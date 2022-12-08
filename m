@@ -2,436 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE3D4647900
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 23:45:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C6BEE6479EB
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 00:29:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230042AbiLHWpg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 17:45:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38556 "EHLO
+        id S229605AbiLHX35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 18:29:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbiLHWpe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 17:45:34 -0500
-Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA3C78BB0
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 14:45:32 -0800 (PST)
-Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-3e45d25de97so31260337b3.6
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 14:45:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4hng1VfGQ3OFYRasuE9ueI1rvZnLW0A5liApM0Pedj0=;
-        b=T8+kN5wBAMJg+qs32fQKCFpkkqoGUVOryGOvKhm1Zgmb4x4gsAzBDSY+KOkgeikfen
-         OGtIlKqN343mBSM6nhT/GdseSTJo4NtWrpQLN+UfarU1MYQyRHoj6pGDAmqptvZ3EBeB
-         Bp6m0XE9yMujSX6MIK8zsC8VyQ8YvAR3AHIpXieaBUtTtmbLkBaIkRo1ebYgfE4B5FuQ
-         7fKVInZ/jcfOIGQUPsb2/cLQks6f349U5T3bG7nc0ktF0q38VUJaHmBZieYGqPLTupNT
-         R2T6JyXmQb8hJuHWXr6ey4/esc0V8Y3BQ130xSIFEysilCIoJ23Ui0cCh70FuYL3mhMm
-         7UVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4hng1VfGQ3OFYRasuE9ueI1rvZnLW0A5liApM0Pedj0=;
-        b=IFwcwS0rA/TVrUqfznTlsSKEZBFtN7hNDxmh7FlnrjWkYB7baiveDyhrojsgxffPcm
-         7O6Gm8mJDS7BwXAzRQGdEk6bsubHpBOYhfBLQykNw2e5086h3C/O0y3ygL+izb30tm9F
-         7oUtNZU5MY8n6V9cQey+Ps1p5QQ5vzr1iFst/5HaPvNnaMSFNWfR0CcZtV6utrD231Hk
-         fK7PT2CmkN8EDxM0GLv3cIHRXzCQHLC5pza8vodDA2U51mHJ6JvOaOBFSJdnsowoH3/i
-         5kr4iAac+Ai1x6pMovFobQKRonsSbogCihoQ4okgCHMW0i02lLHQgcx2LTtuBijeJs7h
-         QvKw==
-X-Gm-Message-State: ANoB5pkImtLflfxfcni29Sc+igKghIcK+vNG2irRCB2q6T45b3MnNvOm
-        WpALVRSmpCgFIzGHcEJDGBqdkDwGkhL6j9ecpTbOBQ==
-X-Google-Smtp-Source: AA0mqf76cVFrQyHROjizxFGLHHf+hQXQa//OlimyfH9+StrPeuPgXHihp5u4ACkxi2OA0k+yyiszIoo/4MYPGomja/A=
-X-Received: by 2002:a0d:dd8a:0:b0:391:c415:f872 with SMTP id
- g132-20020a0ddd8a000000b00391c415f872mr7483891ywe.318.1670539531335; Thu, 08
- Dec 2022 14:45:31 -0800 (PST)
+        with ESMTP id S229470AbiLHX3z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 18:29:55 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE05F1C127;
+        Thu,  8 Dec 2022 15:29:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1670542195; x=1702078195;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=LCm+Srh/9s924PWn8cPwcmuLZDs+nt1TgjMxs15kI5w=;
+  b=AjvBfI/uPmYTelueAngrIPtKZH/8Tw/27DoIoJ291PDBPSAvUNmwMTCm
+   wrVAMAVLX11s90zqovlj+eeS/zv82FlwyNFXEipv8l5skRqq0gSm6ekMo
+   DzIvzO6HnObPWtbuqQFzt1dVheycOR9RJkEbisxz9zV+J09XNq/KKhyTE
+   Qhq715Nkwae9Y0BeE+K7q7B03UZgHie/2N7x570CGJMnYEbk5UrA1qgiE
+   JJrXvPvr3uN7znSApMraRVvff41fsJsxdY7K6FGTn7TzUYAoIPOG9xYZu
+   mehzZ+SWodz1YsdX+ZzwEIKV51blxhJX3WFur2jh+PFI/vQNuqLq7WjA8
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="319194231"
+X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
+   d="scan'208";a="319194231"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:29:47 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="753796804"
+X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
+   d="scan'208";a="753796804"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga002.fm.intel.com with ESMTP; 08 Dec 2022 15:29:47 -0800
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Thu, 8 Dec 2022 15:29:47 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Thu, 8 Dec 2022 15:29:46 -0800
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Thu, 8 Dec 2022 15:29:46 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Thu, 8 Dec 2022 15:29:46 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AvCj7uqMsml7LqPQ+ps5jpR7SG6ZPN1p24qv7H0FNQOoUOEVX4uhtbvzbVOWVQuwg5IVrWXjEo2+QUa2bfUJoCjHpw7aqu4Xtzn6f3hy0smMVtxKnHYjUNhRirIOWinjdDMwFJvVew+pmWMalPw8AQQDoj2p2wW/k9yTmETErYFGb0sfiChFlRPIPrPhNWj0J4m/3ygTBzqcea2/SdMOPVoFbv8El6QYxAeT3qtexrF4NXil0UbZST1+brVBNFX087Qx+KWZsmC/VgHta5N2bO7kGqJjL426U1k7yB6FQHonPthU0Tn16ybCWfLFQaHWkdhcqzkKMOwg1jkQnXYeVw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LCm+Srh/9s924PWn8cPwcmuLZDs+nt1TgjMxs15kI5w=;
+ b=OHHivDMuqa0kvAFCjAYB0S5ASqWOSbnJ9GDc4vJnp4b9VPdngKq39Tg9ntihuC8nRJjykzSI1pWT7PTfpWbTcdVHnNMCAqsLeSCAAJj6LkpJ3v0q6enFnNrVc3HT5VB3qJN7aznN+1BPI8bBZeoqXuoudRQMQYRSBfhj2RW7hRlhKQ2xvF0BA89BrvSAuXQyjUNxT6LCGcub3nd5F/CeddMvAXlpjMjwKRJWo89TWBsIsOEcH2/YD5qQDtHq5ipxbVusZh39Wr3zlEttfOt3/v5auSXUcjGKFUysP01mD+mwkfbs7KigLlJNDqZZFDdHVMm7o3AJW3M9Zopq6CpVJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by SJ0PR11MB4912.namprd11.prod.outlook.com (2603:10b6:a03:2ae::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Thu, 8 Dec
+ 2022 23:29:37 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::2fb7:be18:a20d:9b6e%8]) with mapi id 15.20.5880.014; Thu, 8 Dec 2022
+ 23:29:37 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v7 11/20] x86/virt/tdx: Add placeholder to construct TDMRs
+ to cover all TDX memory regions
+Thread-Topic: [PATCH v7 11/20] x86/virt/tdx: Add placeholder to construct
+ TDMRs to cover all TDX memory regions
+Thread-Index: AQHY/T3ORWilVlKW4kyc0A5kdGk0eq5NGDiAgADmkYCABotngIAAaI+AgAAB1QCAAAiegIANa7YAgAGleYCAACIbgIAAjuYA
+Date:   Thu, 8 Dec 2022 23:29:37 +0000
+Message-ID: <cc195eb6499cf021b4ce2e937200571915bfe66f.camel@intel.com>
+References: <cover.1668988357.git.kai.huang@intel.com>
+         <32c1968fe34c8cf3cb834e3a9966cd2a201efc5b.1668988357.git.kai.huang@intel.com>
+         <6d4d429a-ade2-771d-0e4c-788bef45041a@intel.com>
+         <35aee96c1bb56322191ae442f3928d7dff064a92.camel@intel.com>
+         <9a653cd2-70df-8c55-ac7d-5ddcb3b18b0c@intel.com>
+         <60deb2ffe15e71bc91727aa04298c79f21a58c83.camel@intel.com>
+         <e49829fc-e488-3a65-b6fd-f02e964bdb4a@intel.com>
+         <02d2a49cbd319814a7afdf57ca3cc9809123952a.camel@intel.com>
+         <98935273b05feb55fc52c69a48d31018e0124e58.camel@intel.com>
+         <702c11db9820a074aee31c2958a565b21299607f.camel@intel.com>
+         <d04b3a83-5797-b061-f315-07f84278d961@intel.com>
+In-Reply-To: <d04b3a83-5797-b061-f315-07f84278d961@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SJ0PR11MB4912:EE_
+x-ms-office365-filtering-correlation-id: 197edd0b-b4b8-40c5-7a87-08dad9741256
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: SOY9Kr7hmcEluOU4PvrcPBHOasvKvvIfcVayWKq7f5SBm03TQE4r0CKMUIjw2Yrlk6TFTetuVuonvi6okeL+Buvmx01ufCyHUQeTFwcShPQLGBFoupHQwkmn6p0NiDlViUB7TdeMQan1kU3SpEoelc3GRA7pYmqYKwxjzDjOWrqCrLDEH212Ri/LHrxOfKyqZYvRxEm1hhFEoTT14GOd37MyxCy+zfQNtoIma6H/QMybFuk8RqJJFoX4zUr3+b05E3np4hjGw5zsAdelsUaJaZ1EEPVMoWr5/fCbuu4gEwY+dOt+iqLR+ERvCOcRXNUIn1e8ACaFbxqockY2W27UgUAy+RARHIcuy8CXR72UPDf2R7nVNjH8grOSxIR+EUob7RNAT/6XhpNEsKmVt+A+rePiBrbM1IQSZeMYs1ivSJdBMio24ieWES8nXBQkhCTlZRLRHnPryhmRUwyvhfnTuHI+RrbsnCHaFzbTa0L7xrl6IAqNPsbqxkZusoXP/fAnFiESz0JYaENV/uWJLR73aotkFBe0EldjoQRbICcsWS5WT+3/gDax6YCtxtAtOORDtf3UnLfK8WatUC0WHcFo7msnqyZGVrW+4hISu3XumSWUJiTvGsEfEXTuU2FWQjMDpwjCBWWaBfi7Ftuem1Hs/zJK7LtqICX4F2zB+LtvJUKyuSAfNftLk6LEgZO9ZrhyTpdDRQzvS1Xi3ZXMzFlt5Q==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(396003)(376002)(366004)(346002)(39860400002)(451199015)(71200400001)(122000001)(478600001)(83380400001)(7416002)(8936002)(86362001)(2906002)(38100700002)(38070700005)(5660300002)(4326008)(41300700001)(64756008)(8676002)(53546011)(66476007)(26005)(6512007)(186003)(91956017)(6506007)(66556008)(82960400001)(110136005)(2616005)(66946007)(66446008)(316002)(76116006)(6486002)(54906003)(36756003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V0UwQmYvbSs5aVp5V3VTUmNzRGlyRk5EQjBlVWxxakQzdGZKSnBqRytXN2RK?=
+ =?utf-8?B?SGFjWGZoZzdQV3Bxb2NJVUxMcXlnb2R1WXA2K21YR0l4UEJNTWVOSzAzRFN6?=
+ =?utf-8?B?VjVpaTdweFM5M0RaZzRmYlNCV0o2RjY4RlBrL0s1UU1SdmZmbll4dzFURFJ5?=
+ =?utf-8?B?cDNhNnJ4SU1PNTlON1RhMk9KdjZFQzc2UWtvTDFBc2VneGM3K2FQN0wzZUZr?=
+ =?utf-8?B?dUNCc2ZEblg4UlgvSDR2NUsrL3p2dXZoQVJsQ0lwRUYvazZTZEtBQk0vMTF6?=
+ =?utf-8?B?M0JTcDU1N1ZJS2J2RTR6MS9zelFkY1IxTXhLSkhQTlRXTHMrSlR2a1gzNmFI?=
+ =?utf-8?B?OVRPaHNwZlpFMXBnS3RzMHR3MnhNcHFaWWErM1NCNlZZdFdFa2M5eVBqSUdh?=
+ =?utf-8?B?MVlrYnI1VnhXR0M5QlJ2RzFLdVdkejdYeW42T3h5NktFR3hRQklNRE96MWdI?=
+ =?utf-8?B?UHhLRklhRmRPeld5cUJUdXE1dTFnMldFOHZVb3NTbTVsNnA1eVZMOVh1U0hN?=
+ =?utf-8?B?SnlZVEpSb0lpTVAwNHN1R2VQNGlCOUk1czZoWWJKV2VMOGJtd3BkRTN1NXpI?=
+ =?utf-8?B?L0lkZnhLeVI2SG52R2U3Rm94c2tvYXJSUE5tU1NjbEhCbDJiVjVicllZY3du?=
+ =?utf-8?B?dmdicHk3cTlXMFJEYmxzUTFxRWFVSkZVd0JJWVF1RGRjcHhVek9HZ1ZMZWQ4?=
+ =?utf-8?B?cHhxM2ZNbjJWN2d5cnkwc1JZZzRBQ3V3OEhUSDg1ZUVrTVZtNndkbTJ0ekNw?=
+ =?utf-8?B?UXhURnpmY292MlF0VmpTbi9hNEJSbXVQbmg2alVnRGJzZlFkUVBnNmFzTGZo?=
+ =?utf-8?B?bkNZb1p2NVcwRk5hOWx6Zk1XaDBZNG9BdlVvSzBpTmRmS3Z6a00yaGQ4c2pL?=
+ =?utf-8?B?Qmw2OUVvRmV0MlJiWGtUNE9nb2RzZ3YyS01ieUN2ajZTMjNHWDNpcDgxZVdP?=
+ =?utf-8?B?cCszR2gzZW1EMXJ4clNLd01ONTl4NTM4Y2dNRW9Gc3lPRjVYS3NWT0hhejh3?=
+ =?utf-8?B?UFkzYzRqVkpVeS9SblM2K1F3L3BIYzRvY1cxWXN5dlplZWphVXNOOUFwYy8x?=
+ =?utf-8?B?Rm8rclRvYzJwV1RNZHhJYVV1ZExjKzNuSm5ZL2svMkpINUtGUExpUFBDOFdV?=
+ =?utf-8?B?b1VHMExHT05WYkt5VitEbmZNaU9jTm5SckJmWTBBb2VHaVZoTFB2NDRwYkww?=
+ =?utf-8?B?bXBwRDFKaHlpbmdjelRmalBTRTZGanhxOVNDTzlEQWhJTncranA1Ry9URUE0?=
+ =?utf-8?B?T1pkR0dwelZqY2tYVVlPTytPNWJXejZIanhBS2dyTDg1czZZNkZ3MDBEOHlL?=
+ =?utf-8?B?Mmp3Q1lEQ3hFMlZiTVlneTRRdkcrVjQ0dGg5YkFZbDF6L1R2WUZuRWMzemtJ?=
+ =?utf-8?B?VExOYUNEejlyYVliK2xneXRaUVBTQjh3YURsWWZJSkFsRGJSWVV1KzVjQ3Qz?=
+ =?utf-8?B?NGh0NWppeU1KckptNDRQSkFYbVZrMkRYTUdVZStoRzRNME5IbUNlanJSSExn?=
+ =?utf-8?B?MTJDMktRSWJhS0pXVlF3dXRaMm1IVUVKUzRlTjhYWjV1dE54dks5d0NIYVFV?=
+ =?utf-8?B?YWswN3BLeEJ5aTRZcTd5T253QjFjaHZUZWdCWVF1UG5HOTNRZUV5UklqYmlt?=
+ =?utf-8?B?d3JZSFIyZDJUK01aK2JJTWZ3TE9PQUEwTm13dUdjcVZpMC85d0dvcUYraTNp?=
+ =?utf-8?B?T0Z2S0o5OTI4TGs4cVlKSXZmK1Y3d1FCNWJEMGM5Vy9hdHI5MmlSVXJ2VFVC?=
+ =?utf-8?B?dnRjamZWVlUxWXlENklIOHkzUUtzSlFOWkRlVGVlOUZhdThrVnFZR3VnaDh4?=
+ =?utf-8?B?aXNCcmRXUzNKdlhuZHc3cVhIQ3gvT1BXVXNERGpIcHhXQ0R1TlArRzhDWmVq?=
+ =?utf-8?B?V3RISE9ORXM4SGlXS1hwODk2dE5DN2lkRXZnYWVuc21sM0NBZ0p0a2tyeDQ3?=
+ =?utf-8?B?Z3E3WDZmNFFxUkR3RG9tS2NHQlcwaDM3WG94dVNaQlNpQWFOUWRVOWtLNlhp?=
+ =?utf-8?B?ZTlFdmJQRmM5QnUvWFJSb0V1dXhaZWMyOWF6OEdKUWtQUVpNNWc1VlRpOTFF?=
+ =?utf-8?B?MlpKZjFUUUg0V0t1ZVArdW9ZdFp6WXo0eTZLcUZSYnJFY0MzaGc2Y0ZNalNX?=
+ =?utf-8?B?WVhoSEIyZHYvcXdFclBjVzVDMG5VK3ZTRmVZQ0tNN21JdTE1L2xwVjFoQk5l?=
+ =?utf-8?B?K3c9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <525AEB815DADD34799DC9EA6FA8EEB33@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20221201195718.1409782-1-vipinsh@google.com> <20221201195718.1409782-2-vipinsh@google.com>
- <CANgfPd_sZoW6gRNgs44BbBu4RhwqNPjUO-=biJ++L5d8LpU3zg@mail.gmail.com>
- <Y4481WPLstNidb9X@google.com> <CANgfPd_Ya0TeSBp5ipseA3fT1C0L3NPGSaZ=0ACjyKa_PvrZxA@mail.gmail.com>
- <Y45dldZnI6OIf+a5@google.com>
-In-Reply-To: <Y45dldZnI6OIf+a5@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Thu, 8 Dec 2022 14:44:55 -0800
-Message-ID: <CAHVum0cjqsdG2NEjRF3ZRtUY2t2=Tb9H4OyOz9wpmsrN--Sjhg@mail.gmail.com>
-Subject: Re: [Patch v2 1/2] KVM: x86/mmu: Allocate page table pages on TDP
- splits during dirty log enable on the underlying page's numa node
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, dmatlack@google.com,
-        pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 197edd0b-b4b8-40c5-7a87-08dad9741256
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Dec 2022 23:29:37.2812
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +kQTVzMsDPsl0by4ZL8NIBU+8gIYTjB7PHVV8LthNuSCJ/ScLszmZeIwRrKcr7xuwwN8AKa2n9yf5lTik6RV2Q==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4912
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 5, 2022 at 1:07 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Dec 05, 2022, Ben Gardon wrote:
-> > On Mon, Dec 5, 2022 at 10:47 AM Sean Christopherson <seanjc@google.com> wrote:
-> > > > > +static bool __read_mostly numa_aware_pagetable = true;
-> > > > > +module_param_named(numa_aware_pagetable, numa_aware_pagetable, bool, 0644);
-> > > > > +
-> > > >
-> > > > I'm usually all for having module params to control things, but in
-> > > > this case I don't think it provides much value because whether this
-> > > > NUMA optimization is useful or not is going to depend more on VM size
-> > > > and workload than anything else. If we wanted to make this
-> > > > configurable, a VM capability would probably be a better mechanism so
-> > > > that userspace could leave it off when running small,
-> > > > non-performance-sensitive VMs
-> > >
-> > > Would we actually want to turn it off in this case?  IIUC, @nid is just the
-> > > preferred node, i.e. failure to allocate for the preferred @nid will result in
-> > > falling back to other nodes, not outright failure.  So the pathological worst
-> > > case scenario would be that for a system with VMs that don't care about performance,
-> > > all of a nodes memory is allocated due to all VMs starting on that node.
-> > >
-> > > On the flip side, if a system had a mix of VM shapes, I think we'd want even the
-> > > performance insensitive VMs to be NUMA aware so that they can be sequestered on
-> > > their own node(s), i.e. don't "steal" memory from the VMs that are performance
-> > > sensitive and have been affined to a single node.
-> >
-> > Yeah, the only reason to turn it off would be to save memory. As a
-> > strawman, if you had 100 1-vCPU VMs on a 2 node system, you'd have
-> > 4000 pages allocated in caches, doing nothing.
->
-
-I will keep it as a module parameter for now as Sean noted we don't
-want insensitive VMs to impact the performance sensitive VMs. Also, as
-noted below, changing shrinker behaviour to free cache will allow to
-reclaim memory of unused node.
-
-If there is a better reason for using capability let me know we can
-discuss more about it.
-
-> The management of the caches really should be addressed separately, and this is
-> the perfect excuse to finally get some traction on mmu_shrink_scan().
->
-> From a while back[1]:
->
->  : I know we proposed dropping mmu_shrink_scan(), but the more I think about that,
->  : the more I think that an outright drop is wrong.  The real issue is that KVM as
->  : quite literally the dumbest possible "algorithm" for zapping possibly-in-use
->  : shadow pages, and doesn't target the zapping to fit the cgroup that's under
->  : pressure.
->  :
->  : So for this, IMO rather than assume that freeing the caches when any memslot
->  : disables dirty logging, I think it makes sense to initially keep the caches and
->  : only free them at VM destruction.  Then in follow-up patches, if we want, free
->  : the caches in the mmu_shrink_scan(), and/or add a function hook for toggling
->  : eager_page_split to topup/free the caches accordingly.  That gives userspace
->  : explicit control over when the caches are purged, and does the logical thing of
->  : freeing the caches when eager_page_split is disabled.
->
-> The current mmu_shrink_scan() implementation is basically useless.  It's so naive
-> that relying on it to react to memory pressure all but guarantees that guest
-> performance will tank if the shrinker kicks in.  E.g. KVM zaps the oldest pages,
-> which are likely upper level SPTEs and thus most likely to be reused.  And prior
-> to the TDP MMU, a guest running nested VMs would more than likely zap L1's SPTEs
-> even if the majority of shadow pages were allocated for L2.
->
-> And as pointed out in the RFC to drop shrinker support entirely[1], for well over
-> a decade KVM zapped a single page in each call from the shrinker, i.e. it was
-> _really_ useless.  And although in [1] I said adding memcg would be easy, doing
-> so in a performant way would be quite difficult as the per-cpu counter would need
-> to be made memcg aware (didn't think about that before).
->
-> Lastly, given that I completely broke the shrink logic for ~6 months and someone
-> only noticed when n_max_mmu_pages kicked in (commit 8fc517267fb2 "KVM: x86: Zap
-> the oldest MMU pages, not the newest"), I highly doubt anyone is relying on the
-> current shrinker logic, i.e. KVM_SET_NR_MMU_PAGES is used for setups that actually
-> need to limit the number of MMU pages beyond KVM's default.
->
-> My vote is to do something like the below: repurpose KVM's shrinker integration
-> to only purge the shadow page caches.  That can be done with almost no impact on
-> guest performance, e.g. with a dedicated spinlock, reclaiming from the caches
-> wouldn't even need to kick the vCPU.  Supporting reclaim of the caches would allow
-> us to change the cache capacity and/or behavior without having to worry too much
-> about exploding memory, and would make KVM's shrinker support actually usable.
->
-> [1] https://lore.kernel.org/all/YqzRGj6ryBZfGBSl@google.com
-> [2] https://lore.kernel.org/all/20220503221357.943536-1-vipinsh@google.com
->
-
-As discussed offline.
-1. I will create a patch in this series which changes the behaviour of
-shrinker by freeing the cache.
-
-2. One suggestion came up was to fill the cache of the correct node
-only in the topup stage by using the PFN after kvm_faulin_pfn(). We
-decided it is not good because mmu_topup_memory_cache() cannot be
-called after kvm_faultin_pf() as topup will increase the time between
-reading the mmu_invalidate_seq and checking it in
-is_page_fault_stale() which will increase chances of retrying page
-fault and reducing the guest performance.
-
-3. I will reduce the cache size and try to see if there is any impact observed.
-
-> ---
->  arch/x86/include/asm/kvm_host.h |   2 +
->  arch/x86/kvm/mmu/mmu.c          | 131 ++++++++++++++++----------------
->  2 files changed, 69 insertions(+), 64 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 283cbb83d6ae..f123bd985e1a 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -786,6 +786,8 @@ struct kvm_vcpu_arch {
->         struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
->         struct kvm_mmu_memory_cache mmu_page_header_cache;
->
-> +       spinlock_t mmu_shadow_page_cache_lock;
-> +
->         /*
->          * QEMU userspace and the guest each have their own FPU state.
->          * In vcpu_run, we switch between the user and guest FPU contexts.
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4736d7849c60..fca74cb1f2ce 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -157,7 +157,12 @@ struct kvm_shadow_walk_iterator {
->
->  static struct kmem_cache *pte_list_desc_cache;
->  struct kmem_cache *mmu_page_header_cache;
-> -static struct percpu_counter kvm_total_used_mmu_pages;
-> +
-> +/*
-> + * The total number of allocated, unused MMU pages, i.e. the total number of
-> + * unused pages sitting in kvm_mmu_memory_cache structures.
-> + */
-> +static struct percpu_counter kvm_total_unused_mmu_pages;
->
->  static void mmu_spte_set(u64 *sptep, u64 spte);
->
-> @@ -643,6 +648,23 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
->         }
->  }
->
-> +static int kvm_mmu_topup_sp_cache(struct kvm_vcpu *vcpu)
-> +{
-> +       struct kvm_mmu_memory_cache *cache = &vcpu->arch.mmu_shadow_page_cache;
-> +       int orig_nobjs = cache->nobjs;
-> +       int r;
-> +
-> +       spin_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
-> +       r = kvm_mmu_topup_memory_cache(cache, PT64_ROOT_MAX_LEVEL);
-> +
-> +       if (cache->nobjs != orig_nobjs)
-> +               percpu_counter_add(&kvm_total_unused_mmu_pages,
-> +                                  cache->nobjs - orig_nobjs);
-> +       spin_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
-> +
-> +       return r;
-> +}
-> +
->  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
->  {
->         int r;
-> @@ -652,10 +674,11 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
->                                        1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
->         if (r)
->                 return r;
-> -       r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-> -                                      PT64_ROOT_MAX_LEVEL);
-> +
-> +       r = kvm_mmu_topup_sp_cache(vcpu);
->         if (r)
->                 return r;
-> +
->         if (maybe_indirect) {
->                 r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadowed_info_cache,
->                                                PT64_ROOT_MAX_LEVEL);
-> @@ -1681,28 +1704,23 @@ static int is_empty_shadow_page(u64 *spt)
->  }
->  #endif
->
-> -/*
-> - * This value is the sum of all of the kvm instances's
-> - * kvm->arch.n_used_mmu_pages values.  We need a global,
-> - * aggregate version in order to make the slab shrinker
-> - * faster
-> - */
-> -static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
-> -{
-> -       kvm->arch.n_used_mmu_pages += nr;
-> -       percpu_counter_add(&kvm_total_used_mmu_pages, nr);
-> -}
-> -
->  static void kvm_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
-> -       kvm_mod_used_mmu_pages(kvm, +1);
-> +       kvm->arch.n_used_mmu_pages++;
->         kvm_account_pgtable_pages((void *)sp->spt, +1);
-> +
-> +       percpu_counter_dec(&kvm_total_unused_mmu_pages);
->  }
->
->  static void kvm_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
->  {
-> -       kvm_mod_used_mmu_pages(kvm, -1);
-> +       kvm->arch.n_used_mmu_pages--;
->         kvm_account_pgtable_pages((void *)sp->spt, -1);
-> +
-> +       /*
-> +        * KVM doesn't put freed pages back into the cache, thus freeing a page
-> +        * doesn't affect the number of unused MMU pages.
-> +        */
->  }
->
->  static void kvm_mmu_free_shadow_page(struct kvm_mmu_page *sp)
-> @@ -5859,6 +5877,7 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
->         vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
->
->         vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
-> +       spin_lock_init(&vcpu->arch.mmu_shadow_page_cache_lock);
->
->         vcpu->arch.mmu = &vcpu->arch.root_mmu;
->         vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
-> @@ -5994,11 +6013,6 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
->                 kvm_tdp_mmu_zap_invalidated_roots(kvm);
->  }
->
-> -static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
-> -{
-> -       return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
-> -}
-> -
->  static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
->                         struct kvm_memory_slot *slot,
->                         struct kvm_page_track_notifier_node *node)
-> @@ -6583,69 +6597,58 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
->         }
->  }
->
-> -static unsigned long
-> -mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
-> +static unsigned long mmu_shrink_scan(struct shrinker *shrink,
-> +                                    struct shrink_control *sc)
->  {
-> +       struct kvm_mmu_memory_cache *cache;
-> +       struct kvm_vcpu *vcpu;
->         struct kvm *kvm;
-> -       int nr_to_scan = sc->nr_to_scan;
->         unsigned long freed = 0;
-> +       unsigned long i;
->
->         mutex_lock(&kvm_lock);
->
->         list_for_each_entry(kvm, &vm_list, vm_list) {
-> -               int idx;
-> -               LIST_HEAD(invalid_list);
-> +               kvm_for_each_vcpu(i, vcpu, kvm) {
-> +                       cache = &vcpu->arch.mmu_shadow_page_cache;
->
-> -               /*
-> -                * Never scan more than sc->nr_to_scan VM instances.
-> -                * Will not hit this condition practically since we do not try
-> -                * to shrink more than one VM and it is very unlikely to see
-> -                * !n_used_mmu_pages so many times.
-> -                */
-> -               if (!nr_to_scan--)
-> -                       break;
-> -               /*
-> -                * n_used_mmu_pages is accessed without holding kvm->mmu_lock
-> -                * here. We may skip a VM instance errorneosly, but we do not
-> -                * want to shrink a VM that only started to populate its MMU
-> -                * anyway.
-> -                */
-> -               if (!kvm->arch.n_used_mmu_pages &&
-> -                   !kvm_has_zapped_obsolete_pages(kvm))
-> -                       continue;
-> +                       if (!READ_ONCE(cache->nobjs))
-> +                               continue;
->
-> -               idx = srcu_read_lock(&kvm->srcu);
-> -               write_lock(&kvm->mmu_lock);
-> -
-> -               if (kvm_has_zapped_obsolete_pages(kvm)) {
-> -                       kvm_mmu_commit_zap_page(kvm,
-> -                             &kvm->arch.zapped_obsolete_pages);
-> -                       goto unlock;
-> +                       spin_lock(&vcpu->arch.mmu_shadow_page_cache_lock);
-> +                       while (cache->nobjs) {
-> +                               free_page((unsigned long)cache->objects[--cache->nobjs]);
-> +                               ++freed;
-> +                       }
-> +                       spin_unlock(&vcpu->arch.mmu_shadow_page_cache_lock);
->                 }
->
-> -               freed = kvm_mmu_zap_oldest_mmu_pages(kvm, sc->nr_to_scan);
-> -
-> -unlock:
-> -               write_unlock(&kvm->mmu_lock);
-> -               srcu_read_unlock(&kvm->srcu, idx);
-> -
->                 /*
->                  * unfair on small ones
->                  * per-vm shrinkers cry out
->                  * sadness comes quickly
->                  */
->                 list_move_tail(&kvm->vm_list, &vm_list);
-> -               break;
-> +
-> +               /*
-> +                * Process all vCPUs before checking if enough pages have been
-> +                * freed as a very naive way of providing fairness, e.g. to
-> +                * avoid starving a single vCPU.
-> +                */
-> +               if (freed >= sc->nr_to_scan)
-> +                       break;
->         }
->
->         mutex_unlock(&kvm_lock);
-> +
-> +       sc->nr_scanned = freed;
->         return freed;
->  }
->
-> -static unsigned long
-> -mmu_shrink_count(struct shrinker *shrink, struct shrink_control *sc)
-> +static unsigned long mmu_shrink_count(struct shrinker *shrink,
-> +                                     struct shrink_control *sc)
->  {
-> -       return percpu_counter_read_positive(&kvm_total_used_mmu_pages);
-> +       return percpu_counter_read_positive(&kvm_total_unused_mmu_pages);
->  }
->
->  static struct shrinker mmu_shrinker = {
-> @@ -6753,7 +6756,7 @@ int kvm_mmu_vendor_module_init(void)
->         if (!mmu_page_header_cache)
->                 goto out;
->
-> -       if (percpu_counter_init(&kvm_total_used_mmu_pages, 0, GFP_KERNEL))
-> +       if (percpu_counter_init(&kvm_total_unused_mmu_pages, 0, GFP_KERNEL))
->                 goto out;
->
->         ret = register_shrinker(&mmu_shrinker, "x86-mmu");
-> @@ -6763,7 +6766,7 @@ int kvm_mmu_vendor_module_init(void)
->         return 0;
->
->  out_shrinker:
-> -       percpu_counter_destroy(&kvm_total_used_mmu_pages);
-> +       percpu_counter_destroy(&kvm_total_unused_mmu_pages);
->  out:
->         mmu_destroy_caches();
->         return ret;
-> @@ -6780,7 +6783,7 @@ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
->  void kvm_mmu_vendor_module_exit(void)
->  {
->         mmu_destroy_caches();
-> -       percpu_counter_destroy(&kvm_total_used_mmu_pages);
-> +       percpu_counter_destroy(&kvm_total_unused_mmu_pages);
->         unregister_shrinker(&mmu_shrinker);
->  }
->
->
-> base-commit: d709db0a0c05a6a2973655ed88690d4d43128d60
-> --
+T24gVGh1LCAyMDIyLTEyLTA4IGF0IDA2OjU4IC0wODAwLCBEYXZlIEhhbnNlbiB3cm90ZToNCj4g
+T24gMTIvOC8yMiAwNDo1NiwgSHVhbmcsIEthaSB3cm90ZToNCj4gPiBJIGhhdmVuJ3QgbG9va2Vk
+IGludG8gdGhlIHJlYXNvbiB5ZXQgYnV0IEkgc3VzcGVjdCB0aGUgYWRkcmVzcyBpc24ndCBhbGln
+bmVkIChJDQo+ID4gdXNlZCBfX3BhKCkgdG8gZ2V0IHRoZSBwaHlzaWNhbCBhZGRyZXNzKS4gIEkn
+bGwgdGFrZSBhIGxvb2sgYW5kIHJlcG9ydCBiYWNrLg0KPiA+IA0KPiA+IEluIHRoZSBtZWFudGlt
+ZSwgZG8geW91IGhhdmUgYW55IGNvbW1lbnRzPyAgU2hvdWxkIEkgc3RpbGwgcHVyc3VlIHRvIGtl
+ZXAgdGhlbQ0KPiA+IGFzIGxvY2FsIHZhcmlhYmxlIG9uIHRoZSBzdGFjaz8NCj4gDQo+IFllcywg
+eW91IHNob3VsZCBpbnZlc3RpZ2F0ZSB0aGUgcmVhc29uIGZvciB0aGUgZmFpbHVyZSBhbmQgdHJ5
+IHRvDQo+IHVuZGVyc3RhbmQgYm90aCB0aGUgc3VjY2VzcyBhbmQgdGhlIGZhaWx1cmUgY2FzZXMu
+DQoNCkhpIERhdmUsDQoNCkxlYXJuZWQgc29tZXRoaW5nIG5ldyBmcm9tIEtpcmlsbCB0b2RheS4N
+Cg0KVGhlIHJlYXNvbiBpcyBub3QgdGhlIGFsaWdubWVudCwgYnV0IGl0J3Mgd3JvbmcgdG8gdXNl
+IF9fcGEoKSB0byBnZXQgdGhlDQpwaHlzaWNhbCBhZGRyZXNzIG9mIGZ1bmN0aW9uIGxvY2FsIHZh
+cmlhYmxlIG9uIHRoZSBzdGFjay4gIEl0IGlzIGJlY2F1c2UgS2lyaWxsDQp0b2xkIG1lIGtlcm5l
+bCBzdGFjayBjYW4gbm93IGJlIGFsbG9jYXRlZCB2aWEgdm1hbGxvYygpLCBzbyB1c2UgX19wYSgp
+IHdvbid0DQp3b3JrLg0KDQpJIGNoYW5nZWQgdG8gdXNlIHNsb3dfdmlydF90b19waHlzKCkgYW5k
+IHRyaWVkIGluIG15IHRlc3RpbmcgYW5kIGl0IG5vdyB3b3Jrcy4NCg0KU28gSSdsbCBjaGFuZ2Ug
+dG8gdXNlIHNsb3dfdmlydF90b19waHlzKCkgZm9yIHRoZSBuZXh0IHZlcnNpb24uICBXZSBjYW4g
+dGFrZSBhDQpsb29rIGF0IHRoZSBuZXcgdmVyc2lvbiB0byBzZWUgaWYgdGhhdCBpcyB3aGF0IHlv
+dSB3YW50ZWQuDQoNClRoYW5rcyBmb3IgeW91ciB0aW1lLg0KDQo=
