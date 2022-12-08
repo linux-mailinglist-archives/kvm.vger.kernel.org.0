@@ -2,113 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA31D647519
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 18:46:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 150E2647525
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 18:50:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbiLHRqt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 12:46:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52420 "EHLO
+        id S229847AbiLHRur (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 12:50:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbiLHRqr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 12:46:47 -0500
-Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 132194AF01
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 09:46:47 -0800 (PST)
-Received: by mail-qv1-xf2f.google.com with SMTP id i12so1447859qvs.2
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 09:46:47 -0800 (PST)
+        with ESMTP id S229972AbiLHRum (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 12:50:42 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D777A56E9
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 09:50:35 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id n7so1689519wms.3
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 09:50:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MRpyRZB5lBy9Z1nD/Uad3RYOUJ/MTGJPnzvr8/Vm5uI=;
-        b=ESBDWM8vPxtgr0nr0o6lcF9+PB9miEv4jP5ZbHa9Fs4cD791ArcSEB/rv6kNCjl6JG
-         14IB+pF+tNDqwEE4xq+Fx9hzWD6Xwh502EUecP57/tIeDIhGKdmYbXMBAIwMmjgP5dCt
-         E/rCF31HpP5qBmQzs4Loj/+3bP75Kqhal2oeK507liTIE9NN9hCfRfiwjoEMrBZrZk28
-         +NtHenpHSaYyRbU8aKsQzo6gTDSPYg6/DPt8/dfMELEHyMy5TQszDsqndG6G2Qd/SmCI
-         lyE2GM+FsLgciqjMnEWop0qOa4iCkwtFUKlJTBAge97HtwnppZQYPCrZT0Y4mNJgZ0J2
-         F6/A==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=HcHEfoIgvQqzqdjIyO/o0yadEeMiUClkoqNRl4GZils=;
+        b=DeT+cgArGsVoEBJmKsU2RBwdHKFXTtpobl7x8BEhCc1r77ieUhoA9UsMIsyET9Dawf
+         Ggac+66EKkHXBo48iGQKlNCE4+UXU0BTTRr3CmYrokZPwfUVaE39eMX0D23ACVlvsho3
+         qyadbda5NSqr7j0Z4UvhE5bV2J0BaSqzOrxS7pCJ4xFgdJdnMIBgOOmO8iGVc0PwEtC2
+         hDNdn0dQX1dYe9iEq+GcmuW6U3fTmgx4+7b89xu5h/CXyHVY+rkyZOXjkd2TBn2UCcKr
+         UlSGlYgb2GofIjV92hTfttO7uDTWWLayr58XWmXF60zv8iK27L/MtHjcjOd6UOt13zTY
+         B/fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MRpyRZB5lBy9Z1nD/Uad3RYOUJ/MTGJPnzvr8/Vm5uI=;
-        b=cyOxAAJPXrTGBrMxm0JMLF/qWi/7l1nG4Bjlumb3jYH/gi9gDToKqTrshXYTdQpim8
-         rIXBj5ea9345RRDjYSqiDw8vOZi64U8bowzCmgotdQta7XQ1TmKDNshOZlTx9EiADCgx
-         YcPAm6wOAWLBYjYnk3oZACUFXHA3jhfuXduSCPKmH1XKdZJQnxi5lKQWoNxrSjTcv5e1
-         Qq9WF1tlq0lF4hphD0fZNZDuA63LrwMxePnkAveUDCrhDF/ieI3SvE53tUZiAbB1+8kF
-         xBhvH4yUNfkgzdN8KLrEDEyMVfPA5s3hVFM5DBsgct0t2lzrFQDa22V/UpcGAAGLuMZ/
-         6EJA==
-X-Gm-Message-State: ANoB5pkaRnXvgUepEvQjOTi5wnhOt6LQ+449EBcPNDCu6iXNmPoHiKWt
-        CiLRQKbXQrwn84a+C8xg6HOntA==
-X-Google-Smtp-Source: AA0mqf5Aj/5cQw2RBycR0xrfkOuno1mcy2D7sTt5XSqC1DvOpVH+LzxSA2k0oY0cuoZZqKdBSmNaPg==
-X-Received: by 2002:a0c:c589:0:b0:4b1:af4a:5c65 with SMTP id a9-20020a0cc589000000b004b1af4a5c65mr67786961qvj.121.1670521606169;
-        Thu, 08 Dec 2022 09:46:46 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
-        by smtp.gmail.com with ESMTPSA id 134-20020a37088c000000b006ec771d8f89sm6214606qki.112.2022.12.08.09.46.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 09:46:45 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1p3Kyr-006OSG-0Y;
-        Thu, 08 Dec 2022 13:46:45 -0400
-Date:   Thu, 8 Dec 2022 13:46:45 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Steven Sistare <steven.sistare@oracle.com>
-Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH V1 7/8] vfio: change dma owner
-Message-ID: <Y5IjBe+IaQC/eVDh@ziepe.ca>
-References: <1670363753-249738-1-git-send-email-steven.sistare@oracle.com>
- <1670363753-249738-8-git-send-email-steven.sistare@oracle.com>
- <Y5DGPcfxTJGk7IZm@ziepe.ca>
- <0f6d9adb-b5b9-ca52-9723-752c113e97c4@oracle.com>
- <Y5Ibvv9PNMifi0NF@ziepe.ca>
- <542e7894-df8c-8e83-c6db-eeb22d9062fb@oracle.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HcHEfoIgvQqzqdjIyO/o0yadEeMiUClkoqNRl4GZils=;
+        b=ZzNV7oT7RBclWfCDFlgNSnzCBmaN0o6rB6iFJaemfHU2laHMvPneHydAF8ZQMsFwt2
+         8YSbpSzu9rjYZD4mTl6biGEMnCeyJp2Vu8N5TqkvcVEuMWdURB/WUDJHjBP368kp8yBn
+         bGr3HClJZ8aU9S+COOeGhYmiSi1gKMzw9YQstzyC++4CikslKqWgieYLz+pHXQ3Uz2cc
+         iTFPDmLA4XqHaKIkZN1upQJS7qCxxswrVxzoEhqi+qbjasH0G/Nte9RF10xWR+jn22bW
+         Y55bpgvsKGJK60/sfv+8qV+ZwhHRE4KcqCy4+iLkH6lqxLlU/ez2E5fx/XwETUfdiEke
+         DV0g==
+X-Gm-Message-State: ANoB5pl/fekXkDeGD/LIFFXesi9czHPs4MRQWF0+EDA5sHKdf8CqCQBB
+        jMz9YAEN3+ogecHwoGzjvPc7OXAvzGhOA+JRbujH39T+3JLDN6Px
+X-Google-Smtp-Source: AA0mqf7g1hT+EVeUzX4ihjsGp/nRfj2r7RdPfa8flvKM7lDsUanEkZ+PvRwGFLAZnaT5o+Arex6LpkuNJxazEx70GCY=
+X-Received: by 2002:a05:600c:3847:b0:3d0:7d89:227e with SMTP id
+ s7-20020a05600c384700b003d07d89227emr22185625wmr.166.1670521833742; Thu, 08
+ Dec 2022 09:50:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <542e7894-df8c-8e83-c6db-eeb22d9062fb@oracle.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com>
+ <Y4qgampvx4lrHDXt@google.com> <Y44NylxprhPn6AoN@x1n> <CALzav=d=N7teRvjQZ1p0fs6i9hjmH7eVppJLMh_Go4TteQqqwg@mail.gmail.com>
+ <Y442dPwu2L6g8zAo@google.com> <CADrL8HV_8=ssHSumpQX5bVm2h2J01swdB=+at8=xLr+KtW79MQ@mail.gmail.com>
+ <Y46VgQRU+do50iuv@google.com> <CADrL8HVM1poR5EYCsghhMMoN2U+FYT6yZr_5hZ8pLZTXpLnu8Q@mail.gmail.com>
+ <Y4+DVdq1Pj3k4Nyz@google.com> <CADrL8HVftX-B+oHLbjnJCret01yjUpOjQfmHdDa7mYkMenOa+A@mail.gmail.com>
+ <CALzav=cyPgsYPZfxsUFMBJ1j33LHxfSY-Bj0ttZqjozDm745Nw@mail.gmail.com>
+In-Reply-To: <CALzav=cyPgsYPZfxsUFMBJ1j33LHxfSY-Bj0ttZqjozDm745Nw@mail.gmail.com>
+From:   James Houghton <jthoughton@google.com>
+Date:   Thu, 8 Dec 2022 12:50:22 -0500
+Message-ID: <CADrL8HV2K=NAGATdRobq8aMJJwRapiF7gxrJovhz7k-Me3ZFuw@mail.gmail.com>
+Subject: Re: [RFC] Improving userfaultfd scalability for live migration
+To:     David Matlack <dmatlack@google.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Peter Xu <peterx@redhat.com>,
+        Andrea Arcangeli <aarcange@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Axel Rasmussen <axelrasmussen@google.com>,
+        Linux MM <linux-mm@kvack.org>, kvm <kvm@vger.kernel.org>,
+        chao.p.peng@linux.intel.com, Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 08, 2022 at 12:39:19PM -0500, Steven Sistare wrote:
-> On 12/8/2022 12:15 PM, Jason Gunthorpe wrote:
-> > On Thu, Dec 08, 2022 at 11:48:08AM -0500, Steven Sistare wrote:
-> > 
-> >>> Anyhow, I came up with this thing. Needs a bit of polishing, the
-> >>> design is a bit odd for performance reasons, and I only compiled it.
-> >>
-> >> Thanks, I'll pull an iommfd development environment together and try it.
-> >> However, it will also need an interface to change vaddr for each dma region.
-> >> In general the vaddr will be different when the memory object is re-mapped 
-> >> after exec.
-> > 
-> > Ahh that is yuky :\
-> > 
-> > So I still like the one shot approach because it has nice error
-> > handling properties, and it lets us use the hacky very expensive "stop
-> > the world" lockng to avoid slowing the fast paths.
-> > 
-> > Passing in a sorted list of old_vaddr,new_vaddr is possibly fine, the
-> > kernel can bsearch it as it goes through all the pages objects.
-> 
-> Sorry, I was imprecise. I meant to say, "it will also need an interface to 
-> change all vaddrs".  Passing an array or list of new vaddrs in a one-shot
-> ioctl.
-> 
-> I hope the "very expensive path" is not horribly slow, as it is in the
-> critical path for guest pause time.  Right now the pause time is less than
-> 100 millisecs.
+On Wed, Dec 7, 2022 at 8:57 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Tue, Dec 6, 2022 at 12:41 PM James Houghton <jthoughton@google.com> wrote:
+> > On Tue, Dec 6, 2022 at 1:01 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > Can you elaborate on what makes it better?  Or maybe generate a list of pros and
+> > > cons?  I can think of (dis)advantages for both approaches, but I haven't identified
+> > > anything that would be a blocking issue for either approach.  Doesn't mean there
+> > > isn't one or more blocking issues, just that I haven't thought of any :-)
+> >
+> > Let's see.... so using no-slow-GUP over no UFFD waiting:
+> > - No need to take mmap_lock in mem fault path.
+> > - Change the relevant __gfn_to_pfn_memslot callers
+> > (kvm_faultin_pfn/user_mem_abort/others?) to set `atomic = true` if the
+> > new CAP is used.
+> > - No need for a new PF_NO_UFFD_WAIT (would be toggled somewhere
+> > in/near kvm_faultin_pfn/user_mem_abort).
+> > - Userspace has to indirectly figure out the state of the page tables
+> > to know what action to take (which introduces some weirdness, like if
+> > anyone MADV_DONTNEEDs some guest memory, we need to know).
+>
+> I'm no expert but I believe a guest access to MADV_DONTNEED'd GFN
+> would just cause a new page to be allocated by the kernel. So I think
+> userspace can still blindly do MADV_POPULATE_WRITE in this case. Were
+> there any other scenarios you had in mind?
 
-I think compared to 1 ioctl per map it is probably notably faster, it
-is just "horribly expensive" to do the ioctl preamble - eg you would
-not want to iterate it.
+MADV_POPULATE_WRITE would drop into handle_userfault() if we're using
+uffd minor faults after we do MADV_DONTNEED. For uffd minor faults, if
+the PTE is none (i.e., completely blank, no swap information or
+anything), then we drop into handle_userfault().
 
-Jason
+I partially take back what I said. We have to be careful about someone
+messing with our page tables no matter which API we choose.
+
+Here is a better description of the weirdness that we have to put up
+with given each choice, with this assumption that, normally, we want
+to UFFDIO_CONTINUE a page exactly once:
+
+- For the no-slow-GUP choice, if someone MADV_DONTNEEDed memory and we
+didn't know about it, we would get stuck in MADV_POPULATE_WRITE. By
+using UFFD_FEATURE_THREAD_ID, we can tell if we got a userfault for a
+thread that is in the middle of a MADV_POPULATE_WRITE, and we can try
+to unblock the thread by doing an extra UFFDIO_CONTINUE.
+
+- For the PF_NO_UFFD_WAIT choice, if someone MADV_DONTNEEDed memory,
+we would just keep trying to start the vCPU without doing anything (we
+assume some other thread has UFFDIO_CONTINUEd for us). This is
+basically the same as if we were stuck in MADV_POPULATE_WRITE, and we
+can try to unblock the thread in a fashion similar to how we would in
+the other case.
+
+So really these approaches have similar requirements for what
+userspace needs to track. So I think I prefer the no-slow-GUP approach
+then.
+
+>
+> > - While userfaultfd is registered (so like during post-copy), any
+> > hva_to_pfn() calls that were resolvable with slow GUP before (without
+> > dropping into handle_userfault()) will now need to be resolved by
+> > userspace manually with a call to MADV_POPULATE_WRITE. This extra trip
+> > to userspace could slow things down.
+>
+> Is there any way to enable fast-gup to identify when a PTE is not
+> present due to userfaultfd specifically without taking the mmap_lock
+> (e.g. using an unused bit in the PTE)? Then we could avoid extra trips
+> to userspace for MADV_POPULATE_WRITE.
+
+To know if you would have dropped into handle_userfault(), you have to
+at least check the VMA flags, so at the moment, no. :(
