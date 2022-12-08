@@ -2,68 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C58F16475CA
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 19:49:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3311D6475E1
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:02:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229928AbiLHStE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 13:49:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57722 "EHLO
+        id S229965AbiLHTCH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 14:02:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229788AbiLHStA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 13:49:00 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 948B08BD15;
-        Thu,  8 Dec 2022 10:48:59 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id h33so1875449pgm.9;
-        Thu, 08 Dec 2022 10:48:59 -0800 (PST)
+        with ESMTP id S229947AbiLHTCG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 14:02:06 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8268DBE7
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:02:02 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id gt4so802000pjb.1
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:02:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=weEZOEnZa0pdtpaJMp87RdmAilln7Cqu31ebVo2xgNk=;
-        b=pxoM8Y0EeyyGqEukVegcbFJYlyBqqzZp2AuYYzAewbIj/3QH1ynhAqG7gDtgZP5SRR
-         JmOqlR55lWyDb2Ygjp/iYvEDaZ9l0l8tNjMlWFgqvXSEi8ZBZbv/twfmxThHRKWffpzV
-         qlBGx2/fR3u72h4d51TG2dT2BIUtsCTMxpZUsqskhDGg1oiJb6vtS+sTDe5rpP9xJVke
-         xlHMOBSSplkyq5y2GTShXVxCgZHeYc11JpbIAZOZpAUIY/3yw0Dw2LX01cDCFMrFtANw
-         N2Fu99eJ1ErO3/kw4Hq3x59SxG67Q4w6UekPH+hdsDoNe4vPcoWFqWBcx083iO+VajsC
-         d42Q==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+qj/hgsudAsSQeQjwLgM7Er96xTBcPfba5POCbUPtwA=;
+        b=OZuydJPyQ7RHibQ69DK8aLxuHXUNvSGO5obZIQv0KYH19XsbkQC1aG0MlCb9PZfWCX
+         WANqzP3qFui9udWh/088tR7qgAyIVZwDGFo6GozIXGCty6MttKLjyVr6Wzvr+QVAH/AF
+         6CxPB1pZJI35PWxIXsUk570n/LIoeqNl0mKpWtUxBSngeOqY8WIEIU+b2qKpqC3mmnRL
+         Dve6GGtJOchEaa/us9OjD0lEqWy44kquFqcZs3uIXXlcOMAgUVCnkwQK7KWcE65oXveM
+         9+OVSAKOLGY8YdAZ+y4D4olEzaD3AMRaIj6tQqRenz46uiGZ8DQ8PpV10U+fjEiVoNcZ
+         6j8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=weEZOEnZa0pdtpaJMp87RdmAilln7Cqu31ebVo2xgNk=;
-        b=3M3iyDGUBWjr5MqIcUP4VMyBC6McKA8TXM9ytuw8+Fj82aronCG27ixqeHWqdiyit5
-         kAkQ6dyrKsW7qQWy1/0BrWQF5NMB64O0/Fe5YG/cwpytrO39HbMZSyQ0dDv3qWQ4bHAS
-         w4CsLI93pMn33Qmc7lfjUvRuopy81R18qecLVVpioj5+KszWhPvV1ZCEwGyuYNrH4069
-         3YjNO3MHp+V0iDSZwm/ZLUputsox/m1Wp/a8p4/K/AhUqXf3eCnT07TUC6+cXtRXAV2W
-         Lhael+g2/hWILY/y+J518iI+SSrn0ZGVNEPuLkNrn3f1+Xfu27jc8gOMniL0BExisaid
-         6S5A==
-X-Gm-Message-State: ANoB5pkJMdR7XGUrTEPnHRRort7Y0DOiiae5swMp4OEs4U57iNz8YubQ
-        psc137n/j3eZlAkgb1a51Uy5OqrFdL2NvSyWdj8=
-X-Google-Smtp-Source: AA0mqf7YsKCYXQfcFSpcyTBM0eDMDVY+aTSsVSAUeUxBWThPcQ3A4H+jN0RQkvzTX7fIRQcxQ2uUTeGOaBi2yDq3+VM=
-X-Received: by 2002:a63:5b64:0:b0:478:ae53:a299 with SMTP id
- l36-20020a635b64000000b00478ae53a299mr17576140pgm.260.1670525339058; Thu, 08
- Dec 2022 10:48:59 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+qj/hgsudAsSQeQjwLgM7Er96xTBcPfba5POCbUPtwA=;
+        b=tgfOVj3w5igDTJwTGFkfprdZooJkSBuUuXD9xQPtZw6mn3HB0acJ+Q98gOrnsjh2bJ
+         2N45pfqeMUR0nxnE/eeBOBH/CA926QzUdPNxF/tawWGLOdTP3q2LiAXWdkIJYM9utn2Q
+         U00a4wQmmJSL8/u4p2LEnz9R1HAPgrKbP+m/jbmMp0w5iP8g5Jimy8xM23Ae1urh/sPL
+         YGYwT/velFtUMLdq+HDHCZzqfZ0tIcR+be6mmK1qwczvnreJfcPQpvqJR48KfZWxAlTW
+         f1VFO+fhO+QI+S1kPow760SCmUigrtWfbeq56Y65Is3I7Ovuzzc6kdXIvLCJCUsXjrA+
+         T12Q==
+X-Gm-Message-State: ANoB5pmuLR/IuSK6JKg4N2VbkVxXZbCLX0lzN4MxuGn1GtlETmRYxgAr
+        xXHhw96GLfKVlTP1ISh8GVHJ1A==
+X-Google-Smtp-Source: AA0mqf4AGgSjtYnu5c8NEL23WDXyqgRNekWyEeU6QVFPhXeyxHMI+VeQ/2t+hiPXrAUk+4iEU+mr5g==
+X-Received: by 2002:a17:902:7402:b0:189:58a8:282 with SMTP id g2-20020a170902740200b0018958a80282mr1565905pll.3.1670526121972;
+        Thu, 08 Dec 2022 11:02:01 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u17-20020a170902e81100b0018996404dd5sm5999822plg.109.2022.12.08.11.02.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Dec 2022 11:02:01 -0800 (PST)
+Date:   Thu, 8 Dec 2022 19:01:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: selftests: Setup ucall after loading program
+ into guest memory
+Message-ID: <Y5I0paok+dvTtrkt@google.com>
+References: <20221207214809.489070-1-oliver.upton@linux.dev>
+ <20221207214809.489070-3-oliver.upton@linux.dev>
+ <Y5EoZ5uwrTF3eSKw@google.com>
+ <Y5EtMWuTaJk9I3Bd@google.com>
+ <Y5EutGSjkRmdItQb@google.com>
+ <Y5Exwzr6Ibmmthl0@google.com>
+ <Y5IxNTKRnacfSsLt@google.com>
 MIME-Version: 1.0
-References: <CANBBZXPWe56VYJtzXdimEnkFgF+A=G15TXrd8Z5kBcUOGgHeRw@mail.gmail.com>
- <20221208165008.GA1547952@bhelgaas> <20221208102527.33917ff9.alex.williamson@redhat.com>
- <CANBBZXPBRr6On_3q0Ac0iQtrV5Bs84=GuHNvLz527T3ohHSuCw@mail.gmail.com> <20221208112133.36efe5ff.alex.williamson@redhat.com>
-In-Reply-To: <20221208112133.36efe5ff.alex.williamson@redhat.com>
-From:   Major Saheb <majosaheb@gmail.com>
-Date:   Fri, 9 Dec 2022 00:18:46 +0530
-Message-ID: <CANBBZXPCvY_ePdOA02NcTc2omM0oEBB5=KWv5LFVD-tWvtE0WA@mail.gmail.com>
-Subject: Re: vfio-pci rejects binding to devices having same pcie vendor id
- and device id
-To:     Alex Williamson <alex.williamson@redhat.com>
-Cc:     Bjorn Helgaas <helgaas@kernel.org>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Zhenzhong Duan <zhenzhong.duan@gmail.com>, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5IxNTKRnacfSsLt@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,62 +86,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sure , I will read the process and try to submit the patch.
-Thanks.
+On Thu, Dec 08, 2022, Ricardo Koller wrote:
+> On Thu, Dec 08, 2022 at 12:37:23AM +0000, Oliver Upton wrote:
+> > On Thu, Dec 08, 2022 at 12:24:20AM +0000, Sean Christopherson wrote:
+> > > > Even still, that's just a kludge to make ucalls work. We have other
+> > > > MMIO devices (GIC distributor, for example) that work by chance since
+> > > > nothing conflicts with the constant GPAs we've selected in the tests.
+> > > > 
+> > > > I'd rather we go down the route of having an address allocator for the
+> > > > for both the VA and PA spaces to provide carveouts at runtime.
+> > > 
+> > > Aren't those two separate issues?  The PA, a.k.a. memslots space, can be solved
+> > > by allocating a dedicated memslot, i.e. doesn't need a carve.  At worst, collisions
+> > > will yield very explicit asserts, which IMO is better than whatever might go wrong
+> > > with a carve out.
+> > 
+> > Perhaps the use of the term 'carveout' wasn't right here.
+> > 
+> > What I'm suggesting is we cannot rely on KVM memslots alone to act as an
+> > allocator for the PA space. KVM can provide devices to the guest that
+> > aren't represented as memslots. If we're trying to fix PA allocations
+> > anyway, why not make it generic enough to suit the needs of things
+> > beyond ucalls?
+> 
+> One extra bit of information: in arm, IO is any access to an address (within
+> bounds) not backed by a memslot. Not the same as x86 where MMIO are writes to
+> read-only memslots.  No idea what other arches do.
 
-On Thu, Dec 8, 2022 at 11:51 PM Alex Williamson
-<alex.williamson@redhat.com> wrote:
->
-> On Thu, 8 Dec 2022 23:25:07 +0530
-> Major Saheb <majosaheb@gmail.com> wrote:
->
-> > Thanks Alex ,
-> > That works for me
-> >
-> > ~$ sudo driverctl --nosave set-override 0000:00:05.0 vfio-pci
-> > ~$ sudo driverctl --nosave set-override 0000:00:06.0 vfio-pci
-> > ~$ sudo driverctl --nosave set-override 0000:00:07.0 vfio-pci
-> > admin@node-1:~$ sudo nvme list
-> > Node                  SN                   Model
-> >              Namespace Usage                      Format           FW
-> > Rev
-> > --------------------- --------------------
-> > ---------------------------------------- ---------
-> > -------------------------- ---------------- --------
-> > /dev/nvme10n1         akqvf2-0_10          QEMU NVMe Ctrl
-> >              1         274.88  GB / 274.88  GB    512   B +  0 B   1.0
-> > /dev/nvme11n1         akqvf2-0_11          QEMU NVMe Ctrl
-> >              1         274.88  GB / 274.88  GB    512   B +  0 B   1.0
-> > /dev/nvme5n1          akqvf2-0_5           QEMU NVMe Ctrl
-> >              1         274.88  GB / 274.88  GB    512   B +  0 B   1.0
-> > /dev/nvme6n1          akqvf2-0_6           QEMU NVMe Ctrl
-> >              1         274.88  GB / 274.88  GB    512   B +  0 B   1.0
-> > /dev/nvme7n1          akqvf2-0_7           QEMU NVMe Ctrl
-> >              1         274.88  GB / 274.88  GB    512   B +  0 B   1.0
-> > /dev/nvme8n1          akqvf2-0_8           QEMU NVMe Ctrl
-> >              1         274.88  GB / 274.88  GB    512   B +  0 B   1.0
-> > /dev/nvme9n1          akqvf2-0_9           QEMU NVMe Ctrl
-> >              1         274.88  GB / 274.88  GB    512   B +  0 B   1.0
-> >
-> > I came across you blogspot after I fired the mail
-> > http://vfio.blogspot.com/2015/05/vfio-gpu-how-to-series-part-3-host.html
-> > Some should update https://docs.kernel.org/driver-api/vfio.html in
-> > public interest , If I knew how to do that I would do it,
->
-> Yes, that documentation is from before the driver_override method was
-> introduced.  There's some non vfio specific documentation of
-> driver_override here:
->
-> https://docs.kernel.org/admin-guide/abi-testing.html?highlight=driver_override#abi-sys-bus-pci-devices-driver-override
->
-> Otherwise, documentation updates gladly accepted.  This documentation
-> is part of the kernel source tree and follows the same process as
-> submitting code changes, outlined here:
->
-> https://docs.kernel.org/process/submitting-patches.html
->
-> The kvm@vger.kernel.org mailing list handles patches for vfio, but
-> please keep me in Cc if you submit something.  Thanks,
->
-> Alex
->
+I don't think that's correct, doesn't this code turn write abort on a RO memslot
+into an io_mem_abort()?  Specifically, the "(write_fault && !writable)" check will
+match, and assuming none the the edge cases in the if-statement fire, KVM will
+send the write down io_mem_abort().
+
+	gfn = fault_ipa >> PAGE_SHIFT;
+	memslot = gfn_to_memslot(vcpu->kvm, gfn);
+	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
+	write_fault = kvm_is_write_fault(vcpu);
+	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
+		/*
+		 * The guest has put either its instructions or its page-tables
+		 * somewhere it shouldn't have. Userspace won't be able to do
+		 * anything about this (there's no syndrome for a start), so
+		 * re-inject the abort back into the guest.
+		 */
+		if (is_iabt) {
+			ret = -ENOEXEC;
+			goto out;
+		}
+
+		if (kvm_vcpu_abt_iss1tw(vcpu)) {
+			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
+			ret = 1;
+			goto out_unlock;
+		}
+
+		/*
+		 * Check for a cache maintenance operation. Since we
+		 * ended-up here, we know it is outside of any memory
+		 * slot. But we can't find out if that is for a device,
+		 * or if the guest is just being stupid. The only thing
+		 * we know for sure is that this range cannot be cached.
+		 *
+		 * So let's assume that the guest is just being
+		 * cautious, and skip the instruction.
+		 */
+		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
+			kvm_incr_pc(vcpu);
+			ret = 1;
+			goto out_unlock;
+		}
+
+		/*
+		 * The IPA is reported as [MAX:12], so we need to
+		 * complement it with the bottom 12 bits from the
+		 * faulting VA. This is always 12 bits, irrespective
+		 * of the page size.
+		 */
+		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
+		ret = io_mem_abort(vcpu, fault_ipa);
+		goto out_unlock;
+	}
