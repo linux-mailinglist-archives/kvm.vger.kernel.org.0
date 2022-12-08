@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 190C9647672
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:39:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F56E647677
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:39:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229834AbiLHTjn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 14:39:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57292 "EHLO
+        id S229815AbiLHTjs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 14:39:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229795AbiLHTjc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 14:39:32 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2340F99F30
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:39:26 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-3bd1ff8fadfso24704487b3.18
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:39:25 -0800 (PST)
+        with ESMTP id S229760AbiLHTjf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 14:39:35 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1DA0A56D6
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:39:27 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id y6-20020a25b9c6000000b006c1c6161716so2533645ybj.8
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:39:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jgO+J07Uxt+qL/UpUVJ8WFrJDihM9AG5kpD8vJwjTTs=;
-        b=QrMj5zLDlUXO+ZJ45hsRtxdfgmeW4IfijEqSAU7FIBqFwathovRwq/mzAGouVficrL
-         gQcJIU9VmUG2hiNERRKbyTP3Lu3VIHMZ2AloTdIYXMt+wMOuMe8kDJQZMRgSvO6lAwNU
-         Y6eBROrQrZ0gTi3qA1W8jY3mdXkghgQbhZG8f+ggIaWBggOtbOEtA4aAL9qoZ6wA6iTL
-         UulvutyuA0lBG+LimgEdM3A93jCX+bLrq+G1CQa39qEIq4rZ4XwAKrU+qa0csJ6wjd9Z
-         9Ua/MZeoHkveM5nl5wYxeuSnKf6S8qPxrJT/LRGNG++VotU8B0SenTfkKWEFNecwApXV
-         JVtQ==
+        bh=T0+hU8k+RyCmVBvBo6qJA+pYHpeWz4BnzaTdktBKy2A=;
+        b=j2HX3lJ7u8ucEzkeGBQfuBx9Yb7N2Qy9oTH39ulAVDzwqd+G0fIW4WjnRqotxR/RTx
+         o/pna9eXTXuMdJmAYL1UVpM36PkT4GZM2h0bpfrNAurm7bBa7yOIol4vLsYL261GeqzA
+         3HOdEsZ41tJib1TeC34Adynr+Edi81xeW1SDkV4CdXiQGoTOGOVJ4WxSxzRqIQRX0/iB
+         RSZpalWLzZZk3q25mDyKyCcOP/lgTKFRKvpNiWk49MLHspz7m3Pd9fzp8sxVKQa7WFIV
+         Cq+v/eIrOgIUSWXVgUqA7VpSfMfnDwSrS/lkhXxrcLWaE6ZViWl/62plvpN2oVhZ91U+
+         +4vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jgO+J07Uxt+qL/UpUVJ8WFrJDihM9AG5kpD8vJwjTTs=;
-        b=nh4VjEe6IO2LepQLLp3u9aCb3tFAH2WL+CmvY4yL/Evi6UlAypF2/4omZ5Wf7RkRaS
-         MI7bB4yt/QkkeeaUHpO/LfgsSQkXRgLP2I970Psbj4eNG20p7M3KAv2JfEeBg30mPZQ9
-         PtD1c5u0n4kpnY0OK0tdBeA1aTFe87avch3XhInPzse+qiEq9AS4YswuDCB6CUwzU8yD
-         t/di1L92Ey4q18D81YL+i+nrx+hSzZrGYCN9wd54MSEJq09peNVOSTSLFDw52Arr2eSY
-         APY/dvUYYlqdgRzPNLKan9Q8QgqxfBUTnhi2z8sZRTQ9RCI8PJC3zsmlDo08xIxLQ0tE
-         E/jg==
-X-Gm-Message-State: ANoB5pmXctZgd9mwciuW4jPsbkrgd/gwkWGJoquTzBazwQldTpM1l4YL
-        2W+cfePGwVlmY06CXUpFJ9wnZVFKKDcMjg==
-X-Google-Smtp-Source: AA0mqf4cuymNRC2hTArY/T3ebCSKh1ZW9fvhwu59cqHtPCYYXp2h3U5rWse1hGwJtXv7Z28ATD5Q6YFLoVGbsg==
+        bh=T0+hU8k+RyCmVBvBo6qJA+pYHpeWz4BnzaTdktBKy2A=;
+        b=0Y815YtbRRS0WfdLMxBfKPvKAp183yj59jUY0adfpLZcCKpGMdDkGsiM0rxIdG4cd4
+         67jnFs1+MUIs8TH1DauI5DsKJt7ijTuxYPg6N57b7hMayxhxbxWPomitR6OkigApHNGX
+         UNElgNJqSpkU3HFP3Tfr4AUFywUsCv6ZgH9mIepDhpdn7CIp7bJL4pS1+LjUoqVJ7vKF
+         CYjwgsXYYs8kZszZsYhvlnNw4mJKE8GV0Sw7HqXcWk2w/4xBv3GrtvjWQtt2OKxXsXkD
+         A/HR5FcbEqD2mQBqvL/pbHoKiKS1n5XyB6l842ANpZO9O16Fn/+WuSg1hGY5rD80tqPE
+         wiDg==
+X-Gm-Message-State: ANoB5pnVU+Cs/I71kKn3ZNMffTC/G3Ci6SnnJEHQPUst9+WwAVkUhVJ4
+        IyTLafkiPdzAt3dYEfpUNyF0k6MKP3cTPQ==
+X-Google-Smtp-Source: AA0mqf4KN0ToQ1wmZzmflZp36b4L5Nl4FpG0VJHdW80YwtBlwu869ju+Ri2dl6OmwZR+dYAtfRM+xdMRlNvXFw==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:d03:0:b0:706:e165:f752 with SMTP id
- 3-20020a250d03000000b00706e165f752mr8717208ybn.510.1670528365193; Thu, 08 Dec
- 2022 11:39:25 -0800 (PST)
-Date:   Thu,  8 Dec 2022 11:38:31 -0800
+ (user=dmatlack job=sendgmr) by 2002:a25:6994:0:b0:6f3:c535:4ea3 with SMTP id
+ e142-20020a256994000000b006f3c5354ea3mr55731660ybc.498.1670528366862; Thu, 08
+ Dec 2022 11:39:26 -0800 (PST)
+Date:   Thu,  8 Dec 2022 11:38:32 -0800
 In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221208193857.4090582-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-12-dmatlack@google.com>
-Subject: [RFC PATCH 11/37] KVM: MMU: Move RET_PF_* into common code
+Message-ID: <20221208193857.4090582-13-dmatlack@google.com>
+Subject: [RFC PATCH 12/37] KVM: x86/mmu: Use PG_LEVEL_{PTE,PMD,PUD} in the TDP MMU
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
@@ -90,7 +90,7 @@ Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,89 +98,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the RET_PF_* enum into common code in preparation for moving the
-TDP MMU into common code.
+Use PG_LEVEL_{PTE,PMD,PUD} in the TDP MMU instead of the x86-specific
+PG_LEVEL_{4K,2M,1G} aliases. This prepares for moving the TDP MMU to
+common code, where not all architectures will have 4K PAGE_SIZE.
+
+No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu_internal.h | 28 ----------------------------
- include/kvm/mmu_types.h         | 26 ++++++++++++++++++++++++++
- 2 files changed, 26 insertions(+), 28 deletions(-)
+ arch/x86/kvm/mmu/tdp_iter.h |  2 +-
+ arch/x86/kvm/mmu/tdp_mmu.c  | 16 ++++++++--------
+ 2 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 4abb80a3bd01..d3c1d08002af 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -79,34 +79,6 @@ static inline bool is_nx_huge_page_enabled(struct kvm *kvm)
+diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
+index f0af385c56e0..892c078aab58 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.h
++++ b/arch/x86/kvm/mmu/tdp_iter.h
+@@ -106,7 +106,7 @@ struct tdp_iter {
+ 	     tdp_iter_next(&iter))
  
- int kvm_tdp_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+ #define for_each_tdp_pte(iter, root, start, end) \
+-	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end)
++	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_PTE, start, end)
  
--/*
-- * Return values of handle_mmio_page_fault(), mmu.page_fault(), fast_page_fault(),
-- * and of course kvm_mmu_do_page_fault().
-- *
-- * RET_PF_CONTINUE: So far, so good, keep handling the page fault.
-- * RET_PF_RETRY: let CPU fault again on the address.
-- * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
-- * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
-- * RET_PF_FIXED: The faulting entry has been fixed.
-- * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
-- *
-- * Any names added to this enum should be exported to userspace for use in
-- * tracepoints via TRACE_DEFINE_ENUM() in mmutrace.h
-- *
-- * Note, all values must be greater than or equal to zero so as not to encroach
-- * on -errno return values.  Somewhat arbitrarily use '0' for CONTINUE, which
-- * will allow for efficient machine code when checking for CONTINUE, e.g.
-- * "TEST %rax, %rax, JNZ", as all "stop!" values are non-zero.
-- */
--enum {
--	RET_PF_CONTINUE = 0,
--	RET_PF_RETRY,
--	RET_PF_EMULATE,
--	RET_PF_INVALID,
--	RET_PF_FIXED,
--	RET_PF_SPURIOUS,
--};
--
- static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 					u32 err, bool prefetch)
- {
-diff --git a/include/kvm/mmu_types.h b/include/kvm/mmu_types.h
-index 9f0ca920bf68..07c9962f9aea 100644
---- a/include/kvm/mmu_types.h
-+++ b/include/kvm/mmu_types.h
-@@ -110,4 +110,30 @@ struct kvm_page_fault {
- 	struct kvm_page_fault_arch arch;
- };
+ tdp_ptep_t spte_to_child_pt(u64 pte, int level);
  
-+/*
-+ * Return values for page fault handling routines.
-+ *
-+ * RET_PF_CONTINUE: So far, so good, keep handling the page fault.
-+ * RET_PF_RETRY: let CPU fault again on the address.
-+ * RET_PF_EMULATE: mmio page fault, emulate the instruction directly.
-+ * RET_PF_INVALID: the spte is invalid, let the real page fault path update it.
-+ * RET_PF_FIXED: The faulting entry has been fixed.
-+ * RET_PF_SPURIOUS: The faulting entry was already fixed, e.g. by another vCPU.
-+ *
-+ * Any names added to this enum should be exported to userspace for use in
-+ * tracepoints via TRACE_DEFINE_ENUM() in arch/x86/kvm/mmu/mmutrace.h.
-+ *
-+ * Note, all values must be greater than or equal to zero so as not to encroach
-+ * on -errno return values.  Somewhat arbitrarily use '0' for CONTINUE, which
-+ * will allow for efficient machine code when checking for CONTINUE.
-+ */
-+enum {
-+	RET_PF_CONTINUE = 0,
-+	RET_PF_RETRY,
-+	RET_PF_EMULATE,
-+	RET_PF_INVALID,
-+	RET_PF_FIXED,
-+	RET_PF_SPURIOUS,
-+};
-+
- #endif /* !__KVM_MMU_TYPES_H */
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 4940413d3767..bce0566f2d94 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -347,7 +347,7 @@ static void handle_changed_spte_dirty_log(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	bool pfn_changed;
+ 	struct kvm_memory_slot *slot;
+ 
+-	if (level > PG_LEVEL_4K)
++	if (level > PG_LEVEL_PTE)
+ 		return;
+ 
+ 	pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
+@@ -526,7 +526,7 @@ static void __handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
+ 	bool pfn_changed = spte_to_pfn(old_spte) != spte_to_pfn(new_spte);
+ 
+ 	WARN_ON(level > PT64_ROOT_MAX_LEVEL);
+-	WARN_ON(level < PG_LEVEL_4K);
++	WARN_ON(level < PG_LEVEL_PTE);
+ 	WARN_ON(gfn & (KVM_PAGES_PER_HPAGE(level) - 1));
+ 
+ 	/*
+@@ -897,9 +897,9 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 	 * inducing a stall to allow in-place replacement with a 1gb hugepage.
+ 	 *
+ 	 * Because zapping a SP recurses on its children, stepping down to
+-	 * PG_LEVEL_4K in the iterator itself is unnecessary.
++	 * PG_LEVEL_PTE in the iterator itself is unnecessary.
+ 	 */
+-	__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_1G);
++	__tdp_mmu_zap_root(kvm, root, shared, PG_LEVEL_PUD);
+ 	__tdp_mmu_zap_root(kvm, root, shared, root->role.level);
+ 
+ 	rcu_read_unlock();
+@@ -944,7 +944,7 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+ 
+ 	rcu_read_lock();
+ 
+-	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end) {
++	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_PTE, start, end) {
+ 		if (can_yield &&
+ 		    tdp_mmu_iter_cond_resched(kvm, &iter, flush, false)) {
+ 			flush = false;
+@@ -1303,7 +1303,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
+ 	/* Huge pages aren't expected to be modified without first being zapped. */
+ 	WARN_ON(pte_huge(range->pte) || range->start + 1 != range->end);
+ 
+-	if (iter->level != PG_LEVEL_4K ||
++	if (iter->level != PG_LEVEL_PTE ||
+ 	    !is_shadow_present_pte(iter->old_spte))
+ 		return false;
+ 
+@@ -1672,7 +1672,7 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
+ 		if (!mask)
+ 			break;
+ 
+-		if (iter.level > PG_LEVEL_4K ||
++		if (iter.level > PG_LEVEL_PTE ||
+ 		    !(mask & (1UL << (iter.gfn - gfn))))
+ 			continue;
+ 
+@@ -1726,7 +1726,7 @@ static void zap_collapsible_spte_range(struct kvm *kvm,
+ 
+ 	rcu_read_lock();
+ 
+-	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_2M, start, end) {
++	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_PMD, start, end) {
+ retry:
+ 		if (tdp_mmu_iter_cond_resched(kvm, &iter, false, true))
+ 			continue;
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
