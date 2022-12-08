@@ -2,99 +2,151 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 05E19647838
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 22:49:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77337647840
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 22:52:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229652AbiLHVtc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 16:49:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51458 "EHLO
+        id S229865AbiLHVw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 16:52:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229568AbiLHVta (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 16:49:30 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B2499D88B
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 13:48:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670536110;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JlSLHZU0UyP1zXnoWLl9wrALkHazYkzcA1gB5b/QBD4=;
-        b=h8gJQMxyvGsKoHS5lScHZNQS2cRBg/WEEe6illL3JvtXb8QU1kG7lreELn4yw/hkQInxBq
-        v3aASESWuF4iHEQ+zn3lIzLgpt0v2KSvfAJ94F3mpnxDgopE+zPeF2wKRyHrT2Aqqg9w5+
-        BDXW5eK7BY+Za/IDjxEha5vcOV7d2YY=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-622-F04sXEp4PIaHUwm31E7IwQ-1; Thu, 08 Dec 2022 16:48:29 -0500
-X-MC-Unique: F04sXEp4PIaHUwm31E7IwQ-1
-Received: by mail-io1-f70.google.com with SMTP id n8-20020a6b4108000000b006de520dc5c9so1019168ioa.19
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 13:48:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JlSLHZU0UyP1zXnoWLl9wrALkHazYkzcA1gB5b/QBD4=;
-        b=pEtO3o8GcoRMpNrK0V5V5hYf+bO8Y+CI6R5xrJojXJsPuln/hHVagHk8GHIYkxfyby
-         flUBBKmh0YdfnzYC4fQp8EgwOZzEM/3UCZ88mcf8e3Ysn77qsRnEyf1Bk8lj8AW8MNp5
-         427sPBBVUpO+bKd7DkxrwfX+wle8gd0ieypX/lH4W/8wdwgvsdh9XNakVs2mE3GE53Tn
-         J6pH/9zoJrB/c1804Yq4cqP8SZkYX7wUi7NZyUxHD3+wHT7l38mZW+gGAs+YCOvpOJDt
-         +qco4Y0PcJJyARid2bqAkNIV6i8ZYegKqYaOvm7hJenO+8Dl9kNsAOw9aBLZq6Qujegw
-         uDdw==
-X-Gm-Message-State: ANoB5pm2SBdLd38Rs4DKOEXVpAV6HWn37m9Bk4i9UAFyvMO8bvOSk4jg
-        WbDKf5y9vo1/dAS0DpQ0Z3/oNnsphK5zqfWbu9fhFBKV+WyhShTBpft6shWPWLtojwKHFbo7Obm
-        MqCHuur7FPizt
-X-Received: by 2002:a02:caa9:0:b0:38a:4f3e:a8f3 with SMTP id e9-20020a02caa9000000b0038a4f3ea8f3mr7633706jap.118.1670536108938;
-        Thu, 08 Dec 2022 13:48:28 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5z9amCYid4VD2QKF39+LEnq0/gOoAHkRrex2ThE5am1xPidFCUVQZkXXRQS46wsmIHSMDr3g==
-X-Received: by 2002:a02:caa9:0:b0:38a:4f3e:a8f3 with SMTP id e9-20020a02caa9000000b0038a4f3ea8f3mr7633686jap.118.1670536108715;
-        Thu, 08 Dec 2022 13:48:28 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id q18-20020a927512000000b00302bb083c2bsm1115985ilc.21.2022.12.08.13.48.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 13:48:28 -0800 (PST)
-Date:   Thu, 8 Dec 2022 14:48:25 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>,
-        Bharat Bhushan <bharat.bhushan@nxp.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
-        Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH iommufd 2/9] vfio/type1: Check that every device
- supports IOMMU_CAP_INTR_REMAP
-Message-ID: <20221208144825.33823739.alex.williamson@redhat.com>
-In-Reply-To: <2-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
-References: <0-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
-        <2-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S229568AbiLHVw4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 16:52:56 -0500
+Received: from CO1PR02CU002-vft-obe.outbound.protection.outlook.com (mail-westus2azon11020016.outbound.protection.outlook.com [52.101.46.16])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5DA220F6F;
+        Thu,  8 Dec 2022 13:52:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=It8AE67xXeiiXej8zfOkRCduQZLK52fQT0dX5XJ6hHN1iJVV2FCg4pfylFQXb7R5WxV9z/OpbhZiVUSNs/7QphLvORFdnIusTY2e1HXMWO0xi6wZfAwip2Vv1jiY54CrcgUeiOsPJCOAoEd29YwLY4MuRokiEYnKTkKaTwzgto5LG3/niyW6WPYP6cZQR1J/cfvyJOHUdIR/wJl7ULl7qsZoqHJrAU1BnrW/6Gn2Gd/j/fEs/YjvQLiLlekv7Ci1nzLnPJ5JgSPB2RHZoh6E+2zW9zeBpesHFmbEBjU1uXQ6bciqhviGe6N27wf/WjwEtDEQyW0NDQxx18Xs64Ggkw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6zz9nBGtA318sPa478c/U/NE2A5G5WnkYqfyX7xfr88=;
+ b=mWB3wNBo/tActLPX2+I01raptzkcqozj44ll3mvm12a7GlxjJOdzx6Qqtnjx1TWLGYv0Akn1to0Qo4KrjVHG61USOzghIVcSxkwYj1N2CLU3FYzQoJDfJ8IflKgvLcL2JOHA1VoccZ72FlVxIwsEypb8okLOQewFSChCX2P91VlPwWFyn/29/GFyUFLFNl/KJ45RmBxgM87zUQOh7EeGXAJxLayTUcZpN9yjGCjySxfQBAaaL7Y6tT8mNNP5D/zKR7cdjpHbjtcH1OSBiHuy2yNgUH2cyzXh+56zVdDPlQo8KIwHgDIQR8Fjwv+uMVEtYaDy+t61P2zkqIV9QikvdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6zz9nBGtA318sPa478c/U/NE2A5G5WnkYqfyX7xfr88=;
+ b=XjVJInRmzp7TpMsbewAYybLWh72yhoqoADyCSTbF0x5spq2lDiozCipj0jrbREmyZ2aMjUgL0X2WOdV3OLCkCBypOQn6zvD1B5RtAM8gFzdq+wma5dWh6HLdgAvA4giesRPa+odz5tP5UjurzG5MLds4W8XEAflWJBDhBlmx5pc=
+Received: from SA1PR21MB1335.namprd21.prod.outlook.com (2603:10b6:806:1f2::11)
+ by MN2PR21MB1407.namprd21.prod.outlook.com (2603:10b6:208:204::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.4; Thu, 8 Dec
+ 2022 21:52:45 +0000
+Received: from SA1PR21MB1335.namprd21.prod.outlook.com
+ ([fe80::ac9b:6fe1:dca5:b817]) by SA1PR21MB1335.namprd21.prod.outlook.com
+ ([fe80::ac9b:6fe1:dca5:b817%4]) with mapi id 15.20.5924.004; Thu, 8 Dec 2022
+ 21:52:45 +0000
+From:   Dexuan Cui <decui@microsoft.com>
+To:     Tianyu Lan <ltykernel@gmail.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jgross@suse.com" <jgross@suse.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
+        "srutherford@google.com" <srutherford@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
+        "pawan.kumar.gupta@linux.intel.com" 
+        <pawan.kumar.gupta@linux.intel.com>,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
+        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
+        "alexander.shishkin@linux.intel.com" 
+        <alexander.shishkin@linux.intel.com>,
+        "sandipan.das@amd.com" <sandipan.das@amd.com>,
+        "ray.huang@amd.com" <ray.huang@amd.com>,
+        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        "sterritt@google.com" <sterritt@google.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "samitolvanen@google.com" <samitolvanen@google.com>,
+        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
+Subject: RE: [RFC PATCH V2 10/18] drivers: hv: Decrypt percpu hvcall input arg
+ page in sev-snp enlightened guest
+Thread-Topic: [RFC PATCH V2 10/18] drivers: hv: Decrypt percpu hvcall input
+ arg page in sev-snp enlightened guest
+Thread-Index: AQHY+8njSw/V4BybwEWpqC99Qe/49a5kpeKw
+Date:   Thu, 8 Dec 2022 21:52:45 +0000
+Message-ID: <SA1PR21MB13357A3B9348705F4EB59DAFBF1D9@SA1PR21MB1335.namprd21.prod.outlook.com>
+References: <20221119034633.1728632-1-ltykernel@gmail.com>
+ <20221119034633.1728632-11-ltykernel@gmail.com>
+In-Reply-To: <20221119034633.1728632-11-ltykernel@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=e1afd893-8a7a-49ac-be25-3720fda30ee6;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-12-08T21:47:56Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR21MB1335:EE_|MN2PR21MB1407:EE_
+x-ms-office365-filtering-correlation-id: 6e0ba0c0-2c8c-4d19-8113-08dad9668a55
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: eUQdyQycN07U/Tt3G/7ycDlgaFLL1Z2bSHOf9AlAiYmd6RP9Wr8Qcw8s6M3ahJJ5ZISbUbTjj/qB/DFKaH2XLTChMqcVgbU+McYNG707QeuKFkViL0YznjNNH1GEP+1UyZm0AGUQNe5Om9Eksptt57th9y59TFFQtbkg9q9ahMTdrxcH6LfBzH82Ph0ZYvMDzRkVGqKfjJKKZpRZwqBwt5jHf5IILmcItbdyJIfM/XoZEkb9cjmu1hjv5m6pKIAabQuJ8YiMWPQtISShqwV+rQtrH+44EcPR+BwxmkFwrb8fLGzll7AP8rtC3mt8z96dLoXq0MepSt0W23qYopiLBcxwncknedVYxH+kl9meUft5QeMlIizeIMUTjRSR+Rdc2hxeTgj0eVRUPSZ3y+tk3WhjOkZcVfxpBEW6xI2GT+0xmPXwtmJen8OlbQSPaRRL+V59sBNtRkjIT1z3gfWjrIgMOTk0Pw7D1WG/c3jPLyEg46XMSLPgDJ7rYwGJXXUFwe5W4u7h2xZzcQgLRxQJGoNa6ODqbP2BMxvBjK7nm59oa7gsqj7Dv6RLxnxDnn6uG6nr7yI5eaM+8ot/e0ty8QaicmEZ6NbdUqdILZPCT371mYhr3VKsBhhIR4H7P1kEBKmuYMBhD2hgl7+R5BR8GunLpiY/vczJvUp0yfB5B/r8bJ5UF8t3/6qKDgWDEZ18xB08RZOiMW+AOKdKw9deG4DTotNHrlOo3dJLcTcSYw4B0v4y9kqQ2WpbLuKjqPR5gcxFO7x/X3roJqORaUdFbA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB1335.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(346002)(376002)(366004)(39860400002)(136003)(451199015)(8936002)(5660300002)(7416002)(83380400001)(26005)(76116006)(7406005)(71200400001)(110136005)(9686003)(4326008)(33656002)(10290500003)(86362001)(66946007)(55016003)(186003)(316002)(7696005)(66446008)(54906003)(52536014)(8676002)(38100700002)(66476007)(6506007)(66556008)(64756008)(41300700001)(82950400001)(8990500004)(82960400001)(122000001)(38070700005)(2906002)(478600001)(921005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Gr4ufqpHxUItFDHp+ucXxHsY885KN3v7GFe+hs8H+WttObiAU6Nzsmfvibxp?=
+ =?us-ascii?Q?kKuqN0/T8PmzHIxkMrt2PGLLZGA3yrX1JUKPB/M39N38tTqlcxw6UoZmcJtT?=
+ =?us-ascii?Q?QTnrKA4POh7nOoCKzIL9gCM5ohIUbA/lgf2MsLrmTEY0nto0z3QXOyyLBJgT?=
+ =?us-ascii?Q?YW8IuZea6P3LrGv7JRqQCccyNY7amtoeWhwed9NtxsgLbtnpauTuUaXfr+Y8?=
+ =?us-ascii?Q?ejytSv35a6wNIuAyAKxmpodqJFce/t19CfdsEUqMdKhvBcQCNvU+FhCR+JVU?=
+ =?us-ascii?Q?RsMSCY9vJ52erkhnbY8Lv0vUDdwmsoUUHfZbeQrQOrV+YcajpjIVxY31JxPc?=
+ =?us-ascii?Q?MjxmPywggmbzGg6JvRLq6Zm0I2cVK92w4u/u6TXk1uZ3n2300X5Bjn7EImWG?=
+ =?us-ascii?Q?AVe+Ac8YB+Sz7Q/2+spFq9jIGwxmgCH0IrtJTBD2uGKfFudkjorbukPzKq8e?=
+ =?us-ascii?Q?jQ7ZoiDvFNz54wmQR0xM0MKaVFTpMeLgJyLWxrFe1iqnm32RcaEcxm9P/KNF?=
+ =?us-ascii?Q?tSljMoZWzB7KHeGljfNDUuXOFOwkP8MxdeCq5g/I3fKAumSiaqfRkJ6OFKba?=
+ =?us-ascii?Q?uRcehlzL+jAUhRYf6Nl5rGz9C51AHCFy+gPMu78O4R+cD0iHpJtIAOZUriZ9?=
+ =?us-ascii?Q?tbvyXkmfijq7LqnXOdoDOEzOAUVA0Zo4HKJ0OQ0R+9iNFI8HPYIf/pARydsJ?=
+ =?us-ascii?Q?5nBqEepKN6HE/zq8Z0DlCBXiUIN6sgkkkn4MeOETMqrPTeWhAlAJ4qlEEHGw?=
+ =?us-ascii?Q?2wRORAoxJnDwdP9e4TQosvth8RQEs9KIPAYxPLQuzK5YnSVS0ZUj1LIMM/SM?=
+ =?us-ascii?Q?Nn065WOh5TU0KW2NORIr0QqcCrIJ77oZVZjWuvhR6Fg2awv0HfX6y2S65ijn?=
+ =?us-ascii?Q?7cOZESSUNmn8hulWVCW8qhwdxiroOVRNK8I33IVl7CL+ZP0BUmHVWOxU5orN?=
+ =?us-ascii?Q?pO7AfdRRjV5OAexe5/0sQlQKVAhUUpA5dw7FIXpCtQQn+9NOGczm+f8coNyg?=
+ =?us-ascii?Q?HI8QdwRsPEjVt/NXkuCaS85CZKN+0r9gPk5+c+I6nbv2hdxIg90sQ/o0ZNe2?=
+ =?us-ascii?Q?8ISD7w0WnQ43MAC5m89Y/RhzpUyL4CJ96gtpUDR7IscrAPkTML8nIhWjguWr?=
+ =?us-ascii?Q?R6+0Ik3Cfdylhnj23RQHfjJGVaXuhYC4hI3XqUtr7hiHvDFcBnC14hO0IE3Q?=
+ =?us-ascii?Q?eCIhFOqUFaoPxCUeWgXQofuYYw00cWv19uF+SfFmgMsUQkcyBvGNp9mhrDAp?=
+ =?us-ascii?Q?mtheXzZZaWQ9DNuYHuGT0QwNa5NFJLKN9uOjmJbPf+LpLD8zB5Y1VJs4IndW?=
+ =?us-ascii?Q?7H7kLHzQV1vTy7oinc54iNlfdmvDXqMHr2yUslJ1J9KyaAuQJhwr0reDCCMc?=
+ =?us-ascii?Q?zFOSUXMnpVk7QkmAIZJy5S9amBmEIaWV6E7lFfRBMVyEjboyOMSOVIiXs0MC?=
+ =?us-ascii?Q?YX+efYmfF1XgAtckpXN3OJ8NVRiMA38UQAuhsQKzwVeLMveIh4pbS+6f77jM?=
+ =?us-ascii?Q?I6oSUX4S5JbZ56lK12omQLiafKO14rE5g8AsBzqTZXQ8Kx5RvIdeC9/y4tr3?=
+ =?us-ascii?Q?lSx9TnIJxkqWt82n86fBdISPTics3kAc5FuGtGmR?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB1335.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e0ba0c0-2c8c-4d19-8113-08dad9668a55
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Dec 2022 21:52:45.6629
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 1vmZE2R4ulXDwM+QNt9slX4s+RenIBeXIqfMDskyx+vTnaa1ShxDP/I8aiYhU/0/ozLb2riGz3QBylWUChCTbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR21MB1407
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_NONE autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -102,74 +154,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu,  8 Dec 2022 16:26:29 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+> From: Tianyu Lan <ltykernel@gmail.com>
+> Sent: Friday, November 18, 2022 7:46 PM
+> [...]
+> diff --git a/drivers/hv/hv_common.c b/drivers/hv/hv_common.c
+> @@ -125,6 +126,7 @@ int hv_common_cpu_init(unsigned int cpu)
+>  	u64 msr_vp_index;
+>  	gfp_t flags;
+>  	int pgcount =3D hv_root_partition ? 2 : 1;
+> +	int ret;
+>=20
+>  	/* hv_cpu_init() can be called with IRQs disabled from hv_resume() */
+>  	flags =3D irqs_disabled() ? GFP_ATOMIC : GFP_KERNEL;
+> @@ -134,6 +136,16 @@ int hv_common_cpu_init(unsigned int cpu)
+>  	if (!(*inputarg))
+>  		return -ENOMEM;
+>=20
+> +	if (hv_isolation_type_en_snp()) {
+> +		ret =3D set_memory_decrypted((unsigned long)*inputarg, 1);
 
-> iommu_group_for_each_dev() exits the loop at the first callback that
-> returns 1 - thus returning 1 fails to check the rest of the devices in the
-> group.
-> 
-> msi_remap (aka secure MSI) requires that all the devices in the group
-> support it, not just any one. This is only a theoretical problem as no
-> current drivers will have different secure MSI properties within a group.
+Is it possible hv_root_partition=3D=3D1 here? If yes, the pgcount is 2.
 
-Which is exactly how Robin justified the behavior in the referenced
-commit:
-
-  As with domains, any capability must in practice be consistent for
-  devices in a given group - and after all it's still the same
-  capability which was expected to be consistent across an entire bus!
-  - so there's no need for any complicated validation.
-
-That suggests to me that it's intentional that we break if any device
-supports the capability and therefore this isn't so much a "Fixes:", as
-it is a refactoring expressly to support msi_device_has_secure_msi(),
-which cannot make these sort of assumptions as a non-group API.  Thanks,
-
-Alex
-
-> Make vfio_iommu_device_secure_msi() reduce AND across all the devices.
-> 
-> Fixes: eed20c782aea ("vfio/type1: Simplify bus_type determination")
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 17 +++++++++++------
->  1 file changed, 11 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 23c24fe98c00d4..3025b4e643c135 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -2160,10 +2160,12 @@ static void vfio_iommu_iova_insert_copy(struct vfio_iommu *iommu,
->  	list_splice_tail(iova_copy, iova);
->  }
->  
-> -/* Redundantly walks non-present capabilities to simplify caller */
-> -static int vfio_iommu_device_capable(struct device *dev, void *data)
-> +static int vfio_iommu_device_secure_msi(struct device *dev, void *data)
->  {
-> -	return device_iommu_capable(dev, (enum iommu_cap)data);
-> +	bool *secure_msi = data;
+> +		if (ret) {
+> +			kfree(*inputarg);
+> +			return ret;
+> +		}
 > +
-> +	*secure_msi &= device_iommu_capable(dev, IOMMU_CAP_INTR_REMAP);
-> +	return 0;
->  }
->  
->  static int vfio_iommu_domain_alloc(struct device *dev, void *data)
-> @@ -2278,9 +2280,12 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  	INIT_LIST_HEAD(&domain->group_list);
->  	list_add(&group->next, &domain->group_list);
->  
-> -	msi_remap = irq_domain_check_msi_remap() ||
-> -		    iommu_group_for_each_dev(iommu_group, (void *)IOMMU_CAP_INTR_REMAP,
-> -					     vfio_iommu_device_capable);
-> +	msi_remap = irq_domain_check_msi_remap();
-> +	if (!msi_remap) {
-> +		msi_remap = true;
-> +		iommu_group_for_each_dev(iommu_group, &msi_remap,
-> +					 vfio_iommu_device_secure_msi);
+> +		memset(*inputarg, 0x00, PAGE_SIZE);
 > +	}
->  
->  	if (!allow_unsafe_interrupts && !msi_remap) {
->  		pr_warn("%s: No interrupt remapping support.  Use the module param \"allow_unsafe_interrupts\" to enable VFIO IOMMU support on this platform\n",
+> +
+>  	if (hv_root_partition) {
+>  		outputarg =3D (void **)this_cpu_ptr(hyperv_pcpu_output_arg);
+>  		*outputarg =3D (char *)(*inputarg) + HV_HYP_PAGE_SIZE;
+> @@ -168,6 +180,9 @@ int hv_common_cpu_die(unsigned int cpu)
+>=20
+>  	local_irq_restore(flags);
+>=20
+> +	if (hv_isolation_type_en_snp())
+> +		set_memory_encrypted((unsigned long)mem, 1);
+
+If set_memory_encrypted() fails, we should not free the 'mem'.
+
+> +
+>  	kfree(mem);
+>=20
+>  	return 0;
 
