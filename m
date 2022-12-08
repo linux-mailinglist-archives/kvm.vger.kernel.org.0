@@ -2,82 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D99564785A
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 22:57:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F12C4647864
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 22:59:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230031AbiLHV5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 16:57:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58374 "EHLO
+        id S230096AbiLHV7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 16:59:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbiLHV5N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 16:57:13 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570316B9B5
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 13:57:04 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id s10so3046934ljg.1
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 13:57:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=pivykEMeOC8k2jf5XPeoMmk5A2wR46qumuGcje+Ei0o=;
-        b=lGhCGMkdVr+eMWHzxV4BUBXbHQ5TTADr1PYcqYnbQz+YoK9bJrgM57Vy78B8nxVQkj
-         APRhz3JHUjKUQRk2o2yUo7LdxwH1hglDHr2Oq6GbBEzRkHg3Hgvz8u+aYiTKCZKig4pz
-         ynljJSqDQyCZhITw5JlEZ6OyzJ50h+3094nrTJHUKuMYjmgySvbKjbOWMNnb34nAoSTx
-         dI7cbHkWVJygg+qE0LbN5/ns60bIwNsiIlAZxg0YHoNh8SAAmY7e8NjB/Lmfy0T6g8Qv
-         szI9Zkx/wcNz1KNLi6pWdP5u6sCXFqzSr/CE23Tr9ULqFSKMYqkQu/PO7/3w3cdOcQjx
-         vf7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pivykEMeOC8k2jf5XPeoMmk5A2wR46qumuGcje+Ei0o=;
-        b=vN9Jf8+137vRiIo0S3Wf1F+EwMl3f8DSsk08yo2obkM2fU8yJfW50UJfUhtuDwG20a
-         rmdtfBvHMa7NnxWQMMKT8PIE834iDXt1PK1aKrWKAgNuBxSiEtaQkE6YSeYKiLI9/Ix9
-         NCDbYbWzRH5kkze3gQSsZt3NcxvXUtFQ2qwR3cWsVKE7krwvu/Ym83GrCvtPjTD+JDMX
-         8NiLQCvM/TPDiElIyM2E73T89pthQ/6u6WtD1jfSgzRyKmEq9+A4sLSSyRwXrZFrKkrq
-         NzQmBOx+O1QJcRftQf8uuTkI4AKZW+juWJcf1nGjSd3/9JQtZzVL4N34+eEVOZtkz7Nh
-         6lcg==
-X-Gm-Message-State: ANoB5pk5E5GKAYhNm9TdVA3NJ2eOQpH4f6tAsxkWY4qxLG82a4KmPfTy
-        ne5MSQzSeDO/OKsRrBm9RQB2PCBU53aKKwBp7PGBeg==
-X-Google-Smtp-Source: AA0mqf774hNvaBtqJ0bicEWGn4mx48PVYa1iTqCUFr3Yv8T/uq/ELj0Cd3js7qUzrOD9Qt1CkfqgcMdGwKdjMNJlwdU=
-X-Received: by 2002:a2e:7a0d:0:b0:279:f766:5021 with SMTP id
- v13-20020a2e7a0d000000b00279f7665021mr6288528ljc.328.1670536622278; Thu, 08
- Dec 2022 13:57:02 -0800 (PST)
-MIME-Version: 1.0
-References: <20221111014244.1714148-1-vannapurve@google.com>
- <20221111014244.1714148-5-vannapurve@google.com> <CAMkAt6qLC0BosvSN9Ri2XFYK65xH1E5sqJYNe6uAudb8U08rXw@mail.gmail.com>
- <CAGtprH8TQ9ep5KQ5-U1PUBmzQQC7fBOLOfn2mNgnDLMO70ZYjg@mail.gmail.com>
-In-Reply-To: <CAGtprH8TQ9ep5KQ5-U1PUBmzQQC7fBOLOfn2mNgnDLMO70ZYjg@mail.gmail.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Thu, 8 Dec 2022 13:56:51 -0800
-Message-ID: <CAGtprH9eUCfXEjmYorSZrSTBzD352wLLxdPodiCA-Cs=bOUfFw@mail.gmail.com>
-Subject: Re: [V1 PATCH 4/6] KVM: selftests: x86: Execute VMs with private memory
-To:     Peter Gonda <pgonda@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, nikunj@amd.com, seanjc@google.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
+        with ESMTP id S230094AbiLHV6k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 16:58:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC06721A8
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 13:57:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670536660;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ASIj2kEQ6oY1hd8auPy7e53VDe/NPdiMHyAQK+FFLxI=;
+        b=GUxkxRmgXdlgbffy2qGtf1VVShgE2QIfQkAscBNBPg1mZ+Yvzk8vwUEBKRUmzY2dAjHmZ9
+        21Fz3Hr0SZVvQ7IEnwUTN8B41Kvi98Kf70m+PIolFLqUXArlfBaKadN/WRAsx87PLAIkW9
+        5MXEkytQKNUfp+eEbOy0vX/PthzWXBk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-25-MhO298SpOWi7X7VbPRRFlQ-1; Thu, 08 Dec 2022 16:57:39 -0500
+X-MC-Unique: MhO298SpOWi7X7VbPRRFlQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0CF7D29AA3AF;
+        Thu,  8 Dec 2022 21:57:39 +0000 (UTC)
+Received: from starship (unknown [10.35.206.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9BFA22024CC0;
+        Thu,  8 Dec 2022 21:57:37 +0000 (UTC)
+Message-ID: <96c369fb2042e8722256d36c9b2ccf4a930752d1.camel@redhat.com>
+Subject: Re: [PATCH v4 19/32] KVM: x86: Explicitly track all possibilities
+ for APIC map's logical modes
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Date:   Thu, 08 Dec 2022 23:57:36 +0200
+In-Reply-To: <20221001005915.2041642-20-seanjc@google.com>
+References: <20221001005915.2041642-1-seanjc@google.com>
+         <20221001005915.2041642-20-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,130 +66,194 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Nov 14, 2022 at 5:53 PM Vishal Annapurve <vannapurve@google.com> wrote:
->
-> On Mon, Nov 14, 2022 at 11:37 AM Peter Gonda <pgonda@google.com> wrote:
-> >...
-> > > +static void handle_vm_exit_map_gpa_hypercall(struct kvm_vm *vm,
-> > > +                               struct kvm_vcpu *vcpu)
-> > > +{
-> > > +       uint64_t gpa, npages, attrs, size;
-> > > +
-> > > +       TEST_ASSERT(vcpu->run->hypercall.nr == KVM_HC_MAP_GPA_RANGE,
-> > > +               "Unhandled Hypercall %lld\n", vcpu->run->hypercall.nr);
-> > > +       gpa = vcpu->run->hypercall.args[0];
-> > > +       npages = vcpu->run->hypercall.args[1];
-> > > +       size = npages << MIN_PAGE_SHIFT;
-> > > +       attrs = vcpu->run->hypercall.args[2];
-> > > +       pr_info("Explicit conversion off 0x%lx size 0x%lx to %s\n", gpa, size,
-> > > +               (attrs & KVM_MAP_GPA_RANGE_ENCRYPTED) ? "private" : "shared");
-> > > +
-> > > +       if (attrs & KVM_MAP_GPA_RANGE_ENCRYPTED)
-> > > +               vm_allocate_private_mem(vm, gpa, size);
-> > > +       else
-> > > +               vm_unback_private_mem(vm, gpa, size);
-> > > +
-> > > +       vcpu->run->hypercall.ret = 0;
-> > > +}
-> > > +
-> > > +static void vcpu_work(struct kvm_vm *vm, struct kvm_vcpu *vcpu,
-> > > +       struct vm_setup_info *info)
-> > > +{
-> > > +       struct ucall uc;
-> > > +       uint64_t cmd;
-> > > +
-> > > +       /*
-> > > +        * Loop until the guest is done.
-> > > +        */
-> > > +
-> > > +       while (true) {
-> > > +               vcpu_run(vcpu);
-> > > +
-> > > +               if (vcpu->run->exit_reason == KVM_EXIT_IO) {
-> > > +                       cmd = get_ucall(vcpu, &uc);
-> > > +                       if (cmd != UCALL_SYNC)
-> > > +                               break;
-> > > +
-> > > +                       TEST_ASSERT(info->ioexit_cb, "ioexit cb not present");
-> > > +                       info->ioexit_cb(vm, uc.args[1]);
-> > > +                       continue;
-> > > +               }
-> >
-> > Should this be integrated into the ucall library directly somehow?
-> > That way users of VMs with private memory do not need special
-> > handling?
-> >
-> > After Sean's series:
-> > https://lore.kernel.org/linux-arm-kernel/20220825232522.3997340-3-seanjc@google.com/
-> > we have a common get_ucall() that this check could be integrated into?
-> >
+On Sat, 2022-10-01 at 00:59 +0000, Sean Christopherson wrote:
+> Track all possibilities for the optimized APIC map's logical modes
+> instead of overloading the pseudo-bitmap and treating any "unknown" value
+> as "invalid".
+> 
+> As documented by the now-stale comment above the mode values, the values
+> did have meaning when the optimized map was originally added.  That
+> dependent logical was removed by commit e45115b62f9a ("KVM: x86: use
+> physical LAPIC array for logical x2APIC"), but the obfuscated behavior
+> and its comment were left behind.
+> 
+> Opportunistically rename "mode" to "logical_mode", partly to make it
+> clear that the "disabled" case applies only to the logical map, but also
+> to prove that there is no lurking code that expects "mode" to be a bitmap.
+> 
+> Functionally, this is a glorified nop.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h | 21 +++++++++++---------
+>  arch/x86/kvm/lapic.c            | 35 +++++++++++++++++++++++++--------
+>  2 files changed, 39 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 062758135c86..ac28bbfbf0e3 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -962,19 +962,22 @@ struct kvm_arch_memory_slot {
+>  };
+>  
+>  /*
+> - * We use as the mode the number of bits allocated in the LDR for the
+> - * logical processor ID.  It happens that these are all powers of two.
+> - * This makes it is very easy to detect cases where the APICs are
+> - * configured for multiple modes; in that case, we cannot use the map and
+> - * hence cannot use kvm_irq_delivery_to_apic_fast either.
+> + * Track the mode of the optimized logical map, as the rules for decoding the
+> + * destination vary per mode.  Enabling the optimized logical map requires all
+> + * software-enabled local APIs to be in the same mode, each addressable APIC to
+> + * be mapped to only one MDA, and each MDA to map to at most one APIC.
+>   */
+> -#define KVM_APIC_MODE_XAPIC_CLUSTER          4
+> -#define KVM_APIC_MODE_XAPIC_FLAT             8
+> -#define KVM_APIC_MODE_X2APIC                16
+> +enum kvm_apic_logical_mode {
 
-New patchset posted via [1] modifies the APIs to give more control in
-the actual selftest implementation.
+It would be nice to have short comment about each of the modes, like
 
-[1] https://lore.kernel.org/lkml/20221205232341.4131240-5-vannapurve@google.com/T/
+/* All local APICs are disabled */
+> +	KVM_APIC_MODE_SW_DISABLED,
+/* All enabled local APICs are in XAPIC mode using cluster logical addresssing */
+> +	KVM_APIC_MODE_XAPIC_CLUSTER,
+/* All enabled local APICs are in XAPIC mode using flat logical addresssing */
+> +	KVM_APIC_MODE_XAPIC_FLAT,
+/* All enabled local APICs are in X2APIC mode */
+> +	KVM_APIC_MODE_X2APIC,
+/* 
+   Due to differencies in mode between enabled local APICs and/or other corner cases, 
+   the optimized logical map disabled 
+*/
+> +	KVM_APIC_MODE_MAP_DISABLED,
+> +};
+>  
+>  struct kvm_apic_map {
+>  	struct rcu_head rcu;
+> -	u8 mode;
+> +	enum kvm_apic_logical_mode logical_mode;
+>  	u32 max_apic_id;
+>  	union {
+>  		struct kvm_lapic *xapic_flat_map[8];
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index cef8b202490b..9989893fef69 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -168,7 +168,12 @@ static bool kvm_use_posted_timer_interrupt(struct kvm_vcpu *vcpu)
+>  
+>  static inline bool kvm_apic_map_get_logical_dest(struct kvm_apic_map *map,
+>  		u32 dest_id, struct kvm_lapic ***cluster, u16 *mask) {
+> -	switch (map->mode) {
+> +	switch (map->logical_mode) {
+> +	case KVM_APIC_MODE_SW_DISABLED:
+> +		/* Arbitrarily use the flat map so that @cluster isn't NULL. */
+> +		*cluster = map->xapic_flat_map;
+> +		*mask = 0;
+> +		return true;
+>  	case KVM_APIC_MODE_X2APIC: {
+>  		u32 offset = (dest_id >> 16) * 16;
+>  		u32 max_apic_id = map->max_apic_id;
+> @@ -193,8 +198,10 @@ static inline bool kvm_apic_map_get_logical_dest(struct kvm_apic_map *map,
+>  		*cluster = map->xapic_cluster_map[(dest_id >> 4) & 0xf];
+>  		*mask = dest_id & 0xf;
+>  		return true;
+> +	case KVM_APIC_MODE_MAP_DISABLED:
+> +		return false;
+>  	default:
+> -		/* Not optimized. */
+> +		WARN_ON_ONCE(1);
+>  		return false;
+>  	}
+>  }
+> @@ -256,10 +263,12 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+>  		goto out;
+>  
+>  	new->max_apic_id = max_id;
+> +	new->logical_mode = KVM_APIC_MODE_SW_DISABLED;
+>  
+>  	kvm_for_each_vcpu(i, vcpu, kvm) {
+>  		struct kvm_lapic *apic = vcpu->arch.apic;
+>  		struct kvm_lapic **cluster;
+> +		enum kvm_apic_logical_mode logical_mode;
+>  		u16 mask;
+>  		u32 ldr;
+>  		u8 xapic_id;
+> @@ -282,7 +291,8 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+>  		if (!apic_x2apic_mode(apic) && !new->phys_map[xapic_id])
+>  			new->phys_map[xapic_id] = apic;
+>  
+> -		if (!kvm_apic_sw_enabled(apic))
+> +		if (new->logical_mode == KVM_APIC_MODE_MAP_DISABLED ||
+> +		    !kvm_apic_sw_enabled(apic))
+>  			continue;
+Very minor nitpick: it feels to me that code that updates the logical mode of the
+map, might be better to be in a function, or in 'if', like
 
-> > > +
-> > > +               if (vcpu->run->exit_reason == KVM_EXIT_HYPERCALL) {
-> > > +                       handle_vm_exit_map_gpa_hypercall(vm, vcpu);
-> > > +                       continue;
-> > > +               }
-> > > +
-> > > +               TEST_FAIL("Unhandled VCPU exit reason %d\n",
-> > > +                       vcpu->run->exit_reason);
-> > > +               break;
-> > > +       }
-> > > +
-> > > +       if (vcpu->run->exit_reason == KVM_EXIT_IO && cmd == UCALL_ABORT)
-> > > +               TEST_FAIL("%s at %s:%ld, val = %lu", (const char *)uc.args[0],
-> > > +                         __FILE__, uc.args[1], uc.args[2]);
-> > > +}
-> > > +
-> > > +/*
-> > > + * Execute guest vm with private memory memslots.
-> > > + *
-> > > + * Input Args:
-> > > + *   info - pointer to a structure containing information about setting up a VM
-> > > + *     with private memslots
-> > > + *
-> > > + * Output Args: None
-> > > + *
-> > > + * Return: None
-> > > + *
-> > > + * Function called by host userspace logic in selftests to execute guest vm
-> > > + * logic. It will install test_mem_slot : containing the region of memory that
-> > > + * would be used to test private/shared memory accesses to a memory backed by
-> > > + * private memslots
-> > > + */
-> > > +void execute_vm_with_private_test_mem(struct vm_setup_info *info)
-> > > +{
-> > > +       struct kvm_vm *vm;
-> > > +       struct kvm_enable_cap cap;
-> > > +       struct kvm_vcpu *vcpu;
-> > > +       uint64_t test_area_gpa, test_area_size;
-> > > +       struct test_setup_info *test_info = &info->test_info;
-> > > +
-> > > +       TEST_ASSERT(info->guest_fn, "guest_fn not present");
-> > > +       vm = vm_create_with_one_vcpu(&vcpu, info->guest_fn);
-> >
-> > I am a little confused with how this library is going to work for SEV
-> > VMs that want to have UPM private memory eventually.
-> >
-> > Why should users of UPM be forced to use this very specific VM
-> > creation and vCPU run loop. In the patch
-> > https://lore.kernel.org/lkml/20220829171021.701198-1-pgonda@google.com/T/#m033ebc32df47a172bc6c46d4398b6c4387b7934d
-> > SEV VMs need to be created specially vm_sev_create_with_one_vcpu() but
-> > then callers can run the VM's vCPUs like other selftests.
-> >
-> > How do you see this working with SEV VMs?
-> >
->
-> This VM creation method can be useful to run the VMs whose execution
-> might call mapgpa to change the memory attributes. New VM creation
-> method specific to Sev VMs can be introduced.
->
-> I tried to reuse this framework earlier for Sev VM selftests via:
-> 1) https://lore.kernel.org/lkml/20220830224259.412342-8-vannapurve@google.com/T/#m8164d3111c9a17ebab77f01635df8930207cc65d
-> 2) https://lore.kernel.org/lkml/20220830224259.412342-8-vannapurve@google.com/T/#m8164d3111c9a17ebab77f01635df8930207cc65d
->
-> Though these changes need to be refreshed after this updated series.
+		if (new->logical_mode != KVM_APIC_MODE_MAP_DISABLED) {
+
+			/* Disabled local APICs don't affect the logical map */
+			if (!kvm_apic_sw_enabled(apic))
+				continue;
+			....
+		}
+>  
+>  		ldr = kvm_lapic_get_reg(apic, APIC_LDR);
+> @@ -290,17 +300,26 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
+>  			continue;
+>  
+>  		if (apic_x2apic_mode(apic)) {
+> -			new->mode |= KVM_APIC_MODE_X2APIC;
+> +			logical_mode = KVM_APIC_MODE_X2APIC;
+>  		} else {
+>  			ldr = GET_APIC_LOGICAL_ID(ldr);
+>  			if (kvm_lapic_get_reg(apic, APIC_DFR) == APIC_DFR_FLAT)
+> -				new->mode |= KVM_APIC_MODE_XAPIC_FLAT;
+> +				logical_mode = KVM_APIC_MODE_XAPIC_FLAT;
+>  			else
+> -				new->mode |= KVM_APIC_MODE_XAPIC_CLUSTER;
+> +				logical_mode = KVM_APIC_MODE_XAPIC_CLUSTER;
+>  		}
+> +		if (new->logical_mode != KVM_APIC_MODE_SW_DISABLED &&
+> +		    new->logical_mode != logical_mode) {
+> +			new->logical_mode = KVM_APIC_MODE_MAP_DISABLED;
+> +			continue;
+> +		}
+> +		new->logical_mode = logical_mode;
+
+How about:
+
+		if (new->logical_mode == KVM_APIC_MODE_SW_DISABLED)
+			new->logical_mode = logical_mode;
+
+		if (new->logical_mode != logical_mode) {
+			new->logical_mode = KVM_APIC_MODE_MAP_DISABLED;
+			continue;
+		}
+		
+>  
+> -		if (!kvm_apic_map_get_logical_dest(new, ldr, &cluster, &mask))
+> +		if (WARN_ON_ONCE(!kvm_apic_map_get_logical_dest(new, ldr,
+> +								&cluster, &mask))) {
+> +			new->logical_mode = KVM_APIC_MODE_MAP_DISABLED;
+>  			continue;
+> +		}
+>  
+>  		if (mask)
+>  			cluster[ffs(mask) - 1] = apic;
+> @@ -953,7 +972,7 @@ static bool kvm_apic_is_broadcast_dest(struct kvm *kvm, struct kvm_lapic **src,
+>  {
+>  	if (kvm->arch.x2apic_broadcast_quirk_disabled) {
+>  		if ((irq->dest_id == APIC_BROADCAST &&
+> -				map->mode != KVM_APIC_MODE_X2APIC))
+> +		     map->logical_mode != KVM_APIC_MODE_X2APIC))
+>  			return true;
+>  		if (irq->dest_id == X2APIC_BROADCAST)
+>  			return true;
+
+
+Functionality wise the code looks OK to me.
+
+Best regards,
+	Maxim Levitsky
+
