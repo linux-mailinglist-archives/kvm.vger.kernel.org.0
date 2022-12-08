@@ -2,95 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 814996476BF
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:41:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 518F56476C5
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:46:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbiLHTl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 14:41:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58124 "EHLO
+        id S229605AbiLHTqS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 14:46:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230044AbiLHTkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 14:40:40 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F4D389CD
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:40:20 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-39afd53dcdbso24756187b3.8
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:40:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9jkEeOR+eFVYLdV/biNhqONLCqpOOeuWNQBN9kUw+a4=;
-        b=RcX1fA9WGa6w4C9PUxG4OPVBo1zxjA/xcbKeSP6a3foCAqZ7FzqI1mFwD63t1Zj64f
-         dUcsVkx5+LL+NIjjNV1LqNWVddFOpYikSd3WUTyGFLn96H50k7PwdHsttsFJt9P1ez0b
-         1mfPx6AlqK6ylftXIU2F9Nj5hSc+ikFrGZ/z1f/qPxYxfvx/OXVl/tDLZo61SUF3zvKK
-         PYv1RXX6MMcltPMtFw1Jp+095PHbtWtFgqbpJbKkr0cp5YLn1DUp9X/nB2YNG55HXF6K
-         /rKkgYv9i7/aE4/qJBLcexm7xz9bNSYN/tkjp5XaQYlxAPljLege78wWIo+X1uBQR1Re
-         /MJg==
+        with ESMTP id S229521AbiLHTqQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 14:46:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B5A8F00
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:44:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670528683;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=GYolMYmevphISUXV8T71XWUijdt0atK98M5aC2PO9iI=;
+        b=AfJPyKPb6PBBFi3TE0H26B7asIPdAnJVWLtsJ9NPK/iOXGkci3IU6Xuxlkvs14e5jH4aJz
+        WzhisMB7LhGDUfUQOgVmjh+QuvT/4r0MgBy08p3+gXhG86xpjwQ6cxCMHTY53c64w9tv5g
+        4rLSyTOZ/HiSC+7nYWMVEFRooM1PHMA=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-466-BeGmEuXnOXazAGb2-t0hgg-1; Thu, 08 Dec 2022 14:44:42 -0500
+X-MC-Unique: BeGmEuXnOXazAGb2-t0hgg-1
+Received: by mail-io1-f69.google.com with SMTP id r25-20020a6bfc19000000b006e002cb217fso846843ioh.2
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:44:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9jkEeOR+eFVYLdV/biNhqONLCqpOOeuWNQBN9kUw+a4=;
-        b=j7g0ZXLgALwEFBKS5lanE7XCmTG9lvmu/N5a/IFd7SDh8RM7K1cokbDf45S9+kDRy3
-         KBxqND/rkOIl91etfvpsfH1GIBO1ypeIqNt07+jgutTHncGvj/2IPtXeCd2iddAvWtKD
-         08C7vNZ6aPbrfQLfwXAT4BI+MTJs9+NGphS6FFF9+X8XARMnwSeZbu5FvOZcccrlRlAb
-         h7jSR/OMUA+u/UZhxcwhAyBODrhcXE3zl+ikmGhV+lhYPOGdq6u4JPgW7G0qHJ69Hz/h
-         e56wXIyBPgFGnp3c57FJoaGBRUTeQ4gI1MqCpQWa0WqZesgDP2qDPY7VxoBjNzHimot2
-         AkOQ==
-X-Gm-Message-State: ANoB5plgEKWK5fjSZ7GtL5Gl0dntB3FM6DiMh1xFFbwt9kd6GaPhoyNh
-        Z+8gHR6mfT8rChWVL7tgO+2YphIXZbrPqg==
-X-Google-Smtp-Source: AA0mqf5Y/oazogGX+tpbF7bdOJO4aayzIsYsnlV7zDudirQdvI5dtEVAX371oDYlEt+kHPpaNkmdcoOtQ7CEag==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:c6c2:0:b0:6f0:b351:c300 with SMTP id
- k185-20020a25c6c2000000b006f0b351c300mr63444626ybf.102.1670528409549; Thu, 08
- Dec 2022 11:40:09 -0800 (PST)
-Date:   Thu,  8 Dec 2022 11:38:57 -0800
-In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
-Mime-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com>
-X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-38-dmatlack@google.com>
-Subject: [RFC PATCH 37/37] KVM: MMU: Move the TDP MMU to common code
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Matlack <dmatlack@google.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Nadav Amit <namit@vmware.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Liam R. Howlett" <Liam.Howlett@Oracle.com>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
-        Colin Cross <ccross@google.com>,
-        Hugh Dickins <hughd@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GYolMYmevphISUXV8T71XWUijdt0atK98M5aC2PO9iI=;
+        b=X8b3LUWVWt5rTtZka6DIO88DjrQSTP+Kd1J3V6bYtdBztMBY7T8BQ/cTJ8xreZu9xV
+         yfWfimUpMxVBi07hemllEUJveuGKfRRZzilLTzLeOAAh6b23RlHkIgH/p+nMEXxsjnO4
+         hljrwn1lkNrfv4vQkkEXaP7T+3s2dGCqUiehdOrfrnWwXK053KEZJ+nAkY348zmDxel6
+         gHv9Iht39J3SyxhNJ82waVIyP+ir/VlWuuux9p71RNkzlfrzeXRVgqU8geee5ApEeeXf
+         dI67RpVnAwZZCMLn6Lvaylj65bPFeAm2OTkNDv9+8egUDBjXd0JvHUEtP8ciN7RFv7V9
+         9t0A==
+X-Gm-Message-State: ANoB5pmE2lDcEtOQWIAhHjg/0XCu1pI5wdOgfcYM3yGoGlCg81tVHOQV
+        h1GZUWieliLCJ5LtEcwHQILhdtmXWZrQor8uIQXZVY2GE2UdQzwwZ9O/SODkPAIOGgjGM80OB5u
+        gNwHOq8A3jDVm
+X-Received: by 2002:a92:d784:0:b0:302:e57b:b5b7 with SMTP id d4-20020a92d784000000b00302e57bb5b7mr30609171iln.217.1670528681155;
+        Thu, 08 Dec 2022 11:44:41 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7tnqOERfs0CG01vI6YgE/q7zOmHGLjnFq4cIpRITf7cyJSsfdBQR9UWjLgJGsnxWDWm+fA+g==
+X-Received: by 2002:a92:d784:0:b0:302:e57b:b5b7 with SMTP id d4-20020a92d784000000b00302e57bb5b7mr30609167iln.217.1670528680880;
+        Thu, 08 Dec 2022 11:44:40 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id bo11-20020a056638438b00b0038a6ae38ceasm1976165jab.26.2022.12.08.11.44.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Dec 2022 11:44:40 -0800 (PST)
+Date:   Thu, 8 Dec 2022 12:44:38 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Steven Sistare <steven.sistare@oracle.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>, kvm@vger.kernel.org,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH V1 1/8] vfio: delete interfaces to update vaddr
+Message-ID: <20221208124438.045c5bce.alex.williamson@redhat.com>
+In-Reply-To: <d215f5df-6668-8cfe-1564-2636b3260b8e@oracle.com>
+References: <1670363753-249738-1-git-send-email-steven.sistare@oracle.com>
+        <1670363753-249738-2-git-send-email-steven.sistare@oracle.com>
+        <20221206165232.2a822e52.alex.williamson@redhat.com>
+        <Y5CvBZCyfNS1q7rn@ziepe.ca>
+        <d215f5df-6668-8cfe-1564-2636b3260b8e@oracle.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,107 +82,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move tdp_mmu.[ch] from arch/x86 and into the common code directories.
-This will allow other architectures to use the TDP MMU in the future.
+On Thu, 8 Dec 2022 14:09:44 -0500
+Steven Sistare <steven.sistare@oracle.com> wrote:
 
-No functional change intended.
+> On 12/7/2022 10:19 AM, Jason Gunthorpe wrote:
+> > On Tue, Dec 06, 2022 at 04:52:32PM -0700, Alex Williamson wrote:  
+> >> On Tue,  6 Dec 2022 13:55:46 -0800
+> >> Steve Sistare <steven.sistare@oracle.com> wrote:  
+> >>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> >>> index d7d8e09..5c5cc7e 100644
+> >>> --- a/include/uapi/linux/vfio.h
+> >>> +++ b/include/uapi/linux/vfio.h  
+> >> ...  
+> >>> @@ -1265,18 +1256,12 @@ struct vfio_bitmap {
+> >>>   *
+> >>>   * If flags & VFIO_DMA_UNMAP_FLAG_ALL, unmap all addresses.  iova and size
+> >>>   * must be 0.  This cannot be combined with the get-dirty-bitmap flag.
+> >>> - *
+> >>> - * If flags & VFIO_DMA_UNMAP_FLAG_VADDR, do not unmap, but invalidate host
+> >>> - * virtual addresses in the iova range.  Tasks that attempt to translate an
+> >>> - * iova's vaddr will block.  DMA to already-mapped pages continues.  This
+> >>> - * cannot be combined with the get-dirty-bitmap flag.
+> >>>   */
+> >>>  struct vfio_iommu_type1_dma_unmap {
+> >>>  	__u32	argsz;
+> >>>  	__u32	flags;
+> >>>  #define VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP (1 << 0)
+> >>>  #define VFIO_DMA_UNMAP_FLAG_ALL		     (1 << 1)
+> >>> -#define VFIO_DMA_UNMAP_FLAG_VADDR	     (1 << 2)  
+> >>
+> >> This flag should probably be marked reserved.
+> >>
+> >> Should we consider this separately for v6.2?  
+> > 
+> > I think we should merge this immediately, given the security problem.
+> >   
+> >> For the remainder, the long term plan is to move to iommufd, so any new
+> >> feature of type1 would need equivalent support in iommufd.  Thanks,  
+> > 
+> > At a bare minimum nothing should be merged to type1 that doesn't come
+> > along with an iommufd implementation too.
+> > 
+> > IMHO at this point we should not be changing type1 any more - just do
+> > it iommufd only please. No reason to write and review everything
+> > twice.  
+> 
+> Alex, your opinion?  Implement in iommufd only, or also in type1?  The latter
+> makes it more feasible to port to stable kernels and allow qemu with live update
+> to run on them.  I imagine porting iommufd to a stable kernel would be heavy lift,
+> and be considered too risky.
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
- arch/x86/kvm/Makefile                       | 2 +-
- arch/x86/kvm/mmu/mmu.c                      | 3 ++-
- {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h | 6 +++++-
- virt/kvm/Makefile.kvm                       | 1 +
- {arch/x86 => virt}/kvm/mmu/tdp_mmu.c        | 8 +++-----
- 5 files changed, 12 insertions(+), 8 deletions(-)
- rename {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h (94%)
- rename {arch/x86 => virt}/kvm/mmu/tdp_mmu.c (99%)
+I understand your concerns, but this isn't really an upstream stable
+kernel discussion.  The only thing relevant to an upstream stable
+kernel is the removal of the old, vulnerable interface, which I'm
+preparing to queue for v6.2.  The new re-implementation isn't eligible
+for upstream stable backports, imo.
 
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index cb9ae306892a..06b61fdea539 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -18,7 +18,7 @@ ifdef CONFIG_HYPERV
- kvm-y			+= kvm_onhyperv.o
- endif
- 
--kvm-$(CONFIG_X86_64) += mmu/tdp_pgtable.o mmu/tdp_mmu.o
-+kvm-$(CONFIG_X86_64)	+= mmu/tdp_pgtable.o
- kvm-$(CONFIG_KVM_XEN)	+= xen.o
- kvm-$(CONFIG_KVM_SMM)	+= smm.o
- 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index f2602ee1771f..8653776bca6f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -19,7 +19,6 @@
- #include "ioapic.h"
- #include "mmu.h"
- #include "mmu_internal.h"
--#include "tdp_mmu.h"
- #include "x86.h"
- #include "kvm_cache_regs.h"
- #include "smm.h"
-@@ -27,6 +26,8 @@
- #include "cpuid.h"
- #include "spte.h"
- 
-+#include <kvm/tdp_mmu.h>
-+
- #include <linux/kvm_host.h>
- #include <linux/types.h>
- #include <linux/string.h>
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/include/kvm/tdp_mmu.h
-similarity index 94%
-rename from arch/x86/kvm/mmu/tdp_mmu.h
-rename to include/kvm/tdp_mmu.h
-index 607c1417abd1..538c848149c9 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/include/kvm/tdp_mmu.h
-@@ -5,7 +5,11 @@
- 
- #include <linux/kvm_host.h>
- 
--#include "spte.h"
-+#include <kvm/mmu_types.h>
-+#include <kvm/mmu.h>
-+#include <kvm/tdp_iter.h>
-+#include <kvm/tdp_pgtable.h>
-+#include <kvm/mmutrace.h>
- 
- int kvm_mmu_init_tdp_mmu(struct kvm *kvm);
- void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index 58b595ac9b8d..942681308140 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -14,3 +14,4 @@ kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
- kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
- 
- kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_iter.o
-+kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_mmu.o
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/virt/kvm/mmu/tdp_mmu.c
-similarity index 99%
-rename from arch/x86/kvm/mmu/tdp_mmu.c
-rename to virt/kvm/mmu/tdp_mmu.c
-index c950d688afea..5ca8892ebef5 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/virt/kvm/mmu/tdp_mmu.c
-@@ -1,11 +1,9 @@
- // SPDX-License-Identifier: GPL-2.0
- 
--#include "mmu.h"
--#include "mmu_internal.h"
--#include "tdp_mmu.h"
--#include "spte.h"
--
-+#include <kvm/mmu_types.h>
-+#include <kvm/mmu.h>
- #include <kvm/tdp_iter.h>
-+#include <kvm/tdp_mmu.h>
- #include <kvm/tdp_pgtable.h>
- #include <kvm/mmutrace.h>
- 
--- 
-2.39.0.rc1.256.g54fd8350bd-goog
+So I suspect the only stable kernel relevant to the new implementation
+is a downstream stable kernel.  While I agree that backporting iommufd
+to get this feature is a heavy lift, the alternative is asking upstream
+QEMU and kernel to accept and maintain a separate interface in a
+backend slated for deprecation.  That's a lot.
+
+I expect you'll be in good company pushing for downstream support of
+iommufd given the various improvements and features it offers.  No
+offense, but QEMU live update might not even be the primary reason that
+a downstream ought to be interested in iommufd.  Thanks,
+
+Alex
 
