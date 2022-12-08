@@ -2,75 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01701647433
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 17:26:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C00F64747C
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 17:41:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbiLHQ0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 11:26:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38700 "EHLO
+        id S229898AbiLHQlJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 11:41:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbiLHQ0f (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 11:26:35 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B425C46650
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 08:26:34 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id v13-20020a17090a6b0d00b00219c3be9830so2054296pjj.4
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 08:26:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lTgWx4scVyEdnNwP8DjnL1zHNWGeK2kwc0Zp2eRMXQk=;
-        b=DtPAybS0x/Bv9SwEFO8iJm3Nt7GLaKJyB5eY3bSfC+VBuMJsbkTJk+3VLNLVGY97gW
-         YROZkWwojaG47GUXQLrCTFJjvlpv88vKyYmpnOc7FWDgCcttWvm89GqcBOgYh8KN/QL8
-         /9v/7LFByFTev9BlbnpF8R4jmudaKyQI6sPde3SvQxBvwc2GOTI4GXI5zvbTLRFvcEGx
-         AGbHbEnLGeCwOozEKpTvyUxotEiTTnNjv6inA0lwY/Qszez/CUSG9OWGrms3an78tEEn
-         tTpwS66zjdSS3hLf/dvzM1UXX6tyn+ws0DYwdZ39fO40IVLomt9gYa9j4OrSf3Oy0wmR
-         g5lA==
+        with ESMTP id S229635AbiLHQlI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 11:41:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC0C25C0FA
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 08:40:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670517612;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=P1X+KFxP5lStihMWZu+vAKcvSQfQQhbIKpDUJ5DlVd4=;
+        b=Ur2G4AIWI6sZ7L/U8thGAXM2nErK1/od/Ycy4JZdw8+i48X3+6VIt8RHW1V11BDW9gEHc0
+        K0u3BdqRYNoNO+1fvXWfBMQH/JWrk2ph4RISckWzCWQ4RMPt+Ahl20SsfXH3zaE1apFdlW
+        SdPUNKpuJm5SU7Dkkbin/t80sI+oNys=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-310-KwNaEIekORG-NZnfcAKUaA-1; Thu, 08 Dec 2022 11:40:11 -0500
+X-MC-Unique: KwNaEIekORG-NZnfcAKUaA-1
+Received: by mail-il1-f200.google.com with SMTP id 7-20020a056e0220c700b0030386f0d0e6so1784243ilq.3
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 08:40:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lTgWx4scVyEdnNwP8DjnL1zHNWGeK2kwc0Zp2eRMXQk=;
-        b=x4V1qhR6lDknjzmrImxJeHq8/jnwUmy7PeXc4zhuzdyJ/lR4mhysbJR4vQ9Nu2nHNU
-         kMEsj/T5mTJ33gezFbEyTpHl4RJgPHeSxRR6KLybKPuu+5Lu4O/76kDQZm5LG8PXRVnd
-         CQQmo7W8sFynAQoY0BSzDKb4LhOnvNcqMtWB51bvr0Gc/3n42LqcJRLzApOZkX+atRBE
-         s6pd6F8xGWG68DxDOuhe+NopOLFUSrbXCJvDSb+BIvTEsXVs3Oyv/k5/YrtVEGCs31af
-         yOh8vy9FlUue7psKs2UoN5BSlocbuE/1zmvJN3RA9ulyvC5QHaBrQj8wYijF7huLlSuF
-         MpWA==
-X-Gm-Message-State: ANoB5plDF4u/9OEnEC2loKczuValswQukkLfPHCdrOLAw1XvhibZWxK4
-        6WNkaFbGxlGHMXgbUz2UnakQgg==
-X-Google-Smtp-Source: AA0mqf7Bf1kskqLUj18tNkAcl3wyAWmGfpn9j1mAuma80CPFVrsgkisnFLZddTsm/ZeRKXFPmZsm1A==
-X-Received: by 2002:a17:90a:fd0d:b0:219:828e:ba2 with SMTP id cv13-20020a17090afd0d00b00219828e0ba2mr1449958pjb.0.1670516794018;
-        Thu, 08 Dec 2022 08:26:34 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id h13-20020a65468d000000b00477f5ae26bbsm13286522pgr.50.2022.12.08.08.26.33
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=P1X+KFxP5lStihMWZu+vAKcvSQfQQhbIKpDUJ5DlVd4=;
+        b=QQD/1HXL2SiyMOXm0rUFlvClo01dqwcNGcKA6MIzmkkRRQMz314q9/f1MLKiBpWVmI
+         iaOs1sE4LmhRDl95FZeg4x05numYDa3sTJUktVkfV3adAxSxxYSB/dIBITRTi4YWp798
+         mwU4RHOVQgLxrRCg2K7IYaP11Zs2kmdaV5Lloq5eZh4VZfbek1slrKb516X0+Rga1b8l
+         ZbT8nazwwucxNAtl3FrEsOnCDgOkCpXoGz9ptuXJKiAjmYoyGlOukVhjg0Jy6nN0cI8N
+         w2cMrWmwiT7k1bah8wZfpDj5L5vxkxjKZrFhDu/D7cKc4pVP9ygee5nmzd+0gdNeLYI0
+         i5rA==
+X-Gm-Message-State: ANoB5pkHh3rYTUToHcgRGaI7+q3aziFV9xixkyxTrioM2wFJyVifoqNJ
+        dvA/iimo0PKupCogQ8SkEEBrLVEjm0FN3Ox+URb/eUSncFqep27BwGaqjTUcWF4bX/W5dkkHM84
+        rHNrnIrPJ6JdA
+X-Received: by 2002:a02:665f:0:b0:375:7ab5:7158 with SMTP id l31-20020a02665f000000b003757ab57158mr37694404jaf.160.1670517610744;
+        Thu, 08 Dec 2022 08:40:10 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf62VQAfQty6YN1hlFnkq0P1eY9agOcHbE2epI0NKePHEV+gV3AglUh+0zZZkcK8BVZR92xL5g==
+X-Received: by 2002:a02:665f:0:b0:375:7ab5:7158 with SMTP id l31-20020a02665f000000b003757ab57158mr37694402jaf.160.1670517610501;
+        Thu, 08 Dec 2022 08:40:10 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id p63-20020a022942000000b00389302c018bsm8887048jap.170.2022.12.08.08.40.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 08:26:33 -0800 (PST)
-Date:   Thu, 8 Dec 2022 16:26:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 1/3] x86/cpu: Process all CPUID dependencies after
- identifying CPU info
-Message-ID: <Y5IQNY/fZw2JFA0B@google.com>
-References: <20221203003745.1475584-1-seanjc@google.com>
- <20221203003745.1475584-2-seanjc@google.com>
- <Y5INU3o+SFReGkLz@zn.tnic>
+        Thu, 08 Dec 2022 08:40:09 -0800 (PST)
+Date:   Thu, 8 Dec 2022 09:40:08 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "steven.sistare@oracle.com" <steven.sistare@oracle.com>,
+        "jgg@ziepe.ca" <jgg@ziepe.ca>
+Subject: Re: [PATCH] vfio/type1: Cleanup remaining vaddr removal/update
+ fragments
+Message-ID: <20221208094008.1b79dd59.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276222DAE8343BBEC9A79E98C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <167044909523.3885870.619291306425395938.stgit@omen>
+        <BN9PR11MB5276222DAE8343BBEC9A79E98C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5INU3o+SFReGkLz@zn.tnic>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,42 +81,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 08, 2022, Borislav Petkov wrote:
-> On Sat, Dec 03, 2022 at 12:37:43AM +0000, Sean Christopherson wrote:
-> > Process all CPUID dependencies to ensure that a dependent is disabled if
-> > one or more of its parent features is unsupported.
+On Thu, 8 Dec 2022 07:56:30 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
+
+> > From: Alex Williamson <alex.williamson@redhat.com>
+> > Sent: Thursday, December 8, 2022 5:45 AM
+> > 
+> > Fix several loose ends relative to reverting support for vaddr removal
+> > and update.  Mark feature and ioctl flags as deprecated, restore local
+> > variable scope in pin pages, remove remaining support in the mapping
+> > code.
+> > 
+> > Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+> > ---
+> > 
+> > This applies on top of Steve's patch[1] to fully remove and deprecate
+> > this feature in the short term, following the same methodology we used
+> > for the v1 migration interface removal.  The intention would be to pick
+> > Steve's patch and this follow-on for v6.2 given that existing support
+> > exposes vulnerabilities and no known upstream userspaces make use of
+> > this feature.
+> > 
+> > [1]https://lore.kernel.org/all/1670363753-249738-2-git-send-email-
+> > steven.sistare@oracle.com/
+> >   
 > 
-> Just out of curiosity: this is some weird guest configuration, right?
-
-No, it's also relevant for bare metal.
-
-> Not addressing a real hw issue...
-
-But it's not really a hardware issue either.  More like an admin/user issue.
-
-The problem is that if a kernel is built for subset of CPU types, e.g. just Intel
-or just Centaur, and then booted on an "unsupported" CPU type, init_ia32_feat_ctl()
-will never be invoked because ->c_init() will point a default_init(), and so the
-kernel never checks MSR_IA32_FEAT_CTL to see if VMX and/or SGX are fully enabled.
-
-E.g. if someone booted an "unsupported" kernel and also disabled VMX in BIOS, then
-the CPU will enumerate support for VMX in CPUID, but attempting to actually enable
-VMX will fail due to VMX being disabled in MSR_IA32_FEAT_CTL.
-
-> > diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
-> > index bf4ac1cb93d7..094fc69dba63 100644
-> > --- a/arch/x86/kernel/cpu/common.c
-> > +++ b/arch/x86/kernel/cpu/common.c
-> > @@ -1887,6 +1887,12 @@ static void identify_cpu(struct cpuinfo_x86 *c)
-> >  
-> >  	ppin_init(c);
-> >  
-> > +	/*
-> > +	 * Apply CPUID dependencies to ensure dependent features are disabled
-> > +	 * if a parent feature is unsupported but wasn't explicitly disabled.
-> > +	 */
-> > +	apply_cpuid_deps(c);
+> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 > 
-> I'd probably call that resolve_cpuid_deps()...
+> btw given the exposure and no known upstream usage should this be
+> also pushed to stable kernels?
 
-"resolve" works for me.
+I'll add to both:
+
+Cc: stable@vger.kernel.org # v5.12+
+
+Thanks,
+Alex
+
