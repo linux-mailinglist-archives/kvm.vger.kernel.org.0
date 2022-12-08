@@ -2,84 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D30366476D0
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:49:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E798D647706
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 21:14:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbiLHTtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 14:49:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38516 "EHLO
+        id S229734AbiLHUOK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 15:14:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229564AbiLHTtc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 14:49:32 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966B3389EF
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:49:30 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id gt4so910486pjb.1
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:49:30 -0800 (PST)
+        with ESMTP id S229568AbiLHUOH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 15:14:07 -0500
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A052E78B95
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 12:14:06 -0800 (PST)
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B8Jg08t030140;
+        Thu, 8 Dec 2022 20:14:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2022-7-12;
+ bh=BgsqFHAgIVaoZhZr7Fwc/Tu9DEcZIEjo3SW5N5eHGLs=;
+ b=Rq67vGJa+abShVqW0spx3OYHS6lCt4GQZETSGBpMt7Acj3hUC1RARriuMluvJLfFgVrJ
+ CtQGlFNE43/oSILdg7wFqY7qR+U2XNRWH1X49WihX9ez95+LmU1jkI/JDTtOi8u919+6
+ jiI5Fvv62Ih4ycFStnFkh6eQ2JY6Wi4eUIZAoB6q/cC0Rq9c6+NnSOS2dAEnb4T7/HYC
+ 7xvru2SuYOInqhKurlSgwWUmvRg5SDDpiQnC48qm0xUv0vcKhyFvem3XNglNYbj2hN/C
+ dylRnb5THNlZFhBaPbl+KM40XivKbk+C76MBYItjswzJC5cCW6R013nt5g8YMSCilyGg IQ== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3maujkkmbn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Dec 2022 20:14:04 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2B8IZZQZ032631;
+        Thu, 8 Dec 2022 20:14:03 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3maa7esv6b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 08 Dec 2022 20:14:03 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W7Y+n/INMnAIE78PbPP+3vLbQEhA8ewTWpM+tzDvhY3rnIvqEAq7B44i8XuVcjzYDCxbbrNA/AgV3bvwU3EsyyET7vfTsd8tb4ws8xqXf5T3mOuX2xwWSwGiiSXtuBVtLCFYq7EC7NprVMUuP/EKfMGJUmjrWZodFnhY59yBJr4s8tSNw4yYVa3D2F4ruqxcyzLznClqWM7Llmj6jud9yTZWHunyGltrcfYCAzSjzI0GjCnCgKEAqsB/ZmV8p7M4p93iYCy5zILMIQj11B6ZovKKCf26zhrFslueaq4envNPIcsNsGnvl1DXzKuGOwOYFDvIUtQK00QToTdpKO6QbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BgsqFHAgIVaoZhZr7Fwc/Tu9DEcZIEjo3SW5N5eHGLs=;
+ b=Kh1K6qv6mIm8uK0mQ4YKJSdMRAO6uRwE19Jt4YrfjdALmGPtpRiFlSqCA85/DdLfqCbI2tQ5nREkNRqBDy7buUopwpug7aza74apPL0VU8PPCcjSjxkCDn92oXKgbXyHR3v6YjJFLjg/h/eOLxjPvRHDSTMdhhaz5+pHNEYev29Uz2mGJQEGD7yY7YXXcpCrV4eWGjIEOQsr48QNtqft4vSD3bBhtwDSxX8hrBgvJceXRsrhVyHgUhVcBOv7EfrcphrssVyRAhW2tP+8ZdJ0dGHtPatOAl+NER2nmwrg5tZ7GwQIXMVRwEDXhSkVcD323MbnGz3WmrOl3C5+Zpq/OA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/iRRuEpq3SHF2tTVNW+V0pd2eP3QVViktpfmGsJo8SE=;
-        b=kbZjAjJOckI+jlOCJbuKM/9hTPPtgPZftSrpNxz+6MLKgxGWvBLLNyUR+yLtAe1FHf
-         wJpg2MHXkTzpBNyZxTGd1AdsYy4ZLs6dxynTISt9vca/TyPOGTgUZjlcmzeqpYDnp/lr
-         nfbOFjW274MxXgm+RUWP24N0ybK+fuofYxDYYO/sGvPoD5lfmmfOO3tdwNjQLoMr4mpd
-         /RF/OCtj9uVDzdQiD1V8pMJXjG1PPQFii8S4PnRl+HioQe97ZvVWKQiPgKLeNQV2/HJw
-         gBUXqS7+VDy/y8Zx1/EhxyC9Yxe7Bai4askP49YC2QyLOF6z9J+4HJ7bjYXM/dfQMhAm
-         uWhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/iRRuEpq3SHF2tTVNW+V0pd2eP3QVViktpfmGsJo8SE=;
-        b=QbiRK2DdRIFc+bldp7gJLVo6PGEMLcZEqX5i4n+DonwToPsszpneYT4QyTRi6Kxi6K
-         AO0F7KuBU3x42E6GQRcw8NgLZJil/DGOG04TS7NrJrwxqPD1S5OnxW1gu1S1oBcUNYdj
-         zCHcW3/ssO5C1wRnc/Dw7TH6S8DNt38JaTLyLCTkUpQO3pkpjMm4ekZhwfh8PJAnK4a8
-         ypKGHbOKTGSheWbhkNohlhU6XNHnFFtJjGfbaxwTGtl+K1fxLuNcfKLUwCzFYC2s6mVn
-         ZDNfLmHqOcujz7PmVo8SeWAitVACRrJCrvBYBeAF3dyh9PNGTKH8tPpicxeiZIuNZoBb
-         JNTQ==
-X-Gm-Message-State: ANoB5pkw1Rk7wU79lOyJaOsX5iMl3AD1oZwaLbPAuQ90s+2hyWftC9Wd
-        Ey/Ov9oV53ULWDR09jToCu4oeQ==
-X-Google-Smtp-Source: AA0mqf4+sYmN6TRhUnqm6pJbxgGCoSUwTGEipBsiO/jKS6U41yXiKghC+TQNsnXSTcuYW70TLswWgg==
-X-Received: by 2002:a17:90a:d681:b0:218:84a0:65eb with SMTP id x1-20020a17090ad68100b0021884a065ebmr1775305pju.1.1670528969909;
-        Thu, 08 Dec 2022 11:49:29 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id d15-20020a17090ac24f00b0020b7de675a4sm34718pjx.41.2022.12.08.11.49.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 11:49:29 -0800 (PST)
-Date:   Thu, 8 Dec 2022 11:49:26 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] KVM: selftests: Setup ucall after loading program
- into guest memory
-Message-ID: <Y5I/xiFMLVbpAZj+@google.com>
-References: <20221207214809.489070-1-oliver.upton@linux.dev>
- <20221207214809.489070-3-oliver.upton@linux.dev>
- <Y5EoZ5uwrTF3eSKw@google.com>
- <Y5EtMWuTaJk9I3Bd@google.com>
- <Y5EutGSjkRmdItQb@google.com>
- <Y5Exwzr6Ibmmthl0@google.com>
- <Y5IxNTKRnacfSsLt@google.com>
- <Y5I0paok+dvTtrkt@google.com>
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BgsqFHAgIVaoZhZr7Fwc/Tu9DEcZIEjo3SW5N5eHGLs=;
+ b=M/aNLKsm9MT5IMxvA/K0gfMJouax5WZhQYbVkbGjfowWiPle06+rUmrr9AplCvBXv+JD3tRcI9UICVDZLLpBHHW7TF2DI2GrpzZib1tIlOKf5yNOHEle4ITs/4oqghv4Yo8IZaYE/FPGTc71xqB6SC7KppEJAxbyw+qRb4kYy3U=
+Received: from SA2PR10MB4684.namprd10.prod.outlook.com (2603:10b6:806:119::14)
+ by BLAPR10MB5124.namprd10.prod.outlook.com (2603:10b6:208:325::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.14; Thu, 8 Dec
+ 2022 20:14:01 +0000
+Received: from SA2PR10MB4684.namprd10.prod.outlook.com
+ ([fe80::4056:9f2c:6171:c37e]) by SA2PR10MB4684.namprd10.prod.outlook.com
+ ([fe80::4056:9f2c:6171:c37e%4]) with mapi id 15.20.5880.016; Thu, 8 Dec 2022
+ 20:14:01 +0000
+Message-ID: <ad1a2948-518d-18f8-1bea-c2eacbdeec92@oracle.com>
+Date:   Thu, 8 Dec 2022 15:13:58 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH V1 2/8] vfio/type1: dma owner permission
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+References: <1670363753-249738-1-git-send-email-steven.sistare@oracle.com>
+ <1670363753-249738-3-git-send-email-steven.sistare@oracle.com>
+ <Y5CxCS53/aBT14EH@ziepe.ca>
+From:   Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <Y5CxCS53/aBT14EH@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DS7PR05CA0056.namprd05.prod.outlook.com
+ (2603:10b6:8:2f::17) To SA2PR10MB4684.namprd10.prod.outlook.com
+ (2603:10b6:806:119::14)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5I0paok+dvTtrkt@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PR10MB4684:EE_|BLAPR10MB5124:EE_
+X-MS-Office365-Filtering-Correlation-Id: d3f1dcec-e0f5-4a8f-db9b-08dad958bf11
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: S3fN4H9WZpLCWMn0WpWFnb3hiMzIdPYqRRppC9V/w1c6eg8j8nokjLuYQbQ/0bCRsXDjdMrccAQn5OO544DJAImWaS2TPDscZvXpmQLFgi9QFm933GL1jYSET+cqOQ/q2e1hyGcckJyObAw11UNMS54g9DrkR0A57FjcB0Rjw/3R2I2lZJ6QZZm0Yy+j3b+HxMicBcCC1SOr/Apqdb87FcLzmQi7dn95QezV1G8pXv5Vub0+nrhMBS3Bl0NckpHbqPnkISIPAGv0ZlpxPIj29dyY06IVzCbky3p9q7NkoMa4dtGtaRv52oTgiCLErejODo6iDPJHdWKWd67LptErC3N+NKW6edIw76ZOnHfpOwEg1rQDVrzdS2vb+uygHph6YByjtjrLQxgt+EMfRZi06T1e4QHwdTYERxag3sFtFVBE9AoemcO03IplUS/sNnoTbrn9uNaU+8J4JbmIwyHzK6BQDux1gMt+wst1pMMzVg79TTocJejas3wVAv+xrwcJX+egrqIcFXxxo8KvS9M7SfiCVf6tHsUSL8bGG0KyWBHOR3Ths37PE7rPzI7WqdLzWJnle8hsBUOGwu8j5UeJTfD+DXly7VfxvKoiaw/HhhOSpbmvItz81i4E4daDrP1SQNiDC1uMI9oHk3ugPt18SHZ/5h2KqcWG/+4xJu8vHe/P8vpyb2zgdOF8Ug2nm7DIup9UyOPpENiWYqBIOUvCZvJq8w7fDdsUiE2BZ49r8aw=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR10MB4684.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(396003)(136003)(39860400002)(376002)(366004)(451199015)(4744005)(83380400001)(41300700001)(6506007)(8936002)(31686004)(5660300002)(66899015)(36756003)(36916002)(4326008)(66556008)(66476007)(6512007)(2906002)(316002)(66946007)(8676002)(44832011)(38100700002)(2616005)(6666004)(31696002)(86362001)(53546011)(478600001)(54906003)(6916009)(6486002)(186003)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L1ZsM1RaUExLL3ByU29Dek9OWnk4L0dXUlFmWmIwVnU5akVMTSt0SnFQaE5i?=
+ =?utf-8?B?Y2wxemhLM0hkYkRaM2t0dERzRnc0U0hWd3hkMnpqVHF3SkYySmZHenhCRlZM?=
+ =?utf-8?B?UVRuRjFXMXlBTS80djZWcDJVS3dFRC9ubUdvOTNQWGcrNHpXRnhaaVZTejhz?=
+ =?utf-8?B?bWVnaVBlNjhMUGVFazdHeWZKV1hSSml6SlZZNlZnbWgzVjFTd2lrbnFwdExK?=
+ =?utf-8?B?OUFlSHVWNW41QVRxK0x5OERzWjBMS0VJaHg4L25tWnNQVm84RXJ6OEFNNWNz?=
+ =?utf-8?B?VlpyTmN0dzdnbFV0MFEzbytNQUluSkJZOCtMWXJ3dkh0ZjRlRWZCQytSZVdT?=
+ =?utf-8?B?T043YnZNekJMZTNJbDZUbnh1eDR3aVNnZWFjUDcyNFdEeHBLT05TbGVsc05z?=
+ =?utf-8?B?dnF6azVJM1NOSGorRzJJV0xhbHFNbXo3OFFsWFQvSm5lNlRKSEU5VVdsak50?=
+ =?utf-8?B?ZS8wbFNHV1VUMysvZVoxbldqakNiSXFtY1hlSDREeEJ2YmhveE9sMm5UNWts?=
+ =?utf-8?B?alVBSGYyM01PKzFqKzZFMTJkQnJrK3B0KzVBUllGcWdYOFErSHNVV2RUQWJH?=
+ =?utf-8?B?OTZmQlNWYW9KYk9YM2k1WkNQQmFsZWwyS25Zd1NjQ0VKR3lHcHgyS3lRbTYv?=
+ =?utf-8?B?KzdCeE9UZHNUQ1ZidjFsSWxCc0w4MG5JYnNHb1FkY0RWRlNOcnozUWNjNW5u?=
+ =?utf-8?B?aVZCVUxwclhxMlVNektrUE9CSXg3M1hGUUIyQWRHVUJjWVBUeXE4WGFvcGVQ?=
+ =?utf-8?B?dXRRZG1CUzh3Qk44RXJ5blFsUTRNcFhOQm5mTFVBRGpxWmZTZlNrOWduT2Qv?=
+ =?utf-8?B?elFEVXB1VmdzSTNFekdwL0Q2VFNqaWZLRUltajRoc294QlhyS1hQcU5uSlBV?=
+ =?utf-8?B?Nm52alBrMHhFMmlIa0l1S1Z6dGdvaS8rbG4zazErTmpobkNvaVZKQ096cm5v?=
+ =?utf-8?B?T0Z2TWpkTG9jQTIxTzBrbkFkMTZUQlpXeE1wQ1MzaE9JTm5UY3VtbUEvQWUv?=
+ =?utf-8?B?UFZXM3VvaXR3cFgzeldoQWZIaHdReXlseFRLVTc0eDcrU3E5RFVPWnBreWtW?=
+ =?utf-8?B?WmxqUzVwRGlXazhWbWNVWDN4WWFMcHdUSEJHZmpoN2kyUDJETHliR3F5eVh4?=
+ =?utf-8?B?VFZNZVdVOGUrUmVqMFN4bERpOHlpc0x5M0dWekx5dzZZc1dIdzM3ZHp3RFpt?=
+ =?utf-8?B?SlpMQmlDWEx6SmZIbUtlNkFkRU9MdzZsay9SMXljM3BmUm0wcjJnWFpFdk1i?=
+ =?utf-8?B?cHlGcTdJQ0p4d2xmWHBzNTJJbTgvOEhrR3g4WHlSZE82TW4waTA2b3Uvajhx?=
+ =?utf-8?B?TDU5Q3M4WFpWRHNHZkgxVEZUQ1BYbEs4bytRaEJ1MG5SVU53UkVPd09VMXNO?=
+ =?utf-8?B?SXJOeTNCYzFMMzUvU0dSMk1VeGo0b1Jyc2hIRnlFdFczUGoycTY0YUY1bDg1?=
+ =?utf-8?B?NkttZFcxbEJaWER4THo4ZUJqMlFuODlWaERtbjFLNFh5QVdLMTZVRnhsOVJN?=
+ =?utf-8?B?ckNUcFJHVDNBMXdrc3dQbTdzaENRME85QmRPdy9YYzdaVE9EQmk2ZEFTV00x?=
+ =?utf-8?B?eXVCT3kvSXM0Um9yNUxOSGtESU1KcUFYeEZiaitZc2M4NkYrOVFjSnd6NlZJ?=
+ =?utf-8?B?UzZQNUY5amVQTUdGUldrNWlrTWJOZzY2OEJYOEFFU0RwTmpHc0xYSHBYcFRP?=
+ =?utf-8?B?TEhRRWljWHpHb3ZaWTRnbXBMMEhBQkszYjRwUDRYMzRKUm1GandnQVk0QitQ?=
+ =?utf-8?B?bnZ0R0xpSWxneWgrbVhJYTdNWUNldW9GU2xuWmsxejdBUVpQWm0zUTJ6OWI5?=
+ =?utf-8?B?bFU0MTI5Zi80SFVtR28zYWVjRS9PL1ppc3p0VWN3SEUzZ1JVZEZoNmo3OFlX?=
+ =?utf-8?B?MGxDemdFdXRSbFJGOG9Qd09OelpCWEhGY24yT3cvUk5pd3hrQzYvSitOYVVP?=
+ =?utf-8?B?a0QzdFFwSnhDMXhhUW9tNnBaOTZwckN3YXNGMk5nQ1lJU0V6alB0SlFZS2Z1?=
+ =?utf-8?B?K2FRY2drMFgvdjkySW5RNVRIaHZaTUdmZy9mU1gwUjFSMm4vVExQR0pWV2NT?=
+ =?utf-8?B?VkZubnNBNVMvdUU4YWEwdldKVGRmT25kTThHZzl5ZHNXL1Bxd2hlY0hrUmlZ?=
+ =?utf-8?B?dTR2TFdsVS9nRGtCNHJUbVdsWUJlL3ZyaVRWNytsaitsQ0F1TkZ3K1UydlE3?=
+ =?utf-8?B?enc9PQ==?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d3f1dcec-e0f5-4a8f-db9b-08dad958bf11
+X-MS-Exchange-CrossTenant-AuthSource: SA2PR10MB4684.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2022 20:14:01.3720
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1QU3JUMRnqWjwgbBcAbSdXcQB/DL2rWMpwotXHhSdjseUoLlSYznHaoGv/J1R3/HJ6c+J0vfNszXb8Zx61fLFjDZ+LtJGboZ2tDUCeYp51o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR10MB5124
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-08_11,2022-12-08_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=850 bulkscore=0
+ suspectscore=0 phishscore=0 malwarescore=0 spamscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212080169
+X-Proofpoint-ORIG-GUID: 9xKAw0Qcia94hHtHLWgdEe7iCxTrygTN
+X-Proofpoint-GUID: 9xKAw0Qcia94hHtHLWgdEe7iCxTrygTN
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,92 +158,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 08, 2022 at 07:01:57PM +0000, Sean Christopherson wrote:
-> On Thu, Dec 08, 2022, Ricardo Koller wrote:
-> > On Thu, Dec 08, 2022 at 12:37:23AM +0000, Oliver Upton wrote:
-> > > On Thu, Dec 08, 2022 at 12:24:20AM +0000, Sean Christopherson wrote:
-> > > > > Even still, that's just a kludge to make ucalls work. We have other
-> > > > > MMIO devices (GIC distributor, for example) that work by chance since
-> > > > > nothing conflicts with the constant GPAs we've selected in the tests.
-> > > > > 
-> > > > > I'd rather we go down the route of having an address allocator for the
-> > > > > for both the VA and PA spaces to provide carveouts at runtime.
-> > > > 
-> > > > Aren't those two separate issues?  The PA, a.k.a. memslots space, can be solved
-> > > > by allocating a dedicated memslot, i.e. doesn't need a carve.  At worst, collisions
-> > > > will yield very explicit asserts, which IMO is better than whatever might go wrong
-> > > > with a carve out.
-> > > 
-> > > Perhaps the use of the term 'carveout' wasn't right here.
-> > > 
-> > > What I'm suggesting is we cannot rely on KVM memslots alone to act as an
-> > > allocator for the PA space. KVM can provide devices to the guest that
-> > > aren't represented as memslots. If we're trying to fix PA allocations
-> > > anyway, why not make it generic enough to suit the needs of things
-> > > beyond ucalls?
-> > 
-> > One extra bit of information: in arm, IO is any access to an address (within
-> > bounds) not backed by a memslot. Not the same as x86 where MMIO are writes to
-> > read-only memslots.  No idea what other arches do.
+On 12/7/2022 10:28 AM, Jason Gunthorpe wrote:
+> On Tue, Dec 06, 2022 at 01:55:47PM -0800, Steve Sistare wrote:
+>> The first task to pin any pages becomes the dma owner, and becomes the only
+>> task allowed to pin.  This prevents an application from exceeding the
+>> initial task's RLIMIT_MEMLOCK by fork'ing and pinning in children.
 > 
-> I don't think that's correct, doesn't this code turn write abort on a RO memslot
-> into an io_mem_abort()?  Specifically, the "(write_fault && !writable)" check will
-> match, and assuming none the the edge cases in the if-statement fire, KVM will
-> send the write down io_mem_abort().
+> We do not need to play games with the RLIMIT here - RLIMIT is
+> inherently insecure and if fork is available then the process can blow
+> past the sandbox limit. There is nothing we can do to prevent this in
+> the kernel, so don't even try.
+> 
+> iommufd offers the user based limit tracking which prevents this
+> properly.
+> 
+> And we are working on cgroup based limit tracking that is the best
+> option to solve this problem.
+> 
+> I would rather see us focus on the cgroup stuff than this.
 
-You are right. In fact, page_fault_test checks precisely that: writes on
-RO memslots are sent to userspace as an mmio exit. I was just referring
-to the MMIO done for ucall.
+Yes, this is N/A for an iommufd framework that can enforce aggregate
+limits across a group of processes.
 
-Having said that, we could use ucall as writes on read-only memslots
-like what x86 does.
-
-> 
-> 	gfn = fault_ipa >> PAGE_SHIFT;
-> 	memslot = gfn_to_memslot(vcpu->kvm, gfn);
-> 	hva = gfn_to_hva_memslot_prot(memslot, gfn, &writable);
-> 	write_fault = kvm_is_write_fault(vcpu);
-> 	if (kvm_is_error_hva(hva) || (write_fault && !writable)) {
-> 		/*
-> 		 * The guest has put either its instructions or its page-tables
-> 		 * somewhere it shouldn't have. Userspace won't be able to do
-> 		 * anything about this (there's no syndrome for a start), so
-> 		 * re-inject the abort back into the guest.
-> 		 */
-> 		if (is_iabt) {
-> 			ret = -ENOEXEC;
-> 			goto out;
-> 		}
-> 
-> 		if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> 			kvm_inject_dabt(vcpu, kvm_vcpu_get_hfar(vcpu));
-> 			ret = 1;
-> 			goto out_unlock;
-> 		}
-> 
-> 		/*
-> 		 * Check for a cache maintenance operation. Since we
-> 		 * ended-up here, we know it is outside of any memory
-> 		 * slot. But we can't find out if that is for a device,
-> 		 * or if the guest is just being stupid. The only thing
-> 		 * we know for sure is that this range cannot be cached.
-> 		 *
-> 		 * So let's assume that the guest is just being
-> 		 * cautious, and skip the instruction.
-> 		 */
-> 		if (kvm_is_error_hva(hva) && kvm_vcpu_dabt_is_cm(vcpu)) {
-> 			kvm_incr_pc(vcpu);
-> 			ret = 1;
-> 			goto out_unlock;
-> 		}
-> 
-> 		/*
-> 		 * The IPA is reported as [MAX:12], so we need to
-> 		 * complement it with the bottom 12 bits from the
-> 		 * faulting VA. This is always 12 bits, irrespective
-> 		 * of the page size.
-> 		 */
-> 		fault_ipa |= kvm_vcpu_get_hfar(vcpu) & ((1 << 12) - 1);
-> 		ret = io_mem_abort(vcpu, fault_ipa);
-> 		goto out_unlock;
-> 	}
+- Steve
