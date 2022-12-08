@@ -2,113 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4B696465FE
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 01:37:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 448F3646639
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 02:07:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbiLHAhd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 7 Dec 2022 19:37:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53716 "EHLO
+        id S229875AbiLHBHz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 7 Dec 2022 20:07:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229798AbiLHAhb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 7 Dec 2022 19:37:31 -0500
-Received: from out-157.mta0.migadu.com (out-157.mta0.migadu.com [91.218.175.157])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F3B8DBF1
-        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 16:37:29 -0800 (PST)
-Date:   Thu, 8 Dec 2022 00:37:23 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1670459848;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=R1Ot9//nMiXKCXxmYFxpZAtjZ4ruTDUzpHcMNR6JE8Q=;
-        b=Zo+rwodmUSpHYC0YOk/0NSai9qoHKbHeLsICVlcjQQslcyJgdi8NIVirevj/b5ycOtQtoL
-        r1XtqN67K/9InXjPit9tu81ZxVQ+LMFtY3KPPNRrEScL+qmbpv+RRDRA+MScT8fR1Gp305
-        E074yDhdLgLX+Huj4R41n1ZMU6arnIo=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Ricardo Koller <ricarkol@google.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/4] KVM: selftests: Setup ucall after loading program
- into guest memory
-Message-ID: <Y5Exwzr6Ibmmthl0@google.com>
-References: <20221207214809.489070-1-oliver.upton@linux.dev>
- <20221207214809.489070-3-oliver.upton@linux.dev>
- <Y5EoZ5uwrTF3eSKw@google.com>
- <Y5EtMWuTaJk9I3Bd@google.com>
- <Y5EutGSjkRmdItQb@google.com>
+        with ESMTP id S229470AbiLHBHy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 7 Dec 2022 20:07:54 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D13BFF66
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 17:07:53 -0800 (PST)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4NSGFw1nFDzRprS;
+        Thu,  8 Dec 2022 09:07:00 +0800 (CST)
+Received: from [10.174.176.230] (10.174.176.230) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.31; Thu, 8 Dec 2022 09:07:45 +0800
+Message-ID: <699c1182-62de-ca90-113c-9f4c5b44dd21@huawei.com>
+Date:   Thu, 8 Dec 2022 09:07:44 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5EutGSjkRmdItQb@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.1.0
+Subject: Re: [PATCH] samples: vfio-mdev: Fix missing pci_disable_device() in
+ mdpy_fb_probe()
+To:     Alex Williamson <alex.williamson@redhat.com>
+CC:     <kwankhede@nvidia.com>, <kraxel@redhat.com>, <kvm@vger.kernel.org>
+References: <20221207072128.30344-1-shangxiaojing@huawei.com>
+ <20221207151850.07d7a5e2.alex.williamson@redhat.com>
+From:   shangxiaojing <shangxiaojing@huawei.com>
+In-Reply-To: <20221207151850.07d7a5e2.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.230]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 08, 2022 at 12:24:20AM +0000, Sean Christopherson wrote:
-> On Thu, Dec 08, 2022, Oliver Upton wrote:
-> > On Wed, Dec 07, 2022 at 11:57:27PM +0000, Sean Christopherson wrote:
-> > > > diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > > > index 92d3a91153b6..95d22cfb7b41 100644
-> > > > --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > > > +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-> > > > @@ -609,8 +609,13 @@ static void setup_memslots(struct kvm_vm *vm, struct test_params *p)
-> > > >  				    data_size / guest_page_size,
-> > > >  				    p->test_desc->data_memslot_flags);
-> > > >  	vm->memslots[MEM_REGION_TEST_DATA] = TEST_DATA_MEMSLOT;
-> > > > +}
-> > > > +
-> > > > +static void setup_ucall(struct kvm_vm *vm)
-> > > > +{
-> > > > +	struct userspace_mem_region *region = vm_get_mem_region(vm, MEM_REGION_TEST_DATA);
-> > > >  
-> > > > -	ucall_init(vm, data_gpa + data_size);
-> > > > +	ucall_init(vm, region->region.guest_phys_addr + region->region.memory_size);
-> > > 
-> > > Isn't there a hole after CODE_AND_DATA_MEMSLOT?  I.e. after memslot 0?
-> > 
-> > Sure, but that's only guaranteed in the PA space.
-> > 
-> > > The reason
-> > > I ask is because if so, then we can do the temporarily heinous, but hopefully forward
-> > > looking thing of adding a helper to wrap kvm_vm_elf_load() + ucall_init().
-> > > 
-> > > E.g. I think we can do this immediately, and then at some point in the 6.2 cycle
-> > > add a dedicated region+memslot for the ucall MMIO page.
-> > 
-> > Even still, that's just a kludge to make ucalls work. We have other
-> > MMIO devices (GIC distributor, for example) that work by chance since
-> > nothing conflicts with the constant GPAs we've selected in the tests.
-> > 
-> > I'd rather we go down the route of having an address allocator for the
-> > for both the VA and PA spaces to provide carveouts at runtime.
+
+
+On 2022/12/8 6:18, Alex Williamson wrote:
+> On Wed, 7 Dec 2022 15:21:28 +0800
+> Shang XiaoJing <shangxiaojing@huawei.com> wrote:
 > 
-> Aren't those two separate issues?  The PA, a.k.a. memslots space, can be solved
-> by allocating a dedicated memslot, i.e. doesn't need a carve.  At worst, collisions
-> will yield very explicit asserts, which IMO is better than whatever might go wrong
-> with a carve out.
+>> Add missing pci_disable_device() in fail path of mdpy_fb_probe().
+>>
+>> Fixes: cacade1946a4 ("sample: vfio mdev display - guest driver")
+>> Signed-off-by: Shang XiaoJing <shangxiaojing@huawei.com>
+>> ---
+>>   samples/vfio-mdev/mdpy-fb.c | 5 ++++-
+>>   1 file changed, 4 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
+>> index 9ec93d90e8a5..a7b3a30058e5 100644
+>> --- a/samples/vfio-mdev/mdpy-fb.c
+>> +++ b/samples/vfio-mdev/mdpy-fb.c
+>> @@ -109,7 +109,7 @@ static int mdpy_fb_probe(struct pci_dev *pdev,
+>>   
+>>   	ret = pci_request_regions(pdev, "mdpy-fb");
+>>   	if (ret < 0)
+>> -		return ret;
+>> +		goto err_disable_dev;
+>>   
+>>   	pci_read_config_dword(pdev, MDPY_FORMAT_OFFSET, &format);
+>>   	pci_read_config_dword(pdev, MDPY_WIDTH_OFFSET,	&width);
+>> @@ -191,6 +191,9 @@ static int mdpy_fb_probe(struct pci_dev *pdev,
+>>   err_release_regions:
+>>   	pci_release_regions(pdev);
+>>   
+>> +err_disable_dev:
+>> +	pci_disable_device(pdev);
+>> +
+>>   	return ret;
+>>   }
+>>   
+> 
+> What about the same in the .remove callback?  Seems that all but the
+> framebuffer unwind is missing in the remove path.  Thanks,
+> 
 
-Perhaps the use of the term 'carveout' wasn't right here.
+Right, will fix in v2.
 
-What I'm suggesting is we cannot rely on KVM memslots alone to act as an
-allocator for the PA space. KVM can provide devices to the guest that
-aren't represented as memslots. If we're trying to fix PA allocations
-anyway, why not make it generic enough to suit the needs of things
-beyond ucalls?
-
---
-Thanks,
-Oliver
+Thanks for the review,
+-- 
+Shang XiaoJing
