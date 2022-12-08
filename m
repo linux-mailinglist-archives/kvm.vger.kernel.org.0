@@ -2,49 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65061646F4C
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 13:10:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BFC39646F57
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 13:12:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229702AbiLHMKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 07:10:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55308 "EHLO
+        id S230003AbiLHMMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 07:12:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbiLHMKG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 07:10:06 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2076.outbound.protection.outlook.com [40.107.100.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F00725444D;
-        Thu,  8 Dec 2022 04:10:04 -0800 (PST)
+        with ESMTP id S229946AbiLHMMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 07:12:25 -0500
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on20603.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e8d::603])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 260AB8B1A4;
+        Thu,  8 Dec 2022 04:12:19 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kVthjqmXDA6EJszV4rluVBzkiC5+HpwxV8KH9ftB+C4XXqfXxQlcrxgpsVDHxXIkX4roqvUnG/mqSlcrP3MPsFfbzJP9ajTSVONLM3IwRsg/d9fVODiPW/cHXpOxc2XT4v2glkx366EL71Xz2KhnGn3Bat2TTNDFfXe0diZj+KRy8yd/7PHDoQIfQhZMtvj1PZnrGEZ8qmqXCWiaAmUkzyTlO/2oDCxm8ZboR9ZWZ5x86TaUhd04AzMH9G7tdZfoe3NptfXdyksR/toqoTxE6xV14r1xD3RU2vLIWc5o8Id9sriAb66o+rnUU7YwRKO4U9kmDLM59f1sWjQw85tFbQ==
+ b=ZXTlzuuoLNlZ1vO3dEVOTFf/DXsDn0WUq9T95AAdS+UsgMAqZTTaH7w2JaIh6PVO7oIJHIyga5gsVESK9KNc2+r4fQVwa5FAjcwK2lRWMRc2N6Yy1M2pomZ0M67VDmelMWNz5HzNnjYOinkA/Ky4cGCiUaVsJy4DS7H9ZQnsvwp/Nubxvfs8dD97/mhVUrjHD0raCAl/KAz62paQphmcECK37Q0K9YkuAD01w+KOoKXXpK5EtHlPU2nSib414hH8+iEH4gNpuVrCChEXFtQjG65snoK3xrfY5aM94juUhI+H5xfrv2J8+EuzoW0qAbjCj1K6r73ZYhUV5gBP4aK20Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qEahMelRiz7SVjiH4uQ6odxJbhazHbDGvjxJBf0Dgyw=;
- b=cKdMewM5Hopl7BwbrqiFAPw6tvG48EKHMPwP1N0oO8RLuRdybI0EEhdYL/qTF8x8W68U+QqQ4veI5eOvAU9NLZUnomt2hUkS6QM3aA4e6KLaIgydynXu/ECyVMbS/4Ul9ZPN7ZHEpOwuY+ivpxM6dIjGN3yL/zOSR7yoC5ighOG9x0iU9XjxnVPOwPmK69ZVb5Go86b7IbB4kKpluopqNiJhr23c9h9buTo9/TnkO/wk1Dje0jc7rsMY3XjXYPblboB642RYScf6aDz+jHAj0SCQTn81E7zFIBfRHWJeaDaZLDWm3yQqKdFUxNP0pK2KwtNBL35mkyt4PLNr2UlInQ==
+ bh=2o3zOSUqhTtWTakzJkcaSU1LsBtV+XtVHVhTLwlct/o=;
+ b=TEDXc4rORsM3BRlQ2GUgj83SyKF8jgwIhs5DtdTOu5b0ebb/2Nl46tiXOE8QhslULpiAHVoFVBT7Je3NaESJzI6kTo1457cHgX2/uy2g4WFMbfaOYg9iIwGTt0p0VMo++MT7Q3FUQOmHjMgPyhSB2Hh9fepYLBKNDfpe6Og2qDInPo+iXKiVO5W5ULyStMId3EjtFt5hJSOziJsv8Qu8/RhGEn4M8yK7XBvIPHDP40K9BoYhLO1LWHRdZuYoCsCTlzvNl8Ru7bRnhzvYynJ0BBdFHcGOg25ETw7DQPXXZ/wIgHB0IdC3UMe/UJSaiCYGh8aCCpjXzqE3qE7EqiTq7Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qEahMelRiz7SVjiH4uQ6odxJbhazHbDGvjxJBf0Dgyw=;
- b=erndL7TsO1UtD3/xZ2F+qOuqRkmsBrhVrlcs7ArgKwwLPGro8Uxe10QNnjhGqSUXW3IoHihzOAnqRWky8I14pLUmwidYYITr0YdbYcSy22lxKkYKSzQkIQua4ud3dMIe8lTJom1BLhchtvhWuBBV+nE/YzLesYUyLq8qVy3zrrY=
+ bh=2o3zOSUqhTtWTakzJkcaSU1LsBtV+XtVHVhTLwlct/o=;
+ b=jNLHanzvW84Cwvxn9W1O350LPRi4YUUyct0TEZSkqsCuIV51iXkh3tXTA6EaYsOHlU3fJ5Z27l6o04YHqhJpJTz7oj48OSElfPHSCk8JrAmGPeCBSHe7Bspn9zYQuqrUL5rGecDEzEcUsrmBoTdCG+kaEouCwwjM98kYUpIOa2M=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=amd.com;
 Received: from CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11)
  by CH0PR12MB5042.namprd12.prod.outlook.com (2603:10b6:610:e1::24) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.16; Thu, 8 Dec
- 2022 12:10:00 +0000
+ 2022 12:12:16 +0000
 Received: from CY5PR12MB6323.namprd12.prod.outlook.com
  ([fe80::caf0:cffe:94c4:df18]) by CY5PR12MB6323.namprd12.prod.outlook.com
  ([fe80::caf0:cffe:94c4:df18%4]) with mapi id 15.20.5880.014; Thu, 8 Dec 2022
- 12:10:00 +0000
-Message-ID: <70078abb-f8b7-cd33-5bdd-bc6ee44c0bd3@amd.com>
-Date:   Thu, 8 Dec 2022 17:39:44 +0530
+ 12:12:16 +0000
+Message-ID: <ce38bb11-d8cb-5f02-36e9-01aec7bbefd3@amd.com>
+Date:   Thu, 8 Dec 2022 17:41:57 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.1
-Subject: Re: [PATCH v2 06/11] KVM: SVM: add wrappers to enable/disable IRET
- interception
+Subject: Re: [PATCH v2 11/11] KVM: nSVM: implement support for nested VNMI
 Content-Language: en-US
 To:     Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
 Cc:     Sandipan Das <sandipan.das@amd.com>,
@@ -63,79 +62,79 @@ Cc:     Sandipan Das <sandipan.das@amd.com>,
         Jing Liu <jing2.liu@intel.com>,
         Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>
+        Sean Christopherson <seanjc@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
 References: <20221129193717.513824-1-mlevitsk@redhat.com>
- <20221129193717.513824-7-mlevitsk@redhat.com>
- <41abb37b-c74a-f2cf-c0ce-74d5d6487e92@amd.com>
- <181f437164296e19683f086c11bf64c11a3f380e.camel@redhat.com>
+ <20221129193717.513824-12-mlevitsk@redhat.com>
+ <7efc45d1-4799-972b-cad7-482bb1662fa5@amd.com>
+ <55177ebfc8962dd9f5318e6b6b8cefd0dba16359.camel@redhat.com>
 From:   Santosh Shukla <santosh.shukla@amd.com>
-In-Reply-To: <181f437164296e19683f086c11bf64c11a3f380e.camel@redhat.com>
+In-Reply-To: <55177ebfc8962dd9f5318e6b6b8cefd0dba16359.camel@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN3PR01CA0056.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:99::20) To CY5PR12MB6323.namprd12.prod.outlook.com
+X-ClientProxiedBy: PN3PR01CA0029.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:97::18) To CY5PR12MB6323.namprd12.prod.outlook.com
  (2603:10b6:930:20::11)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: CY5PR12MB6323:EE_|CH0PR12MB5042:EE_
-X-MS-Office365-Filtering-Correlation-Id: f9870377-4264-48c8-214d-08dad91520bf
+X-MS-Office365-Filtering-Correlation-Id: 5b5ee37c-1e9d-4f77-00c4-08dad91571eb
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8plbkLReGkeVa2ezVaxUi0ohJk8moJ3h39rAzJBlAdHRE8hKZmZ6Ske4zmRLOdE2MfBa+9C6XVOs/88IZg90HlLZ/z37BXo8ZWb2OaH5Gxn9TjIMWdv7RFQZQMaHmOQwRFtdegRBJW4vx5T0Ib+6BzBBarj9eNT2uTHBLLCmf1yoGCwHbDcGXx7pLND74Rg/7JlMCX9N0QmUyNgjRy+R7aqbY/H0lOOds+g1cwdQ5PlqH/q9DrE8b1x+ePy2f0q2HC1TVgJUsKlfVtJuxNiifsY6CYS9amD+1scMqozCV2HoB3rx50lhc05276Zc2V8MPg7MFHw1WN0cxtiRzuvu7h83Ok1xb7BQir/I8yWQIUPw6Ti/zIRDeqzaIZ2niCm27vcnD0mlSnidEg0DSpeF9Bd22Dkwmn4wBDo4+2PPQj/gVL9Os0M1zIEGWj2GQ28vU63uACfAXwkxBpOXX/ltFtvABQBiYdAY7v1ihyMAtoHpB7X4yM23cn2ita6Qrvps8dlLoMzkR5Chxokqr/L6exMJtvZXK6Mbq8v4AZjepD89I0Lo3pQI2u/Tpi1fuBQwWrVMtmBgiLcgKEaYAPVIu+bjpty7BRUqVnRs4EAmfNiOFLrqJdXrwruRpnuBJ+uZKROaKnabxHdo61lyM1i8RAgEBjh3Lpe6xzswgl+6+T23WGZDelgp2ZTz5j1cUgf8lXiq521JKTldAbZwesG22FneaCNjigJvQjt+UAH3prk=
+X-Microsoft-Antispam-Message-Info: vU8lWrU/v/CdeOryHnnKbKuXIILxNScx42zmz1JUvDuuWQEL1usZv1eNunUr4wxJDBIWlePO58D8CtaJxjjK7jX+8q+jETnckqyu2VplVL0a+qcn5E4sTjfveyIt0yZcRF/INk9jwkHoNuCSjvZiZJvqgiNUwuODJc0G/eet3vRzsD/f9umPO8goaJeFC8Q3NlAN50DsJzFew+CbfjGUHyACil8iwMpZPEWB0UO4yexPt6twh4b4hDParB0/dkwCN5eoF3wAnBNppbABtPvmiISvHdauLV3vHk6ZV+XRuMmg9tJt7SglOfQLg00t0gwPBCQzn5KqziWLMwPmam7TKHTEOrKTAv3JjZaEaCEH9p5SeD0ruE5ROEVSOiPeFPeGW2OX6p9HsLPxkt4/j+mhxWpK5lPJkgtZmtWvHx+/AVdsu9PJ9HDyLxYwvdLD3xH0SL2luaR778yXhPD9fVY5RfvzqgIFmv2uPsltZWiHLpQajHpGtnqzorAf8E7J0af25Z2J8nH9MVGAA5ISAaqUqm34xkRj1gakQmq80Ah7LPBnUlMnNJ3PmCEsvkmIzoRsCqOeWdHACmo50rFpVlo4SEEbFMlexkpEMHqqZjnWTZiEF1Jd6cTf+KIa5q1v4pWnsye2X34H1DqarXRCWU1lw+c/FANYz7RI1ixxXGBz1yiEofsRaEINEVgHthXZHYfoMXKpg4u2m7OaQXuBTcG2Bzbo0cwQQfYPCvgzji6gmhY=
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6323.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(136003)(366004)(346002)(39860400002)(451199015)(31696002)(186003)(7416002)(86362001)(5660300002)(2616005)(83380400001)(44832011)(8936002)(41300700001)(38100700002)(2906002)(36756003)(6512007)(26005)(53546011)(31686004)(6666004)(478600001)(6486002)(316002)(6506007)(4326008)(66946007)(66476007)(66556008)(8676002)(54906003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?djlrVWo3YWxqT25pYzllZjg4Z0hLZzJzZldRVkR2K25TODFrT0JZUGZLakJS?=
- =?utf-8?B?M3VPWE4zVmxyazJ1SDRCMU1kb2RLNjNxSEFUTnZXbDY1Wjg4OExjbXFlWVBv?=
- =?utf-8?B?L0VtaVJsU1EyRFdraGNTNE1yd3BzK3lLK28wWTB5UGpTWFhkQXExWVRVNytP?=
- =?utf-8?B?QlFsbUJSdVhNVlMwVjczempTVVk1Q1Mrek1ZQ3IrZmk4YWE1cEJpOXd6Vmxo?=
- =?utf-8?B?U1dOSXpYZWxIQ2orY08xRTg5NGd2ekFESmVFK1hFSFpvS1lBMU1hRWdGSXcz?=
- =?utf-8?B?MmhKL2wrWTFLR0JjQ2tFVGZpWlVBQlpKbVMxNStiZk5CWlZRMXAwVkx2VFRN?=
- =?utf-8?B?bVRoWHQydjhZMUpNajF1MExqM1ZYSVRremdQeDFkUGxJNUxXZ1E2WSs5MlJp?=
- =?utf-8?B?TkpBS001NlhnWWhPYmtOSTdSek1yUW9abFI4RHoxSjNLNGQ5NS9TZjgwbCtO?=
- =?utf-8?B?NUhRWjI1eXQrR1EyN2Z0b2lmY0pYZ1ZxY0JJOWd0Ky9BWnJ1SzZBd04zTUhm?=
- =?utf-8?B?RmpLV2ZWZ1FHakxJN3BzeE1EYitmOGx3ZzJ4cDlNSDN5YjRTcnFtZmpqT1dz?=
- =?utf-8?B?SjNSWkkvMTRuTHl6RGZLeFVvdDd2Mkc3NlUvYldlV2V4NkZQSSsybnRjak51?=
- =?utf-8?B?MFpYZ09lNnpaR1BHV1VLdlZDRk52cVRUbGMvcHByUk13YkhVWmVWWG92M0NG?=
- =?utf-8?B?SDFwNXpCa3pHU2ZrSTlUU1M1QWFPWkZrU1NqWkp6TTJUb09pTDR5bFR0NkVZ?=
- =?utf-8?B?eXdIWUhQSFlvQlpWTlpIOVFFS3gwSy8yRFp5TzFseFAyQ0JRRWNJZ3M3bnVE?=
- =?utf-8?B?djg5bDVIRFd3K2V5ZThpZEFud2VrL0pMTDl0a0pwWCtqMzlQM3hPZEdhSXFj?=
- =?utf-8?B?V1NVdGxXWFVQUTEyVUFibVUrYmMyRDRYYnpLMXMwUFZjdFFINnIzNzUvOStK?=
- =?utf-8?B?S2dObWNENm1VT0wxTzRLRHFWMmh2QU5YNitGYWRpV3B4dWtSZk1TTlprUnZP?=
- =?utf-8?B?WUtRSCtrNy8zTGxuNkQyaWVrblRsalBFMWl5TEcvRXZRQ2cwNWhva2pUbGZZ?=
- =?utf-8?B?UUhoTitGdUpOeDVWQ3o1am1BbXliQ1J2L1BaUlplZERGNFFhaG5VaTBKeW9r?=
- =?utf-8?B?VUkzOXA3SFV6L2hpZlhtclpXQXo5YmZxOHBkOTQyVm9NZElmVCszZzRibC90?=
- =?utf-8?B?VkVIenJDWlMxc2dkdUxZM0RhM3pqMzVYV2o1Q3JIazFKM0Jqdlc4THM5Wkpq?=
- =?utf-8?B?aUF1bXc5dGFuRUhYdjd2clFEWkdET01xTHFRbGFDQWZjUlkrTWpHbVhwZVMx?=
- =?utf-8?B?SkVRLy9IalRmSXN2TElIRnBmMC9Mb2dyTTB5bGhYQklsZnhEeS9GeWxCWTdY?=
- =?utf-8?B?NkpMbmtVTkU2eE5KcWJxRCt3Qm92dnV4UFhYYXNvOVNIWlZmT002QkhRTmdI?=
- =?utf-8?B?TjJVQzBEM3RpR0JxVjF3RU1FVkRtRXo1cENFc3U3T1VDSjF4OE1uaFhyRjhR?=
- =?utf-8?B?RFE1dzBQR1dwRVg2Y01rRzY4OWRhRWpVaGQxVTlLNnJ6K1Z5c3ZXOXFzditF?=
- =?utf-8?B?OHNkWGhVdGJuMnprMk5hR3BGei9lejI0L24vR1B4eVJGUmE2VXNucnp5VlBX?=
- =?utf-8?B?TGFTTENDQkw2Z1lOeDBDbEhSWHIrS3Rtdk9ra1J4c2MwQVF3NENsTFlueHB0?=
- =?utf-8?B?V01SbXI0NHdZU3UwaGtCSzEzU1BpWkdFWlRUODNieWtydXVvZUJFSjZiT0Rj?=
- =?utf-8?B?SVNPSUsxTWxxMU5zU2F3blFpTkRnNW5xa3NleDBxaXEydGtBUitNc3NlSzV5?=
- =?utf-8?B?SzhaaUJWVFVDRCttZ1dMMEZLRDNhazNqbHNsUXNPSVlCTWM0aHZHTGQ4ZlBu?=
- =?utf-8?B?NVVHSVArSnFCbngzVzJEYWZnbkRHLy9PQ3ArRDZ6TFZoMk9RLzZmaU1LM21j?=
- =?utf-8?B?TW9qcnQ4bWluZTZQOXZZTGN2dk9yd2ZGK094ODR3TFI0THl0b3VLQkI0RHFJ?=
- =?utf-8?B?MjNBOXB3MXB6Tm00azFZc3lrMmhXQjh2RXo1bFRMQ1VaNkJWZEllZVRiN2lE?=
- =?utf-8?B?NytJSTdvVGZxWDRpZEdCTlo0WkhZSHhhWkpXVUgyRW5NVVk4aVNZeCtFd1hZ?=
- =?utf-8?Q?u8OEfycSHcvF8CCSTPMYFKDl8?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VVo1RW40Zk9WWXV6YUZ6OUVUcytNU0JvOUJjMXFyMUkvMTVPWk5uN0lTNzBJ?=
+ =?utf-8?B?TUx3U3JnTlA4UmNzb1V5N1huMk5idzhURUZObGFVdFMvOTd0Y2txbVpuZTh5?=
+ =?utf-8?B?bGhVS1lXY3NMZ3V0SUw5NjNreTV0V05zTGR4SHNWcjNRbW9LU05zOUxPYmhu?=
+ =?utf-8?B?Z0xlWVdqaGV3aThCT21ueExlMkdlVW1vYTlKSGRNTkY1L3BWWHlUcHpTNHNG?=
+ =?utf-8?B?K1pOczI2b0U1NlJQc2pYSUMzZGpjdjBKZEVkNlRpYUx3eTBHRjlYNHlYalpR?=
+ =?utf-8?B?aGF0OUFHa3FLSWhscnNnWWtJdTJwL2I1QXBYSlZDVXRpVGtpVy9Hd3Uzam0x?=
+ =?utf-8?B?dVFmVFhHZUNHVjJweGNXeGcwZm9aYmVLMzZSYk5hNUxzbXk3Sk5pdkFRVXBM?=
+ =?utf-8?B?c1RtYkhIR3FsTVdZS3NXa0hxNVRtMXNlL2pRNWkrK1hPcE9XTW5Oa2x5eU9k?=
+ =?utf-8?B?bFVsWjhGTHQrcllGYW1wdTUveGJJY1oxWTJZQzNNL1JnWFdzTVQyc0Fmd1Fy?=
+ =?utf-8?B?ZXY1UmJyNW1lY0NoTzNLZUVPeFBhVlFPVFJkSjkxeE9oTFhoT2pnUkM1K2Iw?=
+ =?utf-8?B?aTl0TjdLaUhRRWxhV0dLVllVbGUxaHh2Rk5oS2o4TmpyRkRwN3RXcjFvaDh3?=
+ =?utf-8?B?cEhVNFFORXZUNjliSytnN0diNjR6cDFVZjRkeTNZTTFnZGZ3Y0VFVW92bmh0?=
+ =?utf-8?B?S0dCc1EzQXBxcDMxVVNSTldNQ3NKTnVLWjVVWUhGUTdiTkZJSWRWL0FOU1ZB?=
+ =?utf-8?B?OWhxVEgvMUNveUZaeG9PVHlQdXZZQnh0YTlYcVVHSGEzVzJZU2hid3EzajdH?=
+ =?utf-8?B?S2xoa05rZ2Zyb0htQlp4T3ltVUZQYTJhbGZPVXByQ0lVQ1BHTkdnc0YxNlYx?=
+ =?utf-8?B?aXg1TWlxdnFyb0QrZGN4Y1UwWUw2RllJYlNWc1djUVpRdkhkWVErSkw5OGhk?=
+ =?utf-8?B?NjN2Sm1JcGpjaFNFUkNUcmNyU0VOTUZIaDNzQlpNZFhzc2t0b3pjUnREZ1l0?=
+ =?utf-8?B?bVBVMEZBdTl6WitZK3lSajVab3lvV2dDWHBaRFlRa3FCeTUxRER4cWl4R2lU?=
+ =?utf-8?B?Z3gwL1NGd1pZcExxUnpXcWtHVGZNTU1BYktlNHNXQVJFcjVuV1VvbVQ3OUlD?=
+ =?utf-8?B?Nm43eEF5ZzFUQUFFMDRyM1FSRFM2MDZkd1pBemJyVDRzZGdpUndVcENGeENT?=
+ =?utf-8?B?d05JL04vOEUxVm5DK3JBZDUvcnowZCtWTjZkelduUFV6bTY0WVBORkN2dGVW?=
+ =?utf-8?B?UGJwMk82Wjh6SmphSkZXanY4UWV2WmlkbUdIV21UZTBnSkIvK3hZS2xHT3RW?=
+ =?utf-8?B?OVRSaVBrQVpZVUE2eklSendhcWw5cnNkMktFcUI0bzBYZGdwS0JxeWZMbEND?=
+ =?utf-8?B?OWR4Qm91bUhjVCt3czRyVFpwY0FGUEpYaHp6NHNzUnFVTStlOFgzbnJVb2Ey?=
+ =?utf-8?B?UmtkczNLeE9OZ3crdFZGR3lRdzJoZWZpR1NOcjg2akQ2aGk5bS93NVY1b0VT?=
+ =?utf-8?B?OTlwSDFyY2owdmx2aHI2U0lVTktQYTNUN2NBNGozNkI4TWRTTzVxVk5mTGth?=
+ =?utf-8?B?cXd5d1VyZVhEMk96d2IydWlKV09TSnRxMzJjRERhREcxZ1pxUFlkSXAwTmxi?=
+ =?utf-8?B?amU1NkRpMjN3QVdsUXlibUkremcyejNMQk1sUUZTZ1FmQ1hkZWhOZTlkeFNj?=
+ =?utf-8?B?blZtcVFIaGdqM2EwSHJzRU1xU3hLQ2FtM2Zuajc2Z0ZoRmF0VGRiTE5JalhR?=
+ =?utf-8?B?TVJrM2ozMUptZ1RSZGdKQWZuY1FDU0xubWswRGFBNVJZMW14WWdnWkhnVUht?=
+ =?utf-8?B?NHVRblB0bGtmRnBNRWdQaWgwZHA5MGpYVUxkQ3VOUkxCbW00Q0tQbGNJYUNk?=
+ =?utf-8?B?OW1tY2lEMytIdVF5WGVqbUk0dWl6MXlYclhsTkNLVHhDK0V6VER4WEVjenZD?=
+ =?utf-8?B?YkJUTThRa0hENmwyMFpIc3JMc0FyN2d2T2pwUDYzajlodG1SSGRKbzVJajkv?=
+ =?utf-8?B?T0wrOHQ1UnZ6c0U2bWlUUVhEeGZFTVVGb0NGZzFKeGw0N1JtY3huUE1FMndr?=
+ =?utf-8?B?dTVGODJEVks3MThPS3JycHVEalJpR1BNdTIzaU5mSmQzMGZkVThQTHpoRDlh?=
+ =?utf-8?Q?5spsEtjSzeQ3O5Dc/fIWs0sY7?=
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9870377-4264-48c8-214d-08dad91520bf
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b5ee37c-1e9d-4f77-00c4-08dad91571eb
 X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6323.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2022 12:09:59.8282
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Dec 2022 12:12:15.9800
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8Gb/xfIUbd89J21aHFClG8dFC2gLzK9w3h7opnOTwQMTza3mLenjfEV2KhJn06Gl3UPQo13LhJsPhvw9vCHv5g==
+X-MS-Exchange-CrossTenant-UserPrincipalName: p9vSip84D8ZBzGWqS99TRCeKGoZ7BbE6Zk1OkT0aFGq3/mxiYxq+g8MhX1vlVUjoeJpD+sp+4cZMNz/y1e06uQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5042
 X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -144,105 +143,159 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 12/6/2022 5:44 PM, Maxim Levitsky wrote:
-> On Mon, 2022-12-05 at 21:11 +0530, Santosh Shukla wrote:
+On 12/6/2022 5:49 PM, Maxim Levitsky wrote:
+> On Mon, 2022-12-05 at 22:44 +0530, Santosh Shukla wrote:
 >> On 11/30/2022 1:07 AM, Maxim Levitsky wrote:
->>> SEV-ES guests don't use IRET interception for the detection of
->>> an end of a NMI.
+>>> This patch allows L1 to use vNMI to accelerate its injection
+>>> of NMIs to L2 by passing through vNMI int_ctl bits from vmcb12
+>>> to/from vmcb02.
 >>>
->>> Therefore it makes sense to create a wrapper to avoid repeating
->>> the check for the SEV-ES.
+>>> While L2 runs, L1's vNMI is inhibited, and L1's NMIs are injected
+>>> normally.
 >>>
->>> No functional change is intended.
+>>> In order to support nested VNMI requires saving and restoring the VNMI
+>>> bits during nested entry and exit.
+>>> In case of L1 and L2 both using VNMI- Copy VNMI bits from vmcb12 to
+>>> vmcb02 during entry and vice-versa during exit.
+>>> And in case of L1 uses VNMI and L2 doesn't- Copy VNMI bits from vmcb01 to
+>>> vmcb02 during entry and vice-versa during exit.
 >>>
->>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>>> Tested with the KVM-unit-test and Nested Guest scenario.
+>>>
+>>>
+>>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
 >>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 >>> ---
->>>  arch/x86/kvm/svm/svm.c | 28 +++++++++++++++++++---------
->>>  1 file changed, 19 insertions(+), 9 deletions(-)
+>>>  arch/x86/kvm/svm/nested.c | 13 ++++++++++++-
+>>>  arch/x86/kvm/svm/svm.c    |  5 +++++
+>>>  arch/x86/kvm/svm/svm.h    |  6 ++++++
+>>>  3 files changed, 23 insertions(+), 1 deletion(-)
 >>>
->>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
->>> index 512b2aa21137e2..cfed6ab29c839a 100644
->>> --- a/arch/x86/kvm/svm/svm.c
->>> +++ b/arch/x86/kvm/svm/svm.c
->>> @@ -2468,16 +2468,29 @@ static int task_switch_interception(struct kvm_vcpu *vcpu)
->>>  			       has_error_code, error_code);
+>>> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+>>> index 5bea672bf8b12d..81346665058e26 100644
+>>> --- a/arch/x86/kvm/svm/nested.c
+>>> +++ b/arch/x86/kvm/svm/nested.c
+>>> @@ -278,6 +278,11 @@ static bool __nested_vmcb_check_controls(struct kvm_vcpu *vcpu,
+>>>  	if (CC(!nested_svm_check_tlb_ctl(vcpu, control->tlb_ctl)))
+>>>  		return false;
+>>>  
+>>> +	if (CC((control->int_ctl & V_NMI_ENABLE) &&
+>>> +		!vmcb12_is_intercept(control, INTERCEPT_NMI))) {
+>>> +		return false;
+>>> +	}
+>>> +
+>>>  	return true;
 >>>  }
 >>>  
->>> +static void svm_disable_iret_interception(struct vcpu_svm *svm)
->>> +{
->>> +	if (!sev_es_guest(svm->vcpu.kvm))
->>> +		svm_clr_intercept(svm, INTERCEPT_IRET);
->>> +}
+>>> @@ -427,6 +432,9 @@ void nested_sync_control_from_vmcb02(struct vcpu_svm *svm)
+>>>  	if (nested_vgif_enabled(svm))
+>>>  		mask |= V_GIF_MASK;
+>>>  
+>>> +	if (nested_vnmi_enabled(svm))
+>>> +		mask |= V_NMI_MASK | V_NMI_PENDING;
 >>> +
->>> +static void svm_enable_iret_interception(struct vcpu_svm *svm)
->>> +{
->>> +	if (!sev_es_guest(svm->vcpu.kvm))
->>> +		svm_set_intercept(svm, INTERCEPT_IRET);
->>> +}
->>> +
+>>>  	svm->nested.ctl.int_ctl        &= ~mask;
+>>>  	svm->nested.ctl.int_ctl        |= svm->vmcb->control.int_ctl & mask;
+>>>  }
+>>> @@ -682,8 +690,11 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+>>>  	else
+>>>  		int_ctl_vmcb01_bits |= (V_GIF_MASK | V_GIF_ENABLE_MASK);
+>>>  
+>>> -	if (vnmi)
+>>> +	if (vnmi) {
 >>
->> nits:
->> s/_iret_interception / _iret_intercept
->> does that make sense?
+>> To avoid above change, I think we should move nested bits from 10/11 to this i.e.. move function
+>> (nested_svm_save_vnmi and nested_svm_restore_vnmi) to this patch.
+>>
+>> make sense?
 > 
-> Makes sense. I can also move this to svm.h near the svm_set_intercept(), I think
-> it better a better place for this function there if no objections.
 > 
-I think current approach is fine since function used in svm.c only. but I have
-no strong opinion on moving to svm.h either ways.
+> This is done on purpose:
+> 
+> For each optional SVM feature there are two parts in regard to nesting.
+> 
+> First part is the nesting co-existance, meaning that KVM should still work
+> while a nested guest runs, and the second part is letting the nested hypervisor
+> use the feature.
+> 
+> First part is mandatory, as otherwise KVM will be broken while a nested
+> guest runs.
+> 
+Ok!,.
 
-Thanks,
+> I squashed all of the vNMI support including nested co-existance in the patch 10,
+> and that includes the 'nested_svm_save_vnmi' and 'nested_svm_restore_vnmi'
+> 
+> Now this patch adds the actual nested vNMI, meaning that the nested hypervisor can
+> use it to speed up the delivery of NMI, it would like to inject to L2.
+>
+Ok, Make sense to me.
+Thank-you for the explanation.
+
+Regards,
 Santosh
-
+ 
 > Best regards,
 > 	Maxim Levitsky
+> 
 >>
 >> Thanks,
 >> Santosh
 >>
->>>  static int iret_interception(struct kvm_vcpu *vcpu)
->>>  {
->>>  	struct vcpu_svm *svm = to_svm(vcpu);
+>>>  		nested_svm_save_vnmi(svm);
+>>> +		if (nested_vnmi_enabled(svm))
+>>> +			int_ctl_vmcb12_bits |= (V_NMI_PENDING | V_NMI_ENABLE | V_NMI_MASK);
+>>> +	}
 >>>  
->>>  	++vcpu->stat.nmi_window_exits;
->>>  	svm->awaiting_iret_completion = true;
->>> -	if (!sev_es_guest(vcpu->kvm)) {
->>> -		svm_clr_intercept(svm, INTERCEPT_IRET);
+>>>  	/* Copied from vmcb01.  msrpm_base can be overwritten later.  */
+>>>  	vmcb02->control.nested_ctl = vmcb01->control.nested_ctl;
+>>> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+>>> index bf10adcf3170a8..fb203f536d2f9b 100644
+>>> --- a/arch/x86/kvm/svm/svm.c
+>>> +++ b/arch/x86/kvm/svm/svm.c
+>>> @@ -4214,6 +4214,8 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>>>  
+>>>  	svm->vgif_enabled = vgif && guest_cpuid_has(vcpu, X86_FEATURE_VGIF);
+>>>  
+>>> +	svm->vnmi_enabled = vnmi && guest_cpuid_has(vcpu, X86_FEATURE_AMD_VNMI);
 >>> +
->>> +	svm_disable_iret_interception(svm);
->>> +	if (!sev_es_guest(vcpu->kvm))
->>>  		svm->nmi_iret_rip = kvm_rip_read(vcpu);
->>> -	}
+>>>  	svm_recalc_instruction_intercepts(vcpu, svm);
+>>>  
+>>>  	/* For sev guests, the memory encryption bit is not reserved in CR3.  */
+>>> @@ -4967,6 +4969,9 @@ static __init void svm_set_cpu_caps(void)
+>>>  		if (vgif)
+>>>  			kvm_cpu_cap_set(X86_FEATURE_VGIF);
+>>>  
+>>> +		if (vnmi)
+>>> +			kvm_cpu_cap_set(X86_FEATURE_AMD_VNMI);
 >>> +
->>>  	kvm_make_request(KVM_REQ_EVENT, vcpu);
->>>  	return 1;
->>>  }
->>> @@ -3470,8 +3483,7 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
->>>  		return;
->>>  
->>>  	svm->nmi_masked = true;
->>> -	if (!sev_es_guest(vcpu->kvm))
->>> -		svm_set_intercept(svm, INTERCEPT_IRET);
->>> +	svm_enable_iret_interception(svm);
->>>  	++vcpu->stat.nmi_injections;
->>>  }
->>>  
->>> @@ -3614,12 +3626,10 @@ static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
->>>  
->>>  	if (masked) {
->>>  		svm->nmi_masked = true;
->>> -		if (!sev_es_guest(vcpu->kvm))
->>> -			svm_set_intercept(svm, INTERCEPT_IRET);
->>> +		svm_enable_iret_interception(svm);
->>>  	} else {
->>>  		svm->nmi_masked = false;
->>> -		if (!sev_es_guest(vcpu->kvm))
->>> -			svm_clr_intercept(svm, INTERCEPT_IRET);
->>> +		svm_disable_iret_interception(svm);
+>>>  		/* Nested VM can receive #VMEXIT instead of triggering #GP */
+>>>  		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
 >>>  	}
+>>> diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
+>>> index 0b7e1790fadde1..8fb2085188c5ac 100644
+>>> --- a/arch/x86/kvm/svm/svm.h
+>>> +++ b/arch/x86/kvm/svm/svm.h
+>>> @@ -271,6 +271,7 @@ struct vcpu_svm {
+>>>  	bool pause_filter_enabled         : 1;
+>>>  	bool pause_threshold_enabled      : 1;
+>>>  	bool vgif_enabled                 : 1;
+>>> +	bool vnmi_enabled                 : 1;
+>>>  
+>>>  	u32 ldr_reg;
+>>>  	u32 dfr_reg;
+>>> @@ -545,6 +546,11 @@ static inline bool nested_npt_enabled(struct vcpu_svm *svm)
+>>>  	return svm->nested.ctl.nested_ctl & SVM_NESTED_CTL_NP_ENABLE;
 >>>  }
 >>>  
+>>> +static inline bool nested_vnmi_enabled(struct vcpu_svm *svm)
+>>> +{
+>>> +	return svm->vnmi_enabled && (svm->nested.ctl.int_ctl & V_NMI_ENABLE);
+>>> +}
+>>> +
+>>>  static inline bool is_x2apic_msrpm_offset(u32 offset)
+>>>  {
+>>>  	/* 4 msrs per u8, and 4 u8 in u32 */
 > 
 > 
 
