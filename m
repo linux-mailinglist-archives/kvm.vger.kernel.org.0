@@ -2,78 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F5C3647104
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 14:47:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 43A05647198
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 15:23:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229756AbiLHNr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 08:47:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55414 "EHLO
+        id S229640AbiLHOXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 09:23:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229738AbiLHNrY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 08:47:24 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 089CD93A46
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 05:46:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670507112;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wdFEL8QJ85wlZIJKvo0Er6tQA2lVRghHL9Yr8+9KfAo=;
-        b=TuM99Wv3gNViJgbZOJ0AqfgNiiyVoH2u4FDu3g3bo+Ne5YO49VrPdZ/Rr8YNvcuIVV9cfl
-        OjcjyxzIjCy9ATXW1YPUz8BBL6m8FEsSGF23QreOLMVfmS5EvmtBI0RNhaK6XSVHRG+U++
-        9tSdvHVW0nW+cMbv3G4fETwrgg0RlRU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-609-_1rEUqjINbKkeVG_Lx7LMA-1; Thu, 08 Dec 2022 08:45:01 -0500
-X-MC-Unique: _1rEUqjINbKkeVG_Lx7LMA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 88514185A78B;
-        Thu,  8 Dec 2022 13:45:00 +0000 (UTC)
-Received: from starship (unknown [10.35.206.46])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D5FAF492CA2;
-        Thu,  8 Dec 2022 13:44:56 +0000 (UTC)
-Message-ID: <06d12050eece922e786b7bee1254698466c6d3d4.camel@redhat.com>
-Subject: Re: [PATCH v2 06/11] KVM: SVM: add wrappers to enable/disable IRET
- interception
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Santosh Shukla <santosh.shukla@amd.com>, kvm@vger.kernel.org
-Cc:     Sandipan Das <sandipan.das@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Babu Moger <babu.moger@amd.com>, linux-kernel@vger.kernel.org,
-        Jing Liu <jing2.liu@intel.com>,
-        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>
-Date:   Thu, 08 Dec 2022 15:44:55 +0200
-In-Reply-To: <70078abb-f8b7-cd33-5bdd-bc6ee44c0bd3@amd.com>
-References: <20221129193717.513824-1-mlevitsk@redhat.com>
-         <20221129193717.513824-7-mlevitsk@redhat.com>
-         <41abb37b-c74a-f2cf-c0ce-74d5d6487e92@amd.com>
-         <181f437164296e19683f086c11bf64c11a3f380e.camel@redhat.com>
-         <70078abb-f8b7-cd33-5bdd-bc6ee44c0bd3@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S230071AbiLHOWt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 09:22:49 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BFF887CBE;
+        Thu,  8 Dec 2022 06:21:45 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so4777284pjj.2;
+        Thu, 08 Dec 2022 06:21:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LqtUGDeRhyIU0uvL6sB1iilGR2QZ+QgSxzpj3bG0/0w=;
+        b=XbzNLFQn2MkS6jKtKCqOuDgonun+mWLHs+6xOUJWR9JbHFWiwxJUIcyHlCqydnO1w0
+         raO/wFAEMQwlhYleVtmSMFLq/T1EL+n+FX3ZPasyKW8KlNyaceOFzUHCaLNgF4X3TRTD
+         ySOR+k+3O5bIdPFTcyM6yHwcDL6CUmRcFz9MxSo6695POP/0H/13HaLeiqgMtGVomMIr
+         EggUyaQcI6bfI3BYr42b2sBxh9H163oibE82E1udhNDJWwSVlRQ5TfycS6NdiOX3L82Z
+         W55jWqFZd0e5JWvKrghbGpG3WPwk5y2y/u2UCyIX8jRvnmcBQ+VIas5MsptNokxHLuGS
+         p8PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LqtUGDeRhyIU0uvL6sB1iilGR2QZ+QgSxzpj3bG0/0w=;
+        b=mIZNY0/TVMSANfW899puJVNyBUmjdMAO/xiNZfWmTq9QsVwrz1V++wazzKSJX0IvIs
+         wXsPuULJxav+Wj5K5Dhc2b3Ew1D9NJEvDc+x6PsePoW3fzlN+E6Vy1MkbsYG7YowXIE7
+         N6U2xjhfyxb20/vaZbU1Cm1tcH7H0OjkqMFh1M1LSJzCoXKrCSL/ljKqpFDusOqSVM19
+         HqVgU7fGdDrUhY96nyG/PDwtdZ1OFuHXJDE27Rd1fWZG+Tb5t/emoBcnaCJGKkGfCfkI
+         3n2oN+2c/sIOsOBftwihlDjC+FXWXwgvPmaST4QSlonjqjeorrx6W8bpoxtZorK/UePT
+         Atqg==
+X-Gm-Message-State: ANoB5pny6+KyAPfDZHQwAwttNZLO+N1CGnXxlxij8cj08cVJLA2/yJo8
+        purFbYSFj41IcqfbED/gLpY=
+X-Google-Smtp-Source: AA0mqf62yqWGX4NSoquH8/vJ6ywT+lO47rCgmhBS/AlPQYSxPcvr5USAYB11rckMDH3o8dzPiQWkdw==
+X-Received: by 2002:a17:903:32cb:b0:189:cca6:3966 with SMTP id i11-20020a17090332cb00b00189cca63966mr21750475plr.89.1670509305032;
+        Thu, 08 Dec 2022 06:21:45 -0800 (PST)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
+        by smtp.gmail.com with ESMTPSA id c129-20020a624e87000000b0057627521e82sm13398950pfb.195.2022.12.08.06.21.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Dec 2022 06:21:44 -0800 (PST)
+Message-ID: <c3123488-1623-831e-783f-dae215b3f457@gmail.com>
+Date:   Thu, 8 Dec 2022 22:21:34 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [RFC PATCH V2 16/18] x86/sev: Initialize #HV doorbell and handle
+ interrupt requests
+Content-Language: en-US
+To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        ashish.kalra@amd.com, srutherford@google.com,
+        akpm@linux-foundation.org, anshuman.khandual@arm.com,
+        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
+        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
+        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
+        michael.roth@amd.com, thomas.lendacky@amd.com,
+        venu.busireddy@oracle.com, sterritt@google.com,
+        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
+References: <20221119034633.1728632-1-ltykernel@gmail.com>
+ <20221119034633.1728632-17-ltykernel@gmail.com>
+ <ddb23472-3f8e-191d-fa5f-d18f1a9e4ad7@amd.com>
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <ddb23472-3f8e-191d-fa5f-d18f1a9e4ad7@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,111 +90,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-12-08 at 17:39 +0530, Santosh Shukla wrote:
+On 12/7/2022 10:13 PM, Gupta, Pankaj wrote:
+>> +#endif
+>> +}
+>> +
+>>   static __always_inline void native_irq_disable(void)
+>>   {
+>>       asm volatile("cli": : :"memory");
+>> @@ -43,6 +59,9 @@ static __always_inline void native_irq_disable(void)
+>>   static __always_inline void native_irq_enable(void)
+>>   {
+>>       asm volatile("sti": : :"memory");
+>> +#ifdef CONFIG_AMD_MEM_ENCRYPT
+>> +    check_hv_pending(NULL);
 > 
-> On 12/6/2022 5:44 PM, Maxim Levitsky wrote:
-> > On Mon, 2022-12-05 at 21:11 +0530, Santosh Shukla wrote:
-> > > On 11/30/2022 1:07 AM, Maxim Levitsky wrote:
-> > > > SEV-ES guests don't use IRET interception for the detection of
-> > > > an end of a NMI.
-> > > > 
-> > > > Therefore it makes sense to create a wrapper to avoid repeating
-> > > > the check for the SEV-ES.
-> > > > 
-> > > > No functional change is intended.
-> > > > 
-> > > > Suggested-by: Sean Christopherson <seanjc@google.com>
-> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > ---
-> > > >  arch/x86/kvm/svm/svm.c | 28 +++++++++++++++++++---------
-> > > >  1 file changed, 19 insertions(+), 9 deletions(-)
-> > > > 
-> > > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > > > index 512b2aa21137e2..cfed6ab29c839a 100644
-> > > > --- a/arch/x86/kvm/svm/svm.c
-> > > > +++ b/arch/x86/kvm/svm/svm.c
-> > > > @@ -2468,16 +2468,29 @@ static int task_switch_interception(struct kvm_vcpu *vcpu)
-> > > >  			       has_error_code, error_code);
-> > > >  }
-> > > >  
-> > > > +static void svm_disable_iret_interception(struct vcpu_svm *svm)
-> > > > +{
-> > > > +	if (!sev_es_guest(svm->vcpu.kvm))
-> > > > +		svm_clr_intercept(svm, INTERCEPT_IRET);
-> > > > +}
-> > > > +
-> > > > +static void svm_enable_iret_interception(struct vcpu_svm *svm)
-> > > > +{
-> > > > +	if (!sev_es_guest(svm->vcpu.kvm))
-> > > > +		svm_set_intercept(svm, INTERCEPT_IRET);
-> > > > +}
-> > > > +
-> > > 
-> > > nits:
-> > > s/_iret_interception / _iret_intercept
-> > > does that make sense?
-> > 
-> > Makes sense. I can also move this to svm.h near the svm_set_intercept(), I think
-> > it better a better place for this function there if no objections.
-> > 
-> I think current approach is fine since function used in svm.c only. but I have
-> no strong opinion on moving to svm.h either ways.
+> Just trying to understand when regs will be NULL?
 
-I also think so, just noticed something in case there are any objections.
+check_hv_pending() will be divided into two functions.
 
-Best regards,
-	Maxim Levitsky
-
-> 
-> Thanks,
-> Santosh
-> 
-> > Best regards,
-> > 	Maxim Levitsky
-> > > Thanks,
-> > > Santosh
-> > > 
-> > > >  static int iret_interception(struct kvm_vcpu *vcpu)
-> > > >  {
-> > > >  	struct vcpu_svm *svm = to_svm(vcpu);
-> > > >  
-> > > >  	++vcpu->stat.nmi_window_exits;
-> > > >  	svm->awaiting_iret_completion = true;
-> > > > -	if (!sev_es_guest(vcpu->kvm)) {
-> > > > -		svm_clr_intercept(svm, INTERCEPT_IRET);
-> > > > +
-> > > > +	svm_disable_iret_interception(svm);
-> > > > +	if (!sev_es_guest(vcpu->kvm))
-> > > >  		svm->nmi_iret_rip = kvm_rip_read(vcpu);
-> > > > -	}
-> > > > +
-> > > >  	kvm_make_request(KVM_REQ_EVENT, vcpu);
-> > > >  	return 1;
-> > > >  }
-> > > > @@ -3470,8 +3483,7 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
-> > > >  		return;
-> > > >  
-> > > >  	svm->nmi_masked = true;
-> > > > -	if (!sev_es_guest(vcpu->kvm))
-> > > > -		svm_set_intercept(svm, INTERCEPT_IRET);
-> > > > +	svm_enable_iret_interception(svm);
-> > > >  	++vcpu->stat.nmi_injections;
-> > > >  }
-> > > >  
-> > > > @@ -3614,12 +3626,10 @@ static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
-> > > >  
-> > > >  	if (masked) {
-> > > >  		svm->nmi_masked = true;
-> > > > -		if (!sev_es_guest(vcpu->kvm))
-> > > > -			svm_set_intercept(svm, INTERCEPT_IRET);
-> > > > +		svm_enable_iret_interception(svm);
-> > > >  	} else {
-> > > >  		svm->nmi_masked = false;
-> > > > -		if (!sev_es_guest(vcpu->kvm))
-> > > > -			svm_clr_intercept(svm, INTERCEPT_IRET);
-> > > > +		svm_disable_iret_interception(svm);
-> > > >  	}
-> > > >  }
-> > > >  
-
+The one handles #hv event in the #HV exception code path.
+The other one handles pending irq event in the irq re-enable
+code path。 In this version, the "regs = NULL" for check_hv_pending()
+is used in the irq re-enable code path.
 
