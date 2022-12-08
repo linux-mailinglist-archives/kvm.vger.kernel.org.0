@@ -2,87 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 86520647067
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 14:04:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F5C3647104
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 14:47:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230174AbiLHNEY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 08:04:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59242 "EHLO
+        id S229756AbiLHNr1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 08:47:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229735AbiLHNEX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 08:04:23 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 223E390756;
-        Thu,  8 Dec 2022 05:04:22 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id w37so1133633pga.5;
-        Thu, 08 Dec 2022 05:04:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XPIojMEU3Uk2sxpHYe07tX6pxUYF84XeqU9rfvtr8NU=;
-        b=gdYzEeQQKZkShQb5QebR8HseGam8L3X3SxfNfap9dA22y74aF2tRGTU9n9gpJBROI0
-         iPSPcHCdrbV4LRRGMy7hp6W/8PKHugFX6mtVM1RpbsK/7uBrgKwRym+RMaCC1KVdg4GD
-         /q/AEd9TZ4/eiXVNbnRaPg0YnuWPar8Qu7UvtYQ/MljEIyqtXzlSysTXXIcZKhorQ1C+
-         3Obdk7WOp2b7wOeBf4bG+RY/54hRVcybS7YB0Uc3qVMS4pG67Hg+6g1YPZfVOgE5KH8h
-         XEGWKll+4OQzOkRrTAwS/U1Rr1nJz9MGZQfpp1DaDqJnvXNeq7FWvce/oxW0Q1eFnULx
-         caIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XPIojMEU3Uk2sxpHYe07tX6pxUYF84XeqU9rfvtr8NU=;
-        b=ylpc511XjO/akpQiVZWzNIzQK3becAJgknMVNj1e2ISGz0RNanBBTjg6/KqacuAhGK
-         sPD1pFC4I/Fh9pTIXojkz6FFYOGUPD+Gd4aKLs8mOZKaPmtYf+6EEk14quoc/TNiXURr
-         cyEaZwNrTn5TSbA+uBS72NihFtrAXjm/Pqdbw7Anfx3k53oSB8yKsCeDcbDsmKwC66+1
-         HqJSVTBWZu4s7UMFLJyDUAPDzsIl/TifaMxwYkO5+n5SgEMzxxGgUOM0HVPQUXNPN+PB
-         gW/7PxVD96KMOwv5mWhizNAOZwRP+21OSDdfcQGAxWHh6DaxW5bJj4otPDyfXEGg0kni
-         gang==
-X-Gm-Message-State: ANoB5pkY+K0PVv7R9iHUVKCWoMKP17ExcKsV7/fUrp7MQIIqd1rEWOG0
-        JJ5PvTMocaUueyW5158beGs=
-X-Google-Smtp-Source: AA0mqf6OPNkOMO6/SVyCg8eEu0qOaJuvqFCSd2zQn4XCdJadLYxuQKiZTUgd/cLx4Xm+AAy5vzPKlg==
-X-Received: by 2002:a63:3d8d:0:b0:46f:d4b8:409f with SMTP id k135-20020a633d8d000000b0046fd4b8409fmr86831624pga.475.1670504661067;
-        Thu, 08 Dec 2022 05:04:21 -0800 (PST)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id l5-20020a170903244500b00176b3c9693esm16574824pls.299.2022.12.08.05.04.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Dec 2022 05:04:20 -0800 (PST)
-Message-ID: <bb66e339-61db-6c0b-4e39-22bfd70073fd@gmail.com>
-Date:   Thu, 8 Dec 2022 21:04:10 +0800
+        with ESMTP id S229738AbiLHNrY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 08:47:24 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 089CD93A46
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 05:46:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670507112;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=wdFEL8QJ85wlZIJKvo0Er6tQA2lVRghHL9Yr8+9KfAo=;
+        b=TuM99Wv3gNViJgbZOJ0AqfgNiiyVoH2u4FDu3g3bo+Ne5YO49VrPdZ/Rr8YNvcuIVV9cfl
+        OjcjyxzIjCy9ATXW1YPUz8BBL6m8FEsSGF23QreOLMVfmS5EvmtBI0RNhaK6XSVHRG+U++
+        9tSdvHVW0nW+cMbv3G4fETwrgg0RlRU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-609-_1rEUqjINbKkeVG_Lx7LMA-1; Thu, 08 Dec 2022 08:45:01 -0500
+X-MC-Unique: _1rEUqjINbKkeVG_Lx7LMA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 88514185A78B;
+        Thu,  8 Dec 2022 13:45:00 +0000 (UTC)
+Received: from starship (unknown [10.35.206.46])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D5FAF492CA2;
+        Thu,  8 Dec 2022 13:44:56 +0000 (UTC)
+Message-ID: <06d12050eece922e786b7bee1254698466c6d3d4.camel@redhat.com>
+Subject: Re: [PATCH v2 06/11] KVM: SVM: add wrappers to enable/disable IRET
+ interception
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Santosh Shukla <santosh.shukla@amd.com>, kvm@vger.kernel.org
+Cc:     Sandipan Das <sandipan.das@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>, linux-kernel@vger.kernel.org,
+        Jing Liu <jing2.liu@intel.com>,
+        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Sean Christopherson <seanjc@google.com>
+Date:   Thu, 08 Dec 2022 15:44:55 +0200
+In-Reply-To: <70078abb-f8b7-cd33-5bdd-bc6ee44c0bd3@amd.com>
+References: <20221129193717.513824-1-mlevitsk@redhat.com>
+         <20221129193717.513824-7-mlevitsk@redhat.com>
+         <41abb37b-c74a-f2cf-c0ce-74d5d6487e92@amd.com>
+         <181f437164296e19683f086c11bf64c11a3f380e.camel@redhat.com>
+         <70078abb-f8b7-cd33-5bdd-bc6ee44c0bd3@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [RFC PATCH V2 01/18] x86/sev: Pvalidate memory gab for
- decompressing kernel
-Content-Language: en-US
-To:     "Gupta, Pankaj" <pankaj.gupta@amd.com>, luto@kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
-References: <20221119034633.1728632-1-ltykernel@gmail.com>
- <20221119034633.1728632-2-ltykernel@gmail.com>
- <eee97d32-09ea-b5d0-f45a-51c0e1d18d55@amd.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <eee97d32-09ea-b5d0-f45a-51c0e1d18d55@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,177 +81,111 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/6/2022 5:16 PM, Gupta, Pankaj wrote:
-> Hi Tianyu,
+On Thu, 2022-12-08 at 17:39 +0530, Santosh Shukla wrote:
 > 
-> Some minor nits below.
->
-Thanks a lot to review. I will change these in the next version.
+> On 12/6/2022 5:44 PM, Maxim Levitsky wrote:
+> > On Mon, 2022-12-05 at 21:11 +0530, Santosh Shukla wrote:
+> > > On 11/30/2022 1:07 AM, Maxim Levitsky wrote:
+> > > > SEV-ES guests don't use IRET interception for the detection of
+> > > > an end of a NMI.
+> > > > 
+> > > > Therefore it makes sense to create a wrapper to avoid repeating
+> > > > the check for the SEV-ES.
+> > > > 
+> > > > No functional change is intended.
+> > > > 
+> > > > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > > > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > > ---
+> > > >  arch/x86/kvm/svm/svm.c | 28 +++++++++++++++++++---------
+> > > >  1 file changed, 19 insertions(+), 9 deletions(-)
+> > > > 
+> > > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > > index 512b2aa21137e2..cfed6ab29c839a 100644
+> > > > --- a/arch/x86/kvm/svm/svm.c
+> > > > +++ b/arch/x86/kvm/svm/svm.c
+> > > > @@ -2468,16 +2468,29 @@ static int task_switch_interception(struct kvm_vcpu *vcpu)
+> > > >  			       has_error_code, error_code);
+> > > >  }
+> > > >  
+> > > > +static void svm_disable_iret_interception(struct vcpu_svm *svm)
+> > > > +{
+> > > > +	if (!sev_es_guest(svm->vcpu.kvm))
+> > > > +		svm_clr_intercept(svm, INTERCEPT_IRET);
+> > > > +}
+> > > > +
+> > > > +static void svm_enable_iret_interception(struct vcpu_svm *svm)
+> > > > +{
+> > > > +	if (!sev_es_guest(svm->vcpu.kvm))
+> > > > +		svm_set_intercept(svm, INTERCEPT_IRET);
+> > > > +}
+> > > > +
+> > > 
+> > > nits:
+> > > s/_iret_interception / _iret_intercept
+> > > does that make sense?
+> > 
+> > Makes sense. I can also move this to svm.h near the svm_set_intercept(), I think
+> > it better a better place for this function there if no objections.
+> > 
+> I think current approach is fine since function used in svm.c only. but I have
+> no strong opinion on moving to svm.h either ways.
 
->> Pvalidate needed pages for decompressing kernel. The E820_TYPE_RAM
->> entry includes only validated memory. The kernel expects that the
->> RAM entry's addr is fixed while the entry size is to be extended
->> to cover addresses to the start of next entry. This patch increases
->> the RAM entry size to cover all possilble memory addresses until
+I also think so, just noticed something in case there are any objections.
+
+Best regards,
+	Maxim Levitsky
+
 > 
-> s/possilble/possible
+> Thanks,
+> Santosh
 > 
->> init_size.
->>
->> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
->> ---
->>   arch/x86/boot/compressed/head_64.S |  8 +++
->>   arch/x86/boot/compressed/sev.c     | 84 ++++++++++++++++++++++++++++++
->>   2 files changed, 92 insertions(+)
->>
->> diff --git a/arch/x86/boot/compressed/head_64.S 
->> b/arch/x86/boot/compressed/head_64.S
->> index d33f060900d2..818edaf5d0cf 100644
->> --- a/arch/x86/boot/compressed/head_64.S
->> +++ b/arch/x86/boot/compressed/head_64.S
->> @@ -348,6 +348,14 @@ SYM_CODE_START(startup_64)
->>       cld
->>       cli
->> +#ifdef CONFIG_AMD_MEM_ENCRYPT
->> +    /* pvalidate memory on demand if SNP is enabled. */
->> +    pushq    %rsi
->> +    movq    %rsi, %rdi
->> +    call     pvalidate_for_startup_64
->> +    popq    %rsi
->> +#endif
->> +
->>       /* Setup data segments. */
->>       xorl    %eax, %eax
->>       movl    %eax, %ds
->> diff --git a/arch/x86/boot/compressed/sev.c 
->> b/arch/x86/boot/compressed/sev.c
->> index 960968f8bf75..3a5a1ab16095 100644
->> --- a/arch/x86/boot/compressed/sev.c
->> +++ b/arch/x86/boot/compressed/sev.c
->> @@ -12,8 +12,10 @@
->>    */
->>   #include "misc.h"
->> +#include <asm/msr-index.h>
->>   #include <asm/pgtable_types.h>
->>   #include <asm/sev.h>
->> +#include <asm/svm.h>
->>   #include <asm/trapnr.h>
->>   #include <asm/trap_pf.h>
->>   #include <asm/msr-index.h>
->> @@ -21,6 +23,7 @@
->>   #include <asm/ptrace.h>
->>   #include <asm/svm.h>
->>   #include <asm/cpuid.h>
->> +#include <asm/e820/types.h>
->>   #include "error.h"
->>   #include "../msr.h"
->> @@ -117,6 +120,22 @@ static enum es_result vc_read_mem(struct 
->> es_em_ctxt *ctxt,
->>   /* Include code for early handlers */
->>   #include "../../kernel/sev-shared.c"
->> +/* Check SEV-SNP via MSR */
->> +static bool sev_snp_runtime_check(void)
->> +{
->> +    unsigned long low, high;
->> +    u64 val;
->> +
->> +    asm volatile("rdmsr\n" : "=a" (low), "=d" (high) :
->> +            "c" (MSR_AMD64_SEV));
->> +
->> +    val = (high << 32) | low;
->> +    if (val & MSR_AMD64_SEV_SNP_ENABLED)
->> +        return true;
->> +
->> +    return false;
->> +}
->> +
->>   static inline bool sev_snp_enabled(void)
->>   {
->>       return sev_status & MSR_AMD64_SEV_SNP_ENABLED;
->> @@ -456,3 +475,68 @@ void sev_prep_identity_maps(unsigned long 
->> top_level_pgt)
->>       sev_verify_cbit(top_level_pgt);
->>   }
->> +
->> +static void extend_e820_on_demand(struct boot_e820_entry *e820_entry,
->> +                  u64 needed_ram_end)
->> +{
->> +    u64 end, paddr;
->> +    unsigned long eflags;
->> +    int rc;
->> +
->> +    if (!e820_entry)
->> +        return;
->> +
->> +    /* Validated memory must be aligned by PAGE_SIZE. */
->> +    end = ALIGN(e820_entry->addr + e820_entry->size, PAGE_SIZE);
->> +    if (needed_ram_end > end && e820_entry->type == E820_TYPE_RAM) {
-> 
-> maybe "if check" can be used to return from here, would read code better?
-> 
->> +        for (paddr = end; paddr < needed_ram_end; paddr += PAGE_SIZE) 
-> Maybe we could reuse 'pvalidate_pages' here?
-> 
->> +            rc = pvalidate(paddr, RMP_PG_SIZE_4K, true);
->> +            if (rc) {
->> +                error("Failed to validate address.n");
-> 
-> Would it make sense to print the cause of failure here?
-> 
->> +                return;
->> +            }
->> +        }
->> +        e820_entry->size = needed_ram_end - e820_entry->addr;
->> +    }
->> +}
->> +
->> +/*
->> + * Explicitly pvalidate needed pages for decompressing the kernel.
->> + * The E820_TYPE_RAM entry includes only validated memory. The kernel
->> + * expects that the RAM entry's addr is fixed while the entry size is 
->> to be
->> + * extended to cover addresses to the start of next entry.
->> + * The function increases the RAM entry size to cover all possible 
->> memory
->> + * addresses until init_size.
->> + * For example,  init_end = 0x4000000,
->> + * [RAM: 0x0 - 0x0],                       M[RAM: 0x0 - 0xa0000]
->> + * [RSVD: 0xa0000 - 0x10000]                [RSVD: 0xa0000 - 0x10000]
->> + * [ACPI: 0x10000 - 0x20000]      ==>       [ACPI: 0x10000 - 0x20000]
->> + * [RSVD: 0x800000 - 0x900000]              [RSVD: 0x800000 - 0x900000]
->> + * [RAM: 0x1000000 - 0x2000000]            M[RAM: 0x1000000 - 0x2001000]
->> + * [RAM: 0x2001000 - 0x2007000]            M[RAM: 0x2001000 - 0x4000000]
->> + * Other RAM memory after init_end is pvalidated by 
->> ms_hyperv_init_platform
->> + */
->> +__visible void pvalidate_for_startup_64(struct boot_params *boot_params)
->> +{
->> +    struct boot_e820_entry *e820_entry;
->> +    u64 init_end =
->> +        boot_params->hdr.pref_address + boot_params->hdr.init_size;
->> +    u8 i, nr_entries = boot_params->e820_entries;
->> +    u64 needed_end;
-> 
-> Could not very well interpret the name 'needed_end'.
-> 
->> +
->> +    if (!sev_snp_runtime_check())
->> +        return;
->> +
->> +    for (i = 0; i < nr_entries; ++i) {
->> +        /* Pvalidate memory holes in e820 RAM entries. */
-> 
-> Pvalidate and pvalidate names are used interchangeably in comments.
-> 
->> +        e820_entry = &boot_params->e820_table[i];
->> +        if (i < nr_entries - 1) {
->> +            needed_end = boot_params->e820_table[i + 1].addr;
->> +            if (needed_end < e820_entry->addr)
->> +                error("e820 table is not sorted.\n");
->> +        } else {
->> +            needed_end = init_end;
->> +        }
->> +        extend_e820_on_demand(e820_entry, needed_end);
->> +    }
->> +}
-> 
+> > Best regards,
+> > 	Maxim Levitsky
+> > > Thanks,
+> > > Santosh
+> > > 
+> > > >  static int iret_interception(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > >  	struct vcpu_svm *svm = to_svm(vcpu);
+> > > >  
+> > > >  	++vcpu->stat.nmi_window_exits;
+> > > >  	svm->awaiting_iret_completion = true;
+> > > > -	if (!sev_es_guest(vcpu->kvm)) {
+> > > > -		svm_clr_intercept(svm, INTERCEPT_IRET);
+> > > > +
+> > > > +	svm_disable_iret_interception(svm);
+> > > > +	if (!sev_es_guest(vcpu->kvm))
+> > > >  		svm->nmi_iret_rip = kvm_rip_read(vcpu);
+> > > > -	}
+> > > > +
+> > > >  	kvm_make_request(KVM_REQ_EVENT, vcpu);
+> > > >  	return 1;
+> > > >  }
+> > > > @@ -3470,8 +3483,7 @@ static void svm_inject_nmi(struct kvm_vcpu *vcpu)
+> > > >  		return;
+> > > >  
+> > > >  	svm->nmi_masked = true;
+> > > > -	if (!sev_es_guest(vcpu->kvm))
+> > > > -		svm_set_intercept(svm, INTERCEPT_IRET);
+> > > > +	svm_enable_iret_interception(svm);
+> > > >  	++vcpu->stat.nmi_injections;
+> > > >  }
+> > > >  
+> > > > @@ -3614,12 +3626,10 @@ static void svm_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
+> > > >  
+> > > >  	if (masked) {
+> > > >  		svm->nmi_masked = true;
+> > > > -		if (!sev_es_guest(vcpu->kvm))
+> > > > -			svm_set_intercept(svm, INTERCEPT_IRET);
+> > > > +		svm_enable_iret_interception(svm);
+> > > >  	} else {
+> > > >  		svm->nmi_masked = false;
+> > > > -		if (!sev_es_guest(vcpu->kvm))
+> > > > -			svm_clr_intercept(svm, INTERCEPT_IRET);
+> > > > +		svm_disable_iret_interception(svm);
+> > > >  	}
+> > > >  }
+> > > >  
+
+
