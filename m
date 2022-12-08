@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DFD996476C0
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:41:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 814996476BF
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:41:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230090AbiLHTl3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 14:41:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57262 "EHLO
+        id S229982AbiLHTl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 14:41:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230036AbiLHTki (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 14:40:38 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCA12389C4
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:40:19 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id r7-20020a25c107000000b006ff55ac0ee7so2525296ybf.15
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:40:19 -0800 (PST)
+        with ESMTP id S230044AbiLHTkk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 14:40:40 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71F4D389CD
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:40:20 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-39afd53dcdbso24756187b3.8
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:40:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tkNWRrDgNwNzqtgNwpxgN/DTrlBNLFki8K4gCSCF3lo=;
-        b=Jeo44smHjnYpe2uFwUmmqKcQe01M1Ze9ea9B4uMIU5ntQkPkvB3Zc4thQ3NAsyCsM6
-         njB6ARB2/jwqICHZjLWARLgqlROkOE8dE/Nlmg+cddGuhCUdBUCre+Ape5y9bEn1AH0m
-         QTNzlGiRNxTFT7VabJhOsxdhwjPofjbAJZ1PCWCHwTDUYPBouSQgwVrjYVu7xNslHehx
-         1YNfAbWUQ8IDhGJBMwkGg2u+vzD4HHd3ftPyCOz4Y9YrRbPnwANRWTtpcXIgRmYN6yTS
-         OWchh5FCUZ+isGuwUpxCxPxLXQApiy8OtxlS5CtERREsPneeyxTaL8RKmGDzc7PdZpGa
-         /plg==
+        bh=9jkEeOR+eFVYLdV/biNhqONLCqpOOeuWNQBN9kUw+a4=;
+        b=RcX1fA9WGa6w4C9PUxG4OPVBo1zxjA/xcbKeSP6a3foCAqZ7FzqI1mFwD63t1Zj64f
+         dUcsVkx5+LL+NIjjNV1LqNWVddFOpYikSd3WUTyGFLn96H50k7PwdHsttsFJt9P1ez0b
+         1mfPx6AlqK6ylftXIU2F9Nj5hSc+ikFrGZ/z1f/qPxYxfvx/OXVl/tDLZo61SUF3zvKK
+         PYv1RXX6MMcltPMtFw1Jp+095PHbtWtFgqbpJbKkr0cp5YLn1DUp9X/nB2YNG55HXF6K
+         /rKkgYv9i7/aE4/qJBLcexm7xz9bNSYN/tkjp5XaQYlxAPljLege78wWIo+X1uBQR1Re
+         /MJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tkNWRrDgNwNzqtgNwpxgN/DTrlBNLFki8K4gCSCF3lo=;
-        b=arZZBmWIniv3d490Bgf3d01FLqwG8l53EG09dLkgA9QvRqJwYoPY0eg1oR55F7+DZL
-         a1ymKiUkMbrhfrVR+AZISh3woAoPxgACh9CC5Uiyqodpab9+1jphatq/mPqx/0IR+Nz7
-         1jxOfpWkFADq5RnYpjKL9wucLVLRN9pSuKKOT/zgTJQn1zLGGYQcvCZmuTh67f5Kfofc
-         0xfJWV2aq/5j86P5V/2bt35yNVE+Pu/My35DQopsSjAAVB1NETTAoH/Z+jjE4sp1IZiT
-         30Nep8BkbnlKqKZCVHbMZ4YauQ0I/FcWerB8lG3OOCcdtRhjGNvhuwUE+ZwzZVKCQPxz
-         bENw==
-X-Gm-Message-State: ANoB5pm5l/OZXF4T8nSDzjfOKZ1EU47EM7EEGSZgrWKA+ZCNf2FKT+Al
-        v81ic6W13MUCYRo8tXGaHswarUj38tdlFA==
-X-Google-Smtp-Source: AA0mqf6e/93WEAJhtz+5cgWWhhHXPdHpxdnhitMPWlmfhQ9qhBNIB9WsoIo+5YOGLZdc8lSlrXS+3/eouLkxig==
+        bh=9jkEeOR+eFVYLdV/biNhqONLCqpOOeuWNQBN9kUw+a4=;
+        b=j7g0ZXLgALwEFBKS5lanE7XCmTG9lvmu/N5a/IFd7SDh8RM7K1cokbDf45S9+kDRy3
+         KBxqND/rkOIl91etfvpsfH1GIBO1ypeIqNt07+jgutTHncGvj/2IPtXeCd2iddAvWtKD
+         08C7vNZ6aPbrfQLfwXAT4BI+MTJs9+NGphS6FFF9+X8XARMnwSeZbu5FvOZcccrlRlAb
+         h7jSR/OMUA+u/UZhxcwhAyBODrhcXE3zl+ikmGhV+lhYPOGdq6u4JPgW7G0qHJ69Hz/h
+         e56wXIyBPgFGnp3c57FJoaGBRUTeQ4gI1MqCpQWa0WqZesgDP2qDPY7VxoBjNzHimot2
+         AkOQ==
+X-Gm-Message-State: ANoB5plgEKWK5fjSZ7GtL5Gl0dntB3FM6DiMh1xFFbwt9kd6GaPhoyNh
+        Z+8gHR6mfT8rChWVL7tgO+2YphIXZbrPqg==
+X-Google-Smtp-Source: AA0mqf5Y/oazogGX+tpbF7bdOJO4aayzIsYsnlV7zDudirQdvI5dtEVAX371oDYlEt+kHPpaNkmdcoOtQ7CEag==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a25:818d:0:b0:70e:58c:1c8b with SMTP id
- p13-20020a25818d000000b0070e058c1c8bmr2474845ybk.229.1670528408086; Thu, 08
- Dec 2022 11:40:08 -0800 (PST)
-Date:   Thu,  8 Dec 2022 11:38:56 -0800
+ (user=dmatlack job=sendgmr) by 2002:a25:c6c2:0:b0:6f0:b351:c300 with SMTP id
+ k185-20020a25c6c2000000b006f0b351c300mr63444626ybf.102.1670528409549; Thu, 08
+ Dec 2022 11:40:09 -0800 (PST)
+Date:   Thu,  8 Dec 2022 11:38:57 -0800
 In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221208193857.4090582-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-37-dmatlack@google.com>
-Subject: [RFC PATCH 36/37] KVM: x86/mmu: Move is_tdp_mmu_page() to mmu_internal.h
+Message-ID: <20221208193857.4090582-38-dmatlack@google.com>
+Subject: [RFC PATCH 37/37] KVM: MMU: Move the TDP MMU to common code
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
@@ -98,53 +98,107 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move is_tdp_mmu_page(), which is x86-specific, into mmu_internal.h. This
-prepares for moving tdp_mmu.h into common code.
+Move tdp_mmu.[ch] from arch/x86 and into the common code directories.
+This will allow other architectures to use the TDP MMU in the future.
 
 No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- arch/x86/kvm/mmu/mmu_internal.h | 9 +++++++++
- arch/x86/kvm/mmu/tdp_mmu.h      | 9 ---------
- 2 files changed, 9 insertions(+), 9 deletions(-)
+ arch/x86/kvm/Makefile                       | 2 +-
+ arch/x86/kvm/mmu/mmu.c                      | 3 ++-
+ {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h | 6 +++++-
+ virt/kvm/Makefile.kvm                       | 1 +
+ {arch/x86 => virt}/kvm/mmu/tdp_mmu.c        | 8 +++-----
+ 5 files changed, 12 insertions(+), 8 deletions(-)
+ rename {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h (94%)
+ rename {arch/x86 => virt}/kvm/mmu/tdp_mmu.c (99%)
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index df815cb84bd2..51aef9624521 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -147,4 +147,13 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
- void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
- void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+index cb9ae306892a..06b61fdea539 100644
+--- a/arch/x86/kvm/Makefile
++++ b/arch/x86/kvm/Makefile
+@@ -18,7 +18,7 @@ ifdef CONFIG_HYPERV
+ kvm-y			+= kvm_onhyperv.o
+ endif
  
-+#ifdef CONFIG_X86_64
-+static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp)
-+{
-+	return !sp->arch.shadow_mmu_page;
-+}
-+#else
-+static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
-+#endif
+-kvm-$(CONFIG_X86_64) += mmu/tdp_pgtable.o mmu/tdp_mmu.o
++kvm-$(CONFIG_X86_64)	+= mmu/tdp_pgtable.o
+ kvm-$(CONFIG_KVM_XEN)	+= xen.o
+ kvm-$(CONFIG_KVM_SMM)	+= smm.o
+ 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index f2602ee1771f..8653776bca6f 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -19,7 +19,6 @@
+ #include "ioapic.h"
+ #include "mmu.h"
+ #include "mmu_internal.h"
+-#include "tdp_mmu.h"
+ #include "x86.h"
+ #include "kvm_cache_regs.h"
+ #include "smm.h"
+@@ -27,6 +26,8 @@
+ #include "cpuid.h"
+ #include "spte.h"
+ 
++#include <kvm/tdp_mmu.h>
 +
- #endif /* __KVM_X86_MMU_INTERNAL_H */
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/arch/x86/kvm/mmu/tdp_mmu.h
-index 897608be7f75..607c1417abd1 100644
+ #include <linux/kvm_host.h>
+ #include <linux/types.h>
+ #include <linux/string.h>
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.h b/include/kvm/tdp_mmu.h
+similarity index 94%
+rename from arch/x86/kvm/mmu/tdp_mmu.h
+rename to include/kvm/tdp_mmu.h
+index 607c1417abd1..538c848149c9 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.h
-+++ b/arch/x86/kvm/mmu/tdp_mmu.h
-@@ -71,13 +71,4 @@ int kvm_tdp_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
- u64 *kvm_tdp_mmu_fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, u64 addr,
- 					u64 *spte);
++++ b/include/kvm/tdp_mmu.h
+@@ -5,7 +5,11 @@
  
--#ifdef CONFIG_X86_64
--static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp)
--{
--	return !sp->arch.shadow_mmu_page;
--}
--#else
--static inline bool is_tdp_mmu_page(struct kvm_mmu_page *sp) { return false; }
--#endif
+ #include <linux/kvm_host.h>
+ 
+-#include "spte.h"
++#include <kvm/mmu_types.h>
++#include <kvm/mmu.h>
++#include <kvm/tdp_iter.h>
++#include <kvm/tdp_pgtable.h>
++#include <kvm/mmutrace.h>
+ 
+ int kvm_mmu_init_tdp_mmu(struct kvm *kvm);
+ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm);
+diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
+index 58b595ac9b8d..942681308140 100644
+--- a/virt/kvm/Makefile.kvm
++++ b/virt/kvm/Makefile.kvm
+@@ -14,3 +14,4 @@ kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
+ kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
+ 
+ kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_iter.o
++kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_mmu.o
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/virt/kvm/mmu/tdp_mmu.c
+similarity index 99%
+rename from arch/x86/kvm/mmu/tdp_mmu.c
+rename to virt/kvm/mmu/tdp_mmu.c
+index c950d688afea..5ca8892ebef5 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/virt/kvm/mmu/tdp_mmu.c
+@@ -1,11 +1,9 @@
+ // SPDX-License-Identifier: GPL-2.0
+ 
+-#include "mmu.h"
+-#include "mmu_internal.h"
+-#include "tdp_mmu.h"
+-#include "spte.h"
 -
- #endif /* __KVM_X86_MMU_TDP_MMU_H */
++#include <kvm/mmu_types.h>
++#include <kvm/mmu.h>
+ #include <kvm/tdp_iter.h>
++#include <kvm/tdp_mmu.h>
+ #include <kvm/tdp_pgtable.h>
+ #include <kvm/mmutrace.h>
+ 
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
