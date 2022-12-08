@@ -2,95 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 43FA76469AA
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 08:21:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCBD46469AD
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 08:22:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbiLHHVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 02:21:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59558 "EHLO
+        id S229684AbiLHHW5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 02:22:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbiLHHVP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 02:21:15 -0500
-Received: from forwardcorp1c.mail.yandex.net (forwardcorp1c.mail.yandex.net [178.154.239.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BED79429B0;
-        Wed,  7 Dec 2022 23:21:12 -0800 (PST)
-Received: from sas1-7470331623bb.qloud-c.yandex.net (sas1-7470331623bb.qloud-c.yandex.net [IPv6:2a02:6b8:c08:bd1e:0:640:7470:3316])
-        by forwardcorp1c.mail.yandex.net (Yandex) with ESMTP id DC6CD5EA31;
-        Thu,  8 Dec 2022 10:21:10 +0300 (MSK)
-Received: from [IPV6:2a02:6b8:b081:b508::1:9] (unknown [2a02:6b8:b081:b508::1:9])
-        by sas1-7470331623bb.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id 9LTVHD0Q1uQ1-9HwNS8bl;
-        Thu, 08 Dec 2022 10:21:10 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru; s=default;
-        t=1670484070; bh=PFKUye++mZH6wL0b2UDNrP0wC14IIRxlwdFXpy4yqQE=;
-        h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-        b=lh8v9eF2fLkc1yBcbAW4xC06fyz5scS8E4GH9TFQwEKA75PinjIvg5gX+1WrPLMov
-         CzAcBPiEK52KxNFOe66sniwwxdOeUIVpbInnNBKPnL0jvo4CAevApzi5raRDUPlf1/
-         1TYqcKKXJKJy/B8VH56WnWrh6sJoo8YQ31UmN4uY=
-Authentication-Results: sas1-7470331623bb.qloud-c.yandex.net; dkim=pass header.i=@yandex-team.ru
-Message-ID: <bc387a08-e5ad-7a6b-2af4-61f79090277b@yandex-team.ru>
-Date:   Thu, 8 Dec 2022 10:21:09 +0300
+        with ESMTP id S229573AbiLHHWy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 02:22:54 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CE4962E2
+        for <kvm@vger.kernel.org>; Wed,  7 Dec 2022 23:22:52 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id m14so562494wrh.7
+        for <kvm@vger.kernel.org>; Wed, 07 Dec 2022 23:22:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+KgrJgKlOCWs8OsRLJcfgfE9La+tQMLkIort8Vs082I=;
+        b=FCOqnyeSdn28Fg8m7NEZojAUp1vbm0uShsr0YjvFX3YzeiZopJl+vh0sipA8p4jWDF
+         Jx7dss3IysY8nj0n02uKUdDVPchxEeYGpJsKDVwko9nCCmyObdCsX4s6gnkwY/Nw55WG
+         UeK4CCEdbDGrDrZJQRRvbz4lxGS/7vSVy+6I345PyN18weapfoOZ2G0IYvzAyKiQihO+
+         KRraKZoEOaFZueEtXa5MlbHpMbzKko1rNgT2KkbHmHoM9mes3JQ5UpOA8eO07RtmymbE
+         JziPggF53Ges1XttfZB5CmNHsisuFoH9bxug/3GOyWLcEPi9aINJsj87//v7eD6CGo89
+         o8UA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+KgrJgKlOCWs8OsRLJcfgfE9La+tQMLkIort8Vs082I=;
+        b=js5vkOOGIfou/8Qi0dqrR0zUZWVdK9GPaEi/aONm5tDjhGiBZo765psdnmgL6oWTBq
+         OWMU5xo8rDL1O6XmpjuBFrVfXkWFCtey0WRBi2nc/eSdXQZDVIIQut1f42knESiK6X2D
+         LR54kLrpsg8D8YOLJr4XkseDrZWRGMd7E10LtiQDIL6k444hFa28YMDx0Z6lgLjCei43
+         cPcVLPwby0D6c43mAvkddWshgU2GZ63qLaf67Y81X+YD/1ea7jcwwhU3VYMcpAhfZO/8
+         R3IUL8HEtaFzTP23isijlUXhWwTPKT0Qa0f8lkX8lp5mYUQrKOQqjbYzAKmvCX8e0CH2
+         ZC7Q==
+X-Gm-Message-State: ANoB5plyhpjejGZptHV/xXoJQem+LT6wIdtVKaWex0TgiVu+WxH967q1
+        e5KAd7GoQE7Je1cJiP65pxo=
+X-Google-Smtp-Source: AA0mqf7wPUBYA5aC2yZigXJDteQzOt+U0qWhwkNWTZFT5SFlUP1NIyz3eJeWC0r9X3G3uYiPE8FVFQ==
+X-Received: by 2002:adf:d22f:0:b0:242:481e:467 with SMTP id k15-20020adfd22f000000b00242481e0467mr14800510wrh.72.1670484170796;
+        Wed, 07 Dec 2022 23:22:50 -0800 (PST)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id m188-20020a1c26c5000000b003d1d5a83b2esm3829822wmm.35.2022.12.07.23.22.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Dec 2022 23:22:50 -0800 (PST)
+Date:   Thu, 8 Dec 2022 10:22:47 +0300
+From:   Dan Carpenter <error27@gmail.com>
+To:     oe-kbuild@lists.linux.dev,
+        Steve Sistare <steven.sistare@oracle.com>, kvm@vger.kernel.org
+Cc:     lkp@intel.com, oe-kbuild-all@lists.linux.dev,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Steve Sistare <steven.sistare@oracle.com>
+Subject: Re: [PATCH V1 8/8] vfio/type1: change dma owner
+Message-ID: <202212081401.mUeUos7m-lkp@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v1] drivers/vhost/vhost: fix overflow checks in
- vhost_overflow
-Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221207134631.907221-1-d-tatianin@yandex-team.ru>
- <20221207100028-mutt-send-email-mst@kernel.org>
-From:   Daniil Tatianin <d-tatianin@yandex-team.ru>
-In-Reply-To: <20221207100028-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1670363753-249738-9-git-send-email-steven.sistare@oracle.com>
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/7/22 6:01 PM, Michael S. Tsirkin wrote:
-> On Wed, Dec 07, 2022 at 04:46:31PM +0300, Daniil Tatianin wrote:
->> The if statement would erroneously check for > ULONG_MAX, which could
->> never evaluate to true. Check for equality instead.
->>
->> Found by Linux Verification Center (linuxtesting.org) with the SVACE
->> static analysis tool.
->>
->> Signed-off-by: Daniil Tatianin <d-tatianin@yandex-team.ru>
-> 
-> It can trigger on a 32 bit system. I'd also expect more analysis
-> of the code flow than "this can not trigger switch to a condition
-> that can" to accompany a patch.
+Hi Steve,
 
-Oops, my bad. It can trigger on 32 bit indeed. Sorry, completely 
-overlooked that.
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-Thanks
+url:    https://github.com/intel-lab-lkp/linux/commits/Steve-Sistare/vfio-virtual-address-update-redo/20221207-055735
+base:   https://github.com/awilliam/linux-vfio.git for-linus
+patch link:    https://lore.kernel.org/r/1670363753-249738-9-git-send-email-steven.sistare%40oracle.com
+patch subject: [PATCH V1 8/8] vfio/type1: change dma owner
+config: i386-randconfig-m021
+compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
 
->> ---
->>   drivers/vhost/vhost.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
->> index 40097826cff0..8df706e7bc6c 100644
->> --- a/drivers/vhost/vhost.c
->> +++ b/drivers/vhost/vhost.c
->> @@ -730,7 +730,7 @@ static bool log_access_ok(void __user *log_base, u64 addr, unsigned long sz)
->>   /* Make sure 64 bit math will not overflow. */
->>   static bool vhost_overflow(u64 uaddr, u64 size)
->>   {
->> -	if (uaddr > ULONG_MAX || size > ULONG_MAX)
->> +	if (uaddr == ULONG_MAX || size == ULONG_MAX)
->>   		return true;
->>   
->>   	if (!size)
->> -- 
->> 2.25.1
-> 
+If you fix the issue, kindly add following tag where applicable
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <error27@gmail.com>
+
+New smatch warnings:
+drivers/vfio/vfio_iommu_type1.c:1546 same_file_mapping() error: uninitialized symbol 'pgoff2'.
+drivers/vfio/vfio_iommu_type1.c:1547 same_file_mapping() error: uninitialized symbol 'len2'.
+drivers/vfio/vfio_iommu_type1.c:1547 same_file_mapping() error: uninitialized symbol 'flags2'.
+
+vim +/pgoff2 +1546 drivers/vfio/vfio_iommu_type1.c
+
+f42f5cc4de6087 Steve Sistare    2022-12-06  1517  static bool same_file_mapping(struct mm_struct *mm1, unsigned long vaddr1,
+f42f5cc4de6087 Steve Sistare    2022-12-06  1518  			      struct mm_struct *mm2, unsigned long vaddr2)
+f42f5cc4de6087 Steve Sistare    2022-12-06  1519  {
+f42f5cc4de6087 Steve Sistare    2022-12-06  1520  	const unsigned long mask = VM_READ | VM_WRITE | VM_EXEC | VM_SHARED;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1521  	struct inode *inode1 = NULL, *inode2 = NULL;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1522  	unsigned long pgoff1, len1, flags1;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1523  	unsigned long pgoff2, len2, flags2;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1524  	struct vm_area_struct *vma;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1525  
+f42f5cc4de6087 Steve Sistare    2022-12-06  1526  	mmap_read_lock(mm1);
+f42f5cc4de6087 Steve Sistare    2022-12-06  1527  	vma = find_vma(mm1, vaddr1);
+f42f5cc4de6087 Steve Sistare    2022-12-06  1528  	if (vma && vma->vm_file) {
+f42f5cc4de6087 Steve Sistare    2022-12-06  1529  		inode1 = vma->vm_file->f_inode;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1530  		pgoff1 = vma->vm_pgoff;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1531  		len1 = vma->vm_end - vma->vm_start;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1532  		flags1 = vma->vm_flags & mask;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1533  	}
+f42f5cc4de6087 Steve Sistare    2022-12-06  1534  	mmap_read_unlock(mm1);
+f42f5cc4de6087 Steve Sistare    2022-12-06  1535  
+f42f5cc4de6087 Steve Sistare    2022-12-06  1536  	mmap_read_lock(mm2);
+f42f5cc4de6087 Steve Sistare    2022-12-06  1537  	vma = find_vma(mm2, vaddr2);
+f42f5cc4de6087 Steve Sistare    2022-12-06  1538  	if (vma && vma->vm_file) {
+f42f5cc4de6087 Steve Sistare    2022-12-06  1539  		inode2 = vma->vm_file->f_inode;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1540  		pgoff2 = vma->vm_pgoff;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1541  		len2 = vma->vm_end - vma->vm_start;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1542  		flags2 = vma->vm_flags & mask;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1543  	}
+f42f5cc4de6087 Steve Sistare    2022-12-06  1544  	mmap_read_unlock(mm2);
+f42f5cc4de6087 Steve Sistare    2022-12-06  1545  
+f42f5cc4de6087 Steve Sistare    2022-12-06 @1546  	if (!inode1 || (inode1 != inode2) || (pgoff1 != pgoff2) ||
+
+Presumably the combination of checking !inode1 and inode1 != inode2
+prevents an uninitialized variable use, but it's not clear.
+
+f42f5cc4de6087 Steve Sistare    2022-12-06 @1547  	    (len1 != len2) || (flags1 != flags2)) {
+f42f5cc4de6087 Steve Sistare    2022-12-06  1548  		pr_debug("vfio vma mismatch for old va %lx vs new va %lx\n",
+f42f5cc4de6087 Steve Sistare    2022-12-06  1549  			 vaddr1, vaddr2);
+f42f5cc4de6087 Steve Sistare    2022-12-06  1550  		return false;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1551  	} else {
+f42f5cc4de6087 Steve Sistare    2022-12-06  1552  		return true;
+f42f5cc4de6087 Steve Sistare    2022-12-06  1553  	}
+f42f5cc4de6087 Steve Sistare    2022-12-06  1554  }
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
+
