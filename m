@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5037164764F
+	by mail.lfdr.de (Postfix) with ESMTP id A5610647650
 	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:39:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229750AbiLHTjQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 14:39:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56920 "EHLO
+        id S229722AbiLHTjS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 14:39:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229699AbiLHTjN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 14:39:13 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 560368565C
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:39:08 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id o18-20020a170902d4d200b00189d4c25568so2216832plg.13
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:39:08 -0800 (PST)
+        with ESMTP id S229717AbiLHTjO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 14:39:14 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EB2F85D32
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:39:09 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id n16-20020a056a000d5000b005764608bb24so1750343pfv.12
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:39:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ujLJi7i8azU+eMc6VTcefpCoupmEeGtA9YqNEcSBses=;
-        b=cuzmQGCEldboJ2SHxjhYx+JlxduEJQcra1UJYiUT5ADduRS09xHWw7K4TJw1Q5jPem
-         KcWULiMtAf8RENHwaDz48Nz4wc0mOadnuYaM+NOwk+AV1c8kwUmctYnQ1GnTujQjYANW
-         UoERo9J18Ky3VKEwjcmPruTKMisazad9CVywJ25nL03PajUQw2Wf2MDEk0IdfkLBeD3J
-         G9AegsGcNrXObaDNrAuD1hyo4QJk9gcGNZ+ZlJPS+Q1U4EWY0km2jMLYRnIMLWiuNk9v
-         XjNoj3Jn+65wwAb2AkKPDDUs6bFJD/MvpR3zoNtTlr/HOQWjVuK/lQxa9oM9gzRO/VDs
-         xAPA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zB9oiH2BRr4yMBo3wf45SO3Nck80VorbJdVA47iblXM=;
+        b=g9cixz5ghWNJL3K+TodNMkBqI/oQhLTOr97M7M2/XpZEkjrmI3nr8w2JGkmRiCYvFp
+         oCqkxLLopMMEof8X6INg95QudTyolVDU+RZhaURZt8OAHqkW63+Kglxtq76sXMR3UwFq
+         TH0D0M7upbnITs3QBeHc4oBh6Bot1NKIQBOUihmvyAsu3jIi5z0OXboG4BlLnZQDvrbN
+         irbKiodu/sENkvb3heU4imTZch1oJk77UygEm5fQ1B7wZYOkf7/kSwfDOcxQWmBFS0gg
+         yWvbjdMM2Sl2l6GeuSkr5btl/7w76Xe8GfrXo/KlMP5jfkzzRUjzb+ofPgAfWivKb76C
+         TC7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ujLJi7i8azU+eMc6VTcefpCoupmEeGtA9YqNEcSBses=;
-        b=HNKNShd0SRNR5eAE+7uECkAzYrO3LrFQdMhLMvmmTlYX8S07EKK6RazTRlNI/xCUbu
-         isJiUM8N9Y9+AK6fc7vFeHvb+z0MCRsGDaJGVmnNsxBI/wbasZygXWRwYNNWJHQ+elDJ
-         ohyu2SJKLAl3tVWZIlD4EyAWR9fI4DwNGs4VPZZxCsV3eVhbqFbsx/fWsk7J5tJcCvN9
-         v8XCuxKnJg3rAkFFt1WOJPOZ9QSyKZoM78vWP4gm6AkErKtLzsbwhGISdIqJA3Zrvhmw
-         aZ9b2LbO7Qno9wVhAwcj8o3S+b9vWoD0pY1KZlT5rht+479eRhX16nFVNklgod3ecA1g
-         90wA==
-X-Gm-Message-State: ANoB5pnZc9IQQuT9q3LMmJP+plZSGFHob9pqHgvuPcgQtkE1xnyu/kFT
-        wAOM17W6kfFeeQShJenFK0lPcnvRQFy3/g==
-X-Google-Smtp-Source: AA0mqf7+VfQEHkQMkf8id2SowUe4yQgqt5tzohe0c2eiYcS+MDqzUzJHDLrfnnlooA+chsGoATzx5vrJ+8ydUg==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zB9oiH2BRr4yMBo3wf45SO3Nck80VorbJdVA47iblXM=;
+        b=5vAZ+1bdzHwSMoB4R27luBWAM/ITYD+QvEfUR/xgErUaMyZEWJ0CSjzu6Sz4a/DNy9
+         ilFklQeQfHuSiF0Uv/AHdDC4BzYA2tlBSYoyXL7Ciw/XIYOSuNFLMDosxt/XCQTwpzMe
+         ods3SekHkvkXAuQEqq4FvAIrW6yLkld5W/KtmCOoT3Udz2ArdcUkg6VvhG3yezn/qCXj
+         s6ifcHd8XfEk6V6u8LOePXBBZO7WUdeJ5NImjNp02/EaKPVP3upYZTWIircMvBlp8Hqo
+         9JegI5pvZnXLrEc5H9HkJC7uovclcSojJfF1BzB5d5MxiUTA1PvDMrN6BKpAHrV75vMy
+         is4w==
+X-Gm-Message-State: ANoB5pnjWQhZAnZ3Bxo8xl/D6HOtsoeiKX7XRtOiW4OoULcK6l3SrCd4
+        H7MRTJq3jqdKAIxsn0OEyYJAFV9xS4dwXg==
+X-Google-Smtp-Source: AA0mqf4iTqxLqkeKUJGKBK2vDw/TcOMUrCzACSliwb1y6sicvyYssf60rgU2Phn8zeoC+EETXrN69Yd24770KA==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a17:90b:f89:b0:219:5b3b:2b9f with SMTP id
- ft9-20020a17090b0f8900b002195b3b2b9fmr4096840pjb.2.1670528346939; Thu, 08 Dec
- 2022 11:39:06 -0800 (PST)
-Date:   Thu,  8 Dec 2022 11:38:20 -0800
+ (user=dmatlack job=sendgmr) by 2002:a17:90b:33c8:b0:219:94b2:2004 with SMTP
+ id lk8-20020a17090b33c800b0021994b22004mr28273120pjb.215.1670528349120; Thu,
+ 08 Dec 2022 11:39:09 -0800 (PST)
+Date:   Thu,  8 Dec 2022 11:38:21 -0800
+In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
 Mime-Version: 1.0
+References: <20221208193857.4090582-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-1-dmatlack@google.com>
-Subject: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common code
+Message-ID: <20221208193857.4090582-2-dmatlack@google.com>
+Subject: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID directly
+ in kvm_mmu_page_role
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
@@ -96,222 +99,158 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[ mm folks: You are being cc'd since this series includes a mm patch
-  ("mm: Introduce architecture-neutral PG_LEVEL macros"), but general
-  feedback is also welcome. I imagine there are a lot of lessons KVM can
-  learn from mm about sharing page table code across architectures. ]
+Rename kvm_mmu_page_role.smm with kvm_mmu_page_role.as_id and use it
+directly as the address space ID throughout the KVM MMU code. This
+eliminates a needless level of indirection, kvm_mmu_role_as_id(), and
+prepares for making kvm_mmu_page_role architecture-neutral.
 
-Hello,
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ arch/x86/include/asm/kvm_host.h |  4 ++--
+ arch/x86/kvm/mmu/mmu.c          |  6 +++---
+ arch/x86/kvm/mmu/mmu_internal.h | 10 ----------
+ arch/x86/kvm/mmu/tdp_iter.c     |  2 +-
+ arch/x86/kvm/mmu/tdp_mmu.c      | 12 ++++++------
+ 5 files changed, 12 insertions(+), 22 deletions(-)
 
-This series refactors the KVM/x86 "TDP MMU" into common code. This is
-the first step toward sharing TDP (aka Stage-2) page table management
-code across architectures that support KVM. For more background on this
-effort please see my talk from KVM Forum 2022 "Exploring an
-architecture-neutral MMU":
-
-  https://youtu.be/IBhW34fCFi0
-
-By the end of this series, 90% of the TDP MMU code is in common directories
-(virt/kvm/mmu/ and include/kvm/). The only pieces that remaing in
-arch/x86 are code that deals with constructing/inspecting/modifying PTEs
-and arch hooks to implement NX Huge Pages (a mitigation for an
-Intel-specific vulnerability).
-
-Before:
-
-  180 arch/x86/kvm/mmu/tdp_iter.c
-  118 arch/x86/kvm/mmu/tdp_iter.h
- 1917 arch/x86/kvm/mmu/tdp_mmu.c
-   98 arch/x86/kvm/mmu/tdp_mmu.h
- ----
- 2313 total
-
-After:
-
-  178 virt/kvm/mmu/tdp_iter.c
- 1867 virt/kvm/mmu/tdp_mmu.c
-  117 include/kvm/tdp_iter.h
-   78 include/kvm/tdp_mmu.h
-   39 include/kvm/tdp_pgtable.h
- ----
-  184 arch/x86/kvm/mmu/tdp_pgtable.c
-   76 arch/x86/include/asm/kvm/tdp_pgtable.h
- ----
- 2539 total
-
-This series is very much an RFC, but it does build (I tested x86_64 and
-ARM64) and pass basic testing (KVM selftests and kvm-unit-tests on
-x86_64), so it is entirely functional aside from any bugs.
-
-The main areas I would like feedback are:
-
- - NX Huge Pages support in the TDP MMU requires 5 arch hooks in
-   the common code, which IMO makes the NX Huge Pages implementation
-   harder to read. The alternative is to move the NX Huge Pages
-   implementation into common code, including the fields in struct
-   kvm_mmu_page and kvm_page_fault, which would increase memory usage
-   a tiny bit (for non-x86 architectures) and pollute the common code
-   with an x86-specific security mitigation. Ideas on better ways to
-   handle this would be appreciated.
-
- - struct kvm_mmu_page increased by 64 bytes because the separation of
-   arch and common state eliminated the ability to use unions to
-   optimize the size of the struct. There's two things we can do to
-   reduce the size of the struct back down: (1) dynamically allocated
-   root-specific fields only for root page tables and (2) dynamically
-   allocate Shadow MMU state in kvm_mmu_page_arch only for Shadow MMU
-   pages. This should actually be a net *reduction* the size of
-   kvm_mmu_page relative today for most pages, but I have not
-   implemented it.
-
-   Note that an alternative approach I implemented avoided this problem
-   by creating an entirely separate struct for the common TDP MMU (e.g.
-   struct tdp_mmu_page). This however had a lot of downsides that I
-   don't think make it a good solution. Notably, it complicated a ton of
-   existing code in arch/x86/kvm/mmu/mmu.c (e.g. anything that touches
-   vcpu->arch.mmu->root and kvm_recover_nx_huge_pages()) and created a
-   new runtime failure mode in to_shadow_page().
-
- - Naming. This series does not change the names of any existing code.
-   So all the KVM/x86 Shadow MMU-style terminology like
-   "shadow_page"/"sp"/"spte" persists. Should we keep that style in
-   common code or move toward something less shadow-paging-specific?
-   e.g. "page_table"/"pt"/"pte". Also do we want to keep "TDP" or switch
-   to something more familiar across architectures (e.g. ARM and RISC-V
-   both use "Stage-2")?
-
-Additionally, there are some warts to be aware of. For these I think
-they can be addressed in future series, since they only really matter
-once we are ready to enable the common TDP MMU on a non-x86
-architecture.
-
- - Tracepoints. For now the common MMU continues to use the x86
-   tracepoints code and they are just stubbed (no-ops) for other
-   architectures.
-
- - tdp_mmu_max_mapping_level() and tdp_mmu_max_gfn_exclusive() are
-   currently arch hooks but they can probably be made common code at
-   some point.
-
-Lastly, I still need to verify that there are no negative performance
-impacts of the changes in this series. My main concern is the new
-tdp_pte_*() functions adds overhead from not being able to be inlined.
-
-This series applies on top of kvm/queue commit 89b239585965 ("KVM:
-x86/mmu: Pivot on "TDP MMU enabled" when handling direct page faults"),
-since there are several recent series in kvm/queue that affect this
-refactor. A revert of 0c2a04128f50 ("KVM: x86: remove unnecessary
-exports") is also needed since it breaks the build on x86 (unrelated to
-this refactor).
-
-Thanks.
-
-P.S. Looking to the future... This is just the first step toward
-building a common TDP MMU for KVM. After this, We are looking at adding
-KUnit testing to the common TDP MMU as a way to offset the risk of
-sharing more code across architectures, and then targeting RISC-V as the
-first non-x86 architecture to use the common TDP MMU. If any RISC-V
-developer is interested in working on the port, please reach out.
-
-David Matlack (36):
-  KVM: x86/mmu: Store the address space ID directly in kvm_mmu_page_role
-  KVM: MMU: Move struct kvm_mmu_page_role into common code
-  KVM: MMU: Move tdp_ptep_t into common code
-  KVM: x86/mmu: Invert sp->tdp_mmu_page to sp->shadow_mmu_page
-  KVM: x86/mmu: Unify TDP MMU and Shadow MMU root refcounts
-  KVM: MMU: Move struct kvm_mmu_page to common code
-  mm: Introduce architecture-neutral PG_LEVEL macros
-  KVM: Move page size stats into common code
-  KVM: MMU: Move struct kvm_page_fault to common code
-  KVM: MMU: Move RET_PF_* into common code
-  KVM: x86/mmu: Use PG_LEVEL_{PTE,PMD,PUD} in the TDP MMU
-  KVM: MMU: Move sptep_to_sp() to common code
-  KVM: MMU: Introduce common macros for TDP page tables
-  KVM: x86/mmu: Add a common API for inspecting/modifying TDP PTEs
-  KVM: x86/mmu: Abstract away TDP MMU root lookup
-  KVM: Move struct kvm_gfn_range to kvm_types.h
-  KVM: x86/mmu: Add common API for creating TDP PTEs
-  KVM: x86/mmu: Add arch hooks for NX Huge Pages
-  KVM: x86/mmu: Abstract away computing the max mapping level
-  KVM: Introduce CONFIG_HAVE_TDP_MMU
-  KVM: x86: Select HAVE_TDP_MMU if X86_64
-  KVM: MMU: Move VM-level TDP MMU state to struct kvm
-  KVM: x86/mmu: Move kvm_mmu_hugepage_adjust() up to fault handler
-  KVM: x86/mmu: Pass root role to kvm_tdp_mmu_get_vcpu_root_hpa()
-  KVM: Move page table cache to struct kvm_vcpu
-  KVM: MMU: Move mmu_page_header_cache to common code
-  KVM: MMU: Stub out tracepoints on non-x86 architectures
-  KVM: x86/mmu: Collapse kvm_flush_remote_tlbs_with_{range,address}()
-    together
-  KVM: x86/mmu: Rename kvm_flush_remote_tlbs_with_address()
-  KVM: x86/MMU: Use gfn_t in kvm_flush_remote_tlbs_range()
-  KVM: Allow range-based TLB invalidation from common code
-  KVM: Move kvm_arch_flush_remote_tlbs_memslot() to common code
-  KVM: MMU: Move the TDP iterator to common code
-  KVM: x86/mmu: Move tdp_mmu_max_gfn_exclusive() to tdp_pgtable.c
-  KVM: x86/mmu: Move is_tdp_mmu_page() to mmu_internal.h
-  KVM: MMU: Move the TDP MMU to common code
-
-Jing Zhang (1):
-  KVM: selftests: Stop assuming stats are contiguous in
-    kvm_binary_stats_test
-
- MAINTAINERS                                   |   6 +-
- arch/arm64/include/asm/kvm_host.h             |   3 -
- arch/arm64/kvm/arm.c                          |  10 +-
- arch/arm64/kvm/mmu.c                          |   2 +-
- arch/mips/include/asm/kvm_host.h              |   3 -
- arch/mips/kvm/mips.c                          |  10 +-
- arch/mips/kvm/mmu.c                           |   4 +-
- arch/riscv/include/asm/kvm_host.h             |   3 -
- arch/riscv/kvm/mmu.c                          |   8 +-
- arch/riscv/kvm/vcpu.c                         |   4 +-
- arch/x86/include/asm/kvm/mmu_types.h          | 138 ++++++
- arch/x86/include/asm/kvm/tdp_pgtable.h        |  73 ++++
- arch/x86/include/asm/kvm_host.h               | 122 +-----
- arch/x86/include/asm/pgtable_types.h          |  12 +-
- arch/x86/kvm/Kconfig                          |   1 +
- arch/x86/kvm/Makefile                         |   2 +-
- arch/x86/kvm/mmu.h                            |   5 -
- arch/x86/kvm/mmu/mmu.c                        | 409 +++++++++--------
- arch/x86/kvm/mmu/mmu_internal.h               | 221 ++--------
- arch/x86/kvm/mmu/mmutrace.h                   |  20 +-
- arch/x86/kvm/mmu/paging_tmpl.h                |  48 +-
- arch/x86/kvm/mmu/spte.c                       |   7 +-
- arch/x86/kvm/mmu/spte.h                       |  38 +-
- arch/x86/kvm/mmu/tdp_pgtable.c                | 183 ++++++++
- arch/x86/kvm/x86.c                            |  16 +-
- include/kvm/mmu.h                             |  21 +
- include/kvm/mmu_types.h                       | 179 ++++++++
- include/kvm/mmutrace.h                        |  17 +
- {arch/x86/kvm/mmu => include/kvm}/tdp_iter.h  |  19 +-
- {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h   |  17 +-
- include/kvm/tdp_pgtable.h                     |  39 ++
- include/linux/kvm_host.h                      |  36 +-
- include/linux/kvm_types.h                     |  17 +
- include/linux/mm_types.h                      |   9 +
- .../selftests/kvm/kvm_binary_stats_test.c     |  11 +-
- virt/kvm/Kconfig                              |   3 +
- virt/kvm/Makefile.kvm                         |   3 +
- virt/kvm/kvm_main.c                           |  27 +-
- {arch/x86 => virt}/kvm/mmu/tdp_iter.c         |  24 +-
- {arch/x86 => virt}/kvm/mmu/tdp_mmu.c          | 412 ++++++++----------
- 40 files changed, 1245 insertions(+), 937 deletions(-)
- create mode 100644 arch/x86/include/asm/kvm/mmu_types.h
- create mode 100644 arch/x86/include/asm/kvm/tdp_pgtable.h
- create mode 100644 arch/x86/kvm/mmu/tdp_pgtable.c
- create mode 100644 include/kvm/mmu.h
- create mode 100644 include/kvm/mmu_types.h
- create mode 100644 include/kvm/mmutrace.h
- rename {arch/x86/kvm/mmu => include/kvm}/tdp_iter.h (90%)
- rename {arch/x86/kvm/mmu => include/kvm}/tdp_mmu.h (87%)
- create mode 100644 include/kvm/tdp_pgtable.h
- rename {arch/x86 => virt}/kvm/mmu/tdp_iter.c (89%)
- rename {arch/x86 => virt}/kvm/mmu/tdp_mmu.c (84%)
-
-
-base-commit: 89b2395859651113375101bb07cd6340b1ba3637
-prerequisite-patch-id: 19dc9f47392d43a9a86c0e4f3ce1f13b62004eeb
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index aa4eb8cfcd7e..0a819d40131a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -348,7 +348,7 @@ union kvm_mmu_page_role {
+ 		 * simple shift.  While there is room, give it a whole
+ 		 * byte so it is also faster to load it from memory.
+ 		 */
+-		unsigned smm:8;
++		unsigned as_id:8;
+ 	};
+ };
+ 
+@@ -2056,7 +2056,7 @@ enum {
+ # define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+ # define KVM_ADDRESS_SPACE_NUM 2
+ # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+-# define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
++# define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).as_id)
+ #else
+ # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, 0)
+ #endif
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 4d188f056933..f375b719f565 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5056,7 +5056,7 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
+ 	union kvm_cpu_role role = {0};
+ 
+ 	role.base.access = ACC_ALL;
+-	role.base.smm = is_smm(vcpu);
++	role.base.as_id = is_smm(vcpu);
+ 	role.base.guest_mode = is_guest_mode(vcpu);
+ 	role.ext.valid = 1;
+ 
+@@ -5112,7 +5112,7 @@ kvm_calc_tdp_mmu_root_page_role(struct kvm_vcpu *vcpu,
+ 	role.access = ACC_ALL;
+ 	role.cr0_wp = true;
+ 	role.efer_nx = true;
+-	role.smm = cpu_role.base.smm;
++	role.as_id = cpu_role.base.as_id;
+ 	role.guest_mode = cpu_role.base.guest_mode;
+ 	role.ad_disabled = !kvm_ad_enabled();
+ 	role.level = kvm_mmu_get_tdp_level(vcpu);
+@@ -5233,7 +5233,7 @@ kvm_calc_shadow_ept_root_page_role(struct kvm_vcpu *vcpu, bool accessed_dirty,
+ 
+ 	/*
+ 	 * KVM does not support SMM transfer monitors, and consequently does not
+-	 * support the "entry to SMM" control either.  role.base.smm is always 0.
++	 * support the "entry to SMM" control either.  role.base.as_id is always 0.
+ 	 */
+ 	WARN_ON_ONCE(is_smm(vcpu));
+ 	role.base.level = level;
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index ac00bfbf32f6..5427f65117b4 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -133,16 +133,6 @@ struct kvm_mmu_page {
+ 
+ extern struct kmem_cache *mmu_page_header_cache;
+ 
+-static inline int kvm_mmu_role_as_id(union kvm_mmu_page_role role)
+-{
+-	return role.smm ? 1 : 0;
+-}
+-
+-static inline int kvm_mmu_page_as_id(struct kvm_mmu_page *sp)
+-{
+-	return kvm_mmu_role_as_id(sp->role);
+-}
+-
+ static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
+ {
+ 	/*
+diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/arch/x86/kvm/mmu/tdp_iter.c
+index 39b48e7d7d1a..4a7d58bf81c4 100644
+--- a/arch/x86/kvm/mmu/tdp_iter.c
++++ b/arch/x86/kvm/mmu/tdp_iter.c
+@@ -52,7 +52,7 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
+ 	iter->root_level = root_level;
+ 	iter->min_level = min_level;
+ 	iter->pt_path[iter->root_level - 1] = (tdp_ptep_t)root->spt;
+-	iter->as_id = kvm_mmu_page_as_id(root);
++	iter->as_id = root->role.as_id;
+ 
+ 	tdp_iter_restart(iter);
+ }
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 764f7c87286f..7ccac1aa8df6 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -237,7 +237,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+ 	     _root;								\
+ 	     _root = tdp_mmu_next_root(_kvm, _root, _shared, _only_valid))	\
+ 		if (kvm_lockdep_assert_mmu_lock_held(_kvm, _shared) &&		\
+-		    kvm_mmu_page_as_id(_root) != _as_id) {			\
++		    _root->role.as_id != _as_id) {			\
+ 		} else
+ 
+ #define for_each_valid_tdp_mmu_root_yield_safe(_kvm, _root, _as_id, _shared)	\
+@@ -256,7 +256,7 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
+ #define for_each_tdp_mmu_root(_kvm, _root, _as_id)			\
+ 	list_for_each_entry(_root, &_kvm->arch.tdp_mmu_roots, link)	\
+ 		if (kvm_lockdep_assert_mmu_lock_held(_kvm, false) &&	\
+-		    kvm_mmu_page_as_id(_root) != _as_id) {		\
++		    _root->role.as_id != _as_id) {		\
+ 		} else
+ 
+ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
+@@ -310,7 +310,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
+ 	 * Check for an existing root before allocating a new one.  Note, the
+ 	 * role check prevents consuming an invalid root.
+ 	 */
+-	for_each_tdp_mmu_root(kvm, root, kvm_mmu_role_as_id(role)) {
++	for_each_tdp_mmu_root(kvm, root, role.as_id) {
+ 		if (root->role.word == role.word &&
+ 		    kvm_tdp_mmu_get_root(root))
+ 			goto out;
+@@ -496,8 +496,8 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
+ 			old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte,
+ 							  REMOVED_SPTE, level);
+ 		}
+-		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
+-				    old_spte, REMOVED_SPTE, level, shared);
++		handle_changed_spte(kvm, sp->role.as_id, gfn, old_spte,
++				    REMOVED_SPTE, level, shared);
+ 	}
+ 
+ 	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+@@ -923,7 +923,7 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte)))
+ 		return false;
+ 
+-	__tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
++	__tdp_mmu_set_spte(kvm, sp->role.as_id, sp->ptep, old_spte, 0,
+ 			   sp->gfn, sp->role.level + 1, true, true);
+ 
+ 	return true;
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
