@@ -2,116 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6F3B6474E6
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 18:15:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06CD96474FB
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 18:26:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbiLHRPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 12:15:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40240 "EHLO
+        id S229593AbiLHR01 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 12:26:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbiLHRPp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 12:15:45 -0500
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CD67DA7C
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 09:15:45 -0800 (PST)
-Received: by mail-qk1-x731.google.com with SMTP id j13so1089744qka.3
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 09:15:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3zAEindOiDw3p/QUnojUCi9zb5fCUbsCVu9Sm2mbL70=;
-        b=B+FW31yj55gsXTk6nvxmJifRtRFBRkfUyjyBA5htz6Sq/iqRU03Ej6IZiuESR7Bknc
-         QIPL5AFqtbk6oVZp6VFLfHrmTLfLHeaMdjM2tO3DaFWLbnIWDGZF+nVU/n4pL+Qv9uFX
-         t+cr6KOwwq7jwohZQj7XcnukGnnZVxYS69BQK4fePHOXq3jBjy/EKLg8eO0OXBCmgLyI
-         aKM0CeU9Bs+4sHdOPlrCR8QQvN88xgoBQzApwf2RnQ2gH+oGGETHx3htOMlKLaTliYPk
-         5XLZFO/NOQEJ8S2BlPSjuQ9kKwY5sd3XL2G5OrG2e0fYZJ7WoUC5iMuSKNRYYREkSUfn
-         DTeg==
+        with ESMTP id S229564AbiLHR0Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 12:26:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 040D353EEA
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 09:25:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670520331;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=E71Bhw/FO0T2S1rVc4Z9xmEAUXbwHIkJXUEVUPOidwc=;
+        b=RrXzT75OA8Q9jKRJmvsy6dbhXbNyn5T2CekrH9VPdPMltCTQ2+GPsjzesJHjVzZdi8/Oeh
+        txOGxj4a+yvlOEiji8WREN1ayUe+OW1KkfOrZlhreq+rnUs9EWymZZCQk6NQiW6xbE5f4W
+        dpk3riu1Tt7Dwp4SjypHRiZ6trcrWpk=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-8-ooXGEj7dNnej0ehsumgw5Q-1; Thu, 08 Dec 2022 12:25:29 -0500
+X-MC-Unique: ooXGEj7dNnej0ehsumgw5Q-1
+Received: by mail-io1-f72.google.com with SMTP id h21-20020a05660224d500b006debd7dedccso622049ioe.9
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 09:25:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3zAEindOiDw3p/QUnojUCi9zb5fCUbsCVu9Sm2mbL70=;
-        b=T3zxEDQsow8I+wOZuVA72bDShXfOQ+PYipe03ZbXD51ITE3fMzzZ6ToGUxCZZ6cXDw
-         n5eOAUIwZRiXTxOzVcy0anQXR0LsMZepjOX0yja1NCycz2njV2dhNSrLmAA8xE1jJO1w
-         h6EL5kg1aFIdr7uQ/gTs0xmvkE03Yl6rde3YgUx8gDl3eypcrkXPO3VLK/Sq14Sn6g8S
-         D2ljfjjlqI4YIplEzvvkp5vc8LqDFFB+Qon+VdHmdUTEcveKFQLIdEM4b1MSXPXiYxiV
-         kFoXlGKuddHE6yF1i/HxNoFaxqkOKdXOhGbR78gdVFZ3IMsQ3vAmY0ehVchPIaBBfGqV
-         snGg==
-X-Gm-Message-State: ANoB5pm/3DaEXLy/a2Wra91laneVxZKXOWMRk6yST0U7rCj7PDCTvMOs
-        q5xvmV4RPVf07H6d/daBSlZiGA==
-X-Google-Smtp-Source: AA0mqf4pZoYlrJ8F0Jt5n340oU+nlu49XdQFj5sVnc0ew/a0XeYDX4vYZdf6oljAq04Ha67S3TccyQ==
-X-Received: by 2002:a37:a853:0:b0:6ff:d9d:e395 with SMTP id r80-20020a37a853000000b006ff0d9de395mr146587qke.757.1670519744177;
-        Thu, 08 Dec 2022 09:15:44 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
-        by smtp.gmail.com with ESMTPSA id x12-20020ac8538c000000b003a7e38055c9sm7901992qtp.63.2022.12.08.09.15.43
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=E71Bhw/FO0T2S1rVc4Z9xmEAUXbwHIkJXUEVUPOidwc=;
+        b=a0uHaeTAgf9ztkr9c6iL1rcDoNds8s4QmyWvW9FBb/N03U5NtlaoeK+9YLQ/6O2NaO
+         876D3dN3LlTVpAM4/z/yNLu34IDriDN0Bw+AMVseerOycLRn3Xp7IoBJE7uY77/l3WgN
+         7JbnQ5oI3fuVhRM5Hrzhw1gBi2vp+EEldNcYmJT9SaOzT9gg3pvApD9jWAk2xYM4XbjP
+         lIZhASchGbb4YJKlOpMMRUUtfnN+66mGLsQVOM42GhUHi4GMtax3IiQINMl7Ntr1bLB4
+         AiwjkZKNvamshTNftCh8ONmZQWL8prIa50TwtxCcVFfLGwhoou3yAvdDa/9jbwtnBwwT
+         JIXQ==
+X-Gm-Message-State: ANoB5plxDs+BLqW9ZVv+Y07cBnP6AYcTIrv28kaJOHvu4GjBrzUKHkJl
+        m5TL3JzdC6Vxa0qziu/QGSPNP6pyvBhQ2I6aFaeQb1NXec3wWZvW1El2RrxDJPMcmku7X8NmvxI
+        UlD5jZ/F+0w5/
+X-Received: by 2002:a05:6602:2495:b0:6ca:d145:93 with SMTP id g21-20020a056602249500b006cad1450093mr36674285ioe.71.1670520329048;
+        Thu, 08 Dec 2022 09:25:29 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6NWsKoYU+tBxwYj4F/NAmzAmG9ziUTJ4tCCB5/cJ6F7yZO1Fy5Ia8MSW1AfE9ico+pnmEefQ==
+X-Received: by 2002:a05:6602:2495:b0:6ca:d145:93 with SMTP id g21-20020a056602249500b006cad1450093mr36674274ioe.71.1670520328816;
+        Thu, 08 Dec 2022 09:25:28 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id b30-20020a026f5e000000b0038a590b8cb4sm3170383jae.179.2022.12.08.09.25.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 09:15:43 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1p3KUo-006Nwx-Ny;
-        Thu, 08 Dec 2022 13:15:42 -0400
-Date:   Thu, 8 Dec 2022 13:15:42 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Steven Sistare <steven.sistare@oracle.com>
-Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH V1 7/8] vfio: change dma owner
-Message-ID: <Y5Ibvv9PNMifi0NF@ziepe.ca>
-References: <1670363753-249738-1-git-send-email-steven.sistare@oracle.com>
- <1670363753-249738-8-git-send-email-steven.sistare@oracle.com>
- <Y5DGPcfxTJGk7IZm@ziepe.ca>
- <0f6d9adb-b5b9-ca52-9723-752c113e97c4@oracle.com>
+        Thu, 08 Dec 2022 09:25:28 -0800 (PST)
+Date:   Thu, 8 Dec 2022 10:25:27 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Major Saheb <majosaheb@gmail.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Zhenzhong Duan <zhenzhong.duan@gmail.com>, kvm@vger.kernel.org,
+        linux-pci@vger.kernel.org
+Subject: Re: vfio-pci rejects binding to devices having same pcie vendor id
+ and device id
+Message-ID: <20221208102527.33917ff9.alex.williamson@redhat.com>
+In-Reply-To: <20221208165008.GA1547952@bhelgaas>
+References: <CANBBZXPWe56VYJtzXdimEnkFgF+A=G15TXrd8Z5kBcUOGgHeRw@mail.gmail.com>
+        <20221208165008.GA1547952@bhelgaas>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0f6d9adb-b5b9-ca52-9723-752c113e97c4@oracle.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 08, 2022 at 11:48:08AM -0500, Steven Sistare wrote:
+On Thu, 8 Dec 2022 10:50:08 -0600
+Bjorn Helgaas <helgaas@kernel.org> wrote:
 
-> > Anyhow, I came up with this thing. Needs a bit of polishing, the
-> > design is a bit odd for performance reasons, and I only compiled it.
+> [+cc VFIO folks and Zhenzhong (author of the commit you mention)]
 > 
-> Thanks, I'll pull an iommfd development environment together and try it.
-> However, it will also need an interface to change vaddr for each dma region.
-> In general the vaddr will be different when the memory object is re-mapped 
-> after exec.
+> On Thu, Dec 08, 2022 at 09:24:31PM +0530, Major Saheb wrote:
+> > I have a linux system running in kvm, with 6 qemu emulated NVMe
+> > drives, as expected all of them have the same PCIe Vendor ID and
+> > Device ID(VID: 0x1b36 DID: 0x0010).
+> >
+> > When I try to unbind them from the kernel NVMe driver and bind it to
+> > vfio-pci one by one, I am getting "write error: File exists" when I
+> > try to bind the 2nd(and other) drive to vfio-pci.
+> > 
+> > Kernel version
+> > 
+> > 5.15.0-56-generic #62-Ubuntu SMP Tue Nov 22 19:54:14 UTC 2022 x86_64
+> > x86_64 x86_64 GNU/Linux
+> > 
+> > lrwxrwxrwx 1 root root 0 Dec  8 11:32 /sys/block/nvme0n1 -> ../devices/pci0000:00/0000:00:03.0/nvme/nvme0/nvme0n1
+> > lrwxrwxrwx 1 root root 0 Dec  8 11:32 /sys/block/nvme1n1 -> ../devices/pci0000:00/0000:00:04.0/nvme/nvme1/nvme1n1
+> > lrwxrwxrwx 1 root root 0 Dec  8 11:32 /sys/block/nvme2n1 -> ../devices/pci0000:00/0000:00:05.0/nvme/nvme2/nvme2n1
+> > lrwxrwxrwx 1 root root 0 Dec  8 11:32 /sys/block/nvme3n1 -> ../devices/pci0000:00/0000:00:06.0/nvme/nvme3/nvme3n1
+> > lrwxrwxrwx 1 root root 0 Dec  8 11:32 /sys/block/nvme4n1 -> ../devices/pci0000:00/0000:00:07.0/nvme/nvme4/nvme4n1
+> > lrwxrwxrwx 1 root root 0 Dec  8 11:32 /sys/block/nvme5n1 -> ../devices/pci0000:00/0000:00:08.0/nvme/nvme5/nvme5n1
+> > 
+> > Steps for repro
+> > ubind nvme2 from kernel NVMe driver and bind it to vfio
+> > $ ls -l /sys/bus/pci/drivers/vfio-pci/
+> > lrwxrwxrwx 1 root root    0 Dec  8 13:04 0000:00:05.0 -> ../../../../devices/pci0000:00/0000:00:05.0
+> > --w------- 1 root root 4096 Dec  8 13:07 bind
+> > lrwxrwxrwx 1 root root    0 Dec  8 13:07 module -> ../../../../module/vfio_pci
+> > --w------- 1 root root 4096 Dec  8 13:04 new_id
+> > --w------- 1 root root 4096 Dec  8 13:07 remove_id
+> > --w------- 1 root root 4096 Dec  8 11:32 uevent
+> > --w------- 1 root root 4096 Dec  8 13:07 unbind
+> > 
+> > Unbind nvme3 from  kernel NVMe driver
+> > Try binding to vfio-pci
+> > # echo "0x1b36  0x0010" >  /sys/bus/pci/drivers/vfio-pci/new_id
+> > -bash: echo: write error: File exists
 
-Ahh that is yuky :\
+Presumably you already wrote this same ID to the dynamic ID table from
+the first device, so yes, it's going to rightfully complain that this
+ID already exists.  The new_id interface has numerous problems, which
+is why we added the driver_override interface, which is used by tools
+like libvirt and driverctl in place of this old interface.
 
-So I still like the one shot approach because it has nice error
-handling properties, and it lets us use the hacky very expensive "stop
-the world" lockng to avoid slowing the fast paths.
+I'd recommend something like:
 
-Passing in a sorted list of old_vaddr,new_vaddr is possibly fine, the
-kernel can bsearch it as it goes through all the pages objects.
+# driverctl --nosave set-override 0000:00:03.0 vfio-pci
+# driverctl --nosave set-override 0000:00:04.0 vfio-pci
+# driverctl --nosave set-override 0000:00:05.0 vfio-pci
+...
 
-Due to the way iommufd works, especially with copy, you end up with
-the 'pages' handle that holds the vaddr that many different IOVAs may
-refer to. So it is kind of weird to ask to change a single IOVA's
-mapping, it must always change all the mappings that have been copied
-that share vaddr, pin accounting and so forth.
+Or if vfio-pci is generally the preferred driver for these devices, you
+could remove the --nosave option to have them automatically bound at
+boot.  You could also make use of pre-filling the vfio device table
+using vfio-pci.ids=1b36:0010 on the kernel command line and making sure
+the vfio-pci driver is loaded before the nvme driver.  In general, for
+dynamic binding of devices, driver_override is the recommended solution.
+Thanks,
 
-This is another reason why I liked the one-shot global everything
-approach, as narrowing the objects to target cannot be done by IOVA -
-at best you could target a specific mm and vaddr range.
+Alex
 
-FWIW, there is a nice selftest in iommufd in
-tools/testing/selftests/iommu/iommufd.c and the way to develop
-something like this is to add a simple selftes to exercise your
-scenario and get everything sorted like that before going to qemu.
-
-Using the vfio compat you can keep the existing qemu vfio type1 and
-just hack in a call the IOMMUFD ioctl in the right spot. No need to
-jump to the iommfd version of qemu for testing.
-
-Jason
