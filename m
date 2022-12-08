@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2642647344
+	by mail.lfdr.de (Postfix) with ESMTP id 7715B647343
 	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 16:37:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230335AbiLHPgv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 10:36:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54430 "EHLO
+        id S229601AbiLHPgx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 10:36:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229522AbiLHPgU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 10:36:20 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C4E911A02
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 07:35:45 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id o7-20020a05600c510700b003cffc0b3374so1317311wms.0
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 07:35:45 -0800 (PST)
+        with ESMTP id S229556AbiLHPgV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 10:36:21 -0500
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EC2D7508D
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 07:35:51 -0800 (PST)
+Received: by mail-wr1-x434.google.com with SMTP id m14so2049789wrh.7
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 07:35:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=95bE8x/teeNSfVWODs9hXIcMYWYrin/ZvMeXjp0588I=;
-        b=FV4libTgSRAyEFq5Rcf7SgtXnsjGO+MuKWh6usOXAMeakrMSY0jubB0HPdlK43TlTk
-         ChU5F2WAAAotEnb0MzjwpM9Kkv9eQc5zkFn1aPY9tm52lFS3tIqQHz+/N8kOk9hedUxF
-         WxaM2wm3lCF3EB1d8w1tsOy1b/ExeitagmoezoLIIME5TP4cPaHv+lrmc83JnSFKjHPf
-         4DRgrJhcoNOu9klvQpWLP6Y4YxCWuWWfG0EIm11zqWaBU4y7BRnrSmE+bSi1dmsRc3cY
-         5lDGkibfhYhz9Pt4bqlRrYV50jnQvhW2odgBSpSpss+ixlPla0j28uTC6Hbp94q8HupO
-         +HuQ==
+        bh=D0ClmvfrnC5uwLcCZt7jUcxr3DIHaRVyT4haTfqPSpU=;
+        b=XpzzT24iw0ZShhQVX3SJQm+NbNuVucn667ZU54sKCPOK0bo92MkIa8N8QzmTVRSMiG
+         63sXpqwP5eWwHMzRp5h/eIy4/fAHBtcH1esawAN94i15yVrZWbbqOq05xGyTwX1c7Z+4
+         PtDqQRAUE4nhIt5gpAZOP8QMY3LgEenjva5NWuZGf9nUo1Sm+Jbrb8+z8uw/xgmVDXQV
+         xFeuUkSgSPZl8YGm7PY+hm58cZEZyw5sa1kh1lqc2ow9wm5RFY127PL3NrBB0Hm2lrUq
+         8jX//1MakTmQCDQyIJgBRhc75hPe+dkaz+WQHZ17iqj+HCeSKopLcpqnT7QX36cAUue/
+         rshA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=95bE8x/teeNSfVWODs9hXIcMYWYrin/ZvMeXjp0588I=;
-        b=B2KF5izI6GBAUxND2lTHdIeAzwqWz+5T5XgdKp1n0jSrTazAVCe0Ck4o4AYoQWHXQA
-         MDdp/4W3c1o+NMvF8DzDmDtEcfIPxdj3jE7rBuVrtvxa5ooV1aI0IUoxo2gDNw7/6vyX
-         dCcC+c6MeMStWnvYeulrmQxb0OvzA130j+S99LB+wOIcjENUEczkCJ/HNb/0pnHcQb/o
-         J7Pq8iqKW+27Ploe2nLeEZKiVuvkJfDoj+PTvKEx+WDzr6swKqr8bvhgwdd25tzY9aJI
-         hwhrI3E6PZZW06gZ0A35wpdkmmqGlqZYn2AxOMaLLXSK4wtZgfkhOw7deY1eYSP+CFa4
-         1LEw==
-X-Gm-Message-State: ANoB5plEOVV7o64pkebc9vwg7W/FfK1FRzcs395HDoCvCA47L98bwlgb
-        NOlPpUARFG/+MBX2m+MWNyePfg==
-X-Google-Smtp-Source: AA0mqf53N8sl4xU/kSuL6JcudDZFzJTghUYEdFZkAtJt+ErnWadY+658T57/NW3q5h7ltVHwELEvHw==
-X-Received: by 2002:a05:600c:4f16:b0:3c6:e62e:2e67 with SMTP id l22-20020a05600c4f1600b003c6e62e2e67mr2265941wmq.2.1670513744109;
-        Thu, 08 Dec 2022 07:35:44 -0800 (PST)
+        bh=D0ClmvfrnC5uwLcCZt7jUcxr3DIHaRVyT4haTfqPSpU=;
+        b=3Ql37H9d21x2Me0qEXNXK+uUDPjF72rQtZOsPDpruNIekSudeQ7jiQ3pjudUNCfEV7
+         /TKZaAd15oRE50RHZQ63k8MrBR8pRJjrdhFUtgsm1TYv8+0HNVx/ltIeE4mUaS8g/wEG
+         DbADUrMkU4/qyCCyzjE8I9u/qVjwPeU4Ge8BgXN2IAD89/BvWcauM573zTa3cBVodqT7
+         1VSvyCIGoFCDXz12hvvxnvum0mijxJ+Uj3X6SCl5Ko6sLm6XP53USls4A8rMJjfwFF9j
+         dZIkZ02o9aS5rTdLx5dUjlVP7iZjDR+Px+s8bqXE3mZSlvgjwYb9kowB3TCDs/hIUOgF
+         Iw1Q==
+X-Gm-Message-State: ANoB5pl3kY4S9XtaMNwHsVDi67CRqa5Q/xZ6oJD1EtaF+nsiST+r21/t
+        dLHfl6sNrwZV8X+hA6/HqwlOmA==
+X-Google-Smtp-Source: AA0mqf7edx/LknZ0K6jubJYtk5goftomacXDeZkGPqG/218Y0tB27yp0nabXYRvAR0X9CWJ8mVDivA==
+X-Received: by 2002:adf:f145:0:b0:242:486:5037 with SMTP id y5-20020adff145000000b0024204865037mr1714207wro.32.1670513749928;
+        Thu, 08 Dec 2022 07:35:49 -0800 (PST)
 Received: from localhost.localdomain ([81.0.6.76])
-        by smtp.gmail.com with ESMTPSA id k32-20020a05600c1ca000b003b4ff30e566sm12225493wms.3.2022.12.08.07.35.42
+        by smtp.gmail.com with ESMTPSA id t12-20020adfeb8c000000b0023662245d3csm22310885wrn.95.2022.12.08.07.35.48
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 08 Dec 2022 07:35:43 -0800 (PST)
+        Thu, 08 Dec 2022 07:35:49 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>,
@@ -72,9 +72,9 @@ Cc:     Greg Kurz <groug@kaod.org>, Paolo Bonzini <pbonzini@redhat.com>,
         Daniel Henrique Barboza <danielhb413@gmail.com>,
         Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
         Artyom Tarasenko <atar4qemu@gmail.com>
-Subject: [PATCH-for-8.0 v2 2/4] gdbstub: Use vaddr type for generic insert/remove_breakpoint() API
-Date:   Thu,  8 Dec 2022 16:35:26 +0100
-Message-Id: <20221208153528.27238-3-philmd@linaro.org>
+Subject: [PATCH-for-8.0 v2 3/4] target/cpu: Restrict cpu_get_phys_page_debug() handlers to sysemu
+Date:   Thu,  8 Dec 2022 16:35:27 +0100
+Message-Id: <20221208153528.27238-4-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221208153528.27238-1-philmd@linaro.org>
 References: <20221208153528.27238-1-philmd@linaro.org>
@@ -90,198 +90,233 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Both insert/remove_breakpoint() handlers are used in system and
-user emulation. We can not use the 'hwaddr' type on user emulation,
-we have to use 'vaddr' which is defined as "wide enough to contain
-any #target_ulong virtual address".
-
-gdbstub.c doesn't require to include "exec/hwaddr.h" anymore.
+The 'hwaddr' type is only available / meaningful on system emulation.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- accel/kvm/kvm-all.c        | 4 ++--
- accel/kvm/kvm-cpus.h       | 4 ++--
- accel/tcg/tcg-accel-ops.c  | 4 ++--
- gdbstub/gdbstub.c          | 1 -
- gdbstub/internals.h        | 6 ++++--
- gdbstub/softmmu.c          | 5 ++---
- gdbstub/user.c             | 5 ++---
- include/sysemu/accel-ops.h | 6 +++---
- 8 files changed, 17 insertions(+), 18 deletions(-)
+ target/alpha/cpu.h    | 2 +-
+ target/cris/cpu.h     | 3 +--
+ target/hppa/cpu.h     | 2 +-
+ target/m68k/cpu.h     | 2 +-
+ target/nios2/cpu.h    | 2 +-
+ target/openrisc/cpu.h | 3 ++-
+ target/ppc/cpu.h      | 2 +-
+ target/rx/cpu.h       | 2 +-
+ target/rx/helper.c    | 4 ++--
+ target/sh4/cpu.h      | 2 +-
+ target/sparc/cpu.h    | 3 ++-
+ target/xtensa/cpu.h   | 2 +-
+ 12 files changed, 15 insertions(+), 14 deletions(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index f99b0becd8..f3b434c717 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -3219,7 +3219,7 @@ bool kvm_supports_guest_debug(void)
-     return kvm_has_guest_debug;
+diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+index d0abc949a8..5e67304d81 100644
+--- a/target/alpha/cpu.h
++++ b/target/alpha/cpu.h
+@@ -276,9 +276,9 @@ extern const VMStateDescription vmstate_alpha_cpu;
+ 
+ void alpha_cpu_do_interrupt(CPUState *cpu);
+ bool alpha_cpu_exec_interrupt(CPUState *cpu, int int_req);
++hwaddr alpha_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ #endif /* !CONFIG_USER_ONLY */
+ void alpha_cpu_dump_state(CPUState *cs, FILE *f, int flags);
+-hwaddr alpha_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int alpha_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int alpha_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ 
+diff --git a/target/cris/cpu.h b/target/cris/cpu.h
+index e6776f25b1..71fa1f96e0 100644
+--- a/target/cris/cpu.h
++++ b/target/cris/cpu.h
+@@ -193,12 +193,11 @@ bool cris_cpu_exec_interrupt(CPUState *cpu, int int_req);
+ bool cris_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                        MMUAccessType access_type, int mmu_idx,
+                        bool probe, uintptr_t retaddr);
++hwaddr cris_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ #endif
+ 
+ void cris_cpu_dump_state(CPUState *cs, FILE *f, int flags);
+ 
+-hwaddr cris_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+-
+ int crisv10_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int cris_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int cris_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
+index 6f3b6beecf..b595ef25a9 100644
+--- a/target/hppa/cpu.h
++++ b/target/hppa/cpu.h
+@@ -322,11 +322,11 @@ static inline void cpu_hppa_change_prot_id(CPUHPPAState *env) { }
+ void cpu_hppa_change_prot_id(CPUHPPAState *env);
+ #endif
+ 
+-hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr);
+ int hppa_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int hppa_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ void hppa_cpu_dump_state(CPUState *cs, FILE *f, int);
+ #ifndef CONFIG_USER_ONLY
++hwaddr hppa_cpu_get_phys_page_debug(CPUState *cs, vaddr addr);
+ bool hppa_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                        MMUAccessType access_type, int mmu_idx,
+                        bool probe, uintptr_t retaddr);
+diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+index 3a9cfe2f33..68ed531fc3 100644
+--- a/target/m68k/cpu.h
++++ b/target/m68k/cpu.h
+@@ -176,9 +176,9 @@ struct ArchCPU {
+ #ifndef CONFIG_USER_ONLY
+ void m68k_cpu_do_interrupt(CPUState *cpu);
+ bool m68k_cpu_exec_interrupt(CPUState *cpu, int int_req);
++hwaddr m68k_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ #endif /* !CONFIG_USER_ONLY */
+ void m68k_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+-hwaddr m68k_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int m68k_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int m68k_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ 
+diff --git a/target/nios2/cpu.h b/target/nios2/cpu.h
+index f85581ee56..2f43b67a8f 100644
+--- a/target/nios2/cpu.h
++++ b/target/nios2/cpu.h
+@@ -262,7 +262,6 @@ void nios2_tcg_init(void);
+ void nios2_cpu_do_interrupt(CPUState *cs);
+ void dump_mmu(CPUNios2State *env);
+ void nios2_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+-hwaddr nios2_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ G_NORETURN void nios2_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+                                               MMUAccessType access_type, int mmu_idx,
+                                               uintptr_t retaddr);
+@@ -288,6 +287,7 @@ static inline int cpu_mmu_index(CPUNios2State *env, bool ifetch)
  }
  
--int kvm_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
-+int kvm_insert_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len)
- {
-     struct kvm_sw_breakpoint *bp;
-     int err;
-@@ -3257,7 +3257,7 @@ int kvm_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
-     return 0;
- }
+ #ifndef CONFIG_USER_ONLY
++hwaddr nios2_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ bool nios2_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                         MMUAccessType access_type, int mmu_idx,
+                         bool probe, uintptr_t retaddr);
+diff --git a/target/openrisc/cpu.h b/target/openrisc/cpu.h
+index 1d5efa5ca2..31a4ae5ad3 100644
+--- a/target/openrisc/cpu.h
++++ b/target/openrisc/cpu.h
+@@ -312,7 +312,6 @@ struct ArchCPU {
  
--int kvm_remove_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len)
-+int kvm_remove_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len)
- {
-     struct kvm_sw_breakpoint *bp;
-     int err;
-diff --git a/accel/kvm/kvm-cpus.h b/accel/kvm/kvm-cpus.h
-index fd63fe6a59..ca40add32c 100644
---- a/accel/kvm/kvm-cpus.h
-+++ b/accel/kvm/kvm-cpus.h
-@@ -19,8 +19,8 @@ void kvm_cpu_synchronize_post_reset(CPUState *cpu);
- void kvm_cpu_synchronize_post_init(CPUState *cpu);
- void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
- bool kvm_supports_guest_debug(void);
--int kvm_insert_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len);
--int kvm_remove_breakpoint(CPUState *cpu, int type, hwaddr addr, hwaddr len);
-+int kvm_insert_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len);
-+int kvm_remove_breakpoint(CPUState *cpu, int type, vaddr addr, vaddr len);
- void kvm_remove_all_breakpoints(CPUState *cpu);
+ void cpu_openrisc_list(void);
+ void openrisc_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+-hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int openrisc_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int openrisc_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ void openrisc_translate_init(void);
+@@ -321,6 +320,8 @@ int print_insn_or1k(bfd_vma addr, disassemble_info *info);
+ #define cpu_list cpu_openrisc_list
  
- #endif /* KVM_CPUS_H */
-diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
-index 19cbf1db3a..d9228fd403 100644
---- a/accel/tcg/tcg-accel-ops.c
-+++ b/accel/tcg/tcg-accel-ops.c
-@@ -116,7 +116,7 @@ static inline int xlat_gdb_type(CPUState *cpu, int gdbtype)
-     return cputype;
- }
- 
--static int tcg_insert_breakpoint(CPUState *cs, int type, hwaddr addr, hwaddr len)
-+static int tcg_insert_breakpoint(CPUState *cs, int type, vaddr addr, vaddr len)
- {
-     CPUState *cpu;
-     int err = 0;
-@@ -147,7 +147,7 @@ static int tcg_insert_breakpoint(CPUState *cs, int type, hwaddr addr, hwaddr len
-     }
- }
- 
--static int tcg_remove_breakpoint(CPUState *cs, int type, hwaddr addr, hwaddr len)
-+static int tcg_remove_breakpoint(CPUState *cs, int type, vaddr addr, vaddr len)
- {
-     CPUState *cpu;
-     int err = 0;
-diff --git a/gdbstub/gdbstub.c b/gdbstub/gdbstub.c
-index be88ca0d71..c3fbc31123 100644
---- a/gdbstub/gdbstub.c
-+++ b/gdbstub/gdbstub.c
-@@ -48,7 +48,6 @@
- #include "sysemu/runstate.h"
- #include "semihosting/semihost.h"
- #include "exec/exec-all.h"
--#include "exec/hwaddr.h"
- #include "sysemu/replay.h"
- 
- #include "internals.h"
-diff --git a/gdbstub/internals.h b/gdbstub/internals.h
-index eabb0341d1..b23999f951 100644
---- a/gdbstub/internals.h
-+++ b/gdbstub/internals.h
-@@ -9,9 +9,11 @@
- #ifndef _INTERNALS_H_
- #define _INTERNALS_H_
- 
-+#include "exec/cpu-common.h"
+ #ifndef CONFIG_USER_ONLY
++hwaddr openrisc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
 +
- bool gdb_supports_guest_debug(void);
--int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len);
--int gdb_breakpoint_remove(CPUState *cs, int type, hwaddr addr, hwaddr len);
-+int gdb_breakpoint_insert(CPUState *cs, int type, vaddr addr, vaddr len);
-+int gdb_breakpoint_remove(CPUState *cs, int type, vaddr addr, vaddr len);
- void gdb_breakpoint_remove_all(CPUState *cs);
+ bool openrisc_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                            MMUAccessType access_type, int mmu_idx,
+                            bool probe, uintptr_t retaddr);
+diff --git a/target/ppc/cpu.h b/target/ppc/cpu.h
+index 81d4263a07..6a7a8634da 100644
+--- a/target/ppc/cpu.h
++++ b/target/ppc/cpu.h
+@@ -1346,12 +1346,12 @@ static inline bool vhyp_cpu_in_nested(PowerPCCPU *cpu)
+ #endif /* CONFIG_USER_ONLY */
  
- #endif /* _INTERNALS_H_ */
-diff --git a/gdbstub/softmmu.c b/gdbstub/softmmu.c
-index f208c6cf15..129575e510 100644
---- a/gdbstub/softmmu.c
-+++ b/gdbstub/softmmu.c
-@@ -11,7 +11,6 @@
+ void ppc_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+-hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int ppc_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int ppc_cpu_gdb_read_register_apple(CPUState *cpu, GByteArray *buf, int reg);
+ int ppc_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ int ppc_cpu_gdb_write_register_apple(CPUState *cpu, uint8_t *buf, int reg);
+ #ifndef CONFIG_USER_ONLY
++hwaddr ppc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ void ppc_gdb_gen_spr_xml(PowerPCCPU *cpu);
+ const char *ppc_gdb_get_dynamic_xml(CPUState *cs, const char *xml_name);
+ #endif
+diff --git a/target/rx/cpu.h b/target/rx/cpu.h
+index 5655dffeff..555d230f24 100644
+--- a/target/rx/cpu.h
++++ b/target/rx/cpu.h
+@@ -123,11 +123,11 @@ const char *rx_crname(uint8_t cr);
+ #ifndef CONFIG_USER_ONLY
+ void rx_cpu_do_interrupt(CPUState *cpu);
+ bool rx_cpu_exec_interrupt(CPUState *cpu, int int_req);
++hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ #endif /* !CONFIG_USER_ONLY */
+ void rx_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+ int rx_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int rx_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+-hwaddr rx_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
  
- #include "qemu/osdep.h"
- #include "exec/gdbstub.h"
--#include "exec/hwaddr.h"
- #include "sysemu/cpus.h"
- #include "internals.h"
- 
-@@ -24,7 +23,7 @@ bool gdb_supports_guest_debug(void)
+ void rx_translate_init(void);
+ void rx_cpu_list(void);
+diff --git a/target/rx/helper.c b/target/rx/helper.c
+index f34945e7e2..dad5fb4976 100644
+--- a/target/rx/helper.c
++++ b/target/rx/helper.c
+@@ -144,9 +144,9 @@ bool rx_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
      return false;
  }
  
--int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
-+int gdb_breakpoint_insert(CPUState *cs, int type, vaddr addr, vaddr len)
+-#endif /* !CONFIG_USER_ONLY */
+-
+ hwaddr rx_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
  {
-     const AccelOpsClass *ops = cpus_get_accel();
-     if (ops->insert_breakpoint) {
-@@ -33,7 +32,7 @@ int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
-     return -ENOSYS;
+     return addr;
  }
++
++#endif /* !CONFIG_USER_ONLY */
+diff --git a/target/sh4/cpu.h b/target/sh4/cpu.h
+index 727b829598..02bfd612ea 100644
+--- a/target/sh4/cpu.h
++++ b/target/sh4/cpu.h
+@@ -214,7 +214,6 @@ struct ArchCPU {
  
--int gdb_breakpoint_remove(CPUState *cs, int type, hwaddr addr, hwaddr len)
-+int gdb_breakpoint_remove(CPUState *cs, int type, vaddr addr, vaddr len)
- {
-     const AccelOpsClass *ops = cpus_get_accel();
-     if (ops->remove_breakpoint) {
-diff --git a/gdbstub/user.c b/gdbstub/user.c
-index 033e5fdd71..484bd8f461 100644
---- a/gdbstub/user.c
-+++ b/gdbstub/user.c
-@@ -9,7 +9,6 @@
-  */
  
- #include "qemu/osdep.h"
--#include "exec/hwaddr.h"
- #include "exec/gdbstub.h"
- #include "hw/core/cpu.h"
- #include "internals.h"
-@@ -20,7 +19,7 @@ bool gdb_supports_guest_debug(void)
-     return true;
- }
+ void superh_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+-hwaddr superh_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int superh_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int superh_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ G_NORETURN void superh_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+@@ -225,6 +224,7 @@ void sh4_translate_init(void);
+ void sh4_cpu_list(void);
  
--int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
-+int gdb_breakpoint_insert(CPUState *cs, int type, vaddr addr, vaddr len)
- {
-     CPUState *cpu;
-     int err = 0;
-@@ -41,7 +40,7 @@ int gdb_breakpoint_insert(CPUState *cs, int type, hwaddr addr, hwaddr len)
-     }
- }
+ #if !defined(CONFIG_USER_ONLY)
++hwaddr superh_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ bool superh_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                          MMUAccessType access_type, int mmu_idx,
+                          bool probe, uintptr_t retaddr);
+diff --git a/target/sparc/cpu.h b/target/sparc/cpu.h
+index e478c5eb16..ed0069d0b1 100644
+--- a/target/sparc/cpu.h
++++ b/target/sparc/cpu.h
+@@ -569,10 +569,11 @@ struct ArchCPU {
  
--int gdb_breakpoint_remove(CPUState *cs, int type, hwaddr addr, hwaddr len)
-+int gdb_breakpoint_remove(CPUState *cs, int type, vaddr addr, vaddr len)
- {
-     CPUState *cpu;
-     int err = 0;
-diff --git a/include/sysemu/accel-ops.h b/include/sysemu/accel-ops.h
-index 8cc7996def..30690c71bd 100644
---- a/include/sysemu/accel-ops.h
-+++ b/include/sysemu/accel-ops.h
-@@ -10,7 +10,7 @@
- #ifndef ACCEL_OPS_H
- #define ACCEL_OPS_H
+ #ifndef CONFIG_USER_ONLY
+ extern const VMStateDescription vmstate_sparc_cpu;
++
++hwaddr sparc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ #endif
  
--#include "exec/hwaddr.h"
-+#include "exec/cpu-common.h"
- #include "qom/object.h"
- 
- #define ACCEL_OPS_SUFFIX "-ops"
-@@ -48,8 +48,8 @@ struct AccelOpsClass {
- 
-     /* gdbstub hooks */
-     bool (*supports_guest_debug)(void);
--    int (*insert_breakpoint)(CPUState *cpu, int type, hwaddr addr, hwaddr len);
--    int (*remove_breakpoint)(CPUState *cpu, int type, hwaddr addr, hwaddr len);
-+    int (*insert_breakpoint)(CPUState *cpu, int type, vaddr addr, vaddr len);
-+    int (*remove_breakpoint)(CPUState *cpu, int type, vaddr addr, vaddr len);
-     void (*remove_all_breakpoints)(CPUState *cpu);
- };
- 
+ void sparc_cpu_do_interrupt(CPUState *cpu);
+-hwaddr sparc_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ int sparc_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
+ int sparc_cpu_gdb_write_register(CPUState *cpu, uint8_t *buf, int reg);
+ G_NORETURN void sparc_cpu_do_unaligned_access(CPUState *cpu, vaddr addr,
+diff --git a/target/xtensa/cpu.h b/target/xtensa/cpu.h
+index 579adcb769..b7a54711a6 100644
+--- a/target/xtensa/cpu.h
++++ b/target/xtensa/cpu.h
+@@ -576,9 +576,9 @@ void xtensa_cpu_do_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                       unsigned size, MMUAccessType access_type,
+                                       int mmu_idx, MemTxAttrs attrs,
+                                       MemTxResult response, uintptr_t retaddr);
++hwaddr xtensa_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ #endif
+ void xtensa_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
+-hwaddr xtensa_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ void xtensa_count_regs(const XtensaConfig *config,
+                        unsigned *n_regs, unsigned *n_core_regs);
+ int xtensa_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
 -- 
 2.38.1
 
