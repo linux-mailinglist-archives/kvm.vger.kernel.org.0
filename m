@@ -2,119 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F0D36474D5
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 18:06:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6F3B6474E6
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 18:15:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229769AbiLHRG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 12:06:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36282 "EHLO
+        id S229564AbiLHRPr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 12:15:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229685AbiLHRG1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 12:06:27 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC68085D00
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 09:05:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670519127;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=asW2vy461e0rSdotWn0NTs/7xLf9pA0Y4lAnlw3dKwM=;
-        b=LBaNMV4HsBCCZx0KqKyQEV06co1wHrvUrkFh8WxX/fP8NiV37jYLI5RQoKy3/J6/rt+1Kq
-        xZRYi+u8jNPcDrzzmPWindSUdh7U3LcFTExuQc1ut5ax6o2cufnsPlLQbl2/PHiizwEraI
-        73li8aYbrJ+MyA2hETDPxyxVwB7EB3M=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-650-Iy2TNGiSPjS-tC2gbk2xew-1; Thu, 08 Dec 2022 12:05:08 -0500
-X-MC-Unique: Iy2TNGiSPjS-tC2gbk2xew-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0097A3817963;
-        Thu,  8 Dec 2022 17:05:08 +0000 (UTC)
-Received: from thuth.com (unknown [10.39.192.125])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A23AC40C206B;
-        Thu,  8 Dec 2022 17:05:06 +0000 (UTC)
-From:   Thomas Huth <thuth@redhat.com>
-To:     kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, David Hildenbrand <david@redhat.com>
-Subject: [kvm-unit-tests v2 PATCH] s390x: sie: Test whether the epoch extension field is working as expected
-Date:   Thu,  8 Dec 2022 18:05:02 +0100
-Message-Id: <20221208170502.17984-1-thuth@redhat.com>
+        with ESMTP id S229500AbiLHRPp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 12:15:45 -0500
+Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12CD67DA7C
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 09:15:45 -0800 (PST)
+Received: by mail-qk1-x731.google.com with SMTP id j13so1089744qka.3
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 09:15:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3zAEindOiDw3p/QUnojUCi9zb5fCUbsCVu9Sm2mbL70=;
+        b=B+FW31yj55gsXTk6nvxmJifRtRFBRkfUyjyBA5htz6Sq/iqRU03Ej6IZiuESR7Bknc
+         QIPL5AFqtbk6oVZp6VFLfHrmTLfLHeaMdjM2tO3DaFWLbnIWDGZF+nVU/n4pL+Qv9uFX
+         t+cr6KOwwq7jwohZQj7XcnukGnnZVxYS69BQK4fePHOXq3jBjy/EKLg8eO0OXBCmgLyI
+         aKM0CeU9Bs+4sHdOPlrCR8QQvN88xgoBQzApwf2RnQ2gH+oGGETHx3htOMlKLaTliYPk
+         5XLZFO/NOQEJ8S2BlPSjuQ9kKwY5sd3XL2G5OrG2e0fYZJ7WoUC5iMuSKNRYYREkSUfn
+         DTeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3zAEindOiDw3p/QUnojUCi9zb5fCUbsCVu9Sm2mbL70=;
+        b=T3zxEDQsow8I+wOZuVA72bDShXfOQ+PYipe03ZbXD51ITE3fMzzZ6ToGUxCZZ6cXDw
+         n5eOAUIwZRiXTxOzVcy0anQXR0LsMZepjOX0yja1NCycz2njV2dhNSrLmAA8xE1jJO1w
+         h6EL5kg1aFIdr7uQ/gTs0xmvkE03Yl6rde3YgUx8gDl3eypcrkXPO3VLK/Sq14Sn6g8S
+         D2ljfjjlqI4YIplEzvvkp5vc8LqDFFB+Qon+VdHmdUTEcveKFQLIdEM4b1MSXPXiYxiV
+         kFoXlGKuddHE6yF1i/HxNoFaxqkOKdXOhGbR78gdVFZ3IMsQ3vAmY0ehVchPIaBBfGqV
+         snGg==
+X-Gm-Message-State: ANoB5pm/3DaEXLy/a2Wra91laneVxZKXOWMRk6yST0U7rCj7PDCTvMOs
+        q5xvmV4RPVf07H6d/daBSlZiGA==
+X-Google-Smtp-Source: AA0mqf4pZoYlrJ8F0Jt5n340oU+nlu49XdQFj5sVnc0ew/a0XeYDX4vYZdf6oljAq04Ha67S3TccyQ==
+X-Received: by 2002:a37:a853:0:b0:6ff:d9d:e395 with SMTP id r80-20020a37a853000000b006ff0d9de395mr146587qke.757.1670519744177;
+        Thu, 08 Dec 2022 09:15:44 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-47-55-122-23.dhcp-dynamic.fibreop.ns.bellaliant.net. [47.55.122.23])
+        by smtp.gmail.com with ESMTPSA id x12-20020ac8538c000000b003a7e38055c9sm7901992qtp.63.2022.12.08.09.15.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Dec 2022 09:15:43 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1p3KUo-006Nwx-Ny;
+        Thu, 08 Dec 2022 13:15:42 -0400
+Date:   Thu, 8 Dec 2022 13:15:42 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Steven Sistare <steven.sistare@oracle.com>
+Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH V1 7/8] vfio: change dma owner
+Message-ID: <Y5Ibvv9PNMifi0NF@ziepe.ca>
+References: <1670363753-249738-1-git-send-email-steven.sistare@oracle.com>
+ <1670363753-249738-8-git-send-email-steven.sistare@oracle.com>
+ <Y5DGPcfxTJGk7IZm@ziepe.ca>
+ <0f6d9adb-b5b9-ca52-9723-752c113e97c4@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0f6d9adb-b5b9-ca52-9723-752c113e97c4@oracle.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We recently discovered a bug with the time management in nested scenarios
-which got fixed by kernel commit "KVM: s390: vsie: Fix the initialization
-of the epoch extension (epdx) field". This adds a simple test for this
-bug so that it is easier to determine whether the host kernel of a machine
-has already been fixed or not.
+On Thu, Dec 08, 2022 at 11:48:08AM -0500, Steven Sistare wrote:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- v2: Remove the spurious "2" from the diag 44 opcode
+> > Anyhow, I came up with this thing. Needs a bit of polishing, the
+> > design is a bit odd for performance reasons, and I only compiled it.
+> 
+> Thanks, I'll pull an iommfd development environment together and try it.
+> However, it will also need an interface to change vaddr for each dma region.
+> In general the vaddr will be different when the memory object is re-mapped 
+> after exec.
 
- s390x/sie.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+Ahh that is yuky :\
 
-diff --git a/s390x/sie.c b/s390x/sie.c
-index 87575b29..cd3cea10 100644
---- a/s390x/sie.c
-+++ b/s390x/sie.c
-@@ -58,6 +58,33 @@ static void test_diags(void)
- 	}
- }
- 
-+static void test_epoch_ext(void)
-+{
-+	u32 instr[] = {
-+		0xb2780000,	/* STCKE 0 */
-+		0x83000044	/* DIAG 0x44 to intercept */
-+	};
-+
-+	if (!test_facility(139)) {
-+		report_skip("epdx: Multiple Epoch Facility is not available");
-+		return;
-+	}
-+
-+	guest[0] = 0x00;
-+	memcpy(guest_instr, instr, sizeof(instr));
-+
-+	vm.sblk->gpsw.addr = PAGE_SIZE * 2;
-+	vm.sblk->gpsw.mask = PSW_MASK_64;
-+
-+	vm.sblk->ecd |= ECD_MEF;
-+	vm.sblk->epdx = 0x47;	/* Setting the epoch extension here ... */
-+
-+	sie(&vm);
-+
-+	/* ... should result in the same epoch extension here: */
-+	report(guest[0] == 0x47, "epdx: different epoch is visible in the guest");
-+}
-+
- static void setup_guest(void)
- {
- 	setup_vm();
-@@ -80,6 +107,7 @@ int main(void)
- 
- 	setup_guest();
- 	test_diags();
-+	test_epoch_ext();
- 	sie_guest_destroy(&vm);
- 
- done:
--- 
-2.31.1
+So I still like the one shot approach because it has nice error
+handling properties, and it lets us use the hacky very expensive "stop
+the world" lockng to avoid slowing the fast paths.
 
+Passing in a sorted list of old_vaddr,new_vaddr is possibly fine, the
+kernel can bsearch it as it goes through all the pages objects.
+
+Due to the way iommufd works, especially with copy, you end up with
+the 'pages' handle that holds the vaddr that many different IOVAs may
+refer to. So it is kind of weird to ask to change a single IOVA's
+mapping, it must always change all the mappings that have been copied
+that share vaddr, pin accounting and so forth.
+
+This is another reason why I liked the one-shot global everything
+approach, as narrowing the objects to target cannot be done by IOVA -
+at best you could target a specific mm and vaddr range.
+
+FWIW, there is a nice selftest in iommufd in
+tools/testing/selftests/iommu/iommufd.c and the way to develop
+something like this is to add a simple selftes to exercise your
+scenario and get everything sorted like that before going to qemu.
+
+Using the vfio compat you can keep the existing qemu vfio type1 and
+just hack in a call the IOMMUFD ioctl in the right spot. No need to
+jump to the iommfd version of qemu for testing.
+
+Jason
