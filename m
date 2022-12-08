@@ -2,50 +2,50 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3F88647A1B
+	by mail.lfdr.de (Postfix) with ESMTP id ABA17647A1A
 	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 00:36:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbiLHXgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 18:36:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45620 "EHLO
+        id S230153AbiLHXgO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 18:36:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230101AbiLHXf6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 18:35:58 -0500
+        with ESMTP id S230109AbiLHXf7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 18:35:59 -0500
 Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBF1B6BCB3;
-        Thu,  8 Dec 2022 15:35:57 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA8FD6BC84;
+        Thu,  8 Dec 2022 15:35:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670542557; x=1702078557;
+  t=1670542558; x=1702078558;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=55CT66bcMdxZrRpBG4Gr5xUaPrsTcdj1LMl8jhgsMD8=;
-  b=Aa0evoS9bfohRZQopQNhzqPoBHCqm2M6cLOWBNZVdOg8aCOoDRZ2dSMA
-   Z2y/oOgL8/6rEbl7pN2AiHD1CDg102xovrC5yGWNZbieecWUSt1+Dq5QC
-   lRIuNOQV7ky6cu5xUcglf+jNdFdrWhbI/RgcUvgNTm2VrzFMTVgccULOu
-   MFBtNO3MuQO0+lok2FFXFn9jLWGwS+UsiJlU3Sn+hpEmzXJX7SMm1LWUN
-   adWxGza4M3e/RIFj8CySEJ+XalrP4Y+dRO+NCwMoWSWGWmbmzpEEnZIDS
-   Q1tqtfa/9AhS+mMvwMFLpq3AkFlsr2NeRKm6jpBxfysIuIP16emRVq/Sb
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="403586521"
+  bh=DfwJ+I06Y8UDWays5yaVFXu8YHnX7jZC5476+tFtbmw=;
+  b=g7Cb8Em523Z5iWuwqoIpLBFu2HAjamfgsKtH8Fp6dv1tI65RPYmhMfa+
+   nZM71cHP8lQbovCtWCzqmOMoyo0q4T3Jy/Zdh663urbS9Txg738VZoUgM
+   kTc4ILkif9Hg34JPYo+Uj4bCeUItfIYO9QJJ9yONoy8wKwnQXRbi67acd
+   nowtpcT8v/H70LbiY/uyhzPX0LK0AKDLp5VsQ3WJi1+sHAMmK+pdWPL3q
+   8zGug8u3Eu9vmNNFbVlZFLuzZc8VTlLvD2IQ79ZK6xzkLUFZifYmvkvzX
+   2XQkN1km65GbO8q2vv3tby9gMLl7/mZLBCpIOasmiOscEOiaf5/A+D3g7
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="403586532"
 X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
-   d="scan'208";a="403586521"
+   d="scan'208";a="403586532"
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:35:57 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="677950961"
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:35:58 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="677950980"
 X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
-   d="scan'208";a="677950961"
+   d="scan'208";a="677950980"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:35:56 -0800
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 15:35:57 -0800
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         David Matlack <dmatlack@google.com>
-Subject: [RFC PATCH v2 08/15] KVM: TDX: Pin pages via get_page() right before ADD/AUG'ed to TDs
-Date:   Thu,  8 Dec 2022 15:35:43 -0800
-Message-Id: <dca4917a815a212d6598093f189f12d920887362.1670541736.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v2 09/15] KVM: TDX: Pass desired page level in err code for page fault handler
+Date:   Thu,  8 Dec 2022 15:35:44 -0800
+Message-Id: <29cdf1d12999e132f889e830385c4fce4f7c8e82.1670541736.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1670541736.git.isaku.yamahata@intel.com>
 References: <cover.1670541736.git.isaku.yamahata@intel.com>
@@ -62,83 +62,156 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 
-When kvm_faultin_pfn(), it doesn't have the info regarding which page level
-will the gfn be mapped at. Hence it doesn't know to pin a 4K page or a
-2M page.
+For TDX, EPT violation can happen when TDG.MEM.PAGE.ACCEPT.
+And TDG.MEM.PAGE.ACCEPT contains the desired accept page level of TD guest.
 
-Move the guest private pages pinning logic right before
-TDH_MEM_PAGE_ADD/AUG() since at that time it knows the page level info.
+1. KVM can map it with 4KB page while TD guest wants to accept 2MB page.
+
+  TD geust will get TDX_PAGE_SIZE_MISMATCH and it should try to accept
+  4KB size.
+
+2. KVM can map it with 2MB page while TD guest wants to accept 4KB page.
+
+  KVM needs to honor it because
+  a) there is no way to tell guest KVM maps it as 2MB size. And
+  b) guest accepts it in 4KB size since guest knows some other 4KB page
+     in the same 2MB range will be used as shared page.
+
+For case 2, it need to pass desired page level to MMU's
+page_fault_handler. Use bit 29:31 of kvm PF error code for this purpose.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ arch/x86/include/asm/kvm_host.h |  2 ++
+ arch/x86/kvm/vmx/common.h       |  2 +-
+ arch/x86/kvm/vmx/tdx.c          |  7 ++++++-
+ arch/x86/kvm/vmx/tdx.h          | 19 -------------------
+ arch/x86/kvm/vmx/tdx_arch.h     | 19 +++++++++++++++++++
+ arch/x86/kvm/vmx/vmx.c          |  2 +-
+ 6 files changed, 29 insertions(+), 22 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f9d64775193b..bb790466ebae 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -279,6 +279,8 @@ enum x86_intercept_stage;
+ 				 PFERR_WRITE_MASK |		\
+ 				 PFERR_PRESENT_MASK)
+ 
++#define PFERR_LEVEL(err_code)	(((err_code) & PFERR_LEVEL_MASK) >> PFERR_LEVEL_START_BIT)
++
+ /* apic attention bits */
+ #define KVM_APIC_CHECK_VAPIC	0
+ /*
+diff --git a/arch/x86/kvm/vmx/common.h b/arch/x86/kvm/vmx/common.h
+index 995cf22f47cf..69464ae0f7e8 100644
+--- a/arch/x86/kvm/vmx/common.h
++++ b/arch/x86/kvm/vmx/common.h
+@@ -99,7 +99,7 @@ static inline int __vmx_handle_ept_violation(struct kvm_vcpu *vcpu, gpa_t gpa,
+ 	error_code |= (exit_qualification & EPT_VIOLATION_GVA_TRANSLATED) != 0 ?
+ 	       PFERR_GUEST_FINAL_MASK : PFERR_GUEST_PAGE_MASK;
+ 
+-	if (err_page_level > 0)
++	if (err_page_level > PG_LEVEL_NONE)
+ 		error_code |= (err_page_level << PFERR_LEVEL_START_BIT) & PFERR_LEVEL_MASK;
+ 
+ 	return kvm_mmu_page_fault(vcpu, gpa, error_code, NULL, 0);
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 51b9e250437e..fad7413f7eab 100644
+index fad7413f7eab..39760ee95f04 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1297,7 +1297,8 @@ static void tdx_measure_page(struct kvm_tdx *kvm_tdx, hpa_t gpa, int size)
- 	}
+@@ -2312,6 +2312,7 @@ static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+ 	struct kvm_tdx_init_mem_region region;
+ 	struct kvm_vcpu *vcpu;
+ 	struct page *page;
++	u64 error_code;
+ 	kvm_pfn_t pfn;
+ 	int idx, ret = 0;
+ 
+@@ -2364,7 +2365,11 @@ static int tdx_init_mem_region(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
+ 		kvm_tdx->source_pa = pfn_to_hpa(page_to_pfn(page)) |
+ 				     (cmd->flags & KVM_TDX_MEASURE_MEMORY_REGION);
+ 
+-		pfn = kvm_mmu_map_tdp_page(vcpu, region.gpa, TDX_SEPT_PFERR,
++		/* TODO: large page support. */
++		error_code = TDX_SEPT_PFERR;
++		error_code |= (PG_LEVEL_4K << PFERR_LEVEL_START_BIT) &
++			PFERR_LEVEL_MASK;
++		pfn = kvm_mmu_map_tdp_page(vcpu, region.gpa, error_code,
+ 					   PG_LEVEL_4K);
+ 		if (is_error_noslot_pfn(pfn) || kvm->vm_bugged)
+ 			ret = -EFAULT;
+diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+index e09757acc6f9..6eca8bf4d9e1 100644
+--- a/arch/x86/kvm/vmx/tdx.h
++++ b/arch/x86/kvm/vmx/tdx.h
+@@ -62,25 +62,6 @@ union tdx_exit_reason {
+ 	u64 full;
+ };
+ 
+-union tdx_ext_exit_qualification {
+-	struct {
+-		u64 type		: 4;
+-		u64 reserved0		: 28;
+-		u64 req_sept_level	: 3;
+-		u64 err_sept_level	: 3;
+-		u64 err_sept_state	: 8;
+-		u64 err_sept_is_leaf	: 1;
+-		u64 reserved1		: 17;
+-	};
+-	u64 full;
+-};
+-
+-enum tdx_ext_exit_qualification_type {
+-	EXT_EXIT_QUAL_NONE,
+-	EXT_EXIT_QUAL_ACCEPT,
+-	NUM_EXT_EXIT_QUAL,
+-};
+-
+ struct vcpu_tdx {
+ 	struct kvm_vcpu	vcpu;
+ 
+diff --git a/arch/x86/kvm/vmx/tdx_arch.h b/arch/x86/kvm/vmx/tdx_arch.h
+index 18604734fb14..471a9f61fc81 100644
+--- a/arch/x86/kvm/vmx/tdx_arch.h
++++ b/arch/x86/kvm/vmx/tdx_arch.h
+@@ -163,4 +163,23 @@ struct td_params {
+ #define TDX_MIN_TSC_FREQUENCY_KHZ		(100 * 1000)
+ #define TDX_MAX_TSC_FREQUENCY_KHZ		(10 * 1000 * 1000)
+ 
++union tdx_ext_exit_qualification {
++	struct {
++		u64 type		:  4;
++		u64 reserved0		: 28;
++		u64 req_sept_level	:  3;
++		u64 err_sept_level	:  3;
++		u64 err_sept_state	:  8;
++		u64 err_sept_is_leaf	:  1;
++		u64 reserved1		: 17;
++	};
++	u64 full;
++};
++
++enum tdx_ext_exit_qualification_type {
++	EXT_EXIT_QUAL_NONE = 0,
++	EXT_EXIT_QUAL_ACCEPT,
++	NUM_EXT_EXIT_QUAL,
++};
++
+ #endif /* __KVM_X86_TDX_ARCH_H */
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index 30a715c22647..420c4cf9adeb 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -5784,7 +5784,7 @@ static int handle_ept_violation(struct kvm_vcpu *vcpu)
+ 	if (unlikely(allow_smaller_maxphyaddr && kvm_vcpu_is_illegal_gpa(vcpu, gpa)))
+ 		return kvm_emulate_instruction(vcpu, 0);
+ 
+-	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification, 0);
++	return __vmx_handle_ept_violation(vcpu, gpa, exit_qualification, PG_LEVEL_NONE);
  }
  
--static void tdx_unpin(struct kvm *kvm, kvm_pfn_t pfn, int level)
-+static void tdx_unpin(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
-+		      enum pg_level level)
- {
- 	int i;
- 
-@@ -1330,12 +1331,12 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 	if (likely(is_td_finalized(kvm_tdx))) {
- 		err = tdh_mem_page_aug(kvm_tdx->tdr.pa, gpa, tdx_level, hpa, &out);
- 		if (err == TDX_ERROR_SEPT_BUSY) {
--			tdx_unpin(kvm, pfn, level);
-+			tdx_unpin(kvm, gfn, pfn, level);
- 			return -EAGAIN;
- 		}
- 		if (KVM_BUG_ON(err, kvm)) {
- 			pr_tdx_error(TDH_MEM_PAGE_AUG, err, &out);
--			tdx_unpin(kvm, pfn, level);
-+			tdx_unpin(kvm, gfn, pfn, level);
- 			return -EIO;
- 		}
- 		return 0;
-@@ -1358,7 +1359,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 	 * always uses vcpu 0's page table and protected by vcpu->mutex).
- 	 */
- 	if (KVM_BUG_ON(kvm_tdx->source_pa == INVALID_PAGE, kvm)) {
--		tdx_unpin(kvm, pfn, level);
-+		tdx_unpin(kvm, gfn, pfn, level);
- 		return -EINVAL;
- 	}
- 
-@@ -1376,7 +1377,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
- 	} while (err == TDX_ERROR_SEPT_BUSY);
- 	if (KVM_BUG_ON(err, kvm)) {
- 		pr_tdx_error(TDH_MEM_PAGE_ADD, err, &out);
--		tdx_unpin(kvm, pfn, level);
-+		tdx_unpin(kvm, gfn, pfn, level);
- 		return -EIO;
- 	} else if (measure)
- 		tdx_measure_page(kvm_tdx, gpa, KVM_HPAGE_SIZE(level));
-@@ -1405,7 +1406,7 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
- 		err = tdx_reclaim_page(hpa, level, false, 0);
- 		if (KVM_BUG_ON(err, kvm))
- 			return -EIO;
--		tdx_unpin(kvm, pfn, level);
-+		tdx_unpin(kvm, gfn, pfn, level);
- 		return 0;
- 	}
- 
-@@ -1437,7 +1438,7 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
- 			pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
- 			r = -EIO;
- 		} else
--			tdx_unpin(kvm, pfn + i, PG_LEVEL_4K);
-+			tdx_unpin(kvm, gfn + i, pfn + i, PG_LEVEL_4K);
- 		hpa += PAGE_SIZE;
- 	}
- 	return r;
+ static int handle_ept_misconfig(struct kvm_vcpu *vcpu)
 -- 
 2.25.1
 
