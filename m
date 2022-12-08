@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF68A6476B9
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:41:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D64FD6476BD
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 20:41:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229960AbiLHTlS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 14:41:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58016 "EHLO
+        id S229655AbiLHTl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 14:41:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229955AbiLHTka (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 14:40:30 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59CC185D13
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:40:14 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id x79-20020a633152000000b004785d1cf6bbso1616409pgx.6
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:40:14 -0800 (PST)
+        with ESMTP id S229865AbiLHTkf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 14:40:35 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1997D389C8
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 11:40:17 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id a4-20020a5b0004000000b006fdc6aaec4fso2548249ybp.20
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 11:40:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7el2leYxw6DuE2TKpxO/GVa0AQVZhVPYSCMmz19ZHuI=;
-        b=O++bFFpSURwB8JUZDeWwEc8lxc4/9crS2K4HsyuyBbvilW8kdB4FZPUpBapa95NsxY
-         0xO+2BUFvsH7Lv9OpM/ZNw6lAX1BZkwmvpchLqFMC1N46mGiLFFJBG/HkNWtdDFKz0HV
-         gaJZcacGlJwuJDiHLoKW0WYD/nKr6azk72Tngx5olXe8pBzakRuhI16DprQMVZTjM2QI
-         klMPqFL6afDQzxyjJFzvNFwT6YpAogs4p8iE9rScX7ZpN21ivdBFghpL37wrQT+9CnOv
-         tdduCPP5Ti74kCPUwjTk76Ln1pEwMrFI/tCITETf7aNuyVpMp2Rq1UKSZarbJfTksvTP
-         6Wqg==
+        bh=ZDFxAZ/PI9aKYqwedjkDPDUn0PCD9WUxHYy13eGAWTI=;
+        b=UW5TQakihQ1Rj8oX0fHh6ol3yHICPRAUjId2fBE9HBOx4Z4cfwRHCzOFro0DVog5Py
+         z1d9aYSN4fRQh+yVjk9c6erIMnvGY+3XCA5eND2mJd3lmcs6ZMcic9/HWoIHmoYD+B1m
+         XjqLDiAn+QBJHnf0vzOfnGkxZlkIa53ilOScS8egg7kyZLK+h2NKejyWCaVjbbt+sR5R
+         IhfagMv7s1KO30A1KDYGC5ziILrcoD8HH6N1IH5+EVj3HMWjpbtHUPdv5fpd7dQKJ+67
+         MzWuFb+b2SqNDBq56KYHPAYiPt7QBIFy/9sPV8aGa7CXG5RzY4NELQedDkJBW9qr9WbA
+         evPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7el2leYxw6DuE2TKpxO/GVa0AQVZhVPYSCMmz19ZHuI=;
-        b=gox+HenjPYLQgj/F4pFXz9SdZivFqd4atJWdTU56J1waXUqHX7wuDOJJEb8Bpq7boB
-         tru6x1XusYRLagluaebq6RBDAKDWQvqPo4Ll6rjU/aYvxnFldV+6Q7ePJg1MLKoI5mkZ
-         9EztEjJvdMYGdm7oteKOFUzfjU+qBWMtpTc8ndnVQaN6qEz7dkDUJnBOuIUC+lw07fJp
-         9zULphH+bwptXa7U7bjR4k5KJTxeGm7eNQLd46aoNwZsI4Y8pOTmEnzgLEXCOC14amaA
-         TDJjLunY6+p0JZD90RnKQOGTcHuMQpKNGRMnFmobFzGOhIseV5Pn+ymKZMRY1Uo5wG1x
-         sR9g==
-X-Gm-Message-State: ANoB5pldSTShI1pWtBcdytdVKlMl/5WY2TDfmmSIPu527eLTP2x8zf9u
-        vfHe6eV40Y5c5sh62YNig2NxvE758JwOOA==
-X-Google-Smtp-Source: AA0mqf4ImIWXetG7XX1SXxRXGnECaJ0ODlsgksb3SPKCTTh3sr1uwrp/2qso+8Xm6A48WDYB3HG6hZIxDgKp9g==
+        bh=ZDFxAZ/PI9aKYqwedjkDPDUn0PCD9WUxHYy13eGAWTI=;
+        b=d0wo7syq3tbOmiPP3QDFmPe8lz7Yz1NgH/ZRwogUI1DHrtUH3arh9ur6NN1hJ+avyP
+         dh5EZqRAMzb+eNTqBeDYoBF0dL2RAO+QkBKNWpnP/EQekiDEGpM6T4AaEUplbvhaM6Qw
+         4Ei5r5E6n1D5D4ARxnjS0YYbXAmTdV1MZ7lFsQT8TMf1xJ+K1CFIx+xohtiHH0JXbJCn
+         Hx8l2rwOSN23f8is8Yk6p1lulufV7aqxhPFXRcju5HAdsHnSyGJ2wIoeYC0Y4S30qbGB
+         V55MEn193IaqyulSR9Cq3gaqLaThGQSG0zw7iLS5vagbpBERXdoTGTSHrdGYMXTvnvbP
+         TmQA==
+X-Gm-Message-State: ANoB5pmiuooe+a85BXeW9yAV1n4YQB8Ul9s0uV7jTuUvi65riiEp2Qmg
+        LScdLuVN0Mkr1NQhI/FSm/Wz/SBCMn3GRw==
+X-Google-Smtp-Source: AA0mqf4h5P1c4eLdLR7BQ8qrkqY9isQdWdfvRcIECxB1d810mucDHdG6W99tV9EeqSL89xl1lTy+w8pwh40XXQ==
 X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a05:6a00:2183:b0:574:2104:5657 with SMTP
- id h3-20020a056a00218300b0057421045657mr5713585pfi.58.1670528404717; Thu, 08
- Dec 2022 11:40:04 -0800 (PST)
-Date:   Thu,  8 Dec 2022 11:38:54 -0800
+ (user=dmatlack job=sendgmr) by 2002:a25:6a89:0:b0:6dd:989f:2af4 with SMTP id
+ f131-20020a256a89000000b006dd989f2af4mr92028743ybc.38.1670528406445; Thu, 08
+ Dec 2022 11:40:06 -0800 (PST)
+Date:   Thu,  8 Dec 2022 11:38:55 -0800
 In-Reply-To: <20221208193857.4090582-1-dmatlack@google.com>
 Mime-Version: 1.0
 References: <20221208193857.4090582-1-dmatlack@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221208193857.4090582-35-dmatlack@google.com>
-Subject: [RFC PATCH 34/37] KVM: MMU: Move the TDP iterator to common code
+Message-ID: <20221208193857.4090582-36-dmatlack@google.com>
+Subject: [RFC PATCH 35/37] KVM: x86/mmu: Move tdp_mmu_max_gfn_exclusive() to tdp_pgtable.c
 From:   David Matlack <dmatlack@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
@@ -90,7 +90,7 @@ Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -98,139 +98,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move arch/x86/kvm/mmu/tdp_iter.{c,h} to into common code so that it can
-be used by other architectures in the future.
+Move tdp_mmu_max_gfn_exclusive() to tdp_pgtable.c since it currently
+relies on the x86-specific kvm_mmu_max_gfn() function. This can be
+improved in the future by implementing a common API for calculating the
+max GFN.
 
 No functional change intended.
 
 Signed-off-by: David Matlack <dmatlack@google.com>
 ---
- MAINTAINERS                                  | 2 +-
- arch/x86/kvm/Makefile                        | 2 +-
- arch/x86/kvm/mmu/tdp_mmu.c                   | 2 +-
- arch/x86/kvm/mmu/tdp_pgtable.c               | 2 +-
- {arch/x86/kvm/mmu => include/kvm}/tdp_iter.h | 9 +++------
- virt/kvm/Makefile.kvm                        | 2 ++
- {arch/x86 => virt}/kvm/mmu/tdp_iter.c        | 4 +---
- 7 files changed, 10 insertions(+), 13 deletions(-)
- rename {arch/x86/kvm/mmu => include/kvm}/tdp_iter.h (96%)
- rename {arch/x86 => virt}/kvm/mmu/tdp_iter.c (98%)
+ arch/x86/include/asm/kvm/tdp_pgtable.h |  3 +++
+ arch/x86/kvm/mmu/tdp_mmu.c             | 11 -----------
+ arch/x86/kvm/mmu/tdp_pgtable.c         | 11 +++++++++++
+ 3 files changed, 14 insertions(+), 11 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 7e586d7ba78c..3c33eca85480 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11206,7 +11206,7 @@ F:	include/uapi/asm-generic/kvm*
- F:	include/uapi/linux/kvm*
- F:	tools/kvm/
- F:	tools/testing/selftests/kvm/
--F:	virt/kvm/*
-+F:	virt/kvm/
- 
- KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
- M:	Marc Zyngier <maz@kernel.org>
-diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
-index c294ae51caba..cb9ae306892a 100644
---- a/arch/x86/kvm/Makefile
-+++ b/arch/x86/kvm/Makefile
-@@ -18,7 +18,7 @@ ifdef CONFIG_HYPERV
- kvm-y			+= kvm_onhyperv.o
- endif
- 
--kvm-$(CONFIG_X86_64) += mmu/tdp_pgtable.o mmu/tdp_iter.o mmu/tdp_mmu.o
-+kvm-$(CONFIG_X86_64) += mmu/tdp_pgtable.o mmu/tdp_mmu.o
- kvm-$(CONFIG_KVM_XEN)	+= xen.o
- kvm-$(CONFIG_KVM_SMM)	+= smm.o
- 
+diff --git a/arch/x86/include/asm/kvm/tdp_pgtable.h b/arch/x86/include/asm/kvm/tdp_pgtable.h
+index ff2691ced38b..c1047fcf1a91 100644
+--- a/arch/x86/include/asm/kvm/tdp_pgtable.h
++++ b/arch/x86/include/asm/kvm/tdp_pgtable.h
+@@ -67,4 +67,7 @@ u64 tdp_mmu_make_changed_pte_notifier_pte(struct tdp_iter *iter,
+ 					  struct kvm_gfn_range *range);
+ u64 tdp_mmu_make_huge_page_split_pte(struct kvm *kvm, u64 huge_spte,
+ 				     struct kvm_mmu_page *sp, int index);
++
++gfn_t tdp_mmu_max_gfn_exclusive(void);
++
+ #endif /* !__ASM_KVM_TDP_PGTABLE_H */
 diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 1f1f511cd1a0..c035c051161c 100644
+index c035c051161c..c950d688afea 100644
 --- a/arch/x86/kvm/mmu/tdp_mmu.c
 +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -2,10 +2,10 @@
+@@ -828,17 +828,6 @@ static inline bool __must_check tdp_mmu_iter_cond_resched(struct kvm *kvm,
+ 	return iter->yielded;
+ }
  
- #include "mmu.h"
- #include "mmu_internal.h"
--#include "tdp_iter.h"
- #include "tdp_mmu.h"
- #include "spte.h"
- 
-+#include <kvm/tdp_iter.h>
- #include <kvm/tdp_pgtable.h>
- #include <kvm/mmutrace.h>
- 
+-static inline gfn_t tdp_mmu_max_gfn_exclusive(void)
+-{
+-	/*
+-	 * Bound TDP MMU walks at host.MAXPHYADDR.  KVM disallows memslots with
+-	 * a gpa range that would exceed the max gfn, and KVM does not create
+-	 * MMIO SPTEs for "impossible" gfns, instead sending such accesses down
+-	 * the slow emulation path every time.
+-	 */
+-	return kvm_mmu_max_gfn() + 1;
+-}
+-
+ static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ 			       bool shared, int zap_level)
+ {
 diff --git a/arch/x86/kvm/mmu/tdp_pgtable.c b/arch/x86/kvm/mmu/tdp_pgtable.c
-index cc7b10f703e1..fb40abdb9234 100644
+index fb40abdb9234..4e747956d6ee 100644
 --- a/arch/x86/kvm/mmu/tdp_pgtable.c
 +++ b/arch/x86/kvm/mmu/tdp_pgtable.c
-@@ -2,10 +2,10 @@
- 
- #include <linux/kvm_types.h>
- #include <kvm/tdp_pgtable.h>
-+#include <kvm/tdp_iter.h>
- 
- #include "mmu.h"
- #include "spte.h"
--#include "tdp_iter.h"
- 
- /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
- static_assert(!(REMOVED_TDP_PTE & SPTE_MMU_PRESENT_MASK));
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/include/kvm/tdp_iter.h
-similarity index 96%
-rename from arch/x86/kvm/mmu/tdp_iter.h
-rename to include/kvm/tdp_iter.h
-index 6e3c38532d1d..0a154fcf2664 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/include/kvm/tdp_iter.h
-@@ -1,14 +1,11 @@
- // SPDX-License-Identifier: GPL-2.0
- 
--#ifndef __KVM_X86_MMU_TDP_ITER_H
--#define __KVM_X86_MMU_TDP_ITER_H
-+#ifndef __KVM_TDP_ITER_H
-+#define __KVM_TDP_ITER_H
- 
- #include <linux/kvm_host.h>
- #include <kvm/tdp_pgtable.h>
- 
--#include "mmu.h"
--#include "spte.h"
--
- /*
-  * TDP MMU SPTEs are RCU protected to allow paging structures (non-leaf SPTEs)
-  * to be zapped while holding mmu_lock for read, and to allow TLB flushes to be
-@@ -117,4 +114,4 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
- void tdp_iter_next(struct tdp_iter *iter);
- void tdp_iter_restart(struct tdp_iter *iter);
- 
--#endif /* __KVM_X86_MMU_TDP_ITER_H */
-+#endif /* __KVM_TDP_ITER_H */
-diff --git a/virt/kvm/Makefile.kvm b/virt/kvm/Makefile.kvm
-index 2c27d5d0c367..58b595ac9b8d 100644
---- a/virt/kvm/Makefile.kvm
-+++ b/virt/kvm/Makefile.kvm
-@@ -12,3 +12,5 @@ kvm-$(CONFIG_KVM_ASYNC_PF) += $(KVM)/async_pf.o
- kvm-$(CONFIG_HAVE_KVM_IRQ_ROUTING) += $(KVM)/irqchip.o
- kvm-$(CONFIG_HAVE_KVM_DIRTY_RING) += $(KVM)/dirty_ring.o
- kvm-$(CONFIG_HAVE_KVM_PFNCACHE) += $(KVM)/pfncache.o
+@@ -170,3 +170,14 @@ int tdp_mmu_max_mapping_level(struct kvm *kvm,
+ {
+ 	return kvm_mmu_max_mapping_level(kvm, slot, iter->gfn, PG_LEVEL_NUM);
+ }
 +
-+kvm-$(CONFIG_HAVE_TDP_MMU) += $(KVM)/mmu/tdp_iter.o
-diff --git a/arch/x86/kvm/mmu/tdp_iter.c b/virt/kvm/mmu/tdp_iter.c
-similarity index 98%
-rename from arch/x86/kvm/mmu/tdp_iter.c
-rename to virt/kvm/mmu/tdp_iter.c
-index d5f024b7f6e4..674d93f91979 100644
---- a/arch/x86/kvm/mmu/tdp_iter.c
-+++ b/virt/kvm/mmu/tdp_iter.c
-@@ -1,8 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0
- 
--#include "mmu_internal.h"
--#include "tdp_iter.h"
--#include "spte.h"
-+#include <kvm/tdp_iter.h>
- 
- /*
-  * Recalculates the pointer to the SPTE for the current GFN and level and
++gfn_t tdp_mmu_max_gfn_exclusive(void)
++{
++	/*
++	 * Bound TDP MMU walks at host.MAXPHYADDR.  KVM disallows memslots with
++	 * a gpa range that would exceed the max gfn, and KVM does not create
++	 * MMIO SPTEs for "impossible" gfns, instead sending such accesses down
++	 * the slow emulation path every time.
++	 */
++	return kvm_mmu_max_gfn() + 1;
++}
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
