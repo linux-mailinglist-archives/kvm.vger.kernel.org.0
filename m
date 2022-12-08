@@ -2,101 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 761D66473CD
-	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 17:02:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 86CA86473FD
+	for <lists+kvm@lfdr.de>; Thu,  8 Dec 2022 17:14:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229795AbiLHQC3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 11:02:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47514 "EHLO
+        id S230127AbiLHQOW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 11:14:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229966AbiLHQCZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 11:02:25 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD8709D2FD;
-        Thu,  8 Dec 2022 08:02:21 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id d1so2126055wrs.12;
-        Thu, 08 Dec 2022 08:02:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+upKZf2dVdk/UxAtWyh1oWLSgNq0wwxbyFaq7JE/2d8=;
-        b=Q44swHCZKzaZk3wZ/4tWkIvan1eLvsEiQW7rNIsOHb7fsy0lRHKtKLn2K/vwcQ9c1p
-         kIvp+9JrZ9UIhJZOHKnFFn6oZhAqcBTAuajF5GNjSTE8NUE3ytFTPCG4l9I7w4N20lcN
-         mcL3LJ5E5cwcJlU+tNZpCrtYeK3R6iejM/i/Iy2qo/jGOGyZ4a2mPOaZbo3RhlkZ+d0M
-         fmhjeue1qH8ZumemCJBnu8YUbk9YRzHTTP9bEtt+daUoGkfialkFTXaZA9mI4Zz31e1i
-         f0K091Mb0TDdLLiRO0h1qhZKCpWoJLkQaMUancARgTdkOxJCbX3mgaDK24a+ol4W6viz
-         xEmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+upKZf2dVdk/UxAtWyh1oWLSgNq0wwxbyFaq7JE/2d8=;
-        b=xnTdlwu+l1fncpV2muHEaklIiWq6S2BDbfPbdTpaSMleu0fPW90gcFUz2/cEQCNsR/
-         o3FHd7QHDR79JQp18qUmBTAm6kTwUC860vmLilF1Ymbzws11roAUQxKK06QH2bSlz6zD
-         sVgF3a1ptwH47Xydr5o3jZHHGGhIT9OM8zeWqSB3g0LHajB81FiiYnEzy3Vj0/2CXJ/C
-         8EwmXF+YrjpRYCJxH9sG0F/gvSnZhXBfWIYYS0U0rPC6+Poo5ZUjKzY+SHGRSif9fiHO
-         i3glqgA5PYvbs2klk8l6BdmCAZzRh3FEXiNFHJgCCuGCpaMtaZisB3Qy6YI2z8I3HyYS
-         ypxg==
-X-Gm-Message-State: ANoB5pltVR8ceHhsiBTmVefqf2lG1DIH80zpCoDukSPtf7Bqj92X/EJP
-        xijAdtnSy0O2cY8CPp0Dd9E8V4VVodOGyWCC
-X-Google-Smtp-Source: AA0mqf6cVDconk+NrqZYCtCxzkB8M9gK+LbspUehJ3DlRyW6zfhGopBADDFnhNtDQcH9zshOojkuWw==
-X-Received: by 2002:adf:e743:0:b0:242:1c58:8ea7 with SMTP id c3-20020adfe743000000b002421c588ea7mr1834127wrn.46.1670515340150;
-        Thu, 08 Dec 2022 08:02:20 -0800 (PST)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id d18-20020adfe892000000b002425be3c9e2sm12558272wrm.60.2022.12.08.08.02.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 08:02:19 -0800 (PST)
-Date:   Thu, 8 Dec 2022 19:02:17 +0300
-From:   Dan Carpenter <error27@gmail.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>, Yishai Hadas <yishaih@nvidia.com>
-Cc:     Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: [PATCH 2/2] vfio/mlx5: error pointer dereference in error handling
-Message-ID: <Y5IKia5SaiVxYmG5@kili>
+        with ESMTP id S230125AbiLHQOS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 11:14:18 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DCF9AD9A1;
+        Thu,  8 Dec 2022 08:14:17 -0800 (PST)
+Received: from zn.tnic (p200300ea9733e73d329c23fffea6a903.dip0.t-ipconnect.de [IPv6:2003:ea:9733:e73d:329c:23ff:fea6:a903])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id B3B291EC0532;
+        Thu,  8 Dec 2022 17:14:15 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1670516055;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=mpSVni1jvdroIaME7GDcDgKKXd+H1uRbJlRgfrdVzGw=;
+        b=bk2RCHcHGaBATFGvr0rM4hh4UhD2PsnE+7uwvI86VoueRGXu865kH6uhLuAk6OnMlNuQ6H
+        GNWhLlubf2p4CYu7iu/CQ+QqwRigFnwU/ZlP3jtehiubqxduggk3uTrUIFsX3+xhO/Kdp1
+        pVoF9IxM75f6IBCIBt8mCEzZtchkTtE=
+Date:   Thu, 8 Dec 2022 17:14:11 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 1/3] x86/cpu: Process all CPUID dependencies after
+ identifying CPU info
+Message-ID: <Y5INU3o+SFReGkLz@zn.tnic>
+References: <20221203003745.1475584-1-seanjc@google.com>
+ <20221203003745.1475584-2-seanjc@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y5IKVknlf5Z5NPtU@kili>
-X-Mailer: git-send-email haha only kidding
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20221203003745.1475584-2-seanjc@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This code frees the wrong "buf" variable and results in an error pointer
-dereference.
+On Sat, Dec 03, 2022 at 12:37:43AM +0000, Sean Christopherson wrote:
+> Process all CPUID dependencies to ensure that a dependent is disabled if
+> one or more of its parent features is unsupported.
 
-Fixes: 34e2f27143d1 ("vfio/mlx5: Introduce multiple loads")
-Signed-off-by: Dan Carpenter <error27@gmail.com>
----
-Why did get_maintainer.pl not add Yishai to the CC list?
+Just out of curiosity: this is some weird guest configuration, right?
+Not addressing a real hw issue...
 
- drivers/vfio/pci/mlx5/main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> As is, cpuid_deps is
+> processed if an only if a feature is explicitly disabled via
+> clear_cpu_cap(), which makes it annoying/dangerous to use cpuid_deps for
+> features whose parent(s) do not always have explicit processing.
+> 
+> E.g. VMX and SGX depend on the synthetic X86_FEATURE_MSR_IA32_FEAT_CTL,
+> but there is no common location to clear MSR_IA32_FEAT_CTL, and so
+> consumers of VMX and SGX are forced to check MSR_IA32_FEAT_CTL on top
+> of the dependent feature.
+> 
+> Manually clearing X86_FEATURE_MSR_IA32_FEAT_CTL is the obvious
+> alternative, but it's subtly more difficult that updating
+> init_ia32_feat_ctl().  CONFIG_IA32_FEAT_CTL depends on any of
+> CONFIG_CPU_SUP_{INTEL,CENATUR,ZHAOXIN}, but init_ia32_feat_ctl() is
+> invoked if and only if the actual CPU type matches one of the
+> aforementioned CPU_SUP_* types. E.g. running a kernel built with
+> 
+>   CONFIG_CPU_SUP_INTEL=y
+>   CONFIG_CPU_SUP_AMD=y
+>   # CONFIG_CPU_SUP_HYGON is not set
+>   # CONFIG_CPU_SUP_CENTAUR is not set
+>   # CONFIG_CPU_SUP_ZHAOXIN is not set
+> 
+> on a Cenatur or Zhaoxin CPU will leave X86_FEATURE_VMX set but not set
 
-diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index 83137228352e..9feb89c6d939 100644
---- a/drivers/vfio/pci/mlx5/main.c
-+++ b/drivers/vfio/pci/mlx5/main.c
-@@ -826,7 +826,7 @@ mlx5vf_pci_resume_device_data(struct mlx5vf_pci_core_device *mvdev)
- 	spin_lock_init(&migf->list_lock);
- 	return migf;
- out_buf:
--	mlx5vf_free_data_buffer(buf);
-+	mlx5vf_free_data_buffer(migf->buf);
- out_pd:
- 	mlx5vf_cmd_dealloc_pd(migf);
- out_free:
+Typo fix for the committer: Centaur
+
+> X86_FEATURE_MSR_IA32_FEAT_CTL, and will never call init_ia32_feat_ctl()
+> to give the kernel a convenient opportunity to clear
+> X86_FEATURE_MSR_IA32_FEAT_CTL.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/cpufeature.h |  1 +
+>  arch/x86/kernel/cpu/common.c      |  6 ++++++
+>  arch/x86/kernel/cpu/cpuid-deps.c  | 10 ++++++++++
+>  3 files changed, 17 insertions(+)
+
+...
+
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index bf4ac1cb93d7..094fc69dba63 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -1887,6 +1887,12 @@ static void identify_cpu(struct cpuinfo_x86 *c)
+>  
+>  	ppin_init(c);
+>  
+> +	/*
+> +	 * Apply CPUID dependencies to ensure dependent features are disabled
+> +	 * if a parent feature is unsupported but wasn't explicitly disabled.
+> +	 */
+> +	apply_cpuid_deps(c);
+
+I'd probably call that resolve_cpuid_deps()...
+
+But yeah, that init path would need cleaning up at some point - all
+kinds of init detection functions have been hastily slapped there over
+the years...
+
 -- 
-2.35.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
