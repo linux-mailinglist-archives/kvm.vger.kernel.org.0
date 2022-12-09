@@ -2,220 +2,559 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B8D1647C69
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 03:51:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B23A2647CAB
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 05:05:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229898AbiLICvD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 21:51:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37402 "EHLO
+        id S229901AbiLIDdt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 22:33:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbiLICvB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 21:51:01 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBF086F6B;
-        Thu,  8 Dec 2022 18:51:00 -0800 (PST)
+        with ESMTP id S229517AbiLIDdr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 22:33:47 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0326B1D304;
+        Thu,  8 Dec 2022 19:33:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670554260; x=1702090260;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=gejzUkYvocmg2APb24uluVIU4qc0214qD7EcfuT/bxw=;
-  b=jFpRXzClqPBu/16VstbLQWQaAWPEnDJ08cEHCq/lWAtZWV1uOLjYPmXQ
-   yDqVzfnRW2LZCP2PAmf28ZU8NKkF8cKMEhnl5GoHFtk9b0kp9d/bx802c
-   l5uFOgOrPUE6XvsTQrripG4ZVL/hQiTeJNPfFmr4lLHmxp4hnuyoBlHCB
-   ogg0krhe+CcRt4ZwUJP3I/SNrnddIT1fcURQpJBX04/IuHz6D0jmGDD1F
-   1fuaZqD6hk3f4LouRCXApj0cxYzLiLszrgFrfQnAm+o9lL/1ckpmTKTVc
-   wwoN6xQS9cOJYPzHq2b0RIEmkWD63Lj+jqxL9aeFoyndii3btZpIK/vsr
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="315002968"
+  t=1670556817; x=1702092817;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Vq9nMkdKxWUfGxjoZszTdIqmn0HDQzbbMF06hbT4nuU=;
+  b=cvYMeTtz/GCPH9JPBHzmNYSpG8q2nqZkVgfsvo5NgewLkfzraTk55f1t
+   0uNkc0S8NjbtdCVyZnUtdHrBioUx+3mUsy0OXVb9CnSsVcGQTOwaj89mP
+   qNxiPT+iq14rbd3kMmQE0w+/dzjfn54Zsp7l7dwAxqbNvEhq8FEJmyoF2
+   MHosa6zvA2H5GmkFJwb2UxSZlpZLEf9A5nnfAxPhuRUmu5sqAk5NUFkWF
+   xZCXIPtFKnI9iknhdEYjjasZgHGWQWFUrqDy87PwtFszWWWdPJ0qbl9R6
+   vKNCulhw0f1+gKYHIdfsoC/D80bITxVJ1+9PhCDb8rtKVYsG4BgRb7Q7p
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="300790107"
 X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
-   d="scan'208";a="315002968"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 18:51:00 -0800
+   d="scan'208";a="300790107"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 19:26:15 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="647257255"
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="892508970"
 X-IronPort-AV: E=Sophos;i="5.96,228,1665471600"; 
-   d="scan'208";a="647257255"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orsmga002.jf.intel.com with ESMTP; 08 Dec 2022 18:50:59 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 8 Dec 2022 18:50:58 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 8 Dec 2022 18:50:58 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Thu, 8 Dec 2022 18:50:58 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.102)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Thu, 8 Dec 2022 18:50:58 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n6STT8VpBcjD99gpRp1BNlCk5UIwT1pbGEjmb3qjQWtbFfQaAe30zXzcCtS/zlecMGf1oIP5/j3mrt8lat5R62CUocJ1hgdcpWWOi1kz9HIm/yoDVf2diinFrsIY+sGyczgvOxAmoeu7BJg8/3q2mRL0VIE82up+LXPyYLE/Hs5LA/pu5Ls8h5UYCLKmIA4Ilq9i442o6JhNPVTiBfe28iOSVKLo2qjQPG+dhjWRCHcAv34GgJG0KSe69m5IgxIK4k9zyfHsiJHmQal1qNo2kSTuauug5fHNQpEzi1/F3nQDw0xCsCzfVD0JwWswdrr8ZfSeEL7smd7if8NHjTojZw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gejzUkYvocmg2APb24uluVIU4qc0214qD7EcfuT/bxw=;
- b=R2og7ooi6JEDg1i8qOqhAm4Bi6oNhHyTd9PZyacUGjpwg5DDQ3WBl16blK9QDcr/h5cjRzTMQTBsU1oQ4Ftk3woVD3Y2a0dIC3xOfD0zl1WqYBhpO/GVd/9oOcW/Z+4VPf0spC13FX2ZEXKjS33bFnOfaX476XAL1DNLdMIFExFqcbtjTz+4ms/wXe4B1w/QFr61QykVkHr93dZ4feo8sr12E2BW5OA9emKlGSyB2eYWj/9XKBM7LakS91bvYyjIpLgYgYjLktXiQEp1LziWtMuqBgKsWmdbXLOZU5zk4Wpdn/8DdmcOHoJRC/TPIwO50RzUIxcZBMCKBbUF6ikpDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SJ0PR11MB5136.namprd11.prod.outlook.com (2603:10b6:a03:2d1::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.16; Fri, 9 Dec
- 2022 02:50:56 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::c9ee:bc36:6cf4:c6fb]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::c9ee:bc36:6cf4:c6fb%5]) with mapi id 15.20.5880.016; Fri, 9 Dec 2022
- 02:50:56 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>, Christoph Hellwig <hch@lst.de>
-CC:     "Rao, Lei" <lei.rao@intel.com>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "axboe@fb.com" <axboe@fb.com>, "kch@nvidia.com" <kch@nvidia.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "yishaih@nvidia.com" <yishaih@nvidia.com>,
-        "shameerali.kolothum.thodi@huawei.com" 
-        <shameerali.kolothum.thodi@huawei.com>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "Dong, Eddie" <eddie.dong@intel.com>,
-        "Li, Yadong" <yadong.li@intel.com>,
-        "Liu, Yi L" <yi.l.liu@intel.com>,
-        "Wilk, Konrad" <konrad.wilk@oracle.com>,
-        "stephen@eideticom.com" <stephen@eideticom.com>,
-        "Yuan, Hang" <hang.yuan@intel.com>
-Subject: RE: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Thread-Topic: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Thread-Index: AQHZCTfLVudoTcTfbUW71RdNMUs3aK5gYwIAgAB8LwCAAAPrAIAAF5SAgAAEXoCAAAOwgIAAEcqAgAAnS4CAANPxgIAAXv0AgAAE+4CAABT+gIAAGaOAgAAOwACAABFFgIAAGmYAgAH6rFA=
-Date:   Fri, 9 Dec 2022 02:50:55 +0000
-Message-ID: <BN9PR11MB52762EC4F67AF2198EB379FF8C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <Y49k++D3i8DfLOLL@ziepe.ca> <20221206165503.GA8677@lst.de>
- <Y4+U3VR2LeEh2S7B@ziepe.ca> <20221207075415.GB2283@lst.de>
- <Y5CWVu08abcOuEQH@ziepe.ca> <20221207135203.GA22803@lst.de>
- <Y5CsH5PqMYAWYatw@ziepe.ca> <20221207163857.GB2010@lst.de>
- <Y5DOAKArjyfb6Mcz@ziepe.ca> <20221207183333.GA7049@lst.de>
- <Y5DyorZJPdtN5WcX@ziepe.ca>
-In-Reply-To: <Y5DyorZJPdtN5WcX@ziepe.ca>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ0PR11MB5136:EE_
-x-ms-office365-filtering-correlation-id: f21c1e7f-1934-47e8-f542-08dad99031aa
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: tiiz+G6PXj0jaOPnvyANFjPr+32EkTKDeUFOGj3A/p5gCjB8XLGL+41GyuOh3f77lgJaWzSCG5tp+I5XL6ha5wrcR0dy1h3LsyiCn6GZzDDmclVlR6HscjEr0McvZyXeOLN/ICweE/UCMzS/8KOtUnpAF2N/FmlkMec10peAayH/kpEq6Lf9exTEgdwyX2B2k61yUUDd8m3j6R2RzxCTZ56KdxHLVhAmSJefGinpNtLZ6LEVyzyi4IHS0TshzYx39apC9EN9/xSJEdQvUyaxjE3TrGqz7nxZPjL/udE7MGlhvBcq0m6CtU01X0702xqOHyQZoRBL9wadImEWVYYK+gwze3yJN0Y0jZSSJy0uw26tubW7X83v+B9XWvkEMs4e652KAfUwHggW2i+qzsMvOhD8jBDRqpyAYVczGsgXCOLBq5coGJCcLZorK+7539ndsKPkcdezhU/G7VYCdyR2AtTZtjhemOpl6bOKy1GgEJT20a7mBeBy97yE39CAv9E2CmdyIubi0oRMnWKuoXFzR9OxIxjBGGHxzw/r7ZvpZ1Kk8s1O6VWXK7uvLLetbfo+IEB0lBEuY88yVKTMIu+R8+I33sBbVCN094S1uirVGR9aom9iqWoO0S59/xG5nBpwG1aylS0toEDpEfQTsiZyNSg+hrlJ2uJuuxrIHj1clfZHELcuGcKdX1ba46OA6LGn94C6M0YcNhD9zIF9u+XFEOFgS1xPGmWiW8vnoVwcKBQ=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(396003)(136003)(346002)(366004)(376002)(451199015)(66556008)(38070700005)(478600001)(8936002)(966005)(52536014)(9686003)(64756008)(76116006)(26005)(4326008)(186003)(8676002)(66946007)(66476007)(86362001)(41300700001)(66446008)(71200400001)(7696005)(6506007)(55016003)(122000001)(110136005)(54906003)(33656002)(82960400001)(5660300002)(107886003)(7416002)(316002)(2906002)(38100700002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VEdhWXJkTmdDQWJPNEJyeVljdG1peTBGK3dvS0Vrd2xtTlIyenFyTDZldjZ2?=
- =?utf-8?B?alJyMFZuTVNxZERNazB2ZUdjOGpjSEhOb3FWOUVUZG1iU0RyM0dBRGt3RHpt?=
- =?utf-8?B?Nk5DWTVZZmRLNmtkeXVkNUdWa0JnREo1ZHFkSG9OKzZSTlJhTG42RUxkL2J4?=
- =?utf-8?B?bmlDVXJWeGk0NG9KR1ZtRGJkVW4rWmRudTBPdHBIOUlFaUJsR3R0QzJhN3Q5?=
- =?utf-8?B?eEs2QjQ3YlNjcHViM2ZYZVNSZ0tlWCtVVkFCOUlSQW95OG9UZldBcVJTS2FV?=
- =?utf-8?B?VlY2UERmekFkaVAydzk2U1JONVByMmdkUTdoMzBHTVZjU1lpTEM0NUEzd2cw?=
- =?utf-8?B?ZlN4NXdObUptK1Z0WjkyZFpvSzJjdVcrc0tQVEVEZ1NKYi9KMTJ5a2JsU2E0?=
- =?utf-8?B?aE95b1N5QndaUlVYcmZyN1RpdmswVURMYzM0Y0NnbjJ5MnYzUXZRUXJtVGxK?=
- =?utf-8?B?ejR4dFVmWjJHK3NNdWhTUk05bFdwV21NM1gycDY2QWZBd01WbEdrVHRma3hU?=
- =?utf-8?B?ejhabzBzaHdiUHFoUk02RitWa2loV2ROcWlmSE5WVVZpbmp4aGZwQkh5UGpZ?=
- =?utf-8?B?Ykw1T0FtcnBIN2hEbmo0RVdkOXRUS0hLd3NMQVhkMDBQbWFWd3JNV1E2U0la?=
- =?utf-8?B?RG5NSU80SVNpUEVUK2pLUEo5MnJpaEJRREJrVGl0WnIyZGUwOU1pSENHb2R0?=
- =?utf-8?B?bmprS0N6VVRmckFLUm56S1JRa2xTWXV0MjZHZHc5TXgzbkNpQkRLVHo3WnRj?=
- =?utf-8?B?MmdzakptK3hpeDdPMzRrWkxqcndCdmxleitBTVdCdnNyMXA0bFhxdk1xMWZo?=
- =?utf-8?B?anJjcjlheS9aR1NEWS83d2JqNGV2anVrWmpiL0hvUi9FS3VyQUU2aDhWbGFs?=
- =?utf-8?B?dGtTVHhISjJMZFdEK2dCZnMwbC9KUDJNcHJrL2drQlNsQjMxTnlKakpKQmhX?=
- =?utf-8?B?V0ZtSHlSaUtIVEwrMzNiTUoxdmJZNW93aEREaDB6TjhYR0FJZ3NMMTdrN0pm?=
- =?utf-8?B?dC90YUdhMTQxUW0ycVZmaHlHQ2xCSmVDRForaE9Na1BleGdxdjB5b0d4d1c5?=
- =?utf-8?B?YllNU0pISGp2VzdvbUNZUXo2YlQzQ210cHFDMjBRbXpQRW5KSDA1NFZHYWow?=
- =?utf-8?B?MmNnZXg3K3pmSDhMZGtYcHpwVm1aTGs3M0l4RXdZVVdMTWc5TisySTc5RkE3?=
- =?utf-8?B?N0pEOGJKMzUzMEtRZFNpOUVoOXdKdzJyRVhwdUgwdGhiWkRjdWl2WEJrb094?=
- =?utf-8?B?L2JOMzVXUjJNWmpqclBGQ1dYMTVIZ2pmZXZGYWg0ekJwUEg5OGFOc2pqck93?=
- =?utf-8?B?REwxdjBWZlp2T25OQnFKelJjNUZzOS9sZk84MFpGVHFjcm4wQjVPWDNKM2xG?=
- =?utf-8?B?VUpOU3JlcWlYU082L2FENVlLa09SYW5SQ1diUkdWUTNqUXdRQWNvV2kxSkp1?=
- =?utf-8?B?QlRZSjRyOFQ2a3ZZakwrajNHUGxaMHdiQStLdERFV2l3RWU0TkZCMW1TdDFU?=
- =?utf-8?B?RUpoMXVuc1ZxZFlsOWVsaHBzRHpkaGJZU0ZNRktYVFh1cVJ6VnIveEZhNWNv?=
- =?utf-8?B?UXljSllXejU0Q0lUMEhuQ3NPMWdHSXBaRUp0NXE0eW5MK1R3eXdZNEpxdkF3?=
- =?utf-8?B?ajZxbFQ4elQzNkZ1U3QyKzE4SFR0NEtyKzZCMStXbHQ4VGt0TGZwQk9PREFY?=
- =?utf-8?B?UjVyS1pjc2ZXNU1LUm56eDVSWEdlaldBd2NtTkxjeHg5eTdzeGVpTkVKZFhW?=
- =?utf-8?B?TzRicEFEUmhqOFJZaTNNV1NRbEZVaTBKMHhQMm5PZTJGMk00TWZZcXJDQzZ0?=
- =?utf-8?B?blJ2cm5tdXY3SjFNOU1RR2RKaWxxSHBMb2kwdUZEeE5PM1lpM0NSRlF1M3hR?=
- =?utf-8?B?VGhYSW40N1pyNDJyalQ4UnNacGlzLzhRdGNPdktaREdRVzFTV3phenZ2dGZy?=
- =?utf-8?B?Q21XaEtqMmdoaVh0dllBbGFkaHNLUUhZUjlSSnVPWEF1dnZPZ1lObEFqOUV5?=
- =?utf-8?B?SHFCamk2K3hZYXM0Y2E5TThkNms4QWFEOGh1RXhDRGl6NjF0a2JPNHpxZWor?=
- =?utf-8?B?ZFJuUmpUT1ZtK2FxTTVnczdIakptUTVXZ1JZODZFWjFlNHJ4Wk02VWh6WnB1?=
- =?utf-8?Q?ucCns4IZhtQwGZ2KA/qWf9rmN?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+   d="scan'208";a="892508970"
+Received: from skxmcp01.bj.intel.com ([10.240.193.86])
+  by fmsmga006.fm.intel.com with ESMTP; 08 Dec 2022 19:26:13 -0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+Subject: [PATCH] KVM: X86: Use the common definition - 'GPA_INVALID' for X86
+Date:   Fri,  9 Dec 2022 10:36:22 +0800
+Message-Id: <20221209023622.274715-1-yu.c.zhang@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f21c1e7f-1934-47e8-f542-08dad99031aa
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Dec 2022 02:50:55.7683
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kkGS5LzdEu428re2wC38Txoq5qw4WENRkIgVFvmxyHNUZEuWg4Dv0tQ//4RH0kNZ/W2NUr700OcNvVfXwTfVZg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5136
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0B6aWVwZS5jYT4NCj4gU2VudDogVGh1cnNkYXks
-IERlY2VtYmVyIDgsIDIwMjIgNDowOCBBTQ0KPiANCj4gRm9yIGluc3RhbmNlIGhvdyBkbyBJIHRy
-YXAgRkxSIGxpa2UgbWx4NSBtdXN0IGRvIGlmIHRoZQ0KPiBkcml2ZXJzL2xpdmVfbWlncmF0aW9u
-IGNvZGUgY2Fubm90IGludGVyY2VwdCB0aGUgRkxSIFZGSU8gaW9jdGw/DQo+IA0KPiBIb3cgZG8g
-SSBtYW5nbGUgYW5kIHNoYXJlIHRoZSBCQVIgbGlrZSBoaXNpbGljb24gZG9lcz8NCj4gDQo+IFdo
-aWNoIGlzIHJlYWxseSB3aHkgdGhpcyBpcyBpbiBWRklPIGluIHRoZSBmaXJzdCBwbGFjZS4gSXQg
-YWN0dWFsbHkgaXMNCj4gY291cGxlZCBpbiBwcmFjdGljZSwgaWYgbm90IGluIHRoZW9yeS4NCj4g
-DQoNClRob3NlIGFyZSBnb29kIHF1ZXN0aW9ucyB3aGljaCBJIGFsc28gYnV5IGluIHRvIHN0YXkg
-d2l0aCB0aGUNCmN1cnJlbnQgVkZJTyBmcmFtZXdvcmsuDQoNCkFjdHVhbGx5IHRoZSBzYW1lIGNv
-bnRyb2xsaW5nIHZzLiBjb250cm9sbGVkIGRlc2lnbiBjaG9pY2UgYWxzbyBleGlzdHMNCmluIHRo
-ZSBoYXJkd2FyZSBzaWRlLiBUaGVyZSBhcmUgcGxlbnR5IG9mIFNSLUlPViBkZXZpY2VzIHN1cHBv
-cnRpbmcNCmRvb3JiZWxscyBmb3IgVkYgKGNvbnRyb2xsZWQgZnVuY3Rpb24pIHRvIGNhbGwgc2Vy
-dmljZXMgb24gUEYgKGNvbnRyb2xsaW5nDQpmdW5jdGlvbikgd2hpbGUgdGhlIGRvb3JiZWxsIGlu
-dGVyZmFjZSBpcyBpbXBsZW1lbnRlZCBvbiB0aGUgVkYgc2lkZS4NCg0KSWYgZm9sbG93aW5nIHRo
-ZSBkaXJlY3Rpb24gaGF2aW5nIGNvbnRyb2xsaW5nIGZ1bmN0aW9uIHRvIGV4cGxpY2l0bHkNCnBy
-b3ZpZGUgc2VydmljZXMgdGhlbiBhbGwgdGhvc2UgZG9vcmJlbGxzIHNob3VsZCBiZSBkZXByZWNh
-dGVkDQphbmQgaW5zdGVhZCB3ZSB3YW50IGV4cGxpY2l0IGNvbW11bmljYXRpb25zIGJldHdlZW4g
-VkYgZHJpdmVyDQphbmQgUEYgZHJpdmVyLg0KDQpGcm9tIHVzZXJzcGFjZSBkcml2ZXIgcC5vLnYu
-IHRoZSBWRklPIHVBUEkgaXMga2luZCBvZiBhIGRldmljZQ0KcHJvZ3JhbW1pbmcgaW50ZXJmYWNl
-LiBIZXJlIHdlIGp1c3QgcHJlc2VudCBldmVyeXRoaW5nIHJlbGF0ZWQNCnRvIHRoZSBjb250cm9s
-bGVkIGRldmljZSBpdHNlbGYgKGluY2x1ZGluZyB0aGUgc3RhdGUgbWFuYWdlbWVudCkNCnZpYSBh
-IGNlbnRyYWxpemVkIHBvcnRhbCB0aG91Z2ggaW4gdGhlIGtlcm5lbCB0aGVyZSBtaWdodCBiZSBs
-aW5rYWdlDQpvdXQgb2YgVkZJTyB0byByZWFjaCB0aGUgY29udHJvbGxpbmcgZHJpdmVyLiBraW5k
-IG9mIGEgc3cgZG9vcmJlbGwuIPCfmIoNCg0KYnR3IGp1c3QgdG8gYWRkIG1vcmUgYmFja2dyb3Vu
-ZCB0byB0aGlzIHdvcmsuIEhhbGYgYSB5ZWFyIGFnbyBMZWkNCmFjdHVhbGx5IGRpZCBhIGZsYXZv
-ciBbMV0gaW4gdGhlIG90aGVyIHdheS4NCg0KVGhlIGNvbnRyb2xsaW5nIGZ1bmN0aW9uIG9mIElu
-dGVsIElQVSBjYXJkIGFsc28gc3VwcG9ydHMgYSBuZXR3b3JrIGdSUEMgDQpwcm90b2NvbCB0byBt
-YW5hZ2UgdGhlIHN0YXRlIG9mIGNvbnRyb2xsZWQgTlZNZSBmdW5jdGlvbi4gDQoNClRoZW4gdGhh
-dCBzZXJpZXMgYXR0ZW1wdGVkIHRvIGludHJvZHVjZSBhbiBvdXQtb2YtYmFuZCBtaWdyYXRpb24N
-CmZyYW1ld29yayBpbiBRZW11IHNvIGluc3RlYWQgb2YgZG9pbmcgaW4tbGluZSBzdGF0ZSBtYW5h
-Z2VtZW50DQp2aWEga2VybmVsIFZGSU8gdUFQSSBRZW11IGNhbiB0dXJuIHRvIGFuIGV4dGVybmFs
-IHBsdWdpbiB3aGljaA0KZm9yd2FyZHMgdGhlIHN0YXRlIGNtZCB2aWEgZ1JQQyB0byB0aGUgY29u
-dHJvbGxpbmcgZnVuY3Rpb24uDQoNCkp1c3QgdGhhdCB0aGUgY29udHJvbGxpbmcgZHJpdmVyIGlz
-IG5vdCBpbiB0aGUga2VybmVsLg0KDQpJdCdzIGRyb3BwZWQgYXMgdGhlIGlubGluZSB3YXkgd2Fz
-IHByZWZlcnJlZC4NCg0KVGhhbmtzDQpLZXZpbg0KDQpbMV0gaHR0cHM6Ly9sb3JlLmtlcm5lbC5v
-cmcvYWxsLzIwMjIwNTI0MDYxODQ4LjE2MTU3MDYtMTQtbGVpLnJhb0BpbnRlbC5jb20vVC8NCg==
+KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in
+kvm_types.h, and it is used by ARM and X86 xen code. We do
+not need a replicated 'INVALID_GPA' for X86 specifically.
+Just replace it with the common one.
+
+Tested by rebuilding KVM.
+
+No functional change intended.
+
+Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+---
+ arch/x86/include/asm/kvm_host.h |  2 -
+ arch/x86/kvm/hyperv.c           |  2 +-
+ arch/x86/kvm/mmu/paging_tmpl.h  |  6 +--
+ arch/x86/kvm/svm/nested.c       |  4 +-
+ arch/x86/kvm/svm/svm.c          |  4 +-
+ arch/x86/kvm/vmx/nested.c       | 66 ++++++++++++++++-----------------
+ arch/x86/kvm/vmx/sgx.c          |  2 +-
+ arch/x86/kvm/vmx/vmx.c          |  6 +--
+ arch/x86/kvm/x86.c              | 18 ++++-----
+ 9 files changed, 54 insertions(+), 56 deletions(-)
+
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index d1013c4f673c..461c0b699a38 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -134,8 +134,6 @@
+ #define INVALID_PAGE (~(hpa_t)0)
+ #define VALID_PAGE(x) ((x) != INVALID_PAGE)
+ 
+-#define INVALID_GPA (~(gpa_t)0)
+-
+ /* KVM Hugepage definitions for x86 */
+ #define KVM_MAX_HUGEPAGE_LEVEL	PG_LEVEL_1G
+ #define KVM_NR_PAGE_SIZES	(KVM_MAX_HUGEPAGE_LEVEL - PG_LEVEL_4K + 1)
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index 2c7f2a26421e..09282f0cf0cd 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -1945,7 +1945,7 @@ static u64 kvm_hv_flush_tlb(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+ 	 */
+ 	if (!hc->fast && is_guest_mode(vcpu)) {
+ 		hc->ingpa = translate_nested_gpa(vcpu, hc->ingpa, 0, NULL);
+-		if (unlikely(hc->ingpa == INVALID_GPA))
++		if (unlikely(hc->ingpa == GPA_INVALID))
+ 			return HV_STATUS_INVALID_HYPERCALL_INPUT;
+ 	}
+ 
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 0f6455072055..2709c135a798 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -378,7 +378,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ 		 * information to fix the exit_qualification or exit_info_1
+ 		 * fields.
+ 		 */
+-		if (unlikely(real_gpa == INVALID_GPA))
++		if (unlikely(real_gpa == GPA_INVALID))
+ 			return 0;
+ 
+ 		host_addr = kvm_vcpu_gfn_to_hva_prot(vcpu, gpa_to_gfn(real_gpa),
+@@ -431,7 +431,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
+ #endif
+ 
+ 	real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(gfn), access, &walker->fault);
+-	if (real_gpa == INVALID_GPA)
++	if (real_gpa == GPA_INVALID)
+ 		return 0;
+ 
+ 	walker->gfn = real_gpa >> PAGE_SHIFT;
+@@ -962,7 +962,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
+ 			       struct x86_exception *exception)
+ {
+ 	struct guest_walker walker;
+-	gpa_t gpa = INVALID_GPA;
++	gpa_t gpa = GPA_INVALID;
+ 	int r;
+ 
+ #ifndef CONFIG_X86_64
+diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+index bc9cd7086fa9..5531263f6045 100644
+--- a/arch/x86/kvm/svm/nested.c
++++ b/arch/x86/kvm/svm/nested.c
+@@ -1169,7 +1169,7 @@ void svm_free_nested(struct vcpu_svm *svm)
+ 	 *
+ 	 * When the vmcb02 is freed, this optimization becomes invalid.
+ 	 */
+-	svm->nested.last_vmcb12_gpa = INVALID_GPA;
++	svm->nested.last_vmcb12_gpa = GPA_INVALID;
+ 
+ 	svm->nested.initialized = false;
+ }
+@@ -1180,7 +1180,7 @@ void svm_leave_nested(struct kvm_vcpu *vcpu)
+ 
+ 	if (is_guest_mode(vcpu)) {
+ 		svm->nested.nested_run_pending = 0;
+-		svm->nested.vmcb12_gpa = INVALID_GPA;
++		svm->nested.vmcb12_gpa = GPA_INVALID;
+ 
+ 		leave_guest_mode(vcpu);
+ 
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index 91352d692845..4d88f5293968 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -1275,8 +1275,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+ 	svm->current_vmcb->asid_generation = 0;
+ 	svm->asid = 0;
+ 
+-	svm->nested.vmcb12_gpa = INVALID_GPA;
+-	svm->nested.last_vmcb12_gpa = INVALID_GPA;
++	svm->nested.vmcb12_gpa = GPA_INVALID;
++	svm->nested.last_vmcb12_gpa = GPA_INVALID;
+ 
+ 	if (!kvm_pause_in_guest(vcpu->kvm)) {
+ 		control->pause_filter_count = pause_filter_count;
+diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+index b28be793de29..b903957b2b0b 100644
+--- a/arch/x86/kvm/vmx/nested.c
++++ b/arch/x86/kvm/vmx/nested.c
+@@ -192,7 +192,7 @@ static int nested_vmx_fail(struct kvm_vcpu *vcpu, u32 vm_instruction_error)
+ 	 * failValid writes the error number to the current VMCS, which
+ 	 * can't be done if there isn't a current VMCS.
+ 	 */
+-	if (vmx->nested.current_vmptr == INVALID_GPA &&
++	if (vmx->nested.current_vmptr == GPA_INVALID &&
+ 	    !evmptr_is_valid(vmx->nested.hv_evmcs_vmptr))
+ 		return nested_vmx_failInvalid(vcpu);
+ 
+@@ -219,7 +219,7 @@ static inline u64 vmx_control_msr(u32 low, u32 high)
+ static void vmx_disable_shadow_vmcs(struct vcpu_vmx *vmx)
+ {
+ 	secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_SHADOW_VMCS);
+-	vmcs_write64(VMCS_LINK_POINTER, INVALID_GPA);
++	vmcs_write64(VMCS_LINK_POINTER, GPA_INVALID);
+ 	vmx->nested.need_vmcs12_to_shadow_sync = false;
+ }
+ 
+@@ -236,7 +236,7 @@ static inline void nested_release_evmcs(struct kvm_vcpu *vcpu)
+ 	vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
+ 
+ 	if (hv_vcpu) {
+-		hv_vcpu->nested.pa_page_gpa = INVALID_GPA;
++		hv_vcpu->nested.pa_page_gpa = GPA_INVALID;
+ 		hv_vcpu->nested.vm_id = 0;
+ 		hv_vcpu->nested.vp_id = 0;
+ 	}
+@@ -304,10 +304,10 @@ static void free_nested(struct kvm_vcpu *vcpu)
+ 
+ 	vmx->nested.vmxon = false;
+ 	vmx->nested.smm.vmxon = false;
+-	vmx->nested.vmxon_ptr = INVALID_GPA;
++	vmx->nested.vmxon_ptr = GPA_INVALID;
+ 	free_vpid(vmx->nested.vpid02);
+ 	vmx->nested.posted_intr_nv = -1;
+-	vmx->nested.current_vmptr = INVALID_GPA;
++	vmx->nested.current_vmptr = GPA_INVALID;
+ 	if (enable_shadow_vmcs) {
+ 		vmx_disable_shadow_vmcs(vmx);
+ 		vmcs_clear(vmx->vmcs01.shadow_vmcs);
+@@ -667,7 +667,7 @@ static void nested_cache_shadow_vmcs12(struct kvm_vcpu *vcpu,
+ 	struct gfn_to_hva_cache *ghc = &vmx->nested.shadow_vmcs12_cache;
+ 
+ 	if (!nested_cpu_has_shadow_vmcs(vmcs12) ||
+-	    vmcs12->vmcs_link_pointer == INVALID_GPA)
++	    vmcs12->vmcs_link_pointer == GPA_INVALID)
+ 		return;
+ 
+ 	if (ghc->gpa != vmcs12->vmcs_link_pointer &&
+@@ -686,7 +686,7 @@ static void nested_flush_cached_shadow_vmcs12(struct kvm_vcpu *vcpu,
+ 	struct gfn_to_hva_cache *ghc = &vmx->nested.shadow_vmcs12_cache;
+ 
+ 	if (!nested_cpu_has_shadow_vmcs(vmcs12) ||
+-	    vmcs12->vmcs_link_pointer == INVALID_GPA)
++	    vmcs12->vmcs_link_pointer == GPA_INVALID)
+ 		return;
+ 
+ 	if (ghc->gpa != vmcs12->vmcs_link_pointer &&
+@@ -2008,7 +2008,7 @@ static enum nested_evmptrld_status nested_vmx_handle_enlightened_vmptrld(
+ 	}
+ 
+ 	if (unlikely(evmcs_gpa != vmx->nested.hv_evmcs_vmptr)) {
+-		vmx->nested.current_vmptr = INVALID_GPA;
++		vmx->nested.current_vmptr = GPA_INVALID;
+ 
+ 		nested_release_evmcs(vcpu);
+ 
+@@ -2197,7 +2197,7 @@ static void prepare_vmcs02_constant_state(struct vcpu_vmx *vmx)
+ 	}
+ 
+ 	if (cpu_has_vmx_encls_vmexit())
+-		vmcs_write64(ENCLS_EXITING_BITMAP, INVALID_GPA);
++		vmcs_write64(ENCLS_EXITING_BITMAP, GPA_INVALID);
+ 
+ 	if (kvm_notify_vmexit_enabled(kvm))
+ 		vmcs_write32(NOTIFY_WINDOW, kvm->arch.notify_window);
+@@ -2219,7 +2219,7 @@ static void prepare_vmcs02_early_rare(struct vcpu_vmx *vmx,
+ {
+ 	prepare_vmcs02_constant_state(vmx);
+ 
+-	vmcs_write64(VMCS_LINK_POINTER, INVALID_GPA);
++	vmcs_write64(VMCS_LINK_POINTER, GPA_INVALID);
+ 
+ 	if (enable_vpid) {
+ 		if (nested_cpu_has_vpid(vmcs12) && vmx->nested.vpid02)
+@@ -2984,7 +2984,7 @@ static int nested_vmx_check_vmcs_link_ptr(struct kvm_vcpu *vcpu,
+ 	struct gfn_to_hva_cache *ghc = &vmx->nested.shadow_vmcs12_cache;
+ 	struct vmcs_hdr hdr;
+ 
+-	if (vmcs12->vmcs_link_pointer == INVALID_GPA)
++	if (vmcs12->vmcs_link_pointer == GPA_INVALID)
+ 		return 0;
+ 
+ 	if (CC(!page_address_valid(vcpu, vmcs12->vmcs_link_pointer)))
+@@ -3242,7 +3242,7 @@ static bool nested_get_vmcs12_pages(struct kvm_vcpu *vcpu)
+ 			 * Write an illegal value to VIRTUAL_APIC_PAGE_ADDR to
+ 			 * force VM-Entry to fail.
+ 			 */
+-			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, INVALID_GPA);
++			vmcs_write64(VIRTUAL_APIC_PAGE_ADDR, GPA_INVALID);
+ 		}
+ 	}
+ 
+@@ -3567,7 +3567,7 @@ static int nested_vmx_run(struct kvm_vcpu *vcpu, bool launch)
+ 		return nested_vmx_failInvalid(vcpu);
+ 
+ 	if (CC(!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr) &&
+-	       vmx->nested.current_vmptr == INVALID_GPA))
++	       vmx->nested.current_vmptr == GPA_INVALID))
+ 		return nested_vmx_failInvalid(vcpu);
+ 
+ 	vmcs12 = get_vmcs12(vcpu);
+@@ -5083,7 +5083,7 @@ static int enter_vmx_operation(struct kvm_vcpu *vcpu)
+ 	if (!vmx->nested.cached_vmcs12)
+ 		goto out_cached_vmcs12;
+ 
+-	vmx->nested.shadow_vmcs12_cache.gpa = INVALID_GPA;
++	vmx->nested.shadow_vmcs12_cache.gpa = GPA_INVALID;
+ 	vmx->nested.cached_shadow_vmcs12 = kzalloc(VMCS12_SIZE, GFP_KERNEL_ACCOUNT);
+ 	if (!vmx->nested.cached_shadow_vmcs12)
+ 		goto out_cached_shadow_vmcs12;
+@@ -5194,7 +5194,7 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
+-	if (vmx->nested.current_vmptr == INVALID_GPA)
++	if (vmx->nested.current_vmptr == GPA_INVALID)
+ 		return;
+ 
+ 	copy_vmcs02_to_vmcs12_rare(vcpu, get_vmcs12(vcpu));
+@@ -5214,7 +5214,7 @@ static inline void nested_release_vmcs12(struct kvm_vcpu *vcpu)
+ 
+ 	kvm_mmu_free_roots(vcpu->kvm, &vcpu->arch.guest_mmu, KVM_MMU_ROOTS_ALL);
+ 
+-	vmx->nested.current_vmptr = INVALID_GPA;
++	vmx->nested.current_vmptr = GPA_INVALID;
+ }
+ 
+ /* Emulate the VMXOFF instruction */
+@@ -5312,12 +5312,12 @@ static int handle_vmread(struct kvm_vcpu *vcpu)
+ 
+ 	if (!evmptr_is_valid(vmx->nested.hv_evmcs_vmptr)) {
+ 		/*
+-		 * In VMX non-root operation, when the VMCS-link pointer is INVALID_GPA,
++		 * In VMX non-root operation, when the VMCS-link pointer is GPA_INVALID,
+ 		 * any VMREAD sets the ALU flags for VMfailInvalid.
+ 		 */
+-		if (vmx->nested.current_vmptr == INVALID_GPA ||
++		if (vmx->nested.current_vmptr == GPA_INVALID ||
+ 		    (is_guest_mode(vcpu) &&
+-		     get_vmcs12(vcpu)->vmcs_link_pointer == INVALID_GPA))
++		     get_vmcs12(vcpu)->vmcs_link_pointer == GPA_INVALID))
+ 			return nested_vmx_failInvalid(vcpu);
+ 
+ 		offset = get_vmcs12_field_offset(field);
+@@ -5422,12 +5422,12 @@ static int handle_vmwrite(struct kvm_vcpu *vcpu)
+ 		return 1;
+ 
+ 	/*
+-	 * In VMX non-root operation, when the VMCS-link pointer is INVALID_GPA,
++	 * In VMX non-root operation, when the VMCS-link pointer is GPA_INVALID,
+ 	 * any VMWRITE sets the ALU flags for VMfailInvalid.
+ 	 */
+-	if (vmx->nested.current_vmptr == INVALID_GPA ||
++	if (vmx->nested.current_vmptr == GPA_INVALID ||
+ 	    (is_guest_mode(vcpu) &&
+-	     get_vmcs12(vcpu)->vmcs_link_pointer == INVALID_GPA))
++	     get_vmcs12(vcpu)->vmcs_link_pointer == GPA_INVALID))
+ 		return nested_vmx_failInvalid(vcpu);
+ 
+ 	if (instr_info & BIT(10))
+@@ -5880,7 +5880,7 @@ bool nested_vmx_check_io_bitmaps(struct kvm_vcpu *vcpu, unsigned int port,
+ 	gpa_t bitmap, last_bitmap;
+ 	u8 b;
+ 
+-	last_bitmap = INVALID_GPA;
++	last_bitmap = GPA_INVALID;
+ 	b = -1;
+ 
+ 	while (size > 0) {
+@@ -6364,8 +6364,8 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+ 		.format = KVM_STATE_NESTED_FORMAT_VMX,
+ 		.size = sizeof(kvm_state),
+ 		.hdr.vmx.flags = 0,
+-		.hdr.vmx.vmxon_pa = INVALID_GPA,
+-		.hdr.vmx.vmcs12_pa = INVALID_GPA,
++		.hdr.vmx.vmxon_pa = GPA_INVALID,
++		.hdr.vmx.vmcs12_pa = GPA_INVALID,
+ 		.hdr.vmx.preemption_timer_deadline = 0,
+ 	};
+ 	struct kvm_vmx_nested_state_data __user *user_vmx_nested_state =
+@@ -6391,7 +6391,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+ 
+ 			if (is_guest_mode(vcpu) &&
+ 			    nested_cpu_has_shadow_vmcs(vmcs12) &&
+-			    vmcs12->vmcs_link_pointer != INVALID_GPA)
++			    vmcs12->vmcs_link_pointer != GPA_INVALID)
+ 				kvm_state.size += sizeof(user_vmx_nested_state->shadow_vmcs12);
+ 		}
+ 
+@@ -6467,7 +6467,7 @@ static int vmx_get_nested_state(struct kvm_vcpu *vcpu,
+ 		return -EFAULT;
+ 
+ 	if (nested_cpu_has_shadow_vmcs(vmcs12) &&
+-	    vmcs12->vmcs_link_pointer != INVALID_GPA) {
++	    vmcs12->vmcs_link_pointer != GPA_INVALID) {
+ 		if (copy_to_user(user_vmx_nested_state->shadow_vmcs12,
+ 				 get_shadow_vmcs12(vcpu), VMCS12_SIZE))
+ 			return -EFAULT;
+@@ -6499,11 +6499,11 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 	if (kvm_state->format != KVM_STATE_NESTED_FORMAT_VMX)
+ 		return -EINVAL;
+ 
+-	if (kvm_state->hdr.vmx.vmxon_pa == INVALID_GPA) {
++	if (kvm_state->hdr.vmx.vmxon_pa == GPA_INVALID) {
+ 		if (kvm_state->hdr.vmx.smm.flags)
+ 			return -EINVAL;
+ 
+-		if (kvm_state->hdr.vmx.vmcs12_pa != INVALID_GPA)
++		if (kvm_state->hdr.vmx.vmcs12_pa != GPA_INVALID)
+ 			return -EINVAL;
+ 
+ 		/*
+@@ -6557,7 +6557,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 
+ 	vmx_leave_nested(vcpu);
+ 
+-	if (kvm_state->hdr.vmx.vmxon_pa == INVALID_GPA)
++	if (kvm_state->hdr.vmx.vmxon_pa == GPA_INVALID)
+ 		return 0;
+ 
+ 	vmx->nested.vmxon_ptr = kvm_state->hdr.vmx.vmxon_pa;
+@@ -6570,13 +6570,13 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 		/* See vmx_has_valid_vmcs12.  */
+ 		if ((kvm_state->flags & KVM_STATE_NESTED_GUEST_MODE) ||
+ 		    (kvm_state->flags & KVM_STATE_NESTED_EVMCS) ||
+-		    (kvm_state->hdr.vmx.vmcs12_pa != INVALID_GPA))
++		    (kvm_state->hdr.vmx.vmcs12_pa != GPA_INVALID))
+ 			return -EINVAL;
+ 		else
+ 			return 0;
+ 	}
+ 
+-	if (kvm_state->hdr.vmx.vmcs12_pa != INVALID_GPA) {
++	if (kvm_state->hdr.vmx.vmcs12_pa != GPA_INVALID) {
+ 		if (kvm_state->hdr.vmx.vmcs12_pa == kvm_state->hdr.vmx.vmxon_pa ||
+ 		    !page_address_valid(vcpu, kvm_state->hdr.vmx.vmcs12_pa))
+ 			return -EINVAL;
+@@ -6621,7 +6621,7 @@ static int vmx_set_nested_state(struct kvm_vcpu *vcpu,
+ 
+ 	ret = -EINVAL;
+ 	if (nested_cpu_has_shadow_vmcs(vmcs12) &&
+-	    vmcs12->vmcs_link_pointer != INVALID_GPA) {
++	    vmcs12->vmcs_link_pointer != GPA_INVALID) {
+ 		struct vmcs12 *shadow_vmcs12 = get_shadow_vmcs12(vcpu);
+ 
+ 		if (kvm_state->size <
+diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
+index 8f95c7c01433..7c5a9bbe2908 100644
+--- a/arch/x86/kvm/vmx/sgx.c
++++ b/arch/x86/kvm/vmx/sgx.c
+@@ -79,7 +79,7 @@ static int sgx_gva_to_gpa(struct kvm_vcpu *vcpu, gva_t gva, bool write,
+ 	else
+ 		*gpa = kvm_mmu_gva_to_gpa_read(vcpu, gva, &ex);
+ 
+-	if (*gpa == INVALID_GPA) {
++	if (*gpa == GPA_INVALID) {
+ 		kvm_inject_emulated_page_fault(vcpu, &ex);
+ 		return -EFAULT;
+ 	}
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index cea8c07f5229..21109269b88a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4593,7 +4593,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+ 	if (cpu_has_vmx_msr_bitmap())
+ 		vmcs_write64(MSR_BITMAP, __pa(vmx->vmcs01.msr_bitmap));
+ 
+-	vmcs_write64(VMCS_LINK_POINTER, INVALID_GPA); /* 22.3.1.5 */
++	vmcs_write64(VMCS_LINK_POINTER, GPA_INVALID); /* 22.3.1.5 */
+ 
+ 	/* Control */
+ 	pin_controls_set(vmx, vmx_pin_based_exec_ctrl(vmx));
+@@ -4712,8 +4712,8 @@ static void __vmx_vcpu_reset(struct kvm_vcpu *vcpu)
+ 	vcpu_setup_sgx_lepubkeyhash(vcpu);
+ 
+ 	vmx->nested.posted_intr_nv = -1;
+-	vmx->nested.vmxon_ptr = INVALID_GPA;
+-	vmx->nested.current_vmptr = INVALID_GPA;
++	vmx->nested.vmxon_ptr = GPA_INVALID;
++	vmx->nested.current_vmptr = GPA_INVALID;
+ 	vmx->nested.hv_evmcs_vmptr = EVMPTR_INVALID;
+ 
+ 	vcpu->arch.microcode_version = 0x100000000ULL;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 72ac6bf05c8b..fe984df5c602 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -871,7 +871,7 @@ int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3)
+ 	 */
+ 	real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(pdpt_gfn),
+ 				     PFERR_USER_MASK | PFERR_WRITE_MASK, NULL);
+-	if (real_gpa == INVALID_GPA)
++	if (real_gpa == GPA_INVALID)
+ 		return 0;
+ 
+ 	/* Note the offset, PDPTRs are 32 byte aligned when using PAE paging. */
+@@ -7200,7 +7200,7 @@ static int kvm_read_guest_virt_helper(gva_t addr, void *val, unsigned int bytes,
+ 		unsigned toread = min(bytes, (unsigned)PAGE_SIZE - offset);
+ 		int ret;
+ 
+-		if (gpa == INVALID_GPA)
++		if (gpa == GPA_INVALID)
+ 			return X86EMUL_PROPAGATE_FAULT;
+ 		ret = kvm_vcpu_read_guest_page(vcpu, gpa >> PAGE_SHIFT, data,
+ 					       offset, toread);
+@@ -7231,7 +7231,7 @@ static int kvm_fetch_guest_virt(struct x86_emulate_ctxt *ctxt,
+ 	/* Inline kvm_read_guest_virt_helper for speed.  */
+ 	gpa_t gpa = mmu->gva_to_gpa(vcpu, mmu, addr, access|PFERR_FETCH_MASK,
+ 				    exception);
+-	if (unlikely(gpa == INVALID_GPA))
++	if (unlikely(gpa == GPA_INVALID))
+ 		return X86EMUL_PROPAGATE_FAULT;
+ 
+ 	offset = addr & (PAGE_SIZE-1);
+@@ -7292,7 +7292,7 @@ static int kvm_write_guest_virt_helper(gva_t addr, void *val, unsigned int bytes
+ 		unsigned towrite = min(bytes, (unsigned)PAGE_SIZE - offset);
+ 		int ret;
+ 
+-		if (gpa == INVALID_GPA)
++		if (gpa == GPA_INVALID)
+ 			return X86EMUL_PROPAGATE_FAULT;
+ 		ret = kvm_vcpu_write_guest(vcpu, gpa, data, towrite);
+ 		if (ret < 0) {
+@@ -7406,7 +7406,7 @@ static int vcpu_mmio_gva_to_gpa(struct kvm_vcpu *vcpu, unsigned long gva,
+ 
+ 	*gpa = mmu->gva_to_gpa(vcpu, mmu, gva, access, exception);
+ 
+-	if (*gpa == INVALID_GPA)
++	if (*gpa == GPA_INVALID)
+ 		return -1;
+ 
+ 	return vcpu_is_mmio_gpa(vcpu, gva, *gpa, write);
+@@ -7643,7 +7643,7 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
+ 
+ 	gpa = kvm_mmu_gva_to_gpa_write(vcpu, addr, NULL);
+ 
+-	if (gpa == INVALID_GPA ||
++	if (gpa == GPA_INVALID ||
+ 	    (gpa & PAGE_MASK) == APIC_DEFAULT_PHYS_BASE)
+ 		goto emul_write;
+ 
+@@ -8439,7 +8439,7 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 		 * If the mapping is invalid in guest, let cpu retry
+ 		 * it to generate fault.
+ 		 */
+-		if (gpa == INVALID_GPA)
++		if (gpa == GPA_INVALID)
+ 			return true;
+ 	}
+ 
+@@ -11426,7 +11426,7 @@ int kvm_arch_vcpu_ioctl_translate(struct kvm_vcpu *vcpu,
+ 	gpa = kvm_mmu_gva_to_gpa_system(vcpu, vaddr, NULL);
+ 	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+ 	tr->physical_address = gpa;
+-	tr->valid = gpa != INVALID_GPA;
++	tr->valid = gpa != GPA_INVALID;
+ 	tr->writeable = 1;
+ 	tr->usermode = 0;
+ 
+@@ -13096,7 +13096,7 @@ void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_c
+ 		(PFERR_WRITE_MASK | PFERR_FETCH_MASK | PFERR_USER_MASK);
+ 
+ 	if (!(error_code & PFERR_PRESENT_MASK) ||
+-	    mmu->gva_to_gpa(vcpu, mmu, gva, access, &fault) != INVALID_GPA) {
++	    mmu->gva_to_gpa(vcpu, mmu, gva, access, &fault) != GPA_INVALID) {
+ 		/*
+ 		 * If vcpu->arch.walk_mmu->gva_to_gpa succeeded, the page
+ 		 * tables probably do not match the TLB.  Just proceed
+-- 
+2.25.1
+
