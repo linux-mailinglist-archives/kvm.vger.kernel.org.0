@@ -2,87 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8D80B6482A3
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 13:56:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B0BD6482C0
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 14:19:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229917AbiLIM4r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 07:56:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34012 "EHLO
+        id S229628AbiLINTI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 08:19:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbiLIM4q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 07:56:46 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEEFB6BC81
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 04:56:45 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B9B4Bj6003438;
-        Fri, 9 Dec 2022 12:56:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : subject : to : cc : message-id : date; s=pp1;
- bh=Gk10zfeao+Nv53Q51vcCsjOVsMrNk4oW3opvOXZlA+o=;
- b=J59AwIE0/0dHrdzd/jXibEEIlZkyCpBFuDVe4ekUOOQNxqHt6uL7VBtk/NAL0UWy4lUp
- K3r0FmglS52vdbUcTeT/Ek3aou2zoDSZ7YnbZ80IjqXpoTheTD57BE4WfQxfk/Pty6WS
- 0L7tHICOxC9u4+bmnO8EiGJru0Tg2o/KqqyllpA2ohfdqEf3gULae3n/9oukpRlhX2G8
- Ne9yc7ZuS+VSu+9qw8q9rlbRYHa0t+iNENL7b2ILwDqbuCcqcopDQYSBJukxjszTom2X
- Yaa3epF6/QlFVhWnL8h42X83XN4yNbCONJlbgTDBOLafG8lU/GmZyz19EmLYy+axJXmC fQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mbxakht40-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Dec 2022 12:56:42 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B9CmAuN016238;
-        Fri, 9 Dec 2022 12:56:42 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mbxakht39-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Dec 2022 12:56:42 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.16.1.2) with ESMTP id 2B98MwTe018446;
-        Fri, 9 Dec 2022 12:56:39 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3m9m7rccnd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Dec 2022 12:56:39 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B9CuZs638732198
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 9 Dec 2022 12:56:36 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C3C1620049;
-        Fri,  9 Dec 2022 12:56:35 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A0FE520040;
-        Fri,  9 Dec 2022 12:56:35 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.9.45])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  9 Dec 2022 12:56:35 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229470AbiLINTH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 08:19:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B39271267
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 05:18:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670591888;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=/9tvB40DHzaz/Kv1fA8KRgs6/1Raa5MBrdbg9hBsYVo=;
+        b=gpzjMOVHPmpyG3XHSywnd3LSSt5/AWsHNeQ/qwl+S0if6IpvPIZpG4U5Rg+8S9s9ltYnAn
+        /J1DhLrtq0jy4UEqNEWnacYEhaHiK8QHeGHObZG8AaSr1iccBJoejXePxtdjrOJmDJjADx
+        fp4S3NR40aN5z1+XHSjEDpJVpQKdvm4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-578-aD5J9Lc1PFKM5SBd8Pxc0g-1; Fri, 09 Dec 2022 08:18:07 -0500
+X-MC-Unique: aD5J9Lc1PFKM5SBd8Pxc0g-1
+Received: by mail-wm1-f69.google.com with SMTP id v188-20020a1cacc5000000b003cf76c4ae66so3921568wme.7
+        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 05:18:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/9tvB40DHzaz/Kv1fA8KRgs6/1Raa5MBrdbg9hBsYVo=;
+        b=pwrA6W+HU06vH5h0xjRDd+/ntXhHjtrtrYmGyvs5dNls/ZsoBx7NgSaRQiYdqJujKW
+         nmdLa3zalzjSwbkI1hye7yFg4kuDWSnyAhiWgR2hgHplIXrCd3uIZlns8pXzHkzOB3ns
+         Csfgf9gRmNhOj8vwgVCXIAWapgh44UedKhy1LzHN7wrJG0+24dbJhKYeiNlpiNm7xHuk
+         3w33ZvdWXIqe4/LcRVy8cxZY/ykVfQwhVd3Tq2Qdm8oh2TlDxhCpXqjUSld+Smlq6/1G
+         siI94FStlYwAVoNEGqSyZtoHmlJNks6G4xSoNXQNnSuccXwyhYWiAlH+9GCXcjQdrgjx
+         wV9g==
+X-Gm-Message-State: ANoB5pnYjuykwnKLgUnOYc4myAy8wn7dqBjxEZBj2FRWJ1c+ag54+vLf
+        iaDWzgaiqeZ7AfdgWDM2ezs+caTrigBviw/YuLBlmMgOTQ8zjS78TB/H8PLA+RPCugndE5Z0+ZZ
+        CT9h3jcLAG9Cp
+X-Received: by 2002:a5d:6d0f:0:b0:242:132e:b7af with SMTP id e15-20020a5d6d0f000000b00242132eb7afmr6678152wrq.43.1670591886756;
+        Fri, 09 Dec 2022 05:18:06 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf46JSS0WZRRuK1UDXKTICDpEltpDKI6a3DGwel2jJI3LUdtzSP2fGQ0leZ/g5DcSHxhdFhY+w==
+X-Received: by 2002:a5d:6d0f:0:b0:242:132e:b7af with SMTP id e15-20020a5d6d0f000000b00242132eb7afmr6678126wrq.43.1670591886518;
+        Fri, 09 Dec 2022 05:18:06 -0800 (PST)
+Received: from [192.168.0.5] (ip-109-43-177-15.web.vodafone.de. [109.43.177.15])
+        by smtp.gmail.com with ESMTPSA id bl1-20020adfe241000000b00241fea203b6sm1415758wrb.87.2022.12.09.05.18.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Dec 2022 05:18:05 -0800 (PST)
+Message-ID: <ba74566e-a9f1-1acb-6072-deadc77d26a2@redhat.com>
+Date:   Fri, 9 Dec 2022 14:18:04 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20221202115658.kx7zn6qod24ddt6x@kamzik>
-References: <20221130142249.3558647-1-nrb@linux.ibm.com> <20221130142249.3558647-5-nrb@linux.ibm.com> <20221202115658.kx7zn6qod24ddt6x@kamzik>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 4/4] arm: use migrate_once() in migration tests
-To:     Andrew Jones <andrew.jones@linux.dev>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, imbrenda@linux.ibm.com,
-        thuth@redhat.com, pbonzini@redhat.com, lvivier@redhat.com
-Message-ID: <167059059477.42366.12070842524877835570@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Fri, 09 Dec 2022 13:56:35 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: sYrOJHqzRXQZ2DG0IVPNfpRr5OkC8uwe
-X-Proofpoint-ORIG-GUID: 7wxuSFtsxi1_ro647kRMdrfYMApdrrhV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-09_07,2022-12-08_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- mlxlogscore=978 impostorscore=0 mlxscore=0 lowpriorityscore=0 phishscore=0
- priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2212090098
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests PATCH v1 2/4] powerpc: use migrate_once() in
+ migration tests
+Content-Language: en-US
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, pbonzini@redhat.com,
+        andrew.jones@linux.dev, lvivier@redhat.com
+References: <20221130142249.3558647-1-nrb@linux.ibm.com>
+ <20221130142249.3558647-3-nrb@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20221130142249.3558647-3-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,35 +82,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Andrew Jones (2022-12-02 12:56:58)
-> On Wed, Nov 30, 2022 at 03:22:49PM +0100, Nico Boehr wrote:
-> > Some tests already shipped with their own do_migrate() function, remove
-> > it and instead use the new migrate_once() function. The control flow in
-> > the gib tests can be simplified due to migrate_once().
->=20
-> s/gib/gic/
+On 30/11/2022 15.22, Nico Boehr wrote:
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   powerpc/Makefile.common | 1 +
+>   powerpc/sprs.c          | 4 ++--
+>   2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/powerpc/Makefile.common b/powerpc/Makefile.common
+> index 12c280c15fff..8ce00340b6be 100644
+> --- a/powerpc/Makefile.common
+> +++ b/powerpc/Makefile.common
+> @@ -36,6 +36,7 @@ cflatobjs += lib/getchar.o
+>   cflatobjs += lib/alloc_phys.o
+>   cflatobjs += lib/alloc.o
+>   cflatobjs += lib/devicetree.o
+> +cflatobjs += lib/migrate.o
+>   cflatobjs += lib/powerpc/io.o
+>   cflatobjs += lib/powerpc/hcall.o
+>   cflatobjs += lib/powerpc/setup.o
+> diff --git a/powerpc/sprs.c b/powerpc/sprs.c
+> index d3c8780e8376..5cc1cd16cfda 100644
+> --- a/powerpc/sprs.c
+> +++ b/powerpc/sprs.c
+> @@ -21,6 +21,7 @@
+>    */
+>   #include <libcflat.h>
+>   #include <util.h>
+> +#include <migrate.h>
+>   #include <alloc.h>
+>   #include <asm/handlers.h>
+>   #include <asm/hcall.h>
+> @@ -285,8 +286,7 @@ int main(int argc, char **argv)
+>   	get_sprs(before);
+>   
+>   	if (pause) {
+> -		puts("Now migrate the VM, then press a key to continue...\n");
+> -		(void) getchar();
+> +		migrate_once();
+>   	} else {
+>   		puts("Sleeping...\n");
+>   		handle_exception(0x900, &dec_except_handler, &decr);
 
-Opsie, thanks :)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-[...]
-> > diff --git a/arm/debug.c b/arm/debug.c
-> > index e9f805632db7..21b0f5aeb590 100644
-> > --- a/arm/debug.c
-> > +++ b/arm/debug.c
-[...]
-> > @@ -369,7 +363,7 @@ static noinline void test_ss(bool migrate)
-> >       isb();
-> > =20
-> >       if (migrate) {
-> > -             do_migrate();
-> > +             migrate_once();
-> >       }
->=20
-> While here, please opportunistically drop the unnecessary {}
-
-Done.
-
-[...]
-> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-
-Thanks.
