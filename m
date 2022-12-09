@@ -2,31 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00006648743
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 18:07:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F514648755
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 18:09:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230071AbiLIRHo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 12:07:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56884 "EHLO
+        id S230043AbiLIRJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 12:09:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229963AbiLIRHF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 12:07:05 -0500
-Received: from out-91.mta0.migadu.com (out-91.mta0.migadu.com [IPv6:2001:41d0:1004:224b::5b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6B8130B
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 09:05:32 -0800 (PST)
-Date:   Fri, 9 Dec 2022 17:05:21 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1670605531;
+        with ESMTP id S230045AbiLIRIr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 12:08:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D6C18361
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 09:07:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670605644;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=7PHXtVfxL4Wco+emkfnuAlef7YnCwHHQo9a8I78AtDM=;
-        b=XLTfOjcaFKd5ETBncO1R51Wln8mQ4dix7kBINL1+Hznswp0sRnYGkvxDCZj5uEpEGO5iwo
-        O2aPG/8KAn7awL9px9tK0Ty+Q1XhHBeu2K4bSsTJbKy343i3ISeE4lO/vpKnbNwmp+mjLL
-        vGPTlSpOfaLEzO/mtStWIp8ML4jY2oE=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+        bh=hojLz9t3au/qqPytj+gNDvtXE0hfeHRqSZoktJ8ZVLI=;
+        b=I2CVxnfSP53Ws99ZJzpUPlpAoJgI03WeRbk6LhZAypv+wa2d+DJ29NnofIK5ubQ8yjpKy1
+        VAtS9ZDQ+RcV3QD3pd7QxxS6k1uCVSRUkyUKw2tGCs5KQ0jXqwbD7Ojup7aNgA1xPGA0e6
+        w8QrytUp78iupr9pr0qgrhfm+wsgVQE=
+Received: from mail-vk1-f199.google.com (mail-vk1-f199.google.com
+ [209.85.221.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-103-RX1JrfLQNhC9hA7eitQ6rw-1; Fri, 09 Dec 2022 12:07:23 -0500
+X-MC-Unique: RX1JrfLQNhC9hA7eitQ6rw-1
+Received: by mail-vk1-f199.google.com with SMTP id g20-20020a1f2014000000b003bd84abc0d1so1869916vkg.19
+        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 09:07:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hojLz9t3au/qqPytj+gNDvtXE0hfeHRqSZoktJ8ZVLI=;
+        b=rFk4Tu22xZVbC7v9PY7pIRJ+zsrKzq2PYOi4aqTbA031b0o6dgcl8uEtje20ujd2cP
+         BEtnaMINKlSFLrQl8EMkHxJknRl/QPxr9pMwBSbTXrvjUH/Deal+U49axMljaZ0S6aQU
+         CimP32g915uMqJA2Ip60LNt5TkrOM8i4BSrPB8K/mTF1yDMllMm0mM4CdU96n7czwSa+
+         oqpILC0LpctpcPdjCGscxGo6Hi00UHuw8nZdiG+t8heTANK1cxfEweMkvB4f65yH4hfe
+         BUlt/COP9DmII1Ol52RzGL2dJOGt4I1Q7eg565zlZ7XCOovjaeIpizxbcjPuFKQDQ5VH
+         EiXQ==
+X-Gm-Message-State: ANoB5plWgsNzZLlPtfnTJTer5OjjhbxnTY92PAzT8SKeMV6ngsmT9xgp
+        mEAcM/BtO/bJg5cO5mkHaCe5Jk4XAt2AGPAy1UqoJQNRPUFi6czNegxNeMqA/kqD3Sr6FVvkkXr
+        O3+B+Rfuk3K2wDDkJdBzZfGmDmWgJ
+X-Received: by 2002:a67:ee95:0:b0:3aa:2354:b5d2 with SMTP id n21-20020a67ee95000000b003aa2354b5d2mr45546854vsp.16.1670605643012;
+        Fri, 09 Dec 2022 09:07:23 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5zz6uhq0KfiH7V7TqkPbJSPeXdssw5wlXfqjy07mP6JlwmbeZfTCfhWp5bmBRLBRYOfMVw/rtjU5EJ/PG8pbE=
+X-Received: by 2002:a67:ee95:0:b0:3aa:2354:b5d2 with SMTP id
+ n21-20020a67ee95000000b003aa2354b5d2mr45546820vsp.16.1670605642739; Fri, 09
+ Dec 2022 09:07:22 -0800 (PST)
+MIME-Version: 1.0
+References: <20221205155845.233018-1-maz@kernel.org> <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
+ <Y5EK5dDBhutOQTf6@google.com> <5e51cf73-5d51-835f-8748-7554a65d9111@redhat.com>
+ <Y5Nq0a2JxUP+JuP+@google.com>
+In-Reply-To: <Y5Nq0a2JxUP+JuP+@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+Date:   Fri, 9 Dec 2022 18:07:06 +0100
+Message-ID: <CABgObfbAwaseKFYUSAwowGzP7Hh4bw6QDZrj+76HJ9pzHP3Jtw@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
+To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     Marc Zyngier <maz@kernel.org>,
         Andrew Jones <andrew.jones@linux.dev>,
         Andrew Morton <akpm@linux-foundation.org>,
@@ -45,7 +79,7 @@ Cc:     Marc Zyngier <maz@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
         Peter Collingbourne <pcc@google.com>,
         Peter Xu <peterx@redhat.com>,
-        Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
         Quentin Perret <qperret@google.com>,
         Reiji Watanabe <reijiw@google.com>,
         Ricardo Koller <ricarkol@google.com>,
@@ -60,53 +94,24 @@ Cc:     Marc Zyngier <maz@kernel.org>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvmarm@lists.linux.dev, kvm@vger.kernel.org
-Subject: Re: [GIT PULL] KVM/arm64 updates for 6.2
-Message-ID: <Y5Nq0a2JxUP+JuP+@google.com>
-References: <20221205155845.233018-1-maz@kernel.org>
- <3230b8bd-b763-9ad1-769b-68e6555e4100@redhat.com>
- <Y5EK5dDBhutOQTf6@google.com>
- <5e51cf73-5d51-835f-8748-7554a65d9111@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e51cf73-5d51-835f-8748-7554a65d9111@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hey Paolo,
+On Fri, Dec 9, 2022 at 6:05 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+> Mind dumping what I had in v1 and applying this instead?
+>
+> https://lore.kernel.org/kvm/20221209015307.1781352-1-oliver.upton@linux.dev/
 
-On Fri, Dec 09, 2022 at 05:56:50PM +0100, Paolo Bonzini wrote:
-> On 12/7/22 22:51, Oliver Upton wrote:
-> > > 
-> > > I haven't pushed to kvm/next yet to give you time to check, so the
-> > > merge is currently in kvm/queue only.
-> > Have a look at this series, which gets things building and actually
-> > passing again:
-> > 
-> > https://lore.kernel.org/kvm/20221207214809.489070-1-oliver.upton@linux.dev/
-> 
-> Thank you!  Squashed 1-2 and applied 3-4.
+Ouch, five minutes too late... I can take care of the difference but
+it'll have to wait for Monday.
 
-I actually wound up sending a v2 for this :)
+Paolo
 
-1-2 are the same, but I addressed some of Sean's feedback and also
-pulled in more fixes. In addition to the problems with page_fault_test,
-other KVM selftests were magically failing on arm64 because identity
-mapping ucall MMIO punched a hole straight through the program image.
-
-Mind dumping what I had in v1 and applying this instead?
-
-https://lore.kernel.org/kvm/20221209015307.1781352-1-oliver.upton@linux.dev/
-
-Thanks!
-
---
-Best,
-Oliver
