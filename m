@@ -2,160 +2,184 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3551A6483ED
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 15:39:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44A95648408
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 15:45:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230070AbiLIOjK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 09:39:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60240 "EHLO
+        id S229828AbiLIOp0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 09:45:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230019AbiLIOip (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 09:38:45 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58D2B3A2E0;
-        Fri,  9 Dec 2022 06:38:32 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UIQdJz8zOXuFkd0risRRqCfl9REdUeohs4yw/c6nJAa4rLYhMwsnKF/jIZmhEQF0hsVEvw9NFT4wv/gUM8dFPKI3hrtgMxJu7NcSDdYnLNm4tuhlo6Ot2/OxhfmWRcITmwvK67tI7gxWH0ZMAHxHaTlIR/2eIYzNLmVaxm2ggT/9VfXbVHJfDXgOzSkAahL1do8/2ci6DgbhoSjdY9bQ7Lq63CYvBWr6JNnCJmxovfq7xNmgFSSzyBM20c5YsMJ79JKilGQZH4wMSOcHhhjZZekP0ZMB0wKgiBKQ34fT39KMa7qhMfZSYshSIxV9yUMiTonwOxZkP9kU2ezOBy9pFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZVzm1ku8LmbzD3EMIVo0YYSyCNiVaq80kH+fXN40ax4=;
- b=T1j/asIEPP8GwxdeDQTQc4tAfDpzBwIyJst5x5LPJDRkPmeuwSsoNiMdsL5Ds4lyGdzxqsmtHO18AfJn+fuVJutzbJTLjo5aDmbXtXgyOZ83SV0ZUNcGE0PoVXHpJHiIhpSghDi0CK+EwiXoMoy25rOojk2/cgBq0VuFLZpn2dUhbFEIccxTKFRKUA6H7ChVUfnFx286SxAiRF7ZmhDVAb0y3YrnqeBx/ltdKEWzuDR/21SrNJ0dNPotyLWKYPHx+iMjjABrizpQ4LcUTc9ErBGNnkSuUgb46ECzpjNmjmz/2wVFZ72i5XY8avNxnBDt1725TdIv9yKR/K/6Xq16BA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZVzm1ku8LmbzD3EMIVo0YYSyCNiVaq80kH+fXN40ax4=;
- b=VbP7M3T+pEK+aIguJel/23s8iFYOcM36qRuZGPQ2chZxVpTAMrVUMCr/zOByEQSuwYXadFocoPpFpzoXuSQIZKiJ8OD8tIPYB+SIFZCVMVXS4cgzp/eV0Ljc0A65enA3MT6z3ijyhawJBcq1K3E0caAYIf0bcFcMwYApzlJeWHoCWXkIuOVUuEopuXpXxP0fAFYxlXwOfjJY4xC38bmEsBfXc/8kH00WqhPahT07hhov2l5HMqgRiCwf1YD5neZYvu+AOT7sDtdaZunaaECItnkmbHZFpH66ce9bJFllTYfxW40wKCVNqhvv6Ic6v6frovoaY3KVrHZsr/idBsIAuA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MN2PR12MB4285.namprd12.prod.outlook.com (2603:10b6:208:1d7::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.18; Fri, 9 Dec
- 2022 14:38:30 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5880.014; Fri, 9 Dec 2022
- 14:38:30 +0000
-Date:   Fri, 9 Dec 2022 10:38:29 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>,
-        Bharat Bhushan <bharat.bhushan@nxp.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
-        Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH iommufd 0/9] Remove IOMMU_CAP_INTR_REMAP
-Message-ID: <Y5NIZTKqtlzVeNMJ@nvidia.com>
-References: <0-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
- <BN9PR11MB5276B4F1DE4D31CAF8ADAC408C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB5276B4F1DE4D31CAF8ADAC408C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR11CA0027.namprd11.prod.outlook.com
- (2603:10b6:208:23b::32) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229558AbiLIOpX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 09:45:23 -0500
+Received: from 7.mo548.mail-out.ovh.net (7.mo548.mail-out.ovh.net [46.105.33.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76EAEDEC6
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 06:45:22 -0800 (PST)
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.10])
+        by mo548.mail-out.ovh.net (Postfix) with ESMTPS id EEC1224E00;
+        Fri,  9 Dec 2022 14:45:19 +0000 (UTC)
+Received: from kaod.org (37.59.142.110) by DAG4EX2.mxp5.local (172.16.2.32)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Fri, 9 Dec
+ 2022 15:45:18 +0100
+Authentication-Results: garm.ovh; auth=pass (GARM-110S004a47b3783-5ec0-49c6-a8df-99b9acfa1999,
+                    703C8C4CBBC51929D19CEDB14A3E71E172461769) smtp.auth=clg@kaod.org
+X-OVh-ClientIp: 82.64.250.170
+Message-ID: <d29c06e6-48e2-6cff-0524-297eaab0516b@kaod.org>
+Date:   Fri, 9 Dec 2022 15:45:17 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN2PR12MB4285:EE_
-X-MS-Office365-Filtering-Correlation-Id: 18160298-bf5c-4c9c-1d9d-08dad9f30a50
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: jT5DNSgodVNkE1pH3z2WfKrn5cEqc4HCy6pYCNb1EBbvSb3zCqqXTGPzPSsDzJewt/wP3vo2cFyQa6/PPmWPwxIiUU9DuFP4wrkyVMeer6kujnHCxa4Suap7tC2ZfKAHvo5v8OrDhMLqKBD9hF++e9FGO443K97CUTHHHKobL16QNALvNfQbnvhKgALVxeEYVmH22WF3PncevjRdE4WWGRS2ZHfhvZAYu+7dpfjAWUYrsxDEttbeZ2aPAhDveJ99IoaciYpE/m7MagZMI+9QoUn29FO1BXoLkuPwmK+qNX3LxLKV1AmdLi49Iu1Pej5v/3u6qcF0FGXswv/cxHD4KB7x5LhhKc/adOJHkVIa1uruhHCP0SL08r1BAk7aJIO2u6iQd17qQ2vG/7/o185cIF/lWwKIsVm5ZvclHILvxnhJQG6dyvtgpNuSRgmfYFK1ZvjQwJVPpIJaVt2DJr99ikzGCfV7HQ3QzkNeBqetgyXyRq9b8iFdN1ujS/IZmqXkQZehPGIsdXUGMk9YUT0Qz9zmIWpTiPa6iFuZGe49FPxEERHyEOgSV/ZMcbOiquB+pJMjfoGoFlj+icaiN9HckoKp14wsV/Bo50PZKuxaQNOyQEjTmdccNwilXxC/WpOjlnAulOW14k3mLNd90OFoOQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(346002)(39860400002)(376002)(136003)(396003)(451199015)(6916009)(54906003)(316002)(38100700002)(26005)(36756003)(478600001)(6486002)(83380400001)(186003)(41300700001)(6512007)(2906002)(2616005)(4744005)(66476007)(66556008)(4326008)(8676002)(66946007)(7416002)(5660300002)(8936002)(6506007)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?M2yWFuvlbu4HV5Eyx93hnlwDnFj8nQHG0l3AJrnfEv1K2uby8r96Pm9PitKl?=
- =?us-ascii?Q?pp2tF9HzX7X7kJkPidbDOQLDEjybDpCZLHyYQKx3B1ZBB7UjsDnd4amxivvg?=
- =?us-ascii?Q?z1NlYxbmGM71BPANKgKyYVxhnGv7JgqhOneTsmh/4jOB9WuW7VrSCgOtteer?=
- =?us-ascii?Q?9nHyT45viq4vpdYI0AcdIILMCfX0+d+NZYfzv2Fg4y9u/ioz6ZWheZgas4e0?=
- =?us-ascii?Q?Xbb+tTLCIQOWRMIMNz+ekjmbrzZVfnPzHixOYguIr1ax5O5PzmV/KKvgLEnt?=
- =?us-ascii?Q?OOtNEnH1k+/PxSg0fLWGHOQAXFo1XVSLrt3JmCwnkn3RZy3OllRWT4Upv+JK?=
- =?us-ascii?Q?6uwV2dWzC6ah03GloFStEBSTxLTjqhKz15RSyfd8saVZrNSGEwbRSPXcRwM/?=
- =?us-ascii?Q?OYfmSYQISfCVajYk65GjJAOkITjbXMxFdHfe74mzuKUw54lk0B+EP0Qyx6uU?=
- =?us-ascii?Q?3zXwPyRpaR88PvjhqgegofjIx359FXRRR9Vi4YgAGDHrlIOQ2XtDKyaEveLb?=
- =?us-ascii?Q?GVZ2/LVZCFRMB0w87MmEqPGcS9ukETaMCyvQLa8waL3fHuv7FZNhnZpxVvv3?=
- =?us-ascii?Q?C+XUh2Cq+1qOS9Kv44uFimF2cjGNsJ1C0iRbHWzMRa/FaRR2wtCwcmjNmvHh?=
- =?us-ascii?Q?HrhkxSHfmq8cVlxC9FxfS/dJTNcYObnXcnUYIVueq2nPDlETshGGk20CWaOV?=
- =?us-ascii?Q?UsWcHNBrm2klqUh3wktdlXUeVYqUrvWOMTsvDdShrZQpyScBh0jlumBnruJn?=
- =?us-ascii?Q?Ggx014n9rFtCnbLzU6S2S0VIF9NQnENfLr0wr1TwTcjr3IPwXSjlSwCg+1IQ?=
- =?us-ascii?Q?h+B7Ufqx+aXVlj/imxQRjzW6heuUVuLxo9YaiumaK8b8Hh25eSQcaCf9XNEY?=
- =?us-ascii?Q?SY3hYwoqA0Zph6sfDPg3vvpYebNCg3F/QLliqpaCEAJpChHJPEat2vbodAJb?=
- =?us-ascii?Q?5oOEWzi2vl0yzLrVHC5DSx7D4grL05fHywIVxItFrouspdZKfnBtOXGoJqhs?=
- =?us-ascii?Q?O+T0TetYuMIluaFLrxA2dPdVXzKGFFZ9gqoWh4nvp1+s+aaltxO8FA2KZm8u?=
- =?us-ascii?Q?bLNCzJW+3ZB7Zf/bG0K7poOY64V/Kyj8nr4deTSFSQY/tKqgg/bv6U5VpkhG?=
- =?us-ascii?Q?rz4NsuFGKzO4KZfr9azI20MetFxAVHhHbbJaTl7kcsxdoeQtehKyeM4+24UJ?=
- =?us-ascii?Q?vps/+jYI5CkD8iiPQAeq/AetkrzqePkv7d8RBd1cdEeRoFJalr/Xhb/w26cU?=
- =?us-ascii?Q?75OS1AXhnlLWGgKJ8IRAFxwbppkYtjuaBabBjTxA32dy6b8uWZMIEktVhO42?=
- =?us-ascii?Q?KGrqgNvvICYt9iFpJWBdH3F7YkyDosPlRa5VoSNvtBMts7Hf6gb268Apa7q/?=
- =?us-ascii?Q?3vOg5PQUePJF2p07CzPGzGhPbju7sRXlKq0Xkh1l0vKhsFcn1ICZfmVZjmjc?=
- =?us-ascii?Q?Wmy5c7RY33ewA5TaemwjBA0bAsnHXFP1rCkOkjfwD+6/r2tcmzJpmvbhtkeE?=
- =?us-ascii?Q?hTP5AeKlUhOccF/VfgsptMyap0blEDLO+n6SQvhV+BFCZrF9Jw7yzSHEHaGR?=
- =?us-ascii?Q?NbtbKU0sIGNLMr5VTGA=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 18160298-bf5c-4c9c-1d9d-08dad9f30a50
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2022 14:38:30.2148
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MPlhn4G0ovdXSkN/D6wZVfOfly1hXCnONciTKQkDTPvvua5Rx0gYmYvBDWO++qzQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4285
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v13 0/7] s390x: CPU Topology
+Content-Language: en-US
+To:     Pierre Morel <pmorel@linux.ibm.com>, <qemu-s390x@nongnu.org>
+CC:     <qemu-devel@nongnu.org>, <borntraeger@de.ibm.com>,
+        <pasic@linux.ibm.com>, <richard.henderson@linaro.org>,
+        <david@redhat.com>, <thuth@redhat.com>, <cohuck@redhat.com>,
+        <mst@redhat.com>, <pbonzini@redhat.com>, <kvm@vger.kernel.org>,
+        <ehabkost@redhat.com>, <marcel.apfelbaum@gmail.com>,
+        <eblake@redhat.com>, <armbru@redhat.com>, <seiden@linux.ibm.com>,
+        <nrb@linux.ibm.com>, <scgl@linux.ibm.com>, <frankja@linux.ibm.com>,
+        <berrange@redhat.com>
+References: <20221208094432.9732-1-pmorel@linux.ibm.com>
+From:   =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+In-Reply-To: <20221208094432.9732-1-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.110]
+X-ClientProxiedBy: DAG3EX1.mxp5.local (172.16.2.21) To DAG4EX2.mxp5.local
+ (172.16.2.32)
+X-Ovh-Tracer-GUID: d542ce9c-b5fb-4b4b-acf8-35583068984c
+X-Ovh-Tracer-Id: 5331980484331015123
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvhedrvddvgdeiiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefkffggfgfuvfevfhfhjggtgfhisehtjeertddtfeejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepuedutdetleegjefhieekgeffkefhleevgfefjeevffejieevgeefhefgtdfgiedtnecukfhppeduvdejrddtrddtrddupdefjedrheelrddugedvrdduuddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepuddvjedrtddrtddruddpmhgrihhlfhhrohhmpeeotghlgheskhgrohgurdhorhhgqedpnhgspghrtghpthhtohepuddprhgtphhtthhopehpmhhorhgvlheslhhinhhugidrihgsmhdrtghomhdpshgtghhlsehlihhnuhigrdhisghmrdgtohhmpdhnrhgssehlihhnuhigrdhisghmrdgtohhmpdhsvghiuggvnheslhhinhhugidrihgsmhdrtghomhdprghrmhgsrhhusehrvgguhhgrthdrtghomhdpvggslhgrkhgvsehrvgguhhgrthdrtghomhdpmhgrrhgtvghlrdgrphhfvghlsggruhhmsehgmhgrihhlrdgtohhmpdgvhhgrsghkohhsthesrhgvughhrghtrdgtohhmpdhkvhhmsehvghgvrhdrkhgvrhhnvghlrdhorhhgpd
+ hfrhgrnhhkjhgrsehlihhnuhigrdhisghmrdgtohhmpdhpsghonhiiihhnihesrhgvughhrghtrdgtohhmpdgtohhhuhgtkhesrhgvughhrghtrdgtohhmpdhthhhuthhhsehrvgguhhgrthdrtghomhdpuggrvhhiugesrhgvughhrghtrdgtohhmpdhrihgthhgrrhgurdhhvghnuggvrhhsohhnsehlihhnrghrohdrohhrghdpphgrshhitgeslhhinhhugidrihgsmhdrtghomhdpsghorhhnthhrrggvghgvrhesuggvrdhisghmrdgtohhmpdhqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhgpdhqvghmuhdqshefledtgiesnhhonhhgnhhurdhorhhgpdhmshhtsehrvgguhhgrthdrtghomhdpsggvrhhrrghnghgvsehrvgguhhgrthdrtghomhdpoffvtefjohhsthepmhhoheegkedpmhhouggvpehsmhhtphhouhht
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 09, 2022 at 05:54:46AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Friday, December 9, 2022 4:26 AM
-> > 
-> > In real HW "secure MSI" is implemented in a few different ways:
-> > 
-> >  - x86 uses "interrupt remapping" which is a block that sits between
-> >    the device and APIC, that can "remap" the MSI MemWr using per-RID
-> >    tables. Part of the remapping is discarding, the per-RID tables
-> >    will not contain vectors that have not been enabled for the device.
-> > 
+On 12/8/22 10:44, Pierre Morel wrote:
+> Hi,
 > 
-> per-RID tables is true for AMD.
+> Implementation discussions
+> ==========================
 > 
-> However for Intel VT-d it's per-IOMMU remapping table.
+> CPU models
+> ----------
+> 
+> Since the S390_FEAT_CONFIGURATION_TOPOLOGY is already in the CPU model
+> for old QEMU we could not activate it as usual from KVM but needed
+> a KVM capability: KVM_CAP_S390_CPU_TOPOLOGY.
+> Checking and enabling this capability enables
+> S390_FEAT_CONFIGURATION_TOPOLOGY.
+> 
+> Migration
+> ---------
+> 
+> Once the S390_FEAT_CONFIGURATION_TOPOLOGY is enabled in the source
+> host the STFL(11) is provided to the guest.
+> Since the feature is already in the CPU model of older QEMU,
+> a migration from a new QEMU enabling the topology to an old QEMU
+> will keep STFL(11) enabled making the guest get an exception for
+> illegal operation as soon as it uses the PTF instruction.
+> 
+> A VMState keeping track of the S390_FEAT_CONFIGURATION_TOPOLOGY
+> allows to forbid the migration in such a case.
+> 
+> Note that the VMState will be used to hold information on the
+> topology once we implement topology change for a running guest.
+> 
+> Topology
+> --------
+> 
+> Until we introduce bookss and drawers, polarization and dedication
+> the topology is kept very simple and is specified uniquely by
+> the core_id of the vCPU which is also the vCPU address.
+> 
+> Testing
+> =======
+> 
+> To use the QEMU patches, you will need Linux V6-rc1 or newer,
+> or use the following Linux mainline patches:
+> 
+> f5ecfee94493 2022-07-20 KVM: s390: resetting the Topology-Change-Report
+> 24fe0195bc19 2022-07-20 KVM: s390: guest support for topology function
+> 0130337ec45b 2022-07-20 KVM: s390: Cleanup ipte lock access and SIIF fac..
+> 
+> Currently this code is for KVM only, I have no idea if it is interesting
+> to provide a TCG patch. If ever it will be done in another series.
+> 
+> Documentation
+> =============
+> 
+> To have a better understanding of the S390x CPU Topology and its
+> implementation in QEMU you can have a look at the documentation in the
+> last patch of this series.
+> 
+> The admin will want to match the host and the guest topology, taking
+> into account that the guest does not recognize multithreading.
+> Consequently, two vCPU assigned to threads of the same real CPU should
+> preferably be assigned to the same socket of the guest machine.
+> 
+> Future developments
+> ===================
+> 
+> Two series are actively prepared:
+> - Adding drawers, book, polarization and dedication to the vCPU.
+> - changing the topology with a running guest
 
-Sorry, what exactly does that mean?
+Since we have time before the next QEMU 8.0 release, could you please
+send the whole patchset ? Having the full picture would help in taking
+decisions for downstream also.
 
-Doesn't the HW inspect the RID to determine what to do with the MSI?
+I am still uncertain about the usefulness of S390Topology object because,
+as for now, the state can be computed on the fly, the reset can be
+handled at the machine level directly under s390_machine_reset() and so
+could migration if the machine had a vmstate (not the case today but
+quite easy to add). So before merging anything that could be difficult
+to maintain and/or backport, I would prefer to see it all !
 
-Jason
+Thanks,
+
+C.
+
+
+> 
+> Regards,
+> Pierre
+> 
+> Pierre Morel (7):
+>    s390x/cpu topology: Creating CPU topology device
+>    s390x/cpu topology: reporting the CPU topology to the guest
+>    s390x/cpu_topology: resetting the Topology-Change-Report
+>    s390x/cpu_topology: CPU topology migration
+>    s390x/cpu_topology: interception of PTF instruction
+>    s390x/cpu_topology: activating CPU topology
+>    docs/s390x: document s390x cpu topology
+> 
+>   docs/system/s390x/cpu-topology.rst |  87 ++++++++++
+>   docs/system/target-s390x.rst       |   1 +
+>   include/hw/s390x/cpu-topology.h    |  52 ++++++
+>   include/hw/s390x/s390-virtio-ccw.h |   6 +
+>   target/s390x/cpu.h                 |  78 +++++++++
+>   target/s390x/kvm/kvm_s390x.h       |   1 +
+>   hw/s390x/cpu-topology.c            | 261 +++++++++++++++++++++++++++++
+>   hw/s390x/s390-virtio-ccw.c         |   7 +
+>   target/s390x/cpu-sysemu.c          |  21 +++
+>   target/s390x/cpu_models.c          |   1 +
+>   target/s390x/kvm/cpu_topology.c    | 186 ++++++++++++++++++++
+>   target/s390x/kvm/kvm.c             |  46 ++++-
+>   hw/s390x/meson.build               |   1 +
+>   target/s390x/kvm/meson.build       |   3 +-
+>   14 files changed, 749 insertions(+), 2 deletions(-)
+>   create mode 100644 docs/system/s390x/cpu-topology.rst
+>   create mode 100644 include/hw/s390x/cpu-topology.h
+>   create mode 100644 hw/s390x/cpu-topology.c
+>   create mode 100644 target/s390x/kvm/cpu_topology.c
+> 
+
