@@ -2,64 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 905EB647B48
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 02:22:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE996647B83
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 02:34:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229818AbiLIBWO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 20:22:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58426 "EHLO
+        id S229643AbiLIBeg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 20:34:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbiLIBWM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 20:22:12 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 847BDAC6EF
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 17:22:10 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id d7so3288652pll.9
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 17:22:10 -0800 (PST)
+        with ESMTP id S229674AbiLIBe3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 20:34:29 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3601A87403
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 17:34:28 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id 3-20020a17090a098300b00219041dcbe9so3387641pjo.3
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 17:34:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3Bbsd2uHdvBvlG4eS2408Nj8qBKdDpkwt6U9dXP20Lw=;
-        b=iImLLO18J+yC+3ZRaMcn68SJDq0f2hJA0xGrsSkvmOhsr4XWH5SRng1nllCYriKG5V
-         l+JMnRTvmrOo7RVSmSq1HxrgeN2CZI3m3F0wtrfV86mTyKLhEHSQboXVZRV/HV/qwnxu
-         3dBRFM3QEuopQJKEXTVdJl1bjVZLPaFiOz/Kis8z0rAS7gBIfkeX2vQ7IoN7RThvxzZi
-         35j8g5Wd1oXzfxJCdwIUiQuN2+nBBV7oMLjiOi0BU3NJHLVreZTfrMHhErbLmGU3df6M
-         hcpZ8b+I0hOcVL8tiEFhQNS7oRk0LnoyoN1JQijTAOpoMysKkfSKMmVO/fSxB6QIG2ft
-         5ysQ==
+        bh=nSSgeTw9Yz+FfvbZuDB5LbCT2ojj7LN7YobQNJ1KUoo=;
+        b=EjP//kJK7hYquIZQrKzwY9FwPb11Yn1wPk9KJeae5TVrzXZyWmsA66pgeGGWcg34jX
+         +zYUPxBZjBMRSblRJGEf6ztPnX8kj/f9wEeDLT+o49lKtnSxYzEF0vG/J+YDI4sUFWgs
+         R+Xj85hZjtr3/rrF1O/QctWerzPW8S68i89xV1wPdup/imOl1ViopZCj708NVre1PNPY
+         Q9pun6uBtt+2DN7vHnfVNnRrPUUG9yeP5doUirYI2SjQq3usxj6JVdOl5sw4q58IoeD7
+         Ahf25imVPbTM9HZCCwFVoWiOPrlZsnw9pGhE0R6HdDt9l24KAMKKj/7HkX6eGHSnly8H
+         NOTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3Bbsd2uHdvBvlG4eS2408Nj8qBKdDpkwt6U9dXP20Lw=;
-        b=h1Q9XmLuZDPs2nIIVbFptucgXfqgEhfqVSrrB5E8m4Pe2Kte6Vx/Syc6c04ep8261E
-         Qxa1F1kqScCWSt1Cg4T8A+yGzWBwpM6X0uxElBvjI8Ei3Q4pwLJz/+AvR/gpsOFlBYjQ
-         EYoyWvlV3PMpzs2LQQCotE2WC1qsBQFfULSOTBsAdnRXfuvM+5hJ1qRdsWKgp6ytC7py
-         Pyq4CZBfcax9OEYLz3TASvzQGw6RkBhJVcSKNVZN2PUS37c+gyvio5KvF+/eEFnSGw07
-         yEr5H6qixAPn8QZaWx9VdofKDFn9K/Joy1sT8qhNEdLY74A5jYzSvuPiM/CO935rWTKc
-         w/ow==
-X-Gm-Message-State: ANoB5pmZ9lwvdgq6erOs28Ga3Z+v8zRtkWrWNUqIqjCUcx0FyqZfYI+j
-        PpKxQowJb6DCT9AEvl7EhpVqlw==
-X-Google-Smtp-Source: AA0mqf788C5pqGhBeYbDPVJUntfULeFO3Ua/Vkwj4PpE9W9fzxWBBuL4UmcytM8HmijaOzAMZNA/2g==
-X-Received: by 2002:a17:90a:af89:b0:218:7bf2:4ff2 with SMTP id w9-20020a17090aaf8900b002187bf24ff2mr1892669pjq.0.1670548929898;
-        Thu, 08 Dec 2022 17:22:09 -0800 (PST)
+        bh=nSSgeTw9Yz+FfvbZuDB5LbCT2ojj7LN7YobQNJ1KUoo=;
+        b=ypXMKOKl84SEkcyMoBIZjvr0nRdDS9ncZj1kqtIXf5RmRg6f2pYbkTNeIc7vb+t7Hi
+         Qnn5IZzBouP0CCOnDHQ8ts3Yfc59MJCzrqPcw3t17cwqtoPqy9Fof4nZbeYmjrslAqu8
+         ACna9b6sso52XJLDXdneEE4tjZM+gQl+4sq2MVJr1WIgXpnkwalQZJmc6CW8mCGN7cTA
+         qxsdC9s7ys8sU2ErGpieSrXlEWaaaUH/kV1t6OKWut8Xywi0lRH1NmiiIzVKJjzH08ZI
+         +Tee1gtsrXc1ZBzWOtsovVha1MlOhyxvbTRKKyLZJwAmNGHtBEUxAjYh50diWm65WwPI
+         wZYA==
+X-Gm-Message-State: ANoB5pl5+6cKsa5PWV6vJhZcmReI6CXGXhUCTDsOSRWkKu4+D2+EY8HN
+        odDlV1+4tBoQqeNfSy6gh4nH8Q==
+X-Google-Smtp-Source: AA0mqf7sYRwq5zCxeK0/EntfYrrLqZzWVn8Do+CBDaVntVRbI0oKgUj23CX4Dy+wtSyG9GBGvuBuAA==
+X-Received: by 2002:a17:902:7402:b0:189:58a8:282 with SMTP id g2-20020a170902740200b0018958a80282mr1698209pll.3.1670549667630;
+        Thu, 08 Dec 2022 17:34:27 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i4-20020a170902e48400b001891b01addfsm49745ple.274.2022.12.08.17.22.09
+        by smtp.gmail.com with ESMTPSA id h17-20020a170902f7d100b0018703bf42desm71602plw.159.2022.12.08.17.34.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 17:22:09 -0800 (PST)
-Date:   Fri, 9 Dec 2022 01:22:06 +0000
+        Thu, 08 Dec 2022 17:34:27 -0800 (PST)
+Date:   Fri, 9 Dec 2022 01:34:23 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Hao Peng <flyingpenghao@gmail.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: use unified srcu interface function
-Message-ID: <Y5KNvgzakT1Vvxy4@google.com>
-References: <CAPm50aJTh7optC=gBXfj+1HKVu+9U0165mYH0sjj3Jqgf8Aivg@mail.gmail.com>
+To:     Adamos Ttofari <attofari@amazon.de>
+Cc:     dwmw@amazon.co.uk, Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Nikita Leshenko <nikita.leshchenko@oracle.com>,
+        Liran Alon <liran.alon@oracle.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Radim =?utf-8?B?S3LEjW3DocWZ?= <rkrcmar@redhat.com>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: x86: ioapic: Fix level-triggered EOI and
+ userspace I/OAPIC reconfigure race
+Message-ID: <Y5KQnyZYkfGkBIvR@google.com>
+References: <20221207091324.89619-1-attofari@amazon.de>
+ <20221208094415.12723-1-attofari@amazon.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAPm50aJTh7optC=gBXfj+1HKVu+9U0165mYH0sjj3Jqgf8Aivg@mail.gmail.com>
+In-Reply-To: <20221208094415.12723-1-attofari@amazon.de>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -71,51 +81,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 08, 2022, Hao Peng wrote:
-> From: Peng Hao <flyingpeng@tencent.com>
+On Thu, Dec 08, 2022, Adamos Ttofari wrote:
+> When scanning userspace I/OAPIC entries, intercept EOI for level-triggered
+> IRQs if the current vCPU has a pending and/or in-service IRQ for the
+> vector in its local API, even if the vCPU doesn't match the new entry's
+> destination.  This fixes a race between userspace I/OAPIC reconfiguration
+> and IRQ delivery that results in the vector's bit being left set in the
+> remote IRR due to the eventual EOI not being forwarded to the userspace
+> I/OAPIC.
 > 
-> kvm->irq_routing is protected by kvm->irq_srcu.
+> Commit 0fc5a36dd6b3 ("KVM: x86: ioapic: Fix level-triggered EOI and IOAPIC
+> reconfigure race") fixed the in-kernel IOAPIC, but not the userspace
+> IOAPIC configuration, which has a similar race.
 > 
-> Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+> Fixes: 0fc5a36dd6b3 ("KVM: x86: ioapic: Fix level-triggered EOI and IOAPIC reconfigure race")
+> 
+> Signed-off-by: Adamos Ttofari <attofari@amazon.de>
 > ---
->  virt/kvm/irqchip.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-> index 1e567d1f6d3d..90f54f04e37c 100644
-> --- a/virt/kvm/irqchip.c
-> +++ b/virt/kvm/irqchip.c
-> @@ -216,7 +216,8 @@ int kvm_set_irq_routing(struct kvm *kvm,
->         }
-> 
->         mutex_lock(&kvm->irq_lock);
-> -       old = rcu_dereference_protected(kvm->irq_routing, 1);
-> +       old = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
-> +                                       lockdep_is_held(&kvm->irq_lock));
 
-Readers of irq_routing are protected via kvm->irq_srcu, but this writer is never
-called with kvm->irq_srcu held.  I do like the of replacing '1' with
-lockdep_is_held(&kvm->irq_lock) to document the protection, so what about just
-doing that?  I.e.
-
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 1e567d1f6d3d..77a18b4dc103 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -216,7 +216,8 @@ int kvm_set_irq_routing(struct kvm *kvm,
-        }
- 
-        mutex_lock(&kvm->irq_lock);
--       old = rcu_dereference_protected(kvm->irq_routing, 1);
-+       old = rcu_dereference_protected(kvm->irq_routing,
-+                                       lockdep_is_held(&kvm->irq_lock));
-        rcu_assign_pointer(kvm->irq_routing, new);
-        kvm_irq_routing_update(kvm);
-        kvm_arch_irq_routing_update(kvm);
-
-
->         rcu_assign_pointer(kvm->irq_routing, new);
->         kvm_irq_routing_update(kvm);
->         kvm_arch_irq_routing_update(kvm);
-> --
-> 2.27.0
+Reviewed-by: Sean Christopherson <seanjc@google.com>
