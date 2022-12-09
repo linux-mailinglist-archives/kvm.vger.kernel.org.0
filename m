@@ -2,156 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFE78648A1C
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 22:35:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A140648A5A
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 22:50:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229470AbiLIVff (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 16:35:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33744 "EHLO
+        id S229762AbiLIVul (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 16:50:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229517AbiLIVfe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 16:35:34 -0500
-Received: from out-211.mta0.migadu.com (out-211.mta0.migadu.com [91.218.175.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAEAA92319
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 13:35:32 -0800 (PST)
-Date:   Fri, 9 Dec 2022 21:35:25 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1670621730;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=agoBlhJw/+KDy0+W1zZ2GK62ctFzKYI+xFVcrAtjBk8=;
-        b=NS3bk9bTW9yLMUQP30XiRdXGlm8TEp49GntXjwxUVIVsQeD+1YLPL1WSTesnsFRMj2C5eZ
-        W73BsYN6UvL8vHW74CeWdogfHe73GQIRS/cPcBODhsokqQ0TuoGYty61NU5wXaoRkdTPkn
-        xxWmMg1XF3PjR6O8sxtFMuAkKAxtZZY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Peter Gonda <pgonda@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Ricardo Koller <ricarkol@google.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 7/7] KVM: selftests: Avoid infinite loop if
- ucall_alloc() fails
-Message-ID: <Y5OqHUxCblbiysuo@google.com>
-References: <20221209015307.1781352-1-oliver.upton@linux.dev>
- <20221209015307.1781352-8-oliver.upton@linux.dev>
- <Y5OisdH5ohtr6r3j@google.com>
+        with ESMTP id S229738AbiLIVuh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 16:50:37 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41D241581B
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 13:50:36 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id w23so6244245ply.12
+        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 13:50:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1KXfcXEfVxvgm+oQbytsHY5YjsBZNYLTbS+S3BxyMLA=;
+        b=GdjsIlJUWfNEz8Epwr/QnK5UdJnSF8Rjpz9WWneF+NFgU+gtTlFuhjS2ESINR++Va9
+         u8suQjTAaiUxxthysQaONBDcWcqwvF2EZT6J84aBnGgeTUXUjFjzu6c3IbC1+mN/2B/x
+         wEgdCX1901VLSL0EuvhtwTgEBW3g9S8pllxLaMfO7M4KX8DCb+YF7qOWhzhGMYqcGZEZ
+         1w+KqubNJXnOx3o2iyIeGZWItB2GmwB+jorgFiYgr4vLkP8cN8Kfw3QBfIm8iXs0Avje
+         FiWwD0g9stEi388+2JcsdU3B8Zp8WIscWGw26dg4gF3/kUgzco4FrMC/VDa5zNhE/1Mc
+         Vxmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1KXfcXEfVxvgm+oQbytsHY5YjsBZNYLTbS+S3BxyMLA=;
+        b=qCMKI6ae6y3NCD/lO4jcFWGxba2ImpM8s13v1GoMEtqiiW2+U5fQS58b+BrPllScO3
+         rpt35h481ZPlwDn/ty2XqAAs6Y23YfdLGj8nX1OUwJsuKsGQ3wp9AjHw9AczyHYlUQqy
+         G9o3KpKVSHybkSAyrshKE0glEEEovzMFVIscw9BdnfIYZDhCgcAERU1Vhh4FqIRnYcZO
+         YXFdnpJjMWm+2mu38L4YHu9d45UjTTmzyNd+xfD2a62CT9Nux85TXyFsMKE0K58wofqX
+         m47MpnR3rpmvwYUUBWv1yJCZzlEq1BRs8fv17Vxuep8LOUbU859YzccgYxKZsQxKFrYo
+         S95Q==
+X-Gm-Message-State: ANoB5plabdLo6PC22BwuMuW+YmaACkftON2AxlK4MHejUBT2UCtw4w2z
+        5MANXd+BXgNcvw2skakCcpi9oQ==
+X-Google-Smtp-Source: AA0mqf40xGv5D/JuEy8B6vP2aTk5IUpJC7Nb6dCoeaQj6Hoi+MEv3Wr2qQomxW/IjAp5ZX4YGzueag==
+X-Received: by 2002:a17:903:41c5:b0:189:cec6:7ac5 with SMTP id u5-20020a17090341c500b00189cec67ac5mr10112836ple.44.1670622635503;
+        Fri, 09 Dec 2022 13:50:35 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id b6-20020a170903228600b00188f6cbd950sm1760045plh.226.2022.12.09.13.50.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Dec 2022 13:50:35 -0800 (PST)
+Date:   Fri, 9 Dec 2022 13:50:31 -0800
+From:   David Matlack <dmatlack@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [Patch v3 12/13] KVM: selftests: Make vCPU exit reason test
+ assertion common.
+Message-ID: <Y5OtpwM8ue8nZwG/@google.com>
+References: <20221205191430.2455108-1-vipinsh@google.com>
+ <20221205191430.2455108-13-vipinsh@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y5OisdH5ohtr6r3j@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221205191430.2455108-13-vipinsh@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 09, 2022 at 09:03:45PM +0000, Sean Christopherson wrote:
-
-[...]
-
-> > -	GUEST_ASSERT(0);
-> > +out:
-> > +	/*
-> > +	 * If the guest cannot grab a ucall structure from the pool then the
-> > +	 * only option to get out to userspace is a bare ucall. This is probably
-> > +	 * a good time to mention that guest assertions depend on ucalls with
-> > +	 * arguments too.
-> > +	 */
-> > +	GUEST_UCALL_NONE();
+On Mon, Dec 05, 2022 at 11:14:29AM -0800, Vipin Sharma wrote:
+> Make ASSERT_EXIT_REASON() macro and replace all exit reason test assert
+> statements with it.
 > 
-> UCALL_NONE isn't much better than infinite stack recursion, e.g. a test might end
-> up passing by dumb luck, or go in the wrong direction because it sometimes handles
-> UCALL_NONE.
-
-Oh, I was just seeking an end to my misery. Yeah, we can use a magic
-value to signal this instead.
-
-> How about this?
-
-LGTM.
-
---
-Thanks,
-Oliver
-
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Fri, 9 Dec 2022 12:55:44 -0800
-> Subject: [PATCH] KVM: selftests: Use magic value to signal ucall_alloc()
->  failure
+> No functional changes intended.
 > 
-> Use a magic value to signal a ucall_alloc() failure instead of simply
-> doing GUEST_ASSERT().  GUEST_ASSERT() relies on ucall_alloc() and so a
-> failure puts the guest into an infinite loop.
-> 
-> Use -1 as the magic value, as a real ucall struct should never wrap.
-> 
-> Reported-by: Oliver Upton <oliver.upton@linux.dev>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Suggested-by: David Matlack <dmatlack@google.com>
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+
+Reviewed-by: David Matlack <dmatlack@google.com>
+
 > ---
->  tools/testing/selftests/kvm/lib/ucall_common.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-> index 0cc0971ce60e..2f0e2ea941cc 100644
-> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
-> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-> @@ -4,6 +4,8 @@
->  #include "linux/bitmap.h"
->  #include "linux/atomic.h"
->  
-> +#define GUEST_UCALL_FAILED -1
-> +
->  struct ucall_header {
->  	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
->  	struct ucall ucalls[KVM_MAX_VCPUS];
-> @@ -41,7 +43,8 @@ static struct ucall *ucall_alloc(void)
->  	struct ucall *uc;
->  	int i;
->  
-> -	GUEST_ASSERT(ucall_pool);
-> +	if (!ucall_pool)
-> +		goto ucall_failed;
->  
->  	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
->  		if (!test_and_set_bit(i, ucall_pool->in_use)) {
-> @@ -51,7 +54,13 @@ static struct ucall *ucall_alloc(void)
->  		}
->  	}
->  
-> -	GUEST_ASSERT(0);
-> +ucall_failed:
-> +	/*
-> +	 * If the vCPU cannot grab a ucall structure, make a bare ucall with a
-> +	 * magic value to signal to get_ucall() that things went sideways.
-> +	 * GUEST_ASSERT() depends on ucall_alloc() and so cannot be used here.
-> +	 */
-> +	ucall_arch_do_ucall(GUEST_UCALL_FAILED);
->  	return NULL;
->  }
->  
-> @@ -93,6 +102,9 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
->  
->  	addr = ucall_arch_get_ucall(vcpu);
->  	if (addr) {
-> +		TEST_ASSERT(addr != (void *)GUEST_UCALL_FAILED,
-> +			    "Guest failed to allocate ucall struct");
-> +
->  		memcpy(uc, addr, sizeof(*uc));
->  		vcpu_run_complete_io(vcpu);
->  	} else {
-> 
-> base-commit: dc2efbe4813e0dc4368779bc36c5f0e636cb8eb2
-> -- 
-> 
+>  .../testing/selftests/kvm/aarch64/psci_test.c |  4 +--
+>  .../testing/selftests/kvm/include/test_util.h | 10 ++++++++
+[...]
+>  .../selftests/kvm/x86_64/xapic_ipi_test.c     |  6 +----
+>  .../selftests/kvm/x86_64/xen_shinfo_test.c    |  7 +-----
+>  .../selftests/kvm/x86_64/xen_vmcall_test.c    |  5 +---
+>  44 files changed, 71 insertions(+), 293 deletions(-)
+
+Nice diff stat :)
