@@ -2,193 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D921D6482FB
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 14:52:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F091648326
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 14:59:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229668AbiLINwF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 08:52:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51588 "EHLO
+        id S229824AbiLIN7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 08:59:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229790AbiLINvy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 08:51:54 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F18706ACFB
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 05:50:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670593858;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=UdIkgy6BMRJ7r/sade2qdtqGA4Czc9DE5XCsMjvzwps=;
-        b=Qlbe/bJoXt85XnJtpqgr6F+8mW3bCj9zCNaTFhPcuf6nNdq4rGeQ3ytrlxsaYPDJTjofFc
-        uLsxAlUwe6z2BZd9PSUSg7JD6ULyTmxNZn6Unb1eH4P+tjz611Z5PfQ3CKBqNd8wEJy/+S
-        po5nxwSvwCmXuL9UT4Qh3cvMXFeEy5I=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-622-zWk_PE_1OPqWBM8u22KcDQ-1; Fri, 09 Dec 2022 08:50:51 -0500
-X-MC-Unique: zWk_PE_1OPqWBM8u22KcDQ-1
-Received: by mail-wm1-f69.google.com with SMTP id q6-20020a05600c2e4600b003d211775a99so537640wmf.1
-        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 05:50:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UdIkgy6BMRJ7r/sade2qdtqGA4Czc9DE5XCsMjvzwps=;
-        b=FHbjBpYpklbjJeVhtHISYprSHZ3/JrgJgSwGDehrk3sOs1RsgIK2iT3hnuImEADkQe
-         gIrar6aeeMgvZpCBw8dg+HcxE4H2sMVuCRV++3sVJOTbdDUbntBle3/3VuaA6HQNh+/e
-         jIUXSD+jQJgG3tFuboM+10BAvTTTzUKCHcTEH7jaslM6284Qgu28/69wRv9e+wca69oO
-         91N+Xc9ICcQn9ai1M19I4ViJaZ5Qj+tgssFuuCLTR1G1aG7SYWKzUVZ4PnR+ulmpxKnA
-         jw9W/K8qQf+TL+XjIqBhFPSzuY6fQMqF9DRu3WU4JmiiuJJLR3vPACXx6FMLBrB5qonc
-         U9oQ==
-X-Gm-Message-State: ANoB5pmNZE7+1XbRnCVYqHNqJiGJ1ByMM6b7K8S7UjMfBmfeVa8JindB
-        ZyOoZi0fDzFhbCThIvhVEiH6/QLIB6oJ3UEDKXZK6q6AMa5dlvsaFGBmz5BMj7wAv+lTP4OYvft
-        nVGHPVfPBM0qz
-X-Received: by 2002:a05:600c:348a:b0:3c6:e63e:89aa with SMTP id a10-20020a05600c348a00b003c6e63e89aamr5086722wmq.6.1670593850406;
-        Fri, 09 Dec 2022 05:50:50 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4hgYz57feDfx3gQAIUTjMoGk2YWf2IxJA0RI3KDh7nNxWom8c+WkUNGbJES5lR/4S4VdNNQQ==
-X-Received: by 2002:a05:600c:348a:b0:3c6:e63e:89aa with SMTP id a10-20020a05600c348a00b003c6e63e89aamr5086702wmq.6.1670593850200;
-        Fri, 09 Dec 2022 05:50:50 -0800 (PST)
-Received: from [192.168.0.5] (ip-109-43-177-15.web.vodafone.de. [109.43.177.15])
-        by smtp.gmail.com with ESMTPSA id i10-20020a1c540a000000b003d1f2c3e571sm7855692wmb.33.2022.12.09.05.50.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Dec 2022 05:50:49 -0800 (PST)
-Message-ID: <be4571a6-edaa-3291-1b31-6f309c00a9f9@redhat.com>
-Date:   Fri, 9 Dec 2022 14:50:47 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v13 1/7] s390x/cpu topology: Creating CPU topology device
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20221208094432.9732-1-pmorel@linux.ibm.com>
- <20221208094432.9732-2-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20221208094432.9732-2-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229580AbiLIN7n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 08:59:43 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5FC54778;
+        Fri,  9 Dec 2022 05:59:42 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 35D8ACE2898;
+        Fri,  9 Dec 2022 13:59:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 257B9C433EF;
+        Fri,  9 Dec 2022 13:59:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670594378;
+        bh=YKyaVpqeCeqlnoMH5zjc8JmcTERpSzdvRksnhg86Hlk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=XSqMYnYFgFkdooVOqxjGblosYBPVpJZh+jjvBiZ+t2eiO+aNIJBCWIchLr4ioGdwF
+         3IxbYM2fIZ6HatHjXF7bFyQuDHhJeq/WWVjekztG20UXvNp60lK2II76IXayTvYcVA
+         grzp69iGM2l1uBkzUuT3zeXtOFVxcQ833QE0IdcutyaG+KnM+YksxlIvCeuOnV+4kQ
+         oWWB6tG1+n+uzDdt3gqmL6Wf5ILTZBnLLV9i9m+FivMxfbIHP3dOzQ8LVsn/1C6YQC
+         hH75x2yzWEP97IraUdWZK+DOMkXzeHH1TkJEUNqw37oUZsjKntTNKUVVJa51dTi+XG
+         3XOy00JMK149A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p3duZ-00BbOT-LV;
+        Fri, 09 Dec 2022 13:59:35 +0000
+Date:   Fri, 09 Dec 2022 13:59:35 +0000
+Message-ID: <86bkocr83c.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>,
+        Bharat Bhushan <bharat.bhushan@nxp.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
+        Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH iommufd 1/9] irq: Add msi_device_has_secure_msi()
+In-Reply-To: <1-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
+References: <0-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
+        <1-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: jgg@nvidia.com, agordeev@linux.ibm.com, alex.williamson@redhat.com, baolu.lu@linux.intel.com, borntraeger@linux.ibm.com, cohuck@redhat.com, dwmw2@infradead.org, gerald.schaefer@linux.ibm.com, gor@linux.ibm.com, hca@linux.ibm.com, iommu@lists.linux.dev, joro@8bytes.org, kevin.tian@intel.com, kvm@vger.kernel.org, linux-s390@vger.kernel.org, robin.murphy@arm.com, suravee.suthikulpanit@amd.com, svens@linux.ibm.com, tglx@linutronix.de, will@kernel.org, bharat.bhushan@nxp.com, borntraeger@de.ibm.com, eric.auger@redhat.com, farman@linux.ibm.com, marc.zyngier@arm.com, mjrosato@linux.ibm.com, tomasz.nowicki@caviumnetworks.com, will.deacon@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 08/12/2022 10.44, Pierre Morel wrote:
-> We will need a Topology device to transfer the topology
-> during migration and to implement machine reset.
+On Thu, 08 Dec 2022 20:26:28 +0000,
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 > 
-> The device creation is fenced by s390_has_topology().
+> This will replace irq_domain_check_msi_remap() in following patches.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
-[...]
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> new file mode 100644
-> index 0000000000..b3e59873f6
-> --- /dev/null
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -0,0 +1,149 @@
-> +/*
-> + * CPU Topology
-> + *
-> + * Copyright IBM Corp. 2022
-> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
-> +
-> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
-> + * your option) any later version. See the COPYING file in the top-level
-> + * directory.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qapi/error.h"
-> +#include "qemu/error-report.h"
-> +#include "hw/qdev-properties.h"
-> +#include "hw/boards.h"
-> +#include "qemu/typedefs.h"
-> +#include "target/s390x/cpu.h"
-> +#include "hw/s390x/s390-virtio-ccw.h"
-> +#include "hw/s390x/cpu-topology.h"
-> +
-> +/**
-> + * s390_has_topology
-> + *
-> + * Return false until the commit activating the topology is
-> + * commited.
-> + */
-> +bool s390_has_topology(void)
-> +{
-> +    return false;
-> +}
-> +
-> +/**
-> + * s390_get_topology
-> + *
-> + * Returns a pointer to the topology.
-> + *
-> + * This function is called when we know the topology exist.
-> + * Testing if the topology exist is done with s390_has_topology()
-> + */
-> +S390Topology *s390_get_topology(void)
-> +{
-> +    static S390Topology *s390Topology;
-> +
-> +    if (!s390Topology) {
-> +        s390Topology = S390_CPU_TOPOLOGY(
-> +            object_resolve_path(TYPE_S390_CPU_TOPOLOGY, NULL));
-> +    }
-> +
-> +    assert(s390Topology);
+> The new API makes it more clear what "msi_remap" actually means from a
+> functional perspective instead of identifying an implementation specific
+> HW feature.
+> 
+> Secure MSI means that an irq_domain on the path from the initiating device
 
-I think you can move the assert() into the body of the if-statement.
+irq_domain is a SW construct, and you are trying to validate something
+that is HW property.
 
-> +    return s390Topology;
-> +}
-> +
-> +/**
-> + * s390_init_topology
-> + * @machine: The Machine state, used to retrieve the SMP parameters
-> + * @errp: the error pointer in case of problem
-> + *
-> + * This function creates and initialize the S390Topology with
-> + * the QEMU -smp parameters we will use during adding cores to the
-> + * topology.
-> + */
-> +void s390_init_topology(MachineState *machine, Error **errp)
-> +{
-> +    DeviceState *dev;
-> +
-> +    if (machine->smp.threads > 1) {
-> +        error_setg(errp, "CPU Topology do not support multithreading");
+"Secure" is also a terribly overloaded term that means very different
+things in non-x86 circles. When I read this, I see an ARM system with
+a device generating an MSI with the "secure" bit set as part of the
+transaction and identifying the memory access as being part of the
+"secure" domain.
 
-s/CPU Toplogy do/CPU topology does/
+But that's not what you mean at all.
 
-> +        return;
-> +    }
-> +
-> +    dev = qdev_new(TYPE_S390_CPU_TOPOLOGY);
-> +
-> +    object_property_add_child(&machine->parent_obj,
-> +                              TYPE_S390_CPU_TOPOLOGY, OBJECT(dev));
-> +    object_property_set_int(OBJECT(dev), "num-cores",
-> +                            machine->smp.cores, errp);
-> +    object_property_set_int(OBJECT(dev), "num-sockets",
-> +                            machine->smp.sockets, errp);
-> +
-> +    sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), errp);
-> +}
+> to the CPU will validate that the MSI message specifies an interrupt
+> number that the initiating device is authorized to trigger. Secure MSI
+> must block devices from triggering interrupts they are not authorized to
+> trigger. Currently authorization means the MSI vector is one assigned to
+> the device.
 
-  Thomas
+What you are describing here is a *device isolation* property, and I'd
+rather we stay away from calling that "secure". If anything, I'd
+rather call everything else "broken".
 
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
