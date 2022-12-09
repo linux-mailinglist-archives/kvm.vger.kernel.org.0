@@ -2,70 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2016E647B0A
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 01:56:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6587C647B24
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 02:09:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229777AbiLIA4Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 8 Dec 2022 19:56:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43626 "EHLO
+        id S229640AbiLIBJA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 8 Dec 2022 20:09:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229463AbiLIA4W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 8 Dec 2022 19:56:22 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF5DBA5076
-        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 16:56:21 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id q71so2513202pgq.8
-        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 16:56:21 -0800 (PST)
+        with ESMTP id S229462AbiLIBI7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 8 Dec 2022 20:08:59 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B52080A0E
+        for <kvm@vger.kernel.org>; Thu,  8 Dec 2022 17:08:58 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id k88-20020a17090a4ce100b00219d0b857bcso3353380pjh.1
+        for <kvm@vger.kernel.org>; Thu, 08 Dec 2022 17:08:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wOs4C6BBma642P6OMMzRiIsIhDlU2b6iXgXp4qHQDzo=;
-        b=f11nxtxN8hrAGBuAtH/s266yjx8WyVzDoE7wWwPoHxUHnzNcDfxYfirHZo4YxfgnYS
-         VEf78bwhI5ybygthnEPqJ5iDhaaPqsWfNVnDRt7JR7KETO3XWUcqCebHg5anE6o08LeG
-         KzmZlFlcWFhrVSRoVuMXZDyOJw/lA56z/UaZ5WmzwLsSYWvUuJghgrAy946YfNIUchno
-         HB5SqwNXgW7Sl+sWYzfkBtGBcTxytTY2vkAbdQ3YqFPEonW7lurYtT9HozBifV56bgA6
-         Ratt0yhywNs3NhJNLc5xp4ZjM5kV/6FgzLFyLxlF1RDs4Pi0f29/gfa7jD9bC1M86OdU
-         SCbA==
+        bh=R0W5fcABi4X+T/jYwfg3acG+mAXpKXLqoOLMcVDvb94=;
+        b=YriPTaeIiA+dLmTSSSXERGxZoMyfxJhoF2Q8RM1j7icfTqEwdCfNmwHRywZVksID9N
+         yt3L9g633vwLWxIZEY1PievSOwRoolVjFuC2ekFqhXWDrbAgmSyOG8E61xcBei/0WmkD
+         n3zTXHfaLve5+vNvZO0l7Nq5ja3MPhbw/Zy0/wgqCgHFNdKS3cxS/4qNYhNLqDue4ooc
+         J5EXd9M3CGckvr5AeCg01H05bHqrWl9oIldXxZyKGqNhqjj4kHaNhCQp1c7egMM531/g
+         0N6aof8FoDZ0/n1nLpXmasPJ3LYaX/UAhpwEXGBjpWrXiOyYtqQVHTcsdM7gm/cVbdTY
+         W13w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wOs4C6BBma642P6OMMzRiIsIhDlU2b6iXgXp4qHQDzo=;
-        b=HaY0T4UBhgOt/mYtHd4Btdd369GxmzpggQs6K3xgiF1264ZnfKpRfcYvjoTFf7Vcs9
-         OfMwoeAK2joM2yjJUMHUZZ2yw8aynRdBve44czKDCC7jU/6ALszrrxzy1AiQXXCJ1s7b
-         PW9PsCM3VRpfEVp+rem+kvMNfa9ORHdQ0A/JLpLmU2pI9/gpLyFT78G/kug8mBOlR4/K
-         Hw8HNWI/98ilQITyTk6VQNgvcPeZtCTSI1h0G2ZpxOIP4gZJ5scOiaEHZRcO9BUoOX/3
-         xyyFxRvO30q9VeEDEx2CRKBMnXHlR/ljlMCc14ehaeleOlNGRmuFnAcBeA81y+Wt9AXU
-         ixfg==
-X-Gm-Message-State: ANoB5plBhP6s3oEz3QOLUFsWLsz/jkLf8rrY57pNxxW4zCdfGSrYsn+7
-        XnWF+wYytQ18FqxVENImOcrSJw==
-X-Google-Smtp-Source: AA0mqf7I9fjvyqQmNK0n3BjA7Te2K3XSrNeQRcs8VYDmM6mOWiUJtY4GV7TjXIXOBWChQEK8m78ytw==
-X-Received: by 2002:a62:e718:0:b0:577:36ba:6a86 with SMTP id s24-20020a62e718000000b0057736ba6a86mr1125144pfh.1.1670547381215;
-        Thu, 08 Dec 2022 16:56:21 -0800 (PST)
+        bh=R0W5fcABi4X+T/jYwfg3acG+mAXpKXLqoOLMcVDvb94=;
+        b=2Z1KiUORxZlvrvD1I+vW3r6LIs8q+26m7t6E8k8h/1U5juNDF4KG3kVPsMi758Bwyw
+         6JHmlykR9Q+3XE0c8m7kMfykofaw8hsR0cqe/HPq0FxHxSpyfBshLt0NBlVOHDC8sseO
+         p3Kf59QnbVm8PMCOpDUKMBxMwX2YllnV7/E+1DHmYZvsXQAwq/a1uxtfpJptUnG5h0uk
+         lPu8Se9Z+Ufw7ocAK03APAStxQJyiz15tZqvMnptiOVY0gNTH5dLGOjO6Ax5pfETue3Z
+         j0GbpggMG4/4uKBGasX2OY5WwdV2HcQgB8Uu/5FY3PXmTPHqo52Ijit6j7UDeRzEq+r9
+         cd+A==
+X-Gm-Message-State: ANoB5plcmSl/kWxprxTEBpqDNzkXnOY2wzYhf0zWSQiBkEmYUmq/vJDX
+        cJqDgZs+g6E3lPJz26tDhbDS2Q==
+X-Google-Smtp-Source: AA0mqf7592VdpFGEsXHXafhoIIzr0OlDlMvX/sxUwlVGqoBDiQgVEZPiR3YzSXTZCX1tcoMfJ2vdoQ==
+X-Received: by 2002:a17:902:d491:b0:189:858f:b5c0 with SMTP id c17-20020a170902d49100b00189858fb5c0mr1689887plg.0.1670548137442;
+        Thu, 08 Dec 2022 17:08:57 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 23-20020a621917000000b005748029bab8sm96462pfz.156.2022.12.08.16.56.20
+        by smtp.gmail.com with ESMTPSA id n6-20020a170902d2c600b00189e1522982sm51067plc.168.2022.12.08.17.08.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Dec 2022 16:56:20 -0800 (PST)
-Date:   Fri, 9 Dec 2022 00:56:17 +0000
+        Thu, 08 Dec 2022 17:08:57 -0800 (PST)
+Date:   Fri, 9 Dec 2022 01:08:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH v4 24/32] KVM: x86: Inhibit APICv/AVIC if the optimized
- physical map is disabled
-Message-ID: <Y5KHsdsA/T/gaswC@google.com>
-References: <20221001005915.2041642-1-seanjc@google.com>
- <20221001005915.2041642-25-seanjc@google.com>
- <6de0c4fd228055840648452bd5a3b4955f70d881.camel@redhat.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/4] KVM: selftests: Setup ucall after loading program
+ into guest memory
+Message-ID: <Y5KKpQSd8H88vDoH@google.com>
+References: <20221207214809.489070-1-oliver.upton@linux.dev>
+ <20221207214809.489070-3-oliver.upton@linux.dev>
+ <Y5EoZ5uwrTF3eSKw@google.com>
+ <Y5EtMWuTaJk9I3Bd@google.com>
+ <Y5EutGSjkRmdItQb@google.com>
+ <Y5Exwzr6Ibmmthl0@google.com>
+ <Y5IxNTKRnacfSsLt@google.com>
+ <Y5I0paok+dvTtrkt@google.com>
+ <Y5I/xiFMLVbpAZj+@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <6de0c4fd228055840648452bd5a3b4955f70d881.camel@redhat.com>
+In-Reply-To: <Y5I/xiFMLVbpAZj+@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -77,67 +88,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 08, 2022, Maxim Levitsky wrote:
-> On Sat, 2022-10-01 at 00:59 +0000, Sean Christopherson wrote:
-> > Inhibit APICv/AVIC if the optimized physical map is disabled so that KVM
-> > KVM provides consistent APIC behavior if xAPIC IDs are aliased due to
-> > vcpu_id being truncated and the x2APIC hotplug hack isn't enabled.  If
-> > the hotplug hack is disabled, events that are emulated by KVM will follow
-> > architectural behavior (all matching vCPUs receive events, even if the
-> > "match" is due to truncation), whereas APICv and AVIC will deliver events
-> > only to the first matching vCPU, i.e. the vCPU that matches without
-> > truncation.
+On Thu, Dec 08, 2022, Ricardo Koller wrote:
+> On Thu, Dec 08, 2022 at 07:01:57PM +0000, Sean Christopherson wrote:
+> > On Thu, Dec 08, 2022, Ricardo Koller wrote:
+> > > On Thu, Dec 08, 2022 at 12:37:23AM +0000, Oliver Upton wrote:
+> > > > On Thu, Dec 08, 2022 at 12:24:20AM +0000, Sean Christopherson wrote:
+> > > > > > Even still, that's just a kludge to make ucalls work. We have other
+> > > > > > MMIO devices (GIC distributor, for example) that work by chance since
+> > > > > > nothing conflicts with the constant GPAs we've selected in the tests.
+> > > > > > 
+> > > > > > I'd rather we go down the route of having an address allocator for the
+> > > > > > for both the VA and PA spaces to provide carveouts at runtime.
+> > > > > 
+> > > > > Aren't those two separate issues?  The PA, a.k.a. memslots space, can be solved
+> > > > > by allocating a dedicated memslot, i.e. doesn't need a carve.  At worst, collisions
+> > > > > will yield very explicit asserts, which IMO is better than whatever might go wrong
+> > > > > with a carve out.
+> > > > 
+> > > > Perhaps the use of the term 'carveout' wasn't right here.
+> > > > 
+> > > > What I'm suggesting is we cannot rely on KVM memslots alone to act as an
+> > > > allocator for the PA space. KVM can provide devices to the guest that
+> > > > aren't represented as memslots. If we're trying to fix PA allocations
+> > > > anyway, why not make it generic enough to suit the needs of things
+> > > > beyond ucalls?
+> > > 
+> > > One extra bit of information: in arm, IO is any access to an address (within
+> > > bounds) not backed by a memslot. Not the same as x86 where MMIO are writes to
+> > > read-only memslots.  No idea what other arches do.
 > > 
-> > Note, the "extra" inhibit is needed because  KVM deliberately ignores
-> > mismatches due to truncation when applying the APIC_ID_MODIFIED inhibit
-> > so that large VMs (>255 vCPUs) can run with APICv/AVIC.
-> > 
-> > Fixes: TDB
-> Do you mean Trade & Development Bank of Mongolia ? ;-)
+> > I don't think that's correct, doesn't this code turn write abort on a RO memslot
+> > into an io_mem_abort()?  Specifically, the "(write_fault && !writable)" check will
+> > match, and assuming none the the edge cases in the if-statement fire, KVM will
+> > send the write down io_mem_abort().
+> 
+> You are right. In fact, page_fault_test checks precisely that: writes on
+> RO memslots are sent to userspace as an mmio exit. I was just referring
+> to the MMIO done for ucall.
 
-Heh, this fixes a patch/commit earlier in the series, hence the placeholder.
+To clarify for others, Ricardo thought that x86 selftests were already using a
+read-only memslot for ucalls, hence the confusion.
 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/x86/include/asm/kvm_host.h |  6 ++++++
-> >  arch/x86/kvm/lapic.c            | 13 ++++++++++++-
-> >  arch/x86/kvm/svm/avic.c         |  1 +
-> >  arch/x86/kvm/vmx/vmx.c          |  1 +
-> >  4 files changed, 20 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index ac28bbfbf0e3..171e38b94c89 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1104,6 +1104,12 @@ enum kvm_apicv_inhibit {
-> >  	 */
-> >  	APICV_INHIBIT_REASON_BLOCKIRQ,
-> >  
-> > +	/*
-> > +	 * APICv is disabled because not all vCPUs have a 1:1 mapping between
-> > +	 * APIC ID and vCPU, _and_ KVM is not applying its x2APIC hotplug hack.
-> > +	 */
-> > +	APICV_INHIBIT_REASON_PHYSICAL_ID_ALIASED,
-> > +
-> >  	/*
-> >  	 * For simplicity, the APIC acceleration is inhibited
-> >  	 * first time either APIC ID or APIC base are changed by the guest
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 340c2d3e781b..f6f328d36ae2 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -381,6 +381,16 @@ void kvm_recalculate_apic_map(struct kvm *kvm)
-> >  		cluster[ldr] = apic;
-> >  	}
-> >  out:
-> > +	/*
-> > +	 * The optimized map is effectively KVM's internal version of APICv,
-> Nitpick: APICv/AVIC?
+> Having said that, we could use ucall as writes on read-only memslots
+> like what x86 does.
 
-Hmm.  I think my preference for common code that doesn't need to differentiate
-between Intel and AMD (or AVIC vs. x2AVIC) is to use just APICv.  "APICv" is a
-mostly a KVM term, e.g. Intel uses "APIC-virtualization" as an umbrella term for
-a massive pile of features, so I think bending the term to cover Intel+AMD is ok?
++1.  x86 currently uses I/O with a hardcoded port, but theoretically that's just
+as error prone as hardcoding a GPA, it just works because x86 doesn't have any
+port I/O tests.
 
-Typing APICv/AVIC everywhere will get tedious and creates its own flavor of
-confusion, e.g. the inhibits all use APICV.
+Ugh, and that made me look at sync_regs_test.c, which does its own open coded
+ucall.  That thing is probably working by dumb luck at this point.
