@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 715DB648AD3
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 23:44:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B2991648B3D
+	for <lists+kvm@lfdr.de>; Sat, 10 Dec 2022 00:04:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbiLIWoz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 17:44:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43814 "EHLO
+        id S229873AbiLIXEj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 18:04:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbiLIWow (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 17:44:52 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A712A1A20E
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 14:44:51 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id fa4-20020a17090af0c400b002198d1328a0so9265424pjb.0
-        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 14:44:51 -0800 (PST)
+        with ESMTP id S229571AbiLIXEg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 18:04:36 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F35B96566
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 15:04:36 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id fa4-20020a17090af0c400b002198d1328a0so9292425pjb.0
+        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 15:04:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X60ise7QEnBOLcc3D/dBQfic8PhzrSOslDuErC7Ni10=;
-        b=pHUdoOKYb0ikWsUFyedzTVRqWFVg+GHcvD2Qt3tMkYnRgphgWNKSWcAqSb1lJUGYV3
-         2In6LQHTmk+M/woccvtGcbol+tHuihY0FVIDF2Z4kIsolqvzKaINNw+vqEAgWAFvqT3e
-         SBqsToY0x6VAUpiv7c3CoqyhOzssWXjkXdqbdXdotU02cHCxLcCpXYCL19pqFE1kK7Dk
-         ixODee2lydPhJ+A9DZ458RZ0X9UpXWkPEiwQTP+5HexIHqUS5/vkKTGRPoxNwSi9JlPk
-         99NqBP9UYRQiH5YX47o/EMMJabhk6ghiMSkm4nNj7uUXklplo0CopLcnv7/A5zDLfW7Q
-         Ctkw==
+        bh=N7y0Fsj0V7Jx8UlnHY/tsP4KmC6NWQ+6Fi1dd0y8otA=;
+        b=IWkguZSoL2fItk5S/5KatAx6Ma+mRNW1A7ymBYMHQkfco+SqKmg/BgwhmwAmtDFREa
+         HXqfbd6u8/EfvxH+tCFcjQUntlUR+GJ27QyHmmVB8qPnfhav4uVut7+5jPAnaAhkYQIn
+         tp2ueDwS3HqPgLOU2XAuEXNf2oO6b+3qhX25ywi+jcEhAbAgD3y/9Xn8EHLUELCHZeWU
+         Yo5msYHNeK50cvQk6ZPc3Ug1Yhe/yLwar58UrXx9BO+9eHKIFgsyEMkmPZHHsHyHyx2N
+         YSt+qWJxXpCP0tgJtl1cJDdZGRte0ul2Ue89e3VlQDkZW3BuHbZH0eKaba8TUCJgj797
+         7hRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=X60ise7QEnBOLcc3D/dBQfic8PhzrSOslDuErC7Ni10=;
-        b=xXH696BytqypM39TtG2TsaEsZjsHs33zR98jQxuWC6ziuf10N9q6kM0RBtg0gi0tRG
-         ZVd4AEnBu+tBy/cPIaYPQNeEx2AlUERMo8DrWuXtC33F+Ryxtn1z4E2EbkdzKNL6HEzl
-         baY7kCbmmxWjXjTchIpHV4725xEWyKRLvLwbmraSh+EN9J95+Bq/1MSAQc+Gy937B+zK
-         Xo3+JIn9gOyK6q/yhgG7LXfExdVKc9IxjCEeo0reG8Y0tswnrbDQJAlEXmCHAVdzJelC
-         ORuwc/yuq2sXcE/wuqY3Zof3YdFOqdB9fg4/gLN7qRieVgNdOUgs+UzXMNNJrNSRqXwl
-         0UrA==
-X-Gm-Message-State: ANoB5pkYfIHKZvub2Hgzz25+6WvJ6PXMdxAkcITKqb3TSIPCs2qI26YC
-        MSTYDMiSDrPUPEZ9xjKdnv6eEA==
-X-Google-Smtp-Source: AA0mqf6kfZWSPqHNCi32c0RbsdLJDYiO+lxQPBmPCC1xUSm/BB/fFxSx+3nTSHZ4LGgFZvPhGyTGBw==
-X-Received: by 2002:a17:90a:1b0b:b0:219:396c:9e32 with SMTP id q11-20020a17090a1b0b00b00219396c9e32mr7524057pjq.16.1670625891035;
-        Fri, 09 Dec 2022 14:44:51 -0800 (PST)
+        bh=N7y0Fsj0V7Jx8UlnHY/tsP4KmC6NWQ+6Fi1dd0y8otA=;
+        b=VkqMrNYmmSqIDjJwthA8pZbZgrNTSr4Dy6qlVFHQzbnaNURB5C2Q6mJ/CiSG+hXUD+
+         g5lRcosM5m3cAVCAMBhqJyXqmX76621rZ2EBZmQJVXcyjJTfZyaCXbZB4LPirWw+R7IZ
+         HJet59aBef6w7eZ6l9rWjxZOmwg3jY73uLynIKzTlaX4nxpebOh5ij1Ec8Zf/n+Nh7mm
+         OpmRw4K3b0XfiX1RSxrIXCGlTFrodN0zOjqufzXyDJl56djl/54y+iqMBr/c46UoDeY/
+         Y0lPfRZ2vT9Vu+BY823iL2/yeRu1bTei8N8a3rt6accY16dAM6HkO2WHaQSqQ9mXIaCN
+         QHZw==
+X-Gm-Message-State: ANoB5pnJgMu226tuLl5yx4Xp+uSvlwStZet1OYduo+PHbuD2qUuULtm6
+        OZp2avHbXVLzjoyU8JicKLCPsw==
+X-Google-Smtp-Source: AA0mqf5cA/qtvZTwZolemydZkhpOj8uJXz4RnA1VFMUXuJifwyTUlibOOKUTF/7F0Zjy6vs7xTwZsQ==
+X-Received: by 2002:a17:90b:310f:b0:219:d84:4446 with SMTP id gc15-20020a17090b310f00b002190d844446mr7457385pjb.26.1670627075598;
+        Fri, 09 Dec 2022 15:04:35 -0800 (PST)
 Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id d12-20020a17090a3b0c00b00219f8eb271fsm1670901pjc.5.2022.12.09.14.44.50
+        by smtp.gmail.com with ESMTPSA id gl7-20020a17090b120700b00218f9bd50c7sm1543637pjb.50.2022.12.09.15.04.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 14:44:50 -0800 (PST)
-Date:   Fri, 9 Dec 2022 14:44:46 -0800
+        Fri, 09 Dec 2022 15:04:35 -0800 (PST)
+Date:   Fri, 9 Dec 2022 15:04:31 -0800
 From:   David Matlack <dmatlack@google.com>
 To:     Ben Gardon <bgardon@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -56,14 +56,14 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Peter Xu <peterx@redhat.com>,
         Sean Christopherson <seanjc@google.com>,
         Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH 6/7] KVM: x86/MMU: Move rmap zap operations to rmap.c
-Message-ID: <Y5O6XiJSjGmpMl3R@google.com>
+Subject: Re: [PATCH 2/7] KVM: x86/MMU: Move rmap_iterator to rmap.h
+Message-ID: <Y5O+/1CYivRishFE@google.com>
 References: <20221206173601.549281-1-bgardon@google.com>
- <20221206173601.549281-7-bgardon@google.com>
+ <20221206173601.549281-3-bgardon@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221206173601.549281-7-bgardon@google.com>
+In-Reply-To: <20221206173601.549281-3-bgardon@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,84 +75,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 06, 2022 at 05:36:00PM +0000, Ben Gardon wrote:
-> Move the various rmap zap functions to rmap.c. These functions are less
-> "pure" rmap operations in that they also contain some SPTE manipulation,
-> however they're mostly about rmap / pte list manipulation.
+On Tue, Dec 06, 2022 at 05:35:56PM +0000, Ben Gardon wrote:
+> In continuing to factor the rmap out of mmu.c, move the rmap_iterator
+> and associated functions and macros into rmap.(c|h).
 > 
 > No functional change intended.
 > 
 > Signed-off-by: Ben Gardon <bgardon@google.com>
 > ---
+>  arch/x86/kvm/mmu/mmu.c  | 76 -----------------------------------------
+>  arch/x86/kvm/mmu/rmap.c | 61 +++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/mmu/rmap.h | 18 ++++++++++
+>  3 files changed, 79 insertions(+), 76 deletions(-)
+> 
 [...]
-> -static void kvm_zap_one_rmap_spte(struct kvm *kvm,
-> -				  struct kvm_rmap_head *rmap_head, u64 *sptep)
-> -{
-> -	mmu_spte_clear_track_bits(kvm, sptep);
-> -	pte_list_remove(sptep, rmap_head);
-> -}
-> -
-> -/* Return true if at least one SPTE was zapped, false otherwise */
-> -static bool kvm_zap_all_rmap_sptes(struct kvm *kvm,
-> -				   struct kvm_rmap_head *rmap_head)
-> -{
-> -	struct pte_list_desc *desc, *next;
-> -	int i;
-> -
-> -	if (!rmap_head->val)
-> -		return false;
-> -
-> -	if (!(rmap_head->val & 1)) {
-> -		mmu_spte_clear_track_bits(kvm, (u64 *)rmap_head->val);
-> -		goto out;
-> -	}
-> -
-> -	desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
-> -
-> -	for (; desc; desc = next) {
-> -		for (i = 0; i < desc->spte_count; i++)
-> -			mmu_spte_clear_track_bits(kvm, desc->sptes[i]);
-> -		next = desc->more;
-> -		free_pte_list_desc(desc);
-> -	}
-> -out:
-> -	/* rmap_head is meaningless now, remember to reset it */
-> -	rmap_head->val = 0;
-> -	return true;
-> -}
+> diff --git a/arch/x86/kvm/mmu/rmap.h b/arch/x86/kvm/mmu/rmap.h
+> index 059765b6e066..13b265f3a95e 100644
+> --- a/arch/x86/kvm/mmu/rmap.h
+> +++ b/arch/x86/kvm/mmu/rmap.h
+> @@ -31,4 +31,22 @@ void free_pte_list_desc(struct pte_list_desc *pte_list_desc);
+>  void pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head);
+>  unsigned int pte_list_count(struct kvm_rmap_head *rmap_head);
+>  
+> +/*
+> + * Used by the following functions to iterate through the sptes linked by a
+> + * rmap.  All fields are private and not assumed to be used outside.
+> + */
+> +struct rmap_iterator {
+> +	/* private fields */
+> +	struct pte_list_desc *desc;	/* holds the sptep if not NULL */
+> +	int pos;			/* index of the sptep */
+> +};
+> +
+> +u64 *rmap_get_first(struct kvm_rmap_head *rmap_head,
+> +		    struct rmap_iterator *iter);
+> +u64 *rmap_get_next(struct rmap_iterator *iter);
+> +
+> +#define for_each_rmap_spte(_rmap_head_, _iter_, _spte_)			\
+> +	for (_spte_ = rmap_get_first(_rmap_head_, _iter_);		\
+> +	     _spte_; _spte_ = rmap_get_next(_iter_))
+> +
 
-I don't like moving the rmap zap functions into rmap.c, because they are
-more mmu.c functions, as you note in the commit description. e.g. It's
-odd to have kvm_zap_all_rmap_sptes() in rmap.c but not, say
-__rmap_clear_dirty().
+I always found these function names and kvm_rmap_head confusing since
+they are about iterating through the pte_list_desc data structure. The
+rmap (gfn -> list of sptes) is a specific application of the
+pte_list_desc structure, but not the only application. There's also
+parent_ptes in struct kvm_mmu_page, which is not an rmap, just a plain
+old list of ptes.
 
-I get your point though that kvm_zap_all_rmap_sptes() has to know
-intimate details of the pte_list_desc structure. It would be nice to
-keep those details isolated to rmap.c.
+While you are refactoring this code, what do you think about doing the
+following renames?
 
-What about keeping the zap functions mmu.c and just provide a better API
-for kvm_zap_all_rmap_sptes() to process the rmap entries?
+  struct kvm_rmap_head	-> struct pte_list_head
+  struct rmap_iterator	-> struct pte_list_iterator
+  rmap_get_first()	-> pte_list_get_first()
+  rmap_get_next()	-> pte_list_get_next()
+  for_each_rmap_spte()	-> for_each_pte_list_entry()
 
-e.g.
+Then we can reserve the term "rmap" just for the actual rmap
+(slot->arch.rmap), and code that deals with sp->parent_ptes will become
+a lot more clear IMO (because it will not longer mention rmap).
 
-mmu.c:
+e.g. We go from this:
 
-static bool kvm_zap_all_rmap_sptes(struct kvm *kvm,
-				   struct kvm_rmap_head *rmap_head)
-{
-	struct rmap_iterator iter;
-	bool flush = false;
-	u64 *sptep;
+  struct rmap_iterator iter;
+  u64 *sptep;
 
-	for_each_rmap_spte(rmap_head, &iter, sptep) {
-		mmu_spte_clear_track_bits(kvm, sptep);
-		flush = true;
-	}
+  for_each_rmap_spte(&sp->parent_ptes, &iter, sptep) {
+     ...
+  }
 
-	pte_list_free_all(rmap_head);  // <-- implemented in rmap.c
-	return flush;
-}
+To this:
 
-This should be about as efficient as the current approach (same big-O
-notation at least) and maintain the separation of pte_list_desc
-internals in rmap.c.
+  struct pte_list_iterator iter;
+  u64 *sptep;
+
+  for_each_pte_list_entry(&sp->parent_ptes, &iter, sptep) {
+     ...
+  }
