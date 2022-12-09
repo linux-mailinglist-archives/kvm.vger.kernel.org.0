@@ -2,170 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC7006484E7
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 16:21:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5AC1A6485B6
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 16:41:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230161AbiLIPVR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 10:21:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41688 "EHLO
+        id S229957AbiLIPl0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 10:41:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiLIPVO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 10:21:14 -0500
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2079.outbound.protection.outlook.com [40.107.223.79])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3DC086F69;
-        Fri,  9 Dec 2022 07:21:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=U6pNOhCJdENoAx2FnkZQfwmRARMBXJ5zgcpkOx/0mHPAxt2VNltuPKdVTnF4l1SJDHnHDHnTYEHy0LvsMEhINjgvR34Xlr1oJFl1TxnW6F+wtVohdq/wSrCiI7fgEEodAaCvn0+QTUvPoklStnq3X3HCVrBQIQnD5dwkNS6n7MZzbBMuPTx+izi5wlsIXymfXLV2vjBYk2ciDhjSYx+l4R5RxauEmZuT8/mxrJ4tXe2uuQcm9ds5U2zDzZl9lApl/Ii836YKpyyMlKpUAQ9TQURqUEkOJ1p46BiW1QsC8i2bW8GHrkHKCF8TykxxuU4yAdG1kGJzD1D3pWx61dOMsg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0fKNZrTiJK6sF+/nFTZPPWHEoDMF6oDjOr+9jaiBv3Q=;
- b=DHUmmlssreJ2sz+1iACEXOsyyNg/BpXeHcEGj23N3zVOBAgfvytySHs87cOtNXscR4UOa70Iczj5LRfVTEQc0GLKZdOcCy/dDDv9yOaxUhjnEa1UW26jMub1ePrKE0FSUUDqQyRTBBgkUhbqA4mKYCfd44Chl/ZJAUgzTvY5DLFRE+E56vVkP64pFMm5tZth1nGpKw/Du0u/jxPecYp93RvrTJj7DOsa6xOHFlan5HvKoFu3PZ+bbWh3zeZd8xMz/q6GSF62p5vpjMt9LfEiOt38OjpdxBW2//j3nTaOynlE1Iy1HXRToBDZKSoO3wrThrrJeWITWcrH/gWULc4Bkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0fKNZrTiJK6sF+/nFTZPPWHEoDMF6oDjOr+9jaiBv3Q=;
- b=SMyrcFQSGY2Uo+bk4vHp2B7SRmgADTnNN6Dwhh9lqk9dTygmzhgyhu0iE4vr4hkngRbgpEL0G9fhJO4LiQrxPv/H6mEyp7czsIfsL1nRx6Dp5TxAJ0MXPSKc144Kx15XE2vi3DM88hAxVEPuSBRBFy+DFROID3L46GtF80CY5DJDJjWYdOwVKlXgaxKCMcC3Zv+34ysjsRnwnctb2lP8kIoHF7on0ijO5Zth5PeRIXW/EM9MnkbQ5fLZAn7WH82a/4p3zvw/hpWAuxTich8MVssTUXb/Iuu5RXjdp9hfwcXa8PhExH0g58nEGFULOEIJpQm2YLVTK1s/xGn37THMYg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BL3PR12MB6641.namprd12.prod.outlook.com (2603:10b6:208:38d::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Fri, 9 Dec
- 2022 15:21:12 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5880.014; Fri, 9 Dec 2022
- 15:21:12 +0000
-Date:   Fri, 9 Dec 2022 11:21:09 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>,
-        Bharat Bhushan <bharat.bhushan@nxp.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
-        Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH iommufd 0/9] Remove IOMMU_CAP_INTR_REMAP
-Message-ID: <Y5NSZZzaMAgV5HSe@nvidia.com>
-References: <0-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
- <BN9PR11MB5276B4F1DE4D31CAF8ADAC408C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y5NIZTKqtlzVeNMJ@nvidia.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5NIZTKqtlzVeNMJ@nvidia.com>
-X-ClientProxiedBy: MN2PR13CA0015.namprd13.prod.outlook.com
- (2603:10b6:208:160::28) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229568AbiLIPlY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 10:41:24 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 270AA12AA3
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 07:41:24 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B9DSfS8015203;
+        Fri, 9 Dec 2022 15:41:21 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xqLRr+WVbJ3Rbas5KHEPr5xYgWA2H+4rD4uiJtvWVuQ=;
+ b=Pm5wQfImLuEbNlcHCX1zNK9fwx0si6fmoAH6boKpE1AOgI0mHRkzKyO0m7vvz2h6mu8D
+ OavyPKJCY0EQfVY7EgEH1B7bQBYDZkufmre3MfWpvf7HaZCMQWU/mLMQBLypYcA/7fPe
+ OpGuzpK6UJSb4TI0Hc/Erh0eJHXizGSjLhcb++3rysLDort9ncRU4zgGdVO5soiuvcQC
+ NoDQ6h7AtdmmVW5LP+9rMlmdpfwa/F0vMxHRaLSrOYLqymmjY6HbtEKsuzDicTb/5j/P
+ aNKl8JjuOgPD/PdNtuEdec3XMTbH95ZItapGbY9MfaFgDlsV7r9A1IRnUVT9PHZz5lBx hw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mc10qtkjg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Dec 2022 15:41:21 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B9FGVK6024983;
+        Fri, 9 Dec 2022 15:41:20 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mc10qtkhg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Dec 2022 15:41:20 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2B98uh1o002516;
+        Fri, 9 Dec 2022 15:41:18 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3m9mb24jeb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Dec 2022 15:41:17 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B9FfEjs30933276
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 9 Dec 2022 15:41:14 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 22D7A2004D;
+        Fri,  9 Dec 2022 15:41:14 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 93B1020043;
+        Fri,  9 Dec 2022 15:41:13 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.67.167])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
+        Fri,  9 Dec 2022 15:41:13 +0000 (GMT)
+Date:   Fri, 9 Dec 2022 16:41:11 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
+        pbonzini@redhat.com, andrew.jones@linux.dev, lvivier@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v2 1/4] lib: add function to request
+ migration
+Message-ID: <20221209164111.4a3f8da2@p-imbrenda>
+In-Reply-To: <20221209134809.34532-2-nrb@linux.ibm.com>
+References: <20221209134809.34532-1-nrb@linux.ibm.com>
+        <20221209134809.34532-2-nrb@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL3PR12MB6641:EE_
-X-MS-Office365-Filtering-Correlation-Id: 45b01d83-3b51-4535-fd1f-08dad9f90075
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cu5Wy+H68UtxpkjbHRY5+zV1SJA+0VfFF9I97g9ccncbxvzdyZs3Yzzpy6nYWMKp5hcYuKBljGVSZaaqdyCCukc5Rrhnr3VW/WWuodeDtosuyAbZTmH1EoqV2HKBJw2T8Wk4k9Ah20iV2hMtNQWdVsK4GlyaWlOcFO+I64jfdDKmzwv5X7ucTyWJme/2gLov0t7lGXvfV9Ss0yaA/SFr7KXvM+VA+YyU6MB7QGVTEFvRwVETgdWULCPG3UAZ18Z8GYC5f0krsvGgZJAWzIq+0brm3fiZYbvRjHIenRiqWTtFGk9MuHcmNtLWryjmD9t5mOxmbnVpeu+rzRDhR2igFeS8Cs/CR5a+K7Zsmmr8P6lWGtELQ83Q5O1C6jB5uk5qSuJbiNuvAFnSb8R5RjkGofmjCxWQPatNRAnZDCjW0cm6fSpssh+toEkEy0iX4yo0+nWemiqy0uRmLOw/nyxZ40DO09zTgKOfgNo1TzXa/LD0F+j+/y/KC8aeb7PiU1j/1Ju82q4n81pmYydZhsLBA8lmoIe+Ml4Re8dVHsYHpSg1nmjW7/Rzk5TBBZwro9XvM78h4ktcOVDJCFWcpq/OCRopQdVJxOkPg0+iA6iky1Jg2+X0OnwMVn/nJ6PY2+zEQ9skH3fbMcs2vZ9ls1Gcgg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(366004)(376002)(136003)(39860400002)(451199015)(66556008)(316002)(6512007)(86362001)(478600001)(36756003)(26005)(38100700002)(83380400001)(7416002)(6666004)(41300700001)(8676002)(5660300002)(2906002)(8936002)(6486002)(54906003)(6916009)(66946007)(4326008)(66476007)(6506007)(2616005)(186003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?6EFE4qF/YEr3NnGcwjwsENdMZRtkr6bktNL8Ne8w6R5WoCtRvzTrOuZbUbM9?=
- =?us-ascii?Q?qvyWjt1bQ708vJQuNchYP/ZIfgpA49dcHISMT4usP4mgtEdl1tkosrN0WQy3?=
- =?us-ascii?Q?gGdwSFpEmDtj/R+36eLaQ8KskEMS26tQaCj+ByXYgRoIhNm7rRl49kOQCBi0?=
- =?us-ascii?Q?C4fvFgpdsnVi3lpZtjjtPGgaxySVoP7KrO2+rXCle/yH2Nd3t0Z8CjQz1ij8?=
- =?us-ascii?Q?H3YR30vHi8JwSY2XUV/6Iwb8rARzTyLKLfiFcW6DNYXTcf1eft/63IjImmzK?=
- =?us-ascii?Q?AshgE8xemFBX8orbLu84EHnR8w9Wy1PD55TdmFhkoIjjN1ZlweEgD7hnDpc7?=
- =?us-ascii?Q?sjxQasd4nVo1VxhZdnrpOqvtJUIzo5MqU/RnmtdCg0BPMCg5cHZZoIk7PmRk?=
- =?us-ascii?Q?lQ4odYhG1bYCx534ASESH7wMaZfRVjW/RiQ2aQ8sVNSahhlqG900lLIajdX9?=
- =?us-ascii?Q?pq39G5tYKroqHXmNgfa0bAlqE4PR3+4HbzwNIFL1a9snstBLNbYdIQld6W1q?=
- =?us-ascii?Q?86wSEASht+TTRs0uVy2qfGphtSuwvrkVTIzmWC8OvrFV3SkLsDu1KsAzdi6I?=
- =?us-ascii?Q?UT80dHImwbGdqJEWUG5KJ86efcLfbUuJCHPh7ocdzdzkERNdxYy+m8SVnTNy?=
- =?us-ascii?Q?hC0fZFoXds9SQiem3vjbPc4ASMolN+9pk+OKUIMbloxf7i52Kvb3hsOeZXVM?=
- =?us-ascii?Q?+iOEG4LSowIFC7z31yskv2Jhj5hKHvdB+RSxEaCyRNfIrbtyZuNYpBae7jcV?=
- =?us-ascii?Q?JbVd7kIe7g1492IkXEF/PJQZ+b36CU/z0C8LDlZG+zbMzLPGJUVl8lPnMBDZ?=
- =?us-ascii?Q?6XmwRkJNrZDH9TdfYMnfVcUpZV4tZc7QPHsTChLnb3eBXt48gmweyvvOuNAd?=
- =?us-ascii?Q?O4CbN8bdFhggtlW/3RZnw5Lz+JUA2WQ75gBkNIF12WI7gi9anewtgT+laYDP?=
- =?us-ascii?Q?r2p9csUadm9wiKtYIGfn+c7nle6BpmWbGDTYU3VaxMeLkPynAA07k8VhRkOY?=
- =?us-ascii?Q?oNIX+V13reQfdGro6ny/VtGP5NwXlAKC6QU5b941BWPA+mir88aFJAIZDGlG?=
- =?us-ascii?Q?5a3q0hEp6zdZ2qX0+MjMTs47M/+qfJ1hm/BPzrrYGpqUS5yqeFXfiTBmJrgY?=
- =?us-ascii?Q?/6SXIVBmtK3zOKCkDeXbD+bl/n1Q4V8UjgRC8A3loD00vbj6+NEvmvGUyIdp?=
- =?us-ascii?Q?gqblzAEADWFvRNVKP84gK1utRJG75pj8V5cNhI4xjfUSWlM5PmUEg1sTx/Ai?=
- =?us-ascii?Q?iDZxJ7PgY1khhSRB/NO7yt69zu9CJKryKGc/tZ0x8ZY6yZ5Eoz0G1/2dIbBp?=
- =?us-ascii?Q?wujhAzlLzjCAJyzyznHsa3tthvzGENdBvJeRZElnMC9yeDawBXQZY2gJdSc5?=
- =?us-ascii?Q?BZd9dy1QSYlYsdMHofgNfq2ymL1Q+RtT/xBWrAu5UA30p8u3kVscI88Bt9lH?=
- =?us-ascii?Q?Fdu7F2hxHLZHmfxhL4SkMIPrS90XcYIdOEbJ0H2TycOH1dn8NxT9urftIVyT?=
- =?us-ascii?Q?LPrru7SLU1AeC5BOCKdNFeUT8nm3/8AN3DiQvUWlTb66ZscZ38qAqjE7qn4N?=
- =?us-ascii?Q?KZU29tsZm/ewnROw5lE=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 45b01d83-3b51-4535-fd1f-08dad9f90075
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2022 15:21:12.0437
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1fg+J3qSTt0ng5WfvzlJFhAlRqsgBKP+SwSptt2Yj5WaivKzBsQlu2ilfa9Cj57C
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6641
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: e3Umo0Z7GZer6vR91GASok6Vv2kgjx4I
+X-Proofpoint-ORIG-GUID: jXHtM-yaM1B8-8m7Gpkc_NWYSc4NX4Sv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-09_09,2022-12-08_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ mlxlogscore=999 spamscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ impostorscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0
+ clxscore=1015 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212090125
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 09, 2022 at 10:38:29AM -0400, Jason Gunthorpe wrote:
-> On Fri, Dec 09, 2022 at 05:54:46AM +0000, Tian, Kevin wrote:
-> > > From: Jason Gunthorpe <jgg@nvidia.com>
-> > > Sent: Friday, December 9, 2022 4:26 AM
-> > > 
-> > > In real HW "secure MSI" is implemented in a few different ways:
-> > > 
-> > >  - x86 uses "interrupt remapping" which is a block that sits between
-> > >    the device and APIC, that can "remap" the MSI MemWr using per-RID
-> > >    tables. Part of the remapping is discarding, the per-RID tables
-> > >    will not contain vectors that have not been enabled for the device.
-> > > 
-> > 
-> > per-RID tables is true for AMD.
-> > 
-> > However for Intel VT-d it's per-IOMMU remapping table.
+On Fri,  9 Dec 2022 14:48:06 +0100
+Nico Boehr <nrb@linux.ibm.com> wrote:
+
+> Migration tests can ask migrate_cmd to migrate them to a new QEMU
+> process. Requesting migration and waiting for completion is hence a
+> common pattern which is repeated all over the code base. Add a function
+> which does all of that to avoid repeating the same pattern.
 > 
-> Sorry, what exactly does that mean?
+> Since migrate_cmd currently can only migrate exactly once, this function
+> is called migrate_once() and is a no-op when it has been called before.
+> This can simplify the control flow, especially when tests are skipped.
 > 
-> Doesn't the HW inspect the RID to determine what to do with the MSI?
+> Suggested-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 
-Okay, I get it:
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
- - x86 uses "interrupt remapping" which is a block that sits between
-   the device and APIC, that can "remap" the MSI MemWr. AMD uses per-RID
-   tables to implement isolation while Intel stores the authorized RID in
-   each IRTE entry. Part of the remapping is discarding, HW will not
-   forward MSIs that don't positively match the tables.
+> ---
+>  lib/migrate.h |  9 +++++++++
+>  lib/migrate.c | 34 ++++++++++++++++++++++++++++++++++
+>  2 files changed, 43 insertions(+)
+>  create mode 100644 lib/migrate.h
+>  create mode 100644 lib/migrate.c
+> 
+> diff --git a/lib/migrate.h b/lib/migrate.h
+> new file mode 100644
+> index 000000000000..3c94e6af761c
+> --- /dev/null
+> +++ b/lib/migrate.h
+> @@ -0,0 +1,9 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Migration-related functions
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author: Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +
+> +void migrate_once(void);
+> diff --git a/lib/migrate.c b/lib/migrate.c
+> new file mode 100644
+> index 000000000000..527e63ae189b
+> --- /dev/null
+> +++ b/lib/migrate.c
+> @@ -0,0 +1,34 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + * Migration-related functions
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author: Nico Boehr <nrb@linux.ibm.com>
+> + */
+> +#include <libcflat.h>
+> +#include "migrate.h"
+> +
+> +/* static for now since we only support migrating exactly once per test. */
+> +static void migrate(void)
+> +{
+> +	puts("Now migrate the VM, then press a key to continue...\n");
+> +	(void)getchar();
+> +	report_info("Migration complete");
+> +}
+> +
+> +/*
+> + * Initiate migration and wait for it to complete.
+> + * If this function is called more than once, it is a no-op.
+> + * Since migrate_cmd can only migrate exactly once this function can
+> + * simplify the control flow, especially when skipping tests.
+> + */
+> +void migrate_once(void)
+> +{
+> +	static bool migrated;
+> +
+> +	if (migrated)
+> +		return;
+> +
+> +	migrated = true;
+> +	migrate();
+> +}
 
-Jason
