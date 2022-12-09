@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFB976482EB
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 14:48:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C68676482EA
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 14:48:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbiLINs0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 08:48:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50272 "EHLO
+        id S229691AbiLINsY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 08:48:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229723AbiLINsX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 08:48:23 -0500
+        with ESMTP id S229655AbiLINsV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 08:48:21 -0500
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91B4A67212
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 05:48:22 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B9DjIj6023242;
-        Fri, 9 Dec 2022 13:48:17 GMT
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 569E8663DF
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 05:48:20 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2B9Bexu9016166;
+        Fri, 9 Dec 2022 13:48:18 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=SKMkjU2G3/rcidO63G+Hv9g8OcWNtuv7QqE3ZgpuyyI=;
- b=nVzxlHhv9sTa5vyStO1IVDubaSjvG9kDGSJoXlDHrVG5ROWKENb4cfCrBRLK7JNeYy+J
- 7zbVRqVwZDGWH+sBqQ6hxs/OtHASESudpIUQ4Y227l9FXAdQmfm2j0l9Uev93HnsHjXY
- Zg2GQUQbrxtb+ZwZR1M1vfhCzxC2cQKril0pQvhTtWDuYs3MR0hHbjkPfzGj0ZtlELxF
- 4aUJ9XA2XsY8oG3b8UmmKwGa92MMkhg9SyC/w+94OlGvt+07TEGuZKeF234t0T6l+p9+
- wrj65fuwLFYueqwzt8Unnl8X2+1j71XleYNjveokWoDaxcA8m0EznmbLhFRb1QpFDIll 6A== 
+ bh=zpXxV8LyELDBq08sgH7VA9srihlW4RPOY+uAr4pNY48=;
+ b=SawFzG1P0XmmupmRYFL+yiqZlLmW8/zgS8w/r/iAqK5xLklsYeImS26VsKjkmxkuoUKO
+ V3VQuT++wJAw/ZSpW2Nb7aKu+91S1Vl+fb+e3G6NWkixnIjfayv30esi1i8TWnhyQiFr
+ 7CGsSyPF63QGuO8n1F0Pq6H1VNR3LtYY2/vtrjGWcsotGM6VS9rJtD0AXMn3ShFRuYug
+ inxZB2LMM0LDdlaUx4outqNnI3/HbQygkmtizH8RsH20yv4WygsblwFbKJPOs6gSRUM6
+ GkAJOTxNzJcUAenyfynZmJZvz/V/9wVmjJ3QbDy55KCn4+7H8Va79C5Xu/LZAil4NXBA Dw== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mbxfdk119-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mbrj5suqq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 09 Dec 2022 13:48:17 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B9DE8ZD003992;
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2B9DdO3K031436;
         Fri, 9 Dec 2022 13:48:16 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mbxfdk10e-1
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mbrj5supw-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 09 Dec 2022 13:48:16 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2B99Ii7V022504;
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2B98uhtQ002516;
         Fri, 9 Dec 2022 13:48:14 GMT
 Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3m9kur4dv6-1
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3m9mb24fc6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Fri, 09 Dec 2022 13:48:14 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B9DmBd723462540
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2B9DmB1l21561912
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Fri, 9 Dec 2022 13:48:11 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E798D20040;
-        Fri,  9 Dec 2022 13:48:10 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 3713220049;
+        Fri,  9 Dec 2022 13:48:11 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A309120049;
+        by IMSVA (Postfix) with ESMTP id F1B552004B;
         Fri,  9 Dec 2022 13:48:10 +0000 (GMT)
 Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
         by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -61,24 +61,24 @@ From:   Nico Boehr <nrb@linux.ibm.com>
 To:     kvm@vger.kernel.org
 Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
         pbonzini@redhat.com, andrew.jones@linux.dev, lvivier@redhat.com
-Subject: [kvm-unit-tests PATCH v2 3/4] s390x: use migrate_once() in migration tests
-Date:   Fri,  9 Dec 2022 14:48:08 +0100
-Message-Id: <20221209134809.34532-4-nrb@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH v2 4/4] arm: use migrate_once() in migration tests
+Date:   Fri,  9 Dec 2022 14:48:09 +0100
+Message-Id: <20221209134809.34532-5-nrb@linux.ibm.com>
 X-Mailer: git-send-email 2.36.1
 In-Reply-To: <20221209134809.34532-1-nrb@linux.ibm.com>
 References: <20221209134809.34532-1-nrb@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ctqlczqAFdctfZA4fRV2rAnqecNs_DcZ
-X-Proofpoint-ORIG-GUID: 0MUgO_tdgK6tU6yxmWjyey0rpd4zgU2j
+X-Proofpoint-ORIG-GUID: AEqA5206yTASsoGRPULTWchDYanGZG6R
+X-Proofpoint-GUID: 3rvzfu_EwpWdgz3ixY19IusSiYx7THj1
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-09_07,2022-12-08_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- spamscore=0 lowpriorityscore=0 adultscore=0 bulkscore=0 malwarescore=0
- priorityscore=1501 clxscore=1015 impostorscore=0 suspectscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=999 clxscore=1015 priorityscore=1501
+ impostorscore=0 spamscore=0 suspectscore=0 bulkscore=0 phishscore=0
+ mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2210170000 definitions=main-2212090108
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
@@ -89,177 +89,212 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-migrate_once() can simplify the control flow in migration-skey and
-migration-cmm.
+Some tests already shipped with their own do_migrate() function, remove
+it and instead use the new migrate_once() function. The control flow in
+the gic tests can be simplified due to migrate_once().
 
 Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- s390x/Makefile         |  1 +
- s390x/migration-cmm.c  | 25 ++++++++-----------------
- s390x/migration-sck.c  |  4 ++--
- s390x/migration-skey.c | 15 +++++----------
- s390x/migration.c      |  7 ++-----
- 5 files changed, 18 insertions(+), 34 deletions(-)
+ arm/Makefile.common |  1 +
+ arm/debug.c         | 17 +++++-----------
+ arm/gic.c           | 49 +++++++++++++--------------------------------
+ 3 files changed, 20 insertions(+), 47 deletions(-)
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index bf1504f9d58c..52a9d821974e 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -85,6 +85,7 @@ cflatobjs += lib/alloc_page.o
+diff --git a/arm/Makefile.common b/arm/Makefile.common
+index 38385e0c558e..1bbec64f2342 100644
+--- a/arm/Makefile.common
++++ b/arm/Makefile.common
+@@ -38,6 +38,7 @@ cflatobjs += lib/alloc_page.o
  cflatobjs += lib/vmalloc.o
- cflatobjs += lib/alloc_phys.o
- cflatobjs += lib/getchar.o
+ cflatobjs += lib/alloc.o
+ cflatobjs += lib/devicetree.o
 +cflatobjs += lib/migrate.o
- cflatobjs += lib/s390x/io.o
- cflatobjs += lib/s390x/stack.o
- cflatobjs += lib/s390x/sclp.o
-diff --git a/s390x/migration-cmm.c b/s390x/migration-cmm.c
-index aa7910ca76bf..eef45f5f8fb7 100644
---- a/s390x/migration-cmm.c
-+++ b/s390x/migration-cmm.c
-@@ -9,6 +9,7 @@
-  */
- 
+ cflatobjs += lib/pci.o
+ cflatobjs += lib/pci-host-generic.o
+ cflatobjs += lib/pci-testdev.o
+diff --git a/arm/debug.c b/arm/debug.c
+index e9f805632db7..b3e9749c598f 100644
+--- a/arm/debug.c
++++ b/arm/debug.c
+@@ -1,4 +1,5 @@
  #include <libcflat.h>
 +#include <migrate.h>
- #include <asm/interrupt.h>
- #include <asm/page.h>
- #include <asm/cmm.h>
-@@ -39,8 +40,7 @@ static void test_migration(void)
- 		essa(ESSA_SET_POT_VOLATILE, (unsigned long)pagebuf[i + 3]);
- 	}
- 
--	puts("Please migrate me, then press return\n");
--	(void)getchar();
-+	migrate_once();
- 
- 	for (i = 0; i < NUM_PAGES; i++) {
- 		actual_state = essa(ESSA_GET_STATE, (unsigned long)pagebuf[i]);
-@@ -53,25 +53,16 @@ static void test_migration(void)
- 
- int main(void)
- {
--	bool has_essa = check_essa_available();
--
- 	report_prefix_push("migration-cmm");
--	if (!has_essa) {
--		report_skip("ESSA is not available");
--
--		/*
--		 * If we just exit and don't ask migrate_cmd to migrate us, it
--		 * will just hang forever. Hence, also ask for migration when we
--		 * skip this test alltogether.
--		 */
--		puts("Please migrate me, then press return\n");
--		(void)getchar();
- 
--		goto done;
-+	if (!check_essa_available()) {
-+		report_skip("ESSA is not available");
-+	} else {
-+		test_migration();
- 	}
- 
--	test_migration();
--done:
-+	migrate_once();
-+
- 	report_prefix_pop();
- 	return report_summary();
+ #include <errata.h>
+ #include <asm/setup.h>
+ #include <asm/processor.h>
+@@ -257,13 +258,6 @@ static void reset_debug_state(void)
+ 	isb();
  }
-diff --git a/s390x/migration-sck.c b/s390x/migration-sck.c
-index 2d9a195ab4c4..2a9c87071643 100644
---- a/s390x/migration-sck.c
-+++ b/s390x/migration-sck.c
-@@ -9,6 +9,7 @@
-  */
  
- #include <libcflat.h>
-+#include <migrate.h>
- #include <asm/time.h>
- 
- static void test_sck_migration(void)
-@@ -30,8 +31,7 @@ static void test_sck_migration(void)
- 	report(!cc, "clock running after set");
- 	report(now_after_set >= time_to_set, "TOD clock value is larger than what has been set");
- 
--	puts("Please migrate me, then press return\n");
+-static void do_migrate(void)
+-{
+-	puts("Now migrate the VM, then press a key to continue...\n");
 -	(void)getchar();
-+	migrate_once();
- 
- 	cc = stckf(&now_after_migration);
- 	report(!cc, "clock still set");
-diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-index b7bd82581abe..438a4be95702 100644
---- a/s390x/migration-skey.c
-+++ b/s390x/migration-skey.c
-@@ -9,6 +9,7 @@
-  */
- 
- #include <libcflat.h>
-+#include <migrate.h>
- #include <asm/facility.h>
- #include <asm/page.h>
- #include <asm/mem.h>
-@@ -35,8 +36,7 @@ static void test_migration(void)
- 		set_storage_key(pagebuf[i], key_to_set, 1);
- 	}
- 
--	puts("Please migrate me, then press return\n");
--	(void)getchar();
-+	migrate_once();
- 
- 	for (i = 0; i < NUM_PAGES; i++) {
- 		actual_key.val = get_storage_key(pagebuf[i]);
-@@ -64,20 +64,15 @@ static void test_migration(void)
- int main(void)
+-	report_info("Migration complete");
+-}
+-
+ static noinline void test_hw_bp(bool migrate)
  {
- 	report_prefix_push("migration-skey");
-+
- 	if (test_facility(169)) {
- 		report_skip("storage key removal facility is active");
--
--		/*
--		 * If we just exit and don't ask migrate_cmd to migrate us, it
--		 * will just hang forever. Hence, also ask for migration when we
--		 * skip this test altogether.
--		 */
--		puts("Please migrate me, then press return\n");
--		(void)getchar();
- 	} else {
- 		test_migration();
+ 	extern unsigned char hw_bp0;
+@@ -291,7 +285,7 @@ static noinline void test_hw_bp(bool migrate)
+ 	isb();
+ 
+ 	if (migrate) {
+-		do_migrate();
++		migrate_once();
+ 		report(num_bp == get_num_hw_bp(), "brps match after migrate");
  	}
  
-+	migrate_once();
-+
- 	report_prefix_pop();
- 	return report_summary();
- }
-diff --git a/s390x/migration.c b/s390x/migration.c
-index a45296374cd8..fe6ea8369edb 100644
---- a/s390x/migration.c
-+++ b/s390x/migration.c
-@@ -8,6 +8,7 @@
-  *  Nico Boehr <nrb@linux.ibm.com>
+@@ -335,7 +329,7 @@ static noinline void test_wp(bool migrate)
+ 	isb();
+ 
+ 	if (migrate) {
+-		do_migrate();
++		migrate_once();
+ 		report(num_wp == get_num_wp(), "wrps match after migrate");
+ 	}
+ 
+@@ -368,9 +362,8 @@ static noinline void test_ss(bool migrate)
+ 	write_sysreg(mdscr, mdscr_el1);
+ 	isb();
+ 
+-	if (migrate) {
+-		do_migrate();
+-	}
++	if (migrate)
++		migrate_once();
+ 
+ 	asm volatile("msr daifclr, #8");
+ 
+diff --git a/arm/gic.c b/arm/gic.c
+index 60457e29e73a..c950b0d1597c 100644
+--- a/arm/gic.c
++++ b/arm/gic.c
+@@ -12,6 +12,7 @@
+  * This work is licensed under the terms of the GNU LGPL, version 2.
   */
  #include <libcflat.h>
 +#include <migrate.h>
- #include <asm/arch_def.h>
- #include <asm/vector.h>
- #include <asm/barrier.h>
-@@ -178,11 +179,7 @@ int main(void)
- 		mb();
- 	flag_thread_complete = 0;
+ #include <errata.h>
+ #include <asm/setup.h>
+ #include <asm/processor.h>
+@@ -779,23 +780,15 @@ static void test_its_trigger(void)
+ static void test_its_migration(void)
+ {
+ 	struct its_device *dev2, *dev7;
+-	bool test_skipped = false;
+ 	cpumask_t mask;
  
--	/* ask migrate_cmd to migrate (it listens for 'migrate') */
--	puts("Please migrate me, then press return\n");
--
--	/* wait for migration to finish, we will read a newline */
+-	if (its_setup1()) {
+-		test_skipped = true;
+-		goto do_migrate;
+-	}
++	if (its_setup1())
++		return;
+ 
+ 	dev2 = its_get_device(2);
+ 	dev7 = its_get_device(7);
+ 
+-do_migrate:
+-	puts("Now migrate the VM, then press a key to continue...\n");
 -	(void)getchar();
+-	report_info("Migration complete");
+-	if (test_skipped)
+-		return;
 +	migrate_once();
  
- 	flag_migration_complete = 1;
+ 	stats_reset();
+ 	cpumask_clear(&mask);
+@@ -822,21 +815,17 @@ static void test_migrate_unmapped_collection(void)
+ {
+ 	struct its_collection *col = NULL;
+ 	struct its_device *dev2 = NULL, *dev7 = NULL;
+-	bool test_skipped = false;
+ 	cpumask_t mask;
+ 	int pe0 = 0;
+ 	u8 config;
  
+-	if (its_setup1()) {
+-		test_skipped = true;
+-		goto do_migrate;
+-	}
++	if (its_setup1())
++		return;
+ 
+ 	if (!errata(ERRATA_UNMAPPED_COLLECTIONS)) {
+ 		report_skip("Skipping test, as this test hangs without the fix. "
+ 			    "Set %s=y to enable.", ERRATA_UNMAPPED_COLLECTIONS);
+-		test_skipped = true;
+-		goto do_migrate;
++		return;
+ 	}
+ 
+ 	col = its_create_collection(pe0, pe0);
+@@ -847,12 +836,7 @@ static void test_migrate_unmapped_collection(void)
+ 	its_send_mapti(dev2, 8192, 0, col);
+ 	gicv3_lpi_set_config(8192, LPI_PROP_DEFAULT);
+ 
+-do_migrate:
+-	puts("Now migrate the VM, then press a key to continue...\n");
+-	(void)getchar();
+-	report_info("Migration complete");
+-	if (test_skipped)
+-		return;
++	migrate_once();
+ 
+ 	/* on the destination, map the collection */
+ 	its_send_mapc(col, true);
+@@ -887,15 +871,12 @@ static void test_its_pending_migration(void)
+ 	struct its_collection *collection[2];
+ 	int *expected = calloc(nr_cpus, sizeof(int));
+ 	int pe0 = nr_cpus - 1, pe1 = nr_cpus - 2;
+-	bool test_skipped = false;
+ 	u64 pendbaser;
+ 	void *ptr;
+ 	int i;
+ 
+-	if (its_prerequisites(4)) {
+-		test_skipped = true;
+-		goto do_migrate;
+-	}
++	if (its_prerequisites(4))
++		return;
+ 
+ 	dev = its_create_device(2 /* dev id */, 8 /* nb_ites */);
+ 	its_send_mapd(dev, true);
+@@ -942,12 +923,7 @@ static void test_its_pending_migration(void)
+ 	gicv3_lpi_rdist_enable(pe0);
+ 	gicv3_lpi_rdist_enable(pe1);
+ 
+-do_migrate:
+-	puts("Now migrate the VM, then press a key to continue...\n");
+-	(void)getchar();
+-	report_info("Migration complete");
+-	if (test_skipped)
+-		return;
++	migrate_once();
+ 
+ 	/* let's wait for the 256 LPIs to be handled */
+ 	mdelay(1000);
+@@ -994,14 +970,17 @@ int main(int argc, char **argv)
+ 	} else if (!strcmp(argv[1], "its-migration")) {
+ 		report_prefix_push(argv[1]);
+ 		test_its_migration();
++		migrate_once();
+ 		report_prefix_pop();
+ 	} else if (!strcmp(argv[1], "its-pending-migration")) {
+ 		report_prefix_push(argv[1]);
+ 		test_its_pending_migration();
++		migrate_once();
+ 		report_prefix_pop();
+ 	} else if (!strcmp(argv[1], "its-migrate-unmapped-collection")) {
+ 		report_prefix_push(argv[1]);
+ 		test_migrate_unmapped_collection();
++		migrate_once();
+ 		report_prefix_pop();
+ 	} else if (strcmp(argv[1], "its-introspection") == 0) {
+ 		report_prefix_push(argv[1]);
 -- 
 2.36.1
 
