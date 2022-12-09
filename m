@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BF54647E0E
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 07:54:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47B89647E10
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 07:54:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229952AbiLIGyB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 01:54:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39896 "EHLO
+        id S230017AbiLIGyV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 01:54:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbiLIGxz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 01:53:55 -0500
+        with ESMTP id S229834AbiLIGyC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 01:54:02 -0500
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1612FA42;
-        Thu,  8 Dec 2022 22:53:26 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5D6045A3E;
+        Thu,  8 Dec 2022 22:53:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670568806; x=1702104806;
+  t=1670568811; x=1702104811;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=hJUNPHDZg7gXRSiBMx9nWTsOS5wt7XzKj3iuBZto+M0=;
-  b=GTd45CsFn8SKCOJnn5J87LusSNM9v6cXI83jPLAg1CXx/xFFB1HudajY
-   XQRRuRQm7xRjFVzCPR72DLaRM83sHm8eJ5heRYVpUSSeJ8TyERqg9Ssbs
-   NIWRXudzAciojE7Nc1WmbrekUF3/DADsFVKZgf8bB1id03h2wv7RmFjWr
-   Z/JXfF5KFmD140oaP0Et/KVO1n9ckotCHjl3oEpPRul3FGM3IM/KV2fhS
-   41uhbYbLo8TAWBod7cr9SyahrWS1xssljBsHz1XuCCxFpFe78uoF/kEOu
-   uEiEmj7TreeAq0agRZQe4VOiZsgMeske/UjPf6MXUGS7ZJt4lXC/dWTCG
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="318551318"
+  bh=2JieH49o0RwYeN8IspHMe+dJXCb9JWOWGaNKYRxbRaQ=;
+  b=PCH1pfjXzuXN4VW/gPS1ptQpD/VlQsYpEsBQ8TQcAA6ZyPK7XCMXFYiZ
+   7JwmVsz6mSJEor/sOq+QJdP7iWV/si0rZ8AL3xe5tTKZrAK0uRDzB+qP3
+   flNldJJPNj2phAoBHhb+n/FNvI93X6x/FMm4oFGJNLAuEDsjw5+HjFRDD
+   hT1CM2AnOamypQW+ol7nDn825D1tvLKm+COmaEJc7cgyDeFlmYQw/yF0B
+   j8MewYvLv/krX6CcVRG0hzXqvEneu+IfJd6+iAtYMA4iXA7zX5bTtXD7+
+   QGzExgsv5WWcNNz6gES1PV2J2rf2L+HGNIvypdR8wDSy+8mZlw5scTvyN
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="318551339"
 X-IronPort-AV: E=Sophos;i="5.96,230,1665471600"; 
-   d="scan'208";a="318551318"
+   d="scan'208";a="318551339"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 22:53:26 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="679836851"
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 22:53:31 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10555"; a="679836910"
 X-IronPort-AV: E=Sophos;i="5.96,230,1665471600"; 
-   d="scan'208";a="679836851"
+   d="scan'208";a="679836910"
 Received: from omiramon-mobl1.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.212.28.82])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 22:53:21 -0800
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2022 22:53:26 -0800
 From:   Kai Huang <kai.huang@intel.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     linux-mm@kvack.org, dave.hansen@intel.com, peterz@infradead.org,
@@ -48,9 +48,9 @@ Cc:     linux-mm@kvack.org, dave.hansen@intel.com, peterz@infradead.org,
         chao.gao@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
         bagasdotme@gmail.com, sagis@google.com, imammedo@redhat.com,
         kai.huang@intel.com
-Subject: [PATCH v8 05/16] x86/virt/tdx: Implement functions to make SEAMCALL
-Date:   Fri,  9 Dec 2022 19:52:26 +1300
-Message-Id: <d74565e3f71b6e5e5183f3b736222ec42b6e0b81.1670566861.git.kai.huang@intel.com>
+Subject: [PATCH v8 06/16] x86/virt/tdx: Get information about TDX module and TDX-capable memory
+Date:   Fri,  9 Dec 2022 19:52:27 +1300
+Message-Id: <7c21a3de810397901bade0b1021912bbbf2d18bd.1670566861.git.kai.huang@intel.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <cover.1670566861.git.kai.huang@intel.com>
 References: <cover.1670566861.git.kai.huang@intel.com>
@@ -66,302 +66,312 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-TDX introduces a new CPU mode: Secure Arbitration Mode (SEAM).  This
-mode runs only the TDX module itself or other code to load the TDX
-module.
+Start to transit out the "multi-steps" of initializing the TDX module as
+listed in the skeleton infrastructure.  Do the first step to get the TDX
+module information and the TDX-capable memory regions.
 
-The host kernel communicates with SEAM software via a new SEAMCALL
-instruction.  This is conceptually similar to a guest->host hypercall,
-except it is made from the host to SEAM software instead.  The TDX
-module establishes a new SEAMCALL ABI which allows the host to
-initialize the module and to manage VMs.
+TDX provides increased levels of memory confidentiality and integrity.
+This requires special hardware support for features like memory
+encryption and storage of memory integrity checksums.  Not all memory
+satisfies these requirements.
 
-Add infrastructure to make SEAMCALLs.  The SEAMCALL ABI is very similar
-to the TDCALL ABI and leverages much TDCALL infrastructure.
+As a result, TDX introduced the concept of a "Convertible Memory Region"
+(CMR).  During boot, the firmware builds a list of all of the memory
+ranges which can provide the TDX security guarantees.
 
-SEAMCALL instruction causes #GP when TDX isn't BIOS enabled, and #UD
-when CPU is not in VMX operation.  The current TDX_MODULE_CALL macro
-doesn't handle any of them.  There's no way to check whether the CPU is
-in VMX operation or not.
+CMRs tell the kernel which memory is TDX compatible.  The kernel takes
+CMRs (plus a little more metadata) and constructs "TD Memory Regions"
+(TDMRs).  TDMRs let the kernel grant TDX protections to some or all of
+the CMR areas.
 
-Initializing the TDX module is done at runtime on demand, and it depends
-on the caller to ensure CPU is in VMX operation before making SEAMCALL.
-To avoid getting Oops when the caller mistakenly tries to initialize the
-TDX module when CPU is not in VMX operation, extend the TDX_MODULE_CALL
-macro to handle #UD (and opportunistically #GP since they share the same
-assembly).
+The TDX module information tells the kernel TDX module properties such
+as metadata entry size, the maximum number of TDMRs, and the maximum
+number of reserved areas per TDMR that the module allows, etc.
 
-Introduce two new TDX error codes for #UD and #GP respectively so the
-caller can distinguish.  Also, Opportunistically put the new TDX error
-codes and the existing TDX_SEAMCALL_VMFAILINVALID into INTEL_TDX_HOST
-Kconfig option as they are only used when it is on.
+The list of CMRs, along with the TDX module information, is available to
+the kernel by querying the TDX module.
 
-Any failure during the module initialization is not recoverable for now.
-Print out error message when SEAMCALL failed depending on the error code
-to help the user to understand what went wrong.
+For now, both the TDX module information and CMRs are only used during
+the module initialization, so declare them as local.  However, they are
+1024 bytes and 512 bytes respectively.  Putting them to the stack
+exceeds the default "stack frame size" that the kernel assumes as safe,
+and the compiler yields a warning about this.  Add a kernel build flag
+to extend the safe stack size to 4K for tdx.c to silence the warning --
+the initialization function is only called once so it's safe to have a
+4K stack.
 
+Note not all members in the 1024 bytes TDX module information are used
+(even by the KVM).
+
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Kai Huang <kai.huang@intel.com>
 ---
 
-v7 -> v8:
- - Improved changelog (Dave):
-   - Trim down some sentences (Dave).
-   - Removed __seamcall() and seamcall() function name and changed
-     accordingly (Dave).
-   - Improved the sentence explaining why to handle #GP (Dave).
- - Added code to print out error message in seamcall(), following
-   the idea that tdx_enable() to return universal error and print out
-   error message to make clear what's going wrong (Dave).  Also mention
-   this in changelog.
+v7 -> v8: (Dave)
+ - Improved changelog to tell this is the first patch to transit out the
+   "multi-steps" init_tdx_module().
+ - Removed all CMR check/trim code but to depend on later SEAMCALL.
+ - Variable 'vertical alignment' in print TDX module information.
+ - Added DECLARE_PADDED_STRUCT() for padded structure.
+ - Made tdx_sysinfo and tdx_cmr_array[] to be function local variable
+   (and rename them accordingly), and added -Wframe-larger-than=4096 flag
+   to silence the build warning.
 
 v6 -> v7:
- - No change.
+ - Simplified the check of CMRs due to the fact that TDX actually
+   verifies CMRs (that are passed by the BIOS) before enabling TDX.
+ - Changed the function name from check_cmrs() -> trim_empty_cmrs().
+ - Added CMR page aligned check so that later patch can just get the PFN
+   using ">> PAGE_SHIFT".
 
 v5 -> v6:
- - Added code to handle #UD and #GP (Dave).
- - Moved the seamcall() wrapper function to this patch, and used a
-   temporary __always_unused to avoid compile warning (Dave).
+ - Added to also print TDX module's attribute (Isaku).
+ - Removed all arguments in tdx_gete_sysinfo() to use static variables
+   of 'tdx_sysinfo' and 'tdx_cmr_array' directly as they are all used
+   directly in other functions in later patches.
+ - Added Isaku's Reviewed-by.
 
 - v3 -> v5 (no feedback on v4):
- - Explicitly tell TDX_SEAMCALL_VMFAILINVALID is returned if the
-   SEAMCALL itself fails.
- - Improve the changelog.
+ - Renamed sanitize_cmrs() to check_cmrs().
+ - Removed unnecessary sanity check against tdx_sysinfo and tdx_cmr_array
+   actual size returned by TDH.SYS.INFO.
+ - Changed -EFAULT to -EINVAL in couple places.
+ - Added comments around tdx_sysinfo and tdx_cmr_array saying they are
+   used by TDH.SYS.INFO ABI.
+ - Changed to pass 'tdx_sysinfo' and 'tdx_cmr_array' as function
+   arguments in tdx_get_sysinfo().
+ - Changed to only print BIOS-CMR when check_cmrs() fails.
 
 ---
- arch/x86/include/asm/tdx.h       |  9 ++++++
- arch/x86/virt/vmx/tdx/Makefile   |  2 +-
- arch/x86/virt/vmx/tdx/seamcall.S | 52 ++++++++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.c      | 49 ++++++++++++++++++++++++++++++
- arch/x86/virt/vmx/tdx/tdx.h      | 10 ++++++
- arch/x86/virt/vmx/tdx/tdxcall.S  | 19 ++++++++++--
- 6 files changed, 138 insertions(+), 3 deletions(-)
- create mode 100644 arch/x86/virt/vmx/tdx/seamcall.S
+ arch/x86/virt/vmx/tdx/Makefile |  1 +
+ arch/x86/virt/vmx/tdx/tdx.c    | 85 ++++++++++++++++++++++++++++++++--
+ arch/x86/virt/vmx/tdx/tdx.h    | 76 ++++++++++++++++++++++++++++++
+ 3 files changed, 157 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 4a3ee64c1ca7..5c5ecfddb15b 100644
---- a/arch/x86/include/asm/tdx.h
-+++ b/arch/x86/include/asm/tdx.h
-@@ -8,6 +8,10 @@
- #include <asm/ptrace.h>
- #include <asm/shared/tdx.h>
- 
-+#ifdef CONFIG_INTEL_TDX_HOST
-+
-+#include <asm/trapnr.h>
-+
- /*
-  * SW-defined error codes.
-  *
-@@ -18,6 +22,11 @@
- #define TDX_SW_ERROR			(TDX_ERROR | GENMASK_ULL(47, 40))
- #define TDX_SEAMCALL_VMFAILINVALID	(TDX_SW_ERROR | _UL(0xFFFF0000))
- 
-+#define TDX_SEAMCALL_GP			(TDX_SW_ERROR | X86_TRAP_GP)
-+#define TDX_SEAMCALL_UD			(TDX_SW_ERROR | X86_TRAP_UD)
-+
-+#endif
-+
- #ifndef __ASSEMBLY__
- 
- /* TDX supported page sizes from the TDX module ABI. */
 diff --git a/arch/x86/virt/vmx/tdx/Makefile b/arch/x86/virt/vmx/tdx/Makefile
-index 93ca8b73e1f1..38d534f2c113 100644
+index 38d534f2c113..f8a40d15fdfc 100644
 --- a/arch/x86/virt/vmx/tdx/Makefile
 +++ b/arch/x86/virt/vmx/tdx/Makefile
-@@ -1,2 +1,2 @@
+@@ -1,2 +1,3 @@
  # SPDX-License-Identifier: GPL-2.0-only
--obj-y += tdx.o
-+obj-y += tdx.o seamcall.o
-diff --git a/arch/x86/virt/vmx/tdx/seamcall.S b/arch/x86/virt/vmx/tdx/seamcall.S
-new file mode 100644
-index 000000000000..f81be6b9c133
---- /dev/null
-+++ b/arch/x86/virt/vmx/tdx/seamcall.S
-@@ -0,0 +1,52 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#include <linux/linkage.h>
-+#include <asm/frame.h>
-+
-+#include "tdxcall.S"
-+
-+/*
-+ * __seamcall() - Host-side interface functions to SEAM software module
-+ *		  (the P-SEAMLDR or the TDX module).
-+ *
-+ * Transform function call register arguments into the SEAMCALL register
-+ * ABI.  Return TDX_SEAMCALL_VMFAILINVALID if the SEAMCALL itself fails,
-+ * or the completion status of the SEAMCALL leaf function.  Additional
-+ * output operands are saved in @out (if it is provided by the caller).
-+ *
-+ *-------------------------------------------------------------------------
-+ * SEAMCALL ABI:
-+ *-------------------------------------------------------------------------
-+ * Input Registers:
-+ *
-+ * RAX                 - SEAMCALL Leaf number.
-+ * RCX,RDX,R8-R9       - SEAMCALL Leaf specific input registers.
-+ *
-+ * Output Registers:
-+ *
-+ * RAX                 - SEAMCALL completion status code.
-+ * RCX,RDX,R8-R11      - SEAMCALL Leaf specific output registers.
-+ *
-+ *-------------------------------------------------------------------------
-+ *
-+ * __seamcall() function ABI:
-+ *
-+ * @fn  (RDI)          - SEAMCALL Leaf number, moved to RAX
-+ * @rcx (RSI)          - Input parameter 1, moved to RCX
-+ * @rdx (RDX)          - Input parameter 2, moved to RDX
-+ * @r8  (RCX)          - Input parameter 3, moved to R8
-+ * @r9  (R8)           - Input parameter 4, moved to R9
-+ *
-+ * @out (R9)           - struct tdx_module_output pointer
-+ *			 stored temporarily in R12 (not
-+ *			 used by the P-SEAMLDR or the TDX
-+ *			 module). It can be NULL.
-+ *
-+ * Return (via RAX) the completion status of the SEAMCALL, or
-+ * TDX_SEAMCALL_VMFAILINVALID.
-+ */
-+SYM_FUNC_START(__seamcall)
-+	FRAME_BEGIN
-+	TDX_MODULE_CALL host=1
-+	FRAME_END
-+	RET
-+SYM_FUNC_END(__seamcall)
++CFLAGS_tdx.o += -Wframe-larger-than=4096
+ obj-y += tdx.o seamcall.o
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index ace9770e5e08..b7cedf0589db 100644
+index b7cedf0589db..6fe505c32599 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -101,6 +101,55 @@ bool platform_tdx_enabled(void)
- 	return !!nr_tdx_keyids;
+@@ -13,6 +13,7 @@
+ #include <linux/errno.h>
+ #include <linux/printk.h>
+ #include <linux/mutex.h>
++#include <asm/pgtable_types.h>
+ #include <asm/msr.h>
+ #include <asm/tdx.h>
+ #include "tdx.h"
+@@ -107,9 +108,8 @@ bool platform_tdx_enabled(void)
+  * leaf function return code and the additional output respectively if
+  * not NULL.
+  */
+-static int __always_unused seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+-				    u64 *seamcall_ret,
+-				    struct tdx_module_output *out)
++static int seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
++		    u64 *seamcall_ret, struct tdx_module_output *out)
+ {
+ 	u64 sret;
+ 
+@@ -150,12 +150,85 @@ static int __always_unused seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
+ 	}
  }
  
-+/*
-+ * Wrapper of __seamcall() to convert SEAMCALL leaf function error code
-+ * to kernel error code.  @seamcall_ret and @out contain the SEAMCALL
-+ * leaf function return code and the additional output respectively if
-+ * not NULL.
-+ */
-+static int __always_unused seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
-+				    u64 *seamcall_ret,
-+				    struct tdx_module_output *out)
++static inline bool is_cmr_empty(struct cmr_info *cmr)
 +{
-+	u64 sret;
++	return !cmr->size;
++}
 +
-+	sret = __seamcall(fn, rcx, rdx, r8, r9, out);
++static void print_cmrs(struct cmr_info *cmr_array, int nr_cmrs)
++{
++	int i;
 +
-+	/* Save SEAMCALL return code if the caller wants it */
-+	if (seamcall_ret)
-+		*seamcall_ret = sret;
++	for (i = 0; i < nr_cmrs; i++) {
++		struct cmr_info *cmr = &cmr_array[i];
 +
-+	/* SEAMCALL was successful */
-+	if (!sret)
-+		return 0;
-+
-+	switch (sret) {
-+	case TDX_SEAMCALL_GP:
 +		/*
-+		 * tdx_enable() has already checked that BIOS has
-+		 * enabled TDX at the very beginning before going
-+		 * forward.  It's likely a firmware bug if the
-+		 * SEAMCALL still caused #GP.
++		 * The array of CMRs reported via TDH.SYS.INFO can
++		 * contain tail empty CMRs.  Don't print them.
 +		 */
-+		pr_err_once("[firmware bug]: TDX is not enabled by BIOS.\n");
-+		return -ENODEV;
-+	case TDX_SEAMCALL_VMFAILINVALID:
-+		pr_err_once("TDX module is not loaded.\n");
-+		return -ENODEV;
-+	case TDX_SEAMCALL_UD:
-+		pr_err_once("CPU is not in VMX operation.\n");
-+		return -EINVAL;
-+	default:
-+		pr_err_once("SEAMCALL failed: leaf %llu, error 0x%llx.\n",
-+				fn, sret);
-+		if (out)
-+			pr_err_once("additional output: rcx 0x%llx, rdx 0x%llx, r8 0x%llx, r9 0x%llx, r10 0x%llx, r11 0x%llx.\n",
-+					out->rcx, out->rdx, out->r8,
-+					out->r9, out->r10, out->r11);
-+		return -EIO;
++		if (is_cmr_empty(cmr))
++			break;
++
++		pr_info("CMR: [0x%llx, 0x%llx)\n", cmr->base,
++				cmr->base + cmr->size);
 +	}
++}
++
++/*
++ * Get the TDX module information (TDSYSINFO_STRUCT) and the array of
++ * CMRs, and save them to @sysinfo and @cmr_array, which come from the
++ * kernel stack.  @sysinfo must have been padded to have enough room
++ * to save the TDSYSINFO_STRUCT.
++ */
++static int tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
++			   struct cmr_info *cmr_array)
++{
++	struct tdx_module_output out;
++	u64 sysinfo_pa, cmr_array_pa;
++	int ret;
++
++	/*
++	 * Cannot use __pa() directly as @sysinfo and @cmr_array
++	 * come from the kernel stack.
++	 */
++	sysinfo_pa = slow_virt_to_phys(sysinfo);
++	cmr_array_pa = slow_virt_to_phys(cmr_array);
++	ret = seamcall(TDH_SYS_INFO, sysinfo_pa, TDSYSINFO_STRUCT_SIZE,
++			cmr_array_pa, MAX_CMRS, NULL, &out);
++	if (ret)
++		return ret;
++
++	pr_info("TDX module: atributes 0x%x, vendor_id 0x%x, major_version %u, minor_version %u, build_date %u, build_num %u",
++		sysinfo->attributes,	sysinfo->vendor_id,
++		sysinfo->major_version, sysinfo->minor_version,
++		sysinfo->build_date,	sysinfo->build_num);
++
++	/* R9 contains the actual entries written to the CMR array. */
++	print_cmrs(cmr_array, out.r9);
++
++	return 0;
 +}
 +
  static int init_tdx_module(void)
  {
++	/*
++	 * @tdsysinfo and @cmr_array are used in TDH.SYS.INFO SEAMCALL ABI.
++	 * They are 1024 bytes and 512 bytes respectively but it's fine to
++	 * keep them in the stack as this function is only called once.
++	 */
++	DECLARE_PADDED_STRUCT(tdsysinfo_struct, tdsysinfo,
++			TDSYSINFO_STRUCT_SIZE, TDSYSINFO_STRUCT_ALIGNMENT);
++	struct cmr_info cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMENT);
++	struct tdsysinfo_struct *sysinfo = &PADDED_STRUCT(tdsysinfo);
++	int ret;
++
++	ret = tdx_get_sysinfo(sysinfo, cmr_array);
++	if (ret)
++		goto out;
++
  	/*
+ 	 * TODO:
+ 	 *
+-	 *  - Get TDX module information and TDX-capable memory regions.
+ 	 *  - Build the list of TDX-usable memory regions.
+ 	 *  - Construct a list of TDMRs to cover all TDX-usable memory
+ 	 *    regions.
+@@ -166,7 +239,9 @@ static int init_tdx_module(void)
+ 	 *
+ 	 *  Return error before all steps are done.
+ 	 */
+-	return -EINVAL;
++	ret = -EINVAL;
++out:
++	return ret;
+ }
+ 
+ static int __tdx_enable(void)
 diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-index d00074abcb20..884357a4133c 100644
+index 884357a4133c..6d32f62e4182 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.h
 +++ b/arch/x86/virt/vmx/tdx/tdx.h
-@@ -2,6 +2,8 @@
- #ifndef _X86_VIRT_TDX_H
+@@ -3,6 +3,8 @@
  #define _X86_VIRT_TDX_H
  
-+#include <linux/types.h>
-+
+ #include <linux/types.h>
++#include <linux/stddef.h>
++#include <linux/compiler_attributes.h>
+ 
  /*
   * This file contains both macros and data structures defined by the TDX
-  * architecture and Linux defined software data structures and functions.
-@@ -12,4 +14,12 @@
+@@ -14,6 +16,80 @@
  /* MSR to report KeyID partitioning between MKTME and TDX */
  #define MSR_IA32_MKTME_KEYID_PARTITIONING	0x00000087
  
 +/*
-+ * Do not put any hardware-defined TDX structure representations below
-+ * this comment!
++ * TDX module SEAMCALL leaf functions
 + */
++#define TDH_SYS_INFO		32
 +
-+struct tdx_module_output;
-+u64 __seamcall(u64 fn, u64 rcx, u64 rdx, u64 r8, u64 r9,
-+	       struct tdx_module_output *out);
- #endif
-diff --git a/arch/x86/virt/vmx/tdx/tdxcall.S b/arch/x86/virt/vmx/tdx/tdxcall.S
-index 49a54356ae99..757b0c34be10 100644
---- a/arch/x86/virt/vmx/tdx/tdxcall.S
-+++ b/arch/x86/virt/vmx/tdx/tdxcall.S
-@@ -1,6 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <asm/asm-offsets.h>
- #include <asm/tdx.h>
-+#include <asm/asm.h>
- 
- /*
-  * TDCALL and SEAMCALL are supported in Binutils >= 2.36.
-@@ -45,6 +46,7 @@
- 	/* Leave input param 2 in RDX */
- 
- 	.if \host
-+1:
- 	seamcall
- 	/*
- 	 * SEAMCALL instruction is essentially a VMExit from VMX root
-@@ -57,10 +59,23 @@
- 	 * This value will never be used as actual SEAMCALL error code as
- 	 * it is from the Reserved status code class.
- 	 */
--	jnc .Lno_vmfailinvalid
-+	jnc .Lseamcall_out
- 	mov $TDX_SEAMCALL_VMFAILINVALID, %rax
--.Lno_vmfailinvalid:
-+	jmp .Lseamcall_out
-+2:
++struct cmr_info {
++	u64	base;
++	u64	size;
++} __packed;
++
++#define MAX_CMRS			32
++#define CMR_INFO_ARRAY_ALIGNMENT	512
++
++struct cpuid_config {
++	u32	leaf;
++	u32	sub_leaf;
++	u32	eax;
++	u32	ebx;
++	u32	ecx;
++	u32	edx;
++} __packed;
++
++#define DECLARE_PADDED_STRUCT(type, name, size, alignment)	\
++	struct type##_padded {					\
++		union {						\
++			struct type name;			\
++			u8 padding[size];			\
++		};						\
++	} name##_padded __aligned(alignment)
++
++#define PADDED_STRUCT(name)	(name##_padded.name)
++
++#define TDSYSINFO_STRUCT_SIZE		1024
++#define TDSYSINFO_STRUCT_ALIGNMENT	1024
++
++/*
++ * The size of this structure itself is flexible.  The actual structure
++ * passed to TDH.SYS.INFO must be padded to TDSYSINFO_STRUCT_SIZE and be
++ * aligned to TDSYSINFO_STRUCT_ALIGNMENT using DECLARE_PADDED_STRUCT().
++ */
++struct tdsysinfo_struct {
++	/* TDX-SEAM Module Info */
++	u32	attributes;
++	u32	vendor_id;
++	u32	build_date;
++	u16	build_num;
++	u16	minor_version;
++	u16	major_version;
++	u8	reserved0[14];
++	/* Memory Info */
++	u16	max_tdmrs;
++	u16	max_reserved_per_tdmr;
++	u16	pamt_entry_size;
++	u8	reserved1[10];
++	/* Control Struct Info */
++	u16	tdcs_base_size;
++	u8	reserved2[2];
++	u16	tdvps_base_size;
++	u8	tdvps_xfam_dependent_size;
++	u8	reserved3[9];
++	/* TD Capabilities */
++	u64	attributes_fixed0;
++	u64	attributes_fixed1;
++	u64	xfam_fixed0;
++	u64	xfam_fixed1;
++	u8	reserved4[32];
++	u32	num_cpuid_config;
 +	/*
-+	 * SEAMCALL caused #GP or #UD.  By reaching here %eax contains
-+	 * the trap number.  Convert the trap number to the TDX error
-+	 * code by setting TDX_SW_ERROR to the high 32-bits of %rax.
-+	 *
-+	 * Note cannot OR TDX_SW_ERROR directly to %rax as OR instruction
-+	 * only accepts 32-bit immediate at most.
++	 * The actual number of CPUID_CONFIG depends on above
++	 * 'num_cpuid_config'.
 +	 */
-+	mov $TDX_SW_ERROR, %r12
-+	orq %r12, %rax
- 
-+	_ASM_EXTABLE_FAULT(1b, 2b)
-+.Lseamcall_out:
- 	.else
- 	tdcall
- 	.endif
++	DECLARE_FLEX_ARRAY(struct cpuid_config, cpuid_configs);
++} __packed;
++
+ /*
+  * Do not put any hardware-defined TDX structure representations below
+  * this comment!
 -- 
 2.38.1
 
