@@ -2,189 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14E5A6487DA
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 18:38:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADE376487DD
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 18:41:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230033AbiLIRiG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 12:38:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53770 "EHLO
+        id S229749AbiLIRlS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 12:41:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229749AbiLIRiE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 12:38:04 -0500
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2049.outbound.protection.outlook.com [40.107.102.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 439C02FBDB;
-        Fri,  9 Dec 2022 09:38:03 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aKIqPBsjI/O9qXdqsTx9ibVGx8LozkR4youdLSUYwyrZsCjPIgWlSGryA/wIq+6Tlbzv/rQHYDYwgSvOB3kxYxstE0/nDm6QeoRNu5X54rl8eogN2ZkHoz6dEY/BKq/8HSP0PdUA+fAZ/58pdfnXgCUcsM7g674aSKSw/qTNHT3o+A0mJhwxhIhovO516eL/DPMDs/7VrL/kks407pp5SK9U4kgchyxdoeoEOS+bnS/0rHqduS+L4wSyAcugxdqEjgKww851PL5nLj4sWmOAROiHymO4spKUQdvwUqvCyOzcVrw0ZeFxRPfokUmVh/++L7eZt5YfwYr3XyA5w8VB8w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xl3TTXO9a/FFnp/xDKi2sEa6P20P49qu5v2asYDVDak=;
- b=CU061mx18Vbw4bMeZUIe+jDogZlaxnxt07R7kyd+LRTRCoCLkzv5eIVAuCF7hMPuOLGZv8kpbqIk4zYgF/wcxeLPobaGu6cxziERUqrB/FDJlNiiXshb+rcci4AVDVZ/jCK6KqH6CZKVgG2gzF2A3WRV5aTp0fpcEQn3wjkti1KbR7j+Wf87efijNlkDyiWCUsyPz/U+9Zr4RrSrFKkhzNdV/zOMHU6+h/6XByBHb+RrbZU27CdNIVbQ2FdTjq1VrLMoXsj4/qHUPPkE3ETa9I+iM6SWZQ7T8k2bvQXSLpQ+0m9nRnvupWUgASIPQEKenVjx1kf0zxWgRtDq33Wlcw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xl3TTXO9a/FFnp/xDKi2sEa6P20P49qu5v2asYDVDak=;
- b=JyHwEAK28Tl+FpKGruy1SVms3iukHLRd6c7y+ogeqEHa31emF6KuGkGsVpbfi7ApW0FLf1iXZ2ZDCm/oU5ywwjZypRn3jItYAfhTW2l1eNwUG9hxtS1tit/kAbwrVSija/lkFrnOXhKOHPrAEwCO+v5C4LZR+nwTwaaJICoXkYDWog0oBmle8bAqgTMTqybX2rAkPUEiPGI7QB+9h9bvymbz80BdVJcYA33DaA5wjXnODKSgqEMBbvE8Gr+Cl3uBf+nNHmT6qbY1ZYjk8+3dhHpfqrxXdDggBiuk/j93th3cUnPqibGqETCr5TZQ2Rt7uEEE+mijJSn81NR8/4TFeg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DM4PR12MB6352.namprd12.prod.outlook.com (2603:10b6:8:a0::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5857.23; Fri, 9 Dec
- 2022 17:38:01 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%7]) with mapi id 15.20.5880.014; Fri, 9 Dec 2022
- 17:38:01 +0000
-Date:   Fri, 9 Dec 2022 13:38:00 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>,
-        Bharat Bhushan <bharat.bhushan@nxp.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
-        Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH iommufd 4/9] iommufd: Convert to
- msi_device_has_secure_msi()
-Message-ID: <Y5NyeFyMhlDxHkCW@nvidia.com>
-References: <0-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
- <4-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
- <BN9PR11MB5276522F9FA4D4A486C5F60A8C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y5NKlf4btF9xUXXZ@nvidia.com>
- <5e7dbc83-a853-dc45-5016-c53f1be8aaf8@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5e7dbc83-a853-dc45-5016-c53f1be8aaf8@arm.com>
-X-ClientProxiedBy: BL1PR13CA0132.namprd13.prod.outlook.com
- (2603:10b6:208:2bb::17) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S229770AbiLIRlQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 12:41:16 -0500
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D3776143
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 09:41:15 -0800 (PST)
+Received: by mail-yb1-xb33.google.com with SMTP id d131so6371247ybh.4
+        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 09:41:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ae7igBpi6aOVu172YIUgxS7qKV+pzUf0AUP0I5I75q8=;
+        b=N+7B9/rCWK5Sp2/p4Ir8f6MIvbqCGaqwi8Po2oncdcAwLhGA2JbFygWWQUv6V6CPMa
+         5qEu3kJoWRw2vCClh6Nppk6pcE8Gs4F+bRtzVoiff0JJsexRmVNGr2a680WUghXF5FfZ
+         hJT8t5JkmvW4LhfLt9VxecKUoVAgOFMQFaEgzYrErkPW87ek/r4P8aluMVRPjzuoCpmc
+         s8hnbdPk8IjCsgDtQ2r43eSt/10ErW7paYLAy3fVr+Nls1PaCuUT+RlvNLCKRaMhvrdb
+         84/0ge7Jjg4S3PzFHcaNOXRMWYnTQH+nKv2Q4uZnvxishqyp8n2lzRaNXljaSz/ExQZQ
+         ySPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ae7igBpi6aOVu172YIUgxS7qKV+pzUf0AUP0I5I75q8=;
+        b=BmGUgH58PUQJIQR0LHCGP9aY7plPiRIQ6j28fFcZDaqcGuti9h0tucoH7B4XueEjj/
+         VDFtkpPNtcvU1d3zflDf+md4zefSxfF3dow2thIHGt4KTmQA7OSjpOeRvQOnDjm7XUg8
+         LQ43bT6KKIqvpzbhnOtaLx5M5OI9G6HCaPa6sqCf2wmX6KTg3UCXhOGse4AoDxn6vt6u
+         XXunoAqc4ItKcZTClNJPlF4GiaxGUvrv0WP48Apz5c3BLXu26Cte81/W+ynAJwY2e42r
+         LrM++jOnvL6S8R8BgzoOIFOrW9hET3Y67exJeudhKcDVfacHW9tsh7Q78RMlL7A/tEsa
+         Mwkg==
+X-Gm-Message-State: ANoB5pmCF4+E3YdnOnNUBpsWJLKVoX2izAwQflg8nPl97gPUZiFSULQg
+        6mkBbjeOgF6AntfXmpNzCj5aoU2qgrRAI1lzU79IuA==
+X-Google-Smtp-Source: AA0mqf5h6EJUa8o1mU6n0d18d5R9db+bCd1t++iK380my63/Q1gFej7B2AoWgEI4of2L90azWCjh0YyRl3fL7yBolSs=
+X-Received: by 2002:a25:742:0:b0:6fd:6aa4:82a5 with SMTP id
+ 63-20020a250742000000b006fd6aa482a5mr25244378ybh.305.1670607674506; Fri, 09
+ Dec 2022 09:41:14 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB6352:EE_
-X-MS-Office365-Filtering-Correlation-Id: c756c3f5-579e-41f0-2003-08dada0c1e3e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 12h7w9jU+I4NNqK4C+3RAhW/gk4j5fmNlvecsgMGby+dVQ5yDRiM+wc/wQ53VOYwTmNDzIyNiSEnhzw63AA/KE/zyZp5HCW7V/N6fUUXUpCFQwGSoweu74HcuU9OClKARujhGEnunCJWPoFFdRbNf2+z2hxeAOqoac1/q5FmdQLPEkMOcbTuT9/lCE5cwC3JnpKR8clCJkJ83yaNCIPBmsc/YE8PH7K7pBCE39D7Sg5f2jQk4igtaH97f35Sue2U7amv9NBTYyBLmDqFseDu3truahPLiNqJPWh3YOMnYCwIepJldxVgVp5nr6Hpu0DnBLnlyau4O34n0sOfZnQffVmr78ilnuyv4+n1qR0wY0JAsxMutdQLZuc6/w0S8C+mi+uTyFdYtUw3IiHPApib+xTaa83KMBpB0TJYH+6PR0psZIIIxLQQPua88asitKUZVeR05wNXJA3Ie0fuNz+JUWw/MNCVtXBewJ0tmpuc5iJt+/HAqlDu8NVgkgrBQ+N63u+0AkMRO/KtJxNXUZ0l69OtgAhgmU/ZV3myhtSoYq0O9V5T4MfRh6PoRiLX9njHEYkdJbGsJyV0sNTE8KxYnD0mL0AiGbt8dKPH2bZ5bdR9dN7RwJ2wsSTeEs5r/Vwm8cvtW56msF4QSiQJozNzFg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(346002)(396003)(366004)(376002)(39860400002)(451199015)(6506007)(26005)(316002)(36756003)(54906003)(6916009)(8936002)(6512007)(66556008)(7416002)(2906002)(66946007)(4326008)(83380400001)(5660300002)(86362001)(8676002)(66476007)(186003)(41300700001)(2616005)(38100700002)(6486002)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?p7xPIW5UB2BN3PWguo0epACkFfJcqUCnEJQH4Q7NIlTm8r3cyRFAj+qCJdAw?=
- =?us-ascii?Q?wJbMiLB5eaRU6NUpX/yPDYgCE8uR/q2gg9rffc+eoQmlASvcgU3U2Q/pCEYL?=
- =?us-ascii?Q?XVvozgCwIdDravaGxk4TdSognpju6LGsFnC75LPB9LKxhaOfMtQMbqh+HUZA?=
- =?us-ascii?Q?WLoqoaN39w8xvcaUhzcr1/hZwP6YHPasOXAOYCRW2fHOxJ8wSGn5XxuyE+bM?=
- =?us-ascii?Q?0zc+0QYh/YzRzIFFSZh8X3OZwHlFE16FniSj6bTGd9w1kJT2iQMOAm1iEaWz?=
- =?us-ascii?Q?eYRN8Xcb7qbaimXAlNykzFQf3mlvXhVhnengzw0GEfVLYoRE7FijohmbBumD?=
- =?us-ascii?Q?8v9pDnj+kuz9P4W2RMPYOqChADKiIbx7J/3eMKa9ctxAulBsWD82wwJDKhvc?=
- =?us-ascii?Q?zzEmyPK168y+xE8Bpvv7AgD1DYMbsAggMYdLTt8qsWkolocod+Pxw7yRqhiy?=
- =?us-ascii?Q?8Q4pSKIvb5PFFBaXBl8JJAv75wt/L6YIfGeAE+qAPVWHbqQ+yn9zFK1IA3/H?=
- =?us-ascii?Q?cHEpBwupj1MUO6MpxveZ9V9zwE4UbA2oORGPe1waHHBQwtxZGGzMWiHi0A8d?=
- =?us-ascii?Q?5FOaVVuxVMVO6e9MlQKfyLd8bIXitahx5E06xGNhmay4KdBy4oFKXKUy2Dnp?=
- =?us-ascii?Q?OpEfWDXn0B25QuqhCwBFsrdukRYxbgYsb0n8JfirFOK1DYvmOLpZGOYq9dU6?=
- =?us-ascii?Q?SsiMvOPHQ5nSDUpccck+FAf8jbPvmnP8hHpbN69sgEr+5CDOVHGuLpc/xwez?=
- =?us-ascii?Q?/8zkL2oaVOqvppps1JbOjttRUhOeyKy7VzrFRWV+wmg3qJk6LlknJt5TWrAZ?=
- =?us-ascii?Q?bHPKuzepHe32Gb8fIZ0xgbqYYw/ysxFmNZ/eEHcg7oFnevlveipj027GhSI1?=
- =?us-ascii?Q?ysWx45lIJN0Ql6l2lsqv5Km8PCJcFoynmihx/zqjtC2LpXNKBfTi4Uc/clKK?=
- =?us-ascii?Q?5vaE0GyUS2l0g4USh0yGgqXpoZvQMinPbiYIKqU79HB3AEzi/HSU7aNQDjaj?=
- =?us-ascii?Q?cHOjZ8/n18cBOjzgaL9DmrUfGPzwboOIrqvNkG6Rrc4IB8Xy8iWwa8xZQfZx?=
- =?us-ascii?Q?WuYKmU33w6930U56wczCH9IcpJjpbzCDF5DrORGPvapzkrGTDv0w3EN6m5OX?=
- =?us-ascii?Q?kfgTJ1vQzGZaCYAtQ4Bj5Co8FAWx8iZHMPVnzhWMz2vW6NACApQpwy3dqXQQ?=
- =?us-ascii?Q?C3B5PpsS6UklG4U+E2zDxQTFDli51BPQeUQs7mSrWyWZZjnwnV5sQtJIcbvU?=
- =?us-ascii?Q?S/uiXGGQcd7UWNErrweA1iSeY9msTdkyNwPwyvYuJ+Om6hZvj20MLkH+RX3E?=
- =?us-ascii?Q?lXniRdB4YvPHjCoM2CNtHmrdF+E2ICd+hfh/Tp2YKt1vACz7/WzuEO3SeJIO?=
- =?us-ascii?Q?S86KeqBCo4s1yijMKrfZfSObDbBZvCedANoUCX8i3HviMMwFFhEqliaapwuf?=
- =?us-ascii?Q?XiwkZ/wEAzmRgoAtBYOsADi1cJLeUD+Cg/4AajXCjl1FDo1vOfEXbfRl3vxN?=
- =?us-ascii?Q?KlGKSyRkpHPmk8k/fEQXAo6Aycnr9FiwOU/eAdFayFiyHmOboHU0CBiap4ZB?=
- =?us-ascii?Q?sQnT4t2r/kmwXROBHuQ=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c756c3f5-579e-41f0-2003-08dada0c1e3e
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Dec 2022 17:38:01.0230
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qYONvcVWnXkzHKVnQJLDLTum4o8g55i2U29VOVxgHIF3ZWrcSm7zPX1MpnSX0L22
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6352
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-2-dmatlack@google.com>
+ <22fe2332-497e-fe30-0155-e026b0eded97@intel.com> <Y5NvYmxpy6BPkmpW@google.com>
+In-Reply-To: <Y5NvYmxpy6BPkmpW@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 9 Dec 2022 09:40:48 -0800
+Message-ID: <CALzav=eju4LYyX=ufNneSww+5sraYJ8cfQSi4LTOHfHWmddX9A@mail.gmail.com>
+Subject: Re: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID
+ directly in kvm_mmu_page_role
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     "Yang, Weijiang" <weijiang.yang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        "Amit, Nadav" <namit@vmware.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
+        Colin Cross <ccross@google.com>,
+        Hugh Dickins <hughd@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 09, 2022 at 04:44:06PM +0000, Robin Murphy wrote:
+On Fri, Dec 9, 2022 at 9:25 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> On Fri, Dec 09, 2022 at 10:37:47AM +0800, Yang, Weijiang wrote:
+> >
+> > On 12/9/2022 3:38 AM, David Matlack wrote:
+> > > Rename kvm_mmu_page_role.smm with kvm_mmu_page_role.as_id and use it
+> > > directly as the address space ID throughout the KVM MMU code. This
+> > > eliminates a needless level of indirection, kvm_mmu_role_as_id(), and
+> > > prepares for making kvm_mmu_page_role architecture-neutral.
+> > >
+> > > Signed-off-by: David Matlack <dmatlack@google.com>
+> > > ---
+> > >   arch/x86/include/asm/kvm_host.h |  4 ++--
+> > >   arch/x86/kvm/mmu/mmu.c          |  6 +++---
+> > >   arch/x86/kvm/mmu/mmu_internal.h | 10 ----------
+> > >   arch/x86/kvm/mmu/tdp_iter.c     |  2 +-
+> > >   arch/x86/kvm/mmu/tdp_mmu.c      | 12 ++++++------
+> > >   5 files changed, 12 insertions(+), 22 deletions(-)
+> > >
+> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > > index aa4eb8cfcd7e..0a819d40131a 100644
+> > > --- a/arch/x86/include/asm/kvm_host.h
+> > > +++ b/arch/x86/include/asm/kvm_host.h
+> > > @@ -348,7 +348,7 @@ union kvm_mmu_page_role {
+> > >              * simple shift.  While there is room, give it a whole
+> > >              * byte so it is also faster to load it from memory.
+> > >              */
+> > > -           unsigned smm:8;
+> > > +           unsigned as_id:8;
+> > >     };
+> > >   };
+> > > @@ -2056,7 +2056,7 @@ enum {
+> > >   # define __KVM_VCPU_MULTIPLE_ADDRESS_SPACE
+> > >   # define KVM_ADDRESS_SPACE_NUM 2
+> > >   # define kvm_arch_vcpu_memslots_id(vcpu) ((vcpu)->arch.hflags & HF_SMM_MASK ? 1 : 0)
+> > > -# define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).smm)
+> > > +# define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, (role).as_id)
+> > >   #else
+> > >   # define kvm_memslots_for_spte_role(kvm, role) __kvm_memslots(kvm, 0)
+> > >   #endif
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 4d188f056933..f375b719f565 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -5056,7 +5056,7 @@ kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
+> > >     union kvm_cpu_role role = {0};
+> > >     role.base.access = ACC_ALL;
+> > > -   role.base.smm = is_smm(vcpu);
+> > > +   role.base.as_id = is_smm(vcpu);
+> >
+> > I'm not familiar with other architectures, is there similar conception as
+> > x86 smm mode?
 
-> Isn't the problem with this that it's super-early, and a device's MSI domain
-> may not actually be resolved until someone starts requesting MSIs for it?
-> Maybe Thomas' ongoing per-device stuff changes that, but I'm not
-> sure :/
+The notion of address spaces is already existing architecture-neutral
+concept in KVM (e.g. see uses of KVM_ADDRESS_SPACE_NUM in
+virt/kvm/kvm_main.c), although SMM is the only use-case I'm aware of.
+Architectures that do not use multiple address spaces will just leave
+as_id is as always 0.
 
-Yes, this looks correct, OK, so I will do Kevin's thought
+>
+> For KVM/arm64:
+>
+> No, we don't do anything like SMM emulation on x86. Architecturally
+> speaking, though, we do have a higher level of privilege typically
+> used by firmware on arm64, called EL3.
+>
+> I'll need to read David's series a bit more closely, but I'm inclined to
+> think that the page role is going to be rather arch-specific.
 
-Thanks!
-
-> Furthermore, even if the system does have a topology with multiple
-> heterogeneous MSI controllers reachable by devices behind the same
-> IOMMU,
-
-Sure, but this doesn't exist and my thinking was to put a big red flag
-here in case someone actually wants to try to do it - most likely it
-is a bug not a real thing
-
-I re-did things to use this new function, iommufd and vfio just
-trivially call it
-
-+/**
-+ * iommu_group_has_isolated_msi() - Compute msi_device_has_isolated_msi()
-+ *       for a group
-+ * @group: Group to query
-+ *
-+ * IOMMU groups should not have differing values of
-+ * msi_device_has_isolated_msi() for devices in a group. However nothing
-+ * directly prevents this, so ensure mistakes don't result in isolation failures
-+ * by checking that all the devices are the same.
-+ */
-+bool iommu_group_has_isolated_msi(struct iommu_group *group)
-+{
-+	struct group_device *group_dev;
-+	bool ret = true;
-+
-+	mutex_lock(&group->mutex);
-+	list_for_each_entry(group_dev, &group->devices, list)
-+		ret &= msi_device_has_isolated_msi(group_dev->dev) ||
-+		       device_iommu_capable(group_dev->dev,
-+					    IOMMU_CAP_INTR_REMAP);
-+	mutex_unlock(&group->mutex);
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(iommu_group_has_isolated_msi);
+Yes most of the fields are in the arch-specific sub-role. The TDP MMU
+only needs to know about the as_id, level, and invalid bits. (See next
+patch.)
