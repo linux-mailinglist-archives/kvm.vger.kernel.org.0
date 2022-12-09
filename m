@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19BC5648968
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 21:14:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AEDDF648999
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 21:38:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229554AbiLIUOB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 15:14:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53812 "EHLO
+        id S229779AbiLIUim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 15:38:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229498AbiLIUN7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 15:13:59 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E82D06720B
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 12:13:58 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 203-20020a2502d4000000b006f94ab02400so6116486ybc.2
-        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 12:13:58 -0800 (PST)
+        with ESMTP id S229580AbiLIUik (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 15:38:40 -0500
+Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39136A4314
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 12:38:40 -0800 (PST)
+Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-144bd860fdbso1184719fac.0
+        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 12:38:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=fue5zdvQ0csJssU66zvXs+3fiFxVfKrEWArEoP7DVyM=;
-        b=Y6RK1888y3Ff3zHGr9vHqu+Zxm+K2qWrGjVNt3wlTQoql4f9QjYzkAEO2Me/rO18rJ
-         zydB/2g/sRgDwLQdZY9hXL9rmkn3x3jWb4S+OWGZ1brW3GxRbHa6JP0lW0Ei65ADEUTP
-         IegXtFDkkvUDiQa1EbTyCgQT2H7xtW8TJcyC6L74l+9l11McxLNcFZy5EQj4IXpY+Osb
-         PBHHEpel6WZXC0CgwSUOnSMiszCNBcTyXDUOyZ+tbHSasgfqDeuZTI01qMvVWkgtR6QG
-         k3g18HKA3PhU6i0Lyr5UcGZJKVOvUWmNiDUfbcwa7SB7h4ahI5s+ykDwez0Rpyiactix
-         urIg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pF3iFHXuAqyC453vtW8AYvAdGU6FL+taF+rjrB5LCwA=;
+        b=IdEF5BHXPCcxvnE9oRGbFY6KCdIwvzPIqaIyOp86NpM20cYShoAXq0wS9+u00v4T/H
+         fmF0oT5ICG8lhgZAF7qcBTPykboBDWO1gt3+eOvUSa8eq3v9RWCPdoU7U8WnRVZu5jwy
+         4XnJMrIJd4eDYLE7t8RItutnogkuK5bEIC0FB3OFv95lnMbbfsmb/tY4tEWYR8jhXDCD
+         OAaufnd/yJ5jmPWjf5jTc5cc7VNFY9GvB7YQoB+jNXSlMHF/ueQsf1YM1oLrzSPHwwfm
+         aIBPzGfdxsu76bhtRr3uG3dd0DQvYfICjjFbunJFU36GUgpI871Q1zNnPh4843si5bbQ
+         bU7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fue5zdvQ0csJssU66zvXs+3fiFxVfKrEWArEoP7DVyM=;
-        b=h71wk1lNf+Zv6vhQQVTwmXCWcCGZpscdx++3T8bNC9E2EUxEyrQjVhictWCn57ps+2
-         lIwChrnYnFcEEWJA//8fIAw7kCC4ZnBhOind40VoZDVGlsAtPUUYBst52GHiw5fLIjxw
-         D7HPAb2bpoduydnGO3LqPlLtpWo7irEyxsWREf0ctf6s6KMFzBAJejLQKXsY6YIZDgYL
-         M9hPz7zFLCmnpt6tFXvAjGoPAjWSLOKyfeXShgXYr6vAfoyOP3JxuX2igYS9uGEBhSZO
-         lDYsdFlj7aBgtK8TfhFHIX78MkpNDODFXxz0lYKpYVWev5im+/1WEtAFKpqCoHUHz5m7
-         TKjA==
-X-Gm-Message-State: ANoB5pkGX0rurMSByb+41XTc8qs+oXpnvDm4TJ3mRE/k5vPwkX80889w
-        jJ/GRqHQ+NmcKkd6xBPHi2xCdB0SbpTSXpq5V8hDH6Qf5Z68DFl3vQutV4BYQd234HPNhRqrS7a
-        n+hU7UZ6PWW4HMgV4hUGdWhtp92Cm4YaR4n87DoxXSngAYuRWN7F1gMCW1FU5JLdFK0JZ
-X-Google-Smtp-Source: AA0mqf77XUPPHw14u7lRnqiZOjUhx8QCLAQFIPoapozyk51d9rgPfhJEYkeXeJZ4cby/DFwzwVuvp2ypsms/PvwZ
-X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a25:ba8f:0:b0:6d0:828:9852 with SMTP id
- s15-20020a25ba8f000000b006d008289852mr66748827ybg.364.1670616838004; Fri, 09
- Dec 2022 12:13:58 -0800 (PST)
-Date:   Fri,  9 Dec 2022 20:13:27 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221209201326.2781950-1-aaronlewis@google.com>
-Subject: [PATCH] KVM: selftests: Fix a typo in the vcpu_msrs_set assert
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        Aaron Lewis <aaronlewis@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pF3iFHXuAqyC453vtW8AYvAdGU6FL+taF+rjrB5LCwA=;
+        b=aiZTbmnqpT0l7/VBWLSVAIDS4NdsKHlhBe3m0J28QqwjTd/vF3Ya9ePUUfcuCEl053
+         i1ay0DDgq7QbH1sGVFh8vMnsKmMrOpXg0s3LKnLoWPaRE3Mv1BJKRn42opMJYeP3babk
+         fMWSVZEezImOgWmdJf0a4bW3LBOnwh0B93Vqk8ov03BaCIzcA2dRbNVvqf66bTiM0vr7
+         Zv6fQIlgivJyI02vweWdlmcz05M/YuYfnp/ZKmDvazyS8R6ucYmtkkIRhU/pdLZlu0wB
+         szsxKtYAyY1ZXk2/4MFZMIEx9qnxcmzkk+kvuOigXi6dobj05ccZazJe8NW0RX8z4HJl
+         Wa8A==
+X-Gm-Message-State: ANoB5pmAqP1Y7s99cR2pMQFgQlXyvrzCdRlFjevLhj7WBDwGEq4Ebous
+        +qttGDQZEFeEB41CwbWG/wRAZ/Q/11B7zSZ6n8U+XA==
+X-Google-Smtp-Source: AA0mqf5sbMDdkvFzp48wWJol2tQ7zfOj3tTNmCdpJTuraUQY9KdYqZ7m4rfpUYzRhhZAheiku7GPdwDXr7Nns4CcYdc=
+X-Received: by 2002:a05:6870:9d0e:b0:144:8e4b:f75 with SMTP id
+ pp14-20020a0568709d0e00b001448e4b0f75mr354495oab.112.1670618319267; Fri, 09
+ Dec 2022 12:38:39 -0800 (PST)
+MIME-Version: 1.0
+References: <20221209201326.2781950-1-aaronlewis@google.com>
+In-Reply-To: <20221209201326.2781950-1-aaronlewis@google.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Fri, 9 Dec 2022 12:38:28 -0800
+Message-ID: <CALMp9eTsBPd-f2tCTtvjrX+Vgr1T_J2JY6Sm5r=ckMuNG2FpPA@mail.gmail.com>
+Subject: Re: [PATCH] KVM: selftests: Fix a typo in the vcpu_msrs_set assert
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,28 +66,11 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The assert incorrectly identifies the ioctl being called.  Switch it
-from KVM_GET_MSRS to KVM_SET_MSRS.
-
-Fixes: 6ebfef83f03f ("KVM: selftest: Add proper helpers for x86-specific save/restore ioctls")
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- tools/testing/selftests/kvm/include/x86_64/processor.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index b1a31de7108a..92c5c9eba1bb 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -716,7 +716,7 @@ static inline void vcpu_msrs_set(struct kvm_vcpu *vcpu, struct kvm_msrs *msrs)
- 	int r = __vcpu_ioctl(vcpu, KVM_SET_MSRS, msrs);
- 
- 	TEST_ASSERT(r == msrs->nmsrs,
--		    "KVM_GET_MSRS failed, r: %i (failed on MSR %x)",
-+		    "KVM_SET_MSRS failed, r: %i (failed on MSR %x)",
- 		    r, r < 0 || r >= msrs->nmsrs ? -1 : msrs->entries[r].index);
- }
- static inline void vcpu_debugregs_get(struct kvm_vcpu *vcpu,
--- 
-2.39.0.rc1.256.g54fd8350bd-goog
-
+On Fri, Dec 9, 2022 at 12:13 PM Aaron Lewis <aaronlewis@google.com> wrote:
+>
+> The assert incorrectly identifies the ioctl being called.  Switch it
+> from KVM_GET_MSRS to KVM_SET_MSRS.
+>
+> Fixes: 6ebfef83f03f ("KVM: selftest: Add proper helpers for x86-specific save/restore ioctls")
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
