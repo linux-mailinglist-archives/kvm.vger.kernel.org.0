@@ -2,172 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65AAB6487F1
-	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 18:47:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8BFE664880B
+	for <lists+kvm@lfdr.de>; Fri,  9 Dec 2022 18:57:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229784AbiLIRrc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 12:47:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56660 "EHLO
+        id S229631AbiLIR5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 9 Dec 2022 12:57:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiLIRr2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 12:47:28 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BBF1155CA9
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 09:47:27 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4B58223A;
-        Fri,  9 Dec 2022 09:47:34 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B16663F73D;
-        Fri,  9 Dec 2022 09:47:25 -0800 (PST)
-Date:   Fri, 9 Dec 2022 17:47:14 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, maz@kernel.org, eric.auger@redhat.com,
-        oliver.upton@linux.dev, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
- PMUv3p5 long counters
-Message-ID: <Y5N0os7zL/BaMBa3@monolith.localdoman>
-References: <20221202045527.3646838-1-ricarkol@google.com>
- <20221202045527.3646838-2-ricarkol@google.com>
+        with ESMTP id S229626AbiLIR5p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 9 Dec 2022 12:57:45 -0500
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4400303C6
+        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 09:57:42 -0800 (PST)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-3704852322fso61969817b3.8
+        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 09:57:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=bMZ9vaUyXosUBjlo9WUDdUBep5JMYYDWXkYuJRTyBRc=;
+        b=PNNz0qgco2CC6vK8iX8A8CdQ9XYG/eiYEJI0PFBFwEDrAJkafbZh+wNNez+eyMKsNW
+         dyYIVM2JUEXFIo3AsWaRZNjWiZwyFaVdNR0pQpuSKF0S76DLKWQFl1oZGEBDU5afM86c
+         4MHyLC00G+IV14UOCOsjUR6HTn+tapMh3yj6v/QPIYSR6ep3HNH6Adic+iJisjvPkwA/
+         hLPuSxDfDTXFbxYKTocYksmV9tgslNTPcnfgAPbkxh/jMNo9/8AxKFzwYVG9ZAJJI+XR
+         ZLWDlt7dnT+fbIaDz/1md454IG3J2J19ANvQ4CvzY4M0DlboF2jrnlXjyCT1tHR69aMt
+         lUDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bMZ9vaUyXosUBjlo9WUDdUBep5JMYYDWXkYuJRTyBRc=;
+        b=n5JEo8g1ucIwez1rBgVTz0Q2GjYlJF+hbq2PmHNwLHMU1ScCTbU7b8IcABr2Ni5bFk
+         jWkE++ym7hTjKRETBH/ZBVj20BTpU4HkU8QhQzT7+WuSkgV9nY/BaUJEjr4j/mHRZsIh
+         Cq1hw2dV3TgMztCzcw6W2xR+iFVb2MSfYlWtD4OuvuZY6r1+VAeT5nlbNsaL+bdbVbXX
+         PflF3rnKM/4waqJ8lGQp7iYw5i63LNWoMO9S7r6DCdxhYj4HIRqQ53kjtGAngUqIwy6W
+         40EzO/Ej1e2tNUjS69qzdAZBpUNBeud6Wc22mvDCaHBOYfUbSCgh/AaErkA60xdy1uVQ
+         q+Lw==
+X-Gm-Message-State: ANoB5pmow4hXCVsBYuchh2hDVxls+fiOEl9AFALW/1dzZMsVGK5xzqE+
+        5/pvFq3OobeqO0H26AuJFRphz3ijAqfEe91QQJCj6w==
+X-Google-Smtp-Source: AA0mqf7ZLFzH7tn8G3mgBGvDrhVn7KNrvvpffIzBOW371A0vYuDJaiDqvxR+ZPRcFAJZ2LX4aVuYJ3WS6sGEmfbkAcg=
+X-Received: by 2002:a81:148d:0:b0:36a:75b3:fdda with SMTP id
+ 135-20020a81148d000000b0036a75b3fddamr7388556ywu.168.1670608661842; Fri, 09
+ Dec 2022 09:57:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221202045527.3646838-2-ricarkol@google.com>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-24-dmatlack@google.com>
+ <Y5NxCYz9XV3hgGYX@google.com>
+In-Reply-To: <Y5NxCYz9XV3hgGYX@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 9 Dec 2022 09:57:15 -0800
+Message-ID: <CALzav=f-qDqJcvPEo1ZxxVizAE77crMFsbKUVif5B-mNgGEHyQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 23/37] KVM: MMU: Move VM-level TDP MMU state to struct kvm
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Nadav Amit <namit@vmware.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
+        Colin Cross <ccross@google.com>,
+        Hugh Dickins <hughd@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+On Fri, Dec 9, 2022 at 9:32 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> Hey David,
+>
+> On Thu, Dec 08, 2022 at 11:38:43AM -0800, David Matlack wrote:
+> > Move VM-level TDP MMU state to struct kvm so it can be accessed by
+> > common code in a future commit.
+> >
+> > No functional change intended.
+>
+> Could you instead introduce a structure to hold all of the MMU state and
+> stick that in struct kvm? If the goal is to eventually supersede all
+> uses of the arm64 pgtable library we are going to need the ability to
+> operate outside of a KVM VM context.
 
-On Fri, Dec 02, 2022 at 04:55:25AM +0000, Ricardo Koller wrote:
-> PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
-> for overflowing at 32 or 64-bits. The consequence is that tests that check
-> the counter values after overflowing should not assume that values will be
-> wrapped around 32-bits: they overflow into the other half of the 64-bit
-> counters on PMUv3p5.
-> 
-> Fix tests by correctly checking overflowing-counters against the expected
-> 64-bit value.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arm/pmu.c | 29 ++++++++++++++++++-----------
->  1 file changed, 18 insertions(+), 11 deletions(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index cd47b14..eeac984 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -54,10 +54,10 @@
->  #define EXT_COMMON_EVENTS_LOW	0x4000
->  #define EXT_COMMON_EVENTS_HIGH	0x403F
->  
-> -#define ALL_SET			0xFFFFFFFF
-> -#define ALL_CLEAR		0x0
-> -#define PRE_OVERFLOW		0xFFFFFFF0
-> -#define PRE_OVERFLOW2		0xFFFFFFDC
-> +#define ALL_SET			0x00000000FFFFFFFFULL
-> +#define ALL_CLEAR		0x0000000000000000ULL
-> +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
-> +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
->  
->  #define PMU_PPI			23
->  
-> @@ -538,6 +538,7 @@ static void test_mem_access(void)
->  static void test_sw_incr(void)
->  {
->  	uint32_t events[] = {SW_INCR, SW_INCR};
-> +	uint64_t cntr0;
->  	int i;
->  
->  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> @@ -572,9 +573,9 @@ static void test_sw_incr(void)
->  		write_sysreg(0x3, pmswinc_el0);
->  
->  	isb();
-> -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
-> -	report(read_regn_el0(pmevcntr, 1)  == 100,
-> -		"counter #0 after + 100 SW_INCR");
-> +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
-
-Hm... in the Arm ARM it says that counters are 64-bit if PMUv3p5 is
-implemented.  But it doesn't say anywhere that versions newer than p5 are
-required to implement PMUv3p5.
-
-For example, for PMUv3p7, it says that the feature is mandatory in Arm8.7
-implementations. My interpretation of that is that it is not forbidden for
-an implementer to cherry-pick this version on older versions of the
-architecture where PMUv3p5 is not implemented.
-
-Maybe the check should be pmu.version == ID_DFR0_PMU_V3_8_5, to match the
-counter definitions in the architecture?
-
-Also, I found the meaning of those numbers to be quite cryptic. Perhaps
-something like this would be more resilient to changes to the value of
-PRE_OVERFLOW and easier to understand:
-
-+       cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ?
-+               (uint32_t)PRE_OVERFLOW + 100 :
-+               (uint64_t)PRE_OVERFLOW + 100;
-
-I haven't tested the code, would that work?
-
-Thanks,
-Alex
-
-> +	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
-> +	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
->  	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
->  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
->  	report(read_sysreg(pmovsclr_el0) == 0x1,
-> @@ -584,6 +585,7 @@ static void test_sw_incr(void)
->  static void test_chained_counters(void)
->  {
->  	uint32_t events[] = {CPU_CYCLES, CHAIN};
-> +	uint64_t cntr1;
->  
->  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
->  		return;
-> @@ -618,13 +620,16 @@ static void test_chained_counters(void)
->  
->  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> -	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
-> +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
-> +	report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
-> +
->  	report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
->  }
->  
->  static void test_chained_sw_incr(void)
->  {
->  	uint32_t events[] = {SW_INCR, CHAIN};
-> +	uint64_t cntr0, cntr1;
->  	int i;
->  
->  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> @@ -665,10 +670,12 @@ static void test_chained_sw_incr(void)
->  		write_sysreg(0x1, pmswinc_el0);
->  
->  	isb();
-> +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
-> +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
->  	report((read_sysreg(pmovsclr_el0) == 0x3) &&
-> -		(read_regn_el0(pmevcntr, 1) == 0) &&
-> -		(read_regn_el0(pmevcntr, 0) == 84),
-> -		"expected overflows and values after 100 SW_INCR/CHAIN");
-> +	       (read_regn_el0(pmevcntr, 1) == cntr0) &&
-> +	       (read_regn_el0(pmevcntr, 0) == cntr1),
-> +	       "expected overflows and values after 100 SW_INCR/CHAIN");
->  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
->  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
->  }
-> -- 
-> 2.39.0.rc0.267.gcb52ba06e7-goog
-> 
+This patch does introduce a tdp_mmu struct to hold all of the TDP MMU
+state. Did you have something else in mind?
