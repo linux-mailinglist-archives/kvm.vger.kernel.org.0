@@ -2,111 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 13D0A648C6E
-	for <lists+kvm@lfdr.de>; Sat, 10 Dec 2022 02:48:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 219E1648E51
+	for <lists+kvm@lfdr.de>; Sat, 10 Dec 2022 12:03:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229798AbiLJBsT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 9 Dec 2022 20:48:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33342 "EHLO
+        id S229538AbiLJLDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Dec 2022 06:03:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiLJBsR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 9 Dec 2022 20:48:17 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39E7E2E9C5
-        for <kvm@vger.kernel.org>; Fri,  9 Dec 2022 17:48:16 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so9967370pjj.2
-        for <kvm@vger.kernel.org>; Fri, 09 Dec 2022 17:48:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y+mZaxqrf16SOvU4T4amo68YYff+Aio6hmzF4Lq3mwk=;
-        b=cPB1PRjIjqGXgaKo8CMFxdM4garoBeOIt12F0NkqM6Z58Pxof81vbzQCY3Nnhpi4ib
-         CoRUuzTDKGWrQ/s1D5JZW+htpjp0EYoqufGG3ZiMU5e27xZA6tple3R6hJjKQf2KCcZu
-         nGTxHHmw6CvIegvFKsg4CNaWPFUGWm0ANDZiybEuiVWPCGQ6ek2Q//9HjGCNEk29nTT8
-         pzW33RxmGYtrQVnXPs6+dIsvba55W0v/toW8ypWrNPYIXJqjvCevsqBU006hysNRGCY3
-         YQDPdvRv0+WkRBMs+prg0IbLHV/brZR/48Zvpt8e9/NhTwmp3bC0lANCvmzHAjyH2mti
-         FKaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y+mZaxqrf16SOvU4T4amo68YYff+Aio6hmzF4Lq3mwk=;
-        b=FeaiQIICJUKmhhzZkX2ZGZ9+6p1G6CdsF92Vwo8DaV1Sn/nHLilefT+SO9cjmb+y/X
-         nr4EhZAmQeI+ANafxz1qrvrgUFVY0yaxsCGAUSsLAclr1aswCPZGucXYGOKDIpp9GZAk
-         +y3cNW2NFFYjN3jzEDxIIe8qMBPIj8cY24CUB200dR+kN/f9M9GWB4NQ0n43rhsHK67O
-         WyFAKzsx7ZxtN5H/wWdMFA76KPZ36Netfq/dpenKdMfFVbXyYSApEsCiqydQSHL07bFD
-         lZffciT5SI2j9d3CNgqwPbdZSqc5XPMgSHM9x4otmYuoEZNeZrtoB1MdoiWX70NzVegG
-         b+Ew==
-X-Gm-Message-State: ANoB5pmutHzvGnmwkEZLR2aJpA7B5O8o33/3+D+PoqZRFRcCh7cHY2m3
-        z5EyvCYjJ3Ae/jbNepOakuhdUw==
-X-Google-Smtp-Source: AA0mqf4fMR39Ehk9JSfVhh0GjRlhI2XVjPC//spVAQ5AfeXItJD5XT7p+m66qSVhzJiA2L8HEoBuVA==
-X-Received: by 2002:a17:903:40cd:b0:189:858f:b5c0 with SMTP id t13-20020a17090340cd00b00189858fb5c0mr109490pld.0.1670636895607;
-        Fri, 09 Dec 2022 17:48:15 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id o14-20020a170902d4ce00b0018999a3dd7esm1925340plg.28.2022.12.09.17.48.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Dec 2022 17:48:15 -0800 (PST)
-Date:   Sat, 10 Dec 2022 01:48:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Patch v3 12/13] KVM: selftests: Make vCPU exit reason test
- assertion common.
-Message-ID: <Y5PlW+U2MblIObHT@google.com>
-References: <20221205191430.2455108-1-vipinsh@google.com>
- <20221205191430.2455108-13-vipinsh@google.com>
- <Y5OtpwM8ue8nZwG/@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5OtpwM8ue8nZwG/@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229529AbiLJLDl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Dec 2022 06:03:41 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD646165BB
+        for <kvm@vger.kernel.org>; Sat, 10 Dec 2022 03:03:39 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 93E9CB80ABF
+        for <kvm@vger.kernel.org>; Sat, 10 Dec 2022 11:03:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E593C433D2;
+        Sat, 10 Dec 2022 11:03:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670670217;
+        bh=Oc6bgUBpCXSzLCNc1FFwEecQeeVQ0ev/WIiBfYnZUmE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=d4YOgDkygnkwA+JkltLVbXRWGG7Y/ekq494XE1Hafajd2M5iiSwasVGLwuJTMPENK
+         0lMsBntsjFoDfVcg7gO6tvMTTfEU6jTjbajTzgHXq3/Q7lhGVAC6D0Z9uTvqaVvHJ8
+         +6+hae5B2UEZKEmPgYZq9802LC0rvg3kfmMaaOMl3PsyQpL8Q4NgMvDC6TzegVmuAp
+         gVdjucCD4CCZSfdFjPB4DtrAfxqcZ7gvo/p4pWsqnnecWbm/TcbBS8Ify17/Ot8efd
+         wvZW/Khq/DvRtlYdcHxTG8BQtaZg1y0GTzTXtgdcDwZj0M0VNEhuKR/A6OHqEzNSZT
+         5kGmHaVb/Zqmg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p3xdm-00BlH2-QC;
+        Sat, 10 Dec 2022 11:03:34 +0000
+Date:   Sat, 10 Dec 2022 11:01:53 +0000
+Message-ID: <87fsdnfroe.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for PMUv3p5 long counters
+In-Reply-To: <Y5N0os7zL/BaMBa3@monolith.localdoman>
+References: <20221202045527.3646838-1-ricarkol@google.com>      <20221202045527.3646838-2-ricarkol@google.com>  <Y5N0os7zL/BaMBa3@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev, eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 09, 2022, David Matlack wrote:
-> On Mon, Dec 05, 2022 at 11:14:29AM -0800, Vipin Sharma wrote:
-> > Make ASSERT_EXIT_REASON() macro and replace all exit reason test assert
-> > statements with it.
-> > 
-> > No functional changes intended.
-> > 
-> > Suggested-by: David Matlack <dmatlack@google.com>
-> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
+On Fri, 09 Dec 2022 17:47:14 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> Reviewed-by: David Matlack <dmatlack@google.com>
+> Hi,
 > 
+> On Fri, Dec 02, 2022 at 04:55:25AM +0000, Ricardo Koller wrote:
+> > PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
+> > for overflowing at 32 or 64-bits. The consequence is that tests that check
+> > the counter values after overflowing should not assume that values will be
+> > wrapped around 32-bits: they overflow into the other half of the 64-bit
+> > counters on PMUv3p5.
+> > 
+> > Fix tests by correctly checking overflowing-counters against the expected
+> > 64-bit value.
+> > 
+> > Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > > ---
-> >  .../testing/selftests/kvm/aarch64/psci_test.c |  4 +--
-> >  .../testing/selftests/kvm/include/test_util.h | 10 ++++++++
-> [...]
-> >  .../selftests/kvm/x86_64/xapic_ipi_test.c     |  6 +----
-> >  .../selftests/kvm/x86_64/xen_shinfo_test.c    |  7 +-----
-> >  .../selftests/kvm/x86_64/xen_vmcall_test.c    |  5 +---
-> >  44 files changed, 71 insertions(+), 293 deletions(-)
+> >  arm/pmu.c | 29 ++++++++++++++++++-----------
+> >  1 file changed, 18 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arm/pmu.c b/arm/pmu.c
+> > index cd47b14..eeac984 100644
+> > --- a/arm/pmu.c
+> > +++ b/arm/pmu.c
+> > @@ -54,10 +54,10 @@
+> >  #define EXT_COMMON_EVENTS_LOW	0x4000
+> >  #define EXT_COMMON_EVENTS_HIGH	0x403F
+> >  
+> > -#define ALL_SET			0xFFFFFFFF
+> > -#define ALL_CLEAR		0x0
+> > -#define PRE_OVERFLOW		0xFFFFFFF0
+> > -#define PRE_OVERFLOW2		0xFFFFFFDC
+> > +#define ALL_SET			0x00000000FFFFFFFFULL
+> > +#define ALL_CLEAR		0x0000000000000000ULL
+> > +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
+> > +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
+> >  
+> >  #define PMU_PPI			23
+> >  
+> > @@ -538,6 +538,7 @@ static void test_mem_access(void)
+> >  static void test_sw_incr(void)
+> >  {
+> >  	uint32_t events[] = {SW_INCR, SW_INCR};
+> > +	uint64_t cntr0;
+> >  	int i;
+> >  
+> >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > @@ -572,9 +573,9 @@ static void test_sw_incr(void)
+> >  		write_sysreg(0x3, pmswinc_el0);
+> >  
+> >  	isb();
+> > -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
+> > -	report(read_regn_el0(pmevcntr, 1)  == 100,
+> > -		"counter #0 after + 100 SW_INCR");
+> > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
 > 
-> Nice diff stat :)
+> Hm... in the Arm ARM it says that counters are 64-bit if PMUv3p5 is
+> implemented.  But it doesn't say anywhere that versions newer than p5 are
+> required to implement PMUv3p5.
 
-I like the diffstat too, but I think we need a slightly different name for the
-macro.  "EXIT_REASON" can be interpreted as "hardware exit reason" or "KVM exit
-(to userspace) reason".  Most usage will be fairly obvious, but I'd like to avoid
-confusion when swapping between selftests and KVM-unit-tests (which often asserts
-on the hardware exit reason).   The name will be a bit longer, but I don't think
-line length with ever be a problem.  And most people will just copy+paste so finger
-fatigue likeliy won't be an issue either.
+And I don't think it needs to say it, because there is otherwise no
+way for SW to discover whether 64bit counters are implemented or not.
 
-I also vote to prefix it with TEST, i.e. TEST_ASSERT_KVM_EXIT_REASON(), for
-consistency and to make it very clear it's a TEST_ASSERT() wrapper.  ASSERT_EQ()
-makes me twitch every time I see it.  This is definitely a personal preference 
-(or problem) I can survive with though :-)
+> 
+> For example, for PMUv3p7, it says that the feature is mandatory in Arm8.7
+> implementations. My interpretation of that is that it is not forbidden for
+> an implementer to cherry-pick this version on older versions of the
+> architecture where PMUv3p5 is not implemented.
+
+I'm sorry to have to say that, but I find your suggestion that PMUv3p7
+could be implemented without supporting the full gamut of PMUv3p5
+ludicrous.
+
+Please look back at the ARM ARM, specially at the tiny section titled
+"Alternative ID scheme used for the Performance Monitors Extension
+version" (DDI0487I.a, D17.1.3, page 5553), and the snipped of C code
+that performs exactly this check:
+
+<quote>
+  if (value != 0xF and value >= number) {
+  	// do something that relies on version 'number' of the feature
+  }
+</quote>
+
+Replace 'value' with 7 (PMUv3p7), 'number' with 6 (PMUv3p5), and you
+get the exact property that you pretend doesn't exist, allowing you to
+rely on PMUv3p5 to be implemented when the HW has PMUv3p7.
+
+> Maybe the check should be pmu.version == ID_DFR0_PMU_V3_8_5, to match the
+> counter definitions in the architecture?
+
+No, that'd be totally wrong. You need to check your understanding of
+how the ID registers work.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
