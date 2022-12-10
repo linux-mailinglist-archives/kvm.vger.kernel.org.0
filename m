@@ -2,88 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1400E648FD9
-	for <lists+kvm@lfdr.de>; Sat, 10 Dec 2022 17:58:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C571C6490B8
+	for <lists+kvm@lfdr.de>; Sat, 10 Dec 2022 21:54:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229746AbiLJQ6B (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Dec 2022 11:58:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57116 "EHLO
+        id S229760AbiLJUyZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Dec 2022 15:54:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229627AbiLJQ57 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Dec 2022 11:57:59 -0500
-Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 629B56592
-        for <kvm@vger.kernel.org>; Sat, 10 Dec 2022 08:57:57 -0800 (PST)
-Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-3b5d9050e48so91558787b3.2
-        for <kvm@vger.kernel.org>; Sat, 10 Dec 2022 08:57:57 -0800 (PST)
+        with ESMTP id S229756AbiLJUyS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Dec 2022 15:54:18 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03041707A
+        for <kvm@vger.kernel.org>; Sat, 10 Dec 2022 12:54:17 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id d3so8286545plr.10
+        for <kvm@vger.kernel.org>; Sat, 10 Dec 2022 12:54:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=u0nAkLHKV0vpo/DjFQeWuCjnIFWvWxAPsVOMOIFtGSk=;
-        b=N/YuNhCKlrbachtomiLXy24YBN/H6neRhw4cwQXT8dL0WgGlwB3i8pc64bRVB0Pn3N
-         wQxW3Bc72d4+iszA8RReFGm+MiB5hdjdoIqJs9bE7h4aS39s/cc7IwHklW6sQSFRZh0r
-         Kpuxhyz8zPCAkFtPQjQrFhaHWTKMiA3jPKci0IN973Z9Wh5NIaDcCelz8vzp6v2z3VfG
-         lxe/qEWaM473REetwgWR7bGCFDtNfB/MIS9fe6ACb1Z5C8dd8VlWe88sxMBbTLYtxXkH
-         zHJX9Zt8tF53XSx2IeHf0uzXh1IAMV6+1J8uIW3XCHG0Ux1Us+mVUKiTMpVrG56ftrqG
-         AN4A==
+        d=gmail.com; s=20210112;
+        h=to:reply-to:subject:mime-version:from:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ydTSF8dk1e0BckRx2wdzhp8HjupjiQZx7JbBuGi2k8k=;
+        b=P45hxTrgFu1MIuSkxRGXywQRDwQuryGNu/zoyWuQKxnO3cWkcTwL/k+9HCGZnWp68S
+         r4wSJBuIMn7DPWyccJCbtMEV86KgnQ3obfMh8Yf2ewH5rlYWzCwKeh+PDlSbvlI241Sa
+         NgGjg3u1SRcC4lALaOx8PqrnGwJXsCqp9bMxuQIPn9pQY/y5DiWLHC/4BTA66I0DdAkn
+         WuqliaptjLzowTcs531FzkW+8gtRmc1MexDZdad4Zy3Nv3jlccuWmCmqCgupMT6s/XyG
+         F2NDD0/ZJHjKcSlpaBT2Cjm6MReVKUZ8p2vxi3w1aYJoXTjiItwmMrNc3WvJhag1YG8M
+         DOKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=u0nAkLHKV0vpo/DjFQeWuCjnIFWvWxAPsVOMOIFtGSk=;
-        b=sit8ePCQoLODfWTAADpCilfGsYe2o9QjYQ/wXyN3Ztm0lq6hJBiLOZe38o/zhjODFx
-         q7HBWMYMTSued8DMMYKMUgHLAjBnu7D9c1mg80e6GoG9wYb3QkXLdPLXhEx4Swib8UKT
-         c1pgnt66RpH+Nh/rprPqOEVFthiTu52Sry78bkac9KVVwZJdWpIOftlzTA+m4F6tiwRD
-         0kpA8GKBkvOkQSkvm97FbmlxwU7+4WlKyBf4qYTuQ50joufUNHvrPnNuX/AesY56lTWG
-         67Y+MhkGMORQCRZw1ctKr/eF3VIBcMVSSKgUZLPnu7BpjPMp3t5IRjCGo1chHT2lF2Bn
-         KjVw==
-X-Gm-Message-State: ANoB5pkT7cu1md3Mc3WTE5qDZXG3pzI/MrZuJXXT0DY/irX8MnAznJ+E
-        TMJLUgrlJbMoKVPGndqnwkDkMvyUGspHClM7crzP6g==
-X-Google-Smtp-Source: AA0mqf4tOd40aLLxRbmUXdMSoQbY/EaeotDpeaV8ESmuINdzRMBUeoJFodD0+L2vQuaHQGEsLB1BUNoHV92FUt3m6rQ=
-X-Received: by 2002:a0d:f101:0:b0:3ef:23fb:124b with SMTP id
- a1-20020a0df101000000b003ef23fb124bmr16630287ywf.111.1670691476514; Sat, 10
- Dec 2022 08:57:56 -0800 (PST)
+        h=to:reply-to:subject:mime-version:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ydTSF8dk1e0BckRx2wdzhp8HjupjiQZx7JbBuGi2k8k=;
+        b=kCzNsl2aMnbrRQPWImBzNjZu8zi4xZgPKjAB4wqhf3nD/Lrp/PtTR+qW/+QB7oL6aR
+         i4g2a6tGdRwAtfrut/yiAT7hmEnfJYk7RLt0MeaOqGLNRQ6cdAEfVsOAdVEMVONmMRjB
+         mkX1AeRjAIP5qm3gceKBHux1kujzEU2H0k/uN8aLmeEc1D03HFJab0mgL04jCMIhL47q
+         lRUrADNy8SysVBFMFhLSUGdPiDXqoceGfJlknKANWFT8zCfAOI/vZ3bHkI8QM6W9OSxk
+         DCIhZS9aLQjFOlcZA0FTBrKVqCCLPmV3ZNl/JyzaZK09SkjGytHzdXuTPl1j68WT4awm
+         uOog==
+X-Gm-Message-State: ANoB5pk7aQWpbg1p3L2UoTyoC9jRYRkboeSiqO91qtLTGZb1C9dYRZV6
+        Mydn9PXy/nBx36QOtZYvgo0dEXAJ7pEkCCl/
+X-Google-Smtp-Source: AA0mqf5RzDdlfW1uZSpa1K4hBLgySAgVDFWDWMlKl8Zv7FXNGhOYx9KwsFTraY1u7JLb4/DrWudPpg==
+X-Received: by 2002:a05:6a20:4c99:b0:aa:45c7:fc94 with SMTP id fq25-20020a056a204c9900b000aa45c7fc94mr12297511pzb.19.1670705657020;
+        Sat, 10 Dec 2022 12:54:17 -0800 (PST)
+Received: from [127.0.1.1] ([202.184.51.63])
+        by smtp.gmail.com with ESMTPSA id z9-20020a17090a7b8900b001fd6066284dsm2864132pjc.6.2022.12.10.12.54.16
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Dec 2022 12:54:16 -0800 (PST)
+Message-ID: <6394f1f8.170a0220.c72d1.5880@mx.google.com>
+Date:   Sat, 10 Dec 2022 12:54:16 -0800 (PST)
+From:   Maria Chevchenko <17jackson5ive@gmail.com>
+X-Google-Original-From: Maria Chevchenko <mariachevchenko417@outlook.com>
+Content-Type: multipart/alternative; boundary="===============0768710025615054933=="
 MIME-Version: 1.0
-References: <20221205191430.2455108-1-vipinsh@google.com> <20221205191430.2455108-14-vipinsh@google.com>
- <Y5OxMBSlzjv3w9YW@google.com> <Y5PjUwTU2KGo5xq3@google.com>
-In-Reply-To: <Y5PjUwTU2KGo5xq3@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Sat, 10 Dec 2022 08:57:30 -0800
-Message-ID: <CALzav=f0+Tc3=adUm5vwyw8g3872vDW28x7+c53aeu4c0-JCyg@mail.gmail.com>
-Subject: Re: [Patch v3 13/13] KVM: selftests: Test Hyper-V extended hypercall
- exit to userspace
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vipin Sharma <vipinsh@google.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Subject: Compliment Of The Day,
+Reply-To: Maria Chevchenko <mariachevchenko417@outlook.com>
+To:     kvm@vger.kernel.org
+X-Spam-Status: No, score=1.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
+        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 9, 2022 at 5:39 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Fri, Dec 09, 2022, David Matlack wrote:
-> > On Mon, Dec 05, 2022 at 11:14:30AM -0800, Vipin Sharma wrote:
-> > > Hyper-V extended hypercalls by default exit to userspace. Verify
-> > > userspace gets the call, update the result and then verify in guest
-> > > correct result is received.
-> > >
-> > > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> >
-> > Signed-off-by: David Matlack <dmatlack@google.com>
->
-> Reviewed-by: perhaps?
+--===============0768710025615054933==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Oops, yes.
-
-Reviewed-by: David Matlack <dmatlack@google.com>
+Please, i need your help; I have important business/project information that i wish to share with you. And, I want you to handle the investment. 
+  Please, reply back for more information about this.
+  Thank you.
+--===============0768710025615054933==--
