@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E5C6648FAE
-	for <lists+kvm@lfdr.de>; Sat, 10 Dec 2022 17:19:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A4F72648FB2
+	for <lists+kvm@lfdr.de>; Sat, 10 Dec 2022 17:19:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229849AbiLJQS4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 10 Dec 2022 11:18:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45386 "EHLO
+        id S229905AbiLJQTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 10 Dec 2022 11:19:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229847AbiLJQSx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 10 Dec 2022 11:18:53 -0500
+        with ESMTP id S229863AbiLJQS6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 10 Dec 2022 11:18:58 -0500
 Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8F431837A;
-        Sat, 10 Dec 2022 08:18:52 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54041903C;
+        Sat, 10 Dec 2022 08:18:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670689132; x=1702225132;
+  t=1670689135; x=1702225135;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+MOSPWIOY6Qewya/GY6hl3SXr1wDBdrmlGizJkgTazI=;
-  b=WErpQeHG6JA2aMAgm1Wmy9JFBz4BpIE1inom/bY6CUm75BP0q4mEsZfH
-   66YlsgCKSzw0LizUIT89S4CHmdCx87cng8c7Th9JJr1+H2C7ORcbcgaVY
-   6cGWS32m76lnjtQAJg2I/+Hs5zMX7diUTKaIrM4dXvtIpdXwTLCFP0BXx
-   cdibTRSmIzNgIJNtfNK6htB1WrvnPtULrrBEvgLOPMB/YN3R+mgPFWWyU
-   x2j19+E2r6LuVnOH6lgpEjEn/n4141MnzVZiv3hIHFOwGCzq2ROp81DLF
-   L9AAWtZFgqN3X3h3SYGH5GOPNb8Ix8HUVO8g8PneW3noBaIW7TDQUfu5q
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10557"; a="318780419"
+  bh=jJywodcOgHQB5TBBvwp4cOqodYErhHuV9OjQHIcmq+8=;
+  b=kD8bJerWlYZ84OWcjdj+cNsMLrho4toNcJf9C2/Tlw0qX6YpnLAllWSo
+   +v+QDkLr+4J7PXi3xd1x9jnpgvCxS9Kb9a3aZWaVD70NMRnpzVo8uzBCX
+   fT+wfVOVJZGqx9HTHZqAsSsWpVvgpczAbyRcakkp82K46fjoVlmXxNJ7S
+   dnWnBt43w9n+aOs890fSzZYpmpgB/m4w6jffotBglmFDO8nzww8o2rby3
+   nNgbFK4sn1gY4ehUvKBMNLSfbPbxrYRx6A9QZMp7hYfP8Xfb5pu1xdCyd
+   8ygFunGZYZ9d39qc+Yrimq6eUMWeX11GpZB7lFX9o3Efv+SYQbeqKTFBh
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10557"; a="318780434"
 X-IronPort-AV: E=Sophos;i="5.96,234,1665471600"; 
-   d="scan'208";a="318780419"
+   d="scan'208";a="318780434"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2022 08:18:52 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10557"; a="711208616"
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2022 08:18:55 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10557"; a="711208627"
 X-IronPort-AV: E=Sophos;i="5.96,234,1665471600"; 
-   d="scan'208";a="711208616"
+   d="scan'208";a="711208627"
 Received: from unknown (HELO localhost.localdomain) ([10.239.161.133])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2022 08:18:49 -0800
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Dec 2022 08:18:52 -0800
 From:   Zhang Chen <chen.zhang@intel.com>
 To:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Zhang Chen <chen.zhang@intel.com>, Chao Gao <chao.gao@intel.com>,
@@ -47,9 +47,9 @@ Cc:     Zhang Chen <chen.zhang@intel.com>, Chao Gao <chao.gao@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: [RFC PATCH 1/9] x86/speculation: Introduce Intel SPEC_CTRL BHI related definition
-Date:   Sun, 11 Dec 2022 00:00:38 +0800
-Message-Id: <20221210160046.2608762-2-chen.zhang@intel.com>
+Subject: [RFC PATCH 2/9] KVM: x86: Add a kvm-only leaf for RRSBA_CTRL
+Date:   Sun, 11 Dec 2022 00:00:39 +0800
+Message-Id: <20221210160046.2608762-3-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221210160046.2608762-1-chen.zhang@intel.com>
 References: <20221210160046.2608762-1-chen.zhang@intel.com>
@@ -65,85 +65,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Define BHI_NO bit and new control of BHI hardware mitigation in
-IA32_SPEC_CTRL. These definitions are used by following KVM patches
-to determine whether to enforce BHI hardware mitigiations for
-guests transparently.
+KVM needs to check if guests can see RRSBA_CTRL. If a guest is using
+retpoline and cannot see RRSBA_CTRL and the host enumerates RRSBA,
+KVM is responsible for setting RRSBA_DIS_S for the guest.
 
-BHI_NO means the processor isn't vulnernable to BHI attacks. BHI_DIS_S
-is a new indirect predictor control. Once enabled, BHI_DIS_S prevents
-predicted targets of indirect branches executed in CPL0/1/2 from being
-selected based on branch history from branches executed in CPL3.
-While set in the VMX root, it also prevents predicted targets executed
-in CPL0 from being selected based on branch history from branches
-executed in a VMX non-root.
-
-Branch History Injection (BHI) describes a specific form of intra-mode
-BTI, where an attacker may manipulate branch history before transitioning
-from user to supervisor mode (or from VMX non-root/guest to root mode)
-in an effort to cause an indirect branch predictor to select a specific
-predictor entry for an indirect branch, and a disclosure gadget at the
-predicted target will transiently execute. This may be possible since
-the relevant branch history may contain branches taken in previous
-security contexts, and in particular, in other predictor modes.
-
-Refer to below link for more information:
-https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/technical-documentation/branch-history-injection.html
+This allows VM migration from parts doesn't enumerates RRSBA to those
+that enumerate RRSBA.
 
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
 ---
- arch/x86/include/asm/msr-index.h       | 6 ++++++
- tools/arch/x86/include/asm/msr-index.h | 6 ++++++
- 2 files changed, 12 insertions(+)
+ arch/x86/kvm/cpuid.c         | 4 ++++
+ arch/x86/kvm/reverse_cpuid.h | 7 +++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 4a2af82553e4..1143ac9400c3 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -53,6 +53,8 @@
- #define SPEC_CTRL_SSBD			BIT(SPEC_CTRL_SSBD_SHIFT)	/* Speculative Store Bypass Disable */
- #define SPEC_CTRL_RRSBA_DIS_S_SHIFT	6	   /* Disable RRSBA behavior */
- #define SPEC_CTRL_RRSBA_DIS_S		BIT(SPEC_CTRL_RRSBA_DIS_S_SHIFT)
-+#define SPEC_CTRL_BHI_DIS_S_SHIFT	10	   /* Enable BHI_DIS_S behavior */
-+#define SPEC_CTRL_BHI_DIS_S		BIT(SPEC_CTRL_BHI_DIS_S_SHIFT)
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 62bc7a01cecc..8d45bc0b4b7c 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -668,6 +668,10 @@ void kvm_set_cpu_caps(void)
+ 		SF(SGX1) | SF(SGX2)
+ 	);
  
- #define MSR_IA32_PRED_CMD		0x00000049 /* Prediction Command */
- #define PRED_CMD_IBPB			BIT(0)	   /* Indirect Branch Prediction Barrier */
-@@ -150,6 +152,10 @@
- 						 * are restricted to targets in
- 						 * kernel.
- 						 */
-+#define ARCH_CAP_BHI_NO			BIT(20)	/*
-+						 * Not susceptible to Branch History
-+						 * Injection.
-+						 */
- #define ARCH_CAP_PBRSB_NO		BIT(24)	/*
- 						 * Not susceptible to Post-Barrier
- 						 * Return Stack Buffer Predictions.
-diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
-index f17ade084720..aed18b76dee0 100644
---- a/tools/arch/x86/include/asm/msr-index.h
-+++ b/tools/arch/x86/include/asm/msr-index.h
-@@ -53,6 +53,8 @@
- #define SPEC_CTRL_SSBD			BIT(SPEC_CTRL_SSBD_SHIFT)	/* Speculative Store Bypass Disable */
- #define SPEC_CTRL_RRSBA_DIS_S_SHIFT	6	   /* Disable RRSBA behavior */
- #define SPEC_CTRL_RRSBA_DIS_S		BIT(SPEC_CTRL_RRSBA_DIS_S_SHIFT)
-+#define SPEC_CTRL_BHI_DIS_S_SHIFT	10         /* Enable BHI_DIS_S behavior */
-+#define SPEC_CTRL_BHI_DIS_S		BIT(SPEC_CTRL_BHI_DIS_S_SHIFT)
++	kvm_cpu_cap_init_scattered(CPUID_7_2_EDX,
++		SF(RRSBA_CTRL)
++	);
++
+ 	kvm_cpu_cap_mask(CPUID_8000_0001_ECX,
+ 		F(LAHF_LM) | F(CMP_LEGACY) | 0 /*SVM*/ | 0 /* ExtApicSpace */ |
+ 		F(CR8_LEGACY) | F(ABM) | F(SSE4A) | F(MISALIGNSSE) |
+diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+index a19d473d0184..4c38ed61c505 100644
+--- a/arch/x86/kvm/reverse_cpuid.h
++++ b/arch/x86/kvm/reverse_cpuid.h
+@@ -13,6 +13,7 @@
+  */
+ enum kvm_only_cpuid_leafs {
+ 	CPUID_12_EAX	 = NCAPINTS,
++	CPUID_7_2_EDX,
+ 	NR_KVM_CPU_CAPS,
  
- #define MSR_IA32_PRED_CMD		0x00000049 /* Prediction Command */
- #define PRED_CMD_IBPB			BIT(0)	   /* Indirect Branch Prediction Barrier */
-@@ -150,6 +152,10 @@
- 						 * are restricted to targets in
- 						 * kernel.
- 						 */
-+#define ARCH_CAP_BHI_NO			BIT(20) /*
-+						 * Not susceptible to Branch History
-+						 * Injection.
-+						 */
- #define ARCH_CAP_PBRSB_NO		BIT(24)	/*
- 						 * Not susceptible to Post-Barrier
- 						 * Return Stack Buffer Predictions.
+ 	NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+@@ -24,6 +25,9 @@ enum kvm_only_cpuid_leafs {
+ #define KVM_X86_FEATURE_SGX1		KVM_X86_FEATURE(CPUID_12_EAX, 0)
+ #define KVM_X86_FEATURE_SGX2		KVM_X86_FEATURE(CPUID_12_EAX, 1)
+ 
++/* Intel-defined sub-features, CPUID level 0x00000007:2 (EDX)*/
++#define KVM_X86_FEATURE_RRSBA_CTRL	KVM_X86_FEATURE(CPUID_7_2_EDX, 2)
++
+ struct cpuid_reg {
+ 	u32 function;
+ 	u32 index;
+@@ -46,6 +50,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+ 	[CPUID_8000_0007_EBX] = {0x80000007, 0, CPUID_EBX},
+ 	[CPUID_7_EDX]         = {         7, 0, CPUID_EDX},
+ 	[CPUID_7_1_EAX]       = {         7, 1, CPUID_EAX},
++	[CPUID_7_2_EDX]       = {         7, 2, CPUID_EDX},
+ 	[CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
+ 	[CPUID_8000_001F_EAX] = {0x8000001f, 0, CPUID_EAX},
+ };
+@@ -78,6 +83,8 @@ static __always_inline u32 __feature_translate(int x86_feature)
+ 		return KVM_X86_FEATURE_SGX1;
+ 	else if (x86_feature == X86_FEATURE_SGX2)
+ 		return KVM_X86_FEATURE_SGX2;
++	else if (x86_feature == X86_FEATURE_RRSBA_CTRL)
++		return KVM_X86_FEATURE_RRSBA_CTRL;
+ 
+ 	return x86_feature;
+ }
 -- 
 2.25.1
 
