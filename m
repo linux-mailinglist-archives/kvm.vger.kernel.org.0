@@ -2,111 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68DCB64A485
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 17:01:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 44DBC64A4BA
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 17:25:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232033AbiLLQBU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 11:01:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56390 "EHLO
+        id S232735AbiLLQZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 11:25:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbiLLQBT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 11:01:19 -0500
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13A9F95BA
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 08:01:18 -0800 (PST)
-Received: by mail-io1-xd2e.google.com with SMTP id v2so133257ioe.4
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 08:01:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/NeFznWR0ULlrkxNZ94eeYdH6fRsw0PGtJw8DSFEPf4=;
-        b=ovvTcWS7RZFaNJWyIFQAg9zUL2MuG75Rqo9oCtt/jukSEcBozO7kB7Z8RxrrjgNFug
-         uig+PG9JTA9+hAN8uoffZqee6+qDpvXhcil9iqTMK+dxS7FF6RT76+69whFsclH84jA3
-         p/OfrJBdUzmzCmGrFA4ro+LOl8o5zsK0ZBBV0HE5AnFHisEV4QYSldcvX3pneuQ3u8Vg
-         11ucF4ObfN0NeMSC3RYnQ3vUQskjaLEx+jaAQSu0AOy6I+QXbvUePYnxcyAYwKWhOwLN
-         TNwrNafiBvCayBuZDn6O//8QxZF72Nc/Asuu+ahihwhHRUJV28/fLaZZtk/iB0QO883T
-         j/zQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/NeFznWR0ULlrkxNZ94eeYdH6fRsw0PGtJw8DSFEPf4=;
-        b=Cqcs7x8SdKWU/bS8JtPeEYjRNnvKpjS3qDUfN67FgVLvrACrQoNQJZgHnO6chh0kXT
-         7TKjYMCb8j87LjJ7kyZ0xtw1f2Q7gTF/TU83HvVMNjua1QBfvrLnTgkvEfu7RkC8aq+p
-         GEB4du5ebdNo81HSXPalUZsVDA79bKysopCWGxZpCEibtoZu5uZV36L120wCfrgzxABB
-         rTnLjQCSjIgswielo31YvoUiuVRUCxR6FsQtNV6NlNJ7Xp1dj2SZxXeVteA0ZxvIrrhk
-         3astBJ0N/5b+mQUpIbOb7FAzuF0TK0+nA+NiqPhH0MYLmz79qrXDZ/G4m2WMu34fNS+t
-         IQlA==
-X-Gm-Message-State: ANoB5pm9Pt1F7RKxasi10Gg50Fho8NeHg2tmzNo/n44J/B1QqLvZhgph
-        gkrgEg0VhieM4PLZ34VlfuiukkqpMyRYnUnIW9l8HA==
-X-Google-Smtp-Source: AA0mqf4TIxQiVuqebsemYtwT7zRQ4I7GltT+Q37EmQfWY2OQedW6iBgtHZqhGTq7O0/S/oF/7AI2bK/xymdUAdK/F3s=
-X-Received: by 2002:a05:6638:3786:b0:363:b82d:d510 with SMTP id
- w6-20020a056638378600b00363b82dd510mr44610550jal.112.1670860877213; Mon, 12
- Dec 2022 08:01:17 -0800 (PST)
+        with ESMTP id S232744AbiLLQZR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 11:25:17 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9297AB7E1;
+        Mon, 12 Dec 2022 08:25:15 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1670862314;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ivyFygzV7sPjgzBQhDl4hwzJVxNr9ahM7vvr/Xv9/M4=;
+        b=fpaJhsNCAjzy9bu37SF5hvEZ4MTIux/RwQAZncd7L4CxSp5i4OeHEJ4rhwqGWOe+MmycQr
+        CuVzU2AwfLFStkU6R4uFeqyNN7LMQ1uZdG1I1me7zWkkQjYB1VG7B61OBwq13pOlCpZgjs
+        /sb+WX4O+L70CtvZOCyZw5JGGhMO3atCRj9xu/Om534xS3DwFdbBZC1HQ7cSm3+A9V2zb5
+        kDs6c+3L74no06NdkihIkql86GqYfLhHGv0dGByYK0eqLCcLef3JcjR7tvrYBEOLYhfwQ1
+        +xpmqedrYxhOraFDWeOdxxPlTgXvMDHvblIc+nLj+0fwXhUw2YarSw+hxQPj0w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1670862314;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ivyFygzV7sPjgzBQhDl4hwzJVxNr9ahM7vvr/Xv9/M4=;
+        b=n8cBxybNlqWqQdWXyQ2/e3iZPfJkvjkZZU/hOxSz4jDkeBp1tvCJYQQvMI80Hwz1Eess/X
+        9vpzSvpl60d16TBA==
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Bharat Bhushan <bharat.bhushan@nxp.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
+        Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH iommufd 4/9] iommufd: Convert to
+ msi_device_has_secure_msi()
+In-Reply-To: <Y5dM+VnqRjTefGH1@nvidia.com>
+References: <0-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
+ <4-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
+ <BN9PR11MB5276522F9FA4D4A486C5F60A8C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y5NKlf4btF9xUXXZ@nvidia.com>
+ <5e7dbc83-a853-dc45-5016-c53f1be8aaf8@arm.com>
+ <Y5NyeFyMhlDxHkCW@nvidia.com> <87edt4bqhl.ffs@tglx>
+ <Y5dM+VnqRjTefGH1@nvidia.com>
+Date:   Mon, 12 Dec 2022 17:25:13 +0100
+Message-ID: <875yegbndi.ffs@tglx>
 MIME-Version: 1.0
-References: <20221205191430.2455108-1-vipinsh@google.com> <20221205191430.2455108-13-vipinsh@google.com>
- <Y5OtpwM8ue8nZwG/@google.com> <Y5PlW+U2MblIObHT@google.com>
-In-Reply-To: <Y5PlW+U2MblIObHT@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Mon, 12 Dec 2022 08:00:00 -0800
-Message-ID: <CAHVum0c8HXQhj9sgzsn=VbZ+2LYgW1JE4EkQePMRQKbjypCd5g@mail.gmail.com>
-Subject: Re: [Patch v3 12/13] KVM: selftests: Make vCPU exit reason test
- assertion common.
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Matlack <dmatlack@google.com>, pbonzini@redhat.com,
-        vkuznets@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 9, 2022 at 5:48 PM Sean Christopherson <seanjc@google.com> wrote:
+On Mon, Dec 12 2022 at 11:47, Jason Gunthorpe wrote:
+> On Mon, Dec 12, 2022 at 04:17:58PM +0100, Thomas Gleixner wrote:
+>> Obvioulsy unless it's done somewhere early in the PCI discovery,
+>> i.e. before the discovery associated the domain pointer.
 >
-> On Fri, Dec 09, 2022, David Matlack wrote:
-> > On Mon, Dec 05, 2022 at 11:14:29AM -0800, Vipin Sharma wrote:
-> > > Make ASSERT_EXIT_REASON() macro and replace all exit reason test assert
-> > > statements with it.
-> > >
-> > > No functional changes intended.
-> > >
-> > > Suggested-by: David Matlack <dmatlack@google.com>
-> > > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> >
-> > Reviewed-by: David Matlack <dmatlack@google.com>
-> >
-> > > ---
-> > >  .../testing/selftests/kvm/aarch64/psci_test.c |  4 +--
-> > >  .../testing/selftests/kvm/include/test_util.h | 10 ++++++++
-> > [...]
-> > >  .../selftests/kvm/x86_64/xapic_ipi_test.c     |  6 +----
-> > >  .../selftests/kvm/x86_64/xen_shinfo_test.c    |  7 +-----
-> > >  .../selftests/kvm/x86_64/xen_vmcall_test.c    |  5 +---
-> > >  44 files changed, 71 insertions(+), 293 deletions(-)
-> >
-> > Nice diff stat :)
->
-> I like the diffstat too, but I think we need a slightly different name for the
-> macro.  "EXIT_REASON" can be interpreted as "hardware exit reason" or "KVM exit
-> (to userspace) reason".  Most usage will be fairly obvious, but I'd like to avoid
-> confusion when swapping between selftests and KVM-unit-tests (which often asserts
-> on the hardware exit reason).   The name will be a bit longer, but I don't think
-> line length with ever be a problem.  And most people will just copy+paste so finger
-> fatigue likeliy won't be an issue either.
->
-> I also vote to prefix it with TEST, i.e. TEST_ASSERT_KVM_EXIT_REASON(), for
-> consistency and to make it very clear it's a TEST_ASSERT() wrapper.  ASSERT_EQ()
-> makes me twitch every time I see it.  This is definitely a personal preference
-> (or problem) I can survive with though :-)
+> I thought the problem is more that the iommu drivers change the
+> assigned irq_domain:
 
-I will send a patch with TEST_ASSERT_KVM_EXIT_REASON. No one should
-twitch while reading code!
+Yes they do.
+
+> void intel_irq_remap_add_device(struct dmar_pci_notify_info *info)
+> {
+> 	if (!irq_remapping_enabled || pci_dev_has_special_msi_domain(info->dev))
+> 		return;
+>
+> 	dev_set_msi_domain(&info->dev->dev, map_dev_to_ir(info->dev));
+> }
+>
+> Which is ultimately called by 
+>
+> 	bus_register_notifier(&pci_bus_type, &dmar_pci_bus_nb);
+>
+> And that compares with the iommu setup which is also done from a
+> bus notifier:
+>
+> 		nb[i].notifier_call = iommu_bus_notifier;
+> 		bus_register_notifier(iommu_buses[i], &nb[i]);
+>
+> So, I think, there is not reliable ordering between these two things.
+
+Bah. Notifiers are a complete disaster vs. ordering. This really wants
+reliable ordering IMO.
+
+Thanks,
+
+        tglx
