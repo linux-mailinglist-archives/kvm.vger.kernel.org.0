@@ -2,88 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F10F64A8CC
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 21:37:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 612C164A8DA
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 21:43:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232738AbiLLUhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 15:37:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36040 "EHLO
+        id S233219AbiLLUnA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 15:43:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232096AbiLLUhi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 15:37:38 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2612D19B
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 12:37:36 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BCJmb3W013242
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 20:37:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=qBeh0TimPv+qQUwLwYBwCc4aV6KSDDqrOWCKswCTWVE=;
- b=IT24sFriqdBTaSnVmQyQEGmBdGmekBBx55LMIqMtgFOovhgjjHHDKTOKDGgH4ie2XPeT
- ogjxB+INWBXjqHAm+8XtbcE10D9kNi75Di2o7qWU3ICK/0/tA1V4og98MO2IpzqOxdha
- xCY6bOsOJqMOxu7zaUsbDNSp5rxaqmNItcEc0c5yUu7h6qR8JZfsc2B4sOtTyfzAXPt4
- 8o/6Xt3Ogwyifm9wyPKIex+Zdh8tn4uUpbPOXx3ZAy7ISYaKkdcarQ83lCv8w4uJl2ZM
- fDZUsUq5r07fcCczY+beIjmSAjjyiHpLky8kBYC1Mspw9BlJL2kjisQG5N0i7g786Jy8 Jw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3me7rvdwj9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 20:37:35 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BCKY5DP001967
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 20:37:35 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3me7rvdwhc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Dec 2022 20:37:35 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BCBFlDH029603;
-        Mon, 12 Dec 2022 20:37:33 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3mchr629q6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Dec 2022 20:37:32 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BCKbTcm15925604
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Dec 2022 20:37:29 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3226C20049;
-        Mon, 12 Dec 2022 20:37:29 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D3D2A20043;
-        Mon, 12 Dec 2022 20:37:28 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.179.1.26])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 12 Dec 2022 20:37:28 +0000 (GMT)
-Message-ID: <a54eb84516a5fcb1799ae864caff6aefc31b1896.camel@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 1/1] s390x: add parallel skey
- migration test
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
-Date:   Mon, 12 Dec 2022 21:37:28 +0100
-In-Reply-To: <20221209102122.447324-2-nrb@linux.ibm.com>
-References: <20221209102122.447324-1-nrb@linux.ibm.com>
-         <20221209102122.447324-2-nrb@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
+        with ESMTP id S232983AbiLLUm5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 15:42:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2499318365
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 12:41:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670877719;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=z2uxCw+2oIvu/ILYj5euA+kRPg0up0LSvJCE9PhHSN0=;
+        b=Pv/0JJVI2t9Cs1k/kqK4EDoPYwl+pl22AwnQpLGR2G5a6Ce758zFJGkfW2RIaeuvZS5Klj
+        snqEpyER/Th457JOhwBzrQXSIVnbN4GqB8TlJxw2lB5is9BBr8gRM2JjZ1Y6jJP4Or7ct3
+        O/kY02GalSwgWciitQED5v0URVAL9g8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-118-SUOejsJ0NCqbpJExZjgzkw-1; Mon, 12 Dec 2022 15:41:58 -0500
+X-MC-Unique: SUOejsJ0NCqbpJExZjgzkw-1
+Received: by mail-wm1-f70.google.com with SMTP id a6-20020a05600c224600b003d1f3ed49adso2247345wmm.4
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 12:41:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=z2uxCw+2oIvu/ILYj5euA+kRPg0up0LSvJCE9PhHSN0=;
+        b=w2WCNXAwzzw0r+xnyoqQwi6wW2dAW2lGMTP29CVvavpl4LDyQjQpt8RdDmM2b4iPY7
+         GpEcPoXCxjfGnWWjjTiPX1tIG5DA0bW8NiC9c/KB80Mc/q57TdccModoKfw2XvOrBD3c
+         flAvs2GOmkTkfyaLxsfU//LyjnlcH3x+KnBcxLQiDsz6ZreVJ5dFObjKjbEoyvmx4s/D
+         ElMIVKuG/12mPen0qNDimPGFDCwWT2sHAxn9Fb3msYMf3ipJbopw9N5yZt8ZNjMS9/Cs
+         AsM1aqg3xhfXGHTrOO9XGqrb5fWV5MVn/h4blloEeEb/KgBQDpUs7SX0kes/gKPt+Sz5
+         5biw==
+X-Gm-Message-State: ANoB5pnIJIXh3dM2XaCMh/5xjlvWbbNsbDbNVfTLkr4s6dlifAZdoLG+
+        HcBKtbrQmUPyMLgzSbPSAVWa5ZpZSDrndRCLJLiHJzUeoO98nXMP7uh2YwdvVzcpEIwKYHRFwdA
+        L6GJt04GaaRdj
+X-Received: by 2002:a7b:c30e:0:b0:3c6:f7ff:6f87 with SMTP id k14-20020a7bc30e000000b003c6f7ff6f87mr13366465wmj.11.1670877716605;
+        Mon, 12 Dec 2022 12:41:56 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf6V+fwfdC8Y+PY3oleBzA1Gt3GtqyjsanDv0yhQV9qdsQdGU0QhB8MyaBKKEaH2UQ6mE1DzMA==
+X-Received: by 2002:a7b:c30e:0:b0:3c6:f7ff:6f87 with SMTP id k14-20020a7bc30e000000b003c6f7ff6f87mr13366455wmj.11.1670877716422;
+        Mon, 12 Dec 2022 12:41:56 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id v10-20020a05600c444a00b003cff309807esm11298387wmn.23.2022.12.12.12.41.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Dec 2022 12:41:55 -0800 (PST)
+Message-ID: <6d96a62e-d5a1-e606-3bd2-c38f4a6c8545@redhat.com>
+Date:   Mon, 12 Dec 2022 21:41:55 +0100
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: F9EKuo3_Y2wF6x19Dc-C3xVeYIZD4guI
-X-Proofpoint-ORIG-GUID: uBKOJ4KLMDuJAIBrCEFpaOiRH4skSs8i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-12_02,2022-12-12_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- clxscore=1011 mlxlogscore=999 spamscore=0 bulkscore=0 impostorscore=0
- adultscore=0 phishscore=0 priorityscore=1501 suspectscore=0 malwarescore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212120181
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [GIT PULL] First batch of KVM changes for Linux 6.2
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     torvalds@linux-foundation.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <20221212155027.2841892-1-pbonzini@redhat.com>
+ <Y5ddb+tGS7phN1vc@google.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <Y5ddb+tGS7phN1vc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,78 +81,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2022-12-09 at 11:21 +0100, Nico Boehr wrote:
-> Right now, we have a test which sets storage keys, then migrates the VM
-> and - after migration finished - verifies the skeys are still there.
->=20
-> Add a new version of the test which changes storage keys while the
-> migration is in progress. This is achieved by adding a command line
-> argument to the existing migration-skey test.
->=20
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> ---
->  s390x/migration-skey.c | 214 +++++++++++++++++++++++++++++++++++------
->  s390x/unittests.cfg    |  15 ++-
->  2 files changed, 198 insertions(+), 31 deletions(-)
->=20
-> diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-> index b7bd82581abe..9b9a45f4ad3b 100644
-> --- a/s390x/migration-skey.c
-> +++ b/s390x/migration-skey.c
->=20
-[...]
+On 12/12/22 17:57, Sean Christopherson wrote:
+> On Mon, Dec 12, 2022, Paolo Bonzini wrote:
+>> Linus,
+>>
+>> The following changes since commit 8332f0ed4f187c7b700831bd7cc83ce180a944b9:
+>>
+>>    KVM: Update gfn_to_pfn_cache khva when it moves within the same page (2022-11-23 18:58:46 -0500)
+>>
+>> are available in the Git repository at:
+>>
+>>    https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+>>
+>> for you to fetch changes up to 1396763d469a83c5d791fa84df7dd17eba83dcf2:
+>>
+>>    Merge remote-tracking branch 'kvm/queue' into HEAD (2022-12-09 09:15:09 +0100)
+> 
+> ...
+> 
+>>        KVM: x86: remove unnecessary exports
+> 
+> ...
+> 
+>>        KVM: nVMX: hyper-v: Enable L2 TLB flush
+> 
+> As reported a few times[1][2], these two collided and cause a build failure when
+> building with CONFIG_KVM_AMD=m.
 
-> +static void test_skey_migration_parallel(void)
-> +{
-> +	report_prefix_push("parallel");
-> +
-> +	if (smp_query_num_cpus() =3D=3D 1) {
-> +		report_skip("need at least 2 cpus for this test");
-> +		goto error;
-> +	}
-> +
-> +	smp_cpu_setup(1, PSW_WITH_CUR_MASK(set_skeys_thread));
-> +
-> +	migrate_once();
-> +
-> +	WRITE_ONCE(thread_should_exit, 1);
-> +
-> +	while (!thread_exited)
-> +		mb();
+Ouch, the worst thing that can be reported just before a 5-day public 
+holiday weekend.
 
-Are you doing it this way instead of while(!READ_ONCE(thread_exited)); so t=
-he mb() does double duty
-and ensures "result" is also read from memory a couple of lines down?
-If so, I wonder if the compiler is allowed to arrange the control flow such=
- that if the loop condition
-is false on the first iteration it uses a cached value of "result" (I'd be =
-guessing yes, but what do I know).
-In any case using a do while loop instead would eliminate the question.
-A comment might be nice, too.
+>    ERROR: modpost: "kvm_hv_assist_page_enabled" [arch/x86/kvm/kvm-amd.ko] undefined!
+>    make[2]: *** [scripts/Makefile.modpost:126: Module.symvers] Error 1
+>    make[1]: *** [Makefile:1944: modpost] Error 2
+> 
+> The fix is simple enough, maybe just squash it into the merge?
 
-> +
-> +	report_info("thread completed %u iterations", thread_iters);
-> +
-> +	report_prefix_push("during migration");
-> +	skey_report_verify(&result);
-> +	report_prefix_pop();
-> +
-> +	/*
-> +	 * Verification of skeys occurs on the thread. We don't know if we
-> +	 * were still migrating during the verification.
-> +	 * To be sure, make another verification round after the migration
-> +	 * finished to catch skeys which might not have been migrated
-> +	 * correctly.
-> +	 */
-> +	report_prefix_push("after migration");
-> +	assert(thread_iters > 0);
-> +	result =3D skey_verify_test_pattern(pagebuf, NUM_PAGES, thread_iters - =
-1);
-> +	skey_report_verify(&result);
-> +	report_prefix_pop();
-> +
-> +error:
-> +	report_prefix_pop();
-> +}
-> +
-[...]
+No, I'll fix and respin. :/
+
+Paolo
+
