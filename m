@@ -2,272 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53E0D649E22
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 12:48:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB4A6649F2F
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 13:59:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231797AbiLLLst (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 06:48:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54794 "EHLO
+        id S232403AbiLLM7P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 07:59:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229452AbiLLLsq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 06:48:46 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04E0E63C9
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 03:48:37 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BCBCsZv029626;
-        Mon, 12 Dec 2022 11:48:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=B/Eqw+Jf66UrgQQVDMnUh9fXZjZhp+gRzb6cHMSfu9I=;
- b=DAe58z+mo4b/xcHPRWCpSqsDHJDFlAZCQVlJW+7fkkbig1NniEs/V5YemA7hNni8LWNz
- 4wMkldetyNjKuW9c8X/R/F/tafIkjkhpTSNGaPNk+NvLhD5i9WWBi884uHODhBSHNc0B
- h50467JCAx9rDIHdyI1kDu8T+cbfD5afCPK+YqMiKQLDH3Au/+FHSU59qyOnVNQukKiO
- LlN7NDTsZN2WqLa/6EIRmVwYw6G6AIKVUK4bJ+8u+e7f0I1uPyIrOVJvzStAwyg94oAV
- uVlR8XQ41gQlCrBUzOgXiOLlQQuFO6IatfBQWcsxll0R0xCZQRpC5q+POehFGCbdZLcw lg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3md3sjq4fp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Dec 2022 11:48:35 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BCBSBBc026947;
-        Mon, 12 Dec 2022 11:48:35 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3md3sjq4f4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Dec 2022 11:48:35 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BBNCX2d007765;
-        Mon, 12 Dec 2022 11:48:33 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mchcf2kb1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 12 Dec 2022 11:48:33 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BCBmT3b49938920
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 12 Dec 2022 11:48:29 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 981E42004B;
-        Mon, 12 Dec 2022 11:48:29 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 659BC20040;
-        Mon, 12 Dec 2022 11:48:29 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 12 Dec 2022 11:48:29 +0000 (GMT)
-Date:   Mon, 12 Dec 2022 12:48:28 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com,
-        pbonzini@redhat.com, andrew.jones@linux.dev, lvivier@redhat.com
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] s390x: use migrate_once() in
- migration tests
-Message-ID: <20221212124828.2aef6b05@p-imbrenda>
-In-Reply-To: <20221212111731.292942-4-nrb@linux.ibm.com>
-References: <20221212111731.292942-1-nrb@linux.ibm.com>
-        <20221212111731.292942-4-nrb@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S230113AbiLLM7N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 07:59:13 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAED9C2A;
+        Mon, 12 Dec 2022 04:59:12 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id d7so11973203pll.9;
+        Mon, 12 Dec 2022 04:59:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fqd7rV/LIZQRhBND1wfi4ZK3s862aHDRSXa+Hfs3x/0=;
+        b=d2mgt4Cm3rJ0WcxSsZxqXfIUEu+wiv6uIRONxo/jNgTpK6sDFgWpgj9F1xUHLYj168
+         c+KZZ3anW7HFmcjRNy1H991RyOD58xofnivxlE0WyBFp5R92LEwWB188uSTAmcO8SL0X
+         Uz6frgZlmo/ekNLv5DqDImjtlKyLTtTIyAvMzHKLRw/YwKmQtElGir7VkPOp6OnyDe+M
+         kqhqFynH3NeBGyhN/kUzpR2G5syuw+oiHQKRMdLKipn8E5fL1REcN5DjCyqoOmcA1Iwg
+         BauZ0WtBIbXAmmURP5+DX7EO+UFuvAVJsi/hbn1+/2iqpOCXTnGtiGogYjns1SofZGTN
+         F4Ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fqd7rV/LIZQRhBND1wfi4ZK3s862aHDRSXa+Hfs3x/0=;
+        b=jcIetMcvGY/xRjEWI67/oB2ruP/rzWF+awgrfnLcbsmOJkQ3LcAVqlLrPuY51eyRdg
+         us2LSJ9+5hRUkO9E6NfIfm/ZN8XSmbCR8l34TajZU7u6b/au2QixwZL1G27twPJ+SK0a
+         4sI8opWUiZ0aqajD5vi4XBM360t6JUbsbv9NcgbVAh+7G1VUDbZtvjy2HPNsem5Ozsox
+         /u/vjaM0crvZ2AKXwHhCvQNvwdPvPSbjlq7kyFWFrnBqj/XoSq3f2CdQT18E8w8nR7dP
+         7T3YYVq1n4OFNQCziJGlKwe45y0WHcCEF5sIN71OjgSXoarCT3Q+lEuqvLUHdP4KyR0D
+         CNDw==
+X-Gm-Message-State: ANoB5pnxpxn261StDrWW17RVgCc+ZGhX+2LNnk9EaxnEGNYrdYTVBvg/
+        9o3wmcjqW1OZUS2vKnH07s4=
+X-Google-Smtp-Source: AA0mqf77GZIw7gQFedXZs86HhHJyGeXNzAanu5XUe83msXQOsjZh99qJsuAVkWNAlkekTtkUrbqqcw==
+X-Received: by 2002:a17:903:324c:b0:189:d0fa:231b with SMTP id ji12-20020a170903324c00b00189d0fa231bmr17227594plb.67.1670849952078;
+        Mon, 12 Dec 2022 04:59:12 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id jc3-20020a17090325c300b00186f608c543sm6273927plb.304.2022.12.12.04.59.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 04:59:11 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Peter Zijlstra <peterz@infradead.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: [PATCH RFC 0/8] KVM: x86/pmu: Enable Fixed Counter3 and Topdown Perf Metrics
+Date:   Mon, 12 Dec 2022 20:58:36 +0800
+Message-Id: <20221212125844.41157-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.38.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: XiHFXz0cXa20_Jr21gQVB3m55BfPn4hm
-X-Proofpoint-ORIG-GUID: RtbmZYWz74DjY8EhzIgL6DhSApLnKYo0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-12_02,2022-12-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 bulkscore=0
- suspectscore=0 clxscore=1015 phishscore=0 malwarescore=0 mlxscore=0
- impostorscore=0 priorityscore=1501 mlxlogscore=999 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2210170000 definitions=main-2212120107
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 12 Dec 2022 12:17:30 +0100
-Nico Boehr <nrb@linux.ibm.com> wrote:
+Hi,
 
-> migrate_once() can simplify the control flow in migration-skey and
-> migration-cmm.
-> 
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+The Ice Lake core PMU provides built-in support for Top-down u-arch
+Analysis (TMA) method level 1 metrics. These metrics are always available
+to cross-validate performance observations, freeing general purpose
+counters to count other events in high counter utilization scenarios.
+For more details about the method, refer to Top-Down Analysis Method
+chapter (Appendix B.1) of the Intel® 64 and IA-32 Architectures
+Optimization Reference Manual. (SDM 19.3.9.3 Performance Metrics)
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+This patchset enables Intel Guest Topdow for KVM-based guests. Its basic
+enabling framework remains unchanged, a perf_metric msr is introduced,
+a group (rather than one) of perf_events is created in KVM by binding to
+fiexed counter3 to obtain hardware resources, and the guest value of
+perf_metric msr is assembled based on the count of grouped perf_events.
 
-> ---
->  s390x/Makefile         |  1 +
->  s390x/migration-cmm.c  | 24 +++++++-----------------
->  s390x/migration-sck.c  |  4 ++--
->  s390x/migration-skey.c | 20 +++++++-------------
->  s390x/migration.c      |  7 ++-----
->  5 files changed, 19 insertions(+), 37 deletions(-)
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index bf1504f9d58c..52a9d821974e 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -85,6 +85,7 @@ cflatobjs += lib/alloc_page.o
->  cflatobjs += lib/vmalloc.o
->  cflatobjs += lib/alloc_phys.o
->  cflatobjs += lib/getchar.o
-> +cflatobjs += lib/migrate.o
->  cflatobjs += lib/s390x/io.o
->  cflatobjs += lib/s390x/stack.o
->  cflatobjs += lib/s390x/sclp.o
-> diff --git a/s390x/migration-cmm.c b/s390x/migration-cmm.c
-> index aa7910ca76bf..43673f18e45a 100644
-> --- a/s390x/migration-cmm.c
-> +++ b/s390x/migration-cmm.c
-> @@ -9,6 +9,7 @@
->   */
->  
->  #include <libcflat.h>
-> +#include <migrate.h>
->  #include <asm/interrupt.h>
->  #include <asm/page.h>
->  #include <asm/cmm.h>
-> @@ -39,8 +40,7 @@ static void test_migration(void)
->  		essa(ESSA_SET_POT_VOLATILE, (unsigned long)pagebuf[i + 3]);
->  	}
->  
-> -	puts("Please migrate me, then press return\n");
-> -	(void)getchar();
-> +	migrate_once();
->  
->  	for (i = 0; i < NUM_PAGES; i++) {
->  		actual_state = essa(ESSA_GET_STATE, (unsigned long)pagebuf[i]);
-> @@ -53,25 +53,15 @@ static void test_migration(void)
->  
->  int main(void)
->  {
-> -	bool has_essa = check_essa_available();
-> -
->  	report_prefix_push("migration-cmm");
-> -	if (!has_essa) {
-> -		report_skip("ESSA is not available");
->  
-> -		/*
-> -		 * If we just exit and don't ask migrate_cmd to migrate us, it
-> -		 * will just hang forever. Hence, also ask for migration when we
-> -		 * skip this test alltogether.
-> -		 */
-> -		puts("Please migrate me, then press return\n");
-> -		(void)getchar();
-> +	if (!check_essa_available())
-> +		report_skip("ESSA is not available");
-> +	else
-> +		test_migration();
->  
-> -		goto done;
-> -	}
-> +	migrate_once();
->  
-> -	test_migration();
-> -done:
->  	report_prefix_pop();
->  	return report_summary();
->  }
-> diff --git a/s390x/migration-sck.c b/s390x/migration-sck.c
-> index 2d9a195ab4c4..2a9c87071643 100644
-> --- a/s390x/migration-sck.c
-> +++ b/s390x/migration-sck.c
-> @@ -9,6 +9,7 @@
->   */
->  
->  #include <libcflat.h>
-> +#include <migrate.h>
->  #include <asm/time.h>
->  
->  static void test_sck_migration(void)
-> @@ -30,8 +31,7 @@ static void test_sck_migration(void)
->  	report(!cc, "clock running after set");
->  	report(now_after_set >= time_to_set, "TOD clock value is larger than what has been set");
->  
-> -	puts("Please migrate me, then press return\n");
-> -	(void)getchar();
-> +	migrate_once();
->  
->  	cc = stckf(&now_after_migration);
->  	report(!cc, "clock still set");
-> diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
-> index b7bd82581abe..a91eb6b5a63e 100644
-> --- a/s390x/migration-skey.c
-> +++ b/s390x/migration-skey.c
-> @@ -9,6 +9,7 @@
->   */
->  
->  #include <libcflat.h>
-> +#include <migrate.h>
->  #include <asm/facility.h>
->  #include <asm/page.h>
->  #include <asm/mem.h>
-> @@ -35,8 +36,7 @@ static void test_migration(void)
->  		set_storage_key(pagebuf[i], key_to_set, 1);
->  	}
->  
-> -	puts("Please migrate me, then press return\n");
-> -	(void)getchar();
-> +	migrate_once();
->  
->  	for (i = 0; i < NUM_PAGES; i++) {
->  		actual_key.val = get_storage_key(pagebuf[i]);
-> @@ -64,19 +64,13 @@ static void test_migration(void)
->  int main(void)
->  {
->  	report_prefix_push("migration-skey");
-> -	if (test_facility(169)) {
-> -		report_skip("storage key removal facility is active");
->  
-> -		/*
-> -		 * If we just exit and don't ask migrate_cmd to migrate us, it
-> -		 * will just hang forever. Hence, also ask for migration when we
-> -		 * skip this test altogether.
-> -		 */
-> -		puts("Please migrate me, then press return\n");
-> -		(void)getchar();
-> -	} else {
-> +	if (test_facility(169))
-> +		report_skip("storage key removal facility is active");
-> +	else
->  		test_migration();
-> -	}
-> +
-> +	migrate_once();
->  
->  	report_prefix_pop();
->  	return report_summary();
-> diff --git a/s390x/migration.c b/s390x/migration.c
-> index a45296374cd8..fe6ea8369edb 100644
-> --- a/s390x/migration.c
-> +++ b/s390x/migration.c
-> @@ -8,6 +8,7 @@
->   *  Nico Boehr <nrb@linux.ibm.com>
->   */
->  #include <libcflat.h>
-> +#include <migrate.h>
->  #include <asm/arch_def.h>
->  #include <asm/vector.h>
->  #include <asm/barrier.h>
-> @@ -178,11 +179,7 @@ int main(void)
->  		mb();
->  	flag_thread_complete = 0;
->  
-> -	/* ask migrate_cmd to migrate (it listens for 'migrate') */
-> -	puts("Please migrate me, then press return\n");
-> -
-> -	/* wait for migration to finish, we will read a newline */
-> -	(void)getchar();
-> +	migrate_once();
->  
->  	flag_migration_complete = 1;
->  
+On KVM, patches 0004/5/6 may be reviewd independently if KVM only
+enable fixed counter3 as normal slot event for count and sampling. 
+Patch 7 updates the infrastructure for creating grouped events in KVM,
+and patch 8 uses group events to emulate guest MSR_PERF_METRICS.
+
+On Perf, Patches 0001-0003 are awaiting review for tip/perf/core, and
+could be accepted separately if they make sense. TBH, I don't think our
+perf/core is fully prepared to support kernel space grouped counters,
+considering comments around perf_enable_diasable(). But after much
+exploration on my part, this is probably the most promising way to get
+KVM to create slots plus metrics events. If the addition of *group_leader
+messes things up, please shout at me on your needs.
+
+More details in each commit messages may answer code-related questions.
+
+A classic perf tool usage on a linux guest is as follows:
+$ perf stat --topdown --td-level=1 -I1000 --no-metric-only sleep 1
+#           time             counts unit events
+     1.000548528         34,505,682      slots
+     1.000548528         14,208,222      topdown-retiring                 #     41.5% Retiring
+     1.000548528          1,623,796      topdown-bad-spec                 #      4.7% Bad Speculation
+     1.000548528         14,614,171      topdown-fe-bound                 #     42.7% Frontend Bound
+     1.000548528          3,788,859      topdown-be-bound                 #     11.1% Backend Bound
+
+Related KUT will follow if there are no obstructive negative comments.
+
+Nit, pre-patches includes:
+https://lore.kernel.org/kvm/20221207071506.15733-2-likexu@tencent.com/
+https://lore.kernel.org/kvm/20221205122048.16023-1-likexu@tencent.com/
+
+Please feel free to comment and share your feedback.
+
+Thanks,
+
+Like Xu (8):
+  perf/core: Add *group_leader to perf_event_create_kernel_counter()
+  perf: x86/core: Expose the available number of the Topdown metrics
+  perf: x86/core: Snyc PERF_METRICS bit together with fixed counter3
+  KVM: x86/pmu: Add Intel CPUID-hinted Topdown Slots event
+  KVM: x86/pmu: Add kernel-defined slots event to enable Fixed Counter3
+  KVM: x86/pmu: properly use INTEL_PMC_FIXED_RDPMC_BASE macro
+  KVM: x86/pmu: Use flex *event arrays to implement grouped events
+  KVM: x86/pmu: Add MSR_PERF_METRICS MSR emulation to enable Topdown
+
+ arch/arm64/kvm/pmu-emul.c                 |   4 +-
+ arch/x86/events/core.c                    |   1 +
+ arch/x86/events/intel/core.c              |   3 +
+ arch/x86/include/asm/kvm_host.h           |  14 +-
+ arch/x86/include/asm/msr-index.h          |   1 +
+ arch/x86/include/asm/perf_event.h         |   1 +
+ arch/x86/kernel/cpu/resctrl/pseudo_lock.c |   4 +-
+ arch/x86/kvm/pmu.c                        | 149 ++++++++++++++++++++--
+ arch/x86/kvm/pmu.h                        |  31 +++--
+ arch/x86/kvm/svm/pmu.c                    |   1 +
+ arch/x86/kvm/vmx/pmu_intel.c              |  53 +++++++-
+ arch/x86/kvm/vmx/vmx.c                    |   3 +
+ arch/x86/kvm/x86.c                        |   9 +-
+ include/linux/perf_event.h                |   1 +
+ kernel/events/core.c                      |   4 +-
+ kernel/events/hw_breakpoint.c             |   4 +-
+ kernel/events/hw_breakpoint_test.c        |   2 +-
+ kernel/watchdog_hld.c                     |   2 +-
+ 18 files changed, 239 insertions(+), 48 deletions(-)
+
+-- 
+2.38.2
 
