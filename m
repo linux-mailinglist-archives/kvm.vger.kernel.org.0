@@ -2,124 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36B6364A3FC
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 16:18:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EC8664A428
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 16:31:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232187AbiLLPSF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 10:18:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36674 "EHLO
+        id S232305AbiLLPbK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 10:31:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbiLLPSD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 10:18:03 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D0BF2736;
-        Mon, 12 Dec 2022 07:18:01 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1670858279;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IhelkcQX+S/XH33QhHGqpWajt8PRo+qMzWym0sZ9oIk=;
-        b=tMtjyN6fS+uVLeC57wLEJ14wP3w0rgmgl2GyIszSEv1TrJFxYJcCBytLXN7BhAj0SCoRGm
-        6obyn4j+xRn+pwkXZ7We8pWyVkxV4Y3PCt9giBJutfbAnAI/mNKi7bjQHY+sDRgTaIfTLN
-        gVe7yiRC+Q4mZ5egz/Lx6XcromKMrF6yTZ7Xclwz+/EZbs5ZxOyQoE5PiYPfXiBRmAOgwL
-        eaIfmXRd1hac+i7+NRRUkQjuABd8LYOZjvZu16ST+t+wPlfMM29g7I3WohbdTxLMKpGiVH
-        /8sHOY4sYYfGezFVIHv7b2res4mndg9bdambMFqgVreNf0DvuH90ZA3GSmfm7A==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1670858279;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=IhelkcQX+S/XH33QhHGqpWajt8PRo+qMzWym0sZ9oIk=;
-        b=8l42tLh8Uatvm73gI/8BEcK9ij+5LbTfWWo9qUncK3SFWiOFCWkM0VPRfv2znnO79GXdwm
-        vovfhPRgtqeXFPAA==
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Robin Murphy <robin.murphy@arm.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Will Deacon <will@kernel.org>,
-        Bharat Bhushan <bharat.bhushan@nxp.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
-        Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH iommufd 4/9] iommufd: Convert to
- msi_device_has_secure_msi()
-In-Reply-To: <Y5NyeFyMhlDxHkCW@nvidia.com>
-References: <0-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
- <4-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
- <BN9PR11MB5276522F9FA4D4A486C5F60A8C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
- <Y5NKlf4btF9xUXXZ@nvidia.com>
- <5e7dbc83-a853-dc45-5016-c53f1be8aaf8@arm.com>
- <Y5NyeFyMhlDxHkCW@nvidia.com>
-Date:   Mon, 12 Dec 2022 16:17:58 +0100
-Message-ID: <87edt4bqhl.ffs@tglx>
+        with ESMTP id S231715AbiLLPbG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 10:31:06 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE19CFCFF;
+        Mon, 12 Dec 2022 07:31:04 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id 3-20020a17090a098300b00219041dcbe9so148885pjo.3;
+        Mon, 12 Dec 2022 07:31:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WmyZB7P+T7cldWqjuRT6Y6vUTkEvSfVPUCpeMf28+1M=;
+        b=AJ45vMDiLsDYC0RGs8ey/ELAXs1CCXKzolW+nCXoW6DuKV5tPfmB2l3CyrBXA3/93U
+         3d6O8be+Sz1gg0Lzo4hGPAWY/HGiXJ0OX6QHboSQFyZmVr/Iim+X/1JTMDoJE1J9lQjr
+         g8hIUb+vXQ4CMD6fImvPp3fMGzSIi963oKLr+IprrFytd56NhpoJQ28Sk0J0YHGim1/B
+         hwc1FN+QV0Ka3J73gqAL5bybDJ/ZwrkauKS/Kf2SnnzMD+8uP/2Znek+kQgfyKjbfbDM
+         l1mavjbYTuhYWg07jQ8+D0mC2yJ1QBXEmCGr2/+mFWQWc1u5KHoFr4yTR8jLl7lr+Nyq
+         Uz7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WmyZB7P+T7cldWqjuRT6Y6vUTkEvSfVPUCpeMf28+1M=;
+        b=Y8xEOb/BSqcQTdOdLSRiETYuQkYxCl8qc/mPkAmfL6HRf6UmN1jiCpZXAACowseNgK
+         vH18pSepnS2om2vFOEBsLjCXz8qP3scXRT9m2sjUvo6hPWWm4ve2heq0JQRSNx/BzdV6
+         IJ879NZi4dDnTiyJoGbgIWAkl19h0oa2Rdic1PPELwKw3VCwiMHvA/DVP+xgNyghNGK+
+         dxvFzdOuKpxik2EC2VZnZJYejMGwEebYKYrYqdqNWhYVo6gSM5Bzm8kdIauvQf8SF+01
+         GU3g9+eeBlvGgBiiDNeV9CZJ61tzqlhcT0zhUbq041QrGSy1HlTj68uAGgGdAnA1hdlp
+         v67w==
+X-Gm-Message-State: ANoB5pmwnnOCrfGBv/TrLIkmO6DqKzBao5gCX84fNwuBUEm/Piw/HUHA
+        MqvaRI3PDpuSLyYy9/N4VlrYYNXUjug=
+X-Google-Smtp-Source: AA0mqf6gKkbKbbH/jTJUCwXcd1Jr8sG1yjfFTgllpsvvmhHgIvavOXlkIfGqCvY4lYIBvfx47grGmw==
+X-Received: by 2002:a17:903:2112:b0:189:e711:170 with SMTP id o18-20020a170903211200b00189e7110170mr15330874ple.64.1670859063909;
+        Mon, 12 Dec 2022 07:31:03 -0800 (PST)
+Received: from localhost ([47.254.32.37])
+        by smtp.gmail.com with ESMTPSA id b4-20020a170902d50400b0017f73caf588sm6538974plg.218.2022.12.12.07.31.03
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 12 Dec 2022 07:31:03 -0800 (PST)
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
+Subject: [PATCH 1/2] kvm: x86/mmu: Reduce the update to the spte in FNAME(sync_page)
+Date:   Mon, 12 Dec 2022 23:32:04 +0800
+Message-Id: <20221212153205.3360-2-jiangshanlai@gmail.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
+In-Reply-To: <20221212153205.3360-1-jiangshanlai@gmail.com>
+References: <20221212153205.3360-1-jiangshanlai@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 09 2022 at 13:38, Jason Gunthorpe wrote:
-> On Fri, Dec 09, 2022 at 04:44:06PM +0000, Robin Murphy wrote:
->
->> Isn't the problem with this that it's super-early, and a device's MSI domain
->> may not actually be resolved until someone starts requesting MSIs for it?
->> Maybe Thomas' ongoing per-device stuff changes that, but I'm not
->> sure :/
->
-> Yes, this looks correct, OK, so I will do Kevin's thought
+From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-The device MSI domain has to be valid before a device can be probed, at
-least that's the case for PCI/MSI devices. The pointer is established
-during PCI discovery.
+Sometimes when the guest updates its pagetable, it adds only new gptes
+to it without changing any existed one, so there is no point to update
+the sptes for these existed gptes.
 
-The per device MSI domains do not change that requirement. The only
-difference is that device->msi.domain now points to the MSI parent
-domain.
+Also when the sptes for these unchanged gptes are updated, the AD
+bits are also removed since make_spte() is called with prefetch=true
+which might result unneeded TLB flushing.
 
-In the "global" PCI/MSI domain case the hierarchy walk will (on x86)
-start at the PCI/MSI domain and end up either at the remapping unit,
-which has the protection property, or at the vector (root) domain, which
-does not.
+Do nothing if the permissions are unchanged or only write-access is
+being added.  Only update the spte when write-access is being removed.
+Drop the SPTE otherwise.
 
-For the per device domain case the walk will start at the parent domain,
-which is (on x86) either the remapping unit or the vector (root) domain.
+Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+---
+ arch/x86/kvm/mmu/paging_tmpl.h | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
-The same is true for ARM(64) and other hierarchy users, just the naming
-conventions and possible scenarios are different.
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index e5662dbd519c..613f043a3e9e 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -1023,7 +1023,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 	for (i = 0; i < SPTE_ENT_PER_PAGE; i++) {
+ 		u64 *sptep, spte;
+ 		struct kvm_memory_slot *slot;
+-		unsigned pte_access;
++		unsigned old_pte_access, pte_access;
+ 		pt_element_t gpte;
+ 		gpa_t pte_gpa;
+ 		gfn_t gfn;
+@@ -1064,6 +1064,23 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
+ 			continue;
+ 		}
+ 
++		/*
++		 * Drop the SPTE if the new protections would result in access
++		 * permissions other than write-access is changing.  Do nothing
++		 * if the permissions are unchanged or only write-access is
++		 * being added.  Only update the spte when write-access is being
++		 * removed.
++		 */
++		old_pte_access = kvm_mmu_page_get_access(sp, i);
++		if (old_pte_access == pte_access ||
++		    (old_pte_access | ACC_WRITE_MASK) == pte_access)
++			continue;
++		if (old_pte_access != (pte_access | ACC_WRITE_MASK)) {
++			drop_spte(vcpu->kvm, &sp->spt[i]);
++			flush = true;
++			continue;
++		}
++
+ 		/* Update the shadowed access bits in case they changed. */
+ 		kvm_mmu_page_set_access(sp, i, pte_access);
+ 
+-- 
+2.19.1.6.gb485710b
 
-So for both scenarios (global and per-device) searching for that
-protection property down the hierarchy starting from device->msi.domain
-is correct.
-
-Obvioulsy unless it's done somewhere early in the PCI discovery,
-i.e. before the discovery associated the domain pointer.
-
-Thanks,
-
-        tglx
