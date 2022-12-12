@@ -2,226 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8733664A82E
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 20:41:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F142864A8B1
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 21:24:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233263AbiLLTlj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 14:41:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37546 "EHLO
+        id S233647AbiLLUXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 15:23:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232254AbiLLTlf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 14:41:35 -0500
-Received: from CY4PR02CU007-vft-obe.outbound.protection.outlook.com (mail-westcentralusazon11021020.outbound.protection.outlook.com [40.93.199.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E517F642A;
-        Mon, 12 Dec 2022 11:41:34 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=epUxm+JQ3/kBhrPYPte0GQrhKBu2SelDdBSs/CEtuXVdSpcX0XM1tQzn7phpCTY4+lm0m3HtwfCYwDDAmTck9L6QWre8JXfxjCTWhCwtPejVB+ojbbyPVFE0dJLq319dk1+VU1zfKgRlvrmbR0PZkqPpfOoMD17jRrW/EDYwfVuUmFazLe5tgt6DP2JqiEZeP5vx478QjodcTfcOrVUzSM71spyIDhzhUINHZlI9/LzUUtKgovQOKsqexeoDhmbUjxPu45PK42RTmR3bKnGO4Zsqb7KejjQ74XXfmQfgx3uYHwszxbo2M5xEH78K/pEaT66OTOnlZK3Jt5WCAo0ahg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=F4rl6EpjvuFVOzlpJDWQsharFzL3jV3LB1+DsB93r+8=;
- b=PFLcKXJZf1A1zu7LP2iQFfbcyDz9XNXONbn+B0dAm2nX4fHe8bQKMgwZgFdEB/5IsFSr7ppUwRIiL0K285FC4XtFGFfyO563j6td+EErnsl6cQnp6oXx1SdHJAI32mOf8QbFjECUvLXKV/RynnMXWW2lWVcDdRKpT/Tq4Afiw5CXbVuGO312iJrXW6hZFmuXGuILIR1EztcJgnmV1qmnGFSyhRxvQswzPWMAuHPv47UA7x+DkRchlHiFO1CDvoXFoCWjAdmHYz19hFhcHkj/x5k9wjpd2JoQ+0/4/RyUujhn7ESu9ZK3W0eeqnWtQw3ng0PAXgJ7wna5lN8v56fJvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=F4rl6EpjvuFVOzlpJDWQsharFzL3jV3LB1+DsB93r+8=;
- b=hRKgVW+6G6cD4nXxdXCWCtamO27zVodArvftFlcttahLuf3EUyVySXqJB2pIrT1j5xV7cetmJqngjz5QPppf8Vvj8C3olRrelwhi+57In9RQ7Tl1HTJzUTqdB6/+eBO0CXVINmsipJ6PLWCtaI4rjTzmeuduypZpt4FVReXFGfw=
-Received: from BYAPR21MB1688.namprd21.prod.outlook.com (2603:10b6:a02:bf::26)
- by DS7PR21MB3365.namprd21.prod.outlook.com (2603:10b6:8:81::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.2; Mon, 12 Dec
- 2022 19:41:29 +0000
-Received: from BYAPR21MB1688.namprd21.prod.outlook.com
- ([fe80::1e50:78ec:6954:d6dd]) by BYAPR21MB1688.namprd21.prod.outlook.com
- ([fe80::1e50:78ec:6954:d6dd%8]) with mapi id 15.20.5944.002; Mon, 12 Dec 2022
- 19:41:29 +0000
-From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
-To:     Tianyu Lan <ltykernel@gmail.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
-        "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "sandipan.das@amd.com" <sandipan.das@amd.com>,
-        "ray.huang@amd.com" <ray.huang@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "sterritt@google.com" <sterritt@google.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "samitolvanen@google.com" <samitolvanen@google.com>,
-        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
-Subject: RE: [RFC PATCH V2 04/18] x86/hyperv: Decrypt hv vp assist page in
- sev-snp enlightened guest
-Thread-Topic: [RFC PATCH V2 04/18] x86/hyperv: Decrypt hv vp assist page in
- sev-snp enlightened guest
-Thread-Index: AQHY+8mdW+AXk/uLVkmNd40J6d9ARq5qxxFA
-Date:   Mon, 12 Dec 2022 19:41:29 +0000
-Message-ID: <BYAPR21MB168851BAABC0BEA0790C5A4BD7E29@BYAPR21MB1688.namprd21.prod.outlook.com>
-References: <20221119034633.1728632-1-ltykernel@gmail.com>
- <20221119034633.1728632-5-ltykernel@gmail.com>
-In-Reply-To: <20221119034633.1728632-5-ltykernel@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=a6585880-8f6b-482a-9694-d0e2547944a7;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-12-12T19:24:15Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR21MB1688:EE_|DS7PR21MB3365:EE_
-x-ms-office365-filtering-correlation-id: f4f592a0-2648-4063-aa6d-08dadc78dd51
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Y5ct8hRXSv4f3HCxeGMCohaQ2YC7ii9bMgFPa5Fjm86UcU25Ww6h9q6nvs99QGkh5Ni92suQb6j6x7IrRPJ7iIsG09I9xnDveWnPtTLZXvnzd28QOqPW17odoC6TvgmTAEEQe4gIVFkE8qgs1WJpH+JVBwpizFXgZ00WzefEgf6j3rQpDDWsqDYvfUDpZRUQ6mYuWdwczgNao0+RbjiZTIiARhezbPRmRbII3R8Ye5Ycp8HtBrYzv4iXtIBo7EYJrT3eZaFMgZB0gueHhz3QDeW7AbgORseKqfztxtmqlakQRHuQyr7b6OceRS7tU6zm3+R/u9SqKR82IfN/9dd31BWdyiAXfQ/HTjUXc9fegE8O9B5x1oQ2kIe9dCJjvSUAFNHfXycW2UKaNq/q5TvXIVeKTkpgAI3reMxqa2L4wSsi0M0cqRponBEkryLylKhA1jk6+Y81h++4KfaHrJrrqx+MVuaebVZgfM4zZ4gv8LlERpl0dMd5jiv+bYdYgFPsZGULMeNNHtcUw9zJ+RKMFxcS5xtfzqgIDQ3soD8SvWtjOuaO5HgWaUDigoeOTIfJPClLbsL1y7G7g42UINh6jysh18sRchfUFNu1zt8mN6PkkXpcY7DMIVjS5inYctgSzPXEVsobS2jYoia+Y8vebqX57dEgV+KY97qfXiKnajtwwPGOfFoRuKqO8rmgdS+bTgVhmmD+4Sf9J4o0ZqB3iEVFGAdWp69ONRr9hUUrp6SRHh2JPNGO4ulvv8GdFU727+AgWT2fLfDLdYiyoUmYMPxxjrU8krOTh1JO684w7wo=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR21MB1688.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(136003)(366004)(396003)(39860400002)(451199015)(66946007)(66446008)(921005)(38070700005)(8676002)(4326008)(66476007)(66556008)(83380400001)(76116006)(54906003)(64756008)(71200400001)(10290500003)(316002)(110136005)(41300700001)(2906002)(122000001)(8990500004)(86362001)(38100700002)(8936002)(82960400001)(82950400001)(52536014)(7416002)(7406005)(55016003)(5660300002)(6506007)(7696005)(478600001)(966005)(9686003)(33656002)(186003)(26005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?a6acX+2nFwGsUJAmgP/VqSVYPlvxRjh3/2jm0mvlH9g5dy6R065ZjT1tx6vj?=
- =?us-ascii?Q?w8HcJeCB49CiqSh4i26pEd5kiNPjqxHAfpp+CiCSqPujhuFdOnEK2dwK8IQo?=
- =?us-ascii?Q?oXYWBq8Qnj/BZiwHPONiJ/Z9jjZmTfLrcF1SPmUZ5tojeQ0wajPPUp34cGdu?=
- =?us-ascii?Q?e7nSRJp1JJiTghknnPz/9+/Fm4vbAoXyeW8tyMpmZEUXVVWuFuF7USpLRXBm?=
- =?us-ascii?Q?FYger1NcLgeayHpk/+8KY7/jiBitT32ujQFUjvUaeSf4W5f967ooLbNDPFf8?=
- =?us-ascii?Q?QqVimktQaa8tN+BkHiM/ibWhUhwJxUv4UKZBQqIW5E+VI+ia/K6r1f+9dpSx?=
- =?us-ascii?Q?l11ptLgpncXZJEEa7r74OwwYwxgeCdo1q+YRa/9kfWKhngbjnTDB4gZc77mM?=
- =?us-ascii?Q?XpsGZD9l3lSfDbY7wdB5cs4M9AvjJatz4WA8YxhPAPM2sS64UhyqJZxWCjQN?=
- =?us-ascii?Q?7L+EDABrZf/YUzD9KuSWyJRq1NkIaoFXJw3bRcnmvFyeLU5oSRQmaUvalxbo?=
- =?us-ascii?Q?mORD+7Ftk1QqXBFYPIet7tBCsKPV24QCKp/WqJ+LEr7zilPFyjKjeWZNeZAh?=
- =?us-ascii?Q?Tiv3j1AEFp2OEwNP/fMggTH7ViQ+qBR6i25cjC51u4kkdf6dNk9jgF7/Y0+c?=
- =?us-ascii?Q?bVhdujCcnBVLQ1P226U0vtx4nSm4BX49LNR2URXd7gFCbt7pthSa98UlNhzt?=
- =?us-ascii?Q?qAmdm86olB5/SrsHyb4d00ao7Kzf21YJGTtNf9EYdntewq7jxenAyzZ4OD+q?=
- =?us-ascii?Q?kXjIp0dYkkNeH5jvukgz7iI7Aib0fNCQr9lPGcZYgxK3V/TVLq7DtJskJN+P?=
- =?us-ascii?Q?u3HrJp9HQqIaM1IWifn5GdxJdy+qzsEg/0DNmwN82A1BkOR5qcY8MGMQ4jp0?=
- =?us-ascii?Q?Ea4a5DxHl7Bx0zb7QCtjV4NqqBNpiJgk4dCewOhmjC/pFkXWBeu+jZHM6a5z?=
- =?us-ascii?Q?in5nFpTuRG24/dcv8iDvd/AXBRoq2b6EsxSMQYevRQWhyfZUTDXere68RdSv?=
- =?us-ascii?Q?gABEEluIGQC0KaJMko1xpqdOhS0RZl8tjGAGlNlXZ3JrYl7RKEkFbfyjQPuh?=
- =?us-ascii?Q?IqTRrWs2E1GURytPHD0D75OeAm9fDN0Y1HxVyiHxKSAcbkv/aep7N4hsldba?=
- =?us-ascii?Q?jBPZNnWx1y11pUR+Wr1xOaXtIz1eUy9bT+8KWPOGlOQSgps5m3lFiNnedMQG?=
- =?us-ascii?Q?qnzypiede/FW1Ur9hQcAh2S0FMddJnrHHmz/aarKJicKNRgJh9JysQsFkBfK?=
- =?us-ascii?Q?UDkNzpuh6/2l6K4edllRpbizWB2efnTxtN6QOqvijdMhNZzcb9gmtgjmSupX?=
- =?us-ascii?Q?XA5OQYDawScFAkioQsq9sib8LY1QwJSv8Xqy2iKhuUb2nDCpXksQ5XXPjE5l?=
- =?us-ascii?Q?G8o1MrooPgfuzU2pSGalRvpftLn7hdPaxWyUkqbNCCkG0Rqz96Ll8nCS3Bss?=
- =?us-ascii?Q?mE1QuviMqsP94xtyop0EKHLzOIKKschqmrUNJ7PuQbDyXJcy3KByacwdVnJH?=
- =?us-ascii?Q?5pLiQgesYBVIa350LbAiKLblaDhcqEkuqdy1I+iphuWnMTuGOVg646VPOg1u?=
- =?us-ascii?Q?L5tBC0BwBjldMgWAhjkCeoipqXRGkxmYFShqplJNhJkh1yw/ip81rOfgff9y?=
- =?us-ascii?Q?bQ=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S232180AbiLLUXi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 15:23:38 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D507B26DF;
+        Mon, 12 Dec 2022 12:23:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1670876617; x=1702412617;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cwt1okdWNlX5OjC33VLxJ95ouJ4xQF1dorpCph53eH8=;
+  b=V4HZRrSIuKOFtZPTVRiDVVLsGFNJLRZCsPQU61Z7ZljEIOWOiZbLIdR1
+   wMvdC0J3w3coxrlmz5rHSfdIRtN43LIS/GToX/2z8mLtKIxGtajjb7Dzh
+   b8xIAIJX94chyQIK5T7tS99s4uOuWXtaqFkK3G4CnOXxGVmLrgekAZhqQ
+   K+dpSRdbanoBzlbY7Yh+3bhJt9mSM6sa88qzLthTyHhvXz04aCcebJHTv
+   Vn5W+iRKQ1lazqn45gbSvbEkjrTbPePXN9hcMmtnVQJY42z52B0lsj6pJ
+   /oK468ep8zNsUui1dhRvPJbapvg9HJholWMcVUVwGSanzxWXdrKNZUO5a
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10559"; a="316655491"
+X-IronPort-AV: E=Sophos;i="5.96,239,1665471600"; 
+   d="scan'208";a="316655491"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2022 12:23:37 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10559"; a="650471643"
+X-IronPort-AV: E=Sophos;i="5.96,239,1665471600"; 
+   d="scan'208";a="650471643"
+Received: from cwholzwa-mobl.amr.corp.intel.com (HELO desk) ([10.209.108.80])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2022 12:23:36 -0800
+Date:   Mon, 12 Dec 2022 12:23:34 -0800
+From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+To:     Zhang Chen <chen.zhang@intel.com>
+Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Chao Gao <chao.gao@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [RFC PATCH 5/9] x86/bugs: Use Virtual MSRs to request hardware
+ mitigations
+Message-ID: <20221212202334.ldrgv7fnkgjtsogg@desk>
+References: <20221210160046.2608762-1-chen.zhang@intel.com>
+ <20221210160046.2608762-6-chen.zhang@intel.com>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR21MB1688.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4f592a0-2648-4063-aa6d-08dadc78dd51
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Dec 2022 19:41:29.3180
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: T5pGe4kxcwk9TFIqLSryl6kBNBINzLIxsaGWKTq9l4WazXqStkCUNl1iBolUk7APxtupYiq4BSQ+tKjO/Dbiov/MSYhki4QQgjdn1QCIusQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR21MB3365
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221210160046.2608762-6-chen.zhang@intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Tianyu Lan <ltykernel@gmail.com> Sent: Friday, November 18, 2022 7:46=
- PM
->=20
-> hv vp assist page is shared between sev snp guest and hyperv. Decrypt
-> the page when use it.
->=20
-> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
+On Sun, Dec 11, 2022 at 12:00:42AM +0800, Zhang Chen wrote:
+> From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+> 
+> Guests that have different family/model than the host may not be aware
+> of hardware mitigations(such as RRSBA_DIS_S) available on host. This is
+> particularly true when guests migrate. To solve this problem Intel
+> processors have added a virtual MSR interface through which guests can
+> report their mitigation status and request VMM to deploy relevant
+> hardware mitigations.
+> 
+> Use this virtualized MSR interface to request relevant hardware controls
+> for retpoline mitigation.
+> 
+> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
 > ---
->  arch/x86/hyperv/hv_init.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
->=20
-> diff --git a/arch/x86/hyperv/hv_init.c b/arch/x86/hyperv/hv_init.c
-> index 29774126e931..4600c5941957 100644
-> --- a/arch/x86/hyperv/hv_init.c
-> +++ b/arch/x86/hyperv/hv_init.c
-> @@ -30,6 +30,7 @@
->  #include <clocksource/hyperv_timer.h>
->  #include <linux/highmem.h>
->  #include <linux/swiotlb.h>
-> +#include <linux/set_memory.h>
->=20
->  int hyperv_init_cpuhp;
->  u64 hv_current_partition_id =3D ~0ull;
-> @@ -112,6 +113,11 @@ static int hv_cpu_init(unsigned int cpu)
->  		}
->  		WARN_ON(!(*hvp));
->  		if (*hvp) {
-> +			if (hv_isolation_type_en_snp()) {
-> +				WARN_ON_ONCE(set_memory_decrypted((unsigned long)(*hvp), 1) !=3D 0);
-
-The "!=3D 0" isn't needed.
-
-> +				memset(*hvp, 0, PAGE_SIZE);
-> +			}
+>  arch/x86/include/asm/msr-index.h | 23 +++++++++++++++++++++++
+>  arch/x86/kernel/cpu/bugs.c       | 24 ++++++++++++++++++++++++
+>  2 files changed, 47 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+> index 1143ac9400c3..1166b472377c 100644
+> --- a/arch/x86/include/asm/msr-index.h
+> +++ b/arch/x86/include/asm/msr-index.h
+> @@ -165,6 +165,7 @@
+>  						 * IA32_XAPIC_DISABLE_STATUS MSR
+>  						 * supported
+>  						 */
+> +#define ARCH_CAP_VIRTUAL_ENUM		BIT(63)	/* MSR_VIRTUAL_ENUMERATION supported */
+>  
+>  #define MSR_IA32_FLUSH_CMD		0x0000010b
+>  #define L1D_FLUSH			BIT(0)	/*
+> @@ -1062,6 +1063,28 @@
+>  #define MSR_IA32_VMX_MISC_INTEL_PT                 (1ULL << 14)
+>  #define MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS (1ULL << 29)
+>  #define MSR_IA32_VMX_MISC_PREEMPTION_TIMER_SCALE   0x1F
 > +
->  			msr.enable =3D 1;
->  			wrmsrl(HV_X64_MSR_VP_ASSIST_PAGE, msr.as_uint64);
->  		}
-> @@ -228,6 +234,12 @@ static int hv_cpu_die(unsigned int cpu)
->=20
->  	if (hv_vp_assist_page && hv_vp_assist_page[cpu]) {
->  		union hv_vp_assist_msr_contents msr =3D { 0 };
+> +/* Intel virtual MSRs */
+> +#define MSR_VIRTUAL_ENUMERATION			0x50000000
+> +#define VIRT_ENUM_MITIGATION_CTRL_SUPPORT	BIT(0)	/*
+> +							 * Mitigation ctrl via virtual
+> +							 * MSRs supported
+> +							 */
 > +
-> +		if (hv_isolation_type_en_snp())
-> +			WARN_ON_ONCE(set_memory_encrypted(
-> +				    (unsigned long)hv_vp_assist_page[cpu],
-> +				    1) !=3D 0);
+> +#define MSR_VIRTUAL_MITIGATION_ENUM		0x50000001
+> +#define MITI_ENUM_BHB_CLEAR_SEQ_S_SUPPORT	BIT(0)	/* VMM supports BHI_DIS_S */
+> +#define MITI_ENUM_RETPOLINE_S_SUPPORT		BIT(1)	/* VMM supports RRSBA_DIS_S */
 > +
+> +#define MSR_VIRTUAL_MITIGATION_CTRL		0x50000002
+> +#define MITI_CTRL_BHB_CLEAR_SEQ_S_USED		BIT(0)	/*
+> +							 * Request VMM to deploy
+> +							 * BHI_DIS_S mitigation
+> +							 */
+> +#define MITI_CTRL_RETPOLINE_S_USED		BIT(1)	/*
+> +							 * Request VMM to deploy
+> +							 * RRSBA_DIS_S mitigation
+> +							 */
+> +
+>  /* AMD-V MSRs */
+>  
+>  #define MSR_VM_CR                       0xc0010114
+> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
+> index 3e3230cccaa7..a9e869f568ee 100644
+> --- a/arch/x86/kernel/cpu/bugs.c
+> +++ b/arch/x86/kernel/cpu/bugs.c
+> @@ -1379,6 +1379,28 @@ static void __init spectre_v2_determine_rsb_fill_type_at_vmexit(enum spectre_v2_
+>  	dump_stack();
+>  }
+>  
+> +/* Speculation control using virtualized MSRs */
+> +static void __init spec_ctrl_setup_virtualized_msr(void)
+> +{
+> +	u64 msr_virt_enum, msr_mitigation_enum, msr_mitigation_ctrl;
+> +
+> +	if (!(x86_read_arch_cap_msr() & ARCH_CAP_VIRTUAL_ENUM))
+> +		return;
+> +
+> +	rdmsrl(MSR_VIRTUAL_ENUMERATION, msr_virt_enum);
+> +	if (!(msr_virt_enum & VIRT_ENUM_MITIGATION_CTRL_SUPPORT))
+> +		return;
+> +
+> +	rdmsrl(MSR_VIRTUAL_MITIGATION_ENUM, msr_mitigation_enum);
+> +	/* When retpoline is being used, request relevant hardware controls */
+> +	if (boot_cpu_has(X86_FEATURE_RETPOLINE) &&
+> +	    msr_mitigation_enum & MITI_ENUM_RETPOLINE_S_SUPPORT) {
+> +		rdmsrl(MSR_VIRTUAL_MITIGATION_CTRL, msr_mitigation_ctrl);
+> +		msr_mitigation_ctrl |= MITI_CTRL_RETPOLINE_S_USED;
+> +		wrmsrl(MSR_VIRTUAL_MITIGATION_CTRL, msr_mitigation_ctrl);
+> +	}
+> +}
+> +
+>  static void __init spectre_v2_select_mitigation(void)
+>  {
+>  	enum spectre_v2_mitigation_cmd cmd = spectre_v2_parse_cmdline();
+> @@ -1485,6 +1507,8 @@ static void __init spectre_v2_select_mitigation(void)
+>  	    mode == SPECTRE_V2_RETPOLINE)
+>  		spec_ctrl_disable_kernel_rrsba();
+>  
+> +	spec_ctrl_setup_virtualized_msr();
 
-The re-encryption should not be done here (or anywhere else, for
-that matter) since the VP assist pages are never freed.   The Hyper-V
-synthetic MSR pointing to the page gets cleared, but the memory isn't
-freed.  If the CPU should come back online later, the previously allocated
-VP assist page is reused.   The decryption in hv_cpu_init() is done only
-when a new page is allocated to use as a VP assist page.  So just leave
-the page decrypted here, and it will get reused in its decrypted state.
-
-This handling of the VP assist page is admittedly a bit weird.  But
-it is needed.  See discussion with Vitaly Kuznetsov here:
-https://lore.kernel.org/linux-hyperv/878rkqr7ku.fsf@ovpn-192-136.brq.redhat=
-.com/
-
-Michael
-
->  		if (hv_root_partition) {
->  			/*
->  			 * For root partition the VP assist page is mapped to
-> --
-> 2.25.1
-
+I think this also needs to be called during secondary CPU
+initialization.
