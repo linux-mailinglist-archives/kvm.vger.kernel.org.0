@@ -2,67 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E53B7649F72
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 14:09:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B1BE649F85
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 14:11:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232559AbiLLNJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 08:09:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38156 "EHLO
+        id S231801AbiLLNLo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 08:11:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232048AbiLLNIx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 08:08:53 -0500
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 478D611C22
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 05:08:48 -0800 (PST)
-Received: by mail-ed1-x529.google.com with SMTP id z92so12767340ede.1
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 05:08:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hrsTHdTJbwls01AqE8UPAVwypoZK7MqNkS0vyWojDY0=;
-        b=JAq03fHIf8UuWIJHvhpRM+Oi++N5xfDJubmTSXe4iFh8RjCZmBts2l5NWwEz/a5n9r
-         tW2wQEX4fhpHI4JW2o6SvinEGHARdWRiFAq2k3rUq1II+ltsLB2wLI70zokFvxFJHmbk
-         qPNeFccGX2EspzTx/gmm7DqfoXlkuuKMSKbqwDYY7pr/4JSkU5U1Ljg4nDADttNkS4JE
-         /evkOmJe86hF+zSbt2ptqYc1iVAstcx5/2hERs0+93wQepQJ1KPuUN4dHBiqUAH8UNXo
-         YHeztyJkSJaYXg0nQI22OTdiT5glecWt7B6K1hXmntJ9r8O4IhaS7ymptUu3XOr+zVeK
-         sxHQ==
+        with ESMTP id S232535AbiLLNLT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 08:11:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 577BD1276A
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 05:10:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670850616;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Pgww3P7VivOi/FIBxfkPIAXabbHo6t9kWUrRb+E5jZY=;
+        b=jKa5qDFdEFtCfbBo1EQG9BlaKtKCwpretb/hmFynvAoTzbBBTOihYTWIjWpOKG1pNwlx5g
+        yPE+06HJXKj6irIJPDu7fEeiB+G+wjGNqrPeyKwmtTtRy5K6mcS9XgKONBc0rX4qBxWca+
+        JXOqIAxslNeGGemddK5Pt8BJw+v+UXc=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-101-vmWSX2AnPziI0pO60qa5gA-1; Mon, 12 Dec 2022 08:10:15 -0500
+X-MC-Unique: vmWSX2AnPziI0pO60qa5gA-1
+Received: by mail-wm1-f71.google.com with SMTP id ay19-20020a05600c1e1300b003cf758f1617so4148793wmb.5
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 05:10:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hrsTHdTJbwls01AqE8UPAVwypoZK7MqNkS0vyWojDY0=;
-        b=5FaQDtPSDw1C+RpIu1bJnt5IFtUH+1n7WxM7R0oijxN0+w2c2JK/8NM/Tknx3hfINz
-         dqDokexbCPoApMPQ7jtWGgpS9gUB6TzpWr8Ob43ZDBjaYSA4rHZ8kRaRLAmnRQShckPC
-         9nwTCalbtxded28Uu8m9v7aWYhoHX2gptalfKH3Py7vS6G5wussKqhVNmZyLms2kzIpB
-         bq/yiH4fWZmv1kdDdhUU1pWrINH2lMYb8taI1KKgC74QXGnCzV/37zL5z3uHZwRpxteU
-         65N11jR5sev/m8WuS3S2dip12+WMfo71Ga4Dauay7pWsy8aFkE8/Bge0DEPX5eQSYXe7
-         F/xQ==
-X-Gm-Message-State: ANoB5pk1VSr5Y3xvp6xmhbiiInef00xhhllbYZCwfp3Qopp7bJqZyUm+
-        VYNyM2qljjTMaQNzEcYXNoCuUYsL9Ww4iUqo5jAqGQ==
-X-Google-Smtp-Source: AA0mqf4hhAV6qnhgB/a43t2zmLT85++iSw6RqiW6FztbKeqmmRQu+gMIQlhxBBJ5aKBrrMatWIl0Ylw2BekWCNITujc=
-X-Received: by 2002:aa7:ca4c:0:b0:46c:24fc:ba0f with SMTP id
- j12-20020aa7ca4c000000b0046c24fcba0fmr24347150edt.140.1670850526482; Mon, 12
- Dec 2022 05:08:46 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Pgww3P7VivOi/FIBxfkPIAXabbHo6t9kWUrRb+E5jZY=;
+        b=17TCyPRAT/GEbCruzbd8tw9z3RDekwjxLvO5np920ATAac/f9fwBbqx3G5V2rzxrDm
+         WPbzwZGPdcEOpuKpObXG/8X/bmWVEo5B9yX/4N5ogpTWIg6qHeEkYx6bXGetZI+m9lHX
+         0XGcxNiakzDqopLXz7apLmRRFSxT+/BXBztAdqmadxSCWAd5M18yDW0lCajR651DMHzK
+         wQXz34IYKcKc+MduglwwhMF4mxZEXYMmWQQI6fcQnp5wsW/hhbLvffHpXXpd+kr0Acsb
+         CjC+qZRCjiGjdYgHN3HFcUPxTICpf4tA9h0CjLv7aBmJXT7GZbWiUmI2DAg+UAuaAOEe
+         uVmw==
+X-Gm-Message-State: ANoB5pmpU9hL8B2mdvLAQNwtrSoFH35OBUnz1Msu5DX3ziqGlaRe1aZU
+        K/9Hiod9usZIu+oL0KN2bqCPnlHWEvoG5pOPEl9hC5shjcqjirRR5RR9X2idi84jfAWQT6eNI8X
+        OAM3HpT+5/Vxd
+X-Received: by 2002:adf:f205:0:b0:24d:58b3:e55b with SMTP id p5-20020adff205000000b0024d58b3e55bmr5008017wro.22.1670850614237;
+        Mon, 12 Dec 2022 05:10:14 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7OWZ/ougLMGglCtagFz7TqkIUSxpgqX0sWv2cXCfzNusgn/DA3jXTHuPSG+QkujdHkMWAm2A==
+X-Received: by 2002:adf:f205:0:b0:24d:58b3:e55b with SMTP id p5-20020adff205000000b0024d58b3e55bmr5008009wro.22.1670850614025;
+        Mon, 12 Dec 2022 05:10:14 -0800 (PST)
+Received: from sgarzare-redhat (host-87-11-6-51.retail.telecomitalia.it. [87.11.6.51])
+        by smtp.gmail.com with ESMTPSA id g14-20020adffc8e000000b002421ed1d8c8sm8740554wrr.103.2022.12.12.05.10.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 05:10:13 -0800 (PST)
+Date:   Mon, 12 Dec 2022 14:10:08 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Carlos Llamas <cmllamas@google.com>
+Cc:     Lee Jones <lee.jones@linaro.org>, linux-kernel@vger.kernel.org,
+        Ram Muthiah <rammuthiah@google.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, jiang.wang@bytedance.com
+Subject: Re: [PATCH 1/1] virtio/vsock: Make vsock virtio packet buff size
+ configurable
+Message-ID: <20221212131008.aeui7ahq2jp4j33r@sgarzare-redhat>
+References: <20210721143001.182009-1-lee.jones@linaro.org>
+ <20210722125519.jzs7crke7yqfh73e@steredhat>
+ <Y5OQ8jQsK2Dz8tPy@google.com>
 MIME-Version: 1.0
-References: <CAAhSdy0qihfFCXTV-QUjP-5XiQQqBC4_sP-swx77k6PC3uTmmw@mail.gmail.com>
- <CABgObfZ7Ar-t5m0+p=H1h0_bk-dJ5rYSVRCo6ZP5Wa0Qva2sLQ@mail.gmail.com>
-In-Reply-To: <CABgObfZ7Ar-t5m0+p=H1h0_bk-dJ5rYSVRCo6ZP5Wa0Qva2sLQ@mail.gmail.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Mon, 12 Dec 2022 18:38:34 +0530
-Message-ID: <CAAhSdy0c5_oa27axsG_YnZmJqoTVXAeR2XQ=sqvLtBMaB3wB1Q@mail.gmail.com>
-Subject: Re: [GIT PULL] KVM/riscv changes for 6.2
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        KVM General <kvm@vger.kernel.org>,
-        "open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" 
-        <kvm-riscv@lists.infradead.org>,
-        linux-riscv <linux-riscv@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <Y5OQ8jQsK2Dz8tPy@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,127 +86,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 12, 2022 at 5:06 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+On Fri, Dec 09, 2022 at 07:48:02PM +0000, Carlos Llamas wrote:
+>On Thu, Jul 22, 2021 at 02:55:19PM +0200, Stefano Garzarella wrote:
+>> >
+>> > +uint virtio_transport_max_vsock_pkt_buf_size = 1024 * 64;
+>> > +module_param(virtio_transport_max_vsock_pkt_buf_size, uint, 0444);
+>> > +EXPORT_SYMBOL_GPL(virtio_transport_max_vsock_pkt_buf_size);
+>> > +
 >
-> On Wed, Dec 7, 2022 at 11:33 AM Anup Patel <anup@brainfault.org> wrote:
-> >
-> > Hi Paolo,
-> >
-> > We have the following KVM RISC-V changes for 6.2:
-> > 1) Allow unloading KVM module
-> > 2) Allow KVM user-space to set mvendorid, marchid, and mimpid
-> > 3) Several fixes and cleanups
-> >
-> > Please pull.
-> >
-> > Regards,
-> > Anup
->
-> Hmm, I looked at them more closely and I noticed something weird in
-> the author date:
->
-> git log --format='%an %ad %s' origin/master..6ebbdecff6ae
-> Anup Patel Wed Dec 7 09:17:49 2022 +0530 RISC-V: KVM: Add ONE_REG
-> interface for mvendorid, marchid, and mimpid
-> Anup Patel Wed Dec 7 09:17:43 2022 +0530 RISC-V: KVM: Save mvendorid,
-> marchid, and mimpid when creating VCPU
-> Anup Patel Wed Dec 7 09:17:38 2022 +0530 RISC-V: Export
-> sbi_get_mvendorid() and friends
-> Anup Patel Wed Dec 7 09:17:27 2022 +0530 RISC-V: KVM: Move sbi related
-> struct and functions to kvm_vcpu_sbi.h
-> Anup Patel Wed Dec 7 09:17:19 2022 +0530 RISC-V: KVM: Use switch-case
-> in kvm_riscv_vcpu_set/get_reg()
-> Anup Patel Wed Dec 7 09:17:12 2022 +0530 RISC-V: KVM: Remove redundant
-> includes of asm/csr.h
-> Anup Patel Wed Dec 7 09:17:05 2022 +0530 RISC-V: KVM: Remove redundant
-> includes of asm/kvm_vcpu_timer.h
-> Anup Patel Wed Dec 7 09:16:51 2022 +0530 RISC-V: KVM: Fix reg_val
-> check in kvm_riscv_vcpu_set_reg_config()
-> Christophe JAILLET Wed Dec 7 09:16:39 2022 +0530 RISC-V: KVM: Simplify
-> kvm_arch_prepare_memory_region()
-> Anup Patel Wed Dec 7 09:16:21 2022 +0530 RISC-V: KVM: Exit run-loop
-> immediately if xfer_to_guest fails
-> Bo Liu Wed Dec 7 09:16:11 2022 +0530 RISC-V: KVM: use vma_lookup()
-> instead of find_vma_intersection()
-> XiakaiPan Wed Dec 7 09:16:02 2022 +0530 RISC-V: KVM: Add exit logic to main.c
->
-> Something in your workflow has eaten the actual date when these were
-> posted to the mailing list.
->
-> For example, https://lore.kernel.org/lkml/CAAhSdy0t1XGTENidgNQkQ5m5emZOes+-2RXTPLEJ0tEZXuX2hA@mail.gmail.com/t/
-> shows Bo Liu's patch as being sent on November 1st.
->
-> Please keep the author information from the mailing list messages, and
-> also please try to update the KVM/RISC-V tree as soon as patches are
-> ready and tested, i.e. earlier than the week before the merge window.
-> (Seeing '6.1-rc8' as the base for the pull request is often a sign of
-> something wrong with the workflow; see
->
-> It's a small set of changes, so I'm going to defer this pull request
-> to the second week of the merge window.
+>I'm interested on this functionality, so I could take this on.
 
-Should I send another PR ?
-OR
-Should I re-create the kvm-riscv-6.2-1 tag ?
-
-Regards,
-Anup
+Great!
+We are changing the packet handling using sk_buff [1], so I think it's 
+better to rebase on that work that should be merged in net-next after 
+the current merge window will close.
 
 >
-> Paolo
+>>
+>> Maybe better to add an entry under sysfs similar to what Jiang proposed
+>> here:
+>> https://lists.linuxfoundation.org/pipermail/virtualization/2021-June/054769.html
 >
-> > The following changes since commit 76dcd734eca23168cb008912c0f69ff408905235:
-> >
-> >   Linux 6.1-rc8 (2022-12-04 14:48:12 -0800)
-> >
-> > are available in the Git repository at:
-> >
-> >   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.2-1
-> >
-> > for you to fetch changes up to 6ebbdecff6ae00557a52539287b681641f4f0d33:
-> >
-> >   RISC-V: KVM: Add ONE_REG interface for mvendorid, marchid, and
-> > mimpid (2022-12-07 09:17:49 +0530)
-> >
-> > ----------------------------------------------------------------
-> > KVM/riscv changes for 6.2
-> >
-> > - Allow unloading KVM module
-> > - Allow KVM user-space to set mvendorid, marchid, and mimpid
-> > - Several fixes and cleanups
-> >
-> > ----------------------------------------------------------------
-> > Anup Patel (9):
-> >       RISC-V: KVM: Exit run-loop immediately if xfer_to_guest fails
-> >       RISC-V: KVM: Fix reg_val check in kvm_riscv_vcpu_set_reg_config()
-> >       RISC-V: KVM: Remove redundant includes of asm/kvm_vcpu_timer.h
-> >       RISC-V: KVM: Remove redundant includes of asm/csr.h
-> >       RISC-V: KVM: Use switch-case in kvm_riscv_vcpu_set/get_reg()
-> >       RISC-V: KVM: Move sbi related struct and functions to kvm_vcpu_sbi.h
-> >       RISC-V: Export sbi_get_mvendorid() and friends
-> >       RISC-V: KVM: Save mvendorid, marchid, and mimpid when creating VCPU
-> >       RISC-V: KVM: Add ONE_REG interface for mvendorid, marchid, and mimpid
-> >
-> > Bo Liu (1):
-> >       RISC-V: KVM: use vma_lookup() instead of find_vma_intersection()
-> >
-> > Christophe JAILLET (1):
-> >       RISC-V: KVM: Simplify kvm_arch_prepare_memory_region()
-> >
-> > XiakaiPan (1):
-> >       RISC-V: KVM: Add exit logic to main.c
-> >
-> >  arch/riscv/include/asm/kvm_host.h     | 16 +++----
-> >  arch/riscv/include/asm/kvm_vcpu_sbi.h |  6 +++
-> >  arch/riscv/include/uapi/asm/kvm.h     |  3 ++
-> >  arch/riscv/kernel/sbi.c               |  3 ++
-> >  arch/riscv/kvm/main.c                 |  6 +++
-> >  arch/riscv/kvm/mmu.c                  |  6 +--
-> >  arch/riscv/kvm/vcpu.c                 | 85 ++++++++++++++++++++++++++---------
-> >  arch/riscv/kvm/vcpu_sbi_base.c        | 13 +++---
-> >  arch/riscv/kvm/vcpu_sbi_hsm.c         |  1 -
-> >  arch/riscv/kvm/vcpu_sbi_replace.c     |  1 -
-> >  arch/riscv/kvm/vcpu_sbi_v01.c         |  1 -
-> >  11 files changed, 97 insertions(+), 44 deletions(-)
-> >
+>Having a look at Jiang's RFC patch it seems the proposed sysfs node
+>hangs off from the main kernel object e.g. /sys/kernel. So I wonder if
+>there is a more appropriate parent for this knob?
+
+Agree, what about /sys/devices ?
+I would take a closer look at what is recommend in this case.
+
 >
+>Also, I noticed that Ram's patch here is using read-only permissions for
+>the module parameter and switching to sysfs would mean opening this knob
+>up to be dynamically configured? I'd need to be careful here.
+>
+
+True, but even if it's changed while we're running, I don't think it's a 
+big problem.
+
+Maybe the problem here would be the allocation of RX buffers made during 
+the probe. Could this be a good reason to use a module parameter?
+
+Thanks,
+Stefano
+
+[1] 
+https://lore.kernel.org/lkml/20221202173520.10428-1-bobby.eshleman@bytedance.com/
+
