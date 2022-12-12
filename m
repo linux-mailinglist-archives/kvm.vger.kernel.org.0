@@ -2,112 +2,105 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64A90649A8E
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 10:00:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F009E649A9E
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 10:05:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231706AbiLLJAN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 04:00:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36392 "EHLO
+        id S231726AbiLLJFI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 04:05:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231690AbiLLJAL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 04:00:11 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 007FA6317;
-        Mon, 12 Dec 2022 01:00:10 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id z8-20020a17090abd8800b00219ed30ce47so14974126pjr.3;
-        Mon, 12 Dec 2022 01:00:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=NsqQBlG7OALHs9p2W6AkND+AQ3ZkN//jvoUDNbWIbKQ=;
-        b=HufF+lFF8AUfjv0wnsSPAksVvIPcOML/MwkmnCkf8sbfeMw1cDXYkx+HSUcP50C2Qj
-         OUa4ud1lBI7y7tS9+99H0dV5NFXUTs5maiwW8JtVBlAlv7F/k53HIC/cwirz8jBR0Gl3
-         HWnFcPaNfgkHqlooSq/HS6gipH1YnRrx0uYlhEsj5puSiEHbwZ1HJo+IaGHUmiXvprl/
-         WlMt+0l+bCZVpTXQ0mTavNI1Gt4ZdTOj+WHBY+u7XoLXmZaBIu6hfbnczzeOv9Ngl9R6
-         DxFjYGzjB1DDpHnWmGWPMOMWX6iia5BK7XdRmRmmK4Qu3meSiNgyyUfW4IjQsp/H5XGv
-         bQKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NsqQBlG7OALHs9p2W6AkND+AQ3ZkN//jvoUDNbWIbKQ=;
-        b=z5YFsryKKnULLm60gZZ8cYCLd8/xUFLLzige6vV2TprXB49BhgI6r2Px13cgpidUil
-         hzd3YMhmCM64lcibS5dsJ5Hyo60DCJsScPyT9ICnt2JXYn5DTeVND/1qS0Owj0MGBh9m
-         GceAySEtWghBaQeuCCuNkah1T2dNlmM+SzdMG+d3cKFkOpudqB6IUgyikRAS0FbF6RFH
-         pzjXCu5e9tFekY5jk3/no7+MXlvXOMdlsXyDTi7V9Fp/qvuTm60N+UlleDZ7YZuaavb/
-         EG2fGzbG16n0QKO9QlHMXJAvskHd2aqZUmY4S6A0yNH9fgqOeecrLA+etu1AubfFZ5+v
-         lnrg==
-X-Gm-Message-State: ANoB5pl+JRpujkbZEp+sXzxxr/Gh2NaDoRSzFwQRRwZ73yfBzoEfXc+W
-        B1HlLaW5lv/SI4jhI+8iDf3GeMbp9Rw=
-X-Google-Smtp-Source: AA0mqf47Wr/e9SYIYG2MxuyNDOFV4K49MbtuZvm5nmlgo9zP+gGxiuyxLSatXOGLxfIwC/L6y1bgqA==
-X-Received: by 2002:a17:902:7c8a:b0:189:ed86:178b with SMTP id y10-20020a1709027c8a00b00189ed86178bmr18625085pll.64.1670835610242;
-        Mon, 12 Dec 2022 01:00:10 -0800 (PST)
-Received: from localhost ([47.89.225.180])
-        by smtp.gmail.com with ESMTPSA id e7-20020a17090301c700b00189bf5dc96dsm5771488plh.230.2022.12.12.01.00.09
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 12 Dec 2022 01:00:09 -0800 (PST)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: [PATCH] kvm: x86/mmu: Warn on linking when sp->unsync_children
-Date:   Mon, 12 Dec 2022 17:01:06 +0800
-Message-Id: <20221212090106.378206-1-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229452AbiLLJFG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 04:05:06 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C7942DC4
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 01:05:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A4BA960F39
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 09:05:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CF43C433D2;
+        Mon, 12 Dec 2022 09:05:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1670835905;
+        bh=ufqahpMAcB+LIb2i+yx9UJwmo67U+MbnKsRVmoX94ck=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=CDh/9mWYnr0KDdCMbl1XEmwaBaKzi3JfBmKPkqqtNTDFlvA9fMLtAY55afOLiuYyZ
+         QuBiCitVzcPpxumOuHJIZ/okisWEG2pcv/x2xJS6GabNp8y++Vt8DP2qV7PAgLZBEc
+         TJw4xCGqZCxM5hWhi31eL6FGrQlcRbiGKzOsOe7jKo/RftxfF+/55lHFH0dJqaR3EV
+         xUbkHGAaoxIQ5VGZsC6CaiziPKSPPtC6Q0VOOFlBu+JwSnzVn3unhec1GMMPJF4Cji
+         qzFteM4SCzOhwL8LvrtpN3rHsKakbUcLZ82AjiaAkIHpVR/NiEGfaYYYtU7EOu6zTw
+         R523+kjLGARJQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p4ekA-00C3Xu-Lv;
+        Mon, 12 Dec 2022 09:05:02 +0000
+Date:   Mon, 12 Dec 2022 09:05:02 +0000
+Message-ID: <867cyxq9fl.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     Ricardo Koller <ricarkol@google.com>, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for PMUv3p5 long counters
+In-Reply-To: <Y5XBo6s9JQVY79Wu@monolith.localdoman>
+References: <20221202045527.3646838-1-ricarkol@google.com>
+        <20221202045527.3646838-2-ricarkol@google.com>
+        <Y5N0os7zL/BaMBa3@monolith.localdoman>
+        <87fsdnfroe.wl-maz@kernel.org>
+        <Y5XBo6s9JQVY79Wu@monolith.localdoman>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, ricarkol@google.com, kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev, eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+Alex,
 
-Since the commit 65855ed8b034 ("KVM: X86: Synchronize the shadow
-pagetable before link it"), no sp would be linked with
-sp->unsync_children = 1.
+On Sun, 11 Dec 2022 11:40:39 +0000,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> A simple "hey, you're wrong here, the PMU extensions do not follow the
+> principles of the ID scheme for fields in ID registers" would have
+> sufficed.
 
-So make it WARN if it is the case.
+This is what I did, and saved you the hassle of looking it up.
 
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
----
- arch/x86/kvm/mmu/mmu.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+> Guess you never made a silly mistake ever, right?
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 4d188f056933..15d389370f88 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2367,7 +2367,16 @@ static void __link_shadow_page(struct kvm *kvm,
- 
- 	mmu_page_add_parent_pte(cache, sp, sptep);
- 
--	if (sp->unsync_children || sp->unsync)
-+	/*
-+	 * The non-direct sub-pagetable must be updated before linking.  For
-+	 * L1 sp, the pagetable is updated via kvm_sync_page() in
-+	 * kvm_mmu_find_shadow_page() without write-protecting the gfn,
-+	 * so sp->unsync can be true or false.  For higher level non-direct
-+	 * sp, the pagetable is updated/synced via mmu_sync_children() in
-+	 * FNAME(fetch)(), so sp->unsync_children can only be false.
-+	 * WARN_ON_ONCE() if anything happens unexpectedly.
-+	 */
-+	if (WARN_ON_ONCE(sp->unsync_children) || sp->unsync)
- 		mark_unsync(sptep);
- }
- 
+It's not so much about making a silly mistake. I do that all the time.
+But it is about the way you state these things, and the weight that
+your reviews carry. You're a trusted reviewer, with a lot of
+experience, and posting with an @arm.com address: what you say in a
+public forum sticks. When you assert that the author is wrong, they
+will take it at face value.
+
+> Otherwise, good job encouraging people to help review KVM/arm64 patches ;)
+
+What is the worse: no review? or a review that spreads confusion?
+Think about it. I'm all for being nice, but I will call bullshit when
+I see it asserted by people with a certain level of authority.
+
+And I've long made up my mind about the state of the KVM/arm64 review
+process -- reviews rarely come from people who have volunteered to do
+so, but instead from those who have either a vested interest in it, or
+an ulterior motive. Hey ho...
+
+	M.
+
 -- 
-2.19.1.6.gb485710b
-
+Without deviation from the norm, progress is not possible.
