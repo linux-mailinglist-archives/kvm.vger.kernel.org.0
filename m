@@ -2,249 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BDC364A42A
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 16:31:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8D1D564A462
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 16:47:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232477AbiLLPbO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 10:31:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41324 "EHLO
+        id S232469AbiLLPrN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 10:47:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232503AbiLLPbL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 10:31:11 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462E3120AE;
-        Mon, 12 Dec 2022 07:31:09 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id n65-20020a17090a2cc700b0021bc5ef7a14so222871pjd.0;
-        Mon, 12 Dec 2022 07:31:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+/jm7VnVwXNJnon7L3mSgLc+ja6eHEtRF1Bkw57lTnY=;
-        b=Bfu11zCOiH870ikkLoaQUU7lLREucd4917jtlNMwjuWbwgQlaRhajLIdsCshY8607X
-         j/FThxRyzTRhXxEDWh8moFbWnPWu9AGPEtvMxeutv0ls+ZVtN9wfuBwvMpHdB+HFmiwG
-         rbp67n8/EDDYnrFDzrp6JEB4ms4n3Ld3v8yXQuMJj39hTmxT6LAhB7s9Dpgz6E7osYWY
-         856WC39jWG4e4v8NUfLjwSzDpBBKGCn68IeVa2Vzb3lziqdBEoA+vbvK0Yvq+Y/6bHu9
-         mDSSQt1uWmG0mOfSlv1JFnkq2FXF2TOQvmd2vJ89o9sMN5uzZ5z8RcIk7pSLrIE05dZ5
-         oEXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+/jm7VnVwXNJnon7L3mSgLc+ja6eHEtRF1Bkw57lTnY=;
-        b=BBnqRw7yArkVG62RZ5AWaM0n3GGqf6cIhibbT6Xl1I0xHCd/ZEX6k4BSXMxxt4Hvmy
-         FkUZDlJYucCbKEgqI/18/VOcnaV91bbrfmoSgHT2tN+4MrrrDj3o7nJY94ksYekLppeM
-         TIUcsVFIbx1OSTnNDDXVnRdH38tF56SlfWp+INeIC2PDBhwMDeRPEaO9iW6SQIzOMhrN
-         yeg7AZHlZ+ihgZuQH56ZBuNvOfVJz3ykVhssi7Sa0OvhGUFrRTxscXZF1TqyKzx0aiVJ
-         VT7WsLgSjJJ9IehDJTGpbiJFtBJPvHH30Qec4nLwAqZ2hndMINnxRsDr3QUPbCUwfrhJ
-         bZFg==
-X-Gm-Message-State: ANoB5plXkCTufdqKEIWFBP3B9pixG6GL9ONyYICdijFohYngrh7Kdi6w
-        MkahbO2kwvkc9zujW3bm+Lv6+9aMcXA=
-X-Google-Smtp-Source: AA0mqf78/wgOPeOP++jrViqFADCctTIl0zDYTk5dO53Un5WCmuBMifD+vviBMYCPin0vcR+PgfwHqA==
-X-Received: by 2002:a17:902:cec1:b0:189:cef2:88e3 with SMTP id d1-20020a170902cec100b00189cef288e3mr23097800plg.57.1670859068450;
-        Mon, 12 Dec 2022 07:31:08 -0800 (PST)
-Received: from localhost ([198.11.178.15])
-        by smtp.gmail.com with ESMTPSA id l15-20020a170903244f00b001894198d0ebsm6549695pls.24.2022.12.12.07.31.07
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 12 Dec 2022 07:31:08 -0800 (PST)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: [PATCH 2/2] kvm: x86/mmu: Remove useless shadow_host_writable_mask
-Date:   Mon, 12 Dec 2022 23:32:05 +0800
-Message-Id: <20221212153205.3360-3-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
-In-Reply-To: <20221212153205.3360-1-jiangshanlai@gmail.com>
-References: <20221212153205.3360-1-jiangshanlai@gmail.com>
+        with ESMTP id S231827AbiLLPrL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 10:47:11 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A66A9FE7;
+        Mon, 12 Dec 2022 07:47:10 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SxKZgmKSXq2M/suZASO8vTwDGKB6ZeeViMs7nOKsI5U8th8Eav4WVd15TKcw5eklzDKQAMdKFOWg+fYfByoDK9gmbOHUQZPtE4xRqlDJqQax3h7xbyff15NGkj+ep5OtVHKtNFenDEDz7Cd2HVhTm7ywW7Xbm2ve9abmXqVT/ERkQ5wDkAEJsfxdqWC5hVN26JmaSiOqtAdrpNrC4zg2zybDMVpfjJO7pqa3He8D3WxQD2a8OXjdK3SBeGX7hvhdVIdJarVm9hZVmNAxj1UZgUcNzB3XgW5q7QpFFpTAFNzfCFa7IiHZyxlueQnBT3N6GjFJwJbZALo8DqR++CD8yQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4n4RZv5YB822kKYa3QAvLwmjbjundOrjw0zfuuI/bC4=;
+ b=CEl+OTpjC5PbSV/y92q1nXVMHP34F8wcrUT6G3dGRfX+4rmLOUsT82QT9amNSBeFeN5HK8JvVpY3YD0H7jij9fQMIghhcYfuCFOoaO7mMzUwfuL+FpG/SXbNAw4ZLRkriObrDo5SXubPFBntpA8qE9REJE1m3S9V7ts16aAkSLm0BdSVraLpF2jpBN1ScqUsGrCbA6ir2k9N55aVNGDi/7hw49btaaizdX4SJYb4EUto6SxwlxFm5sfJhDqDO/Oh1XUa36DGEWHRasj2M/6pPmg+vwroCjDd6yozYPbz6X6R2bkBETR5EKtp5PnfH7cd0yWFtUdGSazsGYp8TIxU7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4n4RZv5YB822kKYa3QAvLwmjbjundOrjw0zfuuI/bC4=;
+ b=fYE8ms/0PkSyRhy1caRxZs9Vb0ZNIjYMTlNTaKbQDHSvEGyZRLvmdcBXG+h+XoqjHW/vbARLAnXKP6jn0NAJ/bB38LA3N80hfEPPFEkQ/PR7n8rOLECRTgryj52xfiSTmP0PBVApjWYEeWRXXmhdhqv9z/TxkxRmOqFpk73RbfMGPWya1RJf2RIFhKN660TLh4yMl8weZlyGZuXugDmuC4yZFb2g/NwwpIfaYIlKct2I/8tKLmpwUmiyu0wrRxP8z7CPZ4oVRF4veFF6CMsM0phqeqojj+20Vj9Rc/oZg0nEio3UTLecnEOwDkI6vvKA7twL2wbI6aACxm3AoNPSXA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CY8PR12MB7339.namprd12.prod.outlook.com (2603:10b6:930:51::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.19; Mon, 12 Dec
+ 2022 15:47:08 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5880.019; Mon, 12 Dec 2022
+ 15:47:08 +0000
+Date:   Mon, 12 Dec 2022 11:47:05 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Will Deacon <will@kernel.org>,
+        Bharat Bhushan <bharat.bhushan@nxp.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
+        Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH iommufd 4/9] iommufd: Convert to
+ msi_device_has_secure_msi()
+Message-ID: <Y5dM+VnqRjTefGH1@nvidia.com>
+References: <0-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
+ <4-v1-9e466539c244+47b5-secure_msi_jgg@nvidia.com>
+ <BN9PR11MB5276522F9FA4D4A486C5F60A8C1C9@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y5NKlf4btF9xUXXZ@nvidia.com>
+ <5e7dbc83-a853-dc45-5016-c53f1be8aaf8@arm.com>
+ <Y5NyeFyMhlDxHkCW@nvidia.com>
+ <87edt4bqhl.ffs@tglx>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87edt4bqhl.ffs@tglx>
+X-ClientProxiedBy: BL1PR13CA0128.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::13) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7339:EE_
+X-MS-Office365-Filtering-Correlation-Id: 91b4252b-b58f-4cf6-8fe4-08dadc581f24
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ju5+n17civQV+6eezQZarlWxFDfHhnG1E5PnzCn8u8Te2gSYFfVwOJqL2fwU9ir1oOnl2M/7V3NkhjrYVKszvWG8XjbiwIl8gxFzmAFgWwiZoRuD4Hm7qmvTFs734mCk/spt/8EBNAXeGbINnCu0QU29mdymLwSOn45hmwC/7CSFB+lyGFw/P02Vdf1DQX2+WXAeiDITf183pgji/zDcVOVbtJkqKGBiMcRrxAFDL9lOl6UhdTdzeHbnlDV6t+pemdZGVujeJfj6PenV3sF09tuXIZdLyOjMhymtJc78R1tRn5mvPylKmTduYHCbcpGAxyVXUTFF+uRXNSN6YvEggFr37O6+M2PKTahaQdeJgCFWV5gUjOPH7oHZ9rqezplErRIhXfDdc089wr/SS33ncMQtxACul+TsU60CcxDz0R2TTCz/F1hhvDseqUlV+5yOxavpy5B4yZFGQXsxQFYWrEMZ2aGsONGcko6shp7qamFE5jiM7+J97LoELZC+mPu/Ay0RAghmZkRRRq8sWUuoVP3onKJYpqDh2Wx8pcfLJ1nWLu3WlP2IuKBBaTFhBshToUW//TtYFxP1zzKrBAKlacf9eVdIh1eqvDF9q4GhvpkoT6XHW4j9dy9gPSZ560vm8SFL3g501xjFQw3aJ5mJ3cUhDziahNA6AkUnDsm/DSbpgOPpruBn6gx5HrVE3Ci7
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(396003)(136003)(39860400002)(376002)(346002)(451199015)(26005)(6512007)(2616005)(186003)(6506007)(478600001)(6486002)(6666004)(36756003)(38100700002)(86362001)(83380400001)(41300700001)(66476007)(6916009)(316002)(66946007)(4326008)(66556008)(54906003)(8676002)(5660300002)(7416002)(4744005)(2906002)(8936002)(67856001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?GFwCJMinhRqi9KP9nJMYnx3pyUsS+IfkQD0IyLf5JAsCtEDnf+wwp8aBTohA?=
+ =?us-ascii?Q?0w7FfywdxElVFLP9+bb460mFEdvo9OgAcjdNCB3nDKtSL24+PAVkPzuSJmRw?=
+ =?us-ascii?Q?4FeZOq9fl3FwuPidLpdt42rEgc/phMntiKOGpcq3m/YIbt994L1MZgY8ZmEg?=
+ =?us-ascii?Q?4UwHgvH9rmIG/jzbeXMhn/Sc8ikxofgVPLO1mAReVjZHUT9uegFwNmQJzPtO?=
+ =?us-ascii?Q?4u6iE1mNvpTAzx+APfldaGtqgPsRWjrTe2lgaVTCbY5tw7viCEjNa1M982/l?=
+ =?us-ascii?Q?6nYj3910yXO0OzZ7+k9D1aeFQhrhvw7n3CvFIzefCoxYNgrDy0Jz7hp6LV3M?=
+ =?us-ascii?Q?Pn9raQ4YKED4SU3HVGuj5Q46B9J2x2UMmtf2IU6TdKSUpYVWWRvd9JV/BiYc?=
+ =?us-ascii?Q?I4g6OVhuZ7F2PX0ratctWWrrJysvF0sahrLMmjnI45au9qU2wrM4FZ65gmft?=
+ =?us-ascii?Q?QEt9iVvR/tghJV9Gfx8tzn2O5JJWwmrx4fc/FwK3VOKcaIpJsSNqEhFfG1Lu?=
+ =?us-ascii?Q?2j+7yzuw+xQ8hPfvMpOgOKoJszCPQ7OGJLpI+hbEsmCvU/qlF2x701I2t/Ua?=
+ =?us-ascii?Q?sstFpbTsQYKg0ItKPV1F0aAULSlQt3z5V51JKwAeKfTfB/c6eQ0aeeFeLezj?=
+ =?us-ascii?Q?a8gAdczghVz5Wlx3AmhyucLbk1TunI1CESpBzYciNW03mCeaNn9S8jlcufY3?=
+ =?us-ascii?Q?lKwcnaBMabp3ttSqounALBigejvqdr7cWV7F/fh6ruikRMoKmPr+TAmDpGin?=
+ =?us-ascii?Q?sl4VQkrzUK6LdbdJpxy7QO5ybWjwJqei/0DLLzhD2mrsfsGR5tGD/0KmOW+w?=
+ =?us-ascii?Q?kGm1pelnHXueDAuBqtmejm5iDFuNXNTpeDCRfTbePY7r26D+0hlt+pJHMnW8?=
+ =?us-ascii?Q?nmgg30/evDiazZWizuKilkdFYoTDMbktPTHkRLxVdM9hFQSXTH0W1AN+nzGO?=
+ =?us-ascii?Q?AAqlwbvWlCK4WME9Z3uJCfl6swWzPszQ3+T2mopchEfkTcoOOutC6IEa8qN5?=
+ =?us-ascii?Q?hI5ypIrhnbrCFDGdLYxvEbx+AM0fLgYogK7Z/A80vm+9z4EAZEQLEZkqqWQt?=
+ =?us-ascii?Q?wyemVVe+B8kD1D5vQGRo3PlvZMEMw5bLJTCww9n2ZUNpdKQjwZMAm+HBJvCw?=
+ =?us-ascii?Q?lOVe4LPExjtDI61bjXJoTi/OvKns2keVi63i3nCEzYZjBs8be3PNDI/xYjPG?=
+ =?us-ascii?Q?zDwMLGD0ebCoNJ6jD7/LTBDkcdJoU6JjZ4kJ87pDSSooDSGhmrH3zlTVptDL?=
+ =?us-ascii?Q?FviTfuyA3AMZsJjEvcec3b8RmTcsGH2BILerHmeFR1Ntgu5OrbLaw/whlLcx?=
+ =?us-ascii?Q?9DnHr+p1MoV7xv2tnTINqV5qaU8LDcpLhciSMuEmKoxEHII6WcE5ep7++0in?=
+ =?us-ascii?Q?4LNCFbv2Kj07s4CYFzNzCM4Wgl/FIVbqfSj7LnWWW0SGQJCcEjZwIxlbWXao?=
+ =?us-ascii?Q?F6KD+Ofrbc+Cpu3CoIAqKWthVGC1SKHbrWdXxQ6BLCcD1npbn0p9iMBd9pHY?=
+ =?us-ascii?Q?Q8/B+51o5uu4/p3k4T2zEhx8si3XFU9HnSmxLzDN0oicunYzTELs3mTX5epY?=
+ =?us-ascii?Q?QOa+LcjTUe9S74iTCkw=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91b4252b-b58f-4cf6-8fe4-08dadc581f24
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2022 15:47:08.0806
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c/cO+ajS/chcs3f8ZE5VDEy0sLEYJc3OAb0zOvszd8TzR0PvyJEwPsnJKtA0+WTf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7339
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+On Mon, Dec 12, 2022 at 04:17:58PM +0100, Thomas Gleixner wrote:
 
-shadow_host_writable_mask is only used in FNAME(sync_page) which
-doesn't actually need it.
+> Obvioulsy unless it's done somewhere early in the PCI discovery,
+> i.e. before the discovery associated the domain pointer.
 
-Remove it and release a bit from spte.
+I thought the problem is more that the iommu drivers change the
+assigned irq_domain:
 
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
----
- arch/x86/kvm/mmu/paging_tmpl.h |  7 ++++++-
- arch/x86/kvm/mmu/spte.c        |  8 +------
- arch/x86/kvm/mmu/spte.h        | 38 +++++++++++-----------------------
- 3 files changed, 19 insertions(+), 34 deletions(-)
+void intel_irq_remap_add_device(struct dmar_pci_notify_info *info)
+{
+	if (!irq_remapping_enabled || pci_dev_has_special_msi_domain(info->dev))
+		return;
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 613f043a3e9e..8b83abf1d8bc 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -1084,9 +1084,14 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- 		/* Update the shadowed access bits in case they changed. */
- 		kvm_mmu_page_set_access(sp, i, pte_access);
- 
-+		/*
-+		 * It doesn't matter whether it is host_writable or not since
-+		 * write-access is being removed.
-+		 */
-+		host_writable = false;
-+
- 		sptep = &sp->spt[i];
- 		spte = *sptep;
--		host_writable = spte & shadow_host_writable_mask;
- 		slot = kvm_vcpu_gfn_to_memslot(vcpu, gfn);
- 		make_spte(vcpu, sp, slot, pte_access, gfn,
- 			  spte_to_pfn(spte), spte, true, false,
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index c0fd7e049b4e..00c88b1dca0a 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -24,7 +24,6 @@ static bool __ro_after_init allow_mmio_caching;
- module_param_named(mmio_caching, enable_mmio_caching, bool, 0444);
- EXPORT_SYMBOL_GPL(enable_mmio_caching);
- 
--u64 __read_mostly shadow_host_writable_mask;
- u64 __read_mostly shadow_mmu_writable_mask;
- u64 __read_mostly shadow_nx_mask;
- u64 __read_mostly shadow_x_mask; /* mutual exclusive with nx_mask */
-@@ -192,9 +191,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	if (shadow_memtype_mask)
- 		spte |= static_call(kvm_x86_get_mt_mask)(vcpu, gfn,
- 							 kvm_is_mmio_pfn(pfn));
--	if (host_writable)
--		spte |= shadow_host_writable_mask;
--	else
-+	if (!host_writable)
- 		pte_access &= ~ACC_WRITE_MASK;
- 
- 	if (shadow_me_value && !kvm_is_mmio_pfn(pfn))
-@@ -332,7 +329,6 @@ u64 kvm_mmu_changed_pte_notifier_make_spte(u64 old_spte, kvm_pfn_t new_pfn)
- 	new_spte |= (u64)new_pfn << PAGE_SHIFT;
- 
- 	new_spte &= ~PT_WRITABLE_MASK;
--	new_spte &= ~shadow_host_writable_mask;
- 	new_spte &= ~shadow_mmu_writable_mask;
- 
- 	new_spte = mark_spte_for_access_track(new_spte);
-@@ -440,7 +436,6 @@ void kvm_mmu_set_ept_masks(bool has_ad_bits, bool has_exec_only)
- 	 */
- 	shadow_memtype_mask	= VMX_EPT_MT_MASK | VMX_EPT_IPAT_BIT;
- 	shadow_acc_track_mask	= VMX_EPT_RWX_MASK;
--	shadow_host_writable_mask = EPT_SPTE_HOST_WRITABLE;
- 	shadow_mmu_writable_mask  = EPT_SPTE_MMU_WRITABLE;
- 
- 	/*
-@@ -500,7 +495,6 @@ void kvm_mmu_reset_all_pte_masks(void)
- 	shadow_me_mask		= 0;
- 	shadow_me_value		= 0;
- 
--	shadow_host_writable_mask = DEFAULT_SPTE_HOST_WRITABLE;
- 	shadow_mmu_writable_mask  = DEFAULT_SPTE_MMU_WRITABLE;
- 
- 	/*
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 1f03701b943a..9824b33539c9 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -75,8 +75,7 @@ static_assert(!(SPTE_TDP_AD_MASK & SHADOW_ACC_TRACK_SAVED_MASK));
-  * SPTE is write-protected. See is_writable_pte() for details.
-  */
- 
--/* Bits 9 and 10 are ignored by all non-EPT PTEs. */
--#define DEFAULT_SPTE_HOST_WRITABLE	BIT_ULL(9)
-+/* Bit 10 are ignored by all non-EPT PTEs. */
- #define DEFAULT_SPTE_MMU_WRITABLE	BIT_ULL(10)
- 
- /*
-@@ -84,12 +83,9 @@ static_assert(!(SPTE_TDP_AD_MASK & SHADOW_ACC_TRACK_SAVED_MASK));
-  * to not overlap the A/D type mask or the saved access bits of access-tracked
-  * SPTEs when A/D bits are disabled.
-  */
--#define EPT_SPTE_HOST_WRITABLE		BIT_ULL(57)
- #define EPT_SPTE_MMU_WRITABLE		BIT_ULL(58)
- 
--static_assert(!(EPT_SPTE_HOST_WRITABLE & SPTE_TDP_AD_MASK));
- static_assert(!(EPT_SPTE_MMU_WRITABLE & SPTE_TDP_AD_MASK));
--static_assert(!(EPT_SPTE_HOST_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
- static_assert(!(EPT_SPTE_MMU_WRITABLE & SHADOW_ACC_TRACK_SAVED_MASK));
- 
- /* Defined only to keep the above static asserts readable. */
-@@ -148,7 +144,6 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
- 
- #define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
- 
--extern u64 __read_mostly shadow_host_writable_mask;
- extern u64 __read_mostly shadow_mmu_writable_mask;
- extern u64 __read_mostly shadow_nx_mask;
- extern u64 __read_mostly shadow_x_mask; /* mutual exclusive with nx_mask */
-@@ -383,27 +378,23 @@ static __always_inline bool is_rsvd_spte(struct rsvd_bits_validate *rsvd_check,
-  *
-  * For cases #1 and #4, KVM can safely make such SPTEs writable without taking
-  * mmu_lock as capturing the Accessed/Dirty state doesn't require taking it.
-- * To differentiate #1 and #4 from #2 and #3, KVM uses two software-only bits
-+ * To differentiate #1 and #4 from #2 and #3, KVM uses a software-only bit
-  * in the SPTE:
-  *
-  *  shadow_mmu_writable_mask, aka MMU-writable -
-  *    Cleared on SPTEs that KVM is currently write-protecting for shadow paging
-  *    purposes (case 2 above).
-- *
-- *  shadow_host_writable_mask, aka Host-writable -
-  *    Cleared on SPTEs that are not host-writable (case 3 above)
-  *
-- * Note, not all possible combinations of PT_WRITABLE_MASK,
-- * shadow_mmu_writable_mask, and shadow_host_writable_mask are valid. A given
-- * SPTE can be in only one of the following states, which map to the
-- * aforementioned 3 cases:
-+ * Note, not all possible combinations of PT_WRITABLE_MASK and
-+ * shadow_mmu_writable_mask are valid. A given SPTE can be in only one of the
-+ * following states, which map to the aforementioned 3 cases:
-  *
-- *   shadow_host_writable_mask | shadow_mmu_writable_mask | PT_WRITABLE_MASK
-- *   ------------------------- | ------------------------ | ----------------
-- *   1                         | 1                        | 1       (writable)
-- *   1                         | 1                        | 0       (case 1)
-- *   1                         | 0                        | 0       (case 2)
-- *   0                         | 0                        | 0       (case 3)
-+ *   shadow_mmu_writable_mask | PT_WRITABLE_MASK
-+ *   ------------------------ | ----------------
-+ *   1                        | 1       (writable)
-+ *   1                        | 0       (case 1)
-+ *   0                        | 0       (case 2,3)
-  *
-  * The valid combinations of these bits are checked by
-  * check_spte_writable_invariants() whenever an SPTE is modified.
-@@ -433,13 +424,8 @@ static inline bool is_writable_pte(unsigned long pte)
- /* Note: spte must be a shadow-present leaf SPTE. */
- static inline void check_spte_writable_invariants(u64 spte)
- {
--	if (spte & shadow_mmu_writable_mask)
--		WARN_ONCE(!(spte & shadow_host_writable_mask),
--			  "kvm: MMU-writable SPTE is not Host-writable: %llx",
--			  spte);
--	else
--		WARN_ONCE(is_writable_pte(spte),
--			  "kvm: Writable SPTE is not MMU-writable: %llx", spte);
-+	WARN_ONCE(!(spte & shadow_mmu_writable_mask) && is_writable_pte(spte),
-+		  "kvm: Writable SPTE is not MMU-writable: %llx", spte);
- }
- 
- static inline bool is_mmu_writable_spte(u64 spte)
--- 
-2.19.1.6.gb485710b
+	dev_set_msi_domain(&info->dev->dev, map_dev_to_ir(info->dev));
+}
 
+Which is ultimately called by 
+
+	bus_register_notifier(&pci_bus_type, &dmar_pci_bus_nb);
+
+And that compares with the iommu setup which is also done from a
+bus notifier:
+
+		nb[i].notifier_call = iommu_bus_notifier;
+		bus_register_notifier(iommu_buses[i], &nb[i]);
+
+So, I think, there is not reliable ordering between these two things.
+
+At least that is why I was convinced we should not do the idea I
+shared :)
+
+Thanks,
+Jason
