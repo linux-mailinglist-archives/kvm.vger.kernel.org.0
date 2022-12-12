@@ -2,166 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDE08649CF5
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 11:46:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D658649D6A
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 12:19:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232466AbiLLKql (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 05:46:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38282 "EHLO
+        id S231653AbiLLLS5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 06:18:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232396AbiLLKok (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 05:44:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CE71101DD
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 02:38:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670841531;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0geoJp5y5vah58rc3h1onQRI09PobQgX5h6nKaS34UM=;
-        b=UTOG3Xn/nlg2q5g1qlid6ooLJSUp4MOnsRQ2oiC+heTNWT49l+JHO9dAlk71/0cGNquz23
-        I6NAYQi7HU72xSahX5wZOXaw3XLgREdagPv/q6ixINYFoktSo2Foo/WMRh9M+q4f88w+Wt
-        hJmlqxhHLbWCutnwNV/8yOv/azOI8G8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-403-I-oFkNMZMlahbSNp0jb0Wg-1; Mon, 12 Dec 2022 05:38:50 -0500
-X-MC-Unique: I-oFkNMZMlahbSNp0jb0Wg-1
-Received: by mail-wr1-f72.google.com with SMTP id s1-20020adfa281000000b00241f7467851so2136887wra.17
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 02:38:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0geoJp5y5vah58rc3h1onQRI09PobQgX5h6nKaS34UM=;
-        b=EVUucAjOeoTTVlQqetu5vTjPrvOLrsdHRMd6xLtaVRM0GI7Buq89++AhP8aNaIkB48
-         Ro1MyDNMctFg6TgP1t+N5lsrib5FPmAObJOP/nzApB3E1r+SzUvXKycGQt4KsdJ8LP+v
-         nIxaSJyWi9VaO4FCEQB72AtF4Fg9+Y8m3/MTdTOGW7/hpc+qEvZKPXcDHbP3RPZBag76
-         1XRe7WDjv+GVFq8o5twSF+giu1F+0MRb5vYkGqdJXlgmgSqT61TWAGJy/IVysObGHpH/
-         912AuOV3fL6Abvo38ll7GcC77mLNjjsfccdhI6GorKj5BuJGXnv6KXmnQW9s8HSFqDTm
-         X1qw==
-X-Gm-Message-State: ANoB5pmbsVilQoqO+is+U2ZZhZindJB4RmQ+K/6VDu+YMn16++55MWTU
-        xSWO7EfyasOP5y31xa9rYzbA1aP+5tT2kCZItpkqwa9Hl4m0kSPkVdfvasd/ZLet6hgHw6JEI0j
-        E7wATGP4hOUsa
-X-Received: by 2002:a05:600c:5398:b0:3cf:d0b1:8aa1 with SMTP id hg24-20020a05600c539800b003cfd0b18aa1mr12355048wmb.0.1670841528987;
-        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf43hHD3Xh/hVMzgx7AUun3dPtnLezNxJe71/MuBv74YiGy1tG1gohvB+wRobXA4W5SAS5QTYw==
-X-Received: by 2002:a05:600c:5398:b0:3cf:d0b1:8aa1 with SMTP id hg24-20020a05600c539800b003cfd0b18aa1mr12355032wmb.0.1670841528795;
-        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id iw3-20020a05600c54c300b003d220ef3232sm5442368wmb.34.2022.12.12.02.38.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 02:38:48 -0800 (PST)
-Message-ID: <2ce6eab8-6156-1282-bf29-87fd74e4587a@redhat.com>
-Date:   Mon, 12 Dec 2022 11:38:47 +0100
+        with ESMTP id S231904AbiLLLSA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 06:18:00 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6C18CE3
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 03:17:41 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BC9into029061;
+        Mon, 12 Dec 2022 11:17:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=Kgwtmtfw4hu/4UjAsR1ar1ZP0vAbM/FhOpsiRG+z3xo=;
+ b=FE1oBGah2xgl6HSCJR63lblTdBmTZeoZaXT7nxlZoccusGjA8Ckl/OTUTB6d908Wi7JL
+ ATFqp58tJBSCi4Sd/QJvXtcE4PlKFZz7Z9YqtWakQnyDxmN616+U221lotnJncQwG29D
+ SvLCVOasvEmJqGXDiA+PJ9CrGR+HlziwQKp+E/5qEDr898T6rsuTnodEZYijz1bKFfbD
+ pZ1cpoc5mn2pL8BL8QY1e/11Ou61/JU2HAOrSyydzpR2aUoXS8Y+4mn/v3otkPUGrIli
+ xL+75XAdjcpAVkMxNDO+GNhBD2PtSVzgiOIIRx4OL6IZZoPFjM1//iVlRsgk+vfwgzyK dQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3me1xkj4h6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Dec 2022 11:17:38 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BCBDpJO000781;
+        Mon, 12 Dec 2022 11:17:38 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3me1xkj4gk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Dec 2022 11:17:38 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.16.1.2) with ESMTP id 2BCB9YH8020894;
+        Mon, 12 Dec 2022 11:17:35 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3mchr61tc6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Dec 2022 11:17:35 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BCBHWg239190958
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Dec 2022 11:17:32 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3338C2004B;
+        Mon, 12 Dec 2022 11:17:32 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 011692004D;
+        Mon, 12 Dec 2022 11:17:32 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Dec 2022 11:17:31 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        pbonzini@redhat.com, andrew.jones@linux.dev, lvivier@redhat.com
+Subject: [kvm-unit-tests PATCH v3 0/4] lib: add function to request migration
+Date:   Mon, 12 Dec 2022 12:17:27 +0100
+Message-Id: <20221212111731.292942-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: iP5cV8fWp5hos9VVMQi5awmlt23ymWT1
+X-Proofpoint-GUID: GQfM-imqgSTVh9BqQybWkrB1r44pQ4Br
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v2 7/7] KVM: selftests: Avoid infinite loop if
- ucall_alloc() fails
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Peter Gonda <pgonda@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Ricardo Koller <ricarkol@google.com>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20221209015307.1781352-1-oliver.upton@linux.dev>
- <20221209015307.1781352-8-oliver.upton@linux.dev>
- <Y5OisdH5ohtr6r3j@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y5OisdH5ohtr6r3j@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-12_02,2022-12-12_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 clxscore=1015 spamscore=0 suspectscore=0
+ adultscore=0 mlxlogscore=730 mlxscore=0 phishscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212120102
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/9/22 22:03, Sean Christopherson wrote:
-> From: Sean Christopherson<seanjc@google.com>
-> Date: Fri, 9 Dec 2022 12:55:44 -0800
-> Subject: [PATCH] KVM: selftests: Use magic value to signal ucall_alloc()
->   failure
-> 
-> Use a magic value to signal a ucall_alloc() failure instead of simply
-> doing GUEST_ASSERT().  GUEST_ASSERT() relies on ucall_alloc() and so a
-> failure puts the guest into an infinite loop.
-> 
-> Use -1 as the magic value, as a real ucall struct should never wrap.
-> 
-> Reported-by: Oliver Upton<oliver.upton@linux.dev>
-> Signed-off-by: Sean Christopherson<seanjc@google.com>
-> ---
->   tools/testing/selftests/kvm/lib/ucall_common.c | 16 ++++++++++++++--
->   1 file changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-> index 0cc0971ce60e..2f0e2ea941cc 100644
-> --- a/tools/testing/selftests/kvm/lib/ucall_common.c
-> +++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-> @@ -4,6 +4,8 @@
->   #include "linux/bitmap.h"
->   #include "linux/atomic.h"
->   
-> +#define GUEST_UCALL_FAILED -1
-> +
->   struct ucall_header {
->   	DECLARE_BITMAP(in_use, KVM_MAX_VCPUS);
->   	struct ucall ucalls[KVM_MAX_VCPUS];
-> @@ -41,7 +43,8 @@ static struct ucall *ucall_alloc(void)
->   	struct ucall *uc;
->   	int i;
->   
-> -	GUEST_ASSERT(ucall_pool);
-> +	if (!ucall_pool)
-> +		goto ucall_failed;
->   
->   	for (i = 0; i < KVM_MAX_VCPUS; ++i) {
->   		if (!test_and_set_bit(i, ucall_pool->in_use)) {
-> @@ -51,7 +54,13 @@ static struct ucall *ucall_alloc(void)
->   		}
->   	}
->   
-> -	GUEST_ASSERT(0);
-> +ucall_failed:
-> +	/*
-> +	 * If the vCPU cannot grab a ucall structure, make a bare ucall with a
-> +	 * magic value to signal to get_ucall() that things went sideways.
-> +	 * GUEST_ASSERT() depends on ucall_alloc() and so cannot be used here.
-> +	 */
-> +	ucall_arch_do_ucall(GUEST_UCALL_FAILED);
->   	return NULL;
->   }
->   
-> @@ -93,6 +102,9 @@ uint64_t get_ucall(struct kvm_vcpu *vcpu, struct ucall *uc)
->   
->   	addr = ucall_arch_get_ucall(vcpu);
->   	if (addr) {
-> +		TEST_ASSERT(addr != (void *)GUEST_UCALL_FAILED,
-> +			    "Guest failed to allocate ucall struct");
-> +
->   		memcpy(uc, addr, sizeof(*uc));
->   		vcpu_run_complete_io(vcpu);
->   	} else {
-> 
-> base-commit: dc2efbe4813e0dc4368779bc36c5f0e636cb8eb2
-> -- 
+v2->v3:
+---
+* s390x: remove unneeded parenthesis (thanks Claudio)
 
-Queued, thanks.
+v1->v2:
+---
+* arm: commit message gib->gic (thanks Andrew)
+* arm: remove unneeded {} (thanks Andrew)
+* s390x: make patch less intrusive (thanks Claudio)
 
-Paolo
+With this series, I pick up a suggestion Claudio has brought up in my
+CMM-migration series[1].
+
+Migration tests can ask migrate_cmd to migrate them to a new QEMU
+process. Requesting migration and waiting for completion is hence a
+common pattern which is repeated all over the code base. Add a function
+which does all of that to avoid repetition.
+
+Since migrate_cmd currently can only migrate exactly once, this function
+is called migrate_once() and is a no-op when it has been called before.
+This can simplify the control flow, especially when tests are skipped.
+
+[1] https://lore.kernel.org/kvm/20221125154646.5974cb52@p-imbrenda/
+
+Nico Boehr (4):
+  lib: add function to request migration
+  powerpc: use migrate_once() in migration tests
+  s390x: use migrate_once() in migration tests
+  arm: use migrate_once() in migration tests
+
+ arm/Makefile.common     |  1 +
+ powerpc/Makefile.common |  1 +
+ s390x/Makefile          |  1 +
+ lib/migrate.h           |  9 ++++++++
+ lib/migrate.c           | 34 ++++++++++++++++++++++++++++
+ arm/debug.c             | 17 +++++---------
+ arm/gic.c               | 49 ++++++++++++-----------------------------
+ powerpc/sprs.c          |  4 ++--
+ s390x/migration-cmm.c   | 24 ++++++--------------
+ s390x/migration-sck.c   |  4 ++--
+ s390x/migration-skey.c  | 20 ++++++-----------
+ s390x/migration.c       |  7 ++----
+ 12 files changed, 85 insertions(+), 86 deletions(-)
+ create mode 100644 lib/migrate.h
+ create mode 100644 lib/migrate.c
+
+-- 
+2.36.1
 
