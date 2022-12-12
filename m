@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B0DB64A776
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 19:47:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 05D4264A784
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 19:50:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232874AbiLLSrp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 13:47:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36440 "EHLO
+        id S233383AbiLLSsD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 13:48:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233389AbiLLSqY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 13:46:24 -0500
+        with ESMTP id S233406AbiLLSq1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 13:46:27 -0500
 Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF00B17412;
-        Mon, 12 Dec 2022 10:46:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4941109B;
+        Mon, 12 Dec 2022 10:46:14 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FnCNYnouFpIqm+9pfD9gt/+vCZUMgUGwjrgZcU+G3WYpjyAMWuYNVQ4pixKyQMwzWZ9wsF4o31gNjkl+b2mvnITrJyojFk2sCJCkaN48CFG538HNXvib92VDzVj57vtbhItAHYRuS9upkM3patcYtwjj8HHE0jdQ7+6f0L5p51i12XGPJ2j+NULwDgsKON67O89HdtSWSD/hHX89CFUG2XaNfSiqzZubBQopFNZh0Pd+kFqXLMLA8g2fUr8HU2Lmw+xjecZWEbHuZiplkqChM9ma5Lknu8ZODHFMi0BNeG97u3mGFj1DDtDfUqVJM2xsReUZomJIS4ucSMwRjRtSrg==
+ b=gew03cTpWhyE4yUbcv99zQJ8PzZwfntrb5OxuPTktBYQMyxGGcJlAYt3hYw1yWsDDIrHDZSgGor4r1JgRSD5s2HQR+Gvgh03sX+h5iRdebaw7FiwxJzlhwrJQqQsvUImBw0HRupKtDEJ3BnL4zW2aDwj9loSMVutykvbrzkvPLuQfP0c0tyc2cnd50GtwFNL4z7kqEnzM9nrSYZYkVaw3dVTsX5/i1rdzZGUCWmiRLb7V/Lwb7zc5QjxFJVeihbPpsSpTb765ESzwBbpACdd0UPry2U36B1bu4SylJLq8/++RpKq6an/L0S1dk3B569fG/kjXueE+nyk3t4u03b0TA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SCyOL545mD+Jn9BYCHsO5I6THzW7bsM87PbSEnWiaLo=;
- b=SL/pay+jEXRQzlWRoyNsqtrKB+CccfNC9jMujGas4TFA6HD2K28TzZRlAnQmeWuGO/q7LVOi07CTxVavgNn9qLL5eHSNyG8DAomGTBc4qdeH6W/3GlRJdc+rsBIiRIZqUWrv17njJbNbxH6Ogl8caovpfYQeDqqOTDYXO3Q7WBfxcP3B+bGB0PcBRakFcjpraSUDt84OKkq8koVvJf2TpWgfA+gq2i+Fq+vVvDSC/M7bYr4e8wdRSJ13R9RLZ8L9PKBkL1+f8fUvSYbaqZ6e3iOPWQ6TZTUgeqafaCNjblEI4t80bytLX6lU3fwzs3uxn+aqGb2O2D3oLdYjYC0qTw==
+ bh=aLUh9X/SnrWsXSmE7ZXssRUd+/cFtgHH1Ch57qlPSx4=;
+ b=Ntv4ofxmoQlC08n+wi8Ecn1vroa/OxJjXNqpYbj1LRmuht/j4gpOn6cW3g7/iAbNCqCbT7ejB1Dgi0ZPQSXsD90TjpjJXDlNcm8mF7aDCWhdJGxV+0UWUQ7eY399La6OO13kTlWISYnaNUatmKCYHW7ZlZAmU/M+2ipUX2f2m0KHa8elC8Un04HCjd2hDeYLPCWNP51UDCgqEnxBioAdsqRZ+fnSyRpM2oVwws42xzxmYK1ha5TlNIII4/RFwkW/+j469/X3lov4816O3EbbHPGTG9UNdo6I4OzD5yzG/vFeCSnSNiDGbNabcMYl/sd4V8jWO1v2EZKCeQib/wFY1A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SCyOL545mD+Jn9BYCHsO5I6THzW7bsM87PbSEnWiaLo=;
- b=PotLv4GQCcKFIOqC5rO+xTkc0v1SoO4+OUq2ERYwDu6VvR+xMFkEAjR67ftwrHbPWt/ozGyD+5qQXSIp3paAk3S3mlzJy+5pRfB6C0GvDWBl+gG7rJ4r2KGlPzIEGLaNIfrF3SZw/C1PfRtxKq9FEbShGfWV0UML73T+pc82haoYdRYKhIlfaSs0FZIelnoxOsC8VcXnLCzYNx8Ac9vUB3WyFdgt8CiCIEIqHROlHZ3zMtBwEMCeHraZiWEuTXznxs9XJDISnAeGh2lXFVcluR+j1/5hB+35HIDMMHB3w3rJWfn0AhEFhiMgPBdLf6HJwRzOfN25e56o6039IRfw1w==
+ bh=aLUh9X/SnrWsXSmE7ZXssRUd+/cFtgHH1Ch57qlPSx4=;
+ b=Gg1unIk504QcA8LFMsBVlMs8SU95WfyVpS1dB3BkxO0tjEJQKNpiMUmvg+Az67EKn7+3qEoygHocUDwcLHOqXs8Anvb/+cpRWQ3dz2B/EE9iTx9bXXd/LBw7C2IvF+mePBTE0vsdo1/a43CPPOesdbZEEeoFc9NCjcKzRNsK9Ea1NASl0ldksJYI2pSeWNJaakGhsOG1TwAz6+f3jaFui9Z6NiHXCk7t1gc+ZSbGMCahhZ9GU4J1SMHzgZIdOFNRl05CML7ao7T9Turyj+jaaPUTvRnO63v3x0cuWdS80bAlp4eUNpgdiu6BoIFaDO/RLeMot1Y6GjmTDENgM4zphQ==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
  by DM4PR12MB5748.namprd12.prod.outlook.com (2603:10b6:8:5f::19) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.19; Mon, 12 Dec
- 2022 18:46:06 +0000
+ 2022 18:46:09 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5880.019; Mon, 12 Dec 2022
- 18:46:06 +0000
+ 18:46:09 +0000
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Alexander Gordeev <agordeev@linux.ibm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -66,63 +66,63 @@ Cc:     Bharat Bhushan <bharat.bhushan@nxp.com>,
         Matthew Rosato <mjrosato@linux.ibm.com>,
         Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
         Will Deacon <will.deacon@arm.com>
-Subject: [PATCH iommufd v2 5/9] irq: Remove unused irq_domain_check_msi_remap() code
-Date:   Mon, 12 Dec 2022 14:45:59 -0400
-Message-Id: <5-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
+Subject: [PATCH iommufd v2 6/9] irq: Rename IRQ_DOMAIN_MSI_REMAP to IRQ_DOMAIN_ISOLATED_MSI
+Date:   Mon, 12 Dec 2022 14:46:00 -0400
+Message-Id: <6-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
 In-Reply-To: <0-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
 References: 
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: MN2PR05CA0028.namprd05.prod.outlook.com
- (2603:10b6:208:c0::41) To LV2PR12MB5869.namprd12.prod.outlook.com
+X-ClientProxiedBy: MN2PR03CA0013.namprd03.prod.outlook.com
+ (2603:10b6:208:23a::18) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DM4PR12MB5748:EE_
-X-MS-Office365-Filtering-Correlation-Id: e609b223-13c2-461a-7255-08dadc711ffe
+X-MS-Office365-Filtering-Correlation-Id: 04e1f4ab-2b11-4078-fdf8-08dadc7120b5
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wGXMR4UCaDjPBwuUd3yZVCT5kY5R0+ZVDdaXvfXwWguwADmdc8h1RFDMfI/6TflRT/88DpHeIzSAuu3j3QFfW8PKNM6FVLWqqmWm0IDZC2qHz+HFiIkcAWTpeosZyMo13ivCpD3K638NUamv6KIaXp9yjd1Jxw3iwDiUQX9wbgnmWOSd0+MQ2WqPhFjX5mN9RNuKpo6SVogn6r+yCvhW0hWWvRpgcu46cOcXyZOQtq0pT2Ily7y/iFCYtYgvmLIVKD+DPCVRwFbEUTsAXv9klK+luj9fsSJ7mTnTQchHbYU6AvBXMKtZ2aLstGu/wl3UMSjQdhob6YY5+DQC03ppOrpyrQx/PWwuRGWPCvC9Dx5wEf3vrPeVAta/Iwz8N0m0dBtco2g3k2WfyGiPp1773c2knaMul4lVbDI19M8atCTPv8hqo6IndRlxZJkezthzDGOqIyfc2tdApj8AObq13o/8k1LeMEMQzoT6eUudrQKSscTD80IWIu8MMA+kB9K9OTDyyyYfOXPxO+FtcMLqWyVfhpYYYwbhttYAq18vEL27VSKudq11lUEosYzsaPR7lgCLWIwbj3YuF7qqrXdSoH4aPDJOFcT4JUTRFJueiIOtXM0KcEclrJnAgWOzntwCHflYVzNmB6/wySN5M6sZVa812mQVEHa06IHplEy9F5oZi53k+CZSizz7LUuclzfFA8f7y3pwLlzlIGMEMOZjgg==
+X-Microsoft-Antispam-Message-Info: OVZI1p7zLlsLmRyMdsbyUpHuBRoLS7pKGANmIXPuC60ewMDSILDwo2k20tu9/xfkLbV9ZEB9XTRZH/1rV9kAVTVKGRg72i0m9ANEYaPd9wQblmlwHMc67e2NmV/eWTGUTVHD3Ko4QbxyeOWuK5wW3q6cTOb4WKcQyRAFKMjQHWV2QFeaRd2/qmqt5aUet9JIAjFdsHln8Y4TEl9eRab7QZUsuvdDuOyRYJZv+wsToMRcJruGQJo5dxyJbBLsXpZk1As7vKe9ZLGy8g/srDRxDSYz3sLt/D4OF9HdajcEYqyB4RuLJ5BLNgiWhkJwq6XtC6ZD3rL73wZDXyj/qZti1iCVBx4MhdzmcerNIuElDxqxg8/+tN2xtBZFjUNIXG7hfcyP/62I0Eq5FRgsrjmIdxaFyqp2U5COpmXa9FVR6ktSAzI5PqtfnrvA1uXqJxGjKyF3VTEMsi30vWkvM9SeH77tN5rbDVJuVCp0MjtDhDXwt0YVsjVUpWBH5cfJAWVO4p7fPtOSaume21na9O/XSX8RhMTFl4reFmtHXlo6a23pfLmjr7JndNsuYEz9WRW4uMBmhdUBmP2VQ7IvS5/SOgt2PrBc90Ut/U3Si/tUg+YYAxS3/cJuAnHfC58AQUmcFKNkWuoSTTRcT/ZRjvmmvj1NkpFX7n4RTF2VLuGx4RtasPbaXdXELbHfzIAB1tXxoCm3fzqpKWAtp8GVTatsIQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(376002)(396003)(136003)(39860400002)(451199015)(921005)(2906002)(38100700002)(41300700001)(4326008)(26005)(36756003)(86362001)(6506007)(6666004)(66946007)(54906003)(8936002)(7416002)(316002)(110136005)(5660300002)(66556008)(66476007)(478600001)(6486002)(6512007)(186003)(8676002)(83380400001)(2616005)(4216001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?YAePcslj8tXX4If2Jek7PNw5Jx5myqX0K79cPXzbeo7aK+p5Ogrc0JLQGmDu?=
- =?us-ascii?Q?z6rv8dLVQVlCtGcf/VuS5RYibL/8kP8AgC7+ibbX8AP5DkJrd7kTGrWlgx9E?=
- =?us-ascii?Q?8aZKP2H4TDHlBKZznhQ3pABWI44lhwMBYAys9+YUvbcQIJaA0qFnmvUu3ZVU?=
- =?us-ascii?Q?qfaMM6keUKLOgQORgjWjsX86g85p7pK26IId+LVlqlr8t6nhDPnZtQxS278c?=
- =?us-ascii?Q?W1MYfaqN+CsJCvf9B1Nj70W6wwjMAJ3q99XtTrADYFkpgXjJTaXdt4DingBH?=
- =?us-ascii?Q?BP7BjW4zWeJrHx6oFUVnqhQDcgn1tOBaSRJ6c8JvZJeE4uzuDHIUPfqtRPUy?=
- =?us-ascii?Q?vgbIkjuEgekZH+FxaURxUE3XrI5pEz6o9rKDdfue8SXw/BBvx8lG/XovN6Q7?=
- =?us-ascii?Q?VwN8dZI26ewD7silVRPwTTQXfQEqGGufrXB7caBSvFVhVdzhuvB8q5npqqjm?=
- =?us-ascii?Q?FBvJ0mjwPVu5wcQkMSgw4Y+sWjWmunntBPM2YI+M6oZjyhPZh5EuznnYcbWF?=
- =?us-ascii?Q?N7cWZRxTbNDVhuGUBFhOxllPsGMrdh/hAb8u9WvQXLIvplOw9xCeRkOjAdlx?=
- =?us-ascii?Q?C8zAND7ZW+QVEqsy2H4RL7Tk5TrFFUYQVNAOWL8P15OWWFewErzf8471bSeR?=
- =?us-ascii?Q?vNHoEox98YoP43H42kE+4voootIkI9xOL6GR1TJjN0dBmIdM2w6ZiXvXEFIU?=
- =?us-ascii?Q?1eXwDMazPP6bAR2QC46uBvQwE3ONWcKZDcyXTnT//4gjy7ZoKsDQ48m4YyXd?=
- =?us-ascii?Q?emcaJ9EliOrqcpqj/GX47W/eNBznZAgQCK+XeD8eSomaxLAWtPyTTFRjfGQ4?=
- =?us-ascii?Q?/+Yitly9arbjsQAXykRJ2M6R+Q9uhQsHq6CxlMQVVOg8hEpAdVMtSO8QLjZk?=
- =?us-ascii?Q?AXxYuwc+K9UDlO4u97sEAqAinuWuhyNELCsmLF4t1qlm72F4C0huqR/cksAY?=
- =?us-ascii?Q?Ka7kL02QNUYUt2BSqt1H1zaDEH4iRqm5oBpRaj7uUgxfbLbj/9a/MmkcgwjB?=
- =?us-ascii?Q?c4P1GU5SCr9E3kE/kQY4fJtWIgfG96E2GScAh3n2tLM1uuLs6fsdkQxxuYsv?=
- =?us-ascii?Q?6Rqjqq+r8uQ1x51zW3Ni7uz5qln5Vi7dpsL/tH/4shryilr4TjGpFxWaB61X?=
- =?us-ascii?Q?iM6OxUfn7/oK0TPfU39ouiWKvYTnlxj55WoI28xocvEmHm4kPpi8g+PaFbTL?=
- =?us-ascii?Q?xEc7qy9/SiCc9YmX/M4BoXxnTZOYBnHkWemIYj1zYOa/nXo631nznxOEPy49?=
- =?us-ascii?Q?/n3J0iHGtMwOS1zuPdcpPCBWn0UgT/ZGKq91LdgElQyuOFIdMB8IBL+chKIi?=
- =?us-ascii?Q?wLiPcUxjmyHhhvQI5ug2NL9DvLmbnrtsuc4bB9QoPCoahL0ZKAfQ4zbLojh2?=
- =?us-ascii?Q?dTX3D8p/cDmdpmovnR8z1m07QCnVDuCsLTGsCa98c/SBWX1KJLGdLwxR78rh?=
- =?us-ascii?Q?adhDjxdvjunY/okkyIRkaMtWhsAPDWwLB0yVSKPDHY2V2MySNpqv/6ztEI4l?=
- =?us-ascii?Q?nsoNrXjBjZ3EXdMOXw2gdyFyhssopMt/a4/S2M2Ysrulw/ElUS4oIdHGaM+V?=
- =?us-ascii?Q?w8+ffBmfBoViCwxACrDPp3FIqFLMTxZEgH/qCbc8?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?f76T03qT5pLC8KD854GGb6uG68bLR193IclTesE+b/JnmGNeW6fLwhf4OkgO?=
+ =?us-ascii?Q?4bwfGjkFcoR2cfJCIbOExjk8s8ZEpnNrtsR+zR3q7a0q6OMKOownPv5tjpQF?=
+ =?us-ascii?Q?9c3GOhBf9kUpVihdXE7uy8HeJMt/sOiQQgMwPS/qL0BggFg8mCzL5qI3nN2x?=
+ =?us-ascii?Q?hhCn1A+XrU6G0hMA/g85phf0+hE9O2Ywp3pB8ocSUwpTC/3Czg5sDjnJBtBG?=
+ =?us-ascii?Q?wujVvT7ilpJr7WM+PlqXvRBSunwbfCoGSq4jUp5J8Ld47LWN/nhDXslwuLwL?=
+ =?us-ascii?Q?ELnK2t2uIv/IBW8pBvWCHh3EFmEtQ6ZRhEQzFFhMAPr/R9p+2+EFTTGC92Kr?=
+ =?us-ascii?Q?XHkWAEGUEBvZggyVM/oZBjByD7bBC7/47hCT4iWXgzELxpDNzaocqACRrUn3?=
+ =?us-ascii?Q?wViwsv/3PYX9qYjm1YzZkhT/et3wGALmOFHKrCcJMENz3TBeKzz6CY7MyJiu?=
+ =?us-ascii?Q?dtmRF9JNlQNylS+/ynIML4iFCZ3D+qkKWUfobufuWJ1tFvjZWe4H+OucpT0I?=
+ =?us-ascii?Q?GzvD92jhz1vVAHcQlZCCQwIijRzwl7uynva7dmwh2Xf/aWSNKPu0AhTDGh9Q?=
+ =?us-ascii?Q?iu1pzjpYbf48yiP4eG68omojchpQPEjzD/8Vtmk8nVOAJ1ZFErntkJGsQuuG?=
+ =?us-ascii?Q?zbTZdAcgOQqnIN3WWJR85UYPJBd3zqchdsf0T6ZAsGv7K+AMwHy9CyoYnLwF?=
+ =?us-ascii?Q?F7j5cMmLo6WeGLLMK5uidDcwL0UE0af+zEXE7A2sTr6EmFPQd/uNv0GlK2FW?=
+ =?us-ascii?Q?JD3v3cyqgRudxq5RJpDTmfuy+Szsl7L6vjWDvav0aJ7pak+6qXRleWjoM47z?=
+ =?us-ascii?Q?Vp/++9M0sLJw9reqQB3WR0C3c8tfyDyeE2xfcYusxT9Rqw4uuG0eBMwAiePk?=
+ =?us-ascii?Q?EmIh5TUe9XbXlTmO36OFoJYCciZjjzhRM7tjUwrbqWXN4Wsly2t1ujIj3vrV?=
+ =?us-ascii?Q?iXKMhaUo3VoqjDx25bjGwf3ws9cRRZMvAVDKo270r9B2dxhT9rZmuxlRaWEa?=
+ =?us-ascii?Q?e86DrVRXfYeP1iPkrQcUVVKHZ6B9BFAYfJY0P5XlZkpNTR1XuU7NDhkebgPw?=
+ =?us-ascii?Q?hAZFALz4uNfZfLa61eIUddvC1S7Yn5Pnk5VzRxEQuWnfF8ehytxaWbg2n4Hu?=
+ =?us-ascii?Q?c52alIIuTpDLCHY20XWuQIxRTTjrHtnyQsiYt9XlDy8sb/k12DKK5Nngie41?=
+ =?us-ascii?Q?SJgetY/qIrGTx7LwvZPGJmWUjAoz8et69e1BFIyMbKDcjGORpjMwdkzoAgA7?=
+ =?us-ascii?Q?TAfeWICRRmcgz0P19Q8NpD5ZgJD1g5fNns7qIsZlvZlJwJGGeYoPLG81tbCd?=
+ =?us-ascii?Q?/YJryRYw/cnqigy4Fl1JCqNH+7DDZaoGO+WMYO0DQIMa+rBHVATau+Xbw01Z?=
+ =?us-ascii?Q?pc3wys1aYvaS2lt35NUn557orQbbRkFiYvdqRCFCtkcG+NeLLPVHUwf4jhRF?=
+ =?us-ascii?Q?4efBTWiTD7N22RGpxBQx8FJFNFbjGwTnoGOWWVMKI77Hs+8q1afVl/wIaErc?=
+ =?us-ascii?Q?Q1KdmCM3I4T7RwqoLjd8+p4fU51LqKb3RyBgvkCP2u5/37QtY6obBP72sFL4?=
+ =?us-ascii?Q?3vKQw1HYg0LYu1vZzMBo5ZxptVXLAOvf4XAUCQ3J?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e609b223-13c2-461a-7255-08dadc711ffe
+X-MS-Exchange-CrossTenant-Network-Message-Id: 04e1f4ab-2b11-4078-fdf8-08dadc7120b5
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2022 18:46:05.3936
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Dec 2022 18:46:06.6278
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Xtnnt96szeYR17TM4l+qCYakGpFZ4UtRLi8l5EPMwhLF8ve/BGhKhTY1ZFyU6IC5
+X-MS-Exchange-CrossTenant-UserPrincipalName: o04GRqHcPpPIu7yaPeDxo32hmi/74xgal70T9V3CiN2g93u9826QOkhjr+hgfazu
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5748
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
@@ -134,131 +134,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After converting the users of irq_domain_check_msi_remap() it and the
-helpers are no longer needed.
+What x86 calls "interrupt remapping" is one way to achieve isolated MSI,
+make it clear this is talking about isolated MSI, no matter how it is
+achieved. This matches the new driver facing API name of
+msi_device_has_isolated_msi()
 
-The new version does not require all the #ifdef helpers and inlines
-because CONFIG_GENERIC_MSI_IRQ always requires CONFIG_IRQ_DOMAIN and
-IRQ_DOMAIN_HIERARCHY.
+No functional change.
 
 Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 ---
- include/linux/irqdomain.h | 23 -----------------------
- kernel/irq/irqdomain.c    | 39 ---------------------------------------
- 2 files changed, 62 deletions(-)
+ drivers/irqchip/irq-gic-v3-its.c | 4 ++--
+ include/linux/irqdomain.h        | 6 ++++--
+ kernel/irq/msi.c                 | 2 +-
+ 3 files changed, 7 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+index 973ede0197e36f..b4069f825a9b73 100644
+--- a/drivers/irqchip/irq-gic-v3-its.c
++++ b/drivers/irqchip/irq-gic-v3-its.c
+@@ -4692,7 +4692,7 @@ static bool __maybe_unused its_enable_quirk_socionext_synquacer(void *data)
+ 		}
+ 
+ 		/* the pre-ITS breaks isolation, so disable MSI remapping */
+-		its->msi_domain_flags &= ~IRQ_DOMAIN_FLAG_MSI_REMAP;
++		its->msi_domain_flags &= ~IRQ_DOMAIN_FLAG_ISOLATED_MSI;
+ 		return true;
+ 	}
+ 	return false;
+@@ -5074,7 +5074,7 @@ static int __init its_probe_one(struct resource *res,
+ 	its->cmd_write = its->cmd_base;
+ 	its->fwnode_handle = handle;
+ 	its->get_msi_base = its_irq_get_msi_base;
+-	its->msi_domain_flags = IRQ_DOMAIN_FLAG_MSI_REMAP;
++	its->msi_domain_flags = IRQ_DOMAIN_FLAG_ISOLATED_MSI;
+ 
+ 	its_enable_quirks(its);
+ 
 diff --git a/include/linux/irqdomain.h b/include/linux/irqdomain.h
-index a372086750ca55..b04ce03d3bb69f 100644
+index b04ce03d3bb69f..0a3e974b7288d0 100644
 --- a/include/linux/irqdomain.h
 +++ b/include/linux/irqdomain.h
-@@ -276,7 +276,6 @@ struct irq_domain *irq_domain_create_legacy(struct fwnode_handle *fwnode,
- 					    void *host_data);
- extern struct irq_domain *irq_find_matching_fwspec(struct irq_fwspec *fwspec,
- 						   enum irq_domain_bus_token bus_token);
--extern bool irq_domain_check_msi_remap(void);
- extern void irq_set_default_host(struct irq_domain *host);
- extern struct irq_domain *irq_get_default_host(void);
- extern int irq_domain_alloc_descs(int virq, unsigned int nr_irqs,
-@@ -559,13 +558,6 @@ static inline bool irq_domain_is_msi(struct irq_domain *domain)
- 	return domain->flags & IRQ_DOMAIN_FLAG_MSI;
- }
+@@ -192,8 +192,10 @@ enum {
+ 	/* Irq domain implements MSIs */
+ 	IRQ_DOMAIN_FLAG_MSI		= (1 << 4),
  
--static inline bool irq_domain_is_msi_remap(struct irq_domain *domain)
--{
--	return domain->flags & IRQ_DOMAIN_FLAG_MSI_REMAP;
--}
--
--extern bool irq_domain_hierarchical_is_msi_remap(struct irq_domain *domain);
--
- static inline bool irq_domain_is_msi_parent(struct irq_domain *domain)
- {
- 	return domain->flags & IRQ_DOMAIN_FLAG_MSI_PARENT;
-@@ -611,17 +603,6 @@ static inline bool irq_domain_is_msi(struct irq_domain *domain)
+-	/* Irq domain implements MSI remapping */
+-	IRQ_DOMAIN_FLAG_MSI_REMAP	= (1 << 5),
++	/*
++	 * Irq domain implements isolated MSI, see msi_device_has_isolated_msi()
++	 */
++	IRQ_DOMAIN_FLAG_ISOLATED_MSI	= (1 << 5),
+ 
+ 	/* Irq domain doesn't translate anything */
+ 	IRQ_DOMAIN_FLAG_NO_MAP		= (1 << 6),
+diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
+index 1c6811e145f170..7c5579d3ea4f79 100644
+--- a/kernel/irq/msi.c
++++ b/kernel/irq/msi.c
+@@ -1644,7 +1644,7 @@ bool msi_device_has_isolated_msi(struct device *dev)
+ 	struct irq_domain *domain = dev_get_msi_domain(dev);
+ 
+ 	for (; domain; domain = domain->parent)
+-		if (domain->flags & IRQ_DOMAIN_FLAG_MSI_REMAP)
++		if (domain->flags & IRQ_DOMAIN_FLAG_ISOLATED_MSI)
+ 			return true;
  	return false;
  }
- 
--static inline bool irq_domain_is_msi_remap(struct irq_domain *domain)
--{
--	return false;
--}
--
--static inline bool
--irq_domain_hierarchical_is_msi_remap(struct irq_domain *domain)
--{
--	return false;
--}
--
- static inline bool irq_domain_is_msi_parent(struct irq_domain *domain)
- {
- 	return false;
-@@ -641,10 +622,6 @@ static inline struct irq_domain *irq_find_matching_fwnode(
- {
- 	return NULL;
- }
--static inline bool irq_domain_check_msi_remap(void)
--{
--	return false;
--}
- #endif /* !CONFIG_IRQ_DOMAIN */
- 
- #endif /* _LINUX_IRQDOMAIN_H */
-diff --git a/kernel/irq/irqdomain.c b/kernel/irq/irqdomain.c
-index 8fe1da9614ee8d..10495495158210 100644
---- a/kernel/irq/irqdomain.c
-+++ b/kernel/irq/irqdomain.c
-@@ -436,31 +436,6 @@ struct irq_domain *irq_find_matching_fwspec(struct irq_fwspec *fwspec,
- }
- EXPORT_SYMBOL_GPL(irq_find_matching_fwspec);
- 
--/**
-- * irq_domain_check_msi_remap - Check whether all MSI irq domains implement
-- * IRQ remapping
-- *
-- * Return: false if any MSI irq domain does not support IRQ remapping,
-- * true otherwise (including if there is no MSI irq domain)
-- */
--bool irq_domain_check_msi_remap(void)
--{
--	struct irq_domain *h;
--	bool ret = true;
--
--	mutex_lock(&irq_domain_mutex);
--	list_for_each_entry(h, &irq_domain_list, link) {
--		if (irq_domain_is_msi(h) &&
--		    !irq_domain_hierarchical_is_msi_remap(h)) {
--			ret = false;
--			break;
--		}
--	}
--	mutex_unlock(&irq_domain_mutex);
--	return ret;
--}
--EXPORT_SYMBOL_GPL(irq_domain_check_msi_remap);
--
- /**
-  * irq_set_default_host() - Set a "default" irq domain
-  * @domain: default domain pointer
-@@ -1815,20 +1790,6 @@ static void irq_domain_check_hierarchy(struct irq_domain *domain)
- 	if (domain->ops->alloc)
- 		domain->flags |= IRQ_DOMAIN_FLAG_HIERARCHY;
- }
--
--/**
-- * irq_domain_hierarchical_is_msi_remap - Check if the domain or any
-- * parent has MSI remapping support
-- * @domain: domain pointer
-- */
--bool irq_domain_hierarchical_is_msi_remap(struct irq_domain *domain)
--{
--	for (; domain; domain = domain->parent) {
--		if (irq_domain_is_msi_remap(domain))
--			return true;
--	}
--	return false;
--}
- #else	/* CONFIG_IRQ_DOMAIN_HIERARCHY */
- /**
-  * irq_domain_get_irq_data - Get irq_data associated with @virq and @domain
 -- 
 2.38.1
 
