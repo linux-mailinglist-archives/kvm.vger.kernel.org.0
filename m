@@ -2,57 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 737DD64A748
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 19:40:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF54664A734
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 19:40:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232582AbiLLShk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 13:37:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58126 "EHLO
+        id S233308AbiLLSiA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 13:38:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233556AbiLLShf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 13:37:35 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81C6D65F3
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 10:37:34 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id z8-20020aa79588000000b00576e8050ec9so397055pfj.5
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 10:37:34 -0800 (PST)
+        with ESMTP id S233588AbiLLShh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 13:37:37 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D08C912D32
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 10:37:35 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id b6-20020a17090acc0600b0021a1a90a3e0so403430pju.0
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 10:37:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bbURCdqofOFDrUiFP7Zf5wqNKFvpWI0apMY/Oj4ukw=;
-        b=gbS17rhkHoVXb0OpoVPAKWtl7yRPxK8Vc09PU1KLXZzDv9md5UC9pko3x6/m67drC1
-         Y5XO4OWBJhYfcE2vRyVi+DtiFgeX4INeIRFIDhCcDoLWJOIQPBv8HZ0Y/eYx5HZQ6Cxx
-         PrDlPxfCR+SRe0efthnkNM7HSMl7hFLDAc4A7gO/mjWn0IoBlnLW5fISGAtoDjCb+0US
-         ShQ5q09UQ40NoDxurmINEcRz625soBdZk1btWdM5Fr0GsYMSOfEFTjnYyi+cztCDH+2f
-         39YXnzzMtOtRObU6ZwG6WHkSBCVV/pTe05FlvurfaiMnCU4GWUNfsocPPBJA9UjJqJym
-         CwNA==
+        bh=RTf0vqd6q8+sD3Ai3Fk1grBLzBMEa+ZNH0AvURQNQ5o=;
+        b=pYVYkqiR43tK0hPCEG/kVDHMEt2aJJUYg1bH40nsGgVdu1wYh+ANfWYTGzSekKt7Sl
+         h70vvfs3BMrzkPRXUFrR6/CXV9WmP4E63xa4OPbGvnC97OUhEXc4uBdP44any6xY4x2X
+         XUcUeWHjOyxyNIxvonAUP7ubiABB/4tD8LSKPGME40AwJp+c8uojQNm7Tf9GED8AtSGn
+         RUAskYjgoDDcGPOJL9o47bYtISj8wuSvy7AlOoo3qvNmRhoX58Brzc5N4o8Mr+7odksx
+         F/3swp5pNcElcc5cciV9JdGK5e2XJqOLdojPsYsS1dm8E9puOTLfvVzV3V7S1Jadu5oR
+         SAKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bbURCdqofOFDrUiFP7Zf5wqNKFvpWI0apMY/Oj4ukw=;
-        b=s4n2dVOQoHYnHN3nWKzbyCG7NAIpdMnp8pj2toG6e3DV8YT9C3EJNyzXCWHLTf8WS+
-         cmHAFB366hsPW9CO8oY9Rq2qZl7rN7QTea71XIyfFQwwqOMHBYAY2OVNLM/JkhpGjren
-         tGbM214Xso8bylvbpNOTnhnW3cp22fMIBMu5pYnB3WN9zopytMjt0p8/6nyo/zfGvEWC
-         A2ca9glat/uG2joArC4RY+6Y8DicEWsM8aW2Qq04K05MODtwxF2LwpVAZDtZXNnNmOKU
-         nCrE5Y4SHzuRNmtY/dc2xxr05A2FijcfmkoFPKDNJ0qG8sUYouLtKMqTDN8qlQSNm2CM
-         LbNg==
-X-Gm-Message-State: ANoB5pnS97QrmGoXOm75zUgtBkAPly9rXJzXyprqh9JuS7dy843/GF+8
-        n5iQXUP5rMGsKOKkGDAYrHLw04Ie9IyZ
-X-Google-Smtp-Source: AA0mqf7eQRS0b3QO7o6w6MhBLfw+WBAM9g7CwpHpipQNZ5OHcoxaAPLZu7SR6EyF1XotxyTLfET4fU0wti2d
+        bh=RTf0vqd6q8+sD3Ai3Fk1grBLzBMEa+ZNH0AvURQNQ5o=;
+        b=b69wK/iOV3iPT0G1inYxGb21su/8k+6QERTFj56rsD8ulaWWqU2RdXr9Zi5P6/PWkR
+         acd1GX8PQt4rC82dufIf2QXZZxBFsFWP/3Q488w/5FM/A6ZbJRN6EvgXA/9E1Zb4Yyrj
+         db5tBP12ggYW4Om7z7ZqMz6PQ2sgbo69cdCpACCKHMFX839KeoZ83iIZJcMxroKoK009
+         qODUcqAvYranZvZQbIxeaWS01J31VPHc6qtQGtQanlU94P1mRlKEP34FD4kdOW58MRYX
+         9xBYCnr2Q1/XjRdsvou8CzCItnk3UX/jr9PfkUBECk7BgaM6r7hp57dwq90CN5yxiFhs
+         j2Vw==
+X-Gm-Message-State: ANoB5pluuK0hHtEiuTLM9Wmumf/sF/h/c782dIUrJirmbIqpv+MeF2n0
+        Xhbck1RhwMmTSRMl0q39KQXPRbzjACMC
+X-Google-Smtp-Source: AA0mqf7XdqvvUzZbtRGowjArMbHVjopaA21CdyKAOLrrdgs3Mm9aPIa64BP5PeVL66Hm5zFNegKxkGstEE55
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:aa7:8487:0:b0:56c:3bb4:28a8 with SMTP id
- u7-20020aa78487000000b0056c3bb428a8mr79335494pfn.83.1670870254097; Mon, 12
- Dec 2022 10:37:34 -0800 (PST)
-Date:   Mon, 12 Dec 2022 10:37:13 -0800
+ (user=vipinsh job=sendgmr) by 2002:a17:90a:9c8:b0:20d:48bc:6666 with SMTP id
+ 66-20020a17090a09c800b0020d48bc6666mr2082pjo.98.1670870255442; Mon, 12 Dec
+ 2022 10:37:35 -0800 (PST)
+Date:   Mon, 12 Dec 2022 10:37:14 -0800
 In-Reply-To: <20221212183720.4062037-1-vipinsh@google.com>
 Mime-Version: 1.0
 References: <20221212183720.4062037-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221212183720.4062037-7-vipinsh@google.com>
-Subject: [Patch v4 06/13] KVM: selftests: Test that values written to Hyper-V
- MSRs are preserved
+Message-ID: <20221212183720.4062037-8-vipinsh@google.com>
+Subject: [Patch v4 07/13] KVM: selftests: Test Hyper-V invariant TSC control
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
         dmatlack@google.com
@@ -60,7 +59,7 @@ Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,91 +69,116 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 
-Enhance 'hyperv_features' selftest by adding a check that KVM
-preserves values written to PV MSRs. Two MSRs are, however, 'special':
-- HV_X64_MSR_EOI as it is a 'write-only' MSR,
-- HV_X64_MSR_RESET as it always reads as '0'.
-The later doesn't require any special handling right now because the
-test never writes anything besides '0' to the MSR, leave a TODO node
-about the fact.
+Add a test for the newly introduced Hyper-V invariant TSC control feature:
+- HV_X64_MSR_TSC_INVARIANT_CONTROL is not available without
+ HV_ACCESS_TSC_INVARIANT CPUID bit set and available with it.
+- BIT(0) of HV_X64_MSR_TSC_INVARIANT_CONTROL controls the filtering of
+architectural invariant TSC (CPUID.80000007H:EDX[8]) bit.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Reviewed-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- .../selftests/kvm/x86_64/hyperv_features.c    | 36 ++++++++++++++-----
- 1 file changed, 28 insertions(+), 8 deletions(-)
+ .../selftests/kvm/include/x86_64/hyperv.h     |  3 ++
+ .../selftests/kvm/include/x86_64/processor.h  |  1 +
+ .../selftests/kvm/x86_64/hyperv_features.c    | 47 +++++++++++++++++++
+ 3 files changed, 51 insertions(+)
 
+diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+index ab455c4efc66..28eb99046475 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
++++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
+@@ -335,4 +335,7 @@ struct hyperv_test_pages {
+ struct hyperv_test_pages *vcpu_alloc_hyperv_test_pages(struct kvm_vm *vm,
+ 						       vm_vaddr_t *p_hv_pages_gva);
+ 
++/* HV_X64_MSR_TSC_INVARIANT_CONTROL bits */
++#define HV_INVARIANT_TSC_EXPOSED               BIT_ULL(0)
++
+ #endif /* !SELFTEST_KVM_HYPERV_H */
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 5d310abe6c3f..80cbb9218f19 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -134,6 +134,7 @@ struct kvm_x86_cpu_feature {
+ #define	X86_FEATURE_GBPAGES		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
+ #define	X86_FEATURE_RDTSCP		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
+ #define	X86_FEATURE_LM			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 29)
++#define	X86_FEATURE_INVTSC		KVM_X86_CPU_FEATURE(0x80000007, 0, EDX, 8)
+ #define	X86_FEATURE_RDPRU		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 4)
+ #define	X86_FEATURE_AMD_IBPB		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 12)
+ #define	X86_FEATURE_NPT			KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 0)
 diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index daad3e3cc7bb..b00240963974 100644
+index b00240963974..258267df8e2a 100644
 --- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
 +++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -34,22 +34,36 @@ struct hcall_data {
- 	bool ud_expected;
- };
- 
-+static bool is_write_only_msr(uint32_t msr)
-+{
-+	return msr == HV_X64_MSR_EOI;
-+}
+@@ -63,6 +63,16 @@ static void guest_msr(struct msr_data *msr)
+ 	if (msr->write)
+ 		GUEST_ASSERT_3(msr_val == msr->write_val, msr->idx,
+ 			       msr_val, msr->write_val);
 +
- static void guest_msr(struct msr_data *msr)
- {
--	uint64_t ignored;
--	uint8_t vector;
-+	uint8_t vector = 0;
-+	uint64_t msr_val = 0;
- 
- 	GUEST_ASSERT(msr->idx);
- 
--	if (!msr->write)
--		vector = rdmsr_safe(msr->idx, &ignored);
--	else
-+	if (msr->write)
- 		vector = wrmsr_safe(msr->idx, msr->write_val);
- 
-+	if (!vector && (!msr->write || !is_write_only_msr(msr->idx)))
-+		vector = rdmsr_safe(msr->idx, &msr_val);
++	/* Invariant TSC bit appears when TSC invariant control MSR is written to */
++	if (msr->idx == HV_X64_MSR_TSC_INVARIANT_CONTROL) {
++		if (!this_cpu_has(HV_ACCESS_TSC_INVARIANT))
++			GUEST_ASSERT(this_cpu_has(X86_FEATURE_INVTSC));
++		else
++			GUEST_ASSERT(this_cpu_has(X86_FEATURE_INVTSC) ==
++				     !!(msr_val & HV_INVARIANT_TSC_EXPOSED));
++	}
 +
- 	if (msr->fault_expected)
--		GUEST_ASSERT_2(vector == GP_VECTOR, msr->idx, vector);
-+		GUEST_ASSERT_3(vector == GP_VECTOR, msr->idx, vector, GP_VECTOR);
- 	else
--		GUEST_ASSERT_2(!vector, msr->idx, vector);
-+		GUEST_ASSERT_3(!vector, msr->idx, vector, 0);
-+
-+	if (vector || is_write_only_msr(msr->idx))
-+		goto done;
-+
-+	if (msr->write)
-+		GUEST_ASSERT_3(msr_val == msr->write_val, msr->idx,
-+			       msr_val, msr->write_val);
-+done:
+ done:
  	GUEST_DONE();
  }
+@@ -118,6 +128,7 @@ static void guest_test_msrs_access(void)
+ 	int stage = 0;
+ 	vm_vaddr_t msr_gva;
+ 	struct msr_data *msr;
++	bool has_invtsc = kvm_cpu_has(X86_FEATURE_INVTSC);
  
-@@ -239,6 +253,12 @@ static void guest_test_msrs_access(void)
- 		case 16:
- 			msr->idx = HV_X64_MSR_RESET;
- 			msr->write = true;
-+			/*
-+			 * TODO: the test only writes '0' to HV_X64_MSR_RESET
-+			 * at the moment, writing some other value there will
-+			 * trigger real vCPU reset and the code is not prepared
-+			 * to handle it yet.
-+			 */
- 			msr->write_val = 0;
- 			msr->fault_expected = false;
+ 	while (true) {
+ 		vm = vm_create_with_one_vcpu(&vcpu, guest_msr);
+@@ -435,6 +446,42 @@ static void guest_test_msrs_access(void)
  			break;
-@@ -433,7 +453,7 @@ static void guest_test_msrs_access(void)
  
- 		switch (get_ucall(vcpu, &uc)) {
- 		case UCALL_ABORT:
--			REPORT_GUEST_ASSERT_2(uc, "MSR = %lx, vector = %lx");
-+			REPORT_GUEST_ASSERT_3(uc, "MSR = %lx, arg1 = %lx, arg2 = %lx");
+ 		case 44:
++			/* MSR is not available when CPUID feature bit is unset */
++			if (!has_invtsc)
++				continue;
++			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
++			msr->write = false;
++			msr->fault_expected = true;
++			break;
++		case 45:
++			/* MSR is vailable when CPUID feature bit is set */
++			if (!has_invtsc)
++				continue;
++			vcpu_set_cpuid_feature(vcpu, HV_ACCESS_TSC_INVARIANT);
++			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
++			msr->write = false;
++			msr->fault_expected = false;
++			break;
++		case 46:
++			/* Writing bits other than 0 is forbidden */
++			if (!has_invtsc)
++				continue;
++			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
++			msr->write = true;
++			msr->write_val = 0xdeadbeef;
++			msr->fault_expected = true;
++			break;
++		case 47:
++			/* Setting bit 0 enables the feature */
++			if (!has_invtsc)
++				continue;
++			msr->idx = HV_X64_MSR_TSC_INVARIANT_CONTROL;
++			msr->write = true;
++			msr->write_val = 1;
++			msr->fault_expected = false;
++			break;
++
++		default:
+ 			kvm_vm_free(vm);
  			return;
- 		case UCALL_DONE:
- 			break;
+ 		}
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
