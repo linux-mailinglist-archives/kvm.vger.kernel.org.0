@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C54B64A736
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 19:40:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B8A5364A74C
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 19:40:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233373AbiLLSi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 13:38:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58882 "EHLO
+        id S233618AbiLLSii (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 13:38:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233604AbiLLShl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 13:37:41 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90C29DBF
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 10:37:40 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id v23-20020aa78097000000b005748c087db1so404383pff.2
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 10:37:40 -0800 (PST)
+        with ESMTP id S232934AbiLLShn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 13:37:43 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60F2D11150
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 10:37:42 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id 191-20020a6214c8000000b00577ab8701b0so426997pfu.0
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 10:37:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AQIHU7oFJzfN/dD6MjFy5Gqv9IoHRNmGXG4ddL/MsoE=;
-        b=WZDTp5uHSLJqlVqV7BsnAygUubdknMcQxot4GSHCGt3kDvVaGTS5iwHIZaa+KHHOD+
-         E0fScrJ9kFGJ5yGajKLeL7D6jiQSjkKICmzpbB2fxH+8MZpRY0Ho4p5Bn5WuRqgekZZC
-         G1eeE7pEdWgfx2P7ylueHxelrEwP5Gog/R8nKds+Zi7kKsHWpPMxUYEXgC9zSRSSru8q
-         Q92QHA+M3D0svZUKyV6pK6QnTRdKWicJuMh6rqM0/7nWtkw0QA+rk7a8HtRtoN9ucGKv
-         wEtbnGLTRRBnOrWXjAJfnlerqZHWtJeEGj80PqCqsmPT8Lsz49gv6vS17ePpQoa6VAJn
-         Dv3A==
+        bh=x5QngdHQiKQfEuJYIiEzFXAizHnjRUO3mh7eHj4eZ3w=;
+        b=rdP1+wMzNzcT40yMVG9EmesGEqtj8WetNxbG2ao8AaGcVeiWSJtrO9mjxyuqOOP+dK
+         d/jDekzoXjtR9ksfmyl+xmS2Wqlf9meX9787kRVadr1tpGUOdurqsIR7tRFrrrL/UsDj
+         BehiVYyGedKtL9yglQ2xG49nvJ/Aet8SbOXABV5x4iPwq8SIkEfARjtqQDjGEc/Y2Orw
+         2D5XcyaRWgUaKlMiYtN0vsxBqW5gk5ADC5tH7tmBYUiegMI3P1DWdTj278HS1W8wMSgU
+         ptS3InxvJ9CMBTDB4iDVmABCIyjG87wIO04Uqa/+Sgj5E25pXVR2owVOfsVLdOVXgTai
+         OTqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AQIHU7oFJzfN/dD6MjFy5Gqv9IoHRNmGXG4ddL/MsoE=;
-        b=2HwhEMEs9qnACN53EzxfiQ5oLtFzFsbb/Q51Mte6EyL3CDDNUp+50nufjidmsOY9zY
-         2BOyp5EtvqJ7k6Bufz4LxeSAakzc4RAAEFaQrXxVu4DWATdEePnP2A2NWc3pizT8St3Q
-         Wo1+xzS28A1sRCXMuoFW2DP4BCLxCsBjv4k9yL80BjDMp4Jtg4P//MEyhB9iglIYmxMt
-         rsMtVL4vLlJopUSv/9Berw4kHvoxX6+0Yfh0xsyLCnWUyZ0z9AMzW5L3kh3hdaY09SDn
-         NrTze0+ZSP0Vb2+K9AOQ8XlB1r85zuE7L35WkCs7rlfM4gmuFGYJ1DNMmvKhjZpHZtiQ
-         2tqA==
-X-Gm-Message-State: ANoB5pmPVUMuQTIbMdQuBwj49nZIgoHh8yQCFPTIluVOvoEXURebU+EY
-        Bt3LDcRfrJutNDeQJwObMXlo8gnlAhL8
-X-Google-Smtp-Source: AA0mqf4cERvubxOpWA/x9PbxZimApwZ4/pDD7woS2SB2MbN7JS4TAWw2g2l3Tw7Rx4PtfCZ8UOmBXnYatQ88
+        bh=x5QngdHQiKQfEuJYIiEzFXAizHnjRUO3mh7eHj4eZ3w=;
+        b=DO56Q/Bf2mt4aeOu1M2mxj76+8onSKU3ikOzFUs7YdTdpuWKU5HsxrW9hJm40f4iC3
+         nHMx7U2NNTjUDY+ASw/o5PWIVTtQfo84RvKIS7EVVCS8o2irYMS0M6l13ZuIwAuwBiXw
+         ecLBoEQKgBK/m23Oomhy3IhU7CFpqZRMZkY7pQkaM+vLT0agf5ks8XlzjyQ44BIq1gum
+         qE9XNlhRwrcGMknstDTmDcUxUAw45M70358xPnjGx3HFY0uZEgy/+RCeyEyknYaCJboX
+         5BVl4qadXgEtPVYFgRsxibNWG2Lh0jF9P0ZWt6x1hGuYDxShVdPo+s4uDSPQt7dKadrr
+         NRaw==
+X-Gm-Message-State: ANoB5pn7QCI8yOYoLDfq3UzVhbbYVDvigIwxsKAlG0G6lMzQlxqWJdO2
+        PMB9LVNmNyKAlV2D96v1uX35JsTCUAcX
+X-Google-Smtp-Source: AA0mqf6Dn6GCbSxu0NPu9oPjgMiz92uF+OHQPKb3rPZT7vKfROULEeTOeno/R2eXy5pVf+Qfw+qZw7VUJRdb
 X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:a17:90a:fa46:b0:200:1df3:a7a9 with SMTP id
- dt6-20020a17090afa4600b002001df3a7a9mr108504791pjb.202.1670870260194; Mon, 12
- Dec 2022 10:37:40 -0800 (PST)
-Date:   Mon, 12 Dec 2022 10:37:17 -0800
+ (user=vipinsh job=sendgmr) by 2002:aa7:820e:0:b0:573:ab15:1d6f with SMTP id
+ k14-20020aa7820e000000b00573ab151d6fmr85141950pfi.9.1670870261939; Mon, 12
+ Dec 2022 10:37:41 -0800 (PST)
+Date:   Mon, 12 Dec 2022 10:37:18 -0800
 In-Reply-To: <20221212183720.4062037-1-vipinsh@google.com>
 Mime-Version: 1.0
 References: <20221212183720.4062037-1-vipinsh@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221212183720.4062037-11-vipinsh@google.com>
-Subject: [Patch v4 10/13] KVM: selftests: Test Hyper-V extended hypercall enablement
+Message-ID: <20221212183720.4062037-12-vipinsh@google.com>
+Subject: [Patch v4 11/13] KVM: selftests: Replace hardcoded Linux OS id with HYPERV_LINUX_OS_ID
 From:   Vipin Sharma <vipinsh@google.com>
 To:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
         dmatlack@google.com
@@ -68,62 +68,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test Hyper-V extended hypercall, HV_EXT_CALL_QUERY_CAPABILITIES
-(0x8001), access denied and invalid parameter
-cases.
-
-Access is denied if CPUID.0x40000003.EBX BIT(20) is not set.
-Invalid parameter if call has fast bit set.
+Use HYPERV_LINUX_OS_ID macro instead of hardcoded 0x8100 << 48
 
 Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- tools/testing/selftests/kvm/include/x86_64/hyperv.h  | 5 +++++
- tools/testing/selftests/kvm/x86_64/hyperv_features.c | 9 +++++++++
- 2 files changed, 14 insertions(+)
+ tools/testing/selftests/kvm/x86_64/hyperv_clock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-index 28eb99046475..fa65b908b13e 100644
---- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-@@ -137,6 +137,8 @@
- 	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 11)
- #define HV_CPU_MANAGEMENT			\
- 	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 12)
-+#define HV_ENABLE_EXTENDED_HYPERCALLS		\
-+	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 20)
- #define HV_ISOLATION				\
- 	KVM_X86_CPU_FEATURE(HYPERV_CPUID_FEATURES, 0, EBX, 22)
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+index d576bc8ce823..2ee0af0d449e 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_clock.c
+@@ -104,7 +104,7 @@ static void guest_main(struct ms_hyperv_tsc_page *tsc_page, vm_paddr_t tsc_page_
  
-@@ -213,6 +215,9 @@
- #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_SPACE 0x00af
- #define HVCALL_FLUSH_GUEST_PHYSICAL_ADDRESS_LIST 0x00b0
+ 	/* Set Guest OS id to enable Hyper-V emulation */
+ 	GUEST_SYNC(1);
+-	wrmsr(HV_X64_MSR_GUEST_OS_ID, (u64)0x8100 << 48);
++	wrmsr(HV_X64_MSR_GUEST_OS_ID, HYPERV_LINUX_OS_ID);
+ 	GUEST_SYNC(2);
  
-+/* Extended hypercalls */
-+#define HV_EXT_CALL_QUERY_CAPABILITIES		0x8001
-+
- #define HV_FLUSH_ALL_PROCESSORS			BIT(0)
- #define HV_FLUSH_ALL_VIRTUAL_ADDRESS_SPACES	BIT(1)
- #define HV_FLUSH_NON_GLOBAL_MAPPINGS_ONLY	BIT(2)
-diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_features.c b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-index 258267df8e2a..c5e3b39edd07 100644
---- a/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-+++ b/tools/testing/selftests/kvm/x86_64/hyperv_features.c
-@@ -649,6 +649,15 @@ static void guest_test_hcalls_access(void)
- 			hcall->expect = HV_STATUS_SUCCESS;
- 			break;
- 		case 19:
-+			hcall->control = HV_EXT_CALL_QUERY_CAPABILITIES;
-+			hcall->expect = HV_STATUS_ACCESS_DENIED;
-+			break;
-+		case 20:
-+			vcpu_set_cpuid_feature(vcpu, HV_ENABLE_EXTENDED_HYPERCALLS);
-+			hcall->control = HV_EXT_CALL_QUERY_CAPABILITIES | HV_HYPERCALL_FAST_BIT;
-+			hcall->expect = HV_STATUS_INVALID_PARAMETER;
-+			break;
-+		case 21:
- 			kvm_vm_free(vm);
- 			return;
- 		}
+ 	check_tsc_msr_rdtsc();
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
