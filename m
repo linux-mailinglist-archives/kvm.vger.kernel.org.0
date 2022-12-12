@@ -2,69 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EA6AA64AA58
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 23:33:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF49F64AA81
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 23:43:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233814AbiLLWdu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 17:33:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38678 "EHLO
+        id S233872AbiLLWnX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 17:43:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233827AbiLLWdm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 17:33:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 491AC3886
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 14:32:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670884360;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BHhE1QP3jUCpk1cxLuQ6KAYvI1S2lfEsXBvTRJ9YN5A=;
-        b=F6sM0inhhakwBBTX5N/jZ6Bini7lCXbRRoA1HcHGPYCOcWkgTW5gcK30YbLEA2wITfXQFh
-        aT5WPqf8TLPZPl779hZCwNw+5pJb5cWP7jR32D4FzM7aktT+ebUONIbHcomGjWQE42scxt
-        VqkpB3Cfs8fjjHb2hIXr6IetlReIuR4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-620-Smu6YVSnOIGUbs_0Y3Ls0Q-1; Mon, 12 Dec 2022 17:32:38 -0500
-X-MC-Unique: Smu6YVSnOIGUbs_0Y3Ls0Q-1
-Received: by mail-wm1-f70.google.com with SMTP id h9-20020a1c2109000000b003cfd37aec58so3973459wmh.1
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 14:32:38 -0800 (PST)
+        with ESMTP id S233875AbiLLWmz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 17:42:55 -0500
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CDD9FAFB
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 14:42:54 -0800 (PST)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-3c090251d59so168277947b3.4
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 14:42:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=xlakFXRE5WR+eI81tSHGT8mBX3C2kTQwJgOLsFBL4OY=;
+        b=ndwFSRoXLSuq0mtL5gu3GohHZTtCmsXoG5LnB+4W5ntMQyw7hg7yWmVnEVKI/CMMjq
+         KrRV2sbCGqD+H+xzIvKYj1uByps5sG637+06KzojhBb8JdEZSaKaduwj2AG/udwtUpyt
+         ek+ZoO9A0+tsd50WkNyDpm1NuAuM3Y5dUIJvdzOEDIi6I+KRA7WOdHGwAFMZnvKcKJm8
+         sMmoQVLveW58rH19lDfr14dd1014L5iT8SfRCYVc1nc0+/mzoEy8/Q6/90V5+D11cSnV
+         VR0IEIuzVXTRNeTb22H3kEKuvjJHEQSBOYF1lXueeHZG7VZeReMvOUQqeeOQrxzxcfeM
+         2TJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BHhE1QP3jUCpk1cxLuQ6KAYvI1S2lfEsXBvTRJ9YN5A=;
-        b=Q6T1ibLgwo9jTX0EUwivPxANw8czMqS6st0kAgWt1N/sKt6anhKv5E3UZRMprUbi9T
-         dfm3eN4ZHX6MMoNkTp/fu3/a4/iI+Dx1X7o5vpglQQi/PI69WZhxoeJhrOfX/toxeJrb
-         8LxTdWMOoHDYkpA8ZlIxkJY0v9QhzMA1vjyqtt7KNzBAy+Zzu9LOHQqaxy5r4/fFBXYE
-         g8V2FRr/HWKK4YdajJc2Jdv8Revbj/Mh7B7hVFlBK95h/rHTHf9j86Hnq0JB+ARamUgo
-         CWHvK21/5RgRAQFT5MQHkGeyp+ABxRBw6VJylMnxGOSXHVa1SIm6Sr39xbPYQUp0GnHk
-         6Zfw==
-X-Gm-Message-State: ANoB5pki9XRWfuzZ+ChOfXy2OEa/B4NjaS2uLNsyTbPihbpa1JYbxmxF
-        x/bV2G34XbOJyyX2B0d1HAkuRmODUGbfblT0SwqQvciUAyc4NzzA9lu8zRcqjU6rY/78ScK5PCT
-        GQ5quabBLtfW/
-X-Received: by 2002:a05:600c:3d8f:b0:3c6:e62e:2e74 with SMTP id bi15-20020a05600c3d8f00b003c6e62e2e74mr13978201wmb.15.1670884357779;
-        Mon, 12 Dec 2022 14:32:37 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5rK2wuh16AKn0g4El+6pmLN9CiGHMIzRy1p4C+zNER/+4S5U+s8UBV98mPUqtRVzVGakI9Nw==
-X-Received: by 2002:a05:600c:3d8f:b0:3c6:e62e:2e74 with SMTP id bi15-20020a05600c3d8f00b003c6e62e2e74mr13978185wmb.15.1670884357516;
-        Mon, 12 Dec 2022 14:32:37 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id o5-20020a05600c510500b003cfa3a12660sm186503wms.1.2022.12.12.14.32.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 14:32:36 -0800 (PST)
-Message-ID: <0e159e42-ebca-c0d5-f2ae-29fa2344e720@redhat.com>
-Date:   Mon, 12 Dec 2022 23:32:34 +0100
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xlakFXRE5WR+eI81tSHGT8mBX3C2kTQwJgOLsFBL4OY=;
+        b=cz0dtNy4JH56s+TcnMqxjHKjMjabAicbGI7Ud7Leefte0gJunUTV2GhXitBuvmcRZF
+         fosy146Yr8gQ9OSs3GfRXaUkDqsG3HrCqNdfW/ufHpAJakckkBu6SAas2mGq2ardWtGi
+         JhnFp1wFQ4M4Oqwq6idy8257BY/5stfS6j0TC8mOWPxsaD1vRIYqJLwPyC7VMhwwdxdr
+         59gGythutyb08BaH73QL9mP1NtQswdre2pRReau/GkBrTOtEksQDNmw6MzOeOfAWLKpD
+         NvYca4LmS1/sm83/4QJgQHJvvnWo4zikWE8sCiE9n8BoniUi9EOSESsDLrcEGtEt0tHE
+         N/8Q==
+X-Gm-Message-State: ANoB5pnGCl8ZTpNlcmGV+P11xNKpw8+5YSHwRCw7proJlKwcFYptxUG3
+        1PlnKobGoVmdzPdEzaetRo9UNkS5xlop3l5l9KD2+A==
+X-Google-Smtp-Source: AA0mqf44l006Q6QVS5WsjpiBIi3T4SW6bvJpPAfR1juAzLaGPOaG7kqLyOnkKrJsuk2Vx7E4bBJKqTB5CVZjDntvdQc=
+X-Received: by 2002:a0d:df0a:0:b0:35f:9c14:144a with SMTP id
+ i10-20020a0ddf0a000000b0035f9c14144amr26604984ywe.209.1670884973326; Mon, 12
+ Dec 2022 14:42:53 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [RFC PATCH 06/37] KVM: MMU: Move struct kvm_mmu_page to common
- code
-Content-Language: en-US
-To:     David Matlack <dmatlack@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-34-dmatlack@google.com>
+ <CANgfPd_069QPNby+mR4GuOWDNJtFk_=9EOffb0=2_V5TH-ZCDA@mail.gmail.com>
+In-Reply-To: <CANgfPd_069QPNby+mR4GuOWDNJtFk_=9EOffb0=2_V5TH-ZCDA@mail.gmail.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 12 Dec 2022 14:42:27 -0800
+Message-ID: <CALzav=fMX0g_n9pVFsLShZjEkPLquo2u_QpPMPzUMAGYtjZFOw@mail.gmail.com>
+Subject: Re: [RFC PATCH 33/37] KVM: Move kvm_arch_flush_remote_tlbs_memslot()
+ to common code
+To:     Ben Gardon <bgardon@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
@@ -81,13 +73,12 @@ Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         Nadav Amit <namit@vmware.com>,
         "Matthew Wilcox (Oracle)" <willy@infradead.org>,
         Vlastimil Babka <vbabka@suse.cz>,
-        "Liam R. Howlett" <Liam.Howlett@Oracle.com>,
+        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
         Suren Baghdasaryan <surenb@google.com>,
         Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
         Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
         Colin Cross <ccross@google.com>,
         Hugh Dickins <hughd@google.com>,
-        Ben Gardon <bgardon@google.com>,
         Mingwei Zhang <mizhang@google.com>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>,
         Ricardo Koller <ricarkol@google.com>,
@@ -96,37 +87,38 @@ Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
         kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
         kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
         linux-riscv@lists.infradead.org
-References: <20221208193857.4090582-1-dmatlack@google.com>
- <20221208193857.4090582-7-dmatlack@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20221208193857.4090582-7-dmatlack@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/8/22 20:38, David Matlack wrote:
-> This commit increases the size of struct kvm_mmu_page by 64 bytes on
-> x86_64 (184 bytes -> 248 bytes). The size of this struct can be reduced
-> in future commits by moving TDP MMU root fields into a separate struct
-> and by dynamically allocating fields only used by the Shadow MMU.
+On Mon, Dec 12, 2022 at 2:03 PM Ben Gardon <bgardon@google.com> wrote:
+>
+> On Thu, Dec 8, 2022 at 11:40 AM David Matlack <dmatlack@google.com> wrote:
+> >
+> > Move kvm_arch_flush_remote_tlbs_memslot() to common code and drop
+> > "arch_" from the name. kvm_arch_flush_remote_tlbs_memslot() is just a
+> > range-based TLB invalidation where the range is defined by the memslot.
+> > Now that kvm_flush_remote_tlbs_range() can be called from common code we
+> > can just use that and drop a bunch of duplicate code from the arch
+> > directories.
+> >
+> > Note this adds a lockdep assertion for slot_lock being held when calling
+> > kvm_flush_remote_tlbs_memslot(), which was previously only asserted on
+> > x86.
+>
+> Besides the one lockdep assertion, is there any benefit to having this
+> wrapper function? Open-coding "kvm_flush_remote_tlbs_range(kvm,
+> memslot->base_gfn, memslot->npages);" is only a slightly longer line
+> and, IMO, just as readable. I'm happy to see this cleanup, but it
+> might be just as easy to drop the function.
 
-I think it's already possible to use a union like
-
-	union {
-		struct kvm_mmu_page_arch arch;
-		struct {
-			struct work_struct work;
-			void *data;
-		};
-	};
-
-Paolo
-
+The wrapper makes lines shorter, adds a lockdep assertion, and is just
+as readable. What's the reason to drop it?
