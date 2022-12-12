@@ -2,96 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15B1F64A936
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 22:06:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CAB564A981
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 22:28:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233028AbiLLVGa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 16:06:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46688 "EHLO
+        id S233268AbiLLV2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 16:28:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232934AbiLLVG0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 16:06:26 -0500
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01EE125E4
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 13:06:25 -0800 (PST)
-Received: by mail-yb1-xb35.google.com with SMTP id y135so15261836yby.12
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 13:06:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=as6M7rF8vu2B1VLzLGLnujoNEHxjqSZF2ixbKuvGXxE=;
-        b=jIhGaXVnl3YvAnDSTeWQFwWR+xDHpsjs16kACsfVA5aKtf91JC05OJjmUmKeP0nkpM
-         SnDACAK7EvYaQ0k+/SaN1mEHgyH0DYgRRStukX7P77NP1FuYigKrflB4Ki4chVKDLckx
-         PcbOzgjjYKRLK44+Pe1nn5owF1kec2HNqSnIpRfr7QP2EE/vpPFzlWfDvSdDUaVVenod
-         N2kzbeLjIoQucXZh1kYPlKrgL+ICtIDFTpL/2QNV3RfTDJQxiKbZ0U4k49qhwdvrXZew
-         rCl3bxQP1QGlSh1wnz8qOTaqIvdkcp0n2w91WmgfaTkcQxK4hFcijjPmc+qIiQbMg51Q
-         ysyw==
+        with ESMTP id S233212AbiLLV14 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 16:27:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E87F11741A
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 13:26:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670880416;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ESzb52BjV28O9Vn0affkyljMBG0fZ0DdXYD2mD//kKk=;
+        b=MzIU5E80SNVivInvXQiQWZPus/GGJ2mr3srny/KUTVdU95Yozn3jQqOjDkGheoLAucR5yU
+        UN/DiiLaFuKRS7MbBn/G1dLvtwCt/CcT1LNNvH5wGYJkm3nxR6JXpMcaXR0w4yfj+5X6xk
+        5BkoUYhN/cqiQJDzCBuUKfQhCxdLrBU=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-616-icvrY9odMnyoj0fTdF90vg-1; Mon, 12 Dec 2022 16:26:54 -0500
+X-MC-Unique: icvrY9odMnyoj0fTdF90vg-1
+Received: by mail-il1-f198.google.com with SMTP id x9-20020a056e021ca900b003037ca1af0cso6085491ill.16
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 13:26:54 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=as6M7rF8vu2B1VLzLGLnujoNEHxjqSZF2ixbKuvGXxE=;
-        b=pYoeqYWUkH4dNnXIq+pDJGp45LBuqIlnE/wJuMUVafdNx5PPQbA1OBsmBS+CyG9mIy
-         9UAbETZG1cLNa8fZENc0OG/HOlHbASm2HbMl0dWA4HrhF+Z7DkTBHz4US6J4ouqHngqT
-         uLXEW6lrBhD94nnjV6TVTngWaOj1y5P4+cqTVPCoOmTrcXLzqVKW7H3WVbCFe4UuGI77
-         zLATn9wRD0xA9En3QAweJA9V5rcYR+0TVXP3cCEe7+FMXbxVoO2Lga7Sv1y5PLyyJxBy
-         ZbvIgna2VKFMd8B5ONnw0F0bRKwGxKJHbQPZx35Ws7j6IltfHsgBscYTqKrZS49mwNOJ
-         ijzg==
-X-Gm-Message-State: ANoB5pnDu2BrKpfA96MGSzild7ps+W1wOzYXvWHiA+q2/jJdultzpFk2
-        rEiwn/k868Skj7nq6kjf0yNA8mVQix6h+9MsR3dHjA==
-X-Google-Smtp-Source: AA0mqf6t0tL+M5odHwBkmEtWZ3JrhY8ZOtTx4LY0nKQZE8xDjE9jvCGoO42nxIdR/mBoqjExkkZ8XXCco0Q3+sfbdfg=
-X-Received: by 2002:a25:742:0:b0:6fd:6aa4:82a5 with SMTP id
- 63-20020a250742000000b006fd6aa482a5mr26123897ybh.305.1670879183958; Mon, 12
- Dec 2022 13:06:23 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ESzb52BjV28O9Vn0affkyljMBG0fZ0DdXYD2mD//kKk=;
+        b=ZbQMJLgqmT0V1RJ/yK5xEo1ibhylB2o9iWgd/auL3x1LDXWsBCP4Nx+fGnAIycWQCj
+         mEv3Stbq33R7M1sGWDjdrVvacfVuQ+2TSlqJyv3Iej6zs3rRe8Jq+g7FXnvL9PkXsJ+P
+         TsKNNRt7WWgL3d/jB4VTc3LUpipXCakuV25D6HeEljMNckzwHRZx0BYLa0547AKtxEik
+         Z+QOSrwV3rtS2DnxxLj9/H/ZIJwzfWiJljbMzZ/Q4hgODnEDM7FLC8gP96TSaTBuDr+U
+         fWJ5e/pPyeiLEt6cCJheV69v8OWFvhFi0Ch76/hjl2UwOGUjOUFecDM3GfyvUbEGS6N8
+         UV8A==
+X-Gm-Message-State: ANoB5pk02Od6tY/KZSn1/Vymd/YCwl/f2HAn0BUzrD6tt5GMCGfIgXCd
+        C6fDQdEq4ouBPxZmjgI+2peVSY20w22iMSnKtBFgx88+yrrhZ9avKJy2Fqb0SImjrUjS7brxX6w
+        j5LRBSZYz6vaY
+X-Received: by 2002:a05:6602:1d4:b0:6df:e4f7:8c20 with SMTP id w20-20020a05660201d400b006dfe4f78c20mr9833123iot.14.1670880414009;
+        Mon, 12 Dec 2022 13:26:54 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7v6Ul6nwS26XZd/iOTb8ZkMEzRCGY9PUjpxPpUAioVUp3lRXGnXSwiAa+CdB0kjNlvAEGgCA==
+X-Received: by 2002:a05:6602:1d4:b0:6df:e4f7:8c20 with SMTP id w20-20020a05660201d400b006dfe4f78c20mr9833118iot.14.1670880413778;
+        Mon, 12 Dec 2022 13:26:53 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id i189-20020a6bb8c6000000b006dfb7d199dasm4506948iof.7.2022.12.12.13.26.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 13:26:53 -0800 (PST)
+Date:   Mon, 12 Dec 2022 14:26:51 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Steven Sistare <steven.sistare@oracle.com>
+Cc:     Jason Gunthorpe <jgg@ziepe.ca>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] vfio/type1: Cleanup remaining vaddr removal/update
+ fragments
+Message-ID: <20221212142651.263dd6ae.alex.williamson@redhat.com>
+In-Reply-To: <8f29aad0-7378-ef7a-9ac5-f98b3054d5eb@oracle.com>
+References: <167044909523.3885870.619291306425395938.stgit@omen>
+        <BN9PR11MB5276222DAE8343BBEC9A79E98C1D9@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <20221208094008.1b79dd59.alex.williamson@redhat.com>
+        <b265b4ae-b178-0682-66b8-ef74a1489a8e@oracle.com>
+        <20221209124212.672b7a9c.alex.williamson@redhat.com>
+        <5f494e1f-536d-7225-e2c7-5ec9c993f13a@oracle.com>
+        <20221209140120.667cb658.alex.williamson@redhat.com>
+        <6914b4eb-cd82-0c3e-6637-c7922092ef11@oracle.com>
+        <Y5cqAk1/6ayzmTjg@ziepe.ca>
+        <20221212085823.5d760656.alex.williamson@redhat.com>
+        <8f29aad0-7378-ef7a-9ac5-f98b3054d5eb@oracle.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-21-dmatlack@google.com>
- <CANgfPd-6LNdZ42tb0DnC21r1Z5JGR_1Lvvop8RKJJ8hEz+PUDg@mail.gmail.com>
-In-Reply-To: <CANgfPd-6LNdZ42tb0DnC21r1Z5JGR_1Lvvop8RKJJ8hEz+PUDg@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 12 Dec 2022 13:05:57 -0800
-Message-ID: <CALzav=cashgJPmeKSRQnd_kdYg2EK0G4rygSCt6GaJWSYz3juw@mail.gmail.com>
-Subject: Re: [RFC PATCH 20/37] KVM: x86/mmu: Abstract away computing the max
- mapping level
-To:     Ben Gardon <bgardon@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Nadav Amit <namit@vmware.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
-        Colin Cross <ccross@google.com>,
-        Hugh Dickins <hughd@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -99,29 +90,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 12, 2022 at 11:32 AM Ben Gardon <bgardon@google.com> wrote:
->
-> On Thu, Dec 8, 2022 at 11:39 AM David Matlack <dmatlack@google.com> wrote:
-> >
-> > Abstract away kvm_mmu_max_mapping_level(), which is an x86-specific
-> > function for computing the max level that a given GFN can be mapped in
-> > KVM's page tables. This will be used in a future commit to enable moving
-> > the TDP MMU to common code.
-> >
-> > Provide a default implementation for non-x86 architectures that just
-> > returns the max level. This will result in more zapping than necessary
-> > when disabling dirty logging (i.e. less than optimal performance) but no
-> > correctness issues.
->
-> Apologies if you already implemented it in a later patch in this
-> series, but would it not at least be possible to port
-> host_pfn_mapping_level to common code and check that?
-> I'm assuming, though I could be wrong, that all archs map GFNs with at
-> most a host page table granularity mapping.
-> I suppose that doesn't strictly need to be included in this series,
-> but it would be worth addressing in the commit description.
+On Mon, 12 Dec 2022 15:59:11 -0500
+Steven Sistare <steven.sistare@oracle.com> wrote:
 
-It's not implemented later in this series, but I agree it's something
-we should do. In fact, it's worth doing regardless of this series as a
-way to share more code across architectures (e.g. KVM/ARM has it's own
-version in arch/arm64/kvm/mmu.c:get_user_mapping_size()).
+> On 12/12/2022 10:58 AM, Alex Williamson wrote:
+> > On Mon, 12 Dec 2022 09:17:54 -0400
+> > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >   
+> >> On Sat, Dec 10, 2022 at 09:14:06AM -0500, Steven Sistare wrote:
+> >>  
+> >>> Thank you for your thoughtful response.  Rather than debate the degree of
+> >>> of vulnerability, I propose an alternate solution.  The technical crux of
+> >>> the matter is support for mediated devices.      
+> >>
+> >> I'm not sure I'm convinced about that. It is easy to make problematic
+> >> situations with mdevs, but that doesn't mean other cases don't exist
+> >> too eg what happens if userspace suspends and then immediately does
+> >> something to trigger a domain attachment? Doesn't it still deadlock
+> >> the kernel?  
+> > 
+> > The opportunity for that to deadlock isn't obvious to me, a replay
+> > would be stalled waiting for invalid vaddrs, but this is essentially
+> > the user deadlocking themselves.  There's also code there to handle the
+> > process getting killed while waiting, making it interruptible.  Thanks,  
+> 
+> I will submit new patches tomorrow to exclude mdevs.  Almost done.
+
+I've dropped the removal commits from my next branch in the interim.
+Thanks,
+
+Alex
+
