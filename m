@@ -2,64 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB4A6649F2F
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 13:59:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34982649F33
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 13:59:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232403AbiLLM7P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 07:59:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58446 "EHLO
+        id S232473AbiLLM7X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 07:59:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230113AbiLLM7N (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 07:59:13 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAED9C2A;
-        Mon, 12 Dec 2022 04:59:12 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id d7so11973203pll.9;
-        Mon, 12 Dec 2022 04:59:12 -0800 (PST)
+        with ESMTP id S230113AbiLLM7R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 07:59:17 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F483C78;
+        Mon, 12 Dec 2022 04:59:16 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so15616334pjj.2;
+        Mon, 12 Dec 2022 04:59:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fqd7rV/LIZQRhBND1wfi4ZK3s862aHDRSXa+Hfs3x/0=;
-        b=d2mgt4Cm3rJ0WcxSsZxqXfIUEu+wiv6uIRONxo/jNgTpK6sDFgWpgj9F1xUHLYj168
-         c+KZZ3anW7HFmcjRNy1H991RyOD58xofnivxlE0WyBFp5R92LEwWB188uSTAmcO8SL0X
-         Uz6frgZlmo/ekNLv5DqDImjtlKyLTtTIyAvMzHKLRw/YwKmQtElGir7VkPOp6OnyDe+M
-         kqhqFynH3NeBGyhN/kUzpR2G5syuw+oiHQKRMdLKipn8E5fL1REcN5DjCyqoOmcA1Iwg
-         BauZ0WtBIbXAmmURP5+DX7EO+UFuvAVJsi/hbn1+/2iqpOCXTnGtiGogYjns1SofZGTN
-         F4Ew==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eC2iVrhN64qx0wh1++pd8s8D/4z8tTuZKSx0qqh+jVk=;
+        b=oaByAgTh/mGEsWxXHZhNoHOBQEsZc14IJwDr2btqBiJxfwbgrsIlb9Be3eeDwVB8yn
+         8lLvfVs9DcNU69/EZpheUyDC+TWzd9tcqcRnwZu9v5yKueGX//nlPtoCp+pg1dWf2WPs
+         NeY/qq2otESM0rg3evIACrKeQazyqdSa9ZFwsl8ljsDk+OQKfpAnsnMljwczl4Kap00p
+         j0+/r0QonsHnbcSKj8O4v35+txfNyJnf9UO2dBS+7JQ8O3nL3jNb2s1suZmIwpyHJka5
+         leuOe9bT/YJY0KJ5bcpEuGjGDjy92bxqn/JQKaJi42HbpmKkn4L8mg9JH+9q8W628to0
+         LHng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Fqd7rV/LIZQRhBND1wfi4ZK3s862aHDRSXa+Hfs3x/0=;
-        b=jcIetMcvGY/xRjEWI67/oB2ruP/rzWF+awgrfnLcbsmOJkQ3LcAVqlLrPuY51eyRdg
-         us2LSJ9+5hRUkO9E6NfIfm/ZN8XSmbCR8l34TajZU7u6b/au2QixwZL1G27twPJ+SK0a
-         4sI8opWUiZ0aqajD5vi4XBM360t6JUbsbv9NcgbVAh+7G1VUDbZtvjy2HPNsem5Ozsox
-         /u/vjaM0crvZ2AKXwHhCvQNvwdPvPSbjlq7kyFWFrnBqj/XoSq3f2CdQT18E8w8nR7dP
-         7T3YYVq1n4OFNQCziJGlKwe45y0WHcCEF5sIN71OjgSXoarCT3Q+lEuqvLUHdP4KyR0D
-         CNDw==
-X-Gm-Message-State: ANoB5pnxpxn261StDrWW17RVgCc+ZGhX+2LNnk9EaxnEGNYrdYTVBvg/
-        9o3wmcjqW1OZUS2vKnH07s4=
-X-Google-Smtp-Source: AA0mqf77GZIw7gQFedXZs86HhHJyGeXNzAanu5XUe83msXQOsjZh99qJsuAVkWNAlkekTtkUrbqqcw==
-X-Received: by 2002:a17:903:324c:b0:189:d0fa:231b with SMTP id ji12-20020a170903324c00b00189d0fa231bmr17227594plb.67.1670849952078;
-        Mon, 12 Dec 2022 04:59:12 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eC2iVrhN64qx0wh1++pd8s8D/4z8tTuZKSx0qqh+jVk=;
+        b=CMbM1Z1x+u1DOKkCpGX7MWtRYWYQKavZLrvy5p+ytEfwMVWOPYaoQZaI+gkjcUsAgP
+         Sznb9VWjUGeA4vkTNnoSnyGRPzGaP88dJ5X5/32NmkVIOPHPSW4J1GjvI6X3pQTk2FZN
+         aMPYf4aNAM3Hucz7AYk0s64/xWiFtG54KiT3cU5wcI0sJJT+eQHu4j6t3rP4OiqxaBw9
+         7cK4OHlFbY6aY44jloaK5uCrfjf204MnNePJhJp9diIGyR/CGu6YLwbgIwC09ENn9k6m
+         C4a/NsA6Z3k8EhMswUX8eg8Ab0eMk41LqdkWmZdVCEB0ziWd35RTaH95Gelqz+gqQe69
+         qPIA==
+X-Gm-Message-State: ANoB5pmO/45ElxiFU+DcnAf78mT0SyQrRUQuzWDYSzfmNQGn+LCge6hK
+        Wy940xzu8P8cnr8neScXTm8=
+X-Google-Smtp-Source: AA0mqf4KTmGbap+xoQWGEIBCNcnSByCIwuI9ifKJmSUv2uj5R1Bvnm7bWWoLlnJCQMM8sJMN59So0A==
+X-Received: by 2002:a17:902:ba95:b0:185:441f:7091 with SMTP id k21-20020a170902ba9500b00185441f7091mr15323679pls.22.1670849956058;
+        Mon, 12 Dec 2022 04:59:16 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id jc3-20020a17090325c300b00186f608c543sm6273927plb.304.2022.12.12.04.59.09
+        by smtp.gmail.com with ESMTPSA id jc3-20020a17090325c300b00186f608c543sm6273927plb.304.2022.12.12.04.59.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 04:59:11 -0800 (PST)
+        Mon, 12 Dec 2022 04:59:15 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Peter Zijlstra <peterz@infradead.org>,
         Sean Christopherson <seanjc@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH RFC 0/8] KVM: x86/pmu: Enable Fixed Counter3 and Topdown Perf Metrics
-Date:   Mon, 12 Dec 2022 20:58:36 +0800
-Message-Id: <20221212125844.41157-1-likexu@tencent.com>
+        kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Fenghua Yu <fenghua.yu@intel.com>, kvmarm@lists.linux.dev,
+        linux-perf-users@vger.kernel.org
+Subject: [PATCH RFC 1/8] perf/core: Add *group_leader to perf_event_create_kernel_counter()
+Date:   Mon, 12 Dec 2022 20:58:37 +0800
+Message-Id: <20221212125844.41157-2-likexu@tencent.com>
 X-Mailer: git-send-email 2.38.2
+In-Reply-To: <20221212125844.41157-1-likexu@tencent.com>
+References: <20221212125844.41157-1-likexu@tencent.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
@@ -71,86 +75,190 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
+From: Like Xu <likexu@tencent.com>
 
-The Ice Lake core PMU provides built-in support for Top-down u-arch
-Analysis (TMA) method level 1 metrics. These metrics are always available
-to cross-validate performance observations, freeing general purpose
-counters to count other events in high counter utilization scenarios.
-For more details about the method, refer to Top-Down Analysis Method
-chapter (Appendix B.1) of the Intel® 64 and IA-32 Architectures
-Optimization Reference Manual. (SDM 19.3.9.3 Performance Metrics)
+Like syscalls users, kernel-space perf_event creators may also use group
+counters abstraction to gain pmu functionalities, and an in-kernel counter
+groups behave much like normal 'single' counters, following the group
+semantics-based behavior.
 
-This patchset enables Intel Guest Topdow for KVM-based guests. Its basic
-enabling framework remains unchanged, a perf_metric msr is introduced,
-a group (rather than one) of perf_events is created in KVM by binding to
-fiexed counter3 to obtain hardware resources, and the guest value of
-perf_metric msr is assembled based on the count of grouped perf_events.
+No functional changes at this time. An example will be that KVM creates
+Intel slot event as group leader and other topdown metric events to emulate
+MSR_PERF_METRICS pmu capability for guests.
 
-On KVM, patches 0004/5/6 may be reviewd independently if KVM only
-enable fixed counter3 as normal slot event for count and sampling. 
-Patch 7 updates the infrastructure for creating grouped events in KVM,
-and patch 8 uses group events to emulate guest MSR_PERF_METRICS.
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Fenghua Yu <fenghua.yu@intel.com>
+Cc: kvmarm@lists.linux.dev
+Cc: linux-perf-users@vger.kernel.org
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ arch/arm64/kvm/pmu-emul.c                 | 4 ++--
+ arch/x86/kernel/cpu/resctrl/pseudo_lock.c | 4 ++--
+ arch/x86/kvm/pmu.c                        | 2 +-
+ arch/x86/kvm/vmx/pmu_intel.c              | 2 +-
+ include/linux/perf_event.h                | 1 +
+ kernel/events/core.c                      | 4 +++-
+ kernel/events/hw_breakpoint.c             | 4 ++--
+ kernel/events/hw_breakpoint_test.c        | 2 +-
+ kernel/watchdog_hld.c                     | 2 +-
+ 9 files changed, 14 insertions(+), 11 deletions(-)
 
-On Perf, Patches 0001-0003 are awaiting review for tip/perf/core, and
-could be accepted separately if they make sense. TBH, I don't think our
-perf/core is fully prepared to support kernel space grouped counters,
-considering comments around perf_enable_diasable(). But after much
-exploration on my part, this is probably the most promising way to get
-KVM to create slots plus metrics events. If the addition of *group_leader
-messes things up, please shout at me on your needs.
-
-More details in each commit messages may answer code-related questions.
-
-A classic perf tool usage on a linux guest is as follows:
-$ perf stat --topdown --td-level=1 -I1000 --no-metric-only sleep 1
-#           time             counts unit events
-     1.000548528         34,505,682      slots
-     1.000548528         14,208,222      topdown-retiring                 #     41.5% Retiring
-     1.000548528          1,623,796      topdown-bad-spec                 #      4.7% Bad Speculation
-     1.000548528         14,614,171      topdown-fe-bound                 #     42.7% Frontend Bound
-     1.000548528          3,788,859      topdown-be-bound                 #     11.1% Backend Bound
-
-Related KUT will follow if there are no obstructive negative comments.
-
-Nit, pre-patches includes:
-https://lore.kernel.org/kvm/20221207071506.15733-2-likexu@tencent.com/
-https://lore.kernel.org/kvm/20221205122048.16023-1-likexu@tencent.com/
-
-Please feel free to comment and share your feedback.
-
-Thanks,
-
-Like Xu (8):
-  perf/core: Add *group_leader to perf_event_create_kernel_counter()
-  perf: x86/core: Expose the available number of the Topdown metrics
-  perf: x86/core: Snyc PERF_METRICS bit together with fixed counter3
-  KVM: x86/pmu: Add Intel CPUID-hinted Topdown Slots event
-  KVM: x86/pmu: Add kernel-defined slots event to enable Fixed Counter3
-  KVM: x86/pmu: properly use INTEL_PMC_FIXED_RDPMC_BASE macro
-  KVM: x86/pmu: Use flex *event arrays to implement grouped events
-  KVM: x86/pmu: Add MSR_PERF_METRICS MSR emulation to enable Topdown
-
- arch/arm64/kvm/pmu-emul.c                 |   4 +-
- arch/x86/events/core.c                    |   1 +
- arch/x86/events/intel/core.c              |   3 +
- arch/x86/include/asm/kvm_host.h           |  14 +-
- arch/x86/include/asm/msr-index.h          |   1 +
- arch/x86/include/asm/perf_event.h         |   1 +
- arch/x86/kernel/cpu/resctrl/pseudo_lock.c |   4 +-
- arch/x86/kvm/pmu.c                        | 149 ++++++++++++++++++++--
- arch/x86/kvm/pmu.h                        |  31 +++--
- arch/x86/kvm/svm/pmu.c                    |   1 +
- arch/x86/kvm/vmx/pmu_intel.c              |  53 +++++++-
- arch/x86/kvm/vmx/vmx.c                    |   3 +
- arch/x86/kvm/x86.c                        |   9 +-
- include/linux/perf_event.h                |   1 +
- kernel/events/core.c                      |   4 +-
- kernel/events/hw_breakpoint.c             |   4 +-
- kernel/events/hw_breakpoint_test.c        |   2 +-
- kernel/watchdog_hld.c                     |   2 +-
- 18 files changed, 239 insertions(+), 48 deletions(-)
-
+diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+index 24908400e190..11c3386bc86b 100644
+--- a/arch/arm64/kvm/pmu-emul.c
++++ b/arch/arm64/kvm/pmu-emul.c
+@@ -624,7 +624,7 @@ static void kvm_pmu_create_perf_event(struct kvm_pmc *pmc)
+ 
+ 	attr.sample_period = compute_period(pmc, kvm_pmu_get_pmc_value(pmc));
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current,
++	event = perf_event_create_kernel_counter(&attr, -1, current, NULL,
+ 						 kvm_pmu_perf_overflow, pmc);
+ 
+ 	if (IS_ERR(event)) {
+@@ -713,7 +713,7 @@ static struct arm_pmu *kvm_pmu_probe_armpmu(void)
+ 	attr.config = ARMV8_PMUV3_PERFCTR_CPU_CYCLES;
+ 	attr.sample_period = GENMASK(63, 0);
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current,
++	event = perf_event_create_kernel_counter(&attr, -1, current, NULL,
+ 						 kvm_pmu_perf_overflow, &attr);
+ 
+ 	if (IS_ERR(event)) {
+diff --git a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
+index d961ae3ed96e..43e54bb200cd 100644
+--- a/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
++++ b/arch/x86/kernel/cpu/resctrl/pseudo_lock.c
+@@ -952,12 +952,12 @@ static int measure_residency_fn(struct perf_event_attr *miss_attr,
+ 	u64 tmp;
+ 
+ 	miss_event = perf_event_create_kernel_counter(miss_attr, plr->cpu,
+-						      NULL, NULL, NULL);
++						      NULL, NULL, NULL, NULL);
+ 	if (IS_ERR(miss_event))
+ 		goto out;
+ 
+ 	hit_event = perf_event_create_kernel_counter(hit_attr, plr->cpu,
+-						     NULL, NULL, NULL);
++						     NULL, NULL, NULL, NULL);
+ 	if (IS_ERR(hit_event))
+ 		goto out_miss;
+ 
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index eb594620dd75..f6c8180241d7 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -204,7 +204,7 @@ static int pmc_reprogram_counter(struct kvm_pmc *pmc, u32 type, u64 config,
+ 			attr.precise_ip = 3;
+ 	}
+ 
+-	event = perf_event_create_kernel_counter(&attr, -1, current,
++	event = perf_event_create_kernel_counter(&attr, -1, current, NULL,
+ 						 kvm_perf_overflow, pmc);
+ 	if (IS_ERR(event)) {
+ 		pr_debug_ratelimited("kvm_pmu: event creation failed %ld for pmc->idx = %d\n",
+diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+index f951dc756456..b746381307c7 100644
+--- a/arch/x86/kvm/vmx/pmu_intel.c
++++ b/arch/x86/kvm/vmx/pmu_intel.c
+@@ -299,7 +299,7 @@ int intel_pmu_create_guest_lbr_event(struct kvm_vcpu *vcpu)
+ 	}
+ 
+ 	event = perf_event_create_kernel_counter(&attr, -1,
+-						current, NULL, NULL);
++						current, NULL, NULL, NULL);
+ 	if (IS_ERR(event)) {
+ 		pr_debug_ratelimited("%s: failed %ld\n",
+ 					__func__, PTR_ERR(event));
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index 0031f7b4d9ab..5f34e1d0bff8 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -1023,6 +1023,7 @@ extern struct perf_event *
+ perf_event_create_kernel_counter(struct perf_event_attr *attr,
+ 				int cpu,
+ 				struct task_struct *task,
++				struct perf_event *group_leader,
+ 				perf_overflow_handler_t callback,
+ 				void *context);
+ extern void perf_pmu_migrate_context(struct pmu *pmu,
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 7f04f995c975..f671b1a9a691 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -12674,12 +12674,14 @@ SYSCALL_DEFINE5(perf_event_open,
+  * @attr: attributes of the counter to create
+  * @cpu: cpu in which the counter is bound
+  * @task: task to profile (NULL for percpu)
++ * @group_leader: event group leader
+  * @overflow_handler: callback to trigger when we hit the event
+  * @context: context data could be used in overflow_handler callback
+  */
+ struct perf_event *
+ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
+ 				 struct task_struct *task,
++				 struct perf_event *group_leader,
+ 				 perf_overflow_handler_t overflow_handler,
+ 				 void *context)
+ {
+@@ -12694,7 +12696,7 @@ perf_event_create_kernel_counter(struct perf_event_attr *attr, int cpu,
+ 	if (attr->aux_output)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	event = perf_event_alloc(attr, cpu, task, NULL, NULL,
++	event = perf_event_alloc(attr, cpu, task, group_leader, NULL,
+ 				 overflow_handler, context, -1);
+ 	if (IS_ERR(event)) {
+ 		err = PTR_ERR(event);
+diff --git a/kernel/events/hw_breakpoint.c b/kernel/events/hw_breakpoint.c
+index c3797701339c..65b5b1421e62 100644
+--- a/kernel/events/hw_breakpoint.c
++++ b/kernel/events/hw_breakpoint.c
+@@ -771,7 +771,7 @@ register_user_hw_breakpoint(struct perf_event_attr *attr,
+ 			    void *context,
+ 			    struct task_struct *tsk)
+ {
+-	return perf_event_create_kernel_counter(attr, -1, tsk, triggered,
++	return perf_event_create_kernel_counter(attr, -1, tsk, NULL, triggered,
+ 						context);
+ }
+ EXPORT_SYMBOL_GPL(register_user_hw_breakpoint);
+@@ -881,7 +881,7 @@ register_wide_hw_breakpoint(struct perf_event_attr *attr,
+ 
+ 	cpus_read_lock();
+ 	for_each_online_cpu(cpu) {
+-		bp = perf_event_create_kernel_counter(attr, cpu, NULL,
++		bp = perf_event_create_kernel_counter(attr, cpu, NULL, NULL,
+ 						      triggered, context);
+ 		if (IS_ERR(bp)) {
+ 			err = PTR_ERR(bp);
+diff --git a/kernel/events/hw_breakpoint_test.c b/kernel/events/hw_breakpoint_test.c
+index c57610f52bb4..b3597df12284 100644
+--- a/kernel/events/hw_breakpoint_test.c
++++ b/kernel/events/hw_breakpoint_test.c
+@@ -39,7 +39,7 @@ static struct perf_event *register_test_bp(int cpu, struct task_struct *tsk, int
+ 	attr.bp_addr = (unsigned long)&break_vars[idx];
+ 	attr.bp_len = HW_BREAKPOINT_LEN_1;
+ 	attr.bp_type = HW_BREAKPOINT_RW;
+-	return perf_event_create_kernel_counter(&attr, cpu, tsk, NULL, NULL);
++	return perf_event_create_kernel_counter(&attr, cpu, tsk, NULL, NULL, NULL);
+ }
+ 
+ static void unregister_test_bp(struct perf_event **bp)
+diff --git a/kernel/watchdog_hld.c b/kernel/watchdog_hld.c
+index 247bf0b1582c..bb755dadba54 100644
+--- a/kernel/watchdog_hld.c
++++ b/kernel/watchdog_hld.c
+@@ -173,7 +173,7 @@ static int hardlockup_detector_event_create(void)
+ 	wd_attr->sample_period = hw_nmi_get_sample_period(watchdog_thresh);
+ 
+ 	/* Try to register using hardware perf events */
+-	evt = perf_event_create_kernel_counter(wd_attr, cpu, NULL,
++	evt = perf_event_create_kernel_counter(wd_attr, cpu, NULL, NULL,
+ 					       watchdog_overflow_callback, NULL);
+ 	if (IS_ERR(evt)) {
+ 		pr_debug("Perf event create on CPU %d failed with %ld\n", cpu,
 -- 
 2.38.2
 
