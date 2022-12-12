@@ -2,104 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CEFBA64AB89
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 00:26:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 72B1064AB96
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 00:30:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229497AbiLLX0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 18:26:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42760 "EHLO
+        id S234009AbiLLXa6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 18:30:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233994AbiLLX0k (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 18:26:40 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FE3A1704A
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 15:26:39 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id u5so1468204pjy.5
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 15:26:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zJOQecEGgSp0glbzJ1RpRnPbkp2HAzeJE/NybulD13E=;
-        b=LgVzXCUoiKNG9USGHdtxDWk3jXHPhUfF7aC6Jb6oAf8XA1bTwz+AQ/vH//iOu+Txbq
-         HtNSM7bobeYY6HNyDm3070/s1Oas0aeVxdQOxg9nHQgvvOSD+HbQky0G3NWU2aHHH9iG
-         JVh1AUDnlaepYuer6Ncinshp4+sTBfERSvbRGIUdHuN0fvrTLKzxKu4eop/o7jhMUBSa
-         9I1Z1oUAs6TpwbdTo0ilfAV5dpWM/KOAPcjBCaf+Wh+PzYd+4+Je5We3hpfEFSHW2X9B
-         XNOJfuewe5Qh+b7VEFMhtgGppnAqVlzsDeqFiGrPyEqs9m8tEG3SEwVL1QUihijPEdBo
-         3YcQ==
+        with ESMTP id S234019AbiLLXar (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 18:30:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EE7D1AA06
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 15:29:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670887793;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KvdpY0GY9VJXBTKJUdqEmXaOsTtoqJbtiUj3fVp/sSo=;
+        b=Qtd2FWFBWy+zQ4YEbl8e9zNr0dp+pOAZzgpTGdOAUmP8TOSYzI6TT/NMNU76D3D92iNRK/
+        eSi9Fi0w2pzCRpD8iMsaLXacvXL3lYaB3JHh81vwupL64BOxf32Gs7va7BUXgPTkUeS4DW
+        HYYZBO+n2YmNAVH4PSKcWbjKZ08gi7A=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-391-gRj7vTN_P1WBcFBcgxdz_w-1; Mon, 12 Dec 2022 18:29:52 -0500
+X-MC-Unique: gRj7vTN_P1WBcFBcgxdz_w-1
+Received: by mail-io1-f69.google.com with SMTP id t2-20020a6b6402000000b006dea34ad528so905139iog.1
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 15:29:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zJOQecEGgSp0glbzJ1RpRnPbkp2HAzeJE/NybulD13E=;
-        b=5wV8vEHbpFTT+U+f61CFNUX9S5clRcvFHen5Z2nsubVh70bkOcyb6TGUAbjy7Guh9o
-         WyeutXbu1Fic8cf/OetzYn9LxKSAKtwvmYvtekCtlcvgGnI42tTBwLj/lZKxaMNfJHMd
-         RvAx3sCg6LgY4pOPcCp0GRR9rf9nkuF20xKHFzgiysZPzPfJvdu6EgLY8IJBQQNEAhE4
-         RYO00hT/mid7FrOkat/Dtm6ATCl9RTe1Wy0eDE4EZSUA3cvsHUeBQ5zaFT4cKv4oPIdE
-         DheqGhLtqAZN9XHzH3sjpPaJmKnHJhuzOlSChp3SnrcjM1mEEAuhf4PoavTn5vEPh8rt
-         +ASg==
-X-Gm-Message-State: ANoB5pnkQ9V6kzovxURe5LORcgIAGIFSOsxZXNTWS0gUvP7/Q3qxDonV
-        a71HvIlldOWZL2YXxJ2f1mRwDw==
-X-Google-Smtp-Source: AA0mqf5Ct9lyTd0t0PIpKHrR2fvGzlGpqd0kxk6VIFCVK4Ckp27HzLLjvycFuCodXJHfa/pjm6FVZg==
-X-Received: by 2002:a17:902:da8d:b0:189:3a04:4466 with SMTP id j13-20020a170902da8d00b001893a044466mr16713plx.2.1670887599032;
-        Mon, 12 Dec 2022 15:26:39 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z9-20020a170903018900b00189af02aba4sm6992708plg.3.2022.12.12.15.26.38
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KvdpY0GY9VJXBTKJUdqEmXaOsTtoqJbtiUj3fVp/sSo=;
+        b=wJwbtHItTc9061show9h/gzPzHU/niYtzSF76u0sxv6/anoD/vmF7E8a+U7wGv3Vhi
+         zC7Wo4xHh5hulAulrROWrRXnQmaPoslLHb3rx0h4sTx3AeAFjfKTHNK5TeYTmOc2ZGCT
+         UW8iQl7qPVUG45zxs1eNywvMN16oMV2imPd3RSoJeZy+h2CymlxEafDzTP1XzWGXr/UW
+         itabv7VwTbrqa7r2h9hZUyuSV6nbIfkHI5n8AVSJSHEAdVZBnhSD4Z2P4gE7SM6VDwP6
+         M87RVP0lHF3/1acNd3cUD9heb1uLiH3Q2UNWsdJ6P9TXJwbMAizOLTXHheeX1iz66itI
+         Y+xQ==
+X-Gm-Message-State: ANoB5pliNSitwXucE+RTVgLRYaT4BN2nBKhozhk18kuF/yJNsC0W3eaM
+        /BClSYAzbvcRR5sY6IXgY+8vUl/qCq0g3s/4cL/Vxfd9eMcNZ7nPGjuipF6gdb0hXDHWXblciLR
+        mXJwJMj8piqkk
+X-Received: by 2002:a92:200b:0:b0:2fc:ce26:2bc0 with SMTP id j11-20020a92200b000000b002fcce262bc0mr10108216ile.3.1670887791393;
+        Mon, 12 Dec 2022 15:29:51 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5/nTl2MO7BLyupDgKqODA8Ae7bi8W6A830Qtp+hy+40jQChhduAvwC/003NcjO/jC0QF5PJQ==
+X-Received: by 2002:a92:200b:0:b0:2fc:ce26:2bc0 with SMTP id j11-20020a92200b000000b002fcce262bc0mr10108209ile.3.1670887791138;
+        Mon, 12 Dec 2022 15:29:51 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id q10-20020a92050a000000b00302a9c9b4bfsm3291577ile.44.2022.12.12.15.29.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 15:26:38 -0800 (PST)
-Date:   Mon, 12 Dec 2022 23:26:35 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        David Matlack <dmatlack@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Nadav Amit <namit@vmware.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
-        Colin Cross <ccross@google.com>,
-        Hugh Dickins <hughd@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common
- code
-Message-ID: <Y5e4qxjHWoMt8YGs@google.com>
-References: <20221208193857.4090582-1-dmatlack@google.com>
- <Y5OHVzBSHPmAq2FO@google.com>
- <eb93beee-9d43-1c1e-250c-28ab7e9ebed9@redhat.com>
+        Mon, 12 Dec 2022 15:29:50 -0800 (PST)
+Date:   Mon, 12 Dec 2022 16:29:48 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Steven Sistare <steven.sistare@oracle.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] vfio/type1: Cleanup remaining vaddr removal/update
+ fragments
+Message-ID: <20221212162948.4c7a4586.alex.williamson@redhat.com>
+In-Reply-To: <Y5e0icoO89Qnlc/z@ziepe.ca>
+References: <20221208094008.1b79dd59.alex.williamson@redhat.com>
+        <b265b4ae-b178-0682-66b8-ef74a1489a8e@oracle.com>
+        <20221209124212.672b7a9c.alex.williamson@redhat.com>
+        <5f494e1f-536d-7225-e2c7-5ec9c993f13a@oracle.com>
+        <20221209140120.667cb658.alex.williamson@redhat.com>
+        <6914b4eb-cd82-0c3e-6637-c7922092ef11@oracle.com>
+        <Y5cqAk1/6ayzmTjg@ziepe.ca>
+        <20221212085823.5d760656.alex.williamson@redhat.com>
+        <8f29aad0-7378-ef7a-9ac5-f98b3054d5eb@oracle.com>
+        <20221212142651.263dd6ae.alex.williamson@redhat.com>
+        <Y5e0icoO89Qnlc/z@ziepe.ca>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <eb93beee-9d43-1c1e-250c-28ab7e9ebed9@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -107,21 +90,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 12, 2022, Paolo Bonzini wrote:
-> On 12/9/22 20:07, Oliver Upton wrote:
-> > >   - Naming. This series does not change the names of any existing code.
-> > >     So all the KVM/x86 Shadow MMU-style terminology like
-> > >     "shadow_page"/"sp"/"spte" persists. Should we keep that style in
-> > >     common code or move toward something less shadow-paging-specific?
-> > >     e.g. "page_table"/"pt"/"pte".
+On Mon, 12 Dec 2022 19:08:57 -0400
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
+
+> On Mon, Dec 12, 2022 at 02:26:51PM -0700, Alex Williamson wrote:
+> > On Mon, 12 Dec 2022 15:59:11 -0500
+> > Steven Sistare <steven.sistare@oracle.com> wrote:
+> >   
+> > > On 12/12/2022 10:58 AM, Alex Williamson wrote:  
+> > > > On Mon, 12 Dec 2022 09:17:54 -0400
+> > > > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > > >     
+> > > >> On Sat, Dec 10, 2022 at 09:14:06AM -0500, Steven Sistare wrote:
+> > > >>    
+> > > >>> Thank you for your thoughtful response.  Rather than debate the degree of
+> > > >>> of vulnerability, I propose an alternate solution.  The technical crux of
+> > > >>> the matter is support for mediated devices.        
+> > > >>
+> > > >> I'm not sure I'm convinced about that. It is easy to make problematic
+> > > >> situations with mdevs, but that doesn't mean other cases don't exist
+> > > >> too eg what happens if userspace suspends and then immediately does
+> > > >> something to trigger a domain attachment? Doesn't it still deadlock
+> > > >> the kernel?    
+> > > > 
+> > > > The opportunity for that to deadlock isn't obvious to me, a replay
+> > > > would be stalled waiting for invalid vaddrs, but this is essentially
+> > > > the user deadlocking themselves.  There's also code there to handle the
+> > > > process getting killed while waiting, making it interruptible.  Thanks,    
+> > > 
+> > > I will submit new patches tomorrow to exclude mdevs.  Almost done.  
 > > 
-> > I would strongly be in favor of discarding the shadow paging residue if
-> > x86 folks are willing to part ways with it 😄
+> > I've dropped the removal commits from my next branch in the interim.  
 > 
-> Yes, absolutely.  Something like to_shadow_page->to_mmu_data, sp->md,
-> spt->hpt, spte->spte, sptep->hptep.
+> Woah, please don't do that - I already built and sent pull requests
+> assuming this, there are conflicts.
 
-"host" will be confusing if when the primary MMU is involved though, e.g. I always
-think of the primary MMU's page tables as the "host page tables".
+I've done merges both ways with your iommufd pull request and don't see
+any conflicts relative to these changes.  Kconfig, Makefile, and
+vfio_main.c related to virq integration and group extraction are the
+only conflicts.  Besides, it's already pushed and I don't have any
+references to the old head, so someone would need to provide it if we
+wanted to keep the old hashes.
+ 
+> Why would we not revert everything from 6.2 - that is what we agreed
+> to do?
 
-What if we keep the "S" for SPT(E) and repurpose it to mean Secondary PTE?
+The decision to revert was based on the current interface being buggy,
+abandoned, and re-implemented.  It doesn't seem that there's much future
+for the current interface, but Steve has stepped up to restrict the
+current implementation to non-mdev devices, which resolves your concern
+regarding unlimited user blocking of kernel threads afaict, and we'll
+see what he does with locked memory.  If it looks ok, then I think it
+reduces our urgency to remove it, and in particular, I think negates
+our need to remove it from stable when we eventually do so anyway.
+Thanks,
+
+Alex
+
