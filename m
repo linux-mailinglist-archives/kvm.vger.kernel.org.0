@@ -2,168 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F142864A8B1
-	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 21:24:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F10F64A8CC
+	for <lists+kvm@lfdr.de>; Mon, 12 Dec 2022 21:37:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233647AbiLLUXl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 15:23:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59674 "EHLO
+        id S232738AbiLLUhk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 15:37:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232180AbiLLUXi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 15:23:38 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D507B26DF;
-        Mon, 12 Dec 2022 12:23:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670876617; x=1702412617;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cwt1okdWNlX5OjC33VLxJ95ouJ4xQF1dorpCph53eH8=;
-  b=V4HZRrSIuKOFtZPTVRiDVVLsGFNJLRZCsPQU61Z7ZljEIOWOiZbLIdR1
-   wMvdC0J3w3coxrlmz5rHSfdIRtN43LIS/GToX/2z8mLtKIxGtajjb7Dzh
-   b8xIAIJX94chyQIK5T7tS99s4uOuWXtaqFkK3G4CnOXxGVmLrgekAZhqQ
-   K+dpSRdbanoBzlbY7Yh+3bhJt9mSM6sa88qzLthTyHhvXz04aCcebJHTv
-   Vn5W+iRKQ1lazqn45gbSvbEkjrTbPePXN9hcMmtnVQJY42z52B0lsj6pJ
-   /oK468ep8zNsUui1dhRvPJbapvg9HJholWMcVUVwGSanzxWXdrKNZUO5a
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10559"; a="316655491"
-X-IronPort-AV: E=Sophos;i="5.96,239,1665471600"; 
-   d="scan'208";a="316655491"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2022 12:23:37 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10559"; a="650471643"
-X-IronPort-AV: E=Sophos;i="5.96,239,1665471600"; 
-   d="scan'208";a="650471643"
-Received: from cwholzwa-mobl.amr.corp.intel.com (HELO desk) ([10.209.108.80])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Dec 2022 12:23:36 -0800
-Date:   Mon, 12 Dec 2022 12:23:34 -0800
-From:   Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-To:     Zhang Chen <chen.zhang@intel.com>
-Cc:     x86@kernel.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Chao Gao <chao.gao@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC PATCH 5/9] x86/bugs: Use Virtual MSRs to request hardware
- mitigations
-Message-ID: <20221212202334.ldrgv7fnkgjtsogg@desk>
-References: <20221210160046.2608762-1-chen.zhang@intel.com>
- <20221210160046.2608762-6-chen.zhang@intel.com>
+        with ESMTP id S232096AbiLLUhi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 15:37:38 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2612D19B
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 12:37:36 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BCJmb3W013242
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 20:37:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=qBeh0TimPv+qQUwLwYBwCc4aV6KSDDqrOWCKswCTWVE=;
+ b=IT24sFriqdBTaSnVmQyQEGmBdGmekBBx55LMIqMtgFOovhgjjHHDKTOKDGgH4ie2XPeT
+ ogjxB+INWBXjqHAm+8XtbcE10D9kNi75Di2o7qWU3ICK/0/tA1V4og98MO2IpzqOxdha
+ xCY6bOsOJqMOxu7zaUsbDNSp5rxaqmNItcEc0c5yUu7h6qR8JZfsc2B4sOtTyfzAXPt4
+ 8o/6Xt3Ogwyifm9wyPKIex+Zdh8tn4uUpbPOXx3ZAy7ISYaKkdcarQ83lCv8w4uJl2ZM
+ fDZUsUq5r07fcCczY+beIjmSAjjyiHpLky8kBYC1Mspw9BlJL2kjisQG5N0i7g786Jy8 Jw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3me7rvdwj9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 20:37:35 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BCKY5DP001967
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 20:37:35 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3me7rvdwhc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Dec 2022 20:37:35 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BCBFlDH029603;
+        Mon, 12 Dec 2022 20:37:33 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3mchr629q6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Dec 2022 20:37:32 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BCKbTcm15925604
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 12 Dec 2022 20:37:29 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3226C20049;
+        Mon, 12 Dec 2022 20:37:29 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D3D2A20043;
+        Mon, 12 Dec 2022 20:37:28 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.179.1.26])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 12 Dec 2022 20:37:28 +0000 (GMT)
+Message-ID: <a54eb84516a5fcb1799ae864caff6aefc31b1896.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v2 1/1] s390x: add parallel skey
+ migration test
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Date:   Mon, 12 Dec 2022 21:37:28 +0100
+In-Reply-To: <20221209102122.447324-2-nrb@linux.ibm.com>
+References: <20221209102122.447324-1-nrb@linux.ibm.com>
+         <20221209102122.447324-2-nrb@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.1 (3.46.1-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221210160046.2608762-6-chen.zhang@intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: F9EKuo3_Y2wF6x19Dc-C3xVeYIZD4guI
+X-Proofpoint-ORIG-GUID: uBKOJ4KLMDuJAIBrCEFpaOiRH4skSs8i
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-12_02,2022-12-12_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1011 mlxlogscore=999 spamscore=0 bulkscore=0 impostorscore=0
+ adultscore=0 phishscore=0 priorityscore=1501 suspectscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212120181
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, Dec 11, 2022 at 12:00:42AM +0800, Zhang Chen wrote:
-> From: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
-> 
-> Guests that have different family/model than the host may not be aware
-> of hardware mitigations(such as RRSBA_DIS_S) available on host. This is
-> particularly true when guests migrate. To solve this problem Intel
-> processors have added a virtual MSR interface through which guests can
-> report their mitigation status and request VMM to deploy relevant
-> hardware mitigations.
-> 
-> Use this virtualized MSR interface to request relevant hardware controls
-> for retpoline mitigation.
-> 
-> Signed-off-by: Pawan Gupta <pawan.kumar.gupta@linux.intel.com>
+On Fri, 2022-12-09 at 11:21 +0100, Nico Boehr wrote:
+> Right now, we have a test which sets storage keys, then migrates the VM
+> and - after migration finished - verifies the skeys are still there.
+>=20
+> Add a new version of the test which changes storage keys while the
+> migration is in progress. This is achieved by adding a command line
+> argument to the existing migration-skey test.
+>=20
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
 > ---
->  arch/x86/include/asm/msr-index.h | 23 +++++++++++++++++++++++
->  arch/x86/kernel/cpu/bugs.c       | 24 ++++++++++++++++++++++++
->  2 files changed, 47 insertions(+)
-> 
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index 1143ac9400c3..1166b472377c 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -165,6 +165,7 @@
->  						 * IA32_XAPIC_DISABLE_STATUS MSR
->  						 * supported
->  						 */
-> +#define ARCH_CAP_VIRTUAL_ENUM		BIT(63)	/* MSR_VIRTUAL_ENUMERATION supported */
->  
->  #define MSR_IA32_FLUSH_CMD		0x0000010b
->  #define L1D_FLUSH			BIT(0)	/*
-> @@ -1062,6 +1063,28 @@
->  #define MSR_IA32_VMX_MISC_INTEL_PT                 (1ULL << 14)
->  #define MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS (1ULL << 29)
->  #define MSR_IA32_VMX_MISC_PREEMPTION_TIMER_SCALE   0x1F
-> +
-> +/* Intel virtual MSRs */
-> +#define MSR_VIRTUAL_ENUMERATION			0x50000000
-> +#define VIRT_ENUM_MITIGATION_CTRL_SUPPORT	BIT(0)	/*
-> +							 * Mitigation ctrl via virtual
-> +							 * MSRs supported
-> +							 */
-> +
-> +#define MSR_VIRTUAL_MITIGATION_ENUM		0x50000001
-> +#define MITI_ENUM_BHB_CLEAR_SEQ_S_SUPPORT	BIT(0)	/* VMM supports BHI_DIS_S */
-> +#define MITI_ENUM_RETPOLINE_S_SUPPORT		BIT(1)	/* VMM supports RRSBA_DIS_S */
-> +
-> +#define MSR_VIRTUAL_MITIGATION_CTRL		0x50000002
-> +#define MITI_CTRL_BHB_CLEAR_SEQ_S_USED		BIT(0)	/*
-> +							 * Request VMM to deploy
-> +							 * BHI_DIS_S mitigation
-> +							 */
-> +#define MITI_CTRL_RETPOLINE_S_USED		BIT(1)	/*
-> +							 * Request VMM to deploy
-> +							 * RRSBA_DIS_S mitigation
-> +							 */
-> +
->  /* AMD-V MSRs */
->  
->  #define MSR_VM_CR                       0xc0010114
-> diff --git a/arch/x86/kernel/cpu/bugs.c b/arch/x86/kernel/cpu/bugs.c
-> index 3e3230cccaa7..a9e869f568ee 100644
-> --- a/arch/x86/kernel/cpu/bugs.c
-> +++ b/arch/x86/kernel/cpu/bugs.c
-> @@ -1379,6 +1379,28 @@ static void __init spectre_v2_determine_rsb_fill_type_at_vmexit(enum spectre_v2_
->  	dump_stack();
->  }
->  
-> +/* Speculation control using virtualized MSRs */
-> +static void __init spec_ctrl_setup_virtualized_msr(void)
+>  s390x/migration-skey.c | 214 +++++++++++++++++++++++++++++++++++------
+>  s390x/unittests.cfg    |  15 ++-
+>  2 files changed, 198 insertions(+), 31 deletions(-)
+>=20
+> diff --git a/s390x/migration-skey.c b/s390x/migration-skey.c
+> index b7bd82581abe..9b9a45f4ad3b 100644
+> --- a/s390x/migration-skey.c
+> +++ b/s390x/migration-skey.c
+>=20
+[...]
+
+> +static void test_skey_migration_parallel(void)
 > +{
-> +	u64 msr_virt_enum, msr_mitigation_enum, msr_mitigation_ctrl;
+> +	report_prefix_push("parallel");
 > +
-> +	if (!(x86_read_arch_cap_msr() & ARCH_CAP_VIRTUAL_ENUM))
-> +		return;
-> +
-> +	rdmsrl(MSR_VIRTUAL_ENUMERATION, msr_virt_enum);
-> +	if (!(msr_virt_enum & VIRT_ENUM_MITIGATION_CTRL_SUPPORT))
-> +		return;
-> +
-> +	rdmsrl(MSR_VIRTUAL_MITIGATION_ENUM, msr_mitigation_enum);
-> +	/* When retpoline is being used, request relevant hardware controls */
-> +	if (boot_cpu_has(X86_FEATURE_RETPOLINE) &&
-> +	    msr_mitigation_enum & MITI_ENUM_RETPOLINE_S_SUPPORT) {
-> +		rdmsrl(MSR_VIRTUAL_MITIGATION_CTRL, msr_mitigation_ctrl);
-> +		msr_mitigation_ctrl |= MITI_CTRL_RETPOLINE_S_USED;
-> +		wrmsrl(MSR_VIRTUAL_MITIGATION_CTRL, msr_mitigation_ctrl);
+> +	if (smp_query_num_cpus() =3D=3D 1) {
+> +		report_skip("need at least 2 cpus for this test");
+> +		goto error;
 > +	}
+> +
+> +	smp_cpu_setup(1, PSW_WITH_CUR_MASK(set_skeys_thread));
+> +
+> +	migrate_once();
+> +
+> +	WRITE_ONCE(thread_should_exit, 1);
+> +
+> +	while (!thread_exited)
+> +		mb();
+
+Are you doing it this way instead of while(!READ_ONCE(thread_exited)); so t=
+he mb() does double duty
+and ensures "result" is also read from memory a couple of lines down?
+If so, I wonder if the compiler is allowed to arrange the control flow such=
+ that if the loop condition
+is false on the first iteration it uses a cached value of "result" (I'd be =
+guessing yes, but what do I know).
+In any case using a do while loop instead would eliminate the question.
+A comment might be nice, too.
+
+> +
+> +	report_info("thread completed %u iterations", thread_iters);
+> +
+> +	report_prefix_push("during migration");
+> +	skey_report_verify(&result);
+> +	report_prefix_pop();
+> +
+> +	/*
+> +	 * Verification of skeys occurs on the thread. We don't know if we
+> +	 * were still migrating during the verification.
+> +	 * To be sure, make another verification round after the migration
+> +	 * finished to catch skeys which might not have been migrated
+> +	 * correctly.
+> +	 */
+> +	report_prefix_push("after migration");
+> +	assert(thread_iters > 0);
+> +	result =3D skey_verify_test_pattern(pagebuf, NUM_PAGES, thread_iters - =
+1);
+> +	skey_report_verify(&result);
+> +	report_prefix_pop();
+> +
+> +error:
+> +	report_prefix_pop();
 > +}
 > +
->  static void __init spectre_v2_select_mitigation(void)
->  {
->  	enum spectre_v2_mitigation_cmd cmd = spectre_v2_parse_cmdline();
-> @@ -1485,6 +1507,8 @@ static void __init spectre_v2_select_mitigation(void)
->  	    mode == SPECTRE_V2_RETPOLINE)
->  		spec_ctrl_disable_kernel_rrsba();
->  
-> +	spec_ctrl_setup_virtualized_msr();
-
-I think this also needs to be called during secondary CPU
-initialization.
+[...]
