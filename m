@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E903F64BDEB
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 21:29:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0D9364BDEA
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 21:29:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237136AbiLMU3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 15:29:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44244 "EHLO
+        id S237286AbiLMU3g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 15:29:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238542AbiLMU25 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 15:28:57 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85A9767A
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:22:51 -0800 (PST)
+        with ESMTP id S238345AbiLMU2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 15:28:55 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2A8026481
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:23:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670962971;
+        s=mimecast20190719; t=1670962994;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=v2Dm5LnCOLTySKzdtt7rX+X8eVAkaGHG4gTN1wON7BM=;
-        b=Xk8ceWIzlcJySZBY/h05msZD14/Qcb4YEC/PT//4ynUpO25s3DhBUxHpubuqLNwB7G8jXt
-        xBqUiwo2k51IkaNScWUW4s7Ahfr5uWxtZ87Q71PwkRCwbDmMomrerygYf8Yf39WoJt1Dts
-        duUHSsx3GtYFguTS4rEmOL16JFIdf1E=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=MP2f1uG1cBbDi3s+LsvzJEeEXNAQy5gDqredPnyzZFI=;
+        b=Rxz07iezDOFv3ddLiKxp6ZaaMOFdsVHxpnj72LEghds0x2zUiOt40OGU7Oco+HK5AQQfbi
+        J2lcpR9hiBimS2fS8XP9es6vp8RAEtmBhO+jKaE0ZdbwmcKDWswQD9hrAJiG3gUj3K95aL
+        KPH6PKT/iYDFmktHiCjJpjhgWADkrBs=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-363-r4-eRoACNcy5ZixQkfV5lA-1; Tue, 13 Dec 2022 15:22:49 -0500
-X-MC-Unique: r4-eRoACNcy5ZixQkfV5lA-1
-Received: by mail-io1-f71.google.com with SMTP id r25-20020a6bfc19000000b006e002cb217fso2612665ioh.2
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:22:49 -0800 (PST)
+ us-mta-62-UN-utMvbPfGpnsFIgUVTCQ-1; Tue, 13 Dec 2022 15:23:12 -0500
+X-MC-Unique: UN-utMvbPfGpnsFIgUVTCQ-1
+Received: by mail-io1-f70.google.com with SMTP id t2-20020a6b6402000000b006dea34ad528so2633750iog.1
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:23:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=v2Dm5LnCOLTySKzdtt7rX+X8eVAkaGHG4gTN1wON7BM=;
-        b=0E73cK4o3/OYyE7nxCmP4MtjRzyURcEqkNnf95MBOsmJ3bDbaSTTFvWwgPeBVOf3nI
-         diQpmO99NeXACHwRlFD0OVFGE7SfXqAx+clKIrA+aevtxwU5TXRQ6a5Ws9sMZtT1WScq
-         IDtCspVblTSGDwvLTRsxUcc/kYpT5BfXZSoRNRcZuCHHVbudjHKTZWmRyJ6tw2QKTQXW
-         KiSScyM3iYblrxNl45yf/VhVZnY/gIgRe8NoVNozduojrRfT2ARh7u4g8fNgZOFgMgr5
-         pYk9X8BwOta1dRGqgKL/+NOROyTeHb0j/Zb9cu0tCCEjnBJJIE3IOrOn4vrEnjkhGTPf
-         K/Vw==
-X-Gm-Message-State: ANoB5pmu5jsPtNU/uBfHtLZPpl9d5eY83wFZuDQNCmEsI2W2ujKqp8K2
-        QpKfPtqiGf+H/3RuCSE6fZY2+fDymvSDx9NjfoX0c6J/Z8HyvH4yfDZKXp8t/8B/I/B3S+ICoIq
-        7Ttf1baa5dOkE
-X-Received: by 2002:a92:cacf:0:b0:302:4d47:6971 with SMTP id m15-20020a92cacf000000b003024d476971mr11781004ilq.11.1670962968691;
-        Tue, 13 Dec 2022 12:22:48 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5pHsdgxpqRWzyOMlv+SXJZp4Qxd+pG3DyRSrtBJiAnK70BGMeZHx2je6r3GtgnO0xVvlh/zw==
-X-Received: by 2002:a92:cacf:0:b0:302:4d47:6971 with SMTP id m15-20020a92cacf000000b003024d476971mr11780998ilq.11.1670962968398;
-        Tue, 13 Dec 2022 12:22:48 -0800 (PST)
+        bh=MP2f1uG1cBbDi3s+LsvzJEeEXNAQy5gDqredPnyzZFI=;
+        b=utXmXl0n6QEzfTU89sPLM4tUJs+hjCVVRNmHzWyAPwCtNfWocbfAU5R3ryidO/BG9f
+         or72zI1vP4ZjCjX/2cwnFiFo1RvpGMRBrrqLVjOnrIW16WYp8rvzkKCRit3wYEwtsboF
+         RMm2YZZglU+0OWaQNsLHxQ24tVgkXQqmCRvLcCoM9wP48mB+OA8i1YxJQZ643mOirOvH
+         N5hsIlJZGc/y5jAzeuhL/qoknGHJFkS2CIbDlwXbfJ8sF6C0yVGxVJvh5riJcbMa1jdk
+         vkZpS9AnUomPDfR60j8NLp/cTrWwLVwDbjBfblnADfn8X9OiHGGclWPTajbte0M25fA2
+         rkbQ==
+X-Gm-Message-State: ANoB5pkfgLd9AUsum7OpvPoF3rlPJIz7G02wHdvAlwGjCik9MHCEnlM/
+        aUPBelgT1QuZ1lcpeEXHnb6dkcCO8djdm32GeFX68zzNY6rtdbG1yCz7teKc1OghrXKaSg/Bypv
+        1X02AQFJO9r0X
+X-Received: by 2002:a05:6e02:5a3:b0:303:7c98:b9d4 with SMTP id k3-20020a056e0205a300b003037c98b9d4mr14565840ils.23.1670962991778;
+        Tue, 13 Dec 2022 12:23:11 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5poRQ6jtVh3bTaEvTnPH0Q6smaLd3jeDa8qEVc6s31QeLVRdQSIMg8XFP5dnjHAYfrwMOxMA==
+X-Received: by 2002:a05:6e02:5a3:b0:303:7c98:b9d4 with SMTP id k3-20020a056e0205a300b003037c98b9d4mr14565832ils.23.1670962991491;
+        Tue, 13 Dec 2022 12:23:11 -0800 (PST)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id t10-20020a92cc4a000000b00304aa34b405sm3003911ilq.81.2022.12.13.12.22.47
+        by smtp.gmail.com with ESMTPSA id w11-20020a02cf8b000000b00375b92f14c8sm1120652jar.94.2022.12.13.12.23.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 12:22:47 -0800 (PST)
-Date:   Tue, 13 Dec 2022 13:22:45 -0700
+        Tue, 13 Dec 2022 12:23:10 -0800 (PST)
+Date:   Tue, 13 Dec 2022 13:23:09 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
 To:     Steve Sistare <steven.sistare@oracle.com>
 Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH V2 1/5] vfio/type1: exclude mdevs from VFIO_UPDATE_VADDR
-Message-ID: <20221213132245.10ef6873.alex.williamson@redhat.com>
-In-Reply-To: <1670960459-415264-2-git-send-email-steven.sistare@oracle.com>
+Subject: Re: [PATCH V2 2/5] vfio/type1: prevent locked_vm underflow
+Message-ID: <20221213132309.3e6903e8.alex.williamson@redhat.com>
+In-Reply-To: <1670960459-415264-3-git-send-email-steven.sistare@oracle.com>
 References: <1670960459-415264-1-git-send-email-steven.sistare@oracle.com>
-        <1670960459-415264-2-git-send-email-steven.sistare@oracle.com>
+        <1670960459-415264-3-git-send-email-steven.sistare@oracle.com>
 X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -78,16 +78,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Dec 2022 11:40:55 -0800
+On Tue, 13 Dec 2022 11:40:56 -0800
 Steve Sistare <steven.sistare@oracle.com> wrote:
 
-> Disable the VFIO_UPDATE_VADDR capability if mediated devices are present.
-> Their kernel threads could be blocked indefinitely by a misbehaving
-> userland while trying to pin/unpin pages while vaddrs are being updated.
+> When a vfio container is preserved across exec using the VFIO_UPDATE_VADDR
+> interfaces, locked_vm of the new mm becomes 0.  If the user later unmaps a
+> dma mapping, locked_vm underflows to a large unsigned value, and a
+> subsequent dma map request fails with ENOMEM in __account_locked_vm.
 > 
-> Do not allow groups to be added to the container while vaddr's are invalid,
-> so we never need to block user threads from pinning, and can delete the
-> vaddr-waiting code in a subsequent patch.
+> To avoid underflow, do not decrement locked_vm during unmap if the
+> dma's mm has changed.  To restore the correct locked_vm count, when
+> VFIO_DMA_MAP_FLAG_VADDR is used and the dma's mm has changed, add
+> the mapping's pinned page count to the new mm->locked_vm, subject
+> to the rlimit.  Now that mediated devices are excluded when using
+> VFIO_UPDATE_VADDR, the amount of pinned memory equals the size of
+> the mapping.
 > 
 
 
@@ -96,150 +101,101 @@ Fixes: c3cbab24db38 ("vfio/type1: implement interfaces to update vaddr")
 
 > Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 31 ++++++++++++++++++++++++++++++-
->  include/uapi/linux/vfio.h       | 15 +++++++++------
->  2 files changed, 39 insertions(+), 7 deletions(-)
+>  drivers/vfio/vfio_iommu_type1.c | 23 +++++++++++++++++++----
+>  1 file changed, 19 insertions(+), 4 deletions(-)
 > 
 > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 23c24fe..80bdb4d 100644
+> index 80bdb4d..35a1a52 100644
 > --- a/drivers/vfio/vfio_iommu_type1.c
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -859,6 +859,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
->  	if (!iommu->v2)
->  		return -EACCES;
+> @@ -100,6 +100,7 @@ struct vfio_dma {
+>  	struct task_struct	*task;
+>  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+>  	unsigned long		*bitmap;
+> +	struct mm_struct	*mm;
+>  };
 >  
-> +	WARN_ON(iommu->vaddr_invalid_count);
-> +
+>  struct vfio_batch {
+> @@ -1165,7 +1166,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
+>  					    &iotlb_gather);
+>  	}
+>  
+> -	if (do_accounting) {
+> +	if (do_accounting && current->mm == dma->mm) {
 
-I'd expect this to abort and return -errno rather than simply trigger a
-warning.
 
->  	mutex_lock(&iommu->lock);
->  
->  	/*
-> @@ -976,6 +978,8 @@ static void vfio_iommu_type1_unpin_pages(void *iommu_data,
->  
->  	mutex_lock(&iommu->lock);
->  
-> +	WARN_ON(iommu->vaddr_invalid_count);
-> +
+This seems incompatible with ffed0518d871 ("vfio: remove useless
+judgement") where we no longer assume that the unmap mm is the same as
+the mapping mm.
 
-This should never happen or else I'd suggest this also make an early
-exit.
+Does this need to get_task_mm(dma->task) and compare that mm to dma->mm
+to determine whether an exec w/o vaddr remapping has occurred?  That's
+the only use case I can figure out where grabbing the mm for dma->mm
+actually makes any sense at all.
 
->  	do_accounting = list_empty(&iommu->domain_list);
->  	for (i = 0; i < npage; i++) {
->  		dma_addr_t iova = user_iova + PAGE_SIZE * i;
-> @@ -1343,6 +1347,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  
->  	mutex_lock(&iommu->lock);
->  
-> +	/* Cannot update vaddr if mdev is present. */
-> +	if (invalidate_vaddr && !list_empty(&iommu->emulated_iommu_groups))
-> +		goto unlock;
+>  		vfio_lock_acct(dma, -unlocked, true);
+>  		return 0;
+>  	}
+> @@ -1178,6 +1179,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>  	vfio_unmap_unpin(iommu, dma, true);
+>  	vfio_unlink_dma(iommu, dma);
+>  	put_task_struct(dma->task);
+> +	mmdrop(dma->mm);
+>  	vfio_dma_bitmap_free(dma);
+>  	if (dma->vaddr_invalid) {
+>  		iommu->vaddr_invalid_count--;
+> @@ -1623,9 +1625,20 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>  			   dma->size != size) {
+>  			ret = -EINVAL;
+>  		} else {
+> -			dma->vaddr = vaddr;
+> -			dma->vaddr_invalid = false;
+> -			iommu->vaddr_invalid_count--;
+> +			if (current->mm != dma->mm) {
+> +				ret = vfio_lock_acct(dma, size >> PAGE_SHIFT,
+> +						     0);
+> +				if (!ret) {
+> +					mmdrop(dma->mm);
+> +					dma->mm = current->mm;
+> +					mmgrab(dma->mm);
+> +				}
+> +			}
+> +			if (!ret) {
+> +				dma->vaddr = vaddr;
+> +				dma->vaddr_invalid = false;
+> +				iommu->vaddr_invalid_count--;
+> +			}
 
-A different errno here to reflect that the container state is the issue
-might be appropriate here.
+Poor flow, shouldn't this be:
 
-> +
->  	pgshift = __ffs(iommu->pgsize_bitmap);
->  	pgsize = (size_t)1 << pgshift;
->  
-> @@ -2189,6 +2197,10 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  
->  	mutex_lock(&iommu->lock);
->  
-> +	/* Attach could require pinning, so disallow while vaddr is invalid. */
-> +	if (iommu->vaddr_invalid_count)
-> +		goto out_unlock;
-> +
->  	/* Check for duplicates */
->  	if (vfio_iommu_find_iommu_group(iommu, iommu_group))
->  		goto out_unlock;
-> @@ -2660,6 +2672,16 @@ static int vfio_domains_have_enforce_cache_coherency(struct vfio_iommu *iommu)
->  	return ret;
->  }
->  
-> +static int vfio_iommu_has_emulated(struct vfio_iommu *iommu)
-> +{
-> +	int ret;
-> +
-> +	mutex_lock(&iommu->lock);
-> +	ret = !list_empty(&iommu->emulated_iommu_groups);
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
->  static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->  					    unsigned long arg)
->  {
-> @@ -2668,8 +2690,13 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->  	case VFIO_TYPE1v2_IOMMU:
->  	case VFIO_TYPE1_NESTING_IOMMU:
->  	case VFIO_UNMAP_ALL:
-> -	case VFIO_UPDATE_VADDR:
->  		return 1;
-> +	case VFIO_UPDATE_VADDR:
-> +		/*
-> +		 * Disable this feature if mdevs are present.  They cannot
-> +		 * safely pin/unpin while vaddrs are being updated.
-> +		 */
-> +		return iommu && !vfio_iommu_has_emulated(iommu);
->  	case VFIO_DMA_CC_IOMMU:
->  		if (!iommu)
->  			return 0;
-> @@ -3080,6 +3107,8 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
->  	size_t offset;
->  	int ret;
->  
-> +	WARN_ON(iommu->vaddr_invalid_count);
-> +
+			if (current->mm != dma->mm) {
+				ret = vfio_lock_acct(dma,
+						     size >> PAGE_SHIFT, 0);
+				if (ret)
+					goto out_unlock;
 
-Same as pinning, this should trigger -errno.  Thanks,
+				mmdrop(dma->mm);
+				dma->mm = current->mm;
+				mmgrab(dma->mm);
+			}
+			dma->vaddr = vaddr;
+			dma->vaddr_invalid = false;
+			iommu->vaddr_invalid_count--;
 
+
+Thanks,
 Alex
 
->  	*copied = 0;
+>  			wake_up_all(&iommu->vaddr_wait);
+>  		}
+>  		goto out_unlock;
+> @@ -1683,6 +1696,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>  	get_task_struct(current->group_leader);
+>  	dma->task = current->group_leader;
+>  	dma->lock_cap = capable(CAP_IPC_LOCK);
+> +	dma->mm = dma->task->mm;
+> +	mmgrab(dma->mm);
 >  
->  	ret = vfio_find_dma_valid(iommu, user_iova, 1, &dma);
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index d7d8e09..4e8d344 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -49,7 +49,11 @@
->  /* Supports VFIO_DMA_UNMAP_FLAG_ALL */
->  #define VFIO_UNMAP_ALL			9
+>  	dma->pfn_list = RB_ROOT;
 >  
-> -/* Supports the vaddr flag for DMA map and unmap */
-> +/*
-> + * Supports the vaddr flag for DMA map and unmap.  Not supported for mediated
-> + * devices, so this capability is subject to change as groups are added or
-> + * removed.
-> + */
->  #define VFIO_UPDATE_VADDR		10
->  
->  /*
-> @@ -1215,8 +1219,7 @@ struct vfio_iommu_type1_info_dma_avail {
->   * Map process virtual addresses to IO virtual addresses using the
->   * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
->   *
-> - * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova, and
-> - * unblock translation of host virtual addresses in the iova range.  The vaddr
-> + * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova. The vaddr
->   * must have previously been invalidated with VFIO_DMA_UNMAP_FLAG_VADDR.  To
->   * maintain memory consistency within the user application, the updated vaddr
->   * must address the same memory object as originally mapped.  Failure to do so
-> @@ -1267,9 +1270,9 @@ struct vfio_bitmap {
->   * must be 0.  This cannot be combined with the get-dirty-bitmap flag.
->   *
->   * If flags & VFIO_DMA_UNMAP_FLAG_VADDR, do not unmap, but invalidate host
-> - * virtual addresses in the iova range.  Tasks that attempt to translate an
-> - * iova's vaddr will block.  DMA to already-mapped pages continues.  This
-> - * cannot be combined with the get-dirty-bitmap flag.
-> + * virtual addresses in the iova range.  DMA to already-mapped pages continues.
-> + * Groups may not be added to the container while any addresses are invalid.
-> + * This cannot be combined with the get-dirty-bitmap flag.
->   */
->  struct vfio_iommu_type1_dma_unmap {
->  	__u32	argsz;
 
