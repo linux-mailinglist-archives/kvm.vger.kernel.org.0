@@ -2,85 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2494064AD7B
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 03:13:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85E0664AE31
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 04:30:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233735AbiLMCNc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 21:13:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40066 "EHLO
+        id S234151AbiLMDag (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 22:30:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229638AbiLMCNa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 21:13:30 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E109624D
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 18:13:29 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id u15-20020a17090a3fcf00b002191825cf02so2024920pjm.2
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 18:13:29 -0800 (PST)
+        with ESMTP id S234056AbiLMDaf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 22:30:35 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 567681B7BC
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 19:30:34 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id x188-20020a2531c5000000b00716de19d76bso13292897ybx.19
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 19:30:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dytxSctGH3/JU5+VUvCXKRl3djDPMXaOjikH1n5CrMU=;
-        b=CBf3R1fmXIZ45yTb+WHxJdiyNOFL2h5rhe7iuVz+maaKt1rkPLuLZ1Vg6SAm23HMHG
-         vQ6uXPH/ty7wkcdAYuV/Lh/0nTI9cyJfrD99XFzYtkzgINZ5bTa5LBeoIBAsqfn4QDC3
-         6SVFH94xQAmltYML5ctohPuMu25umC/aZZCO6gUijQK+8crcDBG5bvbVDVdxF3bugd0O
-         rtoRLMRfttq4YtD01i5HrnVdRJstwarVuJG/T6s79sxcBeqvrkLe9Nt+5avTs3+UOplZ
-         FkjJ/F9aFkiOlaZ3Av0iqu9jA/E5UOfBI4ocgDHSNbxKS74BDaooa/RlqBvBkybckhx2
-         eXVw==
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fvHSXXCkeu3/4sx+gtxDD1f9+Q7yHtx6Qc7Gq8TcTlk=;
+        b=LLRdDTGJMdrQ+p+GUnDsrf1yDPoRSSppeKjQs4nboSb+avGRmawlspUOhOBG45/Oyc
+         Y716L2oH9GnjWvtIhq7tQlvtAnPF5QUESJd/UyMZ3SF1NcBmFdEoRa6/UTyjYEb7oYHT
+         08KZOXU3p/P3Famupq2pckKrUL6+9bANZ166gzgFvEotOsNUJSTQZe1IUe/yL/xdXccJ
+         1Qi7bVajLliCxxq8uzKbZxczNBCDyOtI1M6bSv9GDhFCjQ/kufDbk3Wt4phE36kgW870
+         5AVp7S9JPiWbqOwB61ImhJiUOKRzzcboJbFhd7FJezjy3zGlHw/e+FAjspljmpyRvvW1
+         5fkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dytxSctGH3/JU5+VUvCXKRl3djDPMXaOjikH1n5CrMU=;
-        b=isiYFG9k37MNrSb31/AfX0kvWj+WJy5GpBP8Li+zDyCP+V8D+vrHycIbvdvni/HABo
-         22e/FHvQaY60bh7Gs1duNwFneXemEemKEJa0FU0rI1NAVITHcy7Ul97UVAsozmp9Rpfc
-         Lanb/al//Z/6d7xXzuVZZzlof0UIM8lBE5pzx8DkOsan3OTg5Blixas5eD/jPK/pbXla
-         esl/xFnEUSs94LqM7i2S+Yc3mOktMettwpUlwwFLLQESdNZzNO+G0w4fWdmDqjTApkF/
-         NYFvrMPaS/27CLLwKkB19dtF+9XwcrCyxa/zhSY6TlNNiNsptFSIzr1rxIajV9MyfUcx
-         0xzQ==
-X-Gm-Message-State: ANoB5pk2E4u/hzwq0/D83FKOwmRM5h1E6Swx3Qpc3KTI9NLnHA1/ki9M
-        J3LlxiGj6eBsHJOos0Wn4JPgnw==
-X-Google-Smtp-Source: AA0mqf5lyAQrJvHm7xnE6hLi9O52SD019Oq6Ie+uJ0eyRDJIM2Xscc/SexS//WPdt/sgq2p4vlI/tg==
-X-Received: by 2002:a17:902:7b96:b0:189:858f:b5c0 with SMTP id w22-20020a1709027b9600b00189858fb5c0mr90604pll.0.1670897608745;
-        Mon, 12 Dec 2022 18:13:28 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d9-20020a170902654900b00176b63535adsm7060787pln.260.2022.12.12.18.13.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 18:13:28 -0800 (PST)
-Date:   Tue, 13 Dec 2022 02:13:25 +0000
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fvHSXXCkeu3/4sx+gtxDD1f9+Q7yHtx6Qc7Gq8TcTlk=;
+        b=dCL/HE0MnTKE7gPBY1c5B6ewYsgQo8ANL9noTZoOyNay+8u+5kKh6aJarIMu2cjRVH
+         UbGf4ay8Phl0kw5cINhQMM/TZjxyHcV9XgxQXGyatWGbwXPrHhCL4I2Q63ECU9Bp6d9N
+         OCz0PGsvKixYGmdK+QrzSf6FpUmupsElTK3UIwdA9D1mPIBGAvZa33TfQNoZpItL+z8j
+         D6lf/Qz8RkFrtA8pcZeS8WZn+lQXu7pojDA4dWV+1GNSC0n1dH5j7Ysen1YYGWntiIP+
+         WcdhcRFHWQGsZymUhbEDlcmffVX0+bNDUTQsPNRxiyVCyWcchWD2flmkVrBbnWzp68z/
+         knFQ==
+X-Gm-Message-State: ANoB5pm4fE6UgbP1YR5WyDbEDeOYtC49THwwhI2Jo0JjK90c45yjMBBb
+        CPRzVtuyBgpBuLhhTxBbRTO8IngiZEs=
+X-Google-Smtp-Source: AA0mqf7WZkWhOp4xReQE+hoO2FppB9Dpsyv3a/YVfDmXeNw9+aBoYg6nPEnSRG4nKBDA9RC1ub3rwu1vP8g=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a81:998a:0:b0:3dd:49a2:837b with SMTP id
+ q132-20020a81998a000000b003dd49a2837bmr30831405ywg.241.1670902233643; Mon, 12
+ Dec 2022 19:30:33 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Tue, 13 Dec 2022 03:30:25 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
+Message-ID: <20221213033030.83345-1-seanjc@google.com>
+Subject: [PATCH 0/5] KVM: x86/mmu: TDP MMU fixes for 6.2
 From:   Sean Christopherson <seanjc@google.com>
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Tom Rix <trix@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-riscv@lists.infradead.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Ricardo Koller <ricarkol@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH 11/14] KVM: selftests: Disable
- "gnu-variable-sized-type-not-at-end" warning
-Message-ID: <Y5ffxebJ/eRzEXh+@google.com>
-References: <20221213001653.3852042-1-seanjc@google.com>
- <20221213001653.3852042-12-seanjc@google.com>
- <CAKwvOdnRQQb9YbH=MgDymBmmjYgajc8tkyjbJVxjpA5zDZpNTQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdnRQQb9YbH=MgDymBmmjYgajc8tkyjbJVxjpA5zDZpNTQ@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Greg Thelen <gthelen@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,50 +71,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 12, 2022, Nick Desaulniers wrote:
-> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> > index 2487db21b177..9cff99a1cb2e 100644
-> > --- a/tools/testing/selftests/kvm/Makefile
-> > +++ b/tools/testing/selftests/kvm/Makefile
-> > @@ -196,6 +196,7 @@ else
-> >  LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
-> >  endif
-> >  CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
-> > +       -Wno-gnu-variable-sized-type-not-at-end \
-> 
-> This is a clang-specific warning. This will need to be wrapped in a
-> cc-option check.
+Fix three fatal TDP MMU bugs introduced in 6.2, harden related code,
+and clean up kvm_tdp_mmu_map() to eliminate the need for gotos.
 
-Not that I'm against guarding this code, but I don't think cc-option() will do
-anything in this case.
+Sean Christopherson (5):
+  KVM: x86/mmu: Don't attempt to map leaf if target TDP MMU SPTE is
+    frozen
+  KVM: x86/mmu: Map TDP MMU leaf SPTE iff target level is reached
+  KVM: x86/mmu: Re-check under lock that TDP MMU SP hugepage is
+    disallowed
+  KVM: x86/mmu: Don't install TDP MMU SPTE if SP has unexpected level
+  KVM: x86/mmu: Move kvm_tdp_mmu_map()'s prolog and epilog to its caller
 
-AFAICT, gcc stopped treating unknown "-Wno" flags as unconditional errors starting
-with gcc-4.4, and the kernel's min supported version is 5.1.  gcc-4.4 through
-gcc-9.5 all print a mild warning if there's a different error, but otherwise
-silently ignore the uknown "-Wno".
+ arch/x86/kvm/mmu/mmu.c          |  9 +++++++-
+ arch/x86/kvm/mmu/mmu_internal.h |  1 -
+ arch/x86/kvm/mmu/tdp_mmu.c      | 39 +++++++++++++++------------------
+ 3 files changed, 26 insertions(+), 23 deletions(-)
 
-  cc1: warning: unrecognized command line option '-Wno-gnu-variable-sized-type-not-at-end'
 
-gcc-10.1 is even friendlier and notes that the unknown flag may have been related
-to the error.
+base-commit: 51229fd7872f82af07498aef5c79ad51baf81ea0
+-- 
+2.39.0.rc1.256.g54fd8350bd-goog
 
-  cc1: note: unrecognized command-line option '-Wno-gnu-variable-sized-type-not-at-end'
-  may have been intended to silence earlier diagnostics
-
-Because cc-option() doesn't have errors in its probing code, it will return "true"
-on gcc for literally any "-Wno-*" input that gcc deems syntacially valid, e.g.
-gcc barfs on
-
-  depends on $(cc-option,-Wno-)
-  depends on $(cc-option,-Wno)
-
-but happily succeeds with
-
-  depends on $(cc-option,-Wno-lol-gcc)
-
-Various man pages suggest -Wunknown-warnings is a thing, but no gcc version
-supported by godbolt recognizes it.
-
-So unless I'm missing something, trying to detect lack of support will be non-trivial,
-and the worst case scenario is that users of older gcc version will see a potentially
-confusing warning when the build fails.
