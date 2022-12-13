@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4194E64B53C
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 13:36:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7DCE64B53D
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 13:36:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234994AbiLMMgE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 07:36:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44712 "EHLO
+        id S235255AbiLMMgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 07:36:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234740AbiLMMgC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 07:36:02 -0500
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F6060EF
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:36:00 -0800 (PST)
-Received: by mail-wr1-x42d.google.com with SMTP id h16so6486166wrz.12
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:36:00 -0800 (PST)
+        with ESMTP id S234740AbiLMMgH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 07:36:07 -0500
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 916CB164BD
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:36:06 -0800 (PST)
+Received: by mail-wm1-x329.google.com with SMTP id o5-20020a05600c510500b003d21f02fbaaso951601wms.4
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:36:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jfoDaqyDi5g2SMMUF24M2o5M/2GLRFzHx+wauvWPlgQ=;
-        b=RUnAyaXz2JFQXkf5dgXKJV9M0oDJESZyYkFT7wF9FlwaBHuPbbwscXuYCr6iatV0EW
-         0cjPST/WmAs7jL+Ku7Sko0l9gWGIYm355S1wXkBrPAZYT6VwWBwwUaMRf8xwcTQqlpqW
-         U6UKWAnIIPFnBTGoinUsbrcRFZQUKyLsjiSVAM2N10/nxVCUf6B5zLf23hI8I9ncKm9R
-         A0QiEcXFmDIxm2/7EeZ7z3jN680gJMZPvbhKcbkbPnIt3csmMUvDIKym/FV6RlanBanf
-         yVbX17Ng5k7SkpPfXSLjuh+Y0NI+2lpL7wGIDMgFGXx8X6fd6L7Cpf+/hhgxmZFSySuc
-         YJqA==
+        bh=kaPjbKdMr76WDvODBflVFVeFIfBaQyO5rZm5rUBpNuw=;
+        b=O2ot/k263FnLwr6J9y4vgJFRt8gHLPGH+hYoc+NkfvsmnefXlPnGZlKV8VaoDFYsl2
+         tn4cJPrjWf4augfmgq/yh0o+PlrKquNKGxM+vgRAO/pBZE4l5MZ84gzT313lx8kTdwHV
+         K6FxQulbeRmrkFTTBqGMFUcyGs7iCYU5rNySfLLa/9pwV0TyJUgHwk7niUza6Riz0S4E
+         exNt9PaeK9U176+7vydCwwzvZPiJ41xLFN5PRFEM6K/4lqmnr+M/uc8DzjHVI5S0MNyE
+         fNme6kL5jj1uCRkbMgT1tQ1KaxfYfrrr6h9aQJTHxFSoxa8k6RLI2cKkO5Sr1fugKJtF
+         8g0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jfoDaqyDi5g2SMMUF24M2o5M/2GLRFzHx+wauvWPlgQ=;
-        b=kieSg9SrKqVO01x1Ql2M54Aecn5FxbD73NDOTNrqHfA8D4c+1IHocpX3tDCW1vVhgT
-         4ZVjLD/WyCVPETjhuQNXbY4x5miYTnPy9ao0L79QiEVnc7wflMQiEX1edKdL5n5T+FIY
-         Q4pMfuqd/HLc00ywYxHcnSw+0YK3xiKSYXOoQXFRsHgW3i7MEo5KjF11LBo2N+ECVjix
-         XKAI/h8Y7h8abx8SEGBbdsMj40RwTRV5UTK1/Qui25bnDE93S85NN42s81XcYpWPkg1b
-         yDzOUD6f2c3JZmKSAXpLcfz4pueDJ4aBsBzgleDitcOIFvCvdtQDXpe0YQ4AFyELuzP/
-         wz4g==
-X-Gm-Message-State: ANoB5pnmO37qPmmCZl8QrUARdptt2zZaBR04eI76NARCt/I4pqm3e/I9
-        4AnV+dztyypzjb+ZrguQmSieAg==
-X-Google-Smtp-Source: AA0mqf52yKem59QUTfrTjSFYRE9vr+JRXVc9MtIQxCiGer8yhcYzjgGgqwCKdD/1loTBA7u52JhqOQ==
-X-Received: by 2002:a5d:6045:0:b0:242:24a7:c7f2 with SMTP id j5-20020a5d6045000000b0024224a7c7f2mr11925721wrt.58.1670934959132;
-        Tue, 13 Dec 2022 04:35:59 -0800 (PST)
+        bh=kaPjbKdMr76WDvODBflVFVeFIfBaQyO5rZm5rUBpNuw=;
+        b=erovyGyeBo3at2zf1626IvU70BiNht1hBLgF8z0RLZho1o+bvndC0mVwa8JKFcQnYp
+         /8rw9r4lI7zy+r/oRI5/cvPgl7Fy+EgsEg9BHSeHhwN6OaeH0iS9DGEbWgEeNr1d+0iX
+         lL2esXwNpcru5bVvrpEIq63cjqTs42FdMgLaxvivWB/j+p5ZeuIyPN+hhy54FQUuYgof
+         v7zuB92rYNYzLE0FxPsnF/b/7cIu3MA4ehzA6YewG1ekPJBbmGp6jNXgvmLtjbElTHb2
+         ClV2mJcfge1SnvUOmsAylC3fgZA6p027yVM3BhXTTYdWvCu1RBidjAcoc9fDoIKkHCar
+         eiUg==
+X-Gm-Message-State: ANoB5pli/dvuvDnLniMP20Tph6OrXgG10O5S++aeoykGR2fjndXi44Wz
+        ZZ0NnLOTBeTnhlC56ptXuLOLBg==
+X-Google-Smtp-Source: AA0mqf6vaK+43TBHB5IP98FncgtiD9SnBheWSw4weMDQLfnluEzaSymwtarl0qzMsoQxR8wgtmqdTQ==
+X-Received: by 2002:a05:600c:4e46:b0:3d1:c8c8:fc0 with SMTP id e6-20020a05600c4e4600b003d1c8c80fc0mr15296436wmq.10.1670934964621;
+        Tue, 13 Dec 2022 04:36:04 -0800 (PST)
 Received: from localhost.localdomain ([81.0.6.76])
-        by smtp.gmail.com with ESMTPSA id e3-20020a5d5303000000b002366dd0e030sm11671653wrv.68.2022.12.13.04.35.57
+        by smtp.gmail.com with ESMTPSA id o3-20020a05600c4fc300b003cfbbd54178sm3375484wmq.2.2022.12.13.04.36.03
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 13 Dec 2022 04:35:58 -0800 (PST)
+        Tue, 13 Dec 2022 04:36:04 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -60,9 +60,9 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Markus Armbruster <armbru@redhat.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH-for-8.0 1/4] target/ppc/kvm: Add missing "cpu.h" and "exec/hwaddr.h"
-Date:   Tue, 13 Dec 2022 13:35:47 +0100
-Message-Id: <20221213123550.39302-2-philmd@linaro.org>
+Subject: [PATCH-for-8.0 2/4] hw/ppc/vof: Do not include the full "cpu.h"
+Date:   Tue, 13 Dec 2022 13:35:48 +0100
+Message-Id: <20221213123550.39302-3-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221213123550.39302-1-philmd@linaro.org>
 References: <20221213123550.39302-1-philmd@linaro.org>
@@ -78,47 +78,27 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm_ppc.h is missing various declarations from "cpu.h":
-
-  target/ppc/kvm_ppc.h:128:40: error: unknown type name 'CPUPPCState'; did you mean 'CPUState'?
-  static inline int kvmppc_get_hypercall(CPUPPCState *env,
-                                         ^~~~~~~~~~~
-                                         CPUState
-  include/qemu/typedefs.h:45:25: note: 'CPUState' declared here
-  typedef struct CPUState CPUState;
-                          ^
-  target/ppc/kvm_ppc.h:134:40: error: unknown type name 'PowerPCCPU'
-  static inline int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level)
-                                         ^
-  target/ppc/kvm_ppc.h:285:38: error: unknown type name 'hwaddr'
-                                       hwaddr ptex, int n)
-                                       ^
-  target/ppc/kvm_ppc.h:220:15: error: unknown type name 'target_ulong'
-  static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
-                ^
-  target/ppc/kvm_ppc.h:286:38: error: unknown type name 'ppc_hash_pte64_t'
-  static inline void kvmppc_read_hptes(ppc_hash_pte64_t *hptes,
-                                       ^
+"vof.h" doesn't need the full "cpu.h" to get the target_ulong
+definition, including "exec/cpu-defs.h" is enough.
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/ppc/kvm_ppc.h | 3 +++
- 1 file changed, 3 insertions(+)
+ include/hw/ppc/vof.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
-index ee9325bf9a..5fd9753953 100644
---- a/target/ppc/kvm_ppc.h
-+++ b/target/ppc/kvm_ppc.h
-@@ -9,6 +9,9 @@
- #ifndef KVM_PPC_H
- #define KVM_PPC_H
+diff --git a/include/hw/ppc/vof.h b/include/hw/ppc/vof.h
+index f8c0effcaf..d3f293da8b 100644
+--- a/include/hw/ppc/vof.h
++++ b/include/hw/ppc/vof.h
+@@ -9,7 +9,7 @@
+ #include "qom/object.h"
+ #include "exec/address-spaces.h"
+ #include "exec/memory.h"
+-#include "cpu.h"
++#include "exec/cpu-defs.h"
  
-+#include "exec/hwaddr.h"
-+#include "cpu.h"
-+
- #define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
- 
- #ifdef CONFIG_KVM
+ typedef struct Vof {
+     uint64_t top_addr; /* copied from rma_size */
 -- 
 2.38.1
 
