@@ -2,69 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A0D964BD6D
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 20:41:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8DD7D64BDB5
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 21:03:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236411AbiLMTlM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 14:41:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45442 "EHLO
+        id S236766AbiLMUDL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 15:03:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56910 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236875AbiLMTlI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 14:41:08 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A75021266
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 11:41:07 -0800 (PST)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDJJRah008194;
-        Tue, 13 Dec 2022 19:41:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2022-7-12;
- bh=+y6Ylg39vBXwUrwPtWGaBBzYw680t9s886JDqLVR3n4=;
- b=iMQlESF0Z+dJsrKVO+Ef+znjg77zZXeUH4MWTBeKf1r1F87/lpyicRMXG5BNGSrJxiD7
- 5WqJQTnIXCSu5Y0/v2ZG1X4CzBEAEMRtqA3zCTcu757RPxsyHXdZE7enaTkLsN25e6ks
- b/sPW/VkpknQFB9Onov/FOdBKzlmDQ5I4M/VYxL1enGQMpTCBq6fbHPb8vgtzIExl7KA
- vaiJcPD269XjhshVwVe8xAViRc3tsYFqCjAOq39gDXfCcNKlVOAA75xuC7ZE5cu7yjmq
- mH6uChxWbkCZInmekdN80YNSrF00aRhdDtjJh2SFTjHtDX28EMwaDjVVikIfa2U+S2Aj Bw== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3meyewr1yb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Dec 2022 19:41:05 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BDJJKQC031395;
-        Tue, 13 Dec 2022 19:41:04 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3meyesrs2s-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Dec 2022 19:41:04 +0000
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BDJf0Gr028128;
-        Tue, 13 Dec 2022 19:41:04 GMT
-Received: from ca-dev63.us.oracle.com (ca-dev63.us.oracle.com [10.211.8.221])
-        by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3meyesrry8-6;
-        Tue, 13 Dec 2022 19:41:03 +0000
-From:   Steve Sistare <steven.sistare@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V2 5/5] vfio: revert "iommu driver notify callback"
-Date:   Tue, 13 Dec 2022 11:40:59 -0800
-Message-Id: <1670960459-415264-6-git-send-email-steven.sistare@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1670960459-415264-1-git-send-email-steven.sistare@oracle.com>
-References: <1670960459-415264-1-git-send-email-steven.sistare@oracle.com>
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-13_03,2022-12-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 mlxscore=0 spamscore=0
- mlxlogscore=999 bulkscore=0 phishscore=0 adultscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2212130171
-X-Proofpoint-GUID: NnaoAAVJgrdQ3lnPyMcxvKiHBFVT3HsL
-X-Proofpoint-ORIG-GUID: NnaoAAVJgrdQ3lnPyMcxvKiHBFVT3HsL
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        with ESMTP id S235545AbiLMUDJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 15:03:09 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 048D6F00
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:03:09 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id u15-20020a17090a3fcf00b002191825cf02so4728835pjm.2
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:03:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SlLKeNs0EWVsu+ptfdWBNmvU18ZVhMR61XWdAxFV9XQ=;
+        b=Jgh2h70gyFoI+vZEt+HRyYhvy8YXmJruypdwVRYeOAtwakBPLsrcx6y+QvB3hUhUNm
+         v/DiIWAZ3oh+MtBheCrEL++Gyb7HLAT1gDnpqMiVuiB04sbr6RL+4HisIMlXsah7jJHs
+         BQh9UrAAjRfz+6OEQK8DW+ZocCeLgGW7E9/YuE4vDZ2U7pCZP9xxdvcW7BRNNE9/dvXk
+         UHFZHnLNmVVz3QPKDVMD9nL2tc1Un2n3p3lY72Vrrn4IEro5ne4Mp2Xd+uRIFimABqMP
+         9hVMz9Et/jMsgOYssc4gfckHfVOAIkEUwXeMIcmjytkpiwFO3ZODSvpun/Uk3hH9yVpu
+         tYKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SlLKeNs0EWVsu+ptfdWBNmvU18ZVhMR61XWdAxFV9XQ=;
+        b=7WFeal3gPFoTQyBwvxs7WBcpeHRnf+CgxvrqJ/4TSUR3Lssez2wvL1Z5BjQi/OmoTD
+         CbAN3jEBofLVk+NhqFOVLufoATmTkS1k6h8Y4qbMCnbkW2Jmp1uBweaMcNxgYnA7EVKb
+         dOdgenaA2uRCwDNOBtTuAfs0NS0i5eV0EWsNLgS3vD0uu2hkNSJhDjhGq6ItMCp8Cwi4
+         5ywOaCBABemYAUaqNG3NFxy6fVRCbwA0Km/j7hifdA8N6Ms4awGq3vH0AE2Yah7Ax+AS
+         hx0yX0CO4tcXreva1oOs3OEbpt0PTmNZ+LfZGpVGz/DmWi0n/cjN9KiRdwdyHruQL4RM
+         PQyg==
+X-Gm-Message-State: ANoB5pksDmw//3n59gJGsPQ+ME+hfjNp2WkPZiq0Cn5Xuyw3ItmcysRl
+        L2N317yJDlK5Je463otliqLdmQ==
+X-Google-Smtp-Source: AA0mqf43rfeTLye05owqv8MbDwr9r9xovoe2k6ziCGD54isSIqaMDQrLxrh/vw468kpaItrUN7BQ5g==
+X-Received: by 2002:a17:902:7b96:b0:189:858f:b5c0 with SMTP id w22-20020a1709027b9600b00189858fb5c0mr428994pll.0.1670961788301;
+        Tue, 13 Dec 2022 12:03:08 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u5-20020a170903124500b00189667acf19sm289595plh.95.2022.12.13.12.03.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 13 Dec 2022 12:03:07 -0800 (PST)
+Date:   Tue, 13 Dec 2022 20:03:03 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Tom Rix <trix@redhat.com>, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-riscv@lists.infradead.org,
+        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
+        Ricardo Koller <ricarkol@google.com>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Cc:     David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH 06/14] KVM: selftests: Rename UNAME_M to ARCH_DIR, fill
+ explicitly for x86
+Message-ID: <Y5jadzKz6Qi9MiI9@google.com>
+References: <20221213001653.3852042-1-seanjc@google.com>
+ <20221213001653.3852042-7-seanjc@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221213001653.3852042-7-seanjc@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,56 +88,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Revert this dead code:
-  commit ec5e32940cc9 ("vfio: iommu driver notify callback")
++David
 
-Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
----
- drivers/vfio/container.c | 5 -----
- drivers/vfio/vfio.h      | 7 -------
- 2 files changed, 12 deletions(-)
+On Tue, Dec 13, 2022, Sean Christopherson wrote:
+> Rename UNAME_M to ARCH_DIR and explicitly set it directly for x86.  At
+> this point, the name of the arch directory really doesn't have anything
+> to do with `uname -m`, and UNAME_M is unnecessarily confusing given that
+> its purpose is purely to identify the arch specific directory.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> -# No change necessary for x86_64
+> -UNAME_M := $(shell uname -m)
+> -
+> -# Set UNAME_M for arm64 compile/install to work
+> -ifeq ($(ARCH),arm64)
+> -	UNAME_M := aarch64
+> -endif
+> -# Set UNAME_M s390x compile/install to work
+> -ifeq ($(ARCH),s390)
+> -	UNAME_M := s390x
+> -endif
+> -# Set UNAME_M riscv compile/install to work
+> -ifeq ($(ARCH),riscv)
+> -	UNAME_M := riscv
+> +ifeq ($(ARCH),x86)
 
-diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
-index d74164a..5bfd10d 100644
---- a/drivers/vfio/container.c
-+++ b/drivers/vfio/container.c
-@@ -382,11 +382,6 @@ static int vfio_fops_open(struct inode *inode, struct file *filep)
- static int vfio_fops_release(struct inode *inode, struct file *filep)
- {
- 	struct vfio_container *container = filep->private_data;
--	struct vfio_iommu_driver *driver = container->iommu_driver;
--
--	if (driver && driver->ops->notify)
--		driver->ops->notify(container->iommu_data,
--				    VFIO_IOMMU_CONTAINER_CLOSE);
- 
- 	filep->private_data = NULL;
- 
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index bcad54b..8a439c6 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -62,11 +62,6 @@ struct vfio_group {
- 	struct blocking_notifier_head	notifier;
- };
- 
--/* events for the backend driver notify callback */
--enum vfio_iommu_notify_type {
--	VFIO_IOMMU_CONTAINER_CLOSE = 0,
--};
--
- /**
-  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
-  */
-@@ -97,8 +92,6 @@ struct vfio_iommu_driver_ops {
- 				  void *data, size_t count, bool write);
- 	struct iommu_domain *(*group_iommu_domain)(void *iommu_data,
- 						   struct iommu_group *group);
--	void		(*notify)(void *iommu_data,
--				  enum vfio_iommu_notify_type event);
- };
- 
- struct vfio_iommu_driver {
--- 
-1.8.3.1
+As discovered by by David, this breaks doing "ARCH=x86_64 make", which is an
+allowed/supported variant in the kernel proper, so this needs to be:
 
+  ifneq (,$(filter $(ARCH),x86 x86_64))
+
+or alternatively
+
+  ifeq ($(ARCH),x86_64)
+  ARCH := x86
+  endif
+
+Hmm, unless there's a reason to keep ARCH=x86_64, the latter appears to be the
+better option as lib.mak doesn't play nice with x86_64 either, e.g. `ARCH=x86_64
+LLVM=1 make` fails.  That's arguably a lib.mak bug, but it's trivial to handle
+in KVM's makefile so forcing lib.mak to handle both seems unnecessary.
+
+I'll also add a comment to call out that $(ARCH) follows the kernel's terminology
+for arch/*, whereas for whatever reason KVM selftests effectively uses `uname -m`
+terminology.
+
+One last thought/question, what do y'all think about renaming directories to
+follow the kernel proper?  I.e. aarch64=>arm64, s390x=>s390, and x86_64=>x86.
+Then $(ARCH_DIR) would go away.  The churn would be unfortunate, but it would be
+nice to align with arch/ and tools/arch/.
+
+> +	ARCH_DIR := x86_64
+> +else ifeq ($(ARCH),arm64)
+> +	ARCH_DIR := aarch64
+> +else ifeq ($(ARCH),s390)
+> +	ARCH_DIR := s390x
+> +else ifeq ($(ARCH),riscv)
+> +	ARCH_DIR := riscv
+> +else
+> +$(error Unknown architecture '$(ARCH)')
+>  endif
