@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7DCE64B53D
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 13:36:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 286BE64B53E
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 13:36:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235255AbiLMMgM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 07:36:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44794 "EHLO
+        id S235276AbiLMMgS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 07:36:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234740AbiLMMgH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 07:36:07 -0500
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 916CB164BD
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:36:06 -0800 (PST)
-Received: by mail-wm1-x329.google.com with SMTP id o5-20020a05600c510500b003d21f02fbaaso951601wms.4
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:36:05 -0800 (PST)
+        with ESMTP id S235319AbiLMMgO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 07:36:14 -0500
+Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E18513E9B
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:36:11 -0800 (PST)
+Received: by mail-wm1-x32e.google.com with SMTP id ja4-20020a05600c556400b003cf6e77f89cso1075596wmb.0
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:36:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kaPjbKdMr76WDvODBflVFVeFIfBaQyO5rZm5rUBpNuw=;
-        b=O2ot/k263FnLwr6J9y4vgJFRt8gHLPGH+hYoc+NkfvsmnefXlPnGZlKV8VaoDFYsl2
-         tn4cJPrjWf4augfmgq/yh0o+PlrKquNKGxM+vgRAO/pBZE4l5MZ84gzT313lx8kTdwHV
-         K6FxQulbeRmrkFTTBqGMFUcyGs7iCYU5rNySfLLa/9pwV0TyJUgHwk7niUza6Riz0S4E
-         exNt9PaeK9U176+7vydCwwzvZPiJ41xLFN5PRFEM6K/4lqmnr+M/uc8DzjHVI5S0MNyE
-         fNme6kL5jj1uCRkbMgT1tQ1KaxfYfrrr6h9aQJTHxFSoxa8k6RLI2cKkO5Sr1fugKJtF
-         8g0w==
+        bh=GAS00uDwTnX0iz6OiEnof4qv+85R5FD/5UPI6Ha2V80=;
+        b=lQmDA90DbXEwC7qP5vPds/7EEfMXj/0zvOwqP7kxXmDGx6j9d3G5fJXLl9eVN3Voby
+         7N9XLDnv8YW2mE0ZUfC80tjWsajTp1tMWPNqsm2bfIm9lKyRnWmA9PHbpELvM/WJ0nDD
+         SaDduq0n3B5HUjsRgR+3CyFagqZYjN05fZ5T7VPL7tdRQ0BujZ6hJYF/EoyT+nzBd/sy
+         H55ydNcpEOcoDROHV+kPvDP0fguBIb9JZKbAMePgLuxyHHQuK25RhVlJ192zx2oE/P23
+         mTVu+xEKOhWXgNY5Y4wcrdeL1R+mTMHhV2Oau8MdxRaN78GpBLJIMu4DiIOMQgHi84Py
+         +R+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kaPjbKdMr76WDvODBflVFVeFIfBaQyO5rZm5rUBpNuw=;
-        b=erovyGyeBo3at2zf1626IvU70BiNht1hBLgF8z0RLZho1o+bvndC0mVwa8JKFcQnYp
-         /8rw9r4lI7zy+r/oRI5/cvPgl7Fy+EgsEg9BHSeHhwN6OaeH0iS9DGEbWgEeNr1d+0iX
-         lL2esXwNpcru5bVvrpEIq63cjqTs42FdMgLaxvivWB/j+p5ZeuIyPN+hhy54FQUuYgof
-         v7zuB92rYNYzLE0FxPsnF/b/7cIu3MA4ehzA6YewG1ekPJBbmGp6jNXgvmLtjbElTHb2
-         ClV2mJcfge1SnvUOmsAylC3fgZA6p027yVM3BhXTTYdWvCu1RBidjAcoc9fDoIKkHCar
-         eiUg==
-X-Gm-Message-State: ANoB5pli/dvuvDnLniMP20Tph6OrXgG10O5S++aeoykGR2fjndXi44Wz
-        ZZ0NnLOTBeTnhlC56ptXuLOLBg==
-X-Google-Smtp-Source: AA0mqf6vaK+43TBHB5IP98FncgtiD9SnBheWSw4weMDQLfnluEzaSymwtarl0qzMsoQxR8wgtmqdTQ==
-X-Received: by 2002:a05:600c:4e46:b0:3d1:c8c8:fc0 with SMTP id e6-20020a05600c4e4600b003d1c8c80fc0mr15296436wmq.10.1670934964621;
-        Tue, 13 Dec 2022 04:36:04 -0800 (PST)
+        bh=GAS00uDwTnX0iz6OiEnof4qv+85R5FD/5UPI6Ha2V80=;
+        b=tTuVCT6pCk7GOY937o822tey7TWtLFR8RrZgsew/6cVOMeJDGztuyyDxFYoOMn6eLF
+         UpdbVOEb5AkM27crXF7Z00qnMwAKcKA1sBLo4cky+PFlW3bnGuhLNfu8iXvwfdYTsO8p
+         kVR2v7ZL/DcOZwXc7/FhbwE9x25Ffl3ZySs05SCCOJe4SWEWK5aXO3H+D6t5GgS+ZDfK
+         IIFiwgI7rUv8QAKfHUSdDy/4u3ubN5NqP2zxhHcxkpHmekKe3nb3nSZnfBkgUMK9ztEG
+         dhiHsctlYJs5dhNIGOBID0Na7OaQBD6wTVgg+fd8zsj1YUdoBT2hsgwzQueKq5LBc0Qc
+         693Q==
+X-Gm-Message-State: ANoB5pnaKqA7HJ6TCnXqEbBeyIxzB/DmPB3hvFWLrLfAM7lOIzys37Dn
+        Zi+7d229FALTP0yeh+0SNg048aOhtG6JGKNJ3Mk=
+X-Google-Smtp-Source: AA0mqf6Q7a99lz4o6i2mZR6Xev5Bo/BCPIkxBFwblJpymEZdQWi+7bcEYuWQEdQoM9waol9RshSezg==
+X-Received: by 2002:a05:600c:22ca:b0:3d1:ee97:980 with SMTP id 10-20020a05600c22ca00b003d1ee970980mr19035459wmg.7.1670934970165;
+        Tue, 13 Dec 2022 04:36:10 -0800 (PST)
 Received: from localhost.localdomain ([81.0.6.76])
-        by smtp.gmail.com with ESMTPSA id o3-20020a05600c4fc300b003cfbbd54178sm3375484wmq.2.2022.12.13.04.36.03
+        by smtp.gmail.com with ESMTPSA id q13-20020a7bce8d000000b003cf71b1f66csm12090266wmj.0.2022.12.13.04.36.08
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 13 Dec 2022 04:36:04 -0800 (PST)
+        Tue, 13 Dec 2022 04:36:09 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
@@ -60,9 +60,9 @@ Cc:     =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Markus Armbruster <armbru@redhat.com>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH-for-8.0 2/4] hw/ppc/vof: Do not include the full "cpu.h"
-Date:   Tue, 13 Dec 2022 13:35:48 +0100
-Message-Id: <20221213123550.39302-3-philmd@linaro.org>
+Subject: [PATCH-for-8.0 3/4] hw/ppc/spapr: Reduce "vof.h" inclusion
+Date:   Tue, 13 Dec 2022 13:35:49 +0100
+Message-Id: <20221213123550.39302-4-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221213123550.39302-1-philmd@linaro.org>
 References: <20221213123550.39302-1-philmd@linaro.org>
@@ -78,27 +78,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-"vof.h" doesn't need the full "cpu.h" to get the target_ulong
-definition, including "exec/cpu-defs.h" is enough.
+Currently objects including "hw/ppc/spapr.h" are forced to be
+target specific due to the inclusion of "vof.h" in "spapr.h".
+
+"spapr.h" only uses a Vof pointer, so doesn't require the structure
+declaration. The only place where Vof structure is accessed is in
+spapr.c, so include "vof.h" there, and forward declare the structure
+in "spapr.h".
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- include/hw/ppc/vof.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ppc/spapr.c         | 1 +
+ include/hw/ppc/spapr.h | 3 ++-
+ 2 files changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/ppc/vof.h b/include/hw/ppc/vof.h
-index f8c0effcaf..d3f293da8b 100644
---- a/include/hw/ppc/vof.h
-+++ b/include/hw/ppc/vof.h
-@@ -9,7 +9,7 @@
- #include "qom/object.h"
- #include "exec/address-spaces.h"
- #include "exec/memory.h"
--#include "cpu.h"
-+#include "exec/cpu-defs.h"
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index 66b414d2e9..f38a851ee3 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -62,6 +62,7 @@
+ #include "hw/ppc/fdt.h"
+ #include "hw/ppc/spapr.h"
+ #include "hw/ppc/spapr_vio.h"
++#include "hw/ppc/vof.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/pci-host/spapr.h"
+ #include "hw/pci/msi.h"
+diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
+index 04a95669ab..5c8aabd444 100644
+--- a/include/hw/ppc/spapr.h
++++ b/include/hw/ppc/spapr.h
+@@ -12,7 +12,6 @@
+ #include "hw/ppc/spapr_xive.h"  /* For SpaprXive */
+ #include "hw/ppc/xics.h"        /* For ICSState */
+ #include "hw/ppc/spapr_tpm_proxy.h"
+-#include "hw/ppc/vof.h"
  
- typedef struct Vof {
-     uint64_t top_addr; /* copied from rma_size */
+ struct SpaprVioBus;
+ struct SpaprPhbState;
+@@ -22,6 +21,8 @@ typedef struct SpaprEventLogEntry SpaprEventLogEntry;
+ typedef struct SpaprEventSource SpaprEventSource;
+ typedef struct SpaprPendingHpt SpaprPendingHpt;
+ 
++typedef struct Vof Vof;
++
+ #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
+ #define SPAPR_ENTRY_POINT       0x100
+ 
 -- 
 2.38.1
 
