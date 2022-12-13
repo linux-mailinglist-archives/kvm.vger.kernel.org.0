@@ -2,172 +2,235 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2C74664B9F3
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 17:40:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 58CC564BA15
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 17:44:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236118AbiLMQkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 11:40:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44604 "EHLO
+        id S235402AbiLMQoC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 11:44:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234710AbiLMQkl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 11:40:41 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AEABBAB
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:40:40 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDGJRKB039473;
-        Tue, 13 Dec 2022 16:40:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=1PoXFVvKmVqFqqxRyvTqqyyBymr37klRNOqJHjEXgGo=;
- b=DkzgSaQDsYiw/GNDmcSv+o2DEaMPoYuNUvLbFSDuVfkkHnLXauBF1Lte0xXlZrbWXyky
- iLtqndoWzrHIfVOSUr1qAGQO6HBXk9Xr7/DTt23SMTUcZ/zcdRpHRcyJJqSpp8ZiFaqg
- jqLI0nH+baH2ItZRPx9rfQrFp7AhzN9kbWCS8z1O+EVNZ+nO/mf3Bd6Wp1eHOvlfclxb
- jGBH5DtB5gL/ee+BXUFbmXxyhrS8N419GqICa5EzQ/RZUXmnm2XmHINyuGCVEWucKXEV
- KeD19J+IFZVsxeQndnepr0f9oZjpKnASKPVZkjN0Y8Ipw4chxE7wGgnstf14zRVZ2/D4 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mevtk8q2p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Dec 2022 16:40:25 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BDGK5VC002219;
-        Tue, 13 Dec 2022 16:40:24 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mevtk8q1y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Dec 2022 16:40:24 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.16.1.2) with ESMTP id 2BDF0FHj019467;
-        Tue, 13 Dec 2022 16:40:23 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3mchr6sneh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Dec 2022 16:40:23 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BDGeLXt5440214
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Dec 2022 16:40:22 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CCF8358052;
-        Tue, 13 Dec 2022 16:40:21 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 837265804E;
-        Tue, 13 Dec 2022 16:40:16 +0000 (GMT)
-Received: from [9.43.109.223] (unknown [9.43.109.223])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 13 Dec 2022 16:40:16 +0000 (GMT)
-Message-ID: <a49294f9-bdae-bf55-71f0-8de80d23010d@linux.ibm.com>
-Date:   Tue, 13 Dec 2022 22:10:14 +0530
+        with ESMTP id S236258AbiLMQnq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 11:43:46 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8B6101263D
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:43:42 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B690E2F4;
+        Tue, 13 Dec 2022 08:44:22 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B86C93F71E;
+        Tue, 13 Dec 2022 08:43:40 -0800 (PST)
+Date:   Tue, 13 Dec 2022 16:43:38 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
+        andrew.jones@linux.dev, maz@kernel.org, eric.auger@redhat.com,
+        oliver.upton@linux.dev, reijiw@google.com
+Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
+ PMUv3p5 long counters
+Message-ID: <Y5irunF72esHzOWj@monolith.localdoman>
+References: <20221202045527.3646838-1-ricarkol@google.com>
+ <20221202045527.3646838-2-ricarkol@google.com>
+ <Y5hxvj6p+mCC2DOs@monolith.localdoman>
+ <Y5imhKUIJceHDUMD@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH-for-8.0 4/4] hw/ppc/spapr_ovec: Avoid target_ulong
- spapr_ovec_parse_vector()
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Daniel Henrique Barboza <danielhb413@gmail.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Greg Kurz <groug@kaod.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Michael Neuling <mikey@neuling.org>
-References: <20221213123550.39302-1-philmd@linaro.org>
- <20221213123550.39302-5-philmd@linaro.org>
-From:   Harsh Prateek Bora <harshpb@linux.ibm.com>
-In-Reply-To: <20221213123550.39302-5-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: HnCDKmRv4FMx7JMGUhEODaWWPqk8Z3lO
-X-Proofpoint-GUID: tnG3eKKuifj_FEC3bm0-meeTJyjX_kGG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-13_03,2022-12-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- bulkscore=0 clxscore=1011 impostorscore=0 phishscore=0 lowpriorityscore=0
- priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2212130147
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5imhKUIJceHDUMD@google.com>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi,
 
-
-On 12/13/22 18:05, Philippe Mathieu-Daudé wrote:
-> spapr_ovec.c is a device, but it uses target_ulong which is
-> target specific. The hwaddr type (declared in "exec/hwaddr.h")
-> better fits hardware addresses.
+On Tue, Dec 13, 2022 at 08:21:24AM -0800, Ricardo Koller wrote:
+> On Tue, Dec 13, 2022 at 12:36:14PM +0000, Alexandru Elisei wrote:
+> > Hi,
+> > 
+> > Some more comments below.
+> > 
+> > On Fri, Dec 02, 2022 at 04:55:25AM +0000, Ricardo Koller wrote:
+> > > PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
+> > > for overflowing at 32 or 64-bits. The consequence is that tests that check
+> > > the counter values after overflowing should not assume that values will be
+> > > wrapped around 32-bits: they overflow into the other half of the 64-bit
+> > > counters on PMUv3p5.
+> > > 
+> > > Fix tests by correctly checking overflowing-counters against the expected
+> > > 64-bit value.
+> > > 
+> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > > ---
+> > >  arm/pmu.c | 29 ++++++++++++++++++-----------
+> > >  1 file changed, 18 insertions(+), 11 deletions(-)
+> > > 
+> > > diff --git a/arm/pmu.c b/arm/pmu.c
+> > > index cd47b14..eeac984 100644
+> > > --- a/arm/pmu.c
+> > > +++ b/arm/pmu.c
+> > > @@ -54,10 +54,10 @@
+> > >  #define EXT_COMMON_EVENTS_LOW	0x4000
+> > >  #define EXT_COMMON_EVENTS_HIGH	0x403F
+> > >  
+> > > -#define ALL_SET			0xFFFFFFFF
+> > > -#define ALL_CLEAR		0x0
+> > > -#define PRE_OVERFLOW		0xFFFFFFF0
+> > > -#define PRE_OVERFLOW2		0xFFFFFFDC
+> > > +#define ALL_SET			0x00000000FFFFFFFFULL
+> > > +#define ALL_CLEAR		0x0000000000000000ULL
+> > > +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
+> > > +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
+> > >  
+> > >  #define PMU_PPI			23
+> > >  
+> > > @@ -538,6 +538,7 @@ static void test_mem_access(void)
+> > >  static void test_sw_incr(void)
+> > >  {
+> > >  	uint32_t events[] = {SW_INCR, SW_INCR};
+> > > +	uint64_t cntr0;
+> > >  	int i;
+> > >  
+> > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > > @@ -572,9 +573,9 @@ static void test_sw_incr(void)
+> > >  		write_sysreg(0x3, pmswinc_el0);
+> > >  
+> > >  	isb();
+> > > -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
+> > > -	report(read_regn_el0(pmevcntr, 1)  == 100,
+> > > -		"counter #0 after + 100 SW_INCR");
+> > > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
+> > > +	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
+> > > +	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
+> > >  	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
+> > >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> > >  	report(read_sysreg(pmovsclr_el0) == 0x1,
+> > > @@ -584,6 +585,7 @@ static void test_sw_incr(void)
+> > >  static void test_chained_counters(void)
+> > >  {
+> > >  	uint32_t events[] = {CPU_CYCLES, CHAIN};
+> > > +	uint64_t cntr1;
+> > >  
+> > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > >  		return;
+> > > @@ -618,13 +620,16 @@ static void test_chained_counters(void)
+> > >  
+> > >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> > >  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> > > -	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
+> > > +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
+> > > +	report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
+> > 
+> > It looks to me like the intention of the test was to check that the counter
+> > programmed with the CHAIN event wraps, judging from the report message.
+> > 
 > 
-> Change spapr_ovec_parse_vector() to take a hwaddr argument,
-> allowing the removal of "cpu.h" in a device header.
+> Ah, right. Yeah, that message is confusing. It should be the short
+> version of "Inrementing at 32-bits resulted in the right value".
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->   hw/ppc/spapr_ovec.c         | 3 ++-
->   include/hw/ppc/spapr_ovec.h | 4 ++--
->   2 files changed, 4 insertions(+), 3 deletions(-)
+> > I think it would be interesting to keep that by programming counter #1 with
+> > ~0ULL when PMUv3p5 (maybe call it ALL_SET64?) and test the counter value
+> > against 0.
 > 
-> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
-> index b2567caa5c..a18a751b57 100644
-> --- a/hw/ppc/spapr_ovec.c
-> +++ b/hw/ppc/spapr_ovec.c
-> @@ -19,6 +19,7 @@
->   #include "qemu/error-report.h"
->   #include "trace.h"
->   #include <libfdt.h>
-> +#include "cpu.h"
->   
->   #define OV_MAXBYTES 256 /* not including length byte */
->   #define OV_MAXBITS (OV_MAXBYTES * BITS_PER_BYTE)
-> @@ -176,7 +177,7 @@ static target_ulong vector_addr(target_ulong table_addr, int vector)
->       return table_addr;
->   }
->   
-> -SpaprOptionVector *spapr_ovec_parse_vector(target_ulong table_addr, int vector)
-> +SpaprOptionVector *spapr_ovec_parse_vector(hwaddr table_addr, int vector)
+> The last commit adds tests using ALL_SET64.  Tests can be run in two
+> modes: overflow_at_64bits and not.  However, this test,
+> test_chained_counters(), and all other chained tests only use the
+> !overflow_at_64bits mode (even after the last commit). The reason is
+> that there are no CHAIN events when overflowing at 64-bits (more details
+> in the commit message). But, don't worry, there are lots of tests that
+> check wrapping at 64-bits (overflow_at_64bits=true).
 
-IIUC, Option vectors represents a data structure of vectors to advertise 
-guest capabilities to the platform (ref b20b7b7adda4) and doesn't really 
-represent a hardware device by itself. IMHO, target_ulong appears to be 
-more appropriate for this purpose. However, the header file inclusion 
-could be changed to cpu-defs.h if target_ulong is the only requirement here.
+What I was suggesting is this (change on top of this series, not on top of
+this patch, to get access to ALL_SET_AT):
 
-regards,
-Harsh
->   {
->       SpaprOptionVector *ov;
->       target_ulong addr;
-> diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
-> index c3e8b98e7e..d756b916e4 100644
-> --- a/include/hw/ppc/spapr_ovec.h
-> +++ b/include/hw/ppc/spapr_ovec.h
-> @@ -37,7 +37,7 @@
->   #ifndef SPAPR_OVEC_H
->   #define SPAPR_OVEC_H
->   
-> -#include "cpu.h"
-> +#include "exec/hwaddr.h"
->   
->   typedef struct SpaprOptionVector SpaprOptionVector;
->   
-> @@ -73,7 +73,7 @@ void spapr_ovec_set(SpaprOptionVector *ov, long bitnr);
->   void spapr_ovec_clear(SpaprOptionVector *ov, long bitnr);
->   bool spapr_ovec_test(SpaprOptionVector *ov, long bitnr);
->   bool spapr_ovec_empty(SpaprOptionVector *ov);
-> -SpaprOptionVector *spapr_ovec_parse_vector(target_ulong table_addr, int vector);
-> +SpaprOptionVector *spapr_ovec_parse_vector(hwaddr table_addr, int vector);
->   int spapr_dt_ovec(void *fdt, int fdt_offset,
->                     SpaprOptionVector *ov, const char *name);
->   
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 3cb563b1abe4..fd7f20fc6c52 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -607,7 +607,6 @@ static void test_sw_incr(bool overflow_at_64bits)
+ static void test_chained_counters(bool overflow_at_64bits)
+ {
+        uint32_t events[] = {CPU_CYCLES, CHAIN};
+-       uint64_t cntr1;
+
+        if (!satisfy_prerequisites(events, ARRAY_SIZE(events),
+                                   overflow_at_64bits))
+@@ -639,12 +638,11 @@ static void test_chained_counters(bool overflow_at_64bits)
+        report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
+
+        write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+-       write_regn_el0(pmevcntr, 1, ALL_SET);
++       write_regn_el0(pmevcntr, 1, ALL_SET_AT(overflow_at_64bits));
+
+        precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+        report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+-       cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
+-       report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
++       report(read_regn_el0(pmevcntr, 1) == 0, "CHAIN counter #1 wrapped");
+
+        report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
+ }
+
+The counters are 64bit, but the CHAIN event should still work because
+PMCR_EL0.LP is 0, according to the event description in the Arm ARM (ARM
+DDI 0487I.a, page D17-6461).
+
+Thanks,
+Alex
+
+> 
+> > Alternatively, the report message can be modified, and "wrapped"
+> > replaced with "incremented" (or something like that), to avoid confusion.
+> > 
+> > > +
+> > >  	report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
+> > >  }
+> > >  
+> > >  static void test_chained_sw_incr(void)
+> > >  {
+> > >  	uint32_t events[] = {SW_INCR, CHAIN};
+> > > +	uint64_t cntr0, cntr1;
+> > >  	int i;
+> > >  
+> > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> > > @@ -665,10 +670,12 @@ static void test_chained_sw_incr(void)
+> > >  		write_sysreg(0x1, pmswinc_el0);
+> > >  
+> > >  	isb();
+> > > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
+> > > +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
+> > >  	report((read_sysreg(pmovsclr_el0) == 0x3) &&
+> > > -		(read_regn_el0(pmevcntr, 1) == 0) &&
+> > > -		(read_regn_el0(pmevcntr, 0) == 84),
+> > > -		"expected overflows and values after 100 SW_INCR/CHAIN");
+> > > +	       (read_regn_el0(pmevcntr, 1) == cntr0) &&
+> > > +	       (read_regn_el0(pmevcntr, 0) == cntr1),
+> > 
+> > This is hard to parse, it would be better if counter 0 is compared against
+> > cntr0 and counter 1 against cntr1.
+> 
+> Ah, yes, code is correct but that's indeed confusing.
+> 
+> > 
+> > Also, same suggestion here, looks like the test wants to check that the
+> > odd-numbered counter wraps around when counting the CHAIN event.
+> 
+> Ack. Will update for v2.
+> 
+> Thanks!
+> Ricardo
+> 
+> > 
+> > Thanks,
+> > Alex
+> > 
+> > > +	       "expected overflows and values after 100 SW_INCR/CHAIN");
+> > >  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
+> > >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+> > >  }
+> > > -- 
+> > > 2.39.0.rc0.267.gcb52ba06e7-goog
+> > > 
