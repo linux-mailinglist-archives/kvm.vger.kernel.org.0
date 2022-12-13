@@ -2,173 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F25664BB53
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 18:47:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65AF364BB37
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 18:40:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236353AbiLMRrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 12:47:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59502 "EHLO
+        id S235940AbiLMRkj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 12:40:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235907AbiLMRrT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 12:47:19 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BEA621E36;
-        Tue, 13 Dec 2022 09:47:18 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDHKWoH023109;
-        Tue, 13 Dec 2022 17:47:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
+        with ESMTP id S236256AbiLMRk1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 12:40:27 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3FFD2315A
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 09:40:26 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDH0sif011703;
+        Tue, 13 Dec 2022 17:40:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=iiCTz8qQkxR5QpavDy8ro1sdHP7oTSzVGuJJIj3InVQ=;
- b=FYrlAsVp+6eQ3VBHagRekuP/5sI9znkaGr22C6cXngfu8U3gsUQQik/9O44nvxpWXmpL
- 0vq4h0pnoSmCDLORChK6hwnDp7WrkffYly2UWD+shofdTuq8bKRbhWmshSIEz7LWXY95
- 28cHLyl35k2Va76RLPQ3RgYMnB/BkAbrj5yHZ6iAThP3ImEA+mzFDhKChASxCnsCXlao
- MS75yNPQ3+rHZXw4Cro6FqCiD//zwUFupdft+bHhFRYzXKrOiBNiomaEN1GmzviiYVwD
- 6oOS8wd8NE+8QSRDwGJoFDGiYRRpKUH6Tb9eWpCTqdgKoblGX7rxT3xTKs10qSDv2+ej IQ== 
+ bh=Xh1ip6VDpOoE3GMyZTRGQntByek6xZsT9F3J00FBhWw=;
+ b=DLM8iP7XP3a0iUMAiJBNlRG8bRu4/JedyK3KjkLVRi/vhR3EZEHtb3iwzLpJEUaMnKED
+ c8yaMOhp1cCKqki+z4AilSkbp1tFK6SpTj9gPd6dQE9eIGxbx+iu0vhChUddNVT1L9Cr
+ SBW+0+srzW7nZJwTOvPc+vjlLcieJewR6xtFS3EA5PYSOCjNriLQKN41TDuCPdmpSMfU
+ uuzSJVhLqHDOLG5WDqB/BEpHvdCOelUmkhHaThQ7wJ0M5JtcImQ70MUMZ0VAxtB1RO6k
+ +mjpwjFH3nLwQdQgITPezTRJBcdR6KbaanzoJBHGnnz+rJ/X/gL+/0Cs8MjHxhz+l2+v Gg== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mewq6rn1d-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mewe0s2rk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Dec 2022 17:47:13 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BDHKg7b023344;
-        Tue, 13 Dec 2022 17:47:12 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mewq6rn0j-1
+        Tue, 13 Dec 2022 17:40:19 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BDH13cQ013139;
+        Tue, 13 Dec 2022 17:40:18 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mewe0s2qc-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Dec 2022 17:47:12 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDH4QTp007817;
-        Tue, 13 Dec 2022 17:47:10 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mchcf4j1a-1
+        Tue, 13 Dec 2022 17:40:18 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BD606a9030249;
+        Tue, 13 Dec 2022 17:40:16 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3mchr5vh7d-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 13 Dec 2022 17:47:10 +0000
+        Tue, 13 Dec 2022 17:40:16 +0000
 Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BDHl6Ds46596430
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BDHeC4v5571038
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Dec 2022 17:47:06 GMT
+        Tue, 13 Dec 2022 17:40:12 GMT
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 59F2520040;
-        Tue, 13 Dec 2022 17:47:06 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 846F020043;
+        Tue, 13 Dec 2022 17:40:12 +0000 (GMT)
 Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0706520049;
-        Tue, 13 Dec 2022 17:47:06 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
+        by IMSVA (Postfix) with ESMTP id 0612C20040;
+        Tue, 13 Dec 2022 17:40:11 +0000 (GMT)
+Received: from [9.171.23.219] (unknown [9.171.23.219])
         by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 13 Dec 2022 17:47:05 +0000 (GMT)
-Date:   Tue, 13 Dec 2022 18:32:25 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH v4 2/9] Documentation: KVM: s390: Describe
- KVM_S390_MEMOP_F_CMPXCHG
-Message-ID: <20221213183225.3f49ceb8@p-imbrenda>
-In-Reply-To: <20221213165405.2953539-3-scgl@linux.ibm.com>
-References: <20221213165405.2953539-1-scgl@linux.ibm.com>
-        <20221213165405.2953539-3-scgl@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Tue, 13 Dec 2022 17:40:10 +0000 (GMT)
+Message-ID: <ca338024-4e00-6e45-2eea-ffb034c854a9@linux.ibm.com>
+Date:   Tue, 13 Dec 2022 18:40:10 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v13 4/7] s390x/cpu_topology: CPU topology migration
+Content-Language: en-US
+To:     Christian Borntraeger <borntraeger@de.ibm.com>,
+        qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+References: <20221208094432.9732-1-pmorel@linux.ibm.com>
+ <20221208094432.9732-5-pmorel@linux.ibm.com>
+ <65b704e7-ee3a-c9de-45fa-b59c9731cb54@de.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <65b704e7-ee3a-c9de-45fa-b59c9731cb54@de.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: cHAf5-ZPumGPVVyEgG3Lc3qiPP8oj_94
-X-Proofpoint-ORIG-GUID: ow_0cXBSTlZIltbwAVhI5CLUy75PCki0
+X-Proofpoint-GUID: B3JdRGT2_GgnEW400oIh_7xLQbSeOS16
+X-Proofpoint-ORIG-GUID: 1sLm1x_Oa2XEgO_kI1NmyvogJxOHr6AT
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-13_03,2022-12-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
- mlxlogscore=779 suspectscore=0 mlxscore=0 spamscore=0 priorityscore=1501
- malwarescore=0 clxscore=1015 impostorscore=0 bulkscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ spamscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0 mlxscore=0
+ priorityscore=1501 clxscore=1015 mlxlogscore=999 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2210170000 definitions=main-2212130155
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Dec 2022 17:53:58 +0100
-Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-> Describe the semantics of the new KVM_S390_MEMOP_F_CMPXCHG flag for
-> absolute vm write memops which allows user space to perform (storage key
-> checked) cmpxchg operations on guest memory.
+
+On 12/13/22 14:26, Christian Borntraeger wrote:
+> Am 08.12.22 um 10:44 schrieb Pierre Morel:
+>> The migration can only take place if both source and destination
+>> of the migration both use or both do not use the CPU topology
+>> facility.
+>>
+>> We indicate a change in topology during migration postload for the
+>> case the topology changed between source and destination.
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->  Documentation/virt/kvm/api.rst | 20 ++++++++++++++++++--
->  1 file changed, 18 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index eee9f857a986..98f5a35088b8 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -3753,7 +3753,8 @@ The fields in each entry are defined as follows:
->  :Parameters: struct kvm_s390_mem_op (in)
->  :Returns: = 0 on success,
->            < 0 on generic error (e.g. -EFAULT or -ENOMEM),
-> -          > 0 if an exception occurred while walking the page tables  
-> +          16 bit program exception code if the access causes such an exception
+> I dont get why we need this? If the target QEMU has topology it should
+> already create this according to the configuration. WHy do we need a
+> trigger?
 
-s/$/,/
+We do not.
+The first idea was to migrate the topology with a dedicated object but 
+after today discussion, it will be recreated by the admin on the target 
+and the MTCR will not be migrated but simply set to 1 on target start.
 
-> +          other code > 0xffff with special meaning
+So next spin will not get migration included.
 
-s/$/./
+Regards,
+Pierre
 
-with those two nits fixed:
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
->  
->  Read or write data from/to the VM's memory.
->  The KVM_CAP_S390_MEM_OP_EXTENSION capability specifies what functionality is
-> @@ -3771,6 +3772,8 @@ Parameters are specified via the following structure::
->  		struct {
->  			__u8 ar;	/* the access register number */
->  			__u8 key;	/* access key, ignored if flag unset */
-> +			__u8 pad1[6];	/* ignored */
-> +			__u64 old_addr;	/* ignored if flag unset */
->  		};
->  		__u32 sida_offset; /* offset into the sida */
->  		__u8 reserved[32]; /* ignored */
-> @@ -3853,8 +3856,21 @@ Absolute accesses are permitted for non-protected guests only.
->  Supported flags:
->    * ``KVM_S390_MEMOP_F_CHECK_ONLY``
->    * ``KVM_S390_MEMOP_F_SKEY_PROTECTION``
-> +  * ``KVM_S390_MEMOP_F_CMPXCHG``
-> +
-> +The semantics of the flags common with logical accesses are as for logical
-> +accesses.
-> +
-> +For write accesses, the KVM_S390_MEMOP_F_CMPXCHG flag is supported if
-> +KVM_CAP_S390_MEM_OP_EXTENSION has flag KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG set.
-> +In this case, instead of doing an unconditional write, the access occurs
-> +only if the target location contains the value pointed to by "old_addr".
-> +This is performed as an atomic cmpxchg with the length specified by the "size"
-> +parameter. "size" must be a power of two up to and including 16.
-> +If the exchange did not take place because the target value doesn't match the
-> +old value, KVM_S390_MEMOP_R_NO_XCHG is returned.
-> +In this case the value "old_addr" points to is replaced by the target value.
->  
-> -The semantics of the flags are as for logical accesses.
->  
->  SIDA read/write:
->  ^^^^^^^^^^^^^^^^
-
+-- 
+Pierre Morel
+IBM Lab Boeblingen
