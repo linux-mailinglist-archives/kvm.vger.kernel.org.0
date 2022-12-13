@@ -2,151 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9DE7C64BE2B
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 22:01:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F1F764BE41
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 22:16:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236528AbiLMVBh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 16:01:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55214 "EHLO
+        id S236325AbiLMVQn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 16:16:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236601AbiLMVBd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 16:01:33 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31A8120F6F
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 13:01:31 -0800 (PST)
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDKx41X004250;
-        Tue, 13 Dec 2022 21:01:28 GMT
+        with ESMTP id S236173AbiLMVQl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 16:16:41 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B532229E
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 13:16:39 -0800 (PST)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDL2BWv004143;
+        Tue, 13 Dec 2022 21:16:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
  subject : to : cc : references : from : in-reply-to : content-type :
  content-transfer-encoding : mime-version; s=corp-2022-7-12;
- bh=gbrSn/7EhxupjBTHL0yetoJwcpnr6E0M+nWKZC7gbPk=;
- b=qDcLMhATJjtPgqf7X/N3x+0YsuMOl6LCr7r3WUZEnz9Hs9fNRRebq7v12eRt2O0mnQuI
- BGOd7vVY4Z4oboKKFjKy8X/HqvPfQOi0kGlOa7gUVNQUfaduLrzgGYjOy9WCIQe1B/w5
- y1N62WkkZDpAXEurNyZSqwpD+6BK0Br13iS0Hhajl7Hd8f7/2hOp5/gEvkuI0a1/x8la
- zrWjpPAt0fk8iNNcRpoM6rwzN7r4d4GL/Aq0L/iunG3J6iiveqE/eHSHh2r7+wnjB42g
- Snk/+aLH5gOo85y13U41kYTboYXhlYn2Id+6AidGsNmIzeWn3X2zitDvG94NOiWYc9NP KA== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3meyewr8nd-1
+ bh=Okw6deXzIaI7bRwCT/KlpXjYBdqNDSCwGGWZqrNIUvk=;
+ b=KzImmo9vn7kGaIh1uj6nqKc9VpmrvYlJqsWLd0R1+K2CwjJfJqQ7Gz8yEfYI/PV7S0bg
+ LWwhKTnv9kgd4VEAS0c082bjc1B3MDkgBS3PhqpEtu+6uJPeDNQYYy/VbmAzikOJFmU3
+ WGAKGw6bGaI5yJWBui8R4NVCLrDPiz8cQLgO/+Ii37xG++DT2eeV4IxVrpTbAN7qE4Qz
+ Gy2F29EMcJQlHPKELdgGOUXhZcvIF+FdZJ+OFg8/xRwoBSZav8sNu7k4NOGwe/0TlpzG
+ olxZBw+IJVCqzfOw0BFhS1zCq+PYNFBP7Qa353ySqxX8haIRxZ1bneDq7YW7lc/Jn9ss LQ== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3meyewr957-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Dec 2022 21:01:27 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BDJJ0YZ011751;
-        Tue, 13 Dec 2022 21:01:27 GMT
-Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2175.outbound.protection.outlook.com [104.47.57.175])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3meyenmu3c-1
+        Tue, 13 Dec 2022 21:16:37 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BDJItS7031289;
+        Tue, 13 Dec 2022 21:16:36 GMT
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2168.outbound.protection.outlook.com [104.47.58.168])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3meyenwfcg-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Dec 2022 21:01:27 +0000
+        Tue, 13 Dec 2022 21:16:36 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ltKeGUWIDunqY6LWX1MWpfY/fjhxJP3axhbpgJtku2HSBPGPr8QxaPoFHsu4v2Z9XdKc6ITvZkByD7okSL1PrGUXdiO81bsEVber8YWpqMUCpePAHwBzvbbmKghK0xMj/xmqaPt/KMtQZUgBCi1lKZSw2feNGk1+UayyCX8cG2Y4k+2AwHRCw9Z5gKVF1LixkzL1JHT3qkxzwqliXxpGxxX+XeGlg9QPNpTPj+cnOGktV1fEi03hq4EOLM94V1U2AHgi4GBQpIT0u3mG7e6VnmlBydHAsr0t3YjywgDp/37kNq7ir3yNyCIoFhKW9Pv+7SRcAf2lWnULL0BpG1bJiQ==
+ b=SEQ5R8A8HvA2nJevPaFoAkxniUfyrzOFcgO0prbinCLj2UdDppl9+SxsSF6CbrcO6XFoLR1xTg5SyYMGdvSnG7dbRu+Y8iOG4upIlXttVQm2WGHav+lGYytfhhVUzSJB8O7o7MsZS49AkmONkqRGN5zWWT3d/h9XJ0RUYo+n6Fp4xPR5P7XFsBXFphqm0LUcUkOplR7uTuxxKlIvSiGmGGh3Q2AFxvPA5QA4SxePNQrgcj6mKE49bofeBXFZORJYNz1D1+xTsVJLlbNyOppDZwCI+HBg9s5XvIpBjkLt1Q2biC8rBu15IN8IEBSsSFv7jKtgv8ACdz1rEqU1AxSizw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gbrSn/7EhxupjBTHL0yetoJwcpnr6E0M+nWKZC7gbPk=;
- b=Pzbxf47DWoou9B6nHL10KUUrcFl0eyMXCQqf7XJ9w2wfS4FN/55Zr3Gc8e9uxrddUoJ6zcJBcQ2RcbxoFRHL2RidMoQfyse5Fz+xiZmGqCyoZe4VBk8BsK2iJUhWaVq4v9gihCl/BIXxoAxnOVzn/8ztiHZPvFpC6mhOjCYSTOp9DS5hK7vm+Yrl0RZJqniekaMGwUfEY+VcU0E66QfUWH4NQxqecjntoagotgVsfOq/ysmk+hf9pliWheM68oqrzIR3jR905ajqpbAOIhDF97vWOffugibW4aFmw3yBH7fDRRDB7czS4SlWUeCXjo5KqbOucEU2EZg6oVS08QOm8w==
+ bh=Okw6deXzIaI7bRwCT/KlpXjYBdqNDSCwGGWZqrNIUvk=;
+ b=brmxW963p+0tmhgOTV45w5ePvjBZQUbQiQOBTcBRJHhw5ZAs9Jjz9D979wqymVOewJyz3HLUuZAWPcZxJ51/fevNE6HDlRNw77vDPSvobTg4YrZqQ6H/qZ0UQnNpGfh31cmFkCpIst4BrPIN1wBd5AZcsJ1OX08Yb4NJWowCsowcR0xfdJoBq/Ynk3C36hN4Yl0hfJj2bLl14q2wc8WY1idqY/QMDtNp+HV+CE0Km0sarsGJ8/k0GjC38tusSToyFI/jL1qU630G0U9C+8PobRmWuS9p9RiJzsvcX0qLDSP+YvVqgcxjcVVv0GKDr7G/gNXC2aBntMD5Ja6E4LVlIQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gbrSn/7EhxupjBTHL0yetoJwcpnr6E0M+nWKZC7gbPk=;
- b=S8jMD+nwpnw77LtWax2rWWyxqJ0RhaMIpoq7t5YqKCpg4gMs854Ugr2hupzyNqPX4ffJQj1qoW+e6Txmm3pWCXpRYJpaZho1BuDDzphZMSsXo4JkPy/TmLWMxq3ybITa79/LXK9GG3vci85YqJ7to0HMOXVO9bLeRPQNIu7AQpE=
+ bh=Okw6deXzIaI7bRwCT/KlpXjYBdqNDSCwGGWZqrNIUvk=;
+ b=tMAxbIl7tNQlGXkd315lDv5jfBcHPSTyxr1BNSNPTrK0NPO2ImADEwXmA5uNOCzhdJLTOF92xcMkDohLhDFtdVN9Nlf9KEBRMgAoojdOaC7AVtNPiI9LE9AtEPNjzRQocmItiK3DSE2KmUkfjscV4GuqbxqVT/Akpn6qwqDxuts=
 Received: from SA2PR10MB4684.namprd10.prod.outlook.com (2603:10b6:806:119::14)
- by MN2PR10MB4287.namprd10.prod.outlook.com (2603:10b6:208:1da::16) with
+ by PH7PR10MB6402.namprd10.prod.outlook.com (2603:10b6:510:1ac::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.19; Tue, 13 Dec
- 2022 21:01:25 +0000
+ 2022 21:16:34 +0000
 Received: from SA2PR10MB4684.namprd10.prod.outlook.com
  ([fe80::4056:9f2c:6171:c37e]) by SA2PR10MB4684.namprd10.prod.outlook.com
  ([fe80::4056:9f2c:6171:c37e%4]) with mapi id 15.20.5880.019; Tue, 13 Dec 2022
- 21:01:25 +0000
-Message-ID: <ae08a80a-bac0-fbd2-2e8d-278c8609efe4@oracle.com>
-Date:   Tue, 13 Dec 2022 16:01:21 -0500
+ 21:16:34 +0000
+Message-ID: <7b0fc4e5-8bc5-27dc-10f6-06493abb4ea3@oracle.com>
+Date:   Tue, 13 Dec 2022 16:16:31 -0500
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.1
-Subject: Re: [PATCH V2 2/5] vfio/type1: prevent locked_vm underflow
+Subject: Re: [PATCH V2 1/5] vfio/type1: exclude mdevs from VFIO_UPDATE_VADDR
 Content-Language: en-US
 To:     Alex Williamson <alex.williamson@redhat.com>
 Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
 References: <1670960459-415264-1-git-send-email-steven.sistare@oracle.com>
- <1670960459-415264-3-git-send-email-steven.sistare@oracle.com>
- <20221213132309.3e6903e8.alex.williamson@redhat.com>
+ <1670960459-415264-2-git-send-email-steven.sistare@oracle.com>
+ <20221213132245.10ef6873.alex.williamson@redhat.com>
+ <16a49fb7-e7bd-f794-9e12-9e88fa5d536c@oracle.com>
+ <20221213135907.71f56f8a.alex.williamson@redhat.com>
 From:   Steven Sistare <steven.sistare@oracle.com>
 Organization: Oracle Corporation
-In-Reply-To: <20221213132309.3e6903e8.alex.williamson@redhat.com>
+In-Reply-To: <20221213135907.71f56f8a.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN7PR04CA0049.namprd04.prod.outlook.com
- (2603:10b6:806:120::24) To SA2PR10MB4684.namprd10.prod.outlook.com
+X-ClientProxiedBy: DM6PR02CA0065.namprd02.prod.outlook.com
+ (2603:10b6:5:177::42) To SA2PR10MB4684.namprd10.prod.outlook.com
  (2603:10b6:806:119::14)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PR10MB4684:EE_|MN2PR10MB4287:EE_
-X-MS-Office365-Filtering-Correlation-Id: bebb798e-ad29-41e7-1a24-08dadd4d3154
+X-MS-TrafficTypeDiagnostic: SA2PR10MB4684:EE_|PH7PR10MB6402:EE_
+X-MS-Office365-Filtering-Correlation-Id: dbab8db9-d082-49d5-468b-08dadd4f4fdd
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sEjicjQAcwBzHNrfXBB9Vz5fyhX0JTblPWgy4cVshKgW5wNgy0l1y2iTEmS3mqMM/W4Lw6F9q3nqaWqy7Tnw11251xwNb2wMFfg1HyEdG4lxicBVj5ohM97urnXS3tOiqdxRf08GQcBWBAcJYxCHe4EcUDc4N069DDjaVLTN8eLpfvW/NzCpVBP9Ps6xpiE4SWFlL+HR0FgIC97MWrQ22HwlBt2abOOMez9sjm5Tn7asYD+NgtAGQPWAljmwyGD9KeusqocDbm9ot8m8XWY5xzHfsl0lqWGAopHSI3Lm21cRjxyixwKexSe/KU0jnJb2e64G1YnWPfxg4zK9yKx1tYvz2p5O1mABOpu7WaAU3UmVOrLr2ZEqHP4JLE3MhkkpAPdApfrGKCmfqinXHWPd7DlqbVZbiO9DMKQe8SyMoa1h6WT4WmjV4rW6YFHHk4Xg2NC/R/tJiv0LRI/upbkSaZ1edI2SWdjmjpQSn4mZ2PA5LiqyVhco1nITtDrRsDyzVW6YU+Prp0LiUm0t4DMzg6R7Wnf5Jqdb3UYflleOJc38O85vBVeuy61g/t8m4qJQeZ5xfHrq85pKnw2x9DZv9ba1Rmau8XZUm/qC+wKUjeFvYSXkl6c7WTr8WCCmRMnkI9m7zv/3XTKZhYck20/zM4HTBiZ/QAHgOVh7+mjw8fB4sXpyZQRLmIo0hgK5AQinkvRos++vrKtBFB4k0nXxDGI02H6EUnsgl+wanWJM+Jg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR10MB4684.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(396003)(39860400002)(376002)(366004)(346002)(451199015)(31696002)(41300700001)(38100700002)(86362001)(36916002)(6486002)(6666004)(8936002)(478600001)(4326008)(66946007)(316002)(8676002)(66556008)(6916009)(186003)(2906002)(83380400001)(26005)(6506007)(6512007)(66476007)(53546011)(44832011)(2616005)(5660300002)(31686004)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: qxt+wz0uUCJDa4Vy/uIln28JW6ZFQxCFkkbPXMHOmHr68lI2zxcaiEWYLRy6PoouqyL7ukCUJ0AT8/vv7H9J0eJXicIgqjXvI8yH0Xr3tljIOtWe6soqDuIwTJFiakTwWQSgoT6KpyRWY++iG7PrHwfg/ANlhh5NDZ5VPP1Kmg2p89MfrPZABI5pHAxdFXzuFIGhvauYurfNkotIuw3zIWIKPplicdsJawbfQ0Z9JtAxc49CxfWy747LgvxbN2LuWJe6CxArwXErOMf1+0ykOJUBnE7mwdqSnIkcvlxBNPtFhL03RQFnxiQNfakg3fhpoeLcH5B+GFKpC73dCt3kPcGN/42+7DYSs8M6WbuRlXc5ruatUhnu1XUd6eumQnB79MhzEbOsZp088Lz1HWXSNmrmGL0epKKWEg8g7d8H9lGHukubm4GwG8QCn71fKwmh49ML8xbLv4tubj32dEfUdTT8ZtlEpXx4BuJoWhXaW4QKfb4XaDwLTJstdxFUvPomZ/Rq9BWU5OABg13DgrJqQVsxk/hfI/upkVQwQ4jfU1h76I4ZUP46Gte48HQm3ssVCuC3hlk6JfqxtPdjldnurI+bzxVJafupyt5ERY8XkaNVqSr6LdYX0Rnknma3Ue3wG5hLDiSKeNQZU89WxmK834zWoL3i9UhuGocKVBxHQgkUTKNZrCyCxnm6z3Bv4vTsNYF7rREwhckPN2raczBK3NbK/YnN01zu1arSgt/5H1c=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR10MB4684.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(366004)(346002)(39860400002)(136003)(396003)(451199015)(38100700002)(86362001)(31686004)(8936002)(6486002)(36916002)(478600001)(31696002)(6666004)(4326008)(66476007)(186003)(66946007)(66556008)(8676002)(6916009)(2906002)(83380400001)(6506007)(6512007)(26005)(316002)(53546011)(44832011)(2616005)(41300700001)(5660300002)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VERucEpURXVEVlBZb1hCRldYNldtWVhnNmp1UGNRajNTUG52T3pTWEl4U1VO?=
- =?utf-8?B?eE9yQ1p4NWxhSnFXUnoxV1ZaaFhpWVNJMUN4Q01FSWR6SFp2VmdmQStya1ly?=
- =?utf-8?B?eHFwZDBFSjBjRjJRMzI3V3c4bU0vQTlpZ2lYWkI0WU5vbSs3ZWN5NWJ4R0w4?=
- =?utf-8?B?T0l2Z1NSMFN2TTBxS1RGNzRDa3BqTjFkZkxsU1o2V1h4OTc0cm51SDZ4cjhV?=
- =?utf-8?B?cHgvZEtIZkNxM2d1OU1WajFocytKWXRwM1NkRk0vdVB2Z2w4RVhQeHZwa0hz?=
- =?utf-8?B?NGxTMnZZcDBUTEN3WjloeVJERE53VTR1VCsvV0F1SmJmWVNJaCs0UTI3dytp?=
- =?utf-8?B?ek5jK1BrZWkzdW1lbldUZmhnYU1WdXE5RWxlWk5qTm81VFZXeEdETXpBSUpy?=
- =?utf-8?B?aEtFam13WHFOM05lVUMwaUU4VWFCWm05RkwxQ0YzTnhmYTJxZDNXMDFVTU9t?=
- =?utf-8?B?Q3N6cVI3NVVHUm5iSEZMYzV5dzEvSmlpeWRDN1lwa1Z6M0EvaUxTWHdPOC9Q?=
- =?utf-8?B?ZVlHeHhPb2dRWStZSXJVbEk4MEVBdnQwZDZHdjI0cXJvMTZUdzdUKytrNWll?=
- =?utf-8?B?Yk4rU0tQa3FFczVma0tGOEx2ZFVDTTUxVXN1NDFEVncrSXNqV3V2OFBLK2RC?=
- =?utf-8?B?KzNCZjc3YVY4WDhOa0tkYnpKSE5CSmJqSXpUKzNLelgwY0ZvVGRPckUrNERq?=
- =?utf-8?B?d0d2UVF1QjFub0pIS1JwVHZpdFZSaXZPai9ITUpTQWJpQnhTSytiWExRWGV2?=
- =?utf-8?B?OFNPbjVuQ1I3eWlDbnhBaHRVZnQxMXZ6VTZGdTBjR0tNbG0zdm1IMW5lUHc4?=
- =?utf-8?B?RVBkaS92WjlGZ3FFUE54dmpPaXlvU2YyeFlNa1VqZ0pxN2M5VkFYN3grZXRN?=
- =?utf-8?B?UC9nVUVmclU5L1dvYVh3bG4vUGFGUVNuT3ZraE1EL2NKcnl0RHh3OVZTWm1E?=
- =?utf-8?B?NUtTajhqSzBXSWZjakFjVHVRd3FWNGxJei92akRDK0txVFkwMUZENFJtaDBC?=
- =?utf-8?B?VEJxczB5WWhpemlQc09WK2NzWjJYalFSQXNpa1pnbW0rTjczellRZGxBYlpr?=
- =?utf-8?B?QmhWcTlrQkl3RTBGdWEwRW81TkphYTd6cW9yK0xwazNqTjE4Umd2MEpwa3Jk?=
- =?utf-8?B?TkVXSkZiUGhBUDlsMmhGY2dtVTFnWWpITk9MbE9XaXk2V08rTDk2bWkxZExE?=
- =?utf-8?B?N09Fbm9wM2FMUTY4bmhBY09sQjVNUXRGVFBtazg5OXU4L2xQK2xTUHZOdnQx?=
- =?utf-8?B?NlA3dzlHQWwyOVV1d2greHdVbXJIRmVwaFVNQllONTNnR1pNUE5ub3F0dEZm?=
- =?utf-8?B?Vjdsd3RrdW82MFRKcCtDbnh3QlFHUk5zRjQwTGc2NFlYKzJKMEpaMjM3S0J1?=
- =?utf-8?B?Y0FjNXgxc1k2dmFYd0xST1VpR05BdjcwMDM1M2YxZjc2YWNCeVZHcFRyVTMv?=
- =?utf-8?B?OTB4Y0VpRmRISjhQdWtiL21GSVNXd2U5YWd6azRmTUFkNU0xZDZxTmVtSmNr?=
- =?utf-8?B?RTArY2pQbUxsSnVHZlhPU1ZhWGVsN0VsRnd1WVRQTGpGbm1zRmdJVmFzcWtB?=
- =?utf-8?B?WDZLU1FKcEdjZytQVHhkL3VuZzRMdVFlcU92TS9MTnZPN1M3TzdkYWVIYlN0?=
- =?utf-8?B?cmVWK1RPaU1UdVpCdnRyQlRCa1VKT1FqRVd3NmZWNk9CNnNFN3RRNXNadG1F?=
- =?utf-8?B?N1NaR2cxME5mNzVhT2U5YjZVVzg1emRPQkw5azZrMlh4Z0JvaGk2M0pjeDVJ?=
- =?utf-8?B?czY5ZlB6MS9DU25BWCtlQnkxdGFDTXB4SUpEKzJRQmt3eERzS0NnbjU3Nkp5?=
- =?utf-8?B?SEdueVVqRlJiMXlUcEJSNm1kYWJpTHBZekY1SnorRTNmNDJ1M0xIMURsZkxG?=
- =?utf-8?B?dk9EQ0E4RG0vVFI4eVhWK0w4T1RhRm10LzZMUWt4K0Uvb3hXazRUa3hwOGZI?=
- =?utf-8?B?NHUxZlNxczd1U2tyZDUvNXczOFZ2SWc3aHFwengxc3lxRkw2anBPUDJYdlVZ?=
- =?utf-8?B?MXVMeWcrZyttMnpubEljcmp5M2dlK3VwVURCYjZ3SnNOY0xVeWsyU0FHZ20v?=
- =?utf-8?B?c3V2cFAyRnlxNDBRNVpmRWo0TFBRV0U4S0pTU2NMZG4wZyt6TGFMak5lVThm?=
- =?utf-8?B?dlpMa3RBWmsxeERzN1hyenUxckp2dmF5QVZjQXlYS01EZkcyQ1NrdnhpRUhw?=
- =?utf-8?B?OWc9PQ==?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cXRXZTZLRFp4WVpJdVpNcFdKajQ3eWZaNFZWTjd5emgvTllUY3EzazVneG9W?=
+ =?utf-8?B?MVJyV1hnYytDMnFmMi82NXZYcTN5RzRaNFVhK0FjbFpFZWlpRlNaM1lqcFV1?=
+ =?utf-8?B?TmYzY2d3SWx4OFJzUWlXbE1SV1VMbHRPQ3I1c2psS09hc1d4RFlzVzg1T2oz?=
+ =?utf-8?B?V0Z5OWJiekdmd2x4Rk1GMW1GSE5ad3huY0RWb245KytkOUY1WHR0Y1Z3RVlE?=
+ =?utf-8?B?TWlMOTlldFJNQVhMN05JZnpnVzczd1RjWURpVDA0U28wT2lnYm1pNnBHVzFh?=
+ =?utf-8?B?V1hxaGViWmpEcjRxUnNjNGxud0JJcmpDVkNGc0Z4NWFjWis3ZWo1L01RdDlJ?=
+ =?utf-8?B?MmVISjdKbnowRkViQW4xQXo1SWJnVzAvMW52bVRUckxKbWJHNW01YW1oRTNZ?=
+ =?utf-8?B?ZVBrTHFOTWlMdXB4RnZMSlFhTjhUZ1ZrYjkzaFdac24xb29EQjR3RjFvUU5U?=
+ =?utf-8?B?SmZpQ2hEci9lTXRTbVBRS0RPa0taVTFoVWJ4eUdRL09tc3UrQWZmcG1DNTZv?=
+ =?utf-8?B?TjQ3V1lOWm1BdlpCL0R5eC9tUnVDcmttK2ROR0JNcWdnd0RTVDJXcnUxQ2xz?=
+ =?utf-8?B?dElqVWRqZ0FzWlIwa1YzVk16YldyT2ZYY0VnVExEYmZpRi9CMmIzVHpjdGg1?=
+ =?utf-8?B?NzVGdXFHRVZmaEpRVjRLUnYwMjVDQ1YxS2xCOHNYVC9TZ0p2Z0lHVHlicnhr?=
+ =?utf-8?B?NTdHSXFsdGVkYXVQcnF3MXBFOGNJTmlOV1BrS3Z1bWc0Mkg3Ni9LWmE3dFdK?=
+ =?utf-8?B?OUV6eld2OXoxeEd5L2NvKzhSZnJyaVVIMVdmZGNsVi9mL2dxQ0MvdExTbkJz?=
+ =?utf-8?B?WjVTNnR1VWlZVkJ4QWo5aTMxaUpvTUtzZ0ZJdDVObkpiLzc4TGFqYW80VDB0?=
+ =?utf-8?B?em9KUFZHSEJLSWRkWVh2R0plNXdYNkJqL0JMYWM2NFRPa2lxV2FOZVA4eUh2?=
+ =?utf-8?B?NnZlUzB1azNreDZyVFlSUThYYWswUXE0Z2pZWjFhSC82WHJIa1BOUnNQSWJY?=
+ =?utf-8?B?YVhLdmJVU1U4bFVVSXNoN3kyekdxVjNudUFSVWFlNExKSGlzWnlyb2hSR0pS?=
+ =?utf-8?B?RkxLN0x0cWlyVFJXbGY4N3hQeEZKNC9lSDU0cDVKb0dXY3h5dXV2bjB3K2VZ?=
+ =?utf-8?B?ZjI1SjA4cXBJTFcvaVd6d1lKU0VwWGMzVDhzZXlMSi9uSy8vNEQ4Yk1uTXI1?=
+ =?utf-8?B?WVE5UWdWb2cyL3Y5SFdnN2w4TlJ2NnJNNXRsc0h6YWZPTWtyci91d3g2a0kz?=
+ =?utf-8?B?T0VzU1RELy85WlV3emhtZzB3MXlWOXdlS1NsZVpad2dDcFdyMDhxRkNRWUkr?=
+ =?utf-8?B?OEpJZS9yMlJHQzIzV3B5Y2dnN3NPaW9mck91UjRyT29mVTdtNzZjeEQweTlh?=
+ =?utf-8?B?Nm5YTU9DUGpXSEFrQjUvQzRrS21oRFNYbDFYU0hZOFdJa1FpQnNIWWVvd2NZ?=
+ =?utf-8?B?TG1mSTVHTkFwVFY3dGhQS0RhMlFkMjZJSkJ0NjFzNGF1N0xleEF1U2hXMGpQ?=
+ =?utf-8?B?b0xoMVY5MVREcmw1T2pRK016R0IzdDBPUm5FZlZ1aXNOalBqeUt6dTZjM1py?=
+ =?utf-8?B?bUdQSzd2Rm44Y1BMNk9DeG52bUhnTDRPLzlDTjVaZjJFU2RjK0YxbWJoejhm?=
+ =?utf-8?B?SkpjSkxXV3lQdEJRK3VQaTNhZkw0WldyU3k0SkM5enFpaEVzbUtteWk3eWZx?=
+ =?utf-8?B?UEwrR3d5Slc5bExZZVErUDdlMTFOL0lxMlZ6aTRGNk4vbWI4RnhVYW5hRkRq?=
+ =?utf-8?B?NlZhQzVrS0I4UDNxTzRBS3Byb1M3dWtTbEZ4M1FDUmFwakExeS95YzJpamM2?=
+ =?utf-8?B?eEorYTlsUS9pOW1VZEVtMXFLKzI4ckhUMlhwU0FOVmRlcmt6WFcwQVA0aTZI?=
+ =?utf-8?B?R1NBOXJwSkFsYzg5bjRWMEpWTkdZZ0hQVGVDRGQwQStKVER5cmVCNFFNMGpC?=
+ =?utf-8?B?bWlHUlpNaTlianFOelU5SThERVlzVVgxSjhxcmlycCtrSk1WZkhhZVJzQ3Rq?=
+ =?utf-8?B?eitybk9WR0xzeC9qa0ttMnlVRjNzcVR2d0RLa1FQdGg0amxOKzVnNmszci9M?=
+ =?utf-8?B?TW9OMlc1REFTNUNOK1ZqbDZMN3JqeTJlMmxRZnlmeGYzWTJ4NngwQUNZWkMz?=
+ =?utf-8?B?bjJiUmpDWlh0c1REQllJQzRqWDgzRFZwTTdVbytKS1VBQkl2UmwvYUJjYXJx?=
+ =?utf-8?B?Wmc9PQ==?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bebb798e-ad29-41e7-1a24-08dadd4d3154
+X-MS-Exchange-CrossTenant-Network-Message-Id: dbab8db9-d082-49d5-468b-08dadd4f4fdd
 X-MS-Exchange-CrossTenant-AuthSource: SA2PR10MB4684.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2022 21:01:24.9829
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2022 21:16:33.9496
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n+naKT+u0/UxgOfmcs7+4RNuF1XRijAIV6ZXsn6p77g0EHXudI53Wd+vzsJO7ojepWAtrs/Dd5a45Kfq3Uo79SZ3enySrEha3v/bzBYpr1k=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4287
+X-MS-Exchange-CrossTenant-UserPrincipalName: n86e++Wfn0CnWu/a7C7msDidbus9DjM4rWh9odgQkaMk6Suzf39zs594ubnkOPOKWw9lhospWhqZ1I9YIeeApNpK1nUjykeSnMta6dPzLUM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB6402
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-13_03,2022-12-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0 bulkscore=0
- suspectscore=0 mlxscore=0 mlxlogscore=999 spamscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 mlxscore=0
+ phishscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 suspectscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2212130183
-X-Proofpoint-GUID: 3sOrH4qCzoW_7sNElLPbVNzW33ojnOwo
-X-Proofpoint-ORIG-GUID: 3sOrH4qCzoW_7sNElLPbVNzW33ojnOwo
+ definitions=main-2212130185
+X-Proofpoint-ORIG-GUID: yH8qjnQatltgDhX6JvB3gXJMybNaCqw5
+X-Proofpoint-GUID: yH8qjnQatltgDhX6JvB3gXJMybNaCqw5
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -157,133 +159,197 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/13/2022 3:23 PM, Alex Williamson wrote:
-> On Tue, 13 Dec 2022 11:40:56 -0800
-> Steve Sistare <steven.sistare@oracle.com> wrote:
+On 12/13/2022 3:59 PM, Alex Williamson wrote:
+> On Tue, 13 Dec 2022 15:37:45 -0500
+> Steven Sistare <steven.sistare@oracle.com> wrote:
 > 
->> When a vfio container is preserved across exec using the VFIO_UPDATE_VADDR
->> interfaces, locked_vm of the new mm becomes 0.  If the user later unmaps a
->> dma mapping, locked_vm underflows to a large unsigned value, and a
->> subsequent dma map request fails with ENOMEM in __account_locked_vm.
+>> On 12/13/2022 3:22 PM, Alex Williamson wrote:
+>>> On Tue, 13 Dec 2022 11:40:55 -0800
+>>> Steve Sistare <steven.sistare@oracle.com> wrote:
+>>>   
+>>>> Disable the VFIO_UPDATE_VADDR capability if mediated devices are present.
+>>>> Their kernel threads could be blocked indefinitely by a misbehaving
+>>>> userland while trying to pin/unpin pages while vaddrs are being updated.
+>>>>
+>>>> Do not allow groups to be added to the container while vaddr's are invalid,
+>>>> so we never need to block user threads from pinning, and can delete the
+>>>> vaddr-waiting code in a subsequent patch.
+>>>>  
+>>>
+>>>
+>>> Fixes: c3cbab24db38 ("vfio/type1: implement interfaces to update vaddr")  
 >>
->> To avoid underflow, do not decrement locked_vm during unmap if the
->> dma's mm has changed.  To restore the correct locked_vm count, when
->> VFIO_DMA_MAP_FLAG_VADDR is used and the dma's mm has changed, add
->> the mapping's pinned page count to the new mm->locked_vm, subject
->> to the rlimit.  Now that mediated devices are excluded when using
->> VFIO_UPDATE_VADDR, the amount of pinned memory equals the size of
->> the mapping.
-> 
-> Fixes: c3cbab24db38 ("vfio/type1: implement interfaces to update vaddr")
-> 
-> 
->> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
->> ---
->>  drivers/vfio/vfio_iommu_type1.c | 23 +++++++++++++++++++----
->>  1 file changed, 19 insertions(+), 4 deletions(-)
+>> will do in both patches, slipped through the cracks.
 >>
->> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
->> index 80bdb4d..35a1a52 100644
->> --- a/drivers/vfio/vfio_iommu_type1.c
->> +++ b/drivers/vfio/vfio_iommu_type1.c
->> @@ -100,6 +100,7 @@ struct vfio_dma {
->>  	struct task_struct	*task;
->>  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
->>  	unsigned long		*bitmap;
->> +	struct mm_struct	*mm;
->>  };
->>  
->>  struct vfio_batch {
->> @@ -1165,7 +1166,7 @@ static long vfio_unmap_unpin(struct vfio_iommu *iommu, struct vfio_dma *dma,
->>  					    &iotlb_gather);
->>  	}
->>  
->> -	if (do_accounting) {
->> +	if (do_accounting && current->mm == dma->mm) {
+>>>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+>>>> ---
+>>>>  drivers/vfio/vfio_iommu_type1.c | 31 ++++++++++++++++++++++++++++++-
+>>>>  include/uapi/linux/vfio.h       | 15 +++++++++------
+>>>>  2 files changed, 39 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+>>>> index 23c24fe..80bdb4d 100644
+>>>> --- a/drivers/vfio/vfio_iommu_type1.c
+>>>> +++ b/drivers/vfio/vfio_iommu_type1.c
+>>>> @@ -859,6 +859,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>>>>  	if (!iommu->v2)
+>>>>  		return -EACCES;
+>>>>  
+>>>> +	WARN_ON(iommu->vaddr_invalid_count);
+>>>> +  
+>>>
+>>> I'd expect this to abort and return -errno rather than simply trigger a
+>>> warning.  
+>>
+>> I added the three WARN_ON's at your request, but they should never fire because
+>> we exclude mdevs.  I prefer not to bloat the code with additional checking that
+>> never fires, and I would prefer to just delete WARN_ON, but its your call.
 > 
-> 
-> This seems incompatible with ffed0518d871 ("vfio: remove useless
-> judgement") where we no longer assume that the unmap mm is the same as
-> the mapping mm.
+> Other than convention, what prevents non-mdev code from using this
+> interface?  I agree that making vaddr unmapping and emulated IOMMU
+> devices mutually exclusive *should* be enough, but I have reason to
+> suspect there could be out-of-tree non-mdev drivers using these
+> interfaces.  Thanks,
 
-They are compatible.  My fix allows another task to unmap, but only decreases
-locked_vm if the current mm matches the original mm that locked it.  And the
-"original" mm is updated by MAP_FLAG_VADDR.
-
-> Does this need to get_task_mm(dma->task) and compare that mm to dma->mm
-> to determine whether an exec w/o vaddr remapping has occurred?  That's
-> the only use case I can figure out where grabbing the mm for dma->mm
-> actually makes any sense at all.
-
-The mm grab does detect an exec.  Before exec, at map time, we get task and grab
-its mm.  During exec, task gets a new mm.  The old mm becomes defunct, but we
-still hold it and can examine its pointer address.
-
-The new code does not require that current == dma->task.
-
->>  		vfio_lock_acct(dma, -unlocked, true);
->>  		return 0;
->>  	}
->> @@ -1178,6 +1179,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
->>  	vfio_unmap_unpin(iommu, dma, true);
->>  	vfio_unlink_dma(iommu, dma);
->>  	put_task_struct(dma->task);
->> +	mmdrop(dma->mm);
->>  	vfio_dma_bitmap_free(dma);
->>  	if (dma->vaddr_invalid) {
->>  		iommu->vaddr_invalid_count--;
->> @@ -1623,9 +1625,20 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->>  			   dma->size != size) {
->>  			ret = -EINVAL;
->>  		} else {
->> -			dma->vaddr = vaddr;
->> -			dma->vaddr_invalid = false;
->> -			iommu->vaddr_invalid_count--;
->> +			if (current->mm != dma->mm) {
->> +				ret = vfio_lock_acct(dma, size >> PAGE_SHIFT,
->> +						     0);
->> +				if (!ret) {
->> +					mmdrop(dma->mm);
->> +					dma->mm = current->mm;
->> +					mmgrab(dma->mm);
->> +				}
->> +			}
->> +			if (!ret) {
->> +				dma->vaddr = vaddr;
->> +				dma->vaddr_invalid = false;
->> +				iommu->vaddr_invalid_count--;
->> +			}
-> 
-> Poor flow, shouldn't this be:
-> 
-> 			if (current->mm != dma->mm) {
-> 				ret = vfio_lock_acct(dma,
-> 						     size >> PAGE_SHIFT, 0);
-> 				if (ret)
-> 					goto out_unlock;
-> 
-> 				mmdrop(dma->mm);
-> 				dma->mm = current->mm;
-> 				mmgrab(dma->mm);
-> 			}
-> 			dma->vaddr = vaddr;
-> 			dma->vaddr_invalid = false;
-> 			iommu->vaddr_invalid_count--;
-
-Better, will do, thanks.
+OK, none of the exclusion checks will prevent such calls, even for mdevs.  I will 
+delete the WARN_ON's and return an error code.
 
 - Steve
-
->>  			wake_up_all(&iommu->vaddr_wait);
->>  		}
->>  		goto out_unlock;
->> @@ -1683,6 +1696,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
->>  	get_task_struct(current->group_leader);
->>  	dma->task = current->group_leader;
->>  	dma->lock_cap = capable(CAP_IPC_LOCK);
->> +	dma->mm = dma->task->mm;
->> +	mmgrab(dma->mm);
->>  
->>  	dma->pfn_list = RB_ROOT;
->>  
+  
+>>>>  	mutex_lock(&iommu->lock);
+>>>>  
+>>>>  	/*
+>>>> @@ -976,6 +978,8 @@ static void vfio_iommu_type1_unpin_pages(void *iommu_data,
+>>>>  
+>>>>  	mutex_lock(&iommu->lock);
+>>>>  
+>>>> +	WARN_ON(iommu->vaddr_invalid_count);
+>>>> +  
+>>>
+>>> This should never happen or else I'd suggest this also make an early
+>>> exit.  
+>>
+>> I would like to delete the WARN_ON's entirely.
+>>
+>>>>  	do_accounting = list_empty(&iommu->domain_list);
+>>>>  	for (i = 0; i < npage; i++) {
+>>>>  		dma_addr_t iova = user_iova + PAGE_SIZE * i;
+>>>> @@ -1343,6 +1347,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>>>>  
+>>>>  	mutex_lock(&iommu->lock);
+>>>>  
+>>>> +	/* Cannot update vaddr if mdev is present. */
+>>>> +	if (invalidate_vaddr && !list_empty(&iommu->emulated_iommu_groups))
+>>>> +		goto unlock;  
+>>>
+>>> A different errno here to reflect that the container state is the issue
+>>> might be appropriate here.  
+>>
+>> Will do.
+>>
+>>>> +
+>>>>  	pgshift = __ffs(iommu->pgsize_bitmap);
+>>>>  	pgsize = (size_t)1 << pgshift;
+>>>>  
+>>>> @@ -2189,6 +2197,10 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>>>>  
+>>>>  	mutex_lock(&iommu->lock);
+>>>>  
+>>>> +	/* Attach could require pinning, so disallow while vaddr is invalid. */
+>>>> +	if (iommu->vaddr_invalid_count)
+>>>> +		goto out_unlock;
+>>>> +
+>>>>  	/* Check for duplicates */
+>>>>  	if (vfio_iommu_find_iommu_group(iommu, iommu_group))
+>>>>  		goto out_unlock;
+>>>> @@ -2660,6 +2672,16 @@ static int vfio_domains_have_enforce_cache_coherency(struct vfio_iommu *iommu)
+>>>>  	return ret;
+>>>>  }
+>>>>  
+>>>> +static int vfio_iommu_has_emulated(struct vfio_iommu *iommu)
+>>>> +{
+>>>> +	int ret;
+>>>> +
+>>>> +	mutex_lock(&iommu->lock);
+>>>> +	ret = !list_empty(&iommu->emulated_iommu_groups);
+>>>> +	mutex_unlock(&iommu->lock);
+>>>> +	return ret;
+>>>> +}
+>>>> +
+>>>>  static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+>>>>  					    unsigned long arg)
+>>>>  {
+>>>> @@ -2668,8 +2690,13 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+>>>>  	case VFIO_TYPE1v2_IOMMU:
+>>>>  	case VFIO_TYPE1_NESTING_IOMMU:
+>>>>  	case VFIO_UNMAP_ALL:
+>>>> -	case VFIO_UPDATE_VADDR:
+>>>>  		return 1;
+>>>> +	case VFIO_UPDATE_VADDR:
+>>>> +		/*
+>>>> +		 * Disable this feature if mdevs are present.  They cannot
+>>>> +		 * safely pin/unpin while vaddrs are being updated.
+>>>> +		 */
+>>>> +		return iommu && !vfio_iommu_has_emulated(iommu);
+>>>>  	case VFIO_DMA_CC_IOMMU:
+>>>>  		if (!iommu)
+>>>>  			return 0;
+>>>> @@ -3080,6 +3107,8 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+>>>>  	size_t offset;
+>>>>  	int ret;
+>>>>  
+>>>> +	WARN_ON(iommu->vaddr_invalid_count);
+>>>> +  
+>>>
+>>> Same as pinning, this should trigger -errno.  Thanks,  
+>>
+>> Another one that should never happen.  
+>>
+>> - Steve
+>>
+>>>>  	*copied = 0;
+>>>>  
+>>>>  	ret = vfio_find_dma_valid(iommu, user_iova, 1, &dma);
+>>>> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+>>>> index d7d8e09..4e8d344 100644
+>>>> --- a/include/uapi/linux/vfio.h
+>>>> +++ b/include/uapi/linux/vfio.h
+>>>> @@ -49,7 +49,11 @@
+>>>>  /* Supports VFIO_DMA_UNMAP_FLAG_ALL */
+>>>>  #define VFIO_UNMAP_ALL			9
+>>>>  
+>>>> -/* Supports the vaddr flag for DMA map and unmap */
+>>>> +/*
+>>>> + * Supports the vaddr flag for DMA map and unmap.  Not supported for mediated
+>>>> + * devices, so this capability is subject to change as groups are added or
+>>>> + * removed.
+>>>> + */
+>>>>  #define VFIO_UPDATE_VADDR		10
+>>>>  
+>>>>  /*
+>>>> @@ -1215,8 +1219,7 @@ struct vfio_iommu_type1_info_dma_avail {
+>>>>   * Map process virtual addresses to IO virtual addresses using the
+>>>>   * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
+>>>>   *
+>>>> - * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova, and
+>>>> - * unblock translation of host virtual addresses in the iova range.  The vaddr
+>>>> + * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova. The vaddr
+>>>>   * must have previously been invalidated with VFIO_DMA_UNMAP_FLAG_VADDR.  To
+>>>>   * maintain memory consistency within the user application, the updated vaddr
+>>>>   * must address the same memory object as originally mapped.  Failure to do so
+>>>> @@ -1267,9 +1270,9 @@ struct vfio_bitmap {
+>>>>   * must be 0.  This cannot be combined with the get-dirty-bitmap flag.
+>>>>   *
+>>>>   * If flags & VFIO_DMA_UNMAP_FLAG_VADDR, do not unmap, but invalidate host
+>>>> - * virtual addresses in the iova range.  Tasks that attempt to translate an
+>>>> - * iova's vaddr will block.  DMA to already-mapped pages continues.  This
+>>>> - * cannot be combined with the get-dirty-bitmap flag.
+>>>> + * virtual addresses in the iova range.  DMA to already-mapped pages continues.
+>>>> + * Groups may not be added to the container while any addresses are invalid.
+>>>> + * This cannot be combined with the get-dirty-bitmap flag.
+>>>>   */
+>>>>  struct vfio_iommu_type1_dma_unmap {
+>>>>  	__u32	argsz;  
+>>>   
+>>
 > 
