@@ -2,150 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A9B164ABFE
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 01:10:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA66464AC01
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 01:11:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234022AbiLMAKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 19:10:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35982 "EHLO
+        id S233959AbiLMALZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 19:11:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233986AbiLMAJ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 19:09:58 -0500
-Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120351C128
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:09:55 -0800 (PST)
-Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-3f15a6f72d0so170721927b3.1
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:09:55 -0800 (PST)
+        with ESMTP id S229748AbiLMALW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 19:11:22 -0500
+Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3101010FCC
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:11:21 -0800 (PST)
+Received: by mail-vk1-xa2c.google.com with SMTP id b81so816011vkf.1
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:11:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=h//U1P26Q/GbgdDfd7npnXyzvnrUCmDZBLLM2h5i8dQ=;
-        b=gpXQ7GcWnIWicMxrdl18IrxARO4W9z99cly0rZMtgszw+A6mzBnuepYcZ33NW3QCO/
-         3u/MKIylRh8lpUiOYAGXDP7DYMF2CNiPtEuE6wgFezOdTNKYeotkavtJtX6ETrjiGM6v
-         j5lx9n72HotfhD+7iVDyLjyq/wR1F3v3nTbUS5rObyenVdsZ+A3MmiNmWNkxtBsdSjcc
-         g/2EH9wfqwoesaON/tgf1kjuiCoKXzoRmt3wGYFMg4xfam0r84c7+DuJPMFGn/fmgJen
-         Nq7oXVdFQWyaW06vqhuDIIaRR2F21NgmVtlas14PprYeag2lcQXmkAU4EAjJg+b///ca
-         t7tw==
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FjtGS6gb/sf5LFwlRNXdasPLWdxzzo3qokxnkCoJ1pM=;
+        b=XNjIWhRiM82qJhDoroUi6ddgk60VJBgW0VmnnB37IakfIPkgI72OHb7NOtHhQbwiFy
+         SLTGcu8a4I9fI1pRrQLQ+nyIglBbTyHhYU6W3wktdI+zEw1szr6EYEOiBMD7yGjMtGo7
+         OYJ5XG3JKvW/FsYqhz/hC+KdfabA+Vz8eL/vB34dcn0qZDuAc/EtXXNIH1+vqFt6/Vyp
+         YdAf7xBZxHX6H8AZvSgNFyzaqIUG/xmJhe0BNh1FdD5u3iDYOEoyc9TwgKAUY+JQ+tLI
+         NkO6VVpDsgmZB8MEa/d4e2HZDIJ7z0l8r85N/7j0tfQ70chXmNy7xjoFuEFrS0GpFeZs
+         LfvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=h//U1P26Q/GbgdDfd7npnXyzvnrUCmDZBLLM2h5i8dQ=;
-        b=gD1YUVG692BbDEFb21kUnxUZaqfzIywg6Ib7KwMAYQ26V5/NfMjRwPLZPZU0goSloJ
-         C8IhXLPU93Un6W6DSNUT/XqC9e/VjjRao+awkz6pR6jMD29YwZ97abDa3aJTXmdk3T9k
-         o6vPba5oe2dWQcv4c+vUd6DVGWKF9RTMlE6wj9ttIF8rL+VVo9/RnNMNuaQpkpeBxoxp
-         dG+6kn39A/hms1jTWfGuY/WK2Syza5qFzXwdzv22tQ7WlliIOmsLaw1hYSbqzIaeL0Yb
-         a3UUiWMnkS6c8DWC/xOo972Sa813n7noVh5b2WDOdKhVEDymsVI1XeAKLFuyBdCL9ggT
-         jFKQ==
-X-Gm-Message-State: ANoB5pmF0mTk/OJC/PUOKC1enjSnigD1m9HjSNhCw9FqBwaFA+pRjygx
-        VJVkAmBYfNnrKNDikctDIy099ykeda/BOZ0w29rkrg==
-X-Google-Smtp-Source: AA0mqf5l9HXAT+IUtuN+jKG3RgoTLQT/3d9spzn1Vu1DQb5YEA7Tgxew/pbK5Lo2xb5A0ptbPlfv7Kw+AdG08s0G+Ss=
-X-Received: by 2002:a81:8453:0:b0:3e3:87ec:f862 with SMTP id
- u80-20020a818453000000b003e387ecf862mr25312745ywf.15.1670890194208; Mon, 12
- Dec 2022 16:09:54 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FjtGS6gb/sf5LFwlRNXdasPLWdxzzo3qokxnkCoJ1pM=;
+        b=6g2IXeCrODswW8Ps67MUTRTfzLugCj2qii2MHhRcCSdjyjwBSOFfy5ABJzagOGeBnb
+         0YcuhgsMSAQv4Kbi4fEdEhF+86POy0bMj6c9v7EArF/q4YWFha5cqXGMRq5Wvg4YsQtw
+         VKKf3wvFkBqLG4+4haQeZnz25QXKcFQ7318CVPd4+kNIbko12mBQGOr/0TsZGKCG6AEG
+         QwcLYBkK4uIiqCLsaks0EwiOwVbgk8l1mm0ZKBZ9Jlwif5KtLI4CdxeTBHYgodzqYuc/
+         bOq9sarbuXseqHTLEfPQxizwh+WSzNvvGHa2R5hYa0oyNyXmF9Tv0w3dCjcdNeSdzHYT
+         Vs/A==
+X-Gm-Message-State: ANoB5plaCWT3YVb8tknBjsCJOg2uF7KOFP9haR5FbSkuI12725FYaSEn
+        F7zBtz7P7fhkKogKo5PwO7vzoGqIPLHCo07M
+X-Google-Smtp-Source: AA0mqf48U7VK9LJnzncrZ/VbUalMBsr3njYQQGIgoM9SC2myHcKgIV6hkYAUvAxLA2oUQ9zfU9W35A==
+X-Received: by 2002:a05:6122:793:b0:3be:1989:a84 with SMTP id k19-20020a056122079300b003be19890a84mr7009497vkr.7.1670890280287;
+        Mon, 12 Dec 2022 16:11:20 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-50-193.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.50.193])
+        by smtp.gmail.com with ESMTPSA id bl14-20020a05620a1a8e00b006faa2c0100bsm6809965qkb.110.2022.12.12.16.11.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 16:11:19 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1p4stD-009HUb-5S;
+        Mon, 12 Dec 2022 20:11:19 -0400
+Date:   Mon, 12 Dec 2022 20:11:19 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Steven Sistare <steven.sistare@oracle.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] vfio/type1: Cleanup remaining vaddr removal/update
+ fragments
+Message-ID: <Y5fDJ6KkkAYj7tCQ@ziepe.ca>
+References: <20221209140120.667cb658.alex.williamson@redhat.com>
+ <6914b4eb-cd82-0c3e-6637-c7922092ef11@oracle.com>
+ <Y5cqAk1/6ayzmTjg@ziepe.ca>
+ <20221212085823.5d760656.alex.williamson@redhat.com>
+ <8f29aad0-7378-ef7a-9ac5-f98b3054d5eb@oracle.com>
+ <20221212142651.263dd6ae.alex.williamson@redhat.com>
+ <Y5e0icoO89Qnlc/z@ziepe.ca>
+ <20221212162948.4c7a4586.alex.williamson@redhat.com>
+ <Y5e6zB3tW2D/ULlQ@ziepe.ca>
+ <20221212170424.204bdb9a.alex.williamson@redhat.com>
 MIME-Version: 1.0
-References: <20221129191237.31447-1-mizhang@google.com> <Y5Oob6mSJKGoDBnt@google.com>
- <Y5avm5VXpRt263wQ@google.com> <Y5dax8XJV0F5adUw@google.com>
-In-Reply-To: <Y5dax8XJV0F5adUw@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Mon, 12 Dec 2022 16:09:28 -0800
-Message-ID: <CALzav=f2k9dPYkeW2D0ZvkDuDhA8Wmu+zV8W4isMFfd-HAQjrA@mail.gmail.com>
-Subject: Re: [RFC PATCH v4 0/2] Deprecate BUG() in pte_list_remove() in shadow mmu
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Mingwei Zhang <mizhang@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Nagareddy Reddy <nspreddy@google.com>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221212170424.204bdb9a.alex.williamson@redhat.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 12, 2022 at 8:46 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Dec 12, 2022, Mingwei Zhang wrote:
-> > On Fri, Dec 09, 2022, David Matlack wrote:
-> > > On Tue, Nov 29, 2022 at 07:12:35PM +0000, Mingwei Zhang wrote:
-> > > > Deprecate BUG() in pte_list_remove() in shadow mmu to avoid crashing a
-> > > > physical machine. There are several reasons and motivations to do so:
-> > > >
-> > > > MMU bug is difficult to discover due to various racing conditions and
-> > > > corner cases and thus it extremely hard to debug. The situation gets much
-> > > > worse when it triggers the shutdown of a host. Host machine crash might
-> > > > eliminates everything including the potential clues for debugging.
-> > > >
-> > > > From cloud computing service perspective, BUG() or BUG_ON() is probably no
-> > > > longer appropriate as the host reliability is top priority. Crashing the
-> > > > physical machine is almost never a good option as it eliminates innocent
-> > > > VMs and cause service outage in a larger scope. Even worse, if attacker can
-> > > > reliably triggers this code by diverting the control flow or corrupting the
-> > > > memory, then this becomes vm-of-death attack. This is a huge attack vector
-> > > > to cloud providers, as the death of one single host machine is not the end
-> > > > of the story. Without manual interferences, a failed cloud job may be
-> > > > dispatched to other hosts and continue host crashes until all of them are
-> > > > dead.
-> > >
-> > > My only concern with using KVM_BUG() is whether the machine can keep
-> > > running correctly after this warning has been hit. In other words, are
-> > > we sure the damage is contained to just this VM?
->
-> Hmm, good point.  The counter-argument is that KVM doesn't BUG() in get_mmio_spte()
-> when a non-MMIO SPTE has reserved bits set, and as we've seen internally in multiple
-> splats where the reserved bits appear to be set by stack overflow, that has a much,
-> much higher probability of being a symptom of data corruption.
->
-> That said, that's more of a reason to change get_mmio_spte() than it is to ignore
-> potential data corruption in this case.  KVM arguably should kill the VM if
-> get_mmio_spte() fails too.
->
-> What about explicitly treating both get_mmio_spte() and this as potential data
-> corruption?  E.g. something like this, and then use the DATA_CORRUPTION variant
-> in pte_list_remove()?
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 2055e04b8f89..1cb69c6d186b 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4075,6 +4075,7 @@ static bool get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
->                         pr_err("------ spte = 0x%llx level = %d, rsvd bits = 0x%llx",
->                                sptes[level], level,
->                                get_rsvd_bits(rsvd_check, sptes[level], level));
-> +               KVM_BUG_ON_DATA_CORRUPTION(reserved, vcpu->kvm);
->         }
->
->         return reserved;
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index f16c4689322b..5c4a06f66f46 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -863,6 +863,17 @@ static inline void kvm_vm_bugged(struct kvm *kvm)
->         unlikely(__ret);                                        \
->  })
->
-> +#define KVM_BUG_ON_DATA_CORRUPTION(cond, kvm)                  \
-> +({                                                             \
-> +       int __ret = (cond);                                     \
-> +                                                               \
-> +       if (IS_ENABLED(CONFIG_BUG_ON_DATA_CORRUPTION))          \
-> +               BUG_ON(__ret);                                  \
-> +       else if (WARN_ON_ONCE(__ret && !(kvm)->vm_bugged))      \
-> +               kvm_vm_bugged(kvm);                             \
-> +       unlikely(__ret);                                        \
-> +})
-> +
->  static inline void kvm_vcpu_srcu_read_lock(struct kvm_vcpu *vcpu)
->  {
->  #ifdef CONFIG_PROVE_RCU
+On Mon, Dec 12, 2022 at 05:04:24PM -0700, Alex Williamson wrote:
+> > > The decision to revert was based on the current interface being buggy,
+> > > abandoned, and re-implemented.  It doesn't seem that there's much future
+> > > for the current interface, but Steve has stepped up to restrict the
+> > > current implementation to non-mdev devices, which resolves your concern
+> > > regarding unlimited user blocking of kernel threads afaict, and we'll
+> > > see what he does with locked memory.    
+> > 
+> > Except nobody has seen this yet, and it can't go into 6.2 at this
+> > point (see Linus's rather harsh remarks on late work for v6.2)
+> 
+> We already outlined earlier in this thread the criteria that prompted
+> us to tag the revert for stable, which was Steve's primary objection in
+> the short term.
 
-That sounds reasonable to me.
+I still don't understand this, everyone running a distro deals with
+the stuff. Even if you do blindly pull from a -stable branch instead
+of cherry picking you only have to do the revert-revert once. Git is
+good at this stuff.
+
+Plus I have a doubt after all the backporting required to get vfio to
+the required state that -stable patches are even going to work
+anyhow..
+
+> I can't in good faith push forward with a revert, including stable,
+> if Steve is working on a proposal to resolve the issues prompting us
+> to accelerate the code removal.  Depending on the scope of Steve's
+> proposal, I think we might be able to still consider this a fix for
+> v6.2.  Thanks,
+
+Well, IMHO, you are better to send it for v6.2-rc1 than try to squeeze
+it into this merge window and risk Linus's wrath
+
+Jason
