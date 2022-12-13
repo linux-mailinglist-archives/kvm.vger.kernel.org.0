@@ -2,89 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 53E5C64B4BB
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 13:04:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C6FC64B4D7
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 13:09:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235473AbiLMMEg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 07:04:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54992 "EHLO
+        id S235544AbiLMMJr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 07:09:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235104AbiLMMEd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 07:04:33 -0500
+        with ESMTP id S234855AbiLMMJk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 07:09:40 -0500
 Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 116915FF7;
-        Tue, 13 Dec 2022 04:04:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8304014D2B
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 04:09:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1670933071; x=1702469071;
+  t=1670933379; x=1702469379;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=Mmu9iz+w3ikTp4SbfrscqkeC55Id70T9EZSgNrTlufI=;
-  b=e967PJunPwWLSe4kiRQX43P+//IFrMIQ64q/15C+g0aLGJzx/UbPpVuM
-   NY9urI1m4MPM+buI+QuGwhlJj2EBnsAd6sFSirrwPVgQJZteBfp0ddnBM
-   rrpboGVQytpHpG5fNvUnz7O7Y/PPokyQFHhpY34nC+bJgAO8NiiYlKG1M
-   hgJZ5lJZ3+d/ieM+X9eanV+9Hr5s/htldCtZVsdv3hfUFwGoF8dD8YVwz
-   w17jzbgLU/MqpJOIKp1FlCWoNDAYzFVNSGr0GfqZmU3fVo3u2t5th9jYf
-   Uq7Z1SvjGBjQuziaJLHbol8UxDaFpMsLAesJMNu7VTGJS8IyzxeLEjDT8
+  bh=Dyv1R/6BTE9iFQ4ldpV49Tph9Ev3OBjeZLlpinLC6Yg=;
+  b=Pk/K3xNU8LUCTOM/c+6wxxXblAozKyi4Zl/vETZTPBH3VDroXiDsAOqg
+   C7nwka72hJR77RmlBpJgBRnQb9SKstZuBRgMbMr2v1KGQk9/9B7jOtg5N
+   ihgyDy+aQzTtthYiIL8zmODuw2cnZNcrPovvHVb/GhTG1GklL0GmKt4A5
+   AeMMGAS91pHh/k2lLVPfX8cyNrsNgV0NMQ5G/w/uU11s++hvfMs9UZtsk
+   QFtCutxWVKlX8AkDGUJh+pfahCTdaekCLOFwEOxuougn1sohWoa7tnGB4
+   XI6V3OweSKS99I79rA4E/mR59JeXRm2ggXRcMW6voq2vh94/0kGv5/uCE
    w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10559"; a="315751828"
+X-IronPort-AV: E=McAfee;i="6500,9779,10559"; a="315752882"
 X-IronPort-AV: E=Sophos;i="5.96,241,1665471600"; 
-   d="scan'208";a="315751828"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2022 04:04:30 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10559"; a="598800801"
+   d="scan'208";a="315752882"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2022 04:09:39 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10559"; a="648537021"
 X-IronPort-AV: E=Sophos;i="5.96,241,1665471600"; 
-   d="scan'208";a="598800801"
+   d="scan'208";a="648537021"
 Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.255.31.20]) ([10.255.31.20])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2022 04:04:17 -0800
-Message-ID: <4d736cc0-f249-6531-c0af-7093c2c2537f@intel.com>
-Date:   Tue, 13 Dec 2022 20:04:14 +0800
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Dec 2022 04:09:35 -0800
+Message-ID: <cc6304b1-fe60-565c-f561-541ec1c8b479@intel.com>
+Date:   Tue, 13 Dec 2022 20:09:33 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Firefox/102.0 Thunderbird/102.5.1
-Subject: Re: [PATCH v10 3/9] KVM: Extend the memslot to support fd-based
- private memory
+Subject: Re: [PATCH v3 4/8] target/i386/intel-pt: print special message for
+ INTEL_PT_ADDR_RANGES_NUM
 Content-Language: en-US
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+To:     Chenyi Qiang <chenyi.qiang@intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
- <cd950a78-5c5b-16ef-d0a6-ad2878af067e@intel.com>
- <20221208113003.GE1304936@chaop.bj.intel.com>
+        Marcelo Tosatti <mtosatti@redhat.com>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20221208062513.2589476-1-xiaoyao.li@intel.com>
+ <20221208062513.2589476-5-xiaoyao.li@intel.com>
+ <c920ff81-0231-b70f-5ede-b1085c583086@intel.com>
 From:   Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20221208113003.GE1304936@chaop.bj.intel.com>
+In-Reply-To: <c920ff81-0231-b70f-5ede-b1085c583086@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -97,29 +66,49 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/8/2022 7:30 PM, Chao Peng wrote:
-> On Thu, Dec 08, 2022 at 04:37:03PM +0800, Xiaoyao Li wrote:
->> On 12/2/2022 2:13 PM, Chao Peng wrote:
->>
->> ..
->>
->>> Together with the change, a new config HAVE_KVM_RESTRICTED_MEM is added
->>> and right now it is selected on X86_64 only.
->>>
->>
->>  From the patch implementation, I have no idea why HAVE_KVM_RESTRICTED_MEM is
->> needed.
+On 12/9/2022 2:43 PM, Chenyi Qiang wrote:
 > 
-> The reason is we want KVM further controls the feature enabling. An
-> opt-in CONFIG_RESTRICTEDMEM can cause problem if user sets that for
-> unsupported architectures.
-
-HAVE_KVM_RESTRICTED_MEM is not used in this patch. It's better to 
-introduce it in the patch that actually uses it.
-
-> Here is the original discussion:
-> https://lore.kernel.org/all/YkJLFu98hZOvTSrL@google.com/
 > 
-> Thanks,
-> Chao
+> On 12/8/2022 2:25 PM, Xiaoyao Li wrote:
+>> Bit[2:0] of CPUID.14H_01H:EAX stands as a whole for the number of INTEL
+>> PT ADDR RANGES. For unsupported value that exceeds what KVM reports,
+>> report it as a whole in mark_unavailable_features() as well.
+>>
+> 
+> Maybe this patch can be put before 3/8.
+
+patch 3 introduces the logic to check bit 2:0 of CPUID leaf 14_1 as 
+whole. So it's better to be after patch 3.
+
++            /* Bits 2:0 are as a whole to represent INTEL_PT_ADDR_RANGES */
++            if ((requested_features & INTEL_PT_ADDR_RANGES_NUM_MASK) >
++                (host_feat & INTEL_PT_ADDR_RANGES_NUM_MASK)) {
++                unavailable_features |= requested_features &
++                                        INTEL_PT_ADDR_RANGES_NUM_MASK;
+
+>> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
+>> ---
+>>   target/i386/cpu.c | 9 ++++++++-
+>>   1 file changed, 8 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+>> index 65c6f8ae771a..4d7beccc0af7 100644
+>> --- a/target/i386/cpu.c
+>> +++ b/target/i386/cpu.c
+>> @@ -4387,7 +4387,14 @@ static void mark_unavailable_features(X86CPU *cpu, FeatureWord w, uint64_t mask,
+>>           return;
+>>       }
+>>   
+>> -    for (i = 0; i < 64; ++i) {
+>> +    if ((w == FEAT_14_1_EAX) && (mask & INTEL_PT_ADDR_RANGES_NUM_MASK)) {
+>> +        warn_report("%s: CPUID.14H_01H:EAX [bit 2:0]", verbose_prefix);
+>> +        i = 3;
+>> +    } else {
+>> +        i = 0;
+>> +    }
+>> +
+>> +    for (; i < 64; ++i) {
+>>           if ((1ULL << i) & mask) {
+>>               g_autofree char *feat_word_str = feature_word_description(f, i);
+>>               warn_report("%s: %s%s%s [bit %d]",
 
