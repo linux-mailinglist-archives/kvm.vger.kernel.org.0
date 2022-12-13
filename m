@@ -2,149 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31D5F64B9A5
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 17:27:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C74664B9F3
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 17:40:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235657AbiLMQ1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 11:27:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37390 "EHLO
+        id S236118AbiLMQkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 11:40:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235303AbiLMQ1c (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 11:27:32 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D09B236
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:26:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670948809;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jwsK9UOCWwUcP7koLbB3FVoDbhA7pYtpF1ZVddB4pb8=;
-        b=VdSTmS8Lknj7RhL2CTTsIkH6TrFzfIQ3sQo2tTXgUeIe19xC7Q+1yoeJHz/vOiAuuPdonn
-        ZgxxhVBUYvczv2QwDnw4hMfSVCuGqWfuCI6DLVdNMU0xdgU3/EVABqj9ZDomI4TnVRaWQI
-        iYHFIPS4EB2fh5DCl9ZcMNzHem7aiDw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-639-4tVII9tjNTOb8ZJ4UR2GVQ-1; Tue, 13 Dec 2022 11:26:48 -0500
-X-MC-Unique: 4tVII9tjNTOb8ZJ4UR2GVQ-1
-Received: by mail-wm1-f69.google.com with SMTP id bg25-20020a05600c3c9900b003cf3ed7e27bso5057173wmb.4
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:26:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jwsK9UOCWwUcP7koLbB3FVoDbhA7pYtpF1ZVddB4pb8=;
-        b=0RoGKa4teMWGp3RTv3kKDmHX2CbkQOupdSkUGrmY4r+RT7pcEeacDvKG4gJ0bIUEYQ
-         KzkVRe91G+kDcJr00EoMmTK/eSPAjy5vwtZ2nfos7rjW41Lcru5WokgnyHfNjVFnaHjV
-         0+UIyhViM3E7yT/LaO0oh5Nblr2Cp9a3csL9Q0P1y2Snz62+T9S6q1XS2FWDp2DcOh3/
-         XZ/6SX6cVJsusV5ZayANg/sW4r6k/mzM8idzUA3yhXNRSXZ6234rlqCUIaj1v7xbYu0S
-         cIFP7baB6I+hw7Hu3eZvlypLD5DZUlphw1VKHFeR+cmouS4KAnX5aQdejV5MORMCDxfT
-         aH0Q==
-X-Gm-Message-State: ANoB5pnGULmZBkvTBVmrAvKvMGUtT6u/i52+KC4jzsKBt1UqeOpSuGxO
-        XWlwXSTtiDCWlzKlHEKVhOfHTE7BOKrFyuAQfZa+F3SrwmiM7IDpXY40VqTvOQpDFwzOhjSAtL7
-        uIli6h5Dk4o7Z
-X-Received: by 2002:a1c:541c:0:b0:3d1:e1f4:21d1 with SMTP id i28-20020a1c541c000000b003d1e1f421d1mr19911880wmb.26.1670948807245;
-        Tue, 13 Dec 2022 08:26:47 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4rxr0nzytbDv/0CYFxAJvV2YnMacE1MJ9TUkIoHHD5hervWTa4KGxn0w9I/0NAKiTpVYbqbA==
-X-Received: by 2002:a1c:541c:0:b0:3d1:e1f4:21d1 with SMTP id i28-20020a1c541c000000b003d1e1f421d1mr19911861wmb.26.1670948807064;
-        Tue, 13 Dec 2022 08:26:47 -0800 (PST)
-Received: from [192.168.0.5] (ip-109-43-178-131.web.vodafone.de. [109.43.178.131])
-        by smtp.gmail.com with ESMTPSA id q3-20020a1c4303000000b003cfa81e2eb4sm13067262wma.38.2022.12.13.08.26.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Dec 2022 08:26:46 -0800 (PST)
-Message-ID: <1e75008f-7a3a-3646-a8cc-53fe443687f3@redhat.com>
-Date:   Tue, 13 Dec 2022 17:26:45 +0100
+        with ESMTP id S234710AbiLMQkl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 11:40:41 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AEABBAB
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:40:40 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDGJRKB039473;
+        Tue, 13 Dec 2022 16:40:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1PoXFVvKmVqFqqxRyvTqqyyBymr37klRNOqJHjEXgGo=;
+ b=DkzgSaQDsYiw/GNDmcSv+o2DEaMPoYuNUvLbFSDuVfkkHnLXauBF1Lte0xXlZrbWXyky
+ iLtqndoWzrHIfVOSUr1qAGQO6HBXk9Xr7/DTt23SMTUcZ/zcdRpHRcyJJqSpp8ZiFaqg
+ jqLI0nH+baH2ItZRPx9rfQrFp7AhzN9kbWCS8z1O+EVNZ+nO/mf3Bd6Wp1eHOvlfclxb
+ jGBH5DtB5gL/ee+BXUFbmXxyhrS8N419GqICa5EzQ/RZUXmnm2XmHINyuGCVEWucKXEV
+ KeD19J+IFZVsxeQndnepr0f9oZjpKnASKPVZkjN0Y8Ipw4chxE7wGgnstf14zRVZ2/D4 8A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mevtk8q2p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 16:40:25 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BDGK5VC002219;
+        Tue, 13 Dec 2022 16:40:24 GMT
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mevtk8q1y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 16:40:24 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.17.1.19/8.16.1.2) with ESMTP id 2BDF0FHj019467;
+        Tue, 13 Dec 2022 16:40:23 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
+        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3mchr6sneh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 16:40:23 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BDGeLXt5440214
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Dec 2022 16:40:22 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CCF8358052;
+        Tue, 13 Dec 2022 16:40:21 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 837265804E;
+        Tue, 13 Dec 2022 16:40:16 +0000 (GMT)
+Received: from [9.43.109.223] (unknown [9.43.109.223])
+        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 13 Dec 2022 16:40:16 +0000 (GMT)
+Message-ID: <a49294f9-bdae-bf55-71f0-8de80d23010d@linux.ibm.com>
+Date:   Tue, 13 Dec 2022 22:10:14 +0530
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests PATCH v3 0/4] lib: add function to request
- migration
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH-for-8.0 4/4] hw/ppc/spapr_ovec: Avoid target_ulong
+ spapr_ovec_parse_vector()
 Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, pbonzini@redhat.com,
-        andrew.jones@linux.dev, lvivier@redhat.com
-References: <20221212111731.292942-1-nrb@linux.ibm.com>
- <20221213163630.1d9233b9@p-imbrenda>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20221213163630.1d9233b9@p-imbrenda>
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        Greg Kurz <groug@kaod.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Michael Neuling <mikey@neuling.org>
+References: <20221213123550.39302-1-philmd@linaro.org>
+ <20221213123550.39302-5-philmd@linaro.org>
+From:   Harsh Prateek Bora <harshpb@linux.ibm.com>
+In-Reply-To: <20221213123550.39302-5-philmd@linaro.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: HnCDKmRv4FMx7JMGUhEODaWWPqk8Z3lO
+X-Proofpoint-GUID: tnG3eKKuifj_FEC3bm0-meeTJyjX_kGG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-13_03,2022-12-13_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
+ bulkscore=0 clxscore=1011 impostorscore=0 phishscore=0 lowpriorityscore=0
+ priorityscore=1501 adultscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
+ definitions=main-2212130147
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/12/2022 16.36, Claudio Imbrenda wrote:
-> 
-> Paolo and/or Thomas: if you do not have objections, could you pick this
-> series?
-> 
-> every affected architecture has been reviewed :)
-
-Done.
-
-  Thanks,
-   Thomas
 
 
+On 12/13/22 18:05, Philippe Mathieu-Daudé wrote:
+> spapr_ovec.c is a device, but it uses target_ulong which is
+> target specific. The hwaddr type (declared in "exec/hwaddr.h")
+> better fits hardware addresses.
 > 
-> On Mon, 12 Dec 2022 12:17:27 +0100
-> Nico Boehr <nrb@linux.ibm.com> wrote:
+> Change spapr_ovec_parse_vector() to take a hwaddr argument,
+> allowing the removal of "cpu.h" in a device header.
 > 
->> v2->v3:
->> ---
->> * s390x: remove unneeded parenthesis (thanks Claudio)
->>
->> v1->v2:
->> ---
->> * arm: commit message gib->gic (thanks Andrew)
->> * arm: remove unneeded {} (thanks Andrew)
->> * s390x: make patch less intrusive (thanks Claudio)
->>
->> With this series, I pick up a suggestion Claudio has brought up in my
->> CMM-migration series[1].
->>
->> Migration tests can ask migrate_cmd to migrate them to a new QEMU
->> process. Requesting migration and waiting for completion is hence a
->> common pattern which is repeated all over the code base. Add a function
->> which does all of that to avoid repetition.
->>
->> Since migrate_cmd currently can only migrate exactly once, this function
->> is called migrate_once() and is a no-op when it has been called before.
->> This can simplify the control flow, especially when tests are skipped.
->>
->> [1] https://lore.kernel.org/kvm/20221125154646.5974cb52@p-imbrenda/
->>
->> Nico Boehr (4):
->>    lib: add function to request migration
->>    powerpc: use migrate_once() in migration tests
->>    s390x: use migrate_once() in migration tests
->>    arm: use migrate_once() in migration tests
->>
->>   arm/Makefile.common     |  1 +
->>   powerpc/Makefile.common |  1 +
->>   s390x/Makefile          |  1 +
->>   lib/migrate.h           |  9 ++++++++
->>   lib/migrate.c           | 34 ++++++++++++++++++++++++++++
->>   arm/debug.c             | 17 +++++---------
->>   arm/gic.c               | 49 ++++++++++++-----------------------------
->>   powerpc/sprs.c          |  4 ++--
->>   s390x/migration-cmm.c   | 24 ++++++--------------
->>   s390x/migration-sck.c   |  4 ++--
->>   s390x/migration-skey.c  | 20 ++++++-----------
->>   s390x/migration.c       |  7 ++----
->>   12 files changed, 85 insertions(+), 86 deletions(-)
->>   create mode 100644 lib/migrate.h
->>   create mode 100644 lib/migrate.c
->>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
+>   hw/ppc/spapr_ovec.c         | 3 ++-
+>   include/hw/ppc/spapr_ovec.h | 4 ++--
+>   2 files changed, 4 insertions(+), 3 deletions(-)
 > 
+> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
+> index b2567caa5c..a18a751b57 100644
+> --- a/hw/ppc/spapr_ovec.c
+> +++ b/hw/ppc/spapr_ovec.c
+> @@ -19,6 +19,7 @@
+>   #include "qemu/error-report.h"
+>   #include "trace.h"
+>   #include <libfdt.h>
+> +#include "cpu.h"
+>   
+>   #define OV_MAXBYTES 256 /* not including length byte */
+>   #define OV_MAXBITS (OV_MAXBYTES * BITS_PER_BYTE)
+> @@ -176,7 +177,7 @@ static target_ulong vector_addr(target_ulong table_addr, int vector)
+>       return table_addr;
+>   }
+>   
+> -SpaprOptionVector *spapr_ovec_parse_vector(target_ulong table_addr, int vector)
+> +SpaprOptionVector *spapr_ovec_parse_vector(hwaddr table_addr, int vector)
 
+IIUC, Option vectors represents a data structure of vectors to advertise 
+guest capabilities to the platform (ref b20b7b7adda4) and doesn't really 
+represent a hardware device by itself. IMHO, target_ulong appears to be 
+more appropriate for this purpose. However, the header file inclusion 
+could be changed to cpu-defs.h if target_ulong is the only requirement here.
+
+regards,
+Harsh
+>   {
+>       SpaprOptionVector *ov;
+>       target_ulong addr;
+> diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
+> index c3e8b98e7e..d756b916e4 100644
+> --- a/include/hw/ppc/spapr_ovec.h
+> +++ b/include/hw/ppc/spapr_ovec.h
+> @@ -37,7 +37,7 @@
+>   #ifndef SPAPR_OVEC_H
+>   #define SPAPR_OVEC_H
+>   
+> -#include "cpu.h"
+> +#include "exec/hwaddr.h"
+>   
+>   typedef struct SpaprOptionVector SpaprOptionVector;
+>   
+> @@ -73,7 +73,7 @@ void spapr_ovec_set(SpaprOptionVector *ov, long bitnr);
+>   void spapr_ovec_clear(SpaprOptionVector *ov, long bitnr);
+>   bool spapr_ovec_test(SpaprOptionVector *ov, long bitnr);
+>   bool spapr_ovec_empty(SpaprOptionVector *ov);
+> -SpaprOptionVector *spapr_ovec_parse_vector(target_ulong table_addr, int vector);
+> +SpaprOptionVector *spapr_ovec_parse_vector(hwaddr table_addr, int vector);
+>   int spapr_dt_ovec(void *fdt, int fdt_offset,
+>                     SpaprOptionVector *ov, const char *name);
+>   
