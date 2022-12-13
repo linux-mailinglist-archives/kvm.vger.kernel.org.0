@@ -2,218 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC0BE64BB22
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 18:32:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5F25664BB53
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 18:47:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236147AbiLMRca (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 12:32:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50258 "EHLO
+        id S236353AbiLMRrV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 12:47:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235686AbiLMRcL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 12:32:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9889523E96
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 09:31:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670952674;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2TqRyv0mTDcc+B0MCoj2HfDWqQ30TKvEn4VKuug9olM=;
-        b=BavzSSeuFcQOK2hO5cDVGQQdIGLB0xjCMkwj3hyD3a+6q9PEATD5cV9c+vy/KXgCNK9dYT
-        DNkruBFPsM2d7SfK0505ZC8ny9uIQ17r3cD2Szu6SYV2svuS+hImJPNbIQg0GHkaaCOe5w
-        t2mN8+FIThosA2s7AhVHkxqWINNOCxY=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-179-eEhgGYNrMHWsWxGXoTyncw-1; Tue, 13 Dec 2022 12:31:13 -0500
-X-MC-Unique: eEhgGYNrMHWsWxGXoTyncw-1
-Received: by mail-il1-f198.google.com with SMTP id a13-20020a056e0208ad00b003034c36b8b5so7911088ilt.9
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 09:31:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2TqRyv0mTDcc+B0MCoj2HfDWqQ30TKvEn4VKuug9olM=;
-        b=t2JdjVd9ntpynkwheP/tFBQD3aMroZOWPaRHMGZ8V4QDK7pHX9MDf9IM2IgdYOVR32
-         v5Pj4I4DwxZQX4cYsFt0IK2gmegSRiVmp0j6oqL7c0ddv3Y+4fi6q32mCV968H8dZ6Zh
-         okwmIuq/BuWiaINz70q4Mj7rkkjT+adj+Jhn4Et/iEoLNhaxUrgJ4f+XSIt5MKl52kLJ
-         5lbR8SvbiG0hZq50t8ixiVjEgiMjNqp+3pKS82XGG0EwzhZZ0qkH1+mHVWV9TJEplEfh
-         FTucC4IM1++vAp2pSR90HiLaLIOGqv0+Pd2fLpoXz3AJZCwxUGAN23bfbXItRIz9wANd
-         VphA==
-X-Gm-Message-State: ANoB5pkgXu68xJDydIBGzAfS0HLsYuSxkXIRGNCod38LVUjHQm4PYLoZ
-        LRYHBN5ZJFW081u0/h8XGI9YQlYY2nVx+BpoBMyg0jko3RsOJaBYXINmxQamr3DUIog2sqbl76Q
-        wr7Y7ANM9szFO
-X-Received: by 2002:a92:d792:0:b0:303:8cff:983b with SMTP id d18-20020a92d792000000b003038cff983bmr12396582iln.14.1670952672554;
-        Tue, 13 Dec 2022 09:31:12 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5Nhlvph//bWv0tKC40Nia1Qll4EawFYub8OZYbLNr6NqK7TccvvGcVi+FfT71pT9oMGI6U0A==
-X-Received: by 2002:a92:d792:0:b0:303:8cff:983b with SMTP id d18-20020a92d792000000b003038cff983bmr12396564iln.14.1670952672252;
-        Tue, 13 Dec 2022 09:31:12 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id u70-20020a022349000000b003865944247dsm1000868jau.113.2022.12.13.09.31.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 09:31:11 -0800 (PST)
-Date:   Tue, 13 Dec 2022 10:31:09 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Steven Sistare <steven.sistare@oracle.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH V1 1/2] vfio/type1: exclude mdevs from VFIO_UPDATE_VADDR
-Message-ID: <20221213103109.67c2e2ca.alex.williamson@redhat.com>
-In-Reply-To: <3f3ca4c0-b401-0d18-e911-18189ff9c1d0@oracle.com>
-References: <1670946416-155307-1-git-send-email-steven.sistare@oracle.com>
-        <1670946416-155307-2-git-send-email-steven.sistare@oracle.com>
-        <20221213092610.636686fc.alex.williamson@redhat.com>
-        <3f3ca4c0-b401-0d18-e911-18189ff9c1d0@oracle.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S235907AbiLMRrT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 12:47:19 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5BEA621E36;
+        Tue, 13 Dec 2022 09:47:18 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDHKWoH023109;
+        Tue, 13 Dec 2022 17:47:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=iiCTz8qQkxR5QpavDy8ro1sdHP7oTSzVGuJJIj3InVQ=;
+ b=FYrlAsVp+6eQ3VBHagRekuP/5sI9znkaGr22C6cXngfu8U3gsUQQik/9O44nvxpWXmpL
+ 0vq4h0pnoSmCDLORChK6hwnDp7WrkffYly2UWD+shofdTuq8bKRbhWmshSIEz7LWXY95
+ 28cHLyl35k2Va76RLPQ3RgYMnB/BkAbrj5yHZ6iAThP3ImEA+mzFDhKChASxCnsCXlao
+ MS75yNPQ3+rHZXw4Cro6FqCiD//zwUFupdft+bHhFRYzXKrOiBNiomaEN1GmzviiYVwD
+ 6oOS8wd8NE+8QSRDwGJoFDGiYRRpKUH6Tb9eWpCTqdgKoblGX7rxT3xTKs10qSDv2+ej IQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mewq6rn1d-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 17:47:13 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BDHKg7b023344;
+        Tue, 13 Dec 2022 17:47:12 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mewq6rn0j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 17:47:12 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDH4QTp007817;
+        Tue, 13 Dec 2022 17:47:10 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mchcf4j1a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 17:47:10 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BDHl6Ds46596430
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Dec 2022 17:47:06 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 59F2520040;
+        Tue, 13 Dec 2022 17:47:06 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0706520049;
+        Tue, 13 Dec 2022 17:47:06 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 13 Dec 2022 17:47:05 +0000 (GMT)
+Date:   Tue, 13 Dec 2022 18:32:25 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH v4 2/9] Documentation: KVM: s390: Describe
+ KVM_S390_MEMOP_F_CMPXCHG
+Message-ID: <20221213183225.3f49ceb8@p-imbrenda>
+In-Reply-To: <20221213165405.2953539-3-scgl@linux.ibm.com>
+References: <20221213165405.2953539-1-scgl@linux.ibm.com>
+        <20221213165405.2953539-3-scgl@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cHAf5-ZPumGPVVyEgG3Lc3qiPP8oj_94
+X-Proofpoint-ORIG-GUID: ow_0cXBSTlZIltbwAVhI5CLUy75PCki0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-13_03,2022-12-13_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 phishscore=0
+ mlxlogscore=779 suspectscore=0 mlxscore=0 spamscore=0 priorityscore=1501
+ malwarescore=0 clxscore=1015 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212130155
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Dec 2022 11:54:33 -0500
-Steven Sistare <steven.sistare@oracle.com> wrote:
+On Tue, 13 Dec 2022 17:53:58 +0100
+Janis Schoetterl-Glausch <scgl@linux.ibm.com> wrote:
 
-> On 12/13/2022 11:26 AM, Alex Williamson wrote:
-> > On Tue, 13 Dec 2022 07:46:55 -0800
-> > Steve Sistare <steven.sistare@oracle.com> wrote:
-> >   
-> >> Disable the VFIO_UPDATE_VADDR capability if mediated devices are present.
-> >> Their kernel threads could be blocked indefinitely by a misbehaving
-> >> userland while trying to pin/unpin pages while vaddrs are being updated.  
-> > 
-> > Fixes: c3cbab24db38 ("vfio/type1: implement interfaces to update vaddr")
-> >   
-> >> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> >> ---
-> >>  drivers/vfio/vfio_iommu_type1.c | 25 ++++++++++++++++++++++++-
-> >>  include/uapi/linux/vfio.h       |  6 +++++-
-> >>  2 files changed, 29 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> >> index 23c24fe..f81e925 100644
-> >> --- a/drivers/vfio/vfio_iommu_type1.c
-> >> +++ b/drivers/vfio/vfio_iommu_type1.c
-> >> @@ -1343,6 +1343,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
-> >>  
-> >>  	mutex_lock(&iommu->lock);
-> >>  
-> >> +	/* Cannot update vaddr if mdev is present. */
-> >> +	if (invalidate_vaddr && !list_empty(&iommu->emulated_iommu_groups))
-> >> +		goto unlock;
-> >> +
-> >>  	pgshift = __ffs(iommu->pgsize_bitmap);
-> >>  	pgsize = (size_t)1 << pgshift;
-> >>  
-> >> @@ -2189,6 +2193,10 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
-> >>  
-> >>  	mutex_lock(&iommu->lock);
-> >>  
-> >> +	/* Prevent an mdev from sneaking in while vaddr flags are used. */
-> >> +	if (iommu->vaddr_invalid_count && type == VFIO_EMULATED_IOMMU)
-> >> +		goto out_unlock;  
-> > 
-> > Why only mdev devices?  If we restrict that the user cannot attach a
-> > group while there are invalid vaddrs, and the pin/unpin pages and
-> > dma_rw interfaces are restricted to cases where vaddr_invalid_count is
-> > zero, then we can get rid of all the code to handle waiting for vaddrs.
-> > ie. we could still revert:
-> > 
-> > 898b9eaeb3fe ("vfio/type1: block on invalid vaddr")
-> > 487ace134053 ("vfio/type1: implement notify callback")
-> > ec5e32940cc9 ("vfio: iommu driver notify callback")
-> > 
-> > It appears to me it might be easiest to lead with a clean revert of
-> > these, then follow-up imposing the usage restrictions, and I'd go ahead
-> > and add WARN_ON error paths to the pin/unpin/dma_rw paths to make sure
-> > nobody enters those paths with an elevated invalid count.  Thanks,  
+> Describe the semantics of the new KVM_S390_MEMOP_F_CMPXCHG flag for
+> absolute vm write memops which allows user space to perform (storage key
+> checked) cmpxchg operations on guest memory.
 > 
-> Will do.  I think I will put the revert at the end, though, as dead code 
-> clean up.  That patch will be larger, and if it is judged to be too large
-> for stable, it can be omitted from stable.
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
+>  Documentation/virt/kvm/api.rst | 20 ++++++++++++++++++--
+>  1 file changed, 18 insertions(+), 2 deletions(-)
 > 
-> - Steve
-> 
-> >> +
-> >>  	/* Check for duplicates */
-> >>  	if (vfio_iommu_find_iommu_group(iommu, iommu_group))
-> >>  		goto out_unlock;
-> >> @@ -2660,6 +2668,20 @@ static int vfio_domains_have_enforce_cache_coherency(struct vfio_iommu *iommu)
-> >>  	return ret;
-> >>  }
-> >>  
-> >> +/*
-> >> + * Disable this feature if mdevs are present.  They cannot safely pin/unpin
-> >> + * while vaddrs are being updated.
-> >> + */
-> >> +static int vfio_iommu_can_update_vaddr(struct vfio_iommu *iommu)
-> >> +{
-> >> +	int ret;
-> >> +
-> >> +	mutex_lock(&iommu->lock);
-> >> +	ret = list_empty(&iommu->emulated_iommu_groups);
-> >> +	mutex_unlock(&iommu->lock);
-> >> +	return ret;
-> >> +}
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index eee9f857a986..98f5a35088b8 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -3753,7 +3753,8 @@ The fields in each entry are defined as follows:
+>  :Parameters: struct kvm_s390_mem_op (in)
+>  :Returns: = 0 on success,
+>            < 0 on generic error (e.g. -EFAULT or -ENOMEM),
+> -          > 0 if an exception occurred while walking the page tables  
+> +          16 bit program exception code if the access causes such an exception
 
-I'd also keep this generic to what it's actually doing, ie. simply
-reporting if emulated_iommu_groups are present, so it could be
-something like:
+s/$/,/
 
-static bool vfio_iommu_has_emulated(struct vfio_iommu *iommu)
+> +          other code > 0xffff with special meaning
 
-OTOH, I'm not sure it actually makes sense to dynamically change
-reported value, the IOMMU backend supports vaddr update, but there are
-usage restrictions and there's no way that this test can't be racy w/
-other user actions.  Does it have specific utility in userspace to test
-for this immediately before a live-update, or would QEMU enable support
-for the feature based only on some initial condition?  Thanks,
+s/$/./
 
-Alex
+with those two nits fixed:
 
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-> >> +
-> >>  static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
-> >>  					    unsigned long arg)
-> >>  {
-> >> @@ -2668,8 +2690,9 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
-> >>  	case VFIO_TYPE1v2_IOMMU:
-> >>  	case VFIO_TYPE1_NESTING_IOMMU:
-> >>  	case VFIO_UNMAP_ALL:
-> >> -	case VFIO_UPDATE_VADDR:
-> >>  		return 1;
-> >> +	case VFIO_UPDATE_VADDR:
-> >> +		return iommu && vfio_iommu_can_update_vaddr(iommu);
-> >>  	case VFIO_DMA_CC_IOMMU:
-> >>  		if (!iommu)
-> >>  			return 0;
-> >> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> >> index d7d8e09..6d36b84 100644
-> >> --- a/include/uapi/linux/vfio.h
-> >> +++ b/include/uapi/linux/vfio.h
-> >> @@ -49,7 +49,11 @@
-> >>  /* Supports VFIO_DMA_UNMAP_FLAG_ALL */
-> >>  #define VFIO_UNMAP_ALL			9
-> >>  
-> >> -/* Supports the vaddr flag for DMA map and unmap */
-> >> +/*
-> >> + * Supports the vaddr flag for DMA map and unmap.  Not supported for mediated
-> >> + * devices, so this capability is subject to change as groups are added or
-> >> + * removed.
-> >> + */
-> >>  #define VFIO_UPDATE_VADDR		10
-> >>  
-> >>  /*  
-> >   
-> 
+>  
+>  Read or write data from/to the VM's memory.
+>  The KVM_CAP_S390_MEM_OP_EXTENSION capability specifies what functionality is
+> @@ -3771,6 +3772,8 @@ Parameters are specified via the following structure::
+>  		struct {
+>  			__u8 ar;	/* the access register number */
+>  			__u8 key;	/* access key, ignored if flag unset */
+> +			__u8 pad1[6];	/* ignored */
+> +			__u64 old_addr;	/* ignored if flag unset */
+>  		};
+>  		__u32 sida_offset; /* offset into the sida */
+>  		__u8 reserved[32]; /* ignored */
+> @@ -3853,8 +3856,21 @@ Absolute accesses are permitted for non-protected guests only.
+>  Supported flags:
+>    * ``KVM_S390_MEMOP_F_CHECK_ONLY``
+>    * ``KVM_S390_MEMOP_F_SKEY_PROTECTION``
+> +  * ``KVM_S390_MEMOP_F_CMPXCHG``
+> +
+> +The semantics of the flags common with logical accesses are as for logical
+> +accesses.
+> +
+> +For write accesses, the KVM_S390_MEMOP_F_CMPXCHG flag is supported if
+> +KVM_CAP_S390_MEM_OP_EXTENSION has flag KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG set.
+> +In this case, instead of doing an unconditional write, the access occurs
+> +only if the target location contains the value pointed to by "old_addr".
+> +This is performed as an atomic cmpxchg with the length specified by the "size"
+> +parameter. "size" must be a power of two up to and including 16.
+> +If the exchange did not take place because the target value doesn't match the
+> +old value, KVM_S390_MEMOP_R_NO_XCHG is returned.
+> +In this case the value "old_addr" points to is replaced by the target value.
+>  
+> -The semantics of the flags are as for logical accesses.
+>  
+>  SIDA read/write:
+>  ^^^^^^^^^^^^^^^^
 
