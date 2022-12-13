@@ -2,85 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DD7D64BDB5
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 21:03:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E903F64BDEB
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 21:29:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236766AbiLMUDL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 15:03:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56910 "EHLO
+        id S237136AbiLMU3l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 15:29:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235545AbiLMUDJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 15:03:09 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 048D6F00
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:03:09 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id u15-20020a17090a3fcf00b002191825cf02so4728835pjm.2
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:03:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SlLKeNs0EWVsu+ptfdWBNmvU18ZVhMR61XWdAxFV9XQ=;
-        b=Jgh2h70gyFoI+vZEt+HRyYhvy8YXmJruypdwVRYeOAtwakBPLsrcx6y+QvB3hUhUNm
-         v/DiIWAZ3oh+MtBheCrEL++Gyb7HLAT1gDnpqMiVuiB04sbr6RL+4HisIMlXsah7jJHs
-         BQh9UrAAjRfz+6OEQK8DW+ZocCeLgGW7E9/YuE4vDZ2U7pCZP9xxdvcW7BRNNE9/dvXk
-         UHFZHnLNmVVz3QPKDVMD9nL2tc1Un2n3p3lY72Vrrn4IEro5ne4Mp2Xd+uRIFimABqMP
-         9hVMz9Et/jMsgOYssc4gfckHfVOAIkEUwXeMIcmjytkpiwFO3ZODSvpun/Uk3hH9yVpu
-         tYKQ==
+        with ESMTP id S238542AbiLMU25 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 15:28:57 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C85A9767A
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:22:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670962971;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=v2Dm5LnCOLTySKzdtt7rX+X8eVAkaGHG4gTN1wON7BM=;
+        b=Xk8ceWIzlcJySZBY/h05msZD14/Qcb4YEC/PT//4ynUpO25s3DhBUxHpubuqLNwB7G8jXt
+        xBqUiwo2k51IkaNScWUW4s7Ahfr5uWxtZ87Q71PwkRCwbDmMomrerygYf8Yf39WoJt1Dts
+        duUHSsx3GtYFguTS4rEmOL16JFIdf1E=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-363-r4-eRoACNcy5ZixQkfV5lA-1; Tue, 13 Dec 2022 15:22:49 -0500
+X-MC-Unique: r4-eRoACNcy5ZixQkfV5lA-1
+Received: by mail-io1-f71.google.com with SMTP id r25-20020a6bfc19000000b006e002cb217fso2612665ioh.2
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 12:22:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SlLKeNs0EWVsu+ptfdWBNmvU18ZVhMR61XWdAxFV9XQ=;
-        b=7WFeal3gPFoTQyBwvxs7WBcpeHRnf+CgxvrqJ/4TSUR3Lssez2wvL1Z5BjQi/OmoTD
-         CbAN3jEBofLVk+NhqFOVLufoATmTkS1k6h8Y4qbMCnbkW2Jmp1uBweaMcNxgYnA7EVKb
-         dOdgenaA2uRCwDNOBtTuAfs0NS0i5eV0EWsNLgS3vD0uu2hkNSJhDjhGq6ItMCp8Cwi4
-         5ywOaCBABemYAUaqNG3NFxy6fVRCbwA0Km/j7hifdA8N6Ms4awGq3vH0AE2Yah7Ax+AS
-         hx0yX0CO4tcXreva1oOs3OEbpt0PTmNZ+LfZGpVGz/DmWi0n/cjN9KiRdwdyHruQL4RM
-         PQyg==
-X-Gm-Message-State: ANoB5pksDmw//3n59gJGsPQ+ME+hfjNp2WkPZiq0Cn5Xuyw3ItmcysRl
-        L2N317yJDlK5Je463otliqLdmQ==
-X-Google-Smtp-Source: AA0mqf43rfeTLye05owqv8MbDwr9r9xovoe2k6ziCGD54isSIqaMDQrLxrh/vw468kpaItrUN7BQ5g==
-X-Received: by 2002:a17:902:7b96:b0:189:858f:b5c0 with SMTP id w22-20020a1709027b9600b00189858fb5c0mr428994pll.0.1670961788301;
-        Tue, 13 Dec 2022 12:03:08 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u5-20020a170903124500b00189667acf19sm289595plh.95.2022.12.13.12.03.06
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v2Dm5LnCOLTySKzdtt7rX+X8eVAkaGHG4gTN1wON7BM=;
+        b=0E73cK4o3/OYyE7nxCmP4MtjRzyURcEqkNnf95MBOsmJ3bDbaSTTFvWwgPeBVOf3nI
+         diQpmO99NeXACHwRlFD0OVFGE7SfXqAx+clKIrA+aevtxwU5TXRQ6a5Ws9sMZtT1WScq
+         IDtCspVblTSGDwvLTRsxUcc/kYpT5BfXZSoRNRcZuCHHVbudjHKTZWmRyJ6tw2QKTQXW
+         KiSScyM3iYblrxNl45yf/VhVZnY/gIgRe8NoVNozduojrRfT2ARh7u4g8fNgZOFgMgr5
+         pYk9X8BwOta1dRGqgKL/+NOROyTeHb0j/Zb9cu0tCCEjnBJJIE3IOrOn4vrEnjkhGTPf
+         K/Vw==
+X-Gm-Message-State: ANoB5pmu5jsPtNU/uBfHtLZPpl9d5eY83wFZuDQNCmEsI2W2ujKqp8K2
+        QpKfPtqiGf+H/3RuCSE6fZY2+fDymvSDx9NjfoX0c6J/Z8HyvH4yfDZKXp8t/8B/I/B3S+ICoIq
+        7Ttf1baa5dOkE
+X-Received: by 2002:a92:cacf:0:b0:302:4d47:6971 with SMTP id m15-20020a92cacf000000b003024d476971mr11781004ilq.11.1670962968691;
+        Tue, 13 Dec 2022 12:22:48 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5pHsdgxpqRWzyOMlv+SXJZp4Qxd+pG3DyRSrtBJiAnK70BGMeZHx2je6r3GtgnO0xVvlh/zw==
+X-Received: by 2002:a92:cacf:0:b0:302:4d47:6971 with SMTP id m15-20020a92cacf000000b003024d476971mr11780998ilq.11.1670962968398;
+        Tue, 13 Dec 2022 12:22:48 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id t10-20020a92cc4a000000b00304aa34b405sm3003911ilq.81.2022.12.13.12.22.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 12:03:07 -0800 (PST)
-Date:   Tue, 13 Dec 2022 20:03:03 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Tom Rix <trix@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-riscv@lists.infradead.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Ricardo Koller <ricarkol@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Cc:     David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH 06/14] KVM: selftests: Rename UNAME_M to ARCH_DIR, fill
- explicitly for x86
-Message-ID: <Y5jadzKz6Qi9MiI9@google.com>
-References: <20221213001653.3852042-1-seanjc@google.com>
- <20221213001653.3852042-7-seanjc@google.com>
+        Tue, 13 Dec 2022 12:22:47 -0800 (PST)
+Date:   Tue, 13 Dec 2022 13:22:45 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Steve Sistare <steven.sistare@oracle.com>
+Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH V2 1/5] vfio/type1: exclude mdevs from VFIO_UPDATE_VADDR
+Message-ID: <20221213132245.10ef6873.alex.williamson@redhat.com>
+In-Reply-To: <1670960459-415264-2-git-send-email-steven.sistare@oracle.com>
+References: <1670960459-415264-1-git-send-email-steven.sistare@oracle.com>
+        <1670960459-415264-2-git-send-email-steven.sistare@oracle.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221213001653.3852042-7-seanjc@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,64 +78,168 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+David
+On Tue, 13 Dec 2022 11:40:55 -0800
+Steve Sistare <steven.sistare@oracle.com> wrote:
 
-On Tue, Dec 13, 2022, Sean Christopherson wrote:
-> Rename UNAME_M to ARCH_DIR and explicitly set it directly for x86.  At
-> this point, the name of the arch directory really doesn't have anything
-> to do with `uname -m`, and UNAME_M is unnecessarily confusing given that
-> its purpose is purely to identify the arch specific directory.
+> Disable the VFIO_UPDATE_VADDR capability if mediated devices are present.
+> Their kernel threads could be blocked indefinitely by a misbehaving
+> userland while trying to pin/unpin pages while vaddrs are being updated.
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Do not allow groups to be added to the container while vaddr's are invalid,
+> so we never need to block user threads from pinning, and can delete the
+> vaddr-waiting code in a subsequent patch.
+> 
+
+
+Fixes: c3cbab24db38 ("vfio/type1: implement interfaces to update vaddr")
+
+
+> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 > ---
-> -# No change necessary for x86_64
-> -UNAME_M := $(shell uname -m)
-> -
-> -# Set UNAME_M for arm64 compile/install to work
-> -ifeq ($(ARCH),arm64)
-> -	UNAME_M := aarch64
-> -endif
-> -# Set UNAME_M s390x compile/install to work
-> -ifeq ($(ARCH),s390)
-> -	UNAME_M := s390x
-> -endif
-> -# Set UNAME_M riscv compile/install to work
-> -ifeq ($(ARCH),riscv)
-> -	UNAME_M := riscv
-> +ifeq ($(ARCH),x86)
+>  drivers/vfio/vfio_iommu_type1.c | 31 ++++++++++++++++++++++++++++++-
+>  include/uapi/linux/vfio.h       | 15 +++++++++------
+>  2 files changed, 39 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 23c24fe..80bdb4d 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -859,6 +859,8 @@ static int vfio_iommu_type1_pin_pages(void *iommu_data,
+>  	if (!iommu->v2)
+>  		return -EACCES;
+>  
+> +	WARN_ON(iommu->vaddr_invalid_count);
+> +
 
-As discovered by by David, this breaks doing "ARCH=x86_64 make", which is an
-allowed/supported variant in the kernel proper, so this needs to be:
+I'd expect this to abort and return -errno rather than simply trigger a
+warning.
 
-  ifneq (,$(filter $(ARCH),x86 x86_64))
+>  	mutex_lock(&iommu->lock);
+>  
+>  	/*
+> @@ -976,6 +978,8 @@ static void vfio_iommu_type1_unpin_pages(void *iommu_data,
+>  
+>  	mutex_lock(&iommu->lock);
+>  
+> +	WARN_ON(iommu->vaddr_invalid_count);
+> +
 
-or alternatively
+This should never happen or else I'd suggest this also make an early
+exit.
 
-  ifeq ($(ARCH),x86_64)
-  ARCH := x86
-  endif
+>  	do_accounting = list_empty(&iommu->domain_list);
+>  	for (i = 0; i < npage; i++) {
+>  		dma_addr_t iova = user_iova + PAGE_SIZE * i;
+> @@ -1343,6 +1347,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
+>  
+>  	mutex_lock(&iommu->lock);
+>  
+> +	/* Cannot update vaddr if mdev is present. */
+> +	if (invalidate_vaddr && !list_empty(&iommu->emulated_iommu_groups))
+> +		goto unlock;
 
-Hmm, unless there's a reason to keep ARCH=x86_64, the latter appears to be the
-better option as lib.mak doesn't play nice with x86_64 either, e.g. `ARCH=x86_64
-LLVM=1 make` fails.  That's arguably a lib.mak bug, but it's trivial to handle
-in KVM's makefile so forcing lib.mak to handle both seems unnecessary.
+A different errno here to reflect that the container state is the issue
+might be appropriate here.
 
-I'll also add a comment to call out that $(ARCH) follows the kernel's terminology
-for arch/*, whereas for whatever reason KVM selftests effectively uses `uname -m`
-terminology.
+> +
+>  	pgshift = __ffs(iommu->pgsize_bitmap);
+>  	pgsize = (size_t)1 << pgshift;
+>  
+> @@ -2189,6 +2197,10 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  
+>  	mutex_lock(&iommu->lock);
+>  
+> +	/* Attach could require pinning, so disallow while vaddr is invalid. */
+> +	if (iommu->vaddr_invalid_count)
+> +		goto out_unlock;
+> +
+>  	/* Check for duplicates */
+>  	if (vfio_iommu_find_iommu_group(iommu, iommu_group))
+>  		goto out_unlock;
+> @@ -2660,6 +2672,16 @@ static int vfio_domains_have_enforce_cache_coherency(struct vfio_iommu *iommu)
+>  	return ret;
+>  }
+>  
+> +static int vfio_iommu_has_emulated(struct vfio_iommu *iommu)
+> +{
+> +	int ret;
+> +
+> +	mutex_lock(&iommu->lock);
+> +	ret = !list_empty(&iommu->emulated_iommu_groups);
+> +	mutex_unlock(&iommu->lock);
+> +	return ret;
+> +}
+> +
+>  static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+>  					    unsigned long arg)
+>  {
+> @@ -2668,8 +2690,13 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
+>  	case VFIO_TYPE1v2_IOMMU:
+>  	case VFIO_TYPE1_NESTING_IOMMU:
+>  	case VFIO_UNMAP_ALL:
+> -	case VFIO_UPDATE_VADDR:
+>  		return 1;
+> +	case VFIO_UPDATE_VADDR:
+> +		/*
+> +		 * Disable this feature if mdevs are present.  They cannot
+> +		 * safely pin/unpin while vaddrs are being updated.
+> +		 */
+> +		return iommu && !vfio_iommu_has_emulated(iommu);
+>  	case VFIO_DMA_CC_IOMMU:
+>  		if (!iommu)
+>  			return 0;
+> @@ -3080,6 +3107,8 @@ static int vfio_iommu_type1_dma_rw_chunk(struct vfio_iommu *iommu,
+>  	size_t offset;
+>  	int ret;
+>  
+> +	WARN_ON(iommu->vaddr_invalid_count);
+> +
 
-One last thought/question, what do y'all think about renaming directories to
-follow the kernel proper?  I.e. aarch64=>arm64, s390x=>s390, and x86_64=>x86.
-Then $(ARCH_DIR) would go away.  The churn would be unfortunate, but it would be
-nice to align with arch/ and tools/arch/.
+Same as pinning, this should trigger -errno.  Thanks,
 
-> +	ARCH_DIR := x86_64
-> +else ifeq ($(ARCH),arm64)
-> +	ARCH_DIR := aarch64
-> +else ifeq ($(ARCH),s390)
-> +	ARCH_DIR := s390x
-> +else ifeq ($(ARCH),riscv)
-> +	ARCH_DIR := riscv
-> +else
-> +$(error Unknown architecture '$(ARCH)')
->  endif
+Alex
+
+>  	*copied = 0;
+>  
+>  	ret = vfio_find_dma_valid(iommu, user_iova, 1, &dma);
+> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
+> index d7d8e09..4e8d344 100644
+> --- a/include/uapi/linux/vfio.h
+> +++ b/include/uapi/linux/vfio.h
+> @@ -49,7 +49,11 @@
+>  /* Supports VFIO_DMA_UNMAP_FLAG_ALL */
+>  #define VFIO_UNMAP_ALL			9
+>  
+> -/* Supports the vaddr flag for DMA map and unmap */
+> +/*
+> + * Supports the vaddr flag for DMA map and unmap.  Not supported for mediated
+> + * devices, so this capability is subject to change as groups are added or
+> + * removed.
+> + */
+>  #define VFIO_UPDATE_VADDR		10
+>  
+>  /*
+> @@ -1215,8 +1219,7 @@ struct vfio_iommu_type1_info_dma_avail {
+>   * Map process virtual addresses to IO virtual addresses using the
+>   * provided struct vfio_dma_map. Caller sets argsz. READ &/ WRITE required.
+>   *
+> - * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova, and
+> - * unblock translation of host virtual addresses in the iova range.  The vaddr
+> + * If flags & VFIO_DMA_MAP_FLAG_VADDR, update the base vaddr for iova. The vaddr
+>   * must have previously been invalidated with VFIO_DMA_UNMAP_FLAG_VADDR.  To
+>   * maintain memory consistency within the user application, the updated vaddr
+>   * must address the same memory object as originally mapped.  Failure to do so
+> @@ -1267,9 +1270,9 @@ struct vfio_bitmap {
+>   * must be 0.  This cannot be combined with the get-dirty-bitmap flag.
+>   *
+>   * If flags & VFIO_DMA_UNMAP_FLAG_VADDR, do not unmap, but invalidate host
+> - * virtual addresses in the iova range.  Tasks that attempt to translate an
+> - * iova's vaddr will block.  DMA to already-mapped pages continues.  This
+> - * cannot be combined with the get-dirty-bitmap flag.
+> + * virtual addresses in the iova range.  DMA to already-mapped pages continues.
+> + * Groups may not be added to the container while any addresses are invalid.
+> + * This cannot be combined with the get-dirty-bitmap flag.
+>   */
+>  struct vfio_iommu_type1_dma_unmap {
+>  	__u32	argsz;
+
