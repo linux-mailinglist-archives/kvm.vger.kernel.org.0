@@ -2,200 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0CFD64B6EF
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 15:10:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2824064B78B
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 15:38:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235843AbiLMOKS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 09:10:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36320 "EHLO
+        id S235978AbiLMOh4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 09:37:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235711AbiLMOJv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 09:09:51 -0500
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E63D021248
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 06:09:26 -0800 (PST)
-Received: by mail-oo1-xc34.google.com with SMTP id t15-20020a4a96cf000000b0049f7e18db0dso2368673ooi.10
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 06:09:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6/49i19ww7B/xcmBcFjP0U5z4N9HY5b8Hm8g3kdlG5g=;
-        b=hf1kzp+NfEnJnMm4M2VpOttjLAl+nFQGQlH1GlyTF9rPOV0mEt4UTUxrElHLLepo+m
-         cWxSmm8Azkpl+WJGFkt5f8WuumXgVt1Jbw69fwg9t37lNPOVaJOSOrHWLyrHXsOCw4vi
-         k4YUJNmfyKbWkNhpsJfHCDfeBplpcI9Co2rr6c18BSpkyhYWmA60Z/K7rTZhBy7BlwZc
-         ZMZbuRuB9aVodNhrHde4kutbg4d57Mg/UrfPKhEyn5X36Lwx6BuqzywlbAtEYPzdDFeX
-         N0rUOi5Fy259ReXgdCdjsXEstDbsQgFWgVXp1W1mqTnCoTSBdL1YihTcxhdKk8MxfdbV
-         atrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6/49i19ww7B/xcmBcFjP0U5z4N9HY5b8Hm8g3kdlG5g=;
-        b=krDuouXEUKpp8oaC+VzOQJ3pOnM87LZTevZf532lKHhrpD4OMyQuiZ6LoL4Ue6L5bJ
-         BKi7j+mYOBEGTESZeMn0/hPHt9jyh0p5SGHIvEcw0en0qR7f8UbjYyqqHZu2Tw5/VtXL
-         BTLABFwCdJC19Hc9w2cN8RSapJAu8NCXPfpAGb3DL5eNkfieYZsroQ45kQ4UjrGMMI0A
-         zw1u4El+P4StMvsMgLP1E1FNLDBn0N7yl2loMhlYFFUJ2yyyvrUrHVZmggkA6b5AUt0i
-         H4VB9zD0YLhXUal6o2MKb9KEFJW0k0ShdlvZ1OQNREYj6t1++IY+2L4Y9ld1d1Bz2KuA
-         hWjA==
-X-Gm-Message-State: ANoB5pltgooBHr7VXvRQ9yocsQxFhJQliQhzGuMPOH/m0L8VX8Hj4VK2
-        KG0jpJceE3AYnUHwaKAyrEWmK68EnsIUFTE5
-X-Google-Smtp-Source: AA0mqf4MGueTut2qLTFaHdf+Zme8qgmXQUV5NUInn//zVT1CrEtYI77vWxcW8B/cVk6VB1BC84VA7g==
-X-Received: by 2002:a05:7500:5696:b0:ea:f6ed:7d50 with SMTP id ca22-20020a057500569600b000eaf6ed7d50mr1807617gab.14.1670940065724;
-        Tue, 13 Dec 2022 06:01:05 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-50-193.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.50.193])
-        by smtp.gmail.com with ESMTPSA id bp32-20020a05620a45a000b006fcaa1eab0esm783696qkb.123.2022.12.13.06.01.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 06:01:04 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.95)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1p55qB-009VAx-P5;
-        Tue, 13 Dec 2022 10:01:03 -0400
-Date:   Tue, 13 Dec 2022 10:01:03 -0400
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Lei Rao <lei.rao@intel.com>, kbusch@kernel.org, axboe@fb.com,
-        kch@nvidia.com, sagi@grimberg.me, alex.williamson@redhat.com,
-        cohuck@redhat.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
-        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
-        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
-        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
-Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
- issue admin commands for VF driver.
-Message-ID: <Y5iFnw5i3vI9iMFY@ziepe.ca>
-References: <Y4+U3VR2LeEh2S7B@ziepe.ca>
- <20221207075415.GB2283@lst.de>
- <Y5CWVu08abcOuEQH@ziepe.ca>
- <20221207135203.GA22803@lst.de>
- <Y5CsH5PqMYAWYatw@ziepe.ca>
- <20221207163857.GB2010@lst.de>
- <Y5DOAKArjyfb6Mcz@ziepe.ca>
- <20221207183333.GA7049@lst.de>
- <Y5DyorZJPdtN5WcX@ziepe.ca>
- <20221212075046.GB11162@lst.de>
-MIME-Version: 1.0
+        with ESMTP id S235986AbiLMOhw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 09:37:52 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2066.outbound.protection.outlook.com [40.107.92.66])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C88E17A8D;
+        Tue, 13 Dec 2022 06:37:47 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XUMNgOOIrrE4ACa5WGK7QLbMNj5tyoZ61/ANYyV6jFhsa1uAgCbPKx5gEkZ+zCMfmrbcNwsGmtuXXU0XkhmdE6tbqOMcrHHQ4+wpqcp3b5u8Gqvi0TFhkv4qnJ4hj0Y5RVoDwXUoHFM/X+GFqhUhzQwrOn52G3VoKdK3HZWtsKp2jYCmeyGCYVVZl9VMXGu506KgQFYQdzexhcmmTIL9bE5l9JfiZ7Q0J8hNclIXG7AZJmD7t763FaioK5c+iB3AAe08j4VUzxkIQPEpggk4EWLOQSPUbbDtj+XO+gof6rqEkwLiyoArLT/1Be1hr7dta7mTx5DPsrWZzXJv/3b7Qw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pREtGlHDQ2gppoB1iGEaWc4ScZiL+0XCs/gr8oEXiws=;
+ b=YAnlpqPzXetC1sjKI2aHAnBTNEnoCQCdj2oaQVcPtm60VziaA+FRpdZkSTsWiA0+NudoT1jihouutwfKzsLkJMu3yk7axtcFvNz53nTZPH8KgdoaIwRbPMssnQQCrxPssfoyuPfbbsNwJObnBatHC4LiEcnpR8J7eCgcj/jQXmiGg9+TbuMwVIjD11yPirA0RnKpoo3Xzq7M6nTEWnKWt2qhi06hfT6kGkXveZlFrLJH6Um2pKdo4rpCxbhYsG2B7U5er84ngG6VbR+EpwQMG2RgXMIc/lm3sT857f6+Rw0MSOGi3T3SBwjCnyWGnp2bYvBEZCzG2nf+uDWn+qLuJg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pREtGlHDQ2gppoB1iGEaWc4ScZiL+0XCs/gr8oEXiws=;
+ b=MK0T2DxWvw72z/ssUy+TqUa+1xklchEWy/RYVeWyQ9QZUYJ1k3eHuCOQ6xx1DdrJkhppbbDmYWpg0l5xFrq2T9TsSw0L+mEoMngOrwdgM+z6FvYrLfyNx9KsNTgZycmE+AwAsg4WShlUvIvejE5IEh+4fPEKnQHETxDvHBpE6u2pZAw6QJGGvEBxKZual1UDI9zeQEL3PgBkuQs/KaKHPYnA5pwhTATzR5NB+J+VL6zfErhCzCTzfft77VvGV/Ux0HCX7HH+MsexdLsRauFF75dOCo02ZT3HV62yxOgVDtmWP9ueglM3Dz8taR/0vet9zTvOesHXzN9GWX8w1aIIGA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SA1PR12MB5672.namprd12.prod.outlook.com (2603:10b6:806:23c::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.19; Tue, 13 Dec
+ 2022 14:37:45 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5880.019; Tue, 13 Dec 2022
+ 14:37:45 +0000
+Date:   Tue, 13 Dec 2022 10:37:44 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>
+Cc:     Bharat Bhushan <bharat.bhushan@nxp.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
+        Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH iommufd v2 2/9] iommu: Add iommu_group_has_isolated_msi()
+Message-ID: <Y5iOOL4JQ3Vuxjnq@nvidia.com>
+References: <0-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
+ <2-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221212075046.GB11162@lst.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+In-Reply-To: <2-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
+X-ClientProxiedBy: BLAPR03CA0171.namprd03.prod.outlook.com
+ (2603:10b6:208:32f::31) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB5672:EE_
+X-MS-Office365-Filtering-Correlation-Id: bc7c815a-5136-4a06-207a-08dadd179943
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: clfDY3hdFIPGizpvOwcg/hfpxYK2oW3qXXV0xH6UtxtZ5fHMZHA2+/c++bj4Boijk8NeOqRSYMTQcgmpaBGDmREx6eTjrJN4ZaLgBHm7szmNpJBtRAfGrJ6fUZtGBrkKTwlP5mfx5wJSzu4/RlGDI9UpQ2SgOzsDSzCcz04JIVtQwjOyVXvS+JEu9CrXTeLx7+KvFR8Keg5wKcOFqnR/vO1Wp7Yngpctl9dXO5zlID8Y4y4BcH4o/NviRnvxRMryMhqpsLPfT89WRrrulJ9bVTwkHTWbfd56GNpgasjDV3AZeUfQ0UHZKXYku031Wv6gF+UTJMC/BgIIOuBaL3H2oqEpNaP+daS4PmutwelWldOpUojzXsxtfsetMTuTDoz6SI6JjRAmVb90Vm4XGIZ3jPd4cONNRqgLAXtDes6nBLuqasOljkrulV8bUDheGYs+3sIBISWiJ6cub4rzjKRk4gbRqrcNo0hDKloL3CmKU4M4nOC9aY20Ch6AqpjrZ2kAjHy43gxR46vsYjQpXWQBWby5cQcn1I/Anh7FBjre0JysCrlQKQ/wu5XogV9rh/AdawH1528qSnIu0YS1nppcRQECl32okbf9UndiuMcSBUnrRw3UHW9El6shwc4Ft/fGThGAM3oWPG5JV0BsDUoFg3U20blIYBzCuDpRbSVc2+E=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(396003)(366004)(346002)(136003)(451199015)(36756003)(66556008)(4326008)(921005)(66946007)(38100700002)(110136005)(54906003)(8676002)(316002)(5660300002)(86362001)(6506007)(8936002)(26005)(66476007)(2616005)(478600001)(7416002)(186003)(6512007)(2906002)(6486002)(83380400001)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?ifT+RAngxCZOjq+3Kyhtm3lUgQUF3oDN1P4u91we79rEZP27g6N/13P+RlWc?=
+ =?us-ascii?Q?sHLQiJAyHQ3myoFKRoQZosLtZ2OYmxctz/MLyUgnAhmfLTOlmzCp27a2gUBA?=
+ =?us-ascii?Q?ww9il1S72HIEvOvFmBygPJGrwDrSWFNapNVFJiyJbqmpUF3UNZCOCzX64Z7Q?=
+ =?us-ascii?Q?UsJLfqKKcykyl/zOCZpupqZv4yMqfU6KILzLoSpIvCg1yYAYJ+lCw5Pc62Cj?=
+ =?us-ascii?Q?ooQjPf2uK54BKg4Ke1q0ZwskyEZs1kjZwOQsxMXv0bAnHNdN+//98YtkR7l6?=
+ =?us-ascii?Q?I5DYuLDlDy6cthXi5IT99mNVk0o+gSechKpSgiOMXEvx2baQm27KW2TMCEJn?=
+ =?us-ascii?Q?YkObW+Q7dgCKiK19gdE6eK4iPT6lovzW8L3FmjoHZ+qotrfazCV3muJiMyhM?=
+ =?us-ascii?Q?ogjnXQygOHpI65mNlVZH37r0jOt64EXk5127+BFtzRrkKH9avWwE9PfVx7uF?=
+ =?us-ascii?Q?jaVmV0t/hOWwtKux771iSA46W12etpgSSq+SUE7KLF4AfHCAdJjqylLkyIt8?=
+ =?us-ascii?Q?faYLiqHBIzcf6TMZqxYlBrgbn8b1cNzKkmqwML0kM3dqt0dNxu4BeoKZdOIs?=
+ =?us-ascii?Q?Jz4EH/dQOzTHimcvG4jgRbA2n5EwnfNu6Ir3XYuoE1RmrtTaMyK+goN53O5b?=
+ =?us-ascii?Q?7dtCHdGh44q0jQYbaMozW8rwTCcrR3gJpvb5Xio6WFq3VS/f/kX7QekAlCCE?=
+ =?us-ascii?Q?D/sF+DabP66vVZD/wyHfCxfoIzsSaAh+QuICNC09ZKkK22eE1LoGqoP53RT8?=
+ =?us-ascii?Q?Evr0ZMdPA668IlX8Akb+8MgMWodMXOvsnDltMKt4HZd0jL5R36pS7fvdRGBe?=
+ =?us-ascii?Q?8gbjJO6uhgXAzxINR9RF68GqJPzPJQOl8HllhToduO1pA6/WU6Sq0Hhm2A5n?=
+ =?us-ascii?Q?ktSPq+8eCwl5oPmwds/xNAxLPouqCo4AUwBt5nAW97xnpRcAN9NOToOOAR1L?=
+ =?us-ascii?Q?NjmH4WQEE+WWJiislM9Q9WBPN7DB4q27ZHeqj27gaWv4hG3aQpQMyTxeWWwH?=
+ =?us-ascii?Q?VqicNLvyFT1dHGVkgQ+tkyrCk54Tc91Fp3SL7yftMuhEvGincxmEwF0zumJs?=
+ =?us-ascii?Q?4whsBwlSvQSjj0c46Ctht3+/WTLYS98BRPZfdfZQ00C6PZs+MLOAGtZJwy1c?=
+ =?us-ascii?Q?dvgPXIJ2aVp7+wVJ7zHhayGw/hlUCtIFz4GRomz4g410QLeUsu/OESdr5vn0?=
+ =?us-ascii?Q?LqF1Wz/b2hlkkhnIstDtwwy3PMEnXN1b3i9Gc4AlG9P1UjnVEswwc619jTc2?=
+ =?us-ascii?Q?NQ0m9Kgn/X+Kw11IF7L7Md2GEH6S6nbN595ReHxtUJC9BJGN8eQmzJl8U9hM?=
+ =?us-ascii?Q?wlMlIQNZ+DYE9qVPM0JuWOjyP4u1mTQW0ATkWJnV8bCCEih+toQFobwaraZb?=
+ =?us-ascii?Q?aISg7n6oxWfYISBxRBOJIY3LNuGCx0p7n7TcAAgggjw6x7TQovOi5eJ5m3ci?=
+ =?us-ascii?Q?A0X2DEwpXOwsURRpTM9o06p+pTWirzBYgXzKOrrivbrRS62Mdz3vwgpg7eI4?=
+ =?us-ascii?Q?6CJxqjPDUUQb9Yukjp8+lChrgQ6KNcUxrk8yH7U3w4qLJT6ty148fw7YVFw0?=
+ =?us-ascii?Q?63MmdcUB+dhE7Ckwmbi4z+9Aj4vY21o7vhMJ1ICS?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc7c815a-5136-4a06-207a-08dadd179943
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Dec 2022 14:37:45.3833
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nAQ1ajlQ1sTppgW0pQSN4ozwXgcFtT7c3UcILqEA704oimirMvJWa9AznvuJ0hM6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5672
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 12, 2022 at 08:50:46AM +0100, Christoph Hellwig wrote:
-> On Wed, Dec 07, 2022 at 04:08:02PM -0400, Jason Gunthorpe wrote:
-> > However hisilicon managed to do their implementation without this, or
-> > rather you could say their "controlling function" is a single MMIO BAR
-> > page in their PCI VF and their "controlled function" is the rest of
-> > the PCI VF.
-> 
-> Eww.  So you need to carefully filter the BAR and can't actually do
-> any DMA at all?  I'm not sure that is actually practical, especially
-> not for something with a lot of state.
+On Mon, Dec 12, 2022 at 02:45:56PM -0400, Jason Gunthorpe wrote:
+> +/**
+> + * iommu_group_has_isolated_msi() - Compute msi_device_has_isolated_msi()
+> + *       for a group
+> + * @group: Group to query
+> + *
+> + * IOMMU groups should not have differing values of
+> + * msi_device_has_isolated_msi() for devices in a group. However nothing
+> + * directly prevents this, so ensure mistakes don't result in isolation failures
+> + * by checking that all the devices are the same.
+> + */
+> +bool iommu_group_has_isolated_msi(struct iommu_group *group)
+> +{
+> +	struct group_device *group_dev;
+> +	bool ret = true;
+> +
+> +	mutex_lock(&group->mutex);
+> +	list_for_each_entry(group_dev, &group->devices, list)
+> +		ret &= msi_device_has_isolated_msi(group_dev->dev) ||
+> +		       device_iommu_capable(group_dev->dev,
+> +					    IOMMU_CAP_INTR_REMAP);
+> +	mutex_unlock(&group->mutex);
 
-Indeed, but it is what they did and the HW should be supported by the
-kernel, IMO.
+I thought I had let this sit long enough for 0-day to check it, but
+nope, it needs a:
 
-> > If the kernel knows this information then we can find a way for the
-> > vfio_device to have pointers to both controlling and controlled
-> > objects. I have a suggestion below.
-> 
-> So now we need to write a vfio shim for every function even if there
-> is absolutely nothing special about that function?  Migrating really
-> is the controlling functions behavior, and writing a new vfio bit
-> for every controlled thing just does not scale.
+@@ -30,6 +30,7 @@
+ #include <linux/cc_platform.h>
+ #include <trace/events/iommu.h>
+ #include <linux/sched/mm.h>
++#include <linux/msi.h>
+ 
+ #include "dma-iommu.h"
 
-Huh? "does not scale?" We are looking at boilerplates of around 20-30
-lines to make a VFIO driver for a real PCI device. Why is that even
-something we should worry about optimizing?
-
-And when you get into exciting future devices like SIOV you already
-need to make a special VFIO driver anyhow.
-
-> Yes, and that's the problem, because they are associated with the
-> controlled function, and now we have a communication problem between
-> that vfio driver binding to the controlled function and the drive
-> that actually controlls live migration that is associated with the
-> controlling function.  In other words: you've created a giant mess.
-
-So far 100% of the drivers that have been presented, including the two
-RFC ones, have entanglements between live migration and vfio. Shifting
-things to dev/live_migration doesn't make the "communication problem"
-away, it just shifted it into another subsystem.
-
-This is my point, I've yet to even see a driver that meets your
-theoretical standard that it can exist without vfio entanglement. So
-I'd be much more interested in this idea if we had a stable of drivers
-that obviously were harmed by VFIO. We don't have that, and I don't
-even think that we ever will, considering both RFC drivers have
-devices that also stepped on the mlx5 FLR problem too.
-
-The FLR thing actually makes sense, becauase it is not actually the
-controlling function that is doing the live migration inside the
-devices. The controlling function is just a *proxy* to deliver
-commands to the controlled function. So FLR on the controlled device
-effects commands being executed on the controlling function. It is a
-pain.
-
-As it is, live migration is only useful with VFIO, so they are put
-together to keep things simpler. The only complexity is the
-controlled/controlling issue and for all existing SRIOV PF/VF
-relationships we have an OK solution (at least it isn't buggy).
-
-nvme's higher flexability needs more work, but that doesn't mean the
-idea is so wrong. I think you are reall overstating the "mess"
-
-> I'm not proposing to ignore them.  But they should not be needed most
-> of the time.
-
-I'm not seeing that in the drivers I've looked at.
-
-> > Which is really why this is in VFIO in the first place. It actually is
-> > coupled in practice, if not in theory.
-> 
-> So you've created a long term userspace API around working around
-> around buggy and/or misdesigned early designs and now want to force
-> it down everyones throat?
-
-No, we coupled live migration and VFIO because they are never useful
-apart, and we accept that we must find reasonable solutions to linking
-the controlling/controlled device because it is necessary in all cases
-we've seen.
-
-> > If we accept that drivers/vfio can be the "live migration subsystem"
-> > then lets go all the way and have the controlling driver to call
-> > vfio_device_group_register() to create the VFIO char device for the
-> > controlled function.
-> 
-> While creating the VFs from the PF driver makes a lot more sense,
-> remember that vfio is absolutely not the only use case for VFs.
-> There are plenty use cases where you want to use them with the normal
-> kernel driver as well.  So the interface to create VFs needs a now
-> to decide if it should be vfio exported, or use the normal kernel
-> binding.
-
-Yes, that is why this problem has been open for so long. Fixing it
-well requires some reconsideration of how the driver core works :(
-
-It is worse than just VFIO vs one kernel driver, like mlx5 could spawn
-a controlled function that is NVMe, VDPA, mlx5, virtio-net, VFIO,
-etc.
-
-When we create the function we really want to tell the device what
-kind of function it is, and that also tells the kernel what driver
-should be bound to it.
-
-mlx5 even has weird limitations, like a controlled function that is
-live migration capable has fewer features than a function that is
-not. So the user must specify what parameters it wants the controlled
-function to have..
+For some configs
 
 Jason
