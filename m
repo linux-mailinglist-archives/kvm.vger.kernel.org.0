@@ -2,116 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0126864B8C7
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 16:44:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 985DE64B8D6
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 16:45:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235646AbiLMPoX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 10:44:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40800 "EHLO
+        id S236260AbiLMPor (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 10:44:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236232AbiLMPoJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 10:44:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE5622653
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 07:43:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670946192;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ta5qJGL6TYgTS7WdcfK/NhG2rVIgkTUOeHGwN5QJWEY=;
-        b=f2Nv6mr/CealrBMGHCbN/yvFh70HP5uaI+aj8A8vdLBpqAgNgKEbUsrsHwpSC5BeFP6cac
-        S6t58XZphfM0anHxVvizlDqGGrXuza23B81g2wbzsCCDHaOP0jlPvlg5broqhRyh1xHLUT
-        p2spaqwvtWpnFZs6jfPNoUScn3cgvUs=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-167-iQP5BnITN0u-aMA9xT8NvQ-1; Tue, 13 Dec 2022 10:43:11 -0500
-X-MC-Unique: iQP5BnITN0u-aMA9xT8NvQ-1
-Received: by mail-wr1-f69.google.com with SMTP id e19-20020adfa453000000b0024209415034so2969919wra.18
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 07:43:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ta5qJGL6TYgTS7WdcfK/NhG2rVIgkTUOeHGwN5QJWEY=;
-        b=cq8oDsBMiEZWVNo8YwruULxinD8cK9GrFKP891f4sykWq9S+ljvPlVZ30EiC40Rn8x
-         1Zlxct/a6R2PYCODaXCzvCljdCDNCk4DWFKtYFFORS25sCsjuWDio7dv7HcypVGhwSQU
-         VqijMMBriBj7AJLyjIuQlqWCfL9VBpe+bUnGP+MyjaCQ7ECWBKAe2so5vfU6JYtyUV8n
-         AcwySsHQDVIbYkJ5VLMRlcbNlYJYIPmicctczEB4sqaiC9BkAmCreDiyTWea1xegRgi+
-         635uo8326c3RQAgz8aE8Zvwhu9flpr2AR8YdOgoeOfqUDekLq47BuMbj9h6VV3HwYkUD
-         zjlQ==
-X-Gm-Message-State: ANoB5pkQJxZIcmZuAIGJydZtLFjkBE73MpoZxy6LQzaWzWcUj7HiVx59
-        pPSDMPplzPeRZZC0ZWqvUk/Nj60TQLXa9WENoHQnBdonjlmpijjIv3/qeJ/wAOqH5FNW3KjazUi
-        MzcpXi5zpqZAL
-X-Received: by 2002:a05:6000:550:b0:242:880:20ce with SMTP id b16-20020a056000055000b00242088020cemr13771057wrf.47.1670946190490;
-        Tue, 13 Dec 2022 07:43:10 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7Fome2UWsPehy6lJdurAxcXv7sPgyHhsfgJzvy5rYv8HZ777S+ULuoF2cVj9aNlQvSN3jKBA==
-X-Received: by 2002:a05:6000:550:b0:242:880:20ce with SMTP id b16-20020a056000055000b00242088020cemr13771047wrf.47.1670946190282;
-        Tue, 13 Dec 2022 07:43:10 -0800 (PST)
-Received: from sgarzare-redhat (host-87-11-6-51.retail.telecomitalia.it. [87.11.6.51])
-        by smtp.gmail.com with ESMTPSA id j14-20020a5d564e000000b0024165454262sm135347wrw.11.2022.12.13.07.43.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 07:43:09 -0800 (PST)
-Date:   Tue, 13 Dec 2022 16:43:04 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6] virtio/vsock: replace virtio_vsock_pkt with
- sk_buff
-Message-ID: <20221213154304.rjrwzbv6jywkrpxq@sgarzare-redhat>
-References: <20221213072549.1997724-1-bobby.eshleman@bytedance.com>
- <20221213102232.n2mc3y7ietabncax@sgarzare-redhat>
- <20221213100510-mutt-send-email-mst@kernel.org>
+        with ESMTP id S236147AbiLMPoo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 10:44:44 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96B7A5F61;
+        Tue, 13 Dec 2022 07:44:43 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDF9Y5n028455;
+        Tue, 13 Dec 2022 15:44:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=vUIvTfnfTAj8T26MaoLAUf7I4zk2YP28InrrSR0U0F8=;
+ b=qRVZDKVjtEfzvSI9rWB+6KIVonLhE/WcYA0UrBtAaagOC+ZG9K45SgTHgC9fQgv20J21
+ TC8KUaMg/r+pZwoHCCjo/2w8Z4s3rq+vE/sGKggvHSQHkdJuab6IIh6pJaSh02WjJ8wC
+ jNqXa1dAXc2cyg8HMxv5DYJRwhWWVyozXH4yVOlr0kDCQRa/Q4TPqjtZafSCZjPRbFY6
+ kw0b16T5qq4MCAijH0VTp9zB5YM/WnpocFdWGcg0sOfYxw1FlIoHWS1nQYIZNYx3Qlf8
+ hrRQXMkTcgTEHyTQ5iO+4JF2evfEqFxK5Cxv8tAqB4nhnNrZmKT1owSxnToU2RSDwnMf Lw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mesmxd4fb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 15:44:41 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BDFRj9j005717;
+        Tue, 13 Dec 2022 15:44:41 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mesmxd4ey-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 15:44:41 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDF01Fn014276;
+        Tue, 13 Dec 2022 15:44:39 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([9.208.130.98])
+        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3mchr71aqm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 13 Dec 2022 15:44:39 +0000
+Received: from smtpav01.dal12v.mail.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+        by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BDFic0G2163368
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 13 Dec 2022 15:44:38 GMT
+Received: from smtpav01.dal12v.mail.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 73BA958058;
+        Tue, 13 Dec 2022 15:44:38 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9FCC658061;
+        Tue, 13 Dec 2022 15:44:37 +0000 (GMT)
+Received: from li-2c1e724c-2c76-11b2-a85c-ae42eaf3cb3d.endicott.ibm.com (unknown [9.60.85.43])
+        by smtpav01.dal12v.mail.com (Postfix) with ESMTP;
+        Tue, 13 Dec 2022 15:44:37 +0000 (GMT)
+From:   Tony Krowiak <akrowiak@linux.ibm.com>
+To:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        pasic@linux.ibm.com, alex.williamson@redhat.com,
+        kwankhede@nvidia.com, fiuczy@linux.ibm.com
+Subject: [PATCH 0/7] improve AP queue reset processing
+Date:   Tue, 13 Dec 2022 10:44:30 -0500
+Message-Id: <20221213154437.15480-1-akrowiak@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20221213100510-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: XZQ9b_nuV_Ulm5p9MGiE1wsaW7sA2ljH
+X-Proofpoint-ORIG-GUID: vTHPHg9cmRvLuTFeAAMOY-Kd4joDitx0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-13_03,2022-12-13_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 bulkscore=0 clxscore=1015 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=771 priorityscore=1501 phishscore=0 suspectscore=0 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2210170000 definitions=main-2212130137
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 13, 2022 at 10:06:23AM -0500, Michael S. Tsirkin wrote:
->On Tue, Dec 13, 2022 at 11:22:32AM +0100, Stefano Garzarella wrote:
->> > +	if (len <= GOOD_COPY_LEN && !skb_queue_empty_lockless(&vvs->rx_queue)) {
->>
->> Same here.
->>
->> If there are no major changes to be made, I think the next version is the
->> final ones, though we are now in the merge window, so net-next is closed
->> [1], only RFCs can be sent [2].
->>
->> I suggest you wait until the merge window is over (two weeks usually) to
->> send the next version.
->
->Nah, you never know, could be more comments. And depending on the timing
->I might be able to merge it.
+This series introduces several improvements to the function that performs
+AP queue resets:
 
-Right, in the end these changes are only to virtio-vsock transport, so 
-they can go smoothly even with your tree.
+* Breaks up reset processing into multiple smaller, more concise functions.
 
-@Bobby, so if you can fix the remaining small things, we can try to 
-merge it :-)
+* Use TAPQ to verify completion of a reset in progress rather than mulitple
+  invocations of ZAPQ.
 
-Thanks,
-Stefano
+* Check TAPQ response codes when verifying successful completion of ZAPQ.
+
+* Fix erroneous handling of some error response codes.
+
+* Increase the maximum amount of time to wait for successful completion of
+  ZAPQ.
+
+* Always clean up IRQ resources when the ZAPQ response code indicates an
+  error.
+
+* Consider reset complete when ZAPQ response code indicates the adapter to
+  which a queue is connected is deconfigured. All queues associated with an
+  adapter are reset when it is deconfigured. 
+
+Tony Krowiak (7):
+  s390/vfio-ap: verify reset complete in separate function
+  s390/vfio_ap: check TAPQ response code when waiting for queue reset
+  s390/vfio_ap: use TAPQ to verify reset in progress completes
+  s390/vfio_ap: verify ZAPQ completion after return of response code
+    zero
+  s390/vfio_ap: fix handling of error response codes
+  s390/vfio_ap: increase max wait time for reset verification
+  s390/vfio_ap: always clean up IRQ resources
+
+ drivers/s390/crypto/vfio_ap_ops.c | 106 ++++++++++++++++++++----------
+ 1 file changed, 73 insertions(+), 33 deletions(-)
+
+-- 
+2.31.1
 
