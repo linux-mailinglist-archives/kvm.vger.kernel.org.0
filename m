@@ -2,74 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E3AC064BBA3
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 19:12:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DCF7D64BBC3
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 19:17:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236452AbiLMSME (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 13:12:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45874 "EHLO
+        id S236486AbiLMSR0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 13:17:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236366AbiLMSMD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 13:12:03 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52C8F38AC
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 10:12:02 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id n65-20020a17090a2cc700b0021bc5ef7a14so4475902pjd.0
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 10:12:02 -0800 (PST)
+        with ESMTP id S236613AbiLMSQ7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 13:16:59 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4BD24951
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 10:16:02 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id d15so662528pls.6
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 10:16:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xYi2wzTmS91DztQJWezxrVaIvtUxCOobhUQC7IX33rE=;
-        b=kzONbnqS8z1JFK2IXGaoi5GJ1pMCpT4PlXC5FNkIw6q63bTQvlcxZVIW6PmmNPFJ7k
-         N2G7aePg8uGeKvZTxGksUo3W5fmyABmk90UxNaawnPN/wgR22eBiFbXGa0UUlXTFqVXG
-         6HK26llME9zlneTl7iwUD8/2W4Inh5m6n25C4rMGRVU9sXr3B350R73dLotmClxPqqHN
-         xbb6Q9ZqogS3kOrCcqeKYy7uBWf7Se7vxfBXeJzGi0cJuv/YWQjOSpRzlf7NXDXBhFdA
-         zUKIrHHDTuRH+THLudLnEaEAA05w+JB1aaMxDrhwRckrbW/BLDveKaq+RgRmQuGm4GUW
-         7bNQ==
+        bh=mbj0itUaH2iI2Sp/W9k9+6g0jhIxKWmgtOweAbYRTUI=;
+        b=sC+ng59I3Fq379InLul02c4vIKRtojDOmCdA3u1aPrX/Secw1WbygvzSnQtrcXYLRv
+         8VKvHC8/RMQeZSCGG/jWyFsHnoDakOTxmUStaD+UQ8VqsYKOHrI84HA18XL1CVHS8J9h
+         HhulPQMxoeQ5eGoAEvisjEzqhhcynKVfGGNoCr63YtiyGQHXmKY96OaKEomb08NNn78O
+         amnA22Drjb0CZ9McvmqXAFu+94KT/O2XAGO6jzMnzDHE6X30XS5Wm/xpxnd0IeOqdqss
+         oJZHunF1x1iV3VJHnI5ndOfeRV3QYopm0EUclP+FrLqT9kFY93zPSesA2dWEiSOvtQZp
+         hFkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xYi2wzTmS91DztQJWezxrVaIvtUxCOobhUQC7IX33rE=;
-        b=2SPM9aNucoZoHwyAf7bBMlIVcQ9AkfzWzxBVU9tTDj3qU0lK5c0dO9cDDnDCXsu3p2
-         u07rQM0hCoSffXItBlgToGXCwcGTPzgD1cPX31xhlUc/XjYSiB3qEBJkV+U8x89ht0J2
-         vMt8kteWKD8MrvhwnDFmDwyHcAoJ5y1PdV/w9b6s3dcYv8phpNTQWUXkaZDrujQqwuFq
-         /cscolvPeAR8poIrKpra5z5oUY9ER6OtLD1qFaub4MKFVPVVeqM5eD0tNXjItSxLRtiG
-         AM2FGIG4ncTDyqWQ7jF4EsmdUKzipPYpx00A5Kzf46ed4AX4rbrdBOT4ug6X5K1nn1MW
-         QD3A==
-X-Gm-Message-State: ANoB5pmjrUWFs/njbU/0SmYslzDHtCfam2fHw9vx6+yw6OjwsnNCAPmO
-        MEGMuAh0ORGwafzxzyhLrAHiNg==
-X-Google-Smtp-Source: AA0mqf44lsJ2QxarRPDgYalommUaCZ6IBecGxCtP56AfA+m5g0H4m391m+K+ZKD138lxt5j/42c8nQ==
-X-Received: by 2002:a17:902:c381:b0:189:a3de:ea2d with SMTP id g1-20020a170902c38100b00189a3deea2dmr373519plg.2.1670955121681;
-        Tue, 13 Dec 2022 10:12:01 -0800 (PST)
+        bh=mbj0itUaH2iI2Sp/W9k9+6g0jhIxKWmgtOweAbYRTUI=;
+        b=6OThf6kgccw8xt/EO4TS1OmJp5d/C5NXcGDAW6M89Wbh6MX0FGL+nBTyk0/7WtE4fY
+         z4nlWwixFkyCPa1p8VDrA6SO66LUtqLReMqVUZouV7wztp7Td4kEvyn36tGKzygWuIX0
+         SYrJ3/4uH7M5KTj1h6c/70JHVJJiafjQbLLb+EZus/FkJRdZtBRPAsOhoMU+W5zF1U7S
+         YUze3wTGsoEW7oF/1pirnUuuGUPBpHSRsu+q6+Sq/Q8iHmwLVihyRbw4BbLMqgB/5ALG
+         cA3jJS5R/5t2GtKcXWBWrDrW/5xx9IPTdCPJ2wiU32Sgo3LIDZH7DH2ydx86a8LKcqKL
+         4uvA==
+X-Gm-Message-State: ANoB5pmN1IBQnobTN4H632nUq/zzH1l0KCPn1GYC39NctZKVN+YuHNzM
+        bYTIJ23aZlGEhPpTa7R8gdsyAg==
+X-Google-Smtp-Source: AA0mqf5O9wC1on6FlXqUebgt4MLj8U3d2+Rhe7oCe8bSoF5oGoKdWjb5P1acJ9cSewPVoNCoOpq7EQ==
+X-Received: by 2002:a17:902:da8d:b0:189:3a04:4466 with SMTP id j13-20020a170902da8d00b001893a044466mr431766plx.2.1670955362013;
+        Tue, 13 Dec 2022 10:16:02 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n15-20020a170902e54f00b00186ff402508sm154628plf.281.2022.12.13.10.12.00
+        by smtp.gmail.com with ESMTPSA id s14-20020a170902ea0e00b00189c26719cdsm157289plg.272.2022.12.13.10.16.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 10:12:00 -0800 (PST)
-Date:   Tue, 13 Dec 2022 18:11:57 +0000
+        Tue, 13 Dec 2022 10:16:00 -0800 (PST)
+Date:   Tue, 13 Dec 2022 18:15:56 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] kvm: x86/mmu: Reduce the update to the spte in
- FNAME(sync_page)
-Message-ID: <Y5jAbS4kwRAdrWwM@google.com>
-References: <20221212153205.3360-1-jiangshanlai@gmail.com>
- <20221212153205.3360-2-jiangshanlai@gmail.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Greg Thelen <gthelen@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Subject: Re: [PATCH 4/5] KVM: x86/mmu: Don't install TDP MMU SPTE if SP has
+ unexpected level
+Message-ID: <Y5jBXIF26odk6jWC@google.com>
+References: <20221213033030.83345-1-seanjc@google.com>
+ <20221213033030.83345-5-seanjc@google.com>
+ <CALzav=d-9G6SSBCB=TbVWi9Szprm1wD3AqqgZzoCq26_LF_ySw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221212153205.3360-2-jiangshanlai@gmail.com>
+In-Reply-To: <CALzav=d-9G6SSBCB=TbVWi9Szprm1wD3AqqgZzoCq26_LF_ySw@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,81 +78,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 12, 2022, Lai Jiangshan wrote:
-> From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+On Tue, Dec 13, 2022, David Matlack wrote:
+> On Mon, Dec 12, 2022 at 7:30 PM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > Don't install a leaf TDP MMU SPTE if the parent page's level doesn't
+> > match the target level of the fault, and instead have the vCPU retry the
+> > faulting instruction after warning.  Continuing on is completely
+> > unnecessary as the absolute worst case scenario of retrying is DoSing
+> > the vCPU, whereas continuing on all but guarantees bigger explosions, e.g.
 > 
-> Sometimes when the guest updates its pagetable, it adds only new gptes
-> to it without changing any existed one, so there is no point to update
-> the sptes for these existed gptes.
->
-> Also when the sptes for these unchanged gptes are updated, the AD
-> bits are also removed since make_spte() is called with prefetch=true
-> which might result unneeded TLB flushing.
+> Would it make sense to kill the VM instead via KVM_BUG()?
 
-If either of the proposed changes is kept, please move this to a separate patch.
-Skipping updates for PTEs with the same protections is separate logical change
-from skipping updates when making the SPTE writable.
-
-Actually, can't we just pass @prefetch=false to make_spte()?  FNAME(prefetch_invalid_gpte)
-has already verified the Accessed bit is set in the GPTE, so at least for guest
-correctness there's no need to access-track the SPTE.  Host page aging is already
-fuzzy so I don't think there are problems there.
-
-> Do nothing if the permissions are unchanged or only write-access is
-> being added.
-
-I'm pretty sure skipping the "make writable" case is architecturally wrong.  On a
-#PF, any TLB entries for the faulting virtual address are required to be removed.
-That means KVM _must_ refresh the SPTE if a vCPU takes a !WRITABLE fault on an
-unsync page.  E.g. see kvm_inject_emulated_page_fault().
-
-> Only update the spte when write-access is being removed.  Drop the SPTE
-> otherwise.
-
-Correctness aside, there needs to be far more analysis and justification for a
-change like this, e.g. performance numbers for various workloads.
-
-> ---
->  arch/x86/kvm/mmu/paging_tmpl.h | 19 ++++++++++++++++++-
->  1 file changed, 18 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index e5662dbd519c..613f043a3e9e 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -1023,7 +1023,7 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->  	for (i = 0; i < SPTE_ENT_PER_PAGE; i++) {
->  		u64 *sptep, spte;
->  		struct kvm_memory_slot *slot;
-> -		unsigned pte_access;
-> +		unsigned old_pte_access, pte_access;
->  		pt_element_t gpte;
->  		gpa_t pte_gpa;
->  		gfn_t gfn;
-> @@ -1064,6 +1064,23 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->  			continue;
->  		}
->  
-> +		/*
-> +		 * Drop the SPTE if the new protections would result in access
-> +		 * permissions other than write-access is changing.  Do nothing
-> +		 * if the permissions are unchanged or only write-access is
-> +		 * being added.  Only update the spte when write-access is being
-> +		 * removed.
-> +		 */
-> +		old_pte_access = kvm_mmu_page_get_access(sp, i);
-> +		if (old_pte_access == pte_access ||
-> +		    (old_pte_access | ACC_WRITE_MASK) == pte_access)
-> +			continue;
-> +		if (old_pte_access != (pte_access | ACC_WRITE_MASK)) {
-> +			drop_spte(vcpu->kvm, &sp->spt[i]);
-> +			flush = true;
-> +			continue;
-> +		}
-> +
->  		/* Update the shadowed access bits in case they changed. */
->  		kvm_mmu_page_set_access(sp, i, pte_access);
->  
-> -- 
-> 2.19.1.6.gb485710b
-> 
+No, because if bug that hits this escapes to a release, odds are quite high that
+retrying will succeed.  E.g. the fix earlier in this series is for a rare corner
+case that I was able to hit consistently only by hacking KVM to effectively
+synchronize the page fault and zap.  Other than an extra page fault, no harm has
+been done to the guest, e.g. there's no need to kill the VM to protect it from
+data corruption.
