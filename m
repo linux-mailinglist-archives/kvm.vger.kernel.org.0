@@ -2,58 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B96364AFA1
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 07:09:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD17064AFA2
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 07:09:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234093AbiLMGJm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 01:09:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46252 "EHLO
+        id S234456AbiLMGJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 01:09:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234392AbiLMGJY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 01:09:24 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A138D1AD80
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 22:09:23 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id x8-20020a17090a1f8800b0022153149290so1330820pja.5
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 22:09:23 -0800 (PST)
+        with ESMTP id S234403AbiLMGJ0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 01:09:26 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3934F1ADA2
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 22:09:25 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id m13-20020a170902f64d00b001899a70c8f1so12437882plg.14
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 22:09:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=NFEhFRkg0+nIHx94jx/VqF2L4sTiUmledWciOk7WPsw=;
-        b=Mb6tzs3YFjNk5QMuKsNyQaWTpQK6Q7lsJPdTl4vbogpOKDC+ntZV7Jpct4rB9qejgS
-         +TtDI14OD1/tbbyL0L1wge29Emn1TKCNDyUVIVW/9MyHaXI0nXK8IvBdIC6yg8guyoAF
-         gfuWOj8X/Vo1tvZWFwPCHpGbpQmSokz4ohTqy8O5ywgy8xNUQdq25HZyfOn06xVPbeHz
-         f1jN5vSQgRJo2tLg2dmUbtNrbiKUpHc6IEDkC93EvSlNUWgEFgWzh466hT2saqDJ4VPo
-         6z92FRVBWysyeOs5/s4MlzrzvuBOUfUzSekVTf7PEWy4nB84hbdH6GhBOxMWrJyxaqJ0
-         D0sg==
+        bh=3ygtdZJHpe2jAbhrmEODv8rggvGUoguv5qPo3aQqhPM=;
+        b=pcmVTu4JD8o5BzVbE5RqsAHQF4iTjRKXTPoe+Wr1AmHVQrlVOOLTREcGLzBdX+CoDo
+         X5MOObPom/RmvwSbNsO6KyVsAm0XRd0voNAY0/brtLjD+YSWb/xEvQB+xHexbwoeoPei
+         9jdk3IzS747RceXkfVCGzDvhLBGFC74oZOJdMmE48mLLaRx/wH091RT6FwBPkS/zbRf9
+         Oyb4HYwaW1FIGfBTJJj30F7YXbKC/w0okF46x5P04R3+nRZpvXvjuTWHfIssZ5QAoX7I
+         6ex6l/Gs54L1I9eeJHSnhDUtkWvSF4Whla4N2HvTnwSewDlW82hqZ8zQ+QeeiOZJ0UkE
+         4cag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NFEhFRkg0+nIHx94jx/VqF2L4sTiUmledWciOk7WPsw=;
-        b=gDbXnkaNuJohgnJrorb8d4hLRy/zV7vwAbR2IoSRN5zJctdJxQP6KAtaPjlOnQZTC0
-         HCvoWcQKYdjOZhblvUIHsbCeexvdPm7yN4wX6gsxamV1Ik9v3NJUyw/BWhL3dJyIRs1e
-         7vM2dUyCg31hQXrwzbhWl02dns6/x4TSTMMH7jcfxTkAXuc5YKTpN5aaLFdesOHQ8/aT
-         hKot+0uhOjqfvuBMsDEnlm9KURCq67hIjjICFTCXX1w4ojKyNe6ndjY7wFrSS+6zOzN9
-         VO0zq2YhHZoj/ilechLO+WqwNvaWnL5mqe0a2lou4dH6GVUrFDa5sYjLDj1fCX0Npb7K
-         axpA==
-X-Gm-Message-State: ANoB5pl4TyXQTEe6FE+2p84QgEn6wtNWsRsNshgTH5Wk5JKBExz4Q4g7
-        flvSR4Cx/A1eOC+pfQAwxuuFO6termM=
-X-Google-Smtp-Source: AA0mqf5jt5c245aUwJezKZHvkmsfBuO04Z+Vnt9FiIfW7ooVnZwK9K2l+TpVRWvrG4KVi9WhnTLJKZwG7M8=
+        bh=3ygtdZJHpe2jAbhrmEODv8rggvGUoguv5qPo3aQqhPM=;
+        b=zCkDBid6TZ3Rn8IgPi6B3GPG35nyk+AWirax5xdvHrDUf0awFs6rCxp0rZsYDQJOCQ
+         4HSALOJ8bZwOcQFC5RYKoBbIKOs4hEarc3FwbYtuSShyq4nQrillkFnGVwZuI4JS2fr3
+         CPchxsD13UlGpr2XAMIXn1W7cB6xHsfwGjwspL1JwEjKczXWJtaXzXi4n8VRLywHU7Lk
+         vwTFr74JLqGAXAvABo0WecqFuSMoMvnJvNaFI4IY6sVhJnrokIZWWBwQcbF8lZm+JUm1
+         hN5seGONsGCDxfn8APK8L/i79BbbqMmJJMhAXmqGzfJmuKgCUZm55J+VFFrt1iI9LqEZ
+         h0dQ==
+X-Gm-Message-State: ANoB5pmBxXqVMXR12V4PO9QTI6zkwbR8chA1UXjgiXy3hIg9P2a4MMse
+        lBVok0Z8FhEgsn/2so3C87wxqQ8Fu54=
+X-Google-Smtp-Source: AA0mqf5qUYpkTbaxWjOo5zAYsTVPsJWj4HukpB0jjDg+TpR/x3X6VGRcXqTYdfccQRGJk7CJ8Xrm8cfONws=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:2d90:b0:219:7904:6de with SMTP id
- sj16-20020a17090b2d9000b00219790406demr166821pjb.136.1670911763239; Mon, 12
- Dec 2022 22:09:23 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:f14b:b0:18f:5a3:6069 with SMTP id
+ d11-20020a170902f14b00b0018f05a36069mr706521plb.46.1670911764799; Mon, 12 Dec
+ 2022 22:09:24 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 13 Dec 2022 06:09:09 +0000
+Date:   Tue, 13 Dec 2022 06:09:10 +0000
 In-Reply-To: <20221213060912.654668-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221213060912.654668-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.0.rc1.256.g54fd8350bd-goog
-Message-ID: <20221213060912.654668-5-seanjc@google.com>
-Subject: [PATCH 4/7] KVM: VMX: Always inline to_vmx() and to_kvm_vmx()
+Message-ID: <20221213060912.654668-6-seanjc@google.com>
+Subject: [PATCH 5/7] x86/entry: KVM: Use dedicated VMX NMI entry for 32-bit
+ kernels too
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -72,71 +73,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Tag to_vmx() and to_kvm_vmx() __always_inline as they both just reflect
-the passed in pointer (the embedded struct is the first field in the
-container), and drop the @vmx param from vmx_vcpu_enter_exit(), which
-likely existed purely to make noinstr validation happy.
+Use a dedicated entry for invoking the NMI handler from KVM VMX's VM-Exit
+path for 32-bit even though using a dedicated entry for 32-bit isn't
+strictly necessary.  Exposing a single symbol will allow KVM to reference
+the entry point in assembly code without having to resort to more #ifdefs
+(or #defines).  identry.h is intended to be included from asm files only
+once, and so simply including idtentry.h in KVM assembly isn't an option.
 
-Amusingly, when the compiler decides to not inline the helpers, e.g. for
-KASAN builds, to_vmx() and to_kvm_vmx() may end up pointing at the same
-symbol, which generates very confusing objtool warnings.  E.g. the use of
-to_vmx() in a future patch led to objtool complaining about to_kvm_vmx(),
-and only once all use of to_kvm_vmx() was commented out did to_vmx() pop
-up in the obj tool report.
+Bypassing the ESP fixup and CR3 switching in the standard NMI entry code
+is safe as KVM always handles NMIs that occur in the guest on a kernel
+stack, with a kernel CR3.
 
-  vmlinux.o: warning: objtool: vmx_vcpu_enter_exit+0x160: call to to_kvm_vmx()
-                               leaves .noinstr.text section
-
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/vmx/vmx.c | 5 +++--
- arch/x86/kvm/vmx/vmx.h | 4 ++--
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ arch/x86/include/asm/idtentry.h | 16 ++++++----------
+ arch/x86/kernel/nmi.c           |  8 ++++----
+ arch/x86/kvm/vmx/vmx.c          |  4 ++--
+ 3 files changed, 12 insertions(+), 16 deletions(-)
 
+diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+index 72184b0b2219..b241af4ce9b4 100644
+--- a/arch/x86/include/asm/idtentry.h
++++ b/arch/x86/include/asm/idtentry.h
+@@ -582,18 +582,14 @@ DECLARE_IDTENTRY_RAW(X86_TRAP_MC,	xenpv_exc_machine_check);
+ 
+ /* NMI */
+ 
+-#if defined(CONFIG_X86_64) && IS_ENABLED(CONFIG_KVM_INTEL)
++#if IS_ENABLED(CONFIG_KVM_INTEL)
+ /*
+- * Special NOIST entry point for VMX which invokes this on the kernel
+- * stack. asm_exc_nmi() requires an IST to work correctly vs. the NMI
+- * 'executing' marker.
+- *
+- * On 32bit this just uses the regular NMI entry point because 32-bit does
+- * not have ISTs.
++ * Special entry point for VMX which invokes this on the kernel stack, even for
++ * 64-bit, i.e. without using an IST.  asm_exc_nmi() requires an IST to work
++ * correctly vs. the NMI 'executing' marker.  Used for 32-bit kernels as well
++ * to avoid more ifdeffery.
+  */
+-DECLARE_IDTENTRY(X86_TRAP_NMI,		exc_nmi_noist);
+-#else
+-#define asm_exc_nmi_noist		asm_exc_nmi
++DECLARE_IDTENTRY(X86_TRAP_NMI,		exc_nmi_kvm_vmx);
+ #endif
+ 
+ DECLARE_IDTENTRY_NMI(X86_TRAP_NMI,	exc_nmi);
+diff --git a/arch/x86/kernel/nmi.c b/arch/x86/kernel/nmi.c
+index cec0bfa3bc04..e37faba95bb5 100644
+--- a/arch/x86/kernel/nmi.c
++++ b/arch/x86/kernel/nmi.c
+@@ -527,14 +527,14 @@ DEFINE_IDTENTRY_RAW(exc_nmi)
+ 		mds_user_clear_cpu_buffers();
+ }
+ 
+-#if defined(CONFIG_X86_64) && IS_ENABLED(CONFIG_KVM_INTEL)
+-DEFINE_IDTENTRY_RAW(exc_nmi_noist)
++#if IS_ENABLED(CONFIG_KVM_INTEL)
++DEFINE_IDTENTRY_RAW(exc_nmi_kvm_vmx)
+ {
+ 	exc_nmi(regs);
+ }
+-#endif
+ #if IS_MODULE(CONFIG_KVM_INTEL)
+-EXPORT_SYMBOL_GPL(asm_exc_nmi_noist);
++EXPORT_SYMBOL_GPL(asm_exc_nmi_kvm_vmx);
++#endif
+ #endif
+ 
+ void stop_nmi(void)
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fe5615fd8295..e2c96f204b82 100644
+index e2c96f204b82..7ace22ee240d 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -7096,9 +7096,10 @@ static fastpath_t vmx_exit_handlers_fastpath(struct kvm_vcpu *vcpu)
- }
- 
- static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
--					struct vcpu_vmx *vmx,
- 					unsigned long flags)
+@@ -6791,7 +6791,7 @@ void vmx_do_interrupt_nmi_irqoff(unsigned long entry);
+ static void handle_interrupt_nmi_irqoff(struct kvm_vcpu *vcpu,
+ 					unsigned long entry)
  {
-+	struct vcpu_vmx *vmx = to_vmx(vcpu);
-+
- 	guest_state_enter_irqoff();
+-	bool is_nmi = entry == (unsigned long)asm_exc_nmi_noist;
++	bool is_nmi = entry == (unsigned long)asm_exc_nmi_kvm_vmx;
  
- 	/* L1D Flush includes CPU buffer clear to mitigate MDS */
-@@ -7216,7 +7217,7 @@ static fastpath_t vmx_vcpu_run(struct kvm_vcpu *vcpu)
- 	kvm_wait_lapic_expire(vcpu);
+ 	kvm_before_interrupt(vcpu, is_nmi ? KVM_HANDLING_NMI : KVM_HANDLING_IRQ);
+ 	vmx_do_interrupt_nmi_irqoff(entry);
+@@ -6820,7 +6820,7 @@ static void handle_nm_fault_irqoff(struct kvm_vcpu *vcpu)
  
- 	/* The actual VMENTER/EXIT is in the .noinstr.text section. */
--	vmx_vcpu_enter_exit(vcpu, vmx, __vmx_vcpu_run_flags(vmx));
-+	vmx_vcpu_enter_exit(vcpu, __vmx_vcpu_run_flags(vmx));
- 
- 	/* All fields are clean at this point */
- 	if (static_branch_unlikely(&enable_evmcs)) {
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index bb720a2f11ab..2acdc54bc34b 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -640,12 +640,12 @@ BUILD_CONTROLS_SHADOW(tertiary_exec, TERTIARY_VM_EXEC_CONTROL, 64)
- 				(1 << VCPU_EXREG_EXIT_INFO_1) | \
- 				(1 << VCPU_EXREG_EXIT_INFO_2))
- 
--static inline struct kvm_vmx *to_kvm_vmx(struct kvm *kvm)
-+static __always_inline struct kvm_vmx *to_kvm_vmx(struct kvm *kvm)
+ static void handle_exception_nmi_irqoff(struct vcpu_vmx *vmx)
  {
- 	return container_of(kvm, struct kvm_vmx, kvm);
- }
+-	const unsigned long nmi_entry = (unsigned long)asm_exc_nmi_noist;
++	const unsigned long nmi_entry = (unsigned long)asm_exc_nmi_kvm_vmx;
+ 	u32 intr_info = vmx_get_intr_info(&vmx->vcpu);
  
--static inline struct vcpu_vmx *to_vmx(struct kvm_vcpu *vcpu)
-+static __always_inline struct vcpu_vmx *to_vmx(struct kvm_vcpu *vcpu)
- {
- 	return container_of(vcpu, struct vcpu_vmx, vcpu);
- }
+ 	/* if exit due to PF check for async PF */
 -- 
 2.39.0.rc1.256.g54fd8350bd-goog
 
