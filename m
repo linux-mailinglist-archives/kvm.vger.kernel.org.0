@@ -2,74 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D97F64BB7B
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 19:01:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70CA464BB7F
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 19:03:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235917AbiLMSBO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 13:01:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39342 "EHLO
+        id S236177AbiLMSDr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 13:03:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235365AbiLMSBM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 13:01:12 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0634623E99
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 10:01:11 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id s7so616189plk.5
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 10:01:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=My4YjakvUbk1o4WKdOiZPCHxDVw/xJTKMr2LnnQaGN4=;
-        b=qZ2TtkvdjSipsoOAy2H8rx1eDLV0IwHZJqgJhy2mQpYEuqdMLebaJVSgIHR/ARSz1k
-         LfaFGRrM0ut24/oOPGSvhet5aEwIBrXMJDWG/1qMrXzG/Hnhm0YOBCBlHfHNwFyUM+ON
-         a5DoiEzNA9xVWE+azzfd12FxNkqFM9QtuUyqLrqSLSSPmujZzoSkczfNHMIezfoeuaMa
-         1FuUa8IHJO9oFkepiksdXdhNYbopyFA8woTs4VC7UFX9GB34ZFf3672qIK0U0aZrN+aV
-         1pVCFEPNVwNT6baCr9cu0ykRDIy7BR+w7UqqR9kI4FyMgIV0um1klazVcHbNTu++RJG9
-         QrPA==
+        with ESMTP id S235365AbiLMSDp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 13:03:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41944642A
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 10:02:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1670954577;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=r9E+N2k2PlNYTDkkB3cR457URBRxZvtHjvtb7vtCz4k=;
+        b=I8WwdHHDGRTuz+0uTCgTB2Y9WiKa+z42iGqggt/eR4ZajR9BbXF54/2gmH+7JQzH5RFegi
+        YFpZ5an1ELYcPuS4u0nrifzKuYqbDfsbi0wUvK9GdTaatqMoHyp1mIupOQaSSw3CbWGllu
+        NJIoXan5inh6gX7cchXyx9jPXtTPcLw=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-245-NQgzejwtOgqnMipUwHQf9A-1; Tue, 13 Dec 2022 13:02:56 -0500
+X-MC-Unique: NQgzejwtOgqnMipUwHQf9A-1
+Received: by mail-il1-f199.google.com with SMTP id 7-20020a056e0220c700b0030386f0d0e6so7980833ilq.3
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 10:02:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=My4YjakvUbk1o4WKdOiZPCHxDVw/xJTKMr2LnnQaGN4=;
-        b=UaLyFMi7Pmm/8RH5CMLhNS9NefHzGDNaoAajnfqfT7nckiLHhRzjmFd5BBD1dTsSVf
-         vi46EtRQRewNjMDFlRyK5oW60M/ZnBXdZlqmdwn3PfgTabtUGmR7pX+lJh5T152z9pGa
-         CeIlxZeXhnRFrUIPq8QhaYbOHGUBR3vV7cfPT1vcbriMHgT8MRalMkTvNU6hMbmLHxdz
-         02wy1rKI02Nlm7ZuaxhLgenE61oPiEZXe5CjfBIUF/NYPLvwMRL9ekAdmQ3sV72ugJVz
-         dKWiUarX2xHtspUiLnDxLw7ZvGtTJBRuolLwtVMAStZ1ip7bpOvp9vT5QMvchRKyvZQA
-         OLjw==
-X-Gm-Message-State: ANoB5pkyxTiI8a1lqFTPHl99+n7UVZCociUMN0+e5LPyo0fLC/l8o5CL
-        ga7moum6STgx/ZrgKMJWyFe7EQ==
-X-Google-Smtp-Source: AA0mqf4b6XRxUROBc2qMpJNJy/tdk1Pvr20WZBKA5WikwHicXBS9yibYpkN11XonvaaqbdY4TynPWA==
-X-Received: by 2002:a05:6a21:2d8f:b0:a7:882e:3a18 with SMTP id ty15-20020a056a212d8f00b000a7882e3a18mr120302pzb.1.1670954470167;
-        Tue, 13 Dec 2022 10:01:10 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id h196-20020a6283cd000000b0056d3b8f530csm7941292pfe.34.2022.12.13.10.01.09
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=r9E+N2k2PlNYTDkkB3cR457URBRxZvtHjvtb7vtCz4k=;
+        b=L2yreJK8C9gH4phUX4cvHNeUlnPkfKMq9UV3x2thOGIHw/YEfGEvwUWzTyGEq/oR24
+         32CZesl6xfVzWGbzHZYTG2FB7+J7M+1/lKpZ7rNCLOPahTbEttNhoVBZJwbD1g1S7AMr
+         I0mdRLvHHupqbiZW6lj55MK9c58n7Vs7aJtt8kvRZA2Pzol4/e9ZbGZ+7MuG+vrTEXAK
+         twko0FcAENJwoaom9KP7xOSL7wzhStXnHuDLHXF2SvFJvVPFdNx1Gtj0sEdNeUQ852fU
+         nFiav8QLjGRNJxHCtBfu8O03Ouad+peQpiwKfpIzU0C6ZyWK4H//NNG94Dm3W4GP9PEr
+         bmbg==
+X-Gm-Message-State: ANoB5pn9jMY3mUxzcLEMAXHveeTF6CHFSi9OCh0wmkgVk3Vuar+Q8u0c
+        F9u7gl58OvYtvKk7oMg/P5aZb03bl53TlZCDjG0cvlw0vkAz504YlBcXROsGrpvgOV14tt2Sas5
+        cT0d4MRVr/iar
+X-Received: by 2002:a5d:8351:0:b0:6df:e430:e8af with SMTP id q17-20020a5d8351000000b006dfe430e8afmr12799526ior.18.1670954574929;
+        Tue, 13 Dec 2022 10:02:54 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf7fbBsONL4xFqevTRJrZky2JIfHRDglikffxIKp7h2t/k7F5PKdgBRP/9gr8ZkeTK8bSLbi2Q==
+X-Received: by 2002:a5d:8351:0:b0:6df:e430:e8af with SMTP id q17-20020a5d8351000000b006dfe430e8afmr12799508ior.18.1670954574695;
+        Tue, 13 Dec 2022 10:02:54 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id f90-20020a0284e3000000b00374ff5df5ccsm1033157jai.167.2022.12.13.10.02.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 10:01:09 -0800 (PST)
-Date:   Tue, 13 Dec 2022 10:01:06 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, maz@kernel.org, eric.auger@redhat.com,
-        oliver.upton@linux.dev, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH 1/3] arm: pmu: Fix overflow checks for
- PMUv3p5 long counters
-Message-ID: <Y5i94ojqRTJMWu8U@google.com>
-References: <20221202045527.3646838-1-ricarkol@google.com>
- <20221202045527.3646838-2-ricarkol@google.com>
- <Y5hxvj6p+mCC2DOs@monolith.localdoman>
- <Y5imhKUIJceHDUMD@google.com>
- <Y5irunF72esHzOWj@monolith.localdoman>
+        Tue, 13 Dec 2022 10:02:54 -0800 (PST)
+Date:   Tue, 13 Dec 2022 11:02:52 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Steve Sistare <steven.sistare@oracle.com>
+Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [PATCH V1 2/2] vfio/type1: prevent locked_vm underflow
+Message-ID: <20221213110252.7bcebb97.alex.williamson@redhat.com>
+In-Reply-To: <1670946416-155307-3-git-send-email-steven.sistare@oracle.com>
+References: <1670946416-155307-1-git-send-email-steven.sistare@oracle.com>
+        <1670946416-155307-3-git-send-email-steven.sistare@oracle.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5irunF72esHzOWj@monolith.localdoman>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,204 +78,81 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 13, 2022 at 04:43:38PM +0000, Alexandru Elisei wrote:
-> Hi,
-> 
-> On Tue, Dec 13, 2022 at 08:21:24AM -0800, Ricardo Koller wrote:
-> > On Tue, Dec 13, 2022 at 12:36:14PM +0000, Alexandru Elisei wrote:
-> > > Hi,
-> > > 
-> > > Some more comments below.
-> > > 
-> > > On Fri, Dec 02, 2022 at 04:55:25AM +0000, Ricardo Koller wrote:
-> > > > PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
-> > > > for overflowing at 32 or 64-bits. The consequence is that tests that check
-> > > > the counter values after overflowing should not assume that values will be
-> > > > wrapped around 32-bits: they overflow into the other half of the 64-bit
-> > > > counters on PMUv3p5.
-> > > > 
-> > > > Fix tests by correctly checking overflowing-counters against the expected
-> > > > 64-bit value.
-> > > > 
-> > > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > > > ---
-> > > >  arm/pmu.c | 29 ++++++++++++++++++-----------
-> > > >  1 file changed, 18 insertions(+), 11 deletions(-)
-> > > > 
-> > > > diff --git a/arm/pmu.c b/arm/pmu.c
-> > > > index cd47b14..eeac984 100644
-> > > > --- a/arm/pmu.c
-> > > > +++ b/arm/pmu.c
-> > > > @@ -54,10 +54,10 @@
-> > > >  #define EXT_COMMON_EVENTS_LOW	0x4000
-> > > >  #define EXT_COMMON_EVENTS_HIGH	0x403F
-> > > >  
-> > > > -#define ALL_SET			0xFFFFFFFF
-> > > > -#define ALL_CLEAR		0x0
-> > > > -#define PRE_OVERFLOW		0xFFFFFFF0
-> > > > -#define PRE_OVERFLOW2		0xFFFFFFDC
-> > > > +#define ALL_SET			0x00000000FFFFFFFFULL
-> > > > +#define ALL_CLEAR		0x0000000000000000ULL
-> > > > +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
-> > > > +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
-> > > >  
-> > > >  #define PMU_PPI			23
-> > > >  
-> > > > @@ -538,6 +538,7 @@ static void test_mem_access(void)
-> > > >  static void test_sw_incr(void)
-> > > >  {
-> > > >  	uint32_t events[] = {SW_INCR, SW_INCR};
-> > > > +	uint64_t cntr0;
-> > > >  	int i;
-> > > >  
-> > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> > > > @@ -572,9 +573,9 @@ static void test_sw_incr(void)
-> > > >  		write_sysreg(0x3, pmswinc_el0);
-> > > >  
-> > > >  	isb();
-> > > > -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
-> > > > -	report(read_regn_el0(pmevcntr, 1)  == 100,
-> > > > -		"counter #0 after + 100 SW_INCR");
-> > > > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
-> > > > +	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
-> > > > +	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
-> > > >  	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
-> > > >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
-> > > >  	report(read_sysreg(pmovsclr_el0) == 0x1,
-> > > > @@ -584,6 +585,7 @@ static void test_sw_incr(void)
-> > > >  static void test_chained_counters(void)
-> > > >  {
-> > > >  	uint32_t events[] = {CPU_CYCLES, CHAIN};
-> > > > +	uint64_t cntr1;
-> > > >  
-> > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> > > >  		return;
-> > > > @@ -618,13 +620,16 @@ static void test_chained_counters(void)
-> > > >  
-> > > >  	precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
-> > > >  	report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> > > > -	report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
-> > > > +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
-> > > > +	report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
-> > > 
-> > > It looks to me like the intention of the test was to check that the counter
-> > > programmed with the CHAIN event wraps, judging from the report message.
-> > > 
-> > 
-> > Ah, right. Yeah, that message is confusing. It should be the short
-> > version of "Inrementing at 32-bits resulted in the right value".
-> > 
-> > > I think it would be interesting to keep that by programming counter #1 with
-> > > ~0ULL when PMUv3p5 (maybe call it ALL_SET64?) and test the counter value
-> > > against 0.
-> > 
-> > The last commit adds tests using ALL_SET64.  Tests can be run in two
-> > modes: overflow_at_64bits and not.  However, this test,
-> > test_chained_counters(), and all other chained tests only use the
-> > !overflow_at_64bits mode (even after the last commit). The reason is
-> > that there are no CHAIN events when overflowing at 64-bits (more details
-> > in the commit message). But, don't worry, there are lots of tests that
-> > check wrapping at 64-bits (overflow_at_64bits=true).
-> 
-> What I was suggesting is this (change on top of this series, not on top of
-> this patch, to get access to ALL_SET_AT):
+On Tue, 13 Dec 2022 07:46:56 -0800
+Steve Sistare <steven.sistare@oracle.com> wrote:
 
-Ooh, I see, I agree: it would be better to check that the odd counter
-increments from ~0ULL to 0 when using 64-bit counters.
+> When a vfio container is preserved across exec using the VFIO_UPDATE_VADDR
+> interfaces, locked_vm of the new mm becomes 0.  If the user later unmaps a
+> dma mapping, locked_vm underflows to a large unsigned value, and a
+> subsequent dma map request fails with ENOMEM in __account_locked_vm.
+> 
+> To fix, when VFIO_DMA_MAP_FLAG_VADDR is used and the dma's mm has changed,
+> add the mapping's pinned page count to the new mm->locked_vm, subject to
+> the rlimit.  Now that mediated devices are excluded when using
+> VFIO_UPDATE_VADDR, the amount of pinned memory equals the size of the
+> mapping.
+> 
+> Underflow will not occur when all dma mappings are invalidated before exec.
+> An attempt to unmap before updating the vaddr with VFIO_DMA_MAP_FLAG_VADDR
+> will fail with EINVAL because the mapping is in the vaddr_invalid state.
 
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 3cb563b1abe4..fd7f20fc6c52 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -607,7 +607,6 @@ static void test_sw_incr(bool overflow_at_64bits)
->  static void test_chained_counters(bool overflow_at_64bits)
->  {
->         uint32_t events[] = {CPU_CYCLES, CHAIN};
-> -       uint64_t cntr1;
-> 
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events),
->                                    overflow_at_64bits))
-> @@ -639,12 +638,11 @@ static void test_chained_counters(bool overflow_at_64bits)
->         report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
-> 
->         write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, ALL_SET);
-> +       write_regn_el0(pmevcntr, 1, ALL_SET_AT(overflow_at_64bits));
+Where is this enforced?
 
-The only change is that this should be:
+> Underflow may still occur in a buggy application that fails to invalidate
+> all before exec.
+> 
+> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+> ---
+>  drivers/vfio/vfio_iommu_type1.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index f81e925..e5a02f8 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -100,6 +100,7 @@ struct vfio_dma {
+>  	struct task_struct	*task;
+>  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
+>  	unsigned long		*bitmap;
+> +	struct mm_struct	*mm;
+>  };
+>  
+>  struct vfio_batch {
+> @@ -1174,6 +1175,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
+>  	vfio_unmap_unpin(iommu, dma, true);
+>  	vfio_unlink_dma(iommu, dma);
+>  	put_task_struct(dma->task);
+> +	mmdrop(dma->mm);
+>  	vfio_dma_bitmap_free(dma);
+>  	if (dma->vaddr_invalid) {
+>  		iommu->vaddr_invalid_count--;
+> @@ -1622,6 +1624,13 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>  			dma->vaddr = vaddr;
+>  			dma->vaddr_invalid = false;
+>  			iommu->vaddr_invalid_count--;
+> +			if (current->mm != dma->mm) {
+> +				mmdrop(dma->mm);
+> +				dma->mm = current->mm;
+> +				mmgrab(dma->mm);
+> +				ret = vfio_lock_acct(dma, size >> PAGE_SHIFT,
+> +						     0);
 
-	ALL_SET_AT(pmu.version >= ID_DFR0_PMU_V3_8_5)
+What does it actually mean if this fails?  The pages are still pinned.
+lock_vm doesn't get updated.  Underflow can still occur.  Thanks,
 
-Because "overflow_at_64bits" implies PMCR_EL0.LP = 1.
+Alex
 
-> 
->         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->         report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> -       cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
-> -       report(read_regn_el0(pmevcntr, 1) == cntr1, "CHAIN counter #1 wrapped");
-> +       report(read_regn_el0(pmevcntr, 1) == 0, "CHAIN counter #1 wrapped");
-> 
->         report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
->  }
-> 
-> The counters are 64bit, but the CHAIN event should still work because
-> PMCR_EL0.LP is 0, according to the event description in the Arm ARM (ARM
-> DDI 0487I.a, page D17-6461).
-> 
-> Thanks,
-> Alex
-> 
-> > 
-> > > Alternatively, the report message can be modified, and "wrapped"
-> > > replaced with "incremented" (or something like that), to avoid confusion.
-> > > 
-> > > > +
-> > > >  	report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
-> > > >  }
-> > > >  
-> > > >  static void test_chained_sw_incr(void)
-> > > >  {
-> > > >  	uint32_t events[] = {SW_INCR, CHAIN};
-> > > > +	uint64_t cntr0, cntr1;
-> > > >  	int i;
-> > > >  
-> > > >  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> > > > @@ -665,10 +670,12 @@ static void test_chained_sw_incr(void)
-> > > >  		write_sysreg(0x1, pmswinc_el0);
-> > > >  
-> > > >  	isb();
-> > > > +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 0 : ALL_SET + 1;
-> > > > +	cntr1 = (pmu.version < ID_DFR0_PMU_V3_8_5) ? 84 : PRE_OVERFLOW + 100;
-> > > >  	report((read_sysreg(pmovsclr_el0) == 0x3) &&
-> > > > -		(read_regn_el0(pmevcntr, 1) == 0) &&
-> > > > -		(read_regn_el0(pmevcntr, 0) == 84),
-> > > > -		"expected overflows and values after 100 SW_INCR/CHAIN");
-> > > > +	       (read_regn_el0(pmevcntr, 1) == cntr0) &&
-> > > > +	       (read_regn_el0(pmevcntr, 0) == cntr1),
-> > > 
-> > > This is hard to parse, it would be better if counter 0 is compared against
-> > > cntr0 and counter 1 against cntr1.
-> > 
-> > Ah, yes, code is correct but that's indeed confusing.
-> > 
-> > > 
-> > > Also, same suggestion here, looks like the test wants to check that the
-> > > odd-numbered counter wraps around when counting the CHAIN event.
-> > 
-> > Ack. Will update for v2.
-> > 
-> > Thanks!
-> > Ricardo
-> > 
-> > > 
-> > > Thanks,
-> > > Alex
-> > > 
-> > > > +	       "expected overflows and values after 100 SW_INCR/CHAIN");
-> > > >  	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-> > > >  		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
-> > > >  }
-> > > > -- 
-> > > > 2.39.0.rc0.267.gcb52ba06e7-goog
-> > > > 
+> +			}
+>  			wake_up_all(&iommu->vaddr_wait);
+>  		}
+>  		goto out_unlock;
+> @@ -1679,6 +1688,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>  	get_task_struct(current->group_leader);
+>  	dma->task = current->group_leader;
+>  	dma->lock_cap = capable(CAP_IPC_LOCK);
+> +	dma->mm = dma->task->mm;
+> +	mmgrab(dma->mm);
+>  
+>  	dma->pfn_list = RB_ROOT;
+>  
+
