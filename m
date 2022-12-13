@@ -2,141 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C293064B8ED
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 16:49:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73F9964B946
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 17:08:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236356AbiLMPtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 10:49:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44166 "EHLO
+        id S235753AbiLMQIP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 11:08:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236347AbiLMPtT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 10:49:19 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4731317E35
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 07:47:02 -0800 (PST)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BDDtThp013300;
-        Tue, 13 Dec 2022 15:47:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2022-7-12;
- bh=Jl8MqcUP7i6WwvUBNOvDL9IlaIBUhMbriHNYQ+2+wXE=;
- b=aIZcLKfGUCc3T9qNGqXiosWySS+aXBS8dVwfGXq1JT2Pqj7g+44dpfmkUUSX0PiBpy/C
- SfiMCvL3XxDfV2vHyUXVqpTuad6kJRyRz+mk9vKzIk1EkhtYGYiCzRP6fQG+lPbBRxGN
- xbdIcGG5kK4j9oqkZHoDhatEU8QPgO1U7G7v3hsAuYqlS5X/UaKi2dVFURFQqtJvjCXJ
- UKHItf56X8B1SuYijnUeLkprK29RSTpNsBnj5A45oIWs2xjz6ehxFJWm3y9KEXgLQpWR
- 2llkQf6DVATZCQjgkeQ2s6pNFBdDE6gFqbcypoHQEUpw/2/h3MPP5CoTqxJ1GDSR0FQW Iw== 
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3mchqswp3a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Dec 2022 15:47:00 +0000
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BDFCUVt040114;
-        Tue, 13 Dec 2022 15:46:59 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3mcgjcg43p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 13 Dec 2022 15:46:59 +0000
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BDFgwtK031631;
-        Tue, 13 Dec 2022 15:46:59 GMT
-Received: from ca-dev63.us.oracle.com (ca-dev63.us.oracle.com [10.211.8.221])
-        by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3mcgjcg40c-3;
-        Tue, 13 Dec 2022 15:46:59 +0000
-From:   Steve Sistare <steven.sistare@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V1 2/2] vfio/type1: prevent locked_vm underflow
-Date:   Tue, 13 Dec 2022 07:46:56 -0800
-Message-Id: <1670946416-155307-3-git-send-email-steven.sistare@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1670946416-155307-1-git-send-email-steven.sistare@oracle.com>
-References: <1670946416-155307-1-git-send-email-steven.sistare@oracle.com>
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-13_03,2022-12-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 bulkscore=0
- suspectscore=0 mlxlogscore=999 phishscore=0 mlxscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2210170000
- definitions=main-2212130139
-X-Proofpoint-ORIG-GUID: UuxHnpnxYSKfT247nRmYM7Teq6sllVRT
-X-Proofpoint-GUID: UuxHnpnxYSKfT247nRmYM7Teq6sllVRT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S235081AbiLMQIN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 11:08:13 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD9C282;
+        Tue, 13 Dec 2022 08:08:12 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id C5A8867373; Tue, 13 Dec 2022 17:08:07 +0100 (CET)
+Date:   Tue, 13 Dec 2022 17:08:07 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Christoph Hellwig <hch@lst.de>, Lei Rao <lei.rao@intel.com>,
+        kbusch@kernel.org, axboe@fb.com, kch@nvidia.com, sagi@grimberg.me,
+        alex.williamson@redhat.com, cohuck@redhat.com, yishaih@nvidia.com,
+        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com,
+        mjrosato@linux.ibm.com, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, kvm@vger.kernel.org,
+        eddie.dong@intel.com, yadong.li@intel.com, yi.l.liu@intel.com,
+        Konrad.wilk@oracle.com, stephen@eideticom.com, hang.yuan@intel.com
+Subject: Re: [RFC PATCH 1/5] nvme-pci: add function nvme_submit_vf_cmd to
+ issue admin commands for VF driver.
+Message-ID: <20221213160807.GA626@lst.de>
+References: <20221207075415.GB2283@lst.de> <Y5CWVu08abcOuEQH@ziepe.ca> <20221207135203.GA22803@lst.de> <Y5CsH5PqMYAWYatw@ziepe.ca> <20221207163857.GB2010@lst.de> <Y5DOAKArjyfb6Mcz@ziepe.ca> <20221207183333.GA7049@lst.de> <Y5DyorZJPdtN5WcX@ziepe.ca> <20221212075046.GB11162@lst.de> <Y5iFnw5i3vI9iMFY@ziepe.ca>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y5iFnw5i3vI9iMFY@ziepe.ca>
+User-Agent: Mutt/1.5.17 (2007-11-01)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When a vfio container is preserved across exec using the VFIO_UPDATE_VADDR
-interfaces, locked_vm of the new mm becomes 0.  If the user later unmaps a
-dma mapping, locked_vm underflows to a large unsigned value, and a
-subsequent dma map request fails with ENOMEM in __account_locked_vm.
+On Tue, Dec 13, 2022 at 10:01:03AM -0400, Jason Gunthorpe wrote:
+> > So now we need to write a vfio shim for every function even if there
+> > is absolutely nothing special about that function?  Migrating really
+> > is the controlling functions behavior, and writing a new vfio bit
+> > for every controlled thing just does not scale.
+> 
+> Huh? "does not scale?" We are looking at boilerplates of around 20-30
+> lines to make a VFIO driver for a real PCI device. Why is that even
+> something we should worry about optimizing?
 
-To fix, when VFIO_DMA_MAP_FLAG_VADDR is used and the dma's mm has changed,
-add the mapping's pinned page count to the new mm->locked_vm, subject to
-the rlimit.  Now that mediated devices are excluded when using
-VFIO_UPDATE_VADDR, the amount of pinned memory equals the size of the
-mapping.
+But we need a new driver for every controlled function now, which
+is very different from the classic VFIO model where we had one
+vfio_pci.
 
-Underflow will not occur when all dma mappings are invalidated before exec.
-An attempt to unmap before updating the vaddr with VFIO_DMA_MAP_FLAG_VADDR
-will fail with EINVAL because the mapping is in the vaddr_invalid state.
-Underflow may still occur in a buggy application that fails to invalidate
-all before exec.
+> And when you get into exciting future devices like SIOV you already
+> need to make a special VFIO driver anyhow.
 
-Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
----
- drivers/vfio/vfio_iommu_type1.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+You need to special support for it.  It's probably not another
+Linux driver but part of the parent one, though.
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index f81e925..e5a02f8 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -100,6 +100,7 @@ struct vfio_dma {
- 	struct task_struct	*task;
- 	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
- 	unsigned long		*bitmap;
-+	struct mm_struct	*mm;
- };
- 
- struct vfio_batch {
-@@ -1174,6 +1175,7 @@ static void vfio_remove_dma(struct vfio_iommu *iommu, struct vfio_dma *dma)
- 	vfio_unmap_unpin(iommu, dma, true);
- 	vfio_unlink_dma(iommu, dma);
- 	put_task_struct(dma->task);
-+	mmdrop(dma->mm);
- 	vfio_dma_bitmap_free(dma);
- 	if (dma->vaddr_invalid) {
- 		iommu->vaddr_invalid_count--;
-@@ -1622,6 +1624,13 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 			dma->vaddr = vaddr;
- 			dma->vaddr_invalid = false;
- 			iommu->vaddr_invalid_count--;
-+			if (current->mm != dma->mm) {
-+				mmdrop(dma->mm);
-+				dma->mm = current->mm;
-+				mmgrab(dma->mm);
-+				ret = vfio_lock_acct(dma, size >> PAGE_SHIFT,
-+						     0);
-+			}
- 			wake_up_all(&iommu->vaddr_wait);
- 		}
- 		goto out_unlock;
-@@ -1679,6 +1688,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
- 	get_task_struct(current->group_leader);
- 	dma->task = current->group_leader;
- 	dma->lock_cap = capable(CAP_IPC_LOCK);
-+	dma->mm = dma->task->mm;
-+	mmgrab(dma->mm);
- 
- 	dma->pfn_list = RB_ROOT;
- 
--- 
-1.8.3.1
+> So far 100% of the drivers that have been presented, including the two
+> RFC ones, have entanglements between live migration and vfio. Shifting
+> things to dev/live_migration doesn't make the "communication problem"
+> away, it just shifted it into another subsystem.
 
+The main entanglement seems to be that it needs to support a vfio
+interface for live migration while the actual commands go to the
+parent device.
+
+> This is my point, I've yet to even see a driver that meets your
+> theoretical standard that it can exist without vfio entanglement.
+
+It can't right now due to the VFIO design.
+
+> > While creating the VFs from the PF driver makes a lot more sense,
+> > remember that vfio is absolutely not the only use case for VFs.
+> > There are plenty use cases where you want to use them with the normal
+> > kernel driver as well.  So the interface to create VFs needs a now
+> > to decide if it should be vfio exported, or use the normal kernel
+> > binding.
+> 
+> Yes, that is why this problem has been open for so long. Fixing it
+> well requires some reconsideration of how the driver core works :(
+> 
+> It is worse than just VFIO vs one kernel driver, like mlx5 could spawn
+> a controlled function that is NVMe, VDPA, mlx5, virtio-net, VFIO,
+> etc.
+
+This seems to violate the PCIe spec, which says:
+
+"All VFs associated with a PF must be the same device type as the PF,
+(e.g., the same network device type or the same storage device type.)",
+
+which is also enforced by not allowing to read vendor/device/class
+fields from VFs.
+
+(not that I'm arguing that this is a good limit, but that's how
+PCIe does it).
+
+> When we create the function we really want to tell the device what
+> kind of function it is, and that also tells the kernel what driver
+> should be bound to it.
+
+I'd rather have different ways to probe by passing a "kind" or "type"
+argument along the device IDs during probing.  E.g. "driver"
+and "vfio", and then only match for the kind the creator of the device
+added them to the device model for. 
+
+> mlx5 even has weird limitations, like a controlled function that is
+> live migration capable has fewer features than a function that is
+> not. So the user must specify what parameters it wants the controlled
+> function to have..
+
+I don't think that is weird.  If you want to live migrate, you need to
+
+ a) make sure the feature set is compatible with the other side
+ b) there is only state that actually is migratable
+
+so I'd expect that for any other sufficiently complex device.  NVMe
+for sure will have limits like this.
