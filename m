@@ -2,189 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 661F964B9A2
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 17:27:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31D5F64B9A5
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 17:27:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235977AbiLMQ1G (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 13 Dec 2022 11:27:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37308 "EHLO
+        id S235657AbiLMQ1d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 13 Dec 2022 11:27:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235718AbiLMQ1A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 13 Dec 2022 11:27:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 682252BCE
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:26:16 -0800 (PST)
+        with ESMTP id S235303AbiLMQ1c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 13 Dec 2022 11:27:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D09B236
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:26:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670948775;
+        s=mimecast20190719; t=1670948809;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+baNleV2eMc0Cr3ZgvbexVQAFU9ATo/cmcUQl0ZD3Uo=;
-        b=iSf1AgkVI8AwYyEwEEgQwH7Xht1yuKAgE1NrDpHST9zj3M9fDSexrbWgewAHh09qw97Kzn
-        BpcvziWpKAgOkuMiOxMEiA1ZQ06/7jZ9aBGj2sxB56y3ZG3yrqFS8cNk1MZkjooFTzIynl
-        BR5C5FZeucBqPeTwlW/Q/Lzm3CuIcAI=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=jwsK9UOCWwUcP7koLbB3FVoDbhA7pYtpF1ZVddB4pb8=;
+        b=VdSTmS8Lknj7RhL2CTTsIkH6TrFzfIQ3sQo2tTXgUeIe19xC7Q+1yoeJHz/vOiAuuPdonn
+        ZgxxhVBUYvczv2QwDnw4hMfSVCuGqWfuCI6DLVdNMU0xdgU3/EVABqj9ZDomI4TnVRaWQI
+        iYHFIPS4EB2fh5DCl9ZcMNzHem7aiDw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-108-syw_KAAuM_uE1zWW0uQDzw-1; Tue, 13 Dec 2022 11:26:14 -0500
-X-MC-Unique: syw_KAAuM_uE1zWW0uQDzw-1
-Received: by mail-il1-f199.google.com with SMTP id i14-20020a056e020d8e00b003034b93bd07so7811129ilj.14
-        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:26:14 -0800 (PST)
+ us-mta-639-4tVII9tjNTOb8ZJ4UR2GVQ-1; Tue, 13 Dec 2022 11:26:48 -0500
+X-MC-Unique: 4tVII9tjNTOb8ZJ4UR2GVQ-1
+Received: by mail-wm1-f69.google.com with SMTP id bg25-20020a05600c3c9900b003cf3ed7e27bso5057173wmb.4
+        for <kvm@vger.kernel.org>; Tue, 13 Dec 2022 08:26:48 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+baNleV2eMc0Cr3ZgvbexVQAFU9ATo/cmcUQl0ZD3Uo=;
-        b=xuI6Ee4iL1+99nCkff8FgFAIYAKzHeh0kY0EbHoeyr18MtmeM2R1LZeKJ3VBTWw/Jl
-         XoWBrth1a2ZHLc/VRcBPtIfwgAyfL2Rux9ZHN7413wrST/Ic6U97AyD6PIXf1ShRFkyC
-         Dnf/5+NKG3wv4lvyoXbVXv7bmS5Nk+BvC+dnVhIYMm9io1fENNFMw/WtJl0kHcsJtCi8
-         NA4ZVkj96UfFMHfBJuWJxhOu/r5ovzuiI4Z81CA2ADjrFIYSyIySozhW8/ktb14DJ2Ms
-         mSfvWilgep+lS/6RyKsVe2f6ZFaBbr45zJavcJzvyQBIKwKiK/wu4GqTsUukLrYBGKyU
-         47oA==
-X-Gm-Message-State: ANoB5pmZFWc2q1BVLYADJnbyfjrFEbfszwYwr8c+Et2jPZX/cC46hKH4
-        IUBxucoG2nZ8LUbp4K+awgLVOo352uIR/CkbPrtdvGf09ALHR+3Vsf/3tC/VjBCuqb6pQoyydLR
-        JBzi0jtUkpwtr
-X-Received: by 2002:a92:db49:0:b0:302:cb18:b127 with SMTP id w9-20020a92db49000000b00302cb18b127mr11770481ilq.7.1670948772926;
-        Tue, 13 Dec 2022 08:26:12 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7Q+oa5Dow30jTbZUH80x+Df1NY0cnQpiEjV05lNUUBZ4H9UsgmlF/gFsMXAQQqDIB4CyIP/w==
-X-Received: by 2002:a92:db49:0:b0:302:cb18:b127 with SMTP id w9-20020a92db49000000b00302cb18b127mr11770466ilq.7.1670948772608;
-        Tue, 13 Dec 2022 08:26:12 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id n23-20020a027157000000b00389e42ac620sm983055jaf.129.2022.12.13.08.26.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Dec 2022 08:26:11 -0800 (PST)
-Date:   Tue, 13 Dec 2022 09:26:10 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Steve Sistare <steven.sistare@oracle.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH V1 1/2] vfio/type1: exclude mdevs from VFIO_UPDATE_VADDR
-Message-ID: <20221213092610.636686fc.alex.williamson@redhat.com>
-In-Reply-To: <1670946416-155307-2-git-send-email-steven.sistare@oracle.com>
-References: <1670946416-155307-1-git-send-email-steven.sistare@oracle.com>
-        <1670946416-155307-2-git-send-email-steven.sistare@oracle.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jwsK9UOCWwUcP7koLbB3FVoDbhA7pYtpF1ZVddB4pb8=;
+        b=0RoGKa4teMWGp3RTv3kKDmHX2CbkQOupdSkUGrmY4r+RT7pcEeacDvKG4gJ0bIUEYQ
+         KzkVRe91G+kDcJr00EoMmTK/eSPAjy5vwtZ2nfos7rjW41Lcru5WokgnyHfNjVFnaHjV
+         0+UIyhViM3E7yT/LaO0oh5Nblr2Cp9a3csL9Q0P1y2Snz62+T9S6q1XS2FWDp2DcOh3/
+         XZ/6SX6cVJsusV5ZayANg/sW4r6k/mzM8idzUA3yhXNRSXZ6234rlqCUIaj1v7xbYu0S
+         cIFP7baB6I+hw7Hu3eZvlypLD5DZUlphw1VKHFeR+cmouS4KAnX5aQdejV5MORMCDxfT
+         aH0Q==
+X-Gm-Message-State: ANoB5pnGULmZBkvTBVmrAvKvMGUtT6u/i52+KC4jzsKBt1UqeOpSuGxO
+        XWlwXSTtiDCWlzKlHEKVhOfHTE7BOKrFyuAQfZa+F3SrwmiM7IDpXY40VqTvOQpDFwzOhjSAtL7
+        uIli6h5Dk4o7Z
+X-Received: by 2002:a1c:541c:0:b0:3d1:e1f4:21d1 with SMTP id i28-20020a1c541c000000b003d1e1f421d1mr19911880wmb.26.1670948807245;
+        Tue, 13 Dec 2022 08:26:47 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4rxr0nzytbDv/0CYFxAJvV2YnMacE1MJ9TUkIoHHD5hervWTa4KGxn0w9I/0NAKiTpVYbqbA==
+X-Received: by 2002:a1c:541c:0:b0:3d1:e1f4:21d1 with SMTP id i28-20020a1c541c000000b003d1e1f421d1mr19911861wmb.26.1670948807064;
+        Tue, 13 Dec 2022 08:26:47 -0800 (PST)
+Received: from [192.168.0.5] (ip-109-43-178-131.web.vodafone.de. [109.43.178.131])
+        by smtp.gmail.com with ESMTPSA id q3-20020a1c4303000000b003cfa81e2eb4sm13067262wma.38.2022.12.13.08.26.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Dec 2022 08:26:46 -0800 (PST)
+Message-ID: <1e75008f-7a3a-3646-a8cc-53fe443687f3@redhat.com>
+Date:   Tue, 13 Dec 2022 17:26:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests PATCH v3 0/4] lib: add function to request
+ migration
+Content-Language: en-US
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>
+Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, pbonzini@redhat.com,
+        andrew.jones@linux.dev, lvivier@redhat.com
+References: <20221212111731.292942-1-nrb@linux.ibm.com>
+ <20221213163630.1d9233b9@p-imbrenda>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20221213163630.1d9233b9@p-imbrenda>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 13 Dec 2022 07:46:55 -0800
-Steve Sistare <steven.sistare@oracle.com> wrote:
-
-> Disable the VFIO_UPDATE_VADDR capability if mediated devices are present.
-> Their kernel threads could be blocked indefinitely by a misbehaving
-> userland while trying to pin/unpin pages while vaddrs are being updated.
-
-Fixes: c3cbab24db38 ("vfio/type1: implement interfaces to update vaddr")
-
-> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 25 ++++++++++++++++++++++++-
->  include/uapi/linux/vfio.h       |  6 +++++-
->  2 files changed, 29 insertions(+), 2 deletions(-)
+On 13/12/2022 16.36, Claudio Imbrenda wrote:
 > 
-> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 23c24fe..f81e925 100644
-> --- a/drivers/vfio/vfio_iommu_type1.c
-> +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -1343,6 +1343,10 @@ static int vfio_dma_do_unmap(struct vfio_iommu *iommu,
->  
->  	mutex_lock(&iommu->lock);
->  
-> +	/* Cannot update vaddr if mdev is present. */
-> +	if (invalidate_vaddr && !list_empty(&iommu->emulated_iommu_groups))
-> +		goto unlock;
-> +
->  	pgshift = __ffs(iommu->pgsize_bitmap);
->  	pgsize = (size_t)1 << pgshift;
->  
-> @@ -2189,6 +2193,10 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
->  
->  	mutex_lock(&iommu->lock);
->  
-> +	/* Prevent an mdev from sneaking in while vaddr flags are used. */
-> +	if (iommu->vaddr_invalid_count && type == VFIO_EMULATED_IOMMU)
-> +		goto out_unlock;
+> Paolo and/or Thomas: if you do not have objections, could you pick this
+> series?
+> 
+> every affected architecture has been reviewed :)
 
-Why only mdev devices?  If we restrict that the user cannot attach a
-group while there are invalid vaddrs, and the pin/unpin pages and
-dma_rw interfaces are restricted to cases where vaddr_invalid_count is
-zero, then we can get rid of all the code to handle waiting for vaddrs.
-ie. we could still revert:
+Done.
 
-898b9eaeb3fe ("vfio/type1: block on invalid vaddr")
-487ace134053 ("vfio/type1: implement notify callback")
-ec5e32940cc9 ("vfio: iommu driver notify callback")
+  Thanks,
+   Thomas
 
-It appears to me it might be easiest to lead with a clean revert of
-these, then follow-up imposing the usage restrictions, and I'd go ahead
-and add WARN_ON error paths to the pin/unpin/dma_rw paths to make sure
-nobody enters those paths with an elevated invalid count.  Thanks,
 
-Alex
-
-> +
->  	/* Check for duplicates */
->  	if (vfio_iommu_find_iommu_group(iommu, iommu_group))
->  		goto out_unlock;
-> @@ -2660,6 +2668,20 @@ static int vfio_domains_have_enforce_cache_coherency(struct vfio_iommu *iommu)
->  	return ret;
->  }
->  
-> +/*
-> + * Disable this feature if mdevs are present.  They cannot safely pin/unpin
-> + * while vaddrs are being updated.
-> + */
-> +static int vfio_iommu_can_update_vaddr(struct vfio_iommu *iommu)
-> +{
-> +	int ret;
-> +
-> +	mutex_lock(&iommu->lock);
-> +	ret = list_empty(&iommu->emulated_iommu_groups);
-> +	mutex_unlock(&iommu->lock);
-> +	return ret;
-> +}
-> +
->  static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->  					    unsigned long arg)
->  {
-> @@ -2668,8 +2690,9 @@ static int vfio_iommu_type1_check_extension(struct vfio_iommu *iommu,
->  	case VFIO_TYPE1v2_IOMMU:
->  	case VFIO_TYPE1_NESTING_IOMMU:
->  	case VFIO_UNMAP_ALL:
-> -	case VFIO_UPDATE_VADDR:
->  		return 1;
-> +	case VFIO_UPDATE_VADDR:
-> +		return iommu && vfio_iommu_can_update_vaddr(iommu);
->  	case VFIO_DMA_CC_IOMMU:
->  		if (!iommu)
->  			return 0;
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index d7d8e09..6d36b84 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -49,7 +49,11 @@
->  /* Supports VFIO_DMA_UNMAP_FLAG_ALL */
->  #define VFIO_UNMAP_ALL			9
->  
-> -/* Supports the vaddr flag for DMA map and unmap */
-> +/*
-> + * Supports the vaddr flag for DMA map and unmap.  Not supported for mediated
-> + * devices, so this capability is subject to change as groups are added or
-> + * removed.
-> + */
->  #define VFIO_UPDATE_VADDR		10
->  
->  /*
+> 
+> On Mon, 12 Dec 2022 12:17:27 +0100
+> Nico Boehr <nrb@linux.ibm.com> wrote:
+> 
+>> v2->v3:
+>> ---
+>> * s390x: remove unneeded parenthesis (thanks Claudio)
+>>
+>> v1->v2:
+>> ---
+>> * arm: commit message gib->gic (thanks Andrew)
+>> * arm: remove unneeded {} (thanks Andrew)
+>> * s390x: make patch less intrusive (thanks Claudio)
+>>
+>> With this series, I pick up a suggestion Claudio has brought up in my
+>> CMM-migration series[1].
+>>
+>> Migration tests can ask migrate_cmd to migrate them to a new QEMU
+>> process. Requesting migration and waiting for completion is hence a
+>> common pattern which is repeated all over the code base. Add a function
+>> which does all of that to avoid repetition.
+>>
+>> Since migrate_cmd currently can only migrate exactly once, this function
+>> is called migrate_once() and is a no-op when it has been called before.
+>> This can simplify the control flow, especially when tests are skipped.
+>>
+>> [1] https://lore.kernel.org/kvm/20221125154646.5974cb52@p-imbrenda/
+>>
+>> Nico Boehr (4):
+>>    lib: add function to request migration
+>>    powerpc: use migrate_once() in migration tests
+>>    s390x: use migrate_once() in migration tests
+>>    arm: use migrate_once() in migration tests
+>>
+>>   arm/Makefile.common     |  1 +
+>>   powerpc/Makefile.common |  1 +
+>>   s390x/Makefile          |  1 +
+>>   lib/migrate.h           |  9 ++++++++
+>>   lib/migrate.c           | 34 ++++++++++++++++++++++++++++
+>>   arm/debug.c             | 17 +++++---------
+>>   arm/gic.c               | 49 ++++++++++++-----------------------------
+>>   powerpc/sprs.c          |  4 ++--
+>>   s390x/migration-cmm.c   | 24 ++++++--------------
+>>   s390x/migration-sck.c   |  4 ++--
+>>   s390x/migration-skey.c  | 20 ++++++-----------
+>>   s390x/migration.c       |  7 ++----
+>>   12 files changed, 85 insertions(+), 86 deletions(-)
+>>   create mode 100644 lib/migrate.h
+>>   create mode 100644 lib/migrate.c
+>>
+> 
 
