@@ -2,87 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D78D64ABF4
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 01:05:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A9B164ABFE
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 01:10:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233932AbiLMAFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 19:05:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33980 "EHLO
+        id S234022AbiLMAKE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 19:10:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233923AbiLMAFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 19:05:25 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89AC314D1C
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:04:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670889867;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=c778WIu0rf4lDSvaM7X5iaolCDnqS9bySCeUPtXdp1o=;
-        b=V3KBLxq9LHdLp16GacKqWMDSiSlUZy3EVoAYHB/mil6zRzGSof+IIDE9+AnxN6cDtQv2wX
-        5J4H21cZddg09BALvNc+zi+kiO54ldh+vgY1hQAmbYvKTZE3Aiq72zidAVq5yOLXnajd6f
-        46qe+9e1owM6IPZo6dn5d6MaojhB0Cc=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-609-wEWHpHvdPiW2wKFGseDbnA-1; Mon, 12 Dec 2022 19:04:26 -0500
-X-MC-Unique: wEWHpHvdPiW2wKFGseDbnA-1
-Received: by mail-io1-f69.google.com with SMTP id n10-20020a6b590a000000b006e03471b3eeso921782iob.11
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:04:26 -0800 (PST)
+        with ESMTP id S233986AbiLMAJ6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 19:09:58 -0500
+Received: from mail-yw1-x112b.google.com (mail-yw1-x112b.google.com [IPv6:2607:f8b0:4864:20::112b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120351C128
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:09:55 -0800 (PST)
+Received: by mail-yw1-x112b.google.com with SMTP id 00721157ae682-3f15a6f72d0so170721927b3.1
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:09:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=h//U1P26Q/GbgdDfd7npnXyzvnrUCmDZBLLM2h5i8dQ=;
+        b=gpXQ7GcWnIWicMxrdl18IrxARO4W9z99cly0rZMtgszw+A6mzBnuepYcZ33NW3QCO/
+         3u/MKIylRh8lpUiOYAGXDP7DYMF2CNiPtEuE6wgFezOdTNKYeotkavtJtX6ETrjiGM6v
+         j5lx9n72HotfhD+7iVDyLjyq/wR1F3v3nTbUS5rObyenVdsZ+A3MmiNmWNkxtBsdSjcc
+         g/2EH9wfqwoesaON/tgf1kjuiCoKXzoRmt3wGYFMg4xfam0r84c7+DuJPMFGn/fmgJen
+         Nq7oXVdFQWyaW06vqhuDIIaRR2F21NgmVtlas14PprYeag2lcQXmkAU4EAjJg+b///ca
+         t7tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=c778WIu0rf4lDSvaM7X5iaolCDnqS9bySCeUPtXdp1o=;
-        b=1jkaOL7ahTDgQg2qkANoN91NZptG0LcOOaOyW0Sq1K1UU2SjJx4oD1SB7fR32PKOcU
-         d9IWcSiGO+a3U6nBdgA91R0i4Jt8uL/XHAyiJ9K/OaftsApYQ4PZSa/I+rXViegexJaf
-         0bnHPCnk/BOl5JpnmJliqfspDVtjSaCUu2/sgwOFOLxn11TU1vbv01CUPf0lrwG3BwpN
-         UeuDZjNMiVstykh4vMxESkpziigbayR6AH6ZhqeOfRARG9iRz2pcql0lqMlsi0KQ5Ojl
-         V+/CFSSPityXKADAd29w1EVsYcirBgOk9CxcBDJ/gTMN8WGMuY4vr+lJl/OHSWWS4sUd
-         6xcw==
-X-Gm-Message-State: ANoB5pnbCBzr5+9DVvM8pDznMoasfc223tEAIBM0dmeCb0OBdYAGFP3b
-        z5XQmQUTu3Y3dJUJW1MYKbxtwQG2P1E/7vTjjqqn4cx3+wzUZOZb8NwIL7Fu3j/cWlzSSNaYCyP
-        N2A+Rt+d5re6w
-X-Received: by 2002:a6b:fb0a:0:b0:6df:5a37:ed5 with SMTP id h10-20020a6bfb0a000000b006df5a370ed5mr9510094iog.17.1670889865975;
-        Mon, 12 Dec 2022 16:04:25 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5b+C3pNMyB9AHrQTMwkLB3S92Ro4t65xIeqTIY0TV6w+kdpwaeeT0A8eYFHZySo1idjjdX9w==
-X-Received: by 2002:a6b:fb0a:0:b0:6df:5a37:ed5 with SMTP id h10-20020a6bfb0a000000b006df5a370ed5mr9510082iog.17.1670889865683;
-        Mon, 12 Dec 2022 16:04:25 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id i189-20020a6bb8c6000000b006dfb7d199dasm4640362iof.7.2022.12.12.16.04.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Dec 2022 16:04:25 -0800 (PST)
-Date:   Mon, 12 Dec 2022 17:04:24 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Steven Sistare <steven.sistare@oracle.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] vfio/type1: Cleanup remaining vaddr removal/update
- fragments
-Message-ID: <20221212170424.204bdb9a.alex.williamson@redhat.com>
-In-Reply-To: <Y5e6zB3tW2D/ULlQ@ziepe.ca>
-References: <20221209124212.672b7a9c.alex.williamson@redhat.com>
-        <5f494e1f-536d-7225-e2c7-5ec9c993f13a@oracle.com>
-        <20221209140120.667cb658.alex.williamson@redhat.com>
-        <6914b4eb-cd82-0c3e-6637-c7922092ef11@oracle.com>
-        <Y5cqAk1/6ayzmTjg@ziepe.ca>
-        <20221212085823.5d760656.alex.williamson@redhat.com>
-        <8f29aad0-7378-ef7a-9ac5-f98b3054d5eb@oracle.com>
-        <20221212142651.263dd6ae.alex.williamson@redhat.com>
-        <Y5e0icoO89Qnlc/z@ziepe.ca>
-        <20221212162948.4c7a4586.alex.williamson@redhat.com>
-        <Y5e6zB3tW2D/ULlQ@ziepe.ca>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h//U1P26Q/GbgdDfd7npnXyzvnrUCmDZBLLM2h5i8dQ=;
+        b=gD1YUVG692BbDEFb21kUnxUZaqfzIywg6Ib7KwMAYQ26V5/NfMjRwPLZPZU0goSloJ
+         C8IhXLPU93Un6W6DSNUT/XqC9e/VjjRao+awkz6pR6jMD29YwZ97abDa3aJTXmdk3T9k
+         o6vPba5oe2dWQcv4c+vUd6DVGWKF9RTMlE6wj9ttIF8rL+VVo9/RnNMNuaQpkpeBxoxp
+         dG+6kn39A/hms1jTWfGuY/WK2Syza5qFzXwdzv22tQ7WlliIOmsLaw1hYSbqzIaeL0Yb
+         a3UUiWMnkS6c8DWC/xOo972Sa813n7noVh5b2WDOdKhVEDymsVI1XeAKLFuyBdCL9ggT
+         jFKQ==
+X-Gm-Message-State: ANoB5pmF0mTk/OJC/PUOKC1enjSnigD1m9HjSNhCw9FqBwaFA+pRjygx
+        VJVkAmBYfNnrKNDikctDIy099ykeda/BOZ0w29rkrg==
+X-Google-Smtp-Source: AA0mqf5l9HXAT+IUtuN+jKG3RgoTLQT/3d9spzn1Vu1DQb5YEA7Tgxew/pbK5Lo2xb5A0ptbPlfv7Kw+AdG08s0G+Ss=
+X-Received: by 2002:a81:8453:0:b0:3e3:87ec:f862 with SMTP id
+ u80-20020a818453000000b003e387ecf862mr25312745ywf.15.1670890194208; Mon, 12
+ Dec 2022 16:09:54 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20221129191237.31447-1-mizhang@google.com> <Y5Oob6mSJKGoDBnt@google.com>
+ <Y5avm5VXpRt263wQ@google.com> <Y5dax8XJV0F5adUw@google.com>
+In-Reply-To: <Y5dax8XJV0F5adUw@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 12 Dec 2022 16:09:28 -0800
+Message-ID: <CALzav=f2k9dPYkeW2D0ZvkDuDhA8Wmu+zV8W4isMFfd-HAQjrA@mail.gmail.com>
+Subject: Re: [RFC PATCH v4 0/2] Deprecate BUG() in pte_list_remove() in shadow mmu
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Mingwei Zhang <mizhang@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Nagareddy Reddy <nspreddy@google.com>,
+        Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -90,81 +72,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 12 Dec 2022 19:35:40 -0400
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
+On Mon, Dec 12, 2022 at 8:46 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Dec 12, 2022, Mingwei Zhang wrote:
+> > On Fri, Dec 09, 2022, David Matlack wrote:
+> > > On Tue, Nov 29, 2022 at 07:12:35PM +0000, Mingwei Zhang wrote:
+> > > > Deprecate BUG() in pte_list_remove() in shadow mmu to avoid crashing a
+> > > > physical machine. There are several reasons and motivations to do so:
+> > > >
+> > > > MMU bug is difficult to discover due to various racing conditions and
+> > > > corner cases and thus it extremely hard to debug. The situation gets much
+> > > > worse when it triggers the shutdown of a host. Host machine crash might
+> > > > eliminates everything including the potential clues for debugging.
+> > > >
+> > > > From cloud computing service perspective, BUG() or BUG_ON() is probably no
+> > > > longer appropriate as the host reliability is top priority. Crashing the
+> > > > physical machine is almost never a good option as it eliminates innocent
+> > > > VMs and cause service outage in a larger scope. Even worse, if attacker can
+> > > > reliably triggers this code by diverting the control flow or corrupting the
+> > > > memory, then this becomes vm-of-death attack. This is a huge attack vector
+> > > > to cloud providers, as the death of one single host machine is not the end
+> > > > of the story. Without manual interferences, a failed cloud job may be
+> > > > dispatched to other hosts and continue host crashes until all of them are
+> > > > dead.
+> > >
+> > > My only concern with using KVM_BUG() is whether the machine can keep
+> > > running correctly after this warning has been hit. In other words, are
+> > > we sure the damage is contained to just this VM?
+>
+> Hmm, good point.  The counter-argument is that KVM doesn't BUG() in get_mmio_spte()
+> when a non-MMIO SPTE has reserved bits set, and as we've seen internally in multiple
+> splats where the reserved bits appear to be set by stack overflow, that has a much,
+> much higher probability of being a symptom of data corruption.
+>
+> That said, that's more of a reason to change get_mmio_spte() than it is to ignore
+> potential data corruption in this case.  KVM arguably should kill the VM if
+> get_mmio_spte() fails too.
+>
+> What about explicitly treating both get_mmio_spte() and this as potential data
+> corruption?  E.g. something like this, and then use the DATA_CORRUPTION variant
+> in pte_list_remove()?
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 2055e04b8f89..1cb69c6d186b 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -4075,6 +4075,7 @@ static bool get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
+>                         pr_err("------ spte = 0x%llx level = %d, rsvd bits = 0x%llx",
+>                                sptes[level], level,
+>                                get_rsvd_bits(rsvd_check, sptes[level], level));
+> +               KVM_BUG_ON_DATA_CORRUPTION(reserved, vcpu->kvm);
+>         }
+>
+>         return reserved;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index f16c4689322b..5c4a06f66f46 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -863,6 +863,17 @@ static inline void kvm_vm_bugged(struct kvm *kvm)
+>         unlikely(__ret);                                        \
+>  })
+>
+> +#define KVM_BUG_ON_DATA_CORRUPTION(cond, kvm)                  \
+> +({                                                             \
+> +       int __ret = (cond);                                     \
+> +                                                               \
+> +       if (IS_ENABLED(CONFIG_BUG_ON_DATA_CORRUPTION))          \
+> +               BUG_ON(__ret);                                  \
+> +       else if (WARN_ON_ONCE(__ret && !(kvm)->vm_bugged))      \
+> +               kvm_vm_bugged(kvm);                             \
+> +       unlikely(__ret);                                        \
+> +})
+> +
+>  static inline void kvm_vcpu_srcu_read_lock(struct kvm_vcpu *vcpu)
+>  {
+>  #ifdef CONFIG_PROVE_RCU
 
-> On Mon, Dec 12, 2022 at 04:29:48PM -0700, Alex Williamson wrote:
-> > On Mon, 12 Dec 2022 19:08:57 -0400
-> > Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >   
-> > > On Mon, Dec 12, 2022 at 02:26:51PM -0700, Alex Williamson wrote:  
-> > > > On Mon, 12 Dec 2022 15:59:11 -0500
-> > > > Steven Sistare <steven.sistare@oracle.com> wrote:
-> > > >     
-> > > > > On 12/12/2022 10:58 AM, Alex Williamson wrote:    
-> > > > > > On Mon, 12 Dec 2022 09:17:54 -0400
-> > > > > > Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > > > > >       
-> > > > > >> On Sat, Dec 10, 2022 at 09:14:06AM -0500, Steven Sistare wrote:
-> > > > > >>      
-> > > > > >>> Thank you for your thoughtful response.  Rather than debate the degree of
-> > > > > >>> of vulnerability, I propose an alternate solution.  The technical crux of
-> > > > > >>> the matter is support for mediated devices.          
-> > > > > >>
-> > > > > >> I'm not sure I'm convinced about that. It is easy to make problematic
-> > > > > >> situations with mdevs, but that doesn't mean other cases don't exist
-> > > > > >> too eg what happens if userspace suspends and then immediately does
-> > > > > >> something to trigger a domain attachment? Doesn't it still deadlock
-> > > > > >> the kernel?      
-> > > > > > 
-> > > > > > The opportunity for that to deadlock isn't obvious to me, a replay
-> > > > > > would be stalled waiting for invalid vaddrs, but this is essentially
-> > > > > > the user deadlocking themselves.  There's also code there to handle the
-> > > > > > process getting killed while waiting, making it interruptible.  Thanks,      
-> > > > > 
-> > > > > I will submit new patches tomorrow to exclude mdevs.  Almost done.    
-> > > > 
-> > > > I've dropped the removal commits from my next branch in the interim.    
-> > > 
-> > > Woah, please don't do that - I already built and sent pull requests
-> > > assuming this, there are conflicts.  
-> > 
-> > I've done merges both ways with your iommufd pull request and don't see
-> > any conflicts relative to these changes.  Kconfig, Makefile, and
-> > vfio_main.c related to virq integration and group extraction are the
-> > only conflicts.   
-> 
-> I got an extra hunk in the header file
-> 
-> > Besides, it's already pushed and I don't have any references to the
-> > old head, so someone would need to provide it if we wanted to keep
-> > the old hashes.  
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/tag/?h=for-linus-iommufd-merged
-> https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/commit/?h=for-linus-iommufd-merged&id=e9a1f0f32d86c05f01878a0448384a46a453abc7
-
-Ok, I do still have that reference around.  Thanks.
-
-> > > Why would we not revert everything from 6.2 - that is what we agreed
-> > > to do?  
-> > 
-> > The decision to revert was based on the current interface being buggy,
-> > abandoned, and re-implemented.  It doesn't seem that there's much future
-> > for the current interface, but Steve has stepped up to restrict the
-> > current implementation to non-mdev devices, which resolves your concern
-> > regarding unlimited user blocking of kernel threads afaict, and we'll
-> > see what he does with locked memory.    
-> 
-> Except nobody has seen this yet, and it can't go into 6.2 at this
-> point (see Linus's rather harsh remarks on late work for v6.2)
-
-We already outlined earlier in this thread the criteria that prompted
-us to tag the revert for stable, which was Steve's primary objection in
-the short term.  I can't in good faith push forward with a revert,
-including stable, if Steve is working on a proposal to resolve the
-issues prompting us to accelerate the code removal.  Depending on the
-scope of Steve's proposal, I think we might be able to still consider
-this a fix for v6.2.  Thanks,
-
-Alex
-
+That sounds reasonable to me.
