@@ -2,130 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 51DA464ABAF
-	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 00:44:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D78D64ABF4
+	for <lists+kvm@lfdr.de>; Tue, 13 Dec 2022 01:05:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233005AbiLLXo3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 12 Dec 2022 18:44:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48508 "EHLO
+        id S233932AbiLMAFa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 12 Dec 2022 19:05:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232271AbiLLXo2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 12 Dec 2022 18:44:28 -0500
+        with ESMTP id S233923AbiLMAFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 12 Dec 2022 19:05:25 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D2C6116B
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 15:43:31 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89AC314D1C
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:04:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1670888610;
+        s=mimecast20190719; t=1670889867;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=jEA/kHTqeoXaUaGcLLLnYDpNScpRzske2CPEB3QlR58=;
-        b=UVWifuHCD4EeBwril/4keZVwOUwBANsaf+xGrr8HjRD/cGGul3Y9Czc24Ru8MkFhWPlGW3
-        mQW7kYcbQkEZoWOeSnI27dYmCVvFmPT15mNfldOnzGTxgyJ/jvwQS5dw7P57t2dL0/c99+
-        zuMLDot8hA2yDQML+rx5y+HVOsu3rdE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=c778WIu0rf4lDSvaM7X5iaolCDnqS9bySCeUPtXdp1o=;
+        b=V3KBLxq9LHdLp16GacKqWMDSiSlUZy3EVoAYHB/mil6zRzGSof+IIDE9+AnxN6cDtQv2wX
+        5J4H21cZddg09BALvNc+zi+kiO54ldh+vgY1hQAmbYvKTZE3Aiq72zidAVq5yOLXnajd6f
+        46qe+9e1owM6IPZo6dn5d6MaojhB0Cc=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-39-HZu-XpJoNYWJRiMCe9hPxQ-1; Mon, 12 Dec 2022 18:43:21 -0500
-X-MC-Unique: HZu-XpJoNYWJRiMCe9hPxQ-1
-Received: by mail-wm1-f69.google.com with SMTP id m17-20020a05600c3b1100b003cf9cc47da5so4004435wms.9
-        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 15:43:21 -0800 (PST)
+ us-mta-609-wEWHpHvdPiW2wKFGseDbnA-1; Mon, 12 Dec 2022 19:04:26 -0500
+X-MC-Unique: wEWHpHvdPiW2wKFGseDbnA-1
+Received: by mail-io1-f69.google.com with SMTP id n10-20020a6b590a000000b006e03471b3eeso921782iob.11
+        for <kvm@vger.kernel.org>; Mon, 12 Dec 2022 16:04:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jEA/kHTqeoXaUaGcLLLnYDpNScpRzske2CPEB3QlR58=;
-        b=a/Gl3T9DGm/8mFs9gQHE9hR3ieI26ILtlimjrP/ZpktH6N4Z+wnnZVMmlk7j8F/fQy
-         dsNruF62WCCj3UR8hO6t7fXnr/xAyRgOFNdy1nAyS6qh0LOYre1b7gCfN3X+6dy96u3r
-         Tkug7fZt5lrr5Ebo2V7S1AK+dVa+rvT4zgZMHPtwrfJgrGdV7lbilc9JTG1CHQllzZF8
-         C5924HK4iwk00WUQ0JgRhRftTHirD5CslFhkzowArBISy7wxhdXuPRV7Uz5UALqTga4J
-         /5UmUp0+Nhb47yng8xVUOBdRv9MCPvp/Y1Jw+1hRU5VIawWRScLQB6K7NAjIAEcWDfUI
-         3Ddw==
-X-Gm-Message-State: ANoB5pkx0OS6nA1Z4egbf7vppxjsqF027vb8YuEDGDdxz12e0RC0Qu/j
-        ODmRca4xVLl3dA9Zm9aaVsBQWqAlv+EHqWqDCP5s0zcs0KFjbX7/tLdgCKp/3bpsicDGUZeGKv5
-        dZR2pMkPhhysi
-X-Received: by 2002:a05:6000:1a41:b0:232:be5d:4896 with SMTP id t1-20020a0560001a4100b00232be5d4896mr11068890wry.10.1670888600340;
-        Mon, 12 Dec 2022 15:43:20 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6FE6NAMqQtmSlBoZgWlaFymznZFcQYb9/qLkdQoBRkq0uuA5oTNuN3c0LKnzZL0EytBO3qiw==
-X-Received: by 2002:a05:6000:1a41:b0:232:be5d:4896 with SMTP id t1-20020a0560001a4100b00232be5d4896mr11068853wry.10.1670888600068;
-        Mon, 12 Dec 2022 15:43:20 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id j18-20020a5d5652000000b002427bfd17b6sm12017830wrw.63.2022.12.12.15.43.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Dec 2022 15:43:19 -0800 (PST)
-Message-ID: <f1026204-1895-1a7e-5bf8-3527223f3778@redhat.com>
-Date:   Tue, 13 Dec 2022 00:43:17 +0100
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=c778WIu0rf4lDSvaM7X5iaolCDnqS9bySCeUPtXdp1o=;
+        b=1jkaOL7ahTDgQg2qkANoN91NZptG0LcOOaOyW0Sq1K1UU2SjJx4oD1SB7fR32PKOcU
+         d9IWcSiGO+a3U6nBdgA91R0i4Jt8uL/XHAyiJ9K/OaftsApYQ4PZSa/I+rXViegexJaf
+         0bnHPCnk/BOl5JpnmJliqfspDVtjSaCUu2/sgwOFOLxn11TU1vbv01CUPf0lrwG3BwpN
+         UeuDZjNMiVstykh4vMxESkpziigbayR6AH6ZhqeOfRARG9iRz2pcql0lqMlsi0KQ5Ojl
+         V+/CFSSPityXKADAd29w1EVsYcirBgOk9CxcBDJ/gTMN8WGMuY4vr+lJl/OHSWWS4sUd
+         6xcw==
+X-Gm-Message-State: ANoB5pnbCBzr5+9DVvM8pDznMoasfc223tEAIBM0dmeCb0OBdYAGFP3b
+        z5XQmQUTu3Y3dJUJW1MYKbxtwQG2P1E/7vTjjqqn4cx3+wzUZOZb8NwIL7Fu3j/cWlzSSNaYCyP
+        N2A+Rt+d5re6w
+X-Received: by 2002:a6b:fb0a:0:b0:6df:5a37:ed5 with SMTP id h10-20020a6bfb0a000000b006df5a370ed5mr9510094iog.17.1670889865975;
+        Mon, 12 Dec 2022 16:04:25 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf5b+C3pNMyB9AHrQTMwkLB3S92Ro4t65xIeqTIY0TV6w+kdpwaeeT0A8eYFHZySo1idjjdX9w==
+X-Received: by 2002:a6b:fb0a:0:b0:6df:5a37:ed5 with SMTP id h10-20020a6bfb0a000000b006df5a370ed5mr9510082iog.17.1670889865683;
+        Mon, 12 Dec 2022 16:04:25 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id i189-20020a6bb8c6000000b006dfb7d199dasm4640362iof.7.2022.12.12.16.04.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 12 Dec 2022 16:04:25 -0800 (PST)
+Date:   Mon, 12 Dec 2022 17:04:24 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Steven Sistare <steven.sistare@oracle.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] vfio/type1: Cleanup remaining vaddr removal/update
+ fragments
+Message-ID: <20221212170424.204bdb9a.alex.williamson@redhat.com>
+In-Reply-To: <Y5e6zB3tW2D/ULlQ@ziepe.ca>
+References: <20221209124212.672b7a9c.alex.williamson@redhat.com>
+        <5f494e1f-536d-7225-e2c7-5ec9c993f13a@oracle.com>
+        <20221209140120.667cb658.alex.williamson@redhat.com>
+        <6914b4eb-cd82-0c3e-6637-c7922092ef11@oracle.com>
+        <Y5cqAk1/6ayzmTjg@ziepe.ca>
+        <20221212085823.5d760656.alex.williamson@redhat.com>
+        <8f29aad0-7378-ef7a-9ac5-f98b3054d5eb@oracle.com>
+        <20221212142651.263dd6ae.alex.williamson@redhat.com>
+        <Y5e0icoO89Qnlc/z@ziepe.ca>
+        <20221212162948.4c7a4586.alex.williamson@redhat.com>
+        <Y5e6zB3tW2D/ULlQ@ziepe.ca>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common
- code
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        David Matlack <dmatlack@google.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Nadav Amit <namit@vmware.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
-        Colin Cross <ccross@google.com>,
-        Hugh Dickins <hughd@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org
-References: <20221208193857.4090582-1-dmatlack@google.com>
- <Y5OHVzBSHPmAq2FO@google.com>
- <eb93beee-9d43-1c1e-250c-28ab7e9ebed9@redhat.com>
- <Y5e4qxjHWoMt8YGs@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y5e4qxjHWoMt8YGs@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/13/22 00:26, Sean Christopherson wrote:
->>> I would strongly be in favor of discarding the shadow paging residue if
->>> x86 folks are willing to part ways with it 😄
->> Yes, absolutely.  Something like to_shadow_page->to_mmu_data, sp->md,
->> spt->hpt, spte->spte, sptep->hptep.
-> "host" will be confusing if when the primary MMU is involved though, e.g. I always
-> think of the primary MMU's page tables as the "host page tables".
+On Mon, 12 Dec 2022 19:35:40 -0400
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
+
+> On Mon, Dec 12, 2022 at 04:29:48PM -0700, Alex Williamson wrote:
+> > On Mon, 12 Dec 2022 19:08:57 -0400
+> > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >   
+> > > On Mon, Dec 12, 2022 at 02:26:51PM -0700, Alex Williamson wrote:  
+> > > > On Mon, 12 Dec 2022 15:59:11 -0500
+> > > > Steven Sistare <steven.sistare@oracle.com> wrote:
+> > > >     
+> > > > > On 12/12/2022 10:58 AM, Alex Williamson wrote:    
+> > > > > > On Mon, 12 Dec 2022 09:17:54 -0400
+> > > > > > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > > > > >       
+> > > > > >> On Sat, Dec 10, 2022 at 09:14:06AM -0500, Steven Sistare wrote:
+> > > > > >>      
+> > > > > >>> Thank you for your thoughtful response.  Rather than debate the degree of
+> > > > > >>> of vulnerability, I propose an alternate solution.  The technical crux of
+> > > > > >>> the matter is support for mediated devices.          
+> > > > > >>
+> > > > > >> I'm not sure I'm convinced about that. It is easy to make problematic
+> > > > > >> situations with mdevs, but that doesn't mean other cases don't exist
+> > > > > >> too eg what happens if userspace suspends and then immediately does
+> > > > > >> something to trigger a domain attachment? Doesn't it still deadlock
+> > > > > >> the kernel?      
+> > > > > > 
+> > > > > > The opportunity for that to deadlock isn't obvious to me, a replay
+> > > > > > would be stalled waiting for invalid vaddrs, but this is essentially
+> > > > > > the user deadlocking themselves.  There's also code there to handle the
+> > > > > > process getting killed while waiting, making it interruptible.  Thanks,      
+> > > > > 
+> > > > > I will submit new patches tomorrow to exclude mdevs.  Almost done.    
+> > > > 
+> > > > I've dropped the removal commits from my next branch in the interim.    
+> > > 
+> > > Woah, please don't do that - I already built and sent pull requests
+> > > assuming this, there are conflicts.  
+> > 
+> > I've done merges both ways with your iommufd pull request and don't see
+> > any conflicts relative to these changes.  Kconfig, Makefile, and
+> > vfio_main.c related to virq integration and group extraction are the
+> > only conflicts.   
 > 
-> What if we keep the "S" for SPT(E) and repurpose it to mean Secondary PTE?
+> I got an extra hunk in the header file
+> 
+> > Besides, it's already pushed and I don't have any references to the
+> > old head, so someone would need to provide it if we wanted to keep
+> > the old hashes.  
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/tag/?h=for-linus-iommufd-merged
+> https://git.kernel.org/pub/scm/linux/kernel/git/jgg/iommufd.git/commit/?h=for-linus-iommufd-merged&id=e9a1f0f32d86c05f01878a0448384a46a453abc7
 
-Makes sense, so just to_shadow_page->to_secmmu_page?
+Ok, I do still have that reference around.  Thanks.
 
-Paolo
+> > > Why would we not revert everything from 6.2 - that is what we agreed
+> > > to do?  
+> > 
+> > The decision to revert was based on the current interface being buggy,
+> > abandoned, and re-implemented.  It doesn't seem that there's much future
+> > for the current interface, but Steve has stepped up to restrict the
+> > current implementation to non-mdev devices, which resolves your concern
+> > regarding unlimited user blocking of kernel threads afaict, and we'll
+> > see what he does with locked memory.    
+> 
+> Except nobody has seen this yet, and it can't go into 6.2 at this
+> point (see Linus's rather harsh remarks on late work for v6.2)
+
+We already outlined earlier in this thread the criteria that prompted
+us to tag the revert for stable, which was Steve's primary objection in
+the short term.  I can't in good faith push forward with a revert,
+including stable, if Steve is working on a proposal to resolve the
+issues prompting us to accelerate the code removal.  Depending on the
+scope of Steve's proposal, I think we might be able to still consider
+this a fix for v6.2.  Thanks,
+
+Alex
 
