@@ -2,67 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC6C264C498
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 09:06:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7A4064C563
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 09:58:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237399AbiLNIGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 03:06:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34752 "EHLO
+        id S237719AbiLNI6s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 03:58:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230004AbiLNIGI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 03:06:08 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEF6E1DDF4;
-        Wed, 14 Dec 2022 00:06:07 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id 124so3940113pfy.0;
-        Wed, 14 Dec 2022 00:06:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=00263fAplAvONCnwITwPxudPU1CVcj7eiSkLTlLI7Fk=;
-        b=LF1Edmtd2eN21kNuE5gUmccfLa3czY9OYPEAE9XxXacWrtvk/vaV/BIEmOlZidvMlW
-         pGOOVUV/Oje9anH22oPtOJyrLxtQ+GZ5fO1UN5FV1hT/FJDyU73X9QVsduVilBCS8BhH
-         TFW7c/PPnP+uPU6TZCQGOJrudcle2AuccA8xvWg0X9vnKvYDWMqLbmpAF/A9RsiQ/qep
-         4UYfa2nQFE/mhQstf+bHUFhonTH8uSQDso2NoPuEU9NG+/7LBITmCDtOYVBil2BGyVyS
-         TU2Ragm6bhaSct+h9QTHbsPYhAz89s9NjyU7dE4/6pK2Kp5TA9mgFooCNhmOlwopRuMZ
-         /qRw==
+        with ESMTP id S237691AbiLNI6q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 03:58:46 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96FD7F5AB
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 00:58:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671008283;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=832mpI+gR6rtu0NTrZQMBVgIPwRT7EhuSzoHFhXLS+0=;
+        b=hNK84nvEZDkgw6i2HN0RDK6pEC5inFIRRHfCjQFI+ZPKSdqApm7UcUOffhtDT4bfcxM6Z3
+        YYwJjj7RBIgXVSkbvMD63y5n/y3JnuYeQUiCcEPtQKhTUgDaIgpH0i1RItOuGIRJ0gSWuJ
+        Jk3SPZNDu0I/O60mwVmUrJLukhdUO1M=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-166-DIkaKsbEOYKRM4SwHXovwA-1; Wed, 14 Dec 2022 03:58:02 -0500
+X-MC-Unique: DIkaKsbEOYKRM4SwHXovwA-1
+Received: by mail-wm1-f69.google.com with SMTP id a6-20020a05600c224600b003d1f3ed49adso3892510wmm.4
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 00:58:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=00263fAplAvONCnwITwPxudPU1CVcj7eiSkLTlLI7Fk=;
-        b=mIBDL3ymqBiutl/x0Om5M7u0JbNDUuyb1f8JwvKLg+gtD4cQUKEtHyCdSnPjaf0vq8
-         pmsh2rJ1lJ1jJMwS4SrB2WUTVktNWoTCRpIB0+zEzk/pb4A430h7w0nmedA4ZQJVb8zo
-         t3/j/7LBl0SBo0+Q8VaMCQnZblysiZ3FoSuRCgsO3LU3qG+xYotWpTgpI+NO5WaYCyfY
-         iXHxZ8z71Fi7L8bFEH+gh2kiID78U5qMmDD7LL8hcMxu+YJevK99jPbe7B4sZV7Fh9Z3
-         7nxG3R6NemBZiiCtEyqnOpcP00CbetsCv5nAu4qHKO+paDJltjQjLQ/bkWHKLFq+xLTp
-         ENaQ==
-X-Gm-Message-State: ANoB5pkOuUn0Pc5KyzwHudfngxeWy29xgqWHp8DZGsg6gqv+cvo4dmft
-        LfcbWvdRVOvOVQtZZF8MoSpN1UBUIqgwFI5bw3I=
-X-Google-Smtp-Source: AA0mqf5/lelgMvxCc0V/D9A7RuvHgQ9oKJBkHFquAGkc4BvH7uyrswV4h+uxoBrZNVnJLFp28cT0iiRyZTJamCa1KiQ=
-X-Received: by 2002:a63:e4a:0:b0:477:6cd0:9a04 with SMTP id
- 10-20020a630e4a000000b004776cd09a04mr75767633pgo.433.1671005167478; Wed, 14
- Dec 2022 00:06:07 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=832mpI+gR6rtu0NTrZQMBVgIPwRT7EhuSzoHFhXLS+0=;
+        b=ZD0JETaF6HnR2WPz3zIGuWgO1qbnRNZXpi+ICVwQsTskGeuIL0qGDCTFKk0J5g70dd
+         oVjLw2Srwt0CVXltbg15l5jKUQfpZPvQAQIS6J+yvCsNxp37NgKijvIsCAr2qoRZ/tKe
+         FPd2QuM5m0N4bbuVmp0vyrmQpIcqW0gzKXwdThfnEVLzVtyKyTy2ZCqTSaN2f6Ut+P2V
+         Yi1kDeQdo2yWpswcxonxIDrSwow6kLPVfs87qTStvyWhuklDioHtNPpoLiRaM5gVjSmX
+         IlKVC2HUz3JCMk+G9wm3eS1eopRNDU1kdxx9ApykQCmY7gjxncQiwycLvQusRRO/l9Qk
+         VIBg==
+X-Gm-Message-State: ANoB5pmRYNw1r/gpaGG3c2pMEANWUTYZ/onq/SDWEOC6k5QroTo1fFb9
+        jHSLb++Us4bnOveLnWnHGqDNgkL6SY6/61iCGqeks4A8vZtFpngCWsdJTmgFFoUnFLeaUz+wOIY
+        FHMquLDnQ7SbA
+X-Received: by 2002:a05:600c:3d92:b0:3c6:e60f:3f4a with SMTP id bi18-20020a05600c3d9200b003c6e60f3f4amr18216226wmb.1.1671008280664;
+        Wed, 14 Dec 2022 00:58:00 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf53p0lWtwtyxZpsSsSCyKb1X/sJvqIEShJdkD4rFJgOxq6InnJoxKzbHWv/g59LP540LxvirA==
+X-Received: by 2002:a05:600c:3d92:b0:3c6:e60f:3f4a with SMTP id bi18-20020a05600c3d9200b003c6e60f3f4amr18216216wmb.1.1671008280437;
+        Wed, 14 Dec 2022 00:58:00 -0800 (PST)
+Received: from sgarzare-redhat (host-87-11-6-51.retail.telecomitalia.it. [87.11.6.51])
+        by smtp.gmail.com with ESMTPSA id m17-20020a7bce11000000b003d2157627a8sm1685733wmc.47.2022.12.14.00.57.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Dec 2022 00:57:59 -0800 (PST)
+Date:   Wed, 14 Dec 2022 09:57:54 +0100
+From:   Stefano Garzarella <sgarzare@redhat.com>
+To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
+Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
+        Cong Wang <cong.wang@bytedance.com>,
+        Jiang Wang <jiang.wang@bytedance.com>,
+        Krasnov Arseniy <oxffffaa@gmail.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7] virtio/vsock: replace virtio_vsock_pkt with
+ sk_buff
+Message-ID: <20221214085754.6kogsesmqcud5ggn@sgarzare-redhat>
+References: <20221213192843.421032-1-bobby.eshleman@bytedance.com>
 MIME-Version: 1.0
-References: <20221213060912.654668-1-seanjc@google.com> <20221213060912.654668-6-seanjc@google.com>
-In-Reply-To: <20221213060912.654668-6-seanjc@google.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Wed, 14 Dec 2022 16:05:55 +0800
-Message-ID: <CAJhGHyAJj6MGNMgu1i_zFt=0gEqCs1qT8c1ShE97qsZESTptXQ@mail.gmail.com>
-Subject: Re: [PATCH 5/7] x86/entry: KVM: Use dedicated VMX NMI entry for
- 32-bit kernels too
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Peter Zijlstra <peterz@infradead.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20221213192843.421032-1-bobby.eshleman@bytedance.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,53 +88,40 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 13, 2022 at 2:11 PM Sean Christopherson <seanjc@google.com> wrote:
+On Tue, Dec 13, 2022 at 07:28:42PM +0000, Bobby Eshleman wrote:
+>This commit changes virtio/vsock to use sk_buff instead of
+>virtio_vsock_pkt. Beyond better conforming to other net code, using
+>sk_buff allows vsock to use sk_buff-dependent features in the future
+>(such as sockmap) and improves throughput.
 >
-> Use a dedicated entry for invoking the NMI handler from KVM VMX's VM-Exit
-> path for 32-bit even though using a dedicated entry for 32-bit isn't
-> strictly necessary.  Exposing a single symbol will allow KVM to reference
-> the entry point in assembly code without having to resort to more #ifdefs
-> (or #defines).  identry.h is intended to be included from asm files only
-> once, and so simply including idtentry.h in KVM assembly isn't an option.
+>This patch introduces the following performance changes:
 >
-> Bypassing the ESP fixup and CR3 switching in the standard NMI entry code
-> is safe as KVM always handles NMIs that occur in the guest on a kernel
-> stack, with a kernel CR3.
+>Tool/Config: uperf w/ 64 threads, SOCK_STREAM
+>Test Runs: 5, mean of results
+>Before: commit 95ec6bce2a0b ("Merge branch 'net-ipa-more-endpoints'")
 >
-> Cc: Andy Lutomirski <luto@kernel.org>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/include/asm/idtentry.h | 16 ++++++----------
->  arch/x86/kernel/nmi.c           |  8 ++++----
->  arch/x86/kvm/vmx/vmx.c          |  4 ++--
->  3 files changed, 12 insertions(+), 16 deletions(-)
+>Test: 64KB, g2h
+>Before: 21.63 Gb/s
+>After: 25.59 Gb/s (+18%)
 >
-> diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
-> index 72184b0b2219..b241af4ce9b4 100644
-> --- a/arch/x86/include/asm/idtentry.h
-> +++ b/arch/x86/include/asm/idtentry.h
-> @@ -582,18 +582,14 @@ DECLARE_IDTENTRY_RAW(X86_TRAP_MC, xenpv_exc_machine_check);
+>Test: 16B, g2h
+>Before: 11.86 Mb/s
+>After: 17.41 Mb/s (+46%)
 >
->  /* NMI */
+>Test: 64KB, h2g
+>Before: 2.15 Gb/s
+>After: 3.6 Gb/s (+67%)
 >
-> -#if defined(CONFIG_X86_64) && IS_ENABLED(CONFIG_KVM_INTEL)
-> +#if IS_ENABLED(CONFIG_KVM_INTEL)
->  /*
-> - * Special NOIST entry point for VMX which invokes this on the kernel
-> - * stack. asm_exc_nmi() requires an IST to work correctly vs. the NMI
-> - * 'executing' marker.
-> - *
-> - * On 32bit this just uses the regular NMI entry point because 32-bit does
-> - * not have ISTs.
-> + * Special entry point for VMX which invokes this on the kernel stack, even for
-> + * 64-bit, i.e. without using an IST.  asm_exc_nmi() requires an IST to work
-> + * correctly vs. the NMI 'executing' marker.  Used for 32-bit kernels as well
-> + * to avoid more ifdeffery.
->   */
-> -DECLARE_IDTENTRY(X86_TRAP_NMI,         exc_nmi_noist);
-> -#else
-> -#define asm_exc_nmi_noist              asm_exc_nmi
-> +DECLARE_IDTENTRY(X86_TRAP_NMI,         exc_nmi_kvm_vmx);
+>Test: 16B, h2g
+>Before: 14.38 Mb/s
+>After: 18.43 Mb/s (+28%)
+>
+>Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>---
+>
+>Note: v7 only built, not retested since v6.
 
-Reviewed-by: Lai Jiangshan <jiangshanlai@gmail.com>
+I re-tested and everything seems okay:
+
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+
