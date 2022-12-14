@@ -2,105 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DADB64CD4A
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 16:48:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7709464CD64
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 16:52:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238904AbiLNPsU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 10:48:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50806 "EHLO
+        id S238852AbiLNPwQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 10:52:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238819AbiLNPrg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 10:47:36 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48C027FF0
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 07:47:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671032841; x=1702568841;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WF7yMFDVq/TY9XKynV4qmcvJiOnMmzvsFwP2+9IC50c=;
-  b=Eajy268U2TjIGijtILJ+7x8eRUysBoOUj5Rf77jM9s9flxFjKNgIJ//g
-   pvmWHzf7razHVV2fM7YMjdM28ahDjeVL3kGuErsFnBw6I4VPEtNNmBwdj
-   nuWvMEZ3ZovEPtUo2QbqzyIU5V8p1pAjwS3Bpadk9kJhfgYkCQDqOhWOU
-   AgYYmez675wNYJLO9FrsqhTDFrbzY2VcXKeM3Y5N4T/kD42ET6JSsf0/C
-   i+QiCzRJCy4m5tDrLyk0XBVLQm8ebbxtf6jXmusQyNjQY1VreFzrvA1QV
-   uwUolZVHvWJ0/cdEMCDSweFr26Y/BpYUvc8ZvkGPi+BmGPJICIFuvwaCB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10561"; a="318478345"
-X-IronPort-AV: E=Sophos;i="5.96,244,1665471600"; 
-   d="scan'208";a="318478345"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2022 07:47:21 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10561"; a="791340343"
-X-IronPort-AV: E=Sophos;i="5.96,244,1665471600"; 
-   d="scan'208";a="791340343"
-Received: from jliu4-mobl.ccr.corp.intel.com (HELO localhost) ([10.254.215.175])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Dec 2022 07:47:16 -0800
-Date:   Wed, 14 Dec 2022 23:47:14 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        maz@kernel.org, james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, oliver.upton@linux.dev,
-        catalin.marinas@arm.com, will@kernel.org, paul@xen.org
-Subject: Re: [PATCH v2] KVM: MMU: Make the definition of 'INVALID_GPA' common.
-Message-ID: <20221214154714.3qj4wt3u36zwp67q@linux.intel.com>
-References: <20221213090405.762350-1-yu.c.zhang@linux.intel.com>
- <96faca1a685e0d6e7a77cbc9dadc8ae5c6c9a27c.camel@infradead.org>
+        with ESMTP id S238520AbiLNPvz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 10:51:55 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51B1522BFF
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 07:48:49 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so7605623pjj.2
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 07:48:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=WaLTjgWRihQN7b0MKycoZ8sfbj+ZIdN/5VH6BQ1zJG8=;
+        b=XMynpH/QE30AFbSvvPWWkgXqBXOOP1Y7o2E1+jU1ZROwcipnsl43BYfWKz9UVtbJUD
+         FVLlZIdq+s3UiL8JKNXsew7gpKRWx7wcggHKte6wQJLKVPXiwjDE/qbEqakc4+d/kCU2
+         o2eGMGvttgdi6SdN1OzsUGW4UtjOjHLCxTiM4PTKChd0mM4LYT3q+33OqzLuUQhMe/y6
+         CHMJs7HG9S6fYMPMLqzpe5LeKmvI//Ft+/64Ru0nYaHW0Q7FnON5kHJKF4RqxzQH3SYj
+         Ivi5e5hKL/gNehXywqTOr8RChJeVoEFJydOfZFfxG/tuCv6bs8GG84qEb5uroMjXovOr
+         Zsgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WaLTjgWRihQN7b0MKycoZ8sfbj+ZIdN/5VH6BQ1zJG8=;
+        b=KS0sUp9J8PRaNLp1RP8aQya8cOs0c6eqE/hcjuZqZur5lp58/EU+dgJHgdqetOdL3T
+         ZPx8VlDoltZSwgapLEburxG51effSY1+LWAI4qbRM3iurzn2gZQ3YL+nVZ9lnNbFzM2F
+         myV2vdRPnG70uVbicFEXdYG0ZLRdLNTJOr9EFOMDnK6rNfvsTBF2bbVN6dKmGhktJ7/D
+         RvdMrhErNnMjIfCQVxBx319/EA/et6ZKO0QE0R/QyhkybIFX8Pmvv3deGRlNYeK3cp18
+         B3C79wtx9B0zL4SZjsxAnjbYEvyHTVSuW0fR0cIZlRhss5pwEEBFdKFiXndSs8WRPtGw
+         k+cg==
+X-Gm-Message-State: ANoB5plkTlOK9Vbw+3N0QMTv+j0YX+evdY5N8ln612Ftp1fs82sn5QaC
+        SvcS5AisNFWQHnjCfFGnMVAnmQ==
+X-Google-Smtp-Source: AA0mqf6vsR5Xz/LK0X/Dvs2lGxaCS6gbU8Zhg3GtAbtn/rjmbDaH9Nm6wzVn56Lrw2ZzX9gI59k7qw==
+X-Received: by 2002:a05:6a21:2d8f:b0:a7:882e:3a18 with SMTP id ty15-20020a056a212d8f00b000a7882e3a18mr576516pzb.1.1671032929053;
+        Wed, 14 Dec 2022 07:48:49 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id b28-20020aa78edc000000b0056b2e70c2f5sm57481pfr.25.2022.12.14.07.48.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Dec 2022 07:48:48 -0800 (PST)
+Date:   Wed, 14 Dec 2022 15:48:44 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Robert Hoo <robert.hu@linux.intel.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Greg Thelen <gthelen@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+Subject: Re: [PATCH 0/5] KVM: x86/mmu: TDP MMU fixes for 6.2
+Message-ID: <Y5nwXDS38UzavS7n@google.com>
+References: <20221213033030.83345-1-seanjc@google.com>
+ <acb8adfc5a2ace34010dc70d5ccd2821ff0a1ecb.camel@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <96faca1a685e0d6e7a77cbc9dadc8ae5c6c9a27c.camel@infradead.org>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <acb8adfc5a2ace34010dc70d5ccd2821ff0a1ecb.camel@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 11:10:54AM +0000, David Woodhouse wrote:
-> On Tue, 2022-12-13 at 17:04 +0800, Yu Zhang wrote:
-> > --- a/arch/x86/kvm/xen.c
-> > +++ b/arch/x86/kvm/xen.c
-> > @@ -41,7 +41,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
-> >         int ret = 0;
-> >         int idx = srcu_read_lock(&kvm->srcu);
-> >  
-> > -       if (gfn == GPA_INVALID) {
-> > +       if (gfn == INVALID_GPA) {
-> >                 kvm_gpc_deactivate(gpc);
-> >                 goto out;
-> >         }
-> > @@ -659,7 +659,7 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
-> >                 if (kvm->arch.xen.shinfo_cache.active)
-> >                         data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_cache.gpa);
-> >                 else
-> > -                       data->u.shared_info.gfn = GPA_INVALID;
-> > +                       data->u.shared_info.gfn = INVALID_GPA;
-> >                 r = 0;
-> >                 break;
+On Wed, Dec 14, 2022, Robert Hoo wrote:
+> On Tue, 2022-12-13 at 03:30 +0000, Sean Christopherson wrote:
+> > Fix three fatal TDP MMU bugs introduced in 6.2,
 > 
-> Strictly, those are INVALID_GFN not INVALID_GPA but I have so far
-> managed to pretend not to notice...
+> introduced in 6.1? or earlier?
+
+6.2, or more precisely, code sitting in kvm/next that will hopefully become part
+of 6.2-rc1.
+
+> >  harden related code,
+> > and clean up kvm_tdp_mmu_map() to eliminate the need for gotos.
+> > 
+> > Sean Christopherson (5):
+> >   KVM: x86/mmu: Don't attempt to map leaf if target TDP MMU SPTE is
+> >     frozen
+> >   KVM: x86/mmu: Map TDP MMU leaf SPTE iff target level is reached
+> >   KVM: x86/mmu: Re-check under lock that TDP MMU SP hugepage is
+> >     disallowed
+> >   KVM: x86/mmu: Don't install TDP MMU SPTE if SP has unexpected level
+> >   KVM: x86/mmu: Move kvm_tdp_mmu_map()'s prolog and epilog to its
+> > caller
+> > 
+> >  arch/x86/kvm/mmu/mmu.c          |  9 +++++++-
+> >  arch/x86/kvm/mmu/mmu_internal.h |  1 -
+> >  arch/x86/kvm/mmu/tdp_mmu.c      | 39 +++++++++++++++--------------
+> > ----
+> >  3 files changed, 26 insertions(+), 23 deletions(-)
+> > 
+> > 
+> > base-commit: 51229fd7872f82af07498aef5c79ad51baf81ea0
 > 
-> If we're bikeshedding the naming then I might have suggested
-> INVALID_PAGE but that already exists as an hpa_t type.
+> I cannot find this base commit in my tree, where I just pulled to
+> latest queue yesterday. But find this series can be applied to this
+> latest queue as well.
 
-Thanks, David. INVALID_GFN sounds more reasonable for me.
+Ya, I have an extra commit in my local repo sitting on top of kvm/queue so that
+my standard builds don't fail.
 
-But I am not sure if adding INVALID_GFN is necessary. Because for now
-only kvm_xen_shared_info_init() and kvm_xen_hvm_get_attr() use INVALID_GPA
-as a GFN. 
-
-Any suggestion? Thanks!
-
-B.R.
-Yu
-
-
-
-
+diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+index cc3e8c7d0850..2c7f2a26421e 100644
+--- a/arch/x86/kvm/hyperv.c
++++ b/arch/x86/kvm/hyperv.c
+@@ -898,6 +898,7 @@ bool kvm_hv_assist_page_enabled(struct kvm_vcpu *vcpu)
+                return false;
+        return vcpu->arch.pv_eoi.msr_val & KVM_MSR_ENABLED;
+ }
++EXPORT_SYMBOL_GPL(kvm_hv_assist_page_enabled);
+ 
+ int kvm_hv_get_assist_page(struct kvm_vcpu *vcpu)
+ {
