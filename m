@@ -2,74 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 206B064CC8A
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 15:43:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6370264CCD6
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 16:08:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238595AbiLNOn0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 09:43:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54182 "EHLO
+        id S238745AbiLNPH7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 10:07:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238441AbiLNOnY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 09:43:24 -0500
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD13924979
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 06:43:23 -0800 (PST)
-Received: by mail-yb1-xb31.google.com with SMTP id o127so21643535yba.5
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 06:43:23 -0800 (PST)
+        with ESMTP id S237778AbiLNPH5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 10:07:57 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCAC811825;
+        Wed, 14 Dec 2022 07:07:55 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id x66so4651961pfx.3;
+        Wed, 14 Dec 2022 07:07:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PAGV2Q8tueB9u6nAu32uT5tMQP/9mkBrRApmZJ0yLwI=;
-        b=SyvL0FaHaurKAry6ffmCFWOZC/bxFmVIKaFWG7nJ7O7YMAc3KDBaVtm4OXV+CyRzRY
-         RffyeegjDAYl0K9EvLQfmR5yFoPEIIv6ZpTz4A4aELZ37tTt2Jn5DLU8iPH9agztWcpr
-         sWcZtlq/rmGS7NBV3s7aJaSyMd43FauUXHeqR82fwDQjlIX1FLlUOjfR9nQBYAXvCGAn
-         CyJ1F9VxFPc3U4983ylZtrBkITaGWirWxWSzmpfK3YmvIjAd9x1EIPsGtHzH4eQ8LhNC
-         plX3/9+viGigk/+napPq37MsW1ADpHn3cBLFekBefeq6A9NTmRHnuU6UeDriJUTscJ+w
-         uJdA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qghbZ1vjirzjUztvBE2sOOI5LO9NPRdxa9b2gkNrWIo=;
+        b=lV7TKJSjN7h9wfcCVyKTNVr7QvjbhZ1bSqcrNg1PIPmWir9yH0rtfb1mzDx2PCfP7c
+         pTQyQ3cBcXUB/+rGR1FZjdhk/CKFPIY+7EdbDsIcSjuAw0a7XM+kcP+740iHTIY1H8VO
+         u+eYXzURbq2UtnYoqcqe8YTjY6uKsdc2ummc51vluIqCc6TxF//pSL9smq9XZHFQBBCl
+         RsvWle3Bo22z9+9hOHEIOIxfMO9MejoCpH28FkrJMijq5Uj6e9d3og0nmhlibG/N4wxE
+         UUw9mz3aJU48cCzPbiWd18xLVlReslMaqU5Akk+xtIyoPZEAJbDNn2ldpf70e2uZXZcE
+         /dIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PAGV2Q8tueB9u6nAu32uT5tMQP/9mkBrRApmZJ0yLwI=;
-        b=uqJPfXMiQe3Rsqa6gFvWobByPNqwJxV6iwCVCHnkH3hXEH26YqSQ+exeMhle+E9ss1
-         ewwmEd+KIo824k2KfDGv27VuhP7OlIhUdnEfusKzM9bgoG2qXjt72ra0LeriEqeIyAXH
-         bP2FDXUoHPMGvPN0TBxdbAe9rkXxicNZqXeGQZIrX8HdHm0f1SxtWwgXR1kP1HWiDiXD
-         0IX/NLmseRlq+5gDz8CdQTSJ229VYljK89txcUgqxByR8H5uG7pAjMuuC8xthSqDVYzZ
-         BtXiinD3FJkCorilolPfStC6wte4cHHTDAcohTNNHc1m6+Mb0VlJbHKGNDF+jiAq51Ub
-         0bfg==
-X-Gm-Message-State: ANoB5pkK6YWEo40PFPrSmmVCJQ0fH5pgFkz9CU6+vlVseA3ftYH3SnvD
-        b3Ng4P5pH9GdikaRUdM+UVJCMOgBNjnSxHDVCwjXFRSXczw=
-X-Google-Smtp-Source: AA0mqf7wQOno+Qij6QIPJRmDkJfWvIz1zgkynKxXS1Or5dqZ+k6pLDIpnUXU6TUQSR5KcbXV20sp3y0usjJaHkfyKBU=
-X-Received: by 2002:a25:e682:0:b0:6f6:41de:6ef3 with SMTP id
- d124-20020a25e682000000b006f641de6ef3mr52535817ybh.612.1671029002667; Wed, 14
- Dec 2022 06:43:22 -0800 (PST)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qghbZ1vjirzjUztvBE2sOOI5LO9NPRdxa9b2gkNrWIo=;
+        b=F/VfME7UO6jzJn1b7KWn6O6ZecQ1FHXQeiGMmqbBEo9DrLxsKtQClyO+GuJ4btHAo3
+         UsQbIR0baw2aamVHOy3Q3r+2kZ8hlHAepBKxI2JI/W2B4NrDjMIKJ9uPnM1nM+J7jIk3
+         /xEycEP+OFBLg3TcMe1n3mtpJ7O6z0jPA8FIO54zuG+6n02TjNUPouQ1DLYyO9zaMMwd
+         bqWYg20Jm/QpqMT5WeJ4N0pnFjOaVvyRiZ54eCJtuhOb3LIo1JLOsZ2QeFitfNUCeVd3
+         Wdpaa7ua6y5YvfPoCPwOb5i3B0bChnUBnLclxu9rOABuOKwEkFfQkfylZOFdh22yEgVe
+         PzHw==
+X-Gm-Message-State: ANoB5plexQmB4Wx6rmiElksY05xbMeJvJeBnuOm2FY3IsdUSufYNhZnA
+        hshMQz2huqkJpThM2mtokoaLXKyDh/jV69NFVQEgmgrF
+X-Google-Smtp-Source: AA0mqf7A2dJWm35FQPh9Y52xY+Fkrmij/4QW3ZLrwJ6xv0D0waWGXR6b5e9heTPpfLeyZgWYYlZJGCSH1DG+DPzuuXM=
+X-Received: by 2002:a05:6a00:2352:b0:572:91c6:9e4e with SMTP id
+ j18-20020a056a00235200b0057291c69e4emr81363148pfj.53.1671030475127; Wed, 14
+ Dec 2022 07:07:55 -0800 (PST)
 MIME-Version: 1.0
-Received: by 2002:a81:4416:0:0:0:0:0 with HTTP; Wed, 14 Dec 2022 06:43:22
- -0800 (PST)
-Reply-To: felixdouglas212@gmail.com
-From:   Douglas Felix <mrjoshuakunte23@gmail.com>
-Date:   Wed, 14 Dec 2022 14:43:22 +0000
-Message-ID: <CAE8KSLz3T6kXsz7i=LnQYQUbCet8RYtVJBio-kKGPKPavauzLA@mail.gmail.com>
-Subject: Good Day
-To:     undisclosed-recipients:;
+References: <cover.1665214747.git.houwenlong.hwl@antgroup.com>
+ <0ce24d7078fa5f1f8d64b0c59826c50f32f8065e.1665214747.git.houwenlong.hwl@antgroup.com>
+ <Y0bvT8k9vlDUPup+@google.com>
+In-Reply-To: <Y0bvT8k9vlDUPup+@google.com>
+From:   Lai Jiangshan <jiangshanlai@gmail.com>
+Date:   Wed, 14 Dec 2022 23:07:43 +0800
+Message-ID: <CAJhGHyAENXDLL=2-2KXL3_hKF+XZaFxOfRV2vaf6E5nhUa1Mzw@mail.gmail.com>
+Subject: Re: [PATCH v4 2/6] KVM: x86/mmu: Fix wrong gfn range of tlb flushing
+ in kvm_set_pte_rmapp()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Hou Wenlong <houwenlong.hwl@antgroup.com>, kvm@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Lan Tianyu <Tianyu.Lan@microsoft.com>,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=4.8 required=5.0 tests=BAYES_50,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
-X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
--- 
-A mail was sent to you sometime last week with the expectation of
-having a return mail from you but to my surprise you never bothered to replied.
-Kindly reply for further explanations.
+On Thu, Oct 13, 2022 at 1:00 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Mon, Oct 10, 2022, Hou Wenlong wrote:
+> > When the spte of hupe page is dropped in kvm_set_pte_rmapp(), the whole
+> > gfn range covered by the spte should be flushed. However,
+> > rmap_walk_init_level() doesn't align down the gfn for new level like tdp
+> > iterator does, then the gfn used in kvm_set_pte_rmapp() is not the base
+> > gfn of huge page. And the size of gfn range is wrong too for huge page.
+> > Use the base gfn of huge page and the size of huge page for flushing
+> > tlbs for huge page. Also introduce a helper function to flush the given
+> > page (huge or not) of guest memory, which would help prevent future
+> > buggy use of kvm_flush_remote_tlbs_with_address() in such case.
+> >
+> > Fixes: c3134ce240eed ("KVM: Replace old tlb flush function with new one to flush a specified range.")
+> > Signed-off-by: Hou Wenlong <houwenlong.hwl@antgroup.com>
+> > ---
+> >  arch/x86/kvm/mmu/mmu.c          |  4 +++-
+> >  arch/x86/kvm/mmu/mmu_internal.h | 10 ++++++++++
+> >  2 files changed, 13 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 7de3579d5a27..4874c603ed1c 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -1430,7 +1430,9 @@ static bool kvm_set_pte_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+> >       }
+> >
+> >       if (need_flush && kvm_available_flush_tlb_with_range()) {
+> > -             kvm_flush_remote_tlbs_with_address(kvm, gfn, 1);
+> > +             gfn_t base = gfn_round_for_level(gfn, level);
+> > +
+> > +             kvm_flush_remote_tlbs_gfn(kvm, base, level);
+> >               return false;
+> >       }
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> > index 17488d70f7da..249bfcd502b4 100644
+> > --- a/arch/x86/kvm/mmu/mmu_internal.h
+> > +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> > @@ -168,8 +168,18 @@ void kvm_mmu_gfn_allow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
+> >  bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
+> >                                   struct kvm_memory_slot *slot, u64 gfn,
+> >                                   int min_level);
+> > +
+> >  void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
+> >                                       u64 start_gfn, u64 pages);
+> > +
+> > +/* Flush the given page (huge or not) of guest memory. */
+> > +static inline void kvm_flush_remote_tlbs_gfn(struct kvm *kvm, gfn_t gfn, int level)
+> > +{
+> > +     u64 pages = KVM_PAGES_PER_HPAGE(level);
+> > +
+>
+> Rather than require the caller to align gfn, what about doing gfn_round_for_level()
+> in this helper?  It's a little odd that the caller needs to align gfn but doesn't
+> have to compute the size.
+>
+> I'm 99% certain kvm_set_pte_rmap() is the only path that doesn't already align the
+> gfn, but it's nice to not have to worry about getting this right, e.g. alternatively
+> this helper could WARN if the gfn is misaligned, but that's _more work.
+>
+>         kvm_flush_remote_tlbs_with_address(kvm, gfn_round_for_level(gfn, level),
+>                                            KVM_PAGES_PER_HPAGE(level);
+>
+> If no one objects, this can be done when the series is applied, i.e. no need to
+> send v5 just for this.
+>
 
-Respectfully yours,
-Barrister. Douglas Felix.
+Hello Paolo, Sean, Hou,
+
+It seems the patchset has not been queued.  I believe it does
+fix bugs.
+
+Thanks
+Lai
