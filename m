@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E5BC64D10D
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 21:21:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E03D464D033
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 20:46:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230217AbiLNUVb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 15:21:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
+        id S238949AbiLNTqu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 14:46:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230076AbiLNUUj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 15:20:39 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061f.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::61f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D9FBE16;
-        Wed, 14 Dec 2022 12:09:17 -0800 (PST)
+        with ESMTP id S237752AbiLNTqs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 14:46:48 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2063.outbound.protection.outlook.com [40.107.244.63])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B513E186C3;
+        Wed, 14 Dec 2022 11:46:46 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k3Rel/P9Z7OJE5kuAliew2w7FhMk+r8EKcRnU8EL43mhB33HiGwL4d5x5QQlEAnyPM/Sbjim7h427JWmha45fsFJzRAjCAWLrbrMWRS3nc2jCZOzlTueNoWKe2C5tgO4i80z+pKpTysClweyFgwnluf6dsf+KITDF/zMGiL1Sw5cMM6+LKKQaVhk3mucDloQT6hcsCTaWiW+7q21tMKZj/VFPoiHUHVEuMS48RJAkIoC3hpO/decTb8lxsjn6jzugMXpkn4OAJ4z21gaUmMdV9fx8OG6twQ4UpyaImGMJ8IT7txvRCAf9mxRu7T+P5TbQQjXuvcQ91iqxYcKZgHV1w==
+ b=It1ZnRUqJiqFmjSYP23twjCuXhLlF43t3nd7Tyn5LKgIBVmqnKKZstjEhXtTokR0Nlr3Q8CuaIJY0vBNkToiY3iF1HUFqHw6Iuy7MInPubCUhF4prJIEe2YfHTKlu5BLZ8fe6+8Rvzju1ZQuZ5Lv3/sweSPgAUHrgQ6IPSbUbar3BtPemytuX3Kx34ScbuafD/z8vwdsruvMQ9p2A4oQgG0zNOBnO05ISXKQDL1lPXdGeT+k/AkP55xBq5HE3t0qhZXMZtqNdBYqfq9f64hS4BjJeH9uEhh4ZmRGgPteuJbnocWFlDSaEyAXg7nStfvg/3bGHIYL8EZCMJSjOXUACw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UoTE+fiW10Y+o7IhpGUW/8psStYG4PWgFyeDWrTWepE=;
- b=EjXpi+4MgfZPBrGGgDPg6xKlV16lmK71ax7vF6jPh4K+/YMCPgN2KDeOEedEfmUoz35ZH/b5kDLa5lu5D9QhAs+s9yntugnusN7X8tPeJ63CXE1TCzvJI3u56eLsQ13F+PdEG1VjrYfIl5N9uONT9qqPj/QnFh0XYG5Vphxnp3hClswLAts19KMRV85A/k70HAa9UBL0gIZi5NeHVlJO1CL14eTB+C7B3VPCray3x9XUjnT7xovZKJh/BMxjNVBHaRAhsK6orR13Np8Xb8IO7iQMk7Gd1YCsF2TovZ9urTup3vAaUcqoissfifh6xsvI3WlHSvSIZ/1CCqlXJh6ZaQ==
+ bh=KrawmOQcUfOvXjQ5967mZ3Vgq8NBVT7yFWCyAF6k3c8=;
+ b=lIHSnzOUtMmIC0D7RLxzsXUwti5A329DVoMaazYwH2rvItFIre/51GRz5PMDxAePdfi+Q42SYG9XcIuae0EwjiVkCTvr/1594G+EGFME/E/TfxW3HQnnlGvZvVLU2yPcSyRKCcfICquokN9r/qIUcpkUinxjnfT4RwWuyjUqfR+qLyVVWsv6IdgWk2hMinmafnUXU1Hcm9xBncnxCcO5wwQ3Dh7Wmu/BBlI3ioM1LZqYbrIWYJfvtHFJgtwDgtEPWugUBU3eufus90Xqn5oU8ORVisR3hUe5cQgU13PARmH4udX79F+Qlk62VNIHoFUdUyjr4vfrzxfzYthSDQwlOg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UoTE+fiW10Y+o7IhpGUW/8psStYG4PWgFyeDWrTWepE=;
- b=e2JrRsKdrZ+X4ETw96wMApa/EFuSQ6W9rmfP3g0vSfbTIZ3mdYj1gwIN3I11d75Zg6WCS3GVIdo8wtk8Z8NXlHKC99CsMHEEv3LwM297kYt64AMqXQpJfD3WHMY4IIv/xaUq12MF/D0AOi2nm+2oclgr+uRNsv4XwKzzcGF3UPU=
-Received: from MW4PR03CA0303.namprd03.prod.outlook.com (2603:10b6:303:dd::8)
- by PH7PR12MB7236.namprd12.prod.outlook.com (2603:10b6:510:207::20) with
+ bh=KrawmOQcUfOvXjQ5967mZ3Vgq8NBVT7yFWCyAF6k3c8=;
+ b=OeMfWvF9ubeqKey0wnQBXOt5M9XduoYkOw90bAnMW3wYvEE4y0OJWgRPPEL7QYvgHPqhx83CYMu52mJ90r1Ayyif7JAj9823ALMZLPZHmeTkko74xsY2LtoZi5CMm/izPsFYNO5D3Yx58yuQI2d7zfoVSzlmz8VT5lcBQUE4NJ0=
+Received: from BL1PR13CA0098.namprd13.prod.outlook.com (2603:10b6:208:2b9::13)
+ by BL1PR12MB5302.namprd12.prod.outlook.com (2603:10b6:208:31d::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.19; Wed, 14 Dec
- 2022 20:09:13 +0000
-Received: from CO1NAM11FT061.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:dd:cafe::67) by MW4PR03CA0303.outlook.office365.com
- (2603:10b6:303:dd::8) with Microsoft SMTP Server (version=TLS1_2,
+ 2022 19:46:44 +0000
+Received: from BL02EPF0000EE3D.namprd05.prod.outlook.com
+ (2603:10b6:208:2b9:cafe::de) by BL1PR13CA0098.outlook.office365.com
+ (2603:10b6:208:2b9::13) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11 via Frontend
- Transport; Wed, 14 Dec 2022 20:09:13 +0000
+ Transport; Wed, 14 Dec 2022 19:46:44 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +46,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT061.mail.protection.outlook.com (10.13.175.200) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5924.11 via Frontend Transport; Wed, 14 Dec 2022 20:09:13 +0000
+ BL02EPF0000EE3D.mail.protection.outlook.com (10.167.241.134) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5880.8 via Frontend Transport; Wed, 14 Dec 2022 19:46:44 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 14 Dec
- 2022 14:09:08 -0600
+ 2022 13:46:43 -0600
 From:   Michael Roth <michael.roth@amd.com>
 To:     <kvm@vger.kernel.org>
 CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
@@ -71,11 +71,10 @@ CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
         <ashish.kalra@amd.com>, <harald@profian.com>,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>
-Subject: [PATCH RFC v7 08/64] KVM: Move kvm_for_each_memslot_in_hva_range() to be used in SVM
-Date:   Wed, 14 Dec 2022 13:40:00 -0600
-Message-ID: <20221214194056.161492-9-michael.roth@amd.com>
+        Vishal Annapurve <vannapurve@google.com>
+Subject: [PATCH RFC v7 09/64] KVM: Add HVA range operator
+Date:   Wed, 14 Dec 2022 13:40:01 -0600
+Message-ID: <20221214194056.161492-10-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221214194056.161492-1-michael.roth@amd.com>
 References: <20221214194056.161492-1-michael.roth@amd.com>
@@ -87,80 +86,121 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT061:EE_|PH7PR12MB7236:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1e62d8c1-447c-4880-10a6-08dade0f11da
+X-MS-TrafficTypeDiagnostic: BL02EPF0000EE3D:EE_|BL1PR12MB5302:EE_
+X-MS-Office365-Filtering-Correlation-Id: 38003544-7ec6-48ef-62ea-08dade0bee01
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Lg3YP3RpLL5TvffTChCRCg1QLEheUULM+s3Z6rqU1KnzhHb4mXNifSg74d6JT94BoJTVWQAQrmA3GaxcKkIq+w5xfZW0Hhe+obxXUYIUtzvBvymat+biqLpAeb/t4huem+uUfkhx1Fn9t1y2lj67Pr7OrUt8IctrWQhzq/INworfkf7EGmDH5WHo/IqpRo0fKYbzlRYo6Bw0jQbPK0FY5j8RbcyPDUDYA3jpSwgKFliq2aOzprMfX2Z5BAyw3qfaeoX5HK5qnPAkclGD1ZqPYuGaea6ECqtZrl47rlyN4D++E4BXQOjVNjojYilLGHwpMYPiN8sbU9S4D1abPr8KH08r3hl9lSAu3UJ26wvox5rEpEFLsaNwYuESHSHM3hXx6mFfalb001VdGqB8VbceKtHYsgTWTCk/hzXsqYdjDpl+nIuOnLvPRJ1f3je9GD13sXUU6Uzj1hUzJD3Gv1azLKVTdztGlg7Kk7NCdgC20/rCtEMZZ7aNXIarWx/zglNiI7FGzif6JncStwCiOJYBhlEG3X/FcXx2XkzIBjRIPPj0uTvKGV9Jhp8Gt0VEieWFJeuu92BDRfInjt8qSizFJxgEC5NU0asRbPQjq+821ADS68lxM/+Lp638+uauEZazAsNMeB2qktvpGNLslfrgfO+aQ04QYPw63W1IiAw5gk6RpkdXW2hCe22WoDbS1pipaoBdn8FzldenPm0qmYR7GcQ9K0CSkalDshWQr+SWGAU=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(346002)(136003)(396003)(451199015)(36840700001)(46966006)(40470700004)(70586007)(6916009)(70206006)(82740400003)(8676002)(316002)(4326008)(5660300002)(44832011)(356005)(81166007)(7416002)(54906003)(7406005)(8936002)(40480700001)(186003)(1076003)(83380400001)(82310400005)(16526019)(2616005)(36756003)(41300700001)(36860700001)(2906002)(40460700003)(47076005)(426003)(86362001)(336012)(26005)(6666004)(478600001)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: NackQYfnOA84fpGzzOnRkBVpOip+ZZl5oXHHpNEk6hqquHntX/F5SMSmLPTFihkCegh1Lpg1WKCPMOcDwbSJ5ah1c9hKJwnUWGvmdgWxsnWX9voGera+h0dMsyvRClpCgOL1T7fDLguEjxfAGDK4lmYlbnZhOL8yqZVxEQJTs3r2CE+z0FAdap6j4Abn4x9KhTgOVe1SWCb5z69JBAUmt7yfBYTusyJvvh7JKlksIA+a5ERom6LFak0cInj048e6eLaY7UCedCKq3NFdDEThOrizEL/1CvZyyksjX5Hv1LLMKKmJCRGGEp52XVkoB+yG+4tv3GYjAU3eo9Yy/XUGx029NRKdmMglt2shsWv3iu3Or/YOwavTw4s1JluqttfmlP+6zAW1j5N3ljQbEebc6u0SQQMRt8jvYvhtGrZnlkuFV9lrWDxpDdeX1PiqJIlc1eXJBInUivnpd9wfoLWOULnseljBeL5k1zml3Pe7welAODqcdWsAAA41/E6Srtd6u6cua3hQNmDGgR+8InQhb1MyckrSlQgHfCbjx+7qoHtjRwjvaS55JA3AYTkl9N2agps+OM0R7yhHHK9Jac6SW5z7WuTIuex9YepkXiaRSfU6mezPab3Ji9Wo7ut0S64MaQn2t+205SxOkbpZYz2Dixa981Ydh7Lv3RThGPYdKScyJU6lpFiMVR/l0sk6aj/zdVduYR+0yv2H3cRjwqvltbneawFwbOpZsPWf7SPRGIE=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(396003)(136003)(39860400002)(451199015)(36840700001)(46966006)(40470700004)(82740400003)(81166007)(44832011)(83380400001)(5660300002)(478600001)(36756003)(186003)(2616005)(47076005)(356005)(40460700003)(8936002)(70206006)(8676002)(1076003)(41300700001)(82310400005)(7416002)(16526019)(4326008)(86362001)(70586007)(7406005)(336012)(26005)(40480700001)(36860700001)(316002)(6916009)(54906003)(2906002)(426003)(6666004)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 20:09:13.0319
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 19:46:44.4483
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e62d8c1-447c-4880-10a6-08dade0f11da
+X-MS-Exchange-CrossTenant-Network-Message-Id: 38003544-7ec6-48ef-62ea-08dade0bee01
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT061.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF0000EE3D.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7236
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5302
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Nikunj A Dadhania <nikunj@amd.com>
+From: Vishal Annapurve <vannapurve@google.com>
 
-Move the macro to kvm_host.h and make if visible for SVM to use.
+Introduce HVA range operator so that other KVM subsystems
+can operate on HVA range.
 
-No functional change intended.
-
-Suggested-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- include/linux/kvm_host.h | 6 ++++++
- virt/kvm/kvm_main.c      | 6 ------
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ include/linux/kvm_host.h |  6 +++++
+ virt/kvm/kvm_main.c      | 48 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 54 insertions(+)
 
 diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index f72a2e0b8699..43b5c5aa8e80 100644
+index 43b5c5aa8e80..21a539ab17f6 100644
 --- a/include/linux/kvm_host.h
 +++ b/include/linux/kvm_host.h
-@@ -1116,6 +1116,12 @@ static inline bool kvm_memslot_iter_is_valid(struct kvm_memslot_iter *iter, gfn_
- 	     kvm_memslot_iter_is_valid(iter, end);			\
- 	     kvm_memslot_iter_next(iter))
+@@ -1407,6 +1407,12 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm);
+ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end);
+ void kvm_mmu_invalidate_end(struct kvm *kvm);
  
-+/* Iterate over each memslot intersecting [start, last] (inclusive) range */
-+#define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
-+	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
-+	     node;							     \
-+	     node = interval_tree_iter_next(node, start, last))
++typedef int (*kvm_hva_range_op_t)(struct kvm *kvm,
++				struct kvm_gfn_range *range, void *data);
 +
- /*
-  * KVM_SET_USER_MEMORY_REGION ioctl allows the following operations:
-  * - create a new memory slot
++int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
++		unsigned long hva_end, kvm_hva_range_op_t handler, void *data);
++
+ long kvm_arch_dev_ioctl(struct file *filp,
+ 			unsigned int ioctl, unsigned long arg);
+ long kvm_arch_vcpu_ioctl(struct file *filp,
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 73bf0bdedb59..a2306ccf9ab1 100644
+index a2306ccf9ab1..4ff7adaf6c56 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -623,12 +623,6 @@ static void kvm_null_fn(void)
+@@ -700,6 +700,54 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ 	return (int)ret;
  }
- #define IS_KVM_NULL_FN(fn) ((fn) == (void *)kvm_null_fn)
  
--/* Iterate over each memslot intersecting [start, last] (inclusive) range */
--#define kvm_for_each_memslot_in_hva_range(node, slots, start, last)	     \
--	for (node = interval_tree_iter_first(&slots->hva_tree, start, last); \
--	     node;							     \
--	     node = interval_tree_iter_next(node, start, last))	     \
--
- static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
- 						  const struct kvm_hva_range *range)
- {
++int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
++		unsigned long hva_end, kvm_hva_range_op_t handler, void *data)
++{
++	int ret = 0;
++	struct kvm_gfn_range gfn_range;
++	struct kvm_memory_slot *slot;
++	struct kvm_memslots *slots;
++	int i, idx;
++
++	if (WARN_ON_ONCE(hva_end <= hva_start))
++		return -EINVAL;
++
++	idx = srcu_read_lock(&kvm->srcu);
++
++	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
++		struct interval_tree_node *node;
++
++		slots = __kvm_memslots(kvm, i);
++		kvm_for_each_memslot_in_hva_range(node, slots,
++					  hva_start, hva_end - 1) {
++			unsigned long start, end;
++
++			slot = container_of(node, struct kvm_memory_slot,
++				hva_node[slots->node_idx]);
++			start = max(hva_start, slot->userspace_addr);
++			end = min(hva_end, slot->userspace_addr +
++						  (slot->npages << PAGE_SHIFT));
++
++			/*
++			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
++			 * {gfn_start, gfn_start+1, ..., gfn_end-1}.
++			 */
++			gfn_range.start = hva_to_gfn_memslot(start, slot);
++			gfn_range.end = hva_to_gfn_memslot(end + PAGE_SIZE - 1, slot);
++			gfn_range.slot = slot;
++
++			ret = handler(kvm, &gfn_range, data);
++			if (ret)
++				goto e_ret;
++		}
++	}
++
++e_ret:
++	srcu_read_unlock(&kvm->srcu, idx);
++
++	return ret;
++}
++
+ static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+ 						unsigned long start,
+ 						unsigned long end,
 -- 
 2.25.1
 
