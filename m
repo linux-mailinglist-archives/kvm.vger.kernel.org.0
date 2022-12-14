@@ -2,109 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 499DD64D102
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 21:20:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 344F664D02B
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 20:42:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229561AbiLNUUI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 15:20:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52562 "EHLO
+        id S238688AbiLNTmj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 14:42:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbiLNUTg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 15:19:36 -0500
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2061.outbound.protection.outlook.com [40.107.244.61])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64A7F4877D;
-        Wed, 14 Dec 2022 12:08:08 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aqAwigH2I0kR7P7hkeoHLS7Y/nzwmn4vvLNm8PkW8Ta8sjEA1c4ol2YBQ0Z3MgyzvN2YbjClEDJo3ulTqG9xJVclTXirqm1i5+r0r5bupkmlLlA9zhuQ+8/vrGTX0Skz1kZSRrI/1wchEmy95s5JgQhypVWypbZ8l4AoVQHx6SMmGsXMq5Y6WOFm3alNptLSMTioEIQWeET7BAYr7jZ/RMirg6Zj8iWMTGUX1E0C3hnL83vsx0usRJsdL4lnCzFlPREU/NQOVaYtz8xDbfnI3btOxrlhAiYzCOj/ShWDJkWnBbgxMq8Ojrsj90xWuoZ566AKlkvS1Gn2lz+1odCnbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=usdDmXcJMmcLw3KYUul5HJCtUTgF2Nhc7TpOXVijSeg=;
- b=hmhg9KeHlOk4HewIOT0+2oJCX11LVaXoChqKH0Twu0Y8OXFcaO3lGuVLSUgF4yVt7clSob6Tr8QITG3NbSWPkAm9Ut+OnuM1Zs4GLX2cPYdKERg0RxU2d0UpgUD9QHW0qi4frgd8MmZPIh/SM4e1PIrWTAn4ihZfZ7TCI9vd1Y9gBkKg0G1J8wDh7svJCcQ6oS+Xrku6HcC7HSK2hflletEJ9xtpAAIIK0RLB6Q1Oq+PAuXCYFJuxYBIYiuIGGwOfb3Y3e27S1MXuysFTjQ3+Gfjy77oE5+xK9gnjSIGpkS93/gDt9QR29wykrzVWtgdlLbgrRhk0V7TQtRz7xYD9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=usdDmXcJMmcLw3KYUul5HJCtUTgF2Nhc7TpOXVijSeg=;
- b=L1O/IH/Ix7vxJnbehYDLQ9liOghjkQD1Az218hcQCYXP+X+0NwiJ/my3/WShMp8h8B8JQhxqnUJe2yjy+kKlEd4GS4MP6jT4rnbChN2iw9bMS5vVYDDnuHKB7RVhMpIhcNw4vO2VjLxuqvyhPk9D9q83PX7EoZiHF0gE8A1oY4w=
-Received: from MW4PR03CA0103.namprd03.prod.outlook.com (2603:10b6:303:b7::18)
- by MW4PR12MB7285.namprd12.prod.outlook.com (2603:10b6:303:22e::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11; Wed, 14 Dec
- 2022 20:08:06 +0000
-Received: from CO1NAM11FT035.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b7:cafe::64) by MW4PR03CA0103.outlook.office365.com
- (2603:10b6:303:b7::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11 via Frontend
- Transport; Wed, 14 Dec 2022 20:08:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CO1NAM11FT035.mail.protection.outlook.com (10.13.175.36) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.5924.11 via Frontend Transport; Wed, 14 Dec 2022 20:08:05 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 14 Dec
- 2022 14:08:05 -0600
-From:   Michael Roth <michael.roth@amd.com>
-To:     <kvm@vger.kernel.org>
-CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <harald@profian.com>
-Subject: [PATCH RFC v7 64/64] iommu/amd: Add IOMMU_SNP_SHUTDOWN support
-Date:   Wed, 14 Dec 2022 13:40:56 -0600
-Message-ID: <20221214194056.161492-65-michael.roth@amd.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221214194056.161492-1-michael.roth@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
+        with ESMTP id S238500AbiLNTmh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 14:42:37 -0500
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BED482A700
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 11:42:35 -0800 (PST)
+Received: by mail-pl1-x634.google.com with SMTP id a9so4447062pld.7
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 11:42:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ku5jbuAQtkSIptaPybAlGHrWDUjqz+/sshvQ4yTXVKM=;
+        b=gFMFZTb9mro+iD15z0WKOAxzMvbSbzWPvCwsv8UgFNQWpsUuXMnYS1PD3tfN9vh+X7
+         TxVm4jwzNUIAZ9XHYIdI0sTAawVhxSLk731/QHHR0cEuSWQT3MUJ5gn4LDqw2kfypG1G
+         0bQIwCJGwPZ6AKpAq3T0x0kfjiXwM8lxNtxri7D8qhKTIK3pwuhtPFeLIU9CPCLftyT7
+         N4dlul+9Y12mjdb0gPr7ygr3Diy6uRM/rtN0bgjbPYE8emVLaRsMCD/6CMXfynWZUtV8
+         FUhysphsdX7xRND/cGG0xWBHmRXb2BmyzX1vpYoDF3NQ54Xr6HVNV1VJIIrs+JDUy6J7
+         CZcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ku5jbuAQtkSIptaPybAlGHrWDUjqz+/sshvQ4yTXVKM=;
+        b=xYvcqv/GJGhrJ4UR98VfX/ze0tzyERngKt8+nOCDkbGCJlf84fD/HAQDZ4w9A5OOzJ
+         m2PVGFH7ueieWrhfwBKrvAkkFGZyzsth+I2Wb25C0Ljbuzc/06VrpwKcFIkkCuJtsuT/
+         6wR7yDAkPOvJFcmqA8sJx3jr4znLwWkCzJ3EbxCFddDP5VuZJgKNYuKR43dVeQP3ETRb
+         QWVOUknBwC7N15RUUjuISsxZf6pKcyjgR1srczZ8cSKygagJnkVI3GGlLktkek6CAOiP
+         DmxHf/+o/FFOYlJyUc4TEFtxA6kpMLwCMbqC/Am0ZH8XYG6dHtrR9g+YS2+olR6TPV9Y
+         fIiA==
+X-Gm-Message-State: ANoB5pno6vER4NLZf+dsW0Ae6d+QrPhK2sGFGk9mwaySCqwgBbc/Gasq
+        0KQhn4Bn0hEjdCEtGB7PqojfMA==
+X-Google-Smtp-Source: AA0mqf475+T6XuYTtV2Re11WEmkxZATJINn1AOgHBS3Ie2ZV2UqJ+on0NpT5StpdHjXPTHMnUH99rA==
+X-Received: by 2002:a17:90a:2a4f:b0:219:828e:ba2 with SMTP id d15-20020a17090a2a4f00b00219828e0ba2mr871582pjg.0.1671046955097;
+        Wed, 14 Dec 2022 11:42:35 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id a1-20020a170902710100b0018b025d9a40sm2204215pll.256.2022.12.14.11.42.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Dec 2022 11:42:33 -0800 (PST)
+Date:   Wed, 14 Dec 2022 19:42:30 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     David Matlack <dmatlack@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        "Yang, Weijiang" <weijiang.yang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        "Amit, Nadav" <namit@vmware.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
+        Colin Cross <ccross@google.com>,
+        Hugh Dickins <hughd@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
+        "kvmarm@lists.cs.columbia.edu" <kvmarm@lists.cs.columbia.edu>,
+        "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
+        "linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>
+Subject: Re: [RFC PATCH 01/37] KVM: x86/mmu: Store the address space ID
+ directly in kvm_mmu_page_role
+Message-ID: <Y5onJulY3UQJNrmW@google.com>
+References: <20221208193857.4090582-1-dmatlack@google.com>
+ <20221208193857.4090582-2-dmatlack@google.com>
+ <22fe2332-497e-fe30-0155-e026b0eded97@intel.com>
+ <Y5NvYmxpy6BPkmpW@google.com>
+ <CALzav=eju4LYyX=ufNneSww+5sraYJ8cfQSi4LTOHfHWmddX9A@mail.gmail.com>
+ <Y5dnWgJ0ine55/hN@google.com>
+ <CAJhGHyBbjyKVEv3KcoOcPGQ28753FjR_rc9uNDEF3Dd-gNTRGQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT035:EE_|MW4PR12MB7285:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7dce4a32-8379-4710-13b0-08dade0ee9cf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: b2+L6GruvxCW4T89GjBwMM36vRjU5Su1Jjgi8uIGi06/wCUych8U+VvxqDLNMgwo54ExX8uOMubAWwuGWY/Fa0CCS5wt4Lc6k5UisUj8H4Idil8lmVmHzo0RoS2kAsWZL+u703FAuCo9zAEkxZVr5H34iVqLOs8smmfiTFD82PJHhwo0P+Q+PbcC9XB4NqadC8HnU1WBMvK9BtG2gehPBzIz5p/E2mC7hujrtn363ul1Fcrtu7qg40Zbjc+7iI2BFFXiQVkAALHouHg13JvqGgJcduB/EwVma5lY9WtU8dsDfGPzduIOsR9XFhF+Wz0WEPG85ksYQjBFIee8Fi35k66sO6C/b+q84kKFSUdo3Ka42G59z+ErTaNgOpAXF9s7EFdzXtCsznR2gGbN0/0laId6G6vVygpaYi35LIrJSz16iUtcOwbV25CwEqeECsLVc1pRR6xPATarK7ilN8DQ3duFHwysIzN1i4xM/B0Fa/dxajZ78RLMIHZrlPqjEd3nhe26GzG0aAiatwd0nzzgr5ZoNVMR7Qvm6/iY/MyDoxATqA/HsdszfAUBBAgO7GnF6bugR+ZwR3EN7sbpPbDnWxenySjjOqT+WsCfEZwy+9CC3EX0BH0AbncAufskOLgqf1S/309vb2EQZa1EUv4Xmp7qriBIlXJkDAWk8/ZsCncqly7I46KPXLr3nbKh6md2dcpz267l3TTsrhhk+fPwB670LdE0aMVvQjDf2MM+4W0=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(136003)(376002)(346002)(451199015)(46966006)(40470700004)(36840700001)(426003)(47076005)(1076003)(8936002)(336012)(36756003)(8676002)(316002)(6916009)(7406005)(2616005)(4326008)(70586007)(70206006)(41300700001)(36860700001)(81166007)(40480700001)(54906003)(82740400003)(7416002)(83380400001)(86362001)(5660300002)(356005)(44832011)(186003)(2906002)(26005)(40460700003)(16526019)(478600001)(82310400005)(6666004)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 20:08:05.8354
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7dce4a32-8379-4710-13b0-08dade0ee9cf
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT035.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7285
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJhGHyBbjyKVEv3KcoOcPGQ28753FjR_rc9uNDEF3Dd-gNTRGQ@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -112,140 +115,190 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Ashish Kalra <ashish.kalra@amd.com>
+On Wed, Dec 14, 2022, Lai Jiangshan wrote:
+> On Tue, Dec 13, 2022 at 1:47 AM Sean Christopherson <seanjc@google.com> wrote:
+> 
+> >
+> > My preference would be to leave .smm in x86's page role.  IMO, defining multiple
+> > address spaces to support SMM emulation was a mistake that should be contained to
+> > SMM, i.e. should never be used for any other feature.  And with CONFIG_KVM_SMM,
+> > even x86 can opt out.
+> >
+> 
+> 
+> I think the name ASID in kvm/x86 should be used for vmcb's ASID,
+> vmcs's VPID, and PCID. Using the name ASID for other purposes
+> would only result in unnecessary confusion.
 
-Add a new IOMMU API interface amd_iommu_snp_disable() to transition
-IOMMU pages to Hypervisor state from Reclaim state after SNP_SHUTDOWN_EX
-command. Invoke this API from the CCP driver after SNP_SHUTDOWN_EX
-command.
+I agree in principle, but at this point fixing the problem would require a lot of
+churn since "as_id" is pervasive throughout the memslots code.
 
-Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-Signed-off-by: Michael Roth <michael.roth@amd.com>
+It should be possible though, as I don't think anything in KVM's uAPI explicitly
+takes an as_id, i.e. it's KVM-internal terminology for the most part.
+
+> There is a bug for shadow paging when it uses two separate sets
+> of memslots which are using two sets of rmap and page-tracking.
+> 
+> When SMM world is writing to a non-SMM page which happens to be
+> a guest pagetable in the non-SMM world, the write operation will
+> go smoothly without specially handled and the shadow page for the guest
+> pagetable is neither unshadowed nor marked unsync.  The shadow paging
+> code is unaware that the shadow page has deviated from the guest
+> pagetable.
+
+Won't the unsync code work as intended?  for_each_gfn_valid_sp_with_gptes()
+doesn't consume the slot and I don't see any explicit filtering on role.smm,
+i.e. should unsync all SPTEs for the gfn.
+
+Addressing the page-track case is a bit gross, but doesn't appear to be too
+difficult.  I wouldn't be surprised if there are other SMM => non-SMM bugs lurking
+though.
+
 ---
- drivers/crypto/ccp/sev-dev.c | 20 ++++++++++++++
- drivers/iommu/amd/init.c     | 53 ++++++++++++++++++++++++++++++++++++
- include/linux/amd-iommu.h    |  1 +
- 3 files changed, 74 insertions(+)
+ arch/x86/include/asm/kvm_page_track.h |  2 +-
+ arch/x86/kvm/mmu/mmu.c                |  7 +++---
+ arch/x86/kvm/mmu/mmu_internal.h       |  3 ++-
+ arch/x86/kvm/mmu/page_track.c         | 32 +++++++++++++++++++--------
+ arch/x86/kvm/mmu/spte.c               |  2 +-
+ 5 files changed, 31 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 052190bdb8a6..6c4fdcaed72b 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -24,6 +24,7 @@
- #include <linux/cpufeature.h>
- #include <linux/fs.h>
- #include <linux/fs_struct.h>
-+#include <linux/amd-iommu.h>
+diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+index eb186bc57f6a..fdd9de31e160 100644
+--- a/arch/x86/include/asm/kvm_page_track.h
++++ b/arch/x86/include/asm/kvm_page_track.h
+@@ -63,7 +63,7 @@ void kvm_slot_page_track_add_page(struct kvm *kvm,
+ void kvm_slot_page_track_remove_page(struct kvm *kvm,
+ 				     struct kvm_memory_slot *slot, gfn_t gfn,
+ 				     enum kvm_page_track_mode mode);
+-bool kvm_slot_page_track_is_active(struct kvm *kvm,
++bool kvm_slot_page_track_is_active(struct kvm_vcpu *vcpu,
+ 				   const struct kvm_memory_slot *slot,
+ 				   gfn_t gfn, enum kvm_page_track_mode mode);
  
- #include <asm/smp.h>
- #include <asm/e820/types.h>
-@@ -1503,6 +1504,25 @@ static int __sev_snp_shutdown_locked(int *error)
- 		return ret;
- 	}
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 254bc46234e0..1c2200042133 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -2715,9 +2715,10 @@ static void kvm_unsync_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+  * were marked unsync (or if there is no shadow page), -EPERM if the SPTE must
+  * be write-protected.
+  */
+-int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
++int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu, const struct kvm_memory_slot *slot,
+ 			    gfn_t gfn, bool can_unsync, bool prefetch)
+ {
++	struct kvm *kvm = vcpu->kvm;
+ 	struct kvm_mmu_page *sp;
+ 	bool locked = false;
  
-+	/*
-+	 * SNP_SHUTDOWN_EX with IOMMU_SNP_SHUTDOWN set to 1 disables SNP
-+	 * enforcement by the IOMMU and also transitions all pages
-+	 * associated with the IOMMU to the Reclaim state.
-+	 * Firmware was transitioning the IOMMU pages to Hypervisor state
-+	 * before version 1.53. But, accounting for the number of assigned
-+	 * 4kB pages in a 2M page was done incorrectly by not transitioning
-+	 * to the Reclaim state. This resulted in RMP #PF when later accessing
-+	 * the 2M page containing those pages during kexec boot. Hence, the
-+	 * firmware now transitions these pages to Reclaim state and hypervisor
-+	 * needs to transition these pages to shared state. SNP Firmware
-+	 * version 1.53 and above are needed for kexec boot.
-+	 */
-+	ret = amd_iommu_snp_disable();
-+	if (ret) {
-+		dev_err(sev->dev, "SNP IOMMU shutdown failed\n");
-+		return ret;
-+	}
-+
- 	sev->snp_initialized = false;
- 	dev_dbg(sev->dev, "SEV-SNP firmware shutdown\n");
+@@ -2726,7 +2727,7 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
+ 	 * track machinery is used to write-protect upper-level shadow pages,
+ 	 * i.e. this guards the role.level == 4K assertion below!
+ 	 */
+-	if (kvm_slot_page_track_is_active(kvm, slot, gfn, KVM_PAGE_TRACK_WRITE))
++	if (kvm_slot_page_track_is_active(vcpu, slot, gfn, KVM_PAGE_TRACK_WRITE))
+ 		return -EPERM;
  
-diff --git a/drivers/iommu/amd/init.c b/drivers/iommu/amd/init.c
-index 1a2d425bf568..d1270e3c5baf 100644
---- a/drivers/iommu/amd/init.c
-+++ b/drivers/iommu/amd/init.c
-@@ -30,6 +30,7 @@
- #include <asm/io_apic.h>
- #include <asm/irq_remapping.h>
- #include <asm/set_memory.h>
-+#include <asm/sev.h>
+ 	/*
+@@ -4127,7 +4128,7 @@ static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
+ 	 * guest is writing the page which is write tracked which can
+ 	 * not be fixed by page fault handler.
+ 	 */
+-	if (kvm_slot_page_track_is_active(vcpu->kvm, fault->slot, fault->gfn, KVM_PAGE_TRACK_WRITE))
++	if (kvm_slot_page_track_is_active(vcpu, fault->slot, fault->gfn, KVM_PAGE_TRACK_WRITE))
+ 		return true;
  
- #include <linux/crash_dump.h>
- 
-@@ -3651,4 +3652,56 @@ int amd_iommu_snp_enable(void)
- 
- 	return 0;
+ 	return false;
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index ac00bfbf32f6..38040ab27986 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -156,7 +156,8 @@ static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
+ 	return kvm_x86_ops.cpu_dirty_log_size && sp->role.guest_mode;
  }
-+
-+static int iommu_page_make_shared(void *page)
-+{
-+	unsigned long pfn;
-+
-+	pfn = iommu_virt_to_phys(page) >> PAGE_SHIFT;
-+	return rmp_make_shared(pfn, PG_LEVEL_4K);
-+}
-+
-+static int iommu_make_shared(void *va, size_t size)
-+{
-+	void *page;
-+	int ret;
-+
-+	if (!va)
-+		return 0;
-+
-+	for (page = va; page < (va + size); page += PAGE_SIZE) {
-+		ret = iommu_page_make_shared(page);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+int amd_iommu_snp_disable(void)
-+{
-+	struct amd_iommu *iommu;
-+	int ret;
-+
-+	if (!amd_iommu_snp_en)
-+		return 0;
-+
-+	for_each_iommu(iommu) {
-+		ret = iommu_make_shared(iommu->evt_buf, EVT_BUFFER_SIZE);
-+		if (ret)
-+			return ret;
-+
-+		ret = iommu_make_shared(iommu->ppr_log, PPR_LOG_SIZE);
-+		if (ret)
-+			return ret;
-+
-+		ret = iommu_make_shared((void *)iommu->cmd_sem, PAGE_SIZE);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	amd_iommu_snp_en = false;
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(amd_iommu_snp_disable);
- #endif
-diff --git a/include/linux/amd-iommu.h b/include/linux/amd-iommu.h
-index 953e6f12fa1c..a1b33b838842 100644
---- a/include/linux/amd-iommu.h
-+++ b/include/linux/amd-iommu.h
-@@ -208,6 +208,7 @@ struct amd_iommu *get_amd_iommu(unsigned int idx);
  
- #ifdef CONFIG_AMD_MEM_ENCRYPT
- int amd_iommu_snp_enable(void);
-+int amd_iommu_snp_disable(void);
- #endif
+-int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
++int mmu_try_to_unsync_pages(struct kvm_vcpu *vcpu,
++			    const struct kvm_memory_slot *slot,
+ 			    gfn_t gfn, bool can_unsync, bool prefetch);
  
- #endif /* _ASM_X86_AMD_IOMMU_H */
+ void kvm_mmu_gfn_disallow_lpage(const struct kvm_memory_slot *slot, gfn_t gfn);
+diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+index 2e09d1b6249f..0e9bc837257e 100644
+--- a/arch/x86/kvm/mmu/page_track.c
++++ b/arch/x86/kvm/mmu/page_track.c
+@@ -18,6 +18,7 @@
+ 
+ #include "mmu.h"
+ #include "mmu_internal.h"
++#include "smm.h"
+ 
+ bool kvm_page_track_write_tracking_enabled(struct kvm *kvm)
+ {
+@@ -171,27 +172,40 @@ void kvm_slot_page_track_remove_page(struct kvm *kvm,
+ }
+ EXPORT_SYMBOL_GPL(kvm_slot_page_track_remove_page);
+ 
++static bool __kvm_slot_page_track_is_active(const struct kvm_memory_slot *slot,
++					    gfn_t gfn, enum kvm_page_track_mode mode)
++{
++	int index;
++
++	if (!slot)
++		return false;
++
++	index = gfn_to_index(gfn, slot->base_gfn, PG_LEVEL_4K);
++	return !!READ_ONCE(slot->arch.gfn_track[mode][index]);
++}
++
+ /*
+  * check if the corresponding access on the specified guest page is tracked.
+  */
+-bool kvm_slot_page_track_is_active(struct kvm *kvm,
++bool kvm_slot_page_track_is_active(struct kvm_vcpu *vcpu,
+ 				   const struct kvm_memory_slot *slot,
+ 				   gfn_t gfn, enum kvm_page_track_mode mode)
+ {
+-	int index;
+-
+ 	if (WARN_ON(!page_track_mode_is_valid(mode)))
+ 		return false;
+ 
+-	if (!slot)
+-		return false;
+-
+ 	if (mode == KVM_PAGE_TRACK_WRITE &&
+-	    !kvm_page_track_write_tracking_enabled(kvm))
++	    !kvm_page_track_write_tracking_enabled(vcpu->kvm))
+ 		return false;
+ 
+-	index = gfn_to_index(gfn, slot->base_gfn, PG_LEVEL_4K);
+-	return !!READ_ONCE(slot->arch.gfn_track[mode][index]);
++	if (__kvm_slot_page_track_is_active(slot, gfn, mode))
++		return true;
++
++	if (!is_smm(vcpu))
++		return false;
++
++	return __kvm_slot_page_track_is_active(gfn_to_memslot(vcpu->kvm, gfn),
++					       gfn, mode);
+ }
+ 
+ void kvm_page_track_cleanup(struct kvm *kvm)
+diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
+index c0fd7e049b4e..89ddd113c1b9 100644
+--- a/arch/x86/kvm/mmu/spte.c
++++ b/arch/x86/kvm/mmu/spte.c
+@@ -220,7 +220,7 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 		 * e.g. it's write-tracked (upper-level SPs) or has one or more
+ 		 * shadow pages and unsync'ing pages is not allowed.
+ 		 */
+-		if (mmu_try_to_unsync_pages(vcpu->kvm, slot, gfn, can_unsync, prefetch)) {
++		if (mmu_try_to_unsync_pages(vcpu, slot, gfn, can_unsync, prefetch)) {
+ 			pgprintk("%s: found shadow page for %llx, marking ro\n",
+ 				 __func__, gfn);
+ 			wrprot = true;
+
+base-commit: e0ef1f14e97ff65adf6e2157952dbbd1e482065c
 -- 
-2.25.1
 
