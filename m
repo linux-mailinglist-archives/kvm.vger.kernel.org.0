@@ -2,130 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9176464CB90
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 14:48:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C8B4364CBA8
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 14:55:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238313AbiLNNsK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 08:48:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55716 "EHLO
+        id S238467AbiLNNzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 08:55:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238412AbiLNNsI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 08:48:08 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62DC5264A6;
-        Wed, 14 Dec 2022 05:48:07 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id w23so3338442ply.12;
-        Wed, 14 Dec 2022 05:48:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/9eqK/hjcD9Lg4iWqN5uvayjQEDXlG4BGCPiAhKd3a0=;
-        b=eA5yAh3ZPPNxHpT8QpRDYZ/AqfNsbAyuujrUszAcxrb6/+oCDIeFP0+ZwPduui0Olx
-         URIe+QKJUx5OtGDzpgp3SXfJKk80DZgp26B2fFoCv8KI6NCn1gOLsLOTLJJ78s6MhWWL
-         eGEy5Nuk8w2dab03gaS5d1ts+ZgJLMATwS3f+Ij9mXzhRr44wiSBp0IPq1jFS/kvYZDg
-         sI/aK08w1535H1wYHwbuCvxJMNhtwdpoKCnMO3rkdmlBem9oHgtxlXwmJYtW79cP3Rk/
-         rT8UkVN0TtHK5sWE+Ez0FJWdl0x9kTTKBgBW0g1qap+7Ap1SlFePaEgwXi1IDCJzXQFS
-         1gdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/9eqK/hjcD9Lg4iWqN5uvayjQEDXlG4BGCPiAhKd3a0=;
-        b=ZpoMiZFSalYl4Y8CcsHsBoZi7OGWEtVrPbWm2gGK9DbFdKK/g3eejOsEohL79BXtoN
-         +oNEjuiEMdFUXzs4fym1lJ+i9JRHjyk0GFRjC6Y1OW4bSQMUGwCV+5cfd/orI+4LGhld
-         0m8zyW44Mlq+UzrA6YI+2RYqKp76fLnYLZEb4bD2geFP5SlbgUtZiRpliD+UAVbcuzWH
-         JqxD0fHfwilIHsvQ0mwdU53ZlqMzz6/jgL3GE0Xgq6q65vG9CcwP0Yl4k8ezfmkIDBE9
-         G4fie515eph5d+AHOR1ogYV3Yg4L/HhXkXMvP2f1eRwNvqQkJsDdYP5p/Ob7z9vN8WtH
-         SFwA==
-X-Gm-Message-State: ANoB5plZ4uDM09XSfifDUrYPHivJR94HGaekL89uUa+ZGmRPeSFlxSwz
-        ++UNSNbrUWF4G3UScRd2qmJ05M0QCT0d6NWWCTw=
-X-Google-Smtp-Source: AA0mqf6/xeYTAzn0W0hCQ3NuFFAoqoh/wpWuE8inr+myqXC77shQEHVHPdVEZrwdBEe63GsOUW1ppr/1EUcrwTXfx+c=
-X-Received: by 2002:a17:902:d510:b0:186:b137:4b42 with SMTP id
- b16-20020a170902d51000b00186b1374b42mr6292205plg.98.1671025686835; Wed, 14
- Dec 2022 05:48:06 -0800 (PST)
+        with ESMTP id S237958AbiLNNzp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 08:55:45 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521D79FDE
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 05:55:42 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BEDfjwP007966
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 13:55:42 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=GXQSgn3ZL9WpkSbM4TKCetfOUwb3xRKwC+7GNXhiMmM=;
+ b=OVMSbPQTnDrh8tJYj6Vje6RlwufjsLcuZLMTHmRoxrMxz900b/qgkMbxGh91urDZj9w4
+ rpK/0L5MgrXd3U/jLhUIwbYHUWLziDJaa95lrm+Y637iYyGiFzzg24WCT10rTGi5RJ3X
+ 7VEvuIVq7e8oXKgxeMRR+ATi0J44euIotEvYPQHzobZHn2fXfnU1rFUMDKV9SbI0KMoa
+ 43VGZNl933cfTOB/S23XX1jVtocy2Q6XZtqlUAuvCaNtWg1vi+EhcOoUJB8be7knGb6s
+ Rj41WOHPhrRgJQHfX4ptgWe+NIGi1+M1QhqGwbxTdJJgxrGemo3YOFat4iyLReOJWl8h pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mffkjgc4b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 13:55:41 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BEDhbAI019278
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 13:55:41 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mffkjgc3a-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Dec 2022 13:55:41 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BEA1us0023801;
+        Wed, 14 Dec 2022 13:55:39 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3meypyhbku-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Dec 2022 13:55:38 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BEDtZ5R24117652
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 14 Dec 2022 13:55:35 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5E9E32004B;
+        Wed, 14 Dec 2022 13:55:35 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2AFDB20040;
+        Wed, 14 Dec 2022 13:55:35 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 14 Dec 2022 13:55:35 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com,
+        nsg@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v4 0/1] s390x: test storage keys during migration
+Date:   Wed, 14 Dec 2022 14:55:34 +0100
+Message-Id: <20221214135535.704685-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-References: <20221212153205.3360-1-jiangshanlai@gmail.com> <20221212153205.3360-2-jiangshanlai@gmail.com>
- <Y5jAbS4kwRAdrWwM@google.com>
-In-Reply-To: <Y5jAbS4kwRAdrWwM@google.com>
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-Date:   Wed, 14 Dec 2022 21:47:55 +0800
-Message-ID: <CAJhGHyAksXZHO_BC391ax4rHgQLE=xWeZu6dxN60gSgGij+ZLg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] kvm: x86/mmu: Reduce the update to the spte in FNAME(sync_page)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: qnsuulzKUsNIFAELxdTrYj17vRSt5lkv
+X-Proofpoint-GUID: EJGwZvSwmkN1D-P_y5mNfLW5hOYR_LJI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-14_06,2022-12-14_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ malwarescore=0 priorityscore=1501 lowpriorityscore=0 bulkscore=0
+ adultscore=0 mlxlogscore=967 impostorscore=0 mlxscore=0 spamscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2212140107
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Sean,
+v3->v4:
+---
+* comment fixups (thanks Claudio)
+* fix usage (thanks Claudio)
 
-On Wed, Dec 14, 2022 at 2:12 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Dec 12, 2022, Lai Jiangshan wrote:
-> > From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-> >
-> > Sometimes when the guest updates its pagetable, it adds only new gptes
-> > to it without changing any existed one, so there is no point to update
-> > the sptes for these existed gptes.
-> >
-> > Also when the sptes for these unchanged gptes are updated, the AD
-> > bits are also removed since make_spte() is called with prefetch=true
-> > which might result unneeded TLB flushing.
->
-> If either of the proposed changes is kept, please move this to a separate patch.
-> Skipping updates for PTEs with the same protections is separate logical change
-> from skipping updates when making the SPTE writable.
->
-> Actually, can't we just pass @prefetch=false to make_spte()?  FNAME(prefetch_invalid_gpte)
-> has already verified the Accessed bit is set in the GPTE, so at least for guest
-> correctness there's no need to access-track the SPTE.  Host page aging is already
-> fuzzy so I don't think there are problems there.
+v2->v3:
+---
+* remove some now useless arguments to get shorter function signatures
+  (thanks Claudio)
+* fix barriers (thanks Nina)
+* improve command line arg parser (thanks Claudio)
+* use posix-style arguments (thanks Claudio)
+* factor out argument parsing into own function (thanks Claudio)
+* cleanup includes a bit (thanks Nina)
 
-FNAME(prefetch_invalid_gpte) has already verified the Accessed bit is set
-in the GPTE and FNAME(protect_clean_gpte) has already verified the Dirty
-bit is set in the GPTE.  These are only for guest AD bits.
+v1->v2:
+---
+* remove the skey library and move both versions of the skey migration
+  test to a single file
+* rename skey_set_keys/verify_keys to set_test_pattern/verify_test_pattern
+* add a few comments
 
-And I don't think it is a good idea to pass @prefetch=false to make_spte(),
-since the host might have cleared AD bit in the spte for aging or dirty-log,
-The AD bits in the spte are better to be kept as before.
+Add a test which changes storage keys while VM is being migrated.
 
-Though passing @prefetch=false would not cause any correctness problem
-in the view of maintaining guest AD bits.
+This series bases on Claudio's new PSW macros ("[PATCH v3 0/2] lib:
+s390x: add PSW and PSW_WITH_CUR_MASK macros").
 
->
-> > Do nothing if the permissions are unchanged or only write-access is
-> > being added.
->
-> I'm pretty sure skipping the "make writable" case is architecturally wrong.  On a
-> #PF, any TLB entries for the faulting virtual address are required to be removed.
-> That means KVM _must_ refresh the SPTE if a vCPU takes a !WRITABLE fault on an
-> unsync page.  E.g. see kvm_inject_emulated_page_fault().
+Nico Boehr (1):
+  s390x: add parallel skey migration test
 
-I might misunderstand what you meant or I failed to connect it with
-the SDM properly.
+ s390x/migration-skey.c | 218 +++++++++++++++++++++++++++++++++++++----
+ s390x/unittests.cfg    |  15 ++-
+ 2 files changed, 210 insertions(+), 23 deletions(-)
 
-I think there is no #PF here.
+-- 
+2.36.1
 
-And even if the guest is requesting writable, the hypervisor is allowed to
-set it non-writable and prepared to handle it in the ensuing write-fault.
-
-Skipping to make it writable is a kind of lazy operation and considered
-to be "the hypervisor doesn't grant the writable permission for a period
-before next write-fault".
-
-Thanks
-Lai
