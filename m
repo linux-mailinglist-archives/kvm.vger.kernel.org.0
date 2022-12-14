@@ -2,201 +2,203 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2B8364C78D
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 11:59:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 485D764C7C0
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 12:11:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237432AbiLNK7o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 05:59:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59526 "EHLO
+        id S238201AbiLNLLC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 06:11:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237936AbiLNK7m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 05:59:42 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36A4714038
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 02:58:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671015532;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bsm8rypiWXXlAJ/OnIAvVOQDlYOOMt1+SaQ7hOIMf78=;
-        b=T6CDKCDihF+0BOz/Fb8yhLYxRctXcgmKlxfotPR6NdPFrwq97drZnM5v/rPOEl4cyi+Sld
-        ZIy8QF3Gf6MmtN08vjyCC1Lz2tScKY5/4paDrv9Vx01pLksy9/KaedqbU5WD0VcBAhNvBc
-        V0gw1mmL4lIITBIilRRHPeuJFdXw+/k=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-646-7_s7-Jw8N1-oo03dwzVPWA-1; Wed, 14 Dec 2022 05:58:50 -0500
-X-MC-Unique: 7_s7-Jw8N1-oo03dwzVPWA-1
-Received: by mail-wm1-f71.google.com with SMTP id c187-20020a1c35c4000000b003cfee3c91cdso6256005wma.6
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 02:58:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bsm8rypiWXXlAJ/OnIAvVOQDlYOOMt1+SaQ7hOIMf78=;
-        b=7fhewb5uVgZRcP7yEjnAADjP9CtT8AmlqMJMPZeOviLEURAyIajeiPaayzbzBi2Fi3
-         weBHBmBjob1CS5ZBzztIoe/daK7d3CYmXYXcu0bR42yXCtIWdIRTH3sMes8v/JbmSo8+
-         51nYb6h8r7HeSa5gVR7MRCBcijFrYikVtjrybTV0PpjmVgcz4A5TmtyV17XCLePJ4TIb
-         jXkwkZHBK2Ynh9J3iEbLJUDqq7G07f0oBvPJvk50ukC1eeS++POU19e5Pq6nzDpOwUwF
-         pxPIyBUcPx6RXO4H4DTAT+l3LocQB3xyGrNa98pLfCYNE8bk7GHu9vvKwy1awHopddqQ
-         F1BQ==
-X-Gm-Message-State: ANoB5plDuS1i+QTPeqo+oqqZ0SJguwwU/ANlxs9nWqwiIIJ6ZR+g4OQU
-        mMIm4G6PPEWQMEHG5P6eorskUqzAY8mFvUmHiqYfwFx2y1iVVcxhdn2vp9CKq6uT7QcBH2fzAVp
-        c2YsnyCys7FgN
-X-Received: by 2002:a05:600c:1c9e:b0:3d2:7a7:5cc6 with SMTP id k30-20020a05600c1c9e00b003d207a75cc6mr16127426wms.18.1671015529752;
-        Wed, 14 Dec 2022 02:58:49 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4GhTuy3yFMob3cVWbwQSim+kT62Pp9g1pSNQfJtskVOvtO6CT9jLknO7unhHjf9Ss6p0OSBw==
-X-Received: by 2002:a05:600c:1c9e:b0:3d2:7a7:5cc6 with SMTP id k30-20020a05600c1c9e00b003d207a75cc6mr16127414wms.18.1671015529490;
-        Wed, 14 Dec 2022 02:58:49 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-97-87.dyn.eolo.it. [146.241.97.87])
-        by smtp.gmail.com with ESMTPSA id m17-20020a05600c3b1100b003c6b7f5567csm7893601wms.0.2022.12.14.02.58.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Dec 2022 02:58:49 -0800 (PST)
-Message-ID: <4b66f91f23a3eb91c3232bc68f45bdb799217c40.camel@redhat.com>
-Subject: Re: [PATCH net-next v7] virtio/vsock: replace virtio_vsock_pkt with
- sk_buff
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc:     Bobby Eshleman <bobbyeshleman@gmail.com>,
-        Cong Wang <cong.wang@bytedance.com>,
-        Jiang Wang <jiang.wang@bytedance.com>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Date:   Wed, 14 Dec 2022 11:58:47 +0100
-In-Reply-To: <20221213192843.421032-1-bobby.eshleman@bytedance.com>
-References: <20221213192843.421032-1-bobby.eshleman@bytedance.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.42.4 (3.42.4-2.fc35) 
+        with ESMTP id S237778AbiLNLLB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 06:11:01 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFB5BC08
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 03:10:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=MJMIsmKDDtcWfNQ/y290wc2EfuPmS3z+yxHCvWZJuUw=; b=Gd5DVraTwi6eloLpwuYrtAcLcJ
+        J9wW6N/ZIbXc32fVU6s5YPvnI6b2m8zS+dTCmAntJpc18Feqifosa9LcnNI9EtKpTMuhQtX/eaiBA
+        EkbHpVBCR6yF5TRNjqHffqnfx5Gbh3Cbpb0/SA4hv/jueBfWPfRp7bgrVRW+o6hMJoNBHH1IpuWia
+        TpqJkK6utP6gDUxRAa5GYTaZgZXMo2Qj/gBXp7iLmfaHaQQkd/CaHutaedYe66AaTbm35mpVIC53O
+        Lm7+3OgaKx0n3FNLepEyK7UbvSbWfilMAmn3o3vdE2CL7tvOYCsntajCBO1jVM50aICjbqly/rnGn
+        VDsOfjGg==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p5PfE-00DAea-D6; Wed, 14 Dec 2022 11:11:04 +0000
+Message-ID: <96faca1a685e0d6e7a77cbc9dadc8ae5c6c9a27c.camel@infradead.org>
+Subject: Re: [PATCH v2] KVM: MMU: Make the definition of 'INVALID_GPA'
+ common.
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, paul@xen.org
+Date:   Wed, 14 Dec 2022 11:10:54 +0000
+In-Reply-To: <20221213090405.762350-1-yu.c.zhang@linux.intel.com>
+References: <20221213090405.762350-1-yu.c.zhang@linux.intel.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-qJMGd8aQzRsXImXpXdi6"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-12-13 at 19:28 +0000, Bobby Eshleman wrote:
-> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> index 5703775af129..2a5994b029b2 100644
-> --- a/drivers/vhost/vsock.c
-> +++ b/drivers/vhost/vsock.c
-> @@ -51,8 +51,7 @@ struct vhost_vsock {
->  	struct hlist_node hash;
->  
->  	struct vhost_work send_pkt_work;
-> -	spinlock_t send_pkt_list_lock;
-> -	struct list_head send_pkt_list;	/* host->guest pending packets */
-> +	struct sk_buff_head send_pkt_queue; /* host->guest pending packets */
->  
->  	atomic_t queued_replies;
->  
-> @@ -108,40 +107,33 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
->  	vhost_disable_notify(&vsock->dev, vq);
->  
->  	do {
-> -		struct virtio_vsock_pkt *pkt;
-> +		struct virtio_vsock_hdr *hdr;
-> +		size_t iov_len, payload_len;
->  		struct iov_iter iov_iter;
-> +		u32 flags_to_restore = 0;
-> +		struct sk_buff *skb;
->  		unsigned out, in;
->  		size_t nbytes;
-> -		size_t iov_len, payload_len;
->  		int head;
-> -		u32 flags_to_restore = 0;
->  
-> -		spin_lock_bh(&vsock->send_pkt_list_lock);
-> -		if (list_empty(&vsock->send_pkt_list)) {
-> -			spin_unlock_bh(&vsock->send_pkt_list_lock);
-> +		spin_lock(&vsock->send_pkt_queue.lock);
-> +		skb = __skb_dequeue(&vsock->send_pkt_queue);
-> +		spin_unlock(&vsock->send_pkt_queue.lock);
 
-Here you use a plain spin_lock(), but every other lock has the _bh()
-variant. A few lines above this functions acquires a mutex, so this is
-process context (and not BH context): I guess you should use _bh()
-here, too.
+--=-qJMGd8aQzRsXImXpXdi6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[...]
+On Tue, 2022-12-13 at 17:04 +0800, Yu Zhang wrote:
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -41,7 +41,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gf=
+n_t gfn)
+>         int ret =3D 0;
+>         int idx =3D srcu_read_lock(&kvm->srcu);
+> =20
+> -       if (gfn =3D=3D GPA_INVALID) {
+> +       if (gfn =3D=3D INVALID_GPA) {
+>                 kvm_gpc_deactivate(gpc);
+>                 goto out;
+>         }
+> @@ -659,7 +659,7 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_=
+xen_hvm_attr *data)
+>                 if (kvm->arch.xen.shinfo_cache.active)
+>                         data->u.shared_info.gfn =3D gpa_to_gfn(kvm->arch.=
+xen.shinfo_cache.gpa);
+>                 else
+> -                       data->u.shared_info.gfn =3D GPA_INVALID;
+> +                       data->u.shared_info.gfn =3D INVALID_GPA;
+>                 r =3D 0;
+>                 break;
 
-> diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> index 35d7eedb5e8e..0385df976d41 100644
-> --- a/include/linux/virtio_vsock.h
-> +++ b/include/linux/virtio_vsock.h
-> @@ -3,10 +3,116 @@
->  #define _LINUX_VIRTIO_VSOCK_H
->  
->  #include <uapi/linux/virtio_vsock.h>
-> +#include <linux/bits.h>
->  #include <linux/socket.h>
->  #include <net/sock.h>
->  #include <net/af_vsock.h>
->  
-> +#define VIRTIO_VSOCK_SKB_HEADROOM (sizeof(struct virtio_vsock_hdr))
-> +
-> +enum virtio_vsock_skb_flags {
-> +	VIRTIO_VSOCK_SKB_FLAGS_REPLY		= BIT(0),
-> +	VIRTIO_VSOCK_SKB_FLAGS_TAP_DELIVERED	= BIT(1),
-> +};
+Strictly, those are INVALID_GFN not INVALID_GPA but I have so far
+managed to pretend not to notice...
 
-It looks like the above enum is not used anymore, you can drop it.
+If we're bikeshedding the naming then I might have suggested
+INVALID_PAGE but that already exists as an hpa_t type.
 
-[...]
+--=-qJMGd8aQzRsXImXpXdi6
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-> @@ -121,20 +108,18 @@ static void vsock_loopback_work(struct work_struct *work)
->  {
->  	struct vsock_loopback *vsock =
->  		container_of(work, struct vsock_loopback, pkt_work);
-> -	LIST_HEAD(pkts);
-> +	struct sk_buff_head pkts;
-> +	struct sk_buff *skb;
-> +
-> +	skb_queue_head_init(&pkts);
->  
->  	spin_lock_bh(&vsock->pkt_list_lock);
-> -	list_splice_init(&vsock->pkt_list, &pkts);
-> +	skb_queue_splice_init(&vsock->pkt_queue, &pkts);
->  	spin_unlock_bh(&vsock->pkt_list_lock);
->  
-> -	while (!list_empty(&pkts)) {
-> -		struct virtio_vsock_pkt *pkt;
-> -
-> -		pkt = list_first_entry(&pkts, struct virtio_vsock_pkt, list);
-> -		list_del_init(&pkt->list);
-> -
-> -		virtio_transport_deliver_tap_pkt(pkt);
-> -		virtio_transport_recv_pkt(&loopback_transport, pkt);
-> +	while ((skb = skb_dequeue(&pkts))) {
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMjE0MTExMDU0WjAvBgkqhkiG9w0BCQQxIgQgC/F3k/51
+oYK5flgG8H6/zRC11hPYiT55hSha5iShCXwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA7xFSTfxUI02BsorZ9w83MSw5b9GXOMiS/
+59YmYLvaD/5a1jpt41mbWdSVooT1dhsR50ycBSVPuMtrq0IyhkrB7RbtdSKe/ZFxy0sTb7gA9jS3
+ySGVsKM1xStKHY7dNoeuqGGBc2ihmKi7kPa35HfxwKJFSgWNoZo9b1E9HAgrvJpuDHvHHLQ3Hvbp
+MFd/iNtyd/AWpjHH9tW5PkceHr1EFYtd0YoMJDZAYf2v2pK4fwnuFYCTal+2yOCfBBZ2/G25GyUR
+LsDFXZaobpU9tQDsAwSjh7ImlW0+VHB6EXOaJ+av1LHZDVJkvykn6nB7Jr5dGCoe8LvAP22F42pb
+1mL8O0QGIzTB/gV7cslPjwWRbjEFM1DwhOld+K5w3OQLMRtT8oOUUPmmlz71IbdU8KLFFDFIqjX/
+0yuWuzMXe2y0LawYRg5sALL51r3ZSrKstutvP1VS2voZimNOUPdkuTxHjnGpGPS5Y8y655Up3yMo
+yJsgOuuiXCFhV6vdlEAAxencVYfQjQGackGCJUTeanyegQ1r5Q73J4rt8bFi6TEQ0sx2VmK+kSWQ
+5wBG8drqvu6sgT4FhS3W49dPng3ym2tntpNSjxIMNOjpsKz41v+9eR2cwF3NbIq4yTKu/a/KPuvX
+Lsx3KcB3mGN5QnBtzFxfnUSgm1D4DT1M2z2ncVFCagAAAAAAAA==
 
-Minor nit: since this code has complete ownership of the pkts queue,
-you can use the lockless dequeue variant here:
 
-	while ((skb = __skb_dequeue(&pkts))) {
-
-> +		virtio_transport_deliver_tap_pkt(skb);
-> +		virtio_transport_recv_pkt(&loopback_transport, skb);
->  	}
->  }
->  
-
-Other then that LGTM. @Michael: feel free to take this via your tree,
-once that the above feedback has been addressed, thanks!
-
-Paolo
+--=-qJMGd8aQzRsXImXpXdi6--
 
