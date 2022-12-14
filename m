@@ -2,160 +2,155 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9ACF964CFE2
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 20:09:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4C3E64CFE7
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 20:10:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238257AbiLNTJL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 14:09:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37458 "EHLO
+        id S238853AbiLNTKx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 14:10:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229795AbiLNTJK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 14:09:10 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9942654
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 11:09:09 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id js9so7982392pjb.2
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 11:09:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FIlNxfH2N14uQxL9gQjMu+4jFBzMKkxQj54k3fDEAoM=;
-        b=ki7KXMuMgFSwbFlvvSqSuOQhI4nnWJpLKfKstanOkB/onj5nUHoVz525QhfZ8nokKB
-         VXeBAUiQXL7JxbcSrDvQSoa4lSwXeMjbkvKivBYSZ0TEpYbXer0eJBuO5rSLLr9It5WK
-         fvs+dp4wbuKBP0yy+S1uOP84czNeK8nhe/1Uifui5WzzQ+tKUtXjnaV2x0inbQFe8dNk
-         qOUQLOFp3Ks0/MP/nhesJP/lViUPuMv+FypbFBL4U08YgIe7ET0AWrPZN0TUa7vtcmVX
-         4UPcD3345eJMKynVDVcjhWoPJZZ1z1i5AX6S+YpLVZ/1/YeT1xAjXv5yV02NAAay6VtC
-         Kq4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FIlNxfH2N14uQxL9gQjMu+4jFBzMKkxQj54k3fDEAoM=;
-        b=jqdjNw3SP+JSRYzaMYZg/Re1WpcqBU9RlEHGZD+u2YOSzSXL6q1+FbCAZ5Rv/fqosE
-         7ooE83CulB7oEcDKKpoxga8xYfuegVArphuycWuX2tRxoXs+ei/+Z7D5F/1udbu5eeKw
-         8Q28ETXvqoLQFMD+lD1H+uU2XKf8Hj7Yo8B/uC+/Uj0sV8nixnSajbiQJSn1C4XDOZST
-         1+haV554bayaj2f99D4Kym1DEoQNAUxPnMaUnUBU4zjBN/9McobQ7Og9Uw5bItWFfAtK
-         tvpKUTfKNk9SbsJnywfvBxRbxJRiZ1WCOJpTGE5hIITMm0WTK83krp7fFo12RRm+Yga7
-         vIyA==
-X-Gm-Message-State: ANoB5plc1dWzAzDjpV+isYYKylwRskF5H+Ux2yrfMrDN/21H2RmD1oG6
-        qgmxyWbHJEPp8TDG7AXYVTT8cg==
-X-Google-Smtp-Source: AA0mqf7VDwtO7bD7iDYUg1CUV8sCconizPsDQAtMy4jK4dIm4X3K9Vibe1wrX4pKJoLBdYIM/pjdjg==
-X-Received: by 2002:a05:6a21:2d8f:b0:a7:882e:3a18 with SMTP id ty15-20020a056a212d8f00b000a7882e3a18mr671791pzb.1.1671044948611;
-        Wed, 14 Dec 2022 11:09:08 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e28-20020aa7981c000000b00575b6f8b84esm234502pfl.26.2022.12.14.11.09.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Dec 2022 11:09:06 -0800 (PST)
-Date:   Wed, 14 Dec 2022 19:09:02 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Lai Jiangshan <jiangshanlai@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/2] kvm: x86/mmu: Reduce the update to the spte in
- FNAME(sync_page)
-Message-ID: <Y5ofTvOwg46xHeDk@google.com>
-References: <20221212153205.3360-1-jiangshanlai@gmail.com>
- <20221212153205.3360-2-jiangshanlai@gmail.com>
- <Y5jAbS4kwRAdrWwM@google.com>
- <CAJhGHyAksXZHO_BC391ax4rHgQLE=xWeZu6dxN60gSgGij+ZLg@mail.gmail.com>
+        with ESMTP id S238428AbiLNTKv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 14:10:51 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DCA2DECF;
+        Wed, 14 Dec 2022 11:10:48 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BEItBph014456;
+        Wed, 14 Dec 2022 19:10:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wNHocLVtnP7ui1nRS4SlGlXjwBGfuXS/lh3VyLg7rfI=;
+ b=QEkHS/1H5aNgWp6QVrLVxuaYk5vKCeRH30oNati8ivwX4aT2Emqx3N8DaCO4aXkZr0JJ
+ DKOEl9mi4+RW+GiQYmJLyO8Zs+QSez7sMZ4aW8Oob13iDtbvFBHHJuS2ZX7qQo3DFMmt
+ XYlO6huwXubxr6ss3WPJCOGzf8osrweGT/Ly6NUo7qxkDF8cTzV4o3RGZzxsWmeJ+LPa
+ bT3syYnE/trvK296XmAXJnNjAHb6yIt5E+/4nCfMJ/u4cu2e8BpCJD3e8eI+yGz8GIoX
+ QnToSJxUp+QTPV0dIt7gwbscqetY2NWnfR5MMPy3A1BOlPCSeWaIniLulluV4k/IH83Y pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mfm690nn4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Dec 2022 19:10:46 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BEIuGin022457;
+        Wed, 14 Dec 2022 19:10:45 GMT
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mfm690nj7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Dec 2022 19:10:45 +0000
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BEHgnlL017680;
+        Wed, 14 Dec 2022 19:10:42 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
+        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3meyqkeh64-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 14 Dec 2022 19:10:42 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BEJAeSD6750850
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 14 Dec 2022 19:10:41 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E75985803F;
+        Wed, 14 Dec 2022 19:10:40 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8ED0C5804E;
+        Wed, 14 Dec 2022 19:10:39 +0000 (GMT)
+Received: from [9.160.6.239] (unknown [9.160.6.239])
+        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 14 Dec 2022 19:10:39 +0000 (GMT)
+Message-ID: <be4eda2c-5dea-4dd3-245f-f7effd3fa534@linux.ibm.com>
+Date:   Wed, 14 Dec 2022 14:10:39 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJhGHyAksXZHO_BC391ax4rHgQLE=xWeZu6dxN60gSgGij+ZLg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 0/7] improve AP queue reset processing
+Content-Language: en-US
+To:     "Jason J. Herne" <jjherne@linux.ibm.com>,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     freude@linux.ibm.com, borntraeger@de.ibm.com, cohuck@redhat.com,
+        mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20221213154437.15480-1-akrowiak@linux.ibm.com>
+ <f528148d-0074-8173-09fc-c1b50bbabe75@linux.ibm.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <f528148d-0074-8173-09fc-c1b50bbabe75@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3XvQphZ8PRIAZ70O0Ecq6upeLOpvdChn
+X-Proofpoint-GUID: YsGqSkV3o7OAeLZXV0_Cfe3kZgkXUUmg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-14_09,2022-12-14_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ malwarescore=0 suspectscore=0 impostorscore=0 mlxscore=0
+ lowpriorityscore=0 phishscore=0 adultscore=0 priorityscore=1501
+ clxscore=1015 spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2212140155
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022, Lai Jiangshan wrote:
-> Hello Sean,
-> 
-> On Wed, Dec 14, 2022 at 2:12 AM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Mon, Dec 12, 2022, Lai Jiangshan wrote:
-> > > From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-> > >
-> > > Sometimes when the guest updates its pagetable, it adds only new gptes
-> > > to it without changing any existed one, so there is no point to update
-> > > the sptes for these existed gptes.
-> > >
-> > > Also when the sptes for these unchanged gptes are updated, the AD
-> > > bits are also removed since make_spte() is called with prefetch=true
-> > > which might result unneeded TLB flushing.
-> >
-> > If either of the proposed changes is kept, please move this to a separate patch.
-> > Skipping updates for PTEs with the same protections is separate logical change
-> > from skipping updates when making the SPTE writable.
-> >
-> > Actually, can't we just pass @prefetch=false to make_spte()?  FNAME(prefetch_invalid_gpte)
-> > has already verified the Accessed bit is set in the GPTE, so at least for guest
-> > correctness there's no need to access-track the SPTE.  Host page aging is already
-> > fuzzy so I don't think there are problems there.
-> 
-> FNAME(prefetch_invalid_gpte) has already verified the Accessed bit is set
-> in the GPTE and FNAME(protect_clean_gpte) has already verified the Dirty
-> bit is set in the GPTE.  These are only for guest AD bits.
-> 
-> And I don't think it is a good idea to pass @prefetch=false to make_spte(),
-> since the host might have cleared AD bit in the spte for aging or dirty-log,
-> The AD bits in the spte are better to be kept as before.
 
-Drat, I was thinking KVM never flushes when aging SPTEs, but forgot about
-clear_flush_young().
+On 12/14/22 10:16 AM, Jason J. Herne wrote:
+>
+> On 12/13/22 10:44 AM, Tony Krowiak wrote:
+>> This series introduces several improvements to the function that 
+>> performs
+>> AP queue resets:
+>>
+>> * Breaks up reset processing into multiple smaller, more concise 
+>> functions.
+>>
+>> * Use TAPQ to verify completion of a reset in progress rather than 
+>> mulitple
+>>    invocations of ZAPQ.
+>>
+>> * Check TAPQ response codes when verifying successful completion of 
+>> ZAPQ.
+>>
+>> * Fix erroneous handling of some error response codes.
+>>
+>> * Increase the maximum amount of time to wait for successful 
+>> completion of
+>>    ZAPQ.
+>>
+>> * Always clean up IRQ resources when the ZAPQ response code indicates an
+>>    error.
+>>
+>> * Consider reset complete when ZAPQ response code indicates the 
+>> adapter to
+>>    which a queue is connected is deconfigured. All queues associated 
+>> with an
+>>    adapter are reset when it is deconfigured.
+>>
+>> Tony Krowiak (7):
+>>    s390/vfio-ap: verify reset complete in separate function
+>>    s390/vfio_ap: check TAPQ response code when waiting for queue reset
+>>    s390/vfio_ap: use TAPQ to verify reset in progress completes
+>>    s390/vfio_ap: verify ZAPQ completion after return of response code
+>>      zero
+>>    s390/vfio_ap: fix handling of error response codes
+>>    s390/vfio_ap: increase max wait time for reset verification
+>>    s390/vfio_ap: always clean up IRQ resources
+>>
+>>   drivers/s390/crypto/vfio_ap_ops.c | 106 ++++++++++++++++++++----------
+>>   1 file changed, 73 insertions(+), 33 deletions(-)
+>
+>
+> This series largely matches what I've already reviewed. I like the way 
+> you broke this up, it does a better job telling the story.
+>
+> Here's my R-b for the entire series.
+> Reviewed-by: Jason J. Herne <jjherne@linux.ibm.com>
 
-Rather than skipping if the Accessed bit is the only thing that's changing, what
-about simply preserving the Accessed bit?  And s/prefetch/accessed in make_spte()
-so that future changes to make_spte() don't make incorrect assumptions about the
-meaning of "prefetch".
 
-Another alternative would be to conditionally preserve the Accessed bit, i.e. clear
-it if a flush is needed anyways, but that seems unnecessarily complex.
+Thanks for the review Jason.
 
-> Though passing @prefetch=false would not cause any correctness problem
-> in the view of maintaining guest AD bits.
-> 
-> >
-> > > Do nothing if the permissions are unchanged or only write-access is
-> > > being added.
-> >
-> > I'm pretty sure skipping the "make writable" case is architecturally wrong.  On a
-> > #PF, any TLB entries for the faulting virtual address are required to be removed.
-> > That means KVM _must_ refresh the SPTE if a vCPU takes a !WRITABLE fault on an
-> > unsync page.  E.g. see kvm_inject_emulated_page_fault().
-> 
-> I might misunderstand what you meant or I failed to connect it with
-> the SDM properly.
-> 
-> I think there is no #PF here.
-> 
-> And even if the guest is requesting writable, the hypervisor is allowed to
-> set it non-writable and prepared to handle it in the ensuing write-fault.
 
-Yeah, you're right.  The host will see the "spurious" page fault but it will
-never get injected into the guest.
-
-> Skipping to make it writable is a kind of lazy operation and considered
-> to be "the hypervisor doesn't grant the writable permission for a period
-> before next write-fault".
-
-But that raises the question of why?  No TLB flush is needed precisely because any
-!WRITABLE fault will be treated as a spurious fault.  The cost of writing the
-SPTE is minimal.  So why skip?  Skipping just to reclaim a low SPTE bit doesn't
-seem like a good tradeoff, especially without a concrete use case for the SPTE bit.
-
-E.g. on pre-Nehalem Intel CPUs, i.e. CPUs that don't support EPT and thus have
-to use shadow paging, the CPU automatically retries accesses after the TLB flush
-on permission faults.  The lazy approach might introduce a noticeable performance
-regression on such CPUs due to causing more #PF VM-Exits than the current approach.
