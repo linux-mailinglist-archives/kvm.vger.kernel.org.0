@@ -2,76 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8440D64D1ED
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 22:43:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 37EC964D348
+	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 00:23:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229838AbiLNVng (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 16:43:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38212 "EHLO
+        id S229522AbiLNXXG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 18:23:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229705AbiLNVn0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 16:43:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62BFF379C2
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 13:42:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671054154;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/5kOaiQ5bdlOW+7uJUOh9oZPjjvwDTKBEEXenTlVbno=;
-        b=OXSLA2wmX7zJnOnMnEmC+3LYLWVoRyPcnSif5MWwjW5dFjQQKRzu3bX33Yx0zS77ajLKfG
-        GMD1yqcMPWvKfytfIt34AUKDSLQns0SkXj6wxtcW94jE/3Lr2bsZjPcI8UeBkKLzdTjTpF
-        q4xPbXWA5f1b0AuoIaAvxEKGIOCrbIo=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-427-agNWmfrOMhaRnYGJCpXlLA-1; Wed, 14 Dec 2022 16:42:33 -0500
-X-MC-Unique: agNWmfrOMhaRnYGJCpXlLA-1
-Received: by mail-io1-f70.google.com with SMTP id n10-20020a6b590a000000b006e03471b3eeso4624924iob.11
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 13:42:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/5kOaiQ5bdlOW+7uJUOh9oZPjjvwDTKBEEXenTlVbno=;
-        b=dFnS0qLvbXZBxEXL0s1l23Hw6nTm8EOfO2tiB/JZ12PEauOOPXOmReVWwxsj56ovLA
-         NDXSndMg/xRzMBQKMC4IApe0G3EEvZ7VAm9y9B4+IhQLNRk095TwT5CtHKsvNW9TPOzy
-         Ap3AWw36C4sv+5bHg/rihq5HUGdf6pKfunGsokrL79GO5+fkpu2T+hwJm2sz2hKnZY14
-         TE4+SjHa6+kbjF8IkjGjGLfLv3NewBi5hUlrEnftw+C2qBz1s2mQZ3UE1HF8QlHnYzYa
-         55USgWV6IntkUQGONS7fmDRLVLageeAA2s7OPMV2qUwXIeMNtxIFpIUIm6T2DWXGjMpn
-         /tRA==
-X-Gm-Message-State: ANoB5pmKFCOOBG1YcZXX1lWZ5sF4WFzqQ1Qel5Shj5as5oArcr6yXRpy
-        6YOUBI5YkJYH+PoXNn9PyTOS3NK8dk15HugVy1O3Fg2vcWZImLbzVqUvpy7tJsBqPEvJ7ZbxZsl
-        MWPN1s4r1zGHw
-X-Received: by 2002:a92:1910:0:b0:300:bcdd:919 with SMTP id 16-20020a921910000000b00300bcdd0919mr17359081ilz.22.1671054152348;
-        Wed, 14 Dec 2022 13:42:32 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6w3PKGlPj6XomzkCE4zkYt9t+3M4a2+EWYGoW7KGzPMpgc67x3wcpUEBuKusvYKkZI7GPK5A==
-X-Received: by 2002:a92:1910:0:b0:300:bcdd:919 with SMTP id 16-20020a921910000000b00300bcdd0919mr17359064ilz.22.1671054152132;
-        Wed, 14 Dec 2022 13:42:32 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id c2-20020a92dc82000000b00302e4c93a54sm4787794iln.79.2022.12.14.13.42.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Dec 2022 13:42:31 -0800 (PST)
-Date:   Wed, 14 Dec 2022 14:42:29 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Steve Sistare <steven.sistare@oracle.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     kvm@vger.kernel.org, Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH V4 0/5] fixes for virtual address update
-Message-ID: <20221214144229.43c8348d.alex.williamson@redhat.com>
-In-Reply-To: <1671053097-138498-1-git-send-email-steven.sistare@oracle.com>
-References: <1671053097-138498-1-git-send-email-steven.sistare@oracle.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.34; x86_64-redhat-linux-gnu)
+        with ESMTP id S229950AbiLNXWn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 18:22:43 -0500
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2052.outbound.protection.outlook.com [40.107.212.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B8695217E;
+        Wed, 14 Dec 2022 15:21:54 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FD2v0aH80h9WM+mSi9ZiC102az7/aC9JKHR4VBf0lcqXLmYYZigLKoLT1NPzeourg6ga3AZFgnc1dmuMxvC34f5tda2nY06vpsE5Yk2ufGER1QkwwdBnlgF/YPcGnIfcbPOuLg7ynBrHcwbH1OqwLAsf6CB+e7GAm0E2usiP4VJ6k65sYic0Fvyb9vyET/q5noMONlWrNolE+gs0hs+EdCzmzHwQ0p6D8DakYWDcac5jkfqfALKUiDMFUQpZzAYi8xzhkEK2zI3MI4am8jvEmOfKcM50XHfZFK4ZEIbHM8CYbowWoeS2tkGCrRY36tPjQi+fJV2XgHKWpYQGAB5CPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=XW9TFSNN6/+EpznrKytrIqxkFOPjdgqPzvuppy2RT5A=;
+ b=eG/faIwo2wY5FlgVljDfY9c5Zq5b6Ptmiz/efSDV8S1p08KZMbVCEnyNari5gqB5CZu6eZqQtGvNEXt3wMFwAhlfltE8TidHOhmEKlCw/jQydvVI8f2m5zqt1PqfC1viHFoNL7aTQiYATl0zK4n2PYFwvVEI+HtxCJFndycfakzB576ctWGmZBr4IvD1nXTVifpVfrZ0007MultyQhIFd+3qJHGVNYgm06aO/85hWbeZLl1jk9x3o2ycIcSFmV34757tkJ1bZYC5hvrgBpMDNZ9IAySkQRMro1fyQYzOo7HE0JhezpP+GZsyAzK5GsgcVrVu9y9rlYwXtcgZccnMJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XW9TFSNN6/+EpznrKytrIqxkFOPjdgqPzvuppy2RT5A=;
+ b=TQqA4NUgF8aD9qw2a0KuCO5n2Xv9wBxuhwA+1T/sQE25qbffa10nFC5RbgheRgEt4vOV3+f2lUB7dhGhbxiIbTpauMxaVjxRrw9PB4sFdtfy3Cx4nPiNZOcw3MygxBLLpdVeR8JbdzZhtp4o3OzhjrizDbmKTT1xBa70UkBQW90=
+Received: from BN9PR03CA0655.namprd03.prod.outlook.com (2603:10b6:408:13b::30)
+ by SA0PR12MB4429.namprd12.prod.outlook.com (2603:10b6:806:73::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5880.19; Wed, 14 Dec
+ 2022 23:21:52 +0000
+Received: from BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:13b:cafe::b5) by BN9PR03CA0655.outlook.office365.com
+ (2603:10b6:408:13b::30) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11 via Frontend
+ Transport; Wed, 14 Dec 2022 23:21:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT009.mail.protection.outlook.com (10.13.176.65) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5924.12 via Frontend Transport; Wed, 14 Dec 2022 23:21:52 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 14 Dec
+ 2022 17:21:50 -0600
+From:   Brett Creeley <brett.creeley@amd.com>
+To:     <kvm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <alex.williamson@redhat.com>, <cohuck@redhat.com>,
+        <jgg@nvidia.com>, <yishaih@nvidia.com>,
+        <shameerali.kolothum.thodi@huawei.com>, <kevin.tian@intel.com>
+CC:     <shannon.nelson@amd.com>, <drivers@pensando.io>,
+        Brett Creeley <brett.creeley@amd.com>
+Subject: [RFC PATCH v2 vfio 0/7] pds vfio driver
+Date:   Wed, 14 Dec 2022 15:21:29 -0800
+Message-ID: <20221214232136.64220-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT009:EE_|SA0PR12MB4429:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7c7450a4-e8d7-4d3e-730d-08dade29fb80
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: qYQrT6Pmn5nfZ1eOgSGMJl0wg4qB37qCYDsBhCc19Tc3YZcGh3qwzMz3ATqTlGS5Ub5ohh/PcaFG3hoEyKNMm1lQDfGR7xSbFF9f0zfPJ16yHa1q4srJQEQdP+OGClIZeluZJO7WM7TaYgYWS6MFe/f8+Dq9zuvliXECSySTW4WDhWvQfjDFEGqmtD5f7U1eCUI6Vt449BmoFv7IZQZLG8Xxaaeym8sMqAUMMArwtvG1MsGjFWe+A+SvDDPChTgH0Jn585W7owyy5h8yLe3jxqXOG7RLq5ttNfn7nDNrCa2qRR6ogZfmtDnTX3gwii2KUIlgV2v+GmcFCGD6KbkuXQyNzjprXO/3iTV0Rm3hd9PTAofPr7SUUc1N1BRFrB3E3ySSoBWvEA6ngqlm3u/C1+xju97Huwwtj2i1qEHiPAG1KOyGEUZoz4YYit/ZZ6+OkasXroPn5eJzIKTGefFPxwDXjSijiOOE27Ebo3vqVWpKy14I00vnYGj83XvbCYEFJ7WvatgA8skPUylRpWrJDyrTThvoi3gJ2pjUpXClS5a7a5GFrox1TIS98wLBluAKM5uor/gzVQsBvbiw0bGUlIa8XqkmZyiBmsKm6xwWNvaKpdL3mYDpBlMxiqhCbbbqN/rgeIESH/OcL5xa0tIlOe0JunAiRjEpxjL9T3CLWoVtBtbeJnJ9qbiikYC+IpsbxygZRLuzIPN1Cp9wXzkzxeMmWP2BCgiQ38ydFmwTmLit4TjEDzPtQpGMFvQXVGN0121upj/a5MaMRu8z7SNrEQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:CA;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(136003)(396003)(39860400002)(451199015)(36840700001)(40470700004)(46966006)(82310400005)(5660300002)(86362001)(36756003)(47076005)(8936002)(426003)(40480700001)(1076003)(356005)(16526019)(336012)(186003)(41300700001)(83380400001)(82740400003)(81166007)(40460700003)(2906002)(44832011)(36860700001)(26005)(8676002)(478600001)(70586007)(2616005)(966005)(4326008)(70206006)(110136005)(316002)(54906003)(6666004)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Dec 2022 23:21:52.0402
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c7450a4-e8d7-4d3e-730d-08dade29fb80
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT009.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4429
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,54 +98,122 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 14 Dec 2022 13:24:52 -0800
-Steve Sistare <steven.sistare@oracle.com> wrote:
+This is a first draft patchset for a new vendor specific VFIO driver for
+use with the AMD/Pensando Distributed Services Card (DSC). This driver
+(pds_vfio) is a client of the newly introduced pds_core driver.
 
-> Fix bugs in the interfaces that allow the underlying memory object of an
-> iova range to be mapped in a new address space.  They allow userland to
-> indefinitely block vfio mediated device kernel threads, and do not
-> propagate the locked_vm count to a new mm.
-> 
-> The fixes impose restrictions that eliminate waiting conditions, so
-> revert the dead code:
->   commit 898b9eaeb3fe ("vfio/type1: block on invalid vaddr")
->   commit 487ace134053 ("vfio/type1: implement notify callback")
->   commit ec5e32940cc9 ("vfio: iommu driver notify callback")
-> 
-> Changes in V2 (thanks Alex):
->   * do not allow group attach while vaddrs are invalid
->   * add patches to delete dead code
->   * add WARN_ON for never-should-happen conditions
->   * check for changed mm in unmap.
->   * check for vfio_lock_acct failure in remap
-> 
-> Changes in V3 (ditto!):
->   * return errno at WARN_ON sites, and make it unique
->   * correctly check for dma task mm change
->   * change dma owner to current when vaddr is updated
->   * add Fixes to commit messages
->   * refactored new code in vfio_dma_do_map
-> 
-> Changes in V4:
->   * misc cosmetic changes
-> 
-> Steve Sistare (5):
->   vfio/type1: exclude mdevs from VFIO_UPDATE_VADDR
->   vfio/type1: prevent locked_vm underflow
->   vfio/type1: revert "block on invalid vaddr"
->   vfio/type1: revert "implement notify callback"
->   vfio: revert "iommu driver notify callback"
-> 
->  drivers/vfio/container.c        |   5 -
->  drivers/vfio/vfio.h             |   7 --
->  drivers/vfio/vfio_iommu_type1.c | 199 +++++++++++++++++++---------------------
->  include/uapi/linux/vfio.h       |  15 +--
->  4 files changed, 103 insertions(+), 123 deletions(-)
-> 
+Reference to the pds_core patchset:
+https://lore.kernel.org/netdev/20221207004443.33779-1-shannon.nelson@amd.com/
 
-Looks ok to me.  Jason, Kevin, I'd appreciate your reviews regarding
-whether this sufficiently addresses the outstanding issues to keep this
-interface around until we have a re-implementation in iommufd.  Thanks,
+AMD/Pensando already supports a NVMe VF device (1dd8:1006) in the
+Distributed Services Card (DSC). This patchset adds the new pds_vfio
+driver in order to support NVMe VF live migration.
 
-Alex
+This driver will use the pds_core device and auxiliary_bus as the VFIO
+control path to the DSC. The pds_core device creates auxiliary_bus devices
+for each live migratable VF. The devices are named by their feature plus
+the VF PCI BDF so the auxiliary_bus driver implemented by pds_vfio can find
+its related VF PCI driver instance. Once this auxiliary bus connection
+is configured, the pds_vfio driver can send admin queue commands to the
+device and receive events from pds_core.
+
+An ASCII diagram of a VFIO instance looks something like this and can
+be used with the VFIO subsystem to provide devices VFIO and live
+migration support.
+
+                               .------.  .--------------------------.
+                               | QEMU |--|  VM     .-------------.  |
+                               '......'  |         | nvme driver |  |
+                                  |      |         .-------------.  |
+                                  |      |         |  SR-IOV VF  |  |
+                                  |      |         '-------------'  |
+                                  |      '---------------||---------'
+                               .--------------.          ||
+                               |/dev/<vfio_fd>|          ||
+                               '--------------'          ||
+Host Userspace                         |                 ||
+===================================================      ||
+Host Kernel                            |                 ||
+                                       |                 ||
+           pds_core.LM.2305 <--+   .--------.            ||
+                   |           |   |vfio-pci|            ||
+                   |           |   '--------'            ||
+                   |           |       |                 ||
+         .------------.       .-------------.            ||
+         |  pds_core  |       |   pds_vfio  |            ||
+         '------------'       '-------------'            ||
+               ||                   ||                   ||
+             09:00.0              09:00.1                ||
+== PCI ==================================================||=====
+               ||                   ||                   ||
+          .----------.         .----------.              ||
+    ,-----|    PF    |---------|    VF    |-------------------,
+    |     '----------'         '----------'  |      nvme      |
+    |                     DSC                |  data/control  |
+    |                                        |      path      |
+    -----------------------------------------------------------
+
+
+The pds_vfio driver is targeted to reside in drivers/vfio/pci/pds.
+It makes use of and introduces new files in the common include/linux/pds
+include directory.
+
+Changes:
+v2:
+- Implement state transitions for VFIO_MIGRATION_P2P flag
+- Improve auxiliary driver probe by returning EPROBE_DEFER
+  when the PCI driver is not set up correctly
+- Add pointer to docs in
+  Documentation/networking/device_drivers/ethernet/index.rst
+
+Brett Creeley (7):
+  pds_vfio: Initial support for pds_vfio VFIO driver
+  pds_vfio: Add support to register as PDS client
+  pds_vfio: Add VFIO live migration support
+  vfio: Commonize combine_ranges for use in other VFIO drivers
+  pds_vfio: Add support for dirty page tracking
+  pds_vfio: Add support for firmware recovery
+  pds_vfio: Add documentation files
+
+ .../ethernet/pensando/pds_vfio.rst            |  88 +++
+ drivers/vfio/pci/Kconfig                      |   2 +
+ drivers/vfio/pci/mlx5/cmd.c                   |  48 +-
+ drivers/vfio/pci/pds/Kconfig                  |  10 +
+ drivers/vfio/pci/pds/Makefile                 |  12 +
+ drivers/vfio/pci/pds/aux_drv.c                | 216 +++++++
+ drivers/vfio/pci/pds/aux_drv.h                |  30 +
+ drivers/vfio/pci/pds/cmds.c                   | 486 ++++++++++++++++
+ drivers/vfio/pci/pds/cmds.h                   |  44 ++
+ drivers/vfio/pci/pds/dirty.c                  | 541 ++++++++++++++++++
+ drivers/vfio/pci/pds/dirty.h                  |  49 ++
+ drivers/vfio/pci/pds/lm.c                     | 484 ++++++++++++++++
+ drivers/vfio/pci/pds/lm.h                     |  53 ++
+ drivers/vfio/pci/pds/pci_drv.c                | 134 +++++
+ drivers/vfio/pci/pds/pci_drv.h                |   9 +
+ drivers/vfio/pci/pds/vfio_dev.c               | 238 ++++++++
+ drivers/vfio/pci/pds/vfio_dev.h               |  42 ++
+ drivers/vfio/vfio_main.c                      |  48 ++
+ include/linux/pds/pds_core_if.h               |   1 +
+ include/linux/pds/pds_lm.h                    | 356 ++++++++++++
+ include/linux/vfio.h                          |   3 +
+ 21 files changed, 2847 insertions(+), 47 deletions(-)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/pensando/pds_vfio.rst
+ create mode 100644 drivers/vfio/pci/pds/Kconfig
+ create mode 100644 drivers/vfio/pci/pds/Makefile
+ create mode 100644 drivers/vfio/pci/pds/aux_drv.c
+ create mode 100644 drivers/vfio/pci/pds/aux_drv.h
+ create mode 100644 drivers/vfio/pci/pds/cmds.c
+ create mode 100644 drivers/vfio/pci/pds/cmds.h
+ create mode 100644 drivers/vfio/pci/pds/dirty.c
+ create mode 100644 drivers/vfio/pci/pds/dirty.h
+ create mode 100644 drivers/vfio/pci/pds/lm.c
+ create mode 100644 drivers/vfio/pci/pds/lm.h
+ create mode 100644 drivers/vfio/pci/pds/pci_drv.c
+ create mode 100644 drivers/vfio/pci/pds/pci_drv.h
+ create mode 100644 drivers/vfio/pci/pds/vfio_dev.c
+ create mode 100644 drivers/vfio/pci/pds/vfio_dev.h
+ create mode 100644 include/linux/pds/pds_lm.h
+
+--
+2.17.1
 
