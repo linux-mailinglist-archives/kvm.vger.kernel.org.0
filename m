@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D45864CE1D
-	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 17:33:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FEF264CE1B
+	for <lists+kvm@lfdr.de>; Wed, 14 Dec 2022 17:32:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239150AbiLNQc6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 11:32:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49160 "EHLO
+        id S239078AbiLNQcf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 11:32:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239050AbiLNQcJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 11:32:09 -0500
+        with ESMTP id S239075AbiLNQby (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 11:31:54 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D872E17889
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 08:31:28 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52C7D14D13
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 08:31:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671035488;
+        s=mimecast20190719; t=1671035468;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=eNeRnQ41YTwI7Dv9IlQ//H1saK0wcCg2ACIcfcXrP3k=;
-        b=MkK4rkbgeZxOXYa28p3POjhOJs92EpW4Yn4V2XDOPCxPrAF9ewLvE3ows6z+5kvrS21I54
-        ayrVHiosB8ZXg9M06ehFmGMn3TtqKfp2e7zJTbmVACs+WYzRzgniCwkPx+AmF698aHjoA4
-        Gzxr0bEkyu+y1h0vmmT9p6//N5qpd7s=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=zUQYRaS8aTqjl4sq2+Qu5cD5eqcY+9WtPJEWRyeBg18=;
+        b=GrlYnINXsNDr3cPuvstru/DvbdJfke0TdLjVX5xjbx10e+7TVzHIMT8yH5p5ErZObbDtm9
+        U/JJaJlwG+APiZxQFVzYQiF5O9FtvBxGZzTEW5yfaxzY7iEk0+j6gA3Vh3ms8NNXWfDOGJ
+        ZyK85G+YXWZBxTjAWVYQhmBvMbew+Nk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-113-P_t4d2czPLaXE0kKQW7-kw-1; Wed, 14 Dec 2022 11:31:03 -0500
-X-MC-Unique: P_t4d2czPLaXE0kKQW7-kw-1
-Received: by mail-wr1-f69.google.com with SMTP id x1-20020adfbb41000000b002426b33b618so64726wrg.7
+ us-mta-213-JaspCD5kO1mQ6AmY3QADqw-1; Wed, 14 Dec 2022 11:31:01 -0500
+X-MC-Unique: JaspCD5kO1mQ6AmY3QADqw-1
+Received: by mail-wr1-f71.google.com with SMTP id r17-20020adfb1d1000000b002421ae7fd46so61664wra.10
         for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 08:31:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eNeRnQ41YTwI7Dv9IlQ//H1saK0wcCg2ACIcfcXrP3k=;
-        b=U3EBhPw0MMBQZ50oI/ZmD1df5lmfQk9pZ3P3OFigMI7vyC/hLqepMw4Eq0W2tZYMEG
-         VUNLUwRcdzvmHr/FIX9cvj8cH9gfNXnQNOc6k/lPMvUqBercvrLtsaf7QQxT620WhJqg
-         Cdk4CtLg0O+07EmIct/Euu/ira9ds3owh8U9mxSQXrKE83ZoZqqy0XXuhpv1Pfq38SfN
-         08C2e651GBiTJHZ56SAjC70IB3sajKDzxr85VX2LaK/pJOCJ0qYjdu4/A15esmAKR+cg
-         VlRgBxmozCGRRfaNvTQPEyL64jDrbQLm/BO/yyJ19WotKVmrirBIvbfEjGM97/QVKshu
-         8qOQ==
-X-Gm-Message-State: ANoB5pmYIyMi9FuE/RmzIsXCJNPCEuou5lLz25LIiWMxM9jXGk35+wkt
-        aTLiKqsyNFcVEIrXBkEVtN0NHzeFYOCBtbhesvH8rqxOVnhm9zcTm9mTs2oWIXBCvHfKdfmjqGs
-        vtkxPZ/+ONLKS
-X-Received: by 2002:a05:600c:3b15:b0:3d0:d177:cac1 with SMTP id m21-20020a05600c3b1500b003d0d177cac1mr19372604wms.36.1671035458593;
-        Wed, 14 Dec 2022 08:30:58 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf41TbDFZYAxyeY/6/VgR7BHHW22n4sdvEUddOO8zMQQsvGDfuNF6JjoQjUcHxV0WQ+cml5BAg==
-X-Received: by 2002:a05:600c:3b15:b0:3d0:d177:cac1 with SMTP id m21-20020a05600c3b1500b003d0d177cac1mr19372586wms.36.1671035458429;
-        Wed, 14 Dec 2022 08:30:58 -0800 (PST)
+        bh=zUQYRaS8aTqjl4sq2+Qu5cD5eqcY+9WtPJEWRyeBg18=;
+        b=KRaUt/ceXN8VJ7k6ZjTdBSvHxgOad7LZSuWsOBU8rh/FRZ9CRql4uEUWk/s3e/C/yC
+         3OgC+BUBB3qgOxR9tZOFV+9AgdUP2+NxOWJlpHqKadQiPjVVGIHp4GP6mNkEHperxgzh
+         XyfsRd9m4DP5EbVqP8TpUL5rWhVoU70xV5wLm1TkW3E2zDvnTWvFIobzifp14xNwm6vM
+         eFRzn7HC0dzTSWIbWDdUcLTneFJyoVny5wFi9jrtyc3u0GXj67U+LkgMhH610VwcyRjp
+         LobkWUzWRnFjxzq5R18d+Cp79J9EZotBuFgy68tylDm708RkTeF8xQSbNxqQFFVo3UNH
+         k5Qg==
+X-Gm-Message-State: ANoB5pnq5GD88+/ZqdJKIm7QuMTFa1ib/UwHfumxE+XmYIUMMTLHgdtm
+        UIQttKc0wu1kdwX4KmrFan7x7s0Md/f7ul6RHpD1P5jUR+b1z9bM4Rlk9q2unCxEikXXfRpHEzw
+        47DFRmGaUz38v
+X-Received: by 2002:a05:600c:3b1b:b0:3d1:fe12:fe34 with SMTP id m27-20020a05600c3b1b00b003d1fe12fe34mr19040164wms.39.1671035460473;
+        Wed, 14 Dec 2022 08:31:00 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf61ilOWeas/kVNtW9HKu0e1ntW+e3+kM18c3C5LDa9pJ8S3z9wCuW0PcuQ0VElABaMa/0wSoA==
+X-Received: by 2002:a05:600c:3b1b:b0:3d1:fe12:fe34 with SMTP id m27-20020a05600c3b1b00b003d1fe12fe34mr19040142wms.39.1671035460286;
+        Wed, 14 Dec 2022 08:31:00 -0800 (PST)
 Received: from step1.redhat.com (host-87-11-6-51.retail.telecomitalia.it. [87.11.6.51])
-        by smtp.gmail.com with ESMTPSA id c6-20020a05600c0a4600b003d1e3b1624dsm3850323wmq.2.2022.12.14.08.30.56
+        by smtp.gmail.com with ESMTPSA id c6-20020a05600c0a4600b003d1e3b1624dsm3850323wmq.2.2022.12.14.08.30.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Dec 2022 08:30:57 -0800 (PST)
+        Wed, 14 Dec 2022 08:30:59 -0800 (PST)
 From:   Stefano Garzarella <sgarzare@redhat.com>
 To:     virtualization@lists.linux-foundation.org
 Cc:     Jason Wang <jasowang@redhat.com>,
@@ -63,9 +63,9 @@ Cc:     Jason Wang <jasowang@redhat.com>,
         "Michael S. Tsirkin" <mst@redhat.com>, eperezma@redhat.com,
         stefanha@redhat.com, netdev@vger.kernel.org,
         Stefano Garzarella <sgarzare@redhat.com>
-Subject: [RFC PATCH 5/6] vdpa_sim: use kthread worker
-Date:   Wed, 14 Dec 2022 17:30:24 +0100
-Message-Id: <20221214163025.103075-6-sgarzare@redhat.com>
+Subject: [RFC PATCH 6/6] vdpa_sim: add support for user VA
+Date:   Wed, 14 Dec 2022 17:30:25 +0100
+Message-Id: <20221214163025.103075-7-sgarzare@redhat.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221214163025.103075-1-sgarzare@redhat.com>
 References: <20221214163025.103075-1-sgarzare@redhat.com>
@@ -82,87 +82,198 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's use our own kthread to run device jobs.
-This allows us more flexibility, especially we can attach the kthread
-to the user address space when vDPA uses user's VA.
+The new "use_va" module parameter (default: false) is used in
+vdpa_alloc_device() to inform the vDPA framework that the device
+supports VA.
+
+vringh is initialized to use VA only when "use_va" is true and the
+user's mm has been bound. So, only when the bus supports user VA
+(e.g. vhost-vdpa).
+
+vdpasim_mm_work_fn work is used to attach the kthread to the user
+address space when the .bind_mm callback is invoked, and to detach
+it when the device is reset.
 
 Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 ---
- drivers/vdpa/vdpa_sim/vdpa_sim.h |  3 ++-
- drivers/vdpa/vdpa_sim/vdpa_sim.c | 17 ++++++++++++-----
- 2 files changed, 14 insertions(+), 6 deletions(-)
+ drivers/vdpa/vdpa_sim/vdpa_sim.h |   1 +
+ drivers/vdpa/vdpa_sim/vdpa_sim.c | 104 ++++++++++++++++++++++++++++++-
+ 2 files changed, 103 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-index 7e6dd366856f..07ef53ea375e 100644
+index 07ef53ea375e..1b010e5c0445 100644
 --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
 +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-@@ -53,7 +53,8 @@ struct vdpasim_dev_attr {
- struct vdpasim {
- 	struct vdpa_device vdpa;
+@@ -55,6 +55,7 @@ struct vdpasim {
  	struct vdpasim_virtqueue *vqs;
--	struct work_struct work;
-+	struct kthread_worker *worker;
-+	struct kthread_work work;
+ 	struct kthread_worker *worker;
+ 	struct kthread_work work;
++	struct mm_struct *mm_bound;
  	struct vdpasim_dev_attr dev_attr;
  	/* spinlock to synchronize virtqueue state */
  	spinlock_t lock;
 diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-index 9bde33e38e27..36a1d2e0a6ba 100644
+index 36a1d2e0a6ba..6e07cedef30c 100644
 --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
 +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-@@ -11,8 +11,8 @@
- #include <linux/module.h>
- #include <linux/device.h>
- #include <linux/kernel.h>
-+#include <linux/kthread.h>
- #include <linux/slab.h>
--#include <linux/sched.h>
- #include <linux/dma-map-ops.h>
- #include <linux/vringh.h>
- #include <linux/vdpa.h>
-@@ -245,7 +245,7 @@ static const struct dma_map_ops vdpasim_dma_ops = {
- static const struct vdpa_config_ops vdpasim_config_ops;
- static const struct vdpa_config_ops vdpasim_batch_config_ops;
+@@ -36,10 +36,90 @@ module_param(max_iotlb_entries, int, 0444);
+ MODULE_PARM_DESC(max_iotlb_entries,
+ 		 "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
  
--static void vdpasim_work_fn(struct work_struct *work)
-+static void vdpasim_work_fn(struct kthread_work *work)
- {
- 	struct vdpasim *vdpasim = container_of(work, struct vdpasim, work);
- 
-@@ -282,7 +282,13 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
- 	}
- 
- 	vdpasim->dev_attr = *dev_attr;
--	INIT_WORK(&vdpasim->work, vdpasim_work_fn);
++static bool use_va;
++module_param(use_va, bool, 0444);
++MODULE_PARM_DESC(use_va, "Enable the device's ability to use VA");
 +
-+	kthread_init_work(&vdpasim->work, vdpasim_work_fn);
-+	vdpasim->worker = kthread_create_worker(0, "vDPA sim worker: %s",
-+						dev_attr->name);
-+	if (IS_ERR(vdpasim->worker))
-+		goto err_iommu;
+ #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
+ #define VDPASIM_QUEUE_MAX 256
+ #define VDPASIM_VENDOR_ID 0
+ 
++struct vdpasim_mm_work {
++	struct kthread_work work;
++	struct task_struct *owner;
++	struct mm_struct *mm;
++	bool bind;
++	int ret;
++};
 +
- 	spin_lock_init(&vdpasim->lock);
- 	spin_lock_init(&vdpasim->iommu_lock);
- 
-@@ -338,7 +344,7 @@ EXPORT_SYMBOL_GPL(vdpasim_create);
- 
- void vdpasim_schedule_work(struct vdpasim *vdpasim)
++static void vdpasim_mm_work_fn(struct kthread_work *work)
++{
++	struct vdpasim_mm_work *mm_work =
++		container_of(work, struct vdpasim_mm_work, work);
++
++	mm_work->ret = 0;
++
++	if (mm_work->bind) {
++		kthread_use_mm(mm_work->mm);
++#if 0
++		if (mm_work->owner)
++			mm_work->ret = cgroup_attach_task_all(mm_work->owner,
++							      current);
++#endif
++	} else {
++#if 0
++		//TODO: check it
++		cgroup_release(current);
++#endif
++		kthread_unuse_mm(mm_work->mm);
++	}
++}
++
++static void vdpasim_worker_queue_mm(struct vdpasim *vdpasim,
++				    struct vdpasim_mm_work *mm_work)
++{
++	struct kthread_work *work = &mm_work->work;
++
++	kthread_init_work(work, vdpasim_mm_work_fn);
++	kthread_queue_work(vdpasim->worker, work);
++
++	spin_unlock(&vdpasim->lock);
++	kthread_flush_work(work);
++	spin_lock(&vdpasim->lock);
++}
++
++static int vdpasim_worker_bind_mm(struct vdpasim *vdpasim,
++				  struct mm_struct *new_mm,
++				  struct task_struct *owner)
++{
++	struct vdpasim_mm_work mm_work;
++
++	mm_work.owner = owner;
++	mm_work.mm = new_mm;
++	mm_work.bind = true;
++
++	vdpasim_worker_queue_mm(vdpasim, &mm_work);
++
++	if (!mm_work.ret)
++		vdpasim->mm_bound = new_mm;
++
++	return mm_work.ret;
++}
++
++static void vdpasim_worker_unbind_mm(struct vdpasim *vdpasim)
++{
++	struct vdpasim_mm_work mm_work;
++
++	if (!vdpasim->mm_bound)
++		return;
++
++	mm_work.mm = vdpasim->mm_bound;
++	mm_work.bind = false;
++
++	vdpasim_worker_queue_mm(vdpasim, &mm_work);
++
++	vdpasim->mm_bound = NULL;
++}
+ static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
  {
--	schedule_work(&vdpasim->work);
-+	kthread_queue_work(vdpasim->worker, &vdpasim->work);
- }
- EXPORT_SYMBOL_GPL(vdpasim_schedule_work);
+ 	return container_of(vdpa, struct vdpasim, vdpa);
+@@ -66,8 +146,10 @@ static void vdpasim_vq_notify(struct vringh *vring)
+ static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
+ {
+ 	struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
++	bool va_enabled = use_va && vdpasim->mm_bound;
  
-@@ -689,7 +695,8 @@ static void vdpasim_free(struct vdpa_device *vdpa)
- 	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+-	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, false, false,
++	vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, false,
++			  va_enabled,
+ 			  (struct vring_desc *)(uintptr_t)vq->desc_addr,
+ 			  (struct vring_avail *)
+ 			  (uintptr_t)vq->driver_addr,
+@@ -96,6 +178,9 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
+ {
  	int i;
  
--	cancel_work_sync(&vdpasim->work);
-+	kthread_cancel_work_sync(&vdpasim->work);
-+	kthread_destroy_worker(vdpasim->worker);
++	//TODO: should we cancel the works?
++	vdpasim_worker_unbind_mm(vdpasim);
++
+ 	spin_lock(&vdpasim->iommu_lock);
  
  	for (i = 0; i < vdpasim->dev_attr.nvqs; i++) {
- 		vringh_kiov_cleanup(&vdpasim->vqs[i].out_iov);
+@@ -275,7 +360,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
+ 
+ 	vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
+ 				    dev_attr->ngroups, dev_attr->nas,
+-				    dev_attr->name, false);
++				    dev_attr->name, use_va);
+ 	if (IS_ERR(vdpasim)) {
+ 		ret = PTR_ERR(vdpasim);
+ 		goto err_alloc;
+@@ -657,6 +742,19 @@ static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
+ 	return ret;
+ }
+ 
++static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *mm,
++			   struct task_struct *owner)
++{
++	struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
++	int ret;
++
++	spin_lock(&vdpasim->lock);
++	ret = vdpasim_worker_bind_mm(vdpasim, mm, owner);
++	spin_unlock(&vdpasim->lock);
++
++	return ret;
++}
++
+ static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
+ 			   u64 iova, u64 size,
+ 			   u64 pa, u32 perm, void *opaque)
+@@ -744,6 +842,7 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
+ 	.set_group_asid         = vdpasim_set_group_asid,
+ 	.dma_map                = vdpasim_dma_map,
+ 	.dma_unmap              = vdpasim_dma_unmap,
++	.bind_mm		= vdpasim_bind_mm,
+ 	.free                   = vdpasim_free,
+ };
+ 
+@@ -776,6 +875,7 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
+ 	.get_iova_range         = vdpasim_get_iova_range,
+ 	.set_group_asid         = vdpasim_set_group_asid,
+ 	.set_map                = vdpasim_set_map,
++	.bind_mm		= vdpasim_bind_mm,
+ 	.free                   = vdpasim_free,
+ };
+ 
 -- 
 2.38.1
 
