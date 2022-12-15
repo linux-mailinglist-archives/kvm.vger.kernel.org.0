@@ -2,77 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10D5A64DFF1
-	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 18:47:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83B9864E05A
+	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 19:12:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229611AbiLORrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Dec 2022 12:47:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57096 "EHLO
+        id S229917AbiLOSMN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Dec 2022 13:12:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230263AbiLORrI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Dec 2022 12:47:08 -0500
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A371B252BB
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 09:47:07 -0800 (PST)
-Received: by mail-wm1-x32c.google.com with SMTP id m19so14387218wms.5
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 09:47:07 -0800 (PST)
+        with ESMTP id S229629AbiLOSML (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Dec 2022 13:12:11 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BD052ED5C
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 10:12:10 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id c13so152843pfp.5
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 10:12:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sNLNZlLE6oimTLTCnYhJy/T49F8cJl61AWb/ObcFz38=;
-        b=GukGMHxGFO4O4rV9FtHECMfVu6evqvEMgrj6gDaxS3WRJDIHALLdYF88oITeFZ5TPS
-         oLDcyEjr9BYu+elCxOSHrKoN6uO3DNyahMawUUJukIK5xBaklWu8Kd48UprmmnSc9P0d
-         8ACQBBWAlnXxB4iqLNDAWDo+m2o+WS2eYV47Vf+DQEhMqbWQq3cukSHnbCPl7uautt6W
-         ckm3IDwJq7e+iKPSJTeF8+aMtY1qapBU65h8V/t36yGcTMjnoe+9m5hcb3OzUjtifKtU
-         tlPBIK06000XCCSnucr9qWcs1nyZrfp/vxN5EAKBqYLqq4G1RMFwIxF4nbRSxZEE3J2o
-         wUwA==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=44wPBJHMzNhyX/AAPpFtXoVHvuAOAeLVHAd9v4kfyfk=;
+        b=oQbLfsmhc/G0OJn6VfhXCwK4K+Q++I9g8Ek7Ow3JL25sNin9dV5XdkkT5fRn4eA0V7
+         8sUEQ6i160A7+YQthiBbX+q53fUQvDQeoZETj5gqOukdCzKKXHb9hGqHsSseiuFeb4yV
+         TVO+uBy2Q0TdbwWTeqypVdoues/X7o262uLhBTvmg7cpPsz5GKK9HZCUiJIlUJZEfApi
+         mZtHbvntYoFaGOrTKD72Wc9k6eRnLa0TiCF7kTHBZ33xRIScUJHuGdF/A9CxaV49Rb5g
+         t5kd97gmF+BVcJNSZsapAQii587lNHuDG3okxe9itFHJTk8Xzt7okaPUIUJmisHJj4KB
+         uUlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sNLNZlLE6oimTLTCnYhJy/T49F8cJl61AWb/ObcFz38=;
-        b=76wQQV4MQsxwG0OFwR9srLdA3/hgCg5eTVyb1/CS+tqngNMOs7tDNe9V/gIkxB9k6c
-         2KYB7K7GKRbAmTAnL4GJFduHksdWZ/Vd/hc7LRZE5Xzyt2ZQx93E8iWj9azIhSbnnf4u
-         vBqePwZGebAWk2LP+mpPZRbGEXgViSoihw5/jlwSX3yiHFVFYnyEyebTLn136eiuRuz9
-         Bd4bV5IcbAbf3ysyIdfoEzfm545IfDH0euhMmlEH9d8MmMgSn4aZQypUoz6YoIJv5ByH
-         K+eAsrW7W2ROqdy9DP0SNAoxO1fdhD/ko/RP2wuuX66bgnFj3jXv0zThukuzXXU5I0dW
-         dlOg==
-X-Gm-Message-State: ANoB5pkKTQfmDKmLCKuDh9GHVopTeGXKG8arKDz735c1TPIkklXFxhZU
-        LM1zH3yqeLQ4of+5gAhraqs=
-X-Google-Smtp-Source: AA0mqf7IeHn5AwfVHmCooG3859lPSwzRToSxLtGRPZlFFh0THW/wC4vIbBYCuWKS4A1+pF4UuWh+pw==
-X-Received: by 2002:a05:600c:6015:b0:3cf:ea76:1823 with SMTP id az21-20020a05600c601500b003cfea761823mr22917190wmb.41.1671126426075;
-        Thu, 15 Dec 2022 09:47:06 -0800 (PST)
-Received: from [192.168.4.253] (54-240-197-239.amazon.com. [54.240.197.239])
-        by smtp.gmail.com with ESMTPSA id j9-20020a05600c190900b003b4cba4ef71sm8196049wmq.41.2022.12.15.09.47.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Dec 2022 09:47:05 -0800 (PST)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <ed102505-5154-8730-7661-40c430faa437@xen.org>
-Date:   Thu, 15 Dec 2022 17:46:59 +0000
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=44wPBJHMzNhyX/AAPpFtXoVHvuAOAeLVHAd9v4kfyfk=;
+        b=7P98qMp/XIbR6+/rIup+lSOJsPyfw/ktFowsWPiwthu74lCf5/8HITNJyZrAtJzziO
+         Z3fv5RLnGKHZpS7wpwSv42xrGkkAPcQHit4ZnIbfKQzm/4V4nGRwYgYcAKahJDdQ7l5G
+         9cMNkXfN5NuViaVMVqiQ9g4ffAhDsAEc+3NEsbiES9F21fpb4lgjEQbL4J5G2BmanUr1
+         tUlnaUg8UmBG/fIonELBqr8e8RwNG/XwEtMz02XrX0h+AxfY3xUOGuhOEJ1zgazlb9wu
+         jhpXTZFd2Chbr6nmFhsDxM3JR8MWw4euzx1xO7tEGOJwRTRw965HlxtYQ+rN1KNpppV/
+         Nwcg==
+X-Gm-Message-State: AFqh2kojj2hkP8etMTXXnzjRO3DeKXsCXXSvS8LM1jkw/mPjo6xbMOzP
+        E2UfTdWeeDrOya6R4Pm//xNP2w==
+X-Google-Smtp-Source: AMrXdXstWHhMXomeOXys+CMrPMBz+Nk2ZO0j1YcX3ARTSyKfvRnX6trWY97Li0WShtGEeQQ0tCKf6A==
+X-Received: by 2002:a05:6a00:1a8d:b0:577:36ba:6a86 with SMTP id e13-20020a056a001a8d00b0057736ba6a86mr143967pfv.1.1671127929840;
+        Thu, 15 Dec 2022 10:12:09 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id x74-20020a62864d000000b005764c8f8f15sm2026398pfd.73.2022.12.15.10.12.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Dec 2022 10:12:09 -0800 (PST)
+Date:   Thu, 15 Dec 2022 18:12:05 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, dwmw2@infradead.org,
+        paul@xen.org
+Subject: Re: [PATCH v3] KVM: MMU: Make the definition of 'INVALID_GPA' common.
+Message-ID: <Y5tjdeMk2jJCX8Co@google.com>
+References: <20221215095736.1202008-1-yu.c.zhang@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH] KVM: x86/xen: Use kvm_read_guest_virt() instead of
- open-coding it badly
-To:     David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm <kvm@vger.kernel.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Joao Martins <joao.m.martins@oracle.com>
-References: <d52040a8d46e68efd86273be66808fe4a8c70e1d.camel@infradead.org>
-Content-Language: en-US
-Organization: Xen Project
-In-Reply-To: <d52040a8d46e68efd86273be66808fe4a8c70e1d.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221215095736.1202008-1-yu.c.zhang@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,30 +74,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 14/12/2022 13:38, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> In particular, we shouldn't assume that being contiguous in guest virtual
-> address space means being contiguous in guest *physical* address space.
-> 
-> In dropping the manual calls to kvm_mmu_gva_to_gpa_system(), also drop
-> the srcu_read_lock() that was around them. All call sites are reached
-> from kvm_xen_hypercall() which is called from the handle_exit function
-> with the read lock already held.
-> 
-> Fixes: 2fd6df2f2 ("KVM: x86/xen: intercept EVTCHNOP_send from guests")
->         536395260 ("KVM: x86/xen: handle PV timers oneshot mode")
->         1a65105a5 ("KVM: x86/xen: handle PV spinlocks slowpath")
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
-> Spotted the same issue in the QEMU patches while working through them:
-> https://git.infradead.org/users/dwmw2/qemu.git/shortlog/refs/heads/xenfv
-> Then realised it was like that in the kernel too.
-> 
->   arch/x86/kvm/xen.c | 56 +++++++++++++++-------------------------------
->   1 file changed, 18 insertions(+), 38 deletions(-)
-> 
+Nit, terminating punction (the period) isn't usually included in the shortlog.
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+On Thu, Dec 15, 2022, Yu Zhang wrote:
+> KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in
+> kvm_types.h, and it is used by ARM and X86 xen code. We do
+> not need a specific definition of 'INVALID_GPA' for X86.
+> 
+> Instead of using the common 'GPA_INVALID' for X86, replace
+> the definition of 'GPA_INVALID' with 'INVALID_GPA', and
+> change the users of 'GPA_INVALID', so that the diff can be
+> smaller. Also because the name 'INVALID_GPA' tells the user
+> we are using an invalid GPA, while the name 'GPA_INVALID'
+> is emphasizing the GPA is an invalid one.
+> 
+> Also, add definition of 'INVALID_GFN' because it is more
+> proper than 'INVALID_GPA' for GFN variables.
 
+This should be a separate commit.  Yes, it's trivial and a nop, but there's no
+reason to surprise readers/blamers that assumed the shortlog tells the whole
+story.  E.g. add and use INVALID_GFN where appropriate in patch 1, then switch
+to INVALID_GPA in patch 2.  Then you can also add a "Suggested-by: David ..." for
+patch 1.
