@@ -2,70 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE6FF64E386
-	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 22:54:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6CECB64E388
+	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 22:56:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229718AbiLOVyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Dec 2022 16:54:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46776 "EHLO
+        id S229639AbiLOV41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Dec 2022 16:56:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47880 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229846AbiLOVyD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Dec 2022 16:54:03 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A80B4D5C1
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 13:54:02 -0800 (PST)
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BFL3gEC030152;
-        Thu, 15 Dec 2022 21:53:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2022-7-12;
- bh=+y6Ylg39vBXwUrwPtWGaBBzYw680t9s886JDqLVR3n4=;
- b=DBl4Q+eixp1Ji++4k4K9L72yVg6YNqII/ZnOMSYG87HbG3QnxFkwx2YUmY363BRhMPRa
- eGiZOXH5c/o0GT5YQC4VRoUIKxl1TAOhHffYfkC7Y6O34x6XwOePTGhLWWW77p+Al57y
- a782KOno1GG97oh6E9aCdsJi3j0BKDGnKx+h4pjm4RzkVbzeAWZcC50dJ01n78jXggbj
- MKohZaDsSspWo2RIFL3tMoNUtWcGzQX9SyZVagk+U+0nmlj66LNXeoyA6K9aP4V/CMML
- DVVwkl0pAWl06MSHvkXgBS1wLJ1/lRwCUjJqt94yUUyO5sKkekUXnWB8t1C5J4+uvTdE cw== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3meyeue9j3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Dec 2022 21:53:57 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BFKpqU8010083;
-        Thu, 15 Dec 2022 21:53:56 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3meyepnw3k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 15 Dec 2022 21:53:56 +0000
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BFLrrE0005013;
-        Thu, 15 Dec 2022 21:53:55 GMT
-Received: from ca-dev63.us.oracle.com (ca-dev63.us.oracle.com [10.211.8.221])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3meyepnw0y-6;
-        Thu, 15 Dec 2022 21:53:55 +0000
-From:   Steve Sistare <steven.sistare@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V4 5/5] vfio: revert "iommu driver notify callback"
-Date:   Thu, 15 Dec 2022 13:53:52 -0800
-Message-Id: <1671141232-81814-6-git-send-email-steven.sistare@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1671141232-81814-1-git-send-email-steven.sistare@oracle.com>
-References: <1671141232-81814-1-git-send-email-steven.sistare@oracle.com>
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-15_11,2022-12-15_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 malwarescore=0 phishscore=0
- mlxlogscore=999 suspectscore=0 spamscore=0 adultscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2212150182
-X-Proofpoint-ORIG-GUID: 5sxUoeXo8Yjww-g3PUFxezJ0mq-v3CQf
-X-Proofpoint-GUID: 5sxUoeXo8Yjww-g3PUFxezJ0mq-v3CQf
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        with ESMTP id S229510AbiLOV4Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Dec 2022 16:56:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D73BABB7
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 13:55:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671141337;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=vos1+z5OkM2lbvQ/8RNPfK9IFqX7xMJAguBWePudVWk=;
+        b=chRZulOiWGwVC09gSJ3/L/78ntiBxs92OpPTw6dxJ4g6Bx0/ixno1nQ8ppoTQX04zPB4e/
+        8CNwPGVKfaUKGB31yNhNNmGHPdiV+EEpn8fJhivLb7iri5UhI46+Bjrk/aiwtjmL/s2QuE
+        KpXARV/X8QtZcJopFhCmRbU6Fwkbvoc=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-664-r3p_7GcjNMy6qBQMn0ghcA-1; Thu, 15 Dec 2022 16:55:36 -0500
+X-MC-Unique: r3p_7GcjNMy6qBQMn0ghcA-1
+Received: by mail-il1-f198.google.com with SMTP id i14-20020a056e020d8e00b003034b93bd07so441484ilj.14
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 13:55:36 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vos1+z5OkM2lbvQ/8RNPfK9IFqX7xMJAguBWePudVWk=;
+        b=FivQNr9UjyGuPImsnqz+R61XoaBk2Eneop9k+5/Rie18B8mfuews0EcvjODS80dqYT
+         VulhMM9EJ0I9KEbHrVwlw5+VyQeJyGaUGbmSvA/tDexUR3Y0oDULYl40ISNxmLHcwpzD
+         CWy+5N+B3hcjICrhLNIdr+dIoxpbvFTLNhZMFBD8+WkFlfEEKkQXQBa3iDJPPfsEFdKw
+         I0mC6MED/n4SxtjwGtMvL+oI8Hq2xqvQ8GKGhLjxmGPJ7+qhc6wY6RgpxwAHIpIfBhLK
+         36MNYWcTeklzHRhrbIsiAwbIe24+42NifziZBvhIBg6U2TIOpKs46Rssi2pizRofETOV
+         wHug==
+X-Gm-Message-State: ANoB5pmQ3ufgqtU5EqftLJUew3UpQ+33vrfXnhxAQIsdXPCrlDkNzrI5
+        jJWZST8d8oaueB5LmVF9Q1g3rKgMpRc8NNAzN2cRTu92NGn6UeMeePDTP5YVn5yY7TIWqUKuJPd
+        LqlG7LO9PW45+
+X-Received: by 2002:a05:6e02:e42:b0:303:92b3:27ec with SMTP id l2-20020a056e020e4200b0030392b327ecmr16203667ilk.31.1671141335627;
+        Thu, 15 Dec 2022 13:55:35 -0800 (PST)
+X-Google-Smtp-Source: AA0mqf4gKGQbnyggKffBVvBbY4HJA//GchKMkj1R3kloLiYVtBWO1MyRQOxSUuDkypG1B6qE22P+Ag==
+X-Received: by 2002:a05:6e02:e42:b0:303:92b3:27ec with SMTP id l2-20020a056e020e4200b0030392b327ecmr16203657ilk.31.1671141335398;
+        Thu, 15 Dec 2022 13:55:35 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c91-20020a029664000000b00389de6759b8sm140604jai.162.2022.12.15.13.55.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Dec 2022 13:55:34 -0800 (PST)
+Date:   Thu, 15 Dec 2022 14:55:33 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     linux-kernel@vger.kernel.org,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [GIT PULL] VFIO updates for v6.2-rc1
+Message-ID: <20221215145533.3a27b429.alex.williamson@redhat.com>
+In-Reply-To: <CAHk-=whQ48-RsU85vM+Kwi=pRNU9fX8JXmooqx4=c1QYOjv2uw@mail.gmail.com>
+References: <20221215132415.07f82cda.alex.williamson@redhat.com>
+        <CAHk-=whQ48-RsU85vM+Kwi=pRNU9fX8JXmooqx4=c1QYOjv2uw@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -74,56 +79,24 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Revert this dead code:
-  commit ec5e32940cc9 ("vfio: iommu driver notify callback")
+On Thu, 15 Dec 2022 13:20:11 -0800
+Linus Torvalds <torvalds@linux-foundation.org> wrote:
 
-Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
----
- drivers/vfio/container.c | 5 -----
- drivers/vfio/vfio.h      | 7 -------
- 2 files changed, 12 deletions(-)
+> On Thu, Dec 15, 2022 at 12:24 PM Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+> >
+> > I've provided resolution of the conflict chunks here below
+> > the diffstat.  
+> 
+> Ok, mine is slightly different, but the differences seem to be either
+> irrelevant ordering differences (in the Makefile), and due to Jason
+> apparently renaming the goto targets which I didn't do.
+> 
+> But hey,. maybe I messed up, so please do check out it and test. I
+> verified that it all builds cleanly for me, but that's all the testing
+> it has gotten.
 
-diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
-index d74164a..5bfd10d 100644
---- a/drivers/vfio/container.c
-+++ b/drivers/vfio/container.c
-@@ -382,11 +382,6 @@ static int vfio_fops_open(struct inode *inode, struct file *filep)
- static int vfio_fops_release(struct inode *inode, struct file *filep)
- {
- 	struct vfio_container *container = filep->private_data;
--	struct vfio_iommu_driver *driver = container->iommu_driver;
--
--	if (driver && driver->ops->notify)
--		driver->ops->notify(container->iommu_data,
--				    VFIO_IOMMU_CONTAINER_CLOSE);
- 
- 	filep->private_data = NULL;
- 
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index bcad54b..8a439c6 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -62,11 +62,6 @@ struct vfio_group {
- 	struct blocking_notifier_head	notifier;
- };
- 
--/* events for the backend driver notify callback */
--enum vfio_iommu_notify_type {
--	VFIO_IOMMU_CONTAINER_CLOSE = 0,
--};
--
- /**
-  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
-  */
-@@ -97,8 +92,6 @@ struct vfio_iommu_driver_ops {
- 				  void *data, size_t count, bool write);
- 	struct iommu_domain *(*group_iommu_domain)(void *iommu_data,
- 						   struct iommu_group *group);
--	void		(*notify)(void *iommu_data,
--				  enum vfio_iommu_notify_type event);
- };
- 
- struct vfio_iommu_driver {
--- 
-1.8.3.1
+Yep, all looks well.  Thanks!
+
+Alex
 
