@@ -2,98 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18FBE64D889
-	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 10:26:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9D68164D8CF
+	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 10:43:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229978AbiLOJ0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Dec 2022 04:26:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33494 "EHLO
+        id S229866AbiLOJnj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Dec 2022 04:43:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229898AbiLOJ0s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Dec 2022 04:26:48 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F62926FA
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 01:26:47 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id a9so6221387pld.7
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 01:26:47 -0800 (PST)
+        with ESMTP id S229658AbiLOJni (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Dec 2022 04:43:38 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4CFE2BE4
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 01:43:37 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id v13-20020a17090a6b0d00b00219c3be9830so2132346pjj.4
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 01:43:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kHvqhKfwkSYWgIBUppKUElAVHImwDcI/W0up7OF2SsA=;
-        b=mUk56sM9kwSU+ViZr+jON+iHdhoCezdb5Fw2l3HTI57ZeRfviaY12b0CetT767J1U4
-         7bdCCfFVV23jcWuyhqAD/IJszJEdgsO4p9XKA3jnP/R+lJBf/Ulw1o9mrC50ARQHjlLm
-         s1IawtDwx1K1CXPhp0buNvLPz+7XILpxcbVseKyX8MS7gfeubjw+MBHBV/RFdNNpAtFc
-         InQYqSOAZboXRXHZVbp0jndQesRxGsOlOFUyIRP0M7ldbtWUJdb1OyfWV7pfAFwnXDmn
-         8CXS0G5MHpn5kPb0KI9CMENcxWtT9mtGbxq5GlxZvH3ZrZ09eEYcVhIINjzy6llFwkmh
-         loOQ==
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9dNl+I3+2wsmWm9OlHEeo9xRCdSepAcotXH/QyvUQcc=;
+        b=D7XcMHO8IJTYyFeXIyGguZVxZdii9MGTG8X2OCSvAnOS2b145GtUFEBQEWoIpgnVoZ
+         mQv+16MszA+a05OoDMTT7s3mW9ZcUROlpK5leL9rM9Q8ijvPlNXuzFFvksfwkYa4q7L0
+         tqZGK+4vzFzPlirirn8CcdXgQvWMI435m0bCwoXVa2eAq5hgbJDTFhjOi7jTXPkhA7SG
+         f5bQE1ppCKApGZdWg4PmCB0tO75MRPkB9FJSQNcVlbTpc5punCXiehtUNAss1ONKnE4k
+         uMlSggET5TkIzvgFC/sTAtGH82XejLYB4d3v9XwtOMN+QdeskgXkDpEwdgVJpCTMSWTC
+         ZTRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:subject:message-id:date:from:reply-to:mime-version
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kHvqhKfwkSYWgIBUppKUElAVHImwDcI/W0up7OF2SsA=;
-        b=TKRRWP97pgiQVxmF04Q/kPOpZmub8F/qlHhgauVUouaR6m+ENiBE+eMNrTFGVVuKti
-         YY98e9uRtrLOKKwT19M+3+0Z2SPtJJJkSStWCMoqxs9+NHKkUYjAdxMCVfahir3o6FYQ
-         GBzoASCmOCtjFoGTvk0swLdtxx/3koj+ImjjsRwv734oGY7cqSQGFmFUNWgsjhVzVmxK
-         w3mVsV87UKHSMiSt4GOzXp8UcsvTf5/JwQflWMDC4aTOsVLLj15AgInwUpHfGv3cJ1QH
-         41Usy6eenq5c3dL0kegaAiezDYexVzjLt4jxnTn1hjrFLUxuzRODV8LQH9RnvDSumHnU
-         Lnuw==
-X-Gm-Message-State: ANoB5plIzyNnGJZ8CO4iKsrFuV8JwZfp17yHa0sooh3NY0rcF5yqv962
-        ADh5dIGJOllxAwjyj01BCBSoZHes1CwSDRN7CXQ=
-X-Google-Smtp-Source: AA0mqf4QIimy2exiV7eQ2VnNeRKOQpYIxYh9kCiOY6EiZQIgONGJGl+Bjv/CtwLC3LBPxGLt51OCsaUkPhKEhsMnZgM=
-X-Received: by 2002:a17:902:d585:b0:189:9fb2:2541 with SMTP id
- k5-20020a170902d58500b001899fb22541mr44777364plh.60.1671096406654; Thu, 15
- Dec 2022 01:26:46 -0800 (PST)
+        bh=9dNl+I3+2wsmWm9OlHEeo9xRCdSepAcotXH/QyvUQcc=;
+        b=Sp3/EBDw6ZRLd1x9fckCMJ6zmIIBV4uD1wdRCctcDZx7sFGxZwltk256IR5iP3qD5A
+         EBiGrOVh+zhVbiKO8Ti92nyXjzEonzocgw+vPfC5f953WyW1WZhM7i47dN4Es/TU+J6T
+         dFWEqwctQZx+MsHAY0ckvxTlLc1GzLcGzJB4DMM2JcCgJSSEmLJwmZtuCExFm7Bj0x/t
+         +GUuK0oBU3lEfMryOhmwP96wUljMR1RV3vYtLL0vvBnZJR1nk3maG2sJ9MIb/qCl9wIq
+         9m4IzkaBs0FFFm/swCQmJx1Umnja7Mn7jfmoRbgDEbul8XyIUjGyoYW5Px+bWjMIZ/5O
+         KU1Q==
+X-Gm-Message-State: ANoB5pmCudxRQSPdxSsSHn3ryYzQ1SXtVyerAsE0xQRu45tqNY6nWCbU
+        zuzDmaG/UWIpAKlDxLlZwEy+zAtoaE4jujfy
+X-Google-Smtp-Source: AA0mqf6AN7XM485uFKUPD/FUJCLM5u8hdAC4XpnDK3ArG7RhG+ObY0ZSkF+o8mMi0IzetzoD2PabKg==
+X-Received: by 2002:a17:903:22cd:b0:189:e16f:c268 with SMTP id y13-20020a17090322cd00b00189e16fc268mr38742294plg.20.1671097417145;
+        Thu, 15 Dec 2022 01:43:37 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id q10-20020a170902daca00b00190c6518e30sm3329383plx.243.2022.12.15.01.43.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Dec 2022 01:43:36 -0800 (PST)
+Message-ID: <3f0a7487-476c-071c-ece9-49a401982e40@gmail.com>
+Date:   Thu, 15 Dec 2022 17:43:23 +0800
 MIME-Version: 1.0
-Received: by 2002:a05:7300:bc10:b0:89:6a96:4e04 with HTTP; Thu, 15 Dec 2022
- 01:26:46 -0800 (PST)
-Reply-To: peterwhite202101@gmail.com
-From:   Peter White <bossskelle@gmail.com>
-Date:   Thu, 15 Dec 2022 09:26:46 +0000
-Message-ID: <CAN5zVhvCKbTviWbNLeXDnBQwFcS60=dYAuc+tkQWpJ0-FOXO1g@mail.gmail.com>
-Subject: Hello
-To:     undisclosed-recipients:;
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: Yes, score=5.8 required=5.0 tests=BAYES_80,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,FREEMAIL_REPLYTO,
-        FREEMAIL_REPLYTO_END_DIGIT,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Report: * -0.0 RCVD_IN_DNSWL_NONE RBL: Sender listed at
-        *      https://www.dnswl.org/, no trust
-        *      [2607:f8b0:4864:20:0:0:0:630 listed in]
-        [list.dnswl.org]
-        *  2.0 BAYES_80 BODY: Bayes spam probability is 80 to 95%
-        *      [score: 0.8691]
-        *  0.0 FREEMAIL_FROM Sender email is commonly abused enduser mail
-        *      provider
-        *      [bossskelle[at]gmail.com]
-        *  0.2 FREEMAIL_REPLYTO_END_DIGIT Reply-To freemail username ends in
-        *      digit
-        *      [peterwhite202101[at]gmail.com]
-        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
-        * -0.0 SPF_PASS SPF: sender matches SPF record
-        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
-        *       valid
-        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
-        *      envelope-from domain
-        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
-        *      author's domain
-        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
-        *  2.7 UNDISC_FREEM Undisclosed recipients + freemail reply-to
-        *  1.0 FREEMAIL_REPLYTO Reply-To/From or Reply-To/body contain
-        *      different freemails
-X-Spam-Level: *****
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.5.1
+Subject: Re: [PATCH v6 4/7] kvm: x86/pmu: Introduce masked events to the pmu
+ event filter
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        kvm list <kvm@vger.kernel.org>
+References: <20221021205105.1621014-1-aaronlewis@google.com>
+ <20221021205105.1621014-5-aaronlewis@google.com>
+Content-Language: en-US
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20221021205105.1621014-5-aaronlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Greetings from here.
+On 22/10/2022 4:51 am, Aaron Lewis wrote:
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1178,6 +1178,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_S390_ZPCI_OP 221
+>   #define KVM_CAP_S390_CPU_TOPOLOGY 222
+>   #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+> +#define KVM_CAP_PMU_EVENT_MASKED_EVENTS 224
 
-I want to know if this email address is still valid to write to you.
-There is something important I would like to discuss with you.
+I presume that the linux/tools code in google's internal tree
+can directly refer to the various definitions in the kernel headers.
 
-Thank you
-
-Mr. Peter White
+Otherwise, how did the newly added selftest get even compiled ?
+Similar errors include "union cpuid10_eax" from perf_event.h
