@@ -2,67 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1399064DF71
-	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 18:13:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10D5A64DFF1
+	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 18:47:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229954AbiLORNr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Dec 2022 12:13:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35666 "EHLO
+        id S229611AbiLORrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Dec 2022 12:47:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229484AbiLORNo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Dec 2022 12:13:44 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C0B9122
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 09:13:43 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id g10so7510626plo.11
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 09:13:43 -0800 (PST)
+        with ESMTP id S230263AbiLORrI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Dec 2022 12:47:08 -0500
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A371B252BB
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 09:47:07 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id m19so14387218wms.5
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 09:47:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jEQ6mfuj4Wbtj1hlFiFUaWsoiTzbFgeFd9DlYYppalM=;
-        b=MKusfm04tktlOFV3U3TWbUn/vi2fR+BOse5/aOXysYLqCKOaQEQneJvS6qhI1BuCmk
-         uy1GX301qQk6m1A/RWp/Y3o8J2JJA9prBWDAxpKLcYhdYf7GbEzVaAxSQJRwjK/2EKTK
-         5o5Q9hZyByuKXB4/wrP6+3Mj5vx/MRI07ISeKVgT1BG9z3/3eIBA6xGTzW4dqfU131GN
-         LyhagyaPbuQG1l4rPbIZSNqFop3WNy+Ih0IjRyo6odhYOy9r5SeY5osUqChHquR2+b0s
-         TDHEPI5nwSILTE/3Ol+qGuV7kZ/7ADROfmh1vX1cZeMLtqp4apneAK8VVNdnXRq9nU/h
-         sLTg==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sNLNZlLE6oimTLTCnYhJy/T49F8cJl61AWb/ObcFz38=;
+        b=GukGMHxGFO4O4rV9FtHECMfVu6evqvEMgrj6gDaxS3WRJDIHALLdYF88oITeFZ5TPS
+         oLDcyEjr9BYu+elCxOSHrKoN6uO3DNyahMawUUJukIK5xBaklWu8Kd48UprmmnSc9P0d
+         8ACQBBWAlnXxB4iqLNDAWDo+m2o+WS2eYV47Vf+DQEhMqbWQq3cukSHnbCPl7uautt6W
+         ckm3IDwJq7e+iKPSJTeF8+aMtY1qapBU65h8V/t36yGcTMjnoe+9m5hcb3OzUjtifKtU
+         tlPBIK06000XCCSnucr9qWcs1nyZrfp/vxN5EAKBqYLqq4G1RMFwIxF4nbRSxZEE3J2o
+         wUwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jEQ6mfuj4Wbtj1hlFiFUaWsoiTzbFgeFd9DlYYppalM=;
-        b=kgk/cnXnmvQUpSFNnmdjI6MSkhGgTbp4j9y5uwDqD2+UHC+qnGkUjdL9QUTy6O5skX
-         dQepRVp+IhYKF8hWmUIVN2Hl0ibpg+MxpJ8CTbYq/q+m1LIfe+U1D7kKAwPI9RsjTosE
-         6WtmRWC/ktjXPphXpJAU4e4RX05HvruhPw7dfkhRif14/uHedyS1HAkU/g/MzFvRnhug
-         7c/NoMPSRMo567CuiSLjSOJfye26G+4D9gHxIzjHXAJWBN229fseyK8zHnFTzBmtFcIL
-         zKa6jXvsXdwCVfZU1HDuXIBCY06wHLo4wS/ooInjjxT6yltcWHN82niFesdd7t60cyla
-         Rv8A==
-X-Gm-Message-State: AFqh2kohxan+JKAs1/zetM1LDa7hmA3xMN7dbsCMeGrQ7TL1c/scRR0x
-        4etIa8bM99gy3S/qe7DB63GE6w==
-X-Google-Smtp-Source: AMrXdXtLpItDowQI/ObRJffQtLIV7tuvgiRMgxoH20aklNBYMZ491vWheqD+IXI4tcXZO0TJGA5/Eg==
-X-Received: by 2002:a17:90a:5910:b0:218:7bf2:4ff2 with SMTP id k16-20020a17090a591000b002187bf24ff2mr247286pji.0.1671124422929;
-        Thu, 15 Dec 2022 09:13:42 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i7-20020a17090a138700b0020b7de675a4sm3305575pja.41.2022.12.15.09.13.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Dec 2022 09:13:42 -0800 (PST)
-Date:   Thu, 15 Dec 2022 17:13:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH] KVM: selftests: Fix a typo in the vcpu_msrs_set assert
-Message-ID: <Y5tVwvltF+XVjLQu@google.com>
-References: <20221209201326.2781950-1-aaronlewis@google.com>
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sNLNZlLE6oimTLTCnYhJy/T49F8cJl61AWb/ObcFz38=;
+        b=76wQQV4MQsxwG0OFwR9srLdA3/hgCg5eTVyb1/CS+tqngNMOs7tDNe9V/gIkxB9k6c
+         2KYB7K7GKRbAmTAnL4GJFduHksdWZ/Vd/hc7LRZE5Xzyt2ZQx93E8iWj9azIhSbnnf4u
+         vBqePwZGebAWk2LP+mpPZRbGEXgViSoihw5/jlwSX3yiHFVFYnyEyebTLn136eiuRuz9
+         Bd4bV5IcbAbf3ysyIdfoEzfm545IfDH0euhMmlEH9d8MmMgSn4aZQypUoz6YoIJv5ByH
+         K+eAsrW7W2ROqdy9DP0SNAoxO1fdhD/ko/RP2wuuX66bgnFj3jXv0zThukuzXXU5I0dW
+         dlOg==
+X-Gm-Message-State: ANoB5pkKTQfmDKmLCKuDh9GHVopTeGXKG8arKDz735c1TPIkklXFxhZU
+        LM1zH3yqeLQ4of+5gAhraqs=
+X-Google-Smtp-Source: AA0mqf7IeHn5AwfVHmCooG3859lPSwzRToSxLtGRPZlFFh0THW/wC4vIbBYCuWKS4A1+pF4UuWh+pw==
+X-Received: by 2002:a05:600c:6015:b0:3cf:ea76:1823 with SMTP id az21-20020a05600c601500b003cfea761823mr22917190wmb.41.1671126426075;
+        Thu, 15 Dec 2022 09:47:06 -0800 (PST)
+Received: from [192.168.4.253] (54-240-197-239.amazon.com. [54.240.197.239])
+        by smtp.gmail.com with ESMTPSA id j9-20020a05600c190900b003b4cba4ef71sm8196049wmq.41.2022.12.15.09.47.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 15 Dec 2022 09:47:05 -0800 (PST)
+From:   Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <ed102505-5154-8730-7661-40c430faa437@xen.org>
+Date:   Thu, 15 Dec 2022 17:46:59 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221209201326.2781950-1-aaronlewis@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH] KVM: x86/xen: Use kvm_read_guest_virt() instead of
+ open-coding it badly
+To:     David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm <kvm@vger.kernel.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Joao Martins <joao.m.martins@oracle.com>
+References: <d52040a8d46e68efd86273be66808fe4a8c70e1d.camel@infradead.org>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <d52040a8d46e68efd86273be66808fe4a8c70e1d.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,12 +80,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 09, 2022, Aaron Lewis wrote:
-> The assert incorrectly identifies the ioctl being called.  Switch it
-> from KVM_GET_MSRS to KVM_SET_MSRS.
+On 14/12/2022 13:38, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> Fixes: 6ebfef83f03f ("KVM: selftest: Add proper helpers for x86-specific save/restore ioctls")
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> In particular, we shouldn't assume that being contiguous in guest virtual
+> address space means being contiguous in guest *physical* address space.
+> 
+> In dropping the manual calls to kvm_mmu_gva_to_gpa_system(), also drop
+> the srcu_read_lock() that was around them. All call sites are reached
+> from kvm_xen_hypercall() which is called from the handle_exit function
+> with the read lock already held.
+> 
+> Fixes: 2fd6df2f2 ("KVM: x86/xen: intercept EVTCHNOP_send from guests")
+>         536395260 ("KVM: x86/xen: handle PV timers oneshot mode")
+>         1a65105a5 ("KVM: x86/xen: handle PV spinlocks slowpath")
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
 > ---
+> Spotted the same issue in the QEMU patches while working through them:
+> https://git.infradead.org/users/dwmw2/qemu.git/shortlog/refs/heads/xenfv
+> Then realised it was like that in the kernel too.
+> 
+>   arch/x86/kvm/xen.c | 56 +++++++++++++++-------------------------------
+>   1 file changed, 18 insertions(+), 38 deletions(-)
+> 
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Paul Durrant <paul@xen.org>
+
