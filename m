@@ -2,91 +2,269 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D68164D8CF
-	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 10:43:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84D4764D9B2
+	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 11:47:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229866AbiLOJnj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Dec 2022 04:43:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44250 "EHLO
+        id S230199AbiLOKrl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Dec 2022 05:47:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbiLOJni (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Dec 2022 04:43:38 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4CFE2BE4
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 01:43:37 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id v13-20020a17090a6b0d00b00219c3be9830so2132346pjj.4
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 01:43:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9dNl+I3+2wsmWm9OlHEeo9xRCdSepAcotXH/QyvUQcc=;
-        b=D7XcMHO8IJTYyFeXIyGguZVxZdii9MGTG8X2OCSvAnOS2b145GtUFEBQEWoIpgnVoZ
-         mQv+16MszA+a05OoDMTT7s3mW9ZcUROlpK5leL9rM9Q8ijvPlNXuzFFvksfwkYa4q7L0
-         tqZGK+4vzFzPlirirn8CcdXgQvWMI435m0bCwoXVa2eAq5hgbJDTFhjOi7jTXPkhA7SG
-         f5bQE1ppCKApGZdWg4PmCB0tO75MRPkB9FJSQNcVlbTpc5punCXiehtUNAss1ONKnE4k
-         uMlSggET5TkIzvgFC/sTAtGH82XejLYB4d3v9XwtOMN+QdeskgXkDpEwdgVJpCTMSWTC
-         ZTRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9dNl+I3+2wsmWm9OlHEeo9xRCdSepAcotXH/QyvUQcc=;
-        b=Sp3/EBDw6ZRLd1x9fckCMJ6zmIIBV4uD1wdRCctcDZx7sFGxZwltk256IR5iP3qD5A
-         EBiGrOVh+zhVbiKO8Ti92nyXjzEonzocgw+vPfC5f953WyW1WZhM7i47dN4Es/TU+J6T
-         dFWEqwctQZx+MsHAY0ckvxTlLc1GzLcGzJB4DMM2JcCgJSSEmLJwmZtuCExFm7Bj0x/t
-         +GUuK0oBU3lEfMryOhmwP96wUljMR1RV3vYtLL0vvBnZJR1nk3maG2sJ9MIb/qCl9wIq
-         9m4IzkaBs0FFFm/swCQmJx1Umnja7Mn7jfmoRbgDEbul8XyIUjGyoYW5Px+bWjMIZ/5O
-         KU1Q==
-X-Gm-Message-State: ANoB5pmCudxRQSPdxSsSHn3ryYzQ1SXtVyerAsE0xQRu45tqNY6nWCbU
-        zuzDmaG/UWIpAKlDxLlZwEy+zAtoaE4jujfy
-X-Google-Smtp-Source: AA0mqf6AN7XM485uFKUPD/FUJCLM5u8hdAC4XpnDK3ArG7RhG+ObY0ZSkF+o8mMi0IzetzoD2PabKg==
-X-Received: by 2002:a17:903:22cd:b0:189:e16f:c268 with SMTP id y13-20020a17090322cd00b00189e16fc268mr38742294plg.20.1671097417145;
-        Thu, 15 Dec 2022 01:43:37 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id q10-20020a170902daca00b00190c6518e30sm3329383plx.243.2022.12.15.01.43.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 15 Dec 2022 01:43:36 -0800 (PST)
-Message-ID: <3f0a7487-476c-071c-ece9-49a401982e40@gmail.com>
-Date:   Thu, 15 Dec 2022 17:43:23 +0800
+        with ESMTP id S229596AbiLOKrk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Dec 2022 05:47:40 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE842C644
+        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 02:47:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1671101258; x=1702637258;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cSAnH5psTfKTumUa7dLtRX41guoxOrocJnHKkKypqZY=;
+  b=U12Dp/X6FM0/VKTvRhcWkRGhpj3Z1iUV26bE8DgGYYk0ytiBGLixlrU8
+   fxLgWnNfaC9G7A5lrQk6/W3bh1qESg9XhTBaAMNWFLsa7jY1NDEIZJ1+N
+   bLdari6mKen0zok5ohOTOxXgoKUoG+BzxEYsr0rRSeDBhiyDiOWC7UG2G
+   dzb2PI2Kabf0K04mvVuMeC0lGVH8Txz2fcrPXZX9bRYHxXIMfOu89REvi
+   3HLNBVoHfyYaisqQ6u5qviI5j6UH+6tbSNgqH7BTGOntDwcCyzRNXf5wq
+   xW3TeBdwmkykCxjhU99O2RRWd3D9DgdxGH7Z4/kViSZpHMgO8WJVMNOs7
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10561"; a="345732772"
+X-IronPort-AV: E=Sophos;i="5.96,247,1665471600"; 
+   d="scan'208";a="345732772"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Dec 2022 02:47:38 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10561"; a="978176886"
+X-IronPort-AV: E=Sophos;i="5.96,247,1665471600"; 
+   d="scan'208";a="978176886"
+Received: from skxmcp01.bj.intel.com ([10.240.193.86])
+  by fmsmga005.fm.intel.com with ESMTP; 15 Dec 2022 02:47:35 -0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, dwmw2@infradead.org,
+        paul@xen.org
+Subject: [PATCH v3] KVM: MMU: Make the definition of 'INVALID_GPA' common.
+Date:   Thu, 15 Dec 2022 17:57:36 +0800
+Message-Id: <20221215095736.1202008-1-yu.c.zhang@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.5.1
-Subject: Re: [PATCH v6 4/7] kvm: x86/pmu: Introduce masked events to the pmu
- event filter
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        kvm list <kvm@vger.kernel.org>
-References: <20221021205105.1621014-1-aaronlewis@google.com>
- <20221021205105.1621014-5-aaronlewis@google.com>
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20221021205105.1621014-5-aaronlewis@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 22/10/2022 4:51 am, Aaron Lewis wrote:
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1178,6 +1178,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_S390_ZPCI_OP 221
->   #define KVM_CAP_S390_CPU_TOPOLOGY 222
->   #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
-> +#define KVM_CAP_PMU_EVENT_MASKED_EVENTS 224
+KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in
+kvm_types.h, and it is used by ARM and X86 xen code. We do
+not need a specific definition of 'INVALID_GPA' for X86.
 
-I presume that the linux/tools code in google's internal tree
-can directly refer to the various definitions in the kernel headers.
+Instead of using the common 'GPA_INVALID' for X86, replace
+the definition of 'GPA_INVALID' with 'INVALID_GPA', and
+change the users of 'GPA_INVALID', so that the diff can be
+smaller. Also because the name 'INVALID_GPA' tells the user
+we are using an invalid GPA, while the name 'GPA_INVALID'
+is emphasizing the GPA is an invalid one.
 
-Otherwise, how did the newly added selftest get even compiled ?
-Similar errors include "union cpuid10_eax" from perf_event.h
+Also, add definition of 'INVALID_GFN' because it is more
+proper than 'INVALID_GPA' for GFN variables.
+
+Tested by rebuilding KVM for x86 and for ARM64.
+
+No functional change intended.
+
+Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+Reviewed-by: Paul Durrant <paul@xen.org>
+---
+V3:
+Followed David and Sean's comment to add 'INVALID_GFN'. Also,
+changed the commit message.
+v2:
+Followed Sean's comments to rename GPA_INVALID to INVALID_GPA
+and modify _those_ users. Also, changed the commit message.
+v1:
+https://lore.kernel.org/lkml/20221209023622.274715-1-yu.c.zhang@linux.intel.com/
+---
+ arch/arm64/include/asm/kvm_host.h |  4 ++--
+ arch/arm64/kvm/hypercalls.c       |  2 +-
+ arch/arm64/kvm/pvtime.c           |  8 ++++----
+ arch/x86/include/asm/kvm_host.h   |  2 --
+ arch/x86/kvm/xen.c                | 14 +++++++-------
+ include/linux/kvm_types.h         |  3 ++-
+ 6 files changed, 16 insertions(+), 17 deletions(-)
+
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 001c8abe87fc..fcf96e9cc8cd 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -906,12 +906,12 @@ void kvm_arm_vmid_clear_active(void);
+ 
+ static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+ {
+-	vcpu_arch->steal.base = GPA_INVALID;
++	vcpu_arch->steal.base = INVALID_GPA;
+ }
+ 
+ static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
+ {
+-	return (vcpu_arch->steal.base != GPA_INVALID);
++	return (vcpu_arch->steal.base != INVALID_GPA);
+ }
+ 
+ void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index c9f401fa01a9..64c086c02c60 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -198,7 +198,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		break;
+ 	case ARM_SMCCC_HV_PV_TIME_ST:
+ 		gpa = kvm_init_stolen_time(vcpu);
+-		if (gpa != GPA_INVALID)
++		if (gpa != INVALID_GPA)
+ 			val[0] = gpa;
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
+diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+index 78a09f7a6637..4ceabaa4c30b 100644
+--- a/arch/arm64/kvm/pvtime.c
++++ b/arch/arm64/kvm/pvtime.c
+@@ -19,7 +19,7 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+ 	u64 steal = 0;
+ 	int idx;
+ 
+-	if (base == GPA_INVALID)
++	if (base == INVALID_GPA)
+ 		return;
+ 
+ 	idx = srcu_read_lock(&kvm->srcu);
+@@ -40,7 +40,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+ 	switch (feature) {
+ 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+ 	case ARM_SMCCC_HV_PV_TIME_ST:
+-		if (vcpu->arch.steal.base != GPA_INVALID)
++		if (vcpu->arch.steal.base != INVALID_GPA)
+ 			val = SMCCC_RET_SUCCESS;
+ 		break;
+ 	}
+@@ -54,7 +54,7 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
+ 	struct kvm *kvm = vcpu->kvm;
+ 	u64 base = vcpu->arch.steal.base;
+ 
+-	if (base == GPA_INVALID)
++	if (base == INVALID_GPA)
+ 		return base;
+ 
+ 	/*
+@@ -89,7 +89,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+ 		return -EFAULT;
+ 	if (!IS_ALIGNED(ipa, 64))
+ 		return -EINVAL;
+-	if (vcpu->arch.steal.base != GPA_INVALID)
++	if (vcpu->arch.steal.base != INVALID_GPA)
+ 		return -EEXIST;
+ 
+ 	/* Check the address is in a valid memslot */
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f35f1ff4427b..46e50cb6c9ca 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -134,8 +134,6 @@
+ #define INVALID_PAGE (~(hpa_t)0)
+ #define VALID_PAGE(x) ((x) != INVALID_PAGE)
+ 
+-#define INVALID_GPA (~(gpa_t)0)
+-
+ /* KVM Hugepage definitions for x86 */
+ #define KVM_MAX_HUGEPAGE_LEVEL	PG_LEVEL_1G
+ #define KVM_NR_PAGE_SIZES	(KVM_MAX_HUGEPAGE_LEVEL - PG_LEVEL_4K + 1)
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index d7af40240248..ec893276681c 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -41,7 +41,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+ 	int ret = 0;
+ 	int idx = srcu_read_lock(&kvm->srcu);
+ 
+-	if (gfn == GPA_INVALID) {
++	if (gfn == INVALID_GFN) {
+ 		kvm_gpc_deactivate(gpc);
+ 		goto out;
+ 	}
+@@ -659,7 +659,7 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
+ 		if (kvm->arch.xen.shinfo_cache.active)
+ 			data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_cache.gpa);
+ 		else
+-			data->u.shared_info.gfn = GPA_INVALID;
++			data->u.shared_info.gfn = INVALID_GFN;
+ 		r = 0;
+ 		break;
+ 
+@@ -705,7 +705,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		BUILD_BUG_ON(offsetof(struct vcpu_info, time) !=
+ 			     offsetof(struct compat_vcpu_info, time));
+ 
+-		if (data->u.gpa == GPA_INVALID) {
++		if (data->u.gpa == INVALID_GPA) {
+ 			kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_info_cache);
+ 			r = 0;
+ 			break;
+@@ -719,7 +719,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		break;
+ 
+ 	case KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO:
+-		if (data->u.gpa == GPA_INVALID) {
++		if (data->u.gpa == INVALID_GPA) {
+ 			kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_time_info_cache);
+ 			r = 0;
+ 			break;
+@@ -739,7 +739,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 			r = -EOPNOTSUPP;
+ 			break;
+ 		}
+-		if (data->u.gpa == GPA_INVALID) {
++		if (data->u.gpa == INVALID_GPA) {
+ 			r = 0;
+ 		deactivate_out:
+ 			kvm_gpc_deactivate(&vcpu->arch.xen.runstate_cache);
+@@ -937,7 +937,7 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		if (vcpu->arch.xen.vcpu_info_cache.active)
+ 			data->u.gpa = vcpu->arch.xen.vcpu_info_cache.gpa;
+ 		else
+-			data->u.gpa = GPA_INVALID;
++			data->u.gpa = INVALID_GPA;
+ 		r = 0;
+ 		break;
+ 
+@@ -945,7 +945,7 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		if (vcpu->arch.xen.vcpu_time_info_cache.active)
+ 			data->u.gpa = vcpu->arch.xen.vcpu_time_info_cache.gpa;
+ 		else
+-			data->u.gpa = GPA_INVALID;
++			data->u.gpa = INVALID_GPA;
+ 		r = 0;
+ 		break;
+ 
+diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+index 76de36e56cdf..b961043e664a 100644
+--- a/include/linux/kvm_types.h
++++ b/include/linux/kvm_types.h
+@@ -40,7 +40,8 @@ typedef unsigned long  gva_t;
+ typedef u64            gpa_t;
+ typedef u64            gfn_t;
+ 
+-#define GPA_INVALID	(~(gpa_t)0)
++#define INVALID_GPA	(~(gpa_t)0)
++#define INVALID_GFN	(~(gfn_t)0)
+ 
+ typedef unsigned long  hva_t;
+ typedef u64            hpa_t;
+-- 
+2.25.1
+
