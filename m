@@ -2,139 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D28B464D4CA
-	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 01:46:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2968C64D4D1
+	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 01:53:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229676AbiLOAqj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 14 Dec 2022 19:46:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53474 "EHLO
+        id S229738AbiLOAxW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 14 Dec 2022 19:53:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229451AbiLOAqi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 14 Dec 2022 19:46:38 -0500
-Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [IPv6:2620:100:9005:57f::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1533030F4A
-        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 16:46:36 -0800 (PST)
-Received: from pps.filterd (m0122331.ppops.net [127.0.0.1])
-        by mx0b-00190b01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BEMH8hM029338;
-        Thu, 15 Dec 2022 00:46:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=jan2016.eng;
- bh=hYWnssN3UzE1uginjg9PV2a+rGG2wKWg+IAvfNfbNJo=;
- b=DKH8+q2TaSMC9dWTnoyv2vER2DhYAcuGMjbirS70lC6KBHpPcvofGAlj/5VelCRgKw87
- QTaWuBXZmiGDhy+XYsHp1zdcL6oPFn17/WNOeHM+QXVa1WrAwG9ToUT/je7WQ/B2Sfsm
- 0n4qkQdSNCrMBVSuSuyFRzjazPoa+YPvU+IvUOz81p6ksHefrI4a+acqxOTkYi5Afs/J
- rldSbj/Rlfg0HmZXxHLUw4QNzPkUXQ9MreObGYW2tbMMp2xwq1p8YIjy0x/poqlWDhC5
- 4zSlrmo2esEClXsiX0TMD9bzfNbpblguppqJqlvxAJygopC2bDHaDZSzlJ7IVtLpfofs EA== 
-Received: from prod-mail-ppoint3 (a72-247-45-31.deploy.static.akamaitechnologies.com [72.247.45.31] (may be forged))
-        by mx0b-00190b01.pphosted.com (PPS) with ESMTPS id 3mf6r8hh54-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 15 Dec 2022 00:46:33 +0000
-Received: from pps.filterd (prod-mail-ppoint3.akamai.com [127.0.0.1])
-        by prod-mail-ppoint3.akamai.com (8.17.1.5/8.17.1.5) with ESMTP id 2BELS0ol004462;
-        Wed, 14 Dec 2022 19:46:32 -0500
-Received: from email.msg.corp.akamai.com ([172.27.50.204])
-        by prod-mail-ppoint3.akamai.com (PPS) with ESMTPS id 3meytu6b0q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 14 Dec 2022 19:46:32 -0500
-Received: from ustx2ex-dag4mb8.msg.corp.akamai.com (172.27.50.207) by
- ustx2ex-dag4mb3.msg.corp.akamai.com (172.27.50.202) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.20; Wed, 14 Dec 2022 16:46:31 -0800
-Received: from ustx2ex-dag4mb8.msg.corp.akamai.com ([172.27.50.207]) by
- ustx2ex-dag4mb8.msg.corp.akamai.com ([172.27.50.207]) with mapi id
- 15.02.1118.020; Wed, 14 Dec 2022 16:46:31 -0800
-From:   "Jayaramappa, Srilakshmi" <sjayaram@akamai.com>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mlevitsk@redhat.com" <mlevitsk@redhat.com>,
-        "suleiman@google.com" <suleiman@google.com>,
-        "Hunt, Joshua" <johunt@akamai.com>
-Subject: Re: KVM: x86: snapshotted TSC frequency causing time drifts in vms
-Thread-Topic: KVM: x86: snapshotted TSC frequency causing time drifts in vms
-Thread-Index: AQHY7VUBvAGfvnsQJ0OJYynFST/RMK4pUIaA///MAaGARQyI1YAAsjqA//+FK0g=
-Date:   Thu, 15 Dec 2022 00:46:31 +0000
-Message-ID: <bdb1d56a377345f3ad08939d9f2cf418@akamai.com>
-References: <a49dfacc8a99424a94993171ba2955a0@akamai.com>
- <Y2BFSZ1ExLiOIIi9@google.com> <5394d31b6be148b49b80b33aaa39ff45@akamai.com>
- <46774ef6c59e45bf9b166ca4833dddd7@akamai.com>,<Y5pjEwsdeRXVtjcj@google.com>
-In-Reply-To: <Y5pjEwsdeRXVtjcj@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.27.97.87]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S229631AbiLOAxU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 14 Dec 2022 19:53:20 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EBC631372
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 16:53:20 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id z8-20020a17090abd8800b00219ed30ce47so1081519pjr.3
+        for <kvm@vger.kernel.org>; Wed, 14 Dec 2022 16:53:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eg2uix4z/WEf9zETr7MjYcro2yv1FRTpbDhT4aQx4YM=;
+        b=gNbVgqTq9vJL+z/6drn6m9iK5xkj1erfyh9l/baTlm7K8AmEhd9gSVIJjy66lRDkmV
+         7gWZ4y9rrbhwtjqWdy6nY+fvCNXE5K1C8hhahgZNxw2EgX9I9lHaqLdWmqBsSaWpE9bv
+         v1ABUHvi1i5Xy0XXpwz30Vy6hjkVIrBbQames5yqpskgn0qVnuxscnrxEsOEQPfuS751
+         SvZKWdDnhjI95V6GMyNcvlkeTnksbdU5UlLpyZ7JhhqYvjzyJhhb0ERYOAqR9l/hHyPA
+         PMvUL5H4nNtCeZQm4IOo6fBzLDFv/Y+0Pke+Au+LM1tqPP3P/vyE+gzoWLlA/kbot460
+         EEOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eg2uix4z/WEf9zETr7MjYcro2yv1FRTpbDhT4aQx4YM=;
+        b=1plEmHiKjI0Evmi5jxcNCgjBZ+SO+DjheIkCnwGu6c8jAH5c/vj3z/MCnrKVSBT/8C
+         9CiDRan0/yaPQIk5EFV7EGBMbX5uBc5MqozBVuwFQO8uxcPoysN1MJ8gAMd8Mnox4Wvv
+         uRsxV0p08flH5Yc43MoSH0ce6W0t9aVPQ0kf3yoGdyh5WNJwwhyuGl6OTYuPdphKX7H2
+         hX65fGG7XDXWVg2KKE80WyCgvA7Y1t5zIHpH/S+HJ8ZYBL08kaLpuvvjvoU2ciHKaljz
+         xFqPqWP7kTcPoFLf8+VVJdy3woRpEz//UT8cSTuKpTAWBMI26ypcmUgYjEoy7EdVIkFg
+         nhRQ==
+X-Gm-Message-State: ANoB5pnSK6YhqTIlew4Vv5wZ98Q9MIpoLBU8ZfZZHE3rOdNrGm3HTP7H
+        OkUhA3UYwM0DMcH4L1NOX4cHJ2jdKovObj4+
+X-Google-Smtp-Source: AA0mqf589/p7WADF/kJSfbiMjxsUEvvKI+MuHNeDGLUQLo4JXDs2FM8Dm2QXtVaQMo+C2pmuRWDLKw==
+X-Received: by 2002:a17:902:7b96:b0:189:858f:b5c0 with SMTP id w22-20020a1709027b9600b00189858fb5c0mr963628pll.0.1671065599626;
+        Wed, 14 Dec 2022 16:53:19 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id o16-20020a170902779000b001783f964fe3sm2451597pll.113.2022.12.14.16.53.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Dec 2022 16:53:18 -0800 (PST)
+Date:   Thu, 15 Dec 2022 00:53:15 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: RFC: few questions about hypercall patching in KVM
+Message-ID: <Y5pv+/58UBDAfP19@google.com>
+References: <9c7d86d5fd56aa0e35a9a1533a23c90853382227.camel@redhat.com>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-14_12,2022-12-14_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 suspectscore=0 bulkscore=0
- phishscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2212150002
-X-Proofpoint-GUID: PRXCyQALJyVrDVY1Sqf3Y_4CykJRAnTQ
-X-Proofpoint-ORIG-GUID: PRXCyQALJyVrDVY1Sqf3Y_4CykJRAnTQ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-14_12,2022-12-14_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 phishscore=0
- adultscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
- suspectscore=0 mlxscore=0 priorityscore=1501 clxscore=1015 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2212150004
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9c7d86d5fd56aa0e35a9a1533a23c90853382227.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Sean Christopherson <seanjc@google.com>
-Sent: Wednesday, December 14, 2022 6:58 PM
-To: Jayaramappa, Srilakshmi
-Cc: kvm@vger.kernel.org; pbonzini@redhat.com; vkuznets@redhat.com; mlevitsk=
-@redhat.com; suleiman@google.com; Hunt, Joshua
-Subject: Re: KVM: x86: snapshotted TSC frequency causing time drifts in vms
-=A0  =20
-On Wed, Dec 14, 2022, Jayaramappa, Srilakshmi wrote:
-> > There doesn't seem to be any response on the v6 of Anton's patch. I wan=
-ted to
-> > ask if there is further changes in progress or if it is all set to be m=
-erged?
->=20
-> Drat, it slipped through the cracks.
->=20
-> Paolo, can you pick up the below patch?=A0 Oobviously assuming you don't =
-spy any
-> problems.
->=20
-> It has a superficial conflict with commit 938c8745bcf2 ("KVM: x86: Introd=
-uce
+On Wed, Dec 14, 2022, Maxim Levitsky wrote:
+> Hi!
+> 
+> 
+> Recently I had to debug a case of KVM's hypercall patching failing in a
+> special case of running qemu under valgrind.
+>  
+> In nutshell what is happening is that qemu uses 'cpuid' instruction to gather
+> some info about the host and some of it is passed to the guest cpuid, and
+> that includes the vendor string.
+>  
+> Under valgrind it emulates the CPU (aka TCG), so qemu sees virtual cpu, with
+> virtual cpuid which has hardcoded vendor string the 'GenuineIntel', so when
+> your run qemu with KVM on AMD host, the guest will see Intel's vendor string
+> regardless of other '-cpu' settings (even -cpu host)
+>  
+> This ensures that the guest uses the wrong hypercall instruction (vmcall
+> instead of vmmcall), and sometimes it will use it after the guest kernel
+> write protects its memory.  This will lead to a failure of the hypercall
+> patching as the kvm writes to the guest memory as if the instruction wrote to
+> it, and this checks the permissions in the guest paging.
+> 
+> So the VMCALL instruction gets totally unexpected #PF.
 
-...
+Yep, been there, done that :-)
 
-> Could I trouble you to take a look at this patch please?=20
+> 1. Now I suggest that when hypercall patching fails, can we do
+> kvm_vm_bugged() instead of forwarding the hypercall?  I know that vmmcall can
+> be executed from ring 3 as well, so I can limit this to hypercall patching
+> that happens when guest ring is 0.
 
-It's already in kvm/next
+And L1.  But why?  It's not a KVM bug per se, it's a known deficiency in KVM's
+emulator.  What to do in response to the failure should be up to userspace.  The
+real "fix" is to disable the quirk in QEMU.
 
-=A0 3ebcbd2244f5 ("KVM: x86: Use current rather than snapshotted TSC freque=
-ncy if it is constant")
+> 2. Why can't we just emulate the VMCALL/VMMCALL instruction in this case
+> instead of patching? Any technical reasons for not doing this?  Few guests
+> use it so the perf impact should be very small.
 
-but there was a hiccup with the KVM pull request for 6.2[*], which is why i=
-t hasn't
-made it's way to Linus yet.
+Nested is basically impossible to get right[1][2].  IIRC, calling into
+kvm_emulate_hypercall() from the emulator also gets messy (I think I tried doing
+exactly this at some point).
 
-[*]  https://urldefense.com/v3/__https://lore.kernel.org/all/6d96a62e-d5a1-=
-e606-3bd2-c38f4a6c8545@redhat.com__;!!GjvTz_vk!VYIJqzFNCr9fQP6gLlryCKVNhGb-=
-OrtosOocQzLpVk0aIEGoGFKL5OD0Zw8rmEN3QhhX9BmLkMpH7A$
-   =20
-
-Oh that's great, thanks, Sean! Appreciate the help.
-
--Sri=
+[1] https://lore.kernel.org/all/Yjyt7tKSDhW66fnR@google.com 
+[2] https://lore.kernel.org/all/YEZUhbBtNjWh0Zka@google.com
