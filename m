@@ -2,157 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7682364D990
-	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 11:30:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70F4264D9B8
+	for <lists+kvm@lfdr.de>; Thu, 15 Dec 2022 11:48:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229927AbiLOKaL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Dec 2022 05:30:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43296 "EHLO
+        id S229680AbiLOKs4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Dec 2022 05:48:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbiLOKaJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Dec 2022 05:30:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EF7A2B637
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 02:29:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671100175;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+b33YidOzkUiisCIlUSR3ymMkkTJ/Mkj17LYCbl/uXA=;
-        b=CwZqX5NSkK7jbh6Rgq9DLir3cjOEys5el8XeCZBVe52lCxydEoXZSFejL50z134GWoekZO
-        urYGIZRQTDcodULhvpUpURUh8EJ/eWcJiHoD6F6q2XL1WVVeBhsVIn01QGLa/q5SdiQrUW
-        I8cyeBmBl5FdEnHwKW2dlSYPrygaN1s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-376-R8Rrq4qWPrSBnkmQUVkURg-1; Thu, 15 Dec 2022 05:29:33 -0500
-X-MC-Unique: R8Rrq4qWPrSBnkmQUVkURg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3284F811E6E;
-        Thu, 15 Dec 2022 10:29:33 +0000 (UTC)
-Received: from starship (ovpn-192-71.brq.redhat.com [10.40.192.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B91C14171BE;
-        Thu, 15 Dec 2022 10:29:32 +0000 (UTC)
-Message-ID: <0d0ee4ff7e57996342e3eaa3bb714a43d8fa6628.camel@redhat.com>
-Subject: Re: RFC: few questions about hypercall patching in KVM
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Date:   Thu, 15 Dec 2022 12:29:31 +0200
-In-Reply-To: <Y5pv+/58UBDAfP19@google.com>
-References: <9c7d86d5fd56aa0e35a9a1533a23c90853382227.camel@redhat.com>
-         <Y5pv+/58UBDAfP19@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        with ESMTP id S229462AbiLOKsz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Dec 2022 05:48:55 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA17C2B1AE;
+        Thu, 15 Dec 2022 02:48:53 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BFAgPSf017634;
+        Thu, 15 Dec 2022 10:48:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=mime-version : date :
+ from : to : cc : subject : reply-to : in-reply-to : references :
+ message-id : content-type : content-transfer-encoding; s=pp1;
+ bh=vJHOAPiEpxiliQFj/PeyFATh2PWHiiJrIUoB3dHYbJc=;
+ b=ArTFQ2FMLv7ROqunstvEALcrfspFfqRT6A2OV23kpNPEHHsoC1XeXVg39oWIJpvKkaAd
+ L1O1jA1rI4yZaDgI0y/bPyEcZMCGAZ/49crju//+gT7gW4r1mjjGSFwur3fKT1Gkgfgy
+ cH8OaslFvXHYIUC5XcM4dBYW6YsEvB9kX/HMXONe5CtrLCLyIs+sClh0GEEXzGbkK3WT
+ 0UOxl/g0avaLI40VXkV9qj+NQKFSuLTe+gdDVuGPwbYCmxgiabc1QnuZb8HX7U4mLpKJ
+ RgyyVWGnnjF8d0ir1a2aqJ9F35omOL3zbFNRwRU+X7w1FszK//0Qp4JeqTTnup5TI4gp PQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mg22eg4r5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Dec 2022 10:48:50 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BFAiAZT024379;
+        Thu, 15 Dec 2022 10:48:49 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mg22eg4qc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Dec 2022 10:48:49 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BFAAmLf005705;
+        Thu, 15 Dec 2022 10:48:48 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
+        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3meyfdwaq3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 15 Dec 2022 10:48:48 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BFAmkTg2490892
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 15 Dec 2022 10:48:47 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BA0E358052;
+        Thu, 15 Dec 2022 10:48:46 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3F4E85804C;
+        Thu, 15 Dec 2022 10:48:46 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.5.196.140])
+        by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 15 Dec 2022 10:48:46 +0000 (GMT)
 MIME-Version: 1.0
+Date:   Thu, 15 Dec 2022 11:48:46 +0100
+From:   Harald Freudenberger <freude@linux.ibm.com>
+To:     Tony Krowiak <akrowiak@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+Subject: Re: [PATCH 2/7] s390/vfio_ap: check TAPQ response code when waiting
+ for queue reset
+Reply-To: freude@linux.ibm.com
+Mail-Reply-To: freude@linux.ibm.com
+In-Reply-To: <20221213154437.15480-3-akrowiak@linux.ibm.com>
+References: <20221213154437.15480-1-akrowiak@linux.ibm.com>
+ <20221213154437.15480-3-akrowiak@linux.ibm.com>
+Message-ID: <0e7badff0648ec2b731ae7703ed5ba91@linux.ibm.com>
+X-Sender: freude@linux.ibm.com
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: lutQ1SXcVJU7XQ_u_BHrWPJJJm4h-3ZI
+X-Proofpoint-ORIG-GUID: u9rIOepjXX-ia1WSJn9-GBjj-HUCoeJh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-15_05,2022-12-14_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ mlxscore=0 bulkscore=0 mlxlogscore=999 spamscore=0 phishscore=0
+ adultscore=0 impostorscore=0 clxscore=1015 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2212150080
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2022-12-15 at 00:53 +0000, Sean Christopherson wrote:
-> On Wed, Dec 14, 2022, Maxim Levitsky wrote:
-> > Hi!
-> > 
-> > 
-> > Recently I had to debug a case of KVM's hypercall patching failing in a
-> > special case of running qemu under valgrind.
-> >  
-> > In nutshell what is happening is that qemu uses 'cpuid' instruction to gather
-> > some info about the host and some of it is passed to the guest cpuid, and
-> > that includes the vendor string.
-> >  
-> > Under valgrind it emulates the CPU (aka TCG), so qemu sees virtual cpu, with
-> > virtual cpuid which has hardcoded vendor string the 'GenuineIntel', so when
-> > your run qemu with KVM on AMD host, the guest will see Intel's vendor string
-> > regardless of other '-cpu' settings (even -cpu host)
-> >  
-> > This ensures that the guest uses the wrong hypercall instruction (vmcall
-> > instead of vmmcall), and sometimes it will use it after the guest kernel
-> > write protects its memory.  This will lead to a failure of the hypercall
-> > patching as the kvm writes to the guest memory as if the instruction wrote to
-> > it, and this checks the permissions in the guest paging.
-> > 
-> > So the VMCALL instruction gets totally unexpected #PF.
+On 2022-12-13 16:44, Tony Krowiak wrote:
+> The vfio_ap_mdev_reset_queue() function does not check the status
+> response code returned form the PQAP(TAPQ) function when verifying the
+> queue's status; consequently, there is no way of knowing whether
+> verification failed because the wait time was exceeded, or because the
+> PQAP(TAPQ) failed.
 > 
-> Yep, been there, done that :-)
+> This patch adds a function to check the status response code from the
+> PQAP(TAPQ) instruction and logs an appropriate message if it fails.
 > 
-> > 1. Now I suggest that when hypercall patching fails, can we do
-> > kvm_vm_bugged() instead of forwarding the hypercall?  I know that vmmcall can
-> > be executed from ring 3 as well, so I can limit this to hypercall patching
-> > that happens when guest ring is 0.
+> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+> ---
+>  drivers/s390/crypto/vfio_ap_ops.c | 36 ++++++++++++++++++++++++++-----
+>  1 file changed, 31 insertions(+), 5 deletions(-)
 > 
-> And L1.  But why?  It's not a KVM bug per se, it's a known deficiency in KVM's
-> emulator.  What to do in response to the failure should be up to userspace.  The
-> real "fix" is to disable the quirk in QEMU.
-
-Yes, and L1, you are right - I thought about nested case, that maybe it is possible
-to eliminate it, but you are right, it can't be eliminated.
-
-My reasoning for doing kvm_vm_bugged() (or returning X86EMUL_UNHANDLEABLE even better maybe,
-to give userspace a theoretical chance of dealing with it) 
-
-is to make the error at least a bit more visible. 
-(I for example thought for a while that there is some memory corrupion in the guest caused by valgrind,
-which cause that #PF)
-
-
+> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
+> b/drivers/s390/crypto/vfio_ap_ops.c
+> index 83ff94a38102..a5530a46cf31 100644
+> --- a/drivers/s390/crypto/vfio_ap_ops.c
+> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+> @@ -1587,23 +1587,49 @@ static struct vfio_ap_queue
+> *vfio_ap_find_queue(int apqn)
+>  	return q;
+>  }
 > 
-> > 2. Why can't we just emulate the VMCALL/VMMCALL instruction in this case
-> > instead of patching? Any technical reasons for not doing this?  Few guests
-> > use it so the perf impact should be very small.
+> +static int apq_status_check(int apqn, struct ap_queue_status *status)
+> +{
+> +	switch (status->response_code) {
+> +	case AP_RESPONSE_NORMAL:
+> +	case AP_RESPONSE_RESET_IN_PROGRESS:
+> +		if (status->queue_empty && !status->irq_enabled)
+> +			return 0;
+> +		return -EBUSY;
+> +	case AP_RESPONSE_DECONFIGURED:
+> +		/*
+> +		 * If the AP queue is deconfigured, any subsequent AP command
+> +		 * targeting the queue will fail with the same response code. On the
+> +		 * other hand, when an AP adapter is deconfigured, the associated
+> +		 * queues are reset, so let's return a value indicating the reset
+> +		 * for which we're waiting completed successfully.
+> +		 */
+> +		return 0;
+> +	default:
+> +		WARN(true,
+> +		     "failed to verify reset of queue %02x.%04x: TAPQ rc=%u\n",
+> +		     AP_QID_CARD(apqn), AP_QID_QUEUE(apqn),
+> +		     status->response_code);
+> +		return -EIO;
+> +	}
+> +}
+> +
+>  static int apq_reset_check(struct vfio_ap_queue *q)
+>  {
+> -	int iters = 2;
+> +	int iters = 2, ret;
+>  	struct ap_queue_status status;
 > 
-> Nested is basically impossible to get right[1][2].  IIRC, calling into
-> kvm_emulate_hypercall() from the emulator also gets messy (I think I tried doing
-> exactly this at some point).
-
-It could very well be, however if L0's KVM starts to emulate both VMMCALL and VMCALL
-instructions (when the quirk is enabled) then it will be the closest to what KVM always did,
-and it will not overwrite the guest memory.
-
-About calling into kvm_emulate_hypercall I can expect trouble, but I would be very happy
-if you recall which problems did you face.
-
-
-Note that at least for a nested guest, we can avoid patching right away because both VMMCALL and VMCALL
-that are done in nested guest will never need to call kvm_emulate_hypercall().
-
-VMCALL is always intercepted by L1 as defined by VMX spec, while VMMCALL if not intercepted causes #UD
-in the guest.
-
-In those cases emulation is very simple.
-
-As for L1, we already have a precedent: #GP is sometimes
-emulated as SVM instruction due to the AMD's errata.
-
-
-Look at gp_interception:
-
-You first decode the instruciton, and if it is VMCALL, then call the kvm_emulate_hypercall()
-This way there is no recursive emulator call.
-
-What do you think?
-
-
-
-Best regards,
-	Maxim Levitsky
-
-
+>  	while (iters--) {
+>  		msleep(20);
+>  		status = ap_tapq(q->apqn, NULL);
+> -		if (status.queue_empty && !status.irq_enabled)
+> -			return 0;
+> +		ret = apq_status_check(q->apqn, &status);
+> +		if (ret != -EBUSY)
+> +			return ret;
+>  	}
+>  	WARN_ONCE(iters <= 0,
+>  		  "timeout verifying reset of queue %02x.%04x (%u, %u, %u)",
+>  		  AP_QID_CARD(q->apqn), AP_QID_QUEUE(q->apqn),
+>  		  status.queue_empty, status.irq_enabled, status.response_code);
+> -
+> -	return -EBUSY;
+> +	return ret;
+>  }
 > 
-> [1] https://lore.kernel.org/all/Yjyt7tKSDhW66fnR@google.com 
-> [2] https://lore.kernel.org/all/YEZUhbBtNjWh0Zka@google.com
-> 
+>  static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q,
 
+Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
 
+Just one word here: this function is only called once and it is very 
+very special
+to just check the status after RAPQ/ZAPQ. I would merge this function 
+into the
+calling code or rename the function to reflect the special condition 
+under which
+it is called. However - this is not my code and I don't need to maintain 
+it, so
+maybe simple ignore my words.
