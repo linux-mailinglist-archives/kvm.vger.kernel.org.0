@@ -2,132 +2,130 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F416764EF39
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 17:34:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67C5D64EF34
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 17:34:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230141AbiLPQe3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 11:34:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36126 "EHLO
+        id S231451AbiLPQeE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 11:34:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231320AbiLPQeS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 11:34:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5F4922505
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 08:33:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671208406;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Z5m/uTP5bjpIgKQii7paVPxnHjd7vJJPvXm/y28JFgA=;
-        b=irEd0NlSQk58hkhRMAyHXUxIEQ9uNYJZN5rSksm2HOzQ26hzn0zJDhP1pTO5nJd21JUoCd
-        qHnstouveY6V/gBe66whhK4N/Zv6pIWgEGedq/QSYTJN9shoJ5F/u5JHYMRyTm5QaZdkPF
-        LGKqsvV4f35BrM8G2RxMfUgjy1KaASU=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-478-X_M4Ji--NwyqKflo2l_tZQ-1; Fri, 16 Dec 2022 11:33:24 -0500
-X-MC-Unique: X_M4Ji--NwyqKflo2l_tZQ-1
-Received: by mail-io1-f72.google.com with SMTP id b24-20020a056602219800b006e2bf9902cbso1590079iob.4
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 08:33:24 -0800 (PST)
+        with ESMTP id S231630AbiLPQdp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 11:33:45 -0500
+Received: from mail-oa1-x30.google.com (mail-oa1-x30.google.com [IPv6:2001:4860:4864:20::30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B95A7F09
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 08:33:44 -0800 (PST)
+Received: by mail-oa1-x30.google.com with SMTP id 586e51a60fabf-1322d768ba7so3905871fac.5
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 08:33:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ikyShjz8bCnOuVG2FrXIyeFfnEFNbKtS3+YKrJrfDzk=;
+        b=C5FlGKQVSe83KlYXSW/Rb5Ao+TYgwLxKdXSSk7bG4r9JB5CXEx8h09YRBonS3QUcPY
+         KKm0+86REt6Y1+4XiPzS9+WopZZxE8fFo6tD/Ov90PWn3idLCzoL6IvACXl8etGvLHql
+         Bho40ZGJSTG/KnnfOhCsj2NXU7m197/EXdi7KHsoj7/kJeqJBmkIyBASAroCRZ/TktAC
+         +RwlTr9NfAPKvaRgfzaT2KqM3JL04y50fqWGnZ0nBVfFogXgQYUZ7QZWBMH5qe4lhaom
+         2Koj6vuL3alc4934XpFrJYYuhmqgfuV1DViXWAVkRNtIzPL1ir8zObSI+Qe0AWJIqBt9
+         hEOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Z5m/uTP5bjpIgKQii7paVPxnHjd7vJJPvXm/y28JFgA=;
-        b=jrZ4no5bCxdw5rHVkziRb14v3xifpbRvTkToYOJGYD2lrNQm3fLJGJKFKL/Rjt7s7N
-         8PT1Q6WJZI3LhJxceIu5XCgxIeFgMAHvvPTriJB5Xmy9jkeSTfpxH/tep8SPc8hDiMDK
-         lAMBWeTS2hxoK3eHHc46DF9YjLv70PxXc0ypVzhQQZsywkjkmBivqX6OHqPV0rGyRbnm
-         4JVJsXO8O458/UgQUilkBGYSlSvQ1dRjkrNvoyB9wp+2QJGZ03ytdW8uqkZt55l1+vyf
-         /28p9RWBeCnIViZ9/ARRXXkjdv50PrBsBeHfplZ+A+QKwsdpEr/6rFGpZdEeO5CiXMGP
-         sV8w==
-X-Gm-Message-State: ANoB5pnBCP/apY2spy6qrE/VFtK9T7T6GDhJo8WcUm88tvhY33RW0UA+
-        gu7I/IDWTGMrVIvqbo2+J6jZnChM6LZwQ6Ql7mO+6kqRXo9MyaBwwLgSlMdDLymi3Y7v/FXw7Oh
-        hj9N5xpMMhLVy
-X-Received: by 2002:a05:6e02:b4a:b0:303:2b9b:8338 with SMTP id f10-20020a056e020b4a00b003032b9b8338mr19278345ilu.31.1671208403830;
-        Fri, 16 Dec 2022 08:33:23 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf4JNU4S6VAxXZMo8QS9vBe6QThOe0RcqtamxXJishzuOAknEvztOSjUkh8dtM/OYWyYgIF1PQ==
-X-Received: by 2002:a05:6e02:b4a:b0:303:2b9b:8338 with SMTP id f10-20020a056e020b4a00b003032b9b8338mr19278331ilu.31.1671208403549;
-        Fri, 16 Dec 2022 08:33:23 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id u11-20020a92da8b000000b003033505d81esm771329iln.58.2022.12.16.08.33.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Dec 2022 08:33:23 -0800 (PST)
-Date:   Fri, 16 Dec 2022 09:33:21 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Steven Sistare <steven.sistare@oracle.com>
-Cc:     Jason Gunthorpe <jgg@nvidia.com>, kvm@vger.kernel.org,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH V5 2/7] vfio/type1: prevent locked_vm underflow
-Message-ID: <20221216093321.414b13f8.alex.williamson@redhat.com>
-In-Reply-To: <68cbc774-4c2d-c29a-41cc-fee24af89604@oracle.com>
-References: <1671141424-81853-1-git-send-email-steven.sistare@oracle.com>
-        <1671141424-81853-3-git-send-email-steven.sistare@oracle.com>
-        <Y5x8HoAEJA7r8ko+@nvidia.com>
-        <12c07702-ac7a-7e62-8bea-1f38055dfbf3@oracle.com>
-        <20221216091034.4c1cac89.alex.williamson@redhat.com>
-        <68cbc774-4c2d-c29a-41cc-fee24af89604@oracle.com>
-Organization: Red Hat
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ikyShjz8bCnOuVG2FrXIyeFfnEFNbKtS3+YKrJrfDzk=;
+        b=V4gbeFRxky1zNUsgJMmm3lUJmiA5LW8MyrSTmQdlaHlC4CDGhVAkeqM5n0SrybqMcv
+         2hBmFsHVUQmK6JCOtdkdsyh0IHBn1acXavAGoMxIXJueLo/ZI5G7Ga4y0srpKF7AFGY5
+         WFGDVyqRHvs9wSWpSi43CiAigoTQIy+o211Ikh9I9jDvqMvV2f/4I0BDIymJSBWLcAOH
+         6d7QE3j2GTypga2/AUhdJIaqXIPRfh7+YlVtviIzGXI5MQOroolumow7XoYMxwNpU8Vd
+         bwjCB9QGCAxoDqJ7gr1/T1M6ZIyxeVMpr/szplXkxvP29/hVRadvGx7Ec9z54kKxNvh2
+         mlYQ==
+X-Gm-Message-State: AFqh2koSXrfH4KytpaGS6gfy9ssKLMy+6EMHSj4v4CgQis0TE456wpiU
+        xyZN1h8lc6kXMUdzxZe8nGLsTz/CB/A=
+X-Google-Smtp-Source: AMrXdXtaiWb9g3+Gs/cXcWNJFII9MVarhj/56xxwQ1vf3Jy8KOWR0uBC25GlRt2Dn6pS0/xaPcSOZw==
+X-Received: by 2002:a05:6870:e246:b0:14b:da26:5248 with SMTP id d6-20020a056870e24600b0014bda265248mr894039oac.19.1671208424005;
+        Fri, 16 Dec 2022 08:33:44 -0800 (PST)
+Received: from [192.168.68.106] (201-43-103-101.dsl.telesp.net.br. [201.43.103.101])
+        by smtp.gmail.com with ESMTPSA id w23-20020a056870b39700b0014b8347e1e3sm1141099oap.12.2022.12.16.08.33.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Dec 2022 08:33:43 -0800 (PST)
+Message-ID: <47b89df9-4977-75b2-6f60-092e147b1305@gmail.com>
+Date:   Fri, 16 Dec 2022 13:33:39 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH-for-8.0 1/4] target/ppc/kvm: Add missing "cpu.h" and
+ "exec/hwaddr.h"
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
+        kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        Greg Kurz <groug@kaod.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Markus Armbruster <armbru@redhat.com>
+References: <20221213123550.39302-1-philmd@linaro.org>
+ <20221213123550.39302-2-philmd@linaro.org>
+Content-Language: en-US
+From:   Daniel Henrique Barboza <danielhb413@gmail.com>
+In-Reply-To: <20221213123550.39302-2-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 16 Dec 2022 11:16:59 -0500
-Steven Sistare <steven.sistare@oracle.com> wrote:
 
-> On 12/16/2022 11:10 AM, Alex Williamson wrote:
-> > On Fri, 16 Dec 2022 10:42:13 -0500
-> > Steven Sistare <steven.sistare@oracle.com> wrote:
-> >   
-> >> On 12/16/2022 9:09 AM, Jason Gunthorpe wrote:  
-> >>> On Thu, Dec 15, 2022 at 01:56:59PM -0800, Steve Sistare wrote:    
-> >>>> When a vfio container is preserved across exec, the task does not change,
-> >>>> but it gets a new mm with locked_vm=0.  If the user later unmaps a dma
-> >>>> mapping, locked_vm underflows to a large unsigned value, and a subsequent
-> >>>> dma map request fails with ENOMEM in __account_locked_vm.
-> >>>>
-> >>>> To avoid underflow, grab and save the mm at the time a dma is mapped.
-> >>>> Use that mm when adjusting locked_vm, rather than re-acquiring the saved
-> >>>> task's mm, which may have changed.  If the saved mm is dead, do nothing.
-> >>>>
-> >>>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> >>>> ---
-> >>>>  drivers/vfio/vfio_iommu_type1.c | 17 ++++++++++-------
-> >>>>  1 file changed, 10 insertions(+), 7 deletions(-)    
-> >>>
-> >>> Add fixes lines and a CC stable    
-> >>
-> >> This predates the update vaddr functionality, so AFAICT:
-> >>
-> >>     Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
-> >>
-> >> I'll wait on cc'ing stable until alex has chimed in.  
-> > 
-> > Technically, adding the stable Cc tag is still the correct approach per
-> > the stable process docs, but the Fixes: tag alone is generally
-> > sufficient to crank up the backport engines.  The original
-> > implementation is probably the correct commit to identify, exec was
-> > certainly not considered there.  Thanks,  
+
+On 12/13/22 09:35, Philippe Mathieu-Daudé wrote:
+> kvm_ppc.h is missing various declarations from "cpu.h":
 > 
-> Should I cc stable on the whole series, or re-send individually?  If the
-> latter, which ones?
+>    target/ppc/kvm_ppc.h:128:40: error: unknown type name 'CPUPPCState'; did you mean 'CPUState'?
+>    static inline int kvmppc_get_hypercall(CPUPPCState *env,
+>                                           ^~~~~~~~~~~
+>                                           CPUState
+>    include/qemu/typedefs.h:45:25: note: 'CPUState' declared here
+>    typedef struct CPUState CPUState;
+>                            ^
+>    target/ppc/kvm_ppc.h:134:40: error: unknown type name 'PowerPCCPU'
+>    static inline int kvmppc_set_interrupt(PowerPCCPU *cpu, int irq, int level)
+>                                           ^
+>    target/ppc/kvm_ppc.h:285:38: error: unknown type name 'hwaddr'
+>                                         hwaddr ptex, int n)
+>                                         ^
+>    target/ppc/kvm_ppc.h:220:15: error: unknown type name 'target_ulong'
+>    static inline target_ulong kvmppc_configure_v3_mmu(PowerPCCPU *cpu,
+>                  ^
+>    target/ppc/kvm_ppc.h:286:38: error: unknown type name 'ppc_hash_pte64_t'
+>    static inline void kvmppc_read_hptes(ppc_hash_pte64_t *hptes,
+>                                         ^
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> ---
 
-Only for the Fixes: commits, and note that Cc: stable is effectively
-just a tag like Fixes:, you don't actually need to copy the stable@vger
-list on the patch (and IIRC you'll get some correctional email if you
-do).  Thanks,
+Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-Alex
-
+>   target/ppc/kvm_ppc.h | 3 +++
+>   1 file changed, 3 insertions(+)
+> 
+> diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+> index ee9325bf9a..5fd9753953 100644
+> --- a/target/ppc/kvm_ppc.h
+> +++ b/target/ppc/kvm_ppc.h
+> @@ -9,6 +9,9 @@
+>   #ifndef KVM_PPC_H
+>   #define KVM_PPC_H
+>   
+> +#include "exec/hwaddr.h"
+> +#include "cpu.h"
+> +
+>   #define TYPE_HOST_POWERPC_CPU POWERPC_CPU_TYPE_NAME("host")
+>   
+>   #ifdef CONFIG_KVM
