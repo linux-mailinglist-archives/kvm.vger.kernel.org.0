@@ -2,71 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 132F464E684
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 04:58:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECEA664E6BB
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 05:37:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbiLPD61 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 15 Dec 2022 22:58:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34280 "EHLO
+        id S229814AbiLPEhe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 15 Dec 2022 23:37:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbiLPD6Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 15 Dec 2022 22:58:25 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A594AF19;
-        Thu, 15 Dec 2022 19:58:25 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id v13-20020a17090a6b0d00b00219c3be9830so1161664pjj.4;
-        Thu, 15 Dec 2022 19:58:25 -0800 (PST)
+        with ESMTP id S229488AbiLPEhd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 15 Dec 2022 23:37:33 -0500
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E32FB1147E;
+        Thu, 15 Dec 2022 20:37:31 -0800 (PST)
+Received: by mail-pg1-x532.google.com with SMTP id r18so986096pgr.12;
+        Thu, 15 Dec 2022 20:37:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uaxgo5LlIOi0S9JhLYqDMZ4gD6Tc+L6skMURu3UvP5M=;
-        b=VhKJWMt/vBbVHTOsROGaTOiEgWFUEkhaYjOnufZYir75TQ1WusnkY8EayMfHzsOIHM
-         MI9f1yV5IvtPNbGxgpeL5G25+BhhGZcoSOQAw7tCQznHWT46Zbr6aa/fAgpnB6q6WVlH
-         tnKzteOV0o9ac11RfS0XPTIqRXrin9XIvWWYXDomMjAW4Yt7VwaXR7QR0udOPfD84rlY
-         b8ebobqKHhSF5c217HYTCAu5MxYLNT17uD7PPPUcBCLttBp5nYoxvcxtjlZyfL5edYNF
-         DTZVP8IfOyc8kjqWLYwipHwKAOFFk23xcVwcrX1/80ktMo8/n5/vfoD1hABfFATe3u+s
-         h1gQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XLygs21yUm+BsQ9K/jaILqjtoVN7cCv+GmldKd5jCoY=;
+        b=atuW7kj1tICjX6XOEoGlMKRElIbgy8WI/deoKifcFx1519QZRpDCOoxmKj7EgE2l4w
+         PKzJI7L2ZbVuy2LOhWOolJwT0c6HGC5z3GYIC7j6xM/AunIUu1/hMOhZv9S06C7VFhC1
+         4Q2nDbmd0YUF9RndxPqP2p/GdMMZ3K4yhoxZk3FVJ0hYXbi4IN4jZVfHJrGPnQoXbTYJ
+         YAB5z7iNwRy7E4EGbWHbVIEyT9ICXQ8iqfiE3z4SLn1NrJW7NLywpAeLKJB/g9wvfmaM
+         r5jcdkMrnO+dY5EbBAyyZATVFCQYX6igkBalPuLJ6BkhstYEmOV58RsJNRueXOX7Ax8G
+         6CbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uaxgo5LlIOi0S9JhLYqDMZ4gD6Tc+L6skMURu3UvP5M=;
-        b=Aqm+f7BELEuCYcczv17DZs5Uze4/4mEZyWJq3kYNnUkTwS/MkjTmoijOik4y1/LqfD
-         zYyuCkkrJbA8pZt1Lx/uNrpoyk4a+nisEbVsUKv/AuxEXNHDH02KP9hQ1+x31vwh9sOc
-         /qeURm+ulJhk+i1u0+JieY0EVuQvYANzmfptrEsQINmKRXtIdf+UGgoLKZExdNtVT/Wh
-         Nlcu9v9+RLngw7YGRkD0HUhJrTELCiUCGuj0N1IPpM0fnP/JgUSY9mVkC0MxZ8AsTVQA
-         fULqFdijUFSwAf9oV+Ifyb6pc8F0tHsI9SaxIo3OU4U7U3lGRSIeuexfyv8SpPhVFfw7
-         81Dw==
-X-Gm-Message-State: ANoB5plhc+HKx+KUu5KQg9PU5jeNHRv33Tt2kbFczsZot6JtzoRmUcjg
-        yVM6LbComgKVYuz2FNeJXpVDZYRtkeA=
-X-Google-Smtp-Source: AA0mqf5T364XIYvr0zuGPJhY9BDJUvUGHREqsmLjaIaY2M9pI3/LXv6EP0TdJcMdcaeWGGea7BLTEg==
-X-Received: by 2002:a17:902:e811:b0:189:d8fb:152d with SMTP id u17-20020a170902e81100b00189d8fb152dmr44450718plg.25.1671163104670;
-        Thu, 15 Dec 2022 19:58:24 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id v17-20020a63d551000000b00477bdc1d5d5sm499680pgi.6.2022.12.15.19.58.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Dec 2022 19:58:24 -0800 (PST)
-Date:   Thu, 15 Dec 2022 19:58:23 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     Binbin Wu <binbin.wu@linux.intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v10 106/108] Documentation/virt/kvm: Document on Trust
- Domain Extensions(TDX)
-Message-ID: <20221216035823.GE527635@ls.amr.corp.intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <fcf376f0f7703d06b6e7466e95cea624b58f746a.1667110240.git.isaku.yamahata@intel.com>
- <faf65da9-aeb4-d7b2-0e60-995848e47d14@linux.intel.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XLygs21yUm+BsQ9K/jaILqjtoVN7cCv+GmldKd5jCoY=;
+        b=1RDrx1hZ8KHNAUD1/NRRTJ1CPTNhPrld6r2CD6nnJSi5rEybp6koCneM3aNZte9UBO
+         cmDjJ7ObK2xdG8AixelWloZR1cGFaWt+L23EdMB1GSOiKHoLErguHgiF04Q24K6kjbD5
+         JYKpKNAJPInTwyfZgymWBhR8UVMAwWJA3TlJ8iuR6zH16YLbK3AbPB0gt6yB/sytYR7z
+         9dE/ikpFRmcOiB+qpcLUFGuTdO1j9+qdCFa5ifoItvkfjSFE2vGjal+EbK/6hRegywLh
+         HDE5OPllMYS9sV6BAQmdjbenUXor3mHmKymQM3O0RYgsCJqIKaQxUJBTuQez460TA7iR
+         2Zmw==
+X-Gm-Message-State: AFqh2kqo1LdKxAEzULNywHgPzgjgnME/mdLFRsdSc6n6vPpAdXnpMm9V
+        qM3EpT/p1resnd9qPpoHFbF1TFpJvVYrvz4OC/mm9WQjBiU=
+X-Google-Smtp-Source: AMrXdXt5JWumad1PiboheGKsXmVaNjeH8snNXdAqZ+Iojn+pij8j6t8nwEgKCk6P8kauAlDPnokzu+Szv1Dew2bD4rM=
+X-Received: by 2002:a63:584c:0:b0:484:2672:2c6a with SMTP id
+ i12-20020a63584c000000b0048426722c6amr142358pgm.535.1671165451321; Thu, 15
+ Dec 2022 20:37:31 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <faf65da9-aeb4-d7b2-0e60-995848e47d14@linux.intel.com>
+References: <639b23c8.DdUNqMCLdxZ7gLv2%lkp@intel.com>
+In-Reply-To: <639b23c8.DdUNqMCLdxZ7gLv2%lkp@intel.com>
+From:   Vincent Mailhol <vincent.mailhol@gmail.com>
+Date:   Fri, 16 Dec 2022 13:37:20 +0900
+Message-ID: <CAMZ6RqJ7-GTPe7tNdhTYCF6OrnagfNL_7EXrhn5HD=YB8dtCGw@mail.gmail.com>
+Subject: Re: [linux-next:master] BUILD REGRESSION 459c73db4069c27c1d4a0e20d055b837396364b8
+To:     kernel test robot <lkp@intel.com>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        loongarch@lists.linux.dev, linuxppc-dev@lists.ozlabs.org,
+        linux-xfs@vger.kernel.org, linux-parisc@vger.kernel.org,
+        linux-omap@vger.kernel.org, linux-can@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, kvm@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        Linux Memory Management List <linux-mm@kvack.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -77,48 +71,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 25, 2022 at 11:49:08AM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
+On Tue. 15 Dec. 2022 at 22:57, kernel test robot <lkp@intel.com> wrote:
+> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+> branch HEAD: 459c73db4069c27c1d4a0e20d055b837396364b8  Add linux-next specific files for 20221215
+>
+> Error/Warning reports:
 
-> > +New KVM API, ioctl (sub)command, to manage TD VMs
-> > +-------------------------------------------------
-> > +Additional KVM API
-> API -> APIs
-> >   are needed to control TD VMs. The operations on TD
-> > +VMs are specific to TDX.
-> > +
-> > +- Piggyback and repurpose KVM_MEMORY_ENCRYPT_OP
-> > +
-> > +  Although not all operation isn't memory encryption,
-> 
-> How to understand it?
-> 
-> 
-> > repupose to get
+(...)
 
-How about the followings?
+> Documentation/networking/devlink/etas_es58x.rst: WARNING: document isn't included in any toctree
 
-New KVM API, ioctl (sub)command, to manage TD VMs
--------------------------------------------------
-Additional KVM APIs are needed to control TD VMs. The operations on TD
-VMs are specific to TDX.
+A patch for this warning is on its way:
+  https://lore.kernel.org/linux-next/20221213051136.721887-1-mailhol.vincent@wanadoo.fr/T/#u
 
-- Piggyback and repurpose KVM_MEMORY_ENCRYPT_OP
+(...)
 
-  Although operations for TD VMs aren't necessarily related to memory
-  encryption, define sub operations of KVM_MEMORY_ENCRYPT_OP for TDX specific
-  ioctls.
-
-  Pros:
-
-  - No major change in common x86 KVM code.
-  - Follows the SEV case.
-
-  Cons:
-
-  - The sub operations of KVM_MEMORY_ENCRYPT_OP aren't necessarily memory
-    encryption, but operations on TD VMs.
-
-
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+Yours sincerely,
+Vincent Mailhol
