@@ -2,135 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FC9364EF38
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 17:34:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36FED64EF3D
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 17:35:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231582AbiLPQe1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 11:34:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36662 "EHLO
+        id S231320AbiLPQe7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 11:34:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231631AbiLPQeP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 11:34:15 -0500
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 979483885
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 08:34:14 -0800 (PST)
-Received: by mail-ot1-x334.google.com with SMTP id v19-20020a9d5a13000000b0066e82a3872dso1667466oth.5
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 08:34:14 -0800 (PST)
+        with ESMTP id S231277AbiLPQe4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 11:34:56 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A1EE2D
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 08:34:55 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id t17so3000449pjo.3
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 08:34:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=P2e7AtmItaDVcZaaxrpoeObvU+3azD/QhwCEZ5e4+FY=;
-        b=bc7oZhD4qn6w5YgbGlSb0r/KBfW+eMLS1ApsLfGNPDBjMZc2OVWb031cBzF2Ol4Kl6
-         OjtcIbuGUXhUuHDWIgkDVU6w4oMeL1iAUe5HfhJr6ZtcJ+3//QZYGi9SPbSpCtGaw8NO
-         +kbBdIgxDvlCnrIl/iazViJzk+cXpCASQtcu4n6i2h7tBR/jOFgjLWV0Ibua7vUIhv60
-         Xrk+3lpVF3kuuAybLft6gpc3HY1emKDRZju2B/AYIW47oAGGWnPTttZ6g8np/3dTSNRN
-         X/A1H0CWgtM1y51Ywg0GfqHzc0651fq+fZQGYkO7qAj6BY1JhROOxYWTTteLXgk/v6ag
-         t0ww==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DaN+b2cOC3LbMhY1LUaQCaKn6ix8xCEgPdvcQ89ES2o=;
+        b=KLePxd5ddrrB3BabRqKt1pwOAABnJkMBXauuEDa6M3B5+vRvQc/zmwesDHHeJbZDHI
+         9gFh379DRMr8GFOTsydMEI60RWjxDMZ4ydIhaHIpQ4XWtthTsFsSrERnNuX36HngVuF+
+         g7qjBUJmGZ6cy25e4VqLRZ3cTtnECf8vS1jRoQN7zbGkvYLF9BAWylI0kD1O2vVaYbo5
+         BiBVCkgMQLmL3LadZu/3yGbCe+g9yttxAbAF3eZQFs64nj3YITSnA10KMX/KDAOuFBmO
+         wpsPNpXJkikii1zQvBkoXwhcKavYidmjKUl+bQ0p/JlAfwrUVU1ofqDtM4N0mmEigvCp
+         GyNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P2e7AtmItaDVcZaaxrpoeObvU+3azD/QhwCEZ5e4+FY=;
-        b=Id3BvbZZ/tQSyMlJY0HlN96xDjzVWeD/++UxlKD7RNGUUi03Uppanw0phs+//3AyVm
-         XxklcqPIDaK9MFpZICnxU55Tv2uip14fIsG7vVcVmSQiY0nBoLVlKaSlsrgMNh2slv0w
-         gwUT9ZZhfW2LD/yohemvQRof0aV/kFnhWW8E1amKrK8XK6XRBbuIzAD++SvPMNebiaj0
-         gBtsXkvsiPSYyxoCvB4G1GxZ/IRlAcEpfwiYjL9+RpswsXSe8e9AEFxIsEe3OosXyAjg
-         96bEe57aeyYPsYM8Vb4zCnMWsQgYRq/E9Jok4Ixq19hbSqjGfhc7o/280w5ldjNPB/am
-         Zbaw==
-X-Gm-Message-State: AFqh2krNGjNxhdN3rttFDPoe2a664Uo1nNkPQD9GnbR+CYgu6b/tx2T+
-        GhDkq4h2PyCWVueafSaqQl4=
-X-Google-Smtp-Source: AMrXdXs+2OkfmuHGpgYpx2jvQTw3h72iszdz45Si5eBCPO21IKfn1pl2Yxs2wuJ228X+S+ojkxAyxA==
-X-Received: by 2002:a05:6830:93:b0:676:1802:661f with SMTP id a19-20020a056830009300b006761802661fmr2048378oto.25.1671208453875;
-        Fri, 16 Dec 2022 08:34:13 -0800 (PST)
-Received: from [192.168.68.106] (201-43-103-101.dsl.telesp.net.br. [201.43.103.101])
-        by smtp.gmail.com with ESMTPSA id u19-20020a0568301f5300b0066da36d2c45sm1022445oth.22.2022.12.16.08.34.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Dec 2022 08:34:13 -0800 (PST)
-Message-ID: <667d1c5c-19fc-c5f0-2474-519230ae8a94@gmail.com>
-Date:   Fri, 16 Dec 2022 13:34:09 -0300
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DaN+b2cOC3LbMhY1LUaQCaKn6ix8xCEgPdvcQ89ES2o=;
+        b=eO0neWHcjgkE3/WVwrIeM9Cy8HM9cEMHU0XjWxBRluY/u3OZqdGCj6W4RcYXPp4mjW
+         fh3asTD16ouCg8NfCZiP9pLnZB3xvxog+bVgrlGu8CQGSTdPvO9rny9a4wfgrx3GdifL
+         2WjjmbTXqDce8cPo0/uel4RYtwuzy7ISs+OnLzAPMJecRkLI8v+6CfiBqpfoUxWlGq8B
+         kCk8S+jli0xf3QzwmSaWA1hiDJAtLZVTRA1RJ3InYrAZyE+cIJRje/qouwaqUfwmm8PL
+         agBruypxNxahTDKbae9oK1ZOUJ9SPUK2wTLb2DcD9XJcF5da50zoncqywveLYvXckj0/
+         EUpA==
+X-Gm-Message-State: AFqh2kqhrzF6uSvYGmH4MZjG8uncmtvzLqnWwliTvPx6jY41+le42IUS
+        KXTeRmL1LLBuUkW4wgxw5rIqEku/pfM0GLE0
+X-Google-Smtp-Source: AMrXdXvIPWWHwqJEiDp0RmqVrjPtDLmehyEJGVbZ0e+qr5uFEvMXkCr+wO5HU2diEY/WBsRt7r5mWg==
+X-Received: by 2002:a17:90a:e28d:b0:218:84a0:65eb with SMTP id d13-20020a17090ae28d00b0021884a065ebmr486899pjz.1.1671208495379;
+        Fri, 16 Dec 2022 08:34:55 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id mm7-20020a17090b358700b002191e769546sm1603599pjb.4.2022.12.16.08.34.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Dec 2022 08:34:54 -0800 (PST)
+Date:   Fri, 16 Dec 2022 16:34:50 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, dwmw2@infradead.org,
+        paul@xen.org
+Subject: Re: [PATCH v4 1/2] KVM: MMU: Introduce 'INVALID_GFN' and use it for
+ GFN values
+Message-ID: <Y5yeKucYYfYOMXqp@google.com>
+References: <20221216085928.1671901-1-yu.c.zhang@linux.intel.com>
+ <20221216085928.1671901-2-yu.c.zhang@linux.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH-for-8.0 3/4] hw/ppc/spapr: Reduce "vof.h" inclusion
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        Greg Kurz <groug@kaod.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>
-References: <20221213123550.39302-1-philmd@linaro.org>
- <20221213123550.39302-4-philmd@linaro.org>
-From:   Daniel Henrique Barboza <danielhb413@gmail.com>
-In-Reply-To: <20221213123550.39302-4-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221216085928.1671901-2-yu.c.zhang@linux.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 12/13/22 09:35, Philippe Mathieu-Daudé wrote:
-> Currently objects including "hw/ppc/spapr.h" are forced to be
-> target specific due to the inclusion of "vof.h" in "spapr.h".
+On Fri, Dec 16, 2022, Yu Zhang wrote:
+> Currently, KVM xen and its shared info selftest code uses
+> 'GPA_INVALID' for GFN values, but actually it is more accurate
+> to use the name 'INVALID_GFN'. So just add a new definition
+> and use it.
 > 
-> "spapr.h" only uses a Vof pointer, so doesn't require the structure
-> declaration. The only place where Vof structure is accessed is in
-> spapr.c, so include "vof.h" there, and forward declare the structure
-> in "spapr.h".
+> No functional changes intended.
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+> Suggested-by: David Woodhouse <dwmw2@infradead.org>
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
 > ---
-
-Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-
->   hw/ppc/spapr.c         | 1 +
->   include/hw/ppc/spapr.h | 3 ++-
->   2 files changed, 3 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/xen.c                                   | 4 ++--
+>  include/linux/kvm_types.h                            | 1 +
+>  tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c | 4 ++--
+>  3 files changed, 5 insertions(+), 4 deletions(-)
 > 
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 66b414d2e9..f38a851ee3 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -62,6 +62,7 @@
->   #include "hw/ppc/fdt.h"
->   #include "hw/ppc/spapr.h"
->   #include "hw/ppc/spapr_vio.h"
-> +#include "hw/ppc/vof.h"
->   #include "hw/qdev-properties.h"
->   #include "hw/pci-host/spapr.h"
->   #include "hw/pci/msi.h"
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index 04a95669ab..5c8aabd444 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -12,7 +12,6 @@
->   #include "hw/ppc/spapr_xive.h"  /* For SpaprXive */
->   #include "hw/ppc/xics.h"        /* For ICSState */
->   #include "hw/ppc/spapr_tpm_proxy.h"
-> -#include "hw/ppc/vof.h"
->   
->   struct SpaprVioBus;
->   struct SpaprPhbState;
-> @@ -22,6 +21,8 @@ typedef struct SpaprEventLogEntry SpaprEventLogEntry;
->   typedef struct SpaprEventSource SpaprEventSource;
->   typedef struct SpaprPendingHpt SpaprPendingHpt;
->   
-> +typedef struct Vof Vof;
-> +
->   #define HPTE64_V_HPTE_DIRTY     0x0000000000000040ULL
->   #define SPAPR_ENTRY_POINT       0x100
->   
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index d7af40240248..6908a74ab303 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -41,7 +41,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
+>  	int ret = 0;
+>  	int idx = srcu_read_lock(&kvm->srcu);
+>  
+> -	if (gfn == GPA_INVALID) {
+> +	if (gfn == INVALID_GFN) {
+
+Grrr!  This magic value is ABI, as "gfn == -1" yields different behavior than a
+random, garbage gfn.
+                                                                                
+So, sadly, we can't simply introduce INVALID_GFN here, and instead need to do
+something like:
+
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 20522d4ba1e0..2d31caaf812c 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1766,6 +1766,7 @@ struct kvm_xen_hvm_attr {
+                __u8 vector;
+                __u8 runstate_update_flag;
+                struct {
++#define KVM_XEN_INVALID_GFN    (~0ull)
+                        __u64 gfn;
+                } shared_info;
+                struct {
+
+>  		kvm_gpc_deactivate(gpc);
+>  		goto out;
+>  	}
