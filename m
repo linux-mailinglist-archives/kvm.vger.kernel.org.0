@@ -2,42 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7525564E8D9
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 10:49:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5BC7164E8DA
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 10:49:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230029AbiLPJtj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 04:49:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38986 "EHLO
+        id S230216AbiLPJtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 04:49:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229588AbiLPJtg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 04:49:36 -0500
+        with ESMTP id S230163AbiLPJtl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 04:49:41 -0500
 Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6407D31DFB
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 01:49:35 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05EB147328
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 01:49:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671184175; x=1702720175;
+  t=1671184180; x=1702720180;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bt9TYLqZw4RoghheoYihoIHhFL6ZTXmW3xA6aogLkwo=;
-  b=fHzKGfaZZn9aMjOfKrksTyJg4ZIc3NXVfNOaIl7rK6d2Z7qqp/BB+6Ut
-   lXH0nGYFzLg4WEgZTfK+vcKI3Mzl9gVjU8L8+/0M7agDlYQQGwLUHbxh1
-   v97QymvYFuKfwSng2PQO2ljI4+PgxMq5+o24ga+WK50UFCkoUrugtKQug
-   mtcwOlJVs79J1cvhZwQgl6nYhZ/B7Uf8i5DZRe1IweFrpZvuOpce4iOhi
-   W0x80x2r3d7j54gmpgCZCpBsHHogUuooWMcXHMQUJHntSW3ijeXyLHvOe
-   q/a/a+UcfUVa9NcrM36bz4Jw5cCNcRZkwNmLWDu68FfpCErskBx8Vw5CH
+  bh=gShEjJ2hfl0fm1FY2ClSZw9DBfUVJQGyj8JNfRa1rXQ=;
+  b=U67nimpJWRQwdLqAfUTFf8zcW7g1ly7Ryc+lqxzjRn+sq93EMpg0wzCV
+   sXA3F4tonTK/FrgxvsTFEl/CN+zdMfsUcp0Rxppa0qRdMtTv9zwNZDYu0
+   2rwii1PkroVQh2EVvyl8jhI4LEUBOSVEDiHbSniyBlS/AwcykX2wluj9f
+   Lqp+WmZAhZVYWHNJlFOAtMUNL0+mJgfCCNjbfx1N9v13SSnmQDhELZoY0
+   dsH9liYUkQAfl5iUrSj7034cGfe5ozGqV9nABThCiq71rHkIr3oRbL6Ni
+   SbsL71FROL/CB9TQcujLpMPKdd7UtLmjOTSjYemtpaHCw7jSCrN+QF0Yf
    Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10562"; a="299270081"
+X-IronPort-AV: E=McAfee;i="6500,9779,10562"; a="299270092"
 X-IronPort-AV: E=Sophos;i="5.96,249,1665471600"; 
-   d="scan'208";a="299270081"
+   d="scan'208";a="299270092"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2022 01:49:35 -0800
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2022 01:49:39 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10562"; a="649752702"
+X-IronPort-AV: E=McAfee;i="6500,9779,10562"; a="649752713"
 X-IronPort-AV: E=Sophos;i="5.96,249,1665471600"; 
-   d="scan'208";a="649752702"
+   d="scan'208";a="649752713"
 Received: from skxmcp01.bj.intel.com ([10.240.193.86])
-  by orsmga002.jf.intel.com with ESMTP; 16 Dec 2022 01:49:31 -0800
+  by orsmga002.jf.intel.com with ESMTP; 16 Dec 2022 01:49:35 -0800
 From:   Yu Zhang <yu.c.zhang@linux.intel.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
@@ -45,9 +45,9 @@ Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
         suzuki.poulose@arm.com, oliver.upton@linux.dev,
         catalin.marinas@arm.com, will@kernel.org, dwmw2@infradead.org,
         paul@xen.org
-Subject: [PATCH v4 1/2] KVM: MMU: Introduce 'INVALID_GFN' and use it for GFN values
-Date:   Fri, 16 Dec 2022 16:59:27 +0800
-Message-Id: <20221216085928.1671901-2-yu.c.zhang@linux.intel.com>
+Subject: [PATCH v4 2/2] KVM: MMU: Make the definition of 'INVALID_GPA' common
+Date:   Fri, 16 Dec 2022 16:59:28 +0800
+Message-Id: <20221216085928.1671901-3-yu.c.zhang@linux.intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20221216085928.1671901-1-yu.c.zhang@linux.intel.com>
 References: <20221216085928.1671901-1-yu.c.zhang@linux.intel.com>
@@ -62,77 +62,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, KVM xen and its shared info selftest code uses
-'GPA_INVALID' for GFN values, but actually it is more accurate
-to use the name 'INVALID_GFN'. So just add a new definition
-and use it.
+KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in
+kvm_types.h, and it is used by ARM and X86 xen code. We do
+not need a specific definition of 'INVALID_GPA' for X86.
 
-No functional changes intended.
+Instead of using the common 'GPA_INVALID' for X86, replace
+the definition of 'GPA_INVALID' with 'INVALID_GPA', and
+change the users of 'GPA_INVALID', so that the diff can be
+smaller. Also because the name 'INVALID_GPA' tells the user
+we are using an invalid GPA, while the name 'GPA_INVALID'
+is emphasizing the GPA is an invalid one.
 
-Suggested-by: David Woodhouse <dwmw2@infradead.org>
+Also, add definition of 'INVALID_GFN' because it is more
+proper than 'INVALID_GPA' for GFN variables.
+
+No functional change intended.
+
 Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+Reviewed-by: Paul Durrant <paul@xen.org>
 ---
- arch/x86/kvm/xen.c                                   | 4 ++--
- include/linux/kvm_types.h                            | 1 +
- tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c | 4 ++--
- 3 files changed, 5 insertions(+), 4 deletions(-)
+ arch/arm64/include/asm/kvm_host.h |  4 ++--
+ arch/arm64/kvm/hypercalls.c       |  2 +-
+ arch/arm64/kvm/pvtime.c           |  8 ++++----
+ arch/x86/include/asm/kvm_host.h   |  2 --
+ arch/x86/kvm/xen.c                | 10 +++++-----
+ include/linux/kvm_types.h         |  2 +-
+ 6 files changed, 13 insertions(+), 15 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 001c8abe87fc..fcf96e9cc8cd 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -906,12 +906,12 @@ void kvm_arm_vmid_clear_active(void);
+ 
+ static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
+ {
+-	vcpu_arch->steal.base = GPA_INVALID;
++	vcpu_arch->steal.base = INVALID_GPA;
+ }
+ 
+ static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
+ {
+-	return (vcpu_arch->steal.base != GPA_INVALID);
++	return (vcpu_arch->steal.base != INVALID_GPA);
+ }
+ 
+ void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
+diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
+index c9f401fa01a9..64c086c02c60 100644
+--- a/arch/arm64/kvm/hypercalls.c
++++ b/arch/arm64/kvm/hypercalls.c
+@@ -198,7 +198,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
+ 		break;
+ 	case ARM_SMCCC_HV_PV_TIME_ST:
+ 		gpa = kvm_init_stolen_time(vcpu);
+-		if (gpa != GPA_INVALID)
++		if (gpa != INVALID_GPA)
+ 			val[0] = gpa;
+ 		break;
+ 	case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
+diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+index 78a09f7a6637..4ceabaa4c30b 100644
+--- a/arch/arm64/kvm/pvtime.c
++++ b/arch/arm64/kvm/pvtime.c
+@@ -19,7 +19,7 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+ 	u64 steal = 0;
+ 	int idx;
+ 
+-	if (base == GPA_INVALID)
++	if (base == INVALID_GPA)
+ 		return;
+ 
+ 	idx = srcu_read_lock(&kvm->srcu);
+@@ -40,7 +40,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
+ 	switch (feature) {
+ 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
+ 	case ARM_SMCCC_HV_PV_TIME_ST:
+-		if (vcpu->arch.steal.base != GPA_INVALID)
++		if (vcpu->arch.steal.base != INVALID_GPA)
+ 			val = SMCCC_RET_SUCCESS;
+ 		break;
+ 	}
+@@ -54,7 +54,7 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
+ 	struct kvm *kvm = vcpu->kvm;
+ 	u64 base = vcpu->arch.steal.base;
+ 
+-	if (base == GPA_INVALID)
++	if (base == INVALID_GPA)
+ 		return base;
+ 
+ 	/*
+@@ -89,7 +89,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+ 		return -EFAULT;
+ 	if (!IS_ALIGNED(ipa, 64))
+ 		return -EINVAL;
+-	if (vcpu->arch.steal.base != GPA_INVALID)
++	if (vcpu->arch.steal.base != INVALID_GPA)
+ 		return -EEXIST;
+ 
+ 	/* Check the address is in a valid memslot */
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index f35f1ff4427b..46e50cb6c9ca 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -134,8 +134,6 @@
+ #define INVALID_PAGE (~(hpa_t)0)
+ #define VALID_PAGE(x) ((x) != INVALID_PAGE)
+ 
+-#define INVALID_GPA (~(gpa_t)0)
+-
+ /* KVM Hugepage definitions for x86 */
+ #define KVM_MAX_HUGEPAGE_LEVEL	PG_LEVEL_1G
+ #define KVM_NR_PAGE_SIZES	(KVM_MAX_HUGEPAGE_LEVEL - PG_LEVEL_4K + 1)
 diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index d7af40240248..6908a74ab303 100644
+index 6908a74ab303..ec893276681c 100644
 --- a/arch/x86/kvm/xen.c
 +++ b/arch/x86/kvm/xen.c
-@@ -41,7 +41,7 @@ static int kvm_xen_shared_info_init(struct kvm *kvm, gfn_t gfn)
- 	int ret = 0;
- 	int idx = srcu_read_lock(&kvm->srcu);
+@@ -705,7 +705,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		BUILD_BUG_ON(offsetof(struct vcpu_info, time) !=
+ 			     offsetof(struct compat_vcpu_info, time));
  
--	if (gfn == GPA_INVALID) {
-+	if (gfn == INVALID_GFN) {
- 		kvm_gpc_deactivate(gpc);
- 		goto out;
- 	}
-@@ -659,7 +659,7 @@ int kvm_xen_hvm_get_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		if (kvm->arch.xen.shinfo_cache.active)
- 			data->u.shared_info.gfn = gpa_to_gfn(kvm->arch.xen.shinfo_cache.gpa);
+-		if (data->u.gpa == GPA_INVALID) {
++		if (data->u.gpa == INVALID_GPA) {
+ 			kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_info_cache);
+ 			r = 0;
+ 			break;
+@@ -719,7 +719,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		break;
+ 
+ 	case KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO:
+-		if (data->u.gpa == GPA_INVALID) {
++		if (data->u.gpa == INVALID_GPA) {
+ 			kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_time_info_cache);
+ 			r = 0;
+ 			break;
+@@ -739,7 +739,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 			r = -EOPNOTSUPP;
+ 			break;
+ 		}
+-		if (data->u.gpa == GPA_INVALID) {
++		if (data->u.gpa == INVALID_GPA) {
+ 			r = 0;
+ 		deactivate_out:
+ 			kvm_gpc_deactivate(&vcpu->arch.xen.runstate_cache);
+@@ -937,7 +937,7 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		if (vcpu->arch.xen.vcpu_info_cache.active)
+ 			data->u.gpa = vcpu->arch.xen.vcpu_info_cache.gpa;
  		else
--			data->u.shared_info.gfn = GPA_INVALID;
-+			data->u.shared_info.gfn = INVALID_GFN;
+-			data->u.gpa = GPA_INVALID;
++			data->u.gpa = INVALID_GPA;
+ 		r = 0;
+ 		break;
+ 
+@@ -945,7 +945,7 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
+ 		if (vcpu->arch.xen.vcpu_time_info_cache.active)
+ 			data->u.gpa = vcpu->arch.xen.vcpu_time_info_cache.gpa;
+ 		else
+-			data->u.gpa = GPA_INVALID;
++			data->u.gpa = INVALID_GPA;
  		r = 0;
  		break;
  
 diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index 76de36e56cdf..d21c0d7fee31 100644
+index d21c0d7fee31..b961043e664a 100644
 --- a/include/linux/kvm_types.h
 +++ b/include/linux/kvm_types.h
-@@ -41,6 +41,7 @@ typedef u64            gpa_t;
+@@ -40,7 +40,7 @@ typedef unsigned long  gva_t;
+ typedef u64            gpa_t;
  typedef u64            gfn_t;
  
- #define GPA_INVALID	(~(gpa_t)0)
-+#define INVALID_GFN	(~(gfn_t)0)
+-#define GPA_INVALID	(~(gpa_t)0)
++#define INVALID_GPA	(~(gpa_t)0)
+ #define INVALID_GFN	(~(gfn_t)0)
  
  typedef unsigned long  hva_t;
- typedef u64            hpa_t;
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index 721f6a693799..d65a23be88b1 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -20,7 +20,7 @@
- #include <sys/eventfd.h>
- 
- /* Defined in include/linux/kvm_types.h */
--#define GPA_INVALID		(~(ulong)0)
-+#define INVALID_GFN		(~(ulong)0)
- 
- #define SHINFO_REGION_GVA	0xc0000000ULL
- #define SHINFO_REGION_GPA	0xc0000000ULL
-@@ -419,7 +419,7 @@ static void *juggle_shinfo_state(void *arg)
- 
- 	struct kvm_xen_hvm_attr cache_destroy = {
- 		.type = KVM_XEN_ATTR_TYPE_SHARED_INFO,
--		.u.shared_info.gfn = GPA_INVALID
-+		.u.shared_info.gfn = INVALID_GFN
- 	};
- 
- 	for (;;) {
 -- 
 2.25.1
 
