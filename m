@@ -2,270 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EF94D64EDB5
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 16:18:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57AFE64EE0C
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 16:42:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231261AbiLPPSp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 10:18:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45126 "EHLO
+        id S230391AbiLPPmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 10:42:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230030AbiLPPSk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 10:18:40 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7135D2B247;
-        Fri, 16 Dec 2022 07:18:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671203917; x=1702739917;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=02QCuar4dYfcGk8X71Ps6oFW/ok7pF7lniU7WvO+y+o=;
-  b=ZipIDMVoqOS0+ImdM2jzS1A4KQS2BkClU7P2JROSQICvfnrREjFo0Ukd
-   g9Gw1FTiltMuOlYSHd36wtFnA1zhog3VLnlmgbKhdYVth8CLEc84Nsfql
-   9gBA00pZidwBQkLecautY4jly2E4oOpWDObWKEcOMOlQumdzve6ygnn6m
-   prRYkoiUyR4evXF37O1IjhR3QS9SznWskYRUDma7MUhHnPTLt1vhMmv8L
-   sU6m2KZrx8vHIdVP/je2EyagwcytKxmhVQJ0MYU6B5+4barIx9Sc+aPAG
-   9Beql5KJzYu7m4xHf2zrU/RXeMHv2Ya6APeQvUmluDIj3/N6cpPH2aqyy
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10563"; a="383319603"
-X-IronPort-AV: E=Sophos;i="5.96,249,1665471600"; 
-   d="scan'208";a="383319603"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2022 07:18:36 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10563"; a="756782958"
-X-IronPort-AV: E=Sophos;i="5.96,249,1665471600"; 
-   d="scan'208";a="756782958"
-Received: from lkp-server01.sh.intel.com (HELO b5d47979f3ad) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Dec 2022 07:18:33 -0800
-Received: from kbuild by b5d47979f3ad with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1p6CTo-0007EQ-1R;
-        Fri, 16 Dec 2022 15:18:32 +0000
-Date:   Fri, 16 Dec 2022 23:18:17 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     speakup@linux-speakup.org, linuxppc-dev@lists.ozlabs.org,
-        linux-xfs@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-omap@vger.kernel.org, linux-mm@kvack.org,
-        linux-media@vger.kernel.org, linux-can@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, kvm@vger.kernel.org,
-        amd-gfx@lists.freedesktop.org,
-        Linux Memory Management List <linux-mm@kvack.org>
-Subject: [linux-next:master] BUILD REGRESSION
- ca39c4daa6f7f770b1329ffb46f1e4a6bcc3f291
-Message-ID: <639c8c39./q+QZSDrWluXOpoJ%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+        with ESMTP id S229863AbiLPPmb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 10:42:31 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D2B819288
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 07:42:30 -0800 (PST)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BGFY5xH025414;
+        Fri, 16 Dec 2022 15:42:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2022-7-12;
+ bh=d68YVO3oWBlOo3/kn1kPPp2vASeF54SlhY0Ltc2uQoM=;
+ b=M17bd+VeNAm9gsEt0dHgD8n57oJ01II8YH1hsjO3VXRMCBBBVApHx2ryiOHcMMhiJwlm
+ la5Jw94DdAMW0BbJBLUhjB0yBPVRartask/JD0ZOqpyinF2ZMhF0OFr04Aca9YJPLNhw
+ fSSjR2HDR/dG53xAKz8JAwejPepFzhQP1aN98yr7JYo+lTxDaFhRam+9INiINhJFrnlO
+ afCdIBhoW8zUw3ZmNdkv+KJTsPQkw2hcooSEulW4u4PAplYZGYyLgRBhpMV+WORu/gXT
+ CH6UZoo8kOIsyCXpM7zs12JuVRBdgv8gIL//moR4nk5Cqob+y1ctj3qlkWOt3Az78vzv CQ== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3meyewyryq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 16 Dec 2022 15:42:20 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BGE11vd026645;
+        Fri, 16 Dec 2022 15:42:19 GMT
+Received: from nam02-bn1-obe.outbound.protection.outlook.com (mail-bn1nam02lp2040.outbound.protection.outlook.com [104.47.51.40])
+        by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3meyetd0rp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 16 Dec 2022 15:42:19 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NurhhWYUVuZhKIHVDnC8bPq8Cp2AHpDeWu1Y+zDDW4J5aXK6AYJt3hx89SnW0qWUs5TjnZ6E4510/M+/geWiN7oRrjl2YRvhmKHZngcBTWr/x3kmFe33BIGrod9RkW+d+k9/8P0T5akwuknnpH/fnDIvZ67Z8/G8XqUaGgkOTsKrvnoFG5AhAPJknYJ8P2oGujok/EI/k+6EAsXZEiy1roUyuSUwjUzN0rohgUZKAJHBFSCdlsmSwqWsaohldOV5jpGY5vzdnheeOPHje34Kl5sa4cHqHE94eQO9inllPwzgAgXwew9kJTNRhoe5xDRL/OHUeFh5VoT4DfrLhpPcow==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=d68YVO3oWBlOo3/kn1kPPp2vASeF54SlhY0Ltc2uQoM=;
+ b=X9qHUZQqFJLnfu8OEHGYT+FnKatIHQLM30Te2WbAJpfqR1OWelS4U89FF8wfEcS8uwtWsuQK6idDm9v4wF+ZZSgz2NPG0S2Eawt0+6pp6weWeiriG0C66U9gYfxt30Qtn/nZythSxuiGDzEFk9aG5LMaOEjYA9ewbEJGz00CkVC53yx93egXQsNPo95zbCCvB558BTklpVYLAf61omXgtkGteGi79UHHEr8qQg+3GMyy1lifvBXjHL/+tw6rYnZ3t4PC4qpnfe31lTObgQRH1OIuk8nfUhvl/0519F7uyx1ibWw76yokzwy/E5HP/AT/iPpSI6YdDvv15L3mIBjM9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d68YVO3oWBlOo3/kn1kPPp2vASeF54SlhY0Ltc2uQoM=;
+ b=HrIWZjAPcEC+fRYDbPNkPE7tpz73f2+mf1218ZDiEnDTJdW/X7ecIU3E41mgVPJbPgwyVcUXM4uZHCiFyyt3rPg5jmtJ21ATznmlW2kE/n337bIfYEK9kLwqYPDtWE36MrP0Jsg8/mS3UVwGcVfTQ2PFto58eOfxTjBcS3Nbxwo=
+Received: from SA2PR10MB4684.namprd10.prod.outlook.com (2603:10b6:806:119::14)
+ by CO1PR10MB4691.namprd10.prod.outlook.com (2603:10b6:303:92::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.11; Fri, 16 Dec
+ 2022 15:42:16 +0000
+Received: from SA2PR10MB4684.namprd10.prod.outlook.com
+ ([fe80::3667:7f89:cdc7:9cca]) by SA2PR10MB4684.namprd10.prod.outlook.com
+ ([fe80::3667:7f89:cdc7:9cca%7]) with mapi id 15.20.5924.012; Fri, 16 Dec 2022
+ 15:42:16 +0000
+Message-ID: <12c07702-ac7a-7e62-8bea-1f38055dfbf3@oracle.com>
+Date:   Fri, 16 Dec 2022 10:42:13 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH V5 2/7] vfio/type1: prevent locked_vm underflow
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>
+References: <1671141424-81853-1-git-send-email-steven.sistare@oracle.com>
+ <1671141424-81853-3-git-send-email-steven.sistare@oracle.com>
+ <Y5x8HoAEJA7r8ko+@nvidia.com>
+From:   Steven Sistare <steven.sistare@oracle.com>
+Organization: Oracle Corporation
+In-Reply-To: <Y5x8HoAEJA7r8ko+@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-ClientProxiedBy: BY5PR17CA0020.namprd17.prod.outlook.com
+ (2603:10b6:a03:1b8::33) To SA2PR10MB4684.namprd10.prod.outlook.com
+ (2603:10b6:806:119::14)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PR10MB4684:EE_|CO1PR10MB4691:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8bd4047f-954b-4434-f5f1-08dadf7c1c1b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KgWj0p4cso06Gj5pE0/v69CPNOzCypjUGO8PUEbIbuTsKrMXbjRoPdjAqYcbmkogQx6MhTcTOaIadtq6LmEvxCUSu65vQtmhBdFJ4A3D3QFaSsc9lSKRi91an8p4rYfSA2zynup0sFEb1g9HJvjsF+M9XeRdd6ucFdu89ZwcO3lbvbpgaF9wHGzvO/fspoZSw2uhBFzGt6uOpX6IAt+gkoKjqsZ4GeYH7g14+v0h7wUwVbXWZfALJep0oEt0JmJpJkc7IAHOQaNF/slp60+S0BIXYlil1y1V1JY4h4yU1mcBNQmVLOK7DvqzsObLQSzYeEvS3Jy8DTpf7nmpy+3VZFh7UvPkcCDwDZEahc6HOevrN/jAa4p/T+psMHKHHe+wp2ypRhzusOJDyChflx5ARg/KUzHbpanEG4Ts+yiY5NaZXXR0JG9BCQZpTWh0K/nsCWMzkrd1EkMfrhUVPp5PCBkk+OqTw/yX6YGIIqyMppXT/ve5POaqwYY52UOLM1HGf9iZe20OHReUx19jcewdRcjdEkRcN31vBfxne7gSpUGuoTm3rR/+boTJpJBt6VtEeXLW1liKYc/ax/pt63uEJkHVD7fymK3D9ZWDZz+wWgtIAgQG1B5BKsgD8AP7PcsPTNx0lwyhyKHphbU96NP/p4lNSnW5J6KClF/gc48b77wPZ45oBX9vDhDdru15WRMFpTJz4qDlS2WZPCJd50glSjNaZZ51NOH2TPskRdimBvA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR10MB4684.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(376002)(136003)(346002)(366004)(396003)(451199015)(6666004)(8936002)(54906003)(5660300002)(2906002)(6916009)(31686004)(316002)(66556008)(6486002)(44832011)(41300700001)(36916002)(6506007)(53546011)(478600001)(66946007)(8676002)(31696002)(4326008)(2616005)(36756003)(86362001)(38100700002)(83380400001)(66476007)(26005)(186003)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TUhFbWZGZFIyUStHV3FuMDRKVTVKOG9FampVRUdiQlNuNGFjeXdpVk43bWpv?=
+ =?utf-8?B?endRejh6dld1aVRZTDhMZVh6eFB2ZVN5OUdIcjkvYldZdzRUeCtnSmRpWDVj?=
+ =?utf-8?B?ZGJRelFRSXpZTEU1YVY1d3MwcmMwMXVJMlcxMnBaZ0dLZ0I3QkM1dzN3UmZ0?=
+ =?utf-8?B?eHhEUzRtN1dFK1F6bGFlcExlelhQaldFcXpRSEJncnREOUtoYWdEWW9JLzVV?=
+ =?utf-8?B?eHVLbDhYMHl2NjhuSGQ0YVM2a0NtVEhLaHpsUGU0WTRMY1FYMFk1MEpPQVlD?=
+ =?utf-8?B?cTV6MkxXZUFWZ242bGRmcjhkc3dIYXczNVEwY1JWR3MwVWxNTld6TmpjVG1s?=
+ =?utf-8?B?MGwvWURjeTN6ampSalFQNmtERGNLcGdYdVdZc3ZhVjVXckRSNUVjN0F2SUts?=
+ =?utf-8?B?Qm1xN0Joekd2Wk1oMWp4YVdiWGV3empPeExiQnNxdXM1NWthaXVjcTlrLytR?=
+ =?utf-8?B?WEg1YUNpTnlYZHV0aGx2Z2ZzbFFxUVpEMitGZHlBY1ZZY2RpTFh5QnZCMGdQ?=
+ =?utf-8?B?S2VIZ1ZIcU5hS3VVaFhKMkEyRFEvRm9BdHlBVDdoNndWUDhuNjZkek1qQ29O?=
+ =?utf-8?B?RTA1eVRLakFUUnR6dnJsMlZ0bURJWUNaODNhb0ZqWFZuS2Nucm00S2RNU21j?=
+ =?utf-8?B?dmtZRWlZTTVWZFFxQit5Wm93bFMwZkFscXVaSktXWG5VdCtVWFJmVXVlOUdO?=
+ =?utf-8?B?aDBlQVVMNmlpK0xyM2VWT1NYS2YvTUdGSFgvZ1Y5Um5obE5OUjlLaDh2cjNj?=
+ =?utf-8?B?UUtZUDZDYzh2c0FMNHhSZEdCT0NPWFlKVlY5TmNtcDA3eDN3ZUwwTEFGakVP?=
+ =?utf-8?B?OGtMR25JTk9kQVJPZjBoai8zdElBVGFZZjZIdmlsYjFnY1piY1ZLUFpva1pU?=
+ =?utf-8?B?d204NFczZ1ZnV1dRd3lkVmxHT00vSERtMDBMVG11M2c2TnRuVFlwV1hLRTY5?=
+ =?utf-8?B?Q0xud01ZZWNja3l1K1kxMCtFQjl3S2c0YUI3ZXFyQVJGTnR4NmxMYzFOSndi?=
+ =?utf-8?B?VlBnMUtFdDNvMDgydHcwZTRZUFVzK2lBU3FNQzZuRXB6ck9GcWcwdXpyOFlq?=
+ =?utf-8?B?QzBCV1RXZ2IrM1dBblVOUHVFR3MrMHlGOVFOWkJjSHlhTWNJVUo1bTdmMG4r?=
+ =?utf-8?B?bFM5ZzBkYVFTbHdrcXNZeVlpb1dKMVFaZWtmRFhiOEtqYVJjbWwweFkvMXdi?=
+ =?utf-8?B?U2x0RHIrZ1NUM24zM05TTlF2R3RHZWN3SGZVWU9KZkRCd0FDYW9Kd1kxZTI5?=
+ =?utf-8?B?UlhneEtxaFpMaXZ1ZmZ4b3JvSmNQRlRidkYxZTkrQWQzTlM0REN2YldPSGhk?=
+ =?utf-8?B?WUp1K2paUG42NDFLeFlNbGNnbVVCSVorRVZHVUJIblBzTS90d2xnczNNVlVp?=
+ =?utf-8?B?Y3VZVjM3NHBXTWxjWHVWS0Z4VkM0WkpCS2hBRUZBR0JvQi9xUldNMkloYy9o?=
+ =?utf-8?B?c0k3VkhqdmNCc0FmMWw4Y2VpNXB4OHVob25HMzJ0OXg3VHhoM3pWYXREUmdu?=
+ =?utf-8?B?bkhGU1ZlSDgvdWswZVJVQTVwbk8xYlNMYXBnWWIyZEtwVEUweUNyTUsrV2Rm?=
+ =?utf-8?B?SDVMNVBmTDRyZEJ4a1NvUzRQQXZqNU9MRVpnanJTZ2ZkN1lPTEU3SHRoL2hm?=
+ =?utf-8?B?RzZUY1gwMHEreWduN1ZPVzJVT0FDQzNSbHFOeXh0QVNFVnJva05GbzJVMzkz?=
+ =?utf-8?B?TjduaVI0MHpSTFZoODl1cGxrTVZYeUhHeVN4NjJkRDlDQ2FlUm1hdTEzZVBY?=
+ =?utf-8?B?UW5UVEZKNHlHVUtHU0YrYW9hTzh3RWYwdnlxT0FBVTJhVkVBUmNkWk5tTjVk?=
+ =?utf-8?B?YlhxTkQxWlZkOTJkZE53RnF1UlNXOWdURE9mR0lqQkFkdVFhaExLSkMxbnZz?=
+ =?utf-8?B?RnpRa1diUWtKSXd0Q0JNWlFsb1RxeFMvNkkyeS9VV2JKRHpkaVpWNTRCcC95?=
+ =?utf-8?B?R0MrQ3d3eTJycTE2Z0JOL1FVdDRMdFJEMk5FMUtJK25NK04vNlNYOXYvbW9J?=
+ =?utf-8?B?S3F4TmdIVk8zVTMxd1poa0VvVXYyN2Zyd2E1YlVSOGZXL3VZcVhseDJ6ZjBX?=
+ =?utf-8?B?TWtNYk5VQmE3QXBRcFpwTnlJVisyeVhTZzVmQnhxVks4Wi9rV1hYSkJJaWhw?=
+ =?utf-8?B?QVM5Nm8vWk9NV2hQa25ZUktyTGtOQnBBdG1MdnpXV2ZzbzExeFRuNDd5djFB?=
+ =?utf-8?B?M1E9PQ==?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8bd4047f-954b-4434-f5f1-08dadf7c1c1b
+X-MS-Exchange-CrossTenant-AuthSource: SA2PR10MB4684.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Dec 2022 15:42:16.8129
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mxqx7sz+LcC0dzohA4+AiNXBhQ5c4LRnbT77t+4oEgAFxHaillrSQDwzTgJ3SPHXkcqpH1Td5Dp1DSZduoxC52WlTMglidV5sODM66ZnG0g=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4691
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-16_11,2022-12-15_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 mlxscore=0
+ phishscore=0 malwarescore=0 spamscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2212160135
+X-Proofpoint-GUID: SyP9z7aveJbr4I5UlkUgM8bpFL_ysfzK
+X-Proofpoint-ORIG-GUID: SyP9z7aveJbr4I5UlkUgM8bpFL_ysfzK
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: ca39c4daa6f7f770b1329ffb46f1e4a6bcc3f291  Add linux-next specific files for 20221216
+On 12/16/2022 9:09 AM, Jason Gunthorpe wrote:
+> On Thu, Dec 15, 2022 at 01:56:59PM -0800, Steve Sistare wrote:
+>> When a vfio container is preserved across exec, the task does not change,
+>> but it gets a new mm with locked_vm=0.  If the user later unmaps a dma
+>> mapping, locked_vm underflows to a large unsigned value, and a subsequent
+>> dma map request fails with ENOMEM in __account_locked_vm.
+>>
+>> To avoid underflow, grab and save the mm at the time a dma is mapped.
+>> Use that mm when adjusting locked_vm, rather than re-acquiring the saved
+>> task's mm, which may have changed.  If the saved mm is dead, do nothing.
+>>
+>> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
+>> ---
+>>  drivers/vfio/vfio_iommu_type1.c | 17 ++++++++++-------
+>>  1 file changed, 10 insertions(+), 7 deletions(-)
+> 
+> Add fixes lines and a CC stable
 
-Error/Warning reports:
+This predates the update vaddr functionality, so AFAICT:
 
-https://lore.kernel.org/oe-kbuild-all/202211180516.dtOWIlEo-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202211180955.UiXgTkeu-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202211190207.Rf66o1j0-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202211242120.MzZVGULn-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202212020520.0OkMIno3-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202212051759.cEv6fyHy-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202212142121.vendKsOc-lkp@intel.com
+    Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
 
-Error/Warning: (recently discovered and may have been fixed)
+I'll wait on cc'ing stable until alex has chimed in.
 
-Documentation/gpu/drm-internals:179: ./include/drm/drm_file.h:411: WARNING: undefined label: drm_accel_node (if the link has no caption the label must precede a section header)
-Documentation/networking/devlink/etas_es58x.rst: WARNING: document isn't included in any toctree
-Warning: tools/power/cpupower/man/cpupower-powercap-info.1 references a file that doesn't exist: Documentation/power/powercap/powercap.txt
-arch/powerpc/kernel/kvm_emul.o: warning: objtool: kvm_template_end(): can't find starting instruction
-arch/powerpc/kernel/optprobes_head.o: warning: objtool: optprobe_template_end(): can't find starting instruction
-drivers/gpu/drm/amd/amdgpu/../display/dc/irq/dcn201/irq_service_dcn201.c:40:20: warning: no previous prototype for 'to_dal_irq_source_dcn201' [-Wmissing-prototypes]
-drivers/regulator/tps65219-regulator.c:310:32: warning: parameter 'dev' set but not used [-Wunused-but-set-parameter]
-drivers/regulator/tps65219-regulator.c:310:60: warning: parameter 'dev' set but not used [-Wunused-but-set-parameter]
-drivers/regulator/tps65219-regulator.c:370:26: sparse:    int
-drivers/regulator/tps65219-regulator.c:370:26: sparse:    struct regulator_dev *[assigned] rdev
-drivers/regulator/tps65219-regulator.c:370:26: warning: ordered comparison of pointer with integer zero [-Wextra]
+> The subject should be more like 'vfio/typ1: Prevent corruption of mm->locked_vm via exec()'
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
+Underflow is a more precise description of the first corruption. How about:
 
-drivers/accessibility/speakup/main.c:1290:26: sparse: sparse: obsolete array initializer, use C99 syntax
-drivers/i2c/busses/i2c-qcom-geni.c:1028:28: sparse: sparse: symbol 'i2c_master_hub' was not declared. Should it be static?
-drivers/media/platform/ti/davinci/vpif.c:483:20: sparse: sparse: cast from non-scalar
-drivers/media/platform/ti/davinci/vpif.c:483:20: sparse: sparse: cast to non-scalar
-drivers/media/test-drivers/visl/visl-video.c:690:22: sparse: sparse: symbol 'visl_qops' was not declared. Should it be static?
-drivers/usb/misc/sisusbvga/sisusbvga.c:528:9: sparse: sparse: incorrect type in assignment (different base types)
-fs/xfs/xfs_iomap.c:86:29: sparse: sparse: symbol 'xfs_iomap_page_ops' was not declared. Should it be static?
-hidma.c:(.text+0x46): undefined reference to `devm_ioremap_resource'
-mm/hugetlb.c:6897 hugetlb_reserve_pages() error: uninitialized symbol 'chg'.
+vfio/type1: Prevent underflow of locked_vm via exec()
 
-Error/Warning ids grouped by kconfigs:
+>> @@ -1687,6 +1689,8 @@ static int vfio_dma_do_map(struct vfio_iommu *iommu,
+>>  	get_task_struct(current->group_leader);
+>>  	dma->task = current->group_leader;
+>>  	dma->lock_cap = capable(CAP_IPC_LOCK);
+>> +	dma->mm = dma->task->mm;
+> 
+> This should be current->mm, current->group_leader->mm is not quite the
+> same thing (and maybe another bug, I'm not sure)
 
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dcn201-irq_service_dcn201.c:warning:no-previous-prototype-for-to_dal_irq_source_dcn201
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- arc-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dcn201-irq_service_dcn201.c:warning:no-previous-prototype-for-to_dal_irq_source_dcn201
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- arc-randconfig-s053-20221216
-|   |-- drivers-i2c-busses-i2c-qcom-geni.c:sparse:sparse:symbol-i2c_master_hub-was-not-declared.-Should-it-be-static
-|   `-- drivers-media-test-drivers-visl-visl-video.c:sparse:sparse:symbol-visl_qops-was-not-declared.-Should-it-be-static
-|-- arm-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dcn201-irq_service_dcn201.c:warning:no-previous-prototype-for-to_dal_irq_source_dcn201
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- arm64-allyesconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dcn201-irq_service_dcn201.c:warning:no-previous-prototype-for-to_dal_irq_source_dcn201
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- arm64-buildonly-randconfig-r006-20221215
-|   `-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dcn201-irq_service_dcn201.c:warning:no-previous-prototype-for-to_dal_irq_source_dcn201
-|-- arm64-randconfig-s051-20221216
-|   |-- drivers-i2c-busses-i2c-qcom-geni.c:sparse:sparse:symbol-i2c_master_hub-was-not-declared.-Should-it-be-static
-|   |-- drivers-regulator-tps65219-regulator.c:sparse:int
-|   |-- drivers-regulator-tps65219-regulator.c:sparse:sparse:incompatible-types-for-operation-(-):
-|   |-- drivers-regulator-tps65219-regulator.c:sparse:struct-regulator_dev-assigned-rdev
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   |-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|   `-- fs-xfs-xfs_iomap.c:sparse:sparse:symbol-xfs_iomap_page_ops-was-not-declared.-Should-it-be-static
-|-- i386-allyesconfig
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- i386-randconfig-s002
-|   `-- fs-xfs-xfs_iomap.c:sparse:sparse:symbol-xfs_iomap_page_ops-was-not-declared.-Should-it-be-static
-|-- ia64-allmodconfig
-|   |-- drivers-gpu-drm-amd-amdgpu-..-display-dc-irq-dcn201-irq_service_dcn201.c:warning:no-previous-prototype-for-to_dal_irq_source_dcn201
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- m68k-allmodconfig
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- m68k-allyesconfig
-|   |-- drivers-regulator-tps65219-regulator.c:warning:ordered-comparison-of-pointer-with-integer-zero
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- m68k-randconfig-s041-20221216
-|   |-- drivers-media-platform-ti-davinci-vpif.c:sparse:sparse:cast-from-non-scalar
-|   `-- drivers-media-platform-ti-davinci-vpif.c:sparse:sparse:cast-to-non-scalar
-|-- m68k-randconfig-s043-20221216
-|   |-- drivers-accessibility-speakup-main.c:sparse:sparse:obsolete-array-initializer-use-C99-syntax
-|   |-- drivers-usb-misc-sisusbvga-sisusbvga.c:sparse:sparse:incorrect-type-in-assignment-(different-base-types)-expected-unsigned-int-usertype-address-got-restricted-__le32-usertype
-clang_recent_errors
-|-- hexagon-allyesconfig
-|   `-- drivers-regulator-tps65219-regulator.c:warning:parameter-dev-set-but-not-used
-|-- riscv-randconfig-r023-20221215
-|   |-- ld.lld:error:too-many-errors-emitted-stopping-now-(use-error-limit-to-see-all-errors)
-|   |-- ld.lld:error:vmlinux.a(kernel-kallsyms.o):(function-kallsyms_lookup_name:.text):relocation-R_RISCV_PCREL_HI20-out-of-range:is-not-in-references-kallsyms_seqs_of_names
-|   |-- ld.lld:error:vmlinux.a(kernel-kallsyms.o):(function-kallsyms_lookup_names:.text):relocation-R_RISCV_PCREL_HI20-out-of-range:is-not-in-references-kallsyms_num_syms
-|   |-- ld.lld:error:vmlinux.a(kernel-kallsyms.o):(function-kallsyms_lookup_names:.text):relocation-R_RISCV_PCREL_HI20-out-of-range:is-not-in-references-kallsyms_seqs_of_names
-|   |-- ld.lld:error:vmlinux.a(kernel-kallsyms.o):(function-kallsyms_on_each_match_symbol:.text):relocation-R_RISCV_PCREL_HI20-out-of-range:is-not-in-references-kallsyms_offsets
-|   |-- ld.lld:error:vmlinux.a(kernel-kallsyms.o):(function-kallsyms_on_each_match_symbol:.text):relocation-R_RISCV_PCREL_HI20-out-of-range:is-not-in-references-kallsyms_relative_base
-|   |-- ld.lld:error:vmlinux.a(kernel-kallsyms.o):(function-kallsyms_on_each_match_symbol:.text):relocation-R_RISCV_PCREL_HI20-out-of-range:is-not-in-references-kallsyms_seqs_of_names
-|   |-- ld.lld:error:vmlinux.a(kernel-kallsyms.o):(function-kallsyms_sym_address:.text):relocation-R_RISCV_PCREL_HI20-out-of-range:is-not-in-references-kallsyms_offsets
-|   `-- ld.lld:error:vmlinux.a(kernel-kallsyms.o):(function-kallsyms_sym_address:.text):relocation-R_RISCV_PCREL_HI20-out-of-range:is-not-in-references-kallsyms_relative_base
-`-- s390-randconfig-r022-20221215
-    `-- hidma.c:(.text):undefined-reference-to-devm_ioremap_resource
+When are they different -- when the leader is a zombie?
 
-elapsed time: 731m
+BTW I just noticed I need to update the comments about mm preceding these lines.
 
-configs tested: 81
-configs skipped: 2
-
-gcc tested configs:
-arc                                 defconfig
-alpha                               defconfig
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                              defconfig
-x86_64                        randconfig-a013
-x86_64                        randconfig-a011
-x86_64                               rhel-8.3
-arm                                 defconfig
-ia64                             allmodconfig
-x86_64                           rhel-8.3-bpf
-m68k                             allyesconfig
-x86_64                           allyesconfig
-m68k                             allmodconfig
-x86_64                           rhel-8.3-syz
-x86_64                         rhel-8.3-kunit
-arc                  randconfig-r043-20221215
-x86_64                        randconfig-a015
-i386                          randconfig-a001
-x86_64                          rhel-8.3-func
-i386                          randconfig-a003
-s390                             allmodconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                           rhel-8.3-kvm
-s390                             allyesconfig
-s390                                defconfig
-x86_64                            allnoconfig
-x86_64                        randconfig-a004
-arm                  randconfig-r046-20221215
-arm64                            allyesconfig
-i386                          randconfig-a005
-arc                              allyesconfig
-i386                                defconfig
-powerpc                           allnoconfig
-x86_64                        randconfig-a002
-arm                              allyesconfig
-i386                          randconfig-a014
-alpha                            allyesconfig
-powerpc                          allmodconfig
-i386                          randconfig-a012
-x86_64                        randconfig-a006
-i386                          randconfig-a016
-sh                               allmodconfig
-mips                             allyesconfig
-mips                           xway_defconfig
-arc                              alldefconfig
-sh                            shmin_defconfig
-i386                             allyesconfig
-sh                          r7785rp_defconfig
-sparc                            alldefconfig
-sh                         ecovec24_defconfig
-i386                          randconfig-c001
-sh                         apsh4a3a_defconfig
-sh                        sh7757lcr_defconfig
-m68k                        m5307c3_defconfig
-arc                               allnoconfig
-arm                        clps711x_defconfig
-sh                            titan_defconfig
-
-clang tested configs:
-x86_64                        randconfig-a012
-x86_64                        randconfig-a014
-x86_64                          rhel-8.3-rust
-i386                          randconfig-a013
-x86_64                        randconfig-a016
-i386                          randconfig-a002
-i386                          randconfig-a015
-i386                          randconfig-a006
-hexagon              randconfig-r041-20221215
-i386                          randconfig-a004
-hexagon              randconfig-r045-20221215
-x86_64                        randconfig-a005
-i386                          randconfig-a011
-x86_64                        randconfig-a001
-riscv                randconfig-r042-20221215
-s390                 randconfig-r044-20221215
-x86_64                        randconfig-a003
-mips                        qi_lb60_defconfig
-arm                             mxs_defconfig
-arm                         palmz72_defconfig
-arm                         hackkit_defconfig
-arm                          ixp4xx_defconfig
-arm                        vexpress_defconfig
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+- Steve
