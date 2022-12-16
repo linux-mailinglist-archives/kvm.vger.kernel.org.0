@@ -2,116 +2,176 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D748464F1E1
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 20:40:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ED3F64F213
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 21:01:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231897AbiLPTki (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 14:40:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42978 "EHLO
+        id S231882AbiLPUBF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 15:01:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231889AbiLPTkf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 14:40:35 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE4DF264A3
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 11:40:34 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id x2so3268731plb.13
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 11:40:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VvVKBxmjyc40Aovy4uKIkd/GsUUTIzX8idkZXVS4G6E=;
-        b=DncFDm87BS/3OUuqmSyzK5JwSvzMfn4ygYxeWWmaFLbxgZlXUA3/XT+oc7z0lUO8qv
-         vYn9PzeWffXEYpdm3wcvWkjwsq4E5hIUSYUyOftb8WXxxTtyXYeI2hIVCA/hkTJ1BajZ
-         eoWGheONzsAJqxeAZzkSdcC2fcIr03Tage84EOrLL5wrM3hbYVanRPRovBUVJhXOBPPQ
-         t9v4k1Rc/u79q5i3p1z7UwvET4PyMc/1Elb//1x4oJxxzqpprdMoV+3Ero4pSqAuPNYa
-         3l5zW+Mjbk/IADnNRarBwme9dTW510+M/klAmUBjL0rkfSAAAx9cECzyT+MqDmYDNIyO
-         4e4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VvVKBxmjyc40Aovy4uKIkd/GsUUTIzX8idkZXVS4G6E=;
-        b=cPPxW9ClhTcFTTIF+kDYoxwkFoE5fD6xG1Esx/iG+cdxJa0qNQOjB5Jp4fOrX1/qaO
-         xQsQrQRCsse509mJyf9/6VqX5Saa6fcNo0WmcGmwNZUTBC7IFWyIYF8r3uaO5ea9nNWQ
-         tzwqt7VM6L+yGQyUqBYAgqn2gSNWStra1SRCQPW9yCU4CMwHMMR/tAqhNFzT9UhMsXHU
-         welzZoqh0vVKsPITw/Jx+TtmPnaWQXMuPscmXLMu9Ts4QC+6kW7nRs0GK02qD7PYDwzX
-         Vgp+T+lG+awxP5L4BbT+eUwggD72uBklM6a1sm0Jwl3HejAfyn65zbdkYtTq6VUg0Ayj
-         TAPg==
-X-Gm-Message-State: AFqh2kpwjo9OGXBcdq60+/uAkElMX9YJ+oFnZBpXO6lwS+QMPJDlZMIU
-        JI2Z+pY1WOb9BsYnAnV2TJIijw==
-X-Google-Smtp-Source: AMrXdXtOxIsKz7LMW0io6hRDovz6UAfRfn8xRV2LKCX3QTFqqW4USuRmVMB7QYP/4CaY/2Tnv96HFA==
-X-Received: by 2002:a05:6a21:151b:b0:a7:891b:3601 with SMTP id nq27-20020a056a21151b00b000a7891b3601mr712797pzb.1.1671219634188;
-        Fri, 16 Dec 2022 11:40:34 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id l10-20020a63f30a000000b00470275c8d6dsm1826573pgh.10.2022.12.16.11.40.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Dec 2022 11:40:33 -0800 (PST)
-Date:   Fri, 16 Dec 2022 19:40:29 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Li RongQing <lirongqing@baidu.com>
-Subject: Re: [PATCH v4 11/32] KVM: x86: Inhibit APIC memslot if x2APIC and
- AVIC are enabled
-Message-ID: <Y5zJraa0ddooauXB@google.com>
-References: <20221001005915.2041642-1-seanjc@google.com>
- <20221001005915.2041642-12-seanjc@google.com>
- <90d4a2a1733cdb21e7c00843ddafee78ce52bbdc.camel@redhat.com>
- <Y5zBH+2VuPJi4yYV@google.com>
+        with ESMTP id S231405AbiLPUBD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 15:01:03 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 635EC2B25A;
+        Fri, 16 Dec 2022 12:01:00 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BGJiwkN028370;
+        Fri, 16 Dec 2022 20:01:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bmsyMLIDcZ/1wcwvXYl9Kzu/xmDrRfRYNyYXb0TopCk=;
+ b=ptasNTZzJUvrKNFRPPccvSyKjdg24MzKRTQRU3j+An30wgo7a8r5IwYG7HIKG/eoGX72
+ 2217kpFgIqON2ZeQke0aVD/mTP38C1JWu33YhtxYfDGUUWChRn+rO3UX5GX2CRSHhPEx
+ 8yjmv6Nen1XuF1RYwOmvYeqshxnKQzZ245zwh5TQ40zCHOW2iFVFBqJve2Sj2DC7KqE0
+ nA/hX1OWtbDsfUMU5TCsi5H/pVrJCt4qYteJPJ0ghD0OnWiDEKMZU7UMuMrbxvTsMZEM
+ 52ZEoAwQmi8U4ijUzxO5WCCa3vuylp5RVbGc/vDzLLz2vGZZHRWUIhfoA9fRcMXzdK3x NQ== 
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mgy3wgaey-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 16 Dec 2022 20:00:59 +0000
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BGJleW3020797;
+        Fri, 16 Dec 2022 19:59:53 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([9.208.130.99])
+        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3mf07h0xqh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 16 Dec 2022 19:59:53 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+        by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BGJxpNC37159266
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 16 Dec 2022 19:59:52 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B4D6C5805F;
+        Fri, 16 Dec 2022 19:59:51 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 28AEE58058;
+        Fri, 16 Dec 2022 19:59:50 +0000 (GMT)
+Received: from [9.160.114.181] (unknown [9.160.114.181])
+        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 16 Dec 2022 19:59:50 +0000 (GMT)
+Message-ID: <caa39cd9-d488-fea2-6569-88d08b9621b3@linux.ibm.com>
+Date:   Fri, 16 Dec 2022 14:59:49 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5zBH+2VuPJi4yYV@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v1 08/16] vfio/ccw: pass page count to page_array struct
+Content-Language: en-US
+To:     Eric Farman <farman@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+References: <20221121214056.1187700-1-farman@linux.ibm.com>
+ <20221121214056.1187700-9-farman@linux.ibm.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <20221121214056.1187700-9-farman@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Ejqwko0jQXC0qdD_rs6psyWfxRK3X11W
+X-Proofpoint-ORIG-GUID: Ejqwko0jQXC0qdD_rs6psyWfxRK3X11W
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-16_13,2022-12-15_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 bulkscore=0
+ suspectscore=0 clxscore=1015 malwarescore=0 mlxscore=0 phishscore=0
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 spamscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2212160177
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 16, 2022, Sean Christopherson wrote:
-> On Thu, Dec 08, 2022, Maxim Levitsky wrote:
-> > I prefer to just have a boolean 'is_avic' or,
-> > '.needs_x2apic_memslot_inhibition' in the vendor ops, and check it in
-> > 'kvm_vcpu_update_apicv' with the above comment on top of it.
-> > 
-> > need_x2apic_memslot_inhibition can even be set to false when x2avic is
-> > supported at the initalization time, because then AVIC behaves just like
-> > APICv (when x2avic bit is enabled, AVIC mmio is no longer decoded).
+On 11/21/22 4:40 PM, Eric Farman wrote:
+> The allocation of our page_array struct calculates the number
+> of 4K pages that would be needed to hold a certain number of
+> bytes. But, since the number of pages that will be pinned is
+> also calculated by the length of the IDAL, this logic is
+> unnecessary. Let's pass that information in directly, and
+> avoid the math within the allocator.
 > 
-> Oh, so SVM does effectively have independent controls, it's only the "hybrid" mode
-> that's affected?  In that case, how about this?
+> Also, let's make this two allocations instead of one,
+> to make it apparent what's happening within here.
 > 
-> 	/*
-> 	 * Due to sharing page tables across vCPUs, the xAPIC memslot must be
-> 	 * deleted if any vCPU has x2APIC enabled and hardware doesn't support
-> 	 * x2APIC virtualization.  E.g. some AMD CPUs support AVIC but not
-> 	 * x2AVIC.  KVM still allows enabling AVIC in this case so that KVM can
-> 	 * the AVIC doorbell to inject interrupts to running vCPUs, but KVM
-> 	 * mustn't create SPTEs for the APIC base as the vCPU would incorrectly
-> 	 * be able to access the vAPIC page via MMIO despite being in x2APIC
-> 	 * mode.  For simplicity, inhibiting the APIC access page is sticky.
-> 	 */
-> 	if (apic_x2apic_mode(vcpu->arch.apic) &&
-> 	    !kvm_x86_ops.has_hardware_x2apic_virtualization)
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 23 +++++++++++++----------
+>  1 file changed, 13 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 4b6b5f9dc92d..66e890441163 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -43,7 +43,7 @@ struct ccwchain {
+>   * page_array_alloc() - alloc memory for page array
+>   * @pa: page_array on which to perform the operation
+>   * @iova: target guest physical address
+> - * @len: number of bytes that should be pinned from @iova
+> + * @len: number of pages that should be pinned from @iova
+>   *
+>   * Attempt to allocate memory for page array.
+>   *
+> @@ -63,18 +63,20 @@ static int page_array_alloc(struct page_array *pa, u64 iova, unsigned int len)
+>  	if (pa->pa_nr || pa->pa_iova)
+>  		return -EINVAL;
+>  
+> -	pa->pa_nr = ((iova & ~PAGE_MASK) + len + (PAGE_SIZE - 1)) >> PAGE_SHIFT;
+> -	if (!pa->pa_nr)
+> +	if (!len)
 
-Hrm, that's not quite right either since it's obviously possible to have an Intel
-CPU that supports APICv but not x2APIC virtualization.  And in that case KVM
-doesn't need to inhibit the memslot, e.g. if not all vCPUs are in x2APIC.
+Seems like a weird way to check this.  if (len == 0) ?
 
-I was hoping to have a name that communicate _why_ the memslot needs to be
-inhibited, but it's turning out to be really hard to come up with a name that's
-descriptive without being ridiculously verbose.  The best I've come up with is:
+Otherwise:
+Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-	allow_apicv_in_x2apic_without_x2apic_virtualization
+>  		return -EINVAL;
+>  
+> -	pa->pa_iova = kcalloc(pa->pa_nr,
+> -			      sizeof(*pa->pa_iova) + sizeof(*pa->pa_page),
+> -			      GFP_KERNEL);
+> -	if (unlikely(!pa->pa_iova)) {
+> -		pa->pa_nr = 0;
+> +	pa->pa_nr = len;
+> +
+> +	pa->pa_iova = kcalloc(len, sizeof(*pa->pa_iova), GFP_KERNEL);
+> +	if (!pa->pa_iova)
+> +		return -ENOMEM;
+> +
+> +	pa->pa_page = kcalloc(len, sizeof(*pa->pa_page), GFP_KERNEL);
+> +	if (!pa->pa_page) {
+> +		kfree(pa->pa_iova);
+>  		return -ENOMEM;
+>  	}
+> -	pa->pa_page = (struct page **)&pa->pa_iova[pa->pa_nr];
+>  
+>  	pa->pa_iova[0] = iova;
+>  	pa->pa_page[0] = NULL;
+> @@ -167,6 +169,7 @@ static int page_array_pin(struct page_array *pa, struct vfio_device *vdev)
+>  static void page_array_unpin_free(struct page_array *pa, struct vfio_device *vdev)
+>  {
+>  	page_array_unpin(pa, vdev, pa->pa_nr);
+> +	kfree(pa->pa_page);
+>  	kfree(pa->pa_iova);
+>  }
+>  
+> @@ -545,7 +548,7 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
+>  	 * required for the data transfer, since we only only support
+>  	 * 4K IDAWs today.
+>  	 */
+> -	ret = page_array_alloc(pa, iova, bytes);
+> +	ret = page_array_alloc(pa, iova, idaw_nr);
+>  	if (ret < 0)
+>  		goto out_free_idaws;
+>  
 
-It's heinous, but I'm inclined to go with it unless someone has a better idea.
