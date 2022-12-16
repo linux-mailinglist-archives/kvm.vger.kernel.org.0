@@ -2,156 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0E4464E6E2
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 06:17:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5C7164E6E9
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 06:26:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229774AbiLPFRV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 00:17:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56338 "EHLO
+        id S229898AbiLPF0x (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 00:26:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229504AbiLPFRS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 00:17:18 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842234B9A6
-        for <kvm@vger.kernel.org>; Thu, 15 Dec 2022 21:17:17 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2F280B81D2C
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 05:17:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D4BD3C433F1
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 05:17:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671167834;
-        bh=/gJX48GyCJdQoF/zTgyZVQW91hWg9fk8P8Jmal+KSiU=;
-        h=From:To:Subject:Date:From;
-        b=Q98aP7TFjSsMrmK2Gi7XCZ8LjfRVPHlJD7tpYQpY4BK/sWdSP0i1YUfwRowWTBzcK
-         yroN0vo3u+6jpcIJNa0O2dDTRdmovizpP3LTvjb+SquMWmscnCdcjTqoDsSDx6UOPn
-         InvY9Kpwqf1chmDaNus6IC7Up6wM+PVaq5CTSnUUeexJNIHSQuACIG5hmRLqkDnDMl
-         wNFp35MI64cxDfX+4oPQWbTd/UVu7WDkaL/fpdHhCz8JAywcd4qVUaP8AnVZv6jByh
-         Nwd6Gs4fLVodoJBYZ9+kmqSjcgRnFP75DGdGiCpkHMGM/PFSSto0beKUzvexmQa81Z
-         6hgciNh6vGGcQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id B8AFDC43144; Fri, 16 Dec 2022 05:17:14 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 216812] New: kvm-unit-test xapic failed on linux 6.1 release
- kernel
-Date:   Fri, 16 Dec 2022 05:17:14 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: lixiao.yang@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-216812-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S229480AbiLPF0r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 00:26:47 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D56936D60;
+        Thu, 15 Dec 2022 21:26:45 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id t18so1035189pfq.13;
+        Thu, 15 Dec 2022 21:26:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=LP4ffXoiDO65KIjVIcDAkvN8bi+1ldsaOGyKaP67OqU=;
+        b=Nc/v7HgHfvIrS1eZ6VDfSd6TVmIZxuBH4WdtykfA/0ZNQNVVNLgvaUKK2MYG1tAtny
+         9cFrsXYpifcdrn7v0CSNYDev5j0PesePa39Ttv2cDtZUyN6VutywkII5/kG1l1Py/t36
+         8Uxi+ooq7Zl/oP2gfZsXjjiYIaPuMg15kx4KiNLvsg8E3XwQv4bdP6VnrEngvEd2ZIk+
+         Gg7HcJHKbQeMLQPlP9bH9gMvYdx8S+26nMprOeBf5VzMhHKj/5xtevrDLLKWkOAjblVO
+         a8NJKYWOdqk4UeLIZpVlvcL9BH7tABfj1GvUU30siiDQVHCJoBMfxbupBBGYeQa0tfYS
+         lJ/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LP4ffXoiDO65KIjVIcDAkvN8bi+1ldsaOGyKaP67OqU=;
+        b=3jVCJnehbOmPXWHlJAgH12XqNTb6FE8yUs72Yd9FSME3j0d/EAbR6lcvEJgXYcptPG
+         QD2ce0/OCWFmxSd13mkMFRw2pCbvGQ/PYvTMs3qm5lIt3oW0TH+vg7r5G4RDFUsZZlfC
+         H+lr6/epZRx8b5dJmOzIA5aGezJ+2ux5Cn5ZP4ZaHn0mei8yZKhoSxzY2pcGrCo9Q5IF
+         xXq0EcrcLjPMzDuQeXQf94mj4+o9BBSGziJuxlqxCdriPNBnE3nI3YH13RevVYDuezEE
+         i3PYNcKQb3twFFFr9hZOhegH+6PwU9vygU0yCc2IM5jbODTdnW9KqXBLpaVpUgP+gwBX
+         iNkA==
+X-Gm-Message-State: ANoB5pkcvNrubmjPz2ETCdLBTSZXnkXisrCnw6IIogFKPgLRYyc+GIui
+        q4/ZiI9qSZFPkvIHP07REb0=
+X-Google-Smtp-Source: AA0mqf6lIpA85WoHjZGzQWzPaLy0pwvIo54KDzSw1r9f+3dE75IaK1s8W5XOOw5NX0+3E7TLf4nJTg==
+X-Received: by 2002:aa7:911a:0:b0:577:5afa:6321 with SMTP id 26-20020aa7911a000000b005775afa6321mr34819434pfh.26.1671168404629;
+        Thu, 15 Dec 2022 21:26:44 -0800 (PST)
+Received: from localhost ([192.55.54.55])
+        by smtp.gmail.com with ESMTPSA id i73-20020a62874c000000b0056bc5ad4862sm533894pfe.28.2022.12.15.21.26.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Dec 2022 21:26:44 -0800 (PST)
+Date:   Thu, 15 Dec 2022 21:26:42 -0800
+From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "Christopherson,, Sean" <seanjc@google.com>
+Subject: Re: [PATCH v10 105/108] KVM: TDX: Add methods to ignore accesses to
+ CPU state
+Message-ID: <20221216052642.GF527635@ls.amr.corp.intel.com>
+References: <cover.1667110240.git.isaku.yamahata@intel.com>
+ <282dd5a8edbee0aa87cdf035088ecd8558b0b999.1667110240.git.isaku.yamahata@intel.com>
+ <5dc0263aa963534bb049b61adbfb18dec3f65f00.camel@intel.com>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5dc0263aa963534bb049b61adbfb18dec3f65f00.camel@intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D216812
+On Wed, Dec 14, 2022 at 11:43:14AM +0000,
+"Huang, Kai" <kai.huang@intel.com> wrote:
 
-            Bug ID: 216812
-           Summary: kvm-unit-test xapic failed on linux 6.1 release kernel
-           Product: Virtualization
-           Version: unspecified
-    Kernel Version: 6.1
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: lixiao.yang@intel.com
-        Regression: No
+> On Sat, 2022-10-29 at 23:23 -0700, isaku.yamahata@intel.com wrote:
+> > +static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+> > +{
+> > +	if (is_td_vcpu(vcpu)) {
+> > +		if (is_mmio)
+> > +			return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
+> > +		return  MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
+> > +	}
+> > +
+> > +	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
+> > +}
+> 
+> So you are returning WB for _ALL_ guest memory, including shared.  Wouldn't this
+> break MTRR handling for shared memory?  For instance, IIUC we can still support
+> assigning a device to a TDX guest while the VT-d doesn't support coherent
+> memory, in which case guest's MTRR/PAT are honored.  I think this should also
+> apply to TDX guest's shared memory?
 
-Created attachment 303415
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D303415&action=3Dedit
-xapic failure log
+You're right. So here is the updated change.
+--- a/arch/x86/kvm/vmx/main.c
++++ b/arch/x86/kvm/vmx/main.c
+@@ -798,11 +798,8 @@ static int vt_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
+ 
+ static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+ {
+-       if (is_td_vcpu(vcpu)) {
+-               if (is_mmio)
+-                       return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
+-               return  MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
+-       }
++       if (is_td_vcpu(vcpu))
++               return tdx_get_mt_mask(vcpu, gfn, is_mmio);
+ 
+        return vmx_get_mt_mask(vcpu, gfn, is_mmio);
+ }
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index ac47b20e4e91..f1842eb32d6c 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -568,7 +568,31 @@ int tdx_vm_init(struct kvm *kvm)
+        return 0;
+ }
+ 
++u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
++{
++       if (is_mmio)
++               return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
++
++       if (!kvm_arch_has_noncoherent_dma(vcpu->kvm))
++               return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
++
++       /* Guest CR0 is unknown.  Assume CR0.CD = 0. */
++
++       /* TDX private GPA is always WB. */
++       if (gfn & kvm_gfn_shared_mask(vcpu->kvm))
++               return  MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
++
++       /*
++        * Because the definition of MTRR MSR is unaware of shared-bit,
++        * clear shared-bit.
++        */
++       gfn = kvm_gfn_private(vcpu->kvm, gfn);
++       return kvm_mtrr_get_guest_memory_type(vcpu, gfn) << VMX_EPT_MT_EPTE_SHIFT;
++}
++
+ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
++
++
+ {
+        struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+        struct vcpu_tdx *tdx = to_tdx(vcpu);
+diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+index 96f5546194d4..38fb888e1be9 100644
+--- a/arch/x86/kvm/vmx/x86_ops.h
++++ b/arch/x86/kvm/vmx/x86_ops.h
+@@ -168,6 +168,7 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu,
+ void tdx_deliver_interrupt(struct kvm_lapic *apic, int delivery_mode,
+                           int trig_mode, int vector);
+ void tdx_inject_nmi(struct kvm_vcpu *vcpu);
++u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
+ void tdx_get_exit_info(struct kvm_vcpu *vcpu, u32 *reason,
+                u64 *info1, u64 *info2, u32 *intr_info, u32 *error_code);
+ bool tdx_is_emulated_msr(u32 index, bool write);
 
-Environment:
-CPU Architecture: x86_64
-Host OS: Red Hat Enterprise Linux 9 (Ootpa)
-Host kernel: Linux 6.1 release
-gcc: gcc (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)
-Host kernel source:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-Branch: master
-Commit: 830b3c68
-
-Qemu source: https://git.qemu.org/git/qemu.git
-Branch: master
-Commit: 5204b499
-
-kvm-unit-tests source: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
-Branch: master
-Commit: 7cefda524604fe1138333315ce06224d4d864dab
-
-Bug Detailed Description:
-kvm-unit-test xapic fails on the linux 6.1 release kernel.=20
-
-FAIL: Want 2 IPI(s) using physical mode, dest =3D 5d, got 1 IPI(s)
-qemu-system-x86_64: terminating on signal 15 from pid 208676 (timeout)
-FAIL xapic (timeout; duration=3D60)
-
-
-Reproducing Steps:
-
-git clone https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
-cd kvm-unit-tests
-./configure
-make standalone
-cd tests
-./xapic
-
-Actual Result:
-...
-starting broadcast (xapic)
-PASS: APIC physical broadcast address
-PASS: APIC physical broadcast shorthand
-PASS: IPI to single target using logical flat mode
-PASS: IPI to single target using logical cluster mode
-FAIL: Want 2 IPI(s) using logical flat mode, dest =3D 3, got 1 IPI(s)
-FAIL: IPI to multiple targets using logical flat mode
-FAIL: Want 2 IPI(s) using logical cluster mode, dest =3D 3, got 1 IPI(s)
-FAIL: IPI to multiple targets using logical cluster mode
-...
-FAIL: Want 2 IPI(s) using physical mode, dest =3D 5b, got 1 IPI(s)
-FAIL: Want 2 IPI(s) using physical mode, dest =3D 5c, got 1 IPI(s)
-FAIL: Want 2 IPI(s) using physical mode, dest =3D 5d, got 1 IPI(s)
-qemu-system-x86_64: terminating on signal 15 from pid 208676 (timeout)
-FAIL xapic (timeout; duration=3D60)
-
-
-Expected Result:
-...
-PASS xapic
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+-- 
+Isaku Yamahata <isaku.yamahata@gmail.com>
