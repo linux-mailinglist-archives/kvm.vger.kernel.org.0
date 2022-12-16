@@ -2,240 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5BC7164E8DA
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 10:49:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5407364E874
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 10:06:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230216AbiLPJtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 04:49:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39000 "EHLO
+        id S230084AbiLPJF7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 04:05:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230163AbiLPJtl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 04:49:41 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05EB147328
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 01:49:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671184180; x=1702720180;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=gShEjJ2hfl0fm1FY2ClSZw9DBfUVJQGyj8JNfRa1rXQ=;
-  b=U67nimpJWRQwdLqAfUTFf8zcW7g1ly7Ryc+lqxzjRn+sq93EMpg0wzCV
-   sXA3F4tonTK/FrgxvsTFEl/CN+zdMfsUcp0Rxppa0qRdMtTv9zwNZDYu0
-   2rwii1PkroVQh2EVvyl8jhI4LEUBOSVEDiHbSniyBlS/AwcykX2wluj9f
-   Lqp+WmZAhZVYWHNJlFOAtMUNL0+mJgfCCNjbfx1N9v13SSnmQDhELZoY0
-   dsH9liYUkQAfl5iUrSj7034cGfe5ozGqV9nABThCiq71rHkIr3oRbL6Ni
-   SbsL71FROL/CB9TQcujLpMPKdd7UtLmjOTSjYemtpaHCw7jSCrN+QF0Yf
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10562"; a="299270092"
-X-IronPort-AV: E=Sophos;i="5.96,249,1665471600"; 
-   d="scan'208";a="299270092"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2022 01:49:39 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10562"; a="649752713"
-X-IronPort-AV: E=Sophos;i="5.96,249,1665471600"; 
-   d="scan'208";a="649752713"
-Received: from skxmcp01.bj.intel.com ([10.240.193.86])
-  by orsmga002.jf.intel.com with ESMTP; 16 Dec 2022 01:49:35 -0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, oliver.upton@linux.dev,
-        catalin.marinas@arm.com, will@kernel.org, dwmw2@infradead.org,
-        paul@xen.org
-Subject: [PATCH v4 2/2] KVM: MMU: Make the definition of 'INVALID_GPA' common
-Date:   Fri, 16 Dec 2022 16:59:28 +0800
-Message-Id: <20221216085928.1671901-3-yu.c.zhang@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221216085928.1671901-1-yu.c.zhang@linux.intel.com>
-References: <20221216085928.1671901-1-yu.c.zhang@linux.intel.com>
+        with ESMTP id S230082AbiLPJFx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 04:05:53 -0500
+Received: from mail.dorback.pl (mail.dorback.pl [79.141.165.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA49222A1
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 01:05:47 -0800 (PST)
+Received: by mail.dorback.pl (Postfix, from userid 1001)
+        id B4A0B270AE; Fri, 16 Dec 2022 09:02:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=dorback.pl; s=mail;
+        t=1671181383; bh=5/Q5LqnCr9nf+4mgKrDsu7QHA4HlFrn07c6+gLYA3/A=;
+        h=Date:From:To:Subject:From;
+        b=NeDUsd6EPO8fTAvV5QEJMVtVnA9XwL8CyPAy4FzVxf8SMB2M0K8T0ZTBHxnpOtNx4
+         /qGFgYIR3HoMYBHpFMcisHG5emyzjmsUfwtxCVPtOVpM7FioRVKt4/gdB1Fgoz2hFs
+         7Gn92RnKbWR2EY5HDbhhdRDrYrvYfXGqZwqSt2B755rxXFQ7fv05TUZ0QQryS71hqt
+         dg2PX0hkt1rEpDNRNy53YTRRiCgDKlypuqeaTbYcY92AhVi5iRjPcj2fSnbvbQBj4F
+         ffn78SVCmWYWDewpGTucfsg9NXOMJ0RoCoK60gz1Lkw08RyQteCZAoztaRJ5Uf5Jd1
+         /v/xigS43NBFw==
+Received: by mail.dorback.pl for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 09:01:48 GMT
+Message-ID: <20221216073001-0.1.1p.6i7a.0.x0j34jo2mb@dorback.pl>
+Date:   Fri, 16 Dec 2022 09:01:48 GMT
+From:   =?UTF-8?Q? "Pawe=C5=82_Jankowski" ?= <pawel.jankowski@dorback.pl>
+To:     <kvm@vger.kernel.org>
+Subject: =?UTF-8?Q?Rozlicz_fotowoltaik=C4=99_lub_pompy_ciep=C5=82a_jeszcze_w_tym_roku?=
+X-Mailer: mail.dorback.pl
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: Yes, score=7.0 required=5.0 tests=BAYES_20,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_SBL_CSS,
+        RCVD_IN_VALIDITY_RPBL,SPF_HELO_NONE,SPF_PASS,URIBL_CSS_A,
+        URIBL_DBL_SPAM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Report: *  2.5 URIBL_DBL_SPAM Contains a spam URL listed in the Spamhaus DBL
+        *      blocklist
+        *      [URIs: dorback.pl]
+        * -0.0 BAYES_20 BODY: Bayes spam probability is 5 to 20%
+        *      [score: 0.1797]
+        *  3.3 RCVD_IN_SBL_CSS RBL: Received via a relay in Spamhaus SBL-CSS
+        *      [79.141.165.48 listed in zen.spamhaus.org]
+        *  1.3 RCVD_IN_VALIDITY_RPBL RBL: Relay in Validity RPBL,
+        *      https://senderscore.org/blocklistlookup/
+        *      [79.141.165.48 listed in bl.score.senderscore.com]
+        *  0.1 URIBL_CSS_A Contains URL's A record listed in the Spamhaus CSS
+        *      blocklist
+        *      [URIs: dorback.pl]
+        *  0.0 SPF_HELO_NONE SPF: HELO does not publish an SPF Record
+        * -0.0 SPF_PASS SPF: sender matches SPF record
+        *  0.1 DKIM_SIGNED Message has a DKIM or DK signature, not necessarily
+        *       valid
+        * -0.1 DKIM_VALID_EF Message has a valid DKIM or DK signature from
+        *      envelope-from domain
+        * -0.1 DKIM_VALID_AU Message has a valid DKIM or DK signature from
+        *      author's domain
+        * -0.1 DKIM_VALID Message has at least one valid DKIM or DK signature
+X-Spam-Level: *******
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in
-kvm_types.h, and it is used by ARM and X86 xen code. We do
-not need a specific definition of 'INVALID_GPA' for X86.
+Dzie=C5=84 dobry,
 
-Instead of using the common 'GPA_INVALID' for X86, replace
-the definition of 'GPA_INVALID' with 'INVALID_GPA', and
-change the users of 'GPA_INVALID', so that the diff can be
-smaller. Also because the name 'INVALID_GPA' tells the user
-we are using an invalid GPA, while the name 'GPA_INVALID'
-is emphasizing the GPA is an invalid one.
+grudzie=C5=84 to ostatni miesi=C4=85c w tym roku, kiedy mog=C4=85 Pa=C5=84=
+stwo rozliczy=C4=87 podatek VAT z takich inwestycji jak fotowoltaika lub =
+pompy ciep=C5=82a.
 
-Also, add definition of 'INVALID_GFN' because it is more
-proper than 'INVALID_GPA' for GFN variables.
+Jeste=C5=9Bmy firm=C4=85 z wieloletnim do=C5=9Bwiadczeniem, kt=C3=B3ra sp=
+rawnie przygotuje dla Pa=C5=84stwa ofert=C4=99 i wszelkie formalno=C5=9Bc=
+i. Sam monta=C5=BC zaplanujemy na wiosn=C4=99.
 
-No functional change intended.
+O samych plusach fotowoltaiki czy pompach ciep=C5=82a na pewno ju=C5=BC P=
+a=C5=84stwo s=C5=82yszeli, dlatego teraz prosimy o zostawienie kontaktu, =
+aby nasz specjalista m=C3=B3g=C5=82 przedstawi=C4=87 ofert=C4=99 zgodn=C4=
+=85 z Waszymi potrzebami.
 
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-Reviewed-by: Paul Durrant <paul@xen.org>
----
- arch/arm64/include/asm/kvm_host.h |  4 ++--
- arch/arm64/kvm/hypercalls.c       |  2 +-
- arch/arm64/kvm/pvtime.c           |  8 ++++----
- arch/x86/include/asm/kvm_host.h   |  2 --
- arch/x86/kvm/xen.c                | 10 +++++-----
- include/linux/kvm_types.h         |  2 +-
- 6 files changed, 13 insertions(+), 15 deletions(-)
+Kiedy mogliby=C5=9Bmy z Pa=C5=84stwem um=C3=B3wi=C4=87 si=C4=99 na rozmow=
+=C4=99 w celu zbadania potrzeb?
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 001c8abe87fc..fcf96e9cc8cd 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -906,12 +906,12 @@ void kvm_arm_vmid_clear_active(void);
- 
- static inline void kvm_arm_pvtime_vcpu_init(struct kvm_vcpu_arch *vcpu_arch)
- {
--	vcpu_arch->steal.base = GPA_INVALID;
-+	vcpu_arch->steal.base = INVALID_GPA;
- }
- 
- static inline bool kvm_arm_is_pvtime_enabled(struct kvm_vcpu_arch *vcpu_arch)
- {
--	return (vcpu_arch->steal.base != GPA_INVALID);
-+	return (vcpu_arch->steal.base != INVALID_GPA);
- }
- 
- void kvm_set_sei_esr(struct kvm_vcpu *vcpu, u64 syndrome);
-diff --git a/arch/arm64/kvm/hypercalls.c b/arch/arm64/kvm/hypercalls.c
-index c9f401fa01a9..64c086c02c60 100644
---- a/arch/arm64/kvm/hypercalls.c
-+++ b/arch/arm64/kvm/hypercalls.c
-@@ -198,7 +198,7 @@ int kvm_hvc_call_handler(struct kvm_vcpu *vcpu)
- 		break;
- 	case ARM_SMCCC_HV_PV_TIME_ST:
- 		gpa = kvm_init_stolen_time(vcpu);
--		if (gpa != GPA_INVALID)
-+		if (gpa != INVALID_GPA)
- 			val[0] = gpa;
- 		break;
- 	case ARM_SMCCC_VENDOR_HYP_CALL_UID_FUNC_ID:
-diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
-index 78a09f7a6637..4ceabaa4c30b 100644
---- a/arch/arm64/kvm/pvtime.c
-+++ b/arch/arm64/kvm/pvtime.c
-@@ -19,7 +19,7 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
- 	u64 steal = 0;
- 	int idx;
- 
--	if (base == GPA_INVALID)
-+	if (base == INVALID_GPA)
- 		return;
- 
- 	idx = srcu_read_lock(&kvm->srcu);
-@@ -40,7 +40,7 @@ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
- 	switch (feature) {
- 	case ARM_SMCCC_HV_PV_TIME_FEATURES:
- 	case ARM_SMCCC_HV_PV_TIME_ST:
--		if (vcpu->arch.steal.base != GPA_INVALID)
-+		if (vcpu->arch.steal.base != INVALID_GPA)
- 			val = SMCCC_RET_SUCCESS;
- 		break;
- 	}
-@@ -54,7 +54,7 @@ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu)
- 	struct kvm *kvm = vcpu->kvm;
- 	u64 base = vcpu->arch.steal.base;
- 
--	if (base == GPA_INVALID)
-+	if (base == INVALID_GPA)
- 		return base;
- 
- 	/*
-@@ -89,7 +89,7 @@ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
- 		return -EFAULT;
- 	if (!IS_ALIGNED(ipa, 64))
- 		return -EINVAL;
--	if (vcpu->arch.steal.base != GPA_INVALID)
-+	if (vcpu->arch.steal.base != INVALID_GPA)
- 		return -EEXIST;
- 
- 	/* Check the address is in a valid memslot */
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index f35f1ff4427b..46e50cb6c9ca 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -134,8 +134,6 @@
- #define INVALID_PAGE (~(hpa_t)0)
- #define VALID_PAGE(x) ((x) != INVALID_PAGE)
- 
--#define INVALID_GPA (~(gpa_t)0)
--
- /* KVM Hugepage definitions for x86 */
- #define KVM_MAX_HUGEPAGE_LEVEL	PG_LEVEL_1G
- #define KVM_NR_PAGE_SIZES	(KVM_MAX_HUGEPAGE_LEVEL - PG_LEVEL_4K + 1)
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 6908a74ab303..ec893276681c 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -705,7 +705,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 		BUILD_BUG_ON(offsetof(struct vcpu_info, time) !=
- 			     offsetof(struct compat_vcpu_info, time));
- 
--		if (data->u.gpa == GPA_INVALID) {
-+		if (data->u.gpa == INVALID_GPA) {
- 			kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_info_cache);
- 			r = 0;
- 			break;
-@@ -719,7 +719,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 		break;
- 
- 	case KVM_XEN_VCPU_ATTR_TYPE_VCPU_TIME_INFO:
--		if (data->u.gpa == GPA_INVALID) {
-+		if (data->u.gpa == INVALID_GPA) {
- 			kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_time_info_cache);
- 			r = 0;
- 			break;
-@@ -739,7 +739,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 			r = -EOPNOTSUPP;
- 			break;
- 		}
--		if (data->u.gpa == GPA_INVALID) {
-+		if (data->u.gpa == INVALID_GPA) {
- 			r = 0;
- 		deactivate_out:
- 			kvm_gpc_deactivate(&vcpu->arch.xen.runstate_cache);
-@@ -937,7 +937,7 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 		if (vcpu->arch.xen.vcpu_info_cache.active)
- 			data->u.gpa = vcpu->arch.xen.vcpu_info_cache.gpa;
- 		else
--			data->u.gpa = GPA_INVALID;
-+			data->u.gpa = INVALID_GPA;
- 		r = 0;
- 		break;
- 
-@@ -945,7 +945,7 @@ int kvm_xen_vcpu_get_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
- 		if (vcpu->arch.xen.vcpu_time_info_cache.active)
- 			data->u.gpa = vcpu->arch.xen.vcpu_time_info_cache.gpa;
- 		else
--			data->u.gpa = GPA_INVALID;
-+			data->u.gpa = INVALID_GPA;
- 		r = 0;
- 		break;
- 
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index d21c0d7fee31..b961043e664a 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -40,7 +40,7 @@ typedef unsigned long  gva_t;
- typedef u64            gpa_t;
- typedef u64            gfn_t;
- 
--#define GPA_INVALID	(~(gpa_t)0)
-+#define INVALID_GPA	(~(gpa_t)0)
- #define INVALID_GFN	(~(gfn_t)0)
- 
- typedef unsigned long  hva_t;
--- 
-2.25.1
 
+Pozdrawiam,
+Pawe=C5=82 Jankowski
