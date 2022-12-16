@@ -2,127 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D8AF64E810
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 09:18:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8451864E8D8
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 10:49:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229962AbiLPIS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 03:18:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34142 "EHLO
+        id S229964AbiLPJth (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 04:49:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbiLPIS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 03:18:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F9F731DF3
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 00:17:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671178666;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4KGOKUTEvzrBvEA1jxN7kPdKtnidXxtFVRo6lZX+D2Q=;
-        b=RHQZZildndplTTcuTN4PN1ht4ZLFtS/qANn82bYYYxrg3XzDoJrlYh49/xWqXvXaw8tD9F
-        LjfQln9M53T0l8CQ9qWxZJXtwSEvVMrOrRQluUPzh9dNLhXOYPZ9B+wQH32iqgXz58m8my
-        akKefLyHzpXhDcHwMBRwkId0nXJChSg=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-136-7pswXMicP8-auZfzsm4WqA-1; Fri, 16 Dec 2022 03:17:44 -0500
-X-MC-Unique: 7pswXMicP8-auZfzsm4WqA-1
-Received: by mail-ed1-f70.google.com with SMTP id r12-20020a05640251cc00b00463699c95aeso1330790edd.18
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 00:17:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4KGOKUTEvzrBvEA1jxN7kPdKtnidXxtFVRo6lZX+D2Q=;
-        b=oD9BcujgQIdByYJ0orD4KiIfP4Bm2Wik359UWSVpOmqehbmSVAzdTT4cp72iVvm2D3
-         /bju3c4ZOprqtaIgrIZ746yp7BlgJkxW7Bf0VvWJB1Y9LyZ9GZDto+IVNGohpzIPwUVG
-         N9/gOU9Vy5Of5s01WswVJ8rUr8L9EmENvan+II/whJr2Sni9EpP4P5KzApxpTJK0IsFt
-         +2s/UccwvL1SGph8R73Jq9YuRFhfgsZRY86CvA58rhFesiZag0dWXvSiQX/s/eYbQ/gd
-         fyXvXYmKicP4SSPD0R3ILZI+0grdynCpD099lyJDkShUqpoxzYffZwBMRaR/1kNesPzZ
-         NAig==
-X-Gm-Message-State: ANoB5pmVcRRsASYVvPsZmjEI2tc65QYremj6eWXzURmFWb59jov3aai+
-        QCuTrH3wtcLlroYUbIM9yN5zHFmizNUhyEg6VQcrz4Oi8x0W0Q9gQAqUWK52KT/mlUs5f7C3ayS
-        oqzLQIS00DYGU
-X-Received: by 2002:a17:906:2a8c:b0:78d:f454:3771 with SMTP id l12-20020a1709062a8c00b0078df4543771mr24774191eje.20.1671178663700;
-        Fri, 16 Dec 2022 00:17:43 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf6sZCQNVVSH0tlQ7oUCjhdaY1lAQnZ7t2cnJ55GlYG5/67gf8hOOHfNI/lL3sZrJTgcetWSDA==
-X-Received: by 2002:a17:906:2a8c:b0:78d:f454:3771 with SMTP id l12-20020a1709062a8c00b0078df4543771mr24774184eje.20.1671178663487;
-        Fri, 16 Dec 2022 00:17:43 -0800 (PST)
-Received: from sgarzare-redhat (host-87-11-6-51.retail.telecomitalia.it. [87.11.6.51])
-        by smtp.gmail.com with ESMTPSA id 10-20020a170906328a00b007bc8ef7416asm574385ejw.25.2022.12.16.00.17.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Dec 2022 00:17:42 -0800 (PST)
-Date:   Fri, 16 Dec 2022 09:17:38 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, eperezma@redhat.com,
-        stefanha@redhat.com, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 1/6] vdpa: add bind_mm callback
-Message-ID: <20221216081738.wlhevfmvzfs3rsrg@sgarzare-redhat>
-References: <20221214163025.103075-1-sgarzare@redhat.com>
- <20221214163025.103075-2-sgarzare@redhat.com>
- <CACGkMEtB6uQ_6fKU5F-D0vG+gQz9mMdYWUQwre-yp1sVpGvKPQ@mail.gmail.com>
+        with ESMTP id S229547AbiLPJtd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 04:49:33 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A8047325
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 01:49:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1671184172; x=1702720172;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3Jy3D579A34GePYyODHwk6V2pW+lPabCZCjPITSW0do=;
+  b=JngNkG5EOE/9L7nxnmZKen1t0ElJ6fGqw/CCjJLsjlvW7ko9ekQ2IMdl
+   BmaTvuuRUgoQuzy7YFqdCauQVVmC3DLQPve9M7naOHJAreI7NLBk4kx1N
+   NGlGGhNIUvXrXKk8PB10f8n2XMnNQ20WqtVScMYuGwP8GyKfywLJbwXsU
+   IZssoyO4pnZMY23mkjtRgPgb6Y2N3KjkGhjh4F0nJvvJYaZgsfQCr0zz+
+   Jz14ePGhxZkrP3VwvxN8MZxhyIwA5h5Ca/xsjo2MLFykCmHqI7phPOvcM
+   bJfoDME3lFRF7VMbtzgtaY+P/VCrgoRpuG48j1CDMR+bJmYpaytUhq6w0
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10562"; a="299270066"
+X-IronPort-AV: E=Sophos;i="5.96,249,1665471600"; 
+   d="scan'208";a="299270066"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2022 01:49:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10562"; a="649752693"
+X-IronPort-AV: E=Sophos;i="5.96,249,1665471600"; 
+   d="scan'208";a="649752693"
+Received: from skxmcp01.bj.intel.com ([10.240.193.86])
+  by orsmga002.jf.intel.com with ESMTP; 16 Dec 2022 01:49:28 -0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, maz@kernel.org,
+        james.morse@arm.com, alexandru.elisei@arm.com,
+        suzuki.poulose@arm.com, oliver.upton@linux.dev,
+        catalin.marinas@arm.com, will@kernel.org, dwmw2@infradead.org,
+        paul@xen.org
+Subject: [PATCH v4 0/2] KVM: MMU: Use 'INVALID_GPA' and 'INVALID_GFN' properly
+Date:   Fri, 16 Dec 2022 16:59:26 +0800
+Message-Id: <20221216085928.1671901-1-yu.c.zhang@linux.intel.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <CACGkMEtB6uQ_6fKU5F-D0vG+gQz9mMdYWUQwre-yp1sVpGvKPQ@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 16, 2022 at 02:37:45PM +0800, Jason Wang wrote:
->On Thu, Dec 15, 2022 at 12:30 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> This new optional callback is used to bind the device to a specific
->> address space so the vDPA framework can use VA when this callback
->> is implemented.
->>
->> Suggested-by: Jason Wang <jasowang@redhat.com>
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>  include/linux/vdpa.h | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->>
->> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
->> index 6d0f5e4e82c2..34388e21ef3f 100644
->> --- a/include/linux/vdpa.h
->> +++ b/include/linux/vdpa.h
->> @@ -282,6 +282,12 @@ struct vdpa_map_file {
->>   *                             @iova: iova to be unmapped
->>   *                             @size: size of the area
->>   *                             Returns integer: success (0) or error (< 0)
->> + * @bind_mm:                   Bind the device to a specific address space
->> + *                             so the vDPA framework can use VA when this
->> + *                             callback is implemented. (optional)
->> + *                             @vdev: vdpa device
->> + *                             @mm: address space to bind
->
->Do we need an unbind or did a NULL mm mean unbind?
+Pacth 1 adds a new definition, 'INVALID_GFN', so that GFN
+values can use it, instead of the 'GPA_INVALID'.
 
-Yep, your comment in patch 6 makes it necessary. I will add it!
+Pacth 2 makes the definition of 'INVALID_GPA' shared by
+different archs.
 
->
->> + *                             @owner: process that owns the address space
->
->Any reason we need the task_struct here?
+Both are tested by rebuilding KVM for x86 and for ARM64.
 
-Mainly to attach to kthread to the process cgroups, but that part is 
-still in TODO since I need to understand it better.
+---
+V4:
+- Put the addition of 'INVALID_GFN' into a seperate patch.
+V3:
+- Added 'INVALID_GFN' and use it.
+v2:
+- Renamed 'GPA_INVALID' to 'INVALID_GPA' and modify _those_ users. 
+v1:
+https://lore.kernel.org/lkml/20221209023622.274715-1-yu.c.zhang@linux.intel.com/
 
-Maybe we can remove the task_struct here and use `current` directly in 
-the callback.
+Yu Zhang (2):
+  KVM: MMU: Introduce 'INVALID_GFN' and use it for GFN values
+  KVM: MMU: Make the definition of 'INVALID_GPA' common
 
-Thanks,
-Stefano
+ arch/arm64/include/asm/kvm_host.h                  |  4 ++--
+ arch/arm64/kvm/hypercalls.c                        |  2 +-
+ arch/arm64/kvm/pvtime.c                            |  8 ++++----
+ arch/x86/include/asm/kvm_host.h                    |  2 --
+ arch/x86/kvm/xen.c                                 | 14 +++++++-------
+ include/linux/kvm_types.h                          |  3 ++-
+ .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |  4 ++--
+ 7 files changed, 18 insertions(+), 19 deletions(-)
+
+-- 
+2.25.1
 
