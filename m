@@ -2,181 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65AF564F2EA
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 22:05:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C585964F38B
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 22:55:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231783AbiLPVF4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 16:05:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48610 "EHLO
+        id S229734AbiLPVz2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 16:55:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231226AbiLPVFy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 16:05:54 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58C011457;
-        Fri, 16 Dec 2022 13:05:53 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BGKjb2Y006918;
-        Fri, 16 Dec 2022 21:05:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Oo8mBuBZgFRfBoIG2R9zZw/e4eRe4rB5Bfcu13vegAk=;
- b=EoR0U5m/6iVjxgitSzVErDG1iZChS9mnYHzx+KIvAuIPJCtQnXAdRRxW4yVbT5dnPCg0
- 3gS+bSvcUGqQvzXeA31XQsvlJUHa0TW5oJITKyB5rx3EABCcayxxEUgbkzPAAUKKZo8d
- etO8PC6w8GLjNs0jRJ5LCICHJgJB1ZpE1k9qUEC3H6osFvXEsecrktfgffmTkNOwvL93
- WuUL291rkEaNDKtRNQEPfJbFA/0jg5u1PFd58hHPzJiXJgvUVnQa4bCBpheb/o1QLlik
- bjcPVMV5TqG07+PGxpoNnrN6tiJcWgeVbodxOywOqnfVzFEehO+zQKvflnRk4dIpOQWT FA== 
-Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com [169.47.144.26])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mh00brgjt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 16 Dec 2022 21:05:53 +0000
-Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
-        by ppma04wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BGL1FBZ030949;
-        Fri, 16 Dec 2022 21:05:52 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
-        by ppma04wdc.us.ibm.com (PPS) with ESMTPS id 3meyqkvgud-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 16 Dec 2022 21:05:52 +0000
-Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
-        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BGL5ogd66191686
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 16 Dec 2022 21:05:50 GMT
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 963EA5805A;
-        Fri, 16 Dec 2022 21:05:50 +0000 (GMT)
-Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2471F5805F;
-        Fri, 16 Dec 2022 21:05:49 +0000 (GMT)
-Received: from [9.160.114.181] (unknown [9.160.114.181])
-        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 16 Dec 2022 21:05:48 +0000 (GMT)
-Message-ID: <56ab58a3-345b-3ac8-13c4-125e9b83fec1@linux.ibm.com>
-Date:   Fri, 16 Dec 2022 16:05:48 -0500
+        with ESMTP id S229475AbiLPVz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 16:55:26 -0500
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AFE65F402
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 13:55:24 -0800 (PST)
+Received: by mail-ej1-x62a.google.com with SMTP id m18so9238867eji.5
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 13:55:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hDjaN8eJVHHHAcFnMzr9A5qx6nMta47BhVSDkoRkjiY=;
+        b=koVIL3cKjIUh0I9iexsK0DqWfQr49gTESlxiAo8T9vnX2CJ4QixeCzMydRIRBOKWbx
+         +R5klEOuw0jjsMOseiyYra2DmM7xugL01wBlJceq+pr1ETQMYuEF+l2nrxerxSyoOukk
+         EE8047bs8JQBm+dUp3FUQQC1qnfqTHK47keip65hJwdx3mwendQAsAQLaIBR2pRzqlvf
+         NqOH4fAeX01aJpH0nqGWNSKzukViznSJY7eNEFluBWjQzNLupunEjytyMWUMkkzTPBA2
+         KPTKjr9ShUXrdrTne0thHjnLliuX8/iEm2579930rtW//wgEDKCU8+iqi5HVgULV6x0O
+         iFTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hDjaN8eJVHHHAcFnMzr9A5qx6nMta47BhVSDkoRkjiY=;
+        b=yVZVtHnMbjdtueNr8HSn8HoMhCg1SCSHTJh2QvMZYxAJFGU6FmzGejmxqpXF0q68iV
+         9cweVC07wa+2pDgDCapYnoGrNDhha5b54W+IwZbRSYUXlY09gGJn0Cm2qHOpxKPMJgKP
+         6/cai5rKPNiKUfmPRYCrRsCpiArgypRoowlp4s4oKRuDMeJhpSrSVlOnnQrqWrn3TjoV
+         NFFGS54hepJ088k60o3S9JB2M6SLZEHOz1rQV11eZ+UPq/0cg/HQ6Q0TCam1nM8zBV98
+         zwsYUf9l8EoBjWqKBvVhK5VJN5VzofYWQdYL2WPjmFA/5r6nii6bXVIiw19XoHlnIGkb
+         Lqgg==
+X-Gm-Message-State: ANoB5pkqnk6m3EY9vYtlCSq4z/3xGQ6oke5uZoPeeh5T9nprIc/JUvIg
+        avVzX3Zw5VYeppVEAYf0lMNKrw==
+X-Google-Smtp-Source: AA0mqf44m9uRz2q1p7VXh76chobt7pep0KjNv3fyOdRMxmPyqai4zHyqi15eXjf/Z+1BI3Gb+0JNtQ==
+X-Received: by 2002:a17:906:8385:b0:7c4:f348:3b1f with SMTP id p5-20020a170906838500b007c4f3483b1fmr10710690ejx.44.1671227722936;
+        Fri, 16 Dec 2022 13:55:22 -0800 (PST)
+Received: from localhost.localdomain ([185.126.107.38])
+        by smtp.gmail.com with ESMTPSA id f22-20020a17090631d600b007aece68483csm1261840ejf.193.2022.12.16.13.55.20
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Fri, 16 Dec 2022 13:55:22 -0800 (PST)
+From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+To:     qemu-devel@nongnu.org
+Cc:     Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+        =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+        qemu-arm@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Marek Vasut <marex@denx.de>, Bin Meng <bin.meng@windriver.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+        qemu-riscv@nongnu.org, kvm@vger.kernel.org,
+        Stafford Horne <shorne@gmail.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Chris Wulff <crwulff@gmail.com>
+Subject: [PATCH v3 0/5] target/cpu: System/User cleanups around hwaddr/vaddr
+Date:   Fri, 16 Dec 2022 22:55:14 +0100
+Message-Id: <20221216215519.5522-1-philmd@linaro.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v1 09/16] vfio/ccw: populate page_array struct inline
-Content-Language: en-US
-To:     Eric Farman <farman@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>
-Cc:     Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org
-References: <20221121214056.1187700-1-farman@linux.ibm.com>
- <20221121214056.1187700-10-farman@linux.ibm.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <20221121214056.1187700-10-farman@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hBClydWd-bn4w9InIx30Sb4Vq4ar3BKw
-X-Proofpoint-ORIG-GUID: hBClydWd-bn4w9InIx30Sb4Vq4ar3BKw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-16_14,2022-12-15_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
- spamscore=0 adultscore=0 clxscore=1015 malwarescore=0 bulkscore=0
- priorityscore=1501 impostorscore=0 mlxscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2212160187
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 11/21/22 4:40 PM, Eric Farman wrote:
-> There are two possible ways the list of addresses that get passed
-> to vfio are calculated. One is from a guest IDAL, which would be
-> an array of (probably) non-contiguous addresses. The other is
-> built from contiguous pages that follow the starting address
-> provided by ccw->cda.
-> 
-> page_array_alloc() attempts to simplify things by pre-populating
-> this array from the starting address, but that's not needed for
-> a CCW with an IDAL anyway so doesn't need to be in the allocator.
-> Move it to the caller in the non-IDAL case, since it will be
-> overwritten when reading the guest IDAL.
-> 
-> Remove the initialization of the pa_page output pointers,
-> since it won't be explicitly needed for either case.
-> 
-> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+Missing review: #1
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+We are not supposed to use the 'hwaddr' type on user emulation.
 
-> ---
->  drivers/s390/cio/vfio_ccw_cp.c | 22 +++++-----------------
->  1 file changed, 5 insertions(+), 17 deletions(-)
-> 
-> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-> index 66e890441163..a30f26962750 100644
-> --- a/drivers/s390/cio/vfio_ccw_cp.c
-> +++ b/drivers/s390/cio/vfio_ccw_cp.c
-> @@ -42,7 +42,6 @@ struct ccwchain {
->  /*
->   * page_array_alloc() - alloc memory for page array
->   * @pa: page_array on which to perform the operation
-> - * @iova: target guest physical address
->   * @len: number of pages that should be pinned from @iova
->   *
->   * Attempt to allocate memory for page array.
-> @@ -56,10 +55,8 @@ struct ccwchain {
->   *   -EINVAL if pa->pa_nr is not initially zero, or pa->pa_iova is not NULL
->   *   -ENOMEM if alloc failed
->   */
-> -static int page_array_alloc(struct page_array *pa, u64 iova, unsigned int len)
-> +static int page_array_alloc(struct page_array *pa, unsigned int len)
->  {
-> -	int i;
-> -
->  	if (pa->pa_nr || pa->pa_iova)
->  		return -EINVAL;
->  
-> @@ -78,13 +75,6 @@ static int page_array_alloc(struct page_array *pa, u64 iova, unsigned int len)
->  		return -ENOMEM;
->  	}
->  
-> -	pa->pa_iova[0] = iova;
-> -	pa->pa_page[0] = NULL;
-> -	for (i = 1; i < pa->pa_nr; i++) {
-> -		pa->pa_iova[i] = pa->pa_iova[i - 1] + PAGE_SIZE;
-> -		pa->pa_page[i] = NULL;
-> -	}
-> -
->  	return 0;
->  }
->  
-> @@ -548,7 +538,7 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
->  	 * required for the data transfer, since we only only support
->  	 * 4K IDAWs today.
->  	 */
-> -	ret = page_array_alloc(pa, iova, idaw_nr);
-> +	ret = page_array_alloc(pa, idaw_nr);
->  	if (ret < 0)
->  		goto out_free_idaws;
->  
-> @@ -565,11 +555,9 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
->  		for (i = 0; i < idaw_nr; i++)
->  			pa->pa_iova[i] = idaws[i];
->  	} else {
-> -		/*
-> -		 * No action is required here; the iova addresses in page_array
-> -		 * were initialized sequentially in page_array_alloc() beginning
-> -		 * with the contents of ccw->cda.
-> -		 */
-> +		pa->pa_iova[0] = iova;
-> +		for (i = 1; i < pa->pa_nr; i++)
-> +			pa->pa_iova[i] = pa->pa_iova[i - 1] + PAGE_SIZE;
->  	}
->  
->  	if (ccw_does_data_transfer(ccw)) {
+This series is a preparatory cleanup before few refactors to
+isolate further System vs User code.
+
+Since v1:
+- only restrict SavedIOTLB in header (Alex)
+- convert insert/remove_breakpoint implementations (Peter)
+
+Since v2:
+- added 'dump' patch
+- collected R-b tags
+
+Philippe Mathieu-Daudé (5):
+  dump: Include missing "cpu.h" header for tswap32/tswap64()
+    declarations
+  cputlb: Restrict SavedIOTLB to system emulation
+  gdbstub: Use vaddr type for generic insert/remove_breakpoint() API
+  target/cpu: Restrict cpu_get_phys_page_debug() handlers to sysemu
+  target/cpu: Restrict do_transaction_failed() handlers to sysemu
+
+ accel/kvm/kvm-all.c        |  4 ++--
+ accel/kvm/kvm-cpus.h       |  4 ++--
+ accel/tcg/tcg-accel-ops.c  |  4 ++--
+ dump/dump.c                |  1 +
+ gdbstub/gdbstub.c          |  1 -
+ gdbstub/internals.h        |  6 ++++--
+ gdbstub/softmmu.c          |  5 ++---
+ gdbstub/user.c             |  5 ++---
+ include/hw/core/cpu.h      |  6 ++++--
+ include/sysemu/accel-ops.h |  6 +++---
+ target/alpha/cpu.h         |  2 +-
+ target/arm/cpu.h           |  2 +-
+ target/arm/internals.h     |  2 ++
+ target/cris/cpu.h          |  3 +--
+ target/hppa/cpu.h          |  2 +-
+ target/i386/cpu.h          |  5 ++---
+ target/m68k/cpu.h          |  4 +++-
+ target/microblaze/cpu.h    |  4 ++--
+ target/nios2/cpu.h         |  2 +-
+ target/openrisc/cpu.h      |  3 ++-
+ target/ppc/cpu.h           |  2 +-
+ target/riscv/cpu.h         | 12 ++++++------
+ target/rx/cpu.h            |  2 +-
+ target/rx/helper.c         |  4 ++--
+ target/sh4/cpu.h           |  2 +-
+ target/sparc/cpu.h         |  3 ++-
+ target/xtensa/cpu.h        |  2 +-
+ 27 files changed, 52 insertions(+), 46 deletions(-)
+
+-- 
+2.38.1
 
