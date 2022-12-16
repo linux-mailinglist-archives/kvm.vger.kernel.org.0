@@ -2,71 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E62D64F143
-	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 19:51:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A19AA64F15D
+	for <lists+kvm@lfdr.de>; Fri, 16 Dec 2022 20:04:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231322AbiLPSvJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 16 Dec 2022 13:51:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48642 "EHLO
+        id S231846AbiLPTER (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 16 Dec 2022 14:04:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231681AbiLPSu5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 16 Dec 2022 13:50:57 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4A72CCBD
-        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 10:50:54 -0800 (PST)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BGGhbdk026367;
-        Fri, 16 Dec 2022 18:50:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2022-7-12;
- bh=+y6Ylg39vBXwUrwPtWGaBBzYw680t9s886JDqLVR3n4=;
- b=vnRWy+oVJ+N0osI1XzKFDORuoCyLtezSAFjxLsX0iM1iPTSSk5XMhSzO1rbE2Erieu1Q
- 9Z4qFkbu+N2iAi+ug7fpRXZJmIPwGeW3/Ox2m3j/P+hYVXK1bAbC4SiJBetTVxAFaJvB
- bnVjK7UPjyheLn3reQOTmzeR0Vhg1gF+pPfqSNSaw7Gh04xX7JDSNXfKrC6Ty1RhYG+D
- R87kqNpuyFz/J6oYqSKaylVY+o9pZoSjYHAXSIW+8iXDRDHNrxuiRGMe1jTurbR+KziV
- KrmwW0EeoI/4/mIn1FrxvbrreeYQp00LQ/JXJeauLvxMlJygorvkYLIWyKQQai2k1Sz9 XQ== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3meyeu89xn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 16 Dec 2022 18:50:46 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BGH93IQ027701;
-        Fri, 16 Dec 2022 18:50:45 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3meyesnv5y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 16 Dec 2022 18:50:44 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BGIofeU032502;
-        Fri, 16 Dec 2022 18:50:44 GMT
-Received: from ca-dev63.us.oracle.com (ca-dev63.us.oracle.com [10.211.8.221])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3meyesnv2x-8;
-        Fri, 16 Dec 2022 18:50:44 +0000
-From:   Steve Sistare <steven.sistare@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V6 7/7] vfio: revert "iommu driver notify callback"
-Date:   Fri, 16 Dec 2022 10:50:40 -0800
-Message-Id: <1671216640-157935-8-git-send-email-steven.sistare@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1671216640-157935-1-git-send-email-steven.sistare@oracle.com>
-References: <1671216640-157935-1-git-send-email-steven.sistare@oracle.com>
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-16_12,2022-12-15_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 bulkscore=0 malwarescore=0
- mlxscore=0 phishscore=0 adultscore=0 mlxlogscore=999 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2212160164
-X-Proofpoint-ORIG-GUID: yetx3wedcaLhd7y1lG9YM4NtUCgYGaLd
-X-Proofpoint-GUID: yetx3wedcaLhd7y1lG9YM4NtUCgYGaLd
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        with ESMTP id S231646AbiLPTEH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 16 Dec 2022 14:04:07 -0500
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 847696C731
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 11:04:05 -0800 (PST)
+Received: by mail-pf1-x42b.google.com with SMTP id w26so2404198pfj.6
+        for <kvm@vger.kernel.org>; Fri, 16 Dec 2022 11:04:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aGzwqPNSxCpWhN2cMHee9j6iCzacXsV8AGFFZBbCO34=;
+        b=HihVCXHIxqohFeVo6zYSI1IkxtQMPvzFeTSMnqIU6PZ26Clbc6VRgP4j7vx3uL/PBs
+         1DuSUj+BM37ylcqezxKeL8znQtKjYRxt00BPowYqF+9frQE97BgNR2qkN+GYOWA2gH9Z
+         LGHCLSGCrVWWGpvbT0lNNUmYKcUHvglvNkopJzJ36snp+TZHUtaGeTn7pi/JV8wiCqgT
+         gWknt70WNgv/vlJVo8/PTe95DDizk+i0JqwrSUFe5HNwjfPNUNcrq25UkilTQf34oPB7
+         FHzuxzNpDVaaMSUivn6mCuNXY0QnzFZmjy+U5ugBWSNqI1JV+mDFBOWTVmgP1fQ7o7WY
+         qX0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aGzwqPNSxCpWhN2cMHee9j6iCzacXsV8AGFFZBbCO34=;
+        b=zV1n9nw98RPY9FJ4sH9Jrp+B7V8L577sr/8RwTgSuZP/MYQAyqsxuO8mmnOE4Y2D+p
+         +X6/FIvt0jTNYLKb15dSY12P3VuOSHuBQrQLT0iZyncEl25TKHkoWz5iggxeQ3p4wN4b
+         5H52G66gbLZPdyHBccEmzy5JkpLs8O/bdSb91BgmHOkTGOzSeapRKfYJAdMkqJ4qmpQj
+         gUhdDuazYJKVy2wzFHMgDvNQParXrcd3/qXqtSqjNAmBeDow1la55DN/pcqUD8YYIiMf
+         KpYI2o0FW1Bv0RDmhU+TOdqjdgq3poal478RBcpLYB5aix+4zMc6FJSTqXJIH2dPMMBw
+         u/1w==
+X-Gm-Message-State: AFqh2koO/Dt0w+ep/BsuMbL6Nk1svBavzPlngxoGQLxvtHwOdfS/efR1
+        s381FupNztU0nGVg4WqEbpmypA==
+X-Google-Smtp-Source: AMrXdXtAUBDJKAahjbRhwrXdcPadt0Lkxuvj5iRurFgRIC/CPbbKp9+5D2rgJ1TJz9r77VFc8ADnig==
+X-Received: by 2002:a05:6a00:418f:b0:576:22d7:fd9e with SMTP id ca15-20020a056a00418f00b0057622d7fd9emr672910pfb.0.1671217444858;
+        Fri, 16 Dec 2022 11:04:04 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id g15-20020aa79f0f000000b0056b2e70c2f5sm1836646pfr.25.2022.12.16.11.04.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Dec 2022 11:04:03 -0800 (PST)
+Date:   Fri, 16 Dec 2022 19:03:59 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Subject: Re: [PATCH v4 11/32] KVM: x86: Inhibit APIC memslot if x2APIC and
+ AVIC are enabled
+Message-ID: <Y5zBH+2VuPJi4yYV@google.com>
+References: <20221001005915.2041642-1-seanjc@google.com>
+ <20221001005915.2041642-12-seanjc@google.com>
+ <90d4a2a1733cdb21e7c00843ddafee78ce52bbdc.camel@redhat.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <90d4a2a1733cdb21e7c00843ddafee78ce52bbdc.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,56 +77,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Revert this dead code:
-  commit ec5e32940cc9 ("vfio: iommu driver notify callback")
+On Thu, Dec 08, 2022, Maxim Levitsky wrote:
+> On Sat, 2022-10-01 at 00:58 +0000, Sean Christopherson wrote:
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index d40206b16d6c..062758135c86 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1139,6 +1139,17 @@ enum kvm_apicv_inhibit {
+> >  	 * AVIC is disabled because SEV doesn't support it.
+> >  	 */
+> >  	APICV_INHIBIT_REASON_SEV,
+> > +
+> > +	/*
+> > +	 * Due to sharing page tables across vCPUs, the xAPIC memslot must be
+> > +	 * deleted if any vCPU has x2APIC enabled as SVM doesn't provide fully
+> > +	 * independent controls for AVIC vs. x2AVIC, and also because SVM
+> > +	 * supports a "hybrid" AVIC mode for CPUs that support AVIC but not
+> > +	 * x2AVIC.  Note, this isn't a "full" inhibit and is tracked separately.
+> > +	 * AVIC can still be activated, but KVM must not create SPTEs for the
+> > +	 * APIC base.  For simplicity, this is sticky.
+> > +	 */
+> > +	APICV_INHIBIT_REASON_X2APIC,
+> 
+> I still don't understand why do you want this to be an inhibit bit.
 
-Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
----
- drivers/vfio/container.c | 5 -----
- drivers/vfio/vfio.h      | 7 -------
- 2 files changed, 12 deletions(-)
+Because in my mental model, it's an inhibit, but with special properties.  But I
+totally get why that's confusing.
 
-diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
-index d74164a..5bfd10d 100644
---- a/drivers/vfio/container.c
-+++ b/drivers/vfio/container.c
-@@ -382,11 +382,6 @@ static int vfio_fops_open(struct inode *inode, struct file *filep)
- static int vfio_fops_release(struct inode *inode, struct file *filep)
- {
- 	struct vfio_container *container = filep->private_data;
--	struct vfio_iommu_driver *driver = container->iommu_driver;
--
--	if (driver && driver->ops->notify)
--		driver->ops->notify(container->iommu_data,
--				    VFIO_IOMMU_CONTAINER_CLOSE);
- 
- 	filep->private_data = NULL;
- 
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index bcad54b..8a439c6 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -62,11 +62,6 @@ struct vfio_group {
- 	struct blocking_notifier_head	notifier;
- };
- 
--/* events for the backend driver notify callback */
--enum vfio_iommu_notify_type {
--	VFIO_IOMMU_CONTAINER_CLOSE = 0,
--};
--
- /**
-  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
-  */
-@@ -97,8 +92,6 @@ struct vfio_iommu_driver_ops {
- 				  void *data, size_t count, bool write);
- 	struct iommu_domain *(*group_iommu_domain)(void *iommu_data,
- 						   struct iommu_group *group);
--	void		(*notify)(void *iommu_data,
--				  enum vfio_iommu_notify_type event);
- };
- 
- struct vfio_iommu_driver {
--- 
-1.8.3.1
+> Now this 'inhibit' is not even set/clear.
+> 
+> I prefer to just have a boolean 'is_avic' or,
+> '.needs_x2apic_memslot_inhibition' in the vendor ops, and check it in
+> 'kvm_vcpu_update_apicv' with the above comment on top of it.
+> 
+> need_x2apic_memslot_inhibition can even be set to false when x2avic is
+> supported at the initalization time, because then AVIC behaves just like
+> APICv (when x2avic bit is enabled, AVIC mmio is no longer decoded).
 
+Oh, so SVM does effectively have independent controls, it's only the "hybrid" mode
+that's affected?  In that case, how about this?
+
+	/*
+	 * Due to sharing page tables across vCPUs, the xAPIC memslot must be
+	 * deleted if any vCPU has x2APIC enabled and hardware doesn't support
+	 * x2APIC virtualization.  E.g. some AMD CPUs support AVIC but not
+	 * x2AVIC.  KVM still allows enabling AVIC in this case so that KVM can
+	 * the AVIC doorbell to inject interrupts to running vCPUs, but KVM
+	 * mustn't create SPTEs for the APIC base as the vCPU would incorrectly
+	 * be able to access the vAPIC page via MMIO despite being in x2APIC
+	 * mode.  For simplicity, inhibiting the APIC access page is sticky.
+	 */
+	if (apic_x2apic_mode(vcpu->arch.apic) &&
+	    !kvm_x86_ops.has_hardware_x2apic_virtualization)
+		kvm_inhibit_apic_access_page(vcpu)
