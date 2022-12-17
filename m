@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6BD4764FB40
-	for <lists+kvm@lfdr.de>; Sat, 17 Dec 2022 18:29:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 495EA64FB41
+	for <lists+kvm@lfdr.de>; Sat, 17 Dec 2022 18:30:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229453AbiLQR35 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 17 Dec 2022 12:29:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53304 "EHLO
+        id S229915AbiLQRaD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 17 Dec 2022 12:30:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229966AbiLQR3v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 17 Dec 2022 12:29:51 -0500
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49C0E10FEA
-        for <kvm@vger.kernel.org>; Sat, 17 Dec 2022 09:29:50 -0800 (PST)
-Received: by mail-ej1-x62e.google.com with SMTP id vv4so13002387ejc.2
-        for <kvm@vger.kernel.org>; Sat, 17 Dec 2022 09:29:50 -0800 (PST)
+        with ESMTP id S229927AbiLQR37 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 17 Dec 2022 12:29:59 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F23B10FCE
+        for <kvm@vger.kernel.org>; Sat, 17 Dec 2022 09:29:58 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id qk9so12970789ejc.3
+        for <kvm@vger.kernel.org>; Sat, 17 Dec 2022 09:29:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZJBMjUuWi5LDeqCkrRIBhFSAN2qMGyBc5fH/hW07Wew=;
-        b=Ce3aVdizpJjs3ywka/oZyIGX96iCyGdZ0PTh+5EV+KuosLgV+76u2Rj8tAWqH613JD
-         Wy871aO87+6usyV36L9I5EO6nTmKOEv70NRgpMr2W53yqYgjK+bHsqe2AmNCki3JU3GQ
-         h5bzXGd3AMRlIRwaKaPz/t0jPRVFqAvLdGKpPJll83EGbn2NWCtGFScFWlXFiWsN5x5b
-         Yr3utM1/w9WTcWse2NFhi5Fn6ZHYSxO8W5tS65QBKWQw7ton4dKiPmF90D9LG9xCf9D5
-         lxvvXbtrm+9wjVZas9PwqvJ1ggX1iUfYayTHUkkNRMFutCMsTC/VrjJfr/fG0rM+FeS4
-         peqg==
+        bh=Je6pglm7Ro/G6/Hw82+zaiN4Czg7YWpLl/0Q2PSll9w=;
+        b=GtUaV+75kc/w2Jz9y6r/nJ0UXl5KQ9zRbxRmQxJApuJqSpXejlL04qdNyMDJZAF0Sd
+         c7hb2VL3FVp+WZjsMksKpWTI8AtikUc68bY3ruW2CqV3ESSKydsEnZ2b+X2oRE/24DIz
+         gGDdPT2WsiklD4zZ8h8pGe5pgiY7Z5/9RAbS4yWntEgX6RDhQ2aP3f6TqZ+rMFkqkOSF
+         3ur44FGMR9tQImO0CndosOLQOONsdMZLCETwu92SLfn0xssvLS3NqWGM2nAyYzd6FMUB
+         TP2YOxP3+O0lgxLz09QCXkpNxHcmbYOqYaKI08g9NOoXwW5oVWIZ1J3lkiIZ3ZtuBplq
+         hAXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZJBMjUuWi5LDeqCkrRIBhFSAN2qMGyBc5fH/hW07Wew=;
-        b=i+RBdYZYI8qFd/JgwTfoWaUnxq5qg7hQFUn1atNMJP0u5UR7RchYAz+WSXxE9SaE6a
-         bb3xNof5yV5H+McCG8TmTYctKJhNHWwOMqndb+YkGlJtKHTgLC4wb78BiFdYPrP9fAKG
-         HUep9S56P0y0V5nZCFgGDhGANdW8fhvXVj4FOvyRC5hn/4+qXXvxAqpEgWvrvJJHgwR0
-         5v+xGUhwR1p6vd1r0oGrLGxQ4IMd5eXPmWgoadxHrhjXke4WznHtNAihX8kBqcexEPoT
-         oA24pvp9kgGFAg8b4aNs7pF2DcViqTSza5UCCFpS//2klZ4OrGmQOKY5hWeV1iRFdRMf
-         NS/Q==
-X-Gm-Message-State: AFqh2krdbI59WIRD2ee3x8hJJQx/asYRk4xkud4t9vQgNySPAhknpt1E
-        lUUg2Snqn7llGgV2LeYc65omYg==
-X-Google-Smtp-Source: AMrXdXujsqEG4u9fTuNgJiBiJD+KD1h++fJ35JztdqeJ9EpX2ZGquGN4RZ/riwO3nHDjMsMYoxpMWg==
-X-Received: by 2002:a17:906:c0d3:b0:7fc:4242:fa1d with SMTP id bn19-20020a170906c0d300b007fc4242fa1dmr2754845ejb.54.1671298188829;
-        Sat, 17 Dec 2022 09:29:48 -0800 (PST)
+        bh=Je6pglm7Ro/G6/Hw82+zaiN4Czg7YWpLl/0Q2PSll9w=;
+        b=OAJN/x8v/Mt5eukipMDNZQ5LSsIlKj9yt19tNMc+J8YFKNOKWF12FHoFI5wdppqf4T
+         OeIozaA8t364flS/smvXyfq0A0mHB+dOtbwaUImi5ew5erU0JI18eCPX+mXCeWVRPJzN
+         pgDTyQ1xPEecH82bWTaNu5jZgGripPMS1sw5BGBgl6QE4eoEKVmVSnlhE1RrhhtkTJQr
+         cj5krp4GeI48CQG5qbYR4UqPwNbaaD4ZlYwz/tVeL40X3jnhzTqUXgRmNFH7dfEZXb4s
+         BKJQGbRD4PQeE6KdvWvaHyBg3ryEqBZWWaPlUe4HjWTGsKA5sUsGBSGPzaXWHKaD42HV
+         JIaw==
+X-Gm-Message-State: ANoB5pmhnEEkTnpaq9qoxkAxAmyTncqLsHRgpFaSHz7ZqJL/BLJm8cUq
+        wnIAJoz6ma9MCwzrDZGQcdoJJw==
+X-Google-Smtp-Source: AA0mqf72Pm4NY4wNp46CZqXV4Nvqqb64mTPo5WGko4tfGBRcVj0ixpsUx8E+tmqvXqstRrhMA/coNw==
+X-Received: by 2002:a17:906:9f1e:b0:7c0:7d35:e9db with SMTP id fy30-20020a1709069f1e00b007c07d35e9dbmr43794106ejc.15.1671298196789;
+        Sat, 17 Dec 2022 09:29:56 -0800 (PST)
 Received: from localhost.localdomain ([185.126.107.38])
-        by smtp.gmail.com with ESMTPSA id op1-20020a170906bce100b007bfacaea851sm2171205ejb.88.2022.12.17.09.29.45
+        by smtp.gmail.com with ESMTPSA id t1-20020a170906a10100b007a1d4944d45sm2239662ejy.142.2022.12.17.09.29.54
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Sat, 17 Dec 2022 09:29:48 -0800 (PST)
+        Sat, 17 Dec 2022 09:29:56 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     Max Filippov <jcmvbkbc@gmail.com>,
@@ -68,9 +68,9 @@ Cc:     Max Filippov <jcmvbkbc@gmail.com>,
         David Gibson <david@gibson.dropbear.id.au>,
         Xiaojuan Yang <yangxiaojuan@loongson.cn>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH v2 4/9] target/ppc/internal: Restrict MMU declarations to sysemu
-Date:   Sat, 17 Dec 2022 18:29:02 +0100
-Message-Id: <20221217172907.8364-5-philmd@linaro.org>
+Subject: [PATCH v2 5/9] target/ppc/kvm: Remove unused "sysbus.h" header
+Date:   Sat, 17 Dec 2022 18:29:03 +0100
+Message-Id: <20221217172907.8364-6-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221217172907.8364-1-philmd@linaro.org>
 References: <20221217172907.8364-1-philmd@linaro.org>
@@ -86,40 +86,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The 'hwaddr' type is only available / meaningful on system emulation.
+Nothing requires SysBus declarations here.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- target/ppc/internal.h | 5 +++++
- 1 file changed, 5 insertions(+)
+ target/ppc/kvm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/target/ppc/internal.h b/target/ppc/internal.h
-index 337a362205..901bae6d39 100644
---- a/target/ppc/internal.h
-+++ b/target/ppc/internal.h
-@@ -242,9 +242,12 @@ static inline int prot_for_access_type(MMUAccessType access_type)
-     g_assert_not_reached();
- }
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 7c25348b7b..78f6fc50cd 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -32,7 +32,6 @@
+ #include "sysemu/device_tree.h"
+ #include "mmu-hash64.h"
  
-+#ifndef CONFIG_USER_ONLY
-+
- /* PowerPC MMU emulation */
- 
- typedef struct mmu_ctx_t mmu_ctx_t;
-+
- bool ppc_xlate(PowerPCCPU *cpu, vaddr eaddr, MMUAccessType access_type,
-                       hwaddr *raddrp, int *psizep, int *protp,
-                       int mmu_idx, bool guest_visible);
-@@ -266,6 +269,8 @@ struct mmu_ctx_t {
-     int nx;                        /* Non-execute area          */
- };
- 
-+#endif /* !CONFIG_USER_ONLY */
-+
- /* Common routines used by software and hardware TLBs emulation */
- static inline int pte_is_valid(target_ulong pte0)
- {
+-#include "hw/sysbus.h"
+ #include "hw/ppc/spapr.h"
+ #include "hw/ppc/spapr_cpu_core.h"
+ #include "hw/hw.h"
 -- 
 2.38.1
 
