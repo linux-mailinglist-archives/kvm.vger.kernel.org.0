@@ -2,216 +2,326 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D888651020
-	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 17:17:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEF0C65103B
+	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 17:22:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231670AbiLSQRb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Dec 2022 11:17:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50562 "EHLO
+        id S231944AbiLSQWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Dec 2022 11:22:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231944AbiLSQRY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Dec 2022 11:17:24 -0500
+        with ESMTP id S230226AbiLSQWm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Dec 2022 11:22:42 -0500
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78CF2112D;
-        Mon, 19 Dec 2022 08:17:23 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJGBWlQ001910;
-        Mon, 19 Dec 2022 16:16:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E56F1;
+        Mon, 19 Dec 2022 08:22:39 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJGC4mS015106;
+        Mon, 19 Dec 2022 16:22:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
  content-transfer-encoding : mime-version; s=pp1;
- bh=RtsWhsVJvLGz1G5bUGjFJl7qw+Tu+K2zEzV90qBQFDU=;
- b=PcuJHY6lD0GVFAt1z+4FuKrLP7tlVE2ajsO8MDv2BEK+YCnOtVy1Z4tMh+GAq+vyR7Zs
- db8cvsYRFYI0OgjLfuhmtBaigPiG09aIvwXwnCYNYky8pIvwjHAo1t0OmzSMM36V3EFp
- uFc+W5UW6MB+thwtH0lPtlb52GhBCkC1s8ADVU9trLzm8hidYq+upnQQx4o1RiauiVRp
- drpEzz3ctAzPKkXpjw5UNFBS1NRgu+t/VScThUM7BdCe17slII6dtVZc5C1JpwXfXjxA
- G7LTbr4FH3A5j0dlAuQ5kgeag/WyS75Z44te8Zbp9qZivoGsmZ/FHNGj3ZCbSBgFLqtD ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mju8v88ak-1
+ bh=/MlesHWmSmCvX8Cum6kIB419EK9KYfGxSMx1WSEvsJo=;
+ b=kWqzbpJcbxl1sRb0LDAwhwLyPojKhOfhwqPBtSyXTGtlimHzkUDzYgFP9S4OTwQFgnKk
+ knlk8IJ/wKjH0R8y7rLipSw1TbE7PiQEZfN9+XT34Ysqc9mhvn1GjfqjJczKhd2tYyg0
+ d1NbNszRXrRTOnYA125HP2qjcD7mnsKVEcXpkaCAkqrEYM/2pMvROBpog6UACkh6Lo6C
+ r7KhH9OOFn1RkCkWsiu8B9fM5qICIvzNa8J8fL+8oU8EhZR8sAwAOgi6moitjlsAuxwf
+ jEfiAyBKUv8MhiF5Hjhb31EMKf/RGMnXzRI4pvL2XVL9H8I+6VDbT4XUXBGe+PjOK2Bj kA== 
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mju8wrd5x-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Dec 2022 16:16:43 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BJGBlH1005097;
-        Mon, 19 Dec 2022 16:16:42 GMT
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mju8v8896-1
+        Mon, 19 Dec 2022 16:22:39 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+        by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJF7sjx026638;
+        Mon, 19 Dec 2022 16:22:38 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
+        by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3mh6yvj09s-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Dec 2022 16:16:42 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJFKOIC022061;
-        Mon, 19 Dec 2022 16:16:40 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
-        by ppma03wdc.us.ibm.com (PPS) with ESMTPS id 3mh6yxedf9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 19 Dec 2022 16:16:40 +0000
-Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BJGGdek35324618
+        Mon, 19 Dec 2022 16:22:38 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BJGMaRj60096882
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 19 Dec 2022 16:16:39 GMT
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 24E475805B;
-        Mon, 19 Dec 2022 16:16:39 +0000 (GMT)
-Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 65B645805C;
-        Mon, 19 Dec 2022 16:16:36 +0000 (GMT)
-Received: from [9.60.89.243] (unknown [9.60.89.243])
-        by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 19 Dec 2022 16:16:36 +0000 (GMT)
-Message-ID: <8275f4e0-aa73-d4e1-5612-ccf6a369fa07@linux.ibm.com>
-Date:   Mon, 19 Dec 2022 11:16:35 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH iommufd v2 8/9] irq/s390: Add arch_is_isolated_msi() for
- s390
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Mon, 19 Dec 2022 16:22:36 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4B8DA58053;
+        Mon, 19 Dec 2022 16:22:36 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1816F58059;
+        Mon, 19 Dec 2022 16:22:35 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.60.89.68])
+        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 19 Dec 2022 16:22:34 +0000 (GMT)
+Message-ID: <61827ce18008642d556ca899179fb6216a079939.camel@linux.ibm.com>
+Subject: Re: [PATCH v1 07/16] vfio/ccw: remove unnecessary malloc alignment
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
         Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Will Deacon <will@kernel.org>
-Cc:     Bharat Bhushan <bharat.bhushan@nxp.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
-        Will Deacon <will.deacon@arm.com>
-References: <8-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
-Content-Language: en-US
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <8-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0m-J6pGlXN0pvE8Z2zYy5ilSktGE0m3s
-X-Proofpoint-ORIG-GUID: haiwmW7D8jw19evlCLssWmJKGuC9cwcG
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org
+Date:   Mon, 19 Dec 2022 11:22:34 -0500
+In-Reply-To: <f814a82c-f1a6-4e90-4898-290dbbc73770@linux.ibm.com>
+References: <20221121214056.1187700-1-farman@linux.ibm.com>
+         <20221121214056.1187700-8-farman@linux.ibm.com>
+         <f814a82c-f1a6-4e90-4898-290dbbc73770@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 (3.44.4-2.fc36) 
 MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: bNRCGqM8eo_A2BjvsjWpDgszt2HN-SAO
+X-Proofpoint-GUID: bNRCGqM8eo_A2BjvsjWpDgszt2HN-SAO
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-19_01,2022-12-15_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 priorityscore=1501 spamscore=0
- mlxlogscore=999 phishscore=0 adultscore=0 bulkscore=0 clxscore=1015
- mlxscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 malwarescore=0
+ phishscore=0 mlxlogscore=999 mlxscore=0 bulkscore=0 spamscore=0
+ impostorscore=0 suspectscore=0 priorityscore=1501 lowpriorityscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2212070000 definitions=main-2212190142
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/12/22 1:46 PM, Jason Gunthorpe wrote:
-> s390 doesn't use irq_domains, so it has no place to set
-> IRQ_DOMAIN_FLAG_ISOLATED_MSI. Instead of continuing to abuse the iommu
-> subsystem to convey this information add a simple define which s390 can
-> make statically true. The define will cause msi_device_has_isolated() to
-> return true.
-> 
-> Remove IOMMU_CAP_INTR_REMAP from the s390 iommu driver.
-> 
-> Cc: Matthew Rosato <mjrosato@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-> Cc: Eric Farman <farman@linux.ibm.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+On Fri, 2022-12-16 at 15:10 -0500, Matthew Rosato wrote:
+> On 11/21/22 4:40 PM, Eric Farman wrote:
+> > Everything about this allocation is harder than necessary,
+> > since the memory allocation is already aligned to our needs.
+> > Break them apart for readability, instead of doing the
+> > funky artithmetic.
+> >=20
+> > Of the structures that are involved, only ch_ccw needs the
+> > GFP_DMA flag, so the others can be allocated without it.
+> >=20
+> > Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> > ---
+> > =C2=A0drivers/s390/cio/vfio_ccw_cp.c | 39 ++++++++++++++++++-----------=
+-
+> > ----
+> > =C2=A01 file changed, 21 insertions(+), 18 deletions(-)
+> >=20
+> > diff --git a/drivers/s390/cio/vfio_ccw_cp.c
+> > b/drivers/s390/cio/vfio_ccw_cp.c
+> > index d41d94cecdf8..4b6b5f9dc92d 100644
+> > --- a/drivers/s390/cio/vfio_ccw_cp.c
+> > +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> > @@ -311,40 +311,41 @@ static inline int is_tic_within_range(struct
+> > ccw1 *ccw, u32 head, int len)
+> > =C2=A0static struct ccwchain *ccwchain_alloc(struct channel_program *cp=
+,
+> > int len)
+> > =C2=A0{
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct ccwchain *chain;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0void *data;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0size_t size;
+> > -
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Make ccw address aligned =
+to 8. */
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0size =3D ((sizeof(*chain) + =
+7L) & -8L) +
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0sizeof(*chain->ch_ccw) * len +
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0sizeof(*chain->ch_pa) * len;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain =3D kzalloc(size, GFP_=
+DMA | GFP_KERNEL);
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain =3D kzalloc(sizeof(*ch=
+ain), GFP_KERNEL);
+>=20
+> I suppose you could consider a WARN_ONCE here if one of these
+> kzalloc'd addresses has something in the low-order 3 bits; would
+> probably make it more obvious if for some reason the alignment
+> guarantee was broken vs some status after-the-fact in the IRB.=C2=A0 But
+> as per our discussion off-list I think that can only happen if
+> ARCH_KMALLOC_MINALIGN were to change.
 
-Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Yeah, maybe, but the "status after-the-fact" is a program check that
+would be generated by the channel, just as would be done if the ORB was
+located in a similarly-weird location (which we don't check for
+either). Since this is all mainline paths, I don't think it makes sense
+to re-check all those possible permutations here.
 
-Also sanity-tested on s390 (needed the previously-mentioned #include <linux/msi.h> added to drivers/iommu/iommu.c)
+(And, for what it's worth, it's not this allocation that matters, but
+rather the one that gets stuffed into the ORB below [1])
 
-> ---
->  arch/s390/include/asm/msi.h | 17 +++++++++++++++++
->  drivers/iommu/s390-iommu.c  |  2 --
->  include/linux/msi.h         |  6 +++++-
->  kernel/irq/msi.c            |  2 +-
->  4 files changed, 23 insertions(+), 4 deletions(-)
->  create mode 100644 arch/s390/include/asm/msi.h
-> 
-> diff --git a/arch/s390/include/asm/msi.h b/arch/s390/include/asm/msi.h
-> new file mode 100644
-> index 00000000000000..399343ed9ffbc6
-> --- /dev/null
-> +++ b/arch/s390/include/asm/msi.h
-> @@ -0,0 +1,17 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef _ASM_S390_MSI_H
-> +#define _ASM_S390_MSI_H
-> +#include <asm-generic/msi.h>
-> +
-> +/*
-> + * Work around S390 not using irq_domain at all so we can't set
-> + * IRQ_DOMAIN_FLAG_ISOLATED_MSI. See for an explanation how it works:
-> + *
-> + * https://lore.kernel.org/r/31af8174-35e9-ebeb-b9ef-74c90d4bfd93@linux.ibm.com/
-> + *
-> + * Note this is less isolated than the ARM/x86 versions as userspace can trigger
-> + * MSI belonging to kernel devices within the same gisa.
-> + */
-> +#define arch_is_isolated_msi() true
-> +
-> +#endif
-> diff --git a/drivers/iommu/s390-iommu.c b/drivers/iommu/s390-iommu.c
-> index 3c071782f6f16d..c80f4728c0f307 100644
-> --- a/drivers/iommu/s390-iommu.c
-> +++ b/drivers/iommu/s390-iommu.c
-> @@ -44,8 +44,6 @@ static bool s390_iommu_capable(struct device *dev, enum iommu_cap cap)
->  	switch (cap) {
->  	case IOMMU_CAP_CACHE_COHERENCY:
->  		return true;
-> -	case IOMMU_CAP_INTR_REMAP:
-> -		return true;
->  	default:
->  		return false;
->  	}
-> diff --git a/include/linux/msi.h b/include/linux/msi.h
-> index e8a3f3a8a7f427..5cbe6a9d27efd6 100644
-> --- a/include/linux/msi.h
-> +++ b/include/linux/msi.h
-> @@ -48,6 +48,10 @@ typedef struct arch_msi_msg_data {
->  } __attribute__ ((packed)) arch_msi_msg_data_t;
->  #endif
->  
-> +#ifndef arch_is_isolated_msi
-> +#define arch_is_isolated_msi() false
-> +#endif
-> +
->  /**
->   * msi_msg - Representation of a MSI message
->   * @address_lo:		Low 32 bits of msi message address
-> @@ -660,7 +664,7 @@ static inline bool msi_device_has_isolated_msi(struct device *dev)
->  	 * is inherently isolated by our definition. As nobody seems to needs
->  	 * this be conservative and return false anyhow.
->  	 */
-> -	return false;
-> +	return arch_is_isolated_msi();
->  }
->  #endif /* CONFIG_GENERIC_MSI_IRQ */
->  
-> diff --git a/kernel/irq/msi.c b/kernel/irq/msi.c
-> index 7c5579d3ea4f79..3e46420a4f1a9f 100644
-> --- a/kernel/irq/msi.c
-> +++ b/kernel/irq/msi.c
-> @@ -1646,6 +1646,6 @@ bool msi_device_has_isolated_msi(struct device *dev)
->  	for (; domain; domain = domain->parent)
->  		if (domain->flags & IRQ_DOMAIN_FLAG_ISOLATED_MSI)
->  			return true;
-> -	return false;
-> +	return arch_is_isolated_msi();
->  }
->  EXPORT_SYMBOL_GPL(msi_device_has_isolated_msi);
+>=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!chain)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0return NULL;
+> > =C2=A0
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0data =3D (u8 *)chain + ((siz=
+eof(*chain) + 7L) & -8L);
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain->ch_ccw =3D (struct cc=
+w1 *)data;
+> > -
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0data =3D (u8 *)(chain->ch_cc=
+w) + sizeof(*chain->ch_ccw) *
+> > len;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain->ch_pa =3D (struct pag=
+e_array *)data;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain->ch_ccw =3D kcalloc(le=
+n, sizeof(*chain->ch_ccw),
+> > GFP_DMA | GFP_KERNEL);
+
+[1]
+
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!chain->ch_ccw)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto out_err;
+> > =C2=A0
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain->ch_len =3D len;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain->ch_pa =3D kcalloc(len=
+, sizeof(*chain->ch_pa),
+> > GFP_KERNEL);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!chain->ch_pa)
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto out_err;
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0list_add_tail(&chain->n=
+ext, &cp->ccwchain_list);
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return chain;
+> > +
+> > +out_err:
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kfree(chain->ch_ccw);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kfree(chain);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return NULL;
+> > =C2=A0}
+> > =C2=A0
+> > =C2=A0static void ccwchain_free(struct ccwchain *chain)
+> > =C2=A0{
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0list_del(&chain->next);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kfree(chain->ch_pa);
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kfree(chain->ch_ccw);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kfree(chain);
+> > =C2=A0}
+> > =C2=A0
+> > =C2=A0/* Free resource for a ccw that allocated memory for its cda. */
+> > =C2=A0static void ccwchain_cda_free(struct ccwchain *chain, int idx)
+> > =C2=A0{
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct ccw1 *ccw =3D chain->=
+ch_ccw + idx;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct ccw1 *ccw =3D &chain-=
+>ch_ccw[idx];
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (ccw_is_tic(ccw))
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0return;
+> > @@ -443,6 +444,8 @@ static int ccwchain_handle_ccw(u32 cda, struct
+> > channel_program *cp)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain =3D ccwchain_allo=
+c(cp, len);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!chain)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0return -ENOMEM;
+> > +
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain->ch_len =3D len;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0chain->ch_iova =3D cda;
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Copy the actual CCWs=
+ into the new chain */
+> > @@ -464,7 +467,7 @@ static int ccwchain_loop_tic(struct ccwchain
+> > *chain, struct channel_program *cp)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int i, ret;
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0for (i =3D 0; i < chain=
+->ch_len; i++) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0tic =3D chain->ch_ccw + i;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0tic =3D &chain->ch_ccw[i];
+>=20
+> These don't seem equivalent...=C2=A0 Before at each iteration you'd offse=
+t
+> tic by i bytes, now you're treating i as an index of 8B ccw1 structs,
+> so it seems like this went from tic =3D x + i to tic =3D x + (8 * i)?=C2=
+=A0
+> Was the old code broken or am I missing something?=20
+
+I think the latter. :) The old code did one allocation measured in
+bytes, stored it in chain, and then calculated locations within that
+for ch_ccw and ch_pa, cast to the respective pointer types. (See the
+reference [1] above.)
+
+So any use of "i" was an index into the pointer types and thus already
+a "8 * i" addition from your example. My intention here was to remove
+the pseudo-assembly above, and changed these along the way as I was un-
+tangling everything. Looking at the resulting assembly before/after,
+these hunks don't end up changing at all so I'll back these changes
+back out. Especially since...
+
+>=20
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!ccw_is_tic(tic))
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+continue;
+> > @@ -739,8 +742,8 @@ int cp_prefetch(struct channel_program *cp)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0list_for_each_entry(cha=
+in, &cp->ccwchain_list, next) {
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0len =3D chain->ch_len;
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0for (idx =3D 0; idx < len; idx++) {
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ccw =
+=3D chain->ch_ccw + idx;
+> > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pa =3D=
+ chain->ch_pa + idx;
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ccw =
+=3D &chain->ch_ccw[idx];
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0pa =3D=
+ &chain->ch_pa[idx];
+>=20
+> Same sort of question re: ch_pa
+
+...this prompted me to notice that I didn't change the users of "chain-
+>ch_pa + i" when calling page_array_unpin_free(), so now we have both
+flavors which isn't ideal.
+
+BEFORE:
+                        ccw =3D chain->ch_ccw + idx;
+                        pa =3D chain->ch_pa + idx;
+    1536:       eb 3b 00 01 00 0d       sllg    %r3,%r11,1
+    153c:       b9 08 00 3b             agr     %r3,%r11
+    1540:       eb 33 00 03 00 0d       sllg    %r3,%r3,3
+    1546:       e3 30 80 28 00 08       ag      %r3,40(%r8)
+                        ccw =3D chain->ch_ccw + idx;
+    154c:       eb 2b 00 03 00 0d       sllg    %r2,%r11,3
+    1552:       e3 20 80 10 00 08       ag      %r2,16(%r8)
+AFTER
+                        ccw =3D &chain->ch_ccw[idx];
+                        pa =3D &chain->ch_pa[idx];
+    15be:       eb 3b 00 01 00 0d       sllg    %r3,%r11,1
+    15c4:       b9 08 00 3b             agr     %r3,%r11
+    15c8:       eb 33 00 03 00 0d       sllg    %r3,%r3,3
+    15ce:       e3 30 80 28 00 08       ag      %r3,40(%r8)
+                        ccw =3D &chain->ch_ccw[idx];
+    15d4:       eb 2b 00 03 00 0d       sllg    %r2,%r11,3
+    15da:       e3 20 80 10 00 08       ag      %r2,16(%r8)
+
+
+>=20
+> > =C2=A0
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ret =3D ccwchain_fetch_one(ccw, pa, cp);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+if (ret)
+>=20
 
