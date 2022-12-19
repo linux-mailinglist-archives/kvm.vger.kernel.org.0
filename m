@@ -2,172 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D522A650ED0
-	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 16:42:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E095E65100E
+	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 17:14:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232274AbiLSPmX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Dec 2022 10:42:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57802 "EHLO
+        id S232008AbiLSQOO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Dec 2022 11:14:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231811AbiLSPmW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Dec 2022 10:42:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5104411C09
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 07:41:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671464497;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vlKnSWSIx1ojfKs5edw/VgZ4TRdc4IynKJCcaopveyo=;
-        b=Z32lXgW6tG7q2sp2mYbsTlohSx8Tc1keYbY5zf9PsLwVHD0baMX4yeJ54OXLoSBuuZH9d3
-        saWoa0F0R+amAWzN7X0KS6F/1oX92FWp8WpRrJtT9E+Ccd227ROUay2mXfwz7DlUimqmnY
-        4XPGRSB1BoChLclhJZY89UHBO2sWzLA=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-622-Pc4I7YDvMQmDGQ99HFhT1Q-1; Mon, 19 Dec 2022 10:41:30 -0500
-X-MC-Unique: Pc4I7YDvMQmDGQ99HFhT1Q-1
-Received: by mail-wm1-f69.google.com with SMTP id q6-20020a05600c2e4600b003d211775a99so5268799wmf.1
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 07:41:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vlKnSWSIx1ojfKs5edw/VgZ4TRdc4IynKJCcaopveyo=;
-        b=QJZorq8vXhhXjtjoHgLYxmxj0lUx3APJIkyZ3ocS+zL93aGButloWMXuwNrEn+wALR
-         W+ZtrKMJInPuJRvQghc2ZPV0dOEeH/OLsAPWDA9qMPrA2odggLVdcfRBgSx87A/lAh2J
-         16mVboV9MegbX+v37+8kPLMAVzde9+VrRHi5qPszpf/6StcA3O8axGQWbnEh1b2dh1Zk
-         QxDHLTGElCmkyW5TiZO+RrnlLSWYY/gwPLbamU7snKH7/2fccmgykhEkeCQKeMG1A8tA
-         mWzrq0JO49CAjGK0pFEKAjDIZehByYL3RibaBQRsGAI4FQ72OXK/zOGAV9IS7Jyg+p63
-         +BdQ==
-X-Gm-Message-State: ANoB5pk0c8cuub2vnqcilTNfhJivqwam97J79/ItQYohQoibEZh2s5rq
-        tj48VmAzBmi3ziryYpKPCaZ0J7/eqCzKEl3APX92b3JGZiLTFL00D3d1LBLTJPst06bn0kPMreS
-        HIQb40fdYqTqW
-X-Received: by 2002:adf:f98c:0:b0:242:5582:f947 with SMTP id f12-20020adff98c000000b002425582f947mr27182928wrr.19.1671464488917;
-        Mon, 19 Dec 2022 07:41:28 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf7c1CCW4GpXsPVVZneJb9YGEsZaku3fS+KXI667IWEo0kL8508tyP91BWhdT1KIQ5j10Q7ikw==
-X-Received: by 2002:adf:f98c:0:b0:242:5582:f947 with SMTP id f12-20020adff98c000000b002425582f947mr27182913wrr.19.1671464488677;
-        Mon, 19 Dec 2022 07:41:28 -0800 (PST)
-Received: from sgarzare-redhat (host-87-11-6-51.retail.telecomitalia.it. [87.11.6.51])
-        by smtp.gmail.com with ESMTPSA id az17-20020adfe191000000b00241bd7a7165sm10281220wrb.82.2022.12.19.07.41.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Dec 2022 07:41:28 -0800 (PST)
-Date:   Mon, 19 Dec 2022 16:41:23 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>,
-        Krasnov Arseniy <oxffffaa@gmail.com>,
-        Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: Re: [RFC PATCH v1 0/2] virtio/vsock: fix mutual rx/tx hungup
-Message-ID: <CAGxU2F4ca5pxW3RX4wzsTx3KRBtxLK_rO9KxPgUtqcaSNsqXCA@mail.gmail.com>
-References: <39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru>
+        with ESMTP id S231812AbiLSQOC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Dec 2022 11:14:02 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6EE2DF46;
+        Mon, 19 Dec 2022 08:14:01 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJGD177026411;
+        Mon, 19 Dec 2022 16:13:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=ZsydaWwORy2lc4YtcUfyBIIbjUIfDmjxIjEgD4QMMpg=;
+ b=tZCi6XA9crFra2SZQSW+VcfqM0OcrCkWB6INgwJR3EUetKUUt/meawuj7CrJsz2uzmNE
+ tRYyXu269XALwp6F8eil82lFFGqkZt4zJdWlseSurxzuLZIlCV86/2x9MyshgU1LWprp
+ wI7RM42L4ZP5BEyq/wN5rttLFdRdnbvc4hL5tNsWaOStGRQdrVUUdVSsPmSM5Tj9/Hrr
+ 36wmTP7o2GDIiAM0yImHilpZClgnAGhkRZ1IZ7chXyFnzfvOoZvPRr4aClFrlgFQSU68
+ YVyLv3C9KSybNlKHNpJjhMq5dmzCtfJcGINV+tn6gdYqYmZjgrbp0IfH/knZs3VqNky6 /g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mju9eg3fu-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 19 Dec 2022 16:13:47 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BJGDBA9028467;
+        Mon, 19 Dec 2022 16:13:42 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mju9eg2u0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 19 Dec 2022 16:13:42 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BJE7c6s024486;
+        Mon, 19 Dec 2022 16:13:24 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3mh6ywjsym-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 19 Dec 2022 16:13:24 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BJGDLrK25559646
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 19 Dec 2022 16:13:21 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 051062004E;
+        Mon, 19 Dec 2022 16:13:21 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9ACC620040;
+        Mon, 19 Dec 2022 16:13:20 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.170.124])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 19 Dec 2022 16:13:20 +0000 (GMT)
+Message-ID: <fbe79380237a2d6f4aca0c6b6909afd20b35a058.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 5/9] KVM: s390: selftest: memop: Move testlist into
+ main
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+Date:   Mon, 19 Dec 2022 17:13:20 +0100
+In-Reply-To: <20221213165405.2953539-6-scgl@linux.ibm.com>
+References: <20221213165405.2953539-1-scgl@linux.ibm.com>
+         <20221213165405.2953539-6-scgl@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: NATjA8NPGe-CT4G3UaXDW_WsM-6vcUjA
+X-Proofpoint-GUID: LZKs_1CA8sNAPc1PXH-HZy3FrXVqtTCy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-19_01,2022-12-15_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ bulkscore=0 clxscore=1015 suspectscore=0 priorityscore=1501 phishscore=0
+ spamscore=0 mlxlogscore=999 adultscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2212190142
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Arseniy,
+On Tue, 2022-12-13 at 17:54 +0100, Janis Schoetterl-Glausch wrote:
+> This allows checking if the necessary requirements for a test case are
+> met via an arbitrary expression. In particular, it is easy to check if
+> certain bits are set in the memop extension capability.
+>=20
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  tools/testing/selftests/kvm/s390x/memop.c | 132 +++++++++++-----------
+>  1 file changed, 66 insertions(+), 66 deletions(-)
+>=20
+> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/se=
+lftests/kvm/s390x/memop.c
+> index 286185a59238..10f34c629cac 100644
+> --- a/tools/testing/selftests/kvm/s390x/memop.c
+> +++ b/tools/testing/selftests/kvm/s390x/memop.c
+> @@ -690,87 +690,87 @@ static void test_errors(void)
+>  	kvm_vm_free(t.kvm_vm);
+>  }
+> =20
+[...]
+> =20
+>  int main(int argc, char *argv[])
+>  {
+>  	int extension_cap, idx;
+> =20
+> +	setbuf(stdout, NULL);	/* Tell stdout not to buffer its content */
+>  	TEST_REQUIRE(kvm_has_cap(KVM_CAP_S390_MEM_OP));
+> +	extension_cap =3D kvm_check_cap(KVM_CAP_S390_MEM_OP_EXTENSION);
+> =20
+[...]
+> =20
+>  	ksft_print_header();
+> -
+>  	ksft_set_plan(ARRAY_SIZE(testlist));
+> =20
+> -	extension_cap =3D kvm_check_cap(KVM_CAP_S390_MEM_OP_EXTENSION);
+>  	for (idx =3D 0; idx < ARRAY_SIZE(testlist); idx++) {
+> -		if (extension_cap >=3D testlist[idx].extension) {
+> +		if (testlist[idx].requirements_met) {
+>  			testlist[idx].test();
+>  			ksft_test_result_pass("%s\n", testlist[idx].name);
+>  		} else {
+> -			ksft_test_result_skip("%s - extension level %d not supported\n",
+> -					      testlist[idx].name,
+> -					      testlist[idx].extension);
+> +			ksft_test_result_skip("%s - requirements not met (kernel has extensio=
+n cap %#x\n)",
 
-On Sat, Dec 17, 2022 at 8:42 PM Arseniy Krasnov <AVKrasnov@sberdevices.ru> wrote:
->
-> Hello,
->
-> seems I found strange thing(may be a bug) where sender('tx' later) and
-> receiver('rx' later) could stuck forever. Potential fix is in the first
-> patch, second patch contains reproducer, based on vsock test suite.
-> Reproducer is simple: tx just sends data to rx by 'write() syscall, rx
-> dequeues it using 'read()' syscall and uses 'poll()' for waiting. I run
-> server in host and client in guest.
->
-> rx side params:
-> 1) SO_VM_SOCKETS_BUFFER_SIZE is 256Kb(e.g. default).
-> 2) SO_RCVLOWAT is 128Kb.
->
-> What happens in the reproducer step by step:
->
+                                                                           =
+     oops, should be )\n ofc ^
 
-I put the values of the variables involved to facilitate understanding:
-
-RX: buf_alloc = 256 KB; fwd_cnt = 0; last_fwd_cnt = 0;
-    free_space = buf_alloc - (fwd_cnt - last_fwd_cnt) = 256 KB
-
-The credit update is sent if
-free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE [64 KB]
-
-> 1) tx tries to send 256Kb + 1 byte (in a single 'write()')
-> 2) tx sends 256Kb, data reaches rx (rx_bytes == 256Kb)
-> 3) tx waits for space in 'write()' to send last 1 byte
-> 4) rx does poll(), (rx_bytes >= rcvlowat) 256Kb >= 128Kb, POLLIN is set
-> 5) rx reads 64Kb, credit update is not sent due to *
-
-RX: buf_alloc = 256 KB; fwd_cnt = 64 KB; last_fwd_cnt = 0;
-    free_space = 192 KB
-
-> 6) rx does poll(), (rx_bytes >= rcvlowat) 192Kb >= 128Kb, POLLIN is set
-> 7) rx reads 64Kb, credit update is not sent due to *
-
-RX: buf_alloc = 256 KB; fwd_cnt = 128 KB; last_fwd_cnt = 0;
-    free_space = 128 KB
-
-> 8) rx does poll(), (rx_bytes >= rcvlowat) 128Kb >= 128Kb, POLLIN is set
-> 9) rx reads 64Kb, credit update is not sent due to *
-
-Right, (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE) is still false.
-
-RX: buf_alloc = 256 KB; fwd_cnt = 196 KB; last_fwd_cnt = 0;
-    free_space = 64 KB
-
-> 10) rx does poll(), (rx_bytes < rcvlowat) 64Kb < 128Kb, rx waits in poll()
-
-I agree that the TX is stuck because we are not sending the credit 
-update, but also if RX sends the credit update at step 9, RX won't be 
-woken up at step 10, right?
-
->
-> * is optimization in 'virtio_transport_stream_do_dequeue()' which
->   sends OP_CREDIT_UPDATE only when we have not too much space -
->   less than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE.
->
-> Now tx side waits for space inside write() and rx waits in poll() for
-> 'rx_bytes' to reach SO_RCVLOWAT value. Both sides will wait forever. I
-> think, possible fix is to send credit update not only when we have too
-> small space, but also when number of bytes in receive queue is smaller
-> than SO_RCVLOWAT thus not enough to wake up sleeping reader. I'm not
-> sure about correctness of this idea, but anyway - I think that problem
-> above exists. What do You think?
-
-I'm not sure, I have to think more about it, but if RX reads less than 
-SO_RCVLOWAT, I expect it's normal to get to a case of stuck.
-
-In this case we are only unstucking TX, but even if it sends that single 
-byte, RX is still stuck and not consuming it, so it was useless to wake 
-up TX if RX won't consume it anyway, right?
-
-If RX woke up (e.g. SO_RCVLOWAT = 64KB) and read the remaining 64KB, 
-then it would still send the credit update even without this patch and 
-TX will send the 1 byte.
-
-Thanks,
-Stefano
+> +					      testlist[idx].name, extension_cap);
+>  		}
+>  	}
+> =20
 
