@@ -2,78 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36D3265110C
-	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 18:14:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 59546651126
+	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 18:19:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232038AbiLSRON (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Dec 2022 12:14:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48406 "EHLO
+        id S232367AbiLSRTs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Dec 2022 12:19:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229794AbiLSROL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Dec 2022 12:14:11 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10BEB640F
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 09:14:10 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id u15-20020a17090a3fcf00b002191825cf02so9495929pjm.2
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 09:14:10 -0800 (PST)
+        with ESMTP id S231539AbiLSRT2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Dec 2022 12:19:28 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FB4EAE7B
+        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 09:19:27 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id 67-20020a621946000000b00575f8210320so5329316pfz.10
+        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 09:19:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o8HDc6dT9joGnG0gM3Tw5fM1Y1kizsgnHmZfvE7ewTk=;
-        b=YhR1xiT0G8FBVLG4nJ7wyz0mwaCakcQ8zSxJN8XRMcoomBHQBF2s4yfFSUkKVORwII
-         bxpniJ4SxJ36LlZU9hk367x2Z+5rIBF3V0A5DpiQ6xGZM0gzmVwwl1t5pLSGio/O7u/A
-         ngVFBIpD447Cz0UH2XAPfSeSw2XayP5fw5NTudPakDqqe3n1YQZBP3Qja9+F3l4sAi4c
-         Sn53AFhPs5jWQxHskDdW+U4ehLe9k3WzrXVJ1dPTR4/z80LJscC+5JToN19Wd1H2xDCk
-         sENCCk2RzauNypk5LI5YUbTo+pgQtS9xLlE38Xau0R2Du5uLrgAvCp+krPBd2Nsw6xKG
-         yx0Q==
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=u1OxrZzOIajVGZwkXAPogH/ue04ueQgByOpRB200gSU=;
+        b=RrzqGferbVNclkVYmMFvgCACtExupzd+zXKlb6mqsno4S/mJv3bQ7LCh29DMgCaVEu
+         2CVeVtbR98sVzCFZ2PrSeFfDjxBsanG7unC6LTZ7Pvf17Vx8sM/YNe1dVT1DS32UDOfh
+         hteFFn+helbDlE1Cubk5wDLAOGDZTao2EiDVP5kj+BdQOCHaKmFNXcNu8HKZCtnL9iyX
+         UvcOAjulhbrTLhfQXqDGVd6ILFbWZpvYCOcYGraPxPkQ5N8U1+IGg20DKKAkhwCg15pi
+         vN8zy17Y1pJ978V2ET2wigwRRg4poqTNOFZW76ogCRe/tD9RrpOZq/XyQhTz3HV37t5n
+         N0tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o8HDc6dT9joGnG0gM3Tw5fM1Y1kizsgnHmZfvE7ewTk=;
-        b=WxGH09suCAY48QN0yL56zzixi0DG3w2Dh2NT6Qcu+LKWisiibZ6Bz0hn9LAHP+26uM
-         1vIhqWXvZK42Nsfk0QzguKpBX0D4M9vaJYVNrr8S+39t3ePSBVOjUa0AGO/5OQFZIzmQ
-         hYK8fRGxV3CRp63Fo1a8kBiZVb0F6BInHfwXNtQScQlNE1aPCvHGtJcBKwrtmP2oPxHT
-         s36gZyUZmMU5OSKIFQxjZ2pod6fQPFIXx1+js/ZnT2AGOLOpenLOzfdIf3po9bKVCXAX
-         EWzc8+TfauTYuffwIZeHPesEXy48JXLG3F1aUyedmDCDeFclwsOLbCFI8RrcQj+Hoq5R
-         aKOw==
-X-Gm-Message-State: AFqh2krmneblqIivgdoU+nYFu3E9fAqLu1H1Xh12ibIe0M2heOqYOnck
-        JyQ+lSk9IqOzWPWQzKYBuAK/kg==
-X-Google-Smtp-Source: AMrXdXtA/r28YJXIRo6rvLUx9viMsWmFPGKLwT5h9L/Tk/gsWPHqogS0jjDxwTKHjwethgFz72RwtA==
-X-Received: by 2002:a05:6a20:c1a4:b0:a3:d7b0:aeef with SMTP id bg36-20020a056a20c1a400b000a3d7b0aeefmr1680834pzb.0.1671470049442;
-        Mon, 19 Dec 2022 09:14:09 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i3-20020a631303000000b00478fbfd5276sm6532260pgl.15.2022.12.19.09.14.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Dec 2022 09:14:04 -0800 (PST)
-Date:   Mon, 19 Dec 2022 17:14:00 +0000
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:reply-to:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=u1OxrZzOIajVGZwkXAPogH/ue04ueQgByOpRB200gSU=;
+        b=3Xhmi0OEkA0OvTAn2u80ZW1/pxyN/VSspMZ8iFUqRXdM2W9lHpJniwv55f3ZRxPTyj
+         HudM/780+XMNgE5VyO6wDE+3qM6cVTwHJnimnfdO9HKwg0eOrGy6GnOe8mxYEVQuhYFy
+         lLY5j4AmQPdOfHK0xDVFduIgK9RZvE7vurt0fN9n2AkvN5ZN9u431wiR8ZI+sVgGLP/j
+         9hIHMEaRYTowhgz/cjSL8UP2k4bFLZlCfiryrVX6AEcQRcVvbldpCv30ciepQljOyH1K
+         k2cNOZwObSLHanK62/BAXo+FnaeBYNQE/wEyTaNgqqgZkvf50de0nJxj1Gr1cMDmBiGe
+         +86w==
+X-Gm-Message-State: ANoB5pmhvZf146L+Tg2h6Xow/Wzg79SNc/M7QGcytGMH1ACihxNR8yc3
+        wIuqXtaAiJHUNLzyuzzPjWrv+chjcnA=
+X-Google-Smtp-Source: AA0mqf47iFBIWrLHBVtRlKfWtlwfs4338UwzR9+snJh/ddN8hNpdi0zwWP4rl94BM9iTNW8RowDHx1ocEik=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:cf02:b0:189:d193:95e7 with SMTP id
+ i2-20020a170902cf0200b00189d19395e7mr21663279plg.1.1671470367133; Mon, 19 Dec
+ 2022 09:19:27 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Mon, 19 Dec 2022 17:19:24 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20221219171924.67989-1-seanjc@google.com>
+Subject: [PATCH] KVM: Destroy target device if coalesced MMIO unregistration fails
 From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Gao <chao.gao@intel.com>
-Cc:     Zhang Chen <chen.zhang@intel.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [RFC PATCH 5/9] x86/bugs: Use Virtual MSRs to request hardware
- mitigations
-Message-ID: <Y6Cb2OrkQ8X3IvW5@google.com>
-References: <20221210160046.2608762-1-chen.zhang@intel.com>
- <20221210160046.2608762-6-chen.zhang@intel.com>
- <Y5oviY0471JytWPo@google.com>
- <Y6BtcutjgcgE8dsv@gao-cwp>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y6BtcutjgcgE8dsv@gao-cwp>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "=?UTF-8?q?=E6=9F=B3=E8=8F=81=E5=B3=B0?=" <liujingfeng@qianxin.com>,
+        Sean Christopherson <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,41 +70,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 19, 2022, Chao Gao wrote:
-> On Wed, Dec 14, 2022 at 08:18:17PM +0000, Sean Christopherson wrote:
-> > To me, this looks like Intel is foisting a paravirt interface on KVM and other
-> > hypervisors without collaborating with said hypervisors' developers and maintainers.
-> >
-> >I get that some of the mitigations are vendor specific, but things like RETPOLINE
-> >aren't vendor specific.  I haven't followed all of the mitigation stuff very
-> >closely, but I wouldn't be surprised if there are mitigations now or in the future
-> >that are common across architectures, e.g. arm64 and x86-64.  Intel doing its own
-> >thing means AMD and arm64 will likely follow suit, and suddenly KVM is supporting
-> >multiple paravirt interfaces for very similar things, without having any control
-> >over the APIs.  That's all kinds of backwards.
-> 
-> But if the interface is defined by KVM rather than Intel, it will likely end up
-> with different interfaces for different VMMs, then Linux guest needs to support
-> all of them. And KVM needs to implement Hyper-V's and Xen's interface to support
-> Hyper-V enlightened and Xen enlightened guest. This is a _real_ problem and
-> complicates KVM/Linux in a similar way as multiple paravirt interfaces.
+Destroy and free the target coalesced MMIO device if unregistering said
+device fails.  As clearly noted in the code, kvm_io_bus_unregister_dev()
+does not destroy the target device.
 
-I never said the PV interfaces should be defined by KVM.  I 100% agree that any
-one hypervisor defining its own interface will suffer the same problem.
+  BUG: memory leak
+  unreferenced object 0xffff888112a54880 (size 64):
+    comm "syz-executor.2", pid 5258, jiffies 4297861402 (age 14.129s)
+    hex dump (first 32 bytes):
+      38 c7 67 15 00 c9 ff ff 38 c7 67 15 00 c9 ff ff  8.g.....8.g.....
+      e0 c7 e1 83 ff ff ff ff 00 30 67 15 00 c9 ff ff  .........0g.....
+    backtrace:
+      [<0000000006995a8a>] kmalloc include/linux/slab.h:556 [inline]
+      [<0000000006995a8a>] kzalloc include/linux/slab.h:690 [inline]
+      [<0000000006995a8a>] kvm_vm_ioctl_register_coalesced_mmio+0x8e/0x3d0 =
+arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:150
+      [<00000000022550c2>] kvm_vm_ioctl+0x47d/0x1600 arch/x86/kvm/../../../=
+virt/kvm/kvm_main.c:3323
+      [<000000008a75102f>] vfs_ioctl fs/ioctl.c:46 [inline]
+      [<000000008a75102f>] file_ioctl fs/ioctl.c:509 [inline]
+      [<000000008a75102f>] do_vfs_ioctl+0xbab/0x1160 fs/ioctl.c:696
+      [<0000000080e3f669>] ksys_ioctl+0x76/0xa0 fs/ioctl.c:713
+      [<0000000059ef4888>] __do_sys_ioctl fs/ioctl.c:720 [inline]
+      [<0000000059ef4888>] __se_sys_ioctl fs/ioctl.c:718 [inline]
+      [<0000000059ef4888>] __x64_sys_ioctl+0x6f/0xb0 fs/ioctl.c:718
+      [<000000006444fa05>] do_syscall_64+0x9f/0x4e0 arch/x86/entry/common.c=
+:290
+      [<000000009a4ed50b>] entry_SYSCALL_64_after_hwframe+0x49/0xbe
 
-I think having a PV interface for coordinating mitigations between host and guest
-is a great idea.  What I don't like is tying the interface to "hardware" and defining
-the interface without even trying to collaborate with others.
+  BUG: leak checking failed
 
-> The use case of this paravirt interface is specific to Intel CPU microarchitecture.
+Fixes: 5d3c4c79384a ("KVM: Stop looking for coalesced MMIO zones if the bus=
+ is destroyed")
+Cc: stable@vger.kernel.org
+Reported-by: =E6=9F=B3=E8=8F=81=E5=B3=B0 <liujingfeng@qianxin.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ virt/kvm/coalesced_mmio.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Well yeah, because the interface was designed only to work for Intel CPUs.
+diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+index 0be80c213f7f..5ef88f5a0864 100644
+--- a/virt/kvm/coalesced_mmio.c
++++ b/virt/kvm/coalesced_mmio.c
+@@ -187,15 +187,17 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm=
+ *kvm,
+ 			r =3D kvm_io_bus_unregister_dev(kvm,
+ 				zone->pio ? KVM_PIO_BUS : KVM_MMIO_BUS, &dev->dev);
+=20
++			kvm_iodevice_destructor(&dev->dev);
++
+ 			/*
+ 			 * On failure, unregister destroys all devices on the
+ 			 * bus _except_ the target device, i.e. coalesced_zones
+-			 * has been modified.  No need to restart the walk as
+-			 * there aren't any zones left.
++			 * has been modified.  Bail after destroying the target
++			 * device, there's no need to restart the walk as there
++			 * aren't any zones left.
+ 			 */
+ 			if (r)
+ 				break;
+-			kvm_iodevice_destructor(&dev->dev);
+ 		}
+ 	}
+=20
 
-> Supporting multiple paravirt interfaces may not happen in the near future if there
-> is no use case for AMD and arm64.
+base-commit: 9d75a3251adfbcf444681474511b58042a364863
+--=20
+2.39.0.314.g84b9a713c41-goog
 
-I'll take that bet.  The vast majority of problems that are solved by PV interfaces
-are common to all architectures and vendors, e.g. steal time, PV spinlocks, async
-page faults, directed yield, confidential VMs (GHCB vs. GHCI), etc.  I highly doubt
-Intel is the only hardware vendor that will ever benefit from paravirtualizing
-mitigations.
