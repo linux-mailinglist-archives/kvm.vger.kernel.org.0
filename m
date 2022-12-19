@@ -2,124 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22A126509C0
-	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 11:03:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D9666509F1
+	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 11:17:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231248AbiLSKDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Dec 2022 05:03:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59602 "EHLO
+        id S231663AbiLSKRc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Dec 2022 05:17:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbiLSKDI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Dec 2022 05:03:08 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D40721A9
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 02:03:07 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id w26so5851610pfj.6
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 02:03:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o8qF45gRt+DDxbPoBOwLq5gI0X9GK8K9lK2FeNB4ZbI=;
-        b=OVsC/JqVnQqD2ewslQrO0vlgWZhCwX5M37sHjSEjc71UAVeYQwNo+LyywiBSEO/Bvg
-         rlWG5IUTJPQbDSBklwnNZEPH/nC2LxDFBvfrzuAQi9ErT0FagSHXXv/kdzDE8qarmMak
-         sTrK9sSuOTj6A8VX7kCHOTC+J4czpT38kAEaynHppEH5XsQgF5LD5gVrm6OhNso79wtw
-         IUbBBSPAr8zncSXBX9cI1W5iBdGLl0szzUS4vPq/hV18ZiPQg+ZpVTzgRNzuhaUY7xd5
-         sqzh0uy/3CGVTq6FQpEVyKwyG2E74hLHAk1pS8YBenY2TQCijB1dhwKh2x1J8d+PJkNB
-         79ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o8qF45gRt+DDxbPoBOwLq5gI0X9GK8K9lK2FeNB4ZbI=;
-        b=thfg4fwiMYXsezjwxfNfs5HKVXjOO0Hocz8Es6jXy1miHdl8GhnwF0M39u/BbPObVw
-         549H7b05MnLT5W2V9XIn9QlN/tKlFQWv57+fy7QOWqTP/1S2T5CfPXaE7ICjvQ/n09oO
-         avhCayaZ4V8/rCuTQnGLlYa0hrA6WYq990Xzv173saG2cSBbZQNqBmQbG3Z+br6WWyTW
-         GdA7m6R+gDgcbEdPuDotbwoT5XlcrZkxW4iVzu6UNErDqWXDyqDbhUtqP0vfh3d5b5uB
-         NLMEAJxuZR2Wd66eDM3/SNXzRKvD5giAnIUDpvQv+TSAcmJ5qARz5+be8UwG9FdXJTBt
-         0znQ==
-X-Gm-Message-State: AFqh2kpi4Ia1XAgIcB0y2ZiDGjeo4tB4YwbsDh8KuUXc+3hazL7hOoL5
-        Qpk/ac3xemTEh/MKqj5n/x0=
-X-Google-Smtp-Source: AMrXdXsohDxCKKuvOxSq/WEQXAbCVwnxNNPwjt9DArMCb/NpSb/KYdoCi+LsUvALlzIEHbtYKqV/TQ==
-X-Received: by 2002:a62:38cf:0:b0:57e:866d:c090 with SMTP id f198-20020a6238cf000000b0057e866dc090mr7088497pfa.19.1671444186789;
-        Mon, 19 Dec 2022 02:03:06 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id v6-20020aa799c6000000b0056b4c5dde61sm6364036pfi.98.2022.12.19.02.03.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 19 Dec 2022 02:03:06 -0800 (PST)
-Message-ID: <8348d759-2ff5-724d-7808-b205be246573@gmail.com>
-Date:   Mon, 19 Dec 2022 18:02:58 +0800
+        with ESMTP id S231545AbiLSKR3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Dec 2022 05:17:29 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00FCF2DFD;
+        Mon, 19 Dec 2022 02:17:27 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 241F21EC0662;
+        Mon, 19 Dec 2022 11:17:26 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1671445046;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=Td6DN6d9KHuO8Ni0x4sFSPaN76BIetZ9amTLwGfBuQY=;
+        b=Gi31BrcudDAIpa+PJzR9Rm2IwbH2EvgIUujPE8wya8WJCeKy/2ekrtTK9r05L2S9b69Vty
+        nPxnhxFIIyGflDiLpYzFN3KhRz/d2AlJ8y/q4NmLiN36+iptFsaIT87iBVCGpQcQ6JiTDL
+        XdJKVV4+vR907NBBpfad61/X4A6kZl0=
+Date:   Mon, 19 Dec 2022 11:17:22 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+Message-ID: <Y6A6MkFjckQ18fFH@zn.tnic>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+ <Y5yKEpwCzZpNoBrp@zn.tnic>
+ <20221219081532.GD1691829@chaop.bj.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.0
-Subject: Re: [PATCH v6 4/7] kvm: x86/pmu: Introduce masked events to the pmu
- event filter
-To:     Aaron Lewis <aaronlewis@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com,
-        kvm list <kvm@vger.kernel.org>
-References: <20221021205105.1621014-1-aaronlewis@google.com>
- <20221021205105.1621014-5-aaronlewis@google.com>
- <3f0a7487-476c-071c-ece9-49a401982e40@gmail.com>
- <Y5yxIcc4g8EuhtZE@google.com>
- <CAAAPnDHvvCXo8qYpPFK=a7Ghtdf-Z-7sX5RmsgbRCjf_QmoYgA@mail.gmail.com>
-Content-Language: en-US
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <CAAAPnDHvvCXo8qYpPFK=a7Ghtdf-Z-7sX5RmsgbRCjf_QmoYgA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221219081532.GD1691829@chaop.bj.intel.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 17/12/2022 2:31 am, Aaron Lewis wrote:
-> On Fri, Dec 16, 2022 at 9:55 AM Sean Christopherson <seanjc@google.com> wrote:
->>
->> On Thu, Dec 15, 2022, Like Xu wrote:
->>> On 22/10/2022 4:51 am, Aaron Lewis wrote:
->>>> --- a/include/uapi/linux/kvm.h
->>>> +++ b/include/uapi/linux/kvm.h
->>>> @@ -1178,6 +1178,7 @@ struct kvm_ppc_resize_hpt {
->>>>    #define KVM_CAP_S390_ZPCI_OP 221
->>>>    #define KVM_CAP_S390_CPU_TOPOLOGY 222
->>>>    #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
->>>> +#define KVM_CAP_PMU_EVENT_MASKED_EVENTS 224
->>>
->>> I presume that the linux/tools code in google's internal tree
->>> can directly refer to the various definitions in the kernel headers.
->>>
->>> Otherwise, how did the newly added selftest get even compiled ?
->>
->> Magic fairy dust, a.k.a. `make headers_install`.  KVM selftests don't actually
->> get anything from tools/include/uapi/ or tools/arch/<arch>/include/uapi/, the
->> only reason the KVM headers are copied there are for perf usage.  And if it weren't
->> for perf, I'd delete them from tools/, because keeping them in sync is a pain.
-
-LoL, how ignorant I am and thank you. Please review the below fix to see if it 
-helps.
-https://lore.kernel.org/kvm/20221219095540.52208-1-likexu@tencent.com/
-
->>
->> To get tools' uapi copies, KVM selftests would need to change its include paths
->> or change a bunch of #includes to do <uapi/...>.
->>
->>> Similar errors include "union cpuid10_eax" from perf_event.h
->>
->> I don't follow this one.  Commit bef9a701f3eb ("selftests: kvm/x86: Add test for
->> KVM_SET_PMU_EVENT_FILTER") added the union definition in pmu_event_filter_test.c
+On Mon, Dec 19, 2022 at 04:15:32PM +0800, Chao Peng wrote:
+> Tamping down with error number a bit:
 > 
-> That's been replaced since posting.  The function num_gp_counters()
-> needs to be placed with
-> kvm_cpu_property(X86_PROPERTY_PMU_NR_GP_COUNTERS).  I can update and
-> repost.
-> 
+>         if (attrs->flags)
+>                 return -ENXIO;
+>         if (attrs->attributes & ~supported_attrs)
+>                 return -EOPNOTSUPP;
+>         if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size) ||
+>             attrs->size == 0)
+>                 return -EINVAL;
+>         if (attrs->address + attrs->size < attrs->address)
+>                 return -E2BIG;
 
-Yeah, please squeeze out a little time to spin a rebased version.
+Yap, better.
+
+I guess you should add those to the documentation of the ioctl too
+so that people can find out why it fails. Or, well, they can look
+at the code directly too but still... imagine some blurb about
+user-friendliness here...
+
+:-)
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
