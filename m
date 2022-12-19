@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1BF9B6508C0
-	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 09:47:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10DED6508C1
+	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 09:48:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231646AbiLSIrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Dec 2022 03:47:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57258 "EHLO
+        id S231675AbiLSIr4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Dec 2022 03:47:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57280 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229615AbiLSIrm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Dec 2022 03:47:42 -0500
+        with ESMTP id S231586AbiLSIrn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Dec 2022 03:47:43 -0500
 Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C12B3A1BB
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 00:47:40 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F0E8A1BD
+        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 00:47:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671439660; x=1702975660;
+  t=1671439662; x=1702975662;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=u6ravFXwu0qcSyxTT4L4QXDzCd7tAVXR36AsFI5W24s=;
-  b=VgYkqCqHb/z5b+e9cN4tn7HagWjD7keIOxbHbsgiRt4w4oIpnNzpOnqV
-   5NLFA8wUF+Xc21IOrdXBXFvS8gxf4woUa1403exrYYSFOD47Fr6k5bosu
-   w41WSaAe8BcuXBBnazT7qGQoDSuE6SHfXjjShMo2JRoKRFqOOp90+wfAl
-   FVZV+kVt6f/YUUz4SHAZc9bI9SHD8opcU3qnu0zaGh/5wc1bvr6k1nc1d
-   lapau+AwuLo6TnTuicFtojsUJvPu9Pv1I8UrEjTw+yxQwwD227Nqxt6Pu
-   bgUT4r7WBZx8Z4BWyE2OD+mwgvehQDoJ6+cMKE/CA9tu7ms17HRO+WfGD
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10565"; a="381528454"
+  bh=I8tWVihrLhPjxASgfqdwDpZFSIfGHKH3+NkfCVEDmvQ=;
+  b=kEk4QMLJ9ApKukZ8Iq8BtOJwE/RQkxOVe91+k1sClu0eSDADxvEt4+Te
+   /OqDha+Hq1LGS7VXDJOVZS7c2AFGML28WBKUmTNvhRG2nEqJQKarRJGle
+   bdq8BC4BUcI3aSLeRJTwHII7Fa60pAt4HhGy9csCfqYMtQmtPftfU23Jv
+   tPyxA9M/um0BirC0ynwYUxyChx3ip4NPkbs8HsoortISv5MMzsCaLVNXB
+   7ynsodEiM8+STMRR8gyNF17q6M0tKwOR6M6A3BdmScG4Jd/GC08y3z1z/
+   yRuG3v8AD4uIaVnhSsxPG5OnxIuZU/Rh5FWlVa1aZEDT7JuTuocc/souF
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10565"; a="381528461"
 X-IronPort-AV: E=Sophos;i="5.96,255,1665471600"; 
-   d="scan'208";a="381528454"
+   d="scan'208";a="381528461"
 Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 00:47:40 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 00:47:41 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10565"; a="628233762"
+X-IronPort-AV: E=McAfee;i="6500,9779,10565"; a="628233767"
 X-IronPort-AV: E=Sophos;i="5.96,255,1665471600"; 
-   d="scan'208";a="628233762"
+   d="scan'208";a="628233767"
 Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orsmga006.jf.intel.com with ESMTP; 19 Dec 2022 00:47:40 -0800
+  by orsmga006.jf.intel.com with ESMTP; 19 Dec 2022 00:47:41 -0800
 From:   Yi Liu <yi.l.liu@intel.com>
 To:     alex.williamson@redhat.com, jgg@nvidia.com
 Cc:     kevin.tian@intel.com, cohuck@redhat.com, eric.auger@redhat.com,
         nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
         chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
         yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com
-Subject: [RFC 04/12] kvm/vfio: Rename kvm_vfio_group to prepare for accepting vfio device fd
-Date:   Mon, 19 Dec 2022 00:47:10 -0800
-Message-Id: <20221219084718.9342-5-yi.l.liu@intel.com>
+Subject: [RFC 05/12] kvm/vfio: Accept vfio device file from userspace
+Date:   Mon, 19 Dec 2022 00:47:11 -0800
+Message-Id: <20221219084718.9342-6-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221219084718.9342-1-yi.l.liu@intel.com>
 References: <20221219084718.9342-1-yi.l.liu@intel.com>
@@ -61,289 +61,151 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Meanwhile, rename related helpers. No functional change is intended.
+This defines KVM_DEV_VFIO_FILE* and make alias with KVM_DEV_VFIO_GROUP*.
+Old userspace uses KVM_DEV_VFIO_GROUP* works as well.
 
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- virt/kvm/vfio.c | 115 ++++++++++++++++++++++++------------------------
- 1 file changed, 58 insertions(+), 57 deletions(-)
+ Documentation/virt/kvm/devices/vfio.rst | 32 ++++++++++++-------------
+ include/uapi/linux/kvm.h                | 23 +++++++++++++-----
+ virt/kvm/vfio.c                         | 18 +++++++-------
+ 3 files changed, 42 insertions(+), 31 deletions(-)
 
+diff --git a/Documentation/virt/kvm/devices/vfio.rst b/Documentation/virt/kvm/devices/vfio.rst
+index 2d20dc561069..ac4300ded398 100644
+--- a/Documentation/virt/kvm/devices/vfio.rst
++++ b/Documentation/virt/kvm/devices/vfio.rst
+@@ -9,23 +9,23 @@ Device types supported:
+   - KVM_DEV_TYPE_VFIO
+ 
+ Only one VFIO instance may be created per VM.  The created device
+-tracks VFIO groups in use by the VM and features of those groups
+-important to the correctness and acceleration of the VM.  As groups
+-are enabled and disabled for use by the VM, KVM should be updated
+-about their presence.  When registered with KVM, a reference to the
+-VFIO-group is held by KVM.
+-
+-Groups:
+-  KVM_DEV_VFIO_GROUP
+-
+-KVM_DEV_VFIO_GROUP attributes:
+-  KVM_DEV_VFIO_GROUP_ADD: Add a VFIO group to VFIO-KVM device tracking
+-	kvm_device_attr.addr points to an int32_t file descriptor
++tracks VFIO files (group or device) in use by the VM and features
++of those groups/devices important to the correctness and acceleration
++of the VM.  As groups/device are enabled and disabled for use by the
++VM, KVM should be updated about their presence.  When registered with
++KVM, a reference to the VFIO file is held by KVM.
++
++VFIO Files:
++  KVM_DEV_VFIO_FILE
++
++KVM_DEV_VFIO_FILE attributes:
++  KVM_DEV_VFIO_FILE_ADD: Add a VFIO file (group/device) to VFIO-KVM device
++	tracking kvm_device_attr.addr points to an int32_t file descriptor
++	for the VFIO file.
++  KVM_DEV_VFIO_FILE_DEL: Remove a VFIO file (group/device) from VFIO-KVM device
++	tracking kvm_device_attr.addr points to an int32_t file descriptor
+ 	for the VFIO group.
+-  KVM_DEV_VFIO_GROUP_DEL: Remove a VFIO group from VFIO-KVM device tracking
+-	kvm_device_attr.addr points to an int32_t file descriptor
+-	for the VFIO group.
+-  KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE: attaches a guest visible TCE table
++  KVM_DEV_VFIO_FILE_SET_SPAPR_TCE: attaches a guest visible TCE table
+ 	allocated by sPAPR KVM.
+ 	kvm_device_attr.addr points to a struct::
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 0d5d4419139a..77bd6bb409d2 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1398,15 +1398,26 @@ struct kvm_create_device {
+ 
+ struct kvm_device_attr {
+ 	__u32	flags;		/* no flags currently defined */
+-	__u32	group;		/* device-defined */
+-	__u64	attr;		/* group-defined */
++	union {
++		__u32	group;
++		__u32	file;
++	}; /* device-defined */
++	__u64	attr;		/* VFIO-file-defined or group-defined */
+ 	__u64	addr;		/* userspace address of attr data */
+ };
+ 
+-#define  KVM_DEV_VFIO_GROUP			1
+-#define   KVM_DEV_VFIO_GROUP_ADD			1
+-#define   KVM_DEV_VFIO_GROUP_DEL			2
+-#define   KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE		3
++#define  KVM_DEV_VFIO_FILE	1
++
++#define   KVM_DEV_VFIO_FILE_ADD			1
++#define   KVM_DEV_VFIO_FILE_DEL			2
++#define   KVM_DEV_VFIO_FILE_SET_SPAPR_TCE	3
++
++/* Group aliases are for compile time uapi compatibility */
++#define  KVM_DEV_VFIO_GROUP	KVM_DEV_VFIO_FILE
++
++#define   KVM_DEV_VFIO_GROUP_ADD	KVM_DEV_VFIO_FILE_ADD
++#define   KVM_DEV_VFIO_GROUP_DEL	KVM_DEV_VFIO_FILE_DEL
++#define   KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE	KVM_DEV_VFIO_FILE_SET_SPAPR_TCE
+ 
+ enum kvm_device_type {
+ 	KVM_DEV_TYPE_FSL_MPIC_20	= 1,
 diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
-index 868930c7a59b..0f54b9d308d7 100644
+index 0f54b9d308d7..f41705d509d2 100644
 --- a/virt/kvm/vfio.c
 +++ b/virt/kvm/vfio.c
-@@ -21,7 +21,7 @@
- #include <asm/kvm_ppc.h>
- #endif
- 
--struct kvm_vfio_group {
-+struct kvm_vfio_file {
- 	struct list_head node;
- 	struct file *file;
- #ifdef CONFIG_SPAPR_TCE_IOMMU
-@@ -30,7 +30,7 @@ struct kvm_vfio_group {
- };
- 
- struct kvm_vfio {
--	struct list_head group_list;
-+	struct list_head file_list;
- 	struct mutex lock;
- 	bool noncoherent;
- };
-@@ -98,34 +98,35 @@ static struct iommu_group *kvm_vfio_file_iommu_group(struct file *file)
- }
- 
- static void kvm_spapr_tce_release_vfio_group(struct kvm *kvm,
--					     struct kvm_vfio_group *kvg)
-+					     struct kvm_vfio_file *kvf)
- {
--	if (WARN_ON_ONCE(!kvg->iommu_group))
-+	if (WARN_ON_ONCE(!kvf->iommu_group))
- 		return;
- 
--	kvm_spapr_tce_release_iommu_group(kvm, kvg->iommu_group);
--	iommu_group_put(kvg->iommu_group);
--	kvg->iommu_group = NULL;
-+	kvm_spapr_tce_release_iommu_group(kvm, kvf->iommu_group);
-+	iommu_group_put(kvf->iommu_group);
-+	kvf->iommu_group = NULL;
- }
- #endif
- 
- /*
-- * Groups can use the same or different IOMMU domains.  If the same then
-- * adding a new group may change the coherency of groups we've previously
-- * been told about.  We don't want to care about any of that so we retest
-- * each group and bail as soon as we find one that's noncoherent.  This
-- * means we only ever [un]register_noncoherent_dma once for the whole device.
-+ * Groups/devices can use the same or different IOMMU domains.  If the same
-+ * then adding a new group/device may change the coherency of groups/devices
-+ * we've previously been told about.  We don't want to care about any of
-+ * that so we retest each group/device and bail as soon as we find one that's
-+ * noncoherent.  This means we only ever [un]register_noncoherent_dma once
-+ * for the whole device.
-  */
- static void kvm_vfio_update_coherency(struct kvm_device *dev)
- {
- 	struct kvm_vfio *kv = dev->private;
- 	bool noncoherent = false;
--	struct kvm_vfio_group *kvg;
-+	struct kvm_vfio_file *kvf;
- 
- 	mutex_lock(&kv->lock);
- 
--	list_for_each_entry(kvg, &kv->group_list, node) {
--		if (!kvm_vfio_file_enforced_coherent(kvg->file)) {
-+	list_for_each_entry(kvf, &kv->file_list, node) {
-+		if (!kvm_vfio_file_enforced_coherent(kvf->file)) {
- 			noncoherent = true;
- 			break;
- 		}
-@@ -143,10 +144,10 @@ static void kvm_vfio_update_coherency(struct kvm_device *dev)
- 	mutex_unlock(&kv->lock);
- }
- 
--static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
-+static int kvm_vfio_file_add(struct kvm_device *dev, unsigned int fd)
- {
- 	struct kvm_vfio *kv = dev->private;
--	struct kvm_vfio_group *kvg;
-+	struct kvm_vfio_file *kvf;
- 	struct file *filp;
- 	int ret;
- 
-@@ -162,27 +163,27 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
- 
- 	mutex_lock(&kv->lock);
- 
--	list_for_each_entry(kvg, &kv->group_list, node) {
--		if (kvg->file == filp) {
-+	list_for_each_entry(kvf, &kv->file_list, node) {
-+		if (kvf->file == filp) {
- 			ret = -EEXIST;
- 			goto err_unlock;
- 		}
- 	}
- 
--	kvg = kzalloc(sizeof(*kvg), GFP_KERNEL_ACCOUNT);
--	if (!kvg) {
-+	kvf = kzalloc(sizeof(*kvf), GFP_KERNEL_ACCOUNT);
-+	if (!kvf) {
- 		ret = -ENOMEM;
- 		goto err_unlock;
- 	}
- 
--	kvg->file = filp;
--	list_add_tail(&kvg->node, &kv->group_list);
-+	kvf->file = filp;
-+	list_add_tail(&kvf->node, &kv->file_list);
- 
- 	kvm_arch_start_assignment(dev->kvm);
- 
- 	mutex_unlock(&kv->lock);
- 
--	kvm_vfio_file_set_kvm(kvg->file, dev->kvm);
-+	kvm_vfio_file_set_kvm(kvf->file, dev->kvm);
- 	kvm_vfio_update_coherency(dev);
- 
- 	return 0;
-@@ -193,10 +194,10 @@ static int kvm_vfio_group_add(struct kvm_device *dev, unsigned int fd)
- 	return ret;
- }
- 
--static int kvm_vfio_group_del(struct kvm_device *dev, unsigned int fd)
-+static int kvm_vfio_file_del(struct kvm_device *dev, unsigned int fd)
- {
- 	struct kvm_vfio *kv = dev->private;
--	struct kvm_vfio_group *kvg;
-+	struct kvm_vfio_file *kvf;
- 	struct fd f;
- 	int ret;
- 
-@@ -208,18 +209,18 @@ static int kvm_vfio_group_del(struct kvm_device *dev, unsigned int fd)
- 
- 	mutex_lock(&kv->lock);
- 
--	list_for_each_entry(kvg, &kv->group_list, node) {
--		if (kvg->file != f.file)
-+	list_for_each_entry(kvf, &kv->file_list, node) {
-+		if (kvf->file != f.file)
- 			continue;
- 
--		list_del(&kvg->node);
-+		list_del(&kvf->node);
- 		kvm_arch_end_assignment(dev->kvm);
- #ifdef CONFIG_SPAPR_TCE_IOMMU
--		kvm_spapr_tce_release_vfio_group(dev->kvm, kvg);
-+		kvm_spapr_tce_release_vfio_group(dev->kvm, kvf);
- #endif
--		kvm_vfio_file_set_kvm(kvg->file, NULL);
--		fput(kvg->file);
--		kfree(kvg);
-+		kvm_vfio_file_set_kvm(kvf->file, NULL);
-+		fput(kvf->file);
-+		kfree(kvf);
- 		ret = 0;
- 		break;
- 	}
-@@ -234,12 +235,12 @@ static int kvm_vfio_group_del(struct kvm_device *dev, unsigned int fd)
- }
- 
- #ifdef CONFIG_SPAPR_TCE_IOMMU
--static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
--					void __user *arg)
-+static int kvm_vfio_file_set_spapr_tce(struct kvm_device *dev,
-+				       void __user *arg)
- {
- 	struct kvm_vfio_spapr_tce param;
- 	struct kvm_vfio *kv = dev->private;
--	struct kvm_vfio_group *kvg;
-+	struct kvm_vfio_file *kvf;
- 	struct fd f;
- 	int ret;
- 
-@@ -254,20 +255,20 @@ static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
- 
- 	mutex_lock(&kv->lock);
- 
--	list_for_each_entry(kvg, &kv->group_list, node) {
--		if (kvg->file != f.file)
-+	list_for_each_entry(kvf, &kv->file_list, node) {
-+		if (kvf->file != f.file)
- 			continue;
- 
--		if (!kvg->iommu_group) {
--			kvg->iommu_group = kvm_vfio_file_iommu_group(kvg->file);
--			if (WARN_ON_ONCE(!kvg->iommu_group)) {
-+		if (!kvf->iommu_group) {
-+			kvf->iommu_group = kvm_vfio_file_iommu_group(kvf->file);
-+			if (WARN_ON_ONCE(!kvf->iommu_group)) {
- 				ret = -EIO;
- 				goto err_fdput;
- 			}
- 		}
- 
- 		ret = kvm_spapr_tce_attach_iommu_group(dev->kvm, param.tablefd,
--						       kvg->iommu_group);
-+						       kvf->iommu_group);
- 		break;
- 	}
- 
-@@ -278,8 +279,8 @@ static int kvm_vfio_group_set_spapr_tce(struct kvm_device *dev,
- }
- #endif
- 
--static int kvm_vfio_set_group(struct kvm_device *dev, long attr,
--			      void __user *arg)
-+static int kvm_vfio_set_file(struct kvm_device *dev, long attr,
-+			     void __user *arg)
- {
- 	int32_t __user *argp = arg;
+@@ -286,18 +286,18 @@ static int kvm_vfio_set_file(struct kvm_device *dev, long attr,
  	int32_t fd;
-@@ -288,16 +289,16 @@ static int kvm_vfio_set_group(struct kvm_device *dev, long attr,
- 	case KVM_DEV_VFIO_GROUP_ADD:
- 		if (get_user(fd, argp))
- 			return -EFAULT;
--		return kvm_vfio_group_add(dev, fd);
-+		return kvm_vfio_file_add(dev, fd);
  
- 	case KVM_DEV_VFIO_GROUP_DEL:
+ 	switch (attr) {
+-	case KVM_DEV_VFIO_GROUP_ADD:
++	case KVM_DEV_VFIO_FILE_ADD:
  		if (get_user(fd, argp))
  			return -EFAULT;
--		return kvm_vfio_group_del(dev, fd);
-+		return kvm_vfio_file_del(dev, fd);
+ 		return kvm_vfio_file_add(dev, fd);
+ 
+-	case KVM_DEV_VFIO_GROUP_DEL:
++	case KVM_DEV_VFIO_FILE_DEL:
+ 		if (get_user(fd, argp))
+ 			return -EFAULT;
+ 		return kvm_vfio_file_del(dev, fd);
  
  #ifdef CONFIG_SPAPR_TCE_IOMMU
- 	case KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE:
--		return kvm_vfio_group_set_spapr_tce(dev, arg);
-+		return kvm_vfio_file_set_spapr_tce(dev, arg);
+-	case KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE:
++	case KVM_DEV_VFIO_FILE_SET_SPAPR_TCE:
+ 		return kvm_vfio_file_set_spapr_tce(dev, arg);
  #endif
  	}
- 
-@@ -309,8 +310,8 @@ static int kvm_vfio_set_attr(struct kvm_device *dev,
+@@ -309,7 +309,7 @@ static int kvm_vfio_set_attr(struct kvm_device *dev,
+ 			     struct kvm_device_attr *attr)
  {
  	switch (attr->group) {
- 	case KVM_DEV_VFIO_GROUP:
--		return kvm_vfio_set_group(dev, attr->attr,
--					  u64_to_user_ptr(attr->addr));
-+		return kvm_vfio_set_file(dev, attr->attr,
-+					 u64_to_user_ptr(attr->addr));
+-	case KVM_DEV_VFIO_GROUP:
++	case KVM_DEV_VFIO_FILE:
+ 		return kvm_vfio_set_file(dev, attr->attr,
+ 					 u64_to_user_ptr(attr->addr));
  	}
- 
- 	return -ENXIO;
-@@ -339,16 +340,16 @@ static int kvm_vfio_has_attr(struct kvm_device *dev,
- static void kvm_vfio_destroy(struct kvm_device *dev)
+@@ -320,13 +320,13 @@ static int kvm_vfio_set_attr(struct kvm_device *dev,
+ static int kvm_vfio_has_attr(struct kvm_device *dev,
+ 			     struct kvm_device_attr *attr)
  {
- 	struct kvm_vfio *kv = dev->private;
--	struct kvm_vfio_group *kvg, *tmp;
-+	struct kvm_vfio_file *kvf, *tmp;
- 
--	list_for_each_entry_safe(kvg, tmp, &kv->group_list, node) {
-+	list_for_each_entry_safe(kvf, tmp, &kv->file_list, node) {
+-	switch (attr->group) {
+-	case KVM_DEV_VFIO_GROUP:
++	switch (attr->file) {
++	case KVM_DEV_VFIO_FILE:
+ 		switch (attr->attr) {
+-		case KVM_DEV_VFIO_GROUP_ADD:
+-		case KVM_DEV_VFIO_GROUP_DEL:
++		case KVM_DEV_VFIO_FILE_ADD:
++		case KVM_DEV_VFIO_FILE_DEL:
  #ifdef CONFIG_SPAPR_TCE_IOMMU
--		kvm_spapr_tce_release_vfio_group(dev->kvm, kvg);
-+		kvm_spapr_tce_release_vfio_group(dev->kvm, kvf);
+-		case KVM_DEV_VFIO_GROUP_SET_SPAPR_TCE:
++		case KVM_DEV_VFIO_FILE_SET_SPAPR_TCE:
  #endif
--		kvm_vfio_file_set_kvm(kvg->file, NULL);
--		fput(kvg->file);
--		list_del(&kvg->node);
--		kfree(kvg);
-+		kvm_vfio_file_set_kvm(kvf->file, NULL);
-+		fput(kvf->file);
-+		list_del(&kvf->node);
-+		kfree(kvf);
- 		kvm_arch_end_assignment(dev->kvm);
- 	}
- 
-@@ -382,7 +383,7 @@ static int kvm_vfio_create(struct kvm_device *dev, u32 type)
- 	if (!kv)
- 		return -ENOMEM;
- 
--	INIT_LIST_HEAD(&kv->group_list);
-+	INIT_LIST_HEAD(&kv->file_list);
- 	mutex_init(&kv->lock);
- 
- 	dev->private = kv;
+ 			return 0;
+ 		}
 -- 
 2.34.1
 
