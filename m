@@ -2,190 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6F9F650881
-	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 09:20:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8CF36508BC
+	for <lists+kvm@lfdr.de>; Mon, 19 Dec 2022 09:47:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231536AbiLSIUF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Dec 2022 03:20:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51794 "EHLO
+        id S231516AbiLSIrj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 19 Dec 2022 03:47:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbiLSIUC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Dec 2022 03:20:02 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C8ADBF7F;
-        Mon, 19 Dec 2022 00:20:00 -0800 (PST)
+        with ESMTP id S231501AbiLSIrh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 19 Dec 2022 03:47:37 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B09CA1B1
+        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 00:47:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671438000; x=1702974000;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=LNCdKsFcaAqCxKwjGOGvE5vkO4LxzR3OxK3Y+B+ZSpI=;
-  b=LBTL0lT9N7OTJVymllyL6GEEIxeCqISqegKeG8rzigRhMjKVbSyWddah
-   42K2kKHP8aZZ1+tw966Dq9ZdidMew+6klGCrMuBK0AXqctiFu/t5+SH/x
-   0b/DhfzJ6hx/CaYQBRjiTMrr4xfTNvU96Ev0zpbQRAzJeSZrGghs6N+o5
-   vS3X+ny02gWk49F9Bdlkz/6TydT7mfnfK5JoMNM6zOGlK0xe1S6gDodpT
-   uN5eKplH07m0d2R4ZCOhMa/j9XAkKqery7HeaqmHCDvq5ewsoPsI5du1b
-   Y15D731j3waALz/L5OVumxnzBgGxTAEFFttJclyWCya+xTX5rmbmgNSuP
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10565"; a="299627805"
+  t=1671439656; x=1702975656;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QMoyz3oAiIMz2I4vg0aj3CNysJqnK+6UyxEw3x+o8qo=;
+  b=cHvNJd06QmreVmk1o4CzXXeCLeT8hpqftTFnR6WpnqfabwX+ISG6Y6vw
+   T8Vh/tYQyf1ZOG7BjNxYhubMvB7KbzHpyrCnmPUVLyKleH9UvZSPAId02
+   yG0PxeTD3Z30J02kA/gROWRyDCO1KmZtyYUOjdoFjoC0VHOgfyM9Pg58E
+   4LDBsHgRj5WQmStt7n5vbwWMyEB/sXYcKyC/SjE/q7MobLFgtd/hzor9q
+   erzrmpg5/l8JASOFCrPCxTeBL4SyyMrXFF5yOlM33L0TPnOYjM1PGbgrO
+   cySXAdkLeJv/Q7qcYgJb3+J48bZh3T7NQHCnVAohSnFwNMAE2boreHZCK
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10565"; a="381528426"
 X-IronPort-AV: E=Sophos;i="5.96,255,1665471600"; 
-   d="scan'208";a="299627805"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 00:19:59 -0800
+   d="scan'208";a="381528426"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 00:47:34 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10565"; a="719033720"
+X-IronPort-AV: E=McAfee;i="6500,9779,10565"; a="628233713"
 X-IronPort-AV: E=Sophos;i="5.96,255,1665471600"; 
-   d="scan'208";a="719033720"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by fmsmga004.fm.intel.com with ESMTP; 19 Dec 2022 00:19:49 -0800
-Date:   Mon, 19 Dec 2022 16:15:32 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
-Message-ID: <20221219081532.GD1691829@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
- <Y5yKEpwCzZpNoBrp@zn.tnic>
+   d="scan'208";a="628233713"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga006.jf.intel.com with ESMTP; 19 Dec 2022 00:47:34 -0800
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, jgg@nvidia.com
+Cc:     kevin.tian@intel.com, cohuck@redhat.com, eric.auger@redhat.com,
+        nicolinc@nvidia.com, kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.l.liu@intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com
+Subject: [RFC 00/12] Add vfio_device cdev for iommufd support
+Date:   Mon, 19 Dec 2022 00:47:06 -0800
+Message-Id: <20221219084718.9342-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y5yKEpwCzZpNoBrp@zn.tnic>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 16, 2022 at 04:09:06PM +0100, Borislav Petkov wrote:
-> On Fri, Dec 02, 2022 at 02:13:40PM +0800, Chao Peng wrote:
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index 1782c4555d94..7f0f5e9f2406 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -1150,6 +1150,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
-> >  	spin_lock_init(&kvm->mn_invalidate_lock);
-> >  	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
-> >  	xa_init(&kvm->vcpu_array);
-> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
-> > +	xa_init(&kvm->mem_attr_array);
-> > +#endif
-> 
-> 	if (IS_ENABLED(CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES))
-> 		...
-> 
-> would at least remove the ugly ifdeffery.
-> 
-> Or you could create wrapper functions for that xa_init() and
-> xa_destroy() and put the ifdeffery in there.
+Existing VFIO provides group-centric user APIs for userspace. Userspace
+opens the /dev/vfio/$group_id first before getting device fd and hence
+getting access to device. This is not the desired model for iommufd. Per
+the conclusion of community discussion[1], iommufd provides device-centric
+kAPIs and requires its consumer (like VFIO) to be device-centric user
+APIs. Such user APIs are used to associate device with iommufd and also
+the I/O address spaces managed by the iommufd.
 
-Agreed.
+This series first introduces a per device file structure to be prepared
+for further enhancement and refactors the kvm-vfio code to be prepared
+for accepting device file from userspace. Then refactors the vfio to be
+able to handle iommufd binding. This refactor includes the mechanism of
+blocking device access before iommufd bind, making vfio_device_open() be
+exclusive between the group path and the cdev path. Eventually, adds the
+cdev support for vfio device, and makes group infrastructure optional as
+it is not needed when vfio device cdev is compiled.
 
-> 
-> > @@ -2323,6 +2329,49 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
-> >  }
-> >  #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
-> >  
-> > +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
-> > +static u64 kvm_supported_mem_attributes(struct kvm *kvm)
-> 
-> I guess that function should have a verb in the name:
-> 
-> kvm_get_supported_mem_attributes()
+This is also a base for further support iommu nesting for vfio device[2].
 
-Right!
-> 
-> > +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
-> > +					   struct kvm_memory_attributes *attrs)
-> > +{
-> > +	gfn_t start, end;
-> > +	unsigned long i;
-> > +	void *entry;
-> > +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
-> > +
-> > +	/* flags is currently not used. */
-> > +	if (attrs->flags)
-> > +		return -EINVAL;
-> > +	if (attrs->attributes & ~supported_attrs)
-> > +		return -EINVAL;
-> > +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
-> > +		return -EINVAL;
-> > +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
-> > +		return -EINVAL;
-> 
-> Dunno, shouldn't those issue some sort of an error message so that the
-> caller knows where it failed? Or at least return different retvals which
-> signal what the problem is?
+The complete code can be found in below branch, simple test done with the
+legacy group path and the cdev path. Draft QEMU branch can be found at[3]
 
-Tamping down with error number a bit:
+https://github.com/yiliu1765/iommufd/tree/vfio_device_cdev_rfcv1
+(config CONFIG_IOMMUFD=y)
 
-        if (attrs->flags)
-                return -ENXIO;
-        if (attrs->attributes & ~supported_attrs)
-                return -EOPNOTSUPP;
-        if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size) ||
-            attrs->size == 0)
-                return -EINVAL;
-        if (attrs->address + attrs->size < attrs->address)
-                return -E2BIG;
+[1] https://lore.kernel.org/kvm/BN9PR11MB5433B1E4AE5B0480369F97178C189@BN9PR11MB5433.namprd11.prod.outlook.com/
+[2] https://github.com/yiliu1765/iommufd/tree/wip/iommufd-v6.1-rc3-nesting
+[3] https://github.com/yiliu1765/qemu/tree/wip/qemu-iommufd-6.1-rc3
 
-Chao
-> 
-> > +	start = attrs->address >> PAGE_SHIFT;
-> > +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
-> > +
-> > +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
-> > +
-> > +	mutex_lock(&kvm->lock);
-> > +	for (i = start; i < end; i++)
-> > +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
-> > +				    GFP_KERNEL_ACCOUNT)))
-> > +			break;
-> > +	mutex_unlock(&kvm->lock);
-> > +
-> > +	attrs->address = i << PAGE_SHIFT;
-> > +	attrs->size = (end - i) << PAGE_SHIFT;
-> > +
-> > +	return 0;
-> > +}
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
+Regards,
+	Yi Liu
+
+Yi Liu (12):
+  vfio: Allocate per device file structure
+  vfio: Refine vfio file kAPIs
+  vfio: Accept vfio device file in the driver facing kAPI
+  kvm/vfio: Rename kvm_vfio_group to prepare for accepting vfio device
+    fd
+  kvm/vfio: Accept vfio device file from userspace
+  vfio: Pass struct vfio_device_file * to vfio_device_open/close()
+  vfio: Block device access via device fd until device is opened
+  vfio: Add infrastructure for bind_iommufd and attach
+  vfio: Make vfio_device_open() exclusive between group path and device
+    cdev path
+  vfio: Add cdev for vfio_device
+  vfio: Add ioctls for device cdev iommufd
+  vfio: Compile group optionally
+
+ Documentation/virt/kvm/devices/vfio.rst |  32 +-
+ drivers/vfio/Kconfig                    |  17 +
+ drivers/vfio/Makefile                   |   3 +-
+ drivers/vfio/group.c                    | 131 +++----
+ drivers/vfio/iommufd.c                  |  79 +++-
+ drivers/vfio/pci/vfio_pci_core.c        |   4 +-
+ drivers/vfio/vfio.h                     | 108 +++++-
+ drivers/vfio/vfio_main.c                | 492 ++++++++++++++++++++++--
+ include/linux/vfio.h                    |  21 +-
+ include/uapi/linux/iommufd.h            |   2 +
+ include/uapi/linux/kvm.h                |  23 +-
+ include/uapi/linux/vfio.h               |  64 +++
+ virt/kvm/vfio.c                         | 143 +++----
+ 13 files changed, 891 insertions(+), 228 deletions(-)
+
+-- 
+2.34.1
+
