@@ -2,123 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35353651CF5
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 10:16:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE3FE651D13
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 10:19:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233060AbiLTJQM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 04:16:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60264 "EHLO
+        id S233367AbiLTJTd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 04:19:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229690AbiLTJQI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 04:16:08 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDA8595B0;
-        Tue, 20 Dec 2022 01:16:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=tLmDBRcb5bG0HEu7y3TsRnCiz9YjM9HkYhGNTN9FxjU=; b=A/Se8cRO5QDxTngZPZZNloMJWZ
-        uG51t85sQf4iwVRFCoWyl8ikfeyiZM3Vgv0QNYJuzc+w8PVflica22xj70H3zxKCiMGqJViLp05vm
-        Gnkx9booBqLDFkhSTABv3KtClAz/jDbyu/5NxI9JxD8/FqSk+nEnf8hwOljz0Pe2bQjkTM/eBOQSI
-        63x79IkuUnFd3Mx7FHGB8zdMCOegX52rCnCZYeo37zDrxY0WPEgEueHGHYFJ+H/YXct1ZeI/liAMh
-        Xk5IzUT9PjbDhpr7m4z8JeFythoYJ7cQSLsTcEUc2nENMk4Cu6+REkmuqnIU5vxuFQfeOM7sp67aJ
-        e9seskVA==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p7Yj2-001dqa-W5; Tue, 20 Dec 2022 09:15:53 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id DFB3E300023;
-        Tue, 20 Dec 2022 10:15:41 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-        id C344A2C5F830D; Tue, 20 Dec 2022 10:15:41 +0100 (CET)
-Date:   Tue, 20 Dec 2022 10:15:41 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     Xin Li <xin3.li@intel.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
-        dave.hansen@linux.intel.com, hpa@zytor.com,
-        andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
-        ravi.v.shankar@intel.com
-Subject: Re: [RFC PATCH 18/32] x86/fred: add a debug fault entry stub for FRED
-Message-ID: <Y6F9Pan/gY5Taty1@hirez.programming.kicks-ass.net>
-References: <20221220063658.19271-1-xin3.li@intel.com>
- <20221220063658.19271-19-xin3.li@intel.com>
+        with ESMTP id S233355AbiLTJTc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 04:19:32 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4FA017E13
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 01:19:30 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BK9FuDK031523
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 09:19:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=JNXMht38vIWzOHElqbS4c7XzZyHuPUUXiU6RUm5vDgM=;
+ b=NWWVrK9N9ROW9Fjop0hF63olgBcmeBfaQ8ZzY4BBXlT71z1zuAp/gz2Iy6CZyTWRA91U
+ AJCXhQAIh3xiOzP3xXxeDQ8fy8Oz9N0jlFUKXxLAsTIOfbtk21Bx8kCJDrBOegd6a0O2
+ 7ddylHKjKjAu/s+As9mTShmfBcFhxgCCKExRC3JsflUPVBeIbq5BRzJxmBLfJq0z/hQT
+ z0ccZiogXimzpGXYrO16Zah87qrtfNAtMXQ8IzE5Wic7VmiagK92BAh/jo05ra/PkEkH
+ ndTXW8LJcs+Yai3TmxSCpAR7VaDzKuYZkw20Q9+0U/svFidc5nUmlLoxygd09rPvSJvX qw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mka9182r6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 09:19:30 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BK9H7Jh003207
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 09:19:29 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mka9182qn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Dec 2022 09:19:29 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BK6OZC6024486;
+        Tue, 20 Dec 2022 09:19:27 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3mh6ywkr4u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Dec 2022 09:19:27 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BK9JNH738863284
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Dec 2022 09:19:24 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C8C2A20043;
+        Tue, 20 Dec 2022 09:19:23 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A28CB2004B;
+        Tue, 20 Dec 2022 09:19:23 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 20 Dec 2022 09:19:23 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v5 0/1] s390x: test CMM during migration
+Date:   Tue, 20 Dec 2022 10:19:22 +0100
+Message-Id: <20221220091923.69174-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: JS4To9_raBRrido39jdZzYoeABJPonFQ
+X-Proofpoint-GUID: LMki9gUlLXfMVfEXFoPL9NqOlPId-3UG
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221220063658.19271-19-xin3.li@intel.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-20_02,2022-12-15_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 clxscore=1015 phishscore=0 malwarescore=0 priorityscore=1501
+ mlxscore=0 suspectscore=0 spamscore=0 bulkscore=0 mlxlogscore=981
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2212200069
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 19, 2022 at 10:36:44PM -0800, Xin Li wrote:
+v4->v5:
+---
+* merge migration-during-cmm and migration-cmm into one file and remove
+  the cmm library
 
-> +static __always_inline void debug_kernel_common(struct pt_regs *regs,
-> +						unsigned long dr6)
->  {
-> -	/*
-> -	 * Disable breakpoints during exception handling; recursive exceptions
-> -	 * are exceedingly 'fun'.
-> -	 *
-> -	 * Since this function is NOKPROBE, and that also applies to
-> -	 * HW_BREAKPOINT_X, we can't hit a breakpoint before this (XXX except a
-> -	 * HW_BREAKPOINT_W on our stack)
-> -	 *
-> -	 * Entry text is excluded for HW_BP_X and cpu_entry_area, which
-> -	 * includes the entry stack is excluded for everything.
-> -	 */
-> -	unsigned long dr7 = local_db_save();
-> -	irqentry_state_t irq_state = irqentry_nmi_enter(regs);
->  	instrumentation_begin();
->  
->  	/*
-> @@ -1062,7 +1050,8 @@ static __always_inline void exc_debug_kernel(struct pt_regs *regs,
->  	 * Catch SYSENTER with TF set and clear DR_STEP. If this hit a
->  	 * watchpoint at the same time then that will still be handled.
->  	 */
-> -	if ((dr6 & DR_STEP) && is_sysenter_singlestep(regs))
-> +	if (!cpu_feature_enabled(X86_FEATURE_FRED) &&
-> +	    (dr6 & DR_STEP) && is_sysenter_singlestep(regs))
->  		dr6 &= ~DR_STEP;
->  
->  	/*
-> @@ -1089,8 +1078,28 @@ static __always_inline void exc_debug_kernel(struct pt_regs *regs,
->  		regs->flags &= ~X86_EFLAGS_TF;
->  out:
->  	instrumentation_end();
-> -	irqentry_nmi_exit(regs, irq_state);
-> +}
+v3->v4:
+---
+* rebase on top of Claudio's series
+    [kvm-unit-tests PATCH v3 0/2] lib: s390x: add PSW and
+    PSW_WITH_CUR_MASK macros
+    https://lore.kernel.org/kvm/20221130154038.70492-1-imbrenda@linux.ibm.com/
+* switch cmm.h to system includes
+* move const qualifier before struct keyword
 
-Why doesn't the FRED handler get to to use irqentry_nmi_{enter,exit}() ?
+v2->v3:
+---
+* make allowed_essa_state_masks static (thanks Thomas)
+* change several variables to unsigned (thanks Claudio)
+* remove unneeded assignment (thanks Claudio)
+* fix line length (thanks Claudio)
+* fix some spellings, line wraps (thanks Thomas)
+* remove unneeded goto (thanks Thomas)
+* add migrate_once (thanks Claudio)
+  I introduce migrate_once() only in migration-during-cmm.c for now, but
+  I plan to send a future patch to move it to the library.
+* add missing READ_ONCE (thanks Claudio)
 
-> @@ -1179,6 +1188,24 @@ DEFINE_IDTENTRY_DEBUG_USER(exc_debug)
->  {
->  	exc_debug_user(regs, debug_read_clear_dr6());
->  }
-> +
-> +# ifdef CONFIG_X86_FRED
-> +DEFINE_FRED_HANDLER(fred_exc_debug)
-> +{
-> +	/*
-> +	 * The FRED debug information saved onto stack differs from
-> +	 * DR6 in both stickiness and polarity; it is exactly what
-> +	 * debug_read_clear_dr6() returns.
-> +	 */
-> +	unsigned long dr6 = fred_event_data(regs);
-> +
-> +	if (user_mode(regs))
-> +		exc_debug_user(regs, dr6);
-> +	else
-> +		debug_kernel_common(regs, dr6);
-> +}
-> +# endif /* CONFIG_X86_FRED */
+v1->v2:
+---
+* cmm lib: return struct instead of passing in a pointer (thanks Claudio)
+* cmm lib: remove get_page_addr() (thanks Claudio)
+* cmm lib: print address of mismatch (thanks Claudio)
+* cmm lib: misc comments reworked, added and variables renamed
+* make sure page states change on every iteration (thanks Claudio)
+* add WRITE_ONCE even when not strictly needed (thanks Claudio)
+
+Add a test which changes CMM page states while VM is being migrated.
+
+Nico Boehr (1):
+  s390x: add CMM test during migration
+
+ s390x/migration-cmm.c | 258 +++++++++++++++++++++++++++++++++++++-----
+ s390x/unittests.cfg   |  15 ++-
+ 2 files changed, 240 insertions(+), 33 deletions(-)
+
+-- 
+2.36.1
 
