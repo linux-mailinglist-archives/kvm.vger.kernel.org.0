@@ -2,63 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 276A66522F7
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:46:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 23506652334
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:55:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233772AbiLTOqC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 09:46:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40308 "EHLO
+        id S233796AbiLTOzi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 09:55:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233722AbiLTOpz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 09:45:55 -0500
+        with ESMTP id S233803AbiLTOzf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 09:55:35 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 836EE1AA27
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:45:06 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCB792FA
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:54:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671547505;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=y7FxCiNVbVe4Aeam7AWMfw6SzqBYckbxLBbD6zlvImA=;
-        b=ArHXB6IDyCHqycgWFGNK7ECQfYgdhA75MER89C52aTG1IjcQuU4dfVP4kydiPN0d0iFty3
-        bVVT9j4CPZldSAnYbFulcYeZ3tX80HScXYnhFUgC+ITro6QRPRjzWnr7T0pQNdEy8tcoIc
-        FPcx5XQ5peERfZnht4/yh2xWot8UEzo=
+        s=mimecast20190719; t=1671548090;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=ko0kNgzYIZhZ7GeMVgSXuptscUvRr7VT4Xy66tEkl3E=;
+        b=A3F4wz/V4WvSXoN/7aBe4O2X6sGTEsW/AUAUVKw0gvzvLZElXa0Ovs6HQDd01R5apneynJ
+        FIxHgFsH8DVUIKZZgGYpvFrNCwErJAUSw6VY6z3wqmyxclmBrJV0J3zlaIA5gfaDx7HyqA
+        lsw/P4esEvYJeFttlAIXx6001dXO4j4=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-228-7C7bwy4CO-uUTAAp6zNHLg-1; Tue, 20 Dec 2022 09:45:02 -0500
-X-MC-Unique: 7C7bwy4CO-uUTAAp6zNHLg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-312-vgw5XObPNZOYOnHOttwghA-1; Tue, 20 Dec 2022 09:54:46 -0500
+X-MC-Unique: vgw5XObPNZOYOnHOttwghA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 179612805599;
-        Tue, 20 Dec 2022 14:45:02 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.87])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 096E0492B00;
-        Tue, 20 Dec 2022 14:45:00 +0000 (UTC)
-Date:   Tue, 20 Dec 2022 14:44:58 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 3/3] softmmu: Silent -Wmissing-field-initializers warning
-Message-ID: <Y6HKalK+VUnn2Sna@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20221220143532.24958-1-philmd@linaro.org>
- <20221220143532.24958-4-philmd@linaro.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 62D4D1C25E84;
+        Tue, 20 Dec 2022 14:54:46 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4708C112132C;
+        Tue, 20 Dec 2022 14:54:46 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     torvalds@linux-foundation.org
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: [GIT PULL] KVM/RISC-V changes for Linux 6.2
+Date:   Tue, 20 Dec 2022 09:54:45 -0500
+Message-Id: <20221220145445.1221050-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221220143532.24958-4-philmd@linaro.org>
-User-Agent: Mutt/2.2.7 (2022-08-07)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,25 +55,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 03:35:32PM +0100, Philippe Mathieu-Daudé wrote:
-> Silent when compiling with -Wextra:
-> 
->   ../softmmu/vl.c:886:12: warning: missing field 'flags' initializer [-Wmissing-field-initializers]
->     { NULL },
->            ^
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
->  softmmu/vl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Linus,
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+The following changes since commit 76dcd734eca23168cb008912c0f69ff408905235:
 
+  Linux 6.1-rc8 (2022-12-04 14:48:12 -0800)
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+
+for you to fetch changes up to 6ebbdecff6ae00557a52539287b681641f4f0d33:
+
+  RISC-V: KVM: Add ONE_REG interface for mvendorid, marchid, and mimpid (2022-12-07 09:17:49 +0530)
+
+----------------------------------------------------------------
+KVM/riscv changes for 6.2
+
+* Allow unloading KVM module
+
+* Allow KVM user-space to set mvendorid, marchid, and mimpid
+
+* Several fixes and cleanups
+
+----------------------------------------------------------------
+Anup Patel (9):
+      RISC-V: KVM: Exit run-loop immediately if xfer_to_guest fails
+      RISC-V: KVM: Fix reg_val check in kvm_riscv_vcpu_set_reg_config()
+      RISC-V: KVM: Remove redundant includes of asm/kvm_vcpu_timer.h
+      RISC-V: KVM: Remove redundant includes of asm/csr.h
+      RISC-V: KVM: Use switch-case in kvm_riscv_vcpu_set/get_reg()
+      RISC-V: KVM: Move sbi related struct and functions to kvm_vcpu_sbi.h
+      RISC-V: Export sbi_get_mvendorid() and friends
+      RISC-V: KVM: Save mvendorid, marchid, and mimpid when creating VCPU
+      RISC-V: KVM: Add ONE_REG interface for mvendorid, marchid, and mimpid
+
+Bo Liu (1):
+      RISC-V: KVM: use vma_lookup() instead of find_vma_intersection()
+
+Christophe JAILLET (1):
+      RISC-V: KVM: Simplify kvm_arch_prepare_memory_region()
+
+XiakaiPan (1):
+      RISC-V: KVM: Add exit logic to main.c
+
+ arch/riscv/include/asm/kvm_host.h     | 16 +++----
+ arch/riscv/include/asm/kvm_vcpu_sbi.h |  6 +++
+ arch/riscv/include/uapi/asm/kvm.h     |  3 ++
+ arch/riscv/kernel/sbi.c               |  3 ++
+ arch/riscv/kvm/main.c                 |  6 +++
+ arch/riscv/kvm/mmu.c                  |  6 +--
+ arch/riscv/kvm/vcpu.c                 | 85 ++++++++++++++++++++++++++---------
+ arch/riscv/kvm/vcpu_sbi_base.c        | 13 +++---
+ arch/riscv/kvm/vcpu_sbi_hsm.c         |  1 -
+ arch/riscv/kvm/vcpu_sbi_replace.c     |  1 -
+ arch/riscv/kvm/vcpu_sbi_v01.c         |  1 -
+ 11 files changed, 97 insertions(+), 44 deletions(-)
 
