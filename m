@@ -2,272 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C6070652792
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 21:10:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F3CE6527FF
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 21:40:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234155AbiLTUJj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 15:09:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48028 "EHLO
+        id S234126AbiLTUji (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 15:39:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234027AbiLTUJe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 15:09:34 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B3721ADA9
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 12:09:33 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BCF7C615A2
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 20:09:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C30AC4339B;
-        Tue, 20 Dec 2022 20:09:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671566972;
-        bh=Y5H16bZnT3rfVYbiCegagG+RRvHTAFJrdQ8iYT1WEZ8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=BknxODm1Ki8W4ZCUfH7e4Px05eb9NKcxZYsv/hT7Ug2LTOfr7H/BygcZyoOoe+sHG
-         6U2qVWlABQyhaDthWPp5lya3StPwJ3cYw1M3G1FAC2l4/PO4MVBvIWiZZi9Wnv75YF
-         MK6gqej6igkDoCiY8UWp9ux75QpAteaIg0lBq7ZiZ0lZLKxpxTGyydtoAuOPfzo6SG
-         CG5Qj9Hp+jzZY44E0qfnO+GfbxF2Fwbx6PqnI9zIfiiONBh0dHJVrO4TQI+8bzWZhI
-         AE5YRzt3iDoughdzriEAAVbm4qEd+RzmHGclyhUzdrpHzwSGZlTFnsP8uZm8GqoZWt
-         pssTP3FPM7Qlg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1p7iva-00Dzct-1i;
-        Tue, 20 Dec 2022 20:09:30 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>
-Subject: [PATCH 3/3] KVM: arm64: Convert FSC_* over to ESR_ELx_FSC_*
-Date:   Tue, 20 Dec 2022 20:09:23 +0000
-Message-Id: <20221220200923.1532710-4-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20221220200923.1532710-1-maz@kernel.org>
-References: <20221220200923.1532710-1-maz@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ardb@kernel.org, will@kernel.org, qperret@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234312AbiLTUjd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 15:39:33 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9539FCE2
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 12:39:32 -0800 (PST)
+Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKJxHG7004720;
+        Tue, 20 Dec 2022 20:39:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id; s=corp-2022-7-12;
+ bh=7dM+3fjcuWNeyADvyjQnR3O7DfKwlx7AQjEykXjgl20=;
+ b=y4aQHdhuPkN7llDy0LtKPUBG1uvPiWO6sQOZ8e8Jer48zyrg1DIp3gCn9PGiggRAZ6mq
+ wT1on12muyQiJY4kCnnWlS8cbXYVVbBn3d90MfNpA5KQXtBVmFkN/Cd/AfYa+xngsAb8
+ q6SoAsXguL+RS9A70mSKvf5bDE7CRyQgDGLrZ15kUqnBdkyI1NwtHgfQp0f+lBfkkBuW
+ oi6ua9gvJbEGKYK+fBin9BE0rDMX+Vb02dnHihcPqi2wzWy6cmbvIPgU6r+3bClVqTdg
+ cU9cegMDkAblAPaR25maag910NN3W6ytlY5dWXSKva7O6NbeQACP/JSe+CM6QO/A60kZ iA== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3mh6tnf5ep-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Dec 2022 20:39:27 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BKJEWt2012208;
+        Tue, 20 Dec 2022 20:39:26 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3mh475vcma-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Dec 2022 20:39:26 +0000
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BKKdQ0k014895;
+        Tue, 20 Dec 2022 20:39:26 GMT
+Received: from ca-dev63.us.oracle.com (ca-dev63.us.oracle.com [10.211.8.221])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3mh475vcks-1;
+        Tue, 20 Dec 2022 20:39:26 +0000
+From:   Steve Sistare <steven.sistare@oracle.com>
+To:     kvm@vger.kernel.org
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Steve Sistare <steven.sistare@oracle.com>
+Subject: [PATCH V7 0/7] fixes for virtual address update
+Date:   Tue, 20 Dec 2022 12:39:18 -0800
+Message-Id: <1671568765-297322-1-git-send-email-steven.sistare@oracle.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-20_06,2022-12-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 mlxscore=0
+ adultscore=0 phishscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2212200169
+X-Proofpoint-ORIG-GUID: oyp1ZrejpHXqLhLtCOIYzCSqCIZS5uug
+X-Proofpoint-GUID: oyp1ZrejpHXqLhLtCOIYzCSqCIZS5uug
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The former is an AArch32 legacy, so let's move over to the
-verbose (and strictly identical) version.
+Fix bugs in the interfaces that allow the underlying memory object of an
+iova range to be mapped in a new address space.  They allow userland to
+indefinitely block vfio mediated device kernel threads, and do not
+propagate the locked_vm count to a new mm.  Also fix a pre-existing bug
+that allows locked_vm underflow.
 
-This involves moving some of the #defines that were private
-to KVM into the more generic esr.h.
+The fixes impose restrictions that eliminate waiting conditions, so
+revert the dead code:
+  commit 898b9eaeb3fe ("vfio/type1: block on invalid vaddr")
+  commit 487ace134053 ("vfio/type1: implement notify callback")
+  commit ec5e32940cc9 ("vfio: iommu driver notify callback")
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/include/asm/esr.h            |  9 +++++++++
- arch/arm64/include/asm/kvm_arm.h        | 15 ---------------
- arch/arm64/include/asm/kvm_emulate.h    | 20 ++++++++++----------
- arch/arm64/kvm/hyp/include/hyp/fault.h  |  2 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
- arch/arm64/kvm/mmu.c                    | 21 ++++++++++++---------
- 6 files changed, 33 insertions(+), 36 deletions(-)
+Changes in V2 (thanks Alex):
+  * do not allow group attach while vaddrs are invalid
+  * add patches to delete dead code
+  * add WARN_ON for never-should-happen conditions
+  * check for changed mm in unmap.
+  * check for vfio_lock_acct failure in remap
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 15b34fbfca66..206de10524e3 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -114,6 +114,15 @@
- #define ESR_ELx_FSC_ACCESS	(0x08)
- #define ESR_ELx_FSC_FAULT	(0x04)
- #define ESR_ELx_FSC_PERM	(0x0C)
-+#define ESR_ELx_FSC_SEA_TTW0	(0x14)
-+#define ESR_ELx_FSC_SEA_TTW1	(0x15)
-+#define ESR_ELx_FSC_SEA_TTW2	(0x16)
-+#define ESR_ELx_FSC_SEA_TTW3	(0x17)
-+#define ESR_ELx_FSC_SECC	(0x18)
-+#define ESR_ELx_FSC_SECC_TTW0	(0x1c)
-+#define ESR_ELx_FSC_SECC_TTW1	(0x1d)
-+#define ESR_ELx_FSC_SECC_TTW2	(0x1e)
-+#define ESR_ELx_FSC_SECC_TTW3	(0x1f)
- 
- /* ISS field definitions for Data Aborts */
- #define ESR_ELx_ISV_SHIFT	(24)
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index 0df3fc3a0173..26b0c97df986 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -319,21 +319,6 @@
- 				 BIT(18) |		\
- 				 GENMASK(16, 15))
- 
--/* For compatibility with fault code shared with 32-bit */
--#define FSC_FAULT	ESR_ELx_FSC_FAULT
--#define FSC_ACCESS	ESR_ELx_FSC_ACCESS
--#define FSC_PERM	ESR_ELx_FSC_PERM
--#define FSC_SEA		ESR_ELx_FSC_EXTABT
--#define FSC_SEA_TTW0	(0x14)
--#define FSC_SEA_TTW1	(0x15)
--#define FSC_SEA_TTW2	(0x16)
--#define FSC_SEA_TTW3	(0x17)
--#define FSC_SECC	(0x18)
--#define FSC_SECC_TTW0	(0x1c)
--#define FSC_SECC_TTW1	(0x1d)
--#define FSC_SECC_TTW2	(0x1e)
--#define FSC_SECC_TTW3	(0x1f)
--
- /* Hyp Prefetch Fault Address Register (HPFAR/HDFAR) */
- #define HPFAR_MASK	(~UL(0xf))
- /*
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 4ee467065042..d67a09c07f98 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -349,16 +349,16 @@ static __always_inline u8 kvm_vcpu_trap_get_fault_level(const struct kvm_vcpu *v
- static __always_inline bool kvm_vcpu_abt_issea(const struct kvm_vcpu *vcpu)
- {
- 	switch (kvm_vcpu_trap_get_fault(vcpu)) {
--	case FSC_SEA:
--	case FSC_SEA_TTW0:
--	case FSC_SEA_TTW1:
--	case FSC_SEA_TTW2:
--	case FSC_SEA_TTW3:
--	case FSC_SECC:
--	case FSC_SECC_TTW0:
--	case FSC_SECC_TTW1:
--	case FSC_SECC_TTW2:
--	case FSC_SECC_TTW3:
-+	case ESR_ELx_FSC_EXTABT:
-+	case ESR_ELx_FSC_SEA_TTW0:
-+	case ESR_ELx_FSC_SEA_TTW1:
-+	case ESR_ELx_FSC_SEA_TTW2:
-+	case ESR_ELx_FSC_SEA_TTW3:
-+	case ESR_ELx_FSC_SECC:
-+	case ESR_ELx_FSC_SECC_TTW0:
-+	case ESR_ELx_FSC_SECC_TTW1:
-+	case ESR_ELx_FSC_SECC_TTW2:
-+	case ESR_ELx_FSC_SECC_TTW3:
- 		return true;
- 	default:
- 		return false;
-diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
-index 1b8a2dcd712f..9ddcfe2c3e57 100644
---- a/arch/arm64/kvm/hyp/include/hyp/fault.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
-@@ -60,7 +60,7 @@ static inline bool __get_fault_info(u64 esr, struct kvm_vcpu_fault_info *fault)
- 	 */
- 	if (!(esr & ESR_ELx_S1PTW) &&
- 	    (cpus_have_final_cap(ARM64_WORKAROUND_834220) ||
--	     (esr & ESR_ELx_FSC_TYPE) == FSC_PERM)) {
-+	     (esr & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM)) {
- 		if (!__translate_far_to_hpfar(far, &hpfar))
- 			return false;
- 	} else {
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index 3330d1b76bdd..07d37ff88a3f 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -367,7 +367,7 @@ static bool kvm_hyp_handle_dabt_low(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	if (static_branch_unlikely(&vgic_v2_cpuif_trap)) {
- 		bool valid;
- 
--		valid = kvm_vcpu_trap_get_fault_type(vcpu) == FSC_FAULT &&
-+		valid = kvm_vcpu_trap_get_fault_type(vcpu) == ESR_ELx_FSC_FAULT &&
- 			kvm_vcpu_dabt_isvalid(vcpu) &&
- 			!kvm_vcpu_abt_issea(vcpu) &&
- 			!kvm_vcpu_abt_iss1tw(vcpu);
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 31d7fa4c7c14..a3ee3b605c9b 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1212,7 +1212,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	exec_fault = kvm_vcpu_trap_is_exec_fault(vcpu);
- 	VM_BUG_ON(write_fault && exec_fault);
- 
--	if (fault_status == FSC_PERM && !write_fault && !exec_fault) {
-+	if (fault_status == ESR_ELx_FSC_PERM && !write_fault && !exec_fault) {
- 		kvm_err("Unexpected L2 read permission error\n");
- 		return -EFAULT;
- 	}
-@@ -1277,7 +1277,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * only exception to this is when dirty logging is enabled at runtime
- 	 * and a write fault needs to collapse a block entry into a table.
- 	 */
--	if (fault_status != FSC_PERM || (logging_active && write_fault)) {
-+	if (fault_status != ESR_ELx_FSC_PERM ||
-+	    (logging_active && write_fault)) {
- 		ret = kvm_mmu_topup_memory_cache(memcache,
- 						 kvm_mmu_cache_min_pages(kvm));
- 		if (ret)
-@@ -1342,7 +1343,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * backed by a THP and thus use block mapping if possible.
- 	 */
- 	if (vma_pagesize == PAGE_SIZE && !(force_pte || device)) {
--		if (fault_status == FSC_PERM && fault_granule > PAGE_SIZE)
-+		if (fault_status ==  ESR_ELx_FSC_PERM &&
-+		    fault_granule > PAGE_SIZE)
- 			vma_pagesize = fault_granule;
- 		else
- 			vma_pagesize = transparent_hugepage_adjust(kvm, memslot,
-@@ -1350,7 +1352,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 								   &fault_ipa);
- 	}
- 
--	if (fault_status != FSC_PERM && !device && kvm_has_mte(kvm)) {
-+	if (fault_status != ESR_ELx_FSC_PERM && !device && kvm_has_mte(kvm)) {
- 		/* Check the VMM hasn't introduced a new disallowed VMA */
- 		if (kvm_vma_mte_allowed(vma)) {
- 			sanitise_mte_tags(kvm, pfn, vma_pagesize);
-@@ -1376,7 +1378,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	 * permissions only if vma_pagesize equals fault_granule. Otherwise,
- 	 * kvm_pgtable_stage2_map() should be called to change block size.
- 	 */
--	if (fault_status == FSC_PERM && vma_pagesize == fault_granule)
-+	if (fault_status == ESR_ELx_FSC_PERM && vma_pagesize == fault_granule)
- 		ret = kvm_pgtable_stage2_relax_perms(pgt, fault_ipa, prot);
- 	else
- 		ret = kvm_pgtable_stage2_map(pgt, fault_ipa, vma_pagesize,
-@@ -1441,7 +1443,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	fault_ipa = kvm_vcpu_get_fault_ipa(vcpu);
- 	is_iabt = kvm_vcpu_trap_is_iabt(vcpu);
- 
--	if (fault_status == FSC_FAULT) {
-+	if (fault_status == ESR_ELx_FSC_FAULT) {
- 		/* Beyond sanitised PARange (which is the IPA limit) */
- 		if (fault_ipa >= BIT_ULL(get_kvm_ipa_limit())) {
- 			kvm_inject_size_fault(vcpu);
-@@ -1476,8 +1478,9 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 			      kvm_vcpu_get_hfar(vcpu), fault_ipa);
- 
- 	/* Check the stage-2 fault is trans. fault or write fault */
--	if (fault_status != FSC_FAULT && fault_status != FSC_PERM &&
--	    fault_status != FSC_ACCESS) {
-+	if (fault_status != ESR_ELx_FSC_FAULT &&
-+	    fault_status != ESR_ELx_FSC_PERM &&
-+	    fault_status != ESR_ELx_FSC_ACCESS) {
- 		kvm_err("Unsupported FSC: EC=%#x xFSC=%#lx ESR_EL2=%#lx\n",
- 			kvm_vcpu_trap_get_class(vcpu),
- 			(unsigned long)kvm_vcpu_trap_get_fault(vcpu),
-@@ -1539,7 +1542,7 @@ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu)
- 	/* Userspace should not be able to register out-of-bounds IPAs */
- 	VM_BUG_ON(fault_ipa >= kvm_phys_size(vcpu->kvm));
- 
--	if (fault_status == FSC_ACCESS) {
-+	if (fault_status == ESR_ELx_FSC_ACCESS) {
- 		handle_access_fault(vcpu, fault_ipa);
- 		ret = 1;
- 		goto out_unlock;
+Changes in V3 (ditto!):
+  * return errno at WARN_ON sites, and make it unique
+  * correctly check for dma task mm change
+  * change dma owner to current when vaddr is updated
+  * add Fixes to commit messages
+  * refactored new code in vfio_dma_do_map
+
+Changes in V4:
+  * misc cosmetic changes
+
+Changes in V5 (thanks Jason and Kevin):
+  * grab mm and use it for locked_vm accounting
+  * separate patches for underflow and restoring locked_vm
+  * account for reserved pages
+  * improve error messages
+
+Changes in V6:
+  * drop "count reserved pages" patch
+  * add "track locked_vm" patch
+  * grab current->mm not group_leader->mm
+  * simplify vfio_change_dma_owner
+  * fix commit messages
+
+Changes in v7:
+  * compare current->mm not group_leader->mm (missed one)
+  * misc cosmetic changes
+
+Steve Sistare (7):
+  vfio/type1: exclude mdevs from VFIO_UPDATE_VADDR
+  vfio/type1: prevent underflow of locked_vm via exec()
+  vfio/type1: track locked_vm per dma
+  vfio/type1: restore locked_vm
+  vfio/type1: revert "block on invalid vaddr"
+  vfio/type1: revert "implement notify callback"
+  vfio: revert "iommu driver notify callback"
+
+ drivers/vfio/container.c        |   5 -
+ drivers/vfio/vfio.h             |   7 --
+ drivers/vfio/vfio_iommu_type1.c | 226 ++++++++++++++++++----------------------
+ include/uapi/linux/vfio.h       |  15 +--
+ 4 files changed, 111 insertions(+), 142 deletions(-)
+
 -- 
-2.34.1
+1.8.3.1
 
