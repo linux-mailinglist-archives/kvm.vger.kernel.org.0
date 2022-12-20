@@ -2,66 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A6266523D5
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 16:42:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 99D146523F0
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 16:48:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233716AbiLTPmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 10:42:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38652 "EHLO
+        id S233935AbiLTPso (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 10:48:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233610AbiLTPm3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 10:42:29 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8993312D1C
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 07:42:28 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-3bd1ff8fadfso146145877b3.18
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 07:42:28 -0800 (PST)
+        with ESMTP id S229727AbiLTPse (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 10:48:34 -0500
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B001186D5
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 07:48:25 -0800 (PST)
+Received: by mail-wr1-x430.google.com with SMTP id f18so12149279wrj.5
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 07:48:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dsKa095cTH49SjbkUqWhE5H1MZLKKt7lRal8x2NoCtE=;
-        b=Ft+A7TEX38QV7o1ykXA/7fx4gVDgUuwIxuZ0DCWDJFG9acS//ANtB8UHO+yFW2gSex
-         qhctHSJwSVuf/3fF8FZCAwQTfWFo7aL/0FYFnlz9ImM5BZWYJ6kJvomCgbChzeQFFJIY
-         1tA5imqyNbd5XDLIIPtiu02en+BqCJ06vVlB9iytma7Fi8o3sa/B/n66xyJ6bvieal4G
-         oQGZD19Aaw4qR5N3jf9oIXQeXnPbMPNchs5jshzZGD+UO7pCnpkmnLWxj4uLNCBZ6SxJ
-         gC/LWAT8ZxZ3p2vDoOhVY20USQT8CFPrlykXmFjD/AxQut/gDgFxdlZVWpW//yeUtBrQ
-         wMQA==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RhFtHZ+QjsDupGH4qz8UINzGqRrH3VltWVcWI44I3rA=;
+        b=L2CeipNQqdFuDRphU/hivqJxhL/uLxehlF1h9KST8Sp4vPSD9vqdHCgD5S6oxBE4KH
+         LePrJAPFhu3l8KmqwIUwBBcSfCdFDsTN40CIxwUVvju349rGHdtaHqvpM0Mc1t9QdyFx
+         j4XiUyjznH2eGekbFZtXm7DJ4J5xRmU1LdgohszPwznjEQXrKNvYUDUml9sS7xsE9htn
+         GyGZigKojNNqEM4qO9GyR0WrtflqvP2iKP5BWFIhBE7/besZDjSVTSxc+SP42zm7ADdK
+         4RENfH8g2+C1LtZuNwwh1yLP7FwnqtqnuTFHkSigJgCDSX3uTlxLvX3s58GH6y/jWqQ6
+         2uwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dsKa095cTH49SjbkUqWhE5H1MZLKKt7lRal8x2NoCtE=;
-        b=g4J8rNc6gARJEfqI2dr8ixKEFI/UO5rkLTSpD/gQrQtsuN/3RRsCOczEsjq7ZxKFvX
-         J8aT3nuMQhXzBbVlJyePvGXiMu6l/Qj1HHzh7YgYTS4DY24vRXuoxCSljuLwzaDU4hPI
-         q5huLRW2B5BMCD0eQ8eZ+yiTVspWv3rPMdivwKODBTxY6CQkbP9y+LPtdUjokoe4X1hQ
-         CLdoS2iVOwmnwyzB9cw+evoukXeZI+fHhSc2yB439knKx/2d7qIEWPabcbJe8i+PhlPY
-         L81FOi+bHX0Z/x4Q6foCGj5XXKdLSdJyXrBIeeVOXQzbgOO6hEDOViuPPAkpwTijy3ol
-         uYEg==
-X-Gm-Message-State: ANoB5pnSdoleJuIMjpQAj1LfWhoG09dhHfPw7h06UXbGp7MFz+8EP4hA
-        /ICbxbiN6aGh4zXjT9B/ZNKERGEnotk=
-X-Google-Smtp-Source: AA0mqf4DYgS6xBopT3iAX+K1lX+8LK2WPFhx0Qob75zBuJ1Igc4LCcuhx/1Gd13dQcp1DU83Hd6+rJoCZ40=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:5602:0:b0:713:5263:3442 with SMTP id
- k2-20020a255602000000b0071352633442mr4279506ybb.362.1671550947708; Tue, 20
- Dec 2022 07:42:27 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 20 Dec 2022 15:42:24 +0000
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221220154224.526568-1-seanjc@google.com>
-Subject: [PATCH] KVM: nVMX: Document that ignoring memory failures for VMCLEAR
- is deliberate
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        coverity-bot <keescook+coverity-bot@chromium.org>,
-        Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RhFtHZ+QjsDupGH4qz8UINzGqRrH3VltWVcWI44I3rA=;
+        b=bqotrGb5h0WG43+xhwG9+exC773Ni8Rb3fAitW0a4xZrEkDWkkUP5WAcGGhRXp/0z5
+         Q1O8ufko1+pEl+zB/hH6tTwMgiXQgOAN0hmC5AYXADDmYvk8WgF2K0fp4RTYp768fjL9
+         dO+9UOU3EqrmE5et3fu/xRPfJHTlcePxXd2qPLso5PzDs/H0/hgRtc1LpNl15+M1lNW0
+         wWPrGW/SUW2kC05Z8AyPAXF2ecAbWUc/cYXubf9J6mSAmBUt3kaIsYo6pgzez8QKqH5m
+         DXP6XYWTUZ+LEhVq/BNRFuK0nBEqXtKorI9MpCLP4WL+iQ0rEXPH00EQwKsROFV2F9yY
+         u1iQ==
+X-Gm-Message-State: ANoB5pkaDI4zdxDH73F8qTyVaGfoiEojepBXNHVZAREqdCAl55IhSfCR
+        x8Z+BOeDyCE8I+OsB8HnaF4=
+X-Google-Smtp-Source: AA0mqf7G4BOVMkVEsTbsMmz3pGtBVyy1ze7ADRPAc4G+HUARrRvJQEQHBKneqlaeYPSkIUEhHJvUSQ==
+X-Received: by 2002:a5d:464d:0:b0:242:19ba:c325 with SMTP id j13-20020a5d464d000000b0024219bac325mr26927050wrs.30.1671551303677;
+        Tue, 20 Dec 2022 07:48:23 -0800 (PST)
+Received: from [192.168.6.89] (54-240-197-236.amazon.com. [54.240.197.236])
+        by smtp.gmail.com with ESMTPSA id u18-20020adfeb52000000b002423dc3b1a9sm12956118wrn.52.2022.12.20.07.48.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Dec 2022 07:48:23 -0800 (PST)
+From:   Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <e388cfb3-0863-8a22-4305-b3b04bbd08ea@xen.org>
+Date:   Tue, 20 Dec 2022 15:48:22 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v2] KVM: x86/xen: Fix memory leak in
+ kvm_xen_write_hypercall_page()
+Content-Language: en-US
+To:     Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org
+Cc:     dwmw2@infradead.org, seanjc@google.com, pbonzini@redhat.com
+References: <20221220151454.712165-1-mhal@rbox.co>
+Organization: Xen Project
+In-Reply-To: <20221220151454.712165-1-mhal@rbox.co>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -69,62 +78,44 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Explicitly drop the result of kvm_vcpu_write_guest() when writing the
-"launch state" as part of VMCLEAR emulation, and add a comment to call
-out that KVM's behavior is architecturally valid.  Intel's pseudocode
-effectively says that VMCLEAR is a nop if the target VMCS address isn't
-in memory, e.g. if the address points at MMIO.
+On 20/12/2022 15:14, Michal Luczaj wrote:
+> Release page irrespectively of kvm_vcpu_write_guest() return value.
+> 
+> Suggested-by: Paul Durrant <paul@xen.org>
+> Fixes: 23200b7a30de ("KVM: x86/xen: intercept xen hypercalls if enabled")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>   arch/x86/kvm/xen.c | 7 ++++---
+>   1 file changed, 4 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index f3098c0e386a..439a65437075 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -889,6 +889,7 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
+>   		u8 blob_size = lm ? kvm->arch.xen_hvm_config.blob_size_64
+>   				  : kvm->arch.xen_hvm_config.blob_size_32;
+>   		u8 *page;
+> +		int ret;
+>   
+>   		if (page_num >= blob_size)
+>   			return 1;
+> @@ -899,10 +900,10 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
+>   		if (IS_ERR(page))
+>   			return PTR_ERR(page);
+>   
+> -		if (kvm_vcpu_write_guest(vcpu, page_addr, page, PAGE_SIZE)) {
+> -			kfree(page);
+> +		ret = kvm_vcpu_write_guest(vcpu, page_addr, page, PAGE_SIZE);
+> +		kfree(page);
+> +		if (ret)
+>   			return 1;
+> -		}
+>   	}
+>   	return 0;
+>   }
 
-Add a FIXME to call out that suppressing failures on __copy_to_user() is
-wrong, as memory (a memslot) does exist in that case.  Punt the issue to
-the future as open coding kvm_vcpu_write_guest() just to make sure the
-guest dies with -EFAULT isn't worth the extra complexity.  The flaw will
-need to be addressed if KVM ever does something intelligent on uaccess
-failures, e.g. to support post-copy demand paging, but in that case KVM
-will need a more thorough overhaul, i.e. VMCLEAR shouldn't need to open
-code a core KVM helper.
+Thanks.
 
-No functional change intended.
-
-Reported-by: coverity-bot <keescook+coverity-bot@chromium.org>
-Addresses-Coverity-ID: 1527765 ("Error handling issues")
-Fixes: 587d7e72aedc ("kvm: nVMX: VMCLEAR should not cause the vCPU to shut down")
-Cc: Jim Mattson <jmattson@google.com>
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/vmx/nested.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index b6f4411b613e..f18f3a9f0943 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -5296,10 +5296,19 @@ static int handle_vmclear(struct kvm_vcpu *vcpu)
- 		if (vmptr == vmx->nested.current_vmptr)
- 			nested_release_vmcs12(vcpu);
- 
--		kvm_vcpu_write_guest(vcpu,
--				     vmptr + offsetof(struct vmcs12,
--						      launch_state),
--				     &zero, sizeof(zero));
-+		/*
-+		 * Silently ignore memory errors on VMCLEAR, Intel's pseudocode
-+		 * for VMCLEAR includes a "ensure that data for VMCS referenced
-+		 * by the operand is in memory" clause that guards writes to
-+		 * memory, i.e. doing nothing for I/O is architecturally valid.
-+		 *
-+		 * FIXME: Suppress failures if and only if no memslot is found,
-+		 * i.e. exit to userspace if __copy_to_user() fails.
-+		 */
-+		(void)kvm_vcpu_write_guest(vcpu,
-+					   vmptr + offsetof(struct vmcs12,
-+							    launch_state),
-+					   &zero, sizeof(zero));
- 	} else if (vmx->nested.hv_evmcs && vmptr == vmx->nested.hv_evmcs_vmptr) {
- 		nested_release_evmcs(vcpu);
- 	}
-
-base-commit: 9d75a3251adfbcf444681474511b58042a364863
--- 
-2.39.0.314.g84b9a713c41-goog
+Reviewed-by: Paul Durrant <paul@xen.org>
 
