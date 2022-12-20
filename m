@@ -2,129 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6C826527FE
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 21:40:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9602652883
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 22:47:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234333AbiLTUjw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 15:39:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35020 "EHLO
+        id S230142AbiLTVrr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 16:47:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234322AbiLTUjg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 15:39:36 -0500
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F234011A1E
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 12:39:35 -0800 (PST)
-Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKJx0QU016534;
-        Tue, 20 Dec 2022 20:39:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2022-7-12;
- bh=HTvqG4HY5BLSBLASHVunI6zA9I6GOuCYqgjrhW6WmTg=;
- b=AcQzRJSxjv6xZgKd5e06FyhdHBiA84lfGh7zXA+KEuzn3yJSQucUoMAH16Ee460YPeLq
- foqYdAMrDW4030lFNEaoWbn4fbJnZE09bUJCwzRj2MAAWpjb3Hr+XdlHhVBZ7q49Dr/0
- 30kf8lj+f6h0dBCkGE34BopOx4U+1sTH9vW6NotJR52WVIeGy1RAuk767ag/KoMGFMsq
- Ltfh4q3menrYv/pJlgIgHuKl9Q879lQ6/iy/48I08LlJRU++oud5avxD8Rgewwm3rWKi
- xuIc3xZF5BiECYUbdFCC7wEtkOGGptdZqlHLWRLahL99aZqOoG685HEaQuSabVE0ggXX ug== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3mh6tp72w9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 20 Dec 2022 20:39:30 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BKJEWt6012208;
-        Tue, 20 Dec 2022 20:39:30 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3mh475vcq7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 20 Dec 2022 20:39:30 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BKKdQ10014895;
-        Tue, 20 Dec 2022 20:39:29 GMT
-Received: from ca-dev63.us.oracle.com (ca-dev63.us.oracle.com [10.211.8.221])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3mh475vcks-8;
-        Tue, 20 Dec 2022 20:39:29 +0000
-From:   Steve Sistare <steven.sistare@oracle.com>
-To:     kvm@vger.kernel.org
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V7 7/7] vfio: revert "iommu driver notify callback"
-Date:   Tue, 20 Dec 2022 12:39:25 -0800
-Message-Id: <1671568765-297322-8-git-send-email-steven.sistare@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1671568765-297322-1-git-send-email-steven.sistare@oracle.com>
-References: <1671568765-297322-1-git-send-email-steven.sistare@oracle.com>
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-20_06,2022-12-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bulkscore=0 mlxscore=0
- adultscore=0 phishscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2212200169
-X-Proofpoint-GUID: GmIKKFMLMNOhxIo8fVZ2AF1vBTkmTwTq
-X-Proofpoint-ORIG-GUID: GmIKKFMLMNOhxIo8fVZ2AF1vBTkmTwTq
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229451AbiLTVro (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 16:47:44 -0500
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF15D9FF8;
+        Tue, 20 Dec 2022 13:47:42 -0800 (PST)
+Date:   Tue, 20 Dec 2022 21:47:36 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1671572860;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=F8vncucEWH39FBSuf1NnVt7IbuX950skFxSPVBgF758=;
+        b=g7sDNrmjEw882WLwugZWhzOWLajcNfdZ0lKszT3hSDuIUqvwr+CC6J7FqCCuCOHC4zMZVa
+        I/s6HIIH6YmrnM7/vu3hxItl0kNkKG6CbGjPm3+oJc9qpklSXt20AgBgIiQ632xJj2atIK
+        aHZZAGEdLNVqwNxB2TgmZVTxv762ydI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
+Message-ID: <Y6IteDoK406o9pM+@google.com>
+References: <20221220200923.1532710-1-maz@kernel.org>
+ <20221220200923.1532710-2-maz@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221220200923.1532710-2-maz@kernel.org>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Revert this dead code:
-  commit ec5e32940cc9 ("vfio: iommu driver notify callback")
+Hi Marc,
 
-Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-Reviewed-by: Kevin Tian <kevin.tian@intel.com>
----
- drivers/vfio/container.c | 5 -----
- drivers/vfio/vfio.h      | 7 -------
- 2 files changed, 12 deletions(-)
+On Tue, Dec 20, 2022 at 08:09:21PM +0000, Marc Zyngier wrote:
+> A recent development on the EFI front has resulted in guests having
+> their page tables baked in the firmware binary, and mapped into
+> the IPA space as part as a read-only memslot.
 
-diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
-index d74164a..5bfd10d 100644
---- a/drivers/vfio/container.c
-+++ b/drivers/vfio/container.c
-@@ -382,11 +382,6 @@ static int vfio_fops_open(struct inode *inode, struct file *filep)
- static int vfio_fops_release(struct inode *inode, struct file *filep)
- {
- 	struct vfio_container *container = filep->private_data;
--	struct vfio_iommu_driver *driver = container->iommu_driver;
--
--	if (driver && driver->ops->notify)
--		driver->ops->notify(container->iommu_data,
--				    VFIO_IOMMU_CONTAINER_CLOSE);
- 
- 	filep->private_data = NULL;
- 
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index bcad54b..8a439c6 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -62,11 +62,6 @@ struct vfio_group {
- 	struct blocking_notifier_head	notifier;
- };
- 
--/* events for the backend driver notify callback */
--enum vfio_iommu_notify_type {
--	VFIO_IOMMU_CONTAINER_CLOSE = 0,
--};
--
- /**
-  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
-  */
-@@ -97,8 +92,6 @@ struct vfio_iommu_driver_ops {
- 				  void *data, size_t count, bool write);
- 	struct iommu_domain *(*group_iommu_domain)(void *iommu_data,
- 						   struct iommu_group *group);
--	void		(*notify)(void *iommu_data,
--				  enum vfio_iommu_notify_type event);
- };
- 
- struct vfio_iommu_driver {
--- 
-1.8.3.1
+as part of a
 
+> Not only this is legitimate, but it also results in added security,
+> so thumbs up. However, this clashes mildly with our handling of a S1PTW
+> as a write to correctly handle AF/DB updates to the S1 PTs, and results
+> in the guest taking an abort it won't recover from (the PTs mapping the
+> vectors will suffer freom the same problem...).
+
+To be clear, the read-only page tables already have the AF set, right?
+They certainly must, or else the guest isn't getting far :)
+
+I understand you're trying to describe _why_ we promote S1PTW to
+a write, but doing it inline with the context of the EFI issue makes it
+slightly unclear. Could you break these ideas up into two paragraphs and
+maybe spell out the fault conditions a bit more?
+
+  A recent development on the EFI front has resulted in guests having
+  their page tables baked in the firmware binary, and mapped into the
+  IPA space as part of a read-only memslot. Not only is this legitimate,
+  but it also results in added security, so thumbs up.
+
+  It is possible to take an S1PTW translation fault if the S1 PTs are
+  unmapped at stage-2. However, KVM unconditionally treats S1PTW as a
+  write to correctly handle hardware AF/DB updates to the S1 PTs.
+  Furthermore, KVM injects a data abort into the guest for S1PTW writes.
+  In the aforementioned case this results in the guest taking an abort
+  it won't recover from, as the S1 PTs mapping the vectors suffer from
+  the same problem.
+
+Dunno, maybe I stink at reading which is why I got confused in the first
+place.
+
+> So clearly our handling is... wrong.
+> 
+> Instead, switch to a two-pronged approach:
+> 
+> - On S1PTW translation fault, handle the fault as a read
+> 
+> - On S1PTW permission fault, handle the fault as a write
+> 
+> This is of no consequence to SW that *writes* to its PTs (the write
+> will trigger a non-S1PTW fault), and SW that uses RO PTs will not
+> use AF/DB anyway, as that'd be wrong.
+> 
+> Only in the case described in c4ad98e4b72c ("KVM: arm64: Assume write
+> fault on S1PTW permission fault on instruction fetch") do we end-up
+> with two back-to-back faults (page being evicted and faulted back).
+> I don't think this is a case worth optimising for.
+> 
+> Fixes: c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 22 ++++++++++++++++++++--
+>  1 file changed, 20 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 9bdba47f7e14..fd6ad8b21f85 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -373,8 +373,26 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+>  
+>  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+>  {
+> -	if (kvm_vcpu_abt_iss1tw(vcpu))
+> -		return true;
+> +	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> +		/*
+> +		 * Only a permission fault on a S1PTW should be
+> +		 * considered as a write. Otherwise, page tables baked
+> +		 * in a read-only memslot will result in an exception
+> +		 * being delivered in the guest.
+
+Somewhat of a tangent, but:
+
+Aren't we somewhat unaligned with the KVM UAPI by injecting an
+exception in this case? I know we've been doing it for a while, but it
+flies in the face of the rules outlined in the
+KVM_SET_USER_MEMORY_REGION documentation.
+
+> +		 * The drawback is that we end-up fauling twice if the
+
+typo: s/fauling/faulting/
+
+> +		 * guest is using any of HW AF/DB: a translation fault
+> +		 * to map the page containing the PT (read only at
+> +		 * first), then a permission fault to allow the flags
+> +		 * to be set.
+> +		 */
+> +		switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
+> +		case ESR_ELx_FSC_PERM:
+> +			return true;
+> +		default:
+> +			return false;
+> +		}
+> +	}
+>  
+>  	if (kvm_vcpu_trap_is_iabt(vcpu))
+>  		return false;
+> -- 
+> 2.34.1
+> 
+
+Besides the changelog/comment suggestions, the patch looks good to me.
+
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+
+--
+Thanks,
+Oliver
