@@ -2,228 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9047065277B
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 21:00:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AD42652791
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 21:10:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233028AbiLTT7W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 14:59:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44542 "EHLO
+        id S234172AbiLTUJk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 15:09:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbiLTT7S (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 14:59:18 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BADC660C7
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 11:59:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=b8soKJq/ZiK6nSx64qb9GEu07BRG49z8yrlVILz1iFg=; b=juK6f9Q0gdt1WDw8C8Oc4OKaiK
-        CTtQpX7jSrDqwJXyh3giyRWpKrN+VvlZjmZOwa8ecVNTvg8MzH/26fcW2r/wdCQKbPir7I/vsRiUX
-        ze4drfcrSv2c4Sw02zY/66QxXzG9vBwj+9vNAdWGj793HS7XyFFT4VX2Sw4VuUTWVpla0rxDACeQC
-        o1NeA4fKpbu1uqZBryqeXahInsM5eoBDM/hwkphX4qLZS8AjrGHFUFtizauqzqVwtn4UOOeWRFZlp
-        2167ks+FwNxNusfjmyQ1Ch7zMWjNS4bZwRrqhdjhLQ2lqTHq0xNpBSxwpQQhDOgWYZL27my3AOoGh
-        S8JpcXWg==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1p7ilj-0028CQ-Fl; Tue, 20 Dec 2022 19:59:19 +0000
-Message-ID: <89a8f726e6fb1a91097ef18d6e837aff31a675f3.camel@infradead.org>
-Subject: Re: [PATCH v4 1/2] KVM: MMU: Introduce 'INVALID_GFN' and use it for
- GFN values
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, oliver.upton@linux.dev,
-        catalin.marinas@arm.com, will@kernel.org, paul@xen.org
-Date:   Tue, 20 Dec 2022 19:59:07 +0000
-In-Reply-To: <Y5yeKucYYfYOMXqp@google.com>
-References: <20221216085928.1671901-1-yu.c.zhang@linux.intel.com>
-         <20221216085928.1671901-2-yu.c.zhang@linux.intel.com>
-         <Y5yeKucYYfYOMXqp@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-1XPFCNE0KMHhJEAQ0SS3"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S234133AbiLTUJf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 15:09:35 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D7891ADAE
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 12:09:34 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id DF060B8197A
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 20:09:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 973E4C433F1;
+        Tue, 20 Dec 2022 20:09:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671566971;
+        bh=aejWCEP1Ig9CRiir1tLF+G/2ScDfsu7H9JTlto5/gDA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=cgoL9l7oRHWxhVS0Y9LeBDv5/kXb27c3pcperwcn7+YbNfvyzu2E+PfU+mVUB1Qoc
+         T/DKtxSUkyhDMODvew+mnkqFJJ9OChUygfQR+3PiHLJdNBYiLJ74X7qiWncaRZvQZI
+         nU9XVULhkYEIaWbTPAhw7LsfDDRWLJjM0U7aRk3qVh9faJePTbnBI0MwDOkQ27odOB
+         Cr0rV0D3H3Z3mS4ne3tlXY7G/5vEY3LwIKEIRcjFjIh4FFlZSCpcYifvshZ7WvhbhK
+         KBdLnZbxflIJUzzdKL3nSUlm7iPbEA7xGz5g8w8Eff3KMTaalGw+TJFEy9n0ovI+cE
+         j3KioqWzKN57Q==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p7ivZ-00Dzct-9E;
+        Tue, 20 Dec 2022 20:09:29 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>
+Subject: [PATCH 0/3] KVM: arm64: Fix handling of S1PTW S2 fault on RO memslots
+Date:   Tue, 20 Dec 2022 20:09:20 +0000
+Message-Id: <20221220200923.1532710-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ardb@kernel.org, will@kernel.org, qperret@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Recent developments on the EFI front have resulted in guests that
+simply won't boot if the page tables are in a read-only memslot and
+that you're a bit unlucky in the way S2 gets paged in... The core
+issue is related to the fact that we treat a S1PTW as a write, which
+is close enough to what needs to be done. Until to get to RO memslots.
 
---=-1XPFCNE0KMHhJEAQ0SS3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+The first patch fixes this and is definitely a stable candidate. It
+splits the faulting of page tables in two steps (RO translation fault,
+followed by a writable permission fault -- should it even happen).
+The second one is a potential optimisation. I'm not even sure it is
+worth it. The last patch is totally optional, only tangentially
+related, and randomly repainting stuff (maybe that's contagious, who
+knows).
 
-T24gRnJpLCAyMDIyLTEyLTE2IGF0IDE2OjM0ICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOgo+IE9uIEZyaSwgRGVjIDE2LCAyMDIyLCBZdSBaaGFuZyB3cm90ZToKPiA+IEN1cnJlbnRs
-eSwgS1ZNIHhlbiBhbmQgaXRzIHNoYXJlZCBpbmZvIHNlbGZ0ZXN0IGNvZGUgdXNlcwo+ID4gJ0dQ
-QV9JTlZBTElEJyBmb3IgR0ZOIHZhbHVlcywgYnV0IGFjdHVhbGx5IGl0IGlzIG1vcmUgYWNjdXJh
-dGUKPiA+IHRvIHVzZSB0aGUgbmFtZSAnSU5WQUxJRF9HRk4nLiBTbyBqdXN0IGFkZCBhIG5ldyBk
-ZWZpbml0aW9uCj4gPiBhbmQgdXNlIGl0Lgo+ID4gCj4gPiBObyBmdW5jdGlvbmFsIGNoYW5nZXMg
-aW50ZW5kZWQuCj4gPiAKPiA+IFN1Z2dlc3RlZC1ieTogRGF2aWQgV29vZGhvdXNlIDxkd213MkBp
-bmZyYWRlYWQub3JnPgo+ID4gU2lnbmVkLW9mZi1ieTogWXUgWmhhbmcgPHl1LmMuemhhbmdAbGlu
-dXguaW50ZWwuY29tPgo+ID4gLS0tCj4gPiDCoGFyY2gveDg2L2t2bS94ZW4uY8KgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IHwgNCArKy0tCj4gPiDCoGluY2x1ZGUvbGludXgva3ZtX3R5cGVzLmjCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfCAxICsKPiA+IMKgdG9vbHMv
-dGVzdGluZy9zZWxmdGVzdHMva3ZtL3g4Nl82NC94ZW5fc2hpbmZvX3Rlc3QuYyB8IDQgKystLQo+
-ID4gwqAzIGZpbGVzIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMoLSkKPiA+
-IAo+ID4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS94ZW4uYyBiL2FyY2gveDg2L2t2bS94ZW4u
-Ywo+ID4gaW5kZXggZDdhZjQwMjQwMjQ4Li42OTA4YTc0YWIzMDMgMTAwNjQ0Cj4gPiAtLS0gYS9h
-cmNoL3g4Ni9rdm0veGVuLmMKPiA+ICsrKyBiL2FyY2gveDg2L2t2bS94ZW4uYwo+ID4gQEAgLTQx
-LDcgKzQxLDcgQEAgc3RhdGljIGludCBrdm1feGVuX3NoYXJlZF9pbmZvX2luaXQoc3RydWN0IGt2
-bSAqa3ZtLCBnZm5fdCBnZm4pCj4gPiDCoMKgwqDCoMKgwqDCoMKgaW50IHJldCA9IDA7Cj4gPiDC
-oMKgwqDCoMKgwqDCoMKgaW50IGlkeCA9IHNyY3VfcmVhZF9sb2NrKCZrdm0tPnNyY3UpOwo+ID4g
-wqAKPiA+IC3CoMKgwqDCoMKgwqDCoGlmIChnZm4gPT0gR1BBX0lOVkFMSUQpIHsKPiA+ICvCoMKg
-wqDCoMKgwqDCoGlmIChnZm4gPT0gSU5WQUxJRF9HRk4pIHsKPiAKPiBHcnJyIcKgIFRoaXMgbWFn
-aWMgdmFsdWUgaXMgQUJJLCBhcyAiZ2ZuID09IC0xIiB5aWVsZHMgZGlmZmVyZW50IGJlaGF2aW9y
-IHRoYW4gYQo+IHJhbmRvbSwgZ2FyYmFnZSBnZm4uCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqAgCj4gU28sIHNhZGx5LCB3ZSBjYW4ndCBzaW1wbHkgaW50cm9k
-dWNlIElOVkFMSURfR0ZOIGhlcmUsIGFuZCBpbnN0ZWFkIG5lZWQgdG8gZG8KPiBzb21ldGhpbmcg
-bGlrZToKPiAKCldlbGwuLi4geW91IGNhbiBzdGlsbCB1c2UgSU5WQUxJRF9HRk4gYXMgbG9uZyBh
-cyBpdHMgdmFsdWUgcmVtYWlucyB0aGUKc2FtZSAoKHVpbnQ2NF90KS0xKS4KCkJ1dCB5ZXMsIHRo
-ZSBLVk0gQVBJIGRpZmZlcnMgaGVyZSBmcm9tIFhlbiBiZWNhdXNlIFhlbiBvbmx5IGFsbG93cyBh
-Cmd1ZXN0IHRvICpzZXQqIHRoZXNlIChhbmQgbGF0ZXIgdGhleSBpbnZlbnRlZCBTSFVURE9XTl9z
-b2Z0X3Jlc2V0KS4KV2hpbGUgS1ZNIGxldHMgdGhlIHVzZXJzcGFjZSBWTU0gaGFuZGxlIHNvZnQg
-cmVzZXQsIGFuZCBuZWVkcyB0byBhbGxvdwp0aGVtIHRvIGJlICp1bnNldCouIEFuZCBzaW5jZSB6
-ZXJvIGlzIGEgdmFsaWQgR1BBL0dGTiwgLTEgaXMgYQpyZWFzb25hYmxlIHZhbHVlIGZvciAnSU5W
-QUxJRCcuIEJ1dCBJIGRvIHRoaW5rIHRoYXQgZGV0YWlsIGVzY2FwZWQgdGhlCmRvY3VtZW50YXRp
-b24gYW5kIHRoZSB1YXBpIGhlYWRlcnMsIHNvIHlvdXIgc3VnZ2VzdGlvbiBiZWxvdyBpcyBhIGdv
-b2QKb25lLCBhbHRob3VnaCBzdHJpY3RseSB3ZSBuZWVkIGEgR1BBIG9uZSB0b28uCgo+IGRpZmYg
-LS1naXQgYS9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmggYi9pbmNsdWRlL3VhcGkvbGludXgva3Zt
-LmgKPiBpbmRleCAyMDUyMmQ0YmExZTAuLjJkMzFjYWFmODEyYyAxMDA2NDQKPiAtLS0gYS9pbmNs
-dWRlL3VhcGkvbGludXgva3ZtLmgKPiArKysgYi9pbmNsdWRlL3VhcGkvbGludXgva3ZtLmgKPiBA
-QCAtMTc2Niw2ICsxNzY2LDcgQEAgc3RydWN0IGt2bV94ZW5faHZtX2F0dHIgewo+IMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBfX3U4IHZlY3RvcjsKPiDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqAgX191OCBydW5zdGF0ZV91cGRhdGVfZmxhZzsKPiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgc3RydWN0IHsKPiArI2RlZmluZSBLVk1fWEVOX0lOVkFMSURfR0ZOwqDC
-oMKgICh+MHVsbCkKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgIF9fdTY0IGdmbjsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgfSBzaGFyZWRf
-aW5mbzsKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc3RydWN0IHsKPiAKPiA+IMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKga3ZtX2dwY19kZWFjdGl2YXRlKGdwYyk7Cj4g
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdvdG8gb3V0Owo+ID4gwqDCoMKgwqDC
-oMKgwqDCoH0KCg==
+The whole thing is on top of Linus' tree as of today. The reason for
+this very random choice is that there is a patch in v6.1-rc7 that
+hides the problem, and that patch is reverted in rc8 (see commit
+0ba09b1733878afe838fe35c310715fda3d46428). I also wanted to avoid
+conflicts with kvmarm/next, so here you go.
 
+I've tested the series on A55, M1 and M2. The original issue seems to
+trigger best with 16kB pages, so please test with *other* page sizes!
 
---=-1XPFCNE0KMHhJEAQ0SS3
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+	M.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjIxMjIwMTk1OTA3WjAvBgkqhkiG9w0BCQQxIgQgcuwv6UiK
-pMlbr9dwUNn22PMN2bgX4JYm9U+gC0fClQMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA2CCZuiAxj/aRJYD8I9nug7ahnChdAPh3p
-tMDT5SqFLax6V1nrfanyyZiovIAREeUrWbRiB/q0z34lOBgTrS1unueg24hAooD5CXPWpq91/IfY
-wATTBq8rq8i+8o5G656s5snpCk2PBD0hdXvjcKd8kh1zGYTnk1b1Mqc+CqWP1trrWI9b0nMbt6+8
-jdNkDusSI8upU/7Y1N+/XLil9tpKZkdFSlP1bfhXsYNLZW3F2gCH6whi+zaQqYYRFhZjhI04kLL+
-OBXsLoWTKyRAyPRc+NEkYI/yBnRkYMnhXqHQW6otOML2ldt1F4IYhKDUO+UTn7Hh2yXURa2HHOb7
-5NCa2YUBF0itxOjayWaZT7ZHmcJxcHExrFER6nyzTd8v6eareYUGI0VRiBRGYKTCaqIwgE2FzRYU
-MIUKUQr+3HORtyoUfjH6Q8FlzwBV6yc9IxIwpSYegbzwiwQ/S8Ac7ZZGVzJZumfcbhJu5JwCQ2bM
-JMOvHuIlRiRys4pqyz1sQBW74pgDLwCTpw1RKMqlXXoADy1j0kMyuQFVbu/l76DSS1tlupcvLLQi
-sL7vxzdGkAfFJR916SoPa0/4/1HToSVz0EOhOQHOsItcJPxAe2XBMdW7TOxNmzslwtjCikGmyt6j
-DKiBUxjB7jXrj+iFNHd9Y/eMgvKOjgRpQktNwT8ZkAAAAAAAAA==
+Marc Zyngier (3):
+  KVM: arm64: Fix S1PTW handling on RO memslots
+  KVM: arm64: Handle S1PTW translation with TCR_HA set as a write
+  KVM: arm64: Convert FSC_* over to ESR_ELx_FSC_*
 
+ arch/arm64/include/asm/esr.h            |  9 ++++
+ arch/arm64/include/asm/kvm_arm.h        | 15 -------
+ arch/arm64/include/asm/kvm_emulate.h    | 60 ++++++++++++++++++++-----
+ arch/arm64/kvm/hyp/include/hyp/fault.h  |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/mmu.c                    | 21 +++++----
+ 6 files changed, 71 insertions(+), 38 deletions(-)
 
---=-1XPFCNE0KMHhJEAQ0SS3--
+-- 
+2.34.1
+
