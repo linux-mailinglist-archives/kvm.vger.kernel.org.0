@@ -2,214 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B346D652289
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:27:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D78036522AC
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:33:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234048AbiLTO1l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 09:27:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53614 "EHLO
+        id S233997AbiLTOdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 09:33:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234096AbiLTO1F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 09:27:05 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BACFA1C93A
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:26:56 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6C33C2F4;
-        Tue, 20 Dec 2022 06:27:37 -0800 (PST)
-Received: from e126514.cambridge.arm.com (e126514.arm.com [10.1.36.32])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id C01833F703;
-        Tue, 20 Dec 2022 06:26:54 -0800 (PST)
-From:   Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-To:     pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev
-Cc:     kvm@vger.kernel.org, suzuki.poulose@arm.com,
-        alexandru.elisei@arm.com, nd@arm.com,
-        Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-Subject: [kvm-unit-tests PATCH v3 2/2] arm/psci: Add PSCI_CPU_OFF testscase to arm/psci testsuite
-Date:   Tue, 20 Dec 2022 14:31:56 +0000
-Message-Id: <20221220143156.208143-3-Nikita.Venkatesh@arm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20221220143156.208143-1-Nikita.Venkatesh@arm.com>
-References: <20221220143156.208143-1-Nikita.Venkatesh@arm.com>
+        with ESMTP id S234035AbiLTOdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 09:33:25 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 379361C11A;
+        Tue, 20 Dec 2022 06:33:10 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKEDQd8019938;
+        Tue, 20 Dec 2022 14:33:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=61qzrL76S8t3r1ILt15BKCcihcZ3i9gih8qEAWJeto8=;
+ b=DCUpX4lo1OOlKGSfgEG4gC6kPs6sqQ6kiqO3J3Oj3qBJ3lypbDwD5P6slvsJajQXQ/Es
+ 7LM1Xf3Zy/EC0ljFlQmO8EvwoYlkLh6NigvEf8Q/PnE3yEMuKf7yhRAZM7GRttJEbMEM
+ 9c4/vV0l2wAeWLYxPRH8JSGmBSu5bbbZftPVL8yVG3ytihG2ePY0phg2k/x047l54ozG
+ jWHaSzHjddAtwOmnK39n+QInS+4qGoOP04a1FHyeqpF1OM3NdoHMYoNxFeo4N+4HJL+9
+ DkV5mUaR0J/6QrUow1V2yF4sMrFSrRk0hkcm7I31TXbBAgGf2s/XJF20Nwp9XGN6b/tS Yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkemdgksq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Dec 2022 14:33:08 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BKEX7oo025563;
+        Tue, 20 Dec 2022 14:33:07 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkemdgks2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Dec 2022 14:33:07 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKCOa1R010167;
+        Tue, 20 Dec 2022 14:33:07 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([9.208.129.116])
+        by ppma02wdc.us.ibm.com (PPS) with ESMTPS id 3mh6yuvu5n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Dec 2022 14:33:06 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+        by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BKEX5oC6750876
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Dec 2022 14:33:05 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 12FF258060;
+        Tue, 20 Dec 2022 14:33:05 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 18AB65805D;
+        Tue, 20 Dec 2022 14:33:04 +0000 (GMT)
+Received: from [9.160.121.75] (unknown [9.160.121.75])
+        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 20 Dec 2022 14:33:03 +0000 (GMT)
+Message-ID: <7b6d7e91-ba00-6486-39ae-91fca30b2cfb@linux.ibm.com>
+Date:   Tue, 20 Dec 2022 09:33:03 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 7/7] s390/vfio_ap: always clean up IRQ resources
+Content-Language: en-US
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20221213154437.15480-1-akrowiak@linux.ibm.com>
+ <20221213154437.15480-8-akrowiak@linux.ibm.com>
+ <20221219151007.639dff5f.pasic@linux.ibm.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20221219151007.639dff5f.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: HqdGExhJLlCZC92VegDST_sgE8xCtxjO
+X-Proofpoint-ORIG-GUID: 6J7Pzu2NTymBs9MW6X2kRexfWNvTjcAZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-20_05,2022-12-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 mlxscore=0 bulkscore=0 adultscore=0 spamscore=0
+ suspectscore=0 priorityscore=1501 clxscore=1015 phishscore=0
+ mlxlogscore=999 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2212200116
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The test uses the following method.
 
-The primary CPU brings up all the secondary CPUs, which are held in a wait
-loop. Once the primary releases the CPUs, each of the secondary CPUs
-proceed to issue PSCI_CPU_OFF. This is indicated by a cpumask and also
-the status of the call is updated by the secondary CPU in cpu_off_done[].
+On 12/19/22 9:10 AM, Halil Pasic wrote:
+> On Tue, 13 Dec 2022 10:44:37 -0500
+> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> Clean up IRQ resources even when a PQAP(ZAPQ) function fails with an error
+>> not handled by a case statement.
+> Why?
 
-The primary CPU waits for all the secondary CPUs to update the cpumask
-and then proceeds to check for the status of the individual CPU CPU_OFF
-request. There is a chance that some CPUs might fail at the CPU_OFF
-request and come back and update the status once the primary CPU has
-finished the scan. There is no fool proof method to handle this. As of
-now, we add a 1sec delay between the cpumask check and the scan for the
-status.
 
-The test can be triggered by "cpu-off" command line argument.
+If the ZAPQ failed, then instructions submitted to the same queue will 
+likewise fail. Are you saying it's not safe to assume, therefore, that 
+interrupts will not be occurring?
 
-Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
----
- arm/psci.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 84 insertions(+), 6 deletions(-)
 
-diff --git a/arm/psci.c b/arm/psci.c
-index 0b9834c..8e664c2 100644
---- a/arm/psci.c
-+++ b/arm/psci.c
-@@ -12,6 +12,9 @@
- #include <asm/processor.h>
- #include <asm/smp.h>
- #include <asm/psci.h>
-+#include <asm/delay.h>
-+
-+#define CPU_OFF_TEST_WAIT_TIME 1000
- 
- static bool invalid_function_exception;
- 
-@@ -69,8 +72,10 @@ static bool psci_affinity_info_off(void)
- }
- 
- static int cpu_on_ret[NR_CPUS];
--static cpumask_t cpu_on_ready, cpu_on_done;
-+static bool cpu_off_success[NR_CPUS];
-+static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
- static volatile int cpu_on_start;
-+static volatile int cpu_off_start;
- 
- extern void secondary_entry(void);
- static void cpu_on_wake_target(void)
-@@ -92,11 +97,25 @@ static void cpu_on_target(void)
- 	cpumask_set_cpu(cpu, &cpu_on_done);
- }
- 
-+static void cpu_off_secondary_entry(void *data)
-+{
-+	int cpu = smp_processor_id();
-+
-+	while (!cpu_off_start)
-+		cpu_relax();
-+	/* On to the CPU off test */
-+	cpu_off_success[cpu] = true;
-+	cpumask_set_cpu(cpu, &cpu_off_done);
-+	cpu_psci_cpu_die();
-+	/* The CPU shouldn't execute the next steps. */
-+	cpu_off_success[cpu] = false;
-+}
-+
- static bool psci_cpu_on_test(void)
- {
- 	bool failed = false;
- 	int ret_success = 0;
--	int cpu;
-+	int i, cpu;
- 
- 	for_each_present_cpu(cpu) {
- 		if (cpu < 2)
-@@ -125,6 +144,25 @@ static bool psci_cpu_on_test(void)
- 	while (!cpumask_full(&cpu_on_done))
- 		cpu_relax();
- 
-+	report_info("waiting for CPU1 to come online...");
-+	for (i = 0; i < 10; i++) {
-+		mdelay(100);
-+		if (cpumask_full(&cpu_on_done))
-+			break;
-+	}
-+
-+	if (!cpumask_full(&cpu_on_done)) {
-+		for_each_present_cpu(cpu) {
-+			if (!cpumask_test_cpu(cpu, &cpu_on_done)) {
-+				if (cpu == 1)
-+					report_info("CPU1 failed to come online");
-+				else
-+					report_info("CPU%d failed to online CPU1", cpu);
-+			}
-+		}
-+		return false;
-+	}
-+
- 	for_each_present_cpu(cpu) {
- 		if (cpu_on_ret[cpu] == PSCI_RET_SUCCESS) {
- 			ret_success++;
-@@ -142,7 +180,44 @@ static bool psci_cpu_on_test(void)
- 	return !failed;
- }
- 
--int main(void)
-+static bool psci_cpu_off_test(void)
-+{
-+	bool failed = false;
-+	int cpu;
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
-+	}
-+
-+	cpumask_set_cpu(0, &cpu_off_done);
-+
-+	report_info("starting CPU_OFF test...");
-+
-+	/* Release the CPUs */
-+	cpu_off_start = 1;
-+
-+	/* Wait until all are done */
-+	while (!cpumask_full(&cpu_off_done))
-+		cpu_relax();
-+
-+	/* Allow all the other CPUs to complete the operation */
-+	mdelay(CPU_OFF_TEST_WAIT_TIME);
-+
-+	for_each_present_cpu(cpu) {
-+		if (cpu == 0)
-+			continue;
-+
-+		if (!cpu_off_success[cpu]) {
-+			report_info("CPU%d could not be turned off", cpu);
-+			failed = true;
-+		}
-+	}
-+	return !failed;
-+}
-+
-+int main(int argc, char **argv)
- {
- 	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
- 
-@@ -154,15 +229,18 @@ int main(void)
- 	}
- 
- 	report_info("PSCI version %d.%d", PSCI_VERSION_MAJOR(ver),
--					  PSCI_VERSION_MINOR(ver));
-+					PSCI_VERSION_MINOR(ver));
-+
- 	report(psci_invalid_function(), "invalid-function");
- 	report(psci_affinity_info_on(), "affinity-info-on");
- 	report(psci_affinity_info_off(), "affinity-info-off");
- 
--	if (ERRATA(6c7a5dce22b3))
-+	if (ERRATA(6c7a5dce22b3)){
- 		report(psci_cpu_on_test(), "cpu-on");
--	else
-+	} else {
- 		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-+	}
-+	report(psci_cpu_off_test(), "cpu-off");
- 
- done:
- #if 0
--- 
-2.25.1
+>
+> I'm afraid this is a step in the wrong direction...
 
+
+Please explain why.
+
+
+>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>   drivers/s390/crypto/vfio_ap_ops.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c b/drivers/s390/crypto/vfio_ap_ops.c
+>> index e80c5a6b91be..2dd8db9ddb39 100644
+>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>> @@ -1676,7 +1676,7 @@ static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q)
+>>   		     "PQAP/ZAPQ for %02x.%04x failed with invalid rc=%u\n",
+>>   		     AP_QID_CARD(q->apqn), AP_QID_QUEUE(q->apqn),
+>>   		     status.response_code);
+>> -		return -EIO;
+>> +		break;
+>>   	}
+>>   
+>>   	vfio_ap_free_aqic_resources(q);
