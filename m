@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A422652547
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 18:11:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 826F865253F
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 18:10:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233990AbiLTRLF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 12:11:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51986 "EHLO
+        id S234120AbiLTRK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 12:10:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234014AbiLTRKl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 12:10:41 -0500
+        with ESMTP id S234036AbiLTRKj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 12:10:39 -0500
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C21E111F;
-        Tue, 20 Dec 2022 09:10:39 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A55763D1;
+        Tue, 20 Dec 2022 09:10:38 -0800 (PST)
 Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKGrmUl011868;
-        Tue, 20 Dec 2022 17:10:39 GMT
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKGrlgF011848;
+        Tue, 20 Dec 2022 17:10:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=mpf53VhJojwsAlqeo8XNMHNzbcuWjtMV6o0rddgguTo=;
- b=T6ydr+iYxn/thq008aNjwNoEIcgc1xC0om5jf2CTYEGYDYrBDj/QgKirdNui8D1MuUvP
- nzuySzUnGHuGORm/+6/1RI04Wz1MGEf5SnG8GVmqeMkNkli+LJjzidiTjX6if+by/pl1
- Jx9kGIOkxZZsv8uYp4HMBQ3qKajhXv89hzLbhk3HWRYZGX8lo8pxE8CptilfJ5memf+X
- giAQbVjanvnZVy8IY8ABC2Jw7ADUvDiRGYLzEIx7w4vl6tKfLP4gNBInpTNS0+WXFagp
- egGOzPCT0lysWPXA1v4tVmNHCLBQmMK/jynUf2cfTXw56IKir9K9ycjqzzbz0rGMkjzW ZA== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkgyp170g-1
+ bh=X2baz4aYirGZzn8Tjagt+jxYT6ZsFiOiEn/E1+WlobQ=;
+ b=YSeL82qqjqIbbuC/nWC/gIb8lZPh4sQt57BZTH0AoZi8WYT8Z4t4GeEAW2//gDjGI31X
+ RsD7653CxVFGIhsWiVrEBebEe4IErUYRz0zVZ6KSW3z6QmqYHJ45Fa996GSkYv93pO/c
+ HvOnSeUjn/TsF8F97wnLzjpPwd15fL7St/rRc+PytaLMBW0C/R1CC+SMMciF+Co0o06T
+ FW9vqJyU0usdaWokiT9Q8aeuxPSt0GAogVYo7z6ldf7RtHof/iKZZxJvtPT0/FWe2iht
+ tGTnMxE+ZQpNI2qzZd0WAds93SnQZgDaKtk1+z4jeV+S4yIc1n1jzYTInXM7CxgYUgVP dg== 
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkgyp170k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Dec 2022 17:10:38 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BK6qeYs025143;
+        Tue, 20 Dec 2022 17:10:37 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKGXX7b016895;
         Tue, 20 Dec 2022 17:10:13 GMT
 Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3mh6ywmacq-1
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3mh6yw34h3-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 20 Dec 2022 17:10:13 +0000
 Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BKHAARJ45351202
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BKHAAi742074400
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 20 Dec 2022 17:10:10 GMT
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2044A20063;
+        by IMSVA (Postfix) with ESMTP id 19CE62004B;
         Tue, 20 Dec 2022 17:10:10 +0000 (GMT)
 Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1014420043;
+        by IMSVA (Postfix) with ESMTP id 113122004E;
         Tue, 20 Dec 2022 17:10:10 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
         by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
         Tue, 20 Dec 2022 17:10:10 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 9F005E08F2; Tue, 20 Dec 2022 18:10:09 +0100 (CET)
+        id A1D3BE08FD; Tue, 20 Dec 2022 18:10:09 +0100 (CET)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Matthew Rosato <mjrosato@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>
@@ -64,17 +64,17 @@ Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Peter Oberparleiter <oberpar@linux.ibm.com>,
         linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v2 13/16] vfio/ccw: allocate/populate the guest idal
-Date:   Tue, 20 Dec 2022 18:10:05 +0100
-Message-Id: <20221220171008.1362680-14-farman@linux.ibm.com>
+Subject: [PATCH v2 14/16] vfio/ccw: handle a guest Format-1 IDAL
+Date:   Tue, 20 Dec 2022 18:10:06 +0100
+Message-Id: <20221220171008.1362680-15-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221220171008.1362680-1-farman@linux.ibm.com>
 References: <20221220171008.1362680-1-farman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: lYEvEu8L5_uUuhHp8EKy3FVZevqVM_v1
-X-Proofpoint-ORIG-GUID: lYEvEu8L5_uUuhHp8EKy3FVZevqVM_v1
+X-Proofpoint-GUID: BXvIcwkpBwH1apNTg1azUbHulP2DV4Fm
+X-Proofpoint-ORIG-GUID: BXvIcwkpBwH1apNTg1azUbHulP2DV4Fm
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-20_06,2022-12-20_01,2022-06-22_01
@@ -92,141 +92,101 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Today, we allocate memory for a list of IDAWs, and if the CCW
-being processed contains an IDAL we read that data from the guest
-into that space. We then copy each IDAW into the pa_iova array,
-or fabricate that pa_iova array with a list of addresses based
-on a direct-addressed CCW.
+There are two scenarios that need to be addressed here.
 
-Combine the reading of the guest IDAL with the creation of a
-pseudo-IDAL for direct-addressed CCWs, so that both CCW types
-have a "guest" IDAL that can be populated straight into the
-pa_iova array.
+First, an ORB that does NOT have the Format-2 IDAL bit set could
+have both a direct-addressed CCW and an indirect-data-address CCW
+chained together. This means that the IDA CCW will contain a
+Format-1 IDAL, and can be easily converted to a 2K Format-2 IDAL.
+But it also means that the direct-addressed CCW needs to be
+converted to the same 2K Format-2 IDAL for consistency with the
+ORB settings.
+
+Secondly, a Format-1 IDAL is comprised of 31-bit addresses.
+Thus, we need to cast this IDAL to a pointer of ints while
+populating the list of addresses that are sent to vfio.
+
+Since the result of both of these is the use of the 2K IDAL
+variants, and the output of vfio-ccw is always a Format-2 IDAL
+(in order to use 64-bit addresses), make sure that the correct
+control bit gets set in the ORB when these scenarios occur.
 
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
+Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- drivers/s390/cio/vfio_ccw_cp.c | 76 +++++++++++++++++++++++-----------
- 1 file changed, 52 insertions(+), 24 deletions(-)
+ drivers/s390/cio/vfio_ccw_cp.c | 19 ++++++++++++++++---
+ 1 file changed, 16 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index 62a013a631d8..477835b5e5b8 100644
+index 477835b5e5b8..52e5abce5827 100644
 --- a/drivers/s390/cio/vfio_ccw_cp.c
 +++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -192,11 +192,12 @@ static inline void page_array_idal_create_words(struct page_array *pa,
- 	 * idaw.
- 	 */
- 
--	for (i = 0; i < pa->pa_nr; i++)
-+	for (i = 0; i < pa->pa_nr; i++) {
- 		idaws[i] = page_to_phys(pa->pa_page[i]);
- 
--	/* Adjust the first IDAW, since it may not start on a page boundary */
--	idaws[0] += pa->pa_iova[0] & (PAGE_SIZE - 1);
-+		/* Incorporate any offset from each starting address */
-+		idaws[i] += pa->pa_iova[i] & (PAGE_SIZE - 1);
-+	}
+@@ -222,6 +222,8 @@ static void convert_ccw0_to_ccw1(struct ccw1 *source, unsigned long len)
+ 	}
  }
  
- static void convert_ccw0_to_ccw1(struct ccw1 *source, unsigned long len)
-@@ -496,6 +497,44 @@ static int ccwchain_fetch_tic(struct ccw1 *ccw,
- 	return -EFAULT;
- }
- 
-+static unsigned long *get_guest_idal(struct ccw1 *ccw,
-+				     struct channel_program *cp,
-+				     int idaw_nr)
-+{
-+	struct vfio_device *vdev =
-+		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
-+	unsigned long *idaws;
-+	int idal_len = idaw_nr * sizeof(*idaws);
-+	int idaw_size = PAGE_SIZE;
-+	int idaw_mask = ~(idaw_size - 1);
-+	int i, ret;
-+
-+	idaws = kcalloc(idaw_nr, sizeof(*idaws), GFP_DMA | GFP_KERNEL);
-+	if (!idaws)
-+		return ERR_PTR(-ENOMEM);
-+
-+	if (ccw_is_idal(ccw)) {
-+		/* Copy IDAL from guest */
-+		ret = vfio_dma_rw(vdev, ccw->cda, idaws, idal_len, false);
-+		if (ret) {
-+			kfree(idaws);
-+			return ERR_PTR(ret);
-+		}
-+	} else {
-+		/* Fabricate an IDAL based off CCW data address */
-+		if (cp->orb.cmd.c64) {
-+			idaws[0] = ccw->cda;
-+			for (i = 1; i < idaw_nr; i++)
-+				idaws[i] = (idaws[i - 1] + idaw_size) & idaw_mask;
-+		} else {
-+			kfree(idaws);
-+			return ERR_PTR(-EOPNOTSUPP);
-+		}
-+	}
-+
-+	return idaws;
-+}
++#define idal_is_2k(_cp) (!(_cp)->orb.cmd.c64 || (_cp)->orb.cmd.i2k)
 +
  /*
-  * ccw_count_idaws() - Calculate the number of IDAWs needed to transfer
-  * a specified amount of data
-@@ -557,7 +596,7 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
+  * Helpers to operate ccwchain.
+  */
+@@ -504,8 +506,9 @@ static unsigned long *get_guest_idal(struct ccw1 *ccw,
+ 	struct vfio_device *vdev =
  		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
  	unsigned long *idaws;
- 	int ret;
--	int idaw_nr, idal_len;
-+	int idaw_nr;
- 	int i;
++	unsigned int *idaws_f1;
+ 	int idal_len = idaw_nr * sizeof(*idaws);
+-	int idaw_size = PAGE_SIZE;
++	int idaw_size = idal_is_2k(cp) ? PAGE_SIZE / 2 : PAGE_SIZE;
+ 	int idaw_mask = ~(idaw_size - 1);
+ 	int i, ret;
  
- 	/* Calculate size of IDAL */
-@@ -565,12 +604,10 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
- 	if (idaw_nr < 0)
- 		return idaw_nr;
- 
--	idal_len = idaw_nr * sizeof(*idaws);
--
- 	/* Allocate an IDAL from host storage */
--	idaws = kcalloc(idaw_nr, sizeof(*idaws), GFP_DMA | GFP_KERNEL);
--	if (!idaws) {
--		ret = -ENOMEM;
-+	idaws = get_guest_idal(ccw, cp, idaw_nr);
-+	if (IS_ERR(idaws)) {
-+		ret = PTR_ERR(idaws);
- 		goto out_init;
+@@ -527,8 +530,10 @@ static unsigned long *get_guest_idal(struct ccw1 *ccw,
+ 			for (i = 1; i < idaw_nr; i++)
+ 				idaws[i] = (idaws[i - 1] + idaw_size) & idaw_mask;
+ 		} else {
+-			kfree(idaws);
+-			return ERR_PTR(-EOPNOTSUPP);
++			idaws_f1 = (unsigned int *)idaws;
++			idaws_f1[0] = ccw->cda;
++			for (i = 1; i < idaw_nr; i++)
++				idaws_f1[i] = (idaws_f1[i - 1] + idaw_size) & idaw_mask;
+ 		}
  	}
  
-@@ -584,22 +621,13 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
- 	if (ret < 0)
- 		goto out_free_idaws;
- 
--	if (ccw_is_idal(ccw)) {
--		/* Copy guest IDAL into host IDAL */
--		ret = vfio_dma_rw(vdev, ccw->cda, idaws, idal_len, false);
--		if (ret)
--			goto out_unpin;
--
--		/*
--		 * Copy guest IDAWs into page_array, in case the memory they
--		 * occupy is not contiguous.
--		 */
--		for (i = 0; i < idaw_nr; i++)
-+	/*
-+	 * Copy guest IDAWs into page_array, in case the memory they
-+	 * occupy is not contiguous.
-+	 */
-+	for (i = 0; i < idaw_nr; i++) {
-+		if (cp->orb.cmd.c64)
+@@ -595,6 +600,7 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
+ 	struct vfio_device *vdev =
+ 		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
+ 	unsigned long *idaws;
++	unsigned int *idaws_f1;
+ 	int ret;
+ 	int idaw_nr;
+ 	int i;
+@@ -625,9 +631,12 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
+ 	 * Copy guest IDAWs into page_array, in case the memory they
+ 	 * occupy is not contiguous.
+ 	 */
++	idaws_f1 = (unsigned int *)idaws;
+ 	for (i = 0; i < idaw_nr; i++) {
+ 		if (cp->orb.cmd.c64)
  			pa->pa_iova[i] = idaws[i];
--	} else {
--		pa->pa_iova[0] = ccw->cda;
--		for (i = 1; i < pa->pa_nr; i++)
--			pa->pa_iova[i] = pa->pa_iova[i - 1] + PAGE_SIZE;
++		else
++			pa->pa_iova[i] = idaws_f1[i];
  	}
  
  	if (ccw_does_data_transfer(ccw)) {
+@@ -848,7 +857,11 @@ union orb *cp_get_orb(struct channel_program *cp, struct subchannel *sch)
+ 
+ 	/*
+ 	 * Everything built by vfio-ccw is a Format-2 IDAL.
++	 * If the input was a Format-1 IDAL, indicate that
++	 * 2K Format-2 IDAWs were created here.
+ 	 */
++	if (!orb->cmd.c64)
++		orb->cmd.i2k = 1;
+ 	orb->cmd.c64 = 1;
+ 
+ 	if (orb->cmd.lpm == 0)
 -- 
 2.34.1
 
