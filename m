@@ -2,161 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 116E1651953
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 04:10:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF8B4651A85
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 07:07:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232911AbiLTDKr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 19 Dec 2022 22:10:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46550 "EHLO
+        id S233076AbiLTGF0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 01:05:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232896AbiLTDKn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 19 Dec 2022 22:10:43 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1658C10
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 19:10:42 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id b16-20020a17090a10d000b00221653b4526so4426884pje.2
-        for <kvm@vger.kernel.org>; Mon, 19 Dec 2022 19:10:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q10rUBAMPp02OLhY9eCZCmG3XUyvR5sIHjaDQiVf8kk=;
-        b=Tvafgg6lFog2gJPmCOGhUj8Gk0WzLIFS7rEmTaCtNS+wVfoRMaNckCyqEeYcfCMi44
-         r3+3Q+WD5gPtX8afrAtXbryso5Gf+Hr3Pb/yeZHfRoUK1MDHquixZ8yqSiFDmHL515iL
-         uZJbQUo27JjPfEFhq9NQkIV1yO1R1CQDLKq8x17erkYpAFFmET4hq85pFlO8F6MELIH9
-         USR50ALgV96KN3DSQgvUVOn9BQ3Kl0lTe/BYaGi/DUCL+AuAjQFT/hKCdbRph76n5mcb
-         6mN0BbPpaSHn8frr6wxGnG0HIoorI9/Glt/Afy8Fz7JeBZlfv+JT5EhzStQVnyI9fyC3
-         C/cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q10rUBAMPp02OLhY9eCZCmG3XUyvR5sIHjaDQiVf8kk=;
-        b=L18OBMTlfAgiJyZV9SlcDba3FrlXDAmJlhvrmj4eLS77utbWkr3ZoXuIeQMS2sR6YH
-         0DJcR88yWf6yauy505QvAs7O/ueWmTOTCHjXOFnIEiliIdjIvZVG+uRUSCVnbocG6rJG
-         cE8Eouyta3y8eJ67Z2shTyH3bXcSIIKwKDQk0lpnKsJkobb5VFSTmmwGLoX5+0Nq/nwd
-         BckBv5Ojgcxl2Cl6df5itKDsMaNU+VnFlf7/qnPXqN8wCV31yTCjuCMMYsV9o1GxR1U0
-         Mvlts5pdFzpjYjUokJl2Hy77KwGt6rbV+3BJsDM+H7jaV+YfnDRsTuC+JRU3M0Qegznk
-         In8Q==
-X-Gm-Message-State: ANoB5pkeJSWlf72XFHgG9zMUJdH6ai2gVbEMw7p/y7kDSNY6j24RJt0C
-        rklYViC9JblwDpuF6eZX6PqmY/e4H4uEBXiG4ggO0LO6TRiuadxUgzWlrzSmJOil+F1ZjSRzkwX
-        8FozSmZAR4+k9Cqn6di8+FUbMIK1KQeGwsChFE7tPXweXN5V3PeQeJng5865Sm5Y=
-X-Google-Smtp-Source: AA0mqf61vT9Jbaw7sgIBUPagUbDMGnQGx8IGqPTGr0B37Fpqbf+yIDfkZdKydSege8UhWLjgoKJXsr6BdGr+jg==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:aa7:84c7:0:b0:574:9b8d:1873 with SMTP id
- x7-20020aa784c7000000b005749b8d1873mr68849788pfn.75.1671505842066; Mon, 19
- Dec 2022 19:10:42 -0800 (PST)
-Date:   Tue, 20 Dec 2022 03:10:32 +0000
-In-Reply-To: <20221220031032.2648701-1-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20221220031032.2648701-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221220031032.2648701-5-ricarkol@google.com>
-Subject: [kvm-unit-tests PATCH v2 4/4] arm: pmu: Print counter values as hexadecimals
-From:   Ricardo Koller <ricarkol@google.com>
-To:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev
-Cc:     maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
-        oliver.upton@linux.dev, reijiw@google.com,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229769AbiLTGFZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 01:05:25 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA371BEC;
+        Mon, 19 Dec 2022 22:05:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1671516322; x=1703052322;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=VUobp2ibXzyZTJ93NDEYKcJW/1VwPoOYbw9i716lO18=;
+  b=Apjep1o4UZzDT1LNhi5ghPRcOPgMoGvwIE6667b8BJTkE2UTlWCOrziI
+   hGSR2StpNrx/mMAEJ5OP9fxQs0fNMebdJ15dghKZD7iFTPVwXCSlimZ/Y
+   nzFDd7wfZYorZBCi0KddBvM8/I0BpMQN0f7DNJi/wx/ra7RfYEE7E0TUR
+   1expp5QOSAgLcoWtOJR2dUZ1rY14LRMPmEjUYgHRhlQImtKv5F6SRg/X6
+   qSeFEdeH4Ml7M0mitFvVWwSWP6NU3I16wsfAA9DKVgWHNM5mP/7Ks23D5
+   If+VADAMThCrOS7fWBVWghM+NToBFNdqo3Q1H56Uwbb3W5OtVUhi5sMnL
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="319590547"
+X-IronPort-AV: E=Sophos;i="5.96,258,1665471600"; 
+   d="scan'208";a="319590547"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 22:05:22 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="825115698"
+X-IronPort-AV: E=Sophos;i="5.96,258,1665471600"; 
+   d="scan'208";a="825115698"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.174.63]) ([10.249.174.63])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 22:05:20 -0800
+Message-ID: <1427f9d5-e9b8-80c1-541f-a83ff9ea0d91@linux.intel.com>
+Date:   Tue, 20 Dec 2022 14:05:17 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] KVM: Destroy target device if coalesced MMIO
+ unregistration fails
+To:     "Wang, Wei W" <wei.w.wang@intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        =?UTF-8?B?5p+z6I+B5bOw?= <liujingfeng@qianxin.com>
+References: <20221219171924.67989-1-seanjc@google.com>
+ <DS0PR11MB637301E9103F92EE5617D5B2DCEA9@DS0PR11MB6373.namprd11.prod.outlook.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <DS0PR11MB637301E9103F92EE5617D5B2DCEA9@DS0PR11MB6373.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-8.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The arm/pmu test prints the value of counters as %ld.  Most tests start
-with counters around 0 or UINT_MAX, so having something like -16 instead of
-0xffff_fff0 is not very useful.
 
-Report counter values as hexadecimals.
+On 12/20/2022 11:04 AM, Wang, Wei W wrote:
+> On Tuesday, December 20, 2022 1:19 AM, Sean Christopherson wrote:
+>> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c index
+>> 0be80c213f7f..5ef88f5a0864 100644
+>> --- a/virt/kvm/coalesced_mmio.c
+>> +++ b/virt/kvm/coalesced_mmio.c
+>> @@ -187,15 +187,17 @@ int
+>> kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
+>>   			r = kvm_io_bus_unregister_dev(kvm,
+>>   				zone->pio ? KVM_PIO_BUS : KVM_MMIO_BUS, &dev->dev);
+>>
+>> +			kvm_iodevice_destructor(&dev->dev);
+>> +
+>>   			/*
+>>   			 * On failure, unregister destroys all devices on the
+>>   			 * bus _except_ the target device, i.e. coalesced_zones
+>> -			 * has been modified.  No need to restart the walk as
+>> -			 * there aren't any zones left.
+>> +			 * has been modified.  Bail after destroying the target
+>> +			 * device, there's no need to restart the walk as there
+>> +			 * aren't any zones left.
+>>   			 */
+>>   			if (r)
+>>   				break;
+>> -			kvm_iodevice_destructor(&dev->dev);
+>>   		}
+>>   	}
+> Another option is to let kvm_io_bus_unregister_dev handle this, and no need for callers
+> to make the extra kvm_iodevice_destructor() call. This simplifies the usage for callers
+> (e.g. reducing LOCs and no leakages like this):
 
-Reported-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arm/pmu.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+One vote for this option : )
 
-diff --git a/arm/pmu.c b/arm/pmu.c
-index 680623d..b6b2871 100644
---- a/arm/pmu.c
-+++ b/arm/pmu.c
-@@ -537,8 +537,8 @@ static void test_mem_access(bool overflow_at_64bits)
- 	write_sysreg_s(0x3, PMCNTENSET_EL0);
- 	isb();
- 	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
--	report_info("counter #0 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
--	report_info("counter #1 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
-+	report_info("counter #0 is 0x%lx (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
-+	report_info("counter #1 is 0x%lx (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
- 	/* We may measure more than 20 mem access depending on the core */
- 	report((read_regn_el0(pmevcntr, 0) == read_regn_el0(pmevcntr, 1)) &&
- 	       (read_regn_el0(pmevcntr, 0) >= 20) && !read_sysreg(pmovsclr_el0),
-@@ -553,7 +553,7 @@ static void test_mem_access(bool overflow_at_64bits)
- 	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
- 	report(read_sysreg(pmovsclr_el0) == 0x3,
- 	       "Ran 20 mem accesses with expected overflows on both counters");
--	report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
-+	report_info("cnt#0=0x%lx cnt#1=0x%lx overflow=0x%lx",
- 			read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1),
- 			read_sysreg(pmovsclr_el0));
- }
-@@ -584,7 +584,7 @@ static void test_sw_incr(bool overflow_at_64bits)
- 		write_sysreg(0x1, pmswinc_el0);
- 
- 	isb();
--	report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
-+	report_info("SW_INCR counter #0 has value 0x%lx", read_regn_el0(pmevcntr, 0));
- 	report(read_regn_el0(pmevcntr, 0) == pre_overflow,
- 		"PWSYNC does not increment if PMCR.E is unset");
- 
-@@ -604,7 +604,7 @@ static void test_sw_incr(bool overflow_at_64bits)
- 		(uint64_t)pre_overflow + 100;
- 	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
- 	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
--	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
-+	report_info("counter values after 100 SW_INCR #0=0x%lx #1=0x%lx",
- 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
- 	report(read_sysreg(pmovsclr_el0) == 0x1,
- 		"overflow on counter #0 after 100 SW_INCR");
-@@ -680,7 +680,7 @@ static void test_chained_sw_incr(bool unused)
- 	report((read_sysreg(pmovsclr_el0) == 0x1) &&
- 		(read_regn_el0(pmevcntr, 1) == 1),
- 		"overflow and chain counter incremented after 100 SW_INCR/CHAIN");
--	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-+	report_info("overflow=0x%lx, #0=0x%lx #1=0x%lx", read_sysreg(pmovsclr_el0),
- 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
- 
- 	/* 64b SW_INCR and overflow on CHAIN counter*/
-@@ -705,7 +705,7 @@ static void test_chained_sw_incr(bool unused)
- 	       (read_regn_el0(pmevcntr, 0) == cntr0) &&
- 	       (read_regn_el0(pmevcntr, 1) == cntr1),
- 	       "expected overflows and values after 100 SW_INCR/CHAIN");
--	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
-+	report_info("overflow=0x%lx, #0=0x%lx #1=0x%lx", read_sysreg(pmovsclr_el0),
- 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
- }
- 
-@@ -737,11 +737,11 @@ static void test_chain_promotion(bool unused)
- 	mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
- 	report(!read_regn_el0(pmevcntr, 1) && (read_sysreg(pmovsclr_el0) == 0x1),
- 		"odd counter did not increment on overflow if disabled");
--	report_info("MEM_ACCESS counter #0 has value %ld",
-+	report_info("MEM_ACCESS counter #0 has value 0x%lx",
- 		    read_regn_el0(pmevcntr, 0));
--	report_info("CHAIN counter #1 has value %ld",
-+	report_info("CHAIN counter #1 has value 0x%lx",
- 		    read_regn_el0(pmevcntr, 1));
--	report_info("overflow counter %ld", read_sysreg(pmovsclr_el0));
-+	report_info("overflow counter 0x%lx", read_sysreg(pmovsclr_el0));
- 
- 	/* start at 0xFFFFFFDC, +20 with CHAIN enabled, +20 with CHAIN disabled */
- 	pmu_reset();
--- 
-2.39.0.314.g84b9a713c41-goog
 
+>
+> diff --git a/include/kvm/iodev.h b/include/kvm/iodev.h
+> index d75fc4365746..56619e33251e 100644
+> --- a/include/kvm/iodev.h
+> +++ b/include/kvm/iodev.h
+> @@ -55,10 +55,4 @@ static inline int kvm_iodevice_write(struct kvm_vcpu *vcpu,
+>                                   : -EOPNOTSUPP;
+>   }
+>
+> -static inline void kvm_iodevice_destructor(struct kvm_io_device *dev)
+> -{
+> -       if (dev->ops->destructor)
+> -               dev->ops->destructor(dev);
+> -}
+> -
+>   #endif /* __KVM_IODEV_H__ */
+> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+> index 0be80c213f7f..d7135a5e76f8 100644
+> --- a/virt/kvm/coalesced_mmio.c
+> +++ b/virt/kvm/coalesced_mmio.c
+> @@ -195,7 +195,6 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
+>                           */
+>                          if (r)
+>                                  break;
+> -                       kvm_iodevice_destructor(&dev->dev);
+>                  }
+>          }
+>
+> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+> index 2a3ed401ce46..1b277afb545b 100644
+> --- a/virt/kvm/eventfd.c
+> +++ b/virt/kvm/eventfd.c
+> @@ -898,7 +898,6 @@ kvm_deassign_ioeventfd_idx(struct kvm *kvm, enum kvm_bus bus_idx,
+>                  bus = kvm_get_bus(kvm, bus_idx);
+>                  if (bus)
+>                          bus->ioeventfd_count--;
+> -               ioeventfd_release(p);
+>                  ret = 0;
+>                  break;
+>          }
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 13e88297f999..582757ebdce6 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -5200,6 +5200,12 @@ static struct notifier_block kvm_reboot_notifier = {
+>          .priority = 0,
+>   };
+>
+> +static void kvm_iodevice_destructor(struct kvm_io_device *dev)
+> +{
+> +       if (dev->ops->destructor)
+> +               dev->ops->destructor(dev);
+> +}
+> +
+>   static void kvm_io_bus_destroy(struct kvm_io_bus *bus)
+>   {
+>          int i;
+> @@ -5423,7 +5429,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
+>   int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+>                                struct kvm_io_device *dev)
+>   {
+> -       int i, j;
+> +       int i;
+>          struct kvm_io_bus *new_bus, *bus;
+>
+>          lockdep_assert_held(&kvm->slots_lock);
+> @@ -5453,18 +5459,18 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+>          rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
+>          synchronize_srcu_expedited(&kvm->srcu);
+>
+> -       /* Destroy the old bus _after_ installing the (null) bus. */
+> +       /*
+> +        * If (null) bus is installed, destroy the old bus, including all the
+> +        * attached devices. Otherwise, destroy the caller's device only.
+> +        */
+>          if (!new_bus) {
+>                  pr_err("kvm: failed to shrink bus, removing it completely\n");
+> -               for (j = 0; j < bus->dev_count; j++) {
+> -                       if (j == i)
+> -                               continue;
+> -                       kvm_iodevice_destructor(bus->range[j].dev);
+> -               }
+> +               kvm_io_bus_destroy(bus);
+> +               return -ENOMEM;
+>          }
+>
+> -       kfree(bus);
+> -       return new_bus ? 0 : -ENOMEM;
+> +       kvm_iodevice_destructor(dev);
+> +       return 0;
+>   }
+>
+>   struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
