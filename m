@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B4DB6527F6
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 21:40:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D6C826527FE
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 21:40:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234331AbiLTUjv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 15:39:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35234 "EHLO
+        id S234333AbiLTUjw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 15:39:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234320AbiLTUjf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 15:39:35 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 080D611A0F
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 12:39:34 -0800 (PST)
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKJwsUg011158;
-        Tue, 20 Dec 2022 20:39:30 GMT
+        with ESMTP id S234322AbiLTUjg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 15:39:36 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F234011A1E
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 12:39:35 -0800 (PST)
+Received: from pps.filterd (m0246629.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKJx0QU016534;
+        Tue, 20 Dec 2022 20:39:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references; s=corp-2022-7-12;
- bh=BdeHShjzGrsmJ/HZxuZ3mhlQL/MYIL5BaNifqclthfc=;
- b=O7R4PyhsMbP8uaZBni78YwocZAvTXDkDTlg8A0ia/lEkDu8Z7gaGsVz+3DSrG9Al9YAJ
- bNtLLs+mZN3YdRK+Jv1W6Afl1c3KpYtm12n/se+1nq/d9Si+gBrNGlq8dLMvxk7NipEO
- CCwaoKGakyodUWANqgMThR+R6bQ/xtOHmw9JMBvvcikJ9T4alFGuByYJ9OXj3sVhCokw
- L8X6hhyIMXSjmt3IlitB5eBziH3yqvZNc4TeAfSQ023AQ3/sl0ttV0kBz+Mu806b54sP
- tVXXpidsNAJ5AIAkf6V73z7HV/NziV+YTC7SqvQqC084robHHEktSf7vXNLHJAbaLDZe Tw== 
+ bh=HTvqG4HY5BLSBLASHVunI6zA9I6GOuCYqgjrhW6WmTg=;
+ b=AcQzRJSxjv6xZgKd5e06FyhdHBiA84lfGh7zXA+KEuzn3yJSQucUoMAH16Ee460YPeLq
+ foqYdAMrDW4030lFNEaoWbn4fbJnZE09bUJCwzRj2MAAWpjb3Hr+XdlHhVBZ7q49Dr/0
+ 30kf8lj+f6h0dBCkGE34BopOx4U+1sTH9vW6NotJR52WVIeGy1RAuk767ag/KoMGFMsq
+ Ltfh4q3menrYv/pJlgIgHuKl9Q879lQ6/iy/48I08LlJRU++oud5avxD8Rgewwm3rWKi
+ xuIc3xZF5BiECYUbdFCC7wEtkOGGptdZqlHLWRLahL99aZqOoG685HEaQuSabVE0ggXX ug== 
 Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3mh6tsy3es-1
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3mh6tp72w9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 20 Dec 2022 20:39:30 +0000
 Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BKJsHuE012202;
-        Tue, 20 Dec 2022 20:39:29 GMT
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 2BKJEWt6012208;
+        Tue, 20 Dec 2022 20:39:30 GMT
 Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3mh475vcpu-1
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3mh475vcq7-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 20 Dec 2022 20:39:29 +0000
+        Tue, 20 Dec 2022 20:39:30 +0000
 Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BKKdQ0w014895;
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BKKdQ10014895;
         Tue, 20 Dec 2022 20:39:29 GMT
 Received: from ca-dev63.us.oracle.com (ca-dev63.us.oracle.com [10.211.8.221])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3mh475vcks-7;
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3mh475vcks-8;
         Tue, 20 Dec 2022 20:39:29 +0000
 From:   Steve Sistare <steven.sistare@oracle.com>
 To:     kvm@vger.kernel.org
@@ -49,9 +49,9 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         Jason Gunthorpe <jgg@nvidia.com>,
         Kevin Tian <kevin.tian@intel.com>,
         Steve Sistare <steven.sistare@oracle.com>
-Subject: [PATCH V7 6/7] vfio/type1: revert "implement notify callback"
-Date:   Tue, 20 Dec 2022 12:39:24 -0800
-Message-Id: <1671568765-297322-7-git-send-email-steven.sistare@oracle.com>
+Subject: [PATCH V7 7/7] vfio: revert "iommu driver notify callback"
+Date:   Tue, 20 Dec 2022 12:39:25 -0800
+Message-Id: <1671568765-297322-8-git-send-email-steven.sistare@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1671568765-297322-1-git-send-email-steven.sistare@oracle.com>
 References: <1671568765-297322-1-git-send-email-steven.sistare@oracle.com>
@@ -62,8 +62,8 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 bu
  adultscore=0 phishscore=0 suspectscore=0 spamscore=0 mlxlogscore=999
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
  definitions=main-2212200169
-X-Proofpoint-ORIG-GUID: Dv4prwQHJT3aBzLCFHTo_Q47bu6XrJDk
-X-Proofpoint-GUID: Dv4prwQHJT3aBzLCFHTo_Q47bu6XrJDk
+X-Proofpoint-GUID: GmIKKFMLMNOhxIo8fVZ2AF1vBTkmTwTq
+X-Proofpoint-ORIG-GUID: GmIKKFMLMNOhxIo8fVZ2AF1vBTkmTwTq
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -74,62 +74,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is dead code.  Revert it.
-  commit 487ace134053 ("vfio/type1: implement notify callback")
+Revert this dead code:
+  commit ec5e32940cc9 ("vfio: iommu driver notify callback")
 
 Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 ---
- drivers/vfio/vfio_iommu_type1.c | 15 ---------------
- 1 file changed, 15 deletions(-)
+ drivers/vfio/container.c | 5 -----
+ drivers/vfio/vfio.h      | 7 -------
+ 2 files changed, 12 deletions(-)
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index eb2d243..a009e1b 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -75,7 +75,6 @@ struct vfio_iommu {
- 	bool			v2;
- 	bool			nesting;
- 	bool			dirty_page_tracking;
--	bool			container_open;
- 	struct list_head	emulated_iommu_groups;
+diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
+index d74164a..5bfd10d 100644
+--- a/drivers/vfio/container.c
++++ b/drivers/vfio/container.c
+@@ -382,11 +382,6 @@ static int vfio_fops_open(struct inode *inode, struct file *filep)
+ static int vfio_fops_release(struct inode *inode, struct file *filep)
+ {
+ 	struct vfio_container *container = filep->private_data;
+-	struct vfio_iommu_driver *driver = container->iommu_driver;
+-
+-	if (driver && driver->ops->notify)
+-		driver->ops->notify(container->iommu_data,
+-				    VFIO_IOMMU_CONTAINER_CLOSE);
+ 
+ 	filep->private_data = NULL;
+ 
+diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+index bcad54b..8a439c6 100644
+--- a/drivers/vfio/vfio.h
++++ b/drivers/vfio/vfio.h
+@@ -62,11 +62,6 @@ struct vfio_group {
+ 	struct blocking_notifier_head	notifier;
  };
  
-@@ -2566,7 +2565,6 @@ static void *vfio_iommu_type1_open(unsigned long arg)
- 	INIT_LIST_HEAD(&iommu->iova_list);
- 	iommu->dma_list = RB_ROOT;
- 	iommu->dma_avail = dma_entry_limit;
--	iommu->container_open = true;
- 	mutex_init(&iommu->lock);
- 	mutex_init(&iommu->device_list_lock);
- 	INIT_LIST_HEAD(&iommu->device_list);
-@@ -3170,18 +3168,6 @@ static int vfio_iommu_type1_dma_rw(void *iommu_data, dma_addr_t user_iova,
- 	return domain;
- }
- 
--static void vfio_iommu_type1_notify(void *iommu_data,
--				    enum vfio_iommu_notify_type event)
--{
--	struct vfio_iommu *iommu = iommu_data;
+-/* events for the backend driver notify callback */
+-enum vfio_iommu_notify_type {
+-	VFIO_IOMMU_CONTAINER_CLOSE = 0,
+-};
 -
--	if (event != VFIO_IOMMU_CONTAINER_CLOSE)
--		return;
--	mutex_lock(&iommu->lock);
--	iommu->container_open = false;
--	mutex_unlock(&iommu->lock);
--}
--
- static const struct vfio_iommu_driver_ops vfio_iommu_driver_ops_type1 = {
- 	.name			= "vfio-iommu-type1",
- 	.owner			= THIS_MODULE,
-@@ -3196,7 +3182,6 @@ static void vfio_iommu_type1_notify(void *iommu_data,
- 	.unregister_device	= vfio_iommu_type1_unregister_device,
- 	.dma_rw			= vfio_iommu_type1_dma_rw,
- 	.group_iommu_domain	= vfio_iommu_type1_group_iommu_domain,
--	.notify			= vfio_iommu_type1_notify,
+ /**
+  * struct vfio_iommu_driver_ops - VFIO IOMMU driver callbacks
+  */
+@@ -97,8 +92,6 @@ struct vfio_iommu_driver_ops {
+ 				  void *data, size_t count, bool write);
+ 	struct iommu_domain *(*group_iommu_domain)(void *iommu_data,
+ 						   struct iommu_group *group);
+-	void		(*notify)(void *iommu_data,
+-				  enum vfio_iommu_notify_type event);
  };
  
- static int __init vfio_iommu_type1_init(void)
+ struct vfio_iommu_driver {
 -- 
 1.8.3.1
 
