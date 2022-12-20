@@ -2,188 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F8C1652256
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:20:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B0C065225D
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:22:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233985AbiLTOUd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 09:20:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44770 "EHLO
+        id S233416AbiLTOWk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 09:22:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233990AbiLTOTs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 09:19:48 -0500
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C72BE0
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:19:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671545952; x=1703081952;
-  h=message-id:subject:from:to:date:in-reply-to:references:
-   mime-version:content-transfer-encoding;
-  bh=z4wTlZu4LzOwpmOLbU26yfpTov9DP6LbDcQ0VhlEhfI=;
-  b=a5K0AHxDGj2Hp6QvEOPo4w7NbMI4VytNLlBlM5cCHKgBhKp0Jk1mWXL1
-   QuqBwsvJBLUSOLvdpAGyLBMnRZTt2eh09f/iy6qRODeIR99oTSeFHxjQJ
-   69mx4u/gRhi5k8bvgxdnXEV2i+T+s/JE74XAj8E+mj+7nebEZB0ST4r65
-   26deYY/z9i/TD9fuBjU48ggj/kIvD/TQXqGbz8Rv8BEhN+8gWcvXTvcO0
-   XP0LRqzi9+6xTbsgmO49uV3r3fLC7SXeHjj0x//JJBJpLwPL7OluOPOum
-   +nBdHasKt9r0CDwcOqI7UpJeltOEtJf3VIii7EKDHio6YLa7MmicSWMnI
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="381844215"
-X-IronPort-AV: E=Sophos;i="5.96,259,1665471600"; 
-   d="scan'208";a="381844215"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2022 06:19:11 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="896456632"
-X-IronPort-AV: E=Sophos;i="5.96,259,1665471600"; 
-   d="scan'208";a="896456632"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga006.fm.intel.com with ESMTP; 20 Dec 2022 06:19:09 -0800
-Message-ID: <806148f69ace7b305115f10614675dac80441cea.camel@linux.intel.com>
-Subject: Re: [PATCH v3 0/9] Linear Address Masking (LAM) KVM Enabling
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     "Liu, Jingqi" <jingqi.liu@intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, kirill.shutemov@linux.intel.com,
-        kvm@vger.kernel.org
-Date:   Tue, 20 Dec 2022 22:19:09 +0800
-In-Reply-To: <a1491544-5f1d-605e-92bb-7135629ce649@intel.com>
-References: <20221209044557.1496580-1-robert.hu@linux.intel.com>
-         <a1491544-5f1d-605e-92bb-7135629ce649@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S234037AbiLTOW2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 09:22:28 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3873B195;
+        Tue, 20 Dec 2022 06:22:28 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKEBWk7008452;
+        Tue, 20 Dec 2022 14:22:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1Kv7LQYhQQAacZH4s0dEzTM7w5tjcoS6eKG5FsQ37LQ=;
+ b=Gyz0RirGM4JabGZGe+0wmNkOzLZKm/THAGGKkUFoDT+47JTMWUerEtOWyCMaoPKG6W4I
+ UbAwUqyeC5fnaEnblhq4xbTlpB1IbKf63BSuaFEFhTW5a+F/lAjRtNR/FIh1uQBZdaHM
+ r+e1Smkd8Y4tjPGQoko1tocAv2pZb6gLbchzO+HFul8pF0uQH1Es37ypieGXOpjqSZKs
+ 9QluqepQ6gBC3eG5Z6TQGkrNpkzXGrtr1sXAUHWmnZ9qV7keNy4l74cC/NPKl4YucQeU
+ bkTyEuxyra84yHAo2I3xoI7cKVJkoqEgf61WGeXFijgU9aaTYbrb1GWQ2+t4nyWIJqN8 kA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkekk0fm0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Dec 2022 14:22:25 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BKEBndB011069;
+        Tue, 20 Dec 2022 14:22:25 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkekk0fkj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Dec 2022 14:22:25 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKD1Lqp032666;
+        Tue, 20 Dec 2022 14:22:24 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3mh6yysy7r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 20 Dec 2022 14:22:24 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BKEMM7o36766370
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 20 Dec 2022 14:22:22 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0A7375805F;
+        Tue, 20 Dec 2022 14:22:22 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1174158043;
+        Tue, 20 Dec 2022 14:22:21 +0000 (GMT)
+Received: from [9.160.121.75] (unknown [9.160.121.75])
+        by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 20 Dec 2022 14:22:20 +0000 (GMT)
+Message-ID: <ab8b7ef4-3402-aec1-e8a2-ccfa109da0fa@linux.ibm.com>
+Date:   Tue, 20 Dec 2022 09:22:20 -0500
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 3/7] s390/vfio_ap: use TAPQ to verify reset in progress
+ completes
+Content-Language: en-US
+To:     freude@linux.ibm.com
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, borntraeger@de.ibm.com,
+        cohuck@redhat.com, mjrosato@linux.ibm.com, pasic@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20221213154437.15480-1-akrowiak@linux.ibm.com>
+ <20221213154437.15480-4-akrowiak@linux.ibm.com>
+ <2541e0d3d4fb38af995e8bd91a34986d@linux.ibm.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <2541e0d3d4fb38af995e8bd91a34986d@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4eveAoJ9miQitOBABL1XkO1wYh4DAYIH
+X-Proofpoint-GUID: AhnnxKH_NO3XISpPI0uOQpsLyHd8K5ry
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2022-12-20_05,2022-12-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ phishscore=0 suspectscore=0 mlxlogscore=999 lowpriorityscore=0
+ priorityscore=1501 impostorscore=0 clxscore=1015 mlxscore=0 bulkscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2212200116
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-12-20 at 17:20 +0800, Liu, Jingqi wrote:
-> On 12/9/2022 12:45 PM, Robert Hoo wrote:
-> > ===Feature Introduction===
-> > 
-> > Linear-address masking (LAM) [1], modifies the checking that is
-> > applied to
-> > *64-bit* linear addresses, allowing software to use of the
-> > untranslated
-> > address (upper) bits for metadata.
-> > As for which upper bits of linear address can be borrowed, LAM has
-> > 2 modes:
-> > LAM_48 (bits 62:48, i.e. LAM width of 15) and LAM_57 (bits 62:57,
-> > i.e. LAM
-> > width of 6), controlled by these new bits: CR3[62] (LAM_U48),
-> > CR3[61]
-> > (LAM_U57), and CR4[28] (LAM_SUP).
-> > 
-> > * LAM_U48 and LAM_U57 bits controls LAM for user mode address. I.e.
-> > if
-> >    CR3.LAM_U57 = 1, LAM57 is applied; if CR3.LAM_U48 = 1 and
-> > CR3.LAM_U57 = 0,
-> >    LAM48 is applied.
-> > * LAM_SUP bit, combined with paging mode (4-level or 5-level),
-> > determines
-> >    LAM status for supervisor mode address. I.e. when CR4.LAM_SUP
-> > =1, 4-level
-> >    paging mode will have LAM48 for supervisor mode address while 5-
-> > level paging
-> >    will have LAM57.
-> > 
-> > Note:
-> > 1. LAM applies to only data address, not to instructions.
-> > 2. LAM identification of an address as user or supervisor is based
-> > solely on the
-> >     value of pointer bit 63 and does not, for the purposes of LAM,
-> > depend on the CPL.
-> > 3. For user mode address, it is possible that 5-level paging and
-> > LAM_U48 are both
-> >     set, in this case, the effective usable linear address width is
-> > 48, i.e. bit
-> >     56:47 is reserved by LAM. [2]
-> > 
-> > 
-> > ===LAM KVM Design===
-> > 
-> > Pass CR4.LAM_SUP under guest control.
-> > 
-> > Under EPT mode, CR3 is fully under guest control, guest LAM is thus
-> > transparent to
-> > KVM. Nothing more need to do.
-> > 
-> > For Shadow paging (EPT = off), KVM need to handle guest CR3.LAM_U48
-> > and CR3.LAM_U57
-> > toggles.
-> > 
-> > Patch 1 -- This patch can be mostly independent from LAM enabling.
-> > It just renames
-> >             CR4 reserved bits for better understanding, esp. for
-> > beginners.
-> > 	
-> > Patch 2, 9 -- Common part for both EPT and Shadow Paging modes
-> > enabling.
-> > 
-> > Patch 3 ~ 8 -- For Shadow Paging mode LAM enabling.
-> > 
-> > [1] ISE Chap10 https://cdrdv2.intel.com/v1/dl/getContent/671368
-> > (Section 10.6 VMX interaction)
-> > [2] Thus currently, Kernel enabling patch only enables LAM57 mode. 
-> > https://lore.kernel.org/lkml/20220815041803.17954-1-kirill.shutemov@linux.intel.com/
-> > 
-> > ---
-> > Changelog
-> > v2 --> v3:
-> > As LAM Kernel patches are in tip tree now, rebase to it.
-> > https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/
-> > 
-> > v1 --> v2:
-> > 1. Fixes i386-allyesconfig build error on get_pgd(), where
-> >     CR3_HIGH_RSVD_MASK isn't applicable.
-> >     (Reported-by: kernel test robot <lkp@intel.com>)
-> > 2. In kvm_set_cr3(), be conservative on skip tlb flush when only
-> > LAM bits
-> >     toggles. (Kirill)
-> > 
-> > Robert Hoo (9):
-> >    KVM: x86: Rename cr4_reserved/rsvd_* variables to be more
-> > readable
-> >    KVM: x86: Add CR4.LAM_SUP in guest owned bits
-> >    KVM: x86: MMU: Rename get_cr3() --> get_pgd() and clear high
-> > bits for
-> >      pgd
-> >    KVM: x86: MMU: Commets update
-> >    KVM: x86: MMU: Integrate LAM bits when build guest CR3
-> >    KVM: x86: Untag LAM bits when applicable
-> >    KVM: x86: When judging setting CR3 valid or not, consider LAM
-> > bits
-> >    KVM: x86: When guest set CR3, handle LAM bits semantics
-> >    KVM: x86: LAM: Expose LAM CPUID to user space VMM
-> > 
-> >   arch/x86/include/asm/kvm_host.h        |  7 ++--
-> >   arch/x86/include/asm/processor-flags.h |  1 +
-> >   arch/x86/kvm/cpuid.c                   |  6 +--
-> >   arch/x86/kvm/kvm_cache_regs.h          |  3 +-
-> >   arch/x86/kvm/mmu.h                     |  5 +++
-> >   arch/x86/kvm/mmu/mmu.c                 | 18 ++++++---
-> >   arch/x86/kvm/vmx/vmx.c                 |  8 +++-
-> >   arch/x86/kvm/x86.c                     | 51 ++++++++++++++++++++-
-> > -----
-> >   arch/x86/kvm/x86.h                     | 43
-> > +++++++++++++++++++++-
-> >   9 files changed, 115 insertions(+), 27 deletions(-)
-> > 
-> > 
-> > base-commit: a5dadcb601b4954c60494d797b4dd1e03a4b1ebe
-> 
-> It would be better if you can provide a URL link to easily reach
-> this 
-> base-commit.
 
-The URL of tip tree is in above change log.
-I'll move it here for easy association. Thanks.
+On 12/15/22 5:51 AM, Harald Freudenberger wrote:
+> On 2022-12-13 16:44, Tony Krowiak wrote:
+>> To eliminate the repeated calls to the PQAP(ZAPQ) function to verify 
+>> that
+>> a reset in progress completed successfully and ensure that error 
+>> response
+>> codes get appropriately logged, let's call the apq_reset_check() 
+>> function
+>> when the ZAPQ response code indicates that a reset that is already in
+>> progress.
+>>
+>> Signed-off-by: Tony Krowiak <akrowiak@linux.ibm.com>
+>> ---
+>>  drivers/s390/crypto/vfio_ap_ops.c | 24 +++++++++++++-----------
+>>  1 file changed, 13 insertions(+), 11 deletions(-)
+>>
+>> diff --git a/drivers/s390/crypto/vfio_ap_ops.c
+>> b/drivers/s390/crypto/vfio_ap_ops.c
+>> index a5530a46cf31..5bf2d93ae8af 100644
+>> --- a/drivers/s390/crypto/vfio_ap_ops.c
+>> +++ b/drivers/s390/crypto/vfio_ap_ops.c
+>> @@ -33,7 +33,7 @@
+>>  static int vfio_ap_mdev_reset_queues(struct ap_queue_table *qtable);
+>>  static struct vfio_ap_queue *vfio_ap_find_queue(int apqn);
+>>  static const struct vfio_device_ops vfio_ap_matrix_dev_ops;
+>> -static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q, unsigned
+>> int retry);
+>> +static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q);
+>>
+>>  /**
+>>   * get_update_locks_for_kvm: Acquire the locks required to 
+>> dynamically update a
+>> @@ -1632,8 +1632,7 @@ static int apq_reset_check(struct vfio_ap_queue 
+>> *q)
+>>      return ret;
+>>  }
+>>
+>> -static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q,
+>> -                    unsigned int retry)
+>> +static int vfio_ap_mdev_reset_queue(struct vfio_ap_queue *q)
+>>  {
+>>      struct ap_queue_status status;
+>>      int ret;
+>> @@ -1648,12 +1647,15 @@ static int vfio_ap_mdev_reset_queue(struct
+>> vfio_ap_queue *q,
+>>          ret = 0;
+>>          break;
+>>      case AP_RESPONSE_RESET_IN_PROGRESS:
+>> -        if (retry--) {
+>> -            msleep(20);
+>> -            goto retry_zapq;
+>> -        }
+>> -        ret = -EBUSY;
+>> -        break;
+>> +        /*
+>> +         * There is a reset issued by another process in progress. 
+>> Let's wait
+>> +         * for that to complete. Since we have no idea whether it 
+>> was a RAPQ or
+>> +         * ZAPQ, then if it completes successfully, let's issue the 
+>> ZAPQ.
+>> +         */
+>> +        ret = apq_reset_check(q);
+>> +        if (ret)
+>> +            break;
+>> +        goto retry_zapq;
+>>      case AP_RESPONSE_Q_NOT_AVAIL:
+>>      case AP_RESPONSE_DECONFIGURED:
+>>      case AP_RESPONSE_CHECKSTOPPED:
+>> @@ -1688,7 +1690,7 @@ static int vfio_ap_mdev_reset_queues(struct
+>> ap_queue_table *qtable)
+>>      struct vfio_ap_queue *q;
+>>
+>>      hash_for_each(qtable->queues, loop_cursor, q, mdev_qnode) {
+>> -        ret = vfio_ap_mdev_reset_queue(q, 1);
+>> +        ret = vfio_ap_mdev_reset_queue(q);
+>>          /*
+>>           * Regardless whether a queue turns out to be busy, or
+>>           * is not operational, we need to continue resetting
+>> @@ -1931,7 +1933,7 @@ void vfio_ap_mdev_remove_queue(struct ap_device 
+>> *apdev)
+>>          }
+>>      }
+>>
+>> -    vfio_ap_mdev_reset_queue(q, 1);
+>> +    vfio_ap_mdev_reset_queue(q);
+>>      dev_set_drvdata(&apdev->device, NULL);
+>>      kfree(q);
+>>      release_update_locks_for_mdev(matrix_mdev);
+>
+> Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
 
-> 
-> Thanks,
-> Jingqi
+
+Thanks for the review.
+
 
