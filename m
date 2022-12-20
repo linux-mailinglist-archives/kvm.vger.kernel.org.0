@@ -2,162 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20625651B60
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 08:16:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9B153651BA8
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 08:28:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233555AbiLTHQe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 02:16:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38586 "EHLO
+        id S232896AbiLTH2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 02:28:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233162AbiLTHQK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 02:16:10 -0500
-Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65554DEE4;
-        Mon, 19 Dec 2022 23:14:34 -0800 (PST)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mx.sberdevices.ru (Postfix) with ESMTP id 8E0DA5FD04;
-        Tue, 20 Dec 2022 10:14:31 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1671520471;
-        bh=Xd0BCVsrk3kr4gnn18tLqXU4C6sJACZPPguQzkRYYsQ=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=iqojmdwNrEmeYrvi74CKc0x6N9zAVTFnYnGI8wuwvjWJc8vKrQ4j1SRUqx5MGhSAj
-         pQASaU/+Hobep146+p32pbFyOzqFBl20T/Xyt6Eh30wzxL0k4CD056WAo0iL4DlYmS
-         dDp//rv77FxBmcJoPR8eUnRTcAghEy+hxt808vb/1Rc8wcTBiRcbXkQ1ZF7g1KsWoV
-         8AEtHEAhjj30KilkziU5cfqlOAjubBxBM0J3mGx2u9C/crndfE9IU5k/lL4LaqetOl
-         5vmix4rTISeBcnFOizJtdHGodboS2qxquQMHbOgEaFy/vjBprx0FUoCE4CtZITKme9
-         ME/gfMYrB9rhw==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mx.sberdevices.ru (Postfix) with ESMTP;
-        Tue, 20 Dec 2022 10:14:28 +0300 (MSK)
-From:   Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-To:     Stefano Garzarella <sgarzare@redhat.com>
-CC:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
+        with ESMTP id S233506AbiLTH17 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 02:27:59 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61042120B6;
+        Mon, 19 Dec 2022 23:27:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1671521220; x=1703057220;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=c7MFanM5OsQxf4mfVMxJdtJD6xfrjMgUk4/0Zk73muk=;
+  b=diQ/TTC4A/f0m3ip6hLGojkoKtLi1yb+0prGnGDiqcK0tG3ov2K3kDcX
+   jDVl1uj0ZpchIffz/L8jjz8ZWqs11AW66NO3YuEZ/8gI9Z0aIzgKbHD7R
+   hn+zzznAoF7u6IPp8uaC9ejjRz+ohaBy+PHB9fToL6oNo/7ywztCd2Bjf
+   scTJgKSLdnrI5QQul4tv/Hu/EL1zV/rfJch0LZq+FIIxKXiSeEBXHJ9YT
+   dPApISjd4ejTcZibrseEFNAyr6bhP8Id+lOdw2jBLQbtg5Kd0lMMG4jyj
+   yTjzNTVUdmUW/MxNKza3/GkRbh/V4MEK9zejFlGcAUXN+Cp+BbobD+3im
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="317184648"
+X-IronPort-AV: E=Sophos;i="5.96,258,1665471600"; 
+   d="scan'208";a="317184648"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 23:26:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="714332739"
+X-IronPort-AV: E=Sophos;i="5.96,258,1665471600"; 
+   d="scan'208";a="714332739"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by fmsmga008.fm.intel.com with ESMTP; 19 Dec 2022 23:26:44 -0800
+Date:   Tue, 20 Dec 2022 15:22:28 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>,
-        Krasnov Arseniy <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v1 0/2] virtio/vsock: fix mutual rx/tx hungup
-Thread-Topic: [RFC PATCH v1 0/2] virtio/vsock: fix mutual rx/tx hungup
-Thread-Index: AQHZEk+jG/1mxrs/wUyXm0IW7LxCR651KceAgAEEOAA=
-Date:   Tue, 20 Dec 2022 07:14:27 +0000
-Message-ID: <2bc5a0c0-5fb7-9d0e-bd45-879e42c1ea50@sberdevices.ru>
-References: <39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru>
- <CAGxU2F4ca5pxW3RX4wzsTx3KRBtxLK_rO9KxPgUtqcaSNsqXCA@mail.gmail.com>
-In-Reply-To: <CAGxU2F4ca5pxW3RX4wzsTx3KRBtxLK_rO9KxPgUtqcaSNsqXCA@mail.gmail.com>
-Accept-Language: en-US, ru-RU
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <DE922E7A59E7144B9A68546850E08FC1@sberdevices.ru>
-Content-Transfer-Encoding: base64
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "Lutomirski, Andy" <luto@kernel.org>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "tabba@google.com" <tabba@google.com>,
+        "Hocko, Michal" <mhocko@suse.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "dhildenb@redhat.com" <dhildenb@redhat.com>,
+        "bfields@fieldses.org" <bfields@fieldses.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
+        "vannapurve@google.com" <vannapurve@google.com>,
+        "rppt@kernel.org" <rppt@kernel.org>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        "qperret@google.com" <qperret@google.com>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "ddutile@redhat.com" <ddutile@redhat.com>,
+        "naoya.horiguchi@nec.com" <naoya.horiguchi@nec.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
+        "hughd@google.com" <hughd@google.com>,
+        "aarcange@redhat.com" <aarcange@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "steven.price@arm.com" <steven.price@arm.com>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "linmiaohe@huawei.com" <linmiaohe@huawei.com>
+Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
+ create restricted user memory
+Message-ID: <20221220072228.GA1724933@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
+ <5c6e2e516f19b0a030eae9bf073d555c57ca1f21.camel@intel.com>
+ <20221219075313.GB1691829@chaop.bj.intel.com>
+ <deba096c85e41c3a15d122f2159986a74b16770f.camel@intel.com>
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/12/20 03:38:00 #20687629
-X-KSMG-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <deba096c85e41c3a15d122f2159986a74b16770f.camel@intel.com>
+X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gMTkuMTIuMjAyMiAxODo0MSwgU3RlZmFubyBHYXJ6YXJlbGxhIHdyb3RlOg0KDQpIZWxsbyEN
-Cg0KPiBIaSBBcnNlbml5LA0KPiANCj4gT24gU2F0LCBEZWMgMTcsIDIwMjIgYXQgODo0MiBQTSBB
-cnNlbml5IEtyYXNub3YgPEFWS3Jhc25vdkBzYmVyZGV2aWNlcy5ydT4gd3JvdGU6DQo+Pg0KPj4g
-SGVsbG8sDQo+Pg0KPj4gc2VlbXMgSSBmb3VuZCBzdHJhbmdlIHRoaW5nKG1heSBiZSBhIGJ1Zykg
-d2hlcmUgc2VuZGVyKCd0eCcgbGF0ZXIpIGFuZA0KPj4gcmVjZWl2ZXIoJ3J4JyBsYXRlcikgY291
-bGQgc3R1Y2sgZm9yZXZlci4gUG90ZW50aWFsIGZpeCBpcyBpbiB0aGUgZmlyc3QNCj4+IHBhdGNo
-LCBzZWNvbmQgcGF0Y2ggY29udGFpbnMgcmVwcm9kdWNlciwgYmFzZWQgb24gdnNvY2sgdGVzdCBz
-dWl0ZS4NCj4+IFJlcHJvZHVjZXIgaXMgc2ltcGxlOiB0eCBqdXN0IHNlbmRzIGRhdGEgdG8gcngg
-YnkgJ3dyaXRlKCkgc3lzY2FsbCwgcngNCj4+IGRlcXVldWVzIGl0IHVzaW5nICdyZWFkKCknIHN5
-c2NhbGwgYW5kIHVzZXMgJ3BvbGwoKScgZm9yIHdhaXRpbmcuIEkgcnVuDQo+PiBzZXJ2ZXIgaW4g
-aG9zdCBhbmQgY2xpZW50IGluIGd1ZXN0Lg0KPj4NCj4+IHJ4IHNpZGUgcGFyYW1zOg0KPj4gMSkg
-U09fVk1fU09DS0VUU19CVUZGRVJfU0laRSBpcyAyNTZLYihlLmcuIGRlZmF1bHQpLg0KPj4gMikg
-U09fUkNWTE9XQVQgaXMgMTI4S2IuDQo+Pg0KPj4gV2hhdCBoYXBwZW5zIGluIHRoZSByZXByb2R1
-Y2VyIHN0ZXAgYnkgc3RlcDoNCj4+DQo+IA0KPiBJIHB1dCB0aGUgdmFsdWVzIG9mIHRoZSB2YXJp
-YWJsZXMgaW52b2x2ZWQgdG8gZmFjaWxpdGF0ZSB1bmRlcnN0YW5kaW5nOg0KPiANCj4gUlg6IGJ1
-Zl9hbGxvYyA9IDI1NiBLQjsgZndkX2NudCA9IDA7IGxhc3RfZndkX2NudCA9IDA7DQo+ICAgICBm
-cmVlX3NwYWNlID0gYnVmX2FsbG9jIC0gKGZ3ZF9jbnQgLSBsYXN0X2Z3ZF9jbnQpID0gMjU2IEtC
-DQo+IA0KPiBUaGUgY3JlZGl0IHVwZGF0ZSBpcyBzZW50IGlmDQo+IGZyZWVfc3BhY2UgPCBWSVJU
-SU9fVlNPQ0tfTUFYX1BLVF9CVUZfU0laRSBbNjQgS0JdDQo+IA0KPj4gMSkgdHggdHJpZXMgdG8g
-c2VuZCAyNTZLYiArIDEgYnl0ZSAoaW4gYSBzaW5nbGUgJ3dyaXRlKCknKQ0KPj4gMikgdHggc2Vu
-ZHMgMjU2S2IsIGRhdGEgcmVhY2hlcyByeCAocnhfYnl0ZXMgPT0gMjU2S2IpDQo+PiAzKSB0eCB3
-YWl0cyBmb3Igc3BhY2UgaW4gJ3dyaXRlKCknIHRvIHNlbmQgbGFzdCAxIGJ5dGUNCj4+IDQpIHJ4
-IGRvZXMgcG9sbCgpLCAocnhfYnl0ZXMgPj0gcmN2bG93YXQpIDI1NktiID49IDEyOEtiLCBQT0xM
-SU4gaXMgc2V0DQo+PiA1KSByeCByZWFkcyA2NEtiLCBjcmVkaXQgdXBkYXRlIGlzIG5vdCBzZW50
-IGR1ZSB0byAqDQo+IA0KPiBSWDogYnVmX2FsbG9jID0gMjU2IEtCOyBmd2RfY250ID0gNjQgS0I7
-IGxhc3RfZndkX2NudCA9IDA7DQo+ICAgICBmcmVlX3NwYWNlID0gMTkyIEtCDQo+IA0KPj4gNikg
-cnggZG9lcyBwb2xsKCksIChyeF9ieXRlcyA+PSByY3Zsb3dhdCkgMTkyS2IgPj0gMTI4S2IsIFBP
-TExJTiBpcyBzZXQNCj4+IDcpIHJ4IHJlYWRzIDY0S2IsIGNyZWRpdCB1cGRhdGUgaXMgbm90IHNl
-bnQgZHVlIHRvICoNCj4gDQo+IFJYOiBidWZfYWxsb2MgPSAyNTYgS0I7IGZ3ZF9jbnQgPSAxMjgg
-S0I7IGxhc3RfZndkX2NudCA9IDA7DQo+ICAgICBmcmVlX3NwYWNlID0gMTI4IEtCDQo+IA0KPj4g
-OCkgcnggZG9lcyBwb2xsKCksIChyeF9ieXRlcyA+PSByY3Zsb3dhdCkgMTI4S2IgPj0gMTI4S2Is
-IFBPTExJTiBpcyBzZXQNCj4+IDkpIHJ4IHJlYWRzIDY0S2IsIGNyZWRpdCB1cGRhdGUgaXMgbm90
-IHNlbnQgZHVlIHRvICoNCj4gDQo+IFJpZ2h0LCAoZnJlZV9zcGFjZSA8IFZJUlRJT19WU09DS19N
-QVhfUEtUX0JVRl9TSVpFKSBpcyBzdGlsbCBmYWxzZS4NCj4gDQo+IFJYOiBidWZfYWxsb2MgPSAy
-NTYgS0I7IGZ3ZF9jbnQgPSAxOTYgS0I7IGxhc3RfZndkX2NudCA9IDA7DQo+ICAgICBmcmVlX3Nw
-YWNlID0gNjQgS0INCj4gDQo+PiAxMCkgcnggZG9lcyBwb2xsKCksIChyeF9ieXRlcyA8IHJjdmxv
-d2F0KSA2NEtiIDwgMTI4S2IsIHJ4IHdhaXRzIGluIHBvbGwoKQ0KPiANCj4gSSBhZ3JlZSB0aGF0
-IHRoZSBUWCBpcyBzdHVjayBiZWNhdXNlIHdlIGFyZSBub3Qgc2VuZGluZyB0aGUgY3JlZGl0IA0K
-PiB1cGRhdGUsIGJ1dCBhbHNvIGlmIFJYIHNlbmRzIHRoZSBjcmVkaXQgdXBkYXRlIGF0IHN0ZXAg
-OSwgUlggd29uJ3QgYmUgDQo+IHdva2VuIHVwIGF0IHN0ZXAgMTAsIHJpZ2h0Pw0KDQpZZXMsIFJY
-IHdpbGwgc2xlZXAsIGJ1dCBUWCB3aWxsIHdha2UgdXAgYW5kIGFzIHdlIGluZm9ybSBUWCBob3cg
-bXVjaA0KZnJlZSBzcGFjZSB3ZSBoYXZlLCBub3cgdGhlcmUgYXJlIHR3byBjYXNlcyBmb3IgVFg6
-DQoxKSBzZW5kICJzbWFsbCIgcmVzdCBvZiBkYXRhKGUuZy4gd2l0aG91dCBibG9ja2luZyBhZ2Fp
-biksIGxlYXZlICd3cml0ZSgpJw0KICAgYW5kIGNvbnRpbnVlIGV4ZWN1dGlvbi4gUlggc3RpbGwg
-d2FpdHMgaW4gJ3BvbGwoKScuIExhdGVyIFRYIHdpbGwNCiAgIHNlbmQgZW5vdWdoIGRhdGEgdG8g
-d2FrZSB1cCBSWC4NCjIpIHNlbmQgImJpZyIgcmVzdCBvZiBkYXRhIC0gaWYgcmVzdCBpcyB0b28g
-YmlnIHRvIGxlYXZlICd3cml0ZSgpJyBhbmQgVFgNCiAgIHdpbGwgd2FpdCBhZ2FpbiBmb3IgdGhl
-IGZyZWUgc3BhY2UgLSBpdCB3aWxsIGJlIGFibGUgdG8gc2VuZCBlbm91Z2ggZGF0YQ0KICAgdG8g
-d2FrZSB1cCBSWCBhcyB3ZSBjb21wYXJlZCAncnhfYnl0ZXMnIHdpdGggcmN2bG93YXQgdmFsdWUg
-aW4gUlguDQo+IA0KPj4NCj4+ICogaXMgb3B0aW1pemF0aW9uIGluICd2aXJ0aW9fdHJhbnNwb3J0
-X3N0cmVhbV9kb19kZXF1ZXVlKCknIHdoaWNoDQo+PiAgIHNlbmRzIE9QX0NSRURJVF9VUERBVEUg
-b25seSB3aGVuIHdlIGhhdmUgbm90IHRvbyBtdWNoIHNwYWNlIC0NCj4+ICAgbGVzcyB0aGFuIFZJ
-UlRJT19WU09DS19NQVhfUEtUX0JVRl9TSVpFLg0KPj4NCj4+IE5vdyB0eCBzaWRlIHdhaXRzIGZv
-ciBzcGFjZSBpbnNpZGUgd3JpdGUoKSBhbmQgcnggd2FpdHMgaW4gcG9sbCgpIGZvcg0KPj4gJ3J4
-X2J5dGVzJyB0byByZWFjaCBTT19SQ1ZMT1dBVCB2YWx1ZS4gQm90aCBzaWRlcyB3aWxsIHdhaXQg
-Zm9yZXZlci4gSQ0KPj4gdGhpbmssIHBvc3NpYmxlIGZpeCBpcyB0byBzZW5kIGNyZWRpdCB1cGRh
-dGUgbm90IG9ubHkgd2hlbiB3ZSBoYXZlIHRvbw0KPj4gc21hbGwgc3BhY2UsIGJ1dCBhbHNvIHdo
-ZW4gbnVtYmVyIG9mIGJ5dGVzIGluIHJlY2VpdmUgcXVldWUgaXMgc21hbGxlcg0KPj4gdGhhbiBT
-T19SQ1ZMT1dBVCB0aHVzIG5vdCBlbm91Z2ggdG8gd2FrZSB1cCBzbGVlcGluZyByZWFkZXIuIEkn
-bSBub3QNCj4+IHN1cmUgYWJvdXQgY29ycmVjdG5lc3Mgb2YgdGhpcyBpZGVhLCBidXQgYW55d2F5
-IC0gSSB0aGluayB0aGF0IHByb2JsZW0NCj4+IGFib3ZlIGV4aXN0cy4gV2hhdCBkbyBZb3UgdGhp
-bms/DQo+IA0KPiBJJ20gbm90IHN1cmUsIEkgaGF2ZSB0byB0aGluayBtb3JlIGFib3V0IGl0LCBi
-dXQgaWYgUlggcmVhZHMgbGVzcyB0aGFuIA0KPiBTT19SQ1ZMT1dBVCwgSSBleHBlY3QgaXQncyBu
-b3JtYWwgdG8gZ2V0IHRvIGEgY2FzZSBvZiBzdHVjay4NCj4gDQo+IEluIHRoaXMgY2FzZSB3ZSBh
-cmUgb25seSB1bnN0dWNraW5nIFRYLCBidXQgZXZlbiBpZiBpdCBzZW5kcyB0aGF0IHNpbmdsZSAN
-Cj4gYnl0ZSwgUlggaXMgc3RpbGwgc3R1Y2sgYW5kIG5vdCBjb25zdW1pbmcgaXQsIHNvIGl0IHdh
-cyB1c2VsZXNzIHRvIHdha2UgDQo+IHVwIFRYIGlmIFJYIHdvbid0IGNvbnN1bWUgaXQgYW55d2F5
-LCByaWdodD8NCg0KMSkgSSB0aGluayBpdCBpcyBub3QgdXNlbGVzcywgYmVjYXVzZSB3ZSBpbmZv
-cm0obm90IGp1c3Qgd2FrZSB1cCkgVFggdGhhdA0KdGhlcmUgaXMgZnJlZSBzcGFjZSBhdCBSWCBz
-aWRlIC0gYXMgaSBtZW50aW9uZWQgYWJvdmUuDQoyKSBBbnl3YXkgaSB0aGluayB0aGF0IHRoaXMg
-c2l0dWF0aW9uIGlzIGEgbGl0dGxlIGJpdCBzdHJhbmdlOiBUWCB0aGlua3MgdGhhdA0KdGhlcmUg
-aXMgbm8gZnJlZSBzcGFjZSBhdCBSWCBhbmQgd2FpdHMgZm9yIGl0LCBidXQgdGhlcmUgaXMgZnJl
-ZSBzcGFjZSBhdCBSWCENCkF0IHRoZSBzYW1lIHRpbWUsIFJYIHdhaXRzIGluIHBvbGwoKSBmb3Jl
-dmVyIC0gaXQgaXMgcmVhZHkgdG8gZ2V0IG5ldyBwb3J0aW9uDQpvZiBkYXRhIHRvIHJldHVybiBQ
-T0xMSU4sIGJ1dCBUWCAidGhpbmtzIiBleGFjdGx5IG9wcG9zaXRlIHRoaW5nIC0gUlggaXMgZnVs
-bA0Kb2YgZGF0YS4gT2YgY291cnNlLCBpZiB0aGVyZSB3aWxsIGJlIGp1c3Qgc3RhbGxzIGluIFRY
-IGRhdGEgaGFuZGxpbmcgLSBpdCB3aWxsDQpiZSBvayAtIGp1c3QgcGVyZm9ybWFuY2UgZGVncmFk
-YXRpb24sIGJ1dCBUWCBzdHVja3MgZm9yZXZlci4NCg0KPiANCj4gSWYgUlggd29rZSB1cCAoZS5n
-LiBTT19SQ1ZMT1dBVCA9IDY0S0IpIGFuZCByZWFkIHRoZSByZW1haW5pbmcgNjRLQiwgDQo+IHRo
-ZW4gaXQgd291bGQgc3RpbGwgc2VuZCB0aGUgY3JlZGl0IHVwZGF0ZSBldmVuIHdpdGhvdXQgdGhp
-cyBwYXRjaCBhbmQgDQo+IFRYIHdpbGwgc2VuZCB0aGUgMSBieXRlLg0KDQpCdXQgaG93IFJYIHdp
-bGwgd2FrZSB1cCBpbiB0aGlzIGNhc2U/IEUuZy4gaXQgY2FsbHMgcG9sbCgpIHdpdGhvdXQgdGlt
-ZW91dCwNCmNvbm5lY3Rpb24gaXMgZXN0YWJsaXNoZWQsIFJYIGlnbm9yZXMgc2lnbmFsDQoNClRo
-YW5rcywgQXJzZW5peQ0KPiANCj4gVGhhbmtzLA0KPiBTdGVmYW5vDQo+IA0KDQo=
+On Mon, Dec 19, 2022 at 08:48:10AM +0000, Huang, Kai wrote:
+> On Mon, 2022-12-19 at 15:53 +0800, Chao Peng wrote:
+> > > 
+> > > [...]
+> > > 
+> > > > +
+> > > > +	/*
+> > > > +	 * These pages are currently unmovable so don't place them into
+> > > > movable
+> > > > +	 * pageblocks (e.g. CMA and ZONE_MOVABLE).
+> > > > +	 */
+> > > > +	mapping = memfd->f_mapping;
+> > > > +	mapping_set_unevictable(mapping);
+> > > > +	mapping_set_gfp_mask(mapping,
+> > > > +			     mapping_gfp_mask(mapping) & ~__GFP_MOVABLE);
+> > > 
+> > > But, IIUC removing __GFP_MOVABLE flag here only makes page allocation from
+> > > non-
+> > > movable zones, but doesn't necessarily prevent page from being migrated.  My
+> > > first glance is you need to implement either a_ops->migrate_folio() or just
+> > > get_page() after faulting in the page to prevent.
+> > 
+> > The current api restrictedmem_get_page() already does this, after the
+> > caller calling it, it holds a reference to the page. The caller then
+> > decides when to call put_page() appropriately.
+> 
+> I tried to dig some history. Perhaps I am missing something, but it seems Kirill
+> said in v9 that this code doesn't prevent page migration, and we need to
+> increase page refcount in restrictedmem_get_page():
+> 
+> https://lore.kernel.org/linux-mm/20221129112139.usp6dqhbih47qpjl@box.shutemov.name/
+> 
+> But looking at this series it seems restrictedmem_get_page() in this v10 is
+> identical to the one in v9 (except v10 uses 'folio' instead of 'page')?
+
+restrictedmem_get_page() increases page refcount several versions ago so
+no change in v10 is needed. You probably missed my reply:
+
+https://lore.kernel.org/linux-mm/20221129135844.GA902164@chaop.bj.intel.com/
+
+The current solution is clear: unless we have better approach, we will
+let restrictedmem user (KVM in this case) to hold the refcount to
+prevent page migration.
+
+Thanks,
+Chao
+> 
+> Anyway if this is not fixed, then it should be fixed.  Otherwise, a comment at
+> the place where page refcount is increased will be helpful to help people
+> understand page migration is actually prevented.
+> 
