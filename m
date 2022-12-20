@@ -2,51 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C2310651B33
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 08:02:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 988D7651B3A
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 08:03:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233545AbiLTHCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 02:02:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53336 "EHLO
+        id S233576AbiLTHDA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 02:03:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232887AbiLTHBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233293AbiLTHBo (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 20 Dec 2022 02:01:44 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0B8F15FDF;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1B1B15FFB;
         Mon, 19 Dec 2022 23:01:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1671519700; x=1703055700;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=cFa67ljZDOj6B4hnKmSyOvFw/+uBlbUZju1/l5Toj94=;
-  b=bssOtzC1EihsWMNGwXyi8KsQIb6P94dulS/RQW2o/Hu3Ei3wZpXo3uUz
-   BR3lzhuL3u+3YdCULK/GcQ6GGLxGGGq+hOD4aKzABEas9Nd5YUZE3kztV
-   XUo5TScwIQ8Wlrzmtg1mSNzgS07safNFvOZ7lAaPnVYryvS9FmZq/lMfF
-   9XfUbSVJUloTIJ14MlBRAGTny/4c5zSkk4JEYRYFM5zinB4tUN9AegAKz
-   yUg2mgnWZZ/6xfo7Qwc4pLw8ipQ/LJ8wIVjmVi3WFCA4saaPVlVSdXSmq
-   d3mI/2TE4XyDKjh5PqsZprm+Ws4wSjhNCLfIWqaBwB+KRGLvaGDq1XZG4
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="302972128"
+  bh=JKAIJtKpEV0pDtyUyzmPScPoDyIj7KB0n/KR4J5yOTE=;
+  b=lxSZZffo6R2IVG4O66/yYyCQDH/75enSFundJ+3UDvT3CGtyDDogOvYO
+   zNPFQE96TlkBVEN0xdWuV/zA9dS/kqzS3NPeSLAzhvEGm279K6fJlL6qI
+   i5GF6fS+3UCiGEOVN2iG2YA+ZTRatjZQJwfqpJLh3VqUc9/TVdhbdGpwj
+   ditvax7jv5oWk8b+7KXshFgF8I2O3A3Q0rqMz4+/4rxR1WsAFH4LluMr/
+   ekhfinBM2KUM/aX5qtCGv41Ikg5fCJ8/knfsPe3rQmvYbOraVZxRtYR44
+   GCN+PloMttvehJWkpc/WhKO+S1ESphp7LiQbs3ydXhVZuYDAOoAwVpoem
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="302972137"
 X-IronPort-AV: E=Sophos;i="5.96,258,1665471600"; 
-   d="scan'208";a="302972128"
+   d="scan'208";a="302972137"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 23:01:18 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="644326530"
+X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="644326537"
 X-IronPort-AV: E=Sophos;i="5.96,258,1665471600"; 
-   d="scan'208";a="644326530"
+   d="scan'208";a="644326537"
 Received: from unknown (HELO fred..) ([172.25.112.68])
-  by orsmga007.jf.intel.com with ESMTP; 19 Dec 2022 23:01:17 -0800
+  by orsmga007.jf.intel.com with ESMTP; 19 Dec 2022 23:01:18 -0800
 From:   Xin Li <xin3.li@intel.com>
 To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org
 Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [RFC PATCH 25/32] x86/fred: disallow the swapgs instruction when FRED is enabled
-Date:   Mon, 19 Dec 2022 22:36:51 -0800
-Message-Id: <20221220063658.19271-26-xin3.li@intel.com>
+Subject: [RFC PATCH 26/32] x86/fred: no ESPFIX needed when FRED is enabled
+Date:   Mon, 19 Dec 2022 22:36:52 -0800
+Message-Id: <20221220063658.19271-27-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221220063658.19271-1-xin3.li@intel.com>
 References: <20221220063658.19271-1-xin3.li@intel.com>
@@ -63,44 +63,41 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-The FRED architecture establishes the full supervisor/user through:
-1) FRED event delivery swaps the value of the GS base address and
-   that of the IA32_KERNEL_GS_BASE MSR.
-2) ERETU swaps the value of the GS base address and that of the
-   IA32_KERNEL_GS_BASE MSR.
-Thus, the swapgs instruction is disallowed when FRED is enabled,
-otherwise it cauess #UD.
+Because FRED always restores the full value of %rsp, ESPFIX is
+no longer needed when it's enabled.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/kernel/process_64.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ arch/x86/kernel/espfix_64.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
-index bfe6179b7a17..5b6cfd2ca630 100644
---- a/arch/x86/kernel/process_64.c
-+++ b/arch/x86/kernel/process_64.c
-@@ -165,7 +165,8 @@ static noinstr unsigned long __rdgsbase_inactive(void)
+diff --git a/arch/x86/kernel/espfix_64.c b/arch/x86/kernel/espfix_64.c
+index 9417d5aa7305..b594fcc0a4b7 100644
+--- a/arch/x86/kernel/espfix_64.c
++++ b/arch/x86/kernel/espfix_64.c
+@@ -116,6 +116,10 @@ void __init init_espfix_bsp(void)
+ 	pgd_t *pgd;
+ 	p4d_t *p4d;
  
- 	lockdep_assert_irqs_disabled();
++	/* FRED systems don't need ESPFIX */
++	if (cpu_feature_enabled(X86_FEATURE_FRED))
++		return;
++
+ 	/* Install the espfix pud into the kernel page directory */
+ 	pgd = &init_top_pgt[pgd_index(ESPFIX_BASE_ADDR)];
+ 	p4d = p4d_alloc(&init_mm, pgd, ESPFIX_BASE_ADDR);
+@@ -139,6 +143,10 @@ void init_espfix_ap(int cpu)
+ 	void *stack_page;
+ 	pteval_t ptemask;
  
--	if (!static_cpu_has(X86_FEATURE_XENPV)) {
-+	if (!cpu_feature_enabled(X86_FEATURE_FRED) &&
-+	    !static_cpu_has(X86_FEATURE_XENPV)) {
- 		native_swapgs();
- 		gsbase = rdgsbase();
- 		native_swapgs();
-@@ -190,7 +191,8 @@ static noinstr void __wrgsbase_inactive(unsigned long gsbase)
- {
- 	lockdep_assert_irqs_disabled();
- 
--	if (!static_cpu_has(X86_FEATURE_XENPV)) {
-+	if (!cpu_feature_enabled(X86_FEATURE_FRED) &&
-+	    !static_cpu_has(X86_FEATURE_XENPV)) {
- 		native_swapgs();
- 		wrgsbase(gsbase);
- 		native_swapgs();
++	/* FRED systems don't need ESPFIX */
++	if (cpu_feature_enabled(X86_FEATURE_FRED))
++		return;
++
+ 	/* We only have to do this once... */
+ 	if (likely(per_cpu(espfix_stack, cpu)))
+ 		return;		/* Already initialized */
 -- 
 2.34.1
 
