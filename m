@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 826F865253F
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 18:10:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4FD3D652549
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 18:11:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234120AbiLTRK4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 12:10:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52062 "EHLO
+        id S233434AbiLTRLN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 12:11:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234036AbiLTRKj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 12:10:39 -0500
+        with ESMTP id S233996AbiLTRKm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 12:10:42 -0500
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A55763D1;
-        Tue, 20 Dec 2022 09:10:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3B06300;
+        Tue, 20 Dec 2022 09:10:41 -0800 (PST)
 Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKGrlgF011848;
-        Tue, 20 Dec 2022 17:10:38 GMT
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKGrkv6011643;
+        Tue, 20 Dec 2022 17:10:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=X2baz4aYirGZzn8Tjagt+jxYT6ZsFiOiEn/E1+WlobQ=;
- b=YSeL82qqjqIbbuC/nWC/gIb8lZPh4sQt57BZTH0AoZi8WYT8Z4t4GeEAW2//gDjGI31X
- RsD7653CxVFGIhsWiVrEBebEe4IErUYRz0zVZ6KSW3z6QmqYHJ45Fa996GSkYv93pO/c
- HvOnSeUjn/TsF8F97wnLzjpPwd15fL7St/rRc+PytaLMBW0C/R1CC+SMMciF+Co0o06T
- FW9vqJyU0usdaWokiT9Q8aeuxPSt0GAogVYo7z6ldf7RtHof/iKZZxJvtPT0/FWe2iht
- tGTnMxE+ZQpNI2qzZd0WAds93SnQZgDaKtk1+z4jeV+S4yIc1n1jzYTInXM7CxgYUgVP dg== 
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkgyp170k-1
+ bh=IbzD+v2I/BlX64RNSBJ+jwrZm9kzjWYTmHxcLoMGx74=;
+ b=VYfqtthtQ+bXy6mJyp1agLNuJGd0nLp+5EeaCI+44LNXWuV8TO1BnB6wZjedAUx3UcLA
+ bDjWZEMKYs/JUrBrLRjzajlIusAEbhFfUiA2+tmE30saXWffKB7hfXVxTU09PAykZz01
+ 9ET2gADHgCQ9oxfFgZO39KOy4SU0FsGwFblhKMdnkFyc+yuyZYroGHqylhTGJukSJJTD
+ cEpGn8rkZVnkjmFxKLi4XqC9lCDHqI2wED8EBMvyGJJ4k5r30LSbMWXJIn3Hnc6ljAXi
+ EWTNXFiT/QimHjzkMt/65rQeWr2EZB6BPFKe2X/iCqSr5U/qAAF1uD8OsuejhIFv9qn3 zg== 
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkgyp1716-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Dec 2022 17:10:37 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKGXX7b016895;
-        Tue, 20 Dec 2022 17:10:13 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3mh6yw34h3-1
+        Tue, 20 Dec 2022 17:10:39 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BK7b15L014065;
+        Tue, 20 Dec 2022 17:10:14 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3mh6yw4axm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 20 Dec 2022 17:10:13 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BKHAAi742074400
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BKHAA1T20119808
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 20 Dec 2022 17:10:10 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 19CE62004B;
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 610922004F;
         Tue, 20 Dec 2022 17:10:10 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 113122004E;
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 47EFB20043;
         Tue, 20 Dec 2022 17:10:10 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
         Tue, 20 Dec 2022 17:10:10 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id A1D3BE08FD; Tue, 20 Dec 2022 18:10:09 +0100 (CET)
+        id A4AECE08FE; Tue, 20 Dec 2022 18:10:09 +0100 (CET)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Matthew Rosato <mjrosato@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>
@@ -64,17 +64,17 @@ Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Peter Oberparleiter <oberpar@linux.ibm.com>,
         linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v2 14/16] vfio/ccw: handle a guest Format-1 IDAL
-Date:   Tue, 20 Dec 2022 18:10:06 +0100
-Message-Id: <20221220171008.1362680-15-farman@linux.ibm.com>
+Subject: [PATCH v2 15/16] vfio/ccw: don't group contiguous pages on 2K IDAWs
+Date:   Tue, 20 Dec 2022 18:10:07 +0100
+Message-Id: <20221220171008.1362680-16-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221220171008.1362680-1-farman@linux.ibm.com>
 References: <20221220171008.1362680-1-farman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: BXvIcwkpBwH1apNTg1azUbHulP2DV4Fm
-X-Proofpoint-ORIG-GUID: BXvIcwkpBwH1apNTg1azUbHulP2DV4Fm
+X-Proofpoint-GUID: vA18dqw7PEs1lfxh82ZiGoskjSr-clHH
+X-Proofpoint-ORIG-GUID: vA18dqw7PEs1lfxh82ZiGoskjSr-clHH
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-20_06,2022-12-20_01,2022-06-22_01
@@ -92,101 +92,126 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are two scenarios that need to be addressed here.
+The vfio_pin_pages() interface allows contiguous pages to be
+pinned as a single request, which is great for the 4K pages
+that are normally processed. Old IDA formats operate on 2K
+chunks, which makes this logic more difficult.
 
-First, an ORB that does NOT have the Format-2 IDAL bit set could
-have both a direct-addressed CCW and an indirect-data-address CCW
-chained together. This means that the IDA CCW will contain a
-Format-1 IDAL, and can be easily converted to a 2K Format-2 IDAL.
-But it also means that the direct-addressed CCW needs to be
-converted to the same 2K Format-2 IDAL for consistency with the
-ORB settings.
-
-Secondly, a Format-1 IDAL is comprised of 31-bit addresses.
-Thus, we need to cast this IDAL to a pointer of ints while
-populating the list of addresses that are sent to vfio.
-
-Since the result of both of these is the use of the 2K IDAL
-variants, and the output of vfio-ccw is always a Format-2 IDAL
-(in order to use 64-bit addresses), make sure that the correct
-control bit gets set in the ORB when these scenarios occur.
+Since these formats are rare, let's just invoke the page
+pinning one-at-a-time, instead of trying to group them.
+We can rework this code at a later date if needed.
 
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
 Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- drivers/s390/cio/vfio_ccw_cp.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+ drivers/s390/cio/vfio_ccw_cp.c | 30 ++++++++++++++++++++----------
+ 1 file changed, 20 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index 477835b5e5b8..52e5abce5827 100644
+index 52e5abce5827..098d1e9f0c97 100644
 --- a/drivers/s390/cio/vfio_ccw_cp.c
 +++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -222,6 +222,8 @@ static void convert_ccw0_to_ccw1(struct ccw1 *source, unsigned long len)
- 	}
+@@ -83,12 +83,13 @@ static int page_array_alloc(struct page_array *pa, unsigned int len)
+  * @pa: page_array on which to perform the operation
+  * @vdev: the vfio device to perform the operation
+  * @pa_nr: number of user pages to unpin
++ * @unaligned: were pages unaligned on the pin request
+  *
+  * Only unpin if any pages were pinned to begin with, i.e. pa_nr > 0,
+  * otherwise only clear pa->pa_nr
+  */
+ static void page_array_unpin(struct page_array *pa,
+-			     struct vfio_device *vdev, int pa_nr)
++			     struct vfio_device *vdev, int pa_nr, bool unaligned)
+ {
+ 	int unpinned = 0, npage = 1;
+ 
+@@ -97,7 +98,8 @@ static void page_array_unpin(struct page_array *pa,
+ 		dma_addr_t *last = &first[npage];
+ 
+ 		if (unpinned + npage < pa_nr &&
+-		    *first + npage * PAGE_SIZE == *last) {
++		    *first + npage * PAGE_SIZE == *last &&
++		    !unaligned) {
+ 			npage++;
+ 			continue;
+ 		}
+@@ -114,12 +116,19 @@ static void page_array_unpin(struct page_array *pa,
+  * page_array_pin() - Pin user pages in memory
+  * @pa: page_array on which to perform the operation
+  * @vdev: the vfio device to perform pin operations
++ * @unaligned: are pages aligned to 4K boundary?
+  *
+  * Returns number of pages pinned upon success.
+  * If the pin request partially succeeds, or fails completely,
+  * all pages are left unpinned and a negative error value is returned.
++ *
++ * Requests to pin "aligned" pages can be coalesced into a single
++ * vfio_pin_pages request for the sake of efficiency, based on the
++ * expectation of 4K page requests. Unaligned requests are probably
++ * dealing with 2K "pages", and cannot be coalesced without
++ * reworking this logic to incorporate that math.
+  */
+-static int page_array_pin(struct page_array *pa, struct vfio_device *vdev)
++static int page_array_pin(struct page_array *pa, struct vfio_device *vdev, bool unaligned)
+ {
+ 	int pinned = 0, npage = 1;
+ 	int ret = 0;
+@@ -129,7 +138,8 @@ static int page_array_pin(struct page_array *pa, struct vfio_device *vdev)
+ 		dma_addr_t *last = &first[npage];
+ 
+ 		if (pinned + npage < pa->pa_nr &&
+-		    *first + npage * PAGE_SIZE == *last) {
++		    *first + npage * PAGE_SIZE == *last &&
++		    !unaligned) {
+ 			npage++;
+ 			continue;
+ 		}
+@@ -151,14 +161,14 @@ static int page_array_pin(struct page_array *pa, struct vfio_device *vdev)
+ 	return ret;
+ 
+ err_out:
+-	page_array_unpin(pa, vdev, pinned);
++	page_array_unpin(pa, vdev, pinned, unaligned);
+ 	return ret;
  }
  
-+#define idal_is_2k(_cp) (!(_cp)->orb.cmd.c64 || (_cp)->orb.cmd.i2k)
-+
- /*
-  * Helpers to operate ccwchain.
-  */
-@@ -504,8 +506,9 @@ static unsigned long *get_guest_idal(struct ccw1 *ccw,
- 	struct vfio_device *vdev =
- 		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
- 	unsigned long *idaws;
-+	unsigned int *idaws_f1;
- 	int idal_len = idaw_nr * sizeof(*idaws);
--	int idaw_size = PAGE_SIZE;
-+	int idaw_size = idal_is_2k(cp) ? PAGE_SIZE / 2 : PAGE_SIZE;
- 	int idaw_mask = ~(idaw_size - 1);
- 	int i, ret;
- 
-@@ -527,8 +530,10 @@ static unsigned long *get_guest_idal(struct ccw1 *ccw,
- 			for (i = 1; i < idaw_nr; i++)
- 				idaws[i] = (idaws[i - 1] + idaw_size) & idaw_mask;
- 		} else {
--			kfree(idaws);
--			return ERR_PTR(-EOPNOTSUPP);
-+			idaws_f1 = (unsigned int *)idaws;
-+			idaws_f1[0] = ccw->cda;
-+			for (i = 1; i < idaw_nr; i++)
-+				idaws_f1[i] = (idaws_f1[i - 1] + idaw_size) & idaw_mask;
- 		}
- 	}
- 
-@@ -595,6 +600,7 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
- 	struct vfio_device *vdev =
- 		&container_of(cp, struct vfio_ccw_private, cp)->vdev;
- 	unsigned long *idaws;
-+	unsigned int *idaws_f1;
- 	int ret;
- 	int idaw_nr;
- 	int i;
-@@ -625,9 +631,12 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
- 	 * Copy guest IDAWs into page_array, in case the memory they
- 	 * occupy is not contiguous.
- 	 */
-+	idaws_f1 = (unsigned int *)idaws;
- 	for (i = 0; i < idaw_nr; i++) {
- 		if (cp->orb.cmd.c64)
- 			pa->pa_iova[i] = idaws[i];
-+		else
-+			pa->pa_iova[i] = idaws_f1[i];
+ /* Unpin the pages before releasing the memory. */
+-static void page_array_unpin_free(struct page_array *pa, struct vfio_device *vdev)
++static void page_array_unpin_free(struct page_array *pa, struct vfio_device *vdev, bool unaligned)
+ {
+-	page_array_unpin(pa, vdev, pa->pa_nr);
++	page_array_unpin(pa, vdev, pa->pa_nr, unaligned);
+ 	kfree(pa->pa_page);
+ 	kfree(pa->pa_iova);
+ }
+@@ -640,7 +650,7 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
  	}
  
  	if (ccw_does_data_transfer(ccw)) {
-@@ -848,7 +857,11 @@ union orb *cp_get_orb(struct channel_program *cp, struct subchannel *sch)
+-		ret = page_array_pin(pa, vdev);
++		ret = page_array_pin(pa, vdev, idal_is_2k(cp));
+ 		if (ret < 0)
+ 			goto out_unpin;
+ 	} else {
+@@ -656,7 +666,7 @@ static int ccwchain_fetch_ccw(struct ccw1 *ccw,
+ 	return 0;
  
- 	/*
- 	 * Everything built by vfio-ccw is a Format-2 IDAL.
-+	 * If the input was a Format-1 IDAL, indicate that
-+	 * 2K Format-2 IDAWs were created here.
- 	 */
-+	if (!orb->cmd.c64)
-+		orb->cmd.i2k = 1;
- 	orb->cmd.c64 = 1;
- 
- 	if (orb->cmd.lpm == 0)
+ out_unpin:
+-	page_array_unpin_free(pa, vdev);
++	page_array_unpin_free(pa, vdev, idal_is_2k(cp));
+ out_free_idaws:
+ 	kfree(idaws);
+ out_init:
+@@ -754,7 +764,7 @@ void cp_free(struct channel_program *cp)
+ 	cp->initialized = false;
+ 	list_for_each_entry_safe(chain, temp, &cp->ccwchain_list, next) {
+ 		for (i = 0; i < chain->ch_len; i++) {
+-			page_array_unpin_free(&chain->ch_pa[i], vdev);
++			page_array_unpin_free(&chain->ch_pa[i], vdev, idal_is_2k(cp));
+ 			ccwchain_cda_free(chain, i);
+ 		}
+ 		ccwchain_free(chain);
 -- 
 2.34.1
 
