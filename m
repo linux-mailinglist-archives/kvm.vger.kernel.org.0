@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 731206522BF
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:36:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E87B26522C1
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:36:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234073AbiLTOgH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 09:36:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34800 "EHLO
+        id S234086AbiLTOgJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 09:36:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234028AbiLTOfs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 09:35:48 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE9A1011
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:35:47 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id 131-20020a1c0289000000b003d35acb0f9fso1193865wmc.2
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:35:47 -0800 (PST)
+        with ESMTP id S234077AbiLTOfx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 09:35:53 -0500
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 855D86396
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:35:52 -0800 (PST)
+Received: by mail-wm1-x32b.google.com with SMTP id ay40so8904369wmb.2
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:35:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HhQROkoTF/kPUU9r78mLwXXxUZ3Qm+COeH3BT1STH1I=;
-        b=U4bdbUmaKC05ztUaihxcBo5oVklE8EtQIIjgLEAW6aUtd2R4tZP13fs1igeMLdZ0Hy
-         tceVk0pTuZr20byqEM0GGFlRSzOXizqZBTlig538uuZDAptvbU5ka0pVylklZCOY5QXE
-         OucNrefj0aiplupBUujPXxDn1WQE7nqHEnEqN3EWHQV5MI9mjwYo1iYstCELMzpReEMQ
-         bFt2im80GhDxHiE8NGJ6SOI+Djzl2912/B2c4eykby18ExJ/Ys5/ppLx5QpxkYYYWZtH
-         EYpqIxdDbqn94d0X5CeTZRsSB8ZzYtv77MO+Bh4gFMh2EbmEJsFQi3n8v4wAwIyHKQdl
-         7J8Q==
+        bh=dCP5cZyT8xpPHd2CcQgqWCjvisflP6TbPUTdpLOWF1Y=;
+        b=KzRe0Ud/a43NW5H7qYzcwe00FAFc4sTxo6J+P9yZlpZUvuCHUl7e9i3sIsAAQvi2y4
+         5RJhpIveURRwX/02s011zFYUDubFk/edMbNob/YY8N/Lrt3kGLShyq7KxS3XQBU5v/fy
+         FyYMNEpPMgKX+LJmbw9/bipCgFd2puaHmH0BLXt3gjX71CywG9ZJTkmu5KccqfCg/fmn
+         JBJShSu6tfjMTEmPUTcbPU4w9aJX4fVtsmaCrUyAcpiLa/YIXCNoS1rjKXTCkhucr8YM
+         hshnrlMag+kg2uSG3rk3ST2vxSYl1pI2MzfMZn1IA1684MLcP+2DvWmIFmnea2kefTxU
+         VtPg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HhQROkoTF/kPUU9r78mLwXXxUZ3Qm+COeH3BT1STH1I=;
-        b=q1VqC+NqEDSoI4Qsy7nk5qLUaT48WpBJalc045NI/L9KzeuoEVh+AgD1/YK43SAJCH
-         FfCopU5OhzrhnTS/7s6lxtZMemzAaXvSqYfbtplDIw+GC29vrFVdUSh204+ZezQAnnfw
-         HNWMNCvF782gIDU7fvfpd0Pzv63cf9Rj7or1MojUlSymoVgPVwiBRuRQX5L6dGFxODf0
-         o+D5JGKCWtK+waO9QDyvNqNOB5ylBVGVSMrtGs4fAqMTSFoFEf+gGbnKW+31ZpX1fGnq
-         cSmY+wROP+709UGuaGCREzBHitmkwUd5z8lBfUmgUmx4OpOJcajxuEa5vxmSdguo0XFs
-         pl7A==
-X-Gm-Message-State: ANoB5pkIR8a+NEOPL97IFZ16g+unf9TzO8SStLbqOoEF/uaxCY8tjf4P
-        wa2CrfDj85wM0BXJsnHuoWCFSg==
-X-Google-Smtp-Source: AA0mqf792O3BK2uXTYfgvov08uy+kZdnUa+nGrxbZsstHA2YWoojeqCbLBegPYPDG9UvgMVcaO5XEw==
-X-Received: by 2002:a05:600c:310e:b0:3cf:b07a:cd2f with SMTP id g14-20020a05600c310e00b003cfb07acd2fmr34553438wmo.37.1671546945726;
-        Tue, 20 Dec 2022 06:35:45 -0800 (PST)
+        bh=dCP5cZyT8xpPHd2CcQgqWCjvisflP6TbPUTdpLOWF1Y=;
+        b=oMpbgbVSQ4O/x1M4npmKzXAnp5Op6GyKglzTXf+ImfdKFPS0GCKQms98dp/kmOM4Bl
+         cddNPlrS+30TrGvQ9wCzNvc8g3zKGcwkFQgp4PbEFQANEN1MccqvwQtk2HWb8iFhoHT6
+         L/eHs83y9cO91EshNbVaPvZoCyXdYZSctxB4EmoEelUMiJ7DelDxyP2VNEK5sHkYy5Oc
+         vOlBSy6ycoOckFZPx6U6bcAAI0ItuDDppcqqB7hQOBHWS0WY8BiB70VnNrCT51dvZAhV
+         /WgMSmHMeyw6WVNrHas5kD3QnXpIpJ9bDSrNl3A2suWdYvgXYBbVzrE/X0KdTsYz9bRj
+         h3KQ==
+X-Gm-Message-State: ANoB5pn6mUGsYxK7WxvdLRbchn99kT7o8K8deoUnaM7fxN0dUn9G5IC8
+        YuZ+3y4blmSGVc3CbeA/fMLnmg==
+X-Google-Smtp-Source: AA0mqf6F6t3bo/Ea/mNnCTSXbbu6OK1UfnteDWHluOQ+0KdZTZB/cVoCAv/MjUbmGCW6bqC/p9Lx3A==
+X-Received: by 2002:a05:600c:2211:b0:3d2:259f:9061 with SMTP id z17-20020a05600c221100b003d2259f9061mr35596684wml.34.1671546951067;
+        Tue, 20 Dec 2022 06:35:51 -0800 (PST)
 Received: from localhost.localdomain ([81.0.6.76])
-        by smtp.gmail.com with ESMTPSA id m34-20020a05600c3b2200b003d208eb17ecsm17185197wms.26.2022.12.20.06.35.43
+        by smtp.gmail.com with ESMTPSA id m34-20020a05600c3b2200b003d208eb17ecsm17185582wms.26.2022.12.20.06.35.49
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 20 Dec 2022 06:35:44 -0800 (PST)
+        Tue, 20 Dec 2022 06:35:50 -0800 (PST)
 From:   =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
 To:     qemu-devel@nongnu.org
 Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
         Richard Henderson <richard.henderson@linaro.org>,
         =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-Subject: [PATCH 2/3] accel/kvm: Silent -Wmissing-field-initializers warning
-Date:   Tue, 20 Dec 2022 15:35:31 +0100
-Message-Id: <20221220143532.24958-3-philmd@linaro.org>
+Subject: [PATCH 3/3] softmmu: Silent -Wmissing-field-initializers warning
+Date:   Tue, 20 Dec 2022 15:35:32 +0100
+Message-Id: <20221220143532.24958-4-philmd@linaro.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20221220143532.24958-1-philmd@linaro.org>
 References: <20221220143532.24958-1-philmd@linaro.org>
@@ -74,35 +74,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Silent when compiling with -Wextra:
 
-  ../accel/kvm/kvm-all.c:2291:17: warning: missing field 'num' initializer [-Wmissing-field-initializers]
-        { NULL, }
-                ^
+  ../softmmu/vl.c:886:12: warning: missing field 'flags' initializer [-Wmissing-field-initializers]
+    { NULL },
+           ^
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
 ---
- accel/kvm/kvm-all.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ softmmu/vl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index e86c33e0e6..acf1ef84f7 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2282,13 +2282,13 @@ static int kvm_init(MachineState *ms)
-     static const char upgrade_note[] =
-         "Please upgrade to at least kernel 2.6.29 or recent kvm-kmod\n"
-         "(see http://sourceforge.net/projects/kvm).\n";
--    struct {
-+    const struct {
-         const char *name;
-         int num;
-     } num_cpus[] = {
-         { "SMP",          ms->smp.cpus },
-         { "hotpluggable", ms->smp.max_cpus },
--        { NULL, }
-+        { /* end of list */ }
-     }, *nc = num_cpus;
-     int soft_vcpus_limit, hard_vcpus_limit;
-     KVMState *s;
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 798e1dc933..12c56d3b37 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -883,7 +883,7 @@ static const QEMUOption qemu_options[] = {
+ #define ARCHHEADING(text, arch_mask)
+ 
+ #include "qemu-options.def"
+-    { NULL },
++    { /* end of list */ }
+ };
+ 
+ typedef struct VGAInterfaceInfo {
 -- 
 2.38.1
 
