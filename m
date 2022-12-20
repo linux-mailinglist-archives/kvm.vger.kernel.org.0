@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DAA8651B39
+	by mail.lfdr.de (Postfix) with ESMTP id E3B7B651B3B
 	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 08:03:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233283AbiLTHDE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 02:03:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53382 "EHLO
+        id S233597AbiLTHDG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 02:03:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53368 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233296AbiLTHBo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233300AbiLTHBo (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 20 Dec 2022 02:01:44 -0500
 Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E09B15FFC;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DF8715FEC;
         Mon, 19 Dec 2022 23:01:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1671519702; x=1703055702;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=uggmxMn6oJUIBEOGX26R5VtrTEJ+CYj34lHFi9H82Hs=;
-  b=nFU7lkN3HiG5nD4TTdl2XA1ZZHOIShVI9Yv3dSezTsTr4iBLB3O4BK1E
-   ZXysdbDlOSPxZHvHv89JAr6hoQ/iQF4MboQf9zBSFZYLEeeHKtnBj/SDz
-   L/x8j5Mpj7eaG6OJ8AoGmgwrvipO+Vqc1b5cjGAnUpxEqK4U9mbpl4/2q
-   V6ZW83XzwPlbMnK+XtddkUJFoptyqxYA/BX2uXw0L0VA7BkC2PPiKXq9m
-   Me8JUGPsQXdyfwVXiZjr1INt4GAySMM9CjjbxNq8cKn2Sy3VMGb+geGPD
-   sisWt3hc2b4CWazxbBf+xOeh8NK3ZzV9xJUQWqFZ1hXrsMWYh1nUPRxqW
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="302972155"
+  bh=yvHd27MPzoRPhJLMrlSGr6kQm8k0tLId/1KA4wMkuYk=;
+  b=BDPoVh9AaDqOWI32Qx9QseFcXRmMDZzl+jRzot659QlJF1SQmh+e5Tv4
+   iK0CDvJijF5bIQ1Q3D6DHcoJxWtybByVwKKgnlXgVEL+GT8Vt8GhnC2Ch
+   ojDJUW+Y+68EKQ8R69JGxQASLspsfQfNdBDLV82O9hMs54HLcDxxOv4ki
+   BHQq5K1Q6/t6tSQBaYKaduyjNGlfnXsUtvPpPllqCnnozU/0Lj0aAe0F+
+   FQMaA9ScdhOEgWQ+DMpJnPACX/39T8ifL3azyFfVO4IRqkroGqSmsqrbg
+   0+cmA6weMp6dtUOxJZcSe/+sEmMJ5QykUQ3zBgUcHSjdBIyT5Je2QixkF
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="302972165"
 X-IronPort-AV: E=Sophos;i="5.96,258,1665471600"; 
-   d="scan'208";a="302972155"
+   d="scan'208";a="302972165"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
   by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Dec 2022 23:01:19 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="644326547"
+X-IronPort-AV: E=McAfee;i="6500,9779,10566"; a="644326551"
 X-IronPort-AV: E=Sophos;i="5.96,258,1665471600"; 
-   d="scan'208";a="644326547"
+   d="scan'208";a="644326551"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by orsmga007.jf.intel.com with ESMTP; 19 Dec 2022 23:01:19 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [RFC PATCH 28/32] x86/fred: fixup fault on ERETU by jumping to fred_entrypoint_user
-Date:   Mon, 19 Dec 2022 22:36:54 -0800
-Message-Id: <20221220063658.19271-29-xin3.li@intel.com>
+Subject: [RFC PATCH 29/32] x86/ia32: do not modify the DPL bits for a null selector
+Date:   Mon, 19 Dec 2022 22:36:55 -0800
+Message-Id: <20221220063658.19271-30-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221220063658.19271-1-xin3.li@intel.com>
 References: <20221220063658.19271-1-xin3.li@intel.com>
@@ -61,116 +61,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If the stack frame contains an invalid user context (e.g. due to invalid SS,
-a non-canonical RIP, etc.) the ERETU instruction will trap (#SS or #GP).
+When a null selector is to be loaded into a segment register,
+reload_segments() sets its DPL bits to 3. Later when the IRET
+instruction loads it, it zeros the segment register. The two
+operations offset each other to actually effect a nop.
 
-From a Linux point of view, this really should be considered a user space
-failure, so use the standard fault fixup mechanism to intercept the fault,
-fix up the exception frame, and redirect execution to fred_entrypoint_user.
-The end result is that it appears just as if the hardware had taken the
-exception immediately after completing the transition to user space.
+Unlike IRET, ERETU does not make any of DS, ES, FS, or GS null
+if it is found to have DPL < 3. It is expected that a FRED-enabled
+operating system will return to ring 3 (in compatibility mode)
+only when those segments all have DPL = 3.
 
-Suggested-by: H. Peter Anvin (Intel) <hpa@zytor.com>
+Thus when FRED is enabled, we end up with having 3 in a segment
+register even when it is initially set to 0.
+
+Fix it by not modifying the DPL bits for a null selector.
+
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/entry/entry_64_fred.S             |  8 +++++--
- arch/x86/include/asm/extable_fixup_types.h |  4 ++++
- arch/x86/mm/extable.c                      | 28 ++++++++++++++++++++++
- 3 files changed, 38 insertions(+), 2 deletions(-)
+ arch/x86/ia32/ia32_signal.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/entry/entry_64_fred.S b/arch/x86/entry/entry_64_fred.S
-index 1fb765fd3871..027ef8f1e600 100644
---- a/arch/x86/entry/entry_64_fred.S
-+++ b/arch/x86/entry/entry_64_fred.S
-@@ -5,8 +5,10 @@
-  * The actual FRED entry points.
-  */
- #include <linux/linkage.h>
--#include <asm/errno.h>
-+#include <asm/asm.h>
- #include <asm/asm-offsets.h>
-+#include <asm/errno.h>
-+#include <asm/export.h>
- #include <asm/fred.h>
+diff --git a/arch/x86/ia32/ia32_signal.c b/arch/x86/ia32/ia32_signal.c
+index 14c739303099..31f5bbb59441 100644
+--- a/arch/x86/ia32/ia32_signal.c
++++ b/arch/x86/ia32/ia32_signal.c
+@@ -36,22 +36,27 @@
+ #include <asm/smap.h>
+ #include <asm/gsseg.h>
  
- #include "calling.h"
-@@ -38,7 +40,9 @@ SYM_CODE_START_NOALIGN(fred_entrypoint_user)
- 	call	fred_entry_from_user
- SYM_INNER_LABEL(fred_exit_user, SYM_L_GLOBAL)
- 	FRED_EXIT
--	ERETU
-+1:	ERETU
++static inline u16 usrseg(u16 sel)
++{
++	return sel <= 3 ? sel : sel | 3;
++}
 +
-+	_ASM_EXTABLE_TYPE(1b, fred_entrypoint_user, EX_TYPE_ERETU)
- SYM_CODE_END(fred_entrypoint_user)
+ static inline void reload_segments(struct sigcontext_32 *sc)
+ {
+ 	unsigned int cur;
+ 
+ 	savesegment(gs, cur);
+-	if ((sc->gs | 0x03) != cur)
+-		load_gs_index(sc->gs | 0x03);
++	if (usrseg(sc->gs) != cur)
++		load_gs_index(usrseg(sc->gs));
+ 	savesegment(fs, cur);
+-	if ((sc->fs | 0x03) != cur)
+-		loadsegment(fs, sc->fs | 0x03);
++	if (usrseg(sc->fs) != cur)
++		loadsegment(fs, usrseg(sc->fs));
+ 	savesegment(ds, cur);
+-	if ((sc->ds | 0x03) != cur)
+-		loadsegment(ds, sc->ds | 0x03);
++	if (usrseg(sc->ds) != cur)
++		loadsegment(ds, usrseg(sc->ds));
+ 	savesegment(es, cur);
+-	if ((sc->es | 0x03) != cur)
+-		loadsegment(es, sc->es | 0x03);
++	if (usrseg(sc->es) != cur)
++		loadsegment(es, usrseg(sc->es));
+ }
  
  /*
-diff --git a/arch/x86/include/asm/extable_fixup_types.h b/arch/x86/include/asm/extable_fixup_types.h
-index 991e31cfde94..ddebd5b8b340 100644
---- a/arch/x86/include/asm/extable_fixup_types.h
-+++ b/arch/x86/include/asm/extable_fixup_types.h
-@@ -66,4 +66,8 @@
- 
- #define EX_TYPE_ZEROPAD			20 /* longword load with zeropad on fault */
- 
-+#ifdef CONFIG_X86_FRED
-+#define	EX_TYPE_ERETU			21
-+#endif
-+
- #endif
-diff --git a/arch/x86/mm/extable.c b/arch/x86/mm/extable.c
-index 60814e110a54..be9d75358f50 100644
---- a/arch/x86/mm/extable.c
-+++ b/arch/x86/mm/extable.c
-@@ -6,6 +6,7 @@
- #include <xen/xen.h>
- 
- #include <asm/fpu/api.h>
-+#include <asm/fred.h>
- #include <asm/sev.h>
- #include <asm/traps.h>
- #include <asm/kdebug.h>
-@@ -195,6 +196,29 @@ static bool ex_handler_ucopy_len(const struct exception_table_entry *fixup,
- 	return ex_handler_uaccess(fixup, regs, trapnr);
- }
- 
-+#ifdef CONFIG_X86_FRED
-+static bool ex_handler_eretu(const struct exception_table_entry *fixup,
-+			     struct pt_regs *regs, unsigned long error_code)
-+{
-+	struct pt_regs *uregs = (struct pt_regs *)(regs->sp - offsetof(struct pt_regs, ip));
-+	unsigned short ss = uregs->ss;
-+	unsigned short cs = uregs->cs;
-+
-+	fred_info(uregs)->edata = fred_event_data(regs);
-+	uregs->ssl = regs->ssl;
-+	uregs->ss = ss;
-+	uregs->csl = regs->csl;
-+	uregs->current_stack_level = 0;
-+	uregs->cs = cs;
-+	uregs->orig_ax = error_code;
-+
-+	/* drop error code */
-+	regs->sp -= 8;
-+
-+	return ex_handler_default(fixup, regs);
-+}
-+#endif
-+
- int ex_get_fixup_type(unsigned long ip)
- {
- 	const struct exception_table_entry *e = search_exception_tables(ip);
-@@ -272,6 +296,10 @@ int fixup_exception(struct pt_regs *regs, int trapnr, unsigned long error_code,
- 		return ex_handler_ucopy_len(e, regs, trapnr, reg, imm);
- 	case EX_TYPE_ZEROPAD:
- 		return ex_handler_zeropad(e, regs, fault_addr);
-+#ifdef CONFIG_X86_FRED
-+	case EX_TYPE_ERETU:
-+		return ex_handler_eretu(e, regs, error_code);
-+#endif
- 	}
- 	BUG();
- }
 -- 
 2.34.1
 
