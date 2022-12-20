@@ -2,75 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99D146523F0
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 16:48:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED87665246C
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 17:13:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233935AbiLTPso (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 10:48:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43446 "EHLO
+        id S233941AbiLTQMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 11:12:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229727AbiLTPse (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 10:48:34 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B001186D5
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 07:48:25 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id f18so12149279wrj.5
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 07:48:25 -0800 (PST)
+        with ESMTP id S233927AbiLTQMo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 11:12:44 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2A4C10C8
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 08:12:41 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id v17-20020a17090abb9100b002239a73bc6eso7496667pjr.1
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 08:12:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=RhFtHZ+QjsDupGH4qz8UINzGqRrH3VltWVcWI44I3rA=;
-        b=L2CeipNQqdFuDRphU/hivqJxhL/uLxehlF1h9KST8Sp4vPSD9vqdHCgD5S6oxBE4KH
-         LePrJAPFhu3l8KmqwIUwBBcSfCdFDsTN40CIxwUVvju349rGHdtaHqvpM0Mc1t9QdyFx
-         j4XiUyjznH2eGekbFZtXm7DJ4J5xRmU1LdgohszPwznjEQXrKNvYUDUml9sS7xsE9htn
-         GyGZigKojNNqEM4qO9GyR0WrtflqvP2iKP5BWFIhBE7/besZDjSVTSxc+SP42zm7ADdK
-         4RENfH8g2+C1LtZuNwwh1yLP7FwnqtqnuTFHkSigJgCDSX3uTlxLvX3s58GH6y/jWqQ6
-         2uwg==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qPAxDrxjuJlP56I6HP/6RAeVZ6SGw8T6Im2JAaf462o=;
+        b=j/ZMrlKX0RnXTjDoowPDsOobxKL030EqTSd0SKz/r+HWP20KuXrzu9/kOmLb+n2xxB
+         H0ZyEMm1C8+wcsKKvs1C1qx2lFVexyOgh8kmQV+AXLgGTkBOqHb4vkj1tIWbol+RxBq4
+         B3mJkxznR0o4WCYofGe1qaj8ckCrFesX3oncDB8fmj3XWTsVV3if65WPrpLyefNLJ75M
+         zckGx1q7KQX3U8equLjuyAAVgPWw+QFlAkZaA4zqI9DxFGIzwJ0fSV60T/6rg/UkTXC7
+         qXW8C63xS9e9SH7+0jGSi/LgbC8150Bi58iAGWDaTnxdwEl5h4/DoLeITqNs6hY9B044
+         GTIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RhFtHZ+QjsDupGH4qz8UINzGqRrH3VltWVcWI44I3rA=;
-        b=bqotrGb5h0WG43+xhwG9+exC773Ni8Rb3fAitW0a4xZrEkDWkkUP5WAcGGhRXp/0z5
-         Q1O8ufko1+pEl+zB/hH6tTwMgiXQgOAN0hmC5AYXADDmYvk8WgF2K0fp4RTYp768fjL9
-         dO+9UOU3EqrmE5et3fu/xRPfJHTlcePxXd2qPLso5PzDs/H0/hgRtc1LpNl15+M1lNW0
-         wWPrGW/SUW2kC05Z8AyPAXF2ecAbWUc/cYXubf9J6mSAmBUt3kaIsYo6pgzez8QKqH5m
-         DXP6XYWTUZ+LEhVq/BNRFuK0nBEqXtKorI9MpCLP4WL+iQ0rEXPH00EQwKsROFV2F9yY
-         u1iQ==
-X-Gm-Message-State: ANoB5pkaDI4zdxDH73F8qTyVaGfoiEojepBXNHVZAREqdCAl55IhSfCR
-        x8Z+BOeDyCE8I+OsB8HnaF4=
-X-Google-Smtp-Source: AA0mqf7G4BOVMkVEsTbsMmz3pGtBVyy1ze7ADRPAc4G+HUARrRvJQEQHBKneqlaeYPSkIUEhHJvUSQ==
-X-Received: by 2002:a5d:464d:0:b0:242:19ba:c325 with SMTP id j13-20020a5d464d000000b0024219bac325mr26927050wrs.30.1671551303677;
-        Tue, 20 Dec 2022 07:48:23 -0800 (PST)
-Received: from [192.168.6.89] (54-240-197-236.amazon.com. [54.240.197.236])
-        by smtp.gmail.com with ESMTPSA id u18-20020adfeb52000000b002423dc3b1a9sm12956118wrn.52.2022.12.20.07.48.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Dec 2022 07:48:23 -0800 (PST)
-From:   Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <e388cfb3-0863-8a22-4305-b3b04bbd08ea@xen.org>
-Date:   Tue, 20 Dec 2022 15:48:22 +0000
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Reply-To: paul@xen.org
-Subject: Re: [PATCH v2] KVM: x86/xen: Fix memory leak in
- kvm_xen_write_hypercall_page()
-Content-Language: en-US
-To:     Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org
-Cc:     dwmw2@infradead.org, seanjc@google.com, pbonzini@redhat.com
-References: <20221220151454.712165-1-mhal@rbox.co>
-Organization: Xen Project
-In-Reply-To: <20221220151454.712165-1-mhal@rbox.co>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qPAxDrxjuJlP56I6HP/6RAeVZ6SGw8T6Im2JAaf462o=;
+        b=oSY6+ZMWYIr/e+5/3MFtGtElbnfWcDWZn7FYLGYNGtr6GPkMl2oiJYtH+K9zwwS2Y2
+         lhycn7BsUQUv55TqKJ3yRLz6xXYg6KSUjFGR29WRiHaTWt0fgfa8hkT0wfVwIcFpIrQl
+         VgBVvqU3GdolcEzih+68tgAevfO9VL+BV8jtefTN9W3ZWsvo43jbmstLPF7Vv2pSLwFH
+         5dRdTsnBpOOm3KD/bw+lzzIZd9bcu9SADIrAOeHieNyjeAj1f1Fy0wj20rl+fCm5GAYb
+         zUAh7jHrj+h3hW3roz8/kTWpSBFuIAr+KfcHVJNIWVQAEdQK3P6xrR7G/g3sJyi8hgwL
+         yUdA==
+X-Gm-Message-State: AFqh2krBFomXRzj6QrrUqP/V+lqbsTwI9w+PMCxqrE4DsDEqAGEsi1+F
+        FBoZnI9vqa/58wZpicqKSvQsCgIIHbKzUzHbskbiI2qIQVGu0IDCA/dZCwI7/4KjhZjOyjs7CCe
+        TPy774wrBSGEF6j8vSHbkaa8HRmyu/IVgCyiHAcoonfz4khTfrzgv8TwevhH/5eRr3QOE
+X-Google-Smtp-Source: AMrXdXuUpUIlFp1MfanSFR7Z+o2/7WYpjFQh4JqAmcsoXHU/V27Z+f3aCbPciujMgUqehGILDfLbsmAw0dyM4upI
+X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
+ (user=aaronlewis job=sendgmr) by 2002:a17:90a:cf97:b0:213:f398:ed51 with SMTP
+ id i23-20020a17090acf9700b00213f398ed51mr2686895pju.216.1671552761184; Tue,
+ 20 Dec 2022 08:12:41 -0800 (PST)
+Date:   Tue, 20 Dec 2022 16:12:29 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20221220161236.555143-1-aaronlewis@google.com>
+Subject: [PATCH v8 0/7] Introduce and test masked events
+From:   Aaron Lewis <aaronlewis@google.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        like.xu.linux@gmail.com, Aaron Lewis <aaronlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,44 +66,97 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 20/12/2022 15:14, Michal Luczaj wrote:
-> Release page irrespectively of kvm_vcpu_write_guest() return value.
-> 
-> Suggested-by: Paul Durrant <paul@xen.org>
-> Fixes: 23200b7a30de ("KVM: x86/xen: intercept xen hypercalls if enabled")
-> Signed-off-by: Michal Luczaj <mhal@rbox.co>
-> ---
->   arch/x86/kvm/xen.c | 7 ++++---
->   1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index f3098c0e386a..439a65437075 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -889,6 +889,7 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
->   		u8 blob_size = lm ? kvm->arch.xen_hvm_config.blob_size_64
->   				  : kvm->arch.xen_hvm_config.blob_size_32;
->   		u8 *page;
-> +		int ret;
->   
->   		if (page_num >= blob_size)
->   			return 1;
-> @@ -899,10 +900,10 @@ int kvm_xen_write_hypercall_page(struct kvm_vcpu *vcpu, u64 data)
->   		if (IS_ERR(page))
->   			return PTR_ERR(page);
->   
-> -		if (kvm_vcpu_write_guest(vcpu, page_addr, page, PAGE_SIZE)) {
-> -			kfree(page);
-> +		ret = kvm_vcpu_write_guest(vcpu, page_addr, page, PAGE_SIZE);
-> +		kfree(page);
-> +		if (ret)
->   			return 1;
-> -		}
->   	}
->   	return 0;
->   }
+This series introduces the concept of masked events to the pmu event
+filter. Masked events can help reduce the number of events needed in the
+pmu event filter by allowing a more generalized matching method to be
+used for the unit mask when filtering guest events in the pmu.  With
+masked events, if an event select should be restricted from the guest,
+instead of having to add an entry to the pmu event filter for each
+event select + unit mask pair, a masked event can be added to generalize
+the unit mask values.
 
-Thanks.
+Reviewed-by: Sean Christopherson <seanjc@google.com>
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+v7 -> v8
+ - Rebased on top of the latest in kvm/queue.
+ - s/num_gp_counters/X86_PROPERTY_PMU_NR_GP_COUNTERS/ in the masked
+   events test.
+
+v6 -> v7
+ - Rebased on top of the latest in kvm/queue. [Like]
+ - Patch #7, Added comment about how counters value are used. [Sean]
+
+v5 -> v6
+ - The following changes were based on Sean's feedback.
+ - Patch #1, Use a const for EVENTSEL_EVENT rather than a callback.
+ - Patch #2, s/invalid/impossible and removed helpers.
+ - Patch #3, Ditched internal event struct.  Sticking with arch layout.
+ - Patch #4,
+     - Switched masked events to follow arch layout.
+     - Created an internal struct for the pmu event filter.
+     - Track separate lists for include events and exclude events.
+     - General refactors as a result of these changes.
+
+v4 -> v5
+ - Patch #3, Simplified the return logic in filter_contains_match(). [Jim]
+ - Patch #4, Corrected documentation for errors and returns. [Jim]
+ - Patch #6, Added TEST_REQUIRE for KVM_CAP_PMU_EVENT_MASKED_EVENTS. [Jim]
+ - Patch #7,
+     - Removed TEST_REQUIRE for KVM_CAP_PMU_EVENT_MASKED_EVENTS (moved it
+       to patch #6).
+     - Changed the assert to a branch in supports_event_mem_inst_retired().
+       [Jim]
+     - Added a check to make sure 3 GP counters are available. [Jim]
+
+v3 -> v4
+ - Patch #1, Fix the mask for the guest event select used in bsearch.
+ - Patch #2, Remove invalid events from the pmu event filter.
+ - Patch #3, Create an internal/common representation for filter events.
+ - Patch #4,
+     - Use a common filter event to simplify kernel code. [Jim]
+     - s/invalid/exclude for masked events. More descriptive. [Sean]
+     - Simplified masked event layout. There was no need to complicate it.
+     - Add KVM_CAP_PMU_EVENT_MASKED_EVENTS.
+ - Patch #7, Rewrote the masked events tests using MEM_INST_RETIRED (0xd0)
+   on Intel and LS Dispatch (0x29) on AMD. They have multiple unit masks
+   each which were leveraged for improved masked events testing.
+
+v2 -> v3
+ - Reworked and documented the invert flag usage.  It was possible to
+   get ambiguous results when using it.  That should not be possible
+   now.
+ - Added testing for inverted masked events to validate the updated
+   implementation.
+ - Removed testing for inverted masked events from the masked events test.
+   They were meaningless with the updated implementation.  More meaning
+   tests were added separately.
+
+v1 -> v2
+ - Made has_invalid_event() static to fix warning.
+ - Fixed checkpatch.pl errors and warnings.
+ - Updated to account for KVM_X86_PMU_OP().
+
+Aaron Lewis (7):
+  kvm: x86/pmu: Correct the mask used in a pmu event filter lookup
+  kvm: x86/pmu: Remove impossible events from the pmu event filter
+  kvm: x86/pmu: prepare the pmu event filter for masked events
+  kvm: x86/pmu: Introduce masked events to the pmu event filter
+  selftests: kvm/x86: Add flags when creating a pmu event filter
+  selftests: kvm/x86: Add testing for KVM_SET_PMU_EVENT_FILTER
+  selftests: kvm/x86: Test masked events
+
+ Documentation/virt/kvm/api.rst                |  77 +++-
+ arch/x86/include/asm/kvm_host.h               |  14 +-
+ arch/x86/include/uapi/asm/kvm.h               |  29 ++
+ arch/x86/kvm/pmu.c                            | 241 +++++++++--
+ arch/x86/kvm/pmu.h                            |   2 +
+ arch/x86/kvm/svm/pmu.c                        |   1 +
+ arch/x86/kvm/vmx/pmu_intel.c                  |   1 +
+ arch/x86/kvm/x86.c                            |   1 +
+ include/uapi/linux/kvm.h                      |   1 +
+ .../kvm/x86_64/pmu_event_filter_test.c        | 381 +++++++++++++++++-
+ 10 files changed, 697 insertions(+), 51 deletions(-)
+
+-- 
+2.39.0.314.g84b9a713c41-goog
 
