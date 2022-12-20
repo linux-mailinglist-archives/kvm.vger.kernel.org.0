@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9AAF165246E
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 17:13:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3456652475
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 17:13:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233945AbiLTQMx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 11:12:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56510 "EHLO
+        id S233952AbiLTQMy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 11:12:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbiLTQMs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 11:12:48 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81EF510C8
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 08:12:47 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-43ea89bc5d8so120969467b3.4
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 08:12:47 -0800 (PST)
+        with ESMTP id S233927AbiLTQMu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 11:12:50 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0462219280
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 08:12:49 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id h2-20020a170902f54200b0018e56572a4eso9287906plf.9
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 08:12:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IBrgP2w19ZFMF3aW10IyLQJ8VRXdX90TEsumVmFJcoM=;
-        b=Cm4ASHhCXG4dFpghACp5MwgNaHhUnSG3Nq2PnYI4DizdzCUXdLFEfHXs4ZWHuYMynH
-         5cDlkw2h1+E7oP/5pWg88DzEXXF0+8Y0N6oM0Q7c6LtexOjfR4jbQjlyGS0BiI40QTNp
-         YVgEPI9Npk5/7+UxQYHvZJtNDd+Lfyu+fVSoSwMgGDYZRvgk4fEt/GnE9CxzB5QR+lc4
-         A1/+3Zu1CjaeObXd+6UkFL34ARWvSxHdBOp7BVHoD1SoyutjkXhRrb8CMRNeulaV8ZA9
-         HUEGHAuxe2AopIm3mYvSEbOQNBacBC/ZNyaTHGyS3VhwbKOVSavS+2cprdm57z/ZZtui
-         3UQw==
+        bh=49r8duawQcPgxiy2ktnD3Yp39ut/sdqqAgMXrTiLnXw=;
+        b=ebZh3tUC4p2U/ddSGQcLHIAz2VgPwje9mmLHDd4KZBdVGgWLQeC+yNXtcKBgRMEgH/
+         pjefHnbkgjVaUZKKeSp2gOKsmyr9aNio0UQ+NVql4MpV60GLCOD2KV6JfOO/3PVyGV9E
+         Z60w+qXjN9ZfCMgfiFanzI9PZdpsXhIyhf9BnYGzSgYZxrDIFsZPlGVTnAlKlM4dzlC3
+         fu/w/pOhSQcZMalqooyJnlaZm3QjhSLMRHx+WXsaAMHa5XUOrl2WUiXLZYqEOTgvkzXb
+         u0sV9gtHp+FPv9/clP+mKooUHs6jvJrm/hjX0/sZOZtmOe05RQ8mOuGET/RJiZcnLjrW
+         sYWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IBrgP2w19ZFMF3aW10IyLQJ8VRXdX90TEsumVmFJcoM=;
-        b=lQkFkF61t6cPk025VPMCdfVh5pB/BR6bIFOwP7rvXRes/RKLFhE1H22FwtrIE80NlH
-         dvX+OXVkSTh/CVdaqC/WC3nRYDI4uk7F4U7a4InjI2Snx/HbN9r1AIdBO8WAHxY0k4An
-         I1GzuJBXyl6Wi9hanEC05w348DSartT+Z1ztbocSnkFDW6tUua29UVHlaCKqZMZAZW8a
-         53ZcC6i8eS8QMORnWRv6Q6elw1EcI0YpLJPIcwr1wGcxXITsxuCk7aCbCZd7QxNwLSbM
-         jbrCLuPr3ohriVSNDfCjVJZX24FcuPwRXMPfuLNpf3/11nKY0U6WWVXvYYZMv3xwLLyG
-         n54Q==
-X-Gm-Message-State: ANoB5pnSDyr8vgunfoucsQm9dK08evw2hP5EHbTuywMDqOj2PlsV8m9D
-        6wsMfzqveQl7Lt4XS8oifsCLHgWDKMLgu7ZuB3XISDmcFn+x2FGBwZP5nKYWdhDNft4N1pZBp19
-        n/WYDbgPPiL6+shqm4olI4aKcviaBTLlsL5DrY4ttyZkt33jA4rlU83dsJbHVewk4bK9i
-X-Google-Smtp-Source: AA0mqf5yys3dWJUDxHVeb8/hiVPtQq14UMCOnOT+H+CfVbaecrxXAxm6AwH9kD2jiNpcXUPdnqDTluj5igQfvtmx
+        bh=49r8duawQcPgxiy2ktnD3Yp39ut/sdqqAgMXrTiLnXw=;
+        b=DbcLk/Y93iJcv5PCyeoxkEEROsxYB51Rwt3WCqHXg1ZCE0vMPc/LDejm27hdiG7frc
+         +RupoR9MRYUX75h3/sn/qXCU6NPpNAs031GgYz7aNcx0k+TH9LTb2r576mj1uS6eTVt4
+         7FCuSdRZzjAWsYKyb8tjIZ9yO76d+nvHfyOxpE77XG6SLtboSqxB/0nJp1UBsKh6YcVH
+         GSAiMWIxhXVHXJAtbGWpPE6NjdcDPhvyW36pUYdTpIKRA+byzCChih7b5FaOJ70FkVGO
+         zlSAd5R3Ms7F3SnDQx/d05IWtwnuOisJCVGe7Ok5LXslNC8wuGBc4FL1zg+q2KMfBTcE
+         l6gA==
+X-Gm-Message-State: ANoB5pm/OCuchX0JHzNGJCGpvDDqDRfT1K6JMNExZWnB20dOGRrq+Y8J
+        6tkBBExU98jQh4MwpnYQexlxDVvtBZKWTZlv8R/fFlTkXQpBbC/sErUZ7C3fT+st4HK99WVGcVG
+        WcPaxuzjo6VCffUQYxEpR8LAohjOh6YXK0/AsQwGBVXQUPXTeDdRgMrDtcm8j7czj9Kmd
+X-Google-Smtp-Source: AMrXdXvWVbg5NC254v2E/O1WBfAIJInE/Sm5/E2d85CTkHhg505/pjXd5SNVladQp5w2Dl3GsIWSO4TeEgUv7LBf
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a25:8743:0:b0:6f0:c9e7:68bf with SMTP
- id e3-20020a258743000000b006f0c9e768bfmr71025769ybn.78.1671552766748; Tue, 20
- Dec 2022 08:12:46 -0800 (PST)
-Date:   Tue, 20 Dec 2022 16:12:30 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a63:5219:0:b0:481:b6:374c with SMTP id
+ g25-20020a635219000000b0048100b6374cmr1456664pgb.538.1671552768329; Tue, 20
+ Dec 2022 08:12:48 -0800 (PST)
+Date:   Tue, 20 Dec 2022 16:12:31 +0000
 In-Reply-To: <20221220161236.555143-1-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20221220161236.555143-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221220161236.555143-2-aaronlewis@google.com>
-Subject: [PATCH v8 1/7] kvm: x86/pmu: Correct the mask used in a pmu event
- filter lookup
+Message-ID: <20221220161236.555143-3-aaronlewis@google.com>
+Subject: [PATCH v8 2/7] kvm: x86/pmu: Remove impossible events from the pmu
+ event filter
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -69,68 +69,62 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When checking if a pmu event the guest is attempting to program should
-be filtered, only consider the event select + unit mask in that
-decision. Use an architecture specific mask to mask out all other bits,
-including bits 35:32 on Intel.  Those bits are not part of the event
-select and should not be considered in that decision.
+If it's not possible for an event in the pmu event filter to match a
+pmu event being programmed by the guest, it's pointless to have it in
+the list.  Opt for a shorter list by removing those events.
 
-Fixes: 66bb8a065f5a ("KVM: x86: PMU Event Filter")
+Because this is established uAPI the pmu event filter can't outright
+rejected these events as garbage and return an error.  Instead, play
+nice and remove them from the list.
+
+Also, opportunistically rewrite the comment when the filter is set to
+clarify that it guards against *all* TOCTOU attacks on the verified
+data.
+
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- arch/x86/kvm/pmu.c           | 3 ++-
- arch/x86/kvm/pmu.h           | 2 ++
- arch/x86/kvm/svm/pmu.c       | 1 +
- arch/x86/kvm/vmx/pmu_intel.c | 1 +
- 4 files changed, 6 insertions(+), 1 deletion(-)
+ arch/x86/kvm/pmu.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-index 684393c22105..760a09ff65cd 100644
+index 760a09ff65cd..51aac749cb5f 100644
 --- a/arch/x86/kvm/pmu.c
 +++ b/arch/x86/kvm/pmu.c
-@@ -277,7 +277,8 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
- 		goto out;
+@@ -592,6 +592,21 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 perf_hw_id)
+ }
+ EXPORT_SYMBOL_GPL(kvm_pmu_trigger_event);
  
- 	if (pmc_is_gp(pmc)) {
--		key = pmc->eventsel & AMD64_RAW_EVENT_MASK_NB;
-+		key = pmc->eventsel & (kvm_pmu_ops.EVENTSEL_EVENT |
-+				       ARCH_PERFMON_EVENTSEL_UMASK);
- 		if (bsearch(&key, filter->events, filter->nevents,
- 			    sizeof(__u64), cmp_u64))
- 			allow_event = filter->action == KVM_PMU_EVENT_ALLOW;
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 85ff3c0588ba..5b070c563a97 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -40,6 +40,8 @@ struct kvm_pmu_ops {
- 	void (*reset)(struct kvm_vcpu *vcpu);
- 	void (*deliver_pmi)(struct kvm_vcpu *vcpu);
- 	void (*cleanup)(struct kvm_vcpu *vcpu);
++static void remove_impossible_events(struct kvm_pmu_event_filter *filter)
++{
++	int i, j;
 +
-+	const u64 EVENTSEL_EVENT;
- };
++	for (i = 0, j = 0; i < filter->nevents; i++) {
++		if (filter->events[i] & ~(kvm_pmu_ops.EVENTSEL_EVENT |
++					  ARCH_PERFMON_EVENTSEL_UMASK))
++			continue;
++
++		filter->events[j++] = filter->events[i];
++	}
++
++	filter->nevents = j;
++}
++
+ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+ {
+ 	struct kvm_pmu_event_filter tmp, *filter;
+@@ -622,9 +637,11 @@ int kvm_vm_ioctl_set_pmu_event_filter(struct kvm *kvm, void __user *argp)
+ 	if (copy_from_user(filter, argp, size))
+ 		goto cleanup;
  
- void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops);
-diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-index 0e313fbae055..d3ae261d56a6 100644
---- a/arch/x86/kvm/svm/pmu.c
-+++ b/arch/x86/kvm/svm/pmu.c
-@@ -229,4 +229,5 @@ struct kvm_pmu_ops amd_pmu_ops __initdata = {
- 	.refresh = amd_pmu_refresh,
- 	.init = amd_pmu_init,
- 	.reset = amd_pmu_reset,
-+	.EVENTSEL_EVENT = AMD64_EVENTSEL_EVENT,
- };
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index e5cec07ca8d9..edf23115f2ef 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -810,4 +810,5 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
- 	.reset = intel_pmu_reset,
- 	.deliver_pmi = intel_pmu_deliver_pmi,
- 	.cleanup = intel_pmu_cleanup,
-+	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
- };
+-	/* Ensure nevents can't be changed between the user copies. */
++	/* Restore the verified state to guard against TOCTOU attacks. */
+ 	*filter = tmp;
+ 
++	remove_impossible_events(filter);
++
+ 	/*
+ 	 * Sort the in-kernel list so that we can search it with bsearch.
+ 	 */
 -- 
 2.39.0.314.g84b9a713c41-goog
 
