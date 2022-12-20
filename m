@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A930652552
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 18:12:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F3EE652555
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 18:12:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234147AbiLTRM2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 12:12:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52520 "EHLO
+        id S234156AbiLTRMc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 12:12:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233802AbiLTRL4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 12:11:56 -0500
+        with ESMTP id S233491AbiLTRL7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 12:11:59 -0500
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DB351D300;
-        Tue, 20 Dec 2022 09:11:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D48A388D;
+        Tue, 20 Dec 2022 09:11:24 -0800 (PST)
 Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKH8WWJ020849;
-        Tue, 20 Dec 2022 17:11:22 GMT
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKH8YMb021707;
+        Tue, 20 Dec 2022 17:11:24 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=l+hJMSzvO5RqAoNd/EKM3XRdsLdu0O7enub5apvRcyc=;
- b=BvhWhtQMhvcxL5KqdPnwV9hR8A4cVJS5b685kJecJIdMs5y6Q3pfebsknraQc2UAc9cO
- rvVv7TdyfhtBxzOYbPzHK6lTJjbtzMbwKAb/K966z9RRV3GWGoSxxqbsfNbcRXQGcIg8
- lNoMEhI0j6C0vtJaf3+KxVnHFLhcM7zsojENmw/rxqdA9xgYKBgNdLJVQO2jpNfd2BDZ
- nzmSfm2CUF9wdRys9+6GBOdpSx9PjrIupuiQ0CbEKud92ksx1pkP9zNU06YytJxteUsh
- cqmHcKxxxNz5S6fVIlKpJym/ejKvXOtlJTErJAUmWMOQX0rKd3RXIptX60dcYTN2mvP0 tw== 
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkgbw9x1d-1
+ bh=lPBwHGZ1hT700GoLCnuhbGD08X1xhcEyH8DjYISbd2s=;
+ b=ckVNvfWtOWo+JVC7h2bISVicTG7b5AyuBrn8ZFg54Sf8BzlE7zUZ7H9bzFpyfn7AGb19
+ vI/bfUQPCOvdufhJ+wZCa+q+unOuRvonKWmnr7X45h9kJhzB0kowivEDudcFdnNOI/JD
+ eNL+gU8epTAR3/pd0l/CJyO7jCz30HqXoSSz/OQcY0iAjJEbkPagHFQj6kXv25PzhWid
+ XfAqxkpuNmkYEli5EYnNvc5gsA17xLMktEVVLkPUlrCu/B9sXwggGHdpBx70R0mKdHvd
+ EjuGFOfq6MSyGmtoWCyZ5j47AisY5uPqO23Iwg1xahRRRmnsYtffCc/4mPG9bdT/Yp5k 3A== 
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkgbw9x14-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 20 Dec 2022 17:11:21 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BK6gbmp025317;
+        Tue, 20 Dec 2022 17:11:22 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BKE9UCB031366;
         Tue, 20 Dec 2022 17:10:13 GMT
 Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3mh6ywmacp-1
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3mh6yxk4uu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
         Tue, 20 Dec 2022 17:10:13 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BKHA9sG26345936
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BKHA98731129894
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 20 Dec 2022 17:10:10 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D263F20049;
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD7972005A;
         Tue, 20 Dec 2022 17:10:09 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C02FD20040;
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CC7112004F;
         Tue, 20 Dec 2022 17:10:09 +0000 (GMT)
 Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
         Tue, 20 Dec 2022 17:10:09 +0000 (GMT)
 Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-        id 82B47E0819; Tue, 20 Dec 2022 18:10:09 +0100 (CET)
+        id 85965E0895; Tue, 20 Dec 2022 18:10:09 +0100 (CET)
 From:   Eric Farman <farman@linux.ibm.com>
 To:     Matthew Rosato <mjrosato@linux.ibm.com>,
         Halil Pasic <pasic@linux.ibm.com>
@@ -64,17 +64,17 @@ Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Peter Oberparleiter <oberpar@linux.ibm.com>,
         linux-s390@vger.kernel.org, kvm@vger.kernel.org,
         Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH v2 03/16] vfio/ccw: allow non-zero storage keys
-Date:   Tue, 20 Dec 2022 18:09:55 +0100
-Message-Id: <20221220171008.1362680-4-farman@linux.ibm.com>
+Subject: [PATCH v2 04/16] vfio/ccw: move where IDA flag is set in ORB
+Date:   Tue, 20 Dec 2022 18:09:56 +0100
+Message-Id: <20221220171008.1362680-5-farman@linux.ibm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20221220171008.1362680-1-farman@linux.ibm.com>
 References: <20221220171008.1362680-1-farman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: xOqF3U3LGcbgsfjdec3RzfLvY5l6iOL5
-X-Proofpoint-ORIG-GUID: xOqF3U3LGcbgsfjdec3RzfLvY5l6iOL5
+X-Proofpoint-GUID: yO213h_G7L9s9c0-IP_zcnJoJeOSf3Db
+X-Proofpoint-ORIG-GUID: yO213h_G7L9s9c0-IP_zcnJoJeOSf3Db
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-20_06,2022-12-20_01,2022-06-22_01
@@ -92,39 +92,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, vfio-ccw copies the ORB from the io_region to the
-channel_program struct being built. It then adjusts various
-pieces of that ORB to the values needed to be used by the
-SSCH issued by vfio-ccw in the host.
+The output of vfio_ccw is always a Format-2 IDAL, but the code that
+explicitly sets this is buried in cp_init().
 
-This includes setting the subchannel key to the default,
-presumably because Linux doesn't do anything with non-zero
-storage keys itself. But it seems wrong to convert every I/O
-to the default key if the guest itself requested a non-zero
-subchannel (access) key.
+In fact the input is often already a Format-2 IDAL, and would be
+rejected (via the check in ccwchain_calc_length()) if it weren't,
+so explicitly setting it doesn't do much. Setting it way down here
+only makes it impossible to make decisions in support of other
+IDAL formats.
 
-Any channel program that sets a non-zero key would expect the
-same key returned in the SCSW of the IRB, not zero, so best to
-allow that to occur unimpeded.
+Let's move that to where the rest of the ORB is set up, so that the
+CCW processing in cp_prefetch() is performed according to the
+contents of the unmodified guest ORB.
 
 Signed-off-by: Eric Farman <farman@linux.ibm.com>
 Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 ---
- drivers/s390/cio/vfio_ccw_cp.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/s390/cio/vfio_ccw_cp.c | 13 ++++++-------
+ 1 file changed, 6 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index a0060ef1119e..268a90252521 100644
+index 268a90252521..3a11132b1685 100644
 --- a/drivers/s390/cio/vfio_ccw_cp.c
 +++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -836,7 +836,6 @@ union orb *cp_get_orb(struct channel_program *cp, struct subchannel *sch)
+@@ -707,15 +707,9 @@ int cp_init(struct channel_program *cp, union orb *orb)
+ 	/* Build a ccwchain for the first CCW segment */
+ 	ret = ccwchain_handle_ccw(orb->cmd.cpa, cp);
  
+-	if (!ret) {
++	if (!ret)
+ 		cp->initialized = true;
+ 
+-		/* It is safe to force: if it was not set but idals used
+-		 * ccwchain_calc_length would have returned an error.
+-		 */
+-		cp->orb.cmd.c64 = 1;
+-	}
+-
+ 	return ret;
+ }
+ 
+@@ -837,6 +831,11 @@ union orb *cp_get_orb(struct channel_program *cp, struct subchannel *sch)
  	orb->cmd.intparm = (u32)virt_to_phys(sch);
  	orb->cmd.fmt = 1;
--	orb->cmd.key = PAGE_DEFAULT_KEY >> 4;
  
++	/*
++	 * Everything built by vfio-ccw is a Format-2 IDAL.
++	 */
++	orb->cmd.c64 = 1;
++
  	if (orb->cmd.lpm == 0)
  		orb->cmd.lpm = sch->lpm;
+ 
 -- 
 2.34.1
 
