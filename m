@@ -2,148 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44B5F65224B
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:18:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F8C1652256
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 15:20:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233923AbiLTOR4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 09:17:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44908 "EHLO
+        id S233985AbiLTOUd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 09:20:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233922AbiLTORa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 09:17:30 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9FBFD2F6
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:16:49 -0800 (PST)
+        with ESMTP id S233990AbiLTOTs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 09:19:48 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42C72BE0
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 06:19:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671545809; x=1703081809;
+  t=1671545952; x=1703081952;
   h=message-id:subject:from:to:date:in-reply-to:references:
    mime-version:content-transfer-encoding;
-  bh=ymxZryEHDHlrfVLHxwmM4t7sEGIWfOhy9ulmRK9XQcI=;
-  b=QjeUgMTVbIvhar7VwIOYNZ87tD8cm+DWirnu4k0ThIrRv2yDzqsCcAvn
-   ddYY8fBLSEwEqE8bx5LEyoiZmOcQeETRo+CMuxK2NOpAFEhDzfxCr2PiP
-   tn/2ghVPUb4CcxmRGrgbJGuwMztKCfh9pQUj/dDRzvK5Xfo9PROeCucuk
-   mc2twChSwBk9kd4Ucc5K/EzJISQoZTScg+pjgv+DEUNvQO3YzGyjduIM5
-   ySveJQ8I2GLLUgSRt9Qdk6vueQOvHYRHSRDV1Q/V854w6v8KD2+JtOx8S
-   u458Ue9RqaT6sQBCV6BYnAj02MY2t8WA7bZZA6ihzZuEqeviJDCTgZ7/3
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="346724172"
+  bh=z4wTlZu4LzOwpmOLbU26yfpTov9DP6LbDcQ0VhlEhfI=;
+  b=a5K0AHxDGj2Hp6QvEOPo4w7NbMI4VytNLlBlM5cCHKgBhKp0Jk1mWXL1
+   QuqBwsvJBLUSOLvdpAGyLBMnRZTt2eh09f/iy6qRODeIR99oTSeFHxjQJ
+   69mx4u/gRhi5k8bvgxdnXEV2i+T+s/JE74XAj8E+mj+7nebEZB0ST4r65
+   26deYY/z9i/TD9fuBjU48ggj/kIvD/TQXqGbz8Rv8BEhN+8gWcvXTvcO0
+   XP0LRqzi9+6xTbsgmO49uV3r3fLC7SXeHjj0x//JJBJpLwPL7OluOPOum
+   +nBdHasKt9r0CDwcOqI7UpJeltOEtJf3VIii7EKDHio6YLa7MmicSWMnI
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="381844215"
 X-IronPort-AV: E=Sophos;i="5.96,259,1665471600"; 
-   d="scan'208";a="346724172"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2022 06:16:47 -0800
+   d="scan'208";a="381844215"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2022 06:19:11 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="601105939"
+X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="896456632"
 X-IronPort-AV: E=Sophos;i="5.96,259,1665471600"; 
-   d="scan'208";a="601105939"
+   d="scan'208";a="896456632"
 Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by orsmga003.jf.intel.com with ESMTP; 20 Dec 2022 06:16:46 -0800
-Message-ID: <08b4bc70fedcd0bfd6a2bc9c932f283ed5efdbcb.camel@linux.intel.com>
-Subject: Re: [PATCH v3 8/9] KVM: x86: When guest set CR3, handle LAM bits
- semantics
+  by fmsmga006.fm.intel.com with ESMTP; 20 Dec 2022 06:19:09 -0800
+Message-ID: <806148f69ace7b305115f10614675dac80441cea.camel@linux.intel.com>
+Subject: Re: [PATCH v3 0/9] Linear Address Masking (LAM) KVM Enabling
 From:   Robert Hoo <robert.hu@linux.intel.com>
 To:     "Liu, Jingqi" <jingqi.liu@intel.com>, pbonzini@redhat.com,
         seanjc@google.com, kirill.shutemov@linux.intel.com,
         kvm@vger.kernel.org
-Date:   Tue, 20 Dec 2022 22:16:45 +0800
-In-Reply-To: <d9f576df-04b4-1d30-438c-7296e5b4f359@intel.com>
+Date:   Tue, 20 Dec 2022 22:19:09 +0800
+In-Reply-To: <a1491544-5f1d-605e-92bb-7135629ce649@intel.com>
 References: <20221209044557.1496580-1-robert.hu@linux.intel.com>
-         <20221209044557.1496580-9-robert.hu@linux.intel.com>
-         <d9f576df-04b4-1d30-438c-7296e5b4f359@intel.com>
+         <a1491544-5f1d-605e-92bb-7135629ce649@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
 Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-12-20 at 17:10 +0800, Liu, Jingqi wrote:
+On Tue, 2022-12-20 at 17:20 +0800, Liu, Jingqi wrote:
 > On 12/9/2022 12:45 PM, Robert Hoo wrote:
-> > When only changes LAM bits, ask next vcpu run to load mmu pgd, so
-> > that it
-> > will build new CR3 with LAM bits updates. No TLB flush needed on
-> > this case.
-> > When changes on effective addresses, no matter LAM bits changes or
-> > not, go
-> > through normal pgd update process.
+> > ===Feature Introduction===
 > > 
-> > Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> > Linear-address masking (LAM) [1], modifies the checking that is
+> > applied to
+> > *64-bit* linear addresses, allowing software to use of the
+> > untranslated
+> > address (upper) bits for metadata.
+> > As for which upper bits of linear address can be borrowed, LAM has
+> > 2 modes:
+> > LAM_48 (bits 62:48, i.e. LAM width of 15) and LAM_57 (bits 62:57,
+> > i.e. LAM
+> > width of 6), controlled by these new bits: CR3[62] (LAM_U48),
+> > CR3[61]
+> > (LAM_U57), and CR4[28] (LAM_SUP).
+> > 
+> > * LAM_U48 and LAM_U57 bits controls LAM for user mode address. I.e.
+> > if
+> >    CR3.LAM_U57 = 1, LAM57 is applied; if CR3.LAM_U48 = 1 and
+> > CR3.LAM_U57 = 0,
+> >    LAM48 is applied.
+> > * LAM_SUP bit, combined with paging mode (4-level or 5-level),
+> > determines
+> >    LAM status for supervisor mode address. I.e. when CR4.LAM_SUP
+> > =1, 4-level
+> >    paging mode will have LAM48 for supervisor mode address while 5-
+> > level paging
+> >    will have LAM57.
+> > 
+> > Note:
+> > 1. LAM applies to only data address, not to instructions.
+> > 2. LAM identification of an address as user or supervisor is based
+> > solely on the
+> >     value of pointer bit 63 and does not, for the purposes of LAM,
+> > depend on the CPL.
+> > 3. For user mode address, it is possible that 5-level paging and
+> > LAM_U48 are both
+> >     set, in this case, the effective usable linear address width is
+> > 48, i.e. bit
+> >     56:47 is reserved by LAM. [2]
+> > 
+> > 
+> > ===LAM KVM Design===
+> > 
+> > Pass CR4.LAM_SUP under guest control.
+> > 
+> > Under EPT mode, CR3 is fully under guest control, guest LAM is thus
+> > transparent to
+> > KVM. Nothing more need to do.
+> > 
+> > For Shadow paging (EPT = off), KVM need to handle guest CR3.LAM_U48
+> > and CR3.LAM_U57
+> > toggles.
+> > 
+> > Patch 1 -- This patch can be mostly independent from LAM enabling.
+> > It just renames
+> >             CR4 reserved bits for better understanding, esp. for
+> > beginners.
+> > 	
+> > Patch 2, 9 -- Common part for both EPT and Shadow Paging modes
+> > enabling.
+> > 
+> > Patch 3 ~ 8 -- For Shadow Paging mode LAM enabling.
+> > 
+> > [1] ISE Chap10 https://cdrdv2.intel.com/v1/dl/getContent/671368
+> > (Section 10.6 VMX interaction)
+> > [2] Thus currently, Kernel enabling patch only enables LAM57 mode. 
+> > https://lore.kernel.org/lkml/20220815041803.17954-1-kirill.shutemov@linux.intel.com/
+> > 
 > > ---
-> >   arch/x86/kvm/x86.c | 24 ++++++++++++++++++++----
-> >   1 file changed, 20 insertions(+), 4 deletions(-)
+> > Changelog
+> > v2 --> v3:
+> > As LAM Kernel patches are in tip tree now, rebase to it.
+> > https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/
 > > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 48a2ad1e4cd6..6fbe8dd36b1e 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -1248,9 +1248,9 @@ static bool kvm_is_valid_cr3(struct kvm_vcpu
-> > *vcpu, unsigned long cr3)
-> >   int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
-> >   {
-> >   	bool skip_tlb_flush = false;
-> > -	unsigned long pcid = 0;
-> > +	unsigned long pcid = 0, old_cr3;
-> >   #ifdef CONFIG_X86_64
-> > -	bool pcid_enabled = kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
-> > +	bool pcid_enabled = !!kvm_read_cr4_bits(vcpu, X86_CR4_PCIDE);
-> >   
-> >   	if (pcid_enabled) {
-> >   		skip_tlb_flush = cr3 & X86_CR3_PCID_NOFLUSH;
-> > @@ -1263,6 +1263,10 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu,
-> > unsigned long cr3)
-> >   	if (cr3 == kvm_read_cr3(vcpu) && !is_pae_paging(vcpu))
-> >   		goto handle_tlb_flush;
-> >   
-> > +	if (!guest_cpuid_has(vcpu, X86_FEATURE_LAM) &&
-> > +	    (cr3 & (X86_CR3_LAM_U48 | X86_CR3_LAM_U57)))
-> > +		return	1;
-> > +
-> >   	/*
-> >   	 * Do not condition the GPA check on long mode, this helper is
-> > used to
-> >   	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee
-> > that
-> > @@ -1274,8 +1278,20 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu,
-> > unsigned long cr3)
-> >   	if (is_pae_paging(vcpu) && !load_pdptrs(vcpu, cr3))
-> >   		return 1;
-> >   
-> > -	if (cr3 != kvm_read_cr3(vcpu))
-> > -		kvm_mmu_new_pgd(vcpu, cr3);
-> > +	old_cr3 = kvm_read_cr3(vcpu);
-> > +	if (cr3 != old_cr3) {
-> > +		if ((cr3 ^ old_cr3) & CR3_ADDR_MASK) {
-> > +			kvm_mmu_new_pgd(vcpu, cr3 & ~(X86_CR3_LAM_U48 |
-> > +					X86_CR3_LAM_U57));
+> > v1 --> v2:
+> > 1. Fixes i386-allyesconfig build error on get_pgd(), where
+> >     CR3_HIGH_RSVD_MASK isn't applicable.
+> >     (Reported-by: kernel test robot <lkp@intel.com>)
+> > 2. In kvm_set_cr3(), be conservative on skip tlb flush when only
+> > LAM bits
+> >     toggles. (Kirill)
+> > 
+> > Robert Hoo (9):
+> >    KVM: x86: Rename cr4_reserved/rsvd_* variables to be more
+> > readable
+> >    KVM: x86: Add CR4.LAM_SUP in guest owned bits
+> >    KVM: x86: MMU: Rename get_cr3() --> get_pgd() and clear high
+> > bits for
+> >      pgd
+> >    KVM: x86: MMU: Commets update
+> >    KVM: x86: MMU: Integrate LAM bits when build guest CR3
+> >    KVM: x86: Untag LAM bits when applicable
+> >    KVM: x86: When judging setting CR3 valid or not, consider LAM
+> > bits
+> >    KVM: x86: When guest set CR3, handle LAM bits semantics
+> >    KVM: x86: LAM: Expose LAM CPUID to user space VMM
+> > 
+> >   arch/x86/include/asm/kvm_host.h        |  7 ++--
+> >   arch/x86/include/asm/processor-flags.h |  1 +
+> >   arch/x86/kvm/cpuid.c                   |  6 +--
+> >   arch/x86/kvm/kvm_cache_regs.h          |  3 +-
+> >   arch/x86/kvm/mmu.h                     |  5 +++
+> >   arch/x86/kvm/mmu/mmu.c                 | 18 ++++++---
+> >   arch/x86/kvm/vmx/vmx.c                 |  8 +++-
+> >   arch/x86/kvm/x86.c                     | 51 ++++++++++++++++++++-
+> > -----
+> >   arch/x86/kvm/x86.h                     | 43
+> > +++++++++++++++++++++-
+> >   9 files changed, 115 insertions(+), 27 deletions(-)
+> > 
+> > 
+> > base-commit: a5dadcb601b4954c60494d797b4dd1e03a4b1ebe
 > 
-> "CR3_ADDR_MASK" should not contain "X86_CR3_LAM_U48 |
-> X86_CR3_LAM_U57"
+> It would be better if you can provide a URL link to easily reach
+> this 
+> base-commit.
 
-Yes, you're right. CR3_ADDR_MASK is the effective pgd address bits
-range. This hunk of code is: judge if changed bits falls in effective
-address, if true, need to load new pgd, no matter LAM bits changed or
-not.
+The URL of tip tree is in above change log.
+I'll move it here for easy association. Thanks.
 
-> But seems it is not defined explicitly.
-> Besides this, looks good for me.
-> Reviewed-by: Jingqi Liu<jingqi.liu@intel.com>
-> > +		} else {
-> > +			/*
-> > +			 * Though effective addr no change, mark the
-> > +			 * request so that LAM bits will take effect
-> > +			 * when enter guest.
-> > +			 */
-> > +			kvm_make_request(KVM_REQ_LOAD_MMU_PGD, vcpu);
-> > +		}
-> > +	}
-> >   
-> >   	vcpu->arch.cr3 = cr3;
-> >   	kvm_register_mark_dirty(vcpu, VCPU_EXREG_CR3);
+> 
+> Thanks,
+> Jingqi
 
