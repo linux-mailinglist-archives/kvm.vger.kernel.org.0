@@ -2,250 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34DEA651F23
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 11:44:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81740651F29
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 11:45:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233069AbiLTKoI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 05:44:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53744 "EHLO
+        id S233010AbiLTKpH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 05:45:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbiLTKoG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 05:44:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2D391743E
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 02:43:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671533002;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=54Q/AOcDCXt2WoQ+wVvIhTTtHPQ1SiD8DKjFK54h2ww=;
-        b=VGNRrvPDROMo7S+iD4NLFUoMc8Hs5+dfuMVp7mSfiLM4Vt9sVGG5aQOuL0HoBV3lzTDWGg
-        ZfA8AlH/OB0kWknYAsy7aTk2l6/bzhXES3YU161KLoUvb/S/BMQlLz9ZB2TtLFRGgiteP0
-        OT8NaqF9kMpMlcX3Wa680219UwSEMlk=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-628-dhJ82henPeiuLJNBz594FQ-1; Tue, 20 Dec 2022 05:43:20 -0500
-X-MC-Unique: dhJ82henPeiuLJNBz594FQ-1
-Received: by mail-wm1-f69.google.com with SMTP id q6-20020a05600c2e4600b003d211775a99so306443wmf.1
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 02:43:20 -0800 (PST)
+        with ESMTP id S231602AbiLTKpF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 05:45:05 -0500
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4CF178AF
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 02:45:04 -0800 (PST)
+Received: by mail-oi1-x22d.google.com with SMTP id r130so10229289oih.2
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 02:45:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XlLK/9t77OaCz0UGM/J8urYM3bBBnlqtd9YmBawRQfs=;
+        b=VZQVqUyfm+SzD4hUok+TQ3m/aULWBHMuCvEbySofZ7AlqnMdTsBLZaI07suorsSjtv
+         fe/mnNdO+x5Nyh4McN2S1iP8uLWiehdanPgWngG0vsp7HAFmT+liWyQAyUAGnOfb/saC
+         91ynBTrXxHn0zpiO5IoFBLtQGf9Xj7Eq+aVdBBlcPSEApaBll4n1O4cHv/D/CjgO3b69
+         EyPb+x4jFkJynEhVkvQVyl1Ne75ux7sCCj6gflUlEIHDXp20EiV4vosXzP32utRaBg+u
+         GlumX4I9cssgCKSVY0F31fNZbRNniYm44IhQ/bojX60FD7i3IRMxVhPxOyac884xBk1h
+         4cDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=54Q/AOcDCXt2WoQ+wVvIhTTtHPQ1SiD8DKjFK54h2ww=;
-        b=m9p4DimnV+EnAZH0+LETKgt3S5+YxS6MhayJLwOQLX7+8tzPYmSxxXyhKhiQ+ZaQSA
-         rKicIvOLsoGJuBCOz3ZJtSMnx2RBwybmtLv9lAKzl9Y5p1LqOl52AFIZv+owAtFNADxZ
-         07zaKgayJuliWqIo7EdsbUAhFNc0t7ntUziS/qfzjtJwDoNC1bffxNVr+rm3AGm6u3C0
-         aFwEgVO7iuYfIjdO6L/8AOOllOYSlr9z9ZEbmhNaoELdOcAIymCqoE7B+mrADiplLI8r
-         CL5szMfmfyrbhHVn9BPIa3Xk5HAAfHLTl5OpNUoyqU9uMHuHQnVj+7+PRErqpNSbVsIZ
-         Nojg==
-X-Gm-Message-State: ANoB5pniy/MSIhjMrT2zqdko3sas8TWLtnDu7U/TocE9eIkjrd/s/MJc
-        c0tCpw5yrFE5wkRrPZMhiPzeEtDqAlIspgo8X77K6x5Ujv7hJr5bKmboo/zix0BAWrz/qs5t5vb
-        t3rxnCF0/EJAD
-X-Received: by 2002:adf:f54b:0:b0:24d:cac0:96bb with SMTP id j11-20020adff54b000000b0024dcac096bbmr25182765wrp.67.1671532999523;
-        Tue, 20 Dec 2022 02:43:19 -0800 (PST)
-X-Google-Smtp-Source: AA0mqf5pgx3uCD9jue3Oj7nRI0x/hmaTvFuwAA61WD4OHNFKM6UQY27q4Mc9WDLqzqUBHxHaNQLKKw==
-X-Received: by 2002:adf:f54b:0:b0:24d:cac0:96bb with SMTP id j11-20020adff54b000000b0024dcac096bbmr25182747wrp.67.1671532999208;
-        Tue, 20 Dec 2022 02:43:19 -0800 (PST)
-Received: from sgarzare-redhat (host-87-11-6-51.retail.telecomitalia.it. [87.11.6.51])
-        by smtp.gmail.com with ESMTPSA id k6-20020a5d66c6000000b00242271fd2besm12375033wrw.89.2022.12.20.02.43.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Dec 2022 02:43:18 -0800 (PST)
-Date:   Tue, 20 Dec 2022 11:43:12 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc:     Stefan Hajnoczi <stefanha@redhat.com>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        kernel <kernel@sberdevices.ru>,
-        Krasnov Arseniy <oxffffaa@gmail.com>
-Subject: Re: [RFC PATCH v1 0/2] virtio/vsock: fix mutual rx/tx hungup
-Message-ID: <20221220104312.5efhzu5ildj5smnn@sgarzare-redhat>
-References: <39b2e9fd-601b-189d-39a9-914e5574524c@sberdevices.ru>
- <CAGxU2F4ca5pxW3RX4wzsTx3KRBtxLK_rO9KxPgUtqcaSNsqXCA@mail.gmail.com>
- <2bc5a0c0-5fb7-9d0e-bd45-879e42c1ea50@sberdevices.ru>
- <20221220083313.mj2fd4tvfoifayaq@sgarzare-redhat>
- <741d7969-0c39-1e09-7297-84edbc8fddc7@sberdevices.ru>
+        bh=XlLK/9t77OaCz0UGM/J8urYM3bBBnlqtd9YmBawRQfs=;
+        b=AsEIOw1tE+FYn1FxVRodztwHSt226knNIkxK3wEx4/lWw/bQ0jNtEX6O695KswVXMl
+         CA5SNONW7J7vvrR/786gyF6VbOSig4N6BJCs1LlTPHzHHDlRNOtx19GNoVyp+rYRTXpA
+         jUSp15rneIOJZEUXbiz9bKDqr0IvKd+20DbaiBDsexu75BNiVF7xOry5aVqopPMMYYoR
+         FlzZDf0aWv789GLWyDCa8Og/2gDbKGzsinzYm0lW/tQmeAQ8LIsm2/sYAxanvVR9j9ci
+         CC6rz4xCw+jX3kozxHydFNDl7E5xD58auBuHwraM2EglocrBhsDP9oT0s9+2W77s47i6
+         3zUw==
+X-Gm-Message-State: ANoB5pmFbZpTp2h1bUPuoqywXm8W7zpYJIOuxbCpNs9Krf1J6ifCY55W
+        nfTm29Lu5f2/6OlHW9D+QFY=
+X-Google-Smtp-Source: AA0mqf5IhyhoFAFTIOpBSp8ETqrVHUgTAA+/7jM945BelQAHiivdjpQPQFharevJcEcrmsphwDZy5A==
+X-Received: by 2002:a05:6808:30b:b0:35e:57ef:51f8 with SMTP id i11-20020a056808030b00b0035e57ef51f8mr17517142oie.52.1671533103732;
+        Tue, 20 Dec 2022 02:45:03 -0800 (PST)
+Received: from [192.168.68.106] (201-43-103-101.dsl.telesp.net.br. [201.43.103.101])
+        by smtp.gmail.com with ESMTPSA id j2-20020a056808034200b0035e461d9b1bsm5291043oie.50.2022.12.20.02.44.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Dec 2022 02:45:03 -0800 (PST)
+Message-ID: <5d727e59-fa21-ea08-112c-3b74db7e4577@gmail.com>
+Date:   Tue, 20 Dec 2022 07:44:54 -0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1; format=flowed
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v3 1/5] dump: Include missing "cpu.h" header for
+ tswap32/tswap64() declarations
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
+        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        Yanan Wang <wangyanan55@huawei.com>,
+        Artyom Tarasenko <atar4qemu@gmail.com>,
+        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+        Richard Henderson <richard.henderson@linaro.org>,
+        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+        qemu-arm@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Alistair Francis <alistair.francis@wdc.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+        David Gibson <david@gibson.dropbear.id.au>,
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+        Marek Vasut <marex@denx.de>, Bin Meng <bin.meng@windriver.com>,
+        Eduardo Habkost <eduardo@habkost.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+        qemu-riscv@nongnu.org, kvm@vger.kernel.org,
+        Stafford Horne <shorne@gmail.com>,
+        Peter Maydell <peter.maydell@linaro.org>,
+        Chris Wulff <crwulff@gmail.com>
+References: <20221216215519.5522-1-philmd@linaro.org>
+ <20221216215519.5522-2-philmd@linaro.org>
+Content-Language: en-US
+From:   Daniel Henrique Barboza <danielhb413@gmail.com>
+In-Reply-To: <20221216215519.5522-2-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <741d7969-0c39-1e09-7297-84edbc8fddc7@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 09:23:17AM +0000, Arseniy Krasnov wrote:
->On 20.12.2022 11:33, Stefano Garzarella wrote:
->> On Tue, Dec 20, 2022 at 07:14:27AM +0000, Arseniy Krasnov wrote:
->>> On 19.12.2022 18:41, Stefano Garzarella wrote:
->>>
->>> Hello!
->>>
->>>> Hi Arseniy,
->>>>
->>>> On Sat, Dec 17, 2022 at 8:42 PM Arseniy Krasnov <AVKrasnov@sberdevices.ru> wrote:
->>>>>
->>>>> Hello,
->>>>>
->>>>> seems I found strange thing(may be a bug) where sender('tx' later) and
->>>>> receiver('rx' later) could stuck forever. Potential fix is in the first
->>>>> patch, second patch contains reproducer, based on vsock test suite.
->>>>> Reproducer is simple: tx just sends data to rx by 'write() syscall, rx
->>>>> dequeues it using 'read()' syscall and uses 'poll()' for waiting. I run
->>>>> server in host and client in guest.
->>>>>
->>>>> rx side params:
->>>>> 1) SO_VM_SOCKETS_BUFFER_SIZE is 256Kb(e.g. default).
->>>>> 2) SO_RCVLOWAT is 128Kb.
->>>>>
->>>>> What happens in the reproducer step by step:
->>>>>
->>>>
->>>> I put the values of the variables involved to facilitate understanding:
->>>>
->>>> RX: buf_alloc = 256 KB; fwd_cnt = 0; last_fwd_cnt = 0;
->>>> ††† free_space = buf_alloc - (fwd_cnt - last_fwd_cnt) = 256 KB
->>>>
->>>> The credit update is sent if
->>>> free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE [64 KB]
->>>>
->>>>> 1) tx tries to send 256Kb + 1 byte (in a single 'write()')
->>>>> 2) tx sends 256Kb, data reaches rx (rx_bytes == 256Kb)
->>>>> 3) tx waits for space in 'write()' to send last 1 byte
->>>>> 4) rx does poll(), (rx_bytes >= rcvlowat) 256Kb >= 128Kb, POLLIN is set
->>>>> 5) rx reads 64Kb, credit update is not sent due to *
->>>>
->>>> RX: buf_alloc = 256 KB; fwd_cnt = 64 KB; last_fwd_cnt = 0;
->>>> ††† free_space = 192 KB
->>>>
->>>>> 6) rx does poll(), (rx_bytes >= rcvlowat) 192Kb >= 128Kb, POLLIN is set
->>>>> 7) rx reads 64Kb, credit update is not sent due to *
->>>>
->>>> RX: buf_alloc = 256 KB; fwd_cnt = 128 KB; last_fwd_cnt = 0;
->>>> ††† free_space = 128 KB
->>>>
->>>>> 8) rx does poll(), (rx_bytes >= rcvlowat) 128Kb >= 128Kb, POLLIN is set
->>>>> 9) rx reads 64Kb, credit update is not sent due to *
->>>>
->>>> Right, (free_space < VIRTIO_VSOCK_MAX_PKT_BUF_SIZE) is still false.
->>>>
->>>> RX: buf_alloc = 256 KB; fwd_cnt = 196 KB; last_fwd_cnt = 0;
->>>> ††† free_space = 64 KB
->>>>
->>>>> 10) rx does poll(), (rx_bytes < rcvlowat) 64Kb < 128Kb, rx waits in poll()
->>>>
->>>> I agree that the TX is stuck because we are not sending the credit
->>>> update, but also if RX sends the credit update at step 9, RX won't be
->>>> woken up at step 10, right?
->>>
->>> Yes, RX will sleep, but TX will wake up and as we inform TX how much
->>> free space we have, now there are two cases for TX:
->>> 1) send "small" rest of data(e.g. without blocking again), leave 'write()'
->>> † and continue execution. RX still waits in 'poll()'. Later TX will
->>> † send enough data to wake up RX.
->>> 2) send "big" rest of data - if rest is too big to leave 'write()' and TX
->>> † will wait again for the free space - it will be able to send enough data
->>> † to wake up RX as we compared 'rx_bytes' with rcvlowat value in RX.
->>
->> Right, so I'd update the test to behave like this.
->Sorry, You mean vsock_test? To cover TX waiting for free space at RX, thus checking
->this kernel patch logic?
 
-Yep, I mean the test that you added in this series.
 
->> And I'd explain better the problem we are going to fix in the commit message.
->Ok
->>
->>>>
->>>>>
->>>>> * is optimization in 'virtio_transport_stream_do_dequeue()' which
->>>>> † sends OP_CREDIT_UPDATE only when we have not too much space -
->>>>> † less than VIRTIO_VSOCK_MAX_PKT_BUF_SIZE.
->>>>>
->>>>> Now tx side waits for space inside write() and rx waits in poll() for
->>>>> 'rx_bytes' to reach SO_RCVLOWAT value. Both sides will wait forever. I
->>>>> think, possible fix is to send credit update not only when we have too
->>>>> small space, but also when number of bytes in receive queue is smaller
->>>>> than SO_RCVLOWAT thus not enough to wake up sleeping reader. I'm not
->>>>> sure about correctness of this idea, but anyway - I think that problem
->>>>> above exists. What do You think?
->>>>
->>>> I'm not sure, I have to think more about it, but if RX reads less than
->>>> SO_RCVLOWAT, I expect it's normal to get to a case of stuck.
->>>>
->>>> In this case we are only unstucking TX, but even if it sends that single
->>>> byte, RX is still stuck and not consuming it, so it was useless to wake
->>>> up TX if RX won't consume it anyway, right?
->>>
->>> 1) I think it is not useless, because we inform(not just wake up) TX that
->>> there is free space at RX side - as i mentioned above.
->>> 2) Anyway i think that this situation is a little bit strange: TX thinks that
->>> there is no free space at RX and waits for it, but there is free space at RX!
->>> At the same time, RX waits in poll() forever - it is ready to get new portion
->>> of data to return POLLIN, but TX "thinks" exactly opposite thing - RX is full
->>> of data. Of course, if there will be just stalls in TX data handling - it will
->>> be ok - just performance degradation, but TX stucks forever.
->>
->> We did it to avoid a lot of credit update messages.
->Yes, i see
->> Anyway I think here the main point is why RX is setting SO_RCVLOWAT to 128 KB and then reads only half of it?
->>
->> So I think if the users set SO_RCVLOWAT to a value and then RX reads less then it, is expected to get stuck.
->That a really interesting question, I've found nothing about this case in Google(not sure for 100%) or POSIX. But,
->i can modify reproducer: it sets SO_RCVLOWAT to 128Kb BEFORE entering its last poll where it will stuck. In this
->case behaviour looks more legal: it uses default SO_RCVLOWAT of 1, read 64Kb each time. Finally it sets SO_RCVLOWAT
->to 128Kb(and imagine that it prepares 128Kb 'read()' buffer) and enters poll() - we will get same effect: TX will wait
->for space, RX waits in 'poll()'.
+On 12/16/22 18:55, Philippe Mathieu-Daud√© wrote:
+> Signed-off-by: Philippe Mathieu-Daud√© <philmd@linaro.org>
+> ---
 
-Good point!
 
->>
->> Anyway, since the change will not impact the default behaviour (SO_RCVLOWAT = 1) we can merge this patch, but IMHO we need to explain the case better and improve the test.
->I see, of course I'm not sure about this change, just want to ask 
->someone who knows this code better
+Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-Yes, it's an RFC, so you did well! :-)
 
->>
->>>
->>>>
->>>> If RX woke up (e.g. SO_RCVLOWAT = 64KB) and read the remaining 64KB,
->>>> then it would still send the credit update even without this patch and
->>>> TX will send the 1 byte.
->>>
->>> But how RX will wake up in this case? E.g. it calls poll() without timeout,
->>> connection is established, RX ignores signal
->>
->> RX will wake up because SO_RCVLOWAT is 64KB and there are 64 KB in the buffer. Then RX will read it and send the credit update to TX because
->> free_space is 0.
->IIUC, i'm talking about 10 steps above, e.g. RX will never wake up, 
->because TX is waiting for space.
-
-Yep, but if RX uses SO_RCVLOWAT = 64 KB instead of 128 KB (I mean if RX 
-reads all the bytes that it's waiting as it specified in SO_RCVLOWAT), 
-then RX will send the credit message.
-
-But there is the case that you mentioned, when SO_RCVLOWAT is chagend 
-while executing.
-
-Thanks,
-Stefano
-
+>   dump/dump.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/dump/dump.c b/dump/dump.c
+> index 279b07f09b..c62dc94213 100644
+> --- a/dump/dump.c
+> +++ b/dump/dump.c
+> @@ -29,6 +29,7 @@
+>   #include "qemu/main-loop.h"
+>   #include "hw/misc/vmcoreinfo.h"
+>   #include "migration/blocker.h"
+> +#include "cpu.h"
+>   
+>   #ifdef TARGET_X86_64
+>   #include "win_dump.h"
