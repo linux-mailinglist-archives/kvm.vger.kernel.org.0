@@ -2,96 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 81740651F29
-	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 11:45:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D22F6651F2D
+	for <lists+kvm@lfdr.de>; Tue, 20 Dec 2022 11:46:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233010AbiLTKpH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 20 Dec 2022 05:45:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55152 "EHLO
+        id S233257AbiLTKqO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 20 Dec 2022 05:46:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231602AbiLTKpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 20 Dec 2022 05:45:05 -0500
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D4CF178AF
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 02:45:04 -0800 (PST)
-Received: by mail-oi1-x22d.google.com with SMTP id r130so10229289oih.2
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 02:45:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XlLK/9t77OaCz0UGM/J8urYM3bBBnlqtd9YmBawRQfs=;
-        b=VZQVqUyfm+SzD4hUok+TQ3m/aULWBHMuCvEbySofZ7AlqnMdTsBLZaI07suorsSjtv
-         fe/mnNdO+x5Nyh4McN2S1iP8uLWiehdanPgWngG0vsp7HAFmT+liWyQAyUAGnOfb/saC
-         91ynBTrXxHn0zpiO5IoFBLtQGf9Xj7Eq+aVdBBlcPSEApaBll4n1O4cHv/D/CjgO3b69
-         EyPb+x4jFkJynEhVkvQVyl1Ne75ux7sCCj6gflUlEIHDXp20EiV4vosXzP32utRaBg+u
-         GlumX4I9cssgCKSVY0F31fNZbRNniYm44IhQ/bojX60FD7i3IRMxVhPxOyac884xBk1h
-         4cDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlLK/9t77OaCz0UGM/J8urYM3bBBnlqtd9YmBawRQfs=;
-        b=AsEIOw1tE+FYn1FxVRodztwHSt226knNIkxK3wEx4/lWw/bQ0jNtEX6O695KswVXMl
-         CA5SNONW7J7vvrR/786gyF6VbOSig4N6BJCs1LlTPHzHHDlRNOtx19GNoVyp+rYRTXpA
-         jUSp15rneIOJZEUXbiz9bKDqr0IvKd+20DbaiBDsexu75BNiVF7xOry5aVqopPMMYYoR
-         FlzZDf0aWv789GLWyDCa8Og/2gDbKGzsinzYm0lW/tQmeAQ8LIsm2/sYAxanvVR9j9ci
-         CC6rz4xCw+jX3kozxHydFNDl7E5xD58auBuHwraM2EglocrBhsDP9oT0s9+2W77s47i6
-         3zUw==
-X-Gm-Message-State: ANoB5pmFbZpTp2h1bUPuoqywXm8W7zpYJIOuxbCpNs9Krf1J6ifCY55W
-        nfTm29Lu5f2/6OlHW9D+QFY=
-X-Google-Smtp-Source: AA0mqf5IhyhoFAFTIOpBSp8ETqrVHUgTAA+/7jM945BelQAHiivdjpQPQFharevJcEcrmsphwDZy5A==
-X-Received: by 2002:a05:6808:30b:b0:35e:57ef:51f8 with SMTP id i11-20020a056808030b00b0035e57ef51f8mr17517142oie.52.1671533103732;
-        Tue, 20 Dec 2022 02:45:03 -0800 (PST)
-Received: from [192.168.68.106] (201-43-103-101.dsl.telesp.net.br. [201.43.103.101])
-        by smtp.gmail.com with ESMTPSA id j2-20020a056808034200b0035e461d9b1bsm5291043oie.50.2022.12.20.02.44.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Dec 2022 02:45:03 -0800 (PST)
-Message-ID: <5d727e59-fa21-ea08-112c-3b74db7e4577@gmail.com>
-Date:   Tue, 20 Dec 2022 07:44:54 -0300
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v3 1/5] dump: Include missing "cpu.h" header for
- tswap32/tswap64() declarations
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     Greg Kurz <groug@kaod.org>, qemu-ppc@nongnu.org,
-        =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+        with ESMTP id S230189AbiLTKqN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 20 Dec 2022 05:46:13 -0500
+Received: from mr85p00im-hyfv06021401.me.com (mr85p00im-hyfv06021401.me.com [17.58.23.190])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA76397
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 02:46:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ynddal.dk; s=sig1;
+        t=1671533171; bh=+/eU1TAjx4WUSjXZ6JhSVqCcFUfV+vuJWIVq0JcPOrk=;
+        h=Content-Type:Mime-Version:Subject:From:Date:Message-Id:To;
+        b=V6e+hvGRi/qMbxwUXXOCjaAAeljCF0VJ2je1F54nG+aDC/NX8a7QYt3WCXmbtQoY4
+         znaJtDUPcR8eAP1QF5+X6gGECA+s026lu1x9yxfQ1CD118LJROJvPwQBE1QwsQekjJ
+         tVVab+DaDES8o12jHy6Rul4aJCdU25DfH2y1ufV1rsNBXkpwDQZ12ImItWB7ofYYOp
+         aKn5LNH+XEh0DJxCzHvySOhgsbDMy7oolDNs8Q+BhYsRk75+RoqEL6BARkhkDhzIbt
+         l27v5EtEvTSVGhLi60ZkRe2oBsAc3gF38w0vXguDWF4asJpMyNMElpV8o66Cc7j6yD
+         KOVJZgBKKDNrA==
+Received: from smtpclient.apple (mr38p00im-dlb-asmtp-mailmevip.me.com [17.57.152.18])
+        by mr85p00im-hyfv06021401.me.com (Postfix) with ESMTPSA id EF840303FAC4;
+        Tue, 20 Dec 2022 10:46:08 +0000 (UTC)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.200.110.1.12\))
+Subject: Re: [PATCH] gdbstub: move update guest debug to accel ops
+From:   Mads Ynddal <mads@ynddal.dk>
+In-Reply-To: <87h6xyjcdh.fsf@linaro.org>
+Date:   Tue, 20 Dec 2022 11:45:56 +0100
+Cc:     =?utf-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        "open list:Overall KVM CPUs" <kvm@vger.kernel.org>,
         Yanan Wang <wangyanan55@huawei.com>,
-        Artyom Tarasenko <atar4qemu@gmail.com>,
-        Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
         Richard Henderson <richard.henderson@linaro.org>,
-        =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-arm@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Alistair Francis <alistair.francis@wdc.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-        Marek Vasut <marex@denx.de>, Bin Meng <bin.meng@windriver.com>,
         Eduardo Habkost <eduardo@habkost.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        qemu-riscv@nongnu.org, kvm@vger.kernel.org,
-        Stafford Horne <shorne@gmail.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Chris Wulff <crwulff@gmail.com>
-References: <20221216215519.5522-1-philmd@linaro.org>
- <20221216215519.5522-2-philmd@linaro.org>
-Content-Language: en-US
-From:   Daniel Henrique Barboza <danielhb413@gmail.com>
-In-Reply-To: <20221216215519.5522-2-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <4B19094C-63DC-4A81-A008-886504256D5D@ynddal.dk>
+References: <20221123121712.72817-1-mads@ynddal.dk>
+ <af92080f-e708-f593-7ff5-81b7b264d587@linaro.org>
+ <C8BC6E24-F98D-428D-80F8-98BDA40C7B15@ynddal.dk> <87h6xyjcdh.fsf@linaro.org>
+To:     =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+X-Mailer: Apple Mail (2.3731.200.110.1.12)
+X-Proofpoint-GUID: JCBdP1BveQSPN6rlqSgMr_A8JbhoN_u6
+X-Proofpoint-ORIG-GUID: JCBdP1BveQSPN6rlqSgMr_A8JbhoN_u6
+X-Proofpoint-Virus-Version: =?UTF-8?Q?vendor=3Dfsecure_engine=3D1.1.170-22c6f66c430a71ce266a39bfe25bc?=
+ =?UTF-8?Q?2903e8d5c8f:6.0.425,18.0.816,17.11.62.513.0000000_definitions?=
+ =?UTF-8?Q?=3D2022-01-18=5F01:2022-01-14=5F01,2022-01-18=5F01,2021-12-02?=
+ =?UTF-8?Q?=5F01_signatures=3D0?=
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 suspectscore=0
+ mlxlogscore=999 adultscore=0 phishscore=0 clxscore=1030 bulkscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2209130000 definitions=main-2212200090
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -99,27 +68,47 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+> It will do. You could just call it update_guest_debug as it is an
+> internal static function although I guess that makes grepping a bit of =
+a
+> pain.
 
-On 12/16/22 18:55, Philippe Mathieu-Daudé wrote:
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
-> ---
+I agree. It should preferably be something unique, to ease grep'ing.
 
+> Is something being accidentally linked with linux-user and softmmu?
 
-Reviewed-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Good question. I'm not familiar enough with the code base to know.
 
+I experimented with enabling/disabling linux-user when configuring, and =
+it does
+affect whether it compiles or not.
 
->   dump/dump.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/dump/dump.c b/dump/dump.c
-> index 279b07f09b..c62dc94213 100644
-> --- a/dump/dump.c
-> +++ b/dump/dump.c
-> @@ -29,6 +29,7 @@
->   #include "qemu/main-loop.h"
->   #include "hw/misc/vmcoreinfo.h"
->   #include "migration/blocker.h"
-> +#include "cpu.h"
->   
->   #ifdef TARGET_X86_64
->   #include "win_dump.h"
+The following seems to fix it, and I can see the same approach is taken =
+other
+places in cpu.c. Would this be an acceptable solution?
+
+diff --git a/cpu.c b/cpu.c
+index 6effa5acc9..c9e8700691 100644
+--- a/cpu.c
++++ b/cpu.c
+@@ -386,6 +386,7 @@ void cpu_breakpoint_remove_all(CPUState *cpu, int =
+mask)
+ void cpu_single_step(CPUState *cpu, int enabled)
+ {
+     if (cpu->singlestep_enabled !=3D enabled) {
++#if !defined(CONFIG_USER_ONLY)
+         const AccelOpsClass *ops =3D cpus_get_accel();
+
+         cpu->singlestep_enabled =3D enabled;
+@@ -393,6 +394,7 @@ void cpu_single_step(CPUState *cpu, int enabled)
+         if (ops->update_guest_debug) {
+             ops->update_guest_debug(cpu, 0);
+         }
++#endif
+
+         trace_breakpoint_singlestep(cpu->cpu_index, enabled);
+     }
+
+=E2=80=94
+Mads Ynddal
+
