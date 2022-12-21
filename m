@@ -2,98 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8EF7653591
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 18:46:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 998DD6535A2
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 18:54:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234611AbiLURqk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 12:46:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51192 "EHLO
+        id S230462AbiLURyH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 12:54:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234489AbiLURqa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 12:46:30 -0500
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 709A7A3
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:46:29 -0800 (PST)
-Date:   Wed, 21 Dec 2022 17:46:24 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1671644788;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Lq0/8mv7tU3gkv2tPiEwF0HZqzKvAv+MhTUPgiXCBig=;
-        b=BAHGWDxCiyH5CBuau1zbxP1aS3Nr/dlcsmE6N41OxCbyOrAoBs1dvdD4dkxNQ9kGfEhDEJ
-        hMjnzKwzTaX1ELWgQn6MkBecf0shN38nKabz4kcn7hb1MWroIJDVsTs3ErL/A/Llv19dUO
-        bEGY77OWkXqds/w8vnUhdgA5sFtyYik=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set
- as a write
-Message-ID: <Y6NGcFXLtwOt0+d6@google.com>
+        with ESMTP id S229491AbiLURyF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 12:54:05 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDC4223176;
+        Wed, 21 Dec 2022 09:54:03 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 79052B81BDD;
+        Wed, 21 Dec 2022 17:54:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30AEDC433EF;
+        Wed, 21 Dec 2022 17:54:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671645241;
+        bh=7LRl7Za1xJWk+DAkT1K7niH/xhQTNQuhVESv5AviT0Q=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=MwcYMmy0zWFWpAtAluvPnPFo8TnCkeieBXd6A2rvAkrB+3oz764XK7wH8x6tQLkfA
+         bqlk63bzyNJbb9HqEr5o3MV5C8brm3/L4hakACfnJhjiHw+vxoeRkj7yUyYBUNymi0
+         rvLZn1kvb10ovCLU+8p0LPxcWSMnGJ/iTezD7Z5uM/Ci0HJg06RKMNU3f49k1NCDm6
+         1AhpDpNqy/AcbCCcAhjzKewk+wy5+yKHnEBjeO/sCLrgyFZz1n1TivKmZ/jWpi7O8u
+         7LE/dzcHHjAp82elLTpCdMSSyUeQgviJMv8nsEjsH3AGtxIEtczGdASqdQ4xSIxvkD
+         edbO2ZlXSgNSQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p83Hy-00ECiH-OR;
+        Wed, 21 Dec 2022 17:53:58 +0000
+Date:   Wed, 21 Dec 2022 17:53:58 +0000
+Message-ID: <86k02kbq2x.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
+In-Reply-To: <Y6M5Vh+EGOhkR5hd@google.com>
 References: <20221220200923.1532710-1-maz@kernel.org>
- <20221220200923.1532710-3-maz@kernel.org>
- <Y6M4TqvJytAEq2ID@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y6M4TqvJytAEq2ID@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        <20221220200923.1532710-2-maz@kernel.org>
+        <Y6IteDoK406o9pM+@google.com>
+        <86pmcdaylx.wl-maz@kernel.org>
+        <Y6M5Vh+EGOhkR5hd@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, ardb@kernel.org, will@kernel.org, qperret@google.com, stable@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 08:46:06AM -0800, Ricardo Koller wrote:
-
-[...]
-
-> > -			return false;
-> > +			/* Can't introspect TCR_EL1 with pKVM */
-> > +			if (kvm_vm_is_protected(vcpu->kvm))
-> > +				return false;
-> > +
-> > +			mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > +			afdb = cpuid_feature_extract_unsigned_field(mmfr1, ID_AA64MMFR1_EL1_HAFDBS_SHIFT);
-> > +
-> > +			if (afdb == ID_AA64MMFR1_EL1_HAFDBS_NI)
-> > +				return false;
-> > +
-> > +			return (vcpu_read_sys_reg(vcpu, TCR_EL1) & TCR_HA);
+On Wed, 21 Dec 2022 16:50:30 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> Also tested this specific case using page_fault_test when the PT page is
-> marked for dirty logging with and without AF. In both cases there's a
-> single _FSC_FAULT (no PERM_FAUT) as expected, and the PT page is marked dirty
-> in the AF case. The RO and UFFD cases also work as expected.
+> On Wed, Dec 21, 2022 at 09:35:06AM +0000, Marc Zyngier wrote:
 > 
-> Need to send some changes for page_fault_test as many tests assume that
-> any S1PTW is always a PT write, and are failing. Also need to add some new
-> tests for PTs in RO memslots (as it didn't make much sense before this
-> change).
+> [...]
+> 
+> > > > +	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> > > > +		/*
+> > > > +		 * Only a permission fault on a S1PTW should be
+> > > > +		 * considered as a write. Otherwise, page tables baked
+> > > > +		 * in a read-only memslot will result in an exception
+> > > > +		 * being delivered in the guest.
+> > > 
+> > > Somewhat of a tangent, but:
+> > > 
+> > > Aren't we somewhat unaligned with the KVM UAPI by injecting an
+> > > exception in this case? I know we've been doing it for a while, but it
+> > > flies in the face of the rules outlined in the
+> > > KVM_SET_USER_MEMORY_REGION documentation.
+> > 
+> > That's an interesting point, and I certainly haven't considered that
+> > for faults introduced by page table walks.
+> > 
+> > I'm not sure what userspace can do with that though. The problem is
+> > that this is a write for which we don't have useful data: although we
+> > know it is a page-table walker access, we don't know what it was about
+> > to write. The instruction that caused the write is meaningless (it
+> > could either be a load, a store, or an instruction fetch). How do you
+> > populate the data[] field then?
+> > 
+> > If anything, this is closer to KVM_EXIT_ARM_NISV, for which we give
+> > userspace the full ESR and ask it to sort it out. I doubt it will be
+> > able to, but hey, maybe it is worth a shot. This would need to be a
+> > different exit reason though, as NISV is explicitly for non-memslot
+> > stuff.
+> > 
+> > In any case, the documentation for KVM_SET_USER_MEMORY_REGION needs to
+> > reflect the fact that KVM_EXIT_MMIO cannot represent a fault due to a
+> > S1 PTW.
+> 
+> Oh I completely agree with you here. I probably should have said before,
+> I think the exit would be useless anyway. Getting the documentation in
+> line with the intended behavior seems to be the best fix.
 
-So I actually wanted to bring up the issue of user visibility, glad your
-test picked up something.
+Right. How about something like this?
 
-This has two implications, which are rather odd.
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index 226b40baffb8..72abd018a618 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -1381,6 +1381,14 @@ It is recommended to use this API instead of the KVM_SET_MEMORY_REGION ioctl.
+ The KVM_SET_MEMORY_REGION does not allow fine grained control over memory
+ allocation and is deprecated.
+ 
++Note: On arm64, a write generated by the page-table walker (to update
++the Access and Dirty flags, for example) never results in a
++KVM_EXIT_MMIO exit when the slot has the KVM_MEM_READONLY flag. This
++is because KVM cannot provide the data that would be written by the
++page-table walker, making it impossible to emulate the access.
++Instead, an abort (data abort if the cause of the page-table update
++was a load or a store, instruction abort if it was an instruction
++fetch) is injected in the guest.
+ 
+ 4.36 KVM_SET_TSS_ADDR
+ ---------------------
 
- - When UFFD is in use, translation faults are reported to userspace as
-   writes when from a RW memslot and reads when from an RO memslot.
-
- - S1 page table memory is spuriously marked as dirty, as we presume a
-   write immediately follows the translation fault. That isn't entirely
-   senseless, as it would mean both the target page and the S1 PT that
-   maps it are both old. This is nothing new I suppose, just weird.
-
-Marc, do you have any concerns about leaving this as-is for the time
-being? At least before we were doing the same thing (write fault) every
-time.
-
---
 Thanks,
-Oliver
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
