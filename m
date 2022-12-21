@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A378653881
+	by mail.lfdr.de (Postfix) with ESMTP id C8FCF653883
 	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 23:24:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234942AbiLUWY3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 17:24:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36148 "EHLO
+        id S234964AbiLUWYe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 17:24:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229601AbiLUWY0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 17:24:26 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAE102715A
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 14:24:25 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id l7-20020a170902f68700b00192495b1f10so153147plg.2
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 14:24:25 -0800 (PST)
+        with ESMTP id S234948AbiLUWYb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 17:24:31 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 578BB2715E
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 14:24:29 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id jc4-20020a17090325c400b00189ceee4049so152620plb.3
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 14:24:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mr/upkq9nUstxPAXFOYz+TIWTjnNhJ7646Ga8zDx7MA=;
-        b=jcxCfXrS0rhqjdrrTg9RFmHommcZLL9JJIOJmSEjlqGB6hsqaBvlotnqSYyzuM2o1r
-         oyxgX7LusyGPkW4t09A2Ps3Tbd/T0zkw/iHV6uV3gwWeBDbz3xZpksS8uIEZQReN8k4D
-         gTZ/kgRejuP4J7gYltEmSRz4GYSehjtuE/FLqamWE/P7u15/c9ZToC0iogQQIP8Pejds
-         ii5k/zaJDE/8yX30EqZr7Fdi6ezF9uKNfAO4Wkpzv0osK8ojhKjyjCCtLfLzO/HKX78u
-         wOc1P5laTqWlvK39uvp0tnnasQLlOXiwegfhLRQh58XXgN51EcR94i5Ib2o2lx+A3Bi6
-         sIuw==
+        bh=yXovaXGmQ2hj+xhfXzlYPf6jy3g3M6Z97i9sJYKtL7o=;
+        b=XUqeRrYpmjbz24aOUCRdZhU/hasfAHWkBLZ4lTvglulOiCrqV4g30TxCuKN75BwGCU
+         4LXBLsZDthjsLf+2AAZudjXxcPvh/idm+4kfCCahPLRDtw4awMTHPJRM+3GLuCE2z2xW
+         UXWY9noDLDSwD7MOFEHp549vimmJUdsZlZLlkat6N1yZkyca8ji4la9bIC+7aRA7MNjJ
+         YtbFM6nqgK4y9kxkqqzX2AYDFPzZeTYjsNQEJ2emwoQuCWJEmRyoXNEcGGrMTsjlBGmI
+         JZjMUvnzAPwUHXLd7BkZn8APBej2IkOxylMhK0+Z0QbMqCvFV2hi5iU8e6JCqA3ryxd/
+         vIwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mr/upkq9nUstxPAXFOYz+TIWTjnNhJ7646Ga8zDx7MA=;
-        b=UmmHhhsYnuM1beYVIJfYBNsGIC9ycCQTEyRvYYlhfytcvXfK4HYP8Kx+ZrZ8DiaG3R
-         MWMK+oTKlKC/Nbi0933h5Fp1W6l7Ilca/u8OXN6Kkvy7U9VBIjSbRgXrwG8IpA7HGYoq
-         gfhOp0mpBVd5dhsIwOmtv4Ot0kodF/zVSOWGzYrefktQARSTDtR//hWyTQUEi2VGcNrW
-         Vw+Ps7gnRavD2RzEC2cONfUS6BOVFFHYuIb1v/ocveKqjwMhSym72K3NcCg6AokSfzOw
-         PadOPEKpqI6lFZhZ0stjARHZ+kQ3pqadAOzTPSSMBIvyFWFDAf2Rhz6RxoOWtITvM+nF
-         4XxA==
-X-Gm-Message-State: AFqh2krOU6xDrPMzKAeioFVL4GuRjl+XWtzKpa1XVelaq8Qx8Vyg1Jwe
-        Jl5J+M5rn0N7iX9SKrcYLgsFLAkV0GyG
-X-Google-Smtp-Source: AMrXdXtD9skHtEgX98zo+vsV8XbpbOjpDWDpMzej9vuGx7SmxRfWxOXIU8CMO9TrBWF83dJViVPY5tL4GZ10
+        bh=yXovaXGmQ2hj+xhfXzlYPf6jy3g3M6Z97i9sJYKtL7o=;
+        b=S25hcHMGVzrIpcrgRM9zjR54QMNcTx5nKhcmd79tw2NElUsThtBgtBvRTUnEcUMMbP
+         +wAQnOBn7SSXqXgVtioGl0l+BD8SfVPhhf/4qCAZ9ZwzYA4w6OTUoHWmAKijUgfUVvs1
+         1gU2FSCTnVjhrhsaIsEyL4JkBry0REPTePzUmjfcvCt3OjMXtDigUs93VqcaoFhIrFNQ
+         C7k/eCeb80mu++/ySRuxgd2/u1DNeoTTOKifJDhsB6OIr5zFpEMBGe40zbUey+JPKjiJ
+         xJHRCnR7gv8ss1vNcseYt108LpqlvQ9MVZS3vFerUUIn1kRlPNQ6G8BJyzieko9dm0+e
+         8MOQ==
+X-Gm-Message-State: AFqh2kpSLN9s3FrHy7ouaceU6bla8r7T4jRnM6H2jkThLqDJ2PH3AdLJ
+        SJxnTdZeMNI053yEWUff9ghnWOQlG6bD
+X-Google-Smtp-Source: AMrXdXv8RdH6TwKdO23ZhAUnv4pAyWPuCeF7bltNA6yJNFTlLDH8JfMjr5eV9VokhVrwkrGyuruwOWr5Fb3F
 X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
- (user=bgardon job=sendgmr) by 2002:a62:2781:0:b0:57a:6e2a:c236 with SMTP id
- n123-20020a622781000000b0057a6e2ac236mr218098pfn.82.1671661465306; Wed, 21
- Dec 2022 14:24:25 -0800 (PST)
-Date:   Wed, 21 Dec 2022 22:24:06 +0000
+ (user=bgardon job=sendgmr) by 2002:a17:90a:9913:b0:225:aa06:8fcb with SMTP id
+ b19-20020a17090a991300b00225aa068fcbmr167806pjp.78.1671661468931; Wed, 21 Dec
+ 2022 14:24:28 -0800 (PST)
+Date:   Wed, 21 Dec 2022 22:24:08 +0000
 In-Reply-To: <20221221222418.3307832-1-bgardon@google.com>
 Mime-Version: 1.0
 References: <20221221222418.3307832-1-bgardon@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221221222418.3307832-3-bgardon@google.com>
-Subject: [RFC 02/14] KVM: x86/MMU: Expose functions for the Shadow MMU
+Message-ID: <20221221222418.3307832-5-bgardon@google.com>
+Subject: [RFC 04/14] KVM: x86/MMU: Expose functions for paging_tmpl.h
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -71,196 +71,144 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Expose various common MMU functions which the Shadow MMU will need via
-mmu_internal.h. This just slightly reduces the work needed to move the
-shadow MMU code out of mmu.c, which will already be a massive change.
+In preparation for moving paging_tmpl.h to shadow_mmu.c, expose various
+functions it needs through mmu_internal.h. This includes modifying the
+BUILD_MMU_ROLE_ACCESSOR macro so that it does not automatically include
+the static label, since some but not all of the accessors are needed by
+paging_tmpl.h.
 
 No functional change intended.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c          | 41 ++++++++++++++-------------------
- arch/x86/kvm/mmu/mmu_internal.h | 24 +++++++++++++++++++
- 2 files changed, 41 insertions(+), 24 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 32 ++++++++++++++++----------------
+ arch/x86/kvm/mmu/mmu_internal.h | 16 ++++++++++++++++
+ 2 files changed, 32 insertions(+), 16 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 07b99a7ce830..729a2799d4d7 100644
+index bf14e181eb12..a17e8a79e4df 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -156,9 +156,9 @@ struct kvm_shadow_walk_iterator {
- 		({ spte = mmu_spte_get_lockless(_walker.sptep); 1; });	\
- 	     __shadow_walk_next(&(_walker), spte))
- 
--static struct kmem_cache *pte_list_desc_cache;
-+struct kmem_cache *pte_list_desc_cache;
- struct kmem_cache *mmu_page_header_cache;
--static struct percpu_counter kvm_total_used_mmu_pages;
-+struct percpu_counter kvm_total_used_mmu_pages;
- 
- static void mmu_spte_set(u64 *sptep, u64 spte);
- 
-@@ -234,11 +234,6 @@ static struct kvm_mmu_role_regs vcpu_to_role_regs(struct kvm_vcpu *vcpu)
- 	return regs;
+@@ -153,18 +153,18 @@ BUILD_MMU_ROLE_REGS_ACCESSOR(efer, lma, EFER_LMA);
+  * and the vCPU may be incorrect/irrelevant.
+  */
+ #define BUILD_MMU_ROLE_ACCESSOR(base_or_ext, reg, name)		\
+-static inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
++inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
+ {								\
+ 	return !!(mmu->cpu_role. base_or_ext . reg##_##name);	\
  }
+ BUILD_MMU_ROLE_ACCESSOR(base, cr0, wp);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
++static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
+ BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smep);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
++static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
++static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
++static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
+ BUILD_MMU_ROLE_ACCESSOR(base, efer, nx);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  efer, lma);
++static BUILD_MMU_ROLE_ACCESSOR(ext,  efer, lma);
  
--static inline bool kvm_available_flush_tlb_with_range(void)
--{
--	return kvm_x86_ops.tlb_remote_flush_with_range;
--}
--
- static void kvm_flush_remote_tlbs_with_range(struct kvm *kvm,
- 		struct kvm_tlb_range *range)
+ static inline bool is_cr0_pg(struct kvm_mmu *mmu)
  {
-@@ -262,8 +257,8 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
+@@ -210,7 +210,7 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
  	kvm_flush_remote_tlbs_with_range(kvm, &range);
  }
  
--static void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
--			   unsigned int access)
-+void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
-+		    unsigned int access)
+-static gfn_t get_mmio_spte_gfn(u64 spte)
++gfn_t get_mmio_spte_gfn(u64 spte)
  {
- 	u64 spte = make_mmio_spte(vcpu, gfn, access);
+ 	u64 gpa = spte & shadow_nonpresent_or_rsvd_lower_gfn_mask;
  
-@@ -610,7 +605,7 @@ static bool mmu_spte_age(u64 *sptep)
- 	return true;
+@@ -240,7 +240,7 @@ static bool check_mmio_spte(struct kvm_vcpu *vcpu, u64 spte)
+ 	return likely(kvm_gen == spte_gen);
  }
  
--static void walk_shadow_page_lockless_begin(struct kvm_vcpu *vcpu)
-+void walk_shadow_page_lockless_begin(struct kvm_vcpu *vcpu)
+-static int is_cpuid_PSE36(void)
++int is_cpuid_PSE36(void)
  {
- 	if (is_tdp_mmu(vcpu->arch.mmu)) {
- 		kvm_tdp_mmu_walk_lockless_begin();
-@@ -629,7 +624,7 @@ static void walk_shadow_page_lockless_begin(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+@@ -279,7 +279,7 @@ void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
  	}
  }
  
--static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
-+void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+-static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
++int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
  {
- 	if (is_tdp_mmu(vcpu->arch.mmu)) {
- 		kvm_tdp_mmu_walk_lockless_end();
-@@ -822,8 +817,8 @@ void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp)
- 		      &kvm->arch.possible_nx_huge_pages);
+ 	int r;
+ 
+@@ -818,8 +818,8 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, gfn_t gfn, kvm_pfn_t pfn)
+ 	return -EFAULT;
  }
  
--static void account_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp,
--				 bool nx_huge_page_possible)
-+void account_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp,
-+			  bool nx_huge_page_possible)
+-static int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+-			       unsigned int access)
++int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++			unsigned int access)
  {
- 	sp->nx_huge_page_disallowed = true;
- 
-@@ -857,16 +852,15 @@ void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp)
- 	list_del_init(&sp->possible_nx_huge_page_link);
+ 	/* The pfn is invalid, report the error! */
+ 	if (unlikely(is_error_pfn(fault->pfn)))
+@@ -1275,8 +1275,8 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
+ 	return RET_PF_RETRY;
  }
  
--static void unaccount_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp)
-+void unaccount_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+-static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
+-					 struct kvm_page_fault *fault)
++bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
++				  struct kvm_page_fault *fault)
  {
- 	sp->nx_huge_page_disallowed = false;
- 
- 	untrack_possible_nx_huge_page(kvm, sp);
- }
- 
--static struct kvm_memory_slot *
--gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu, gfn_t gfn,
--			    bool no_dirty_log)
-+struct kvm_memory_slot *gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu,
-+						    gfn_t gfn, bool no_dirty_log)
- {
- 	struct kvm_memory_slot *slot;
- 
-@@ -1403,7 +1397,7 @@ bool kvm_mmu_slot_gfn_write_protect(struct kvm *kvm,
- 	return write_protected;
- }
- 
--static bool kvm_vcpu_write_protect_gfn(struct kvm_vcpu *vcpu, u64 gfn)
-+bool kvm_vcpu_write_protect_gfn(struct kvm_vcpu *vcpu, u64 gfn)
- {
- 	struct kvm_memory_slot *slot;
- 
-@@ -1902,9 +1896,8 @@ static int kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	return ret;
- }
- 
--static bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm,
--					struct list_head *invalid_list,
--					bool remote_flush)
-+bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm, struct list_head *invalid_list,
-+				 bool remote_flush)
- {
- 	if (!remote_flush && list_empty(invalid_list))
+ 	if (unlikely(fault->rsvd))
  		return false;
-@@ -1916,7 +1909,7 @@ static bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm,
- 	return true;
+@@ -1338,7 +1338,7 @@ void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+ 	kvm_mmu_do_page_fault(vcpu, work->cr2_or_gpa, 0, true);
  }
  
--static bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
-+bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+-static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
++int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
  {
- 	if (sp->role.invalid)
- 		return true;
-@@ -6148,7 +6141,7 @@ static inline bool need_topup(struct kvm_mmu_memory_cache *cache, int min)
- 	return kvm_mmu_memory_cache_nr_free_objects(cache) < min;
- }
+ 	struct kvm_memory_slot *slot = fault->slot;
+ 	bool async;
+@@ -1403,8 +1403,8 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+  * Returns true if the page fault is stale and needs to be retried, i.e. if the
+  * root was invalidated by a memslot update or a relevant mmu_notifier fired.
+  */
+-static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+-				struct kvm_page_fault *fault, int mmu_seq)
++bool is_page_fault_stale(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++			 int mmu_seq)
+ {
+ 	struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
  
--static bool need_topup_split_caches_or_resched(struct kvm *kvm)
-+bool need_topup_split_caches_or_resched(struct kvm *kvm)
- {
- 	if (need_resched() || rwlock_needbreak(&kvm->mmu_lock))
- 		return true;
-@@ -6163,7 +6156,7 @@ static bool need_topup_split_caches_or_resched(struct kvm *kvm)
- 	       need_topup(&kvm->arch.split_shadow_page_cache, 1);
- }
- 
--static int topup_split_caches(struct kvm *kvm)
-+int topup_split_caches(struct kvm *kvm)
- {
- 	/*
- 	 * Allocating rmap list entries when splitting huge pages for nested
 diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index dbaf6755c5a7..856e2e0a8420 100644
+index 74a99b67f09e..957376fcb333 100644
 --- a/arch/x86/kvm/mmu/mmu_internal.h
 +++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -131,7 +131,9 @@ struct kvm_mmu_page {
- #endif
- };
+@@ -341,6 +341,22 @@ bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
+ void walk_shadow_page_lockless_begin(struct kvm_vcpu *vcpu);
+ void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu);
  
-+extern struct kmem_cache *pte_list_desc_cache;
- extern struct kmem_cache *mmu_page_header_cache;
-+extern struct percpu_counter kvm_total_used_mmu_pages;
- 
- static inline int kvm_mmu_role_as_id(union kvm_mmu_page_role role)
- {
-@@ -317,6 +319,28 @@ void disallowed_hugepage_adjust(struct kvm_page_fault *fault, u64 spte, int cur_
- void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
- 
- void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-+void account_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp,
-+			  bool nx_huge_page_possible);
- void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
-+void unaccount_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
- 
-+static inline bool kvm_available_flush_tlb_with_range(void)
-+{
-+	return kvm_x86_ops.tlb_remote_flush_with_range;
-+}
++int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect);
+ bool need_topup_split_caches_or_resched(struct kvm *kvm);
+ int topup_split_caches(struct kvm *kvm);
 +
-+void mark_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, u64 gfn,
-+		    unsigned int access);
-+struct kvm_memory_slot *gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu,
-+						    gfn_t gfn, bool no_dirty_log);
-+bool kvm_vcpu_write_protect_gfn(struct kvm_vcpu *vcpu, u64 gfn);
-+bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm, struct list_head *invalid_list,
-+				 bool remote_flush);
-+bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
++bool is_page_fault_stale(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++			 int mmu_seq);
++bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
++				  struct kvm_page_fault *fault);
++int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
++int handle_abnormal_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++			unsigned int access);
 +
-+void walk_shadow_page_lockless_begin(struct kvm_vcpu *vcpu);
-+void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu);
++gfn_t get_mmio_spte_gfn(u64 spte);
 +
-+bool need_topup_split_caches_or_resched(struct kvm *kvm);
-+int topup_split_caches(struct kvm *kvm);
++bool is_efer_nx(struct kvm_mmu *mmu);
++bool is_cr4_smep(struct kvm_mmu *mmu);
++bool is_cr0_wp(struct kvm_mmu *mmu);
++int is_cpuid_PSE36(void);
  #endif /* __KVM_X86_MMU_INTERNAL_H */
 -- 
 2.39.0.314.g84b9a713c41-goog
