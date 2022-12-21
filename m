@@ -2,168 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AD6D652D23
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 08:04:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 55B4D652D38
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 08:19:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234409AbiLUHD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 02:03:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52760 "EHLO
+        id S234372AbiLUHTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 02:19:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234423AbiLUHDy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 02:03:54 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD2DB20365
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 23:03:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671606231; x=1703142231;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=g4q0zXpf34afc09WSeD5KCd2tdDSXHperZUY5Bxi34Y=;
-  b=KSvq7qhB09REIpWhpJcBRdMO+/+W7E99ZfznTLubZHgDKpgADduTP/P4
-   ngHTNbSc1JwxTdan7WgHQC8H80lnOtJdB2Lut+tYD8vI6DglV6RA7OR4W
-   CLYQ3gMBCGWsq17zuCB8wF53zuTntd1SZqwKfi3/+D/DOjyFzLVNcR0o8
-   xP5PgG2hF1r1rF8GasBCoKessaa9Po8ObQFHswLZhmcYTSQTTKk8JRTmM
-   DJC3r/CAM4ZdBdULUHSMr+EGnYSJwK9/YtfWb35lWmT5sk+8nJZ6gHUot
-   ddrx5lMP2RBJN6j46AVfpfZ885cWiHB45ygCFO9eM2hUNb8zvgqIHZIyY
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="317438919"
-X-IronPort-AV: E=Sophos;i="5.96,261,1665471600"; 
-   d="scan'208";a="317438919"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2022 23:03:41 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="653402819"
-X-IronPort-AV: E=Sophos;i="5.96,261,1665471600"; 
-   d="scan'208";a="653402819"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga007.fm.intel.com with ESMTP; 20 Dec 2022 23:03:40 -0800
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 20 Dec 2022 23:03:40 -0800
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 20 Dec 2022 23:03:39 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Tue, 20 Dec 2022 23:03:39 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.174)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Tue, 20 Dec 2022 23:03:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=boezAZJgV563MRoPphLexIPnd7ONe7V05Rvh+Uqnhu6dy4FeOskbXrlmrwOZWG4eEK+mfcRth9ygeyzp85B6nxmg1rn/wNDXXdDrwj24A1LQFavbBLGnysA8ACEvaz+37GMm4yfea02Pod+eB0E6cBZuw5uEGvxusZ/fAJX/CNkqDH+2wrvielsL8I27qdt4s1QbVzbH77ifhKogiFIzsPVfmwSLE4a8hIUTtYQWDn61/t+ohyLQpqD2brhLI8FWQ6hdBJGeuY2g09P9hCFQhFMM4VZexGhVafY3RTfcVkJqbw9MbbWDGJR/uhd96SvC5edx078tlrE4tjWNZZiw/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qBazJo/RwDlfVsvZ1pjcPetwr0kBPvt7qUoFhFH0rdg=;
- b=mM4a3nxvaB/A8Yr6ta9dr2ud3tW37TneIFB7pp+1cZhUlJw0AaHiSu1ifF5c59VQ8XufbES/V7tnCfwuBGiPeRxhAgw74hvGX0KnKodKlPenj1/dhSQFfQifw553SqmdvKAk9uLQcwOXCUmD4f2arD5ORlLyuSyGFXTamqri8uzIuqt0aAunT6Xf7yHt1sCbapDHsReao1yAEeMb0LTI8RREUlWHyTryQB6hN9O1TnH7EzNry1RuL578woOZ024UslK0ZtVXcbZDIstNwE7AoLpJtOH2sxwuoCZnd4ev1SZzSEaJSgUttibifcUZCLS25CSb0jzALTCiJyFC180vJA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by CY8PR11MB7361.namprd11.prod.outlook.com (2603:10b6:930:84::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5924.16; Wed, 21 Dec
- 2022 07:03:38 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::991e:f94d:f7ac:4f8]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::991e:f94d:f7ac:4f8%8]) with mapi id 15.20.5924.016; Wed, 21 Dec 2022
- 07:03:38 +0000
-Message-ID: <924cfb40-4443-7b81-cfe6-ac0978f58be3@intel.com>
-Date:   Wed, 21 Dec 2022 15:04:21 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Firefox/91.0 Thunderbird/91.11.0
-Subject: Re: [RFC 06/12] vfio: Pass struct vfio_device_file * to
- vfio_device_open/close()
-Content-Language: en-US
-To:     "Tian, Kevin" <kevin.tian@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>
-References: <20221219084718.9342-1-yi.l.liu@intel.com>
- <20221219084718.9342-7-yi.l.liu@intel.com>
- <BN9PR11MB5276DF71950E708BA18619C08CEB9@BN9PR11MB5276.namprd11.prod.outlook.com>
-From:   Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <BN9PR11MB5276DF71950E708BA18619C08CEB9@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SI1PR02CA0007.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::6) To DS0PR11MB7529.namprd11.prod.outlook.com
- (2603:10b6:8:141::20)
+        with ESMTP id S234145AbiLUHTF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 02:19:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8370E2099B
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 23:18:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671607101;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=nlacvgblqRgjQqp66kSgstJzrl1cVqPeE2g1ienuDTo=;
+        b=Cak2C6KamcIiOxPk3p3PnztbjOAb52goZq8uVVAVd5XaSu0l7wAodhHRgP8lidWZbZlobl
+        klO4IWOzf6SRbnuRsTo6+OLbBORSBAc5e7F0hjs7Sr5Om9pxB97V4w7rf6RYD913d7R4ma
+        dvwKzkk1ngcIO5d6MgmrW7KaBnAIbUk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-616-XzAvhCe-MNyaSRMa80wJpA-1; Wed, 21 Dec 2022 02:18:19 -0500
+X-MC-Unique: XzAvhCe-MNyaSRMa80wJpA-1
+Received: by mail-ej1-f70.google.com with SMTP id nb4-20020a1709071c8400b007c18ba778e9so9929075ejc.16
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 23:18:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nlacvgblqRgjQqp66kSgstJzrl1cVqPeE2g1ienuDTo=;
+        b=qyFtHWC5Tq2dx/Wq5l2GFR5XOU3n/T9jKQ/moz1yl87nQnPKpaY4QGAHDHR6BdHc3i
+         Z04ETovpy2YXEc/7EMFR8uoLfSiwfNS+yFYDr3qDGZmATeAESvq5JjuJ+JC0seTmtLZK
+         pMl8njNcP1ST3TUowRBgRcFwh+rL3jyq0kvWNlUiYkKEgzbbZP4k6wCnQpRzJLHXZD8e
+         NcviF3CrNqBrdd4TUVyME5bp3W4n9geHfBv0C9P0MGBhs7BDIMutXAiNH3+/IKHbvru/
+         2i64z+uCy5D9xsQhdvgJHKCRFPnKk1qXhHSJvAVW1jLumia//YTNddr//iHQHKPlBEsb
+         2gyA==
+X-Gm-Message-State: AFqh2kqLRPKJV72xrPtIHzJCIDL8dl2D4em9GMQygCmnixVXxgnXXlO0
+        UIWuzJm0N7mh/tI12BrsqPt0HEGF4Y9mX8UpmdmhNCTTNXE89eCUx6vN9w8nM/trdPMcCuzQkM9
+        3vNrXSHnTOLe+wwpD/81U24wpFNRO
+X-Received: by 2002:a17:906:6d5a:b0:83c:17d9:67a8 with SMTP id a26-20020a1709066d5a00b0083c17d967a8mr65003ejt.540.1671607098814;
+        Tue, 20 Dec 2022 23:18:18 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuzlsICdOi1XsQcOQoxAwJvryf5JuNM6c3TqgmwU1+PwZghUoO7dzApodHgZZy4Kvd4Eu9EUUskw6B/bKoPcYY=
+X-Received: by 2002:a17:906:6d5a:b0:83c:17d9:67a8 with SMTP id
+ a26-20020a1709066d5a00b0083c17d967a8mr64995ejt.540.1671607098627; Tue, 20 Dec
+ 2022 23:18:18 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|CY8PR11MB7361:EE_
-X-MS-Office365-Filtering-Correlation-Id: 26afec92-70fb-4548-3130-08dae3217bec
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0pCpZx/DvVQkLwv0daN7Y4n7D7RAHTsnsGOyQv5Grz92ZgRS7GxKfztRE0nDCHyKCnWBA6xi1xgfe8SPDvblngWiv0gLmNS3Q/W1CjtszbvpQk4Rjg3yskZDUvrDesuSVwVQubXyI61Mre0mZ049+4+f/Py0RDsd6srxSuoUZ57vAhzaAj2il6rgjqaQbTwFU/xnbZoFrd5UpoHXVkM6tz3Dhzl8SpFhlQWk7j0Cqo3mJmqapZRoIw1Edq8qdAZDOCzR3PxwRJheh02WiWLP0Q/tRJ/regUdlO+5RBdCIRpASqOBLn8EqlW/CzVgul28a6DphtGwh3Df/UGpTx12+kNo0tBa9+ha9KNbudCNqrYbXsYonLvBnYxnMq00ITEPH37/63NxF+15NxQs4BL+5dpX7I0ufZBxhY3pQEitbp+itGOD7Sikp5PGqOrYgsl0DZR2KcG8pSey+7S3jZYAPaLJTbrPSdXGmsTNa+/iFRdiIRdHwLeqEs+JrHPBJFjdiDobHhRsUGKTWRs3+IMcL8z8lCPCe/W//Q/Dx9W6c/6dI2GceTA9bZGF5MJMdsFJn93zsreOQfInZb4EWnTOXcpPXfScYSr5if9eN0oGBhCauwN2Cq5k+TYQ+fszm6GpIUTe1fFFdugK15sKD8v32MZwfOb0MPk8biu5FmFxvlP8Hnt+YY8Agf9A26R4SrPu5oim6AARKZ8ngElwYVOjCVsQzHMILB8pXdBFwXGb03U=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(39860400002)(346002)(376002)(396003)(366004)(451199015)(26005)(31686004)(6512007)(6486002)(2616005)(186003)(6506007)(478600001)(66946007)(4326008)(66556008)(66476007)(8676002)(41300700001)(8936002)(5660300002)(6666004)(83380400001)(2906002)(7416002)(36756003)(110136005)(38100700002)(86362001)(54906003)(31696002)(53546011)(82960400001)(316002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Qm5vRDBFQ0xpOGRBelM2MkVldlFoWTNZQStwSW5oNnhTaFU0YmVMakdoMzFz?=
- =?utf-8?B?ZVBzNm5KWXdVYXBhRlFLM1hYUmVNS0paekp6bzIvYWlUdEp2cEdFYkduRnVo?=
- =?utf-8?B?ZlZ1SU44dUZXNVo2MnFEZWNJdWVlNkcrN0VCRWxUZFVza0R4dVhndWRFSTZu?=
- =?utf-8?B?TDlqMzJKZlRHNXJCMmxSSk9oSFhwdERxVkhpdTNJNDFFaHpybXBheENJdDZE?=
- =?utf-8?B?OUl3eU5WSGhiL0dIQVVYVFJ1T1ZNdS9YTnhXcDZFSmpwUjVvTkxWTjk5QTc4?=
- =?utf-8?B?Ty9SN1htNXFEZG4xM2ZxMVlWQUUyYmdhK1dCQUhwMmk2QUVRTkx1cGthcVFS?=
- =?utf-8?B?S1pCYkRnQmtDd1AyN1YrRnpJdGpHZU43NHJIZUpnWlpWUlJ2Z3QrdENaTlFR?=
- =?utf-8?B?MWsyam1KOG9sTW4vWlFSdVZOTU50U1d4Y3dpRGwvN2ViWlBudUdubDRXR2Zo?=
- =?utf-8?B?bDg4UFhYcVF2Sk5vYi9sd2ViU05YY0E5MzFGaFI2TkNJc29wc1pIVmpuUW0w?=
- =?utf-8?B?OW1YMUhSYWRvSWFVOStzOFJaMXVjRTNtQlFkY01wWllnaDFBSE03UjRQZktW?=
- =?utf-8?B?a2QyWWdZOTk4dUJ5V29TOHZsZUFFR1k5WFJJTXp2bm5mNFVmTVczcnd4ZVdL?=
- =?utf-8?B?L2RIZEtJUTNCTzQ3Nkd6L3JlcFFJUWprek9pS3ArUExkdGZVT1ZIcWQ1VmJh?=
- =?utf-8?B?cWhiTDFydzAwZ3hnOEtCQkEzZUNJWGllMkpwZUJqM0hrZWdMNVRRVCtvUmlF?=
- =?utf-8?B?NzdJLzI1WWlIckQydzFNeHB5WHZnbzQxMjFqbHMvL3gvR3VLUTZjQkxUUGFD?=
- =?utf-8?B?TytpNk5xam92TUt6enA2eDlRVlRvci9hNU1PWkZkeUQxYjZrTlMwVy9tUHFi?=
- =?utf-8?B?OWFsRkVTWTR0RXhKVGdSYzlmSC9tVnZsdjUybDlTRm5xTnlWUHJmQlNaUTA3?=
- =?utf-8?B?VjdPVTByanJlWnFPNXRWVnU4by90REh1WSs1VVd0U1U1SlBOczA5aStlNXp4?=
- =?utf-8?B?ckMwSCtXMVNzRTNxQjY0ajJEUi9IRlh3UTU4eXRaQTBGRytwK2k5SHRGNjVE?=
- =?utf-8?B?Zzg0eVp4S0plelZOTnJZdDMydDJGSk9FK2J1Q2lBc0lGMFduTnY4SVZYVXd3?=
- =?utf-8?B?aXkvNVFxUDFuaFVwV2dOdDVLOTRFaGhXN1l2QWRlUDJONHhzbDdQK2RXR1Br?=
- =?utf-8?B?Y09rV0p3ZkZZOElhY1pJekgwaElhQUpzT2N0SW5aMnBpcVFHeUlRTlhhSGNE?=
- =?utf-8?B?RkxybzZVdzhVMlBuQ3dpcHFwck8xYmIyOU1Rb2xveS9mN2Nhdk43aWwydmwx?=
- =?utf-8?B?MGtCRWxQM1llNFN1TFdUTGJoOWNMYU5NWlJEK1dLMlVHRWxBUWMxeDZDa2dl?=
- =?utf-8?B?QVJmL1RaWlVteEF4SmtHbitZbmh3bWI4aWtyN0xhVko4MEFEMGtsMUt3Wkky?=
- =?utf-8?B?REdnV2RTelBUOXJKd1h6aUtwUTJYOWN3RW1PSkp2NUowNnh2aElFQ2NTVW10?=
- =?utf-8?B?OGtseDU3WXZyeGZBWDRkaGpIbnhsRzB2VkJ5NDFGYjErbEFXSGlKc3E1dkdZ?=
- =?utf-8?B?U0xsVkRVYno3L3dsQ29Md3hlNDdlVkg2RjE3eVkrVU9xcVUwbzVLdUZwUEd0?=
- =?utf-8?B?VDJhcVdOTVoyY0s4Q3hkdkJkTGNlSFNvNGtPeGs5N1k3SWYvWERRMjQ3S3RC?=
- =?utf-8?B?bURnZ1h5Z0ZURnpGdndLOUJiN1RRS1lsbkx1WWhVWTJtYXM2Um91ZXB5dXZ1?=
- =?utf-8?B?NUZlRW1CUWdTQ3Q2WXAxcVhkNy9lVUpMTWMzVlE2d2VEOHE1ZmQ4d3ZYSnRL?=
- =?utf-8?B?QlN2RHk5RmUxL2FXSC9jQ3FIdTY0aFk5WDU3V0tuazhuc0IwOXJwMEpwdkN1?=
- =?utf-8?B?QXVETzdpYkpXU2xqNTFTTXQzMEFIaEoxSENmc3lXdldQdXdHZysyVW92OC9j?=
- =?utf-8?B?NndYZmZNUThJL2FQQlFSTUs3SFhoSWRiRFZWUXZsY3NPaGd1bmlGYXFCNWRG?=
- =?utf-8?B?aERodFJucnRSak1LaGhJRHFhU05la3FFcDEvUDB5VDZ3TXEvR0NUQ0pTQVlJ?=
- =?utf-8?B?MWxKc05iWWlkZmplQTRKWE9veEQ5aEowcFFxaVM2WFRPWGloUFhhaHJLYUFw?=
- =?utf-8?Q?2z1OMjv6GvrZc+y6tmmBAw1F9?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 26afec92-70fb-4548-3130-08dae3217bec
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Dec 2022 07:03:38.1348
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UBAdgbA70BpPBYsCM0/+KFi9kkhv7LsDhu2b/WkpTUoFc+4rUV4fZ3v7C5UnfTUQOFLX+0zNXMdfkgmynlDa8Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7361
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-8.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20221214163025.103075-1-sgarzare@redhat.com> <20221214163025.103075-7-sgarzare@redhat.com>
+In-Reply-To: <20221214163025.103075-7-sgarzare@redhat.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 21 Dec 2022 08:17:41 +0100
+Message-ID: <CAJaqyWdwa5P6hXJ5Ovup+Uz3293Asr10CLvi4JVQZqDL-M1p1A@mail.gmail.com>
+Subject: Re: [RFC PATCH 6/6] vdpa_sim: add support for user VA
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     virtualization@lists.linux-foundation.org,
+        Jason Wang <jasowang@redhat.com>,
+        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -171,51 +76,205 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Wed, Dec 14, 2022 at 5:31 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>
+> The new "use_va" module parameter (default: false) is used in
 
-On 2022/12/21 12:10, Tian, Kevin wrote:
->> From: Liu, Yi L <yi.l.liu@intel.com>
->> Sent: Monday, December 19, 2022 4:47 PM
->>
->> This avoids passing struct kvm * and struct iommufd_ctx * in multiple
->> functions. vfio_device_open() becomes to be a locked helper, while
->> vfio_device_open() still holds device->dev_set->lock itself.
-> 
-> Not sure what the words after 'while' intend to explain.
+Why not true by default? I'd say it makes more sense for the simulator
+to use va mode and only use pa for testing it.
 
-yeah, may remove it.
+> vdpa_alloc_device() to inform the vDPA framework that the device
+> supports VA.
+>
+> vringh is initialized to use VA only when "use_va" is true and the
+> user's mm has been bound. So, only when the bus supports user VA
+> (e.g. vhost-vdpa).
+>
+> vdpasim_mm_work_fn work is used to attach the kthread to the user
+> address space when the .bind_mm callback is invoked, and to detach
+> it when the device is reset.
+>
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+> ---
+>  drivers/vdpa/vdpa_sim/vdpa_sim.h |   1 +
+>  drivers/vdpa/vdpa_sim/vdpa_sim.c | 104 ++++++++++++++++++++++++++++++-
+>  2 files changed, 103 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
+> index 07ef53ea375e..1b010e5c0445 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
+> @@ -55,6 +55,7 @@ struct vdpasim {
+>         struct vdpasim_virtqueue *vqs;
+>         struct kthread_worker *worker;
+>         struct kthread_work work;
+> +       struct mm_struct *mm_bound;
+>         struct vdpasim_dev_attr dev_attr;
+>         /* spinlock to synchronize virtqueue state */
+>         spinlock_t lock;
+> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> index 36a1d2e0a6ba..6e07cedef30c 100644
+> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
+> @@ -36,10 +36,90 @@ module_param(max_iotlb_entries, int, 0444);
+>  MODULE_PARM_DESC(max_iotlb_entries,
+>                  "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
+>
+> +static bool use_va;
+> +module_param(use_va, bool, 0444);
+> +MODULE_PARM_DESC(use_va, "Enable the device's ability to use VA");
+> +
+>  #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
+>  #define VDPASIM_QUEUE_MAX 256
+>  #define VDPASIM_VENDOR_ID 0
+>
+> +struct vdpasim_mm_work {
+> +       struct kthread_work work;
+> +       struct task_struct *owner;
+> +       struct mm_struct *mm;
+> +       bool bind;
+> +       int ret;
+> +};
+> +
+> +static void vdpasim_mm_work_fn(struct kthread_work *work)
+> +{
+> +       struct vdpasim_mm_work *mm_work =
+> +               container_of(work, struct vdpasim_mm_work, work);
+> +
+> +       mm_work->ret = 0;
+> +
+> +       if (mm_work->bind) {
+> +               kthread_use_mm(mm_work->mm);
+> +#if 0
+> +               if (mm_work->owner)
+> +                       mm_work->ret = cgroup_attach_task_all(mm_work->owner,
+> +                                                             current);
+> +#endif
+> +       } else {
+> +#if 0
+> +               //TODO: check it
+> +               cgroup_release(current);
+> +#endif
+> +               kthread_unuse_mm(mm_work->mm);
+> +       }
+> +}
+> +
+> +static void vdpasim_worker_queue_mm(struct vdpasim *vdpasim,
+> +                                   struct vdpasim_mm_work *mm_work)
+> +{
+> +       struct kthread_work *work = &mm_work->work;
+> +
+> +       kthread_init_work(work, vdpasim_mm_work_fn);
+> +       kthread_queue_work(vdpasim->worker, work);
+> +
+> +       spin_unlock(&vdpasim->lock);
+> +       kthread_flush_work(work);
+> +       spin_lock(&vdpasim->lock);
+> +}
+> +
+> +static int vdpasim_worker_bind_mm(struct vdpasim *vdpasim,
+> +                                 struct mm_struct *new_mm,
+> +                                 struct task_struct *owner)
+> +{
+> +       struct vdpasim_mm_work mm_work;
+> +
+> +       mm_work.owner = owner;
+> +       mm_work.mm = new_mm;
+> +       mm_work.bind = true;
+> +
+> +       vdpasim_worker_queue_mm(vdpasim, &mm_work);
+> +
+> +       if (!mm_work.ret)
+> +               vdpasim->mm_bound = new_mm;
+> +
+> +       return mm_work.ret;
+> +}
+> +
+> +static void vdpasim_worker_unbind_mm(struct vdpasim *vdpasim)
+> +{
+> +       struct vdpasim_mm_work mm_work;
+> +
+> +       if (!vdpasim->mm_bound)
+> +               return;
+> +
+> +       mm_work.mm = vdpasim->mm_bound;
+> +       mm_work.bind = false;
+> +
+> +       vdpasim_worker_queue_mm(vdpasim, &mm_work);
+> +
+> +       vdpasim->mm_bound = NULL;
+> +}
+>  static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
+>  {
+>         return container_of(vdpa, struct vdpasim, vdpa);
+> @@ -66,8 +146,10 @@ static void vdpasim_vq_notify(struct vringh *vring)
+>  static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
+>  {
+>         struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
+> +       bool va_enabled = use_va && vdpasim->mm_bound;
+>
+> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, false, false,
+> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, false,
+> +                         va_enabled,
+>                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
+>                           (struct vring_avail *)
+>                           (uintptr_t)vq->driver_addr,
+> @@ -96,6 +178,9 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
+>  {
+>         int i;
+>
+> +       //TODO: should we cancel the works?
+> +       vdpasim_worker_unbind_mm(vdpasim);
+> +
+>         spin_lock(&vdpasim->iommu_lock);
+>
+>         for (i = 0; i < vdpasim->dev_attr.nvqs; i++) {
+> @@ -275,7 +360,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
+>
+>         vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
+>                                     dev_attr->ngroups, dev_attr->nas,
+> -                                   dev_attr->name, false);
+> +                                   dev_attr->name, use_va);
+>         if (IS_ERR(vdpasim)) {
+>                 ret = PTR_ERR(vdpasim);
+>                 goto err_alloc;
+> @@ -657,6 +742,19 @@ static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
+>         return ret;
+>  }
+>
+> +static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *mm,
+> +                          struct task_struct *owner)
+> +{
+> +       struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
+> +       int ret;
+> +
+> +       spin_lock(&vdpasim->lock);
+> +       ret = vdpasim_worker_bind_mm(vdpasim, mm, owner);
+> +       spin_unlock(&vdpasim->lock);
+> +
+> +       return ret;
+> +}
+> +
+>  static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
+>                            u64 iova, u64 size,
+>                            u64 pa, u32 perm, void *opaque)
+> @@ -744,6 +842,7 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
+>         .set_group_asid         = vdpasim_set_group_asid,
+>         .dma_map                = vdpasim_dma_map,
+>         .dma_unmap              = vdpasim_dma_unmap,
+> +       .bind_mm                = vdpasim_bind_mm,
+>         .free                   = vdpasim_free,
+>  };
+>
+> @@ -776,6 +875,7 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
+>         .get_iova_range         = vdpasim_get_iova_range,
+>         .set_group_asid         = vdpasim_set_group_asid,
+>         .set_map                = vdpasim_set_map,
+> +       .bind_mm                = vdpasim_bind_mm,
+>         .free                   = vdpasim_free,
+>  };
+>
+> --
+> 2.38.1
+>
 
->> -int vfio_device_open(struct vfio_device *device,
->> -		     struct iommufd_ctx *iommufd, struct kvm *kvm)
->> +int vfio_device_open(struct vfio_device_file *df)
->>   {
->> -	int ret = 0;
->> +	struct vfio_device *device = df->device;
->> +
->> +	lockdep_assert_held(&device->dev_set->lock);
->>
->> -	mutex_lock(&device->dev_set->lock);
->>   	device->open_count++;
->>   	if (device->open_count == 1) {
->> -		ret = vfio_device_first_open(device, iommufd, kvm);
->> -		if (ret)
->> +		int ret;
->> +
->> +		ret = vfio_device_first_open(df);
->> +		if (ret) {
->>   			device->open_count--;
->> +			return ret;
->> +		}
->>   	}
->> -	mutex_unlock(&device->dev_set->lock);
->>
->> -	return ret;
->> +	return 0;
->>   }
-> 
-> I don't see the point of moving 'ret' into the inner block.
-
-just want to make the function success oriented. :-)
-
--- 
-Regards,
-Yi Liu
