@@ -2,128 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 44D54653207
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 14:47:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AB936532E9
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 16:09:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233140AbiLUNrQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 08:47:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
+        id S233782AbiLUPJB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 10:09:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230072AbiLUNrP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 08:47:15 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BE36475;
-        Wed, 21 Dec 2022 05:47:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671630434; x=1703166434;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=Ey/uI44qPCpd4ueyxtxDLkQhSghq6Fbj8dB2OhBP0No=;
-  b=Hta25vIZugyt08XE12XPlw8wi4ujV3wir82IZS9dfVva9Cgnwz9KC31f
-   ei5ocTRN2lF9EQU/d8dqZW4jc7lrGKFNdwTw3RUQh+zuWkI/m63+AFwRW
-   4I+TY2JNyVNzQB67IxQBnS8Kgl3CosleTrM4pUovIMXLKNxSCoP+3xrCA
-   ERQBCx8OG6yd8z+WCpRRmVQJUi+hDzEzKQJqYUQsgvpWL8he8TtaAVtdj
-   dfBM3PWzqKV6YbegjQ+TAdtKUZh3x4aO2yR0AQ9E6Qs9WGUh1PPnzdn1u
-   fn9up1uI31MzP3z7GTFB/13ku2WvXwL/4NptD6RS4YYVXbkur1vUb7L4J
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="318568460"
-X-IronPort-AV: E=Sophos;i="5.96,262,1665471600"; 
-   d="scan'208";a="318568460"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2022 05:47:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="651402272"
-X-IronPort-AV: E=Sophos;i="5.96,262,1665471600"; 
-   d="scan'208";a="651402272"
-Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga002.jf.intel.com with ESMTP; 21 Dec 2022 05:47:03 -0800
-Date:   Wed, 21 Dec 2022 21:42:46 +0800
-From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 3/9] KVM: Extend the memslot to support fd-based
- private memory
-Message-ID: <20221221134246.GB1766136@chaop.bj.intel.com>
-Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
- <Y6B27MpZO8o1Asfe@zn.tnic>
- <20221220074318.GC1724933@chaop.bj.intel.com>
- <Y6GGoAVQGPyCaDnS@zn.tnic>
+        with ESMTP id S229596AbiLUPJA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 10:09:00 -0500
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5007F22B01;
+        Wed, 21 Dec 2022 07:08:59 -0800 (PST)
+Received: by mail-wm1-x32f.google.com with SMTP id o15so11375404wmr.4;
+        Wed, 21 Dec 2022 07:08:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OXTq8sebFtJCOj2ociK9GeRfG8lBsoPqCb0yS+CSPS8=;
+        b=EN7oMT5rjrIRJvyVaC/QdFIEDYM+UzOV5EBaftH2racgVsgMoQzMFRlkR1zMQLnhVp
+         VkGnLH/fV/DvbZFfS61A3Y7/EVE4mzTGx/PB/TuKMMQYPrLsRJ1V1rYgvqsJqYianeVD
+         STacOrZhkcGMReTm40n2VeCFED1RFfKpEWcBtkY7LFeM6iEVCSPd7qfJ7bHWqW9Fp4f5
+         LSHu35aRYJD8xP6FyU7HBsru4BDtuGgOiWV/ahZqtyYfcTI0rBI8/0PFrkF0taKWzhbL
+         w4WhD2BOuQ4nmdmcH2PKH+N2j20ZROTpF0wXPR/hMPByPNPubNVJWvWUW5Ob1/7k3pHa
+         hjqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OXTq8sebFtJCOj2ociK9GeRfG8lBsoPqCb0yS+CSPS8=;
+        b=vTK/o7hE5+wggztu0vrS62yTJix7q6+y3EzX5JqRFFz1fhIPM44RKRTMayxaddTelh
+         aB84pNUN9ghzLBDYa6KEmPgGezDAx4qBi0pG0JYzourBRQE098+LTYVoN3ih8FJCZ3Sq
+         Hu15wG3nQatKB4hPIuSmVqdiVjlYqGBGOjMWTbuX2KrHNr5mF3Wtz2fAy1gia2ynjR6U
+         7E+8huIi8GikMzak8ymqkA3zgSX/lVOZvkAFXU/laBPFMOWfo/9EEoDIq8ikMQbrv1CV
+         3KOxzrmaDtECZLVd5Tx+4JyF91VTWf5Sc7wV86xucH2RlShj0S3OMRN4zRlVCk/6Smzd
+         E07A==
+X-Gm-Message-State: AFqh2kqY4KAWjUBGZH0AZI0RqZ/Ha2ObBmncDnAfTawNle5iTb9BQlFo
+        /J4vUdNjHwnh9SaJnPR0Y9ybIbpIsOotAoM6FW73FopF
+X-Google-Smtp-Source: AMrXdXvbreqW1N4Iv6xe2I6QmjzM7ZPwEApyn0Kkk/CcJYjy3hGRfIyACRkOHyT+WP3i0uraOpFTN7ozjuahNMmOEV4=
+X-Received: by 2002:a05:600c:4395:b0:3d0:7513:d149 with SMTP id
+ e21-20020a05600c439500b003d07513d149mr159969wmn.156.1671635337433; Wed, 21
+ Dec 2022 07:08:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y6GGoAVQGPyCaDnS@zn.tnic>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+From:   Major Saheb <majosaheb@gmail.com>
+Date:   Wed, 21 Dec 2022 20:38:46 +0530
+Message-ID: <CANBBZXNCaZx9fmHsre2mF2yr7Ru66BSEZxFT7ou=Y04zv5a8Zw@mail.gmail.com>
+Subject: DMAR: [DMA Read NO_PASID] Request device [0b:00.0] fault addr
+ 0xffffe000 [fault reason 0x06] PTE Read access is not set
+To:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Zhenzhong Duan <zhenzhong.duan@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 10:55:44AM +0100, Borislav Petkov wrote:
-> On Tue, Dec 20, 2022 at 03:43:18PM +0800, Chao Peng wrote:
-> > RESTRICTEDMEM is needed by TDX_HOST, not TDX_GUEST.
-> 
-> Which basically means that RESTRICTEDMEM should simply depend on KVM.
-> Because you can't know upfront whether KVM will run a TDX guest or a SNP
-> guest and so on.
-> 
-> Which then means that RESTRICTEDMEM will practically end up always
-> enabled in KVM HV configs.
+I have an ubuntu guest running on kvm , and I am passing it 10 qemu
+emulated nvme drives
+    <iommu model='intel'>
+      <driver intremap='on' eim='on'/>
+    </iommu>
+<qemu:arg value='pcie-root-port,id=pcie-root-port%d,slot=%d'/>
+<qemu:arg value='nvme,drive=NVME%d,serial=%s_%d,id=NVME%d,bus=pcie-root-port%d'/>
 
-That's right, CONFIG_RESTRICTEDMEM is always selected for supported KVM
-architectures (currently x86_64).
+kernel
+Linux node-1 5.15.0-56-generic #62-Ubuntu SMP ----- x86_64 x86_64
+x86_64 GNU/Linux
 
-> 
-> > The only reason to add another HAVE_KVM_RESTRICTED_MEM is some code only
-> > works for 64bit[*] and CONFIG_RESTRICTEDMEM is not sufficient to enforce
-> > that.
-> 
-> This is what I mean with "we have too many Kconfig items". :-\
+kernel command line
+intel_iommu=on
 
-Yes I agree. One way to remove this is probably additionally checking
-CONFIG_64BIT instead.
+I have attached these drives to vfio-pcie.
 
-Thanks,
-Chao
-> 
-> -- 
-> Regards/Gruss,
->     Boris.
-> 
-> https://people.kernel.org/tglx/notes-about-netiquette
+when I try to send IO commands to these drives VIA a userspace nvme
+driver using VFIO I get
+[ 1474.752590] DMAR: DRHD: handling fault status reg 2
+[ 1474.754463] DMAR: [DMA Read NO_PASID] Request device [0b:00.0]
+fault addr 0xffffe000 [fault reason 0x06] PTE Read access is not set
+
+Can someone explain to me what's happening here ?
