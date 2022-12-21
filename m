@@ -2,279 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55B4D652D38
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 08:19:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9585D652D75
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 08:50:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234372AbiLUHTH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 02:19:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55778 "EHLO
+        id S234292AbiLUHus (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 02:50:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234145AbiLUHTF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 02:19:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8370E2099B
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 23:18:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671607101;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nlacvgblqRgjQqp66kSgstJzrl1cVqPeE2g1ienuDTo=;
-        b=Cak2C6KamcIiOxPk3p3PnztbjOAb52goZq8uVVAVd5XaSu0l7wAodhHRgP8lidWZbZlobl
-        klO4IWOzf6SRbnuRsTo6+OLbBORSBAc5e7F0hjs7Sr5Om9pxB97V4w7rf6RYD913d7R4ma
-        dvwKzkk1ngcIO5d6MgmrW7KaBnAIbUk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-616-XzAvhCe-MNyaSRMa80wJpA-1; Wed, 21 Dec 2022 02:18:19 -0500
-X-MC-Unique: XzAvhCe-MNyaSRMa80wJpA-1
-Received: by mail-ej1-f70.google.com with SMTP id nb4-20020a1709071c8400b007c18ba778e9so9929075ejc.16
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 23:18:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nlacvgblqRgjQqp66kSgstJzrl1cVqPeE2g1ienuDTo=;
-        b=qyFtHWC5Tq2dx/Wq5l2GFR5XOU3n/T9jKQ/moz1yl87nQnPKpaY4QGAHDHR6BdHc3i
-         Z04ETovpy2YXEc/7EMFR8uoLfSiwfNS+yFYDr3qDGZmATeAESvq5JjuJ+JC0seTmtLZK
-         pMl8njNcP1ST3TUowRBgRcFwh+rL3jyq0kvWNlUiYkKEgzbbZP4k6wCnQpRzJLHXZD8e
-         NcviF3CrNqBrdd4TUVyME5bp3W4n9geHfBv0C9P0MGBhs7BDIMutXAiNH3+/IKHbvru/
-         2i64z+uCy5D9xsQhdvgJHKCRFPnKk1qXhHSJvAVW1jLumia//YTNddr//iHQHKPlBEsb
-         2gyA==
-X-Gm-Message-State: AFqh2kqLRPKJV72xrPtIHzJCIDL8dl2D4em9GMQygCmnixVXxgnXXlO0
-        UIWuzJm0N7mh/tI12BrsqPt0HEGF4Y9mX8UpmdmhNCTTNXE89eCUx6vN9w8nM/trdPMcCuzQkM9
-        3vNrXSHnTOLe+wwpD/81U24wpFNRO
-X-Received: by 2002:a17:906:6d5a:b0:83c:17d9:67a8 with SMTP id a26-20020a1709066d5a00b0083c17d967a8mr65003ejt.540.1671607098814;
-        Tue, 20 Dec 2022 23:18:18 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuzlsICdOi1XsQcOQoxAwJvryf5JuNM6c3TqgmwU1+PwZghUoO7dzApodHgZZy4Kvd4Eu9EUUskw6B/bKoPcYY=
-X-Received: by 2002:a17:906:6d5a:b0:83c:17d9:67a8 with SMTP id
- a26-20020a1709066d5a00b0083c17d967a8mr64995ejt.540.1671607098627; Tue, 20 Dec
- 2022 23:18:18 -0800 (PST)
+        with ESMTP id S230238AbiLUHup (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 02:50:45 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6141EB3E
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 23:50:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1671609043; x=1703145043;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=0AnB+hgpDMdzl2ksAPHCogUVHsAxYeV5yXh3+TszIwk=;
+  b=mdHJWGFt/f9QK7iy/tSCDsit4nhTWo5hq6BObE5Tqb16HlSW2Q8hPPkR
+   0hxp8+KEORkZ89NLd4f/UHuEl2dSBsCr+P4FKwP1KsmCVBJIPi/wbmEqo
+   vPPiN1cjTFKJSc+tn5FH5yRtMdtfOKrfe39NEv8lGcazoPsUbAmM0USTI
+   PG93GULg0e68X52cvw5iRQFYRZRn6SRQha0GhzlC4rWBtzSpvaGy8Ej3q
+   ZSfwF9g/fjEYWEWS0BiDXR5I5auXYjePvlEc0ORIQU7+Ohbj1KpDXA0pk
+   UCSyMV9uOZV1fRTpxhMdClFgR/5YoyJzQ3D4VsTEZZtjPwlBqpiLyIgMd
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="321720708"
+X-IronPort-AV: E=Sophos;i="5.96,262,1665471600"; 
+   d="scan'208";a="321720708"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2022 23:50:42 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="825555966"
+X-IronPort-AV: E=Sophos;i="5.96,262,1665471600"; 
+   d="scan'208";a="825555966"
+Received: from xruan5-mobl.ccr.corp.intel.com (HELO localhost) ([10.255.29.248])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Dec 2022 23:50:37 -0800
+Date:   Wed, 21 Dec 2022 15:50:35 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     Robert Hoo <robert.hu@linux.intel.com>
+Cc:     Yuan Yao <yuan.yao@linux.intel.com>, pbonzini@redhat.com,
+        seanjc@google.com, kirill.shutemov@linux.intel.com,
+        kvm@vger.kernel.org, Jingqi Liu <jingqi.liu@intel.com>
+Subject: Re: [PATCH v3 5/9] KVM: x86: MMU: Integrate LAM bits when build
+ guest CR3
+Message-ID: <20221221075034.yx5unrmkkwubvpm2@linux.intel.com>
+References: <20221209044557.1496580-1-robert.hu@linux.intel.com>
+ <20221209044557.1496580-6-robert.hu@linux.intel.com>
+ <20221219065347.oojvunwaszvqxhu5@yy-desk-7060>
+ <49fd8ecc10bef5a4c6393aa8f313858c69a03ea3.camel@linux.intel.com>
 MIME-Version: 1.0
-References: <20221214163025.103075-1-sgarzare@redhat.com> <20221214163025.103075-7-sgarzare@redhat.com>
-In-Reply-To: <20221214163025.103075-7-sgarzare@redhat.com>
-From:   Eugenio Perez Martin <eperezma@redhat.com>
-Date:   Wed, 21 Dec 2022 08:17:41 +0100
-Message-ID: <CAJaqyWdwa5P6hXJ5Ovup+Uz3293Asr10CLvi4JVQZqDL-M1p1A@mail.gmail.com>
-Subject: Re: [RFC PATCH 6/6] vdpa_sim: add support for user VA
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Jason Wang <jasowang@redhat.com>,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, stefanha@redhat.com,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <49fd8ecc10bef5a4c6393aa8f313858c69a03ea3.camel@linux.intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 5:31 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
->
-> The new "use_va" module parameter (default: false) is used in
+> No. CR4.LAM_SUP isn't an enablement switch over CR3.LAM_U{48,57},
+> they're parallel relationship, CR4.LAM_SUP controls supervisor mode
+> addresses has LAM or not while CR3.LAM_U controls user mode address's
+> LAM enablement.
 
-Why not true by default? I'd say it makes more sense for the simulator
-to use va mode and only use pa for testing it.
+Unfortunately, the spec(the one in your cover letter) has a bug in
+"10.1 ENUMERATION, ENABLING, AND CONFIGURATION":
 
-> vdpa_alloc_device() to inform the vDPA framework that the device
-> supports VA.
->
-> vringh is initialized to use VA only when "use_va" is true and the
-> user's mm has been bound. So, only when the bus supports user VA
-> (e.g. vhost-vdpa).
->
-> vdpasim_mm_work_fn work is used to attach the kthread to the user
-> address space when the .bind_mm callback is invoked, and to detach
-> it when the device is reset.
->
-> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
-> ---
->  drivers/vdpa/vdpa_sim/vdpa_sim.h |   1 +
->  drivers/vdpa/vdpa_sim/vdpa_sim.c | 104 ++++++++++++++++++++++++++++++-
->  2 files changed, 103 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.h b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> index 07ef53ea375e..1b010e5c0445 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.h
-> @@ -55,6 +55,7 @@ struct vdpasim {
->         struct vdpasim_virtqueue *vqs;
->         struct kthread_worker *worker;
->         struct kthread_work work;
-> +       struct mm_struct *mm_bound;
->         struct vdpasim_dev_attr dev_attr;
->         /* spinlock to synchronize virtqueue state */
->         spinlock_t lock;
-> diff --git a/drivers/vdpa/vdpa_sim/vdpa_sim.c b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> index 36a1d2e0a6ba..6e07cedef30c 100644
-> --- a/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> +++ b/drivers/vdpa/vdpa_sim/vdpa_sim.c
-> @@ -36,10 +36,90 @@ module_param(max_iotlb_entries, int, 0444);
->  MODULE_PARM_DESC(max_iotlb_entries,
->                  "Maximum number of iotlb entries for each address space. 0 means unlimited. (default: 2048)");
->
-> +static bool use_va;
-> +module_param(use_va, bool, 0444);
-> +MODULE_PARM_DESC(use_va, "Enable the device's ability to use VA");
-> +
->  #define VDPASIM_QUEUE_ALIGN PAGE_SIZE
->  #define VDPASIM_QUEUE_MAX 256
->  #define VDPASIM_VENDOR_ID 0
->
-> +struct vdpasim_mm_work {
-> +       struct kthread_work work;
-> +       struct task_struct *owner;
-> +       struct mm_struct *mm;
-> +       bool bind;
-> +       int ret;
-> +};
-> +
-> +static void vdpasim_mm_work_fn(struct kthread_work *work)
-> +{
-> +       struct vdpasim_mm_work *mm_work =
-> +               container_of(work, struct vdpasim_mm_work, work);
-> +
-> +       mm_work->ret = 0;
-> +
-> +       if (mm_work->bind) {
-> +               kthread_use_mm(mm_work->mm);
-> +#if 0
-> +               if (mm_work->owner)
-> +                       mm_work->ret = cgroup_attach_task_all(mm_work->owner,
-> +                                                             current);
-> +#endif
-> +       } else {
-> +#if 0
-> +               //TODO: check it
-> +               cgroup_release(current);
-> +#endif
-> +               kthread_unuse_mm(mm_work->mm);
-> +       }
-> +}
-> +
-> +static void vdpasim_worker_queue_mm(struct vdpasim *vdpasim,
-> +                                   struct vdpasim_mm_work *mm_work)
-> +{
-> +       struct kthread_work *work = &mm_work->work;
-> +
-> +       kthread_init_work(work, vdpasim_mm_work_fn);
-> +       kthread_queue_work(vdpasim->worker, work);
-> +
-> +       spin_unlock(&vdpasim->lock);
-> +       kthread_flush_work(work);
-> +       spin_lock(&vdpasim->lock);
-> +}
-> +
-> +static int vdpasim_worker_bind_mm(struct vdpasim *vdpasim,
-> +                                 struct mm_struct *new_mm,
-> +                                 struct task_struct *owner)
-> +{
-> +       struct vdpasim_mm_work mm_work;
-> +
-> +       mm_work.owner = owner;
-> +       mm_work.mm = new_mm;
-> +       mm_work.bind = true;
-> +
-> +       vdpasim_worker_queue_mm(vdpasim, &mm_work);
-> +
-> +       if (!mm_work.ret)
-> +               vdpasim->mm_bound = new_mm;
-> +
-> +       return mm_work.ret;
-> +}
-> +
-> +static void vdpasim_worker_unbind_mm(struct vdpasim *vdpasim)
-> +{
-> +       struct vdpasim_mm_work mm_work;
-> +
-> +       if (!vdpasim->mm_bound)
-> +               return;
-> +
-> +       mm_work.mm = vdpasim->mm_bound;
-> +       mm_work.bind = false;
-> +
-> +       vdpasim_worker_queue_mm(vdpasim, &mm_work);
-> +
-> +       vdpasim->mm_bound = NULL;
-> +}
->  static struct vdpasim *vdpa_to_sim(struct vdpa_device *vdpa)
->  {
->         return container_of(vdpa, struct vdpasim, vdpa);
-> @@ -66,8 +146,10 @@ static void vdpasim_vq_notify(struct vringh *vring)
->  static void vdpasim_queue_ready(struct vdpasim *vdpasim, unsigned int idx)
->  {
->         struct vdpasim_virtqueue *vq = &vdpasim->vqs[idx];
-> +       bool va_enabled = use_va && vdpasim->mm_bound;
->
-> -       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, false, false,
-> +       vringh_init_iotlb(&vq->vring, vdpasim->features, vq->num, false,
-> +                         va_enabled,
->                           (struct vring_desc *)(uintptr_t)vq->desc_addr,
->                           (struct vring_avail *)
->                           (uintptr_t)vq->driver_addr,
-> @@ -96,6 +178,9 @@ static void vdpasim_do_reset(struct vdpasim *vdpasim)
->  {
->         int i;
->
-> +       //TODO: should we cancel the works?
-> +       vdpasim_worker_unbind_mm(vdpasim);
-> +
->         spin_lock(&vdpasim->iommu_lock);
->
->         for (i = 0; i < vdpasim->dev_attr.nvqs; i++) {
-> @@ -275,7 +360,7 @@ struct vdpasim *vdpasim_create(struct vdpasim_dev_attr *dev_attr,
->
->         vdpasim = vdpa_alloc_device(struct vdpasim, vdpa, NULL, ops,
->                                     dev_attr->ngroups, dev_attr->nas,
-> -                                   dev_attr->name, false);
-> +                                   dev_attr->name, use_va);
->         if (IS_ERR(vdpasim)) {
->                 ret = PTR_ERR(vdpasim);
->                 goto err_alloc;
-> @@ -657,6 +742,19 @@ static int vdpasim_set_map(struct vdpa_device *vdpa, unsigned int asid,
->         return ret;
->  }
->
-> +static int vdpasim_bind_mm(struct vdpa_device *vdpa, struct mm_struct *mm,
-> +                          struct task_struct *owner)
-> +{
-> +       struct vdpasim *vdpasim = vdpa_to_sim(vdpa);
-> +       int ret;
-> +
-> +       spin_lock(&vdpasim->lock);
-> +       ret = vdpasim_worker_bind_mm(vdpasim, mm, owner);
-> +       spin_unlock(&vdpasim->lock);
-> +
-> +       return ret;
-> +}
-> +
->  static int vdpasim_dma_map(struct vdpa_device *vdpa, unsigned int asid,
->                            u64 iova, u64 size,
->                            u64 pa, u32 perm, void *opaque)
-> @@ -744,6 +842,7 @@ static const struct vdpa_config_ops vdpasim_config_ops = {
->         .set_group_asid         = vdpasim_set_group_asid,
->         .dma_map                = vdpasim_dma_map,
->         .dma_unmap              = vdpasim_dma_unmap,
-> +       .bind_mm                = vdpasim_bind_mm,
->         .free                   = vdpasim_free,
->  };
->
-> @@ -776,6 +875,7 @@ static const struct vdpa_config_ops vdpasim_batch_config_ops = {
->         .get_iova_range         = vdpasim_get_iova_range,
->         .set_group_asid         = vdpasim_set_group_asid,
->         .set_map                = vdpasim_set_map,
-> +       .bind_mm                = vdpasim_bind_mm,
->         .free                   = vdpasim_free,
->  };
->
-> --
-> 2.38.1
->
+CR4.LAM_SUP enables and configures LAM for supervisor pointers:
+• If CR3.LAM_SUP = 0, LAM is not enabled for supervisor pointers.
+• If CR3.LAM_SUP = 1, LAM is enabled for supervisor pointers with a width determined by the paging mode:
 
+Based on the context, I think "CR3.LAM_SUP" should be "CR4.LAM_SUP".
+
+I believe it could just be a typo. But it is confusing enough.
+
+B.R.
+Yu
