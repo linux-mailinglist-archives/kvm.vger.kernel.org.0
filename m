@@ -2,70 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BC091652C9A
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 06:59:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4F77C652CEC
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 07:36:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234440AbiLUF7n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 00:59:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57736 "EHLO
+        id S234274AbiLUGg2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 01:36:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234411AbiLUF7j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 00:59:39 -0500
+        with ESMTP id S234395AbiLUGf5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 01:35:57 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F297BE0F
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 21:58:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C27FE1EC71
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 22:35:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671602330;
+        s=mimecast20190719; t=1671604509;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=YqEHm3UzxG6ffY8Bp/o4RuRuWIrmYvg6Ffwy9vsFjIs=;
-        b=Mi/HbYe1RJ4GADp2eQPpEwVQBTbDPICKUccaW4EeSDUSP1sSlxVsQC14tl/FDL8dgig2Yd
-        sGoHTeiV/ObEuy87WKdH44f2Hs4tnX1NL0OXbr5TcT3Ha5+LJTzeqjQ3ax+RQ4bWzm09dT
-        +wjmISTRX+iFFo+MDmuG8EoeMl2mwDE=
-Received: from mail-ot1-f69.google.com (mail-ot1-f69.google.com
- [209.85.210.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Oogjy+HZSATwQ8rGTEmVI9Wh5GRJb31ePjraWFpnkQk=;
+        b=eja6HyZ/Kk/6V2g3NdFBxcDSvqimdxB5aVkN5K+LbtejNkrxf/iX1sTyQbikZB9S9Yza0g
+        1IaF8IKfpvSK7nlepptWrN7za+VthIXR9gmAKAY3SNZNfG2mlkq6H632IQhdQ/d90wEiOR
+        fgOhTbAficxHtOFmwkMiHyOEgBsipAc=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-661-oZkJIqrAPtSIsYIspuONaQ-1; Wed, 21 Dec 2022 00:58:48 -0500
-X-MC-Unique: oZkJIqrAPtSIsYIspuONaQ-1
-Received: by mail-ot1-f69.google.com with SMTP id bq2-20020a056830388200b00672e4a07168so8129256otb.2
-        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 21:58:48 -0800 (PST)
+ us-mta-641-mYh6y93WPGizbteYoaHrPw-1; Wed, 21 Dec 2022 01:35:08 -0500
+X-MC-Unique: mYh6y93WPGizbteYoaHrPw-1
+Received: by mail-qt1-f198.google.com with SMTP id v20-20020ac87494000000b003a81928b279so6617083qtq.21
+        for <kvm@vger.kernel.org>; Tue, 20 Dec 2022 22:35:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=YqEHm3UzxG6ffY8Bp/o4RuRuWIrmYvg6Ffwy9vsFjIs=;
-        b=FtNwpyVVXZQC7iFMEd9rRKH8BBkCVNdytuTCU2YanT8sjwpfRjtaPBCsIhcfMITTpl
-         +7EYJR3sPuXZ3es0Dp3QSDUzbz2HE+LlCwXeGJqYQo0SOXZqswCocBD5dqzDf32LwxI3
-         EAO9aVNthFiz4DXEsGs0ltvPIGwuuIw8pD1oWhd/VhGzziaTmmcJFn3ArwgOeCubLG1n
-         paxtZGdNRsXtC4mFZ52JW39GjFrx9tTVKntdRzsw17jmNCz8+Vbst5KiM+lWuR/yRcrj
-         hr6yds8JeP/QOKO08ChtokvwNIHP7nrkbbjA9uEqQcsKeUTN6IHsjWxKlukZCwVssJVw
-         jdYQ==
-X-Gm-Message-State: AFqh2kryggD2HItxL6SP7b/9/pv7HmDSNQgU81ovtuhHMQtHRPcQJfee
-        B5mP1bPgQ1uAc+ZSBIsLwBM/3soMez/rlrVKq2lcdcwvUPeGhfqg15KmAiuigZaD8PjPT2YDGCA
-        Fimyb6Sl4dIJAgvBQfWX7rqYN0Q4R
-X-Received: by 2002:a05:6870:ac21:b0:144:910f:43ea with SMTP id kw33-20020a056870ac2100b00144910f43eamr23557oab.140.1671602328020;
-        Tue, 20 Dec 2022 21:58:48 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXsDR9nnF7mnDlflQ/HQ+MgFqmKyqDpmpzDNyhXa+P22bXXqLYMkGFpt1uwqUiJhWJY6UGD9PZR/L2LPB+ouxTY=
-X-Received: by 2002:a05:6870:ac21:b0:144:910f:43ea with SMTP id
- kw33-20020a056870ac2100b00144910f43eamr23554oab.140.1671602327855; Tue, 20
- Dec 2022 21:58:47 -0800 (PST)
-MIME-Version: 1.0
-References: <20221220140205.795115-1-lulu@redhat.com> <CACGkMEuJuUrA220XgHDOruK-aHWSfJ6mTaqNVQCAcOsPEwV91A@mail.gmail.com>
-In-Reply-To: <CACGkMEuJuUrA220XgHDOruK-aHWSfJ6mTaqNVQCAcOsPEwV91A@mail.gmail.com>
-From:   Cindy Lu <lulu@redhat.com>
-Date:   Wed, 21 Dec 2022 13:58:11 +0800
-Message-ID: <CACLfguUgsWrE+ZFxJYd-h81AvMQFio0-VU9oE0kpj7t5D2pJvg@mail.gmail.com>
-Subject: Re: [PATCH] vhost_vdpa: fix the compile issue in commit 881ac7d2314f
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Oogjy+HZSATwQ8rGTEmVI9Wh5GRJb31ePjraWFpnkQk=;
+        b=CMXo8YCyhsDM9s5icHFym/6j8VqlVLtQ86zmGYjlWET5FN+jx2a05yDax/rGCOfHVG
+         ZLqqMdo14bbnHlVkA6y7RcopgJzOWE8KSSC6ZevKjjBaqrhlkjWTa+wP7ZjJURVE6bkC
+         5GfYXvLCT9KGQqfrcXiFWkyfQAxNwNyaKPvEX6UrAczjpoMv8Biba+1lmbD7YgZFx4ys
+         7+UaAMEjP6cLrM+IiX3r0xjSLlfDLDIWJIwaTuk8hbRg/nBFBY9Y3ezWz35zIhyy/W1L
+         THjdv/c2EKeua2Q06jXrpCbPi7Rn1ZGb/L7MKLQixRQGKtcFG+dp6Mk2N4xauesYlKFs
+         ajtw==
+X-Gm-Message-State: AFqh2koDG/fy/U38u2GegCF6Iq8OPVXKDOJCmQ7zUpDet4ipdAwzB+gx
+        GOm5iYBik2Q06D//xHr/sRTf0jXcZYxZ5C9ljEW2WacBwemNmh57WEMuoYrPZUw3qIoxQqOP2EA
+        o4dimIGjTXaRA
+X-Received: by 2002:ac8:5e8f:0:b0:3a6:a292:286c with SMTP id r15-20020ac85e8f000000b003a6a292286cmr634087qtx.18.1671604507913;
+        Tue, 20 Dec 2022 22:35:07 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvLb3tolXBEGGnqe6rCD+KVURXzM+dzc3FfO7RoLpOTxOFn0WRR3dQpaeRRHkQJy4ymraACkQ==
+X-Received: by 2002:ac8:5e8f:0:b0:3a6:a292:286c with SMTP id r15-20020ac85e8f000000b003a6a292286cmr634076qtx.18.1671604507655;
+        Tue, 20 Dec 2022 22:35:07 -0800 (PST)
+Received: from redhat.com ([37.19.199.117])
+        by smtp.gmail.com with ESMTPSA id h9-20020ac81389000000b003a530a32f67sm8639661qtj.65.2022.12.20.22.35.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Dec 2022 22:35:07 -0800 (PST)
+Date:   Wed, 21 Dec 2022 01:35:02 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+Cc:     Cindy Lu <lulu@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] vhost_vdpa: fix the compile issue in commit 881ac7d2314f
+Message-ID: <20221221013359-mutt-send-email-mst@kernel.org>
+References: <20221220140205.795115-1-lulu@redhat.com>
+ <CACGkMEuJuUrA220XgHDOruK-aHWSfJ6mTaqNVQCAcOsPEwV91A@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEuJuUrA220XgHDOruK-aHWSfJ6mTaqNVQCAcOsPEwV91A@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,8 +79,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 21 Dec 2022 at 11:23, Jason Wang <jasowang@redhat.com> wrote:
->
+On Wed, Dec 21, 2022 at 11:23:09AM +0800, Jason Wang wrote:
 > On Tue, Dec 20, 2022 at 10:02 PM Cindy Lu <lulu@redhat.com> wrote:
 > >
 > > The input of  vhost_vdpa_iotlb_unmap() was changed in 881ac7d2314f,
@@ -83,19 +88,18 @@ On Wed, 21 Dec 2022 at 11:23, Jason Wang <jasowang@redhat.com> wrote:
 > >
 > > Cc: stable@vger.kernel.org
 > > Fixes: 881ac7d2314f ("vhost_vdpa: fix the crash in unmap a large memory")
->
+> 
 > Is this commit merged into Linus tree?
->
+> 
 > Btw, Michael, I'd expect there's a respin of the patch so maybe Cindy
 > can squash the fix into the new version?
->
+> 
 > Thanks
->
-This is not merged in linus tree, and this compile issue was hit in mst's tree
-should I send a new version squash the patch and the fix?
 
-Thanks
-Cindy
+Thanks, I fixed it myself already. Why do you want a respin?
+That will mean trouble as the fixed patch is now being tested.
+
+
 > > Reported-by: kernel test robot <lkp@intel.com>
 > > Signed-off-by: Cindy Lu <lulu@redhat.com>
 > > ---
@@ -129,5 +133,4 @@ Cindy
 > > --
 > > 2.34.3
 > >
->
 
