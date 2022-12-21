@@ -2,119 +2,190 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F343A65353D
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 18:32:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9134653577
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 18:43:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234817AbiLURcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 12:32:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38912 "EHLO
+        id S234636AbiLURnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 12:43:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234976AbiLURbs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 12:31:48 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD512229D
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:31:27 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so3040079pjj.2
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:31:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BzfXU+65m1+EuRocaydYDANlIZBnDelolaKGZVP6Sro=;
-        b=Ojq2AzyZZPB49APxgJhBdY0AQ/VFQmDlWYseAVaEaUwGpHzd1tpAh6yUBLqjO5rBTm
-         YnZ9dDjcln6owR8e1IRMEV0CQZXjMe/rpSPJ04yQZ1oQo3Zp2CYkeun9rNDZnU5Ul2iW
-         bzrMgwoTmjPCcMTygO/gzFZ5ZdMO7y+YKfHpfjTQt71Garr1pZpI7Vly4TTzrtLTkUyK
-         B0nrGSRn+rI2c9pn9jKdfeMqnEtyODI7o7HW2vJCtzCxxhYIhLauGhoWqZbry8HJK44x
-         tOpupExfDgZBBC2DxIejtIFzIyPWhWHDFWK+Q/Sxn14d2m9RAgNk4+qN8C9Dsp7CU+DN
-         a/Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BzfXU+65m1+EuRocaydYDANlIZBnDelolaKGZVP6Sro=;
-        b=x3ERO1ObpC2/RGD9ld7Zv8N09WtAQFERrc2m81XKSiqEGZffp9t27ODsiefSdiQjYv
-         nDnhEKzGBdXxmNNtg33YdS9B/4YuEkS2xjaelt1smlYUy9SrDo4YyDK3I6M5aSBs9ZbA
-         DgpnNe7+Pf3XQQkgU6lzpVQrcLQXXLBDOBXb98Qc7cljj0Sjeq8ymWyEZ9sJuvre0e78
-         KIxfIuNjEH059qToGriOTSgtrOeL3rVx0r75H/YbAOtzNcQADzV/OSO974Gi9d9VrwpK
-         sZEk8/jSKc4e78Hgn6KTg8vzAYAFf66PIWIj122xahc3wM128gloghhWPftVjnqmiuhJ
-         IeUA==
-X-Gm-Message-State: AFqh2kq24GbyQxVacsD+rj8eBwXo37sHQscy3RcEqHG2pzakHKzPcuxR
-        aQPHVCRtXEBjmvm/d0BQtOTOOg==
-X-Google-Smtp-Source: AMrXdXugapoMgWk4M/6C7lfr+TgWgmHh7i/yUmaPnnEB6/LHldceHX3DZ13bXLzQfl4QZY9Gy4aexA==
-X-Received: by 2002:a17:90a:6aca:b0:223:9cfb:2f9e with SMTP id b10-20020a17090a6aca00b002239cfb2f9emr2948495pjm.22.1671643887404;
-        Wed, 21 Dec 2022 09:31:27 -0800 (PST)
-Received: from ?IPV6:2602:47:d48c:8101:e04c:516d:5698:abe8? ([2602:47:d48c:8101:e04c:516d:5698:abe8])
-        by smtp.gmail.com with ESMTPSA id e7-20020a635007000000b0046b1dabf9a8sm10181611pgb.70.2022.12.21.09.31.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Dec 2022 09:31:26 -0800 (PST)
-Message-ID: <f9a9c36d-61d6-2bd8-fe19-1e3585ae5fdd@linaro.org>
-Date:   Wed, 21 Dec 2022 09:31:25 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v2] MIPS: remove support for trap and emulate KVM
-Content-Language: en-US
-To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     libvir-list@redhat.com, kvm@vger.kernel.org,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Jiaxun Yang <jiaxun.yang@flygoat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Aurelien Jarno <aurelien@aurel32.net>,
-        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
-References: <20221221091718.71844-1-philmd@linaro.org>
-From:   Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20221221091718.71844-1-philmd@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229926AbiLURnJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 12:43:09 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C94CF2333A
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:43:07 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6FA5861772
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 17:43:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D09B9C433D2;
+        Wed, 21 Dec 2022 17:43:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671644586;
+        bh=c6+zdcvnGWSlQMr7XAbCecefyK6/9YWJKEvEz0Wazpo=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=r42H7GUfGRymqIfNvm8bPKU/RkBi0QJLX7WcVzLhLCgyLkXlGfAjOSnWKX7GVphW6
+         SkVIpg0mFnCh0J+XVDsNKs+Vjvph6bto2t2EfSx08FP1g0YcYnUuB/zwQzBhc2OdxQ
+         1WUpY/jYgTiIxtFqD7YY2T7uY3nXnpn+eE9JeDz25aBXqAr7tQg3YLq+sbeICZH0UN
+         7NS/9EsxxqUw2KRL4fOvMxg/oXTn2tz+a5G0WEC/ktTHy/8pggyQvZGLk2JQ7r5NUN
+         OXVIHXQjAPZ5YGb71uct/nE5mZatfbwjSXg/wsgBmGEdtzt+/4TwXaTZU2kkSCyUk+
+         vov6Ko4u/54lw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p837Q-00ECbS-Fw;
+        Wed, 21 Dec 2022 17:43:04 +0000
+Date:   Wed, 21 Dec 2022 17:43:03 +0000
+Message-ID: <86len0bql4.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set as a write
+In-Reply-To: <Y6M4TqvJytAEq2ID@google.com>
+References: <20221220200923.1532710-1-maz@kernel.org>
+        <20221220200923.1532710-3-maz@kernel.org>
+        <Y6M4TqvJytAEq2ID@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS,URI_DOTEDU autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/21/22 01:17, Philippe Mathieu-Daudé wrote:
-> From: Paolo Bonzini<pbonzini@redhat.com>
-> 
-> This support was limited to the Malta board, drop it.
-> I do not have a machine that can run VZ KVM, so I am assuming
-> that it works for -M malta as well.
-> 
-> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé<philmd@linaro.org>
-> ---
-> Since Paolo's v1:
-> 
-> - Remove cpu_mips_kvm_um_phys_to_kseg0() declaration in "cpu.h"
-> - Remove unused KVM_KSEG0_BASE/KVM_KSEG2_BASE definitions
-> - Use USEG_LIMIT/KSEG0_BASE instead of magic values
-> 
->         /* Check where the kernel has been linked */
->    -    if (!(kernel_entry & 0x80000000ll)) {
->    -        error_report("CONFIG_KVM_GUEST kernels are not supported");
->    +    if (kernel_entry <= USEG_LIMIT) {
->    +        error_report("Trap-and-Emul kernels (Linux CONFIG_KVM_GUEST)"
->    +                     " are not supported");
-> 
->    -    env->CP0_EBase = (cs->cpu_index & 0x3FF) | (int32_t)0x80000000;
->    +    env->CP0_EBase = KSEG0_BASE | (cs->cpu_index & 0x3FF);
-> ---
->   docs/about/deprecated.rst       |  9 -------
->   docs/about/removed-features.rst |  9 +++++++
->   hw/mips/malta.c                 | 46 +++++----------------------------
->   target/mips/cpu.c               |  7 +----
->   target/mips/cpu.h               |  3 ---
->   target/mips/internal.h          |  3 ---
->   target/mips/kvm.c               | 11 +-------
->   target/mips/sysemu/addr.c       | 17 ------------
->   target/mips/sysemu/physaddr.c   | 13 ----------
->   9 files changed, 18 insertions(+), 100 deletions(-)
+Hi Ricardo,
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On Wed, 21 Dec 2022 16:46:06 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
+> 
+> Hello,
+> 
+> On Tue, Dec 20, 2022 at 08:09:22PM +0000, Marc Zyngier wrote:
+> > As a minor optimisation, we can retrofit the "S1PTW is a write
+> > even on translation fault" concept *if* the vcpu is using the
+> > HW-managed Access Flag, as setting TCR_EL1.HA is guaranteed
+> > to result in an update of the PTE.
+> > 
+> > However, we cannot do the same thing for DB, as it would require
+> > us to parse the PTs to find out if the DBM bit is set there.
+> > This is not going to happen.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_emulate.h | 20 +++++++++++++++++++-
+> >  1 file changed, 19 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> > index fd6ad8b21f85..4ee467065042 100644
+> > --- a/arch/arm64/include/asm/kvm_emulate.h
+> > +++ b/arch/arm64/include/asm/kvm_emulate.h
+> > @@ -374,6 +374,9 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+> >  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+> >  {
+> >  	if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> > +		unsigned int afdb;
+> > +		u64 mmfr1;
+> > +
+> >  		/*
+> >  		 * Only a permission fault on a S1PTW should be
+> >  		 * considered as a write. Otherwise, page tables baked
+> > @@ -385,12 +388,27 @@ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+> >  		 * to map the page containing the PT (read only at
+> >  		 * first), then a permission fault to allow the flags
+> >  		 * to be set.
+> > +		 *
+> > +		 * We can improve things if the guest uses AF, as this
+> > +		 * is guaranteed to result in a write to the PTE. For
+> > +		 * DB, however, we'd need to parse the guest's PTs,
+> > +		 * and that's not on. DB is crap anyway.
+> >  		 */
+> >  		switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
+> 
+> Nit: fault_status is calculated once when taking the fault, and passed
+> around to all users (like user_mem_abort()). Not sure if this is because
+> of the extra cycles needed to get it, or just style. Anyway, maybe it
+> applies here.
 
-r~
+All these things are just fields in ESR_EL2, which we keep looking at
+all the time. The compiler actually does a pretty good job at keeping
+that around, specially considering that this function is inlined (at
+least here, kvm_handle_guest_abort and kvm_user_mem_abort are merged
+into a single monster).
+
+So passing the parameter wouldn't change a thing, and I find the above
+more readable (I know that all the information in this function are
+derived from the same data structure).
+
+> 
+> >  		case ESR_ELx_FSC_PERM:
+> >  			return true;
+> >  		default:
+> > -			return false;
+> > +			/* Can't introspect TCR_EL1 with pKVM */
+> > +			if (kvm_vm_is_protected(vcpu->kvm))
+> > +				return false;
+> > +
+> > +			mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > +			afdb = cpuid_feature_extract_unsigned_field(mmfr1, ID_AA64MMFR1_EL1_HAFDBS_SHIFT);
+> > +
+> > +			if (afdb == ID_AA64MMFR1_EL1_HAFDBS_NI)
+> > +				return false;
+> > +
+> > +			return (vcpu_read_sys_reg(vcpu, TCR_EL1) & TCR_HA);
+> 
+> Also tested this specific case using page_fault_test when the PT page is
+> marked for dirty logging with and without AF. In both cases there's a
+> single _FSC_FAULT (no PERM_FAUT) as expected, and the PT page is marked dirty
+> in the AF case. The RO and UFFD cases also work as expected.
+
+Ah, thanks for checking this.
+
+> 
+> Need to send some changes for page_fault_test as many tests assume that
+> any S1PTW is always a PT write, and are failing. Also need to add some new
+> tests for PTs in RO memslots (as it didn't make much sense before this
+> change).
+
+I think this is what I really quite didn't grok in these tests. They
+seem to verify the KVM behaviour, which is not what we should check
+for.
+
+Instead, we should check for the architectural behaviour, which is
+that if HAFDBS is enabled, we can observe updates to the PTs even when
+we do not write to them directly.
+
+> 
+> >  		}
+> >  	}
+> >  
+> > -- 
+> > 2.34.1
+> > 
+> > _______________________________________________
+> > kvmarm mailing list
+> > kvmarm@lists.cs.columbia.edu
+> > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+> 
+> Reviewed-by: Ricardo Koller <ricarkol@google.com>
+
+Thanks!
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
