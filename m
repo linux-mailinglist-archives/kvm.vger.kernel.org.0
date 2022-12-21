@@ -2,59 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38B3A653470
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 17:57:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F343A65353D
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 18:32:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230103AbiLUQ5I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 11:57:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46588 "EHLO
+        id S234817AbiLURcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 12:32:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbiLUQ5G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 11:57:06 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C49DBFC5
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 08:57:05 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 60C9A6185F
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 16:57:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 961D2C433F1;
-        Wed, 21 Dec 2022 16:57:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671641824;
-        bh=cEYJJ6q+Z3W4XwReV1cxVAXE3fttacMjuR65aYSWHTs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GmfT0dyqk1fG4CWSPoJ5DXu9iJ/CiVNL8ZTWi+vbl7ESo1V7x1jHIpE5rMa3otDwo
-         l5e4zmhOAPUMLptxz26tPhD6sVrYupe3wpdA/hE2hPlbi17fWdXe+w+PcUU5Yg+bjj
-         0vT/PFnOpncBpMFOLx0m2owfUs0Co7eoXgmp632YDC7vfVyhXgf7tACRJ5EhZUe+ak
-         oMYPaslo97Mffsfigc/u/U+5b4B3gzy1pKCSA4B77jussvfBF1ogyeAJ3Wc6nMQ8Yt
-         rBGzFJ+uhytG6zyP1d/I24Yu/7Bnl7Wq2ITZ5QR7SwCrOIngmIt+MtH2fgrNskkPWQ
-         QYzuvehQaqoiQ==
-Received: by quaco.ghostprotocols.net (Postfix, from userid 1000)
-        id 1F90E40367; Wed, 21 Dec 2022 13:57:02 -0300 (-03)
-Date:   Wed, 21 Dec 2022 13:57:02 -0300
-From:   Arnaldo Carvalho de Melo <acme@kernel.org>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Gavin Shan <gshan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ian Rogers <irogers@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Namhyung Kim <namhyung@kernel.org>, kvm@vger.kernel.org
-Subject: Re: [PATCH 1/1] kvm selftests: Add conditional
- KVM_CAP_DIRTY_LOG_RING_ACQ_REL define kernel sources
-Message-ID: <Y6M63qKnghUmSSEG@kernel.org>
-References: <Y6H3b1Q4Msjy5Yz3@kernel.org>
- <Y6H6At0xkY+gDsf5@kernel.org>
- <8f10c91a-0731-6dbb-51b7-9ed1dc0e69a8@redhat.com>
- <86r0wtb0d4.wl-maz@kernel.org>
+        with ESMTP id S234976AbiLURbs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 12:31:48 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD512229D
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:31:27 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id o1-20020a17090a678100b00219cf69e5f0so3040079pjj.2
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:31:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BzfXU+65m1+EuRocaydYDANlIZBnDelolaKGZVP6Sro=;
+        b=Ojq2AzyZZPB49APxgJhBdY0AQ/VFQmDlWYseAVaEaUwGpHzd1tpAh6yUBLqjO5rBTm
+         YnZ9dDjcln6owR8e1IRMEV0CQZXjMe/rpSPJ04yQZ1oQo3Zp2CYkeun9rNDZnU5Ul2iW
+         bzrMgwoTmjPCcMTygO/gzFZ5ZdMO7y+YKfHpfjTQt71Garr1pZpI7Vly4TTzrtLTkUyK
+         B0nrGSRn+rI2c9pn9jKdfeMqnEtyODI7o7HW2vJCtzCxxhYIhLauGhoWqZbry8HJK44x
+         tOpupExfDgZBBC2DxIejtIFzIyPWhWHDFWK+Q/Sxn14d2m9RAgNk4+qN8C9Dsp7CU+DN
+         a/Yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BzfXU+65m1+EuRocaydYDANlIZBnDelolaKGZVP6Sro=;
+        b=x3ERO1ObpC2/RGD9ld7Zv8N09WtAQFERrc2m81XKSiqEGZffp9t27ODsiefSdiQjYv
+         nDnhEKzGBdXxmNNtg33YdS9B/4YuEkS2xjaelt1smlYUy9SrDo4YyDK3I6M5aSBs9ZbA
+         DgpnNe7+Pf3XQQkgU6lzpVQrcLQXXLBDOBXb98Qc7cljj0Sjeq8ymWyEZ9sJuvre0e78
+         KIxfIuNjEH059qToGriOTSgtrOeL3rVx0r75H/YbAOtzNcQADzV/OSO974Gi9d9VrwpK
+         sZEk8/jSKc4e78Hgn6KTg8vzAYAFf66PIWIj122xahc3wM128gloghhWPftVjnqmiuhJ
+         IeUA==
+X-Gm-Message-State: AFqh2kq24GbyQxVacsD+rj8eBwXo37sHQscy3RcEqHG2pzakHKzPcuxR
+        aQPHVCRtXEBjmvm/d0BQtOTOOg==
+X-Google-Smtp-Source: AMrXdXugapoMgWk4M/6C7lfr+TgWgmHh7i/yUmaPnnEB6/LHldceHX3DZ13bXLzQfl4QZY9Gy4aexA==
+X-Received: by 2002:a17:90a:6aca:b0:223:9cfb:2f9e with SMTP id b10-20020a17090a6aca00b002239cfb2f9emr2948495pjm.22.1671643887404;
+        Wed, 21 Dec 2022 09:31:27 -0800 (PST)
+Received: from ?IPV6:2602:47:d48c:8101:e04c:516d:5698:abe8? ([2602:47:d48c:8101:e04c:516d:5698:abe8])
+        by smtp.gmail.com with ESMTPSA id e7-20020a635007000000b0046b1dabf9a8sm10181611pgb.70.2022.12.21.09.31.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Dec 2022 09:31:26 -0800 (PST)
+Message-ID: <f9a9c36d-61d6-2bd8-fe19-1e3585ae5fdd@linaro.org>
+Date:   Wed, 21 Dec 2022 09:31:25 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v2] MIPS: remove support for trap and emulate KVM
+Content-Language: en-US
+To:     =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
+        qemu-devel@nongnu.org
+Cc:     libvir-list@redhat.com, kvm@vger.kernel.org,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Jiaxun Yang <jiaxun.yang@flygoat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Aurelien Jarno <aurelien@aurel32.net>,
+        Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+References: <20221221091718.71844-1-philmd@linaro.org>
+From:   Richard Henderson <richard.henderson@linaro.org>
+In-Reply-To: <20221221091718.71844-1-philmd@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <86r0wtb0d4.wl-maz@kernel.org>
-X-Url:  http://acmel.wordpress.com
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -62,62 +78,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Em Wed, Dec 21, 2022 at 08:57:11AM +0000, Marc Zyngier escreveu:
-> On Wed, 21 Dec 2022 07:06:41 +0000, Gavin Shan <gshan@redhat.com> wrote:
-> > On 12/21/22 5:08 AM, Arnaldo Carvalho de Melo wrote:
-> > > I tried to build make -C tools/testing/selftests/kvm/ to check that an
-> > > update I made to the tools/include/uapi/linux/kvm.h file wouldn't break
-> > > the KVM selftests, but I stumbled on an unrelated build failure where
-> > > it tries to use a define that isn't available in the system headers
-> > > (fedora 36), so add it conditionally.
-
-> > > Shouldn't this use the tools/ headers? Anyway, see if this is something
-> > > useful.
-
-> > > Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
-
-> > > ---
-
-> > > diff --git a/tools/testing/selftests/kvm/include/kvm_util.h b/tools/testing/selftests/kvm/include/kvm_util.h
-> > > index c9286811a4cb88e0..4ab76fd22efd951d 100644
-> > > --- a/tools/testing/selftests/kvm/include/kvm_util.h
-> > > +++ b/tools/testing/selftests/kvm/include/kvm_util.h
-> > > @@ -10,4 +10,8 @@
-> > >   #include "kvm_util_base.h"
-> > >   #include "ucall_common.h"
-> > >   +#ifndef KVM_CAP_DIRTY_LOG_RING_ACQ_REL
-> > > +#define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
-> > > +#endif
-> > > +
-> > >   #endif /* SELFTEST_KVM_UTIL_H */
-
-> > I don't think it's necessary because KVM_CAP_DIRTY_LOG_RING_ACQ_REL has been
-> > defined in include/uapi/linux/kvm.h, which needs to be synchronized to
-> > /usr/include/linux/kvm.h, included by tools/testing/selftests/kvm/include/kvm_util_base.h
-
-Until that happens, I can't test build it, and:
-
-⬢[acme@toolbox perf]$ rpm -qf /usr/include/linux/kvm.h
-kernel-headers-6.0.5-200.fc36.x86_64
-
-is in a distro package.
-
-- Arnaldo
-
-> > By the way, you forgot to copy the correct maillist, kvm@vger.kernel.org or
-> > kvmarm@lists.cs.columbia.edu.
+On 12/21/22 01:17, Philippe Mathieu-Daudé wrote:
+> From: Paolo Bonzini<pbonzini@redhat.com>
 > 
-> Actually, the latter is now deprecated, and will be turned off early
-> next year. kvmarm@lists.linux.dev is the new kid on the block (I just
-> need to get Konstantin to turn on the archiving process).
+> This support was limited to the Malta board, drop it.
+> I do not have a machine that can run VZ KVM, so I am assuming
+> that it works for -M malta as well.
 > 
-> Thanks,
+> Signed-off-by: Paolo Bonzini<pbonzini@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé<philmd@linaro.org>
+> ---
+> Since Paolo's v1:
 > 
-> 	M.
+> - Remove cpu_mips_kvm_um_phys_to_kseg0() declaration in "cpu.h"
+> - Remove unused KVM_KSEG0_BASE/KVM_KSEG2_BASE definitions
+> - Use USEG_LIMIT/KSEG0_BASE instead of magic values
 > 
-> -- 
-> Without deviation from the norm, progress is not possible.
+>         /* Check where the kernel has been linked */
+>    -    if (!(kernel_entry & 0x80000000ll)) {
+>    -        error_report("CONFIG_KVM_GUEST kernels are not supported");
+>    +    if (kernel_entry <= USEG_LIMIT) {
+>    +        error_report("Trap-and-Emul kernels (Linux CONFIG_KVM_GUEST)"
+>    +                     " are not supported");
+> 
+>    -    env->CP0_EBase = (cs->cpu_index & 0x3FF) | (int32_t)0x80000000;
+>    +    env->CP0_EBase = KSEG0_BASE | (cs->cpu_index & 0x3FF);
+> ---
+>   docs/about/deprecated.rst       |  9 -------
+>   docs/about/removed-features.rst |  9 +++++++
+>   hw/mips/malta.c                 | 46 +++++----------------------------
+>   target/mips/cpu.c               |  7 +----
+>   target/mips/cpu.h               |  3 ---
+>   target/mips/internal.h          |  3 ---
+>   target/mips/kvm.c               | 11 +-------
+>   target/mips/sysemu/addr.c       | 17 ------------
+>   target/mips/sysemu/physaddr.c   | 13 ----------
+>   9 files changed, 18 insertions(+), 100 deletions(-)
 
--- 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-- Arnaldo
+r~
