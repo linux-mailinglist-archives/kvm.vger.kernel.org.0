@@ -2,165 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 911CB6537E0
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 21:54:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3878D65381E
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 22:13:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234761AbiLUUyt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 15:54:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41810 "EHLO
+        id S234848AbiLUVNy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 16:13:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234636AbiLUUyr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 15:54:47 -0500
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2C6F2189F
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 12:54:45 -0800 (PST)
-Received: by mail-il1-f200.google.com with SMTP id s2-20020a056e02216200b0030bc3be69e5so3799241ilv.20
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 12:54:45 -0800 (PST)
+        with ESMTP id S230336AbiLUVNv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 16:13:51 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD791DD8
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 13:13:50 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id k2-20020a17090a514200b002198214abdcso1696115pjm.8
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 13:13:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=PenTOvotttU7AmWkY+rsqQVQep4flBuUsNbRQCbS+sM=;
+        b=pOTmhACNYo1c6e5VpoPFMfTaxHbIAJuEC/bxSSylZ5vRbtUdOFRCXgjFIA4X5jLvPD
+         flb/LB4TH/uuvoK2/NtP8JnzbfZXvS9oBcxDUwcJj3QW4lRcXpSTNxIlkqP7cyKBl7nv
+         4Jtq6tPAoI59O/RzpP0bcGNyfSJN1WPMXoBXtioyDtqsUO8V33g9bXwEegywfWsIxBvF
+         sXErENFQlthvY1dtQam1/J86obaYy26jTOs/kejj6Fs7Qftdv8fCx8uD1f+Yqgw7xScQ
+         VITw+P/JMdyCTi81bpYxT/SJvcGA8NpnRjgGoewE1JR+s0QkkZhgGB7tUYclt6lIxImm
+         jctg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KSld9w5b0c5431C0gCV8qTOX+c8jsvfzKbAp62hQ8Fg=;
-        b=WRRYJsfGK8pjOWaGJA/ORQD+nw4DvKfLwbGjAHVKNjuSmbFlU2Koyz1ylExcgusK1T
-         H2DsEgmXET/WC7qbT3If3FQUelWnjqcd2tXF871MGctSnQ/pUBdWojivKeZH6ySGUGGh
-         kpZuVVty1VZAc5cHguekq3LVJAF4+0psG2hyFFwXxVFSEG6zN5b0+t8baPcunW/6e387
-         e3nGhFMQfu622jT+R5TsaVIJhF77MAHZD33rFFAQPzsQrh/2iS7nLRTWpRuKO9l2Bfsf
-         PAu8qChVU5tdReUJstCwVb6825Rx07y3xN2GYBlh3rwubgczkJjZk2mYtFJNTmhmz6z6
-         zL3Q==
-X-Gm-Message-State: AFqh2krc2gxTbd4LfDoQAk/H+U2gDZwBe2StmhV9MslTyPmpevaKif2s
-        55Ws5TKsb3o+C3YyAPB538qJ36Q4hkBx/AT4ipF1snrLK1Jf
-X-Google-Smtp-Source: AMrXdXuL+24luRUyHNexCg4o+QwHOBlu6ukTdpFscESJScttijITt95GXMl+4BD/sska23LG+fo/yuJO9BggiQAHirIFJYJP4F+G
-MIME-Version: 1.0
-X-Received: by 2002:a02:cc65:0:b0:398:d917:5c51 with SMTP id
- j5-20020a02cc65000000b00398d9175c51mr200801jaq.42.1671656085361; Wed, 21 Dec
- 2022 12:54:45 -0800 (PST)
-Date:   Wed, 21 Dec 2022 12:54:45 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000279ebd05f05cc339@google.com>
-Subject: [syzbot] INFO: trying to register non-static key in __timer_delete_sync
-From:   syzbot <syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PenTOvotttU7AmWkY+rsqQVQep4flBuUsNbRQCbS+sM=;
+        b=rtegbB736mHMzUPguePUemmJEuYIMa78ARLPwAkSX/UYVkQL3ux+vu2pRawyGzuah7
+         Nv4vG7vb5W1vg/Ffs1Hp5FJkGPJj0VtxSBBo3EM92fYVER1LbAqP+pYACd0737kmP3F5
+         /pFoZHlK1EDerGWqmjIZrGS5qxUXgazr+GpFHC7cm3mInhgk+l2tdrsLGTcNr5NlqV2b
+         owOJQndxyjrqpimARVWqdD8WFnCuRqtZHX04712xNDf8jLtLP8B8og1V6yogDPYc5ky9
+         cXqhSdhuh2xpS8hxAiyPUFClfjmXSz37QXcvDl1aerKNpSFLYEpyRZIiXAacH7Te9vYv
+         rhAA==
+X-Gm-Message-State: AFqh2ko/H42gBv2SAn3eA1zRzdsf20QSBAYZBdSychbb515SUb/aduHs
+        jiK0p2ZZnCmJRjY5waAs2ow1yUa3qa19MQht8g==
+X-Google-Smtp-Source: AMrXdXtddR1n0o7PYnl0IaV/gyWF5bACxgunxQd/8awvcQVlOohm0sx9Yn/7KRBEs4Dt6XioXrkpg456lqVBy42XTg==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a05:6a00:1d81:b0:576:ba28:29a8 with
+ SMTP id z1-20020a056a001d8100b00576ba2829a8mr195606pfw.47.1671657230323; Wed,
+ 21 Dec 2022 13:13:50 -0800 (PST)
+Date:   Wed, 21 Dec 2022 13:13:48 -0800
+In-Reply-To: <20221018205845.770121-6-pgonda@google.com> (message from Peter
+ Gonda on Tue, 18 Oct 2022 13:58:43 -0700)
+Mime-Version: 1.0
+Message-ID: <diqz3598v4s3.fsf@google.com>
+Subject: Re: [PATCH V5 5/7] KVM: selftests: add library for
+ creating/interacting with SEV guests
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     Peter Gonda <pgonda@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcorr@google.com, seanjc@google.com, michael.roth@amd.com,
+        thomas.lendacky@amd.com, joro@8bytes.org, mizhang@google.com,
+        pbonzini@redhat.com, andrew.jones@linux.dev, pgonda@google.com,
+        vannapurve@google.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello,
 
-syzbot found the following issue on:
+> +static void encrypt_region(struct kvm_vm *vm, struct  
+> userspace_mem_region *region)
+> +{
+> +	const struct sparsebit *protected_phy_pages =
+> +		region->protected_phy_pages;
+> +	const uint64_t memory_size = region->region.memory_size;
+> +	const vm_paddr_t gpa_start = region->region.guest_phys_addr;
+> +	sparsebit_idx_t pg = 0;
+> +
+> +	sev_register_user_region(vm, region);
+> +
+> +	while (pg < (memory_size / vm->page_size)) {
+> +		sparsebit_idx_t nr_pages;
+> +
+> +		if (sparsebit_is_clear(protected_phy_pages, pg)) {
+> +			pg = sparsebit_next_set(protected_phy_pages, pg);
+> +			if (!pg)
+> +				break;
+> +		}
+> +
+> +		nr_pages = sparsebit_next_clear(protected_phy_pages, pg) - pg;
+> +		if (nr_pages <= 0)
+> +			nr_pages = 1;
 
-HEAD commit:    ca39c4daa6f7 Add linux-next specific files for 20221216
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1182429d880000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9f0bce83c86de334
-dashboard link: https://syzkaller.appspot.com/bug?extid=1e164be619b690a43d79
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+I think this may not be correct in the case where the sparsebit has the
+range [x, 2**64-1] (inclusive) set. In that case, sparsebit_next_clear()
+will return 0, but the number of pages could be more than 1.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> +
+> +		sev_launch_update_data(vm, gpa_start + pg * vm->page_size,
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3cbf8a8f223d/disk-ca39c4da.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f104cf6ddf80/vmlinux-ca39c4da.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6ba8b49536b5/bzImage-ca39c4da.xz
+Computing the beginning of the gpa range with
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1e164be619b690a43d79@syzkaller.appspotmail.com
+gpa_start + pg * vm->page_size
 
-INFO: trying to register non-static key.
-The code is fine but needs lockdep annotation, or maybe
-you didn't initialize this object before use?
-turning off the locking correctness validator.
-CPU: 0 PID: 20857 Comm: syz-executor.5 Not tainted 6.1.0-next-20221216-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/26/2022
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xd1/0x138 lib/dump_stack.c:106
- assign_lock_key kernel/locking/lockdep.c:981 [inline]
- register_lock_class+0xf1b/0x1120 kernel/locking/lockdep.c:1294
- __lock_acquire+0x109/0x56d0 kernel/locking/lockdep.c:4934
- lock_acquire.part.0+0x11a/0x350 kernel/locking/lockdep.c:5668
- __timer_delete_sync+0x5d/0x1c0 kernel/time/timer.c:1555
- del_timer_sync include/linux/timer.h:200 [inline]
- cleanup_srcu_struct kernel/rcu/srcutree.c:611 [inline]
- cleanup_srcu_struct+0x112/0x3e0 kernel/rcu/srcutree.c:599
- kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1325 [inline]
- kvm_put_kvm+0x884/0xb80 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1352
- kvm_vm_release+0x43/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1375
- __fput+0x27c/0xa90 fs/file_table.c:320
- task_work_run+0x16f/0x270 kernel/task_work.c:179
- resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
- exit_to_user_mode_prepare+0x23c/0x250 kernel/entry/common.c:203
- __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
- syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
- do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f1a7ae3df8b
-Code: 0f 05 48 3d 00 f0 ff ff 77 45 c3 0f 1f 40 00 48 83 ec 18 89 7c 24 0c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
-RSP: 002b:00007fff9d5d14e0 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 00007f1a7ae3df8b
-RDX: 0000000000000000 RSI: 0000001b32320ef8 RDI: 0000000000000004
-RBP: 00007f1a7afad980 R08: 0000000000000000 R09: 000000008acd30fc
-R10: 0000000000000000 R11: 0000000000000293 R12: 000000000011376f
-R13: 00007fff9d5d15e0 R14: 00007f1a7afac050 R15: 0000000000000032
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 20857 at kernel/workqueue.c:3066 __flush_work+0x90a/0xaf0 kernel/workqueue.c:3066
-Modules linked in:
-CPU: 1 PID: 20857 Comm: syz-executor.5 Not tainted 6.1.0-next-20221216-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/26/2022
-RIP: 0010:__flush_work+0x90a/0xaf0 kernel/workqueue.c:3066
-Code: 00 48 c7 c6 2f 7b 52 81 48 c7 c7 c0 28 79 8c e8 1c 7c 11 00 e9 ab fc ff ff e8 12 d7 2e 00 0f 0b e9 9f fc ff ff e8 06 d7 2e 00 <0f> 0b 45 31 ed e9 90 fc ff ff e8 77 e6 7c 00 e9 7a fb ff ff e8 ed
-RSP: 0018:ffffc900038afb60 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffffe8ffffcd0620 RCX: 0000000000000000
-RDX: ffff888020d38000 RSI: ffffffff81527b6a RDI: 0000000000000001
-RBP: ffffc900038afcf8 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 3e4b5341542f3c20 R12: ffffc9000393b478
-R13: 0000000000000001 R14: fffffbfff1ce6138 R15: ffffe8ffffcd0638
-FS:  0000555555edb400(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000200e9000 CR3: 00000000297ac000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- cleanup_srcu_struct kernel/rcu/srcutree.c:612 [inline]
- cleanup_srcu_struct+0x11e/0x3e0 kernel/rcu/srcutree.c:599
- kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1325 [inline]
- kvm_put_kvm+0x884/0xb80 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1352
- kvm_vm_release+0x43/0x50 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1375
- __fput+0x27c/0xa90 fs/file_table.c:320
- task_work_run+0x16f/0x270 kernel/task_work.c:179
- resume_user_mode_work include/linux/resume_user_mode.h:49 [inline]
- exit_to_user_mode_loop kernel/entry/common.c:171 [inline]
- exit_to_user_mode_prepare+0x23c/0x250 kernel/entry/common.c:203
- __syscall_exit_to_user_mode_work kernel/entry/common.c:285 [inline]
- syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:296
- do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f1a7ae3df8b
-Code: 0f 05 48 3d 00 f0 ff ff 77 45 c3 0f 1f 40 00 48 83 ec 18 89 7c 24 0c e8 63 fc ff ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 fc ff ff 8b 44
-RSP: 002b:00007fff9d5d14e0 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: 0000000000000000 RBX: 0000000000000005 RCX: 00007f1a7ae3df8b
-RDX: 0000000000000000 RSI: 0000001b32320ef8 RDI: 0000000000000004
-RBP: 00007f1a7afad980 R08: 0000000000000000 R09: 000000008acd30fc
-R10: 0000000000000000 R11: 0000000000000293 R12: 000000000011376f
-R13: 00007fff9d5d15e0 R14: 00007f1a7afac050 R15: 0000000000000032
- </TASK>
+only works if this memory region's gpa_start is 0.
+
+> +				       nr_pages * vm->page_size);
+> +		pg += nr_pages;
+> +	}
+> +}
+
+Here's a suggestion (I'm using this on a TDX version of this patch)
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+/**
+  * Iterate over set ranges within sparsebit @s. In each iteration,
+  * @range_begin and @range_end will take the beginning and end of the set  
+range,
+  * which are of type sparsebit_idx_t.
+  *
+  * For example, if the range [3, 7] (inclusive) is set, within the  
+iteration,
+  * @range_begin will take the value 3 and @range_end will take the value 7.
+  *
+  * Ensure that there is at least one bit set before using this macro with
+  * sparsebit_any_set(), because sparsebit_first_set() will abort if none are
+  * set.
+  */
+#define sparsebit_for_each_set_range(s, range_begin, range_end)		\
+	for (range_begin = sparsebit_first_set(s),			\
+		     range_end =					\
+		     sparsebit_next_clear(s, range_begin) - 1;		\
+	     range_begin && range_end;					\
+	     range_begin = sparsebit_next_set(s, range_end),		\
+		     range_end =					\
+		     sparsebit_next_clear(s, range_begin) - 1)
+/*
+  * sparsebit_next_clear() can return 0 if [x, 2**64-1] are all set, and the  
+-1
+  * would then cause an underflow back to 2**64 - 1. This is expected and
+  * correct.
+  *
+  * If the last range in the sparsebit is [x, y] and we try to iterate,
+  * sparsebit_next_set() will return 0, and sparsebit_next_clear() will try  
+and
+  * find the first range, but that's correct because the condition expression
+  * would cause us to quit the loop.
+  */
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+static void encrypt_region(struct kvm_vm *vm, struct userspace_mem_region  
+*region)
+{
+	const struct sparsebit *protected_phy_pages =
+		region->protected_phy_pages;
+	const vm_paddr_t gpa_base = region->region.guest_phys_addr;
+	const sparsebit_idx_t lowest_page_in_region = gpa_base >> vm->page_shift;
+
+	sparsebit_idx_t i;
+	sparsebit_idx_t j;
+
+	if (!sparsebit_any_set(protected_phy_pages))
+		return;
+
+	sev_register_user_region(vm, region);
+
+	sparsebit_for_each_set_range(protected_phy_pages, i, j) {
+		const uint64_t size_to_load = (j - i + 1) * vm->page_size;
+		const uint64_t offset = (i - lowest_page_in_region) * vm->page_size;
+		const uint64_t gpa = gpa_base + offset;
+
+		sev_launch_update_data(vm, gpa, size_to_load);
+	}
+}
