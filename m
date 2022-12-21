@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A301653889
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 23:25:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6D8365388A
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 23:25:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234967AbiLUWZD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 17:25:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36322 "EHLO
+        id S235029AbiLUWZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 17:25:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234960AbiLUWYd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 17:24:33 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65342275C6
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 14:24:31 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id u3-20020a056a00124300b0056d4ab0c7cbso1849pfi.7
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 14:24:31 -0800 (PST)
+        with ESMTP id S234975AbiLUWYi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 17:24:38 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D99327174
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 14:24:33 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-460ab8a327eso2986857b3.23
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 14:24:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8kZrCNGBjg1WS7ODt19uiL6/LMaIleV0jy9dXg5qXsU=;
-        b=gm4wVDeMjNDC25vIMLZJDuIuxtNrgMkW/U8DzY9/JjzdiZzvFqg5Z9nrrcuVrdI+Cr
-         mlp9FAy3A+XDVeEZyHG8Xc52Dea5StINuVBgplWUrUUWZ69CNhfzLT4HzTN4LN1TEk0D
-         IpYExoj/5fAFNK6+d1bgopQ28Zgn7SVezYfuMlI3pItzNuDAxxrhAWNTk67M+IKLP4c2
-         n+qybJS7g4bTiF/kDELV1VGdQmRTOxAQSwONIrFtaMW76yMhZ3d0Kp39BOtqavNeur3r
-         Auhjsa2ghpUls+QQDvUrWngcD+RIh8YLSET0PWut8cdrrGwgVsH0f/PqQl4TB9PEBsIV
-         uuCQ==
+        bh=PpjDc5kQAW+k4ZQYHkXtWYHcVTdhQtxJVF/UKPc9J1o=;
+        b=iOK91BqR2al5dx6yxJYNdJ0KjbgTezozD9d7Mfm19BVc0Kn0bIzeV8O1a2Amyvc21A
+         k4zIUHIPW0rEnb7NHeK7QnH/T9jDadvayvwB+uwAIHMBE+jIW0LKKiX43+hFzNddGEDL
+         PsoSH7FSpEWOZODYGU8x75XtalOTNUa5zPk+Dw5g9eAW8EGY1XV1zBxEfiZC/iqpNyik
+         T1BVGUnWV6RWCRPu8ua0k42ZlNt7NDeOb9uT5nVz4LTvl55RESt8bk00TJGWB9wl+4Xk
+         8Q+0BypI3uvPrwdnt6Xpgenc3i+yQX0gL4bvsoyke4sHKc9qjqTPrazgLRNuAaA9Jrhb
+         se0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8kZrCNGBjg1WS7ODt19uiL6/LMaIleV0jy9dXg5qXsU=;
-        b=my9+ZGlkppHM0/5jmu7u7EMNUaNYzHpnM0ERdQeAX6T930N4xSTA7YVi9TxwbYTOzl
-         KorRwPJtSyDAqUpVEU/L0G9m8Ec5IwoynggJ10dbkjkID9LVnYHeMwxe+jKizYqZYPch
-         +L/PwR6mDDZ+uZwFTrP8PsKCAVbgAR/KvmSvwapznVl9UZPDCq49b9MMJ3mU5cWKWYPS
-         wcjPvkMMwiL1Ksb7CFiVUj5RLLYVVEgDY1wZX4Z8z1hlRMYv+pyVRFH7sAIyg2ZUyYAc
-         GEQYFH+ZBt9CKrFXDMGIQ2V5gOtIQIQ1xua4hGtihMXkTXkZ3Ek1S/vAc9JjXv2ByaII
-         5snA==
-X-Gm-Message-State: AFqh2kqFf4q3ib7r9YksdTTu0h2xnprd8vTn9sEWKhj+PF401odaqIVT
-        SkIC/m6n+a5V0HJ92xquLnbgCOY4pk5u
-X-Google-Smtp-Source: AMrXdXv30EHXL+5DK+Y+8Ijs4U9jsgv9W+gn+nLjMgEdO1gBmY8O8wHR5Scv0SFd17HJN2nRWWz7fI2pi91H
+        bh=PpjDc5kQAW+k4ZQYHkXtWYHcVTdhQtxJVF/UKPc9J1o=;
+        b=l3MITiakzivud1UilmWiKBsOKE9og6kZQI9Tauri95L+xa1kzmxhvxuEQ3niI+Sb7h
+         +8BCA8nRVVLN/RWNiy0Bwd1BPN7FCWdEAuZSZYHXDWjjwXCE1jLxooC0hgjnp4KPfWTP
+         RCCKSSIp+4RGj4hFH310ftvtiWhaJohZCTWglSxobIQwpChbQgX5ZY0yvW+sX7QHbDlr
+         N+lXayqcDYvi3voY26tVxKjW44yz9bU1VjLD/Du7wyoD+hhRlBVd6uEyehTTZTK6hDGh
+         ZXPzcwc8sQhw7KCQq4n0bs3kCIx3ylDLzErF3BlZVKw7vFoPsJKqVBtgACn0vfjWba5u
+         r8WQ==
+X-Gm-Message-State: AFqh2koIIPd/2o1UDWQxG/t4fx/MhQHPGjF5R+gX0eumFK4iOJo91ZF3
+        ZYYEBIWA1kGP1J8of0iLEucdlYPk7jrr
+X-Google-Smtp-Source: AMrXdXu88AaC3b5v889t8A+RxymtaH7gcPHvKNpTnvt/AXsdpsQsEau7v6rQsJqLyekXwlH5RmEX9VxdYxs2
 X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
- (user=bgardon job=sendgmr) by 2002:a17:902:d510:b0:189:ced9:c9e7 with SMTP id
- b16-20020a170902d51000b00189ced9c9e7mr251984plg.108.1671661470555; Wed, 21
- Dec 2022 14:24:30 -0800 (PST)
-Date:   Wed, 21 Dec 2022 22:24:09 +0000
+ (user=bgardon job=sendgmr) by 2002:a05:6902:513:b0:6fa:5a47:c208 with SMTP id
+ x19-20020a056902051300b006fa5a47c208mr376658ybs.472.1671661472442; Wed, 21
+ Dec 2022 14:24:32 -0800 (PST)
+Date:   Wed, 21 Dec 2022 22:24:10 +0000
 In-Reply-To: <20221221222418.3307832-1-bgardon@google.com>
 Mime-Version: 1.0
 References: <20221221222418.3307832-1-bgardon@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221221222418.3307832-6-bgardon@google.com>
-Subject: [RFC 05/14] KVM: x86/MMU: Move paging_tmpl.h includes to shadow_mmu.c
+Message-ID: <20221221222418.3307832-7-bgardon@google.com>
+Subject: [RFC 06/14] KVM: x86/MMU: Clean up Shadow MMU exports
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -71,200 +71,333 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Move the integration point for paging_tmpl.h to shadow_mmu.c since
-paging_tmpl.h is ostensibly part of the Shadow MMU. This requires
-modifying some of the definitions to be non-static and then exporting
-the pre-processed function names through shadow_mmu.h since they are
-needed for mmu context callbacks in mmu.c. This will facilitate cleanups
-in following commits because many of the functions being exposed by
-shadow_mmu.h are only needed by paging_tmpl.h. Those functions will no
-longer need to be exported.
-
-sync_mmio_spte() is only used by paging_tmpl.h, so move it along with
-the includes.
+Now that paging_tmpl.h is included from shadow_mmu.c, there's no need to
+export many of the functions currrently in shadow_mmu.h, so remove those
+exports and mark the functions static. This cleans up the interface
+of the Shadow MMU, and will allow the implementation to keep the details
+of rmap_heads internal.
 
 No functional change intended.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 29 -----------------------------
- arch/x86/kvm/mmu/paging_tmpl.h | 11 +++++------
- arch/x86/kvm/mmu/shadow_mmu.c  | 30 ++++++++++++++++++++++++++++++
- arch/x86/kvm/mmu/shadow_mmu.h  | 25 ++++++++++++++++++++++++-
- 4 files changed, 59 insertions(+), 36 deletions(-)
+ arch/x86/kvm/mmu/shadow_mmu.c | 78 +++++++++++++++++++++--------------
+ arch/x86/kvm/mmu/shadow_mmu.h | 51 +----------------------
+ 2 files changed, 48 insertions(+), 81 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index a17e8a79e4df..dd97e346c786 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1699,35 +1699,6 @@ static unsigned long get_cr3(struct kvm_vcpu *vcpu)
- 	return kvm_read_cr3(vcpu);
- }
- 
--static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
--			   unsigned int access)
--{
--	if (unlikely(is_mmio_spte(*sptep))) {
--		if (gfn != get_mmio_spte_gfn(*sptep)) {
--			mmu_spte_clear_no_track(sptep);
--			return true;
--		}
--
--		mark_mmio_spte(vcpu, sptep, gfn, access);
--		return true;
--	}
--
--	return false;
--}
--
--#define PTTYPE_EPT 18 /* arbitrary */
--#define PTTYPE PTTYPE_EPT
--#include "paging_tmpl.h"
--#undef PTTYPE
--
--#define PTTYPE 64
--#include "paging_tmpl.h"
--#undef PTTYPE
--
--#define PTTYPE 32
--#include "paging_tmpl.h"
--#undef PTTYPE
--
- static void
- __reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
- 			u64 pa_bits_rsvd, int level, bool nx, bool gbpages,
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 0f6455072055..2e3b2aca64ad 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -787,7 +787,7 @@ FNAME(is_self_change_mapping)(struct kvm_vcpu *vcpu,
-  *  Returns: 1 if we need to emulate the instruction, 0 otherwise, or
-  *           a negative value on error.
-  */
--static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-+int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
- 	struct guest_walker walker;
- 	int r;
-@@ -897,7 +897,7 @@ static gpa_t FNAME(get_level1_sp_gpa)(struct kvm_mmu_page *sp)
- 	return gfn_to_gpa(sp->gfn) + offset * sizeof(pt_element_t);
- }
- 
--static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
-+void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
- {
- 	struct kvm_shadow_walk_iterator iterator;
- 	struct kvm_mmu_page *sp;
-@@ -957,9 +957,8 @@ static void FNAME(invlpg)(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root_hpa)
- }
- 
- /* Note, @addr is a GPA when gva_to_gpa() translates an L2 GPA to an L1 GPA. */
--static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
--			       gpa_t addr, u64 access,
--			       struct x86_exception *exception)
-+gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, gpa_t addr,
-+			u64 access, struct x86_exception *exception)
- {
- 	struct guest_walker walker;
- 	gpa_t gpa = INVALID_GPA;
-@@ -992,7 +991,7 @@ static gpa_t FNAME(gva_to_gpa)(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-  *   0: the sp is synced and no tlb flushing is required
-  * > 0: the sp is synced and tlb flushing is required
-  */
--static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-+int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
- {
- 	union kvm_mmu_page_role root_role = vcpu->arch.mmu->root_role;
- 	int i;
 diff --git a/arch/x86/kvm/mmu/shadow_mmu.c b/arch/x86/kvm/mmu/shadow_mmu.c
-index 05d8f5be559d..86b5fb75d50a 100644
+index 86b5fb75d50a..090b4788f7de 100644
 --- a/arch/x86/kvm/mmu/shadow_mmu.c
 +++ b/arch/x86/kvm/mmu/shadow_mmu.c
-@@ -10,6 +10,7 @@
-  * Shadow MMU also supports TDP, it's just less scalable. The Shadow and TDP
-  * MMUs can cooperate to support nested virtualization on hardware with TDP.
+@@ -21,6 +21,20 @@
+ #include <asm/cmpxchg.h>
+ #include <trace/events/kvm.h>
+ 
++struct kvm_shadow_walk_iterator {
++	u64 addr;
++	hpa_t shadow_addr;
++	u64 *sptep;
++	int level;
++	unsigned index;
++};
++
++#define for_each_shadow_entry_using_root(_vcpu, _root, _addr, _walker)     \
++	for (shadow_walk_init_using_root(&(_walker), (_vcpu),              \
++					 (_root), (_addr));                \
++	     shadow_walk_okay(&(_walker));			           \
++	     shadow_walk_next(&(_walker)))
++
+ #define for_each_shadow_entry(_vcpu, _addr, _walker)            \
+ 	for (shadow_walk_init(&(_walker), _vcpu, _addr);	\
+ 	     shadow_walk_okay(&(_walker));			\
+@@ -227,7 +241,7 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+  *
+  * Returns true if the TLB needs to be flushed
   */
-+#include "ioapic.h"
- #include "mmu.h"
- #include "mmu_internal.h"
- #include "mmutrace.h"
-@@ -2798,6 +2799,35 @@ void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
- 	walk_shadow_page_lockless_end(vcpu);
+-bool mmu_spte_update(u64 *sptep, u64 new_spte)
++static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+ {
+ 	bool flush = false;
+ 	u64 old_spte = mmu_spte_update_no_track(sptep, new_spte);
+@@ -311,7 +325,7 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
+  * Directly clear spte without caring the state bits of sptep,
+  * it is used to set the upper level spte.
+  */
+-void mmu_spte_clear_no_track(u64 *sptep)
++static void mmu_spte_clear_no_track(u64 *sptep)
+ {
+ 	__update_clear_spte_fast(sptep, 0ull);
+ }
+@@ -354,7 +368,7 @@ static void mmu_free_pte_list_desc(struct pte_list_desc *pte_list_desc)
+ 
+ static bool sp_has_gptes(struct kvm_mmu_page *sp);
+ 
+-gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
++static gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index)
+ {
+ 	if (sp->role.passthrough)
+ 		return sp->gfn;
+@@ -410,8 +424,8 @@ static void kvm_mmu_page_set_translation(struct kvm_mmu_page *sp, int index,
+ 	          sp->gfn, kvm_mmu_page_get_gfn(sp, index), gfn);
  }
  
-+static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
-+			   unsigned int access)
-+{
-+	if (unlikely(is_mmio_spte(*sptep))) {
-+		if (gfn != get_mmio_spte_gfn(*sptep)) {
-+			mmu_spte_clear_no_track(sptep);
-+			return true;
-+		}
-+
-+		mark_mmio_spte(vcpu, sptep, gfn, access);
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+#define PTTYPE_EPT 18 /* arbitrary */
-+#define PTTYPE PTTYPE_EPT
-+#include "paging_tmpl.h"
-+#undef PTTYPE
-+
-+#define PTTYPE 64
-+#include "paging_tmpl.h"
-+#undef PTTYPE
-+
-+#define PTTYPE 32
-+#include "paging_tmpl.h"
-+#undef PTTYPE
-+
- static bool is_obsolete_root(struct kvm *kvm, hpa_t root_hpa)
+-void kvm_mmu_page_set_access(struct kvm_mmu_page *sp, int index,
+-			     unsigned int access)
++static void kvm_mmu_page_set_access(struct kvm_mmu_page *sp, int index,
++				    unsigned int access)
  {
+ 	gfn_t gfn = kvm_mmu_page_get_gfn(sp, index);
+ 
+@@ -627,7 +641,7 @@ struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
+ 	return &slot->arch.rmap[level - PG_LEVEL_4K][idx];
+ }
+ 
+-bool rmap_can_add(struct kvm_vcpu *vcpu)
++static bool rmap_can_add(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_mmu_memory_cache *mc;
+ 
+@@ -735,7 +749,7 @@ static u64 *rmap_get_next(struct rmap_iterator *iter)
+ 	for (_spte_ = rmap_get_first(_rmap_head_, _iter_);		\
+ 	     _spte_; _spte_ = rmap_get_next(_iter_))
+ 
+-void drop_spte(struct kvm *kvm, u64 *sptep)
++static void drop_spte(struct kvm *kvm, u64 *sptep)
+ {
+ 	u64 old_spte = mmu_spte_clear_track_bits(kvm, sptep);
+ 
+@@ -1112,7 +1126,7 @@ static void mmu_page_remove_parent_pte(struct kvm_mmu_page *sp,
+ 	pte_list_remove(parent_pte, &sp->parent_ptes);
+ }
+ 
+-void drop_parent_pte(struct kvm_mmu_page *sp, u64 *parent_pte)
++static void drop_parent_pte(struct kvm_mmu_page *sp, u64 *parent_pte)
+ {
+ 	mmu_page_remove_parent_pte(sp, parent_pte);
+ 	mmu_spte_clear_no_track(parent_pte);
+@@ -1342,8 +1356,8 @@ static void mmu_pages_clear_parents(struct mmu_page_path *parents)
+ 	} while (!sp->unsync_children);
+ }
+ 
+-int mmu_sync_children(struct kvm_vcpu *vcpu, struct kvm_mmu_page *parent,
+-		      bool can_yield)
++static int mmu_sync_children(struct kvm_vcpu *vcpu, struct kvm_mmu_page *parent,
++			     bool can_yield)
+ {
+ 	int i;
  	struct kvm_mmu_page *sp;
+@@ -1389,7 +1403,7 @@ void __clear_sp_write_flooding_count(struct kvm_mmu_page *sp)
+ 	atomic_set(&sp->write_flooding_count,  0);
+ }
+ 
+-void clear_sp_write_flooding_count(u64 *spte)
++static void clear_sp_write_flooding_count(u64 *spte)
+ {
+ 	__clear_sp_write_flooding_count(sptep_to_sp(spte));
+ }
+@@ -1602,9 +1616,9 @@ static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct,
+ 	return role;
+ }
+ 
+-struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu, u64 *sptep,
+-					  gfn_t gfn, bool direct,
+-					  unsigned int access)
++static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
++						 u64 *sptep, gfn_t gfn,
++						 bool direct, unsigned int access)
+ {
+ 	union kvm_mmu_page_role role;
+ 
+@@ -1615,8 +1629,9 @@ struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu, u64 *sptep,
+ 	return kvm_mmu_get_shadow_page(vcpu, gfn, role);
+ }
+ 
+-void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
+-				 struct kvm_vcpu *vcpu, hpa_t root, u64 addr)
++static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
++					struct kvm_vcpu *vcpu, hpa_t root,
++					u64 addr)
+ {
+ 	iterator->addr = addr;
+ 	iterator->shadow_addr = root;
+@@ -1643,14 +1658,14 @@ void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
+ 	}
+ }
+ 
+-void shadow_walk_init(struct kvm_shadow_walk_iterator *iterator,
+-		      struct kvm_vcpu *vcpu, u64 addr)
++static void shadow_walk_init(struct kvm_shadow_walk_iterator *iterator,
++			     struct kvm_vcpu *vcpu, u64 addr)
+ {
+ 	shadow_walk_init_using_root(iterator, vcpu, vcpu->arch.mmu->root.hpa,
+ 				    addr);
+ }
+ 
+-bool shadow_walk_okay(struct kvm_shadow_walk_iterator *iterator)
++static bool shadow_walk_okay(struct kvm_shadow_walk_iterator *iterator)
+ {
+ 	if (iterator->level < PG_LEVEL_4K)
+ 		return false;
+@@ -1672,7 +1687,7 @@ static void __shadow_walk_next(struct kvm_shadow_walk_iterator *iterator,
+ 	--iterator->level;
+ }
+ 
+-void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator)
++static void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator)
+ {
+ 	__shadow_walk_next(iterator, *iterator->sptep);
+ }
+@@ -1703,13 +1718,14 @@ static void __link_shadow_page(struct kvm *kvm,
+ 		mark_unsync(sptep);
+ }
+ 
+-void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep, struct kvm_mmu_page *sp)
++static void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep,
++			     struct kvm_mmu_page *sp)
+ {
+ 	__link_shadow_page(vcpu->kvm, &vcpu->arch.mmu_pte_list_desc_cache, sptep, sp, true);
+ }
+ 
+-void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+-			  unsigned direct_access)
++static void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
++				 unsigned direct_access)
+ {
+ 	if (is_shadow_present_pte(*sptep) && !is_large_pte(*sptep)) {
+ 		struct kvm_mmu_page *child;
+@@ -1731,8 +1747,8 @@ void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+ }
+ 
+ /* Returns the number of zapped non-leaf child shadow pages. */
+-int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp, u64 *spte,
+-		     struct list_head *invalid_list)
++static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp, u64 *spte,
++			    struct list_head *invalid_list)
+ {
+ 	u64 pte;
+ 	struct kvm_mmu_page *child;
+@@ -2144,9 +2160,9 @@ int mmu_try_to_unsync_pages(struct kvm *kvm, const struct kvm_memory_slot *slot,
+ 	return 0;
+ }
+ 
+-int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+-		 u64 *sptep, unsigned int pte_access, gfn_t gfn,
+-		 kvm_pfn_t pfn, struct kvm_page_fault *fault)
++static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
++			u64 *sptep, unsigned int pte_access, gfn_t gfn,
++			kvm_pfn_t pfn, struct kvm_page_fault *fault)
+ {
+ 	struct kvm_mmu_page *sp = sptep_to_sp(sptep);
+ 	int level = sp->role.level;
+@@ -2251,8 +2267,8 @@ static int direct_pte_prefetch_many(struct kvm_vcpu *vcpu,
+ 	return 0;
+ }
+ 
+-void __direct_pte_prefetch(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+-			   u64 *sptep)
++static void __direct_pte_prefetch(struct kvm_vcpu *vcpu,
++				  struct kvm_mmu_page *sp, u64 *sptep)
+ {
+ 	u64 *spte, *start = NULL;
+ 	int i;
+@@ -2788,7 +2804,7 @@ int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level)
+ 	return leaf;
+ }
+ 
+-void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
++static void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr)
+ {
+ 	struct kvm_shadow_walk_iterator iterator;
+ 	u64 spte;
 diff --git a/arch/x86/kvm/mmu/shadow_mmu.h b/arch/x86/kvm/mmu/shadow_mmu.h
-index 83876047c1f5..00d2f9abecf0 100644
+index 00d2f9abecf0..20c65a0ea52c 100644
 --- a/arch/x86/kvm/mmu/shadow_mmu.h
 +++ b/arch/x86/kvm/mmu/shadow_mmu.h
-@@ -73,7 +73,6 @@ bool kvm_test_age_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+@@ -23,32 +23,11 @@ struct pte_list_desc {
+ 	u64 *sptes[PTE_LIST_EXT];
+ };
+ 
++/* Only exported for debugfs.c. */
+ unsigned int pte_list_count(struct kvm_rmap_head *rmap_head);
+ 
+-struct kvm_shadow_walk_iterator {
+-	u64 addr;
+-	hpa_t shadow_addr;
+-	u64 *sptep;
+-	int level;
+-	unsigned index;
+-};
+-
+-#define for_each_shadow_entry_using_root(_vcpu, _root, _addr, _walker)     \
+-	for (shadow_walk_init_using_root(&(_walker), (_vcpu),              \
+-					 (_root), (_addr));                \
+-	     shadow_walk_okay(&(_walker));			           \
+-	     shadow_walk_next(&(_walker)))
+-
+-bool mmu_spte_update(u64 *sptep, u64 new_spte);
+-void mmu_spte_clear_no_track(u64 *sptep);
+-gfn_t kvm_mmu_page_get_gfn(struct kvm_mmu_page *sp, int index);
+-void kvm_mmu_page_set_access(struct kvm_mmu_page *sp, int index,
+-			     unsigned int access);
+-
+ struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
+ 				  const struct kvm_memory_slot *slot);
+-bool rmap_can_add(struct kvm_vcpu *vcpu);
+-void drop_spte(struct kvm *kvm, u64 *sptep);
+ bool rmap_write_protect(struct kvm_rmap_head *rmap_head, bool pt_protect);
+ bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 			const struct kvm_memory_slot *slot);
+@@ -72,30 +51,8 @@ bool kvm_test_age_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 		       struct kvm_memory_slot *slot, gfn_t gfn,
  		       int level, pte_t unused);
  
- void drop_parent_pte(struct kvm_mmu_page *sp, u64 *parent_pte);
--int nonpaging_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp);
- int mmu_sync_children(struct kvm_vcpu *vcpu, struct kvm_mmu_page *parent,
- 		      bool can_yield);
+-void drop_parent_pte(struct kvm_mmu_page *sp, u64 *parent_pte);
+-int mmu_sync_children(struct kvm_vcpu *vcpu, struct kvm_mmu_page *parent,
+-		      bool can_yield);
  void __clear_sp_write_flooding_count(struct kvm_mmu_page *sp);
-@@ -150,4 +149,28 @@ void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
- 				    const struct kvm_memory_slot *slot);
+-void clear_sp_write_flooding_count(u64 *spte);
+-
+-struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu, u64 *sptep,
+-					  gfn_t gfn, bool direct,
+-					  unsigned int access);
+-
+-void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
+-				 struct kvm_vcpu *vcpu, hpa_t root, u64 addr);
+-void shadow_walk_init(struct kvm_shadow_walk_iterator *iterator,
+-		      struct kvm_vcpu *vcpu, u64 addr);
+-bool shadow_walk_okay(struct kvm_shadow_walk_iterator *iterator);
+-void shadow_walk_next(struct kvm_shadow_walk_iterator *iterator);
+-
+-void link_shadow_page(struct kvm_vcpu *vcpu, u64 *sptep, struct kvm_mmu_page *sp);
+-
+-void validate_direct_spte(struct kvm_vcpu *vcpu, u64 *sptep,
+-			  unsigned direct_access);
  
- unsigned long mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc);
-+
-+/* Exports from paging_tmpl.h */
-+gpa_t paging32_gva_to_gpa(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-+			  gpa_t vaddr, u64 access,
-+			  struct x86_exception *exception);
-+gpa_t paging64_gva_to_gpa(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-+			  gpa_t vaddr, u64 access,
-+			  struct x86_exception *exception);
-+gpa_t ept_gva_to_gpa(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu, gpa_t vaddr,
-+		     u64 access, struct x86_exception *exception);
-+
-+int paging32_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-+int paging64_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-+int ept_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-+
-+int paging32_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp);
-+int paging64_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp);
-+int ept_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp);
-+/* Defined in shadow_mmu.c. */
-+int nonpaging_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp);
-+
-+void paging32_invlpg(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root);
-+void paging64_invlpg(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root);
-+void ept_invlpg(struct kvm_vcpu *vcpu, gva_t gva, hpa_t root);
- #endif /* __KVM_X86_MMU_SHADOW_MMU_H */
+-int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp, u64 *spte,
+-		     struct list_head *invalid_list);
+ bool __kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
+ 				struct list_head *invalid_list,
+ 				int *nr_zapped);
+@@ -107,11 +64,6 @@ int make_mmu_pages_available(struct kvm_vcpu *vcpu);
+ 
+ int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva);
+ 
+-int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
+-		 u64 *sptep, unsigned int pte_access, gfn_t gfn,
+-		 kvm_pfn_t pfn, struct kvm_page_fault *fault);
+-void __direct_pte_prefetch(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+-			   u64 *sptep);
+ int __direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
+ u64 *fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gpa_t gpa, u64 *spte);
+ 
+@@ -121,7 +73,6 @@ int mmu_alloc_special_roots(struct kvm_vcpu *vcpu);
+ 
+ int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level);
+ 
+-void shadow_page_table_clear_flood(struct kvm_vcpu *vcpu, gva_t addr);
+ void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 		       int bytes, struct kvm_page_track_notifier_node *node);
+ 
 -- 
 2.39.0.314.g84b9a713c41-goog
 
