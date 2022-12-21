@@ -2,256 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D2C6653060
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 12:48:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 380206530C2
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 13:26:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234565AbiLULsD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 06:48:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50038 "EHLO
+        id S229932AbiLUM0K (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 07:26:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229448AbiLULsC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 06:48:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329041DA46
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 03:47:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671623234;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=dtRxOgX0TZOayu+PRuST1sFSCcBr/Ov+tY3NROTlMbQ=;
-        b=Rl7ZfT+SfCBmhEojUhyrviRY+cvaCJOBRS4PL1DZ0a7EJR2GTzkVIyjd9ibI+0qErh+rfJ
-        ClbRR+d6ldhE5H6aRMcN3KVu6VfAw7ysGmoWX9L4oS+aSJDek6zbNZq2ZyjIV1cU+WyJ3m
-        x3TgW2oLQdwFh2sg0ELPITB8u+goWBo=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-53-6Tx7ibZyNVyjiFlGRhVFeQ-1; Wed, 21 Dec 2022 06:47:12 -0500
-X-MC-Unique: 6Tx7ibZyNVyjiFlGRhVFeQ-1
-Received: by mail-qk1-f197.google.com with SMTP id j13-20020a05620a410d00b006e08208eb31so11265560qko.3
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 03:47:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dtRxOgX0TZOayu+PRuST1sFSCcBr/Ov+tY3NROTlMbQ=;
-        b=NA5BwhpcDHnEVC6da0LvYPdb7Ym/rM85QUShPqf8wfG1gQg+jlq5FFMYchhQJFle+1
-         Zf6cYoyqCjm4fIQar1UhSKQjFs+/MFZoWFu8sUmRD2ldq+LwylftzgPJm5rHpAxTY6AI
-         JMJ3YZBC5a7jIlDu1l9FtXfogIPYi/RFUunXRwUfLFRjK9hhI+JJJrU/yd0dPhLDZwpE
-         2QhgBPp6juqzonI/zlvsHgaHdYef1FJAi9pz2gyJmid/Ek7GAzXCv5Hcz7QjPK162ZnR
-         YVzXqD1uS0ta6rS/H3HH29FprsVoUV4hQ9Qp+4R8VQRdyu3TBEUNodCAGExkFuXPyMY9
-         LtIw==
-X-Gm-Message-State: AFqh2kqPATgkpQWN4UzLqiUgupTewh7ideebHW5LjM7yXzrOMtNQYu3p
-        fn0GlKDoDB7m58VPuUjhcYH1TyTfcfLvIqq7ybD5Kd8idOVGrYrl7lhMtlZbJtkNIkHjNfkDDy2
-        odAX3y01tuDN7
-X-Received: by 2002:a05:6214:5443:b0:4c7:80fa:755c with SMTP id kz3-20020a056214544300b004c780fa755cmr1379824qvb.45.1671623232262;
-        Wed, 21 Dec 2022 03:47:12 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtCgdSPiFJ0Kc3hCB+/E4fHjzkyrWfeDKkFFyw04R0HX5of4NBMeHt0cwR58dN52CLO78Pcjw==
-X-Received: by 2002:a05:6214:5443:b0:4c7:80fa:755c with SMTP id kz3-20020a056214544300b004c780fa755cmr1379794qvb.45.1671623231982;
-        Wed, 21 Dec 2022 03:47:11 -0800 (PST)
-Received: from redhat.com ([37.19.199.117])
-        by smtp.gmail.com with ESMTPSA id m9-20020a05620a290900b006fa8299b4d5sm11066079qkp.100.2022.12.21.03.47.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Dec 2022 03:47:11 -0800 (PST)
-Date:   Wed, 21 Dec 2022 06:47:03 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     Eugenio Perez Martin <eperezma@redhat.com>, qemu-devel@nongnu.org,
-        Liuxiangdong <liuxiangdong5@huawei.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Zhu Lingshan <lingshan.zhu@intel.com>,
-        Si-Wei Liu <si-wei.liu@oracle.com>,
-        Laurent Vivier <lvivier@redhat.com>,
-        "Gonglei (Arei)" <arei.gonglei@huawei.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Cindy Lu <lulu@redhat.com>, Gautam Dawar <gdawar@xilinx.com>,
-        Eli Cohen <eli@mellanox.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Longpeng <longpeng2@huawei.com>,
-        Harpreet Singh Anand <hanand@xilinx.com>,
-        Parav Pandit <parav@mellanox.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v9 06/12] vdpa: request iova_range only once
-Message-ID: <20221221064619-mutt-send-email-mst@kernel.org>
-References: <20221215113144.322011-1-eperezma@redhat.com>
- <20221215113144.322011-7-eperezma@redhat.com>
- <CACGkMEtE_6nci5zwQZbOMbu3e9gh4aa_88WjTgkWkjKqQBB3Zw@mail.gmail.com>
- <CAJaqyWcxeuOiHYBb_ftedSrJpNpN9vQJ2sZZ_5cZh4RsQSdgVQ@mail.gmail.com>
- <CACGkMEtkWJQVrnuG7CKJ+zFcMFhhZs3=iFPjv85U7KAjkpd=EA@mail.gmail.com>
+        with ESMTP id S229641AbiLUM0I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 07:26:08 -0500
+Received: from out162-62-57-210.mail.qq.com (out162-62-57-210.mail.qq.com [162.62.57.210])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D42B0B0D
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 04:26:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
+        s=s201512; t=1671625563;
+        bh=wFNhnD3NzmTBl/E3WRuZI7LywtLlUP3cETCmajXFZTU=;
+        h=From:To:Cc:Subject:Date;
+        b=jeIaI/o1DJ8WUMCms1nnK5ihfhei97zs5I1Qp6+hsGBs1DmoVnUSXKIIizqQkTGCf
+         MMJxfg9ndjCCDFvyxSWTCTqD6Qz0MG2Qf9MQHsN561XvlseA4vgKWJIgWHzadZeCLF
+         jEvHJuS++wwPBdEp1/MovX8PtBt+1tvExp72TE9U=
+Received: from localhost.localdomain ([39.156.73.13])
+        by newxmesmtplogicsvrsza10-0.qq.com (NewEsmtp) with SMTP
+        id 6229AC9C; Wed, 21 Dec 2022 20:24:34 +0800
+X-QQ-mid: xmsmtpt1671625474tv1woa6v3
+Message-ID: <tencent_31E6ACADCB6915E157CF5113C41803212107@qq.com>
+X-QQ-XMAILINFO: M/NR0wiIuy70qs0pG1YAOxMsMstPYRYt/MG1TX1OpkGzw8hC1ywrfOfgUCyQyX
+         qdfy1hPFOA6646ti+jbPj30FbaQYPii5k7ExSm3ZNJb9yZH3J53N9Za8u5F0gvf0TtaWruGcR95O
+         AcFLcFkPtVMEPBmtnBY+HBMl3kX92xM4AXM3TBjGdzPzAiD7Io8jUXM2eCrXoPVQuIF3XrP+cYv9
+         lYS7yLmjGhTfW3wMo6nYgzsbOjZ9adOK0TrpdwIer/5wabf33x2RIKWZYzdc32o7HQrXam1uC2pG
+         kapORg7XUCulQ+c4uZh1vfHNc81hkJyDjYJfVK5mL9XiXqGUDh9B1Nl28mZ2goMYRt+SvABi0haM
+         iuVT8HMrZ2dvoPJYWmg9bGncL81UNQhiKJcALW5MIZpfWHXaZrOxt07dx9mV/l8BQOsajZFb8HSJ
+         SnYI0MsMF1kjDiY4eRqF8FNnJVljCCVfUk4xvwEY6OT5eeOcm/mnQdib9aYWjKfZA9RozhT1jOPZ
+         PeWAvys/TLdafyvS2nrWL8oRqYP5O7ovJFm2DWR8ihHJazp1OS6yzXrkAO+fUm3mB41x8e50NVaY
+         SSKOC1llUu6M+wYbHOITAVMW/PB5GgHJ8UhFLzqMaBd4PEjlxu2s9VHlkRlbRFECzoJOCxo4ojKK
+         6GpOS+T3HRSwcLftRfEa/74oh8BmWE+zVZK6XIqRW++keN6UWHRXzxBpMlfOaVWIRIlvifxojN5R
+         dRiTmkGhBZAL3Bp7xHrz8TCkvCWBtVU2osGb9XJBfyHRQm9hMHHQrgY2oG8x6MhUTTbJML+XzDKp
+         56YrxY28cQKfQFz3+oQhJ6e2Xid3TBBFNiNQTo4HWbwvnU6comaqTq5AayAIebsajHWaI4W6RPE0
+         BEz4iVa+ST9d0RvAf5a2qcOCR2d8Brw0hYfgFRSs+plAlDLMqe3nK3aLBNW+15Lokv42MzhzVIu7
+         0mnsFZkNQeSnMXFlEtslzp6eBtfJ9RlqVFTuqC6vg01EtcDv/KoT+MXEDColcq
+From:   Rong Tao <rtoax@foxmail.com>
+To:     seanjc@google.com
+Cc:     bp@alien8.de, dave.hansen@linux.intel.com, gg@google.com,
+        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, pbonzini@redhat.com, rongtao@cestc.cn,
+        rtoax@foxmail.com, tglx@linutronix.de, x86@kernel.org
+Subject: [PATCH v2] KVM: VMX: Fix indentation coding style issue
+Date:   Wed, 21 Dec 2022 20:24:32 +0800
+X-OQ-MSGID: <20221221122432.80129-1-rtoax@foxmail.com>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEtkWJQVrnuG7CKJ+zFcMFhhZs3=iFPjv85U7KAjkpd=EA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        HELO_DYNAMIC_IPADDR,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,RDNS_DYNAMIC,
+        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 04:21:52PM +0800, Jason Wang wrote:
-> On Fri, Dec 16, 2022 at 5:53 PM Eugenio Perez Martin
-> <eperezma@redhat.com> wrote:
-> >
-> > On Fri, Dec 16, 2022 at 8:29 AM Jason Wang <jasowang@redhat.com> wrote:
-> > >
-> > > On Thu, Dec 15, 2022 at 7:32 PM Eugenio Pérez <eperezma@redhat.com> wrote:
-> > > >
-> > > > Currently iova range is requested once per queue pair in the case of
-> > > > net. Reduce the number of ioctls asking it once at initialization and
-> > > > reusing that value for each vhost_vdpa.
-> > > >
-> > > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-> > > > ---
-> > > >  hw/virtio/vhost-vdpa.c | 15 ---------------
-> > > >  net/vhost-vdpa.c       | 27 ++++++++++++++-------------
-> > > >  2 files changed, 14 insertions(+), 28 deletions(-)
-> > > >
-> > > > diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
-> > > > index 691bcc811a..9b7f4ef083 100644
-> > > > --- a/hw/virtio/vhost-vdpa.c
-> > > > +++ b/hw/virtio/vhost-vdpa.c
-> > > > @@ -365,19 +365,6 @@ static int vhost_vdpa_add_status(struct vhost_dev *dev, uint8_t status)
-> > > >      return 0;
-> > > >  }
-> > > >
-> > > > -static void vhost_vdpa_get_iova_range(struct vhost_vdpa *v)
-> > > > -{
-> > > > -    int ret = vhost_vdpa_call(v->dev, VHOST_VDPA_GET_IOVA_RANGE,
-> > > > -                              &v->iova_range);
-> > > > -    if (ret != 0) {
-> > > > -        v->iova_range.first = 0;
-> > > > -        v->iova_range.last = UINT64_MAX;
-> > > > -    }
-> > > > -
-> > > > -    trace_vhost_vdpa_get_iova_range(v->dev, v->iova_range.first,
-> > > > -                                    v->iova_range.last);
-> > > > -}
-> > > > -
-> > > >  /*
-> > > >   * The use of this function is for requests that only need to be
-> > > >   * applied once. Typically such request occurs at the beginning
-> > > > @@ -465,8 +452,6 @@ static int vhost_vdpa_init(struct vhost_dev *dev, void *opaque, Error **errp)
-> > > >          goto err;
-> > > >      }
-> > > >
-> > > > -    vhost_vdpa_get_iova_range(v);
-> > > > -
-> > > >      if (!vhost_vdpa_first_dev(dev)) {
-> > > >          return 0;
-> > > >      }
-> > > > diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-> > > > index 2c0ff6d7b0..b6462f0192 100644
-> > > > --- a/net/vhost-vdpa.c
-> > > > +++ b/net/vhost-vdpa.c
-> > > > @@ -541,14 +541,15 @@ static const VhostShadowVirtqueueOps vhost_vdpa_net_svq_ops = {
-> > > >  };
-> > > >
-> > > >  static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
-> > > > -                                           const char *device,
-> > > > -                                           const char *name,
-> > > > -                                           int vdpa_device_fd,
-> > > > -                                           int queue_pair_index,
-> > > > -                                           int nvqs,
-> > > > -                                           bool is_datapath,
-> > > > -                                           bool svq,
-> > > > -                                           VhostIOVATree *iova_tree)
-> > > > +                                       const char *device,
-> > > > +                                       const char *name,
-> > > > +                                       int vdpa_device_fd,
-> > > > +                                       int queue_pair_index,
-> > > > +                                       int nvqs,
-> > > > +                                       bool is_datapath,
-> > > > +                                       bool svq,
-> > > > +                                       struct vhost_vdpa_iova_range iova_range,
-> > > > +                                       VhostIOVATree *iova_tree)
-> > >
-> > > Nit: it's better not mix style changes.
-> > >
-> >
-> > The style changes are because the new parameter is longer than 80
-> > characters, do you prefer me to send a previous patch reducing
-> > indentation?
-> >
-> 
-> Michale, what's your preference? I'm fine with both.
-> 
-> Thanks
+From: Rong Tao <rongtao@cestc.cn>
 
-I think it doesn't matter much, but generally 80 char limit is
-not a hard limit. We can just let it be.
+Code indentation should use tabs where possible.
 
-> > Thanks!
-> >
-> > > Other than this:
-> > >
-> > > Acked-by: Jason Wang <jasonwang@redhat.com>
-> > >
-> > > Thanks
-> > >
-> > > >  {
-> > > >      NetClientState *nc = NULL;
-> > > >      VhostVDPAState *s;
-> > > > @@ -567,6 +568,7 @@ static NetClientState *net_vhost_vdpa_init(NetClientState *peer,
-> > > >      s->vhost_vdpa.device_fd = vdpa_device_fd;
-> > > >      s->vhost_vdpa.index = queue_pair_index;
-> > > >      s->vhost_vdpa.shadow_vqs_enabled = svq;
-> > > > +    s->vhost_vdpa.iova_range = iova_range;
-> > > >      s->vhost_vdpa.iova_tree = iova_tree;
-> > > >      if (!is_datapath) {
-> > > >          s->cvq_cmd_out_buffer = qemu_memalign(qemu_real_host_page_size(),
-> > > > @@ -646,6 +648,7 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-> > > >      int vdpa_device_fd;
-> > > >      g_autofree NetClientState **ncs = NULL;
-> > > >      g_autoptr(VhostIOVATree) iova_tree = NULL;
-> > > > +    struct vhost_vdpa_iova_range iova_range;
-> > > >      NetClientState *nc;
-> > > >      int queue_pairs, r, i = 0, has_cvq = 0;
-> > > >
-> > > > @@ -689,14 +692,12 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-> > > >          return queue_pairs;
-> > > >      }
-> > > >
-> > > > +    vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
-> > > >      if (opts->x_svq) {
-> > > > -        struct vhost_vdpa_iova_range iova_range;
-> > > > -
-> > > >          if (!vhost_vdpa_net_valid_svq_features(features, errp)) {
-> > > >              goto err_svq;
-> > > >          }
-> > > >
-> > > > -        vhost_vdpa_get_iova_range(vdpa_device_fd, &iova_range);
-> > > >          iova_tree = vhost_iova_tree_new(iova_range.first, iova_range.last);
-> > > >      }
-> > > >
-> > > > @@ -705,7 +706,7 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-> > > >      for (i = 0; i < queue_pairs; i++) {
-> > > >          ncs[i] = net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
-> > > >                                       vdpa_device_fd, i, 2, true, opts->x_svq,
-> > > > -                                     iova_tree);
-> > > > +                                     iova_range, iova_tree);
-> > > >          if (!ncs[i])
-> > > >              goto err;
-> > > >      }
-> > > > @@ -713,7 +714,7 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-> > > >      if (has_cvq) {
-> > > >          nc = net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
-> > > >                                   vdpa_device_fd, i, 1, false,
-> > > > -                                 opts->x_svq, iova_tree);
-> > > > +                                 opts->x_svq, iova_range, iova_tree);
-> > > >          if (!nc)
-> > > >              goto err;
-> > > >      }
-> > > > --
-> > > > 2.31.1
-> > > >
-> > >
-> >
+Signed-off-by: Rong Tao <rongtao@cestc.cn>
+---
+v2: KVM: VMX: for case-insensitive searches
+v1: https://lore.kernel.org/lkml/tencent_4D21B619F00AE966BD5DD2ABA4BC7A8F060A@qq.com/
+---
+ arch/x86/kvm/vmx/vmx.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index fe5615fd8295..29f0a639e1e7 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -806,7 +806,7 @@ void vmx_update_exception_bitmap(struct kvm_vcpu *vcpu)
+ 	 */
+ 	if (is_guest_mode(vcpu))
+ 		eb |= get_vmcs12(vcpu)->exception_bitmap;
+-        else {
++	else {
+ 		int mask = 0, match = 0;
+ 
+ 		if (enable_ept && (eb & (1u << PF_VECTOR))) {
+@@ -1214,7 +1214,7 @@ void vmx_prepare_switch_to_guest(struct kvm_vcpu *vcpu)
+ 		}
+ 	}
+ 
+-    	if (vmx->nested.need_vmcs12_to_shadow_sync)
++	if (vmx->nested.need_vmcs12_to_shadow_sync)
+ 		nested_sync_vmcs12_to_shadow(vcpu);
+ 
+ 	if (vmx->guest_state_loaded)
+@@ -4966,10 +4966,10 @@ static int vmx_interrupt_allowed(struct kvm_vcpu *vcpu, bool for_injection)
+ 	if (to_vmx(vcpu)->nested.nested_run_pending)
+ 		return -EBUSY;
+ 
+-       /*
+-        * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
+-        * e.g. if the IRQ arrived asynchronously after checking nested events.
+-        */
++	/*
++	 * An IRQ must not be injected into L2 if it's supposed to VM-Exit,
++	 * e.g. if the IRQ arrived asynchronously after checking nested events.
++	 */
+ 	if (for_injection && is_guest_mode(vcpu) && nested_exit_on_intr(vcpu))
+ 		return -EBUSY;
+ 
+-- 
+2.39.0
 
