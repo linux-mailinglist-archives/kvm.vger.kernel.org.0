@@ -2,83 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1B50652E2B
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 10:03:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0200652E63
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 10:25:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234435AbiLUJD0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 04:03:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34240 "EHLO
+        id S234544AbiLUJZG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 04:25:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234443AbiLUJDU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 04:03:20 -0500
+        with ESMTP id S234516AbiLUJZD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 04:25:03 -0500
 Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE57EF596
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 01:03:17 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BL8ulxb018187
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:03:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : from
- : to : subject : cc : message-id : date; s=pp1;
- bh=WcrfEfJnj4Nk2vIh+DC0CYqu5ui+4SIEGAtQihxe4MM=;
- b=VheHI01Sqnpp9VNxaPoPndICR1kuq54kRG+HJSMPL0bcrA1H8ROfh1FMuMbOMJz/L4US
- 3jwAtRSxId4r4qqMov+SjuEQ1sTWXN+LprX2DCZnnHZMlZSpIm47Id4VfmbXACtiHZmq
- K0zKfjiun80G0WVV2tO6tHri6aZScCuZpXKDUhdeMu1FpC/UHHEvUrwIPliPae82d96W
- uM0CfOQB/0PMJl8hWqRRkXyutpZts1E/XB98Yh4eo9Yr3eTTH8hx4TtjtMJe3emf0XRB
- fvSjXmIIdELIj/Wy7Mp4qcx/oVdr5pSdLKEg8+HX6vDiMIOUqiKFdL4ek7ENVGluyu0J kw== 
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 112A613CE5
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 01:25:02 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BL9C22R011806
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:25:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=EwbFRWNNdUtCAMbpQbOEjNg5NcmQbn8Z1OkUI6n2K+c=;
+ b=hgyA9KV221aR+43baBkSs/FXhlvW6YWTiVWnaPz5YfhiTUISbldAiJFr+s1236eKbWqd
+ 53Uvett19FMKlBkMcbFrGYi0/PHqCsW7zEb3ij5t4peH1dLYaXPcV6gxRFaulrkLjHlc
+ QiwBn2TCiHWVgvyrDuqllchJCYFNmfP1LBUxTnI+JSfPTvyKt9vsE05OwZCD5SONjG9i
+ OeANsuO8nOrWORegOYbVcig1brnzERIzvOir7+lINI0BqJLx4W+HkNAMmDmdV1AkIn5v
+ HF6LCsVn5FZwCnAKBM24rMvuetfCDVknSV09af7enbelu4NKViA3u7Pcwiz0kHd5zgy6 hA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mky3284gn-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkya3gdbj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:03:16 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BL8wbL6022918
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:03:16 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mky3284bf-1
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:25:01 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BL9CSKb015913
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 09:25:01 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mkya3gd5j-14
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Dec 2022 09:03:16 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BL5BwRw013223;
-        Wed, 21 Dec 2022 09:03:13 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3mh6yxktug-1
+        Wed, 21 Dec 2022 09:25:01 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BL10jSm000918;
+        Wed, 21 Dec 2022 09:09:57 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3mh6ywn995-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 21 Dec 2022 09:03:13 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BL9396c24052420
+        Wed, 21 Dec 2022 09:09:57 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BL99s5r41091580
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Dec 2022 09:03:09 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CB8EC20043;
-        Wed, 21 Dec 2022 09:03:09 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AF90720040;
-        Wed, 21 Dec 2022 09:03:09 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.40.3])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 21 Dec 2022 09:03:09 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20221220171953.41195228@p-imbrenda>
-References: <20221220091923.69174-1-nrb@linux.ibm.com> <20221220091923.69174-2-nrb@linux.ibm.com> <20221220171953.41195228@p-imbrenda>
+        Wed, 21 Dec 2022 09:09:54 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 09CCA20043;
+        Wed, 21 Dec 2022 09:09:54 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D408020040;
+        Wed, 21 Dec 2022 09:09:53 +0000 (GMT)
+Received: from a46lp57.lnxne.boe (unknown [9.152.108.100])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 21 Dec 2022 09:09:53 +0000 (GMT)
 From:   Nico Boehr <nrb@linux.ibm.com>
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v5 1/1] s390x: add CMM test during migration
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com, thuth@redhat.com
-Message-ID: <167161338893.28055.1068744169200393594@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Wed, 21 Dec 2022 10:03:09 +0100
+To:     kvm@vger.kernel.org
+Cc:     frankja@linux.ibm.com, imbrenda@linux.ibm.com, thuth@redhat.com
+Subject: [kvm-unit-tests PATCH v6 0/1] s390x: test CMM during migration
+Date:   Wed, 21 Dec 2022 10:09:52 +0100
+Message-Id: <20221221090953.341247-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.36.1
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: PFl4A_Xgjjd2ULyeXCderPscZQX0QEP4
-X-Proofpoint-GUID: TjC5Cars6flZXatdtyEHWfTizlnseYHK
+X-Proofpoint-GUID: eB5hBOxtTflshsrcb26Al68F5Q1UCZnw
+X-Proofpoint-ORIG-GUID: ZnDB3IBRPY4KMuYznAUSFQ1TCf2zt0XD
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
  definitions=2022-12-21_04,2022-12-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- bulkscore=0 malwarescore=0 phishscore=0 spamscore=0 mlxlogscore=999
- adultscore=0 clxscore=1015 suspectscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 spamscore=0
+ suspectscore=0 priorityscore=1501 bulkscore=0 phishscore=0
+ lowpriorityscore=0 mlxscore=0 adultscore=0 clxscore=1015 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2212070000 definitions=main-2212210072
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
@@ -89,20 +86,55 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Claudio Imbrenda (2022-12-20 17:19:53)
-[...]
-> > +
-> > +[migration-cmm-sequential]
-> > +file =3D migration-cmm.elf
-> > +groups =3D migration
-> > +extra_params =3D -append '--sequential'
-> > +
-> > +[migration-cmm-parallel]
-> > +file =3D migration-during-cmm.elf
->=20
-> this should actually be migration-cmm.elf
+v5->v6:
+---
+* actually commit changes which were missing in v5, sorry :-(
 
-Yes, please ignore this version, I forgot to commit most of my changes. v6 =
-will follow.
+v4->v5:
+---
+* merge migration-during-cmm and migration-cmm into one file and remove
+  the cmm library
 
-It's about time for the holidays.
+v3->v4:
+---
+* rebase on top of Claudio's series
+    [kvm-unit-tests PATCH v3 0/2] lib: s390x: add PSW and
+    PSW_WITH_CUR_MASK macros
+    https://lore.kernel.org/kvm/20221130154038.70492-1-imbrenda@linux.ibm.com/
+* switch cmm.h to system includes
+* move const qualifier before struct keyword
+
+v2->v3:
+---
+* make allowed_essa_state_masks static (thanks Thomas)
+* change several variables to unsigned (thanks Claudio)
+* remove unneeded assignment (thanks Claudio)
+* fix line length (thanks Claudio)
+* fix some spellings, line wraps (thanks Thomas)
+* remove unneeded goto (thanks Thomas)
+* add migrate_once (thanks Claudio)
+  I introduce migrate_once() only in migration-during-cmm.c for now, but
+  I plan to send a future patch to move it to the library.
+* add missing READ_ONCE (thanks Claudio)
+
+v1->v2:
+---
+* cmm lib: return struct instead of passing in a pointer (thanks Claudio)
+* cmm lib: remove get_page_addr() (thanks Claudio)
+* cmm lib: print address of mismatch (thanks Claudio)
+* cmm lib: misc comments reworked, added and variables renamed
+* make sure page states change on every iteration (thanks Claudio)
+* add WRITE_ONCE even when not strictly needed (thanks Claudio)
+
+Add a test which changes CMM page states while VM is being migrated.
+
+Nico Boehr (1):
+  s390x: add CMM test during migration
+
+ s390x/migration-cmm.c | 258 +++++++++++++++++++++++++++++++++++++-----
+ s390x/unittests.cfg   |  15 ++-
+ 2 files changed, 240 insertions(+), 33 deletions(-)
+
+-- 
+2.36.1
+
