@@ -2,183 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A6516531BC
-	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 14:28:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 672C56531EF
+	for <lists+kvm@lfdr.de>; Wed, 21 Dec 2022 14:43:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234589AbiLUN2H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 08:28:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34556 "EHLO
+        id S230361AbiLUNng (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 21 Dec 2022 08:43:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234491AbiLUN12 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 08:27:28 -0500
-Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA2CDE5
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 05:26:56 -0800 (PST)
-Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1322d768ba7so19160108fac.5
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 05:26:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sfAx5V1o1e/QdKHDl+1bc+xUXDa6fYhV+plOxuA3aLU=;
-        b=TB1ijPDYtOSaO3IZyGxMDT/6TdAnpolPx4fLsdc8SA71rFwP1skxv4IsCc55qHIxu+
-         NClrSfUmJOlZeHUR3QkbC54WbwdOFMDhsQ6zIn/FCHGDle0mrScIiCHPOgbRulCG4xj/
-         7vMT3GCKx88q0S1cTCsvI68p/mgmKd8r/qhOJ2ntPBv06dg6zzHhVRbhugcoqPXD08gP
-         rzfzIf+ql8UTAL54vWTUIhOljBMw1VEAyOcZmlM2f1aC7lzis1qIt/bchYqB14n4Mw+g
-         X4tRLY/lJzvlvgtAJW3/eZOa380HOOelg6Qo+Gu8rQYwLodrnu+ivY1OhMQH7NYbEwhT
-         KK9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sfAx5V1o1e/QdKHDl+1bc+xUXDa6fYhV+plOxuA3aLU=;
-        b=KDSekoT+7nAc7D64+DdJfTyFwOBp+cC3WbFPTKzq8M4AbhFYYTuYkvDtv/aI9kJrSo
-         zQpk46ep+GrTtGoGnwgaGicpQRSaPM8LVJ847uL60lPr5+BHv5VYJSqBlc9LL3zxvuIw
-         3k1lTud/ncBSm4oFUNHgeELYGCXUsZgmdnbQmhLxJt2B/2Rq9ynnVDsLor4svgcB3okp
-         CeXbokDLn8t44WVfTfS2uE2eYV/+dY/ONgHZVKurk/kaGLEB+pWKpS8CPC7CvGaDq5B1
-         WRzM/tebxrxyhMputVa576jZRtBjFIlENv6lG5u08i+xwng1D7wC1jxN63SKwF8yBpk6
-         hOAg==
-X-Gm-Message-State: AFqh2krWAhr/kBMY2r2miVPx5qO7rQDZJgMFNzjoq7qoZb0uFiT6wYGf
-        /gUAXxdfxsrUOANTsWnb1jI=
-X-Google-Smtp-Source: AMrXdXtIWCAc/Brt99I1yXYQ8Xd5LCkRdCPuf4H7uKUWRmqQjsFd1UpmWmuwoIruy1wunRiRtqjyZQ==
-X-Received: by 2002:a05:6871:458f:b0:144:df53:a4f6 with SMTP id nl15-20020a056871458f00b00144df53a4f6mr742685oab.10.1671629216186;
-        Wed, 21 Dec 2022 05:26:56 -0800 (PST)
-Received: from [192.168.68.106] (201-43-103-101.dsl.telesp.net.br. [201.43.103.101])
-        by smtp.gmail.com with ESMTPSA id i3-20020a056870890300b001446d5702b5sm7193582oao.56.2022.12.21.05.26.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Dec 2022 05:26:55 -0800 (PST)
-Message-ID: <7c67f0e8-f7b7-8d0d-ba72-06cd2c8d29d3@gmail.com>
-Date:   Wed, 21 Dec 2022 10:26:51 -0300
+        with ESMTP id S229789AbiLUNnf (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 21 Dec 2022 08:43:35 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A70FD2F;
+        Wed, 21 Dec 2022 05:43:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1671630213; x=1703166213;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=KeOWd+1s5+y+piSUTaodricsl+2xgK/0jmwlSljJARM=;
+  b=H2lhxz8q4YJTpIViEVDPCYU52PGAYs5BwE0RwSTi2YMdg24ADkMxnoAq
+   JzHTa2zb7qy6FuEfPxAR3wKDmzBn9rXOdxcW8kiMTqZV8wQRFnosagiIp
+   dDSK9JZNIHo5G11ul/94dob5MrLNqM05P5QBx/hO61R8LNfybSUhRRguU
+   +763/0rbo2hHmGRVg3RWZ+jFtIQZWIDUDcaznUWl+owo/ikQVcQ9zV/iN
+   9YycOMh0uWsRf5ogaCIzKRwJID9d68Oi70qhNKTIMlVbiQJKA2AInnpLQ
+   a6OrajCHXmyJLJMDAhntjhyVmFgkpi8wL9OJL8Nrsfiz+UmoLi+0jrXeX
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="318567865"
+X-IronPort-AV: E=Sophos;i="5.96,262,1665471600"; 
+   d="scan'208";a="318567865"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Dec 2022 05:43:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10567"; a="651401281"
+X-IronPort-AV: E=Sophos;i="5.96,262,1665471600"; 
+   d="scan'208";a="651401281"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga002.jf.intel.com with ESMTP; 21 Dec 2022 05:43:21 -0800
+Date:   Wed, 21 Dec 2022 21:39:05 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "tglx@linutronix.de" <tglx@linutronix.de>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "Lutomirski, Andy" <luto@kernel.org>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Hocko, Michal" <mhocko@suse.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "tabba@google.com" <tabba@google.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "bfields@fieldses.org" <bfields@fieldses.org>,
+        "dhildenb@redhat.com" <dhildenb@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        "rppt@kernel.org" <rppt@kernel.org>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
+        "ddutile@redhat.com" <ddutile@redhat.com>,
+        "qperret@google.com" <qperret@google.com>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vannapurve@google.com" <vannapurve@google.com>,
+        "naoya.horiguchi@nec.com" <naoya.horiguchi@nec.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
+        "hughd@google.com" <hughd@google.com>,
+        "aarcange@redhat.com" <aarcange@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "steven.price@arm.com" <steven.price@arm.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "linmiaohe@huawei.com" <linmiaohe@huawei.com>
+Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
+ create restricted user memory
+Message-ID: <20221221133905.GA1766136@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
+ <5c6e2e516f19b0a030eae9bf073d555c57ca1f21.camel@intel.com>
+ <20221219075313.GB1691829@chaop.bj.intel.com>
+ <deba096c85e41c3a15d122f2159986a74b16770f.camel@intel.com>
+ <20221220072228.GA1724933@chaop.bj.intel.com>
+ <126046ce506df070d57e6fe5ab9c92cdaf4cf9b7.camel@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH-for-8.0 4/4] hw/ppc/spapr_ovec: Avoid target_ulong
- spapr_ovec_parse_vector()
-Content-Language: en-US
-To:     =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
-        qemu-devel@nongnu.org
-Cc:     =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
-        qemu-ppc@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
-        kvm@vger.kernel.org, Alexey Kardashevskiy <aik@ozlabs.ru>,
-        Greg Kurz <groug@kaod.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Markus Armbruster <armbru@redhat.com>
-References: <20221213123550.39302-1-philmd@linaro.org>
- <20221213123550.39302-5-philmd@linaro.org>
- <c871b044-4241-2f02-ebd6-6b797663a140@gmail.com>
- <5f70da81-2854-766f-1804-59a037a605b8@kaod.org>
-From:   Daniel Henrique Barboza <danielhb413@gmail.com>
-In-Reply-To: <5f70da81-2854-766f-1804-59a037a605b8@kaod.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-        FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <126046ce506df070d57e6fe5ab9c92cdaf4cf9b7.camel@intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, Dec 20, 2022 at 08:33:05AM +0000, Huang, Kai wrote:
+> On Tue, 2022-12-20 at 15:22 +0800, Chao Peng wrote:
+> > On Mon, Dec 19, 2022 at 08:48:10AM +0000, Huang, Kai wrote:
+> > > On Mon, 2022-12-19 at 15:53 +0800, Chao Peng wrote:
+> > > > > 
+> > > > > [...]
+> > > > > 
+> > > > > > +
+> > > > > > +	/*
+> > > > > > +	 * These pages are currently unmovable so don't place them into
+> > > > > > movable
+> > > > > > +	 * pageblocks (e.g. CMA and ZONE_MOVABLE).
+> > > > > > +	 */
+> > > > > > +	mapping = memfd->f_mapping;
+> > > > > > +	mapping_set_unevictable(mapping);
+> > > > > > +	mapping_set_gfp_mask(mapping,
+> > > > > > +			���� mapping_gfp_mask(mapping) & ~__GFP_MOVABLE);
+> > > > > 
+> > > > > But, IIUC removing __GFP_MOVABLE flag here only makes page allocation from
+> > > > > non-
+> > > > > movable zones, but doesn't necessarily prevent page from being migrated.� My
+> > > > > first glance is you need to implement either a_ops->migrate_folio() or just
+> > > > > get_page() after faulting in the page to prevent.
+> > > > 
+> > > > The current api restrictedmem_get_page() already does this, after the
+> > > > caller calling it, it holds a reference to the page. The caller then
+> > > > decides when to call put_page() appropriately.
+> > > 
+> > > I tried to dig some history. Perhaps I am missing something, but it seems Kirill
+> > > said in v9 that this code doesn't prevent page migration, and we need to
+> > > increase page refcount in restrictedmem_get_page():
+> > > 
+> > > https://lore.kernel.org/linux-mm/20221129112139.usp6dqhbih47qpjl@box.shutemov.name/
+> > > 
+> > > But looking at this series it seems restrictedmem_get_page() in this v10 is
+> > > identical to the one in v9 (except v10 uses 'folio' instead of 'page')?
+> > 
+> > restrictedmem_get_page() increases page refcount several versions ago so
+> > no change in v10 is needed. You probably missed my reply:
+> > 
+> > https://lore.kernel.org/linux-mm/20221129135844.GA902164@chaop.bj.intel.com/
+> 
+> But for non-restricted-mem case, it is correct for KVM to decrease page's
+> refcount after setting up mapping in the secondary mmu, otherwise the page will
+> be pinned by KVM for normal VM (since KVM uses GUP to get the page).
 
-
-On 12/21/22 06:46, Cédric Le Goater wrote:
-> On 12/16/22 17:47, Daniel Henrique Barboza wrote:
->>
->>
->> On 12/13/22 09:35, Philippe Mathieu-Daudé wrote:
->>> spapr_ovec.c is a device, but it uses target_ulong which is
->>> target specific. The hwaddr type (declared in "exec/hwaddr.h")
->>> better fits hardware addresses.
->>
->> As said by Harsh, spapr_ovec is in fact a data structure that stores platform
->> options that are supported by the guest.
->>
->> That doesn't mean that I oppose the change made here. Aside from semantics - which
->> I also don't have a strong opinion about it - I don't believe it matters that
->> much - spapr is 64 bit only, so hwaddr will always be == target_ulong.
->>
->> Cedric/David/Greg, let me know if you have any restriction/thoughts about this.
->> I'm inclined to accept it as is.
-> 
-> Well, I am not sure.
-> 
-> The vector table variable is the result of a ppc64_phys_to_real() conversion
-> of the CAS hcall parameter, which is a target_ulong, but ppc64_phys_to_real()
-> returns a uint64_t.
-> 
-> The code is not consistent in another places :
-> 
->    hw/ppc/spapr_tpm_proxy.c uses a uint64_t
->    hw/ppc/spapr_hcall.c, a target_ulong
->    hw/ppc/spapr_rtas.c, a hwaddr
->    hw/ppc/spapr_drc.c, a hwaddr indirectly
-> 
-> Should we change ppc64_phys_to_real() to return an hwaddr (also) ?
-
-It makes sense to me a function called ppc64_phys_to_real() returning
-a hwaddr type.
-
-Daniel
-
+That's true. Actually even true for restrictedmem case, most likely we
+will still need the kvm_release_pfn_clean() for KVM generic code. On one
+side, other restrictedmem users like pKVM may not require page pinning
+at all. On the other side, see below.
 
 > 
-> C.
+> So what we are expecting is: for KVM if the page comes from restricted mem, then
+> KVM cannot decrease the refcount, otherwise for normal page via GUP KVM should.
+
+I argue that this page pinning (or page migration prevention) is not
+tied to where the page comes from, instead related to how the page will
+be used. Whether the page is restrictedmem backed or GUP() backed, once
+it's used by current version of TDX then the page pinning is needed. So
+such page migration prevention is really TDX thing, even not KVM generic
+thing (that's why I think we don't need change the existing logic of
+kvm_release_pfn_clean()). Wouldn't better to let TDX code (or who
+requires that) to increase/decrease the refcount when it populates/drops
+the secure EPT entries? This is exactly what the current TDX code does:
+
+get_page():
+https://github.com/intel/tdx/blob/kvm-upstream/arch/x86/kvm/vmx/tdx.c#L1217
+
+put_page():
+https://github.com/intel/tdx/blob/kvm-upstream/arch/x86/kvm/vmx/tdx.c#L1334
+
+Thanks,
+Chao
 > 
+> > 
+> > The current solution is clear: unless we have better approach, we will
+> > let restrictedmem user (KVM in this case) to hold the refcount to
+> > prevent page migration.
+> > 
 > 
->>
->>
->> Daniel
->>
->>>
->>> Change spapr_ovec_parse_vector() to take a hwaddr argument,
->>> allowing the removal of "cpu.h" in a device header.
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <philmd@linaro.org>
->>> ---
->>>   hw/ppc/spapr_ovec.c         | 3 ++-
->>>   include/hw/ppc/spapr_ovec.h | 4 ++--
->>>   2 files changed, 4 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/hw/ppc/spapr_ovec.c b/hw/ppc/spapr_ovec.c
->>> index b2567caa5c..a18a751b57 100644
->>> --- a/hw/ppc/spapr_ovec.c
->>> +++ b/hw/ppc/spapr_ovec.c
->>> @@ -19,6 +19,7 @@
->>>   #include "qemu/error-report.h"
->>>   #include "trace.h"
->>>   #include <libfdt.h>
->>> +#include "cpu.h"
->>>   #define OV_MAXBYTES 256 /* not including length byte */
->>>   #define OV_MAXBITS (OV_MAXBYTES * BITS_PER_BYTE)
->>> @@ -176,7 +177,7 @@ static target_ulong vector_addr(target_ulong table_addr, int vector)
->>>       return table_addr;
->>>   }
->>> -SpaprOptionVector *spapr_ovec_parse_vector(target_ulong table_addr, int vector)
->>> +SpaprOptionVector *spapr_ovec_parse_vector(hwaddr table_addr, int vector)
->>>   {
->>>       SpaprOptionVector *ov;
->>>       target_ulong addr;
->>> diff --git a/include/hw/ppc/spapr_ovec.h b/include/hw/ppc/spapr_ovec.h
->>> index c3e8b98e7e..d756b916e4 100644
->>> --- a/include/hw/ppc/spapr_ovec.h
->>> +++ b/include/hw/ppc/spapr_ovec.h
->>> @@ -37,7 +37,7 @@
->>>   #ifndef SPAPR_OVEC_H
->>>   #define SPAPR_OVEC_H
->>> -#include "cpu.h"
->>> +#include "exec/hwaddr.h"
->>>   typedef struct SpaprOptionVector SpaprOptionVector;
->>> @@ -73,7 +73,7 @@ void spapr_ovec_set(SpaprOptionVector *ov, long bitnr);
->>>   void spapr_ovec_clear(SpaprOptionVector *ov, long bitnr);
->>>   bool spapr_ovec_test(SpaprOptionVector *ov, long bitnr);
->>>   bool spapr_ovec_empty(SpaprOptionVector *ov);
->>> -SpaprOptionVector *spapr_ovec_parse_vector(target_ulong table_addr, int vector);
->>> +SpaprOptionVector *spapr_ovec_parse_vector(hwaddr table_addr, int vector);
->>>   int spapr_dt_ovec(void *fdt, int fdt_offset,
->>>                     SpaprOptionVector *ov, const char *name);
+> OK.  Will leave to others :)
 > 
