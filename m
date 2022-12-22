@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDD91654914
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 00:05:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 090D3654918
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 00:05:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbiLVXFK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 18:05:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49942 "EHLO
+        id S230422AbiLVXFP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 18:05:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49946 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiLVXFH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 18:05:07 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173C827176
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 15:05:07 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id b16-20020a17090a551000b00225aa26f1dbso1648613pji.8
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 15:05:07 -0800 (PST)
+        with ESMTP id S229691AbiLVXFK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 18:05:10 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2123A2715F
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 15:05:10 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id l63-20020a639142000000b0047942953738so1769287pge.15
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 15:05:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tHWaMPgNH1Gc3dyUgtUp96T2Ds+DtSztVEOEp9eXXLE=;
-        b=J1m6H/8q08TJDo6V440ml0vH1FPML4rBgC8Z8KKPyy9b9/w8p2/vuVbFAcP5/BIAJ4
-         8g2gBZHdZ0kkBZpuRDrDBf6PK5MKrygPfkntIl+QYO7R3SsdNqtM7zMJJFD+QQT7Vf3O
-         cZzYsjv9ugcbYt1JdD/7UhuGjKi2sO0roV3kbzu1WamewDTwrz4UtKcNrevBr7fZqtH/
-         NFIWVwfuajUEi3u4L8ZDM7NCHNFAgx1b6x/mJ97l9sH5BMg4X0cRKjU9Mb8VFKkwMYvx
-         lpO9dvk7LHv4xWvbOnlwithG5+PhG/ySqI8EUDrlzxI313a5QmjtI0xcWfwjMLYPijgz
-         TS3g==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QBAw5tj+XZKcsIopd0PuHb+ptawoD6UcsAoOXegakKM=;
+        b=FfldrF5j7ml2+CyoMh3UJZdx5Pxju6v8JLoR8Wzy2EtSgDfNcusRpSzdVQZqNygCpn
+         SZ3vOQ6VlsgZiFOoPcrXdy5xDFDbcJD/VaI9iTUAl7/NsaqKVRVqapxytseWUc4rxYBH
+         xiqb0qD98zWkh6H6j4ELJo4ovoYeP0IZbdw854nhsTbtx2jvusYI+QDJDGyrw2+aM6H+
+         f7hkkezSm6ioLPf8mXrkiHjkzaSv4O6onclZxkidov4mde4JXNvddnVQ4rQkCr7Wvy7n
+         kzX4IbhrucHz5Oi6mBMDXXoGgivY91w9kHq7+mGfV3bKJplyLAVLEEm+vqdg+WTgxOG0
+         lZgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tHWaMPgNH1Gc3dyUgtUp96T2Ds+DtSztVEOEp9eXXLE=;
-        b=k0bI+3BGwFqKxwqSdxVBt1AXwePd4uyHZvScaQFRyqYcJE4jVvu1kGOhWM2SF6JPIy
-         fH8ZcZG+NNrn1azvIAyfKvXgGIOzDS2OuzcHrhhlpSCqlxRtqq0gC9DQwsk06+rkx941
-         jUb9vzoCjrsYVNS6BOx6dYYLBQ64ffD/p585KZx6AaThgR2H7gMwvcPlcTzfopyD1hEm
-         U4nwfQpssrYTAUJHw3YfpTb1W/J3dAXt7JngMcpd65KKZ+zI6i7px4Ai3veDt/7IAiZl
-         iQ6EpY24r9bLvQc8mIUC6s5FwAbFcZrBwKc3jxttq/HSvK8ojh+WLQSCuZsuaG2leTMQ
-         uEiw==
-X-Gm-Message-State: AFqh2kqRmwVx9dgJTw98iG6SZwu7QawhgKJwW6po76zdpBTlQC6DyYNd
-        o6Q1FsKm6bqT1pEPC5aTS+tU47eJhHOTDWIu
-X-Google-Smtp-Source: AMrXdXvwYXr/36+Tv89Q0SjDNBpV9g/udTWdh/80BGWKMaCWt/H1422BELxbkBKJEg7hprGc87A0aX+OAgBKgpj6
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QBAw5tj+XZKcsIopd0PuHb+ptawoD6UcsAoOXegakKM=;
+        b=et0XDlznBRFseslqNWMN7gM+bvbjnWiI3iq7/giFMzEhl3PAeFeplX+ChfWeSFFQ2o
+         4Iw9rynS1StmZtN0I3Jed8FfN8brW2wIfxrLOo9GC+TzU9RzGibj+V21i56Hylyz+8Hm
+         Bgg4fRGjN9Xb2F+aLTX0YkrxQ+usfnG8VpOEjoU1L+6Ygyu2dyghHXbGFIJpcV7X2Bfb
+         harQApbcKzgkmuAcLFEI9dvFJRVkK/RblANhFkCWTXGfuq4RTgugOONgFhPSN40QFGi1
+         /HyFJ3swUKYRneUgeSOuFY1MYlsUmICwuosCq7LyQihUJGME3vEKtx4ZqVZyFfZ4MKcv
+         RIMw==
+X-Gm-Message-State: AFqh2kpdlojx4RxHpuYh9lQ17+SGBtmH/D8jm/IKmwJ9meGJymmFRQPR
+        cyxhbQzO+uQUnxYquDg41oBBYBSFK8VgZoX7
+X-Google-Smtp-Source: AMrXdXtZlLSwGeOw1fDYwDB6/onhlXQraxe0XRLS92zZDtVnK31Kdv0Z6As55v2VbKjC/TUH0H08l4HhIgez3WZJ
 X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:a17:90a:d350:b0:223:fa07:7bfb with SMTP
- id i16-20020a17090ad35000b00223fa077bfbmr675609pjx.38.1671750306569; Thu, 22
- Dec 2022 15:05:06 -0800 (PST)
-Date:   Thu, 22 Dec 2022 23:04:56 +0000
+ (user=vannapurve job=sendgmr) by 2002:a17:90a:7083:b0:219:2d33:9504 with SMTP
+ id g3-20020a17090a708300b002192d339504mr597027pjk.171.1671750309699; Thu, 22
+ Dec 2022 15:05:09 -0800 (PST)
+Date:   Thu, 22 Dec 2022 23:04:57 +0000
+In-Reply-To: <20221222230458.3828342-1-vannapurve@google.com>
 Mime-Version: 1.0
+References: <20221222230458.3828342-1-vannapurve@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221222230458.3828342-1-vannapurve@google.com>
-Subject: [V3 PATCH 0/2] Execute hypercalls from guests according to cpu
+Message-ID: <20221222230458.3828342-2-vannapurve@google.com>
+Subject: [V3 PATCH 1/2] KVM: selftests: x86: Cache the cpu vendor type
 From:   Vishal Annapurve <vannapurve@google.com>
 To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -60,7 +62,7 @@ Cc:     pbonzini@redhat.com, shuah@kernel.org, bgardon@google.com,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,36 +70,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Confidential VMs(CVMs) need to execute hypercall instruction as per the CPU
-type. Normally KVM emulates the vmcall/vmmcall instruction by patching
-the guest code at runtime. Such a guest memory manipulation by KVM is
-not allowed with CVMs.
+Query cpuid once per guest selftest and store the cpu vendor type so that
+subsequent queries can reuse the cached cpu vendor type.
 
-This series adds support of executing hypercall as per the native cpu
-type queried using cpuid instruction. CPU vendor type is stored after
-one time execution of cpuid instruction to be reused later.
+Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+---
+ .../selftests/kvm/lib/x86_64/processor.c      | 33 ++++++++++++++++---
+ 1 file changed, 28 insertions(+), 5 deletions(-)
 
-Changes in v3:
-1) Guest logic is modified to not rely on host cpu type and instead query
-cpu vendor using cpuid instruction.
-2) Existing callers of vmmcall/vmcall are not updated to avoid enforcing
-native hypercall instruction across all users which are mostly
-non-confidential usecases.
-
-v2:
-https://lore.kernel.org/all/20220915000448.1674802-1-vannapurve@google.com/
-
-More discussion around this change:
-https://lore.kernel.org/lkml/Y1Hhw40H58EmZ6lK@google.com/
-
-Vishal Annapurve (2):
-  KVM: selftests: x86: Cache the cpu vendor type
-  KVM: selftests: x86: Add native hypercall support
-
- .../selftests/kvm/include/x86_64/processor.h  |  3 ++
- .../selftests/kvm/lib/x86_64/processor.c      | 51 +++++++++++++++++--
- 2 files changed, 49 insertions(+), 5 deletions(-)
-
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index 097cef430774..1e93bb3cb058 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -20,6 +20,9 @@
+ 
+ vm_vaddr_t exception_handlers;
+ 
++static bool is_cpu_vendor_intel;
++static bool is_cpu_vendor_amd;
++
+ static void regs_dump(FILE *stream, struct kvm_regs *regs, uint8_t indent)
+ {
+ 	fprintf(stream, "%*srax: 0x%.16llx rbx: 0x%.16llx "
+@@ -1017,18 +1020,36 @@ void kvm_x86_state_cleanup(struct kvm_x86_state *state)
+ 	free(state);
+ }
+ 
+-static bool cpu_vendor_string_is(const char *vendor)
++static void check_cpu_vendor(void)
+ {
+-	const uint32_t *chunk = (const uint32_t *)vendor;
++	const char *intel_id = "GenuineIntel";
++	const uint32_t *intel_id_chunks = (const uint32_t *)intel_id;
++	const char *amd_id = "AuthenticAMD";
++	const uint32_t *amd_id_chunks = (const uint32_t *)amd_id;
++	static bool cpu_vendor_checked;
+ 	uint32_t eax, ebx, ecx, edx;
+ 
++	if (cpu_vendor_checked)
++		return;
++
+ 	cpuid(0, &eax, &ebx, &ecx, &edx);
+-	return (ebx == chunk[0] && edx == chunk[1] && ecx == chunk[2]);
++
++	if (ebx == intel_id_chunks[0] && edx == intel_id_chunks[1] &&
++		ecx == intel_id_chunks[2])
++		is_cpu_vendor_intel = true;
++	else {
++		if (ebx == amd_id_chunks[0] && edx == amd_id_chunks[1] &&
++			ecx == amd_id_chunks[2])
++			is_cpu_vendor_amd = true;
++	}
++	cpu_vendor_checked = true;
+ }
+ 
+ bool is_intel_cpu(void)
+ {
+-	return cpu_vendor_string_is("GenuineIntel");
++	check_cpu_vendor();
++
++	return is_cpu_vendor_intel;
+ }
+ 
+ /*
+@@ -1036,7 +1057,9 @@ bool is_intel_cpu(void)
+  */
+ bool is_amd_cpu(void)
+ {
+-	return cpu_vendor_string_is("AuthenticAMD");
++	check_cpu_vendor();
++
++	return is_cpu_vendor_amd;
+ }
+ 
+ void kvm_get_cpu_address_width(unsigned int *pa_bits, unsigned int *va_bits)
 -- 
 2.39.0.314.g84b9a713c41-goog
 
