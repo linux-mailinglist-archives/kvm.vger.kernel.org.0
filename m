@@ -2,177 +2,255 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A67D36545E2
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 19:15:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E91536545F2
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 19:25:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230028AbiLVSPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 13:15:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49840 "EHLO
+        id S231892AbiLVSZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 13:25:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229904AbiLVSPc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 13:15:32 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF391AA36
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 10:15:29 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id m4so2762457pls.4
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 10:15:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=752C77UYWYC/kCXAv9m+o+bKyybany3JU3TCXHGZR0U=;
-        b=mnWHipNRICDDr9o9B9k9tzUHQ5DlJw7QNZU1NFFDGUJ/WFgmaKL6adljuLzxsRCR1T
-         yOt1llvxRLddf3o8tFdD1XSrfvJKY91Y6BA+Ue/bxbYYHAufNWWHf+w2InX7LDglGQta
-         9K3BVA4lZMYr2iIsmJ+f1M3V5mNVtVOBrDe0He7TJ193jL7X5zGQlNAIk8two/do47Qa
-         +IAmme0Ak9mW8lBakzH8LqHkhC04c8aYC5+Yadk9FKgybASwcKtR2kDtwpwTkfLtjN0F
-         Pf78IoRu0kt98rlTKH1ZJdwA91Ht9u39VkBXmY2L8neh0zXKIViW79WjZdA8w13OMOlE
-         OnLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=752C77UYWYC/kCXAv9m+o+bKyybany3JU3TCXHGZR0U=;
-        b=P0dTxGveIzdhiimCE9BF4+qHMnt1sqLi/dGX6vIF3Cp6qozqoTbkp5c3H3yFsZ1My+
-         o5/tbEXJpax01DEbVOIMZgaMKHJDil+sVOmeuzt/EoobwYHCtdh+LcIYaPIETHZnSDEg
-         0zHygqEZe0U0FOb/b7Fxzni99Lr9rjig3NfYdHv0R9NmgRbgC2OTy4cxd7g00fvnUDh3
-         w0T7W+9OCDEmbmJyTGFAzha4M3PCiJN1dwy4mayk4mt0p7NbuY1LnQxrIw8cwQLZfAEh
-         22AiPAThll//1COTjeQo/QyriVcu7krpTQwQoqnCHNBtZ1vnt6oq9CAApY4Q2tCZP+IH
-         IEsA==
-X-Gm-Message-State: AFqh2kpa30iBqHc2pJDd+osSkbyNT+pQLpIamE8LOuW/G+cLvN7KlTut
-        j7hmjpN0nF6WBBFGvhuWPrzidg==
-X-Google-Smtp-Source: AMrXdXtVsGTXmJ+OudFvpboyWukOEY96QmhFL3/LDUsVn+qtHCwo04yMbEQyfv9hcz3t0HxxdVHCiA==
-X-Received: by 2002:a17:903:41ca:b0:189:6624:58c0 with SMTP id u10-20020a17090341ca00b00189662458c0mr1174380ple.3.1671732928592;
-        Thu, 22 Dec 2022 10:15:28 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a7-20020a17090a70c700b00219feae9486sm3443216pjm.7.2022.12.22.10.15.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Dec 2022 10:15:28 -0800 (PST)
-Date:   Thu, 22 Dec 2022 18:15:24 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "Lutomirski, Andy" <luto@kernel.org>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Hocko, Michal" <mhocko@suse.com>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "tabba@google.com" <tabba@google.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "bfields@fieldses.org" <bfields@fieldses.org>,
-        "dhildenb@redhat.com" <dhildenb@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "vbabka@suse.cz" <vbabka@suse.cz>,
-        "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
-        "ddutile@redhat.com" <ddutile@redhat.com>,
-        "qperret@google.com" <qperret@google.com>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "vannapurve@google.com" <vannapurve@google.com>,
-        "naoya.horiguchi@nec.com" <naoya.horiguchi@nec.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
-        "hughd@google.com" <hughd@google.com>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "jlayton@kernel.org" <jlayton@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "steven.price@arm.com" <steven.price@arm.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "linmiaohe@huawei.com" <linmiaohe@huawei.com>
-Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Message-ID: <Y6SevJt6XXOsmIBD@google.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
- <5c6e2e516f19b0a030eae9bf073d555c57ca1f21.camel@intel.com>
- <20221219075313.GB1691829@chaop.bj.intel.com>
- <deba096c85e41c3a15d122f2159986a74b16770f.camel@intel.com>
- <20221220072228.GA1724933@chaop.bj.intel.com>
- <126046ce506df070d57e6fe5ab9c92cdaf4cf9b7.camel@intel.com>
- <20221221133905.GA1766136@chaop.bj.intel.com>
+        with ESMTP id S230071AbiLVSZn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 13:25:43 -0500
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD09326;
+        Thu, 22 Dec 2022 10:25:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
+        t=1671733456; bh=3C//pPReD1huiKwB+HIgGP+aYEUDdZN5HiRsK7t6BqE=;
+        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=FIbEaueLWxPWU2nVI81X+aZBJqb7pGiKZdoKgG+U+/42wzeWTFzf6iHOLbjwRHbKS
+         aMZzYGP8gHRMOKHvL1MBsPw9wQm7ScTzhLbqAW1IOwD6kJAt/sBzJJXkcro7xzTtFd
+         2IKPtO3ztNsG868yBfXLbm6JnrU3PAYcrgydeAVD8/kiq7SqwykGc7pn8Ku0Q1Mm80
+         0ko/EnwuL32ohUPiwG0c04Co75Liy1YpueJvj9rrltmRh0ZIwg/6S3bUW5rvzlD3mw
+         S+3O/RlnmWoqSD1a5e6mTdikoi28Qy0hxvDowJ2Oh8g3xC6T10Zy/wLSvR/GdoQeT8
+         ekEncX+m2UNyA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost ([62.143.90.77]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Ma20k-1pKZqG2wdg-00Vvny; Thu, 22
+ Dec 2022 19:24:16 +0100
+Date:   Thu, 22 Dec 2022 19:24:02 +0100
+From:   erbse.13@gmx.de
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com, Nikunj A Dadhania <nikunj@amd.com>
+Subject: Re: [PATCH RFC v7 11/64] KVM: SEV: Support private pages in
+ LAUNCH_UPDATE_DATA
+Message-ID: <Y6Sgwp/BofzCUrQe@notebook>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-12-michael.roth@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221221133905.GA1766136@chaop.bj.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20221214194056.161492-12-michael.roth@amd.com>
+X-Provags-ID: V03:K1:iVceB1ZaTzjhtQbFgMfH9Ymg2SVfhDV1qs8iVgziQpLZ9OiSFWI
+ sN08JdZwg8iuA8yLBoaQVNwx8WhVzL/GntbJSgRtWdUJ+dV69YrUwD8vPGSvr+qBqI+rvM3
+ 7IQ605ZNfMYdkWFdgTDF8nA3LA0A96qzMWZ7ICA/7cCXnt3WtZsxm/sU/LXGtPEQxcfSpuL
+ q4SEojyNdmQn9qUyq7hWw==
+UI-OutboundReport: notjunk:1;M01:P0:mdELVBPtDLE=;IBvNb1Mqd/JKAyjgIXTx8Dll7mH
+ ROU2y7XjKq0+oZ1bfY2w7dFcRtxeWQa8eVJ2+S0loCSdqt2xz8Hvg+ZagBUZLQg37Dt0Dc2ZD
+ YF0+WtnJpmHVjBwzEd0AEULmciHzK5mHAvWPEBcUisv/SMfoPkzxQpq4TabH9ZbYJUgeHhr0F
+ dzRTGl4HeUPmp9vWNwN1oDJMDdYEyqfffS/K0SaT68igm8SQdH7gjmL60nSab2fY8uxOTXklR
+ 4m5HEuR1zhTSNHp3Ztf27Z8gVKDQYlCQMHM4ERCmPTcC0Wca5TYHg+iclVpS6V5EaB4nk/N8u
+ WIZA2Eeft+8wzqXUW18TV6CiRkp7oocNjB1NN50akqy7kGJ33YZTMKhBJsYeVGsx9oPn4jagA
+ YzXPsqlwrP2kPPSUomkmnV+O7jtHtVnXTIAihl934kbl40IRHsk6yMKBb9iDfI9Lnj0sPMCjN
+ /Tx8FgwNxQuHQoWlNrk1JGDKjn4Yg1A7dDY9IsHF8ejlyBZXDJK3JcnKjBa/5kJ4PbX9E8Ngc
+ W4gBgYrVfxd260LRebdhVupfZcmgUa2LlWHR7BGYXu2uSBNw7gbwye+l9zhdd/KGml/y7OzbJ
+ roxc6AF378FfsfxnPQjf43niz7yHhqz1r4DSzdNiuU1PHfB1J7F4RRCIxyzjnyelcSuBQGEZe
+ dtJiFXcsivaiT4mRDDptAqQJEqxibD+KAUrnFQxt9J4/g/AWFksHi/jFd9ypkOx6ziR0qDASL
+ Djfb3x4uOG88TKmbb22g+FrU3FJntg3/h5xGX094wlMHv6Sy+APV+7nZVOjHeK6kfAfm4q9C3
+ qFawT+WGJ1h856OcOLx5qNe1MCyAq7QOPigBPzWfo3ic2vbEqs/yLTC6vZPGkyN8gd6Liti22
+ Tte+ZHHryGvKmvcJfFOCNXgQNahqzo0yWT6RhyS0zGY0okNfvraWBasF4gDZmXLn7FhvKj7oS
+ LCIiDaYU51jEQPEcd8umLujuT40=
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 21, 2022, Chao Peng wrote:
-> On Tue, Dec 20, 2022 at 08:33:05AM +0000, Huang, Kai wrote:
-> > On Tue, 2022-12-20 at 15:22 +0800, Chao Peng wrote:
-> > > On Mon, Dec 19, 2022 at 08:48:10AM +0000, Huang, Kai wrote:
-> > > > On Mon, 2022-12-19 at 15:53 +0800, Chao Peng wrote:
-> > But for non-restricted-mem case, it is correct for KVM to decrease page's
-> > refcount after setting up mapping in the secondary mmu, otherwise the page will
-> > be pinned by KVM for normal VM (since KVM uses GUP to get the page).
-> 
-> That's true. Actually even true for restrictedmem case, most likely we
-> will still need the kvm_release_pfn_clean() for KVM generic code. On one
-> side, other restrictedmem users like pKVM may not require page pinning
-> at all. On the other side, see below.
-> 
-> > 
-> > So what we are expecting is: for KVM if the page comes from restricted mem, then
-> > KVM cannot decrease the refcount, otherwise for normal page via GUP KVM should.
+On Wed, Dec 14, 2022 at 01:40:03PM -0600, Michael Roth wrote:
+> From: Nikunj A Dadhania <nikunj@amd.com>
+>
+> Pre-boot guest payload needs to be encrypted and VMM has copied it
+> over to the private-fd. Add support to get the pfn from the memfile fd
+> for encrypting the payload in-place.
+>
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c | 79 ++++++++++++++++++++++++++++++++++--------
+>  1 file changed, 64 insertions(+), 15 deletions(-)
+>
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index a7e4e3005786..ae4920aeb281 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -107,6 +107,11 @@ static inline bool is_mirroring_enc_context(struct =
+kvm *kvm)
+>  	return !!to_kvm_svm(kvm)->sev_info.enc_context_owner;
+>  }
+>
+> +static bool kvm_is_upm_enabled(struct kvm *kvm)
+> +{
+> +	return kvm->arch.upm_mode;
+> +}
+> +
+>  /* Must be called with the sev_bitmap_lock held */
+>  static bool __sev_recycle_asids(int min_asid, int max_asid)
+>  {
+> @@ -382,6 +387,38 @@ static int sev_launch_start(struct kvm *kvm, struct=
+ kvm_sev_cmd *argp)
+>  	return ret;
+>  }
+>
+> +static int sev_get_memfile_pfn_handler(struct kvm *kvm, struct kvm_gfn_=
+range *range, void *data)
+> +{
+> +	struct kvm_memory_slot *memslot =3D range->slot;
+> +	struct page **pages =3D data;
+> +	int ret =3D 0, i =3D 0;
+> +	kvm_pfn_t pfn;
+> +	gfn_t gfn;
+> +
+> +	for (gfn =3D range->start; gfn < range->end; gfn++) {
+> +		int order;
+> +
+> +		ret =3D kvm_restricted_mem_get_pfn(memslot, gfn, &pfn, &order);
+> +		if (ret)
+> +			return ret;
+> +
+> +		if (is_error_noslot_pfn(pfn))
+> +			return -EFAULT;
+> +
+> +		pages[i++] =3D pfn_to_page(pfn);
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +static int sev_get_memfile_pfn(struct kvm *kvm, unsigned long addr,
+> +			       unsigned long size, unsigned long npages,
+> +			       struct page **pages)
+> +{
+> +	return kvm_vm_do_hva_range_op(kvm, addr, size,
+> +				      sev_get_memfile_pfn_handler, pages);
+> +}
 
-No, requiring the user (KVM) to guard against lack of support for page migration
-in restricted mem is a terrible API.  It's totally fine for restricted mem to not
-support page migration until there's a use case, but punting the problem to KVM
-is not acceptable.  Restricted mem itself doesn't yet support page migration,
-e.g. explosions would occur even if KVM wanted to allow migration since there is
-no notification to invalidate existing mappings.
+The third argument for the kvm_vm_do_hva_range_op call should be addr+size=
+; the
+function expects the end of the range not the size of the range.
 
-> I argue that this page pinning (or page migration prevention) is not
-> tied to where the page comes from, instead related to how the page will
-> be used. Whether the page is restrictedmem backed or GUP() backed, once
-> it's used by current version of TDX then the page pinning is needed. So
-> such page migration prevention is really TDX thing, even not KVM generic
-> thing (that's why I think we don't need change the existing logic of
-> kvm_release_pfn_clean()). Wouldn't better to let TDX code (or who
-> requires that) to increase/decrease the refcount when it populates/drops
-> the secure EPT entries? This is exactly what the current TDX code does:
+> +
+>  static struct page **sev_pin_memory(struct kvm *kvm, unsigned long uadd=
+r,
+>  				    unsigned long ulen, unsigned long *n,
+>  				    int write)
+> @@ -424,16 +461,25 @@ static struct page **sev_pin_memory(struct kvm *kv=
+m, unsigned long uaddr,
+>  	if (!pages)
+>  		return ERR_PTR(-ENOMEM);
+>
+> -	/* Pin the user virtual address. */
+> -	npinned =3D pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0,=
+ pages);
+> -	if (npinned !=3D npages) {
+> -		pr_err("SEV: Failure locking %lu pages.\n", npages);
+> -		ret =3D -ENOMEM;
+> -		goto err;
+> +	if (kvm_is_upm_enabled(kvm)) {
+> +		/* Get the PFN from memfile */
+> +		if (sev_get_memfile_pfn(kvm, uaddr, ulen, npages, pages)) {
+> +			pr_err("%s: ERROR: unable to find slot for uaddr %lx", __func__, uad=
+dr);
+> +			ret =3D -ENOMEM;
+> +			goto err;
+> +		}
 
-I agree that whether or not migration is supported should be controllable by the
-user, but I strongly disagree on punting refcount management to KVM (or TDX).
-The whole point of restricted mem is to support technologies like TDX and SNP,
-accomodating their special needs for things like page migration should be part of
-the API, not some footnote in the documenation.
+This branch doesn't initialize npinned. If sev_get_memfile_pfn fails, the =
+code following the err
+label passes the uninitialized value to unpin_user_pages.
 
-It's not difficult to let the user communicate support for page migration, e.g.
-if/when restricted mem gains support, add a hook to restrictedmem_notifier_ops
-to signal support (or lack thereof) for page migration.  NULL == no migration,
-non-NULL == migration allowed.
+> +	} else {
+> +		/* Pin the user virtual address. */
+> +		npinned =3D pin_user_pages_fast(uaddr, npages, write ? FOLL_WRITE : 0=
+, pages);
+> +		if (npinned !=3D npages) {
+> +			pr_err("SEV: Failure locking %lu pages.\n", npages);
+> +			ret =3D -ENOMEM;
+> +			goto err;
+> +		}
+> +		sev->pages_locked =3D locked;
+>  	}
+>
+>  	*n =3D npages;
+> -	sev->pages_locked =3D locked;
+>
+>  	return pages;
+>
+> @@ -514,6 +560,7 @@ static int sev_launch_update_shared_gfn_handler(stru=
+ct kvm *kvm,
+>
+>  	size =3D (range->end - range->start) << PAGE_SHIFT;
+>  	vaddr_end =3D vaddr + size;
+> +	WARN_ON(size < PAGE_SIZE);
+>
+>  	/* Lock the user memory. */
+>  	inpages =3D sev_pin_memory(kvm, vaddr, size, &npages, 1);
+> @@ -554,13 +601,16 @@ static int sev_launch_update_shared_gfn_handler(st=
+ruct kvm *kvm,
+>  	}
+>
+>  e_unpin:
+> -	/* content of memory is updated, mark pages dirty */
+> -	for (i =3D 0; i < npages; i++) {
+> -		set_page_dirty_lock(inpages[i]);
+> -		mark_page_accessed(inpages[i]);
+> +	if (!kvm_is_upm_enabled(kvm)) {
+> +		/* content of memory is updated, mark pages dirty */
+> +		for (i =3D 0; i < npages; i++) {
+> +			set_page_dirty_lock(inpages[i]);
+> +			mark_page_accessed(inpages[i]);
+> +		}
+> +		/* unlock the user pages */
+> +		sev_unpin_memory(kvm, inpages, npages);
+>  	}
+> -	/* unlock the user pages */
+> -	sev_unpin_memory(kvm, inpages, npages);
+> +
+>  	return ret;
+>  }
+>
+> @@ -609,9 +659,8 @@ static int sev_launch_update_priv_gfn_handler(struct=
+ kvm *kvm,
+>  			goto e_ret;
+>  		kvm_release_pfn_clean(pfn);
+>  	}
+> -	kvm_vm_set_region_attr(kvm, range->start, range->end,
+> -		true /* priv_attr */);
+>
+> +	kvm_vm_set_region_attr(kvm, range->start, range->end, KVM_MEMORY_ATTRI=
+BUTE_PRIVATE);
+>  e_ret:
+>  	return ret;
+>  }
+> --
+> 2.25.1
+>
 
-We know that supporting page migration in TDX and SNP is possible, and we know
-that page migration will require a dedicated API since the backing store can't
-memcpy() the page.  I don't see any reason to ignore that eventuality.
-
-But again, unless I'm missing something, that's a future problem because restricted
-mem doesn't yet support page migration regardless of the downstream user.
+Regards, Tom
