@@ -2,104 +2,149 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 20AB2653CE9
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 09:21:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C2F6653D3A
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 10:01:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235003AbiLVIV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 03:21:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54176 "EHLO
+        id S235190AbiLVJB3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 04:01:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235095AbiLVIVy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 03:21:54 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 966B711162
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 00:21:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1671697313; x=1703233313;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=JtmLm+rud1dmKaAW0K1sJ4HYiTgN2eQcr/vzqEkFTxU=;
-  b=TP5CeCqLSEG0nj7cXZ3MGbPgBgz+8TrnB/fYwyFLRqgesC8t4zan6Oxm
-   ZTx5Qk5ClYsNswBqF1H1Q+zB2MT35jX8ViZ4G8asTXbYTVRHARek1Cibb
-   ZTTPZ2UorwGsAqBfCsvsZumgpSbvHg+Nxfg2IiPSWI7WqhLIwRDiK08sl
-   4YmRiIH2Ro6J/fNMCUry3duAFDARs9RFg9BWyB9l6CbMdaFegwEQOteJO
-   CzFvuS0pSHfePgbknaDDPAyN80IYS39CXUUuXfa9h/XwlT0Vuk2Zfxb3u
-   jZyADEbcEiVJDUWrBzEa+9susQ3BxuNBGTuWP4Lc3iHCATz/KliTKIgbQ
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10568"; a="320131320"
-X-IronPort-AV: E=Sophos;i="5.96,265,1665471600"; 
-   d="scan'208";a="320131320"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2022 00:21:52 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10568"; a="794017018"
-X-IronPort-AV: E=Sophos;i="5.96,264,1665471600"; 
-   d="scan'208";a="794017018"
-Received: from jjin4-desk2.ccr.corp.intel.com (HELO localhost) ([10.249.171.81])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Dec 2022 00:21:45 -0800
-Date:   Thu, 22 Dec 2022 16:21:32 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     Yuan Yao <yuan.yao@linux.intel.com>
-Cc:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
-        seanjc@google.com, kirill.shutemov@linux.intel.com,
-        kvm@vger.kernel.org, Jingqi Liu <jingqi.liu@intel.com>
-Subject: Re: [PATCH v3 6/9] KVM: x86: Untag LAM bits when applicable
-Message-ID: <20221222082132.2nnkuvgfez7iiwbj@linux.intel.com>
-References: <20221209044557.1496580-1-robert.hu@linux.intel.com>
- <20221209044557.1496580-7-robert.hu@linux.intel.com>
- <20221219094511.boo7iththyps565z@yy-desk-7060>
- <3e3a389cc887062a737327713a634ded80e977b2.camel@linux.intel.com>
- <20221221080222.ohsk6mcqvq5z4t3t@linux.intel.com>
- <ec96c8499a9a48aea59ce87f0244c9b31f91641f.camel@linux.intel.com>
- <20221221101032.3g54omjqhnscuaqw@linux.intel.com>
- <20221221103030.hwo5xj2jlrflrevx@yy-desk-7060>
- <20221221124053.5s2aashbhqz4hppx@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221221124053.5s2aashbhqz4hppx@linux.intel.com>
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-7.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S235174AbiLVJBX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 04:01:23 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5A871FFA0
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 01:01:21 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 899B5B81C5E
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 09:01:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4ADB6C433F0;
+        Thu, 22 Dec 2022 09:01:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671699679;
+        bh=ReKgCYVMU0fpHo9ze2q5t+tzd2M1R5louYV6HlhKykg=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=K3EoC8oVVMd180JnK8wlfqqXrRU9pl3C+A9OqnRxP9m+fsED6HPf/xu1NTrGW7ay4
+         YIG/BIl5SpAs4md/d21goElhP76tmavHluID2fY5qmdhILdGBATelfssv2Ra0dLiDE
+         iWd4pXnrtzjRCTkDUtsOm1IqLeyJdtXk5ybr/JqM1VtOpC3nf0ZGc2D6PxqRI7AO1T
+         p6AEI/g2wCzy/3nq1jl6Sx2XOCOUPUoF6bNfja/14+8pNyUjE10lKDoUO+6k2fCRa8
+         76l7q0yDe8NH7Vm0GYglLsm8XoxmYqDt7Z1sRL4FlBQbfaBpp5h7/61Kk83639M30h
+         P2Sm4zGjziHGw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p8HS0-00EKZt-4s;
+        Thu, 22 Dec 2022 09:01:16 +0000
+Date:   Thu, 22 Dec 2022 09:01:15 +0000
+Message-ID: <86ili3byn8.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Ricardo Koller <ricarkol@google.com>, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set as a write
+In-Reply-To: <Y6NGcFXLtwOt0+d6@google.com>
+References: <20221220200923.1532710-1-maz@kernel.org>
+        <20221220200923.1532710-3-maz@kernel.org>
+        <Y6M4TqvJytAEq2ID@google.com>
+        <Y6NGcFXLtwOt0+d6@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, ricarkol@google.com, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> > > > >
-> > > > > Well, it's not about the control register or MSR emulation. It is
-> > > > > about
-> > > > > the instruction decoder, which may encounter an instruction with a
-> > > > > memory
-> > > > > operand with LAM bits occupied.
-> > > > >
-> > > > OK, combine reply to you and Yuan's comments here.
-> > > > So you're talking about when KVM emulates an instruction, and that
-> > > > instruction is accessing memory, and the address for the memory can be
-> > > > LAM tagged.
-> > > > I think instruction emulation and memory access should be separated,
-> > > > and LAM rules should apply to memory access phase. But frankly
-> > > > speaking, I haven't looked into such case yet. Can you name an example
-> > > > of such emulated instruction? I can take a look, hoping that the
-> > > > emulation accessing memory falls into same code path as page fault
-> > > > handling.
-> > >
-> > > I do not know the usage case of LAM. According to the spec, LAM does
-> > > not apply to instruction fetches, so guest rip and target addresses
-> > > in instructions such as jump, call etc. do not need special treatment.
-> > > But the spec does not say if LAM can be used to MMIO addresses...
+On Wed, 21 Dec 2022 17:46:24 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Wed, Dec 21, 2022 at 08:46:06AM -0800, Ricardo Koller wrote:
+> 
+> [...]
+> 
+> > > -			return false;
+> > > +			/* Can't introspect TCR_EL1 with pKVM */
+> > > +			if (kvm_vm_is_protected(vcpu->kvm))
+> > > +				return false;
+> > > +
+> > > +			mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
+> > > +			afdb = cpuid_feature_extract_unsigned_field(mmfr1, ID_AA64MMFR1_EL1_HAFDBS_SHIFT);
+> > > +
+> > > +			if (afdb == ID_AA64MMFR1_EL1_HAFDBS_NI)
+> > > +				return false;
+> > > +
+> > > +			return (vcpu_read_sys_reg(vcpu, TCR_EL1) & TCR_HA);
 > > 
-> > The MMIO accessing in guest is also via GVA, so any emulated
-> > device MMIO accessing hits this case. KVM checks GVA firstly even in TDP
+> > Also tested this specific case using page_fault_test when the PT page is
+> > marked for dirty logging with and without AF. In both cases there's a
+> > single _FSC_FAULT (no PERM_FAUT) as expected, and the PT page is marked dirty
+> > in the AF case. The RO and UFFD cases also work as expected.
+> > 
+> > Need to send some changes for page_fault_test as many tests assume that
+> > any S1PTW is always a PT write, and are failing. Also need to add some new
+> > tests for PTs in RO memslots (as it didn't make much sense before this
+> > change).
 > 
-> Yes. And sorry, I meant the spec does not say LAM can not be used
-> to MMIO addresses.
+> So I actually wanted to bring up the issue of user visibility, glad your
+> test picked up something.
 > 
-BTW, it is not just about MMIO. Normal memory address can also trigger the
-linearize(), e.g., memory operand of io instructions, though I still have
-no idea if this could be one of the usage cases of LAM.
+> This has two implications, which are rather odd.
+> 
+>  - When UFFD is in use, translation faults are reported to userspace as
+>    writes when from a RW memslot and reads when from an RO memslot.
 
-B.R.
-Yu
+Not quite: translation faults are reported as reads if TCR_EL1.HA
+isn't set, and as writes if it is. Ignoring TCR_EL1.HD for a moment,
+this matches exactly the behaviour of the page-table walker, which
+will update the S1 PTs only if this bit is set.
+
+Or is it what userfaultfd does on its own? That'd be confusing...
+
+> 
+>  - S1 page table memory is spuriously marked as dirty, as we presume a
+>    write immediately follows the translation fault. That isn't entirely
+>    senseless, as it would mean both the target page and the S1 PT that
+>    maps it are both old. This is nothing new I suppose, just weird.
+
+s/old/young/ ?
+
+I think you're confusing the PT access with the access that caused the
+PT access (I'll have that printed on a t-shirt, thank you very much).
+
+Here, we're not considering the cause of the PT access anymore. If
+TCR_EL1.HA is set, the S1 PT page will be marked as accessed even on a
+read, and only that page.
+
+TCR_EL1.HD is what muddies the waters a bit. If it is set without HA
+being set, we still handle the translation fault as a read, followed
+by a write permission fault. But again, that's solely for the purpose
+of the S1 PT. What happens for the mapped page is completely
+independent.
+
+> Marc, do you have any concerns about leaving this as-is for the time
+> being? At least before we were doing the same thing (write fault) every
+> time.
+
+I have the ugly feeling we're talking at cross purpose here, mostly
+because I don't get how userfaultfd fits in that picture. Can you shed
+some light here?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
