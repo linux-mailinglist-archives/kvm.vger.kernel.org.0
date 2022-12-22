@@ -2,100 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26356653EFE
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 12:24:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AF59E6540E2
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 13:17:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235471AbiLVLYb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 06:24:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38594 "EHLO
+        id S235411AbiLVMRz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 07:17:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230014AbiLVLYa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 06:24:30 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7053E0D;
-        Thu, 22 Dec 2022 03:24:29 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id fy4so1645426pjb.0;
-        Thu, 22 Dec 2022 03:24:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LWK1UZD15pC86of5uFnIDc94rM103F7ouYNED5rDSeM=;
-        b=fUR2kPUmZet+6oP0omTAhR/kmNyrMw9X4qpmj4WvKQKks35uABLMj2IHOgw3aZG1sT
-         NaiqOyaK0jctXKNa7y684kEEEqb5b6vHz3i8zTmw2NN6lc8MZQeCaMqzv7oSgAFZ/cig
-         dxUk5Acnt6HjP4UN7g9mmN4jwGqet0oQFx9dtoteLU9Y6gf9fTmUlhvGFQg9mFE4f/m3
-         1ee8LcAN/+AARasdfIcvVPS2Ce9LqcxzfmIRT3tioNnRxPwddUcp2YJJYFsUplsWP/v5
-         feCNoREZaCGC8zKsDm94kbOlDKEOmrzu0yFNFGfmE/KYOIib6Km0ub+fZgS3MNDlsn4O
-         PQNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LWK1UZD15pC86of5uFnIDc94rM103F7ouYNED5rDSeM=;
-        b=sx3tp72Fa6SnzZUmgKZxCwshf6XXF1itRkhnyopOe6wVtnBJOZAKgGwlnXe8//FQi5
-         5qTudLGu+Yuqpq8pJrb9NmrjARgGW+ycpYHyu6otozDf8vZI/Xzs15QZG2tHs0JOkvuR
-         ktc37G+LnJjWj2WtZ5FNHq1Rps7u33zMVvkDMU1fF7k+HAJPIcKChfdPNvzzxe+qSHun
-         KwvDBtRp7BdrFbhZUXyjmE9iwa2bqVBZpKqwfFPnEKLT5nJn5yQ7bE5fgbbwj+wWeJS+
-         c0eVuLa6C41YYIEfJHrw3+eqMM3qUi1KaiLuGRl7+BLqx/3vgSY1ilXbtVXqu2Nw3w5J
-         JuIA==
-X-Gm-Message-State: AFqh2kqiJhWRY3tXPSuoPkOS4iwRwmBwPP0p5g1u7JU3ZhRq2HDLH4/H
-        +o1n7I/Veg13AIo98VR7tWQ=
-X-Google-Smtp-Source: AMrXdXspSBvYC0XfvtGNtDvFKRz76MChnIu54o0XWk5BUrvQyI1y3460dN8EjNseAplFZ2S5KWgLSw==
-X-Received: by 2002:a17:90a:eb03:b0:225:b9df:c4a3 with SMTP id j3-20020a17090aeb0300b00225b9dfc4a3mr770472pjz.3.1671708269509;
-        Thu, 22 Dec 2022 03:24:29 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id om15-20020a17090b3a8f00b00218fba260e2sm2984207pjb.43.2022.12.22.03.24.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Dec 2022 03:24:29 -0800 (PST)
-Message-ID: <03fd9d59-16da-9b93-74bb-593937eae941@gmail.com>
-Date:   Thu, 22 Dec 2022 19:24:22 +0800
+        with ESMTP id S235518AbiLVMR2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 07:17:28 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D14B512D05;
+        Thu, 22 Dec 2022 04:16:11 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 55D831EC0715;
+        Thu, 22 Dec 2022 13:16:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1671711370;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o/VXYlruW2xooSsXWnWYyMCr5jlbGKrzKBa2cG6Y2Ww=;
+        b=XjXW5Z8oYRDLihGMfhUQO8kyU/QX/4pvN9dV0v1Cbyb493Z8bynjeUG11y+TBLchroJzlt
+        VoGxu2Y+sifUYuL4UyuR2V1uyTCWlmVn5DzYni+p08sQRqsFXqgEsVzXToa9qqwUh5n8rm
+        k8g04qR1xN0LQsSA70L2TEiGH9YC8Fw=
+Date:   Thu, 22 Dec 2022 13:16:04 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, harald@profian.com,
+        Nikunj A Dadhania <nikunj@amd.com>
+Subject: Re: [PATCH RFC v7 01/64] KVM: Fix memslot boundary condition for
+ large page
+Message-ID: <Y6RKhDVaeqVZwMCZ@zn.tnic>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-2-michael.roth@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.0
-Subject: Re: [PATCH v2 06/15] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for guest
- Arch LBR
-Content-Language: en-US
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     kan.liang@linux.intel.com, wei.w.wang@intel.com, seanjc@google.com,
-        pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20221125040604.5051-1-weijiang.yang@intel.com>
- <20221125040604.5051-7-weijiang.yang@intel.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20221125040604.5051-7-weijiang.yang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20221214194056.161492-2-michael.roth@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/11/2022 12:05 pm, Yang Weijiang wrote:
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index cea8c07f5229..1ae2efc29546 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -2120,6 +2120,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   						VM_EXIT_SAVE_DEBUG_CONTROLS)
->   			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
->   
-> +		/*
-> +		 * For Arch LBR, IA32_DEBUGCTL[bit 0] has no meaning.
-> +		 * It can be written to 0 or 1, but reads will always return 0.
-> +		 */
+On Wed, Dec 14, 2022 at 01:39:53PM -0600, Michael Roth wrote:
+> From: Nikunj A Dadhania <nikunj@amd.com>
+> 
+> Aligned end boundary causes a kvm crash, handle the case.
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index b1953ebc012e..b3ffc61c668c 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -7159,6 +7159,9 @@ static void kvm_update_lpage_private_shared_mixed(struct kvm *kvm,
+>  		for (gfn = first + pages; gfn < last; gfn += pages)
+>  			linfo_set_mixed(gfn, slot, level, false);
+>  
+> +		if (gfn == last)
+> +			goto out;
 
-The comment looks good, please verify it with a test.
+I'm guessing this was supposed to be "return;" here:
 
-> +		if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-> +			data &= ~DEBUGCTLMSR_LBR;
-> +
->   		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
->   		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
->   		    (data & DEBUGCTLMSR_LBR))
+arch/x86/kvm/mmu/mmu.c: In function ‘kvm_update_lpage_private_shared_mixed’:
+arch/x86/kvm/mmu/mmu.c:7090:25: error: label ‘out’ used but not defined
+ 7090 |                         goto out;
+      |                         ^~~~
+
+/me goes and digs deeper.
+
+Aha, it was a "return" but you reordered the patches and the one adding
+the out label:
+
+KVM: x86: Add 'update_mem_attr' x86 op
+
+went further down and this became the first but it didn't have the label
+anymore.
+
+Yeah, each patch needs to build successfully for bisection reasons, ofc.
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
