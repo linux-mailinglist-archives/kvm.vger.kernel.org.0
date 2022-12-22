@@ -2,152 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0ABC6653B2D
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 05:19:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CDD7653C1C
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 07:19:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234980AbiLVETZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 21 Dec 2022 23:19:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44666 "EHLO
+        id S235092AbiLVGTV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 01:19:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234872AbiLVETP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 21 Dec 2022 23:19:15 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7618B21832
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 20:18:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1671682702;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1Qy8hVVHmVV3a9aFahEig8gWF7+7mU2tU8B+FtzuZ9U=;
-        b=Jy7qT3z/PwbhKypKPt92PhcRtA48MIj+0++LG6KkrOa1Q0PZRtmoYOgIdaergqhNBQy7Wu
-        56aq8c4MPD0IxnR4HY4olA7gO7XCAO5/wbsaKlN3mlR+XTZyeuphz7MpBzoWs/za3RNd4R
-        5kaGI7J/5I3uqYk4SOSoc3vUJigs+Jk=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-155-JTk5ZRZPP9-c41QYz7Qcwg-1; Wed, 21 Dec 2022 23:18:21 -0500
-X-MC-Unique: JTk5ZRZPP9-c41QYz7Qcwg-1
-Received: by mail-pl1-f198.google.com with SMTP id h2-20020a170902f54200b0018e56572a4eso644368plf.9
-        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 20:18:21 -0800 (PST)
+        with ESMTP id S235068AbiLVGTU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 01:19:20 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69B0E639A
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 22:19:19 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id u15-20020a17090a3fcf00b002191825cf02so905460pjm.2
+        for <kvm@vger.kernel.org>; Wed, 21 Dec 2022 22:19:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uSQJp3c40T4fZk8/DCzTgVC9RtoHPQk5yC/bARRlKoA=;
+        b=WfM89LTEK3i+PhXwL56ijGBXSSryZivNFfoc/MehuAtY4NC0w+CPDFvm5ZJNdTEDS6
+         6nfvQeqwnKZ8NJflo3QgTLJh9+ZDJQ4anHM2kC1dZ8AjJ89SaOEKv2xZiOXjj7P9sgfa
+         zB+0uvKveEZulAU6x3G3E1CgRxfux2WmACIRLv+77AbhnmctLELTNVgsMy00kYMYGhRw
+         niUu+5kdMLfxVSo0jiVGmUXIvIYomUSFOaVOSZUKafkrR/1xkYS0+hDr9ntr7GrHpCYL
+         rjAWRt6CjLss/2PE+R5g7bI5fhPiGs7X8SlesiT5bncvzX3zMwyua4RLgiHaNoitY/qd
+         e31Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1Qy8hVVHmVV3a9aFahEig8gWF7+7mU2tU8B+FtzuZ9U=;
-        b=PNug52puerJGTkVNvp5UV/JiC+ALeDSYDJsfGNaH9WJrZlr9QIH/hlXAz7bQpE5y50
-         03XHkf+1yQWe6taMUcQISuz4xOVON3i77IB3zdG4sYx8q6dvkW+m6TXmmavVSYK1Wgpm
-         G6w7iqX6qyvpAQGnK0XWLNVCtxxHIBCKO+kVf8WRaAoV+R3ibGsugVXYPYV2F2QpOaeu
-         6+4cKhSIl9n0jzUYNu0t7rd4H/sbDyqGzgGswrFuYNdpROZVAJT9CNZPvkKHCYlCjWMn
-         6hpuosnd+I+V7XnGWWPHvybIpZIOsRpMnAfmfIWxSa52QUO0sARxjVL4UKJNwaOqNExg
-         AmcQ==
-X-Gm-Message-State: AFqh2kqk6aYrdAFK4vmgEcgFdq8Ttmn17W03W2AgX4THQSQIeNy1Krd+
-        bn1nCjdoS7T6RXzWVK7cNN1J/sQMhQVsPTI//X+kXW7xTH9n54pimVjvXtHbAtyNwyLPt6QUm+O
-        FRdhiCr5EHY4p
-X-Received: by 2002:a17:902:8693:b0:191:e0b0:f8df with SMTP id g19-20020a170902869300b00191e0b0f8dfmr4257956plo.58.1671682700229;
-        Wed, 21 Dec 2022 20:18:20 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvZKUVvz7e/snSM74hURYmadL6kaZsaTLi4j3NcrD1AHY0tQQj2CPhCtOvjsaEFfVjLLRP5tg==
-X-Received: by 2002:a17:902:8693:b0:191:e0b0:f8df with SMTP id g19-20020a170902869300b00191e0b0f8dfmr4257947plo.58.1671682700005;
-        Wed, 21 Dec 2022 20:18:20 -0800 (PST)
-Received: from [10.72.13.15] ([209.132.188.80])
-        by smtp.gmail.com with ESMTPSA id n10-20020a170902e54a00b0018b025d9a40sm12290654plf.256.2022.12.21.20.18.16
+        bh=uSQJp3c40T4fZk8/DCzTgVC9RtoHPQk5yC/bARRlKoA=;
+        b=VrIcMhJdv/Zp9FLW1SRt53NakvJSt4Tua5ZrDPkdii4n9Z2OLOf/UT8HSOMaqWYwdQ
+         2Q43MIZGgq4ErRhkelt/FPTce+nnV6mj7RAH6+M/Fk0VgkHpI3Zrf5P+SfFDsPLY11qO
+         9hJ7AYcEi/axq/G/yfssZJDihGTwzEhbanAtGuawjQnx9a1+G86i54BBUGaWlNU6u4Js
+         Kdv/jM09IIzxF1iF5PpyFSEMeI82wZKn8B+Hzi/EsEu3/3IZHIm5rqo03m4sFMld7QPq
+         z35LnB/t4hqJDFDtQ/c+xgDrn0MtXfoOsJN69f52zwgDI+nJq+EDuy2O7LLEuDPCssez
+         Kk/w==
+X-Gm-Message-State: AFqh2kqgHTZpfNRvuL5FzzrM50ZmxUUzOAUNjuy0BegyrgKK+SR2+mlc
+        ao4UTuUzXyYoWSvCmYTME9s=
+X-Google-Smtp-Source: AMrXdXuFanj7Rtkp0ahgxL6swgH6UgHZJ8lLqp0jzTv1kgbRxlGmhVzFKmk275nAXJm1CUQCydWdrg==
+X-Received: by 2002:a17:90a:cb16:b0:225:b36b:caef with SMTP id z22-20020a17090acb1600b00225b36bcaefmr1361194pjt.23.1671689958786;
+        Wed, 21 Dec 2022 22:19:18 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id o8-20020a17090ad24800b00218daa55e5fsm710603pjw.12.2022.12.21.22.19.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Dec 2022 20:18:19 -0800 (PST)
-Message-ID: <bd1c0fea-9934-1956-b3fe-0442d90b0477@redhat.com>
-Date:   Thu, 22 Dec 2022 12:18:15 +0800
+        Wed, 21 Dec 2022 22:19:18 -0800 (PST)
+Message-ID: <37064a64-47cb-aaad-4b8e-6ce2bdf68e56@gmail.com>
+Date:   Thu, 22 Dec 2022 14:19:11 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.6.0
-Subject: Re: [RFC PATCH 1/6] vdpa: add bind_mm callback
+Subject: Re: [PATCH v8 1/7] kvm: x86/pmu: Correct the mask used in a pmu event
+ filter lookup
+To:     Aaron Lewis <aaronlewis@google.com>
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
+        kvm list <kvm@vger.kernel.org>
+References: <20221220161236.555143-1-aaronlewis@google.com>
+ <20221220161236.555143-2-aaronlewis@google.com>
 Content-Language: en-US
-To:     Stefano Garzarella <sgarzare@redhat.com>
-Cc:     virtualization@lists.linux-foundation.org,
-        Andrey Zhadchenko <andrey.zhadchenko@virtuozzo.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, eperezma@redhat.com,
-        stefanha@redhat.com, netdev@vger.kernel.org
-References: <20221214163025.103075-1-sgarzare@redhat.com>
- <20221214163025.103075-2-sgarzare@redhat.com>
- <CACGkMEtB6uQ_6fKU5F-D0vG+gQz9mMdYWUQwre-yp1sVpGvKPQ@mail.gmail.com>
- <20221216081738.wlhevfmvzfs3rsrg@sgarzare-redhat>
-From:   Jason Wang <jasowang@redhat.com>
-In-Reply-To: <20221216081738.wlhevfmvzfs3rsrg@sgarzare-redhat>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <20221220161236.555143-2-aaronlewis@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On 21/12/2022 12:12 am, Aaron Lewis wrote:
+> When checking if a pmu event the guest is attempting to program should
+> be filtered, only consider the event select + unit mask in that
+> decision. Use an architecture specific mask to mask out all other bits,
+> including bits 35:32 on Intel.  Those bits are not part of the event
+> select and should not be considered in that decision.
+> 
+> Fixes: 66bb8a065f5a ("KVM: x86: PMU Event Filter")
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>   arch/x86/kvm/pmu.c           | 3 ++-
+>   arch/x86/kvm/pmu.h           | 2 ++
+>   arch/x86/kvm/svm/pmu.c       | 1 +
+>   arch/x86/kvm/vmx/pmu_intel.c | 1 +
+>   4 files changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+> index 684393c22105..760a09ff65cd 100644
+> --- a/arch/x86/kvm/pmu.c
+> +++ b/arch/x86/kvm/pmu.c
+> @@ -277,7 +277,8 @@ static bool check_pmu_event_filter(struct kvm_pmc *pmc)
+>   		goto out;
+>   
+>   	if (pmc_is_gp(pmc)) {
+> -		key = pmc->eventsel & AMD64_RAW_EVENT_MASK_NB;
+> +		key = pmc->eventsel & (kvm_pmu_ops.EVENTSEL_EVENT |
+> +				       ARCH_PERFMON_EVENTSEL_UMASK);
+>   		if (bsearch(&key, filter->events, filter->nevents,
+>   			    sizeof(__u64), cmp_u64))
+>   			allow_event = filter->action == KVM_PMU_EVENT_ALLOW;
+> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+> index 85ff3c0588ba..5b070c563a97 100644
+> --- a/arch/x86/kvm/pmu.h
+> +++ b/arch/x86/kvm/pmu.h
+> @@ -40,6 +40,8 @@ struct kvm_pmu_ops {
+>   	void (*reset)(struct kvm_vcpu *vcpu);
+>   	void (*deliver_pmi)(struct kvm_vcpu *vcpu);
+>   	void (*cleanup)(struct kvm_vcpu *vcpu);
+> +
+> +	const u64 EVENTSEL_EVENT;
 
-在 2022/12/16 16:17, Stefano Garzarella 写道:
-> On Fri, Dec 16, 2022 at 02:37:45PM +0800, Jason Wang wrote:
->> On Thu, Dec 15, 2022 at 12:30 AM Stefano Garzarella 
->> <sgarzare@redhat.com> wrote:
->>>
->>> This new optional callback is used to bind the device to a specific
->>> address space so the vDPA framework can use VA when this callback
->>> is implemented.
->>>
->>> Suggested-by: Jason Wang <jasowang@redhat.com>
->>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->>> ---
->>>  include/linux/vdpa.h | 8 ++++++++
->>>  1 file changed, 8 insertions(+)
->>>
->>> diff --git a/include/linux/vdpa.h b/include/linux/vdpa.h
->>> index 6d0f5e4e82c2..34388e21ef3f 100644
->>> --- a/include/linux/vdpa.h
->>> +++ b/include/linux/vdpa.h
->>> @@ -282,6 +282,12 @@ struct vdpa_map_file {
->>>   *                             @iova: iova to be unmapped
->>>   *                             @size: size of the area
->>>   *                             Returns integer: success (0) or 
->>> error (< 0)
->>> + * @bind_mm:                   Bind the device to a specific 
->>> address space
->>> + *                             so the vDPA framework can use VA 
->>> when this
->>> + *                             callback is implemented. (optional)
->>> + *                             @vdev: vdpa device
->>> + *                             @mm: address space to bind
->>
->> Do we need an unbind or did a NULL mm mean unbind?
->
-> Yep, your comment in patch 6 makes it necessary. I will add it!
->
->>
->>> + *                             @owner: process that owns the 
->>> address space
->>
->> Any reason we need the task_struct here?
->
-> Mainly to attach to kthread to the process cgroups, but that part is 
-> still in TODO since I need to understand it better.
+Isn't it weird when the new thing added here is
+not of the same type as the existing members ?
 
+Doesn't "pmu->raw_event_mask" help here ?
 
-Ok I see.
-
-
->
-> Maybe we can remove the task_struct here and use `current` directly in 
-> the callback.
-
-
-Yes, it's easier to start without cgroup and we can add it on top.
-
-Thanks
-
-
->
-> Thanks,
-> Stefano
->
-
+>   };
+>   
+>   void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops);
+> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
+> index 0e313fbae055..d3ae261d56a6 100644
+> --- a/arch/x86/kvm/svm/pmu.c
+> +++ b/arch/x86/kvm/svm/pmu.c
+> @@ -229,4 +229,5 @@ struct kvm_pmu_ops amd_pmu_ops __initdata = {
+>   	.refresh = amd_pmu_refresh,
+>   	.init = amd_pmu_init,
+>   	.reset = amd_pmu_reset,
+> +	.EVENTSEL_EVENT = AMD64_EVENTSEL_EVENT,
+>   };
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index e5cec07ca8d9..edf23115f2ef 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -810,4 +810,5 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
+>   	.reset = intel_pmu_reset,
+>   	.deliver_pmi = intel_pmu_deliver_pmi,
+>   	.cleanup = intel_pmu_cleanup,
+> +	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
+>   };
