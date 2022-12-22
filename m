@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF903653ED4
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 12:15:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF966653EF3
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 12:20:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235289AbiLVLPq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 06:15:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60218 "EHLO
+        id S235555AbiLVLUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 06:20:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231892AbiLVLPn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 06:15:43 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B1F4B32;
-        Thu, 22 Dec 2022 03:15:41 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id t2so1736623ply.2;
-        Thu, 22 Dec 2022 03:15:41 -0800 (PST)
+        with ESMTP id S235540AbiLVLUK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 06:20:10 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B29E928E22;
+        Thu, 22 Dec 2022 03:19:41 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id 79so1104586pgf.11;
+        Thu, 22 Dec 2022 03:19:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gpwsKuBdIKVc+8dUt36fJ7t12PQ33aLBPSMZVuaKlLc=;
-        b=Cy5qUj8cfZFCcheO+YNLSBSRxvrMZgFJsfh7uL7F4TL3Ac+gHEDfUhzUH8NOnZynaF
-         /snsGPxIG+4QzzocLydXEY2akp7SmF5AOTnAFnpRfDfDbdSbwUBi+lANr0R6WvH5b5qM
-         ffDNuVz+270aTZDoWjII3naPjbbu7VecYH7FaN6jVB3mh5WjYpUUEMnZ8VjrVLrKqvyj
-         T4mYKv0DCTsWq1B5Zc24qTOq8wG4PqoQpe4Utbo6+uKnUZV9WXjiZeNb+UvCVleMMkK+
-         fBWeA/vIaHfHjYlrrPS35YgHSzDGdbKYkppl75DH+5cbZaZQ+Pw+pezCw9OOknQAUWsO
-         JJ1w==
+        bh=ThY4jwNSz9WNz66c+Gq56mp1Xus1nRpZseDD/IIsQV8=;
+        b=W9aekgtzzUojrEQMmQe9w5uoV6JsjF8UmP3nNWOUz2Spq80vENvlt4srFzThAUp9kM
+         Aero3X/Uqgo6zPtZb3EUVGG6HNF399N9K7EhL0e8VcWs5XWPN75EaOYV1D6f3/brTi9Z
+         ea++HoYMKIUJkRcTLgIGD70aYfd/4TCdc9fgVGmA8lyryXDO+92gwi7RdLBj0+6BVQ8g
+         TLaNh9rXaM90V5lgdEzyHnAlCdCmgidq8EOG+MbkeGXAg3JhJODcDI1iBxMmmVfN6Y5m
+         1Z5jr0hRdK/2UEMuEMruXtAOrI/PgJj1ADkXDwGzAvIGlt8i2yaqUPasze/5OH0rHBvK
+         alJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gpwsKuBdIKVc+8dUt36fJ7t12PQ33aLBPSMZVuaKlLc=;
-        b=W4LbWYf1C8h+W7e1GQXorBvUn/jwyiWngR7pMnGcxwA4R7oTUhOo4KUp6SDzbXeXk6
-         yS/fmXCRBHMCjxT3DIiEZMPBPRITd7J5oJrj+6tugnJ2LP1swYKQTRo2qYOUvUmAFYBq
-         lEdonbhPQKyeRi13LT9YJQI2BhGOQJREBXjg2DJxacpEzsF28Q5kdJHSZk7y5M8nvp0V
-         sS28ZoMrIWPW4botHbj/0eIO/guUcwMLkSjbAFEtb2owOX+t8czw5mKYW+jqFDXFb9Vv
-         vKuOz63dKT+l1Opic5VwXHUppR3JojrfXwAn2UM4xPCNz4TmKorcLe6o64xou52JSErs
-         fkCg==
-X-Gm-Message-State: AFqh2kqUbTLDmcus9bGU2yqpWCFR274qD6GuSqIOuhCtaJkyLGUW5LMF
-        9I3rOcqKrYPH4JxJ/juCCiM=
-X-Google-Smtp-Source: AMrXdXu9XyChZ/kSUgcOcAeD6hIrXWzNMZCTgNRsqQ2lBG/IEoZFpJwH7ainSAs8ZlvRzEYFrVG7YA==
-X-Received: by 2002:a17:903:264d:b0:189:2276:30c5 with SMTP id je13-20020a170903264d00b00189227630c5mr5394637plb.0.1671707741175;
-        Thu, 22 Dec 2022 03:15:41 -0800 (PST)
+        bh=ThY4jwNSz9WNz66c+Gq56mp1Xus1nRpZseDD/IIsQV8=;
+        b=j3V+XM4K0/UATGQABe5bUOK+RDVJjUauVQwrUkgCaApWPRYeITjawUkDTA+r9Os0sS
+         nr0RMAUNKmyueRgd5yIoVynASHX4ZEieUvOYTROPkPN2i+luMj0ij263lHFR2BuSQ/0C
+         yKV/qJ/8gAjH3Ac8uY8YppVQzOjyjzA4Wi4/ssuHOa7prXLhu4u2c0HZ500K9CAdCT+y
+         ou0s2aHsxwIARAZY66Meh+FwrT/jiwo3+HRwX16P+hsOcfr3ZIxf6Exn7Hf7mhbe0C2Z
+         rzs0bFu/tiwUdhTuCA8dlXUIJBF/EI+XewEZBJWaUmVtOcQZwiOPyMtmW7KEQ8ThU6FW
+         KX5g==
+X-Gm-Message-State: AFqh2kpG489Av4+ybShHR0B9/hlSaWrtAl5wndg+FSGie0oqdYjPwCgr
+        b7fBtbdEObmwYnXmL9zdSrqvubH52oS1jouP
+X-Google-Smtp-Source: AMrXdXsveWQka6a2pqhiWu+zECyiBI1Db0UnrWJn8BNpqpdiQXuNbrNBklIGCxqeC2AhPyLRUkHHZA==
+X-Received: by 2002:a62:1c16:0:b0:577:50c4:6dbe with SMTP id c22-20020a621c16000000b0057750c46dbemr5933362pfc.4.1671707980577;
+        Thu, 22 Dec 2022 03:19:40 -0800 (PST)
 Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id y16-20020a17090322d000b00188f8badbcdsm278419plg.137.2022.12.22.03.15.39
+        by smtp.gmail.com with ESMTPSA id i127-20020a625485000000b005769cee6735sm493538pfb.43.2022.12.22.03.19.38
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Dec 2022 03:15:40 -0800 (PST)
-Message-ID: <a7c09bc6-8d80-3028-1cea-ee355b41109d@gmail.com>
-Date:   Thu, 22 Dec 2022 19:15:33 +0800
+        Thu, 22 Dec 2022 03:19:40 -0800 (PST)
+Message-ID: <065de8d2-895e-9ee9-e3e5-16e79969508f@gmail.com>
+Date:   Thu, 22 Dec 2022 19:19:33 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.6.0
-Subject: Re: [PATCH v2 05/15] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_DEPTH for
- guest Arch LBR
+Subject: Re: [PATCH v2 06/15] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for guest
+ Arch LBR
 Content-Language: en-US
 To:     Yang Weijiang <weijiang.yang@intel.com>
 Cc:     kan.liang@linux.intel.com, wei.w.wang@intel.com, seanjc@google.com,
         pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20221125040604.5051-1-weijiang.yang@intel.com>
- <20221125040604.5051-6-weijiang.yang@intel.com>
+ <20221125040604.5051-7-weijiang.yang@intel.com>
 From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20221125040604.5051-6-weijiang.yang@intel.com>
+In-Reply-To: <20221125040604.5051-7-weijiang.yang@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -78,17 +78,28 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 25/11/2022 12:05 pm, Yang Weijiang wrote:
-> +static bool cpuid_enable_lbr(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +	struct kvm_cpuid_entry2 *entry;
-> +	int depth_bit;
+> @@ -727,12 +772,16 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+>    */
+>   static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
+>   {
+> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +	u32 lbr_ctl_field = GUEST_IA32_DEBUGCTL;
+>   
+> -	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
+> -		data &= ~DEBUGCTLMSR_LBR;
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> -	}
+> +	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI))
+> +		return;
 > +
-> +	if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-> +		return !static_cpu_has(X86_FEATURE_ARCH_LBR) &&
-> +			cpuid_model_is_consistent(vcpu);
+> +	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
+> +	    guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+> +		lbr_ctl_field = GUEST_IA32_LBR_CTL;
+> +
+> +	vmcs_write64(lbr_ctl_field, vmcs_read64(lbr_ctl_field) & ~0x1ULL);
+>   }
+>   
+>   static void intel_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
 
-Please add selftests to cover this incompatibility.
-
-And running the SPR vcpu model on a GNR host, the guest arch lbr
-should be fully supported as long as both hosts have the same lbr_depth.
+The legacy lbr test case in KUT does not cover this scenario, but
+arch lbr contributor should take the opportunity to fill this gap. Thanks.
