@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF966653EF3
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 12:20:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 206A2653EF8
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 12:22:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235555AbiLVLUb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 06:20:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34424 "EHLO
+        id S235410AbiLVLWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 06:22:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37770 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235540AbiLVLUK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 06:20:10 -0500
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B29E928E22;
-        Thu, 22 Dec 2022 03:19:41 -0800 (PST)
-Received: by mail-pg1-x536.google.com with SMTP id 79so1104586pgf.11;
-        Thu, 22 Dec 2022 03:19:41 -0800 (PST)
+        with ESMTP id S235133AbiLVLWv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 06:22:51 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 938E612600;
+        Thu, 22 Dec 2022 03:22:49 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id u4-20020a17090a518400b00223f7eba2c4so1539634pjh.5;
+        Thu, 22 Dec 2022 03:22:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=ThY4jwNSz9WNz66c+Gq56mp1Xus1nRpZseDD/IIsQV8=;
-        b=W9aekgtzzUojrEQMmQe9w5uoV6JsjF8UmP3nNWOUz2Spq80vENvlt4srFzThAUp9kM
-         Aero3X/Uqgo6zPtZb3EUVGG6HNF399N9K7EhL0e8VcWs5XWPN75EaOYV1D6f3/brTi9Z
-         ea++HoYMKIUJkRcTLgIGD70aYfd/4TCdc9fgVGmA8lyryXDO+92gwi7RdLBj0+6BVQ8g
-         TLaNh9rXaM90V5lgdEzyHnAlCdCmgidq8EOG+MbkeGXAg3JhJODcDI1iBxMmmVfN6Y5m
-         1Z5jr0hRdK/2UEMuEMruXtAOrI/PgJj1ADkXDwGzAvIGlt8i2yaqUPasze/5OH0rHBvK
-         alJA==
+        bh=hLgs1lnetEyknU/J00Q9dg+rep4hDdlUeMLNhubrH7k=;
+        b=jFpjvGje8T+CENNBBCN2AMF/9FIhSTWjz1wfo+HYkF/V9M9n8c1Zep6WmWwXmteyBu
+         WLRLkAczJGuk9jipcgZtyx4DqKOs4Hf0bM2LFGWaZoUPeXxksmXJJDI9DCp6c2Mg3bBr
+         2n8wX1Uv/7RMMNGpgIOGGZUji0uLPCgGQHsfzwDNpgZfTGiH9nUVCodrrC8pvLtbatv9
+         oH76U9GZ/CA6pAdv4at+CgP8blvC5DFxA+leWHvdscSouvJ2+Dz+CwtB47vU9Bi/EH0/
+         RgnzgU4qN2rMlQ7k3BzeBaucrjP/5lDYigb/AsDR5LaAIvaZmlQHcAajwdINCX2vC5hs
+         jMWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ThY4jwNSz9WNz66c+Gq56mp1Xus1nRpZseDD/IIsQV8=;
-        b=j3V+XM4K0/UATGQABe5bUOK+RDVJjUauVQwrUkgCaApWPRYeITjawUkDTA+r9Os0sS
-         nr0RMAUNKmyueRgd5yIoVynASHX4ZEieUvOYTROPkPN2i+luMj0ij263lHFR2BuSQ/0C
-         yKV/qJ/8gAjH3Ac8uY8YppVQzOjyjzA4Wi4/ssuHOa7prXLhu4u2c0HZ500K9CAdCT+y
-         ou0s2aHsxwIARAZY66Meh+FwrT/jiwo3+HRwX16P+hsOcfr3ZIxf6Exn7Hf7mhbe0C2Z
-         rzs0bFu/tiwUdhTuCA8dlXUIJBF/EI+XewEZBJWaUmVtOcQZwiOPyMtmW7KEQ8ThU6FW
-         KX5g==
-X-Gm-Message-State: AFqh2kpG489Av4+ybShHR0B9/hlSaWrtAl5wndg+FSGie0oqdYjPwCgr
-        b7fBtbdEObmwYnXmL9zdSrqvubH52oS1jouP
-X-Google-Smtp-Source: AMrXdXsveWQka6a2pqhiWu+zECyiBI1Db0UnrWJn8BNpqpdiQXuNbrNBklIGCxqeC2AhPyLRUkHHZA==
-X-Received: by 2002:a62:1c16:0:b0:577:50c4:6dbe with SMTP id c22-20020a621c16000000b0057750c46dbemr5933362pfc.4.1671707980577;
-        Thu, 22 Dec 2022 03:19:40 -0800 (PST)
+        bh=hLgs1lnetEyknU/J00Q9dg+rep4hDdlUeMLNhubrH7k=;
+        b=qL1mtRQDYbpoLQei9TXhv+DKc2wSha0mxe5dNkdx2baA6RTkRQuQqCgt/DGd4ddb+R
+         DuVj2Hn2XA9Ubxd/GbjwzB0xsGUQv/l9l+InOcWwNGHK9DjfwVhH+aWSniVrMLeg0xt3
+         9GDi6B0suwDAeBuyZ3fP49dIcLILzsxXlS/JyV6lssOvkdHmlS+OEsSFOnG8ZwTOoQHH
+         LehMhcmV3h/Pxt5wgwP7p39HZK1EnmTi0APGge1uxJvidsf3xqQp+mtCieW3Jxu+9OAn
+         bRrwyMBOV7GgUQvidUgcFczSiIWmRn/tt1CTOKip/I4fFzZNCVL6OAT5mFriMfVi2Vw0
+         kiTg==
+X-Gm-Message-State: AFqh2koDiO78RH3NkMw1pOrUJg9IjgEJlSWHpUd00kCjCTAgBJsp3JWp
+        EGdEjMc5H7atq3nHooSNzIA=
+X-Google-Smtp-Source: AMrXdXtDw4S2svhTHvYarWfBuWqpYWueLLxgbOGNu07nleRYG642JRNpHHVYWYza6grZUflq7Qd+Uw==
+X-Received: by 2002:a17:90b:3711:b0:223:f7a6:1c1e with SMTP id mg17-20020a17090b371100b00223f7a61c1emr5783069pjb.31.1671708169146;
+        Thu, 22 Dec 2022 03:22:49 -0800 (PST)
 Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id i127-20020a625485000000b005769cee6735sm493538pfb.43.2022.12.22.03.19.38
+        by smtp.gmail.com with ESMTPSA id n8-20020a17090a73c800b0021e1c8ef788sm2966940pjk.51.2022.12.22.03.22.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Dec 2022 03:19:40 -0800 (PST)
-Message-ID: <065de8d2-895e-9ee9-e3e5-16e79969508f@gmail.com>
-Date:   Thu, 22 Dec 2022 19:19:33 +0800
+        Thu, 22 Dec 2022 03:22:48 -0800 (PST)
+Message-ID: <195c26b7-783f-fc27-1a60-b0dcd1de01ac@gmail.com>
+Date:   Thu, 22 Dec 2022 19:22:42 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.6.0
-Subject: Re: [PATCH v2 06/15] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for guest
- Arch LBR
+Subject: Re: [PATCH v2 12/15] KVM: x86/vmx: Disable Arch LBREn bit in #DB and
+ warm reset
 Content-Language: en-US
 To:     Yang Weijiang <weijiang.yang@intel.com>
 Cc:     kan.liang@linux.intel.com, wei.w.wang@intel.com, seanjc@google.com,
         pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20221125040604.5051-1-weijiang.yang@intel.com>
- <20221125040604.5051-7-weijiang.yang@intel.com>
+ <20221125040604.5051-13-weijiang.yang@intel.com>
 From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20221125040604.5051-7-weijiang.yang@intel.com>
+In-Reply-To: <20221125040604.5051-13-weijiang.yang@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -77,29 +77,33 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/11/2022 12:05 pm, Yang Weijiang wrote:
-> @@ -727,12 +772,16 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
->    */
->   static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
->   {
-> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
-> +	u32 lbr_ctl_field = GUEST_IA32_DEBUGCTL;
->   
-> -	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
-> -		data &= ~DEBUGCTLMSR_LBR;
-> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
-> -	}
-> +	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI))
-> +		return;
+On 25/11/2022 12:06 pm, Yang Weijiang wrote:
+> +static void disable_arch_lbr_ctl(struct kvm_vcpu *vcpu)
+> +{
+> +	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
 > +
 > +	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
-> +	    guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-> +		lbr_ctl_field = GUEST_IA32_LBR_CTL;
+> +	    test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use) &&
+> +	    lbr_desc->event) {
+> +		u64 ctl = vmcs_read64(GUEST_IA32_LBR_CTL);
 > +
-> +	vmcs_write64(lbr_ctl_field, vmcs_read64(lbr_ctl_field) & ~0x1ULL);
->   }
+> +		vmcs_write64(GUEST_IA32_LBR_CTL, ctl & ~ARCH_LBR_CTL_LBREN);
+> +	}
+> +}
+> +
+>   static void vmx_inject_exception(struct kvm_vcpu *vcpu)
+>   {
+>   	struct kvm_queued_exception *ex = &vcpu->arch.exception;
+> @@ -1738,6 +1752,9 @@ static void vmx_inject_exception(struct kvm_vcpu *vcpu)
+>   	vmcs_write32(VM_ENTRY_INTR_INFO_FIELD, intr_info);
 >   
->   static void intel_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
+>   	vmx_clear_hlt(vcpu);
+> +
+> +	if (ex->vector == DB_VECTOR)
+> +		disable_arch_lbr_ctl(vcpu);
 
-The legacy lbr test case in KUT does not cover this scenario, but
-arch lbr contributor should take the opportunity to fill this gap. Thanks.
+Please verify this with KUT testcase, once I failed and did not confirm
+if it is a hardware issue. Good Luck.
+
+>   }
