@@ -2,163 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ECA11654177
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 14:02:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9DCF265417C
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 14:04:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235403AbiLVNCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 08:02:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42566 "EHLO
+        id S235445AbiLVNEf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 08:04:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235386AbiLVNCM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 08:02:12 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D9C2793D;
-        Thu, 22 Dec 2022 05:02:11 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C1896B81D11;
-        Thu, 22 Dec 2022 13:02:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BD1FC43392;
-        Thu, 22 Dec 2022 13:02:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671714128;
-        bh=+il+SxtPaF4c4xhIERSlV2b3ebbMTBDe+tDbOlWavI0=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=LjgSe3GSP0mW8adQgzLeMLPnwVygpphDdWa+BPcD1ECfJRmzzdQJjvMPGXRjo9Udq
-         8yC8XbmXvUuAjZyXWQt1cDBVqNrCk8WX8GP+xSa96IS49fN/H9ezA/DTkcBx4BWAHS
-         u+SkG8R7qYRHRwXJ0j/L8lq6qVVnBUetpboBeWYbQ6eNlBnWZcT9BrcJKJKEfOrEoN
-         67gMnoIyBGXwnc6x0TVUrg+4KWDVsbQag6/LVhpsuks5bQqbBHaGZGs4bF+XwciDqB
-         wcskYfV+uiM4ggb7efsnRqFMETthrIyjUj8AoO7eIlbFZaRLh8wi5E8D0a58vfJJyv
-         2s4JEZ0af1Y0A==
-Received: by mail-lf1-f52.google.com with SMTP id b3so2649612lfv.2;
-        Thu, 22 Dec 2022 05:02:08 -0800 (PST)
-X-Gm-Message-State: AFqh2kpeltGF4sH3pX66moV/qJM4WSna7++XnxxDmLBm+r7VorD39Dsa
-        ZVuOHT9CxNBYqnn4YbLnBncGzcH8crTUdZ1f4/Y=
-X-Google-Smtp-Source: AMrXdXs/FbXEMKkikcQh2g0G6KKTqaNtxuHVOptoJqHyWe59cAaGZyR/wktYEyC/Z4h8imqHqegrkCH7cW9DCXyG+z0=
-X-Received: by 2002:ac2:5d4e:0:b0:4b5:964d:49a4 with SMTP id
- w14-20020ac25d4e000000b004b5964d49a4mr572665lfd.637.1671714126548; Thu, 22
- Dec 2022 05:02:06 -0800 (PST)
+        with ESMTP id S235159AbiLVNEc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 08:04:32 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3018527CF9;
+        Thu, 22 Dec 2022 05:04:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=mvzYaFpmiBrAALCIOGS8LyjgZjYQvTkctg7B9W1gCbA=; b=eHub322LS1fojURr/mFQ8s9YEW
+        pgIvOlB+BReIjBD7xZUrHEExwUWlZVYYvQ+RFWdr1Np8pzM4xPv6OYWQnOLV2/LvC64mc6pKzbbrD
+        GEUnM9q8UGW1wxzlnHB+Er0zXmBzT4dhe16TRpk99QvLdNtf6N3lbFg41lxpXjtZ3D+KT05Xz/5D7
+        CaBd19Q0BTSq95A7ok10jWhCSpDHpXkzhTKjehIqetjTjgHVtZMSn7hgHwSWUyXff0G7voVN8WHxC
+        t6o7XAFGbUvL2i1HEko9l7MctqJDHUL9NlpmyQXnaDKbla2sV/BEE8Xk4ZofN+Hgw8jMcyzSR23H7
+        kwaPGhpQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1p8LF3-003fgr-Og; Thu, 22 Dec 2022 13:04:09 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 283FA3000DD;
+        Thu, 22 Dec 2022 14:03:58 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 040EF20D2DE36; Thu, 22 Dec 2022 14:03:57 +0100 (CET)
+Date:   Thu, 22 Dec 2022 14:03:57 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     "Li, Xin3" <xin3.li@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "andrew.cooper3@citrix.com" <andrew.cooper3@citrix.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shankar, Ravi V" <ravi.v.shankar@intel.com>
+Subject: Re: [RFC PATCH 14/32] x86/fred: header file with FRED definitions
+Message-ID: <Y6RVvRg20Xc6IR4k@hirez.programming.kicks-ass.net>
+References: <20221220063658.19271-1-xin3.li@intel.com>
+ <20221220063658.19271-15-xin3.li@intel.com>
+ <Y6F4s0K2b2G8aMve@hirez.programming.kicks-ass.net>
+ <BN6PR1101MB21615569318BD964A2855F44A8EB9@BN6PR1101MB2161.namprd11.prod.outlook.com>
 MIME-Version: 1.0
-References: <20221220200923.1532710-1-maz@kernel.org> <20221220200923.1532710-2-maz@kernel.org>
-In-Reply-To: <20221220200923.1532710-2-maz@kernel.org>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 22 Dec 2022 14:01:55 +0100
-X-Gmail-Original-Message-ID: <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
-Message-ID: <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Will Deacon <will@kernel.org>,
-        Quentin Perret <qperret@google.com>, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN6PR1101MB21615569318BD964A2855F44A8EB9@BN6PR1101MB2161.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 20 Dec 2022 at 21:09, Marc Zyngier <maz@kernel.org> wrote:
->
-> A recent development on the EFI front has resulted in guests having
-> their page tables baked in the firmware binary, and mapped into
-> the IPA space as part as a read-only memslot.
->
-> Not only this is legitimate, but it also results in added security,
-> so thumbs up. However, this clashes mildly with our handling of a S1PTW
-> as a write to correctly handle AF/DB updates to the S1 PTs, and results
-> in the guest taking an abort it won't recover from (the PTs mapping the
-> vectors will suffer freom the same problem...).
->
-> So clearly our handling is... wrong.
->
-> Instead, switch to a two-pronged approach:
->
-> - On S1PTW translation fault, handle the fault as a read
->
-> - On S1PTW permission fault, handle the fault as a write
->
-> This is of no consequence to SW that *writes* to its PTs (the write
-> will trigger a non-S1PTW fault), and SW that uses RO PTs will not
-> use AF/DB anyway, as that'd be wrong.
->
-> Only in the case described in c4ad98e4b72c ("KVM: arm64: Assume write
-> fault on S1PTW permission fault on instruction fetch") do we end-up
-> with two back-to-back faults (page being evicted and faulted back).
-> I don't think this is a case worth optimising for.
->
-> Fixes: c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch")
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> Cc: stable@vger.kernel.org
+On Wed, Dec 21, 2022 at 02:58:06AM +0000, Li, Xin3 wrote:
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+> > > +/* Flags above the CS selector (regs->csl) */
+> > > +#define FRED_CSL_ENABLE_NMI		_BITUL(28)
+> > > +#define FRED_CSL_ALLOW_SINGLE_STEP	_BITUL(25)
+> > > +#define FRED_CSL_INTERRUPT_SHADOW	_BITUL(24)
+> > 
+> > What's the state of IBT WAIT-FOR-ENDBR vs this? That really should also get a
+> > high CS bit.
+> 
+> FRED does provide more possibilities :)
 
-I have tested this patch on my TX2 with one of the EFI builds in
-question, and everything works as before (I never observed the issue
-itself)
-
-Regression-tested-by: Ard Biesheuvel <ardb@kernel.org>
-
-For the record, the EFI build in question targets QEMU/mach-virt and
-switches to a set of read-only page tables in emulated NOR flash
-straight out of reset, so it can create and populate the real page
-tables with MMU and caches enabled. EFI does not use virtual memory or
-paging so managing access flags or dirty bits in hardware is unlikely
-to add any value, and it is not being used at the moment. And given
-that this is emulated NOR flash, any ordinary write to it tears down
-the r/o memslot altogether, and kicks the NOR flash emulation in QEMU
-into programming mode, which is fully based on MMIO emulation and does
-not use a memslot at all. IOW, even if we could figure out what store
-the PTW was attempting to do, it is always going to be rejected since
-the r/o page tables can only be modified by 'programming' the NOR
-flash sector.
-
-
-> ---
->  arch/arm64/include/asm/kvm_emulate.h | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> index 9bdba47f7e14..fd6ad8b21f85 100644
-> --- a/arch/arm64/include/asm/kvm_emulate.h
-> +++ b/arch/arm64/include/asm/kvm_emulate.h
-> @@ -373,8 +373,26 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
->
->  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
->  {
-> -       if (kvm_vcpu_abt_iss1tw(vcpu))
-> -               return true;
-> +       if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> +               /*
-> +                * Only a permission fault on a S1PTW should be
-> +                * considered as a write. Otherwise, page tables baked
-> +                * in a read-only memslot will result in an exception
-> +                * being delivered in the guest.
-> +                *
-> +                * The drawback is that we end-up fauling twice if the
-> +                * guest is using any of HW AF/DB: a translation fault
-> +                * to map the page containing the PT (read only at
-> +                * first), then a permission fault to allow the flags
-> +                * to be set.
-> +                */
-> +               switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-> +               case ESR_ELx_FSC_PERM:
-> +                       return true;
-> +               default:
-> +                       return false;
-> +               }
-> +       }
->
->         if (kvm_vcpu_trap_is_iabt(vcpu))
->                 return false;
-> --
-> 2.34.1
->
+That's not an answer. IBT has a clear defect and FRED *should* fix it.
