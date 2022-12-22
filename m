@@ -2,238 +2,177 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 879646545B9
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 18:48:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A67D36545E2
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 19:15:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229867AbiLVRs2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 12:48:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41796 "EHLO
+        id S230028AbiLVSPe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 13:15:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229630AbiLVRs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 12:48:26 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E200628E12
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 09:48:24 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 628482F4;
-        Thu, 22 Dec 2022 09:49:05 -0800 (PST)
-Received: from monolith.localdoman (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0F3B33FAFB;
-        Thu, 22 Dec 2022 09:48:22 -0800 (PST)
-Date:   Thu, 22 Dec 2022 17:48:12 +0000
-From:   Alexandru Elisei <alexandru.elisei@arm.com>
-To:     Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-Cc:     pbonzini@redhat.com, thuth@redhat.com, andrew.jones@linux.dev,
-        kvm@vger.kernel.org, suzuki.poulose@arm.com, nd@arm.com
-Subject: Re: [kvm-unit-tests PATCH v3 2/2] arm/psci: Add PSCI_CPU_OFF
- testscase to arm/psci testsuite
-Message-ID: <Y6SYXNsF616Brf/Q@monolith.localdoman>
-References: <20221220143156.208143-1-Nikita.Venkatesh@arm.com>
- <20221220143156.208143-3-Nikita.Venkatesh@arm.com>
+        with ESMTP id S229904AbiLVSPc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 13:15:32 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EF391AA36
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 10:15:29 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id m4so2762457pls.4
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 10:15:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=752C77UYWYC/kCXAv9m+o+bKyybany3JU3TCXHGZR0U=;
+        b=mnWHipNRICDDr9o9B9k9tzUHQ5DlJw7QNZU1NFFDGUJ/WFgmaKL6adljuLzxsRCR1T
+         yOt1llvxRLddf3o8tFdD1XSrfvJKY91Y6BA+Ue/bxbYYHAufNWWHf+w2InX7LDglGQta
+         9K3BVA4lZMYr2iIsmJ+f1M3V5mNVtVOBrDe0He7TJ193jL7X5zGQlNAIk8two/do47Qa
+         +IAmme0Ak9mW8lBakzH8LqHkhC04c8aYC5+Yadk9FKgybASwcKtR2kDtwpwTkfLtjN0F
+         Pf78IoRu0kt98rlTKH1ZJdwA91Ht9u39VkBXmY2L8neh0zXKIViW79WjZdA8w13OMOlE
+         OnLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=752C77UYWYC/kCXAv9m+o+bKyybany3JU3TCXHGZR0U=;
+        b=P0dTxGveIzdhiimCE9BF4+qHMnt1sqLi/dGX6vIF3Cp6qozqoTbkp5c3H3yFsZ1My+
+         o5/tbEXJpax01DEbVOIMZgaMKHJDil+sVOmeuzt/EoobwYHCtdh+LcIYaPIETHZnSDEg
+         0zHygqEZe0U0FOb/b7Fxzni99Lr9rjig3NfYdHv0R9NmgRbgC2OTy4cxd7g00fvnUDh3
+         w0T7W+9OCDEmbmJyTGFAzha4M3PCiJN1dwy4mayk4mt0p7NbuY1LnQxrIw8cwQLZfAEh
+         22AiPAThll//1COTjeQo/QyriVcu7krpTQwQoqnCHNBtZ1vnt6oq9CAApY4Q2tCZP+IH
+         IEsA==
+X-Gm-Message-State: AFqh2kpa30iBqHc2pJDd+osSkbyNT+pQLpIamE8LOuW/G+cLvN7KlTut
+        j7hmjpN0nF6WBBFGvhuWPrzidg==
+X-Google-Smtp-Source: AMrXdXtVsGTXmJ+OudFvpboyWukOEY96QmhFL3/LDUsVn+qtHCwo04yMbEQyfv9hcz3t0HxxdVHCiA==
+X-Received: by 2002:a17:903:41ca:b0:189:6624:58c0 with SMTP id u10-20020a17090341ca00b00189662458c0mr1174380ple.3.1671732928592;
+        Thu, 22 Dec 2022 10:15:28 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id a7-20020a17090a70c700b00219feae9486sm3443216pjm.7.2022.12.22.10.15.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Dec 2022 10:15:28 -0800 (PST)
+Date:   Thu, 22 Dec 2022 18:15:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "jmattson@google.com" <jmattson@google.com>,
+        "Lutomirski, Andy" <luto@kernel.org>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Hocko, Michal" <mhocko@suse.com>,
+        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+        "tabba@google.com" <tabba@google.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "bfields@fieldses.org" <bfields@fieldses.org>,
+        "dhildenb@redhat.com" <dhildenb@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        "rppt@kernel.org" <rppt@kernel.org>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "vkuznets@redhat.com" <vkuznets@redhat.com>,
+        "vbabka@suse.cz" <vbabka@suse.cz>,
+        "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
+        "ddutile@redhat.com" <ddutile@redhat.com>,
+        "qperret@google.com" <qperret@google.com>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "vannapurve@google.com" <vannapurve@google.com>,
+        "naoya.horiguchi@nec.com" <naoya.horiguchi@nec.com>,
+        "wanpengli@tencent.com" <wanpengli@tencent.com>,
+        "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
+        "hughd@google.com" <hughd@google.com>,
+        "aarcange@redhat.com" <aarcange@redhat.com>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "hpa@zytor.com" <hpa@zytor.com>,
+        "Nakajima, Jun" <jun.nakajima@intel.com>,
+        "jlayton@kernel.org" <jlayton@kernel.org>,
+        "joro@8bytes.org" <joro@8bytes.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Wang, Wei W" <wei.w.wang@intel.com>,
+        "steven.price@arm.com" <steven.price@arm.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "linmiaohe@huawei.com" <linmiaohe@huawei.com>
+Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
+ create restricted user memory
+Message-ID: <Y6SevJt6XXOsmIBD@google.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
+ <5c6e2e516f19b0a030eae9bf073d555c57ca1f21.camel@intel.com>
+ <20221219075313.GB1691829@chaop.bj.intel.com>
+ <deba096c85e41c3a15d122f2159986a74b16770f.camel@intel.com>
+ <20221220072228.GA1724933@chaop.bj.intel.com>
+ <126046ce506df070d57e6fe5ab9c92cdaf4cf9b7.camel@intel.com>
+ <20221221133905.GA1766136@chaop.bj.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221220143156.208143-3-Nikita.Venkatesh@arm.com>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221221133905.GA1766136@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
-
-On Tue, Dec 20, 2022 at 02:31:56PM +0000, Nikita Venkatesh wrote:
-> The test uses the following method.
+On Wed, Dec 21, 2022, Chao Peng wrote:
+> On Tue, Dec 20, 2022 at 08:33:05AM +0000, Huang, Kai wrote:
+> > On Tue, 2022-12-20 at 15:22 +0800, Chao Peng wrote:
+> > > On Mon, Dec 19, 2022 at 08:48:10AM +0000, Huang, Kai wrote:
+> > > > On Mon, 2022-12-19 at 15:53 +0800, Chao Peng wrote:
+> > But for non-restricted-mem case, it is correct for KVM to decrease page's
+> > refcount after setting up mapping in the secondary mmu, otherwise the page will
+> > be pinned by KVM for normal VM (since KVM uses GUP to get the page).
 > 
-> The primary CPU brings up all the secondary CPUs, which are held in a wait
-> loop. Once the primary releases the CPUs, each of the secondary CPUs
-> proceed to issue PSCI_CPU_OFF. This is indicated by a cpumask and also
-> the status of the call is updated by the secondary CPU in cpu_off_done[].
+> That's true. Actually even true for restrictedmem case, most likely we
+> will still need the kvm_release_pfn_clean() for KVM generic code. On one
+> side, other restrictedmem users like pKVM may not require page pinning
+> at all. On the other side, see below.
 > 
-> The primary CPU waits for all the secondary CPUs to update the cpumask
-> and then proceeds to check for the status of the individual CPU CPU_OFF
-> request. There is a chance that some CPUs might fail at the CPU_OFF
-> request and come back and update the status once the primary CPU has
-> finished the scan. There is no fool proof method to handle this. As of
-> now, we add a 1sec delay between the cpumask check and the scan for the
-> status.
-> 
-> The test can be triggered by "cpu-off" command line argument.
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > 
+> > So what we are expecting is: for KVM if the page comes from restricted mem, then
+> > KVM cannot decrease the refcount, otherwise for normal page via GUP KVM should.
 
-I don't think that's true anymore.
+No, requiring the user (KVM) to guard against lack of support for page migration
+in restricted mem is a terrible API.  It's totally fine for restricted mem to not
+support page migration until there's a use case, but punting the problem to KVM
+is not acceptable.  Restricted mem itself doesn't yet support page migration,
+e.g. explosions would occur even if KVM wanted to allow migration since there is
+no notification to invalidate existing mappings.
 
-> 
-> Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
-> ---
->  arm/psci.c | 90 ++++++++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 84 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arm/psci.c b/arm/psci.c
-> index 0b9834c..8e664c2 100644
-> --- a/arm/psci.c
-> +++ b/arm/psci.c
-> @@ -12,6 +12,9 @@
->  #include <asm/processor.h>
->  #include <asm/smp.h>
->  #include <asm/psci.h>
-> +#include <asm/delay.h>
-> +
-> +#define CPU_OFF_TEST_WAIT_TIME 1000
->  
->  static bool invalid_function_exception;
->  
-> @@ -69,8 +72,10 @@ static bool psci_affinity_info_off(void)
->  }
->  
->  static int cpu_on_ret[NR_CPUS];
-> -static cpumask_t cpu_on_ready, cpu_on_done;
-> +static bool cpu_off_success[NR_CPUS];
-> +static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
->  static volatile int cpu_on_start;
-> +static volatile int cpu_off_start;
->  
->  extern void secondary_entry(void);
->  static void cpu_on_wake_target(void)
-> @@ -92,11 +97,25 @@ static void cpu_on_target(void)
->  	cpumask_set_cpu(cpu, &cpu_on_done);
->  }
->  
-> +static void cpu_off_secondary_entry(void *data)
-> +{
-> +	int cpu = smp_processor_id();
-> +
-> +	while (!cpu_off_start)
-> +		cpu_relax();
-> +	/* On to the CPU off test */
-> +	cpu_off_success[cpu] = true;
-> +	cpumask_set_cpu(cpu, &cpu_off_done);
-> +	cpu_psci_cpu_die();
-> +	/* The CPU shouldn't execute the next steps. */
-> +	cpu_off_success[cpu] = false;
-> +}
-> +
->  static bool psci_cpu_on_test(void)
->  {
->  	bool failed = false;
->  	int ret_success = 0;
-> -	int cpu;
-> +	int i, cpu;
->  
->  	for_each_present_cpu(cpu) {
->  		if (cpu < 2)
-> @@ -125,6 +144,25 @@ static bool psci_cpu_on_test(void)
->  	while (!cpumask_full(&cpu_on_done))
->  		cpu_relax();
->  
-> +	report_info("waiting for CPU1 to come online...");
-> +	for (i = 0; i < 10; i++) {
-> +		mdelay(100);
-> +		if (cpumask_full(&cpu_on_done))
-> +			break;
-> +	}
-> +
-> +	if (!cpumask_full(&cpu_on_done)) {
-> +		for_each_present_cpu(cpu) {
-> +			if (!cpumask_test_cpu(cpu, &cpu_on_done)) {
-> +				if (cpu == 1)
-> +					report_info("CPU1 failed to come online");
-> +				else
-> +					report_info("CPU%d failed to online CPU1", cpu);
-> +			}
-> +		}
-> +		return false;
-> +	}
-> +
+> I argue that this page pinning (or page migration prevention) is not
+> tied to where the page comes from, instead related to how the page will
+> be used. Whether the page is restrictedmem backed or GUP() backed, once
+> it's used by current version of TDX then the page pinning is needed. So
+> such page migration prevention is really TDX thing, even not KVM generic
+> thing (that's why I think we don't need change the existing logic of
+> kvm_release_pfn_clean()). Wouldn't better to let TDX code (or who
+> requires that) to increase/decrease the refcount when it populates/drops
+> the secure EPT entries? This is exactly what the current TDX code does:
 
-This change should be part of the previous patch.
+I agree that whether or not migration is supported should be controllable by the
+user, but I strongly disagree on punting refcount management to KVM (or TDX).
+The whole point of restricted mem is to support technologies like TDX and SNP,
+accomodating their special needs for things like page migration should be part of
+the API, not some footnote in the documenation.
 
->  	for_each_present_cpu(cpu) {
->  		if (cpu_on_ret[cpu] == PSCI_RET_SUCCESS) {
->  			ret_success++;
-> @@ -142,7 +180,44 @@ static bool psci_cpu_on_test(void)
->  	return !failed;
->  }
->  
-> -int main(void)
-> +static bool psci_cpu_off_test(void)
-> +{
-> +	bool failed = false;
-> +	int cpu;
-> +
-> +	for_each_present_cpu(cpu) {
-> +		if (cpu == 0)
-> +			continue;
-> +		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
-> +	}
-> +
-> +	cpumask_set_cpu(0, &cpu_off_done);
-> +
-> +	report_info("starting CPU_OFF test...");
-> +
-> +	/* Release the CPUs */
-> +	cpu_off_start = 1;
-> +
-> +	/* Wait until all are done */
-> +	while (!cpumask_full(&cpu_off_done))
-> +		cpu_relax();
-> +
-> +	/* Allow all the other CPUs to complete the operation */
-> +	mdelay(CPU_OFF_TEST_WAIT_TIME);
-> +
-> +	for_each_present_cpu(cpu) {
-> +		if (cpu == 0)
-> +			continue;
-> +
-> +		if (!cpu_off_success[cpu]) {
-> +			report_info("CPU%d could not be turned off", cpu);
-> +			failed = true;
-> +		}
-> +	}
-> +	return !failed;
-> +}
-> +
-> +int main(int argc, char **argv)
->  {
->  	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
->  
-> @@ -154,15 +229,18 @@ int main(void)
->  	}
->  
->  	report_info("PSCI version %d.%d", PSCI_VERSION_MAJOR(ver),
-> -					  PSCI_VERSION_MINOR(ver));
-> +					PSCI_VERSION_MINOR(ver));
+It's not difficult to let the user communicate support for page migration, e.g.
+if/when restricted mem gains support, add a hook to restrictedmem_notifier_ops
+to signal support (or lack thereof) for page migration.  NULL == no migration,
+non-NULL == migration allowed.
 
-This change is unneeded. Whitespace change?
+We know that supporting page migration in TDX and SNP is possible, and we know
+that page migration will require a dedicated API since the backing store can't
+memcpy() the page.  I don't see any reason to ignore that eventuality.
 
-> +
->  	report(psci_invalid_function(), "invalid-function");
->  	report(psci_affinity_info_on(), "affinity-info-on");
->  	report(psci_affinity_info_off(), "affinity-info-off");
->  
-> -	if (ERRATA(6c7a5dce22b3))
-> +	if (ERRATA(6c7a5dce22b3)){
->  		report(psci_cpu_on_test(), "cpu-on");
-> -	else
-> +	} else {
->  		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
-> +	}
-
-The adition of braces here seems unnecessary. Is it by any chance a
-leftover from the previous version of the patches, where they were
-necessary?
-
-Otherwise, the patches look good, also ran a few tests for good measure.
-
-Thanks,
-Alex
-
-> +	report(psci_cpu_off_test(), "cpu-off");
->  
->  done:
->  #if 0
-> -- 
-> 2.25.1
-> 
+But again, unless I'm missing something, that's a future problem because restricted
+mem doesn't yet support page migration regardless of the downstream user.
