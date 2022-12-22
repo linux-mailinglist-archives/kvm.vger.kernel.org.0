@@ -2,177 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 177D765410A
-	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 13:33:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECA11654177
+	for <lists+kvm@lfdr.de>; Thu, 22 Dec 2022 14:02:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235540AbiLVMdH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 07:33:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55026 "EHLO
+        id S235403AbiLVNCP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 08:02:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235542AbiLVMdA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 07:33:00 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1694F25EB9;
-        Thu, 22 Dec 2022 04:32:50 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BMCFHvE025679;
-        Thu, 22 Dec 2022 12:32:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=2Ud7qlUcdnoe8KhA2+Hd9TL+vFSLoW/2hQIjB8zlhco=;
- b=DIxAS70DDeNC2o9rYvyGkVlIbe9AP60vixNvQlykBJsDbbp4X6KBa2w+ABgq/jPWswgL
- dy6N8XGuOufxZQjJPx0eLabyHu9VAN1KkKAoYMjok/EXt+GyQ3eLXISzO2vTgKP5zXVW
- 2HIvnK62RWsKRn9upUSqQc/RAAreCIn3R/kdK1zNM3JCyS6/a26Ray8G5lStu1qa5LlI
- mHyQDtRl5GANY98N7FRTbIQGBeaG1wDV+2fKwXhhdCfSRLcJQFlF81Jy7wj53iZU0IOO
- cLUQPl6tdolOt8rsHQR5TD61Xibn/u0YJsHqHI3QHzgsUYY3z8o8RmufAu2dbG51an1b VA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mmq2t8cs2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Dec 2022 12:32:49 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 2BMCLtvB019064;
-        Thu, 22 Dec 2022 12:32:48 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mmq2t8cq7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Dec 2022 12:32:48 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 2BM2j3jR027376;
-        Thu, 22 Dec 2022 12:32:46 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3mh6ywq268-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 22 Dec 2022 12:32:46 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2BMCWhKq52429198
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Dec 2022 12:32:43 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EB50720040;
-        Thu, 22 Dec 2022 12:32:42 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A2E6F20049;
-        Thu, 22 Dec 2022 12:32:42 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 22 Dec 2022 12:32:42 +0000 (GMT)
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        =?UTF-8?q?Christian=20Borntr=C3=A4ger?= <borntraeger@linux.ibm.com>,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] vfio/type1: Respect IOMMU reserved regions in vfio_test_domain_fgsp()
-Date:   Thu, 22 Dec 2022 13:32:42 +0100
-Message-Id: <20221222123242.1598848-1-schnelle@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S235386AbiLVNCM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 08:02:12 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D9C2793D;
+        Thu, 22 Dec 2022 05:02:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id C1896B81D11;
+        Thu, 22 Dec 2022 13:02:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BD1FC43392;
+        Thu, 22 Dec 2022 13:02:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1671714128;
+        bh=+il+SxtPaF4c4xhIERSlV2b3ebbMTBDe+tDbOlWavI0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=LjgSe3GSP0mW8adQgzLeMLPnwVygpphDdWa+BPcD1ECfJRmzzdQJjvMPGXRjo9Udq
+         8yC8XbmXvUuAjZyXWQt1cDBVqNrCk8WX8GP+xSa96IS49fN/H9ezA/DTkcBx4BWAHS
+         u+SkG8R7qYRHRwXJ0j/L8lq6qVVnBUetpboBeWYbQ6eNlBnWZcT9BrcJKJKEfOrEoN
+         67gMnoIyBGXwnc6x0TVUrg+4KWDVsbQag6/LVhpsuks5bQqbBHaGZGs4bF+XwciDqB
+         wcskYfV+uiM4ggb7efsnRqFMETthrIyjUj8AoO7eIlbFZaRLh8wi5E8D0a58vfJJyv
+         2s4JEZ0af1Y0A==
+Received: by mail-lf1-f52.google.com with SMTP id b3so2649612lfv.2;
+        Thu, 22 Dec 2022 05:02:08 -0800 (PST)
+X-Gm-Message-State: AFqh2kpeltGF4sH3pX66moV/qJM4WSna7++XnxxDmLBm+r7VorD39Dsa
+        ZVuOHT9CxNBYqnn4YbLnBncGzcH8crTUdZ1f4/Y=
+X-Google-Smtp-Source: AMrXdXs/FbXEMKkikcQh2g0G6KKTqaNtxuHVOptoJqHyWe59cAaGZyR/wktYEyC/Z4h8imqHqegrkCH7cW9DCXyG+z0=
+X-Received: by 2002:ac2:5d4e:0:b0:4b5:964d:49a4 with SMTP id
+ w14-20020ac25d4e000000b004b5964d49a4mr572665lfd.637.1671714126548; Thu, 22
+ Dec 2022 05:02:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: GxQMyUlwK-kb4nWNrV1hL-BuInFrstTt
-X-Proofpoint-ORIG-GUID: X-Vh0qEZCrKQc7pK-0xInN1iuH8WTD8z
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-22_06,2022-12-22_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 impostorscore=0 priorityscore=1501 phishscore=0 spamscore=0
- mlxscore=0 bulkscore=0 mlxlogscore=961 clxscore=1011 adultscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2212220100
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221220200923.1532710-1-maz@kernel.org> <20221220200923.1532710-2-maz@kernel.org>
+In-Reply-To: <20221220200923.1532710-2-maz@kernel.org>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 22 Dec 2022 14:01:55 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
+Message-ID: <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
+Subject: Re: [PATCH 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
+To:     Marc Zyngier <maz@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Since commit cbf7827bc5dc ("iommu/s390: Fix potential s390_domain
-aperture shrinking") the s390 IOMMU driver uses a reserved region
-instead of an artificially shrunk aperture to restrict IOMMU use based
-on the system provided DMA ranges of devices. In particular on current
-machines this prevents use of DMA addresses below 2^32 for all devices.
-While usually just IOMMU mapping below these addresses is
-harmless. However our virtual ISM PCI device looks at new mappings on
-IOTLB flush and immediately goes into the error state if such a mapping
-violates its allowed DMA ranges. This then breaks pass-through of the
-ISM device to a KVM guest.
+On Tue, 20 Dec 2022 at 21:09, Marc Zyngier <maz@kernel.org> wrote:
+>
+> A recent development on the EFI front has resulted in guests having
+> their page tables baked in the firmware binary, and mapped into
+> the IPA space as part as a read-only memslot.
+>
+> Not only this is legitimate, but it also results in added security,
+> so thumbs up. However, this clashes mildly with our handling of a S1PTW
+> as a write to correctly handle AF/DB updates to the S1 PTs, and results
+> in the guest taking an abort it won't recover from (the PTs mapping the
+> vectors will suffer freom the same problem...).
+>
+> So clearly our handling is... wrong.
+>
+> Instead, switch to a two-pronged approach:
+>
+> - On S1PTW translation fault, handle the fault as a read
+>
+> - On S1PTW permission fault, handle the fault as a write
+>
+> This is of no consequence to SW that *writes* to its PTs (the write
+> will trigger a non-S1PTW fault), and SW that uses RO PTs will not
+> use AF/DB anyway, as that'd be wrong.
+>
+> Only in the case described in c4ad98e4b72c ("KVM: arm64: Assume write
+> fault on S1PTW permission fault on instruction fetch") do we end-up
+> with two back-to-back faults (page being evicted and faulted back).
+> I don't think this is a case worth optimising for.
+>
+> Fixes: c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch")
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> Cc: stable@vger.kernel.org
 
-Analysing this we found that vfio_test_domain_fgsp() maps 2 pages at DMA
-address 0 irrespective of the IOMMUs reserved regions. Even if usually
-harmless this seems wrong in the general case so instead go through the
-freshly updated IOVA list and try to find a range that isn't reserved
-and fits 2 pages and use that for testing for fine grained super pages.
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-Fixes: 6fe1010d6d9c ("vfio/type1: DMA unmap chunking")
-Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
----
-- Testing: I tested this based on current master on both on s390 where it skips
-  the reserved 0x0-0x100000000 range and on AMD Vi where it continues to do the
-  test on DMA address 0 and sets domain->fgsp to true.
+I have tested this patch on my TX2 with one of the EFI builds in
+question, and everything works as before (I never observed the issue
+itself)
 
- drivers/vfio/vfio_iommu_type1.c | 29 ++++++++++++++++++-----------
- 1 file changed, 18 insertions(+), 11 deletions(-)
+Regression-tested-by: Ard Biesheuvel <ardb@kernel.org>
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 23c24fe98c00..9395097897b8 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -1856,24 +1856,31 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
-  * significantly boosts non-hugetlbfs mappings and doesn't seem to hurt when
-  * hugetlbfs is in use.
-  */
--static void vfio_test_domain_fgsp(struct vfio_domain *domain)
-+static void vfio_test_domain_fgsp(struct vfio_domain *domain, struct list_head *regions)
- {
--	struct page *pages;
- 	int ret, order = get_order(PAGE_SIZE * 2);
-+	struct vfio_iova *region;
-+	struct page *pages;
- 
- 	pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, order);
- 	if (!pages)
- 		return;
- 
--	ret = iommu_map(domain->domain, 0, page_to_phys(pages), PAGE_SIZE * 2,
--			IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE);
--	if (!ret) {
--		size_t unmapped = iommu_unmap(domain->domain, 0, PAGE_SIZE);
-+	list_for_each_entry(region, regions, list) {
-+		if (region->end - region->start < PAGE_SIZE * 2)
-+			continue;
- 
--		if (unmapped == PAGE_SIZE)
--			iommu_unmap(domain->domain, PAGE_SIZE, PAGE_SIZE);
--		else
--			domain->fgsp = true;
-+		ret = iommu_map(domain->domain, region->start, page_to_phys(pages), PAGE_SIZE * 2,
-+				IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE);
-+		if (!ret) {
-+			size_t unmapped = iommu_unmap(domain->domain, region->start, PAGE_SIZE);
-+
-+			if (unmapped == PAGE_SIZE)
-+				iommu_unmap(domain->domain, region->start + PAGE_SIZE, PAGE_SIZE);
-+			else
-+				domain->fgsp = true;
-+		}
-+		break;
- 	}
- 
- 	__free_pages(pages, order);
-@@ -2326,7 +2333,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
- 		}
- 	}
- 
--	vfio_test_domain_fgsp(domain);
-+	vfio_test_domain_fgsp(domain, &iova_copy);
- 
- 	/* replay mappings on new domains */
- 	ret = vfio_iommu_replay(iommu, domain);
--- 
-2.34.1
+For the record, the EFI build in question targets QEMU/mach-virt and
+switches to a set of read-only page tables in emulated NOR flash
+straight out of reset, so it can create and populate the real page
+tables with MMU and caches enabled. EFI does not use virtual memory or
+paging so managing access flags or dirty bits in hardware is unlikely
+to add any value, and it is not being used at the moment. And given
+that this is emulated NOR flash, any ordinary write to it tears down
+the r/o memslot altogether, and kicks the NOR flash emulation in QEMU
+into programming mode, which is fully based on MMIO emulation and does
+not use a memslot at all. IOW, even if we could figure out what store
+the PTW was attempting to do, it is always going to be rejected since
+the r/o page tables can only be modified by 'programming' the NOR
+flash sector.
 
+
+> ---
+>  arch/arm64/include/asm/kvm_emulate.h | 22 ++++++++++++++++++++--
+>  1 file changed, 20 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+> index 9bdba47f7e14..fd6ad8b21f85 100644
+> --- a/arch/arm64/include/asm/kvm_emulate.h
+> +++ b/arch/arm64/include/asm/kvm_emulate.h
+> @@ -373,8 +373,26 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
+>
+>  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
+>  {
+> -       if (kvm_vcpu_abt_iss1tw(vcpu))
+> -               return true;
+> +       if (kvm_vcpu_abt_iss1tw(vcpu)) {
+> +               /*
+> +                * Only a permission fault on a S1PTW should be
+> +                * considered as a write. Otherwise, page tables baked
+> +                * in a read-only memslot will result in an exception
+> +                * being delivered in the guest.
+> +                *
+> +                * The drawback is that we end-up fauling twice if the
+> +                * guest is using any of HW AF/DB: a translation fault
+> +                * to map the page containing the PT (read only at
+> +                * first), then a permission fault to allow the flags
+> +                * to be set.
+> +                */
+> +               switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
+> +               case ESR_ELx_FSC_PERM:
+> +                       return true;
+> +               default:
+> +                       return false;
+> +               }
+> +       }
+>
+>         if (kvm_vcpu_trap_is_iabt(vcpu))
+>                 return false;
+> --
+> 2.34.1
+>
