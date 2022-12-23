@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 68485654A09
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:58:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 984F8654A19
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:58:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235828AbiLWA62 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 19:58:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57372 "EHLO
+        id S235884AbiLWA6p (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 19:58:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230298AbiLWA6C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 19:58:02 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E0952189D
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:57:57 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id pi14-20020a17090b1e4e00b0021d20da7a51so4013530pjb.2
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:57:57 -0800 (PST)
+        with ESMTP id S235759AbiLWA6Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 19:58:24 -0500
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 905BC27DEC
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:57:59 -0800 (PST)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-45c1b233dd7so36901347b3.20
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:57:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=8k64KFPY2FFl58dlOKiSt/6ffoasCJxRfQQP/flk2s8=;
-        b=ADGdSRhE19CpKn3Mx8Gw1o4OLrTbUVUIoTOjSZyGWqJNQL1SN7v8qQsh4q5cXqj6ZL
-         hD6fxxwCTl4y/NNCwu4uuodODhWf/UAdCQYUzyxbDjQPykN+rUTv5icpILVoRgxBnOw/
-         yeOcWPtNLNwR3Y/uk6j76NAwfZg7MRzWvFz7ko8kkCzO6CB+8LvhG1Xfv7qgN06BwTPR
-         tE+2BbMHDSCHA/Y16iC2bZMsqqlYWqoBvXSOH7eVW1O1/dc8s+Fc+brkRiaAncEhUjUu
-         kRfRqXhHbJkZXcp9gW5MeZZhEQ+HG6DbvBb/0kC1i/PgW4/d5vbzVWUhK143REl6RJgm
-         KT7Q==
+        bh=Wv7Sq7HoBVZLuoe15+dVfh7DmwmErtwyqBsV25zTBHk=;
+        b=dwSVlAZgWxSlftsojKgyDx43KpFpCJGRtc3IRFu3GmjsFZNeXwP+0HlSGWWwzg1wic
+         Mm8K8eEYW2H1yntodiOGHv7lvnOm/1z24jmE/DoOEat/BXnpKDQetjSQ2e/jlISDndzn
+         1nmJlnErn6cTNVPegHjYDWQB84MK9ay6ny7wDMYHPF2bxt/IRS4V3CpBw0hHNVnqSIPI
+         AOuSn1InRMkW0W/W4Y6bnc9MzsuXj7+c1GJLKaVvotPIuTliO7YbpvONhosQQihMYApz
+         5tjeLw12T/6UEC7CuL4oYzssc0CPUs+/hEDmPefuDbcWkak3eQWMtCmICA4OJuf63YKd
+         I+mQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8k64KFPY2FFl58dlOKiSt/6ffoasCJxRfQQP/flk2s8=;
-        b=6WqTHYRyjPF4KS4/40bPYK6DE49oq+6t0zJva4VlfwqsZAOwnx3+WZEDI3URPnLssJ
-         pKelE2nOuvla7I4+BntYBHHx68hVU1APAg2t8cTMan5HXLKRfuPRdLm8C5wAMbKL42g1
-         MGzRC5W+DQzw/UODGcro6T8qEUUTRKEsCwS28du5oQ05FFhauxKmtDXVhvxxJG5BlL8S
-         EVicsllPQaGxT0KMKtYhIu63+eAFA7fzVsLuT6tVhDPADjuWQDaGwnNX+zsPMRgX9+sr
-         WkIwaOlT9YEeTroCfBUwSVxWF8YshTm88zvPceUDHlHWGnSppSwg/8kYSM8rn52gH5jN
-         RaIw==
-X-Gm-Message-State: AFqh2krEHvsXJN+sC5SFlKthmsB6L+OAHW0o33V5GOww3JFsDzBNlEZ9
-        UDNRzamwaLifO87le5N0lrVhwYlnM6E=
-X-Google-Smtp-Source: AMrXdXtZzqXSfhAfIWlCK+WT2T5JZRV5LJOH9tPTZxKT6bo1HSjiqq3ll6wCTHVFE26Ee59g4OXn+ZR2sNc=
+        bh=Wv7Sq7HoBVZLuoe15+dVfh7DmwmErtwyqBsV25zTBHk=;
+        b=Oshh9Xw6oQ5wG+2wHQrn/HTBL4QutTmeLOzdZBohG3lUyml/2bP6K86FPaXsdZ4u9H
+         IRTF5npMZFEzo2SGh9y30oZllO58dNfYKI6CVaGXpFoH57v2EdsvI2U7z15TuxHFL6ON
+         wAA/C+qJYzhJdUwnCX0cGeARCdCoVD+9IxwwSlpIA+tVWRW3mhG3W1GVs5KC0atu55Lx
+         UVnLoJstUpsIaWZht4bRm0JHgpQuMYC5TNwmZ1q9tdPQ3L4MtcNpHiDtjQjYAtekGId+
+         HRdVswz3n1AAog+Z8mB3xh9UWdf2h8p7mNUC2DviSGiwMlqYBm3VVpQUqvFIiFWQcnfU
+         Ngww==
+X-Gm-Message-State: AFqh2krBEWQjglyUsnf0BFwxB9L6cHhzrubrXVzCiJLIs4CBNkfVxUpD
+        U0Vvzcp2cM5ew5mC5b51ojwXgTJs/gA=
+X-Google-Smtp-Source: AMrXdXstOrx3bUm5K/7Br+kFYpSxsgyLT1oZYQfRteln3A58NAAOzxF3mVNqbUjLF/5Fsax8WFKaA37+ZY8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:7794:b0:189:6936:7031 with SMTP id
- o20-20020a170902779400b0018969367031mr457317pll.31.1671757077092; Thu, 22 Dec
- 2022 16:57:57 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a25:9209:0:b0:756:3e38:765f with SMTP id
+ b9-20020a259209000000b007563e38765fmr658755ybo.428.1671757078643; Thu, 22 Dec
+ 2022 16:57:58 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 23 Dec 2022 00:57:19 +0000
+Date:   Fri, 23 Dec 2022 00:57:20 +0000
 In-Reply-To: <20221223005739.1295925-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221223005739.1295925-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221223005739.1295925-8-seanjc@google.com>
-Subject: [PATCH 07/27] drm/i915/gvt: Use an "unsigned long" to iterate over
- memslot gfns
+Message-ID: <20221223005739.1295925-9-seanjc@google.com>
+Subject: [PATCH 08/27] drm/i915/gvt: Hoist acquisition of vgpu_lock out to kvmgt_page_track_write()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -75,29 +74,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Use an "unsigned long" instead of an "int" when iterating over the gfns
-in a memslot.  The number of pages in the memslot is tracked as an
-"unsigned long", e.g. KVMGT could theoretically break if a KVM memslot
-larger than 16TiB were deleted (2^32 * 4KiB).
+Host the acquisition of vgpu_lock from intel_vgpu_page_track_handler() out
+to its sole caller, kvmgt_page_track_write().  An upcoming fix will add a
+mutex to protect the gfn hash table that referenced by
+kvmgt_gfn_is_write_protected(), i.e. kvmgt_page_track_write() will need to
+acquire another lock.  Conceptually, the to-be-introduced gfn_lock has
+finer granularity than vgpu_lock and so the lock order should ideally be
+vgpu_lock => gfn_lock, e.g. to avoid potential lock inversion elsewhere in
+KVMGT.
+
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/gpu/drm/i915/gvt/kvmgt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/gpu/drm/i915/gvt/kvmgt.c      |  4 ++++
+ drivers/gpu/drm/i915/gvt/page_track.c | 10 ++--------
+ 2 files changed, 6 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index 6f358b4fe406..5d0e029d60d7 100644
+index 5d0e029d60d7..ca9926061cd8 100644
 --- a/drivers/gpu/drm/i915/gvt/kvmgt.c
 +++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -1635,7 +1635,7 @@ static void kvmgt_page_track_flush_slot(struct kvm *kvm,
- 		struct kvm_memory_slot *slot,
- 		struct kvm_page_track_notifier_node *node)
- {
--	int i;
-+	unsigned long i;
- 	gfn_t gfn;
+@@ -1626,9 +1626,13 @@ static void kvmgt_page_track_write(struct kvm_vcpu *vcpu, gpa_t gpa,
  	struct intel_vgpu *info =
  		container_of(node, struct intel_vgpu, track_node);
+ 
++	mutex_lock(&info->vgpu_lock);
++
+ 	if (kvmgt_gfn_is_write_protected(info, gpa_to_gfn(gpa)))
+ 		intel_vgpu_page_track_handler(info, gpa,
+ 						     (void *)val, len);
++
++	mutex_unlock(&info->vgpu_lock);
+ }
+ 
+ static void kvmgt_page_track_flush_slot(struct kvm *kvm,
+diff --git a/drivers/gpu/drm/i915/gvt/page_track.c b/drivers/gpu/drm/i915/gvt/page_track.c
+index 3375b51c75f1..6d72d11914a5 100644
+--- a/drivers/gpu/drm/i915/gvt/page_track.c
++++ b/drivers/gpu/drm/i915/gvt/page_track.c
+@@ -162,13 +162,9 @@ int intel_vgpu_page_track_handler(struct intel_vgpu *vgpu, u64 gpa,
+ 	struct intel_vgpu_page_track *page_track;
+ 	int ret = 0;
+ 
+-	mutex_lock(&vgpu->vgpu_lock);
+-
+ 	page_track = intel_vgpu_find_page_track(vgpu, gpa >> PAGE_SHIFT);
+-	if (!page_track) {
+-		ret = -ENXIO;
+-		goto out;
+-	}
++	if (!page_track)
++		return -ENXIO;
+ 
+ 	if (unlikely(vgpu->failsafe)) {
+ 		/* Remove write protection to prevent furture traps. */
+@@ -179,7 +175,5 @@ int intel_vgpu_page_track_handler(struct intel_vgpu *vgpu, u64 gpa,
+ 			gvt_err("guest page write error, gpa %llx\n", gpa);
+ 	}
+ 
+-out:
+-	mutex_unlock(&vgpu->vgpu_lock);
+ 	return ret;
+ }
 -- 
 2.39.0.314.g84b9a713c41-goog
 
