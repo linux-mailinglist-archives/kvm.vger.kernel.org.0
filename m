@@ -2,73 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EFA996549C9
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:33:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0170F6549CB
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:37:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235372AbiLWAdk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 19:33:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51782 "EHLO
+        id S230024AbiLWAhX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 19:37:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbiLWAdj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 19:33:39 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36C526565
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:33:36 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id w4-20020a17090ac98400b002186f5d7a4cso7387921pjt.0
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:33:36 -0800 (PST)
+        with ESMTP id S229997AbiLWAhW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 19:37:22 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DADDCDF8B
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:37:20 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id c8-20020a17090a4d0800b00225c3614161so207967pjg.5
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:37:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3SnnWK2Yn0kyk7GHu2M0DJEtHKPpePG30TC/rB02220=;
-        b=pux3Eczt9o7v57Vha09NoD0CZwgZukOQ8CNR88RBhCONIrU7gn+hgrP53dVZpTYpgB
-         XNsOnhlwYkKxxLuz3iR6gtBOwCK2JAjhhB195u2s1pykEt0IUu1A0MAZ/iT86mPgmroV
-         R5jkXUOJf0oiDWOfuhnqYka5nAhY5MVcVET556Nh/gqIOeCADwVXiPUz5Rubz+ZCZkRG
-         KhTeq9+TBch7q0lzkGmMRS/CoXRJlfE7w+qVkeKudJuEeCp54JdqnEp+pptDc54VBMxL
-         l3fcx3TkbRihSBQGeuFp2OM8CbeaaXWJVKyeiJ6SjQi7m/76MA5gxQUWa0Z4cM3v8TLy
-         ueFw==
+        bh=5qpVu3sN2GuUThZ9RB+4eYZTG5/t0SB6qmR3AbS+l70=;
+        b=B8R3XSgXnZA0zY5ZIdpmzNALRNnKsAfqFMLI/F+HF96zJYmqg1RNfhTugB8bwKI8A2
+         JS/Y6GRPNC3bxfTQCrdpS/9K/kg2Lr6+RHAiBOrwY5KMWHe7ixr5p9ST9I6V2CdjBoQW
+         utBDn9+m+81ByW1uwDLF2LCDyCILvdtt27LVTPhR5xnYw17Qhp8OzxxUN+OC0WbfgeyF
+         OJHSL9IpNLDgSNZ8DTQRpKT2MgorAXNG7vnzvJERj00cpKqFnRlol438XrI30+88e00T
+         aTN9PmkIoWMfS2sV12MkOTVjfYk520RDEMd6Mi5dYYe4rhkOYnXeilicT614LDtZ6Pug
+         UAHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3SnnWK2Yn0kyk7GHu2M0DJEtHKPpePG30TC/rB02220=;
-        b=HRGJcyICzAd8SPjKkA2YFzQatxXkswo7uNGZgPAr1NRvDwxKCQWY/BHNfv/Iq8ojY4
-         fT6hnyjxA/amFOIVuezc0lzp8D7kBeKpnF32JAw5PFPcEZ1yi2/kl+nh2MwfjrUoOi2b
-         vLSLWRSO6pxJXtZTdXnJXBimN0dpA36vl8NeQarqLZZKOgtIAoPbW6Cf3xTEUmR0LS1f
-         zewoQeJPH6vlDI2O/WgyxoFdwyA4t118BatmHmSrWaHWDaKOS99KgMRQrennoEIZEpqF
-         x9GaSUHocHYS/VVuWb/SZEuoaPyBJySHcPiHKGVkMLJgtWGHLCHpSNKmEA2iEvQg7FHj
-         KCyg==
-X-Gm-Message-State: AFqh2kozoHd4+mOtnokwX+UnsSqaDzRTWDmJg4c7jdaQHAkyWA2rGc6L
-        3zuVDHngSmL/cRGlgPRGPZwrfWLi5BbEGy1W
-X-Google-Smtp-Source: AMrXdXvQgA5PcrwGJ6ExX4g/wBYdgRBMgQzBvslBOJ24nda1rowog9Yon9hIjf2jj7oDDELe19sSmg==
-X-Received: by 2002:a05:6a20:2a9f:b0:a4:efde:2ed8 with SMTP id v31-20020a056a202a9f00b000a4efde2ed8mr1644018pzh.0.1671755615505;
-        Thu, 22 Dec 2022 16:33:35 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id d6-20020a170902654600b0019255ab4dc8sm1118649pln.66.2022.12.22.16.33.34
+        bh=5qpVu3sN2GuUThZ9RB+4eYZTG5/t0SB6qmR3AbS+l70=;
+        b=TYMU2i3/58Qy80lWaKjkNbvTyd4bTL+oAL3haCYP/rNhxHDhnAzN1sH4+WSs6/hDVM
+         7UYAqV3fnOicUJ9HliK4S8IxvKTg+5LGwpVa5iVHZVIKDtlw3D4epEZOy75QeZKtEnHB
+         BEzqBHJu7sem8lNmPK5rr5EkegbvxogYnXNqhfhc6lbZ2CNgiSmpE6RUs+P1K1YPoBPf
+         2TqGss+MWwFS9hkge23HIdauW4gNOTNT8BTSlsG0cB0qtSVX/YmpJu2fpTFW+7hGC08p
+         o/bHfCKoL2DzEUzKQ2Nc0yuHULh3FAIa7JVFByPJql22IWOapZLVBdrORfAlEhH56w43
+         Ipww==
+X-Gm-Message-State: AFqh2kpyWu8yOwp6Q4JGSBIfympfN7E/YC8c7EJLXfXmC+vghRipTW/w
+        cg1XeSTYMB9Tld97eUaRgMGazA==
+X-Google-Smtp-Source: AMrXdXsjr7g6zJgmvJf2nNP86FhM3dZ2aK3tAps43yzHeFgEfsriOphjFvjgXLdFPCH3uTD/vS0vNQ==
+X-Received: by 2002:a17:90a:408d:b0:223:e2df:8030 with SMTP id l13-20020a17090a408d00b00223e2df8030mr1083496pjg.2.1671755840213;
+        Thu, 22 Dec 2022 16:37:20 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id l7-20020a17090b078700b00218fb3bec27sm1103723pjz.56.2022.12.22.16.37.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Dec 2022 16:33:34 -0800 (PST)
-Date:   Thu, 22 Dec 2022 16:33:31 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set
- as a write
-Message-ID: <Y6T3W9qtA3v42d0z@google.com>
-References: <20221220200923.1532710-1-maz@kernel.org>
- <20221220200923.1532710-3-maz@kernel.org>
- <Y6M4TqvJytAEq2ID@google.com>
- <86len0bql4.wl-maz@kernel.org>
+        Thu, 22 Dec 2022 16:37:19 -0800 (PST)
+Date:   Fri, 23 Dec 2022 00:37:16 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        shuah@kernel.org, bgardon@google.com, oupton@google.com,
+        peterx@redhat.com, vkuznets@redhat.com, dmatlack@google.com,
+        pgonda@google.com, andrew.jones@linux.dev
+Subject: Re: [V3 PATCH 2/2] KVM: selftests: x86: Add native hypercall support
+Message-ID: <Y6T4PJfF3nGU25Ee@google.com>
+References: <20221222230458.3828342-1-vannapurve@google.com>
+ <20221222230458.3828342-3-vannapurve@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <86len0bql4.wl-maz@kernel.org>
-X-Spam-Status: No, score=-16.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+In-Reply-To: <20221222230458.3828342-3-vannapurve@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        URI_DOTEDU,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=no
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,178 +75,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Wed, Dec 21, 2022 at 05:43:03PM +0000, Marc Zyngier wrote:
-> Hi Ricardo,
+On Thu, Dec 22, 2022, Vishal Annapurve wrote:
+> Add an API to execute hypercall as per the cpu type by checking the
+> underlying CPU. KVM emulates vmcall/vmmcall instruction by modifying
+> guest memory contents with hypercall instruction as per the cpu type.
 > 
-> On Wed, 21 Dec 2022 16:46:06 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
-> > 
-> > Hello,
-> > 
-> > On Tue, Dec 20, 2022 at 08:09:22PM +0000, Marc Zyngier wrote:
-> > > As a minor optimisation, we can retrofit the "S1PTW is a write
-> > > even on translation fault" concept *if* the vcpu is using the
-> > > HW-managed Access Flag, as setting TCR_EL1.HA is guaranteed
-> > > to result in an update of the PTE.
-> > > 
-> > > However, we cannot do the same thing for DB, as it would require
-> > > us to parse the PTs to find out if the DBM bit is set there.
-> > > This is not going to happen.
-> > > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_emulate.h | 20 +++++++++++++++++++-
-> > >  1 file changed, 19 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-> > > index fd6ad8b21f85..4ee467065042 100644
-> > > --- a/arch/arm64/include/asm/kvm_emulate.h
-> > > +++ b/arch/arm64/include/asm/kvm_emulate.h
-> > > @@ -374,6 +374,9 @@ static __always_inline int kvm_vcpu_sys_get_rt(struct kvm_vcpu *vcpu)
-> > >  static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	if (kvm_vcpu_abt_iss1tw(vcpu)) {
-> > > +		unsigned int afdb;
-> > > +		u64 mmfr1;
-> > > +
-> > >  		/*
-> > >  		 * Only a permission fault on a S1PTW should be
-> > >  		 * considered as a write. Otherwise, page tables baked
-> > > @@ -385,12 +388,27 @@ static inline bool kvm_is_write_fault(struct kvm_vcpu *vcpu)
-> > >  		 * to map the page containing the PT (read only at
-> > >  		 * first), then a permission fault to allow the flags
-> > >  		 * to be set.
-> > > +		 *
-> > > +		 * We can improve things if the guest uses AF, as this
-> > > +		 * is guaranteed to result in a write to the PTE. For
-> > > +		 * DB, however, we'd need to parse the guest's PTs,
-> > > +		 * and that's not on. DB is crap anyway.
-> > >  		 */
-> > >  		switch (kvm_vcpu_trap_get_fault_type(vcpu)) {
-> > 
-> > Nit: fault_status is calculated once when taking the fault, and passed
-> > around to all users (like user_mem_abort()). Not sure if this is because
-> > of the extra cycles needed to get it, or just style. Anyway, maybe it
-> > applies here.
+> Confidential VMs need to execute hypercall instruction without it being
+> emulated by KVM as KVM can not modify guest memory contents.
 > 
-> All these things are just fields in ESR_EL2, which we keep looking at
-> all the time. The compiler actually does a pretty good job at keeping
-> that around, specially considering that this function is inlined (at
-> least here, kvm_handle_guest_abort and kvm_user_mem_abort are merged
-> into a single monster).
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> ---
+>  .../selftests/kvm/include/x86_64/processor.h   |  3 +++
+>  .../selftests/kvm/lib/x86_64/processor.c       | 18 ++++++++++++++++++
+>  2 files changed, 21 insertions(+)
 > 
-> So passing the parameter wouldn't change a thing, and I find the above
-> more readable (I know that all the information in this function are
-> derived from the same data structure).
->
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index 4d5dd9a467e1..3617f83bb2e5 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -1039,6 +1039,9 @@ uint64_t *vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr);
+>  uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
+>  		       uint64_t a3);
+>  
+> +uint64_t kvm_native_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
+> +		       uint64_t a3);
+> +
+>  void __vm_xsave_require_permission(int bit, const char *name);
+>  
+>  #define vm_xsave_require_permission(perm)	\
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 1e93bb3cb058..429e55f2609f 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1202,6 +1202,24 @@ uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
+>  	return r;
+>  }
+>  
+> +uint64_t kvm_native_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
 
-Got it, thanks for the info.
+Just do this in kvm_hypercall().  David didn't say "don't do that", he said "don't
+do that in a single patch".  Except for fix_hypercall_test, selftests should always
+use the native hypercall instruction and not rely on KVM's patching, e.g. patching
+will go sideways if someone gets clever and makes guest code not-writable.
 
-> > 
-> > >  		case ESR_ELx_FSC_PERM:
-> > >  			return true;
-> > >  		default:
-> > > -			return false;
-> > > +			/* Can't introspect TCR_EL1 with pKVM */
-> > > +			if (kvm_vm_is_protected(vcpu->kvm))
-> > > +				return false;
-> > > +
-> > > +			mmfr1 = read_sanitised_ftr_reg(SYS_ID_AA64MMFR1_EL1);
-> > > +			afdb = cpuid_feature_extract_unsigned_field(mmfr1, ID_AA64MMFR1_EL1_HAFDBS_SHIFT);
-> > > +
-> > > +			if (afdb == ID_AA64MMFR1_EL1_HAFDBS_NI)
-> > > +				return false;
-> > > +
-> > > +			return (vcpu_read_sys_reg(vcpu, TCR_EL1) & TCR_HA);
-> > 
-> > Also tested this specific case using page_fault_test when the PT page is
-> > marked for dirty logging with and without AF. In both cases there's a
-> > single _FSC_FAULT (no PERM_FAUT) as expected, and the PT page is marked dirty
-> > in the AF case. The RO and UFFD cases also work as expected.
-> 
-> Ah, thanks for checking this.
-> 
-> > 
-> > Need to send some changes for page_fault_test as many tests assume that
-> > any S1PTW is always a PT write, and are failing. Also need to add some new
-> > tests for PTs in RO memslots (as it didn't make much sense before this
-> > change).
-> 
-> I think this is what I really quite didn't grok in these tests. They
-> seem to verify the KVM behaviour, which is not what we should check
-> for.
-> 
-> Instead, we should check for the architectural behaviour, which is
-> that if HAFDBS is enabled, we can observe updates to the PTs even when
-> we do not write to them directly.
+> +		       uint64_t a3)
 
-There are some tests checking that case (e.g., AF set by HW), but they
-also do it while interacting with dirty-logging, userfaultfd, and/or RO
-memslots. Some checks are clearly dealing with architectural behavior,
-while others are not that clear. Let me use this sample test to get more
-specific.  This test deals with HW setting the AF bit on a punched hole
-backed by userfaultfd:
+Align parameters.
 
-TEST_UFFD(guest_exec, with_af, CMD_HOLE_PT, ...):
-	1. set TCR_EL1.HA and clear the AF in the test-data PTE,
-	2. punch a hole on the test-data PTE page, and register it for
-	   userfaultfd,
-	3. execute code in the test-data page; this triggers a S1PTW,
-	4. assert that there is a userfaultfd _write_ fault on the PT page,
-	5. assert that the test-data instruction was executed,
-	6. assert that the AF is set on the test-data PTE,
+> +{
+> +	uint64_t r;
+> +
+> +	if (is_amd_cpu()) {
 
-IIUC, only checking for architectural behavior implies skipping step 4.
-And I agree, it might be a good idea to skip 4, as it actually depends
-on whether the kernel has only the previous commit, or both the previous
-and this one. The fault is a _write_ at this commit, and a _read_ at the
-previous.
+Curly brace is unnecessary.  Though I think I'd prefer to not duplicate the asm
+blob (too many darn inputs).  It's a little ugly, but I prefer it over duplicating
+the entire blob.  The approach could also likely be macrofied for other hypercall
+usage (future problem).
 
-The issue is that there are some cases where checking KVM behavior could
-be useful. For example, this dirty_logging test can also help (besides
-testing dirty-logging) for checking regressions of commit c4ad98e4b72c
-("KVM: arm64: Assume write fault on S1PTW permission fault on
-instruction fetch"):
-
-TEST_DIRTY_LOG(guest_exec, with_af, ...)
-	1. set TCR_EL1.HA and clear the AF in the test-data PTE,
-	2. enable dirty logging on the PT memslot,
-	3. execute code in the test-data page; this triggers a S1PTW,
-	4. assert that the test-data PTE page is dirty on the log,
-	5. assert that the test-data instruction was executed,
-	6. assert that the AF is set on the test-data PTE,
-
-Step 4 above is not exactly checking architectural behavior, but I think
-it's still useful.
-
-So, regarding what to do with page_fault_test. As a start, I need to go
-through all tests and make sure they pass at both this and the previous
-commit. Next, I have to identify other tests that also need to be
-relaxed a bit (removing some test asserts).
-
-Thanks,
-Ricardo
-
-> 
-> > 
-> > >  		}
-> > >  	}
-> > >  
-> > > -- 
-> > > 2.34.1
-> > > 
-> > > _______________________________________________
-> > > kvmarm mailing list
-> > > kvmarm@lists.cs.columbia.edu
-> > > https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> > 
-> > Reviewed-by: Ricardo Koller <ricarkol@google.com>
-> 
-> Thanks!
-> 
-> 	M.
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
+	asm volatile("test %[use_vmmcall], %[use_vmmcall]\n\t"
+		     "jnz 1f\n\t"
+		     "vmcall\n\t"
+		     "jmp 2f\n\t"
+		     "1: vmmcall\n\t"
+		     "2:"
+		     : "=a"(r)
+		     : "a"(nr), "b"(a0), "c"(a1), "d"(a2), "S"(a3),
+		       [use_vmmcall] "r" (is_amd_cpu()));
+	return r;
