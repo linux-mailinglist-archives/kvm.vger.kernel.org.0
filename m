@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1AEBF654A4E
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 02:01:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DA7E654A51
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 02:01:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236058AbiLWBBE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 20:01:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58388 "EHLO
+        id S235452AbiLWBBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 20:01:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235955AbiLWA7v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 19:59:51 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492DB26AF3
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:58:31 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id t16-20020aa79390000000b0057fd4bf27fbso1850567pfe.4
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:58:31 -0800 (PST)
+        with ESMTP id S235937AbiLWA7w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 19:59:52 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A47927910
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:58:32 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id a33-20020a630b61000000b00429d91cc649so1877137pgl.8
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:58:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=E5mEvk7mhTbLTbI71CnckeUYfBuaX+0urxAADq0bdpk=;
-        b=H4aiigdAaqzzU7IYxEhnMpAq+LO60LbHzZkIUHopuBtbH6R08DMSSogGhi16I6aE+4
-         rBYIQ2VLojy92J2PjyPZiHasqVnT0Ui5kZCWTATNP1Cul9XqKd/nszUe4q3i+a4O0uNF
-         bQZebRaR8FAgQDfzR6SWs/it4PXf9aFISvcDfu7stvlvsBejgW/qGrDacC5uvcsaP05G
-         NzSEC5gIE0jjBIqUWtHqUP1Xyc9t0AIcTg6eWJlbLxpb0SMx/Yww3bYWtSkzpxW/rR/F
-         c6ZwXZP4ooTQfKR+K5Oxmg1twSznhUSZNuMCeAD4BqJs9cvQednvW2HhTkFitU22C50d
-         f7uw==
+        bh=V8FAaAl0J9ffNWKaCLz4W642o24GOa7DnL8QonYcD98=;
+        b=UzY0yUdAsSHqxmLxd4OyL4bxAdzwhGWK25Flfzl+3CSyBx4kwIJVNG/QqI/lEoiQWG
+         1g9CTW0KbQfl4yxxYHicB7tZpBJS3+JDxVpagsj6ZvSPwtPG7I219mwfhejfgHJIY5TU
+         vhuuyqRnoPGDIUURZgXyzgqXqjifZseZVKmtqXslCUeBPewP7CXDFYMObhbBt/jkxuZx
+         9Q6fteMKITvfLQMXDCAl86dwX4NbXVPgBasUaJ4v7EfcPQCx9XXhZgIOGvdcj1OIJzZb
+         ayyWomna9itTTfDShpmkFAtofYY7bdQoOXkARSJzHVtMPUYKFspGFs2sIEHpHx62vnLB
+         Yj2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=E5mEvk7mhTbLTbI71CnckeUYfBuaX+0urxAADq0bdpk=;
-        b=zRjyfDOCvO0lpKMi6H5tV6aIEzCrOMJ5DrRWV7wiZMSY69KiPZVGDlpVGOm4PtD9zO
-         sR7oHL+SCV6BrH1b+3JHSFxbU34Bfbi+HIyNMlhEX5Vi8Strxf1BmohjaQtaRbtQJsSY
-         4Va4hMBbD7dbGEU7MPSU/UdSGgc5rXP4FTNxEna1zmUUITj07hb+AlUw2B+yaPg6zV17
-         1Voor2CAaU1naAGl3kP8uucqxp0SC5G6+hPULCWFgdr+PsW/7hRiEU5HNIR6VXYswhJj
-         XRPRURTkQ6V/HBd4OMq6GtmqogOetvZnqff/FsH0dlWmOXx51bFrqglMFIOPRMmsZvKP
-         QCEw==
-X-Gm-Message-State: AFqh2krON/oybB5hlztOjA9mSdW22s8lIhdOrVUClK82Opyps7doBgXW
-        Mu9MGtffZmjCVpoHTE7jCzZkxsjcCX0=
-X-Google-Smtp-Source: AMrXdXsumktbf9ORj6WvpRUFhzGjzygFSn5YpEseKjoNgVCVrMAzWGMwc4HsbeZ8JZZkARlRq26lxPKoLnE=
+        bh=V8FAaAl0J9ffNWKaCLz4W642o24GOa7DnL8QonYcD98=;
+        b=FdbXpjoX+ScTgNdQn376d9nvGIpgoAVfsoOgi8J1IZBvh8aDrpupNf2NWWoxZEpVOs
+         m4TqAslPkKmFZ9R+Ip0V2ld846Gg+3wA7hQ8AeeRYSoIQURdtpuggYit8rOczHokgDLR
+         1dirHRZ2EQ4+1oz56r2XryUeJQdcfqPHrVsdD8ns4j6Npdjdq4Adh8y+J/sk+Feu87M5
+         oqps0fIvRU2K43evhpKrAj6b+zX/ZdlaeUJqizNe4uM+uGsvJ9c0bhKzXfWBF0KnDwp5
+         lNkXzR7kiaoXg2kCGR++NNknu0QeZIc5qQ+G11Cif1CyLDdluIpplsOr4FoCIZyuUZNc
+         pqNw==
+X-Gm-Message-State: AFqh2kpQHTsfu4HD7/11SHfWXJDgEe9dBgLR87Pi26UFnPi8DcQYngg3
+        cwEAbCAkzfJLBAv7A26ldN9Xn+3ZWWo=
+X-Google-Smtp-Source: AMrXdXvFMAtq9aBAxQUI4uknZz6s0YjI8T1zwMJn1E+HEm5yUiOyL4AXuzXTzJ1SS2mW/rs793etyELbCXo=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:701:b0:219:1d0a:34a6 with SMTP id
- s1-20020a17090b070100b002191d0a34a6mr180831pjz.1.1671757109874; Thu, 22 Dec
- 2022 16:58:29 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:4d83:b0:220:1f03:129b with SMTP id
+ oj3-20020a17090b4d8300b002201f03129bmr188159pjb.0.1671757111704; Thu, 22 Dec
+ 2022 16:58:31 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 23 Dec 2022 00:57:38 +0000
+Date:   Fri, 23 Dec 2022 00:57:39 +0000
 In-Reply-To: <20221223005739.1295925-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221223005739.1295925-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221223005739.1295925-27-seanjc@google.com>
-Subject: [PATCH 26/27] KVM: x86/mmu: Add page-track API to query if a gfn is valid
+Message-ID: <20221223005739.1295925-28-seanjc@google.com>
+Subject: [PATCH 27/27] drm/i915/gvt: Drop final dependencies on KVM internal details
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -74,85 +74,50 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a page-track API to query if a gfn is "valid", i.e. is backed by a
-memslot and is visible to the guest.  This is one more step toward
-removing KVM internal details from the page-track APIs.
-
-Add a FIXME to call out that intel_gvt_is_valid_gfn() is broken with
-respect to 2MiB (or larger) guest entries, e.g. if the starting gfn is
-valid but a 2MiB page starting at the gfn covers "invalid" memory due
-to running beyond the memslot.
+Open code gpa_to_gfn() in kvmgt_page_track_write() and drop KVMGT's
+dependency on kvm_host.h, i.e. include only on kvm_page_track.h.
+KVMGT assumes "gfn == gpa >> PAGE_SHIFT" all over the place, including
+a few lines below in the same function with the same gpa, i.e. there's
+no reason to use KVM's helper for this one case.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_page_track.h |  1 +
- arch/x86/kvm/mmu/page_track.c         | 13 +++++++++++++
- drivers/gpu/drm/i915/gvt/gtt.c        | 11 ++---------
- 3 files changed, 16 insertions(+), 9 deletions(-)
+ drivers/gpu/drm/i915/gvt/gvt.h   | 3 ++-
+ drivers/gpu/drm/i915/gvt/kvmgt.c | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-index 66a0d7c34311..99e1d6eeb0fb 100644
---- a/arch/x86/include/asm/kvm_page_track.h
-+++ b/arch/x86/include/asm/kvm_page_track.h
-@@ -52,6 +52,7 @@ int kvm_page_track_register_notifier(struct kvm *kvm,
- void kvm_page_track_unregister_notifier(struct kvm *kvm,
- 					struct kvm_page_track_notifier_node *n);
+diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
+index fbfd7eafec14..4fb94b19ffde 100644
+--- a/drivers/gpu/drm/i915/gvt/gvt.h
++++ b/drivers/gpu/drm/i915/gvt/gvt.h
+@@ -34,10 +34,11 @@
+ #define _GVT_H_
  
-+bool kvm_page_track_is_valid_gfn(struct kvm *kvm, gfn_t gfn);
- int kvm_write_track_add_gfn(struct kvm *kvm, gfn_t gfn);
- int kvm_write_track_remove_gfn(struct kvm *kvm, gfn_t gfn);
- #endif /* CONFIG_KVM_EXTERNAL_WRITE_TRACKING */
-diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-index 1af431a41f71..9da071a514b3 100644
---- a/arch/x86/kvm/mmu/page_track.c
-+++ b/arch/x86/kvm/mmu/page_track.c
-@@ -264,6 +264,19 @@ enum pg_level kvm_page_track_max_mapping_level(struct kvm *kvm, gfn_t gfn,
- }
- EXPORT_SYMBOL_GPL(kvm_page_track_max_mapping_level);
+ #include <uapi/linux/pci_regs.h>
+-#include <linux/kvm_host.h>
+ #include <linux/vfio.h>
+ #include <linux/mdev.h>
  
-+bool kvm_page_track_is_valid_gfn(struct kvm *kvm, gfn_t gfn)
-+{
-+	bool ret;
-+	int idx;
++#include <asm/kvm_page_track.h>
 +
-+	idx = srcu_read_lock(&kvm->srcu);
-+	ret = kvm_is_visible_gfn(kvm, gfn);
-+	srcu_read_unlock(&kvm->srcu, idx);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(kvm_page_track_is_valid_gfn);
-+
- /*
-  * add guest page to the tracking pool so that corresponding access on that
-  * page will be intercepted.
-diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
-index 59ba6639e622..43c4fc23205d 100644
---- a/drivers/gpu/drm/i915/gvt/gtt.c
-+++ b/drivers/gpu/drm/i915/gvt/gtt.c
-@@ -51,18 +51,11 @@ static int preallocated_oos_pages = 8192;
+ #include "i915_drv.h"
+ #include "intel_gvt.h"
  
- static bool intel_gvt_is_valid_gfn(struct intel_vgpu *vgpu, unsigned long gfn)
- {
--	struct kvm *kvm = vgpu->vfio_device.kvm;
--	int idx;
--	bool ret;
--
- 	if (!vgpu->attached)
- 		return false;
+diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
+index e4227ac6ab58..a1647177d1c8 100644
+--- a/drivers/gpu/drm/i915/gvt/kvmgt.c
++++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
+@@ -1607,7 +1607,7 @@ static void kvmgt_page_track_write(gpa_t gpa, const u8 *val, int len,
+ 	mutex_lock(&info->vgpu_lock);
+ 	mutex_lock(&info->gfn_lock);
  
--	idx = srcu_read_lock(&kvm->srcu);
--	ret = kvm_is_visible_gfn(kvm, gfn);
--	srcu_read_unlock(&kvm->srcu, idx);
--
--	return ret;
-+	/* FIXME: This doesn't properly handle guest entries larger than 4K. */
-+	return kvm_page_track_is_valid_gfn(vgpu->vfio_device.kvm, gfn);
- }
+-	if (kvmgt_gfn_is_write_protected(info, gpa_to_gfn(gpa)))
++	if (kvmgt_gfn_is_write_protected(info, gpa >> PAGE_SHIFT))
+ 		intel_vgpu_page_track_handler(info, gpa,
+ 						     (void *)val, len);
  
- /*
 -- 
 2.39.0.314.g84b9a713c41-goog
 
