@@ -2,71 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DA7E654A51
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 02:01:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 28A08654A5A
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 02:04:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235452AbiLWBBL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 20:01:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58406 "EHLO
+        id S235997AbiLWBE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 20:04:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235937AbiLWA7w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 19:59:52 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A47927910
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:58:32 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id a33-20020a630b61000000b00429d91cc649so1877137pgl.8
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:58:32 -0800 (PST)
+        with ESMTP id S235968AbiLWBEB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 20:04:01 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83CCC3B413
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 17:00:18 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id m4so3580343pls.4
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 17:00:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=V8FAaAl0J9ffNWKaCLz4W642o24GOa7DnL8QonYcD98=;
-        b=UzY0yUdAsSHqxmLxd4OyL4bxAdzwhGWK25Flfzl+3CSyBx4kwIJVNG/QqI/lEoiQWG
-         1g9CTW0KbQfl4yxxYHicB7tZpBJS3+JDxVpagsj6ZvSPwtPG7I219mwfhejfgHJIY5TU
-         vhuuyqRnoPGDIUURZgXyzgqXqjifZseZVKmtqXslCUeBPewP7CXDFYMObhbBt/jkxuZx
-         9Q6fteMKITvfLQMXDCAl86dwX4NbXVPgBasUaJ4v7EfcPQCx9XXhZgIOGvdcj1OIJzZb
-         ayyWomna9itTTfDShpmkFAtofYY7bdQoOXkARSJzHVtMPUYKFspGFs2sIEHpHx62vnLB
-         Yj2Q==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9fNngnnpE2StonojfqQey1eQCIEtpFm3j4CmrqaN8gA=;
+        b=bqqhyt59RZ5/7uexDzRRAXepjZVuBZumLQVNbYyYwnmJdFK5uPPDp136NtYUkMl8go
+         ETJ/ONXb/ZNy3XuM0z+SLweQdxyzTr2v2qvLkD8QmYr7hwB4ah5TedSe+7a4byts+8fR
+         AUWCsJEPQEtoT7H+WF27A2LC9+h/fp8rHpITGkFHCfcUKDnGlWmi0YS9sZ0KVL+ZvcCl
+         8aBhox831l2QBwyqKlHZizYh+NMC9xTjjkXtZRYt8NiTVkXn/TEmpDsxCgQj9629oAeh
+         xNcnNXpCv4lrcogZAoUdn3ob2yDSRnWdYWCUAYnAuD81ohkCSwmDlKPPh3YOQ2hmUB6j
+         jTew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V8FAaAl0J9ffNWKaCLz4W642o24GOa7DnL8QonYcD98=;
-        b=FdbXpjoX+ScTgNdQn376d9nvGIpgoAVfsoOgi8J1IZBvh8aDrpupNf2NWWoxZEpVOs
-         m4TqAslPkKmFZ9R+Ip0V2ld846Gg+3wA7hQ8AeeRYSoIQURdtpuggYit8rOczHokgDLR
-         1dirHRZ2EQ4+1oz56r2XryUeJQdcfqPHrVsdD8ns4j6Npdjdq4Adh8y+J/sk+Feu87M5
-         oqps0fIvRU2K43evhpKrAj6b+zX/ZdlaeUJqizNe4uM+uGsvJ9c0bhKzXfWBF0KnDwp5
-         lNkXzR7kiaoXg2kCGR++NNknu0QeZIc5qQ+G11Cif1CyLDdluIpplsOr4FoCIZyuUZNc
-         pqNw==
-X-Gm-Message-State: AFqh2kpQHTsfu4HD7/11SHfWXJDgEe9dBgLR87Pi26UFnPi8DcQYngg3
-        cwEAbCAkzfJLBAv7A26ldN9Xn+3ZWWo=
-X-Google-Smtp-Source: AMrXdXvFMAtq9aBAxQUI4uknZz6s0YjI8T1zwMJn1E+HEm5yUiOyL4AXuzXTzJ1SS2mW/rs793etyELbCXo=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4d83:b0:220:1f03:129b with SMTP id
- oj3-20020a17090b4d8300b002201f03129bmr188159pjb.0.1671757111704; Thu, 22 Dec
- 2022 16:58:31 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 23 Dec 2022 00:57:39 +0000
-In-Reply-To: <20221223005739.1295925-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20221223005739.1295925-1-seanjc@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221223005739.1295925-28-seanjc@google.com>
-Subject: [PATCH 27/27] drm/i915/gvt: Drop final dependencies on KVM internal details
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>
-Cc:     kvm@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Yan Zhao <yan.y.zhao@intel.com>,
-        Ben Gardon <bgardon@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9fNngnnpE2StonojfqQey1eQCIEtpFm3j4CmrqaN8gA=;
+        b=F8fMAIIS2CPSu16am8TGlIJS//PfIFF3K2JFDoMlQYsUwVGSFsKHnqZ6LGJMEtWS14
+         ahkuHgyEmHIXtqykS3Hpca7uDeNjlELxpE2inlL2TGM+/iOLeEwNXxDwLNIqbycgjMN1
+         HI9PGCFs2K7S7XQJDRo0NVkKQ6rf0mbG+rU+QU5j09bwpDvCq430k7lcoDjNxqoIhIOL
+         BuAjmyg/g31UrCHyksOG+oRYvA8h2r8DoaL92nIi2ipyDDqIexS5irsIf6MGpJoeQjCB
+         pUYy6+b693lOUe4mRPRRHypbrN6/s/XlnPe73BbxTrIcTDSLOuI87BPDwICLQ7EBsjmT
+         8jww==
+X-Gm-Message-State: AFqh2koK9442uO8sOGtn7fGuQphu2p/bGNHvONJF+W2zXJFXmE/SazrS
+        qkCUeISnhCqu97N68HikhVD8oeVI9nztMXtl
+X-Google-Smtp-Source: AMrXdXtKUNrR6zj/7PH2VEbsItoUuVA4yZcHcLe5RCHjCNX53q/K79iy62BAlgWiKIhyuf9E98mKsQ==
+X-Received: by 2002:a17:902:a608:b0:189:b910:c6d2 with SMTP id u8-20020a170902a60800b00189b910c6d2mr1164911plq.1.1671757207187;
+        Thu, 22 Dec 2022 17:00:07 -0800 (PST)
+Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
+        by smtp.gmail.com with ESMTPSA id s7-20020a170902988700b0018f6e4e425dsm1088195plp.198.2022.12.22.17.00.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Dec 2022 17:00:06 -0800 (PST)
+Date:   Thu, 22 Dec 2022 17:00:03 -0800
+From:   Ricardo Koller <ricarkol@google.com>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set
+ as a write
+Message-ID: <Y6T9kxfCo86q13Iq@google.com>
+References: <20221220200923.1532710-1-maz@kernel.org>
+ <20221220200923.1532710-3-maz@kernel.org>
+ <Y6M4TqvJytAEq2ID@google.com>
+ <Y6NGcFXLtwOt0+d6@google.com>
+ <86ili3byn8.wl-maz@kernel.org>
+ <Y6TFAClKlJgkFKef@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y6TFAClKlJgkFKef@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,50 +78,103 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Open code gpa_to_gfn() in kvmgt_page_track_write() and drop KVMGT's
-dependency on kvm_host.h, i.e. include only on kvm_page_track.h.
-KVMGT assumes "gfn == gpa >> PAGE_SHIFT" all over the place, including
-a few lines below in the same function with the same gpa, i.e. there's
-no reason to use KVM's helper for this one case.
+On Thu, Dec 22, 2022 at 08:58:40PM +0000, Oliver Upton wrote:
+> On Thu, Dec 22, 2022 at 09:01:15AM +0000, Marc Zyngier wrote:
+> > On Wed, 21 Dec 2022 17:46:24 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > >  - When UFFD is in use, translation faults are reported to userspace as
+> > >    writes when from a RW memslot and reads when from an RO memslot.
+> > 
+> > Not quite: translation faults are reported as reads if TCR_EL1.HA
+> > isn't set, and as writes if it is. Ignoring TCR_EL1.HD for a moment,
+> > this matches exactly the behaviour of the page-table walker, which
+> > will update the S1 PTs only if this bit is set.
+> 
+> My bad, yes you're right. I conflated the use case here with the
+> architectural state.
+> 
+> I'm probably being way too pedantic, but I just wanted to make sure we
+> agree about the ensuing subtlety. More below:
+> 
+> > Or is it what userfaultfd does on its own? That'd be confusing...
+> > 
+> > > 
+> > >  - S1 page table memory is spuriously marked as dirty, as we presume a
+> > >    write immediately follows the translation fault. That isn't entirely
+> > >    senseless, as it would mean both the target page and the S1 PT that
+> > >    maps it are both old. This is nothing new I suppose, just weird.
+> > 
+> > s/old/young/ ?
+> > 
+> > I think you're confusing the PT access with the access that caused the
+> > PT access (I'll have that printed on a t-shirt, thank you very much).
+> 
+> I'd buy it!
+> 
+> > Here, we're not considering the cause of the PT access anymore. If
+> > TCR_EL1.HA is set, the S1 PT page will be marked as accessed even on a
+> > read, and only that page.
+> 
+> I think this is where the disconnect might be. TCR_EL1.HA == 1 suggests
+> a write could possibly follow, but I don't think it requires it. The
+> page table walker must first load the S1 PTE before writing to it.
+> 
+> From AArch64.S1Translate() (DDI0487H.a):
+> 
+>     (fault, descaddress, walkstate, descriptor) = AArch64.S1Walk(fault, walkparams, va, regime,
+> 								 ss, acctype, iswrite, ispriv);
+> 
+>     [...]
+> 
+>     new_desc = descriptor;
+>     if walkparams.ha == '1' && AArch64.FaultAllowsSetAccessFlag(fault) then
+>       // Set descriptor AF bit
+>       new_desc<10> = '1';
+> 
+>     [...]
+> 
+>     // Either the access flag was clear or AP<2> is set
+>     if new_desc != descriptor then
+>       if regime == Regime_EL10 && EL2Enabled() then
+>         s1aarch64 = TRUE;
+> 	s2fs1walk = TRUE;
+> 	aligned = TRUE;
+> 	iswrite = TRUE;
+> 	(s2fault, descupdateaddress) = AArch64.S2Translate(fault, descaddress, s1aarch64,
+> 							   ss, s2fs1walk, AccType_ATOMICRW,
+> 							   aligned, iswrite, ispriv);
+> 
+>     if s2fault.statuscode != Fault_None then
+>       return (s2fault, AddressDescriptor UNKNOWN);
+>     else
+>       descupdateaddress = descaddress;
+> 
+>     (fault, mem_desc) = AArch64.MemSwapTableDesc(fault, descriptor, new_desc,
+>     						 walkparams.ee, descupdateaddress)
+> 
+> Buried in AArch64.S1Walk() is a stage-2 walk for a read to fetch the
+> descriptor. The second stage-2 walk for write is conditioned on having
+> already fetched the stage-1 descriptor and determining the AF needs
+> to be set.
+> 
+> Relating back to UFFD: if we expect KVM to do exactly what hardware
+> does, UFFD should see an attempted read when the first walk fails
+> because of an S2 translation fault. Based on this patch, though, we'd
+> promote it to a write if TCR_EL1.HA == 1.
+> 
+> This has the additional nuance of marking the S1 PT's IPA as dirty, even
+> though it might not actually have been written to. Having said that,
+> the false positive rate should be negligible given that S1 PTs ought to
+> account for a small amount of guest memory.
 
-No functional change intended.
+Another false positive is TCR_EL1.HA == 1 and having the AF bit set in
+the PTE. This results on a write, when I don't think it should.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- drivers/gpu/drm/i915/gvt/gvt.h   | 3 ++-
- drivers/gpu/drm/i915/gvt/kvmgt.c | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/gpu/drm/i915/gvt/gvt.h b/drivers/gpu/drm/i915/gvt/gvt.h
-index fbfd7eafec14..4fb94b19ffde 100644
---- a/drivers/gpu/drm/i915/gvt/gvt.h
-+++ b/drivers/gpu/drm/i915/gvt/gvt.h
-@@ -34,10 +34,11 @@
- #define _GVT_H_
- 
- #include <uapi/linux/pci_regs.h>
--#include <linux/kvm_host.h>
- #include <linux/vfio.h>
- #include <linux/mdev.h>
- 
-+#include <asm/kvm_page_track.h>
-+
- #include "i915_drv.h"
- #include "intel_gvt.h"
- 
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index e4227ac6ab58..a1647177d1c8 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -1607,7 +1607,7 @@ static void kvmgt_page_track_write(gpa_t gpa, const u8 *val, int len,
- 	mutex_lock(&info->vgpu_lock);
- 	mutex_lock(&info->gfn_lock);
- 
--	if (kvmgt_gfn_is_write_protected(info, gpa_to_gfn(gpa)))
-+	if (kvmgt_gfn_is_write_protected(info, gpa >> PAGE_SHIFT))
- 		intel_vgpu_page_track_handler(info, gpa,
- 						     (void *)val, len);
- 
--- 
-2.39.0.314.g84b9a713c41-goog
-
+> 
+> Like I said before, I'm probably being unnecessarily pedantic :) It just
+> seems to me that the view we're giving userspace of S1PTW aborts isn't
+> exactly architectural and I want to make sure that is explicitly
+> intentional.
+>
+> --
+> Thanks,
+> Oliver
