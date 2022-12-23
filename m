@@ -2,84 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2011E655438
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 21:33:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B6AC655515
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 23:28:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232783AbiLWUda (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Dec 2022 15:33:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55434 "EHLO
+        id S231467AbiLWW2f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Dec 2022 17:28:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232555AbiLWUd2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Dec 2022 15:33:28 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8CA82AE2;
-        Fri, 23 Dec 2022 12:33:25 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DFA6F1EC0354;
-        Fri, 23 Dec 2022 21:33:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1671827604;
+        with ESMTP id S229650AbiLWW2d (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Dec 2022 17:28:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2450C1AF08
+        for <kvm@vger.kernel.org>; Fri, 23 Dec 2022 14:27:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671834471;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=g4fBVP6B/mhnkNFZJu0f1SRCvVq/AKhj/YqOZGGwvF4=;
-        b=I0K8TNt9L5H36UG2Ocm1J86itUmusbOXaZu7dcVD7JxZjkP1Z93AmpVNurMCJo8yU4QCvP
-        95+QMVqRxViDu7ciW5TGuylqPeWaN8xy+KVf6aD0dL/YBbv5voXiSDo7cuAP69uOmYnTQ8
-        xIBA3VHkmNwK4R3zzoNGHGU9/4yTrwY=
-Date:   Fri, 23 Dec 2022 21:33:16 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com
-Subject: Re: [PATCH RFC v7 00/64] Add AMD Secure Nested Paging (SEV-SNP)
- Hypervisor Support
-Message-ID: <Y6YQjJyoxKC5hfij@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
+         in-reply-to:in-reply-to:references:references;
+        bh=NtRKjrrbYIdgIGkqJ3VqinENOoahNs+OyBFqva7XmGo=;
+        b=E7DqpYKTGehP8+1P8QLubJAG/tC6tW28WOqY7A4C3iTrBE6Idrn7T1MbbG24kcb+mw1YLv
+        cEvC4nL7bTMwzmwk5GUvjNvhL3z+S7fFhe7Kmyp2Ol9yyg2GmFz3KfEasFGM5i9MGbv5O6
+        NqLv3aOTUsMbB+8dggqma1kBb0xZVt0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-652-yI8d2aWqMMW8qOTGyREusA-1; Fri, 23 Dec 2022 17:27:50 -0500
+X-MC-Unique: yI8d2aWqMMW8qOTGyREusA-1
+Received: by mail-wm1-f70.google.com with SMTP id fl12-20020a05600c0b8c00b003d96f0a7f36so1385728wmb.1
+        for <kvm@vger.kernel.org>; Fri, 23 Dec 2022 14:27:49 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NtRKjrrbYIdgIGkqJ3VqinENOoahNs+OyBFqva7XmGo=;
+        b=j3FNCAszqr2UBlh5E8hfcUlKF8pNXC+oX0aH3FK10dlRDlIzOhDd+bci93ZZ7hbvto
+         hWmv/zF/KnMIYAm9f4SyHwdurMTAes0vB82hHSJYaW1hWf7w1l93UbvAPdoX/vRjEY11
+         Q8HdbYA+z9BqAeudq++svglr127F5z/DBafawTgdDA9Nki3f0Li8AQcOyEnBwTh2j3ky
+         ZcZfLl8cWfbNVPPrfoqlJRZ7c0ABnlA2Wz6Xk5aGL57FHamN3iJPBuVbJtaZwc+IKWKB
+         ijDEUV1tKXBfaLoIViLOpU00G/RXOs+C3OcPV9p9zHZ4qvoQbduG4/cJb5BVEmUrjpOj
+         c2ZQ==
+X-Gm-Message-State: AFqh2krsx1HUIAHAmSnwdvEjdoiDUnFJIFcOAJed/5lgzZs2b85wr/b1
+        sHs4/N/BTJ0lUhMkRJZcw+Xfxe8Q4mqxc9sjAcPRmYyuKJviC3DT6xlp78qqu6T/7pWfzYKE9mK
+        0w2DLKTQyNpUK
+X-Received: by 2002:a1c:770b:0:b0:3cf:a18d:399c with SMTP id t11-20020a1c770b000000b003cfa18d399cmr8706209wmi.1.1671834468902;
+        Fri, 23 Dec 2022 14:27:48 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtypUNzb7VgDxwSmNV5kkZqdNzHIvqFLFIqRXIsvO8K841mwmSg7ycczPWKeRCh2AE62HTTFw==
+X-Received: by 2002:a1c:770b:0:b0:3cf:a18d:399c with SMTP id t11-20020a1c770b000000b003cfa18d399cmr8706186wmi.1.1671834468656;
+        Fri, 23 Dec 2022 14:27:48 -0800 (PST)
+Received: from redhat.com ([2.55.175.215])
+        by smtp.gmail.com with ESMTPSA id h12-20020a05600c350c00b003d355ad9bb7sm11729817wmq.20.2022.12.23.14.27.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Dec 2022 14:27:47 -0800 (PST)
+Date:   Fri, 23 Dec 2022 17:27:41 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        almasrymina@google.com, alvaro.karsz@solid-run.com,
+        anders.roxell@linaro.org, angus.chen@jaguarmicro.com,
+        bobby.eshleman@bytedance.com, colin.i.king@gmail.com,
+        dave@stgolabs.net, dengshaomin@cdjrlc.com, dmitry.fomichev@wdc.com,
+        elic@nvidia.com, eperezma@redhat.com, gautam.dawar@xilinx.com,
+        harshit.m.mogalapalli@oracle.com, jasowang@redhat.com,
+        leiyang@redhat.com, lingshan.zhu@intel.com, lkft@linaro.org,
+        lulu@redhat.com, m.szyprowski@samsung.com, nathan@kernel.org,
+        pabeni@redhat.com, pizhenwei@bytedance.com, rafaelmendsr@gmail.com,
+        ricardo.canuelo@collabora.com, ruanjinjie@huawei.com,
+        sammler@google.com, set_pte_at@outlook.com, sfr@canb.auug.org.au,
+        sgarzare@redhat.com, shaoqin.huang@intel.com,
+        si-wei.liu@oracle.com, stable@vger.kernel.org, stefanha@gmail.com,
+        sunnanyong@huawei.com, wangjianli@cdjrlc.com,
+        wangrong68@huawei.com, weiyongjun1@huawei.com,
+        xuanzhuo@linux.alibaba.com, yuancan@huawei.com
+Subject: Re: [GIT PULL] virtio,vhost,vdpa: features, fixes, cleanups
+Message-ID: <20221223172549-mutt-send-email-mst@kernel.org>
+References: <20221222144343-mutt-send-email-mst@kernel.org>
+ <CAHk-=wi6Gkr7hJz20+xD=pBuTrseccVgNR9ajU7=Bqbrdk1t4g@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-1-michael.roth@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CAHk-=wi6Gkr7hJz20+xD=pBuTrseccVgNR9ajU7=Bqbrdk1t4g@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:39:52PM -0600, Michael Roth wrote:
-> This patchset is based on top of the following patchset:
+On Fri, Dec 23, 2022 at 11:54:41AM -0800, Linus Torvalds wrote:
+> On Thu, Dec 22, 2022 at 11:43 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 > 
->   "[PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM"
->   https://lore.kernel.org/lkml/20221202061347.1070246-1-chao.p.peng@linux.intel.com/T/#me1dd3a4c295758b4e4ac8ff600f2db055bc5f987
+> I see none of this in linux-next.
+> 
+>                Linus
 
-Well, not quite.
-
-There's also this thing which is stuck in there:
-
-https://lore.kernel.org/r/20221205232341.4131240-1-vannapurve@google.com
-
-and I would appreciate reading that in the 0th message so that I don't
-scratch my head over why don't those patches apply and what else is
-missing...
+They were all there, just not as these commits, as I squashed fixups to
+avoid bisect breakages with some configs. Did I do wrong?
 
 -- 
-Regards/Gruss,
-    Boris.
+MST
 
-https://people.kernel.org/tglx/notes-about-netiquette
