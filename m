@@ -2,54 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7A1F65499C
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:14:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 92BBC65499F
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:14:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbiLWAN6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 19:13:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44476 "EHLO
+        id S229867AbiLWAOB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 19:14:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiLWAN4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 19:13:56 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10454264B6
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:13:56 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id o8-20020a6548c8000000b0047927da1501so1841475pgs.18
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:13:56 -0800 (PST)
+        with ESMTP id S230010AbiLWAN7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 19:13:59 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75411264B6
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:13:58 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d7-20020a170902b70700b0018f4bf00569so2334360pls.4
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:13:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=GPSysGAZa55nuUkb2Ih+MCRLyMCYc0jfLWIStqar/Ew=;
-        b=Q2fp2fViZYQmjABDbOlNm+s4gHb7QMx+a9N99tHJpeKoNus7beuKwA84TUJdATLbdG
-         sq3uqywv7wl+E2hEsT77xyG3MM+ZjxMrWEls3jNvyoGMZoQrN3nhsk1y8GLKDLimki0a
-         e3P+Jj0S6ijxEsAZ6P79qLcJoe9hN23jbdCiPY6qMe7NvoqbaaiaFK7YWTmFs8NItvSp
-         vlXJ1QhtlP8iPcA3XKnpmVGytYowLIxnHf5d931eFQd7XCESJdUV9yQdwZJoWVL+mnAZ
-         mv/VB4rCVS5MqMSC15EKTPI0ivkamF6RXmuJ423+pW7pdf62IC1lGxOkdjdp2WsTr9bk
-         IJDA==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3CXtB6MmWgwzdyhdYI6wgxsbgDPgAgTn0fSY+N59/F8=;
+        b=drpNHVsxlEQPFFOKpXIeD+HdXUVwglQVf5P3SjgrGRWkac+ExKksqwf2uJcdq6tNAY
+         dzE7DEuw9lOfVmG4IPSHg9ge2WxIe4c3sdbOoBHOuRakO+snBcaTDAt0Ex/WGTRsTYrg
+         b5/8VhWaubp4zJlxmRXrbSSUC/MfGw3nZVk63VY7yoLpxgLU80KPH4J/51ITcwYHISkT
+         Swk4EqO7j+tz4b98gJSbEof3ugrIy8hT5k/XbiZx9Q3rbrQs9Fmj+j09Njf0tHrQX6pX
+         xl2cickkH5OxZPemDApPAiesiswRMUt/uQVQeLGXWKtqOABdpBLcolSi9Qf3ao4VZmEm
+         XyRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GPSysGAZa55nuUkb2Ih+MCRLyMCYc0jfLWIStqar/Ew=;
-        b=QKbZNHRLXkDxvF2tcaWfdQb5qsWwa69SdMMIoEsoXjR3yyKdI+QHzWLWYs7HagJ49p
-         hYBCjC0lP/vpFQpTb2cUPXmqzjwOClXEGzB8nEKzXEBIebCZqa7H5RHkVdIqz6lw/c8B
-         141BQIIQFNPEsJ/yBSHeEzb6OnD3hzXaBwzTDZKw3yGziiRXBIupUTGkxx1HXKr+ZMii
-         Gn7H0+sO+AWhPdknHGusyv/kHJO1IeWKKrtKv3q1w97fRhmgddgXqZ7W6aOedgz5j/m7
-         hFERM+F00AyoqrC0vYnkVBPuhgAsgWKGW5sYlJYr70Y7hs5Nya4kWXLdIiYlVtEbQTCV
-         UrCA==
-X-Gm-Message-State: AFqh2kpaBSSar9MPBNjmjQd+mx5iQpdORUHa6WLbs+6EEObsu4XKY/Re
-        jtWuEJbqmjNIkktwGrnnhDetjOTUzzvfXPtQ
-X-Google-Smtp-Source: AMrXdXvKB4/hjodXCCmAf88j534jf/MqKWZgd91wpCO6eXU20E9ur8obGtj0TYzGdpYu2fh7hDZKmWl8JHbo5vsQ
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3CXtB6MmWgwzdyhdYI6wgxsbgDPgAgTn0fSY+N59/F8=;
+        b=N1C/Prpte7/y0v2nuWjKbaikjpN0F74AphsZ7K8GTyFtjbhhKxquaVpvH+8irtK66m
+         qSRvfTLjSb5qYcKLnYZ8n2whHq0aoXI8MZavmmqgL3OoCM4lYtxWiqSvpFo7+OtePewD
+         CHh7hWtOfpQgfLJiEp0ZyDu/CjZTOa+hLkz5faV27gIJA9zYxwoc0czUqOKvSQQBvDtd
+         KRRBmJmvjhwotoxRnMlPIJpJg8iZ8XA35ZeSZ3JGnPkhIvV/iYYLLtoExzlqfXMK8ykT
+         WCaoIU7xTJxnv8P4YgkQWK9p9X+VnUMlD4kQOhdtdkQUKd2hFa/4c8Q+C3nVRIUEhMSt
+         wYSw==
+X-Gm-Message-State: AFqh2koEb5dzyNm+RkxEifF9c4bwOTPuqe0IF5QH46dTcah1eepQeFph
+        WJ9OMuiXaV1+LGHxQ+1YZf4hmCU2IYz72jIK
+X-Google-Smtp-Source: AMrXdXv4c3s22lQ8qQxnMVuKAij3ndlrk3aTTDiiOZmva1SV1pclFaT3/V/1VZXr2KoAYvuhAnpCUB0B/vE4Bscr
 X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:aa7:8081:0:b0:56d:2e71:449 with SMTP id
- v1-20020aa78081000000b0056d2e710449mr491383pff.46.1671754435394; Thu, 22 Dec
- 2022 16:13:55 -0800 (PST)
-Date:   Fri, 23 Dec 2022 00:13:44 +0000
+ (user=vannapurve job=sendgmr) by 2002:a05:6a00:349b:b0:576:91fa:8ed0 with
+ SMTP id cp27-20020a056a00349b00b0057691fa8ed0mr603715pfb.15.1671754437896;
+ Thu, 22 Dec 2022 16:13:57 -0800 (PST)
+Date:   Fri, 23 Dec 2022 00:13:45 +0000
+In-Reply-To: <20221223001352.3873203-1-vannapurve@google.com>
 Mime-Version: 1.0
+References: <20221223001352.3873203-1-vannapurve@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221223001352.3873203-1-vannapurve@google.com>
-Subject: [V3 PATCH 0/8] KVM: selftests: SEV: selftests for fd-based private memory
+Message-ID: <20221223001352.3873203-2-vannapurve@google.com>
+Subject: [V3 PATCH 1/8] KVM: selftests: private_mem: Use native hypercall
 From:   Vishal Annapurve <vannapurve@google.com>
 To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -82,73 +84,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series implements selftests executing SEV VMs to target the feature
-implemented by Chao via:
-https://lore.kernel.org/lkml/20221220074318.GC1724933@chaop.bj.intel.com/T/
+CVMs need to execute hypercalls as per the cpu type without relying on
+KVM emulation.
 
-Below changes aim to test the fd based approach for guest private memory
-in context of SEV VMs executing on AMD SEV compatible platforms.
+Execute hypercall from the guest using native instructions.
 
-sev_private_mem_test.c file adds selftest to access private memory from
-the guest via private/shared accesses and checking if the contents can be
-leaked to/accessed by vmm via shared memory view before/after
-conversions.
+Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+---
+ tools/testing/selftests/kvm/lib/x86_64/private_mem.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-To allow SEV/SEV-ES VMs to toggle the encryption bit during memory
-conversion, support is added for mapping guest pagetables to guest va
-ranges and passing the mapping information to guests via shared pages.
-
-Updates in v3:
-1) Dropped RFC tag.
-2) Pagetable mapping logic is revisited to reduce the APIs and passing
-the information to guest is simplified.
-3) Additional changes to execute hypercall as per cpu type are added
-4) Selftest implementation is based on revised non-confidential VM
-selftests.
-
-Link to RFC v2:
-https://lore.kernel.org/lkml/20220830224259.412342-8-vannapurve@google.com/T/
-
-This series has dependency on following patch series:
-1) Series mentioned above from Chao
-2) Selftests testing fd based memory for non-confidential VMs:
-https://lore.kernel.org/lkml/20221205232341.4131240-5-vannapurve@google.com/T/
-3) Selftests to add SEV VM creation and execution from Peter and Michael:
-https://lore.kernel.org/lkml/20221018205845.770121-3-pgonda@google.com/T/
-4) Series to execute hypercall natively:
-https://lore.kernel.org/lkml/20221222230458.3828342-1-vannapurve@google.com/
-
-Github link for the patches posted as part of this series:
-https://github.com/vishals4gh/linux/commits/sev_upm_selftests_rfc_v3
-
-Vishal Annapurve (8):
-  KVM: selftests: private_mem: Use native hypercall
-  KVM: selftests: Support mapping pagetables to guest virtual memory
-  KVM: selftests: x86: Support changing gpa encryption masks
-  KVM: selftests: Split SEV VM creation logic
-  KVM: selftests: Enable pagetable mapping for SEV VMs
-  KVM: selftests: Refactor private_mem_test
-  KVM: selftests: private_mem_test: Add support for SEV VMs
-  KVM: selftests: Add private mem test for SEV VMs
-
- tools/testing/selftests/kvm/.gitignore        |   1 +
- tools/testing/selftests/kvm/Makefile          |   2 +
- .../selftests/kvm/include/kvm_util_base.h     |  88 +++++++
- .../include/x86_64/private_mem_test_helper.h  |  18 ++
- .../selftests/kvm/include/x86_64/processor.h  |   4 +
- .../selftests/kvm/include/x86_64/sev.h        |   4 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |  88 ++++++-
- .../selftests/kvm/lib/x86_64/private_mem.c    |   2 +-
- .../kvm/lib/x86_64/private_mem_test_helper.c  | 228 ++++++++++++++++++
- .../selftests/kvm/lib/x86_64/processor.c      |  80 ++++++
- tools/testing/selftests/kvm/lib/x86_64/sev.c  |  25 +-
- .../selftests/kvm/x86_64/private_mem_test.c   | 187 +-------------
- .../kvm/x86_64/sev_private_mem_test.c         |  26 ++
- 13 files changed, 562 insertions(+), 191 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/private_mem_test_helper.h
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/private_mem_test_helper.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c
-
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/private_mem.c b/tools/testing/selftests/kvm/lib/x86_64/private_mem.c
+index 2b97fc34ec4a..5a8fd8c3bc04 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/private_mem.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/private_mem.c
+@@ -24,7 +24,7 @@
+ static inline uint64_t __kvm_hypercall_map_gpa_range(uint64_t gpa, uint64_t size,
+ 	uint64_t flags)
+ {
+-	return kvm_hypercall(KVM_HC_MAP_GPA_RANGE, gpa, size >> PAGE_SHIFT, flags, 0);
++	return kvm_native_hypercall(KVM_HC_MAP_GPA_RANGE, gpa, size >> PAGE_SHIFT, flags, 0);
+ }
+ 
+ static inline void kvm_hypercall_map_gpa_range(uint64_t gpa, uint64_t size,
 -- 
 2.39.0.314.g84b9a713c41-goog
 
