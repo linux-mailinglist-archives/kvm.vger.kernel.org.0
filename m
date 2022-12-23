@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8623C6549B1
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:14:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4890E6549B5
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:15:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235882AbiLWAOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 19:14:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45340 "EHLO
+        id S235925AbiLWAPC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 19:15:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235527AbiLWAO3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 19:14:29 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B68B62CC9A
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:14:12 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id 203-20020a2502d4000000b006f94ab02400so3560237ybc.2
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:14:12 -0800 (PST)
+        with ESMTP id S235800AbiLWAOg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 19:14:36 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C138E2EFB2
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:14:14 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id x79-20020a633152000000b004785d1cf6bbso1837688pgx.6
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:14:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cg/JgGzimgcKVfqgQO+cUvnCvql5iWRhml8JYXpDmXI=;
-        b=sKa9lZOuyXiASyHL4kp9hKmVWR3zOuZrETb1wLibzqRJxzfzbNiXmD3S/Ng64NhoIV
-         dG0JMir7Cp6iNktQKkX5sBYxyju/rlNqCnClo9LzUHp/AWgs2Rqw4X/ISUkosL7Vk3hF
-         vOtpWhHppffPQzTZWm8ePcCZB4Mg0y1R3GLScM3UVXHIb1oriQz3rC37vJh6KSbT9dk9
-         QwVio4xoJMLgsmYL9wa/th4KU9kK7Ifj82VKjZ6iiKgfpicNUasXw2+pT10Imdo1LYz6
-         RsxZ4cYzbTWlVUGCpcI+kuwa0buaX4maiwjQf007tXO124EPcBnjuFRyKclaij46vGZJ
-         GmGg==
+        bh=mXjvTaFGl0oQkWFtQLkmlcU0BiyCn63t9cGXi+l6V/w=;
+        b=acLkEOZ4nvyQu2uxwn2hL7G9VDeqPcNGplhMBS2a+Yx+2SNZIeWbRIHKUjv160NG0L
+         m4d1KpHGQ2RR4P8vLlHgq6jgo7zEUuXsmdGzHVhSiFQvET6Dn4GkihmCSrLavj+zpSes
+         8CGusZoJ/ApV1KTPj7x4yLhN9l2mKIEZY9i00cpn307Av1luAJreVNajomg2aj1GLaH5
+         BjUxMIfDWuKDDZfHZN4igce+Jgfx/dOsevMY+0KgQPEcSG5w3V7gSDyz9iQ8s6oGsVO6
+         51pr/aXD8Jb0W+dVj27LxZ94KU0+dCZsk08OInfH1quXH3A4uj+O+BM3KnT33TzIPjoq
+         dv1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Cg/JgGzimgcKVfqgQO+cUvnCvql5iWRhml8JYXpDmXI=;
-        b=Om8yJbaqyjxR6MkjQpqQymQi1xhAPWSlbUrzI4ij3ERs8HPeyfS4aEcqEVn/DDhcXX
-         YDUuNXFqIvWIZDMI0kn4UQexVvRXu3SFii7/dPcmNaDDtzM7nqpAoBwpmnCqNeqvgAHi
-         +4lPaWhLpvD/RoOaShk66y7TwiHwEZtg8xBhaS+GtCy7uTl2VNXoe2JGzFhaUBXyhxdr
-         A3aa4wFUzzQwFSWoYrUiT7iHDdHjR8VG0h6KUbDdJ+malohyw7ia0mPRvE/PqCmExJlA
-         4dMh+5eU2Q/l4QsxiUrZ7YIMk3vQqKsMPQ4J6qazW1+F90VhlSgIoDttGTwNBWYGeF4m
-         btkw==
-X-Gm-Message-State: AFqh2kr5/AM6XOBQHCI+XoOF4X8cyX8jyzU/fSw317XHzIKQTU2Lm7F5
-        gQzkw4ZeyLuFqYcx+TLVL2TXXR3oelD7jygN
-X-Google-Smtp-Source: AMrXdXsGUdmfYazAx27DakjPtcERF5H/JBaT1GEG+jEsY0D2C/qM670rVyWuDdWr5cFAJrkfpPOF+5JCcq5fk0Li
+        bh=mXjvTaFGl0oQkWFtQLkmlcU0BiyCn63t9cGXi+l6V/w=;
+        b=SleboBfv3mg1PagxQnBGwuiVN+lC6LCnpk79ZkO6WMtuvjjr24/3iM3DsYYtRjg612
+         wehmqAlDfY1MwkzYk4QJrQiU+IgSoLSLQ0k4FtSDL9JhvgmC2Hk5oAHPJPjFsI4dGWug
+         Q8KtbxnGaaaNv4jtLdXQZ9V9UqH/eKrJred3ahGIa9zpjnLykuAYZstupAIFTY7MfkSr
+         LVJu4eAYfpw8RWbQgBzpalBnYdg9g9T7D26ExjynUp36g3Eq4NqMmhFcFZJenCO3k+YW
+         hasmPceYL0hFsvC+AzXnFDOOJUzkW6iOnDJ7JDeTiBprllvZ7yeXxGfpFHlQV/W2DZkO
+         JR6g==
+X-Gm-Message-State: AFqh2kqcJ9WFHzlkaVusJJA/kelH9HXoK5stPCv26cNOs+O93OfMiNeU
+        j1C/iAKndPeKZPu1cUGpprKu1Uc740r4qnjC
+X-Google-Smtp-Source: AMrXdXvICP9uAMh9F1qCb0MWER00sCMo/yyKBdu7ShrN3F6Pwkbk7bfoFJbU6crsZgKj54Km5Tgzn7z2dXwHkz4z
 X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:a25:4485:0:b0:764:2d1e:4345 with SMTP
- id r127-20020a254485000000b007642d1e4345mr404750yba.551.1671754451977; Thu,
- 22 Dec 2022 16:14:11 -0800 (PST)
-Date:   Fri, 23 Dec 2022 00:13:51 +0000
+ (user=vannapurve job=sendgmr) by 2002:a63:530a:0:b0:46f:1e8d:d6a8 with SMTP
+ id h10-20020a63530a000000b0046f1e8dd6a8mr592287pgb.248.1671754454109; Thu, 22
+ Dec 2022 16:14:14 -0800 (PST)
+Date:   Fri, 23 Dec 2022 00:13:52 +0000
 In-Reply-To: <20221223001352.3873203-1-vannapurve@google.com>
 Mime-Version: 1.0
 References: <20221223001352.3873203-1-vannapurve@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221223001352.3873203-8-vannapurve@google.com>
-Subject: [V3 PATCH 7/8] KVM: selftests: private_mem_test: Add support for SEV VMs
+Message-ID: <20221223001352.3873203-9-vannapurve@google.com>
+Subject: [V3 PATCH 8/8] KVM: selftests: Add private mem test for SEV VMs
 From:   Vishal Annapurve <vannapurve@google.com>
 To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-kselftest@vger.kernel.org
@@ -84,109 +84,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add support of executing private mem test with SEV VMs to allow
-creating SEV VMs and make the guest code do page table updates in
-case of executiong from SEV VM context.
+Add SEV VM specific private mem test to invoke selftest logic similar
+to the one executed for non-confidential VMs.
 
 Signed-off-by: Vishal Annapurve <vannapurve@google.com>
 ---
- .../include/x86_64/private_mem_test_helper.h  |  3 ++
- .../kvm/lib/x86_64/private_mem_test_helper.c  | 37 +++++++++++++++++--
- 2 files changed, 37 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/.gitignore        |  1 +
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../kvm/x86_64/sev_private_mem_test.c         | 26 +++++++++++++++++++
+ 3 files changed, 28 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/private_mem_test_helper.h b/tools/testing/selftests/kvm/include/x86_64/private_mem_test_helper.h
-index 4d32c025876c..e54870b72369 100644
---- a/tools/testing/selftests/kvm/include/x86_64/private_mem_test_helper.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/private_mem_test_helper.h
-@@ -12,4 +12,7 @@
- void execute_vm_with_private_test_mem(
- 			enum vm_mem_backing_src_type test_mem_src);
- 
-+void execute_sev_vm_with_private_test_mem(
-+			enum vm_mem_backing_src_type test_mem_src);
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index f73639dcbebb..e5c82a1cd733 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -40,6 +40,7 @@
+ /x86_64/set_sregs_test
+ /x86_64/sev_all_boot_test
+ /x86_64/sev_migrate_tests
++/x86_64/sev_private_mem_test
+ /x86_64/smaller_maxphyaddr_emulation_test
+ /x86_64/smm_test
+ /x86_64/state_test
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 83c649c9de23..a8ee7c473644 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -104,6 +104,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
+ TEST_GEN_PROGS_x86_64 += x86_64/private_mem_test
+ TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
+ TEST_GEN_PROGS_x86_64 += x86_64/set_sregs_test
++TEST_GEN_PROGS_x86_64 += x86_64/sev_private_mem_test
+ TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
+ TEST_GEN_PROGS_x86_64 += x86_64/smm_test
+ TEST_GEN_PROGS_x86_64 += x86_64/state_test
+diff --git a/tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c b/tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c
+new file mode 100644
+index 000000000000..943fdfbe41d9
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/sev_private_mem_test.c
+@@ -0,0 +1,26 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022, Google LLC.
++ */
++#define _GNU_SOURCE /* for program_invocation_short_name */
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
 +
- #endif /* SELFTEST_KVM_PRIVATE_MEM_TEST_HELPER_H */
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/private_mem_test_helper.c b/tools/testing/selftests/kvm/lib/x86_64/private_mem_test_helper.c
-index 600bd21d1bb8..36a8b1ab1c74 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/private_mem_test_helper.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/private_mem_test_helper.c
-@@ -22,6 +22,9 @@
- #include <private_mem.h>
- #include <private_mem_test_helper.h>
- #include <processor.h>
-+#include <sev.h>
++#include <private_mem_test_helper.h>
 +
-+static bool is_guest_sev_vm;
- 
- #define TEST_AREA_SLOT		10
- #define TEST_AREA_GPA		0xC0000000
-@@ -104,6 +107,8 @@ static void guest_conv_test_fn(void)
- 	GUEST_ASSERT(verify_test_area(test_area_base, TEST_MEM_DATA_PATTERN1,
- 		TEST_MEM_DATA_PATTERN1));
- 
-+	if (is_guest_sev_vm)
-+		guest_set_region_shared(guest_test_mem, guest_test_size);
- 	kvm_hypercall_map_shared((uint64_t)guest_test_mem, guest_test_size);
- 
- 	populate_guest_test_mem(guest_test_mem, TEST_MEM_DATA_PATTERN2);
-@@ -112,6 +117,9 @@ static void guest_conv_test_fn(void)
- 	GUEST_ASSERT(verify_test_area(test_area_base, TEST_MEM_DATA_PATTERN1,
- 		TEST_MEM_DATA_PATTERN5));
- 
-+	if (is_guest_sev_vm)
-+		guest_set_region_private(guest_test_mem, guest_test_size);
-+
- 	kvm_hypercall_map_private((uint64_t)guest_test_mem, guest_test_size);
- 
- 	populate_guest_test_mem(guest_test_mem, TEST_MEM_DATA_PATTERN3);
-@@ -170,14 +178,19 @@ static void host_conv_test_fn(struct kvm_vm *vm, struct kvm_vcpu *vcpu)
- 	ASSERT_GUEST_DONE(vcpu);
- }
- 
--void execute_vm_with_private_test_mem(
--			enum vm_mem_backing_src_type test_mem_src)
-+static void execute_private_mem_test(enum vm_mem_backing_src_type test_mem_src,
-+	bool is_sev_vm)
- {
- 	struct kvm_vm *vm;
- 	struct kvm_enable_cap cap;
- 	struct kvm_vcpu *vcpu;
- 
--	vm = vm_create_with_one_vcpu(&vcpu, guest_conv_test_fn);
-+	if (is_sev_vm)
-+		vm = sev_vm_init_with_one_vcpu(SEV_POLICY_NO_DBG,
-+			guest_conv_test_fn, &vcpu);
-+	else
-+		vm = vm_create_with_one_vcpu(&vcpu, guest_conv_test_fn);
-+	TEST_ASSERT(vm, "VM creation failed\n");
- 
- 	vm_check_cap(vm, KVM_CAP_EXIT_HYPERCALL);
- 	cap.cap = KVM_CAP_EXIT_HYPERCALL;
-@@ -191,7 +204,25 @@ void execute_vm_with_private_test_mem(
- 
- 	virt_map(vm, TEST_AREA_GPA, TEST_AREA_GPA, TEST_AREA_SIZE/vm->page_size);
- 
-+	if (is_sev_vm) {
-+		is_guest_sev_vm = true;
-+		sync_global_to_guest(vm, is_guest_sev_vm);
-+		sev_vm_finalize(vm, SEV_POLICY_NO_DBG);
-+	}
-+
- 	host_conv_test_fn(vm, vcpu);
- 
- 	kvm_vm_free(vm);
- }
-+
-+void execute_vm_with_private_test_mem(
-+			enum vm_mem_backing_src_type test_mem_src)
++int main(int argc, char *argv[])
 +{
-+	execute_private_mem_test(test_mem_src, false);
-+}
++	execute_sev_vm_with_private_test_mem(
++				VM_MEM_SRC_ANONYMOUS_AND_RESTRICTED_MEMFD);
 +
-+void execute_sev_vm_with_private_test_mem(
-+			enum vm_mem_backing_src_type test_mem_src)
-+{
-+	execute_private_mem_test(test_mem_src, true);
++	/* Needs 2MB Hugepages */
++	if (get_free_huge_2mb_pages() >= 1) {
++		printf("Running SEV VM private mem test with 2M pages\n");
++		execute_sev_vm_with_private_test_mem(
++				VM_MEM_SRC_ANON_HTLB2M_AND_RESTRICTED_MEMFD);
++	} else
++		printf("Skipping SEV VM private mem test with 2M pages\n");
++
++	return 0;
 +}
 -- 
 2.39.0.314.g84b9a713c41-goog
