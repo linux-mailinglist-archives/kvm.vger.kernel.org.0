@@ -2,145 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C96D06552FA
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 17:57:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A2F01655301
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 18:00:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231701AbiLWQ5E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 23 Dec 2022 11:57:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54974 "EHLO
+        id S232168AbiLWRAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 23 Dec 2022 12:00:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230527AbiLWQ5B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 23 Dec 2022 11:57:01 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEE271D3;
-        Fri, 23 Dec 2022 08:56:58 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 62AA51EC0724;
-        Fri, 23 Dec 2022 17:56:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1671814616;
+        with ESMTP id S229658AbiLWRAU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 23 Dec 2022 12:00:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173FEB87E
+        for <kvm@vger.kernel.org>; Fri, 23 Dec 2022 08:59:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671814773;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=eIrwyfehmxU3S8OfAsjHXXxAvKGYqWtRXnlHsmPvMIs=;
-        b=sQpLqtBZNyzt9lCkh02Tv1TArmXNvAYkccThgPqKToX+E4uRVMeRWpB6DQOtn0UgGq7QfH
-        xnfQYy4dQI8JTVvBFgPDRc1+UI8QVqekXcGosVLwwJkrENFYZi9w4fEUexsMn6EYHGTJQO
-        Vhfz7bb9sk0ICgmVHhqqvOh8tEjrjhY=
-Date:   Fri, 23 Dec 2022 17:56:50 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com,
-        Nikunj A Dadhania <nikunj@amd.com>
-Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
- to KVM
-Message-ID: <Y6Xd0ruz3kMij/5F@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-4-michael.roth@amd.com>
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=snC/PNGmj9/9pmnH59NmM2PmFAPOTYqksLz2IZwK8jY=;
+        b=Yq85WcgbYjEwapO7IJUoyGCogTU7EqZPw5UmgV5b96cDVeWGr3KRFDUmF70WSPhHcaUkKR
+        eRhcJR1dthoAYv0nZykc5RrEDzvAjI/venu58sxI4EZbBgClGZ3ccanDjFRHpmdh4pYV+D
+        l1XCCXEdRrmn42oGdtfCJDm1/cMtENo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-474-ezVoEr9MMYu4x6SmpvSXqQ-1; Fri, 23 Dec 2022 11:59:29 -0500
+X-MC-Unique: ezVoEr9MMYu4x6SmpvSXqQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 627E11C05AA4;
+        Fri, 23 Dec 2022 16:59:29 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3CE50C15BA0;
+        Fri, 23 Dec 2022 16:59:29 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Prevent zero period event from being repeatedly released
+Date:   Fri, 23 Dec 2022 11:58:35 -0500
+Message-Id: <20221223165834.1621170-1-pbonzini@redhat.com>
+In-Reply-To: <20221207071506.15733-2-likexu@tencent.com>
+References: 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-4-michael.roth@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
-> +       bool (*private_mem_enabled)(struct kvm *kvm);
+Queued, thanks.  Please resubmit the test though.
 
-This looks like a function returning boolean to me. IOW, you can
-simplify this to:
+Paolo
 
-diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-index 82ba4a564e58..4449aeff0dff 100644
---- a/arch/x86/include/asm/kvm-x86-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-ops.h
-@@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
- KVM_X86_OP(complete_emulated_msr)
- KVM_X86_OP(vcpu_deliver_sipi_vector)
- KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-+KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
- 
- #undef KVM_X86_OP
- #undef KVM_X86_OP_OPTIONAL
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1da0474edb2d..1b4b89ddeb55 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
- 
- 	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
- 			     int root_level);
-+	bool (*private_mem_enabled)(struct kvm *kvm);
- 
- 	bool (*has_wbinvd_exit)(void);
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index ce362e88a567..73b780fa4653 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
- 	return 0;
- }
- 
-+static bool svm_private_mem_enabled(struct kvm *kvm)
-+{
-+	if (sev_guest(kvm))
-+		return kvm->arch.upm_mode;
-+
-+	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
-+}
-+
- static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.name = "kvm_amd",
- 
-@@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 
- 	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
- 
-+	.private_mem_enabled = svm_private_mem_enabled,
-+
- 	.has_wbinvd_exit = svm_has_wbinvd_exit,
- 
- 	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 823646d601db..9a1ca59d36a4 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
- }
- EXPORT_SYMBOL_GPL(__x86_set_memory_region);
- 
-+bool kvm_arch_has_private_mem(struct kvm *kvm)
-+{
-+	return static_call(kvm_x86_private_mem_enabled)(kvm);
-+}
-+
- void kvm_arch_pre_destroy_vm(struct kvm *kvm)
- {
- 	kvm_mmu_pre_destroy_vm(kvm);
 
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
