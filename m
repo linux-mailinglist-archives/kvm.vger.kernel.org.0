@@ -2,59 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9F7D6549EA
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:58:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2ED8F654A02
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:58:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235507AbiLWA57 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 19:57:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57014 "EHLO
+        id S235746AbiLWA6X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 19:58:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231259AbiLWA5x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 19:57:53 -0500
-Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B99B821899
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:57:52 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id j18-20020a170902da9200b00189b3b16addso2393504plx.23
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:57:52 -0800 (PST)
+        with ESMTP id S235380AbiLWA55 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 19:57:57 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6403A222B9
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:57:54 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id h6-20020a17090aa88600b00223fccff2efso4000095pjq.6
+        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 16:57:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=d+Q/YQeHZWJ0vREmMTQabuLJv/+4O5g7zAHpbuOFGTs=;
-        b=cGB2Kk6wNWNAIq0pn/lG31LZ+jy1BxxG22XBitcS8CWDmp2z4Lhdnef0BGcAm+RvUh
-         dJmcq7R+7SuGck4PuyUeyUCJkW65Lvfi9fboC8f7g9EVEpDN857mWJxXqLgFMLrQWGln
-         Kjecvsk3TvvJ2gGLKH55SZwSxBxEOcPg0oFfMnU/R5GleViIAv1XjeCPLyU1wTWSJK2S
-         +iS3t0vV/qEduOYgT/AES8Jul3ZiXXRXD3dl2cOxJsXpYTudq3EXtRTOFEi2bF+1egWF
-         QP48ZSSaeO6lXbbjEfyK0KsD6kqL75R5X9rhhYcXTnDt3mgITCArhWecSITrbyBZ+xt2
-         3VTA==
+        bh=NBTVXhB5C1LBSgUVZgx9DDnSqNxpCLvQp+2Tt7daAzY=;
+        b=PlfdJuINIz79VbNXj96aWe6+xyqOcNWgoFfBKXO69TEmccmX1942p1Kyzpar864asr
+         XDLlrV4h/z3yt7ub3l4JawTQViMgB+vso07ZoO5qPG8HZ8ZwZ79n9sNsdI9q2RoIwbeG
+         AbHqwyDWwx9IAhFNAoqcInUGxLMtyU01VX9lvM0rmbSOQgWKiNnfERh1rh/elzAovs+8
+         3y70iyzOvz/NxL9S/TaVq/aBs6+nmTg/gOUzTp23eWU84817bdw4cPSr/sXHXzdSEx8S
+         P4Mp5+sUcRqXpTl/uiqPGeug+OSUTglz8ISXwjwtbnXBQir9/d83nYa1sF0t6p/+TDh4
+         ciOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=d+Q/YQeHZWJ0vREmMTQabuLJv/+4O5g7zAHpbuOFGTs=;
-        b=dcoQuyarL6KuozyXkKyhWPaY24QH8SqRGktpKmofcGF9amn8RhlBRaePdaerwrdQdJ
-         dTCpkihMbcIUTnAlh5TZWuZturpPTDgiJrldRUz/USQWb8rd2bDt/fXRC/wi+e5hXo0L
-         MYyeW/1hNanebuWvItiiC03j4UdnG1h0qJU8YdNciEc3gZ5UpN8E9BJiW/YvZru0uB2K
-         1TexuknZMBsgNNZBpmSwHr117Q2ZIjMtyHqS12w7GwYeH8WmuHNL1+WJs1XiVcTXnU8I
-         BrhLmW3wzTqBLu379c2oySnCYsIoW5dV/wW44kC+3eAgSq6opyuIgZ/Qswv2cPuw/bDd
-         BzbA==
-X-Gm-Message-State: AFqh2kqsUmER4hG983tlK1r5poWoSd2NhMKBvKWewjA2arOy6A/kpvJ7
-        K86aT35TN8Lc4xQnkd7sYkciOc6LlYo=
-X-Google-Smtp-Source: AMrXdXs1Xo/ZikoJFeArKRToXLGYmJLPRFbPAWwxlzpvnOIeRODeOddNaO6jwczXdcof/QkZXUFwsMJdkN8=
+        bh=NBTVXhB5C1LBSgUVZgx9DDnSqNxpCLvQp+2Tt7daAzY=;
+        b=w355jLr1QdeOgJL5Jo9pwdm+ZxE5jzDGLrpEGGdbGdH+tHmkeXLn5bv4xk/nibTCmb
+         EHIDpZ0fyGBXZLZNrrIJSFs+k4MLXTysABBUNbI0SsGakeh9RmMubl3FvNgLp4LbTHoB
+         SfjBkuIhm17+00558A5n98wY9pJp2EaKYDHXonEQvZKc6/iiLLVsebA6AYlw1cylAciI
+         Fhd+8gYH9mIkusdtndmQgcSs0hRbGmKEJnj0wLbWxHzL0x4/+XxiGv7Y5lBRTir5Tvyb
+         szUCWAFPDSHXZ5ge9r28Ps9aKnvY1hQEz9jfU6jOjNhjb6LYl1zuoCR34IMv2K+8eEmv
+         z3uw==
+X-Gm-Message-State: AFqh2ko9TAoxep4hyBHXSNGTJG/I4+X2OZY97fjjOfVdwXYlWDgPxb6f
+        GRMIJAVdNzwujYiSb2/ZlEMRrYfWgMk=
+X-Google-Smtp-Source: AMrXdXtuJpzQAA6YsAARKoo86Ndko68Bw/8PzP0Po4HgPrkiwdi87VkArdRLlydeD02n3c8sF2p0uUxApik=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:701:b0:219:1d0a:34a6 with SMTP id
- s1-20020a17090b070100b002191d0a34a6mr180782pjz.1.1671757072021; Thu, 22 Dec
- 2022 16:57:52 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:c155:b0:189:9a71:109b with SMTP id
+ 21-20020a170902c15500b001899a71109bmr561626plj.171.1671757073922; Thu, 22 Dec
+ 2022 16:57:53 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri, 23 Dec 2022 00:57:16 +0000
+Date:   Fri, 23 Dec 2022 00:57:17 +0000
 In-Reply-To: <20221223005739.1295925-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20221223005739.1295925-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221223005739.1295925-5-seanjc@google.com>
-Subject: [PATCH 04/27] drm/i915/gvt: Verify VFIO-pinned page is THP when
- shadowing 2M gtt entry
+Message-ID: <20221223005739.1295925-6-seanjc@google.com>
+Subject: [PATCH 05/27] drm/i915/gvt: Put the page reference obtained by KVM's gfn_to_pfn()
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
@@ -67,7 +66,7 @@ Cc:     kvm@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,60 +74,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When shadowing a GTT entry with a 2M page, explicitly verify that the
-first page pinned by VFIO is a transparent hugepage instead of assuming
-that page observed by is_2MB_gtt_possible() is the same page pinned by
-vfio_pin_pages().  E.g. if userspace is doing something funky with the
-guest's memslots, or if the page is demoted between is_2MB_gtt_possible()
-and vfio_pin_pages().
+Put the struct page reference acquired by gfn_to_pfn(), KVM's API is that
+the caller is ultimately responsible for dropping any reference.
 
-This is more of a performance optimization than a bug fix as the check
-for contiguous struct pages should guard against incorrect mapping (even
-though assuming struct pages are virtually contiguous is wrong).
+Note, kvm_release_pfn_clean() ensures the pfn is actually a refcounted
+struct page before trying to put any references.
 
-The real motivation for explicitly checking for a transparent hugepage
-after pinning is that it will reduce the risk of introducing a bug in a
-future fix for a page refcount leak (KVMGT doesn't put the reference
-acquired by gfn_to_pfn()), and eventually will allow KVMGT to stop using
-KVM's gfn_to_pfn() altogether.
-
+Fixes: b901b252b6cf ("drm/i915/gvt: Add 2M huge gtt support")
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- drivers/gpu/drm/i915/gvt/kvmgt.c | 18 ++++++++++++++++--
- 1 file changed, 16 insertions(+), 2 deletions(-)
+ drivers/gpu/drm/i915/gvt/gtt.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index 714221f9a131..6f358b4fe406 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -159,11 +159,25 @@ static int gvt_pin_guest_page(struct intel_vgpu *vgpu, unsigned long gfn,
- 			goto err;
- 		}
+diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
+index 6736d7bd94ea..9936f8bd19af 100644
+--- a/drivers/gpu/drm/i915/gvt/gtt.c
++++ b/drivers/gpu/drm/i915/gvt/gtt.c
+@@ -1181,6 +1181,7 @@ static int is_2MB_gtt_possible(struct intel_vgpu *vgpu,
+ 	unsigned long gfn = ops->get_pfn(entry);
+ 	kvm_pfn_t pfn;
+ 	int max_level;
++	int ret;
  
--		if (npage == 0)
--			base_page = cur_page;
-+		if (npage == 0) {
-+			/*
-+			 * Bail immediately to avoid unnecessary pinning when
-+			 * trying to shadow a 2M page and the host page isn't
-+			 * a transparent hugepage.
-+			 *
-+			 * TODO: support other type hugepages, e.g. HugeTLB.
-+			 */
-+			if (size == I915_GTT_PAGE_SIZE_2M &&
-+			    !PageTransHuge(cur_page))
-+				ret = -EIO;
-+			else
-+				base_page = cur_page;
-+		}
- 		else if (base_page + npage != cur_page) {
- 			gvt_vgpu_err("The pages are not continuous\n");
- 			ret = -EINVAL;
-+		}
-+		if (ret < 0) {
- 			npage++;
- 			goto err;
- 		}
+ 	if (!HAS_PAGE_SIZES(vgpu->gvt->gt->i915, I915_GTT_PAGE_SIZE_2M))
+ 		return 0;
+@@ -1200,7 +1201,9 @@ static int is_2MB_gtt_possible(struct intel_vgpu *vgpu,
+ 	if (!pfn_valid(pfn))
+ 		return -EINVAL;
+ 
+-	return PageTransHuge(pfn_to_page(pfn));
++	ret = PageTransHuge(pfn_to_page(pfn));
++	kvm_release_pfn_clean(pfn);
++	return ret;
+ }
+ 
+ static int split_2MB_gtt_entry(struct intel_vgpu *vgpu,
 -- 
 2.39.0.314.g84b9a713c41-goog
 
