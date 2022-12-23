@@ -2,67 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D946F65491B
-	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 00:05:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4058C65498F
+	for <lists+kvm@lfdr.de>; Fri, 23 Dec 2022 01:10:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229997AbiLVXFR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 22 Dec 2022 18:05:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49972 "EHLO
+        id S230253AbiLWAKL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 22 Dec 2022 19:10:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230347AbiLVXFM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 22 Dec 2022 18:05:12 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 418BE26AE6
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 15:05:12 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id v17-20020a17090abb9100b002239a73bc6eso3870984pjr.1
-        for <kvm@vger.kernel.org>; Thu, 22 Dec 2022 15:05:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4AO35zZT0Yff42sOPrRxNuOogU4VodqUrhlKgNxVvKA=;
-        b=aJF1ndtciA5/VQ0vui9aGcpiql44z/hN7BE9pna2NVdLJ7XJ8NjpnYM+v/LXYEGHyi
-         AQU/QBurR8cFL3MlJ3lSM48jPc3XlMEdi4UTE8QuhkGu5Utmj7mfO/KD7rxo6BgRR9lz
-         UY96xna912+UOVd1cuJOerNskvzrOBbgLedCEsZwAg3a0gRczRiKvlSHOH7D5nQpbab6
-         GG6i3hvw5rgYd923nxkvPybjrUk8BTiKEv9FlmamZ0eP9Rnyb3hLDWyo74/bq4f7DfrY
-         Nj1Hf7fEmRVBqskTAoqlh65Xc0rcYJ2hAXQndD3GdLe61gRga/BUv4Gcgqv0B2lpIa89
-         TztQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4AO35zZT0Yff42sOPrRxNuOogU4VodqUrhlKgNxVvKA=;
-        b=P/VIOXtcbOqVjMQuR3Kw/3Z7A7KgCtxSgLqEs9VtPlaSamtl8TIx9Fv85EqV/wG/I9
-         wqJcOxayLOD8706n0qyYJuE3pOr+ADyJSMMejiirTp4F3MNAx8UkMzTUnVmGudfILvJt
-         xif4aBy8eU813B8ty4V9QIxd6MtdnKm4GUMxd6RHaZ3xNAWKJ22BZpOh98MgCPpU7GR1
-         WFNiwL59DAIL7qP0365w3tK+xHt5lEIso9Nl8SX+RRdWDLacXePqPiS8yS+oFegxJCz/
-         4F3tqQqLEAh1eBToKTStc8QI+9I4SSr1mBOfpYQhNOQ1pSF43aT1sLNNmp870HaXzkLK
-         BCLw==
-X-Gm-Message-State: AFqh2kojYbU6ydaQjE2hDsQKZO/0/3md+4gKHUzIsJegjFtcDR1/lKR3
-        3o+psQd4pw60IHRlV8SYYZJEUXymYPX0XTUT
-X-Google-Smtp-Source: AMrXdXsE/MYtXhi7hYtJYbo7XECgkFRAmYclxWHWoMJCgI9gfsIxP+5vHkx2w3R+NlUVA7K+Tf+PgUZsxng0SPPt
-X-Received: from vannapurve2.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:41f8])
- (user=vannapurve job=sendgmr) by 2002:aa7:81d4:0:b0:577:5678:bc80 with SMTP
- id c20-20020aa781d4000000b005775678bc80mr535664pfn.62.1671750311936; Thu, 22
- Dec 2022 15:05:11 -0800 (PST)
-Date:   Thu, 22 Dec 2022 23:04:58 +0000
-In-Reply-To: <20221222230458.3828342-1-vannapurve@google.com>
-Mime-Version: 1.0
-References: <20221222230458.3828342-1-vannapurve@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221222230458.3828342-3-vannapurve@google.com>
-Subject: [V3 PATCH 2/2] KVM: selftests: x86: Add native hypercall support
-From:   Vishal Annapurve <vannapurve@google.com>
-To:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Cc:     pbonzini@redhat.com, shuah@kernel.org, bgardon@google.com,
-        seanjc@google.com, oupton@google.com, peterx@redhat.com,
-        vkuznets@redhat.com, dmatlack@google.com, pgonda@google.com,
-        andrew.jones@linux.dev, Vishal Annapurve <vannapurve@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        with ESMTP id S229524AbiLWAKJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 22 Dec 2022 19:10:09 -0500
+Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E68DF20BC7;
+        Thu, 22 Dec 2022 16:10:08 -0800 (PST)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+        by mailout.nyi.internal (Postfix) with ESMTP id 4F9775C0100;
+        Thu, 22 Dec 2022 19:10:08 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute6.internal (MEProxy); Thu, 22 Dec 2022 19:10:08 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tyhicks.com; h=
+        cc:cc:content-transfer-encoding:date:date:from:from:in-reply-to
+        :message-id:mime-version:reply-to:sender:subject:subject:to:to;
+         s=fm1; t=1671754208; x=1671840608; bh=Bwyalj77/Ba/0vMQnbq0zje7V
+        uiWq5z0TaX6kKGRNR0=; b=KCy4dgfyUMeMeQmwfxGbv9cglnPrbxi/JR/SYW63c
+        JdhPbBYtDlnEMuriLb335UXGrLgQJxMcZJotbIj44W1FgHs4ciqNN0A+MUUV0JVd
+        N6N8V0erzUuBUaHMiC/U1xBfmuxUTGS1Oz+dEPezy5hJ8x9Tz2SL1jBjzVBH9TAE
+        a+IqwM1bcb1IHe5egsxvDncLpXa1hjC797jKFMMVUe6N0HsXTUKeU38ZtdhbB8Q0
+        ak6yPt16qPuyAYlrY/O/LhJEzOO9QxwIX5UFygvNV4LqrXWOBIKauOCalgkhZeSH
+        ixa/oCdY5Ja1AV11H/rHh3RBjL+fBTM3Pd+ADdjUPYzHw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:cc:content-transfer-encoding:date:date
+        :feedback-id:feedback-id:from:from:in-reply-to:message-id
+        :mime-version:reply-to:sender:subject:subject:to:to:x-me-proxy
+        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+        1671754208; x=1671840608; bh=Bwyalj77/Ba/0vMQnbq0zje7VuiWq5z0TaX
+        6kKGRNR0=; b=at+L0lCZ2y9CRDrytM2QKfJqzz1N8lvcDIAT3gPyvqIrmf+wdHG
+        Vj7Vb9RAkAdlODKtBbR6yIOg/7adluhcS17MV6HvWDceRrn0v2ZAyAju9fmvet14
+        74On8e6u+KjWKvtXpOrquvlhSe63nqwHrZ2pNFMKsXfN9aJilgjF/bG2Ca6mTV6S
+        YM1JUwgXtphPmD74vRP+iOwmi7A9OEKvmSshegJAPhzlmCUubAwQk8VF5dawlUS3
+        fzYpAOGV+VNA91jq5ycHgvpoK8d8anoo5hclOqrjeaC8Ve3jxHWlQ4WLoaw24pB7
+        sxASflJMwnSU1ia8Ya9F12h2h1ABuUMiR/A==
+X-ME-Sender: <xms:4PGkY1cX00W14It12Bg_Q4u42HaABfvahSUl__zY9oDnbf74mnhZ5Q>
+    <xme:4PGkYzM2A6CXr2tpraVwE1v6SH-sLFDXBwUC7IW1Vrxn0uw8KVNKOlbNxnCDosSjX
+    lq4FIu4qYP4nN3Lrqw>
+X-ME-Received: <xmr:4PGkY-g9dCyL-h1CcHMX1xs6tc-zvaKREKzv3YhOVQBYTl_D416wp8pI0QhfoNQ0rYGmMtbBFiOpS8zCUlfk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrhedugddvtdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefvhihlvghrucfj
+    ihgtkhhsuceotghouggvsehthihhihgtkhhsrdgtohhmqeenucggtffrrghtthgvrhhnpe
+    ejteetjedvfeelkedutdfgleegjedufeeigeefkeejheetvdeggfefffdvgedukeenucev
+    lhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegtohguvgesth
+    ihhhhitghkshdrtghomh
+X-ME-Proxy: <xmx:4PGkY-834OPiAKTpVngdjoE5xvwR1WhdfgAIpi0Krw8L6E7fyLRomw>
+    <xmx:4PGkYxtPUIeEoGRG1fsCs5NJH8jB73DaCay0wYmjmuiP41_lUNkGlg>
+    <xmx:4PGkY9GMDpxNFXNpbQALnaVvcBs2EiJ6b8wIuarPUlpBKAFtVe9BjQ>
+    <xmx:4PGkYynepIQR_AKcj5Y_pcC2Taj-MT7zxkFDlr__k7BXICP173xzKQ>
+Feedback-ID: i78e14604:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
+ 22 Dec 2022 19:10:07 -0500 (EST)
+From:   Tyler Hicks <code@tyhicks.com>
+To:     gregkh@linuxfoundation.org, stable@vger.kernel.org
+Cc:     "Tyler Hicks" <code@tyhicks.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Gavin Shan <gshan@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        Karolina Drobnik <karolinadrobnik@gmail.com>,
+        Mike Rapoport <rppt@kernel.org>
+Subject: [PATCH 5.15 0/2] Fix kvm selftest build failures in linux-5.15.y
+Date:   Thu, 22 Dec 2022 18:09:56 -0600
+Message-Id: <20221223000958.729256-1-code@tyhicks.com>
+X-Mailer: git-send-email 2.34.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,62 +85,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add an API to execute hypercall as per the cpu type by checking the
-underlying CPU. KVM emulates vmcall/vmmcall instruction by modifying
-guest memory contents with hypercall instruction as per the cpu type.
+From: "Tyler Hicks" <code@tyhicks.com>
 
-Confidential VMs need to execute hypercall instruction without it being
-emulated by KVM as KVM can not modify guest memory contents.
+The backport of commit 05c2224d4b04 ("KVM: selftests: Fix number of
+pages for memory slot in memslot_modification_stress_test") broke the
+build of the KVM selftest memslot_modification_stress_test.c source file
+in two ways:
 
-Signed-off-by: Vishal Annapurve <vannapurve@google.com>
----
- .../selftests/kvm/include/x86_64/processor.h   |  3 +++
- .../selftests/kvm/lib/x86_64/processor.c       | 18 ++++++++++++++++++
- 2 files changed, 21 insertions(+)
+- Incorrectly assumed that max_t() was defined despite commit
+  5cf67a6051ea ("tools/include: Add _RET_IP_ and math definitions to
+  kernel.h") not being present
+- Incorrectly assumed that kvm_vm struct members could be directly
+  accessed despite b530eba14c70 ("KVM: selftests: Get rid of
+  kvm_util_internal.h") not being present
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 4d5dd9a467e1..3617f83bb2e5 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -1039,6 +1039,9 @@ uint64_t *vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr);
- uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
- 		       uint64_t a3);
- 
-+uint64_t kvm_native_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
-+		       uint64_t a3);
-+
- void __vm_xsave_require_permission(int bit, const char *name);
- 
- #define vm_xsave_require_permission(perm)	\
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 1e93bb3cb058..429e55f2609f 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -1202,6 +1202,24 @@ uint64_t kvm_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
- 	return r;
- }
- 
-+uint64_t kvm_native_hypercall(uint64_t nr, uint64_t a0, uint64_t a1, uint64_t a2,
-+		       uint64_t a3)
-+{
-+	uint64_t r;
-+
-+	if (is_amd_cpu()) {
-+		asm volatile("vmmcall"
-+		     : "=a"(r)
-+		     : "a"(nr), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
-+	} else {
-+		asm volatile("vmcall"
-+		     : "=a"(r)
-+		     : "a"(nr), "b"(a0), "c"(a1), "d"(a2), "S"(a3));
-+	}
-+
-+	return r;
-+}
-+
- const struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void)
- {
- 	static struct kvm_cpuid2 *cpuid;
+Backport the first commit, as it is simple enough. Work around the lack
+of the second commit by using the accessors to get to the kvm_vm struct
+members.
+
+Note that the linux-6.0.y backport of commit 05c2224d4b04 ("KVM:
+selftests: Fix number of pages for memory slot in
+memslot_modification_stress_test") is fine because the two prerequisite
+commits, mentioned above, are both present in v6.0.
+
+Tyler
+
+Karolina Drobnik (1):
+  tools/include: Add _RET_IP_ and math definitions to kernel.h
+
+Tyler Hicks (Microsoft) (1):
+  KVM: selftests: Fix build regression by using accessor function
+
+ tools/include/linux/kernel.h                                | 6 ++++++
+ .../selftests/kvm/memslot_modification_stress_test.c        | 2 +-
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
 -- 
-2.39.0.314.g84b9a713c41-goog
+2.34.1
 
