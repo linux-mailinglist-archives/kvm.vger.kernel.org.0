@@ -2,97 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D0C386559E6
-	for <lists+kvm@lfdr.de>; Sat, 24 Dec 2022 12:15:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EDA056559F1
+	for <lists+kvm@lfdr.de>; Sat, 24 Dec 2022 12:29:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230491AbiLXLP3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Dec 2022 06:15:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59186 "EHLO
+        id S231149AbiLXL3R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Dec 2022 06:29:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbiLXLP1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 24 Dec 2022 06:15:27 -0500
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A89BEEE24
-        for <kvm@vger.kernel.org>; Sat, 24 Dec 2022 03:15:25 -0800 (PST)
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1p92Us-006Xda-Bt; Sat, 24 Dec 2022 12:15:22 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=1VBp4nTFbVEhmp+YB6kb3QXe5jkWbW6KjWeeyT++l7U=; b=KHQ6+TQSGMaXPUI/j4CXKV1rwc
-        iGxfFvllWdj1+KX/BiICp20TdL6B/8NsJPqz8ApMEZjQosRwZ77V4KwQ3tYZ8vsrWryqOZSDfWqUS
-        +da0hGNxn/njJdMaM/l7N/ZdIE4oEu3izSQAS5rEuqmxU6na/yhTTStdQKMpAcybdpuf85QsyAnJP
-        EzD3KicgbOW+SfXI2+BCVNAuLDfStw27+mIJ/2q+YqJu/vBhrrQYLbGtgelE8AP70wP7Mvor3oaeG
-        iU0rdGT36Y9XRxU5te3EP48HZRCFM6b+b86s36MzmD5D9fiMw+jOsUHzL6cADH4R8YKBwCUJRFMz7
-        0sUg1a5Q==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1p92Up-0008Ij-I5; Sat, 24 Dec 2022 12:15:19 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1p92UW-000589-VC; Sat, 24 Dec 2022 12:15:01 +0100
-Message-ID: <ea97ca88-b354-e96b-1a16-0a1be29af50c@rbox.co>
-Date:   Sat, 24 Dec 2022 12:14:59 +0100
+        with ESMTP id S230445AbiLXL3P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 24 Dec 2022 06:29:15 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14C19B4B4
+        for <kvm@vger.kernel.org>; Sat, 24 Dec 2022 03:28:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1671881306;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JQfHFluJStqMAVjm8YivW74tDU05oCwMWLpLFH2ZJDA=;
+        b=Ev8e0IWDkSQYTZBaUuHWdlrI4gE78ofg54ksHStDyy0WFNPauRtYSJdjn0NeCAFXzi1DRr
+        xZH7f51gdIILBbLvTLacjwX4YhBe8F+pt7NLhdW8Kqh5u6GlILjjuc9Vi+gbtmVQ73svnM
+        KtAzYGqKnVI/XftZMYKsbUSUiRUkIQA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-176-H2ih_t97ORCHFoZ6OfNyJw-1; Sat, 24 Dec 2022 06:28:25 -0500
+X-MC-Unique: H2ih_t97ORCHFoZ6OfNyJw-1
+Received: by mail-wm1-f71.google.com with SMTP id i7-20020a05600c354700b003d62131fe46so5196044wmq.5
+        for <kvm@vger.kernel.org>; Sat, 24 Dec 2022 03:28:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JQfHFluJStqMAVjm8YivW74tDU05oCwMWLpLFH2ZJDA=;
+        b=b9c/M2osX7Nide2YgyG1OL3H1CZ02F3ID/xMl4l7elwV/UXbGrXMDeRXN6Qbv4VNcg
+         QPHHPmEaW1MHWA5iqg6kT5cnHK0z/aK4eDla9am/eTGDccvpXis4mL9PP5XObaSu6r6U
+         wIEawxvJ3/SMFJELWdEpK8B3L8XGJezr/BRxsaRdVAMWJgfLkL8TRVTNNve4r1XDJDPf
+         8KAezdkRQiXS/KKvl4xVlatMM2nECscotVTt3Q+ASWUw4zueFcJ4btPQK8jH5p4uE/QS
+         cbVHufB0MkHGq5wBYoz4zyOeRoyToGj43p7SGt67BTiVri2w3GRDssBkWOG/oGLOf7aC
+         420Q==
+X-Gm-Message-State: AFqh2koaGYn61nd+7LOivHexJjjoZ26YGZ3qIoR7gIIe1sO7HUQsGD2Q
+        KwKnZQfJJlHNcnQM2l8wSkOHA7/esCIfezjEk3EZdslvWAHao8DDH6VkSfdI9UPLFsfsPr4TAqF
+        9PMnsiTyP/Qm9
+X-Received: by 2002:a5d:49c3:0:b0:232:be5c:ec4a with SMTP id t3-20020a5d49c3000000b00232be5cec4amr11351831wrs.6.1671881304003;
+        Sat, 24 Dec 2022 03:28:24 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuzqzQuZiVw3dHitCdMvuaTddTiExV1+yb8w1dPWupnmnSH1RzpFeJq4F8DeQJZG9fQQBe56g==
+X-Received: by 2002:a5d:49c3:0:b0:232:be5c:ec4a with SMTP id t3-20020a5d49c3000000b00232be5cec4amr11351824wrs.6.1671881303791;
+        Sat, 24 Dec 2022 03:28:23 -0800 (PST)
+Received: from redhat.com ([2.52.27.62])
+        by smtp.gmail.com with ESMTPSA id h6-20020a056000000600b002423dc3b1a9sm5127678wrx.52.2022.12.24.03.28.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Dec 2022 03:28:22 -0800 (PST)
+Date:   Sat, 24 Dec 2022 06:28:15 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        almasrymina@google.com, alvaro.karsz@solid-run.com,
+        anders.roxell@linaro.org, angus.chen@jaguarmicro.com,
+        bobby.eshleman@bytedance.com, colin.i.king@gmail.com,
+        dave@stgolabs.net, dengshaomin@cdjrlc.com, dmitry.fomichev@wdc.com,
+        elic@nvidia.com, eperezma@redhat.com, gautam.dawar@xilinx.com,
+        harshit.m.mogalapalli@oracle.com, jasowang@redhat.com,
+        leiyang@redhat.com, lingshan.zhu@intel.com, lkft@linaro.org,
+        lulu@redhat.com, m.szyprowski@samsung.com, nathan@kernel.org,
+        pabeni@redhat.com, pizhenwei@bytedance.com, rafaelmendsr@gmail.com,
+        ricardo.canuelo@collabora.com, ruanjinjie@huawei.com,
+        sammler@google.com, set_pte_at@outlook.com, sfr@canb.auug.org.au,
+        sgarzare@redhat.com, shaoqin.huang@intel.com,
+        si-wei.liu@oracle.com, stable@vger.kernel.org, stefanha@gmail.com,
+        sunnanyong@huawei.com, wangjianli@cdjrlc.com,
+        wangrong68@huawei.com, weiyongjun1@huawei.com,
+        xuanzhuo@linux.alibaba.com, yuancan@huawei.com
+Subject: Re: [GIT PULL] virtio,vhost,vdpa: features, fixes, cleanups
+Message-ID: <20221224061932-mutt-send-email-mst@kernel.org>
+References: <20221222144343-mutt-send-email-mst@kernel.org>
+ <CAHk-=wi6Gkr7hJz20+xD=pBuTrseccVgNR9ajU7=Bqbrdk1t4g@mail.gmail.com>
+ <20221223172549-mutt-send-email-mst@kernel.org>
+ <CAHk-=whpdP7X+L8RtGsonthr7Ffug=FhR+TrFe3JUyb5-zaYCA@mail.gmail.com>
+ <20221224003445-mutt-send-email-mst@kernel.org>
+ <CAHk-=wh_cyzZgYp1pL8MDA6sioB1RndQ_fref=9V+vm9faE7fg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [RFC PATCH 1/2] KVM: x86/xen: Fix use-after-free in
- kvm_xen_eventfd_update()
-Content-Language: pl-PL, en-GB
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     dwmw2@infradead.org, paul@xen.org, seanjc@google.com
-References: <20221222203021.1944101-1-mhal@rbox.co>
- <20221222203021.1944101-2-mhal@rbox.co>
- <42483e26-10bd-88d2-308a-3407a0c54d55@redhat.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <42483e26-10bd-88d2-308a-3407a0c54d55@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wh_cyzZgYp1pL8MDA6sioB1RndQ_fref=9V+vm9faE7fg@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/24/22 09:52, Paolo Bonzini wrote:
-> On 12/22/22 21:30, Michal Luczaj wrote:
->> +	idx = srcu_read_lock(&kvm->srcu);
->> +
->>   	mutex_lock(&kvm->lock);
->>   	evtchnfd = idr_find(&kvm->arch.xen.evtchn_ports, port);
->>   	mutex_unlock(&kvm->lock);
->>   
+On Fri, Dec 23, 2022 at 10:10:30PM -0800, Linus Torvalds wrote:
+> On Fri, Dec 23, 2022 at 9:35 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > They were in  next-20221220 though.
 > 
-> This lock/unlock pair can cause a deadlock because it's inside the SRCU 
-> read side critical section.  Fortunately it's simpler to just use 
-> mutex_lock for the whole function instead of using two small critical 
-> sections, and then SRCU is not needed.
+> So, perfect for the *next* merge window.
+> 
+> Do you understand what the word "next" means? We don't call it
+> "linux-this", do we?
+> 
+> This is not a new rule. Things are supposed to be ready *before* the
+> merge window (that's what makes it "next", get it?).
+> 
+> I will also point you to to
+> 
+>   https://lore.kernel.org/lkml/CAHk-=wj_HcgFZNyZHTLJ7qC2613zphKDtLh6ndciwopZRfH0aQ@mail.gmail.com/
+> 
+> where I'm being pretty damn clear about things.
+> 
+> And before you start bleating about "I needed more heads up", never
+> mind that this isn't even a new rule, and never mind what that "next"
+> word means, let me just point to the 6.1-rc6 notice too:
+> 
+>   https://lore.kernel.org/lkml/CAHk-=wgUZwX8Sbb8Zvm7FxWVfX6CGuE7x+E16VKoqL7Ok9vv7g@mail.gmail.com/
+> 
+> and if the meaning of "next" has eluded you all these years, maybe it
+> was high time you learnt. Hmm?
+> 
+>               Linus
 
-Ah, I didn't think using a single mutex_lock would be ok. And maybe that's
-a silly question, but how can this lock/unlock pair cause a deadlock? My
-assumption was it's a *sleepable* RCU after all.
+Yea I really screwed up with this one. High time I learned that "no
+fallout from testing" most likely does not mean "no bugs" but instead
+"you forgot to push to next". Putting procedures in place now to
+check automatically.
 
-> However, the same issue exists in kvm_xen_hcall_evtchn_send where 
-> idr_find is not protected by kvm->lock.  In that case, it is important 
-> to use rcu_read_lock/unlock() around it, because idr_remove() will *not* 
-> use synchronize_srcu() to wait for readers to complete.
 
-Isn't kvm_xen_hcall_evtchn_send() already protected by srcu_read_lock()?
+-- 
+MST
 
-vcpu_enter_guest
-  kvm_vcpu_srcu_read_lock		<--
-  kvm_x86_handle_exit
-    vmx_handle_exit
-      __vmx_handle_exit (via kvm_vmx_exit_handlers)
-        kvm_emulate_hypercall
-          kvm_xen_hypercall
-            kvm_xen_hcall_evtchn_send
-
-Thanks,
-Michal
