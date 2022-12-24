@@ -2,63 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE419655A0C
-	for <lists+kvm@lfdr.de>; Sat, 24 Dec 2022 13:00:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CA2D655A1B
+	for <lists+kvm@lfdr.de>; Sat, 24 Dec 2022 13:19:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231133AbiLXMAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 24 Dec 2022 07:00:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40110 "EHLO
+        id S231135AbiLXMTr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 24 Dec 2022 07:19:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229570AbiLXMAr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 24 Dec 2022 07:00:47 -0500
+        with ESMTP id S229615AbiLXMTp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 24 Dec 2022 07:19:45 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59353310
-        for <kvm@vger.kernel.org>; Sat, 24 Dec 2022 04:00:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFD7AD10C;
+        Sat, 24 Dec 2022 04:19:44 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B44B660A5A
-        for <kvm@vger.kernel.org>; Sat, 24 Dec 2022 12:00:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 093F5C433D2;
-        Sat, 24 Dec 2022 12:00:45 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6A3DB6098A;
+        Sat, 24 Dec 2022 12:19:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD3F7C433D2;
+        Sat, 24 Dec 2022 12:19:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1671883245;
-        bh=m2EiFEyisQ9bmq/xgqzbRGVb+gogXJXymw1uS+HVbo4=;
+        s=k20201202; t=1671884383;
+        bh=7UnOgNqNNGkq1j7WPH+xcgypxvXyh8WRz4m5mCEWNZk=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=JbF9kr9jYH1y/IzjuATj80ZAE6QwqcRuvDkqjjwbrEHnHKZyLzaT5RsRODWlThPIF
-         a3hsfQK7uMzvFrpIcapk330TcJ1ElBElbnTE3N9IdaQ/0S5rrfaC9hGhpo8EWItBot
-         RkLcFd9fZ4WHeJS9XfVZRgfJtK97E3K98j/+oK0PiA3ufVsshd1CczVjwWNorkBkse
-         /yJsyA+BRFvaxsFfgyrwJGqqFAde1ZfS9Od944deiTwLwJ+HpcxVxfQjjQ3So+77Yt
-         R1/0q6IE0Xmzhj5mX7OCfG5frOdG+ro/AVffjLixpUzO3yn71I0sufQ6rAfI5lTubL
-         z2nVa8jP2FzPQ==
+        b=E/G4HzOUKAk4mtpPu05c6/cGgYsSlTFgrDa70JvlD7S3x2fhnr7/HHh51JKs9UK7E
+         ZdAnRCRhZkLzfmJFFK52Gb6NxlIfZ+UXd4tkzFNta0SFWLu3F4jkHgc1PbY/zXmfgE
+         MgpwqBJe5tSZtFF2NQErKLmPMR3FBko+TX2ejupaosYucx3zvwAJb8MNVGp8wzSOBp
+         PbIntcez+NbcasbEut/mIq1PlZWIt/LbFVAlmto2QMo4DvRRyvkEWqtpsFstzo/8UN
+         dTJezRaA9eIH7NxZZKtWqPIB+NzMs5MHVuqJKaUW6FISEAf27qJvIerEovWTvJA5um
+         7Vz/fccD0jDFw==
 Received: from host81-132-227-111.range81-132.btcentralplus.com ([81.132.227.111] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1p93Ck-00EuJg-L8;
-        Sat, 24 Dec 2022 12:00:42 +0000
-Date:   Sat, 24 Dec 2022 11:59:19 +0000
-Message-ID: <878rixf1wo.wl-maz@kernel.org>
+        id 1p93V7-00EuoY-Bv;
+        Sat, 24 Dec 2022 12:19:41 +0000
+Date:   Sat, 24 Dec 2022 12:18:16 +0000
+Message-ID: <877cyhf113.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Ricardo Koller <ricarkol@google.com>, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH 2/3] KVM: arm64: Handle S1PTW translation with TCR_HA set as a write
-In-Reply-To: <Y6TFAClKlJgkFKef@google.com>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 1/3] KVM: arm64: Fix S1PTW handling on RO memslots
+In-Reply-To: <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
 References: <20221220200923.1532710-1-maz@kernel.org>
-        <20221220200923.1532710-3-maz@kernel.org>
-        <Y6M4TqvJytAEq2ID@google.com>
-        <Y6NGcFXLtwOt0+d6@google.com>
-        <86ili3byn8.wl-maz@kernel.org>
-        <Y6TFAClKlJgkFKef@google.com>
+        <20221220200923.1532710-2-maz@kernel.org>
+        <CAMj1kXE57xTzkmdhQzxOBSePVzUCS5GW7PAVvx+iF+3UHv0OrA@mail.gmail.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 81.132.227.111
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, ricarkol@google.com, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, will@kernel.org
+X-SA-Exim-Rcpt-To: ardb@kernel.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, will@kernel.org, qperret@google.com, stable@vger.kernel.org
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -70,142 +72,72 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 22 Dec 2022 20:58:40 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
+On Thu, 22 Dec 2022 13:01:55 +0000,
+Ard Biesheuvel <ardb@kernel.org> wrote:
 > 
-> On Thu, Dec 22, 2022 at 09:01:15AM +0000, Marc Zyngier wrote:
-> > On Wed, 21 Dec 2022 17:46:24 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > >  - When UFFD is in use, translation faults are reported to userspace as
-> > >    writes when from a RW memslot and reads when from an RO memslot.
-> > 
-> > Not quite: translation faults are reported as reads if TCR_EL1.HA
-> > isn't set, and as writes if it is. Ignoring TCR_EL1.HD for a moment,
-> > this matches exactly the behaviour of the page-table walker, which
-> > will update the S1 PTs only if this bit is set.
+> On Tue, 20 Dec 2022 at 21:09, Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > A recent development on the EFI front has resulted in guests having
+> > their page tables baked in the firmware binary, and mapped into
+> > the IPA space as part as a read-only memslot.
+> >
+> > Not only this is legitimate, but it also results in added security,
+> > so thumbs up. However, this clashes mildly with our handling of a S1PTW
+> > as a write to correctly handle AF/DB updates to the S1 PTs, and results
+> > in the guest taking an abort it won't recover from (the PTs mapping the
+> > vectors will suffer freom the same problem...).
+> >
+> > So clearly our handling is... wrong.
+> >
+> > Instead, switch to a two-pronged approach:
+> >
+> > - On S1PTW translation fault, handle the fault as a read
+> >
+> > - On S1PTW permission fault, handle the fault as a write
+> >
+> > This is of no consequence to SW that *writes* to its PTs (the write
+> > will trigger a non-S1PTW fault), and SW that uses RO PTs will not
+> > use AF/DB anyway, as that'd be wrong.
+> >
+> > Only in the case described in c4ad98e4b72c ("KVM: arm64: Assume write
+> > fault on S1PTW permission fault on instruction fetch") do we end-up
+> > with two back-to-back faults (page being evicted and faulted back).
+> > I don't think this is a case worth optimising for.
+> >
+> > Fixes: c4ad98e4b72c ("KVM: arm64: Assume write fault on S1PTW permission fault on instruction fetch")
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > Cc: stable@vger.kernel.org
 > 
-> My bad, yes you're right. I conflated the use case here with the
-> architectural state.
+> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 > 
-> I'm probably being way too pedantic, but I just wanted to make sure we
-> agree about the ensuing subtlety. More below:
-> 
-> > Or is it what userfaultfd does on its own? That'd be confusing...
-> > 
-> > > 
-> > >  - S1 page table memory is spuriously marked as dirty, as we presume a
-> > >    write immediately follows the translation fault. That isn't entirely
-> > >    senseless, as it would mean both the target page and the S1 PT that
-> > >    maps it are both old. This is nothing new I suppose, just weird.
-> > 
-> > s/old/young/ ?
-> > 
-> > I think you're confusing the PT access with the access that caused the
-> > PT access (I'll have that printed on a t-shirt, thank you very much).
-> 
-> I'd buy it!
-> 
-> > Here, we're not considering the cause of the PT access anymore. If
-> > TCR_EL1.HA is set, the S1 PT page will be marked as accessed even on a
-> > read, and only that page.
-> 
-> I think this is where the disconnect might be. TCR_EL1.HA == 1 suggests
-> a write could possibly follow, but I don't think it requires it. The
-> page table walker must first load the S1 PTE before writing to it.
+> I have tested this patch on my TX2 with one of the EFI builds in
+> question, and everything works as before (I never observed the issue
+> itself)
 
-Ah, you're talking of the write to the PTE. Too many writes!
-
-My reasoning is based on Rule LFTXR in DDI0487I.a, which says:
-
-"When the PE performs a hardware update of the AF, it sets the AF to 1
- in the corresponding descriptor in memory, in a coherent manner,
- using an atomic read-modify-write of that descriptor."
-
-An atomic-or operation fits this description, and I cannot see
-anything in the architecture that would prevent the write of a PTE
-even if AF is already set, such as mandating something like a
-test-and-set or compare-and-swap.
-
-I'm not saying this is the only possible implementation, or even a
-good one. But I don't think this is incompatible with what the
-architecture mandates.
+If you get the chance, could you try with non-4kB page sizes? Here, I
+could only reproduce it with 16kB pages. It was firing like clockwork
+on Cortex-A55 with that.
 
 > 
-> From AArch64.S1Translate() (DDI0487H.a):
+> Regression-tested-by: Ard Biesheuvel <ardb@kernel.org>
 > 
->     (fault, descaddress, walkstate, descriptor) = AArch64.S1Walk(fault, walkparams, va, regime,
-> 								 ss, acctype, iswrite, ispriv);
-> 
->     [...]
-> 
->     new_desc = descriptor;
->     if walkparams.ha == '1' && AArch64.FaultAllowsSetAccessFlag(fault) then
->       // Set descriptor AF bit
->       new_desc<10> = '1';
-> 
->     [...]
-> 
->     // Either the access flag was clear or AP<2> is set
->     if new_desc != descriptor then
->       if regime == Regime_EL10 && EL2Enabled() then
->         s1aarch64 = TRUE;
-> 	s2fs1walk = TRUE;
-> 	aligned = TRUE;
-> 	iswrite = TRUE;
-> 	(s2fault, descupdateaddress) = AArch64.S2Translate(fault, descaddress, s1aarch64,
-> 							   ss, s2fs1walk, AccType_ATOMICRW,
-> 							   aligned, iswrite, ispriv);
-> 
->     if s2fault.statuscode != Fault_None then
->       return (s2fault, AddressDescriptor UNKNOWN);
->     else
->       descupdateaddress = descaddress;
-> 
->     (fault, mem_desc) = AArch64.MemSwapTableDesc(fault, descriptor, new_desc,
->     						 walkparams.ee, descupdateaddress)
-> 
-> Buried in AArch64.S1Walk() is a stage-2 walk for a read to fetch the
-> descriptor. The second stage-2 walk for write is conditioned on having
-> already fetched the stage-1 descriptor and determining the AF needs
-> to be set.
+> For the record, the EFI build in question targets QEMU/mach-virt and
+> switches to a set of read-only page tables in emulated NOR flash
+> straight out of reset, so it can create and populate the real page
+> tables with MMU and caches enabled. EFI does not use virtual memory or
+> paging so managing access flags or dirty bits in hardware is unlikely
+> to add any value, and it is not being used at the moment. And given
+> that this is emulated NOR flash, any ordinary write to it tears down
+> the r/o memslot altogether, and kicks the NOR flash emulation in QEMU
+> into programming mode, which is fully based on MMIO emulation and does
+> not use a memslot at all. IOW, even if we could figure out what store
+> the PTW was attempting to do, it is always going to be rejected since
+> the r/o page tables can only be modified by 'programming' the NOR
+> flash sector.
 
-The question is whether this is one possible implementation, or the
-only possible implementation. My bet is on the former.
+Indeed, and this would be a pretty dodgy setup anyway.
 
-> Relating back to UFFD: if we expect KVM to do exactly what hardware
-> does, UFFD should see an attempted read when the first walk fails
-> because of an S2 translation fault. Based on this patch, though, we'd
-> promote it to a write if TCR_EL1.HA == 1.
-> 
-> This has the additional nuance of marking the S1 PT's IPA as dirty, even
-> though it might not actually have been written to. Having said that,
-> the false positive rate should be negligible given that S1 PTs ought to
-> account for a small amount of guest memory.
-> 
-> Like I said before, I'm probably being unnecessarily pedantic :) It just
-> seems to me that the view we're giving userspace of S1PTW aborts isn't
-> exactly architectural and I want to make sure that is explicitly
-> intentional.
-
-I think it is perfectly fine to be pedantic about these things,
-because they really matter.
-
-I still think that this change doesn't violate the architecture. But
-at the same time, I see some value in strictly following what the HW
-does, specially given that this only optimises the case where:
-
-- S1 PTs do not have a pre-existing S2 mapping (either placed there by
-  the VMM, or swapped out)
-
-- TCR_EL1.HA==1
-
-which is such a corner case that nobody will loose any sleep over it
-(and I'll buy beer to anyone who can come up with a real workload
-where this optimisation actually matters).
-
-So my suggestion is to drop the change altogether, and stick with the
-original fix.
-
-Thanks,
+Thanks for having had a look,
 
 	M.
 
