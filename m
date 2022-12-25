@@ -2,109 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3F5BD655D3C
-	for <lists+kvm@lfdr.de>; Sun, 25 Dec 2022 13:48:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 47D96655D9B
+	for <lists+kvm@lfdr.de>; Sun, 25 Dec 2022 17:08:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229746AbiLYMs2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Dec 2022 07:48:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58616 "EHLO
+        id S231136AbiLYQIY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 25 Dec 2022 11:08:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiLYMs0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Dec 2022 07:48:26 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D2F8F60;
-        Sun, 25 Dec 2022 04:48:25 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id d4so287419wrw.6;
-        Sun, 25 Dec 2022 04:48:25 -0800 (PST)
+        with ESMTP id S229592AbiLYQIW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 25 Dec 2022 11:08:22 -0500
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED6512DFE
+        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 08:08:20 -0800 (PST)
+Received: by mail-wr1-x42f.google.com with SMTP id z10so8489111wrh.10
+        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 08:08:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Wk1BYg8FM+pEOgDUvLnl6H2w5OLbpMOtJjAehLPuXXg=;
-        b=YHiNy0AmTytHP/zM9DGOTXAdMVIWPHQKGN7JAJo6k+uIomMU75y8IHyPEW+ES0OPdr
-         M/+FA3SefMb7j5210TxukQhIYcpJOzlHYzq/dJ2mbqVM7OC90BvO2+tNBU7RXjHfGHpA
-         8MV3QQhFxANj+r9fYGZjR7hR5SF1/LOP+/OBVJeKHB5EJnkLIhpe99srhnuDwIRFpGeb
-         58S19os2iTMy2PrOAXYL2nYfWnx2ZFrdxSRgodtYPV8ddBtikcqUxqbxLlemcUJR0j1y
-         PBOtRSXMPqsp9BWYKw/nq8l9UedKeXsYf8ZR/tt+OzA9ebBGfVYHL6n3RSznSiQy+J/3
-         WXYw==
+        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K1DFvd/qB2iPwiRdxjvsshI/YDS4Nv+p2asGKuDLehw=;
+        b=FPGMvd6ycy/DVoukakccjqVpVwpmaFpEdiWorn7nG/ecxljNVmYVFoCUxVKoUYCWmh
+         LqsfJKIyBB1nGMaEAyPBq+p1/N5qXneDl2fiF5BkMe+t7P8ZuwX3k0wyJi0RFY05xYwL
+         1k9UsUvoZsL+GGRDHb/+rPcNi9tfaKFgLONAkRzIzAc+vevndauE/dqne8eoqSWxAmTg
+         +iPRApnS9NHVmRzpkj8nOy8Oio4JSYis4LCc9EHOtfmkgSOEiAbGQrVAFkuqH9FQcmk0
+         5Rok7W7LuwKbv5BmWfNAA6YY8t9exYcmHcZHdZ0+hwbqF0xnpKFeKU0AYV5S6MK4pUXk
+         oMCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wk1BYg8FM+pEOgDUvLnl6H2w5OLbpMOtJjAehLPuXXg=;
-        b=omIRn/X/YBL7n6QTteyVXhX6Rck9IqlJHaLTL+hfcJiybfw7+LROX5A7ueC+i4YlfS
-         92KGhFNtT/Zr8HgnLF3FyHQEBDLWx8h8VIgfJc6cEaQmZiW+YfLvlJseyE0JCAqqTJyP
-         YSm9PJL+1c/lOouOVAjmq6ENK2FQMB7Yqs/AwL/Pc6n4cJHlyxzHGEu3PK13za/brsql
-         AkOPKmUoBj7BdAi4cWip1F+1w8J7pd36/O6OO7GOroKaDUsgYeUrPkcgLCdtwvpGik0O
-         APQpY/sWkiimbJ7GbDNVImvG1wNtWgpwEouSFMf20Owz4tZJjrEIsGTq4opBqFVlzugJ
-         M3Qg==
-X-Gm-Message-State: AFqh2kqQbBb4A04RbsN31miqBYNu79V1D7RnEjn0ByhGeJGGgPrgr++1
-        vN24qCEftud4dq3uh644MZqGYF7QxPPEa5VBePU=
-X-Google-Smtp-Source: AMrXdXsx0pPjFgu/n8lPaCTSb+6KPZ4hC0xDpuJIX+7IWbqDf6CjFGfegRUnmN1X3F1HeoBXqGZHY8pfUUl/X7KgcQ0=
-X-Received: by 2002:a5d:4e4b:0:b0:242:4ab7:5a19 with SMTP id
- r11-20020a5d4e4b000000b002424ab75a19mr275499wrt.389.1671972503776; Sun, 25
- Dec 2022 04:48:23 -0800 (PST)
+        h=to:subject:message-id:date:from:reply-to:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K1DFvd/qB2iPwiRdxjvsshI/YDS4Nv+p2asGKuDLehw=;
+        b=DrBt/EQG4gkTIHu4md6ubg4k1Cb2j/HKiWbVVN2r3d2MN95dsQmBYU/E3AnpmIZGRm
+         wErIm7HeVJzKWtxeXhD6sQaxCuRq65z3kdoKQo1eBZOmima8YhDSyBsF5OzCy1srKmye
+         FLCPfyzclAHWmHDAEaIlaVpVqbuch4N5qTRlpstlnIFm2pa0AbDbym3y2usxIv7aTq/2
+         JM0L4ashy576Eq3hf5ZL0WhNHCEZ8VrNyaP7xCOmd7n/KCYxHWPM1rFtdcPw94hJ9w8j
+         5DJhFsPgtwgCJvMD9KqZi+VcX4QjnABxZijPbL2BuhPC6WnC2TTonoR/+xa79QDf2qZ5
+         gJ6Q==
+X-Gm-Message-State: AFqh2krfN22b6IPou4JkE2WW00/FoSy/bzWa7/J7msS4UqwNw27w6FWa
+        Fn3In5FIqC2fNufv5F1cb0vKqrCNGJjCQ05rGB8=
+X-Google-Smtp-Source: AMrXdXuF3gbk+gWs5BSluoV6iqWDFvC7ULadlRazruLVPp1Y5pz2sj+54mU7/xAOjUBZkywO5USBLOPyUXCbSooPLP4=
+X-Received: by 2002:adf:f351:0:b0:241:c595:9f05 with SMTP id
+ e17-20020adff351000000b00241c5959f05mr750757wrp.439.1671984499471; Sun, 25
+ Dec 2022 08:08:19 -0800 (PST)
 MIME-Version: 1.0
-From:   Hao Peng <flyingpenghao@gmail.com>
-Date:   Sun, 25 Dec 2022 20:48:26 +0800
-Message-ID: <CAPm50aKYh-qXt_MmQvbSH6Tye=yxrwAp_x_jcJHh=8ZoA=1P_A@mail.gmail.com>
-Subject: [PATCH v2] KVM: use unified srcu interface function
-To:     pbonzini@redhat.com
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        linux-kernel@vger.kernel.org
+Received: by 2002:a05:6020:400d:b0:22f:eab8:86e8 with HTTP; Sun, 25 Dec 2022
+ 08:08:18 -0800 (PST)
+Reply-To: thajxoa@gmail.com
+From:   Thaj Xoa <milleymilley325@gmail.com>
+Date:   Sun, 25 Dec 2022 16:08:18 +0000
+Message-ID: <CANf+LmtfC+3a13w22G+2H_-pS+TQWZBxLJP3qEoz4PSkKP=Q9g@mail.gmail.com>
+Subject: 
+To:     undisclosed-recipients:;
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=4.5 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+        SPF_PASS,UNDISC_FREEM autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Peng Hao <flyingpeng@tencent.com>
+-- 
+Good Day Dearest,
 
-kvm->irq_routing is protected by kvm->irq_srcu.
+ I am Mrs. Thaj Xoa from Vietnam, I Have an important message I want
+to tell you please reply back for more details.
 
-Signed-off-by: Peng Hao <flyingpeng@tencent.com>
----
- virt/kvm/irqchip.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
-index 1e567d1f6d3d..d3ccfe922880 100644
---- a/virt/kvm/irqchip.c
-+++ b/virt/kvm/irqchip.c
-@@ -18,6 +18,10 @@
- #include <linux/export.h>
- #include <trace/events/kvm.h>
-
-+#define kvm_get_irq_routing(kvm) \
-+       srcu_dereference_check((kvm)->irq_routing, &(kvm)->irq_srcu,    \
-+                               lockdep_is_held(&(kvm)->irq_lock))
-+
- int kvm_irq_map_gsi(struct kvm *kvm,
-                    struct kvm_kernel_irq_routing_entry *entries, int gsi)
- {
-@@ -25,8 +29,7 @@ int kvm_irq_map_gsi(struct kvm *kvm,
-        struct kvm_kernel_irq_routing_entry *e;
-        int n = 0;
-
--       irq_rt = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
--                                       lockdep_is_held(&kvm->irq_lock));
-+       irq_rt = kvm_get_irq_routing(kvm);
-        if (irq_rt && gsi < irq_rt->nr_rt_entries) {
-                hlist_for_each_entry(e, &irq_rt->map[gsi], link) {
-                        entries[n] = *e;
-@@ -216,7 +219,7 @@ int kvm_set_irq_routing(struct kvm *kvm,
-        }
-
-        mutex_lock(&kvm->irq_lock);
--       old = rcu_dereference_protected(kvm->irq_routing, 1);
-+       old = kvm_get_irq_routing(kvm);
-        rcu_assign_pointer(kvm->irq_routing, new);
-        kvm_irq_routing_update(kvm);
-        kvm_arch_irq_routing_update(kvm);
---
-2.27.0
+Regards
+Mrs. Thaj xoa
