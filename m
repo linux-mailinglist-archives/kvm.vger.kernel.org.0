@@ -2,123 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B02D76560FF
-	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 09:00:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 705376561C3
+	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 11:09:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231794AbiLZIAK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Dec 2022 03:00:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37624 "EHLO
+        id S231658AbiLZKJN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Dec 2022 05:09:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231585AbiLZIAF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Dec 2022 03:00:05 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F44B115E;
-        Mon, 26 Dec 2022 00:00:03 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id 17so10227159pll.0;
-        Mon, 26 Dec 2022 00:00:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=snF9FgPM3QZjb6wYG/8ShchxVTbs8eu54AlMx41SJXI=;
-        b=I9kpb2beBVnPOjsLJGcv0RYiBxwiJwxcOTw40CumIZc1EnhS/GQAT4QRDqEBM5sSYf
-         Wd0CZdozC+zvNZ7cefd7AMsfQMn8aUnwQfQ/uf7n6zSgQA1Ebim0kWEsrEKkU4KiHbf5
-         CTAKlSW3/BWnXqb8ZO7yZcTq22RASfUWsBbIgpvirQGHePw9rpt4KRdY3+r+VSGYlaL6
-         J6oyvXqwS5xVcMVIHNV/tuuCBQMpa2kDLG7bIuzQRnXNP65cDWBWSS8XymH/O7pfjYzN
-         Cf09qjoM18+lqqsA9DjGW8bHSTBHxh79FnzS3q9y4D1zUfjg9aGHptcrwmvICxm1/7BI
-         kZlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=snF9FgPM3QZjb6wYG/8ShchxVTbs8eu54AlMx41SJXI=;
-        b=NFzv5Plj9UpRLa47HCk05zMKxlGP3/OcBKtET8od6IqMVC+imTQ0ZRjqot+sEUxhvf
-         //ZGyoAPsmzendWsHheiSKV2L2f81VEfrScVQGNQtonOfpynytBi/3lvsboxvoYzSoG+
-         rVdiG5eOg50Od/KwAbx3oFovYdhDAVKSzcHGxbDQGWs0D7q4pDL4yEKCMZYaIjM5fZae
-         1nOSqhk3O57pW8tzQil5JmSCGZ03MnVffezABl7ESk9GKwYYBLonKeWUT2/tamyEzduD
-         vv4Arlj79DrTjI6+rWfr5I2edKahEs8VW5ZPcmk1TLLSfkP/y8Q8ygOR0EZ22FtxxHv5
-         HQGA==
-X-Gm-Message-State: AFqh2kp+6dldAtf1XuokYcuc6k5U1kUiAD5NdD9yuNJ+rBT1xkcl9apT
-        VGgYU0GSPOHydExemnVsIwg=
-X-Google-Smtp-Source: AMrXdXsYDTq8QKHNt6PaId85nRz+73j5VQZcvOKpuC70WJG4kZTU8GY496g9fIp6s4h43XrC3tqXlg==
-X-Received: by 2002:a17:902:7e03:b0:192:70f1:b34 with SMTP id b3-20020a1709027e0300b0019270f10b34mr6048820plm.19.1672041603032;
-        Mon, 26 Dec 2022 00:00:03 -0800 (PST)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id s19-20020a170903201300b00187197c4999sm6447717pla.167.2022.12.25.23.59.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Dec 2022 00:00:02 -0800 (PST)
-Message-ID: <ee43a3ce-2b66-f660-39cc-32cdc0cf6587@gmail.com>
-Date:   Mon, 26 Dec 2022 15:59:52 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [RFC PATCH V2 11/18] Drivers: hv: vmbus: Decrypt vmbus ring
- buffer
-Content-Language: en-US
-To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
-        "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "sandipan.das@amd.com" <sandipan.das@amd.com>,
-        "ray.huang@amd.com" <ray.huang@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "sterritt@google.com" <sterritt@google.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "samitolvanen@google.com" <samitolvanen@google.com>,
-        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
-References: <20221119034633.1728632-1-ltykernel@gmail.com>
- <20221119034633.1728632-12-ltykernel@gmail.com>
- <BYAPR21MB1688329AFB42391E92051E9CD7E09@BYAPR21MB1688.namprd21.prod.outlook.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <BYAPR21MB1688329AFB42391E92051E9CD7E09@BYAPR21MB1688.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229643AbiLZKJM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Dec 2022 05:09:12 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBEA6B91
+        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 02:09:10 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id AA786B802BE
+        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 10:09:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50BF3C433EF;
+        Mon, 26 Dec 2022 10:09:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672049348;
+        bh=fUH0/nqWbICMXF5To7PRfA6XTb37qIj/+e/XMPfX+JU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=lAwpFuDNLwa3Au3Fp+0j6FHTcEC+MIDd2WZDNAT20IxY5/H7+yirS7aFX6DR7R5O3
+         +hkVCYw+mc4DtQD9HApOjvoLSnKJTUXfy/U+ECdXJesnGiA+xJmdB180tsxfMRM7mS
+         o9eit3BgWltHOJ6OhbSrim7Q9BFsbjPeA5PdGeUys37FncDeb6zN7FUtIQB26z1azg
+         OBTznwNmemVeRXsKuzxvpNYX5i3vLzNHCdckFEG3VNxv1jBFQ8eXAYLOyXs488obKx
+         BmPVl3rxL+PYpIQ3Hup4rhaqPRnJzPEx6gXIhaf4KUT8W8lzpRDkAdTJ/icCCPyur+
+         6N9Z43vgEKfRA==
+Received: from host81-132-227-111.range81-132.btcentralplus.com ([81.132.227.111] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1p9kPp-00FCPR-Vq;
+        Mon, 26 Dec 2022 10:09:06 +0000
+Date:   Mon, 26 Dec 2022 10:07:43 +0000
+Message-ID: <874jtifpg0.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
+        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
+        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of vcpus
+In-Reply-To: <eafbcd77-aab1-4e82-d53e-1bcc87225549@nutanix.com>
+References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
+        <20221113170507.208810-2-shivam.kumar1@nutanix.com>
+        <86zgcpo00m.wl-maz@kernel.org>
+        <18b66b42-0bb4-4b32-e92c-3dce61d8e6a4@nutanix.com>
+        <86mt8iopb7.wl-maz@kernel.org>
+        <dfa49851-da9d-55f8-7dec-73a9cf985713@nutanix.com>
+        <86ilinqi3l.wl-maz@kernel.org>
+        <Y5DvJQWGwYRvlhZz@google.com>
+        <b55b79b1-9c47-960a-860b-b669ed78abc0@nutanix.com>
+        <eafbcd77-aab1-4e82-d53e-1bcc87225549@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 81.132.227.111
+X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, seanjc@google.com, pbonzini@redhat.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/15/2022 2:25 AM, Michael Kelley (LINUX) wrote:
-> From: Tianyu Lan<ltykernel@gmail.com>  Sent: Friday, November 18, 2022 7:46 PM
->> The ring buffer is remapped in the hv_ringbuffer_init()
->> and it should be with decrypt flag in order to share it
->> with hypervisor in sev-snp enlightened guest.
-> FWIW, the change in this patch is included in Patch 9
-> in my vTOM-related patch series.
-> 
+On Sun, 25 Dec 2022 16:50:04 +0000,
+Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+>=20
+>=20
+>=20
+> On 08/12/22 1:00 pm, Shivam Kumar wrote:
+> >=20
+> >=20
+> > On 08/12/22 1:23 am, Sean Christopherson wrote:
+> >> On Wed, Dec 07, 2022, Marc Zyngier wrote:
+> >>> On Tue, 06 Dec 2022 06:22:45 +0000,
+> >>> Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> >>> You need to define the granularity of the counter, and account for
+> >>> each fault according to its mapping size. If an architecture has 16kB
+> >>> as the base page size, a 32MB fault (the size of the smallest block
+> >>> mapping) must bump the counter by 2048. That's the only way userspace
+> >>> can figure out what is going on.
+> >>=20
+> >> I don't think that's true for the dirty logging case.=C2=A0 IIUC, when=
+ a
+> >> memslot is
+> >> being dirty logged, KVM forces the memory to be mapped with
+> >> PAGE_SIZE granularity,
+> >> and that base PAGE_SIZE is fixed and known to userspace.=C2=A0
+> >> I.e. accuracy is naturally
+> >> provided for this primary use case where accuracy really matters,
+> >> and so this is
+> >> effectively a documentation issue and not a functional issue.
+> >=20
+> > So, does defining "count" as "the number of write permission faults"
+> > help in addressing the documentation issue? My understanding too is
+> > that for dirty logging, we will have uniform granularity.
+> >=20
+> > Thanks.
+> >=20
+> >>=20
+> >>> Without that, you may as well add a random number to the counter, it
+> >>> won't be any worse.
+> >>=20
+> >> The stat will be wildly inaccurate when dirty logging isn't
+> >> enabled, but that doesn't
+> >> necessarily make the stat useless, e.g. it might be useful as a
+> >> very rough guage
+> >> of which vCPUs are likely to be writing memory.=C2=A0 I do agree though
+> >> that the value
+> >> provided is questionable and/or highly speculative.
+> >>=20
+> >>> [...]
+> >>>=20
+> >>>>>>> If you introduce additional #ifdefery here, why are the additional
+> >>>>>>> fields in the vcpu structure unconditional?
+> >>>>>>=20
+> >>>>>> pages_dirtied can be a useful information even if dirty quota
+> >>>>>> throttling is not used. So, I kept it unconditional based on
+> >>>>>> feedback.
+> >>>>>=20
+> >>>>> Useful for whom? This creates an ABI for all architectures, and this
+> >>>>> needs buy-in from everyone. Personally, I think it is a pretty usel=
+ess
+> >>>>> stat.
+> >>>>=20
+> >>>> When we started this patch series, it was a member of the kvm_run
+> >>>> struct. I made this a stat based on the feedback I received from the
+> >>>> reviews. If you think otherwise, I can move it back to where it was.
+> >>>=20
+> >>> I'm certainly totally opposed to stats that don't have a clear use
+> >>> case. People keep piling random stats that satisfy their pet usage,
+> >>> and this only bloats the various structures for no overall benefit
+> >>> other than "hey, it might be useful". This is death by a thousand cut.
+> >>=20
+> >> I don't have a strong opinion on putting the counter into kvm_run
+> >> as an "out"
+> >> fields vs. making it a state.=C2=A0 I originally suggested making it a
+> >> stat because
+> >> KVM needs to capture the information somewhere, so why not make it
+> >> a stat?=C2=A0 But
+> >> I am definitely much more cavalier when it comes to adding stats,
+> >> so I've no
+> >> objection to dropping the stat side of things.
+> >=20
+> > I'll be skeptical about making it a stat if we plan to allow the
+> > userspace to reset it at will.
+> >=20
+> >=20
+> > Thank you so much for the comments.
+> >=20
+> > Thanks,
+> > Shivam
+>=20
+> Hi Marc,
+> Hi Sean,
+>=20
+> Please let me know if there's any further question or feedback.
 
-I will rebase next version on your series. Thanks for reminder.
+My earlier comments still stand: the proposed API is not usable as a
+general purpose memory-tracking API because it counts faults instead
+of memory, making it inadequate except for the most trivial cases.
+And I cannot believe you were serious when you mentioned that you were
+happy to make that the API.
+
+This requires some serious work, and this series is not yet near a
+state where it could be merged.
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
