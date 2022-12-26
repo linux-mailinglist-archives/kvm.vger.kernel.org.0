@@ -2,60 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B79DD6560F9
-	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 08:54:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4BAFA6560FA
+	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 08:54:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231781AbiLZHyh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Dec 2022 02:54:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36608 "EHLO
+        id S231784AbiLZHyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Dec 2022 02:54:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231766AbiLZHyf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Dec 2022 02:54:35 -0500
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A956A13E
-        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 23:54:33 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id w26so6847590pfj.6
-        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 23:54:33 -0800 (PST)
+        with ESMTP id S231585AbiLZHyh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Dec 2022 02:54:37 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F1E0132
+        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 23:54:36 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id b12so6806008pgj.6
+        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 23:54:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=nCsShkqzAQC2vblsPgRikGqyp95YkRxeETotFwCvMC0=;
-        b=mPVhEiGzrcEEi6VIuF5ym1dQX1c0unvvrJJB9uVKrJNyhhMTPcUSyAwQsqD9wEfOjg
-         JMedzt7Z2ccZqW1aYFhtF55iP8JekRPTdcmt+3ZuN24HaW/0dtBkin979v0g/S+E3Lzo
-         vUdXyfForO3AiPh1bbQcDfV7+POEvQJ37exYn5B2Dd7Kkm+Vy8kPs1zDt1j0YvaewR/F
-         iS0QrXDdW24giAl0a/vB1cA9rT/6QxoNvyKY8zdi1mT+nWeK6L7iBFwfxoxknNvaO6y0
-         JE26WUVrqx+uyi6BvRF7WSiUFpITyEFsEzmfUFcw5vcndPhyXbdAGjwkKXltWBM4eZfY
-         Nefg==
+        bh=IDZYs/MEWificaqkh6FAhYITezAJQayTh3RxZA+C/28=;
+        b=RNWrgtwBhoAJXm3UKDk5hBFuo/iirBlK2G2UTe7SRLKUuZ/nb2BME3RuFO1MZe+uJn
+         jDCe8jbT+9+7mENo0OrcYD89GL39sjV1wjLmYr372/qp2VzMcH9s4VEcMaq4VOmAG0o4
+         pQ3a/Xkp6mGFqhAhA5/Xx2kVG5mYYoELcpCFQDZGafxMbnBdDuYXXiJylbxbUo3rlSvw
+         wk5xVbPkLPOBF3zHYZUfP1xWXNl8o0tVJGfwIX2AXI0AN5IOw5AYTbtOgHaM0QiFORYI
+         oJnhM1CufdgO42WKkhTGdGkEH1Z/TgRYFQZBZqw+GdJ6Hqu3hfot713JyYZ7Cdyyq320
+         hzpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nCsShkqzAQC2vblsPgRikGqyp95YkRxeETotFwCvMC0=;
-        b=HVjEGd6AI7cP0MFHL1qHH6zbnep4wJR5lk3XTppLMQuOfsiD3MWU7d0BZ3QO2ZMuVt
-         bO9hMjiGrThbnJ3wtDsHuO62IZCQDIjIlO3dWD0VmmFxaNJNBj7ww18GohCsWBa6C4SI
-         A0HKCpb5mCS0vsrtHwVXCzjyFPRqzYzE92GK1wzzShm4mCXeB5Q2tNvMH4OKlCrEeKvw
-         862Zzjvm86oymRijGYYKwuxDN1Y6WHLS86xCG6a0Z1Jaiv1PXPmDLYlbCqfmXHqyARoC
-         hGwJL4J+3kwKoaQ9r2f3afuJoXylIcvJmDBSX7pBI/1fDbzyrsv8dr7YXvD8TAdorujx
-         s5XA==
-X-Gm-Message-State: AFqh2krBm9xM0q3kiD4hWDI61fsgvaIigOgP1TWplY2v3kWih+1O3TxJ
-        sUohIJZ5Ajy5o3busiRcWTc=
-X-Google-Smtp-Source: AMrXdXscLfnh3fZcHvIWNsJt/5VQj3PkKdThREXoY9ZKNESR+/Xnld2HH7poTzOsJqF4q4rVAccfbg==
-X-Received: by 2002:a62:84c9:0:b0:581:1f4b:d1e5 with SMTP id k192-20020a6284c9000000b005811f4bd1e5mr3408041pfd.12.1672041273161;
-        Sun, 25 Dec 2022 23:54:33 -0800 (PST)
+        bh=IDZYs/MEWificaqkh6FAhYITezAJQayTh3RxZA+C/28=;
+        b=LK2UzLPIEU5my2GYCtDpYQZ2rVmqn4AaXjgZ60TBcsoEYGNkg3atdxny8f6WHV78kk
+         tkXpZL//d/ll4ZlAv+Di+bGznp5Ej8ZUC4oSInevM9IwxHhfnOLKKgpUgiUo7pkE93c2
+         G2R+ZFx9+0UUhK86CtbSRR2PYn/D2aF+pXG6VA8AGk4XMkXWrc2lGHMJxanDuaKFokEy
+         4R916PzfrVQOkQnpeBTiRSKGMplY2co1rOvcFxjIfCoNQ5uUzHvoQEfGVRLNq1H59dgi
+         anjJH2bHAY5PGdZTqORVRJYgTg+/hPRxRV1jmCz9wvhkKmjMtfsvv20w/mv0hDP3VsCv
+         OHlg==
+X-Gm-Message-State: AFqh2kpRcYkP7EnYe8TnC45c4RM9XjemL1X6aOucW7mHjLq+cjn6uEuP
+        1RElZORvt/RGeaw9i/9rqgLMGifHNG1gqgUD
+X-Google-Smtp-Source: AMrXdXuh+eDg8oMYq3nzKWiojs56PNEZ9O5fIFll5Is0eAtgpdoeamkFmWJ5/DykG89Z4PVsr8m4Lw==
+X-Received: by 2002:a05:6a00:1da2:b0:580:f804:d704 with SMTP id z34-20020a056a001da200b00580f804d704mr5857903pfw.28.1672041275954;
+        Sun, 25 Dec 2022 23:54:35 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id a125-20020a621a83000000b00575467891besm6289271pfa.136.2022.12.25.23.54.31
+        by smtp.gmail.com with ESMTPSA id a125-20020a621a83000000b00575467891besm6289271pfa.136.2022.12.25.23.54.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Dec 2022 23:54:32 -0800 (PST)
+        Sun, 25 Dec 2022 23:54:35 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH V2 1/2] x86/pmu: Add Intel Guest Transactional (commited) cycles testcase
-Date:   Mon, 26 Dec 2022 15:54:11 +0800
-Message-Id: <20221226075412.61167-2-likexu@tencent.com>
+Subject: [kvm-unit-tests PATCH RESEND 2/2] x86/pmu: Wrap the written counter value with gp_counter_width
+Date:   Mon, 26 Dec 2022 15:54:12 +0800
+Message-Id: <20221226075412.61167-3-likexu@tencent.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20221226075412.61167-1-likexu@tencent.com>
 References: <20221226075412.61167-1-likexu@tencent.com>
@@ -73,92 +73,38 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-On Intel platforms with TSX feature, pmu users in guest can collect
-the commited or total transactional cycles for a tsx-enabled workload,
-adding new test cases to cover them, as they are not strictly the same
-as normal hardware events from the KVM implementation point of view.
+The check_emulated_instr() testcase fails when the KVM module parameter
+"force_emulation_prefix" is 1. The root cause is that the value written by
+the counter exceeds the maximum bit width of the GP counter.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
-V1: https://lore.kernel.org/kvm/20221207071506.15733-1-likexu@tencent.com/
-V1 -> V2 Changelog:
-- Drop HLE check; (Weijiang)
-- Print out the data here for each GP counter; (Weijiang)
-- Use "unsigned int" for EAX; (Sean)
-- Use mnemonic for XBEGIN; (Sean)
-- Drop use of _xend(); (Sean)
-- Use xbegin inline instead of processor.h to avoid conflicts with vmx_tests;
-
- x86/pmu.c | 42 +++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 41 insertions(+), 1 deletion(-)
+ x86/pmu.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 72c2c9c..356d589 100644
+index 356d589..4dbbe71 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -20,7 +20,7 @@
- 
- typedef struct {
- 	uint32_t ctr;
--	uint32_t config;
-+	uint64_t config;
- 	uint64_t count;
- 	int idx;
- } pmu_counter_t;
-@@ -547,6 +547,45 @@ static void check_emulated_instr(void)
- 	report_prefix_pop();
- }
- 
-+#define XBEGIN_STARTED (~0u)
-+static void check_tsx_cycles(void)
-+{
-+	pmu_counter_t cnt;
-+	unsigned int i, ret = 0;
-+
-+	if (!this_cpu_has(X86_FEATURE_RTM))
-+		return;
-+
-+	report_prefix_push("TSX cycles");
-+
-+	for (i = 0; i < pmu.nr_gp_counters; i++) {
-+		cnt.ctr = MSR_GP_COUNTERx(i);
-+
-+		if (i == 2)
-+			/* Transactional cycles commited only on gp counter 2 */
-+			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x30000003c;
-+		else
-+			/* Transactional cycles */
-+			cnt.config = EVNTSEL_OS | EVNTSEL_USR | 0x10000003c;
-+
-+		start_event(&cnt);
-+
-+		asm volatile("xbegin 1f\n\t"
-+				"1:\n\t"
-+				: "+a" (ret) :: "memory");
-+
-+		/* Generate a non-canonical #GP to trigger ABORT. */
-+		if (ret == XBEGIN_STARTED)
-+			*(int *)NONCANONICAL = 0;
-+
-+		stop_event(&cnt);
-+
-+		report(cnt.count > 0, "gp cntr-%d with a value of %" PRId64 "", i, cnt.count);
-+	}
-+
-+	report_prefix_pop();
-+}
-+
- static void check_counters(void)
+@@ -477,6 +477,7 @@ static void check_running_counter_wrmsr(void)
+ static void check_emulated_instr(void)
  {
- 	if (is_fep_available())
-@@ -559,6 +598,7 @@ static void check_counters(void)
- 	check_counter_overflow();
- 	check_gp_counter_cmask();
- 	check_running_counter_wrmsr();
-+	check_tsx_cycles();
- }
+ 	uint64_t status, instr_start, brnch_start;
++	uint64_t gp_counter_width = (1ull << pmu.gp_counter_width) - 1;
+ 	unsigned int branch_idx = pmu.is_intel ? 5 : 2;
+ 	pmu_counter_t brnch_cnt = {
+ 		.ctr = MSR_GP_COUNTERx(0),
+@@ -498,8 +499,8 @@ static void check_emulated_instr(void)
  
- static void do_unsupported_width_counter_write(void *index)
+ 	brnch_start = -EXPECTED_BRNCH;
+ 	instr_start = -EXPECTED_INSTR;
+-	wrmsr(MSR_GP_COUNTERx(0), brnch_start);
+-	wrmsr(MSR_GP_COUNTERx(1), instr_start);
++	wrmsr(MSR_GP_COUNTERx(0), brnch_start & gp_counter_width);
++	wrmsr(MSR_GP_COUNTERx(1), instr_start & gp_counter_width);
+ 	// KVM_FEP is a magic prefix that forces emulation so
+ 	// 'KVM_FEP "jne label\n"' just counts as a single instruction.
+ 	asm volatile(
 -- 
 2.39.0
 
