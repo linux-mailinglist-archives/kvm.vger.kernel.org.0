@@ -2,67 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4BAFA6560FA
-	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 08:54:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B02D76560FF
+	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 09:00:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231784AbiLZHyj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Dec 2022 02:54:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36614 "EHLO
+        id S231794AbiLZIAK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Dec 2022 03:00:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231585AbiLZHyh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Dec 2022 02:54:37 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F1E0132
-        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 23:54:36 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id b12so6806008pgj.6
-        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 23:54:36 -0800 (PST)
+        with ESMTP id S231585AbiLZIAF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Dec 2022 03:00:05 -0500
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F44B115E;
+        Mon, 26 Dec 2022 00:00:03 -0800 (PST)
+Received: by mail-pl1-x62d.google.com with SMTP id 17so10227159pll.0;
+        Mon, 26 Dec 2022 00:00:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IDZYs/MEWificaqkh6FAhYITezAJQayTh3RxZA+C/28=;
-        b=RNWrgtwBhoAJXm3UKDk5hBFuo/iirBlK2G2UTe7SRLKUuZ/nb2BME3RuFO1MZe+uJn
-         jDCe8jbT+9+7mENo0OrcYD89GL39sjV1wjLmYr372/qp2VzMcH9s4VEcMaq4VOmAG0o4
-         pQ3a/Xkp6mGFqhAhA5/Xx2kVG5mYYoELcpCFQDZGafxMbnBdDuYXXiJylbxbUo3rlSvw
-         wk5xVbPkLPOBF3zHYZUfP1xWXNl8o0tVJGfwIX2AXI0AN5IOw5AYTbtOgHaM0QiFORYI
-         oJnhM1CufdgO42WKkhTGdGkEH1Z/TgRYFQZBZqw+GdJ6Hqu3hfot713JyYZ7Cdyyq320
-         hzpA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=snF9FgPM3QZjb6wYG/8ShchxVTbs8eu54AlMx41SJXI=;
+        b=I9kpb2beBVnPOjsLJGcv0RYiBxwiJwxcOTw40CumIZc1EnhS/GQAT4QRDqEBM5sSYf
+         Wd0CZdozC+zvNZ7cefd7AMsfQMn8aUnwQfQ/uf7n6zSgQA1Ebim0kWEsrEKkU4KiHbf5
+         CTAKlSW3/BWnXqb8ZO7yZcTq22RASfUWsBbIgpvirQGHePw9rpt4KRdY3+r+VSGYlaL6
+         J6oyvXqwS5xVcMVIHNV/tuuCBQMpa2kDLG7bIuzQRnXNP65cDWBWSS8XymH/O7pfjYzN
+         Cf09qjoM18+lqqsA9DjGW8bHSTBHxh79FnzS3q9y4D1zUfjg9aGHptcrwmvICxm1/7BI
+         kZlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IDZYs/MEWificaqkh6FAhYITezAJQayTh3RxZA+C/28=;
-        b=LK2UzLPIEU5my2GYCtDpYQZ2rVmqn4AaXjgZ60TBcsoEYGNkg3atdxny8f6WHV78kk
-         tkXpZL//d/ll4ZlAv+Di+bGznp5Ej8ZUC4oSInevM9IwxHhfnOLKKgpUgiUo7pkE93c2
-         G2R+ZFx9+0UUhK86CtbSRR2PYn/D2aF+pXG6VA8AGk4XMkXWrc2lGHMJxanDuaKFokEy
-         4R916PzfrVQOkQnpeBTiRSKGMplY2co1rOvcFxjIfCoNQ5uUzHvoQEfGVRLNq1H59dgi
-         anjJH2bHAY5PGdZTqORVRJYgTg+/hPRxRV1jmCz9wvhkKmjMtfsvv20w/mv0hDP3VsCv
-         OHlg==
-X-Gm-Message-State: AFqh2kpRcYkP7EnYe8TnC45c4RM9XjemL1X6aOucW7mHjLq+cjn6uEuP
-        1RElZORvt/RGeaw9i/9rqgLMGifHNG1gqgUD
-X-Google-Smtp-Source: AMrXdXuh+eDg8oMYq3nzKWiojs56PNEZ9O5fIFll5Is0eAtgpdoeamkFmWJ5/DykG89Z4PVsr8m4Lw==
-X-Received: by 2002:a05:6a00:1da2:b0:580:f804:d704 with SMTP id z34-20020a056a001da200b00580f804d704mr5857903pfw.28.1672041275954;
-        Sun, 25 Dec 2022 23:54:35 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id a125-20020a621a83000000b00575467891besm6289271pfa.136.2022.12.25.23.54.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Dec 2022 23:54:35 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
-Subject: [kvm-unit-tests PATCH RESEND 2/2] x86/pmu: Wrap the written counter value with gp_counter_width
-Date:   Mon, 26 Dec 2022 15:54:12 +0800
-Message-Id: <20221226075412.61167-3-likexu@tencent.com>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20221226075412.61167-1-likexu@tencent.com>
-References: <20221226075412.61167-1-likexu@tencent.com>
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=snF9FgPM3QZjb6wYG/8ShchxVTbs8eu54AlMx41SJXI=;
+        b=NFzv5Plj9UpRLa47HCk05zMKxlGP3/OcBKtET8od6IqMVC+imTQ0ZRjqot+sEUxhvf
+         //ZGyoAPsmzendWsHheiSKV2L2f81VEfrScVQGNQtonOfpynytBi/3lvsboxvoYzSoG+
+         rVdiG5eOg50Od/KwAbx3oFovYdhDAVKSzcHGxbDQGWs0D7q4pDL4yEKCMZYaIjM5fZae
+         1nOSqhk3O57pW8tzQil5JmSCGZ03MnVffezABl7ESk9GKwYYBLonKeWUT2/tamyEzduD
+         vv4Arlj79DrTjI6+rWfr5I2edKahEs8VW5ZPcmk1TLLSfkP/y8Q8ygOR0EZ22FtxxHv5
+         HQGA==
+X-Gm-Message-State: AFqh2kp+6dldAtf1XuokYcuc6k5U1kUiAD5NdD9yuNJ+rBT1xkcl9apT
+        VGgYU0GSPOHydExemnVsIwg=
+X-Google-Smtp-Source: AMrXdXsYDTq8QKHNt6PaId85nRz+73j5VQZcvOKpuC70WJG4kZTU8GY496g9fIp6s4h43XrC3tqXlg==
+X-Received: by 2002:a17:902:7e03:b0:192:70f1:b34 with SMTP id b3-20020a1709027e0300b0019270f10b34mr6048820plm.19.1672041603032;
+        Mon, 26 Dec 2022 00:00:03 -0800 (PST)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
+        by smtp.gmail.com with ESMTPSA id s19-20020a170903201300b00187197c4999sm6447717pla.167.2022.12.25.23.59.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Dec 2022 00:00:02 -0800 (PST)
+Message-ID: <ee43a3ce-2b66-f660-39cc-32cdc0cf6587@gmail.com>
+Date:   Mon, 26 Dec 2022 15:59:52 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [RFC PATCH V2 11/18] Drivers: hv: vmbus: Decrypt vmbus ring
+ buffer
+Content-Language: en-US
+To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jgross@suse.com" <jgross@suse.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
+        "srutherford@google.com" <srutherford@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
+        "pawan.kumar.gupta@linux.intel.com" 
+        <pawan.kumar.gupta@linux.intel.com>,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
+        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
+        "alexander.shishkin@linux.intel.com" 
+        <alexander.shishkin@linux.intel.com>,
+        "sandipan.das@amd.com" <sandipan.das@amd.com>,
+        "ray.huang@amd.com" <ray.huang@amd.com>,
+        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        "sterritt@google.com" <sterritt@google.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "samitolvanen@google.com" <samitolvanen@google.com>,
+        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
+References: <20221119034633.1728632-1-ltykernel@gmail.com>
+ <20221119034633.1728632-12-ltykernel@gmail.com>
+ <BYAPR21MB1688329AFB42391E92051E9CD7E09@BYAPR21MB1688.namprd21.prod.outlook.com>
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <BYAPR21MB1688329AFB42391E92051E9CD7E09@BYAPR21MB1688.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -71,40 +112,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+On 12/15/2022 2:25 AM, Michael Kelley (LINUX) wrote:
+> From: Tianyu Lan<ltykernel@gmail.com>  Sent: Friday, November 18, 2022 7:46 PM
+>> The ring buffer is remapped in the hv_ringbuffer_init()
+>> and it should be with decrypt flag in order to share it
+>> with hypervisor in sev-snp enlightened guest.
+> FWIW, the change in this patch is included in Patch 9
+> in my vTOM-related patch series.
+> 
 
-The check_emulated_instr() testcase fails when the KVM module parameter
-"force_emulation_prefix" is 1. The root cause is that the value written by
-the counter exceeds the maximum bit width of the GP counter.
-
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- x86/pmu.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/x86/pmu.c b/x86/pmu.c
-index 356d589..4dbbe71 100644
---- a/x86/pmu.c
-+++ b/x86/pmu.c
-@@ -477,6 +477,7 @@ static void check_running_counter_wrmsr(void)
- static void check_emulated_instr(void)
- {
- 	uint64_t status, instr_start, brnch_start;
-+	uint64_t gp_counter_width = (1ull << pmu.gp_counter_width) - 1;
- 	unsigned int branch_idx = pmu.is_intel ? 5 : 2;
- 	pmu_counter_t brnch_cnt = {
- 		.ctr = MSR_GP_COUNTERx(0),
-@@ -498,8 +499,8 @@ static void check_emulated_instr(void)
- 
- 	brnch_start = -EXPECTED_BRNCH;
- 	instr_start = -EXPECTED_INSTR;
--	wrmsr(MSR_GP_COUNTERx(0), brnch_start);
--	wrmsr(MSR_GP_COUNTERx(1), instr_start);
-+	wrmsr(MSR_GP_COUNTERx(0), brnch_start & gp_counter_width);
-+	wrmsr(MSR_GP_COUNTERx(1), instr_start & gp_counter_width);
- 	// KVM_FEP is a magic prefix that forces emulation so
- 	// 'KVM_FEP "jne label\n"' just counts as a single instruction.
- 	asm volatile(
--- 
-2.39.0
-
+I will rebase next version on your series. Thanks for reminder.
