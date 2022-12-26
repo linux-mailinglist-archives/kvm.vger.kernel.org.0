@@ -2,108 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 073236560C5
-	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 08:26:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6AC3D6560F8
+	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 08:54:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231616AbiLZH0n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Dec 2022 02:26:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56094 "EHLO
+        id S231769AbiLZHyg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Dec 2022 02:54:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbiLZH0m (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Dec 2022 02:26:42 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CF54CE5;
-        Sun, 25 Dec 2022 23:26:41 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id 7so6798283pga.1;
-        Sun, 25 Dec 2022 23:26:41 -0800 (PST)
+        with ESMTP id S231585AbiLZHyd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Dec 2022 02:54:33 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCB8D132
+        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 23:54:31 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id 17so10218351pll.0
+        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 23:54:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5BP28ThNDrV2+rj7tyFrglRNo5Mo/dZrYmPpGBSiwqg=;
-        b=J9xkOrFjRuPH/wQYbTXZd86iNKUmAZCtUK8mRWuXKGimVW+cix1U7UmdkbEelLbyqA
-         udrffEjJy6YF+oHuN94bvwxsO1PRXL3UesBT752P6lgGBxHBestN3hu3yg2aET+DEdah
-         MHlVZw5qDx8oeM/9k8RlcRdWrjr/SCfj6n8SKRRc2MBwaM+CuUkxXvEBsfW3u4ZeZdbp
-         iuP1e+aVAXTCVMTrZOh2IPJ4WBbRNH4b+HgWWbgymuGAq3VhMMdjgc9mWjsr+BWHvE9c
-         sihA3I2RdPuZJMpxWLNLhU8JT4hHjHcK17GySMtrDK5hJ79PTdurllIqiltLzjboyyoy
-         ppSw==
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=w8zH1fR9Stg0Yi/nA8lQcAgTB4aNXmQ0BHpixBovr9c=;
+        b=f2tlDMpmsPea0qvWqYYTkIx/tF3mgqvnlKM6X/EzlHn0Nc7bbeivHpcyJex/3aNDW2
+         HKovvdj76IA9OqqoJqdM6Q2v4Hh/ZoTQQMFlpMc6LXILyXMWDTG8pCaabOTk97WE6K6f
+         sxrzvu63Sqqm0YEy3XA6O1PRoGui4tkKWMIC7Cz1qmofiE5jDzG2UZv8fBrGIcu6UCfv
+         aPmZEJatvMtlr9xw8cQWsEElAl5Tf9J1UJLswypwjxL9FycFnDlNfd5r/pNOjqahSFSm
+         PCCkxmxY1wA5v/JXAW7+0Ji09MMnACKe/buxLujb5jLtgQlxzi8Hvr1zyoiWHzmgK+aY
+         x3hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5BP28ThNDrV2+rj7tyFrglRNo5Mo/dZrYmPpGBSiwqg=;
-        b=b0/BbMFbLrFjEAAX4/svR+t/rNQDRzC9ylXXDVzfytvQXkMRK71m+EVWXeNUcXLMbD
-         xZEkU951VzwEnUM6it/Z13ws4GHr7MJAfKQNtqcLzU1l9z9bHZ4YrTCr89z1jnim77vY
-         2qgGFAPPh7zulM2hTQGjo8sBv7pcMsfa4aceCPG3zs5SaPIvLcBlwFBcV/ZBDNRcequf
-         EP/ZABMi/IQpDZZZLVi3GszDUtfO4X4s9pdfl964mKo3kofwlfzbRkN0/d/bj+zOFj/V
-         2Vl2iyJlV1OaDj47REtRYEWsgQ9Zjb6isPDWDSmznaE+PtCm/ci/tv2zd6WN8JqMC92s
-         fMsw==
-X-Gm-Message-State: AFqh2kqafDJwGcdeIWbHetHMlnj3KDVRciCMdVELugBDANb9jQboQz8w
-        uroIez8IeB0oS6AnBhBPbsw=
-X-Google-Smtp-Source: AMrXdXuyr5O0DLExCO9wALqIc5t/+SNGh1usm32pp45Z+S6V5/Is/1z5fyykemBBcsB1O66woqdJUQ==
-X-Received: by 2002:a62:4e93:0:b0:57f:ef11:acf9 with SMTP id c141-20020a624e93000000b0057fef11acf9mr18045290pfb.10.1672039600680;
-        Sun, 25 Dec 2022 23:26:40 -0800 (PST)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id a7-20020aa795a7000000b0056cea9530b6sm1845037pfk.202.2022.12.25.23.26.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 25 Dec 2022 23:26:40 -0800 (PST)
-Message-ID: <a42f1d1a-3eda-83dc-7806-7ea2c9e7656a@gmail.com>
-Date:   Mon, 26 Dec 2022 15:26:30 +0800
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w8zH1fR9Stg0Yi/nA8lQcAgTB4aNXmQ0BHpixBovr9c=;
+        b=3hiy8LCOfgoFQzadFeoAtqrlO3K69XScFiatJtn9d/bjP1PbvtinI91Yhn6Yev5z2w
+         ScyZ1xMJlEZRnfqpEvfesJ66ntg1t8dwuwx1wyaBmJtwBzv8yGydmVSTPkeye+6VRhUZ
+         XrI0VEAf0p8LphxhWEDtrLWwK6JtJ6xNzJ23cyrMlymi2o2kSS9zeKWhNvU7cH+dJyQQ
+         48Mikrh4hP0De2mieoU4e6XYDoVLJX2NwnDGrKHCMKoA8S83yJ0L4M/ka6ltFxasIX+6
+         9anhIRTO9TeX0dmJx+bU5MI07KBdte69mg30ZOoZs0QP8SBxNBEQisRyFksWHTeHBqoh
+         v7Cw==
+X-Gm-Message-State: AFqh2koE47+oEt8K2GITzBgugd7zTrct4AzyOllJiMmgkXDOW9b5UREx
+        PMjYYzub1fYsfv9mEdDJi64=
+X-Google-Smtp-Source: AMrXdXvUjCsLcBQieJWGCThb1pXYTLIoDg2h21Oc5tuV8RuZvfKX/2lzzt/wOBKwmhTk64GtaT+ENg==
+X-Received: by 2002:a05:6a20:4b1e:b0:a3:dc4e:74f9 with SMTP id fp30-20020a056a204b1e00b000a3dc4e74f9mr21557911pzb.19.1672041271222;
+        Sun, 25 Dec 2022 23:54:31 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id a125-20020a621a83000000b00575467891besm6289271pfa.136.2022.12.25.23.54.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Dec 2022 23:54:30 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org
+Subject: [kvm-unit-tests PATCH 0/2] x86/pmu: Add TSX testcase and fix force_emulation_prefix
+Date:   Mon, 26 Dec 2022 15:54:10 +0800
+Message-Id: <20221226075412.61167-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [RFC PATCH V2 10/18] drivers: hv: Decrypt percpu hvcall input arg
- page in sev-snp enlightened guest
-Content-Language: en-US
-To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
-        "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "sandipan.das@amd.com" <sandipan.das@amd.com>,
-        "ray.huang@amd.com" <ray.huang@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "sterritt@google.com" <sterritt@google.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "samitolvanen@google.com" <samitolvanen@google.com>,
-        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
-References: <20221119034633.1728632-1-ltykernel@gmail.com>
- <20221119034633.1728632-11-ltykernel@gmail.com>
- <BYAPR21MB168878729E4A76AFC9B3E053D7E09@BYAPR21MB1688.namprd21.prod.outlook.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <BYAPR21MB168878729E4A76AFC9B3E053D7E09@BYAPR21MB1688.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -112,18 +68,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/15/2022 2:16 AM, Michael Kelley (LINUX) wrote:
->> @@ -134,6 +136,16 @@ int hv_common_cpu_init(unsigned int cpu)
->>   	if (!(*inputarg))
->>   		return -ENOMEM;
->>
->> +	if (hv_isolation_type_en_snp()) {
->> +		ret = set_memory_decrypted((unsigned long)*inputarg, 1);
->> +		if (ret) {
->> +			kfree(*inputarg);
-> After the kfree(), set *inputarg back to NULL.  There's other code that
-> tests the value of *inputarg to know if the per-CPU hypercall page has
-> been successfully allocated.
-> 
+We have adopted a test-driven development approach for vPMU's features,
+and these two fixes below cover the paths for at least two corner use cases.
 
-Good point! Will add in the next version.
+Like Xu (2):
+  x86/pmu: Add Intel Guest Transactional (commited) cycles testcase
+  x86/pmu: Wrap the written counter value with gp_counter_width
+
+ x86/pmu.c | 47 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 44 insertions(+), 3 deletions(-)
+
+-- 
+2.39.0
+
