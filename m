@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C68F656222
-	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 12:17:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EECFB656224
+	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 12:17:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232030AbiLZLRp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 26 Dec 2022 06:17:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56568 "EHLO
+        id S231959AbiLZLRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 26 Dec 2022 06:17:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231645AbiLZLRk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 26 Dec 2022 06:17:40 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED6AA1147;
-        Mon, 26 Dec 2022 03:17:35 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id o8-20020a17090a9f8800b00223de0364beso14515050pjp.4;
-        Mon, 26 Dec 2022 03:17:35 -0800 (PST)
+        with ESMTP id S231890AbiLZLRm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 26 Dec 2022 06:17:42 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECA0F62EE;
+        Mon, 26 Dec 2022 03:17:37 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id g16so828007plq.12;
+        Mon, 26 Dec 2022 03:17:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zcuQAG+JKdD/aO7T8iny1vSHAfiWv95oSPUA+CCs7Jg=;
-        b=kZKFlcnM+CEZTwXAWeJF6kp7BKU9XfNN9o+TqH7pT0LpGwRYypYXPymMkiOe/jxmsI
-         L2FNpT+UXjisuR7Ovmy+g6Z1WwJPxgI3JCgLmyKoiJnwojuZX27M/Rrw+fWNjcBCsqAd
-         t0Hd4OcEOlCqlCa8erJVmNuh3ciLQ0R8k7fBn6K6Eef2K1tQgE/J3kN5Mh3vOrjCFcyF
-         nB2GzZ1urp9NTqPCJNSqMa/c4O7bkgaeX71t+4kwwmpXXAiqGmqbDi0OGvOAmVgxxrHR
-         BkT76JsTsv1xIZ1+BzmPAH6QvwI2XcRllFDJpFS3BKwLtW22axp++Iyu3Z+N2hxB7tqb
-         /Y2w==
+        bh=ndX3aqFP5QuEDhvL4ldT5jQnDdYTin+9vnF0038Ulgg=;
+        b=RphvVQzwFXgVoTS5jqEvakUba+uXRziyjLAqub7pHS+ZxoTKe1DC6NcicuVTOMjJ59
+         QjADRpuZusVxBx0L5uhUDwYWUkbY4Nn91UdQ7NguH0j2ac9hhJgZDMeQagI/DLejcTve
+         NCzT0s18AeKXfqavujK8qYIIHkoWkx3HsN4hLcNpgvTwFr/VxV1mUG/INW6/+fKec3fQ
+         kHyfaC+GIL+oVgOp6Mbgs9UVGtNd0X/TeoltDnW9j4RqOoc3vsvAPsfB7MaexZLSQe+G
+         vWX3aKbdrUgRq09zjHjSjmbhmu3f5DPdA++MWDNYinIQyerdfqGTI4R9P6KUj8a/n7J1
+         J+cQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zcuQAG+JKdD/aO7T8iny1vSHAfiWv95oSPUA+CCs7Jg=;
-        b=qz+YOKBTOUBNf36aUUb/f0MR9iKcASxtPC/n6iyqmOZF46ggfRsl0lQbTt7oKj+lkY
-         FlXqpZlIvbY/bYjKpwpylDHPiHj9xoQxrKNiNrvwTrOQK/y/8J8vcpge8tPKfw2aClNB
-         5DmBek+E/V+JH7JbsbWyhuUZ9HcVtRtfhRlQcUZJ/W2uYEL0+0f+V4ifSc9S4/LauyCx
-         SV1FIzBJccsRWOi3TC6C8XH5dOvQnb/dlK1NXlOX8BWmnkChdsp147U/XRJLFRmjEX0R
-         PTOo0P8RgGIeSAqwcPUWlz5oP2CrQ1UY0U6GyVtJrzp/HtIiB8U9aDjXLjvKAIUUofwL
-         Seyw==
-X-Gm-Message-State: AFqh2kpPNzuSBOzTS6SOP3gBM7fYtuUMbUbjKqMOPZMXWxAb8oSr+7NS
-        a4OfcVS7irWOt9YP5uJ9qzw=
-X-Google-Smtp-Source: AMrXdXtlievYYm09jk7x9s0JJBtk6g7GkW2EM4Zw0P7XGaHY4eR7bunwu+h/XQD1Mc/f16oQ8iwC+A==
-X-Received: by 2002:a17:90a:e648:b0:223:3642:f74d with SMTP id ep8-20020a17090ae64800b002233642f74dmr33845126pjb.37.1672053455369;
-        Mon, 26 Dec 2022 03:17:35 -0800 (PST)
+        bh=ndX3aqFP5QuEDhvL4ldT5jQnDdYTin+9vnF0038Ulgg=;
+        b=WvsnffwsgSIX5fgWKqFiZ0YxTt0uwpYSsdKMt55u6WGg6bFsHuIgMe7ixfEmperpfj
+         1TBYeMrzOy4WYR1iGu9RR1VtmZnnDPwaGPyvixrnUy9gzlHA0M59oApqLAvjdnUzkk81
+         C0a2DCcnw/muM7mIechFMegGVZnnn77rAsD3Phua94lBc8g1uVkUs4qrBAr+0yBO1kq8
+         VI029ZOdtBmoZF+qOFoza94U8VG+41FV/fEf0/+lJRWdMgTRnUhcCQ16mdZiChU0XXTa
+         QmNtQ1UZsv20N/MuiOAIdvquhsHG2rTnL4cZbzxBRILoRXeaAW0Z64qpq+vLfaO6/zCs
+         z+gg==
+X-Gm-Message-State: AFqh2krRf9B6b/l3sajth05sI7ODoYONtPJUbk3zKeTrARJnbt2+YatL
+        /seye3/CX/79wFGWVoFVLQs=
+X-Google-Smtp-Source: AMrXdXvyf7fgBvsBrFaC8Q2Bx7zb02JCWMfOL9SqfqIbHMsH0YCX802LXrGHzUZDESkNe49KfuNFpQ==
+X-Received: by 2002:a05:6a20:ce4b:b0:b2:ed11:284e with SMTP id id11-20020a056a20ce4b00b000b2ed11284emr10544156pzb.52.1672053457446;
+        Mon, 26 Dec 2022 03:17:37 -0800 (PST)
 Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id dw6-20020a17090b094600b00223f495dc28sm6281490pjb.14.2022.12.26.03.17.32
+        by smtp.gmail.com with ESMTPSA id dw6-20020a17090b094600b00223f495dc28sm6281490pjb.14.2022.12.26.03.17.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Dec 2022 03:17:35 -0800 (PST)
+        Mon, 26 Dec 2022 03:17:37 -0800 (PST)
 From:   Like Xu <like.xu.linux@gmail.com>
 X-Google-Original-From: Like Xu <likexu@tencent.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] KVM: x86: Ignore host accesses to higher version PMU features MSRs
-Date:   Mon, 26 Dec 2022 19:17:09 +0800
-Message-Id: <20221226111710.51831-3-likexu@tencent.com>
+Subject: [PATCH 3/3] KVM: x86: Fix a typo about msrs_to_save_all[] in kvm_init_msr_list()
+Date:   Mon, 26 Dec 2022 19:17:10 +0800
+Message-Id: <20221226111710.51831-4-likexu@tencent.com>
 X-Mailer: git-send-email 2.39.0
 In-Reply-To: <20221226111710.51831-1-likexu@tencent.com>
 References: <20221226111710.51831-1-likexu@tencent.com>
@@ -74,49 +74,28 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Like Xu <likexu@tencent.com>
 
-Higher version PMU features are obviously not supported on hosts with
-lower version Arch pmu, such as trying to access FIXED_CTR registers
-and PERF_GLOBAL registers from pmu.version >1 on a host with version 1.
-
-Ignore host userspace reads and writes of '0' to those PMU MSRs that
-KVM reports in the MSR-to-save list, but the MSRs are ultimately
-unsupported. All MSRs in said list must be writable by userspace, e.g.
-if userspace sends the list back at KVM without filtering out the MSRs
-it doesn't need.
+The commit 7a5ee6edb42e ("KVM: X86: Fix initialization of MSR lists")
+changed the variable name from msrs_to_save[] to msrs_to_save_all[]
+but it still misused "msrs_to_saved_all[]" in kvm_init_msr_list(). Fix it.
 
 Signed-off-by: Like Xu <likexu@tencent.com>
 ---
- arch/x86/kvm/x86.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index f570367463c8..fcb9c317df59 100644
+index fcb9c317df59..b419ff9cef3b 100644
 --- a/arch/x86/kvm/x86.c
 +++ b/arch/x86/kvm/x86.c
-@@ -3881,6 +3881,11 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_DS_AREA:
- 	case MSR_PEBS_DATA_CFG:
- 	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
-+	case MSR_ARCH_PERFMON_FIXED_CTR0 ... MSR_ARCH_PERFMON_FIXED_CTR_MAX:
-+	case MSR_CORE_PERF_FIXED_CTR_CTRL:
-+	case MSR_CORE_PERF_GLOBAL_STATUS:
-+	case MSR_CORE_PERF_GLOBAL_CTRL:
-+	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
- 		if (kvm_pmu_is_valid_msr(vcpu, msr))
- 			return kvm_pmu_set_msr(vcpu, msr_info);
- 		/*
-@@ -3984,6 +3989,11 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_IA32_DS_AREA:
- 	case MSR_PEBS_DATA_CFG:
- 	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
-+	case MSR_ARCH_PERFMON_FIXED_CTR0 ... MSR_ARCH_PERFMON_FIXED_CTR_MAX:
-+	case MSR_CORE_PERF_FIXED_CTR_CTRL:
-+	case MSR_CORE_PERF_GLOBAL_STATUS:
-+	case MSR_CORE_PERF_GLOBAL_CTRL:
-+	case MSR_CORE_PERF_GLOBAL_OVF_CTRL:
- 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
- 			return kvm_pmu_get_msr(vcpu, msr_info);
- 		/*
+@@ -7012,7 +7012,7 @@ static void kvm_init_msr_list(void)
+ 	unsigned i;
+ 
+ 	BUILD_BUG_ON_MSG(KVM_PMC_MAX_FIXED != 3,
+-			 "Please update the fixed PMCs in msrs_to_saved_all[]");
++			 "Please update the fixed PMCs in msrs_to_save_all[]");
+ 
+ 	num_msrs_to_save = 0;
+ 	num_emulated_msrs = 0;
 -- 
 2.39.0
 
