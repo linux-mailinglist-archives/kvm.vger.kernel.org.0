@@ -2,248 +2,162 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C5FE655DDA
-	for <lists+kvm@lfdr.de>; Sun, 25 Dec 2022 17:50:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5E82655FB2
+	for <lists+kvm@lfdr.de>; Mon, 26 Dec 2022 05:20:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231286AbiLYQuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 25 Dec 2022 11:50:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38646 "EHLO
+        id S231566AbiLZEUH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 25 Dec 2022 23:20:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231367AbiLYQum (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 25 Dec 2022 11:50:42 -0500
-Received: from mx0b-002c1b01.pphosted.com (mx0b-002c1b01.pphosted.com [148.163.155.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC2A326F3
-        for <kvm@vger.kernel.org>; Sun, 25 Dec 2022 08:50:38 -0800 (PST)
-Received: from pps.filterd (m0127843.ppops.net [127.0.0.1])
-        by mx0b-002c1b01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 2BPGFDpH010796;
-        Sun, 25 Dec 2022 08:50:19 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=5ucad86wh+fsQxnASjpwkqbhJU5Y8Paec9NxQUYNZwk=;
- b=aVGfDZN5ulGsLMMHb4hvkz1lQKhzxuD5ttJKG3ccDFKIvK7wK7ZpUsPWjMq8O1gYgnmq
- gjdE9gAGwp1jplW81h5+UqKkwKhmzJW5A/cD9JM/mRW0YJkohCX8pZKRr7jTR4ptOhXO
- k2KUBq6Z5pzG9aHxDkNegUwwm8v79Ovs+P0t8rBUNTMqkQxFrj6LnngJ8FNEpUsTJyw+
- WqeFn8Zr18M9M4PEA5DIu9rtG44Kb51xBGdzSfpOG8+Y6ODsknmtcjlzsW4j90pMJDjV
- lo09qSzAHa1o2b/Kph2CLaCpoQRjfaDwfRnbaEveKEfiGkaB5pUKZ2LBd/4qNAV5npRA Pg== 
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2105.outbound.protection.outlook.com [104.47.58.105])
-        by mx0b-002c1b01.pphosted.com (PPS) with ESMTPS id 3mp0dq981r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 25 Dec 2022 08:50:19 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=anNunN3uPL8TcQowIMi+nc93YAcEvUjiwVArBSpd1MvXTu2SqW20SVvygQMEHv4t2pr2MBJrVlEfNX0RIPLBYXQUJNscx0xWECgePh9MkAMcEpUz1wa8XgW8LFEyHC0omnUnBPUyIjvmlmN+o6hM+/GPzd5eyXQ1be45crV2Q+Af6VWKug2SJQhZLA3uoF4iaUxGqeffm5hai9ZoUD9ibyqj/7PFAuR/k93wmSRa+n1CmJOtheA4DMDEceF7ShvrCJEhafBMNo7nrqCvoO7+YH+PcJb37i7aSalpNA5jjL2ZnsTNB+B4zlNL8YZRi0RQBt9EsyXFgyjPSHz1ns5xNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5ucad86wh+fsQxnASjpwkqbhJU5Y8Paec9NxQUYNZwk=;
- b=JXpUkKw8awRBrAsiIxnShP7A8ZDQqt7KcX508m3Haiag+KxwO82NZjffikBer52f1dLXDUqwFBjaInD4aNvgqfO1mEcYMET+GaJHAl19d9xbKC5jKdSmz7e/eua35F+eSPTBQ5lwzp1n/ty/5q8spTv4B26SQdCnTWkKn/uvusHGmqthGOvrDEJBsOWWDzjMXG2oPCOWetahSRzV8m8XH3RgMP3y30DLh7ZXqNCz76hwIncZ9Xe4TZ83gO1y/sAGRGKBTWdEIB64IxdW9nqmjxW4qZesZaaawy8zpAhCLbF2tx1kVAQk+Pri1y/GBsyjd761LP5ADz93Z8qdlsK2sQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5ucad86wh+fsQxnASjpwkqbhJU5Y8Paec9NxQUYNZwk=;
- b=HVfpulfGCE3GsIFV92TUcZynM1E3stRt3HV/FjoPKp1uv3J4EcLdfRN682t+HQqzZ+IWqAM29U6W3NkpibtUUPPQHgF45AKBEKSNj2y1DkuMgIzJKh5ZoKuiYXlUlrsUzVjJcOdKnqpfxwvKJUXXFvoGtonWkPHe2Aoqks3LUblEnVomYsSKSAFdoIafqOA/GNhBCl2VZpN7zeC0sP9rguokte4W2o1odrTuBw3i53jHpvMrqB3d+KmW1BMun9+jcUJ+NhrCQnCYI0uaY5zaPFC3UlI1r9PGrPxdTs8erY5nGVF4WiQNX8OKs5U7y0S8AvwSjKUzf1HAWmEp23H0NA==
-Received: from CO6PR02MB7555.namprd02.prod.outlook.com (2603:10b6:303:b3::20)
- by BL0PR02MB6516.namprd02.prod.outlook.com (2603:10b6:208:1ca::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.12; Sun, 25 Dec
- 2022 16:50:17 +0000
-Received: from CO6PR02MB7555.namprd02.prod.outlook.com
- ([fe80::dc45:3b8a:bd53:133a]) by CO6PR02MB7555.namprd02.prod.outlook.com
- ([fe80::dc45:3b8a:bd53:133a%8]) with mapi id 15.20.5944.016; Sun, 25 Dec 2022
- 16:50:17 +0000
-Message-ID: <eafbcd77-aab1-4e82-d53e-1bcc87225549@nutanix.com>
-Date:   Sun, 25 Dec 2022 22:20:04 +0530
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of
- vcpus
-From:   Shivam Kumar <shivam.kumar1@nutanix.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Marc Zyngier <maz@kernel.org>
-Cc:     pbonzini@redhat.com, james.morse@arm.com,
-        borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org,
-        Shaju Abraham <shaju.abraham@nutanix.com>,
-        Manish Mishra <manish.mishra@nutanix.com>,
-        Anurag Madnawat <anurag.madnawat@nutanix.com>
-References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
- <20221113170507.208810-2-shivam.kumar1@nutanix.com>
- <86zgcpo00m.wl-maz@kernel.org>
- <18b66b42-0bb4-4b32-e92c-3dce61d8e6a4@nutanix.com>
- <86mt8iopb7.wl-maz@kernel.org>
- <dfa49851-da9d-55f8-7dec-73a9cf985713@nutanix.com>
- <86ilinqi3l.wl-maz@kernel.org> <Y5DvJQWGwYRvlhZz@google.com>
- <b55b79b1-9c47-960a-860b-b669ed78abc0@nutanix.com>
-In-Reply-To: <b55b79b1-9c47-960a-860b-b669ed78abc0@nutanix.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MA0PR01CA0002.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:80::8) To CO6PR02MB7555.namprd02.prod.outlook.com
- (2603:10b6:303:b3::20)
+        with ESMTP id S229619AbiLZEUE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 25 Dec 2022 23:20:04 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEFB0182;
+        Sun, 25 Dec 2022 20:20:02 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id 82so6645035pgc.0;
+        Sun, 25 Dec 2022 20:20:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ihv+rRergc0+rZ9vlteUpmym/v26iiTrc7B/gFQDU1I=;
+        b=EQx2qS8wZKvgmrNacE2vzxNchD2qsdYshv9lre2VaV8DDwHTpG/bU5cmx7D7zSU/kz
+         apIA33umqiWIpuRYQ6aloNW8ZBR2f7JLXBxT5kRKZ6n89lRncjjTkB+IJLWie3Ah2uMG
+         6BpRYUL03yBW8g+k2Ga7txUUQcnWc88+SUIV205XAH+cpRM6qJI4nRC7bNTRsnX4eEnq
+         ReUeHsbaf/nmbtld76Yz9F72uR0SJhQ5kf82GCKu6dwJkRyYAfZ+q0UXvxdSQxyHXAJF
+         72TrEPLahcJGPyZFxWPsrOdGUot+Hqu8a1N4QidvvwUU7cuNAh69M8CFdbS5MCeEubnA
+         tLLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ihv+rRergc0+rZ9vlteUpmym/v26iiTrc7B/gFQDU1I=;
+        b=A46s1rKQRp8SMerTv8FhcP66SPArUxfUdd19kdUa0vbQHeA3QOOv5sdh/fpEykjev+
+         M7Kwey5U8Du3/vL+1ptRZQAAD1RfaurfWhm3ZLDQ4nKCCxK1We9Tr3GmxlSCVeJnxL28
+         lqoKllPpsZunN/778hsRsendapvboOZMb9YajY1P/H6gGtI/4CusssMG38HRnWoTURhR
+         HgfZ9pPkm+/unK8/BU6NDxhP51gR6Y/bMcn7kNa/0GH0SJ7V4jsKLX5skw5tCX7RwzCN
+         pPRxOcEsBCXGypBNrOdyMAZ6QDQrcAKIj+ths7WGL8++UnqMFtL0VRV2cNn2nMtpQXuq
+         4W9Q==
+X-Gm-Message-State: AFqh2kr3T0dKdNGHQzUXzHYboAKGQTKQVhpD9UBmiWhc6tjqonJrrlVd
+        MKY5C4/7ziS7BuwjKJhYUu4=
+X-Google-Smtp-Source: AMrXdXsgGYu5uvxvnzfPorgJsB6j6WbxZ6RsZwQigXjvL1TI+MTyjSlsMeKFHhv8SXu5kfWdHqOLHA==
+X-Received: by 2002:aa7:9054:0:b0:580:c75f:44dc with SMTP id n20-20020aa79054000000b00580c75f44dcmr9964268pfo.19.1672028402142;
+        Sun, 25 Dec 2022 20:20:02 -0800 (PST)
+Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
+        by smtp.gmail.com with ESMTPSA id l190-20020a6225c7000000b005771d583893sm6057338pfl.96.2022.12.25.20.19.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 25 Dec 2022 20:20:01 -0800 (PST)
+Message-ID: <ec2b1723-1698-ac64-279b-c47b38b8d16f@gmail.com>
+Date:   Mon, 26 Dec 2022 12:19:51 +0800
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR02MB7555:EE_|BL0PR02MB6516:EE_
-X-MS-Office365-Filtering-Correlation-Id: b9415016-b593-4222-5af7-08dae6981979
-x-proofpoint-crosstenant: true
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Pe9daIhh7RCsNWrRl6fuaELR1WjDQXOnUxqOwyisyq1sYzqAlo2UX+uNFYRMAJzN67jtTSICEHwHNbPQfU9cR7SgBwtE4cDq+Bo8FJCCsG+byuHRAu3jstyHbm4B22eNDiL6SntLCp45OU9K6/2/gCTxTQdtdWhvUqClBYuLLpj4lZcmO3sDeLDMB+8NXsCC0mBocINMG2Oza/2RgmKJ7Jbw2Ybfk0NjnwkTBTFp1UPnNn1sE1v/JmI6LBwVHim3PI3yeC7j+9OvZGODEhLv34fMfdpVBfmJmgEao+q+a+E+mRvRXVkpL+bK6yoa6p3ffSG9Mk54A/oD5AGYrLv+pWGsavn5WZ9f5sWoqn/LCVtGn1SyRsRkXNW6nAq4C8UXiJ9P6IAt+vYVWfazMJ89HGDYqKVCYxYk1DwGungYuxYaUNQfafjmd3v/dUdrHvcXKK217YI8fjkL20WlRQWmGqcrYvGcWOi29wrsyLdGvJ5wd6ycCnFEP1ZlX8YwOyUglsztpvi6Z77My25fvnO56ZE46aT/vmnqe+u9CTdIth5k9ALFCs4hDE6Wvu3fzRgaHuVuampSCPe2a+qf+zn9lisvtW3CZbeetrxYfKruSAxDgFm/LvGdr85OuavdfluN2g725DVx1bYhRJiH90uzaa62sBTwVjVG7Vmehiukg+pBydRpkhTm/Z/AZ2HrobeKgL1w13JYtdlGo9F4B2SEKD5aFWMfKprdRrbx8puL2KPk4v/A1oBsHJyVw65V3Rgb
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR02MB7555.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(376002)(366004)(39840400004)(396003)(136003)(451199015)(66946007)(66476007)(8936002)(66556008)(4326008)(41300700001)(6666004)(53546011)(107886003)(6506007)(26005)(6512007)(36756003)(8676002)(2906002)(15650500001)(31696002)(5660300002)(31686004)(186003)(316002)(110136005)(86362001)(54906003)(6486002)(38100700002)(478600001)(83380400001)(2616005)(14143004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aEVYRk9SbDdKSW5CREhnZ3lQUGdiNy8wekRNTlhxU25UYldKOXE0NnhLNWhu?=
- =?utf-8?B?K3Y4N1RsUWQwRE43MUkxZnRLMTNnTkRCZkF5OEtQSXplM3R0TlFlUm1DOXpx?=
- =?utf-8?B?U0lML3RENmNlZG9FaGhpMENSclhSanhPaGJlaXhzaER1ZEluQ3l2dVJ0RDBB?=
- =?utf-8?B?ZExJZXJsTm8wU216SUNnR1ZDUjhXMU5mV0lObHZuQUxUcUI3TUJEYnBKd3E2?=
- =?utf-8?B?NWkzRy9sd0VNTG43bTRKVWpjdlkvbkdMUjJaMFNCcHdDOERjOFNCL0xYSXdu?=
- =?utf-8?B?RzNzNkpBTEF2S3RMclhBV1ljNlVLS0Z6dktRQVRvalhIUlphcjhUN0Era3lM?=
- =?utf-8?B?QzVwYjdwM05LKzJ6dU1NTkY3cTcrMzVGTWhOUm5UZ1ZDa0FnRloyQUhtb1gr?=
- =?utf-8?B?TWhacFJNODlJUGtaRmZoN2xqWnE1TnNDM0ZadzQxSFpaK1dDRWU1UklsSmJn?=
- =?utf-8?B?VllMRy9rUkJZbVQ1U1ZJek5KTEx1aVoycHFhZ0I3UStqQ0F1MEVpeW9qWTd4?=
- =?utf-8?B?QjVCRGdKU3FPUWlFZ2FxcUlicXUzZjVGZlpDdFhRZ2ZGcnJvVWNMckhMejFo?=
- =?utf-8?B?Q3I1cTBrRDI5UnJBOVprd0tnUUtEdVlaRjUzVHFzZzJ1QTM1bmRrbzFaS1Z4?=
- =?utf-8?B?MnZELysvZjlwYWJ4WnpOdms1TVJRVTZIVVRRQTczK1FaY0FBVTdCT3c0Z1hF?=
- =?utf-8?B?eURzdTB0KzZza0tsUDgxaGdKanZWWWtDamV3cGlHeTdRQm5LQmlwck5LSmc4?=
- =?utf-8?B?M0tLYU56Y1pkeGliMWtTVlA0Yll4SlRuakpRNnc0aVkxZ0V2RDFReWU3UXB2?=
- =?utf-8?B?eVkvMWF4VHRxeW9sWThzSFRKM1hieGhPMlBVSXR4K0l0c2ZWb3VDM3hZUFhi?=
- =?utf-8?B?dGxpQzJiNEpRb0g5OVdWZHRacmY0OVVFZExDVVJPWVcwM2MrdlljUkF2TU1B?=
- =?utf-8?B?YjkwenlOaVV4NERQSVRFRFdPVGptRjhDbkpSeEhRelA5MHJpNUdXOXg4MVdo?=
- =?utf-8?B?UVlma3h3ZXdhUVVMZGhJdHVwYTJ4ejc1THVXc25sTjNPeldwcEFYOE41ekts?=
- =?utf-8?B?bVgwRExqSGhvbExQcWlqbkoycFM2QVdZekY4UnhZRW9vejk0UUNXSEhIWXR1?=
- =?utf-8?B?ZUE4NnhDdlR4RTZSNXpQdDlwTjZ3dXJPak9Tb2EvSmhpMmx0eEs2cFVTQm1C?=
- =?utf-8?B?elJkVjQ2VmR2Zm1QRHpEdkdYcFVPOFV3L1lRVlNGYUo2QzkwWDFxMjJvbFhB?=
- =?utf-8?B?UTlxQ2xGakZ5QWo0RnU5R2M2UnB5aDdZVDNsZVVlN2FBMTdkRVk2ZWpsd2Zm?=
- =?utf-8?B?ZCtKalVkNUVhQUF1TzcrZmhSd0pGRGpwd3Rpd28xZmpZRk94YlVCdFE5QkYw?=
- =?utf-8?B?L2hJMWhhZmM4U3hnbVVmY05oRXU1NVk4aHB3bFlIMlZjOXFUa0RVU0wrOU9o?=
- =?utf-8?B?VVJ1cEJxM01mNkxLcTFNaVBBOUZlVDZGR3Q5Z0lLWXY4Q2R1bXVrYlB1bU05?=
- =?utf-8?B?dWpHTEFZZUZISjI1dWI4YTFjK2xTMUZlRG9uYklvY0QyV01PYjRNb1pqVnNQ?=
- =?utf-8?B?ckhiRWtUNnF2cjRkWkZOYTNKZVl0eVJ4dFQybnVmWW1JdUhQNlcwS0pHVzg0?=
- =?utf-8?B?OC95NmVIVlJ1UlZPQUIvZUlsdjdDQjY4aTlaR3lXQU5NSjYvQVIzL0MrYTlh?=
- =?utf-8?B?UmFlQ0FKOVpjRy84SnlzVjdZeFpscURrSTErYkg5V0ZtSU1Mcy9iNkpnQ3A3?=
- =?utf-8?B?a0FXMjFuU0FFcHo3dlhpcE94aEpWNVdXaHF0OFJ2Z3BhVVBPU3VvTUZQd0x3?=
- =?utf-8?B?bHJudHc5VmZZcEVNNEVBMGMrc0VlSmhqUGNMNFRjdjQ5dzNsYzVKbHlxUTdX?=
- =?utf-8?B?RTdXQmpHTWczSFFHV3NFSGNiVzBZNkJPOUhjWjN5OUR0Ry9NSUJic2FTd0g1?=
- =?utf-8?B?bG1UL0JGaE1aTVlHU0JpRVN4YzgySXBFWGdxTk05TjI1ZmZJcnZYc0VSNXlD?=
- =?utf-8?B?OTRJY25PRlFVUFUrd2h0YWUzdzIrNk5hV29RdGR4TGdCeE95cXpTYVV5NTFC?=
- =?utf-8?B?c2xpQTZVY2NYYlgyZjhVeXUxdXNoYjYvcTR5L0VBSEZLak0xREQ3L2dSMmJ0?=
- =?utf-8?B?c1JWQk5kT0hJOXY5ZUFOTHppZ1lXdzhubEFxdkRTUzI0SDA4Yk12d2x2T3RL?=
- =?utf-8?B?ZEE9PQ==?=
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b9415016-b593-4222-5af7-08dae6981979
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR02MB7555.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Dec 2022 16:50:16.7053
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: E79DBt267j7NVwT1Ny0/htlkfoKWpwa1f5iEbeTj9E5GiabaR8Rbq2RLoA/sHzijbLYOQ2qgIqyd+9zHfOmoLSwZ3ItFbfOiwBj0fRWxRzg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR02MB6516
-X-Proofpoint-ORIG-GUID: JPkhxrT5adeKK5nT9XVMXpP9UpIUI6Uj
-X-Proofpoint-GUID: JPkhxrT5adeKK5nT9XVMXpP9UpIUI6Uj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2022-12-25_13,2022-12-23_01,2022-06-22_01
-X-Proofpoint-Spam-Reason: safe
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [RFC PATCH V2 08/18] x86/hyperv: decrypt vmbus pages for sev-snp
+ enlightened guest
+To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
+        "luto@kernel.org" <luto@kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "mingo@redhat.com" <mingo@redhat.com>,
+        "bp@alien8.de" <bp@alien8.de>,
+        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
+        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
+        "seanjc@google.com" <seanjc@google.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "jgross@suse.com" <jgross@suse.com>,
+        Tianyu Lan <Tianyu.Lan@microsoft.com>,
+        "kirill@shutemov.name" <kirill@shutemov.name>,
+        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
+        "srutherford@google.com" <srutherford@google.com>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
+        "pawan.kumar.gupta@linux.intel.com" 
+        <pawan.kumar.gupta@linux.intel.com>,
+        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
+        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
+        "alexander.shishkin@linux.intel.com" 
+        <alexander.shishkin@linux.intel.com>,
+        "sandipan.das@amd.com" <sandipan.das@amd.com>,
+        "ray.huang@amd.com" <ray.huang@amd.com>,
+        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
+        "michael.roth@amd.com" <michael.roth@amd.com>,
+        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
+        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
+        "sterritt@google.com" <sterritt@google.com>,
+        "tony.luck@intel.com" <tony.luck@intel.com>,
+        "samitolvanen@google.com" <samitolvanen@google.com>,
+        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
+References: <20221119034633.1728632-1-ltykernel@gmail.com>
+ <20221119034633.1728632-9-ltykernel@gmail.com>
+ <BYAPR21MB168838758CAA630B55E73DB2D7E39@BYAPR21MB1688.namprd21.prod.outlook.com>
+Content-Language: en-US
+From:   Tianyu Lan <ltykernel@gmail.com>
+In-Reply-To: <BYAPR21MB168838758CAA630B55E73DB2D7E39@BYAPR21MB1688.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 08/12/22 1:00 pm, Shivam Kumar wrote:
-> 
-> 
-> On 08/12/22 1:23 am, Sean Christopherson wrote:
->> On Wed, Dec 07, 2022, Marc Zyngier wrote:
->>> On Tue, 06 Dec 2022 06:22:45 +0000,
->>> Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
->>> You need to define the granularity of the counter, and account for
->>> each fault according to its mapping size. If an architecture has 16kB
->>> as the base page size, a 32MB fault (the size of the smallest block
->>> mapping) must bump the counter by 2048. That's the only way userspace
->>> can figure out what is going on.
+On 12/14/2022 2:08 AM, Michael Kelley (LINUX) wrote:
+> From: Tianyu Lan <ltykernel@gmail.com> Sent: Friday, November 18, 2022 7:46 PM
 >>
->> I don't think that's true for the dirty logging case.  IIUC, when a 
->> memslot is
->> being dirty logged, KVM forces the memory to be mapped with PAGE_SIZE 
->> granularity,
->> and that base PAGE_SIZE is fixed and known to userspace.  I.e. 
->> accuracy is naturally
->> provided for this primary use case where accuracy really matters, and 
->> so this is
->> effectively a documentation issue and not a functional issue.
 > 
-> So, does defining "count" as "the number of write permission faults" 
-> help in addressing the documentation issue? My understanding too is that 
-> for dirty logging, we will have uniform granularity.
-> 
-> Thanks.
-> 
->>
->>> Without that, you may as well add a random number to the counter, it
->>> won't be any worse.
->>
->> The stat will be wildly inaccurate when dirty logging isn't enabled, 
->> but that doesn't
->> necessarily make the stat useless, e.g. it might be useful as a very 
->> rough guage
->> of which vCPUs are likely to be writing memory.  I do agree though 
->> that the value
->> provided is questionable and/or highly speculative.
->>
->>> [...]
->>>
->>>>>>> If you introduce additional #ifdefery here, why are the additional
->>>>>>> fields in the vcpu structure unconditional?
->>>>>>
->>>>>> pages_dirtied can be a useful information even if dirty quota
->>>>>> throttling is not used. So, I kept it unconditional based on
->>>>>> feedback.
->>>>>
->>>>> Useful for whom? This creates an ABI for all architectures, and this
->>>>> needs buy-in from everyone. Personally, I think it is a pretty useless
->>>>> stat.
->>>>
->>>> When we started this patch series, it was a member of the kvm_run
->>>> struct. I made this a stat based on the feedback I received from the
->>>> reviews. If you think otherwise, I can move it back to where it was.
->>>
->>> I'm certainly totally opposed to stats that don't have a clear use
->>> case. People keep piling random stats that satisfy their pet usage,
->>> and this only bloats the various structures for no overall benefit
->>> other than "hey, it might be useful". This is death by a thousand cut.
->>
->> I don't have a strong opinion on putting the counter into kvm_run as 
->> an "out"
->> fields vs. making it a state.  I originally suggested making it a stat 
->> because
->> KVM needs to capture the information somewhere, so why not make it a 
->> stat?  But
->> I am definitely much more cavalier when it comes to adding stats, so 
->> I've no
->> objection to dropping the stat side of things.
-> 
-> I'll be skeptical about making it a stat if we plan to allow the 
-> userspace to reset it at will.
-> 
-> 
-> Thank you so much for the comments.
-> 
-> Thanks,
-> Shivam
+> The Subject prefix for this patch should be "Drivers: hv: vmbus:"
 
-Hi Marc,
-Hi Sean,
+Sure. Will update in the next version.
 
-Please let me know if there's any further question or feedback.
+> 
+>> Vmbus int, synic and post message pages are shared with hypervisor
+>> and so decrypt these pages in the sev-snp guest.
+>>
+>> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
+>> ---
+>>   drivers/hv/connection.c | 13 +++++++++++++
+>>   drivers/hv/hv.c         | 32 +++++++++++++++++++++++++++++++-
+>>   2 files changed, 44 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/hv/connection.c b/drivers/hv/connection.c
+>> index 9dc27e5d367a..43141225ea15 100644
+>> --- a/drivers/hv/connection.c
+>> +++ b/drivers/hv/connection.c
+>> @@ -215,6 +215,15 @@ int vmbus_connect(void)
+>>   		(void *)((unsigned long)vmbus_connection.int_page +
+>>   			(HV_HYP_PAGE_SIZE >> 1));
+>>
+>> +	if (hv_isolation_type_snp() || hv_isolation_type_en_snp()) {
+> 
+> This decryption should be done only for a fully enlightened SEV-SNP
+> guest, not for a vTOM guest.
+> 
+>> +		ret = set_memory_decrypted((unsigned long)
+>> +				vmbus_connection.int_page, 1);
+>> +		if (ret)
+>> +			goto cleanup;
+> 
+> This cleanup path doesn't work correctly.  It calls
+> vmbus_disconnect(), which will try to re-encrypt the memory.
+> But if the original decryption failed, re-encrypting is the wrong
+> thing to do.
+> 
+> It looks like this same bug exists in current code if the decryption
+> of the monitor pages fails or if just one of the original memory
+> allocations fails.  vmbus_disconnect() doesn't know whether it
+> should re-encrypt the pages.
 
-Thanks,
-Shivam
+Agree. It's necessary to handle decryption failure case by case in stead 
+of re-encryting all pages. Will fix this in the next version. Thanks to 
+point out.
