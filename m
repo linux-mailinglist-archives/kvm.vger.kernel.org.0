@@ -2,59 +2,60 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5280A656E7E
-	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 21:01:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7587D656E97
+	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 21:20:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230178AbiL0UBD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 15:01:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58270 "EHLO
+        id S231723AbiL0UUy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 15:20:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229488AbiL0UBB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 15:01:01 -0500
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C59D8C0A
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 12:01:00 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id i26-20020a9d68da000000b00672301a1664so8757416oto.6
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 12:01:00 -0800 (PST)
+        with ESMTP id S229608AbiL0UUW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 15:20:22 -0500
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A08CB35
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 12:20:20 -0800 (PST)
+Received: by mail-io1-xd2a.google.com with SMTP id b192so7377239iof.8
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 12:20:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=4VAL3DeAX58VLHn/2RTmElxk6IH1Cdb+7IOYdSiiefI=;
-        b=DQNZ8yhk3dcKcmDA9aLCpeGKFZU6W5omKAAIjeVci6YzuNWY1eWHkN5VWH2T5lomvx
-         7NGx7C+Q/craZcONT5TIb4gjQcU+qVti+Mxil9wTHgdKBmkeHJW3TlN+01yW8Ftn7R2S
-         pSsunIWB/wM6orthABAx9o7QCFBdfbftcJ93A6qvT2n8lysRRU7XnDE5HEF+Lr42EZUn
-         k2Yv2qk9QkeJC8kMdmHplNT1p6isHJyCyViDt7zOouChi6r8FetXS713Z4LEGjaHd+To
-         jlbBgYo2Fpey1PzII7ALrc1ipOBjJ0Xice/7CeAzU9zcGAkrktW3dJrSYoBiD0VOhHTz
-         tDXA==
+        bh=oUdac+MaBje7dX/XEq6/cPZiPaJDSdQLf+a0j0f0Qqs=;
+        b=H6vvZyL1skdR13RvGEshUaU8gUIScSnwMf3TGZ6LIUQCjoVdwDNOD8cjd7ALF0m3hz
+         HtJDrnlnBlorNyxICsJfwlgL91qpBG+rXe9NYupt4qAehTEqtRUjW8Eh92/6N6EVOhM6
+         4EiwtdcdRSl0T5NkiAdWwQ8SXiWyIgmxTqaT1sxAuXk9npXkczgTlvoxJDYi1YnNYKqZ
+         eWGU90oL3qgHk/5Rjz9xHGETlWWYZEitZyMyZfw/25Fv261NyDDYoI5i4OKZQ2uJnCNg
+         v2+Dd0eDxPvZJmmc8Vk48QZAA8bLLuuzATPixi6n8lTckyjWHZZhmTdWrstrdzt6jqBU
+         ho3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4VAL3DeAX58VLHn/2RTmElxk6IH1Cdb+7IOYdSiiefI=;
-        b=7V3DxApdGm/LwWet7/CVaua9QzQI80TFME0vUoUMTLp+nhNo+y5OctW7pwmO3WR5rp
-         vf+QliYgi4v+KmnmPiZBSxvAFbwf7Tkbl3T5CTnxuKgJcKi3qBWFq2Nx8O0q2UFzJhiX
-         8pnKViZorXx9DBpm3WYmo2Mb2iwsxu6g8QvGsPshgBTCG09eAdccQac4ka8GNtoit4aR
-         +ueeCYNkFbDUk71O4wOSGjcIIClGjlbkhp7Yy0loGFY/M43QoCcmaMk2Fg+Ryfk9SiLw
-         uZdolmT7JFdI2RLpqybsRSMCfFIVN3t7S4/LRv+rVKlsveOf7dGPUbs8pj/xQ7+b7j3M
-         BXbw==
-X-Gm-Message-State: AFqh2kqWheIDm7/P/nAs+jFWAE85ljPFoH1gTGxxJ2tu2AYVGjnlEuzl
-        3F8Sy+ov4Y1bRpMS361csT02PZbPZErnwYTIe+9qpg==
-X-Google-Smtp-Source: AMrXdXvq0gajIyjneJ9tPOfCxdmhveWkGGSmozLyTWruI7uPfOUJ4/VPZChL4pFA2Gn4TS71NQ7VMLeNADekxkaA5hE=
-X-Received: by 2002:a05:6830:14d5:b0:678:1d9f:20c9 with SMTP id
- t21-20020a05683014d500b006781d9f20c9mr1269302otq.45.1672171259996; Tue, 27
- Dec 2022 12:00:59 -0800 (PST)
+        bh=oUdac+MaBje7dX/XEq6/cPZiPaJDSdQLf+a0j0f0Qqs=;
+        b=uGW0v1NKFTdCCe1UgCwnXRQI+ntSY6Creb+m6It+WWcXwIiy+WbxypaPUSw/YMVUx2
+         /Dy25uZR04nj8wc9TcBxw8ckG0MWNW6CjjoIIvac2+quN8RTFlTb2t/vT3EyX2LEJbzf
+         ictPojo4/mIrWgveWeB8M/aZvN6+E8JX1g7tQXwpUFEeZZ55gSYLsMqR+7uUL43ajsnT
+         MFSYmNAmbPxgwvhQ0y/oJy6Kj68gWg/j4fkEllnZjLWFQSDwaVOSs31pcWBLPDx5strX
+         pSxuCgLMJ47jnyhyt53IzlQEM59xzwGzSOQPM6T0GtvjOHgXYubNMFyIR+7y9tdlBUxu
+         LPxA==
+X-Gm-Message-State: AFqh2kqepHSGq8EO5VkGteV/fAAvmqBsKUP5chbC6jyMjxVZlbEtXUwl
+        wFsGQr4PFgooYrNol6oQlPPhpsLC7yQdQvhKZepD8Q==
+X-Google-Smtp-Source: AMrXdXs4LQM1m7FgXjaY8gGUH1zxONsQeP5eBG3gk7IFl8MKFT+TJ3hPwJyZ7yEfUyWs3ni8d1UZgbvOe0kRgu/3i1U=
+X-Received: by 2002:a02:340b:0:b0:38a:2499:c04b with SMTP id
+ x11-20020a02340b000000b0038a2499c04bmr1852258jae.72.1672172419223; Tue, 27
+ Dec 2022 12:20:19 -0800 (PST)
 MIME-Version: 1.0
-References: <20221227183713.29140-1-aaronlewis@google.com>
-In-Reply-To: <20221227183713.29140-1-aaronlewis@google.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 27 Dec 2022 12:00:49 -0800
-Message-ID: <CALMp9eRe+8ypPXVvR5cwRT7YeuXFtT2HjiyGOU9a1U5WjoD0Pw@mail.gmail.com>
-Subject: Re: [PATCH 0/3] Clean up AMX cpuid bits XTILE_CFG and XTILE_DATA
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        like.xu.linux@gmail.com
+References: <20221212183720.4062037-1-vipinsh@google.com> <20221212183720.4062037-3-vipinsh@google.com>
+In-Reply-To: <20221212183720.4062037-3-vipinsh@google.com>
+From:   Aaron Lewis <aaronlewis@google.com>
+Date:   Tue, 27 Dec 2022 20:20:08 +0000
+Message-ID: <CAAAPnDH3sg4rmHi7uirOB5oYwr-Ub+O0+fxdg5XiO5oCU0i1OQ@mail.gmail.com>
+Subject: Re: [Patch v4 02/13] KVM: x86: Add a KVM-only leaf for CPUID_8000_0007_EDX
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, vkuznets@redhat.com,
+        dmatlack@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -67,34 +68,105 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 27, 2022 at 10:38 AM Aaron Lewis <aaronlewis@google.com> wrote:
+On Mon, Dec 12, 2022 at 6:37 PM Vipin Sharma <vipinsh@google.com> wrote:
 >
-> When running a SPR guest without AMX enabled
-
-Can you clarify what "without AMX enabled" means? Do you mean that
-userspace hasn't opted in to AMX via arch_prctl()?
-
-> CPUID.(EAX=0DH,ECX=0):EAX.XTILE_CFG[bit-17] will be set and
-> CPUID.(EAX=0DH,ECX=0):EAX.XTILE_DATA[bit-18] will be clear.  While this
-> is architecturally correct it can be a little awkward for userspace
-> or a guest when using them.  Instead of leaving the CPUID leaf in a
-> half baked state, either clear them both or leave them both set.
+> From: Vitaly Kuznetsov <vkuznets@redhat.com>
 >
-> Additionally, add testing to verify the CPUID isn't in such a state.
+> CPUID_8000_0007_EDX may come handy when X86_FEATURE_CONSTANT_TSC
+> needs to be checked.
 >
-> Aaron Lewis (3):
->   KVM: x86: Clear XTILE_CFG if XTILE_DATA is clear
->   KVM: selftests: Hoist XGETBV and XSETBV to make them more accessible
->   KVM: selftests: Add XCR0 Test
+> No functional change intended.
 >
->  arch/x86/kvm/cpuid.c                          |   4 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/include/x86_64/processor.h  |  19 +++
->  tools/testing/selftests/kvm/x86_64/amx_test.c |  24 +---
->  .../selftests/kvm/x86_64/xcr0_cpuid_test.c    | 134 ++++++++++++++++++
->  5 files changed, 161 insertions(+), 21 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
+> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/cpuid.c         | 8 ++++++--
+>  arch/x86/kvm/reverse_cpuid.h | 7 +++++++
+>  2 files changed, 13 insertions(+), 2 deletions(-)
 >
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 723502181a3a..42913695fedd 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -701,6 +701,10 @@ void kvm_set_cpu_caps(void)
+>         if (!tdp_enabled && IS_ENABLED(CONFIG_X86_64))
+>                 kvm_cpu_cap_set(X86_FEATURE_GBPAGES);
+>
+> +       kvm_cpu_cap_init_kvm_defined(CPUID_8000_0007_EDX,
+> +               SF(CONSTANT_TSC)
+> +       );
+> +
+>         kvm_cpu_cap_mask(CPUID_8000_0008_EBX,
+>                 F(CLZERO) | F(XSAVEERPTR) |
+>                 F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
+> @@ -1153,8 +1157,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>                 entry->edx &= ~GENMASK(17, 16);
+>                 break;
+>         case 0x80000007: /* Advanced power management */
+> -               /* invariant TSC is CPUID.80000007H:EDX[8] */
+> -               entry->edx &= (1 << 8);
+> +               cpuid_entry_override(entry, CPUID_8000_0007_EDX);
+> +
+>                 /* mask against host */
+>                 entry->edx &= boot_cpu_data.x86_power;
+>                 entry->eax = entry->ebx = entry->ecx = 0;
+> diff --git a/arch/x86/kvm/reverse_cpuid.h b/arch/x86/kvm/reverse_cpuid.h
+> index 203fdad07bae..25b9b51abb20 100644
+> --- a/arch/x86/kvm/reverse_cpuid.h
+> +++ b/arch/x86/kvm/reverse_cpuid.h
+> @@ -14,6 +14,7 @@
+>  enum kvm_only_cpuid_leafs {
+>         CPUID_12_EAX     = NCAPINTS,
+>         CPUID_7_1_EDX,
+> +       CPUID_8000_0007_EDX,
+>         NR_KVM_CPU_CAPS,
+>
+>         NKVMCAPINTS = NR_KVM_CPU_CAPS - NCAPINTS,
+> @@ -42,6 +43,9 @@ enum kvm_only_cpuid_leafs {
+>  #define X86_FEATURE_AVX_NE_CONVERT      KVM_X86_FEATURE(CPUID_7_1_EDX, 5)
+>  #define X86_FEATURE_PREFETCHITI         KVM_X86_FEATURE(CPUID_7_1_EDX, 14)
+>
+> +/* CPUID level 0x80000007 (EDX). */
+> +#define KVM_X86_FEATURE_CONSTANT_TSC   KVM_X86_FEATURE(CPUID_8000_0007_EDX, 8)
+> +
+>  struct cpuid_reg {
+>         u32 function;
+>         u32 index;
+> @@ -67,6 +71,7 @@ static const struct cpuid_reg reverse_cpuid[] = {
+>         [CPUID_12_EAX]        = {0x00000012, 0, CPUID_EAX},
+>         [CPUID_8000_001F_EAX] = {0x8000001f, 0, CPUID_EAX},
+>         [CPUID_7_1_EDX]       = {         7, 1, CPUID_EDX},
+> +       [CPUID_8000_0007_EDX] = {0x80000007, 0, CPUID_EDX},
+>  };
+>
+>  /*
+> @@ -97,6 +102,8 @@ static __always_inline u32 __feature_translate(int x86_feature)
+>                 return KVM_X86_FEATURE_SGX1;
+>         else if (x86_feature == X86_FEATURE_SGX2)
+>                 return KVM_X86_FEATURE_SGX2;
+> +       else if (x86_feature == X86_FEATURE_CONSTANT_TSC)
+> +               return KVM_X86_FEATURE_CONSTANT_TSC;
+>
+>         return x86_feature;
+>  }
 > --
-> 2.39.0.314.g84b9a713c41-goog
+> 2.39.0.rc1.256.g54fd8350bd-goog
 >
+
+I believe this version of the patch should have been taken instead of:
+https://git.kernel.org/pub/scm/virt/kvm/kvm.git/commit/?h=queue&id=42b76c1ae40b89716c7a804cb575a4b52eb4e12f
+
+I think it should be kvm_cpu_cap_init_kvm_defined() rather than
+kvm_cpu_cap_init_scattered().
+
+I'm getting this:
+arch/x86/kvm/cpuid.c:705:2: error: call to undeclared function
+'kvm_cpu_cap_init_scattered'; ISO C99 and later do not support
+implicit function declarations [-Wimplicit-function-declaration]
+        kvm_cpu_cap_init_scattered(CPUID_8000_0007_EDX,
+        ^
+arch/x86/kvm/cpuid.c:705:2: note: did you mean 'kvm_cpu_cap_init_kvm_defined'?
+arch/x86/kvm/cpuid.c:553:6: note: 'kvm_cpu_cap_init_kvm_defined' declared here
+void kvm_cpu_cap_init_kvm_defined(enum kvm_only_cpuid_leafs leaf, u32 mask)
+     ^
+1 error generated.
