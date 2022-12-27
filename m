@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FC30656FE6
-	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 22:15:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 211CB656FEF
+	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 22:23:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231426AbiL0VOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 16:14:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48016 "EHLO
+        id S230114AbiL0VXr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 16:23:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53906 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230354AbiL0VOc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 16:14:32 -0500
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3157111E
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 13:14:31 -0800 (PST)
-Received: by mail-ot1-x336.google.com with SMTP id j16-20020a056830271000b0067202045ee9so8851793otu.7
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 13:14:31 -0800 (PST)
+        with ESMTP id S229898AbiL0VXp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 16:23:45 -0500
+Received: from mail-oo1-xc30.google.com (mail-oo1-xc30.google.com [IPv6:2607:f8b0:4864:20::c30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1C04F4C
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 13:23:44 -0800 (PST)
+Received: by mail-oo1-xc30.google.com with SMTP id m23-20020a4abc97000000b004bfe105c580so2409469oop.4
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 13:23:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5B3gRbk7mPTy6cABE5bRAfMgyd0DMPubiMozUKCh0xs=;
-        b=kj/ebOrzNTFjaJ3PIhpn1A93x2Rf4mlsy4MQgOuZbnIvkTa8M2ef2dYXNPH/apaqWZ
-         WcXzTBRaLbPeZI4KiKmOI0XbNOSkk51Pd2Y7Ds1H0LglgJAYLw0Rd7QQ7fFNdwVM0pEw
-         586zJb04MDAHHKfLAMS7MVydF0lFRPXIgbsZat5A+lcMHfafmmfgRUhY6FBIcE+HQLCa
-         zSFsIOKk/molyqnYsvnA7A+im6UbPnjfrWjLY+XJIcCO5RGgcfx45NuYljvjm6pT+MS/
-         PDlm6MuoQ7bhyHyxatnRUfYiETDB8rC2iuYCnXWGklf9S/H4N0IrIydecN/S7diUM6MN
-         PybA==
+        bh=LJmVkOnb6rX3XrBrgRu585wdYWYx//ek9uXDwJrERMw=;
+        b=DwXyxPre28aJdMG2QS26vFZsvWhG0+8ty+Uh0h6Jl+AmUYw7slOXAnvRdtk3mXP+tg
+         gFG5h30SGx1Cn/06EnmI/vBW1QyFLaEG33C8Tt37bjCFake+8Ml7nLDw4PyFk4/EJt4S
+         Z79aL3paffMBtlvvfVZ4z5dFre6D28Irx/3ALcZ7d7t6C6vv4zeabnPVoFViH+I/HLej
+         4MsswXLZ7T2y2PjtprPTz13dRtBbQ2VDpO3HtTxXtUq2nVLmKB4VfmFR0mYMIbCi5Y/T
+         MDvhlicnTTHyblIv1vm/sRGiLw2ef+iW9PT5BNK9g1IuF9910BC1ShrhKKMLpegLFVZA
+         ZfSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=5B3gRbk7mPTy6cABE5bRAfMgyd0DMPubiMozUKCh0xs=;
-        b=Sqhvs1YS6tPP+NbxRBEBhHez4Q0WUCXjMJ35G72G68HvmirS+DF68m/NbbtpdoDJi7
-         f92disAR+Bkkj1/ktt9izBP20gVIS5P2z7OxPLb9OmplGZHz5twQ8kIm8owiRGs8oTwH
-         9zd0lSKxB2U4+hc8ZFRRDy8al0AZoeswtsXwqn0/uxgkqRLVsdWd1B+vrVQLhi2JP7fo
-         Ai8k98A+9Db9C47N+smvsa79FI96s/6RGglBxsnldAzqdmcSqbyBzbo9we0RUAYNIckQ
-         d+SwFhbltznggkFveRD8CPcCYewZd524NTDzze1g7hiL7p/1rxXdCF51+DnvI8MNxbSl
-         Yq+A==
-X-Gm-Message-State: AFqh2koSTfl+QaDohi9I/MYNvjJzb9ZBZlI6TPECgW7xaVl0XItgpecg
-        YGFQNDgL3W3w62G//4VAL4k6LmFWgf/4yeIV1E8dKA==
-X-Google-Smtp-Source: AMrXdXttjUPZGgWXlpUzktmXjvoZEX08g9rVnFYgBy6JmWurRqMwD1RGt7c69aTPAYANoe+P0YdSeEpv6FE6wPVVAsc=
-X-Received: by 2002:a9d:6d84:0:b0:66c:a613:9843 with SMTP id
- x4-20020a9d6d84000000b0066ca6139843mr1662571otp.8.1672175670362; Tue, 27 Dec
- 2022 13:14:30 -0800 (PST)
+        bh=LJmVkOnb6rX3XrBrgRu585wdYWYx//ek9uXDwJrERMw=;
+        b=xKT7AHxhBqscv6L8sdAwv4lZRxZE2fzkK+fKCxN0qFzANY4QpPnL3JpazSuCeCkfiA
+         Jz4SivZbzp0Bo/zpZrUi0TJiMl4L6r6jjc6pd8m16kVmdiwwDu8iTBUTEe2Q0SvXkZhh
+         gbxDiqyIl3Zw95jP+gz1dBYcK+AwhOnSCHcmdHL16scGivatH2igBv6SGSA20x5JYLBH
+         6s1HDjrqOl2AmRresQsrG+XyOcpCs7QYN0cXpJZvtVQhq/FNzdLPia7Vz2sA0iE5UQWf
+         hVSGk6OJgwLJaYqP6l0JLN4ZvSkqHRSjnHU1IJbGjLImtSanLOnNP3Jg7ynCb2vt3ydq
+         bjSA==
+X-Gm-Message-State: AFqh2kpjcVtAUuGeM0QbU/TaiJpl98Th82iTuygKqqirWYTJ2bkwJhia
+        EKCMYOFKCt8M8FV8advz2LMcxkjN51Dcj2pl2lWCLg==
+X-Google-Smtp-Source: AMrXdXuRGOArMnueFus0lZK0ZT18dXjB5OBpHcE7H/zIk3iT6c3GpfUxZvm9vatsVtfnwtWdDh+uP1Vv8f67DfqWdPk=
+X-Received: by 2002:a4a:e7d2:0:b0:4a3:e23d:4e2a with SMTP id
+ y18-20020a4ae7d2000000b004a3e23d4e2amr1021814oov.7.1672176223860; Tue, 27 Dec
+ 2022 13:23:43 -0800 (PST)
 MIME-Version: 1.0
-References: <20221227183713.29140-1-aaronlewis@google.com> <20221227183713.29140-2-aaronlewis@google.com>
- <CALMp9eRidX1TkpdLzzLyC6HhREhPsPeh2MZ5itoLbv3ik+a29g@mail.gmail.com> <CAAAPnDH6CqvtgT_ykn-BfP=hTUUugYbgOpcOWTx7ZaS__JyheQ@mail.gmail.com>
-In-Reply-To: <CAAAPnDH6CqvtgT_ykn-BfP=hTUUugYbgOpcOWTx7ZaS__JyheQ@mail.gmail.com>
+References: <20221227183713.29140-1-aaronlewis@google.com> <20221227183713.29140-3-aaronlewis@google.com>
+In-Reply-To: <20221227183713.29140-3-aaronlewis@google.com>
 From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 27 Dec 2022 13:14:19 -0800
-Message-ID: <CALMp9eRH6YRmksZPY2=8FXnxGMS4WHAQeBsY5Ppc7d1rTGHgsw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] KVM: x86: Clear XTILE_CFG if XTILE_DATA is clear
+Date:   Tue, 27 Dec 2022 13:23:32 -0800
+Message-ID: <CALMp9eS1Tap_fF4Yn-5yyqBPZQ0XBnzmUVThjDSQPfR8giqCmA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: selftests: Hoist XGETBV and XSETBV to make them
+ more accessible
 To:     Aaron Lewis <aaronlewis@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com,
         like.xu.linux@gmail.com
@@ -68,34 +68,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 27, 2022 at 12:44 PM Aaron Lewis <aaronlewis@google.com> wrote:
+On Tue, Dec 27, 2022 at 10:38 AM Aaron Lewis <aaronlewis@google.com> wrote:
 >
-> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > index 0b5bf013fcb8e..2d9910847786a 100644
-> > > --- a/arch/x86/kvm/cpuid.c
-> > > +++ b/arch/x86/kvm/cpuid.c
-> > > @@ -977,6 +977,10 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> > >                 u64 permitted_xcr0 = kvm_caps.supported_xcr0 & xstate_get_guest_group_perm();
-> > >                 u64 permitted_xss = kvm_caps.supported_xss;
-> > >
-> > > +               if (!(permitted_xcr0 & XFEATURE_MASK_XTILE_CFG) ||
-> > > +                   !(permitted_xcr0 & XFEATURE_MASK_XTILE_DATA))
-> > > +                       permitted_xcr0 &= ~XFEATURE_MASK_XTILE;
-> > > +
-> > >                 entry->eax &= permitted_xcr0;
-> > >                 entry->ebx = xstate_required_size(permitted_xcr0, false);
-> > >                 entry->ecx = entry->ebx;
-> > > --
-> > > 2.39.0.314.g84b9a713c41-goog
-> > >
-> >
-> > Two questions:
-> >
-> > 1) Under what circumstances would this happen?
-> This would happen if userspace hasn't opted in to using AMX via arch_prctl().
+> The instructions XGETBV and XSETBV are useful to other tests.  Move
+> them to processor.h to make them available to be used more broadly.
 >
-> > 2) Shouldn't we also clear XFEATURE_MASK_CFG if both bits are not set?
-> Both CFG and DATA are cleared with XFEATURE_MASK_XTILE.  It defines both.
-Doh!
+> No functional change intended.
+>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>  .../selftests/kvm/include/x86_64/processor.h  | 19 +++++++++++++++
+>  tools/testing/selftests/kvm/x86_64/amx_test.c | 24 +++----------------
+>  2 files changed, 22 insertions(+), 21 deletions(-)
+>
+> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> index b1a31de7108ac..34957137be375 100644
+> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> @@ -492,6 +492,25 @@ static inline void set_cr4(uint64_t val)
+>         __asm__ __volatile__("mov %0, %%cr4" : : "r" (val) : "memory");
+>  }
+>
+> +static inline u64 xgetbv(u32 index)
+> +{
+> +       u32 eax, edx;
+> +
+> +       __asm__ __volatile__("xgetbv;"
+> +                    : "=a" (eax), "=d" (edx)
+> +                    : "c" (index));
+> +       return eax | ((u64)edx << 32);
+> +}
+> +
+> +static inline void xsetbv(u32 index, u64 value)
+> +{
+> +       u32 eax = value;
+> +       u32 edx = value >> 32;
+> +
+> +       __asm__ __volatile__("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
+> +}
+> +
+> +
+
+Not your change, but shouldn't both of these asm statements have
+artificial "memory" clobbers, to prevent reordering?
 
 Reviewed-by: Jim Mattson <jmattson@google.com>
