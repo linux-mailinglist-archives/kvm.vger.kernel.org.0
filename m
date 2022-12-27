@@ -2,143 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9535D6567F5
-	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 08:49:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 753AF65680A
+	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 08:57:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbiL0Hth (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 02:49:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49444 "EHLO
+        id S231265AbiL0H5D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 02:57:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229990AbiL0Hte (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 02:49:34 -0500
-Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0683E2F
-        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 23:49:33 -0800 (PST)
-Received: by mail-ua1-x931.google.com with SMTP id z23so2779382uae.7
-        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 23:49:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=igel-co-jp.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W5to3Z4Sn21mWEIZEJGvSoWUEuZOvMtlIkM4pTNXTa4=;
-        b=athKvejDkz6WSCUOqN63r4RkPc7PljBcdn1pqKggjZSE8/UMue7d69Hl0+z0dS1T14
-         TMhEMq/PWya4AXj39g9+GOrmLL/6PF0RM4WrxXttFOwovqpHxNQYtyH4IboGtbgLeNqV
-         SXdXhdL07fADUCEVkrw4TPoqd61my8VqkLH8JoelYHKVxjoTN/wxYvv/ArhTnhs9dRHG
-         k5aaZcuYrmlAQmcwMjLycR0ZuNHCCCf3taivtDVAZ5oAdkOHU0A1//IUelvkKEKIWYYa
-         jNK5gRLbWE3DV++L1ZnaRG6YpOx9jMjvsaOPkoQD+v6pnSzOtW7vFH5SC2hG7hXGo4AN
-         ec2Q==
+        with ESMTP id S229641AbiL0H4w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 02:56:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 466A6BD7
+        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 23:56:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672127770;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=kXIiVrztZsdU7pju6USGfTMhcaQjY/sBo8HpMhE5ZAA=;
+        b=VaJjcKiI7m6Ip3ToUh+HHHMX68WqbDp4wvwRdzl35sTDWgqMm0x+4MB+8Uppm1j6jPqXF8
+        F3Aun8Joh6E+NtfAPfBWlRzQG6LiaUIGNc++GcIQhh0PsicJa/Fd6HdoWlDouOYN8Z4PrM
+        bKrD1pYOvH6pm+cZKL+uACggmql70I4=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-151-5bwHdF4_Ng-xqGvUQ7XY7A-1; Tue, 27 Dec 2022 02:56:09 -0500
+X-MC-Unique: 5bwHdF4_Ng-xqGvUQ7XY7A-1
+Received: by mail-ed1-f71.google.com with SMTP id i8-20020a05640242c800b004852914ce42so2677154edc.6
+        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 23:56:08 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=W5to3Z4Sn21mWEIZEJGvSoWUEuZOvMtlIkM4pTNXTa4=;
-        b=2ASj8MWnEyRkqmpBwbwbmkq36y+KAoBO+5hM6SupE0/9DoIAJkB4M/tI7wQ36rAeGL
-         woHlW1xroJYDyZZi6oOZoFJ6oOwMB8kWNk/6sy6Jm0F4VXfzDqnpHGvjyQnzfvdAStT/
-         ZPmCjQrJm5LdP7rJBxqIsVmaQvYFo6m1OzsnJ+6Ygdz5ifaEELCiOegYMOqsWi7BCSqb
-         /dlQb8vlj0CRCyQdlwpxmJRA+IFrEV1NsoaqxM+c7cLI1/w3uzZyBwWcFyabFjgrp8ji
-         TNj2xgT+sNNNFUjuBS/JJ3wFoRLJ3ihFLODQpyJIFjyyfjTSEbqTTsr6z0Hrr85S40lH
-         Wkhg==
-X-Gm-Message-State: AFqh2kroSzUkTGMmiHkJlu7llJe/u/UhaZHCwzyHgOFAGG4Zpi5PUN/x
-        buCfqGUvoApZnAOivHFEWEgx6+IwQfgaQRGmNFsTBA==
-X-Google-Smtp-Source: AMrXdXusNUsGQL0Ne/cKnzjlrEkV3MuC9iimVicFSzsdURbLbmAJZHBO2efWxuvY91KyNogPqzmtu2qQDpJ5tYpw3H8=
-X-Received: by 2002:ab0:2eb7:0:b0:43a:243f:35b7 with SMTP id
- y23-20020ab02eb7000000b0043a243f35b7mr2032126uay.101.1672127372773; Mon, 26
- Dec 2022 23:49:32 -0800 (PST)
-MIME-Version: 1.0
-References: <20221227022528.609839-1-mie@igel.co.jp> <20221227022528.609839-5-mie@igel.co.jp>
- <20221227020007-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20221227020007-mutt-send-email-mst@kernel.org>
-From:   Shunsuke Mie <mie@igel.co.jp>
-Date:   Tue, 27 Dec 2022 16:49:21 +0900
-Message-ID: <CANXvt5pRy-i7=_ikNkZPp2HcRmWZYNJYpjO_ieBJJVc90nds+A@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/9] vringh: unify the APIs for all accessors
-To:     "Michael S. Tsirkin" <mst@redhat.com>
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kXIiVrztZsdU7pju6USGfTMhcaQjY/sBo8HpMhE5ZAA=;
+        b=u5hWj6UwBxVwjXhkFF+8icqbJq5xbLUZu5t6+D2+oIWjjdbHgWrwy0/SfErWH20M6t
+         fMRoI9QgFKE4HW9JWi2O15SVn567SKZknYJb5lTHUQ8+8QITvfleoDa7mSAJYQbzxPQN
+         Ye1TqPvD2JwGcWbBgmD4y16zUo+CfJ+BN00VJ+wLB3CgoERzqwRK0hX1bt8KAzk18HPL
+         XYH03x8iBtTsGZ3eRlG4q8VcN+Y1upFm0l9JiC9Z4JlKfLaIwmgEuobAfbdeocMmOIkM
+         LvRuRM5IcY5ROQt6zmhGqvKJuSDlWhkY+xuhhmsWie0RnbnLsTGsOInTKJqGn5q7MBfw
+         muTA==
+X-Gm-Message-State: AFqh2kqZETnuRT8yf00b3TfPd9s/JhED1JzafsTePJjGdo4xhGfwwbtr
+        ZQqUGE8NLe8BAxvrOGnE5zkMfCgglC/yQnSqOmQXDuRouXt4LH5MNljAiWetc41WEU8GVe3S7iq
+        YoOwX5ad5vfgA
+X-Received: by 2002:a17:906:abc6:b0:7ad:d835:e822 with SMTP id kq6-20020a170906abc600b007add835e822mr19018395ejb.42.1672127767730;
+        Mon, 26 Dec 2022 23:56:07 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuVNGbHfVGyJQhVKDfEoIS76PHdndlS5IKd1waWV9EOOy+ytuh7yvRbAC+e0kyXprTc9YN9KA==
+X-Received: by 2002:a17:906:abc6:b0:7ad:d835:e822 with SMTP id kq6-20020a170906abc600b007add835e822mr19018382ejb.42.1672127767500;
+        Mon, 26 Dec 2022 23:56:07 -0800 (PST)
+Received: from redhat.com ([2.52.151.85])
+        by smtp.gmail.com with ESMTPSA id a1-20020a170906684100b007c0f90a9cc5sm5716281ejs.105.2022.12.26.23.56.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Dec 2022 23:56:06 -0800 (PST)
+Date:   Tue, 27 Dec 2022 02:56:04 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Shunsuke Mie <mie@igel.co.jp>
 Cc:     Jason Wang <jasowang@redhat.com>,
         Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Subject: Re: [RFC PATCH 2/9] vringh: remove vringh_iov and unite to
+ vringh_kiov
+Message-ID: <20221227025534-mutt-send-email-mst@kernel.org>
+References: <20221227022528.609839-1-mie@igel.co.jp>
+ <20221227022528.609839-3-mie@igel.co.jp>
+ <CACGkMEtAaYpuZtS0gx_m931nFzcvqSNK9BhvUZH_tZXTzjgQCg@mail.gmail.com>
+ <20221227020425-mutt-send-email-mst@kernel.org>
+ <CANXvt5pXkS=TTOU0+Lkx6CjcV7xvDHRS6FbFikJ4Ww8832sg8g@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANXvt5pXkS=TTOU0+Lkx6CjcV7xvDHRS6FbFikJ4Ww8832sg8g@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:04 Michael S. Tsirkin <ms=
-t@redhat.com>:
->
-> On Tue, Dec 27, 2022 at 11:25:26AM +0900, Shunsuke Mie wrote:
-> > Each vringh memory accessors that are for user, kern and iotlb has own
-> > interfaces that calls common code. But some codes are duplicated and th=
-at
-> > becomes loss extendability.
+On Tue, Dec 27, 2022 at 04:13:49PM +0900, Shunsuke Mie wrote:
+> 2022年12月27日(火) 16:05 Michael S. Tsirkin <mst@redhat.com>:
 > >
-> > Introduce a struct vringh_ops and provide a common APIs for all accesso=
-rs.
-> > It can bee easily extended vringh code for new memory accessor and
-> > simplified a caller code.
+> > On Tue, Dec 27, 2022 at 02:04:03PM +0800, Jason Wang wrote:
+> > > On Tue, Dec 27, 2022 at 10:25 AM Shunsuke Mie <mie@igel.co.jp> wrote:
+> > > >
+> > > > struct vringh_iov is defined to hold userland addresses. However, to use
+> > > > common function, __vring_iov, finally the vringh_iov converts to the
+> > > > vringh_kiov with simple cast. It includes compile time check code to make
+> > > > sure it can be cast correctly.
+> > > >
+> > > > To simplify the code, this patch removes the struct vringh_iov and unifies
+> > > > APIs to struct vringh_kiov.
+> > > >
+> > > > Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
+> > >
+> > > While at this, I wonder if we need to go further, that is, switch to
+> > > using an iov iterator instead of a vringh customized one.
+> > >
+> > > Thanks
 > >
-> > Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
-> > ---
-> >  drivers/vhost/vringh.c | 667 +++++++++++------------------------------
-> >  include/linux/vringh.h | 100 +++---
-> >  2 files changed, 225 insertions(+), 542 deletions(-)
-> >
-> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> > index aa3cd27d2384..ebfd3644a1a3 100644
-> > --- a/drivers/vhost/vringh.c
-> > +++ b/drivers/vhost/vringh.c
-> > @@ -35,15 +35,12 @@ static __printf(1,2) __cold void vringh_bad(const c=
-har *fmt, ...)
-> >  }
-> >
-> >  /* Returns vring->num if empty, -ve on error. */
-> > -static inline int __vringh_get_head(const struct vringh *vrh,
-> > -                                 int (*getu16)(const struct vringh *vr=
-h,
-> > -                                               u16 *val, const __virti=
-o16 *p),
-> > -                                 u16 *last_avail_idx)
-> > +static inline int __vringh_get_head(const struct vringh *vrh, u16 *las=
-t_avail_idx)
-> >  {
-> >       u16 avail_idx, i, head;
-> >       int err;
-> >
-> > -     err =3D getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
-> > +     err =3D vrh->ops.getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
-> >       if (err) {
-> >               vringh_bad("Failed to access avail idx at %p",
-> >                          &vrh->vring.avail->idx);
->
-> I like that this patch removes more lines of code than it adds.
->
-> However one of the design points of vringh abstractions is that they were
-> carefully written to be very low overhead.
-> This is why we are passing function pointers to inline functions -
-> compiler can optimize that out.
->
-> I think that introducing ops indirect functions calls here is going to br=
-eak
-> these assumptions and hurt performance.
-> Unless compiler can somehow figure it out and optimize?
-> I don't see how it's possible with ops pointer in memory
-> but maybe I'm wrong.
-I think your concern is correct. I have to understand the compiler
-optimization and redesign this approach If it is needed.
-> Was any effort taken to test effect of these patches on performance?
-I just tested vringh_test and already faced little performance reduction.
-I have to investigate that, as you said.
+> > Possibly, but when doing changes like this one needs to be careful
+> > to avoid breaking all the inlining tricks vringh relies on for
+> > performance.
+> Definitely, I'm evaluating the performance using vringh_test. I'll add a
+> result of the evaluation. But, If there are other evaluation methods, could you
+> please tell me?
 
-Thank you for your comments.
-> Thanks!
->
->
-Best,
-Shunsuke.
+high level tests over virtio blk and net are possible, but let's
+start with vringh_test.
+
+> > --
+> > MST
+> >
+> 
+> Best,
+> Shunsuke
+
