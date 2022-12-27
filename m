@@ -2,75 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1C106569BE
-	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 12:14:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 013396569C2
+	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 12:15:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229533AbiL0LMK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 06:12:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57226 "EHLO
+        id S229825AbiL0LPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 06:15:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229445AbiL0LMJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 06:12:09 -0500
+        with ESMTP id S229824AbiL0LOy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 06:14:54 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 645DE2E9
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 03:11:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF9F2E9
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 03:14:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672139481;
+        s=mimecast20190719; t=1672139645;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=WsCNe46n9ddWwjhOAxc7hwn4WEFVPHSKWtHXt0UTIho=;
-        b=IhOlla4eZDRHqJ32dHnt36DuxTHtEB561GWBD7wB+w8AHj11fMAAWAfntlBRGx6keiL6lW
-        gW7spfiG0Fge1/Hh6bwx2hloXE1v7jFP7qRBUrZzhzsIJs5iYJJTgNS+/N7nN+G3EKUJBX
-        YiTb4UfEYczwrfd3gdAiaJwNdmOVhWo=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=bZYacPdkOeKkUF+8E+NKgm04sBXoJCSeU32YMBjx4M8=;
+        b=Ze0qZwM1Lq/M6k09LoJhiZ5EBIia47BxSESAKw0vpQcbNdP6Lc0TXSRFQ6Zadq6j870+pY
+        EvhH/npTn8heoPaXhmJiekrS3a1OW3tB0iXYpmCM6zVOJoHZP1mVnD1mXfxb+jEvgIvEjh
+        FceysIksUt/FG1pf09b7QeqapjwB3Ng=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-474-TILfDWKAPVeU9YQpzqAzEg-1; Tue, 27 Dec 2022 06:11:20 -0500
-X-MC-Unique: TILfDWKAPVeU9YQpzqAzEg-1
-Received: by mail-ej1-f70.google.com with SMTP id hs18-20020a1709073e9200b007c0f9ac75f9so8813740ejc.9
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 03:11:20 -0800 (PST)
+ us-mta-638-egRUFv2DPPOJhKYyoc2Ctw-1; Tue, 27 Dec 2022 06:14:03 -0500
+X-MC-Unique: egRUFv2DPPOJhKYyoc2Ctw-1
+Received: by mail-ed1-f71.google.com with SMTP id z16-20020a05640235d000b0046d0912ae25so9093159edc.5
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 03:14:03 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WsCNe46n9ddWwjhOAxc7hwn4WEFVPHSKWtHXt0UTIho=;
-        b=TUi71swVUZos6ryPFYxn+DcqSyh5tfScq9zmABon9SjXEXyw70zkRml4791wMDbXVM
-         VWlOMDaCfLfkXdZx9opT2ra1Cf83Gslb5Za563AoNvcGerp9MidX9szW30VN4rz0dcl0
-         s2w+LfNmISQuogXuB4mX3rhVJ/eyzRW6F0fMN6CbHeGlNTGyYh44jePvT1277qWlXXbq
-         4TQLpzFMlao+hZ+AWWKx+FnVEPgREImbRvAcluD6vQlGaaj1RqeA8Zn9OdoxuZfwCsab
-         9EAqalQhVnDAFrirQVHxLJzWreSCcm7sHJUSroC4fYaNYjAwh6LxE3Fc78OZzAPAAZkW
-         HgvQ==
-X-Gm-Message-State: AFqh2kr6wG88L9DX0V+dyNr+PECUZk1p/7nqaKXJsSLdozfqS2vdN7lS
-        epeCx8QfxUQm9kVSsgCe0oynzA7DnB68vKC7cm0UBp5VNQbjKqKtBZwwjGdoys6FkTXCsM9Ozx9
-        BMvJHrZSSAvlY
-X-Received: by 2002:a17:907:a641:b0:7c0:f7b0:95d3 with SMTP id vu1-20020a170907a64100b007c0f7b095d3mr18622113ejc.36.1672139479179;
-        Tue, 27 Dec 2022 03:11:19 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvx+3qzO3Q7VgBQjTVzHdY5jtx7sniGAOvp1pB7Qo1ua/wfSk6LVTR6kHvV2aASTgoNanZEig==
-X-Received: by 2002:a17:907:a641:b0:7c0:f7b0:95d3 with SMTP id vu1-20020a170907a64100b007c0f7b095d3mr18622102ejc.36.1672139478920;
-        Tue, 27 Dec 2022 03:11:18 -0800 (PST)
+        bh=bZYacPdkOeKkUF+8E+NKgm04sBXoJCSeU32YMBjx4M8=;
+        b=kC22asW9Mo/IEK6KGwyxvLLPp6zkQPaAXxxhsl9Y1csHocGDJZaAmHxfbTlXjsHiD4
+         oNfy4n1SlN9vg+ZO0bRg1rDQ8DczbaxqK4LEg4mhKEJRn8PBvPVtyyS6U2n0lD+ObhGE
+         /13hT85qtCum84zPiV2iC3lIUzgYlkSdX2pC545f2tP5mJIzPUWED7gURrn3ocjBCDcz
+         zJcTNV2Ocom+nFPgferaHjpMuqXFgCdHjmegW64RHniM379EW+US0NtRoSmdgEgw+EtC
+         0h5hn2KLnNKUYjJH6EUudhzSQSWdEV3EnzWwclzXpoRV3PamGh9ofCW12vQCcgs4rmGm
+         MRJg==
+X-Gm-Message-State: AFqh2krUascjsf+KvymtEXabVy6kClHdYQi9EKlrsW3B3lSwWkmtQZWi
+        OIvZLtfa8346+8NjuZvCuJiIfu69ow9uSCbYpDeSWApyPuzJ2hC79nal6VQZoamoJghWi8Wl4jd
+        hDQY51/bGiPK5
+X-Received: by 2002:a17:906:684b:b0:7c1:ff4:d0c6 with SMTP id a11-20020a170906684b00b007c10ff4d0c6mr18861910ejs.36.1672139641735;
+        Tue, 27 Dec 2022 03:14:01 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuTvHu5LyN039mR0jxQHt/DogLpF/rlAQJnHb2v8rN4ygI+wL79VyNiKL5Cu3d62r3keQzLZA==
+X-Received: by 2002:a17:906:684b:b0:7c1:ff4:d0c6 with SMTP id a11-20020a170906684b00b007c10ff4d0c6mr18861894ejs.36.1672139641325;
+        Tue, 27 Dec 2022 03:14:01 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id 13-20020a170906300d00b007c0985aa6b0sm5904469ejz.191.2022.12.27.03.11.17
+        by smtp.googlemail.com with ESMTPSA id 18-20020a170906301200b007bf5250b515sm5889017ejz.29.2022.12.27.03.14.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 27 Dec 2022 03:11:18 -0800 (PST)
-Message-ID: <af3846d2-19b2-543d-8f5f-d818dbdffc75@redhat.com>
-Date:   Tue, 27 Dec 2022 12:11:17 +0100
+        Tue, 27 Dec 2022 03:14:00 -0800 (PST)
+Message-ID: <4500b24d-8ac0-c7a8-dd8d-bbb660752c71@redhat.com>
+Date:   Tue, 27 Dec 2022 12:14:00 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.1
-Subject: Re: [RFC PATCH 1/2] KVM: x86/xen: Fix use-after-free in
- kvm_xen_eventfd_update()
+Subject: Re: [PATCH v2] KVM: use unified srcu interface function
 Content-Language: en-US
-To:     Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org
-Cc:     dwmw2@infradead.org, paul@xen.org, seanjc@google.com
-References: <20221222203021.1944101-1-mhal@rbox.co>
- <20221222203021.1944101-2-mhal@rbox.co>
- <42483e26-10bd-88d2-308a-3407a0c54d55@redhat.com>
- <ea97ca88-b354-e96b-1a16-0a1be29af50c@rbox.co>
+To:     Hao Peng <flyingpenghao@gmail.com>
+Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org
+References: <CAPm50aKYh-qXt_MmQvbSH6Tye=yxrwAp_x_jcJHh=8ZoA=1P_A@mail.gmail.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <ea97ca88-b354-e96b-1a16-0a1be29af50c@rbox.co>
+In-Reply-To: <CAPm50aKYh-qXt_MmQvbSH6Tye=yxrwAp_x_jcJHh=8ZoA=1P_A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -83,31 +80,64 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/24/22 12:14, Michal Luczaj wrote:
->> This lock/unlock pair can cause a deadlock because it's inside the SRCU
->> read side critical section.  Fortunately it's simpler to just use
->> mutex_lock for the whole function instead of using two small critical
->> sections, and then SRCU is not needed.
-> Ah, I didn't think using a single mutex_lock would be ok. And maybe that's
-> a silly question, but how can this lock/unlock pair cause a deadlock? My
-> assumption was it's a*sleepable*  RCU after all.
+On 12/25/22 13:48, Hao Peng wrote:
+> From: Peng Hao <flyingpeng@tencent.com>
 > 
+> kvm->irq_routing is protected by kvm->irq_srcu.
+> 
+> Signed-off-by: Peng Hao <flyingpeng@tencent.com>
 
-This is a pretty simple AB-BA deadlock, just involving SRCU and a mutex 
-instead of two mutexes:
+Please use the same email to send your message from, for the author, and 
+for the Signed-off-by.
 
-Thread 1			Thread 2
-				mutex_lock()
-srcu_read_lock()
-mutex_lock()  // stops here
-				synchronize_srcu()  // stops here
-				mutex_unlock()
-mutex_unlock()
-srcu_read_unlock()
+Perhaps you can do
 
-Thread 2's synchronize_srcu() is waiting for srcu_read_unlock(), which 
-however won't happen until thread 1 can take the mutex.  But the mutex 
-is taken by thread 2, hence the deadlock.
+git config user.name "Peng Hao (Tencent)"
+git config user.email flyingpenghao@gmail.com
+
+?  This is a common set up for people that do not use the company email 
+to write to mailing lists.
 
 Paolo
+
+> ---
+>   virt/kvm/irqchip.c | 9 ++++++---
+>   1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/virt/kvm/irqchip.c b/virt/kvm/irqchip.c
+> index 1e567d1f6d3d..d3ccfe922880 100644
+> --- a/virt/kvm/irqchip.c
+> +++ b/virt/kvm/irqchip.c
+> @@ -18,6 +18,10 @@
+>   #include <linux/export.h>
+>   #include <trace/events/kvm.h>
+> 
+> +#define kvm_get_irq_routing(kvm) \
+> +       srcu_dereference_check((kvm)->irq_routing, &(kvm)->irq_srcu,    \
+> +                               lockdep_is_held(&(kvm)->irq_lock))
+> +
+>   int kvm_irq_map_gsi(struct kvm *kvm,
+>                      struct kvm_kernel_irq_routing_entry *entries, int gsi)
+>   {
+> @@ -25,8 +29,7 @@ int kvm_irq_map_gsi(struct kvm *kvm,
+>          struct kvm_kernel_irq_routing_entry *e;
+>          int n = 0;
+> 
+> -       irq_rt = srcu_dereference_check(kvm->irq_routing, &kvm->irq_srcu,
+> -                                       lockdep_is_held(&kvm->irq_lock));
+> +       irq_rt = kvm_get_irq_routing(kvm);
+>          if (irq_rt && gsi < irq_rt->nr_rt_entries) {
+>                  hlist_for_each_entry(e, &irq_rt->map[gsi], link) {
+>                          entries[n] = *e;
+> @@ -216,7 +219,7 @@ int kvm_set_irq_routing(struct kvm *kvm,
+>          }
+> 
+>          mutex_lock(&kvm->irq_lock);
+> -       old = rcu_dereference_protected(kvm->irq_routing, 1);
+> +       old = kvm_get_irq_routing(kvm);
+>          rcu_assign_pointer(kvm->irq_routing, new);
+>          kvm_irq_routing_update(kvm);
+>          kvm_arch_irq_routing_update(kvm);
+> --
+> 2.27.0
 
