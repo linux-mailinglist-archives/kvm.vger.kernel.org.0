@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA468656E03
-	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 19:39:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF4FC656DFD
+	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 19:38:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230401AbiL0Si6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 13:38:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33352 "EHLO
+        id S230046AbiL0Shf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 13:37:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229566AbiL0Siy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 13:38:54 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F5B82639
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 10:38:53 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id f132-20020a636a8a000000b00473d0b600ebso6996078pgc.14
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 10:38:53 -0800 (PST)
+        with ESMTP id S229798AbiL0Shd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 13:37:33 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D1ECB12
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 10:37:31 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id jo4so33666681ejb.7
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 10:37:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lkceNBu3Cbfn5w2vNeWIIipWKDlu9o2a8WGB/CgbDnw=;
-        b=k4lZfAxw0FDVLpd8uv3FYjCbKBP+DAdbJxul15ekbQRNy3Gcp3lbw8Aig7LPkFbJde
-         WSiuvBFLqTKNHkseQc7nuIGap2OxSHDeql+U/tfyXutQZknXGTzW/B8RLYMCxD5FgBh3
-         +ShtmjRqm7y1ZVb6VPJcr40rg8kOnUeYcUlIne6iSFrEAY7oidHwVb2vOTErPi7KSUEH
-         NROdFjRjrWXlU+qOYH+WojKPFpA7Em9bHqFnOciFW0C5wCNCEMnSvfWGz7ZQtHQlOHwc
-         rGqcq/6Bl+iGo1YU40vCMhW+I/Hdx0yVBfxI0Ey5zg8KDzYCi0nMlFv4M3SCBBC1wTvI
-         VMTQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mtT1CYuT8CWIl64h+/we48hidWTbVFCtwNQWGwCYM5g=;
+        b=ijoPY5UeWFMn/JCem/IEYUuA32T1P7cFrzlcTxCFOS8OinKaUZ978uiDVAmDN1uV7H
+         jH3gdEXzFfGe5AWQMXKszb84HkJJjDRSnyE9XrDXTMlIni+UkNbWc5Gm2QQPj1asTTw3
+         pTqCJN2Cu7xLASd9ilbuA0ZSWWaokRBf6zvVOvKKiwtdc01WlvRFHsYHq3kR9ygvGC2Q
+         +UG89N4qk726ToW1m4sGV8d8/txDUgTdqVuekvKrzSOSnl5mC0YDsC2BK2cxQewbdxew
+         c65Jn5B8gvPfGexWr+eDLEqy8pFtHqNt4yD6tjpkXD8nc5KvUmjzwSR5DFZKBscSpSQT
+         4D6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lkceNBu3Cbfn5w2vNeWIIipWKDlu9o2a8WGB/CgbDnw=;
-        b=UHEwvc1SMo7RNBbL/x8Tz03U3z++aGhctBxcuZC/kNaITiaYckNahEoBUw/KueoNuZ
-         NsH2RE7/xKjXKSN/OxO3IuJyINjnRBH3f5Xg6+XA24fbsTChjv70v6TmCsgf0g/aP1Rs
-         8ql8bwR2U0bK3qaRCd8N8aGqY3RKPz+n38plDy5UU5TsoWXHj8ghxCGaSKk09uWsAjhA
-         T4ZE5JY60Xr9upgoSRIkCXO5SBvSxVQKvuVyPXIuj1edo4MeXnQ/qnOFLYZcvRhF3RTP
-         mj6jK+/GrLnqkpItEFxvBz4JMTQmQc+lXpwQFTcF5bakmk43ffN/4beFCfgMefgQEqQy
-         hN5A==
-X-Gm-Message-State: AFqh2kqjc/LT4cvIJygQIEdX3r6Hn7U+CGogT5jJkDcUW7OZ0k2wnPk0
-        HXdfnVbFuGtMjaED85Otg9nB6LT/z3F2KSuSNZxlqFfmhQxn4znP57aMMcep6Z3Q/zYtA1WvKvx
-        AJ3NF7tEhmV7v1Q1htsPVue9+tJZ5yFaVI6KrG2Gopiia2RT8edPA6vhC2mPxO/lnPQqp
-X-Google-Smtp-Source: AMrXdXt57ldBKeLCduhxiDS2UpSHsClNgc81Nghr4hblaBiDbgMlTtbqG/y25+dzHJl3OcpiVB5vAl8D6KSP0GEx
-X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a17:90b:f0f:b0:225:eaa2:3f5d with SMTP
- id br15-20020a17090b0f0f00b00225eaa23f5dmr184386pjb.2.1672166332543; Tue, 27
- Dec 2022 10:38:52 -0800 (PST)
-Date:   Tue, 27 Dec 2022 18:37:15 +0000
-In-Reply-To: <20221227183713.29140-1-aaronlewis@google.com>
-Mime-Version: 1.0
-References: <20221227183713.29140-1-aaronlewis@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221227183713.29140-4-aaronlewis@google.com>
-Subject: [PATCH 3/3] KVM: selftests: Add XCR0 Test
-From:   Aaron Lewis <aaronlewis@google.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
-        like.xu.linux@gmail.com, Aaron Lewis <aaronlewis@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mtT1CYuT8CWIl64h+/we48hidWTbVFCtwNQWGwCYM5g=;
+        b=MGBIXfnihD+wJhvu/tT+opurZHviO3qpiX4W4FpvVRWd6Uw6nQ7skKKp6qu0P0ETA9
+         VwJPzBKVg2SGp6PlDhREeeZ1b/OP42HOQ4iT/8VuSThoHVQM8xqOnT39B+2FDnYnaJb6
+         k93H9ZiiIpHtseX9SH9hGpptIT1Qv0HoH1Bq4IDjTYlIuWSNHzPP8Jtszo1CzFSTo96H
+         bc96QV70GlEL48xrDOi+L8zL8ID+2jGR7/61Xxx74b8wfYgHdDjw66QSLiK6MFTi5RCT
+         WsIoryHyJstHQCPfv3JKWoNRG2SBmkWqmzyMiRfzaw2MHEwKs5JKgEgk9URm0J50Uq2Y
+         +2xA==
+X-Gm-Message-State: AFqh2koPXb8xP+RRnHaRW5du6ZjkU+blPOvjh6x9XJCickiOzB9oURgy
+        +pPYoL3KoLCG2Qq6+86Hc8N4ZL+hFZmx+fmwRiSIeQ==
+X-Google-Smtp-Source: AMrXdXuCP4vsQg4VrWuvd/rLSSxPGc0+gQT5QpM/bG7B7ANFBBF3ekDZmRg3yhrFVHHwlIdXflcoAQjREV/KeWdwdhU=
+X-Received: by 2002:a17:906:e247:b0:836:9ca8:50cd with SMTP id
+ gq7-20020a170906e24700b008369ca850cdmr1634747ejb.364.1672166249445; Tue, 27
+ Dec 2022 10:37:29 -0800 (PST)
+MIME-Version: 1.0
+References: <20221222023457.1764-1-vipinsh@google.com> <20221222023457.1764-2-vipinsh@google.com>
+In-Reply-To: <20221222023457.1764-2-vipinsh@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Tue, 27 Dec 2022 10:37:17 -0800
+Message-ID: <CANgfPd9fr0KfRRg9LMD=3DTLJ9CKGLe0HaY512BeK16sgFX4kQ@mail.gmail.com>
+Subject: Re: [Patch v3 1/9] KVM: x86/mmu: Repurpose KVM MMU shrinker to purge
+ shadow page caches
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,177 +68,481 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Test that the user xfeature bits, EDX:EAX of CPUID.(EAX=0DH,ECX=0),
-don't set up userspace for failure.
+On Wed, Dec 21, 2022 at 6:35 PM Vipin Sharma <vipinsh@google.com> wrote:
+>
+> mmu_shrink_scan() is very disruptive to VMs. It picks the first
+> VM in the vm_list, zaps the oldest page which is most likely an upper
+> level SPTEs and most like to be reused. Prior to TDP MMU, this is even
+> more disruptive in nested VMs case, considering L1 SPTEs will be the
+> oldest even though most of the entries are for L2 SPTEs.
+>
+> As discussed in
+> https://lore.kernel.org/lkml/Y45dldZnI6OIf+a5@google.com/
+> shrinker logic has not be very useful in actually keeping VMs performant
+> and reducing memory usage.
+>
+> Change mmu_shrink_scan() to free pages from the vCPU's shadow page
+> cache.  Freeing pages from cache doesn't cause vCPU exits, therefore, a
+> VM's performance should not be affected.
+>
+> This also allows to change cache capacities without worrying too much
+> about high memory usage in cache.
+>
+> Tested this change by running dirty_log_perf_test while dropping cache
+> via "echo 2 > /proc/sys/vm/drop_caches" at 1 second interval
+> continuously. There were WARN_ON(!mc->nobjs) messages printed in kernel
+> logs from kvm_mmu_memory_cache_alloc(), which is expected.
 
-Though it isn't architectural, test that the user xfeature bits aren't
-set in a half baked state that will cause a #GP if used when setting
-XCR0.
+Oh, that's not a good thing. I don't think we want to be hitting those
+warnings. For one, kernel warnings should not be expected behavior,
+probably for many reasons, but at least because Syzbot will find it.
+In this particular case, we don't want to hit that because in that
+case we'll try to do a GFP_ATOMIC, which can fail, and if it fails,
+we'll BUG:
 
-Check that the rules for XCR0 described in the SDM vol 1, section
-13.3 ENABLING THE XSAVE FEATURE SET AND XSAVE-ENABLED FEATURES, are
-followed for the xfeature bits too.
+void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+{
+        void *p;
 
-Signed-off-by: Aaron Lewis <aaronlewis@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/x86_64/xcr0_cpuid_test.c    | 134 ++++++++++++++++++
- 2 files changed, 135 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
+        if (WARN_ON(!mc->nobjs))
+                p = mmu_memory_cache_alloc_obj(mc, GFP_ATOMIC | __GFP_ACCOUNT);
+        else
+                p = mc->objects[--mc->nobjs];
+        BUG_ON(!p);
+        return p;
+}
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 1750f91dd9362..e2e56c82b8a90 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -104,6 +104,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/vmx_tsc_adjust_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_nested_tsc_scaling_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_ipi_test
- TEST_GEN_PROGS_x86_64 += x86_64/xapic_state_test
-+TEST_GEN_PROGS_x86_64 += x86_64/xcr0_cpuid_test
- TEST_GEN_PROGS_x86_64 += x86_64/xss_msr_test
- TEST_GEN_PROGS_x86_64 += x86_64/debug_regs
- TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
-diff --git a/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c b/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
-new file mode 100644
-index 0000000000000..644791ff5c48b
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/xcr0_cpuid_test.c
-@@ -0,0 +1,134 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * XCR0 cpuid test
-+ *
-+ * Copyright (C) 2022, Google LLC.
-+ */
-+
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+
-+#include "kvm_util.h"
-+#include "processor.h"
-+
-+#define XFEATURE_MASK_SSE		(1ul << 1)
-+#define XFEATURE_MASK_YMM		(1ul << 2)
-+#define XFEATURE_MASK_BNDREGS		(1ul << 3)
-+#define XFEATURE_MASK_BNDCSR		(1ul << 4)
-+#define XFEATURE_MASK_OPMASK		(1ul << 5)
-+#define XFEATURE_MASK_ZMM_Hi256		(1ul << 6)
-+#define XFEATURE_MASK_Hi16_ZMM		(1ul << 7)
-+#define XFEATURE_MASK_XTILECFG		(1ul << 17)
-+#define XFEATURE_MASK_XTILEDATA		(1ul << 18)
-+#define XFEATURE_MASK_XTILE		(XFEATURE_MASK_XTILECFG | \
-+					 XFEATURE_MASK_XTILEDATA)
-+
-+static uint64_t get_supported_user_xfeatures(void)
-+{
-+	uint32_t a, b, c, d;
-+
-+	cpuid(0xd, &a, &b, &c, &d);
-+
-+	return a | ((uint64_t)d << 32);
-+}
-+
-+static void guest_code(void)
-+{
-+	uint64_t xcr0_rest;
-+	uint64_t supported_xcr0;
-+	uint64_t xfeature_mask;
-+	uint64_t supported_state;
-+
-+	set_cr4(get_cr4() | X86_CR4_OSXSAVE);
-+
-+	xcr0_rest = xgetbv(0);
-+	supported_xcr0 = get_supported_user_xfeatures();
-+
-+	GUEST_ASSERT(xcr0_rest == 1ul);
-+
-+	/* Check AVX */
-+	xfeature_mask = XFEATURE_MASK_SSE | XFEATURE_MASK_YMM;
-+	supported_state = supported_xcr0 & xfeature_mask;
-+	GUEST_ASSERT(supported_state != XFEATURE_MASK_YMM);
-+
-+	/* Check MPX */
-+	xfeature_mask = XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR;
-+	supported_state = supported_xcr0 & xfeature_mask;
-+	GUEST_ASSERT((supported_state == xfeature_mask) ||
-+		     (supported_state == 0ul));
-+
-+	/* Check AVX-512 */
-+	xfeature_mask = XFEATURE_MASK_OPMASK |
-+			XFEATURE_MASK_ZMM_Hi256 |
-+			XFEATURE_MASK_Hi16_ZMM;
-+	supported_state = supported_xcr0 & xfeature_mask;
-+	GUEST_ASSERT((supported_state == xfeature_mask) ||
-+		     (supported_state == 0ul));
-+
-+	/* Check AMX */
-+	xfeature_mask = XFEATURE_MASK_XTILE;
-+	supported_state = supported_xcr0 & xfeature_mask;
-+	GUEST_ASSERT((supported_state == xfeature_mask) ||
-+		     (supported_state == 0ul));
-+
-+	GUEST_SYNC(0);
-+
-+	xsetbv(0, supported_xcr0);
-+
-+	GUEST_DONE();
-+}
-+
-+static void guest_gp_handler(struct ex_regs *regs)
-+{
-+	GUEST_ASSERT(!"Failed to set the supported xfeature bits in XCR0.");
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_run *run;
-+	struct kvm_vm *vm;
-+	struct ucall uc;
-+
-+	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_XSAVE));
-+
-+	/* Tell stdout not to buffer its content */
-+	setbuf(stdout, NULL);
-+
-+	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
-+	run = vcpu->run;
-+
-+	vm_init_descriptor_tables(vm);
-+	vcpu_init_descriptor_tables(vcpu);
-+
-+	while (1) {
-+		vcpu_run(vcpu);
-+
-+		TEST_ASSERT(run->exit_reason == KVM_EXIT_IO,
-+			    "Unexpected exit reason: %u (%s),\n",
-+			    run->exit_reason,
-+			    exit_reason_str(run->exit_reason));
-+
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			vm_install_exception_handler(vm, GP_VECTOR,
-+						     guest_gp_handler);
-+			break;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+			break;
-+		case UCALL_DONE:
-+			goto done;
-+		default:
-+			TEST_FAIL("Unknown ucall %lu", uc.cmd);
-+		}
-+	}
-+
-+done:
-+	kvm_vm_free(vm);
-+	return 0;
-+}
--- 
-2.39.0.314.g84b9a713c41-goog
+Perhaps the risk of actually panicking is small, but it probably
+indicates that we need better error handling around failed allocations
+from the cache.
+Or, the slightly less elegant approach might be to just hold the cache
+lock around the cache topup and use of pages from the cache, but
+adding better error handling would probably be cleaner.
 
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |   5 +
+>  arch/x86/kvm/mmu/mmu.c          | 163 +++++++++++++++++++-------------
+>  arch/x86/kvm/mmu/mmu_internal.h |   2 +
+>  arch/x86/kvm/mmu/tdp_mmu.c      |   3 +-
+>  include/linux/kvm_host.h        |   1 +
+>  virt/kvm/kvm_main.c             |  11 ++-
+>  6 files changed, 114 insertions(+), 71 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index aa4eb8cfcd7e..89cc809e4a00 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -786,6 +786,11 @@ struct kvm_vcpu_arch {
+>         struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
+>         struct kvm_mmu_memory_cache mmu_page_header_cache;
+>
+> +       /*
+> +        * Protects change in size of mmu_shadow_page_cache cache.
+> +        */
+> +       spinlock_t mmu_shadow_page_cache_lock;
+> +
+>         /*
+>          * QEMU userspace and the guest each have their own FPU state.
+>          * In vcpu_run, we switch between the user and guest FPU contexts.
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 254bc46234e0..157417e1cb6e 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -164,7 +164,10 @@ struct kvm_shadow_walk_iterator {
+>
+>  static struct kmem_cache *pte_list_desc_cache;
+>  struct kmem_cache *mmu_page_header_cache;
+> -static struct percpu_counter kvm_total_used_mmu_pages;
+> +/*
+> + * Total number of unused pages in MMU shadow page cache.
+> + */
+> +static struct percpu_counter kvm_total_unused_mmu_pages;
+>
+>  static void mmu_spte_set(u64 *sptep, u64 spte);
+>
+> @@ -655,6 +658,22 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+>         }
+>  }
+>
+> +static int mmu_topup_sp_memory_cache(struct kvm_mmu_memory_cache *cache,
+> +                                    spinlock_t *cache_lock)
+> +{
+> +       int orig_nobjs;
+> +       int r;
+> +
+> +       spin_lock(cache_lock);
+> +       orig_nobjs = cache->nobjs;
+> +       r = kvm_mmu_topup_memory_cache(cache, PT64_ROOT_MAX_LEVEL);
+> +       if (orig_nobjs != cache->nobjs)
+> +               percpu_counter_add(&kvm_total_unused_mmu_pages,
+> +                                  (cache->nobjs - orig_nobjs));
+> +       spin_unlock(cache_lock);
+> +       return r;
+> +}
+> +
+>  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>  {
+>         int r;
+> @@ -664,8 +683,8 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>                                        1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
+>         if (r)
+>                 return r;
+> -       r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
+> -                                      PT64_ROOT_MAX_LEVEL);
+> +       r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
+> +                                     &vcpu->arch.mmu_shadow_page_cache_lock);
+>         if (r)
+>                 return r;
+>         if (maybe_indirect) {
+> @@ -678,10 +697,25 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+>                                           PT64_ROOT_MAX_LEVEL);
+>  }
+>
+> +static void mmu_free_sp_memory_cache(struct kvm_mmu_memory_cache *cache,
+> +                                    spinlock_t *cache_lock)
+> +{
+> +       int orig_nobjs;
+> +
+> +       spin_lock(cache_lock);
+> +       orig_nobjs = cache->nobjs;
+> +       kvm_mmu_free_memory_cache(cache);
+> +       if (orig_nobjs)
+> +               percpu_counter_sub(&kvm_total_unused_mmu_pages, orig_nobjs);
+> +
+> +       spin_unlock(cache_lock);
+> +}
+> +
+>  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
+>  {
+>         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
+> -       kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
+> +       mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
+> +                                &vcpu->arch.mmu_shadow_page_cache_lock);
+>         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
+>         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
+>  }
+> @@ -1693,27 +1727,15 @@ static int is_empty_shadow_page(u64 *spt)
+>  }
+>  #endif
+>
+> -/*
+> - * This value is the sum of all of the kvm instances's
+> - * kvm->arch.n_used_mmu_pages values.  We need a global,
+> - * aggregate version in order to make the slab shrinker
+> - * faster
+> - */
+> -static inline void kvm_mod_used_mmu_pages(struct kvm *kvm, long nr)
+> -{
+> -       kvm->arch.n_used_mmu_pages += nr;
+> -       percpu_counter_add(&kvm_total_used_mmu_pages, nr);
+> -}
+> -
+>  static void kvm_account_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  {
+> -       kvm_mod_used_mmu_pages(kvm, +1);
+> +       kvm->arch.n_used_mmu_pages++;
+>         kvm_account_pgtable_pages((void *)sp->spt, +1);
+>  }
+>
+>  static void kvm_unaccount_mmu_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+>  {
+> -       kvm_mod_used_mmu_pages(kvm, -1);
+> +       kvm->arch.n_used_mmu_pages--;
+>         kvm_account_pgtable_pages((void *)sp->spt, -1);
+>  }
+>
+> @@ -2150,8 +2172,31 @@ struct shadow_page_caches {
+>         struct kvm_mmu_memory_cache *page_header_cache;
+>         struct kvm_mmu_memory_cache *shadow_page_cache;
+>         struct kvm_mmu_memory_cache *shadowed_info_cache;
+> +       /*
+> +        * Protects change in size of shadow_page_cache cache.
+> +        */
+> +       spinlock_t *shadow_page_cache_lock;
+>  };
+>
+> +void *kvm_mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *shadow_page_cache,
+> +                                   spinlock_t *cache_lock)
+> +{
+> +       int orig_nobjs;
+> +       void *page;
+> +
+> +       if (!cache_lock) {
+> +               spin_lock(cache_lock);
+> +               orig_nobjs = shadow_page_cache->nobjs;
+> +       }
+
+I believe this is guaranteed to cause a null pointer dereference.
+
+> +       page = kvm_mmu_memory_cache_alloc(shadow_page_cache);
+> +       if (!cache_lock) {
+> +               if (orig_nobjs)
+> +                       percpu_counter_dec(&kvm_total_unused_mmu_pages);
+> +               spin_unlock(cache_lock);
+
+Again, this will cause a null-pointer dereference. The check above
+just needs to be inverted.
+
+> +       }
+> +       return page;
+> +}
+> +
+>  static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+>                                                       struct shadow_page_caches *caches,
+>                                                       gfn_t gfn,
+> @@ -2161,7 +2206,8 @@ static struct kvm_mmu_page *kvm_mmu_alloc_shadow_page(struct kvm *kvm,
+>         struct kvm_mmu_page *sp;
+>
+>         sp = kvm_mmu_memory_cache_alloc(caches->page_header_cache);
+> -       sp->spt = kvm_mmu_memory_cache_alloc(caches->shadow_page_cache);
+> +       sp->spt = kvm_mmu_sp_memory_cache_alloc(caches->shadow_page_cache,
+> +                                               caches->shadow_page_cache_lock);
+>         if (!role.direct)
+>                 sp->shadowed_translation = kvm_mmu_memory_cache_alloc(caches->shadowed_info_cache);
+>
+> @@ -2218,6 +2264,7 @@ static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
+>                 .page_header_cache = &vcpu->arch.mmu_page_header_cache,
+>                 .shadow_page_cache = &vcpu->arch.mmu_shadow_page_cache,
+>                 .shadowed_info_cache = &vcpu->arch.mmu_shadowed_info_cache,
+> +               .shadow_page_cache_lock = &vcpu->arch.mmu_shadow_page_cache_lock
+>         };
+>
+>         return __kvm_mmu_get_shadow_page(vcpu->kvm, vcpu, &caches, gfn, role);
+> @@ -5916,6 +5963,7 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+>         vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+>
+>         vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> +       spin_lock_init(&vcpu->arch.mmu_shadow_page_cache_lock);
+>
+>         vcpu->arch.mmu = &vcpu->arch.root_mmu;
+>         vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+> @@ -6051,11 +6099,6 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
+>                 kvm_tdp_mmu_zap_invalidated_roots(kvm);
+>  }
+>
+> -static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
+> -{
+> -       return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
+> -}
+> -
+>  static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
+>                         struct kvm_memory_slot *slot,
+>                         struct kvm_page_track_notifier_node *node)
+> @@ -6277,6 +6320,7 @@ static struct kvm_mmu_page *shadow_mmu_get_sp_for_split(struct kvm *kvm, u64 *hu
+>         /* Direct SPs do not require a shadowed_info_cache. */
+>         caches.page_header_cache = &kvm->arch.split_page_header_cache;
+>         caches.shadow_page_cache = &kvm->arch.split_shadow_page_cache;
+> +       caches.shadow_page_cache_lock = NULL;
+>
+>         /* Safe to pass NULL for vCPU since requesting a direct SP. */
+>         return __kvm_mmu_get_shadow_page(kvm, NULL, &caches, gfn, role);
+> @@ -6646,66 +6690,49 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+>  static unsigned long
+>  mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
+>  {
+> -       struct kvm *kvm;
+> -       int nr_to_scan = sc->nr_to_scan;
+> +       struct kvm_mmu_memory_cache *cache;
+> +       struct kvm *kvm, *first_kvm = NULL;
+>         unsigned long freed = 0;
+> +       /* spinlock for memory cache */
+> +       spinlock_t *cache_lock;
+> +       struct kvm_vcpu *vcpu;
+> +       unsigned long i;
+>
+>         mutex_lock(&kvm_lock);
+>
+>         list_for_each_entry(kvm, &vm_list, vm_list) {
+> -               int idx;
+> -               LIST_HEAD(invalid_list);
+> -
+> -               /*
+> -                * Never scan more than sc->nr_to_scan VM instances.
+> -                * Will not hit this condition practically since we do not try
+> -                * to shrink more than one VM and it is very unlikely to see
+> -                * !n_used_mmu_pages so many times.
+> -                */
+> -               if (!nr_to_scan--)
+> +               if (first_kvm == kvm)
+>                         break;
+> -               /*
+> -                * n_used_mmu_pages is accessed without holding kvm->mmu_lock
+> -                * here. We may skip a VM instance errorneosly, but we do not
+> -                * want to shrink a VM that only started to populate its MMU
+> -                * anyway.
+> -                */
+> -               if (!kvm->arch.n_used_mmu_pages &&
+> -                   !kvm_has_zapped_obsolete_pages(kvm))
+> -                       continue;
+> +               if (!first_kvm)
+> +                       first_kvm = kvm;
+> +               list_move_tail(&kvm->vm_list, &vm_list);
+>
+> -               idx = srcu_read_lock(&kvm->srcu);
+
+I think we still want to do the SRCU read lock here to prevent
+use-after-free on the vCPUs.
+
+> -               write_lock(&kvm->mmu_lock);
+> +               kvm_for_each_vcpu(i, vcpu, kvm) {
+> +                       cache = &vcpu->arch.mmu_shadow_page_cache;
+> +                       cache_lock = vcpu->arch.mmu_shadow_page_cache_lock;
+> +                       if (READ_ONCE(cache->nobjs)) {
+> +                               spin_lock(cache_lock);
+> +                               freed += kvm_mmu_empty_memory_cache(cache);
+
+Would it make sense to just have kvm_mmu_empty_memory_cache()
+decrement the per-cpu counter itself? I don't think there's much perf
+to be gained by reducing percpu counter updates here and it would
+consolidate the bookkeeping.
+
+> +                               spin_unlock(cache_lock);
+> +                       }
+>
+> -               if (kvm_has_zapped_obsolete_pages(kvm)) {
+> -                       kvm_mmu_commit_zap_page(kvm,
+> -                             &kvm->arch.zapped_obsolete_pages);
+> -                       goto unlock;
+>                 }
+>
+> -               freed = kvm_mmu_zap_oldest_mmu_pages(kvm, sc->nr_to_scan);
+> -
+> -unlock:
+> -               write_unlock(&kvm->mmu_lock);
+> -               srcu_read_unlock(&kvm->srcu, idx);
+> -
+> -               /*
+> -                * unfair on small ones
+> -                * per-vm shrinkers cry out
+> -                * sadness comes quickly
+> -                */
+
+Nooooo, don't delete the beautiful poem!
+
+> -               list_move_tail(&kvm->vm_list, &vm_list);
+> -               break;
+> +               if (freed >= sc->nr_to_scan)
+> +                       break;
+>         }
+>
+> +       if (freed)
+> +               percpu_counter_sub(&kvm_total_unused_mmu_pages, freed);
+>         mutex_unlock(&kvm_lock);
+> +       percpu_counter_sync(&kvm_total_unused_mmu_pages);
+>         return freed;
+>  }
+>
+>  static unsigned long
+>  mmu_shrink_count(struct shrinker *shrink, struct shrink_control *sc)
+>  {
+> -       return percpu_counter_read_positive(&kvm_total_used_mmu_pages);
+> +       return percpu_counter_sum_positive(&kvm_total_unused_mmu_pages);
+
+This will return 0 if the sum of all the per-cpu counters is negative.
+It should never be negative though. Might be nice to add a warning if
+we would get a negative sum.
+
+>  }
+>
+>  static struct shrinker mmu_shrinker = {
+> @@ -6820,7 +6847,7 @@ int kvm_mmu_vendor_module_init(void)
+>         if (!mmu_page_header_cache)
+>                 goto out;
+>
+> -       if (percpu_counter_init(&kvm_total_used_mmu_pages, 0, GFP_KERNEL))
+> +       if (percpu_counter_init(&kvm_total_unused_mmu_pages, 0, GFP_KERNEL))
+>                 goto out;
+>
+>         ret = register_shrinker(&mmu_shrinker, "x86-mmu");
+> @@ -6830,7 +6857,7 @@ int kvm_mmu_vendor_module_init(void)
+>         return 0;
+>
+>  out_shrinker:
+> -       percpu_counter_destroy(&kvm_total_used_mmu_pages);
+> +       percpu_counter_destroy(&kvm_total_unused_mmu_pages);
+>  out:
+>         mmu_destroy_caches();
+>         return ret;
+> @@ -6847,7 +6874,7 @@ void kvm_mmu_destroy(struct kvm_vcpu *vcpu)
+>  void kvm_mmu_vendor_module_exit(void)
+>  {
+>         mmu_destroy_caches();
+> -       percpu_counter_destroy(&kvm_total_used_mmu_pages);
+> +       percpu_counter_destroy(&kvm_total_unused_mmu_pages);
+>         unregister_shrinker(&mmu_shrinker);
+>  }
+>
+> diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+> index ac00bfbf32f6..c2a342028b6a 100644
+> --- a/arch/x86/kvm/mmu/mmu_internal.h
+> +++ b/arch/x86/kvm/mmu/mmu_internal.h
+> @@ -325,4 +325,6 @@ void *mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+>  void track_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+>  void untrack_possible_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp);
+>
+> +void *kvm_mmu_sp_memory_cache_alloc(struct kvm_mmu_memory_cache *shadow_page_cache,
+> +                                   spinlock_t *cache_lock);
+>  #endif /* __KVM_X86_MMU_INTERNAL_H */
+> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> index 764f7c87286f..4974fa96deff 100644
+> --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> @@ -264,7 +264,8 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
+>         struct kvm_mmu_page *sp;
+>
+>         sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
+> -       sp->spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache);
+> +       sp->spt = kvm_mmu_sp_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache,
+> +                                               &vcpu->arch.mmu_shadow_page_cache_lock);
+>
+>         return sp;
+>  }
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 01aad8b74162..efd9b38ea9a2 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1362,6 +1362,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm);
+>  int kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int min);
+>  int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min);
+>  int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc);
+> +int kvm_mmu_empty_memory_cache(struct kvm_mmu_memory_cache *mc);
+>  void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc);
+>  void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc);
+>  #endif
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 13e88297f999..f2d762878b97 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -438,8 +438,10 @@ int kvm_mmu_memory_cache_nr_free_objects(struct kvm_mmu_memory_cache *mc)
+>         return mc->nobjs;
+>  }
+>
+> -void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+> +int kvm_mmu_empty_memory_cache(struct kvm_mmu_memory_cache *mc)
+>  {
+> +       int freed = mc->nobjs;
+> +
+>         while (mc->nobjs) {
+>                 if (mc->kmem_cache)
+>                         kmem_cache_free(mc->kmem_cache, mc->objects[--mc->nobjs]);
+> @@ -447,8 +449,13 @@ void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+>                         free_page((unsigned long)mc->objects[--mc->nobjs]);
+>         }
+>
+> -       kvfree(mc->objects);
+> +       return freed;
+> +}
+>
+> +void kvm_mmu_free_memory_cache(struct kvm_mmu_memory_cache *mc)
+> +{
+> +       kvm_mmu_empty_memory_cache(mc);
+> +       kvfree(mc->objects);
+>         mc->objects = NULL;
+>         mc->capacity = 0;
+>  }
+> --
+> 2.39.0.314.g84b9a713c41-goog
+>
