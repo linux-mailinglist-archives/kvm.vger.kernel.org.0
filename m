@@ -2,60 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 785EC65680E
-	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 08:57:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AC5965695D
+	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 11:22:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230342AbiL0H5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 02:57:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53212 "EHLO
+        id S230511AbiL0KWw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 05:22:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbiL0H53 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 02:57:29 -0500
-Received: from mail-ua1-x92b.google.com (mail-ua1-x92b.google.com [IPv6:2607:f8b0:4864:20::92b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DE0E331
-        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 23:57:24 -0800 (PST)
-Received: by mail-ua1-x92b.google.com with SMTP id ay42so2785118uab.6
-        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 23:57:24 -0800 (PST)
+        with ESMTP id S229445AbiL0KWu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 05:22:50 -0500
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EDC37659
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 02:22:48 -0800 (PST)
+Received: by mail-vk1-xa2d.google.com with SMTP id b81so5914234vkf.1
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 02:22:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=igel-co-jp.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7v/WSJyZmtBjH1RduwJIBnIVDn9u078UD/StpnslVx0=;
-        b=mDjhdOb+37hZkSU5zz/DbB2FXU0Pc/729sq2tkWFJiYAVkgTfJKuUpOSXeo0P8EzEI
-         bhvix75DeyyFatTBY3VZFtz+3N0uYxzvYQyIRe3J2bhYKTyltbqH3tHftOLiqj30uybe
-         u4Ctr0Gk9w3V2DMnaAWShGbvxy33VSLGYTfcJXxyi0g6ADHstijwy8Mb6Ux2lh5SlkIF
-         ylW1Upb/0Njy0ENduTaULY90gM/vB/jM/88JULcTRxcNXIchHnvyUw6EzkLggnuEyXNi
-         nNZ9AVJDThH5Gy1xpZyGD5iPmx+Ez0gJ4ZgmpLUj6TOx1lWdtd2mxwaRoFaJNuny/6aF
-         3XNw==
+        bh=C5/0JksOM2lGuEYSzF1Qu3MnIOgzw58Ul9AktACBNVI=;
+        b=NoTyXYNTcm9i+GC7/+I09XJcPjGPm2toisrvYx3dF44c57grwNAzYz5vVRbhRnJA9S
+         B34KZz4oVKrZN6wpBQ+QnVG35XqSCtcpouGuyB3/fUIXDDIpvt2o1dete8IQ4jhB2VK4
+         pTiaILZwM41NBdToO6kueGNZ1CXaHt5GRY3XI59BNUIdJR6mN615Mf+88Gmm6QxHb95p
+         U2SNRsXu3eqo5n5Smjbcca054NvBvgIuwPw6R1Xds9lzkojAc2OLtCvD9hN5aBTgkIPV
+         WpOHVwYJ4HgifzdLK3a+ewkHHdUb5DUt4wNyHa5aVn0xUqXEJ4EnpoZHjRQsUqZ3yip/
+         TFJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7v/WSJyZmtBjH1RduwJIBnIVDn9u078UD/StpnslVx0=;
-        b=kDbKRfaORu9FKVjrJfA6/WuHA6O+txnn/97KBby55XycvQczF6kJwypY/XxlM78cMm
-         zS7YAL2UCDQmoDfPjmMUDH7koOWbh51+3NhFf2LNYDI7oLDtUqvbsdUqJZf8eTihH2Wp
-         AYCFO5Iiv8OaOsw2usfpVsak38/ClHvHpRZ+6kdhJPgJGf2BwjD3iJ5Pl0yGascZ7u5/
-         4eh6wWGJGE6z4Y92WHszRf91+l+7ilzX+aKRMHVWUvJH/Gif17TgkezDKf8QV8O9xr8T
-         prUfrZHbXvs39rgyPdDnuabtTSttr7k9qb3Zm4HEKia2Amkz2/yyQu+ihmBEmzvGRrwi
-         WS2w==
-X-Gm-Message-State: AFqh2krJ7ZcYSjeh0AzJn86gj3Qhh701WKCJgkyYczXmKK04hhK4M1hE
-        j4zzp7tfAJw0afzft5n2NVxEBbcweZ07whjBY1kCbQ==
-X-Google-Smtp-Source: AMrXdXsR/ThovcjSI43AaK4Fos8vXu6n0K3qiqUEOlotWF5yGcagJgxiHP0FtJUsV9OnUNvEQSj+hEYwL6OSgTbFwqU=
-X-Received: by 2002:ab0:2398:0:b0:3fe:c0cb:aa43 with SMTP id
- b24-20020ab02398000000b003fec0cbaa43mr1886262uan.72.1672127843661; Mon, 26
- Dec 2022 23:57:23 -0800 (PST)
+        bh=C5/0JksOM2lGuEYSzF1Qu3MnIOgzw58Ul9AktACBNVI=;
+        b=gTZTn9A2c4UZK1TMYTHd4uEMSz0BQ+DZJZ1tqGhlzt3xXYBTFl1S5d9bcYhKHeMUlw
+         UPe1W3/SwBmVDHO+bX+6ZIry6dSAyKeCl6IHDe7j6F8jYz/Sk3izDmc7I8VgtP3Nqp7y
+         spRpXImVKeNZWP7rWTv+n/cTkZ7H9OKSmS9SSEk9Sc2rFOwY/5njWAyuLDYhUe3vvppN
+         zZnrpn8Rj3eJWTmQvLCO0ZuqF6hppzjAiOUSSHxF4y0TSZO38ctqDW+DXQZy1oVOgiEm
+         ihml0DWc9PZVi+RoW55iuQDgOoTGfq9mF9hOAaytcwkqPuxZ7ZuUOLGdGFZujElBf7BW
+         HrOg==
+X-Gm-Message-State: AFqh2kp2aXodtuSC8WrIvjmXnoQUouQEJFN7zgYb2jeMAAbTecaLer+U
+        sf+Ld3DjBK/MQRnmD8sgjNyTlhxtKRigYav5r21BOg==
+X-Google-Smtp-Source: AMrXdXuBs2JliWerOZZXmJNVHzg/xf71Hb0VEHnA0XGAF1ihq/iN1gmrkZTToN9EzxIyzAeEgwTxu37dmgcPKXEXKFI=
+X-Received: by 2002:a1f:2016:0:b0:3d5:53d8:aa10 with SMTP id
+ g22-20020a1f2016000000b003d553d8aa10mr872944vkg.21.1672136567160; Tue, 27 Dec
+ 2022 02:22:47 -0800 (PST)
 MIME-Version: 1.0
-References: <20221227022528.609839-1-mie@igel.co.jp> <20221227022528.609839-3-mie@igel.co.jp>
- <CACGkMEtAaYpuZtS0gx_m931nFzcvqSNK9BhvUZH_tZXTzjgQCg@mail.gmail.com>
- <20221227020425-mutt-send-email-mst@kernel.org> <CANXvt5pXkS=TTOU0+Lkx6CjcV7xvDHRS6FbFikJ4Ww8832sg8g@mail.gmail.com>
- <20221227025534-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20221227025534-mutt-send-email-mst@kernel.org>
+References: <20221227022528.609839-1-mie@igel.co.jp> <20221227022528.609839-5-mie@igel.co.jp>
+ <20221227020007-mutt-send-email-mst@kernel.org> <CANXvt5pRy-i7=_ikNkZPp2HcRmWZYNJYpjO_ieBJJVc90nds+A@mail.gmail.com>
+In-Reply-To: <CANXvt5pRy-i7=_ikNkZPp2HcRmWZYNJYpjO_ieBJJVc90nds+A@mail.gmail.com>
 From:   Shunsuke Mie <mie@igel.co.jp>
-Date:   Tue, 27 Dec 2022 16:57:12 +0900
-Message-ID: <CANXvt5qh885mi7shJ9jiZbCBeSVR7=bDhx29GnpL1ZHymb_Rxw@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/9] vringh: remove vringh_iov and unite to vringh_kiov
+Date:   Tue, 27 Dec 2022 19:22:36 +0900
+Message-ID: <CANXvt5qUUOqB1CVgAk5KyL9sV+NsnJSKhatvdV12jH5=kBjjJw@mail.gmail.com>
+Subject: Re: [RFC PATCH 4/9] vringh: unify the APIs for all accessors
 To:     "Michael S. Tsirkin" <mst@redhat.com>
 Cc:     Jason Wang <jasowang@redhat.com>,
         Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
@@ -64,61 +62,149 @@ Cc:     Jason Wang <jasowang@redhat.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:56 Michael S. Tsirkin <ms=
-t@redhat.com>:
+2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:49 Shunsuke Mie <mie@igel=
+.co.jp>:
 >
-> On Tue, Dec 27, 2022 at 04:13:49PM +0900, Shunsuke Mie wrote:
-> > 2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:05 Michael S. Tsirkin=
- <mst@redhat.com>:
-> > >
-> > > On Tue, Dec 27, 2022 at 02:04:03PM +0800, Jason Wang wrote:
-> > > > On Tue, Dec 27, 2022 at 10:25 AM Shunsuke Mie <mie@igel.co.jp> wrot=
-e:
-> > > > >
-> > > > > struct vringh_iov is defined to hold userland addresses. However,=
- to use
-> > > > > common function, __vring_iov, finally the vringh_iov converts to =
-the
-> > > > > vringh_kiov with simple cast. It includes compile time check code=
- to make
-> > > > > sure it can be cast correctly.
-> > > > >
-> > > > > To simplify the code, this patch removes the struct vringh_iov an=
-d unifies
-> > > > > APIs to struct vringh_kiov.
-> > > > >
-> > > > > Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
-> > > >
-> > > > While at this, I wonder if we need to go further, that is, switch t=
-o
-> > > > using an iov iterator instead of a vringh customized one.
-> > > >
-> > > > Thanks
-> > >
-> > > Possibly, but when doing changes like this one needs to be careful
-> > > to avoid breaking all the inlining tricks vringh relies on for
-> > > performance.
-> > Definitely, I'm evaluating the performance using vringh_test. I'll add =
-a
-> > result of the evaluation. But, If there are other evaluation methods, c=
-ould you
-> > please tell me?
->
-> high level tests over virtio blk and net are possible, but let's
-> start with vringh_test.
-Ok, I'll do it.
-> > > --
-> > > MST
-> > >
+> 2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:04 Michael S. Tsirkin <=
+mst@redhat.com>:
 > >
-> > Best,
-> > Shunsuke
->
+> > On Tue, Dec 27, 2022 at 11:25:26AM +0900, Shunsuke Mie wrote:
+> > > Each vringh memory accessors that are for user, kern and iotlb has ow=
+n
+> > > interfaces that calls common code. But some codes are duplicated and =
+that
+> > > becomes loss extendability.
+> > >
+> > > Introduce a struct vringh_ops and provide a common APIs for all acces=
+sors.
+> > > It can bee easily extended vringh code for new memory accessor and
+> > > simplified a caller code.
+> > >
+> > > Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
+> > > ---
+> > >  drivers/vhost/vringh.c | 667 +++++++++++----------------------------=
+--
+> > >  include/linux/vringh.h | 100 +++---
+> > >  2 files changed, 225 insertions(+), 542 deletions(-)
+> > >
+> > > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > > index aa3cd27d2384..ebfd3644a1a3 100644
+> > > --- a/drivers/vhost/vringh.c
+> > > +++ b/drivers/vhost/vringh.c
+> > > @@ -35,15 +35,12 @@ static __printf(1,2) __cold void vringh_bad(const=
+ char *fmt, ...)
+> > >  }
+> > >
+> > >  /* Returns vring->num if empty, -ve on error. */
+> > > -static inline int __vringh_get_head(const struct vringh *vrh,
+> > > -                                 int (*getu16)(const struct vringh *=
+vrh,
+> > > -                                               u16 *val, const __vir=
+tio16 *p),
+> > > -                                 u16 *last_avail_idx)
+> > > +static inline int __vringh_get_head(const struct vringh *vrh, u16 *l=
+ast_avail_idx)
+> > >  {
+> > >       u16 avail_idx, i, head;
+> > >       int err;
+> > >
+> > > -     err =3D getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
+> > > +     err =3D vrh->ops.getu16(vrh, &avail_idx, &vrh->vring.avail->idx=
+);
+> > >       if (err) {
+> > >               vringh_bad("Failed to access avail idx at %p",
+> > >                          &vrh->vring.avail->idx);
+> >
+> > I like that this patch removes more lines of code than it adds.
+> >
+> > However one of the design points of vringh abstractions is that they we=
+re
+> > carefully written to be very low overhead.
+> > This is why we are passing function pointers to inline functions -
+> > compiler can optimize that out.
+> >
+> > I think that introducing ops indirect functions calls here is going to =
+break
+> > these assumptions and hurt performance.
+> > Unless compiler can somehow figure it out and optimize?
+> > I don't see how it's possible with ops pointer in memory
+> > but maybe I'm wrong.
+> I think your concern is correct. I have to understand the compiler
+> optimization and redesign this approach If it is needed.
+> > Was any effort taken to test effect of these patches on performance?
+> I just tested vringh_test and already faced little performance reduction.
+> I have to investigate that, as you said.
+I attempted to test with perf. I found that the performance of patched code
+is almost the same as the upstream one. However, I have to investigate way
+this patch leads to this result, also the profiling should be run on
+more powerful
+machines too.
+
+environment:
+$ grep 'model name' /proc/cpuinfo
+model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+
+results:
+* for patched code
+ Performance counter stats for 'nice -n -20 ./vringh_test_patched
+--parallel --eventidx --fast-vringh --indirect --virtio-1' (20 runs):
+
+          3,028.05 msec task-clock                #    0.995 CPUs
+utilized            ( +-  0.12% )
+            78,150      context-switches          #   25.691 K/sec
+               ( +-  0.00% )
+                 5      cpu-migrations            #    1.644 /sec
+               ( +-  3.33% )
+               190      page-faults               #   62.461 /sec
+               ( +-  0.41% )
+     6,919,025,222      cycles                    #    2.275 GHz
+               ( +-  0.13% )
+     8,990,220,160      instructions              #    1.29  insn per
+cycle           ( +-  0.04% )
+     1,788,326,786      branches                  #  587.899 M/sec
+               ( +-  0.05% )
+         4,557,398      branch-misses             #    0.25% of all
+branches          ( +-  0.43% )
+
+           3.04359 +- 0.00378 seconds time elapsed  ( +-  0.12% )
+
+* for upstream code
+ Performance counter stats for 'nice -n -20 ./vringh_test_base
+--parallel --eventidx --fast-vringh --indirect --virtio-1' (10 runs):
+
+          3,058.41 msec task-clock                #    0.999 CPUs
+utilized            ( +-  0.14% )
+            78,149      context-switches          #   25.545 K/sec
+               ( +-  0.00% )
+                 5      cpu-migrations            #    1.634 /sec
+               ( +-  2.67% )
+               194      page-faults               #   63.414 /sec
+               ( +-  0.43% )
+     6,988,713,963      cycles                    #    2.284 GHz
+               ( +-  0.14% )
+     8,512,533,269      instructions              #    1.22  insn per
+cycle           ( +-  0.04% )
+     1,638,375,371      branches                  #  535.549 M/sec
+               ( +-  0.05% )
+         4,428,866      branch-misses             #    0.27% of all
+branches          ( +- 22.57% )
+
+           3.06085 +- 0.00420 seconds time elapsed  ( +-  0.14% )
+
+> Thank you for your comments.
+> > Thanks!
+> >
+> >
+> Best,
+> Shunsuke.
