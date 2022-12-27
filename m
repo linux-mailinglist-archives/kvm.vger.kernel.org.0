@@ -2,68 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD450656773
-	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 07:05:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D0176567A8
+	for <lists+kvm@lfdr.de>; Tue, 27 Dec 2022 08:05:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbiL0GFD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 01:05:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58510 "EHLO
+        id S229626AbiL0HFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 02:05:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229621AbiL0GFA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 01:05:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A4BF2DCF
-        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 22:04:17 -0800 (PST)
+        with ESMTP id S229488AbiL0HFM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 02:05:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1BF1162
+        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 23:04:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672121057;
+        s=mimecast20190719; t=1672124665;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=JtwK0TmUyPB3eYskZMtg0oNP152qeukFtzmu8szThS4=;
-        b=DqQ5gJ6sIs5GYY/AZHOdgEBHaWkP39q7GptckzO1WSf/WxUV/D4qSaA4x0ljizwVE2xJbz
-        aFR+WCXSC90XE6CSwhHG64F/1V47+51EPNtI0M0+dW0xLxVAfLdqS0gJ3UwCnY3SvIDP2K
-        EULs09MemSx8UPK6diBI7YiMYpWCeY0=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=aoTymnMJhMCAhdxLx/6Xd8j2K/EbpmVCnrzJwfgh2hQ=;
+        b=gjuKed5QBwXNcfMp9j3eUvlXusUGm9TwpT6r41jEC0+y0Qw+T0CtJPLbxFR6cJEwFsBbYN
+        REKxXbxpt5SZS/rMzoVhHYSGKK/cyu7YQvFdI2dFYkOXoNVTlnK2DvkSr5m+Ck5IiYEMl8
+        vnA6fkC1s0IrrHIacQitLU3NGU0OOJE=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-287-3WMkAgyZNMmjrQWH-GPb5A-1; Tue, 27 Dec 2022 01:04:15 -0500
-X-MC-Unique: 3WMkAgyZNMmjrQWH-GPb5A-1
-Received: by mail-ot1-f71.google.com with SMTP id e15-20020a0568301e4f00b006783b3a27c3so7271538otj.0
-        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 22:04:15 -0800 (PST)
+ us-mta-646-st6jhuKtN8apzpPHyL3aaQ-1; Tue, 27 Dec 2022 02:04:23 -0500
+X-MC-Unique: st6jhuKtN8apzpPHyL3aaQ-1
+Received: by mail-ej1-f71.google.com with SMTP id xc12-20020a170907074c00b007416699ea14so8549567ejb.19
+        for <kvm@vger.kernel.org>; Mon, 26 Dec 2022 23:04:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JtwK0TmUyPB3eYskZMtg0oNP152qeukFtzmu8szThS4=;
-        b=OcCBI9oi17nZl2z882+/kxDAp38DyekeS+f7NLqkEsitEwiO35+SDyQCgmwaAXp06i
-         1iI7am0xfXYslgDdwR/x5mjzZoQXrnCpwzaI6WKzR+QPfHu29ySHddqGvqDmN0yj6nBV
-         6y08+tjpYrBXGJgF6agZniMQNBBne4bcB2yctMOaS9LVT8u+MnvZxMGqlJ/bRTOjaU5h
-         1xiDNBJ0QrlRmQTAK0x0dWcyPlNNeS1cvmqPzIJ8+FYzopGP/KKFkYpG53ONxjFMtH8/
-         cZggjZXvVbBjtNyrZoEzT5VAJIvGrgLCVtjaIhh71cKWjBtIAx7J0j33JNHwNFfX7ri5
-         L3cA==
-X-Gm-Message-State: AFqh2koXya+qYxIgDmvr2p2PRW75SvjZ1NrE8VdEIjkHU5xA1/85vxEa
-        Tyr3J6Ih8IR2IMZPufD7wvmO1PKiVNsMp0SYQ+E1TZXACpg2t29cIkSi8CCEctVawPDhwAEnw1a
-        A4arlu12knMhLnHV7ODGKo1F6M6vl
-X-Received: by 2002:aca:1111:0:b0:35e:7a42:7ab5 with SMTP id 17-20020aca1111000000b0035e7a427ab5mr1074623oir.280.1672121054825;
-        Mon, 26 Dec 2022 22:04:14 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtdg06zg3ogBEVD5FhVYBrkQ3mVFEJUcvWP+Qa87KA4giCLeV4ft04uckoxPDm96o/QYr3l3GA1xlty9lfuvl8=
-X-Received: by 2002:aca:1111:0:b0:35e:7a42:7ab5 with SMTP id
- 17-20020aca1111000000b0035e7a427ab5mr1074622oir.280.1672121054572; Mon, 26
- Dec 2022 22:04:14 -0800 (PST)
-MIME-Version: 1.0
-References: <20221227022528.609839-1-mie@igel.co.jp> <20221227022528.609839-3-mie@igel.co.jp>
-In-Reply-To: <20221227022528.609839-3-mie@igel.co.jp>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 27 Dec 2022 14:04:03 +0800
-Message-ID: <CACGkMEtAaYpuZtS0gx_m931nFzcvqSNK9BhvUZH_tZXTzjgQCg@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/9] vringh: remove vringh_iov and unite to vringh_kiov
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aoTymnMJhMCAhdxLx/6Xd8j2K/EbpmVCnrzJwfgh2hQ=;
+        b=wJMr3R15NNf8Rq83+AgEjHL2GOd38RXeFBfq/KPQMJTeLD9VsrE++NoGI+VqnfZFgu
+         ryW/b4x8w106niCulq3hWocIbhpmLNfyMEchmkQz32nCYhm8KVh2w41fJaMP/q8yBCyd
+         yH8t4ys+Wgvo6QslK8LNvaHsB9kvMEOEINyLmRLPwOs4ikSGGXA5ooRmOE1vKydRmG/8
+         UyZ5acC3xmPISsIRXPYomJSQDlg89hY4IR98YttTnF/6MAYvciXRD1ccQ8zXDyYbtQ8w
+         sBy1E+rBzyp7ZVp3wSep0oDMsvfLpNqhuOePh1e1ZYnFytGnMIDnZbLrvginDozI11E2
+         iXiQ==
+X-Gm-Message-State: AFqh2kqD/y96IVAtCi8fddopVsubBK+C/jEPu25QjVduvAvT8s+7vm6j
+        Ef19ZXbM5BzSvvEfAoX+UtVJpydtoFJrhnD8nBPJHdwVTr6QlIzlMn8VUW3OWaSOzG9V9UIrOzx
+        d8bho2fT73raa
+X-Received: by 2002:a17:907:2388:b0:7c0:e0d9:d20d with SMTP id vf8-20020a170907238800b007c0e0d9d20dmr19088746ejb.37.1672124662541;
+        Mon, 26 Dec 2022 23:04:22 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXu6gAxH/ncrPcbp+Eit49juvH4l55QVsieawsjzQ5QHGjjI86Ork+Wd8xiQwiDtwhCgj4ZHBw==
+X-Received: by 2002:a17:907:2388:b0:7c0:e0d9:d20d with SMTP id vf8-20020a170907238800b007c0e0d9d20dmr19088733ejb.37.1672124662287;
+        Mon, 26 Dec 2022 23:04:22 -0800 (PST)
+Received: from redhat.com ([2.52.151.85])
+        by smtp.gmail.com with ESMTPSA id k13-20020a1709061c0d00b0082000f8d871sm5695709ejg.152.2022.12.26.23.04.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Dec 2022 23:04:21 -0800 (PST)
+Date:   Tue, 27 Dec 2022 02:04:18 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
 To:     Shunsuke Mie <mie@igel.co.jp>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+Cc:     Jason Wang <jasowang@redhat.com>,
         Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [RFC PATCH 4/9] vringh: unify the APIs for all accessors
+Message-ID: <20221227020007-mutt-send-email-mst@kernel.org>
+References: <20221227022528.609839-1-mie@igel.co.jp>
+ <20221227022528.609839-5-mie@igel.co.jp>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221227022528.609839-5-mie@igel.co.jp>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -74,177 +79,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 27, 2022 at 10:25 AM Shunsuke Mie <mie@igel.co.jp> wrote:
->
-> struct vringh_iov is defined to hold userland addresses. However, to use
-> common function, __vring_iov, finally the vringh_iov converts to the
-> vringh_kiov with simple cast. It includes compile time check code to make
-> sure it can be cast correctly.
->
-> To simplify the code, this patch removes the struct vringh_iov and unifies
-> APIs to struct vringh_kiov.
->
+On Tue, Dec 27, 2022 at 11:25:26AM +0900, Shunsuke Mie wrote:
+> Each vringh memory accessors that are for user, kern and iotlb has own
+> interfaces that calls common code. But some codes are duplicated and that
+> becomes loss extendability.
+> 
+> Introduce a struct vringh_ops and provide a common APIs for all accessors.
+> It can bee easily extended vringh code for new memory accessor and
+> simplified a caller code.
+> 
 > Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
-
-While at this, I wonder if we need to go further, that is, switch to
-using an iov iterator instead of a vringh customized one.
-
-Thanks
-
 > ---
->  drivers/vhost/vringh.c | 32 ++++++------------------------
->  include/linux/vringh.h | 45 ++++--------------------------------------
->  2 files changed, 10 insertions(+), 67 deletions(-)
->
+>  drivers/vhost/vringh.c | 667 +++++++++++------------------------------
+>  include/linux/vringh.h | 100 +++---
+>  2 files changed, 225 insertions(+), 542 deletions(-)
+> 
 > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> index 828c29306565..aa3cd27d2384 100644
+> index aa3cd27d2384..ebfd3644a1a3 100644
 > --- a/drivers/vhost/vringh.c
 > +++ b/drivers/vhost/vringh.c
-> @@ -691,8 +691,8 @@ EXPORT_SYMBOL(vringh_init_user);
->   * calling vringh_iov_cleanup() to release the memory, even on error!
->   */
->  int vringh_getdesc_user(struct vringh *vrh,
-> -                       struct vringh_iov *riov,
-> -                       struct vringh_iov *wiov,
-> +                       struct vringh_kiov *riov,
-> +                       struct vringh_kiov *wiov,
->                         bool (*getrange)(struct vringh *vrh,
->                                          u64 addr, struct vringh_range *r),
->                         u16 *head)
-> @@ -708,26 +708,6 @@ int vringh_getdesc_user(struct vringh *vrh,
->         if (err == vrh->vring.num)
->                 return 0;
->
-> -       /* We need the layouts to be the identical for this to work */
-> -       BUILD_BUG_ON(sizeof(struct vringh_kiov) != sizeof(struct vringh_iov));
-> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, iov) !=
-> -                    offsetof(struct vringh_iov, iov));
-> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, i) !=
-> -                    offsetof(struct vringh_iov, i));
-> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, used) !=
-> -                    offsetof(struct vringh_iov, used));
-> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, max_num) !=
-> -                    offsetof(struct vringh_iov, max_num));
-> -       BUILD_BUG_ON(sizeof(struct iovec) != sizeof(struct kvec));
-> -       BUILD_BUG_ON(offsetof(struct iovec, iov_base) !=
-> -                    offsetof(struct kvec, iov_base));
-> -       BUILD_BUG_ON(offsetof(struct iovec, iov_len) !=
-> -                    offsetof(struct kvec, iov_len));
-> -       BUILD_BUG_ON(sizeof(((struct iovec *)NULL)->iov_base)
-> -                    != sizeof(((struct kvec *)NULL)->iov_base));
-> -       BUILD_BUG_ON(sizeof(((struct iovec *)NULL)->iov_len)
-> -                    != sizeof(((struct kvec *)NULL)->iov_len));
-> -
->         *head = err;
->         err = __vringh_iov(vrh, *head, (struct vringh_kiov *)riov,
->                            (struct vringh_kiov *)wiov,
-> @@ -740,14 +720,14 @@ int vringh_getdesc_user(struct vringh *vrh,
->  EXPORT_SYMBOL(vringh_getdesc_user);
->
->  /**
-> - * vringh_iov_pull_user - copy bytes from vring_iov.
-> + * vringh_iov_pull_user - copy bytes from vring_kiov.
->   * @riov: the riov as passed to vringh_getdesc_user() (updated as we consume)
->   * @dst: the place to copy.
->   * @len: the maximum length to copy.
->   *
->   * Returns the bytes copied <= len or a negative errno.
->   */
-> -ssize_t vringh_iov_pull_user(struct vringh_iov *riov, void *dst, size_t len)
-> +ssize_t vringh_iov_pull_user(struct vringh_kiov *riov, void *dst, size_t len)
+> @@ -35,15 +35,12 @@ static __printf(1,2) __cold void vringh_bad(const char *fmt, ...)
+>  }
+>  
+>  /* Returns vring->num if empty, -ve on error. */
+> -static inline int __vringh_get_head(const struct vringh *vrh,
+> -				    int (*getu16)(const struct vringh *vrh,
+> -						  u16 *val, const __virtio16 *p),
+> -				    u16 *last_avail_idx)
+> +static inline int __vringh_get_head(const struct vringh *vrh, u16 *last_avail_idx)
 >  {
->         return vringh_iov_xfer(NULL, (struct vringh_kiov *)riov,
->                                dst, len, xfer_from_user);
-> @@ -755,14 +735,14 @@ ssize_t vringh_iov_pull_user(struct vringh_iov *riov, void *dst, size_t len)
->  EXPORT_SYMBOL(vringh_iov_pull_user);
->
->  /**
-> - * vringh_iov_push_user - copy bytes into vring_iov.
-> + * vringh_iov_push_user - copy bytes into vring_kiov.
->   * @wiov: the wiov as passed to vringh_getdesc_user() (updated as we consume)
->   * @src: the place to copy from.
->   * @len: the maximum length to copy.
->   *
->   * Returns the bytes copied <= len or a negative errno.
->   */
-> -ssize_t vringh_iov_push_user(struct vringh_iov *wiov,
-> +ssize_t vringh_iov_push_user(struct vringh_kiov *wiov,
->                              const void *src, size_t len)
->  {
->         return vringh_iov_xfer(NULL, (struct vringh_kiov *)wiov,
-> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-> index 1991a02c6431..733d948e8123 100644
-> --- a/include/linux/vringh.h
-> +++ b/include/linux/vringh.h
-> @@ -79,18 +79,6 @@ struct vringh_range {
->         u64 offset;
->  };
->
-> -/**
-> - * struct vringh_iov - iovec mangler.
-> - *
-> - * Mangles iovec in place, and restores it.
-> - * Remaining data is iov + i, of used - i elements.
-> - */
-> -struct vringh_iov {
-> -       struct iovec *iov;
-> -       size_t consumed; /* Within iov[i] */
-> -       unsigned i, used, max_num;
-> -};
-> -
->  /**
->   * struct vringh_kiov - kvec mangler.
->   *
-> @@ -113,44 +101,19 @@ int vringh_init_user(struct vringh *vrh, u64 features,
->                      vring_avail_t __user *avail,
->                      vring_used_t __user *used);
->
-> -static inline void vringh_iov_init(struct vringh_iov *iov,
-> -                                  struct iovec *iovec, unsigned num)
-> -{
-> -       iov->used = iov->i = 0;
-> -       iov->consumed = 0;
-> -       iov->max_num = num;
-> -       iov->iov = iovec;
-> -}
-> -
-> -static inline void vringh_iov_reset(struct vringh_iov *iov)
-> -{
-> -       iov->iov[iov->i].iov_len += iov->consumed;
-> -       iov->iov[iov->i].iov_base -= iov->consumed;
-> -       iov->consumed = 0;
-> -       iov->i = 0;
-> -}
-> -
-> -static inline void vringh_iov_cleanup(struct vringh_iov *iov)
-> -{
-> -       if (iov->max_num & VRINGH_IOV_ALLOCATED)
-> -               kfree(iov->iov);
-> -       iov->max_num = iov->used = iov->i = iov->consumed = 0;
-> -       iov->iov = NULL;
-> -}
-> -
->  /* Convert a descriptor into iovecs. */
->  int vringh_getdesc_user(struct vringh *vrh,
-> -                       struct vringh_iov *riov,
-> -                       struct vringh_iov *wiov,
-> +                       struct vringh_kiov *riov,
-> +                       struct vringh_kiov *wiov,
->                         bool (*getrange)(struct vringh *vrh,
->                                          u64 addr, struct vringh_range *r),
->                         u16 *head);
->
->  /* Copy bytes from readable vsg, consuming it (and incrementing wiov->i). */
-> -ssize_t vringh_iov_pull_user(struct vringh_iov *riov, void *dst, size_t len);
-> +ssize_t vringh_iov_pull_user(struct vringh_kiov *riov, void *dst, size_t len);
->
->  /* Copy bytes into writable vsg, consuming it (and incrementing wiov->i). */
-> -ssize_t vringh_iov_push_user(struct vringh_iov *wiov,
-> +ssize_t vringh_iov_push_user(struct vringh_kiov *wiov,
->                              const void *src, size_t len);
->
->  /* Mark a descriptor as used. */
-> --
-> 2.25.1
->
+>  	u16 avail_idx, i, head;
+>  	int err;
+>  
+> -	err = getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
+> +	err = vrh->ops.getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
+>  	if (err) {
+>  		vringh_bad("Failed to access avail idx at %p",
+>  			   &vrh->vring.avail->idx);
+
+I like that this patch removes more lines of code than it adds.
+
+However one of the design points of vringh abstractions is that they were
+carefully written to be very low overhead.
+This is why we are passing function pointers to inline functions -
+compiler can optimize that out.
+
+I think that introducing ops indirect functions calls here is going to break
+these assumptions and hurt performance.
+Unless compiler can somehow figure it out and optimize?
+I don't see how it's possible with ops pointer in memory
+but maybe I'm wrong.
+
+Was any effort taken to test effect of these patches on performance?
+
+Thanks!
+
 
