@@ -2,245 +2,456 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D8486573DB
-	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 09:21:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E1426573F0
+	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 09:28:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230183AbiL1IVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Dec 2022 03:21:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40626 "EHLO
+        id S232554AbiL1I2l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Dec 2022 03:28:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229665AbiL1IVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Dec 2022 03:21:09 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18D08E26;
-        Wed, 28 Dec 2022 00:21:07 -0800 (PST)
+        with ESMTP id S232464AbiL1I2k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Dec 2022 03:28:40 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 923E3F037;
+        Wed, 28 Dec 2022 00:28:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672215667; x=1703751667;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=ud7x6N/VZcwlByuAmjb9pzAZL7D+9DkcF39pzl8gafg=;
-  b=WkuM642R93shMC6s5dfcE3VqfQ5OPVApOQ51imTs/LxxGp5OqbVlVs/v
-   RfkGVQTe+bQozbwEpfzcsCvP6PVnsPsKPWqhG9L+RaAKjADPAlsq2/yTX
-   1jPUckN4tNUTOODqgz5Fw5Z2eaWDIxJ4nkL17XhHhapUsEX0tJ6Gnb8+L
-   1mNW5RXjOK4tiAwZUt40ZFyi7ryztuOkMUgVhty+MshiBZcZx/yf/YeGR
-   gyQo3zUJxpQHS7kDfLkEVvZLqJZCnIoN1Kq4Phhiuv6D30zyCdUnNv+PU
-   MW5FFXjhq8A4ORybdEHIR7eAxQSDS6Zk1jYLOzw53Y/9OOtQPss2loZQB
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="385254448"
+  t=1672216118; x=1703752118;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=GHYckRNLBAJkM1B6ZVZAzlngKHgbuthXJCPMXZpUS18=;
+  b=STGx9+vPg6hzKH0jSzHifA2RNweCWBsRH/e2sTSrGl4iSvA0NCvVFgGM
+   0IsarcprYZyju/RJlJuGvW/B2Tuf/Qatj9+AbGzMRAPymTXUOtMIlBhEW
+   uwA5ABeeFBDm0K0ILoMpXAjsxhtPE1cFVJFgoS+4+VMS36bziMIP/8GOz
+   CkCOqcYgyQ6Q38Mnxeyek/m5CaQbm1JeVd7S3pXoGMTdoXcGolrsEa+5I
+   WqPyT0QLTc9GQAax3coHUywUrDr4FiDRLQ0LagnWavxd1Hwu7LlljjqjU
+   KwNGqYriBJ819rhkDFgOOFRSfcJzjPehJ2eUqMuiTN2yeJsasLIJxDk94
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="322068246"
 X-IronPort-AV: E=Sophos;i="5.96,280,1665471600"; 
-   d="scan'208";a="385254448"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2022 00:20:57 -0800
+   d="scan'208";a="322068246"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Dec 2022 00:28:37 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="741960554"
+X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="716565660"
 X-IronPort-AV: E=Sophos;i="5.96,280,1665471600"; 
-   d="scan'208";a="741960554"
+   d="scan'208";a="716565660"
 Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by FMSMGA003.fm.intel.com with ESMTP; 28 Dec 2022 00:20:56 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+  by fmsmga008.fm.intel.com with ESMTP; 28 Dec 2022 00:28:35 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
  ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Wed, 28 Dec 2022 00:20:56 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Wed, 28 Dec 2022 00:20:55 -0800
+ 15.1.2507.16; Wed, 28 Dec 2022 00:28:34 -0800
 Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
  orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Wed, 28 Dec 2022 00:20:55 -0800
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ 15.1.2507.16 via Frontend Transport; Wed, 28 Dec 2022 00:28:34 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.107)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Wed, 28 Dec 2022 00:20:54 -0800
+ 15.1.2507.16; Wed, 28 Dec 2022 00:28:33 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cJrgOksYzcrB1WlDpiKTdSmi5nt8Ags/N1bhIUSzxkKSqRyqPqZ+XKR8eeF3qUHr3+suPbLr+e6v/wEOLGUGK8YjaWG2XjOj668HjB+juwaaudUg79ppX2Qn0JnoF2moo3pJNMcYjCa7ftvTnX8LubqxSKh347katiyo2N2u6lf36OXRmJHPULnWy94wWT+P2Jj8VaoD89hSu0x5CccFaDKFws5D6+e9WoEgO6LoY4Nogi/Tp+REP1jxD8Y42dPOALaqEJ0ry2hdsFNkwoushj2i+Mm7ccx7IOPts8eym5/rFdi7q44snGmiCCBgXXm5uPvWZwJPjAk98WPW/regCA==
+ b=Rl8OIlP8rSD70Z1QPAqv+4TVIuHWK1QlZ8p5KdqFRYgBHvTQcnU5u+baNFQqkWlkVZIZl4BBykic3wQZ10uDeIlU5F4IPoqPHuJI4gQDSkHffTAOoxMRJl91FkSf0jTCIPJ5tKRBGKq/paXKcJPxYWvd4sW6qrfkV1Jmd/6UQYWOHR7ePQkpxOYK2Sql2RnY97//RYSd48qlXQlqmpnbwBf3/2Hnlm8GAvL07f86rAYjJ68ePVjGATXThcSdyUxcDWQ7tP4Us8APss3drIYRcR4JJnN31ZdYo7Y3Wpvc/STuAaqH1aoMc70eCNoNCmySeWq1QRllK510fVxnUknu1g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WqQ/5NNio99xdIHKJklsNsbv45dQMESCeDa7qx1Xfqs=;
- b=MiMNROK/79fM8WQYxVyy5wF3fxtmxQDjduMi+fFXg8v+601mGgIfujOMU8/7CJDXkChJ/Jxsm2VFmdrIyNcLOtuGd0cbBVgwswDz3EimS9GzpJmm9P2YK7S/QriECjLynxL8KinbcgyKTAObTQM1znwnZjQ4pLV2mIS9TzRoYZQcE5p6t+Uv7EjxcED6G2+Fj+Ptcym64fxf2XE9lwRsdWcAHFQ4g145napMq1j3f+pK1rvbPKpf69KpqUZnWTFROxKAbu1PkE98AcASG5haIA+Jp3qGbpoKSVec/288UdoZ3VZabHPoGyEUFHzPLItNx/Iubny9NYtNp413mT//ow==
+ bh=U0wHkUBLhb2NVqlSR+uKFzfL++/32lyZTLZ2Q7ms/qQ=;
+ b=STVP6rg2MqlojABMeapZ6UQoYboBnv3dMbbfq1F7RsLhNJVlGiMldiqPMRXGaJo7GpafV4YPJGBvuVuPlWgthVDkpz1klUiWdzhWIbfxkPdQXBTUyTZrp7vFfuErTdjbGPFnMQSVY30fl+zx5KvnJ6dpnUMlZqGBSbS+v2GCe+HB+dUZxwbKLwqVPzeBIDBJA9eQuLEsuXPHTbOaCnXkXjKYBQK8B9HKHCw/wzvVF+o1IiCvtEfyOGDlk3S0djaEhnAZjtH7gR+ku+qHRrCxib1x08QoGNTxYIxs2cBlt2Rp2Sd1ynVPgHVPDbWaltD1jBVQW5Ge0UHqTriHgZpufg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- MN6PR11MB8146.namprd11.prod.outlook.com (2603:10b6:208:470::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5944.16; Wed, 28 Dec 2022 08:20:52 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::bd50:2cf7:f362:3734]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::bd50:2cf7:f362:3734%9]) with mapi id 15.20.5944.016; Wed, 28 Dec 2022
- 08:20:52 +0000
-Date:   Wed, 28 Dec 2022 15:57:39 +0800
-From:   Yan Zhao <yan.y.zhao@intel.com>
-To:     Sean Christopherson <seanjc@google.com>
+Received: from SA2PR11MB5052.namprd11.prod.outlook.com (2603:10b6:806:fa::15)
+ by MW4PR11MB6572.namprd11.prod.outlook.com (2603:10b6:303:1ee::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.16; Wed, 28 Dec
+ 2022 08:28:23 +0000
+Received: from SA2PR11MB5052.namprd11.prod.outlook.com
+ ([fe80::d95b:a6f1:ed4d:5327]) by SA2PR11MB5052.namprd11.prod.outlook.com
+ ([fe80::d95b:a6f1:ed4d:5327%8]) with mapi id 15.20.5944.016; Wed, 28 Dec 2022
+ 08:28:23 +0000
+Message-ID: <1c9bbaa5-eea3-351e-d6a0-cfbc32115c82@intel.com>
+Date:   Wed, 28 Dec 2022 16:28:01 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.6.1
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+Content-Language: en-US
+To:     Chao Peng <chao.p.peng@linux.intel.com>, <kvm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <linux-fsdevel@vger.kernel.org>, <linux-arch@vger.kernel.org>,
+        <linux-api@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <qemu-devel@nongnu.org>
 CC:     Paolo Bonzini <pbonzini@redhat.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, <kvm@vger.kernel.org>,
-        <intel-gvt-dev@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 26/27] KVM: x86/mmu: Add page-track API to query if a gfn
- is valid
-Message-ID: <Y6v287BFez8tU43e@yzhao56-desk.sh.intel.com>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20221223005739.1295925-1-seanjc@google.com>
- <20221223005739.1295925-27-seanjc@google.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20221223005739.1295925-27-seanjc@google.com>
-X-ClientProxiedBy: SG2PR02CA0113.apcprd02.prod.outlook.com
- (2603:1096:4:92::29) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, <x86@kernel.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        <luto@kernel.org>, <jun.nakajima@intel.com>,
+        <dave.hansen@intel.com>, <ak@linux.intel.com>, <david@redhat.com>,
+        <aarcange@redhat.com>, <ddutile@redhat.com>, <dhildenb@redhat.com>,
+        Quentin Perret <qperret@google.com>, <tabba@google.com>,
+        Michael Roth <michael.roth@amd.com>, <mhocko@suse.com>,
+        <wei.w.wang@intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+From:   Chenyi Qiang <chenyi.qiang@intel.com>
+In-Reply-To: <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SG2PR03CA0124.apcprd03.prod.outlook.com
+ (2603:1096:4:91::28) To SA2PR11MB5052.namprd11.prod.outlook.com
+ (2603:10b6:806:fa::15)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|MN6PR11MB8146:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2a2dfd25-7208-435d-e0ed-08dae8ac6eb8
+X-MS-TrafficTypeDiagnostic: SA2PR11MB5052:EE_|MW4PR11MB6572:EE_
+X-MS-Office365-Filtering-Correlation-Id: dc99bd20-2dac-49fe-daf6-08dae8ad7bdc
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MW8cJPDR1G3DZ2MDYSnl9U8/RLsUDbNs6DoPffkZxg/7QLJUV0CqqJETfPh+rNC5xoWOHoHE/s/MmW2eySl596vSWRn3e7ivuTRpDqfbMioOh/2Vy955gp9/X7bfN/ZcnfBK3Avpo5hmcI2lKjL7UqTuNwHWQkzzmJCOynrb2hPPpz5peMwTcONvtylmspC+MTAFf7d8WlX+wXo1CzYGTy4Uw5gNjTATAMRpXHtZDiJPgTkAIdnUhGe9LBixpemEPqHh47IwPVsS9kvc/VWRgcldyteA8NId9y2LG0v4cyqvBGVO6S37kffJKaLBoze1RATwMFDFdhQHVp4TWH+xXi6O4K47NmL0IcSAb5VMD8aew25QBJ+xBy0aS2LcPslUDxKa8tV4rbRj+jorI3FAglmtLtueUvJ19mYBBT96tcaSyhQnFN2aOrXvzNNXVG9kG7H0eUF2qpMQZzExpVIiNs0W5X/ju+iwLLCF94aVD0/5AruTVyiAwJP6AJSwL7vcNhHissXnKOsj5N96cXfcT47JCrafNVPo282GGIct46O3vKHFufWj9UpzA+YoqCJhC+2n5izYTCIbBvk809zWHXN65ioPtgxLrnv4AymDFFe3KUFvpLs1BcV/oPxPEWtBDDybelQtPkDaIMiWQ+d3NAYpDWU27pqxjTPtKQalFftSMrp5p5djoO8FGcZ5VImg
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(366004)(136003)(39860400002)(376002)(396003)(451199015)(2906002)(3450700001)(8936002)(5660300002)(41300700001)(4326008)(8676002)(66556008)(66476007)(66946007)(86362001)(6916009)(54906003)(6506007)(82960400001)(316002)(38100700002)(6486002)(478600001)(83380400001)(6666004)(186003)(26005)(6512007)(21314003);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: 3jDNOgnqpVNTJpoERKSxjgjPgz0nTEcHl3IMzjuRncNmLHKjsiAtPJiJRk42ZvIjlnXxOtgzShDMk7lr75y7pMejzUeYyBtK7UcckuFsq3Il1Z5t3rPW5YT+saRRhKAULS88JlGwWeNMN+fyq201DoHYFvrBfPTdu74Be5N434AK3e7vhUdZzBm+yM0FHVUu2jQSjqZrUohhgSdc1lxEFefzlgQku8nJfaatdjoADHoNORqaG+wwfneOgmU1ojMbsljOBdUIWdBOWRXBrPC2t/3aCBh7rqQSzLngLvaWDFlHegqX6ahjTiTTVu2yurSSNMds96HuehY+0BwYmOIg25FFPppn3pMsNQ4ndg8uWQlaz0bUhCgOQYPuR5tFZkIeukPugiB6k4WJMGw4FOeM067/WUOAfKvYgw4zADWK/h8HGksf4kysVTi9QpRQqdA0BfT57eT7C92XbqYlMZCXoSohZEcxU2A8neAp76GEL+qC0V56O0Zi5momJYeIDy2HtM2nipsDX8MRVVaDP4KtqiWVH/65DZAzZDgssipwXAXTYZPqW/9MTpBCd3QzK752gaZ4F032hPIlLLvIRMa8XUWhPYx76mBPLJeZXYNLkp6X8H3qLEzBokmVMw6NXuXQjnxY7DfYBap4KGhS4Sl4rDtPAGLhLZw2ws05HCQboL7xL93wYZ2I0woPSi/sx2NGyX6OaCbeJj7lRNry83endAWw32yznupmkb+va46MtXF6jJnHu7g7i93wt6yuJyL5vFePfOkDa5P1EKxcAD4GyQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA2PR11MB5052.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(376002)(346002)(39860400002)(136003)(366004)(451199015)(36756003)(2906002)(82960400001)(38100700002)(5660300002)(8936002)(41300700001)(7416002)(7406005)(44832011)(83380400001)(31696002)(86362001)(31686004)(66946007)(66556008)(66476007)(54906003)(6666004)(478600001)(6506007)(6486002)(966005)(316002)(8676002)(4326008)(6512007)(53546011)(186003)(26005)(2616005)(45980500001)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?RRw1Q8UaSChSylELz2ZWGYU3qkXzF5DtTtcw3x73DC1PatTdeSRrEiA6Wb9g?=
- =?us-ascii?Q?BkpE2xTjPstwSiP9JjMPuutHbzc1x6DofsTgCXHQ+qAGzH4SG0CvIhCoPHgY?=
- =?us-ascii?Q?wrRONDmbVA0EPkSpLerqfWddPT/FOMBX9mqCgtiu9cPYIoqdiGjBqRIZo8Gp?=
- =?us-ascii?Q?YVK/Z1LEopv6VTPumoAo4qJnFHUK4K9Wav27P/9uYVj743Emid+lmr5I8fV1?=
- =?us-ascii?Q?QbI2xxGozEpikxz/EtR+PTxGwQr11fDIwV0rOgQ8CrMeF7VgToESoKBC5May?=
- =?us-ascii?Q?omma7wj6m+2vLZW2kOT5t62FF3ZlJe7OTK4RYT7DdAi3vkXVzT7NCmUbmhh8?=
- =?us-ascii?Q?gT66ynCZd/P4b3ncE3m5IgISkPvyCclgcfajk8lym6in4yYKb6NoJlULyubV?=
- =?us-ascii?Q?7vO6c3C7vDFpRoBuBFb7CUqJ2aJ58gpqrRP2x9l4OSAF0rLh3lJUD/sQfoI+?=
- =?us-ascii?Q?uC3FAA1W15P/ZlbPlxSu1Oe0DlSKOvEHBXHRABPCEMQThGswXyvfvjqdoSPG?=
- =?us-ascii?Q?TTJl63sLnCExCfpqDIoTI+kpqvkCuhGN0SLSBZclPuhkmnPzWyfbRB3WITr0?=
- =?us-ascii?Q?F4AoUNb6l6APjCM2RSVIEwOEyCtdWAZAQEEh+QkVCwsO2P+Pxl8PExRxr7nA?=
- =?us-ascii?Q?+VCj+GkQ8ptl4RvIdOfEUGqy1ocjORhK4rmYXKIsW1NbydhyeJ4ij4KzoTci?=
- =?us-ascii?Q?5h5S3G9W1jr7wwjQcLaoao0kmCXsnKTpdfgZSxjeMpXD3xp9umnmMd/glmkW?=
- =?us-ascii?Q?seN/cJW3F75z7Q1yRFD5EJwAS0mLEcPjEmA4nSEOcHc8X15haIfLNWbGlqfI?=
- =?us-ascii?Q?BJTlmjmD2FtHeuPiF9ziW4ctpwYCWUN3+r1b2SWmt+PmUL7gOAIydzGY0wYt?=
- =?us-ascii?Q?Yen5jm2u2sT9P5bZByBoGm1TNddkDPlJPwbC/gvRnw+qL0wkkS6+iIcJlZqb?=
- =?us-ascii?Q?PjKef90v3gNCvBtKXYzUzhIDJMSGxtaEG62Uinyu/wAq2vqyyI62sOjx65Q/?=
- =?us-ascii?Q?tG1Bvqt4MZOpqDxXth6mj4Qy0LcLxcG2+ypQIfepSxJJ0bw/sfC2HKe3+W3p?=
- =?us-ascii?Q?SBLxLzJ935Gsnp1vNRZ9qvCbqoX3OGCLwGMT/3Tjq3bPJcf6bFYuM/MyDsdx?=
- =?us-ascii?Q?w4PxqrC0bvvsgkPPiMlOct/5Ev5SNIszteSPWflMCy+l/l8wKENLu4omjzaw?=
- =?us-ascii?Q?vygObCBi3P5hzCCnFExlP9M1aFX0TyePUhWxiXugtgYhR4E7b4oHrevO3bQk?=
- =?us-ascii?Q?KjENMW5cFg/twFY8InpkFe/F4ON02Pm2e5UCa69oOxvDdq7St5ha64vEwVd3?=
- =?us-ascii?Q?gqWIBoAGOHPVkmwfjdkYQyaBeoGlalIMIxmAjhMfI4k6CmxfxzAJNNl0b4wC?=
- =?us-ascii?Q?MQFUiEqW5jhEQKYSl73mPeL5xb1PDeJo1YOxCkITvLK2BTQ0rYA/HgQVtAaj?=
- =?us-ascii?Q?k8CCmjug4qMI/n3o6irjYL7kpPmxnmKFadjuMaZFl80cvkSkaUipa0a72t3l?=
- =?us-ascii?Q?/LE9l53xVcrm9SFCcvTPhyI1LtsUQhjdlhawbx553ZlOsGg8OYUojGiPIMoP?=
- =?us-ascii?Q?fpPX3jk3bErhwueD/ocxG+jB51y3OZEuIoZqChiX?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2a2dfd25-7208-435d-e0ed-08dae8ac6eb8
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?S1JtZERLWGhGTFB0TDZRWThtdit4NitFZUc1QUFTTzlFUUFCdmMvVzR1aTN2?=
+ =?utf-8?B?YTdlTkNPcDZqYUxteHZ3SklmMVhQWEhjRWhXeE03WjhzZjVPU0JGYklQZGEx?=
+ =?utf-8?B?cDh4dnBEK3hDUGdwd2JndlZnemxxNkFMSnBVdlFUaFNDK2RudUlZMWNDRUEx?=
+ =?utf-8?B?QzdsZTR2TzQzL1FqMVplNncxMk1yOEhtZlFmeWpEY1lZRGJ2enAyT3hwZnJW?=
+ =?utf-8?B?Q2tPQVIwYVZneFRzMU9OYk1LZHIzcHQ2YitXK2liNDBaMXhUem9kd2VNNVBr?=
+ =?utf-8?B?VWYwOVdXQ3FSRi9wVFIvL1h1ajF3SlhhNmFJTGNlbE9rNjFLZklxTXdnTkhw?=
+ =?utf-8?B?VHBFdGRaQVM3ajhIWVdwa3pTczFINldvZVR2NUl1RHhueHNkREtyd1YvSDd4?=
+ =?utf-8?B?MDF2R25vbkQyUk04UmExR3VmTi9kOGp3b0c4bE1GaEtlWFNBNzY0T3VhNElz?=
+ =?utf-8?B?a3hNbkdRVEpxc3dqSmpXeVBhdkZMSnFzQlA2dDZ2ZDdlbVZhdyttTWRtRDNw?=
+ =?utf-8?B?V2ZLdjFRQWZSWEdEakZpSEdDdEhJamtsY3VmaEw4eXBibVFaTFpMSytQM24y?=
+ =?utf-8?B?NlNIb0dOQjFLT2sxcXkyWUtCWFpuRDFLMjk0ZVc5NXdHNHFuTmovNHo5QTVK?=
+ =?utf-8?B?aXVib1BpYmFOejJ6NEpBV0M5cUNmK0MwQjhMczgzRkpJQlRyK2liVlVqR2Ra?=
+ =?utf-8?B?U2c2NmNJNEpEUUJkcG5iclZ3TWErYkpnSHYwWG02aEJVWm9MNXlPU0FBc0FZ?=
+ =?utf-8?B?Mmw5RDlheHg0c0NNOFB0OFJjUm9seGlsY3k5V2VJanJMbVJZNXpRRTR0blF2?=
+ =?utf-8?B?Y0VWenEzZUh1ekUvbXcwSU5kOEx0WW9lRnkyVDlXRlNlOTdsNjV1WXJwLytz?=
+ =?utf-8?B?eHdQaThIeDBwL0VxRmM4VVJIZ1dnQ256cWRxTUxYaVNJY05QekwvL09wbHRz?=
+ =?utf-8?B?R3FyMnpCRjhmZEJZRDk0MnBOblI3bnQ0NTkxUlIzbFBwYjc0SlE3R29lbXB4?=
+ =?utf-8?B?Y010WmhNYysvQTJBRFlZSHNFNWZWSHVuS1ZxRklIVVdJUUowNXFSK2tlQUls?=
+ =?utf-8?B?Q1Z2VTRoNm0xeWg0OExYOUduTjU5dFAxWnlHRTlVQU9ITjJRRFhzQWpKWG1V?=
+ =?utf-8?B?d0FuM2xLekw2U0l2N3RhTTZVYjBVTlJscDFQYjc2blA1cE9hSk5zdFJSSU55?=
+ =?utf-8?B?SS9jTVovTkpmL2xUaW9Qbmt2SmVpam1ZK0tBMTZ3RjJ6VTBHVVZkczhhWXlQ?=
+ =?utf-8?B?WWFqRFU5MEg3NWFzZDRpenR1SDNlazFlS2VqQzhML2t0d0VmYXY5NHg4NER2?=
+ =?utf-8?B?czhlOFRlNzNMWjRPNHBRL0k4YUZHMkE5ZTBEYUpCTXBKUTFuSjMxVHJQeE1p?=
+ =?utf-8?B?NGRhbEc4RmFxNzlEVmwwdUR4ZFZLbWxXdnhLRGlRYTBXVlpONzdUSGtMajB4?=
+ =?utf-8?B?MXJaemJBL0NyUnM1dURUVlBidjJUZUladUhRc3BTSTFSQzJBR0dXMEM4bTZQ?=
+ =?utf-8?B?aytKZ0NQWm5nUm80VjB5U3NEY3djVGF3RWNRZGJwRGdHZWdiVnRCVjBkbGtI?=
+ =?utf-8?B?NzdSZWlwcks5NXpwWklZcmZiMjZzRHhDT3pqZEh5YUp6U3MxWkJOcjVqWm5Q?=
+ =?utf-8?B?WU9uWitPSjhDT2JOakkxeW80dytxVDAyM2k4c3VVTWRTV2Q4UGhJRGs2YzNs?=
+ =?utf-8?B?U2NLODJxUU5qcGlGWHhiSWVXeXJFYzhsdDhvbm9DSEpzZ2hwcHN0Ymxwamcr?=
+ =?utf-8?B?RkRDVWFxR1ZtV3plV1pJbTBncEVXZUpIRlNBTzRjRTAxeTFMODhrcXBYMmJk?=
+ =?utf-8?B?RVBhY1pqZ2h4OVBDR0V5S1d1UUpQMzFaaGk1U3A2aEtQR3BaNk9pNEZvbFc5?=
+ =?utf-8?B?c0lVbG5rL0NJMXNRUjVvbFJZS1l4SlZWbTN6Y3F2K2JleGVjMmkyUnUzVDBW?=
+ =?utf-8?B?aTY4SDRpTTMwRzRTMGliYURyKy9UYWl3VElWdUZsVDBzWGtZNDN2VG5YVk5X?=
+ =?utf-8?B?YTRSNzloY1NVNWhMMG1PN1BoSXFTUHdBNWxsL1dyb2N5TjM3aGFEWFZVRWY4?=
+ =?utf-8?B?NlozWG1heVJxTE9vRWRpY1dqN2V0TGx1OVkvWC8vV3FoTUpQa3pQSkRPOFY3?=
+ =?utf-8?B?bEpuMGFYZ1orbWdvdWZnMVU4TjJxOG5mdTBKL2Vmc09tQXhqMmpwUkdTMHF6?=
+ =?utf-8?B?SVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc99bd20-2dac-49fe-daf6-08dae8ad7bdc
+X-MS-Exchange-CrossTenant-AuthSource: SA2PR11MB5052.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2022 08:20:51.7536
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2022 08:28:23.5309
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: LoZ2zFwCQycLPt1PLW6CRQmLBZcjO5BMT+GWLfaBsTnaUovBuy1TD9DqGjDZVMl9NvDF5ECO4NE+S22meG5mwA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR11MB8146
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3nfq/1k+GUq+SfZtGySx3qF75/dMebs/u9KKh8Dlfq8qSgwRTjhzbdF4TQlg2nPfGFiaM7ApmgfHlk3BtBAlwQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6572
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-5.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 23, 2022 at 12:57:38AM +0000, Sean Christopherson wrote:
-> Add a page-track API to query if a gfn is "valid", i.e. is backed by a
-> memslot and is visible to the guest.  This is one more step toward
-> removing KVM internal details from the page-track APIs.
+
+
+On 12/2/2022 2:13 PM, Chao Peng wrote:
+> In confidential computing usages, whether a page is private or shared is
+> necessary information for KVM to perform operations like page fault
+> handling, page zapping etc. There are other potential use cases for
+> per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> or exec-only, etc.) without having to modify memslots.
 > 
-> Add a FIXME to call out that intel_gvt_is_valid_gfn() is broken with
-> respect to 2MiB (or larger) guest entries, e.g. if the starting gfn is
-> valid but a 2MiB page starting at the gfn covers "invalid" memory due
-> to running beyond the memslot.
+> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> userspace to operate on the per-page memory attributes.
+>   - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+>     a guest memory range.
+>   - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+>     memory attributes.
 > 
-> No functional change intended.
+> KVM internally uses xarray to store the per-page memory attributes.
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com/
 > ---
->  arch/x86/include/asm/kvm_page_track.h |  1 +
->  arch/x86/kvm/mmu/page_track.c         | 13 +++++++++++++
->  drivers/gpu/drm/i915/gvt/gtt.c        | 11 ++---------
->  3 files changed, 16 insertions(+), 9 deletions(-)
+>  Documentation/virt/kvm/api.rst | 63 ++++++++++++++++++++++++++++
+>  arch/x86/kvm/Kconfig           |  1 +
+>  include/linux/kvm_host.h       |  3 ++
+>  include/uapi/linux/kvm.h       | 17 ++++++++
+>  virt/kvm/Kconfig               |  3 ++
+>  virt/kvm/kvm_main.c            | 76 ++++++++++++++++++++++++++++++++++
+>  6 files changed, 163 insertions(+)
 > 
-> diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
-> index 66a0d7c34311..99e1d6eeb0fb 100644
-> --- a/arch/x86/include/asm/kvm_page_track.h
-> +++ b/arch/x86/include/asm/kvm_page_track.h
-> @@ -52,6 +52,7 @@ int kvm_page_track_register_notifier(struct kvm *kvm,
->  void kvm_page_track_unregister_notifier(struct kvm *kvm,
->  					struct kvm_page_track_notifier_node *n);
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 5617bc4f899f..bb2f709c0900 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5952,6 +5952,59 @@ delivery must be provided via the "reg_aen" struct.
+>  The "pad" and "reserved" fields may be used for future extensions and should be
+>  set to 0s by userspace.
 >  
-> +bool kvm_page_track_is_valid_gfn(struct kvm *kvm, gfn_t gfn);
->  int kvm_write_track_add_gfn(struct kvm *kvm, gfn_t gfn);
->  int kvm_write_track_remove_gfn(struct kvm *kvm, gfn_t gfn);
->  #endif /* CONFIG_KVM_EXTERNAL_WRITE_TRACKING */
-> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
-> index 1af431a41f71..9da071a514b3 100644
-> --- a/arch/x86/kvm/mmu/page_track.c
-> +++ b/arch/x86/kvm/mmu/page_track.c
-> @@ -264,6 +264,19 @@ enum pg_level kvm_page_track_max_mapping_level(struct kvm *kvm, gfn_t gfn,
+> +4.138 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
+> +-----------------------------------------
+> +
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm ioctl
+> +:Parameters: u64 memory attributes bitmask(out)
+> +:Returns: 0 on success, <0 on error
+> +
+> +Returns supported memory attributes bitmask. Supported memory attributes will
+> +have the corresponding bits set in u64 memory attributes bitmask.
+> +
+> +The following memory attributes are defined::
+> +
+> +  #define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
+> +  #define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
+> +  #define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
+> +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> +
+> +4.139 KVM_SET_MEMORY_ATTRIBUTES
+> +-----------------------------------------
+> +
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_memory_attributes(in/out)
+> +:Returns: 0 on success, <0 on error
+> +
+> +Sets memory attributes for pages in a guest memory range. Parameters are
+> +specified via the following structure::
+> +
+> +  struct kvm_memory_attributes {
+> +	__u64 address;
+> +	__u64 size;
+> +	__u64 attributes;
+> +	__u64 flags;
+> +  };
+> +
+> +The user sets the per-page memory attributes to a guest memory range indicated
+> +by address/size, and in return KVM adjusts address and size to reflect the
+> +actual pages of the memory range have been successfully set to the attributes.
+> +If the call returns 0, "address" is updated to the last successful address + 1
+> +and "size" is updated to the remaining address size that has not been set
+> +successfully. The user should check the return value as well as the size to
+> +decide if the operation succeeded for the whole range or not. The user may want
+> +to retry the operation with the returned address/size if the previous range was
+> +partially successful.
+> +
+> +Both address and size should be page aligned and the supported attributes can be
+> +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
+> +
+> +The "flags" field may be used for future extensions and should be set to 0s.
+> +
+>  5. The kvm_run structure
+>  ========================
+>  
+> @@ -8270,6 +8323,16 @@ structure.
+>  When getting the Modified Change Topology Report value, the attr->addr
+>  must point to a byte where the value will be stored or retrieved from.
+>  
+> +8.40 KVM_CAP_MEMORY_ATTRIBUTES
+> +------------------------------
+> +
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm
+> +
+> +This capability indicates KVM supports per-page memory attributes and ioctls
+> +KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES are available.
+> +
+>  9. Known KVM API problems
+>  =========================
+>  
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index fbeaa9ddef59..a8e379a3afee 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -49,6 +49,7 @@ config KVM
+>  	select SRCU
+>  	select INTERVAL_TREE
+>  	select HAVE_KVM_PM_NOTIFIER if PM
+> +	select HAVE_KVM_MEMORY_ATTRIBUTES
+>  	help
+>  	  Support hosting fully virtualized guest machines using hardware
+>  	  virtualization extensions.  You will need a fairly recent
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 8f874a964313..a784e2b06625 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -800,6 +800,9 @@ struct kvm {
+>  
+>  #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+>  	struct notifier_block pm_notifier;
+> +#endif
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +	struct xarray mem_attr_array;
+>  #endif
+>  	char stats_id[KVM_STATS_NAME_SIZE];
+>  };
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 64dfe9c07c87..5d0941acb5bb 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1182,6 +1182,7 @@ struct kvm_ppc_resize_hpt {
+>  #define KVM_CAP_S390_CPU_TOPOLOGY 222
+>  #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+>  #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+> +#define KVM_CAP_MEMORY_ATTRIBUTES 225
+>  
+>  #ifdef KVM_CAP_IRQ_ROUTING
+>  
+> @@ -2238,4 +2239,20 @@ struct kvm_s390_zpci_op {
+>  /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+>  #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+>  
+> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
+> +#define KVM_SET_MEMORY_ATTRIBUTES              _IOWR(KVMIO,  0xd3, struct kvm_memory_attributes)
+> +
+> +struct kvm_memory_attributes {
+> +	__u64 address;
+> +	__u64 size;
+> +	__u64 attributes;
+> +	__u64 flags;
+> +};
+> +
+> +#define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
+> +#define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
+> +#define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
+> +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> +
+>  #endif /* __LINUX_KVM_H */
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 800f9470e36b..effdea5dd4f0 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -19,6 +19,9 @@ config HAVE_KVM_IRQ_ROUTING
+>  config HAVE_KVM_DIRTY_RING
+>         bool
+>  
+> +config HAVE_KVM_MEMORY_ATTRIBUTES
+> +       bool
+> +
+>  # Only strongly ordered architectures can select this, as it doesn't
+>  # put any explicit constraint on userspace ordering. They can also
+>  # select the _ACQ_REL version.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 1782c4555d94..7f0f5e9f2406 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1150,6 +1150,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>  	spin_lock_init(&kvm->mn_invalidate_lock);
+>  	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+>  	xa_init(&kvm->vcpu_array);
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +	xa_init(&kvm->mem_attr_array);
+> +#endif
+>  
+>  	INIT_LIST_HEAD(&kvm->gpc_list);
+>  	spin_lock_init(&kvm->gpc_lock);
+> @@ -1323,6 +1326,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
+>  		kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
+>  		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
+>  	}
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +	xa_destroy(&kvm->mem_attr_array);
+> +#endif
+>  	cleanup_srcu_struct(&kvm->irq_srcu);
+>  	cleanup_srcu_struct(&kvm->srcu);
+>  	kvm_arch_free_vm(kvm);
+> @@ -2323,6 +2329,49 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
 >  }
->  EXPORT_SYMBOL_GPL(kvm_page_track_max_mapping_level);
+>  #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
 >  
-> +bool kvm_page_track_is_valid_gfn(struct kvm *kvm, gfn_t gfn)
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +static u64 kvm_supported_mem_attributes(struct kvm *kvm)
 > +{
-> +	bool ret;
-> +	int idx;
-> +
-> +	idx = srcu_read_lock(&kvm->srcu);
-> +	ret = kvm_is_visible_gfn(kvm, gfn);
-> +	srcu_read_unlock(&kvm->srcu, idx);
-> +
-> +	return ret;
+> +	return 0;
 > +}
-> +EXPORT_SYMBOL_GPL(kvm_page_track_is_valid_gfn);
-This implementation is only to check whether a GFN is within a visible
-kvm memslot. So, why this helper function is named kvm_page_track_xxx()?
-Don't think it's anything related to page track, and not all of its callers
-in KVMGT are for page tracking.
-
-Thanks
-Yan
-
 > +
->  /*
->   * add guest page to the tracking pool so that corresponding access on that
->   * page will be intercepted.
-> diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
-> index 59ba6639e622..43c4fc23205d 100644
-> --- a/drivers/gpu/drm/i915/gvt/gtt.c
-> +++ b/drivers/gpu/drm/i915/gvt/gtt.c
-> @@ -51,18 +51,11 @@ static int preallocated_oos_pages = 8192;
->  
->  static bool intel_gvt_is_valid_gfn(struct intel_vgpu *vgpu, unsigned long gfn)
+> +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> +					   struct kvm_memory_attributes *attrs)
+> +{
+> +	gfn_t start, end;
+> +	unsigned long i;
+> +	void *entry;
+> +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+> +
+> +	/* flags is currently not used. */
+> +	if (attrs->flags)
+> +		return -EINVAL;
+> +	if (attrs->attributes & ~supported_attrs)
+> +		return -EINVAL;
+> +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> +		return -EINVAL;
+> +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> +		return -EINVAL;
+> +
+> +	start = attrs->address >> PAGE_SHIFT;
+> +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> +
+> +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> +
+
+Because guest memory defaults to private, and now this patch stores the
+attributes with KVM_MEMORY_ATTRIBUTE_PRIVATE instead of _SHARED, it
+would bring more KVM_EXIT_MEMORY_FAULT exits at the beginning of boot
+time. Maybe it can be optimized somehow in other places? e.g. set mem
+attr in advance.
+
+> +	mutex_lock(&kvm->lock);
+> +	for (i = start; i < end; i++)
+> +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> +				    GFP_KERNEL_ACCOUNT)))
+> +			break;
+> +	mutex_unlock(&kvm->lock);
+> +
+> +	attrs->address = i << PAGE_SHIFT;
+> +	attrs->size = (end - i) << PAGE_SHIFT;
+> +
+> +	return 0;
+> +}
+> +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> +
+>  struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn)
 >  {
-> -	struct kvm *kvm = vgpu->vfio_device.kvm;
-> -	int idx;
-> -	bool ret;
-> -
->  	if (!vgpu->attached)
->  		return false;
->  
-> -	idx = srcu_read_lock(&kvm->srcu);
-> -	ret = kvm_is_visible_gfn(kvm, gfn);
-> -	srcu_read_unlock(&kvm->srcu, idx);
-> -
-> -	return ret;
-> +	/* FIXME: This doesn't properly handle guest entries larger than 4K. */
-> +	return kvm_page_track_is_valid_gfn(vgpu->vfio_device.kvm, gfn);
->  }
->  
->  /*
-> -- 
-> 2.39.0.314.g84b9a713c41-goog
-> 
+>  	return __gfn_to_memslot(kvm_memslots(kvm), gfn);
+
