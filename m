@@ -2,45 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ABD9B6575E0
-	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 12:22:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17349657631
+	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 13:00:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232658AbiL1LWr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Dec 2022 06:22:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57360 "EHLO
+        id S232958AbiL1MAF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Dec 2022 07:00:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232796AbiL1LWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Dec 2022 06:22:18 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 423F325FB;
-        Wed, 28 Dec 2022 03:22:16 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CDC02B81636;
-        Wed, 28 Dec 2022 11:22:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C988C433EF;
-        Wed, 28 Dec 2022 11:22:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672226533;
-        bh=g/ko60RCUy62mgwJX+BHqh4+FybNochgcGqfnbFgn1s=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=bkySoNrEPygYgl5QF2mbRvdQP90/TfV81MHuS96aaZXlQcngUJ3MnPH6eA7QDx4Th
-         9qys9DmCGwyeY+hU2x+2CaIsq4ffMaWs2Andkc5MUnCRyhe2gJL1UT52VEPs78jq5D
-         4F1Tuo0nQj1sMGDBh/MID5iNoErPu3cmtJOLrAi9mragNuaOC3UExlhvrMtXFgnRzt
-         wrjQrwIdzHmXG2C/xHTzuK1MlUOE4h7gPaZmWOD7ADqmpxfpX3FjjQu/1lKSa6NQ2/
-         OpnrZhXA+oWI8B3m33i+IQsklsKqkL22FNLezHwLuMeZmbP3lDV+wqKLg9C8uYzdJ+
-         KTTyjywJXPOvw==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pAUVf-00FXTE-4f;
-        Wed, 28 Dec 2022 11:22:11 +0000
+        with ESMTP id S233073AbiL1L7X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Dec 2022 06:59:23 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 488DF11465
+        for <kvm@vger.kernel.org>; Wed, 28 Dec 2022 03:58:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672228721;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=KYdiyUW7v3jDVb1QwzZWNab9jTsMpMxmysun3BoXT8E=;
+        b=BUmrbtzLHXKgoS2cqq0PXGvKWAC5e997bHYtEwEZOPPY6zk7DsT/+SPsXE6A6fPtiiXYhA
+        uyHReXcNu9XqL42bARoWjCMgaenQqa8jNDHYzG9cijSu0VK/eSeq7ZmFHbXk8Cha1R6yly
+        zEs0Zs6zSvzH6xkrIgVz+EL76A54CIw=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-82-XpWsihHWP6CRe3MYdGX8UQ-1; Wed, 28 Dec 2022 06:58:39 -0500
+X-MC-Unique: XpWsihHWP6CRe3MYdGX8UQ-1
+Received: by mail-ed1-f71.google.com with SMTP id b15-20020a056402350f00b0048477a5114bso5351735edd.2
+        for <kvm@vger.kernel.org>; Wed, 28 Dec 2022 03:58:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KYdiyUW7v3jDVb1QwzZWNab9jTsMpMxmysun3BoXT8E=;
+        b=3/GCYDd6NiD2awY4N0E9KSe6VI/wjZntULDgMCAqYz49Ao1mKCTqzvkNvH+vaHeSsd
+         KOnwvz8yqTMwcdq4xyQyYe4Bw7AXCw3zsh1C/mjYDK/7utJocjEMlAXoLZFMNrUjdLtm
+         YTpOZeS4xPSrccA8NpzWyum3KZvsuUN0u4yKTNQWIEGVxHi01JmFbgG6tOBek6UdKgxw
+         Nmk6hA4C9+4x501/dgspnicFSqyM0/uI7jcRX9uEqE80R8SgnrR//ssqfN5DpPbz5VXA
+         1buTJMj2M6ppo8MqK09M5U78FQ1rFJ5XlG5zIsGr6gFxUnerrUL/TMhm27iXxI21SehK
+         N/nQ==
+X-Gm-Message-State: AFqh2kqZjmqV77uUtIOgmZ5Hez/UjcyH4zBN1Mh8RscrmO48UZRiibm7
+        kFAaK9FLvfevbcDYHab8p6EI5Z2Sucu6rgZlTzxxb2nyOWC8WYymMTtSJIy6LuB4TxTuOjvHXFi
+        Vn13vXt9vyfV2
+X-Received: by 2002:aa7:de15:0:b0:483:30d7:f9ac with SMTP id h21-20020aa7de15000000b0048330d7f9acmr12028220edv.19.1672228718676;
+        Wed, 28 Dec 2022 03:58:38 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtrIO5srJBbY8oizuyf5Q39Hr1tveD2PqIx/4KuqYlJNhV9zI7izo96N6ps5dxKil3bsWjXNA==
+X-Received: by 2002:aa7:de15:0:b0:483:30d7:f9ac with SMTP id h21-20020aa7de15000000b0048330d7f9acmr12028204edv.19.1672228718422;
+        Wed, 28 Dec 2022 03:58:38 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id h25-20020aa7de19000000b00463b9d47e1fsm7031261edv.71.2022.12.28.03.58.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 28 Dec 2022 03:58:37 -0800 (PST)
+Message-ID: <55a31d67-b9d0-1a62-1c60-f86b48a34a8b@redhat.com>
+Date:   Wed, 28 Dec 2022 12:58:33 +0100
 MIME-Version: 1.0
-Date:   Wed, 28 Dec 2022 11:22:10 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
+Content-Language: en-US
+To:     Marc Zyngier <maz@kernel.org>
 Cc:     Sean Christopherson <seanjc@google.com>,
         Huacai Chen <chenhuacai@kernel.org>,
         Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
@@ -68,44 +90,38 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         linux-kernel@vger.kernel.org, Yuan Yao <yuan.yao@intel.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Isaku Yamahata <isaku.yamahata@intel.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>,
         Fabiano Rosas <farosas@linux.ibm.com>,
         Michael Ellerman <mpe@ellerman.id.au>,
         Kai Huang <kai.huang@intel.com>, Chao Gao <chao.gao@intel.com>,
         Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH v2 00/50] KVM: Rework kvm_init() and hardware enabling
-In-Reply-To: <20221227130249.1650197-1-pbonzini@redhat.com>
 References: <20221227130249.1650197-1-pbonzini@redhat.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <9acea262dec3511e9cf63081506f0bd7@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: pbonzini@redhat.com, seanjc@google.com, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, borntraeger@linux.ibm.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, mjrosato@linux.ibm.com, farman@linux.ibm.com, vkuznets@redhat.com, dwmw2@infradead.org, paul@xen.org, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, atishp@atishpatra.org, david@redhat.com, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org, yuan.yao@intel.com, cohuck@redhat.com, isaku.yamahata@intel.com, philmd@linaro.org, farosas@linux.ibm.com, mpe@ellerman.id.au, kai.huang@intel.com, chao.gao@intel.com, tglx@linutronix.de
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+ <9acea262dec3511e9cf63081506f0bd7@kernel.org>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <9acea262dec3511e9cf63081506f0bd7@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2022-12-27 13:02, Paolo Bonzini wrote:
-> Queued, thanks.  I will leave this in kvm/queue after testing 
-> everything
-> else and moving it to kvm/next; this way, we can wait for test results
-> on other architectures.
+On 12/28/22 12:22, Marc Zyngier wrote:
+> 
+>> Queued, thanks.  I will leave this in kvm/queue after testing everything
+>> else and moving it to kvm/next; this way, we can wait for test results
+>> on other architectures.
+> 
+> Can you please make this a topic branch, and if possible based
+> on a released -rc? It would make it a lot easier for everyone.
 
-Can you please make this a topic branch, and if possible based
-on a released -rc? It would make it a lot easier for everyone.
+Yes, I will (it will be based on 6.2-rc1 + pull request for rc2 that I'm 
+preparing + x86 changes that this conflicts with).
 
-Thanks,
+Paolo
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
