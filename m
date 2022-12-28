@@ -2,228 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E169C657217
-	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 03:24:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6065D657263
+	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 04:37:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230289AbiL1CYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 21:24:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50902 "EHLO
+        id S229718AbiL1Dhi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 22:37:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229526AbiL1CYX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 21:24:23 -0500
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E941E65FC
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 18:24:21 -0800 (PST)
-Received: by mail-vk1-xa33.google.com with SMTP id z190so2693927vka.4
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 18:24:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=igel-co-jp.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lttqZKeMZ42Wftl+a8lEKBwDe2IpQRheXD3/dUIOrPE=;
-        b=vLsxbKjnqmN7ZOTHeMz7NeULAaBP7Lfep7XHvKEKppWhzJsr0kdCDXNIueyDJW7iVL
-         la70SsV6Ie6ZMuuy9gZiH0wLLJMRYSg2bTYDV14tlozyS3xAPU9gEHvXZVlTYbrgIuP8
-         aE9qw7gWzsANwTwSfOkhq3eh/Fo6ZRciivXlZObFquyr6pMO+DGhNIoEEW34DoTxowO0
-         CqQx7pam0TnoF72zI1W2XVJI5r5x9tD2jHyPsMl3d/IiP/Yx8UCWe2S1Ziw91SkBk8bU
-         NjTJYO+lSwXDsoRKiRin6oAsX+ieLJnv8B2QE/DPzvPaDbHM60/L30bM7tXNrBDN+PqM
-         qXQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lttqZKeMZ42Wftl+a8lEKBwDe2IpQRheXD3/dUIOrPE=;
-        b=vtJ+35ZVsDa3opRDVfyrXiySUJXcWm+StB6hbLgVt2Qbe98Rnd7IR9y5mtecG9Vc/V
-         4J5aH24Hlb1Kgt20GwYpkKFMJOmWupT0OyuR4EUYoK4NiPUde5uGEkH2ZKkRD/Fx3oRh
-         ImIGCCOc8S3nwuveQF2bAXj8D66ARnUARgi1MJ9updBuwjbl4PlM6QgIVoIgZbTu0iWn
-         y34EWrPFbx67TDRtb0rSMUugQ2RY8GC4oe2L6cQH/XRg7lzzDDJIGbccfOBonlNtztFq
-         sYvxTozYmJwe/J+bpWJEvJOTg80gUGAKP2PpFlzvW8AnzMyRyTSf7WWQunl6VVuqOhAe
-         xF7Q==
-X-Gm-Message-State: AFqh2kqSPrGD64jS+Aa559iaFO+2OesyIT/mr2qD7FFDGAmaBHXgmURl
-        8O531JJJOl7QWT+Ter38GRh0+1hnR5mAxd3omzJJOA==
-X-Google-Smtp-Source: AMrXdXvLQNIe1PcsU5De/1MFPipsfDOPkaOr3HULUDZN915fVJLoMYjD7SkPBo8QjiIJb6mDo9iqWmSJIrELWUFy1fw=
-X-Received: by 2002:a1f:2016:0:b0:3d5:53d8:aa10 with SMTP id
- g22-20020a1f2016000000b003d553d8aa10mr1129190vkg.21.1672194261032; Tue, 27
- Dec 2022 18:24:21 -0800 (PST)
+        with ESMTP id S229475AbiL1Dhg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 22:37:36 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFC8F64EF
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 19:37:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1672198655; x=1703734655;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=4hQcUXsiViRjod30lQOD13w+C/qGkkiQKki5wyj2xyE=;
+  b=YvGxMpWpfKKFSFhrWh/+XSR3vdedTFIIFHYQuCS1tPxYBjiffLt3piNi
+   9pdtLTByXHBl3wdcKYdmnzDjad6WruJYTdxR7bZfnVroNZl00EfHGCFub
+   +PHv5nlX4P8Q77lkqtRF2uIkCwXbUpC0BUk0QNssk+8cNT1HHeLSppSYj
+   O1hTA/VFIQyBmAxCmSXp4wg15azbC9+VkLlkHoG59zgpbVFPvIT4OGGdr
+   N72wAuY1+cUKBatmTkNlz8C6SU3P/RZakAteCC7gukbhNHRLBbhwnX7wG
+   S9bdSzjXC4+o8rdVFat0ssLwTxLGJpSGm4IWp2ln3AlAF6NMgPWaowRNQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="300490663"
+X-IronPort-AV: E=Sophos;i="5.96,280,1665471600"; 
+   d="scan'208";a="300490663"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2022 19:37:30 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="898549909"
+X-IronPort-AV: E=Sophos;i="5.96,280,1665471600"; 
+   d="scan'208";a="898549909"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.255.28.140]) ([10.255.28.140])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2022 19:37:29 -0800
+Message-ID: <2e395a24-ee7b-e31e-981c-b83e80ac5be1@linux.intel.com>
+Date:   Wed, 28 Dec 2022 11:37:27 +0800
 MIME-Version: 1.0
-References: <20221227022528.609839-1-mie@igel.co.jp> <20221227022528.609839-5-mie@igel.co.jp>
- <20221227020007-mutt-send-email-mst@kernel.org> <CANXvt5pRy-i7=_ikNkZPp2HcRmWZYNJYpjO_ieBJJVc90nds+A@mail.gmail.com>
- <CANXvt5qUUOqB1CVgAk5KyL9sV+NsnJSKhatvdV12jH5=kBjjJw@mail.gmail.com> <20221227075332-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20221227075332-mutt-send-email-mst@kernel.org>
-From:   Shunsuke Mie <mie@igel.co.jp>
-Date:   Wed, 28 Dec 2022 11:24:10 +0900
-Message-ID: <CANXvt5qTbGi7p5Y7eVSjyHJ7MLjiMgGKyAM-LEkJZXvhtSh7vw@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/9] vringh: unify the APIs for all accessors
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v3 1/9] KVM: x86: Rename cr4_reserved/rsvd_* variables to
+ be more readable
+To:     Robert Hoo <robert.hu@linux.intel.com>, pbonzini@redhat.com,
+        seanjc@google.com, kirill.shutemov@linux.intel.com,
+        kvm@vger.kernel.org
+References: <20221209044557.1496580-1-robert.hu@linux.intel.com>
+ <20221209044557.1496580-2-robert.hu@linux.intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20221209044557.1496580-2-robert.hu@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 23:37 Michael S. Tsirkin <ms=
-t@redhat.com>:
+
+On 12/9/2022 12:45 PM, Robert Hoo wrote:
+> kvm_vcpu_arch::cr4_guest_owned_bits and kvm_vcpu_arch::cr4_guest_rsvd_bits
+> looks confusing. Rename latter to cr4_host_rsvd_bits, because it in fact
+> decribes the effective host reserved cr4 bits from the vcpu's perspective.
+
+IMO, the current name cr4_guest_rsvd_bits is OK becuase it shows that 
+these bits are reserved bits from the pointview of guest.
+
+Change to *host* is OK, but seems not easier to understand.
+
+
 >
-> On Tue, Dec 27, 2022 at 07:22:36PM +0900, Shunsuke Mie wrote:
-> > 2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:49 Shunsuke Mie <mie@=
-igel.co.jp>:
-> > >
-> > > 2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:04 Michael S. Tsirk=
-in <mst@redhat.com>:
-> > > >
-> > > > On Tue, Dec 27, 2022 at 11:25:26AM +0900, Shunsuke Mie wrote:
-> > > > > Each vringh memory accessors that are for user, kern and iotlb ha=
-s own
-> > > > > interfaces that calls common code. But some codes are duplicated =
-and that
-> > > > > becomes loss extendability.
-> > > > >
-> > > > > Introduce a struct vringh_ops and provide a common APIs for all a=
-ccessors.
-> > > > > It can bee easily extended vringh code for new memory accessor an=
-d
-> > > > > simplified a caller code.
-> > > > >
-> > > > > Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
-> > > > > ---
-> > > > >  drivers/vhost/vringh.c | 667 +++++++++++------------------------=
-------
-> > > > >  include/linux/vringh.h | 100 +++---
-> > > > >  2 files changed, 225 insertions(+), 542 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> > > > > index aa3cd27d2384..ebfd3644a1a3 100644
-> > > > > --- a/drivers/vhost/vringh.c
-> > > > > +++ b/drivers/vhost/vringh.c
-> > > > > @@ -35,15 +35,12 @@ static __printf(1,2) __cold void vringh_bad(c=
-onst char *fmt, ...)
-> > > > >  }
-> > > > >
-> > > > >  /* Returns vring->num if empty, -ve on error. */
-> > > > > -static inline int __vringh_get_head(const struct vringh *vrh,
-> > > > > -                                 int (*getu16)(const struct vrin=
-gh *vrh,
-> > > > > -                                               u16 *val, const _=
-_virtio16 *p),
-> > > > > -                                 u16 *last_avail_idx)
-> > > > > +static inline int __vringh_get_head(const struct vringh *vrh, u1=
-6 *last_avail_idx)
-> > > > >  {
-> > > > >       u16 avail_idx, i, head;
-> > > > >       int err;
-> > > > >
-> > > > > -     err =3D getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
-> > > > > +     err =3D vrh->ops.getu16(vrh, &avail_idx, &vrh->vring.avail-=
->idx);
-> > > > >       if (err) {
-> > > > >               vringh_bad("Failed to access avail idx at %p",
-> > > > >                          &vrh->vring.avail->idx);
-> > > >
-> > > > I like that this patch removes more lines of code than it adds.
-> > > >
-> > > > However one of the design points of vringh abstractions is that the=
-y were
-> > > > carefully written to be very low overhead.
-> > > > This is why we are passing function pointers to inline functions -
-> > > > compiler can optimize that out.
-> > > >
-> > > > I think that introducing ops indirect functions calls here is going=
- to break
-> > > > these assumptions and hurt performance.
-> > > > Unless compiler can somehow figure it out and optimize?
-> > > > I don't see how it's possible with ops pointer in memory
-> > > > but maybe I'm wrong.
-> > > I think your concern is correct. I have to understand the compiler
-> > > optimization and redesign this approach If it is needed.
-> > > > Was any effort taken to test effect of these patches on performance=
-?
-> > > I just tested vringh_test and already faced little performance reduct=
-ion.
-> > > I have to investigate that, as you said.
-> > I attempted to test with perf. I found that the performance of patched =
-code
-> > is almost the same as the upstream one. However, I have to investigate =
-way
-> > this patch leads to this result, also the profiling should be run on
-> > more powerful
-> > machines too.
-> >
-> > environment:
-> > $ grep 'model name' /proc/cpuinfo
-> > model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
-> > model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
-> > model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
-> > model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
-> >
-> > results:
-> > * for patched code
-> >  Performance counter stats for 'nice -n -20 ./vringh_test_patched
-> > --parallel --eventidx --fast-vringh --indirect --virtio-1' (20 runs):
-> >
-> >           3,028.05 msec task-clock                #    0.995 CPUs
-> > utilized            ( +-  0.12% )
-> >             78,150      context-switches          #   25.691 K/sec
-> >                ( +-  0.00% )
-> >                  5      cpu-migrations            #    1.644 /sec
-> >                ( +-  3.33% )
-> >                190      page-faults               #   62.461 /sec
-> >                ( +-  0.41% )
-> >      6,919,025,222      cycles                    #    2.275 GHz
-> >                ( +-  0.13% )
-> >      8,990,220,160      instructions              #    1.29  insn per
-> > cycle           ( +-  0.04% )
-> >      1,788,326,786      branches                  #  587.899 M/sec
-> >                ( +-  0.05% )
-> >          4,557,398      branch-misses             #    0.25% of all
-> > branches          ( +-  0.43% )
-> >
-> >            3.04359 +- 0.00378 seconds time elapsed  ( +-  0.12% )
-> >
-> > * for upstream code
-> >  Performance counter stats for 'nice -n -20 ./vringh_test_base
-> > --parallel --eventidx --fast-vringh --indirect --virtio-1' (10 runs):
-> >
-> >           3,058.41 msec task-clock                #    0.999 CPUs
-> > utilized            ( +-  0.14% )
-> >             78,149      context-switches          #   25.545 K/sec
-> >                ( +-  0.00% )
-> >                  5      cpu-migrations            #    1.634 /sec
-> >                ( +-  2.67% )
-> >                194      page-faults               #   63.414 /sec
-> >                ( +-  0.43% )
-> >      6,988,713,963      cycles                    #    2.284 GHz
-> >                ( +-  0.14% )
-> >      8,512,533,269      instructions              #    1.22  insn per
-> > cycle           ( +-  0.04% )
-> >      1,638,375,371      branches                  #  535.549 M/sec
-> >                ( +-  0.05% )
-> >          4,428,866      branch-misses             #    0.27% of all
-> > branches          ( +- 22.57% )
-> >
-> >            3.06085 +- 0.00420 seconds time elapsed  ( +-  0.14% )
+> Meanwhile, rename other related variables/macros to be better descriptive:
+> * CR4_RESERVED_BITS --> CR4_HOST_RESERVED_BITS, which describes host bare
+> metal CR4 reserved bits.
 >
+> * cr4_reserved_bits --> cr4_kvm_reserved_bits, which describes
+> CR4_HOST_RESERVED_BITS + !kvm_cap_has() = kvm level cr4 reserved bits.
 >
-> How you compiled it also matters. ATM we don't enable retpolines
-> and it did not matter since we didn't have indirect calls,
-> but we should. Didn't yet investigate how to do that for virtio tools.
-I think the retpolines certainly affect performance. Thank you for pointing
-it out. I'd like to start the investigation that how to apply the
-retpolines to the
-virtio tools.
-> > > Thank you for your comments.
-> > > > Thanks!
-> > > >
-> > > >
-> > > Best,
-> > > Shunsuke.
+> * __cr4_reserved_bits() --> __cr4_calc_reserved_bits(), which to calc
+> effective cr4 reserved bits for kvm or vm level, by corresponding
+> x_cpu_has() input.
 >
+> Thus, by these renames, the hierarchical relations of those reserved CR4
+> bits is more clear.
+>
+> Just renames, no functional changes intended.
+>
+> Signed-off-by: Robert Hoo <robert.hu@linux.intel.com>
+> ---
+>   arch/x86/include/asm/kvm_host.h |  4 ++--
+>   arch/x86/kvm/cpuid.c            |  4 ++--
+>   arch/x86/kvm/vmx/vmx.c          |  2 +-
+>   arch/x86/kvm/x86.c              | 12 ++++++------
+>   arch/x86/kvm/x86.h              |  4 ++--
+>   5 files changed, 13 insertions(+), 13 deletions(-)
+>
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index f05ebaa26f0f..3c736e00b6b1 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -114,7 +114,7 @@
+>   			  | X86_CR0_ET | X86_CR0_NE | X86_CR0_WP | X86_CR0_AM \
+>   			  | X86_CR0_NW | X86_CR0_CD | X86_CR0_PG))
+>   
+> -#define CR4_RESERVED_BITS                                               \
+> +#define CR4_HOST_RESERVED_BITS                                               \
+>   	(~(unsigned long)(X86_CR4_VME | X86_CR4_PVI | X86_CR4_TSD | X86_CR4_DE\
+>   			  | X86_CR4_PSE | X86_CR4_PAE | X86_CR4_MCE     \
+>   			  | X86_CR4_PGE | X86_CR4_PCE | X86_CR4_OSFXSR | X86_CR4_PCIDE \
+> @@ -671,7 +671,7 @@ struct kvm_vcpu_arch {
+>   	unsigned long cr3;
+>   	unsigned long cr4;
+>   	unsigned long cr4_guest_owned_bits;
+> -	unsigned long cr4_guest_rsvd_bits;
+> +	unsigned long cr4_host_rsvd_bits;
+>   	unsigned long cr8;
+>   	u32 host_pkru;
+>   	u32 pkru;
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index c92c49a0b35b..01e2b93ef563 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -352,8 +352,8 @@ static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>   	vcpu->arch.reserved_gpa_bits = kvm_vcpu_reserved_gpa_bits_raw(vcpu);
+>   
+>   	kvm_pmu_refresh(vcpu);
+> -	vcpu->arch.cr4_guest_rsvd_bits =
+> -	    __cr4_reserved_bits(guest_cpuid_has, vcpu);
+> +	vcpu->arch.cr4_host_rsvd_bits =
+> +	    __cr4_calc_reserved_bits(guest_cpuid_has, vcpu);
+>   
+>   	kvm_hv_set_cpuid(vcpu, kvm_cpuid_has_hyperv(vcpu->arch.cpuid_entries,
+>   						    vcpu->arch.cpuid_nent));
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 63247c57c72c..cfa06c7c062e 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -4250,7 +4250,7 @@ void set_cr4_guest_host_mask(struct vcpu_vmx *vmx)
+>   	struct kvm_vcpu *vcpu = &vmx->vcpu;
+>   
+>   	vcpu->arch.cr4_guest_owned_bits = KVM_POSSIBLE_CR4_GUEST_BITS &
+> -					  ~vcpu->arch.cr4_guest_rsvd_bits;
+> +					  ~vcpu->arch.cr4_host_rsvd_bits;
+>   	if (!enable_ept) {
+>   		vcpu->arch.cr4_guest_owned_bits &= ~X86_CR4_TLBFLUSH_BITS;
+>   		vcpu->arch.cr4_guest_owned_bits &= ~X86_CR4_PDPTR_BITS;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 69227f77b201..eb1f2c20e19e 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -108,7 +108,7 @@ u64 __read_mostly efer_reserved_bits = ~((u64)(EFER_SCE | EFER_LME | EFER_LMA));
+>   static u64 __read_mostly efer_reserved_bits = ~((u64)EFER_SCE);
+>   #endif
+>   
+> -static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
+> +static u64 __read_mostly cr4_kvm_reserved_bits = CR4_HOST_RESERVED_BITS;
+>   
+>   #define KVM_EXIT_HYPERCALL_VALID_MASK (1 << KVM_HC_MAP_GPA_RANGE)
+>   
+> @@ -1102,10 +1102,10 @@ EXPORT_SYMBOL_GPL(kvm_emulate_xsetbv);
+>   
+>   bool __kvm_is_valid_cr4(struct kvm_vcpu *vcpu, unsigned long cr4)
+>   {
+> -	if (cr4 & cr4_reserved_bits)
+> +	if (cr4 & cr4_kvm_reserved_bits)
+>   		return false;
+>   
+> -	if (cr4 & vcpu->arch.cr4_guest_rsvd_bits)
+> +	if (cr4 & vcpu->arch.cr4_host_rsvd_bits)
+>   		return false;
+>   
+>   	return true;
+> @@ -12290,7 +12290,7 @@ int kvm_arch_hardware_setup(void *opaque)
+>   		kvm_caps.supported_xss = 0;
+>   
+>   #define __kvm_cpu_cap_has(UNUSED_, f) kvm_cpu_cap_has(f)
+> -	cr4_reserved_bits = __cr4_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
+> +	cr4_kvm_reserved_bits = __cr4_calc_reserved_bits(__kvm_cpu_cap_has, UNUSED_);
+>   #undef __kvm_cpu_cap_has
+>   
+>   	if (kvm_caps.has_tsc_control) {
+> @@ -12323,8 +12323,8 @@ int kvm_arch_check_processor_compat(void *opaque)
+>   
+>   	WARN_ON(!irqs_disabled());
+>   
+> -	if (__cr4_reserved_bits(cpu_has, c) !=
+> -	    __cr4_reserved_bits(cpu_has, &boot_cpu_data))
+> +	if (__cr4_calc_reserved_bits(cpu_has, c) !=
+> +	    __cr4_calc_reserved_bits(cpu_has, &boot_cpu_data))
+>   		return -EIO;
+>   
+>   	return ops->check_processor_compatibility();
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 829d3134c1eb..d92e580768e5 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -452,9 +452,9 @@ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+>   #define  KVM_MSR_RET_INVALID	2	/* in-kernel MSR emulation #GP condition */
+>   #define  KVM_MSR_RET_FILTERED	3	/* #GP due to userspace MSR filter */
+>   
+> -#define __cr4_reserved_bits(__cpu_has, __c)             \
+> +#define __cr4_calc_reserved_bits(__cpu_has, __c)             \
+>   ({                                                      \
+> -	u64 __reserved_bits = CR4_RESERVED_BITS;        \
+> +	u64 __reserved_bits = CR4_HOST_RESERVED_BITS;        \
+>                                                           \
+>   	if (!__cpu_has(__c, X86_FEATURE_XSAVE))         \
+>   		__reserved_bits |= X86_CR4_OSXSAVE;     \
