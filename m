@@ -2,103 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D03A657165
-	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 01:21:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E169C657217
+	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 03:24:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229884AbiL1AVY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 27 Dec 2022 19:21:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
+        id S230289AbiL1CYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 27 Dec 2022 21:24:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbiL1AVW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 27 Dec 2022 19:21:22 -0500
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D1FCE34
-        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 16:21:18 -0800 (PST)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1pAKC2-00EuQW-Mk; Wed, 28 Dec 2022 01:21:14 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=u+SXGGAMjZrou0lH27ETbaoXiSkwMP3eNynZwxgvLTc=; b=hdB+vaa9pV7tGriN1iB8uAiGLp
-        FhwOSP6JWYY5TC2HORlctAWS729p2nLzO5o2NMqdFAO3CPU0LQi+mCkxb9IQRSIYG1QKoCk+cAIZG
-        m3tR4z8kvkJQiV7R0IpolRNJ0r0DgbxFI0Z64xgBInlOr3PKnAq8ZhAH3YSTBdn/OpieFTAnifiA9
-        iVQ9CYoVL9MliZkdzJLXdTiugLM1u4djIb8lfGNSiEStqfk0VpVmgSus58F9m4R2HZRjp3bqpvTjt
-        dyptRrDkT+p2GmNUf3rOzg7v/nGl3RT6mdNX4wkaNTl/bkO9VW1u6LgZ9FT/0Wd30GSbCBCGavKdp
-        1go9t1Fw==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1pAKC1-0004CS-MZ; Wed, 28 Dec 2022 01:21:13 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1pAKBz-0000IQ-LO; Wed, 28 Dec 2022 01:21:11 +0100
-Message-ID: <532cef98-1f0f-7011-7793-cef5b37397fc@rbox.co>
-Date:   Wed, 28 Dec 2022 01:21:10 +0100
+        with ESMTP id S229526AbiL1CYX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 27 Dec 2022 21:24:23 -0500
+Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E941E65FC
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 18:24:21 -0800 (PST)
+Received: by mail-vk1-xa33.google.com with SMTP id z190so2693927vka.4
+        for <kvm@vger.kernel.org>; Tue, 27 Dec 2022 18:24:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=igel-co-jp.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lttqZKeMZ42Wftl+a8lEKBwDe2IpQRheXD3/dUIOrPE=;
+        b=vLsxbKjnqmN7ZOTHeMz7NeULAaBP7Lfep7XHvKEKppWhzJsr0kdCDXNIueyDJW7iVL
+         la70SsV6Ie6ZMuuy9gZiH0wLLJMRYSg2bTYDV14tlozyS3xAPU9gEHvXZVlTYbrgIuP8
+         aE9qw7gWzsANwTwSfOkhq3eh/Fo6ZRciivXlZObFquyr6pMO+DGhNIoEEW34DoTxowO0
+         CqQx7pam0TnoF72zI1W2XVJI5r5x9tD2jHyPsMl3d/IiP/Yx8UCWe2S1Ziw91SkBk8bU
+         NjTJYO+lSwXDsoRKiRin6oAsX+ieLJnv8B2QE/DPzvPaDbHM60/L30bM7tXNrBDN+PqM
+         qXQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lttqZKeMZ42Wftl+a8lEKBwDe2IpQRheXD3/dUIOrPE=;
+        b=vtJ+35ZVsDa3opRDVfyrXiySUJXcWm+StB6hbLgVt2Qbe98Rnd7IR9y5mtecG9Vc/V
+         4J5aH24Hlb1Kgt20GwYpkKFMJOmWupT0OyuR4EUYoK4NiPUde5uGEkH2ZKkRD/Fx3oRh
+         ImIGCCOc8S3nwuveQF2bAXj8D66ARnUARgi1MJ9updBuwjbl4PlM6QgIVoIgZbTu0iWn
+         y34EWrPFbx67TDRtb0rSMUugQ2RY8GC4oe2L6cQH/XRg7lzzDDJIGbccfOBonlNtztFq
+         sYvxTozYmJwe/J+bpWJEvJOTg80gUGAKP2PpFlzvW8AnzMyRyTSf7WWQunl6VVuqOhAe
+         xF7Q==
+X-Gm-Message-State: AFqh2kqSPrGD64jS+Aa559iaFO+2OesyIT/mr2qD7FFDGAmaBHXgmURl
+        8O531JJJOl7QWT+Ter38GRh0+1hnR5mAxd3omzJJOA==
+X-Google-Smtp-Source: AMrXdXvLQNIe1PcsU5De/1MFPipsfDOPkaOr3HULUDZN915fVJLoMYjD7SkPBo8QjiIJb6mDo9iqWmSJIrELWUFy1fw=
+X-Received: by 2002:a1f:2016:0:b0:3d5:53d8:aa10 with SMTP id
+ g22-20020a1f2016000000b003d553d8aa10mr1129190vkg.21.1672194261032; Tue, 27
+ Dec 2022 18:24:21 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [RFC PATCH 1/2] KVM: x86/xen: Fix use-after-free in
- kvm_xen_eventfd_update()
-Content-Language: pl-PL
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     dwmw2@infradead.org, paul@xen.org, seanjc@google.com
-References: <20221222203021.1944101-1-mhal@rbox.co>
- <20221222203021.1944101-2-mhal@rbox.co>
- <42483e26-10bd-88d2-308a-3407a0c54d55@redhat.com>
- <ea97ca88-b354-e96b-1a16-0a1be29af50c@rbox.co>
- <af3846d2-19b2-543d-8f5f-d818dbdffc75@redhat.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <af3846d2-19b2-543d-8f5f-d818dbdffc75@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20221227022528.609839-1-mie@igel.co.jp> <20221227022528.609839-5-mie@igel.co.jp>
+ <20221227020007-mutt-send-email-mst@kernel.org> <CANXvt5pRy-i7=_ikNkZPp2HcRmWZYNJYpjO_ieBJJVc90nds+A@mail.gmail.com>
+ <CANXvt5qUUOqB1CVgAk5KyL9sV+NsnJSKhatvdV12jH5=kBjjJw@mail.gmail.com> <20221227075332-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20221227075332-mutt-send-email-mst@kernel.org>
+From:   Shunsuke Mie <mie@igel.co.jp>
+Date:   Wed, 28 Dec 2022 11:24:10 +0900
+Message-ID: <CANXvt5qTbGi7p5Y7eVSjyHJ7MLjiMgGKyAM-LEkJZXvhtSh7vw@mail.gmail.com>
+Subject: Re: [RFC PATCH 4/9] vringh: unify the APIs for all accessors
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/27/22 12:11, Paolo Bonzini wrote:
-> On 12/24/22 12:14, Michal Luczaj wrote:
->>> This lock/unlock pair can cause a deadlock because it's inside the SRCU
->>> read side critical section.  Fortunately it's simpler to just use
->>> mutex_lock for the whole function instead of using two small critical
->>> sections, and then SRCU is not needed.
->> Ah, I didn't think using a single mutex_lock would be ok. And maybe that's
->> a silly question, but how can this lock/unlock pair cause a deadlock? My
->> assumption was it's a*sleepable*  RCU after all.
->>
-> 
-> This is a pretty simple AB-BA deadlock, just involving SRCU and a mutex 
-> instead of two mutexes:
-> 
-> Thread 1			Thread 2
-> 				mutex_lock()
-> srcu_read_lock()
-> mutex_lock()  // stops here
-> 				synchronize_srcu()  // stops here
-> 				mutex_unlock()
-> mutex_unlock()
-> srcu_read_unlock()
-> 
-> Thread 2's synchronize_srcu() is waiting for srcu_read_unlock(), which 
-> however won't happen until thread 1 can take the mutex.  But the mutex 
-> is taken by thread 2, hence the deadlock.
-
-Ahh, I see. Thank you for explaining.
-
-Does it mean kvm_xen_hcall_evtchn_send() deadlocks in the same fashion?
-
-				kvm_xen_eventfd_reset()
-				  mutex_lock()
-srcu_read_lock()
-kvm_xen_hcall_evtchn_send()
-  kvm_xen_set_evtchn()
-    mutex_lock()
-    				  synchronize_srcu()
-
-Michal
+2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 23:37 Michael S. Tsirkin <ms=
+t@redhat.com>:
+>
+> On Tue, Dec 27, 2022 at 07:22:36PM +0900, Shunsuke Mie wrote:
+> > 2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:49 Shunsuke Mie <mie@=
+igel.co.jp>:
+> > >
+> > > 2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 16:04 Michael S. Tsirk=
+in <mst@redhat.com>:
+> > > >
+> > > > On Tue, Dec 27, 2022 at 11:25:26AM +0900, Shunsuke Mie wrote:
+> > > > > Each vringh memory accessors that are for user, kern and iotlb ha=
+s own
+> > > > > interfaces that calls common code. But some codes are duplicated =
+and that
+> > > > > becomes loss extendability.
+> > > > >
+> > > > > Introduce a struct vringh_ops and provide a common APIs for all a=
+ccessors.
+> > > > > It can bee easily extended vringh code for new memory accessor an=
+d
+> > > > > simplified a caller code.
+> > > > >
+> > > > > Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
+> > > > > ---
+> > > > >  drivers/vhost/vringh.c | 667 +++++++++++------------------------=
+------
+> > > > >  include/linux/vringh.h | 100 +++---
+> > > > >  2 files changed, 225 insertions(+), 542 deletions(-)
+> > > > >
+> > > > > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+> > > > > index aa3cd27d2384..ebfd3644a1a3 100644
+> > > > > --- a/drivers/vhost/vringh.c
+> > > > > +++ b/drivers/vhost/vringh.c
+> > > > > @@ -35,15 +35,12 @@ static __printf(1,2) __cold void vringh_bad(c=
+onst char *fmt, ...)
+> > > > >  }
+> > > > >
+> > > > >  /* Returns vring->num if empty, -ve on error. */
+> > > > > -static inline int __vringh_get_head(const struct vringh *vrh,
+> > > > > -                                 int (*getu16)(const struct vrin=
+gh *vrh,
+> > > > > -                                               u16 *val, const _=
+_virtio16 *p),
+> > > > > -                                 u16 *last_avail_idx)
+> > > > > +static inline int __vringh_get_head(const struct vringh *vrh, u1=
+6 *last_avail_idx)
+> > > > >  {
+> > > > >       u16 avail_idx, i, head;
+> > > > >       int err;
+> > > > >
+> > > > > -     err =3D getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
+> > > > > +     err =3D vrh->ops.getu16(vrh, &avail_idx, &vrh->vring.avail-=
+>idx);
+> > > > >       if (err) {
+> > > > >               vringh_bad("Failed to access avail idx at %p",
+> > > > >                          &vrh->vring.avail->idx);
+> > > >
+> > > > I like that this patch removes more lines of code than it adds.
+> > > >
+> > > > However one of the design points of vringh abstractions is that the=
+y were
+> > > > carefully written to be very low overhead.
+> > > > This is why we are passing function pointers to inline functions -
+> > > > compiler can optimize that out.
+> > > >
+> > > > I think that introducing ops indirect functions calls here is going=
+ to break
+> > > > these assumptions and hurt performance.
+> > > > Unless compiler can somehow figure it out and optimize?
+> > > > I don't see how it's possible with ops pointer in memory
+> > > > but maybe I'm wrong.
+> > > I think your concern is correct. I have to understand the compiler
+> > > optimization and redesign this approach If it is needed.
+> > > > Was any effort taken to test effect of these patches on performance=
+?
+> > > I just tested vringh_test and already faced little performance reduct=
+ion.
+> > > I have to investigate that, as you said.
+> > I attempted to test with perf. I found that the performance of patched =
+code
+> > is almost the same as the upstream one. However, I have to investigate =
+way
+> > this patch leads to this result, also the profiling should be run on
+> > more powerful
+> > machines too.
+> >
+> > environment:
+> > $ grep 'model name' /proc/cpuinfo
+> > model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+> > model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+> > model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+> > model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+> >
+> > results:
+> > * for patched code
+> >  Performance counter stats for 'nice -n -20 ./vringh_test_patched
+> > --parallel --eventidx --fast-vringh --indirect --virtio-1' (20 runs):
+> >
+> >           3,028.05 msec task-clock                #    0.995 CPUs
+> > utilized            ( +-  0.12% )
+> >             78,150      context-switches          #   25.691 K/sec
+> >                ( +-  0.00% )
+> >                  5      cpu-migrations            #    1.644 /sec
+> >                ( +-  3.33% )
+> >                190      page-faults               #   62.461 /sec
+> >                ( +-  0.41% )
+> >      6,919,025,222      cycles                    #    2.275 GHz
+> >                ( +-  0.13% )
+> >      8,990,220,160      instructions              #    1.29  insn per
+> > cycle           ( +-  0.04% )
+> >      1,788,326,786      branches                  #  587.899 M/sec
+> >                ( +-  0.05% )
+> >          4,557,398      branch-misses             #    0.25% of all
+> > branches          ( +-  0.43% )
+> >
+> >            3.04359 +- 0.00378 seconds time elapsed  ( +-  0.12% )
+> >
+> > * for upstream code
+> >  Performance counter stats for 'nice -n -20 ./vringh_test_base
+> > --parallel --eventidx --fast-vringh --indirect --virtio-1' (10 runs):
+> >
+> >           3,058.41 msec task-clock                #    0.999 CPUs
+> > utilized            ( +-  0.14% )
+> >             78,149      context-switches          #   25.545 K/sec
+> >                ( +-  0.00% )
+> >                  5      cpu-migrations            #    1.634 /sec
+> >                ( +-  2.67% )
+> >                194      page-faults               #   63.414 /sec
+> >                ( +-  0.43% )
+> >      6,988,713,963      cycles                    #    2.284 GHz
+> >                ( +-  0.14% )
+> >      8,512,533,269      instructions              #    1.22  insn per
+> > cycle           ( +-  0.04% )
+> >      1,638,375,371      branches                  #  535.549 M/sec
+> >                ( +-  0.05% )
+> >          4,428,866      branch-misses             #    0.27% of all
+> > branches          ( +- 22.57% )
+> >
+> >            3.06085 +- 0.00420 seconds time elapsed  ( +-  0.14% )
+>
+>
+> How you compiled it also matters. ATM we don't enable retpolines
+> and it did not matter since we didn't have indirect calls,
+> but we should. Didn't yet investigate how to do that for virtio tools.
+I think the retpolines certainly affect performance. Thank you for pointing
+it out. I'd like to start the investigation that how to apply the
+retpolines to the
+virtio tools.
+> > > Thank you for your comments.
+> > > > Thanks!
+> > > >
+> > > >
+> > > Best,
+> > > Shunsuke.
+>
