@@ -2,63 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC64A65869F
-	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 21:16:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BC621658715
+	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 22:33:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231398AbiL1UQY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Dec 2022 15:16:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57000 "EHLO
+        id S232147AbiL1VdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Dec 2022 16:33:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230122AbiL1UQX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Dec 2022 15:16:23 -0500
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52EA714D28
-        for <kvm@vger.kernel.org>; Wed, 28 Dec 2022 12:16:22 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id u8so8684787ilq.13
-        for <kvm@vger.kernel.org>; Wed, 28 Dec 2022 12:16:22 -0800 (PST)
+        with ESMTP id S230406AbiL1VdG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Dec 2022 16:33:06 -0500
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D1E7140C8
+        for <kvm@vger.kernel.org>; Wed, 28 Dec 2022 13:33:02 -0800 (PST)
+Received: by mail-qk1-x749.google.com with SMTP id i4-20020a05620a248400b006febc1651bbso11743419qkn.4
+        for <kvm@vger.kernel.org>; Wed, 28 Dec 2022 13:33:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9QLEzUOv77SITzoeVrj0OIlPqik0hjcbepFC3pXiGFc=;
-        b=nJuiCcxqbnGdd0Nw0gAUW1qImTlYRb2F4Z1Gi0qGU/JHQCQ57kCCVTSdVv7+WB894z
-         zm+lMiIxcZTZnt50ihWWYIVCQYNbjWioaw9Fx1EifbILhv2PYLy7OytFCC+0UoluNl7P
-         D2gFqmO+ke7FrXkctTJxeiICWJxAK1gZb8GrS+7eHHUtHYN+BCURoNUjrngMh+9gBBCk
-         0PvnisrR3Pm7VUG5yQjhk12g0/lFr9adFFqsdNcguZ5+0Pwse1muqTnpFeOGImfYkTZe
-         bEc5QXFCNyeJK7WgsF0RHAQQ70SEIPzaT6Ad6y7bZaFgAjDlydDb+hHR/O/6y6DTZZ/5
-         fpWA==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=IL2YbOoN7yPmIShOQbEFF8vOUsSkAn/M3lJ9txKjS40=;
+        b=DQd928Kdr25J4ElaX6WZIg0y5aPMxnpaZIJg7IPsyFdp7Z3sU095SY0P4pr93F+joX
+         xUOk7tHxITprNKxjOzKUe37tbXK/nCU27n9rSpuQq1RpZsLqxdkYR8J3rkdvDie+cd+y
+         ICbF0Bb4zALDvouCsj8CQka5kHUqA+uGamn/b8vdYyT2UPKCSqXq3xcLHVYsCFJ49nfE
+         DEiCH87vUImae/stFU5wBLHDK0H2wgLqT9wzF1M2QF/ObcdX/Z82QE3LEsX8T45STvmL
+         D1V14FdeAMzvVu4ud311bpNBF3CP3ub9xaQlueCFvMG89KPT/0ILIL398AEZfuEQs4Zg
+         I1rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9QLEzUOv77SITzoeVrj0OIlPqik0hjcbepFC3pXiGFc=;
-        b=uk/61zW5nh5sSK6rRt6vlkT4QqakKBNiLCBCL5YyPpveWe4384iTehKt819wZQcMTE
-         0cyyDIuyEEpeRCDe0dVB5Hr5NouCeW4HKewMdgOZKaDQUMKEGnwlgbcyf/WA/aLaJaat
-         o/rjwRCoM0Wx9/Xq39Dlw/JmjPuHlvCubAaIJEHC0J35C4HTSKMBNRj4sYKrIaozVjq2
-         X4pgR0LaAoZ1urwTLIbu9rWumZP7e573wZiZ8IUuVdsw3ZC02SXiLG3qu1IVaLjokRrd
-         9uQZUomAqGVrGeFFh18j+vU5CSffHGCJahx/WuVD0FM5G0QA23ZAMFTJjDBpQOy67C3x
-         r+FA==
-X-Gm-Message-State: AFqh2kp8Qs5MXNqubXIVRsUefYjn5p+GUl2QnCztIPAD9gxTn804ivwp
-        sK+xzdA47m2//nGWxQHq7DL6baYbjr/84t0KcJblGr4gNEDjqA==
-X-Google-Smtp-Source: AMrXdXubHfsk/m6Myu2oB6/R0W/tn75MM/etzaiSHFclpma/chJHs6K23As0hteH3p6Gy60l7ID54lhbguJ5LeepH9Y=
-X-Received: by 2002:a92:dcca:0:b0:303:26c0:e1fe with SMTP id
- b10-20020a92dcca000000b0030326c0e1femr2311698ilr.102.1672258581610; Wed, 28
- Dec 2022 12:16:21 -0800 (PST)
-MIME-Version: 1.0
-References: <20221227220518.965948-1-aaronlewis@google.com> <CALMp9eQfuq2VRqA37S16Am+3bWjWgAe27zyxnmNSeqzG-Dojuw@mail.gmail.com>
-In-Reply-To: <CALMp9eQfuq2VRqA37S16Am+3bWjWgAe27zyxnmNSeqzG-Dojuw@mail.gmail.com>
-From:   Aaron Lewis <aaronlewis@google.com>
-Date:   Wed, 28 Dec 2022 20:16:10 +0000
-Message-ID: <CAAAPnDHcNPWhO+rSdkZOjXaMM7QQowkfvLh5PkeRbC786dBbmA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: selftests: Assert that XSAVE supports XTILE in amx_test
-To:     Jim Mattson <jmattson@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=IL2YbOoN7yPmIShOQbEFF8vOUsSkAn/M3lJ9txKjS40=;
+        b=otI9CYQ/Q7Ja6kv8IN1A8CG3et6VmveReaGX9W8Dz/dpbj5j20ycntuOlCUIRuJskv
+         1USZyalfSlOJ2AV8qYj0qZqKcmYbaID+6F/0a5ajw4Z/+w9GRvnfQB+frGIXe44awkqP
+         8lWfSxKwv2shVtVpvT499S1RwaXy3ije8ytny/nlx718Q2l4zEGgC135lPfGCcpmDNwC
+         fqcwS2WHE9+XgYgviY5eQYMvLkPiC862jy9bQuefnaAsO8NL4BbbLlcK/zL91lVrvXPY
+         TCtc+7ewnmQRBcK6N1ckQGiwpXxsIuycgMMJmSAKd5q4J42lGHFJ00I3B/NUxZUsmLoY
+         gp8Q==
+X-Gm-Message-State: AFqh2kpn+DXhgjkTdTCXEwFibeFXcggwmKa+YHZce1bWDzcwqgnSLpxv
+        b/BqLBj7VgIIYtb7usz5dfCroeic1AoXHQ==
+X-Google-Smtp-Source: AMrXdXuT3YZ7pyxLMjotm+dwHDwO4EFMSgwCmbIC0SCzzCpxPS24vC4Udc+/ecWzG0atJluAdQBMxnC4sffFuA==
+X-Received: from shacharr-cloud.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:4338])
+ (user=shacharr job=sendgmr) by 2002:a0c:e991:0:b0:530:eae2:9240 with SMTP id
+ z17-20020a0ce991000000b00530eae29240mr750777qvn.106.1672263181304; Wed, 28
+ Dec 2022 13:33:01 -0800 (PST)
+Date:   Wed, 28 Dec 2022 21:32:12 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20221228213212.628636-1-shacharr@google.com>
+Subject: [PATCH] Convert backwards goto into a while loop
+From:   Shachar Raindel <shacharr@google.com>
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shachar Raindel <shacharr@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -66,30 +66,63 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 28, 2022 at 6:36 PM Jim Mattson <jmattson@google.com> wrote:
->
-> On Tue, Dec 27, 2022 at 2:05 PM Aaron Lewis <aaronlewis@google.com> wrote:
-> >
-> > The check in amx_test that ensures that XSAVE supports XTILE, doesn't
-> > actually check anything.  It simply returns a bool which the test does
-> > nothing with.
-> > Additionally, the check ensures that at least one of the XTILE bits are
-> > set, XTILECFG or XTILEDATA, when it really should be checking that both
-> > are set.
-> >
-> > Change both behaviors to:
-> >  1) Asserting if the check fails.
-> >  2) Fail if both XTILECFG and XTILEDATA aren't set.
->
-> For (1), why not simply undo the damage caused by commit 5dc19f1c7dd3
-> ("KVM: selftests: Convert AMX test to use X86_PROPRETY_XXX"), and
-> restore the GUEST_ASSERT() at the call site?
+The function vaddr_get_pfns used a goto retry structure to implement
+retrying.  This is discouraged by the coding style guide (which is
+only recommending goto for handling function exits). Convert the code
+to a while loop, making it explicit that the follow block only runs
+when the pin attempt failed.
 
-I opted to add the assert in the check call to be consistent with the
-others.  I thought it would look odd to have 3 check calls being
-called one after the other, where 2 of them made the call and did
-nothing with the result and 1 was wrapped in an assert.
+Signed-off-by: Shachar Raindel <shacharr@google.com>
+---
+ drivers/vfio/vfio_iommu_type1.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-> Should this be two separate changes, since there are two separate bug fixes?
+diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+index 23c24fe98c00..7f38d7fc3f62 100644
+--- a/drivers/vfio/vfio_iommu_type1.c
++++ b/drivers/vfio/vfio_iommu_type1.c
+@@ -570,27 +570,28 @@ static int vaddr_get_pfns(struct mm_struct *mm, unsigned long vaddr,
+ 		}
+ 
+ 		*pfn = page_to_pfn(pages[0]);
+-		goto done;
+-	}
++	} else
++		do {
++
++			/* This is not a normal page, lookup PFN for P2P DMA */
++			vaddr = untagged_addr(vaddr);
+ 
+-	vaddr = untagged_addr(vaddr);
++			vma = vma_lookup(mm, vaddr);
+ 
+-retry:
+-	vma = vma_lookup(mm, vaddr);
++			if (!vma || !(vma->vm_flags & VM_PFNMAP))
++				break;
+ 
+-	if (vma && vma->vm_flags & VM_PFNMAP) {
+-		ret = follow_fault_pfn(vma, mm, vaddr, pfn, prot & IOMMU_WRITE);
+-		if (ret == -EAGAIN)
+-			goto retry;
++			ret = follow_fault_pfn(vma, mm, vaddr, pfn,
++					       prot & IOMMU_WRITE);
++			if (ret)
++				continue; /* Retry for EAGAIN, otherwise bail */
+ 
+-		if (!ret) {
+ 			if (is_invalid_reserved_pfn(*pfn))
+ 				ret = 1;
+ 			else
+ 				ret = -EFAULT;
+-		}
+-	}
+-done:
++		} while (ret == -EAGAIN);
++
+ 	mmap_read_unlock(mm);
+ 	return ret;
+ }
+-- 
+2.39.0.314.g84b9a713c41-goog
 
-Sure, splitting this into two commits SGTM.
