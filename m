@@ -2,75 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 082E96572EB
-	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 06:26:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DFAB8657310
+	for <lists+kvm@lfdr.de>; Wed, 28 Dec 2022 07:08:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229785AbiL1F0k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Dec 2022 00:26:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54628 "EHLO
+        id S232577AbiL1GI2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Dec 2022 01:08:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbiL1F0h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Dec 2022 00:26:37 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF60DCC;
-        Tue, 27 Dec 2022 21:26:36 -0800 (PST)
+        with ESMTP id S229494AbiL1GHg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Dec 2022 01:07:36 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42B8395A4;
+        Tue, 27 Dec 2022 22:05:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672205196; x=1703741196;
+  t=1672207558; x=1703743558;
   h=date:from:to:cc:subject:message-id:reply-to:references:
    in-reply-to:mime-version;
-  bh=XDy8Il0MTNCGPwjTPCrKL9oYSFXuTTRgA7drsDMKWf4=;
-  b=M5OJknT+9EhoadncZCoMHVQt1zb/ak8F37cwlnMLw76x/ZhS2xmldp9+
-   51O3g9r/ZANSZOqy1cy7qhWkiyPtCs6iqq/ezQgrQquRcwANB4yi+6a7W
-   7xfU5I4KDVCk8upc54n6BNIhSi9pPO1zQKsBhmzCYlsNmUePpwtyaqtTv
-   np9JKCk2Q0ANZBoMqGx3eI6xoCsyOi7DVJEgbsOwab4E73QJFF+k6lODw
-   wvxDGc/xxgxBo2xtMqWY+kafRbqnUgE3Gx9xTfCUOGuas745nzt2c407c
-   O/wOEBveHLjZ+nceex0i9t1Cbgw38Cbwvm6w+4NM29ZE+AKKH0ku8HmmF
+  bh=szArQPUq31fmy14HbRIHShl6wylkp3wFsgE7kg/0jvQ=;
+  b=ez+hB4g/9Mc9YaGYHSHZ/9b9feTH5NK0TzAuzvQLB6alBIOmK6sOyunk
+   4McXicrxGQ8tzx5KQKpogwEvujh0CyAco6NAulAvOrH5b0Zzsoxyd27T9
+   vXuCqOaBEMUGGAxygwgaCl8BcR5nVhM1/00TcKMuf6Rvgg712QzzijUrG
+   28IjlMJko3j5w5xTMUNtfW+jCc0Oo2/roxOCQN7NCRG6au74XkL5s9+q0
+   Xn53UcpivvFNPohc1WahTSLmE2rl907Z4QLo9HLYA23wmvdk5BlxRGT6T
+   Jc6j6gSCeka/Y+yy13DFZv1ZcDh8XoBIb4uOdTHMniSwX+pIHtUzRzVG+
    g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="322044116"
+X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="318490664"
 X-IronPort-AV: E=Sophos;i="5.96,280,1665471600"; 
-   d="scan'208";a="322044116"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2022 21:26:35 -0800
+   d="scan'208";a="318490664"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Dec 2022 22:05:57 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="898570638"
+X-IronPort-AV: E=McAfee;i="6500,9779,10573"; a="741940339"
 X-IronPort-AV: E=Sophos;i="5.96,280,1665471600"; 
-   d="scan'208";a="898570638"
+   d="scan'208";a="741940339"
 Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga006.fm.intel.com with ESMTP; 27 Dec 2022 21:26:35 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+  by FMSMGA003.fm.intel.com with ESMTP; 27 Dec 2022 22:05:57 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
  ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 27 Dec 2022 21:26:34 -0800
+ 15.1.2507.16; Tue, 27 Dec 2022 22:05:56 -0800
 Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Tue, 27 Dec 2022 21:26:34 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ 15.1.2507.16 via Frontend Transport; Tue, 27 Dec 2022 22:05:56 -0800
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
  by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Tue, 27 Dec 2022 21:26:34 -0800
+ 15.1.2507.16; Tue, 27 Dec 2022 22:05:56 -0800
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mR3fAEqvDYBMzPAMY6nlEX7/1CfwAtQEoOEMsldyHAgsEoYg8xfxWrpSy6ptQeHGUiKUAiMcUkbGDaJBUeS96opH+xEXOCHAnTdp3TgG9U1INrHTgZDyq6SN9Jn8pMfV3FWcrXO6Mf3nWYqHLktezqPKeEz6xj1c+JWk5y4XmjiC5jIi7o1v1pprxayltO1pEzS5lN7FzVbbFae+otbNA1JAbPDMQwct7XVWYDEEEb1YyMw9skYewulmmiZBs2A4xfEwD2B6utQ7HcnGzGnPz4PuxxnPcQW4cdmX9ppO5KcQ4ldG/FW5mTU5d5dKsnZ3rupIy9tMX7Zx6JDHuTZkAA==
+ b=HNwLyBdYhVNL3BsaIYayr8Hrvh6LbyTQY7fBSboZ5Klst++GmwbLhfWDz1AH7YkMBUV/y0/n8kbFSjxWyLs3zLePP6JcZooLlvaurSlePjlbdYHYqaV48KbtqdDrz2kicAn0QHucTTMx+F9b2MOXojVNuN1WBOkAjiWEs8MY4I4HFYdSyRolOT2KzKpqYVOx8r4GvU2GTUSn4QxFgVaD+qQMGAWqpp5I0IM4dIvNRf0UvwnyY3wLWUV81q3WcEYWLqXNdGXxHoU60RxJULyhhuCCdCLdENGucY7cY0CiShRvhHhPF9wwrWjxqtY8DNNj3jmSh7+aVNchAKyxbba5QA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=W5uzWJJBzHBLrk49lAED71T0b3AGRym9xG6/bZ13slc=;
- b=TJyABzNG3dsaDGZxPZFuy+CTWqa3YBE9f83M2OeGfSD225wtScRJ8wTO9pPdVSl3BabX7haDDIXSZD+C4uXKCAfyWMWh9ln4D4VjzU+NK/HVsHn7LVmM5IaEYVcqp3Y6rINHc+HdigIU+6u7zl1gH2dmLJlSoUlKB9SC9Yi+0X4ZbYyY3GUaZhUIdT2bqPSkcJUzCqDx3Q7BGx08T+4hEMjMI9JcK2rkSsJsDCyj37TpXsR3NKWQFbMlHxUJmXyQSCPrtlUKNIgW9hs8kfr0gYznHWdufxCsWRIsIWaT841H+LhQmb7D5+E0vvnsj4Vy9Ue4uBEZTG8gwFTdBRBaug==
+ bh=vlQibGe86ySO9H1ggH1/1ZN2UtPW7TQKooVQslra8Kk=;
+ b=eVVihydnpoYTlaSs5lym24gms60DgHtHV7Xuv7Lr2L6DbqmOoYYpkQ1lO+Ek/uKhnHvEOZcAm6esQNeXG7bWBBnI1bHbyZbfxDega8klBkMAkB2fcZT/EavjE00tx8Nc4fnE6XQ6Ab1EwkkjQr/EtkwVC+7pA0FnlCdFgjo21Ab5vE5a/+HYEDOAv++Qe9nwK8SHFnqUvxJVabtmg0Cxp/7zD0W/PUxcguV028XZva6SPnIvtqtudk05uk2Jhyz6IB8+Tf25NkLLkniPML5/tzHw2wRUn2i/ouvgrN4ytPVMvT9Ecd0RmDsN8sLvcZ21Ud1fC38/HAoJ2hRG2rEFdA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=intel.com;
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SJ0PR11MB4894.namprd11.prod.outlook.com (2603:10b6:a03:2d4::5) with Microsoft
+ DM6PR11MB4690.namprd11.prod.outlook.com (2603:10b6:5:2ae::17) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5944.16; Wed, 28 Dec 2022 05:26:32 +0000
+ 15.20.5944.16; Wed, 28 Dec 2022 06:05:53 +0000
 Received: from DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::bd50:2cf7:f362:3734]) by DS7PR11MB5966.namprd11.prod.outlook.com
  ([fe80::bd50:2cf7:f362:3734%9]) with mapi id 15.20.5944.016; Wed, 28 Dec 2022
- 05:26:32 +0000
-Date:   Wed, 28 Dec 2022 13:03:14 +0800
+ 06:05:53 +0000
+Date:   Wed, 28 Dec 2022 13:42:37 +0800
 From:   Yan Zhao <yan.y.zhao@intel.com>
 To:     Sean Christopherson <seanjc@google.com>
 CC:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -79,218 +79,183 @@ CC:     Paolo Bonzini <pbonzini@redhat.com>,
         <intel-gvt-dev@lists.freedesktop.org>,
         <intel-gfx@lists.freedesktop.org>, <linux-kernel@vger.kernel.org>,
         Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH 09/27] drm/i915/gvt: Protect gfn hash table with
- dedicated mutex
-Message-ID: <Y6vOEjHZhOWulyo1@yzhao56-desk.sh.intel.com>
+Subject: Re: [PATCH 03/27] drm/i915/gvt: Incorporate KVM memslot info into
+ check for 2MiB GTT entry
+Message-ID: <Y6vXTcxDNovrmeVB@yzhao56-desk.sh.intel.com>
 Reply-To: Yan Zhao <yan.y.zhao@intel.com>
 References: <20221223005739.1295925-1-seanjc@google.com>
- <20221223005739.1295925-10-seanjc@google.com>
+ <20221223005739.1295925-4-seanjc@google.com>
 Content-Type: text/plain; charset="us-ascii"
 Content-Disposition: inline
-In-Reply-To: <20221223005739.1295925-10-seanjc@google.com>
-X-ClientProxiedBy: SI2PR06CA0011.apcprd06.prod.outlook.com
- (2603:1096:4:186::16) To DS7PR11MB5966.namprd11.prod.outlook.com
+In-Reply-To: <20221223005739.1295925-4-seanjc@google.com>
+X-ClientProxiedBy: SI1PR02CA0056.apcprd02.prod.outlook.com
+ (2603:1096:4:1f5::7) To DS7PR11MB5966.namprd11.prod.outlook.com
  (2603:10b6:8:71::6)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SJ0PR11MB4894:EE_
-X-MS-Office365-Filtering-Correlation-Id: 04468502-4ff0-43ec-f1cb-08dae8941478
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|DM6PR11MB4690:EE_
+X-MS-Office365-Filtering-Correlation-Id: 864a10fc-fc51-4d7c-6f8c-08dae89993a8
 X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: anzUvF3dkgS2WoGpGNJq9Yd5ydfrGOiV6Sx5tpZP9ZzYHEJY4m6EEQ3ukWjOv0fk0tIwZC2tGQ46y3lJcYY41QZy0Q7SQrYDRQeNTs21fEA2+0HpFPC+h3Q9lUi+GVHTX+tiTQZ0Jh2nyPzx5UXoD1gF3bObNDqRYl1KFnnEoiBPwVM/aYjc6q2NYIv1gye/FbKaP5LsVfLPLmb+G0zpAY7XvNMBz2IWuZEa/m+9dz0gLCOJQsbG+H8/b0606sW8FBBJVS0FOaNkBWxmRzSTdf1th8+5UI5j6ecoc4WBqZ4dy/RXtFlLi7aKXxEVm64fq1mrPqpdB+/wjIUy7W1m85X03wJITHfHHXGE+1M1n007RY08IsyDp0/JiSIo1W+KnP8PYMFGj2oiGBtPmGeRL4lxACVXur/RWtvLYwHB/rnR0+8zKjj9E+n268rV98oUPaqVAFtbpsWEpuho3hb+Uzw6lFMkfPDLy69wOKNjbJysnSQihDgHUaAToHMXFWgAzXELOBfe47VVZlBME5I8iQIlj2W5hbeoPHkEySiev6/09uq0ikcvT5PdhB3H5eoWsMxgA21h/eIMsL7i1vPugY8l/zmqA+UjnKdADfftebrL+tvCXamvyPscDfw607yiZAUbszUDmdhLzWD/8PdyiQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(396003)(376002)(136003)(39860400002)(366004)(346002)(451199015)(38100700002)(82960400001)(83380400001)(4326008)(8676002)(86362001)(66556008)(316002)(6916009)(66946007)(41300700001)(66476007)(54906003)(2906002)(3450700001)(5660300002)(8936002)(26005)(6512007)(186003)(478600001)(6486002)(6506007)(6666004);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: r+WZgBG/slf3Un2i9RjwtssA9vRLOjzXPUWcIamQvpIWM1fbesdCnQib40fWGhV0Wj8ipSMkOoBr0I+Pb7CRl4ez26t43Y3zD1GM9cDkmdACKEZe8xZCLMo4bZyu3SWnUU006XUYXGZdz/xqWWfWYhiKiHUNRdkOG67YQBSyWmvKQ1XleXIZpqLxR9zjceZpYt/hStNIPd8dehEF3Q9afoovWvJOY4+yTrR92roJFBmlk2UgMltm8t3bA9U1MZYfJJSeAOS0USK9R7Om0+aL03xAzdmK4bl9jbj6zv9YlhkA8Sgk9b4NeYX4yI3H5OUSto8p8DaSNRVLEQliHEY0ArH3oJdqnE/AbwoFifMd0Gh885OqffWggt+4LUY9eTl7R9iaFQEQoXBu84GXPPxySZUaT5Wpx/IF5LyoRcL6kn/F7WCWgLphXxtlcQj/JhLnRLtv3SqrBpoJJCJGI3sMVYoH0D6cXkS8AmofUZq/NisuQIF7iV2n7TIten9GtiwlDSKtqWDcWj/VzQ3xBZtg1Txy6Ry+tmHlwVwPTPo94ofU0pniyndUXH8VwdN+dNq28dvvyG6Dz2CYySbKWq+SdGFe5HLGvOnCvT1h2MWs4bBHKmMaPMGuipKmUcBfmrtS6d5dkhaaF510hXZICqZAsQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(366004)(136003)(376002)(346002)(39860400002)(396003)(451199015)(3450700001)(2906002)(38100700002)(8936002)(41300700001)(5660300002)(86362001)(83380400001)(66476007)(66946007)(316002)(54906003)(6916009)(66556008)(8676002)(6506007)(6486002)(82960400001)(478600001)(6666004)(4326008)(26005)(6512007)(186003);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?vzq3ZqIbfYQCB2djoF97QelNbWV8qZw4rHkWBlbK1fLcb9uYczt8b9DK2/0E?=
- =?us-ascii?Q?tS+Q1tXCwP8PnJmRCOVaoLyA59GacqnYlu5Z9NkFvqRknhEaZiKVFvpQ3j16?=
- =?us-ascii?Q?0GSC8UiUWAk2S1wPNl7rJlCQxLJjKLks/6BBoZ1s3PPayQYw5t7Q6EtSse7B?=
- =?us-ascii?Q?P3OFWCB/jQMHSvtSyFuu3b7/pLTpTaxRND8A7bKkfHNRJaN3XYcxr7b6XIxm?=
- =?us-ascii?Q?z3QUTQz+MVZoTCOuUQZYLq336vBYKvYoNOcSmKXJd0qzfdFXPgVNchk3Lc9Z?=
- =?us-ascii?Q?gnqG+mCXks0Dr38fAcB3+p+65wq77jg8BaIv94P6u2u2yrcKvkIc8GvFTJgv?=
- =?us-ascii?Q?4Cf6THMn03LHZsfP3RjX7o3JZmWc3IGH/dZHiZl233LZt8ylCfCHIquh97+e?=
- =?us-ascii?Q?0qr2/Q77d91pfJJEpqzKGxVvy0lJgtBNfdt3YY20+3XGLKggtYS7pYABZKOf?=
- =?us-ascii?Q?al0LjQqrBDrVp/TPTU9AwArm28cHO8X0+z0sO/MtnQFMGxcRqL6K9p+oTo0C?=
- =?us-ascii?Q?q7PzCluXhCMwX0bGVb9jAyYn4ppzC/RqZ3B8ja91mlP7LOiGPpGFt5kt1DU8?=
- =?us-ascii?Q?65ruAJ+ikiQh9rlx2YEzCjCHOPYzEzf8nmcnkOdYrebp3NypfGcTIukiKGha?=
- =?us-ascii?Q?XrRlyUJfMvi0b2CMsRkvjj1AiYgkZKe7mHGuwypXU+Q+joppiswotIKfgjjw?=
- =?us-ascii?Q?znyYPhCXsZmh8unOEvTfQeVzQNBamb6faA5DH3S1HqxWAvxDY3p3cIrmRGpT?=
- =?us-ascii?Q?sVxU0nsukParQNRFfZ2rm42JvHd2aH4dg6+whR5kV/5EkCbGBul6LgvL1LXP?=
- =?us-ascii?Q?QU5RLn9KzSDd+5FDm7EXUDxGy/nypAqRev7Xd2jk2fVOtdUkTI1cnNoUrcC/?=
- =?us-ascii?Q?OKmeS97ztHxcb3dUi9vZk42FMmN/x2gsNS/dbbALK3TXW28LShB3Pgm20WOS?=
- =?us-ascii?Q?DK3vmEZLgKu47hXMYwFvwTim0cuI8dQqts6C88RCpXlHKDms8Vw9BbUSVCDB?=
- =?us-ascii?Q?gQX4MI1PR5H9oUMqoqyj+g+2eKGY8w4/Y1TBO91eYx4JWmKuVP9z+w/0FaTU?=
- =?us-ascii?Q?X1HQxL/+AChCLlCE2OTz+m+Do+MiWvLh9uSpx7cjv0Z//+SRJkoNmMakvLYE?=
- =?us-ascii?Q?GriOKuj7KqJ4XLNnU32xXkMdlTebnnw3OjCiKMnKbW2wYZAZN78pQQ/+wx44?=
- =?us-ascii?Q?DIBTdsmuQl9sJK+xIcTGaWgSbxpyTE0ysM6ZpQUXF6nHppVr3TXfLEP37++G?=
- =?us-ascii?Q?Rsu8Z5AU15Vsgsc+WbXgMdnib9+Z7KdhFVOv+q9TUE7vX+jM6LwLewhCLow9?=
- =?us-ascii?Q?bwxi9tpmi7kpft9K0G6M3U5W7N7wL85XiZKEctYuRJM735885uvcFxehVIEU?=
- =?us-ascii?Q?lnfyV+b8fPFtL+tLNvTqLg9wbABROA1tangnQp1HO/GQli7mbEyBj+0CoVGQ?=
- =?us-ascii?Q?WcvbimRAecHCCcXZTRxAfXJeBfl/MpG+z9fwbB3+q4nE9n9fyVW3nQFgXbHy?=
- =?us-ascii?Q?FEMHfyhZDsT5HFpFrk3Kt3wyBCks50KK06TsTKOWofORNlzCW5ejM83hbztl?=
- =?us-ascii?Q?gXefXLXbsmwPRGuETgaNn858eVwexoE/TeIfua75?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04468502-4ff0-43ec-f1cb-08dae8941478
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zGUzR0n/127hK3CfNyyWtrTXf67bYQYzyXqr/rRC66tnFxnZfVpeykMZX/My?=
+ =?us-ascii?Q?lh16dwiQQgDqUT578YDs+f0aO7HvNslOT4EdMMlb00O5h9Up53Kk8sQi04nx?=
+ =?us-ascii?Q?WFAJR0vSK2W9Efy5Ui7jZettWOeNltWnYqXigFKaMqFyxQpgIa406YkDGWYG?=
+ =?us-ascii?Q?+hoF5PfbzKt5d5izOWms2KKtmYj/eNS0OflcG23LSUOC0Q/aFxDdhCGZ8ItK?=
+ =?us-ascii?Q?KWcTWBAmXvvZSih3JFxu48O94Yp3RGGARdf/bscfaSuJwJ9i203zFNWucl2Y?=
+ =?us-ascii?Q?L279hQJvJCP6m8U+Gu7SvbUoBuXOpbzV6IrnJ4LhZNOkEJMBAcc+F6nYph8N?=
+ =?us-ascii?Q?uf8xw5pSfDAZ28bfVOGsJC6MGmKAnoKVOtZCp4midtU2T4wCqaOgTfhTkE6a?=
+ =?us-ascii?Q?Vtv9tNd9D0wrQ/lrppCVGOMr0NNKIYSJaun2jBMgillo07ziab2FzcRlmvE6?=
+ =?us-ascii?Q?iujHcu8epYWyTT5HaJJQCHYWMejGo8k/4UEc//OeBg6OboNwAoHrWAI35c19?=
+ =?us-ascii?Q?wuBET3EtHRROIzCAcOV3Ll8P0B+4YI1axqtoa1azoc1MVmq9h/Hl+XTNbIxs?=
+ =?us-ascii?Q?E9KHyOZOEyTn8ZL+hX9dMYx7RWGzMNZR4JgMNpcr6j2QGyE4C5gjLYy5zAtD?=
+ =?us-ascii?Q?nEasS++RSheo/XDAxe9vb0B4YeJDj6RNR/3S8P4gg/l40ZA05l3rdeOEhjLb?=
+ =?us-ascii?Q?uPRQMPbDcibw8JxTJyilVg058WSJpyk3msRXkBxahJHOMjyOyRiu/awaC4n5?=
+ =?us-ascii?Q?9NJuQ8dNbhDr28B/ouk489F1iNhpVrxAYp5oOw7dlY36eyauaE2nqQWDC4O9?=
+ =?us-ascii?Q?0VH+u39ZjZxZjdpWcn6fCxI6L1/0BWcwMljXbL/PfiZ0vmFybZMi9csx629S?=
+ =?us-ascii?Q?rz0OztLY7pj2O+TR1I5TCKiaMqicu35FFFSnkfVjxSRXPYcfQdtGVdaRjZmm?=
+ =?us-ascii?Q?D3gb4y/MKpVtcdFkTod6j0bLx03xnycJKYuXNb6jh6I3KRNrv7xwZ3b4bcDX?=
+ =?us-ascii?Q?H9MI4pKvukrZhzYZYrq+FhSW5mECi7ZvjLvAANOwI1WDga69ov9nwJMCdclX?=
+ =?us-ascii?Q?Ikgcqfybk/Cw2gMrIIhjfw+TJzJxWWYzlZSA5Rcp2rpThvuBk44eyEnSdE57?=
+ =?us-ascii?Q?rWqcFJ7KM8LGsd0vHRSUGk7QON0qFSglCSqv10uU5Lv8RtGm/uqmL6vFB347?=
+ =?us-ascii?Q?Skqi3GtxgRN4LgVmM4KMgqYff3WQ+1qU5ySVPKBFCHoaVWlJYqfsN9TVfRfk?=
+ =?us-ascii?Q?ugrP2plWP/5vUDE+BGjlOMr6BQ79DRL8HYptSE51xfQ9nSX+BTdHmAks0Gcw?=
+ =?us-ascii?Q?spkt9YgfrU1EXV22ZgmHqkDqF9tqnOLrwCj3C93J/y2UO76wYhNwvTvuwyjI?=
+ =?us-ascii?Q?sD23yz4QGd4UtQy06uPUtSY/seMUhCN+HARC+6CoyZdHUCsqq7wn49rYwU9B?=
+ =?us-ascii?Q?D8Oq9hLG81NvRGxIA25waKYwf+clhxw2bt8BsnqQO4x/IULVR6gNua8+y+K0?=
+ =?us-ascii?Q?+OSbCq6ZIqyCQgz4Nn086FuDPn5cONjIS6/BWDAhollWC6Lel5oRIUle3/Io?=
+ =?us-ascii?Q?X0nrnGSk6axif2nE08Lcy7u/haHzoXrBB8RsDrk5?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 864a10fc-fc51-4d7c-6f8c-08dae89993a8
 X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2022 05:26:32.4652
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Dec 2022 06:05:53.5101
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GUBywnnkdqpCOhnNahDF4ZaF6guLk4J+F6rQROJIBncTXKUw8EGrTdXaEqTbQumFVd2mQd5nRdSPErRI8UWhuA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4894
+X-MS-Exchange-CrossTenant-UserPrincipalName: wpqUOU1F6T5PrNPZX7/Xew4EPl8rwRE/+whrYrZHHtEPNFo6st0VjRUB21Lof8JWwZmIEU8KnkrvNV+DJdBX/w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4690
 X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 23, 2022 at 12:57:21AM +0000, Sean Christopherson wrote:
-> Add and use a new mutex, gfn_lock, to protect accesses to the hash table
-> used to track which gfns are write-protected when shadowing the guest's
-> GTT.  This fixes a bug where kvmgt_page_track_write(), which doesn't hold
-> kvm->mmu_lock, could race with intel_gvt_page_track_remove() and trigger
-> a use-after-free.
+On Fri, Dec 23, 2022 at 12:57:15AM +0000, Sean Christopherson wrote:
+> Honor KVM's max allowed page size when determining whether or not a 2MiB
+> GTT shadow page can be created for the guest.  Querying KVM's max allowed
+> size is somewhat odd as there's no strict requirement that KVM's memslots
+> and VFIO's mappings are configured with the same gfn=>hva mapping, but
+Without vIOMMU, VFIO's mapping is configured with the same as KVM's
+memslots, i.e. with the same gfn==>HVA mapping
+
+
+> the check will be accurate if userspace wants to have a functional guest,
+> and at the very least checking KVM's memslots guarantees that the entire
+> 2MiB range has been exposed to the guest.
+
+I think just check the entrie 2MiB GFN range are all within KVM memslot is
+enough.
+If for some reason, KVM maps a 2MiB range in 4K sizes, KVMGT can still map
+it in IOMMU size in 2MiB size as long as the PFNs are continous and the
+whole range is all exposed to guest.
+Actually normal device passthrough with VFIO-PCI also maps GFNs in a
+similar way, i.e. maps a guest visible range in as large size as
+possible as long as the PFN is continous. 
 > 
-> Fixing kvmgt_page_track_write() by taking kvm->mmu_lock is not an option
-> as mmu_lock is a r/w spinlock, and intel_vgpu_page_track_handler() might
-> sleep when acquiring vgpu->cache_lock deep down the callstack:
+> Note, KVM may also restrict the mapping size for reasons that aren't
+> relevant to KVMGT, e.g. for KVM's iTLB multi-hit workaround or if the gfn
+Will iTLB multi-hit affect DMA?
+AFAIK, IOMMU mappings currently never sets exec bit (and I'm told this bit is
+under discussion to be removed).
+
+
+> is write-tracked (KVM's write-tracking only handles writes from vCPUs).
+> However, such scenarios are unlikely to occur with a well-behaved guest,
+> and at worst will result in sub-optimal performance.
+> Fixes: b901b252b6cf ("drm/i915/gvt: Add 2M huge gtt support")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_page_track.h |  2 ++
+>  arch/x86/kvm/mmu/page_track.c         | 18 ++++++++++++++++++
+>  drivers/gpu/drm/i915/gvt/gtt.c        | 10 +++++++++-
+>  3 files changed, 29 insertions(+), 1 deletion(-)
 > 
->   intel_vgpu_page_track_handler()
->   |
->   |->  page_track->handler / ppgtt_write_protection_handler()
->        |
->        |-> ppgtt_handle_guest_write_page_table_bytes()
->            |
->            |->  ppgtt_handle_guest_write_page_table()
->                 |
->                 |-> ppgtt_handle_guest_entry_removal()
->                     |
->                     |-> ppgtt_invalidate_pte()
->                         |
->                         |-> intel_gvt_dma_unmap_guest_page()
->                             |
->                             |-> mutex_lock(&vgpu->cache_lock);
+> diff --git a/arch/x86/include/asm/kvm_page_track.h b/arch/x86/include/asm/kvm_page_track.h
+> index eb186bc57f6a..3f72c7a172fc 100644
+> --- a/arch/x86/include/asm/kvm_page_track.h
+> +++ b/arch/x86/include/asm/kvm_page_track.h
+> @@ -51,6 +51,8 @@ void kvm_page_track_cleanup(struct kvm *kvm);
+>  
+>  bool kvm_page_track_write_tracking_enabled(struct kvm *kvm);
+>  int kvm_page_track_write_tracking_alloc(struct kvm_memory_slot *slot);
+> +enum pg_level kvm_page_track_max_mapping_level(struct kvm *kvm, gfn_t gfn,
+> +					       enum pg_level max_level);
+>  
+>  void kvm_page_track_free_memslot(struct kvm_memory_slot *slot);
+>  int kvm_page_track_create_memslot(struct kvm *kvm,
+> diff --git a/arch/x86/kvm/mmu/page_track.c b/arch/x86/kvm/mmu/page_track.c
+> index 2e09d1b6249f..69ea16c31859 100644
+> --- a/arch/x86/kvm/mmu/page_track.c
+> +++ b/arch/x86/kvm/mmu/page_track.c
+> @@ -300,3 +300,21 @@ void kvm_page_track_flush_slot(struct kvm *kvm, struct kvm_memory_slot *slot)
+>  			n->track_flush_slot(kvm, slot, n);
+>  	srcu_read_unlock(&head->track_srcu, idx);
+>  }
+> +
+> +enum pg_level kvm_page_track_max_mapping_level(struct kvm *kvm, gfn_t gfn,
+> +					       enum pg_level max_level)
+> +{
+> +	struct kvm_memory_slot *slot;
+> +	int idx;
+> +
+> +	idx = srcu_read_lock(&kvm->srcu);
+> +	slot = gfn_to_memslot(kvm, gfn);
+> +	if (!slot || slot->flags & KVM_MEMSLOT_INVALID)
+> +		max_level = PG_LEVEL_4K;
+> +	else
+> +		max_level = kvm_mmu_max_slot_mapping_level(slot, gfn, max_level);
+> +	srcu_read_unlock(&kvm->srcu, idx);
+> +
+> +	return max_level;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_page_track_max_mapping_level);
+> diff --git a/drivers/gpu/drm/i915/gvt/gtt.c b/drivers/gpu/drm/i915/gvt/gtt.c
+> index d0fca53a3563..6736d7bd94ea 100644
+> --- a/drivers/gpu/drm/i915/gvt/gtt.c
+> +++ b/drivers/gpu/drm/i915/gvt/gtt.c
+> @@ -1178,14 +1178,22 @@ static int is_2MB_gtt_possible(struct intel_vgpu *vgpu,
+>  	struct intel_gvt_gtt_entry *entry)
+>  {
+>  	const struct intel_gvt_gtt_pte_ops *ops = vgpu->gvt->gtt.pte_ops;
+> +	unsigned long gfn = ops->get_pfn(entry);
+>  	kvm_pfn_t pfn;
+> +	int max_level;
+>  
+>  	if (!HAS_PAGE_SIZES(vgpu->gvt->gt->i915, I915_GTT_PAGE_SIZE_2M))
+>  		return 0;
+>  
+>  	if (!vgpu->attached)
+>  		return -EINVAL;
+> -	pfn = gfn_to_pfn(vgpu->vfio_device.kvm, ops->get_pfn(entry));
+> +
+> +	max_level = kvm_page_track_max_mapping_level(vgpu->vfio_device.kvm,
+> +						     gfn, PG_LEVEL_2M);
+> +	if (max_level < PG_LEVEL_2M)
+> +		return 0;
+> +
+> +	pfn = gfn_to_pfn(vgpu->vfio_device.kvm, gfn);
+>  	if (is_error_noslot_pfn(pfn))
+>  		return -EINVAL;
+>  
+> -- 
+> 2.39.0.314.g84b9a713c41-goog
 > 
-This gfn_lock could lead to deadlock in below sequence.
-
-(1) kvm_write_track_add_gfn() to GFN 1
-(2) kvmgt_page_track_write() for GFN 1
-kvmgt_page_track_write()
-|
-|->mutex_lock(&info->vgpu_lock)
-|->intel_vgpu_page_track_handler (as is kvmgt_gfn_is_write_protected)
-   |
-   |->page_track->handler() (ppgtt_write_protection_handler())
-      |	
-      |->ppgtt_handle_guest_write_page_table_bytes()
-         |
-         |->ppgtt_handle_guest_write_page_table()
-	    |
-	    |->ppgtt_handle_guest_entry_add() --> new_present
-	       |
-	       |->ppgtt_populate_spt_by_guest_entry()
-	          |
-		  |->intel_vgpu_enable_page_track() --> for GFN 2
-		     |
-		     |->intel_gvt_page_track_add()
-		        |
-			|->mutex_lock(&info->gfn_lock) ===>deadlock
-
-
-Below fix based on this patch is to reuse vgpu_lock to protect the hash table
-info->ptable.
-Please check if it's good.
-
-
-diff --git a/drivers/gpu/drm/i915/gvt/kvmgt.c b/drivers/gpu/drm/i915/gvt/kvmgt.c
-index b924ed079ad4..526bd973e784 100644
---- a/drivers/gpu/drm/i915/gvt/kvmgt.c
-+++ b/drivers/gpu/drm/i915/gvt/kvmgt.c
-@@ -364,7 +364,7 @@ __kvmgt_protect_table_find(struct intel_vgpu *info, gfn_t gfn)
- {
-        struct kvmgt_pgfn *p, *res = NULL;
-
--       lockdep_assert_held(&info->gfn_lock);
-+       lockdep_assert_held(&info->vgpu_lock);
-
-        hash_for_each_possible(info->ptable, p, hnode, gfn) {
-                if (gfn == p->gfn) {
-@@ -388,7 +388,7 @@ static void kvmgt_protect_table_add(struct intel_vgpu *info, gfn_t gfn)
- {
-        struct kvmgt_pgfn *p;
-
--       lockdep_assert_held(&info->gfn_lock);
-+       lockdep_assert_held(&info->vgpu_lock);
-
-        if (kvmgt_gfn_is_write_protected(info, gfn))
-                return;
-@@ -1572,7 +1572,7 @@ int intel_gvt_page_track_add(struct intel_vgpu *info, u64 gfn)
-        if (!info->attached)
-                return -ESRCH;
-
--       mutex_lock(&info->gfn_lock);
-+       lockdep_assert_held(&info->vgpu_lock);
-
-        if (kvmgt_gfn_is_write_protected(info, gfn))
-                goto out;
-@@ -1581,7 +1581,6 @@ int intel_gvt_page_track_add(struct intel_vgpu *info, u64 gfn)
-        if (!ret)
-                kvmgt_protect_table_add(info, gfn);
- out:
--       mutex_unlock(&info->gfn_lock);
-        return ret;
- }
-
-@@ -1592,7 +1591,7 @@ int intel_gvt_page_track_remove(struct intel_vgpu *info, u64 gfn)
-        if (!info->attached)
-                return 0;
-
--       mutex_lock(&info->gfn_lock);
-+       lockdep_assert_held(&info->vgpu_lock);
-
-        if (!kvmgt_gfn_is_write_protected(info, gfn))
-                goto out;
-@@ -1601,7 +1600,6 @@ int intel_gvt_page_track_remove(struct intel_vgpu *info, u64 gfn)
-        if (!ret)
-                kvmgt_protect_table_del(info, gfn);
- out:
--       mutex_unlock(&info->gfn_lock);
-        return ret;
- }
-
-@@ -1612,13 +1610,15 @@ static void kvmgt_page_track_write(gpa_t gpa, const u8 *val, int len,
-                container_of(node, struct intel_vgpu, track_node);
-
-        mutex_lock(&info->vgpu_lock);
--       mutex_lock(&info->gfn_lock);
-
-        if (kvmgt_gfn_is_write_protected(info, gpa >> PAGE_SHIFT))
-                intel_vgpu_page_track_handler(info, gpa,
-                                                     (void *)val, len);
-        }
-
--       mutex_unlock(&info->gfn_lock);
-        mutex_unlock(&info->vgpu_lock);
- }
-@@ -1629,12 +1629,11 @@ static void kvmgt_page_track_remove_region(gfn_t gfn, unsigned long nr_pages,
-        struct intel_vgpu *info =
-                container_of(node, struct intel_vgpu, track_node);
- 
--       mutex_lock(&info->gfn_lock);
-+       lockdep_assert_held(&info->vgpu_lock);
-        for (i = 0; i < nr_pages; i++) {
-                if (kvmgt_gfn_is_write_protected(info, gfn + i))
-                        kvmgt_protect_table_del(info, gfn + i);
-        }
--       mutex_unlock(&info->gfn_lock);
- }
-
-
-Thanks
-Yan
