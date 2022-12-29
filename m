@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8532A658B88
+	by mail.lfdr.de (Postfix) with ESMTP id D142A658B89
 	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 11:16:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233205AbiL2KQM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 05:16:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45920 "EHLO
+        id S233357AbiL2KQO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 05:16:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233214AbiL2KNp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233232AbiL2KNp (ORCPT <rfc822;kvm@vger.kernel.org>);
         Thu, 29 Dec 2022 05:13:45 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2055.outbound.protection.outlook.com [40.107.237.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1C3BD11F
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 02:08:28 -0800 (PST)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2060.outbound.protection.outlook.com [40.107.237.60])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3CBEE0D0
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 02:08:36 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f6sU7rC8rO9MH5W+s4eTLuxdnfNcZeJRI663A+omR0BawZBT5dqyTcBb1D0dxSeE7fdmOARsrYb3jKY87YMwEoBV+W71ODDPvw5Z1TOr32kJbra8QgsRjAIVWE1qI3LNmzbDxw9xrRLGvIKflcyrmOxNCwmurHQR+uqpCfocq+4anCF4mNUraCCOdP6ev4vXCV8NnH65MycD5MJ7p9ZL2h9cM7DexlFBCMXxpy7OWVfghVYmKUMgLUQwRTPPTlNr10Gj5xIyZwkZfonGbCLxyk0icwuYbSlda1XHyN5aMaRuUlhE83n8xP6M3Z6SL0cG4bqjJ7F2NAb3UcJaIMeb3g==
+ b=CMh/mhvyMVFGSucNo6Pi4g3tIP1i0staiizsJmD0eFwyJ5vhi0vuUWihvAzkxtkwsHi0Nyj4cK/4+UuiUCF4uTw5AJc7VumbbDKsrSIya/flE/mnnWc5H0Ma+tlF9LYIlIvuvbDne8AfeURGiyibN63QlWucDTjislk+3l9NhKicMxcf2d12I6kMy+OyuG+wnBy8RUlaApdhmECZBU67Pepe1zmFH3MYrpI/rpWfgyXohnvKOal7L2QjP4xvz8zqw1Bzcep1N007qqSiFCt5bCiKM8Frgze4WteMHxzTpDjA0D4GxbZDPRcPnjqHRnsm7HvjZfFTa+QnY452idPz5Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+TcsfW/dp/8PqsCSSvTuVvqWyYIokfo7N8BoKIYBpKE=;
- b=ABSu9g1wueaFyW8KQSHteUxDgF7GEs9ARLzHGaycPxfZ9U7FWUCnV+kv+lwsA9QydeZCbp6/vtb9Ez/LUv5tWqaRBJvvZrTl+ITEKanmK2mmrcCZdMtUTxpyEW4beK94jrAbVIAhiD8dhYZSewHKd/CynabSVyYPi7gUI0n//B7Dx3RbAkjd26AMzAaS2Kk6RPeOQ16qVJHcf7A6ldkNoLLSn+M400eawmREkGHBuLy7XLDDkWgg/hGRfmowStrSTDZYERildnUXB9ZkNRfRRo9ySX7GJXUT2O6m7Z/rbs0W1nFebA7dD12VBeKzgyeJCYYRZ09cMNY+4t6xxywnrQ==
+ bh=FRwQek0anxxy0zZiASG8tv0VCq12SKcFXfGRel+KhjQ=;
+ b=krLUUS3dWBdWKCkvtkBPiL9na3GvMbcWMelQogNNJ2yQJ8jNKlYqQ4pPMiFKcex2p0u8S3lIMjIqAB0EefkZNaDp4IRcgdhkylzWhfrjRWWr3te8hXciV/bt1VtK4aQlKmNfbGcnMQyC0HgzGZTpGXW93cwsTua6CCgqMnkCVgl0PRILHtnivSc9xgo6HnhmdRaPNnn2fjPqhqw+ArYGhZp57XPljwEg5QFkHrIzqBypLItmuvEkmEmMNW2yZnCZsSLoL9YAMfAlShjoAk6P8NZso0YcWOJcM86mvJkkn871xN88l1tfDP3QliouL7rHK7XGqIgOY+UBdo0SNY6Umw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+TcsfW/dp/8PqsCSSvTuVvqWyYIokfo7N8BoKIYBpKE=;
- b=iU4SNqBFUKZl+O7APPo54R/BpFZ9B7onpXKQtb1S/+spnRHUAWVemxDUZJeRUwDC7lHKaYGsg2LdkvB2K4s9jWai0NC9hPnKs/qwjUAVgbgeyeFHsnDXAbTZi/YC2EXpy9jAhxHHELGN1WwI62rGaLrhbV+aGqP32/Ovu6bWKd80PE1Q/y6z9oTHO8e9wJ7qWZXNquBt+3O2dOzjiKru+NEUnJSpNeVE4h1lJLRz5FzROIiT69gQhzyJ+RPHHKpIFW1434x7UACBXLcpTOZJVs0gycmYpq2x+lM+dwEySfDMAC8HDFy1JToMhxGbh0gsa0QjL/TF4vKZZw38BPbSZA==
-Received: from MW4P220CA0008.NAMP220.PROD.OUTLOOK.COM (2603:10b6:303:115::13)
- by BY5PR12MB4998.namprd12.prod.outlook.com (2603:10b6:a03:1d4::11) with
+ bh=FRwQek0anxxy0zZiASG8tv0VCq12SKcFXfGRel+KhjQ=;
+ b=a0hS99hgT19MWd9RdTYvkemFueXsWRYZ4Mkx8KK5MnB1Eg9PMRePvRu4D/mDOVODi/fj84IY8bbH5Ml9X1CSSAy6OTQjzqczazqpSXEClH0yfUXab1q+6qB8RMfYtsAMQWSerGMhEQ6RtkpEQEmcq4NNG+OFr0KYyUKi8aDrOkmWdKJBXDz8AymyV1pYNR9vG16vmtdRaJANV9mFsGrP92LLOKtXINE2JZIhF1lCwkFy0sBhjjWRi3GMPkguOXbWsf/YEUXibyibvCTFFX33g4+XSANHd5sCa95iTraKzGwJUT+Cspgixx4hANdavc1rmrntSbHT49IPvrSS8A6xRw==
+Received: from BN1PR13CA0014.namprd13.prod.outlook.com (2603:10b6:408:e2::19)
+ by PH8PR12MB7135.namprd12.prod.outlook.com (2603:10b6:510:22c::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.16; Thu, 29 Dec
- 2022 10:08:26 +0000
-Received: from CO1NAM11FT081.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:115:cafe::17) by MW4P220CA0008.outlook.office365.com
- (2603:10b6:303:115::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.16 via Frontend
- Transport; Thu, 29 Dec 2022 10:08:26 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ 2022 10:08:33 +0000
+Received: from BN8NAM11FT071.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e2:cafe::e9) by BN1PR13CA0014.outlook.office365.com
+ (2603:10b6:408:e2::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.7 via Frontend
+ Transport; Thu, 29 Dec 2022 10:08:33 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1NAM11FT081.mail.protection.outlook.com (10.13.174.80) with Microsoft SMTP
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN8NAM11FT071.mail.protection.outlook.com (10.13.177.92) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5944.17 via Frontend Transport; Thu, 29 Dec 2022 10:08:26 +0000
+ 15.20.5944.17 via Frontend Transport; Thu, 29 Dec 2022 10:08:33 +0000
 Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 29 Dec
- 2022 02:08:20 -0800
+ 2022 02:08:24 -0800
 Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
  (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 29 Dec
- 2022 02:08:20 -0800
+ 2022 02:08:23 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
  with Microsoft SMTP Server id 15.2.986.36 via Frontend Transport; Thu, 29 Dec
- 2022 02:08:16 -0800
+ 2022 02:08:20 -0800
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
 CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
@@ -68,9 +68,9 @@ CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
         <diana.craciun@oss.nxp.com>, <eric.auger@redhat.com>,
         <yishaih@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>,
         <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH vfio 1/6] vfio/mlx5: Fix UBSAN note
-Date:   Thu, 29 Dec 2022 12:07:29 +0200
-Message-ID: <20221229100734.224388-2-yishaih@nvidia.com>
+Subject: [PATCH vfio 2/6] vfio/mlx5: Allow loading of larger images than 512 MB
+Date:   Thu, 29 Dec 2022 12:07:30 +0200
+Message-ID: <20221229100734.224388-3-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20221229100734.224388-1-yishaih@nvidia.com>
 References: <20221229100734.224388-1-yishaih@nvidia.com>
@@ -79,23 +79,23 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT081:EE_|BY5PR12MB4998:EE_
-X-MS-Office365-Filtering-Correlation-Id: 510d0b7d-4684-495d-7e1d-08dae984a0ad
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT071:EE_|PH8PR12MB7135:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5e01960c-569e-4a03-45ad-08dae984a4ad
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: c6wxsdHxCzVK4nIyHMwNtbWWE9dJdiuTZEzfV/3p+asmzSJCofS8nMNeHqJqqEhy4XRes5KlT9M1Lw9P6OcKCIigEp80MSJFOhZqxS5a6P0dj4LH5SQxOnY6nszXKbfNvPtLjr0pylL61kW7ZtRDsYlXc+XJh1Q7zR+LGyUANsJ04q/40+MPkUTZWkrlpryRRvLLZhaLB7ZlcJuXugcTEJvAD/fmGeytMtf/yqlBzcUcXh7YLJFdy9mK699FQqFCdCYlIj+P33hbizqIuOmJTxBXKOzq6rcwQsYQhq7jsyXDQK3sD6vbHj0jmvGouxykwOWxhjo+uB4JJrZQ6A8zysaXa6r08OJmMPvVZk5G9/ufxuRYOuCddSjntV/V2LELbUXfBqkcdcxfiqx5+AoqJlBh+5a1hlbTM2FTh4dSREhnVivdBdqzmwptANvV9pF+XeCejoNvRB09GZfV/kQHuSqEKkvONB6QdidoMwIGjSnHVbUJtzPUNc9A03GBc3smG1DhFh0qtENuxaYUZLNfKG0TYn745/3hqcVWkz+a8D7RddTR2m5jkmAndhplW6ms0ocvNv5H7BfrQWTfugxnE+HXdDXeUIXfT25rlt7JssYbfkeNaqDk1jYLhLHGaogJp+R1gTyhvDTY9mee+9BpZWLK6OT9WBxwkKvJhIhtMK6VHH4z8gJl/FouqW9AhOkQZ3qfa9UVdkNWeY2A6x2wNA==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(396003)(39860400002)(136003)(451199015)(36840700001)(40470700004)(46966006)(426003)(83380400001)(36860700001)(47076005)(336012)(86362001)(8936002)(356005)(2906002)(41300700001)(5660300002)(70206006)(82740400003)(40460700003)(82310400005)(7696005)(40480700001)(6666004)(478600001)(1076003)(26005)(2616005)(4326008)(186003)(70586007)(54906003)(6636002)(316002)(110136005)(7636003)(8676002)(36756003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: u8lkVbHHFTf41HzfVYxlzUhw6ryAG5ZzVbucih8WZNMWHrthXDnEZ0udzkMcMsaV5yOdlSDku2mJY5+Y1PXNktuKaisJMf/GOrZWKTjfDvDTTdNOOUDv0hIpzy+UA8bzhxl+41HMnvvaJAIiZSLu3F2cUDWnKCHjC35s7mOpqh4SufqyaB78B8FpKyGtFhfIQxOqyK4ZDGUNH9PhZvUYJWyBGPBmwArvBuRNKTY3VmA2Izx0I1Ut3VLaWMETfBM2C3Kjr7ErEhLDddzEguKBz6GzyizGRFkNBN933TXB9H26RVxUYuW6gnw9JykjVKV2Z6CrPCrSwJiuzxDZpLEkcwzNehIMo+E6DA/QWk+8jJRLfcQWNfZIy8aTKJuGSVhmBxSXc1hDdA3Bdeu4WxKqo5XE92bbgxQWzPA2wueir6ol8xo5LZLvqPzmXFXQ4jgqaqj9Fc5NVL1/3cju5qpRSeZtZ8PHrLU3G1BKC7XVUnSDveS0331pQ3CLo6SIV0qOYcioqARUzdqnHZxfO3/F0QASY0dz4ytNPTWI4Ii0ZzA7GOjEeg4vfEmKXJ4bJh39agKb1wUzkOx7rJjkidBc/34W7KEq8aUMOf7Lx5F1UWyPHei1m2TavFYsqfEcO77X4IgtQdXgKORt2xvORj4pYAxoEl8PaDsjOIAXJ/iKyji9SeM3RNUQYAzrsI7wO9APAtkJiL305quLKl8gbcwKtg==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(376002)(136003)(346002)(451199015)(46966006)(40470700004)(36840700001)(478600001)(6666004)(26005)(186003)(7696005)(83380400001)(2616005)(1076003)(47076005)(41300700001)(336012)(426003)(82310400005)(36860700001)(4326008)(8676002)(7636003)(6636002)(54906003)(110136005)(82740400003)(36756003)(40480700001)(86362001)(8936002)(40460700003)(70586007)(5660300002)(316002)(356005)(70206006)(2906002);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2022 10:08:26.6088
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2022 10:08:33.2089
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 510d0b7d-4684-495d-7e1d-08dae984a0ad
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e01960c-569e-4a03-45ad-08dae984a4ad
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT081.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT071.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4998
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7135
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -106,60 +106,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Prevent calling roundup_pow_of_two() with value of 0 as it causes the
-below UBSAN note.
+Allow loading of larger images than 512 MB by dropping the arbitrary
+hard-coded value that we have today and move to use the max device
+loading value which is for now 4GB.
 
-Move this code and its few extra related lines to be called only when
-it's really applicable.
+As part of that we move to use the GFP_KERNEL_ACCOUNT option upon
+allocating the persistent data of mlx5 and rely on the cgroup to provide
+the memory limit for the given user.
 
-UBSAN: shift-out-of-bounds in ./include/linux/log2.h:57:13
-shift exponent 64 is too large for 64-bit type 'long unsigned int'
-CPU: 15 PID: 1639 Comm: live_migration Not tainted 6.1.0-rc4 #1116
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
-BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <TASK>
-dump_stack_lvl+0x45/0x59
-ubsan_epilogue+0x5/0x36
- __ubsan_handle_shift_out_of_bounds.cold+0x61/0xef
-? lock_is_held_type+0x98/0x110
-? rcu_read_lock_sched_held+0x3f/0x70
-mlx5vf_create_rc_qp.cold+0xe4/0xf2 [mlx5_vfio_pci]
-mlx5vf_start_page_tracker+0x769/0xcd0 [mlx5_vfio_pci]
- vfio_device_fops_unl_ioctl+0x63f/0x700 [vfio]
-__x64_sys_ioctl+0x433/0x9a0
-do_syscall_64+0x3d/0x90
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
- </TASK>
+The GFP_KERNEL_ACCOUNT option lets the memory allocator know that this
+is untrusted allocation triggered from userspace and should be a subject
+of kmem accountingis, and as such it is controlled by the cgroup
+mechanism.
 
-Fixes: 79c3cf279926 ("vfio/mlx5: Init QP based resources for dirty tracking")
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/mlx5/cmd.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/vfio/pci/mlx5/cmd.c  | 11 ++++++-----
+ drivers/vfio/pci/mlx5/main.c | 19 ++++++++++---------
+ 2 files changed, 16 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-index 64e68d13cb98..c5dcddbc4126 100644
+index c5dcddbc4126..0586f09c69af 100644
 --- a/drivers/vfio/pci/mlx5/cmd.c
 +++ b/drivers/vfio/pci/mlx5/cmd.c
-@@ -1036,14 +1036,14 @@ mlx5vf_create_rc_qp(struct mlx5_core_dev *mdev,
+@@ -373,7 +373,7 @@ mlx5vf_alloc_data_buffer(struct mlx5_vf_migration_file *migf,
+ 	struct mlx5_vhca_data_buffer *buf;
+ 	int ret;
+ 
+-	buf = kzalloc(sizeof(*buf), GFP_KERNEL);
++	buf = kzalloc(sizeof(*buf), GFP_KERNEL_ACCOUNT);
+ 	if (!buf)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -1032,7 +1032,7 @@ mlx5vf_create_rc_qp(struct mlx5_core_dev *mdev,
+ 	void *in;
+ 	int err;
+ 
+-	qp = kzalloc(sizeof(*qp), GFP_KERNEL);
++	qp = kzalloc(sizeof(*qp), GFP_KERNEL_ACCOUNT);
  	if (!qp)
  		return ERR_PTR(-ENOMEM);
  
--	qp->rq.wqe_cnt = roundup_pow_of_two(max_recv_wr);
--	log_rq_stride = ilog2(MLX5_SEND_WQE_DS);
--	log_rq_sz = ilog2(qp->rq.wqe_cnt);
- 	err = mlx5_db_alloc_node(mdev, &qp->db, mdev->priv.numa_node);
- 	if (err)
- 		goto err_free;
+@@ -1213,12 +1213,13 @@ static int alloc_recv_pages(struct mlx5_vhca_recv_buf *recv_buf,
+ 	int i;
  
- 	if (max_recv_wr) {
-+		qp->rq.wqe_cnt = roundup_pow_of_two(max_recv_wr);
-+		log_rq_stride = ilog2(MLX5_SEND_WQE_DS);
-+		log_rq_sz = ilog2(qp->rq.wqe_cnt);
- 		err = mlx5_frag_buf_alloc_node(mdev,
- 			wq_get_byte_sz(log_rq_sz, log_rq_stride),
- 			&qp->buf, mdev->priv.numa_node);
+ 	recv_buf->page_list = kvcalloc(npages, sizeof(*recv_buf->page_list),
+-				       GFP_KERNEL);
++				       GFP_KERNEL_ACCOUNT);
+ 	if (!recv_buf->page_list)
+ 		return -ENOMEM;
+ 
+ 	for (;;) {
+-		filled = alloc_pages_bulk_array(GFP_KERNEL, npages - done,
++		filled = alloc_pages_bulk_array(GFP_KERNEL_ACCOUNT,
++						npages - done,
+ 						recv_buf->page_list + done);
+ 		if (!filled)
+ 			goto err;
+@@ -1248,7 +1249,7 @@ static int register_dma_recv_pages(struct mlx5_core_dev *mdev,
+ 
+ 	recv_buf->dma_addrs = kvcalloc(recv_buf->npages,
+ 				       sizeof(*recv_buf->dma_addrs),
+-				       GFP_KERNEL);
++				       GFP_KERNEL_ACCOUNT);
+ 	if (!recv_buf->dma_addrs)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
+index 9feb89c6d939..79de38931d24 100644
+--- a/drivers/vfio/pci/mlx5/main.c
++++ b/drivers/vfio/pci/mlx5/main.c
+@@ -21,8 +21,8 @@
+ 
+ #include "cmd.h"
+ 
+-/* Arbitrary to prevent userspace from consuming endless memory */
+-#define MAX_MIGRATION_SIZE (512*1024*1024)
++/* Device specification max LOAD size */
++#define MAX_LOAD_SIZE (BIT(__mlx5_bit_sz(load_vhca_state_in, size)) - 1)
+ 
+ static struct mlx5vf_pci_core_device *mlx5vf_drvdata(struct pci_dev *pdev)
+ {
+@@ -73,12 +73,13 @@ int mlx5vf_add_migration_pages(struct mlx5_vhca_data_buffer *buf,
+ 	int ret;
+ 
+ 	to_fill = min_t(unsigned int, npages, PAGE_SIZE / sizeof(*page_list));
+-	page_list = kvzalloc(to_fill * sizeof(*page_list), GFP_KERNEL);
++	page_list = kvzalloc(to_fill * sizeof(*page_list), GFP_KERNEL_ACCOUNT);
+ 	if (!page_list)
+ 		return -ENOMEM;
+ 
+ 	do {
+-		filled = alloc_pages_bulk_array(GFP_KERNEL, to_fill, page_list);
++		filled = alloc_pages_bulk_array(GFP_KERNEL_ACCOUNT, to_fill,
++						page_list);
+ 		if (!filled) {
+ 			ret = -ENOMEM;
+ 			goto err;
+@@ -87,7 +88,7 @@ int mlx5vf_add_migration_pages(struct mlx5_vhca_data_buffer *buf,
+ 		ret = sg_alloc_append_table_from_pages(
+ 			&buf->table, page_list, filled, 0,
+ 			filled << PAGE_SHIFT, UINT_MAX, SG_MAX_SINGLE_ALLOC,
+-			GFP_KERNEL);
++			GFP_KERNEL_ACCOUNT);
+ 
+ 		if (ret)
+ 			goto err;
+@@ -467,7 +468,7 @@ mlx5vf_pci_save_device_data(struct mlx5vf_pci_core_device *mvdev, bool track)
+ 	size_t length;
+ 	int ret;
+ 
+-	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
++	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
+ 	if (!migf)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -564,7 +565,7 @@ mlx5vf_resume_read_image_no_header(struct mlx5_vhca_data_buffer *vhca_buf,
+ {
+ 	int ret;
+ 
+-	if (requested_length > MAX_MIGRATION_SIZE)
++	if (requested_length > MAX_LOAD_SIZE)
+ 		return -ENOMEM;
+ 
+ 	if (vhca_buf->allocated_length < requested_length) {
+@@ -648,7 +649,7 @@ mlx5vf_resume_read_header(struct mlx5_vf_migration_file *migf,
+ 		u64 flags;
+ 
+ 		vhca_buf->header_image_size = le64_to_cpup((__le64 *)to_buff);
+-		if (vhca_buf->header_image_size > MAX_MIGRATION_SIZE) {
++		if (vhca_buf->header_image_size > MAX_LOAD_SIZE) {
+ 			ret = -ENOMEM;
+ 			goto end;
+ 		}
+@@ -781,7 +782,7 @@ mlx5vf_pci_resume_device_data(struct mlx5vf_pci_core_device *mvdev)
+ 	struct mlx5_vhca_data_buffer *buf;
+ 	int ret;
+ 
+-	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
++	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
+ 	if (!migf)
+ 		return ERR_PTR(-ENOMEM);
+ 
 -- 
 2.18.1
 
