@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 232BC658CFF
-	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 14:02:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14D02658DAE
+	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 14:54:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229783AbiL2NCW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 08:02:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45638 "EHLO
+        id S233472AbiL2Nyl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 08:54:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbiL2NCU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Dec 2022 08:02:20 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C83D2D3
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 05:02:19 -0800 (PST)
+        with ESMTP id S233594AbiL2Nyj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Dec 2022 08:54:39 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4EB41121
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 05:54:38 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 158ECB81913
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 13:02:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE07C433EF;
-        Thu, 29 Dec 2022 13:02:16 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5F071B819C4
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 13:54:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4317C433EF;
+        Thu, 29 Dec 2022 13:54:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1672318936;
-        bh=rrOMS6JWy1WFDiSkkmKZJnG4y5ugZHFgDcLi/ReaVIw=;
+        s=k20201202; t=1672322075;
+        bh=cluGXPOR4SegMfJZlmuHjl3pxFZULPPadZDrzZNHRNE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=nulAoRrgHQIkkvpDhF2T7ryJX3wU9J9R3QJneHPj7oOfTv1udwAibE+3oDzA8R3Q8
-         PhkZ/X1x0Mr/icqFIEHli61jQzuv8sFBs95UV77LDx7JewBHpi5h3lennbwOL28OAn
-         VLflfRkg4SUbr5atAa/OE1+vAUniEq/5v+U5gSk5N6kKKXAOfkaoa/s3oXYqOOJrj6
-         wM7Btc207MM3hBJZ/1BFEGPvt5cpwFx/1VKgjArMTigyoQPjBgviYezwfUdYYU/4lC
-         5UybB/cNffKvfUKI6opXSUeSCWiButuj5LO2VAw/5vB+W3Q2JWRsze0INsDmuwkRS6
-         990fEywOyKFtw==
+        b=RMzTcEXzWbgoSKBDGd3S9lQJFrTiMblFXZJqChIw/m8KHYqcFgsICC6jbO8/qEGJK
+         dg34LF/o2wNt3csRIOaAIlLoElP/E+x4C0o0ZircSujyE8SW5niJ7Qjf0vdxzDPXOJ
+         thBa9sCmbsIcTXQ41Ijzr7nClMJ57hr8CdMud6p+6l3ISoSOuwFb4ktdEhbh65hbXh
+         zMwP1hJFp/2TWtMpGWpNTqxyWv8SwET29S2JQYmSwTQJx8cTnfesOSHQHjNY3d9h1k
+         Cg8vc+rDNFve4Pj/5uqozlVgNVuWW1DnXV7wVkno8BST6c12DDtDAy8PYSjE8g0mAa
+         n9AcI3vQlJPvQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pAsY2-00Fhw7-Ca;
-        Thu, 29 Dec 2022 13:02:14 +0000
-Date:   Thu, 29 Dec 2022 13:00:55 +0000
-Message-ID: <87zgb6e54o.wl-maz@kernel.org>
+        id 1pAtMf-00FiN4-Lp;
+        Thu, 29 Dec 2022 13:54:33 +0000
+Date:   Thu, 29 Dec 2022 13:53:15 +0000
+Message-ID: <87y1qqe2pg.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 Cc:     catalin.marinas@arm.com, will@kernel.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, scott@os.amperecomputing.com,
         keyur@os.amperecomputing.com
-Subject: Re: [PATCH 1/3] KVM: arm64: nv: only emulate timers that have not yet fired
-In-Reply-To: <20220824060304.21128-2-gankulkarni@os.amperecomputing.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: nv: Emulate ISTATUS when emulated timers are fired.
+In-Reply-To: <20220824060304.21128-3-gankulkarni@os.amperecomputing.com>
 References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
-        <20220824060304.21128-2-gankulkarni@os.amperecomputing.com>
+        <20220824060304.21128-3-gankulkarni@os.amperecomputing.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,69 +67,79 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 24 Aug 2022 07:03:02 +0100,
+On Wed, 24 Aug 2022 07:03:03 +0100,
 Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 > 
-> From: D Scott Phillips <scott@os.amperecomputing.com>
+> Guest-Hypervisor forwards the timer interrupt to Guest-Guest, if it is
+> enabled, unmasked and ISTATUS bit of register CNTV_CTL_EL0 is set for a
+> loaded timer.
 > 
-> The timer emulation logic goes into an infinite loop when the NestedVM(L2)
-> timer is being emulated.
+> For NV2 implementation, the Host-Hypervisor is not emulating the ISTATUS
+> bit while forwarding the Emulated Vtimer Interrupt to Guest-Hypervisor.
+> This results in the drop of interrupt from Guest-Hypervisor, where as
+> Host Hypervisor marked it as an active interrupt and expecting Guest-Guest
+> to consume and acknowledge. Due to this, some of the Guest-Guest vCPUs
+> are stuck in Idle thread and rcu soft lockups are seen.
 > 
-> While the CPU is executing in L1 context, the L2 timers are emulated using
-> host hrtimer. When the delta of cval and current time reaches zero, the
-> vtimer interrupt is fired/forwarded to L2, however the emulation function
-> in Host-Hypervisor(L0) is still restarting the hrtimer with an expiry time
-> set to now, triggering hrtimer to fire immediately and resulting in a
-> continuous trigger of hrtimer and endless looping in the timer emulation.
+> This issue is not seen with NV1 case since the register CNTV_CTL_EL0 read
+> trap handler is emulating the ISTATUS bit.
 > 
-> Adding a fix to avoid restarting of the hrtimer if the interrupt is
-> already fired.
+> Adding code to set/emulate the ISTATUS when the emulated timers are fired.
 > 
-> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
 > Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 > ---
->  arch/arm64/kvm/arch_timer.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  arch/arm64/kvm/arch_timer.c | 5 +++++
+>  1 file changed, 5 insertions(+)
 > 
 > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 2371796b1ab5..27a6ec46803a 100644
+> index 27a6ec46803a..0b32d943d2d5 100644
 > --- a/arch/arm64/kvm/arch_timer.c
 > +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -472,7 +472,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
->  		return;
+> @@ -63,6 +63,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+>  			      struct arch_timer_context *timer,
+>  			      enum kvm_arch_timer_regs treg);
+>  static bool kvm_arch_timer_get_input_level(int vintid);
+> +static u64 read_timer_ctl(struct arch_timer_context *timer);
+>  
+>  static struct irq_ops arch_timer_irq_ops = {
+>  	.get_input_level = kvm_arch_timer_get_input_level,
+> @@ -356,6 +357,8 @@ static enum hrtimer_restart kvm_hrtimer_expire(struct hrtimer *hrt)
+>  		return HRTIMER_RESTART;
 >  	}
 >  
-> -	soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
-> +	if (!ctx->irq.level)
-> +		soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+> +	/* Timer emulated, emulate ISTATUS also */
+> +	timer_set_ctl(ctx, read_timer_ctl(ctx));
+
+Why should we do that for non-NV2 configurations?
+
+>  	kvm_timer_update_irq(vcpu, true, ctx);
+>  	return HRTIMER_NORESTART;
 >  }
+> @@ -458,6 +461,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
+>  	trace_kvm_timer_emulate(ctx, should_fire);
 >  
->  static void timer_save_state(struct arch_timer_context *ctx)
+>  	if (should_fire != ctx->irq.level) {
+> +		/* Timer emulated, emulate ISTATUS also */
+> +		timer_set_ctl(ctx, read_timer_ctl(ctx));
+>  		kvm_timer_update_irq(ctx->vcpu, should_fire, ctx);
+>  		return;
+>  	}
 
-I think this is a regression introduced by bee038a67487 ("KVM:
-arm/arm64: Rework the timer code to use a timer_map"), and you can see
-it because the comment in this function doesn't make much sense
-anymore.
+I'm not overly keen on this. Yes, we can set the status bit there. But
+conversely, the bit will not get cleared when the guest reprograms the
+timer, and will take a full exit/entry cycle for it to appear.
 
-Does the following work for you, mostly restoring the original code?
+Ergo, the architecture is buggy as memory (the VNCR page) cannot be
+used to emulate something as dynamic as a timer.
+
+It is only with FEAT_ECV that we can solve this correctly by trapping
+the counter/timer accesses and emulate them for the guest hypervisor.
+I'd rather we add support for that, as I expect all the FEAT_NV2
+implementations to have it (and hopefully FEAT_FGT as well).
 
 Thanks,
 
 	M.
-
-diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-index ad2a5df88810..4945c5b96f05 100644
---- a/arch/arm64/kvm/arch_timer.c
-+++ b/arch/arm64/kvm/arch_timer.c
-@@ -480,7 +480,7 @@ static void timer_emulate(struct arch_timer_context *ctx)
- 	 * scheduled for the future.  If the timer cannot fire at all,
- 	 * then we also don't need a soft timer.
- 	 */
--	if (!kvm_timer_irq_can_fire(ctx)) {
-+	if (should_fire || !kvm_timer_irq_can_fire(ctx)) {
- 		soft_timer_cancel(&ctx->hrtimer);
- 		return;
- 	}
 
 -- 
 Without deviation from the norm, progress is not possible.
