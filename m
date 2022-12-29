@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 87933658B90
-	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 11:16:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D94DE658B8E
+	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 11:16:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233378AbiL2KQ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 05:16:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45928 "EHLO
+        id S233045AbiL2KQY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 05:16:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229773AbiL2KNp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Dec 2022 05:13:45 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2042.outbound.protection.outlook.com [40.107.100.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 803BE12D3C
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 02:08:49 -0800 (PST)
+        with ESMTP id S230166AbiL2KNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Dec 2022 05:13:46 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2067.outbound.protection.outlook.com [40.107.223.67])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C55513D5B
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 02:08:54 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YS1BA+HbOhpr0yzcPX4wAZ3gGTaRaQhC+TF5nf0kcsKSk4nyq0w8xYVkkbUMmGP4Ma555YiBgYqFj3lnyLuP1NmobHAbCZghvEDs4VCpGSTOaBM/70PkuVYc15aWMG5sUD+e5ACd6McAJemvIEKeZbkQGbo0HqNACFK565sq7f0hSykVL6NHpq298j/bFubn7sgrTJDZTXCsEs5N37QwUJQ0Jp6HThUXNiNxvXCfVM88/0viM/kcM2gKla09yFaeYrXrXpD8fFKklVW4btdXiEoEgDy4Z5K9ETchnNhFaGu9/90uKcDdosghCIdf9n9ekxgPNuw2h4JKpc/8fcklEg==
+ b=Po+bmBhqEZiDNE6l/Uo7vDqSP2qBTJniehmkvOZfOaR+FX+NnAD38m+haLHTPssocahi17iBY1kCK9WOu6ujrTb2EsnjGdBxGp+8QVyfvuqi+P0AZREdGZtVL6MhiK8bjL+NjH0QjJ4Jm9FPm3UrSViP1xx9LsWefS7NWiKDcPBxfmcvFmKxf98MOx2M73BhrHqeHRLdfLVB0pwX0ODu6WrtXQFoUwVxurDl1TsIYlXz8kmqaCERJiUSVzy3dnKU3FjtH8Ax/8U7OZVnWeA8YsNxGhjw+mw7oY18s4yuC9XJPJz11z7/3KTUNmRqYacXx+ySbHzQ9Z5tB2ehPLqghg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=G0XGCOkgyuv8m0nwvRX4wOpn+ZvdjTqENu8sAo2WW1M=;
- b=aIqNIdx4ALIHB2ElRJKXBekjdXpIzLWlnNIP18eS2zfodPuukb2uMLAY21fMC07sMiPsdpNg7bYRks01xeAR/h+wo0zfWTb+hj0yVyFQtLjs6EnXE53ahXuZwXGkC9vilRn1e6XK6evZ/d9r00+YxGg6x71SxTK9J8t3XpoGYaFMTdSg0rMKDCidezCKDfDB/TCNcRLjAqW/4y0OJEXSI1PEt11aAvrYNkyY2R3LE96llhfjEQeKv2AFw2u6IFIF7gqvWdMUQSlJPz/yuPizcnMDzg+4WZAeiT3agYCx6ovjp5jVYETg7mgR9p5/kpP3xwXJ2gskox6J//Pd1KjytA==
+ bh=yVl5ZCxDwtAQIqnOXSYR5+CBDbOPiF+dzxqRUGVZgaQ=;
+ b=meJw6vbMozUUKRno1ty14q81YG3c0ivWMR8XorIAnSd+M3rsSQsZswHv8EY2kkCEdRIBkIGSPTn1adoPlrepMjIWGgk3wJN8Osub9KWS3dP5dxWGlyoIX9v1xsf0HKywa1YXzvI6KZxAiMjQSC3Xe6f5UHmAwBL6lJ2GdsicAT6EpElwzhClskY8gSmy6dZakKlhGFHtqROFWYjg8NpuRmbc9ItL4poabyhmVQF6m201PdOXM6Hflih40/NXY0GI0YkblLeE2IogE/ps8uvohga9B0R9ha8aUVByT9FJ2Ud/+TBYENeUKIVch/vTD9t+qg+u9ZfMLE7Z60gP6n3Kfw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=G0XGCOkgyuv8m0nwvRX4wOpn+ZvdjTqENu8sAo2WW1M=;
- b=FbIw/rDBU7XGZ/ltCUZt7Erfr1xok99AG8s+FCW11ltQKQMln6U048f/5bkLYsMvEo7p3bRXeeCZtDzSB8IxSga4d0v+hqO0C8IzBR+yjAxEWucHMK20uDA05KMsYVPCQ8oyONootyCEWoP8uomQavvVsy9LUacUidFiB+IGOG9lPMmVRSAyqgFGNBDtUHiQpiljOp7BlztJjL965by/xX6v4DOKafFFLdkh0DkmoYao5dYdQvhjkW6oxavjMUqciE/mM1Q/DXZxXQ5ZD3MHAvDB+mhpQnreIYb7UCPevqqgdLrhoCpfANi7kTJ09aVTaWf9enLK8GM+8OIBlpcuVQ==
-Received: from BN1PR13CA0024.namprd13.prod.outlook.com (2603:10b6:408:e2::29)
- by DM4PR12MB6011.namprd12.prod.outlook.com (2603:10b6:8:6b::14) with
+ bh=yVl5ZCxDwtAQIqnOXSYR5+CBDbOPiF+dzxqRUGVZgaQ=;
+ b=kpMVxRpbehvrgOVfnGKuyr6mOMrdyraovOjidYGLhElAFXu2FxHARQVNUVHBMJdRUpPvD4Fuc8Ec/NuqxAM6PhqOTHF+1egScJ56dmJDVztXnRCkp5dNS6u4Jd3AwOSs3WrRSURYPYkmbL6MtFcy5LYt2dxYLYPrbjbPGLq5Q4DbqJMlyFK8+6OFCTXpCEY9THkLygcJyx485zZ6zJ7F3Zisn2cYUv6BpQMQZWanFZD2WvZDP/OISPow3wG4UgtewE5Y0sr9i4OL2RpNCOUAw2Cj7QCTetH1F0GvCqe3g69X3B+r6F8H74JhUI7vY3dkZGUOgQ74icpSxW01BwJ+kQ==
+Received: from MW4PR04CA0092.namprd04.prod.outlook.com (2603:10b6:303:83::7)
+ by MN0PR12MB5908.namprd12.prod.outlook.com (2603:10b6:208:37c::14) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.16; Thu, 29 Dec
- 2022 10:08:47 +0000
-Received: from BN8NAM11FT005.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:e2:cafe::aa) by BN1PR13CA0024.outlook.office365.com
- (2603:10b6:408:e2::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.7 via Frontend
- Transport; Thu, 29 Dec 2022 10:08:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ 2022 10:08:52 +0000
+Received: from CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:83:cafe::f5) by MW4PR04CA0092.outlook.office365.com
+ (2603:10b6:303:83::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.16 via Frontend
+ Transport; Thu, 29 Dec 2022 10:08:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BN8NAM11FT005.mail.protection.outlook.com (10.13.176.69) with Microsoft SMTP
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1NAM11FT066.mail.protection.outlook.com (10.13.175.18) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5966.18 via Frontend Transport; Thu, 29 Dec 2022 10:08:47 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.5966.17 via Frontend Transport; Thu, 29 Dec 2022 10:08:51 +0000
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 29 Dec
- 2022 02:08:35 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
+ 2022 02:08:38 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
+ (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Thu, 29 Dec
- 2022 02:08:34 -0800
+ 2022 02:08:38 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
  with Microsoft SMTP Server id 15.2.986.36 via Frontend Transport; Thu, 29 Dec
- 2022 02:08:31 -0800
+ 2022 02:08:35 -0800
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
 CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
@@ -68,9 +68,9 @@ CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
         <diana.craciun@oss.nxp.com>, <eric.auger@redhat.com>,
         <yishaih@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>,
         <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH vfio 5/6] vfio/fsl-mc: Use GFP_KERNEL_ACCOUNT for userspace persistent allocations
-Date:   Thu, 29 Dec 2022 12:07:33 +0200
-Message-ID: <20221229100734.224388-6-yishaih@nvidia.com>
+Subject: [PATCH vfio 6/6] vfio/platform: Use GFP_KERNEL_ACCOUNT for userspace persistent allocations
+Date:   Thu, 29 Dec 2022 12:07:34 +0200
+Message-ID: <20221229100734.224388-7-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20221229100734.224388-1-yishaih@nvidia.com>
 References: <20221229100734.224388-1-yishaih@nvidia.com>
@@ -79,23 +79,23 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT005:EE_|DM4PR12MB6011:EE_
-X-MS-Office365-Filtering-Correlation-Id: f57d3ce2-fc01-4106-ec79-08dae984ad0e
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT066:EE_|MN0PR12MB5908:EE_
+X-MS-Office365-Filtering-Correlation-Id: f0c67505-5760-4c54-ba02-08dae984afcf
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0pJQCoRIyXhS/9lsmAkS6Zu1JvWZ+BHqD6lIIWHg0h4TI01clkNAdqnfFMWnXrbf51xy6qqCFcBaZipBo5MmnlxVcijok1k6L5ngsaNBx8bs8NjL4eTblgEBM3xtRYS7yQe6iVnd71DlaLxYRoPalyo3WQT/6rdC+7Uxs0qip0KTcaID/FQerkvf6RviLOej3EGALdjwalftiDijZ8VxwEVJVuuFFBF8wqEfkxQRkYKUihuZDohNN0LIEKk521WfwyNVJvZ5EDV76iLxg7jXBjXNuBUCPuA5E8SgyhP8bzMYoMLuKp7auevCiD7M7E4R8QpyQ604pmYDEHBvU9rmfzYtk/0sD6wRAcXzbUdpz2ySAyzUhO1uuZJkBe5wdhk+yA+IbTy3pQANkkQxRD9hLWUkC/ugKoQUOo431XzVF9oS5P07/vDFS6EQT9EZg46d5U/PTZevT1kotWQLGrpkMM/X1+bQ+QQYxaVSgFCCLrw32PXvigLakzNW5FLfbrciLqrsAUCmt5/EppvGwbbk6zfSOM1jTK6cy72wuRW9WaG8Ye0sZvz9yHefet8ujnU9Erf7LxhfhI9Wsn+Msjtrelaarjjgn9Ro5NoRAfaDs2RsGj/S51mgChXczReBvSsdafobH2t4RNV+0klytrPsdZm3zJHKW+/GoH0xe1BpWlpez/unjrTG3XRvhCZgjNQOHTf+zS+AGxMF5PrvV1XARA==
-X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(39860400002)(346002)(136003)(451199015)(36840700001)(40470700004)(46966006)(6636002)(54906003)(316002)(110136005)(40460700003)(36756003)(186003)(26005)(356005)(5660300002)(2906002)(83380400001)(82310400005)(36860700001)(82740400003)(7636003)(70586007)(4326008)(8676002)(70206006)(2616005)(336012)(40480700001)(1076003)(426003)(47076005)(8936002)(41300700001)(86362001)(478600001)(7696005);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: OnArHT5JIjR/Bzq++pBRQO7kzTx6iVa/aJ7FOkUyPO2pmwiUK3OXBlfRWHAB5OWqFQFhxNAlD7DqxxvkPqh3KS3Frv5lK1x/bm4Xh+HggtlZH5xRAJ9BvT3r6xvBlzns51luqqBFkHmBJ7uX2WpnJsZvGkKwFPvfrzkVTpYDLH7PFtTsn0E1in6H+LHLSCQwLb8V5mg4KvxuCJV2MWOjYEUu3pWAhMVgw0IdjIEvuaDPfgKZi1tyY3t8xjbSkll0ii5sDSkJ3RMGngVy5+zrg87lBEGuU9C9Mw93//FHKyDnXXBwV2bgZ32Xqh1VzbaIKhJwlEMzhopjXEgEAKnzU7oPSjZFfyAizG5JClwSQ9uCHdSdG+E0Sl5AFp8QqVqujfEJJ9BKKv5Is5e3eSn3bEAWQwOwUaag9cz7rJ+/2Axjam3EnJvHOUiS+/HezQ5ZRiONCb1ynTCVK9RFeFsz2bbHyLxyePh6KSRTDvGKbQpsvEQcZU5QtNF2Kqh2rhyz20eyCqO5t4zYtHztQjxY8Bax12Ma44jjeLjvZpD79/OFwoU+bxEIc8NYLB3DXhsl8zJqGTxKNk3nG75PmTO7Fd4BAlatnF9SVpUvsIHSFUafUctvF0vwMbY1xXDz5fEC3w7WN9eJ3qMB69xcHpPpKhyVCcbt9bvxwRDBGgOMjPYpsCuJfMdlKuGmthbfy3tiM9i5FDJl3MJy8Qf5A2o7/Q==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(376002)(346002)(136003)(396003)(39860400002)(451199015)(36840700001)(46966006)(40470700004)(36756003)(70206006)(41300700001)(70586007)(54906003)(6636002)(86362001)(8676002)(4326008)(83380400001)(7636003)(82740400003)(356005)(36860700001)(7696005)(47076005)(426003)(478600001)(110136005)(5660300002)(8936002)(2906002)(40460700003)(316002)(40480700001)(2616005)(186003)(336012)(26005)(1076003)(82310400005);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2022 10:08:47.2706
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Dec 2022 10:08:51.9990
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f57d3ce2-fc01-4106-ec79-08dae984ad0e
+X-MS-Exchange-CrossTenant-Network-Message-Id: f0c67505-5760-4c54-ba02-08dae984afcf
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT005.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT066.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6011
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5908
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -115,45 +115,49 @@ mechanism.
 
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/fsl-mc/vfio_fsl_mc.c      | 2 +-
- drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ drivers/vfio/platform/vfio_platform_common.c | 2 +-
+ drivers/vfio/platform/vfio_platform_irq.c    | 8 ++++----
+ 2 files changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc.c b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-index defeb8510ace..c89a047a4cd8 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc.c
-@@ -28,7 +28,7 @@ static int vfio_fsl_mc_open_device(struct vfio_device *core_vdev)
- 	int i;
+diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+index 1a0a238ffa35..278c92cde555 100644
+--- a/drivers/vfio/platform/vfio_platform_common.c
++++ b/drivers/vfio/platform/vfio_platform_common.c
+@@ -142,7 +142,7 @@ static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
+ 		cnt++;
  
- 	vdev->regions = kcalloc(count, sizeof(struct vfio_fsl_mc_region),
+ 	vdev->regions = kcalloc(cnt, sizeof(struct vfio_platform_region),
 -				GFP_KERNEL);
 +				GFP_KERNEL_ACCOUNT);
  	if (!vdev->regions)
  		return -ENOMEM;
  
-diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-index 64d01f3fb13d..c51229fccbd6 100644
---- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-+++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
-@@ -29,7 +29,7 @@ static int vfio_fsl_mc_irqs_allocate(struct vfio_fsl_mc_device *vdev)
+diff --git a/drivers/vfio/platform/vfio_platform_irq.c b/drivers/vfio/platform/vfio_platform_irq.c
+index c5b09ec0a3c9..665197caed89 100644
+--- a/drivers/vfio/platform/vfio_platform_irq.c
++++ b/drivers/vfio/platform/vfio_platform_irq.c
+@@ -186,9 +186,8 @@ static int vfio_set_trigger(struct vfio_platform_device *vdev, int index,
  
- 	irq_count = mc_dev->obj_desc.irq_count;
- 
--	mc_irq = kcalloc(irq_count, sizeof(*mc_irq), GFP_KERNEL);
-+	mc_irq = kcalloc(irq_count, sizeof(*mc_irq), GFP_KERNEL_ACCOUNT);
- 	if (!mc_irq)
- 		return -ENOMEM;
- 
-@@ -77,7 +77,7 @@ static int vfio_set_trigger(struct vfio_fsl_mc_device *vdev,
  	if (fd < 0) /* Disable only */
  		return 0;
- 
+-
 -	irq->name = kasprintf(GFP_KERNEL, "vfio-irq[%d](%s)",
+-						irq->hwirq, vdev->name);
 +	irq->name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-irq[%d](%s)",
- 			    hwirq, dev_name(&vdev->mc_dev->dev));
++			      irq->hwirq, vdev->name);
  	if (!irq->name)
  		return -ENOMEM;
+ 
+@@ -286,7 +285,8 @@ int vfio_platform_irq_init(struct vfio_platform_device *vdev)
+ 	while (vdev->get_irq(vdev, cnt) >= 0)
+ 		cnt++;
+ 
+-	vdev->irqs = kcalloc(cnt, sizeof(struct vfio_platform_irq), GFP_KERNEL);
++	vdev->irqs = kcalloc(cnt, sizeof(struct vfio_platform_irq),
++			     GFP_KERNEL_ACCOUNT);
+ 	if (!vdev->irqs)
+ 		return -ENOMEM;
+ 
 -- 
 2.18.1
 
