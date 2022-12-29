@@ -2,178 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 64913658CB6
-	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 13:33:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 452F0658CB9
+	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 13:34:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231229AbiL2Md0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 07:33:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60912 "EHLO
+        id S233313AbiL2MeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 07:34:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229773AbiL2MdY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Dec 2022 07:33:24 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 444B165EB;
-        Thu, 29 Dec 2022 04:33:23 -0800 (PST)
+        with ESMTP id S233263AbiL2MeF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Dec 2022 07:34:05 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E23313DD4;
+        Thu, 29 Dec 2022 04:33:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672317203; x=1703853203;
+  t=1672317226; x=1703853226;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=bNbpE4OIGne2tvX2ONyBKUpBuaBYYWTXY86Z1ZMXdyY=;
-  b=CscflM5GpbXQUco/+fIWMt1RK1iNtDnw0oo/69g0xXVpPQ726IUDKL2y
-   4UGyb3bN1BoX6xhNvmI/UqOauvr2UHnskPmiN3WEPK2P3c9HS+9xXwDRx
-   MC0Zkc/tWcrxCrSdzo0fMuu0EgiIPpI5iWI3govitAMAEDMUwocGnX9af
-   nEFo7TSrh+nwD+X4l6MruCagXh2mqNGKNhTIjTUnGZwNhgMxSuwch/SJD
-   8uL6etaUXUrkQFsWfQmUYFItC7E5LEr8wswO4o2SQGJssfujYWRDRSYOp
-   ZPpRHHSBl3Ep0Zt6IDtsBOwx9DD6LqBsRzNj3+HeXiVxMhzZUIciUPLcY
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10574"; a="348243730"
+  bh=zHreUtqmKvOEGxfPmwFyAvdSxxzgj/SeSN1QmXbCurY=;
+  b=kZLTBsk2Qi0hYJvbUKDC9pkUDY+5f+V2IeQbuPDFRp2bS4tKvjSqAFa8
+   /6BsSgkW//kneHdQebAJ6gY0oGtHrby+nTATDl1AhJ96uXfrM/tNRlxBL
+   0LNi0RYV8Q/BHD8gq1b7hLRLrPKA2sCAAtzZJtdxtMB9Q8EM5rnli/aIp
+   oF34sRZfNghBnric+yZHTv70/IuJecUnV4g17RQVBv7WnCc5CPedo4Mrb
+   /VgkTeiD7YXsPy0Eyp8JVH1OF3mdoxywdudtfpT+IOJrC8Gokdfg6B8E0
+   hvGapkDG1p0KEN6tc+raKxpkpXswbWfRCIKKG6ctOxvP5BYMPuUludij4
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10574"; a="300720474"
 X-IronPort-AV: E=Sophos;i="5.96,284,1665471600"; 
-   d="scan'208";a="348243730"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2022 04:33:08 -0800
+   d="scan'208";a="300720474"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2022 04:33:45 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10574"; a="777683323"
+X-IronPort-AV: E=McAfee;i="6500,9779,10574"; a="684195741"
 X-IronPort-AV: E=Sophos;i="5.96,284,1665471600"; 
-   d="scan'208";a="777683323"
+   d="scan'208";a="684195741"
 Received: from tdx-lm.sh.intel.com ([10.239.53.27])
-  by orsmga004.jf.intel.com with ESMTP; 29 Dec 2022 04:33:06 -0800
+  by orsmga008.jf.intel.com with ESMTP; 29 Dec 2022 04:33:43 -0800
 From:   Wei Wang <wei.w.wang@intel.com>
 To:     pbonzini@redhat.com, seanjc@google.com
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wei Wang <wei.w.wang@intel.com>, stable@vger.kernel.org,
-        =?UTF-8?q?=E6=9F=B3=E8=8F=81=E5=B3=B0?= <liujingfeng@qianxin.com>
-Subject: [PATCH v1] KVM: destruct kvm_io_device while unregistering it from kvm_io_bus
-Date:   Thu, 29 Dec 2022 20:33:02 +0800
-Message-Id: <20221229123302.4083-1-wei.w.wang@intel.com>
+        Wei Wang <wei.w.wang@intel.com>
+Subject: [PATCH v2] KVM: move KVM_CAP_DEVICE_CTRL to the generic check
+Date:   Thu, 29 Dec 2022 20:33:38 +0800
+Message-Id: <20221229123338.4142-1-wei.w.wang@intel.com>
 X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Current usage of kvm_io_device requires users to destruct it with an extra
-call of kvm_iodevice_destructor after the device gets unregistered from
-the kvm_io_bus. This is not necessary and can cause errors if a user
-forgot to make the extra call.
+KVM_CAP_DEVICE_CTRL allows userspace to check if the kvm_device
+framework (e.g. KVM_CREATE_DEVICE) is supported by KVM. Move
+KVM_CAP_DEVICE_CTRL to the generic check for the two reasons:
+1) it already supports arch agnostic usages (i.e. KVM_DEV_TYPE_VFIO).
+For example, userspace VFIO implementation may needs to create
+KVM_DEV_TYPE_VFIO on x86, riscv, or arm etc. It is simpler to have it
+checked at the generic code than at each arch's code.
+2) KVM_CREATE_DEVICE has been added to the generic code.
 
-Simplify the usage by combining kvm_iodevice_destructor into
-kvm_io_bus_unregister_dev. This reduces LOCs a bit for users and can
-avoid the leakage of destructing the device explicitly.
-
-The fix was originally provided by Sean Christopherson.
-Link: https://lore.kernel.org/lkml/DS0PR11MB6373F27D0EE6CD28C784478BDCEC9@DS0PR11MB6373.namprd11.prod.outlook.com/T/
-Fixes: 5d3c4c79384a ("KVM: Stop looking for coalesced MMIO zones if the bus is destroyed")
-Cc: stable@vger.kernel.org
-Reported-by: 柳菁峰 <liujingfeng@qianxin.com>
 Signed-off-by: Wei Wang <wei.w.wang@intel.com>
 ---
- include/kvm/iodev.h       |  6 ------
- virt/kvm/coalesced_mmio.c |  1 -
- virt/kvm/eventfd.c        |  1 -
- virt/kvm/kvm_main.c       | 24 +++++++++++++++---------
- 4 files changed, 15 insertions(+), 17 deletions(-)
+ arch/arm64/kvm/arm.c       | 1 -
+ arch/powerpc/kvm/powerpc.c | 1 -
+ arch/riscv/kvm/vm.c        | 1 -
+ arch/s390/kvm/kvm-s390.c   | 1 -
+ virt/kvm/kvm_main.c        | 1 +
+ 5 files changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/include/kvm/iodev.h b/include/kvm/iodev.h
-index d75fc4365746..56619e33251e 100644
---- a/include/kvm/iodev.h
-+++ b/include/kvm/iodev.h
-@@ -55,10 +55,4 @@ static inline int kvm_iodevice_write(struct kvm_vcpu *vcpu,
- 				 : -EOPNOTSUPP;
- }
- 
--static inline void kvm_iodevice_destructor(struct kvm_io_device *dev)
--{
--	if (dev->ops->destructor)
--		dev->ops->destructor(dev);
--}
--
- #endif /* __KVM_IODEV_H__ */
-diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-index 0be80c213f7f..d7135a5e76f8 100644
---- a/virt/kvm/coalesced_mmio.c
-+++ b/virt/kvm/coalesced_mmio.c
-@@ -195,7 +195,6 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
- 			 */
- 			if (r)
- 				break;
--			kvm_iodevice_destructor(&dev->dev);
- 		}
- 	}
- 
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 2a3ed401ce46..1b277afb545b 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -898,7 +898,6 @@ kvm_deassign_ioeventfd_idx(struct kvm *kvm, enum kvm_bus bus_idx,
- 		bus = kvm_get_bus(kvm, bus_idx);
- 		if (bus)
- 			bus->ioeventfd_count--;
--		ioeventfd_release(p);
- 		ret = 0;
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 9c5573bc4614..190e9c3b10a7 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -212,7 +212,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = vgic_present;
  		break;
- 	}
+ 	case KVM_CAP_IOEVENTFD:
+-	case KVM_CAP_DEVICE_CTRL:
+ 	case KVM_CAP_USER_MEMORY:
+ 	case KVM_CAP_SYNC_MMU:
+ 	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
+diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
+index 04494a4fb37a..21f9fbe96f6a 100644
+--- a/arch/powerpc/kvm/powerpc.c
++++ b/arch/powerpc/kvm/powerpc.c
+@@ -541,7 +541,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ENABLE_CAP:
+ 	case KVM_CAP_ONE_REG:
+ 	case KVM_CAP_IOEVENTFD:
+-	case KVM_CAP_DEVICE_CTRL:
+ 	case KVM_CAP_IMMEDIATE_EXIT:
+ 	case KVM_CAP_SET_GUEST_DEBUG:
+ 		r = 1;
+diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
+index 65a964d7e70d..6efe93b282e1 100644
+--- a/arch/riscv/kvm/vm.c
++++ b/arch/riscv/kvm/vm.c
+@@ -57,7 +57,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 
+ 	switch (ext) {
+ 	case KVM_CAP_IOEVENTFD:
+-	case KVM_CAP_DEVICE_CTRL:
+ 	case KVM_CAP_USER_MEMORY:
+ 	case KVM_CAP_SYNC_MMU:
+ 	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index e4890e04b210..191d220b6a30 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -567,7 +567,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_ENABLE_CAP:
+ 	case KVM_CAP_S390_CSS_SUPPORT:
+ 	case KVM_CAP_IOEVENTFD:
+-	case KVM_CAP_DEVICE_CTRL:
+ 	case KVM_CAP_S390_IRQCHIP:
+ 	case KVM_CAP_VM_ATTRIBUTES:
+ 	case KVM_CAP_MP_STATE:
 diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 13e88297f999..582757ebdce6 100644
+index 582757ebdce6..84073464aea0 100644
 --- a/virt/kvm/kvm_main.c
 +++ b/virt/kvm/kvm_main.c
-@@ -5200,6 +5200,12 @@ static struct notifier_block kvm_reboot_notifier = {
- 	.priority = 0,
- };
- 
-+static void kvm_iodevice_destructor(struct kvm_io_device *dev)
-+{
-+	if (dev->ops->destructor)
-+		dev->ops->destructor(dev);
-+}
-+
- static void kvm_io_bus_destroy(struct kvm_io_bus *bus)
- {
- 	int i;
-@@ -5423,7 +5429,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
- int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 			      struct kvm_io_device *dev)
- {
--	int i, j;
-+	int i;
- 	struct kvm_io_bus *new_bus, *bus;
- 
- 	lockdep_assert_held(&kvm->slots_lock);
-@@ -5453,18 +5459,18 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
- 	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
- 	synchronize_srcu_expedited(&kvm->srcu);
- 
--	/* Destroy the old bus _after_ installing the (null) bus. */
-+	/*
-+	 * If (null) bus is installed, destroy the old bus, including all the
-+	 * attached devices. Otherwise, destroy the caller's device only.
-+	 */
- 	if (!new_bus) {
- 		pr_err("kvm: failed to shrink bus, removing it completely\n");
--		for (j = 0; j < bus->dev_count; j++) {
--			if (j == i)
--				continue;
--			kvm_iodevice_destructor(bus->range[j].dev);
--		}
-+		kvm_io_bus_destroy(bus);
-+		return -ENOMEM;
- 	}
- 
--	kfree(bus);
--	return new_bus ? 0 : -ENOMEM;
-+	kvm_iodevice_destructor(dev);
-+	return 0;
- }
- 
- struct kvm_io_device *kvm_io_bus_get_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+@@ -4524,6 +4524,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ #endif
+ 	case KVM_CAP_BINARY_STATS_FD:
+ 	case KVM_CAP_SYSTEM_EVENT_DATA:
++	case KVM_CAP_DEVICE_CTRL:
+ 		return 1;
+ 	default:
+ 		break;
 -- 
 2.27.0
 
