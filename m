@@ -2,186 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56602658FF0
-	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 18:34:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91F5A658FFD
+	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 18:44:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233953AbiL2Rey (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 12:34:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60218 "EHLO
+        id S233873AbiL2RoA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 12:44:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233997AbiL2Reo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Dec 2022 12:34:44 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E27BE0B
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 09:33:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672335237;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=cSN4qRzkjG7moedM70V1xHmUGsUwaFVTnRTOfqVw+jc=;
-        b=TvB3eGVP74awK4VoaIjTkxsXUJtR1hc/px1qSQ1PFUwnWgQpDS2SHVsjr7/o7wnN6Ws/g/
-        X6PIxIMcwdSp4YWki9Q9+3d8rqoWuRg9ggRU1ykelZAQl4J8gLPt2avOJE/0QsCtR7GBfR
-        oCvHo5K7CAGExFCLLnNwK/SBPQg4qWs=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-517-_ftLoMbONAS1BnvIxiU_7w-1; Thu, 29 Dec 2022 12:33:55 -0500
-X-MC-Unique: _ftLoMbONAS1BnvIxiU_7w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S229535AbiL2Rn7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Dec 2022 12:43:59 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F321BF5C
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 09:43:58 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 44B601C07581;
-        Thu, 29 Dec 2022 17:33:55 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 26A7B53A3;
-        Thu, 29 Dec 2022 17:33:55 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: [GIT PULL] KVM fixes for Linux 6.2-rc2
-Date:   Thu, 29 Dec 2022 12:33:54 -0500
-Message-Id: <20221229173354.1769443-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        by ams.source.kernel.org (Postfix) with ESMTPS id 339A3B81A1A
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 17:43:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C476EC433D2;
+        Thu, 29 Dec 2022 17:43:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672335835;
+        bh=0zUp+fYSboly8+3UmtFNqfIjlBnD7OkrbQa+vn0tC9s=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=DYvMWD2mjSmEIkjREzwavaZh0Ms4a2zNBTf7Y431IlU/3ynD+x87SMiXkjyfx45lV
+         18mfk3l8jUHNf8dIjbUyB4je0jTpZZ29jzkm8w90ga+bzF4jB2ragTbBwsmI5F7SFY
+         WEOhDPHPrZspPMth73fNKyVIPo0Q6s5axvybLqJyutrQnPm91YkYIEuSJlQJJWrSY0
+         Sxy6aG86mMpSksNFNT1ggtkVKeXm1dOOWV6PQVAhUSgICcSUQSX6ux1E+ljArfA/Pj
+         to8Mvx+ZhgM3NVRwS4d9H22aPDHneL9AtukY0sAfN8Du4bnMN7+V+ON4U6eQkhE5Cl
+         0E5YqjNVx6ISg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pAwwb-00FkJB-Eb;
+        Thu, 29 Dec 2022 17:43:53 +0000
+Date:   Thu, 29 Dec 2022 17:42:34 +0000
+Message-ID: <87wn6ads39.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     catalin.marinas@arm.com, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, scott@os.amperecomputing.com,
+        keyur@os.amperecomputing.com
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Avoid block mapping if max_map_size is smaller than block size.
+In-Reply-To: <20220824060304.21128-4-gankulkarni@os.amperecomputing.com>
+References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+        <20220824060304.21128-4-gankulkarni@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, scott@os.amperecomputing.com, keyur@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Linus,
+On Wed, 24 Aug 2022 07:03:04 +0100,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> In NV case, Shadow stage 2 page table is created using host hypervisor
+> page table configuration like page size, block size etc. Also, the shadow
+> stage 2 table uses block level mapping if the Guest Hypervisor IPA is
+> backed by the THP pages. However, this is resulting in illegal mapping of
+> NestedVM IPA to Host Hypervisor PA, when Guest Hypervisor and Host
+> hypervisor are configured with different pagesize.
+> 
+> Adding fix to avoid block level mapping in stage 2 mapping if
+> max_map_size is smaller than the block size.
+> 
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> ---
+>  arch/arm64/kvm/mmu.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> index 6caa48da1b2e..3d4b53f153a1 100644
+> --- a/arch/arm64/kvm/mmu.c
+> +++ b/arch/arm64/kvm/mmu.c
+> @@ -1304,7 +1304,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>  	 * backed by a THP and thus use block mapping if possible.
+>  	 */
+>  	if (vma_pagesize == PAGE_SIZE &&
+> -	    !(max_map_size == PAGE_SIZE || device)) {
+> +	    !(max_map_size < PMD_SIZE || device)) {
+>  		if (fault_status == FSC_PERM && fault_granule > PAGE_SIZE)
+>  			vma_pagesize = fault_granule;
+>  		else
 
-The following changes since commit 1b929c02afd37871d5afb9d498426f83432e71c2:
+That's quite a nice catch. I guess this was the main issue with
+running 64kB L1 on a 4kB L0? Now, I'm not that fond of the fix itself,
+and I think max_map_size should always represent something that is a
+valid size *on the host*, specially when outside of NV-specific code.
 
-  Linux 6.2-rc1 (2022-12-25 13:41:39 -0800)
+How about something like this instead:
 
-are available in the Git repository at:
+@@ -1346,6 +1346,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 		 * table uses at least as big a mapping.
+ 		 */
+ 		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
++
++		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
++			max_map_size = PMD_SIZE;
++		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
++			max_map_size = PAGE_SIZE;
+ 	}
+ 
+ 	vma_pagesize = min(vma_pagesize, max_map_size);
 
-  https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-for you to fetch changes up to a5496886eb130ea08b1a5cd5c284543909bde749:
+Admittedly, this is a lot uglier than your fix. But it keep the nested
+horror localised, and doesn't risk being reverted by accident by
+people who would not take NV into account (can't blame them, really).
 
-  Merge branch 'kvm-late-6.1-fixes' into HEAD (2022-12-28 07:19:14 -0500)
+Can you please give it a go?
 
-----------------------------------------------------------------
-Changes that were posted too late for 6.1, or after the release.
+Thanks,
 
-x86:
+	M.
 
-* several fixes to nested VMX execution controls
-
-* fixes and clarification to the documentation for Xen emulation
-
-* do not unnecessarily release a pmu event with zero period
-
-* MMU fixes
-
-* fix Coverity warning in kvm_hv_flush_tlb()
-
-selftests:
-
-* fixes for the ucall mechanism in selftests
-
-* other fixes mostly related to compilation with clang
-
-----------------------------------------------------------------
-Adamos Ttofari (1):
-      KVM: x86: ioapic: Fix level-triggered EOI and userspace I/OAPIC reconfigure race
-
-David Woodhouse (3):
-      KVM: x86/xen: Use kvm_read_guest_virt() instead of open-coding it badly
-      KVM: x86/xen: Add KVM_XEN_INVALID_GPA and KVM_XEN_INVALID_GFN to uapi
-      KVM: x86/xen: Documentation updates and clarifications
-
-Lai Jiangshan (2):
-      kvm: Remove the unused macro KVM_MMU_READ_{,UN}LOCK()
-      kvm: x86/mmu: Remove duplicated "be split" in spte.h
-
-Like Xu (1):
-      KVM: x86/pmu: Prevent zero period event from being repeatedly released
-
-Lukas Bulwahn (1):
-      MAINTAINERS: adjust entry after renaming the vmx hyperv files
-
-Michal Luczaj (2):
-      KVM: x86/xen: Fix memory leak in kvm_xen_write_hypercall_page()
-      KVM: x86/xen: Simplify eventfd IOCTLs
-
-Oliver Upton (2):
-      KVM: arm64: selftests: Don't identity map the ucall MMIO hole
-      KVM: selftests: Mark correct page as mapped in virt_map()
-
-Paolo Bonzini (6):
-      KVM: selftests: document the default implementation of vm_vaddr_populate_bitmap
-      KVM: x86/xen: Fix SRCU/RCU usage in readers of evtchn_ports
-      KVM: x86: fix deadlock for KVM_XEN_EVTCHN_RESET
-      Documentation: kvm: clarify SRCU locking order
-      KVM: selftests: restore special vmmcall code layout needed by the harness
-      Merge branch 'kvm-late-6.1-fixes' into HEAD
-
-Peng Hao (1):
-      KVM: x86: Simplify kvm_apic_hw_enabled
-
-Sean Christopherson (22):
-      KVM: x86: Sanity check inputs to kvm_handle_memory_failure()
-      KVM: selftests: Zero out valid_bank_mask for "all" case in Hyper-V IPI test
-      KVM: nVMX: Document that ignoring memory failures for VMCLEAR is deliberate
-      KVM: nVMX: Properly expose ENABLE_USR_WAIT_PAUSE control to L1
-      KVM: nVMX: Don't stuff secondary execution control if it's not supported
-      KVM: x86/mmu: Don't attempt to map leaf if target TDP MMU SPTE is frozen
-      KVM: x86/mmu: Map TDP MMU leaf SPTE iff target level is reached
-      KVM: x86/mmu: Re-check under lock that TDP MMU SP hugepage is disallowed
-      KVM: x86/mmu: Don't install TDP MMU SPTE if SP has unexpected level
-      KVM: selftests: Define literal to asm constraint in aarch64 as unsigned long
-      KVM: selftests: Delete dead code in x86_64/vmx_tsc_adjust_test.c
-      KVM: selftests: Fix divide-by-zero bug in memslot_perf_test
-      KVM: selftests: Use pattern matching in .gitignore
-      KVM: selftests: Fix a typo in x86-64's kvm_get_cpu_address_width()
-      KVM: selftests: Rename UNAME_M to ARCH_DIR, fill explicitly for x86
-      KVM: selftests: Use proper function prototypes in probing code
-      KVM: selftests: Probe -no-pie with actual CFLAGS used to compile
-      KVM: selftests: Explicitly disable builtins for mem*() overrides
-      KVM: selftests: Include lib.mk before consuming $(CC)
-      KVM: selftests: Disable "gnu-variable-sized-type-not-at-end" warning
-      KVM: selftests: Use magic value to signal ucall_alloc() failure
-      KVM: Delete extra block of "};" in the KVM API documentation
-
-Vitaly Kuznetsov (1):
-      KVM: x86: hyper-v: Fix 'using uninitialized value' Coverity warning
-
- Documentation/virt/kvm/api.rst                     |  46 ++++---
- Documentation/virt/kvm/locking.rst                 |  19 ++-
- MAINTAINERS                                        |   2 +-
- arch/x86/kvm/hyperv.c                              |  63 +++++----
- arch/x86/kvm/irq_comm.c                            |   5 +-
- arch/x86/kvm/lapic.h                               |   4 +-
- arch/x86/kvm/mmu/spte.h                            |   2 +-
- arch/x86/kvm/mmu/tdp_mmu.c                         |  25 +++-
- arch/x86/kvm/pmu.c                                 |   3 +-
- arch/x86/kvm/pmu.h                                 |   3 +-
- arch/x86/kvm/vmx/nested.c                          |  20 ++-
- arch/x86/kvm/vmx/vmx.c                             |   7 +
- arch/x86/kvm/x86.c                                 |   3 +
- arch/x86/kvm/xen.c                                 | 144 +++++++++++----------
- include/uapi/linux/kvm.h                           |   3 +
- tools/testing/selftests/kvm/.gitignore             |  91 +------------
- tools/testing/selftests/kvm/Makefile               |  64 ++++-----
- .../selftests/kvm/aarch64/page_fault_test.c        |   2 +-
- tools/testing/selftests/kvm/lib/aarch64/ucall.c    |   6 +-
- tools/testing/selftests/kvm/lib/kvm_util.c         |  13 +-
- tools/testing/selftests/kvm/lib/ucall_common.c     |  16 ++-
- tools/testing/selftests/kvm/lib/x86_64/processor.c |   2 +-
- tools/testing/selftests/kvm/memslot_perf_test.c    |   3 +
- tools/testing/selftests/kvm/x86_64/hyperv_ipi.c    |   3 +-
- .../kvm/x86_64/svm_nested_soft_inject_test.c       |  13 +-
- .../selftests/kvm/x86_64/vmx_tsc_adjust_test.c     |   5 -
- .../testing/selftests/kvm/x86_64/xen_shinfo_test.c |   6 +
- virt/kvm/kvm_mm.h                                  |   4 -
- 28 files changed, 290 insertions(+), 287 deletions(-)
-
+-- 
+Without deviation from the norm, progress is not possible.
