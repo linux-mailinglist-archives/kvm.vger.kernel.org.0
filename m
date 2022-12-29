@@ -2,92 +2,84 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7FE3565887F
-	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 03:00:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2F463658890
+	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 03:12:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232867AbiL2CA1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 28 Dec 2022 21:00:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41414 "EHLO
+        id S230254AbiL2CMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 28 Dec 2022 21:12:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230106AbiL2CAY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 28 Dec 2022 21:00:24 -0500
-X-Greylist: delayed 467 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 28 Dec 2022 18:00:11 PST
-Received: from mail4.tencent.com (mail12.tencent.com [61.241.47.121])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8051FBC9B;
-        Wed, 28 Dec 2022 18:00:11 -0800 (PST)
-Received: from EX-SZ018.tencent.com (unknown [10.28.6.39])
-        by mail4.tencent.com (Postfix) with ESMTP id 3B180BA31F;
-        Thu, 29 Dec 2022 09:52:22 +0800 (CST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=tencent.com;
-        s=s202002; t=1672278742;
-        bh=IT5RZfT5T334qVeq2A/RSbr1MuPROR0hLfXMCIZCR+o=;
-        h=From:To:CC:Subject:Date;
-        b=VAITQT+B4wjIJ24YQuIEAMVlpM2ZD9YsCynLp56lUHDiCXkrKEtN2ETo2u1xpogf8
-         SiHLYM11/MJ/JkDtGKkIkchBfhRb8s8DLML6LmyQo/NNUxswL6jtcuwwvWzy2lnnIo
-         V3MCzDygWV4cmSrGms2vRyYNFvWY034cjautQQ3c=
-Received: from EX-SZ052.tencent.com (10.28.6.108) by EX-SZ018.tencent.com
- (10.28.6.39) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Thu, 29 Dec
- 2022 09:52:22 +0800
-Received: from EX-SZ049.tencent.com (10.28.6.102) by EX-SZ052.tencent.com
- (10.28.6.108) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Thu, 29 Dec
- 2022 09:52:21 +0800
-Received: from EX-SZ049.tencent.com ([fe80::a50b:1c86:c1f2:8cf4]) by
- EX-SZ049.tencent.com ([fe80::a50b:1c86:c1f2:8cf4%8]) with mapi id
- 15.01.2242.008; Thu, 29 Dec 2022 09:52:21 +0800
-From:   =?utf-8?B?Zmx5aW5ncGVuZyjlva3mtakp?= <flyingpeng@tencent.com>
-To:     "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: [RESEND PATCH v2] KVM: use unified srcu interface function
-Thread-Topic: [RESEND PATCH v2] KVM: use unified srcu interface function
-Thread-Index: AQHZGygwmEDfKOhCQ02bKVr49C7THQ==
-Date:   Thu, 29 Dec 2022 01:52:21 +0000
-Message-ID: <C1483DFC-94D2-4515-95E5-FCEEC0B2A250@tencent.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.99.213.112]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D873D5F5A08BEB42B5C1EA4350589402@tencent.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S230159AbiL2CMp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 28 Dec 2022 21:12:45 -0500
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32BD9B2E
+        for <kvm@vger.kernel.org>; Wed, 28 Dec 2022 18:12:43 -0800 (PST)
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1pAiPQ-00HWrM-EL; Thu, 29 Dec 2022 03:12:40 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=y7RAPx28QRbazXIKyVTwHIcXUMEWW3VfqXO3yEz0moA=; b=GPaCi0NUclEhlQd3DsJTNESR9B
+        hif/pZQ2cmVeBWjMLt77LMUIUDb+pI9CfZ13taupJG/tINTst4NPQRlgN8/suvkyzHAraTjOOgwIq
+        DEfk8cT6tUF/k7IObwqXZ03Z7GWz6KpxJ+VuAwgEKxDFkd+qF8g7rS8NKo0agdD5GI14gzKxYfhw6
+        dsTUa8yvWO3RV8pxsdNH+WnqJjnKq5aNcW5UhCLaA5pBdS0LKHZYNFZjtf+1BkVWFNBt10F0Ngjtb
+        yuFflvGXcvKZ7CZhgPBtWCRpnkaUH4B3BmT3M76jg8nIwJRrR3Bo0S88m8xbLrwK352mxB80xH/Eh
+        e88mugKQ==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+        by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1pAiPJ-0000yR-OJ; Thu, 29 Dec 2022 03:12:33 +0100
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1pAiP0-0005Cq-3s; Thu, 29 Dec 2022 03:12:14 +0100
+Message-ID: <2ac40491-7efc-64bf-d7b8-b10dc4346094@rbox.co>
+Date:   Thu, 29 Dec 2022 03:12:13 +0100
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_PASS,T_SPF_HELO_TEMPERROR
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Thunderbird
+Subject: Re: [RFC PATCH 1/2] KVM: x86/xen: Fix use-after-free in
+ kvm_xen_eventfd_update()
+Content-Language: pl-PL, en-US
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
+Cc:     paul@xen.org, seanjc@google.com
+References: <20221222203021.1944101-1-mhal@rbox.co>
+ <20221222203021.1944101-2-mhal@rbox.co>
+ <42483e26-10bd-88d2-308a-3407a0c54d55@redhat.com>
+ <ea97ca88-b354-e96b-1a16-0a1be29af50c@rbox.co>
+ <af3846d2-19b2-543d-8f5f-d818dbdffc75@redhat.com>
+ <532cef98-1f0f-7011-7793-cef5b37397fc@rbox.co>
+ <4ed92082-ef81-3126-7f55-b0aae6e4a215@redhat.com>
+ <9b09359f88e4da1037139eb30ff4ae404beee866.camel@infradead.org>
+ <6d2e2043-dc44-e0c0-b357-c5480d7c4e7c@redhat.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <6d2e2043-dc44-e0c0-b357-c5480d7c4e7c@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-a3ZtLT5pcnFfcm91dGluZyBpcyBwcm90ZWN0ZWQgYnkga3ZtLT5pcnFfc3JjdS4NCg0KU2lnbmVk
-LW9mZi1ieTogUGVuZyBIYW8gPGZseWluZ3BlbmdAdGVuY2VudC5jb20+DQotLS0NCiB2aXJ0L2t2
-bS9pcnFjaGlwLmMgfCA5ICsrKysrKy0tLQ0KIDEgZmlsZSBjaGFuZ2VkLCA2IGluc2VydGlvbnMo
-KyksIDMgZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS92aXJ0L2t2bS9pcnFjaGlwLmMgYi92
-aXJ0L2t2bS9pcnFjaGlwLmMNCmluZGV4IDFlNTY3ZDFmNmQzZC4uZDNjY2ZlOTIyODgwIDEwMDY0
-NA0KLS0tIGEvdmlydC9rdm0vaXJxY2hpcC5jDQorKysgYi92aXJ0L2t2bS9pcnFjaGlwLmMNCkBA
-IC0xOCw2ICsxOCwxMCBAQA0KICNpbmNsdWRlIDxsaW51eC9leHBvcnQuaD4NCiAjaW5jbHVkZSA8
-dHJhY2UvZXZlbnRzL2t2bS5oPg0KDQorI2RlZmluZSBrdm1fZ2V0X2lycV9yb3V0aW5nKGt2bSkg
-XA0KKyAgICAgICBzcmN1X2RlcmVmZXJlbmNlX2NoZWNrKChrdm0pLT5pcnFfcm91dGluZywgJihr
-dm0pLT5pcnFfc3JjdSwgICAgXA0KKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsb2Nr
-ZGVwX2lzX2hlbGQoJihrdm0pLT5pcnFfbG9jaykpDQorDQogaW50IGt2bV9pcnFfbWFwX2dzaShz
-dHJ1Y3Qga3ZtICprdm0sDQogICAgICAgICAgICAgICAgICAgIHN0cnVjdCBrdm1fa2VybmVsX2ly
-cV9yb3V0aW5nX2VudHJ5ICplbnRyaWVzLCBpbnQgZ3NpKQ0KIHsNCkBAIC0yNSw4ICsyOSw3IEBA
-IGludCBrdm1faXJxX21hcF9nc2koc3RydWN0IGt2bSAqa3ZtLA0KICAgICAgICBzdHJ1Y3Qga3Zt
-X2tlcm5lbF9pcnFfcm91dGluZ19lbnRyeSAqZTsNCiAgICAgICAgaW50IG4gPSAwOw0KDQotICAg
-ICAgIGlycV9ydCA9IHNyY3VfZGVyZWZlcmVuY2VfY2hlY2soa3ZtLT5pcnFfcm91dGluZywgJmt2
-bS0+aXJxX3NyY3UsDQotICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbG9j
-a2RlcF9pc19oZWxkKCZrdm0tPmlycV9sb2NrKSk7DQorICAgICAgIGlycV9ydCA9IGt2bV9nZXRf
-aXJxX3JvdXRpbmcoa3ZtKTsNCiAgICAgICAgaWYgKGlycV9ydCAmJiBnc2kgPCBpcnFfcnQtPm5y
-X3J0X2VudHJpZXMpIHsNCiAgICAgICAgICAgICAgICBobGlzdF9mb3JfZWFjaF9lbnRyeShlLCAm
-aXJxX3J0LT5tYXBbZ3NpXSwgbGluaykgew0KICAgICAgICAgICAgICAgICAgICAgICAgZW50cmll
-c1tuXSA9ICplOw0KQEAgLTIxNiw3ICsyMTksNyBAQCBpbnQga3ZtX3NldF9pcnFfcm91dGluZyhz
-dHJ1Y3Qga3ZtICprdm0sDQogICAgICAgIH0NCg0KICAgICAgICBtdXRleF9sb2NrKCZrdm0tPmly
-cV9sb2NrKTsNCi0gICAgICAgb2xkID0gcmN1X2RlcmVmZXJlbmNlX3Byb3RlY3RlZChrdm0tPmly
-cV9yb3V0aW5nLCAxKTsNCisgICAgICAgb2xkID0ga3ZtX2dldF9pcnFfcm91dGluZyhrdm0pOw0K
-ICAgICAgICByY3VfYXNzaWduX3BvaW50ZXIoa3ZtLT5pcnFfcm91dGluZywgbmV3KTsNCiAgICAg
-ICAga3ZtX2lycV9yb3V0aW5nX3VwZGF0ZShrdm0pOw0KICAgICAgICBrdm1fYXJjaF9pcnFfcm91
-dGluZ191cGRhdGUoa3ZtKTsNCi0tDQoyLjI3LjANCg0K
+On 12/28/22 12:58, Paolo Bonzini wrote:
+> On 12/28/22 10:54, David Woodhouse wrote:
+>> But what is the general case lock ordering rule here? Can other code
+>> call synchronize_srcu() while holding kvm->lock? Or is that verboten?
+> 
+> Nope, it's a general rule---and one that would extend to any other lock 
+> taken inside srcu_read_lock(&kvm->srcu).
+> 
+> I have sent a patch to fix reset, and one to clarify the lock ordering 
+> rules.
+
+It looks like there are more places with such bad ordering:
+kvm_vm_ioctl_set_msr_filter(), kvm_vm_ioctl_set_pmu_event_filter().
+
+Michal
+
