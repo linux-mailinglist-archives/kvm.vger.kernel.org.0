@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08922659040
-	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 19:20:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1978A659044
+	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 19:23:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230343AbiL2SU6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 13:20:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43782 "EHLO
+        id S233335AbiL2SXF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 13:23:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbiL2SUz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Dec 2022 13:20:55 -0500
-Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFCC13E9A
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 10:20:48 -0800 (PST)
-Received: by mail-ed1-x52a.google.com with SMTP id l29so20595956edj.7
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 10:20:48 -0800 (PST)
+        with ESMTP id S231241AbiL2SWx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Dec 2022 13:22:53 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6261513E9A
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 10:22:52 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id qk9so46788762ejc.3
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 10:22:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=ON3me5uunsk4XleJoGvtCW00ElJeZA1o43QDGwsGENY=;
-        b=DcDtMicUWn8mu80sWCPWXICeHw1CtsaWHUywPGih6hfWB+smbHF3kgwL9SO7LkLmC1
-         /TF0MzknWi2sphxy5knIi3KKvVnavNgwV/NHjOq5lOuiTYyxqeDBZdUsLPkrw4V5FcV4
-         wFMiKMmpBEYupziUftIt4PdFaJxIWxcoeik0po1yG2f7SfVth4xwWS/HP8Wbt5f6iAsZ
-         0wtdPTnvC1w8zydIgMZxcWpOiSXHiD/NVEExI6nZa5/qRaS/Zd8FFrnuXc6jHfG/HH2s
-         3QyFpt8v8GVm2ghYxOuNr/hsRU0lkxGlXGvNA5xWzLlAScuLu1Kwy9/ylTzVOUe73GDM
-         iXtg==
+        bh=Zv7x2EwFCE53UN71pKw+MbADH4Kh0HBRItue+SrAL2A=;
+        b=Ee4FFnw5RsWkdyVuYQT+CnRP7mXIoRfHw8CK1ekzd2++R/UDJKdHJd6ZwYEUdi6Pb6
+         ib84b9pC7iF3eWIRvhUvTpJco632cgQeOELTEnvNEoAj9FsI2IlX98qWU8W3eJWRDL2J
+         hctJVjlSMzGJSD9p6Om9p7e5rp5Qm3lmeYOrVaw/9vMie1Wtg2KwzDWPo0JMKde7c5XS
+         2upOasG6vJj3EpyNZqR0B/XywVJf4VvVS+loSNyCTMChMaHEkTRaR9O+UBskoXe8ell/
+         oiTx4otoO/sK1bUhXkK943h80fVpLCYMpcwjJNhgTrVSBnOFBAiSv/kpYaLlzTG7Jjq0
+         WIwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=ON3me5uunsk4XleJoGvtCW00ElJeZA1o43QDGwsGENY=;
-        b=wVNRkMRJQuTYYsGZ7K4Ya1teovRzquM4zgZhu3pLjoWBJ7BS1GRaf7gTbCYdD3kMhf
-         otOEcaefK8Vj8NYb/2jCTOHA5pO3FynadO7nbloJYAUviqSTawcDf8H73kn/9NiNk4vB
-         qD5UZ3gszC73lUQ+MX2GGO5l+eOizoVBcuf5fPN/uf0uLx2H5OcLpj4gNCAtocEA5aCb
-         yeba4bO5Tiw6RUyfws9ylhN4wAjzJvWxv04DvkiSibkt39LunhyxK1oIYKTdC8fIeiSc
-         4Q6Lq4hWAHrb9aGDmiG8ij0ptmiqdS8syWmNnS3FLeRwpe02XbHkBL7t2F5mnnIPMQS7
-         hMkA==
-X-Gm-Message-State: AFqh2kot+TDYVSjcQdmecZ6NK4Co941oEOUUYq+uFLog0ydG7cU4tzYO
-        xB0umNq6a576S88wtfvQO/X9OnTVpyGXvRSGds68lmkgazo5Og==
-X-Google-Smtp-Source: AMrXdXuX7hDJJFMW8bVCDXPgZW120f/VGaoT38dceDKWI+pCgb8sxy7Q6BUU/q1IctaOrBjGIq9gdsMrZgNDhTOjAo8=
-X-Received: by 2002:aa7:d741:0:b0:47d:f760:d4b2 with SMTP id
- a1-20020aa7d741000000b0047df760d4b2mr3438224eds.202.1672338047233; Thu, 29
- Dec 2022 10:20:47 -0800 (PST)
+        bh=Zv7x2EwFCE53UN71pKw+MbADH4Kh0HBRItue+SrAL2A=;
+        b=MEMAYDQQku7FZvoPwsdbuOkF1wHdS7z8YYyQcmnAIS27EpSkJGqxXHUFu2Nq1NcERA
+         nsr6n+IX3DLiS+vaoCtDtJtFQa6xROFYcBmrTrTUXp1cHi3Nopuxc0NneYHsN9HxL9tw
+         1BNxOaDBukXHLqtaQfcaO0APLu6XjpPm74rZ+wpvE4sGdM5w5wkz35b9wU2Yv/aoqJaz
+         skSazg4i9nV116NIDcGGu5vTD44WXYp+f0t2VITzAg5YUPzysFy6iWOLSYcMADxCac1k
+         DHexCpL833xSsYz4fO5K0clMfpd3KaQYmuNVIoQ0YDlwnsHKICvuqyIX2hdxByzUifB0
+         iRrQ==
+X-Gm-Message-State: AFqh2kqkrhZ/77/rQ8L79vpHBBWpMx969ooK2AuicKQlKTCNbkMIbXj9
+        aX7Q8tOVZ/Qy3pGDQSr8nfVkHw3loixWkVa9ExiKzIdiYi1SsQ==
+X-Google-Smtp-Source: AMrXdXtqzZ9speXcpg3QjBVDwROQXiCqiwodonvRHFg07N7Y1lkVWp9l4JkmcQjuHhRzXlSIzQovqJwSsscR+2Sk0tM=
+X-Received: by 2002:a17:906:6a04:b0:803:3f50:a7af with SMTP id
+ qw4-20020a1709066a0400b008033f50a7afmr1959083ejc.78.1672338170886; Thu, 29
+ Dec 2022 10:22:50 -0800 (PST)
 MIME-Version: 1.0
-References: <20221222023457.1764-1-vipinsh@google.com> <20221222023457.1764-8-vipinsh@google.com>
- <CANgfPd_iktQYfRc0=zp4wsrADPQhPQNKo_MBZ0djzeeYi+w6aw@mail.gmail.com> <CAHVum0dU5C7Nrs1GPMzrWcg6juz6xYKoEPbvUj4h_VLiov4z0w@mail.gmail.com>
-In-Reply-To: <CAHVum0dU5C7Nrs1GPMzrWcg6juz6xYKoEPbvUj4h_VLiov4z0w@mail.gmail.com>
+References: <20221222023457.1764-1-vipinsh@google.com> <20221222023457.1764-7-vipinsh@google.com>
+ <CANgfPd_=WwrgVVQnooZLCSXpSnEjRVOdt6qZtrvhO_wmxc5Tzg@mail.gmail.com> <CAHVum0dkqp1MnMyqoOQdGp2K74h5NFrzZ4KaT=0+ezVP-JJnVQ@mail.gmail.com>
+In-Reply-To: <CAHVum0dkqp1MnMyqoOQdGp2K74h5NFrzZ4KaT=0+ezVP-JJnVQ@mail.gmail.com>
 From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 29 Dec 2022 10:20:35 -0800
-Message-ID: <CANgfPd9BawLX7qxGCfgeduDjFD4pPyRr-VcyJ2=+KyvjT63R0w@mail.gmail.com>
-Subject: Re: [Patch v3 7/9] KVM: x86/mmu: Allocate page table's pages on NUMA
- node of the underlying pages
+Date:   Thu, 29 Dec 2022 10:22:38 -0800
+Message-ID: <CANgfPd8KU3pqSYu--bSP1QesmkrnLqqB8QH_8rZVS=8S4HNBDQ@mail.gmail.com>
+Subject: Re: [Patch v3 6/9] KVM: Provide NUMA node support to kvm_mmu_memory_cache{}
 To:     Vipin Sharma <vipinsh@google.com>
 Cc:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -71,385 +70,202 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Wed, Dec 28, 2022 at 2:08 PM Vipin Sharma <vipinsh@google.com> wrote:
 >
-> On Tue, Dec 27, 2022 at 11:34 AM Ben Gardon <bgardon@google.com> wrote:
+> On Tue, Dec 27, 2022 at 11:10 AM Ben Gardon <bgardon@google.com> wrote:
 > >
 > > On Wed, Dec 21, 2022 at 6:35 PM Vipin Sharma <vipinsh@google.com> wrote:
 > > >
-> > > Page table pages of a VM are currently allocated based on the current
-> > > task's NUMA node or its mempolicy. This can cause suboptimal remote
-> > > accesses by the vCPU if it is accessing physical pages local to its NUMA
-> > > node but the page table pages mapping those physcal pages were created
-> > > by some other vCPU which was on different NUMA node or had different
-> > > policy.
-> > >
-> > > Allocate page table pages on the same NUMA node where underlying
-> > > physical page exists. Page table at level 5, 4, and 3 might not end up
-> > > on the same NUMA node as they can span multiple NUMA nodes.
-> >
-> > A page table at any level could map memory spanning multiple NUMA
-> > nodes, it just becomes more likely at higher levels.
-> > We're only guaranteed that a page table maps memory all on the same
-> > node if it's a split hugepage.
->
-> Even in this case, it is a best effort.
->
-> > This change can only guarantee that the page table pages are allocated
-> > on the same node as at least some of the memory they map.
-> > Of course in practice, the above is absolutely correct since we'd
-> > expect to have multi-GB continuous ranges of GFNs allocated on the
-> > same node via huge pages.
-> >
-> > And since the root pages are allocated based only on where the thread
-> > allocating them is running, they're not actually guaranteed to be on
-> > the same node as any of the memory they map. (Though they probably
-> > will be.)
-> >
->
-> I will add more details in the commit in the next version.
->
+> > > Add 'node' variable in kvm_mmu_memory_cache{} to denote which NUMA node
+> > > this cache should allocate memory from. Default initialize to
+> > > NUMA_NO_NODE in all architectures.
 > > >
 > > > Signed-off-by: Vipin Sharma <vipinsh@google.com>
 > > > ---
-> > >  arch/x86/include/asm/kvm_host.h |  2 +-
-> > >  arch/x86/kvm/mmu/mmu.c          | 63 ++++++++++++++++++++++-----------
-> > >  arch/x86/kvm/mmu/paging_tmpl.h  |  4 +--
-> > >  arch/x86/kvm/mmu/tdp_mmu.c      | 11 +++---
-> > >  virt/kvm/kvm_main.c             |  2 +-
-> > >  5 files changed, 53 insertions(+), 29 deletions(-)
+> > >  arch/arm64/kvm/arm.c      |  2 +-
+> > >  arch/arm64/kvm/mmu.c      |  4 +++-
+> > >  arch/mips/kvm/mips.c      |  2 ++
+> > >  arch/riscv/kvm/mmu.c      |  2 +-
+> > >  arch/riscv/kvm/vcpu.c     |  2 +-
+> > >  arch/x86/kvm/mmu/mmu.c    | 22 ++++++++++++----------
+> > >  include/linux/kvm_host.h  |  6 ++++++
+> > >  include/linux/kvm_types.h |  2 ++
+> > >  8 files changed, 28 insertions(+), 14 deletions(-)
 > > >
-> > > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > > index 293994fabae3..b1f319ad6f89 100644
-> > > --- a/arch/x86/include/asm/kvm_host.h
-> > > +++ b/arch/x86/include/asm/kvm_host.h
-> > > @@ -782,7 +782,7 @@ struct kvm_vcpu_arch {
-> > >         struct kvm_mmu *walk_mmu;
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index 9c5573bc4614..52a41f4532e2 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -340,7 +340,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> > >         vcpu->arch.target = -1;
+> > >         bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
 > > >
-> > >         struct kvm_mmu_memory_cache mmu_pte_list_desc_cache;
-> > > -       struct kvm_mmu_memory_cache mmu_shadow_page_cache;
-> > > +       struct kvm_mmu_memory_cache mmu_shadow_page_cache[MAX_NUMNODES];
-> > >         struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
-> > >         struct kvm_mmu_memory_cache mmu_page_header_cache;
+> > > -       vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_cache, NULL, NUMA_NO_NODE);
 > > >
+> > >         /*
+> > >          * Default value for the FP state, will be overloaded at load
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 31d7fa4c7c14..bd07155e17fa 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -894,12 +894,14 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> > >  {
+> > >         phys_addr_t addr;
+> > >         int ret = 0;
+> > > -       struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+> > > +       struct kvm_mmu_memory_cache cache;
+> > >         struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> > >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+> > >                                      KVM_PGTABLE_PROT_R |
+> > >                                      (writable ? KVM_PGTABLE_PROT_W : 0);
+> > >
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&cache, NULL, NUMA_NO_NODE);
+> > > +
+> > >         if (is_protected_kvm_enabled())
+> > >                 return -EPERM;
+> > >
+> > > diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> > > index a25e0b73ee70..b017c29a9340 100644
+> > > --- a/arch/mips/kvm/mips.c
+> > > +++ b/arch/mips/kvm/mips.c
+> > > @@ -304,6 +304,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> > >                      HRTIMER_MODE_REL);
+> > >         vcpu->arch.comparecount_timer.function = kvm_mips_comparecount_wakeup;
+> > >
+> > > +       vcpu->arch.mmu_page_cache.node = NUMA_NO_NODE;
+> > > +
+> >
+> > It looks weird to have MIPS not using the initialization MACRO. Should
+> > it just have a GFP_ZERO parameter?
+>
+> MIPS is not setting GFP_ZERO explicitly before my series, so, I didn't
+> make it GFP_ZERO. I am not sure if MIPS needs it or not, I tried to
+> keep the same functionality in my patch.
+>
+> May be someone from MIPS can tell more about it.
+
+That makes sense, I just don't want to see MIPS get left behind
+because we move the cache init logic to a macro or function. Folks
+might update the init function but forget to update MIPS too.
+
+>
+> >
+> > >         /*
+> > >          * Allocate space for host mode exception handlers that handle
+> > >          * guest mode exits
+> > > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> > > index 34b57e0be2ef..119de4520cc6 100644
+> > > --- a/arch/riscv/kvm/mmu.c
+> > > +++ b/arch/riscv/kvm/mmu.c
+> > > @@ -353,9 +353,9 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
+> > >         phys_addr_t addr, end;
+> > >         struct kvm_mmu_memory_cache pcache = {
+> > >                 .gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0,
+> > > -               .gfp_zero = __GFP_ZERO,
+> > >         };
+> > >
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&pcache, NULL, NUMA_NO_NODE);
+> > >         end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+> > >         pfn = __phys_to_pfn(hpa);
+> > >
+> > > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > > index 7c08567097f0..189b14feb365 100644
+> > > --- a/arch/riscv/kvm/vcpu.c
+> > > +++ b/arch/riscv/kvm/vcpu.c
+> > > @@ -161,7 +161,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> > >
+> > >         /* Mark this VCPU never ran */
+> > >         vcpu->arch.ran_atleast_once = false;
+> > > -       vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_cache, NULL, NUMA_NO_NODE);
+> > >         bitmap_zero(vcpu->arch.isa, RISCV_ISA_EXT_MAX);
+> > >
+> > >         /* Setup ISA features available to VCPU */
 > > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > > index 23a3b82b2384..511c6ef265ee 100644
+> > > index 6f6a10d7a871..23a3b82b2384 100644
 > > > --- a/arch/x86/kvm/mmu/mmu.c
 > > > +++ b/arch/x86/kvm/mmu/mmu.c
-> > > @@ -677,24 +677,29 @@ static int mmu_topup_sp_memory_cache(struct kvm_mmu_memory_cache *cache,
-> > >
-> > >  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+> > > @@ -5954,13 +5954,14 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
 > > >  {
-> > > -       int r;
-> > > +       int r, nid;
+> > >         int ret;
 > > >
-> > >         /* 1 rmap, 1 parent PTE per level, and the prefetched rmaps. */
-> > >         r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache,
-> > >                                        1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
-> > >         if (r)
-> > >                 return r;
-> > > -       r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-> > > -                                     &vcpu->arch.mmu_shadow_page_cache_lock,
-> > > -                                     PT64_ROOT_MAX_LEVEL);
-> > > -       if (r)
-> > > -               return r;
-> > > +
-> > > +       for_each_online_node(nid) {
-> > > +               r = mmu_topup_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache[nid],
-> > > +                                             &vcpu->arch.mmu_shadow_page_cache_lock,
-> > > +                                             PT64_ROOT_MAX_LEVEL);
-> > > +               if (r)
-> > > +                       return r;
-> > > +       }
-> > > +
-> > >         if (maybe_indirect) {
-> > >                 r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadowed_info_cache,
-> > >                                                PT64_ROOT_MAX_LEVEL);
-> > >                 if (r)
-> > >                         return r;
-> > >         }
-> > > +
-> > >         return kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_page_header_cache,
-> > >                                           PT64_ROOT_MAX_LEVEL);
-> > >  }
-> > > @@ -715,9 +720,14 @@ static void mmu_free_sp_memory_cache(struct kvm_mmu_memory_cache *cache,
+> > > -       vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+> > > -       vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_pte_list_desc_cache,
+> > > +                                 pte_list_desc_cache, NUMA_NO_NODE);
 > > >
-> > >  static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
-> > >  {
-> > > +       int nid;
-> > > +
-> > >         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
-> > > -       mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-> > > -                                &vcpu->arch.mmu_shadow_page_cache_lock);
-> > > +
-> > > +       for_each_node(nid)
-> > > +               mmu_free_sp_memory_cache(&vcpu->arch.mmu_shadow_page_cache[nid],
-> > > +                                        &vcpu->arch.mmu_shadow_page_cache_lock);
-> > > +
-> >
-> > Was just trying to think if there could be any issue with memory
-> > leakage if the online nodes changed, though IDK if any hardware does
-> > that.
-> > Still, it might be more robust to use ARRAY_SIZE and cover the whole array.
->
-> for_each_node() goes through all of the possible nodes on the system,
-> whereas, for_each_online_node() goes through only online nodes.
-> Current code seems right to me, let me know if I am overlooking
-> something.
-
-Ah okay, I didn't see the distinction. That sounds good to me.
-
->
-> >
-> > >         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
-> > >         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
-> > >  }
-> > > @@ -2256,11 +2266,12 @@ static struct kvm_mmu_page *__kvm_mmu_get_shadow_page(struct kvm *kvm,
+> > > -       vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+> > > -       vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_header_cache,
+> > > +                                 mmu_page_header_cache, NUMA_NO_NODE);
 > > >
-> > >  static struct kvm_mmu_page *kvm_mmu_get_shadow_page(struct kvm_vcpu *vcpu,
-> > >                                                     gfn_t gfn,
-> > > -                                                   union kvm_mmu_page_role role)
-> > > +                                                   union kvm_mmu_page_role role,
-> > > +                                                   int nid)
-> > >  {
-> > >         struct shadow_page_caches caches = {
-> > >                 .page_header_cache = &vcpu->arch.mmu_page_header_cache,
-> > > -               .shadow_page_cache = &vcpu->arch.mmu_shadow_page_cache,
-> > > +               .shadow_page_cache = &vcpu->arch.mmu_shadow_page_cache[nid],
-> > >                 .shadowed_info_cache = &vcpu->arch.mmu_shadowed_info_cache,
-> > >                 .shadow_page_cache_lock = &vcpu->arch.mmu_shadow_page_cache_lock
-> > >         };
-> > > @@ -2316,15 +2327,19 @@ static union kvm_mmu_page_role kvm_mmu_child_role(u64 *sptep, bool direct,
-> > >
-> > >  static struct kvm_mmu_page *kvm_mmu_get_child_sp(struct kvm_vcpu *vcpu,
-> > >                                                  u64 *sptep, gfn_t gfn,
-> > > -                                                bool direct, unsigned int access)
-> > > +                                                bool direct, unsigned int access,
-> > > +                                                kvm_pfn_t pfn)
-> > >  {
-> > >         union kvm_mmu_page_role role;
-> > > +       int nid;
-> > >
-> > >         if (is_shadow_present_pte(*sptep) && !is_large_pte(*sptep))
-> > >                 return ERR_PTR(-EEXIST);
-> > >
-> > >         role = kvm_mmu_child_role(sptep, direct, access);
-> > > -       return kvm_mmu_get_shadow_page(vcpu, gfn, role);
-> > > +       nid = kvm_pfn_to_page_table_nid(pfn);
-> > > +
-> > > +       return kvm_mmu_get_shadow_page(vcpu, gfn, role, nid);
-> > >  }
-> > >
-> > >  static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterator,
-> > > @@ -3208,7 +3223,8 @@ static int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> > >                 if (it.level == fault->goal_level)
-> > >                         break;
-> > >
-> > > -               sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn, true, ACC_ALL);
-> > > +               sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn, true,
-> > > +                                         ACC_ALL, fault->pfn);
-> > >                 if (sp == ERR_PTR(-EEXIST))
-> > >                         continue;
-> > >
-> > > @@ -3636,7 +3652,7 @@ static hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant,
-> > >         WARN_ON_ONCE(quadrant && !role.has_4_byte_gpte);
-> > >         WARN_ON_ONCE(role.direct && role.has_4_byte_gpte);
-> > >
-> > > -       sp = kvm_mmu_get_shadow_page(vcpu, gfn, role);
-> > > +       sp = kvm_mmu_get_shadow_page(vcpu, gfn, role, numa_mem_id());
-> > >         ++sp->root_count;
-> > >
-> > >         return __pa(sp->spt);
-> > > @@ -5952,7 +5968,7 @@ static int __kvm_mmu_create(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu)
-> > >
-> > >  int kvm_mmu_create(struct kvm_vcpu *vcpu)
-> > >  {
-> > > -       int ret;
-> > > +       int ret, nid;
-> > >
-> > >         INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_pte_list_desc_cache,
-> > >                                   pte_list_desc_cache, NUMA_NO_NODE);
-> > > @@ -5960,8 +5976,9 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
-> > >         INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_header_cache,
-> > >                                   mmu_page_header_cache, NUMA_NO_NODE);
-> > >
-> > > -       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadow_page_cache,
-> > > -                                 NULL, NUMA_NO_NODE);
-> > > +       for_each_node(nid)
-> > > +               INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadow_page_cache[nid],
-> > > +                                         NULL, nid);
+> > > -       vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadow_page_cache,
+> > > +                                 NULL, NUMA_NO_NODE);
 > > >         spin_lock_init(&vcpu->arch.mmu_shadow_page_cache_lock);
 > > >
 > > >         vcpu->arch.mmu = &vcpu->arch.root_mmu;
-> > > @@ -6692,13 +6709,17 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+> > > @@ -6124,14 +6125,15 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+> > >         node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+> > >         kvm_page_track_register_notifier(kvm, node);
+> > >
+> > > -       kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
+> > > -       kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_page_header_cache,
+> > > +                                 mmu_page_header_cache, NUMA_NO_NODE);
+> > >
+> > > -       kvm->arch.split_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_shadow_page_cache,
+> > > +                                 NULL, NUMA_NO_NODE);
+> > >         spin_lock_init(&kvm->arch.split_shadow_page_cache_lock);
+> > >
+> > > -       kvm->arch.split_desc_cache.kmem_cache = pte_list_desc_cache;
+> > > -       kvm->arch.split_desc_cache.gfp_zero = __GFP_ZERO;
+> > > +       INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_desc_cache,
+> > > +                                 pte_list_desc_cache, NUMA_NO_NODE);
+> > >
+> > >         return 0;
 > > >  }
+> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > index a262e15ebd19..719687a37ef7 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -2302,4 +2302,10 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+> > >  /* Max number of entries allowed for each kvm dirty ring */
+> > >  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
 > > >
-> > >  static unsigned long mmu_shrink_cache(struct kvm_mmu_memory_cache *cache,
-> > > +                                     int cache_count,
-> > >                                       spinlock_t *cache_lock)
-> > >  {
-> > >         unsigned long freed = 0;
-> > > +       int nid;
-> > >
-> > >         spin_lock(cache_lock);
-> > > -       if (cache->nobjs)
-> > > -               freed = kvm_mmu_empty_memory_cache(cache);
-> > > +       for (nid = 0; nid < cache_count; nid++) {
-> > > +               if (node_online(nid) && cache[nid].nobjs)
+> > > +#define INIT_KVM_MMU_MEMORY_CACHE(_cache, _kmem_cache, _node) ({       \
+> > > +       (_cache)->kmem_cache = _kmem_cache;                             \
+> > > +       (_cache)->gfp_zero = __GFP_ZERO;                                \
+> > > +       (_cache)->node = _node;                                         \
+> > > +})
+> > > +
 > >
-> > Is there any reason to keep the cache if !node_online(nid)?
-> > Actually, I'd also just drop the cache_count argument and always
-> > iterate over the entire array, only checking nobjs. There's no
-> > guarantee I'm aware of that the set of nodes has a sequential series
-> > of IDs starting at 0 and you'd get a bug if that wasn't the case since
-> > it only iterates to  nid < cache_count here but some of the earlier
-> > nids might not have been online.
+> > Given that this initialization is probably not happening in a super
+> > hot path, is there any downside to just using a function for the
+> > initialization?
 > >
 >
-> This is just temporary and will be removed in the next patch in the series.
->
-> mmu_shrink_cache() is used for both split_shadow_page_cache (single
-> object) and mmu_shadow_page_cache[MAX_NUMANODES].
->
-> In next patch of this series, I used for_each_online_node(nide), I
-> will change it to for_each_node() in the next version.
->
-> > > +                       freed += kvm_mmu_empty_memory_cache(&cache[nid]);
-> > > +       }
-> > >         spin_unlock(cache_lock);
-> > >         return freed;
-> > >  }
-> > > @@ -6721,13 +6742,15 @@ mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
-> > >                 list_move_tail(&kvm->vm_list, &vm_list);
-> > >
-> > >                 freed += mmu_shrink_cache(&kvm->arch.split_shadow_page_cache,
-> > > +                                         1,
-> >
-> > So lonely.
-> > One.
-> > All by itself,
-> > with only a coma for company.
-> >
-> > NIT: This could be merged to the previous or subsequent lines.
->
-> This is a strong and independent '1'.
->
-> >
-> > >                                           &kvm->arch.split_shadow_page_cache_lock);
-> > >
-> > >                 if (freed >= sc->nr_to_scan)
-> > >                         break;
-> > >
-> > >                 kvm_for_each_vcpu(i, vcpu, kvm) {
-> > > -                       freed += mmu_shrink_cache(&vcpu->arch.mmu_shadow_page_cache,
-> > > +                       freed += mmu_shrink_cache(vcpu->arch.mmu_shadow_page_cache,
-> > > +                                                 MAX_NUMNODES,
-> > >                                                   &vcpu->arch.mmu_shadow_page_cache_lock);
-> > >                 }
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> > > index e5662dbd519c..1ceca62ec4cf 100644
-> > > --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> > > +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> > > @@ -652,7 +652,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-> > >                 table_gfn = gw->table_gfn[it.level - 2];
-> > >                 access = gw->pt_access[it.level - 2];
-> > >                 sp = kvm_mmu_get_child_sp(vcpu, it.sptep, table_gfn,
-> > > -                                         false, access);
-> > > +                                         false, access, fault->pfn);
-> > >
-> > >                 if (sp != ERR_PTR(-EEXIST)) {
-> > >                         /*
-> > > @@ -708,7 +708,7 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
-> > >                 validate_direct_spte(vcpu, it.sptep, direct_access);
-> > >
-> > >                 sp = kvm_mmu_get_child_sp(vcpu, it.sptep, base_gfn,
-> > > -                                         true, direct_access);
-> > > +                                         true, direct_access, fault->pfn);
-> > >                 if (sp == ERR_PTR(-EEXIST))
-> > >                         continue;
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > index 376b8dceb3f9..b5abae2366dd 100644
-> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > @@ -259,12 +259,12 @@ static struct kvm_mmu_page *tdp_mmu_next_root(struct kvm *kvm,
-> > >                     kvm_mmu_page_as_id(_root) != _as_id) {              \
-> > >                 } else
-> > >
-> > > -static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu)
-> > > +static struct kvm_mmu_page *tdp_mmu_alloc_sp(struct kvm_vcpu *vcpu, int nid)
-> > >  {
-> > >         struct kvm_mmu_page *sp;
-> > >
-> > >         sp = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_page_header_cache);
-> > > -       sp->spt = kvm_mmu_sp_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache,
-> > > +       sp->spt = kvm_mmu_sp_memory_cache_alloc(&vcpu->arch.mmu_shadow_page_cache[nid],
-> > >                                                 &vcpu->arch.mmu_shadow_page_cache_lock);
-> > >
-> > >         return sp;
-> > > @@ -317,7 +317,7 @@ hpa_t kvm_tdp_mmu_get_vcpu_root_hpa(struct kvm_vcpu *vcpu)
-> > >                         goto out;
-> > >         }
-> > >
-> > > -       root = tdp_mmu_alloc_sp(vcpu);
-> > > +       root = tdp_mmu_alloc_sp(vcpu, numa_mem_id());
-> >
-> > Might be worth calling out somewhere that the root page is just
-> > allocated based on where the thread allocating it runs.
-> >
->
-> How about a comment just up here or do you prefer at tdp_mmu_roots in
-> struct kvm_arch{}?
+> It can totally be a function as well. I will make it function in the
+> next version.
 
-Here or just in the commit description or cover letter.
-Thanks!
+Awesome, thanks.
 
 >
-> > >         tdp_mmu_init_sp(root, NULL, 0, role);
-> > >
-> > >         refcount_set(&root->tdp_mmu_root_count, 1);
-> > > @@ -1149,7 +1149,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> > >         struct kvm *kvm = vcpu->kvm;
-> > >         struct tdp_iter iter;
-> > >         struct kvm_mmu_page *sp;
-> > > -       int ret = RET_PF_RETRY;
-> > > +       int ret = RET_PF_RETRY, nid;
-> > >
-> > >         kvm_mmu_hugepage_adjust(vcpu, fault);
-> > >
-> > > @@ -1178,11 +1178,12 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-> > >                     !is_large_pte(iter.old_spte))
-> > >                         continue;
-> > >
-> > > +               nid = kvm_pfn_to_page_table_nid(fault->pfn);
-> > >                 /*
-> > >                  * The SPTE is either non-present or points to a huge page that
-> > >                  * needs to be split.
-> > >                  */
-> > > -               sp = tdp_mmu_alloc_sp(vcpu);
-> > > +               sp = tdp_mmu_alloc_sp(vcpu, nid);
-> > >                 tdp_mmu_init_child_sp(sp, &iter);
-> > >
-> > >                 sp->nx_huge_page_disallowed = fault->huge_page_disallowed;
-> > > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > > index d96c8146e9ba..4f3db7ffeba8 100644
-> > > --- a/virt/kvm/kvm_main.c
-> > > +++ b/virt/kvm/kvm_main.c
-> > > @@ -415,7 +415,7 @@ static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
-> > >         if (mc->kmem_cache)
-> > >                 return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
-> > >         else
-> > > -               return (void *)__get_free_page(gfp_flags);
-> > > +               return kvm_mmu_get_free_page(mc->node, gfp_flags);
-> >
-> > You could do part of this change in the commit that introduced
-> > kvm_mmu_get_free_page too.
 >
-> Yeah, I can do it there as well. No strong opinions. I will update in
-> the next version.
->
-> > >  }
+> > >  #endif
+> > > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> > > index 76de36e56cdf..9c70ce95e51f 100644
+> > > --- a/include/linux/kvm_types.h
+> > > +++ b/include/linux/kvm_types.h
+> > > @@ -97,6 +97,8 @@ struct kvm_mmu_memory_cache {
+> > >         struct kmem_cache *kmem_cache;
+> > >         int capacity;
+> > >         void **objects;
+> > > +       /* Node on which memory should be allocated by default */
+> > > +       int node;
+> > >  };
+> > >  #endif
 > > >
-> > >  int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
 > > > --
 > > > 2.39.0.314.g84b9a713c41-goog
 > > >
