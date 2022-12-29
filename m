@@ -2,139 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 452F0658CB9
-	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 13:34:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 232BC658CFF
+	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 14:02:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233313AbiL2MeJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 07:34:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
+        id S229783AbiL2NCW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 08:02:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45638 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233263AbiL2MeF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Dec 2022 07:34:05 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E23313DD4;
-        Thu, 29 Dec 2022 04:33:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672317226; x=1703853226;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=zHreUtqmKvOEGxfPmwFyAvdSxxzgj/SeSN1QmXbCurY=;
-  b=kZLTBsk2Qi0hYJvbUKDC9pkUDY+5f+V2IeQbuPDFRp2bS4tKvjSqAFa8
-   /6BsSgkW//kneHdQebAJ6gY0oGtHrby+nTATDl1AhJ96uXfrM/tNRlxBL
-   0LNi0RYV8Q/BHD8gq1b7hLRLrPKA2sCAAtzZJtdxtMB9Q8EM5rnli/aIp
-   oF34sRZfNghBnric+yZHTv70/IuJecUnV4g17RQVBv7WnCc5CPedo4Mrb
-   /VgkTeiD7YXsPy0Eyp8JVH1OF3mdoxywdudtfpT+IOJrC8Gokdfg6B8E0
-   hvGapkDG1p0KEN6tc+raKxpkpXswbWfRCIKKG6ctOxvP5BYMPuUludij4
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10574"; a="300720474"
-X-IronPort-AV: E=Sophos;i="5.96,284,1665471600"; 
-   d="scan'208";a="300720474"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Dec 2022 04:33:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10574"; a="684195741"
-X-IronPort-AV: E=Sophos;i="5.96,284,1665471600"; 
-   d="scan'208";a="684195741"
-Received: from tdx-lm.sh.intel.com ([10.239.53.27])
-  by orsmga008.jf.intel.com with ESMTP; 29 Dec 2022 04:33:43 -0800
-From:   Wei Wang <wei.w.wang@intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Wei Wang <wei.w.wang@intel.com>
-Subject: [PATCH v2] KVM: move KVM_CAP_DEVICE_CTRL to the generic check
-Date:   Thu, 29 Dec 2022 20:33:38 +0800
-Message-Id: <20221229123338.4142-1-wei.w.wang@intel.com>
-X-Mailer: git-send-email 2.27.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229625AbiL2NCU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Dec 2022 08:02:20 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C83D2D3
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 05:02:19 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 158ECB81913
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 13:02:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE07C433EF;
+        Thu, 29 Dec 2022 13:02:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672318936;
+        bh=rrOMS6JWy1WFDiSkkmKZJnG4y5ugZHFgDcLi/ReaVIw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=nulAoRrgHQIkkvpDhF2T7ryJX3wU9J9R3QJneHPj7oOfTv1udwAibE+3oDzA8R3Q8
+         PhkZ/X1x0Mr/icqFIEHli61jQzuv8sFBs95UV77LDx7JewBHpi5h3lennbwOL28OAn
+         VLflfRkg4SUbr5atAa/OE1+vAUniEq/5v+U5gSk5N6kKKXAOfkaoa/s3oXYqOOJrj6
+         wM7Btc207MM3hBJZ/1BFEGPvt5cpwFx/1VKgjArMTigyoQPjBgviYezwfUdYYU/4lC
+         5UybB/cNffKvfUKI6opXSUeSCWiButuj5LO2VAw/5vB+W3Q2JWRsze0INsDmuwkRS6
+         990fEywOyKFtw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pAsY2-00Fhw7-Ca;
+        Thu, 29 Dec 2022 13:02:14 +0000
+Date:   Thu, 29 Dec 2022 13:00:55 +0000
+Message-ID: <87zgb6e54o.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     catalin.marinas@arm.com, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, scott@os.amperecomputing.com,
+        keyur@os.amperecomputing.com
+Subject: Re: [PATCH 1/3] KVM: arm64: nv: only emulate timers that have not yet fired
+In-Reply-To: <20220824060304.21128-2-gankulkarni@os.amperecomputing.com>
+References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+        <20220824060304.21128-2-gankulkarni@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, scott@os.amperecomputing.com, keyur@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM_CAP_DEVICE_CTRL allows userspace to check if the kvm_device
-framework (e.g. KVM_CREATE_DEVICE) is supported by KVM. Move
-KVM_CAP_DEVICE_CTRL to the generic check for the two reasons:
-1) it already supports arch agnostic usages (i.e. KVM_DEV_TYPE_VFIO).
-For example, userspace VFIO implementation may needs to create
-KVM_DEV_TYPE_VFIO on x86, riscv, or arm etc. It is simpler to have it
-checked at the generic code than at each arch's code.
-2) KVM_CREATE_DEVICE has been added to the generic code.
+On Wed, 24 Aug 2022 07:03:02 +0100,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> From: D Scott Phillips <scott@os.amperecomputing.com>
+> 
+> The timer emulation logic goes into an infinite loop when the NestedVM(L2)
+> timer is being emulated.
+> 
+> While the CPU is executing in L1 context, the L2 timers are emulated using
+> host hrtimer. When the delta of cval and current time reaches zero, the
+> vtimer interrupt is fired/forwarded to L2, however the emulation function
+> in Host-Hypervisor(L0) is still restarting the hrtimer with an expiry time
+> set to now, triggering hrtimer to fire immediately and resulting in a
+> continuous trigger of hrtimer and endless looping in the timer emulation.
+> 
+> Adding a fix to avoid restarting of the hrtimer if the interrupt is
+> already fired.
+> 
+> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
+> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> ---
+>  arch/arm64/kvm/arch_timer.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> index 2371796b1ab5..27a6ec46803a 100644
+> --- a/arch/arm64/kvm/arch_timer.c
+> +++ b/arch/arm64/kvm/arch_timer.c
+> @@ -472,7 +472,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
+>  		return;
+>  	}
+>  
+> -	soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+> +	if (!ctx->irq.level)
+> +		soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+>  }
+>  
+>  static void timer_save_state(struct arch_timer_context *ctx)
 
-Signed-off-by: Wei Wang <wei.w.wang@intel.com>
----
- arch/arm64/kvm/arm.c       | 1 -
- arch/powerpc/kvm/powerpc.c | 1 -
- arch/riscv/kvm/vm.c        | 1 -
- arch/s390/kvm/kvm-s390.c   | 1 -
- virt/kvm/kvm_main.c        | 1 +
- 5 files changed, 1 insertion(+), 4 deletions(-)
+I think this is a regression introduced by bee038a67487 ("KVM:
+arm/arm64: Rework the timer code to use a timer_map"), and you can see
+it because the comment in this function doesn't make much sense
+anymore.
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9c5573bc4614..190e9c3b10a7 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -212,7 +212,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 		r = vgic_present;
- 		break;
- 	case KVM_CAP_IOEVENTFD:
--	case KVM_CAP_DEVICE_CTRL:
- 	case KVM_CAP_USER_MEMORY:
- 	case KVM_CAP_SYNC_MMU:
- 	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
-diff --git a/arch/powerpc/kvm/powerpc.c b/arch/powerpc/kvm/powerpc.c
-index 04494a4fb37a..21f9fbe96f6a 100644
---- a/arch/powerpc/kvm/powerpc.c
-+++ b/arch/powerpc/kvm/powerpc.c
-@@ -541,7 +541,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_ONE_REG:
- 	case KVM_CAP_IOEVENTFD:
--	case KVM_CAP_DEVICE_CTRL:
- 	case KVM_CAP_IMMEDIATE_EXIT:
- 	case KVM_CAP_SET_GUEST_DEBUG:
- 		r = 1;
-diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-index 65a964d7e70d..6efe93b282e1 100644
---- a/arch/riscv/kvm/vm.c
-+++ b/arch/riscv/kvm/vm.c
-@@ -57,7 +57,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 
- 	switch (ext) {
- 	case KVM_CAP_IOEVENTFD:
--	case KVM_CAP_DEVICE_CTRL:
- 	case KVM_CAP_USER_MEMORY:
- 	case KVM_CAP_SYNC_MMU:
- 	case KVM_CAP_DESTROY_MEMORY_REGION_WORKS:
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index e4890e04b210..191d220b6a30 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -567,7 +567,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_S390_CSS_SUPPORT:
- 	case KVM_CAP_IOEVENTFD:
--	case KVM_CAP_DEVICE_CTRL:
- 	case KVM_CAP_S390_IRQCHIP:
- 	case KVM_CAP_VM_ATTRIBUTES:
- 	case KVM_CAP_MP_STATE:
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 582757ebdce6..84073464aea0 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4524,6 +4524,7 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
- #endif
- 	case KVM_CAP_BINARY_STATS_FD:
- 	case KVM_CAP_SYSTEM_EVENT_DATA:
-+	case KVM_CAP_DEVICE_CTRL:
- 		return 1;
- 	default:
- 		break;
+Does the following work for you, mostly restoring the original code?
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index ad2a5df88810..4945c5b96f05 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -480,7 +480,7 @@ static void timer_emulate(struct arch_timer_context *ctx)
+ 	 * scheduled for the future.  If the timer cannot fire at all,
+ 	 * then we also don't need a soft timer.
+ 	 */
+-	if (!kvm_timer_irq_can_fire(ctx)) {
++	if (should_fire || !kvm_timer_irq_can_fire(ctx)) {
+ 		soft_timer_cancel(&ctx->hrtimer);
+ 		return;
+ 	}
+
 -- 
-2.27.0
-
+Without deviation from the norm, progress is not possible.
