@@ -2,82 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D2B3E6591F1
-	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 22:04:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C19B659200
+	for <lists+kvm@lfdr.de>; Thu, 29 Dec 2022 22:07:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234101AbiL2VEU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 16:04:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35174 "EHLO
+        id S234153AbiL2VHP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 16:07:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbiL2VES (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Dec 2022 16:04:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDE1638A2
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 13:03:39 -0800 (PST)
+        with ESMTP id S233889AbiL2VHN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Dec 2022 16:07:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4314E1E4
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 13:06:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672347819;
+        s=mimecast20190719; t=1672347989;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=lo9jTUCpeOz7gOnHi1O8cWhVViGe+xtdWqoEDHttnaA=;
-        b=jNuQrlDZNOa/QIk4PltL74Kkwp3yD3q6wv5DvZBU9rs931MnIHVuJtTmmvqWZhgdrGVfcQ
-        42BsB3wlpDwCPLaPaOCmJ9i+5u2APMffvwgbvA4RxfsFPAYKSYFXW1t2IG6FyX4/X8/vMi
-        s2oucEvpC+tuJBUhZSPA4lm78nLdtag=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=it+B1PS32dTGPCypZI1aX6Ei43ZO2hTLVkDexUvu2GQ=;
+        b=ac7MxG5VAy52JNbTCyvMGWawtJF0Rzfztc+8H+AMQ1HQ0Zo/43H5VVSKVMguKx8fvS77OJ
+        3q/9XbFVd7ed3ycE4os6JoY8yG11RlXZxsOcKrVpzIDVWpYwbFBsHVaoMbex0BicGGPcSZ
+        CwDSI/WJGxw64znkuO1JQU1BIYYdsVk=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-121-or4q6OKDPYiyy04c4V_1bA-1; Thu, 29 Dec 2022 16:03:37 -0500
-X-MC-Unique: or4q6OKDPYiyy04c4V_1bA-1
-Received: by mail-ej1-f69.google.com with SMTP id xh12-20020a170906da8c00b007413144e87fso13060654ejb.14
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 13:03:37 -0800 (PST)
+ us-mta-266-3qpcaH4dNcmAd5VOqhgXRw-1; Thu, 29 Dec 2022 16:06:27 -0500
+X-MC-Unique: 3qpcaH4dNcmAd5VOqhgXRw-1
+Received: by mail-ej1-f71.google.com with SMTP id dr5-20020a170907720500b00808d17c4f27so12919153ejc.6
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 13:06:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lo9jTUCpeOz7gOnHi1O8cWhVViGe+xtdWqoEDHttnaA=;
-        b=M4Iy/xusbYOG8wjVL7oFKk2An916nX8QQY+XEM4Z1/YXgGaemC515rRLvHmDP+2kIY
-         ETUJMXGxMnhIRFnevyD62x1eE7LkvcbG9WPNpgwo87LPEOThAESSWyVwSLX2G5NVmz4Y
-         VgJ8pFIUVUKLQhvWBMWHw7CX7T98moSRLoWBt9s5U1ijLIZLLsmckcGFGfyIvosD4ID/
-         5VMqD5GAIH0r3iriq+QBXXMVJE1JjIz5zVOqv5WyFbp0TZg3wWsUottofP/Oae8A4akT
-         aBY2ZZOM1/mzhqgwSaVvBwOYiRXRDmrm3LiMkp3MaM5wTilYOzmWRIf8fke2bgzOoujF
-         LExw==
-X-Gm-Message-State: AFqh2kpzwJxFa/FOQiQPSMpLXE8F+VtZmTLlQPfRhAXna0heCvYmUa5y
-        Qa4yvhWqcC0zrlVUMpW4r5BGD+yDozc1zXsZ0O68YJY391fML/Cjl8R3PZnoORb5IZxCZGTYpzT
-        IJgnHyGajSaWB
-X-Received: by 2002:a17:906:aed6:b0:7af:170f:512 with SMTP id me22-20020a170906aed600b007af170f0512mr25558609ejb.38.1672347816481;
-        Thu, 29 Dec 2022 13:03:36 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXsSoT6wR4FWMpyJ/uY8ZWT39t7im2HPHYutYgdfKoiG7UkuXRi+X/UjOMzo3+kzPOHwAzSPpA==
-X-Received: by 2002:a17:906:aed6:b0:7af:170f:512 with SMTP id me22-20020a170906aed600b007af170f0512mr25558601ejb.38.1672347816291;
-        Thu, 29 Dec 2022 13:03:36 -0800 (PST)
+        bh=it+B1PS32dTGPCypZI1aX6Ei43ZO2hTLVkDexUvu2GQ=;
+        b=jAMMRL76JKo+DZ/Fmvnr5cTXNudZMhWJLXx3qU0UDqvNjBHzg/w5K4tPMowMrXR/sH
+         RTzzTQmNomXdYxX+A3bHq7GH4ciwuofwkRlTdQ3JJFKowm50pTcpgyWskzb6JdwPtlcU
+         IWTGg1CBE0BYEoCb6G9sbCVeunz6wHeAslZOV7b2Dy5c86s5kcnTawKPc53HkEEBjf4u
+         zeR+Bq6l5wxrssWRtIB3QZCAEXQvvNfFUZZufIUzDlSJ4NlnBUc5HcXGKakXAXmVobbU
+         n+7SccFKct1L54naZbLPRn2lGwGVagnpF3be6flDP/RFokfyvXhDlobOFx4aMznaE67d
+         TOQw==
+X-Gm-Message-State: AFqh2kqoRG+KmsLHbyDoGK5PUQryrNEKVRnEU4oR8ayyJNnxfGlhP/TT
+        x75EuMt0jAg7OMJiFmP8rP/1STseZccYEeN94jgQmCitl1TJ/moQGrOCC31U3BoWzsFTfzBREPY
+        r/M7KGkkpijz9
+X-Received: by 2002:a17:907:8c0a:b0:7c4:edee:28c0 with SMTP id ta10-20020a1709078c0a00b007c4edee28c0mr33927893ejc.24.1672347986714;
+        Thu, 29 Dec 2022 13:06:26 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvQL7mNzDT9TfcU620OIPHvZr6KsbN//Mw8YFdfU0TCUvExqxFpww9gz67fGiOGe/8ra1uDMQ==
+X-Received: by 2002:a17:907:8c0a:b0:7c4:edee:28c0 with SMTP id ta10-20020a1709078c0a00b007c4edee28c0mr33927879ejc.24.1672347986450;
+        Thu, 29 Dec 2022 13:06:26 -0800 (PST)
 Received: from ?IPV6:2001:b07:6468:f312::529? ([2001:b07:6468:f312::529])
-        by smtp.googlemail.com with ESMTPSA id u17-20020a170906409100b00779cde476e4sm8874485ejj.62.2022.12.29.13.03.34
+        by smtp.googlemail.com with ESMTPSA id c10-20020a17090618aa00b00846734faa9asm8878423ejf.164.2022.12.29.13.06.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Dec 2022 13:03:35 -0800 (PST)
-Message-ID: <a03a298d-dfd0-b1ed-2375-311044054f1a@redhat.com>
-Date:   Thu, 29 Dec 2022 22:03:34 +0100
+        Thu, 29 Dec 2022 13:06:25 -0800 (PST)
+Message-ID: <49636b4c-10e1-8cec-efdf-e2bd4b832a9e@redhat.com>
+Date:   Thu, 29 Dec 2022 22:06:24 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.5.1
-Subject: Re: [RFC PATCH 1/2] KVM: x86/xen: Fix use-after-free in
- kvm_xen_eventfd_update()
+Subject: Re: [PATCH 5/5] KVM: x86/mmu: Move kvm_tdp_mmu_map()'s prolog and
+ epilog to its caller
 Content-Language: en-US
-To:     Michal Luczaj <mhal@rbox.co>,
-        David Woodhouse <dwmw2@infradead.org>, kvm@vger.kernel.org
-Cc:     paul@xen.org, seanjc@google.com
-References: <20221222203021.1944101-1-mhal@rbox.co>
- <20221222203021.1944101-2-mhal@rbox.co>
- <42483e26-10bd-88d2-308a-3407a0c54d55@redhat.com>
- <ea97ca88-b354-e96b-1a16-0a1be29af50c@rbox.co>
- <af3846d2-19b2-543d-8f5f-d818dbdffc75@redhat.com>
- <532cef98-1f0f-7011-7793-cef5b37397fc@rbox.co>
- <4ed92082-ef81-3126-7f55-b0aae6e4a215@redhat.com>
- <9b09359f88e4da1037139eb30ff4ae404beee866.camel@infradead.org>
- <6d2e2043-dc44-e0c0-b357-c5480d7c4e7c@redhat.com>
- <2ac40491-7efc-64bf-d7b8-b10dc4346094@rbox.co>
+To:     David Matlack <dmatlack@google.com>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Robert Hoo <robert.hu@linux.intel.com>,
+        Greg Thelen <gthelen@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>
+References: <20221213033030.83345-1-seanjc@google.com>
+ <20221213033030.83345-6-seanjc@google.com> <Y6H2o2ADCALDA2oL@google.com>
+ <Y6NRJTboZnjKbAL7@google.com> <Y63v0UnlI+wrrXfa@google.com>
 From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <2ac40491-7efc-64bf-d7b8-b10dc4346094@rbox.co>
+In-Reply-To: <Y63v0UnlI+wrrXfa@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -90,13 +87,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/29/22 03:12, Michal Luczaj wrote:
-> It looks like there are more places with such bad ordering:
-> kvm_vm_ioctl_set_msr_filter(), kvm_vm_ioctl_set_pmu_event_filter().
+On 12/29/22 20:51, David Matlack wrote:
+> Your proposal (below) to split out the "lower half" of the page fault
+> handling routine works now because that's where all the divergence is.
+> But with the common MMU there's also going to be divergence in the fast
+> page fault handler. So I prefer to just keep the routines separate to
+> avoid thrashing down the road.
 
-These are easy to fix because the unlock can just be moved before 
-synchronize_srcu() or synchronize_srcu_expedited().  Would you like to 
-send a patch?
+Can you put the changes at the beginning of the common MMU series? 
+Large parts of the whole common MMU refactoring can be merged piece by 
+piece, so they can be taken as soon as they're ready.
 
 Paolo
 
