@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A0B80659411
-	for <lists+kvm@lfdr.de>; Fri, 30 Dec 2022 02:36:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BBFC2659412
+	for <lists+kvm@lfdr.de>; Fri, 30 Dec 2022 02:37:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234337AbiL3Bg6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 29 Dec 2022 20:36:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39466 "EHLO
+        id S234340AbiL3BhA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 29 Dec 2022 20:37:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234319AbiL3Bgz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 29 Dec 2022 20:36:55 -0500
+        with ESMTP id S234308AbiL3Bg5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 29 Dec 2022 20:36:57 -0500
 Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5DA1649E
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 17:36:54 -0800 (PST)
-Received: by mail-pl1-x64a.google.com with SMTP id y8-20020a170902b48800b00192a600df83so1269977plr.15
-        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 17:36:54 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71D6716490
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 17:36:56 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id l15-20020a170903244f00b001927c3a0055so8120634pls.6
+        for <kvm@vger.kernel.org>; Thu, 29 Dec 2022 17:36:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3wGskcCyiYz5CCtqFByr0hpAIpWgYsQbsu2vOAdkTFQ=;
-        b=VH4BlhLtUh7NNIHtveLcLoQzm00dpUqe/vWrdfl4wVlwjAAEdZDSls8kUoYlT2mEsu
-         YHPG29Vm1Ty1zAzUjCtvEC68zllsb/6emETnG9x0Qzwyd1WRI45ZJhSxVf6QTlInbx5r
-         rVt+4XB8fY/ilGWc95Tzc6ikK0H7J4w3fGe3KssTydQrxeaGilyFYlFIp2hSTWQKeyqa
-         ziwl8j5EYwE6mjx6t8wLCNSEOfXqu5tBX5c3ZrY+wTYUrHHsZQUMCczwERFBn3VDACJu
-         faw3Z+n5jCfyz6RRF/2mUlT9LWdPwihM52bKApFnOC17jc5iflo6s5aSomQVvg1gYGPT
-         7Jdw==
+        bh=K693M+RJONwJVc6/926ikzKQZnNuLaPR/xF052DwOT4=;
+        b=kc2DyXWGf/HZakft0TEaOOUlqL94MGjmuvu3SSuVOspxKUU3yBcvHDgGd9u1cmg9VG
+         dYIqdiMFNMtn45evyHzRwSdCpm7Q4RlaADc43y8yDn+NDvrPhDiTaEeJRtrI0/iH6kZA
+         06ojrjKfTENtPcetE+771PXgDxKVNdT+2n6RqNjvSYB+rb8K0UWMidugV/j0NOk2T9QT
+         +cM+qUhBXnY6J46vvjAs7JNLwsdFfiPgq1D3kwRQXttxxPS7nos+AETNKE1qtX3SsAle
+         SMhxt3gCX918hbtNlqyTOlyJnR+R204GtCFwq8gadS/RP1YspYX6NU0DHFkuhlKhrgHr
+         SqGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3wGskcCyiYz5CCtqFByr0hpAIpWgYsQbsu2vOAdkTFQ=;
-        b=BWtx1jUZAE0/GZHA6i4PnBxiZvzrh5TBfS59Tng8CnmAcshiE74n5+VVd+J+FTjNEJ
-         6S9xrEV52elmFNN1gC80e+BCzIjZV7XZbP9yKBz73bYVeJ5RFaZiPVSlnyDuq0RkCIzi
-         V13EYfnr24q9yR30wPbKkhiNb4RJXvfIhicUQq848b9f71pIBQ9WUrJmnPtO4imaJ4g8
-         n2mXyxVy3cyJ4B9qASPkp66OuGFk2/nedPDcBx0igB6XYDQDxir6yfuXAVJ22Rh8RC68
-         U/LC6NzUXE8hrhzKVrz6S2weSqL6CsagD6lsd5Bb97taYjXlIzbJLe/P5ErFXp1ANjFd
-         PaUA==
-X-Gm-Message-State: AFqh2kowKSJr7qZLYophCFIZb3UrigZWyMknWGuYAQOdLm5ZJ4M6tMLb
-        hC65j2YOb1S9RtCBZ70YHTmyoxqg+dyxOSpP0/gDh3q0XrEuNh7+CKAUNiifoMEiPFtZmgxYAJr
-        EKH1TXOITymhd0DumHSDPVLS7GNDnvEfsIQRq2dm09j7ZcK7qfDeT1GplyAHVcflpzB6z
-X-Google-Smtp-Source: AMrXdXvZ30Q7JZa2DFQwpXkwjcxF+CxgqH8AdX9FfaaHAjk8AKJPIXRT4RzoMV+ODadBF9nqpU/Ix5/QaRoyrmfo
+        bh=K693M+RJONwJVc6/926ikzKQZnNuLaPR/xF052DwOT4=;
+        b=MF1O3X2p2nSBdA4YqBa4WHH8TUQzPhvrunwM/LfgEJbFheFudtFuR9LGmGKaaEvdgk
+         /IXBrxCMsA+WA5nuNTvJA64gSMSAZXSAf5HxSIimdw8aeMmnnRoTT78OsZMxkSh7iI6U
+         sNxL4APOXX+eQC8mtTVFRZGEJi3Yv32FhIOF0pClb9wi+gJe0uAPMVkTDoFMGkgCPLRP
+         S40sYXQ++sJHydb3r0i5lY2YOxzij2D8bBYXYqC1vCV4jyaPfwHUrn0Vh+bCLsUlo7RC
+         9JfcnaNNxi2XrcboCbrXHwa9cTflf8q+M1nJ9TAOxbH3Ga/DfrYiG2T78okJg4nY0jtT
+         J/jA==
+X-Gm-Message-State: AFqh2krmWOK5Fyj+2Pvx378x0QxacSlgrvHCII3/ejQQxu32qS4Z0+5/
+        1mw6uIg2+npOnIWq/Y6bs4djWOi+pbkgvflJrQXbkT/oihhkX0NfeNNxqyi0t7a89NkGXzsA2Vx
+        B1rFwVvP0x74OcoXDglKuoJ9dfYsIeRvc7ZoQRkzFCFsj1NHuLh1J7aZYyo4V17BInMTp
+X-Google-Smtp-Source: AMrXdXshoWXP+Nr8T94ckUdDn9Pueqkb1qKwShrQjIknX5+l9GKzZl8QCwzKoAkX/y0IctirxkAsBUwW16UX2zQr
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a17:90a:8c10:b0:21d:f016:5685 with SMTP
- id a16-20020a17090a8c1000b0021df0165685mr2800466pjo.27.1672364213902; Thu, 29
- Dec 2022 17:36:53 -0800 (PST)
-Date:   Fri, 30 Dec 2022 01:36:47 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a17:90b:4d83:b0:220:1f03:129b with SMTP
+ id oj3-20020a17090b4d8300b002201f03129bmr176602pjb.0.1672364215620; Thu, 29
+ Dec 2022 17:36:55 -0800 (PST)
+Date:   Fri, 30 Dec 2022 01:36:48 +0000
 In-Reply-To: <20221230013648.2850519-1-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20221230013648.2850519-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221230013648.2850519-2-aaronlewis@google.com>
-Subject: [PATCH v2 1/2] KVM: selftests: Assert that XSAVE supports XTILE in amx_test
+Message-ID: <20221230013648.2850519-3-aaronlewis@google.com>
+Subject: [PATCH v2 2/2] KVM: selftests: Assert that XSAVE supports both XTILE{CFG,DATA}
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -68,31 +68,28 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The check in amx_test that ensures that XSAVE supports XTILE, doesn't
-actually check anything.  It simply returns a bool which the test does
-nothing with.
+The check in amx_test that ensures that XSAVE supports XTILE makes sure
+at least one of the XTILE bits are set, XTILECFG or XTILEDATA, when it
+really should be checking that both are set.
 
-Assert that XSAVE supports XTILE.
+Assert that both XTILECFG and XTILEDATA a set.
 
-Fixes: 5dc19f1c7dd3 ("KVM: selftests: Convert AMX test to use X86_PROPRETY_XXX")
+Fixes: bf70636d9443 ("selftest: kvm: Add amx selftest")
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
 ---
- tools/testing/selftests/kvm/x86_64/amx_test.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tools/testing/selftests/kvm/x86_64/amx_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index bd72c6eb3b670..2f555f5c93e99 100644
+index 2f555f5c93e99..db1b38ca7c840 100644
 --- a/tools/testing/selftests/kvm/x86_64/amx_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -119,9 +119,9 @@ static inline void check_cpuid_xsave(void)
- 	GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
- }
+@@ -121,7 +121,7 @@ static inline void check_cpuid_xsave(void)
  
--static bool check_xsave_supports_xtile(void)
-+static inline void check_xsave_supports_xtile(void)
+ static inline void check_xsave_supports_xtile(void)
  {
--	return __xgetbv(0) & XFEATURE_MASK_XTILE;
-+	GUEST_ASSERT(__xgetbv(0) & XFEATURE_MASK_XTILE);
+-	GUEST_ASSERT(__xgetbv(0) & XFEATURE_MASK_XTILE);
++	GUEST_ASSERT((__xgetbv(0) & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE);
  }
  
  static void check_xtile_info(void)
