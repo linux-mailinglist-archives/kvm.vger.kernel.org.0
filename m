@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 819EC659A80
-	for <lists+kvm@lfdr.de>; Fri, 30 Dec 2022 17:25:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50E6E659A81
+	for <lists+kvm@lfdr.de>; Fri, 30 Dec 2022 17:25:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235240AbiL3QZI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Dec 2022 11:25:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43484 "EHLO
+        id S235238AbiL3QZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Dec 2022 11:25:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229967AbiL3QZG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Dec 2022 11:25:06 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8883963FC
-        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 08:25:04 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id s6-20020a259006000000b00706c8bfd130so22647868ybl.11
-        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 08:25:04 -0800 (PST)
+        with ESMTP id S235239AbiL3QZH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Dec 2022 11:25:07 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D411C137
+        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 08:25:06 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id b16-20020a17090a551000b00225aa26f1dbso9023614pji.8
+        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 08:25:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t9euw23AvLOKmgxif0QMlhmbR+VDi8SZe//P9Qi80Hw=;
-        b=d2EqC9LsNWNcP1sJ1zEpANiizSEGI4Soyly6dW15XDDbSn+Z8uHXx1bA2Ljf+AOxSn
-         6ljD4moSJ7uDcrnRG7pmkLWr5MqO5PCl/7CXp/ER3h1ouRN6C6x5I0k6yc4jwzDuCFNn
-         AV5mElrZQFJT6xYB4xO4VnhypQ12BnIJF44cZtVlpVo75/lY8+kffKMg7svzC3fM3OA1
-         D/mDUoXlNuaHcwnPIPFnvxBJf2cdFuqjq1P/TXi7xNbqrtKJjw3OTc5DVLnDXqCraNAj
-         OciA73njrZHCmrEN4DZudu6JfLTdoFyl1GfwZXd1V/L1ITqkmvD1VFyfWQ/nCzDpsEm/
-         v7sQ==
+        bh=f0C5GuIe1dBEke5RFrB7sVhrtoLubRh+09eyq8bpu38=;
+        b=jgdeIXQYzIIMbPKhgL4kLqlPAPQ+RG2Wy1veKzA6UHZrbtpehEgdieXul6vNX35s2X
+         Tn21NYLGz2x04rB2ezeOil/TPZe/8hhEN0il4o0bMTGKnNDcL6eT06tFeV71p+EFk9kX
+         APjhc3a3Q/W2grGxPMtditmP7wHcJdMQxjXtPs60MvoRTUW9B3U6G0GQ+X+YTn5U6tU0
+         uqBlTNwvtk3CAEKRp9IxZmOuMdk9+knIg17euA0PAOSAd+uT/Cfy9BVrkJ8jWsCMwrac
+         PQn91Sg5cgZJrmoUu0GTrIxgkeMNj+ZNcmGMR3U7AxVgVjEOUD/pUT1V5T1HCPc80WbM
+         NUNA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t9euw23AvLOKmgxif0QMlhmbR+VDi8SZe//P9Qi80Hw=;
-        b=ZOHZBQhR/xq3OGlUZnIWbCxl7XzPO/Xo1g5qPnvse5oup8Kq+rSE53nZeX0GKHgNzX
-         cznh3y8ErEtMOMdGp9NmOMZZmk6lCbGXpxm1gnK5vx0P1zkko3S6m/SYG632xwGrayN3
-         YImOQ8cdfRz9mEz0jpT9eNzu90jFKF3+/tEH2ALBbIwUhjmHkF1uxStAjynmzNUaVaZF
-         LnE0vZBRBl2uAJk6eFq7gby4hwJu78a7hzvv2xkudVHwNTV89sxlgQkgg9TzXKPwN1V3
-         oZxXJCruCFBmx4MeXREDOGmm/wcG72CRRj1TW+FYoTG/kpJlZ9BPP00Ad03WQ6ktOL4A
-         +RIQ==
-X-Gm-Message-State: AFqh2kp0zRNsohqv0XKnvO1Wl9VUa/5R9zsEcJ06nvcbnRsfx7waNFmo
-        NgeH8kI+OMD+IVVMnrFt/ujs31QDsaTZifrZxpCGQukTwNqIfnOtpfhtSUctht5LZFb0VyMXeJW
-        rj2pSwX1XmO3aG4Fiw+p9tgRppFrhgFhZCpVsWiQyuOUbIKl+4Dn8ZSQxY6Lrp3DwirBh
-X-Google-Smtp-Source: AMrXdXv9GeTC2Zs9RvS4SDhRuExvf1F6fCw4NpOW/najOkACnnljgkmHZwI6pqCyIIu9sHF3HBsLslPOVjA892aA
+        bh=f0C5GuIe1dBEke5RFrB7sVhrtoLubRh+09eyq8bpu38=;
+        b=fFK12rsijIaAfj2nsGEFqfajNptUZaQOw7pKhTRHhWKrLLj4qEVI3enl6H5+EbSfOb
+         RI17DuJhbuJcwjo0HgdhcKJ7WXTM8p1LUt0fPkRxWT2nJ4IJcl4p5CSizyRHAVaY3Szn
+         oml64YTXczQ25+E1PGA/E/yDq9XpeFkxBk3qiytdEDLryoWNgNRaQ2BcOI7orzIC6HY/
+         Tz1SMGFoSi8866JlKPyA5uKC/HKq18ukqZW2hW4UCGbQF9ApHpibFWH2FRI/KdNhobaR
+         a3568ykV0L7IHij0ucTzqULf76xsa+WlRTS6QpGj0/dE33knjyY3fBcBwoyPn6bnYNMk
+         n8dw==
+X-Gm-Message-State: AFqh2kpIRrQ/oxLNd9EWG2ztAvHia+AB/I19cF/wKFstd4I7QoD4r0ZZ
+        OVY+9FOrKiyNrTBRDHKaZgOwQwWZfgkCmokHo8p2xKgRmJrZB/KKFKFXFtHja9vR+8IH+hZr1Ff
+        C9aqttwIG50mWPmr3OyCgLDdge3pnTu4fc16fIlIrYBiUYl/+RtM4VW3pNogCmquxNdo7
+X-Google-Smtp-Source: AMrXdXsUsWHsXzmZhnFE6ZaD/6jagcSMucA7McVfwdsc30amZTvpzlD7IRZUbCsYepcWDuS+iZKpdTomWsiAFRUd
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a81:7103:0:b0:478:831e:4a63 with SMTP
- id m3-20020a817103000000b00478831e4a63mr1531932ywc.425.1672417503715; Fri, 30
- Dec 2022 08:25:03 -0800 (PST)
-Date:   Fri, 30 Dec 2022 16:24:39 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a62:30c6:0:b0:581:6059:b7c8 with SMTP
+ id w189-20020a6230c6000000b005816059b7c8mr1001008pfw.26.1672417505490; Fri,
+ 30 Dec 2022 08:25:05 -0800 (PST)
+Date:   Fri, 30 Dec 2022 16:24:40 +0000
 In-Reply-To: <20221230162442.3781098-1-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20221230162442.3781098-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221230162442.3781098-4-aaronlewis@google.com>
-Subject: [PATCH v2 3/6] KVM: x86: Clear all supported AMX xfeatures if they
- are not all set
+Message-ID: <20221230162442.3781098-5-aaronlewis@google.com>
+Subject: [PATCH v2 4/6] KVM: selftests: Hoist XGETBV and XSETBV to make them
+ more accessible
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -69,33 +69,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Be a good citizen and don't allow any of the supported AMX xfeatures[1]
-to be set if they can't all be set.  That way userspace or a guest
-doesn't fail if it attempts to set them in XCR0.
+The instructions XGETBV and XSETBV are useful to other tests.  Move
+them to processor.h to make them available to be used more broadly.
 
-[1] CPUID.(EAX=0DH,ECX=0):EAX.XTILE_CFG[bit-17]
-    CPUID.(EAX=0DH,ECX=0):EAX.XTILE_DATA[bit-18]
+No functional change intended.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+Reviewed-by: Jim Mattson <jmattson@google.com>
 ---
- arch/x86/kvm/cpuid.c | 3 +++
- 1 file changed, 3 insertions(+)
+ .../selftests/kvm/include/x86_64/processor.h  | 19 +++++++++++++++
+ tools/testing/selftests/kvm/x86_64/amx_test.c | 24 +++----------------
+ 2 files changed, 22 insertions(+), 21 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 89ad8cd865173..bdccc4ddb45b1 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -866,6 +866,9 @@ static u64 sanitize_xcr0(u64 xcr0) {
- 	if ((xcr0 & mask) != mask)
- 		xcr0 &= ~XFEATURE_MASK_AVX512;
- 
-+	if ((xcr0 & XFEATURE_MASK_XTILE) != XFEATURE_MASK_XTILE)
-+		xcr0 &= ~XFEATURE_MASK_XTILE;
-+
- 	return xcr0;
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index 2a5f47d513884..5f06d6f27edf7 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -493,6 +493,25 @@ static inline void set_cr4(uint64_t val)
+ 	__asm__ __volatile__("mov %0, %%cr4" : : "r" (val) : "memory");
  }
  
++static inline u64 xgetbv(u32 index)
++{
++	u32 eax, edx;
++
++	__asm__ __volatile__("xgetbv;"
++		     : "=a" (eax), "=d" (edx)
++		     : "c" (index));
++	return eax | ((u64)edx << 32);
++}
++
++static inline void xsetbv(u32 index, u64 value)
++{
++	u32 eax = value;
++	u32 edx = value >> 32;
++
++	__asm__ __volatile__("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
++}
++
++
+ static inline struct desc_ptr get_gdt(void)
+ {
+ 	struct desc_ptr gdt;
+diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
+index bd72c6eb3b670..4b733ad218313 100644
+--- a/tools/testing/selftests/kvm/x86_64/amx_test.c
++++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
+@@ -68,24 +68,6 @@ struct xtile_info {
+ 
+ static struct xtile_info xtile;
+ 
+-static inline u64 __xgetbv(u32 index)
+-{
+-	u32 eax, edx;
+-
+-	asm volatile("xgetbv;"
+-		     : "=a" (eax), "=d" (edx)
+-		     : "c" (index));
+-	return eax + ((u64)edx << 32);
+-}
+-
+-static inline void __xsetbv(u32 index, u64 value)
+-{
+-	u32 eax = value;
+-	u32 edx = value >> 32;
+-
+-	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
+-}
+-
+ static inline void __ldtilecfg(void *cfg)
+ {
+ 	asm volatile(".byte 0xc4,0xe2,0x78,0x49,0x00"
+@@ -121,7 +103,7 @@ static inline void check_cpuid_xsave(void)
+ 
+ static bool check_xsave_supports_xtile(void)
+ {
+-	return __xgetbv(0) & XFEATURE_MASK_XTILE;
++	return xgetbv(0) & XFEATURE_MASK_XTILE;
+ }
+ 
+ static void check_xtile_info(void)
+@@ -177,9 +159,9 @@ static void init_regs(void)
+ 	cr4 |= X86_CR4_OSXSAVE;
+ 	set_cr4(cr4);
+ 
+-	xcr0 = __xgetbv(0);
++	xcr0 = xgetbv(0);
+ 	xcr0 |= XFEATURE_MASK_XTILE;
+-	__xsetbv(0x0, xcr0);
++	xsetbv(0x0, xcr0);
+ }
+ 
+ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
 -- 
 2.39.0.314.g84b9a713c41-goog
 
