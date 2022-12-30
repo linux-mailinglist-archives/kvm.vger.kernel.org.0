@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50E6E659A81
-	for <lists+kvm@lfdr.de>; Fri, 30 Dec 2022 17:25:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7E10C659A82
+	for <lists+kvm@lfdr.de>; Fri, 30 Dec 2022 17:25:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235238AbiL3QZJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Dec 2022 11:25:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43508 "EHLO
+        id S235248AbiL3QZK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Dec 2022 11:25:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235239AbiL3QZH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Dec 2022 11:25:07 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30D411C137
-        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 08:25:06 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id b16-20020a17090a551000b00225aa26f1dbso9023614pji.8
-        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 08:25:06 -0800 (PST)
+        with ESMTP id S235243AbiL3QZI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Dec 2022 11:25:08 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF0D1C126
+        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 08:25:07 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id 84-20020a630257000000b00477f88d334eso10443073pgc.11
+        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 08:25:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f0C5GuIe1dBEke5RFrB7sVhrtoLubRh+09eyq8bpu38=;
-        b=jgdeIXQYzIIMbPKhgL4kLqlPAPQ+RG2Wy1veKzA6UHZrbtpehEgdieXul6vNX35s2X
-         Tn21NYLGz2x04rB2ezeOil/TPZe/8hhEN0il4o0bMTGKnNDcL6eT06tFeV71p+EFk9kX
-         APjhc3a3Q/W2grGxPMtditmP7wHcJdMQxjXtPs60MvoRTUW9B3U6G0GQ+X+YTn5U6tU0
-         uqBlTNwvtk3CAEKRp9IxZmOuMdk9+knIg17euA0PAOSAd+uT/Cfy9BVrkJ8jWsCMwrac
-         PQn91Sg5cgZJrmoUu0GTrIxgkeMNj+ZNcmGMR3U7AxVgVjEOUD/pUT1V5T1HCPc80WbM
-         NUNA==
+        bh=wjr9E/VJc/P1Y7whIHcfDB38hDTLVG7H3PGa2lFNg8A=;
+        b=CACIqhk2Mcy9Y9dKKCyYNWkoyeo8SOyi5MY5EGh/sBeB/CMrBb1Bdkz1HuAiCAjguz
+         tznjRnLJz/koaRBxmjjGwtTWl9KcyjsLb9YPx3ENhvhVm0jg+ZU0eURKlU+S7hv7IPaE
+         k/8HWOTlBIzM6Y88sZw78xvqSc3u70C4ejU98fTfVj9f1nHtU0LjgF/Qk6+hVPOu73Nm
+         BrzfuDR75ztUq4IJyu6d+vykz3hG6fTOkDOmWZ4OhhrTtdSKjl+Ay6Oeq6uiqwxOfXly
+         ld9ix7EOxcLkbOjA9yBDEoffV01pAZ11Rv9Qzh8qT/KU1D3jm0C8fDN5j/qrqC6yg0l5
+         nktg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=f0C5GuIe1dBEke5RFrB7sVhrtoLubRh+09eyq8bpu38=;
-        b=fFK12rsijIaAfj2nsGEFqfajNptUZaQOw7pKhTRHhWKrLLj4qEVI3enl6H5+EbSfOb
-         RI17DuJhbuJcwjo0HgdhcKJ7WXTM8p1LUt0fPkRxWT2nJ4IJcl4p5CSizyRHAVaY3Szn
-         oml64YTXczQ25+E1PGA/E/yDq9XpeFkxBk3qiytdEDLryoWNgNRaQ2BcOI7orzIC6HY/
-         Tz1SMGFoSi8866JlKPyA5uKC/HKq18ukqZW2hW4UCGbQF9ApHpibFWH2FRI/KdNhobaR
-         a3568ykV0L7IHij0ucTzqULf76xsa+WlRTS6QpGj0/dE33knjyY3fBcBwoyPn6bnYNMk
-         n8dw==
-X-Gm-Message-State: AFqh2kpIRrQ/oxLNd9EWG2ztAvHia+AB/I19cF/wKFstd4I7QoD4r0ZZ
-        OVY+9FOrKiyNrTBRDHKaZgOwQwWZfgkCmokHo8p2xKgRmJrZB/KKFKFXFtHja9vR+8IH+hZr1Ff
-        C9aqttwIG50mWPmr3OyCgLDdge3pnTu4fc16fIlIrYBiUYl/+RtM4VW3pNogCmquxNdo7
-X-Google-Smtp-Source: AMrXdXsUsWHsXzmZhnFE6ZaD/6jagcSMucA7McVfwdsc30amZTvpzlD7IRZUbCsYepcWDuS+iZKpdTomWsiAFRUd
+        bh=wjr9E/VJc/P1Y7whIHcfDB38hDTLVG7H3PGa2lFNg8A=;
+        b=ioaBJ0S/sYff7MI9qHOxGvxURN6Xy8Ixz1tCr34P+zX4rufkdfNqUNPmjmKUDHKrCZ
+         SfavuW2LfbsWfnsTe6Sxd7IG08xfLk87t2R+JC6AfQl0IiFVeA7xzIA+SybF07eSFKf0
+         HBiyJiEgSQt2XUehahmrtG3q4IYdNZK+yCy2cy2JOlPnvnywlIUJFnbjBISP3B6vwpWt
+         VeangM6uN5ADKANyvI/1w0yChiiFy7BfVhI4kR3d7dN5IfOI8au0gv13Fnzq2P6lBrJg
+         C+hUcvNqD6J8HyloZgSFT8nnm2lRZPeLUyDQm/reSQB0Ms5XHLKXs6g38YBBlPidobLy
+         LZYQ==
+X-Gm-Message-State: AFqh2krHCmv3VGMdQnCU7JhvPT/eCQClBAwRQkEZzSlT7s2X/abnrMWv
+        0+wTbszH4E48lhpUEQXu3OfKecVIoKV0ZV+EHzTnasgs2bwGcbm3kSCr1KDRr6Epb/qFio8jFaw
+        S2Y9hbLDW8Yrrv4zNwdSwZiQtV84Qnyi+tfT4Znvia3PufCIc65A/YRrKVSz51dQF8MH2
+X-Google-Smtp-Source: AMrXdXvX86inkt8Gw5ivwZ8h18y7lCjZwIrL2Zq++0XgxfguMo6PjUeGUuCUa5qjoOsJxQfzSlagBKrzUNY4kuy3
 X-Received: from aaronlewis.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:2675])
- (user=aaronlewis job=sendgmr) by 2002:a62:30c6:0:b0:581:6059:b7c8 with SMTP
- id w189-20020a6230c6000000b005816059b7c8mr1001008pfw.26.1672417505490; Fri,
- 30 Dec 2022 08:25:05 -0800 (PST)
-Date:   Fri, 30 Dec 2022 16:24:40 +0000
+ (user=aaronlewis job=sendgmr) by 2002:a05:6a00:4393:b0:56b:e64c:5c7e with
+ SMTP id bt19-20020a056a00439300b0056be64c5c7emr1272345pfb.18.1672417507151;
+ Fri, 30 Dec 2022 08:25:07 -0800 (PST)
+Date:   Fri, 30 Dec 2022 16:24:41 +0000
 In-Reply-To: <20221230162442.3781098-1-aaronlewis@google.com>
 Mime-Version: 1.0
 References: <20221230162442.3781098-1-aaronlewis@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20221230162442.3781098-5-aaronlewis@google.com>
-Subject: [PATCH v2 4/6] KVM: selftests: Hoist XGETBV and XSETBV to make them
- more accessible
+Message-ID: <20221230162442.3781098-6-aaronlewis@google.com>
+Subject: [PATCH v2 5/6] KVM: selftests: Add XFEATURE masks to common code
 From:   Aaron Lewis <aaronlewis@google.com>
 To:     kvm@vger.kernel.org
 Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com,
@@ -69,98 +68,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The instructions XGETBV and XSETBV are useful to other tests.  Move
-them to processor.h to make them available to be used more broadly.
+Add XFEATURE masks to processor.h to make them more broadly available
+in KVM selftests.
 
-No functional change intended.
+They were taken from fpu/types.h, which included a difference in
+spacing between the ones in amx_test from XTILECFG and XTILEDATA, to
+XTILE_CFG and XTILE_DATA.  This has been reflected in amx_test.
 
 Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-Reviewed-by: Jim Mattson <jmattson@google.com>
 ---
- .../selftests/kvm/include/x86_64/processor.h  | 19 +++++++++++++++
- tools/testing/selftests/kvm/x86_64/amx_test.c | 24 +++----------------
- 2 files changed, 22 insertions(+), 21 deletions(-)
+ .../selftests/kvm/include/x86_64/processor.h  | 16 ++++++++++++++
+ tools/testing/selftests/kvm/x86_64/amx_test.c | 22 +++++++------------
+ 2 files changed, 24 insertions(+), 14 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index 2a5f47d513884..5f06d6f27edf7 100644
+index 5f06d6f27edf7..c1132ac277227 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -493,6 +493,25 @@ static inline void set_cr4(uint64_t val)
- 	__asm__ __volatile__("mov %0, %%cr4" : : "r" (val) : "memory");
- }
+@@ -45,6 +45,22 @@
+ #define X86_CR4_SMAP		(1ul << 21)
+ #define X86_CR4_PKE		(1ul << 22)
  
-+static inline u64 xgetbv(u32 index)
-+{
-+	u32 eax, edx;
++#define XFEATURE_MASK_SSE		BIT_ULL(1)
++#define XFEATURE_MASK_YMM		BIT_ULL(2)
++#define XFEATURE_MASK_BNDREGS		BIT_ULL(3)
++#define XFEATURE_MASK_BNDCSR		BIT_ULL(4)
++#define XFEATURE_MASK_OPMASK		BIT_ULL(5)
++#define XFEATURE_MASK_ZMM_Hi256		BIT_ULL(6)
++#define XFEATURE_MASK_Hi16_ZMM		BIT_ULL(7)
++#define XFEATURE_MASK_XTILE_CFG		BIT_ULL(17)
++#define XFEATURE_MASK_XTILE_DATA	BIT_ULL(18)
 +
-+	__asm__ __volatile__("xgetbv;"
-+		     : "=a" (eax), "=d" (edx)
-+		     : "c" (index));
-+	return eax | ((u64)edx << 32);
-+}
++#define XFEATURE_MASK_AVX512		(XFEATURE_MASK_OPMASK \
++					 | XFEATURE_MASK_ZMM_Hi256 \
++					 | XFEATURE_MASK_Hi16_ZMM)
++#define XFEATURE_MASK_XTILE		(XFEATURE_MASK_XTILE_DATA \
++					 | XFEATURE_MASK_XTILE_CFG)
 +
-+static inline void xsetbv(u32 index, u64 value)
-+{
-+	u32 eax = value;
-+	u32 edx = value >> 32;
-+
-+	__asm__ __volatile__("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
-+}
-+
-+
- static inline struct desc_ptr get_gdt(void)
- {
- 	struct desc_ptr gdt;
+ /* Note, these are ordered alphabetically to match kvm_cpuid_entry2.  Eww. */
+ enum cpuid_output_regs {
+ 	KVM_CPUID_EAX,
 diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-index bd72c6eb3b670..4b733ad218313 100644
+index 4b733ad218313..14a7656620d5f 100644
 --- a/tools/testing/selftests/kvm/x86_64/amx_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-@@ -68,24 +68,6 @@ struct xtile_info {
+@@ -33,12 +33,6 @@
+ #define MAX_TILES			16
+ #define RESERVED_BYTES			14
  
- static struct xtile_info xtile;
+-#define XFEATURE_XTILECFG		17
+-#define XFEATURE_XTILEDATA		18
+-#define XFEATURE_MASK_XTILECFG		(1 << XFEATURE_XTILECFG)
+-#define XFEATURE_MASK_XTILEDATA		(1 << XFEATURE_XTILEDATA)
+-#define XFEATURE_MASK_XTILE		(XFEATURE_MASK_XTILECFG | XFEATURE_MASK_XTILEDATA)
+-
+ #define XSAVE_HDR_OFFSET		512
  
--static inline u64 __xgetbv(u32 index)
--{
--	u32 eax, edx;
--
--	asm volatile("xgetbv;"
--		     : "=a" (eax), "=d" (edx)
--		     : "c" (index));
--	return eax + ((u64)edx << 32);
--}
--
--static inline void __xsetbv(u32 index, u64 value)
--{
--	u32 eax = value;
--	u32 edx = value >> 32;
--
--	asm volatile("xsetbv" :: "a" (eax), "d" (edx), "c" (index));
--}
--
- static inline void __ldtilecfg(void *cfg)
+ struct xsave_data {
+@@ -187,14 +181,14 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
+ 	__tilerelease();
+ 	GUEST_SYNC(5);
+ 	/* bit 18 not in the XCOMP_BV after xsavec() */
+-	set_xstatebv(xsave_data, XFEATURE_MASK_XTILEDATA);
+-	__xsavec(xsave_data, XFEATURE_MASK_XTILEDATA);
+-	GUEST_ASSERT((get_xstatebv(xsave_data) & XFEATURE_MASK_XTILEDATA) == 0);
++	set_xstatebv(xsave_data, XFEATURE_MASK_XTILE_DATA);
++	__xsavec(xsave_data, XFEATURE_MASK_XTILE_DATA);
++	GUEST_ASSERT((get_xstatebv(xsave_data) & XFEATURE_MASK_XTILE_DATA) == 0);
+ 
+ 	/* xfd=0x40000, disable amx tiledata */
+-	wrmsr(MSR_IA32_XFD, XFEATURE_MASK_XTILEDATA);
++	wrmsr(MSR_IA32_XFD, XFEATURE_MASK_XTILE_DATA);
+ 	GUEST_SYNC(6);
+-	GUEST_ASSERT(rdmsr(MSR_IA32_XFD) == XFEATURE_MASK_XTILEDATA);
++	GUEST_ASSERT(rdmsr(MSR_IA32_XFD) == XFEATURE_MASK_XTILE_DATA);
+ 	set_tilecfg(amx_cfg);
+ 	__ldtilecfg(amx_cfg);
+ 	/* Trigger #NM exception */
+@@ -206,11 +200,11 @@ static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
+ 
+ void guest_nm_handler(struct ex_regs *regs)
  {
- 	asm volatile(".byte 0xc4,0xe2,0x78,0x49,0x00"
-@@ -121,7 +103,7 @@ static inline void check_cpuid_xsave(void)
- 
- static bool check_xsave_supports_xtile(void)
- {
--	return __xgetbv(0) & XFEATURE_MASK_XTILE;
-+	return xgetbv(0) & XFEATURE_MASK_XTILE;
- }
- 
- static void check_xtile_info(void)
-@@ -177,9 +159,9 @@ static void init_regs(void)
- 	cr4 |= X86_CR4_OSXSAVE;
- 	set_cr4(cr4);
- 
--	xcr0 = __xgetbv(0);
-+	xcr0 = xgetbv(0);
- 	xcr0 |= XFEATURE_MASK_XTILE;
--	__xsetbv(0x0, xcr0);
-+	xsetbv(0x0, xcr0);
- }
- 
- static void __attribute__((__flatten__)) guest_code(struct tile_config *amx_cfg,
+-	/* Check if #NM is triggered by XFEATURE_MASK_XTILEDATA */
++	/* Check if #NM is triggered by XFEATURE_MASK_XTILE_DATA */
+ 	GUEST_SYNC(7);
+-	GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILEDATA);
++	GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILE_DATA);
+ 	GUEST_SYNC(8);
+-	GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILEDATA);
++	GUEST_ASSERT(rdmsr(MSR_IA32_XFD_ERR) == XFEATURE_MASK_XTILE_DATA);
+ 	/* Clear xfd_err */
+ 	wrmsr(MSR_IA32_XFD_ERR, 0);
+ 	/* xfd=0, enable amx */
 -- 
 2.39.0.314.g84b9a713c41-goog
 
