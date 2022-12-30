@@ -2,92 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14506659B55
-	for <lists+kvm@lfdr.de>; Fri, 30 Dec 2022 19:17:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A0966659B98
+	for <lists+kvm@lfdr.de>; Fri, 30 Dec 2022 20:20:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235438AbiL3SRX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 30 Dec 2022 13:17:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54862 "EHLO
+        id S231319AbiL3TUs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 30 Dec 2022 14:20:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235407AbiL3SRB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 30 Dec 2022 13:17:01 -0500
-Received: from vmicros1.altlinux.org (vmicros1.altlinux.org [194.107.17.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DDFA55F45
-        for <kvm@vger.kernel.org>; Fri, 30 Dec 2022 10:17:00 -0800 (PST)
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 2171E72C90B;
-        Fri, 30 Dec 2022 21:17:00 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 050D44A5064;
-        Fri, 30 Dec 2022 21:17:00 +0300 (MSK)
-Date:   Fri, 30 Dec 2022 21:16:59 +0300
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Alexander Graf <agraf@csgraf.de>
-Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marcelo Tosatti <mtosatti@redhat.com>,
-        Alexey Shabalin <shaba@basealt.ru>,
-        "Dmitry V. Levin" <ldv@altlinux.org>
-Subject: Re: qemu-system-i386: Could not install MSR_CORE_THREAD_COUNT
- handler: Success
-Message-ID: <20221230181659.obkhfe7g6jn2wkb6@altlinux.org>
-References: <20221230142222.r3ahbntnlvj7jpc2@altlinux.org>
- <13D59483-BE6C-4AB5-AAB8-78B3A03D96E7@csgraf.de>
+        with ESMTP id S229464AbiL3TUr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 30 Dec 2022 14:20:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC8401AD;
+        Fri, 30 Dec 2022 11:20:45 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5435F617E7;
+        Fri, 30 Dec 2022 19:20:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 743FEC433D2;
+        Fri, 30 Dec 2022 19:20:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672428044;
+        bh=Cxa5GqF/BRtwNF5TaYSaNDpv5IAthq89suBzSJ+3K7M=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:From;
+        b=EzH8bQtz1p233ZKnVT7fTbeQdIXJIcXX/9dnP+bh/ZHMizYBrKXaHr959KqPynimq
+         dhDZoB+7fVkswDr0N5GS8S2udsbkiNBz+R4r5pA5h2989RC7Ry349pLa6L2m0c19jD
+         BigBzoqQxAfF5aPdQWhm43NaOUJPIMmpWQskRFZ2IvU8nlkOnL5RQSj61oYdtKE5iJ
+         y4zowa9xdfizrTufduLMET/jEQHg8xWZ6GzwbI77eSPEkWIyafjFhNPzn6oioDR8my
+         J/3QIYaezxAtX+4SpSh1I67aU78Bclx8moMzicg20H3EaSJt6/A0L6vggwRk3FucIF
+         ZAjNXispShBNg==
+Date:   Fri, 30 Dec 2022 13:20:42 -0600
+From:   Bjorn Helgaas <helgaas@kernel.org>
+To:     Major Saheb <majosaheb@gmail.com>
+Cc:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Zhenzhong Duan <zhenzhong.duan@gmail.com>
+Subject: Re: DMAR: [DMA Read NO_PASID] Request device [0b:00.0] fault addr
+ 0xffffe000 [fault reason 0x06] PTE Read access is not set
+Message-ID: <20221230192042.GA697217@bhelgaas>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <13D59483-BE6C-4AB5-AAB8-78B3A03D96E7@csgraf.de>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <CANBBZXNCaZx9fmHsre2mF2yr7Ru66BSEZxFT7ou=Y04zv5a8Zw@mail.gmail.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Alexander,
+Hi Major,
 
-On Fri, Dec 30, 2022 at 06:44:14PM +0100, Alexander Graf wrote:
-> Hi Vitaly,
-> 
-> This is a kvm kernel bug and should be fixed with the latest stable releases. Which kernel version are you running?
+Thanks for the report!
 
-This is on latest v6.0 stable - 6.0.15.
+On Wed, Dec 21, 2022 at 08:38:46PM +0530, Major Saheb wrote:
+> I have an ubuntu guest running on kvm , and I am passing it 10 qemu
+> emulated nvme drives
+>     <iommu model='intel'>
+>       <driver intremap='on' eim='on'/>
+>     </iommu>
+> <qemu:arg value='pcie-root-port,id=pcie-root-port%d,slot=%d'/>
+> <qemu:arg value='nvme,drive=NVME%d,serial=%s_%d,id=NVME%d,bus=pcie-root-port%d'/>
+> 
+> kernel
+> Linux node-1 5.15.0-56-generic #62-Ubuntu SMP ----- x86_64 x86_64
+> x86_64 GNU/Linux
+> 
+> kernel command line
+> intel_iommu=on
+> 
+> I have attached these drives to vfio-pcie.
+> 
+> when I try to send IO commands to these drives VIA a userspace nvme
+> driver using VFIO I get
+> [ 1474.752590] DMAR: DRHD: handling fault status reg 2
+> [ 1474.754463] DMAR: [DMA Read NO_PASID] Request device [0b:00.0]
+> fault addr 0xffffe000 [fault reason 0x06] PTE Read access is not set
+> 
+> Can someone explain to me what's happening here ?
 
-Maybe there could be workaround for such situations? (Or maybe it's
-possible to make this error non-fatal?) We use qemu+kvm for testing and
-now we cannot test on x86.
+I'm not an IOMMU expert, but I think the device (0b:00.0, I assume an
+nvme device) did a DMA read to 0xffffe000 (which looks suspiciously
+like a null pointer (-8192 off a null pointer)), and the IOMMU had no
+mapping for that address.
 
-Thanks,
+Can you point us to the userspace nvme driver?  I'm not a VFIO expert
+either, but I assume it uses something like a VFIO_IOMMU_MAP_DMA ioctl
+to map buffers and get IOVAs to give to the device?
 
+Can you collect a dmesg log and output of "sudo lspci -vv" for your
+guest?  Is this something that worked in the past and broke on a newer
+kernel?  It looks like you're using a 5.15 kernel; have you tried any
+newer kernels?
 
-> 
-> Thanks,
-> 
-> Alex
-> 
-> 
-> > Am 30.12.2022 um 15:30 schrieb Vitaly Chikunov <vt@altlinux.org>:
-> > 
-> > ﻿Hi,
-> > 
-> > QEMU 7.2.0 when run on 32-bit x86 architecture fails with:
-> > 
-> >  i586$ qemu-system-i386 -enable-kvm
-> >  qemu-system-i386: Could not install MSR_CORE_THREAD_COUNT handler: Success
-> >  i586$ qemu-system-x86_64 -enable-kvm
-> >  qemu-system-x86_64: Could not install MSR_CORE_THREAD_COUNT handler: Success
-> > 
-> > Minimal reproducer is `qemu-system-i386 -enable-kvm'. And this only
-> > happens on x86 (linux32 personality and binaries on x86_64 host):
-> > 
-> >  i586$ file /usr/bin/qemu-system-i386
-> >  /usr/bin/qemu-system-i386: ELF 32-bit LSB pie executable, Intel 80386, version 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, BuildID[sha1]=0ba1d953bcb7a691014255954f060ff404c8df90, for GNU/Linux 3.2.0, stripped
-> >  i586$ /usr/bin/qemu-system-i386 --version
-> >  QEMU emulator version 7.2.0 (qemu-7.2.0-alt1)
-> >  Copyright (c) 2003-2022 Fabrice Bellard and the QEMU Project developers
-> > 
-> > Thanks,
-> > 
-> 
+Bjorn
