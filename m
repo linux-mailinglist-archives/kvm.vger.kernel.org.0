@@ -2,104 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1CDB65A37F
-	for <lists+kvm@lfdr.de>; Sat, 31 Dec 2022 11:36:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3E95165A3C2
+	for <lists+kvm@lfdr.de>; Sat, 31 Dec 2022 12:34:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231522AbiLaKge (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 31 Dec 2022 05:36:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37724 "EHLO
+        id S229741AbiLaLeu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 31 Dec 2022 06:34:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbiLaKgc (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 31 Dec 2022 05:36:32 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B84F310CC;
-        Sat, 31 Dec 2022 02:36:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=TsW62Eh7HZlyUbKA+A/Mar8D1usoJjy+ytSxp2K7qwQ=; b=QA22YSLMn2agfVYH6FSpg1mj3P
-        a+qBfYShWXWIUVFauSp93yGBDBapPj68IlXGGmZGXZsRa8ymjcxDuSvaru6yqQTdJRb8qYK5hbnZQ
-        K8ykCC5gzrLrzKWe6FG4Fh6hzGzXodczlioEjUVwRBgjMx7tNX3cRaTp6spR1L7bMoI9sPx8ekkX1
-        iPhBXhO7zccNwWisoIoBt9thLxUCNdot5J+1YPVitMIEnkRhAOVEr6YkzPSIgHmv4aIUZ7C3PAkmc
-        zRzQmj0+s+dKk28uW79LoHJSVRxmn0aoo7+ZNmqp+4beAOEVKxV3lK3bmdEFUOqb43kx4uGhxhEDS
-        k/cbqE1A==;
-Received: from [2a00:23ee:1340:47e2:1764:351d:ad92:fc1a] (helo=[IPv6:::1])
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pBZDr-00H9Dw-34;
-        Sat, 31 Dec 2022 10:36:16 +0000
-Date:   Sat, 31 Dec 2022 10:36:11 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Yi Liu <yi.l.liu@intel.com>, Bjorn Helgaas <helgaas@kernel.org>,
-        Major Saheb <majosaheb@gmail.com>
-CC:     linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Zhenzhong Duan <zhenzhong.duan@gmail.com>
-Subject: =?US-ASCII?Q?Re=3A_DMAR=3A_=5BDMA_Read_NO=5FPASID=5D_?= =?US-ASCII?Q?Request_device_=5B0b=3A00=2E0=5D_fault_?= =?US-ASCII?Q?addr_0xffffe000_=5Bfault_reason_0?= =?US-ASCII?Q?x06=5D_PTE_Read_access_is_not_set?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <0e5dc3e1-3be2-f7bc-a93c-d3e23739aa3d@intel.com>
-References: <20221230192042.GA697217@bhelgaas> <29F6A46D-FBE0-40E3-992B-2C5CC6CD59D7@infradead.org> <0e5dc3e1-3be2-f7bc-a93c-d3e23739aa3d@intel.com>
-Message-ID: <0E552CD3-1AD0-41FA-AF8B-186A916894CA@infradead.org>
+        with ESMTP id S229484AbiLaLes (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 31 Dec 2022 06:34:48 -0500
+Received: from zulu616.server4you.de (mail.csgraf.de [85.25.223.15])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A15F6580
+        for <kvm@vger.kernel.org>; Sat, 31 Dec 2022 03:34:47 -0800 (PST)
+Received: from [192.168.106.127] (dynamic-095-117-083-145.95.117.pool.telefonica.de [95.117.83.145])
+        by csgraf.de (Postfix) with ESMTPSA id 6D3686080227;
+        Sat, 31 Dec 2022 12:34:46 +0100 (CET)
+Message-ID: <af4fcc32-e2d4-14ae-0edc-b70d7e877140@csgraf.de>
+Date:   Sat, 31 Dec 2022 12:34:45 +0100
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: qemu-system-i386: Could not install MSR_CORE_THREAD_COUNT
+ handler: Success
+Content-Language: en-US
+To:     Vitaly Chikunov <vt@altlinux.org>
+Cc:     qemu-devel@nongnu.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Marcelo Tosatti <mtosatti@redhat.com>,
+        Alexey Shabalin <shaba@basealt.ru>,
+        "Dmitry V. Levin" <ldv@altlinux.org>
+References: <20221230142222.r3ahbntnlvj7jpc2@altlinux.org>
+ <13D59483-BE6C-4AB5-AAB8-78B3A03D96E7@csgraf.de>
+ <20221230181659.obkhfe7g6jn2wkb6@altlinux.org>
+ <e71675a2-e95d-8190-a9ee-32f02b96c60c@csgraf.de>
+ <20221231101747.2skbmx3ipvr6xbx6@altlinux.org>
+From:   Alexander Graf <agraf@csgraf.de>
+In-Reply-To: <20221231101747.2skbmx3ipvr6xbx6@altlinux.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Vitaly,
 
-
-On 31 December 2022 10:13:37 GMT, Yi Liu <yi=2El=2Eliu@intel=2Ecom> wrote:
->On 2022/12/31 04:07, David Woodhouse wrote:
->>=20
->>=20
->> On 30 December 2022 19:20:42 GMT, Bjorn Helgaas <helgaas@kernel=2Eorg> =
-wrote:
->>> Hi Major,
->>>=20
->>> Thanks for the report!
->>>=20
->>> On Wed, Dec 21, 2022 at 08:38:46PM +0530, Major Saheb wrote:
->>>> I have an ubuntu guest running on kvm , and I am passing it 10 qemu
->>>> emulated nvme drives
->>>>      <iommu model=3D'intel'>
->>>>        <driver intremap=3D'on' eim=3D'on'/>
->>>>      </iommu>
->>>> <qemu:arg value=3D'pcie-root-port,id=3Dpcie-root-port%d,slot=3D%d'/>
->>>> <qemu:arg value=3D'nvme,drive=3DNVME%d,serial=3D%s_%d,id=3DNVME%d,bus=
-=3Dpcie-root-port%d'/>
->>>>=20
->>>> kernel
->>>> Linux node-1 5=2E15=2E0-56-generic #62-Ubuntu SMP ----- x86_64 x86_64
->>>> x86_64 GNU/Linux
->>>>=20
->>>> kernel command line
->>>> intel_iommu=3Don
->>>>=20
->>>> I have attached these drives to vfio-pcie=2E
->>>>=20
->>>> when I try to send IO commands to these drives VIA a userspace nvme
->>>> driver using VFIO I get
->>>> [ 1474=2E752590] DMAR: DRHD: handling fault status reg 2
->>>> [ 1474=2E754463] DMAR: [DMA Read NO_PASID] Request device [0b:00=2E0]
->>>> fault addr 0xffffe000 [fault reason 0x06] PTE Read access is not set
->>>>=20
->>>> Can someone explain to me what's happening here ?
+On 31.12.22 11:17, Vitaly Chikunov wrote:
+> Alexander,
 >
->You can enable iommu debugfs (CONFIG_INTEL_IOMMU_DEBUGFS=3Dy) to check
->the mapping=2E In this file, you can see if the 0xffffe000 is mapped or
->not=2E
+> On Sat, Dec 31, 2022 at 10:28:21AM +0100, Alexander Graf wrote:
+>> On 30.12.22 19:16, Vitaly Chikunov wrote:
+>>> On Fri, Dec 30, 2022 at 06:44:14PM +0100, Alexander Graf wrote:
+>>>> This is a kvm kernel bug and should be fixed with the latest stable releases. Which kernel version are you running?
+>>> This is on latest v6.0 stable - 6.0.15.
+>>>
+>>> Maybe there could be workaround for such situations? (Or maybe it's
+>>> possible to make this error non-fatal?) We use qemu+kvm for testing and
+>>> now we cannot test on x86.
+>> I'm confused what's going wrong for you. I tried to reproduce the issue
+>> locally, but am unable to:
+>>
+>> $ uname -a
+>> Linux server 6.0.15-default #1 SMP PREEMPT_DYNAMIC Sat Dec 31 07:52:52 CET
+>> 2022 x86_64 x86_64 x86_64 GNU/Linux
+>> $ linux32 chroot .
+>> $ uname -a
+>> Linux server 6.0.15-default #1 SMP PREEMPT_DYNAMIC Sat Dec 31 07:52:52 CET
+>> 2022 i686 GNU/Linux
+>> $ cd qemu
+>> $ file ./build/qemu-system-i386
+>> ./build/qemu-system-i386: ELF 32-bit LSB shared object, Intel 80386, version
+>> 1 (SYSV), dynamically linked, interpreter /lib/ld-linux.so.2, for GNU/Linux
+>> 3.2.0, BuildID[sha1]=f75e20572be5c604c121de4497397665c168aa4c, with
+>> debug_info, not stripped
+>> $ ./build/qemu-system-i386 --version
+>> QEMU emulator version 7.2.0 (v7.2.0-dirty)
+>> Copyright (c) 2003-2022 Fabrice Bellard and the QEMU Project developers
+>> $ ./build/qemu-system-i386 -nographic -enable-kvm
+>> SeaBIOS (version rel-1.16.1-0-g3208b098f51a-prebuilt.qemu.org)
+>> [...]
+>>
+>>
+>> Can you please double check whether your host kernel version is 6.0.15?
+>> Please paste the output of "uname -a".
+> Excuse me, I'm incorrectly reported kernel version I tried to boot instead
+> of host one. Host kernels are quite old, 5.15.59 and even 5.17.15 --
+> where failure is occurring.
 >
->/sys/kernel/debug/iommu/intel/domain_translation_struct
+> I just tested on 5.15.85 and there is no failure.
 
-My first guess would be that it *was* using queues mapped at that address,=
- but was taken out of the IOMMU domain to be given to userspace, without st=
-opping them=2E
+
+Awesome, great to hear :). That means everything works as expected at least.
+
+
+>    builder@i586:/.in$ uname -a
+>    Linux localhost.localdomain 5.15.85-std-def-alt1 #1 SMP Wed Dec 21 21:14:40 UTC 2022 i686 GNU/Linux
+>    builder@i586:/.in$ qemu-system-i386 -nographic -enable-kvm
+>    SeaBIOS (version 1.16.1-alt1)
+>
+> Perhaps, one of solutions it to reboot our build fleet to newer kernels.
+> [This maybe hard, though, since special builder node image should be
+> created and reboot shall be coordinated through all systems, in compare,
+> updating QEMU would be easier since chroot is created on every build].
+
+
+I understand that it may be slightly painful to update your build fleet, 
+but given this is a genuine kernel bug that has a fix available upstream 
+and it only happens on niche corner cases (i386 QEMU on x86-64 Linux 
+kernels with the bug) that I doubt anyone will use in production, I'd 
+prefer we keep the QEMU logic as is :).
+
+In the meanwhile, while you're patching the build fleet, you can apply 
+the patch below as part of your build process to ensure you don't fail 
+due to the kernel bug. Just make sure to remove it again as soon as 
+you're done with the fleet update :).
+
+
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index a213209379..b9396bc7a6 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -2632,7 +2632,11 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+                  return ret;
+              }
+      }
++#ifdef __x86_64__
+      if (kvm_vm_check_extension(s, KVM_CAP_X86_USER_SPACE_MSR)) {
++#else
++    if (0) {
++#endif
+          bool r;
+
+          ret = kvm_vm_enable_cap(s, KVM_CAP_X86_USER_SPACE_MSR, 0,
+
+Alex
+
+
