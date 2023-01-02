@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 001D265B6F7
-	for <lists+kvm@lfdr.de>; Mon,  2 Jan 2023 20:42:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 449EB65B709
+	for <lists+kvm@lfdr.de>; Mon,  2 Jan 2023 21:02:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232168AbjABTmV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Jan 2023 14:42:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44636 "EHLO
+        id S232620AbjABUCV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Jan 2023 15:02:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48046 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229627AbjABTmU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Jan 2023 14:42:20 -0500
+        with ESMTP id S230443AbjABUCS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Jan 2023 15:02:18 -0500
 Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E852B482;
-        Mon,  2 Jan 2023 11:42:18 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E58521B4;
+        Mon,  2 Jan 2023 12:02:17 -0800 (PST)
 Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A74C51EC050D;
-        Mon,  2 Jan 2023 20:42:16 +0100 (CET)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A059F1EC0518;
+        Mon,  2 Jan 2023 21:02:15 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1672688536;
+        t=1672689735;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=+L+JdAD5fujGBQBI4oqQqpeb1zLWSL4pvB3LgNSB0fs=;
-        b=W5YbOv7UBgUHPOdMItwgm1S76PCy+0cPBg6pySgudrO2FeQRmqaIJlpTGuYQTUkXCNfT2W
-        GF20fbR/hMR6eRkchgSB1X/UNifSX6gsOc8lhqnPHInrA8CF8H2PDkaR1+qL/Jo+d2nacK
-        GbKA3QaraMdmtS5wg5OSmhmRMtpTBA8=
-Date:   Mon, 2 Jan 2023 20:42:11 +0100
+        bh=QfkRnZ8rB5PER1Hjpd4mBmBLogx74L19nz9zOgfhl18=;
+        b=qa8K5TXi6a8VfthYzIFjpTBIjFj9eQJSPfIH1VQ+mfjfiEupRte6mF4aGmAC4I7NISFiR5
+        w9CBxK9iP8YjzP6eBf13M8VU3T/dKlHqWigm+ODKHeRNYDHkeHtp3QfFZhhytSzlN4T7BU
+        8ueypGzaB2bJTgAKDXztWIbzDKbyfBc=
+Date:   Mon, 2 Jan 2023 21:02:11 +0100
 From:   Borislav Petkov <bp@alien8.de>
 To:     "Nikunj A. Dadhania" <nikunj@amd.com>
 Cc:     David Rientjes <rientjes@google.com>, linux-kernel@vger.kernel.org,
@@ -37,7 +37,7 @@ Cc:     David Rientjes <rientjes@google.com>, linux-kernel@vger.kernel.org,
         pbonzini@redhat.com, thomas.lendacky@amd.com, michael.roth@amd.com,
         stable@kernel.org
 Subject: Re: [PATCH v3] x86/sev: Add SEV-SNP guest feature negotiation support
-Message-ID: <Y7Mzk3tDImk46xcu@zn.tnic>
+Message-ID: <Y7M4IzNYBtfEJe6Z@zn.tnic>
 References: <20230102083810.71178-1-nikunj@amd.com>
  <3169b54b-d990-7707-5ec4-cde7261318fe@google.com>
  <45487a87-764a-7ff3-292b-4a55fe29f7ba@amd.com>
@@ -55,29 +55,33 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Jan 02, 2023 at 08:50:23PM +0530, Nikunj A. Dadhania wrote:
-> I think the "why" part depends on the user. Whether or not the user needs a
-> certain feature enabled for the confidential guest.
+> >> +		/*
+> >> +		 * Terminate the boot if hypervisor has enabled any feature
+> >> +		 * lacking guest side implementation.
+> >> +		 */
+> >> +		if (sev_status & SNP_FEATURES_IMPL_REQ & ~SNP_FEATURES_PRESENT)
+> >> +			sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_FEAT_NOT_IMPLEMENTED);
+> > 
+> > We can't help out by specifying which feature(s)?
 > 
-> If the cloud provider(hypervisor) enables the feature on user request, the
-> guest terminates with GHCB_SNP_FEAT_NOT_IMPLEMENTED when guest kernel does
-> have corresponding code/implementation.
+> The purpose of SNP_FEATURES_PRESENT is just that, at present no features that need guest 
+> implementation is part of the kernel. For e.g. I will be posting patches with SecureTSC 
+> enabled, that will make the following change.
 
-I think you mean "does not have" here.
+I think what David means is, can we have sev_es_terminate() say exactly which
+feature wasn't implemented instead of users having to dig out which one exactly
+wasn't by trying to find out what their SNP_FEATURES_IMPL_REQ and
+SNP_FEATURES_PRESENT masks are.
 
-In any case, I think this whole handling of SEV features could go both ways:
+Looking at the GHCB protocol, where GHCB_SNP_FEAT_NOT_IMPLEMENTED reason code
+goes is GHCBData[23:16] which is not enough... And the VMSA has SEV_FEATURES but
+that's guest-only.
 
-* Cloud provider could say: we've enabled features X, Y and Z and if the guest
-doesn't have support for them, then it would fail booting.
+I guess we need a way to communicate those masks in a more user-friendly way so
+that it is exactly clear because of which missing feature(s) has the guest
+terminated.
 
-There would optimally be some text sowewhere in the cloud provider documentation
-stating why those features are enabled and thus required to be supported by the
-guest.
-
-* Guest owner could require a minimal subset of features which must be present
-in the HV in order to even boot on that HV.
-
-Of course, I'm only speculating here. How it ends up really playing out in
-reality we will have to see...
+Hmm.
 
 -- 
 Regards/Gruss,
