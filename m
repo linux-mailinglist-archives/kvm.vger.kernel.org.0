@@ -2,123 +2,115 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3302365B1C6
-	for <lists+kvm@lfdr.de>; Mon,  2 Jan 2023 13:09:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE2FC65B3B9
+	for <lists+kvm@lfdr.de>; Mon,  2 Jan 2023 16:04:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230145AbjABMI5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Jan 2023 07:08:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40140 "EHLO
+        id S236090AbjABPD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Jan 2023 10:03:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229447AbjABMI4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Jan 2023 07:08:56 -0500
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2B15FFD;
-        Mon,  2 Jan 2023 04:08:55 -0800 (PST)
-Received: by mail-wr1-x434.google.com with SMTP id bs20so24031187wrb.3;
-        Mon, 02 Jan 2023 04:08:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=/7OU6LLPb4MAlfsZPwdeEX5z7HKPN5jGvf3Z2m0cZ3g=;
-        b=Q7nSJIgxvSeILtTo3xVYRqdW1boBgrY3h11H41EuHZUn/3iFA3SgfueB2NeOKPTszP
-         GNkUnWSjizqipvyWWagGEBvXFfwddEsadbuqyO5baSrFzmBl5d1UsnwpT5WQLL0UmNfa
-         ULBsPsMTl248dMbc47rrtCTGAAEEAPBy4ZXwM5DgVvfNBRq64sfZfk87tMT5Rc14ZoJp
-         fBlUc14VUzfwAr4aP/vN2oJT9zRiQ7WpjEm5VoZo3GD70sdYNklbuXIJsalXadVBrNaX
-         CpeVpRFdXQ8LDxltF2o6jsK4Vvjupwb2rERPVa64ZOaB4vXcynpuLKt9ookaweyCxQ34
-         4hKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/7OU6LLPb4MAlfsZPwdeEX5z7HKPN5jGvf3Z2m0cZ3g=;
-        b=pulVtZJMpRkKtJDpr3bLOCzz8zF9LIq1Y2UbpSAkLb6vVmR+EoQ2QFx603Yvh1MfZ3
-         E8zQBeGZDk866yGLesQk5cVrsmLn1CsXDEPAUw8ouJ9OAR0FzzEqN5WsZvcMN2sFoY1O
-         XJfPwHQzhojKbkPBnSEe0y+1Enk6E2fg1ppq8Jj4f0XZuyk+Hzshj32qXiuHOtj7xXup
-         qj4BnRm0AsRYIRw5+v77bo16wnsX+iiohGz6Eya7tayzuFa2bd8BXcMxbynEGKrzXIbH
-         j30qtU2XBdg4geGkVPW2XI4xGsceYBCzEyujT++z+lQ4KeSNbqea65bURMjZ46sxRBY9
-         wO7w==
-X-Gm-Message-State: AFqh2krEhD01yFxmcKQbvo4CAhPYIR1PerI4PIhqzdpEBD/lgFbsdwV6
-        PrMaTUTGT0Om4E7P8jeOInClOFru+2kr3IC7EHI=
-X-Google-Smtp-Source: AMrXdXt4fgWH/GWiGQE79vQbR5rE7/act5CDX9O7L50eEsVKfdJbHsloWuq5E75HiONkpSUWqeBhxuAMH6/RqZMdwVo=
-X-Received: by 2002:a5d:53c4:0:b0:294:f269:111 with SMTP id
- a4-20020a5d53c4000000b00294f2690111mr167442wrw.699.1672661333576; Mon, 02 Jan
- 2023 04:08:53 -0800 (PST)
+        with ESMTP id S236156AbjABPDg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Jan 2023 10:03:36 -0500
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ED828FEA
+        for <kvm@vger.kernel.org>; Mon,  2 Jan 2023 07:03:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1672671815; x=1704207815;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ewFkyV0boZJhQiAAEXzc/pLPo66h7zoDQ9PAXlMuubA=;
+  b=RPhqU3CKons5p2er5cZ9OTcmrDh76s5OD3YIbEDNyy+zxTt02IgdFI6U
+   WydYFEKgkir2mY4vaVURQPffM0FqsfKU5ODkgHZEunU2k5ict/gi3g9Du
+   le1mKTvAgrVZ/To/sQ9E3hSOb94HNjCwwKrgtLV5TovJRq/mRDb9BlDKN
+   omqnx6COF6s86jVjlAyhhyzgil6O7ynHaa+1RYoNhEvh4PkXGKJIMkAIa
+   Ke/CwcDalnvaX4UKPabLuxbgqH/4c8RIZ5P7yskJxT5BxAuONmZA/uSfH
+   V4qt+kr57w1NxK+8HpKjhUR21gNerk+QMzJlFJuc4CwcgG+giEiDSMW0+
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10578"; a="407754910"
+X-IronPort-AV: E=Sophos;i="5.96,294,1665471600"; 
+   d="scan'208";a="407754910"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2023 07:03:16 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10578"; a="654508023"
+X-IronPort-AV: E=Sophos;i="5.96,294,1665471600"; 
+   d="scan'208";a="654508023"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.249.169.251]) ([10.249.169.251])
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jan 2023 07:03:14 -0800
+Message-ID: <93332d0c-108c-7f10-1f21-6dd94abcfb7f@intel.com>
+Date:   Mon, 2 Jan 2023 23:03:11 +0800
 MIME-Version: 1.0
-References: <20221230192042.GA697217@bhelgaas> <29F6A46D-FBE0-40E3-992B-2C5CC6CD59D7@infradead.org>
- <0e5dc3e1-3be2-f7bc-a93c-d3e23739aa3d@intel.com> <0E552CD3-1AD0-41FA-AF8B-186A916894CA@infradead.org>
-In-Reply-To: <0E552CD3-1AD0-41FA-AF8B-186A916894CA@infradead.org>
-From:   Major Saheb <majosaheb@gmail.com>
-Date:   Mon, 2 Jan 2023 17:38:42 +0530
-Message-ID: <CANBBZXOe=pfU2uideM2ZPO_ctB4=jCeKdA67GFV_XDCdqft52Q@mail.gmail.com>
-Subject: Re: DMAR: [DMA Read NO_PASID] Request device [0b:00.0] fault addr
- 0xffffe000 [fault reason 0x06] PTE Read access is not set
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Yi Liu <yi.l.liu@intel.com>, Bjorn Helgaas <helgaas@kernel.org>,
-        linux-pci@vger.kernel.org, kvm@vger.kernel.org,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Zhenzhong Duan <zhenzhong.duan@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Firefox/102.0 Thunderbird/102.6.1
+Subject: Re: [PATCH v2 1/6] KVM: x86: Clear all supported MPX xfeatures if
+ they are not all set
+Content-Language: en-US
+To:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, jmattson@google.com, seanjc@google.com
+References: <20221230162442.3781098-1-aaronlewis@google.com>
+ <20221230162442.3781098-2-aaronlewis@google.com>
+From:   Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20221230162442.3781098-2-aaronlewis@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-6.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,HK_RANDOM_ENVFROM,
+        HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Thanks for the pointers , It seems there was some issue in QEMU
-emulator version 6.2.0, I updated it to QEMU emulator version 7.1.92
-and the issue was gone. I don't dig deeper though to find out exactly
-what in QEMU.
+On 12/31/2022 12:24 AM, Aaron Lewis wrote:
+> Be a good citizen and don't allow any of the supported MPX xfeatures[1]
+> to be set if they can't all be set.  That way userspace or a guest
+> doesn't fail if it attempts to set them in XCR0.
+> 
+> [1] CPUID.(EAX=0DH,ECX=0):EAX.BNDREGS[bit-3]
+>      CPUID.(EAX=0DH,ECX=0):EAX.BNDCSR[bit-4]
+> 
+> Suggested-by: Jim Mattson <jmattson@google.com>
+> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> ---
+>   arch/x86/kvm/cpuid.c | 12 ++++++++++++
+>   1 file changed, 12 insertions(+)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index c4e8257629165..2431c46d456b4 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -855,6 +855,16 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
+>   	return 0;
+>   }
+>   
+> +static u64 sanitize_xcr0(u64 xcr0)
+> +{
+> +	u64 mask;
+> +
+> +	mask = XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR;
+> +	if ((xcr0 & mask) != mask)
+> +		xcr0 &= ~mask;
 
-On Sat, Dec 31, 2022 at 4:06 PM David Woodhouse <dwmw2@infradead.org> wrote:
->
->
->
-> On 31 December 2022 10:13:37 GMT, Yi Liu <yi.l.liu@intel.com> wrote:
-> >On 2022/12/31 04:07, David Woodhouse wrote:
-> >>
-> >>
-> >> On 30 December 2022 19:20:42 GMT, Bjorn Helgaas <helgaas@kernel.org> wrote:
-> >>> Hi Major,
-> >>>
-> >>> Thanks for the report!
-> >>>
-> >>> On Wed, Dec 21, 2022 at 08:38:46PM +0530, Major Saheb wrote:
-> >>>> I have an ubuntu guest running on kvm , and I am passing it 10 qemu
-> >>>> emulated nvme drives
-> >>>>      <iommu model='intel'>
-> >>>>        <driver intremap='on' eim='on'/>
-> >>>>      </iommu>
-> >>>> <qemu:arg value='pcie-root-port,id=pcie-root-port%d,slot=%d'/>
-> >>>> <qemu:arg value='nvme,drive=NVME%d,serial=%s_%d,id=NVME%d,bus=pcie-root-port%d'/>
-> >>>>
-> >>>> kernel
-> >>>> Linux node-1 5.15.0-56-generic #62-Ubuntu SMP ----- x86_64 x86_64
-> >>>> x86_64 GNU/Linux
-> >>>>
-> >>>> kernel command line
-> >>>> intel_iommu=on
-> >>>>
-> >>>> I have attached these drives to vfio-pcie.
-> >>>>
-> >>>> when I try to send IO commands to these drives VIA a userspace nvme
-> >>>> driver using VFIO I get
-> >>>> [ 1474.752590] DMAR: DRHD: handling fault status reg 2
-> >>>> [ 1474.754463] DMAR: [DMA Read NO_PASID] Request device [0b:00.0]
-> >>>> fault addr 0xffffe000 [fault reason 0x06] PTE Read access is not set
-> >>>>
-> >>>> Can someone explain to me what's happening here ?
-> >
-> >You can enable iommu debugfs (CONFIG_INTEL_IOMMU_DEBUGFS=y) to check
-> >the mapping. In this file, you can see if the 0xffffe000 is mapped or
-> >not.
-> >
-> >/sys/kernel/debug/iommu/intel/domain_translation_struct
->
-> My first guess would be that it *was* using queues mapped at that address, but was taken out of the IOMMU domain to be given to userspace, without stopping them.
+Maybe it can WARN_ON_ONCE() here.
+
+It implies either a kernel bug that permitted_xcr0 is invalid or a 
+broken HW.
+
+> +	return xcr0;
+> +}
+> +
+>   static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>   {
+>   	struct kvm_cpuid_entry2 *entry;
+> @@ -982,6 +992,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>   		u64 permitted_xcr0 = kvm_caps.supported_xcr0 & xstate_get_guest_group_perm();
+>   		u64 permitted_xss = kvm_caps.supported_xss;
+>   
+> +		permitted_xcr0 = sanitize_xcr0(permitted_xcr0);
+> +
+>   		entry->eax &= permitted_xcr0;
+>   		entry->ebx = xstate_required_size(permitted_xcr0, false);
+>   		entry->ecx = entry->ebx;
+
