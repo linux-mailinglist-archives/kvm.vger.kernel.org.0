@@ -2,293 +2,197 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 45F7D65B082
-	for <lists+kvm@lfdr.de>; Mon,  2 Jan 2023 12:24:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 19A3965B171
+	for <lists+kvm@lfdr.de>; Mon,  2 Jan 2023 12:47:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232947AbjABLYG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Jan 2023 06:24:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45626 "EHLO
+        id S231730AbjABLqm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Jan 2023 06:46:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232744AbjABLXx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Jan 2023 06:23:53 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0AAA55B8
-        for <kvm@vger.kernel.org>; Mon,  2 Jan 2023 03:23:51 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id ge16so26095161pjb.5
-        for <kvm@vger.kernel.org>; Mon, 02 Jan 2023 03:23:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WvoweWw/70ivy5NhGIDsQUyOQzuO+TAKiYfPlBf2qwI=;
-        b=YchLhpPconal93iXKzKSH3gjBZFo64/w295n1NXc+vfqOt8vXqu/YZ/7Biub6l8XJT
-         1GL+W1kK/Cs7oe/JS9XCTV1IjxPXvnXjY5tTQId3qOGpOu3rJGJvbss1pLxlni8GkNCC
-         iGFfF6EtIBVxS9YqcUUGFi/wFYr7Ogq+LwvqVtBV/2D2jvOYV3qdxYvYXWj6sC0mJNsU
-         gJi1RJZpTBT6lFF7lOpbZfxtFLrGvLnPME9Mq4RmzbDY2aIl/n94QEwXB0dEIQTw+XtB
-         Rnd/F3BEFwqowu8Hck9Et3OlElTkSwR2ZE5zaplS58L87vdu7WS14gptw+w6P1bsN3a0
-         tipA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:references:message-id:in-reply-to:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WvoweWw/70ivy5NhGIDsQUyOQzuO+TAKiYfPlBf2qwI=;
-        b=fqHy0Lv/1mukN+rLho/QpXdkY0E6F32BTK7Jj7cw6p/xHHU1hokT8xBoFn3nHkxvbK
-         deYFdOBjrVZGtW3WqjFNDJLl3fSPAu1IkNJ2AWExbczOXDZjKJFakM/5QdxiqWxrTAep
-         G75+fq7EiwD/fQsDkljsoxnoptGNuy3kwMBfYgRWhaZSZDuiFXlBPp9MdqX+KPFqR/Ok
-         XXIM2L6PSu1xWGc4NH67pvflbRgj1GoozFGcAaZjSCj2Z3suH6EmRQI5S9G5c3rbqMKa
-         1Faeju3py/unSkBBmyPgICSEqmYgRwt0IUo950zs+q1JRAR1PZm6/mFFcVvMSAiIUTJF
-         826Q==
-X-Gm-Message-State: AFqh2krW7r5RcFmSdnZwlBPAQQSYfmlSWiHOMWHEj8ibUuCqJFukveCa
-        uJxa816R5wYCJO8yREVsYDfoew==
-X-Google-Smtp-Source: AMrXdXsIV1+R6Q3jwWt535qSNqSmJo2qQnw8GByeE6YAMD5Q/YI21RfUVdJ18geg7rpHDbEymWK8eA==
-X-Received: by 2002:a17:902:b615:b0:191:4367:7fde with SMTP id b21-20020a170902b61500b0019143677fdemr3646444pls.0.1672658631287;
-        Mon, 02 Jan 2023 03:23:51 -0800 (PST)
-Received: from [2620:15c:29:203:20a4:1331:a6b6:c59b] ([2620:15c:29:203:20a4:1331:a6b6:c59b])
-        by smtp.gmail.com with ESMTPSA id m4-20020a170902db0400b0018703bf42desm19942476plx.159.2023.01.02.03.23.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 Jan 2023 03:23:50 -0800 (PST)
-Date:   Mon, 2 Jan 2023 03:23:49 -0800 (PST)
-From:   David Rientjes <rientjes@google.com>
-To:     Nikunj A Dadhania <nikunj@amd.com>
-cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
-        dave.hansen@linux.intel.com, seanjc@google.com,
-        pbonzini@redhat.com, thomas.lendacky@amd.com, michael.roth@amd.com,
-        stable@kernel.org
-Subject: Re: [PATCH v3] x86/sev: Add SEV-SNP guest feature negotiation
- support
-In-Reply-To: <20230102083810.71178-1-nikunj@amd.com>
-Message-ID: <3169b54b-d990-7707-5ec4-cde7261318fe@google.com>
-References: <20230102083810.71178-1-nikunj@amd.com>
-MIME-Version: 1.0
+        with ESMTP id S232103AbjABLqK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Jan 2023 06:46:10 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F380D64
+        for <kvm@vger.kernel.org>; Mon,  2 Jan 2023 03:46:08 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 82E0860F63
+        for <kvm@vger.kernel.org>; Mon,  2 Jan 2023 11:46:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9165C433EF;
+        Mon,  2 Jan 2023 11:46:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672659967;
+        bh=pkoNww/3woHJbKQ2rbbErmlkidtmGFD9xreR1oEQz18=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=TMouMMfYuvBt6CeD3YzniYL1bk940QsJKRtjEG0wIaIzDneHDt4EGseGnORkH+aFs
+         AZsm+RKnLj+uS5sXzuWN4NPH23QvOLWL0qE9MFUmDK0kHQz8ZYuGg0Mq/FNP1bBjdE
+         mgQw/xEjxPKnXYMF3FYY1gjric5pOoNiaQuwfCqqOvq2iX+ZgnJzGwrGsIdFyVdjvK
+         a22YCyzepbbav1zySKw5TsZnwmcgmBVq4JrYG7DVp7c/VP61cPnC6b2lbAEuqd4YvV
+         hqnQW9J3MQg6nF9C9P48/yQiHQhXc/c72C+VxGM5HJtojUITysONe2QcOlURlTqHmw
+         kUm2f7Z0axy2w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pCJGX-00GJRt-HQ;
+        Mon, 02 Jan 2023 11:46:05 +0000
+Date:   Mon, 02 Jan 2023 11:46:05 +0000
+Message-ID: <867cy5b1mq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     catalin.marinas@arm.com, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, scott@os.amperecomputing.com,
+        keyur@os.amperecomputing.com
+Subject: Re: [PATCH 2/3] KVM: arm64: nv: Emulate ISTATUS when emulated timers are fired.
+In-Reply-To: <87y1qqe2pg.wl-maz@kernel.org>
+References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+        <20220824060304.21128-3-gankulkarni@os.amperecomputing.com>
+        <87y1qqe2pg.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, scott@os.amperecomputing.com, keyur@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2 Jan 2023, Nikunj A Dadhania wrote:
+On Thu, 29 Dec 2022 13:53:15 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
+> 
+> On Wed, 24 Aug 2022 07:03:03 +0100,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> > 
+> > Guest-Hypervisor forwards the timer interrupt to Guest-Guest, if it is
+> > enabled, unmasked and ISTATUS bit of register CNTV_CTL_EL0 is set for a
+> > loaded timer.
+> > 
+> > For NV2 implementation, the Host-Hypervisor is not emulating the ISTATUS
+> > bit while forwarding the Emulated Vtimer Interrupt to Guest-Hypervisor.
+> > This results in the drop of interrupt from Guest-Hypervisor, where as
+> > Host Hypervisor marked it as an active interrupt and expecting Guest-Guest
+> > to consume and acknowledge. Due to this, some of the Guest-Guest vCPUs
+> > are stuck in Idle thread and rcu soft lockups are seen.
+> > 
+> > This issue is not seen with NV1 case since the register CNTV_CTL_EL0 read
+> > trap handler is emulating the ISTATUS bit.
+> > 
+> > Adding code to set/emulate the ISTATUS when the emulated timers are fired.
+> > 
+> > Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+> > ---
+> >  arch/arm64/kvm/arch_timer.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+> > index 27a6ec46803a..0b32d943d2d5 100644
+> > --- a/arch/arm64/kvm/arch_timer.c
+> > +++ b/arch/arm64/kvm/arch_timer.c
+> > @@ -63,6 +63,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
+> >  			      struct arch_timer_context *timer,
+> >  			      enum kvm_arch_timer_regs treg);
+> >  static bool kvm_arch_timer_get_input_level(int vintid);
+> > +static u64 read_timer_ctl(struct arch_timer_context *timer);
+> >  
+> >  static struct irq_ops arch_timer_irq_ops = {
+> >  	.get_input_level = kvm_arch_timer_get_input_level,
+> > @@ -356,6 +357,8 @@ static enum hrtimer_restart kvm_hrtimer_expire(struct hrtimer *hrt)
+> >  		return HRTIMER_RESTART;
+> >  	}
+> >  
+> > +	/* Timer emulated, emulate ISTATUS also */
+> > +	timer_set_ctl(ctx, read_timer_ctl(ctx));
+> 
+> Why should we do that for non-NV2 configurations?
+> 
+> >  	kvm_timer_update_irq(vcpu, true, ctx);
+> >  	return HRTIMER_NORESTART;
+> >  }
+> > @@ -458,6 +461,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
+> >  	trace_kvm_timer_emulate(ctx, should_fire);
+> >  
+> >  	if (should_fire != ctx->irq.level) {
+> > +		/* Timer emulated, emulate ISTATUS also */
+> > +		timer_set_ctl(ctx, read_timer_ctl(ctx));
+> >  		kvm_timer_update_irq(ctx->vcpu, should_fire, ctx);
+> >  		return;
+> >  	}
+> 
+> I'm not overly keen on this. Yes, we can set the status bit there. But
+> conversely, the bit will not get cleared when the guest reprograms the
+> timer, and will take a full exit/entry cycle for it to appear.
+> 
+> Ergo, the architecture is buggy as memory (the VNCR page) cannot be
+> used to emulate something as dynamic as a timer.
+> 
+> It is only with FEAT_ECV that we can solve this correctly by trapping
+> the counter/timer accesses and emulate them for the guest hypervisor.
+> I'd rather we add support for that, as I expect all the FEAT_NV2
+> implementations to have it (and hopefully FEAT_FGT as well).
 
-> The hypervisor can enable various new features (SEV_FEATURES[1:63])
-> and start the SNP guest. Some of these features need guest side
-> implementation. If any of these features are enabled without guest
-> side implementation, the behavior of the SNP guest will be undefined.
-> The SNP guest boot may fail in a non-obvious way making it difficult
-> to debug.
-> 
-> Instead of allowing the guest to continue and have it fail randomly
-> later, detect this early and fail gracefully.
-> 
-> SEV_STATUS MSR indicates features which hypervisor has enabled. While
-> booting, SNP guests should ascertain that all the enabled features
-> have guest side implementation. In case any feature is not implemented
-> in the guest, the guest terminates booting with SNP feature
-> unsupported exit code.
-> 
-> More details in AMD64 APM[1] Vol 2: 15.34.10 SEV_STATUS MSR
-> 
-> [1] https://www.amd.com/system/files/TechDocs/40332_4.05.pdf
-> 
-> Fixes: cbd3d4f7c4e5 ("x86/sev: Check SEV-SNP features support")
-> CC: Borislav Petkov <bp@alien8.de>
-> CC: Michael Roth <michael.roth@amd.com>
-> CC: Tom Lendacky <thomas.lendacky@amd.com>
-> CC: <stable@kernel.org>
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> 
-> ---
-> 
-> Changes:
-> v2:
-> * Updated Documentation/x86/amd-memory-encryption.rst
-> * Address review feedback from Boris/Tom
-> 
-> v1:
-> * Dropped _ENABLED from the feature bits
-> * Use approprate macro/function names and move closer to the function where
->   it is used.
-> * More details added to the commit message and comments
-> * Fixed compilation issue
-> ---
->  Documentation/x86/amd-memory-encryption.rst | 35 +++++++++++++++++++
->  arch/x86/boot/compressed/sev.c              | 37 +++++++++++++++++++++
->  arch/x86/include/asm/msr-index.h            | 20 +++++++++++
->  arch/x86/include/asm/sev-common.h           |  1 +
->  4 files changed, 93 insertions(+)
-> 
-> diff --git a/Documentation/x86/amd-memory-encryption.rst b/Documentation/x86/amd-memory-encryption.rst
-> index a1940ebe7be5..b8b6b87be995 100644
-> --- a/Documentation/x86/amd-memory-encryption.rst
-> +++ b/Documentation/x86/amd-memory-encryption.rst
-> @@ -95,3 +95,38 @@ by supplying mem_encrypt=on on the kernel command line.  However, if BIOS does
->  not enable SME, then Linux will not be able to activate memory encryption, even
->  if configured to do so by default or the mem_encrypt=on command line parameter
->  is specified.
-> +
-> +Secure Nested Paging (SNP):
-> +===========================
-> +SEV-SNP introduces new features (SEV_FEATURES[1:63]) which can be enabled
-> +by the hypervisor for security enhancements. Some of these features need
-> +guest side implementation to function correctly. The below table lists the
-> +expected guest behavior with various possible scenarios of guest/hypervisor
-> +SNP feature support.
-> +
-> ++---------------+---------------+---------------+---------------+
-> +|Feature Enabled|  Guest needs  |   Guest has   |  Guest boot   |
-> +|     by HV     |implementation |implementation |   behavior    |
-> ++---------------+---------------+---------------+---------------+
-> +|      No       |      No       |      No       |     Boot      |
-> +|               |               |               |               |
-> ++---------------+---------------+---------------+---------------+
-> +|      No       |      Yes      |      No       |     Boot      |
-> +|               |               |               |               |
-> ++---------------+---------------+---------------+---------------+
-> +|      No       |      Yes      |      Yes      |     Boot      |
-> +|               |               |               |               |
-> ++---------------+---------------+---------------+---------------+
-> +|      Yes      |      No       |      No       |   Boot with   |
-> +|               |               |               |feature enabled|
-> ++---------------+---------------+---------------+---------------+
-> +|      Yes      |      Yes      |      No       | Graceful Boot |
-> +|               |               |               |    Failure    |
-> ++---------------+---------------+---------------+---------------+
-> +|      Yes      |      Yes      |      Yes      |   Boot with   |
-> +|               |               |               |feature enabled|
-> ++---------------+---------------+---------------+---------------+
-> +
+So I went ahead and implemented some very basic FEAT_ECV support to
+correctly emulate the timers (trapping the CTL/CVAL accesses).
 
-Couple things:
+Performance dropped like a rock (~30% extra overhead) for L2
+exit-heavy workloads that are terminated in userspace, such as virtio.
+For those workloads, vcpu_{load,put}() in L1 now generate extra traps,
+as we save/restore the timer context, and this is enough to make
+things visibly slower, even on a pretty fast machine.
 
- - I'd assume that the documentation would refer the reader to the
-   SNP_FEATURES_IMPL_REQ mask that defines whether the guest is required 
-   to have a specific feature or not.
+I managed to get *some* performance back by satisfying CTL/CVAL reads
+very early on the exit path (a pretty common theme with NV). Which
+means we end-up needing something like what you have -- only a bit
+more complete. I came up with the following:
 
- - Don't hate me, but I feel wanting more from this, such as a rationale
-   for why certain features are required in the guest.  When a guest fails
-   to boot and the reasoning provided by a cloud provider is "your guest
-   doesn't support ${feature}", the natural question to ask will be "why 
-   do I need ${feature}?"
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index 4945c5b96f05..a198a6211e2a 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -450,6 +450,25 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
+ {
+ 	int ret;
+ 
++	/*
++	 * Paper over NV2 brokenness by publishing the interrupt status
++	 * bit. This still results in a poor quality of emulation (guest
++	 * writes will have no effect until the next exit).
++	 *
++	 * But hey, it's fast, right?
++	 */
++	if (vcpu_has_nv2(vcpu) && is_hyp_ctxt(vcpu) &&
++	    (timer_ctx == vcpu_vtimer(vcpu) || timer_ctx == vcpu_ptimer(vcpu))) {
++		u32 ctl = timer_get_ctl(timer_ctx);
++
++		if (new_level)
++			ctl |= ARCH_TIMER_CTRL_IT_STAT;
++		else
++			ctl &= ~ARCH_TIMER_CTRL_IT_STAT;
++
++		timer_set_ctl(timer_ctx, ctl);
++	}
++
+ 	timer_ctx->irq.level = new_level;
+ 	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
+ 				   timer_ctx->irq.level);
 
-> +More details in AMD64 APM[1] Vol 2: 15.34.10 SEV_STATUS MSR
-> +
-> +[1] https://www.amd.com/system/files/TechDocs/40332_4.05.pdf
-> diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-> index c93930d5ccbd..43793f46cfc1 100644
-> --- a/arch/x86/boot/compressed/sev.c
-> +++ b/arch/x86/boot/compressed/sev.c
-> @@ -270,6 +270,36 @@ static void enforce_vmpl0(void)
->  		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_NOT_VMPL0);
->  }
->  
-> +/*
-> + * SNP_FEATURES_IMPL_REQ is the mask of SNP features that will need
-> + * guest side implementation for proper functioning of the guest. If any
-> + * of these features are enabled in the hypervisor but are lacking guest
-> + * side implementation, the behavior of the guest will be undefined. The
-> + * guest could fail in non-obvious way making it difficult to debug.
-> + *
-> + * As the behavior of reserved feature bits is unknown to be on the
-> + * safe side add them to the required features mask.
+which reports the interrupt state in all cases.
 
-If one or more of the reserved feature bits turns out to not be required 
-for the SNP guest to function correctly, is this the correct choice?
+Does this work for you?
 
-IIUC, legacy guests would fail to boot correctly (and unnecessarily, 
-because of this change) if they do not have an implentation for a 
-non-required feature.  Absent this change, however, they would proceed 
-just fine.
+Thanks,
 
-> + */
-> +#define SNP_FEATURES_IMPL_REQ	(MSR_AMD64_SNP_VTOM |			\
-> +				MSR_AMD64_SNP_REFLECT_VC |		\
-> +				MSR_AMD64_SNP_RESTRICTED_INJ |		\
-> +				MSR_AMD64_SNP_ALT_INJ |			\
-> +				MSR_AMD64_SNP_DEBUG_SWAP |		\
-> +				MSR_AMD64_SNP_VMPL_SSS |		\
-> +				MSR_AMD64_SNP_SECURE_TSC |		\
-> +				MSR_AMD64_SNP_VMGEXIT_PARAM |		\
-> +				MSR_AMD64_SNP_VMSA_REG_PROTECTION |	\
-> +				MSR_AMD64_SNP_RESERVED_BIT13 |		\
-> +				MSR_AMD64_SNP_RESERVED_BIT15 |		\
-> +				MSR_AMD64_SNP_RESERVED_MASK)
-> +
-> +/*
-> + * SNP_FEATURES_PRESENT is the mask of SNP features that are implemented
-> + * by the guest kernel. As and when a new feature is implemented in the
-> + * guest kernel, a corresponding bit should be added to the mask.
-> + */
-> +#define SNP_FEATURES_PRESENT (0)
-> +
->  void sev_enable(struct boot_params *bp)
->  {
->  	unsigned int eax, ebx, ecx, edx;
-> @@ -335,6 +365,13 @@ void sev_enable(struct boot_params *bp)
->  		if (!(get_hv_features() & GHCB_HV_FT_SNP))
->  			sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_UNSUPPORTED);
->  
-> +		/*
-> +		 * Terminate the boot if hypervisor has enabled any feature
-> +		 * lacking guest side implementation.
-> +		 */
-> +		if (sev_status & SNP_FEATURES_IMPL_REQ & ~SNP_FEATURES_PRESENT)
-> +			sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_FEAT_NOT_IMPLEMENTED);
+	M.
 
-We can't help out by specifying which feature(s)?
-
-> +
->  		enforce_vmpl0();
->  	}
->  
-> diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-> index 37ff47552bcb..d3fe82c5d6b6 100644
-> --- a/arch/x86/include/asm/msr-index.h
-> +++ b/arch/x86/include/asm/msr-index.h
-> @@ -566,6 +566,26 @@
->  #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
->  #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
->  
-> +/* SNP feature bits enabled by the hypervisor */
-> +#define MSR_AMD64_SNP_VTOM			BIT_ULL(3)
-> +#define MSR_AMD64_SNP_REFLECT_VC		BIT_ULL(4)
-> +#define MSR_AMD64_SNP_RESTRICTED_INJ		BIT_ULL(5)
-> +#define MSR_AMD64_SNP_ALT_INJ			BIT_ULL(6)
-> +#define MSR_AMD64_SNP_DEBUG_SWAP		BIT_ULL(7)
-> +#define MSR_AMD64_SNP_PREVENT_HOST_IBS		BIT_ULL(8)
-> +#define MSR_AMD64_SNP_BTB_ISOLATION		BIT_ULL(9)
-> +#define MSR_AMD64_SNP_VMPL_SSS			BIT_ULL(10)
-> +#define MSR_AMD64_SNP_SECURE_TSC		BIT_ULL(11)
-> +#define MSR_AMD64_SNP_VMGEXIT_PARAM		BIT_ULL(12)
-> +#define MSR_AMD64_SNP_IBS_VIRT			BIT_ULL(14)
-> +#define MSR_AMD64_SNP_VMSA_REG_PROTECTION	BIT_ULL(16)
-> +#define MSR_AMD64_SNP_SMT_PROTECTION		BIT_ULL(17)
-> +
-> +/* SNP feature bits reserved for future use. */
-> +#define MSR_AMD64_SNP_RESERVED_BIT13		BIT_ULL(13)
-> +#define MSR_AMD64_SNP_RESERVED_BIT15		BIT_ULL(15)
-> +#define MSR_AMD64_SNP_RESERVED_MASK		GENMASK_ULL(63, 18)
-> +
->  #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
->  
->  /* AMD Collaborative Processor Performance Control MSRs */
-> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-> index b8357d6ecd47..db60cbb01b31 100644
-> --- a/arch/x86/include/asm/sev-common.h
-> +++ b/arch/x86/include/asm/sev-common.h
-> @@ -148,6 +148,7 @@ struct snp_psc_desc {
->  #define GHCB_SEV_ES_GEN_REQ		0
->  #define GHCB_SEV_ES_PROT_UNSUPPORTED	1
->  #define GHCB_SNP_UNSUPPORTED		2
-> +#define GHCB_SNP_FEAT_NOT_IMPLEMENTED	3
->  
->  /* Linux-specific reason codes (used with reason set 1) */
->  #define SEV_TERM_SET_LINUX		1
-> -- 
-> 2.32.0
-> 
-> 
+-- 
+Without deviation from the norm, progress is not possible.
