@@ -2,66 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ACEA665C611
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 19:24:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9F8BF65C636
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 19:27:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238775AbjACSYi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 13:24:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40534 "EHLO
+        id S238908AbjACS1b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 13:27:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238766AbjACSYd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 13:24:33 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 572AE13D34
-        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 10:24:32 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id n65-20020a17090a2cc700b0021bc5ef7a14so32004731pjd.0
-        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 10:24:32 -0800 (PST)
+        with ESMTP id S238954AbjACS1H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 13:27:07 -0500
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9525FF5D
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 10:26:52 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id n78so34004073yba.12
+        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 10:26:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rk3/IZ0Tali2mWQU+drpOkqSz37XQmDfj78i0CHemRY=;
-        b=FlkKNfLDlAP8KDjh3L3g/64PFtn919TQ/dEwCVWbZTQmB8k3I7+2px0b5z6KR9ENoL
-         OEJ9qsPSyZ/YWDVJryD89jmPqXv4VxvCdJLbXdr0ssZN6wcOeq7zgP3iXDxz+z5lQF7S
-         ymVNtowkcqEYDRvEa1sVqV1pt/kDo2BC1UZpsggapdy/MbVKwBLcDNkucMr1bJAEpRWC
-         YI4MVmVPoYzrtNgqMgvQ7Jbgc/Z16Lw+w8GyBaVdNMU2mWDRZB8zRwzCIX4eu1TMABm3
-         1+AB2OjbUnzbT7JZwnN7bJap0kMnRNpzOWkoJNH7vEqY4/wuEOAmJ1Ow52t73N+sNShO
-         BDAg==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=pq3R+dMUCBtQBXaTENIPK+pFT96E7II7s9kyI9TK3FA=;
+        b=qtM6NgWaiVqZCrj8mlfOBfl9chZFnGk7FZeAhK0wy71zu0Jbt2DGUrwpnG+p6HliNC
+         wO2NaOlbCKIgyAgsIjNe/ikj5/5528+86PkkSkuC0kNwPWkn7sa5m7z0RYJ3nJKeFbCh
+         qKMd4AqqUqZL4N4KitDhTrxCoBKchw+0ODvu4s+qk5ApqgNxN5YNl00Xc/+j+jTj5Zf3
+         pPUGZsWkOgqVLfWCcj3yYEHcaOdmMTAoL6Jc05sJ/Hh4r2FXvyZEmzUYIWm9n0Tt0b7y
+         GzMQ8UT2wOaVw/bOcZ1dvM88egQWS4WawD4MiF/7QBnjCih+TPZ3Cy6Y3OPb5R3FTuf3
+         76FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rk3/IZ0Tali2mWQU+drpOkqSz37XQmDfj78i0CHemRY=;
-        b=zuASv+YO1WhqY4K/dzkZzWwsl9dDuc4dpcvvyEgTpb3G5rrknGoat+c+IRmhcmkue9
-         1VBW7R1JSBIQBmGEaAVH0vpGwY4nRA8a6/E8v8jCiP1TbahJLkFZy0egpYmj4MUHfooZ
-         8FQT5ijTODUXx/oYE4E2SB1lHY8du0ubGTzXE3nV9FNG4jGdYyJqrFmOF9H/wJ6sXqJh
-         pn4KqVYKcSFrhU4+MpupQh6baNWQ9++v8hHtIERtrVMe3wAwJJNWF5CeXoNQfZdI2OFw
-         D10PXCZK+Fmz6WSZ226dyn9w0trvKOtoKF8FrOARpqGAyyraCcIKFaon2U5cnjmPpcH7
-         al/Q==
-X-Gm-Message-State: AFqh2koDvvN3G6cWzFfN7RpRLJGSocasts4f9gdED2KRzBtR9gU1UXfi
-        Fv8D1ZwPR9o+2VaucxRmhk66RlN8S7xmaPYY
-X-Google-Smtp-Source: AMrXdXtt6NTSkuKb0mgaJaN0bgvqUqV6cEjq67Vt81B0EL3xPwhmHnOY3MX9tl5Z/bMZoJUhr9GuTg==
-X-Received: by 2002:a17:902:9049:b0:189:6d32:afeb with SMTP id w9-20020a170902904900b001896d32afebmr4242465plz.1.1672770271759;
-        Tue, 03 Jan 2023 10:24:31 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id k11-20020a170902c40b00b001926a76e8absm19693858plk.114.2023.01.03.10.24.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jan 2023 10:24:31 -0800 (PST)
-Date:   Tue, 3 Jan 2023 18:24:27 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v2 1/2] KVM: selftests: Assert that XSAVE supports XTILE
- in amx_test
-Message-ID: <Y7Ry24zfi1/ZOnf8@google.com>
-References: <20221230013648.2850519-1-aaronlewis@google.com>
- <20221230013648.2850519-2-aaronlewis@google.com>
- <Y7RwZg9XGIJREcph@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pq3R+dMUCBtQBXaTENIPK+pFT96E7II7s9kyI9TK3FA=;
+        b=wJbm0pd8FAVpWed4ffXpzDqVsYurpXZy7eOSm22xKnypd1AJJC1eHQrW4hwjwKNNUX
+         pBRvCtkrypxP8yOP4yZ4TU+giJIT0pxeeUMXq4sZfXJdc97VUxgSiCvew8Ss4HduFklB
+         Dik1Szg8uM3/byQ8X729exT1v8LTC2cP8D4K7cN82/5kyaZY/QnKO/8Ku3iTzFZ/WEdy
+         fV3bjarHjCToKVlzTRhYbd2ppcbYUQDKU/17CPnQFUGnnlCmrBwvS6uJPnumvlV7xMpA
+         nMKwMZKgIleD8BZfZPEOog+6Q7UTKExshx+NnuOmx8wGI9sAziuQBqcVZoZ1x9ZOaqfS
+         VR0Q==
+X-Gm-Message-State: AFqh2kps8HekdUE8XGFNGWVqx4C8ZZ6TgdNZpSQdAMASMDNdvs7rBqD8
+        MXaZz8maNYyKflpTs4Gw/D2zcl8m7uy5zD2cpAugW+F1JsHsrA==
+X-Google-Smtp-Source: AMrXdXtz9fE389kox3Zm+Hqn9n1jIVfUW3PvUCQvVSXTI5E+gIl9S5H+OLruEjvmoAaAls5jjJ+8Df66Dwj9ERutr3Y=
+X-Received: by 2002:a25:da14:0:b0:707:34cf:b4b1 with SMTP id
+ n20-20020a25da14000000b0070734cfb4b1mr4286913ybf.123.1672770411475; Tue, 03
+ Jan 2023 10:26:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y7RwZg9XGIJREcph@google.com>
+References: <20221222023457.1764-1-vipinsh@google.com> <20221222023457.1764-6-vipinsh@google.com>
+ <Y64VG4Bl0fujE2qG@google.com>
+In-Reply-To: <Y64VG4Bl0fujE2qG@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 3 Jan 2023 10:26:15 -0800
+Message-ID: <CAHVum0eE+bJw7vaYczipR5v8h94QzAkddz6etQKYkEBz6+zZoQ@mail.gmail.com>
+Subject: Re: [Patch v3 5/9] KVM: x86/mmu: Allocate TDP page table's page on
+ correct NUMA node on split
+To:     David Matlack <dmatlack@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,64 +69,154 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 03, 2023, Sean Christopherson wrote:
-> On Fri, Dec 30, 2022, Aaron Lewis wrote:
-> > The check in amx_test that ensures that XSAVE supports XTILE, doesn't
-> > actually check anything.  It simply returns a bool which the test does
-> > nothing with.
-> > 
-> > Assert that XSAVE supports XTILE.
-> > 
-> > Fixes: 5dc19f1c7dd3 ("KVM: selftests: Convert AMX test to use X86_PROPRETY_XXX")
-> 
-> Doh.
-> 
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+On Thu, Dec 29, 2022 at 2:30 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Wed, Dec 21, 2022 at 06:34:53PM -0800, Vipin Sharma wrote:
+> > When dirty log is enabled, huge pages are split. Page table's pages
+> > during the split are allocated based on the current thread NUMA node or
+> > mempolicy. This causes inefficient page table accesses if underlying
+> > page is on a different NUMA node
+> >
+> > Allocate page table's pages on the same NUMA node as the underlying huge
+> > page when dirty log is enabled and huge pages are split.
+> >
+> > The performance gain during the pre-copy phase of live migrations of a
+> > 416 vCPUs and 11 TiB memory VM  on a 8 node host was seen in the range
+> > of 130% to 150%.
+>
+> Can you be more specific about this. "The performance" is vague. I know
+> it's an internal workload and fully explaining it would be difficult,
+> but you can give readers a slightly more specific idea of what improved.
+> e.g.
+>
+>  When testing with a synthetic write-heavy workload in a 416 vCPU VM on
+>  an 8 NUMA node host, the throughput increased by 150% from X to Y
+>  operations per second.
+>
+> It's also necessary to characterize the improvement relative to the
+> performance when dirty logging is not enabled. Whithout that information
+> it would be hard for an unfamiliar reader to understand how useful this
+> change really is.
+>
+> For example, let's say the throughput of your workload is 100,000
+> operations per second before dirty logging is enabled, and that drops
+> down to 1,000 operations per second after dirty logging is enabled. This
+> commit could increase that by 150% to 2,500 operations per second, but
+> that's actually not a very meaningful improvement since, either way,
+> guest performance is degraded by 95+% during dirty logging.
+>
+> On the other hand, if performance goes from 100,000 to 30,000 normally,
+> and this commit increases that 30,000 to 75,000 (150%), that's a much
+> more meaningful improvement.
+>
+
+Yeah, I will provide more insight in the next version.
+
+> >
+> > Suggested-by: David Matlack <dmatlack@google.com>
+> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
 > > ---
-> >  tools/testing/selftests/kvm/x86_64/amx_test.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/x86_64/amx_test.c b/tools/testing/selftests/kvm/x86_64/amx_test.c
-> > index bd72c6eb3b670..2f555f5c93e99 100644
-> > --- a/tools/testing/selftests/kvm/x86_64/amx_test.c
-> > +++ b/tools/testing/selftests/kvm/x86_64/amx_test.c
-> > @@ -119,9 +119,9 @@ static inline void check_cpuid_xsave(void)
-> >  	GUEST_ASSERT(this_cpu_has(X86_FEATURE_OSXSAVE));
+> >  arch/x86/kvm/mmu/tdp_mmu.c | 12 ++++++++----
+> >  include/linux/kvm_host.h   | 18 ++++++++++++++++++
+> >  2 files changed, 26 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+> > index 4974fa96deff..376b8dceb3f9 100644
+> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
+> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
+> > @@ -1403,7 +1403,7 @@ bool kvm_tdp_mmu_wrprot_slot(struct kvm *kvm,
+> >       return spte_set;
 > >  }
-> >  
-> > -static bool check_xsave_supports_xtile(void)
-> > +static inline void check_xsave_supports_xtile(void)
-> 
-> Don't explicitly tag local static functions as inline (ignore the existing code
-> that sets a bad precedent), modern compilers don't need the hint to generate
-> optimal code,
-> 
+> >
+> > -static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
+> > +static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(int nid, gfp_t gfp)
 > >  {
-> > -	return __xgetbv(0) & XFEATURE_MASK_XTILE;
-> > +	GUEST_ASSERT(__xgetbv(0) & XFEATURE_MASK_XTILE);
-> 
-> Any objection to moving the assertion into check_xtile_info() and dropping this
-> one-line helper?
+> >       struct kvm_mmu_page *sp;
+> >
+> > @@ -1413,7 +1413,8 @@ static struct kvm_mmu_page *__tdp_mmu_alloc_sp_for_split(gfp_t gfp)
+> >       if (!sp)
+> >               return NULL;
+> >
+> > -     sp->spt = (void *)__get_free_page(gfp);
+> > +     sp->spt = kvm_mmu_get_free_page(nid, gfp);
+> > +
+> >       if (!sp->spt) {
+> >               kmem_cache_free(mmu_page_header_cache, sp);
+> >               return NULL;
+> > @@ -1427,6 +1428,9 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+> >                                                      bool shared)
+> >  {
+> >       struct kvm_mmu_page *sp;
+> > +     int nid;
+> > +
+> > +     nid = kvm_pfn_to_page_table_nid(spte_to_pfn(iter->old_spte));
+> >
+> >       /*
+> >        * Since we are allocating while under the MMU lock we have to be
+> > @@ -1437,7 +1441,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+> >        * If this allocation fails we drop the lock and retry with reclaim
+> >        * allowed.
+> >        */
+> > -     sp = __tdp_mmu_alloc_sp_for_split(GFP_NOWAIT | __GFP_ACCOUNT);
+> > +     sp = __tdp_mmu_alloc_sp_for_split(nid, GFP_NOWAIT | __GFP_ACCOUNT);
+> >       if (sp)
+> >               return sp;
+> >
+> > @@ -1449,7 +1453,7 @@ static struct kvm_mmu_page *tdp_mmu_alloc_sp_for_split(struct kvm *kvm,
+> >               write_unlock(&kvm->mmu_lock);
+> >
+> >       iter->yielded = true;
+> > -     sp = __tdp_mmu_alloc_sp_for_split(GFP_KERNEL_ACCOUNT);
+> > +     sp = __tdp_mmu_alloc_sp_for_split(nid, GFP_KERNEL_ACCOUNT);
+> >
+> >       if (shared)
+> >               read_lock(&kvm->mmu_lock);
+> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > index d48064503b88..a262e15ebd19 100644
+> > --- a/include/linux/kvm_host.h
+> > +++ b/include/linux/kvm_host.h
+> > @@ -1583,6 +1583,24 @@ void kvm_arch_sync_events(struct kvm *kvm);
+> >  int kvm_cpu_has_pending_timer(struct kvm_vcpu *vcpu);
+> >
+> >  struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn);
+> > +
+> > +/*
+> > + * Tells the appropriate NUMA node location of the page table's page based on
+> > + * pfn it will point to.
+>
+> I know what you are trying to say but the wording is a bit awkward. e.g.
+> "Tells" instead of "Returns", "location" is redundant, "page table's
+> page", etc. Suggest this:
+>
+> /*
+>  * Returns an appropriate NUMA node on which to allocate a page table that
+>  * maps @pfn.
+>  */
+>
+> > + *
+> > + * Return the nid of the page if pfn is valid and backed by a refcounted page,
+> > + * otherwise, return the nearest memory node for the current CPU.
+>
+> I would just drop this as it's just restating the code, which is already
+> very readable.
+>
 
-Actually, this code is silly, and arguably unnecessary. init_regs() explicitly
-sets XCR0 to XFEATURE_MASK_XTILE.  If something goes awry, XSETBV should #GP.
-If we want to be really paranoid and assert that KVM didn't silently fail XSETBV,
-then the more logical place for the assertion is immediately after the XSETBV.
+Okay.
 
-i.e.
-
-  static void init_regs(void)
-  {
-	uint64_t cr4, xcr0;
-
-	/* turn on CR4.OSXSAVE */
-	cr4 = get_cr4();
-	cr4 |= X86_CR4_OSXSAVE;
-	set_cr4(cr4);
-
-	xcr0 = __xgetbv(0);
-	xcr0 |= XFEATURE_MASK_XTILE;
-	__xsetbv(0x0, xcr0);
-
-	GUEST_ASSERT((__xgetbv(0) & XFEATURE_MASK_XTILE) == XFEATURE_MASK_XTILE);
-  }
+> > + */
+> > +static inline int kvm_pfn_to_page_table_nid(kvm_pfn_t pfn)
+> > +{
+> > +     struct page *page = kvm_pfn_to_refcounted_page(pfn);
+> > +
+> > +     if (page)
+> > +             return page_to_nid(page);
+> > +     else
+> > +             return numa_mem_id();
+> > +}
+> > +
+> >  bool kvm_is_zone_device_page(struct page *page);
+> >
+> >  struct kvm_irq_ack_notifier {
+> > --
+> > 2.39.0.314.g84b9a713c41-goog
+> >
