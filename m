@@ -2,136 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B67C965C2EF
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 16:24:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 26FFC65C34E
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 16:51:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233588AbjACPX1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 10:23:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47770 "EHLO
+        id S238024AbjACPuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 10:50:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237815AbjACPWx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 10:22:53 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2077.outbound.protection.outlook.com [40.107.94.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EB331135
-        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 07:22:52 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NcufKO10nyiRdezvQKuqDjrHdfpuwGFaPF529m1n5zgOX832JFZ1/QsD8ynPve4dyz2Pm0vkcezQjtKDIwlq9ANLfAR8dpOGZQnzYJuU00wleQPnqlFrdVWflflUz/sLafOo505t6pClgNjWPaN9Xk2fS2BwXTsRD5zLa2Aq5vfqzudPLWGU8si/yxH58D+EzkuFf4wFLslIN7wzAPEopqKMZMggKAMDPnjpy/pBDNY8LVzM70FP9Hc1p1ie+XOdba7EO/tiJhIrbykoA9YKM2EiEkDNHpRYZhdFOIa6h0DQ4xHjlvgIX0BP62eQUYTHtNVOh7DB0H5TygDRcf29aw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Y3y/R8o6yHPtQudgyFz/pPJ5V+9m5GNJ05Jh5smWe4M=;
- b=Ep23AXtHos32jsKxN+OJ/DuYte8gF/SIESAv6FkPrYg9YwHOkKyrC2Y5JHto26TI1QdoKbXDSI4zpI6yp8Z+qTHr1DK27MNhPyY7lEgxYhVnCj4Xwiy0TRFzPnkHHlahds/OMnBPnLoU+Wt4fwP312yPwG9kZ6uNCvkIZW/6LE+vgXbTTLgec694WzbaWr1Uyw4WK+POCyLm07hKVaVznK3JA78gtSLoFbSre1lOlHa/GRPVwO/AnFgBkhw79xZ8IYHYY5bZWjPt3C6jR9Jb2xVXC9xrGtjZ7I5QMfiEPCg+lSZHpdZszSB+SDCXSJ+NcYx74iAyiDyAd+F4q19/dg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Y3y/R8o6yHPtQudgyFz/pPJ5V+9m5GNJ05Jh5smWe4M=;
- b=YwwxnffIRtKIDxyeegVP1z3/5VVYnCgIecUJ79HgYPexetypFNsjB+qkNtb/6WndLW8CrAFEyKk4A0RUMIDjWq0QTDDLYgeTA62YjGHwUhFDN4kGC5s5dgv+yKFVAaJbzwwZzeJ96ivxXgeqh5NZDickysGRSq8voKzBLUn8Lo3Hr4sDxDX9D3x2ACdIAQLqN0PGTJ+ZN5z6Rpa9DnUFGgUOAHGVjNuBDkvyrd/Y66txGrRHKaoFXwCYFnChdCm2Mj8DKVxO4ObM63evAZaCfZ6jTdSGDtVHgWuAztLEbOWdsTjeG/GPJNgHpeATipYhT+6cGiVysWj3fhUx4c+ERQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by CY8PR12MB7146.namprd12.prod.outlook.com (2603:10b6:930:5e::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Tue, 3 Jan
- 2023 15:22:50 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5944.019; Tue, 3 Jan 2023
- 15:22:50 +0000
-Date:   Tue, 3 Jan 2023 11:22:49 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Steve Sistare <steven.sistare@oracle.com>
-Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH V7 4/7] vfio/type1: restore locked_vm
-Message-ID: <Y7RISZXrvjzIyktd@nvidia.com>
-References: <1671568765-297322-1-git-send-email-steven.sistare@oracle.com>
- <1671568765-297322-5-git-send-email-steven.sistare@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1671568765-297322-5-git-send-email-steven.sistare@oracle.com>
-X-ClientProxiedBy: BL0PR0102CA0070.prod.exchangelabs.com
- (2603:10b6:208:25::47) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S237609AbjACPup (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 10:50:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC53A1260D
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 07:49:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672760994;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=WC94+qRtcsQoAZV6EJBwTDdUsyIqcyvTkPy2eHYVDF8=;
+        b=Dsw+a1skJrczJSjugB4GFPkVku1KQU+pKKtHoH8KoPlUobI7sRzGiWLORGW//f1JBwGbGh
+        2j0ZsbqAF1iwbQCnVmDi7Z3YdwBIex4InD+PZsovaqcenjusr+JQKmr4rRA8n03XTSEnXO
+        D5mJlX7dtfLNXRc7IhLo+gPf1Lib6Jo=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-477-RomfFkLKMNeXChK8CB3p_w-1; Tue, 03 Jan 2023 10:49:53 -0500
+X-MC-Unique: RomfFkLKMNeXChK8CB3p_w-1
+Received: by mail-wm1-f72.google.com with SMTP id p34-20020a05600c1da200b003d990064285so11111128wms.8
+        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 07:49:53 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:content-disposition:mime-version
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WC94+qRtcsQoAZV6EJBwTDdUsyIqcyvTkPy2eHYVDF8=;
+        b=QjlMZGMvjK0CzCrTcUG+o66njIJLoFeF9EhcU8MkiOJNZj88XeIZNsaIhDq/j69jDj
+         DU+cvD/n3+syrV8O9rulogA7fAC0dqlU7zr8d8lZTOvXiDN6ADreh6RF5cAcdWBv18OK
+         WPxufssI/TWf6AIE2yYs6BBXjJWOHhFKYFiIITSPkxWpgjpaS3fMXVzZEkXmtC/Nflh8
+         e+gMTRWGv7gFMAjplpyVjXI5iCfX47dkkn4xJRX1IZOiAnN2EX0efoUfymKRTHg3Sl+p
+         IgH6+8uc/k6fZFAZwdmsd3WctlB1MkqsDPs/R2+szeA5+iFUND9nLqvNi3DfWWZsSwqv
+         CABA==
+X-Gm-Message-State: AFqh2kqwIj+H1qJ9UqViZJ8NDGOfJXufqDH5oV+VKr0jm6L/6qAngCQW
+        YOAflwaxljcm39c1GbOjaLUdHRsSIJA7FXb/nahug589Q2bNwUN1hr8FueuB8NJg5z8i/2A+Xqj
+        btGr+0NjAihSD
+X-Received: by 2002:a05:600c:4fcf:b0:3d1:d396:1ade with SMTP id o15-20020a05600c4fcf00b003d1d3961ademr31416067wmq.9.1672760992137;
+        Tue, 03 Jan 2023 07:49:52 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvBokw4ntbihohzRlAT/7Kd2Eqgl7eiuIEN+Pul08FB9XjA5yr3GOYK70ZuUvwnVXP0KlLXRw==
+X-Received: by 2002:a05:600c:4fcf:b0:3d1:d396:1ade with SMTP id o15-20020a05600c4fcf00b003d1d3961ademr31416049wmq.9.1672760991925;
+        Tue, 03 Jan 2023 07:49:51 -0800 (PST)
+Received: from redhat.com ([2.52.151.85])
+        by smtp.gmail.com with ESMTPSA id r10-20020a05600c458a00b003d9a86a13bfsm15382532wmo.28.2023.01.03.07.49.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Jan 2023 07:49:51 -0800 (PST)
+Date:   Tue, 3 Jan 2023 10:49:46 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        angus.chen@jaguarmicro.com, colin.i.king@gmail.com,
+        dave@stgolabs.net, dengshaomin@cdjrlc.com, dmitry.fomichev@wdc.com,
+        elic@nvidia.com, eperezma@redhat.com, gautam.dawar@xilinx.com,
+        harshit.m.mogalapalli@oracle.com, jasowang@redhat.com,
+        lulu@redhat.com, mst@redhat.com, pizhenwei@bytedance.com,
+        rafaelmendsr@gmail.com, ricardo.canuelo@collabora.com,
+        ruanjinjie@huawei.com, set_pte_at@outlook.com, sgarzare@redhat.com,
+        shaoqin.huang@intel.com, si-wei.liu@oracle.com,
+        stable@vger.kernel.org, sunnanyong@huawei.com,
+        wangjianli@cdjrlc.com, wangrong68@huawei.com,
+        weiyongjun1@huawei.com, yuancan@huawei.com
+Subject: [GIT PULL v2] virtio,vhost,vdpa: fixes, cleanups
+Message-ID: <20230103104946-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CY8PR12MB7146:EE_
-X-MS-Office365-Filtering-Correlation-Id: 66dda98d-db7c-4849-925f-08daed9e604b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: awFBdwAvAAmQ/fH1iC946kQSaCH2tXRuz/kpFY5qVvu8PaXXm/Y7gKSRyilNl38Sp41a9IKVlVRZk2teoOCvgFCOvV5mgXKfBJXfhbunM9onrBvkldRlVWfRYRgfsZ5I8xb8sqUUijVU7wuBsDuOHGCffJCe92mkzmc/ChR24pJ6+wgcTIKI9x5ufFN3pK6bGqsjJ8jGsZ1Jx4zeZ/baw3bnuLV+zSWqGgpXOiAPiPDTn7sz3L1Tp0hNoOJISuTO9hz9/2ekfdHf0katWiEbdjfLXbR3BLUO0LsHjNOWjnW4Zg3gOlVWB6r2N7KOq3iZS81+EVKG7OprTWemx5BaOSipN6nLJlnGdCge2+FHxOXaQ8YjZ2Lfuqt3mTXAhcb1OMExWOejFiGOYNHhfGfr1n48eGyVshumvC2pIZ4ExSHupBDKFA/iAsfbzv4IuyQmTyeB5bzMdgqpnBGwwo7lKYGis5W+i/4u1pRIhZ0Iu1vhOIMI10aTwIBnk4o21RZpgx9jaidTyUEj4/i/Lo7FXAhTkKibg89zBy1xxmJmLKovrn2JpDBiDSOHQgVpANMEzXY0YPB329abtLpeZE+utKSkjdfIK6ZZq9gaqeqki4fea3FAB38BFYzF7obUtGio9flAMZ0ZU72JKBn7hQD1wiimuY3tRNtC7/aDPnklaQJItQ7qt3y0lfqifoW4+rxO
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(366004)(396003)(346002)(376002)(39860400002)(451199015)(186003)(6486002)(26005)(6512007)(6916009)(54906003)(316002)(478600001)(6506007)(2616005)(4326008)(66946007)(8676002)(66556008)(66476007)(38100700002)(8936002)(4744005)(83380400001)(5660300002)(2906002)(41300700001)(36756003)(86362001)(22166006);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Wy1yXeWxT0jZTkfSLL6/LFAwF0sMrAsgOfAqCtfr9nX8mUhVOSGsbCKQwmQP?=
- =?us-ascii?Q?iDxV7KwgGjvinKSIaK0t5TpVWr74lwJEwNLe0NHWLWKtYLLtxEwIyEOP/bZm?=
- =?us-ascii?Q?1xKjlzz1zGS0Pms2rmqB/kIAbYMPRrvbeksDeuOMqUGlZgDY+jQAxA/m9lPo?=
- =?us-ascii?Q?iAEQ/3S/LCtoD9+UGRBvyJWExOafppRIv+tb+aIz/P8/PbgPkFCEw5LUsdJ3?=
- =?us-ascii?Q?ntLb2qnWNgTxnOKwUSr/37ctgui4y4UWheTjGhkSFIEjyZLH6tESkHe14oPj?=
- =?us-ascii?Q?0W5zewiidOXpeL8ORl3vxs2K9l/Pq3OIztmDP0197C3ucNndtHVA0B5mJAuX?=
- =?us-ascii?Q?xgQpoSzrmv1xa3kDPbZC0Wop4bJobP1n8xcAfFh85jZwuCS5jw9dizrW+a3b?=
- =?us-ascii?Q?5MMW163h6bKk92YDA3kiyxhRYKB5pyGd/p7LN9mMa9wBlQtgx+XavVZ3538p?=
- =?us-ascii?Q?c4Mz8n5LpU7MPE1F3R3/2yyYxYuFJCZmjr5dOUIMY8Et3ca81PXnesNQWDMI?=
- =?us-ascii?Q?pvYI2lhVZNheSooHN3ybQ4+lORGiTwUOBzeGgp1Bq3sMraa+uqW/0sx3Gq2O?=
- =?us-ascii?Q?Wjp4XMASADoeCBFa0Oa1LC46C02x3OyWxr2p/TqpFI90aPPXEcz1dsJ/weOs?=
- =?us-ascii?Q?6ZfJDmcOSyFYBP2SrP3t8wf8yiov4UrX7rfESMnjYs1bcTyi7u+lDouGQ6CT?=
- =?us-ascii?Q?/GYIDSsgmiL6YpEhn4Aa8luFu161UE9xz1ggWbSwDbXBKGQ2uYgmIxb5Df6R?=
- =?us-ascii?Q?5UAn+6sTEeZo8nYuqVoczF5QrXTVN+AhaDraD/UdLZh60m5ceha0EaGp16ca?=
- =?us-ascii?Q?yvGU6a51rQAgKZcxK2bm60km+R3M3cX5zkdAbR3t5riJyXjIBvRIdZOQChGY?=
- =?us-ascii?Q?VuBn30GaG4P6opynFWlSalTJ3dJvuWXQeq1sCJh7Sak0naxB+swSX1DnxvHU?=
- =?us-ascii?Q?pDU+yV3f98XWVNXrGK7KUAOpGuMzDD5/FlzO/Dajcl3rpDP8LkWnGb1bxmBV?=
- =?us-ascii?Q?2uiAhwGAb71dQhNozsH6X7yBlLRR80vWv4r0KWOxXSJHagUFd8v19XQpn6n9?=
- =?us-ascii?Q?+MAV0MBKTQZ+J06ZEd/74XUh1p/Yk6YKqYKrNtU8BOEQKGhP2b7FZIBwbks0?=
- =?us-ascii?Q?v+v2SxkvCcheOUtVA+z7CoMtHcOB5TqP2DxRN/4S8w5asdCZmSRShng3hiuk?=
- =?us-ascii?Q?0Gg9r4otMPize2BaaLkT2o4JBIpAlnUN5Bp1WukOqZNkURY0PhVU7k3Cq0lU?=
- =?us-ascii?Q?Ou2BmN1z0Y+tUOY4fv4xahG1yHTLnesL8H5uQ4hoDYJZ3nadTdQjEOQvzff1?=
- =?us-ascii?Q?tK7+PNKCEWQU/AuYH4yC7H95KW0uCtxN+QuMDWQn94gkJ0FivwsqpB27x0Vx?=
- =?us-ascii?Q?c8YAls4PoEAhjlv9MofRVHSPoBZI4kdqQHmlm8iCr7vglzSr2ceW/Li2lDiV?=
- =?us-ascii?Q?ggwdbnBsDyeVFW2VOtFs0/hwFboDZ3eN7WnU9CQ6qd9i+5CEEN9qeHq1wXp5?=
- =?us-ascii?Q?eTtADEMwobS0MYGoFPJW6nmxFPMaCzd/Dnt3zSMmlNFqfmeYOlrC+rSYqLB1?=
- =?us-ascii?Q?IOpXagFXmZUF44ZhDQ2wWHxfVZCTw4PsLYxgKAHS?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66dda98d-db7c-4849-925f-08daed9e604b
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2023 15:22:50.4089
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8NFG1hZYlEP+90u5Ey27XFn4P0n9pcrX3aw50taA04lceEdyo1ty/vjcaW6wHWrA
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7146
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 12:39:22PM -0800, Steve Sistare wrote:
-> When a vfio container is preserved across exec or fork-exec, the new
-> task's mm has a locked_vm count of 0.  After a dma vaddr is updated using
-> VFIO_DMA_MAP_FLAG_VADDR, locked_vm remains 0, and the pinned memory does
-> not count against the task's RLIMIT_MEMLOCK.
-> 
-> To restore the correct locked_vm count, when VFIO_DMA_MAP_FLAG_VADDR is
-> used and the dma's mm has changed, add the dma's locked_vm count to
-> the new mm->locked_vm, subject to the rlimit.
-> 
-> Fixes: c3cbab24db38 ("vfio/type1: implement interfaces to update vaddr")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> ---
->  drivers/vfio/vfio_iommu_type1.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
+These fixes have been in next, though not as these commits.
 
-But you should subtract it from the old one as well?
+I'd like to apologize again to contributors for missing the merge
+window with new features. These by necessity have been pushed out
+to the next merge window. This pull only has bugfixes.
 
-Jason
+I put automation in place to help prevent missing merge window
+in the future.
+
+The following changes since commit 1b929c02afd37871d5afb9d498426f83432e71c2:
+
+  Linux 6.2-rc1 (2022-12-25 13:41:39 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to a26116c1e74028914f281851488546c91cbae57d:
+
+  virtio_blk: Fix signedness bug in virtblk_prep_rq() (2022-12-28 05:28:11 -0500)
+
+----------------------------------------------------------------
+virtio,vhost,vdpa: fixes, cleanups
+
+mostly fixes all over the place, a couple of cleanups.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Angus Chen (2):
+      virtio_pci: modify ENOENT to EINVAL
+      virtio_blk: use UINT_MAX instead of -1U
+
+Cindy Lu (2):
+      vhost_vdpa: fix the crash in unmap a large memory
+      vdpa_sim_net: should not drop the multicast/broadcast packet
+
+Colin Ian King (1):
+      RDMA/mlx5: remove variable i
+
+Davidlohr Bueso (2):
+      tools/virtio: remove stray characters
+      tools/virtio: remove smp_read_barrier_depends()
+
+Dawei Li (1):
+      virtio: Implementing attribute show with sysfs_emit
+
+Dmitry Fomichev (1):
+      virtio-blk: use a helper to handle request queuing errors
+
+Eli Cohen (5):
+      vdpa/mlx5: Fix rule forwarding VLAN to TIR
+      vdpa/mlx5: Return error on vlan ctrl commands if not supported
+      vdpa/mlx5: Fix wrong mac address deletion
+      vdpa/mlx5: Avoid using reslock in event_handler
+      vdpa/mlx5: Avoid overwriting CVQ iotlb
+
+Harshit Mogalapalli (1):
+      vduse: Validate vq_num in vduse_validate_config()
+
+Jason Wang (2):
+      vdpa: conditionally fill max max queue pair for stats
+      vdpasim: fix memory leak when freeing IOTLBs
+
+Rafael Mendonca (1):
+      virtio_blk: Fix signedness bug in virtblk_prep_rq()
+
+Ricardo Cañuelo (1):
+      tools/virtio: initialize spinlocks in vring_test.c
+
+Rong Wang (1):
+      vdpa/vp_vdpa: fix kfree a wrong pointer in vp_vdpa_remove
+
+Shaomin Deng (1):
+      tools: Delete the unneeded semicolon after curly braces
+
+Shaoqin Huang (2):
+      virtio_pci: use helper function is_power_of_2()
+      virtio_ring: use helper function is_power_of_2()
+
+Si-Wei Liu (1):
+      vdpa: merge functionally duplicated dev_features attributes
+
+Stefano Garzarella (4):
+      vringh: fix range used in iotlb_translate()
+      vhost: fix range used in translate_desc()
+      vhost-vdpa: fix an iotlb memory leak
+      vdpa_sim: fix vringh initialization in vdpasim_queue_ready()
+
+Wei Yongjun (1):
+      virtio-crypto: fix memory leak in virtio_crypto_alg_skcipher_close_session()
+
+Yuan Can (1):
+      vhost/vsock: Fix error handling in vhost_vsock_init()
+
+ruanjinjie (1):
+      vdpa_sim: fix possible memory leak in vdpasim_net_init() and vdpasim_blk_init()
+
+wangjianli (1):
+      tools/virtio: Variable type completion
+
+ drivers/block/virtio_blk.c                         | 35 +++++-----
+ .../crypto/virtio/virtio_crypto_skcipher_algs.c    |  3 +-
+ drivers/vdpa/mlx5/core/mlx5_vdpa.h                 |  5 +-
+ drivers/vdpa/mlx5/core/mr.c                        | 46 +++++++------
+ drivers/vdpa/mlx5/net/mlx5_vnet.c                  | 78 +++++++---------------
+ drivers/vdpa/vdpa.c                                | 11 ++-
+ drivers/vdpa/vdpa_sim/vdpa_sim.c                   |  7 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim_blk.c               |  4 +-
+ drivers/vdpa/vdpa_sim/vdpa_sim_net.c               |  7 +-
+ drivers/vdpa/vdpa_user/vduse_dev.c                 |  3 +
+ drivers/vdpa/virtio_pci/vp_vdpa.c                  |  2 +-
+ drivers/vhost/vdpa.c                               | 52 +++++++++------
+ drivers/vhost/vhost.c                              |  4 +-
+ drivers/vhost/vringh.c                             |  5 +-
+ drivers/vhost/vsock.c                              |  9 ++-
+ drivers/virtio/virtio.c                            | 12 ++--
+ drivers/virtio/virtio_pci_modern.c                 |  4 +-
+ drivers/virtio/virtio_ring.c                       |  2 +-
+ include/uapi/linux/vdpa.h                          |  4 +-
+ tools/virtio/ringtest/main.h                       | 37 +++++-----
+ tools/virtio/virtio-trace/trace-agent-ctl.c        |  2 +-
+ tools/virtio/virtio_test.c                         |  2 +-
+ tools/virtio/vringh_test.c                         |  2 +
+ 23 files changed, 173 insertions(+), 163 deletions(-)
+
