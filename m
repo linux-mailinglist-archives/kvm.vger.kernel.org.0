@@ -2,65 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3330965C6B2
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 19:48:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB52C65C6B5
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 19:49:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238336AbjACSsC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 13:48:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54154 "EHLO
+        id S238379AbjACStE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 13:49:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238563AbjACSqO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 13:46:14 -0500
+        with ESMTP id S238712AbjACSsU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 13:48:20 -0500
 Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7C1AE60
-        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 10:46:08 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id 60-20020a17090a0fc200b002264ebad204so10401448pjz.1
-        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 10:46:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42B5213F04
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 10:48:02 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id o31-20020a17090a0a2200b00223fedffb30so32029076pjo.3
+        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 10:48:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vUBKTHLzQlFTilTKOe+he3Zfuv35jABiHO+4q1BFtZg=;
-        b=RJwTBqwJSPg4pEOztqybJHHSc4f7SGD6gGq+OC5UUmXiVHhPJwAVNmccBXNsJqAstG
-         Apu7yf9aRer10XeY/guXR80pyDnU8FMwVRIEFuN6VZQNXqhVgKOw1QXrqngmBOb9JJmm
-         pV0UVJzPczypUguvqxu3Vc3NjURZRovXg3jP8D1Xo9F0ke6pKENqWmUgK0c/U9rlpNoN
-         i96a0gfA/hwHIUKC7piNN3Z8fks9RhqTbnQY4oaY1u+ECetPDXsEZ3DNxtBd3XVntTjF
-         yr2vfrV7pEGsELMQDSqG2P4kqYGmRYt07Zuk0kFId/+L2kHIv7ne4qUxix66oRHrK96q
-         Htqg==
+        bh=zPLabJ1YI0HZ9Wsi0ecPwiS5fdbOizZ50cPFPVQexEs=;
+        b=R1w0pU6KGAQdeL1yc+Q0rNnUGDeCT5CF1GPhykJTBKwbfffFGUiaW2RFHT+nl42tQh
+         QKAxyTPV/Tal6fZbW3qjOjO8FkxyrOP0q7XMptUlvkbwl7fDSgHqQBn4FdeBWAwX4T5u
+         qHwNUgLImdYqQMbZUoFBqBFRn01Zkbu3qkJUtpOKQUwflGm4dmjTIaadw3iUNF7cn2Ft
+         kq78APQxToGkRJ5lgLxMfqbYu4N49p0fi0whNcm9J6l0wq292ya7AD7uzQMuEXvynajn
+         2ApzWg5UxQgiPKNxmCFyj7yIOFfREZrKaSOgLNKTrjE4EQgheMtj2KoCchD7l11nxoLP
+         FFDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vUBKTHLzQlFTilTKOe+he3Zfuv35jABiHO+4q1BFtZg=;
-        b=pZQj75YM6DI/QZns3d3ZhhlRpYXhid9YHbBNWmEnW0iCpBfW02Dhw7HJoSQSHx2BM/
-         aLtgT04vnw+iQCi7fva58hLxUD4Il2xicI9VfRe4gI91bmmxd4cnuVGN/pljCfXkD06Z
-         EVCokVxxyluUsNA5rHp18QZYWHbvM/7lMuPqWhxlxCsR9O9pAHu06ZLPUJSsVYx1I86b
-         zfJ1eU0YHQzNJv2AfsPFDyw1TgVVFdjt+DESl/HCGC6RNiQ+kjhtzqoCsUDbgB1VIsfk
-         87LvBZb3GAhYywM0xswuaREg+ecdRcr+LWPPSkGVBYzM2YaGZkWIw+BRa8YP31nubYDo
-         hkng==
-X-Gm-Message-State: AFqh2ko5K3kMJqhB9AMO/QimIfOmLP2uFGjjFDVVgqVYiI8OAk10kgE5
-        1GPIgQvDsf3PfN6vc84w4PH6uA==
-X-Google-Smtp-Source: AMrXdXtC5icJu1Wu92PpjdTohwtshRtCDMvnGh3zyEu+ZRAb5mZCIiaNOy7D5q29ykTjsiKpcSX1SA==
-X-Received: by 2002:a17:90a:f2d6:b0:225:e576:a577 with SMTP id gt22-20020a17090af2d600b00225e576a577mr2107389pjb.0.1672771568240;
-        Tue, 03 Jan 2023 10:46:08 -0800 (PST)
+        bh=zPLabJ1YI0HZ9Wsi0ecPwiS5fdbOizZ50cPFPVQexEs=;
+        b=KOuRgYiwZ2/veZPj5pU+6Dnj+HNOyyW9+vY9+nkspHnHOPKtqzrfMQIwID2U+rOHHV
+         qBjjWmvSWxrzh6bCsVlfsODrUEuO9CgCHrqIX3s6aOsYNB+lCmloBcD8/iJgJUyBhlfw
+         bzXOfKMyBLzFFBJVOWYgLhlfPfszkNkpWTnhFfrDAPaf5GpYc9HJ6VkeRms4aCueRsvZ
+         IefsiHdeW1+OpAJTbyASPOM6Ab4HhA/qHylvVnfuNhXYhGNrrX8kwbScyAetil//pINd
+         fDx5GRyZN4sGQ7B7z+Q+HUh4+BFO2xbjk2d0rlwj6Z4lqbx7LpLex5XMxWlpi22fo8US
+         2xGg==
+X-Gm-Message-State: AFqh2kpREEY/2HZ09k+e+Uj0eWEVDPOUDMRTnpQoF/3pDkzslKwKBDDc
+        QdsmGaktjI+fUUaAmiW7kgRpPg==
+X-Google-Smtp-Source: AMrXdXubjSTI7gT8RJBzr8xtJ0VO4rdYpfRZAQU/fckOxRlIapOcyz8N/+AntS3ASdk1Lsr2VJ2bQQ==
+X-Received: by 2002:a17:90a:8b8c:b0:219:c2f2:f83c with SMTP id z12-20020a17090a8b8c00b00219c2f2f83cmr3620407pjn.2.1672771681642;
+        Tue, 03 Jan 2023 10:48:01 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id ms2-20020a17090b234200b002194319662asm21890317pjb.42.2023.01.03.10.46.07
+        by smtp.gmail.com with ESMTPSA id b5-20020a17090aa58500b001fb1de10a4dsm4770495pjq.33.2023.01.03.10.48.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jan 2023 10:46:07 -0800 (PST)
-Date:   Tue, 3 Jan 2023 18:46:03 +0000
+        Tue, 03 Jan 2023 10:48:01 -0800 (PST)
+Date:   Tue, 3 Jan 2023 18:47:57 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+To:     Xiaoyao Li <xiaoyao.li@intel.com>
+Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, jmattson@google.com
 Subject: Re: [PATCH v2 1/6] KVM: x86: Clear all supported MPX xfeatures if
  they are not all set
-Message-ID: <Y7R36wsXn3JqwfEv@google.com>
+Message-ID: <Y7R4XY12Oyqymhyk@google.com>
 References: <20221230162442.3781098-1-aaronlewis@google.com>
  <20221230162442.3781098-2-aaronlewis@google.com>
+ <93332d0c-108c-7f10-1f21-6dd94abcfb7f@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221230162442.3781098-2-aaronlewis@google.com>
+In-Reply-To: <93332d0c-108c-7f10-1f21-6dd94abcfb7f@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,85 +74,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 30, 2022, Aaron Lewis wrote:
-> Be a good citizen and don't allow any of the supported MPX xfeatures[1]
-> to be set if they can't all be set.  That way userspace or a guest
-> doesn't fail if it attempts to set them in XCR0.
+On Mon, Jan 02, 2023, Xiaoyao Li wrote:
+> On 12/31/2022 12:24 AM, Aaron Lewis wrote:
+> > Be a good citizen and don't allow any of the supported MPX xfeatures[1]
+> > to be set if they can't all be set.  That way userspace or a guest
+> > doesn't fail if it attempts to set them in XCR0.
+> > 
+> > [1] CPUID.(EAX=0DH,ECX=0):EAX.BNDREGS[bit-3]
+> >      CPUID.(EAX=0DH,ECX=0):EAX.BNDCSR[bit-4]
+> > 
+> > Suggested-by: Jim Mattson <jmattson@google.com>
+> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> > ---
+> >   arch/x86/kvm/cpuid.c | 12 ++++++++++++
+> >   1 file changed, 12 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > index c4e8257629165..2431c46d456b4 100644
+> > --- a/arch/x86/kvm/cpuid.c
+> > +++ b/arch/x86/kvm/cpuid.c
+> > @@ -855,6 +855,16 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
+> >   	return 0;
+> >   }
+> > +static u64 sanitize_xcr0(u64 xcr0)
+> > +{
+> > +	u64 mask;
+> > +
+> > +	mask = XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR;
+> > +	if ((xcr0 & mask) != mask)
+> > +		xcr0 &= ~mask;
 > 
-> [1] CPUID.(EAX=0DH,ECX=0):EAX.BNDREGS[bit-3]
->     CPUID.(EAX=0DH,ECX=0):EAX.BNDCSR[bit-4]
+> Maybe it can WARN_ON_ONCE() here.
 > 
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> ---
->  arch/x86/kvm/cpuid.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index c4e8257629165..2431c46d456b4 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -855,6 +855,16 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
->  	return 0;
->  }
->  
-> +static u64 sanitize_xcr0(u64 xcr0)
-> +{
-> +	u64 mask;
-> +
-> +	mask = XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR;
-> +	if ((xcr0 & mask) != mask)
-> +		xcr0 &= ~mask;
-> +
-> +	return xcr0;
-> +}
-> +
->  static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  {
->  	struct kvm_cpuid_entry2 *entry;
-> @@ -982,6 +992,8 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  		u64 permitted_xcr0 = kvm_caps.supported_xcr0 & xstate_get_guest_group_perm();
->  		u64 permitted_xss = kvm_caps.supported_xss;
->  
-> +		permitted_xcr0 = sanitize_xcr0(permitted_xcr0);
+> It implies either a kernel bug that permitted_xcr0 is invalid or a broken
+> HW.
 
-
-This isn't 100% correct, all usage needs to be sanitized so that KVM provides a
-consistent view.  E.g. KVM_CAP_XSAVE2 would report the wrong size.
-
-	case KVM_CAP_XSAVE2: {
-		u64 guest_perm = xstate_get_guest_group_perm();
-
-		r = xstate_required_size(kvm_caps.supported_xcr0 & guest_perm, false);
-		if (r < sizeof(struct kvm_xsave))
-			r = sizeof(struct kvm_xsave);
-		break;
-	}
-
-Barring a kernel bug, xstate_get_guest_group_perm() will never report partial
-support, so I think the easy solution is to sanitize kvm_caps.suport_xcr0.
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 2480b8027a45..7ea06c58eaf6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -9344,6 +9344,10 @@ int kvm_arch_init(void *opaque)
-        if (boot_cpu_has(X86_FEATURE_XSAVE)) {
-                host_xcr0 = xgetbv(XCR_XFEATURE_ENABLED_MASK);
-                kvm_caps.supported_xcr0 = host_xcr0 & KVM_SUPPORTED_XCR0;
-+               if (!(kvm_caps.supported_xcr0 & XFEATURE_MASK_BNDREGS) ||
-+                   !(kvm_caps.supported_xcr0 & XFEATURE_MASK_BNDCSR))
-+                       kvm_caps.supported_xcr0 &= ~(XFEATURE_MASK_BNDREGS |
-+                                                    XFEATURE_MASK_BNDCSR);
-        }
- 
-        if (pi_inject_timer == -1)
-
-
-> +
->  		entry->eax &= permitted_xcr0;
->  		entry->ebx = xstate_required_size(permitted_xcr0, false);
->  		entry->ecx = entry->ebx;
-> -- 
-> 2.39.0.314.g84b9a713c41-goog
-> 
+I'm pretty sure KVM can't WARN, as this falls into the category of "it's technically
+architecturally legal to report only one of the features, but real hardware will
+always report both".
