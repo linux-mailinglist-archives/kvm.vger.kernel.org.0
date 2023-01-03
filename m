@@ -2,214 +2,260 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26FFC65C34E
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 16:51:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4EA9165C3CF
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 17:23:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238024AbjACPuy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 10:50:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59198 "EHLO
+        id S237795AbjACQUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 11:20:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237609AbjACPup (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 10:50:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC53A1260D
-        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 07:49:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672760994;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=WC94+qRtcsQoAZV6EJBwTDdUsyIqcyvTkPy2eHYVDF8=;
-        b=Dsw+a1skJrczJSjugB4GFPkVku1KQU+pKKtHoH8KoPlUobI7sRzGiWLORGW//f1JBwGbGh
-        2j0ZsbqAF1iwbQCnVmDi7Z3YdwBIex4InD+PZsovaqcenjusr+JQKmr4rRA8n03XTSEnXO
-        D5mJlX7dtfLNXRc7IhLo+gPf1Lib6Jo=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-477-RomfFkLKMNeXChK8CB3p_w-1; Tue, 03 Jan 2023 10:49:53 -0500
-X-MC-Unique: RomfFkLKMNeXChK8CB3p_w-1
-Received: by mail-wm1-f72.google.com with SMTP id p34-20020a05600c1da200b003d990064285so11111128wms.8
-        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 07:49:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:content-disposition:mime-version
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WC94+qRtcsQoAZV6EJBwTDdUsyIqcyvTkPy2eHYVDF8=;
-        b=QjlMZGMvjK0CzCrTcUG+o66njIJLoFeF9EhcU8MkiOJNZj88XeIZNsaIhDq/j69jDj
-         DU+cvD/n3+syrV8O9rulogA7fAC0dqlU7zr8d8lZTOvXiDN6ADreh6RF5cAcdWBv18OK
-         WPxufssI/TWf6AIE2yYs6BBXjJWOHhFKYFiIITSPkxWpgjpaS3fMXVzZEkXmtC/Nflh8
-         e+gMTRWGv7gFMAjplpyVjXI5iCfX47dkkn4xJRX1IZOiAnN2EX0efoUfymKRTHg3Sl+p
-         IgH6+8uc/k6fZFAZwdmsd3WctlB1MkqsDPs/R2+szeA5+iFUND9nLqvNi3DfWWZsSwqv
-         CABA==
-X-Gm-Message-State: AFqh2kqwIj+H1qJ9UqViZJ8NDGOfJXufqDH5oV+VKr0jm6L/6qAngCQW
-        YOAflwaxljcm39c1GbOjaLUdHRsSIJA7FXb/nahug589Q2bNwUN1hr8FueuB8NJg5z8i/2A+Xqj
-        btGr+0NjAihSD
-X-Received: by 2002:a05:600c:4fcf:b0:3d1:d396:1ade with SMTP id o15-20020a05600c4fcf00b003d1d3961ademr31416067wmq.9.1672760992137;
-        Tue, 03 Jan 2023 07:49:52 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvBokw4ntbihohzRlAT/7Kd2Eqgl7eiuIEN+Pul08FB9XjA5yr3GOYK70ZuUvwnVXP0KlLXRw==
-X-Received: by 2002:a05:600c:4fcf:b0:3d1:d396:1ade with SMTP id o15-20020a05600c4fcf00b003d1d3961ademr31416049wmq.9.1672760991925;
-        Tue, 03 Jan 2023 07:49:51 -0800 (PST)
-Received: from redhat.com ([2.52.151.85])
-        by smtp.gmail.com with ESMTPSA id r10-20020a05600c458a00b003d9a86a13bfsm15382532wmo.28.2023.01.03.07.49.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jan 2023 07:49:51 -0800 (PST)
-Date:   Tue, 3 Jan 2023 10:49:46 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        angus.chen@jaguarmicro.com, colin.i.king@gmail.com,
-        dave@stgolabs.net, dengshaomin@cdjrlc.com, dmitry.fomichev@wdc.com,
-        elic@nvidia.com, eperezma@redhat.com, gautam.dawar@xilinx.com,
-        harshit.m.mogalapalli@oracle.com, jasowang@redhat.com,
-        lulu@redhat.com, mst@redhat.com, pizhenwei@bytedance.com,
-        rafaelmendsr@gmail.com, ricardo.canuelo@collabora.com,
-        ruanjinjie@huawei.com, set_pte_at@outlook.com, sgarzare@redhat.com,
-        shaoqin.huang@intel.com, si-wei.liu@oracle.com,
-        stable@vger.kernel.org, sunnanyong@huawei.com,
-        wangjianli@cdjrlc.com, wangrong68@huawei.com,
-        weiyongjun1@huawei.com, yuancan@huawei.com
-Subject: [GIT PULL v2] virtio,vhost,vdpa: fixes, cleanups
-Message-ID: <20230103104946-mutt-send-email-mst@kernel.org>
+        with ESMTP id S238113AbjACQUi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 11:20:38 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425DC60C9;
+        Tue,  3 Jan 2023 08:20:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=B5uGzTtjX9o8pa28G6FRUDTV66nYvLyyOzR5n/GwlGw=; b=ETZ/IdtdfHRrBRANOAueHT2GTK
+        W33+ZsD/84oHExa4qeebeayYod4GrDKm3iiTAkehg67D3oOXrnfwkK7UlLUUSrIc6H2KeABbQ9Z/C
+        3BV+xxzhNRQx+VxISjJLYohK5fa6kS4ch9AjTeq9YkbKAmJep58LjoxSPH6Y1S6yjcDOzQMdYdlJn
+        fJNSCBuNkPWzWdCGnqJ/lXmWYojiZ96r/pDF8f6OAxBZ79TLK7Q6LmGPUvMgCavMeaehQNmzC4Vub
+        qsDmLwmc4gw07nrmAtmsh6JBobu5ALBRIyFKMdIdcYJ7L4Yp9juQgTYcEjGvfslCYNcqtvVn0Nco/
+        +YT05YAg==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pCk1k-00EFdD-3i; Tue, 03 Jan 2023 16:20:36 +0000
+Message-ID: <42df94c1661c2ece94d51e4ffcf68651887189db.camel@infradead.org>
+Subject: Re: [PATCH v6 1/2] KVM: x86/cpuid: generalize
+ kvm_update_kvm_cpuid_base() and also capture limit
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paul Durrant <pdurrant@amazon.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>
+Date:   Tue, 03 Jan 2023 16:20:18 +0000
+In-Reply-To: <20221220134053.15591-2-pdurrant@amazon.com>
+References: <20221220134053.15591-1-pdurrant@amazon.com>
+         <20221220134053.15591-2-pdurrant@amazon.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-K89h+9vUFNC02WVSry7I"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-These fixes have been in next, though not as these commits.
 
-I'd like to apologize again to contributors for missing the merge
-window with new features. These by necessity have been pushed out
-to the next merge window. This pull only has bugfixes.
+--=-K89h+9vUFNC02WVSry7I
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-I put automation in place to help prevent missing merge window
-in the future.
+T24gVHVlLCAyMDIyLTEyLTIwIGF0IDEzOjQwICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6Cj4g
+QSBzdW5zZXF1ZW50IHBhdGNoIHdpbGwgbmVlZCB0byBhY3F1aXJlIHRoZSBDUFVJRCBsZWFmIHJh
+bmdlIGZvciBlbXVsYXRlZAo+IFhlbiBzbyBleHBsaWNpdGx5IHBhc3MgdGhlIHNpZ25hdHVyZSBv
+ZiB0aGUgaHlwZXJ2aXNvciB3ZSdyZSBpbnRlcmVzdGVkIGluCj4gdG8gdGhlIG5ldyBmdW5jdGlv
+bi4gQWxzbyBpbnRyb2R1Y2UgYSBuZXcga3ZtX2h5cGVydmlzb3JfY3B1aWQgc3RydWN0dXJlCj4g
+c28gd2UgY2FuIG5lYXRseSBzdG9yZSBib3RoIHRoZSBiYXNlIGFuZCBsaW1pdCBsZWFmIGluZGlj
+ZXMuCj4gCj4gU2lnbmVkLW9mZi1ieTogUGF1bCBEdXJyYW50IDxwZHVycmFudEBhbWF6b24uY29t
+Pgo+IC0tLQoKUmV2aWV3ZWQtYnk6IERhdmlkIFdvb2Rob3VzZSA8ZHdtd0BhbWF6b24uY28udWs+
+Cgo+IENjOiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4KPiBDYzogUGFv
+bG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KPiBDYzogVGhvbWFzIEdsZWl4bmVyIDx0
+Z2x4QGxpbnV0cm9uaXguZGU+Cj4gQ2M6IEluZ28gTW9sbmFyIDxtaW5nb0ByZWRoYXQuY29tPgo+
+IENjOiBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFsaWVuOC5kZT4KPiBDYzogRGF2ZSBIYW5zZW4gPGRh
+dmUuaGFuc2VuQGxpbnV4LmludGVsLmNvbT4KPiBDYzogRGF2aWQgV29vZGhvdXNlIDxkd213MkBp
+bmZyYWRlYWQub3JnPgo+IAo+IHY2Ogo+IMKgLSBOZXcgaW4gdGhpcyB2ZXJzaW9uCj4gLS0tCj4g
+wqBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHzCoCA3ICsrKysrKy0KPiDCoGFyY2gv
+eDg2L2t2bS9jcHVpZC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDE1ICsrKysrKysrLS0tLS0t
+LQo+IMKgMiBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQo+
+IAo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC94
+ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IGluZGV4IGYzNWYxZmY0NDI3Yi4uZmYyMDFhZDM1
+NTUxIDEwMDY0NAo+IC0tLSBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiArKysg
+Yi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gQEAgLTcxMCw2ICs3MTAsMTEgQEAg
+c3RydWN0IGt2bV9xdWV1ZWRfZXhjZXB0aW9uIHsKPiDCoMKgwqDCoMKgwqDCoMKgYm9vbCBoYXNf
+cGF5bG9hZDsKPiDCoH07Cj4gwqAKPiArc3RydWN0IGt2bV9oeXBlcnZpc29yX2NwdWlkIHsKPiAr
+wqDCoMKgwqDCoMKgwqB1MzIgYmFzZTsKPiArwqDCoMKgwqDCoMKgwqB1MzIgbGltaXQ7Cj4gK307
+Cj4gKwo+IMKgc3RydWN0IGt2bV92Y3B1X2FyY2ggewo+IMKgwqDCoMKgwqDCoMKgwqAvKgo+IMKg
+wqDCoMKgwqDCoMKgwqAgKiByaXAgYW5kIHJlZ3MgYWNjZXNzZXMgbXVzdCBnbyB0aHJvdWdoCj4g
+QEAgLTgyNiw3ICs4MzEsNyBAQCBzdHJ1Y3Qga3ZtX3ZjcHVfYXJjaCB7Cj4gwqAKPiDCoMKgwqDC
+oMKgwqDCoMKgaW50IGNwdWlkX25lbnQ7Cj4gwqDCoMKgwqDCoMKgwqDCoHN0cnVjdCBrdm1fY3B1
+aWRfZW50cnkyICpjcHVpZF9lbnRyaWVzOwo+IC3CoMKgwqDCoMKgwqDCoHUzMiBrdm1fY3B1aWRf
+YmFzZTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qga3ZtX2h5cGVydmlzb3JfY3B1aWQga3ZtX2Nw
+dWlkOwo+IMKgCj4gwqDCoMKgwqDCoMKgwqDCoHU2NCByZXNlcnZlZF9ncGFfYml0czsKPiDCoMKg
+wqDCoMKgwqDCoMKgaW50IG1heHBoeWFkZHI7Cj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9j
+cHVpZC5jIGIvYXJjaC94ODYva3ZtL2NwdWlkLmMKPiBpbmRleCAwYjViZjAxM2ZjYjguLjI0Njg3
+MjBmOGQ4NCAxMDA2NDQKPiAtLS0gYS9hcmNoL3g4Ni9rdm0vY3B1aWQuYwo+ICsrKyBiL2FyY2gv
+eDg2L2t2bS9jcHVpZC5jCj4gQEAgLTE4MCwxMiArMTgwLDEzIEBAIHN0YXRpYyBpbnQga3ZtX2Nw
+dWlkX2NoZWNrX2VxdWFsKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bV9jcHVpZF9l
+bnRyeTIKPiDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIDA7Cj4gwqB9Cj4gwqAKPiAtc3RhdGljIHZv
+aWQga3ZtX3VwZGF0ZV9rdm1fY3B1aWRfYmFzZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gK3N0
+YXRpYyB2b2lkIGt2bV91cGRhdGVfaHlwZXJ2aXNvcl9jcHVpZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
+cHUsIGNvbnN0IGNoYXIgKmh5cGVydmlzb3Jfc2lnbmF0dXJlLAo+ICvCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqBzdHJ1Y3Qga3ZtX2h5cGVydmlzb3JfY3B1aWQgKmh5cGVydmlzb3JfY3B1aWQpCj4gwqB7
+Cj4gwqDCoMKgwqDCoMKgwqDCoHUzMiBmdW5jdGlvbjsKPiDCoMKgwqDCoMKgwqDCoMKgc3RydWN0
+IGt2bV9jcHVpZF9lbnRyeTIgKmVudHJ5Owo+IMKgCj4gLcKgwqDCoMKgwqDCoMKgdmNwdS0+YXJj
+aC5rdm1fY3B1aWRfYmFzZSA9IDA7Cj4gK8KgwqDCoMKgwqDCoMKgbWVtc2V0KGh5cGVydmlzb3Jf
+Y3B1aWQsIDAsIHNpemVvZigqaHlwZXJ2aXNvcl9jcHVpZCkpOwo+IMKgCj4gwqDCoMKgwqDCoMKg
+wqDCoGZvcl9lYWNoX3Bvc3NpYmxlX2h5cGVydmlzb3JfY3B1aWRfYmFzZShmdW5jdGlvbikgewo+
+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZW50cnkgPSBrdm1fZmluZF9jcHVpZF9l
+bnRyeSh2Y3B1LCBmdW5jdGlvbik7Cj4gQEAgLTE5Nyw5ICsxOTgsOSBAQCBzdGF0aWMgdm9pZCBr
+dm1fdXBkYXRlX2t2bV9jcHVpZF9iYXNlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBzaWduYXR1cmVbMV0gPSBl
+bnRyeS0+ZWN4Owo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoHNpZ25hdHVyZVsyXSA9IGVudHJ5LT5lZHg7Cj4gwqAKPiAtwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoEJVSUxEX0JVR19PTihzaXplb2Yoc2lnbmF0dXJl
+KSA+IHNpemVvZihLVk1fU0lHTkFUVVJFKSk7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoIW1lbWNtcChzaWduYXR1cmUsIEtWTV9TSUdOQVRVUkUs
+IHNpemVvZihzaWduYXR1cmUpKSkgewo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZjcHUtPmFyY2gua3ZtX2NwdWlkX2Jhc2Ug
+PSBmdW5jdGlvbjsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoGlmICghbWVtY21wKHNpZ25hdHVyZSwgaHlwZXJ2aXNvcl9zaWduYXR1cmUsIHNpemVvZihz
+aWduYXR1cmUpKSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGh5cGVydmlzb3JfY3B1aWQtPmJhc2UgPSBmdW5jdGlvbjsK
+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqBoeXBlcnZpc29yX2NwdWlkLT5saW1pdCA9IGVudHJ5LT5lYXg7Cj4gwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJy
+ZWFrOwo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0K
+PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0KPiBAQCAtMjA5LDcgKzIxMCw3IEBA
+IHN0YXRpYyB2b2lkIGt2bV91cGRhdGVfa3ZtX2NwdWlkX2Jhc2Uoc3RydWN0IGt2bV92Y3B1ICp2
+Y3B1KQo+IMKgc3RhdGljIHN0cnVjdCBrdm1fY3B1aWRfZW50cnkyICpfX2t2bV9maW5kX2t2bV9j
+cHVpZF9mZWF0dXJlcyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgIHN0cnVjdCBrdm1fY3B1aWRfZW50cnkyICplbnRyaWVzLCBpbnQgbmVu
+dCkKPiDCoHsKPiAtwqDCoMKgwqDCoMKgwqB1MzIgYmFzZSA9IHZjcHUtPmFyY2gua3ZtX2NwdWlk
+X2Jhc2U7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGJhc2UgPSB2Y3B1LT5hcmNoLmt2bV9jcHVpZC5i
+YXNlOwo+IMKgCj4gwqDCoMKgwqDCoMKgwqDCoGlmICghYmFzZSkKPiDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoHJldHVybiBOVUxMOwo+IEBAIC00MzksNyArNDQwLDcgQEAgc3RhdGlj
+IGludCBrdm1fc2V0X2NwdWlkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bV9jcHVp
+ZF9lbnRyeTIgKmUyLAo+IMKgwqDCoMKgwqDCoMKgwqB2Y3B1LT5hcmNoLmNwdWlkX2VudHJpZXMg
+PSBlMjsKPiDCoMKgwqDCoMKgwqDCoMKgdmNwdS0+YXJjaC5jcHVpZF9uZW50ID0gbmVudDsKPiDC
+oAo+IC3CoMKgwqDCoMKgwqDCoGt2bV91cGRhdGVfa3ZtX2NwdWlkX2Jhc2UodmNwdSk7Cj4gK8Kg
+wqDCoMKgwqDCoMKga3ZtX3VwZGF0ZV9oeXBlcnZpc29yX2NwdWlkKHZjcHUsIEtWTV9TSUdOQVRV
+UkUsICZ2Y3B1LT5hcmNoLmt2bV9jcHVpZCk7Cj4gwqDCoMKgwqDCoMKgwqDCoGt2bV92Y3B1X2Fm
+dGVyX3NldF9jcHVpZCh2Y3B1KTsKPiDCoAo+IMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gMDsKCg==
 
-The following changes since commit 1b929c02afd37871d5afb9d498426f83432e71c2:
 
-  Linux 6.2-rc1 (2022-12-25 13:41:39 -0800)
+--=-K89h+9vUFNC02WVSry7I
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-are available in the Git repository at:
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTAzMTYyMDE4WjAvBgkqhkiG9w0BCQQxIgQg38HqfnPV
+FehSyPNLJdoPpZTrKtWqgINqaGXgURqKMn4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAN9KdPlNptQRcDM16Z+JD2I9U+PyW5frfL
+cBrJKghuppfYB3AlS6/9jcmcx2uX5QgcTZIshXF/V90XmHWWfi1dZW1zbWxndNZfT3sMjk/6B7Z1
+vO19M4rNFDZK6WI5cNKvmyk08OQhmJqDvdR+pup731YU1VaO0q0Ty4CrLDiilECVZv9z8jqmGECG
+302YWl1RSLzzUbB9HSP7XVl+CLKZAjDo+7pghbZM/VRspf7V0iKLeBHoOYgjyw3uO4UW1yE7oaMf
+Y/N2PXpufdlPD7pnS0AGgRpyVo4NpiWyf0Pxp6QlQATbBhSwt5Tn3zGsmmKcH6sIWA1lDTj7vt8P
+mg/zbH7LgGc1FouHYA4J6Pr7d7Y9IIqSL5FXyDPrFn3dFn1XiLoVPQi+Hx8mLv4Z1bjVn+588rsq
+YK7mMWJcwUzsmCKrdnY7qyrf/h41t+JfCEinwV7j9ZQQ3i6EqT5HY+oCRRYbW1rgGCqjpykFhGsD
+EadIF9+bfbLWIANYgP9hd9qTJbksf5MMgBdTmczVGVpRaQCCSboO4jbGEsmG3HRpcgRaL0E4oNpQ
+NaohYF8VNOSBBOR9y8BpkCOKRNwjdvpnBCfiG1yF8Kt47jaFvPB5g62vulK6j1Cx0fSGELK8wcKw
+hVSzgB8LHoaZYwtVFxcT4eKmPVv3B0CMYp1eaNsotAAAAAAAAA==
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-for you to fetch changes up to a26116c1e74028914f281851488546c91cbae57d:
-
-  virtio_blk: Fix signedness bug in virtblk_prep_rq() (2022-12-28 05:28:11 -0500)
-
-----------------------------------------------------------------
-virtio,vhost,vdpa: fixes, cleanups
-
-mostly fixes all over the place, a couple of cleanups.
-
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Angus Chen (2):
-      virtio_pci: modify ENOENT to EINVAL
-      virtio_blk: use UINT_MAX instead of -1U
-
-Cindy Lu (2):
-      vhost_vdpa: fix the crash in unmap a large memory
-      vdpa_sim_net: should not drop the multicast/broadcast packet
-
-Colin Ian King (1):
-      RDMA/mlx5: remove variable i
-
-Davidlohr Bueso (2):
-      tools/virtio: remove stray characters
-      tools/virtio: remove smp_read_barrier_depends()
-
-Dawei Li (1):
-      virtio: Implementing attribute show with sysfs_emit
-
-Dmitry Fomichev (1):
-      virtio-blk: use a helper to handle request queuing errors
-
-Eli Cohen (5):
-      vdpa/mlx5: Fix rule forwarding VLAN to TIR
-      vdpa/mlx5: Return error on vlan ctrl commands if not supported
-      vdpa/mlx5: Fix wrong mac address deletion
-      vdpa/mlx5: Avoid using reslock in event_handler
-      vdpa/mlx5: Avoid overwriting CVQ iotlb
-
-Harshit Mogalapalli (1):
-      vduse: Validate vq_num in vduse_validate_config()
-
-Jason Wang (2):
-      vdpa: conditionally fill max max queue pair for stats
-      vdpasim: fix memory leak when freeing IOTLBs
-
-Rafael Mendonca (1):
-      virtio_blk: Fix signedness bug in virtblk_prep_rq()
-
-Ricardo Cañuelo (1):
-      tools/virtio: initialize spinlocks in vring_test.c
-
-Rong Wang (1):
-      vdpa/vp_vdpa: fix kfree a wrong pointer in vp_vdpa_remove
-
-Shaomin Deng (1):
-      tools: Delete the unneeded semicolon after curly braces
-
-Shaoqin Huang (2):
-      virtio_pci: use helper function is_power_of_2()
-      virtio_ring: use helper function is_power_of_2()
-
-Si-Wei Liu (1):
-      vdpa: merge functionally duplicated dev_features attributes
-
-Stefano Garzarella (4):
-      vringh: fix range used in iotlb_translate()
-      vhost: fix range used in translate_desc()
-      vhost-vdpa: fix an iotlb memory leak
-      vdpa_sim: fix vringh initialization in vdpasim_queue_ready()
-
-Wei Yongjun (1):
-      virtio-crypto: fix memory leak in virtio_crypto_alg_skcipher_close_session()
-
-Yuan Can (1):
-      vhost/vsock: Fix error handling in vhost_vsock_init()
-
-ruanjinjie (1):
-      vdpa_sim: fix possible memory leak in vdpasim_net_init() and vdpasim_blk_init()
-
-wangjianli (1):
-      tools/virtio: Variable type completion
-
- drivers/block/virtio_blk.c                         | 35 +++++-----
- .../crypto/virtio/virtio_crypto_skcipher_algs.c    |  3 +-
- drivers/vdpa/mlx5/core/mlx5_vdpa.h                 |  5 +-
- drivers/vdpa/mlx5/core/mr.c                        | 46 +++++++------
- drivers/vdpa/mlx5/net/mlx5_vnet.c                  | 78 +++++++---------------
- drivers/vdpa/vdpa.c                                | 11 ++-
- drivers/vdpa/vdpa_sim/vdpa_sim.c                   |  7 +-
- drivers/vdpa/vdpa_sim/vdpa_sim_blk.c               |  4 +-
- drivers/vdpa/vdpa_sim/vdpa_sim_net.c               |  7 +-
- drivers/vdpa/vdpa_user/vduse_dev.c                 |  3 +
- drivers/vdpa/virtio_pci/vp_vdpa.c                  |  2 +-
- drivers/vhost/vdpa.c                               | 52 +++++++++------
- drivers/vhost/vhost.c                              |  4 +-
- drivers/vhost/vringh.c                             |  5 +-
- drivers/vhost/vsock.c                              |  9 ++-
- drivers/virtio/virtio.c                            | 12 ++--
- drivers/virtio/virtio_pci_modern.c                 |  4 +-
- drivers/virtio/virtio_ring.c                       |  2 +-
- include/uapi/linux/vdpa.h                          |  4 +-
- tools/virtio/ringtest/main.h                       | 37 +++++-----
- tools/virtio/virtio-trace/trace-agent-ctl.c        |  2 +-
- tools/virtio/virtio_test.c                         |  2 +-
- tools/virtio/vringh_test.c                         |  2 +
- 23 files changed, 173 insertions(+), 163 deletions(-)
-
+--=-K89h+9vUFNC02WVSry7I--
