@@ -2,109 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93E6265C2E7
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 16:21:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AA86765C2EA
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 16:22:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237875AbjACPUr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 10:20:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46632 "EHLO
+        id S233212AbjACPWV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 10:22:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237867AbjACPU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 10:20:26 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45E1F117D
-        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 07:20:25 -0800 (PST)
+        with ESMTP id S238093AbjACPV5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 10:21:57 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2077.outbound.protection.outlook.com [40.107.95.77])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D931135
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 07:21:56 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SKmkOe8JM7+zzcB4NBcP2ckqvcIQcGqq9nxzR1vCogt5ydWlAPg9UL6lqASNmnHNQ1LMSVKIig5UpDrwv7UJy3mgT7pYB2frF7uqKsqRUV9WllOnI524qGuX7Q65ttdbACM231soY641OhkX0cVIgzIJybarBtX+8t/7NnLDAH8UZPu3dCcZ3WyTDqt7pWY/Z3bAG6H9eAEhVJi5KaV0UZU63sFuZBPfdtpYSMTqgj3gq/FU6tmVRb4unkJKEw+j3AAcyO7V0bqrZI66+xRfaACbbRC0Gs0KUOauI5JMC89ERh23Zq0U3rcZ9kG1kOqCPtNP3ayrIrNxmKqNDB97RA==
+ b=YiSBl5jKFQ0hmElx1BlU6HR0gkpk0ceDgOCRnkxjAGaxWEilqvb9BBLggb8v1UnlDJ6l4hYYRP5gjDE1ahA3yEAEaH2e7LqLP+g+TUwKSl6Lxxozh3Il1Tmk+q2kr/Wsu6l/bnwr+Pibv8MU2Xn8j6HvT95n9i/jkXmZPSw6OQZBPe6T7wtVYpELTmvfSIKDY6svSoaPkFrD2rm12yiBwMO4ohB20RyJD49gtWOqWbeQwfWXfrrW3+Y9AqDH19yUgqE6kJgjA/9V9hXz3c2vvmCHIZsJO77+jC33U1xe76+05pCAWDtr+3bRVJjXbJVEtMf+f+s1Gq6zF8Gux7Tq0g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2ivojQ7ZkMTmay2O+jLganTQCBMi5fpnSb8PR60afNM=;
- b=A+msW/N4As1d6yhj2lLDpxcjTiqz0sPBmjgX1gY22w4eyIYj3Qiwf5lsBOMW48I1ZI1lAB230Otpf+iYV4TBAM4XWpeUTmVLC8yI6zCFbygXehhZdY/blwgZ4yvVSK4YrTj0yO8zZPidTdm7Uy6ffLolkXQAw6OxC2Kn9IqQWNe1vF8sp1u1VJZTQJWsVjxopwEL76MIAhVZ8wyTO36eOEyefeUKEMAo0BKebMM8Iz5qsXZy5zLRm1Nr7RAJtLehlMdC2weV37Euw0Jpc+Wld30GmiGfolp4LFNaFCt9GIIEZ9MetAb5lygsZMVnnB8ypDWwgTfej6b8cyZkbCeDLQ==
+ bh=MR45Ib2lhphn4d3gp+LP6Bvr6uklvNFejK0jmVL4YuQ=;
+ b=nHeODIJkBrYWqG8ia0wwXP7szO94WQ6+mpmTnX/KtlI8mkUHl3llB3I+i/GqtgIlw6QEL5ZEgT7WyeshCjJrZYMsGD1outcGFn1Jf85P/zwiapKBOT78I4uk5nLhqpCTyyV6wVmNWtklJyrYcTglYbVOahv/3c+j8mEYrIfPgqos3nAj3JgyYJWpYx0Os0JxGxRXlYa4bXNO4jqBONF7v/gOViu7TDN4MeOeuUHErp+DE5RbD0G/dCdb5ccS8aCUDX7QDcIJt9/SwEPtPBjhzXheFr2xVP/ue+dNzthIZNrBsYpBFgkjGQas9YDLZA5xbV+dA18uHsF6iJ6cLP4zkA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2ivojQ7ZkMTmay2O+jLganTQCBMi5fpnSb8PR60afNM=;
- b=Utjv1DBL1CAUiIa76rHP1p24O1Xu2viPxRkn53PX/WXHVmGBuc2/+/Ayh3vsSaoKzuxnT4PEqQ1SDCsOMlhYyveL+q30HLqoiq0yqYEBvPrL+pR3LrfJDii/04LFJPOfolMKg3QrjeIisKu0Qe+Sq3FHlowqH2S0I//6bkHdfMarPGo0cW25qm5jOddGDKktHxcDDi/eTqIdsYWURwabvtl44P/KLrIKAdYN1w0w45K+OkkDGeG3pntVCzamEkRiqsaC+UwtYk1QAR8JoiyYZ4uj6daqtTRSL0kXM8n7qp31Y4CYZtWAunL2UPzxOY2hPMkrPShlzCfZKq/N7Zr69g==
+ bh=MR45Ib2lhphn4d3gp+LP6Bvr6uklvNFejK0jmVL4YuQ=;
+ b=IjzpREKryQF3kGfOI+wGDG4Vz+glgVtbyrgpHe/Aw9vazKoTIecjKO9QfmaFGTcKy9TsJR8oDLHfIxeMHGC5aPeaLJfoLCbms8mWHV+4SDWxlynecLMuiGlTA/Z5f+KzrufoxjTuoVqf8CQZ8qbNu5tCiAida1Cf6pLLPrfN0yDdCLn4g2JX3niFIPrd8A4iH+ru9nCmj1OdqM+3RFBojp9xRnSV3z+Iuz39uBZyz4L20OCcKeG1BkxohKc5MsoUDL9jkFA8FyZkK9ZFagshnq977X7WXRNrMZwB2EfqAJD/Mdm3mMe053Ylz6vghz64reyG7V1gZo9xxg5xM/LAtA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ1PR12MB6243.namprd12.prod.outlook.com (2603:10b6:a03:456::13) with
+ by BL1PR12MB5379.namprd12.prod.outlook.com (2603:10b6:208:317::15) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Tue, 3 Jan
- 2023 15:20:23 +0000
+ 2023 15:21:54 +0000
 Received: from LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
  ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5944.019; Tue, 3 Jan 2023
- 15:20:23 +0000
-Date:   Tue, 3 Jan 2023 11:20:21 -0400
+ 15:21:54 +0000
+Date:   Tue, 3 Jan 2023 11:21:53 -0400
 From:   Jason Gunthorpe <jgg@nvidia.com>
 To:     Steve Sistare <steven.sistare@oracle.com>
 Cc:     kvm@vger.kernel.org, Alex Williamson <alex.williamson@redhat.com>,
         Cornelia Huck <cohuck@redhat.com>,
         Kevin Tian <kevin.tian@intel.com>
-Subject: Re: [PATCH V7 2/7] vfio/type1: prevent underflow of locked_vm via
- exec()
-Message-ID: <Y7RHtRnHOcrBuxBi@nvidia.com>
+Subject: Re: [PATCH V7 3/7] vfio/type1: track locked_vm per dma
+Message-ID: <Y7RIEeQW5L+qFt9a@nvidia.com>
 References: <1671568765-297322-1-git-send-email-steven.sistare@oracle.com>
- <1671568765-297322-3-git-send-email-steven.sistare@oracle.com>
+ <1671568765-297322-4-git-send-email-steven.sistare@oracle.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1671568765-297322-3-git-send-email-steven.sistare@oracle.com>
-X-ClientProxiedBy: MN2PR15CA0043.namprd15.prod.outlook.com
- (2603:10b6:208:237::12) To LV2PR12MB5869.namprd12.prod.outlook.com
+In-Reply-To: <1671568765-297322-4-git-send-email-steven.sistare@oracle.com>
+X-ClientProxiedBy: BL0PR0102CA0070.prod.exchangelabs.com
+ (2603:10b6:208:25::47) To LV2PR12MB5869.namprd12.prod.outlook.com
  (2603:10b6:408:176::16)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ1PR12MB6243:EE_
-X-MS-Office365-Filtering-Correlation-Id: 15bddd0b-0824-42dc-42ec-08daed9e0864
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BL1PR12MB5379:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3c1e318e-e1a9-4421-a774-08daed9e3f06
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IvI1yLBSnOWnbrDIE5f5Ds2f/o1wY7Pc31PScI3zHc9EQU4fvEQd6zu4V1LXMwESUm8y7BhdDUOYHPf45luq8Bui3gc/4iaTk/g9Hm77ozQdGpAL8l7FEq2S+L7y/DJrFhahvVSCvwSTIwuqZYXEaVbG3+jzcXh5ffsrhAc/DKl23K4QiDUmWLqM0gYbYyaAoSWICaEH8/4uxYmzpi0OVqHuN1MxrIgcneCE2AljUCoy7rotkthlIVQQkvgoewfW06H5HJOa8Ahigd19qgK8j818beLsK/G6kqz4bykbUHKW2cR0JFHeltki3lD1Ob+mdwWukI4xN6xaunVspiRWXAnHwg7f2juLyMwb8feWAnABa+bNO1955MlDLeyZO5DokeC4p2olh+CX6eOQ7qE8BKfCbkHe4y8aqASif1Jd0BbQZ9uMn/SwD7W3A6uaaYCQoqyVu/+NVAGJcXiMiGSA76FMiQSYY/rTU8bQ4RTBMdmw5w+d9BnwPcV4CCkHsEZwyN7gCtCP3v36A95+ySS4JpQ3tuJLR61fXYMPl2bIfjSleYdI1DeCj/BrK0CI1spotr9C9dVShSEHqp1A9U1p7CByf1IL9qYQYbc/tgqpFWaT7LOQWKbJjP3XeDHWXH9lkIzE8O5qsK1Xni5VkE6n20ppZPaMF8OMw5P6pgCpnDDi/iCyuws7HaD4EomKCnxn
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(376002)(366004)(136003)(346002)(451199015)(41300700001)(4326008)(8936002)(8676002)(5660300002)(66946007)(316002)(6916009)(66476007)(54906003)(2906002)(6486002)(6506007)(478600001)(66556008)(86362001)(2616005)(186003)(26005)(6512007)(83380400001)(38100700002)(36756003)(22166006);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: BUx5zQHBk21Mb3mcMEuY2kXPleDgOL46vf24GPtIYn52UatlnAqfSutxEB+JymKjjTC7pebIpmobmcIBoX76tQj71Lpq66TTws3CqgtmpdBiwG/lYKD8sE0hzHfW/e6/AtuC5Ogl+AmSU897cHKfRdVde25xfUbh+vBKGVhYg35uEQ+5VGv/p8O66tofo3CYRnupBkrbF+vYsaa5/bk+MrHjx6n0cK1Xj8ZwU0jQeMBFs0BTn/lcB0vHfqQA3h989wThxgGbPWbGqiiZ9GNDsA6edMpPR5yXOps7BekGDk20UugJRV7Ubvl42PincmdtKRKXVTBShB/T6pvHVhwI/B6z4uwF9ila/WsSpepl56/t8hO/d83hfVzP6XGfBdx/d8vXwIobTyGO5snaX9ysrfs5ywMpZoB/Dt2Zht0Y6p+kOng/fIQ+oWmza4o3IyYF6pdCOGeKWDZOPEU5nIRLr8L1DYB1tJ23FM2LgS2HeCCdEsnJQTOU1Yo+bexXnr9V1ouJZpjHPXR/ypxD5T7cGcW3r2iM6trcJrDia7A/GYMA6uqtsu0xdaec+vhX93hKbxMnndJMZLnFx8L/+AafPN8cKmMi+h3xZbOyXAB2yr+X2YBy2uw94K5gmoqUfcnN6Af+qOT+3px+rLaDw14rEUmQbKWRB/qRLO7i8lUlc6YChfNXdIRrvl0Jsuay36nKs4+OpH3Y04v8CK8+b34trA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(376002)(39860400002)(396003)(136003)(346002)(451199015)(5660300002)(2906002)(8936002)(4326008)(8676002)(41300700001)(478600001)(316002)(66476007)(54906003)(66946007)(6916009)(66556008)(6486002)(26005)(6512007)(6506007)(83380400001)(186003)(38100700002)(2616005)(86362001)(36756003)(22166006)(67856001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nLLSlgTR8OPeY/p4mUiCaxvZM3BhPSAjJjnOpbqd2dedRoyBOIeYvL486s5H?=
- =?us-ascii?Q?xl50agAL5EYlrPfOBb/2GGsrko7PQynGvWHauOJc6u9eQ7bVbueeZdai41RC?=
- =?us-ascii?Q?4sZMfH1W20T6TlwMIIIwD2W2eVgANugA6PxVzLGcfAacYXpu2Bm25R+TwQdL?=
- =?us-ascii?Q?jNkYNe3gUEiUGujC3tvivbnh/m//YLqSDWeUbszQhNiCWyz0AjecLijOb+CB?=
- =?us-ascii?Q?zdGANoXaYkX4h++CjWZ6ZQBnHjD5fMYR3xIi+8fNs7dG8HtqJYlbP2KfxpO7?=
- =?us-ascii?Q?VjoOPyZ7jkOhiaf+J/NSvkRnCW1Q3wQhWi9RdKHaOy8X3XgIkjZaME0Se6F9?=
- =?us-ascii?Q?YGuXCoRdPWe0wbMt/fOwZVBV81qmsvoJDwmSuLObFrGYCgIPxxkmKYP0e/wD?=
- =?us-ascii?Q?X8wbOf6Q0VYdJAmXxdMoIUyNj3dXYvhzIeNNKbnHrspsn6xxNWsoBSeMFMln?=
- =?us-ascii?Q?8plsTBcVeuQHT25lObSjbvUMKYPJ8MNsvwwH59jBYDudMdTw6k2OC+ROc1d8?=
- =?us-ascii?Q?rWTUHcwy/LfacPkH9m318Q1ngMq+AU1ElRJJtCwUn2HGN5k9mIg+hsk1ZxxL?=
- =?us-ascii?Q?/7bPD5ZV1dVImajuvkhMHvTcG0UGETpYOrtxy+4Q95DFoFiJbJESjFfQ0DtF?=
- =?us-ascii?Q?wG5r+3HJWStchISjsT0rz5kr4NwVirHIJANcrs6QJaEXgzgqilQ+l+jciKpI?=
- =?us-ascii?Q?hxArLxzwKzgu8CNpQMnyO2zDwDVWRz1kiutoLp2/OD4ollOAUtl+5N++RSlL?=
- =?us-ascii?Q?h9Yu/QrwdXwnJCwrWqWGcImi87reuC7NDsDy4aetxSTQqrZc+D1DKzuNc8qi?=
- =?us-ascii?Q?4xQ+ji+7x5Y0h2QoPWuVkR3NZ/IG1UkMzAVPN/myk57bNan68kQRIbi12dI9?=
- =?us-ascii?Q?g6gnhaPoyt4FvIr0arOfm1zsAkO08gm3KZN7gJ7Zidznd4rW9SmmIC8qI5fl?=
- =?us-ascii?Q?ksRHBAKgx6IuwQfkyR9bWwKUgxtNozb5DK8oHIdinOMFbFjqSE5B4tpVG0n6?=
- =?us-ascii?Q?a81zNp6CHzbWDXcD7TcB6H/nO8+WcjnI/nRRJYH1xB/u5FURuV+z9+sm76Rw?=
- =?us-ascii?Q?DWYwCrAOP4gUTP5obsACKcGNX2LKJ5p1lHR5otIL7/wDlSGJnG6oU/sUvquQ?=
- =?us-ascii?Q?87mXxculs5zgX9tkK9AkksH7fFuvJqMjwkCisSXLzNSAqr52UatDKbH+1TVK?=
- =?us-ascii?Q?TapNvOjQPNNujpXETZLQitaKnnvIWn0IYhpgnAb+QxpkLHevRi5Ph/vekGfz?=
- =?us-ascii?Q?C2ti+CywJvwB9+qhSFmTHi2NO7OTUSaZ6KsyqcEhhqBqheW1zLDqOdfe4pwv?=
- =?us-ascii?Q?egPVw/XiZSrUzackvVDp/eTjItlFp/vsPVsETSmUNv05lfr5SkFn5uGZLkYt?=
- =?us-ascii?Q?YqiR+kCq+2GA9L4CK8qxFaep94lJMJO42PDdkOvbsH+1Yl6Co6CXGAYoGinU?=
- =?us-ascii?Q?MX7krzS08J7DgHpDzneaqfqmJZn5MnB2Ae28KNYtI1R3rpQGMtRHzIPvKsyM?=
- =?us-ascii?Q?Pa8gt5qBHCW38tolXETrxM2To4QqWrHY3inCkGDQCeFf0UtXPs7Kj1sWxixo?=
- =?us-ascii?Q?DXmxlSOO/xULAKKAI0aDuwJNhadV3G5v+QSpVtco?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?R7484/+XY96sElyJv9piRb44hRSaoepIJczJDXMQiEMZHf/DOUB/OmHdbkmJ?=
+ =?us-ascii?Q?rfnrg8JLD/XbOej/cKaES2siE3lNWyUNrByatHGG/vXpKlDJKyhmOW93GZM5?=
+ =?us-ascii?Q?ziUfQa8Z59A5xs9TN009AfM6k4MRl1ZzQiLkMFrbl4j7gsfXHfZYnwEskHMY?=
+ =?us-ascii?Q?916oRCeq4sZ56dGVL65w/D0cCtKdEVhyjcbsyYB1zuNGMGj7L4w56aIM0APt?=
+ =?us-ascii?Q?WV3pbQk7OyCMxHD/HAD+BrExZqYZrIlfSTM+DZIWoLxPoHv4q85Dj3Y2oqMS?=
+ =?us-ascii?Q?Y8R3pf3gG/9mBB14vCkpmpdzAQdUoItTQg5YujUd4aMkgxPFJ7RB00fzO/aD?=
+ =?us-ascii?Q?AHisQwQIgciI3ctEhsE9Q1IM+UbOnwojqDU6J1q8HleQjKXfFcRJWlGvnO+l?=
+ =?us-ascii?Q?AG0rkBeazwmbxlxYg3lbRvIouE72bDZO5G6dSJachy6YUErNNOWNulQJbrHU?=
+ =?us-ascii?Q?h/LLhELkLGFkCc117ifWNJ+9ulWj47OxexFUSmGMWsN7tZK8146eDXqDyoak?=
+ =?us-ascii?Q?qUJ5SAbV0hFf0LkPo+LROF+FDtKRLc81TuppBRHwveqLtzA+r4N1KecjDoww?=
+ =?us-ascii?Q?vCZ+EkQKjJRY7eFkCvlYagEU8btTuZzgtmW57IM1MKHgvxtqoxlHtQhkZZaY?=
+ =?us-ascii?Q?Tr9rBg/b+hJLb8PcCs5HB4dYEIp6nTmh3b3KZYQPNw9YgXAA241yhbJmWWz9?=
+ =?us-ascii?Q?kQWjo3ZL4uO3C3V4k6HCMZ+o4kACjcpjl4mRNQn6fc4EkYijKqfXWsHzlmGl?=
+ =?us-ascii?Q?YpHdA2rqrXUDbY7/CyM0Jg6XrV9jL2j2sf4EGkRx9l9kpRYAeikiehpSJT3x?=
+ =?us-ascii?Q?7Los4rIMmmqDl5MQl0Gt+FhBkBjARDo+BAfIlD6WRQSqjtP9vwT45I6NxPLB?=
+ =?us-ascii?Q?7OBL7TTcJg2N/9UDTReyr77+3xFdoBhBn42+Q6QEgXlqPaDI2BNIaxF6yQXY?=
+ =?us-ascii?Q?OLwCzJM+2cuHh5+xH4mYRGi9gVvXzxUuXF2PCCDcWyr4DE02CznykJju62tD?=
+ =?us-ascii?Q?wewYVsCwo7H0svMG24wvgNeFa95pQ9jhgSJOMEPTgYfd1AYxpTZrmQ98w0R/?=
+ =?us-ascii?Q?puB5+9/SJhCA+qMD/qJtPcQUKDalg3N9uNXqVDoXJ8yrxtyObujJhG7LN1z8?=
+ =?us-ascii?Q?k1YG/MeKHg6rOszb+5jnYvxc2wPYCdgBvNP+UCHj3eRkiN+Rom6WDBf4XUNU?=
+ =?us-ascii?Q?iSMyPDaraRC8XyKX+x77ArPeVr838rjTFOrYy3odfzLvmemO9mbb25tj6Krt?=
+ =?us-ascii?Q?hovSdvglSuLhoXXUowsmWm/ZwJ3VXAREfuhJSCBt27TRV1o7WWRP2e0rS9PK?=
+ =?us-ascii?Q?i4ItZc5+A946XsP+yurKWHUEKzT1dgg2Ofgt8ndMOU3TtyIlctEBbKI+G3nN?=
+ =?us-ascii?Q?lE9eNFN1BQ/oHZDhwp2pJ2/Hg4UDKpX0/Dfb3w7RKo3hfPGXQ6dD8wUtZ2I3?=
+ =?us-ascii?Q?qshNPJPXV6yHaoJPo89ZBTloIMBlxOgMh0VGzyXg5RDiMo9IjlLDtGCRahQq?=
+ =?us-ascii?Q?4soSwzmuO0oArd6GjyP974M9QNDPE2aqKtuQaiGreDo7CWQpn5yt4GR0pnft?=
+ =?us-ascii?Q?q8cONIzhNiJAkNr2s/MMsPKh/Aqo0ujyaOFJ8DW0?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 15bddd0b-0824-42dc-42ec-08daed9e0864
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c1e318e-e1a9-4421-a774-08daed9e3f06
 X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2023 15:20:22.9482
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2023 15:21:54.5925
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /cCEGAKi3eExStUs1AmF/j2ts7Jgff1xM92LcxJEi6WpCcIQR+YNE7OXSPD10Cma
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6243
+X-MS-Exchange-CrossTenant-UserPrincipalName: hlZA0udsRFVnxKiFzaUzn3wNdHuYz4gB5QYB/bWpRsTWoQSh0JexAHWMV/itqb8+
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5379
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -115,67 +114,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 20, 2022 at 12:39:20PM -0800, Steve Sistare wrote:
-> When a vfio container is preserved across exec, the task does not change,
-> but it gets a new mm with locked_vm=0, and loses the count from existing
-> dma mappings.  If the user later unmaps a dma mapping, locked_vm underflows
-> to a large unsigned value, and a subsequent dma map request fails with
-> ENOMEM in __account_locked_vm.
+On Tue, Dec 20, 2022 at 12:39:21PM -0800, Steve Sistare wrote:
+> Track locked_vm per dma struct, and create a new subroutine, both for use
+> in a subsequent patch.  No functional change.
 > 
-> To avoid underflow, grab and save the mm at the time a dma is mapped.
-> Use that mm when adjusting locked_vm, rather than re-acquiring the saved
-> task's mm, which may have changed.  If the saved mm is dead, do nothing.
-> 
-> locked_vm is incremented for existing mappings in a subsequent patch.
-> 
-> Fixes: 73fa0d10d077 ("vfio: Type1 IOMMU implementation")
+> Fixes: c3cbab24db38 ("vfio/type1: implement interfaces to update vaddr")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Steve Sistare <steven.sistare@oracle.com>
 > Reviewed-by: Kevin Tian <kevin.tian@intel.com>
 > ---
->  drivers/vfio/vfio_iommu_type1.c | 27 +++++++++++----------------
->  1 file changed, 11 insertions(+), 16 deletions(-)
+>  drivers/vfio/vfio_iommu_type1.c | 20 +++++++++++++++-----
+>  1 file changed, 15 insertions(+), 5 deletions(-)
 > 
 > diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-> index 144f5bb..71f980b 100644
+> index 71f980b..588d690 100644
 > --- a/drivers/vfio/vfio_iommu_type1.c
 > +++ b/drivers/vfio/vfio_iommu_type1.c
-> @@ -100,6 +100,7 @@ struct vfio_dma {
->  	struct task_struct	*task;
+> @@ -101,6 +101,7 @@ struct vfio_dma {
 >  	struct rb_root		pfn_list;	/* Ex-user pinned pfn list */
 >  	unsigned long		*bitmap;
-> +	struct mm_struct	*mm;
+>  	struct mm_struct	*mm;
+> +	long			locked_vm;
+
+Why is it long? Can it be negative?
+
 >  };
 >  
 >  struct vfio_batch {
-> @@ -420,8 +421,8 @@ static int vfio_lock_acct(struct vfio_dma *dma, long npage, bool async)
->  	if (!npage)
->  		return 0;
+> @@ -413,22 +414,21 @@ static int vfio_iova_put_vfio_pfn(struct vfio_dma *dma, struct vfio_pfn *vpfn)
+>  	return ret;
+>  }
 >  
-> -	mm = async ? get_task_mm(dma->task) : dma->task->mm;
-> -	if (!mm)
-> +	mm = dma->mm;
-> +	if (async && !mmget_not_zero(mm))
->  		return -ESRCH; /* process exited */
+> -static int vfio_lock_acct(struct vfio_dma *dma, long npage, bool async)
+> +static int mm_lock_acct(struct task_struct *task, struct mm_struct *mm,
+> +			bool lock_cap, long npage, bool async)
+>  {
 
-Just delete the async, the lock_acct always acts on the dma which
-always has a singular mm.
-
-FIx the few callers that need it to do the mmget_no_zero() before
-calling in.
-
-> @@ -794,8 +795,8 @@ static int vfio_pin_page_external(struct vfio_dma *dma, unsigned long vaddr,
->  	struct mm_struct *mm;
->  	int ret;
->  
-> -	mm = get_task_mm(dma->task);
-> -	if (!mm)
-> +	mm = dma->mm;
-> +	if (!mmget_not_zero(mm))
->  		return -ENODEV;
-
-eg things get all confused here where we have the mmget_not_zero
-
-But then we go ahead and call vfio_lock_acct() with true
+Now async is even more confusing, the caller really should have a
+valid handle on the mm before using it as an argument like this.
 
 Jason
