@@ -2,91 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 95FE865BC32
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 09:27:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BB70165BDB7
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 11:12:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237011AbjACI1H (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 03:27:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49056 "EHLO
+        id S233093AbjACKLW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 05:11:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230211AbjACI1G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 03:27:06 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA8EDF87;
-        Tue,  3 Jan 2023 00:27:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672734425; x=1704270425;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=5beijWPU1uPpW8czZDjIwlVtrcesTLaWCl4YOM+jLzw=;
-  b=IEwEQTC7arDaWA5x0kJMJ95s4YHWpIRNZljA0aq2sjxCzfscuM0Hr6Yg
-   gYjV4oelWyMyZksYdZPrx7h+Krltgp3UyXuSfgKJ7GJAR6fyT4cXUjgQd
-   xoQEWsIUnOQqfR3GswyLTvMXxIggrGYR640PPOZTuwDM36Xg/2cTyarkC
-   dVubaAziBVPjg/VkY4zSS4bKYN8DrInF3dwd3rvmw0QK6A/xoYd54BY6p
-   DtNAF2zaDKKp73B3EwjKv2hk88pGvcpkYzwPaUra4i77W+zvupOkosubq
-   ZkrLEwnOszJfdhI1bgGdjixzNlhqKST4o8RSYCx1/U4zhsxXZTYz9DQOh
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10578"; a="407868363"
-X-IronPort-AV: E=Sophos;i="5.96,296,1665471600"; 
-   d="scan'208";a="407868363"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2023 00:27:05 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10578"; a="983494958"
-X-IronPort-AV: E=Sophos;i="5.96,296,1665471600"; 
-   d="scan'208";a="983494958"
-Received: from leiwang7-mobl.ccr.corp.intel.com (HELO [10.254.213.238]) ([10.254.213.238])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2023 00:27:03 -0800
-Message-ID: <44e77307-8c49-e350-49e4-d5fa3261db27@intel.com>
-Date:   Tue, 3 Jan 2023 16:26:59 +0800
+        with ESMTP id S232809AbjACKLN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 05:11:13 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3FD6288
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 02:11:12 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 5F3A3B80E63
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 10:11:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20F3DC433D2;
+        Tue,  3 Jan 2023 10:11:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672740670;
+        bh=WIRV9KeB+qBR1jtRqfl+nRZmcaTal+PfFn3fayW3MbA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=aD+3j0aGED8xAJEtKKQsSDWuHJH5cdS2wOM0FGzxKFLLYw9R+EQwt1g4O+1a/RK3f
+         7N47+cdsKzrhBzz1XYSyVl6YgbfvK3/keai+86uJ3SDsG8Nld9ybVkiZ7k9MQsaeyC
+         qaMtL+EFKi3b7gV+XgbP5MD7cijBDXqMjnFIqzi0LY/SM8uZUqO47XSkuUGckA8t0t
+         hkJRpma3Y4rR6MERm2vkraygD9tkM/+R5pwu90YN1PQ83yVkiqOJ+kWvyVMFtRE0jm
+         +fMVxCQA/Q2yOWpeWiFQ6xsTmvdCHOR6hvp1qYBpv9WO4P5WybpUhij6CRLEstREHK
+         J9uXF/S3RWz2A==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pCeEF-00GTpw-PU;
+        Tue, 03 Jan 2023 10:11:08 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Cc:     James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Will Deacon <will@kernel.org>,
+        Quentin Perret <qperret@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Subject: [PATCH v2 0/3] KVM: arm64: Fix handling of S1PTW S2 fault on RO memslots
+Date:   Tue,  3 Jan 2023 10:09:01 +0000
+Message-Id: <20230103100904.3232426-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.6.1
-Subject: Re: [PATCH v10 000/108] KVM TDX basic feature support
-Content-Language: en-US
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
-From:   "Wang, Lei" <lei4.wang@intel.com>
-In-Reply-To: <cover.1667110240.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, alexandru.elisei@arm.com, oliver.upton@linux.dev, ardb@kernel.org, will@kernel.org, qperret@google.com, ricarkol@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/30/2022 2:22 PM, isaku.yamahata@intel.com wrote:
+Recent developments on the EFI front have resulted in guests that
+simply won't boot if the page tables are in a read-only memslot and
+that you're a bit unlucky in the way S2 gets paged in... The core
+issue is related to the fact that we treat a S1PTW as a write, which
+is close enough to what needs to be done. Until to get to RO memslots.
 
-> ** Detecting the TDX module readiness.
-> TDX host patch series implements the detection of the TDX module availability
-> and its initialization so that KVM can use it.  Also it manages Host KeyID
-> (HKID) assigned to guest TD.
-> The assumed APIs the TDX host patch series provides are
-> - int seamrr_enabled()
->   Check if required cpu feature (SEAM mode) is available. This only check CPU
->   feature availability.  At this point, the TDX module may not be ready for KVM
->   to use.
-> - int init_tdx(void);
->   Initialization of TDX module so that the TDX module is ready for KVM to use.
-> - const struct tdsysinfo_struct *tdx_get_sysinfo(void);
->   Return the system wide information about the TDX module.  NULL if the TDX
->   isn't initialized.
-> - u32 tdx_get_global_keyid(void);
->   Return global key id that is used for the TDX module itself.
-> - int tdx_keyid_alloc(void);
->   Allocate HKID for guest TD.
-> - void tdx_keyid_free(int keyid);
->   Free HKID for guest TD.
+The first patch fixes this and is definitely a stable candidate. It
+splits the faulting of page tables in two steps (RO translation fault,
+followed by a writable permission fault -- should it even happen).
+The second one documents the slightly odd behaviour of PTW writes to
+RO memslot, which do not result in a KVM_MMIO exit. The last patch is
+totally optional, only tangentially related, and randomly repainting
+stuff (maybe that's contagious, who knows).
 
-tdx_enable() is introduced by TDX host patch series and used in patch 5, should
-it be added to this list too?
+The whole thing is on top of v6.1-rc2.
+
+I plan to take this in as a fix shortly.
+
+	M.
+
+* From v1:
+
+  - Added the documentation patch
+
+  - Dropped the AF micro-optimisation, as it was creating more
+    confusion, was hard to test, and was of dubious value
+
+  - Collected RBs, with thanks
+
+Marc Zyngier (3):
+  KVM: arm64: Fix S1PTW handling on RO memslots
+  KVM: arm64: Document the behaviour of S1PTW faults on RO memslots
+  KVM: arm64: Convert FSC_* over to ESR_ELx_FSC_*
+
+ Documentation/virt/kvm/api.rst          |  8 +++++
+ arch/arm64/include/asm/esr.h            |  9 ++++++
+ arch/arm64/include/asm/kvm_arm.h        | 15 ---------
+ arch/arm64/include/asm/kvm_emulate.h    | 42 ++++++++++++++++++-------
+ arch/arm64/kvm/hyp/include/hyp/fault.h  |  2 +-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
+ arch/arm64/kvm/mmu.c                    | 21 +++++++------
+ 7 files changed, 61 insertions(+), 38 deletions(-)
+
+-- 
+2.34.1
+
