@@ -2,67 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB52C65C6B5
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 19:49:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0431665C6BB
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 19:51:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238379AbjACStE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 13:49:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56654 "EHLO
+        id S238412AbjACSuj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 13:50:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238712AbjACSsU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 13:48:20 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42B5213F04
-        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 10:48:02 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id o31-20020a17090a0a2200b00223fedffb30so32029076pjo.3
-        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 10:48:02 -0800 (PST)
+        with ESMTP id S238803AbjACSt6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 13:49:58 -0500
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD40213F35
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 10:49:47 -0800 (PST)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-466c5fb1c39so436234147b3.10
+        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 10:49:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zPLabJ1YI0HZ9Wsi0ecPwiS5fdbOizZ50cPFPVQexEs=;
-        b=R1w0pU6KGAQdeL1yc+Q0rNnUGDeCT5CF1GPhykJTBKwbfffFGUiaW2RFHT+nl42tQh
-         QKAxyTPV/Tal6fZbW3qjOjO8FkxyrOP0q7XMptUlvkbwl7fDSgHqQBn4FdeBWAwX4T5u
-         qHwNUgLImdYqQMbZUoFBqBFRn01Zkbu3qkJUtpOKQUwflGm4dmjTIaadw3iUNF7cn2Ft
-         kq78APQxToGkRJ5lgLxMfqbYu4N49p0fi0whNcm9J6l0wq292ya7AD7uzQMuEXvynajn
-         2ApzWg5UxQgiPKNxmCFyj7yIOFfREZrKaSOgLNKTrjE4EQgheMtj2KoCchD7l11nxoLP
-         FFDw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kD5iCtmMtoY9zsUWZCFp6s8wajpgXbqSKtnkj2WC3Sw=;
+        b=L69g2USYZkrgZ0NBPPovmuZzIm0GkBKlaw7kOr6MsNMHL5yfYxZmdW8n/WZo7h27Ov
+         a8wEcdkm3ACX7AMviZn5cczTFZDZnd6E1mjtn0dAIBg0VO89RYGO5P50EX12+cKD0rMf
+         GOxXDEL1e2WxSEU1X3DRI2dllts9D+GJWtDtrTHdUshkFyJQMbWC985rnA4b/DbPanJX
+         wC+oZneFvhy8Er8/9waMD7X8gLM54afCq3eEQUEY6q/sOzMIhKMLGdquLvJkWl9BOrq6
+         6Kl69DbvaddqEQoaLmOPy+JBkF8Wjf7dXKaH5O6F6uQs5t4Ii4ATiIpsuE5oz/GL4m04
+         jl3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zPLabJ1YI0HZ9Wsi0ecPwiS5fdbOizZ50cPFPVQexEs=;
-        b=KOuRgYiwZ2/veZPj5pU+6Dnj+HNOyyW9+vY9+nkspHnHOPKtqzrfMQIwID2U+rOHHV
-         qBjjWmvSWxrzh6bCsVlfsODrUEuO9CgCHrqIX3s6aOsYNB+lCmloBcD8/iJgJUyBhlfw
-         bzXOfKMyBLzFFBJVOWYgLhlfPfszkNkpWTnhFfrDAPaf5GpYc9HJ6VkeRms4aCueRsvZ
-         IefsiHdeW1+OpAJTbyASPOM6Ab4HhA/qHylvVnfuNhXYhGNrrX8kwbScyAetil//pINd
-         fDx5GRyZN4sGQ7B7z+Q+HUh4+BFO2xbjk2d0rlwj6Z4lqbx7LpLex5XMxWlpi22fo8US
-         2xGg==
-X-Gm-Message-State: AFqh2kpREEY/2HZ09k+e+Uj0eWEVDPOUDMRTnpQoF/3pDkzslKwKBDDc
-        QdsmGaktjI+fUUaAmiW7kgRpPg==
-X-Google-Smtp-Source: AMrXdXubjSTI7gT8RJBzr8xtJ0VO4rdYpfRZAQU/fckOxRlIapOcyz8N/+AntS3ASdk1Lsr2VJ2bQQ==
-X-Received: by 2002:a17:90a:8b8c:b0:219:c2f2:f83c with SMTP id z12-20020a17090a8b8c00b00219c2f2f83cmr3620407pjn.2.1672771681642;
-        Tue, 03 Jan 2023 10:48:01 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id b5-20020a17090aa58500b001fb1de10a4dsm4770495pjq.33.2023.01.03.10.48.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jan 2023 10:48:01 -0800 (PST)
-Date:   Tue, 3 Jan 2023 18:47:57 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Xiaoyao Li <xiaoyao.li@intel.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v2 1/6] KVM: x86: Clear all supported MPX xfeatures if
- they are not all set
-Message-ID: <Y7R4XY12Oyqymhyk@google.com>
-References: <20221230162442.3781098-1-aaronlewis@google.com>
- <20221230162442.3781098-2-aaronlewis@google.com>
- <93332d0c-108c-7f10-1f21-6dd94abcfb7f@intel.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kD5iCtmMtoY9zsUWZCFp6s8wajpgXbqSKtnkj2WC3Sw=;
+        b=OOETP9zls5gZYAjXOK2hU+qOXAmLj/TKRacaamdobK8S7fIbsKWg5RfdA39fqAlg+G
+         OCfDcCJY3xL+FtnhLKGiukiNx3MNyYe3WrjcdF+CCGWG8AYRhbzJOSoOoAn5PQ+VkcX7
+         vNIQgLHw7NQcG59eCOtoMWVCCBVdqqHKF/5XbUbmyvTydEQHSR4b49GfRt3nuex/pZUZ
+         bswyUDV98RUIYmy+bBZvV3CEQTfx/cKcFuZ9CQBZlk5RmAt5mW3ryV5bMJijjzLB/Vdq
+         08wqifffHb9muRQM0+2I9EYbahlNAPrMT/owM8J4bCTjDVgX9c7Kn3IXlljoD+AGbjMy
+         Ro4g==
+X-Gm-Message-State: AFqh2kpoulMgWVkRHZOz/1NLRbn6AbHwG8ta+UMxlo6435bxnqM6vOEk
+        QPvJM8Q+uuuotBvGqo8l6uQTejmM7E+HGruWwFpM0w==
+X-Google-Smtp-Source: AMrXdXupLlRU1794URzIsqQNP+rdNjB+ialAMHEflMgrpUGU4vGKeZ7VQKQDqIj7Yd7LKbscJcUzylDa4lYvAn279eU=
+X-Received: by 2002:a0d:e2c1:0:b0:474:1969:ed89 with SMTP id
+ l184-20020a0de2c1000000b004741969ed89mr3051604ywe.175.1672771786812; Tue, 03
+ Jan 2023 10:49:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <93332d0c-108c-7f10-1f21-6dd94abcfb7f@intel.com>
+References: <20221222023457.1764-1-vipinsh@google.com> <20221222023457.1764-9-vipinsh@google.com>
+ <Y64gLzMJ5Ap2VmDs@google.com>
+In-Reply-To: <Y64gLzMJ5Ap2VmDs@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 3 Jan 2023 10:49:11 -0800
+Message-ID: <CAHVum0cVzitQ79TJHE0vx2XQqtxvytGd5gmg7-wxFSDUqNEYsA@mail.gmail.com>
+Subject: Re: [Patch v3 8/9] KVM: x86/mmu: Make split_shadow_page_cache NUMA aware
+To:     David Matlack <dmatlack@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,41 +68,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 02, 2023, Xiaoyao Li wrote:
-> On 12/31/2022 12:24 AM, Aaron Lewis wrote:
-> > Be a good citizen and don't allow any of the supported MPX xfeatures[1]
-> > to be set if they can't all be set.  That way userspace or a guest
-> > doesn't fail if it attempts to set them in XCR0.
-> > 
-> > [1] CPUID.(EAX=0DH,ECX=0):EAX.BNDREGS[bit-3]
-> >      CPUID.(EAX=0DH,ECX=0):EAX.BNDCSR[bit-4]
-> > 
-> > Suggested-by: Jim Mattson <jmattson@google.com>
-> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+On Thu, Dec 29, 2022 at 3:18 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Wed, Dec 21, 2022 at 06:34:56PM -0800, Vipin Sharma wrote:
+> > Make split_shadow_page_cache NUMA aware and allocate page table's pages
+> > during the split based on the underlying physical page's NUMA node.
+> >
+> > Signed-off-by: Vipin Sharma <vipinsh@google.com>
 > > ---
-> >   arch/x86/kvm/cpuid.c | 12 ++++++++++++
-> >   1 file changed, 12 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index c4e8257629165..2431c46d456b4 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -855,6 +855,16 @@ static int __do_cpuid_func_emulated(struct kvm_cpuid_array *array, u32 func)
-> >   	return 0;
-> >   }
-> > +static u64 sanitize_xcr0(u64 xcr0)
-> > +{
-> > +	u64 mask;
-> > +
-> > +	mask = XFEATURE_MASK_BNDREGS | XFEATURE_MASK_BNDCSR;
-> > +	if ((xcr0 & mask) != mask)
-> > +		xcr0 &= ~mask;
-> 
-> Maybe it can WARN_ON_ONCE() here.
-> 
-> It implies either a kernel bug that permitted_xcr0 is invalid or a broken
-> HW.
-
-I'm pretty sure KVM can't WARN, as this falls into the category of "it's technically
-architecturally legal to report only one of the features, but real hardware will
-always report both".
+> >  arch/x86/include/asm/kvm_host.h |  2 +-
+> >  arch/x86/kvm/mmu/mmu.c          | 50 ++++++++++++++++++---------------
+> >  2 files changed, 29 insertions(+), 23 deletions(-)
+> >
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index b1f319ad6f89..7b3f36ae37a4 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1410,7 +1410,7 @@ struct kvm_arch {
+> >        *
+> >        * Protected by kvm->slots_lock.
+> >        */
+> > -     struct kvm_mmu_memory_cache split_shadow_page_cache;
+> > +     struct kvm_mmu_memory_cache split_shadow_page_cache[MAX_NUMNODES];
+> >       struct kvm_mmu_memory_cache split_page_header_cache;
+> >
+> >       /*
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 511c6ef265ee..7454bfc49a51 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -6126,7 +6126,7 @@ static void kvm_mmu_invalidate_zap_pages_in_memslot(struct kvm *kvm,
+> >  int kvm_mmu_init_vm(struct kvm *kvm)
+> >  {
+> >       struct kvm_page_track_notifier_node *node = &kvm->arch.mmu_sp_tracker;
+> > -     int r;
+> > +     int r, nid;
+> >
+> >       INIT_LIST_HEAD(&kvm->arch.active_mmu_pages);
+> >       INIT_LIST_HEAD(&kvm->arch.possible_nx_huge_pages);
+> > @@ -6145,8 +6145,9 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+> >       INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_page_header_cache,
+> >                                 mmu_page_header_cache, NUMA_NO_NODE);
+> >
+> > -     INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_shadow_page_cache,
+> > -                               NULL, NUMA_NO_NODE);
+> > +     for_each_node(nid)
+> > +             INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_shadow_page_cache[nid],
+> > +                                       NULL, NUMA_NO_NODE);
+>                                                 ^^^^^^^^^^^^
+>                                                 Should this be nid?
+Yes, I will fix it in the next version. Thanks
