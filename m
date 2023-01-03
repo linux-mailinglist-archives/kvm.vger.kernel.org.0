@@ -2,146 +2,159 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6226B65C100
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 14:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5574865C147
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 14:56:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233130AbjACNlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 08:41:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40344 "EHLO
+        id S237722AbjACNy4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 08:54:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230337AbjACNk5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 08:40:57 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70706E19;
-        Tue,  3 Jan 2023 05:40:53 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S237693AbjACNyx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 08:54:53 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18FA3BF6E;
+        Tue,  3 Jan 2023 05:54:53 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 82AA21EC034B;
-        Tue,  3 Jan 2023 14:40:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1672753251;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=7WZ2I/kePpaASy/qY+vLm4NwRwJ6Szd4KG46JRy26ow=;
-        b=Cd3iHtUkCRfBCwEoy0QhT1+l1dGdwcDQG6hBwbnGP/lQOiIZYKzEes5LgYqJGNpEhFgPs2
-        1qCwjW5inVX8Vtxd72WTULF82jle/+plZ1j/S4B2Y0im7H6C2907v7NpAFuL9MYPQ5vv/t
-        5GSOnpLGNWkU7BAyw6A1UJV2M0nrCaM=
-Date:   Tue, 3 Jan 2023 14:40:45 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Nikunj A Dadhania <nikunj@amd.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
-        seanjc@google.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
-        michael.roth@amd.com, stable@kernel.org
-Subject: Re: [PATCH v3] x86/sev: Add SEV-SNP guest feature negotiation support
-Message-ID: <Y7QwXcAUmS3VZcbH@zn.tnic>
-References: <20230102083810.71178-1-nikunj@amd.com>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id BD6DF3E904;
+        Tue,  3 Jan 2023 13:54:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1672754091; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lPjJ65LXLSP5211IEL4Pol3CqU430+xRcc/7OVK2aG8=;
+        b=zOUbHmOJlDlsryeOjHKtFYQM9HIWsmYVu0mAWhci9ERLDdF3OeUiSCru0JdO4z32SCL4oJ
+        z/BbTh7J20YuzT1D/rh8GIl06dOQybJbthpt6mVgKFtmtuxYBkmDL6zXOCoqqgSjdQnqZ3
+        WZWD+ej78TLbiMh9JLLxIdjilR7skds=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1672754091;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lPjJ65LXLSP5211IEL4Pol3CqU430+xRcc/7OVK2aG8=;
+        b=PsVNrqGLsyiKHDBNQfPQUxbfu85wANuMx69vJSS1n36XOKgiUoIhrc+1zD1Y4lhZDsBmTa
+        tazSzMFNHS8RzwAw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6E3181390C;
+        Tue,  3 Jan 2023 13:54:51 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id e8tCGasztGPjNQAAMHmgww
+        (envelope-from <tzimmermann@suse.de>); Tue, 03 Jan 2023 13:54:51 +0000
+Message-ID: <e92e498a-2da3-7bb8-5d79-f78c650e3a02@suse.de>
+Date:   Tue, 3 Jan 2023 14:54:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230102083810.71178-1-nikunj@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH 09/18] vfio-mdev/mdpy-fb: Do not set struct
+ fb_info.apertures
+Content-Language: en-US
+To:     Javier Martinez Canillas <javierm@redhat.com>, daniel@ffwll.ch,
+        airlied@gmail.com, deller@gmx.de
+Cc:     linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gfx@lists.freedesktop.org, linux-hyperv@vger.kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        dri-devel@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org
+References: <20221219160516.23436-1-tzimmermann@suse.de>
+ <20221219160516.23436-10-tzimmermann@suse.de>
+ <12990f75-6b72-7ed7-0593-1c542d71f0f0@redhat.com>
+From:   Thomas Zimmermann <tzimmermann@suse.de>
+In-Reply-To: <12990f75-6b72-7ed7-0593-1c542d71f0f0@redhat.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------x40lYiYs0eNp1acnmwtMEKvD"
+X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 02, 2023 at 02:08:10PM +0530, Nikunj A Dadhania wrote:
-> The hypervisor can enable various new features (SEV_FEATURES[1:63])
-> and start the SNP guest. Some of these features need guest side
-> implementation. If any of these features are enabled without guest
-> side implementation, the behavior of the SNP guest will be undefined.
-> The SNP guest boot may fail in a non-obvious way making it difficult
-> to debug.
-> 
-> Instead of allowing the guest to continue and have it fail randomly
-> later, detect this early and fail gracefully.
-> 
-> SEV_STATUS MSR indicates features which hypervisor has enabled. While
-					 ^
-					 the
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------x40lYiYs0eNp1acnmwtMEKvD
+Content-Type: multipart/mixed; boundary="------------UdOWonX0FCjJ3gZ430ygyHXY";
+ protected-headers="v1"
+From: Thomas Zimmermann <tzimmermann@suse.de>
+To: Javier Martinez Canillas <javierm@redhat.com>, daniel@ffwll.ch,
+ airlied@gmail.com, deller@gmx.de
+Cc: linux-fbdev@vger.kernel.org, kvm@vger.kernel.org,
+ intel-gfx@lists.freedesktop.org, linux-hyperv@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, Kirti Wankhede <kwankhede@nvidia.com>,
+ dri-devel@lists.freedesktop.org, linux-arm-kernel@lists.infradead.org
+Message-ID: <e92e498a-2da3-7bb8-5d79-f78c650e3a02@suse.de>
+Subject: Re: [PATCH 09/18] vfio-mdev/mdpy-fb: Do not set struct
+ fb_info.apertures
+References: <20221219160516.23436-1-tzimmermann@suse.de>
+ <20221219160516.23436-10-tzimmermann@suse.de>
+ <12990f75-6b72-7ed7-0593-1c542d71f0f0@redhat.com>
+In-Reply-To: <12990f75-6b72-7ed7-0593-1c542d71f0f0@redhat.com>
 
-> booting, SNP guests should ascertain that all the enabled features
-> have guest side implementation. In case any feature is not implemented
-> in the guest, the guest terminates booting with SNP feature
-> unsupported exit code.
-> 
-> More details in AMD64 APM[1] Vol 2: 15.34.10 SEV_STATUS MSR
-> 
-> [1] https://www.amd.com/system/files/TechDocs/40332_4.05.pdf
-> 
-> Fixes: cbd3d4f7c4e5 ("x86/sev: Check SEV-SNP features support")
-> CC: Borislav Petkov <bp@alien8.de>
-> CC: Michael Roth <michael.roth@amd.com>
-> CC: Tom Lendacky <thomas.lendacky@amd.com>
-> CC: <stable@kernel.org>
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+--------------UdOWonX0FCjJ3gZ430ygyHXY
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-...
+DQoNCkFtIDIwLjEyLjIyIHVtIDEwOjMyIHNjaHJpZWIgSmF2aWVyIE1hcnRpbmV6IENhbmls
+bGFzOg0KPiBbYWRkaW5nIEtpcnRpIFdhbmtoZWRlIGFuZCBrdm1Admdlci5rZXJuZWwub3Jn
+IHRvIENjIGxpc3RdDQo+IA0KPiBPbiAxMi8xOS8yMiAxNzowNSwgVGhvbWFzIFppbW1lcm1h
+bm4gd3JvdGU6DQo+PiBHZW5lcmljIGZiZGV2IGRyaXZlcnMgdXNlIHRoZSBhcGVydHVyZXMg
+ZmllbGQgaW4gc3RydWN0IGZiX2luZm8gdG8NCj4+IGNvbnRyb2wgb3duZXJzaGlwIG9mIHRo
+ZSBmcmFtZWJ1ZmZlciBtZW1vcnkgYW5kIGdyYXBoaWNzIGRldmljZS4gRG8NCj4+IG5vdCBz
+ZXQgdGhlIHZhbHVlcyBpbiBtZHB5LWZiLg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IFRob21h
+cyBaaW1tZXJtYW5uIDx0emltbWVybWFubkBzdXNlLmRlPg0KPj4gLS0tDQo+PiAgIHNhbXBs
+ZXMvdmZpby1tZGV2L21kcHktZmIuYyB8IDggLS0tLS0tLS0NCj4+ICAgMSBmaWxlIGNoYW5n
+ZWQsIDggZGVsZXRpb25zKC0pDQo+Pg0KPj4gZGlmZiAtLWdpdCBhL3NhbXBsZXMvdmZpby1t
+ZGV2L21kcHktZmIuYyBiL3NhbXBsZXMvdmZpby1tZGV2L21kcHktZmIuYw0KPj4gaW5kZXgg
+OWVjOTNkOTBlOGE1Li4xZGU1ODAxY2QyZTggMTAwNjQ0DQo+PiAtLS0gYS9zYW1wbGVzL3Zm
+aW8tbWRldi9tZHB5LWZiLmMNCj4+ICsrKyBiL3NhbXBsZXMvdmZpby1tZGV2L21kcHktZmIu
+Yw0KPj4gQEAgLTE2MSwxNCArMTYxLDYgQEAgc3RhdGljIGludCBtZHB5X2ZiX3Byb2JlKHN0
+cnVjdCBwY2lfZGV2ICpwZGV2LA0KPj4gICAJCWdvdG8gZXJyX3JlbGVhc2VfZmI7DQo+PiAg
+IAl9DQo+PiAgIA0KPj4gLQlpbmZvLT5hcGVydHVyZXMgPSBhbGxvY19hcGVydHVyZXMoMSk7
+DQo+PiAtCWlmICghaW5mby0+YXBlcnR1cmVzKSB7DQo+PiAtCQlyZXQgPSAtRU5PTUVNOw0K
+Pj4gLQkJZ290byBlcnJfdW5tYXA7DQo+PiAtCX0NCj4+IC0JaW5mby0+YXBlcnR1cmVzLT5y
+YW5nZXNbMF0uYmFzZSA9IGluZm8tPmZpeC5zbWVtX3N0YXJ0Ow0KPj4gLQlpbmZvLT5hcGVy
+dHVyZXMtPnJhbmdlc1swXS5zaXplID0gaW5mby0+Zml4LnNtZW1fbGVuOw0KPj4gLQ0KPj4g
+ICAJaW5mby0+ZmJvcHMgPSAmbWRweV9mYl9vcHM7DQo+PiAgIAlpbmZvLT5mbGFncyA9IEZC
+SU5GT19ERUZBVUxUOw0KPj4gICAJaW5mby0+cHNldWRvX3BhbGV0dGUgPSBwYXItPnBhbGV0
+dGU7DQo+IFJldmlld2VkLWJ5OiBKYXZpZXIgTWFydGluZXogQ2FuaWxsYXMgPGphdmllcm1A
+cmVkaGF0LmNvbT4NCj4gDQo+IEJ1dCBJIHRoaW5rIGFuIGFjayBmcm9tIEtpcnRpIFdhbmto
+ZWRlIG9yIG90aGVyIHZpcnQgZm9sayBpcyBuZWVkZWQgaWYgeW91DQo+IHdhbnQgdG8gbWVy
+Z2UgdGhpcyB0aHJvdWdoIGRybS1taXNjLW5leHQuDQoNCnBpbmcuIENvdWxkIEkgaGF2ZSBh
+IHJldmlldyBmcm9tIHRoZSB2ZmlvIGRldnMsIHBsZWFzZS4NCg0KQmVzdCByZWdhcmRzDQpU
+aG9tYXMNCg0KPiANCg0KLS0gDQpUaG9tYXMgWmltbWVybWFubg0KR3JhcGhpY3MgRHJpdmVy
+IERldmVsb3Blcg0KU1VTRSBTb2Z0d2FyZSBTb2x1dGlvbnMgR2VybWFueSBHbWJIDQpNYXhm
+ZWxkc3RyLiA1LCA5MDQwOSBOw7xybmJlcmcsIEdlcm1hbnkNCihIUkIgMzY4MDksIEFHIE7D
+vHJuYmVyZykNCkdlc2Now6RmdHNmw7xocmVyOiBJdm8gVG90ZXYNCg==
 
-> diff --git a/Documentation/x86/amd-memory-encryption.rst b/Documentation/x86/amd-memory-encryption.rst
-> index a1940ebe7be5..b8b6b87be995 100644
-> --- a/Documentation/x86/amd-memory-encryption.rst
-> +++ b/Documentation/x86/amd-memory-encryption.rst
-> @@ -95,3 +95,38 @@ by supplying mem_encrypt=on on the kernel command line.  However, if BIOS does
->  not enable SME, then Linux will not be able to activate memory encryption, even
->  if configured to do so by default or the mem_encrypt=on command line parameter
->  is specified.
-> +
-> +Secure Nested Paging (SNP):
+--------------UdOWonX0FCjJ3gZ430ygyHXY--
 
-No ":"
+--------------x40lYiYs0eNp1acnmwtMEKvD
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
 
-> +===========================
+-----BEGIN PGP SIGNATURE-----
 
-<---- newline here.
+wsF5BAABCAAjFiEExndm/fpuMUdwYFFolh/E3EQov+AFAmO0M6oFAwAAAAAACgkQlh/E3EQov+Cn
+FBAAj4qcPw5/JJZ1bFRUtXXnzawgXo97xQ5NWU07BD1q6MhOlEmGgSI0e0ruEuFs1afzHgUd/pfk
+TuBd1ZDPKC0EsW/zxI+Gjys7VgkUvk7cx28VNrryz7UAiRNWrhx9ndqBsjTxqIb9qj/wIH6BOq7D
+NOvElo4VriWEdNV6fMiyfK4bvOB3B//xIbRk1IqFtm0z3HzRfeorUPVLKGR68cyB2Ftae6vjjhqS
+XA2t3yGlgXPTn/uH/kfwLw7yCYFij9ncffE9fofWlGNAlB46j58y51sQb4nPbYs1KCyqvl9Iy80n
+nyQJ76JAli1LQhfgPpdZIb3YoE0UrIARKt2BZpfqjYUG2nH20Kd3Pz2Flp6DyfS8+Kg3nmt6z+yo
+ESsU4M+4GkwsuLNbe9cILXWfWegOk/gMEelue0CZSzMd10+WG3oZQn10/NcJ4QiBNQf55OYw+MmW
+J2SwrIBPguWsiz6QvN4Qgr8Vt9sjwWnp1LwHwDRr7O4LzwpPpUgD2vAn4jzpZoYxrf32EDC+VdJU
+Im8aCy8b9ywxm+TafzQ5fOA0raPTisgmqGEvvXWCKMSstSDqkPi+e8fgFcZipe0MNLoqWEfq7wYU
+zrx52evfoWuzqEYLyb8o+cwfqqepskD5TSjomZt2UKp87500MlSqmmuRbLazopKIG6TT0WTEc6fb
+w+k=
+=tbnT
+-----END PGP SIGNATURE-----
 
-> +SEV-SNP introduces new features (SEV_FEATURES[1:63]) which can be enabled
-> +by the hypervisor for security enhancements. Some of these features need
-> +guest side implementation to function correctly. The below table lists the
-> +expected guest behavior with various possible scenarios of guest/hypervisor
-> +SNP feature support.
-> +
-> ++---------------+---------------+---------------+---------------+
-> +|Feature Enabled|  Guest needs  |   Guest has   |  Guest boot   |
-> +|     by HV     |implementation |implementation |   behavior    |
-> ++---------------+---------------+---------------+---------------+
-> +|      No       |      No       |      No       |     Boot      |
-> +|               |               |               |               |
-> ++---------------+---------------+---------------+---------------+
-> +|      No       |      Yes      |      No       |     Boot      |
-> +|               |               |               |               |
-> ++---------------+---------------+---------------+---------------+
-> +|      No       |      Yes      |      Yes      |     Boot      |
-> +|               |               |               |               |
-> ++---------------+---------------+---------------+---------------+
-> +|      Yes      |      No       |      No       |   Boot with   |
-> +|               |               |               |feature enabled|
-> ++---------------+---------------+---------------+---------------+
-> +|      Yes      |      Yes      |      No       | Graceful Boot |
-> +|               |               |               |    Failure    |
-> ++---------------+---------------+---------------+---------------+
-> +|      Yes      |      Yes      |      Yes      |   Boot with   |
-> +|               |               |               |feature enabled|
-> ++---------------+---------------+---------------+---------------+
-
-sphinx is not happy about that table for some reason. I always find the error
-messages cryptic though:
-
-Documentation/x86/amd-memory-encryption.rst:110: WARNING: Block quote ends without a blank line; unexpected unindent.
-Documentation/x86/amd-memory-encryption.rst:110: WARNING: Block quote ends without a blank line; unexpected unindent.
-Documentation/x86/amd-memory-encryption.rst:122: WARNING: Block quote ends without a blank line; unexpected unindent.
-Documentation/x86/amd-memory-encryption.rst:128: WARNING: Block quote ends without a blank line; unexpected unindent.
-
-You can repro by doing "make htmldocs".
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+--------------x40lYiYs0eNp1acnmwtMEKvD--
