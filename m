@@ -2,126 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8B2B65C65E
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 19:38:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70F3B65C6B0
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 19:48:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233685AbjACSiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 13:38:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49016 "EHLO
+        id S238245AbjACSsA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 13:48:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231293AbjACSiI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 13:38:08 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2082.outbound.protection.outlook.com [40.107.100.82])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF29281;
-        Tue,  3 Jan 2023 10:38:06 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jVvPa6f9yZdnSlS+LBj7ths0p43V6dZTaukZtdN9ruWKd1RUH8kLuhurK4LnEVfTC8tLt26IT16atoETjLHq7tcxVQ+ch5N2DZjmkK8/AVBAK29csNHnozeFIL1Mh17pGHYLiJGuOtdeHy0mMYn3B15bW9omRijQfIT2wqqE6JHEU77go/AovrjulH7r3nuYZa3EbgI0XLoQKB+wPE4VQ+U4AwFRUzwVQPWlac8RxvzJoGeBCWKrCumU/hdVw7P36WZAlUL3h1PD/rIaJNKI4Fa/PqvSSCkm/cEoN+YWXgoTO7S60+phiN7pEAqWnRC+MkhRe4MNb9cowSWvOv58Hw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cVJDRcUEKqQ0JfZ12+qYXC8+sADyVsqN04NJ9bxKQws=;
- b=hj/0vGp/WEx4mTzguGPLnoxfd3Ft0VjCSI/UGBRgPs1HTorkkZf13PMsBnqMtg6a3KBJGS2B7krwgiVipT2GXtETnTrMW6s2hQN3XdTGkL18qf3kCxzy6hnvHmOM7FVoDjOS5IjJZYMNzGkPoXLaB4VgReh91hQrPh2e8CxCoOTIJmrAtar28VH+Yf9hEGILKP2Qxli5H9zsh6C8f64zshYGrapG1s5FZHi5miEoyVBKHb4pfex62fFgKZ/MgqsgyiE34uRoo3ZLwpKHL+dGBz7ne/xNJm4DGkNLIKPF0/Zh3CJGv+luGqv5sxYxFDA5kqYZlawFcr9ydGuOHFEt8w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cVJDRcUEKqQ0JfZ12+qYXC8+sADyVsqN04NJ9bxKQws=;
- b=2z8+E4KGYqJXpzEKx22M3IX1418NBW04/8UE1cznp2DOOi9QfkdY4O8AzqKoa6ZEhCaMoxWzYc8FQfRUtyT6Xk0ZJFDqQ6uDKCuRM7HARCKYn3MPmGvS9+XakRUC6ZfuyO2LLkodEFsWwnrsINtnEMkEpAWqDZ8GwibcrEMM9Gk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- CH3PR12MB8186.namprd12.prod.outlook.com (2603:10b6:610:129::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Tue, 3 Jan
- 2023 18:38:04 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::43e4:6bab:7b1e:235f]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::43e4:6bab:7b1e:235f%9]) with mapi id 15.20.5944.019; Tue, 3 Jan 2023
- 18:38:04 +0000
-Message-ID: <04455ea2-79f0-dc78-5148-a73893d0bc53@amd.com>
-Date:   Tue, 3 Jan 2023 10:38:00 -0800
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.0
-Subject: Re: [RFC PATCH v2 vfio 1/7] vfio/pds: Initial support for pds_vfio
- VFIO driver
-To:     liulongfang <liulongfang@huawei.com>,
-        Brett Creeley <brett.creeley@amd.com>, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, alex.williamson@redhat.com,
-        cohuck@redhat.com, jgg@nvidia.com, yishaih@nvidia.com,
-        shameerali.kolothum.thodi@huawei.com, kevin.tian@intel.com
-Cc:     drivers@pensando.io
-References: <20221214232136.64220-1-brett.creeley@amd.com>
- <20221214232136.64220-2-brett.creeley@amd.com>
- <a62bb7e5-e5f5-8fa5-27e2-c682725d7139@huawei.com>
-Content-Language: en-US
-From:   Shannon Nelson <shannon.nelson@amd.com>
-In-Reply-To: <a62bb7e5-e5f5-8fa5-27e2-c682725d7139@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR04CA0006.namprd04.prod.outlook.com
- (2603:10b6:a03:1d0::16) To DS0PR12MB6583.namprd12.prod.outlook.com
- (2603:10b6:8:d1::12)
+        with ESMTP id S238284AbjACSq3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 13:46:29 -0500
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8BDE10FF1
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 10:46:27 -0800 (PST)
+Received: by mail-yb1-xb32.google.com with SMTP id n78so34059867yba.12
+        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 10:46:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=zMM79R7cqTsBsvAEfVjTqYtKnnoyNuCArOemgcn3l64=;
+        b=fT6Nl/AR1KZXfZDfxlPsejL5yaYMUgK5QMfzbxN/9n1ShiShit9ZG9l7euKNgcC901
+         Vb+tUSGYk13dZx07tRUD5SjDjebTi84CWdLcL2AtBYsWhE0l1o3GnSwoP5s6239miwLu
+         92RPggzYMZDPgqq0PRiQSnANMXsODi81ZkykopwKCJbGDeitrTxvhiJu5FaA06ZJSa3X
+         Zca544K6Ee+bEhRgPCwXMfz5s2wLPh+W5qH2utpTrJ/AXI8wAKoOhHoyeVvJS1vZAweq
+         LAKC21Ogq5CWL/BMo3x16PrjvkET3a2z8Rol7gDG0KWnfRcYpbJ4kyUE7gRbOogtNmqw
+         C0WA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zMM79R7cqTsBsvAEfVjTqYtKnnoyNuCArOemgcn3l64=;
+        b=oT7+pLk0e4rykDzkAjTb5dLLYQIS8XYf45COZsqLLt5xHmXnuUa2UgPHYMMmZxSdZB
+         W1LRnxBVnJTm9S4X/FQC7XgXJZKAiftLKLw8weSkCnIUqisxacI0uPZNY9S8L/UPbYD4
+         f1TKy3qE6REPzCYqKPpCBP8zyPkemEOd6itpBPJki9lcDdtU19dUTLJrpOURjKPvy4bX
+         iUrpXqmOqWlfk3r2Wwlbmej/Lfocvkd6w76Zw/zHwMByf7nqkx+Mdbp+n3SZwFktpokn
+         c3S5foySFqYSuaY2mU0AQrQpuLYGfCk1mf0xCLUkqU7bHv5qfS8NvOF57qN4W3zMfNqh
+         XuLA==
+X-Gm-Message-State: AFqh2krc/Tw7rdp09HTpNtwcaZSBnKr1qoqRno/I5OEV7wn8vIX85nT5
+        EcVEzBOPuTM9+lcYpNWT+AakHZr+J62vEPm125ISZA==
+X-Google-Smtp-Source: AMrXdXulrrPrKjE2OAgTgupDIPDf70WZCm+YU+d2D4nGF8mNmfmoq71cczZjfPYu2eQboFVofDZv+qAyrhDySuKPp3Q=
+X-Received: by 2002:a25:420d:0:b0:76a:701e:3972 with SMTP id
+ p13-20020a25420d000000b0076a701e3972mr4329174yba.519.1672771586618; Tue, 03
+ Jan 2023 10:46:26 -0800 (PST)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|CH3PR12MB8186:EE_
-X-MS-Office365-Filtering-Correlation-Id: 739df7d4-d11a-4b30-a462-08daedb9a618
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: O+6gsUupliNxJKaTy1+qo8tgPCPhTPfeWukdDkzQQQ5v86N5NLauin6pDV8ZELgd8N1l0HoHyz+z9DCcE4hF0Sw53RkQWTpssxGVqaAoNYPQXIzUOzWQC4EAlNm5kLgcZpgM9W1xvnxXINo4Kmq8NUhmNIqjZtX3FicGj05jKH58bEO4vFJQhX4c7UtV7KUsc6vKzVxa7ru2SWvcLJfI+TdcAxylrCeUCWcBIqM8DzD8VKr8i1ipigKLztQxqN5CSSO2yUf6fXaBtbh2QP78hJSgj1dqFWBC5No1V5VdBBodNUQQL0IB9yVZB5VfArP7ZoRJjjmBiEYxR6+kTS/hrnMFLm9xbqn+6qkjRY1q3lrJ2b+xZu8G+R0+qeCpPfOxVb2ZIA8Px3ke4r8X9RD5kF7aYeKX9XcyYA93gY+IY2VDhm9JjnVBIqpK7LNu1JfuYJqlcVIKN5uZDzsJoaYzoqd0U0j6T4HL6wT+gOV6ngV/fDSjtit/od9TPmU6cmTJkkaUjlRXASghFXn3fnBfNuJseUeWHoDGL0cCkDpNvoOI4zWgLsJ+LiXb1zI2Y6k4puq5vqMGZ6SHsu+l7O2LmT13hooaq/YbC4eWplc7l11Ul8JI4jp1fnEetKuYiBnJkdaYWFuzjJrSmQ3nV22Hc+wAUEr41LPzLcFpBsx1vr1scs0YO6LPHF9mzV1j+qA4r/vXjXx57AQ9vzisWCDtMRPDOe8ZIQeiH6TlVH2v5+5rCIK+JrXcXMIUp1oZIaEp+xFGZdpEm2exJ2WtIj/kEw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(136003)(39860400002)(376002)(366004)(346002)(451199015)(316002)(2616005)(921005)(186003)(6512007)(6486002)(478600001)(26005)(86362001)(6506007)(36756003)(53546011)(31696002)(110136005)(31686004)(6666004)(41300700001)(8936002)(2906002)(44832011)(5660300002)(7416002)(83380400001)(8676002)(66476007)(4326008)(66556008)(66946007)(38100700002)(22166006)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YXJvYysxTWhwbldFWkh6UVRacmVZTGcveDNjaHpEclA3NnpOZjZYTkd2WVZs?=
- =?utf-8?B?amVtdzdVSnpMUkxOWWVWMHRaTFZic0dwbUh4emg1M1pYdUhiUFdrbnpVVDI0?=
- =?utf-8?B?dFhQZVhrOCtySGdpSE9iZTBITVdXUzBrK1lkNG5idEE5U0gyYXpNZTVYZ2Ja?=
- =?utf-8?B?L0dQcVA5MzZzamY2WTBicVhlT1BxQ0pSR0daWHFYOUwvNkFxcjBvR0ROVks5?=
- =?utf-8?B?UHUwOUp1MnRNOFpEWEN6K3k3NURtczE2a2taTU5PZFNkMFB2TDd5Z3JIVGVL?=
- =?utf-8?B?S0psSGY5aE1YWVQzOXVvbk1BNjJyU0VrY2dVS1VYWTBYb25odGU1c3d5TjR1?=
- =?utf-8?B?UW9KUm1UandweU5EaktJcXo4Ti8xYkN1WXZXTk5yZksrT013OWk2Y3dWOVJh?=
- =?utf-8?B?eHdocXV3eGQzUTZhMFNJVVpOUHNaOGJ0NjRPeUx3L21FVE83c2NHQVk3TCtY?=
- =?utf-8?B?YkY2cTUzU1FLeTArQzNRNC90OHFEMDBUYmpHNG0yNlJxc011ckE0cXpHTlJn?=
- =?utf-8?B?d0xQeDF4YThiMmNHZkxHeXIyVFBIamYxK2Z4S3l3SlJITWpDSDJVTVpLR2Q3?=
- =?utf-8?B?THpZUzdrZXJFeDdIdkdMQnNJVFZHZHpUandXRWs1UkIrZVlVMkcySjBZQm9V?=
- =?utf-8?B?SEh6R1BIQzFSZkJRV3VzajhkT0ZQWjNEV25qbG1UclRHaDFaSnVkOFVzSHU1?=
- =?utf-8?B?UjFXOFJ5d1ZiOHVQeTRYVWY1M2F0WFNsN0FEOEhBelpITm9pam1qQ3A3RXJo?=
- =?utf-8?B?VUJpM1ZtellhZmhRcFlKSkVubHhQcTFvMmlUTFZtSTF4VExHUEhSVVVJYU1q?=
- =?utf-8?B?bUpTd0ptU0l4UVhzeG5vaUhTWmhUbUxsZHZwTktKOWthUmV0TVBQREVkYzIw?=
- =?utf-8?B?ZUhTSmdGOXlxalArZko3RmZ6eTRHMVpOS0oxT2dNOVFWd3VjNG1NRmJ5L3hV?=
- =?utf-8?B?RDd0NVl3TmtCZTY2WFBEV0xMSnVMbW5HL2FpNStpSmxCUnpxV2UybVdReThp?=
- =?utf-8?B?YURmV2NiNk1BdHlOTXpiL2hVNENTa1FPK0RvZ3pYRWRyVXJUbGhZd3BXbGkv?=
- =?utf-8?B?dEtpNFduQmVGSFoyallXTTR2WVA5ck5tL3I4bWl1SU9JY3c0V2dEdWJJcFBI?=
- =?utf-8?B?UWFWNUZpeU1mc28vVWVINWZXTFgzeG4wOHV6NFdJT1ZMMHN0Wk5ILys2cDRT?=
- =?utf-8?B?MmxhLzJNOVE3K0RqUVFtMkJCc1F1T3BzSy9hVmdhTDQxbFp4RDhZVE5UelpM?=
- =?utf-8?B?SHZ4cUZoRkFUZjNQSC9UVkJWaldaUWd6ckN4eDE4a3ExZ1NURExpMTg0T1pS?=
- =?utf-8?B?ajVidVVkdUN5cTBiZ2VpRmRlWkpvakJOTkp2Nk5MR21lTXlFb2VNUFhEVmhj?=
- =?utf-8?B?VjBMdHdKVVUyVDFZMUJwbmpzU0J5dVdsbVgwQzd0NzhkTlNpYjF0ZmlyaHND?=
- =?utf-8?B?cWNweEFXVmFoWGt1a3NPTWpPcnZsaGk3b01HbnlOYVRwRkFESzV1Wm11V25X?=
- =?utf-8?B?U3RKOXdIcWI4R291cmJsS0dGbTExckFub093S3ZHVUkvWWRWOFRWOXlUc0Zt?=
- =?utf-8?B?cFJYOWQ5QUY2OEx3RTVBZVZZd2c4MzdHeXlZdWNDcWRQcVl1eUFXYTdjUFVi?=
- =?utf-8?B?Q3J4V3JBMnU5TDhDR0RHb2d1aVNwazd6QW53a3R5OHRUbXIzbTFaTWF6NGRP?=
- =?utf-8?B?emRFMkhJR0lwOUlpWlZXeDZzVGg4MFBOaGxDOGxhTFR6NlRzcmhzQ3VvR3Iy?=
- =?utf-8?B?QndEeWtHZTMzN0dFdldRVHNoRWNQYm53VnlFRWRtWkxpazNXaytPZGhTYVBL?=
- =?utf-8?B?Y1p0ZjJVVldVWGpwbEJKK2lrbWRBVDR0U2NIcVJCODhrLzkvdXVxeXZZSXln?=
- =?utf-8?B?Y1ZHZWJ0dlIzT2JRUHYvQnFGaTdmcG9NS3ZvbGhlTGVXanpoaFdDbzZTVFlV?=
- =?utf-8?B?TEM2aFBnd1p2VnJLcko4bFVUL0ErSExJMTFiUDFUeU5uYWlkMGpwNFQ5clNF?=
- =?utf-8?B?VEhxK21YYXVxUVNOdDhVeFB3alZ5SEFmSG12YmhvVFFCbkl1QmtWbVlrNWgx?=
- =?utf-8?B?ekdJODZhVFhxZzhWeVBjWGFtaXRrTmV6dG5uNUdZQUMvM0RqNzRGU1NnUEVG?=
- =?utf-8?Q?EjpHZtgHi4DOd8K6RVYhfVsxT?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 739df7d4-d11a-4b30-a462-08daedb9a618
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2023 18:38:03.9742
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UizLO71JP7mgpV7BNaGE+th5iB5kd7jdtB/TOwfFT50jeMRRcHN/6jRObt3NhwBbpkpiDzIJfen5n6KzwmcH5Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8186
-X-Spam-Status: No, score=-5.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+References: <20221222023457.1764-1-vipinsh@google.com> <20221222023457.1764-7-vipinsh@google.com>
+ <Y64eAvm4JglT1au4@google.com> <CALzav=fGmy=YmpA6u=b0-p8zxnKbF2rt5mQUo-DWm2wYBU7dzA@mail.gmail.com>
+In-Reply-To: <CALzav=fGmy=YmpA6u=b0-p8zxnKbF2rt5mQUo-DWm2wYBU7dzA@mail.gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Tue, 3 Jan 2023 10:45:50 -0800
+Message-ID: <CAHVum0fdz8HmgQd5z2n9eAzWuTjtBPA5_aVrY123K=kAMdJvhw@mail.gmail.com>
+Subject: Re: [Patch v3 6/9] KVM: Provide NUMA node support to kvm_mmu_memory_cache{}
+To:     David Matlack <dmatlack@google.com>
+Cc:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -129,280 +68,333 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/3/23 4:12 AM, liulongfang wrote:
-> On 2022/12/15 7:21, Brett Creeley wrote:
->> This is the initial framework for the new pds_vfio device driver. This
->> does the very basics of registering the PCI device 1dd8:1006 and
->> configuring as a VFIO PCI device.
->>
->> With this change, the VF device can be bound to the pds_vfio driver on
->> the host and presented to the VM as an NVMe VF.
->>
->> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
->> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
->> ---
->>   drivers/vfio/pci/pds/Makefile   |   6 ++
->>   drivers/vfio/pci/pds/pci_drv.c  | 102 ++++++++++++++++++++++++++++++++
->>   drivers/vfio/pci/pds/vfio_dev.c |  74 +++++++++++++++++++++++
->>   drivers/vfio/pci/pds/vfio_dev.h |  23 +++++++
->>   include/linux/pds/pds_core_if.h |   1 +
->>   5 files changed, 206 insertions(+)
->>   create mode 100644 drivers/vfio/pci/pds/Makefile
->>   create mode 100644 drivers/vfio/pci/pds/pci_drv.c
->>   create mode 100644 drivers/vfio/pci/pds/vfio_dev.c
->>   create mode 100644 drivers/vfio/pci/pds/vfio_dev.h
->>
->> diff --git a/drivers/vfio/pci/pds/Makefile b/drivers/vfio/pci/pds/Makefile
->> new file mode 100644
->> index 000000000000..dcc8f6beffe2
->> --- /dev/null
->> +++ b/drivers/vfio/pci/pds/Makefile
->> @@ -0,0 +1,6 @@
->> +# SPDX-License-Identifier: GPL-2.0
->> +obj-$(CONFIG_PDS_VFIO_PCI) += pds_vfio.o
->> +
->> +pds_vfio-y := \
->> +     pci_drv.o       \
->> +     vfio_dev.o
->> diff --git a/drivers/vfio/pci/pds/pci_drv.c b/drivers/vfio/pci/pds/pci_drv.c
->> new file mode 100644
->> index 000000000000..09cab0dbb0e9
->> --- /dev/null
->> +++ b/drivers/vfio/pci/pds/pci_drv.c
->> @@ -0,0 +1,102 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/* Copyright(c) 2022 Pensando Systems, Inc */
->> +
->> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
->> +
->> +#include <linux/module.h>
->> +#include <linux/pci.h>
->> +#include <linux/types.h>
->> +#include <linux/vfio.h>
->> +
->> +#include <linux/pds/pds_core_if.h>
->> +
->> +#include "vfio_dev.h"
->> +
->> +#define PDS_VFIO_DRV_NAME            "pds_vfio"
->> +#define PDS_VFIO_DRV_DESCRIPTION     "Pensando VFIO Device Driver"
->> +#define PCI_VENDOR_ID_PENSANDO               0x1dd8
->> +
->> +static int
->> +pds_vfio_pci_probe(struct pci_dev *pdev,
->> +                const struct pci_device_id *id)
->> +{
->> +     struct pds_vfio_pci_device *pds_vfio;
->> +     int err;
->> +
->> +     pds_vfio = vfio_alloc_device(pds_vfio_pci_device, vfio_coredev.vdev,
->> +                                  &pdev->dev,  pds_vfio_ops_info());
->> +     if (IS_ERR(pds_vfio))
->> +             return PTR_ERR(pds_vfio);
->> +
->> +     dev_set_drvdata(&pdev->dev, &pds_vfio->vfio_coredev);
->> +     pds_vfio->pdev = pdev;
->> +
->> +     err = vfio_pci_core_register_device(&pds_vfio->vfio_coredev);
->> +     if (err)
->> +             goto out_put_vdev;
->> +
->> +     return 0;
->> +
->> +out_put_vdev:
->> +     vfio_put_device(&pds_vfio->vfio_coredev.vdev);
->> +     return err;
->> +}
->> +
->> +static void
->> +pds_vfio_pci_remove(struct pci_dev *pdev)
->> +{
->> +     struct pds_vfio_pci_device *pds_vfio = pds_vfio_pci_drvdata(pdev);
->> +
->> +     vfio_pci_core_unregister_device(&pds_vfio->vfio_coredev);
->> +     vfio_put_device(&pds_vfio->vfio_coredev.vdev);
->> +}
->> +
->> +static const struct pci_device_id
->> +pds_vfio_pci_table[] = {
->> +     {
->> +             .class = PCI_CLASS_STORAGE_EXPRESS,
->> +             .class_mask = 0xffffff,
->> +             .vendor = PCI_VENDOR_ID_PENSANDO,
->> +             .device = PCI_DEVICE_ID_PENSANDO_NVME_VF,
->> +             .subvendor = PCI_ANY_ID,
->> +             .subdevice = PCI_ANY_ID,
->> +             .override_only = PCI_ID_F_VFIO_DRIVER_OVERRIDE,
->> +     },
->> +     { 0, }
->> +};
->> +MODULE_DEVICE_TABLE(pci, pds_vfio_pci_table);
->> +
->> +static struct pci_driver
->> +pds_vfio_pci_driver = {
->> +     .name = PDS_VFIO_DRV_NAME,
->> +     .id_table = pds_vfio_pci_table,
->> +     .probe = pds_vfio_pci_probe,
->> +     .remove = pds_vfio_pci_remove,
->> +     .driver_managed_dma = true,
->> +};
->> +
->> +static void __exit
->> +pds_vfio_pci_cleanup(void)
->> +{
->> +     pci_unregister_driver(&pds_vfio_pci_driver);
->> +}
->> +module_exit(pds_vfio_pci_cleanup);
->> +
->> +static int __init
->> +pds_vfio_pci_init(void)
->> +{
->> +     int err;
->> +
->> +     err = pci_register_driver(&pds_vfio_pci_driver);
->> +     if (err) {
->> +             pr_err("pci driver register failed: %pe\n", ERR_PTR(err));
->> +             return err;
->> +     }
->> +
->> +     return 0;
->> +}
->> +module_init(pds_vfio_pci_init);
-> 
-> It would be better to use module_pci_driver(pds_vfio_pci_driver) instead
+On Thu, Dec 29, 2022 at 3:12 PM David Matlack <dmatlack@google.com> wrote:
+>
+> On Thu, Dec 29, 2022 at 3:08 PM David Matlack <dmatlack@google.com> wrote:
+> >
+> > On Wed, Dec 21, 2022 at 06:34:54PM -0800, Vipin Sharma wrote:
+> > > Add 'node' variable in kvm_mmu_memory_cache{} to denote which NUMA node
+> > > this cache should allocate memory from. Default initialize to
+> > > NUMA_NO_NODE in all architectures.
+> > >
+> > > Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> > > ---
+> > >  arch/arm64/kvm/arm.c      |  2 +-
+> > >  arch/arm64/kvm/mmu.c      |  4 +++-
+> > >  arch/mips/kvm/mips.c      |  2 ++
+> > >  arch/riscv/kvm/mmu.c      |  2 +-
+> > >  arch/riscv/kvm/vcpu.c     |  2 +-
+> > >  arch/x86/kvm/mmu/mmu.c    | 22 ++++++++++++----------
+> > >  include/linux/kvm_host.h  |  6 ++++++
+> > >  include/linux/kvm_types.h |  2 ++
+> > >  8 files changed, 28 insertions(+), 14 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > > index 9c5573bc4614..52a41f4532e2 100644
+> > > --- a/arch/arm64/kvm/arm.c
+> > > +++ b/arch/arm64/kvm/arm.c
+> > > @@ -340,7 +340,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> > >       vcpu->arch.target = -1;
+> > >       bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
+> > >
+> > > -     vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_cache, NULL, NUMA_NO_NODE);
+> > >
+> > >       /*
+> > >        * Default value for the FP state, will be overloaded at load
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 31d7fa4c7c14..bd07155e17fa 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -894,12 +894,14 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> > >  {
+> > >       phys_addr_t addr;
+> > >       int ret = 0;
+> > > -     struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+> > > +     struct kvm_mmu_memory_cache cache;
+> > >       struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> > >       enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+> > >                                    KVM_PGTABLE_PROT_R |
+> > >                                    (writable ? KVM_PGTABLE_PROT_W : 0);
+> > >
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&cache, NULL, NUMA_NO_NODE);
+> >
+> > This is not any better than setting cache.node = NUMA_NO_NODE directly.
+> > Yes it's less lines of code, but it's harder to read (what does NULL
+> > mean here?), and every user of kvm_mmu_memory_cache still has to know to
+> > pass NUMA_NO_NODE.
+> >
+> > When I originally gave this suggestion, I intended to suggest that
+> > INIT_KVM_MMU_MEMORY_CACHE() provide just default initialization.
+> > Non-default initialization for gfp_zero, gfp_custom, kmem_cache, and
+> > node would remain as they are.
+> >
+> > Yes this adds some more lines, but keeps things readable, and doesn't
+> > every initialization site of kvm_mmu_memory_cache to know what to pass
+> > for gfp_zero, node, and kmem_cache. It only needs to set the fields
+> > *it* cares about.
+>
+> And to offset the extra lines to call INIT_KVM_MMU_MEMORY_CACHE(), we
+> could finally invert the meaning of gfp_zero so that caches use
+> __GFP_ZERO by default. The majority of caches want __GFP_ZERO, so that
+> should cut down a bunch of lines.
+>
 
-Generally you are correct, but note that the next patch adds the 
-auxiliary_driver registration so that it is no longer  a simple PCI init.
+Can you clarify what you mean by invert?
 
-sln
+Caches which don't want __GFP_ZERO will explicitly set gfp_zero to 0.
+Is this what you intend?
 
-> 
-> Thanks,
-> Longfang.
-> 
->> +
->> +MODULE_DESCRIPTION(PDS_VFIO_DRV_DESCRIPTION);
->> +MODULE_AUTHOR("Pensando Systems, Inc");
->> +MODULE_LICENSE("GPL");
->> diff --git a/drivers/vfio/pci/pds/vfio_dev.c b/drivers/vfio/pci/pds/vfio_dev.c
->> new file mode 100644
->> index 000000000000..f8f4006c0915
->> --- /dev/null
->> +++ b/drivers/vfio/pci/pds/vfio_dev.c
->> @@ -0,0 +1,74 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/* Copyright(c) 2022 Pensando Systems, Inc */
->> +
->> +#include <linux/vfio.h>
->> +#include <linux/vfio_pci_core.h>
->> +
->> +#include "vfio_dev.h"
->> +
->> +struct pds_vfio_pci_device *
->> +pds_vfio_pci_drvdata(struct pci_dev *pdev)
->> +{
->> +     struct vfio_pci_core_device *core_device = dev_get_drvdata(&pdev->dev);
->> +
->> +     return container_of(core_device, struct pds_vfio_pci_device,
->> +                         vfio_coredev);
->> +}
->> +
->> +static int
->> +pds_vfio_init_device(struct vfio_device *vdev)
->> +{
->> +     struct pds_vfio_pci_device *pds_vfio =
->> +             container_of(vdev, struct pds_vfio_pci_device,
->> +                          vfio_coredev.vdev);
->> +     struct pci_dev *pdev = to_pci_dev(vdev->dev);
->> +     int err;
->> +
->> +     err = vfio_pci_core_init_dev(vdev);
->> +     if (err)
->> +             return err;
->> +
->> +     pds_vfio->vf_id = pci_iov_vf_id(pdev);
->> +     pds_vfio->pci_id = PCI_DEVID(pdev->bus->number, pdev->devfn);
->> +
->> +     return 0;
->> +}
->> +
->> +static int
->> +pds_vfio_open_device(struct vfio_device *vdev)
->> +{
->> +     struct pds_vfio_pci_device *pds_vfio =
->> +             container_of(vdev, struct pds_vfio_pci_device,
->> +                          vfio_coredev.vdev);
->> +     int err;
->> +
->> +     err = vfio_pci_core_enable(&pds_vfio->vfio_coredev);
->> +     if (err)
->> +             return err;
->> +
->> +     vfio_pci_core_finish_enable(&pds_vfio->vfio_coredev);
->> +
->> +     return 0;
->> +}
->> +
->> +static const struct vfio_device_ops
->> +pds_vfio_ops = {
->> +     .name = "pds-vfio",
->> +     .init = pds_vfio_init_device,
->> +     .release = vfio_pci_core_release_dev,
->> +     .open_device = pds_vfio_open_device,
->> +     .close_device = vfio_pci_core_close_device,
->> +     .ioctl = vfio_pci_core_ioctl,
->> +     .device_feature = vfio_pci_core_ioctl_feature,
->> +     .read = vfio_pci_core_read,
->> +     .write = vfio_pci_core_write,
->> +     .mmap = vfio_pci_core_mmap,
->> +     .request = vfio_pci_core_request,
->> +     .match = vfio_pci_core_match,
->> +};
->> +
->> +const struct vfio_device_ops *
->> +pds_vfio_ops_info(void)
->> +{
->> +     return &pds_vfio_ops;
->> +}
->> diff --git a/drivers/vfio/pci/pds/vfio_dev.h b/drivers/vfio/pci/pds/vfio_dev.h
->> new file mode 100644
->> index 000000000000..289479a08dce
->> --- /dev/null
->> +++ b/drivers/vfio/pci/pds/vfio_dev.h
->> @@ -0,0 +1,23 @@
->> +// SPDX-License-Identifier: GPL-2.0
->> +/* Copyright(c) 2022 Pensando Systems, Inc */
->> +
->> +#ifndef _VFIO_DEV_H_
->> +#define _VFIO_DEV_H_
->> +
->> +#include <linux/pci.h>
->> +#include <linux/vfio_pci_core.h>
->> +
->> +struct pds_vfio_pci_device {
->> +     struct vfio_pci_core_device vfio_coredev;
->> +     struct pci_dev *pdev;
->> +
->> +     int vf_id;
->> +     int pci_id;
->> +};
->> +
->> +const struct vfio_device_ops *
->> +pds_vfio_ops_info(void);
->> +struct pds_vfio_pci_device *
->> +pds_vfio_pci_drvdata(struct pci_dev *pdev);
->> +
->> +#endif /* _VFIO_DEV_H_ */
->> diff --git a/include/linux/pds/pds_core_if.h b/include/linux/pds/pds_core_if.h
->> index 6e92697657e4..4362b94a7666 100644
->> --- a/include/linux/pds/pds_core_if.h
->> +++ b/include/linux/pds/pds_core_if.h
->> @@ -9,6 +9,7 @@
->>   #define PCI_VENDOR_ID_PENSANDO                       0x1dd8
->>   #define PCI_DEVICE_ID_PENSANDO_CORE_PF               0x100c
->>   #define PCI_DEVICE_ID_PENSANDO_VDPA_VF          0x100b
->> +#define PCI_DEVICE_ID_PENSANDO_NVME_VF               0x1006
->>
->>   #define PDS_CORE_BARS_MAX                    4
->>   #define PDS_CORE_PCI_BAR_DBELL                       1
->>
+
+> >
+> > Here's what I mean specifically, based on INIT_LIST_HEAD. I don't think
+> > I got all the kvm_mmu_memory_cache users, but you get the point.
+> >
+> >
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 9c5573bc4614..0e138dcaf4d4 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -340,6 +340,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> >         vcpu->arch.target = -1;
+> >         bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
+> >
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_cache);
+> >         vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+> >
+> >         /*
+> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > index 31d7fa4c7c14..f5fd78a4f084 100644
+> > --- a/arch/arm64/kvm/mmu.c
+> > +++ b/arch/arm64/kvm/mmu.c
+> > @@ -894,12 +894,14 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+> >  {
+> >         phys_addr_t addr;
+> >         int ret = 0;
+> > -       struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
+> > +       KVM_MMU_MEMORY_CACHE(cache);
+> >         struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
+> >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
+> >                                      KVM_PGTABLE_PROT_R |
+> >                                      (writable ? KVM_PGTABLE_PROT_W : 0);
+> >
+> > +       cache.gfp_zero = __GFP_ZERO;
+> > +
+> >         if (is_protected_kvm_enabled())
+> >                 return -EPERM;
+> >
+> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> > index 34b57e0be2ef..7915a5a2d104 100644
+> > --- a/arch/riscv/kvm/mmu.c
+> > +++ b/arch/riscv/kvm/mmu.c
+> > @@ -351,10 +351,11 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
+> >         int ret = 0;
+> >         unsigned long pfn;
+> >         phys_addr_t addr, end;
+> > -       struct kvm_mmu_memory_cache pcache = {
+> > -               .gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0,
+> > -               .gfp_zero = __GFP_ZERO,
+> > -       };
+> > +       KVM_MMU_MEMORY_CACHE(pcache);
+> > +
+> > +       pcache.gfp_zero = __GFP_ZERO;
+> > +       if (in_atomic)
+> > +               pcache.gfp_custom = GFP_ATOMIC | __GFP_ACCOUNT;
+> >
+> >         end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+> >         pfn = __phys_to_pfn(hpa);
+> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > index 7c08567097f0..3d73ab3ec9a4 100644
+> > --- a/arch/riscv/kvm/vcpu.c
+> > +++ b/arch/riscv/kvm/vcpu.c
+> > @@ -161,6 +161,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> >
+> >         /* Mark this VCPU never ran */
+> >         vcpu->arch.ran_atleast_once = false;
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_header_cache);
+> >         vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+> >         bitmap_zero(vcpu->arch.isa, RISCV_ISA_EXT_MAX);
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 254bc46234e0..d4cd8e64cc03 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -5909,14 +5909,19 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+> >  {
+> >         int ret;
+> >
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_pte_list_desc_cache);
+> >         vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+> >         vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
+> >
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_header_cache);
+> >         vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+> >         vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+> >
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadow_page_cache);
+> >         vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> >
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadowed_info_cache);
+> > +
+> >         vcpu->arch.mmu = &vcpu->arch.root_mmu;
+> >         vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
+> >
+> > @@ -6083,11 +6088,14 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+> >         node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+> >         kvm_page_track_register_notifier(kvm, node);
+> >
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_page_header_cache);
+> >         kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
+> >         kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
+> >
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_shadow_page_cache);
+> >         kvm->arch.split_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> >
+> > +       INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_desc_cache);
+> >         kvm->arch.split_desc_cache.kmem_cache = pte_list_desc_cache;
+> >         kvm->arch.split_desc_cache.gfp_zero = __GFP_ZERO;
+> >
+> > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> > index 76de36e56cdf..eb7ff9afa5c7 100644
+> > --- a/include/linux/kvm_types.h
+> > +++ b/include/linux/kvm_types.h
+> > @@ -98,6 +98,17 @@ struct kvm_mmu_memory_cache {
+> >         int capacity;
+> >         void **objects;
+> >  };
+> > +
+> > +#define KVM_MMU_MEMORY_CACHE_INIT() (struct kvm_mmu_memory_cache) { \
+> > +}
+> > +
+> > +#define KVM_MMU_MEMORY_CACHE(_name) \
+> > +       struct kvm_mmu_memory_cache _name = KVM_MMU_MEMORY_CACHE_INIT()
+> > +
+> > +static inline void INIT_KVM_MMU_MEMORY_CACHE(struct kvm_mmu_memory_cache *cache)
+> > +{
+> > +       *cache = KVM_MMU_MEMORY_CACHE_INIT();
+> > +}
+> >  #endif
+> >
+> >  #define HALT_POLL_HIST_COUNT                   32
+> >
+> > > +
+> > >       if (is_protected_kvm_enabled())
+> > >               return -EPERM;
+> > >
+> > > diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
+> > > index a25e0b73ee70..b017c29a9340 100644
+> > > --- a/arch/mips/kvm/mips.c
+> > > +++ b/arch/mips/kvm/mips.c
+> > > @@ -304,6 +304,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> > >                    HRTIMER_MODE_REL);
+> > >       vcpu->arch.comparecount_timer.function = kvm_mips_comparecount_wakeup;
+> > >
+> > > +     vcpu->arch.mmu_page_cache.node = NUMA_NO_NODE;
+> > > +
+> > >       /*
+> > >        * Allocate space for host mode exception handlers that handle
+> > >        * guest mode exits
+> > > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> > > index 34b57e0be2ef..119de4520cc6 100644
+> > > --- a/arch/riscv/kvm/mmu.c
+> > > +++ b/arch/riscv/kvm/mmu.c
+> > > @@ -353,9 +353,9 @@ int kvm_riscv_gstage_ioremap(struct kvm *kvm, gpa_t gpa,
+> > >       phys_addr_t addr, end;
+> > >       struct kvm_mmu_memory_cache pcache = {
+> > >               .gfp_custom = (in_atomic) ? GFP_ATOMIC | __GFP_ACCOUNT : 0,
+> > > -             .gfp_zero = __GFP_ZERO,
+> > >       };
+> > >
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&pcache, NULL, NUMA_NO_NODE);
+> > >       end = (gpa + size + PAGE_SIZE - 1) & PAGE_MASK;
+> > >       pfn = __phys_to_pfn(hpa);
+> > >
+> > > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > > index 7c08567097f0..189b14feb365 100644
+> > > --- a/arch/riscv/kvm/vcpu.c
+> > > +++ b/arch/riscv/kvm/vcpu.c
+> > > @@ -161,7 +161,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> > >
+> > >       /* Mark this VCPU never ran */
+> > >       vcpu->arch.ran_atleast_once = false;
+> > > -     vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_cache, NULL, NUMA_NO_NODE);
+> > >       bitmap_zero(vcpu->arch.isa, RISCV_ISA_EXT_MAX);
+> > >
+> > >       /* Setup ISA features available to VCPU */
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 6f6a10d7a871..23a3b82b2384 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -5954,13 +5954,14 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
+> > >  {
+> > >       int ret;
+> > >
+> > > -     vcpu->arch.mmu_pte_list_desc_cache.kmem_cache = pte_list_desc_cache;
+> > > -     vcpu->arch.mmu_pte_list_desc_cache.gfp_zero = __GFP_ZERO;
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_pte_list_desc_cache,
+> > > +                               pte_list_desc_cache, NUMA_NO_NODE);
+> > >
+> > > -     vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
+> > > -     vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_header_cache,
+> > > +                               mmu_page_header_cache, NUMA_NO_NODE);
+> > >
+> > > -     vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_shadow_page_cache,
+> > > +                               NULL, NUMA_NO_NODE);
+> > >       spin_lock_init(&vcpu->arch.mmu_shadow_page_cache_lock);
+> > >
+> > >       vcpu->arch.mmu = &vcpu->arch.root_mmu;
+> > > @@ -6124,14 +6125,15 @@ int kvm_mmu_init_vm(struct kvm *kvm)
+> > >       node->track_flush_slot = kvm_mmu_invalidate_zap_pages_in_memslot;
+> > >       kvm_page_track_register_notifier(kvm, node);
+> > >
+> > > -     kvm->arch.split_page_header_cache.kmem_cache = mmu_page_header_cache;
+> > > -     kvm->arch.split_page_header_cache.gfp_zero = __GFP_ZERO;
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_page_header_cache,
+> > > +                               mmu_page_header_cache, NUMA_NO_NODE);
+> > >
+> > > -     kvm->arch.split_shadow_page_cache.gfp_zero = __GFP_ZERO;
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_shadow_page_cache,
+> > > +                               NULL, NUMA_NO_NODE);
+> > >       spin_lock_init(&kvm->arch.split_shadow_page_cache_lock);
+> > >
+> > > -     kvm->arch.split_desc_cache.kmem_cache = pte_list_desc_cache;
+> > > -     kvm->arch.split_desc_cache.gfp_zero = __GFP_ZERO;
+> > > +     INIT_KVM_MMU_MEMORY_CACHE(&kvm->arch.split_desc_cache,
+> > > +                               pte_list_desc_cache, NUMA_NO_NODE);
+> > >
+> > >       return 0;
+> > >  }
+> > > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> > > index a262e15ebd19..719687a37ef7 100644
+> > > --- a/include/linux/kvm_host.h
+> > > +++ b/include/linux/kvm_host.h
+> > > @@ -2302,4 +2302,10 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+> > >  /* Max number of entries allowed for each kvm dirty ring */
+> > >  #define  KVM_DIRTY_RING_MAX_ENTRIES  65536
+> > >
+> > > +#define INIT_KVM_MMU_MEMORY_CACHE(_cache, _kmem_cache, _node) ({     \
+> > > +     (_cache)->kmem_cache = _kmem_cache;                             \
+> > > +     (_cache)->gfp_zero = __GFP_ZERO;                                \
+> > > +     (_cache)->node = _node;                                         \
+> > > +})
+> > > +
+> > >  #endif
+> > > diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> > > index 76de36e56cdf..9c70ce95e51f 100644
+> > > --- a/include/linux/kvm_types.h
+> > > +++ b/include/linux/kvm_types.h
+> > > @@ -97,6 +97,8 @@ struct kvm_mmu_memory_cache {
+> > >       struct kmem_cache *kmem_cache;
+> > >       int capacity;
+> > >       void **objects;
+> > > +     /* Node on which memory should be allocated by default */
+> > > +     int node;
+> > >  };
+> > >  #endif
+> > >
+> > > --
+> > > 2.39.0.314.g84b9a713c41-goog
+> > >
