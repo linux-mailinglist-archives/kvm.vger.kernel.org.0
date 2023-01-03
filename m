@@ -2,67 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2801865C542
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 18:43:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6564765C546
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 18:44:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238489AbjACRmk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 12:42:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42690 "EHLO
+        id S237771AbjACRod (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 12:44:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238336AbjACRmh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 12:42:37 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4477A2DB
-        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 09:42:36 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id o31-20020a17090a0a2200b00223fedffb30so31831245pjo.3
-        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 09:42:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OkcZf3Nc7+BU1+DO0enKeeF9MyS0vVC/gIcg/2SqswM=;
-        b=gS6a/Etgsc3Y7wqJ1duGRSBfgWWVzFB4u1JMrxXTtmJzxj3QvXhb39dbInsEk3YqZX
-         FoWN1FUPGmngIT6N6nqeyXb+BJIHU0LO87D2ByM2QmyUtps6LxE7DHpdveXReFP4vzAw
-         99HYN3J4tHMdgezOwSWNy7CyYU1D67c15zs7FaECgSU0CCqzDam22fzrxEV15mO7cqcp
-         f5TbCO1iUh3Vl8usPlVbkfN9c7sCvDFIbXzwd8CH6R3PPJRGKK2woFXWIBZVn9bTIIDE
-         yRji+6s9YSRhvi1peu9DzDqEnOxKqAE8qlTvvYpAl5WHesv3r4y0RARgwkoPR6qq3GDH
-         0zew==
+        with ESMTP id S233872AbjACRob (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 12:44:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 037DBE27
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 09:43:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672767823;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jO6Zl402uF1R5RJR+aDfFIjsGFP/yqalvVW+NL65RNM=;
+        b=A09Foso3tZUCqMiNJZcMvg6dYytvjYOxsUthAoTAdI0r5uCJbJX9X1X6BMllHg7/WLh1R6
+        Iwpnc/SLNOW6gdqWsGLaHapoVwJiYHPgWBZywnYd8XROKOMeJl8lrXydigiTKWFQ4wzHYj
+        Ru3aAVsMN4hoac1XFhV691LUpYCk21o=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-58-uPlXUiy3M-yscl37Kdya1Q-1; Tue, 03 Jan 2023 12:43:42 -0500
+X-MC-Unique: uPlXUiy3M-yscl37Kdya1Q-1
+Received: by mail-io1-f69.google.com with SMTP id u24-20020a6be918000000b006ed1e9ad302so8768718iof.22
+        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 09:43:42 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OkcZf3Nc7+BU1+DO0enKeeF9MyS0vVC/gIcg/2SqswM=;
-        b=pj2SlbgfaQK/OdufhC68bBhhapA9WB0ae3Kf+v3LlADxuv8m+bCIzUAAOgnNJlX9gp
-         ZJ7O31Ol/jqUYFnEmPdXhm4xiFigGbEclFrU4NhF5s2AG25sKY5BI0zD3k5xVyjrwsan
-         WRjJ99vAYUdGJN9tcUb0SCYFVFYx44IxSF606qZNDuqb7Vjha2wnSdffGJa+dUSjknFt
-         x6KWE9tTFAht0jxxpOtzmRANejj5q6ToIPqRK2yVYgJi4SYp+hCAaOkPN83nrKYrmGhc
-         5RhwdXQx8XM5LdMG15fSZsNgF7MpSSwziB250U8lprDaA0YaUkHtUkIjYYD8lz8jem4E
-         VYkA==
-X-Gm-Message-State: AFqh2kqB9+8RPWR/qpKVr5IAOQRj+00s0cLF1JLnNaUwl3L/52xkHn96
-        vBJFi4m3BM8nWnA6Eunus96AIg==
-X-Google-Smtp-Source: AMrXdXtPqHrkrzSlIRciJoetvHMCPwMdBuKzCM1WyhWc9yv71Rd92zOcdIG8AXUPiO47gGatcXvf6g==
-X-Received: by 2002:a17:902:9049:b0:189:6d32:afeb with SMTP id w9-20020a170902904900b001896d32afebmr4220394plz.1.1672767755628;
-        Tue, 03 Jan 2023 09:42:35 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u18-20020a170903125200b00189adf6770fsm22749792plh.233.2023.01.03.09.42.35
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jO6Zl402uF1R5RJR+aDfFIjsGFP/yqalvVW+NL65RNM=;
+        b=TsxTlJ9D+5ODtmFMuRfcbZ0pW7fJQsbt+SSiAzWvFmINdJdc9e47PKidw6Yv3pSiOy
+         HBERAwoMGuxewmybqAiARYvixkGoC0oBzGjM1Oisn6DvKF1w+jVG5ozAH0ipjgWoAqZa
+         HAVoLqnnW3Xxy5MttaQNiYxER9KEARgzDjcpyp0WCNTgr0/LYV6+XHU2TWrSsdij5RXx
+         Sthc5/2+mVG2gRmCQBcikPH0BLUR6/EzNK1SZvUBtwbS/yLaJq0vzld5UnEqvYJb6ulW
+         qN2WDAfT1FdZ3wHby0UCjzLO1Gnp9UUg0vy/TAE5sUeuWtm2oAh2+XuKCASh80bniMJz
+         8uSg==
+X-Gm-Message-State: AFqh2kpnW9jsVPWnuXdMd5sRUgUrQcA4ESaZmi9j+C95KQ48ri7cYrL2
+        GYdQ1Vxg1fgcSJZKUtBDYqRxVVrXj7yXtfGQuvpar7nFXucCo11cwvnoViEpW4Dj3YlPx7Lj2aF
+        jLhIKP3g/4Ilo
+X-Received: by 2002:a6b:6310:0:b0:6d6:4daf:623f with SMTP id p16-20020a6b6310000000b006d64daf623fmr27685232iog.6.1672767821067;
+        Tue, 03 Jan 2023 09:43:41 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXum1NkGfbp5wP/yTi/4H0MnD8Iv6ksddlNLbXCBrWU4pLdAWOiz5nI4pkUUR+nGBnIUSJw+7A==
+X-Received: by 2002:a6b:6310:0:b0:6d6:4daf:623f with SMTP id p16-20020a6b6310000000b006d64daf623fmr27685220iog.6.1672767820803;
+        Tue, 03 Jan 2023 09:43:40 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id r6-20020a02aa06000000b00389b6c71347sm10422648jam.60.2023.01.03.09.43.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Jan 2023 09:42:35 -0800 (PST)
-Date:   Tue, 3 Jan 2023 17:42:31 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] Documentation: kvm: clarify SRCU locking order
-Message-ID: <Y7RpB+trpnhVRhQW@google.com>
-References: <20221228110410.1682852-2-pbonzini@redhat.com>
+        Tue, 03 Jan 2023 09:43:40 -0800 (PST)
+Date:   Tue, 3 Jan 2023 10:43:38 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Shachar Raindel <shacharr@google.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Convert backwards goto into a while loop
+Message-ID: <20230103104338.4371e012.alex.williamson@redhat.com>
+In-Reply-To: <20221228213212.628636-1-shacharr@google.com>
+References: <20221228213212.628636-1-shacharr@google.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221228110410.1682852-2-pbonzini@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,67 +78,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 28, 2022, Paolo Bonzini wrote:
-> Currently only the locking order of SRCU vs kvm->slots_arch_lock
-> and kvm->slots_lock is documented.  Extend this to kvm->lock
-> since Xen emulation got it terribly wrong.
-> 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On Wed, 28 Dec 2022 21:32:12 +0000
+Shachar Raindel <shacharr@google.com> wrote:
+
+> The function vaddr_get_pfns used a goto retry structure to implement
+> retrying.  This is discouraged by the coding style guide (which is
+> only recommending goto for handling function exits). Convert the code
+> to a while loop, making it explicit that the follow block only runs
+> when the pin attempt failed.
+
+What coding style guide are you referring to?  In
+Documentation/process/coding-style.rst I only see goto mentioned in 7)
+Centralized exiting of functions, which suggests it's a useful
+mechanism for creating centralized cleanup code, while noting "[a]lbeit
+deprecated by *some people*", emphasis added.  This doesn't suggest to
+me such a strong statement as implied in this commit log.
+ 
+> Signed-off-by: Shachar Raindel <shacharr@google.com>
 > ---
->  Documentation/virt/kvm/locking.rst | 19 ++++++++++++++-----
->  1 file changed, 14 insertions(+), 5 deletions(-)
+>  drivers/vfio/vfio_iommu_type1.c | 27 ++++++++++++++-------------
+>  1 file changed, 14 insertions(+), 13 deletions(-)
 > 
-> diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-> index 845a561629f1..a3ca76f9be75 100644
-> --- a/Documentation/virt/kvm/locking.rst
-> +++ b/Documentation/virt/kvm/locking.rst
-> @@ -16,17 +16,26 @@ The acquisition orders for mutexes are as follows:
->  - kvm->slots_lock is taken outside kvm->irq_lock, though acquiring
->    them together is quite rare.
+> diff --git a/drivers/vfio/vfio_iommu_type1.c
+> b/drivers/vfio/vfio_iommu_type1.c index 23c24fe98c00..7f38d7fc3f62
+> 100644 --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -570,27 +570,28 @@ static int vaddr_get_pfns(struct mm_struct *mm,
+> unsigned long vaddr, }
 >  
-> -- Unlike kvm->slots_lock, kvm->slots_arch_lock is released before
-> -  synchronize_srcu(&kvm->srcu).  Therefore kvm->slots_arch_lock
-> -  can be taken inside a kvm->srcu read-side critical section,
-> -  while kvm->slots_lock cannot.
-> -
->  - kvm->mn_active_invalidate_count ensures that pairs of
->    invalidate_range_start() and invalidate_range_end() callbacks
->    use the same memslots array.  kvm->slots_lock and kvm->slots_arch_lock
->    are taken on the waiting side in install_new_memslots, so MMU notifiers
->    must not take either kvm->slots_lock or kvm->slots_arch_lock.
+>  		*pfn = page_to_pfn(pages[0]);
+> -		goto done;
+> -	}
+> +	} else
+
+Coding style would however discourage skipping the braces around this
+half of the branch, as done here, as a) they're used around the former
+half and b) the below is not a single simple statement.  Thanks,
+
+Alex
+
+> +		do {
+> +
+> +			/* This is not a normal page, lookup PFN for P2P DMA */
+> +			vaddr = untagged_addr(vaddr);
 >  
-> +For SRCU:
-> +
-> +- ``synchronize_srcu(&kvm->srcu)`` is called _inside_
-> +  the kvm->slots_lock critical section, therefore kvm->slots_lock
-> +  cannot be taken inside a kvm->srcu read-side critical section.
-> +  Instead, kvm->slots_arch_lock is released before the call
-> +  to ``synchronize_srcu()`` and _can_ be taken inside a
-> +  kvm->srcu read-side critical section.
-> +
-> +- kvm->lock is taken inside kvm->srcu, therefore
-
-Prior to the recent Xen change, is this actually true?  There are many instances
-where kvm->srcu is taken inside kvm->lock, but I can't find any existing cases
-where the reverse is true.  Logically, it makes sense to take kvm->lock first since
-kvm->srcu can be taken deep in helpers, e.g. for accessing guest memory.  It's also
-more consistent to take kvm->lock first since kvm->srcu is taken inside vcpu->mutex,
-and vcpu->mutex is taken inside kvm->lock.
-
-Disallowing synchronize_srcu(kvm->srcu) inside kvm->lock isn't probelmatic per se,
-but it's going to result in a weird set of rules because synchronize_scru() can,
-and is, called while holding a variety of other locks.
-
-In other words, IMO taking kvm->srcu outside of kvm->lock in the Xen code is the
-real bug.
-
-> +  ``synchronize_srcu(&kvm->srcu)`` cannot be called inside
-> +  a kvm->lock critical section.  If you cannot delay the
-> +  call until after kvm->lock is released, use ``call_srcu``.
-> +
->  On x86:
+> -	vaddr = untagged_addr(vaddr);
+> +			vma = vma_lookup(mm, vaddr);
 >  
->  - vcpu->mutex is taken outside kvm->arch.hyperv.hv_lock
-> -- 
-> 2.31.1
-> 
+> -retry:
+> -	vma = vma_lookup(mm, vaddr);
+> +			if (!vma || !(vma->vm_flags & VM_PFNMAP))
+> +				break;
+>  
+> -	if (vma && vma->vm_flags & VM_PFNMAP) {
+> -		ret = follow_fault_pfn(vma, mm, vaddr, pfn, prot & IOMMU_WRITE);
+> -		if (ret == -EAGAIN)
+> -			goto retry;
+> +			ret = follow_fault_pfn(vma, mm, vaddr, pfn,
+> +					       prot & IOMMU_WRITE);
+> +			if (ret)
+> +				continue; /* Retry for EAGAIN, otherwise bail */
+>  
+> -		if (!ret) {
+>  			if (is_invalid_reserved_pfn(*pfn))
+>  				ret = 1;
+>  			else
+>  				ret = -EFAULT;
+> -		}
+> -	}
+> -done:
+> +		} while (ret == -EAGAIN);
+> +
+>  	mmap_read_unlock(mm);
+>  	return ret;
+>  }
+
