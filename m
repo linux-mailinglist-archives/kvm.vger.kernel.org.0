@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8B90665BA04
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 05:23:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A887865BA07
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 05:26:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236788AbjACEXm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 2 Jan 2023 23:23:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35130 "EHLO
+        id S232871AbjACE0f (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 2 Jan 2023 23:26:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236789AbjACEW5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 2 Jan 2023 23:22:57 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2105.outbound.protection.outlook.com [40.107.100.105])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61506DEA7
-        for <kvm@vger.kernel.org>; Mon,  2 Jan 2023 20:22:08 -0800 (PST)
+        with ESMTP id S230071AbjACE0c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 2 Jan 2023 23:26:32 -0500
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB3B5EB6
+        for <kvm@vger.kernel.org>; Mon,  2 Jan 2023 20:26:31 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Vc54pDDakMpaJTC18prjr6MBQDBz4eea+iSC3rAu7k1D9DbB4tCNxOVQ24Q018po8IFv33EbCr4UuKcNqMv0WhJSs/5h8HUAet/DTXhurX1f2tK5rBMGwvRVZRsrlHoPOALzNMQu4DFRMJ8LFOdQotBPiHgEMmDsdIIPOek0AY/k9qmjKveFPt9U7Mzc8zjRTE/zJ27cjcMEBChYGX3+PlFjrvGb98/hIJja3UMYIsGq43MBhNtKFn6xbHzZ0pY8//O5aSm++2AH3p4CU2qGOXTHGNIu4zJo9KREE7KnIfs+oXJF6Ns2pwoY6tZ7fSjKmwxVUYs+hfoYnLpD6iCspA==
+ b=SsnIzjm7V/Ksg0NsT8QYIoynAv7bvXv0745x0umJym8i0Nzaxmy1g19F7Vop8L2RuPwmUmTPpAtM53oGwzOJI4Ubj9CLVUW0YfKSS8LZF9sucpOTs/E28csaTHOj0Zqw1Zj4D6XZ5ZrgPO1br0wdWFD5uwRSMjGK8Y2+B+c3U35SCAVYPmOSuuzWOXqTPSAVsH7dnsuZ2gFBZO9lABGNH1AjFCyPZhILtLqw7hde9S2/u37OMGVD9kkEJyRMCHFFmDTMZo24qjTqVCuMSN65cOd25Zmb2tigpJgMalTTGvgkMhTrFbx3NMboHWJBwl6dE2bu97tmXamz8WcIIbNMEg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aJX+e8jWq83mExwloS4S210BaWcDOPyH4xLNHWN3INk=;
- b=g4LK0AgJUIFaf4sHlhIbHU1WJIJRvEAkzGlP3RHGuPpSSOI03cd+oMV0iCI0ohQzecbBalg9C9pTYNslOY+hl4isQGUPGlWJpTv/98nW+bLeOSAupntPsf2arV+RMtlJGeOYwxwE8Nvj/Pg+1aLAoqxZ5VTk7KYlHv/AekQ9+JA7lhY7nKMv4DnuDPOmPDqQrdtGqSEL7MemvWZ3eBp/sAjTV6BzjPAH34aILJKAUXcBcRaZm+sCEr6NWT+hHvV35tUdRVwtTDy5kNEOeCYqF9kSToo9gP1MYoWjpJh7n4fXwPJCVF9h4hjfDaJuZnu6NCpo8A3KfJR8MBfoDKGpuw==
+ bh=KwYshsR/kSCBX1djLVRMSKkd7qGBaacG1aAd3fYrbsI=;
+ b=XCfdGxu/4JwrbPFWvOc8i/aPzaKllRu8YEAcMTAIu0FHwEFuP9P4EMEzAzKWQZi/xC1u9NXwZAqKQwEumL+pmI/7118XS5PrKFfD+DTL/dPOk3JTOU2oe4yABMskk1nmkZVlJ3CMAV/70gv1mGHz7MzPcFnsPX2bSkSmFdD1GqXrM35HV4lX8Lu1lhSJPonNkGx7k4j7lhKeC2MdEU8BJLhQxMYwwTEd71YtXyFa1mn1GdpMSBMsz5pEE+R4qywEZio5yq5qWWRa7QzJLBN/WO9YG7esj30oaoJrOkMa5z/hJZHc8Cx/fbuXLVpnQUqmUYORM3nudplCmMRMjYuEeQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -28,98 +28,98 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aJX+e8jWq83mExwloS4S210BaWcDOPyH4xLNHWN3INk=;
- b=E5qCmJDiwrKvGrUitDzJ8nGuZU0t4c5a8yMmIpgTauc7SxuBFI/TnJDA+Ap049NjOLoEYG/zCcbW0lsG0JIq8hD0h6SVQuIl3rUVcSnQRAAF5kfceiNVgToNR39rL+6N8F27LfdCeYy/3sRQ2ABnpOIBUoad9/nm/1KoCzIjgGI=
+ bh=KwYshsR/kSCBX1djLVRMSKkd7qGBaacG1aAd3fYrbsI=;
+ b=gZQeZrfpGuDPh7EUGamR3ZELx1P91u7tVYWV8D5bN7WEeJ9Ouyn2t0lHlVOnO9asRtCZ4p6DWxTJaMkzHX38A9HeB1JrhUIx81oRz1Gs0S2RpBYijAkeA5ZpHkM8o6Utb63n0i9QNDwt1l2P7UKkT5B6KfvVqD8AeybsIdDrpIM=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- CY4PR0101MB3158.prod.exchangelabs.com (2603:10b6:910:43::17) with Microsoft
+ LV2PR01MB7720.prod.exchangelabs.com (2603:10b6:408:172::5) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5944.16; Tue, 3 Jan 2023 04:22:03 +0000
+ 15.20.5944.16; Tue, 3 Jan 2023 04:26:27 +0000
 Received: from DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::6b5b:1242:818c:e70d]) by DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::6b5b:1242:818c:e70d%5]) with mapi id 15.20.5944.019; Tue, 3 Jan 2023
- 04:22:03 +0000
-Message-ID: <77a0523b-4bf5-5625-3f11-9b8e277b3a70@os.amperecomputing.com>
-Date:   Tue, 3 Jan 2023 09:51:54 +0530
+ 04:26:27 +0000
+Message-ID: <eadac5ec-6b61-9afe-3117-50fd9569ad4a@os.amperecomputing.com>
+Date:   Tue, 3 Jan 2023 09:56:19 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.1
-Subject: Re: [PATCH 2/3] KVM: arm64: nv: Emulate ISTATUS when emulated timers
- are fired.
+Subject: Re: [PATCH 3/3] KVM: arm64: nv: Avoid block mapping if max_map_size
+ is smaller than block size.
+Content-Language: en-US
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     catalin.marinas@arm.com, will@kernel.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, scott@os.amperecomputing.com,
         darren@os.amperecomputing.com
 References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
- <20220824060304.21128-3-gankulkarni@os.amperecomputing.com>
- <87y1qqe2pg.wl-maz@kernel.org> <867cy5b1mq.wl-maz@kernel.org>
-Content-Language: en-US
+ <20220824060304.21128-4-gankulkarni@os.amperecomputing.com>
+ <87wn6ads39.wl-maz@kernel.org>
 From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <867cy5b1mq.wl-maz@kernel.org>
+In-Reply-To: <87wn6ads39.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR02CA0057.apcprd02.prod.outlook.com
- (2603:1096:4:54::21) To DM8PR01MB6824.prod.exchangelabs.com
+X-ClientProxiedBy: SG2PR02CA0022.apcprd02.prod.outlook.com
+ (2603:1096:3:17::34) To DM8PR01MB6824.prod.exchangelabs.com
  (2603:10b6:8:23::24)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|CY4PR0101MB3158:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5abf80b8-d364-4392-6dcd-08daed4210b8
+X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|LV2PR01MB7720:EE_
+X-MS-Office365-Filtering-Correlation-Id: 78a90b35-29d9-4c37-7389-08daed42ae54
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0Knp2ARGrjq0VAxAK62pMB9nFg3TAeG6ZN9yqi0ymGqn7EiCEnF6VKmQqRoHasJtZ5h+4d3rCpIo0WcgpACPfNKnpxUTXIZ+frN2ujf8in/+DcXCMmZmy3GNEFuAtEwqwdBGYKlwKgxAgCdsFdxNUDvRTTSigciFubKRAK6dHViB+f8hhDk4icw34RsmAb9m68uI7OSLvvCWfrUfDF2VzGj9goEw891QQRukZRfc4OQkEHLysi/KqwU/25PLXTPvo8NoStReh6DihhrAXp3hAT/pk8XQ49QzfaylHOloGazv+oxM98J3rTxQgHjHhIr+ZmbSJnUUPVURGzD3mJd/AZSNhyXbzYx2XquGtW92iBYKLyxg2qF8u8upavZTKo7+LfM49zWTIlL/Dz9lJ5+xlzVOK/rfc3ymnpPwrgtt1JASOzbyotxeGyJ+8CLsM2r+uzXc110qZfuxnXa5u+R0f5S1KxJoZ8qeCPenvf5KS4AXBciHNqT7gN1tEXjvaFhkvAVxu+2o7M7hRGIE0Oh63oSL/Iq69cYEFck2UHmAQSMjrBN/gcK2T5TyOuWGm+IdryKIneEYPU2mqHTx+ysbFM+mLGH8cmfC9Aih8BdN7MIrIzhax0cKFpxGK7HzBDfepjPnqsQDugSI/KhXedjsPw5lfvN5gcTxm1wzGqyzmdpORY8M+Sb9dc7vR2QiwUbOE3uiwXFwJS8cT1sy186qX/Y4tK+SzPLWHf5nb9z/mbg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39840400004)(366004)(136003)(376002)(346002)(396003)(451199015)(478600001)(38100700002)(6486002)(83380400001)(6506007)(53546011)(107886003)(6666004)(6512007)(2616005)(26005)(186003)(31686004)(8936002)(5660300002)(8676002)(4326008)(66476007)(66946007)(66556008)(41300700001)(6916009)(2906002)(31696002)(316002)(86362001)(22166006)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: 0vQrv7jfiGMmRqGlgl00FomZcvsKFgkFyauet3uhtaX3p4rxFx8+2tZEhddJzuID9TCPV4m4PYFcn+kgOa91JSG8eIA2cQXUd5cwRr6R8D+B/r8wD0nP8bspqTzAlDMYgE8HNVgLIBVwMrUkktqZHsutps58/cFL6eZ43T6rjOnabJsa9IyNKS0uW8DqhcZmKUuEYEYl4beSuxtAT9sFHjpNDT1+gtPlLpwl7+hYmlIgFLIxtbEwiUjrCFQyFu26zhlIFkqDqOgC8wUINjQ/dvcX7mQFAshmszm3yWdo/Iug9vTQ8o7p8grKqQF3jqiMrSdb5yuuPww0BHbhJ1U8ziPoiC+UyF2H/7ghrsCp4r1ckovkY/oAAeYXvRdkbQsCxRc9L6XEMOd+/wz49v9fHfYeioPmQ2lb1nrQmTKCQkHSXHbq7TAVFUrxiHH88KPPUrI76CE2pilDwtkUz7+qzc5LpethGl3PJFbSAJ5dCU7SwfbzNVjyDFGBMUiMEIZJbi4EBJNnusUEfypCi3VqGoZyLqalpR6fVEwSCNlqI2TQ5EvIiYdjQN6zMS+HaYQl1Gb3bqClNAyOQinhZQTQvLp8pH01ncT1EgE/2nDXoT/Up/iw1pL0k83jb0LNNcvblOhk8oPHY/wMqrwbubyV2o6gQ5tM/u8z8Ku9Omr/wcOnBEjqeKl29YI3EpJa4bf6vC3QdPN/DwHmWeEaE9D975vG0F1tgckthrAN9BbauCg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(366004)(376002)(396003)(39850400004)(346002)(451199015)(66556008)(66946007)(31696002)(8676002)(4326008)(31686004)(66476007)(86362001)(41300700001)(8936002)(5660300002)(316002)(6916009)(83380400001)(2906002)(53546011)(478600001)(6666004)(107886003)(186003)(6512007)(6506007)(38100700002)(26005)(6486002)(2616005)(22166006)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RkJwUk9KZjVYSG5ycTk2TWk3SGEzaWp0b2dQVkdsQ0RpakJQSFpWUVpCRkNo?=
- =?utf-8?B?WERiTGVINHNiS05zWW8wdGlKM09GVUFFOUlPU2psMUF5aEJXRlQ4cGxpM2N1?=
- =?utf-8?B?Tkp1QnNJcWQ3RnF1S3Z0NnRRRW9RVmlCL01kSUFBdUowbUtYV1lCdWJERGo3?=
- =?utf-8?B?SzEzUHI2ZngzSmx3MDRBeHpXVlhScWtDT3E3dTE2ZlJMUkRnbW9oL1pmelRM?=
- =?utf-8?B?V1JjOEZ5VGwvdDliazZKa1lCZXlOZjZPYkI1blFlcDVsRzRvajEvU1J4bGdw?=
- =?utf-8?B?RWRBOWRONnB2L0NzRDYvaTl4WHhZS0Y2aFNxMFh4V3pVMXBsUkhoMDBtT0ww?=
- =?utf-8?B?T1BuTGgrMDluRXVNWlFucTdyUklIUjlNM3VUS3F0Z0J1eXliSTUxczhaVmw0?=
- =?utf-8?B?RSsvVytmOGlxRVd4UTZ2b1lsZVFKNU1xditydDdtblgyblM2akhFVU1Bek9Z?=
- =?utf-8?B?dHJnKzB4bXA5VmViRlBJVHpFUzZ6U3RVMy95R3pVZE01eHZQZmxHZkN1dUZt?=
- =?utf-8?B?ZUE4S1lyMzNCOVhqWnFvdFNaVTFhcmFSdVhhWWwxMFNqanhpS3JkdUdTRVpj?=
- =?utf-8?B?TEY5cW51RjdlV1B0SHc0L3dNWnJxSWEzcDJRTnEwVUpIVGp0djlQRHgreTMy?=
- =?utf-8?B?WE05RzlKaXYvdmNhdmtyV05zRVFTcUJBMnJ6ZHl0MytCbDdOQ1BaaUxpbVUr?=
- =?utf-8?B?a2VtWm9YbE9FZ0VvVzBsUUI3MzBKaFYzUTY2OEt3OVA1dzJLRU5ob3BCZGJP?=
- =?utf-8?B?aXJXVWYwYmxLWDFTZ1BualJLTEZTanZxcjB6RnhoTzJUNDZCamlTYVNRYURO?=
- =?utf-8?B?UUtBT1F2eE5NRWVXcEU2N2RRaFlOM2Q2eUcvUFd3K3crTXZzaDEvNnJNYkdk?=
- =?utf-8?B?WVdlQVQ3SEREeDk1QzFRTnRtcFBlUDlsa0lsb25jcll1RGRBdW4zem9DUytH?=
- =?utf-8?B?cFNreUxQVkJ5ZlN1U3k4VXNjQ3dPVUJMSkx2ZDF0b1hFazltV0JUNWVja1hy?=
- =?utf-8?B?M3d1Z2MvcXFqUWROVnZvckxZWHJ0bGsrSHoySFlyR0p1SUowMm1XaG1pVVJV?=
- =?utf-8?B?L3EvT0pRamVIakZWRk1Ed3FyekVJSGh5UHVXcDU2ZS9QU0V5WHpsZ3NVVEdM?=
- =?utf-8?B?NExvcXprcnBLYzN4M0swbUE2M2t2SkdRNndncUtiKzBDdVdQK3d1YWV6TFdp?=
- =?utf-8?B?dlpQSzd4LzQxT3R4VVpMMUxqYzY3OVVNTFlWdTNzZU1VZTR2NThYTDFVQ0Yy?=
- =?utf-8?B?bk9FcWR4eW81NDI5V2s0R2tuaGgvWjRzRTQzd1JNR2ZINXlIbUNZVHFQSVhC?=
- =?utf-8?B?ZzRuUEs4eWhUK3g2SFpOak4zRXhyWWZaWFdGZGJmdUVKMDFUQXlra2liR2FR?=
- =?utf-8?B?MlFQbC9ueTlsVFZtYnFLVHhCMks4cmRFYm01MFdCNzFnZXhzM3Fwc0dCWG9s?=
- =?utf-8?B?NytwZWljRnhVejhuUWhuUkFLdkFVVGxuR240YWU1bmx4RGNBWXFPUnQ5ZHZK?=
- =?utf-8?B?ZHV0dzQvUmxhekNzRUxrV1ZUcWZIK0NHbEd1akJjT0M4dDNla1VVUzVXeUoy?=
- =?utf-8?B?VlpKeDFNNUUxOXZWanhvbC9oVitaYzZPeEFzVTdvNUlSQlFEb25qR3pwM2Zi?=
- =?utf-8?B?RFE0dmczazNHYjZ1ZDgzS1gyTmRMaUhMc244NU5mMkRURkxpNytUblNkVGUy?=
- =?utf-8?B?b3dWbWROMURya1B6UFNUQTBSQmF3VzFmZW5pSWU5WTQxMHRsMjBwemVGUWxh?=
- =?utf-8?B?RXdhcnJaMW5PYzV3QTN1YU1WeWdOZ2NqTlFIc2dXNWpZVHRDeDRmaHpUT3BF?=
- =?utf-8?B?L3B4QjgrTjlVUXB5eUd6K2VwcFJSZTN5bmlkMHJuR1J6VmNJN25ObHJsTVpX?=
- =?utf-8?B?YndvN2Nyd1hqRnF6bjVCNWI5UnpFekphcXg5dnFGL2F4ZU5zc2hwTjhaQm5Y?=
- =?utf-8?B?M0pVUUI3YnBqczFwYVhnd3F4MmZPZEtWMnhnejd1VGptSUNWajg5ZjI3T1RQ?=
- =?utf-8?B?bEVNWTJ4Zitadi9CdUxrTzgzR016c0IwN1grdk9OYVFEUng4S2gwQXYyZ0s2?=
- =?utf-8?B?djBlME5aeVF2MFVIVGw5bExya0NTcjM2WG9EZ0xhcFlYT3MxTzgzR3FSdG5S?=
- =?utf-8?B?MkVuUGVGanFvNGdQakcvVmJYNkFjSkhoQnpKa0hLdjVXd3JtVVgybm9tSzhI?=
- =?utf-8?Q?qUGP9PPTLidjkPj/820N62ymyt+H8Dz0nJr+jcExKS/p?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?U1BLWFQxYmE5UkR6ZzJZemhyNFlhTHF4RG9vdGdYYndlaHRNUlYrekFQK0dB?=
+ =?utf-8?B?dU4rZXhpK1lqZUxLL0lrK1g0N0owQTJZY1FDZFZHbHdPWGRWQWxKOFljYXdD?=
+ =?utf-8?B?dnhEODBOeUdNVnUvK2dETEtqeVZtT1plMUdDVjNWSFhGVGhWVlROVzFuNEFQ?=
+ =?utf-8?B?eGxibkxCcExjdStmWlMvSlRCQUQ5cXN0YnFNMndlUWxyYUY5YXlYbTdidzVN?=
+ =?utf-8?B?MUJjSmFJSUhhcXB6R0N4aVdZc2tsejF1MFU3aWVNTVN2QUcvMDM1VXBIU09O?=
+ =?utf-8?B?bXN0YWxmNGR2eEZEVVNCRVdQaFg0WWxBRTJNR1g5QXg3dWhlTWpwbFR6RWky?=
+ =?utf-8?B?SFZxeFMweUVWVGM0L3VIWU4yVXQ2OTRqNHNNZjVLUlY4M1VNQ2hiWXlsdU55?=
+ =?utf-8?B?cER6bC9FUFRCTlM4MEhaVDJLTHJmcjNNQmYzNm1kSWN4QzkxTW5RUWVMd1NJ?=
+ =?utf-8?B?Q2FKZXhJZnlZa0MrZCt1REk5YnJ0QmpwRE1VbXVSUTB0VGc0Yzl4ajgyU0JE?=
+ =?utf-8?B?VU15cGhjdWQ5R2wzUHdYbG9IMnFabVZUZnR2OXQ2T2tyaWpkZCtsWUIyVnV6?=
+ =?utf-8?B?SndNSVBVTXliY2I1SW9IMHpXNlV3aVk5VHJBVXFiTDBYeC9US3M4REg4eWh1?=
+ =?utf-8?B?V1dOM3Vpbkd5MjR2a1lKQjgxdFFFbVhSaWRwT1BGTE9QbnYyVVRnWk56TFRl?=
+ =?utf-8?B?eitrcnIzUnlRdkhaMVpsV1ZjSlN0UUpUa0dGZEJ3WUxFeUROWXBnS1JUcGwv?=
+ =?utf-8?B?YThzdlVTUi9ncHV5ZDM5emkrVWV2bEN1Z2t4UDJFRGEyWjJSZGRsYkNNUkl1?=
+ =?utf-8?B?aFRsYzBxKzhJd2dsenVHdTgvWVRCR0p3MnVwTTRudnVGa0l5ZjRGMkRlUEVD?=
+ =?utf-8?B?c3FhKzM3ZUEwc0k2Y1VrV3Y4VHRPVXAzOGcrc0R5T0NCZExRdHZhWHRLUHNK?=
+ =?utf-8?B?OVRtQmR6Y1ZFbTNpQys2b0RJTVVKMHdJREVnczRjU2xzNHZ1azE0RWpaUUQ5?=
+ =?utf-8?B?d3IzQWF1OUlVbm9QQlBrV0lSUDgrZDhBN2tWdm5GVjJ4akJPd1llcWU5c204?=
+ =?utf-8?B?ckRnelBUaTAvcHpwQ0JTMUFBQnpnYjViNWkrQXFFaXk2UStYUFlPLytwQ3NL?=
+ =?utf-8?B?QUpEYkEzcitzemNCTDJFWVg2b3dZVXIveGswcmlpWGtsTUwxN1FtYkErcUJj?=
+ =?utf-8?B?TWo5aGFxbDA4NW1icFQ5Z0ROajdWdDdzZXU2L1FzSG9PdEtXT3F0emZyeGsr?=
+ =?utf-8?B?M3I2djM2aktLZVMwMzJpcks0VzdTREVuTUVzQ1pjS3VBbU0vMEswM1RMRlRz?=
+ =?utf-8?B?Z051MkdJbXAxM0lYQkRCNDZqN1RPVHU2bXlXaERra0tHQk5BN3BsVFNwMWpw?=
+ =?utf-8?B?YTFZcHZjdmNiUGF2WWExdk9KZnp0SzRHdWdsVXlkSXNod2F0aW1xQ0RjaTJ5?=
+ =?utf-8?B?YVRLR1ViOXh6TUwxNkhwVXJhenhRSG1nRkQzR2syTk5ycWJ1b2hXS1pMNldK?=
+ =?utf-8?B?QjIwVjlTeHhMQ3ZMeDBXRTd4MlV6YlRxZ2RqM2dvYy9nR2VUcE5GZFU1SGtX?=
+ =?utf-8?B?WDNrU1Jrc1VTTWRoQUtlVmRLTStvN2ZiT2hOb3hJNmorQXIrVTlZTXltRVhS?=
+ =?utf-8?B?ck0xSk4zSVRaTHJVaXc1Vm1PeXd5UVpYL0hSRTVEUjA2YkVlSjRGVVluQzIz?=
+ =?utf-8?B?cndVMzBSZ21lRjh2VXpwbEliaFY1ZkdIekRjZ25aM0VwUitOUEtWSzVYWlVB?=
+ =?utf-8?B?KzZPdTVaTEJIS2R4N201SlFOaVV5bTBtbWFpODBXeDNtT1ViNlRYbnloMExS?=
+ =?utf-8?B?Z2ppOElpR0xSbUx2SXYzWU53MWJ3U3FBcGQ0aE5QY0hkTnpUZ0szT2JhT3l3?=
+ =?utf-8?B?dDNRZEhna2gvVHdVOXBob2FBSW5PY2tCWWhmdHFOMm5vbGJoNWxWY2ZKeFRY?=
+ =?utf-8?B?ODB5bVFUMGhVc2JjdFM3cTlEcmRhRjZTYXlXVWJJaE95TEN6clZySXdlQTVH?=
+ =?utf-8?B?cHZldS8vaXBCYXE3enk2T2F6dDNvZDBjUHgzZ2RWVFFtTzNJZkFVVXdnL0tX?=
+ =?utf-8?B?c3Y5ZFQwNzhjM3ZXK3V3VDc1TEhHakFBOVVIZC9jdE1pYVk4M0hUcWUzWXhI?=
+ =?utf-8?B?VzhGRS9pWW9XdmxaZmI3NWp1WUwvKzFiWWlXZ2pMRXBrYVljVVlLK2k2QXNt?=
+ =?utf-8?Q?cz0nbay85FXzRk6Zmv872QfKXtq/WkmxDW0QzysoiWtn?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5abf80b8-d364-4392-6dcd-08daed4210b8
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78a90b35-29d9-4c37-7389-08daed42ae54
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2023 04:22:03.5335
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jan 2023 04:26:27.8334
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UwXpihem75Z4UQuim49GIrWwgsTPzf5ar/fbuHNvkx4mJuYzH0bjCSSF+BsqZ+i/dLJmbY55r/FJi73JlRD7nYJNoYGBP1IDFlZC3Kr481L0UTESsx5BslnOuxtyUCiw
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0101MB3158
+X-MS-Exchange-CrossTenant-UserPrincipalName: CeKgipX98i8yosiUwdFlIDevCx1Qp2bGKNYsT3tnlthwZXhkBrVqKqSCi45b1anF9pARGupeVUmjpuMwHD1z4/l6SZaai1LTgNJzkQlK6oedh1Y2Mrom2UETCKk59PLX
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR01MB7720
 X-Spam-Status: No, score=-5.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -132,131 +132,71 @@ X-Mailing-List: kvm@vger.kernel.org
 
 
 
-On 02-01-2023 05:16 pm, Marc Zyngier wrote:
-> On Thu, 29 Dec 2022 13:53:15 +0000,
-> Marc Zyngier <maz@kernel.org> wrote:
+On 29-12-2022 11:12 pm, Marc Zyngier wrote:
+> On Wed, 24 Aug 2022 07:03:04 +0100,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 >>
->> On Wed, 24 Aug 2022 07:03:03 +0100,
->> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>>
->>> Guest-Hypervisor forwards the timer interrupt to Guest-Guest, if it is
->>> enabled, unmasked and ISTATUS bit of register CNTV_CTL_EL0 is set for a
->>> loaded timer.
->>>
->>> For NV2 implementation, the Host-Hypervisor is not emulating the ISTATUS
->>> bit while forwarding the Emulated Vtimer Interrupt to Guest-Hypervisor.
->>> This results in the drop of interrupt from Guest-Hypervisor, where as
->>> Host Hypervisor marked it as an active interrupt and expecting Guest-Guest
->>> to consume and acknowledge. Due to this, some of the Guest-Guest vCPUs
->>> are stuck in Idle thread and rcu soft lockups are seen.
->>>
->>> This issue is not seen with NV1 case since the register CNTV_CTL_EL0 read
->>> trap handler is emulating the ISTATUS bit.
->>>
->>> Adding code to set/emulate the ISTATUS when the emulated timers are fired.
->>>
->>> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
->>> ---
->>>   arch/arm64/kvm/arch_timer.c | 5 +++++
->>>   1 file changed, 5 insertions(+)
->>>
->>> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
->>> index 27a6ec46803a..0b32d943d2d5 100644
->>> --- a/arch/arm64/kvm/arch_timer.c
->>> +++ b/arch/arm64/kvm/arch_timer.c
->>> @@ -63,6 +63,7 @@ static u64 kvm_arm_timer_read(struct kvm_vcpu *vcpu,
->>>   			      struct arch_timer_context *timer,
->>>   			      enum kvm_arch_timer_regs treg);
->>>   static bool kvm_arch_timer_get_input_level(int vintid);
->>> +static u64 read_timer_ctl(struct arch_timer_context *timer);
->>>   
->>>   static struct irq_ops arch_timer_irq_ops = {
->>>   	.get_input_level = kvm_arch_timer_get_input_level,
->>> @@ -356,6 +357,8 @@ static enum hrtimer_restart kvm_hrtimer_expire(struct hrtimer *hrt)
->>>   		return HRTIMER_RESTART;
->>>   	}
->>>   
->>> +	/* Timer emulated, emulate ISTATUS also */
->>> +	timer_set_ctl(ctx, read_timer_ctl(ctx));
+>> In NV case, Shadow stage 2 page table is created using host hypervisor
+>> page table configuration like page size, block size etc. Also, the shadow
+>> stage 2 table uses block level mapping if the Guest Hypervisor IPA is
+>> backed by the THP pages. However, this is resulting in illegal mapping of
+>> NestedVM IPA to Host Hypervisor PA, when Guest Hypervisor and Host
+>> hypervisor are configured with different pagesize.
 >>
->> Why should we do that for non-NV2 configurations?
+>> Adding fix to avoid block level mapping in stage 2 mapping if
+>> max_map_size is smaller than the block size.
 >>
->>>   	kvm_timer_update_irq(vcpu, true, ctx);
->>>   	return HRTIMER_NORESTART;
->>>   }
->>> @@ -458,6 +461,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
->>>   	trace_kvm_timer_emulate(ctx, should_fire);
->>>   
->>>   	if (should_fire != ctx->irq.level) {
->>> +		/* Timer emulated, emulate ISTATUS also */
->>> +		timer_set_ctl(ctx, read_timer_ctl(ctx));
->>>   		kvm_timer_update_irq(ctx->vcpu, should_fire, ctx);
->>>   		return;
->>>   	}
+>> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+>> ---
+>>   arch/arm64/kvm/mmu.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
 >>
->> I'm not overly keen on this. Yes, we can set the status bit there. But
->> conversely, the bit will not get cleared when the guest reprograms the
->> timer, and will take a full exit/entry cycle for it to appear.
->>
->> Ergo, the architecture is buggy as memory (the VNCR page) cannot be
->> used to emulate something as dynamic as a timer.
->>
->> It is only with FEAT_ECV that we can solve this correctly by trapping
->> the counter/timer accesses and emulate them for the guest hypervisor.
->> I'd rather we add support for that, as I expect all the FEAT_NV2
->> implementations to have it (and hopefully FEAT_FGT as well).
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index 6caa48da1b2e..3d4b53f153a1 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1304,7 +1304,7 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   	 * backed by a THP and thus use block mapping if possible.
+>>   	 */
+>>   	if (vma_pagesize == PAGE_SIZE &&
+>> -	    !(max_map_size == PAGE_SIZE || device)) {
+>> +	    !(max_map_size < PMD_SIZE || device)) {
+>>   		if (fault_status == FSC_PERM && fault_granule > PAGE_SIZE)
+>>   			vma_pagesize = fault_granule;
+>>   		else
 > 
-> So I went ahead and implemented some very basic FEAT_ECV support to
-> correctly emulate the timers (trapping the CTL/CVAL accesses).
+> That's quite a nice catch. I guess this was the main issue with
+> running 64kB L1 on a 4kB L0? Now, I'm not that fond of the fix itself,
+> and I think max_map_size should always represent something that is a
+> valid size *on the host*, specially when outside of NV-specific code.
 > 
-> Performance dropped like a rock (~30% extra overhead) for L2
-> exit-heavy workloads that are terminated in userspace, such as virtio.
-> For those workloads, vcpu_{load,put}() in L1 now generate extra traps,
-> as we save/restore the timer context, and this is enough to make
-> things visibly slower, even on a pretty fast machine.
+
+Thanks Marc, yes this patch was to fix the issue seen with L1 64K and L0 
+4K page size.
+
+> How about something like this instead:
 > 
-> I managed to get *some* performance back by satisfying CTL/CVAL reads
-> very early on the exit path (a pretty common theme with NV). Which
-> means we end-up needing something like what you have -- only a bit
-> more complete. I came up with the following:
-> 
-> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
-> index 4945c5b96f05..a198a6211e2a 100644
-> --- a/arch/arm64/kvm/arch_timer.c
-> +++ b/arch/arm64/kvm/arch_timer.c
-> @@ -450,6 +450,25 @@ static void kvm_timer_update_irq(struct kvm_vcpu *vcpu, bool new_level,
->   {
->   	int ret;
+> @@ -1346,6 +1346,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>   		 * table uses at least as big a mapping.
+>   		 */
+>   		max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
+> +
+> +		if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
+> +			max_map_size = PMD_SIZE;
+> +		else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
+> +			max_map_size = PAGE_SIZE;
+>   	}
 >   
-> +	/*
-> +	 * Paper over NV2 brokenness by publishing the interrupt status
-> +	 * bit. This still results in a poor quality of emulation (guest
-> +	 * writes will have no effect until the next exit).
-> +	 *
-> +	 * But hey, it's fast, right?
-> +	 */
-> +	if (vcpu_has_nv2(vcpu) && is_hyp_ctxt(vcpu) &&
-> +	    (timer_ctx == vcpu_vtimer(vcpu) || timer_ctx == vcpu_ptimer(vcpu))) {
-> +		u32 ctl = timer_get_ctl(timer_ctx);
-> +
-> +		if (new_level)
-> +			ctl |= ARCH_TIMER_CTRL_IT_STAT;
-> +		else
-> +			ctl &= ~ARCH_TIMER_CTRL_IT_STAT;
-> +
-> +		timer_set_ctl(timer_ctx, ctl);
-> +	}
-> +
->   	timer_ctx->irq.level = new_level;
->   	trace_kvm_timer_update_irq(vcpu->vcpu_id, timer_ctx->irq.irq,
->   				   timer_ctx->irq.level);
+>   	vma_pagesize = min(vma_pagesize, max_map_size);
 > 
-> which reports the interrupt state in all cases.
 > 
-> Does this work for you?
+> Admittedly, this is a lot uglier than your fix. But it keep the nested
+> horror localised, and doesn't risk being reverted by accident by
+> people who would not take NV into account (can't blame them, really).
+> 
+> Can you please give it a go?
 
-Thanks Marc for the patch. I will try this and update at the earliest.
-
+Sure, I will try this and update at the earliest.
 > 
 > Thanks,
 > 
