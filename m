@@ -2,34 +2,34 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4EA9165C3CF
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 17:23:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E576F65C3CB
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 17:23:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237795AbjACQUz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 11:20:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46038 "EHLO
+        id S237917AbjACQUu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 11:20:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238113AbjACQUi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 11:20:38 -0500
+        with ESMTP id S238114AbjACQUj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 11:20:39 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 425DC60C9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3506E1A0;
         Tue,  3 Jan 2023 08:20:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=B5uGzTtjX9o8pa28G6FRUDTV66nYvLyyOzR5n/GwlGw=; b=ETZ/IdtdfHRrBRANOAueHT2GTK
-        W33+ZsD/84oHExa4qeebeayYod4GrDKm3iiTAkehg67D3oOXrnfwkK7UlLUUSrIc6H2KeABbQ9Z/C
-        3BV+xxzhNRQx+VxISjJLYohK5fa6kS4ch9AjTeq9YkbKAmJep58LjoxSPH6Y1S6yjcDOzQMdYdlJn
-        fJNSCBuNkPWzWdCGnqJ/lXmWYojiZ96r/pDF8f6OAxBZ79TLK7Q6LmGPUvMgCavMeaehQNmzC4Vub
-        qsDmLwmc4gw07nrmAtmsh6JBobu5ALBRIyFKMdIdcYJ7L4Yp9juQgTYcEjGvfslCYNcqtvVn0Nco/
-        +YT05YAg==;
+        bh=dBpDiP0P5xz3wnGtG6Tt/BQdUOE/eOzTfl+enLnHthA=; b=sNmCKUGQXl0+A8DQ/G5Imie4qj
+        9djtEeUWPp/MR9XEIryBhnsizKq9E8DyPkOgzd5zIWdKxdTsocL2ddssX5JMdLvivqUP0nZe0zWBC
+        CPDjHC1jH7ULOF6y04HzXQATIKyvW/UV4QvDm+LNk1ytvijoE+lqFKnH9FDUAjddOvHBhwfaTJlJv
+        MMAh3Qw/ggVil3KeG7hUE/OIxaocbwqUy4H0AwvN8LOY7a5g4NRx7NkHgzmXAhwWwE+FTQRSyFQYP
+        xfQiDya305AzG4TlO9o31/8Se7dUn6aCz314CAN6lLMSRs2xv7EBDnFc+665v+j20zMgzqV9ia0mN
+        z5D9o59A==;
 Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pCk1k-00EFdD-3i; Tue, 03 Jan 2023 16:20:36 +0000
-Message-ID: <42df94c1661c2ece94d51e4ffcf68651887189db.camel@infradead.org>
-Subject: Re: [PATCH v6 1/2] KVM: x86/cpuid: generalize
- kvm_update_kvm_cpuid_base() and also capture limit
+        id 1pCk1o-00EFdT-65; Tue, 03 Jan 2023 16:20:40 +0000
+Message-ID: <0ce7c27f0c968e39361c163513aee0008f8994cf.camel@infradead.org>
+Subject: Re: [PATCH v6 2/2] KVM: x86/xen: update Xen CPUID Leaf 4 (tsc info)
+ sub-leaves, if present
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paul Durrant <pdurrant@amazon.com>, x86@kernel.org,
         kvm@vger.kernel.org, linux-kernel@vger.kernel.org
@@ -37,13 +37,14 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>
-Date:   Tue, 03 Jan 2023 16:20:18 +0000
-In-Reply-To: <20221220134053.15591-2-pdurrant@amazon.com>
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Date:   Tue, 03 Jan 2023 16:20:26 +0000
+In-Reply-To: <20221220134053.15591-3-pdurrant@amazon.com>
 References: <20221220134053.15591-1-pdurrant@amazon.com>
-         <20221220134053.15591-2-pdurrant@amazon.com>
+         <20221220134053.15591-3-pdurrant@amazon.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-K89h+9vUFNC02WVSry7I"
+        boundary="=-w5yk85upEwi5bLRrWwB6"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -57,96 +58,248 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-K89h+9vUFNC02WVSry7I
+--=-w5yk85upEwi5bLRrWwB6
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 
-T24gVHVlLCAyMDIyLTEyLTIwIGF0IDEzOjQwICswMDAwLCBQYXVsIER1cnJhbnQgd3JvdGU6Cj4g
-QSBzdW5zZXF1ZW50IHBhdGNoIHdpbGwgbmVlZCB0byBhY3F1aXJlIHRoZSBDUFVJRCBsZWFmIHJh
-bmdlIGZvciBlbXVsYXRlZAo+IFhlbiBzbyBleHBsaWNpdGx5IHBhc3MgdGhlIHNpZ25hdHVyZSBv
-ZiB0aGUgaHlwZXJ2aXNvciB3ZSdyZSBpbnRlcmVzdGVkIGluCj4gdG8gdGhlIG5ldyBmdW5jdGlv
-bi4gQWxzbyBpbnRyb2R1Y2UgYSBuZXcga3ZtX2h5cGVydmlzb3JfY3B1aWQgc3RydWN0dXJlCj4g
-c28gd2UgY2FuIG5lYXRseSBzdG9yZSBib3RoIHRoZSBiYXNlIGFuZCBsaW1pdCBsZWFmIGluZGlj
-ZXMuCj4gCj4gU2lnbmVkLW9mZi1ieTogUGF1bCBEdXJyYW50IDxwZHVycmFudEBhbWF6b24uY29t
-Pgo+IC0tLQoKUmV2aWV3ZWQtYnk6IERhdmlkIFdvb2Rob3VzZSA8ZHdtd0BhbWF6b24uY28udWs+
-Cgo+IENjOiBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT4KPiBDYzogUGFv
-bG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4KPiBDYzogVGhvbWFzIEdsZWl4bmVyIDx0
-Z2x4QGxpbnV0cm9uaXguZGU+Cj4gQ2M6IEluZ28gTW9sbmFyIDxtaW5nb0ByZWRoYXQuY29tPgo+
-IENjOiBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFsaWVuOC5kZT4KPiBDYzogRGF2ZSBIYW5zZW4gPGRh
-dmUuaGFuc2VuQGxpbnV4LmludGVsLmNvbT4KPiBDYzogRGF2aWQgV29vZGhvdXNlIDxkd213MkBp
-bmZyYWRlYWQub3JnPgo+IAo+IHY2Ogo+IMKgLSBOZXcgaW4gdGhpcyB2ZXJzaW9uCj4gLS0tCj4g
-wqBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIHzCoCA3ICsrKysrKy0KPiDCoGFyY2gv
-eDg2L2t2bS9jcHVpZC5jwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8IDE1ICsrKysrKysrLS0tLS0t
-LQo+IMKgMiBmaWxlcyBjaGFuZ2VkLCAxNCBpbnNlcnRpb25zKCspLCA4IGRlbGV0aW9ucygtKQo+
-IAo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oIGIvYXJjaC94
-ODYvaW5jbHVkZS9hc20va3ZtX2hvc3QuaAo+IGluZGV4IGYzNWYxZmY0NDI3Yi4uZmYyMDFhZDM1
-NTUxIDEwMDY0NAo+IC0tLSBhL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2bV9ob3N0LmgKPiArKysg
-Yi9hcmNoL3g4Ni9pbmNsdWRlL2FzbS9rdm1faG9zdC5oCj4gQEAgLTcxMCw2ICs3MTAsMTEgQEAg
-c3RydWN0IGt2bV9xdWV1ZWRfZXhjZXB0aW9uIHsKPiDCoMKgwqDCoMKgwqDCoMKgYm9vbCBoYXNf
-cGF5bG9hZDsKPiDCoH07Cj4gwqAKPiArc3RydWN0IGt2bV9oeXBlcnZpc29yX2NwdWlkIHsKPiAr
-wqDCoMKgwqDCoMKgwqB1MzIgYmFzZTsKPiArwqDCoMKgwqDCoMKgwqB1MzIgbGltaXQ7Cj4gK307
-Cj4gKwo+IMKgc3RydWN0IGt2bV92Y3B1X2FyY2ggewo+IMKgwqDCoMKgwqDCoMKgwqAvKgo+IMKg
-wqDCoMKgwqDCoMKgwqAgKiByaXAgYW5kIHJlZ3MgYWNjZXNzZXMgbXVzdCBnbyB0aHJvdWdoCj4g
-QEAgLTgyNiw3ICs4MzEsNyBAQCBzdHJ1Y3Qga3ZtX3ZjcHVfYXJjaCB7Cj4gwqAKPiDCoMKgwqDC
-oMKgwqDCoMKgaW50IGNwdWlkX25lbnQ7Cj4gwqDCoMKgwqDCoMKgwqDCoHN0cnVjdCBrdm1fY3B1
-aWRfZW50cnkyICpjcHVpZF9lbnRyaWVzOwo+IC3CoMKgwqDCoMKgwqDCoHUzMiBrdm1fY3B1aWRf
-YmFzZTsKPiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3Qga3ZtX2h5cGVydmlzb3JfY3B1aWQga3ZtX2Nw
-dWlkOwo+IMKgCj4gwqDCoMKgwqDCoMKgwqDCoHU2NCByZXNlcnZlZF9ncGFfYml0czsKPiDCoMKg
-wqDCoMKgwqDCoMKgaW50IG1heHBoeWFkZHI7Cj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2L2t2bS9j
-cHVpZC5jIGIvYXJjaC94ODYva3ZtL2NwdWlkLmMKPiBpbmRleCAwYjViZjAxM2ZjYjguLjI0Njg3
-MjBmOGQ4NCAxMDA2NDQKPiAtLS0gYS9hcmNoL3g4Ni9rdm0vY3B1aWQuYwo+ICsrKyBiL2FyY2gv
-eDg2L2t2bS9jcHVpZC5jCj4gQEAgLTE4MCwxMiArMTgwLDEzIEBAIHN0YXRpYyBpbnQga3ZtX2Nw
-dWlkX2NoZWNrX2VxdWFsKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bV9jcHVpZF9l
-bnRyeTIKPiDCoMKgwqDCoMKgwqDCoMKgcmV0dXJuIDA7Cj4gwqB9Cj4gwqAKPiAtc3RhdGljIHZv
-aWQga3ZtX3VwZGF0ZV9rdm1fY3B1aWRfYmFzZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpCj4gK3N0
-YXRpYyB2b2lkIGt2bV91cGRhdGVfaHlwZXJ2aXNvcl9jcHVpZChzdHJ1Y3Qga3ZtX3ZjcHUgKnZj
-cHUsIGNvbnN0IGNoYXIgKmh5cGVydmlzb3Jfc2lnbmF0dXJlLAo+ICvCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqBzdHJ1Y3Qga3ZtX2h5cGVydmlzb3JfY3B1aWQgKmh5cGVydmlzb3JfY3B1aWQpCj4gwqB7
-Cj4gwqDCoMKgwqDCoMKgwqDCoHUzMiBmdW5jdGlvbjsKPiDCoMKgwqDCoMKgwqDCoMKgc3RydWN0
-IGt2bV9jcHVpZF9lbnRyeTIgKmVudHJ5Owo+IMKgCj4gLcKgwqDCoMKgwqDCoMKgdmNwdS0+YXJj
-aC5rdm1fY3B1aWRfYmFzZSA9IDA7Cj4gK8KgwqDCoMKgwqDCoMKgbWVtc2V0KGh5cGVydmlzb3Jf
-Y3B1aWQsIDAsIHNpemVvZigqaHlwZXJ2aXNvcl9jcHVpZCkpOwo+IMKgCj4gwqDCoMKgwqDCoMKg
-wqDCoGZvcl9lYWNoX3Bvc3NpYmxlX2h5cGVydmlzb3JfY3B1aWRfYmFzZShmdW5jdGlvbikgewo+
-IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgZW50cnkgPSBrdm1fZmluZF9jcHVpZF9l
-bnRyeSh2Y3B1LCBmdW5jdGlvbik7Cj4gQEAgLTE5Nyw5ICsxOTgsOSBAQCBzdGF0aWMgdm9pZCBr
-dm1fdXBkYXRlX2t2bV9jcHVpZF9iYXNlKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSkKPiDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBzaWduYXR1cmVbMV0gPSBl
-bnRyeS0+ZWN4Owo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoHNpZ25hdHVyZVsyXSA9IGVudHJ5LT5lZHg7Cj4gwqAKPiAtwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoEJVSUxEX0JVR19PTihzaXplb2Yoc2lnbmF0dXJl
-KSA+IHNpemVvZihLVk1fU0lHTkFUVVJFKSk7Cj4gLcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoIW1lbWNtcChzaWduYXR1cmUsIEtWTV9TSUdOQVRVUkUs
-IHNpemVvZihzaWduYXR1cmUpKSkgewo+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHZjcHUtPmFyY2gua3ZtX2NwdWlkX2Jhc2Ug
-PSBmdW5jdGlvbjsKPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoGlmICghbWVtY21wKHNpZ25hdHVyZSwgaHlwZXJ2aXNvcl9zaWduYXR1cmUsIHNpemVvZihz
-aWduYXR1cmUpKSkgewo+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoGh5cGVydmlzb3JfY3B1aWQtPmJhc2UgPSBmdW5jdGlvbjsK
-PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBoeXBlcnZpc29yX2NwdWlkLT5saW1pdCA9IGVudHJ5LT5lYXg7Cj4gwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJy
-ZWFrOwo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0K
-PiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoH0KPiBAQCAtMjA5LDcgKzIxMCw3IEBA
-IHN0YXRpYyB2b2lkIGt2bV91cGRhdGVfa3ZtX2NwdWlkX2Jhc2Uoc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1KQo+IMKgc3RhdGljIHN0cnVjdCBrdm1fY3B1aWRfZW50cnkyICpfX2t2bV9maW5kX2t2bV9j
-cHVpZF9mZWF0dXJlcyhzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsCj4gwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgIHN0cnVjdCBrdm1fY3B1aWRfZW50cnkyICplbnRyaWVzLCBpbnQgbmVu
-dCkKPiDCoHsKPiAtwqDCoMKgwqDCoMKgwqB1MzIgYmFzZSA9IHZjcHUtPmFyY2gua3ZtX2NwdWlk
-X2Jhc2U7Cj4gK8KgwqDCoMKgwqDCoMKgdTMyIGJhc2UgPSB2Y3B1LT5hcmNoLmt2bV9jcHVpZC5i
-YXNlOwo+IMKgCj4gwqDCoMKgwqDCoMKgwqDCoGlmICghYmFzZSkKPiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoHJldHVybiBOVUxMOwo+IEBAIC00MzksNyArNDQwLDcgQEAgc3RhdGlj
-IGludCBrdm1fc2V0X2NwdWlkKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgc3RydWN0IGt2bV9jcHVp
-ZF9lbnRyeTIgKmUyLAo+IMKgwqDCoMKgwqDCoMKgwqB2Y3B1LT5hcmNoLmNwdWlkX2VudHJpZXMg
-PSBlMjsKPiDCoMKgwqDCoMKgwqDCoMKgdmNwdS0+YXJjaC5jcHVpZF9uZW50ID0gbmVudDsKPiDC
-oAo+IC3CoMKgwqDCoMKgwqDCoGt2bV91cGRhdGVfa3ZtX2NwdWlkX2Jhc2UodmNwdSk7Cj4gK8Kg
-wqDCoMKgwqDCoMKga3ZtX3VwZGF0ZV9oeXBlcnZpc29yX2NwdWlkKHZjcHUsIEtWTV9TSUdOQVRV
-UkUsICZ2Y3B1LT5hcmNoLmt2bV9jcHVpZCk7Cj4gwqDCoMKgwqDCoMKgwqDCoGt2bV92Y3B1X2Fm
-dGVyX3NldF9jcHVpZCh2Y3B1KTsKPiDCoAo+IMKgwqDCoMKgwqDCoMKgwqByZXR1cm4gMDsKCg==
+On Tue, 2022-12-20 at 13:40 +0000, Paul Durrant wrote:
+> The scaling information in subleaf 1 should match the values set by KVM i=
+n
+> the 'vcpu_info' sub-structure 'time_info' (a.k.a. pvclock_vcpu_time_info)
+> which is shared with the guest, but is not directly available to the VMM.
+> The offset values are not set since a TSC offset is already applied.
+> The TSC frequency should also be set in sub-leaf 2.
+>=20
+> Signed-off-by: Paul Durrant <pdurrant@amazon.com>
+
+Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+
+> ---
+> Cc: Sean Christopherson <seanjc@google.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ingo Molnar <mingo@redhat.com>
+> Cc: Borislav Petkov <bp@alien8.de>
+> Cc: Dave Hansen <dave.hansen@linux.intel.com>
+> Cc: "H. Peter Anvin" <hpa@zytor.com>
+> Cc: David Woodhouse <dwmw2@infradead.org>
+>=20
+> v6:
+> =C2=A0- Stash Xen cpuid base and limit values when cpuid is set
+> =C2=A0- Re-name kvm_xen_setup_tsc_info() to kvm_xen_update_tsc_info()
+>=20
+> v5:
+> =C2=A0- Drop the caching of the CPUID entry pointers and only update the
+> =C2=A0=C2=A0 sub-leaves if the CPU frequency has actually changed
+>=20
+> v4:
+> =C2=A0- Update commit comment
+>=20
+> v3:
+> =C2=A0- Add leaf limit check in kvm_xen_set_cpuid()
+>=20
+> v2:
+> =C2=A0- Make sure sub-leaf pointers are NULLed if the time leaf is remove=
+d
+> ---
+> =C2=A0arch/x86/include/asm/kvm_host.h | 11 ++++++-----
+> =C2=A0arch/x86/kvm/cpuid.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 ++
+> =C2=A0arch/x86/kvm/x86.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
+> =C2=A0arch/x86/kvm/xen.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 26 ++++++++++++++++++++++++++
+> =C2=A0arch/x86/kvm/xen.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 7 +++++++
+> =C2=A05 files changed, 42 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_h=
+ost.h
+> index ff201ad35551..44329594bdf7 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -678,6 +678,11 @@ struct kvm_vcpu_hv {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0} nested;
+> =C2=A0};
+> =C2=A0
+> +struct kvm_hypervisor_cpuid {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 base;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 limit;
+> +};
+> +
+> =C2=A0/* Xen HVM per vcpu emulation context */
+> =C2=A0struct kvm_vcpu_xen {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u64 hypercall_rip;
+> @@ -698,6 +703,7 @@ struct kvm_vcpu_xen {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct hrtimer timer;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0int poll_evtchn;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct timer_list poll_ti=
+mer;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_hypervisor_cpuid cp=
+uid;
+> =C2=A0};
+> =C2=A0
+> =C2=A0struct kvm_queued_exception {
+> @@ -710,11 +716,6 @@ struct kvm_queued_exception {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0bool has_payload;
+> =C2=A0};
+> =C2=A0
+> -struct kvm_hypervisor_cpuid {
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 base;
+> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 limit;
+> -};
+> -
+> =C2=A0struct kvm_vcpu_arch {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/*
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * rip and regs accesses =
+must go through
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 2468720f8d84..e661413ddf8d 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -25,6 +25,7 @@
+> =C2=A0#include "mmu.h"
+> =C2=A0#include "trace.h"
+> =C2=A0#include "pmu.h"
+> +#include "xen.h"
+> =C2=A0
+> =C2=A0/*
+> =C2=A0 * Unlike "struct cpuinfo_x86.x86_capability", kvm_cpu_caps doesn't=
+ need to be
+> @@ -441,6 +442,7 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struc=
+t kvm_cpuid_entry2 *e2,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vcpu->arch.cpuid_nent =3D=
+ nent;
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_update_hypervisor_cpu=
+id(vcpu, KVM_SIGNATURE, &vcpu->arch.kvm_cpuid);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_update_hypervisor_cpuid(vc=
+pu, XEN_SIGNATURE, &vcpu->arch.xen.cpuid);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_vcpu_after_set_cpuid(=
+vcpu);
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return 0;
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index fd6c01a39312..60acc55f0c00 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3158,6 +3158,7 @@ static int kvm_guest_time_update(struct kvm_vcpu *v=
+)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &vcpu->hv_clock.t=
+sc_shift,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 &vcpu->hv_clock.t=
+sc_to_system_mul);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0vcpu->hw_tsc_khz =3D tgt_tsc_khz;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0kvm_xen_update_tsc_info(v);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> =C2=A0
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0vcpu->hv_clock.tsc_timest=
+amp =3D tsc_timestamp;
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index d7af40240248..46297521791c 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -22,6 +22,9 @@
+> =C2=A0#include <xen/interface/event_channel.h>
+> =C2=A0#include <xen/interface/sched.h>
+> =C2=A0
+> +#include <asm/xen/cpuid.h>
+> +
+> +#include "cpuid.h"
+> =C2=A0#include "trace.h"
+> =C2=A0
+> =C2=A0static int kvm_xen_set_evtchn(struct kvm_xen_evtchn *xe, struct kvm=
+ *kvm);
+> @@ -2061,6 +2064,29 @@ void kvm_xen_destroy_vcpu(struct kvm_vcpu *vcpu)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0del_timer_sync(&vcpu->arc=
+h.xen.poll_timer);
+> =C2=A0}
+> =C2=A0
+> +void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
+> +{
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0struct kvm_cpuid_entry2 *entry=
+;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0u32 function;
+> +
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!vcpu->arch.xen.cpuid.base=
+)
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0return;
+> +
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0function =3D vcpu->arch.xen.cp=
+uid.base | XEN_CPUID_LEAF(3);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (function > vcpu->arch.xen.=
+cpuid.limit)
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0return;
+> +
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0entry =3D kvm_find_cpuid_entry=
+_index(vcpu, function, 1);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (entry) {
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0entry->ecx =3D vcpu->arch.hv_clock.tsc_to_system_mul;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0entry->edx =3D vcpu->arch.hv_clock.tsc_shift;
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+> +
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0entry =3D kvm_find_cpuid_entry=
+_index(vcpu, function, 2);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (entry)
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0entry->eax =3D vcpu->arch.hw_tsc_khz;
+> +}
+> +
+> =C2=A0void kvm_xen_init_vm(struct kvm *kvm)
+> =C2=A0{
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0idr_init(&kvm->arch.xen.e=
+vtchn_ports);
+> diff --git a/arch/x86/kvm/xen.h b/arch/x86/kvm/xen.h
+> index ea33d80a0c51..88dd085e10f8 100644
+> --- a/arch/x86/kvm/xen.h
+> +++ b/arch/x86/kvm/xen.h
+> @@ -32,6 +32,7 @@ int kvm_xen_set_evtchn_fast(struct kvm_xen_evtchn *xe,
+> =C2=A0int kvm_xen_setup_evtchn(struct kvm *kvm,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 st=
+ruct kvm_kernel_irq_routing_entry *e,
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 co=
+nst struct kvm_irq_routing_entry *ue);
+> +void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu);
+> =C2=A0
+> =C2=A0static inline bool kvm_xen_msr_enabled(struct kvm *kvm)
+> =C2=A0{
+> @@ -135,6 +136,10 @@ static inline bool kvm_xen_timer_enabled(struct kvm_=
+vcpu *vcpu)
+> =C2=A0{
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return false;
+> =C2=A0}
+> +
+> +static inline void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
+> +{
+> +}
+> =C2=A0#endif
+> =C2=A0
+> =C2=A0int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+> @@ -143,6 +148,8 @@ int kvm_xen_hypercall(struct kvm_vcpu *vcpu);
+> =C2=A0#include <asm/xen/interface.h>
+> =C2=A0#include <xen/interface/vcpu.h>
+> =C2=A0
+> +#define XEN_SIGNATURE "XenVMMXenVMM"
+> +
+> =C2=A0void kvm_xen_update_runstate(struct kvm_vcpu *vcpu, int state);
+> =C2=A0
+> =C2=A0static inline void kvm_xen_runstate_set_running(struct kvm_vcpu *vc=
+pu)
 
 
---=-K89h+9vUFNC02WVSry7I
+--=-w5yk85upEwi5bLRrWwB6
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -238,24 +391,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTAzMTYyMDE4WjAvBgkqhkiG9w0BCQQxIgQg38HqfnPV
-FehSyPNLJdoPpZTrKtWqgINqaGXgURqKMn4wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTAzMTYyMDI2WjAvBgkqhkiG9w0BCQQxIgQgyKutQAiz
+Vcg0ZVsgIl1NLWIX2MZWMwgDbwz5GiioGocwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAN9KdPlNptQRcDM16Z+JD2I9U+PyW5frfL
-cBrJKghuppfYB3AlS6/9jcmcx2uX5QgcTZIshXF/V90XmHWWfi1dZW1zbWxndNZfT3sMjk/6B7Z1
-vO19M4rNFDZK6WI5cNKvmyk08OQhmJqDvdR+pup731YU1VaO0q0Ty4CrLDiilECVZv9z8jqmGECG
-302YWl1RSLzzUbB9HSP7XVl+CLKZAjDo+7pghbZM/VRspf7V0iKLeBHoOYgjyw3uO4UW1yE7oaMf
-Y/N2PXpufdlPD7pnS0AGgRpyVo4NpiWyf0Pxp6QlQATbBhSwt5Tn3zGsmmKcH6sIWA1lDTj7vt8P
-mg/zbH7LgGc1FouHYA4J6Pr7d7Y9IIqSL5FXyDPrFn3dFn1XiLoVPQi+Hx8mLv4Z1bjVn+588rsq
-YK7mMWJcwUzsmCKrdnY7qyrf/h41t+JfCEinwV7j9ZQQ3i6EqT5HY+oCRRYbW1rgGCqjpykFhGsD
-EadIF9+bfbLWIANYgP9hd9qTJbksf5MMgBdTmczVGVpRaQCCSboO4jbGEsmG3HRpcgRaL0E4oNpQ
-NaohYF8VNOSBBOR9y8BpkCOKRNwjdvpnBCfiG1yF8Kt47jaFvPB5g62vulK6j1Cx0fSGELK8wcKw
-hVSzgB8LHoaZYwtVFxcT4eKmPVv3B0CMYp1eaNsotAAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBP41urDW2ML9CGvL2hXR5bCH8H+WbEWWE+
+K2lgN78LbA5bTOGGUEec7mn3Z1FVxvzC2TELd+8EHOr+8V/Y0wpIrkoyqKOwPmq0kpcG6U3skXf0
+yPLsPe+/wf5RCKFXXZ8h9kzJ+PzF9QfQRfraHILtsWRSurQCvhTjz4ysHbovyfmi/73dCXjSDPVw
+8T7AKoO1HSn6AFeyReTlf1GpinMqY3H0H/1cp3NrMTM1V/zUlKWdHQ9o9UCszeCoE+cvg6ISY1ga
+QW+Cf75X2myCM9eq0KjfOfGOjixqwfBgQU5xDS80JmxaB1wZscA8ndtoTQicvAv3wYrhFtsd3NwW
+LbY0UY6gYcrw1GPelVOO3i02axXCmoPzBHDRd5PS91Z6T+2wvcKIQLjCsIw9Z7gW+r1hrwI8//8N
+ssIza/m1W2ZVx/MYIjPWiLb/MU/3riavoqNLvkAVrS8SiDEYw6X0qDevEWzbC7JgXM9O0BFcNjZk
+jwvyZdW8z0ruUjVrluIRbylB28Q9KRcasUBADV/WuLlmQfvbT/V3lEScekY6Fbr+NTzWGMlTiBEf
+p4nlcFVyb/u61fN+FXCftsy7iBg15FxUZRabvqMhyqK1B5CXBsFo9eK/bex6kZoI2YL/wxCoLR0n
+Fzl0xiELAHGZY7Lrje5I1ZqKXxb0B9ACWvf0jRnyNAAAAAAAAA==
 
 
---=-K89h+9vUFNC02WVSry7I--
+--=-w5yk85upEwi5bLRrWwB6--
