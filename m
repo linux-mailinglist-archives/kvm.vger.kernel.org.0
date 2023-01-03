@@ -2,67 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0FEA65C527
-	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 18:37:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EAC9365C539
+	for <lists+kvm@lfdr.de>; Tue,  3 Jan 2023 18:42:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233753AbjACRhb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 3 Jan 2023 12:37:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39502 "EHLO
+        id S238167AbjACRkK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 3 Jan 2023 12:40:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233374AbjACRha (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 3 Jan 2023 12:37:30 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7159B87E
-        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 09:37:28 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id g4so33857323ybg.7
-        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 09:37:28 -0800 (PST)
+        with ESMTP id S238354AbjACRjh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 3 Jan 2023 12:39:37 -0500
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1CCEFD24
+        for <kvm@vger.kernel.org>; Tue,  3 Jan 2023 09:39:34 -0800 (PST)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-4a263c4ddbaso108364587b3.0
+        for <kvm@vger.kernel.org>; Tue, 03 Jan 2023 09:39:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=OeWoV2jDJv8fM4Dg3JYXPgrQnOUrSK9gsg7zC/eF8E4=;
-        b=TPkqz6ugysO/Ainbe2exHeibI4ZMUjP7dUE/L2EFkFgPKqQndvZuh+xBMazTijUOHb
-         7NSgN/YiganWrWNBUfrwv4rgtGMfnQB4waNbo8b2/sIK13pbGPDaMBXBROH0UvcmVP6p
-         xzcO+i9ALp3ZzlqiEHigxO+1AZZ6O5TdrAGRYcKw0LW9W2xMa4Mw48NO7o5mssCFe3zH
-         N4CrONsXgkn2UxCZHOFXu63lYI+165i/egMXZ0yVA9oD/98AYhH3T6U1d0JIRFRavYeg
-         7cVd6wrzGUNFzZIRViTZrJtk+23qVwDMmvz65+9qPHjA5Nd2oycxhglfK2GIQNMbomfw
-         eEiA==
+        bh=qKTgLEVHfpoE4LRyGeW2aBvpWAAPdaN/ODQpVhyWmJg=;
+        b=r4Ry87zih11LdqU6ILa2uPmN/JJ4XIyd0xMj+t4dTCEJq5U99ZDfGSAB6+zG/H9nX/
+         JiQtDJOp1I1GXDc70gHhc3X8HbdQBC6pgxKn4BrCc2GW6nerocXkGCv1ZkvPipdzxmEZ
+         0dGMIaKkib8cyARCkkEdMHPrtiTQz885H7t7wMz0mhjiIgVs/cRgfNcB2B0/XkMdlMJu
+         NpHqMwwyCA6FQQ856ggx7YpZyDlDJJ/y3mxh/YMaciEpGcQoTk9DL8R12J52xkvlKvHV
+         0WHTGdcbocafgKq0W+qhIvMJzpVyV41Cl79W/TNJuy1+lYRa4EYTGgVPddot0ItUeSt4
+         Nx5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OeWoV2jDJv8fM4Dg3JYXPgrQnOUrSK9gsg7zC/eF8E4=;
-        b=pckG/R+EpyU4oCIcMJ1tiVU1s5/mH6YFfVr45whLLoGpGxmHjBRyr5eQaEhNkpen6y
-         T22Udi0SbsEUhsULtF+k8Jx1rL9XMRgoNRR4VTOnvD81WZLivkRFITCR55BtyD2DoaiT
-         weC3dUI06Ie3XgqfmSLETH9mNuPGvFtIKtdpTurnjPZCc0/jpL8kPQF4Zrc2C9gMQU55
-         c6+H/i7AWxCXRmrwyj6YtD34yCvoRA6O2PjzJuRqmFdOY+0eFS1VeOC48+gcewOxsGjZ
-         ZKnfI1E9U5Nq/JnGGz568n/d5feUGGyFFHU6Bpo5s6aQgx2RbMxulQaz2J04PCyC7cIN
-         ITaw==
-X-Gm-Message-State: AFqh2kpJ96FXAt/X6HHFHs3Q+gtMxYdb/JgzLNjhIZNdpP5NgOlY9dBH
-        ovAKjtnMwBD2X69D1n3YiIdLv73PgEA2x1ifBYb7NA==
-X-Google-Smtp-Source: AMrXdXu8GSgfBPWxgydDd2VXKPn6C9kVOiid1xdDcwjSNmmaplcDYLpEMrF/beW8ri/5hqrJgbgQyQdWu2jBsgUJQkw=
-X-Received: by 2002:a25:da14:0:b0:707:34cf:b4b1 with SMTP id
- n20-20020a25da14000000b0070734cfb4b1mr4271075ybf.123.1672767447737; Tue, 03
- Jan 2023 09:37:27 -0800 (PST)
+        bh=qKTgLEVHfpoE4LRyGeW2aBvpWAAPdaN/ODQpVhyWmJg=;
+        b=OdrC8YMHX11JPy1AU5Jj5ySiF/vEejVy+EvMUnlghBpN3Ta3BXsACwQ78AApQ31ji0
+         HDDdd7O9jfLrtQikP277XaUD9vvxjf78XaQcrjJOGTGbz0Z0wz4Mi7lJMelVAEBmQV7S
+         EMK4axC00rfXlBOUOUeaQ/mr8qgHNdeEofnUwiguuHZfeCHvTVXoK293dsh9/bY075GU
+         YW8OSLFmU6eg7AOWz85FZ/HY+Ah1X3n2WOz5E5NIn7En49eWbYbPsjJewYtOsC2Fjkzu
+         8Oe6zCR6DQ0v0BNDhrXEnEUARCLo/LrcUJg8sCIxEtaDQ7Zh8WA9TV0wkK7wSqVDcdgR
+         9G7A==
+X-Gm-Message-State: AFqh2koax33EzQT3JM4aGMXbxF3AEufIULoyeR30h2g+ERCpDb6h/Nmu
+        QqdCp3nJUAhEf4FnDt6JheJSPRL616GcTi9lXakMwA==
+X-Google-Smtp-Source: AMrXdXu/Gtq80JKxA7VpKizOf0cM3DCjP2+vKObMadEMlMqdD+hI0/XP28eOJ+//fCpQL48X3i5DnmJt7y9U2haCIF4=
+X-Received: by 2002:a0d:cc87:0:b0:475:3ae:cf with SMTP id o129-20020a0dcc87000000b0047503ae00cfmr4888663ywd.354.1672767573896;
+ Tue, 03 Jan 2023 09:39:33 -0800 (PST)
 MIME-Version: 1.0
-References: <20221222023457.1764-1-vipinsh@google.com> <20221222023457.1764-7-vipinsh@google.com>
- <CANgfPd_=WwrgVVQnooZLCSXpSnEjRVOdt6qZtrvhO_wmxc5Tzg@mail.gmail.com>
- <CAHVum0dkqp1MnMyqoOQdGp2K74h5NFrzZ4KaT=0+ezVP-JJnVQ@mail.gmail.com> <CANgfPd8KU3pqSYu--bSP1QesmkrnLqqB8QH_8rZVS=8S4HNBDQ@mail.gmail.com>
-In-Reply-To: <CANgfPd8KU3pqSYu--bSP1QesmkrnLqqB8QH_8rZVS=8S4HNBDQ@mail.gmail.com>
+References: <20221222023457.1764-1-vipinsh@google.com> <20221222023457.1764-2-vipinsh@google.com>
+ <CANgfPd9fr0KfRRg9LMD=3DTLJ9CKGLe0HaY512BeK16sgFX4kQ@mail.gmail.com>
+ <CAHVum0efHuRmER-whXnwHYMsBLBcb-mgDu+uogCJbMhz2e0_MA@mail.gmail.com> <Y64DgHuPd8oTPSm5@google.com>
+In-Reply-To: <Y64DgHuPd8oTPSm5@google.com>
 From:   Vipin Sharma <vipinsh@google.com>
-Date:   Tue, 3 Jan 2023 09:36:51 -0800
-Message-ID: <CAHVum0c+17Z-RbGAFdU-xmRejDjDQ+MKOfN4XaObh2SwgWAjLg@mail.gmail.com>
-Subject: Re: [Patch v3 6/9] KVM: Provide NUMA node support to kvm_mmu_memory_cache{}
-To:     chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com
-Cc:     seanjc@google.com, pbonzini@redhat.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ben Gardon <bgardon@google.com>
+Date:   Tue, 3 Jan 2023 09:38:58 -0800
+Message-ID: <CAHVum0e5MurqNnTJ1uG9RqiqQscJOCBa+OmMFTbJGVjmjDS68g@mail.gmail.com>
+Subject: Re: [Patch v3 1/9] KVM: x86/mmu: Repurpose KVM MMU shrinker to purge
+ shadow page caches
+To:     David Matlack <dmatlack@google.com>
+Cc:     Ben Gardon <bgardon@google.com>, seanjc@google.com,
+        pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,94 +70,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 29, 2022 at 10:22 AM Ben Gardon <bgardon@google.com> wrote:
+On Thu, Dec 29, 2022 at 1:15 PM David Matlack <dmatlack@google.com> wrote:
 >
-> On Wed, Dec 28, 2022 at 2:08 PM Vipin Sharma <vipinsh@google.com> wrote:
-> >
-> > On Tue, Dec 27, 2022 at 11:10 AM Ben Gardon <bgardon@google.com> wrote:
-> > >
+> On Wed, Dec 28, 2022 at 02:07:49PM -0800, Vipin Sharma wrote:
+> > On Tue, Dec 27, 2022 at 10:37 AM Ben Gardon <bgardon@google.com> wrote:
 > > > On Wed, Dec 21, 2022 at 6:35 PM Vipin Sharma <vipinsh@google.com> wrote:
 > > > >
-> > > > Add 'node' variable in kvm_mmu_memory_cache{} to denote which NUMA node
-> > > > this cache should allocate memory from. Default initialize to
-> > > > NUMA_NO_NODE in all architectures.
-> > > >
-> > > > Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> > > > ---
-> > > >  arch/arm64/kvm/arm.c      |  2 +-
-> > > >  arch/arm64/kvm/mmu.c      |  4 +++-
-> > > >  arch/mips/kvm/mips.c      |  2 ++
-> > > >  arch/riscv/kvm/mmu.c      |  2 +-
-> > > >  arch/riscv/kvm/vcpu.c     |  2 +-
-> > > >  arch/x86/kvm/mmu/mmu.c    | 22 ++++++++++++----------
-> > > >  include/linux/kvm_host.h  |  6 ++++++
-> > > >  include/linux/kvm_types.h |  2 ++
-> > > >  8 files changed, 28 insertions(+), 14 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> > > > index 9c5573bc4614..52a41f4532e2 100644
-> > > > --- a/arch/arm64/kvm/arm.c
-> > > > +++ b/arch/arm64/kvm/arm.c
-> > > > @@ -340,7 +340,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> > > >         vcpu->arch.target = -1;
-> > > >         bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
-> > > >
-> > > > -       vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
-> > > > +       INIT_KVM_MMU_MEMORY_CACHE(&vcpu->arch.mmu_page_cache, NULL, NUMA_NO_NODE);
-> > > >
-> > > >         /*
-> > > >          * Default value for the FP state, will be overloaded at load
-> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > index 31d7fa4c7c14..bd07155e17fa 100644
-> > > > --- a/arch/arm64/kvm/mmu.c
-> > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > @@ -894,12 +894,14 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
-> > > >  {
-> > > >         phys_addr_t addr;
-> > > >         int ret = 0;
-> > > > -       struct kvm_mmu_memory_cache cache = { .gfp_zero = __GFP_ZERO };
-> > > > +       struct kvm_mmu_memory_cache cache;
-> > > >         struct kvm_pgtable *pgt = kvm->arch.mmu.pgt;
-> > > >         enum kvm_pgtable_prot prot = KVM_PGTABLE_PROT_DEVICE |
-> > > >                                      KVM_PGTABLE_PROT_R |
-> > > >                                      (writable ? KVM_PGTABLE_PROT_W : 0);
-> > > >
-> > > > +       INIT_KVM_MMU_MEMORY_CACHE(&cache, NULL, NUMA_NO_NODE);
-> > > > +
-> > > >         if (is_protected_kvm_enabled())
-> > > >                 return -EPERM;
-> > > >
-> > > > diff --git a/arch/mips/kvm/mips.c b/arch/mips/kvm/mips.c
-> > > > index a25e0b73ee70..b017c29a9340 100644
-> > > > --- a/arch/mips/kvm/mips.c
-> > > > +++ b/arch/mips/kvm/mips.c
-> > > > @@ -304,6 +304,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
-> > > >                      HRTIMER_MODE_REL);
-> > > >         vcpu->arch.comparecount_timer.function = kvm_mips_comparecount_wakeup;
-> > > >
-> > > > +       vcpu->arch.mmu_page_cache.node = NUMA_NO_NODE;
-> > > > +
+> > > > Tested this change by running dirty_log_perf_test while dropping cache
+> > > > via "echo 2 > /proc/sys/vm/drop_caches" at 1 second interval
+> > > > continuously. There were WARN_ON(!mc->nobjs) messages printed in kernel
+> > > > logs from kvm_mmu_memory_cache_alloc(), which is expected.
 > > >
-> > > It looks weird to have MIPS not using the initialization MACRO. Should
-> > > it just have a GFP_ZERO parameter?
+> > > Oh, that's not a good thing. I don't think we want to be hitting those
+> > > warnings. For one, kernel warnings should not be expected behavior,
+> > > probably for many reasons, but at least because Syzbot will find it.
+> > > In this particular case, we don't want to hit that because in that
+> > > case we'll try to do a GFP_ATOMIC, which can fail, and if it fails,
+> > > we'll BUG:
+> > >
+> > > void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memory_cache *mc)
+> > > {
+> > >         void *p;
+> > >
+> > >         if (WARN_ON(!mc->nobjs))
+> > >                 p = mmu_memory_cache_alloc_obj(mc, GFP_ATOMIC | __GFP_ACCOUNT);
+> > >         else
+> > >                 p = mc->objects[--mc->nobjs];
+> > >         BUG_ON(!p);
+> > >         return p;
+> > > }
+> > >
+> > > Perhaps the risk of actually panicking is small, but it probably
+> > > indicates that we need better error handling around failed allocations
+> > > from the cache.
+> > > Or, the slightly less elegant approach might be to just hold the cache
+> > > lock around the cache topup and use of pages from the cache, but
+> > > adding better error handling would probably be cleaner.
 > >
-> > MIPS is not setting GFP_ZERO explicitly before my series, so, I didn't
-> > make it GFP_ZERO. I am not sure if MIPS needs it or not, I tried to
-> > keep the same functionality in my patch.
+> > I was counting on the fact that shrinker will ideally run only in
+> > extreme cases, i.e. host is running on low memory. So, this WARN_ON
+> > will only be rarely used. I was not aware of Syzbot, it seems like it
+> > will be a concern if it does this kind of testing.
+>
+> In an extreme low-memory situation, forcing vCPUS to do GFP_ATOMIC
+> allocations to handle page faults is risky. Plus it's a waste of time to
+> free that memory since it's just going to get immediately reallocated.
+>
 > >
-> > May be someone from MIPS can tell more about it.
+> > I thought about keeping a mutex, taking it during topup and releasing
+> > it after the whole operation is done but I stopped it as the duration
+> > of holding mutex will be long and might block the memory shrinker
+> > longer. I am not sure though, if this is a valid concern.
 >
-> That makes sense, I just don't want to see MIPS get left behind
-> because we move the cache init logic to a macro or function. Folks
-> might update the init function but forget to update MIPS too.
->
+> Use mutex_trylock() to skip any vCPUs that are currently handling page
+> faults.
 
-Hi Huacai, Aleksandar,
-
-I have noticed that MIPS doesn't use __GFP_ZERO flag for
-mmu_page_cache in KVM. Is it intentional? I was wondering if it will
-be useful if I add zero flag for cache in this patch for MIPS? All
-other architectures seem to use __GFP_ZERO flag for their caches.
-
-Thanks
-Vipin
+oh yeah! Thanks.
