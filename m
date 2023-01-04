@@ -2,134 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1F3865D384
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 13:59:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 85B6865D3B8
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 14:05:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234952AbjADM6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 07:58:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37862 "EHLO
+        id S237559AbjADNE6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 08:04:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234014AbjADM6B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 07:58:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2F01E3E5
-        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 04:57:03 -0800 (PST)
+        with ESMTP id S239170AbjADNEy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 08:04:54 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA5DE186CE
+        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 05:04:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672837023;
+        s=mimecast20190719; t=1672837447;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=98JNIQy8FeRzxONlKyvSI5Ze/+IGOFmKeu3MLQNRHHs=;
-        b=M/Z3ODjZAWGhIRAd+KDB7kgMo72Gcj2eLa8CndIdGf6dy6kGuLoY+9HjL/HbFp2/CZCYM8
-        JnCVCOMBPbG3SzxNLiOUfLOCHjfr6JvFUmhMslFxCx7h1WWAZjRvKRfB19e32Hrh8mmB23
-        ZrxbZdXf5gn0EY4tXOiWukJk1+l0gsg=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=qox/oCIKrJgN89xrHJUvG+swnnlfN7DPV4U9vLlEgHk=;
+        b=T164K/udNfLL3MHRvqoM9xWudo1b6jZvyCK7ugALKhfH/o0PIVa8XselgTWUwdz2l6VmPX
+        dohisYVXSYg3fOnjQi+FLv4W/MZ1GjNLeGnRChsdIUBKbL9VQyWPzWUQ1YIG0lK8cNtKSK
+        TgIXhjNOXpKnrINi+njdW1DWZ+lGpFU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-646-2FF6sDY-PYKaaXIQH-uToQ-1; Wed, 04 Jan 2023 07:57:01 -0500
-X-MC-Unique: 2FF6sDY-PYKaaXIQH-uToQ-1
-Received: by mail-wr1-f69.google.com with SMTP id w20-20020adf8bd4000000b00272d0029f18so3710611wra.7
-        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 04:57:01 -0800 (PST)
+ us-mta-85-6wce-ZYtPU2yoAbsA9DN2A-1; Wed, 04 Jan 2023 08:04:06 -0500
+X-MC-Unique: 6wce-ZYtPU2yoAbsA9DN2A-1
+Received: by mail-wm1-f71.google.com with SMTP id m7-20020a05600c4f4700b003d971a5e770so16047939wmq.3
+        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 05:04:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=98JNIQy8FeRzxONlKyvSI5Ze/+IGOFmKeu3MLQNRHHs=;
-        b=lCzSIjmk8s+2Xeayy8T37JcNIERzKqs5950lYuyMUwlXbMhQpasJ7Z0g5x0tVSAxHo
-         l4IIxd2vnYgxiVL6C39tSGvSjfdM2wMeh7634ibPjTdz3J7oBJh91p+fSWBAkOPesmwe
-         HaPVtrPGtxt3CeHFToT2R8LINkpHkZ+KJ5+IUG2Hi+mpeozq/4RQD2Ts/J3e2QNLvpEH
-         3DPvm6mCDEtoQb1C2jVm3UB5b9oPs3MSDK+5cV+zFwpqr72pmlQPBACt1XEaE7cHx5PJ
-         xVdPijxNtriuA5BMkZGsq5Yo02Pp8xP+gtc2U0GDl+gn4FjK/qX8S66CTM7uBzzzU4Yg
-         mktw==
-X-Gm-Message-State: AFqh2kqnMvWA+JRTeMu2TfdJpAINHulEcBiiEXkdAp224uOi99hbrYZZ
-        0vWpxh6qQvEVtwI0CBj2RQbrlQoIGyrkQ4jp2VAw7cNcbQayca3j8n5KX+GZt7rNZO9pdn+oIgx
-        E70kcyIRnC9TS
-X-Received: by 2002:adf:e38e:0:b0:251:d76:94d6 with SMTP id e14-20020adfe38e000000b002510d7694d6mr27613865wrm.8.1672837020893;
-        Wed, 04 Jan 2023 04:57:00 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXsTL72pbSJ0LqO0mZBqA1ZA5XXdELBG+wXp27yRc6oWkoAnGHBgpT+NGeci3xFu6QaJLcbk+g==
-X-Received: by 2002:adf:e38e:0:b0:251:d76:94d6 with SMTP id e14-20020adfe38e000000b002510d7694d6mr27613861wrm.8.1672837020716;
-        Wed, 04 Jan 2023 04:57:00 -0800 (PST)
-Received: from [192.168.0.5] (ip-109-43-176-239.web.vodafone.de. [109.43.176.239])
-        by smtp.gmail.com with ESMTPSA id a6-20020adfed06000000b0028e8693bb75sm18725288wro.63.2023.01.04.04.56.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 04 Jan 2023 04:57:00 -0800 (PST)
-Message-ID: <6560bcba-b967-55b5-41ff-e20360a7102e@redhat.com>
-Date:   Wed, 4 Jan 2023 13:56:57 +0100
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qox/oCIKrJgN89xrHJUvG+swnnlfN7DPV4U9vLlEgHk=;
+        b=OlgySRmlFfh7U51sIDzdlRHZL79x6mzzU8kltL/eEcg+xW94vdF4iMS1eFajKqS0bQ
+         Pj3vEYuuFk9EOjeobQmOD0sq9zV5PbjwR5icr0jTlftZFylHqp6FvsU39GxxnKByhv8J
+         +zSWRK3gGO6gepQpY/+pdfy1b1/K241u3qQayPmvLanNiIxwGHIA/LypWWwJI9kcPIk2
+         j1N2mbe9w6kxYCK1zbrZyd38mrZcEqsqBCnSCVpFPlAfN0n1w8vK8oZKEt1bVRFLwpi5
+         1cUJABY3h3qtj+Eomrp2hV6yvyMErcmPjKveEyBo//RZSPzF7iZVjKVMUTFbSH2Ir17u
+         ngSQ==
+X-Gm-Message-State: AFqh2kqBjL6oZpYrPBsEItCvceF+72RiTDh3e1wPTjq2MzozFc45Cq5m
+        eK3CwdFhrwUO/pb+xdBB/tp45DmapJxJyOhETj4RgONofentBId6v40kotC+XYllL2Bi2ON4tLu
+        4L1GN7JrNn0Lf
+X-Received: by 2002:a05:6000:18c3:b0:288:ca2e:7d74 with SMTP id w3-20020a05600018c300b00288ca2e7d74mr14295788wrq.14.1672837444935;
+        Wed, 04 Jan 2023 05:04:04 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtlcfpal455TLuLVy79Kxfe58vG4oN1jPIOPsIFNn4IYhDNS4aZnX9DtEvIz+VUUb8U5/RbTg==
+X-Received: by 2002:a05:6000:18c3:b0:288:ca2e:7d74 with SMTP id w3-20020a05600018c300b00288ca2e7d74mr14295762wrq.14.1672837444627;
+        Wed, 04 Jan 2023 05:04:04 -0800 (PST)
+Received: from redhat.com ([2.52.151.85])
+        by smtp.gmail.com with ESMTPSA id j1-20020adfff81000000b0024cb961b6aesm33027899wrr.104.2023.01.04.05.04.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Jan 2023 05:04:03 -0800 (PST)
+Date:   Wed, 4 Jan 2023 08:03:59 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc:     Cong Wang <xiyou.wangcong@gmail.com>,
+        syzbot <syzbot+30b72abaa17c07fe39dd@syzkaller.appspotmail.com>,
+        jasowang@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        sgarzare@redhat.com, stefanha@redhat.com,
+        syzkaller-bugs@googlegroups.com,
+        virtualization@lists.linux-foundation.org, bobby.eshleman@gmail.com
+Subject: Re: [syzbot] kernel BUG in vhost_vsock_handle_tx_kick
+Message-ID: <20230104074613-mutt-send-email-mst@kernel.org>
+References: <0000000000003a68dc05f164fd69@google.com>
+ <Y7T+xTIq2izSlHHE@pop-os.localdomain>
+ <Y6A/Yyoh2uZSR0xj@bullseye>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests PATCH v1 1/1] s390x: fix make standalone
-Content-Language: en-US
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Andrew Jones <andrew.jones@linux.dev>
-Cc:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
-        frankja@linux.ibm.com, seiden@linux.ibm.com, nsg@linux.ibm.com
-References: <20221220175508.57180-1-imbrenda@linux.ibm.com>
- <167161061144.28055.8565976183630294954@t14-nrb.local>
- <167161409237.28055.17477704571322735500@t14-nrb.local>
- <20221226184112.ezyw2imr2ezffutr@orel> <20230104120720.0d3490bd@p-imbrenda>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230104120720.0d3490bd@p-imbrenda>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y6A/Yyoh2uZSR0xj@bullseye>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 04/01/2023 12.07, Claudio Imbrenda wrote:
-> On Mon, 26 Dec 2022 19:41:12 +0100
-> Andrew Jones <andrew.jones@linux.dev> wrote:
+On Mon, Dec 19, 2022 at 10:46:47AM +0000, Bobby Eshleman wrote:
+> On Tue, Jan 03, 2023 at 08:21:25PM -0800, Cong Wang wrote:
+> > On Tue, Jan 03, 2023 at 04:08:51PM -0800, syzbot wrote:
+> > > Hello,
+> > > 
+> > > syzbot found the following issue on:
+> > > 
+> > > HEAD commit:    c76083fac3ba Add linux-next specific files for 20221226
+> > > git tree:       linux-next
+> > > console+strace: https://syzkaller.appspot.com/x/log.txt?x=1723da42480000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=c217c755f1884ab6
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=30b72abaa17c07fe39dd
+> > > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14fc414c480000
+> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1604b20a480000
+> > > 
+> > > Downloadable assets:
+> > > disk image: https://storage.googleapis.com/syzbot-assets/e388f26357fd/disk-c76083fa.raw.xz
+> > > vmlinux: https://storage.googleapis.com/syzbot-assets/e24f0bae36d5/vmlinux-c76083fa.xz
+> > > kernel image: https://storage.googleapis.com/syzbot-assets/a5a69a059716/bzImage-c76083fa.xz
+> > > 
+> > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > > Reported-by: syzbot+30b72abaa17c07fe39dd@syzkaller.appspotmail.com
+> > 
+> > +bobby.eshleman@gmail.com
+> > 
+> > Bobby, please take a look.
+> > 
+> > Thanks.
 > 
->> On Wed, Dec 21, 2022 at 10:14:52AM +0100, Nico Boehr wrote:
->>> Quoting Nico Boehr (2022-12-21 09:16:51)
->>>> Quoting Claudio Imbrenda (2022-12-20 18:55:08)
->>>>> A recent patch broke make standalone. The function find_word is not
->>>>> available when running make standalone, replace it with a simple grep.
->>>>>
->>>>> Reported-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
->>>>> Fixes: 743cacf7 ("s390x: don't run migration tests under PV")
->>>>> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
->>>>
->>>> I am confused why find_word would not be available in standalone, since run() in runtime.bash uses it quite a few times.
->>>>
->>>> Not that I mind the grep, but I fear more might be broken in standalone?
->>
->> standalone tests don't currently include scripts/$ARCH/func.bash, which
->> may be an issue for s390x. That could be fixed, though.
->>
->>>>
->>>> Anyways, to get this fixed ASAP:
->>>>
->>>> Acked-by: Nico Boehr <nrb@linux.ibm.com>
->>>
->>> OK, I get it now, find_word is not available during _build time_.
->>
->> That could be changed, but it'd need to be moved to somewhere that
->> mkstandalone.sh wants to source, which could be common.bash, but
->> then we'd need to include common.bash in the standalone tests. So,
->> a new file for find_word() would be cleaner, but that sounds like
->> overkill.
-> 
-> the hack I posted here was meant to be "clean enough" and
-> arch-only (since we are the only ones with this issue). To be
-> honest, I don't really care __how__ we fix the problem, only that we do
-> fix it :)
-> 
-> what do you think would be the cleanest solution?
+> Roger that, I'll take a gander asap.
 
-I think your patch is good enough for fixing the issue, so I went ahead and 
-pushed it. If someone wants to figure out a nice way to make find_word 
-available to the standalone builds, too, feel free to send a patch on top of 
-this.
+I'll going to revert commit f169a9538803469418d9ba2c42a0236fc43cd876 unless
+I hear from you soon, we need linux-next testable.
 
-  Thanks,
-   Thomas
+-- 
+MST
 
