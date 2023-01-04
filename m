@@ -2,167 +2,196 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C3CF165CFF8
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 10:53:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1D4765D069
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 11:10:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234274AbjADJxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 04:53:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33298 "EHLO
+        id S233904AbjADKJt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 05:09:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229658AbjADJxF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 04:53:05 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26A9C14D24;
-        Wed,  4 Jan 2023 01:53:04 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30491YKq005437;
-        Wed, 4 Jan 2023 09:53:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=JlmYzHFhOaizUWNQHBWIUaZlKaKHnAOrMQFlQD5zHp0=;
- b=dmD3vlVV7P/wJKLX+cZIJWvoOhlgQNafs0s1u8CTEYm+9pJ1nUIzF9KSKum3TuejWkHS
- Oih8jgCiZ2HOtNoycGBGMWPB3xf27kaROMXk3dYoF4aUZL4uCah/Cihd8WjHvusxOQpj
- FfMfAj6P0m/rhNmQAaRQcsHyMZCDXRZ/zKjMigaHZ4Ve9v4ZYxqaKHB3kdxgqjquT/Mo
- vimGl0uVuZwDR1wMmYJNEnUU357QePHrsiAlVC/f2Eu5XHjMGvsta3vxt0LxNiKtsNfq
- V1AXF4AAO/pebYqgDzk9tc2AeyArY2go7ecEWXpFBpCXtYkiOawzV0Y0Ug+U8kJGbEG6 qQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mvq49cd2t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 09:53:02 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3049Wfsm008979;
-        Wed, 4 Jan 2023 09:53:02 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mvq49cd2b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 09:53:02 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 303MIg5A001428;
-        Wed, 4 Jan 2023 09:53:00 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mtcbfd2xx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 09:53:00 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3049quIR39256416
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 Jan 2023 09:52:57 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DE51120040;
-        Wed,  4 Jan 2023 09:52:56 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D2EAA2004B;
-        Wed,  4 Jan 2023 09:52:55 +0000 (GMT)
-Received: from [9.171.35.166] (unknown [9.171.35.166])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  4 Jan 2023 09:52:55 +0000 (GMT)
-Message-ID: <4e8d3f53af2f73a464e4ffc4a9a28c8d31692369.camel@linux.ibm.com>
-Subject: Re: [PATCH 1/1] vfio/type1: Respect IOMMU reserved regions in
- vfio_test_domain_fgsp()
-From:   Niklas Schnelle <schnelle@linux.ibm.com>
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Pierre Morel <pmorel@linux.ibm.com>,
-        Christian =?ISO-8859-1?Q?Borntr=E4ger?= 
-        <borntraeger@linux.ibm.com>
-Date:   Wed, 04 Jan 2023 10:52:55 +0100
-In-Reply-To: <Y7S8loyvHyjAmNdh@ziepe.ca>
-References: <20230102093452.761185-1-schnelle@linux.ibm.com>
-         <20230102093452.761185-2-schnelle@linux.ibm.com>
-         <Y7S8loyvHyjAmNdh@ziepe.ca>
+        with ESMTP id S234647AbjADKJW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 05:09:22 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E253167DB
+        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 02:08:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672826923;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=T7HpEnvLFRP9Wc3pt+AlvGW4vqhHztK91tjZWI6KGnk=;
+        b=PtBrc/RZbxxUmJw5lut2UduhR2BQr3vLadYikWAdmoiK1WYznPYG4HKyhcZnbeX92Tn29q
+        PrWzupVd8RhKwuHgwc3NdwKklCtMWR1+2pNvfIOpL8Rfggo47Br4b11btaZGXjQio73qDo
+        iFYP+NP3F/kp2DdYL3QIuLvycLMyf0A=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-461-kh2jA7IeOXeLm-cKcVDr0w-1; Wed, 04 Jan 2023 05:08:42 -0500
+X-MC-Unique: kh2jA7IeOXeLm-cKcVDr0w-1
+Received: by mail-wm1-f72.google.com with SMTP id k20-20020a05600c1c9400b003d9717c8b11so15934939wms.7
+        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 02:08:42 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T7HpEnvLFRP9Wc3pt+AlvGW4vqhHztK91tjZWI6KGnk=;
+        b=gjZIk5dYXaqefj5bKXBYLRseCxvw3l3pXeKWZD5b+L4Rlzp9H8g5U1WDhK0V3PiyPy
+         4aky2uNrVUMdGUdVul+ETwUZjgN8bukh256HFQlFW64C+Q1O7ic4qP1Onr1w0TbXrxYD
+         cuqhGS4DNlsA3BP60VuKzLuOPhnZGjBQOG/5oUEjlhQSN17ZskHVIoFh0l9I4wt4EcCX
+         nTVElVhMZChCPv8GeE6m7gIthL81Mc1qMjLJ+obedtr9mS9flrWPqWv+wEetdfMVBNir
+         Ci1tyLPPO/TTBHu4S2oEMK/5+5GGDujBUhF22zU65p40ytspxozn+efUW3oQ5HLIpDd3
+         njRQ==
+X-Gm-Message-State: AFqh2kpcAEPYiVmu4783IFRfvUqqplKXAofnpQacOPDcZmStS3J0zfQ6
+        C/ssyM0f99A4kYukc08KDbVDG5aHtjijh8uMY1Jgew3h0czdegjSMmff54UienjWffne2MGk1RT
+        cpECfzXfMwgPJ
+X-Received: by 2002:adf:ee83:0:b0:270:213a:b53d with SMTP id b3-20020adfee83000000b00270213ab53dmr28007203wro.33.1672826921388;
+        Wed, 04 Jan 2023 02:08:41 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXsGj8pewT8+sUCUsJf50Rb17SXAd6Z6tmNwzcf4m/yIhH3mB51TOWtZJwSua81YkACkPxNNdQ==
+X-Received: by 2002:adf:ee83:0:b0:270:213a:b53d with SMTP id b3-20020adfee83000000b00270213ab53dmr28007190wro.33.1672826921142;
+        Wed, 04 Jan 2023 02:08:41 -0800 (PST)
+Received: from starship ([89.237.103.62])
+        by smtp.gmail.com with ESMTPSA id u17-20020adfeb51000000b0026e94493858sm33190358wrn.106.2023.01.04.02.08.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Jan 2023 02:08:40 -0800 (PST)
+Message-ID: <aba3787196caa812cee04f840dce26ac8a79eb7f.camel@redhat.com>
+Subject: Re: [PATCH v4 28/32] KVM: SVM: Require logical ID to be power-of-2
+ for AVIC entry
+From:   Maxim Levitsky <mlevitsk@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Date:   Wed, 04 Jan 2023 12:08:38 +0200
+In-Reply-To: <b002fd18c2abdfe5f4395be38858f461b3c76ac3.camel@redhat.com>
+References: <20221001005915.2041642-1-seanjc@google.com>
+         <20221001005915.2041642-29-seanjc@google.com>
+         <f1f1a33134c739f09f5820b5a4973535f121c0da.camel@redhat.com>
+         <b002fd18c2abdfe5f4395be38858f461b3c76ac3.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 84DkRbnro9HDhaYZVjXnLs_i6XAL8PB5
-X-Proofpoint-GUID: 7V-kUb0cOHQwbR6rfOfSsI_dwpHcgFcB
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-04_05,2023-01-03_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- clxscore=1011 priorityscore=1501 malwarescore=0 impostorscore=0
- spamscore=0 lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=946
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301040080
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2023-01-03 at 19:39 -0400, Jason Gunthorpe wrote:
-> On Mon, Jan 02, 2023 at 10:34:52AM +0100, Niklas Schnelle wrote:
-> > Since commit cbf7827bc5dc ("iommu/s390: Fix potential s390_domain
-> > aperture shrinking") the s390 IOMMU driver uses a reserved region
-> > instead of an artificially shrunk aperture to restrict IOMMU use based
-> > on the system provided DMA ranges of devices. In particular on current
-> > machines this prevents use of DMA addresses below 2^32 for all devices.
-> > While usually just IOMMU mapping below these addresses is
-> > harmless. However our virtual ISM PCI device looks at new mappings on
-> > IOTLB flush and immediately goes into the error state if such a mapping
-> > violates its allowed DMA ranges. This then breaks pass-through of the
-> > ISM device to a KVM guest.
-> >=20
-> > Analysing this we found that vfio_test_domain_fgsp() maps 2 pages at DM=
-A
-> > address 0 irrespective of the IOMMUs reserved regions. Even if usually
-> > harmless this seems wrong in the general case so instead go through the
-> > freshly updated IOVA list and try to find a range that isn't reserved
-> > and fits 2 pages and use that for testing for fine grained super pages.
->=20
-> Why does it matter? The s390 driver will not set fgsp=3Dtrue, so if it
-> fails because map fails or does a proper detection it shouldn't make a
-> difference.
->=20
-> IOW how does this actualy manifest into a failure?
+On Thu, 2022-12-29 at 10:27 +0200, mlevitsk@redhat.com wrote:
+> On Fri, 2022-12-09 at 00:00 +0200, Maxim Levitsky wrote:
+> > On Sat, 2022-10-01 at 00:59 +0000, Sean Christopherson wrote:
+> > > Do not modify AVIC's logical ID table if the logical ID portion of the
+> > > LDR is not a power-of-2, i.e. if the LDR has multiple bits set.  Taking
+> > > only the first bit means that KVM will fail to match MDAs that intersect
+> > > with "higher" bits in the "ID"
+> > > 
+> > > The "ID" acts as a bitmap, but is referred to as an ID because theres an
+> > > implicit, unenforced "requirement" that software only set one bit.  This
+> > > edge case is arguably out-of-spec behavior, but KVM cleanly handles it
+> > > in all other cases, e.g. the optimized logical map (and AVIC!) is also
+> > > disabled in this scenario.
+> > > 
+> > > Refactor the code to consolidate the checks, and so that the code looks
+> > > more like avic_kick_target_vcpus_fast().
+> > > 
+> > > Fixes: 18f40c53e10f ("svm: Add VMEXIT handlers for AVIC")
+> > > Cc: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
+> > > Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/kvm/svm/avic.c | 30 +++++++++++++++---------------
+> > >  1 file changed, 15 insertions(+), 15 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
+> > > index 4b6fc9d64f4d..a9e4e09f83fc 100644
+> > > --- a/arch/x86/kvm/svm/avic.c
+> > > +++ b/arch/x86/kvm/svm/avic.c
+> > > @@ -513,26 +513,26 @@ unsigned long avic_vcpu_get_apicv_inhibit_reasons(struct kvm_vcpu *vcpu)
+> > >  static u32 *avic_get_logical_id_entry(struct kvm_vcpu *vcpu, u32 ldr, bool flat)
+> > >  {
+> > >  	struct kvm_svm *kvm_svm = to_kvm_svm(vcpu->kvm);
+> > > -	int index;
+> > >  	u32 *logical_apic_id_table;
+> > > -	int dlid = GET_APIC_LOGICAL_ID(ldr);
+> > > +	u32 cluster, index;
+> > >  
+> > > -	if (!dlid)
+> > > -		return NULL;
+> > > +	ldr = GET_APIC_LOGICAL_ID(ldr);
+> > >  
+> > > -	if (flat) { /* flat */
+> > > -		index = ffs(dlid) - 1;
+> > > -		if (index > 7)
+> > > +	if (flat) {
+> > > +		cluster = 0;
+> > > +	} else {
+> > > +		cluster = (ldr >> 4) << 2;
+> > > +		if (cluster >= 0xf)
+> > >  			return NULL;
+> > > -	} else { /* cluster */
+> > > -		int cluster = (dlid & 0xf0) >> 4;
+> > > -		int apic = ffs(dlid & 0x0f) - 1;
+> > > -
+> > > -		if ((apic < 0) || (apic > 7) ||
+> > > -		    (cluster >= 0xf))
+> > > -			return NULL;
+> > > -		index = (cluster << 2) + apic;
+> > > +		ldr &= 0xf;
+> > >  	}
+> > > +	if (!ldr || !is_power_of_2(ldr))
+> > > +		return NULL;
+> > > +
+> > > +	index = __ffs(ldr);
+> > > +	if (WARN_ON_ONCE(index > 7))
+> > > +		return NULL;
+> > > +	index += (cluster << 2);
+> > >  
+> > >  	logical_apic_id_table = (u32 *) page_address(kvm_svm->avic_logical_id_table_page);
+> > >  
+> > 
+> > Looks good.
+> 
+> I hate to say it but this patch has a bug:
+> 
+> We have both 'cluster = (ldr >> 4) << 2' and then 'index += (cluster << 2)'
+> 
+> One of the shifts has to go.
 
-Oh, yeah I agree that's what I meant by saying that just mapping should
-usually be harmless. This is indeedthe case for all normal PCI devices
-on s390 there it doesn't matter.=C2=A0
 
-The problem manifests only with ISM devices which are a special s390
-virtual PCI device that is implemented in the machine hypervisor. This
-device is used for high speed cross-LPAR (Logical Partition)
-communication, basically it allows two LPARs that previously exchanged
-an authentication token to memcpy between their partitioned memory
-using the virtual device. For copying a receiving LPAR will IOMMU map a
-region of memory for the ISM device that it will allow DMAing into
-(memcpy by the hypervisor). All other regions remain unmapped and thus
-inaccessible. In preparation the device  emulation in the machine
-hypervisor intercepts the IOTLB flush and looks at the IOMMU
-translation tables performing e.g. size and alignment checks I presume,
-one of these checks against the start/end DMA boundaries. This check
-fails which leads to the virtual ISM device being put into an error
-state. Being in an error state it then fails to be initialized by the
-guest driver later on.
+Sean, please don't forget to fix this isssue in the next patch series.
+Best regards,
+	Maxim Levitsky
+> 
+> Best regards,
+> 	Maxim Levitsky
+> 
+> 
+> > For future refactoring, I also suggest to rename this function to 'avic_get_logical_id_table_entry'
+> > to stress the fact that it gets a pointer to the AVIC's data structure.
+> > 
+> > Same for 'avic_get_physical_id_entry'
+> > 
+> > And also while at it : the 'svm->avic_physical_id_cache', is a very misleading name,
+> > 
+> > It should be svm->avic_physical_id_table_entry_ptr with a comment explaining that
+> > is is the pointer to physid table entry.
+> > 
+> > 
+> > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > 
+> > 
+> > 
+> > Best regards,
+> > 	Maxim Levitsky
+> 
+> 
 
->=20
-> > -	if (!ret) {
-> > -		size_t unmapped =3D iommu_unmap(domain->domain, 0, PAGE_SIZE);
-> > +	list_for_each_entry(region, regions, list) {
-> > +		if (region->end - region->start < PAGE_SIZE * 2)
-> > +			continue;
-> > =20
-> > -		if (unmapped =3D=3D PAGE_SIZE)
-> > -			iommu_unmap(domain->domain, PAGE_SIZE, PAGE_SIZE);
-> > -		else
-> > -			domain->fgsp =3D true;
-> > +		ret =3D iommu_map(domain->domain, region->start, page_to_phys(pages)=
-, PAGE_SIZE * 2,
-> > +				IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE);
->=20
-> The region also needs to have 'region->start % (PAGE_SIZE*2) =3D=3D 0' fo=
-r the
-> test to work
->=20
-> Jason
 
-Ah okay makes sense, I guess that check could easily be added.
