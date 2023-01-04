@@ -2,55 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 04AA465DDF8
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 22:03:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09BC765DF02
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 22:27:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239087AbjADVDY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 16:03:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51288 "EHLO
+        id S240435AbjADV1L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 16:27:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235503AbjADVDV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 16:03:21 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 456EC18E25;
-        Wed,  4 Jan 2023 13:03:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=DdXvznrWNFXCWn/0dzxvJoX7bP6fArqWW8xJiDt8/zM=; b=ETs0XrrINbauFT2FNiPan8dX/h
-        smrSRTJL8gZM3NK1XmGCEoHDQpWXIp/7+j08+gEU3WBABGfV8lB9/uYxsj7wWxPfMmLl3IHUwpj3n
-        kn0PYXLHRhgaOsBOPZg82zGOS/5BP7JmytEEnAog2qrIcS/FP0x9gvaqWerZcJiett/oCAWLrQwOH
-        BIkaS6ROtmAWt0y3pVnb0HdOwnqJZGAD+aVAtse2jnenc9Mc6DJxA9lPbknW9nqG7XAF59005QCLl
-        Z/UOLhVTXZ+nN+ngaM6DOVsYKEZzcqccmLiyNvHQ9Lv6Gm80cbkQaYFn+Ib3s2k/t4Nugns3yXnSg
-        w17j9Eig==;
-Received: from [172.31.31.126] (helo=[127.0.0.1])
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pDAub-0014WI-1Z;
-        Wed, 04 Jan 2023 21:03:02 +0000
-Date:   Wed, 04 Jan 2023 21:03:04 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Sean Christopherson <seanjc@google.com>
-CC:     Paul Durrant <pdurrant@amazon.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_v6_2/2=5D_KVM=3A_x86/xen=3A_update_Xen_C?= =?US-ASCII?Q?PUID_Leaf_4_=28tsc_info=29_sub-leaves=2C_if_present?=
-User-Agent: K-9 Mail for Android
-In-Reply-To: <Y7Xfp3Izlc6VPEzC@google.com>
-References: <20221220134053.15591-1-pdurrant@amazon.com> <20221220134053.15591-3-pdurrant@amazon.com> <Y7XWHr1kb4AHd4Lv@google.com> <0e58d9a6bc8bf15c23feff25ec24e9b3c26945cc.camel@infradead.org> <Y7Xfp3Izlc6VPEzC@google.com>
-Message-ID: <C0955015-2E2F-4D56-9611-4696553E2A2A@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S240467AbjADV0u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 16:26:50 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEF4543C05
+        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 13:20:40 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id j18-20020a170902da9200b00189b3b16addso24921890plx.23
+        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 13:20:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9Tq7FtjdAxMenZUdP94jpiY1WQWtFexBAUHIvWXe5/E=;
+        b=rhMJnL5Kf2ZkCYhp3cK7TEhpRX5YMA+GtsfOOIzbLggq6rTracB5eJx9MQdqkYxe7e
+         eWtu0sMivWTwYWdxQFeBdPgyWfqnVbfvWFNK/eEEffjHrcxg0a34bg0jOuEvv6DC2jlF
+         osfjOEOcWnv4olDRNPZEXB/95n3/lJ3b/Q0mvhQn4CcHuQsD3ECZOglQoirZar7eerZK
+         9pB3UCmCj6CGjh1dMNPSIeq+fIqGUsEkMAFBuv39udy4xCmk7EVtMfnP8HzYV3NbaOhc
+         /8GgMYDt1PxTHijgHXP9IOWQWjcl3FERTxE7FxEjU+ApJ9iYGHC9xwuKPPt1OSP6uKiD
+         qYGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Tq7FtjdAxMenZUdP94jpiY1WQWtFexBAUHIvWXe5/E=;
+        b=BfmdUWa/JsuNpWGzfozLyoU39gw6MUCCEr7H0uJD/dg+ZLGNQwK6POAP6GwWi5oFqv
+         ATwbro2LxwZmtLcgFYBf33yQQikfFyZSQaYKTt+YVDKat26hp8ggivJwgO+/Bz1ci+TW
+         TnuyyA/VBFWssyECCm2brKi33lIkWIn/PS8xoZUtY4OBZEdKCGonajeBqGOXmoIKPXiR
+         9tRNsc9pUXb7p2v60UbN65l9snJRJzyKVrhX0+ItVaRCwGgZfh8MsIp0+9gMEVjzxD1U
+         gW9LmzwYF/4XEdwBoZ4f8050qXZxMiOOEt7CaEPvf/2RZNu8HmT1aKvG0elTsDpiChyj
+         xVgA==
+X-Gm-Message-State: AFqh2kqZp7xn9w+7AF+nw1Y8htOERLcl4dXnKZyNRyDCc49zgqEvljRf
+        ouLLMh0K2qz9dZAFKXM14D57sC994MBHH4/JRQ==
+X-Google-Smtp-Source: AMrXdXtYvWz/PGzmklWTOEIC+Zs5FTse5JdOKgdHAQi/lUm8mTSUtejZOuNeKzMqkBt1J1UiQZgXBrmGeK6x3rKaMA==
+X-Received: from ackerleytng-cloudtop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:1f5f])
+ (user=ackerleytng job=sendgmr) by 2002:a17:902:bb8f:b0:192:fa87:f109 with
+ SMTP id m15-20020a170902bb8f00b00192fa87f109mr88333pls.173.1672867215663;
+ Wed, 04 Jan 2023 13:20:15 -0800 (PST)
+Date:   Wed, 04 Jan 2023 13:20:13 -0800
+In-Reply-To: <1cacbda18e3c7dcccd92a7390b0ca7f4ba073f85.1667110240.git.isaku.yamahata@intel.com>
+Mime-Version: 1.0
+Message-ID: <diqz5ydmov3m.fsf@google.com>
+Subject: Re: [PATCH v10 098/108] KVM: TDX: Implement callbacks for MSR
+ operations for TDX
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
+        pbonzini@redhat.com, erdemaktas@google.com, seanjc@google.com,
+        sagis@google.com, dmatlack@google.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -58,30 +69,18 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+I believe we should also have a handler for .msr_filter_changed.
 
-On 4 January 2023 20:20:55 GMT, Sean Christopherson <seanjc@google=2Ecom> =
-wrote:
->On Wed, Jan 04, 2023, David Woodhouse wrote:
->> On Wed, 2023-01-04 at 19:40 +0000, Sean Christopherson wrote:
->> >=20
->> > arch/x86/include/asm/xen/hypervisor=2Eh also open codes the signature=
-=2E=C2=A0 Rather than
->> > add a KVM-specific define, what about putting in xen/cpuid=2Eh?=C2=A0=
- (I've had a version
->> > of this series sitting in my todo pile for far too long, sorry)=2E
->>=20
->> xen/cpuid=2Eh is an external header imported from Xen itself so in
->> general I'd prefer to avoid modifying it unless we also send the
->> changes upstream=2E
->
->*sigh*  Fool me once=2E=2E=2E
->
->Can we shove it into arch/x86/include/asm/xen/hypervisor=2Eh?  Or is incl=
-uding
->that in KVM too confusing/ugly?
+Without an .msr_filter_changed handler, a host crash can occur if we
+first set up a vcpu for the TD, and then set an MSR filter.
 
-Maybe, if that's our own header=2E We do include a bunch of stuff intended=
- for use by Xen guests, in arch/x86/kvm/xen=2Ec to provide Xen support=2E I=
-t's only the 32-bit compat bits we define for ourselves within arch/x86/kvm=
-/xen=2Eh=2E
+If we first set up a vcpu for the TD, and then set an MSR filter, upon
+vcpu_enter_guest, the .msr_filter_changed handler (currently
+vmx_msr_filter_changed()) will be invoked. to_vmx(vcpu) interprets the
+containing struct of struct kvm_vcpu to be a struct vcpu_vmx instead of
+a struct vcpu_tdx.
+
+In my case, I was working on a selftest and the missing handler caused a
+NULL dereference in vmx_disable_intercept_for_msr() because
+vmx->vmcs01.msr_bitmap is NULL.
 
