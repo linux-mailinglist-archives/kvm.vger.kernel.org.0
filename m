@@ -2,82 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D1F065D68A
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 15:50:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDE6965D6BB
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 16:00:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231967AbjADOuD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 09:50:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39886 "EHLO
+        id S239357AbjADPAX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 10:00:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjADOt5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 09:49:57 -0500
-Received: from out-193.mta0.migadu.com (out-193.mta0.migadu.com [IPv6:2001:41d0:1004:224b::c1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B39853B931
-        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 06:49:56 -0800 (PST)
-Date:   Wed, 4 Jan 2023 15:49:54 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1672843794;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=c5+azPSl9t3Nzh5rdp+z+EbLNQg5/hYpCKX3CHSNXfg=;
-        b=gBQTMAJ1FF0jejXuilFHa3Jl6i4qexrgKiTtd9agdDWS/VpwsreqaOVdTqpmlC2GY5l3jC
-        +K4c19DKVUvU4mFoo5cMhbJ/ivGZkc2uQZ7qi0rqDpuYmQ3QDw0AE2ylL767mz7E9pd/RA
-        Qql0rWf5NjzJqov1p8hIuSYASjHnDTM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Thomas Huth <thuth@redhat.com>
-Cc:     Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-        frankja@linux.ibm.com, nrb@linux.ibm.com, seiden@linux.ibm.com,
-        nsg@linux.ibm.com
-Subject: Re: [kvm-unit-tests PATCH v1 1/1] s390x: fix make standalone
-Message-ID: <20230104144954.w6sr26xxr5mn64yv@orel>
-References: <20221220175508.57180-1-imbrenda@linux.ibm.com>
- <20221226183634.7qr7f4otucfzat5g@orel>
- <af8e6828-6342-17d0-858f-20de5ef6e1a6@redhat.com>
+        with ESMTP id S229461AbjADPAV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 10:00:21 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6601EEC1
+        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 07:00:21 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id j8-20020a17090a3e0800b00225fdd5007fso24925520pjc.2
+        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 07:00:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VWdAqOaf2J8kFGx5GmjkkSMfxAT7jnHGKS/Wkn2kL/s=;
+        b=op4MZAZxo4ZY6ToBUU9OY+2VFCFdMNDuPbS5g6e6iFNJVj55Nm2g4H7Wx4+jgwteJp
+         dybTJfGd8OgfQri0wKDJHFbwGRDMBs08g0PhtdRvZHrXVtFzLmsHVuAPpGbljEP6z2Zs
+         Q4jcfEVqVTZtLfvBV4YS4IFua0N/JDlWRl60JPnsGaCCA1TW5seQJr658UX/DtRNF2lm
+         yGMjNZCIGXNI8+2hYlqbf7joznvOLsJElkhyA2x/31OXvazuA//sY4Qc7pw2+L3XSxP0
+         oDklw1d3wjD59bVumzdLVdBRtjcCbUAY4ebPJPLauUMnAvAi6iTuZhMWw44D5/Ih4rQn
+         NtKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VWdAqOaf2J8kFGx5GmjkkSMfxAT7jnHGKS/Wkn2kL/s=;
+        b=gycDN9nyG1cIl7dI4Jl7naojvY2xknNaUJ4nbvFFNuMkKticXUU1GH09rDzQPXJQB5
+         yBct/iPKNEop63m0pPrDUC+YemDlJlb4RpKhRZuNupBLtEPhe/jGBMpgtxG808dqjUdz
+         66LqxYt/kVGCeV+pa5elhOLb4KmrcLO8JpOSXhUrYw2aWOzPpafV3IfRz8yWDJRvEAHh
+         sbpo6SISu+R58AWcyBnPby58g98D/QeVccUFj8y4s/2fmt8j6c6XiOEoPMOs6wOpmu6G
+         oByjwccR7BhCZ/7trnTDeOcu1WIfh3UwfMBQt7PnlhHnZtPWl/q4c/bFIks//6NUK/gN
+         1iPQ==
+X-Gm-Message-State: AFqh2kqeR7C8rKLY2H+bqakz733iUj6OdGV3YsHt1sPb7YKsfP3SsFvm
+        SZQeSL5Sr+dm+lbvfgMV1c3oyA==
+X-Google-Smtp-Source: AMrXdXsPEgKMMjHmRgdojrhDbnkbsf0Sv08U/01xCaCtH2N0xfl3A/C8fCoSWZ8rOZ89tu/o5+UPlw==
+X-Received: by 2002:a05:6a20:5488:b0:a3:d7b0:aeef with SMTP id i8-20020a056a20548800b000a3d7b0aeefmr5551738pzk.0.1672844420743;
+        Wed, 04 Jan 2023 07:00:20 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 64-20020a620543000000b0056bd1bf4243sm22704544pff.53.2023.01.04.07.00.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Jan 2023 07:00:20 -0800 (PST)
+Date:   Wed, 4 Jan 2023 15:00:16 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Andrew Jones <andrew.jones@linux.dev>
+Subject: Re: [PATCH 1/1] KVM: selftests: kvm_vm_elf_load() and elfhdr_get()
+ should close fd
+Message-ID: <Y7WUgI4muVCn8glt@google.com>
+References: <20221220170921.2499209-1-reijiw@google.com>
+ <20221220170921.2499209-2-reijiw@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <af8e6828-6342-17d0-858f-20de5ef6e1a6@redhat.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221220170921.2499209-2-reijiw@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 01:52:21PM +0100, Thomas Huth wrote:
-> On 26/12/2022 19.36, Andrew Jones wrote:
-> > On Tue, Dec 20, 2022 at 06:55:08PM +0100, Claudio Imbrenda wrote:
-> > > A recent patch broke make standalone. The function find_word is not
-> > > available when running make standalone, replace it with a simple grep.
-> > > 
-> > > Reported-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-> > > Fixes: 743cacf7 ("s390x: don't run migration tests under PV")
-> > > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > > ---
-> > >   scripts/s390x/func.bash | 2 +-
-> > >   1 file changed, 1 insertion(+), 1 deletion(-)
-> > > 
-> > > diff --git a/scripts/s390x/func.bash b/scripts/s390x/func.bash
-> > > index 2a941bbb..6c75e89a 100644
-> > > --- a/scripts/s390x/func.bash
-> > > +++ b/scripts/s390x/func.bash
-> > > @@ -21,7 +21,7 @@ function arch_cmd_s390x()
-> > >   	"$cmd" "$testname" "$groups" "$smp" "$kernel" "$opts" "$arch" "$check" "$accel" "$timeout"
-> > >   	# run PV test case
-> > > -	if [ "$ACCEL" = 'tcg' ] || find_word "migration" "$groups"; then
-> > > +	if [ "$ACCEL" = 'tcg' ] || grep -q "migration" <<< "$groups"; then
-> > 
-> > What about the '-F' that find_word has?
+On Tue, Dec 20, 2022, Reiji Watanabe wrote:
+> kvm_vm_elf_load() and elfhdr_get() open one file each, but they
+> never close the opened file descriptor.  If a test repeatedly
+> creates and destroys a VM with __vm_create(), which
+> (directly or indirectly) calls those two functions, the test
+> might end up getting a open failure with EMFILE.
+> Fix those two functions to close the file descriptor.
 > 
-> "migration" is only one string without regular expressions in it, so I
-> assume the -F does not matter here, does it?
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> ---
 
-You're right. I got carried away at checking equivalence.
-
-Thanks,
-drew
+Reviewed-by: Sean Christopherson <seanjc@google.com>
