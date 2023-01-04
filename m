@@ -2,615 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8F90A65CDF1
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 08:59:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C3CF165CFF8
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 10:53:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233560AbjADH7V (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 02:59:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48534 "EHLO
+        id S234274AbjADJxH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 04:53:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233162AbjADH7R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 02:59:17 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E65011868D;
-        Tue,  3 Jan 2023 23:59:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672819155; x=1704355155;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=USF2fanSgaIK7zt2gxBK+vlxIsNSVKalkrSdoHPqaEM=;
-  b=UZFshW1LXSa3lNDh4zTEYXlDcIFR5LAlB4adGD8lDxTOVsLuESnv/tfo
-   yVa48D4rOhy0DAk6+R9hXnqwa/iUmmuHJ/yDYz0yUIRnnF8zLKyGHW8in
-   NECp71oC4qo7YRGXspgjYBLCya4eFXRerKWnutUa7BWxQtSxL0bjypG7Y
-   WPObmzKnCd3gSTEOyYuU6ih2z3e/jaUbX79K8i0GCa2byW1MSRNEo4hzL
-   E6oqdGxVtHPZ104VUGjjoamZDCAbEBQkow8/8JWx9vaNE9x3zeBKCUhlO
-   gT2ieQfq6ac5n7X+lpxQ3VoPhPZFmP6inEFG92KFHg37YP7YAOejtLRtw
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10579"; a="323868674"
-X-IronPort-AV: E=Sophos;i="5.96,299,1665471600"; 
-   d="scan'208";a="323868674"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2023 23:59:15 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10579"; a="685673579"
-X-IronPort-AV: E=Sophos;i="5.96,299,1665471600"; 
-   d="scan'208";a="685673579"
-Received: from leiwang7-mobl.ccr.corp.intel.com (HELO [10.254.214.111]) ([10.254.214.111])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jan 2023 23:59:12 -0800
-Message-ID: <f9d7c13e-e96c-2afd-4c8b-cb7f17d61445@intel.com>
-Date:   Wed, 4 Jan 2023 15:59:08 +0800
+        with ESMTP id S229658AbjADJxF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 04:53:05 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26A9C14D24;
+        Wed,  4 Jan 2023 01:53:04 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30491YKq005437;
+        Wed, 4 Jan 2023 09:53:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=JlmYzHFhOaizUWNQHBWIUaZlKaKHnAOrMQFlQD5zHp0=;
+ b=dmD3vlVV7P/wJKLX+cZIJWvoOhlgQNafs0s1u8CTEYm+9pJ1nUIzF9KSKum3TuejWkHS
+ Oih8jgCiZ2HOtNoycGBGMWPB3xf27kaROMXk3dYoF4aUZL4uCah/Cihd8WjHvusxOQpj
+ FfMfAj6P0m/rhNmQAaRQcsHyMZCDXRZ/zKjMigaHZ4Ve9v4ZYxqaKHB3kdxgqjquT/Mo
+ vimGl0uVuZwDR1wMmYJNEnUU357QePHrsiAlVC/f2Eu5XHjMGvsta3vxt0LxNiKtsNfq
+ V1AXF4AAO/pebYqgDzk9tc2AeyArY2go7ecEWXpFBpCXtYkiOawzV0Y0Ug+U8kJGbEG6 qQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mvq49cd2t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Jan 2023 09:53:02 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3049Wfsm008979;
+        Wed, 4 Jan 2023 09:53:02 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mvq49cd2b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Jan 2023 09:53:02 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 303MIg5A001428;
+        Wed, 4 Jan 2023 09:53:00 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mtcbfd2xx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 04 Jan 2023 09:53:00 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3049quIR39256416
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 4 Jan 2023 09:52:57 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DE51120040;
+        Wed,  4 Jan 2023 09:52:56 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D2EAA2004B;
+        Wed,  4 Jan 2023 09:52:55 +0000 (GMT)
+Received: from [9.171.35.166] (unknown [9.171.35.166])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed,  4 Jan 2023 09:52:55 +0000 (GMT)
+Message-ID: <4e8d3f53af2f73a464e4ffc4a9a28c8d31692369.camel@linux.ibm.com>
+Subject: Re: [PATCH 1/1] vfio/type1: Respect IOMMU reserved regions in
+ vfio_test_domain_fgsp()
+From:   Niklas Schnelle <schnelle@linux.ibm.com>
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Christian =?ISO-8859-1?Q?Borntr=E4ger?= 
+        <borntraeger@linux.ibm.com>
+Date:   Wed, 04 Jan 2023 10:52:55 +0100
+In-Reply-To: <Y7S8loyvHyjAmNdh@ziepe.ca>
+References: <20230102093452.761185-1-schnelle@linux.ibm.com>
+         <20230102093452.761185-2-schnelle@linux.ibm.com>
+         <Y7S8loyvHyjAmNdh@ziepe.ca>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.6.1
-Subject: Re: [PATCH v10 021/108] KVM: TDX: initialize VM with TDX specific
- parameters
-Content-Language: en-US
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <ebb4beadff8e117d0fb643af4ee310b6608679bf.1667110240.git.isaku.yamahata@intel.com>
-From:   "Wang, Lei" <lei4.wang@intel.com>
-In-Reply-To: <ebb4beadff8e117d0fb643af4ee310b6608679bf.1667110240.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 84DkRbnro9HDhaYZVjXnLs_i6XAL8PB5
+X-Proofpoint-GUID: 7V-kUb0cOHQwbR6rfOfSsI_dwpHcgFcB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-04_05,2023-01-03_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ clxscore=1011 priorityscore=1501 malwarescore=0 impostorscore=0
+ spamscore=0 lowpriorityscore=0 adultscore=0 phishscore=0 mlxlogscore=946
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301040080
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 10/30/2022 2:22 PM, isaku.yamahata@intel.com wrote:
-> From: Xiaoyao Li <xiaoyao.li@intel.com>
-> 
-> TDX requires additional parameters for TDX VM for confidential execution to
-> protect its confidentiality of its memory contents and its CPU state from
-> any other software, including VMM. When creating guest TD VM before
-> creating vcpu, the number of vcpu, TSC frequency (that is same among
-> vcpus. and it can't be changed.)  CPUIDs which is emulated by the TDX
-> module. It means guest can trust those CPUIDs. and sha384 values for
-> measurement.
-> 
-> Add new subcommand, KVM_TDX_INIT_VM, to pass parameters for TDX guest.  It
-> assigns encryption key to the TDX guest for memory encryption.  TDX
-> encrypts memory per-guest bases.  It assigns device model passes per-VM
-> parameters for the TDX guest.  The maximum number of vcpus, tsc frequency
-> (TDX guest has fised VM-wide TSC frequency. not per-vcpu.  The TDX guest
-> can not change it.), attributes (production or debug), available extended
-> features (which is reflected into guest XCR0, IA32_XSS MSR), cpuids, sha384
-> measurements, and etc.
-> 
-> This subcommand is called before creating vcpu and KVM_SET_CPUID2, i.e.
-> cpuids configurations aren't available yet.  So CPUIDs configuration values
-> needs to be passed in struct kvm_init_vm.  It's device model responsibility
+On Tue, 2023-01-03 at 19:39 -0400, Jason Gunthorpe wrote:
+> On Mon, Jan 02, 2023 at 10:34:52AM +0100, Niklas Schnelle wrote:
+> > Since commit cbf7827bc5dc ("iommu/s390: Fix potential s390_domain
+> > aperture shrinking") the s390 IOMMU driver uses a reserved region
+> > instead of an artificially shrunk aperture to restrict IOMMU use based
+> > on the system provided DMA ranges of devices. In particular on current
+> > machines this prevents use of DMA addresses below 2^32 for all devices.
+> > While usually just IOMMU mapping below these addresses is
+> > harmless. However our virtual ISM PCI device looks at new mappings on
+> > IOTLB flush and immediately goes into the error state if such a mapping
+> > violates its allowed DMA ranges. This then breaks pass-through of the
+> > ISM device to a KVM guest.
+> >=20
+> > Analysing this we found that vfio_test_domain_fgsp() maps 2 pages at DM=
+A
+> > address 0 irrespective of the IOMMUs reserved regions. Even if usually
+> > harmless this seems wrong in the general case so instead go through the
+> > freshly updated IOVA list and try to find a range that isn't reserved
+> > and fits 2 pages and use that for testing for fine grained super pages.
+>=20
+> Why does it matter? The s390 driver will not set fgsp=3Dtrue, so if it
+> fails because map fails or does a proper detection it shouldn't make a
+> difference.
+>=20
+> IOW how does this actualy manifest into a failure?
 
-I suppose this should be kvm_tdx_init_vm.
+Oh, yeah I agree that's what I meant by saying that just mapping should
+usually be harmless. This is indeedthe case for all normal PCI devices
+on s390 there it doesn't matter.=C2=A0
 
-> to make this cpuid config for KVM_TDX_INIT_VM and KVM_SET_CPUID2.
-> 
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->  arch/x86/include/asm/tdx.h            |   3 +
->  arch/x86/include/uapi/asm/kvm.h       |  31 +++
->  arch/x86/kvm/vmx/tdx.c                | 296 ++++++++++++++++++++++----
->  arch/x86/kvm/vmx/tdx.h                |  22 ++
->  tools/arch/x86/include/uapi/asm/kvm.h |  33 +++
->  5 files changed, 347 insertions(+), 38 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> index cd304d323d33..05ac4bfc8f8a 100644
-> --- a/arch/x86/include/asm/tdx.h
-> +++ b/arch/x86/include/asm/tdx.h
-> @@ -131,6 +131,9 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
->  #endif /* CONFIG_INTEL_TDX_GUEST && CONFIG_KVM_GUEST */
->  
->  #ifdef CONFIG_INTEL_TDX_HOST
-> +
-> +/* -1 indicates CPUID leaf with no sub-leaves. */
-> +#define TDX_CPUID_NO_SUBLEAF	((u32)-1)
->  struct tdx_cpuid_config {
->  	u32	leaf;
->  	u32	sub_leaf;
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index 2ad9666e02a5..26661879c031 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -538,6 +538,7 @@ struct kvm_pmu_event_filter {
->  /* Trust Domain eXtension sub-ioctl() commands. */
->  enum kvm_tdx_cmd_id {
->  	KVM_TDX_CAPABILITIES = 0,
-> +	KVM_TDX_INIT_VM,
->  
->  	KVM_TDX_CMD_NR_MAX,
->  };
-> @@ -583,4 +584,34 @@ struct kvm_tdx_capabilities {
->  	struct kvm_tdx_cpuid_config cpuid_configs[0];
->  };
->  
-> +struct kvm_tdx_init_vm {
-> +	__u64 attributes;
-> +	__u64 mrconfigid[6];	/* sha384 digest */
-> +	__u64 mrowner[6];	/* sha384 digest */
-> +	__u64 mrownerconfig[6];	/* sha348 digest */
-> +	union {
-> +		/*
-> +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus before
-> +		 * KVM_SET_CPUID2.  CPUID configurations needs to be passed.
-> +		 *
-> +		 * This configuration supersedes KVM_SET_CPUID{,2}.
-> +		 * The user space VMM, e.g. qemu, should make them consistent
-> +		 * with this values.
-> +		 * sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES(256)
-> +		 * = 8KB.
-> +		 */
-> +		struct {
-> +			struct kvm_cpuid2 cpuid;
-> +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
-> +			struct kvm_cpuid_entry2 entries[];
-> +		};
-> +		/*
-> +		 * For future extensibility.
-> +		 * The size(struct kvm_tdx_init_vm) = 16KB.
-> +		 * This should be enough given sizeof(TD_PARAMS) = 1024
-> +		 */
-> +		__u64 reserved[2029];
-> +	};
-> +};
-> +
->  #endif /* _ASM_X86_KVM_H */
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index d77709a6da51..54045e0576e7 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -284,6 +284,205 @@ static int tdx_do_tdh_mng_key_config(void *param)
->  int tdx_vm_init(struct kvm *kvm)
->  {
->  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +
-> +	kvm_tdx->hkid = -1;
-> +
-> +	/*
-> +	 * This function initializes only KVM software construct.  It doesn't
-> +	 * initialize TDX stuff, e.g. TDCS, TDR, TDCX, HKID etc.
-> +	 * It is handled by KVM_TDX_INIT_VM, __tdx_td_init().
-> +	 */
-> +
-> +	return 0;
-> +}
-> +
-> +int tdx_dev_ioctl(void __user *argp)
-> +{
-> +	struct kvm_tdx_capabilities __user *user_caps;
-> +	struct kvm_tdx_capabilities caps;
-> +	struct kvm_tdx_cmd cmd;
-> +
-> +	BUILD_BUG_ON(sizeof(struct kvm_tdx_cpuid_config) !=
-> +		     sizeof(struct tdx_cpuid_config));
-> +
-> +	if (copy_from_user(&cmd, argp, sizeof(cmd)))
-> +		return -EFAULT;
-> +	if (cmd.flags || cmd.error || cmd.unused)
-> +		return -EINVAL;
-> +	/*
-> +	 * Currently only KVM_TDX_CAPABILITIES is defined for system-scoped
-> +	 * mem_enc_ioctl().
-> +	 */
-> +	if (cmd.id != KVM_TDX_CAPABILITIES)
-> +		return -EINVAL;
-> +
-> +	user_caps = (void __user *)cmd.data;
-> +	if (copy_from_user(&caps, user_caps, sizeof(caps)))
-> +		return -EFAULT;
-> +
-> +	if (caps.nr_cpuid_configs < tdx_caps.nr_cpuid_configs)
-> +		return -E2BIG;
-> +
-> +	caps = (struct kvm_tdx_capabilities) {
-> +		.attrs_fixed0 = tdx_caps.attrs_fixed0,
-> +		.attrs_fixed1 = tdx_caps.attrs_fixed1,
-> +		.xfam_fixed0 = tdx_caps.xfam_fixed0,
-> +		.xfam_fixed1 = tdx_caps.xfam_fixed1,
-> +		.nr_cpuid_configs = tdx_caps.nr_cpuid_configs,
-> +		.padding = 0,
-> +	};
-> +
-> +	if (copy_to_user(user_caps, &caps, sizeof(caps)))
-> +		return -EFAULT;
-> +	if (copy_to_user(user_caps->cpuid_configs, &tdx_caps.cpuid_configs,
-> +			 tdx_caps.nr_cpuid_configs *
-> +			 sizeof(struct tdx_cpuid_config)))
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
+The problem manifests only with ISM devices which are a special s390
+virtual PCI device that is implemented in the machine hypervisor. This
+device is used for high speed cross-LPAR (Logical Partition)
+communication, basically it allows two LPARs that previously exchanged
+an authentication token to memcpy between their partitioned memory
+using the virtual device. For copying a receiving LPAR will IOMMU map a
+region of memory for the ISM device that it will allow DMAing into
+(memcpy by the hypervisor). All other regions remain unmapped and thus
+inaccessible. In preparation the device  emulation in the machine
+hypervisor intercepts the IOTLB flush and looks at the IOMMU
+translation tables performing e.g. size and alignment checks I presume,
+one of these checks against the start/end DMA boundaries. This check
+fails which leads to the virtual ISM device being put into an error
+state. Being in an error state it then fails to be initialized by the
+guest driver later on.
 
-tdx_dev_ioctl() is introduced in previous patch with the same code added here,
-which means this is just a place change and it will confuse reviewers. Is it
-neccesary to do so?
+>=20
+> > -	if (!ret) {
+> > -		size_t unmapped =3D iommu_unmap(domain->domain, 0, PAGE_SIZE);
+> > +	list_for_each_entry(region, regions, list) {
+> > +		if (region->end - region->start < PAGE_SIZE * 2)
+> > +			continue;
+> > =20
+> > -		if (unmapped =3D=3D PAGE_SIZE)
+> > -			iommu_unmap(domain->domain, PAGE_SIZE, PAGE_SIZE);
+> > -		else
+> > -			domain->fgsp =3D true;
+> > +		ret =3D iommu_map(domain->domain, region->start, page_to_phys(pages)=
+, PAGE_SIZE * 2,
+> > +				IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE);
+>=20
+> The region also needs to have 'region->start % (PAGE_SIZE*2) =3D=3D 0' fo=
+r the
+> test to work
+>=20
+> Jason
 
-> +
-> +/*
-> + * cpuid entry lookup in TDX cpuid config way.
-> + * The difference is how to specify index(subleaves).
-> + * Specify index to TDX_CPUID_NO_SUBLEAF for CPUID leaf with no-subleaves.
-> + */
-> +static const struct kvm_cpuid_entry2 *tdx_find_cpuid_entry(const struct kvm_cpuid2 *cpuid,
-> +							   u32 function, u32 index)
-> +{
-> +	int i;
-> +
-> +	/* In TDX CPU CONFIG, TDX_CPUID_NO_SUBLEAF means index = 0. */
-> +	if (index == TDX_CPUID_NO_SUBLEAF)
-> +		index = 0;
-> +
-> +	for (i = 0; i < cpuid->nent; i++) {
-> +		const struct kvm_cpuid_entry2 *e = &cpuid->entries[i];
-> +
-> +		if (e->function == function &&
-> +		    (e->index == index ||
-> +		     !(e->flags & KVM_CPUID_FLAG_SIGNIFCANT_INDEX)))
-> +			return e;
-> +	}
-> +	return NULL;
-> +}
-> +
-> +static int setup_tdparams(struct kvm *kvm, struct td_params *td_params,
-> +			struct kvm_tdx_init_vm *init_vm)
-
-Indentation is broken here, please fix it.
-
-> +{
-> +	const struct kvm_cpuid2 *cpuid = &init_vm->cpuid;
-> +	const struct kvm_cpuid_entry2 *entry;
-> +	u64 guest_supported_xcr0;
-> +	u64 guest_supported_xss;
-> +	int max_pa;
-> +	int i;
-> +
-> +	if (kvm->created_vcpus)
-> +		return -EBUSY;
-> +	td_params->max_vcpus = kvm->max_vcpus;
-> +	td_params->attributes = init_vm->attributes;
-> +	if (td_params->attributes & TDX_TD_ATTRIBUTE_PERFMON) {
-> +		/*
-> +		 * TODO: save/restore PMU related registers around TDENTER.
-> +		 * Once it's done, remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support perfmon yet. KVM needs to save/restore "
-> +			"host perf registers properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	for (i = 0; i < tdx_caps.nr_cpuid_configs; i++) {
-> +		const struct tdx_cpuid_config *config = &tdx_caps.cpuid_configs[i];
-> +		const struct kvm_cpuid_entry2 *entry =
-> +			tdx_find_cpuid_entry(cpuid, config->leaf, config->sub_leaf);
-> +		struct tdx_cpuid_value *value = &td_params->cpuid_values[i];
-> +
-> +		if (!entry)
-> +			continue;
-> +
-> +		value->eax = entry->eax & config->eax;
-> +		value->ebx = entry->ebx & config->ebx;
-> +		value->ecx = entry->ecx & config->ecx;
-> +		value->edx = entry->edx & config->edx;
-> +	}
-> +
-> +	max_pa = 36;
-> +	entry = tdx_find_cpuid_entry(cpuid, 0x80000008, 0);
-> +	if (entry)
-> +		max_pa = entry->eax & 0xff;
-> +
-> +	td_params->eptp_controls = VMX_EPTP_MT_WB;
-> +	/*
-> +	 * No CPU supports 4-level && max_pa > 48.
-> +	 * "5-level paging and 5-level EPT" section 4.1 4-level EPT
-> +	 * "4-level EPT is limited to translating 48-bit guest-physical
-> +	 *  addresses."
-> +	 * cpu_has_vmx_ept_5levels() check is just in case.
-> +	 */
-> +	if (cpu_has_vmx_ept_5levels() && max_pa > 48) {
-> +		td_params->eptp_controls |= VMX_EPTP_PWL_5;
-> +		td_params->exec_controls |= TDX_EXEC_CONTROL_MAX_GPAW;
-> +	} else {
-> +		td_params->eptp_controls |= VMX_EPTP_PWL_4;
-> +	}
-> +
-> +	/* Setup td_params.xfam */
-> +	entry = tdx_find_cpuid_entry(cpuid, 0xd, 0);
-> +	if (entry)
-> +		guest_supported_xcr0 = (entry->eax | ((u64)entry->edx << 32));
-> +	else
-> +		guest_supported_xcr0 = 0;
-> +	guest_supported_xcr0 &= kvm_caps.supported_xcr0;
-> +
-> +	entry = tdx_find_cpuid_entry(cpuid, 0xd, 1);
-> +	if (entry)
-> +		guest_supported_xss = (entry->ecx | ((u64)entry->edx << 32));
-> +	else
-> +		guest_supported_xss = 0;
-> +	/* PT can be exposed to TD guest regardless of KVM's XSS support */
-> +	guest_supported_xss &= (kvm_caps.supported_xss | XFEATURE_MASK_PT);
-> +
-> +	td_params->xfam = guest_supported_xcr0 | guest_supported_xss;
-> +	if (td_params->xfam & XFEATURE_MASK_LBR) {
-> +		/*
-> +		 * TODO: once KVM supports LBR(save/restore LBR related
-> +		 * registers around TDENTER), remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support LBR yet. KVM needs to save/restore "
-> +			"IA32_LBR_DEPTH properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	if (td_params->xfam & XFEATURE_MASK_XTILE) {
-> +		/*
-> +		 * TODO: once KVM supports AMX(save/restore AMX related
-> +		 * registers around TDENTER), remove this guard.
-> +		 */
-> +		pr_warn("TD doesn't support AMX yet. KVM needs to save/restore "
-> +			"IA32_XFD, IA32_XFD_ERR properly.\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	td_params->tsc_frequency =
-> +		TDX_TSC_KHZ_TO_25MHZ(kvm->arch.default_tsc_khz);
-> +
-> +#define MEMCPY_SAME_SIZE(dst, src)				\
-> +	do {							\
-> +		BUILD_BUG_ON(sizeof(dst) != sizeof(src));	\
-> +		memcpy((dst), (src), sizeof(dst));		\
-> +	} while (0)
-> +
-> +	MEMCPY_SAME_SIZE(td_params->mrconfigid, init_vm->mrconfigid);
-> +	MEMCPY_SAME_SIZE(td_params->mrowner, init_vm->mrowner);
-> +	MEMCPY_SAME_SIZE(td_params->mrownerconfig, init_vm->mrownerconfig);
-> +
-> +	return 0;
-> +}
-> +
-> +static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params)
-> +{
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct tdx_module_output out;
->  	cpumask_var_t packages;
->  	int ret, i;
->  	u64 err;
-> @@ -390,10 +589,13 @@ int tdx_vm_init(struct kvm *kvm)
->  		tdx_mark_td_page_added(&kvm_tdx->tdcs[i]);
->  	}
->  
-> -	/*
-> -	 * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
-> -	 * ioctl() to define the configure CPUID values for the TD.
-> -	 */
-> +	err = tdh_mng_init(kvm_tdx->tdr.pa, __pa(td_params), &out);
-> +	if (WARN_ON_ONCE(err)) {
-> +		pr_tdx_error(TDH_MNG_INIT, err, &out);
-> +		ret = -EIO;
-> +		goto teardown;
-> +	}
-> +
->  	return 0;
->  
->  	/*
-> @@ -431,50 +633,65 @@ int tdx_vm_init(struct kvm *kvm)
->  	return ret;
->  }
->  
-> -int tdx_dev_ioctl(void __user *argp)
-> +static int tdx_td_init(struct kvm *kvm, struct kvm_tdx_cmd *cmd)
->  {
-> -	struct kvm_tdx_capabilities __user *user_caps;
-> -	struct kvm_tdx_capabilities caps;
-> -	struct kvm_tdx_cmd cmd;
-> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> +	struct kvm_tdx_init_vm *init_vm = NULL;
-> +	struct td_params *td_params = NULL;
-> +	void *entries_end;
-> +	int ret;
->  
-> -	BUILD_BUG_ON(sizeof(struct kvm_tdx_cpuid_config) !=
-> -		     sizeof(struct tdx_cpuid_config));
-> +	BUILD_BUG_ON(sizeof(*init_vm) != 16 * 1024);
-> +	BUILD_BUG_ON((sizeof(*init_vm) - offsetof(typeof(*init_vm), entries)) /
-> +		     sizeof(init_vm->entries[0]) < KVM_MAX_CPUID_ENTRIES);
-> +	BUILD_BUG_ON(sizeof(struct td_params) != 1024);
->  
-> -	if (copy_from_user(&cmd, argp, sizeof(cmd)))
-> -		return -EFAULT;
-> -	if (cmd.flags || cmd.error || cmd.unused)
-> +	if (is_td_initialized(kvm))
->  		return -EINVAL;
-> -	/*
-> -	 * Currently only KVM_TDX_CAPABILITIES is defined for system-scoped
-> -	 * mem_enc_ioctl().
-> -	 */
-> -	if (cmd.id != KVM_TDX_CAPABILITIES)
-> +
-> +	if (cmd->flags)
->  		return -EINVAL;
->  
-> -	user_caps = (void __user *)cmd.data;
-> -	if (copy_from_user(&caps, user_caps, sizeof(caps)))
-> -		return -EFAULT;
-> +	init_vm = kzalloc(sizeof(*init_vm), GFP_KERNEL);
-> +	if (copy_from_user(init_vm, (void __user *)cmd->data, sizeof(*init_vm))) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
->  
-> -	if (caps.nr_cpuid_configs < tdx_caps.nr_cpuid_configs)
-> -		return -E2BIG;
-> +	ret = -EINVAL;
-> +	if (init_vm->cpuid.padding)
-> +		goto out;
-> +	/* init_vm->entries shouldn't overrun. */
-> +	entries_end = init_vm->entries + init_vm->cpuid.nent;
-> +	if (entries_end > (void *)(init_vm + 1))
-> +		goto out;
-> +	/* Unused part must be zero. */
-> +	if (memchr_inv(entries_end, 0, (void *)(init_vm + 1) - entries_end))
-> +		goto out;
->  
-> -	caps = (struct kvm_tdx_capabilities) {
-> -		.attrs_fixed0 = tdx_caps.attrs_fixed0,
-> -		.attrs_fixed1 = tdx_caps.attrs_fixed1,
-> -		.xfam_fixed0 = tdx_caps.xfam_fixed0,
-> -		.xfam_fixed1 = tdx_caps.xfam_fixed1,
-> -		.nr_cpuid_configs = tdx_caps.nr_cpuid_configs,
-> -		.padding = 0,
-> -	};
-> +	td_params = kzalloc(sizeof(struct td_params), GFP_KERNEL);
-> +	if (!td_params) {
-> +		ret = -ENOMEM;
-> +		goto out;
-> +	}
->  
-> -	if (copy_to_user(user_caps, &caps, sizeof(caps)))
-> -		return -EFAULT;
-> -	if (copy_to_user(user_caps->cpuid_configs, &tdx_caps.cpuid_configs,
-> -			 tdx_caps.nr_cpuid_configs *
-> -			 sizeof(struct tdx_cpuid_config)))
-> -		return -EFAULT;
-> +	ret = setup_tdparams(kvm, td_params, init_vm);
-> +	if (ret)
-> +		goto out;
->  
-> -	return 0;
-> +	ret = __tdx_td_init(kvm, td_params);
-> +	if (ret)
-> +		goto out;
-> +
-> +	kvm_tdx->tsc_offset = td_tdcs_exec_read64(kvm_tdx, TD_TDCS_EXEC_TSC_OFFSET);
-> +	kvm_tdx->attributes = td_params->attributes;
-> +	kvm_tdx->xfam = td_params->xfam;
-> +
-> +out:
-> +	/* kfree() accepts NULL. */
-> +	kfree(init_vm);
-> +	kfree(td_params);
-> +	return ret;
->  }
->  
->  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
-> @@ -490,6 +707,9 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
->  	mutex_lock(&kvm->lock);
->  
->  	switch (tdx_cmd.id) {
-> +	case KVM_TDX_INIT_VM:
-> +		r = tdx_td_init(kvm, &tdx_cmd);
-> +		break;
->  	default:
->  		r = -EINVAL;
->  		goto out;
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 938314635b47..ff0ea9cad347 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -18,7 +18,11 @@ struct kvm_tdx {
->  	struct tdx_td_page tdr;
->  	struct tdx_td_page *tdcs;
->  
-> +	u64 attributes;
-> +	u64 xfam;
->  	int hkid;
-> +
-> +	u64 tsc_offset;
->  };
->  
->  struct vcpu_tdx {
-> @@ -48,6 +52,11 @@ static inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
->  	return container_of(vcpu, struct vcpu_tdx, vcpu);
->  }
->  
-> +static inline bool is_td_initialized(struct kvm *kvm)
-> +{
-> +	return to_kvm_tdx(kvm)->hkid > 0;
-> +}
-
-There is a similar function, is_hkid_assigned(), which is previously defined. Do
-you think redefining a new function here will bring code redundency?
-
-> +
->  static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
->  {
->  #define VMCS_ENC_ACCESS_TYPE_MASK	0x1UL
-> @@ -148,6 +157,19 @@ TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
->  TDX_BUILD_TDVPS_ACCESSORS(64, STATE_NON_ARCH, state_non_arch);
->  TDX_BUILD_TDVPS_ACCESSORS(8, MANAGEMENT, management);
->  
-> +static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
-> +{
-> +	struct tdx_module_output out;
-> +	u64 err;
-> +
-> +	err = tdh_mng_rd(kvm_tdx->tdr.pa, TDCS_EXEC(field), &out);
-> +	if (unlikely(err)) {
-> +		pr_err("TDH_MNG_RD[EXEC.0x%x] failed: 0x%llx\n", field, err);
-> +		return 0;
-> +	}
-> +	return out.r8;
-> +}
-> +
->  #else
->  struct kvm_tdx {
->  	struct kvm kvm;
-> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-> index 2ad9666e02a5..531a0033e530 100644
-> --- a/tools/arch/x86/include/uapi/asm/kvm.h
-> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
-> @@ -538,6 +538,7 @@ struct kvm_pmu_event_filter {
->  /* Trust Domain eXtension sub-ioctl() commands. */
->  enum kvm_tdx_cmd_id {
->  	KVM_TDX_CAPABILITIES = 0,
-> +	KVM_TDX_INIT_VM,
->  
->  	KVM_TDX_CMD_NR_MAX,
->  };
-> @@ -583,4 +584,36 @@ struct kvm_tdx_capabilities {
->  	struct kvm_tdx_cpuid_config cpuid_configs[0];
->  };
->  
-> +struct kvm_tdx_init_vm {
-> +	__u64 attributes;
-> +	__u32 max_vcpus;
-> +	__u32 padding;
-> +	__u64 mrconfigid[6];    /* sha384 digest */
-> +	__u64 mrowner[6];       /* sha384 digest */
-> +	__u64 mrownerconfig[6]; /* sha348 digest */
-> +	union {
-> +		/*
-> +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus before
-> +		 * KVM_SET_CPUID2.  CPUID configurations needs to be passed.
-> +		 *
-> +		 * This configuration supersedes KVM_SET_CPUID{,2}.
-> +		 * The user space VMM, e.g. qemu, should make them consistent
-> +		 * with this values.
-> +		 * sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES(256)
-> +		 * = 8KB.
-> +		 */
-> +		struct {
-> +			struct kvm_cpuid2 cpuid;
-> +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
-> +			struct kvm_cpuid_entry2 entries[];
-> +		};
-> +		/*
-> +		 * For future extensibility.
-> +		 * The size(struct kvm_tdx_init_vm) = 16KB.
-> +		 * This should be enough given sizeof(TD_PARAMS) = 1024
-> +		 */
-> +		__u64 reserved[2028];
-> +	};
-> +};
-> +
->  #endif /* _ASM_X86_KVM_H */
+Ah okay makes sense, I guess that check could easily be added.
