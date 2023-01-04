@@ -2,115 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D1CE265DBC5
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 19:00:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE88A65DBC8
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 19:02:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239580AbjADSAM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 13:00:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56098 "EHLO
+        id S235180AbjADSCi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 13:02:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235296AbjADSAA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 13:00:00 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3211EC5;
-        Wed,  4 Jan 2023 10:00:00 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 304GhYJT007825;
-        Wed, 4 Jan 2023 17:59:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=sc47u3Z+RbHwcenEQCYadPXvc7mLDEKgKoTJEM1TTjU=;
- b=qDUq7fiHxOLLYtPOMjv7vKxAVlE33oNhT5NvURmK76pVKHIl0onp2WDpO+lXmh5MHG7D
- Yam4lbHdjiTbWYc6CATTigpFzmVbZpzgXKIoqBdmo4WufrAex0jQtk/FRKxQL2fHl0dn
- jBG4QPFZDeEm6c/9uyfDX9oadD/WpmToOWwkR9We8e/TaTlkOheIGupCczzSx+GveiWg
- IVm8OAxjonozDf6nGizrDC9EezIQJeYD6U2OovOm5jTn2aQ6EhQXPsnp4QUGfn4XmcUb
- 8VL93P44Dq4HNZ+c9W/xAkBiDf6to81vYn4LDvf+dL037V3jUwZB6z6H8YNSjDmDgOhN AQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwd7n1puq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 17:59:59 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 304GhfUP007960;
-        Wed, 4 Jan 2023 17:59:58 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwd7n1pu2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 17:59:58 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30486XiR001864;
-        Wed, 4 Jan 2023 17:59:56 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mtcbfdp0w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 04 Jan 2023 17:59:56 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 304HxrKQ16449980
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 4 Jan 2023 17:59:53 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2225920043;
-        Wed,  4 Jan 2023 17:59:53 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D9CF520040;
-        Wed,  4 Jan 2023 17:59:52 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed,  4 Jan 2023 17:59:52 +0000 (GMT)
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Thomas Huth <thuth@redhat.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: [kvm-unit-tests PATCH v1] s390x: Fix integer literal in skey.c
-Date:   Wed,  4 Jan 2023 18:59:50 +0100
-Message-Id: <20230104175950.731988-1-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S230383AbjADSCg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 13:02:36 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A1637502
+        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 10:02:35 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id d9so19877720pll.9
+        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 10:02:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4OUIsT4Ue9m0VbhsGtpKU6oulTgEcGl2iMz66cGTxVE=;
+        b=QZaCSJUVXl49NzYO9dU8W6BmW3G29oaEgmX7T1p7rH4t4MU2h3Nyr4o8urB0eRP3ST
+         kh5an6BJuJ3sX808ciGc6NZBqrU8JrHj/xSvzrJCsJNW/zoB9e3Ygpb8feBl5Mz9+Wt3
+         SCjTyIUhhB93UMzYLFGVt4fpR6G5/9csVXo1xdETzfEHXxi51RaCeDyxyiL0PLTCwwxs
+         ApDXrE43RJSH7a+c/ibDDNljxowV3HcDUJiRnYJpowgzqzIKBA9Ta4Hu9XS7aOBg0ReI
+         YBCScKWz60WtZqCttbCYsZccq5yk72r8/Fcccvu1ig4YiyeQY3xDl+NGmCQrdgzDkITd
+         p2Uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4OUIsT4Ue9m0VbhsGtpKU6oulTgEcGl2iMz66cGTxVE=;
+        b=0u4WbRk4RT2ZOakQfPE/1o7R93q+jjGB2Y8Do2T3S7m+/V7ZneG3tGL9cionwEWGOt
+         HjaUsfAjx74oA5A6fg41DqL+BsAel565ack/DTt1OnVU7PDg2CaXh8P67CkXqvokXL/K
+         X232omoP5ga6jcLyr/riL6wqcKilIKi9hm5qRLMaCH3XM5eJV9TlBhAoin17ltQdyDju
+         CWwX5W4MElajXyaXg6O531OJXlBjgNoacGMZzHsQW8cCS3Jzi06UNYCY0XcCIeY2cTJr
+         x5NQ3SdXK/lTUpRqLwqZxsCH4wcrTGVydH6spnDXxSImNClIzuxSPgTLUgNZzctDuXi2
+         DZlQ==
+X-Gm-Message-State: AFqh2krsHu4K3l2retEpCRJzPaW7fc1kRkMI1PnBbW5IuTJ8Zkryn7zk
+        eTjmwIuWFR5mazx9Sa7TvJ/W2g==
+X-Google-Smtp-Source: AMrXdXsVzYxPh2J7HnR4Y4xXdAV5Bt7ZJbRGFAoR8vE/WDaMJt2cDP+M+nIp2KZshC7lssd3ISP7Ag==
+X-Received: by 2002:a05:6a20:3b25:b0:b4:1a54:25c6 with SMTP id c37-20020a056a203b2500b000b41a5425c6mr1488576pzh.1.1672855355120;
+        Wed, 04 Jan 2023 10:02:35 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id j22-20020a635516000000b004a3510effa5sm4943943pgb.65.2023.01.04.10.02.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Jan 2023 10:02:34 -0800 (PST)
+Date:   Wed, 4 Jan 2023 18:02:30 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     mlevitsk@redhat.com
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>
+Subject: Re: [PATCH v4 28/32] KVM: SVM: Require logical ID to be power-of-2
+ for AVIC entry
+Message-ID: <Y7W/NinWOnJMtUk8@google.com>
+References: <20221001005915.2041642-1-seanjc@google.com>
+ <20221001005915.2041642-29-seanjc@google.com>
+ <f1f1a33134c739f09f5820b5a4973535f121c0da.camel@redhat.com>
+ <b002fd18c2abdfe5f4395be38858f461b3c76ac3.camel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: y_PO-LvEtO166hlBLKtE5qEleju2D26P
-X-Proofpoint-ORIG-GUID: 40mwZw9aLX5ZnWdy-oNRAYDtZ5xO_m48
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-04_07,2023-01-04_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- lowpriorityscore=0 malwarescore=0 suspectscore=0 priorityscore=1501
- bulkscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0 spamscore=0
- adultscore=0 phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301040146
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b002fd18c2abdfe5f4395be38858f461b3c76ac3.camel@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The code is a 64bit number of which the upper 48 bits must be 0.
+On Thu, Dec 29, 2022, mlevitsk@redhat.com wrote:
+> On Fri, 2022-12-09 at 00:00 +0200, Maxim Levitsky wrote:
+> > On Sat, 2022-10-01 at 00:59 +0000, Sean Christopherson wrote:
+> > > +	} else {
+> > > +		cluster = (ldr >> 4) << 2;
+> > > +		if (cluster >= 0xf)
+> > >  			return NULL;
+> > > -	} else { /* cluster */
+> > > -		int cluster = (dlid & 0xf0) >> 4;
+> > > -		int apic = ffs(dlid & 0x0f) - 1;
+> > > -
+> > > -		if ((apic < 0) || (apic > 7) ||
+> > > -		    (cluster >= 0xf))
+> > > -			return NULL;
+> > > -		index = (cluster << 2) + apic;
+> > > +		ldr &= 0xf;
+> > >  	}
+> > > +	if (!ldr || !is_power_of_2(ldr))
+> > > +		return NULL;
+> > > +
+> > > +	index = __ffs(ldr);
+> > > +	if (WARN_ON_ONCE(index > 7))
+> > > +		return NULL;
+> > > +	index += (cluster << 2);
+> > >  
+> > >  	logical_apic_id_table = (u32 *) page_address(kvm_svm->avic_logical_id_table_page);
+> > >  
+> > 
+> > Looks good.
+> 
+> I hate to say it but this patch has a bug:
+> 
+> We have both 'cluster = (ldr >> 4) << 2' and then 'index += (cluster << 2)'
+> 
+> One of the shifts has to go.
 
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
- s390x/skey.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+The first shift is wrong.  The "cluster >= 0xf" check needs to be done on the actual
+cluster.  The "<< 2", a.k.a. "* 4", is specific to indexing the AVIC table.
 
-diff --git a/s390x/skey.c b/s390x/skey.c
-index 1167e4d3..7c7a8090 100644
---- a/s390x/skey.c
-+++ b/s390x/skey.c
-@@ -320,7 +320,7 @@ static void test_diag_308(void)
- 		"lr	%[response],%%r3\n"
- 		: [response] "=d" (response)
- 		: [ipib] "d" (ipib),
--		  [code] "d" (5)
-+		  [code] "d" (5L)
- 		: "%r2", "%r3"
- 	);
- 	report(response == 0x402, "no exception on fetch, response: invalid IPIB");
-
-base-commit: 73d9d850f1c2c9f0df321967e67acda0d2c305ea
--- 
-2.36.1
-
+Thanks!
