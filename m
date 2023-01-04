@@ -2,118 +2,98 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 271AE65D640
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 15:43:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7296F65D685
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 15:49:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239486AbjADOnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 09:43:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33384 "EHLO
+        id S229449AbjADOtI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 09:49:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239679AbjADOms (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 09:42:48 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCFDA1B9DD
-        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 06:42:45 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id n4so36087206plp.1
-        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 06:42:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XqrtrKRhDtPaDDzxdLxDCGFf7RuTdmXM7ZNOkYasJp0=;
-        b=annFklxy87JJ3NRbnht+zPMvo+BAwdt75U4NiJoQVnyUOKlpPtp/cRuA2vofqUcQCi
-         P0vuJl1DIw3GMfw5OTu1tZiv2Vj3qPg+WnN/Jx7K9J6RdGVZSi9zs+Zlp1gP2aqAhVjL
-         AqzsIO9GT4hQEORUz+CRmEUeKbk0I42JGplO2YoztwiDlYiMb+TO9BJa/n3E5GXZhbuL
-         GhjKblEIvWoseorJLshQnlvMK+QxSrk5smdrSblQmZ7FyzYfHXRZfElfeDV+lX1tb3YX
-         bS2etoCnGfiK5NAvxGZ+DWDbLoy2IBD1CMYXN4G6CS+r9yhOO0i7f3uaOMNTgYA4dxv9
-         aDCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XqrtrKRhDtPaDDzxdLxDCGFf7RuTdmXM7ZNOkYasJp0=;
-        b=NLypy3rrn9x/1pyMGBr55gNKwtWm9aRo2keEBUPauXQEAHAuoHt5bwJZS1Tu6AQzT7
-         E4oJwdSzAbv8hAPj/QUhXfjT0NxHjoBHb1GWlmSklCbsWb9/N/PKdeSJ1VtlY8wf76E7
-         LotNlFD8n002jR1kR32EMMDpZMphcRiMjpMzpLo5V5SXMr6ds8PsA5B6lpmcjmwoYkXB
-         +iCAw58PKbaAMr/OdRmWxiIfsIshMuYNk4DCCrRLfGdRnCkL7QV9R6RD2O6TTRpWSB86
-         1UCvjuPCg83jq4Xf6pVq/n53KrqXxu2sIvG9dJVCH+dCsxVSf2Zg66s1aW/jWHCi/aQf
-         G3Lw==
-X-Gm-Message-State: AFqh2kq2wMT800Gmjr7TpuT8kPSUftREiieHoU/p79KxfUWz3Z67TnAb
-        NiR6Nc+cHpDmd3iW+V82rpHMPfoDdMYqX7G6
-X-Google-Smtp-Source: AMrXdXtZlSUzwJzX/CvX/YPyt/O1AXFajoGSeAYuzp0beESFSo5sq4QF1exhZz+z45WMIHfXVDWBFg==
-X-Received: by 2002:a05:6a20:7f59:b0:ac:af5c:2970 with SMTP id e25-20020a056a207f5900b000acaf5c2970mr3145986pzk.3.1672843364859;
-        Wed, 04 Jan 2023 06:42:44 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z15-20020a63190f000000b0046ffe3fea77sm20377445pgl.76.2023.01.04.06.42.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jan 2023 06:42:44 -0800 (PST)
-Date:   Wed, 4 Jan 2023 14:42:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>
-Subject: Re: [PATCH v2 3/4] KVM: nVMX: Don't muck with allowed sec exec
- controls on CPUID changes
-Message-ID: <Y7WQYLO4Ou8M8ElV@google.com>
-References: <20221213062306.667649-1-seanjc@google.com>
- <20221213062306.667649-4-seanjc@google.com>
- <70872206-7a75-0a19-3df5-a97207e710fa@redhat.com>
- <Y7WNrZ9NaDHOxwuG@google.com>
+        with ESMTP id S232953AbjADOs6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 09:48:58 -0500
+X-Greylist: delayed 87536 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 Jan 2023 06:48:54 PST
+Received: from out-50.mta0.migadu.com (out-50.mta0.migadu.com [91.218.175.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204D2311
+        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 06:48:50 -0800 (PST)
+Date:   Wed, 4 Jan 2023 15:48:44 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1672843728;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=MNwZOyqLj9xn1bPxHWKDATNAwq2xM0+a42rxaXN/zHk=;
+        b=SDkyp9hiu7kn1BByvEk60S0KcSMWKqzbM4LJg5LMUjRbGQrmy6VQLFQ19pQoZFgQQws7w+
+        yOUsiPOM65ohUzepnaf3PgtxsqnPMDKttNTbzCi+ZDGc32/X7ZksOqL3vHr90DSZs1AzvV
+        WvYQdlj9VkPb69Ud4yHpVHaxxfujmK0=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Nico Boehr <nrb@linux.ibm.com>, kvm@vger.kernel.org,
+        frankja@linux.ibm.com, seiden@linux.ibm.com, nsg@linux.ibm.com,
+        thuth@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/1] s390x: fix make standalone
+Message-ID: <20230104144844.ldhurl73imixvrx2@orel>
+References: <20221220175508.57180-1-imbrenda@linux.ibm.com>
+ <167161061144.28055.8565976183630294954@t14-nrb.local>
+ <167161409237.28055.17477704571322735500@t14-nrb.local>
+ <20221226184112.ezyw2imr2ezffutr@orel>
+ <20230104120720.0d3490bd@p-imbrenda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y7WNrZ9NaDHOxwuG@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230104120720.0d3490bd@p-imbrenda>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 04, 2023, Sean Christopherson wrote:
-> On Fri, Dec 23, 2022, Paolo Bonzini wrote:
-> > On 12/13/22 07:23, Sean Christopherson wrote:
-> > > Don't modify the set of allowed secondary execution controls, i.e. the
-> > > virtual MSR_IA32_VMX_PROCBASED_CTLS2, in response to guest CPUID changes.
-> > > To avoid breaking old userspace that never sets the VMX MSRs, i.e. relies
-> > > on KVM to provide a consistent vCPU model, keep the existing behavior if
-> > > userspace has never written MSR_IA32_VMX_PROCBASED_CTLS2.
-> > > 
-> > > KVM should not modify the VMX capabilities presented to L1 based on CPUID
-> > > as doing so may discard explicit settings provided by userspace.  E.g. if
-> > > userspace does KVM_SET_MSRS => KVM_SET_CPUID and disables a feature in
-> > > the VMX MSRs but not CPUID (to prevent exposing the feature to L2), then
-> > > stuffing the VMX MSRs during KVM_SET_CPUID will expose the feature to L2
-> > > against userspace's wishes.
+On Wed, Jan 04, 2023 at 12:07:20PM +0100, Claudio Imbrenda wrote:
+> On Mon, 26 Dec 2022 19:41:12 +0100
+> Andrew Jones <andrew.jones@linux.dev> wrote:
+> 
+> > On Wed, Dec 21, 2022 at 10:14:52AM +0100, Nico Boehr wrote:
+> > > Quoting Nico Boehr (2022-12-21 09:16:51)  
+> > > > Quoting Claudio Imbrenda (2022-12-20 18:55:08)  
+> > > > > A recent patch broke make standalone. The function find_word is not
+> > > > > available when running make standalone, replace it with a simple grep.
+> > > > > 
+> > > > > Reported-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > > > > Fixes: 743cacf7 ("s390x: don't run migration tests under PV")
+> > > > > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>  
+> > > > 
+> > > > I am confused why find_word would not be available in standalone, since run() in runtime.bash uses it quite a few times.
+> > > > 
+> > > > Not that I mind the grep, but I fear more might be broken in standalone?  
 > > 
-> > The commit message doesn't explain *why* KVM_SET_CPUID would be done before
-> > KVM_SET_MSRS.
+> > standalone tests don't currently include scripts/$ARCH/func.bash, which
+> > may be an issue for s390x. That could be fixed, though.
+> > 
+> > > > 
+> > > > Anyways, to get this fixed ASAP:
+> > > > 
+> > > > Acked-by: Nico Boehr <nrb@linux.ibm.com>  
+> > > 
+> > > OK, I get it now, find_word is not available during _build time_.  
+> > 
+> > That could be changed, but it'd need to be moved to somewhere that
+> > mkstandalone.sh wants to source, which could be common.bash, but
+> > then we'd need to include common.bash in the standalone tests. So,
+> > a new file for find_word() would be cleaner, but that sounds like
+> > overkill.
 > 
-> I assume you mean why KVM_SET_MSRS would be done before KVM_SET_CPUID2?
+> the hack I posted here was meant to be "clean enough" and
+> arch-only (since we are the only ones with this issue). To be
+> honest, I don't really care __how__ we fix the problem, only that we do
+> fix it :)
 > 
-> This patch is mostly paranoia, AFAIK there is no userspace that is negatively
-> affected by KVM's manipulations.  The only case I can think of is if userspace
-> wanted to emulate dynamic CPUID updates, e.g. set an MSR filter to intercept writes
-> to MISC_ENABLES to update MONITOR/MWAIT support, but that behavior isn't allowed
-> since commit feb627e8d6f6 ("KVM: x86: Forbid KVM_SET_CPUID{,2} after KVM_RUN").
-> 
-> There are scenarios where userspace might do KVM_SET_MSRS before KVM_SET_CPUID,
-> e.g. QEMU's reuse of a vCPU for CPU hotplug, but in those cases I would expect
-> userspace to follow up with another KVM_SET_MSRS.
+> what do you think would be the cleanest solution?
 
-An argument for taking this patch is that it might be necessary to disallow
-KVM_SET_MSRS after KVM_RUN[*].  If KVM manipulates VMX MSRs during KVM_SET_CPUID2,
-reusing a vCPU with sequence:
+A new file, but, like I said, that may be overkill at this time.
 
-  SET_CPUID2 => SET_MSRS => RUN => unplug => hotplug => SET_CPUID2 => SET_MSRS
-
-sequence will cause the second SET_MSRS to fail due to userspace "changing" the
-MSR value.
-
-[*] https://lore.kernel.org/all/20220805172945.35412-4-seanjc@google.com
+Thanks,
+drew
