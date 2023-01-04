@@ -2,64 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B5EFA65DA97
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 17:46:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3F2A65DB01
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 18:13:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235344AbjADQpf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 11:45:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37594 "EHLO
+        id S231133AbjADRNv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 12:13:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240088AbjADQow (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 11:44:52 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F51343A08
-        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 08:43:33 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id ge16so33014518pjb.5
-        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 08:43:33 -0800 (PST)
+        with ESMTP id S229441AbjADRNu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 12:13:50 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A8CF6165
+        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 09:13:49 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id c6so3289233pls.4
+        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 09:13:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GJGzsVqc0RH5NEpH/nYCC5djq7BOccUoPDmHsHYpZwE=;
-        b=KaxhlHQF5TQjW01S1eDEGwJgxs9WhYjpWHUSjUTVUaOQbJl4mINBsEjD74mKJLmhTj
-         w9q3++UpDsEptTQhal8HNfoo+mbJ7LylI4W/0/1IGL6BY24OEbvjTf8G9oWEHi+dEcvV
-         MYpHOB9nuwUjddOsKrCzIFnC63Us8QTShUlfahJxTQ6PkkIlZJBxGieWyeVJD0ZPnRIp
-         1Lgq/E0k04PxiAWASP7VuhnSVHn/q1yasyk5I3e10p1SoIA4j2SfEhcEyuMZxQLEArce
-         5Y1VICuP80DVjaPNcUXKd6zaEbMPF1LjRWScHfoZbjrabc6YlD6T8uR9BuZ7BIsurxWq
-         tewg==
+        bh=73Eln868VcK/zvFu0uZkd/A2VFpfqwYRSaKsskcT6as=;
+        b=kWbOLR/QUF3GoT2ZCaoFdUPy5T8Ek7121DYfuKdWq8hxW5xI3PRiCUYu/JBWLqsUEl
+         9WN4azlBSFIyl0V3SVz46wVDFdpL6R5DshE2SalTxtkIgzuAucrMyz0KPmxuQs1BI09o
+         y4ccdJEsWY3wCduQz2mnziNW8bC0mTZsSCJn0AC0Xxxptwc0STiDcZqaeLKpoquQkOfG
+         YSNHh7Gw80KjLlGyWNtXF50HcTd7GcgON6BsVJsfAeU3Tz+kSi6wzS3bvO73mNoNx6P4
+         LXVH0A10H3ykSNszsl2xFuc/AMruXbOJ50dZLGk7+WghcTIlacuAbN1x2YC6cO9LXBNr
+         fTxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GJGzsVqc0RH5NEpH/nYCC5djq7BOccUoPDmHsHYpZwE=;
-        b=0gMjV+oeLpGY4OLZZthaxkmQc3sjkZ+KqYUGvrvxb5MsInTC2rgeAfturWvebhCsfP
-         R9CgRJ4/zFPbvoBWkA0hI3l1fPm9391Rmhdx57x3CqDGaERV4mscGrQeD18mTEOivw5y
-         8ZqrGTYK/E7E0kmP5teLwWA8kk3E1dMskIIBfI9XfS8GJkNHk2TVB7grkA1TaKCyRH8j
-         k1++tgkOC6qlOfjDEXbvzpbqXCLEzve6GNgSpu9PI4DiMocCpSvAr+T1/0W4+r1aXb9r
-         FgMMEdUQmmaZakomqoci/l1VUNczrhnNj18A6owWlLyF2uVKy20HAnYBnC8HwdRMJ2hi
-         0vjQ==
-X-Gm-Message-State: AFqh2kp5/7uXUJ0c8tIuGETfLLdGDw3tZmi+Xhto4uuRtycAPu1ZmTuH
-        AnhzZLAOprJ/GAUzNSUCfWO8dA==
-X-Google-Smtp-Source: AMrXdXtYFmPSuHX/OSbe7mC5KMIZ4r5Pn8smw+kSOhqck7iyztzXqRZq4dsqIFnLMBWidoGOAWCz2Q==
-X-Received: by 2002:a17:902:d4d1:b0:189:3a04:4466 with SMTP id o17-20020a170902d4d100b001893a044466mr4718738plg.2.1672850603260;
-        Wed, 04 Jan 2023 08:43:23 -0800 (PST)
+        bh=73Eln868VcK/zvFu0uZkd/A2VFpfqwYRSaKsskcT6as=;
+        b=6hRqhxkTjPk/v9FAO6OaZvoFgDX8M7ahw8P3G4RRp/SPrih1/+ygfomgLDATJw+wLL
+         oh7B7LDql9UI7IQg4/NRF9aVTgwt0vS43scts3sRbuh0Xb55abINyBr5lPVjr667flIz
+         +VfK6gG2FFVG6BL2lvvIJ+tEtfgK5ImK5yv0jCNQpmH9iybvOBH2pUS0rJwkCFIbx7YM
+         QZaWFsF6wE0K4gxZrcM/hgZ9ld3r2ETAzhuInFOs2tKtltDmsrkLQE9GV1SE5Qd/PvLG
+         cEFcYmoGARtgdJY5aoVoVDVAsBFwoEH3ZKyzKhpG5/UIyNli3DwNoCptyOJ++GRiViC9
+         vyIQ==
+X-Gm-Message-State: AFqh2kqx9+kAspwULeSSD1dTZfrwygxl6it9CZ5qEm9cT+crMuw1mfAh
+        h9YoP5Ffmg9HchbdMfcL21TqGQ==
+X-Google-Smtp-Source: AMrXdXt/NiETw/De0+ssB/fkL7CTlPMSvM9WOAHGWsrDnTIPNlq3wEevEI7gVvJT6lKW7mL4ljb3zA==
+X-Received: by 2002:a17:902:b615:b0:191:4367:7fde with SMTP id b21-20020a170902b61500b0019143677fdemr4511520pls.0.1672852428566;
+        Wed, 04 Jan 2023 09:13:48 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id jb3-20020a170903258300b0018bde2250fcsm24490402plb.203.2023.01.04.08.43.22
+        by smtp.gmail.com with ESMTPSA id ne2-20020a17090b374200b001ef8ab65052sm20869294pjb.11.2023.01.04.09.13.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jan 2023 08:43:22 -0800 (PST)
-Date:   Wed, 4 Jan 2023 16:43:19 +0000
+        Wed, 04 Jan 2023 09:13:47 -0800 (PST)
+Date:   Wed, 4 Jan 2023 17:13:43 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Aaron Lewis <aaronlewis@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v2 5/6] KVM: selftests: Add XFEATURE masks to common code
-Message-ID: <Y7WspxRhEVwyWf5Y@google.com>
+Subject: Re: [PATCH v2 6/6] KVM: selftests: Add XCR0 Test
+Message-ID: <Y7Wzx5qW1zMQJq88@google.com>
 References: <20221230162442.3781098-1-aaronlewis@google.com>
- <20221230162442.3781098-6-aaronlewis@google.com>
+ <20221230162442.3781098-7-aaronlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221230162442.3781098-6-aaronlewis@google.com>
+In-Reply-To: <20221230162442.3781098-7-aaronlewis@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,61 +72,115 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Dec 30, 2022, Aaron Lewis wrote:
-> Add XFEATURE masks to processor.h to make them more broadly available
-> in KVM selftests.
-> 
-> They were taken from fpu/types.h, which included a difference in
+> +static uint64_t get_supported_user_xfeatures(void)
 
-Nit, state the rename as a command, e.g.
+I would rather put this in processor.h too, with a "this_cpu" prefix.  Maybe
+this_cpu_supported_xcr0() or this_cpu_supported_user_xfeatures()?
 
-  Use the names from the kernel's fpu/types.h for consistency, i.e. rename
-  XTILECFG and XTILEDATA to XTILE_CFG and XTILE_DATA respectively.
-
-> spacing between the ones in amx_test from XTILECFG and XTILEDATA, to
-> XTILE_CFG and XTILE_DATA.  This has been reflected in amx_test.
-> 
-> Signed-off-by: Aaron Lewis <aaronlewis@google.com>
-> ---
->  .../selftests/kvm/include/x86_64/processor.h  | 16 ++++++++++++++
->  tools/testing/selftests/kvm/x86_64/amx_test.c | 22 +++++++------------
->  2 files changed, 24 insertions(+), 14 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index 5f06d6f27edf7..c1132ac277227 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -45,6 +45,22 @@
->  #define X86_CR4_SMAP		(1ul << 21)
->  #define X86_CR4_PKE		(1ul << 22)
->  
-
-Add 
-
- #define XFEATURE_MASK_FP		BIT_ULL(0)
-
-so that you don't have to open code the literal in the next patch.
-
-> +#define XFEATURE_MASK_SSE		BIT_ULL(1)
-> +#define XFEATURE_MASK_YMM		BIT_ULL(2)
-> +#define XFEATURE_MASK_BNDREGS		BIT_ULL(3)
-> +#define XFEATURE_MASK_BNDCSR		BIT_ULL(4)
-> +#define XFEATURE_MASK_OPMASK		BIT_ULL(5)
-> +#define XFEATURE_MASK_ZMM_Hi256		BIT_ULL(6)
-> +#define XFEATURE_MASK_Hi16_ZMM		BIT_ULL(7)
-> +#define XFEATURE_MASK_XTILE_CFG		BIT_ULL(17)
-> +#define XFEATURE_MASK_XTILE_DATA	BIT_ULL(18)
+> +{
+> +	uint32_t a, b, c, d;
 > +
-> +#define XFEATURE_MASK_AVX512		(XFEATURE_MASK_OPMASK \
-> +					 | XFEATURE_MASK_ZMM_Hi256 \
-> +					 | XFEATURE_MASK_Hi16_ZMM)
+> +	cpuid(0xd, &a, &b, &c, &d);
+> +
+> +	return a | ((uint64_t)d << 32);
+> +}
+> +
+> +static void guest_code(void)
+> +{
+> +	uint64_t xcr0_rest;
 
-'|' on the previous line please, i.e.
+s/rest/reset ?
 
-#define XFEATURE_MASK_AVX512		(XFEATURE_MASK_OPMASK | \
-					 XFEATURE_MASK_ZMM_Hi256 | \
-					 XFEATURE_MASK_Hi16_ZMM)
+> +	uint64_t supported_xcr0;
+> +	uint64_t xfeature_mask;
+> +	uint64_t supported_state;
+> +
+> +	set_cr4(get_cr4() | X86_CR4_OSXSAVE);
+> +
+> +	xcr0_rest = xgetbv(0);
+> +	supported_xcr0 = get_supported_user_xfeatures();
+> +
+> +	GUEST_ASSERT(xcr0_rest == 1ul);
 
-> +#define XFEATURE_MASK_XTILE		(XFEATURE_MASK_XTILE_DATA \
-> +					 | XFEATURE_MASK_XTILE_CFG)
+XFEATURE_MASK_FP instead of 1ul.
 
-Same comment here.
+> +
+> +	/* Check AVX */
+> +	xfeature_mask = XFEATURE_MASK_SSE | XFEATURE_MASK_YMM;
+> +	supported_state = supported_xcr0 & xfeature_mask;
+> +	GUEST_ASSERT(supported_state != XFEATURE_MASK_YMM);
+
+Oof, this took me far too long to read correctly.  What about?
+
+	/* AVX can be supported if and only if SSE is supported. */
+	GUEST_ASSERT((supported_xcr0 & XFEATURE_MASK_SSE) ||
+		     !(supported_xcr0 & XFEATURE_MASK_YMM));
+
+Hmm or maybe add helpers?  Printing the info on failure would also make it easier
+to debug.  E.g.
+
+static void check_all_or_none_xfeature(uint64_t supported_xcr0, uint64_t mask)
+{
+	supported_xcr0 &= mask;
+
+	GUEST_ASSERT_2(!supported_xcr0 || supported_xcr0 == mask,
+		       supported_xcr0, mask);
+}
+
+static void check_xfeature_dependencies(uint64_t supported_xcr0, uint64_t mask,
+					uint64_t dependencies)
+{
+	supported_xcr0 &= (mask | dependencies);
+
+	GUEST_ASSERT_3(!(supported_xcr0 & mask) ||
+		       supported_xcr0 == (mask | dependencies),
+		       supported_xcr0, mask, dependencies);
+}
+
+would yield
+
+	check_xfeature_dependencies(supported_xcr0, XFEATURE_MASK_YMM,
+				    XFEATURE_MASK_SSE);
+
+and then for AVX512:
+
+	check_xfeature_dependencies(supported_xcr0, XFEATURE_MASK_AVX512,
+				    XFEATURE_MASK_SSE | XFEATURE_MASK_YMM);
+	check_all_or_none_xfeature(supported_xcr0, XFEATURE_MASK_AVX512);
+
+That would more or less eliminate the need for comments, and IMO makes it more
+obvious what is being checked.
+
+> +	xsetbv(0, supported_xcr0);
+> +
+> +	GUEST_DONE();
+> +}
+> +
+> +static void guest_gp_handler(struct ex_regs *regs)
+> +{
+> +	GUEST_ASSERT(!"Failed to set the supported xfeature bits in XCR0.");
+
+I'd rather add an xsetbv_safe() variant than install a #GP handler.  That would
+also make it super easy to add negative testing.  E.g. (completely untested)
+
+static inline uint8_t xsetbv_safe(uint32_t index, uint64_t value)
+{
+	u32 eax = value;
+	u32 edx = value >> 32;
+
+	return kvm_asm_safe("xsetbv", "a" (eax), "d" (edx), "c" (index));
+}
+
+and
+	vector = xsetbv_safe(0, supported_xcr0);
+	GUEST_ASSERT_2(!vector, supported_xcr0, vector);
+
+and rudimentary negative testing
+
+	for (i = 0; i < 64; i++) {
+		if (supported_xcr0 & BIT_ULL(i))
+			continue;
+
+		vector = xsetbv_safe(0, supported_xcr0 | BIT_ULL(i));
+		GUEST_ASSERT_2(vector == GP_VECTOR, supported_xcr0, vector);
+	}
