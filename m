@@ -2,135 +2,114 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E5BE765DDD2
-	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 21:47:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E0AF665DDF5
+	for <lists+kvm@lfdr.de>; Wed,  4 Jan 2023 22:02:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240105AbjADUrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 15:47:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47282 "EHLO
+        id S235639AbjADVCS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 16:02:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229464AbjADUrl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 15:47:41 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2072.outbound.protection.outlook.com [40.107.94.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB1613EB1
-        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 12:47:39 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iD/hqnFi4L92Zt+uoqo1MWmMeXczhYGZGYv1jsr46ZJfY2DfCwaktUrsZMN8RpRdHEG6GFLMrwjWzLRy7XyejCcBCxV87md/QUHi0KM6KwZrBL4hCQoOZAnUMO+dUgyMBTbLS24twNR0ZaVi8YgSAM0ZEqc80pYzNldvsXgBSz8RiBdk90xYzISq39ZaHrVot9QUm5wFgNe26vaMWwAqezM9eYnkStJjNicYltIx2Y3kik/C4Mqa/GZhajBj2UgmLMI+EyxmCEKsKlRey9IGExj9uLrByRqXloYkRw+KDuYmN/bNk7rLD8WSDF3L8XYtFjFmebcMiDhYCvKfyWJw/g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3D9khfa7cjDxzJxSfulaWmKKoD0taoiYwwnvbLuo2J8=;
- b=cDqPythVozig0ZYrQ0JAXK2rZ1zoFFFkwjJbRhh33qfy9QtHbMmHMH10TLw+2LEGNxdDSVFwu7utqxAMSZyQ+3LVwmANtQqtpL3v976cxQtRYs3rR9PVQPCK9EcqH6X9JENEFeZ+3DuW7/hiRvbhFJ5fqFIqj9Hxz9I/04HfrCUwnVDQozhUwPHsOPH+OFgT1aWBPgGNwQO0iMPO/WrR8AURzbuR+Uv2Sx+mntz3rtE5fckvODTkDQBU3/5Q8BpcA1ow1FlkHNeAxDjlI+SW1qGfOApOeFAYkMnYZgT9UL4S5naZ7WwPi+7GIFDk81YWB0okRW1yxTXM85ng951Hag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3D9khfa7cjDxzJxSfulaWmKKoD0taoiYwwnvbLuo2J8=;
- b=IxClvEsL4aAtKv0MLjXdxKARwgzNJ4IiV/BB77wNUWu9bg8uPsD8Zk1Wa0oxZhj3M8n9EXlyFpuH9FAgiqXDRpJATXMevEnZTN1YaKcppAJB4tzu7XwOJzCqzTfxdQ2+9gbElkteS2t/M7IoAVPN5yLPuPkulJX93Mx3VYGh8P8B1Vy/jxNlNY7yLJfc3vA3W4sCxQxxfV+X135VjCdKTOnUteZq1yVWPfVG+JM1mDwOroSU6/Q9cniBQqVlR+vjnZJ67i7TVVNb8YWOMre7NzoVWG3TAUChA0Ix2SZLMYYfCje97K0000cdr7LKaC0LXvzZUB/xrywtO686Jv/gtg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by BN9PR12MB5308.namprd12.prod.outlook.com (2603:10b6:408:105::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Wed, 4 Jan
- 2023 20:47:37 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5944.019; Wed, 4 Jan 2023
- 20:47:37 +0000
-Date:   Wed, 4 Jan 2023 16:47:36 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     alex.williamson@redhat.com, kevin.tian@intel.com,
-        cohuck@redhat.com, eric.auger@redhat.com, nicolinc@nvidia.com,
-        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
-        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
-        peterx@redhat.com, jasowang@redhat.com
-Subject: Re: [RFC 07/12] vfio: Block device access via device fd until device
- is opened
-Message-ID: <Y7Xl6AxA9w7IgsZ5@nvidia.com>
-References: <20221219084718.9342-1-yi.l.liu@intel.com>
- <20221219084718.9342-8-yi.l.liu@intel.com>
+        with ESMTP id S240191AbjADVCM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 16:02:12 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D571018E25
+        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 13:02:09 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id cl14so1000328pjb.2
+        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 13:02:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vISU1FPw/aHrMjNc1nhfkvc/GB6EDt7VqnAMVm3EwR8=;
+        b=Yys+zW+APt41+V6DFzV6RlAoKO3RDaZS4urhgcG21g5jEoQkGshVFRpCiNVeWEOSCY
+         4mR3YaDMEeHw+vLm9cARMoldChkzG+Zx6QeTVgg77MvcNBo++cuvTDuKSzHY+IWE9Ix9
+         c0I6gZp3ZtVTPr5qwk3wLhAaGZMjuIN/t5XfSIRTbLLHUm09Tg6bHNJnwElPUSoz6c0b
+         8hS5A9oJduawQvt0dENYSjIkH+PeCcGsZscu/YpOjd50t53fE4ixC+WJEl8BBpYriSMk
+         ZscCHfIKLPLSf7UB9m7dwaa5gEcezi50l7K6ff4w7JnsYT7+YTRZ+6F8MdB0Gmt/6nv3
+         Zskg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vISU1FPw/aHrMjNc1nhfkvc/GB6EDt7VqnAMVm3EwR8=;
+        b=AXeKuLCEBAoEI6Uah1KDwclpluLc0Z6jtSzmCHf1VclHaT+TxRm5OpCVxWFo5iCjWE
+         gAJLnK4VAx+5EyDIdiT/nzaUcR2kU5/xU86h5BOLgqkzB8gRdY6/xK2jyfdpPoOIob5p
+         nXojtsgdzFcUPXjJt1Rk5XtABMVZrhjT5LV6TkCCGxLNlaUyvUzuLu5bm4solaZiH4lo
+         FA44H+ckB57STM6owRmZycTztAZDNdSVGooIwMly7lR0Cfg7ImEnEsRekmw1DrldXHjh
+         31A6NbdAeMkupRoZT0yBpQ7/YNzJqiN3ahN7EB1557cOLagq0NF/YwiAZl9wP5TBs3mK
+         qDRg==
+X-Gm-Message-State: AFqh2koXZavf/mTNj7Xm1zKXH6YPccObXWJ6modhRdyHAMQdya1cv86o
+        /djrje0fQ9IoZwEF2Jam8E7xZQ==
+X-Google-Smtp-Source: AMrXdXs/blzzQEv+PAikgMz8k3fGTAtkg7tfb5Q55cnqvuB69irdaYC8fBDzwVlI5B3qGBKi1YCwow==
+X-Received: by 2002:a17:902:a608:b0:189:b910:c6d2 with SMTP id u8-20020a170902a60800b00189b910c6d2mr4410257plq.1.1672866129202;
+        Wed, 04 Jan 2023 13:02:09 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id c18-20020a170903235200b0017ec1b1bf9fsm5903503plh.217.2023.01.04.13.02.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Jan 2023 13:02:08 -0800 (PST)
+Date:   Wed, 4 Jan 2023 21:02:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 1/3] x86/cpu: Process all CPUID dependencies after
+ identifying CPU info
+Message-ID: <Y7XpTAFV6BLT8KgB@google.com>
+References: <20221203003745.1475584-1-seanjc@google.com>
+ <20221203003745.1475584-2-seanjc@google.com>
+ <Y5INU3o+SFReGkLz@zn.tnic>
+ <Y5IQNY/fZw2JFA0B@google.com>
+ <Y5IUsB83PzHCJ+EY@zn.tnic>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221219084718.9342-8-yi.l.liu@intel.com>
-X-ClientProxiedBy: MN2PR16CA0016.namprd16.prod.outlook.com
- (2603:10b6:208:134::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|BN9PR12MB5308:EE_
-X-MS-Office365-Filtering-Correlation-Id: 191f4d97-c6af-4b67-e51c-08daee94ea0b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bhJz3AIIvGgYshNs8aYz8kDB6tUtpIJ4oH/dGB9oMErZzYNoFtSq+U4AgB9zuUIcJFfmC724U1fzxXV81iD9WKNpzrdJA+0ZT63Oac0IvV6p0jIAtNAzCxpNuH0dsO59QAS8MYe4IvBB9I39SAgT+LpQpNMTCn38iUdj1jbdb88niEZNwmxr7dyJFASGjNUBBZZmY6cBfA2Jj3VDRj+WM688i47XHJkVefs888iOzzNa0I2UO7NEJqaFRUN126JUMRbtsF2r+5Jw67ambezfnvrXJu6xTCJix7PHAYaeDSaIJ2vDFtnRazoejrUdrNyINCuV9bcRs+FteJcgjqk+Q7RsNzfQdvrQmGnPBPEr6HpMdVwOLcrFlFlrx3arwN7I9uEHpPkVc0qa95rNXXfUKG7nQzek875yuW6gE6wfG3mCgPc0clWjmkfTBnbl4VobqoVZKoNyuAGjG8crlr45p/3AAE8EsI7eBE+au4BN1CbST5xnoVJBEgmVj6w8FPWgEhpkF6glV/g4pNti0fLiCH/UDWJCZ5OVEesQMtMCTs/YIAJiCMSqi1QmM0SvGAfJEaf/Y2gMn5o7zLn/cmGwTeKgl/GQoP65FwMHNrCDpTWgs6zvzP6wC6o7dDtXEj0nQHHJYf8VlNgVOMvYqY9fog==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(346002)(39860400002)(366004)(376002)(451199015)(7416002)(26005)(186003)(6512007)(83380400001)(8936002)(6486002)(478600001)(6506007)(6916009)(316002)(66476007)(2616005)(66946007)(66556008)(8676002)(4326008)(41300700001)(36756003)(4744005)(5660300002)(2906002)(38100700002)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?TgZZzdT1U8xaHOJ+HPwmm58cWqQpBARWq8nvrZ0OEquF3waiFFb4yWm3blpi?=
- =?us-ascii?Q?9HFkGPLLSI92VeY2FLH9LuITzlgjDpNnmXuziBmQvYpATmcMDPsLpP3yK23M?=
- =?us-ascii?Q?C/O1dcyh7mKVtonmW7pT6naddAllV83yH+9OHVKQlbcG2vnVTlNw5i30ORk4?=
- =?us-ascii?Q?o3eViR6oytK9hil4ApPWlpcXMvA0n5txvuGXTaMECDtO1hT5SYqnw3j8kuKc?=
- =?us-ascii?Q?8PDowqjBxUO1Q8a5g2tjuNIAWjyJE07MyP60YEgs0tVps3qVgtQPPHOWHLdL?=
- =?us-ascii?Q?Fm0D/qhGv9gl4FV18PkI076bUuS40jr6/s1e8DPFpwlCdJPEN8OPijDl21iU?=
- =?us-ascii?Q?/wpuKR1s5GqJhl3T+JMnZa3yHmAnqO1LH/sgTdcznpatC+PtoknPYi+Ynpy/?=
- =?us-ascii?Q?AvKUOtUJ5mOtjK9SJvzgruF1iFkf0Xo7NG0RsjPmm/hkvfBEGdwJRkm8bflW?=
- =?us-ascii?Q?Um4tlciPT/jyL8WWEM+rSdfaQaSTq3Wl7O6iYWYgnSVfXVqzGykcGnPxg4Oc?=
- =?us-ascii?Q?V0xZkWbQQnSYXg1fgZ67gIHbj0xuMBgyxm9ZqvjgIycpaTmObuatQcCbf/5n?=
- =?us-ascii?Q?S5B4oYvZgkjMmKqCu/u6Fz3hjezplrvN5fdn8z03b8mdJbeA6PNxlmsOWDNf?=
- =?us-ascii?Q?iYyEqf0FcQXCWnq2FwIKxsBaYUdx9bJDw9gcVVRkxh15vkawJDpyta6bfFEe?=
- =?us-ascii?Q?mgH0cjMs2vYZLgrnj1Lsz9iD8qFJLasf8qON873/fY891ZtP4laOEV0h4t2g?=
- =?us-ascii?Q?PBldjSZuoQmGscQVLHjJzT4lKLZEok+6++do3b4mWuBWLtIhrWxyUt2TRg5g?=
- =?us-ascii?Q?ro/ZNjhXGOCnomv8qg+CDBrrwquoAPJ54X4eFeZido+Do0lL05RwquuOXYYk?=
- =?us-ascii?Q?nfR9wl66DysRxPDsZ78/he6LsxfycS8XEtCnQa04apuUTaLNFHKOIKURccoJ?=
- =?us-ascii?Q?15ZVusf9fKRIC4ANnMQEuhWtK826OIEuPCEsupth14Pm5IyXRWne2BExdjBu?=
- =?us-ascii?Q?us2uTed95qEFYYkfBAr+Uf+Zystvg43mBVmx7Z5HGgvWHRNnSZCmby48SAfy?=
- =?us-ascii?Q?d4WYzfgUM4f4QcIjaKbD/zOJKq9viwN+otVjacDA0+qNL2Xp4mAANWMxWW7k?=
- =?us-ascii?Q?sqxZsP3jAiKbP9NI1ifKINnRjwXiTgXJrDaaxK4FVMX6C7dqhM00zvz9CjGP?=
- =?us-ascii?Q?gzK7Afl1c6kDgTIsxbAGO4s1yKB11tUtEDy+3ofOdoQgxQHS29Y7Irm0IhAW?=
- =?us-ascii?Q?dS+oJyl5pZYUkIuLinvNBs29xjul7I13KYpBHThXITj+9lRJN7yndtmbHAtH?=
- =?us-ascii?Q?N1EOaDpVmbtQE73Pqn2Ykhro1cqMCMIFvknrIcJmgCeGq0lEZIH7ICFySFwa?=
- =?us-ascii?Q?Ah6T7XuYXpXcXs3o7GbFQBBTZKVYbobXmpGpdbcvJDpwhN+oaC2wfrHtla5E?=
- =?us-ascii?Q?tUkmJ/rd+VbD9jc4fmKWKMSyJDYV4cJMbIYAzN7ZZIF9q3eVAqai/6HPDe8i?=
- =?us-ascii?Q?FFGwAEQE76SG4+xncG3iEQECWQ9ekeyN91lP28ZO1S3E5QAItt6JFAAmeBo+?=
- =?us-ascii?Q?/t+6aO6s7uNvdSfGZUC5BIo7aq5OGDmMXfxzwSAa?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 191f4d97-c6af-4b67-e51c-08daee94ea0b
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jan 2023 20:47:37.7127
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qbp8kB/eHeTmNcLsuRBEoGCMdBVbCvkGIwHTtNXJibfocnmi39srH2j41MI7MsC8
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR12MB5308
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <Y5IUsB83PzHCJ+EY@zn.tnic>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 19, 2022 at 12:47:13AM -0800, Yi Liu wrote:
+On Thu, Dec 08, 2022, Borislav Petkov wrote:
+> On Thu, Dec 08, 2022 at 04:26:29PM +0000, Sean Christopherson wrote:
+> > But it's not really a hardware issue either.  More like an admin/user issue.
+> > 
+> > The problem is that if a kernel is built for subset of CPU types, e.g. just Intel
+> > or just Centaur, and then booted on an "unsupported" CPU type, init_ia32_feat_ctl()
+> > will never be invoked because ->c_init() will point a default_init(), and so the
+> > kernel never checks MSR_IA32_FEAT_CTL to see if VMX and/or SGX are fully enabled.
+> 
+> Yeah, you called it an "edge case". I'm wondering whether we should even
+> worry about that case...
+> 
+> I mean, the majority of Linuxes out there are allmodconfig-like kernels
+> and booting on unsupported CPU type doesn't happen.
+> 
+> Hell, I'd even say that if you attempt booting on unsupported CPU type,
+> we should simply fail that boot attempt.
+> 
+> I.e., what validate_cpu() does in some cases.
+> 
+> IOW, I don't mind what you're doing but I wonder whether we should even
+> go the trouble to do so or simply deny that by saying "Well, don't do
+> that then".
 
-> @@ -452,6 +457,11 @@ void vfio_device_close(struct vfio_device_file *df)
->  	struct vfio_device *device = df->device;
->  
->  	mutex_lock(&device->dev_set->lock);
-> +	/*
-> +	 * Paired with smp_load_acquire() in vfio_device_fops::ioctl/
-> +	 * read/write/mmap
-> +	 */
-> +	smp_store_release(&df->access_granted, false);
+I agree with the "don't do that" sentiment, but IMO refusing to boot is too much.
+Unlike the validate_cpu() cases, the kernel can likely boot and run just fine,
+albeit with limited feature enabling.
 
-Storing false makes no sense, it can't do anything, this function
-should only be called if we are in a release function so we know that
-there can't be concurrent access to access_granted.
-
-Jason
+And there's a non-zero chance we'd end up with a kernel param to allow booting
+unknown CPUs, e.g. for people doing weird things with VMs or running old, esoteric
+hardware.  At that point we'd end up with a more complex implementation than
+processing dependencies on synthetic flags, especially if there's ever a more
+legitimate need to process such dependencies.
