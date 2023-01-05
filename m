@@ -2,127 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F338D65EFA1
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 16:05:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02AF465F019
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 16:30:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233417AbjAEPFB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 10:05:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32834 "EHLO
+        id S233371AbjAEPaZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 10:30:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbjAEPE7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 10:04:59 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 045171B1DA;
-        Thu,  5 Jan 2023 07:04:57 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        with ESMTP id S230261AbjAEPaX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 10:30:23 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B7963D9CC;
+        Thu,  5 Jan 2023 07:30:22 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 358AE1EC06C1;
-        Thu,  5 Jan 2023 16:04:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1672931096;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=GMhRtk9cEauGSmA4lPJVHebUyYxqUZuIY1TvE+SPTcQ=;
-        b=o+f2lFmxFzDQwrfUVndeh9pSFO8/LILqo+ZjpnBMTpmkZ2j3xQE7du8BJEeP4NOvinPKDJ
-        CZ2SUiY4EhKFCAxxNXGnIO9ZwiomP4VihxslRhAomrMtQRbs/vKjrA4VaMa7aldn2n3R8J
-        wqYVXKk5PfqMtT/WLzrqxpxBNT1yYo0=
-Date:   Thu, 5 Jan 2023 16:04:51 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com,
-        Nikunj A Dadhania <nikunj@amd.com>,
-        chao.p.peng@linux.intel.com
-Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
- to KVM
-Message-ID: <Y7bnE5bTUb6fQiX/@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-4-michael.roth@amd.com>
- <Y6Xd0ruz3kMij/5F@zn.tnic>
- <20230105021419.rs23nfq44rv64tsd@amd.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 056D361AF9;
+        Thu,  5 Jan 2023 15:30:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68475C433EF;
+        Thu,  5 Jan 2023 15:30:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1672932621;
+        bh=N5kVPjkKTgjrzzrxUIoZaOuMPZJESbY+VzfMe0AvOXQ=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=nZRYoHZ8HPJTLfePbI6xcdnaeBciRnfl77NvG5KQ2gA8uXPbUcudFePLYOmFupLUm
+         3tJoumVOSP5LimB2DL/+AcFvgsLALMOn7plZ8CyPBVO8bhl198Ud9r3hkkSZFPfeUp
+         7B767D9fLuMD1MtFS17fOehUobBzPGSqk3nO06oXb3DNisYvAyWTd94WX8aFeyl7o0
+         SQG+CK0pJbwGV1Y+lprC5qKT7Vc41YT3Yoa4uGbmn9jq/+0sv60+xVg3t7ebC/CcJs
+         Wd0xsVulNsfh8Y0yfk+eqJL0BuS5tM54xpqs9JtjgtQWokWL9dgXczT4QxwMfLgqoQ
+         1urhDfFMiRbXw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+        id 121225C029A; Thu,  5 Jan 2023 07:30:21 -0800 (PST)
+Date:   Thu, 5 Jan 2023 07:30:21 -0800
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Heiko Carstens <hca@linux.ibm.com>
+Cc:     rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@meta.com, rostedt@goodmis.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH rcu 06/27] arch/s390/kvm: Remove "select SRCU"
+Message-ID: <20230105153021.GR4028633@paulmck-ThinkPad-P17-Gen-1>
+Reply-To: paulmck@kernel.org
+References: <20230105003759.GA1769545@paulmck-ThinkPad-P17-Gen-1>
+ <20230105003813.1770367-6-paulmck@kernel.org>
+ <Y7aFAqmgF4eu6SNH@osiris>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230105021419.rs23nfq44rv64tsd@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y7aFAqmgF4eu6SNH@osiris>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
-> Maybe that's not actually enforced, by it seems awkward to try to use a
-> bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
-
-I don't see there being a problem/restriction for bool functions, see
-
-5be2226f417d ("KVM: x86: allow defining return-0 static calls")
-
-and __static_call_return0() returns a long which, if you wanna interpret as
-bool, works too as "false".
-
-I still need to disassemble and single-step through a static_call to see what
-all that magic does in detail, to be sure.
-
-> However, we could just use KVM_X86_OP() to declare it so we can cleanly
-> use a function that returns bool, and then we just need to do:
+On Thu, Jan 05, 2023 at 09:06:26AM +0100, Heiko Carstens wrote:
+> On Wed, Jan 04, 2023 at 04:37:52PM -0800, Paul E. McKenney wrote:
+> > Now that the SRCU Kconfig option is unconditionally selected, there is
+> > no longer any point in selecting it.  Therefore, remove the "select SRCU"
+> > Kconfig statements.
+> > 
+> > Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
+> > Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> > Cc: Janosch Frank <frankja@linux.ibm.com>
+> > Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> > Cc: David Hildenbrand <david@redhat.com>
+> > Cc: Heiko Carstens <hca@linux.ibm.com>
+> > Cc: Vasily Gorbik <gor@linux.ibm.com>
+> > Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> > Cc: Sven Schnelle <svens@linux.ibm.com>
+> > Cc: <kvm@vger.kernel.org>
+> > Cc: <linux-s390@vger.kernel.org>
+> > ---
+> >  arch/s390/kvm/Kconfig | 1 -
+> >  1 file changed, 1 deletion(-)
 > 
->   bool kvm_arch_has_private_mem(struct kvm *kvm)
->   {
->           if (kvm_x86_ops.private_mem_enabled)
->                   return static_call(kvm_x86_private_mem_enabled)(kvm);
+> Acked-by: Heiko Carstens <hca@linux.ibm.com>
 
-That would be defeating the whole purpose of static calls, AFAICT, as you're
-testing the pointer. Might as well leave it be a normal function pointer then.
+Thank you, Heiko!  I will apply on my next rebase.
 
-> On a separate topic though, at a high level, this hook is basically a way
-> for platform-specific code to tell generic KVM code that private memslots
-> are supported by overriding the kvm_arch_has_private_mem() weak
-> reference. In this case the AMD platform is using using kvm->arch.upm_mode
-> flag to convey that, which is in turn set by the
-> KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
-> 
-> But if, as I suggested in response to your PATCH 2 comments, we drop
-> KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
-> KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
-> code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
-> in-part relies on kvm_arch_has_private_mem() to determine what flags are
-> supported, whereas SEV/SNP code would be using what was set by
-> KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
-> kvm_arch_has_private_mem().
-> 
-> So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
-> on something else. Maybe the logic can just be:
-> 
->   bool svm_private_mem_enabled(struct kvm *kvm)
->   {
->     return sev_enabled(kvm) || sev_snp_enabled(kvm)
-
-I haven't followed the whole discussion in detail but this means that SEV/SNP
-*means* UPM. I.e., no SEV/SNP without UPM, correct? I guess that's the final
-thing you guys decided to do ...
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+							Thanx, Paul
