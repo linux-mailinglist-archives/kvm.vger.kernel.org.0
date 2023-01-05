@@ -2,173 +2,146 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CE2F65F77E
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 00:10:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B290065F79F
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 00:34:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236349AbjAEXKM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 18:10:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48638 "EHLO
+        id S235939AbjAEXel (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 18:34:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236293AbjAEXKK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 18:10:10 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13D9961459
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 15:10:09 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id c6so7721805pls.4
-        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 15:10:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=I00PfRXFv6U8Xy8h8VZKYoXSKEt5A1u/WyccCLlv9P0=;
-        b=ZIjg2TcD4Ck+PWR1k1iRhRf+mPTzPqnJzVHfYMsjPVZhazJGf1x8Q97OC/lRmpCDC7
-         UypuKLBYEPZRhzcmHcZv16BkjrveWpXAMZH1BQwgdO7B7z763aYHaS+1Vjx4FDwo2saM
-         W0kED+WL/+W8kw93Ux6tbPmxWJfWvxWPjX4Xq/VyaW1WMTzh7mqAlYcddksivDoLuRot
-         fxRu70O7bPUakIlgdy9K+FgeldVV4dN6nJZTMbroij+0q8BJJvLdEgcE4WUiMY0R59CU
-         MY/OJ1C0gFuSUMh6A2MPKul+rlOC1f9nz+4A0+1hFqI/J5RcMFEC5IYr1yrsyCxhI08F
-         mmvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I00PfRXFv6U8Xy8h8VZKYoXSKEt5A1u/WyccCLlv9P0=;
-        b=OQLxfDyPsmQKMCl62gH/rvONWXuuDvEYyRAW067bEU0mfwejdExLRGLeql4JsBK7uT
-         WaEMDhQBfpb0o88t7+Eb3Fck7iOKy5nXvbr9VpBnffqkgxdGpn4QjDnysZvnYlluIRMO
-         dfMNK2Ow4ujPU1r68qfGXsk9qHM3QoSFZJsJFBgrPyOA+pGF7KhgIZkbE6iPgvX3spL3
-         XjntzeKPMQJKDRoU788hjlA2vdjMkytGwkMRJf45ENm9qSULHKBVeY0S0/5ClIQyv1bz
-         VFbrR5rZ3jQWWB+cMioh0MKW5w56/kb9ggWj2MxlixHEHeRwTn4iRTH7WWH8LlKTcQKI
-         xhZA==
-X-Gm-Message-State: AFqh2kr7KhLZA3UBnY30gaS0SMGLJE3P1I0UQMn3OLBBSokYZ892gDlK
-        gf9Xyirp+qe2lEHCyBnscqK3kA==
-X-Google-Smtp-Source: AMrXdXs84ctSy+th0zPGM+NNs0yvI53hNLR0begg630kNt7sC5UPeWcZ2dHCnyN94kYPvp8vPEWV9g==
-X-Received: by 2002:a05:6a20:a699:b0:b3:66b7:24ff with SMTP id ba25-20020a056a20a69900b000b366b724ffmr41250pzb.1.1672960208498;
-        Thu, 05 Jan 2023 15:10:08 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id k12-20020a6568cc000000b004788780dd8esm22390112pgt.63.2023.01.05.15.10.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jan 2023 15:10:07 -0800 (PST)
-Date:   Thu, 5 Jan 2023 23:10:04 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Aaron Lewis <aaronlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
-Subject: Re: [PATCH v2 6/6] KVM: selftests: Add XCR0 Test
-Message-ID: <Y7dYzEjZcj/NVmHA@google.com>
-References: <20221230162442.3781098-1-aaronlewis@google.com>
- <20221230162442.3781098-7-aaronlewis@google.com>
- <Y7Wzx5qW1zMQJq88@google.com>
- <CAAAPnDET+z6CY7_SKe5qx-r5Br7e4MP+TvGq5Km4btYd27Li3Q@mail.gmail.com>
-MIME-Version: 1.0
+        with ESMTP id S235822AbjAEXeh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 18:34:37 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2086.outbound.protection.outlook.com [40.107.92.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C514E71FD4;
+        Thu,  5 Jan 2023 15:34:33 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S0xl9Jeu6YyRHvAc9SWuxHLRF8cgjqmiuxZwmnke0HW0LNtr/BsNx0gUqHGCaZ250i2j5UlFJv5rYMFtvBn+15+w4YR18sLxZqGDfs2cbuBqY/hLRpTYqwzOPsx1VyYn64tLo+KJ92AT6X1YArKXlFYTmnicVJT8L+iXk3dVceaA4TkrYDWuNvk81lD+Tqs425kex+po3qwxWxiSnWrYbcKK2rMRNwxqxxRMvMZbz2UVaJbeci9shtCbyvp+iciy7HPqvyooUy+B9WxMcLItC34aZ9qMe/E4BzLkkG2GNyE/wzck0UrUhJQ7Qq9uUJCKghW3OF+2htfIiGAD3kZYmg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EB4Ls5mRB6gC8zZa89OhEpXfyEBQ1BLtaw/bEOWDQxw=;
+ b=eXdMx3sC6bJ4RVTv1Da35gX2OXhXGcCvIPr4Yoj8rHzBrJfNso2YIX4oMtaQ7k6wcrS5KH9bfiXGGJlm80f2Mbkgo8+G2lFyLokq4WUsrZcrb5Q9gdScuYDn1sPK9Lv9WR7R5pPqHV/FPMOI5UQTtOiSiIE8C4Y/GVAuYSotopfHhr+tjAa9nXC6BWrhDUCaStKID76FGQjG0UBjyNMot1X93tkjN9ZQ8PoPkmxultzr8DuFL4ov7hbhX+IOY9lFrftXgJ6MTCi/0vP1b8uSQUo44oYMjRr7MJD6RYmmHxrv1N5rW4DnPKkKmUgUH30W3CkEOxlqQDtpLpnrDISvtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EB4Ls5mRB6gC8zZa89OhEpXfyEBQ1BLtaw/bEOWDQxw=;
+ b=pXR53lRt+OAEauZ5fL43Ml1buLGHGwCF1QEaVEkYTVmSbvZh3D5BXRXQsJrGPVAiOnunsrRvPfDyh2Hach2pff5NJr8kk8BNtzlomgMm8NLPrc8uX1v1WC/1tqh8BWaC4Px/cBV/LG5dblssCxltjXap0p5VXQ/z7dOGfiHOsZQ99hSch/qftF3Ye9GsKXrogbawgrrxpKZxlEpg415SsgSpypuSXL+10bNu/tHU7/pSo86H49hiNmZX2t8rk2jUUVJzXwMJwyJfhFcEDSx1ecdToW1o8fesy9ecPGiG+QlJ38rcDjtkEhTXun3FvCLUibB2idVaCynb9e7QVyQ63A==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA1PR12MB8359.namprd12.prod.outlook.com (2603:10b6:208:3fc::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
+ 2023 23:34:32 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5944.019; Thu, 5 Jan 2023
+ 23:34:32 +0000
+Date:   Thu, 5 Jan 2023 19:34:30 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Alex Williamson <alex.williamson@redhat.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>, cohuck@redhat.com,
+        borntraeger@linux.ibm.com, jjherne@linux.ibm.com,
+        akrowiak@linux.ibm.com, pasic@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, hch@infradead.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kevin Tian <kevin.tian@intel.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v3 1/1] vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
+Message-ID: <Y7dehnZSC6ukNxKU@nvidia.com>
+References: <20220519183311.582380-1-mjrosato@linux.ibm.com>
+ <20220519183311.582380-2-mjrosato@linux.ibm.com>
+ <20230105150930.6ee65182.alex.williamson@redhat.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAAAPnDET+z6CY7_SKe5qx-r5Br7e4MP+TvGq5Km4btYd27Li3Q@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230105150930.6ee65182.alex.williamson@redhat.com>
+X-ClientProxiedBy: BLAP220CA0005.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:32c::10) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA1PR12MB8359:EE_
+X-MS-Office365-Filtering-Correlation-Id: 94b83d4e-c351-4777-a0bf-08daef756566
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QXLEfPyyXJVFnIrAEMPtdWBsw9VXwCe72+dSQFxKEx0lagW9hyciOXQEiIGdwCpJWRDSQsu+iIeiBNb/sgwj7VayY+2Dn2+5OWQXm4vRiTRCcC95lmQWzEQ9NhGMSq2x1jCWK8WIb9fbxpMmIIwT0tYc02yUNac4DwjcsuCZRnrkFlRcE5Nv2kG6RM0Ftu8GnXur8QLRcuuSRKozPS/zc12Xv0PzfU0eip9qqNe9vK6WgTKbAfarudr299W6tgh0QuZhjIkdh7YMn4bityr9aksf3NOky4jFcJoVYDHuh0nLJDGUk+4jOLdX3DWhI7q+SH04U01Z90q8K1fvcI+uOm5J+7d6LvPaRwO0IEiMoVFy16Qc/8IAVUECN5TQbmlzYvRZ4kvS5t2Q7/hVJjrOFevY6hB9fArOoIGyncZxQ++MawVdc+StN3Eefk1b/ygnyVNDM6u9NBVBV8LI+SI/BxcY+QCHifMHFIA6ThOIAPk2EiINmG27yDQYmQ04ht9mChcS41S4Rxn8xdzaB7t1Ewdn8f9PuXzEmBKLswBHJNYz6K8lhw8QxcNrGByqbJwpPjUN+MW4G3qSqS2jKQ1XI8LBPEIPo+gkpINd55FhXv6z98fCAhlIuAmMiIVRER7KS2DLvKfIbaMZG7E6Gk+EIg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(366004)(346002)(376002)(136003)(451199015)(36756003)(6916009)(86362001)(316002)(54906003)(38100700002)(7416002)(6506007)(2616005)(478600001)(6486002)(26005)(186003)(6512007)(5660300002)(83380400001)(4744005)(2906002)(66556008)(8676002)(4326008)(66946007)(66476007)(8936002)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?rkBcOEQZyBlkCrec3N9dZwhxKCvZmNWrysTh4KelHKOAQYPZncwFU2ud4NW0?=
+ =?us-ascii?Q?NcKd38q4/Y/pbMYNJmQwJDf+Apyj9iRrk0RGJsrPvM+kQhfkCp0D04CU6Vur?=
+ =?us-ascii?Q?FpcWC4whJmI6l9dMT24aPiVsYNiTQciaSO11J5SyqwxqFb7wEI1LHP5Ml6V+?=
+ =?us-ascii?Q?kH8MN+fP6VIn7yTLHcOYUXdz1Dj1HBxEnQmO+r6GnKMW9lYOmv80jDSRagIR?=
+ =?us-ascii?Q?CiSrM+sF6xcDSPO2FsoPMi4q+LNyddCmLHA/BycsOxzPcuOH14nQ0f1S7cPQ?=
+ =?us-ascii?Q?TPHxxNpsQmxhOyI44rAasRnP86UTjntIoMEH8DF60JUTDR3hL61H9Rj9qR08?=
+ =?us-ascii?Q?gEsKP8uut27qSQBicXjH4SV6ybgIGh3yaTUy2n+zXnaXdfBm9lSkOvyBlhcN?=
+ =?us-ascii?Q?JHX5qmUCk8sQrLFdQIZDzUEGcXlo7DoUb2i9FA/NQD5LJeMn0PpDI0JjC0ou?=
+ =?us-ascii?Q?9fdlsmwxjg0/ezvMmo9CjQFNlMBv+yRmw8DP/2EnItxjABc2WmKzkNxF1TaB?=
+ =?us-ascii?Q?b0a106FBI7aWNnBMI8+qjUYMW12369Ok+DFa8jcHgi2IVZSuB4OW7udfZFNn?=
+ =?us-ascii?Q?d4aolKJYC4Cflh3cViorax/I4GDSm8+FnKFok3BHryilO4a0+FGnoVhcjWbT?=
+ =?us-ascii?Q?uyJZrMk4E0iZ2NsBfMUCIKc71WasILGRD6SSVAmkXJ5upfLl5iU+fY5g3Qbo?=
+ =?us-ascii?Q?CnT+L91bh3HcIef8FlOB+XGFI8HWUMA8wkN0SiDCw3bKlEWzr6xe+w27q5FL?=
+ =?us-ascii?Q?Qadat71D/iiMthjZzjptvDlKjzdGEWIVMOOle0WpYaXmV1/IVKYNtlUNptP6?=
+ =?us-ascii?Q?SX9/4lrx8gvtKB+JbkiuNw4CCt2TVRpaR7CMFU+YngOk3YoKgl9mwmhIuEfA?=
+ =?us-ascii?Q?FvuiE4wytDnaej8GstaiVCL0VqKyTpAtZ4KXUxJhLS872/uhxMwQEcBDBma+?=
+ =?us-ascii?Q?CXoqHhRdkMTllUuv9wh7aaMUd/vfu8pfUmw6//rHCZdtEqN4mAbaPwjsmWu4?=
+ =?us-ascii?Q?s93DpRWLtRgoMfgeslk5iPdfXhed4Kj4PIwvOVrh5yABBHUH5SjIbuc/j9mu?=
+ =?us-ascii?Q?NQvv65Bsfc+s6A87Oqh7ZzgnEPEU3U+4VhBLKL5DD52vTleLdWr68/FJ4S89?=
+ =?us-ascii?Q?zNz3X5Qr9QGax85p+Dio8aHgAlocU1kXxwLecr+psu0lKbYJQkHtgRZ7zTd7?=
+ =?us-ascii?Q?DALNhI0ZXePSGplO2Gn3laiVvWtTsDdcgeXtLWuE4edfHrNZT5pVegpgAtEy?=
+ =?us-ascii?Q?3VlEItTo6o3WrVc+8uKH6nqmHNUMjiDU+ZhEd2xebHYeah8A6SJQCnCo/Wzf?=
+ =?us-ascii?Q?yJ+7Bw+nmg3jb54WXll5fI9lqDzay2Ti0PYJ+7brUO+cdbkxR7UXl3kPAiz9?=
+ =?us-ascii?Q?oClTo1hS9RhxeRiIB1fQ9HI8Ua2Dbv03rzIserH2zLp05ybmrOXuon8nGZhh?=
+ =?us-ascii?Q?PadIDy0ej1CqrDeaEavMk+u+DqYsXj9wP1pfdb63k3Ikv23JbyaMCyMxWuW+?=
+ =?us-ascii?Q?Y3V+LYQ3FF9TuGDj/kwXgIoL9vfiMh/vbMe8aBy0E5xA5o6+Kc8bbXwTua2c?=
+ =?us-ascii?Q?jGyYvWe6A/EgI3IXxIJta2e6t/DRC3jOPUnZvAhX?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 94b83d4e-c351-4777-a0bf-08daef756566
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 23:34:31.9814
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: B60D4lLUZ1xmsCpFppI/O0GyxI05IXu2uL5dA7+kC77zYnBc7k3FaDkW5lIkdllV
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8359
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 05, 2023, Aaron Lewis wrote:
-> On Wed, Jan 4, 2023 at 5:13 PM Sean Christopherson <seanjc@google.com> wrote:
-> > Hmm or maybe add helpers?  Printing the info on failure would also make it easier
-> > to debug.  E.g.
-> >
-> > static void check_all_or_none_xfeature(uint64_t supported_xcr0, uint64_t mask)
-> > {
-> >         supported_xcr0 &= mask;
-> >
-> >         GUEST_ASSERT_2(!supported_xcr0 || supported_xcr0 == mask,
-> >                        supported_xcr0, mask);
-> > }
-> >
-> > static void check_xfeature_dependencies(uint64_t supported_xcr0, uint64_t mask,
-> >                                         uint64_t dependencies)
-> > {
-> >         supported_xcr0 &= (mask | dependencies);
-> >
-> >         GUEST_ASSERT_3(!(supported_xcr0 & mask) ||
-> >                        supported_xcr0 == (mask | dependencies),
-> >                        supported_xcr0, mask, dependencies);
-> > }
-> >
-> > would yield
-> >
-> >         check_xfeature_dependencies(supported_xcr0, XFEATURE_MASK_YMM,
-> >                                     XFEATURE_MASK_SSE);
-> >
-> > and then for AVX512:
-> >
-> >         check_xfeature_dependencies(supported_xcr0, XFEATURE_MASK_AVX512,
-> >                                     XFEATURE_MASK_SSE | XFEATURE_MASK_YMM);
-> >         check_all_or_none_xfeature(supported_xcr0, XFEATURE_MASK_AVX512);
-> >
-> > That would more or less eliminate the need for comments, and IMO makes it more
-> > obvious what is being checked.
+On Thu, Jan 05, 2023 at 03:09:30PM -0700, Alex Williamson wrote:
+> On Thu, 19 May 2022 14:33:11 -0400
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 > 
-> The reason I chose not to use helpers here was it hides the line
-> number the assert occured on.  With helpers you have multiple places
-> the problem came from and one place it's asserting.  The way I wrote
-> it the line number in the assert tells you exactly where the problem
-> occured.
+> > Rather than relying on a notifier for associating the KVM with
+> > the group, let's assume that the association has already been
+> > made prior to device_open.  The first time a device is opened
+> > associate the group KVM with the device.
+> > 
+> > This fixes a user-triggerable oops in GVT.
 > 
-> I get you can deduce the line number with the values passed back in
-> the assert,
+> It seems this has traded an oops for a deadlock, which still exists
+> today in both GVT-g and vfio-ap.  These are the only vfio drivers that
+> care about kvm, so they make use of kvm_{get,put}_kvm(), where the
+> latter is called by their .close_device() callbacks.
 
-But the line number ultimately doesn't matter, no?  In the original code, the
-line number lets you know what feature bits failed, but in the proposed helpers
-above, that's explicitly provided.
+Bleck
 
-> but the assert information printed out on the host has to
-> be purposefully vague because you get one fmt for the entire test
+It is pretty common to run the final part of 'put' from a workqueue
+specifically to avoid stuff like this, eg fput does it
 
-Right, but the line number of the helper disambiguates the data.  E.g. knowing
-that the assert in check_xfeature_dependencies() fired lets the reader know what
-the args mean.
+Maybe that is the simplest?
 
-> If I was able to do a printf style asserts from the guest, that would allow
-> me to provide more, clear context to tie it back.
-
-Yeah, we need to figure out a solution for that sooner than later.
-
-> Having the line number where the assert fired I felt was useful to keep.
-> 
-> I guess one way to get the best of both worlds would be to have the
-> helpers return a bool rather than assert in the helper.  I could also
-> include the additional info you suggested in the asserts.
-
-That seems like it will end up with hard to read code, and a lot of copy+paste.
-E.g.
-
-	GUEST_ASSERT_3(is_valid_xfeature(supported_xcr0, XFEATURE_MASK_AVX512,
-					 XFEATURE_MASK_SSE | XFEATURE_MASK_YMM),
-		       supported_xcr0, XFEATURE_MASK_AVX512,
-		       XFEATURE_MASK_SSE | XFEATURE_MASK_YMM);
-
-isn't the friendliest.
-
-What about using macros?  It's a little gory, but I don't think it'll be a
-maintenance issue, and the code is quite small.  And on the plus side, it's more
-obvious that the "caller" is making an assertion.
-
-#define ASSERT_ALL_OR_NONE_XFEATURE(supported_xcr0, mask)	\
-do {								\
-	uint64_t __supported = supported_xcr0 & (mask);		\
-								\
-	GUEST_ASSERT_2(!supported || supported == (mask),	\
-		       supported, (mask));			\
-while (0)
-
-> That said, if we do end up going with helpers I don't think we have to
-> call them both like in the AVX512 example.  They both check the same
-> thing, except check_xfeature_dependencies() additionally allows for
-> dependencies to be used.
-
-My thought was to intentionally separate the checks by their semantics, even though
-it means more checks.  Asserting that the dependencies are in place is backed by
-architectural rules, whereas asserting the "all or nothing" stuff is KVM's own
-software-defined rules.
+Jason
