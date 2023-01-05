@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CA4DA65EF6A
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 15:55:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C39D165EF6D
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 15:55:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234241AbjAEOye (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 09:54:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52894 "EHLO
+        id S234422AbjAEOyp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 09:54:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234258AbjAEOyD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 09:54:03 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36FD35BA02
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 06:54:01 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 305Epi2P022468;
-        Thu, 5 Jan 2023 14:53:29 GMT
+        with ESMTP id S234333AbjAEOyG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 09:54:06 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD2C5BA01
+        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 06:54:05 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 305EKf0f009627;
+        Thu, 5 Jan 2023 14:53:31 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=SxbuPdOWXGoof9kp9R4zjXTiOzZkOwyrjxz+z9AhaYQ=;
- b=bGdqpOCVba0/BRwvi2fXTS0Qip7MYFiMv+rgg2yyli3aV36v/bGIQNtDo4JuOLGUOI2s
- bgnK24JU+8pqJ1Ss8gGayZca6O0r/BGa6/h0GenGdq8k5yvX4vNtytA1t2ZPPgaU6y4h
- WzydoeUiBT4qUlvQqvjRuS1PCllB24hlDVkdg1lMPOEN1GxShjr0nImJUqDSK/SOPk5o
- 86yexXgiW5Os2FEWTG2M6gaCcSJy7o6PFHBZlj+wLlUyF0R9mtSMpQDg7taKdypaeYgJ
- F/I55DT6pk7Di3LotUWjAtQEsJAfN6jiy74WPB45//XnG7XHgOzBC0fGemGwv+NwS/Yq vQ== 
+ bh=ethdufynlW1MEixRs+2AXSiySCmWBFk8ra2McLsJN2w=;
+ b=QiWszAf4qE3F3ntXCbwv+wpRdhHbAhLOhfw75gqCfd8Ytvt+F8kafwxBULRF/p0kGpDy
+ u9KwQSq/L7MNjE0mYFv3qDhFJ3L6JvR1j6p6G3ZiL+1oHxNbAkpPBGZ22skhmCGqvsgI
+ UV9EbcbJqIDLax/DJvkQPw3vFp3w5B638Vn6q471UbVgmTM1OtBOlnPfUe6p09DWcB0U
+ iTj4vZt20Ztld5jmrzumx56+EJyViSLJrDFUljoeooCUzHDYq4MuE90EgbfOpWNthzup
+ tFEnVUJKpxGtI9tM14cB4pZYNgL8N/HEZYIZrwvYTtthb1afOSxBYU98brtxlH8oAzDg zQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mx0pfg152-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mx07wrsd9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 14:53:29 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 305Er4jb028552;
+        Thu, 05 Jan 2023 14:53:31 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 305EL1p0011135;
+        Thu, 5 Jan 2023 14:53:30 GMT
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mx07wrscg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 05 Jan 2023 14:53:30 +0000
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3052VGxW010510;
         Thu, 5 Jan 2023 14:53:28 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mx0pfg14d-1
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3mtcq6d2b9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 14:53:28 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3051kSQE024684;
-        Thu, 5 Jan 2023 14:53:26 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3mtcq6d20q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 14:53:26 +0000
+        Thu, 05 Jan 2023 14:53:27 +0000
 Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 305ErN6021692726
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 305ErOVg49414634
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Jan 2023 14:53:23 GMT
+        Thu, 5 Jan 2023 14:53:24 GMT
 Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 07C832004D;
+        by IMSVA (Postfix) with ESMTP id 2598120040;
+        Thu,  5 Jan 2023 14:53:24 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 217BA20049;
         Thu,  5 Jan 2023 14:53:23 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1F08320049;
-        Thu,  5 Jan 2023 14:53:22 +0000 (GMT)
 Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.26.113])
         by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  5 Jan 2023 14:53:22 +0000 (GMT)
+        Thu,  5 Jan 2023 14:53:23 +0000 (GMT)
 From:   Pierre Morel <pmorel@linux.ibm.com>
 To:     qemu-s390x@nongnu.org
 Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
@@ -66,98 +66,291 @@ Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
         marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
         seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
         frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
-Subject: [PATCH v14 07/11] target/s390x/cpu topology: activating CPU topology
-Date:   Thu,  5 Jan 2023 15:53:09 +0100
-Message-Id: <20230105145313.168489-8-pmorel@linux.ibm.com>
+Subject: [PATCH v14 08/11] qapi/s390/cpu topology:  change-topology monitor command
+Date:   Thu,  5 Jan 2023 15:53:10 +0100
+Message-Id: <20230105145313.168489-9-pmorel@linux.ibm.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230105145313.168489-1-pmorel@linux.ibm.com>
 References: <20230105145313.168489-1-pmorel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: pdTodLx_1JY0KDVqf9b0TiW1uEOtEAqs
-X-Proofpoint-GUID: SZqsnV2NOC1ugrFzqDpTUIgVW94-qQe3
+X-Proofpoint-GUID: kaN2e_OFZoK6BbQPjgAzMn5S4LU9B7Im
+X-Proofpoint-ORIG-GUID: xefNCUmSMyiOBuSaxryUHpmIPiDQcEqm
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-05_05,2023-01-05_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- mlxlogscore=999 clxscore=1015 phishscore=0 lowpriorityscore=0
- suspectscore=0 malwarescore=0 mlxscore=0 bulkscore=0 spamscore=0
- impostorscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2301050114
+ definitions=2023-01-05_04,2023-01-05_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ malwarescore=0 priorityscore=1501 bulkscore=0 adultscore=0 spamscore=0
+ impostorscore=0 lowpriorityscore=0 mlxlogscore=999 mlxscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2301050114
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
-activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
-the topology facility for the guest in the case the topology
-is available in QEMU and in KVM.
+The modification of the CPU attributes are done through a monitor
+commands.
 
-The feature is disabled by default and fenced for SE
-(secure execution).
+It allows to move the core inside the topology tree to optimise
+the cache usage in the case the host's hypervizor previously
+moved the CPU.
+
+The same command allows to modifiy the CPU attributes modifiers
+like polarization entitlement and the dedicated attribute to notify
+the guest if the host admin modified scheduling or dedication of a vCPU.
+
+With this knowledge the guest has the possibility to optimize the
+usage of the vCPUs.
 
 Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 ---
- hw/s390x/cpu-topology.c   |  2 +-
- target/s390x/cpu_models.c |  1 +
- target/s390x/kvm/kvm.c    | 13 +++++++++++++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ qapi/machine-target.json |  29 ++++++++
+ include/monitor/hmp.h    |   1 +
+ hw/s390x/cpu-topology.c  | 141 +++++++++++++++++++++++++++++++++++++++
+ hmp-commands.hx          |  16 +++++
+ 4 files changed, 187 insertions(+)
 
+diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+index 2e267fa458..75b0aa254d 100644
+--- a/qapi/machine-target.json
++++ b/qapi/machine-target.json
+@@ -342,3 +342,32 @@
+                    'TARGET_S390X',
+                    'TARGET_MIPS',
+                    'TARGET_LOONGARCH64' ] } }
++
++##
++# @change-topology:
++#
++# @core: the vCPU ID to be moved
++# @socket: the destination socket where to move the vCPU
++# @book: the destination book where to move the vCPU
++# @drawer: the destination drawer where to move the vCPU
++# @polarity: optional polarity, default is last polarity set by the guest
++# @dedicated: optional, if the vCPU is dedicated to a real CPU
++#
++# Modifies the topology by moving the CPU inside the topology
++# tree or by changing a modifier attribute of a CPU.
++#
++# Returns: Nothing on success, the reason on failure.
++#
++# Since: <next qemu stable release, eg. 1.0>
++##
++{ 'command': 'change-topology',
++  'data': {
++      'core': 'int',
++      'socket': 'int',
++      'book': 'int',
++      'drawer': 'int',
++      '*polarity': 'int',
++      '*dedicated': 'bool'
++  },
++  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
++}
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index 27f86399f7..15c36bf549 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -144,5 +144,6 @@ void hmp_human_readable_text_helper(Monitor *mon,
+                                     HumanReadableText *(*qmp_handler)(Error **));
+ void hmp_info_stats(Monitor *mon, const QDict *qdict);
+ void hmp_pcie_aer_inject_error(Monitor *mon, const QDict *qdict);
++void hmp_change_topology(Monitor *mon, const QDict *qdict);
+ 
+ #endif
 diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-index e6b4692581..b69955a1cd 100644
+index b69955a1cd..0faffe657e 100644
 --- a/hw/s390x/cpu-topology.c
 +++ b/hw/s390x/cpu-topology.c
-@@ -52,7 +52,7 @@ static int s390_socket_nb(s390_topology_id id)
-  */
- bool s390_has_topology(void)
- {
--    return false;
-+    return s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY);
+@@ -18,6 +18,10 @@
+ #include "target/s390x/cpu.h"
+ #include "hw/s390x/s390-virtio-ccw.h"
+ #include "hw/s390x/cpu-topology.h"
++#include "qapi/qapi-commands-machine-target.h"
++#include "qapi/qmp/qdict.h"
++#include "monitor/hmp.h"
++#include "monitor/monitor.h"
+ 
+ /*
+  * s390_topology is used to keep the topology information.
+@@ -203,6 +207,21 @@ static void s390_topology_set_entry(S390TopologyEntry *entry,
+     s390_topology.sockets[s390_socket_nb(id)]++;
  }
  
++/**
++ * s390_topology_clear_entry:
++ * @entry: Topology entry to setup
++ * @id: topology id to use for the setup
++ *
++ * Clear the core bit inside the topology mask and
++ * decrements the number of cores for the socket.
++ */
++static void s390_topology_clear_entry(S390TopologyEntry *entry,
++                                      s390_topology_id id)
++{
++    clear_bit(63 - id.core, &entry->mask);
++    s390_topology.sockets[s390_socket_nb(id)]--;
++}
++
  /**
-diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-index c3a4f80633..3f05e05fd3 100644
---- a/target/s390x/cpu_models.c
-+++ b/target/s390x/cpu_models.c
-@@ -253,6 +253,7 @@ bool s390_has_feat(S390Feat feat)
-         case S390_FEAT_SIE_CMMA:
-         case S390_FEAT_SIE_PFMFI:
-         case S390_FEAT_SIE_IBS:
-+        case S390_FEAT_CONFIGURATION_TOPOLOGY:
-             return false;
-             break;
-         default:
-diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-index fb63be41b7..4e2a2ff516 100644
---- a/target/s390x/kvm/kvm.c
-+++ b/target/s390x/kvm/kvm.c
-@@ -2470,6 +2470,19 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
-         set_bit(S390_FEAT_UNPACK, model->features);
-     }
+  * s390_topology_new_entry:
+  * @id: s390_topology_id to add
+@@ -383,3 +402,125 @@ void s390_topology_set_cpu(MachineState *ms, S390CPU *cpu, Error **errp)
  
-+    /*
-+     * If we have support for CPU Topology prevent overrule
-+     * S390_FEAT_CONFIGURATION_TOPOLOGY with S390_FEAT_DISABLE_CPU_TOPOLOGY
-+     * implemented in KVM, activate the CPU TOPOLOGY feature.
-+     */
-+    if (kvm_check_extension(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY)) {
-+        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY, 0) < 0) {
-+            error_setg(errp, "KVM: Error enabling KVM_CAP_S390_CPU_TOPOLOGY");
-+            return;
+     s390_topology_insert(id);
+ }
++
++/*
++ * qmp and hmp implementations
++ */
++
++static S390TopologyEntry *s390_topology_core_to_entry(int core)
++{
++    S390TopologyEntry *entry;
++
++    QTAILQ_FOREACH(entry, &s390_topology.list, next) {
++        if (entry->mask & (1UL << (63 - core))) {
++            return entry;
 +        }
-+        set_bit(S390_FEAT_CONFIGURATION_TOPOLOGY, model->features);
++    }
++    return NULL;
++}
++
++static void s390_change_topology(Error **errp, int64_t core, int64_t socket,
++                                 int64_t book, int64_t drawer,
++                                 int64_t polarity, bool dedicated)
++{
++    S390TopologyEntry *entry;
++    s390_topology_id new_id;
++    s390_topology_id old_id;
++    Error *local_error = NULL;
++
++    /* Get the old entry */
++    entry = s390_topology_core_to_entry(core);
++    if (!entry) {
++        error_setg(errp, "No core %ld", core);
++        return;
 +    }
 +
-     /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
-     set_bit(S390_FEAT_ZPCI, model->features);
-     set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
++    /* Compute old topology id */
++    old_id = entry->id;
++    old_id.core = core;
++
++    /* Compute new topology id */
++    new_id = entry->id;
++    new_id.core = core;
++    new_id.socket = socket;
++    new_id.book = book;
++    new_id.drawer = drawer;
++    new_id.p = polarity;
++    new_id.d = dedicated;
++    new_id.type = S390_TOPOLOGY_CPU_IFL;
++
++    /* Same topology entry, nothing to do */
++    if (entry->id.id == new_id.id) {
++        return;
++    }
++
++    /* Check for space on the socket if ids are different */
++    if ((s390_socket_nb(old_id) != s390_socket_nb(new_id)) &&
++        (s390_topology.sockets[s390_socket_nb(new_id)] >=
++         s390_topology.smp->sockets)) {
++        error_setg(errp, "No more space on this socket");
++        return;
++    }
++
++    /* Verify the new topology */
++    s390_topology_check(&local_error, new_id);
++    if (local_error) {
++        error_propagate(errp, local_error);
++        return;
++    }
++
++    /* Clear the old topology */
++    s390_topology_clear_entry(entry, old_id);
++
++    /* Insert the new topology */
++    s390_topology_insert(new_id);
++
++    /* Remove unused entry */
++    if (!entry->mask) {
++        QTAILQ_REMOVE(&s390_topology.list, entry, next);
++        g_free(entry);
++    }
++
++    /* Advertise the topology change */
++    s390_cpu_topology_set();
++}
++
++void qmp_change_topology(int64_t core, int64_t socket,
++                         int64_t book, int64_t drawer,
++                         bool has_polarity, int64_t polarity,
++                         bool has_dedicated, bool dedicated,
++                         Error **errp)
++{
++    Error *local_err = NULL;
++
++    if (!s390_has_topology()) {
++        error_setg(&local_err, "This machine doesn't support topology");
++        return;
++    }
++    s390_change_topology(&local_err, core, socket, book, drawer,
++                         polarity, dedicated);
++    if (local_err) {
++        error_propagate(errp, local_err);
++    }
++}
++
++void hmp_change_topology(Monitor *mon, const QDict *qdict)
++{
++    const int64_t core = qdict_get_int(qdict, "core");
++    const int64_t socket = qdict_get_int(qdict, "socket");
++    const int64_t book = qdict_get_int(qdict, "book");
++    const int64_t drawer = qdict_get_int(qdict, "drawer");
++    bool has_polarity    = qdict_haskey(qdict, "polarity");
++    const int64_t polarity = qdict_get_try_int(qdict, "polarity", 0);
++    bool has_dedicated    = qdict_haskey(qdict, "dedicated");
++    const bool dedicated = qdict_get_try_bool(qdict, "dedicated", false);
++    Error *local_err = NULL;
++
++    qmp_change_topology(core, socket, book, drawer,
++                        has_polarity, polarity,
++                        has_dedicated, dedicated,
++                        &local_err);
++    if (hmp_handle_error(mon, local_err)) {
++        return;
++    }
++}
+diff --git a/hmp-commands.hx b/hmp-commands.hx
+index 673e39a697..a617cfed0d 100644
+--- a/hmp-commands.hx
++++ b/hmp-commands.hx
+@@ -1815,3 +1815,19 @@ SRST
+   Dump the FDT in dtb format to *filename*.
+ ERST
+ #endif
++
++#if defined(TARGET_S390X) && defined(CONFIG_KVM)
++    {
++        .name       = "change-topology",
++        .args_type  = "core:l,socket:l,book:l,drawer:l,polarity:l?,dedicated:b?",
++        .params     = "core socket book drawer [polarity] [dedicated]",
++        .help       = "Move CPU 'core' to 'socket/book/drawer' "
++                      "optionaly modifies polarity and dedication",
++        .cmd        = hmp_change_topology,
++    },
++
++SRST
++``change-topology`` *core* *socket* *book* *drawer* *polarity* *dedicated*
++  Moves the CPU  *core* to *socket* *book* *drawer* with *polarity* *dedicated*.
++ERST
++#endif
 -- 
 2.31.1
 
