@@ -2,88 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0098565F150
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 17:40:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D1CB665F17C
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 17:54:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233386AbjAEQj5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 11:39:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37910 "EHLO
+        id S234250AbjAEQyn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 11:54:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231640AbjAEQj4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 11:39:56 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B9E5D401
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 08:39:55 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 305GRipV012206
-        for <kvm@vger.kernel.org>; Thu, 5 Jan 2023 16:39:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- in-reply-to : references : subject : to : from : cc : message-id : date :
- content-transfer-encoding : mime-version; s=pp1;
- bh=JljXeo4L1wen521eBqYRC37Bx87fAjvOSGUIOi1zopg=;
- b=TfeNjFdj1qjcssDCBGe3tZuQdpsU1PQZwuNiRY5slHH+Hbm2SrsUN0uObMfww1Pfe3/l
- Ma+JDCsDvPp8g/whr9gDGt5c/5xO9OZepNyOeQdkx/CNzgSOwzcCNCR7KupaB+vEXjBO
- 3BMeVAmOFreZ9ZVPdxAI9ELCkOpc9CWrrQkVWzCH8loAJTbDb/wnByasA0Hy00GvTiQq
- OMs54g75kpn5LOZ2aUdqISQN6lqV7/qIbNhhUO2XlwPSb/UoOsuP1S4iF22PZDvU0QLO
- PsBpg1/QkVAirP+Q+uWJY79VGTBIrH7YpY/CVh/Sz2GvtnfJ2mycq+F1cp8KlW2ZBFGT Qw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mx23ega3f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 16:39:55 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 305GSrvO015097
-        for <kvm@vger.kernel.org>; Thu, 5 Jan 2023 16:39:54 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mx23ega2v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 16:39:54 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 305535ee001543;
-        Thu, 5 Jan 2023 16:39:52 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3mtcbff1s0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 16:39:52 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 305Gdmvq44892472
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Jan 2023 16:39:48 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7A41E20043;
-        Thu,  5 Jan 2023 16:39:48 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 58BDA20040;
-        Thu,  5 Jan 2023 16:39:48 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.89.196])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  5 Jan 2023 16:39:48 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
-In-Reply-To: <b525ee76-67ce-f1f9-8b09-b3d447641943@redhat.com>
-References: <20230105121538.52008-1-imbrenda@linux.ibm.com> <20230105121538.52008-5-imbrenda@linux.ibm.com> <b525ee76-67ce-f1f9-8b09-b3d447641943@redhat.com>
-Subject: Re: [kvm-unit-tests GIT PULL 4/4] s390x: add CMM test during migration
-To:     Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>, pbonzini@redhat.com
-From:   Nico Boehr <nrb@linux.ibm.com>
-Cc:     kvm@vger.kernel.org, frankja@linux.ibm.com
-Message-ID: <167293678759.10194.7855209900471212728@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Thu, 05 Jan 2023 17:39:48 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: vtR3sJ7w7cEmp-z3jjXojBIW832T8wob
-X-Proofpoint-ORIG-GUID: 7WD1kl2Fv23F0lKmZVw9XoWmnRmT4OVp
-Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
-MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-05_08,2023-01-05_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- priorityscore=1501 mlxlogscore=999 malwarescore=0 phishscore=0
- adultscore=0 lowpriorityscore=0 impostorscore=0 mlxscore=0 suspectscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301050131
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        with ESMTP id S234187AbjAEQyl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 11:54:41 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1782200D
+        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 08:54:40 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4bdeb1bbeafso21931027b3.4
+        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 08:54:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=RdmIXoppbPamXRLV/ZPAoxp8qfjGfL/jUk9HPqw/f3Q=;
+        b=MtyeU//Qgz+a1RJ0OW2B+/zo/LxD2WG8972UzJNzDP5+3KAnMvrAOlK65YIHubqfcR
+         9ocVYf7W2UobeUfTFAKnim5NJEuYIaMvC6hlk8H9GfZ+3QmYE1YYD3Rff27QzQjrMQWV
+         a2tYx/GuvbRza2WnyA+6TLpUd3Y3gHTriNIUL8wWNzreSTC7efxsQp/WPyWD7x27HNpD
+         cIfjwL6FuRkVnVUqK6Xn6MxFihOSwpeN65osiJBhETB3dPImgToILW7tuuKLmvT1GA6G
+         O2SQoom1XKzvDko4hNBoxOZeHYPRAB0uM/PQtCas/eyZgkT0gIbKMCvxJlgtxXLQMtJN
+         scNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RdmIXoppbPamXRLV/ZPAoxp8qfjGfL/jUk9HPqw/f3Q=;
+        b=Py/Mhv4BSVFZ/fzyclCA0mTpWhhqroXP/g/2RLxLZRIR5nb7FXz77BR6stMm13/ayL
+         95XmNvO8VG7TkC+nQaa2yYSEFq1E41ZL6ZzqxvZqSU4cczIzmGPu9dH/+TdzUQOxT8N9
+         4nu8BHVtB/XtQRqui7zbM7u4jy+hzFrOjne+LT8icAVhXmf7X7KRdy0IeqJKSG9N2rOP
+         I1OWoigf5Sx0SZeXXLTuWiW1DSZedy3XG59dahcSb2g9gmbvE7HCSYGIHqiACsQHESdw
+         jO/EIiZ1iZD+jqRDHPtGdni5EjWyt3TDRdqVoExuD3ozNB/ND1eLch4Pa3jLE1+YXVtY
+         1G/Q==
+X-Gm-Message-State: AFqh2kpu92r4HicXlTclhEvJ0I2Fq8Ep7tZYzvrZA24jq1E7H46GBykW
+        YETGCbTZgxASeJY5i2WVlYh7txjIkcz0wA==
+X-Google-Smtp-Source: AMrXdXuqYWVLQp2RopSij9yQ5M7QhFAl1+gZZfNVA+aAHnGDf4ypcZbSVqBXHMsdi1Up14DiYSvLRe/T615J8w==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a5b:dc5:0:b0:76c:7e68:ebbf with SMTP id
+ t5-20020a5b0dc5000000b0076c7e68ebbfmr3931513ybr.51.1672937680290; Thu, 05 Jan
+ 2023 08:54:40 -0800 (PST)
+Date:   Thu,  5 Jan 2023 08:54:31 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20230105165431.2770276-1-dmatlack@google.com>
+Subject: [PATCH] KVM: x86: Replace cpu_dirty_logging_count with nr_memslots_dirty_logging
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,35 +65,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Thomas Huth (2023-01-05 13:24:03)
-> On 05/01/2023 13.15, Claudio Imbrenda wrote:
-> > From: Nico Boehr <nrb@linux.ibm.com>
-> >=20
-> > Add a test which modifies CMM page states while migration is in
-> > progress.
-> >=20
-> > This is added to the existing migration-cmm test, which gets a new
-> > command line argument for the sequential and parallel variants.
-> >=20
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > Link: https://lore.kernel.org/r/20221221090953.341247-2-nrb@linux.ibm.c=
-om
-> > Message-Id: <20221221090953.341247-2-nrb@linux.ibm.com>
-> > Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> > ---
-> >   s390x/migration-cmm.c | 258 +++++++++++++++++++++++++++++++++++++-----
-> >   s390x/unittests.cfg   |  15 ++-
-> >   2 files changed, 240 insertions(+), 33 deletions(-)
->=20
->   Hi!
->=20
-> While this works fine on my z15 LPAR, I'm getting a failure when running=
-=20
-> this test on my z13 LPAR:
+Drop cpu_dirty_logging_count in favor of nr_memslots_dirty_logging.
+Both fields count the number of memslots that have dirty-logging enabled,
+with the only difference being that cpu_dirty_logging_count is only
+incremented when using PML. So while nr_memslots_dirty_logging is not a
+direct replacement for cpu_dirty_logging_count, it can be combined with
+enable_pml to get the same information.
 
-I can _sometimes_ reproduce this on z16, z13 and misc older machines. The o=
-lder the machine, the more often it seems to happen.
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ arch/x86/include/asm/kvm_host.h | 1 -
+ arch/x86/kvm/vmx/vmx.c          | 8 +++++---
+ arch/x86/kvm/x86.c              | 8 ++------
+ 3 files changed, 7 insertions(+), 10 deletions(-)
 
-I think we may have a bug somewhere. While I investigate, feel free to leav=
-e out this patch if you prefer.
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 2f5bf581d00a..f328007ea05a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1329,7 +1329,6 @@ struct kvm_arch {
+ 	u32 bsp_vcpu_id;
+ 
+ 	u64 disabled_quirks;
+-	int cpu_dirty_logging_count;
+ 
+ 	enum kvm_irqchip_mode irqchip_mode;
+ 	u8 nr_reserved_ioapic_pins;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c788aa382611..9c1bf4dfafcc 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4606,7 +4606,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+ 	 * it needs to be set here when dirty logging is already active, e.g.
+ 	 * if this vCPU was created after dirty logging was enabled.
+ 	 */
+-	if (!vcpu->kvm->arch.cpu_dirty_logging_count)
++	if (!enable_pml || !atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
+ 		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
+ 
+ 	if (cpu_has_vmx_xsaves()) {
+@@ -7993,12 +7993,14 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
+ 		return;
+ 	}
+ 
++	WARN_ON_ONCE(!enable_pml);
++
+ 	/*
+-	 * Note, cpu_dirty_logging_count can be changed concurrent with this
++	 * Note, nr_memslots_dirty_logging can be changed concurrent with this
+ 	 * code, but in that case another update request will be made and so
+ 	 * the guest will never run with a stale PML value.
+ 	 */
+-	if (vcpu->kvm->arch.cpu_dirty_logging_count)
++	if (atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
+ 		secondary_exec_controls_setbit(vmx, SECONDARY_EXEC_ENABLE_PML);
+ 	else
+ 		secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_ENABLE_PML);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c936f8d28a53..ee89a85bbd4e 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12482,16 +12482,12 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 
+ static void kvm_mmu_update_cpu_dirty_logging(struct kvm *kvm, bool enable)
+ {
+-	struct kvm_arch *ka = &kvm->arch;
+-
+ 	if (!kvm_x86_ops.cpu_dirty_log_size)
+ 		return;
+ 
+-	if ((enable && ++ka->cpu_dirty_logging_count == 1) ||
+-	    (!enable && --ka->cpu_dirty_logging_count == 0))
++	if ((enable && atomic_read(&kvm->nr_memslots_dirty_logging) == 1) ||
++	    (!enable && atomic_read(&kvm->nr_memslots_dirty_logging) == 0))
+ 		kvm_make_all_cpus_request(kvm, KVM_REQ_UPDATE_CPU_DIRTY_LOGGING);
+-
+-	WARN_ON_ONCE(ka->cpu_dirty_logging_count < 0);
+ }
+ 
+ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+
+base-commit: 91dc252b0dbb6879e4067f614df1e397fec532a1
+-- 
+2.39.0.314.g84b9a713c41-goog
+
