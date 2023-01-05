@@ -2,52 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B00465E887
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 11:03:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E918465E88D
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 11:03:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231830AbjAEKCs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 05:02:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56512 "EHLO
+        id S232305AbjAEKDU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 05:03:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232598AbjAEKC2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 05:02:28 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74692559F3;
-        Thu,  5 Jan 2023 02:00:51 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id v13-20020a17090a6b0d00b00219c3be9830so1527844pjj.4;
-        Thu, 05 Jan 2023 02:00:51 -0800 (PST)
+        with ESMTP id S231370AbjAEKC5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 05:02:57 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4A3013D16;
+        Thu,  5 Jan 2023 02:02:00 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id j8-20020a17090a3e0800b00225fdd5007fso1541163pjc.2;
+        Thu, 05 Jan 2023 02:02:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=M+2IhZIBR+Idxq3vIqRuDT4ymQmEMRboW9fuQZxNIh8=;
-        b=Ww/NBISVOlI36DZ7kwZz6fjIEw4Anyt3l8HPqf2WYWvnvowi1N9aQrBXlZkpmWl90H
-         Zbn5iqvCzbBh9dfNNZuyGTx/UF4nhCZdB78ONiG6M75lTjOVxBJ1GJd0gL+2S5dSP61V
-         Rdc/gknT3XiVz4GsQ8AKkI93qbPoU6GQQkfhcmWv2Aojp2U9/KcCQu8js2YGfeQEcZnp
-         tqyVW1ZcNUKTi6CpWMD0vbrAGZWduff1E6QtYj+pzURiaKtOhnleNbpcSLMn8m/fRtBI
-         WxlK2kFX9MhawoNPl/PaiN1FJmw7zuL5uPSU6oXWOfFXGr0nu9AyfVFmCVRKsMsYrchs
-         GhPw==
+        bh=dIL5BQ5kiCN7aWb7s9J+mPjf4X7P7/oQ9fGAS1Y2L0E=;
+        b=f5KnFQOrQ2JEr8F86AehTNd+ZROpDhAlBdTHW+sQYV6yM5KDjBEMCyvZ12qrjFD9CK
+         hWZ7SJN5l4EG1gwNCGgMxUE3jBJwNHyb7wBjuiPJ9OWEi5v7qW9S/vqRI08wD7kB71IL
+         adHmoDoeTFpkJUSpteSRZ/ctlaKAqqb5fnN5O81WvxGj/UBSH1c2OsyJnmegGrAnJ2It
+         sNixLzo9UMmY7SvTZLaNPVvhflJ8zmTX0ZGIpX+8gNZ9kkQZ+zjxxBN9WbgvMFw6upf7
+         CLs7RzP4YPEBeU1POophBkGzSWq5RB70+1BTpU05eCNxV4xHCXEPCauCt72Rjga+PYUH
+         UiAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=M+2IhZIBR+Idxq3vIqRuDT4ymQmEMRboW9fuQZxNIh8=;
-        b=auFKnn3TPn8sy5oaOf55MsRU/mHuK2q85kYEDqRsccSuVQCJaAN67whYVS1pr1yOmz
-         bFLoyoUKUDlm5Ty2W8GGFpaVG4Poj6zZkFDWpBWUmvhpjZbjaQm18VdTKu8Rt4ttqVtN
-         jIl1dTIg5xQeUZT+0mg1nomorR+G12DczMBBuzQFwygRqRWwuYa7O30Y73o2vL3/uZ3L
-         NJkR515lQrm79tPUHuTS0WHUKh6Ok2JTrHZkbkIY52Rsx1mkUK4p63go+osdv/O6v3Kf
-         brE/NT1OPZR1Qzqo7JG7t1ak6cewpCY17qoe9WgQ9bCD7kcbAj3ADXcDX7izCVB2amkQ
-         QoVA==
-X-Gm-Message-State: AFqh2krfhHClfoYMQLaFHUgNoBnEqQ99KieOKTnQ9e+PbzadeTyi6gWy
-        8d+rorLVFx4LlNgtmyaG8dPZp+XaxJM=
-X-Google-Smtp-Source: AMrXdXuQhMR7Eq5Mvi6U/P387guWHU6F2ykmQzDHk4WUlQxFqBwwpQ874h/T5S7KJ8ZuYYr43wMS6Q==
-X-Received: by 2002:a17:90b:2314:b0:225:c2b4:8458 with SMTP id mt20-20020a17090b231400b00225c2b48458mr44757064pjb.21.1672912850281;
-        Thu, 05 Jan 2023 02:00:50 -0800 (PST)
+        bh=dIL5BQ5kiCN7aWb7s9J+mPjf4X7P7/oQ9fGAS1Y2L0E=;
+        b=AcchJOY78jjYuaDAlK2VvMn9YQAR6E+qISskHq6U1gClrtj1EW0NZME9TmalQ7GW3b
+         Gqg+yDMvy50z1fLdJmJUGI1OMJr+M621xiayhJmtxWEczIvxHwAeIseEKFTnqE/awdgb
+         dHYEkgThjeePyUVvf3dstwJM0QRopFzAFK5d4OOygCjs799wieyd7IIEDFxXvsDynFbR
+         A6qqOaf7htHl3Woq0cSA0sy/RB31QNIdr7CAc1rTSNhx+vK6YK98VIUVmDjh54+XMzZn
+         gMEruRNdHdOw0WBpTUcfnoCULmqJjz8op+HuB68NFYF+Fq+z7d08YSFTStT/F7FpSKtD
+         Z5pw==
+X-Gm-Message-State: AFqh2kp8G+dZBCitjdnEUycHB0pqXf1+/bynF2FAINXeGkOEssREOw4z
+        xHfQd9XcOZEMX7GR7Hui8w2wNvFTK1A=
+X-Google-Smtp-Source: AMrXdXvz9VmRiK/nF4+b56vm0SwVXF2WbbUpzjI9Cd6uxuBQIS9oHmSJq79WwnzTS7r+ImhHatuGXw==
+X-Received: by 2002:a05:6a20:94c4:b0:aa:806:7b91 with SMTP id ht4-20020a056a2094c400b000aa08067b91mr65167272pzb.39.1672912919124;
+        Thu, 05 Jan 2023 02:01:59 -0800 (PST)
 Received: from localhost ([47.88.5.130])
-        by smtp.gmail.com with ESMTPSA id ge3-20020a17090b0e0300b00218cd71781csm1005525pjb.51.2023.01.05.02.00.49
+        by smtp.gmail.com with ESMTPSA id mp10-20020a17090b190a00b00213202d77d9sm1006086pjb.43.2023.01.05.02.01.57
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 05 Jan 2023 02:00:49 -0800 (PST)
+        Thu, 05 Jan 2023 02:01:58 -0800 (PST)
 From:   Lai Jiangshan <jiangshanlai@gmail.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -57,9 +57,9 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
         Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
         "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: [PATCH] kvm: x86/mmu: Rename SPTE_TDP_AD_ENABLED_MASK to SPTE_TDP_AD_ENABLED
-Date:   Thu,  5 Jan 2023 18:02:03 +0800
-Message-Id: <20230105100204.6521-1-jiangshanlai@gmail.com>
+Subject: [PATCH] kvm: x86/mmu: Don't clear write flooding for direct SP
+Date:   Thu,  5 Jan 2023 18:03:10 +0800
+Message-Id: <20230105100310.6700-1-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.19.1.6.gb485710b
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -75,92 +75,43 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 
-SPTE_TDP_AD_ENABLED_MASK, SPTE_TDP_AD_DISABLED_MASK and
-SPTE_TDP_AD_WRPROT_ONLY_MASK are actual value, not mask.
-
-Remove "MASK" from their names.
+Although there is no harm, but there is no point to clear write
+flooding for direct SP.
 
 Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
 ---
- arch/x86/kvm/mmu/spte.c |  6 +++---
- arch/x86/kvm/mmu/spte.h | 16 ++++++++--------
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ arch/x86/kvm/mmu/paging_tmpl.h | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index fce6f047399f..c15bfca3ed15 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -147,9 +147,9 @@ bool make_spte(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
- 	WARN_ON_ONCE(!pte_access && !shadow_present_mask);
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 79da423ee4cb..11f17efbec97 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -649,12 +649,12 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 	if (WARN_ON(!VALID_PAGE(vcpu->arch.mmu->root.hpa)))
+ 		goto out_gpte_changed;
  
- 	if (sp->role.ad_disabled)
--		spte |= SPTE_TDP_AD_DISABLED_MASK;
-+		spte |= SPTE_TDP_AD_DISABLED;
- 	else if (kvm_mmu_page_ad_need_write_protect(sp))
--		spte |= SPTE_TDP_AD_WRPROT_ONLY_MASK;
-+		spte |= SPTE_TDP_AD_WRPROT_ONLY;
+-	for (shadow_walk_init(&it, vcpu, fault->addr);
+-	     shadow_walk_okay(&it) && it.level > gw->level;
+-	     shadow_walk_next(&it)) {
++	for_each_shadow_entry(vcpu, fault->addr, it) {
+ 		gfn_t table_gfn;
  
- 	/*
- 	 * For the EPT case, shadow_present_mask is 0 if hardware
-@@ -317,7 +317,7 @@ u64 make_nonleaf_spte(u64 *child_pt, bool ad_disabled)
- 		shadow_user_mask | shadow_x_mask | shadow_me_value;
+ 		clear_sp_write_flooding_count(it.sptep);
++		if (it.level == gw->level)
++			break;
  
- 	if (ad_disabled)
--		spte |= SPTE_TDP_AD_DISABLED_MASK;
-+		spte |= SPTE_TDP_AD_DISABLED;
- 	else
- 		spte |= shadow_accessed_mask;
+ 		table_gfn = gw->table_gfn[it.level - 2];
+ 		access = gw->pt_access[it.level - 2];
+@@ -706,8 +706,6 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 	trace_kvm_mmu_spte_requested(fault);
  
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 0d8deefee66c..1279db2eab44 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -28,10 +28,10 @@
-  */
- #define SPTE_TDP_AD_SHIFT		52
- #define SPTE_TDP_AD_MASK		(3ULL << SPTE_TDP_AD_SHIFT)
--#define SPTE_TDP_AD_ENABLED_MASK	(0ULL << SPTE_TDP_AD_SHIFT)
--#define SPTE_TDP_AD_DISABLED_MASK	(1ULL << SPTE_TDP_AD_SHIFT)
--#define SPTE_TDP_AD_WRPROT_ONLY_MASK	(2ULL << SPTE_TDP_AD_SHIFT)
--static_assert(SPTE_TDP_AD_ENABLED_MASK == 0);
-+#define SPTE_TDP_AD_ENABLED		(0ULL << SPTE_TDP_AD_SHIFT)
-+#define SPTE_TDP_AD_DISABLED		(1ULL << SPTE_TDP_AD_SHIFT)
-+#define SPTE_TDP_AD_WRPROT_ONLY		(2ULL << SPTE_TDP_AD_SHIFT)
-+static_assert(SPTE_TDP_AD_ENABLED == 0);
- 
- #ifdef CONFIG_DYNAMIC_PHYSICAL_MASK
- #define SPTE_BASE_ADDR_MASK (physical_mask & ~(u64)(PAGE_SIZE-1))
-@@ -164,7 +164,7 @@ extern u64 __read_mostly shadow_me_value;
- extern u64 __read_mostly shadow_me_mask;
- 
- /*
-- * SPTEs in MMUs without A/D bits are marked with SPTE_TDP_AD_DISABLED_MASK;
-+ * SPTEs in MMUs without A/D bits are marked with SPTE_TDP_AD_DISABLED;
-  * shadow_acc_track_mask is the set of bits to be cleared in non-accessed
-  * pages.
-  */
-@@ -266,18 +266,18 @@ static inline bool sp_ad_disabled(struct kvm_mmu_page *sp)
- static inline bool spte_ad_enabled(u64 spte)
- {
- 	MMU_WARN_ON(!is_shadow_present_pte(spte));
--	return (spte & SPTE_TDP_AD_MASK) != SPTE_TDP_AD_DISABLED_MASK;
-+	return (spte & SPTE_TDP_AD_MASK) != SPTE_TDP_AD_DISABLED;
- }
- 
- static inline bool spte_ad_need_write_protect(u64 spte)
- {
- 	MMU_WARN_ON(!is_shadow_present_pte(spte));
- 	/*
--	 * This is benign for non-TDP SPTEs as SPTE_TDP_AD_ENABLED_MASK is '0',
-+	 * This is benign for non-TDP SPTEs as SPTE_TDP_AD_ENABLED is '0',
- 	 * and non-TDP SPTEs will never set these bits.  Optimize for 64-bit
- 	 * TDP and do the A/D type check unconditionally.
- 	 */
--	return (spte & SPTE_TDP_AD_MASK) != SPTE_TDP_AD_ENABLED_MASK;
-+	return (spte & SPTE_TDP_AD_MASK) != SPTE_TDP_AD_ENABLED;
- }
- 
- static inline u64 spte_shadow_accessed_mask(u64 spte)
+ 	for (; shadow_walk_okay(&it); shadow_walk_next(&it)) {
+-		clear_sp_write_flooding_count(it.sptep);
+-
+ 		/*
+ 		 * We cannot overwrite existing page tables with an NX
+ 		 * large page, as the leaf could be executable.
 -- 
 2.19.1.6.gb485710b
 
