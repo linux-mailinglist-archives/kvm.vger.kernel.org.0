@@ -2,62 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D36265F5FA
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 22:43:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F24FB65F60A
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 22:46:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235891AbjAEVnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 16:43:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60346 "EHLO
+        id S235928AbjAEVq2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 16:46:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235880AbjAEVnN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 16:43:13 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCB063F4C
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 13:43:08 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id y66-20020a25c845000000b00733b5049b6fso37968889ybf.3
-        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 13:43:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0k8Eh3FnHHiMlI7XeQYrpdIiTZhNzkhLxpPe3BO8c4A=;
-        b=c9YSJY/2otkN7Utg70+ilB8KoZM0milhdm1GdIoK4GyiTm0bzWU2vcb5cLDerZrtes
-         wdEidWi7edywndP5LwauyKt/knhk6NyQ3eA1chgtbL0iWe2ibt/rlPz2sSoSNyHqtDON
-         XaNR6AVlL6flOqMQYMBjXjlnDd47hUTCokkK+K6TNsMEp0jNPmNDqAXwlCU9l8oygVql
-         xHiDBUZ4J4Ex4I2fTBv+QszU6ZCmPkGxFMCGGcYqVjz2GHfhNWBRTwMo3C+DgbLLYxuz
-         lLJM1JHfYQeoa2p6/0xdfcRAqc5NvwCu5PiRh0C5OpF4NJ94TIN2yfH+OG0Ebj8Thj09
-         Ws+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0k8Eh3FnHHiMlI7XeQYrpdIiTZhNzkhLxpPe3BO8c4A=;
-        b=bSv7ALS1sEsTjSdRT+qs+g/T1jHeV1JT5L8TiGNKZm93zI+COp6D8FpVqoxAOjMatm
-         Q8Lz6cMLWtq0m0mLs0oPX0DA2aHSOu6oMRYCOLnnKIQqXnYK983cCb86/+TH/q35n5hQ
-         Udsc/UkXYqNW3Hx3relQ6zMAKSS+MXTNM0G9gcYutwT5s2eTZE5kPVa86GfNK6YTTGac
-         2RBiUQR6LyaCSq9jOnoL/phudksjeEFNgYt0Tod4wup3Vco2nnm8jMpxkqvlR84d/QO7
-         8ghQNpa2a/HW2lfu3iYKO+MBPBYPRZcT4rVRXuMwl05Bhni7EcjrEaoQEl1ifJILBQR3
-         d90A==
-X-Gm-Message-State: AFqh2kqlAosiwg8eVDZgoXFfPJIND7tAzUmWj6JIqwUlKbFj6iDyRqO1
-        L8+ZOlxJ6x7l0osi4d6AWKYo5252MJCV/Q==
-X-Google-Smtp-Source: AMrXdXs3+W+vVR3jatr9B/Yvna6j2M6l7O8iIYGoAFyg01kg7sH11hDZHV5Vm13VYF9ILDSJXA1HAE7asnB4HA==
-X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
- (user=dmatlack job=sendgmr) by 2002:a81:1b03:0:b0:4ba:f2ff:566c with SMTP id
- b3-20020a811b03000000b004baf2ff566cmr783615ywb.312.1672954988124; Thu, 05 Jan
- 2023 13:43:08 -0800 (PST)
-Date:   Thu,  5 Jan 2023 13:43:03 -0800
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230105214303.2919415-1-dmatlack@google.com>
-Subject: [PATCH v2] KVM: x86: Replace cpu_dirty_logging_count with nr_memslots_dirty_logging
-From:   David Matlack <dmatlack@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        David Matlack <dmatlack@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        with ESMTP id S235925AbjAEVqZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 16:46:25 -0500
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2075.outbound.protection.outlook.com [40.107.95.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CAF663D28;
+        Thu,  5 Jan 2023 13:46:22 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SkJtITLQPq274TwugSXQ4p3etcxAyD69UYwEsS/Vthg8aYtCqLX/uMYPi2/6m+0+Ou5bAe2U0dTS7hjG1S7/kZKI2fs+RovULGPgAPjnj1e4G0I9WJcpFhUm3A+ehqFO0T8PskqBNJVnor7GD8ircQwXoCJfUDb1OJTOQrh29ryyodMrfhh1Ze31tp9gmDrjdc3ncQryD/BFQDowbLPD52z+XzzNcnEufp9U8XATKL3WTo3DQxLqKsDEN/P27PE9gpxHFJcIh6us/Tx5+zI6/iAySJgFFUGVEgdFUMhRwp1o9fkclmcLFLXC1M9awLppoGQQd/qs6IRYrlqICTetDA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fMbKZJ4SSB6zZqvnrTy73ZeHcgWUYxJ/CIBVBsyFD8s=;
+ b=Dfco4mpDQ0ufDK1wZ5kZE5qnLve5ajYOPoD3l34k2zXk2bDXsf19re/QHkNX7rqnEnimo/EKGLQG9rfMIDZbQJlRa2MSKGsDrS6RGTmZF5vrg6LFa+keprMJ7tV6LWSEYOwonTm3SMKiDYFeNQBVXBr/Z2PQwX9Of/4x5qXP4tfMs99hUf+0dCYyok2T1v+w9lr8izkMIlZMYfnB664yH8KTe6E0eUPwQ14qyrlhmJS1tfXAq4GwxKV/fqN91xSc9C6ipCTj4xZejDMaGX99QjuLCjL/F3VrvCOSLw+fJqwgxg5Pz2LDnvB5DY1brd3MswhBtk1axFbFfoqtYgSIHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fMbKZJ4SSB6zZqvnrTy73ZeHcgWUYxJ/CIBVBsyFD8s=;
+ b=s/ziD4s2PaF70r1yOOtka/FBbjZhvbqfwPLrmaW7kAfKxBK/Us5OqnntM2uvg2KpFnEG6tjtl3cy/JsYAaeK/3z+qt2jevq9LNvkLuWMmu3vr9eOFzqhJMhCmWRgLyIefvsB7HhddkuqTNSRGQts5KozCx2dzjuQMKskw5OaQ0Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SJ2PR12MB8036.namprd12.prod.outlook.com (2603:10b6:a03:4c1::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
+ 2023 21:46:20 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::5317:fa3f:5cbe:45e9%3]) with mapi id 15.20.5944.019; Thu, 5 Jan 2023
+ 21:46:20 +0000
+Message-ID: <1c525bcd-fe77-276d-4697-ac2ec3e00182@amd.com>
+Date:   Thu, 5 Jan 2023 15:46:13 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
+ when adding it to RMP table
+Content-Language: en-US
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Michael Roth <michael.roth@amd.com>, x86@kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org
+References: <cover.1655761627.git.ashish.kalra@amd.com>
+ <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
+ <YuFvbm/Zck9Tr5pq@zn.tnic> <20221219150026.bltiyk72pmdc2ic3@amd.com>
+ <Y6DEv4QuvIfwWlCW@zn.tnic> <ab96e918-c8b7-67d5-1dfd-320264858cec@amd.com>
+ <Y63Jz01c7zLx03gQ@zn.tnic>
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+In-Reply-To: <Y63Jz01c7zLx03gQ@zn.tnic>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH0P221CA0029.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:610:11d::7) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SJ2PR12MB8036:EE_
+X-MS-Office365-Filtering-Correlation-Id: c985107f-2808-43aa-733e-08daef6647d1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: J2muMyBVuJ5wwCEJDbSphgGDymg/aVZi/NsfVb1N8KH1p9276ynFNIID358iHrO7B/W8ZTg+VNyN7uR7lOp3kJM0JMac57ocWibEkjPmCN4or26KAj+so90eeZ8GBYWV39+iYtOLVxHdCqARr+wxxx3e6DzHoxKk9EuVlhoQgeljNGyJwkR8ZaJfEuArWTuYuMb6a7FG6EvDJ/VByE3rrMzAuBzsAAF7bt/S1iy9yVMnAX3f13xlhmgbzZj3Zf3yhdl8N3xHodtwqUlna4VejMQ9d/qYT1QaRcocg3toICOa/BDrH3rNMimGMN84THUbhkjYNSAkPVGXPJc82qagMIvPsofFAyXitPuVA/2jqRBBc32D6pgLo35vh0N1nMNrXljrQx3VZW7g+P6p1bZsUGmJ+8hlY9+YC5jAcIJ98DsLCSBvxXidC9XfRwZCMURpIeYsKm/HfBm44Ru9SgGsA7yRh7yzTa5jJv4EWl4Je/Z92aQKyrBycbObS97Jr6vVJ+kZh4M5AtD8i85W6nwXtHhxqFNzgm3sSfIEWFIt3tnoY4WrwjG7u/7jwmKwjBJRRMFWxvDiTO3o3SOAtvHxZT5TsdGqwJaRYQ5b24kLyEJUELQ66F97dSRgXK3EgjXOHbGzIi607XAEiHyLDH9rbIwntJFQhnzKsM8nyaqnPI2e9A50RbPnPdKRjttfX02ingRH2044KtDal3E1POXXSTqXJ1pM7k+Ur3Qe4dWKVO7qtbcaVmDvldOoXnm+4KdV
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(346002)(396003)(136003)(366004)(451199015)(31686004)(7416002)(7406005)(5660300002)(66556008)(8676002)(316002)(6916009)(2906002)(41300700001)(4326008)(66476007)(8936002)(66946007)(478600001)(6666004)(36756003)(53546011)(6486002)(6506007)(186003)(6512007)(2616005)(26005)(86362001)(31696002)(38100700002)(43740500002)(45980500001)(309714004);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K1VGT05qSTU3eDk0QWdiM1RFNzdSaTljWjNqQXBpYVNRbzNXemxXeFZuWlRI?=
+ =?utf-8?B?cUVYL2JpdnpOVTc5TUdsRHN5LzF3akNWQzZmVzlKbG12Ujc5VUU3WFllZlEy?=
+ =?utf-8?B?YjVrcHFoaGVSRVpUb2kyQ2JuNExISnJEK2FkSEI3SXV6enlwWFFWZTNLQmVE?=
+ =?utf-8?B?T1hvWDFYRVkya202clJqd3BuMGsyN1JsTXY3ZWQ4WmNERzZkdUYyNUZBV1o1?=
+ =?utf-8?B?SERyYU00VUZ4MEtXUkd5WXgwZTZSR051MFBGaU0wRHJjOURpVFpmYzc2Q0lG?=
+ =?utf-8?B?ZmV6QWZERXliQmg1alU4dHliNGsvTGVGT1Jxa29wTkhFdXgwYzBnb0UyQVhy?=
+ =?utf-8?B?YlgvK24zb3UxU3Z2K0MyOHBxNlFYRjhLWnljdFJBcUVJRGQ2Yk1NRXVSR0Qr?=
+ =?utf-8?B?M2NvUDdicVQwMW83WnFsMHhGVXIxSFZRZkh6eHUxN2xBek9BU1BEM2lKcXpB?=
+ =?utf-8?B?aE1zTExJdU5zdHR3VWJ4WS9NS1hrVUhGTmVUWm9zbmRtb0FydExYYzQ5RDdW?=
+ =?utf-8?B?dzFJVjhlUTY0amZ3SEVLcWpaU0JLK003bHhXc01vdUdOYkJGWDYxaCsrNk1I?=
+ =?utf-8?B?bDNMZmRRaHpNWDFkbmUydFBnYTRCUE5FSDh5UnpINEM5U1BRd1F1Q2QwWFlZ?=
+ =?utf-8?B?eWZOTlJxUzduZHJoaHgySUpnVFdkbGxaSEI2Y2FUS1hVSmNKTW45VWlUb0JS?=
+ =?utf-8?B?c3ZHbkNaZzdRR3B3YmFtd2kwYnJkL3lKSHVwcnlLb3JobkFrUzZBZU5Ka2ZW?=
+ =?utf-8?B?WTB5MGdKV0FpRmtUL3lkeG5sVWo4NXhCbEw4cThzTVpBaG9USmRvT0pSUEcr?=
+ =?utf-8?B?aGFoL282c0h6WGU4RTBUbldoOFVHaWQ3OTVJNFJ3RkZFQlhoOFFvYmhwVXgx?=
+ =?utf-8?B?ZkFzM2tuR3I2VnJkVVZxSFNXcjU1cldkcERjU3FsTjgzT3poR0xMRCt4eWEv?=
+ =?utf-8?B?Rzl0eFJzTWljNUpDMnlCQ1lGb2c0TXJJbzZmQjVZTnZaYWYwbjlnZVdxQmp6?=
+ =?utf-8?B?UkFLNFVtN3ZyNXBCWGFtNXNpYytsUFhJMWVrYkptaFRSUmNCUldUMWxhcklR?=
+ =?utf-8?B?OW5iOVhNOTZISjB5QngxWncxOFBxSU02RTczZzBiQWUwaUpFZHVyNzhib3dP?=
+ =?utf-8?B?eDROYXhCNEtEL2dQQ1Bld0d3dzhBY1krWnBjcWF2SnpJZWJzVVRQcDIzQ3VH?=
+ =?utf-8?B?U1dod2hkSk5iWnJMVUNETzRnbEw0T1RsUldxd0dwa1p1cWsySWV4cjZNekdI?=
+ =?utf-8?B?eFhobW5ZeisrejJ2bmNvRmptb2xlNEVCUEp1eGJicGVlS1V2QVRJT2g4ZFIz?=
+ =?utf-8?B?Q0cyK0lNdGFiUFJwM250T1E0TUpoSXR4aGwwWmgrNmk1ZElMOFVaWkZ6Lytz?=
+ =?utf-8?B?aGh0MFhqbGJzSlJNWFNEMXVHbWoyZUw4LytvWGJoMWR1cXpaNkUrcWgrcEhE?=
+ =?utf-8?B?R2JmQnBYREtFZkJYd1duc1Z1dXlPWTRvZGxvKzdTVG9HbWVuRGNseG41MlMr?=
+ =?utf-8?B?VXBsa3NjYnJhb0VteVpnODNlekwrS3d2cjRZdXRPUnZYeDNiR3pPUnBKMTJp?=
+ =?utf-8?B?RUppTkxqc05xTHplUzBoclFPaktYcFYyRjlRTUJrb3RtRFp0RVBLTE5CSjY2?=
+ =?utf-8?B?bWVTS1JXMTh1RjV4ZG1IaytnV3Q1L1RLcVI0SU1uL21zL041STV4ek55b2Iw?=
+ =?utf-8?B?cjVrYWozU29Za3NETEMyZ003dkIyWVdmbWlhOWRoRHpMTGhxdGZTTk9aU2wx?=
+ =?utf-8?B?ZWRGc1h3dXZhT0xHUVFiVHlKYTIwd3BBVHRQTW1Ec1A5bUhhOGZGdE40L0Ns?=
+ =?utf-8?B?VVd0dDJlSWxiUUF4eW1HSFA4WHQweDBaMFZtdmRHa3NGS3ZuTjhXdm1ZdzYv?=
+ =?utf-8?B?NlUrKy9Nd0syeFQzM3NuK0tBbWFVL0o5N01CeGN6bG5xL2owK0VsNG8rcUhI?=
+ =?utf-8?B?dkQvbFdSOHlCbFMwa2xkeG1FTVZaTlBNSmZZak5oN2hLL0FkVW9JR25ER09j?=
+ =?utf-8?B?dXVBYWtpaHJXQTQ4a1gxaXkxZXVuVU1aYXRHNGEvUnc4QXVHMnRVdktSQlFs?=
+ =?utf-8?B?SmVSOXlFYzdIRHlxaFlyTE1zUkJWSHNGQUVVOHFPbW1kVVVSZ1ZzOC9qZUk0?=
+ =?utf-8?Q?O+zkBW18HzDkozkA+yKrGxHkS?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c985107f-2808-43aa-733e-08daef6647d1
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 21:46:19.9145
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: O0djPHJ6ZYbrnfARpiBeLP38ULaP4CrqNVXJ65rpMdJ9+qJuMcKgLe+nTuocZ3/3oIWe4A43quAKmrY4B4x6kw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8036
+X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -65,100 +140,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Drop cpu_dirty_logging_count in favor of nr_memslots_dirty_logging.
-Both fields count the number of memslots that have dirty-logging enabled,
-with the only difference being that cpu_dirty_logging_count is only
-incremented when using PML. So while nr_memslots_dirty_logging is not a
-direct replacement for cpu_dirty_logging_count, it can be combined with
-enable_pml to get the same information.
+Hello Boris,
 
-Signed-off-by: David Matlack <dmatlack@google.com>
----
-v2:
- - Return early if !enable_pml in vmx_update_cpu_dirty_logging() [Sean]
- - Do a single atomic_read() in kvm_mmu_update_cpu_dirty_logging() [Sean]
+On 12/29/2022 11:09 AM, Borislav Petkov wrote:
+> On Tue, Dec 27, 2022 at 03:49:39PM -0600, Kalra, Ashish wrote:
+>> Milan onward,
+> 
+> And before ML there's no SNP, right?
+> 
 
-v1: https://lore.kernel.org/kvm/20230105165431.2770276-1-dmatlack@google.com/
+Yes, that's correct.
 
- arch/x86/include/asm/kvm_host.h | 1 -
- arch/x86/kvm/vmx/vmx.c          | 9 ++++++---
- arch/x86/kvm/x86.c              | 8 +++-----
- 3 files changed, 9 insertions(+), 9 deletions(-)
+>> there is H/W support for coherency between mappings of the
+>> same physical page with different encryption keys, so AFAIK, there should be
+>> no need to flush during page state transitions, where we invoke these direct
+>> map interface functions for re-mapping/invalidating pages.
+> 
+> Yah, that rings a bell.
+> 
+> In any case, the fact that flushing is not needed should be stated
+> somewhere in text so that it is clear why.
+> 
+>> I don't know if there is any other reason to flush after modifying
+>> the direct map ?
+> 
+> There's
+> 
+>          /*
+>           * No need to flush, when we did not set any of the caching
+>           * attributes:
+>           */
+>          cache = !!pgprot2cachemode(mask_set);
+> 
+> 
+> Does the above HW cover this case too?
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 2f5bf581d00a..f328007ea05a 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1329,7 +1329,6 @@ struct kvm_arch {
- 	u32 bsp_vcpu_id;
- 
- 	u64 disabled_quirks;
--	int cpu_dirty_logging_count;
- 
- 	enum kvm_irqchip_mode irqchip_mode;
- 	u8 nr_reserved_ioapic_pins;
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index c788aa382611..bbf60bda877e 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -4606,7 +4606,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
- 	 * it needs to be set here when dirty logging is already active, e.g.
- 	 * if this vCPU was created after dirty logging was enabled.
- 	 */
--	if (!vcpu->kvm->arch.cpu_dirty_logging_count)
-+	if (!enable_pml || !atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
- 		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
- 
- 	if (cpu_has_vmx_xsaves()) {
-@@ -7988,17 +7988,20 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
- {
- 	struct vcpu_vmx *vmx = to_vmx(vcpu);
- 
-+	if (WARN_ON_ONCE(!enable_pml))
-+		return;
-+
- 	if (is_guest_mode(vcpu)) {
- 		vmx->nested.update_vmcs01_cpu_dirty_logging = true;
- 		return;
- 	}
- 
- 	/*
--	 * Note, cpu_dirty_logging_count can be changed concurrent with this
-+	 * Note, nr_memslots_dirty_logging can be changed concurrent with this
- 	 * code, but in that case another update request will be made and so
- 	 * the guest will never run with a stale PML value.
- 	 */
--	if (vcpu->kvm->arch.cpu_dirty_logging_count)
-+	if (atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
- 		secondary_exec_controls_setbit(vmx, SECONDARY_EXEC_ENABLE_PML);
- 	else
- 		secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_ENABLE_PML);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index c936f8d28a53..2f273b20fcdf 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12482,16 +12482,14 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
- 
- static void kvm_mmu_update_cpu_dirty_logging(struct kvm *kvm, bool enable)
- {
--	struct kvm_arch *ka = &kvm->arch;
-+	int nr_slots;
- 
- 	if (!kvm_x86_ops.cpu_dirty_log_size)
- 		return;
- 
--	if ((enable && ++ka->cpu_dirty_logging_count == 1) ||
--	    (!enable && --ka->cpu_dirty_logging_count == 0))
-+	nr_slots = atomic_read(&kvm->nr_memslots_dirty_logging);
-+	if ((enable && nr_slots == 1) || !nr_slots)
- 		kvm_make_all_cpus_request(kvm, KVM_REQ_UPDATE_CPU_DIRTY_LOGGING);
--
--	WARN_ON_ONCE(ka->cpu_dirty_logging_count < 0);
- }
- 
- static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
+Actually, as both set_memory_p() and set_memory_np() are only 
+setting/clearing the _PAGE_PRESENT flag and not changing any of the page 
+caching attributes so this flush won't be required anyway.
 
-base-commit: 91dc252b0dbb6879e4067f614df1e397fec532a1
--- 
-2.39.0.314.g84b9a713c41-goog
+Thanks,
+Ashish
 
+> 
+> Thx.
+> 
