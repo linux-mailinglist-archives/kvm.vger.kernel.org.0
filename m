@@ -2,82 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E7BE865F683
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 23:10:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82A8F65F6A5
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 23:23:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235725AbjAEWKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 17:10:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46000 "EHLO
+        id S235541AbjAEWXV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 17:23:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235753AbjAEWK0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 17:10:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C7767BF0
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 14:09:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1672956575;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FHRon4iazglsqJx0za5dkKZ1ECmTBS5D3uCSiao/wBQ=;
-        b=Z8nnAsIVsplhS9AxYvOfdZwdwcEPyHOeJ6oIGWrrxmjcU8Bgw0bSKGLVBTbUvDDm+E2FXd
-        vlknkPchEfmjJOz1EdXV2LagO5Lt2LMyLnO7IHXD693zGSwAyEYcZuerrWn2eJGO2l607D
-        HmgAHUP5Vwhnmw+Svy2b52XkqIjiNLw=
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
- [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-381-a6ImTjHBOKSo_L14yZSifw-1; Thu, 05 Jan 2023 17:09:33 -0500
-X-MC-Unique: a6ImTjHBOKSo_L14yZSifw-1
-Received: by mail-il1-f198.google.com with SMTP id z19-20020a921a53000000b0030b90211df1so18954ill.2
-        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 14:09:33 -0800 (PST)
+        with ESMTP id S234584AbjAEWXS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 17:23:18 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50CA76B1BC
+        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 14:23:17 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id c4so9428plc.5
+        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 14:23:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9ZUWI9B4Owwm465nJyIQW6HmnzWig8L33yKkIgBmosw=;
+        b=K9f+2BQMqZtR5VH8+ECz8mesBL2ybcl/zaQ3bFlI5mtZ/hz4cF1gb/3ogwoX9PPRgl
+         NckWtYkJnoE7FpHlxWSod9Xroqbi7TvW17pizpjs8wikv7HGtZlJmeJlmDRIQ/03KY3Y
+         tnRBgmi5ybDUp8cBsjYKSDhIFX1q2pNnsNTQZfgIQSv0yhEcimONI1A1vWhHiyYecmes
+         Q/267drc2xi2DqE5CcJYSWMEbCrXbA9NhPL3TPnXFzQtT+Fp8TvNTMG8j64mcfXmubJX
+         5tH4kLRxYoZhXkdWKm+VHftCe6PMKlC6pBwtRKx+MlaL1kT/2kHXBwmRmtEL+0pxKTcF
+         q89A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FHRon4iazglsqJx0za5dkKZ1ECmTBS5D3uCSiao/wBQ=;
-        b=1yKnkUg0Gi1y0LtXd1qX6FZ0HeETGFMh/+5CCGVA0J6YPEXRdSdvPRMwDd89oeNJjF
-         +YQtcIkK3wcxD1ThccrvSaSLMrckosZwmaifLP+MFdu60FB1RXWLftLZ8mkDuuvUAPfM
-         maMo4wiq1Vqndb2e6MBoXb6+SaI+DBLmupscPlVtVWnQqJ+F+A8tNOMYi74JtkH0MZ9x
-         Q1HsLAMJVdHSSG9sjMv2AfWaMdunQX3fkDgdpBcSXnO2shuH7V6NbFMQHfTYpBELt1RM
-         FQSFcb0s/DQ4hnOcC5eblaQUJtrSUafgrqDwkGT0196UM84GUAneizCDDfatJVadKPwr
-         JZSg==
-X-Gm-Message-State: AFqh2kqG/CfGGxlu30j3DF0OxvFX6KcNPN7bSiUJUjeWM0b7GjcimrpY
-        uH6VRh3dIk3LZWS+udW4lURLwPJll+ba03/uuaDjZD9sreiPSDnoO0GRaHZBe/FeKL8WuDATJ0X
-        Rlw2zbKvuGaz6
-X-Received: by 2002:a5e:a609:0:b0:6e4:2893:2b33 with SMTP id q9-20020a5ea609000000b006e428932b33mr32962714ioi.14.1672956573186;
-        Thu, 05 Jan 2023 14:09:33 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXs5yKX/wdLm9HEyg87onxVqgfS0N/eR1/PgmgN9uAH7OlTthfhrG0MhtGAnQyZQ6XYAeeVAMA==
-X-Received: by 2002:a5e:a609:0:b0:6e4:2893:2b33 with SMTP id q9-20020a5ea609000000b006e428932b33mr32962706ioi.14.1672956572929;
-        Thu, 05 Jan 2023 14:09:32 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id w12-20020a5e970c000000b006e3170eeee4sm13692498ioj.6.2023.01.05.14.09.31
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ZUWI9B4Owwm465nJyIQW6HmnzWig8L33yKkIgBmosw=;
+        b=dKrMswDXZQS5sgMO5FC6tGoq0w3e5UiaDENOG9U57EKS+7QlxsOzn5zImvtnS+CZs5
+         bMHQQ8kI1lGFaCndribevgkMCp+eBy4WBdR/Lg8Z3gtU5n/oRokm18cRxileZZh/wBHF
+         Mc/LYK8O6m2Itt55CMLfLwU9q7RrikQcYhtsiGX2ev9UmSupLN4XhFFpVW+atMcWWNRD
+         lFNO2R7RCsdfHQeRbLutgZuBQ3Ipi/waBQjjqTLkeRZ8zRHxltuj26B23hwe1nj6Q48O
+         vq7fHKKw6ol1l5P9/y5XZ+uBcSnmw0KcouJZKm6cIcEEbb1H9+yZn56ff6keikOauA33
+         dr1g==
+X-Gm-Message-State: AFqh2kqjnGKNziHJI0NT4pCKvSfIWGjkvuG7QwjTmaL9OQyi+K+R/vhw
+        diW8E7eB2QNmIXUlS6tDciLG2Q==
+X-Google-Smtp-Source: AMrXdXsCSCT5awBcuS5E75gCkeg3w/PQLlJVHtbF93EP/ViM28fZ2Nq8YfeoQwTeIwzE8wFK4X8/IQ==
+X-Received: by 2002:a17:902:c153:b0:191:1543:6b2f with SMTP id 19-20020a170902c15300b0019115436b2fmr19439plj.3.1672957396726;
+        Thu, 05 Jan 2023 14:23:16 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u9-20020a1709026e0900b00192dda430ddsm5742265plk.123.2023.01.05.14.23.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Jan 2023 14:09:32 -0800 (PST)
-Date:   Thu, 5 Jan 2023 15:09:30 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     jgg@nvidia.com, cohuck@redhat.com, borntraeger@linux.ibm.com,
-        jjherne@linux.ibm.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, hch@infradead.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kevin Tian <kevin.tian@intel.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v3 1/1] vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
-Message-ID: <20230105150930.6ee65182.alex.williamson@redhat.com>
-In-Reply-To: <20220519183311.582380-2-mjrosato@linux.ibm.com>
-References: <20220519183311.582380-1-mjrosato@linux.ibm.com>
-        <20220519183311.582380-2-mjrosato@linux.ibm.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Thu, 05 Jan 2023 14:23:16 -0800 (PST)
+Date:   Thu, 5 Jan 2023 22:23:12 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Michal Luczaj <mhal@rbox.co>
+Cc:     pbonzini@redhat.com, dwmw2@infradead.org, kvm@vger.kernel.org,
+        paul@xen.org
+Subject: Re: [PATCH 1/2] KVM: x86: Fix deadlock in
+ kvm_vm_ioctl_set_msr_filter()
+Message-ID: <Y7dN0Negds7XUbvI@google.com>
+References: <a03a298d-dfd0-b1ed-2375-311044054f1a@redhat.com>
+ <20221229211737.138861-1-mhal@rbox.co>
+ <20221229211737.138861-2-mhal@rbox.co>
+ <Y7RjL+0Sjbm/rmUv@google.com>
+ <c33180be-a5cc-64b1-f2e5-6a1a5dd0d996@rbox.co>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c33180be-a5cc-64b1-f2e5-6a1a5dd0d996@rbox.co>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,34 +76,65 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 19 May 2022 14:33:11 -0400
-Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-
-> Rather than relying on a notifier for associating the KVM with
-> the group, let's assume that the association has already been
-> made prior to device_open.  The first time a device is opened
-> associate the group KVM with the device.
+On Thu, Jan 05, 2023, Michal Luczaj wrote:
+> On 1/3/23 18:17, Sean Christopherson wrote:
+> > On Thu, Dec 29, 2022, Michal Luczaj wrote:
+> >> Move synchronize_srcu(&kvm->srcu) out of kvm->lock critical section.
+> > 
+> > This needs a much more descriptive changelog, and an update to
+> > Documentation/virt/kvm/locking.rst to define the ordering requirements between
+> > kvm->scru and kvm->lock.  And IIUC, there is no deadlock in the current code
+> > base, so this really should be a prep patch that's sent along with the Xen series[*]
+> > that wants to take kvm->-srcu outside of kvm->lock.
+> > 
+> > [*] https://lore.kernel.org/all/20221222203021.1944101-2-mhal@rbox.co
 > 
-> This fixes a user-triggerable oops in GVT.
+> I'd be happy to provide a more descriptive changelog, but right now I'm a
+> bit confused. I'd be really grateful for some clarifications:
+> 
+> I'm not sure how to understand "no deadlock in the current code base". I've
+> ran selftests[1] under the up-to-date mainline/master and I do see the
+> deadlocks. Is there a branch where kvm_xen_set_evtchn() is not taking
+> kvm->lock while inside kvm->srcu?
 
-It seems this has traded an oops for a deadlock, which still exists
-today in both GVT-g and vfio-ap.  These are the only vfio drivers that
-care about kvm, so they make use of kvm_{get,put}_kvm(), where the
-latter is called by their .close_device() callbacks.
+Ah, no, I'm the one that's confused, I saw an earlier patch touch SRCU stuff and
+assumed it introduced the deadlock.  Actually, it's the KVM Xen code that's confused.
 
-.close_device() is called holding the group->group_lock, or at the time
-of this commit group->group_rwsem.  The remaining call chain looks like
-this:
+This comment in kvm_xen_set_evtchn() is a tragicomedy.  It explicitly calls out
+the exact case that would be problematic (Xen hypercall), but commit 2fd6df2f2b47
+("KVM: x86/xen: intercept EVTCHNOP_send from guests") ran right past that.
 
-kvm_put_kvm
- -> kvm_destroy_vm
-  -> kvm_destroy_devices
-   -> kvm_vfio_destroy
-    -> kvm_vfio_file_set_kvm
-     -> vfio_file_set_kvm
-      -> group->group_lock/group_rwsem
+	/*
+	 * For the irqfd workqueue, using the main kvm->lock mutex is
+	 * fine since this function is invoked from kvm_set_irq() with
+	 * no other lock held, no srcu. In future if it will be called
+	 * directly from a vCPU thread (e.g. on hypercall for an IPI)
+	 * then it may need to switch to using a leaf-node mutex for
+	 * serializing the shared_info mapping.
+	 */
+	mutex_lock(&kvm->lock);
 
-Any suggestions for a fix?  Thanks,
+> Also, is there a consensus as for the lock ordering?  IOW, is the state of
+> virt/kvm/locking.rst up to date, regardless of the discussion going on[2]?
 
-Alex
+I'm not convinced that allowing kvm->lock to be taken while holding kvm->srcu is
+a good idea.  Requiring kvm->lock to be dropped before doing synchronize_srcu()
+isn't problematic, and arguably it's a good rule since holding kvm->lock for
+longer than necessary is undesirable.  What I don't like is taking kvm->lock inside
+kvm->srcu.  It's not documented, but in pretty much every other case except Xen,
+sleepable locks are taken outside of kvm->srcu, e.g. vcpu->mutex, slots_lock, and
+quite often kvm->lock itself.
 
+Ha!  Case in point.  The aforementioned Xen code blatantly violates KVM's locking
+rules:
+
+  - kvm->lock is taken outside vcpu->mutex
+
+In the kvm_xen_hypercal() case, vcpu->mutex is held (KVM_RUN) when kvm_xen_set_evtchn()
+is called, i.e. takes kvm->lock inside vcpu->mutex.  It doesn't cause explosions
+because KVM x86 only takes vcpu->mutex inside kvm->lock for SEV, and no one runs
+Xen+SEV guests, but the Xen code is still a trainwreck waiting to happen.
+
+In other words, I'm find with this patch for optimization purposes, but I don't
+think we should call it a bug fix.  commit 2fd6df2f2b47 ("KVM: x86/xen: intercept
+EVTCHNOP_send from guests") is the one who is wrong and needs fixing.
