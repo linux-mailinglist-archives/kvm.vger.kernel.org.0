@@ -2,112 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9514C65E0E7
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 00:25:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 993BB65E15C
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 01:14:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235073AbjADXZu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 18:25:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41284 "EHLO
+        id S235431AbjAEAOo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 19:14:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234474AbjADXZr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 18:25:47 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3154435A
-        for <kvm@vger.kernel.org>; Wed,  4 Jan 2023 15:18:36 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id n65-20020a17090a2cc700b0021bc5ef7a14so218914pjd.0
-        for <kvm@vger.kernel.org>; Wed, 04 Jan 2023 15:18:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gRcfEeBUiKP91OsdArHb6simzQ/tXUisez8hBc+MWKo=;
-        b=YeU28UUL4inyRR7K5g/5Trnb8sZ76lyOBb8OTfdfkx6AUmJMIiQlH+49+Bx4uNuoZ1
-         vEH1jJt49B+55yNcwU8pcBuxnU5H+niZCLDOT74HhOcrGXi/b3iUFJf6oQ3H2hAwk8Cv
-         qV/caibJO6eCkxt9m/vnTZSwMMvugUGv/DCsV76q1HKtg8CtSlwa1qMBoB5K87kFD7Rc
-         jUNXzcbJOFxtniFBeSIjzUvUH0UQwWSdGVWYkRR2sqxFVUc+ovakE6SFIFI8aDfyqg/M
-         MHSMOx4t9dqPYWD2v/2peV6yfGXbq+aq2msDKuTegR7aE7AHA9YTjyHt5woOqX8OMir1
-         adEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gRcfEeBUiKP91OsdArHb6simzQ/tXUisez8hBc+MWKo=;
-        b=au6BP/j+xyhjXoh37w5UuffWTbW+g9eUyqZPfNPCpBle7Bok304jdFDOLMW1b9urWq
-         1kPHLhrzls1khNAA/t4p+BbXaiNKrZG42i6HKik3Gd6oWsfvo94bIv7xxkBhmARMtzsF
-         m8oDcQ115qSdaG/ZbEZPlwK6ejqGuiINJsbvOycL5Ksn3jIQ/6ep8ftAPQb7btQD1hG8
-         IvSIseIVfFd6jo6vuJwG67K1oD6o9lbOZWnfTzXoUcs7HRKI6Mnbc7KmLgIstnR30aIO
-         Y79dOpVHHaaQvKE500T/vBgTcaibxac6GDVMmD7+r72FegKwvZrCXFMwyIcBbtjpFcI8
-         LvAQ==
-X-Gm-Message-State: AFqh2kqOP2JWF3dViJWUq6ROojaPn9uaQG+fABGc+WsVJG6dH6XlErM5
-        CiMfSxH8uQzGHF78hWl1MXMC5g==
-X-Google-Smtp-Source: AMrXdXsDjg+cB5XnlPEkPebRkiYzNI867eG9HsWV7lTjWcL2caaY5Z5/HSEP85Wc/JySwN/fQSfHrA==
-X-Received: by 2002:a17:903:2481:b0:191:1543:6b2f with SMTP id p1-20020a170903248100b0019115436b2fmr3952plw.3.1672874315439;
-        Wed, 04 Jan 2023 15:18:35 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x2-20020a170902ec8200b0017f72a430adsm24909082plg.71.2023.01.04.15.18.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Jan 2023 15:18:34 -0800 (PST)
-Date:   Wed, 4 Jan 2023 23:18:31 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH 1/3] x86/cpu: Process all CPUID dependencies after
- identifying CPU info
-Message-ID: <Y7YJRwlWVqt3uY9/@google.com>
-References: <20221203003745.1475584-1-seanjc@google.com>
- <20221203003745.1475584-2-seanjc@google.com>
- <Y5INU3o+SFReGkLz@zn.tnic>
- <Y5IQNY/fZw2JFA0B@google.com>
- <Y5IUsB83PzHCJ+EY@zn.tnic>
- <Y7XpTAFV6BLT8KgB@google.com>
- <Y7YDz/8lsVigmeXF@zn.tnic>
-MIME-Version: 1.0
+        with ESMTP id S235515AbjAEAOP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 19:14:15 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2087.outbound.protection.outlook.com [40.107.243.87])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 251BB17436;
+        Wed,  4 Jan 2023 16:13:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gl26cj2uvA7y4u/Exnkm2TGUIKsNr9vZWQdH+nm8MixkSuUOq1n5xOLzNfWYM274T1gPI68nIERBLaZU8dLUQzZwv3nE5GSnpmklahJ9wi4FOT8EqYYLh0avN/Akhb5aU7yceaCo1VxTsmU4xM7xbdo+zvbXS9MA+nSkKZiS/gEuIVQrL2xhleRvPKlAMdT6zyqRxxMaHTJ2ssuE44Z7nQKgx3wk0vYf3ZGpoG+9eFXjPd7DaYyKirjcRCX2W7b0SQAzJxVQfuzbjjjYZFduzYqIAgo09lGwot6g24fXJM4ZOqAZ+82ZQ6kwwdU2LotkqQsRaLGrz+5I1bk4gE9kwg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V89MiAqblwWs32Xcy+/gCRrOegqPK6G0klisDcitduo=;
+ b=OyWgaRIy/X96NxHXNQSHFTwLYYPh5IkiHRAmrymQ36IY4iBhCsUiT0HfA0yqvjbEgQZ/lJ7DE3ka8ANcAsjC7F8PlXVyM0EwFI/QQEcYJTjMNiKvW48LgNTaUnEeOFOvNAOydmpCR3j2IBCPNdUFeiW1d7/dgu1Ja+bv/O7rbnLOsR4rfjrP6SNaVQvAt6Gxmh7SsY6zk9YX7AoZspMDgs0yPjjNo4bLE93z7n89VbjeTtyA6KJb6XSNb7wy7Km1FWISAyQ1gQBGfyD/sC0YHUted3nBYvtXhOWxXkUgC+tpMgVrWQN8Mcm+YeSs/JdSFHQ2o56h7gJb+fl4VUf2gQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=V89MiAqblwWs32Xcy+/gCRrOegqPK6G0klisDcitduo=;
+ b=B4XSBBWTDYs8gTn7fse4NDsStRmsliyGkqWzAkivcKrqMO4MoVSBWHZ1dVBTkmp7P/I2X0qgklTGJEME3J22w64OC2Y8GCeNv8PlUmGFwWvWQ/21qTBGWOE7iC4+cayOqmpZUcvLLoG0BkHB3oVN7EVpxmDYoO6K6BsKtm7qjHQIyBZKlC4hSvrwbH4zeyEH5UrWubJAdXfMcVE+je5HikArhX8iSsn+NMAlaRRmOdr6tanZ05dzzDYXV8r3Nh0KvECi7vuEQrkM32P1zjjN3gFHfzLExVfQUdv31Y79IZen2Takg9Ker2JJz85aVY6FDWaBA+bZ6rSkmPo1euvOQA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by IA1PR12MB6260.namprd12.prod.outlook.com (2603:10b6:208:3e4::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Thu, 5 Jan
+ 2023 00:13:22 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5944.019; Thu, 5 Jan 2023
+ 00:13:22 +0000
+Date:   Wed, 4 Jan 2023 20:13:20 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        Joerg Roedel <joro@8bytes.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        Marc Zyngier <maz@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>,
+        Bharat Bhushan <bharat.bhushan@nxp.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
+        Will Deacon <will.deacon@arm.com>
+Subject: Re: [PATCH iommufd v2 8/9] irq/s390: Add arch_is_isolated_msi() for
+ s390
+Message-ID: <Y7YWIFxyl8gD7J47@nvidia.com>
+References: <0-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
+ <8-v2-10ad79761833+40588-secure_msi_jgg@nvidia.com>
+ <BN9PR11MB527666D2192E2C25FF8A36AA8CE19@BN9PR11MB5276.namprd11.prod.outlook.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y7YDz/8lsVigmeXF@zn.tnic>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <BN9PR11MB527666D2192E2C25FF8A36AA8CE19@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: MN2PR05CA0002.namprd05.prod.outlook.com
+ (2603:10b6:208:c0::15) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|IA1PR12MB6260:EE_
+X-MS-Office365-Filtering-Correlation-Id: d9c29a63-15a0-4483-825a-08daeeb1a7c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: d1aw08gMFsgPa/rD5REhje0OLKg12mKCE94v72V43K9LWeEM8NF0Ol1+f0x/LEuUt6S+65NdMyra9J4f9+BNVHcf7JWrukrYWq9D7Zd3kZgYQwCxT6lKt2i5/piLKcIzzUXNXCTP9NI+vZhxaJT74rEf+wDGECtX7slkq+v65RlcS3H/lsU847BPvZNosYC8nagdF+AiVcZeh1a2ebonq6tcBWz66FbSL3ayj3fsWl+9sOl8Qv4bidscqEGkDF8nKQNAlH3yEEuIl57yUXsTE56D82qDVWyUGOKhG+BcS/nJCVrNQcCvKxVwKUh7rwiDSTasmh9iSo+Os5Hi7YV394BbXnvASHjViu33F9OT8YlwCW0BmSX10JEO2LsTTOc2DaZftEnLfbX7JTIkokMjic0P0hcDaVpG67W1HIjTys4uqo5AGMApNQG4BKKhYPgOa9KmIAgQEczm7zsO978ajUOO3+jKL4U5tGO83AZY8juPAmmC+R07ZTXF+fO1GPpqIpwK87EwnDnjJcEZjieod5a3gp+sVZoXOIPa6ZWCjICCeix2wJvnfi5F7xtG8NimywKIfPDB0jUAuyYcBkBtTC0y5hlIJr3hGW9uEH/r1AeNJ3Uq1fXFzsAZZCPc5UHo/3FgA8EtReb7SetrsChRQA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(396003)(39860400002)(136003)(366004)(451199015)(83380400001)(2906002)(86362001)(38100700002)(8936002)(7416002)(4744005)(41300700001)(5660300002)(66556008)(478600001)(2616005)(316002)(26005)(186003)(6512007)(8676002)(4326008)(6506007)(54906003)(6486002)(66946007)(6916009)(66476007)(36756003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Y3rqCIej3xgvhLDe7agbhVsLmuJSCEbsdgyyg/vgZdS/lNUZt4EGGoPBH8SG?=
+ =?us-ascii?Q?Kma7R+K8jvjy1mg1UKapIeTq/M7/SRmwV/S+o8zf/2zy/3SYENwqsdU2eueB?=
+ =?us-ascii?Q?uT7ZeEknPq1PTK2GlXL9MUeaL0ZJX1EgOAcLNkUCstz8vp3uGgFunVGTbtj6?=
+ =?us-ascii?Q?XOX/Vh4UHq8zWP+SYooMA6i/BZV02W2FNO3vfEHl+pNdvpenEuOxvFSU6bti?=
+ =?us-ascii?Q?vu76J7wQMUJp3NSiA2ppyiIM/QloA+2O4l3wmc57Ry3/v2KL/HKn7ZlEfGdF?=
+ =?us-ascii?Q?adJwHXHPdaKxyiiJ7/UkbArQAF/H0S7eg6xWHpXIVbWsPerfjJWhQij5LSk0?=
+ =?us-ascii?Q?3S13e/2SdRxoRLvON5eFMvmn8Z6ES4rZxXnrfsS53fgugPsFxgtNs+Jw1Rzl?=
+ =?us-ascii?Q?bf4nuYa7k3rqW/HD1mY0LDkO6TNX5F4ZTITNHLNOGuTPOmDE4t6cUfxAbvxO?=
+ =?us-ascii?Q?EWA06igHhnR/daqbtkTDKjxp9xIqtk5YpbqsQqb3NWxazraNaeXSK0WfK8+l?=
+ =?us-ascii?Q?Ii2mHhxv/1YcharhhJHdcOa7zSpH2sUz2SmsM1EJQKseT6fGoYofFygOTS06?=
+ =?us-ascii?Q?lKAVGFTP8NbwAFt/F+Pfp6gQwewpssqqCncZ3wOToge/MLQP4uiMla5y+pPw?=
+ =?us-ascii?Q?1yJWQw0kSjhkLgCL9d21KM6lNxxMrPV2MdUyVj8zA35ftlwR1J2R6oJWwV2l?=
+ =?us-ascii?Q?XiOMOvB7qeSubuiJl7tmkZglI7DEMNyLkBotNIXQPRcsD0mahI3gVCT92+l8?=
+ =?us-ascii?Q?JoIrhdGKGRc7otANvJBefpuh5dDh/dxhiwfrDxIOghlvaVgfNI3u0Cyr4OfL?=
+ =?us-ascii?Q?jU/EeTKKiuT+nmphTYaMD5I2qnkEj+rFbedMNnH+qEr5SRZxpW6ILoRNdzNs?=
+ =?us-ascii?Q?bI0W36XUNefYiYTD+gk+Y8ITY8eq6khDmK2cx35volMgSDur5OG30tE2zicP?=
+ =?us-ascii?Q?v01mcHsJcAzP4Op1hNdSllQoeQS7wJ7vVE4DUFeNStZ7qeGIVj8ZRnqplTng?=
+ =?us-ascii?Q?idOEhYWdzoWQQB/g2sb2j+W07Ivl4oA5g4whNAbggquXwd1XJjJZNqXGeMJm?=
+ =?us-ascii?Q?9Pwj194aUV8VO7gK0NO+/gCDhrso5svi/Bus54s9rpglrgLMiA/+uUt8fAbR?=
+ =?us-ascii?Q?y/r8TxmvaomY1r2mQd8B4yCpkvjpn/IysodhmBdZIKl10knhecEirpTwjiW5?=
+ =?us-ascii?Q?+KSixA5AyxsJgwUhjWiWzusoolDGPgyTZezbTtxsFhQ5ZsNjdDVuUTG/sigw?=
+ =?us-ascii?Q?hgrD/D7CQaq3n1P2BuQVT/+LJQOpoegxFkxRsQfDU4QoJpJ9y6jRuETuC7mn?=
+ =?us-ascii?Q?/CCZJ3ERdocjmpuoOX+AcNfxOxAhr7DuWsCB71MRqc4topVVReLDsX/vbVfK?=
+ =?us-ascii?Q?S+oJHnNCIWRCPOIlx/3aDb+Fw6fsTVwsXZMB6kxjnZawS9e+pjEJ0HOBWm27?=
+ =?us-ascii?Q?hG70d7AExhxk1TmQQ+kFMsV4DurdnJKtT0sLmcV7DlgY84IxluGErYBtIX10?=
+ =?us-ascii?Q?ny0mb9m0GvrBWeKVUXtzYOxo5BLKuq9cWW4AITDYb6OlXEOB7lVunWuAL4uj?=
+ =?us-ascii?Q?mU3TOiHSw++FMS9JZPLOB681wSIAHORzkQx6mu2n?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d9c29a63-15a0-4483-825a-08daeeb1a7c9
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jan 2023 00:13:22.0292
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RNcaSrcKVthIvmSKcQw0/wioCCbJkhdzShiABPxvjt1ASCJOOkfua1P5UFCzHw4/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6260
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 04, 2023, Borislav Petkov wrote:
-> On Wed, Jan 04, 2023 at 09:02:04PM +0000, Sean Christopherson wrote:
-> > And there's a non-zero chance we'd end up with a kernel param to allow booting
-> > unknown CPUs, e.g. for people doing weird things with VMs or running old, esoteric
-> > hardware.  At that point we'd end up with a more complex implementation than
-> > processing dependencies on synthetic flags, especially if there's ever a more
-> > legitimate need to process such dependencies.
+On Thu, Dec 15, 2022 at 07:39:25AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Tuesday, December 13, 2022 2:46 AM
+> > @@ -660,7 +664,7 @@ static inline bool msi_device_has_isolated_msi(struct
+> > device *dev)
+> >  	 * is inherently isolated by our definition. As nobody seems to needs
+> >  	 * this be conservative and return false anyhow.
 > 
-> I'm sorry but I'm still unclear on what actual use care are we even fixing here?
+> Also update the comment given the returned value is arch specific
+> now.
 
-There's no fix.  What I was trying to say is that modifying the kernel to refuse
-to boot on unknown CPUs is opening a can of worms for very little benefit.
+	/*
+	 * Arguably if the platform does not enable MSI support then it has
+	 * "isolated MSI", as an interrupt controller that cannot receive MSIs
+	 * is inherently isolated by our definition. The default definition for
+	 * arch_is_isolated_msi() is conservative and returns false anyhow.
+	 */
 
-> If it is about people who'd like to tinker with old hw or doing weird VM things,
-> they can just as well adjust their kernel .configs and rebuild.
-> 
-> Peeking around your patchset, if all this is about dropping the
-> X86_FEATURE_MSR_IA32_FEAT_CTL check and checking only X86_FEATURE_VMX and in
-> order to do that, you want to cover those obscure cases where
-> init_ia32_feat_ctl() won't get run, then sure, I guess - changes look simple
-> enough. :)
-
-Yes, this is purely to drop the explicit X86_FEATURE_MSR_IA32_FEAT_CTL checks.
-
-Alternatively, we could just drop the checks without processing the dependency,
-i.e. take the stance that running KVM with a funky .config is a user error, but
-that feels unnecessarily hostile since it's quite easy to play nice.
-
-Or I guess do nothing and carry the explicit checks.
+Jason
