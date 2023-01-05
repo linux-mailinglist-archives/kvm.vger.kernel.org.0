@@ -2,94 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9D7DA65F54E
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 21:38:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D36265F5FA
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 22:43:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235605AbjAEUiw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 15:38:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34714 "EHLO
+        id S235891AbjAEVnP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 16:43:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235599AbjAEUip (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 15:38:45 -0500
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCAE263F46
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 12:38:42 -0800 (PST)
-Received: by mail-qt1-x82b.google.com with SMTP id bp44so28344315qtb.0
-        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 12:38:42 -0800 (PST)
+        with ESMTP id S235880AbjAEVnN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 16:43:13 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCB063F4C
+        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 13:43:08 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id y66-20020a25c845000000b00733b5049b6fso37968889ybf.3
+        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 13:43:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=5R84gnDXIcZCl3q1uuKNVrzE7JF/GewA0GD7Joj4Tac=;
-        b=JTqD02qzpNL7au3Z3GUF4Xu2ARxubYVglZyPFMGjd5IBB76X21fyAUfGvELrmmzFik
-         QzBJjZBaZ6aZe7oTAlxNCti0+kLpAukE+qZM7LrpHVjgAMiyLgJZ2+98YW1K5vKsRoVw
-         2umAOw9diVB8LQA7BnZCONR8pssadQA3XE8f0al71RlaiMm7wUNlcWpSs5hmEzVyjqeM
-         eYv5U34leRc2bqLAihlC18sqPCveW9G6816ZQccg0Z2ovOthL6yQhQkI0guVnNH8iTu7
-         dG6eqdfXW1bD1DNzwo+oob/r+0lWSVvlcjXTltffxVApLthVRgT5BHTNgmHgdLEzU0KX
-         YdYg==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0k8Eh3FnHHiMlI7XeQYrpdIiTZhNzkhLxpPe3BO8c4A=;
+        b=c9YSJY/2otkN7Utg70+ilB8KoZM0milhdm1GdIoK4GyiTm0bzWU2vcb5cLDerZrtes
+         wdEidWi7edywndP5LwauyKt/knhk6NyQ3eA1chgtbL0iWe2ibt/rlPz2sSoSNyHqtDON
+         XaNR6AVlL6flOqMQYMBjXjlnDd47hUTCokkK+K6TNsMEp0jNPmNDqAXwlCU9l8oygVql
+         xHiDBUZ4J4Ex4I2fTBv+QszU6ZCmPkGxFMCGGcYqVjz2GHfhNWBRTwMo3C+DgbLLYxuz
+         lLJM1JHfYQeoa2p6/0xdfcRAqc5NvwCu5PiRh0C5OpF4NJ94TIN2yfH+OG0Ebj8Thj09
+         Ws+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5R84gnDXIcZCl3q1uuKNVrzE7JF/GewA0GD7Joj4Tac=;
-        b=LZUKdAoRGzpWLfbaQhgFSCw0Zh5SBa+fO8QvqrJadhUodfoNKhHVES3wK766tQnDnk
-         GE0Jrs1VqDfgur2v9CrY3dAjXarrb/pufNGA65br06lMhzLg8XUWegsMQe8TUz/ovB/U
-         peDDb405WXHZ+DGzRANDR1WHSLlHbMFjdidnPGZDxjcDFjqLqunbz9ti3UIBEsx3etXw
-         pV9u672O/X0TmCHLe6/ipeCto/FyAVhyYtEvxiHTuTuPPS+opeafIfuokMMg7l1HXNZh
-         ZR0X2tG3uUKLPwFymMgJyZyvS4l307pBumK0516TPqL5Tf3O3qxYmmQSZiGm51cFo4tC
-         iAbg==
-X-Gm-Message-State: AFqh2kon5JVEwFQyy3NZRbOh+85MOztBgMivI1j3/jHmG1YlPYslxXWz
-        5gLt7UHAP58a1b0PjjmRBzwRKZnrqxyAS+cy7XSEhQ==
-X-Google-Smtp-Source: AMrXdXsO9CWfLwOzPVqYnAJucA/qVRf1ChKGrluQUWC1ROk0zrv6560/2Dre8nwP8Lxgkk7sOMhP2BMCSX8GFdVvZpI=
-X-Received: by 2002:ac8:5e0c:0:b0:3ab:754e:f0b3 with SMTP id
- h12-20020ac85e0c000000b003ab754ef0b3mr2062105qtx.583.1672951121587; Thu, 05
- Jan 2023 12:38:41 -0800 (PST)
-MIME-Version: 1.0
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com> <20221202061347.1070246-10-chao.p.peng@linux.intel.com>
-In-Reply-To: <20221202061347.1070246-10-chao.p.peng@linux.intel.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Thu, 5 Jan 2023 12:38:30 -0800
-Message-ID: <CAGtprH_pbSo1HeEFUEB6ZZxm-=NEw+nLZ6ZVvr76=9BeX=AHPA@mail.gmail.com>
-Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0k8Eh3FnHHiMlI7XeQYrpdIiTZhNzkhLxpPe3BO8c4A=;
+        b=bSv7ALS1sEsTjSdRT+qs+g/T1jHeV1JT5L8TiGNKZm93zI+COp6D8FpVqoxAOjMatm
+         Q8Lz6cMLWtq0m0mLs0oPX0DA2aHSOu6oMRYCOLnnKIQqXnYK983cCb86/+TH/q35n5hQ
+         Udsc/UkXYqNW3Hx3relQ6zMAKSS+MXTNM0G9gcYutwT5s2eTZE5kPVa86GfNK6YTTGac
+         2RBiUQR6LyaCSq9jOnoL/phudksjeEFNgYt0Tod4wup3Vco2nnm8jMpxkqvlR84d/QO7
+         8ghQNpa2a/HW2lfu3iYKO+MBPBYPRZcT4rVRXuMwl05Bhni7EcjrEaoQEl1ifJILBQR3
+         d90A==
+X-Gm-Message-State: AFqh2kqlAosiwg8eVDZgoXFfPJIND7tAzUmWj6JIqwUlKbFj6iDyRqO1
+        L8+ZOlxJ6x7l0osi4d6AWKYo5252MJCV/Q==
+X-Google-Smtp-Source: AMrXdXs3+W+vVR3jatr9B/Yvna6j2M6l7O8iIYGoAFyg01kg7sH11hDZHV5Vm13VYF9ILDSJXA1HAE7asnB4HA==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a81:1b03:0:b0:4ba:f2ff:566c with SMTP id
+ b3-20020a811b03000000b004baf2ff566cmr783615ywb.312.1672954988124; Thu, 05 Jan
+ 2023 13:43:08 -0800 (PST)
+Date:   Thu,  5 Jan 2023 13:43:03 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20230105214303.2919415-1-dmatlack@google.com>
+Subject: [PATCH v2] KVM: x86: Replace cpu_dirty_logging_count with nr_memslots_dirty_logging
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+        David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -97,41 +65,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 1, 2022 at 10:20 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
->
-> +#ifdef CONFIG_HAVE_KVM_RESTRICTED_MEM
-> +static bool restrictedmem_range_is_valid(struct kvm_memory_slot *slot,
-> +                                        pgoff_t start, pgoff_t end,
-> +                                        gfn_t *gfn_start, gfn_t *gfn_end)
-> +{
-> +       unsigned long base_pgoff = slot->restricted_offset >> PAGE_SHIFT;
-> +
-> +       if (start > base_pgoff)
-> +               *gfn_start = slot->base_gfn + start - base_pgoff;
+Drop cpu_dirty_logging_count in favor of nr_memslots_dirty_logging.
+Both fields count the number of memslots that have dirty-logging enabled,
+with the only difference being that cpu_dirty_logging_count is only
+incremented when using PML. So while nr_memslots_dirty_logging is not a
+direct replacement for cpu_dirty_logging_count, it can be combined with
+enable_pml to get the same information.
 
-There should be a check for overflow here in case start is a very big
-value. Additional check can look like:
-if (start >= base_pgoff + slot->npages)
-       return false;
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+v2:
+ - Return early if !enable_pml in vmx_update_cpu_dirty_logging() [Sean]
+ - Do a single atomic_read() in kvm_mmu_update_cpu_dirty_logging() [Sean]
 
-> +       else
-> +               *gfn_start = slot->base_gfn;
-> +
-> +       if (end < base_pgoff + slot->npages)
-> +               *gfn_end = slot->base_gfn + end - base_pgoff;
+v1: https://lore.kernel.org/kvm/20230105165431.2770276-1-dmatlack@google.com/
 
-If "end" is smaller than base_pgoff, this can cause overflow and
-return the range as valid. There should be additional check:
-if (end < base_pgoff)
-         return false;
+ arch/x86/include/asm/kvm_host.h | 1 -
+ arch/x86/kvm/vmx/vmx.c          | 9 ++++++---
+ arch/x86/kvm/x86.c              | 8 +++-----
+ 3 files changed, 9 insertions(+), 9 deletions(-)
 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index 2f5bf581d00a..f328007ea05a 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1329,7 +1329,6 @@ struct kvm_arch {
+ 	u32 bsp_vcpu_id;
+ 
+ 	u64 disabled_quirks;
+-	int cpu_dirty_logging_count;
+ 
+ 	enum kvm_irqchip_mode irqchip_mode;
+ 	u8 nr_reserved_ioapic_pins;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c788aa382611..bbf60bda877e 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4606,7 +4606,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+ 	 * it needs to be set here when dirty logging is already active, e.g.
+ 	 * if this vCPU was created after dirty logging was enabled.
+ 	 */
+-	if (!vcpu->kvm->arch.cpu_dirty_logging_count)
++	if (!enable_pml || !atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
+ 		exec_control &= ~SECONDARY_EXEC_ENABLE_PML;
+ 
+ 	if (cpu_has_vmx_xsaves()) {
+@@ -7988,17 +7988,20 @@ void vmx_update_cpu_dirty_logging(struct kvm_vcpu *vcpu)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+ 
++	if (WARN_ON_ONCE(!enable_pml))
++		return;
++
+ 	if (is_guest_mode(vcpu)) {
+ 		vmx->nested.update_vmcs01_cpu_dirty_logging = true;
+ 		return;
+ 	}
+ 
+ 	/*
+-	 * Note, cpu_dirty_logging_count can be changed concurrent with this
++	 * Note, nr_memslots_dirty_logging can be changed concurrent with this
+ 	 * code, but in that case another update request will be made and so
+ 	 * the guest will never run with a stale PML value.
+ 	 */
+-	if (vcpu->kvm->arch.cpu_dirty_logging_count)
++	if (atomic_read(&vcpu->kvm->nr_memslots_dirty_logging))
+ 		secondary_exec_controls_setbit(vmx, SECONDARY_EXEC_ENABLE_PML);
+ 	else
+ 		secondary_exec_controls_clearbit(vmx, SECONDARY_EXEC_ENABLE_PML);
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index c936f8d28a53..2f273b20fcdf 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12482,16 +12482,14 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+ 
+ static void kvm_mmu_update_cpu_dirty_logging(struct kvm *kvm, bool enable)
+ {
+-	struct kvm_arch *ka = &kvm->arch;
++	int nr_slots;
+ 
+ 	if (!kvm_x86_ops.cpu_dirty_log_size)
+ 		return;
+ 
+-	if ((enable && ++ka->cpu_dirty_logging_count == 1) ||
+-	    (!enable && --ka->cpu_dirty_logging_count == 0))
++	nr_slots = atomic_read(&kvm->nr_memslots_dirty_logging);
++	if ((enable && nr_slots == 1) || !nr_slots)
+ 		kvm_make_all_cpus_request(kvm, KVM_REQ_UPDATE_CPU_DIRTY_LOGGING);
+-
+-	WARN_ON_ONCE(ka->cpu_dirty_logging_count < 0);
+ }
+ 
+ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
 
-> +       else
-> +               *gfn_end = slot->base_gfn + slot->npages;
-> +
-> +       if (*gfn_start >= *gfn_end)
-> +               return false;
-> +
-> +       return true;
-> +}
-> +
+base-commit: 91dc252b0dbb6879e4067f614df1e397fec532a1
+-- 
+2.39.0.314.g84b9a713c41-goog
+
