@@ -2,45 +2,45 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BFBDD65E3A2
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 04:40:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 86CDE65E3A6
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 04:41:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229896AbjAEDjk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 22:39:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41954 "EHLO
+        id S229763AbjAEDl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 22:41:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230241AbjAEDjP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 22:39:15 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B55E748CE6;
-        Wed,  4 Jan 2023 19:39:14 -0800 (PST)
+        with ESMTP id S229503AbjAEDl1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 22:41:27 -0500
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54BB6B4AA;
+        Wed,  4 Jan 2023 19:41:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1672889954; x=1704425954;
+  t=1672890086; x=1704426086;
   h=date:from:to:cc:subject:message-id:reply-to:references:
-   mime-version:in-reply-to;
-  bh=7+whF6O83FkAi7trCF9TEjov28V0K0S8cRinP/bHSI4=;
-  b=ElbdV5eTGT0Yeh0HM7g0ELxfawM/y47UILcCEBkPM68kEcmsvpMG+yo2
-   cXyNaWIwr5t8fjT02RdsoajI+ciGPSFbNWp73UECvKAgpC7jDrabEqrBH
-   EgVTKZeEapj7m8WNX4e00SdxMrrq2WYVewX2G0SVcSbWm/FrjexK91IXG
-   41WXjiJSG/GHmgk94LfsV1ZUi0KFQYzdg9w/KZtSHupwiikwFlSHYKxdS
-   hNCtxMFuWG2qNqyDsnLN9xtVyKWNSROjcQ0k9l/cq+XlD/Gb+2ugG23W2
-   2O+SAOO4XgMQdA4ML+KfswJKuUmxX9tvfRWUSmQCxaOAeX5WaRqWLy4E+
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="349328871"
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=jhdOYu/i/WR/3sag1mrvD/fdCUONvVid9L0DwaMBfmI=;
+  b=bkM1tiySFA9OMfIBUtIVHdfN/bVtDcbSN63uy7cqgomsx0JAYuSnI0fZ
+   2jFIm/Xn4LWd3sELTBEwqkmo1GbsgFuVa744XvlEZrRm0wtgcS8SKYIQh
+   cmoei4hMof4vTd50e6yiRSxMJbWwkmWAla+WslzlI5nixAZXzAVMS2QZn
+   bFHRORpPo80udqS835GbB/IT9UD86KHLZB5JTeFS9oS2Ad3avgV5RnQkA
+   IqntWPPtvULPE22CTpmV7lbajhzrIU3rTUZWSPXhAJYT6CgsPgt3Ku1iB
+   EsciH//o6/i14fgGeHR4f5IoGnk6igc93WgiKVFP3pE/1kiH+5sG7jY97
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="384401926"
 X-IronPort-AV: E=Sophos;i="5.96,301,1665471600"; 
-   d="scan'208";a="349328871"
+   d="scan'208";a="384401926"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2023 19:39:14 -0800
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jan 2023 19:41:25 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="829394357"
+X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="829395002"
 X-IronPort-AV: E=Sophos;i="5.96,301,1665471600"; 
-   d="scan'208";a="829394357"
+   d="scan'208";a="829395002"
 Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
-  by orsmga005.jf.intel.com with ESMTP; 04 Jan 2023 19:39:04 -0800
-Date:   Thu, 5 Jan 2023 11:34:51 +0800
+  by orsmga005.jf.intel.com with ESMTP; 04 Jan 2023 19:41:13 -0800
+Date:   Thu, 5 Jan 2023 11:37:00 +0800
 From:   Chao Peng <chao.p.peng@linux.intel.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>
+To:     Borislav Petkov <bp@alien8.de>
 Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
         linux-coco@lists.linux.dev, linux-mm@kvack.org,
         linux-crypto@vger.kernel.org, x86@kernel.org,
@@ -51,47 +51,39 @@ Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
         luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
         pgonda@google.com, peterz@infradead.org,
         srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, harald@profian.com,
         Nikunj A Dadhania <nikunj@amd.com>
 Subject: Re: [PATCH RFC v7 01/64] KVM: Fix memslot boundary condition for
  large page
-Message-ID: <20230105033451.GA2251521@chaop.bj.intel.com>
+Message-ID: <20230105033700.GB2251521@chaop.bj.intel.com>
 Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
 References: <20221214194056.161492-1-michael.roth@amd.com>
  <20221214194056.161492-2-michael.roth@amd.com>
- <Y7VqgbTE34/Sxupw@kernel.org>
+ <Y6RKhDVaeqVZwMCZ@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=gb2312
 Content-Disposition: inline
-In-Reply-To: <Y7VqgbTE34/Sxupw@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Y6RKhDVaeqVZwMCZ@zn.tnic>
 X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 12:01:05PM +0000, Jarkko Sakkinen wrote:
+On Thu, Dec 22, 2022 at 01:16:04PM +0100, Borislav Petkov wrote:
 > On Wed, Dec 14, 2022 at 01:39:53PM -0600, Michael Roth wrote:
 > > From: Nikunj A Dadhania <nikunj@amd.com>
 > > 
 > > Aligned end boundary causes a kvm crash, handle the case.
 > > 
-> 
-> Link: https://lore.kernel.org/kvm/20221202061347.1070246-8-chao.p.peng@linux.intel.com/
-> 
-> Chao, are you aware of this issue already?
-
-Thanks Jarkko adding me. I'm not aware of there is a fix.
-
-> 
 > > Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 > > Signed-off-by: Michael Roth <michael.roth@amd.com>
 > > ---
@@ -108,23 +100,36 @@ Thanks Jarkko adding me. I'm not aware of there is a fix.
 > >  
 > > +		if (gfn == last)
 > > +			goto out;
-> > +
+> 
+> I'm guessing this was supposed to be "return;" here:
 
-Nikunj or Michael, could you help me understand in which case it causes
-a KVM crash? To me, even the end is aligned to huge page boundary, but:
-    last = (end - 1) & mask;
-so 'last' is the base address for the last effective huage page. Even
-when gfn == last, it should still a valid page and needs to be updated
-for mem_attrs, correct?
+If we finally need this, this should be "continue;", we can't skip the
+remaining huge page levels.
 
 Thanks,
 Chao
-> >  		gfn = last;
-> >  		gfn_end = min(last + pages, slot->base_gfn + slot->npages);
-> >  		mixed = mem_attrs_mixed(kvm, slot, level, attrs, gfn, gfn_end);
-> > -- 
-> > 2.25.1
-> > 
 > 
+> arch/x86/kvm/mmu/mmu.c: In function ¡®kvm_update_lpage_private_shared_mixed¡¯:
+> arch/x86/kvm/mmu/mmu.c:7090:25: error: label ¡®out¡¯ used but not defined
+>  7090 |                         goto out;
+>       |                         ^~~~
 > 
-> BR, Jarkko
+> /me goes and digs deeper.
+> 
+> Aha, it was a "return" but you reordered the patches and the one adding
+> the out label:
+> 
+> KVM: x86: Add 'update_mem_attr' x86 op
+> 
+> went further down and this became the first but it didn't have the label
+> anymore.
+> 
+> Yeah, each patch needs to build successfully for bisection reasons, ofc.
+> 
+> Thx.
+> 
+> -- 
+> Regards/Gruss,
+>     Boris.
+> 
+> https://people.kernel.org/tglx/notes-about-netiquette
