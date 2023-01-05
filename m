@@ -2,79 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EFCD65F676
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 23:10:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7BE865F683
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 23:10:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235353AbjAEWJh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 17:09:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46590 "EHLO
+        id S235725AbjAEWKk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 17:10:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235726AbjAEWJB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 17:09:01 -0500
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADFFB6953B
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 14:08:59 -0800 (PST)
-Received: by mail-oi1-x231.google.com with SMTP id r130so33184622oih.2
-        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 14:08:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bn7Z6oDABvJGYJVlfHzj/OFR2MilP9KE/xPylqtRaI8=;
-        b=LPsmEqdAF17ASsCpSdQFeo9d4yZM+w20RGOPe9inlsD+sZCird0lne6ib9WTiUsoq6
-         2YgzaklAwt7/d/G7TwXebs7qINP7lo6g4gokBAoTDbEuLNRCPOur2bdGaSB5436CIeQq
-         ow56Fuel0bIs5L34wyTU1If5GO/VcfHRlBWxOg8w8qsR3+7n9GR21BPqtWii9RShhyO4
-         sK4o0wllJQDfn0fBTBRKdj+90uTkehVGEmVCx2XkcMotlGcWsc49QFRAovOssriMnEgU
-         2rvFg916i1tZO2H3RWKP5p1gJ4gYmWV4zvrIbxxpj3BvvCGMhW7SujCWmA146HEcnYhg
-         iNbg==
+        with ESMTP id S235753AbjAEWK0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 17:10:26 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C7767BF0
+        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 14:09:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1672956575;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FHRon4iazglsqJx0za5dkKZ1ECmTBS5D3uCSiao/wBQ=;
+        b=Z8nnAsIVsplhS9AxYvOfdZwdwcEPyHOeJ6oIGWrrxmjcU8Bgw0bSKGLVBTbUvDDm+E2FXd
+        vlknkPchEfmjJOz1EdXV2LagO5Lt2LMyLnO7IHXD693zGSwAyEYcZuerrWn2eJGO2l607D
+        HmgAHUP5Vwhnmw+Svy2b52XkqIjiNLw=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-381-a6ImTjHBOKSo_L14yZSifw-1; Thu, 05 Jan 2023 17:09:33 -0500
+X-MC-Unique: a6ImTjHBOKSo_L14yZSifw-1
+Received: by mail-il1-f198.google.com with SMTP id z19-20020a921a53000000b0030b90211df1so18954ill.2
+        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 14:09:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bn7Z6oDABvJGYJVlfHzj/OFR2MilP9KE/xPylqtRaI8=;
-        b=Vo3oibld/A6GQiPvaRRBl0b+OY6sA5WFvJwuAmnMjFlpu/Xat9hdyF0noiTdvIzTJD
-         uSXSSsep7NKvbCZJrpCE3n37UCR7KG0t+S2WCCFGuyCAKxRr6kh/apoL6gmxY7QMabAD
-         HAFf9KyIA1HvO0Tenc1AL1kl+ncWbSsoAN6TXJPGqwi6I3goi2jLVBYZuuu6NG3jlP+3
-         pPIgNAhbEsQ3L3hSXWxpS+6eiC9Qg22gBk13WuZzZXcIRJ5SbFmOcqvVjV4KrtPBn000
-         9RBsS8k5YGDdTRlLCKt8OBXiGrfP7d4fPufyiVU9lrcV7Q9i1iXFiZkURDfFNCkRxJ3K
-         64qg==
-X-Gm-Message-State: AFqh2kpJIJ/pGs+6lnnPumISvamjfSLulRWHfn4IqByb1R4V0TyAumz9
-        XIGUMDoayttbHUxJpmmJwU6/2rwH1EpO1uILw2fMAg==
-X-Google-Smtp-Source: AMrXdXuxkMBtlIcBn4GdWW98m54t/OKdTbEuF+GncEMuoeBfYSSzt5Own7F/lydDPhj0/ruVF7sknqqThK7mIt4x8Js=
-X-Received: by 2002:a05:6808:3947:b0:354:7fd4:f17b with SMTP id
- en7-20020a056808394700b003547fd4f17bmr2403497oib.221.1672956538794; Thu, 05
- Jan 2023 14:08:58 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FHRon4iazglsqJx0za5dkKZ1ECmTBS5D3uCSiao/wBQ=;
+        b=1yKnkUg0Gi1y0LtXd1qX6FZ0HeETGFMh/+5CCGVA0J6YPEXRdSdvPRMwDd89oeNJjF
+         +YQtcIkK3wcxD1ThccrvSaSLMrckosZwmaifLP+MFdu60FB1RXWLftLZ8mkDuuvUAPfM
+         maMo4wiq1Vqndb2e6MBoXb6+SaI+DBLmupscPlVtVWnQqJ+F+A8tNOMYi74JtkH0MZ9x
+         Q1HsLAMJVdHSSG9sjMv2AfWaMdunQX3fkDgdpBcSXnO2shuH7V6NbFMQHfTYpBELt1RM
+         FQSFcb0s/DQ4hnOcC5eblaQUJtrSUafgrqDwkGT0196UM84GUAneizCDDfatJVadKPwr
+         JZSg==
+X-Gm-Message-State: AFqh2kqG/CfGGxlu30j3DF0OxvFX6KcNPN7bSiUJUjeWM0b7GjcimrpY
+        uH6VRh3dIk3LZWS+udW4lURLwPJll+ba03/uuaDjZD9sreiPSDnoO0GRaHZBe/FeKL8WuDATJ0X
+        Rlw2zbKvuGaz6
+X-Received: by 2002:a5e:a609:0:b0:6e4:2893:2b33 with SMTP id q9-20020a5ea609000000b006e428932b33mr32962714ioi.14.1672956573186;
+        Thu, 05 Jan 2023 14:09:33 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXs5yKX/wdLm9HEyg87onxVqgfS0N/eR1/PgmgN9uAH7OlTthfhrG0MhtGAnQyZQ6XYAeeVAMA==
+X-Received: by 2002:a5e:a609:0:b0:6e4:2893:2b33 with SMTP id q9-20020a5ea609000000b006e428932b33mr32962706ioi.14.1672956572929;
+        Thu, 05 Jan 2023 14:09:32 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id w12-20020a5e970c000000b006e3170eeee4sm13692498ioj.6.2023.01.05.14.09.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 Jan 2023 14:09:32 -0800 (PST)
+Date:   Thu, 5 Jan 2023 15:09:30 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     jgg@nvidia.com, cohuck@redhat.com, borntraeger@linux.ibm.com,
+        jjherne@linux.ibm.com, akrowiak@linux.ibm.com, pasic@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, hch@infradead.org,
+        intel-gfx@lists.freedesktop.org,
+        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kevin Tian <kevin.tian@intel.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH v3 1/1] vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
+Message-ID: <20230105150930.6ee65182.alex.williamson@redhat.com>
+In-Reply-To: <20220519183311.582380-2-mjrosato@linux.ibm.com>
+References: <20220519183311.582380-1-mjrosato@linux.ibm.com>
+        <20220519183311.582380-2-mjrosato@linux.ibm.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <cover.1655761627.git.ashish.kalra@amd.com> <243778c282cd55a554af9c11d2ecd3ff9ea6820f.1655761627.git.ashish.kalra@amd.com>
- <YuFvbm/Zck9Tr5pq@zn.tnic> <20221219150026.bltiyk72pmdc2ic3@amd.com>
- <Y6DEv4QuvIfwWlCW@zn.tnic> <ab96e918-c8b7-67d5-1dfd-320264858cec@amd.com>
-In-Reply-To: <ab96e918-c8b7-67d5-1dfd-320264858cec@amd.com>
-From:   Marc Orr <marcorr@google.com>
-Date:   Thu, 5 Jan 2023 14:08:47 -0800
-Message-ID: <CAA03e5GKCcevo7goyyRqWrgk3KeFPTddb-E2pRmgDmyPSNxDvA@mail.gmail.com>
-Subject: Re: [PATCH Part2 v6 07/49] x86/sev: Invalid pages from direct map
- when adding it to RMP table
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Michael Roth <michael.roth@amd.com>, x86@kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,47 +85,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Dec 27, 2022 at 1:49 PM Kalra, Ashish <ashish.kalra@amd.com> wrote:
->
-> Hello Boris,
->
-> On 12/19/2022 2:08 PM, Borislav Petkov wrote:
-> > On Mon, Dec 19, 2022 at 09:00:26AM -0600, Michael Roth wrote:
-> >> We implemented this approach for v7, but it causes a fairly significant
-> >> performance regression, particularly for the case for npages > 1 which
-> >> this change was meant to optimize.
-> >>
-> >> I still need to dig in a big but I'm guessing it's related to flushing
-> >> behavior.
-> >
-> > Well, AFAICT, change_page_attr_set_clr() flushes once at the end.
-> >
-> > Don't you need to flush when you modify the direct map?
-> >
->
-> Milan onward, there is H/W support for coherency between mappings of the
-> same physical page with different encryption keys, so AFAIK, there
-> should be no need to flush during page state transitions, where we
-> invoke these direct map interface functions for re-mapping/invalidating
-> pages.
->
-> I don't know if there is any other reason to flush after modifying
-> the direct map ?
+On Thu, 19 May 2022 14:33:11 -0400
+Matthew Rosato <mjrosato@linux.ibm.com> wrote:
 
-Isn't the Milan coherence feature (SME_COHERENT?) about the caches --
-not the TLBs? And isn't the flushing being discussed here about the
-TLBs?
+> Rather than relying on a notifier for associating the KVM with
+> the group, let's assume that the association has already been
+> made prior to device_open.  The first time a device is opened
+> associate the group KVM with the device.
+> 
+> This fixes a user-triggerable oops in GVT.
 
-Also, I thought that Mingwei Zhang <mizhang@google.com> found that the
-Milan SEV coherence feature was basically unusable in Linux because it
-only works across CPUs. It does not extend to IO (e.g., CPU caches
-need to be flushed prior to free'ing a SEV VM's private address and
-reallocating that location to a device driver to be used for IO). My
-understanding of this feature and its limitations may be too coarse.
-But I think we should be very careful about relying on this feature as
-it is implemented in Milan.
+It seems this has traded an oops for a deadlock, which still exists
+today in both GVT-g and vfio-ap.  These are the only vfio drivers that
+care about kvm, so they make use of kvm_{get,put}_kvm(), where the
+latter is called by their .close_device() callbacks.
 
-That being said, I guess I could see an argument to rely on the
-feature here, since we're not deallocating the memory and reallocating
-it to a device. But again, I thought the feature was about cache
-coherence -- not TLB coherence.
+.close_device() is called holding the group->group_lock, or at the time
+of this commit group->group_rwsem.  The remaining call chain looks like
+this:
+
+kvm_put_kvm
+ -> kvm_destroy_vm
+  -> kvm_destroy_devices
+   -> kvm_vfio_destroy
+    -> kvm_vfio_file_set_kvm
+     -> vfio_file_set_kvm
+      -> group->group_lock/group_rwsem
+
+Any suggestions for a fix?  Thanks,
+
+Alex
+
