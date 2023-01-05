@@ -2,119 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD5F965E672
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 09:07:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C5BC265E6C9
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 09:22:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231329AbjAEIHI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 03:07:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52198 "EHLO
+        id S231948AbjAEIWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 03:22:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229839AbjAEIHF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 03:07:05 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CDF7544F3;
-        Thu,  5 Jan 2023 00:07:05 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3057kGWt005426;
-        Thu, 5 Jan 2023 08:06:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=em0hYjDj0abFWoDkUwKCbrdF0k41o839F18VwMFiLbQ=;
- b=r5SbpYYMV7SfkmKmBgrnFjKFuMAC3R7tY8OfcVgbKHy5sBghZmuk5jiky1sc4AuE4bbL
- wfM5lrCKuQE6qW2wwEqM37nEstHy7n0ACWgNED9hPp0r4S8yO5GwcvjTCAakDODz7b1z
- zSQsC6GsHgnBd9zEeFYtgDrOMJFq+yU2f2sEBV9ZMWyWYd7e6bnSBrpzPJrJTEC5ha2x
- BOpAauydOjlX8dI0VD1aIhTtMYeRrm6IPGSVWO8ehDFb/fV/wJpBgocd96Dvqw+Emo8p
- mDpZjVHLC4P3T5/CSA+a5WDqgAnN++VXbe7hWgh2b4XjgW124lvm5GaFLUxCix2HC4Su YQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwtf18ejp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 08:06:34 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3057vaZ9013612;
-        Thu, 5 Jan 2023 08:06:34 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3mwtf18ej1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 08:06:34 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30518CNv008371;
-        Thu, 5 Jan 2023 08:06:32 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3mtcbfmqxw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 05 Jan 2023 08:06:32 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30586SbA24510954
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 5 Jan 2023 08:06:28 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9A3F720043;
-        Thu,  5 Jan 2023 08:06:28 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BFE4420040;
-        Thu,  5 Jan 2023 08:06:27 +0000 (GMT)
-Received: from osiris (unknown [9.171.68.186])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Thu,  5 Jan 2023 08:06:27 +0000 (GMT)
-Date:   Thu, 5 Jan 2023 09:06:26 +0100
-From:   Heiko Carstens <hca@linux.ibm.com>
-To:     "Paul E. McKenney" <paulmck@kernel.org>
-Cc:     rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@meta.com, rostedt@goodmis.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH rcu 06/27] arch/s390/kvm: Remove "select SRCU"
-Message-ID: <Y7aFAqmgF4eu6SNH@osiris>
-References: <20230105003759.GA1769545@paulmck-ThinkPad-P17-Gen-1>
- <20230105003813.1770367-6-paulmck@kernel.org>
+        with ESMTP id S231663AbjAEIVn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 03:21:43 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 520F94D4BD;
+        Thu,  5 Jan 2023 00:19:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1672906774; x=1704442774;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=tC9MfXbbP5iSwnqmC95iyTsovDGJETn82JLa7mFYxG4=;
+  b=jG1DJy8tYR/kzOlWYs+Iy43Q34IjeHasVX+dBFDnKm7OlFFSGCjI3hzq
+   yD8u/aDv0Ss0EzAsvPP4x6IGt1D7d5zjNF8gulthsxD+CNmHDeWvHJkRE
+   hxGAj0Z2UxszmOnDgtBe2TyR2xezYu3PGGpNiEdGxCe1GfOpsuPLDTwLd
+   j2hULJRjx+q3wZ/kroatt6NCcVuEhHIPP/6GmcwchlVw4Gj8bVGR5+/N4
+   +ytADuEGH3sk/uQEJKtmpVi7FJQvaHuTh21mXb6B1V+JXQpHZVGnjw6h5
+   0hYnD9NFK8pkYqQ0nkD5F7cZ7aGqYZvpK3HBr6MUvE3Ct7rFBAySnPhNC
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="320856195"
+X-IronPort-AV: E=Sophos;i="5.96,302,1665471600"; 
+   d="scan'208";a="320856195"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2023 00:18:26 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10580"; a="605458382"
+X-IronPort-AV: E=Sophos;i="5.96,302,1665471600"; 
+   d="scan'208";a="605458382"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by orsmga003.jf.intel.com with ESMTP; 05 Jan 2023 00:18:16 -0800
+Date:   Thu, 5 Jan 2023 16:14:04 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     "Nikunj A. Dadhania" <nikunj@amd.com>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com
+Subject: Re: [PATCH RFC v7 01/64] KVM: Fix memslot boundary condition for
+ large page
+Message-ID: <20230105081404.GA2257863@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-2-michael.roth@amd.com>
+ <Y7VqgbTE34/Sxupw@kernel.org>
+ <20230105033451.GA2251521@chaop.bj.intel.com>
+ <2ebc9510-d7bf-a46d-6e78-f9e528b79501@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230105003813.1770367-6-paulmck@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bFKzjL5BSCYr32RZTpDpfBd6VwtgBcQx
-X-Proofpoint-ORIG-GUID: YJxYUOCrB21-BA5binzfh_-OHRIhi9Jk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-05_02,2023-01-04_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- clxscore=1015 phishscore=0 mlxlogscore=361 impostorscore=0 spamscore=0
- suspectscore=0 adultscore=0 lowpriorityscore=0 malwarescore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301050066
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <2ebc9510-d7bf-a46d-6e78-f9e528b79501@amd.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 04:37:52PM -0800, Paul E. McKenney wrote:
-> Now that the SRCU Kconfig option is unconditionally selected, there is
-> no longer any point in selecting it.  Therefore, remove the "select SRCU"
-> Kconfig statements.
+On Thu, Jan 05, 2023 at 09:38:59AM +0530, Nikunj A. Dadhania wrote:
 > 
-> Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
-> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Cc: Janosch Frank <frankja@linux.ibm.com>
-> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> Cc: David Hildenbrand <david@redhat.com>
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> Cc: Sven Schnelle <svens@linux.ibm.com>
-> Cc: <kvm@vger.kernel.org>
-> Cc: <linux-s390@vger.kernel.org>
-> ---
->  arch/s390/kvm/Kconfig | 1 -
->  1 file changed, 1 deletion(-)
+> 
+> On 05/01/23 09:04, Chao Peng wrote:
+> > On Wed, Jan 04, 2023 at 12:01:05PM +0000, Jarkko Sakkinen wrote:
+> >> On Wed, Dec 14, 2022 at 01:39:53PM -0600, Michael Roth wrote:
+> >>> From: Nikunj A Dadhania <nikunj@amd.com>
+> >>>
+> >>> Aligned end boundary causes a kvm crash, handle the case.
+> >>>
+> >>
+> >> Link: https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Flore.kernel.org%2Fkvm%2F20221202061347.1070246-8-chao.p.peng%40linux.intel.com%2F&data=05%7C01%7Cnikunj.dadhania%40amd.com%7C7a95933fac1b433e339c08daeece6c2c%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638084867591405299%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=vDEu9Uxs0QRdzbUkJbE2LsJnMHJJHBdQijkePbE2woc%3D&reserved=0
+> >>
+> >> Chao, are you aware of this issue already?
+> > 
+> > Thanks Jarkko adding me. I'm not aware of there is a fix.
+> 
+> It was discussed here: https://lore.kernel.org/all/e234d307-0b05-6548-5882-c24fc32c8e77@amd.com/
+> 
+> I was hitting this with one of the selftests case.
 
-Acked-by: Heiko Carstens <hca@linux.ibm.com>
+Yeah, I remember that discussion. With the new UPM code, this bug
+should be fixed. If you still hit the issue please let me know.
+
+Thanks,
+Chao
+> 
+> > 
+> >>
+> >>> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> >>> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> >>> ---
+> >>>  arch/x86/kvm/mmu/mmu.c | 3 +++
+> >>>  1 file changed, 3 insertions(+)
+> >>>
+> >>> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> >>> index b1953ebc012e..b3ffc61c668c 100644
+> >>> --- a/arch/x86/kvm/mmu/mmu.c
+> >>> +++ b/arch/x86/kvm/mmu/mmu.c
+> >>> @@ -7159,6 +7159,9 @@ static void kvm_update_lpage_private_shared_mixed(struct kvm *kvm,
+> >>>  		for (gfn = first + pages; gfn < last; gfn += pages)
+> >>>  			linfo_set_mixed(gfn, slot, level, false);
+> >>>  
+> >>> +		if (gfn == last)
+> >>> +			goto out;
+> >>> +
+> > 
+> > Nikunj or Michael, could you help me understand in which case it causes
+> > a KVM crash? To me, even the end is aligned to huge page boundary, but:
+> >     last = (end - 1) & mask;
+> > so 'last' is the base address for the last effective huage page. Even
+> > when gfn == last, it should still a valid page and needs to be updated
+> > for mem_attrs, correct?
+> 
+> Yes, that is correct with: last = (end - 1) & mask;
+> 
+> We can drop this patch from SNP series.
+> 
+> Regards
+> Nikunj
