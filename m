@@ -2,50 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EE30365E1C7
-	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 01:41:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0121D65E1BA
+	for <lists+kvm@lfdr.de>; Thu,  5 Jan 2023 01:41:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235768AbjAEAlN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 4 Jan 2023 19:41:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45018 "EHLO
+        id S235604AbjAEAlF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 4 Jan 2023 19:41:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240662AbjAEAiq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 4 Jan 2023 19:38:46 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D90BB1B;
-        Wed,  4 Jan 2023 16:38:16 -0800 (PST)
+        with ESMTP id S240691AbjAEAis (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 4 Jan 2023 19:38:48 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9725BC23;
+        Wed,  4 Jan 2023 16:38:19 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id BC47561890;
-        Thu,  5 Jan 2023 00:38:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 20BF4C433F1;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5685D618A0;
+        Thu,  5 Jan 2023 00:38:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 697C2C433AA;
         Thu,  5 Jan 2023 00:38:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1672879095;
-        bh=Dk3fbmwrwKI+Ju1OKvba1E6k//C52GxxfEwKgJeFV/E=;
+        bh=DG7Pd7Nd4SDFQ0Z2L3qtkeDuW2Mx222F1hGW9El87wY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UiOT16+5fy+ZmlY3dQ4rBYsTA89IkFc+A4RtgWUMm8g2H27yGepuXpenbS3q+7Fen
-         Yx9qedTGLeb2TG7J+JgxnX3VlWN+r1jCHZzXQ8hIWpQdqo+sEy6p5G+7gYq6TpQANG
-         JJL4jlHAbAMXa7dvcsyOZPZ+gT2k69uYrvw0pvj21ot5Jbq27mUqcSrRHbi6k+fRyM
-         7D/hGfrezAZpbakTuKPhgqM3t6uu8v1J9nihITN51oGbesCYuEBUz55kGA/kPZU+O/
-         Syr6yvA9o1/kr7cIGRB8rZnxb4fr7oWSMrPDeDY+RcF0U/cLTMQ698RB2/u4yLdAXD
-         TQtcUHdY/9e/g==
+        b=T0KeEQevUbKVz3bYSLrR93Wal79fsjYKnTPR7SX3CUYnrv4rH+W31Q3tgM6QGP1Mt
+         Aw/KQZprQxWswMUcgXu1wkPPvaZlLoQgoHr+mhiZGSFiN2GsR9gBScMSVUus3LR8cF
+         wLx8T5/6+3CEe6BoSUse4eie7lsotO9KAm0FANz60tJ7VG9dTVbiXxdEhTrSqARvb1
+         /mM383P0IXDH53usLPqMDLlh/4gsUS/B7KzyQRRWX7zdUyiYevbmm9pP6guj6sfJfn
+         qrBMGJ0iXoc7rDcEtcsIHvn94QWqiz9PpYq6HY7ej7nxpPwj99UnEOb8z+ErJihzc5
+         owDecVACEulCA==
 Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id BE0335C149B; Wed,  4 Jan 2023 16:38:14 -0800 (PST)
+        id C028C5C1ADF; Wed,  4 Jan 2023 16:38:14 -0800 (PST)
 From:   "Paul E. McKenney" <paulmck@kernel.org>
 To:     rcu@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org, kernel-team@meta.com,
         rostedt@goodmis.org, "Paul E. McKenney" <paulmck@kernel.org>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org
-Subject: [PATCH rcu 05/27] arch/riscv/kvm: Remove "select SRCU"
-Date:   Wed,  4 Jan 2023 16:37:51 -0800
-Message-Id: <20230105003813.1770367-5-paulmck@kernel.org>
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: [PATCH rcu 06/27] arch/s390/kvm: Remove "select SRCU"
+Date:   Wed,  4 Jan 2023 16:37:52 -0800
+Message-Id: <20230105003813.1770367-6-paulmck@kernel.org>
 X-Mailer: git-send-email 2.31.1.189.g2e36527f23
 In-Reply-To: <20230105003759.GA1769545@paulmck-ThinkPad-P17-Gen-1>
 References: <20230105003759.GA1769545@paulmck-ThinkPad-P17-Gen-1>
@@ -65,30 +68,32 @@ no longer any point in selecting it.  Therefore, remove the "select SRCU"
 Kconfig statements.
 
 Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
-Cc: Anup Patel <anup@brainfault.org>
-Cc: Atish Patra <atishp@atishpatra.org>
-Cc: Paul Walmsley <paul.walmsley@sifive.com>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Albert Ou <aou@eecs.berkeley.edu>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: David Hildenbrand <david@redhat.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>
 Cc: <kvm@vger.kernel.org>
-Cc: <kvm-riscv@lists.infradead.org>
-Cc: <linux-riscv@lists.infradead.org>
+Cc: <linux-s390@vger.kernel.org>
 ---
- arch/riscv/kvm/Kconfig | 1 -
+ arch/s390/kvm/Kconfig | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
-index f36a737d5f96d..6bc9b290c1283 100644
---- a/arch/riscv/kvm/Kconfig
-+++ b/arch/riscv/kvm/Kconfig
-@@ -27,7 +27,6 @@ config KVM
- 	select KVM_XFER_TO_GUEST_WORK
- 	select HAVE_KVM_VCPU_ASYNC_IOCTL
- 	select HAVE_KVM_EVENTFD
+diff --git a/arch/s390/kvm/Kconfig b/arch/s390/kvm/Kconfig
+index 33f4ff909476c..45fdf2a9b2e32 100644
+--- a/arch/s390/kvm/Kconfig
++++ b/arch/s390/kvm/Kconfig
+@@ -31,7 +31,6 @@ config KVM
+ 	select HAVE_KVM_IRQ_ROUTING
+ 	select HAVE_KVM_INVALID_WAKEUPS
+ 	select HAVE_KVM_NO_POLL
 -	select SRCU
- 	help
- 	  Support hosting virtualized guest machines.
- 
+ 	select KVM_VFIO
+ 	select INTERVAL_TREE
+ 	select MMU_NOTIFIER
 -- 
 2.31.1.189.g2e36527f23
 
