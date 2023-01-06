@@ -2,239 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 475F966073C
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 20:36:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED87C66075E
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 20:49:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235798AbjAFTgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 14:36:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34360 "EHLO
+        id S235872AbjAFTta (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 14:49:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235745AbjAFTgd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 14:36:33 -0500
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C5262F1;
-        Fri,  6 Jan 2023 11:36:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673033792; x=1704569792;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=JKQwhg3SKN3PwT6OwIBONjP4dNuxovJ0f2FMLC1fPXY=;
-  b=D1J740NLI5kA6NVxgZwHuCuAkSghTZ35rLerR1Rx65bZ39t0M103srEH
-   r22UMNya9gvorRhMabqPVO9YqUksO/wuAKrjiCsPuT1F6L8yJJqF0lf11
-   SIX/gaSfd3SaQQYwr5M4Z+NVoM7S6Z513IK6zI9xwnUAjLuT52FOhi6a9
-   ey7+RSo27IJDFQ37DHs9Xyv/Fmqx14E8okwvWKPq+vu8wDoANms8Z3pmC
-   cWdFUQ3Ryv70ycSIebMI9Lkelym42y4PphGNJTAIwK//mk6iYm6P6TnxK
-   XnQIjt8yq7JxrbBuWn+sq84owFxlfv9lTKQeTBOEZC+KIla8IQpZUpJR4
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="323791777"
-X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
-   d="scan'208";a="323791777"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 11:36:32 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="686563906"
-X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
-   d="scan'208";a="686563906"
-Received: from xiangyuy-mobl.amr.corp.intel.com (HELO [10.212.251.186]) ([10.212.251.186])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 11:36:31 -0800
-Message-ID: <725de6e9-e468-48ef-3bae-1e8a1b7ef0f7@intel.com>
-Date:   Fri, 6 Jan 2023 11:36:31 -0800
+        with ESMTP id S235677AbjAFTt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 14:49:27 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAA1F81134
+        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 11:49:25 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id 124so1850734pfy.0
+        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 11:49:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YpLhyQZgzATzGstIxP/yvcKxq7IWDPng7YIobZxZsWE=;
+        b=NaTj72ToNSnGDtsnSbfXRC0MrcjYoQaX9kpyZ5vVjg6OZiwmy8NTNCDMMPZGmM14kJ
+         M12Pnc/QtqB8iXrvhUV9TqiRY4oEkVcekZBgEkwsFw/Ey6vDwdagoeOgLxoTz393l7Jq
+         ZvUTync74JnlDdbgoaAIOK998mrb8TmOXII/cvwWw+POIMYFJA6IOMpOmIgC4xPvoift
+         UYgLQguf9nKzRUwIOkrsMssEGp/TGoHjZBDMj7mTulKxmmffh7goodfUr3ZI0FZt78Nu
+         0SFG9BwzcT6LIA3qgIaqYInrITpAgIzjMfJxwLCJPGEj3kcWjkWSwvzTfT11bNatanDq
+         bsWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YpLhyQZgzATzGstIxP/yvcKxq7IWDPng7YIobZxZsWE=;
+        b=jsfwGaJCh7bIHQI17MxwijMCBVcNOMqX6rq0JbPrjC4IkdE2yK2oi7MaG2vTp+ewuV
+         qfoRG5WJyMy+xZKiCxc0Ve9VNsL+YsjoaF/aiYcil3vp58iHj4zWxU4mOuIYwIlMZOKZ
+         2t13sveIlDg+LLy5QEozYX7+e4i+JMNeZ5nZTZNcO27rxgAWckAxWbSQlY+ynm06UEYj
+         5XUIXJGhlpwLbr67EBGxXi5/DDlSwVbmBFKMVXSotzG+zMfwl2wP91/7VlPCRLQFDdjL
+         fir6u8ehwe/XMFG71zc4iBUiSZ4QyAI/6QwzAemFy7msRaX6cerCe5C43Zg/nsPJTuLi
+         ROPQ==
+X-Gm-Message-State: AFqh2kpLn29nPxHO739QOnFfK7k+ffhjf5ZN33mFsWukeZdVbW3ddf+K
+        I7yyKZwS3nGOMaNs8eAFJXxrlNrcyGSr+tus
+X-Google-Smtp-Source: AMrXdXu1uBgFKprnO9cuXoFH7oVu848CIFtxVfPHnSfhiyB8agF+UnmRjSKK7IcTtkaLqFUFkCGMtQ==
+X-Received: by 2002:a05:6a00:4c82:b0:582:8d34:7253 with SMTP id eb2-20020a056a004c8200b005828d347253mr18444500pfb.20.1673034565298;
+        Fri, 06 Jan 2023 11:49:25 -0800 (PST)
+Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
+        by smtp.gmail.com with ESMTPSA id b12-20020aa78ecc000000b00581a156b920sm1460447pfr.132.2023.01.06.11.49.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Jan 2023 11:49:24 -0800 (PST)
+Date:   Fri, 6 Jan 2023 11:49:20 -0800
+From:   David Matlack <dmatlack@google.com>
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Nagareddy Reddy <nspreddy@google.com>
+Subject: Re: [RFC 04/14] KVM: x86/MMU: Expose functions for paging_tmpl.h
+Message-ID: <Y7h7QPI5YcJ/FO02@google.com>
+References: <20221221222418.3307832-1-bgardon@google.com>
+ <20221221222418.3307832-5-bgardon@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v8 09/16] x86/virt/tdx: Fill out TDMRs to cover all TDX
- memory regions
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, peterz@infradead.org, tglx@linutronix.de,
-        seanjc@google.com, pbonzini@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
-        ying.huang@intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1670566861.git.kai.huang@intel.com>
- <6f9c0bc1074501fa2431bde73bdea57279bf0085.1670566861.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <6f9c0bc1074501fa2431bde73bdea57279bf0085.1670566861.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221221222418.3307832-5-bgardon@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/8/22 22:52, Kai Huang wrote:
-> Start to transit out the "multi-steps" to construct a list of "TD Memory
-> Regions" (TDMRs) to cover all TDX-usable memory regions.
+On Wed, Dec 21, 2022 at 10:24:08PM +0000, Ben Gardon wrote:
+> In preparation for moving paging_tmpl.h to shadow_mmu.c, expose various
+> functions it needs through mmu_internal.h. This includes modifying the
+> BUILD_MMU_ROLE_ACCESSOR macro so that it does not automatically include
+> the static label, since some but not all of the accessors are needed by
+> paging_tmpl.h.
 > 
-> The kernel configures TDX-usable memory regions by passing a list of
-> TDMRs "TD Memory Regions" (TDMRs) to the TDX module.  Each TDMR contains
-> the information of the base/size of a memory region, the base/size of the
-> associated Physical Address Metadata Table (PAMT) and a list of reserved
-> areas in the region.
+> No functional change intended.
 > 
-> Do the first step to fill out a number of TDMRs to cover all TDX memory
-> regions.  To keep it simple, always try to use one TDMR for each memory
-> region.  As the first step only set up the base/size for each TDMR.
+> Signed-off-by: Ben Gardon <bgardon@google.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c          | 32 ++++++++++++++++----------------
+>  arch/x86/kvm/mmu/mmu_internal.h | 16 ++++++++++++++++
+>  2 files changed, 32 insertions(+), 16 deletions(-)
 > 
-> Each TDMR must be 1G aligned and the size must be in 1G granularity.
-> This implies that one TDMR could cover multiple memory regions.  If a
-> memory region spans the 1GB boundary and the former part is already
-> covered by the previous TDMR, just use a new TDMR for the remaining
-> part.
-> 
-> TDX only supports a limited number of TDMRs.  Disable TDX if all TDMRs
-> are consumed but there is more memory region to cover.
-
-This could probably use some discussion of why it is not being
-future-proofed.  Maybe:
-
-	There are fancier things that could be done like trying to merge
-	adjacent TDMRs.  This would allow more pathological memory
-	layouts to be supported.  But, current systems are not even
-	close to exhausting the existing TDMR resources in practice.
-	For now, keep it simple.
-
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index d36ac72ef299..5b1de0200c6b 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -407,6 +407,90 @@ static void free_tdmr_list(struct tdmr_info_list *tdmr_list)
->  			tdmr_list->max_tdmrs * tdmr_list->tdmr_sz);
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index bf14e181eb12..a17e8a79e4df 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -153,18 +153,18 @@ BUILD_MMU_ROLE_REGS_ACCESSOR(efer, lma, EFER_LMA);
+>   * and the vCPU may be incorrect/irrelevant.
+>   */
+>  #define BUILD_MMU_ROLE_ACCESSOR(base_or_ext, reg, name)		\
+> -static inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
+> +inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
+>  {								\
+>  	return !!(mmu->cpu_role. base_or_ext . reg##_##name);	\
 >  }
+>  BUILD_MMU_ROLE_ACCESSOR(base, cr0, wp);
+> -BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
+> +static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
+>  BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smep);
+> -BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
+> -BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
+> -BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
+> +static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
+> +static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
+> +static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
+>  BUILD_MMU_ROLE_ACCESSOR(base, efer, nx);
+> -BUILD_MMU_ROLE_ACCESSOR(ext,  efer, lma);
+> +static BUILD_MMU_ROLE_ACCESSOR(ext,  efer, lma);
+
+Suggest moving all the BUILD_MMU_ROLE*() macros to mmu_internal.h, since
+they are already static inline. That would be a cleaner patch and reduce
+future churn if shadow_mmu.c ever needs to use a different role accessor
+at some point.
+
 >  
-> +/* Get the TDMR from the list at the given index. */
-> +static struct tdmr_info *tdmr_entry(struct tdmr_info_list *tdmr_list,
-> +				    int idx)
-> +{
-> +	return (struct tdmr_info *)((unsigned long)tdmr_list->first_tdmr +
-> +			tdmr_list->tdmr_sz * idx);
-> +}
-
-I think that's more complicated and has more casting than necessary.
-This looks nicer:
-
-	int tdmr_info_offset = tdmr_list->tdmr_sz * idx;
-
-	return (void *)tdmr_list->first_tdmr + tdmr_info_offset;
-
-Also, it might even be worth keeping ->first_tdmr as a void*.  It isn't
-a real C array and keeping it as void* would keep anyone from doing:
-
-	tdmr_foo = tdmr_list->first_tdmr[foo];
-
-> +#define TDMR_ALIGNMENT		BIT_ULL(30)
-> +#define TDMR_PFN_ALIGNMENT	(TDMR_ALIGNMENT >> PAGE_SHIFT)
-> +#define TDMR_ALIGN_DOWN(_addr)	ALIGN_DOWN((_addr), TDMR_ALIGNMENT)
-> +#define TDMR_ALIGN_UP(_addr)	ALIGN((_addr), TDMR_ALIGNMENT)
-> +
-> +static inline u64 tdmr_end(struct tdmr_info *tdmr)
-> +{
-> +	return tdmr->base + tdmr->size;
-> +}
-> +
-> +/*
-> + * Take the memory referenced in @tmb_list and populate the
-> + * preallocated @tdmr_list, following all the special alignment
-> + * and size rules for TDMR.
-> + */
-> +static int fill_out_tdmrs(struct list_head *tmb_list,
-> +			  struct tdmr_info_list *tdmr_list)
-> +{
-> +	struct tdx_memblock *tmb;
-> +	int tdmr_idx = 0;
-> +
-> +	/*
-> +	 * Loop over TDX memory regions and fill out TDMRs to cover them.
-> +	 * To keep it simple, always try to use one TDMR to cover one
-> +	 * memory region.
-> +	 *
-> +	 * In practice TDX1.0 supports 64 TDMRs, which is big enough to
-> +	 * cover all memory regions in reality if the admin doesn't use
-> +	 * 'memmap' to create a bunch of discrete memory regions.  When
-> +	 * there's a real problem, enhancement can be done to merge TDMRs
-> +	 * to reduce the final number of TDMRs.
-> +	 */
-> +	list_for_each_entry(tmb, tmb_list, list) {
-> +		struct tdmr_info *tdmr = tdmr_entry(tdmr_list, tdmr_idx);
-> +		u64 start, end;
-> +
-> +		start = TDMR_ALIGN_DOWN(PFN_PHYS(tmb->start_pfn));
-> +		end   = TDMR_ALIGN_UP(PFN_PHYS(tmb->end_pfn));
-> +
-> +		/*
-> +		 * A valid size indicates the current TDMR has already
-> +		 * been filled out to cover the previous memory region(s).
-> +		 */
-> +		if (tdmr->size) {
-> +			/*
-> +			 * Loop to the next if the current memory region
-> +			 * has already been fully covered.
-> +			 */
-> +			if (end <= tdmr_end(tdmr))
-> +				continue;
-> +
-> +			/* Otherwise, skip the already covered part. */
-> +			if (start < tdmr_end(tdmr))
-> +				start = tdmr_end(tdmr);
-> +
-> +			/*
-> +			 * Create a new TDMR to cover the current memory
-> +			 * region, or the remaining part of it.
-> +			 */
-> +			tdmr_idx++;
-> +			if (tdmr_idx >= tdmr_list->max_tdmrs)
-> +				return -E2BIG;
-> +
-> +			tdmr = tdmr_entry(tdmr_list, tdmr_idx);
-> +		}
-> +
-> +		tdmr->base = start;
-> +		tdmr->size = end - start;
-> +	}
-> +
-> +	/* @tdmr_idx is always the index of last valid TDMR. */
-> +	tdmr_list->nr_tdmrs = tdmr_idx + 1;
-> +
-> +	return 0;
-> +}
-> +
->  /*
->   * Construct a list of TDMRs on the preallocated space in @tdmr_list
->   * to cover all TDX memory regions in @tmb_list based on the TDX module
-> @@ -416,16 +500,23 @@ static int construct_tdmrs(struct list_head *tmb_list,
->  			   struct tdmr_info_list *tdmr_list,
->  			   struct tdsysinfo_struct *sysinfo)
+>  static inline bool is_cr0_pg(struct kvm_mmu *mmu)
 >  {
-> +	int ret;
-> +
-> +	ret = fill_out_tdmrs(tmb_list, tdmr_list);
-> +	if (ret)
-> +		goto err;
-> +
->  	/*
->  	 * TODO:
->  	 *
-> -	 *  - Fill out TDMRs to cover all TDX memory regions.
->  	 *  - Allocate and set up PAMTs for each TDMR.
->  	 *  - Designate reserved areas for each TDMR.
->  	 *
->  	 * Return -EINVAL until constructing TDMRs is done
->  	 */
-> -	return -EINVAL;
-> +	ret = -EINVAL;
-> +err:
-> +	return ret;
+> @@ -210,7 +210,7 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
+>  	kvm_flush_remote_tlbs_with_range(kvm, &range);
 >  }
 >  
->  static int init_tdx_module(void)
+> -static gfn_t get_mmio_spte_gfn(u64 spte)
+> +gfn_t get_mmio_spte_gfn(u64 spte)
+>  {
+>  	u64 gpa = spte & shadow_nonpresent_or_rsvd_lower_gfn_mask;
+>  
+> @@ -240,7 +240,7 @@ static bool check_mmio_spte(struct kvm_vcpu *vcpu, u64 spte)
+>  	return likely(kvm_gen == spte_gen);
+>  }
+>  
+> -static int is_cpuid_PSE36(void)
+> +int is_cpuid_PSE36(void)
+>  {
+>  	return 1;
+>  }
 
-Otherwise this actually looks fine.
+Can we just drop is_cpuid_PSE36(), e.g. as a precursor patch? It just
+returns 1...
