@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0FC5B65FDAD
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 10:21:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B516865FDB3
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 10:22:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231646AbjAFJVu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 04:21:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44022 "EHLO
+        id S233358AbjAFJWF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 04:22:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231514AbjAFJU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233079AbjAFJU0 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 6 Jan 2023 04:20:26 -0500
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD63463188;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B19566B5B4;
         Fri,  6 Jan 2023 01:20:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1672996824; x=1704532824;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=9Ow+AUlF3YAQbms59Th+YlBw4taXZzsqN7sPL++pLxY=;
-  b=GFrwoDoZzAQYsx0gh11Hqxb8h7fLwmSqNWEyZMek6VpRGQHJe8r5KzEe
-   5azy9OXAUco3j4MRSfK710d9U3u3xWunR3gQum3iB0mp7oTPlctIijmeU
-   I6SLl9HXMMCsroCwYHzJ288fm4ig2QKFUWrL8audRh6MMM3+FJshVF+w8
-   GfBgJPhq4Azh7q9cI6IXPnWqirZOqfKulFIZTGozSMM03hCRZnaPRapU7
-   kn0pY2/OyK6+UFZc3nqCL4AQ/gdGuGMEobirTEvFQOjxBI9ksq5t0rRK3
-   v4tBaiAcRDqQegOIC/cVPsjjmlMugfgLcGfuTEajrGIwQ6PQY+/95acqF
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="322511592"
+  bh=cFa67ljZDOj6B4hnKmSyOvFw/+uBlbUZju1/l5Toj94=;
+  b=nSUnNxdzSUaxCQvfugbbCcU1gb/P3R5kMcqSqlvBI67Mh+JHZQuSBEJk
+   tBQfuaxOgyVDdx8IrudVG5MCLCOGRrH+DOeiO83/HrAXa/FtHIgybhyFK
+   afLK4/GuTN8xRKkPFz2goezMU/ej/NBxP//kfryi9agy93V/vt75T9r77
+   xfGpu1KfQNoUB3doZflwvYNRcH+au41YBA0Z+sG3uSoNL/nzTxyfV/kxT
+   tNLMM2iEAowG4ITCabeT8qxm0d/GaA8xRk/wT/ulA4V8lzSEEpYNbpp7X
+   wmhEknz9xtDIBxv2wu+LEhHdkpbrTa3fkHrORlvw61GEcaPnpyIFoP5he
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="322511608"
 X-IronPort-AV: E=Sophos;i="5.96,304,1665471600"; 
-   d="scan'208";a="322511592"
+   d="scan'208";a="322511608"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 01:20:17 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="719139434"
+X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="719139439"
 X-IronPort-AV: E=Sophos;i="5.96,304,1665471600"; 
-   d="scan'208";a="719139434"
+   d="scan'208";a="719139439"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by fmsmga008.fm.intel.com with ESMTP; 06 Jan 2023 01:20:16 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [RFC PATCH v2 24/32] x86/fred: let ret_from_fork() jmp to fred_exit_user when FRED is enabled
-Date:   Fri,  6 Jan 2023 00:56:09 -0800
-Message-Id: <20230106085617.17248-25-xin3.li@intel.com>
+Subject: [RFC PATCH v2 25/32] x86/fred: disallow the swapgs instruction when FRED is enabled
+Date:   Fri,  6 Jan 2023 00:56:10 -0800
+Message-Id: <20230106085617.17248-26-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230106085617.17248-1-xin3.li@intel.com>
 References: <20230106085617.17248-1-xin3.li@intel.com>
@@ -63,32 +63,44 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Let ret_from_fork() jmp to fred_exit_user when FRED is enabled,
-otherwise the existing IDT code is chosen.
+The FRED architecture establishes the full supervisor/user through:
+1) FRED event delivery swaps the value of the GS base address and
+   that of the IA32_KERNEL_GS_BASE MSR.
+2) ERETU swaps the value of the GS base address and that of the
+   IA32_KERNEL_GS_BASE MSR.
+Thus, the swapgs instruction is disallowed when FRED is enabled,
+otherwise it cauess #UD.
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/entry/entry_64.S | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/x86/kernel/process_64.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
-index e0c48998d2fb..cdb696cbb2a0 100644
---- a/arch/x86/entry/entry_64.S
-+++ b/arch/x86/entry/entry_64.S
-@@ -297,7 +297,12 @@ SYM_CODE_START(ret_from_fork)
- 	UNWIND_HINT_REGS
- 	movq	%rsp, %rdi
- 	call	syscall_exit_to_user_mode	/* returns with IRQs disabled */
-+#ifdef CONFIG_X86_FRED
-+	ALTERNATIVE "jmp swapgs_restore_regs_and_return_to_usermode", \
-+		    "jmp fred_exit_user", X86_FEATURE_FRED
-+#else
- 	jmp	swapgs_restore_regs_and_return_to_usermode
-+#endif
+diff --git a/arch/x86/kernel/process_64.c b/arch/x86/kernel/process_64.c
+index bfe6179b7a17..5b6cfd2ca630 100644
+--- a/arch/x86/kernel/process_64.c
++++ b/arch/x86/kernel/process_64.c
+@@ -165,7 +165,8 @@ static noinstr unsigned long __rdgsbase_inactive(void)
  
- 1:
- 	/* kernel thread */
+ 	lockdep_assert_irqs_disabled();
+ 
+-	if (!static_cpu_has(X86_FEATURE_XENPV)) {
++	if (!cpu_feature_enabled(X86_FEATURE_FRED) &&
++	    !static_cpu_has(X86_FEATURE_XENPV)) {
+ 		native_swapgs();
+ 		gsbase = rdgsbase();
+ 		native_swapgs();
+@@ -190,7 +191,8 @@ static noinstr void __wrgsbase_inactive(unsigned long gsbase)
+ {
+ 	lockdep_assert_irqs_disabled();
+ 
+-	if (!static_cpu_has(X86_FEATURE_XENPV)) {
++	if (!cpu_feature_enabled(X86_FEATURE_FRED) &&
++	    !static_cpu_has(X86_FEATURE_XENPV)) {
+ 		native_swapgs();
+ 		wrgsbase(gsbase);
+ 		native_swapgs();
 -- 
 2.34.1
 
