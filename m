@@ -2,161 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 325AB6605A5
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 18:24:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8212A6605AC
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 18:26:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235584AbjAFRY0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 12:24:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57214 "EHLO
+        id S229949AbjAFR0B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 12:26:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235674AbjAFRYQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 12:24:16 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2046.outbound.protection.outlook.com [40.107.243.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B8167D1FD;
-        Fri,  6 Jan 2023 09:24:14 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eS4WQQpuFUVu0BIQ24Tne76BrkHarT20WNH5gB/5ZCjZ2L+s1EdaNDyOqch0er8vtw/9lToOafchyylBbZeuHv+RvAuM8duxVEGJ07Mz2fgG6tyiU0B60Z2MgHkorqOBoXDAMUhoicyK1JN3PbUpyUAfEC2lbMX6wSz9PDJyG7z8JXkc3wEWZWo/hXaW8MQVy8B1NPOVn6jf4MMiwHGFr0VwbXt+fqlRc2P8Jdto5J9qOE+mkt9VpjClLUIxsDNEsjVDa52k6a6V39smSUBd5IpOHEiQPO5YZT0HoPtrrwI7zv0fs8JjwtrpQ6SJl+geNwIuhJ6S6wbYEtmoN6yV0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nC8yyf2i/rJX4emyigWAVpCtFlGoeW7cDYHn+lLikTc=;
- b=f8Kz8Bfw5h9iCquFZM+HlJpSwJQF6rMLmXtlDFR350JAV+djauH7kN9fqYBRjQpwUPou3Miju5Kd+QZUIKRDc2jRcoYC8zlAqg7nEtD+4spvf+uLcyZfuM91Sl/zM+YXp5VjA7O55rKfckOTA2Plqc4YK2PCJfSXbxxtDt5BSRzq3oalIwiaGHZIXf3UqCmD5WyQj1jC8lnXyVncOcAR9MpoLC5NPcJDuqsKw3lmEYAXadBRPB7tHokA2rYPfD8vZkvkUdeU58SHYHX3wydiQM+EOFYnpEECVduqSc0UI3VLSfqmWo26YEMgnjBun5PpfoAjXcgWnpQrIp4MFhYFEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nC8yyf2i/rJX4emyigWAVpCtFlGoeW7cDYHn+lLikTc=;
- b=dy20YQ0zCwCUynL/UqFT3QUZ6wkH8WAP961E41nFNktXLo5DgWVcTZKTe7YDgLfdAcUIDLJPX/QE3pfrYPzi5jbiSj24JpPmIVKd23pD9DbbQr1F3gQlDH90P2a2V0kniP0DC7a1tpqk89VJ0Z6unmx9H8CUFWpaKHoJhUZsxjVoszhyGWwc6JizHnzZ1MAn1gnAnl5YNZwCu8cwxWx65d1H0hCipwIXGaU5bpWmVJc3qXQJBQGb+aChnmOEzrzYDcNzzbtLJOfTuoSV3asnKKxbYyVdkOA3BqmpbFOYVQbk4fxanA5qkSMXtI3qT1j7dwlWSkanKzhPKrArovVEtg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MW4PR12MB5601.namprd12.prod.outlook.com (2603:10b6:303:168::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Fri, 6 Jan
- 2023 17:24:13 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.5944.019; Fri, 6 Jan 2023
- 17:24:12 +0000
-Date:   Fri, 6 Jan 2023 13:24:11 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        with ESMTP id S235610AbjAFRZo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 12:25:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26177D9C5
+        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 09:24:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673025897;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=uRJJdpda2LberW2Uz7MtJU0ApzokqFKrYHUptCsTqd0=;
+        b=gHnoxtaTv/WX35tiQ34VNvC7VqEiwWsyKpA7DHRo8xLTKz4R56qw5Jz3dVljyilTSlh8jy
+        jKKSDESj2oa8wiy0Q/DNKCKRCgaN/QW6CdNEu4N66sdGrRucV3V9dKL5arTB1V/qxs+lbV
+        JaWQ52Inzh+83oodhnVDlIW5Vha3fQU=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-411-s7cGtJ-bMW-2psjpcRHj0g-1; Fri, 06 Jan 2023 12:24:55 -0500
+X-MC-Unique: s7cGtJ-bMW-2psjpcRHj0g-1
+Received: by mail-il1-f199.google.com with SMTP id h4-20020a056e021b8400b0030d901a84d9so520010ili.6
+        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 09:24:55 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=uRJJdpda2LberW2Uz7MtJU0ApzokqFKrYHUptCsTqd0=;
+        b=YmN8CSk+Q4ulxi7vglJ3WJwnbc9eBr0Yht47MaL4mE3FpHQzi/6hliiC/yk93mr1+K
+         FmFgrPDbHWrEV36ohb2P0Nj7Q31M5CjMDkVxdDeEXqI+G1TluMXu+GDPR97GuB6XgbwM
+         cccCFKoGe+JfHyKn7u0qNcSYLbmKcvu4iNpKxs02BcelnJqcvK0EK4bmlYMp/OoJ33n/
+         yeuGxL5y8tYbZUSL9UO1B5f0xlOXbxQbDbahJYG/2/9aWAxRR5DjJVpM5m7+CpFigz+F
+         Oy3wS7Ab0LYPgCRToNbpeJSul2g8JCZI7HOfjNKf8A7/Tx/x6/hFAb8FG3ThDNgHZJSe
+         tvGg==
+X-Gm-Message-State: AFqh2kpgHswxGYZkK4cWgOUvsr+gZserrLfknrLG2wAl62daRaK0lEWb
+        JZBDI3NQGKmJA1H6DaHrkFoX3bFG1TmKwB8K1cNP1jwGJcJi8YNLZ+tL9rge26/DDF70ejHSBBo
+        9taEW5O1GW9N3
+X-Received: by 2002:a05:6e02:105:b0:30c:8559:9d33 with SMTP id t5-20020a056e02010500b0030c85599d33mr8126737ilm.3.1673025894893;
+        Fri, 06 Jan 2023 09:24:54 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtaheVCMJsd6UkYBpmwqPt3EuW+qeUOqMou/3T67c+kqzqmdM7Q68FRZUlmkLIekfUKA50HbA==
+X-Received: by 2002:a05:6e02:105:b0:30c:8559:9d33 with SMTP id t5-20020a056e02010500b0030c85599d33mr8126722ilm.3.1673025894562;
+        Fri, 06 Jan 2023 09:24:54 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a17-20020a056e020e1100b0030c186ea94fsm522963ilk.55.2023.01.06.09.24.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Jan 2023 09:24:53 -0800 (PST)
+Date:   Fri, 6 Jan 2023 10:24:50 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Niklas Schnelle <schnelle@linux.ibm.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-s390@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-tegra@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH 1/8] iommu: Add a gfp parameter to iommu_map()
-Message-ID: <Y7hZOwerwljDKoQq@nvidia.com>
-References: <1-v1-6e8b3997c46d+89e-iommu_map_gfp_jgg@nvidia.com>
- <4fd1b194-29ef-621d-4059-a8336058f217@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4fd1b194-29ef-621d-4059-a8336058f217@arm.com>
-X-ClientProxiedBy: MN2PR12CA0004.namprd12.prod.outlook.com
- (2603:10b6:208:a8::17) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Christian =?UTF-8?B?Qm9ybnRyw6RnZXI=?= 
+        <borntraeger@linux.ibm.com>
+Subject: Re: [PATCH v2 1/1] vfio/type1: Respect IOMMU reserved regions in
+ vfio_test_domain_fgsp()
+Message-ID: <20230106102450.2e6c70bb.alex.williamson@redhat.com>
+In-Reply-To: <20230104154202.1152198-2-schnelle@linux.ibm.com>
+References: <20230104154202.1152198-1-schnelle@linux.ibm.com>
+        <20230104154202.1152198-2-schnelle@linux.ibm.com>
+Organization: Red Hat
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MW4PR12MB5601:EE_
-X-MS-Office365-Filtering-Correlation-Id: a380c960-bbc3-4788-e1ef-08daf00ad407
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6qJH666CBhIW5tUF2AsyhSKgkkKCL7qQ+0QvpkGXxA5fosBL2pe5k3FzB+YXv22Q2GysE6xXwb1HuOzGxF+qXLaq+nXCQrFd4y/n1GxEk8+S0bp5z9AYM0xBOoKAYRNbd5PBTl0BT7ABQFgzk9OqAQX5tRnqsTsNUgBG0TB6XpeH2RH6klh8Cza8zimRZeiqwEfNkiY3aK2XlvkEJU3OBi1agbVr2x8o2xq1CGGL+CTyWuYyEAF8w4caTrGQGp4bPYE1xwnPc3b3DyeMDZnVgNbBJD+h3lD+VE60bntuYQaIzJqRiOtJI2ksLPU6h8vEggZPTmS1rG51A3T3uTYAWG+dKn1+SxZ+G8iD4GtUWRVLKbLYNCjLOeHX6LsN6vv0fyQYQc8ud+tt9hIV8CdlrqHrpuAwoFwQ5pRuNvPPewxJ4OZILiGc+u6MVIw8lrm5XwFJG2m5n4m0ru0Y6rlol2eqebZJUSM84fCUCjd2fr4ChBU1OyOi34eIEBiJwDRPe6xIuWahIJSlBbFBY3Fv7/KwkjYRD35ynFav+MidO58TKqaGY2VimiJ/rbDKyPX3SXaN5HGJ0QaWCnld407OD+S9TFDS2mf2CozxQjxNITbgoKZqXwrbfspiAk41amQrhl4+9anZ9rkFCh+0s5XviQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(396003)(136003)(376002)(366004)(346002)(451199015)(54906003)(186003)(26005)(66556008)(66476007)(2616005)(6486002)(478600001)(6512007)(8676002)(8936002)(7416002)(83380400001)(41300700001)(5660300002)(2906002)(4326008)(316002)(66946007)(86362001)(6916009)(6506007)(53546011)(38100700002)(36756003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gUtguh/BhjSsWFMyOvOkTocwMW34MIv6f+dQH0dsuXmPdkuOjqZjELhOoCBR?=
- =?us-ascii?Q?jw/9LzWuOml7GUNslDGnwn35hTk3PfwFosS/n//Om1Omq40fna+7KkqQTSF4?=
- =?us-ascii?Q?D6sIJr7h9Gfk0ZeWsJBVRBm11B+Darv7rylsGsY0WKszhDnvMWSWJRA/MqI9?=
- =?us-ascii?Q?hsetMQd/d1+oJdZAlyW1iiJTtgk8PrMuAzfkTs42KLEZ+2QU6H8iSsT1FyBt?=
- =?us-ascii?Q?VSLPzGYe8cQxO1WUF86hM/4N4RWO3dfhARjrkUizubFVbCstcWf4VA2Q4sm9?=
- =?us-ascii?Q?42sdcJJNEd0DrrgSCfk0chB21gvbI14S6UJ6XJhl81+UKR1TlxKjdkfIVroU?=
- =?us-ascii?Q?vHa3qlcSPjUK7l9PJk46XCLZSa7BLIZLIEn2ktcKl47Azrm6LIu/XszuIu+8?=
- =?us-ascii?Q?UZOWwrCt74fT43uZdnZT9Zfbrwn0w7BW0mGaXpCth8FfaFN07Rl2mam0O7D0?=
- =?us-ascii?Q?gxA1/xJcSE7aUKUncuhSvGsSCPeFfgx1T71E+59Z+8/rGdGH6PD0HwxggPz+?=
- =?us-ascii?Q?gFjHo/QAVRvyJqoTqP3N9gzeaLxiWLoaDwWM+O2eCTe3VaEavpuLW+X7ZqaB?=
- =?us-ascii?Q?nZAyRj8OV/ujMXMFsg4pKDLJSWMsd8u/f5t5rjZgfVBkKFGTZ0CVRjEi2OIM?=
- =?us-ascii?Q?HplJ3hvt6yMxfJ8HU7BcD1G2JXVtQhGD/Lxt8braTiN/MSuDWSO6tUoUmIvs?=
- =?us-ascii?Q?4MVTggacoJznwyUTxA7mKHOs3oX1EQD3Bi/0DAxiCXsWKShBaITtJh6m9ucK?=
- =?us-ascii?Q?k5gbShKvKfd8d6t5YWtP1RrTSUXXVxaXGLHzPg8KlSPCNHcUQhQBWTWYY4By?=
- =?us-ascii?Q?NFE5y/n2dynXHdjy2/nIf8Yxd/vSzBW/gx2vDf7m0kJjIAJk/vdXr8x755Up?=
- =?us-ascii?Q?qgnC7KJ8wu3VE42HIMu+T0s0WGsEZlRNtPGlwAxEI+OisFxdreVgEUmHHFpK?=
- =?us-ascii?Q?nJagpumxXtxVoVDp6I4zPrivqQSVZzplcfplE0qu6mXkdj9qZK2F6wL36b3q?=
- =?us-ascii?Q?jrCXpMZaCFpv+Xal25tX6jqHeYX+3OPYeLc+jZYNZzEpqkTyy2VRvTomYZt1?=
- =?us-ascii?Q?PRhA5xSzVWtHhxDWZXLj+Ha4bpATSb8KkyB1f+G0W5F+OX0f3+U44ZXm5G/d?=
- =?us-ascii?Q?nmuL44r/aT8Odag8gE0zL+vnZsYjkif6UEqiH4w1p/fPdVOTy2Ze8kiB6Ecv?=
- =?us-ascii?Q?GeS18tfQFq2kBnYk/+U6iSkDavbJo5rO8mpMqLb+BzxQfpGAQJZMrfOknBnK?=
- =?us-ascii?Q?oBPIbmEe5Jzp/w1D1B+nuoTMCYm0i6YBD+84hAOe06aU2IVF70WG8pa0Lo67?=
- =?us-ascii?Q?y3gr3I894Exe5oQkhznS2TuG3UDApRj7jZQYSxdOp62P83+SwGHOgL1P6jgA?=
- =?us-ascii?Q?GbV53ubvNCNTBM0uP9GhYwb4WWnjh7jjIDhyZELmQDlSTtuh1tOr67dGTqW2?=
- =?us-ascii?Q?nKOaf5OvnXFR3G+ycDWf6znVbK0mGti3bQ51KYU1ieMy+4Oc9L8HJDxAScD+?=
- =?us-ascii?Q?eUzyRx/JZt4JOZ75y4YnKNES9JvIpZjayYtbPSws/bsAm12Qp7pbrpsNv0Bf?=
- =?us-ascii?Q?BLbdROencX9YMTiONhIirY8MXkPGWLo+bBmeTMjI?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a380c960-bbc3-4788-e1ef-08daf00ad407
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2023 17:24:12.7096
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: /G4slPQ9LdfbZ+iK5j2t1fMDw7VqdkXkdo74dzB3f1XOhCF0xdxdWnTliW/zmjfK
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5601
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 06, 2023 at 05:15:28PM +0000, Robin Murphy wrote:
-> On 2023-01-06 16:42, Jason Gunthorpe wrote:
-> > The internal mechanisms support this, but instead of exposting the gfp to
-> > the caller it wrappers it into iommu_map() and iommu_map_atomic()
-> > 
-> > Fix this instead of adding more variants for GFP_KERNEL_ACCOUNT.
+On Wed,  4 Jan 2023 16:42:02 +0100
+Niklas Schnelle <schnelle@linux.ibm.com> wrote:
+
+> Since commit cbf7827bc5dc ("iommu/s390: Fix potential s390_domain
+> aperture shrinking") the s390 IOMMU driver uses reserved regions for the
+
+Are you asking for this in v6.2?  Seems like the above was introduced
+in v6.2 and I can't tell if this is sufficiently prevalent that we need
+a fix in the same release.
+
+> system provided DMA ranges of PCI devices. Previously it reduced the
+> size of the IOMMU aperture and checked it on each mapping operation.
+> On current machines the system denies use of DMA addresses below 2^32 for
+> all PCI devices.
 > 
-> FWIW, since we *do* have two variants already, I think I'd have a mild
-> preference for leaving the regular map calls as-is (i.e. implicit
-> GFP_KERNEL), and just generalising the _atomic versions for the special
-> cases.
+> Usually mapping IOVAs in a reserved regions is harmless until a DMA
+> actually tries to utilize the mapping. However on s390 there is
+> a virtual PCI device called ISM which is implemented in firmware and
+> used for cross LPAR communication. Unlike real PCI devices this device
+> does not use the hardware IOMMU but inspects IOMMU translation tables
+> directly on IOTLB flush (s390 RPCIT instruction). If it detects IOVA
+> mappings outside the allowed ranges it goes into an error state. This
+> error state then causes the device to be unavailable to the KVM guest.
+> 
+> Analysing this we found that vfio_test_domain_fgsp() maps 2 pages at DMA
+> address 0 irrespective of the IOMMUs reserved regions. Even if usually
+> harmless this seems wrong in the general case so instead go through the
+> freshly updated IOVA list and try to find a range that isn't reserved,
+> and fits 2 pages, is PAGE_SIZE * 2 aligned. If found use that for
+> testing for fine grained super pages.
+> 
+> Fixes: 6fe1010d6d9c ("vfio/type1: DMA unmap chunking")
 
-I think it is just better to follow kernel convention and have
-allocation functions include the GFP because it is a clear signal to
-the user that there is an allocation hidden inside the API. The whole
-point of gfp is not to have multitudes of every function for every
-allocation mode.
+Nit, the above patch pre-dates any notion of reserved regions, so isn't
+this actually fixing the implementation of reserved regions in type1 to
+include this test?  ie.
 
-There are not so many callers that it seems worth worrying about
-removing the extra GFP_KERNEL argument.
+Fixes: af029169b8fd ("vfio/type1: Check reserved region conflict and update iovalist")
 
-> However, echoing the recent activity over on the DMA API side of things, I
-> think it's still worth proactively constraining the set of permissible
-> flags, lest we end up with more weird problems if stuff that doesn't really
-> make sense, like GFP_COMP or zone flags, manages to leak through (that may
-> have been part of the reason for having the current wrappers rather than a
-> bare gfp argument in the first place, I forget now).
+> Reported-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> ---
+> v1 -> v2:
+> - Reworded commit message to hopefully explain things a bit better and
+>   highlight that usually just mapping but not issuing DMAs for IOVAs in
+>   a resverved region is harmless but still breaks things with ISM devices.
+> - Added a check for PAGE_SIZE * 2 alignment (Jason)
+> 
+>  drivers/vfio/vfio_iommu_type1.c | 30 +++++++++++++++++++-----------
+>  1 file changed, 19 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
+> index 23c24fe98c00..87b27ffb93d0 100644
+> --- a/drivers/vfio/vfio_iommu_type1.c
+> +++ b/drivers/vfio/vfio_iommu_type1.c
+> @@ -1856,24 +1856,32 @@ static int vfio_iommu_replay(struct vfio_iommu *iommu,
+>   * significantly boosts non-hugetlbfs mappings and doesn't seem to hurt when
+>   * hugetlbfs is in use.
+>   */
+> -static void vfio_test_domain_fgsp(struct vfio_domain *domain)
+> +static void vfio_test_domain_fgsp(struct vfio_domain *domain, struct list_head *regions)
+>  {
+> -	struct page *pages;
+>  	int ret, order = get_order(PAGE_SIZE * 2);
+> +	struct vfio_iova *region;
+> +	struct page *pages;
+>  
+>  	pages = alloc_pages(GFP_KERNEL | __GFP_ZERO, order);
+>  	if (!pages)
+>  		return;
+>  
+> -	ret = iommu_map(domain->domain, 0, page_to_phys(pages), PAGE_SIZE * 2,
+> -			IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE);
+> -	if (!ret) {
+> -		size_t unmapped = iommu_unmap(domain->domain, 0, PAGE_SIZE);
+> +	list_for_each_entry(region, regions, list) {
+> +		if (region->end - region->start < PAGE_SIZE * 2 ||
+> +				region->start % (PAGE_SIZE*2))
 
-Yeah, that can be done
+Maybe this falls into the noise, but we don't care if region->start is
+aligned to a double page, so long as we can map an aligned double page
+within the region.  Maybe something like:
 
-Thanks,
-Jason
+	dma_addr_t start = ALIGN(region->start, PAGE_SIZE * 2);
+
+	if (start >= region->end || (region->end - start < PAGE_SIZE * 2))
+		continue;
+
+
+s/region->// for below if so.  Thanks,
+
+Alex
+
+> +			continue;
+>  
+> -		if (unmapped == PAGE_SIZE)
+> -			iommu_unmap(domain->domain, PAGE_SIZE, PAGE_SIZE);
+> -		else
+> -			domain->fgsp = true;
+> +		ret = iommu_map(domain->domain, region->start, page_to_phys(pages), PAGE_SIZE * 2,
+> +				IOMMU_READ | IOMMU_WRITE | IOMMU_CACHE);
+> +		if (!ret) {
+> +			size_t unmapped = iommu_unmap(domain->domain, region->start, PAGE_SIZE);
+> +
+> +			if (unmapped == PAGE_SIZE)
+> +				iommu_unmap(domain->domain, region->start + PAGE_SIZE, PAGE_SIZE);
+> +			else
+> +				domain->fgsp = true;
+> +		}
+> +		break;
+>  	}
+>  
+>  	__free_pages(pages, order);
+> @@ -2326,7 +2334,7 @@ static int vfio_iommu_type1_attach_group(void *iommu_data,
+>  		}
+>  	}
+>  
+> -	vfio_test_domain_fgsp(domain);
+> +	vfio_test_domain_fgsp(domain, &iova_copy);
+>  
+>  	/* replay mappings on new domains */
+>  	ret = vfio_iommu_replay(iommu, domain);
+
