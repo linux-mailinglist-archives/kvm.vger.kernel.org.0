@@ -2,71 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9BEB365FA98
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 05:15:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BCAEF65FAA5
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 05:18:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230267AbjAFEOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 23:14:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53060 "EHLO
+        id S231270AbjAFESR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 23:18:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229554AbjAFEO3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 23:14:29 -0500
-X-Greylist: delayed 482 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 05 Jan 2023 20:14:29 PST
-Received: from njjs-sys-mailin01.njjs.baidu.com (mx315.baidu.com [180.101.52.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 20A2E6AD9F
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 20:14:28 -0800 (PST)
-Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-        by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id 882EF7F00044;
-        Fri,  6 Jan 2023 12:06:25 +0800 (CST)
-From:   Li RongQing <lirongqing@baidu.com>
-To:     kvm@vger.kernel.org, lirongqing@baidu.com, pbonzini@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, pshier@google.com,
-        seanjc@google.com
-Subject: [PATCH][resend] KVM: x86: fire timer when it is migrated and expired, and in oneshot mode
-Date:   Fri,  6 Jan 2023 12:06:25 +0800
-Message-Id: <20230106040625.8404-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.9.4
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229881AbjAFESN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 23:18:13 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15D38192A3;
+        Thu,  5 Jan 2023 20:18:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1672978690; x=1704514690;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=EJ99zGke5SZh6gZ65kHYJO251QjbQMEaDGPaMs8wAzE=;
+  b=CbyG3GC4YLer1neUAZaMNGD4HLhevcUQpVGMfx/4qZ+7m0Ss4TPfVan4
+   8CdnjIgoeUDebp9BWWG9PZ50eFi4rS/DFKffhsF846AMO1XalTrKQqfjl
+   XYEGTef7mSY8R1vWKvKrlWILixPI2U7Z6+BRfLTleJM7bMDGpZ3fKz8TY
+   XypYjTs2zuL3CLCX2h+bG3lIoF7G5dOPYyWfCXht/+0grr0l5y9b0YlVG
+   G+ZtnkKvHOu3OjvlR7Bo/Yv0ruUWPiJYjaiWg04f2FSlMEEDL7ZyGXjkt
+   HDHTbD28MsdolLD1f7hoGMfgDNY6TeyisTmCC8iIN9VDKasBQM6JIjTp1
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="323651270"
+X-IronPort-AV: E=Sophos;i="5.96,304,1665471600"; 
+   d="scan'208";a="323651270"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jan 2023 20:18:09 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="744504828"
+X-IronPort-AV: E=Sophos;i="5.96,304,1665471600"; 
+   d="scan'208";a="744504828"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.193.75])
+  by FMSMGA003.fm.intel.com with ESMTP; 05 Jan 2023 20:17:58 -0800
+Date:   Fri, 6 Jan 2023 12:13:46 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Vishal Annapurve <vannapurve@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
+Message-ID: <20230106041346.GA2288017@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-10-chao.p.peng@linux.intel.com>
+ <CAGtprH_pbSo1HeEFUEB6ZZxm-=NEw+nLZ6ZVvr76=9BeX=AHPA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGtprH_pbSo1HeEFUEB6ZZxm-=NEw+nLZ6ZVvr76=9BeX=AHPA@mail.gmail.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-when the vCPU was migrated, if its timer is expired, KVM _should_ fire
-the timer ASAP, zeroing the deadline here will cause the timer to
-immediately fire on the destination
+On Thu, Jan 05, 2023 at 12:38:30PM -0800, Vishal Annapurve wrote:
+> On Thu, Dec 1, 2022 at 10:20 PM Chao Peng <chao.p.peng@linux.intel.com> wrote:
+> >
+> > +#ifdef CONFIG_HAVE_KVM_RESTRICTED_MEM
+> > +static bool restrictedmem_range_is_valid(struct kvm_memory_slot *slot,
+> > +                                        pgoff_t start, pgoff_t end,
+> > +                                        gfn_t *gfn_start, gfn_t *gfn_end)
+> > +{
+> > +       unsigned long base_pgoff = slot->restricted_offset >> PAGE_SHIFT;
+> > +
+> > +       if (start > base_pgoff)
+> > +               *gfn_start = slot->base_gfn + start - base_pgoff;
+> 
+> There should be a check for overflow here in case start is a very big
+> value. Additional check can look like:
+> if (start >= base_pgoff + slot->npages)
+>        return false;
+> 
+> > +       else
+> > +               *gfn_start = slot->base_gfn;
+> > +
+> > +       if (end < base_pgoff + slot->npages)
+> > +               *gfn_end = slot->base_gfn + end - base_pgoff;
+> 
+> If "end" is smaller than base_pgoff, this can cause overflow and
+> return the range as valid. There should be additional check:
+> if (end < base_pgoff)
+>          return false;
 
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Peter Shier <pshier@google.com>
-Cc: Jim Mattson <jmattson@google.com>
-Cc: Wanpeng Li <wanpengli@tencent.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- arch/x86/kvm/lapic.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Thanks! Both are good catches. The improved code:
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 4efdb4a4..13f8ab3 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -1841,8 +1841,12 @@ static bool set_target_expiration(struct kvm_lapic *apic, u32 count_reg)
- 		if (unlikely(count_reg != APIC_TMICT)) {
- 			deadline = tmict_to_ns(apic,
- 				     kvm_lapic_get_reg(apic, count_reg));
--			if (unlikely(deadline <= 0))
--				deadline = apic->lapic_timer.period;
-+			if (unlikely(deadline <= 0)) {
-+				if (apic_lvtt_period(apic))
-+					deadline = apic->lapic_timer.period;
-+				else
-+					deadline = 0;
-+			}
- 			else if (unlikely(deadline > apic->lapic_timer.period)) {
- 				pr_info_ratelimited(
- 				    "kvm: vcpu %i: requested lapic timer restore with "
--- 
-2.9.4
+static bool restrictedmem_range_is_valid(struct kvm_memory_slot *slot,
+					 pgoff_t start, pgoff_t end,
+					 gfn_t *gfn_start, gfn_t *gfn_end)
+{
+	unsigned long base_pgoff = slot->restricted_offset >> PAGE_SHIFT;
 
+	if (start >= base_pgoff + slot->npages)
+		return false;
+	else if (start <= base_pgoff)
+		*gfn_start = slot->base_gfn;
+	else
+		*gfn_start = start - base_pgoff + slot->base_gfn;
+
+	if (end <= base_pgoff)
+		return false;
+	else if (end >= base_pgoff + slot->npages)
+		*gfn_end = slot->base_gfn + slot->npages;
+	else
+		*gfn_end = end - base_pgoff + slot->base_gfn;
+
+	if (*gfn_start >= *gfn_end)
+		return false;
+
+	return true;
+}
+
+Thanks,
+Chao
+> 
+> 
+> > +       else
+> > +               *gfn_end = slot->base_gfn + slot->npages;
+> > +
+> > +       if (*gfn_start >= *gfn_end)
+> > +               return false;
+> > +
+> > +       return true;
+> > +}
+> > +
