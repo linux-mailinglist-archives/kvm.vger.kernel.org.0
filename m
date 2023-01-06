@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 655C8660945
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 23:08:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C13966096C
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 23:21:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236232AbjAFWIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 17:08:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46700 "EHLO
+        id S231668AbjAFWVF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 17:21:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235927AbjAFWHt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 17:07:49 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A60184BCB;
-        Fri,  6 Jan 2023 14:07:49 -0800 (PST)
+        with ESMTP id S230085AbjAFWVD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 17:21:03 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0404C7DE26;
+        Fri,  6 Jan 2023 14:21:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673042869; x=1704578869;
+  t=1673043663; x=1704579663;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=PUhwpAPx9QoZBSVf0J1Kqv9kcSs4Ha7qkZRGZTH8vzQ=;
-  b=EWVv+6XcGEfVmVjZEuznc4i9AQd0FXp+Dgaot8lxGEqj9H8pOQTF8SAq
-   IBXUd2v04Aov6TQ80Ihmx86D1s6us9FbhAOIyjY4OnDwyps1crrkOGLKe
-   i7Obz/pNLQSv3HLV7X6tFUd4pmEkOLTuTRjqKoSc9C1cL5v8KHyPGM5jd
-   +uK5byOCoeKoGQBkRl1fHCbHE38Dy3tAtyI1Oe6IwKJoV94lmhCOHJqdO
-   4rOsCoqazpcWAAXXXcl84PjH5KEDu25Y1Mp8hgsX31hddtW+IqLZaGrfl
-   sz1fEd776yOhhuQGPtiDRG0kf1khTGZF4BX7g+jm5dtUp0vMmb/EnR5dT
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="349787228"
+  bh=fsHOPPQFiulqGu7o78qgPixVmSbGcMUL81E6/CjfVe4=;
+  b=PAEGPmbaz3hq7KEx+K+xpiPe3dvHM1v6r/SLBL3YWaBu5o2YqhogsAWw
+   F9o2jfggjQAhXv/7dR6TTD+oXTQPSTZ1gIREwNGbG86392/uZmr76vAs1
+   S+PIgWwUvnipPPQAto27AnIPY9Z4h56ZS04c9iKpcC5oQ8Wxcny9o2E10
+   HyXbeS6w6OWg/+/GXnEJmuqzc+nsL0VwMPriZCD5PrCDXR5IiHJwx8h7H
+   6ARaJQDLYnm3AVZqMn5LgJUu7o0cM8/1YGTXlyuq3Dwk2YN1OGDB3spAh
+   +2NTbPxKSI9ZLFkbr/3kDn/40xlSrtwi4Aetx55GOjSerm/9VwsmTAaO+
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="310370554"
 X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
-   d="scan'208";a="349787228"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 14:07:48 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="649436711"
+   d="scan'208";a="310370554"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 14:21:02 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="606025616"
 X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
-   d="scan'208";a="649436711"
+   d="scan'208";a="606025616"
 Received: from xiangyuy-mobl.amr.corp.intel.com (HELO [10.212.251.186]) ([10.212.251.186])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 14:07:47 -0800
-Message-ID: <2d7d2824-7aa7-5f96-d79b-b44ff7fe2ef9@intel.com>
-Date:   Fri, 6 Jan 2023 14:07:47 -0800
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 14:21:01 -0800
+Message-ID: <e1a55f50-efc0-5098-1a2d-f0eaa0b51a82@intel.com>
+Date:   Fri, 6 Jan 2023 14:21:01 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.1
-Subject: Re: [PATCH v8 11/16] x86/virt/tdx: Designate reserved areas for all
- TDMRs
+Subject: Re: [PATCH v8 12/16] x86/virt/tdx: Designate the global KeyID and
+ configure the TDX module
 Content-Language: en-US
 To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org
@@ -56,9 +56,9 @@ Cc:     linux-mm@kvack.org, peterz@infradead.org, tglx@linutronix.de,
         sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
         sagis@google.com, imammedo@redhat.com
 References: <cover.1670566861.git.kai.huang@intel.com>
- <27dcd2781a450b3f77a2aec833de6a3669bc0fb8.1670566861.git.kai.huang@intel.com>
+ <d7b01f396908da796644e58298a34c1f8a140be7.1670566861.git.kai.huang@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <27dcd2781a450b3f77a2aec833de6a3669bc0fb8.1670566861.git.kai.huang@intel.com>
+In-Reply-To: <d7b01f396908da796644e58298a34c1f8a140be7.1670566861.git.kai.huang@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -72,45 +72,136 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On 12/8/22 22:52, Kai Huang wrote:
-> +static int tdmr_add_rsvd_area(struct tdmr_info *tdmr, int *p_idx, u64 addr,
-> +			      u64 size, u16 max_reserved_per_tdmr)
+> After a list of "TD Memory Regions" (TDMRs) has been constructed to
+> cover all TDX-usable memory regions, the next step is to pick up a TDX
+> private KeyID as the "global KeyID" (which protects, i.e. TDX module's
+> metadata), and configure it to the TDX module along with the TDMRs.
+
+For whatever reason, whenever I see "i.e." in a changelog, it's usually
+going off the rails.  This is no exception.  Let's also get rid of the
+passive voice:
+
+	The next step After constructing a list of "TD Memory Regions"
+	(TDMRs) to cover all TDX-usable memory regions is to designate a
+	TDX private KeyID as the "global KeyID".  This KeyID is used by
+	the TDX module for mapping things like the PAMT and other TDX
+	metadata.  This KeyID is passed to the TDX module at the same
+	time as the TDMRs.
+
+> To keep things simple, just use the first TDX KeyID as the global KeyID.
+
+
+
+
+> ---
+>  arch/x86/virt/vmx/tdx/tdx.c | 41 +++++++++++++++++++++++++++++++++++--
+>  arch/x86/virt/vmx/tdx/tdx.h |  2 ++
+>  2 files changed, 41 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index 620b35e2a61b..ab961443fed5 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -916,6 +916,36 @@ static int construct_tdmrs(struct list_head *tmb_list,
+>  	return ret;
+>  }
+>  
+> +static int config_tdx_module(struct tdmr_info_list *tdmr_list, u64 global_keyid)
 > +{
-> +	struct tdmr_reserved_area *rsvd_areas = tdmr->reserved_areas;
-> +	int idx = *p_idx;
+> +	u64 *tdmr_pa_array, *p;
+> +	size_t array_sz;
+> +	int i, ret;
 > +
-> +	/* Reserved area must be 4K aligned in offset and size */
-> +	if (WARN_ON(addr & ~PAGE_MASK || size & ~PAGE_MASK))
-> +		return -EINVAL;
+> +	/*
+> +	 * TDMRs are passed to the TDX module via an array of physical
+> +	 * addresses of each TDMR.  The array itself has alignment
+> +	 * requirement.
+> +	 */
+> +	array_sz = tdmr_list->nr_tdmrs * sizeof(u64) +
+> +		TDMR_INFO_PA_ARRAY_ALIGNMENT - 1;
+
+One other way of doing this which might be a wee bit less messy:
+
+	array_sz = roundup_pow_of_two(array_sz);
+	if (array_sz < TDMR_INFO_PA_ARRAY_ALIGNMENT)
+		array_sz = TDMR_INFO_PA_ARRAY_ALIGNMENT;
+
+Since that keeps 'array_sz' at a power-of-two, then kzalloc() will give
+you all the alignment you need, except if the array is too small, in
+which case you can just bloat it to the alignment requirement.
+
+This would get rid of the PTR_ALIGN() below too.
+
+Your choice.  What you have works too.
+
+> +	p = kzalloc(array_sz, GFP_KERNEL);
+> +	if (!p)
+> +		return -ENOMEM;
 > +
-> +	if (idx >= max_reserved_per_tdmr)
-> +		return -E2BIG;
+> +	tdmr_pa_array = PTR_ALIGN(p, TDMR_INFO_PA_ARRAY_ALIGNMENT);
+> +	for (i = 0; i < tdmr_list->nr_tdmrs; i++)
+> +		tdmr_pa_array[i] = __pa(tdmr_entry(tdmr_list, i));
 > +
-> +	rsvd_areas[idx].offset = addr - tdmr->base;
-> +	rsvd_areas[idx].size = size;
+> +	ret = seamcall(TDH_SYS_CONFIG, __pa(tdmr_pa_array), tdmr_list->nr_tdmrs,
+> +				global_keyid, 0, NULL, NULL);
 > +
-> +	*p_idx = idx + 1;
+> +	/* Free the array as it is not required anymore. */
+> +	kfree(p);
 > +
-> +	return 0;
+> +	return ret;
 > +}
+> +
+>  static int init_tdx_module(void)
+>  {
+>  	/*
+> @@ -960,17 +990,24 @@ static int init_tdx_module(void)
+>  	if (ret)
+>  		goto out_free_tdmrs;
+>  
+> +	/*
+> +	 * Use the first private KeyID as the global KeyID, and pass
+> +	 * it along with the TDMRs to the TDX module.
+> +	 */
+> +	ret = config_tdx_module(&tdmr_list, tdx_keyid_start);
+> +	if (ret)
+> +		goto out_free_pamts;
 
-It's probably worth at least a comment here to say:
+This is "consuming" tdx_keyid_start.  Does it need to get incremented
+since the first guest can't use this KeyID now?
 
-	/*
-	 * Consume one reserved area per call.  Make no effort to
-	 * optimize or reduce the number of reserved areas which are
-	 * consumed by contiguous reserved areas, for instance.
-	 */
+>  	/*
+>  	 * TODO:
+>  	 *
+> -	 *  - Pick up one TDX private KeyID as the global KeyID.
+> -	 *  - Configure the TDMRs and the global KeyID to the TDX module.
+>  	 *  - Configure the global KeyID on all packages.
+>  	 *  - Initialize all TDMRs.
+>  	 *
+>  	 *  Return error before all steps are done.
+>  	 */
+>  	ret = -EINVAL;
+> +out_free_pamts:
+>  	if (ret)
+>  		tdmrs_free_pamt_all(&tdmr_list);
+>  	else
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+> index d0c762f1a94c..4d2edd477480 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.h
+> +++ b/arch/x86/virt/vmx/tdx/tdx.h
+> @@ -20,6 +20,7 @@
+>   * TDX module SEAMCALL leaf functions
+>   */
+>  #define TDH_SYS_INFO		32
+> +#define TDH_SYS_CONFIG		45
+>  
+>  struct cmr_info {
+>  	u64	base;
+> @@ -96,6 +97,7 @@ struct tdmr_reserved_area {
+>  } __packed;
+>  
+>  #define TDMR_INFO_ALIGNMENT	512
+> +#define TDMR_INFO_PA_ARRAY_ALIGNMENT	512
+>  
+>  struct tdmr_info {
+>  	u64 base;
 
-I think the -E2BIG is also wrong.  It should be ENOSPC.  I'd also add a
-pr_warn() there.  Especially with how lazy this whole thing is, I can
-start to see how the reserved areas might be exhausted.  Let's be kind
-to our future selves and make the error (and the fix) easier to find.
-
-It's probably also worth noting *somewhere* that there's a balance to be
-had between TDMRs and reserved areas.  A system that is running out of
-reserved areas in a TDMR could split a TDMR to get more reserved areas.
-A system that has run out of TDMRs could relatively easily coalesce two
-adjacent TDMRs (before the PAMTs are allocated) and use a reserved area
-if there was a gap between them.
-
-I'm *really* close to acking this patch once those are fixed up.
