@@ -2,426 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 605D4660646
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 19:18:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ED0B36606BC
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 19:58:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235541AbjAFSS2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 13:18:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54590 "EHLO
+        id S235931AbjAFS5g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 13:57:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235638AbjAFSS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 13:18:26 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF21273E00;
-        Fri,  6 Jan 2023 10:18:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673029104; x=1704565104;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8RsSGmntUbelvavRBP1w2DS+4Yl8+okwt7S+8oN3aS4=;
-  b=jJfZB9xV5owNueAUlXvPCfxtSqIGCVnBIN7GY5I6ZEw3octCQPV9BDfb
-   FxbHeXGcmNrLalP4go++njaO0ypEpowecgskkuk8tN0YH2XheKJF2ea0t
-   mGew+082dYUR/unZWogZCLUOstLwRIkHm4xRt4AlyMER8E6wK5fuchkSr
-   pnbsCOyo3qI+oPuirvXRvXoYm89Su0QZGIvu/FI2clAQdzVDPSfyI5qeh
-   bv06X7wzDUeO/36JT3rVXEP/lQwKlXdWe9wYx1LqQZPCncd/ksxFI9Uf0
-   PubwvTKS+HGhogrVSnRZWZxFHqk30rf/znY5Mzy+IcJHFLR75aYNUtrlY
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="306045763"
-X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
-   d="scan'208";a="306045763"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 10:18:23 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="984741869"
-X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
-   d="scan'208";a="984741869"
-Received: from xiangyuy-mobl.amr.corp.intel.com (HELO [10.212.251.186]) ([10.212.251.186])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 10:18:22 -0800
-Message-ID: <e7b682a1-abdf-ce73-f262-8b7ce946e78e@intel.com>
-Date:   Fri, 6 Jan 2023 10:18:22 -0800
+        with ESMTP id S235942AbjAFS5N (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 13:57:13 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2054.outbound.protection.outlook.com [40.107.237.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B80B7DE2A
+        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 10:57:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CRO5mBlM1GYesnjY7WI21C4m40kdoUEuzqcvjCVuD2Yt+ZGAKjIVXwwp4zDZNFRMaHunsCrVYXs/D2yW3ifuvlUOjbkIiYOkPBtEFfu/4XViY4tfWobJn9/FYNDF38PDZL2lukpOLW14iGHiqn+KbOhoGFC35ZPgMeLTnauLSmQXqwAneDkNFJGE1bhmgI34ce4z0CuV560tsuDd+oXIAnTnT99/i+XfbWN8s9VM0Ch/fwcINcJ1NVSmFRP8KdnWwWq3FC6lq2zce+g/5FGM1YB0dURqVYBaD6x/fTr0I5GiaqAzvxbl4CwIAJ6LteyNvYz6u6TFAGuKl8ZTnZa/EA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kxeFWfdcTzvbL95V3ndbqWNM/dSi9uWoJb7MwTbTc84=;
+ b=mECJ9Irq+pIPheZLpwPGOIUeNorE4fPGPGnAngbr7xO2aycE22GpEguqzzrpki7p6UuLPJDYbQ3JCSKuDwz6/EaPpK1cSpbCCUNkQuYTHqTnOM+4gWM1310h60yN9ZfXVyvryc+kJx+mMiVFi/j2pIF7t6PNb7g8tjV+KHtPNSdEIthaGvhSkDqtCXRU55C9aLa36hukM2SRh7g/Wc/4r2uT+hAriftOLPwYA2EH+V29tygeHf3qYRu8NVFIfEQs2MQpiJkx7Iodd+pAoelxkty23bpOQ/8O4klKqevyrvNT8ABf/x7IZjyL1Flxl4p1d899N9C5Zv3KB/jvUtvJDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kxeFWfdcTzvbL95V3ndbqWNM/dSi9uWoJb7MwTbTc84=;
+ b=rYCkvhPleN9XWbQLT49vbQHDMk26IZSvZK7aOt7KMaRXNCDVPRdjsNogwwiafrZGbrCTmCm0NkeCwR0t4zc2CrJu48a2uDB1iXEUEfcVA7/q5O21kNFF707s60rUWT4mi8GdlEOL51kN/x2jZo7eXsJNyrA8GtYZlbmpXk00Zr4=
+Received: from MN2PR08CA0005.namprd08.prod.outlook.com (2603:10b6:208:239::10)
+ by CY8PR12MB7659.namprd12.prod.outlook.com (2603:10b6:930:9f::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Fri, 6 Jan
+ 2023 18:57:08 +0000
+Received: from BL02EPF00010208.namprd05.prod.outlook.com
+ (2603:10b6:208:239:cafe::11) by MN2PR08CA0005.outlook.office365.com
+ (2603:10b6:208:239::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.15 via Frontend
+ Transport; Fri, 6 Jan 2023 18:57:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF00010208.mail.protection.outlook.com (10.167.241.199) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.5986.15 via Frontend Transport; Fri, 6 Jan 2023 18:57:08 +0000
+Received: from bmoger-ubuntu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Fri, 6 Jan
+ 2023 12:57:06 -0600
+From:   Babu Moger <babu.moger@amd.com>
+To:     <pbonzini@redhat.com>
+CC:     <mtosatti@redhat.com>, <kvm@vger.kernel.org>, <mst@redhat.com>,
+        <marcel.apfelbaum@gmail.com>, <imammedo@redhat.com>,
+        <richard.henderson@linaro.org>, <yang.zhong@intel.com>,
+        <jing2.liu@intel.com>, <vkuznets@redhat.com>,
+        <michael.roth@amd.com>, <wei.huang2@amd.com>
+Subject: [PATCH v2 0/5] target/i386: Update AMD EPYC CPU Models
+Date:   Fri, 6 Jan 2023 12:56:55 -0600
+Message-ID: <20230106185700.28744-1-babu.moger@amd.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v8 07/16] x86/virt/tdx: Use all system memory when
- initializing TDX module as TDX memory
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, peterz@infradead.org, tglx@linutronix.de,
-        seanjc@google.com, pbonzini@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
-        ying.huang@intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1670566861.git.kai.huang@intel.com>
- <8aab33a7db7a408beb403950e21f693b0b0f1f2b.1670566861.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <8aab33a7db7a408beb403950e21f693b0b0f1f2b.1670566861.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF00010208:EE_|CY8PR12MB7659:EE_
+X-MS-Office365-Filtering-Correlation-Id: 56f23f81-f6fd-43cc-5965-08daf017cf73
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ub+sIbxAYmml6DcmLXXJuhZqLlmLtZQTgVlTMCFdXqh/B+C6GMo8PaZpGlzvIhYBofKPVBNH3sebwXEJwfgl1424PmLj2Ukyp5s7rYM5Emnuy1qUh1HBLz1P33X/1NAxhbzdDesBB3G0FjXKWwj+aQLS3IFcXcGktW3tegqjisOTskTm9dIN02LZ7pwVWwMkuFDDpCdIzFCZTOhuTgnPxKgIohUlH7KMeO+N75bFKYlK66Gylr42bHAo3acKF7hXypQwrJ6LO2AWd/I2VaIhOJ7r0z+0F+nTd8iREliIL0aZ1khtRjJqvTF1xiaX46vu1/zw1msXSLBtAhm+7iUOduyfXrAXE26ODVW5r0y8titg+gz5F+jxSaTsIrT0eh5VhNvr54K1V8LJfdkmg1s7AEjrAea14WHkAJ1mj+ZeAitlocK94b4LV8xuQ/kwDxFy4E2vMtB+docbqPvTfGNfthjFjex3ytJKMEsRbOXSV+Y0btzl+6x5l8LsKkfNV+/GwJmwtmctOGubJawCmkFRyAEnZaFz9t4Lp5iNeiX+VzJsSq9xFPwRaw2aDbKQvHktpZ4uPhPIroHguopBVHsHhBUNec4QeB4A8Fo1mtCrsBWs2Opw8yeO71r3wuGnqvl03Fq7p51oxdUUQe98XRc4gCgRAuaV9JIyIOSEuSubJQH1gWJNJBFIsDX5titY7+9lsXLaud5hKWdhDYsQxu48uQxfnnc5oZIwKZCWiGxHsGvR9coWCTlg1YvO5/q/Txi7r4oWpEc8qm4yOQpNYaqD9/x5fHj110KLBGStw4nX99ndmNv9rXvIi7ygqWTqjZMPJNPZyw8MgPM8jpQawZRVbg==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(376002)(136003)(39860400002)(451199015)(36840700001)(40470700004)(46966006)(7416002)(2906002)(5660300002)(44832011)(8676002)(41300700001)(4326008)(15650500001)(8936002)(70586007)(70206006)(6916009)(54906003)(966005)(316002)(478600001)(82310400005)(26005)(186003)(16526019)(7696005)(336012)(6666004)(40480700001)(426003)(47076005)(83380400001)(2616005)(40460700003)(81166007)(356005)(82740400003)(1076003)(86362001)(36756003)(36860700001)(170073001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jan 2023 18:57:08.0922
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56f23f81-f6fd-43cc-5965-08daf017cf73
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BL02EPF00010208.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7659
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/8/22 22:52, Kai Huang wrote:
-> As a step of initializing the TDX module, the kernel needs to tell the
-> TDX module which memory regions can be used by the TDX module as TDX
-> guest memory.
-> 
-> TDX reports a list of "Convertible Memory Region" (CMR) to tell the
-> kernel which memory is TDX compatible.  The kernel needs to build a list
-> of memory regions (out of CMRs) as "TDX-usable" memory and pass them to
-> the TDX module.  Once this is done, those "TDX-usable" memory regions
-> are fixed during module's lifetime.
-> 
-> The initial support of TDX guests will only allocate TDX guest memory
-> from the global page allocator.  To keep things simple, just make sure
-> all pages in the page allocator are TDX memory.
+This series adds following changes.
+a. Allow versioned CPUs to specify new cache_info pointers.
+b. Add EPYC-v4, EPYC-Rome-v3 and EPYC-Milan-v2 fixing the
+   cache_info.complex_indexing.
+c. Introduce EPYC-Milan-v2 by adding few missing feature bits.
+---
+v2:
+  Refreshed the patches on top of latest master.
+  Changed the feature NULL_SELECT_CLEARS_BASE to NULL_SEL_CLR_BASE to
+  match the kernel name.
+  https://lore.kernel.org/kvm/20221205233235.622491-3-kim.phillips@amd.com/
 
-It's hard to tell what "The initial support of TDX guests" means.  I
-*think* you mean "this series".  But, we try not to say "this blah" too
-much, so just say this:
-
-	To keep things simple, assume that all TDX-protected memory will
-	comes page allocator.  Make sure all pages in the page allocator
-	*are* TDX-usable memory.
-
-> To guarantee that, stash off the memblock memory regions at the time of
-> initializing the TDX module as TDX's own usable memory regions, and in
-> the meantime, register a TDX memory notifier to reject to online any new
-> memory in memory hotplug.
-
-First, this is a run-on sentence.  Second, it isn't really clear what
-memblocks have to do with this or why you need to stash them off.
-Please explain.
-
-> This approach works as in practice all boot-time present DIMMs are TDX
-> convertible memory.  However, if any non-TDX-convertible memory has been
-> hot-added (i.e. CXL memory via kmem driver) before initializing the TDX
-> module, the module initialization will fail.
-
-I really don't know what this is trying to say.
-
-*How* and *why* does this module initialization failure occur?  How do
-you implement it and why is it necessary?
-
-> This can also be enhanced in the future, i.e. by allowing adding non-TDX
-> memory to a separate NUMA node.  In this case, the "TDX-capable" nodes
-> and the "non-TDX-capable" nodes can co-exist, but the kernel/userspace
-> needs to guarantee memory pages for TDX guests are always allocated from
-> the "TDX-capable" nodes.
-
-Why does it need to be enhanced?  What's the problem?
-
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index dd333b46fafb..b36129183035 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -1959,6 +1959,7 @@ config INTEL_TDX_HOST
->  	depends on X86_64
->  	depends on KVM_INTEL
->  	depends on X86_X2APIC
-> +	select ARCH_KEEP_MEMBLOCK
->  	help
->  	  Intel Trust Domain Extensions (TDX) protects guest VMs from malicious
->  	  host and certain physical attacks.  This option enables necessary TDX
-> diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
-> index 216fee7144ee..3a841a77fda4 100644
-> --- a/arch/x86/kernel/setup.c
-> +++ b/arch/x86/kernel/setup.c
-> @@ -1174,6 +1174,8 @@ void __init setup_arch(char **cmdline_p)
->  	 *
->  	 * Moreover, on machines with SandyBridge graphics or in setups that use
->  	 * crashkernel the entire 1M is reserved anyway.
-> +	 *
-> +	 * Note the host kernel TDX also requires the first 1MB being reserved.
->  	 */
->  	reserve_real_mode();
->  
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 6fe505c32599..f010402f443d 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -13,6 +13,13 @@
->  #include <linux/errno.h>
->  #include <linux/printk.h>
->  #include <linux/mutex.h>
-> +#include <linux/list.h>
-> +#include <linux/slab.h>
-> +#include <linux/memblock.h>
-> +#include <linux/memory.h>
-> +#include <linux/minmax.h>
-> +#include <linux/sizes.h>
-> +#include <linux/pfn.h>
->  #include <asm/pgtable_types.h>
->  #include <asm/msr.h>
->  #include <asm/tdx.h>
-> @@ -25,6 +32,12 @@ enum tdx_module_status_t {
->  	TDX_MODULE_ERROR
->  };
->  
-> +struct tdx_memblock {
-> +	struct list_head list;
-> +	unsigned long start_pfn;
-> +	unsigned long end_pfn;
-> +};
-> +
->  static u32 tdx_keyid_start __ro_after_init;
->  static u32 nr_tdx_keyids __ro_after_init;
->  
-> @@ -32,6 +45,9 @@ static enum tdx_module_status_t tdx_module_status;
->  /* Prevent concurrent attempts on TDX detection and initialization */
->  static DEFINE_MUTEX(tdx_module_lock);
->  
-> +/* All TDX-usable memory regions */
-> +static LIST_HEAD(tdx_memlist);
-> +
->  /*
->   * tdx_keyid_start and nr_tdx_keyids indicate that TDX is uninitialized.
->   * This is used in TDX initialization error paths to take it from
-> @@ -69,6 +85,50 @@ static int __init record_keyid_partitioning(void)
->  	return 0;
->  }
->  
-> +static bool is_tdx_memory(unsigned long start_pfn, unsigned long end_pfn)
-> +{
-> +	struct tdx_memblock *tmb;
-> +
-> +	/* Empty list means TDX isn't enabled. */
-> +	if (list_empty(&tdx_memlist))
-> +		return true;
-> +
-> +	list_for_each_entry(tmb, &tdx_memlist, list) {
-> +		/*
-> +		 * The new range is TDX memory if it is fully covered by
-> +		 * any TDX memory block.
-> +		 *
-> +		 * Note TDX memory blocks are originated from memblock
-> +		 * memory regions, which can only be contiguous when two
-> +		 * regions have different NUMA nodes or flags.  Therefore
-> +		 * the new range cannot cross multiple TDX memory blocks.
-> +		 */
-> +		if (start_pfn >= tmb->start_pfn && end_pfn <= tmb->end_pfn)
-> +			return true;
-> +	}
-> +	return false;
-> +}
-
-I don't really like that comment.  It should first state its behavior
-and assumptions, like:
-
-	This check assumes that the start_pfn<->end_pfn range does not
-	cross multiple tdx_memlist entries.
-
-Only then should it describe why that is OK:
-
-	A single memory hotplug even across mutliple memblocks (from
-	which tdx_memlist entries are derived) is impossible.  ... then
-	actually explain
+v1: https://lore.kernel.org/kvm/167001034454.62456.7111414518087569436.stgit@bmoger-ubuntu/
 
 
+Babu Moger (3):
+  target/i386: Add a couple of feature bits in 8000_0008_EBX
+  target/i386: Add feature bits for CPUID_Fn80000021_EAX
+  target/i386: Add missing feature bits in EPYC-Milan model
 
-> +static int tdx_memory_notifier(struct notifier_block *nb, unsigned long action,
-> +			       void *v)
-> +{
-> +	struct memory_notify *mn = v;
-> +
-> +	if (action != MEM_GOING_ONLINE)
-> +		return NOTIFY_OK;
-> +
-> +	/*
-> +	 * Not all memory is compatible with TDX.  Reject
-> +	 * to online any incompatible memory.
-> +	 */
+Michael Roth (2):
+  target/i386: allow versioned CPUs to specify new cache_info
+  target/i386: Add new EPYC CPU versions with updated cache_info
 
-This comment isn't quite right either.  There might actually be totally
-TDX *compatible* memory here.  It just wasn't configured for use with TDX.
+ target/i386/cpu.c | 252 +++++++++++++++++++++++++++++++++++++++++++++-
+ target/i386/cpu.h |  12 +++
+ 2 files changed, 259 insertions(+), 5 deletions(-)
 
-Shouldn't this be something more like:
-
-	/*
-	 * The TDX memory configuration is static and can not be
-	 * changed.  Reject onlining any memory which is outside
-	 * of the static configuration whether it supports TDX or not.
-	 */
-
-> +	return is_tdx_memory(mn->start_pfn, mn->start_pfn + mn->nr_pages) ?
-> +		NOTIFY_OK : NOTIFY_BAD;
-> +}
-> +
-> +static struct notifier_block tdx_memory_nb = {
-> +	.notifier_call = tdx_memory_notifier,
-> +};
-> +
->  static int __init tdx_init(void)
->  {
->  	int err;
-> @@ -89,6 +149,13 @@ static int __init tdx_init(void)
->  		goto no_tdx;
->  	}
->  
-> +	err = register_memory_notifier(&tdx_memory_nb);
-> +	if (err) {
-> +		pr_info("initialization failed: register_memory_notifier() failed (%d)\n",
-> +				err);
-> +		goto no_tdx;
-> +	}
-> +
->  	return 0;
->  no_tdx:
->  	clear_tdx();
-> @@ -209,6 +276,77 @@ static int tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
->  	return 0;
->  }
->  
-> +/*
-> + * Add a memory region as a TDX memory block.  The caller must make sure
-> + * all memory regions are added in address ascending order and don't
-> + * overlap.
-> + */
-> +static int add_tdx_memblock(struct list_head *tmb_list, unsigned long start_pfn,
-> +			    unsigned long end_pfn)
-> +{
-> +	struct tdx_memblock *tmb;
-> +
-> +	tmb = kmalloc(sizeof(*tmb), GFP_KERNEL);
-> +	if (!tmb)
-> +		return -ENOMEM;
-> +
-> +	INIT_LIST_HEAD(&tmb->list);
-> +	tmb->start_pfn = start_pfn;
-> +	tmb->end_pfn = end_pfn;
-> +
-> +	list_add_tail(&tmb->list, tmb_list);
-> +	return 0;
-> +}
-> +
-> +static void free_tdx_memlist(struct list_head *tmb_list)
-> +{
-> +	while (!list_empty(tmb_list)) {
-> +		struct tdx_memblock *tmb = list_first_entry(tmb_list,
-> +				struct tdx_memblock, list);
-> +
-> +		list_del(&tmb->list);
-> +		kfree(tmb);
-> +	}
-> +}
-
-'tdx_memlist' is written only once at boot and then is read-only, right?
-
-It might be nice to mention that so that the lack of locking doesn't
-look problematic.
-
-> +/*
-> + * Ensure that all memblock memory regions are convertible to TDX
-> + * memory.  Once this has been established, stash the memblock
-> + * ranges off in a secondary structure because memblock is modified
-> + * in memory hotplug while TDX memory regions are fixed.
-> + */
-
-Ahh, that's why we need to "shadow" the memblocks.  Can you add a
-sentence on this to the changelog, please?
-
-> +static int build_tdx_memlist(struct list_head *tmb_list)
-> +{
-> +	unsigned long start_pfn, end_pfn;
-> +	int i, ret;
-> +
-> +	for_each_mem_pfn_range(i, MAX_NUMNODES, &start_pfn, &end_pfn, NULL) {
-> +		/*
-> +		 * The first 1MB is not reported as TDX convertible memory.
-> +		 * Although the first 1MB is always reserved and won't end up
-> +		 * to the page allocator, it is still in memblock's memory
-> +		 * regions.  Skip them manually to exclude them as TDX memory.
-> +		 */
-> +		start_pfn = max(start_pfn, PHYS_PFN(SZ_1M));
-> +		if (start_pfn >= end_pfn)
-> +			continue;
-> +
-> +		/*
-> +		 * Add the memory regions as TDX memory.  The regions in
-> +		 * memblock has already guaranteed they are in address
-> +		 * ascending order and don't overlap.
-> +		 */
-> +		ret = add_tdx_memblock(tmb_list, start_pfn, end_pfn);
-> +		if (ret)
-> +			goto err;
-> +	}
-> +
-> +	return 0;
-> +err:
-> +	free_tdx_memlist(tmb_list);
-> +	return ret;
-> +}
-> +
->  static int init_tdx_module(void)
->  {
->  	/*
-> @@ -226,10 +364,25 @@ static int init_tdx_module(void)
->  	if (ret)
->  		goto out;
->  
-> +	/*
-> +	 * The initial support of TDX guests only allocates memory from
-> +	 * the global page allocator.  To keep things simple, just make
-> +	 * sure all pages in the page allocator are TDX memory.
-
-I didn't like this in the changelog either.  Try to make this "timeless"
-rather than refer to what the support is today.  I gave you example text
-above.
-
-> +	 * Build the list of "TDX-usable" memory regions which cover all
-> +	 * pages in the page allocator to guarantee that.  Do it while
-> +	 * holding mem_hotplug_lock read-lock as the memory hotplug code
-> +	 * path reads the @tdx_memlist to reject any new memory.
-> +	 */
-> +	get_online_mems();
-
-Oh, it actually uses the memory hotplug locking for list protection.
-That's at least a bit subtle.  Please document that somewhere in the
-functions that actually manipulate the list.
-
-I think it's also worth saying something here about the high-level
-effects of what's going on:
-
-	Take a snapshot of the memory configuration (memblocks).  This
-	snapshot will be used to enable TDX support for *this* memory
-	configuration only.  Use a memory hotplug notifier to ensure
-	that no other RAM can be added outside of this configuration.
-
-That's it, right?
-
-> +	ret = build_tdx_memlist(&tdx_memlist);
-> +	if (ret)
-> +		goto out;
-> +
->  	/*
->  	 * TODO:
->  	 *
-> -	 *  - Build the list of TDX-usable memory regions.
->  	 *  - Construct a list of TDMRs to cover all TDX-usable memory
->  	 *    regions.
->  	 *  - Pick up one TDX private KeyID as the global KeyID.
-> @@ -241,6 +394,11 @@ static int init_tdx_module(void)
->  	 */
->  	ret = -EINVAL;
->  out:
-> +	/*
-> +	 * @tdx_memlist is written here and read at memory hotplug time.
-> +	 * Lock out memory hotplug code while building it.
-> +	 */
-> +	put_online_mems();
->  	return ret;
->  }
-
-You would also be wise to have the folks who do a lot of memory hotplug
-work today look at this sooner rather than later.  I _think_ what you
-have here is OK, but I'm really rusty on the code itself.
+-- 
+2.34.1
 
