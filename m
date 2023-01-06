@@ -2,133 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0D27E65F87C
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 02:03:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4989465F8B9
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 02:13:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236425AbjAFBDw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 20:03:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58082 "EHLO
+        id S236613AbjAFBNY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 20:13:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236382AbjAFBDq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 20:03:46 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2A1F564C9;
-        Thu,  5 Jan 2023 17:03:45 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3060xRJs027071;
-        Fri, 6 Jan 2023 01:03:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=H3o6tON5owMSXwvuPyf2voj0PCtiOis55aqH7xs9h+Q=;
- b=qGD9nV9Wwn5xkJP5ZW8DYBQZnIPjLy37H/l+TB+mrQv2bvMvFOyVFoC/BcUSUuVjbMRH
- 8pSV2BNyTAus8E+Z608QE70pROq/AZDvpRo34zwiy5fLvzCl+TfWBJPa2C+pJ7NFeKmN
- wYMeCxy6rgh94KDdHK4lqrH0UrhjXkSGpVLf3YZsdbAH/rhW+3caQXGulz61ifux6UDS
- 9XgS4Up5n7mgDGyEMyXl0QFN4/D+iGp7vC5shDMCwelaY4KLmSEQpf9u2igWrba0ODte
- m5dQu28/42T7OjJSOHw1xomfFfZiw6GZdd1B9wQ/4C4ftt83YMTfvqoUwRXyxyC2lyb5 cg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mx9k983hu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Jan 2023 01:03:37 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30610808030362;
-        Fri, 6 Jan 2023 01:03:37 GMT
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3mx9k983hb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Jan 2023 01:03:36 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 305NmnaV020198;
-        Fri, 6 Jan 2023 01:03:35 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3mtcq80w9w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 Jan 2023 01:03:35 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30613Y4K46334654
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 6 Jan 2023 01:03:34 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 54CC858064;
-        Fri,  6 Jan 2023 01:03:34 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 77CA458056;
-        Fri,  6 Jan 2023 01:03:32 +0000 (GMT)
-Received: from [9.160.126.91] (unknown [9.160.126.91])
-        by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  6 Jan 2023 01:03:32 +0000 (GMT)
-Message-ID: <d0e55400-d749-23a2-c88f-a2272723bc65@linux.ibm.com>
-Date:   Thu, 5 Jan 2023 20:03:32 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH v3 1/1] vfio: remove VFIO_GROUP_NOTIFY_SET_KVM
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>, cohuck@redhat.com,
-        borntraeger@linux.ibm.com, jjherne@linux.ibm.com,
-        akrowiak@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, hch@infradead.org,
-        intel-gfx@lists.freedesktop.org,
-        intel-gvt-dev@lists.freedesktop.org, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kevin Tian <kevin.tian@intel.com>,
-        Christoph Hellwig <hch@lst.de>
-References: <20220519183311.582380-1-mjrosato@linux.ibm.com>
- <20220519183311.582380-2-mjrosato@linux.ibm.com>
- <20230105150930.6ee65182.alex.williamson@redhat.com>
- <Y7dehnZSC6ukNxKU@nvidia.com>
- <5e17a35d-2a94-f482-c466-521afcab80b8@linux.ibm.com>
- <Y7dsJpudKGtM0kbl@nvidia.com>
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-In-Reply-To: <Y7dsJpudKGtM0kbl@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: qSA-WQm0cN_f2KPomMfKGbg7bJ0EykJW
-X-Proofpoint-ORIG-GUID: K0or9jUZQNxgyJRFdIz7eHqAFs_WqRdN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-05_14,2023-01-05_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- spamscore=0 suspectscore=0 adultscore=0 mlxscore=0 phishscore=0
- bulkscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301060006
-X-Spam-Status: No, score=-4.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S236738AbjAFBNP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 20:13:15 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 789A372D01
+        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 17:13:14 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id v13-20020a25ab8d000000b007b54623bf71so449356ybi.2
+        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 17:13:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=exXmbXtQOvjtL6oDSNpvthzMuaVH9c6hK6Io7Q3H2PQ=;
+        b=Gd2Hc3yAemxhyPG2YJom6CSzPSNwdfYGbmw+Li60o3dSnVKYx0XiVKd0icK+AHEuIk
+         cr5aDPLRFr/2CT8g2JuA15L4l7Yr9Gv+v4vZE6abq951XP07mH9FmjQbtRMeGxHWqvA1
+         6+okIXdOG0GcP9+YnE6ajjTn+vj+n3TIqQsyXKSyK3fVAN1scHB4o95WZ7LLHrHJWChj
+         mEF6ZpF8Noq7jcrGsh7Tig0G45woaqJy6021lf/DM3NZxjaWBpvN9MYJxWV6PInswNb4
+         P5I7cDsWcUr4lBnWnASkz0clzoO1ftn9eCbP+0lbwF3aW8mGbteLdVvaygR51AERV6qs
+         dstg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=exXmbXtQOvjtL6oDSNpvthzMuaVH9c6hK6Io7Q3H2PQ=;
+        b=lafQnow6u4xp+tVUMwYv4sA+cIogaZCEcOYGADoxc3aFi2ft/YYzNy6lWz/CMO5Zny
+         9ZSXxDGOPY74AvOXVOHK1VkB+G/1/gly62YIwBWg9Pa4oDXxudGDx7WPONH4vSZVe/Vv
+         2N6jAHU9Ag5IvxHaaYdstis2b6wiGJtjPAK2u1y1ftmFmAbryrZdgBeK/vg5x0e4mzfL
+         sJVfbhu8vRyy5RfI9AEL8dRjTdYfI3UiUfkaKg4DESpV30mBb4eiEAa8YUCvcgGHABxy
+         20QjwOVopr7sLYaAWz1kTTAxe4WBKiyLtVP6O9J3usX1hJIaHnv9JuSYUC366uKZmHly
+         m3QQ==
+X-Gm-Message-State: AFqh2koIHal8SoJyIo2oxq3nNVKFhlM+/fV0AGlAWFW0PbcgR8Y0soSG
+        hKjQ7nsxRaWW5DnqRso2uvqMFitQlUM=
+X-Google-Smtp-Source: AMrXdXtta04aQhy7QBNY7oPlWzJPsXfi2+xs0akHqXF92W/veVVbnwfRL4McCB4DkElSKPuingj0Yr4c+L8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:2e47:0:b0:722:fd7a:94c4 with SMTP id
+ b7-20020a252e47000000b00722fd7a94c4mr3420610ybn.607.1672967593768; Thu, 05
+ Jan 2023 17:13:13 -0800 (PST)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date:   Fri,  6 Jan 2023 01:12:33 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20230106011306.85230-1-seanjc@google.com>
+Subject: [PATCH v5 00/33] KVM: x86: AVIC and local APIC fixes+cleanups
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Alejandro Jimenez <alejandro.j.jimenez@oracle.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Li RongQing <lirongqing@baidu.com>,
+        Greg Edwards <gedwards@ddn.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/5/23 7:32 PM, Jason Gunthorpe wrote:
-> On Thu, Jan 05, 2023 at 07:16:37PM -0500, Matthew Rosato wrote:
-> 
->> Yeah, this is also what I was thinking, replace the direct
->> kvm_put_kvm calls with, say, schedule_delayed_work in each driver,
->> where the delayed task just does the kvm_put_kvm (along with a brief
->> comment explaining why we handle the put asynchronously).
-> 
-> Don't put that in every driver, do something like mmput_async() where
-> the core code has all of this.
-> 
+Paolo,
 
-If the core vfio code were to add logic to invoke kvm_put_kvm and kvm_get_kvm, won't this introduce a vfio dependency on kvm?  If I recall, we have the drivers handling the kvm reference today in order to avoid that..
+This is a wholesale (and hopefully a drop-in) replacement for the patches
+in `kvm-lapic-fix-and-cleanup`.  The changes for " KVM: x86: Inhibit APIC
+memslot if x2APIC and AVIC are enabled" in v5 are relatively minor, but it
+led to multiple conflicts in later patches, i.e. a patch-to-be-squashed
+wasn't going to work.  Let me know if you've already done a lot of
+massaging on your side, shouldn't be too difficult to generate patches to
+go on top.
 
->> Other than that..  The goal of this patch originally was to get the
->> kvm reference at first open_device and release it with the very last
->> close_device, so the only other option I could think of would be to
->> take the responsibility back from the vfio drivers and do the
->> kvm_get_kvm and kvm_put_kvm directly in vfio_main after dropping the
->> (but that would result in some ugly symbol linkage and would acquire
->> kvm references that a driver maybe does not care about so I don't
->> really like that idea)
-> 
-> And we still have the deadlock problem anyhow..
+The first half or so patches fix semi-urgent, real-world relevant APICv
+and AVIC bugs.
 
-Looks like I never finished my sentence here -- I meant call kvm_put_kvm directly in vfio_main after dropping the group lock (e.g. when we set device->kvm = NULL;). But I think we'd still have the kvm dependency issue
+The second half fixes a variety of AVIC and optimized APIC map bugs
+where KVM doesn't play nice with various edge cases that are
+architecturally legal(ish), but are unlikely to occur in most real world
+scenarios
 
+v5:
+  - Fix even more bugs! [Greg]
+  - Collect reviews. [Maxim]
+  - Don't use an inhibit flag for hybrid AVIC. [Maxim]
+  - Fix an LDR cluster calc goof in the AVIC code. [Maxim]
+  - Drop a redundant "ldr == 0" check. [Maxim]
+  - Add helpers for logical vs. physical optimized map calcs. [Maxim]
+
+v4:
+  - https://lore.kernel.org/all/20221001005915.2041642-1-seanjc@google.com
+  - Fix more bugs! [Alejandro]
+  - Delete APIC memslot to inhibit xAVIC acceleration when x2APIC is
+    enabled on AMD/SVM instead of using a "partial" inihbit. [Maxim]
+
+v3:
+  - https://lore.kernel.org/all/20220920233134.940511-1-seanjc@google.com
+  - Collect reviews. [Paolo]
+  - Drop "partial" x2APIC inhibit and instead delete the memslot.
+    [Maxim, Suravee]
+  - Skip logical mode updates for x2APIC, which just reuses the
+    phys_map with some clever logic. [Suravee]
+  - Add a fix for "nodecode write" traps. [Alejandro]
+
+v2:
+  - https://lore.kernel.org/all/20220903002254.2411750-1-seanjc@google.com
+  - Collect reviews. [Li, Maxim]
+  - Disable only MMIO access when x2APIC is enabled (instead of disabling
+    all of AVIC). [Maxim]
+  - Inhibit AVIC when logical IDs are aliased. [Maxim]
+  - Tweak name of set_virtual_apic_mode() hook. [Maxim]
+  - Straight up revert logical ID fastpath mess. [Maxim]
+  - Reword changelog about skipping vCPU during logical setup. [Maxim]
+  - Fix LDR updates on AVIC. [Maxim?]
+  - Fix a nasty ISR caching bug.
+  - Flush TLB when activating AVIC.
+
+v1: https://lore.kernel.org/all/20220831003506.4117148-1-seanjc@google.com
+
+Greg Edwards (1):
+  KVM: x86: Allow APICv APIC ID inhibit to be cleared
+
+Sean Christopherson (31):
+  KVM: x86: Blindly get current x2APIC reg value on "nodecode write"
+    traps
+  KVM: x86: Purge "highest ISR" cache when updating APICv state
+  KVM: SVM: Flush the "current" TLB when activating AVIC
+  KVM: SVM: Process ICR on AVIC IPI delivery failure due to invalid
+    target
+  KVM: x86: Don't inhibit APICv/AVIC on xAPIC ID "change" if APIC is
+    disabled
+  KVM: x86: Don't inhibit APICv/AVIC if xAPIC ID mismatch is due to
+    32-bit ID
+  KVM: SVM: Don't put/load AVIC when setting virtual APIC mode
+  KVM: x86: Handle APICv updates for APIC "mode" changes via request
+  KVM: x86: Move APIC access page helper to common x86 code
+  KVM: x86: Inhibit APIC memslot if x2APIC and AVIC are enabled
+  KVM: SVM: Replace "avic_mode" enum with "x2avic_enabled" boolean
+  KVM: SVM: Compute dest based on sender's x2APIC status for AVIC kick
+  Revert "KVM: SVM: Use target APIC ID to complete x2AVIC IRQs when
+    possible"
+  KVM: SVM: Document that vCPU ID == APIC ID in AVIC kick fastpatch
+  KVM: SVM: Add helper to perform final AVIC "kick" of single vCPU
+  KVM: x86: Explicitly skip optimized logical map setup if vCPU's LDR==0
+  KVM: x86: Explicitly track all possibilities for APIC map's logical
+    modes
+  KVM: x86: Skip redundant x2APIC logical mode optimized cluster setup
+  KVM: x86: Disable APIC logical map if logical ID covers multiple MDAs
+  KVM: x86: Disable APIC logical map if vCPUs are aliased in logical
+    mode
+  KVM: x86: Honor architectural behavior for aliased 8-bit APIC IDs
+  KVM: x86: Inhibit APICv/AVIC if the optimized physical map is disabled
+  KVM: SVM: Inhibit AVIC if vCPUs are aliased in logical mode
+  KVM: SVM: Always update local APIC on writes to logical dest register
+  KVM: SVM: Update svm->ldr_reg cache even if LDR is "bad"
+  KVM: SVM: Require logical ID to be power-of-2 for AVIC entry
+  KVM: SVM: Handle multiple logical targets in AVIC kick fastpath
+  KVM: SVM: Ignore writes to Remote Read Data on AVIC write traps
+  Revert "KVM: SVM: Do not throw warning when calling avic_vcpu_load on
+    a running vcpu"
+  KVM: x86: Track required APICv inhibits with variable, not callback
+  KVM: x86: Add helpers to recalc physical vs. logical optimized APIC
+    maps
+
+Suravee Suthikulpanit (1):
+  KVM: SVM: Fix x2APIC Logical ID calculation for
+    avic_kick_target_vcpus_fast
+
+ Documentation/virt/kvm/x86/errata.rst |  11 +
+ arch/x86/include/asm/kvm-x86-ops.h    |   1 -
+ arch/x86/include/asm/kvm_host.h       |  52 +++-
+ arch/x86/kvm/lapic.c                  | 319 +++++++++++++++++-----
+ arch/x86/kvm/lapic.h                  |   2 +
+ arch/x86/kvm/svm/avic.c               | 372 ++++++++++++--------------
+ arch/x86/kvm/svm/nested.c             |   2 +-
+ arch/x86/kvm/svm/svm.c                |   8 +-
+ arch/x86/kvm/svm/svm.h                |  27 +-
+ arch/x86/kvm/vmx/vmx.c                |  58 +---
+ arch/x86/kvm/x86.c                    |  29 +-
+ 11 files changed, 524 insertions(+), 357 deletions(-)
+
+
+base-commit: c04ec04c0d15a51aa33660be175ed978beb8de0c
+-- 
+2.39.0.314.g84b9a713c41-goog
 
