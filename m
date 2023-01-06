@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2341965F8CC
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 02:14:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CF5365F8CF
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 02:14:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236454AbjAFBOB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 5 Jan 2023 20:14:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37544 "EHLO
+        id S235745AbjAFBOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 5 Jan 2023 20:14:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236846AbjAFBNk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 5 Jan 2023 20:13:40 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61BEF72D24
-        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 17:13:38 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id pi14-20020a17090b1e4e00b0021d20da7a51so2105432pjb.2
-        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 17:13:38 -0800 (PST)
+        with ESMTP id S236842AbjAFBNl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 5 Jan 2023 20:13:41 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B46C72D30
+        for <kvm@vger.kernel.org>; Thu,  5 Jan 2023 17:13:40 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id x28-20020a056a000bdc00b005826732edb6so23609pfu.22
+        for <kvm@vger.kernel.org>; Thu, 05 Jan 2023 17:13:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=dY73TyImmD0wCqNL26nvzhCHfX8vBgtKvyMOXbN+v1I=;
-        b=B861zubBIjRS4M7hrE2P/lP1yiAP6O9QSDe8ztqdzZ75i+UmjMLuMJpNqdL1Elk8v/
-         RAAfOXEHLS8mwZoF3qdVZsbOy4/D5cBa1NaNov3OMq4WhgX+YWKDc18ZxIck79I1eX76
-         1S9Dd/6XPyWvlMNYGUn+0Bxbfx7NM3Bb8F2MkBes6HJ441yQNZ9yJnSAr6SZrWwUMgF0
-         F6fMSah5f8GauF6VTpl4lM81mhmTu8PAsbyUeUc8I9prYkJWnHInHrRzbBeahfU3Lci8
-         NUNUa/xmwowTdGQxAb69BtM7JoxrsfzEZIYUinrzK/gKYn1gTY4gK8xbr8v0C/Ggak2O
-         zMHQ==
+        bh=+aYaKFD5zMoXFl3Mrpqz5yT+Tj9hEBdwhn1YhcxYDeU=;
+        b=sVrsJnqLgRkQyST7umHC5BB4qxL1l41vI7qq4E+/x2fYGDtl5AblzcCHBALLb9sRU2
+         ri/9ceRv5yQOzb3I+MmQ3K1QAJGXYtF1Y4wKvQgdg92ouBF5eFn7dTG1dhyfPIaqfNya
+         TtWAEjejrgGg4APj5FxYfagDJ/CSY7RVZ3U4SuZnL+FCbmpn1Z0CShem1/ETEBsadwyt
+         q2k7WmsXJhirwxtI6qS8NTr7kOKbg63MA7fFnTq0fgXqguYnYjo331l4d5XiadWpW5Ye
+         8DaMyvexx2ci4k40Bay6fKvVXBqel9Gu10bgBFLXHp4mCFYpcUuvkphUhvN6nqw7lctd
+         sOqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=dY73TyImmD0wCqNL26nvzhCHfX8vBgtKvyMOXbN+v1I=;
-        b=o/ksA5ZTAfntre7btfdSh0sXe5RGsYj6Q6zTSPsaEeYmpeNXCrAjnzM5wXMRElN5QG
-         avpo80IpDeAxVlhegB2DC9ThOFNIivsSjbu4aipAuag/rZ90WjgAYHl3n/S/k4AchlmH
-         0T+ZkMAfA6oHHppW7k1GviJRG97vwa1rSCaLqg2xY2WI5RVOgXZzpPtFRumTCTIYE6f/
-         hQODv//4k4GkEdQ3Q9mIe79yV4l8WqQTQoN3S0CGVNrWrYh/G7UUMefaoOCldQW2bmEL
-         iIM6Zb5eg1uOPZvqkTPt2VhFrD6BnZ4xV8Mmj0CpNrcJuLw+hLOkMUQakO0b6acXdD28
-         AArg==
-X-Gm-Message-State: AFqh2kpMf11gPePCj2BCBQ5STG8YYOMgYt8dWg8YtRso7T45Caf75ox1
-        owve9+FkAM+ekvecaxwnonT9yMr+DVo=
-X-Google-Smtp-Source: AMrXdXvXUwoPtx1VGD8IrsXsf3RNGjmLaGKsP+ZxpWSG6SVLX4nROauFHzf5Vp7o4I738ZRKSXgckNPWa9E=
+        bh=+aYaKFD5zMoXFl3Mrpqz5yT+Tj9hEBdwhn1YhcxYDeU=;
+        b=i6mEuVgSWPyN2AaLqeOOEpTQ35kNlaiM+FEiV8iJHLHfdImpHUm0P5N6WpZtr38iWG
+         b20J9o5Yd/qkwYazgBTRXHto4tYdRaGotsXmxyow/otYyY47csazo3buoCgsXTxmB1Lm
+         3D50DU80MZBRPoCJDgSwkn0p1F4wQy32yWgMKOqbx7ArSfJpnX8u4p1lXalM9Dn7ejS6
+         UETufrjf374vYt966gRZ+dSICWW+Sr1SVIe4qktQnnGuIxB/6l6rY1lj+envKVBv3TQ1
+         77FG2hl2eMwGeEcCBj/o+202z9/FKWlXECwedkhRZQuAQ6688m0JPxf4ItQWpKKZiT8x
+         yDPA==
+X-Gm-Message-State: AFqh2krPQaXVa3MuCX6XOTo571mAVsvTNa7eNqENsGdg/ZZEskdjc5fP
+        o63pjW04OHRPz71qxh4UoVT8bpilDtM=
+X-Google-Smtp-Source: AMrXdXsFgmf3vW4OGvIOFJZ6YjwA2U3Z4H//RGBlZizTl/eqLOIH4Tvb+Bga8Mjioz5BnlSq2KifbpKrqKg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:999c:0:b0:582:74a2:1e4e with SMTP id
- k28-20020aa7999c000000b0058274a21e4emr1235081pfh.26.1672967617919; Thu, 05
- Jan 2023 17:13:37 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a62:1c4d:0:b0:581:1898:93ae with SMTP id
+ c74-20020a621c4d000000b00581189893aemr2945460pfc.51.1672967619557; Thu, 05
+ Jan 2023 17:13:39 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Fri,  6 Jan 2023 01:12:47 +0000
+Date:   Fri,  6 Jan 2023 01:12:48 +0000
 In-Reply-To: <20230106011306.85230-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230106011306.85230-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230106011306.85230-15-seanjc@google.com>
-Subject: [PATCH v5 14/33] Revert "KVM: SVM: Use target APIC ID to complete
- x2AVIC IRQs when possible"
+Message-ID: <20230106011306.85230-16-seanjc@google.com>
+Subject: [PATCH v5 15/33] KVM: SVM: Document that vCPU ID == APIC ID in AVIC
+ kick fastpatch
 From:   Sean Christopherson <seanjc@google.com>
 To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>
@@ -75,74 +75,60 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Due to a likely mismerge of patches, KVM ended up with a superfluous
-commit to "enable" AVIC's fast path for x2AVIC mode.  Even worse, the
-superfluous commit has several bugs and creates a nasty local shadow
-variable.
+Document that AVIC is inhibited if any vCPU's APIC ID diverges from its
+vCPU ID, i.e. that there's no need to check for a destination match in
+the AVIC kick fast path.
 
-Rather than fix the bugs piece-by-piece[*] to achieve the same end
-result, revert the patch wholesale.
+Opportunistically tweak comments to remove "guest bug", as that suggests
+KVM is punting on error handling, which is not the case.  Targeting a
+non-existent vCPU or no vCPUs _may_ be a guest software bug, but whether
+or not it's a guest bug is irrelevant.  Such behavior is architecturally
+legal and thus needs to faithfully emulated by KVM (and it is).
 
-Opportunistically add a comment documenting the x2AVIC dependencies.
-
-This reverts commit 8c9e639da435874fb845c4d296ce55664071ea7a.
-
-[*] https://lore.kernel.org/all/YxEP7ZBRIuFWhnYJ@google.com
-
-Fixes: 8c9e639da435 ("KVM: SVM: Use target APIC ID to complete x2AVIC IRQs when possible")
-Suggested-by: Maxim Levitsky <mlevitsk@redhat.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
+Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/svm/avic.c | 29 +++++++++++------------------
- 1 file changed, 11 insertions(+), 18 deletions(-)
+ arch/x86/kvm/svm/avic.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
 diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-index 0f67fd34ef99..e4b5f8b14882 100644
+index e4b5f8b14882..eb2ad5b54877 100644
 --- a/arch/x86/kvm/svm/avic.c
 +++ b/arch/x86/kvm/svm/avic.c
-@@ -378,7 +378,17 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+@@ -368,8 +368,8 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+ 			cluster = (dest >> 4) << 2;
+ 		}
  
- 		logid_index = cluster + __ffs(bitmap);
++		/* Nothing to do if there are no destinations in the cluster. */
+ 		if (unlikely(!bitmap))
+-			/* guest bug: nobody to send the logical interrupt to */
+ 			return 0;
  
--		if (!apic_x2apic_mode(source)) {
-+		if (apic_x2apic_mode(source)) {
-+			/*
-+			 * For x2APIC, the logical APIC ID is a read-only value
-+			 * that is derived from the x2APIC ID, thus the x2APIC
-+			 * ID can be found by reversing the calculation (done
-+			 * above).  Note, bits 31:20 of the x2APIC ID are not
-+			 * propagated to the logical ID, but KVM limits the
-+			 * x2APIC ID limited to KVM_MAX_VCPU_IDS.
-+			 */
-+			l1_physical_id = logid_index;
-+		} else {
- 			u32 *avic_logical_id_table =
- 				page_address(kvm_svm->avic_logical_id_table_page);
+ 		if (!is_power_of_2(bitmap))
+@@ -397,7 +397,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+ 			if (WARN_ON_ONCE(index != logid_index))
+ 				return -EINVAL;
  
-@@ -393,23 +403,6 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
+-			/* guest bug: non existing/reserved logical destination */
++			/* Nothing to do if the logical destination is invalid. */
+ 			if (unlikely(!(logid_entry & AVIC_LOGICAL_ID_ENTRY_VALID_MASK)))
+ 				return 0;
  
- 			l1_physical_id = logid_entry &
- 					 AVIC_LOGICAL_ID_ENTRY_GUEST_PHYSICAL_ID_MASK;
--		} else {
--			/*
--			 * For x2APIC logical mode, cannot leverage the index.
--			 * Instead, calculate physical ID from logical ID in ICRH.
--			 */
--			int cluster = (icrh & 0xffff0000) >> 16;
--			int apic = ffs(icrh & 0xffff) - 1;
--
--			/*
--			 * If the x2APIC logical ID sub-field (i.e. icrh[15:0])
--			 * contains anything but a single bit, we cannot use the
--			 * fast path, because it is limited to a single vCPU.
--			 */
--			if (apic < 0 || icrh != (1 << apic))
--				return -EINVAL;
--
--			l1_physical_id = (cluster << 4) + apic;
+@@ -406,9 +406,13 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
  		}
  	}
  
++	/*
++	 * KVM inhibits AVIC if any vCPU ID diverges from the vCPUs APIC ID,
++	 * i.e. APIC ID == vCPU ID.  Once again, nothing to do if the target
++	 * vCPU doesn't exist.
++	 */
+ 	target_vcpu = kvm_get_vcpu_by_id(kvm, l1_physical_id);
+ 	if (unlikely(!target_vcpu))
+-		/* guest bug: non existing vCPU is a target of this IPI*/
+ 		return 0;
+ 
+ 	target_vcpu->arch.apic->irr_pending = true;
 -- 
 2.39.0.314.g84b9a713c41-goog
 
