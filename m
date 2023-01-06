@@ -2,92 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 26C516605B5
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 18:30:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ED306605C4
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 18:37:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234465AbjAFR3o (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 12:29:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60778 "EHLO
+        id S235303AbjAFRhU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 12:37:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234866AbjAFR3h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 12:29:37 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF10A7D1E5;
-        Fri,  6 Jan 2023 09:29:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673026175; x=1704562175;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Bk36Bjlg11pHfC2kVVC8AHsa8BkcjI7RwNUEFj2ZCuM=;
-  b=UfeQb14Zptg6yqXSuH6IA18ZfobrLRYLYmJ8iAZ5iPtgf7KDuUYZ3Hxd
-   amVZIxAVo2WCx3DDNGP31FEA35YmiHtv3udbsGgZbwsB0lyYyGymP5Iih
-   8bJZ459iaddKKk9GG1eu+1GUW7FCBmJh1v3xQYJPDUg+ZFgLm+4eW8Glp
-   VDVc/Cr7ehoW9s3xFhJsFvITDQIqhvJzMsRXkz0aAFhXYlslcamovaOWZ
-   P42v9B9E4sQy5VN0LN1gbphZdVqSzxVw1pUYZQDpOoLMR0c3DPhrj4twV
-   JxOFJ3ki3Cf1+NqEU3C9LiFF2PyDlnmsOORKE62XeJ6+/APKepqglS680
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="306036983"
-X-IronPort-AV: E=Sophos;i="5.96,305,1665471600"; 
-   d="scan'208";a="306036983"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 09:29:35 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="984734060"
-X-IronPort-AV: E=Sophos;i="5.96,305,1665471600"; 
-   d="scan'208";a="984734060"
-Received: from xiangyuy-mobl.amr.corp.intel.com (HELO [10.212.251.186]) ([10.212.251.186])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 09:29:34 -0800
-Message-ID: <61b9cc00-d514-df77-0a31-88ec35d73456@intel.com>
-Date:   Fri, 6 Jan 2023 09:29:33 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v8 05/16] x86/virt/tdx: Implement functions to make
- SEAMCALL
-Content-Language: en-US
-To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     linux-mm@kvack.org, peterz@infradead.org, tglx@linutronix.de,
-        seanjc@google.com, pbonzini@redhat.com, dan.j.williams@intel.com,
-        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
-        ying.huang@intel.com, reinette.chatre@intel.com,
-        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
-        isaku.yamahata@intel.com, chao.gao@intel.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
-        sagis@google.com, imammedo@redhat.com
-References: <cover.1670566861.git.kai.huang@intel.com>
- <d74565e3f71b6e5e5183f3b736222ec42b6e0b81.1670566861.git.kai.huang@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <d74565e3f71b6e5e5183f3b736222ec42b6e0b81.1670566861.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-5.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229949AbjAFRhS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 12:37:18 -0500
+Received: from mail-io1-xd49.google.com (mail-io1-xd49.google.com [IPv6:2607:f8b0:4864:20::d49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88DE97D9DB
+        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 09:37:17 -0800 (PST)
+Received: by mail-io1-xd49.google.com with SMTP id b21-20020a5d8d95000000b006fa39fbb94eso1112959ioj.17
+        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 09:37:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hBdWajpGgTVSFSM+SgsmRly6oW6Jqhbc8VPLCLHaxTk=;
+        b=BLdbvIQn4bXEznMPq85NSoIfwhSJY9dT17IXX04NEEY28nrtMZdEL8oErq2J4CtXFw
+         bQX0oXGd+ruPmpxQ+CsB/fy+l8KpE31Jl9kylzccoyj/kePBvX23Yth1phFheE5jMqu9
+         eeaiz3iNNkZkNNeObL7qfVvpQkaCQEPGw19xO/QilblLxFJReeJIXoM/2NuIyYPq3f3/
+         DLYswrKVsCiB9zZ7NQimtNNpxsOYW+vB57OyvvK5stxKs1NGN92oLFAE+Q8U4GsB+xRE
+         5JWWjktSIoiJaKrbixDRJxYzTv+kW8GPav98/YwRC9u72GoQ/D+wjLEW0q9rEOeoqmnU
+         Qdhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hBdWajpGgTVSFSM+SgsmRly6oW6Jqhbc8VPLCLHaxTk=;
+        b=kyuhnbpXCWInBANdlS9AA45iQtYc0KE/TWjiRobPeg15rws7kbT/VH29irawxFgRxo
+         N1hkfiApbRpFkJgmCP3dAb66F04kjOZlhVSVkzfOHyN0l5zoACAUvScu09e1nBI3VnGU
+         LDTkQeJhKrIDDutKfdrVEfLTrwnr6Ipy2lMJZAf4Oh9Y/1klhk0EFuOlnIjeWr3zojfF
+         lsNHcld9TEbSQT4sB750lq87iGH/gTUnP/B8JK+ZNvLI54uAqFrTz/4+Asa3G744v0Pq
+         raVDDHtG8xDQI+dz4ohGX48SdWpCT04Xa/i9wnLPlPc+dTyeTrn6MxWd1bYpsbWnDQqM
+         ZaHQ==
+X-Gm-Message-State: AFqh2kpgJSr++R7F3lT1HfnvmtypdlEa242LakMM16SLktHOZESPjD89
+        1Ks5ei3AuuAZM895/EO9Vjf/UWEkR1R6vRPJQA==
+X-Google-Smtp-Source: AMrXdXvDZxrWBwEAYfcM7rW2ruUn7tl7QW7w8kY9EkKMU4RiAVZVquILKhc/6VIb2IHtlV9OdSqP3EmYJDTgsnJ4ww==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a92:2c04:0:b0:30b:fedc:9c72 with SMTP
+ id t4-20020a922c04000000b0030bfedc9c72mr5009808ile.290.1673026636918; Fri, 06
+ Jan 2023 09:37:16 -0800 (PST)
+Date:   Fri, 06 Jan 2023 17:37:16 +0000
+In-Reply-To: <20230106071124.ytv6cmkvmvxhzmoh@orel> (message from Andrew Jones
+ on Fri, 6 Jan 2023 08:11:24 +0100)
+Mime-Version: 1.0
+Message-ID: <gsntwn5zr2cz.fsf@coltonlewis-kvm.c.googlers.com>
+Subject: Re: [kvm-unit-tests PATCH] arm: Remove MAX_SMP probe loop
+From:   Colton Lewis <coltonlewis@google.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     alexandru.elisei@arm.com, kvm@vger.kernel.org,
+        kvmarm@lists.cs.columbia.edu, maz@kernel.org,
+        eric.auger@redhat.com, oliver.upton@linux.dev, reijiw@google.com,
+        ricarkol@google.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The subject here is a bit too specific.  This patch isn't just
-"implementing functions".  There are more than just functions here.  The
-best subject is probably:
+Andrew Jones <andrew.jones@linux.dev> writes:
 
-	Add SEAMCALL infrastructure
+>> We could cap at 8 for ACCEL=tcg. Even if no one cares, I'm tempted to do
+>> it so no one hits the same little landmine as me in the future.
 
-But that's rather generic by necessity because this patch does several
-_different_ logical things:
+> TCG supports up to 255 CPUs. The only reason it'd have a max of 8 is if
+> you were configuring a GICv2 instead of a GICv3.
 
- * Wrap TDX_MODULE_CALL so it can be used for SEAMCALLs with host=1
- * Add handling to TDX_MODULE_CALL to allow it to handle specifically
-   host-side error conditions
- * Add high-level seamcall() function with actual error handling
+That makes sense as it was the GICv2 tests failing that led me to this
+rabbit hole. In that case, it should be completely safe to delete the
+loop because all the GICv2 tests have ternary condition to cap at 8
+already.
 
-It's probably also worth noting that the code that allows "host=1" to be
-passed to TDX_MODULE_CALL is dead code in mainline right now.  It
-probably shouldn't have been merged this way, but oh well.
-
-I don't know that you really _need_ to split this up, but I'm just
-pointing out that mashing three different logical things together makes
-it hard to write a coherent Subject.  But, I've seen worse.
+If we can't delete, the loop logic is still a suboptimal way to do
+things as qemu reports the max cpus it can take. We could read MAX_SMP
+from qemu error output.
