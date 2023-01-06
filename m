@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0518365FD8A
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 10:21:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F288865FD97
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 10:21:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232787AbjAFJUr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 04:20:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43700 "EHLO
+        id S232636AbjAFJVD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 04:21:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232958AbjAFJUT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S232976AbjAFJUT (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 6 Jan 2023 04:20:19 -0500
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 893E36B5E5;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2EF63188;
         Fri,  6 Jan 2023 01:20:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1672996817; x=1704532817;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=HUHrRZTDjkecGuHDXK4PBl+TXz2Ml8+ie04d+kki1CQ=;
-  b=Q4udPxw9JOAoaVlnAufzC/a6XcgpzCAUyH4ZQJ05hqJ/E5S/hd3fMn2j
-   fYbaQIhR3+/niD9JRw/W5LeAv7t70xKB3zDvgkV3FjhIkIanVL2lBO9Gp
-   FH4zDG3WrVEajn7Y2oxrxO3yIDheli2hPYVcnFA7BQ4SLAn6EwgWjBFgA
-   mDbpjwoE5Rq6OPGW4x346IB+5unVx3BULsBRdexkc1yiei1zw0juJtMwU
-   y3UFcOLYZgacheV0Ody6K4vwsv8Uc5kdt6HE88XfL51LhhJ11bG1WWOTS
-   Loh7jjcYFkwzBmZMfrcEs1hmsnieGn8cZuuqZJa7jEHqHwY/bQAGhmhDY
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="322511436"
+  bh=o7a+0760MneBwxPKzFiaj9Nq7KFWmVxmzGnbcDhAUFY=;
+  b=KYB4DbBec/JF8CbKctjZjdQBK0rCOojU2N+ABq4oosJCLUGYJ9ZWtjQ8
+   6judQxcKrRohuMnfjRTYhbFEQxCWJT+4ep3JE58AlURBXNGfhvzi9wy67
+   ivfoXR1JQuRI/Z12OaddB+6Y5GexTzGN/feEMxEqzJnAhwMOfWyqpl0HY
+   BTM5pA2KN1WqUR3vHEtqN6y280Cm9NeiOtoHxMsupNCapcrcTHC5g7X4T
+   UFKw/z6TmGCynXjMw2mswZiEwy8MXpps5aHjF7EH9oApQuXU+x17aztfb
+   HEkfFXi4rwxmOGDAMAvk75wpAN1O1TBLldTIwjAy+9UEmVG2q6nFZTm/J
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="322511439"
 X-IronPort-AV: E=Sophos;i="5.96,304,1665471600"; 
-   d="scan'208";a="322511436"
+   d="scan'208";a="322511439"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 01:20:13 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="719139363"
+X-IronPort-AV: E=McAfee;i="6500,9779,10581"; a="719139367"
 X-IronPort-AV: E=Sophos;i="5.96,304,1665471600"; 
-   d="scan'208";a="719139363"
+   d="scan'208";a="719139367"
 Received: from unknown (HELO fred..) ([172.25.112.68])
   by fmsmga008.fm.intel.com with ESMTP; 06 Jan 2023 01:20:12 -0800
 From:   Xin Li <xin3.li@intel.com>
@@ -44,9 +44,9 @@ Cc:     tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
         dave.hansen@linux.intel.com, hpa@zytor.com, peterz@infradead.org,
         andrew.cooper3@citrix.com, seanjc@google.com, pbonzini@redhat.com,
         ravi.v.shankar@intel.com
-Subject: [RFC PATCH v2 07/32] x86/opcode: add ERETU, ERETS instructions to x86-opcode-map
-Date:   Fri,  6 Jan 2023 00:55:52 -0800
-Message-Id: <20230106085617.17248-8-xin3.li@intel.com>
+Subject: [RFC PATCH v2 08/32] x86/objtool: teach objtool about ERETU and ERETS
+Date:   Fri,  6 Jan 2023 00:55:53 -0800
+Message-Id: <20230106085617.17248-9-xin3.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230106085617.17248-1-xin3.li@intel.com>
 References: <20230106085617.17248-1-xin3.li@intel.com>
@@ -63,43 +63,48 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: "H. Peter Anvin (Intel)" <hpa@zytor.com>
 
-Add the instruction opcodes used by FRED: ERETU, ERETS.
-Opcode number is per public FRED draft spec v3.0
-https://cdrdv2.intel.com/v1/dl/getContent/678938.
+Update the objtool decoder to know about the ERETU and ERETS
+instructions (type INSN_CONTEXT_SWITCH.)
 
 Signed-off-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 Signed-off-by: Xin Li <xin3.li@intel.com>
 ---
- arch/x86/lib/x86-opcode-map.txt       | 2 +-
- tools/arch/x86/lib/x86-opcode-map.txt | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tools/objtool/arch/x86/decode.c | 22 ++++++++++++++++------
+ 1 file changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/arch/x86/lib/x86-opcode-map.txt b/arch/x86/lib/x86-opcode-map.txt
-index 5168ee0360b2..7a269e269dc0 100644
---- a/arch/x86/lib/x86-opcode-map.txt
-+++ b/arch/x86/lib/x86-opcode-map.txt
-@@ -1052,7 +1052,7 @@ EndTable
+diff --git a/tools/objtool/arch/x86/decode.c b/tools/objtool/arch/x86/decode.c
+index 1c253b4b7ce0..fbfe0a39599a 100644
+--- a/tools/objtool/arch/x86/decode.c
++++ b/tools/objtool/arch/x86/decode.c
+@@ -480,12 +480,22 @@ int arch_decode_instruction(struct objtool_file *file, const struct section *sec
+ 	case 0x0f:
  
- GrpTable: Grp7
- 0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B)
--1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
-+1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B) | ERETU (F3),(010),(11B) | ERETS (F2),(010),(11B)
- 2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
- 3: LIDT Ms
- 4: SMSW Mw/Rv
-diff --git a/tools/arch/x86/lib/x86-opcode-map.txt b/tools/arch/x86/lib/x86-opcode-map.txt
-index 5168ee0360b2..7a269e269dc0 100644
---- a/tools/arch/x86/lib/x86-opcode-map.txt
-+++ b/tools/arch/x86/lib/x86-opcode-map.txt
-@@ -1052,7 +1052,7 @@ EndTable
+ 		if (op2 == 0x01) {
+-
+-			if (modrm == 0xca)
+-				*type = INSN_CLAC;
+-			else if (modrm == 0xcb)
+-				*type = INSN_STAC;
+-
++			switch (insn_last_prefix_id(&insn)) {
++			case INAT_PFX_REPE:
++			case INAT_PFX_REPNE:
++				if (modrm == 0xca) {
++					/* eretu/erets */
++					*type = INSN_CONTEXT_SWITCH;
++				}
++				break;
++			default:
++				if (modrm == 0xca) {
++					*type = INSN_CLAC;
++				} else if (modrm == 0xcb) {
++					*type = INSN_STAC;
++				}
++				break;
++			}
+ 		} else if (op2 >= 0x80 && op2 <= 0x8f) {
  
- GrpTable: Grp7
- 0: SGDT Ms | VMCALL (001),(11B) | VMLAUNCH (010),(11B) | VMRESUME (011),(11B) | VMXOFF (100),(11B) | PCONFIG (101),(11B) | ENCLV (000),(11B)
--1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B)
-+1: SIDT Ms | MONITOR (000),(11B) | MWAIT (001),(11B) | CLAC (010),(11B) | STAC (011),(11B) | ENCLS (111),(11B) | ERETU (F3),(010),(11B) | ERETS (F2),(010),(11B)
- 2: LGDT Ms | XGETBV (000),(11B) | XSETBV (001),(11B) | VMFUNC (100),(11B) | XEND (101)(11B) | XTEST (110)(11B) | ENCLU (111),(11B)
- 3: LIDT Ms
- 4: SMSW Mw/Rv
+ 			*type = INSN_JUMP_CONDITIONAL;
 -- 
 2.34.1
 
