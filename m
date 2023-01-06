@@ -2,143 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 55BFC66071E
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 20:29:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 475F966073C
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 20:36:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbjAFT3K (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 14:29:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59510 "EHLO
+        id S235798AbjAFTgf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 14:36:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231335AbjAFT3F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 14:29:05 -0500
-Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 532B26E0C9
-        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 11:29:03 -0800 (PST)
-Date:   Fri, 6 Jan 2023 19:28:57 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1673033341;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=LXDHeC7704u3jwtTSi+/q3L7bguB9Hm9yDT2bH4uWxg=;
-        b=FOVvO6BfYU70vDpFMUoI7emATWuED3kBPOQLnSX25Md1raEAPm+XS9/GzQIH1AM6eda/iM
-        BOAjbVKYdz5BHjO5VvUSp7DEohbmsWxwKuMnKZB/R39RCJsNvGQXWVZnxYxlF7ftHXFJ+v
-        bg87+oCMuSh0N0trHuyksn5xHDlhK/A=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu,
-        andrew.jones@linux.dev, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, reijiw@google.com
-Subject: Re: [kvm-unit-tests PATCH v2 1/4] arm: pmu: Fix overflow checks for
- PMUv3p5 long counters
-Message-ID: <Y7h2eQp5oFd/DN7A@google.com>
-References: <20221220031032.2648701-1-ricarkol@google.com>
- <20221220031032.2648701-2-ricarkol@google.com>
+        with ESMTP id S235745AbjAFTgd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 14:36:33 -0500
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C5262F1;
+        Fri,  6 Jan 2023 11:36:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673033792; x=1704569792;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JKQwhg3SKN3PwT6OwIBONjP4dNuxovJ0f2FMLC1fPXY=;
+  b=D1J740NLI5kA6NVxgZwHuCuAkSghTZ35rLerR1Rx65bZ39t0M103srEH
+   r22UMNya9gvorRhMabqPVO9YqUksO/wuAKrjiCsPuT1F6L8yJJqF0lf11
+   SIX/gaSfd3SaQQYwr5M4Z+NVoM7S6Z513IK6zI9xwnUAjLuT52FOhi6a9
+   ey7+RSo27IJDFQ37DHs9Xyv/Fmqx14E8okwvWKPq+vu8wDoANms8Z3pmC
+   cWdFUQ3Ryv70ycSIebMI9Lkelym42y4PphGNJTAIwK//mk6iYm6P6TnxK
+   XnQIjt8yq7JxrbBuWn+sq84owFxlfv9lTKQeTBOEZC+KIla8IQpZUpJR4
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="323791777"
+X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
+   d="scan'208";a="323791777"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 11:36:32 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="686563906"
+X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
+   d="scan'208";a="686563906"
+Received: from xiangyuy-mobl.amr.corp.intel.com (HELO [10.212.251.186]) ([10.212.251.186])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 11:36:31 -0800
+Message-ID: <725de6e9-e468-48ef-3bae-1e8a1b7ef0f7@intel.com>
+Date:   Fri, 6 Jan 2023 11:36:31 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221220031032.2648701-2-ricarkol@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v8 09/16] x86/virt/tdx: Fill out TDMRs to cover all TDX
+ memory regions
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, peterz@infradead.org, tglx@linutronix.de,
+        seanjc@google.com, pbonzini@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
+        ying.huang@intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+References: <cover.1670566861.git.kai.huang@intel.com>
+ <6f9c0bc1074501fa2431bde73bdea57279bf0085.1670566861.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <6f9c0bc1074501fa2431bde73bdea57279bf0085.1670566861.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+On 12/8/22 22:52, Kai Huang wrote:
+> Start to transit out the "multi-steps" to construct a list of "TD Memory
+> Regions" (TDMRs) to cover all TDX-usable memory regions.
+> 
+> The kernel configures TDX-usable memory regions by passing a list of
+> TDMRs "TD Memory Regions" (TDMRs) to the TDX module.  Each TDMR contains
+> the information of the base/size of a memory region, the base/size of the
+> associated Physical Address Metadata Table (PAMT) and a list of reserved
+> areas in the region.
+> 
+> Do the first step to fill out a number of TDMRs to cover all TDX memory
+> regions.  To keep it simple, always try to use one TDMR for each memory
+> region.  As the first step only set up the base/size for each TDMR.
+> 
+> Each TDMR must be 1G aligned and the size must be in 1G granularity.
+> This implies that one TDMR could cover multiple memory regions.  If a
+> memory region spans the 1GB boundary and the former part is already
+> covered by the previous TDMR, just use a new TDMR for the remaining
+> part.
+> 
+> TDX only supports a limited number of TDMRs.  Disable TDX if all TDMRs
+> are consumed but there is more memory region to cover.
 
-On Tue, Dec 20, 2022 at 03:10:29AM +0000, Ricardo Koller wrote:
-> PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
-> for overflowing at 32 or 64-bits. The consequence is that tests that check
-> the counter values after overflowing should not assume that values will be
-> wrapped around 32-bits: they overflow into the other half of the 64-bit
-> counters on PMUv3p5.
-> 
-> Fix tests by correctly checking overflowing-counters against the expected
-> 64-bit value.
-> 
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arm/pmu.c | 37 +++++++++++++++++++++++++------------
->  1 file changed, 25 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index cd47b14..1b55e20 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -54,10 +54,13 @@
->  #define EXT_COMMON_EVENTS_LOW	0x4000
->  #define EXT_COMMON_EVENTS_HIGH	0x403F
+This could probably use some discussion of why it is not being
+future-proofed.  Maybe:
+
+	There are fancier things that could be done like trying to merge
+	adjacent TDMRs.  This would allow more pathological memory
+	layouts to be supported.  But, current systems are not even
+	close to exhausting the existing TDMR resources in practice.
+	For now, keep it simple.
+
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index d36ac72ef299..5b1de0200c6b 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -407,6 +407,90 @@ static void free_tdmr_list(struct tdmr_info_list *tdmr_list)
+>  			tdmr_list->max_tdmrs * tdmr_list->tdmr_sz);
+>  }
 >  
-> -#define ALL_SET			0xFFFFFFFF
-> -#define ALL_CLEAR		0x0
-> -#define PRE_OVERFLOW		0xFFFFFFF0
-> -#define PRE_OVERFLOW2		0xFFFFFFDC
-> +#define ALL_SET			0x00000000FFFFFFFFULL
-> +#define ALL_SET_64		0xFFFFFFFFFFFFFFFFULL
-> +#define ALL_CLEAR		0x0000000000000000ULL
-> +#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
-> +#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
+> +/* Get the TDMR from the list at the given index. */
+> +static struct tdmr_info *tdmr_entry(struct tdmr_info_list *tdmr_list,
+> +				    int idx)
+> +{
+> +	return (struct tdmr_info *)((unsigned long)tdmr_list->first_tdmr +
+> +			tdmr_list->tdmr_sz * idx);
+> +}
+
+I think that's more complicated and has more casting than necessary.
+This looks nicer:
+
+	int tdmr_info_offset = tdmr_list->tdmr_sz * idx;
+
+	return (void *)tdmr_list->first_tdmr + tdmr_info_offset;
+
+Also, it might even be worth keeping ->first_tdmr as a void*.  It isn't
+a real C array and keeping it as void* would keep anyone from doing:
+
+	tdmr_foo = tdmr_list->first_tdmr[foo];
+
+> +#define TDMR_ALIGNMENT		BIT_ULL(30)
+> +#define TDMR_PFN_ALIGNMENT	(TDMR_ALIGNMENT >> PAGE_SHIFT)
+> +#define TDMR_ALIGN_DOWN(_addr)	ALIGN_DOWN((_addr), TDMR_ALIGNMENT)
+> +#define TDMR_ALIGN_UP(_addr)	ALIGN((_addr), TDMR_ALIGNMENT)
 > +
-> +#define ALL_SET_AT(_64b)       (_64b ? ALL_SET_64 : ALL_SET)
-
-AFAICT, ALL_SET is mostly used to toggle all PMCs in a configuration
-register. Using it for PMEVCNTR<n> seems a bit odd to me. How about
-introducing a helper for getting the counter mask to avoid the
-open-coded version check?
-
-static uint64_t pmevcntr_mask(void)
-{
-	/*
-	 * Bits [63:0] are always incremented for 64-bit counters,
-	 * even if the PMU is configured to generate an overflow at
-	 * bits [31:0]
-	 *
-	 * See DDI0487I.a, section D11.3 ("Behavior on overflow") for
-	 * more details.
-	 */
-	if (pmu.version >= ID_DFR0_PMU_V3_8_5)
-		return ~0;
-
-	return (uint32_t)~0;
-}
-
-I've always found the PMU documentation to be a bit difficult to grok,
-and the above citation only mentions the intended behavior in passing.
-Please feel free to update with a better citation if it exists.
-
->  #define PMU_PPI			23
->  
-> @@ -538,6 +541,7 @@ static void test_mem_access(void)
->  static void test_sw_incr(void)
+> +static inline u64 tdmr_end(struct tdmr_info *tdmr)
+> +{
+> +	return tdmr->base + tdmr->size;
+> +}
+> +
+> +/*
+> + * Take the memory referenced in @tmb_list and populate the
+> + * preallocated @tdmr_list, following all the special alignment
+> + * and size rules for TDMR.
+> + */
+> +static int fill_out_tdmrs(struct list_head *tmb_list,
+> +			  struct tdmr_info_list *tdmr_list)
+> +{
+> +	struct tdx_memblock *tmb;
+> +	int tdmr_idx = 0;
+> +
+> +	/*
+> +	 * Loop over TDX memory regions and fill out TDMRs to cover them.
+> +	 * To keep it simple, always try to use one TDMR to cover one
+> +	 * memory region.
+> +	 *
+> +	 * In practice TDX1.0 supports 64 TDMRs, which is big enough to
+> +	 * cover all memory regions in reality if the admin doesn't use
+> +	 * 'memmap' to create a bunch of discrete memory regions.  When
+> +	 * there's a real problem, enhancement can be done to merge TDMRs
+> +	 * to reduce the final number of TDMRs.
+> +	 */
+> +	list_for_each_entry(tmb, tmb_list, list) {
+> +		struct tdmr_info *tdmr = tdmr_entry(tdmr_list, tdmr_idx);
+> +		u64 start, end;
+> +
+> +		start = TDMR_ALIGN_DOWN(PFN_PHYS(tmb->start_pfn));
+> +		end   = TDMR_ALIGN_UP(PFN_PHYS(tmb->end_pfn));
+> +
+> +		/*
+> +		 * A valid size indicates the current TDMR has already
+> +		 * been filled out to cover the previous memory region(s).
+> +		 */
+> +		if (tdmr->size) {
+> +			/*
+> +			 * Loop to the next if the current memory region
+> +			 * has already been fully covered.
+> +			 */
+> +			if (end <= tdmr_end(tdmr))
+> +				continue;
+> +
+> +			/* Otherwise, skip the already covered part. */
+> +			if (start < tdmr_end(tdmr))
+> +				start = tdmr_end(tdmr);
+> +
+> +			/*
+> +			 * Create a new TDMR to cover the current memory
+> +			 * region, or the remaining part of it.
+> +			 */
+> +			tdmr_idx++;
+> +			if (tdmr_idx >= tdmr_list->max_tdmrs)
+> +				return -E2BIG;
+> +
+> +			tdmr = tdmr_entry(tdmr_list, tdmr_idx);
+> +		}
+> +
+> +		tdmr->base = start;
+> +		tdmr->size = end - start;
+> +	}
+> +
+> +	/* @tdmr_idx is always the index of last valid TDMR. */
+> +	tdmr_list->nr_tdmrs = tdmr_idx + 1;
+> +
+> +	return 0;
+> +}
+> +
+>  /*
+>   * Construct a list of TDMRs on the preallocated space in @tdmr_list
+>   * to cover all TDX memory regions in @tmb_list based on the TDX module
+> @@ -416,16 +500,23 @@ static int construct_tdmrs(struct list_head *tmb_list,
+>  			   struct tdmr_info_list *tdmr_list,
+>  			   struct tdsysinfo_struct *sysinfo)
 >  {
->  	uint32_t events[] = {SW_INCR, SW_INCR};
-> +	uint64_t cntr0;
->  	int i;
+> +	int ret;
+> +
+> +	ret = fill_out_tdmrs(tmb_list, tdmr_list);
+> +	if (ret)
+> +		goto err;
+> +
+>  	/*
+>  	 * TODO:
+>  	 *
+> -	 *  - Fill out TDMRs to cover all TDX memory regions.
+>  	 *  - Allocate and set up PAMTs for each TDMR.
+>  	 *  - Designate reserved areas for each TDMR.
+>  	 *
+>  	 * Return -EINVAL until constructing TDMRs is done
+>  	 */
+> -	return -EINVAL;
+> +	ret = -EINVAL;
+> +err:
+> +	return ret;
+>  }
 >  
->  	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> @@ -572,9 +576,11 @@ static void test_sw_incr(void)
->  		write_sysreg(0x3, pmswinc_el0);
->  
->  	isb();
-> -	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
-> -	report(read_regn_el0(pmevcntr, 1)  == 100,
-> -		"counter #0 after + 100 SW_INCR");
-> +	cntr0 = (pmu.version < ID_DFR0_PMU_V3_8_5) ?
-> +		(uint32_t)PRE_OVERFLOW + 100 :
-> +		(uint64_t)PRE_OVERFLOW + 100;
+>  static int init_tdx_module(void)
 
-With the above suggestion, it would be nice to rewrite like so:
-
-	cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-
-If you do go this route, then you'll probably want to drop all the other
-open-coded PMUv3p5 checks in favor of the helper.
-
---
-Thanks,
-Oliver
+Otherwise this actually looks fine.
