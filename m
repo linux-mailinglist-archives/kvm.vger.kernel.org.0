@@ -2,113 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F21E6606FF
-	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 20:18:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C41B9660712
+	for <lists+kvm@lfdr.de>; Fri,  6 Jan 2023 20:24:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234801AbjAFTSU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 14:18:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53032 "EHLO
+        id S234603AbjAFTYl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 14:24:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229575AbjAFTSR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 14:18:17 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 554B8A3
-        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 11:18:15 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id z4-20020a17090a170400b00226d331390cso2701438pjd.5
-        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 11:18:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J1g+D6GKRsTiQykQO9KE60w2GEfBj+ZoVYOVS89fqaM=;
-        b=lForBUT+xfCxFfejzmI48nWa304S9hs7+UtxKzsuGf+nKyNipgoBWpzJ3oOllc+BLy
-         fLDlp8q4SaVr26D/cDF6oKbi7FnAMwtfV4yARvo4vxo/iax71v8smWoTzF/n1QraNary
-         oqQVOZQeoGzYVFn3of8qosgGmmGcsI+Wup5HINc3+dtX1yQqnSXsHe+P2XXwvQ4WNLxG
-         1mZ+JIzOAaVv46hpmEMSoVcfUbbegViVzXj5QjdFOi1yRs7ritmPEDewD1MPVwBi3fsf
-         oMSiGOMJt4u0HEfrZYT3EG5kMiF4K9BabXmQPhxyvFFOrdAgjceyG36wgZzmDEnzlOkJ
-         ebXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J1g+D6GKRsTiQykQO9KE60w2GEfBj+ZoVYOVS89fqaM=;
-        b=H3Idoszt3PcK8jIs6N88IyFgLYO+rwBr7t+ogHZL04k+nsM/FFwrQVrHezMo5Z5utA
-         zyfCy0i2JSLrwVQTvUCjvBWUkw49f+7bbhj9qxtK0lyKUXZ14Bes/SDP+YnvnY7Dcufr
-         eDmLvVKS4aquPYDDTpTbgbh6bvrdEcD+0GK4g5xe9EWaHPWEFGIaoEnCrS2WPPJq1rHT
-         kFQsvyl3w7hqGNvNXuHe3CSRquCpZ/qSH73WmZ+CGZEtUFO5dMjlyk3qqL4g8N48qYRL
-         8ZSUlcrP6TvZNuuX4zjLVfHPIrb+vKDRwMYtBMfRfxEV2g/ISqwEobnHDkzVv6VQD8y4
-         UR/w==
-X-Gm-Message-State: AFqh2kqOM+Zs1FwaSvx2qPOT+1KN73sIJkvm7EFZFxpfrk9GILAjfs1g
-        DA+S/ZDS7ZdC83SIO2DIwEptIA==
-X-Google-Smtp-Source: AMrXdXuynn2Ya06o13mJ6u/LbnfcEx4D+cI/xzrrDy+wPkCxomKjTBCmiUXC9ZkytIb46+gz7PMTEg==
-X-Received: by 2002:a05:6a20:8362:b0:ac:7a44:db55 with SMTP id z34-20020a056a20836200b000ac7a44db55mr56135144pzc.39.1673032694737;
-        Fri, 06 Jan 2023 11:18:14 -0800 (PST)
-Received: from google.com (223.103.125.34.bc.googleusercontent.com. [34.125.103.223])
-        by smtp.gmail.com with ESMTPSA id e14-20020a170902ed8e00b00192850277fcsm1291714plj.146.2023.01.06.11.18.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Jan 2023 11:18:14 -0800 (PST)
-Date:   Fri, 6 Jan 2023 11:18:10 -0800
-From:   David Matlack <dmatlack@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Nagareddy Reddy <nspreddy@google.com>
-Subject: Re: [RFC 00/14] KVM: x86/MMU: Formalize the Shadow MMU
-Message-ID: <Y7hz8geAGgysptY5@google.com>
-References: <20221221222418.3307832-1-bgardon@google.com>
+        with ESMTP id S230270AbjAFTYj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 14:24:39 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 610F314017;
+        Fri,  6 Jan 2023 11:24:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1CCA9B81E54;
+        Fri,  6 Jan 2023 19:24:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28D00C433D2;
+        Fri,  6 Jan 2023 19:24:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673033075;
+        bh=pUhCzZXW5uAhkeucFRyrJOvPIYXPSxjQMSSltvsf5GU=;
+        h=From:Date:Subject:To:Cc:From;
+        b=Zg7s+fH2r6yDUAXq7LG9zDV6ebrf7mSY33tZ0Wv9vInilOm+PQPBl7YI/pyB1U5r1
+         i6OYuslhR+AnFPfzdcIMMIkNJ+HtIAJCqzs21ZJXUmP5R0OA8bDsjBpP3qMVu55s+f
+         DrnaN2JuWSGlXo3+hk3R2Cb/j3vYuuF9VmOAInQvLttwvM8X6jnBFMsivq+Uh9mZ/y
+         SBj4t9anW09U/WadQFpbIILYOVgtiJpRWwAh5XTVnSlHvrhOnVM7Xx40GTGGDuPWSz
+         9YJJrDuwmJ9ixKglReDDYj5XZJUpK43C12eywkDyBi947ntU/hbkRlxp96MChHKxGU
+         18my1U1xeiA2Q==
+From:   Mark Brown <broonie@kernel.org>
+Date:   Fri, 06 Jan 2023 19:24:19 +0000
+Subject: [PATCH] KVM: selftests: Fix build of rseq test
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221221222418.3307832-1-bgardon@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20230106-fix-kvm-rseq-build-v1-1-b704d9831d02@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAGN1uGMC/x3N3QrCMAyG4VsZOTbQ1vmDtyIepG10QVe3RMdg7
+ N7tPHw/ePgWMFZhg0uzgPIkJu9Sw+8aSB2VB6Pk2hBc2DvvjniXGZ9Tj2o8YvzKK2PrKR3OkXwO
+ J6gwkjFGpZK6jX76YVsH5Wr/V9fbuv4Apj854XoAAAA=
+To:     Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
+X-Mailer: b4 0.12-dev-214b3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2193; i=broonie@kernel.org;
+ h=from:subject:message-id; bh=pUhCzZXW5uAhkeucFRyrJOvPIYXPSxjQMSSltvsf5GU=;
+ b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBjuHVxdxGpcompwADLK642hJjFryKat+gJATaaaUrJ
+ 4OqQOO2JATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCY7h1cQAKCRAk1otyXVSH0GxeB/
+ 41bDW/XmF/u3hghygJer46nez9Uh+ZOg7fBgU9rscLSq41/MoAoXDn+rjn/3v8TmsjvUXopoHL1YCo
+ hzVYuH4J8zE68t3nJ0iIrqbCG9W2lCyQD79HTk4nQDzbeYHQ6SLNnP3E8Zo+Oy1O/aUIoF9fE/4X+u
+ K3hI1kwXXS4jcqok2ji9NyhAzwJ89fwLhcm2la4juA32a6Hm3dBqo0dVslfHQniYt0yhhX1EHChkOH
+ H10Tl1n1TSuulr+dsf+nWZGToPrdF3fuqYRmWQ0JImG8fntrX+IGf0jV9A6Xbnp5cNB+fRt6YbAutL
+ w+NZIjpBhYkZYki8wkyEFBwY25d58S
+X-Developer-Key: i=broonie@kernel.org; a=openpgp;
+ fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 10:24:04PM +0000, Ben Gardon wrote:
-> This series makes the Shadow MMU a distinct part of the KVM x86 MMU,
-> implemented in separate files, with a defined interface to common code.
+The KVM rseq test is failing to build in -next due to a commit merged
+from the tip tree which adds a wrapper for sys_getcpu() to the rseq
+kselftests, conflicting with the wrapper already included in the KVM
+selftest:
 
-Overall I really like the end result.
+rseq_test.c:48:13: error: conflicting types for 'sys_getcpu'
+   48 | static void sys_getcpu(unsigned *cpu)
+          |             ^~~~~~~~~~
+In file included from rseq_test.c:23:
+../rseq/rseq.c:82:12: note: previous definition of 'sys_getcpu' was here
+   82 | static int sys_getcpu(unsigned *cpu, unsigned *node)
+          |            ^~~~~~~~~~
 
-While looking through I found a few more bits of code that should
-probably be moved into shadow_mmu.c:
+Fix this by removing the local wrapper and moving the result check up to
+the caller.
 
- - kvm_mmu_zap_all(): Move the shadow MMU zapping to shadow_mmu.c (the
-   active_mmu_pages loop + commit_zap_page).
+Fixes: 99babd04b250 ("selftests/rseq: Implement rseq numa node id field selftest")
+Signed-off-by: Mark Brown <broonie@kernel.org>
+---
+This will need to go via the tip tree due to the breaking change being
+there.
+---
+ tools/testing/selftests/kvm/rseq_test.c | 16 +++-------------
+ 1 file changed, 3 insertions(+), 13 deletions(-)
 
- - need_topup(), need_topup_split_caches_or_resched()
-   topup_split_caches() should be static functions in shadow_mmu.c.
+diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
+index 3045fdf9bdf5..f74e76d03b7e 100644
+--- a/tools/testing/selftests/kvm/rseq_test.c
++++ b/tools/testing/selftests/kvm/rseq_test.c
+@@ -41,18 +41,6 @@ static void guest_code(void)
+ 		GUEST_SYNC(0);
+ }
+ 
+-/*
+- * We have to perform direct system call for getcpu() because it's
+- * not available until glic 2.29.
+- */
+-static void sys_getcpu(unsigned *cpu)
+-{
+-	int r;
+-
+-	r = syscall(__NR_getcpu, cpu, NULL, NULL);
+-	TEST_ASSERT(!r, "getcpu failed, errno = %d (%s)", errno, strerror(errno));
+-}
+-
+ static int next_cpu(int cpu)
+ {
+ 	/*
+@@ -249,7 +237,9 @@ int main(int argc, char *argv[])
+ 			 * across the seq_cnt reads.
+ 			 */
+ 			smp_rmb();
+-			sys_getcpu(&cpu);
++			r = sys_getcpu(&cpu, NULL);
++			TEST_ASSERT(!r, "getcpu failed, errno = %d (%s)",
++				    errno, strerror(errno));
+ 			rseq_cpu = rseq_current_cpu_raw();
+ 			smp_rmb();
+ 		} while (snapshot != atomic_read(&seq_cnt));
 
- - Split out kvm_mmu_init/uninit_vm() functions for the shadow MMU.
-   Notably, the split caches, active_mmu_pages, zapped_obsolete_pages,
-   and other Shadow MMU-specific stuff can go in shadow_mmu.c.
+---
+base-commit: 469a89fd3bb73bb2eea628da2b3e0f695f80b7ce
+change-id: 20230106-fix-kvm-rseq-build-41ac58ba1d27
 
- - The Shadow MMU parts of walk_shadow_page_lockless_begin/end() should
-   go in shadow_mmu.c. e.g. kvm_shadow_mmu_walk_lockless_begin/end().
-
-> Patch 3 is an enormous change, and doing it all at once in a single
-> commit all but guarantees merge conflicts and makes it hard to review. I
-> don't have a good answer to this problem as there's no easy way to move
-> 3.5K lines between files. I tried moving the code bit-by-bit but the
-> intermediate steps added complexity and ultimately the 50+ patches it
-> created didn't seem any easier to review.
-> Doing the big move all at once at least makes it easier to get past when
-> doing Git archeology, and doing it at the beggining of the series allows the
-> rest of the commits to still show up in Git blame.
-
-An alternative would be to rename mmu.c to shadow_mmu.c first and then
-move code in the opposite direction. That would preserve the git-blame
-history for shadow_mmu.c. But by the end of the series mmu.c and
-shadow_mmu.c are both ~3K LOC, so I don't think doing this is really any
-better. Either way, you have to move ~3K LOC.
+Best regards,
+-- 
+Mark Brown <broonie@kernel.org>
