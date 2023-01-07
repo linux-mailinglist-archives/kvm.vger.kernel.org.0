@@ -2,173 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4C7B9660B62
-	for <lists+kvm@lfdr.de>; Sat,  7 Jan 2023 02:17:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EC412660BDB
+	for <lists+kvm@lfdr.de>; Sat,  7 Jan 2023 03:19:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236454AbjAGBRx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 20:17:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37482 "EHLO
+        id S235241AbjAGCTx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 21:19:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236482AbjAGBRs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 20:17:48 -0500
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D27A3056C
-        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 17:17:45 -0800 (PST)
-Received: by mail-pl1-x649.google.com with SMTP id u2-20020a17090341c200b00192bc565119so2240365ple.16
-        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 17:17:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=fuXSliv8FIF3N3/7qZl1OzzM/nJx2QL6aEeV4ofyMMs=;
-        b=f0olwSia31Hi6Xreavl0pZZ4+61XaPYdZTuShAvnXUjqfYcv0sK0zQObAUDSz6g5Ja
-         8CPs9Ejoiq/e5RorA1Kt7eNoQJp+K/c678aT9tUPVx+fCBso/UriF8AcF/rv6nMMDCfz
-         xsUxznQeuPtCMG7aRJwiiONRS/LZEkUMvLxCUC58ez74oI3T0sCBWJTh46c6EO1N0Cio
-         t2j4Rx/Xid+uO2YS8LzRRmXG/9N6GLRs1ox+D4gw9DPQsME/ZB39o1nXo9jm2rm4qh0H
-         xOo5p0ksaY8zcXrKStSm7nBJ1TCuC6zwmday3HyararyTH2GvyCcJuTx+ubtyOrkzPvS
-         peDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fuXSliv8FIF3N3/7qZl1OzzM/nJx2QL6aEeV4ofyMMs=;
-        b=bzsZLThEyKTXLD58ICGh3hThNYUBDBmf0Kd6b++3rgoRAsugYQel92o41dD4WEVjJe
-         Hwcwpk5Yev1n+wFwkJ80xOR3QF+YsvaH429ccqrbXn/vbIBJRL1yU6DOPdxgxADmnLAg
-         e74eTEYmXYoXK1SD57T7Tv7NLW5qs2bCMpInY+pCfV2JIu8hbalxlk8fIH3EgTsEc4YC
-         oJ+2tZIXfXEDFLzJdxh0Oqp0p4dk+eF81lbMfH/EcavCmtjqLnSOzv8PzHwQcBxNyrg8
-         9RUzV/vgtuMhBuBOppHsaZ8q0hk5Brs0B6H3bZlUcSANolOoyStgTARWFVFTVXWOfpij
-         buNA==
-X-Gm-Message-State: AFqh2koaoR8JdIhliHM++U+lGV23py4inmA0bTCm2kv/1DxbVTvTa8kX
-        L7Qnzdrq/lwnC0x9Xzul1IVcnzaqlFQ=
-X-Google-Smtp-Source: AMrXdXtsxyaIy77W+Z7JHYUS0+G4deoIhkr006OeRMTECQYiL8bhbQna8EWloQ2G74GgraIgm0EhuNG+vno=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a62:5f87:0:b0:57f:ef13:63aa with SMTP id
- t129-20020a625f87000000b0057fef1363aamr3669493pfb.42.1673054264621; Fri, 06
- Jan 2023 17:17:44 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat,  7 Jan 2023 01:17:37 +0000
-In-Reply-To: <20230107011737.577244-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230107011737.577244-1-seanjc@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230107011737.577244-4-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 3/3] x86/msr: Add testcases for x2APIC MSRs
-From:   Sean Christopherson <seanjc@google.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229521AbjAGCTu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 21:19:50 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9DFE93;
+        Fri,  6 Jan 2023 18:19:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673057989; x=1704593989;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=uqRXSv+w2S4+7Q/28oxX65phfR+wQelpxsc+b44OilQ=;
+  b=YhT88yCfF9JuA5S2SIrDg9szqh+wFVD/baEd2XlIRU315t1vAadmtdsA
+   Mzrb4XC6FCRavVIRM2tFIolYN+OJX2PPUL0O2M38Cl/xompvfe1CV5ru0
+   jKzt2QUlRy7/q9aJyVJpxYJ9BTA9+9tDfEcvaxEC9KEkCLhtO/Wvi18MO
+   ihk2eNoYkbCjxji+WBtg1P76hLYRbGdtoOWmStRuHbVSrYlY08Pvs2wMg
+   z2ECavMbMc1orG81IiUrPqB333vFIqRhrWfL4s5dGYxjFLW+MI1Y627Z3
+   Y3hJJNcyzbD5AAiEG00XXGr39ylJE7ZFICzQOc5iKwYdoiiQU22bZY5J7
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="321305976"
+X-IronPort-AV: E=Sophos;i="5.96,307,1665471600"; 
+   d="scan'208";a="321305976"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 18:19:49 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="763702557"
+X-IronPort-AV: E=Sophos;i="5.96,307,1665471600"; 
+   d="scan'208";a="763702557"
+Received: from yiweihua-mobl1.ccr.corp.intel.com (HELO [10.254.209.158]) ([10.254.209.158])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 18:19:43 -0800
+Message-ID: <e06f65a5-11e9-527e-97fd-857abe7e2e16@linux.intel.com>
+Date:   Sat, 7 Jan 2023 10:19:40 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH iommufd v3 2/9] iommu: Add iommu_group_has_isolated_msi()
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Alexander Gordeev <agordeev@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, iommu@lists.linux.dev,
+        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Will Deacon <will@kernel.org>,
+        Bharat Bhushan <bharat.bhushan@nxp.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Eric Farman <farman@linux.ibm.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Marc Zyngier <marc.zyngier@arm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
+        Will Deacon <will.deacon@arm.com>
+References: <2-v3-3313bb5dd3a3+10f11-secure_msi_jgg@nvidia.com>
+ <2c12143b-eaa9-2f6b-d367-e55d6f1e180d@linux.intel.com>
+ <Y7geJZkCdXmgaD8V@nvidia.com>
+Content-Language: en-US
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <Y7geJZkCdXmgaD8V@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Verify that reads and writes to x2APIC MSRs #GP when x2APIC is disabled,
-and that reads and writes honor KVM's emulation (which follows Intel
-behavior) when x2APIC is enabled.  E.g. verify that writes to read-only
-registers #GP, reads to write-onliy registers #GP, etc...
+On 1/6/2023 9:12 PM, Jason Gunthorpe wrote:
+> On Fri, Jan 06, 2023 at 07:28:46PM +0800, Baolu Lu wrote:
+> 
+>>> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+>>> index 46e1347bfa2286..9b7a9fa5ad28d3 100644
+>>> --- a/include/linux/iommu.h
+>>> +++ b/include/linux/iommu.h
+>>> @@ -455,6 +455,7 @@ static inline const struct iommu_ops *dev_iommu_ops(struct device *dev)
+>>>    extern int bus_iommu_probe(struct bus_type *bus);
+>>>    extern bool iommu_present(struct bus_type *bus);
+>>>    extern bool device_iommu_capable(struct device *dev, enum iommu_cap cap);
+>>> +extern bool iommu_group_has_isolated_msi(struct iommu_group *group);
+>> This lacks a static inline definition when CONFIG_IOMMU_API is false?
+> It is not needed, the call sites are all compilation protected by
+> CONFIG_IOMMU_API already.
 
-Write '0' to write-only registers to play nice with AMD's more restrictive
-behavior (Intel doesn't care what value is written).
+Thanks for the explanation. It's okay to me as it has been considered.
 
-Note, the x2APIC enabled testcases will likely fail if run on AMD bare
-metal as the KVM doesn't emulate registers above self-IPI, i.e. MSRs that
-are expected to #GP are presumably handled by AMD hardware.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- x86/msr.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 59 insertions(+)
-
-diff --git a/x86/msr.c b/x86/msr.c
-index f97f0c51..97cf5987 100644
---- a/x86/msr.c
-+++ b/x86/msr.c
-@@ -1,6 +1,7 @@
- /* msr tests */
- 
- #include "libcflat.h"
-+#include "apic.h"
- #include "processor.h"
- #include "msr.h"
- #include <stdlib.h>
-@@ -213,6 +214,63 @@ static void test_mce_msrs(void)
- 	}
- }
- 
-+static void __test_x2apic_msrs(bool x2apic_enabled)
-+{
-+	enum x2apic_reg_semantics semantics;
-+	unsigned int index, i;
-+	char msr_name[32];
-+
-+	for (i = 0; i < 0x1000; i += 0x10) {
-+		index = x2apic_msr(i);
-+		snprintf(msr_name, sizeof(msr_name), "x2APIC MSR 0x%x", index);
-+
-+		if (x2apic_enabled)
-+			semantics = get_x2apic_reg_semantics(i);
-+		else
-+			semantics = X2APIC_INVALID;
-+
-+		if (!(semantics & X2APIC_WRITABLE))
-+			test_wrmsr_fault(index, msr_name, 0);
-+
-+		if (!(semantics & X2APIC_READABLE))
-+			test_rdmsr_fault(index, msr_name);
-+
-+		/*
-+		 * Except for ICR, the only 64-bit x2APIC register, bits 64:32
-+		 * are reserved.  ICR is testable if x2APIC is disabled.
-+		 */
-+		if (!x2apic_enabled || i != APIC_ICR)
-+			test_wrmsr_fault(index, msr_name, -1ull);
-+
-+		/* Bits 31:8 of self-IPI are reserved. */
-+		if (i == APIC_SELF_IPI) {
-+			test_wrmsr_fault(index, "x2APIC Self-IPI", 0x100);
-+			test_wrmsr_fault(index, "x2APIC Self-IPI", 0xff00);
-+			test_wrmsr_fault(index, "x2APIC Self-IPI", 0xff000000ull);
-+		}
-+
-+		if (semantics == X2APIC_RW)
-+			__test_msr_rw(index, msr_name, 0, -1ull);
-+		else if (semantics == X2APIC_WO)
-+			wrmsr(index, 0);
-+		else if (semantics == X2APIC_RO)
-+			report(!(rdmsr(index) >> 32),
-+			       "Expected bits 63:32 == 0 for '%s'", msr_name);
-+	}
-+}
-+
-+static void test_x2apic_msrs(void)
-+{
-+	reset_apic();
-+
-+	__test_x2apic_msrs(false);
-+
-+	if (!enable_x2apic())
-+		return;
-+
-+	__test_x2apic_msrs(true);
-+}
-+
- int main(int ac, char **av)
- {
- 	/*
-@@ -224,6 +282,7 @@ int main(int ac, char **av)
- 	} else {
- 		test_misc_msrs();
- 		test_mce_msrs();
-+		test_x2apic_msrs();
- 	}
- 
- 	return report_summary();
--- 
-2.39.0.314.g84b9a713c41-goog
-
+--
+Best regards,
+baolu
