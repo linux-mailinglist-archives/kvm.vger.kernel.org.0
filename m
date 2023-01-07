@@ -2,59 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AC24660B60
-	for <lists+kvm@lfdr.de>; Sat,  7 Jan 2023 02:17:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 01064660B61
+	for <lists+kvm@lfdr.de>; Sat,  7 Jan 2023 02:17:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235512AbjAGBRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 20:17:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37512 "EHLO
+        id S236635AbjAGBRu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 20:17:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236354AbjAGBRo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 20:17:44 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB66C3218F
-        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 17:17:41 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id q9-20020a17090a304900b00226e84c4880so948197pjl.4
-        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 17:17:41 -0800 (PST)
+        with ESMTP id S236149AbjAGBRr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 20:17:47 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BB1F3727D
+        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 17:17:43 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id s14-20020a17090302ce00b00192d831a155so2246809plk.11
+        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 17:17:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=c3x1mmxx6TaNj9r8WPatQxSE1ESQY1hOyTXtA2x+pCI=;
-        b=Dl/ZNRGf5+C1hLJRrVSHIhNgh+4anqIDA15i2+K70kVlOxNghEKnFBL9TAI++ErUlw
-         V2603r7O87MA1Bmz5VCUeKq6M13RzpLx/mZxxwbeIrvC1Kvro8klvk3C/AR8fPA2Cj28
-         ZWcODKIHSsAk2XsUToCcCpHDcYOxJHJD2obS0PAq+K941zSoCQ0Ch3KFO0VmhtzaxMiq
-         6/5/zTKCdoO1PbqZXZRFGLimV2vVpVhUPO+hua+xzEDLbWkDphpYZEpJ3KBDnoRbxp7H
-         CzVoEiL0SK591WezfSbqzt3Wvx2DQ4i99UAotO4udcqlrANJkWztCYRPh4ulzrZlEzkM
-         ZmIA==
+        bh=qO8mfhsVSPdL0T8eFEvGtRbjwTJsBRQylFIVnEAzo5U=;
+        b=ZQHvMSnq45ADnfSSFjVX29v2zZktAJGGMshYAevgX2+TW2R2fOdXHEGcdjq5QLSuBm
+         uNBWi0YCc9UHIwddvxqoYqGUXRsN3Sf/Y8c0JzPB3jwylTfm2H9pFR/BL/rhutuRw0be
+         kcMV5YgdyIOpFpceVn9NNjiHFSHD3s46tmz5B7neqppI4atv9gR5MfJxk7yU/HfCyOKz
+         ha74g+YE44erXcPcE9WEKFpXB8nyL4vGWTzkt2zTWGwu8kMBWHBtvZ3nmrxoQjLq3A32
+         DtFnEJ8tVO3jiI7Ym2oW6c6TJpjFqqwforTei/ui/WLMez4pnZdKCC3WpcIXZxkK9b5q
+         eHmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=c3x1mmxx6TaNj9r8WPatQxSE1ESQY1hOyTXtA2x+pCI=;
-        b=oGY9fZDYRHpd4/qRR8l6SSH7EThNvMmn9rqTdJUK3J1GmvGN6STAw64gXjOgVSiE3e
-         oLbwY9TPeXRPxCyFH8dNBfPYUDK627jdbQIvucF0o336iLatjkpvnv7ASaica+3xny2o
-         EInhg1cpybXkEPfMQGsGn1x60L5EoY0brQBOpu3YPBiDJcuSsYwkSvITEw/VIEICkt6h
-         K/XoAZ+36Q8C2Hpra7Nb2VYYmzwRmkApLqiZAft522hpGQsofaUCUkEwL/5S0WX+qEE6
-         NggPOkKYOnhp2wlvCfXIK49w6gs5YCEau5dGAVrkhrztykFUqKxwvA8ady/th8n0yivQ
-         YB5Q==
-X-Gm-Message-State: AFqh2kpwkb3ZIGvRsEl6cCSNZisB5XSGDnF9zaBCyjM0qENY6sttSsWQ
-        +UXDcLlAfZk6pU5Bu4K7i0WUf+2qHho=
-X-Google-Smtp-Source: AMrXdXvrTv4fa5r1HPDGrifRejbcWrVT0idyOPSrl2iCMTOwzvcIEfwzcdz1d44G2s+MCzOS1nYhk2a5UmM=
+        bh=qO8mfhsVSPdL0T8eFEvGtRbjwTJsBRQylFIVnEAzo5U=;
+        b=N9VKpVW1YMhDeJxXvovJxwyy16zkF7Xgl+h8+zg176UxGCpU9r3QuFVA3a6y610mJG
+         yPdoyHDtSCiNhTKkucpwH8TrAvsYR3rugGiFnZba6kn+H/PfIhaLuEQyAdWWphVlEmk1
+         ivT2w28Xyg/RBq+aqXeuCsRXcrifit5kyDd9x5e1r1tChYHI5vxRXdh+hYRTsP3qVYCU
+         dalddB+nFG2INGVRVxrz/xT6odQJmrHT+eKW8BLlKSfXYdbL+gXphooEhYTWFLoIKm8X
+         FPN1ZIhAwH79RKPm/rAPtfsMuwUPt92nGUxY32Ef38AqnY/8jqaMmvmxiRtztilf4mNX
+         kDCg==
+X-Gm-Message-State: AFqh2kp43Vra6uyxOGwaOF+Fbn0aKUdWIC+QTqahcn5rcHqZM/8QtLYf
+        R2kjh1HHz+/nmNryLq+bTfMudyNsps4=
+X-Google-Smtp-Source: AMrXdXv0W1d41lKbSU9q43HImDECcCGWzyawhWGMQQcL0K1r6+lDAT0utSBaF/xN9ETEkctBA9WbeCeRQ8c=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:982f:0:b0:583:319a:4409 with SMTP id
- q15-20020aa7982f000000b00583319a4409mr544334pfl.27.1673054261265; Fri, 06 Jan
- 2023 17:17:41 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:a17:902:a589:b0:17c:9a37:72fb with SMTP id
+ az9-20020a170902a58900b0017c9a3772fbmr3497461plb.82.1673054263045; Fri, 06
+ Jan 2023 17:17:43 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat,  7 Jan 2023 01:17:35 +0000
+Date:   Sat,  7 Jan 2023 01:17:36 +0000
 In-Reply-To: <20230107011737.577244-1-seanjc@google.com>
 Mime-Version: 1.0
 References: <20230107011737.577244-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230107011737.577244-2-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 1/3] x86/msr: Skip built-in testcases if user
- provides custom MSR+value to test
+Message-ID: <20230107011737.577244-3-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 2/3] x86/apic: Refactor x2APIC reg helper to
+ provide exact semantics
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -69,205 +69,124 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Skip the built-in MSR testcases if the user provides a custom MSR+value
-to test.  If the user is asking to test a specific MSR+value, they likely
-don't want to wait for the test to burn though a pile of MCE MSRs.
+Refactor x2apic_reg_reserved() into get_x2apic_reg_semantics() and have
+it provide the semantics for all registers.  The full semantics will be
+used by the MSR test to verify KVM correctly emulates all x2APIC MSRs.
 
-Fixes: 039d9207 ("x86: msr: Add tests for MCE bank MSRs")
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- x86/msr.c | 170 ++++++++++++++++++++++++++++++------------------------
- 1 file changed, 96 insertions(+), 74 deletions(-)
+ lib/x86/apic.h  | 59 ++++++++++++++++++++++++++++++++++++++-----------
+ x86/vmx_tests.c |  6 ++---
+ 2 files changed, 48 insertions(+), 17 deletions(-)
 
-diff --git a/x86/msr.c b/x86/msr.c
-index 69e81475..f97f0c51 100644
---- a/x86/msr.c
-+++ b/x86/msr.c
-@@ -120,88 +120,110 @@ static void test_msr(struct msr_info *msr, bool is_64bit_host)
- 	}
+diff --git a/lib/x86/apic.h b/lib/x86/apic.h
+index 6d27f047..023dff0d 100644
+--- a/lib/x86/apic.h
++++ b/lib/x86/apic.h
+@@ -1,6 +1,7 @@
+ #ifndef _X86_APIC_H_
+ #define _X86_APIC_H_
+ 
++#include <bitops.h>
+ #include <stdint.h>
+ #include "apic-defs.h"
+ 
+@@ -74,24 +75,56 @@ static inline bool apic_lvt_entry_supported(int idx)
+ 	return GET_APIC_MAXLVT(apic_read(APIC_LVR)) >= idx;
  }
  
--int main(int ac, char **av)
-+static void test_custom_msr(int ac, char **av)
-+{
-+	bool is_64bit_host = this_cpu_has(X86_FEATURE_LM);
-+	char msr_name[32];
-+	int index = strtoul(av[1], NULL, 0x10);
-+	snprintf(msr_name, sizeof(msr_name), "MSR:0x%x", index);
+-static inline bool x2apic_reg_reserved(u32 reg)
++enum x2apic_reg_semantics {
++	X2APIC_INVALID	= 0,
++	X2APIC_READABLE	= BIT(0),
++	X2APIC_WRITABLE	= BIT(1),
++	X2APIC_RO	= X2APIC_READABLE,
++	X2APIC_WO	= X2APIC_WRITABLE,
++	X2APIC_RW	= X2APIC_READABLE | X2APIC_WRITABLE,
++};
 +
-+	struct msr_info msr = {
-+		.index = index,
-+		.name = msr_name,
-+		.value = strtoull(av[2], NULL, 0x10)
-+	};
-+	test_msr(&msr, is_64bit_host);
-+}
-+
-+static void test_misc_msrs(void)
-+{
-+	bool is_64bit_host = this_cpu_has(X86_FEATURE_LM);
-+	int i;
-+
-+	for (i = 0 ; i < ARRAY_SIZE(msr_info); i++)
-+		test_msr(&msr_info[i], is_64bit_host);
-+}
-+
-+static void test_mce_msrs(void)
++static inline enum x2apic_reg_semantics get_x2apic_reg_semantics(u32 reg)
  {
- 	bool is_64bit_host = this_cpu_has(X86_FEATURE_LM);
- 	unsigned int nr_mce_banks;
- 	char msr_name[32];
- 	int i;
- 
-+	nr_mce_banks = rdmsr(MSR_IA32_MCG_CAP) & 0xff;
-+	for (i = 0; i < nr_mce_banks; i++) {
-+		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_CTL", i);
-+		test_msr_rw(MSR_IA32_MCx_CTL(i), msr_name, 0);
-+		test_msr_rw(MSR_IA32_MCx_CTL(i), msr_name, -1ull);
-+		test_wrmsr_fault(MSR_IA32_MCx_CTL(i), msr_name, NONCANONICAL);
++	assert(!(reg & 0xf));
 +
-+		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_STATUS", i);
-+		test_msr_rw(MSR_IA32_MCx_STATUS(i), msr_name, 0);
-+		/*
-+		 * STATUS MSRs can only be written with '0' (to clear the MSR),
-+		 * except on AMD-based systems with bit 18 set in MSR_K7_HWCR.
-+		 * That bit is not architectural and should not be set by
-+		 * default by KVM or by the VMM (though this might fail if run
-+		 * on bare metal).
-+		 */
-+		test_wrmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name, 1);
-+
-+		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_ADDR", i);
-+		test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, 0);
-+		test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, -1ull);
-+		/*
-+		 * The ADDR is a physical address, and all bits are writable on
-+		 * 64-bit hosts.  Don't test the negative case, as KVM doesn't
-+		 * enforce checks on bits 63:36 for 32-bit hosts.  The behavior
-+		 * depends on the underlying hardware, e.g. a 32-bit guest on a
-+		 * 64-bit host may observe 64-bit values in the ADDR MSRs.
-+		 */
-+		if (is_64bit_host)
-+			test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, NONCANONICAL);
-+
-+		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_MISC", i);
-+		test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, 0);
-+		test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, -1ull);
-+		test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, NONCANONICAL);
-+	}
-+
-+	/*
-+	 * The theoretical maximum number of MCE banks is 32 (on Intel CPUs,
-+	 * without jumping to a new base address), as the last unclaimed MSR is
-+	 * 0x479; 0x480 begins the VMX MSRs.  Verify accesses to theoretically
-+	 * legal, unsupported MSRs fault.
-+	 */
-+	for (i = nr_mce_banks; i < 32; i++) {
-+		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_CTL", i);
-+		test_rdmsr_fault(MSR_IA32_MCx_CTL(i), msr_name);
-+		test_wrmsr_fault(MSR_IA32_MCx_CTL(i), msr_name, 0);
-+
-+		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_STATUS", i);
-+		test_rdmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name);
-+		test_wrmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name, 0);
-+
-+		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_ADDR", i);
-+		test_rdmsr_fault(MSR_IA32_MCx_ADDR(i), msr_name);
-+		test_wrmsr_fault(MSR_IA32_MCx_ADDR(i), msr_name, 0);
-+
-+		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_MISC", i);
-+		test_rdmsr_fault(MSR_IA32_MCx_MISC(i), msr_name);
-+		test_wrmsr_fault(MSR_IA32_MCx_MISC(i), msr_name, 0);
-+	}
-+}
-+
-+int main(int ac, char **av)
-+{
-+	/*
-+	 * If the user provided an MSR+value, test exactly that and skip all
-+	 * built-in testcases.
-+	 */
- 	if (ac == 3) {
--		int index = strtoul(av[1], NULL, 0x10);
--		snprintf(msr_name, sizeof(msr_name), "MSR:0x%x", index);
--
--		struct msr_info msr = {
--			.index = index,
--			.name = msr_name,
--			.value = strtoull(av[2], NULL, 0x10)
--		};
--		test_msr(&msr, is_64bit_host);
-+		test_custom_msr(ac, av);
- 	} else {
--		for (i = 0 ; i < ARRAY_SIZE(msr_info); i++)
--			test_msr(&msr_info[i], is_64bit_host);
--
--		nr_mce_banks = rdmsr(MSR_IA32_MCG_CAP) & 0xff;
--		for (i = 0; i < nr_mce_banks; i++) {
--			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_CTL", i);
--			test_msr_rw(MSR_IA32_MCx_CTL(i), msr_name, 0);
--			test_msr_rw(MSR_IA32_MCx_CTL(i), msr_name, -1ull);
--			test_wrmsr_fault(MSR_IA32_MCx_CTL(i), msr_name, NONCANONICAL);
--
--			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_STATUS", i);
--			test_msr_rw(MSR_IA32_MCx_STATUS(i), msr_name, 0);
--			/*
--			 * STATUS MSRs can only be written with '0' (to clear
--			 * the MSR), except on AMD-based systems with bit 18
--			 * set in MSR_K7_HWCR.  That bit is not architectural
--			 * and should not be set by default by KVM or by the
--			 * VMM (though this might fail if run on bare metal).
--			 */
--			test_wrmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name, 1);
--
--			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_ADDR", i);
--			test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, 0);
--			test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, -1ull);
--			/*
--			 * The ADDR is a physical address, and all bits are
--			 * writable on 64-bit hosts.    Don't test the negative
--			 * case, as KVM doesn't enforce checks on bits 63:36
--			 * for 32-bit hosts.  The behavior depends on the
--			 * underlying hardware, e.g. a 32-bit guest on a 64-bit
--			 * host may observe 64-bit values in the ADDR MSRs.
--			 */
--			if (is_64bit_host)
--				test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, NONCANONICAL);
--
--			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_MISC", i);
--			test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, 0);
--			test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, -1ull);
--			test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, NONCANONICAL);
--		}
--
--		/*
--		 * The theoretical maximum number of MCE banks is 32 (on Intel
--		 * CPUs, without jumping to a new base address), as the last
--		 * unclaimed MSR is 0x479; 0x480 begins the VMX MSRs.  Verify
--		 * accesses to theoretically legal, unsupported MSRs fault.
--		 */
--		for (i = nr_mce_banks; i < 32; i++) {
--			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_CTL", i);
--			test_rdmsr_fault(MSR_IA32_MCx_CTL(i), msr_name);
--			test_wrmsr_fault(MSR_IA32_MCx_CTL(i), msr_name, 0);
--
--			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_STATUS", i);
--			test_rdmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name);
--			test_wrmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name, 0);
--
--			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_ADDR", i);
--			test_rdmsr_fault(MSR_IA32_MCx_ADDR(i), msr_name);
--			test_wrmsr_fault(MSR_IA32_MCx_ADDR(i), msr_name, 0);
--
--			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_MISC", i);
--			test_rdmsr_fault(MSR_IA32_MCx_MISC(i), msr_name);
--			test_wrmsr_fault(MSR_IA32_MCx_MISC(i), msr_name, 0);
--		}
-+		test_misc_msrs();
-+		test_mce_msrs();
+ 	switch (reg) {
+-	case 0x000 ... 0x010:
+-	case 0x040 ... 0x070:
+-	case 0x090:
+-	case 0x0c0:
+-	case 0x0e0:
+-	case 0x290 ... 0x2e0:
+-	case 0x310:
+-	case 0x3a0 ... 0x3d0:
+-	case 0x3f0:
+-		return true;
++	case APIC_ID:
++	case APIC_LVR:
++	case APIC_PROCPRI:
++	case APIC_LDR:
++	case APIC_ISR ... APIC_ISR + 0x70:
++	case APIC_TMR ... APIC_TMR + 0x70:
++	case APIC_IRR ... APIC_IRR + 0x70:
++	case APIC_TMCCT:
++		return X2APIC_RO;
++	case APIC_TASKPRI:
++	case APIC_SPIV:
++	case APIC_ESR:
++	case APIC_ICR:
++	case APIC_LVTT:
++	case APIC_LVTTHMR:
++	case APIC_LVTPC:
++	case APIC_LVT0:
++	case APIC_LVT1:
++	case APIC_LVTERR:
++	case APIC_TMICT:
++	case APIC_TDCR:
++		return X2APIC_RW;
++	case APIC_EOI:
++	case APIC_SELF_IPI:
++		return X2APIC_WO;
+ 	case APIC_CMCI:
+-		return !apic_lvt_entry_supported(6);
++		if (apic_lvt_entry_supported(6))
++			return X2APIC_RW;
++		break;
++	case APIC_RRR:
++	case APIC_DFR:
++	case APIC_ICR2:
+ 	default:
+-		return false;
++		break;
  	}
++	return X2APIC_INVALID;
+ }
  
- 	return report_summary();
+ #endif
+diff --git a/x86/vmx_tests.c b/x86/vmx_tests.c
+index 7bba8165..59dfe6a5 100644
+--- a/x86/vmx_tests.c
++++ b/x86/vmx_tests.c
+@@ -6191,9 +6191,7 @@ static void virt_x2apic_mode_rd_expectation(
+ 	bool apic_register_virtualization, bool virtual_interrupt_delivery,
+ 	struct virt_x2apic_mode_expectation *expectation)
+ {
+-	bool readable =
+-		!x2apic_reg_reserved(reg) &&
+-		reg != APIC_EOI;
++	enum x2apic_reg_semantics semantics = get_x2apic_reg_semantics(reg);
+ 
+ 	expectation->rd_exit_reason = VMX_VMCALL;
+ 	expectation->virt_fn = virt_x2apic_mode_identity;
+@@ -6209,7 +6207,7 @@ static void virt_x2apic_mode_rd_expectation(
+ 		expectation->rd_val = MAGIC_VAL_1;
+ 		expectation->virt_fn = virt_x2apic_mode_nibble1;
+ 		expectation->rd_behavior = X2APIC_ACCESS_VIRTUALIZED;
+-	} else if (!disable_x2apic && readable) {
++	} else if (!disable_x2apic && (semantics & X2APIC_READABLE)) {
+ 		expectation->rd_val = apic_read(reg);
+ 		expectation->rd_behavior = X2APIC_ACCESS_PASSED_THROUGH;
+ 	} else {
 -- 
 2.39.0.314.g84b9a713c41-goog
 
