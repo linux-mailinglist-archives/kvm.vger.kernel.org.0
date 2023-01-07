@@ -2,119 +2,173 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 788AB660AF0
-	for <lists+kvm@lfdr.de>; Sat,  7 Jan 2023 01:37:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8FBC2660AF1
+	for <lists+kvm@lfdr.de>; Sat,  7 Jan 2023 01:37:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231395AbjAGAhE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 19:37:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44074 "EHLO
+        id S236595AbjAGAhG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 19:37:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236290AbjAGAfZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 19:35:25 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E69040C29
-        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 16:35:10 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id n12so3118013pjp.1
-        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 16:35:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bXq8vuFGGvOv35bUy+EyGeh26Ce9kmE/NPpZHF2+yik=;
-        b=GaHAV5OSUosgIlhbKZU0knGkSBuNcrmEFL/MxpfoPWY1CY5AWTrAwmFY0YO0XFktYw
-         24wDdthRmLVjKLr6ncoOAHj3H2HawsueKzAAoarsWnr2MOvfeXcx/MbEkMjNI1qxc6a7
-         2BnfFkauOk0LY/gA0DhCuxK9FC2kYZjlPyCn5NadOoQj3ViiupRr/VZKuuCi3NbJqgqM
-         J8iC0n+suOpfUTw7C7hr1jvU4Qpz1Yv3g6MG3Cw6kH8+qnUhTBN+1C4Si6k4KC1VPiN8
-         Lpd0RMhB5wkSgjY2JOz+/882WwSErSfZwhdA6enf7DzED/DHX2svcLiL3vAcl9Q2zXzc
-         zcbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bXq8vuFGGvOv35bUy+EyGeh26Ce9kmE/NPpZHF2+yik=;
-        b=Mwpf0QQPz81pjF90T1i3Ujl/D1zZszCJ17q5L6czCsRyEdSSGjZvibn8TNNgVvv9VU
-         lm0az9hPDN2IwWeeXzCcN4Esj6EqVOagU3cgVETJMpvMxOLMD/UvWLahOq7FTBwOf7P4
-         Hs9Xyuo3mz/aHoDImr8oZ2tT+E+mLCU2OF6TfMpqnU7qThsLlbinny32R0Yb8HmMsYWw
-         vYwdDiN44mlXSUq+pv1NOdObzcTPbKg4E24axGmGutnoCBNlpRRh4d1H6brGANCJQSlC
-         32nSovWcAgzd6XRbap7W6tF5Tap0Ufw4obrcgJxvdDqPk2Qk1S5Lj0T5awHWv43ukYZO
-         fSbA==
-X-Gm-Message-State: AFqh2kqi6Z8ZBWV6q7AXtDf2DVgRz4tcL3HelTHiq2ycbVY12IMiDLdp
-        ETEbVlH8K6tpf+H2N+pb2eHOVQ==
-X-Google-Smtp-Source: AMrXdXvf8PJ2X/dRmbdsw9QNylVEJi8QMlZUpl9k+2tYEh64CIJy7JUPttqUClq+ntDxGPgAumLKaw==
-X-Received: by 2002:a17:902:820e:b0:189:6624:58c0 with SMTP id x14-20020a170902820e00b00189662458c0mr3784pln.3.1673051709529;
-        Fri, 06 Jan 2023 16:35:09 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id s6-20020a170902ea0600b001913c5fc051sm1438523plg.274.2023.01.06.16.35.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Jan 2023 16:35:09 -0800 (PST)
-Date:   Sat, 7 Jan 2023 00:35:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Robert Hoo <robert.hu@linux.intel.com>
-Cc:     Binbin Wu <binbin.wu@linux.intel.com>, pbonzini@redhat.com,
-        kirill.shutemov@linux.intel.com, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 1/9] KVM: x86: Rename cr4_reserved/rsvd_* variables to
- be more readable
-Message-ID: <Y7i+OW+8p7Ehlh3C@google.com>
-References: <20221209044557.1496580-1-robert.hu@linux.intel.com>
- <20221209044557.1496580-2-robert.hu@linux.intel.com>
- <2e395a24-ee7b-e31e-981c-b83e80ac5be1@linux.intel.com>
- <b8f8f8acb6348ad5789fc1df6a6c18b0fa5f91ee.camel@linux.intel.com>
+        with ESMTP id S236784AbjAGAg2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 19:36:28 -0500
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52A2E6C29C;
+        Fri,  6 Jan 2023 16:35:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673051751; x=1704587751;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=aOAUFsSLQRTZY0xZlfuNr828MZiMICWj/1uXvVg70Ks=;
+  b=NUF83tS+HBzeHi5imnQXwPWzFLbxdbzH9paPJgOXtZHWUVG5ugIcFn2k
+   s7doXD6nTT312Y4OD+97sGJXgzaCUryE7XgCzxdLa5pUfjx3NiwUIqbf4
+   trcbL2GzsYls+LJ8iTJq4f6kmzdhZ4UZJQgrE3LPcbjMjD1FXqpJXsO62
+   SLANRo2QYb7V25RVd2dS8+hYlJ6uemUuFQQLISm4I+2gZl4miNODsbh0w
+   DvHDLf+dxTrFe2aeUTqGQz97r9Q6Q99etYvnQid84EYbQdOkKhI2YqCj+
+   NJ6x1eTu1TBxmIfLojLkgIE/PeBa4IDNRzUZf5nKaty+NmOOxJrb8auxK
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="349805294"
+X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
+   d="scan'208";a="349805294"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 16:35:51 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10582"; a="688460597"
+X-IronPort-AV: E=Sophos;i="5.96,306,1665471600"; 
+   d="scan'208";a="688460597"
+Received: from xiangyuy-mobl.amr.corp.intel.com (HELO [10.212.251.186]) ([10.212.251.186])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jan 2023 16:35:50 -0800
+Message-ID: <ba0fdee9-148b-b0b9-ecde-2610eff02ba1@intel.com>
+Date:   Fri, 6 Jan 2023 16:35:49 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b8f8f8acb6348ad5789fc1df6a6c18b0fa5f91ee.camel@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v8 15/16] x86/virt/tdx: Flush cache in kexec() when TDX is
+ enabled
+Content-Language: en-US
+To:     Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Cc:     linux-mm@kvack.org, peterz@infradead.org, tglx@linutronix.de,
+        seanjc@google.com, pbonzini@redhat.com, dan.j.williams@intel.com,
+        rafael.j.wysocki@intel.com, kirill.shutemov@linux.intel.com,
+        ying.huang@intel.com, reinette.chatre@intel.com,
+        len.brown@intel.com, tony.luck@intel.com, ak@linux.intel.com,
+        isaku.yamahata@intel.com, chao.gao@intel.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, bagasdotme@gmail.com,
+        sagis@google.com, imammedo@redhat.com
+References: <cover.1670566861.git.kai.huang@intel.com>
+ <ee5185e1727c3cd8bd51dbf9fcec95d432100d12.1670566861.git.kai.huang@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <ee5185e1727c3cd8bd51dbf9fcec95d432100d12.1670566861.git.kai.huang@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-7.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 29, 2022, Robert Hoo wrote:
-> On Wed, 2022-12-28 at 11:37 +0800, Binbin Wu wrote:
-> > On 12/9/2022 12:45 PM, Robert Hoo wrote:
-> > > kvm_vcpu_arch::cr4_guest_owned_bits and
-> > > kvm_vcpu_arch::cr4_guest_rsvd_bits
-> > > looks confusing. Rename latter to cr4_host_rsvd_bits, because it in
-> > > fact decribes the effective host reserved cr4 bits from the vcpu's
-> > > perspective.
-> > 
-> > IMO, the current name cr4_guest_rsvd_bits is OK becuase it shows that these
-> > bits are reserved bits from the pointview of guest.
+On 12/8/22 22:52, Kai Huang wrote:
+> There are two problems in terms of using kexec() to boot to a new kernel
+> when the old kernel has enabled TDX: 1) Part of the memory pages are
+> still TDX private pages (i.e. metadata used by the TDX module, and any
+> TDX guest memory if kexec() happens when there's any TDX guest alive).
+> 2) There might be dirty cachelines associated with TDX private pages.
 > 
-> Actually, it's cr4_guest_owned_bits that from the perspective of guest.
+> Because the hardware doesn't guarantee cache coherency among different
+> KeyIDs, the old kernel needs to flush cache (of those TDX private pages)
+> before booting to the new kernel.  Also, reading TDX private page using
+> any shared non-TDX KeyID with integrity-check enabled can trigger #MC.
+> Therefore ideally, the kernel should convert all TDX private pages back
+> to normal before booting to the new kernel.
 
-No, cr4_guest_owned_bits is KVM's view of things.  It tracks which bits have
-effectively been passed through to the guest and so need to be read out of the
-VMCS after running the vCPU.
+This is just talking about way too many things that just don't apply.
 
-> cr4_guest_owned_bits and cr4_guest_rsvd_bits together looks quite
-> confusing.
+Let's focus on the *ACTUAL* problem that's being addressed instead of
+the 15 problems that aren't actual practical problems.
 
-I disagree, KVM (and the SDM and the APM) uses "reserved" or "rsvd" all over the
-place to indicate reserved bits/values/fields.
+> However, this implementation doesn't convert TDX private pages back to
+> normal in kexec() because of below considerations:
+> 
+> 1) Neither the kernel nor the TDX module has existing infrastructure to
+>    track which pages are TDX private pages.
+> 2) The number of TDX private pages can be large, and converting all of
+>    them (cache flush + using MOVDIR64B to clear the page) in kexec() can
+>    be time consuming.
+> 3) The new kernel will almost only use KeyID 0 to access memory.  KeyID
+>    0 doesn't support integrity-check, so it's OK.
+> 4) The kernel doesn't (and may never) support MKTME.  If any 3rd party
+>    kernel ever supports MKTME, it can/should do MOVDIR64B to clear the
+>    page with the new MKTME KeyID (just like TDX does) before using it.
 
-> > > * cr4_reserved_bits --> cr4_kvm_reserved_bits, which describes
+Yeah, why are we getting all worked up about MKTME when there is not
+support?
 
-Hard no.  They aren't just KVM reserved, many of those bits are reserved by
-hardware, which is 100% dependent on the host.
+The only thing that matters here is dirty cacheline writeback.  There
+are two things the kernel needs to do to mitigate that:
 
-> > > CR4_HOST_RESERVED_BITS + !kvm_cap_has() = kvm level cr4 reserved
-> > > bits.
-> > > 
-> > > * __cr4_reserved_bits() --> __cr4_calc_reserved_bits(), which to
-> > > calc
-> > > effective cr4 reserved bits for kvm or vm level, by corresponding
-> > > x_cpu_has() input.
-> > > 
-> > > Thus, by these renames, the hierarchical relations of those reserved CR4
-> > > bits is more clear.
+ 1. Stop accessing TDX private memory mappings
+  1a. Stop making TDX module calls (uses global private KeyID)
+  1b. Stop TDX guests from running (uses per-guest KeyID)
+ 2. Flush any cachelines from previous private KeyID writes
 
-Sorry, but I don't like any of the changes in this patch.  At best, some of the
-changes are a wash (neither better nor worse), and in that case the churn, however
-minor isn't worth it.
+There are a couple of ways we can do #2.  We do *NOT* need to convert
+*ANYTHING* back to KeyID 0.  Page conversion doesn't even come into play
+in any way as far as I can tell.
+
+I think you're also saying that since all CPUs go through this path and
+there is no TDX activity between the WBINVD and the native_halt() that
+1a and 1b basically happen for "free" without needing to do theme
+explicitly.
+
+> Therefore, this implementation just flushes cache to make sure there are
+> no stale dirty cachelines associated with any TDX private KeyIDs before
+> booting to the new kernel, otherwise they may silently corrupt the new
+> kernel.
+
+That's fine.  So, this patch kinda happens to land in the right spot
+even after thrashing about about a while.
+
+> Following SME support, use wbinvd() to flush cache in stop_this_cpu().
+> Theoretically, cache flush is only needed when the TDX module has been
+> initialized.  However initializing the TDX module is done on demand at
+> runtime, and it takes a mutex to read the module status.  Just check
+> whether TDX is enabled by BIOS instead to flush cache.
+
+Yeah, close enough.
+
+> diff --git a/arch/x86/kernel/process.c b/arch/x86/kernel/process.c
+> index c21b7347a26d..0cc84977dc62 100644
+> --- a/arch/x86/kernel/process.c
+> +++ b/arch/x86/kernel/process.c
+> @@ -765,8 +765,14 @@ void __noreturn stop_this_cpu(void *dummy)
+>  	 *
+>  	 * Test the CPUID bit directly because the machine might've cleared
+>  	 * X86_FEATURE_SME due to cmdline options.
+> +	 *
+> +	 * Similar to SME, if the TDX module is ever initialized, the
+> +	 * cachelines associated with any TDX private KeyID must be flushed
+> +	 * before transiting to the new kernel.  The TDX module is initialized
+> +	 * on demand, and it takes the mutex to read its status.  Just check
+> +	 * whether TDX is enabled by BIOS instead to flush cache.
+>  	 */
+
+There's too much detail here.  Let's up-level it a bit.  We don't need
+to be talking about TDX locking here.
+
+	/*
+	 * The TDX module or guests might have left dirty cachelines
+	 * behind.  Flush them to avoid corruption from later writeback.
+	 * Note that this flushes on all systems where TDX is possible,
+	 * but does not actually check that TDX was in use.
+	 */
+
+> -	if (cpuid_eax(0x8000001f) & BIT(0))
+> +	if (cpuid_eax(0x8000001f) & BIT(0) || platform_tdx_enabled())
+>  		native_wbinvd();
+>  	for (;;) {
+>  		/*
+
