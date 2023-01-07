@@ -2,55 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C04E660B5F
+	by mail.lfdr.de (Postfix) with ESMTP id 8AC24660B60
 	for <lists+kvm@lfdr.de>; Sat,  7 Jan 2023 02:17:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235241AbjAGBRq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 6 Jan 2023 20:17:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37490 "EHLO
+        id S235512AbjAGBRs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 6 Jan 2023 20:17:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235512AbjAGBRn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 6 Jan 2023 20:17:43 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BDFB1E3EB
-        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 17:17:40 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-4c0fe6e3f13so35246207b3.0
-        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 17:17:40 -0800 (PST)
+        with ESMTP id S236354AbjAGBRo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 6 Jan 2023 20:17:44 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB66C3218F
+        for <kvm@vger.kernel.org>; Fri,  6 Jan 2023 17:17:41 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id q9-20020a17090a304900b00226e84c4880so948197pjl.4
+        for <kvm@vger.kernel.org>; Fri, 06 Jan 2023 17:17:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WyvGKzpzx3N94FItes14H220nJNdMOeIXaL9ux0jsIQ=;
-        b=Ii1qwhRa2pej1KSG3bq1HJejpupU3uHFfPLNv4H8XwNc6sz1asCNdUkoWVS7Zlk5Mn
-         DZN0rVk9bIC1WmPjV5WyQpJn4WWBIaQpMNUBVNR2mpchcsfLSGF2+7tQFGrIJ7PMG403
-         vwdr2bkr9FjgkkUwK/gdmYrUKD83odSArsCHy6GvexP+N9fPUe17lLUdNiUxR255JUlv
-         6H+3k6ZjhPf+B2If/NLfjMFmJEOM2WFI995DdiJUnK3Y7s/phI3NOrKxkkDrOtVfOeNO
-         hhX3ov4KAGPI5FXv391Q1YGb2anpAt5KomVyKpbDQPva143WJAS53t9DaTEiiPRVzJIk
-         TQ0A==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=c3x1mmxx6TaNj9r8WPatQxSE1ESQY1hOyTXtA2x+pCI=;
+        b=Dl/ZNRGf5+C1hLJRrVSHIhNgh+4anqIDA15i2+K70kVlOxNghEKnFBL9TAI++ErUlw
+         V2603r7O87MA1Bmz5VCUeKq6M13RzpLx/mZxxwbeIrvC1Kvro8klvk3C/AR8fPA2Cj28
+         ZWcODKIHSsAk2XsUToCcCpHDcYOxJHJD2obS0PAq+K941zSoCQ0Ch3KFO0VmhtzaxMiq
+         6/5/zTKCdoO1PbqZXZRFGLimV2vVpVhUPO+hua+xzEDLbWkDphpYZEpJ3KBDnoRbxp7H
+         CzVoEiL0SK591WezfSbqzt3Wvx2DQ4i99UAotO4udcqlrANJkWztCYRPh4ulzrZlEzkM
+         ZmIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WyvGKzpzx3N94FItes14H220nJNdMOeIXaL9ux0jsIQ=;
-        b=HnyhQm7nmpzyDEJLltd7JFLtfzCWNAaTq9p00S7V4PnGxv4HeLcnuksbu8OM4HD4go
-         tKaWzBRGNk79MNhbejAQW71csuIqs5WC7FzI3r4glZr16QsllqmM+KNjFYJkF9FGETD2
-         L09q6y3ktY+2VJO0164EdU6wl2U5DoZZNaxD3Bt69MzjLgr9/mTF6HA0aJJaTdoVL3bP
-         RH2IR0vxGvo8BrDP37SubOrflzROTdWBIVxf7SGddnZJCgRghWdzx1k7m+qBerdqnijU
-         6U3E3AudqA84c243jMxErf6nxCJorV0cEkH4v5dTIbi+wsOx3mA9vAErO76QFAVZoYcZ
-         v37w==
-X-Gm-Message-State: AFqh2kqd/NolcXjjuS0S/RqMrZqwIWo15j0vX9NJ/qYt620rn+/UhEsB
-        kYPUBTAog2YjA2tjvvO4NnI1Y/1Qf9o=
-X-Google-Smtp-Source: AMrXdXunqrFYvoIyWCzI/mhQ/azkE/DQy7d4KszJ1rlvC4KSPy8lhvSH1JCbFNEds/ijCVJQ5+xWgmURgXo=
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c3x1mmxx6TaNj9r8WPatQxSE1ESQY1hOyTXtA2x+pCI=;
+        b=oGY9fZDYRHpd4/qRR8l6SSH7EThNvMmn9rqTdJUK3J1GmvGN6STAw64gXjOgVSiE3e
+         oLbwY9TPeXRPxCyFH8dNBfPYUDK627jdbQIvucF0o336iLatjkpvnv7ASaica+3xny2o
+         EInhg1cpybXkEPfMQGsGn1x60L5EoY0brQBOpu3YPBiDJcuSsYwkSvITEw/VIEICkt6h
+         K/XoAZ+36Q8C2Hpra7Nb2VYYmzwRmkApLqiZAft522hpGQsofaUCUkEwL/5S0WX+qEE6
+         NggPOkKYOnhp2wlvCfXIK49w6gs5YCEau5dGAVrkhrztykFUqKxwvA8ady/th8n0yivQ
+         YB5Q==
+X-Gm-Message-State: AFqh2kpwkb3ZIGvRsEl6cCSNZisB5XSGDnF9zaBCyjM0qENY6sttSsWQ
+        +UXDcLlAfZk6pU5Bu4K7i0WUf+2qHho=
+X-Google-Smtp-Source: AMrXdXvrTv4fa5r1HPDGrifRejbcWrVT0idyOPSrl2iCMTOwzvcIEfwzcdz1d44G2s+MCzOS1nYhk2a5UmM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:cacd:0:b0:7b2:afab:f372 with SMTP id
- a196-20020a25cacd000000b007b2afabf372mr1367968ybg.640.1673054259691; Fri, 06
- Jan 2023 17:17:39 -0800 (PST)
+ (user=seanjc job=sendgmr) by 2002:aa7:982f:0:b0:583:319a:4409 with SMTP id
+ q15-20020aa7982f000000b00583319a4409mr544334pfl.27.1673054261265; Fri, 06 Jan
+ 2023 17:17:41 -0800 (PST)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Sat,  7 Jan 2023 01:17:34 +0000
+Date:   Sat,  7 Jan 2023 01:17:35 +0000
+In-Reply-To: <20230107011737.577244-1-seanjc@google.com>
 Mime-Version: 1.0
+References: <20230107011737.577244-1-seanjc@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230107011737.577244-1-seanjc@google.com>
-Subject: [kvm-unit-tests PATCH 0/3] x86: Add testcases for x2APIC MSRs
+Message-ID: <20230107011737.577244-2-seanjc@google.com>
+Subject: [kvm-unit-tests PATCH 1/3] x86/msr: Skip built-in testcases if user
+ provides custom MSR+value to test
 From:   Sean Christopherson <seanjc@google.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, Sean Christopherson <seanjc@google.com>
@@ -65,26 +69,205 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add tests to verify that RDMSR and WRMSR to x2APIC MSRs behave according
-to Intel's architecture, e.g. that writes to read-only MSRs and reads to
-write-only MSRs #GP, accesses to non-existent MSRs #GP, etc... 
+Skip the built-in MSR testcases if the user provides a custom MSR+value
+to test.  If the user is asking to test a specific MSR+value, they likely
+don't want to wait for the test to burn though a pile of MCE MSRs.
 
-Many of the testcases fail without the associated KVM fixes:
-https://lore.kernel.org/all/20230107011025.565472-1-seanjc@google.com
+Fixes: 039d9207 ("x86: msr: Add tests for MCE bank MSRs")
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ x86/msr.c | 170 ++++++++++++++++++++++++++++++------------------------
+ 1 file changed, 96 insertions(+), 74 deletions(-)
 
-Sean Christopherson (3):
-  x86/msr: Skip built-in testcases if user provides custom MSR+value to
-    test
-  x86/apic: Refactor x2APIC reg helper to provide exact semantics
-  x86/msr: Add testcases for x2APIC MSRs
-
- lib/x86/apic.h  |  59 ++++++++++---
- x86/msr.c       | 229 ++++++++++++++++++++++++++++++++----------------
- x86/vmx_tests.c |   6 +-
- 3 files changed, 203 insertions(+), 91 deletions(-)
-
-
-base-commit: e11a0e2f881d7bc038f44d8d4f99b2d55a01bc4e
+diff --git a/x86/msr.c b/x86/msr.c
+index 69e81475..f97f0c51 100644
+--- a/x86/msr.c
++++ b/x86/msr.c
+@@ -120,88 +120,110 @@ static void test_msr(struct msr_info *msr, bool is_64bit_host)
+ 	}
+ }
+ 
+-int main(int ac, char **av)
++static void test_custom_msr(int ac, char **av)
++{
++	bool is_64bit_host = this_cpu_has(X86_FEATURE_LM);
++	char msr_name[32];
++	int index = strtoul(av[1], NULL, 0x10);
++	snprintf(msr_name, sizeof(msr_name), "MSR:0x%x", index);
++
++	struct msr_info msr = {
++		.index = index,
++		.name = msr_name,
++		.value = strtoull(av[2], NULL, 0x10)
++	};
++	test_msr(&msr, is_64bit_host);
++}
++
++static void test_misc_msrs(void)
++{
++	bool is_64bit_host = this_cpu_has(X86_FEATURE_LM);
++	int i;
++
++	for (i = 0 ; i < ARRAY_SIZE(msr_info); i++)
++		test_msr(&msr_info[i], is_64bit_host);
++}
++
++static void test_mce_msrs(void)
+ {
+ 	bool is_64bit_host = this_cpu_has(X86_FEATURE_LM);
+ 	unsigned int nr_mce_banks;
+ 	char msr_name[32];
+ 	int i;
+ 
++	nr_mce_banks = rdmsr(MSR_IA32_MCG_CAP) & 0xff;
++	for (i = 0; i < nr_mce_banks; i++) {
++		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_CTL", i);
++		test_msr_rw(MSR_IA32_MCx_CTL(i), msr_name, 0);
++		test_msr_rw(MSR_IA32_MCx_CTL(i), msr_name, -1ull);
++		test_wrmsr_fault(MSR_IA32_MCx_CTL(i), msr_name, NONCANONICAL);
++
++		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_STATUS", i);
++		test_msr_rw(MSR_IA32_MCx_STATUS(i), msr_name, 0);
++		/*
++		 * STATUS MSRs can only be written with '0' (to clear the MSR),
++		 * except on AMD-based systems with bit 18 set in MSR_K7_HWCR.
++		 * That bit is not architectural and should not be set by
++		 * default by KVM or by the VMM (though this might fail if run
++		 * on bare metal).
++		 */
++		test_wrmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name, 1);
++
++		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_ADDR", i);
++		test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, 0);
++		test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, -1ull);
++		/*
++		 * The ADDR is a physical address, and all bits are writable on
++		 * 64-bit hosts.  Don't test the negative case, as KVM doesn't
++		 * enforce checks on bits 63:36 for 32-bit hosts.  The behavior
++		 * depends on the underlying hardware, e.g. a 32-bit guest on a
++		 * 64-bit host may observe 64-bit values in the ADDR MSRs.
++		 */
++		if (is_64bit_host)
++			test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, NONCANONICAL);
++
++		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_MISC", i);
++		test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, 0);
++		test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, -1ull);
++		test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, NONCANONICAL);
++	}
++
++	/*
++	 * The theoretical maximum number of MCE banks is 32 (on Intel CPUs,
++	 * without jumping to a new base address), as the last unclaimed MSR is
++	 * 0x479; 0x480 begins the VMX MSRs.  Verify accesses to theoretically
++	 * legal, unsupported MSRs fault.
++	 */
++	for (i = nr_mce_banks; i < 32; i++) {
++		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_CTL", i);
++		test_rdmsr_fault(MSR_IA32_MCx_CTL(i), msr_name);
++		test_wrmsr_fault(MSR_IA32_MCx_CTL(i), msr_name, 0);
++
++		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_STATUS", i);
++		test_rdmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name);
++		test_wrmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name, 0);
++
++		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_ADDR", i);
++		test_rdmsr_fault(MSR_IA32_MCx_ADDR(i), msr_name);
++		test_wrmsr_fault(MSR_IA32_MCx_ADDR(i), msr_name, 0);
++
++		snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_MISC", i);
++		test_rdmsr_fault(MSR_IA32_MCx_MISC(i), msr_name);
++		test_wrmsr_fault(MSR_IA32_MCx_MISC(i), msr_name, 0);
++	}
++}
++
++int main(int ac, char **av)
++{
++	/*
++	 * If the user provided an MSR+value, test exactly that and skip all
++	 * built-in testcases.
++	 */
+ 	if (ac == 3) {
+-		int index = strtoul(av[1], NULL, 0x10);
+-		snprintf(msr_name, sizeof(msr_name), "MSR:0x%x", index);
+-
+-		struct msr_info msr = {
+-			.index = index,
+-			.name = msr_name,
+-			.value = strtoull(av[2], NULL, 0x10)
+-		};
+-		test_msr(&msr, is_64bit_host);
++		test_custom_msr(ac, av);
+ 	} else {
+-		for (i = 0 ; i < ARRAY_SIZE(msr_info); i++)
+-			test_msr(&msr_info[i], is_64bit_host);
+-
+-		nr_mce_banks = rdmsr(MSR_IA32_MCG_CAP) & 0xff;
+-		for (i = 0; i < nr_mce_banks; i++) {
+-			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_CTL", i);
+-			test_msr_rw(MSR_IA32_MCx_CTL(i), msr_name, 0);
+-			test_msr_rw(MSR_IA32_MCx_CTL(i), msr_name, -1ull);
+-			test_wrmsr_fault(MSR_IA32_MCx_CTL(i), msr_name, NONCANONICAL);
+-
+-			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_STATUS", i);
+-			test_msr_rw(MSR_IA32_MCx_STATUS(i), msr_name, 0);
+-			/*
+-			 * STATUS MSRs can only be written with '0' (to clear
+-			 * the MSR), except on AMD-based systems with bit 18
+-			 * set in MSR_K7_HWCR.  That bit is not architectural
+-			 * and should not be set by default by KVM or by the
+-			 * VMM (though this might fail if run on bare metal).
+-			 */
+-			test_wrmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name, 1);
+-
+-			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_ADDR", i);
+-			test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, 0);
+-			test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, -1ull);
+-			/*
+-			 * The ADDR is a physical address, and all bits are
+-			 * writable on 64-bit hosts.    Don't test the negative
+-			 * case, as KVM doesn't enforce checks on bits 63:36
+-			 * for 32-bit hosts.  The behavior depends on the
+-			 * underlying hardware, e.g. a 32-bit guest on a 64-bit
+-			 * host may observe 64-bit values in the ADDR MSRs.
+-			 */
+-			if (is_64bit_host)
+-				test_msr_rw(MSR_IA32_MCx_ADDR(i), msr_name, NONCANONICAL);
+-
+-			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_MISC", i);
+-			test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, 0);
+-			test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, -1ull);
+-			test_msr_rw(MSR_IA32_MCx_MISC(i), msr_name, NONCANONICAL);
+-		}
+-
+-		/*
+-		 * The theoretical maximum number of MCE banks is 32 (on Intel
+-		 * CPUs, without jumping to a new base address), as the last
+-		 * unclaimed MSR is 0x479; 0x480 begins the VMX MSRs.  Verify
+-		 * accesses to theoretically legal, unsupported MSRs fault.
+-		 */
+-		for (i = nr_mce_banks; i < 32; i++) {
+-			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_CTL", i);
+-			test_rdmsr_fault(MSR_IA32_MCx_CTL(i), msr_name);
+-			test_wrmsr_fault(MSR_IA32_MCx_CTL(i), msr_name, 0);
+-
+-			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_STATUS", i);
+-			test_rdmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name);
+-			test_wrmsr_fault(MSR_IA32_MCx_STATUS(i), msr_name, 0);
+-
+-			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_ADDR", i);
+-			test_rdmsr_fault(MSR_IA32_MCx_ADDR(i), msr_name);
+-			test_wrmsr_fault(MSR_IA32_MCx_ADDR(i), msr_name, 0);
+-
+-			snprintf(msr_name, sizeof(msr_name), "MSR_IA32_MC%u_MISC", i);
+-			test_rdmsr_fault(MSR_IA32_MCx_MISC(i), msr_name);
+-			test_wrmsr_fault(MSR_IA32_MCx_MISC(i), msr_name, 0);
+-		}
++		test_misc_msrs();
++		test_mce_msrs();
+ 	}
+ 
+ 	return report_summary();
 -- 
 2.39.0.314.g84b9a713c41-goog
 
