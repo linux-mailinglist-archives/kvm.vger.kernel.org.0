@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 239FC661641
-	for <lists+kvm@lfdr.de>; Sun,  8 Jan 2023 16:45:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D554C661643
+	for <lists+kvm@lfdr.de>; Sun,  8 Jan 2023 16:45:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232837AbjAHPp3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 8 Jan 2023 10:45:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51920 "EHLO
+        id S232989AbjAHPpi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 8 Jan 2023 10:45:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232624AbjAHPp1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 8 Jan 2023 10:45:27 -0500
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2063.outbound.protection.outlook.com [40.107.92.63])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EC0FCF6
-        for <kvm@vger.kernel.org>; Sun,  8 Jan 2023 07:45:26 -0800 (PST)
+        with ESMTP id S233053AbjAHPpe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 8 Jan 2023 10:45:34 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2040.outbound.protection.outlook.com [40.107.93.40])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 386F2FD34
+        for <kvm@vger.kernel.org>; Sun,  8 Jan 2023 07:45:32 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZzvJl8IIEzjjOHEKlFfvnPltdgUg1ApGNWgdkAxFcSc88ZgtQbK6rUk/6IiRglWt6maiskTTtPgbm8ewycTlrAm40qdqqM+rP+W/KtWiIiwpftffdzV9ut/8ZniWm09F2jnYcQ/xiF/z8ko4Vn/jwu/7i5Czq4HcUxLKUfogp96sYTO4gjTuHlcKZGTMT2UoctRpz8HyTvjltCu1cyYeAuVtxdUgRc+Om8fENlfUl+Fxl6fJS38ncwyfkDT/26hVuWmAem10ZxK3PpQc/czJCvpvIOnQRwEcktFOy6UsIIA+LV1Eefrw39uQVCj9R5b6Usf2iFZl4Jlhm+ZB6bMYMg==
+ b=ZLyn39NHeR72n73R6cyy8ENrwFXH31AF/fv3NxZfWPV0Q16bJk/CiAn2U3h/z/seHeLOI7J23NovbNkGFhaKc2LqhdhdRKaEo0MzWBEROjpHaI+1yAViL+PItlJhLAQ435utbgeKsjwAQjR4Pqg0f2wjFc4ve3V2WkRAIwL9D9Zwr/ghTLDyp4C0G28QzVkPa2BCGm5rEwHVD3nwt8KNYcsLOMu5wM47r5Bw/ARvLs+nmd4H4Byb683xiiesRLM18CQqbxum7SpThIPbbixRCFsYDH5Oi3RoyijBRlfIcBT5H6V+2jVrWpoMqVes0U6jANTYHArSaMPBQHuH5s9aMg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uEr5Sq2CAJ+a1zrebdR3kAnoRJuPrqSklQgjRfrVNRI=;
- b=K7P9TYXY8t9o2ovmvcGSYMdKS/foHaDBreVXPYbZti9yKmxdI6d3wEtsA+9hOHcG8+TXMueZ5LIx18LX93HcIrbjZmO5JK75ulDqTUyiKNSib4EBGoqqCTJZOQfxYs8bUoNJREPTVk3gmsRYWcj8H7xyTrowkgMLWnXESBX77i56vuj/0y5zARk63SeI9fY/zS3WVnO+on6LHUFCEvRswe8v9egyjz21NceJ1ZLrg9/aEMoyrCIZIlpSJ7j6IVZLVaaIeVIZ1wuXgdiP+jveGIoxXYYIZvwcM6Kr8zwlKnIXPRuP9mfe037kAp86lhBo0S23qlkl8/YscBYOGM1UcQ==
+ bh=iB+wwZESLnJeV0tnBePwfhYaT1OSc27ioTbYMJScf8g=;
+ b=OxuFA9Kmu5eS/qJz+/bnfhBowEd9rKDAwz/WFhouclpa1hRSqBW+3gIVeNgY8oL6YMwffetl0tKZsEfNSrhKOm0e6wfOJd2r50fYrBCjd6OCnECRAsN24razPJQYL+JgmPS5uF3/X6gZMdGw3QTHXj8XphVAxSXq31XztJTF6ftv7Ot5vs0cpy4d6obnIlcAigkcoBjI4IJ6pjCQFhxfIYYb/C6dpKWt25jWPVlA/7PgFCGUqavNekyizVS5zQeiiyTV+KJpNW6mUvyyeLlfnkDG9MXm8kkZYithR2D4IHQsLt2NnJYrIkVMr/bv7FToHQKu+acyTqw9Ic0vOhuHcQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -28,18 +28,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uEr5Sq2CAJ+a1zrebdR3kAnoRJuPrqSklQgjRfrVNRI=;
- b=TjD/xtjo49yMEmu+c5OcQuol3MvAwWOwE4eN4iH+AjXgrfDRRIr4RY97c/UdQvNbGbj3aAb6f6O/JspIXvUSfFn6/ZSXvtlBv6MLlIBCkv3sdA7UA0eFjt1WDXjZFOawY4TcjPXx3rcjxRzHvu7EV+acbA5oQTs6w4o3BeD+wpJSF+BzTwd09vglJPXcnvItwr8OpUx96f7fl5wdBcDBBDKekwGxsJxKAsQkzxrV+yVNujexZ54S7Wd0V+KcJmxnbVNXEdmObe6WBy6Kb9jzMeXsc6dP2m04ANIZg6WiUheJeHnlzYr3a9DbadXpTBdnAd7APBr0IIbXmIEoGB7MnA==
-Received: from BN9PR03CA0593.namprd03.prod.outlook.com (2603:10b6:408:10d::28)
- by SA0PR12MB4432.namprd12.prod.outlook.com (2603:10b6:806:98::16) with
+ bh=iB+wwZESLnJeV0tnBePwfhYaT1OSc27ioTbYMJScf8g=;
+ b=PV/d7LecH7YEtJGumGziabD6bdUp5L76fQfuoRqH/MwxqTd1nLPLRUbN4UjeFuNbioV4uyzlYi9NpVt1OLbNK1SSvmh8f0VrZyddPd9AptFI3lTLwB1MQg9kStW127XUQdM14tMaL8Ag5LuGXzgBqHW0j9LzVglcZtLMfSvLXzg4IG6Sh4AU4fS3OfFdYfQrcD+TAM1ykB4L/pYO9D+6VSAh/xs7sekrEcOS1SmXHimIvLmED0Afn84ETqd39F7U4YUGGAo29kl0iWMd9tpV1bJfX2yG6zd4EZcxXAX6TjoVnuNVKotBxp6gCUxE316mFXrgyHyIrBeOU50ddoDSmw==
+Received: from BN9PR03CA0582.namprd03.prod.outlook.com (2603:10b6:408:10d::17)
+ by MW4PR12MB5603.namprd12.prod.outlook.com (2603:10b6:303:16a::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Sun, 8 Jan
- 2023 15:45:24 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5944.19; Sun, 8 Jan
+ 2023 15:45:30 +0000
 Received: from BN8NAM11FT091.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:10d:cafe::ee) by BN9PR03CA0593.outlook.office365.com
- (2603:10b6:408:10d::28) with Microsoft SMTP Server (version=TLS1_2,
+ (2603:10b6:408:10d:cafe::a5) by BN9PR03CA0582.outlook.office365.com
+ (2603:10b6:408:10d::17) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18 via Frontend
- Transport; Sun, 8 Jan 2023 15:45:24 +0000
+ Transport; Sun, 8 Jan 2023 15:45:29 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -49,18 +49,18 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.117.160) by
  BN8NAM11FT091.mail.protection.outlook.com (10.13.176.134) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5986.18 via Frontend Transport; Sun, 8 Jan 2023 15:45:24 +0000
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ 15.20.5986.18 via Frontend Transport; Sun, 8 Jan 2023 15:45:29 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Sun, 8 Jan 2023
- 07:45:13 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail203.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ 07:45:17 -0800
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Sun, 8 Jan 2023
- 07:45:13 -0800
+ 07:45:17 -0800
 Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
  with Microsoft SMTP Server id 15.2.986.36 via Frontend Transport; Sun, 8 Jan
- 2023 07:45:10 -0800
+ 2023 07:45:13 -0800
 From:   Yishai Hadas <yishaih@nvidia.com>
 To:     <alex.williamson@redhat.com>, <jgg@nvidia.com>
 CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
@@ -68,9 +68,9 @@ CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
         <diana.craciun@oss.nxp.com>, <eric.auger@redhat.com>,
         <yishaih@nvidia.com>, <maorg@nvidia.com>, <cohuck@redhat.com>,
         <shameerali.kolothum.thodi@huawei.com>
-Subject: [PATCH V1 vfio 2/6] vfio/mlx5: Allow loading of larger images than 512 MB
-Date:   Sun, 8 Jan 2023 17:44:23 +0200
-Message-ID: <20230108154427.32609-3-yishaih@nvidia.com>
+Subject: [PATCH V1 vfio 3/6] vfio: Use GFP_KERNEL_ACCOUNT for userspace persistent allocations
+Date:   Sun, 8 Jan 2023 17:44:24 +0200
+Message-ID: <20230108154427.32609-4-yishaih@nvidia.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20230108154427.32609-1-yishaih@nvidia.com>
 References: <20230108154427.32609-1-yishaih@nvidia.com>
@@ -79,23 +79,23 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT091:EE_|SA0PR12MB4432:EE_
-X-MS-Office365-Filtering-Correlation-Id: b751032f-8a83-48a7-4635-08daf18f5ba2
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT091:EE_|MW4PR12MB5603:EE_
+X-MS-Office365-Filtering-Correlation-Id: 76409af9-ae94-401a-f75a-08daf18f5ec0
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kjJhFxizepvUsGH9RkPQyfD9jEFfuULmF2Ud6Cx7bZzQfwMYHRNtlGTI9wsUfk6fObXVdv2YQFi1XjqlKUHwqnrJYUYISmfjKV5zTSabT5yXxYckoit+WOJF5wLPuxoEcV5opbu+RBoGkP+ztXPyHcV6CLIAAsvUC1/CA6xJVMgsX7+JQTa+iwADRnK9Fxg09ofDpd0goY2vdkqFVp6N0KYeiq3RqBwXoVnTboE9zT8l77qOzjU0PwNhP7n++sQSYg73rE8/ClI6xFjZCD91oOpmKaDqIsL8kTRZeaamdxCNFCkaqLMAY6eBPOQE2cDAfkYp4jszTP6Kymys3rTH7zIhVameIoYbQ1ZG9yL7V/jIQ4W19GcmBg8TqQcGJTiwevhkrzBflzzXvk78UJaBGY/Vv+rTXacE8HhvscMWBQloRg8gF8dhdaCLJtDrA3A3q9+Tqn0kU9FZgMSQY1Ua9zJcmqphVJqRrTZHftD0Wc2CFTYVWw451ZXom9zLI/UC+jwbl7KK/95duP+bHtMNBZgN8bog5N5mVx1sM0jODErsufLHDHbbIh58EUrKrA3EboAlqA2Wj8xjrwtwJMGebVhSfeEvuuhT5pRRvFohAGcaUMU00AWTvtOFvezuj6Q00Qp0zcSHju80e85jfHqnNY1qpjtmID7e/la9gGSrnYFW5qr4oHlRctrtMD3qXLmlWhbwDKmxmhk/7BlNfTv7vw==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(396003)(376002)(346002)(451199015)(46966006)(40470700004)(36840700001)(1076003)(316002)(5660300002)(40480700001)(7696005)(26005)(186003)(478600001)(2616005)(426003)(41300700001)(40460700003)(47076005)(6636002)(70586007)(110136005)(54906003)(4326008)(336012)(8676002)(70206006)(83380400001)(82310400005)(8936002)(86362001)(36756003)(6666004)(36860700001)(82740400003)(356005)(2906002)(7636003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: XaZ9KzSK70aSqmghTGJGTrfeo0msTacIUu2rsXoQnq6wElxkX5BR4eo0OovEYH37aNWvZmjBebxdHMek8+fFBKxAxv7g1yfE8Vn9lQPfjQt6l5y5OcoW93OUYePI2PhFiQPXVmCLTlS5yAG6MNoHTWSPhb7wNGfQg2J64u9Deqml8W/RIEIyxQ3ZhS9PEk0D/d6zLqBT5zstKhqj1yipzszFG17P55xjGKs+iPU9H+D98U+nUaXSwms5jkt1QTQBkZniM4Y2begJditEVw7F54L6z+/8mL6hf0WmG8B4nb4wpFpT5O6UURUR6/2CDpLBZ54SvFpwqPb9XgNGXNQLIlLZewImAECdCCxCa6rcYc8HUGSTfUj5796UF8BAWlL6DvoGori542yOpWNsx+4JDHFNo5EgA1kmmxCFzpFBZHtUlaDN5zM7AkhWhurnRUQnpjo/OQYFd4iBdpgMZSst/7dS1tmCegFwedwAzFJ8Y+S5ARygJvd3Neolco1JIvXiloGCufa0DiK9IAKF0SVos/akH15zp4AK2JDw8toTS2ZnF+KoNKE9QemhXlaFdGZAd1lu0LCkt9EEGfzXDmOA0Yr/avDdnQA3KEdH4qfQRnIXA4esORZy6MG/HkcidMZWdNcLFt+YRm7tHw3a9qcA/+qQG3AhZbYChbifmTHKKmeUR1JnR0R9IxS+iMyc9P5DUbp5EF+e2QA9bEQqGder9g==
+X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(396003)(39860400002)(376002)(346002)(136003)(451199015)(36840700001)(40470700004)(46966006)(6666004)(316002)(110136005)(186003)(26005)(6636002)(54906003)(4326008)(336012)(2616005)(70586007)(1076003)(70206006)(7636003)(7696005)(8676002)(478600001)(426003)(83380400001)(41300700001)(356005)(8936002)(47076005)(5660300002)(2906002)(36860700001)(82740400003)(36756003)(86362001)(40460700003)(82310400005)(40480700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2023 15:45:24.4137
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jan 2023 15:45:29.6637
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b751032f-8a83-48a7-4635-08daf18f5ba2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 76409af9-ae94-401a-f75a-08daf18f5ec0
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT091.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4432
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5603
 X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
@@ -106,147 +106,183 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Allow loading of larger images than 512 MB by dropping the arbitrary
-hard-coded value that we have today and move to use the max device
-loading value which is for now 4GB.
+From: Jason Gunthorpe <jgg@nvidia.com>
 
-As part of that we move to use the GFP_KERNEL_ACCOUNT option upon
-allocating the persistent data of mlx5 and rely on the cgroup to provide
-the memory limit for the given user.
+Use GFP_KERNEL_ACCOUNT for userspace persistent allocations.
 
 The GFP_KERNEL_ACCOUNT option lets the memory allocator know that this
 is untrusted allocation triggered from userspace and should be a subject
 of kmem accountingis, and as such it is controlled by the cgroup
 mechanism.
 
+The way to find the relevant allocations was for example to look at the
+close_device function and trace back all the kfrees to their
+allocations.
+
+Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
 Signed-off-by: Yishai Hadas <yishaih@nvidia.com>
 ---
- drivers/vfio/pci/mlx5/cmd.c  | 11 ++++++-----
- drivers/vfio/pci/mlx5/main.c | 19 ++++++++++---------
- 2 files changed, 16 insertions(+), 14 deletions(-)
+ drivers/vfio/container.c           |  2 +-
+ drivers/vfio/pci/vfio_pci_config.c |  6 +++---
+ drivers/vfio/pci/vfio_pci_core.c   |  7 ++++---
+ drivers/vfio/pci/vfio_pci_igd.c    |  2 +-
+ drivers/vfio/pci/vfio_pci_intrs.c  | 10 ++++++----
+ drivers/vfio/pci/vfio_pci_rdwr.c   |  2 +-
+ drivers/vfio/virqfd.c              |  2 +-
+ 7 files changed, 17 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/vfio/pci/mlx5/cmd.c b/drivers/vfio/pci/mlx5/cmd.c
-index c5dcddbc4126..0586f09c69af 100644
---- a/drivers/vfio/pci/mlx5/cmd.c
-+++ b/drivers/vfio/pci/mlx5/cmd.c
-@@ -373,7 +373,7 @@ mlx5vf_alloc_data_buffer(struct mlx5_vf_migration_file *migf,
- 	struct mlx5_vhca_data_buffer *buf;
- 	int ret;
- 
--	buf = kzalloc(sizeof(*buf), GFP_KERNEL);
-+	buf = kzalloc(sizeof(*buf), GFP_KERNEL_ACCOUNT);
- 	if (!buf)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -1032,7 +1032,7 @@ mlx5vf_create_rc_qp(struct mlx5_core_dev *mdev,
- 	void *in;
- 	int err;
- 
--	qp = kzalloc(sizeof(*qp), GFP_KERNEL);
-+	qp = kzalloc(sizeof(*qp), GFP_KERNEL_ACCOUNT);
- 	if (!qp)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -1213,12 +1213,13 @@ static int alloc_recv_pages(struct mlx5_vhca_recv_buf *recv_buf,
- 	int i;
- 
- 	recv_buf->page_list = kvcalloc(npages, sizeof(*recv_buf->page_list),
--				       GFP_KERNEL);
-+				       GFP_KERNEL_ACCOUNT);
- 	if (!recv_buf->page_list)
- 		return -ENOMEM;
- 
- 	for (;;) {
--		filled = alloc_pages_bulk_array(GFP_KERNEL, npages - done,
-+		filled = alloc_pages_bulk_array(GFP_KERNEL_ACCOUNT,
-+						npages - done,
- 						recv_buf->page_list + done);
- 		if (!filled)
- 			goto err;
-@@ -1248,7 +1249,7 @@ static int register_dma_recv_pages(struct mlx5_core_dev *mdev,
- 
- 	recv_buf->dma_addrs = kvcalloc(recv_buf->npages,
- 				       sizeof(*recv_buf->dma_addrs),
--				       GFP_KERNEL);
-+				       GFP_KERNEL_ACCOUNT);
- 	if (!recv_buf->dma_addrs)
- 		return -ENOMEM;
- 
-diff --git a/drivers/vfio/pci/mlx5/main.c b/drivers/vfio/pci/mlx5/main.c
-index 9feb89c6d939..7ba127d8889a 100644
---- a/drivers/vfio/pci/mlx5/main.c
-+++ b/drivers/vfio/pci/mlx5/main.c
-@@ -21,8 +21,8 @@
- 
- #include "cmd.h"
- 
--/* Arbitrary to prevent userspace from consuming endless memory */
--#define MAX_MIGRATION_SIZE (512*1024*1024)
-+/* Device specification max LOAD size */
-+#define MAX_LOAD_SIZE (BIT_ULL(__mlx5_bit_sz(load_vhca_state_in, size)) - 1)
- 
- static struct mlx5vf_pci_core_device *mlx5vf_drvdata(struct pci_dev *pdev)
+diff --git a/drivers/vfio/container.c b/drivers/vfio/container.c
+index b7a9560ab25e..5f398c493a1b 100644
+--- a/drivers/vfio/container.c
++++ b/drivers/vfio/container.c
+@@ -367,7 +367,7 @@ static int vfio_fops_open(struct inode *inode, struct file *filep)
  {
-@@ -73,12 +73,13 @@ int mlx5vf_add_migration_pages(struct mlx5_vhca_data_buffer *buf,
- 	int ret;
+ 	struct vfio_container *container;
  
- 	to_fill = min_t(unsigned int, npages, PAGE_SIZE / sizeof(*page_list));
--	page_list = kvzalloc(to_fill * sizeof(*page_list), GFP_KERNEL);
-+	page_list = kvzalloc(to_fill * sizeof(*page_list), GFP_KERNEL_ACCOUNT);
- 	if (!page_list)
+-	container = kzalloc(sizeof(*container), GFP_KERNEL);
++	container = kzalloc(sizeof(*container), GFP_KERNEL_ACCOUNT);
+ 	if (!container)
  		return -ENOMEM;
  
- 	do {
--		filled = alloc_pages_bulk_array(GFP_KERNEL, to_fill, page_list);
-+		filled = alloc_pages_bulk_array(GFP_KERNEL_ACCOUNT, to_fill,
-+						page_list);
- 		if (!filled) {
- 			ret = -ENOMEM;
- 			goto err;
-@@ -87,7 +88,7 @@ int mlx5vf_add_migration_pages(struct mlx5_vhca_data_buffer *buf,
- 		ret = sg_alloc_append_table_from_pages(
- 			&buf->table, page_list, filled, 0,
- 			filled << PAGE_SHIFT, UINT_MAX, SG_MAX_SINGLE_ALLOC,
--			GFP_KERNEL);
-+			GFP_KERNEL_ACCOUNT);
+diff --git a/drivers/vfio/pci/vfio_pci_config.c b/drivers/vfio/pci/vfio_pci_config.c
+index 4a350421c5f6..523e0144c86f 100644
+--- a/drivers/vfio/pci/vfio_pci_config.c
++++ b/drivers/vfio/pci/vfio_pci_config.c
+@@ -1244,7 +1244,7 @@ static int vfio_msi_cap_len(struct vfio_pci_core_device *vdev, u8 pos)
+ 	if (vdev->msi_perm)
+ 		return len;
  
- 		if (ret)
- 			goto err;
-@@ -467,7 +468,7 @@ mlx5vf_pci_save_device_data(struct mlx5vf_pci_core_device *mvdev, bool track)
- 	size_t length;
- 	int ret;
+-	vdev->msi_perm = kmalloc(sizeof(struct perm_bits), GFP_KERNEL);
++	vdev->msi_perm = kmalloc(sizeof(struct perm_bits), GFP_KERNEL_ACCOUNT);
+ 	if (!vdev->msi_perm)
+ 		return -ENOMEM;
  
--	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
- 	if (!migf)
- 		return ERR_PTR(-ENOMEM);
+@@ -1731,11 +1731,11 @@ int vfio_config_init(struct vfio_pci_core_device *vdev)
+ 	 * no requirements on the length of a capability, so the gap between
+ 	 * capabilities needs byte granularity.
+ 	 */
+-	map = kmalloc(pdev->cfg_size, GFP_KERNEL);
++	map = kmalloc(pdev->cfg_size, GFP_KERNEL_ACCOUNT);
+ 	if (!map)
+ 		return -ENOMEM;
  
-@@ -564,7 +565,7 @@ mlx5vf_resume_read_image_no_header(struct mlx5_vhca_data_buffer *vhca_buf,
+-	vconfig = kmalloc(pdev->cfg_size, GFP_KERNEL);
++	vconfig = kmalloc(pdev->cfg_size, GFP_KERNEL_ACCOUNT);
+ 	if (!vconfig) {
+ 		kfree(map);
+ 		return -ENOMEM;
+diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+index 26a541cc64d1..a6492a25ff6a 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -144,7 +144,8 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
+ 			 * of the exclusive page in case that hot-add
+ 			 * device's bar is assigned into it.
+ 			 */
+-			dummy_res = kzalloc(sizeof(*dummy_res), GFP_KERNEL);
++			dummy_res =
++				kzalloc(sizeof(*dummy_res), GFP_KERNEL_ACCOUNT);
+ 			if (dummy_res == NULL)
+ 				goto no_mmap;
+ 
+@@ -863,7 +864,7 @@ int vfio_pci_core_register_dev_region(struct vfio_pci_core_device *vdev,
+ 
+ 	region = krealloc(vdev->region,
+ 			  (vdev->num_regions + 1) * sizeof(*region),
+-			  GFP_KERNEL);
++			  GFP_KERNEL_ACCOUNT);
+ 	if (!region)
+ 		return -ENOMEM;
+ 
+@@ -1644,7 +1645,7 @@ static int __vfio_pci_add_vma(struct vfio_pci_core_device *vdev,
  {
- 	int ret;
+ 	struct vfio_pci_mmap_vma *mmap_vma;
  
--	if (requested_length > MAX_MIGRATION_SIZE)
-+	if (requested_length > MAX_LOAD_SIZE)
+-	mmap_vma = kmalloc(sizeof(*mmap_vma), GFP_KERNEL);
++	mmap_vma = kmalloc(sizeof(*mmap_vma), GFP_KERNEL_ACCOUNT);
+ 	if (!mmap_vma)
  		return -ENOMEM;
  
- 	if (vhca_buf->allocated_length < requested_length) {
-@@ -648,7 +649,7 @@ mlx5vf_resume_read_header(struct mlx5_vf_migration_file *migf,
- 		u64 flags;
+diff --git a/drivers/vfio/pci/vfio_pci_igd.c b/drivers/vfio/pci/vfio_pci_igd.c
+index 5e6ca5926954..dd70e2431bd7 100644
+--- a/drivers/vfio/pci/vfio_pci_igd.c
++++ b/drivers/vfio/pci/vfio_pci_igd.c
+@@ -180,7 +180,7 @@ static int vfio_pci_igd_opregion_init(struct vfio_pci_core_device *vdev)
+ 	if (!addr || !(~addr))
+ 		return -ENODEV;
  
- 		vhca_buf->header_image_size = le64_to_cpup((__le64 *)to_buff);
--		if (vhca_buf->header_image_size > MAX_MIGRATION_SIZE) {
-+		if (vhca_buf->header_image_size > MAX_LOAD_SIZE) {
- 			ret = -ENOMEM;
- 			goto end;
- 		}
-@@ -781,7 +782,7 @@ mlx5vf_pci_resume_device_data(struct mlx5vf_pci_core_device *mvdev)
- 	struct mlx5_vhca_data_buffer *buf;
- 	int ret;
+-	opregionvbt = kzalloc(sizeof(*opregionvbt), GFP_KERNEL);
++	opregionvbt = kzalloc(sizeof(*opregionvbt), GFP_KERNEL_ACCOUNT);
+ 	if (!opregionvbt)
+ 		return -ENOMEM;
  
--	migf = kzalloc(sizeof(*migf), GFP_KERNEL);
-+	migf = kzalloc(sizeof(*migf), GFP_KERNEL_ACCOUNT);
- 	if (!migf)
- 		return ERR_PTR(-ENOMEM);
+diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
+index 40c3d7cf163f..bffb0741518b 100644
+--- a/drivers/vfio/pci/vfio_pci_intrs.c
++++ b/drivers/vfio/pci/vfio_pci_intrs.c
+@@ -177,7 +177,7 @@ static int vfio_intx_enable(struct vfio_pci_core_device *vdev)
+ 	if (!vdev->pdev->irq)
+ 		return -ENODEV;
+ 
+-	vdev->ctx = kzalloc(sizeof(struct vfio_pci_irq_ctx), GFP_KERNEL);
++	vdev->ctx = kzalloc(sizeof(struct vfio_pci_irq_ctx), GFP_KERNEL_ACCOUNT);
+ 	if (!vdev->ctx)
+ 		return -ENOMEM;
+ 
+@@ -216,7 +216,7 @@ static int vfio_intx_set_signal(struct vfio_pci_core_device *vdev, int fd)
+ 	if (fd < 0) /* Disable only */
+ 		return 0;
+ 
+-	vdev->ctx[0].name = kasprintf(GFP_KERNEL, "vfio-intx(%s)",
++	vdev->ctx[0].name = kasprintf(GFP_KERNEL_ACCOUNT, "vfio-intx(%s)",
+ 				      pci_name(pdev));
+ 	if (!vdev->ctx[0].name)
+ 		return -ENOMEM;
+@@ -284,7 +284,8 @@ static int vfio_msi_enable(struct vfio_pci_core_device *vdev, int nvec, bool msi
+ 	if (!is_irq_none(vdev))
+ 		return -EINVAL;
+ 
+-	vdev->ctx = kcalloc(nvec, sizeof(struct vfio_pci_irq_ctx), GFP_KERNEL);
++	vdev->ctx = kcalloc(nvec, sizeof(struct vfio_pci_irq_ctx),
++			    GFP_KERNEL_ACCOUNT);
+ 	if (!vdev->ctx)
+ 		return -ENOMEM;
+ 
+@@ -343,7 +344,8 @@ static int vfio_msi_set_vector_signal(struct vfio_pci_core_device *vdev,
+ 	if (fd < 0)
+ 		return 0;
+ 
+-	vdev->ctx[vector].name = kasprintf(GFP_KERNEL, "vfio-msi%s[%d](%s)",
++	vdev->ctx[vector].name = kasprintf(GFP_KERNEL_ACCOUNT,
++					   "vfio-msi%s[%d](%s)",
+ 					   msix ? "x" : "", vector,
+ 					   pci_name(pdev));
+ 	if (!vdev->ctx[vector].name)
+diff --git a/drivers/vfio/pci/vfio_pci_rdwr.c b/drivers/vfio/pci/vfio_pci_rdwr.c
+index e352a033b4ae..e27de61ac9fe 100644
+--- a/drivers/vfio/pci/vfio_pci_rdwr.c
++++ b/drivers/vfio/pci/vfio_pci_rdwr.c
+@@ -470,7 +470,7 @@ int vfio_pci_ioeventfd(struct vfio_pci_core_device *vdev, loff_t offset,
+ 		goto out_unlock;
+ 	}
+ 
+-	ioeventfd = kzalloc(sizeof(*ioeventfd), GFP_KERNEL);
++	ioeventfd = kzalloc(sizeof(*ioeventfd), GFP_KERNEL_ACCOUNT);
+ 	if (!ioeventfd) {
+ 		ret = -ENOMEM;
+ 		goto out_unlock;
+diff --git a/drivers/vfio/virqfd.c b/drivers/vfio/virqfd.c
+index 497a17b37865..29c564b7a6e1 100644
+--- a/drivers/vfio/virqfd.c
++++ b/drivers/vfio/virqfd.c
+@@ -112,7 +112,7 @@ int vfio_virqfd_enable(void *opaque,
+ 	int ret = 0;
+ 	__poll_t events;
+ 
+-	virqfd = kzalloc(sizeof(*virqfd), GFP_KERNEL);
++	virqfd = kzalloc(sizeof(*virqfd), GFP_KERNEL_ACCOUNT);
+ 	if (!virqfd)
+ 		return -ENOMEM;
  
 -- 
 2.18.1
