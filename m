@@ -2,55 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5C1FA6632A2
+	by mail.lfdr.de (Postfix) with ESMTP id B060C6632A3
 	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 22:19:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237479AbjAIVTU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 16:19:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56884 "EHLO
+        id S236183AbjAIVTJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 16:19:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238198AbjAIVSD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S238202AbjAIVSD (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 9 Jan 2023 16:18:03 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4D2D3AB
-        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 13:17:57 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id z4-20020a17090ab10400b002195a146546so7887504pjq.9
-        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 13:17:57 -0800 (PST)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A37C33
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 13:17:59 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id z17-20020a25e311000000b00719e04e59e1so10404640ybd.10
+        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 13:17:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=C+A/7tP9mvR5o1GtT1H6KbVlKl608UdMee+76BtuWKY=;
-        b=NYrhvrbbfkSmHLJAY5CoZsw9Z3pb8ZX1ARyBNHXSy5UxUbbLAOboQMst98y0xabMqe
-         muJWrH8SW/zai8ix/V5vd6Cvvd1FxWt2qsVrDAqaHmBhUC7E8K2daLlkiKTBZLmKRxts
-         Y4sY6z61Q50T9kyRSJ9hReFHU2j8uWDaU3tdwAvts5+Op/7tQdP79goWGPgDMFXlEUvG
-         mZluVz0K5AgRFjdLSJ1yyRBwriqOmg5Gd1XlQgnk8PvYQbVlC639wCpvg2lL29nylI2c
-         HrsRFjRvlHfutZtzuOq8hXnm1DeeKK1aMK+sUlKxGsWeQ9GnYz3ewoJvu7z/ruRqZ8RX
-         qS0g==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8vYRLwUIk98bjKuNyIlvlUFommPfoiF0oXe1gHbwjak=;
+        b=VvomFRCWxi3Cf9audhc8IhllDwknftt5v1xuSBd+oY9d3AEEOifMGXkAtQ1y+FuIWb
+         u4XdeSZza8zSXC5W+g5s1/ZJfNX2sHykubx/mkrqg/oeakTwtE2nb9DOpAmXMFvLMLU1
+         keLlnyqIXs/che9x+5WVb4heav9HjlZ+W7tly48xIaqrlC5yRwha947w1eUmBJL3lmhM
+         7qYw1hlJD+RWGnmoQJLChDzs4MZjLDF0aiQYZrXq9g577VzsaC8KpcMYgsOuZHVagPXF
+         QmL6WFGiMstE0vlkkCQyOHy17XYWZcxMOmykD7QP/fLW7A9wIRrtSjKWVfVZV5JxPZf6
+         EF9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=C+A/7tP9mvR5o1GtT1H6KbVlKl608UdMee+76BtuWKY=;
-        b=btLrrGJgYJGPAPwGgd/63W9hZ87T2qJBzCbqtJ+lkHEKiHetI1gLyi0pUoMSGbVbx6
-         GgcP/dZU7lB8ILihf6qG42sdOOqGbGRq+rk/cLrMeIO1UxezLHumy2AjTBRNX+AH3YpZ
-         t2vD8AbUmyyC8IqSpOy5p12ErJZNh0APr7X6aKg/CIt47ZUUt5u52SKssA5elqYrsk8C
-         xbpR6wpv/u5bATuSbcXJoMfuKV6kdXlqyca4W9oXH2mvL9PxYEkO74+mnNkWgB/Xt2r6
-         fBqxuLeczH6nUROAY5D3pp4uSRzz8FEj6Q1LWbr0L6b2hipHI8baG2JRwRe8Jd+lkjKf
-         l00g==
-X-Gm-Message-State: AFqh2kpM42eWfcMiM/wPBSzBYlEcrG69ogTp4Un2c5DwYQ/D1CdK4IRQ
-        IZsZc9JEZtIDDNTEX5v7oM0KslB4uxYAl1UEO3d5tbiZ/6HMCrHAZmuHsDfi6yMGL/BcQVFjLSs
-        XdRwhcIVpsMbRPe8W06cpFLsyk6EQgaAEvXtlHL2wwd88u1uxmAJMqapPrQq5X1k=
-X-Google-Smtp-Source: AMrXdXsuzGhN57hreYNDB9W34vnllmBsMvmdjRf6dJryLCkM6AVR0IfSHN4dMqg2O1uk8SFEEXOTG7dfKPg2wg==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8vYRLwUIk98bjKuNyIlvlUFommPfoiF0oXe1gHbwjak=;
+        b=o1R6M4RhNogOpvsdSjE54BSMoja8s4NYYMiGZ1snVazPAhmnth2w628+nk6iZUFMtY
+         piQ/OgWsOOpq8hjsEddl4LQMBDPz0A4ogOhbtMgPUQDIns7mvHwdSAcNSr+r15amKsTS
+         +9b3MlnHOLGrkH5dnvS99Zh3F/O5ptuFKNV02/cuo6bY9JPnbxRX5XgG/b6gZmgztHxH
+         ug7RDUz+g8tcR0EIEeN/x3+XWvQKwRFttSvUj1gsSvjsQtaO1BPkK8nxf8YpwHmZKhgR
+         q2d29fHKxscSEzBOl7CWJJyXkr8h+SXGMhe9h4nqP/WeIZ9BGNpEpr7g4E6ruOt20Y7o
+         1E8w==
+X-Gm-Message-State: AFqh2krOnIJcxILJ0Z56hZzXjOPfukDKFQFHBOEOA5ieC/MpiCLC+BdY
+        SNf+eyX7dY2qPpumbh+737+J4Yp8aa6ADmjcRnDGR9tifs1qG2EypaA3jjZJcPIZGDXWbJmbwnH
+        GvoJpyF74XygO1oJI6KOKwpcVaCz7wHSiYlgS2lkX6mtJeLz0un+YF+g0RggGc0c=
+X-Google-Smtp-Source: AMrXdXv6G8Fd/Iz5y6AF6zj+XDreYn28g1+TON+MSNkB+1uemEgtB8oJGGT41EqFVyH6vt6dFGBz92mmUdxaMg==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a62:5f87:0:b0:57f:ef13:63aa with SMTP id
- t129-20020a625f87000000b0057fef1363aamr4334401pfb.42.1673299077120; Mon, 09
- Jan 2023 13:17:57 -0800 (PST)
-Date:   Mon,  9 Jan 2023 21:17:50 +0000
+ (user=ricarkol job=sendgmr) by 2002:a25:ae06:0:b0:7bf:162d:a1b7 with SMTP id
+ a6-20020a25ae06000000b007bf162da1b7mr415585ybj.410.1673299079087; Mon, 09 Jan
+ 2023 13:17:59 -0800 (PST)
+Date:   Mon,  9 Jan 2023 21:17:51 +0000
+In-Reply-To: <20230109211754.67144-1-ricarkol@google.com>
 Mime-Version: 1.0
+References: <20230109211754.67144-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230109211754.67144-1-ricarkol@google.com>
-Subject: [kvm-unit-tests PATCH v3 0/4] arm: pmu: Add support for PMUv3p5
+Message-ID: <20230109211754.67144-2-ricarkol@google.com>
+Subject: [kvm-unit-tests PATCH v3 1/4] arm: pmu: Fix overflow checks for
+ PMUv3p5 long counters
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
 Cc:     maz@kernel.org, alexandru.elisei@arm.com, eric.auger@redhat.com,
@@ -67,51 +70,104 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The first commit fixes the tests when running on PMUv3p5. The issue is that
 PMUv3p5 uses 64-bit counters irrespective of whether the PMU is configured
-for overflowing at 32 or 64-bits. Tests are currently failing [0] on
-PMUv3p5 because of this. They wrongly assume that values will be wrapped
-around 32-bits, but they overflow into the other half of the 64-bit
-counters.
+for overflowing at 32 or 64-bits. The consequence is that tests that check
+the counter values after overflowing should not assume that values will be
+wrapped around 32-bits: they overflow into the other half of the 64-bit
+counters on PMUv3p5.
 
-The second and third commits add new tests for 64-bit overflows, a feature
-added with PMUv3p5 (PMCR_EL0.LP == 1). This is done by running all
-overflow-related tests in two modes: with 32-bit and 64-bit overflows.
-The fourt commit changes the value reporting to use %lx instead of %ld.
+Fix tests by correctly checking overflowing-counters against the expected
+64-bit value.
 
-This series was tested on PMUv3p5 and PMUv3p4 using the ARM Fast Model and
-kvmtool.  All tests pass on both PMUv3p5 and PMUv3p4 when using Marc's
-PMUv3p5 series [0], plus the suggestion made at [1]. Didn't test AArch32.
+Signed-off-by: Ricardo Koller <ricarkol@google.com>
+---
+ arm/pmu.c | 38 ++++++++++++++++++++++++++++----------
+ 1 file changed, 28 insertions(+), 10 deletions(-)
 
-Changes from v2:
-- used Oliver's suggestion of using pmevcntr_mask() for masking counters to
-  32 or 64 bits, instead of casting to uint32_t or uint64_t.
-- removed ALL_SET_AT() in favor of pmevcntr_mask(). (Oliver)
-- moved the change to have odd counter overflows at 64-bits from first to
-  third commit.
-- renamed PRE_OVERFLOW macro to PRE_OVERFLOW_32, and PRE_OVERFLOW_AT() to
-  PRE_OVERFLOW().
-
-Changes from v1 (all suggested by Alexandru):
-- report counter values in hexadecimal
-- s/overflow_at_64bits/unused for all chained tests
-- check that odd counters do not increment when using overflow_at_64bits
-  (pmcr.LP=1)
-- test 64-bit odd counters overflows
-- switch confusing var names in test_chained_sw_incr(): cntr0 <-> cntr1
-
-[0] https://lore.kernel.org/kvmarm/20221113163832.3154370-1-maz@kernel.org/
-[1] https://lore.kernel.org/kvmarm/Y4jasyxvFRNvvmox@google.com/
-
-Ricardo Koller (4):
-  arm: pmu: Fix overflow checks for PMUv3p5 long counters
-  arm: pmu: Prepare for testing 64-bit overflows
-  arm: pmu: Add tests for 64-bit overflows
-  arm: pmu: Print counter values as hexadecimals
-
- arm/pmu.c | 260 ++++++++++++++++++++++++++++++++++--------------------
- 1 file changed, 163 insertions(+), 97 deletions(-)
-
+diff --git a/arm/pmu.c b/arm/pmu.c
+index cd47b14..7f0794d 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -54,10 +54,10 @@
+ #define EXT_COMMON_EVENTS_LOW	0x4000
+ #define EXT_COMMON_EVENTS_HIGH	0x403F
+ 
+-#define ALL_SET			0xFFFFFFFF
+-#define ALL_CLEAR		0x0
+-#define PRE_OVERFLOW		0xFFFFFFF0
+-#define PRE_OVERFLOW2		0xFFFFFFDC
++#define ALL_SET			0x00000000FFFFFFFFULL
++#define ALL_CLEAR		0x0000000000000000ULL
++#define PRE_OVERFLOW		0x00000000FFFFFFF0ULL
++#define PRE_OVERFLOW2		0x00000000FFFFFFDCULL
+ 
+ #define PMU_PPI			23
+ 
+@@ -419,6 +419,22 @@ static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
+ 	return true;
+ }
+ 
++static uint64_t pmevcntr_mask(void)
++{
++	/*
++	 * Bits [63:0] are always incremented for 64-bit counters,
++	 * even if the PMU is configured to generate an overflow at
++	 * bits [31:0]
++	 *
++	 * For more details see the AArch64.IncrementEventCounter()
++	 * pseudo-code in the ARM ARM DDI 0487I.a, section J1.1.1.
++	 */
++	if (pmu.version >= ID_DFR0_PMU_V3_8_5)
++		return ~0;
++
++	return (uint32_t)~0;
++}
++
+ static void test_basic_event_count(void)
+ {
+ 	uint32_t implemented_counter_mask, non_implemented_counter_mask;
+@@ -538,6 +554,7 @@ static void test_mem_access(void)
+ static void test_sw_incr(void)
+ {
+ 	uint32_t events[] = {SW_INCR, SW_INCR};
++	uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
+ 	int i;
+ 
+ 	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+@@ -572,9 +589,8 @@ static void test_sw_incr(void)
+ 		write_sysreg(0x3, pmswinc_el0);
+ 
+ 	isb();
+-	report(read_regn_el0(pmevcntr, 0)  == 84, "counter #1 after + 100 SW_INCR");
+-	report(read_regn_el0(pmevcntr, 1)  == 100,
+-		"counter #0 after + 100 SW_INCR");
++	report(read_regn_el0(pmevcntr, 0) == cntr0, "counter #0 after + 100 SW_INCR");
++	report(read_regn_el0(pmevcntr, 1) == 100, "counter #1 after + 100 SW_INCR");
+ 	report_info("counter values after 100 SW_INCR #0=%ld #1=%ld",
+ 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+ 	report(read_sysreg(pmovsclr_el0) == 0x1,
+@@ -625,6 +641,8 @@ static void test_chained_counters(void)
+ static void test_chained_sw_incr(void)
+ {
+ 	uint32_t events[] = {SW_INCR, CHAIN};
++	uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
++	uint64_t cntr1 = (ALL_SET + 1) & pmevcntr_mask();
+ 	int i;
+ 
+ 	if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+@@ -666,9 +684,9 @@ static void test_chained_sw_incr(void)
+ 
+ 	isb();
+ 	report((read_sysreg(pmovsclr_el0) == 0x3) &&
+-		(read_regn_el0(pmevcntr, 1) == 0) &&
+-		(read_regn_el0(pmevcntr, 0) == 84),
+-		"expected overflows and values after 100 SW_INCR/CHAIN");
++	       (read_regn_el0(pmevcntr, 0) == cntr0) &&
++	       (read_regn_el0(pmevcntr, 1) == cntr1),
++	       "expected overflows and values after 100 SW_INCR/CHAIN");
+ 	report_info("overflow=0x%lx, #0=%ld #1=%ld", read_sysreg(pmovsclr_el0),
+ 		    read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
+ }
 -- 
 2.39.0.314.g84b9a713c41-goog
 
