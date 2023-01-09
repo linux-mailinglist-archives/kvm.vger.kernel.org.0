@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA6FB66268B
+	by mail.lfdr.de (Postfix) with ESMTP id 39C4F662689
 	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 14:09:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230005AbjAINJd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 08:09:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52640 "EHLO
+        id S234965AbjAINJa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 08:09:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233321AbjAINJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233264AbjAINJJ (ORCPT <rfc822;kvm@vger.kernel.org>);
         Mon, 9 Jan 2023 08:09:09 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB94D4B
-        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 05:06:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A3C734772
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 05:06:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673269576;
+        s=mimecast20190719; t=1673269574;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=luPXsS+ks9CN356IQwEOn1IqYG8Q1VUr1O3bLDCB5Co=;
-        b=ail+zzeX55J6EERUpw5Og+yQqitxjo4YYKLUz6fvNFATyrvw1QsMIvDahqflHlrvliMC1v
-        wIVXmKsQtiMvFdJb6AjNHK3NmqeblFeKS6cW3TkGIyFKbcwEIizwvxK6ktaF5vkOF3oErI
-        M39HTwk2dba6s/jx0z0JpnKRAg2Db04=
+        bh=yqnAszpgy0KJ191Ho69gF9UoikTfczETJLDKhGuW5zw=;
+        b=UoUTDDpYnT/LHAKKn5SGG1k2ipn6Gu4KeWv3xqNpXYSedH3JyLq8OP1Wnj059dPH4y2TEm
+        fh9/KFvl3N2enuVdNuFwbcXrB7cMrIfJguazoZaeM2kb3V/JYnEWGvWnDSXzoXhnjMh3aw
+        KeDuKMWtaKIrJHYBEO0HfqOYGTTjvfA=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-435-2oUJb9aVOYKsK2CZI1NtXQ-1; Mon, 09 Jan 2023 08:06:10 -0500
-X-MC-Unique: 2oUJb9aVOYKsK2CZI1NtXQ-1
+ us-mta-495-yTRL9aU4O3yaIXCTW92jXQ-1; Mon, 09 Jan 2023 08:06:11 -0500
+X-MC-Unique: yTRL9aU4O3yaIXCTW92jXQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 88BFB80D0EB;
-        Mon,  9 Jan 2023 13:06:09 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0144E183B3CA;
+        Mon,  9 Jan 2023 13:06:10 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 24BF9175AD;
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 91D53175AD;
         Mon,  9 Jan 2023 13:06:09 +0000 (UTC)
 From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
 To:     kvm@vger.kernel.org
@@ -51,9 +51,9 @@ Cc:     Sean Christopherson <seanjc@google.com>,
         Krish Sadhukhan <krish.sadhukhan@oracle.com>,
         Jim Mattson <jmattson@google.com>,
         linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: [RFC PATCH 1/2] KVM: x86: update APIC_ID also when disabling x2APIC in kvm_lapic_set_base
-Date:   Mon,  9 Jan 2023 08:06:04 -0500
-Message-Id: <20230109130605.2013555-2-eesposit@redhat.com>
+Subject: [RFC PATCH 2/2] KVM: selftests: APIC_ID must be correctly updated when disabling x2apic
+Date:   Mon,  9 Jan 2023 08:06:05 -0500
+Message-Id: <20230109130605.2013555-3-eesposit@redhat.com>
 In-Reply-To: <20230109130605.2013555-1-eesposit@redhat.com>
 References: <20230109130605.2013555-1-eesposit@redhat.com>
 MIME-Version: 1.0
@@ -69,39 +69,96 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If KVM_SET_MSR firstly enables and then disables x2APIC, make sure
-APIC_ID is actually updated correctly, since bits and offset differ from
-xAPIC and x2APIC.
+Make sure the APIC_ID is correctly shifted in the right bit positions
+when disabling x2APIC via KVM_SET_MSRS.
 
-Currently this is not handled correctly, as kvm_set_apic_base() will
-have msr_info->host_initiated, so switching from x2APIC to xAPIC won't
-fail, but kvm_lapic_set_base() does not handle the case.
-
-Fixes: 8d860bbeedef ("kvm: vmx: Basic APIC virtualization controls have three settings")
 Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
 ---
- arch/x86/kvm/lapic.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ .../selftests/kvm/x86_64/xapic_state_test.c   | 64 +++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index 4efdb4a4d72c..df0a50099aa2 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2394,8 +2394,12 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
- 		}
- 	}
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+index d7d37dae3eeb..6ebda7162a25 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+@@ -132,6 +132,62 @@ static void test_icr(struct xapic_vcpu *x)
+ 	__test_icr(x, -1ull & ~APIC_DM_FIXED_MASK);
+ }
  
--	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE))
--		kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
-+	if ((old_value ^ value) & X2APIC_ENABLE) {
-+		if (value & X2APIC_ENABLE)
-+			kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
-+		else
-+			kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
-+	}
++static void _test_lapic_id(struct kvm_vcpu *vcpu, bool x2apic_enabled,
++			   int expected_id)
++{
++	struct kvm_lapic_state xapic;
++
++	vcpu_ioctl(vcpu, KVM_GET_LAPIC, &xapic);
++	if (x2apic_enabled)
++		ASSERT_EQ(xapic.regs[APIC_ID], expected_id);
++	else
++		ASSERT_EQ(xapic.regs[0x23], expected_id);
++
++}
++
++static void test_apic_id(struct kvm_vcpu *vcpu, int id)
++{
++	int ret;
++	struct {
++		struct kvm_msrs info;
++		struct kvm_msr_entry entries[1];
++	} msr_data = {
++		.info.nmsrs = 1,
++		.entries[0].index = MSR_IA32_APICBASE,
++	};
++
++	/* vcpu is initialized with xAPIC enabled */
++	ret = __vcpu_ioctl(vcpu, KVM_GET_MSRS, &msr_data.info);
++	TEST_ASSERT(ret == 1, __KVM_IOCTL_ERROR("__vcpu_ioctl", ret));
++	ASSERT_EQ(msr_data.entries[0].data & MSR_IA32_APICBASE_ENABLE,
++		  MSR_IA32_APICBASE_ENABLE);
++	ASSERT_EQ(msr_data.entries[0].data & X2APIC_ENABLE, 0);
++	_test_lapic_id(vcpu, false, id);
++
++	/* enable x2APIC */
++	msr_data.entries[0].data |= X2APIC_ENABLE;
++	ret = __vcpu_ioctl(vcpu, KVM_SET_MSRS, &msr_data.info);
++	TEST_ASSERT(ret == 1, __KVM_IOCTL_ERROR("__vcpu_ioctl", ret));
++	ASSERT_EQ(msr_data.entries[0].data & MSR_IA32_APICBASE_ENABLE,
++		  MSR_IA32_APICBASE_ENABLE);
++	ASSERT_EQ(msr_data.entries[0].data & X2APIC_ENABLE, X2APIC_ENABLE);
++	_test_lapic_id(vcpu, true, id);
++
++	/*
++	 * Check that disabling x2APIC correctly updates the APIC ID to the
++	 * xAPIC format.
++	 */
++	msr_data.entries[0].data ^= X2APIC_ENABLE;
++	ret = __vcpu_ioctl(vcpu, KVM_SET_MSRS, &msr_data.info);
++	TEST_ASSERT(ret == 1, __KVM_IOCTL_ERROR("__vcpu_ioctl", ret));
++	ASSERT_EQ(msr_data.entries[0].data & MSR_IA32_APICBASE_ENABLE,
++		  MSR_IA32_APICBASE_ENABLE);
++	ASSERT_EQ(msr_data.entries[0].data & X2APIC_ENABLE, 0);
++	_test_lapic_id(vcpu, false, id);
++}
++
++#define NCPUS 3
++
+ int main(int argc, char *argv[])
+ {
+ 	struct xapic_vcpu x = {
+@@ -139,6 +195,14 @@ int main(int argc, char *argv[])
+ 		.is_x2apic = true,
+ 	};
+ 	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpus[NCPUS] = { 0 };
++	int i;
++
++	vm = vm_create_with_vcpus(NCPUS, NULL, vcpus);
++	vm_enable_cap(vm, KVM_CAP_X2APIC_API, KVM_X2APIC_API_USE_32BIT_IDS);
++	for (i = 0; i < NCPUS; i++)
++		test_apic_id(vcpus[i], i);
++	kvm_vm_free(vm);
  
- 	if ((old_value ^ value) & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE)) {
- 		kvm_vcpu_update_apicv(vcpu);
+ 	vm = vm_create_with_one_vcpu(&x.vcpu, x2apic_guest_code);
+ 	test_icr(&x);
 -- 
 2.31.1
 
