@@ -2,136 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DF7146633F0
-	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 23:27:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B492663559
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 00:35:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235462AbjAIW1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 17:27:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50480 "EHLO
+        id S234977AbjAIXff (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 18:35:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231220AbjAIW1W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 17:27:22 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2074.outbound.protection.outlook.com [40.107.93.74])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CDF99FC2;
-        Mon,  9 Jan 2023 14:27:20 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GeIE7Y0m1sNau3zTmxiluHS0Z28L1xxJWk2HAcmP8o1tqWS8NU7rVldkGavMjYLPXkTjfSDjtWbJWR71FEhyFob2xgtOfaAbXZS9uTTGA0hhBcs2UdYkW59BTylcLhbbVtDdss7V+l5QXoiBKt+ebXNFosKYuZ3EIuSZr93v4YyYv2io5HYV8BUYDfQUCY0i+bE6P8HLClZcTakOv9o6hK3t4qPU7JE809BB3o6NjU5B4bexL2f0DkSa7fhctI1dNnhZ2MrBw7n/XK8hcw2Na2lx2RaOfNvrjiManDfuMwd/57n2urvYSSNXIqmkkdfsWyuJN4a76q2NaXj02CaaFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GsF9EIfTai5Ogul357Q9HtfHXvGjdUFbGX1hlRuGx/c=;
- b=ggMMnqPLjxntNJ51beBD8/2SxocSkBOy0vQMcJja+418cghn4jQ8kKCMHT1xEaA+YRo9j/saZq3DrW4T9mK+pRnMsyl381cSvdv4p6EasYGgjsZywQ3zNL5psnVwz1zEMgEw4k2qZ9gHoq9a9I8SwhfRZa3747SkqDiqwdXRg7My/X5UVvc62qSc1JvXtY83xKswYCGL4xq5drSL6VhxVC+6hH72SKC5Er9o3RaWRhq+aC6SwGN7DOCICtYoirbizyLHgMqQexq5Qg58G9gvmNtv/5txUgAHyNdIbsOosKxJhMQNhYIIR8AtIIprM7gmotX20StToEkXS8MvfHvDpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GsF9EIfTai5Ogul357Q9HtfHXvGjdUFbGX1hlRuGx/c=;
- b=3K5h3i0TbCcmkMcwnwZTAnswgOyLXrsIF8mNe0aI1BhRVi1m+yGdnDrbILUzU4JfTLAH38vqxhl9CYtm/ZXe0OwY4O7rs1t+Q/jkL3dOCvwDJqqkpJNElRmvJNxUwwuXT1TIodGnKDdZFElFEJJxpY2EtQw+KTEtKE7SHGMray0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by IA1PR12MB8077.namprd12.prod.outlook.com (2603:10b6:208:3f4::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Mon, 9 Jan
- 2023 22:27:17 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::8200:4042:8db4:63d7]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::8200:4042:8db4:63d7%4]) with mapi id 15.20.5986.018; Mon, 9 Jan 2023
- 22:27:17 +0000
-Message-ID: <54ff7326-e3a4-945f-1f60-e73dd8865527@amd.com>
-Date:   Mon, 9 Jan 2023 16:27:12 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
-Content-Language: en-US
-To:     Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-63-michael.roth@amd.com>
- <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
- <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MN2PR15CA0004.namprd15.prod.outlook.com
- (2603:10b6:208:1b4::17) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        with ESMTP id S233794AbjAIXfd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 18:35:33 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9B9112743
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 15:34:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673307279;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=FozQ3/c6RDpTVE/6HP5M15UZWmYfpOpcHl1wdMdjQAg=;
+        b=FFCO6zqSjTIL062oagPiELRXWQTGplSTQE0t2x/lZNGp0FXRQKu3uO6KzCAgdyBBR8Vrpl
+        znLIIxGsS3N3yDoE8tpeUV1ydeNuls3LS8JBIU7g2szuw17mKCC8bv/6p8Y4695o2hEWUO
+        G91BtgJE3TGzDcCmKprUYXTdQsu0Jtg=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-546-cC6GYK8_N-CRghPV_mFe8g-1; Mon, 09 Jan 2023 18:34:39 -0500
+X-MC-Unique: cC6GYK8_N-CRghPV_mFe8g-1
+Received: by mail-io1-f70.google.com with SMTP id y23-20020a056602201700b006e408c1d2a1so5903343iod.1
+        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 15:34:39 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FozQ3/c6RDpTVE/6HP5M15UZWmYfpOpcHl1wdMdjQAg=;
+        b=5puu+5Y32Gt+u+A8wOBaD3OzX0xp31Vl2jHwpmctXfo2X0V4hnjFnfBynS3m5uZ9xr
+         rXLgsC6nHupEkePSL1imalG1bZ6s+kmCuEtfpR21r5G7fmMvC152yjtyYrSI5DTbSWPY
+         uiSM4vwlKmCuz7yGGLO+mzuRk+Ddv27EtnGzygsBJVDfmuxdRLZAfZeW6JizukITmIRC
+         mF27su9RpvKbqMZhBY+g6tsSlZIlttDJsTgKI0jdxDeUoetmLZoFJ2YABC5qakzZTW5Z
+         ZvnJulF6wICs3zBgLduoKTuAWsFwSRkHSGsfedgqfKn1ULG4GdBOp2nOTIrw9U7HA6C9
+         sl+g==
+X-Gm-Message-State: AFqh2kqr0SsOVHGe8wXrbMU0DbsM4H4PCFGRTxidjKPGH7aoXBbfV5DK
+        PIaZ1hjr/FGlCwd8hLklD/uw7hHfYHtGIRra+1bu17zSdULL9Xyvt0bv+VQqfP7Iz0LKuJp4RXN
+        8KW89Z4g+aCHE
+X-Received: by 2002:a5d:9043:0:b0:6e0:58c:fb32 with SMTP id v3-20020a5d9043000000b006e0058cfb32mr47569112ioq.2.1673307277685;
+        Mon, 09 Jan 2023 15:34:37 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvxxbAe0TsNAdKrk8Q3h9bNEzmrl0aiL9ZGXDzoCk4MVPzXVGkLYEdDLSITN+/8NYceFI3/Aw==
+X-Received: by 2002:a5d:9043:0:b0:6e0:58c:fb32 with SMTP id v3-20020a5d9043000000b006e0058cfb32mr47569104ioq.2.1673307277329;
+        Mon, 09 Jan 2023 15:34:37 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id a14-20020a02734e000000b0039e90ba37e3sm707498jae.43.2023.01.09.15.34.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 15:34:36 -0800 (PST)
+Date:   Mon, 9 Jan 2023 16:34:34 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
+        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
+        Yi Liu <yi.l.liu@intel.com>
+Subject: Re: [PATCH] vfio: Support VFIO_NOIOMMU with iommufd
+Message-ID: <20230109163434.6311b4a6.alex.williamson@redhat.com>
+In-Reply-To: <0-v1-5cde901db21d+661fe-iommufd_noiommu_jgg@nvidia.com>
+References: <0-v1-5cde901db21d+661fe-iommufd_noiommu_jgg@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|IA1PR12MB8077:EE_
-X-MS-Office365-Filtering-Correlation-Id: cfb0569a-af58-49af-32e5-08daf290aa40
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EXzQiX7R0+OKLE3mHf6cPB3YErNNb7WwmpvOXFITLqPDX1AHsa9woe4vfLH16xjC7M3bXW6VSeeHWgyv5yZAQM7req0CwdxzFRw6Er1tfXD3ghDFg75AwV22v6/3ESuiGr67CcqJqVDML6E1kKbq6mRlSIdgcqaYoNFTCQloEZ/NyjEP6pivibltGgEZaTX/hIwJtj28HUmIqQI+jtCTJ6QCy+4IcCbsnudeK4Alklkj6kfX4gINvnkvaTKEfvMgffv9CZeE7knkDWc8aoWtfEPnqf/mkBiOHNH5eqgpk55PPcNDJHkr0+vlni1rAFLwK+7+xJiJoSg7l0ddN+9Q/1laKYE3EWqAc5fLLu2VqR1wWwqkYt5X4ogiVIfONKp2IjURIKJBHwNWkrshJ0icpuYSHvN989NGozCjlTltQMj5djo/de6P46ErJauS4ItsTDfAJmn/7pcAOQC+hxsuXHMoetMwGGSHliwNjCQYVYbm8UExqivHcs1Y+TMwW/o6p8Zvh8aZ2ObehwNNYW4oXCOSgG71PFMpRgoe2/hkDp+wZK5geC4Qgg22udsWq0xCbCagajGLfCrubuKW/dIblwlgtqzMDoXaHJAOmD+7aYyUkfQJRLNSGZTUBqKQ4cunW3cKLztExJZTnaLRawzNMD0lIbFOnhWeMj9T+8A7MwyP9jIGYiEjb6BpfGTcRuQkXWbza+XMo09eqtQ+TDLPxLqmIMhQnct+3UZdYrmo+B8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(346002)(136003)(39860400002)(396003)(376002)(451199015)(6506007)(6512007)(186003)(2616005)(6666004)(110136005)(8676002)(86362001)(66556008)(66946007)(38100700002)(66476007)(7406005)(31696002)(4326008)(5660300002)(7416002)(478600001)(36756003)(53546011)(2906002)(31686004)(26005)(316002)(8936002)(41300700001)(83380400001)(6486002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NGhDcXgxWU5oRHNpSzdEZ1JzOHorWGI0UktNQzJYWE84b1g5YzFWNTg2S25E?=
- =?utf-8?B?TDR6ZnBRY2VHaERPOWQ0SVBhZFFSQ1pqQ3BaSm9CT0hwaDdicXhCU1VoT2Jx?=
- =?utf-8?B?U0o5QVFnbWU2bExsVWN3Rmt2S2dlV1RFb0tSdm9ueGZmQmtIaU4vQVphc0U4?=
- =?utf-8?B?eVdNM1R0cVBYNDRDYlpBUWgyNERLempxaEJSNndPUHVDalUwanZBSWc4TGw0?=
- =?utf-8?B?cE9nY1l5cGQwZDBYN2prNlhZOWlLTTZPVnh6d3k1MlF5bGRUQWlwZCtadWk4?=
- =?utf-8?B?N3hOaEszem5nejNiSnBFbEZ3MDk4U2VBQ01ZVXNxZS9ldkxNbFhDY1lRcnQy?=
- =?utf-8?B?SUNITDN1RHYzNGx5YWJjeTlkOXc4YmtPQVh6a0Y5cTFEcGtyMTJ4bStiTXVZ?=
- =?utf-8?B?YTUxZzRlQW1aWlErY0VvbVVRRHNybVRJT1JsM1FGTGpveTROMzl2b2paYThv?=
- =?utf-8?B?M3g2RmRtbGRqdU10ZFhManMreCt6eFc3bGlmcmt4YnhLellOTDN0Ni9QOWlo?=
- =?utf-8?B?bzZScVhaYWR2QTQvYnNOOE5Zb1NWQkhQSVJIVXZhUWJoL1JxaFlTZU50Z2dh?=
- =?utf-8?B?enFXWE1tTHJpRlBsUmVJdG1DV3RONGZpZDVIK0dTd0kwNW1XMmhDNGkwQlpJ?=
- =?utf-8?B?WlQvSHRjVXZDb0owOE5iMmZHb1ZRVGxHSy9SUm82ZUQ5NkFMSVVQbXRmeCs4?=
- =?utf-8?B?SEo3OUxucWVyWEwxMmxWclExcHE3NUdHWERpTUplcmR6NmxZb1VvMjY3UGdQ?=
- =?utf-8?B?djZwd0RWMEluUzMvbW1pZStZUmoxS0Rkazh6VHE2djBkM2h1M3FMMUxMbnVu?=
- =?utf-8?B?VzIvM1U2Z01VTjJPRkh6VlFjWFFLU2UrNjNSSlVYMCt6cFBIanJDME9yZzJu?=
- =?utf-8?B?R256WTRVUGxXUTRGTVhWUU9YYTFBdGUxMVljUzJTNm1iblozSGd5b3p5WjNK?=
- =?utf-8?B?N3UvRTByb1drUXo4Nkl0eDZua3BkQkwzSlRQSGlKZjVGWG9hU3QxWFVITDFB?=
- =?utf-8?B?TElKcndET0FiYXFmV1FyNHpvZEh4VEFabnd5Ylkxa0JuN1lsUWNWNTd4dkk3?=
- =?utf-8?B?SVFzcnZOZVYxUFhoRnd2OVBLcmlIRmFXUFJnaFYyM1diazEvR0gxbSt1K3pK?=
- =?utf-8?B?OXZMRTZsYi9CV2xhdjNRdXRwU3hOL1Y4WTVudzV6Vys5QkNRR3RIN2NrV1lR?=
- =?utf-8?B?STJudUphN05Ib2kxbWplN1NhL05OaHhhK0Ztc2I3Wm96TnduNG5jMFlZTG1h?=
- =?utf-8?B?Z3VJb002RHI3RFFMelJlT1BUdGRxTGJac3d2SzV6THppb2F3Tlh3Q0pqVWNG?=
- =?utf-8?B?Y3oxTk9xTmZjcHhaOFd2ai92WjlXVEk3TFhLdVJ5bnhieHF5NGtKak1uRFdS?=
- =?utf-8?B?NW9lVnkva3BSVTByaDVaaDh6bmtoUkI2L3FLNGFrZVR1eXhsT2hza28wNXZW?=
- =?utf-8?B?M25wa1hRcXo3VTR3bnNLb3E1cE9ydVpkK2NBc1oyMk1ITUFhNCtVTE1GdW1Y?=
- =?utf-8?B?OHJwemJvZmVMMlBiendRY1hQZFVjMVZWUkozczk4YXNPUk0zdTcwTXJHU0ZI?=
- =?utf-8?B?NGhKZFlWRkJialFiUVg5aWZOeEh5OTJWQlpEU2tvdGFWQTV5QklmL0NGdGRY?=
- =?utf-8?B?ZC9OMWtHQzE4YnhhVlMvV2I0WHUvN1haSFFHQWJWSjhEVUF0Wk5sQnhyWkxR?=
- =?utf-8?B?eFRrYUN1SEJKRElxWXcxS1BjNnJzeVpSdmw0YVpIdWRzcE5wbFhqTEZsRG54?=
- =?utf-8?B?bExxQTU0NVllTTZIU2Rvdk01SGR5dStudk5WSktDOXNrK0h6REp6UFZXcUtT?=
- =?utf-8?B?WWpOYlBEYjZZZUJLZGhQeUFnYUw1dXkzWWxUMytIcDVxK1RadzMxdDVmRzZs?=
- =?utf-8?B?SlRZa1BlRGRtV3hIYWQ1NHBlNU0wQTJvNGplQ0JUckRLK0ZLS0JiT3l0WHpF?=
- =?utf-8?B?U0luTnhTUzNOYmhhNkZoSm8wYU9XdHF5bmd5V0E5TXNQK1ZaV1VQY0t3cjBY?=
- =?utf-8?B?MjhnbkVJUUJFTGFyNXdnMFM2OE5WNWtwRnFnS3czcVhOYTNmcjNzczZPOEJQ?=
- =?utf-8?B?WS93cjdVTG1DSklGSWFTNWtEdVozb3JMM3lLQ3dzcEtjQng2QWN2MXVtd3h6?=
- =?utf-8?Q?VWJfKiTj94/839KWlbcL0Oz2n?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cfb0569a-af58-49af-32e5-08daf290aa40
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2023 22:27:17.7672
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Hs7jN8hZr6IOlmILuFFaM0Zkv146Kywfo9HwWG8vwbcTTBHCGCNK6cO2PbJibjT/B8Jl52qkPJoPuVBVqzTdog==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8077
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -139,69 +79,231 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/9/23 10:55, Dionna Amalie Glaze wrote:
->>> +
->>> +static int snp_set_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>> +{
->> [...]
->>
->> Here we set the length to the page-aligned value, but we copy only
->> params.cert_len bytes.  If there are two subsequent
->> snp_set_instance_certs() calls where the second one has a shorter
->> length, we might "keep" some leftover bytes from the first call.
->>
->> Consider:
->> 1. snp_set_instance_certs(certs_addr point to "AAA...", certs_len=8192)
->> 2. snp_set_instance_certs(certs_addr point to "BBB...", certs_len=4097)
->>
->> If I understand correctly, on the second call we'll copy 4097 "BBB..."
->> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
->> 1) & PAGE_MASK which will be 8192.
->>
->> Later when fetching the certs (for the extended report or in
->> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
->> filled with 4097 BBBs and 4095 leftover AAAs.
->>
->> Maybe zero sev->snp_certs_data entirely before writing to it?
->>
-> 
-> Yes, I agree it should be zeroed, at least if the previous length is
-> greater than the new length. Good catch.
-> 
-> 
->> Related question (not only for this patch) regarding snp_certs_data
->> (host or per-instance): why is its size page-aligned at all? why is it
->> limited by 16KB or 20KB? If I understand correctly, for SNP, this buffer
->> is never sent to the PSP.
->>
-> 
-> The buffer is meant to be copied into the guest driver following the
-> GHCB extended guest request protocol. The data to copy back are
-> expected to be in 4K page granularity.
+On Mon,  9 Jan 2023 10:22:59 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-I don't think the data has to be in 4K page granularity. Why do you think 
-it does?
+> Add a small amount of emulation to vfio_compat to accept the SET_IOMMU
+> to VFIO_NOIOMMU_IOMMU and have vfio just ignore iommufd if it is working
+> on a no-iommu enabled device.
+>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  drivers/iommu/iommufd/Kconfig       |  2 +-
+>  drivers/iommu/iommufd/vfio_compat.c | 46 ++++++++++++++++++++++++-----
+>  drivers/vfio/group.c                | 13 ++++----
+>  drivers/vfio/iommufd.c              | 21 ++++++++++++-
+>  include/linux/iommufd.h             |  6 ++--
+>  5 files changed, 70 insertions(+), 18 deletions(-)
+> 
+> This needs a testing confirmation with dpdk to go forward, thanks
 
-Thanks,
-Tom
+How do we create a noiommu group w/o the vfio_noiommu flag that's
+provided by container.c?  Even without dpdk, you should be able to turn
+off the system IOMMU and get something bound to vfio-pci that still
+taints the kernel and provides a noiommu-%d group under /dev/vfio/.
+There's a rudimentary unit test for noiommu here[1].  Thanks,
 
+Alex
+
+[1]https://github.com/awilliam/tests/blob/master/vfio-noiommu-pci-device-open.c
+
+> diff --git a/drivers/iommu/iommufd/Kconfig b/drivers/iommu/iommufd/Kconfig
+> index 8306616b6d8198..ada693ea51a78e 100644
+> --- a/drivers/iommu/iommufd/Kconfig
+> +++ b/drivers/iommu/iommufd/Kconfig
+> @@ -23,7 +23,7 @@ config IOMMUFD_VFIO_CONTAINER
+>  	  removed.
+>  
+>  	  IOMMUFD VFIO container emulation is known to lack certain features
+> -	  of the native VFIO container, such as no-IOMMU support, peer-to-peer
+> +	  of the native VFIO container, such as peer-to-peer
+>  	  DMA mapping, PPC IOMMU support, as well as other potentially
+>  	  undiscovered gaps.  This option is currently intended for the
+>  	  purpose of testing IOMMUFD with unmodified userspace supporting VFIO
+> diff --git a/drivers/iommu/iommufd/vfio_compat.c b/drivers/iommu/iommufd/vfio_compat.c
+> index 3ceca0e8311c39..6c8e5dc1c221f4 100644
+> --- a/drivers/iommu/iommufd/vfio_compat.c
+> +++ b/drivers/iommu/iommufd/vfio_compat.c
+> @@ -26,16 +26,35 @@ static struct iommufd_ioas *get_compat_ioas(struct iommufd_ctx *ictx)
+>  }
+>  
+>  /**
+> - * iommufd_vfio_compat_ioas_id - Return the IOAS ID that vfio should use
+> + * iommufd_vfio_compat_ioas_get_id - Ensure a comat IOAS exists
+> + * @ictx: Context to operate on
+> + *
+> + * Return the ID of the current compatibility ioas. The ID can be passed into
+> + * other functions that take an ioas_id.
+> + */
+> +int iommufd_vfio_compat_ioas_get_id(struct iommufd_ctx *ictx, u32 *out_ioas_id)
+> +{
+> +	struct iommufd_ioas *ioas;
+> +
+> +	ioas = get_compat_ioas(ictx);
+> +	if (IS_ERR(ioas))
+> +		return PTR_ERR(ioas);
+> +	*out_ioas_id = ioas->obj.id;
+> +	iommufd_put_object(&ioas->obj);
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(iommufd_vfio_compat_ioas_get_id, IOMMUFD_VFIO);
+> +
+> +/**
+> + * iommufd_vfio_compat_ioas_create_id - Return the IOAS ID that vfio should use
+>   * @ictx: Context to operate on
+> - * @out_ioas_id: The ioas_id the caller should use
+>   *
+>   * The compatibility IOAS is the IOAS that the vfio compatibility ioctls operate
+>   * on since they do not have an IOAS ID input in their ABI. Only attaching a
+> - * group should cause a default creation of the internal ioas, this returns the
+> - * existing ioas if it has already been assigned somehow.
+> + * group should cause a default creation of the internal ioas, this does nothing
+> + * if an existing ioas has already been assigned somehow.
+>   */
+> -int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx, u32 *out_ioas_id)
+> +int iommufd_vfio_compat_ioas_create_id(struct iommufd_ctx *ictx)
+>  {
+>  	struct iommufd_ioas *ioas = NULL;
+>  	struct iommufd_ioas *out_ioas;
+> @@ -53,7 +72,6 @@ int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx, u32 *out_ioas_id)
+>  	}
+>  	xa_unlock(&ictx->objects);
+>  
+> -	*out_ioas_id = out_ioas->obj.id;
+>  	if (out_ioas != ioas) {
+>  		iommufd_put_object(&out_ioas->obj);
+>  		iommufd_object_abort(ictx, &ioas->obj);
+> @@ -68,7 +86,7 @@ int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx, u32 *out_ioas_id)
+>  	iommufd_object_finalize(ictx, &ioas->obj);
+>  	return 0;
+>  }
+> -EXPORT_SYMBOL_NS_GPL(iommufd_vfio_compat_ioas_id, IOMMUFD_VFIO);
+> +EXPORT_SYMBOL_NS_GPL(iommufd_vfio_compat_ioas_create_id, IOMMUFD_VFIO);
+>  
+>  int iommufd_vfio_ioas(struct iommufd_ucmd *ucmd)
+>  {
+> @@ -235,6 +253,9 @@ static int iommufd_vfio_check_extension(struct iommufd_ctx *ictx,
+>  	case VFIO_UNMAP_ALL:
+>  		return 1;
+>  
+> +	case VFIO_NOIOMMU_IOMMU:
+> +	return IS_ENABLED(CONFIG_VFIO_NOIOMMU);
+> +
+>  	case VFIO_DMA_CC_IOMMU:
+>  		return iommufd_vfio_cc_iommu(ictx);
+>  
+> @@ -264,6 +285,17 @@ static int iommufd_vfio_set_iommu(struct iommufd_ctx *ictx, unsigned long type)
+>  	struct iommufd_ioas *ioas = NULL;
+>  	int rc = 0;
+>  
+> +	/*
+> +	 * Emulation for NOIMMU is imperfect in that VFIO blocks almost all
+> +	 * other ioctls. We let them keep working but they mostly fail since no
+> +	 * IOAS should exist.
+> +	 */
+> +	if (IS_ENABLED(CONFIG_VFIO_NOIOMMU) && type == VFIO_NOIOMMU_IOMMU) {
+> +		if (!capable(CAP_SYS_RAWIO))
+> +			return -EPERM;
+> +		return 0;
+> +	}
+> +
+>  	if (type != VFIO_TYPE1_IOMMU && type != VFIO_TYPE1v2_IOMMU)
+>  		return -EINVAL;
+>  
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index bb24b2f0271e03..0f2a483a1f3bdb 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -133,12 +133,13 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
+>  
+>  	iommufd = iommufd_ctx_from_file(f.file);
+>  	if (!IS_ERR(iommufd)) {
+> -		u32 ioas_id;
+> -
+> -		ret = iommufd_vfio_compat_ioas_id(iommufd, &ioas_id);
+> -		if (ret) {
+> -			iommufd_ctx_put(group->iommufd);
+> -			goto out_unlock;
+> +		if (!IS_ENABLED(CONFIG_VFIO_NO_IOMMU) ||
+> +		    group->type != VFIO_NO_IOMMU) {
+> +			ret = iommufd_vfio_compat_ioas_create_id(iommufd);
+> +			if (ret) {
+> +				iommufd_ctx_put(group->iommufd);
+> +				goto out_unlock;
+> +			}
+>  		}
+>  
+>  		group->iommufd = iommufd;
+> diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
+> index 4f82a6fa7c6c7f..da50feb24b6e1d 100644
+> --- a/drivers/vfio/iommufd.c
+> +++ b/drivers/vfio/iommufd.c
+> @@ -18,6 +18,21 @@ int vfio_iommufd_bind(struct vfio_device *vdev, struct iommufd_ctx *ictx)
+>  
+>  	lockdep_assert_held(&vdev->dev_set->lock);
+>  
+> +	if (IS_ENABLED(CONFIG_VFIO_NO_IOMMU) &&
+> +	    vdev->group->type == VFIO_NO_IOMMU) {
+> +		if (!capable(CAP_SYS_RAWIO))
+> +			return -EPERM;
+> +
+> +		/*
+> +		 * Require no compat ioas to be assigned to proceed. The basic
+> +		 * statement is that the user cannot have done something that
+> +		 * implies they expected translation to exist
+> +		 */
+> +		if (!iommufd_vfio_compat_ioas_get_id(ictx, &ioas_id))
+> +			return -EPERM;
+> +		return 0;
+> +	}
+> +
+>  	/*
+>  	 * If the driver doesn't provide this op then it means the device does
+>  	 * not do DMA at all. So nothing to do.
+> @@ -29,7 +44,7 @@ int vfio_iommufd_bind(struct vfio_device *vdev, struct iommufd_ctx *ictx)
+>  	if (ret)
+>  		return ret;
+>  
+> -	ret = iommufd_vfio_compat_ioas_id(ictx, &ioas_id);
+> +	ret = iommufd_vfio_compat_ioas_get_id(ictx, &ioas_id);
+>  	if (ret)
+>  		goto err_unbind;
+>  	ret = vdev->ops->attach_ioas(vdev, &ioas_id);
+> @@ -52,6 +67,10 @@ void vfio_iommufd_unbind(struct vfio_device *vdev)
+>  {
+>  	lockdep_assert_held(&vdev->dev_set->lock);
+>  
+> +	if (IS_ENABLED(CONFIG_VFIO_NO_IOMMU) &&
+> +	    vdev->group->type == VFIO_NO_IOMMU)
+> +		return;
+> +
+>  	if (vdev->ops->unbind_iommufd)
+>  		vdev->ops->unbind_iommufd(vdev);
+>  }
+> diff --git a/include/linux/iommufd.h b/include/linux/iommufd.h
+> index 650d45629647a7..9d1afd417215d0 100644
+> --- a/include/linux/iommufd.h
+> +++ b/include/linux/iommufd.h
+> @@ -57,7 +57,8 @@ void iommufd_access_unpin_pages(struct iommufd_access *access,
+>  				unsigned long iova, unsigned long length);
+>  int iommufd_access_rw(struct iommufd_access *access, unsigned long iova,
+>  		      void *data, size_t len, unsigned int flags);
+> -int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx, u32 *out_ioas_id);
+> +int iommufd_vfio_compat_ioas_get_id(struct iommufd_ctx *ictx, u32 *out_ioas_id);
+> +int iommufd_vfio_compat_ioas_create_id(struct iommufd_ctx *ictx);
+>  #else /* !CONFIG_IOMMUFD */
+>  static inline struct iommufd_ctx *iommufd_ctx_from_file(struct file *file)
+>  {
+> @@ -89,8 +90,7 @@ static inline int iommufd_access_rw(struct iommufd_access *access, unsigned long
+>  	return -EOPNOTSUPP;
+>  }
+>  
+> -static inline int iommufd_vfio_compat_ioas_id(struct iommufd_ctx *ictx,
+> -					      u32 *out_ioas_id)
+> +static inline int iommufd_vfio_compat_ioas_create_id(struct iommufd_ctx *ictx)
+>  {
+>  	return -EOPNOTSUPP;
+>  }
 > 
->> [...]
->>>
->>> -#define SEV_FW_BLOB_MAX_SIZE 0x4000  /* 16KB */
->>> +#define SEV_FW_BLOB_MAX_SIZE 0x5000  /* 20KB */
->>>
->>
->> This has effects in drivers/crypto/ccp/sev-dev.c
->>                                                                 (for
->> example in alloc_snp_host_map).  Is that OK?
->>
-> 
-> No, this was a mistake of mine because I was using a bloated data
-> encoding that needed 5 pages for the GUID table plus 4 small
-> certificates. I've since fixed that in our user space code.
-> We shouldn't change this size and instead wait for a better size
-> negotiation protocol between the guest and host to avoid this awkward
-> hard-coding.
-> 
-> 
+> base-commit: 88603b6dc419445847923fcb7fe5080067a30f98
+
