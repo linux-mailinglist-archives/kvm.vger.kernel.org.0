@@ -2,64 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5F783662F77
-	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 19:47:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 41E2D662F97
+	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 19:56:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237298AbjAISr0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 13:47:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36536 "EHLO
+        id S235359AbjAIS4P (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 13:56:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237227AbjAISrY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 13:47:24 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6166B1A067
-        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 10:47:23 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id qk9so22516131ejc.3
-        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 10:47:23 -0800 (PST)
+        with ESMTP id S235188AbjAIS4O (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 13:56:14 -0500
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCF171408F
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 10:56:12 -0800 (PST)
+Received: by mail-yb1-xb32.google.com with SMTP id e76so9429385ybh.11
+        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 10:56:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=VSLCkgRxPXWXMTSkxLq4wqVTmi1HEC8Jc15sBo3hsxU=;
-        b=o6BX2rq01AVrJKPxEo13bfQkBfaDVMK+QbxAZSUlU2ecB54iCbjdCSG/9fRT4kFNR2
-         9Lkpw/ICRmplQursH2brjIrKyYwCMpcFPev81YyObFN37wUnSCI71Ox2hF7eGH0utLtc
-         PThzAHjJOFWiayUCPbqXLzIFGQ56l0tXJlLjxOdoRMZCn26Q8k5l9UFKaOWefkIOPEAf
-         /1cF/mCknvjFeS2vQGJqGj/pQm3H6+SD49oR5WHqXTjkyqa1GPJzfPzWTQrzs1ggwodi
-         S+MATMuYeJWMpXltu/DRtnz7+En9Ji0pGPt2Awnp6+zFRAfITvjMTM9jRacUJbHg9rTd
-         6lOQ==
+        bh=npK1pVWS9Y7zSvO0nWYdwcAA7TbeGlnyEckY5HPb/Qg=;
+        b=EHKm0/F2buMoOsKhjWg0lWsOuJldy/zfoO9SoYjwOUBjEtYFI7vDu+I5lwSpjMbW6Z
+         3ObtFaGnVjmdcg2O2Aret0FZO2bn7yqTJbEhANZLCO7TmNFgRBE+1H+8TwiSfzm06+sv
+         NoXn+BRIUqVauOHPZ13p93njC8trw+pKMvKGKG+JOay5G96uMzNCvp6yocnoligPU/KG
+         nsT5KAmMgHERAldXeigMGDd8xVH2mvsfpS/FV/+f0V+6HxueWNzcx2CaGaqz8pAq/Qe/
+         1IhIl/jFSe8NXCzMDt2iiVq0nAJOXzbL0gSR4VpeaFp+Z0f01ufRbR7OxltlcKWyJfdN
+         GLKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=VSLCkgRxPXWXMTSkxLq4wqVTmi1HEC8Jc15sBo3hsxU=;
-        b=l+3mhM0tc3TlgnVpptf7xtu+n/RXWWOmysTBrAjzNReByIvvd/kqhGOPNymXYrRtli
-         /Aj+z96CIoMJ8j1hXpHBu4NvmmvKlTZoIVFtJMnuLpiNju19EOPMpWppIrhHLrzYuDil
-         iVex9h08CGEwZ7n36P+wZfauFa4mkj0UVMU8wrM/kyPAz3FEKr3uUJqx7ZtkUBbJSAdB
-         uYp2f1zlGuXuYoh6ngkBWzyHV7uUvr60NcScBjkH6qiigzj4kiUcSf72lkMyQaHkRRRb
-         Z/3PLBBqS/FIhTnPL7jyn9duPkUYm+n9CQ4kCoO+3gebKdA68QngJyqks/TNPGIM0WOu
-         Vk+Q==
-X-Gm-Message-State: AFqh2kpzXqHyhAl0If3gyBt0KoOt8XXXtn+K+Yzys9BOqkk6FJN0pTvL
-        JWvbKEKFYzSlET6RtRqb6F4nXqJL/wsOWyurB4Pj2g==
-X-Google-Smtp-Source: AMrXdXvo5wUENKzrMfZI2ewVd2Uu0zsa5mESC6RMQY0/fFvr0uUuVvcJd9KHpXWwQiPUSV+TO9DbGaRFNbFPr9Tk4qw=
-X-Received: by 2002:a17:907:91cd:b0:854:cd76:e982 with SMTP id
- h13-20020a17090791cd00b00854cd76e982mr46397ejz.364.1673290041879; Mon, 09 Jan
- 2023 10:47:21 -0800 (PST)
+        bh=npK1pVWS9Y7zSvO0nWYdwcAA7TbeGlnyEckY5HPb/Qg=;
+        b=VqA6kEBAqhtwzGVWVc/ZgkTEXuxjIEABPzwVIG3ToQbC2LqpIBwKXsJ2np/udD7oH6
+         79MLYk+G+mEN7RlWVtErB99dQ86DYhsF2jICNSdd/KxYElGCMrpIp5mz6aAGAIQy4u+D
+         IbXdg6Vi93eA+E1/zPeFzvVJ4ZL+EQNAA4gaipYOnS62BJ20hK5bsSP36al8gqE5MARe
+         Fxz4yrpJsE9n5NlsmwbQqhI0Vgxv/VWloFdh+6qK9OxUew72ebHqBb1WD9f7JDhcjU3C
+         5Qb+PQZrGn2fC7bCj477iD+JMKhqPksZnvp1QsiQ9X9FHU6sQxH0iJDv1RSiBz3iq9St
+         qJKw==
+X-Gm-Message-State: AFqh2komxvr2a5dufKq7cHAoPsAHmeCBLHtMaHFXp75btYPZyJ48amgD
+        eiXBfe/TvoZM7x3ox33z/gG2Z7f4GSnAbxyRlzPYyQ==
+X-Google-Smtp-Source: AMrXdXuGuwlSiliqUzNPwuP95duqjm2wzwipEY34JM0d62JWS00zM7bbMqGhGQDGetcNhy7upYl68Cx0Wdx6BZEJfKU=
+X-Received: by 2002:a5b:1c8:0:b0:6fe:46c9:7479 with SMTP id
+ f8-20020a5b01c8000000b006fe46c97479mr7514517ybp.191.1673290571936; Mon, 09
+ Jan 2023 10:56:11 -0800 (PST)
 MIME-Version: 1.0
-References: <20221221222418.3307832-1-bgardon@google.com> <20221221222418.3307832-5-bgardon@google.com>
- <Y7h7QPI5YcJ/FO02@google.com>
-In-Reply-To: <Y7h7QPI5YcJ/FO02@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Mon, 9 Jan 2023 10:47:10 -0800
-Message-ID: <CANgfPd8uOgTTF4whwyYw_CWnBhUahAauEryVHmFAL2wZNpwR8w@mail.gmail.com>
-Subject: Re: [RFC 04/14] KVM: x86/MMU: Expose functions for paging_tmpl.h
-To:     David Matlack <dmatlack@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
+References: <20221208193857.4090582-1-dmatlack@google.com> <20221208193857.4090582-11-dmatlack@google.com>
+ <ce1ea196-d854-18bd-0e60-91985ed5aaea@redhat.com>
+In-Reply-To: <ce1ea196-d854-18bd-0e60-91985ed5aaea@redhat.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Mon, 9 Jan 2023 10:55:45 -0800
+Message-ID: <CALzav=fVbvKQMhSBD0AdrRTH+jDyRG0Hf5M-H7vCtRCR1Lk9sw@mail.gmail.com>
+Subject: Re: [RFC PATCH 10/37] KVM: MMU: Move struct kvm_page_fault to common code
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
         Sean Christopherson <seanjc@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Nagareddy Reddy <nspreddy@google.com>
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Nadav Amit <namit@vmware.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
+        Colin Cross <ccross@google.com>,
+        Hugh Dickins <hughd@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
@@ -72,81 +98,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 6, 2023 at 11:49 AM David Matlack <dmatlack@google.com> wrote:
+On Mon, Dec 12, 2022 at 2:27 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
-> On Wed, Dec 21, 2022 at 10:24:08PM +0000, Ben Gardon wrote:
-> > In preparation for moving paging_tmpl.h to shadow_mmu.c, expose various
-> > functions it needs through mmu_internal.h. This includes modifying the
-> > BUILD_MMU_ROLE_ACCESSOR macro so that it does not automatically include
-> > the static label, since some but not all of the accessors are needed by
-> > paging_tmpl.h.
-> >
-> > No functional change intended.
-> >
-> > Signed-off-by: Ben Gardon <bgardon@google.com>
-> > ---
-> >  arch/x86/kvm/mmu/mmu.c          | 32 ++++++++++++++++----------------
-> >  arch/x86/kvm/mmu/mmu_internal.h | 16 ++++++++++++++++
-> >  2 files changed, 32 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> > index bf14e181eb12..a17e8a79e4df 100644
-> > --- a/arch/x86/kvm/mmu/mmu.c
-> > +++ b/arch/x86/kvm/mmu/mmu.c
-> > @@ -153,18 +153,18 @@ BUILD_MMU_ROLE_REGS_ACCESSOR(efer, lma, EFER_LMA);
-> >   * and the vCPU may be incorrect/irrelevant.
-> >   */
-> >  #define BUILD_MMU_ROLE_ACCESSOR(base_or_ext, reg, name)              \
-> > -static inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)     \
-> > +inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)    \
-> >  {                                                            \
-> >       return !!(mmu->cpu_role. base_or_ext . reg##_##name);   \
-> >  }
-> >  BUILD_MMU_ROLE_ACCESSOR(base, cr0, wp);
-> > -BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
-> > +static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
-> >  BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smep);
-> > -BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
-> > -BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
-> > -BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
-> > +static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
-> > +static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
-> > +static BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
-> >  BUILD_MMU_ROLE_ACCESSOR(base, efer, nx);
-> > -BUILD_MMU_ROLE_ACCESSOR(ext,  efer, lma);
-> > +static BUILD_MMU_ROLE_ACCESSOR(ext,  efer, lma);
+> On 12/8/22 20:38, David Matlack wrote:
+> > +
+> > +     /* Derived from mmu and global state.  */
+> > +     const bool is_tdp;
 >
-> Suggest moving all the BUILD_MMU_ROLE*() macros to mmu_internal.h, since
-> they are already static inline. That would be a cleaner patch and reduce
-> future churn if shadow_mmu.c ever needs to use a different role accessor
-> at some point.
+> I think this could stay in the architecture-independent part.
 
-That sounds reasonable. Will do in V1.
-
->
-> >
-> >  static inline bool is_cr0_pg(struct kvm_mmu *mmu)
-> >  {
-> > @@ -210,7 +210,7 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
-> >       kvm_flush_remote_tlbs_with_range(kvm, &range);
-> >  }
-> >
-> > -static gfn_t get_mmio_spte_gfn(u64 spte)
-> > +gfn_t get_mmio_spte_gfn(u64 spte)
-> >  {
-> >       u64 gpa = spte & shadow_nonpresent_or_rsvd_lower_gfn_mask;
-> >
-> > @@ -240,7 +240,7 @@ static bool check_mmio_spte(struct kvm_vcpu *vcpu, u64 spte)
-> >       return likely(kvm_gen == spte_gen);
-> >  }
-> >
-> > -static int is_cpuid_PSE36(void)
-> > +int is_cpuid_PSE36(void)
-> >  {
-> >       return 1;
-> >  }
->
-> Can we just drop is_cpuid_PSE36(), e.g. as a precursor patch? It just
-> returns 1...
-
-Yeah, good idea. Looks like we can eliminate a little dead code doing that too.
+I agree but until there's a use case for accessing it in common code
+I'm inclined to leave it in x86's kvm_page_fault_arch.
