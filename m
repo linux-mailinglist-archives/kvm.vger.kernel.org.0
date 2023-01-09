@@ -2,91 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7F97A662ABC
-	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 17:03:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D4BE5662AD7
+	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 17:08:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234855AbjAIQDz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 11:03:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42660 "EHLO
+        id S235943AbjAIQIW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 11:08:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231341AbjAIQDw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 11:03:52 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9AD31D0D4;
-        Mon,  9 Jan 2023 08:03:50 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 309FL7Xc015963;
-        Mon, 9 Jan 2023 16:03:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=foMnHzTcJhE1OB25m5g2nN/Qijb9TqQf2o1tQuw9Dac=;
- b=sTR4ZxQlqjqlT88dFiweZBW+z7dOsNcyH0Mj+jCVquhb8IFZOiOcvRy97zN0McZiYwTP
- 47uyAOp6yjN6GTLX8XeZ79hiLYhzxdRQLKrk8XEJRAfOGYj8FRpZZk/Cz6uoVpPUBkUR
- TQnoJaSVtNkS+qC36m/5bBlv3g//klBTzUQH4lQHrTiZUHedB8x1laiY171lmezqHtsu
- tL/clSnxtGqsOqdZKT25V4rqvJdejCn1OJgAjJTTFSjwi8sBjGn1bJMyL2rZU73STmmQ
- dMOKHGV+MV++BsSxKmmLKWtSP1jMv81M2HVnu2Xiq03+TFGb/fPUfOsCmKIEDFRBTVFp UQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3myj6jjpqv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Jan 2023 16:03:50 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 309FtOkI024134;
-        Mon, 9 Jan 2023 16:03:49 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3myj6jjpp9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Jan 2023 16:03:49 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3098ti3b024704;
-        Mon, 9 Jan 2023 16:03:47 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3my0c6k665-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Jan 2023 16:03:47 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 309G3hmO49152340
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Jan 2023 16:03:43 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A6AFE20049;
-        Mon,  9 Jan 2023 16:03:43 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1BA3C20043;
-        Mon,  9 Jan 2023 16:03:43 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.179.4.251])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-        Mon,  9 Jan 2023 16:03:43 +0000 (GMT)
-Date:   Mon, 9 Jan 2023 17:03:41 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Heiko Carstens <hca@linux.ibm.com>
-Cc:     Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] KVM: s390: interrupt: use READ_ONCE() before
- cmpxchg()
-Message-ID: <20230109170341.6d3edc7b@p-imbrenda>
-In-Reply-To: <20230109145456.2895385-1-hca@linux.ibm.com>
-References: <20230109145456.2895385-1-hca@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5T46g9dGXCgn6OyAowMtmuMtyNQ7Z96M
-X-Proofpoint-GUID: SqoaB9pIu61Qn1_q_Bvu7ue_YjBHWEbu
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-09_09,2023-01-09_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- lowpriorityscore=0 mlxlogscore=844 phishscore=0 adultscore=0 mlxscore=0
- suspectscore=0 impostorscore=0 priorityscore=1501 bulkscore=0 spamscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301090116
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        with ESMTP id S237239AbjAIQIR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 11:08:17 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46F7B3AAB9
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 08:08:15 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id 12-20020a62160c000000b005808c2cd0b6so3674156pfw.12
+        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 08:08:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=xyECd1rsW3exJndECu8q+ev3KdOyDWWEbigO77NqdCk=;
+        b=kdlmONTLmbqdAZs/NBYP9jUdOxLAvA9jdwZbpjHZ3tHyjKxTjfuYCoDYum07dI89m+
+         QA/38bTswLYyeXsN3mwxQyODhROjF+E9OSa+b5n97FSe7w+0ZmqtrE/RjlL9NqxaHuz3
+         CRMS65fzgV2Qdurg0/02eiWhqj8bUG5iObMSWz+AFwR+TTc0yH30HL5Ygupu9JDCxzx7
+         vXXo16GwV7Lw54C1yComnMOTMBkzkm3Uu8vjLepmcAGGJvEMaRhdqT3JvZAjXcLPbl3Q
+         8V4xupbRgxh9G8haSYFa/ZQow09ZZYa7EG/tKB7LxTa5ns9ZKgc6nJ78eKvktKo/tRWO
+         GrPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:mime-version:message-id:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xyECd1rsW3exJndECu8q+ev3KdOyDWWEbigO77NqdCk=;
+        b=f6T41KHQaMP8LTOzBAhk0jEdPE5Phy7QH3IRwZaW7s5R5u302H3BXedYAJS3TvxniI
+         G6JzoyiQbedV7mPb+1tynoMLT7BHbkpvRBYWdP+Uf/1UY+OrrCXiFiikqGxV8sgFt+Vj
+         apWLVdC0Sg2m4loVr1RupKG6KCFG9baP6vOqIAV6hWHDRSU6sM/LqX/s5kzn9/ilNVgB
+         k30FRqyELiRVFAeuFLU7seSVFG3yN1N6a957ekPtbyEhQMoUClD0o6Jjb+mRxNo1rpDa
+         YV4h48XszornuvGy+d4KggsBg90Ic62RqswUFjHcK9eN6MbfwRaMq/KxsBsyVkuZsPDu
+         2IVg==
+X-Gm-Message-State: AFqh2krLzdfJ/NmGWXbSYZF8989PDoNxyORAx6LLQQAGNfBgtY4XCG+K
+        HZ0if5P2SU3QBhP7fRzNdd8liEITBCdbxIpby456kdfCvB6bq1Ga/XRZlQfn1VJPIOzrkZgMVyw
+        A+kL4kG72Cr/yxapS7nhHWnXk1vsdmjHxDi/FCDLjileYVxwm1eUYZRHRtQ==
+X-Google-Smtp-Source: AMrXdXtfd2sfBIxNw+Rxy/KydCOZGP1eQYUZB45FYydRThzpSXrCW/RZvZm+D+uYBJzZ6R3Ukg06UrfuG1g=
+X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:ca:b043:174:2b96])
+ (user=pgonda job=sendgmr) by 2002:a17:902:8213:b0:192:a805:29d with SMTP id
+ x19-20020a170902821300b00192a805029dmr2217114pln.31.1673280494640; Mon, 09
+ Jan 2023 08:08:14 -0800 (PST)
+Date:   Mon,  9 Jan 2023 08:08:08 -0800
+Message-Id: <20230109160808.3618132-1-pgonda@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Subject: [PATCH] KVM: sev: Fix int overflow in send|recieve_update_data ioctls
+From:   Peter Gonda <pgonda@google.com>
+To:     kvm@vger.kernel.org
+Cc:     Peter Gonda <pgonda@google.com>, Andy Nguyen <theflow@google.com>,
+        Thomas Lendacky <thomas.lendacky@amd.com>,
+        David Rientjes <rientjes@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        stable@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,68 +70,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon,  9 Jan 2023 15:54:56 +0100
-Heiko Carstens <hca@linux.ibm.com> wrote:
+KVM_SEV_SEND_UPDATE_DATA and KVM_SEV_RECEIVE_UPDATE_DATA have an integer
+overflow issue. Params.guest_len and offset are both 32bite wide, with a
+large params.guest_len the check to confirm a page boundary is not
+crossed can falsely pass:
 
-> Use READ_ONCE() before cmpxchg() to prevent that the compiler generates
-> code that fetches the to be compared old value several times from memory.
-> 
-> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
+    /* Check if we are crossing the page boundary *
+    offset = params.guest_uaddr & (PAGE_SIZE - 1);
+    if ((params.guest_len + offset > PAGE_SIZE))
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Add an additional check to this conditional to confirm that
+params.guest_len itself is not greater than PAGE_SIZE.
 
-> ---
-> 
-> v2: make it compile
-> 
-> arch/s390/kvm/interrupt.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-> index 1dae78deddf2..ab26aa53ee37 100644
-> --- a/arch/s390/kvm/interrupt.c
-> +++ b/arch/s390/kvm/interrupt.c
-> @@ -83,8 +83,9 @@ static int sca_inject_ext_call(struct kvm_vcpu *vcpu, int src_id)
->  		struct esca_block *sca = vcpu->kvm->arch.sca;
->  		union esca_sigp_ctrl *sigp_ctrl =
->  			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
-> -		union esca_sigp_ctrl new_val = {0}, old_val = *sigp_ctrl;
-> +		union esca_sigp_ctrl new_val = {0}, old_val;
->  
-> +		old_val = READ_ONCE(*sigp_ctrl);
->  		new_val.scn = src_id;
->  		new_val.c = 1;
->  		old_val.c = 0;
-> @@ -95,8 +96,9 @@ static int sca_inject_ext_call(struct kvm_vcpu *vcpu, int src_id)
->  		struct bsca_block *sca = vcpu->kvm->arch.sca;
->  		union bsca_sigp_ctrl *sigp_ctrl =
->  			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
-> -		union bsca_sigp_ctrl new_val = {0}, old_val = *sigp_ctrl;
-> +		union bsca_sigp_ctrl new_val = {0}, old_val;
->  
-> +		old_val = READ_ONCE(*sigp_ctrl);
->  		new_val.scn = src_id;
->  		new_val.c = 1;
->  		old_val.c = 0;
-> @@ -126,16 +128,18 @@ static void sca_clear_ext_call(struct kvm_vcpu *vcpu)
->  		struct esca_block *sca = vcpu->kvm->arch.sca;
->  		union esca_sigp_ctrl *sigp_ctrl =
->  			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
-> -		union esca_sigp_ctrl old = *sigp_ctrl;
-> +		union esca_sigp_ctrl old;
->  
-> +		old = READ_ONCE(*sigp_ctrl);
->  		expect = old.value;
->  		rc = cmpxchg(&sigp_ctrl->value, old.value, 0);
->  	} else {
->  		struct bsca_block *sca = vcpu->kvm->arch.sca;
->  		union bsca_sigp_ctrl *sigp_ctrl =
->  			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
-> -		union bsca_sigp_ctrl old = *sigp_ctrl;
-> +		union bsca_sigp_ctrl old;
->  
-> +		old = READ_ONCE(*sigp_ctrl);
->  		expect = old.value;
->  		rc = cmpxchg(&sigp_ctrl->value, old.value, 0);
->  	}
+The current code is can only overflow with a params.guest_len of greater
+than 0xfffff000. And the FW spec says these commands fail with lengths
+greater than 16KB. So this issue should not be a security concern
+
+Fixes: 15fb7de1a7f5 ("KVM: SVM: Add KVM_SEV_RECEIVE_UPDATE_DATA command")
+Fixes: d3d1af85e2c7 ("KVM: SVM: Add KVM_SEND_UPDATE_DATA command")
+Reported-by: Andy Nguyen <theflow@google.com>
+Suggested-by: Thomas Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Peter Gonda <pgonda@google.com>
+Cc: David Rientjes <rientjes@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org
+Cc: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ arch/x86/kvm/svm/sev.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 273cba809328..9451de72f917 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -1294,7 +1294,7 @@ static int sev_send_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	/* Check if we are crossing the page boundary */
+ 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
+-	if ((params.guest_len + offset > PAGE_SIZE))
++	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset > PAGE_SIZE))
+ 		return -EINVAL;
+ 
+ 	/* Pin guest memory */
+@@ -1474,7 +1474,7 @@ static int sev_receive_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+ 
+ 	/* Check if we are crossing the page boundary */
+ 	offset = params.guest_uaddr & (PAGE_SIZE - 1);
+-	if ((params.guest_len + offset > PAGE_SIZE))
++	if (params.guest_len > PAGE_SIZE || (params.guest_len + offset > PAGE_SIZE))
+ 		return -EINVAL;
+ 
+ 	hdr = psp_copy_user_blob(params.hdr_uaddr, params.hdr_len);
+-- 
+2.39.0.314.g84b9a713c41-goog
 
