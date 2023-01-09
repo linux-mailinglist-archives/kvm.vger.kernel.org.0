@@ -2,110 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8FA5D663034
-	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 20:22:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6FB4C66306B
+	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 20:32:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235146AbjAITWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 14:22:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58292 "EHLO
+        id S237494AbjAITcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 14:32:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234934AbjAITWb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 14:22:31 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 221436C2BE;
-        Mon,  9 Jan 2023 11:22:30 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8D44C61115;
-        Mon,  9 Jan 2023 19:22:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCC67C433EF;
-        Mon,  9 Jan 2023 19:22:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673292148;
-        bh=htbtetKp6LvDEmtxfygdNB2SYbLgZM+2mVnnjewbqS4=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=Au6Y+DeU+7zTdmR/w13Bb2913aWfnKsrBWT0WL1Y3humfk2O8vXhFYp79RSotXbeO
-         UyA5cheMgKBO9b7e8zwAffWSNfK4JxvxGqoR76OjH9KY66SzDyhFppU39clTt4MaiC
-         qdRyxEhFg6DtGiHRp3jWinivHMTG8QYQe2NnenFmxXniV81gj2w3TxzfrP2eL4J+bl
-         p3/55maqNVSYx+05YCUYY0qUAwPMGCF6z7XJ2CVIZz9fhAnO1Je5mjinxq9OTCNEX6
-         Jf8n4BNeHBZXif/YbFp+0DEKuVrGf++Gw8sfTHQw8y3fqwZT7iq1kEzZrHqnQ6V+VY
-         tGsnWVp5c+L2Q==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 78CF65C05C8; Mon,  9 Jan 2023 11:22:28 -0800 (PST)
-Date:   Mon, 9 Jan 2023 11:22:28 -0800
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@meta.com, rostedt@goodmis.org,
+        with ESMTP id S237192AbjAITcN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 14:32:13 -0500
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C5117429
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 11:32:10 -0800 (PST)
+Received: by mail-pf1-x42a.google.com with SMTP id x4so2822273pfj.1
+        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 11:32:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MS9c8pSDmVucTZdPdHhH3mdXKbPND6bL5OXnhsaz428=;
+        b=sOIFmmww5t87chNqg4RrjKvRSK55mbJUfkLlDwVdXFzdUVNQpuL8j+67d+DkgdzGV/
+         cY+1zKjyGAv7inACtQNgX5uUKu4ApW+iH+DVN7GkXfrRLLF2Mvo9WifnFmurzCTgdAvo
+         yO0VsoKDonS/b5FpljJp4kIUzSG1uLseP8M04BYadiPR3LnDKhEB8JDIFZ6XY2cYQ9Ip
+         q/lAxkFfWGCi4n140C5isaU+LhXs1upwAI92uUGwcJ28pRBl0VFZtoKmw+InBC55cTsl
+         h4qHQp+F6duxw8RJ/SXhE+ei/WHcJpuK0DK+gQrpAmJlxVZpoBxyR4o9mafVKF6RyDWB
+         AG3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MS9c8pSDmVucTZdPdHhH3mdXKbPND6bL5OXnhsaz428=;
+        b=Wk7orOG1y/huBis7uQ8VjipRBwqbprCEChtwOTDzyWDelilFTeS695WOKy0XIfLrd/
+         pwYK7kTozTrJ4FZfpvCsEqTMNgvZaV8LfgDGJdrFocD7nZjXC8wfXObHmdPxCPQF22Bo
+         Nzw9897EA6KZgllnhgh5ql2Rx2Pci855RyuMhhF4XUsVSor3md2gvc1BRKRjeCaJyvpo
+         78gpNzGk0uZ6GuNBtC3BlYY/cstqQ+AO3CS/PwfK622PvsrkDZlT1XPQIM5TZMr9n5lJ
+         iE1gjJkc8vnBFwHXScEMNU4tRHBe2e+ugkIyI0k+GLAaw/U6PnXoVrBXz4K7rpMBU9RA
+         MQpQ==
+X-Gm-Message-State: AFqh2kpjUbQHsD07zEfLvnbxYyDh0IT4p+M5qp//r/RQum+Ne74UmS4j
+        hcab2ceWGwPZ9TWSRKRS9DvYvw==
+X-Google-Smtp-Source: AMrXdXsOvwNIYYmxRZ1A4P2qL2M11DO9ETy3xVnstT6ROBE9IIpgFgsb6iMlmsjwANei+MKsQQb7Fw==
+X-Received: by 2002:aa7:973c:0:b0:574:8995:c0d0 with SMTP id k28-20020aa7973c000000b005748995c0d0mr742042pfg.1.1673292729425;
+        Mon, 09 Jan 2023 11:32:09 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 194-20020a6214cb000000b005809d382016sm6429041pfu.74.2023.01.09.11.32.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 Jan 2023 11:32:09 -0800 (PST)
+Date:   Mon, 9 Jan 2023 19:32:05 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     Jarkko Sakkinen <jarkko@kernel.org>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, x86@kernel.org,
-        kvm@vger.kernel.org
-Subject: Re: [PATCH rcu 01/27] arch/x86: Remove "select SRCU"
-Message-ID: <20230109192228.GV4028633@paulmck-ThinkPad-P17-Gen-1>
-Reply-To: paulmck@kernel.org
-References: <20230105003759.GA1769545@paulmck-ThinkPad-P17-Gen-1>
- <20230105003813.1770367-1-paulmck@kernel.org>
- <Y7xSO2dW1sy21RVz@google.com>
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 3/9] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <Y7xrtf9FCuYRYm1q@google.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
+ <Y7azFdnnGAdGPqmv@kernel.org>
+ <20230106094000.GA2297836@chaop.bj.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y7xSO2dW1sy21RVz@google.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230106094000.GA2297836@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 09, 2023 at 05:43:23PM +0000, Sean Christopherson wrote:
-> On Wed, Jan 04, 2023, Paul E. McKenney wrote:
-> > Now that the SRCU Kconfig option is unconditionally selected, there is
-> > no longer any point in selecting it.  Therefore, remove the "select SRCU"
-> > Kconfig statements.
+On Fri, Jan 06, 2023, Chao Peng wrote:
+> On Thu, Jan 05, 2023 at 11:23:01AM +0000, Jarkko Sakkinen wrote:
+> > On Fri, Dec 02, 2022 at 02:13:41PM +0800, Chao Peng wrote:
+> > > To make future maintenance easy, internally use a binary compatible
+> > > alias struct kvm_user_mem_region to handle both the normal and the
+> > > '_ext' variants.
 > > 
-> > Signed-off-by: Paul E. McKenney <paulmck@kernel.org>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Ingo Molnar <mingo@redhat.com>
-> > Cc: Borislav Petkov <bp@alien8.de>
-> > Cc: Dave Hansen <dave.hansen@linux.intel.com>
-> > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > Cc: Sean Christopherson <seanjc@google.com>
-> > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > Cc: <x86@kernel.org>
-> > Cc: <kvm@vger.kernel.org>
-> > ---
-> 
-> ...
-> 
-> > diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-> > index fbeaa9ddef598..9306d99585188 100644
-> > --- a/arch/x86/kvm/Kconfig
-> > +++ b/arch/x86/kvm/Kconfig
-> > @@ -46,7 +46,6 @@ config KVM
-> >  	select KVM_XFER_TO_GUEST_WORK
-> >  	select KVM_GENERIC_DIRTYLOG_READ_PROTECT
-> >  	select KVM_VFIO
-> > -	select SRCU
-> 
-> Would it be too much trouble to bundle all of the KVM changes into a single patch?
-> The SRCU requirement is a generic KVM requirement that's handled in the arch Kconfigs
-> purely because of KVM's somewhat roundabout Kconfig setup.
-
-No problem, and will do on my next rebase.  I might end up with a long
-list of Cc's, but so it goes.  I will of course send the result as a
-reply to this message.
-
-							Thanx, Paul
-
-> >  	select INTERVAL_TREE
-> >  	select HAVE_KVM_PM_NOTIFIER if PM
-> >  	help
-> > -- 
-> > 2.31.1.189.g2e36527f23
+> > Feels bit hacky IMHO, and more like a completely new feature than
+> > an extension.
 > > 
+> > Why not just add a new ioctl? The commit message does not address
+> > the most essential design here.
+> 
+> Yes, people can always choose to add a new ioctl for this kind of change
+> and the balance point here is we want to also avoid 'too many ioctls' if
+> the functionalities are similar.  The '_ext' variant reuses all the
+> existing fields in the 'normal' variant and most importantly KVM
+> internally can reuse most of the code. I certainly can add some words in
+> the commit message to explain this design choice.
+
+After seeing the userspace side of this, I agree with Jarkko; overloading
+KVM_SET_USER_MEMORY_REGION is a hack.  E.g. the size validation ends up being
+bogus, and userspace ends up abusing unions or implementing kvm_user_mem_region
+itself.
+
+It feels absolutely ridiculous, but I think the best option is to do:
+
+#define KVM_SET_USER_MEMORY_REGION2 _IOW(KVMIO, 0x49, \
+					 struct kvm_userspace_memory_region2)
+
+/* for KVM_SET_USER_MEMORY_REGION2 */
+struct kvm_user_mem_region2 {
+	__u32 slot;
+	__u32 flags;
+	__u64 guest_phys_addr;
+	__u64 memory_size;
+	__u64 userspace_addr;
+	__u64 restricted_offset;
+	__u32 restricted_fd;
+	__u32 pad1;
+	__u64 pad2[14];
+}
+
+And it's consistent with other KVM ioctls(), e.g. KVM_SET_CPUID2.
+
+Regarding the userspace side of things, please include Vishal's selftests in v11,
+it's impossible to properly review the uAPI changes without seeing the userspace
+side of things.  I'm in the process of reviewing Vishal's v2[*], I'll try to
+massage it into a set of patches that you can incorporate into your series.
+
+[*] https://lore.kernel.org/all/20221205232341.4131240-1-vannapurve@google.com
