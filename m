@@ -2,25 +2,25 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1A7586627E3
-	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 14:58:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7FB86662805
+	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 15:04:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233336AbjAIN6z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 08:58:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38000 "EHLO
+        id S236558AbjAIOE1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 09:04:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237245AbjAIN6n (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 08:58:43 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1008B25C0
-        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 05:58:42 -0800 (PST)
+        with ESMTP id S237395AbjAIODt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 09:03:49 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2115.outbound.protection.outlook.com [40.107.93.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED677B2B
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 06:03:26 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UVO2e2uduiSQW+WwZlIGMEO/zIL214lsMiV7MfoSfucZK1G2Vq+G9Y4JPRbrN/1VtRSVKMoyxdIzeWfLDwx2HUBQ+GC5Cdq262cb87f+m7u09fCNcyXeG2PcCqK1cHAuiV5BLP3e8fRfvXbygCEOpKR4x7SK7y8rLPtufnVtn9naZCBLw8wHQW56aXak3AfeT9/Yxz1PI+Wa9WrOlDzyoGJWsm2DQ1hGfjESpV08k0QGQxWyvOiT6i0no7bK8tpS0hZUdm+N/MAqsxqUH7xAe2/Kv2kml421p+H6IYMAWH9YPNtWJPQU/P3MShzF3KCLXHB9B+hsDkwZZmL4oRvYRA==
+ b=UsMDZwCoBM22qtZEvQQShb3zq2lc36HPM7tNN+7SGxRkey+XWOBQ7Wb7lrW1sicpWqin/fw4X/PGl6Fz7woUp46i/b9Z9kT2HYUTSA/dRtOBjTkeXMAS5AJn4YaKJDNuWnlS9zCDWPUaiagZvzMRWgpCVl/INohGR1eSqPiSi1hHaoRGxX/0GgJNCg6yL/tvzFOqcEI1vktsTC51GQHvxpWMz+xIezurP3Ga/00JMGLQ6SQ9MSSxoCPVY9EL6wHae4UjaB4jYlZv0EBfdqbB65RKbC6Wz+DvuSMcHCJym8R9Oof9iWxqDOEkCcGz7LzStTISHElCtXaxO8TTRMx71w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Qull4C2jLLpKgmWE4OFUu/C2BBbArsJkYEXikFTMzFM=;
- b=UZ6CRklNffnIAkWQOntYxBzSWPo+SjcZ8bdb7O2ueQnLyUikN5HqyxNrm9lATogc7LUml75ZxE5RSYtAO+EUoQe5sBTkB9s7d7fjyR/zNDv2bfCNeuTuJmFpkL32oAkag4Fgmxq2IYvd4kZwx7LFdng7nleoNDWUPeAGQKikMJBgzAt9hz2DA0OSQ0cSOVRcCnHQBM5r1FNihxafeq4HVd6LYu0uLOZPX8jCpam1mx4P/lSf01n3DR+Eg9wmMRT2pob+w0+X9BhJKSyMYwC1Qc/dok99Q5ZhS33qMlxwiubvTarkigYDTkQft1tdqnODrZ/sjpfJ1s4wwb+2Q5XOCQ==
+ bh=sr3dVpBCftmLSlmwy9TG9Vx+Lo9ZmXVXhK5zNs34oXY=;
+ b=XT54p07x9ICmOkBKyJfN2aLcgDylV6Oq/NfHasAxPey3eejUZXKRskXabIpKT26ppGFcOUCy9PDWECxcrzZDSAvuKNNvDffrhLjUdIye9fWklFbMnIqFxlVHlsCQWSNyb2/RZcPAoeEY+p9mcHcKNXGZRiIq0Wyos3eGLr5Sxw/P/4DuoI5DprVtUtuzRqxukXwUoukVX8r1LcD8f95kb+VTT7R+zcOPwO+ZprGUuULYruoc1zKsJLR6iJ7DYJ71t38mwqQA33UrT7nikicAEt40FG6/ealzfknozc1109KYk0R2bG44nhf9mi9vKfy0OyXSfdiGvPHSXNV34V4oLw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
  header.from=os.amperecomputing.com; dkim=pass
@@ -28,99 +28,100 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=os.amperecomputing.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qull4C2jLLpKgmWE4OFUu/C2BBbArsJkYEXikFTMzFM=;
- b=JMdtkE2tVObx6mkQs9KQLasENK5rvxI3ZJ9i54mesOydGWq/ahMR8VjPUL58cXoM9kywJhWuXT9QMZ518QHmoTUrKXFbNcWHk25NwQdx/8Y1r4VtAxVmQFdgdHn/hy02fIjMmxKkFgDeMMax0mv97hyHVlT+tE9Ev4EuHl7x++0=
+ bh=sr3dVpBCftmLSlmwy9TG9Vx+Lo9ZmXVXhK5zNs34oXY=;
+ b=SLgQ++4P1wb9FofXhoEfzrMo7wN26L832RfET4Sz0fetxq1/yduhzvK3yPZ3gGwqL648Va/Re5aIMvX1XAu4oQxasQ5tYSCgLMWGe3DGyrRT8tt2Nj4zZbKyzNpu5RPSDIvcYdcmR2VsR0RMLU2vMh/7hHJgZ5ylSqZ1vHxMfZs=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
 Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- SN6PR01MB3887.prod.exchangelabs.com (2603:10b6:805:27::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5986.18; Mon, 9 Jan 2023 13:58:38 +0000
+ DM8PR01MB7095.prod.exchangelabs.com (2603:10b6:8:3::11) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5986.18; Mon, 9 Jan 2023 14:03:24 +0000
 Received: from DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::6b5b:1242:818c:e70d]) by DM8PR01MB6824.prod.exchangelabs.com
  ([fe80::6b5b:1242:818c:e70d%6]) with mapi id 15.20.5986.018; Mon, 9 Jan 2023
- 13:58:37 +0000
-Message-ID: <3d630420-d485-44b7-d274-58c41fb46d7c@os.amperecomputing.com>
-Date:   Mon, 9 Jan 2023 19:28:30 +0530
+ 14:03:24 +0000
+Message-ID: <3b357b3e-58d3-3830-220e-6a52ffb094fd@os.amperecomputing.com>
+Date:   Mon, 9 Jan 2023 19:33:17 +0530
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.1
-Subject: Re: [PATCH 3/3] KVM: arm64: nv: Avoid block mapping if max_map_size
- is smaller than block size.
+Subject: Re: [PATCH 1/3] KVM: arm64: nv: only emulate timers that have not yet
+ fired
 Content-Language: en-US
-From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 To:     Marc Zyngier <maz@kernel.org>
 Cc:     catalin.marinas@arm.com, will@kernel.org,
         linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         kvm@vger.kernel.org, scott@os.amperecomputing.com,
-        darren@os.amperecomputing.com
+        Darren Hart <darren@os.amperecomputing.com>
 References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
- <20220824060304.21128-4-gankulkarni@os.amperecomputing.com>
- <87wn6ads39.wl-maz@kernel.org>
- <eadac5ec-6b61-9afe-3117-50fd9569ad4a@os.amperecomputing.com>
-In-Reply-To: <eadac5ec-6b61-9afe-3117-50fd9569ad4a@os.amperecomputing.com>
+ <20220824060304.21128-2-gankulkarni@os.amperecomputing.com>
+ <87zgb6e54o.wl-maz@kernel.org>
+ <e1a2fabd-969f-d80d-09df-4562c8d5d342@os.amperecomputing.com>
+ <86h6wzomad.wl-maz@kernel.org>
+From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <86h6wzomad.wl-maz@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH0PR03CA0220.namprd03.prod.outlook.com
- (2603:10b6:610:e7::15) To DM8PR01MB6824.prod.exchangelabs.com
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: CH2PR07CA0062.namprd07.prod.outlook.com
+ (2603:10b6:610:5b::36) To DM8PR01MB6824.prod.exchangelabs.com
  (2603:10b6:8:23::24)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|SN6PR01MB3887:EE_
-X-MS-Office365-Filtering-Correlation-Id: 50c616e1-389d-49ae-4c5d-08daf2499b2f
+X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|DM8PR01MB7095:EE_
+X-MS-Office365-Filtering-Correlation-Id: f295908f-96ec-406f-8bca-08daf24a463e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gF1RoUWllaOS8HPrz7RtLHNhwlW9b0rOhNQDqBujUR92TWaWtOoWs8aYW6XVi3c9ySjUX9Segr7KhwV3SflskFXLocBeB0XD6pn5Mq6kLwQ+sISuEM4kOX5Bpe4sDzfF3f0gnssJKbXLnYUo36Jbng5Exq2jWPS50gEjriM/kJaPxU54+fC3/4yO0Vujf1hxbzpS11wziAwZ7Rba+d6YYltZaxtcX6xU84+ZYxieZ55/ymcs8WTA37A4LZhrtSUfoDMLtVlz6WV4ahO/alQCq1o4ICyW1MnRhexFbglOBfMZlnVsEvSAONKBokOjqzfdWLYNvY1c8IpFsEszRJgveJ+Qxyj36V7ojRMY6Qw0QUNlGyzQondDBRWr/vmmRcoFwk6lhGeYy2hfeG6O41hGFtdTRwwitifsiqmgPzDcecRXInl5PPwuskX3o8jFD6mrPU29eBkccqeRV/7uYJW0p13d8g4Mefyw0+mSppV+cUxWgNM8soYs6ff+hqV0EtPrR6o8GbzHJ5L3+GyYZurYC/NGgfrBqP2opOmEGRZjlk909AxGnPaiBqwFo/GSJuNFsR4DF7GKUKEbBj+zTZ1/T7PAiXo+iD5JJdB+F0Dlo1XcK4/gX3vIgYV4SVliJK891PFyq4mXn4Xyq4WffNJ1pM7EGFBwXngS+X1iajQ8zNdnMtPzyBm8AEqql9j7DdRe
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(376002)(346002)(39850400004)(366004)(451199015)(41300700001)(31686004)(8936002)(5660300002)(2906002)(66946007)(8676002)(6916009)(66556008)(66476007)(6512007)(316002)(6666004)(107886003)(6486002)(478600001)(6506007)(53546011)(26005)(4326008)(186003)(2616005)(31696002)(86362001)(83380400001)(38100700002)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: ZVCWA/owuEH6TIDoRZ3m7dnVErTD947GGKZGsyX4o1RqfXofbPJ5VCr0cUzoy6NhG3NPe8aocHEisGr+FhlvXHjBLz1Ag7SM31biK50L0L0Qj02deUr8zb+b29FZDeUxHoI0QgcVF1l+eR9AxhTJbdWutyQiCJqBhoZqv3gxrVo5SBeCAloG7xWWZ23yt1KmX9ky/19thVXhjP11dC/BSz43Fo4KEpgMvUs8nhtUrbVeTx/pWXvLqt00OzLZFzMdrw8V84ETXRsl6y6syRlbLlZbxiO+PI0Uw6OShrs+Rn9IzRjFAGJ/K5UqV7WtSvk24IYE7QYLUu/b3MDxjTWkjk0CaNanmrTWhA2gTsFzrbiZ8LngsOqx5J+2RYH7zJCOyY1px4iZdwxk4XgAwSP3algxbKTE840N+9SvGqgLR1DPbpxUy0GB2ZUMpGgplM57grzUA1pbHT+b5bI7blRKiLxaeC7n/cxusMV8S/wFc70CwZNL/6OeiDF4HLwflr4p5EMlK8lSxTYvofTCyqRf2hkWOhBW9AVHVXJPDA5pfp65x1g8Rt3Xs5QrI04u0EabxMOOAkaJG26uhMLz9pY8e4pyjbSMLWFsW9IVQBvMf7tOlYfcOKF1k5MQx4SnOiDmdYlgI/eRTtGn4iWijDsdbzFnMPEsiO68vad7aPSpXtzTHg6DRHW4XccUjP+NANZjeXosAGVlWAscDB2sICRtTxk7jB11Dmg7EHFACCV++7w=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(366004)(396003)(39850400004)(376002)(136003)(451199015)(8936002)(2906002)(5660300002)(41300700001)(66476007)(66556008)(4326008)(6916009)(8676002)(316002)(66946007)(186003)(26005)(6512007)(2616005)(38100700002)(31686004)(31696002)(83380400001)(86362001)(107886003)(966005)(478600001)(6486002)(6506007)(53546011)(6666004)(43740500002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VjcySEJKaHR6SU9RZk9RSFZENTltS0NZaHZtK1RhTmhEanVqNC9nVW9ZWDdM?=
- =?utf-8?B?bUxjYnRhVFROMllwOHJxaXFxMUVud2lMMUNsd05oUUpaSG1xRzlabzg5U21M?=
- =?utf-8?B?QjNpRFlQbUhNUFZ1OVUvbGxLdG1uMGgwWDJQRzdCNTRveFMyNzNIR1dVSk1t?=
- =?utf-8?B?RmtveEVvMHkzNWZnT0lOVkZaSUNTL3pXYXhqNWh2Z2pmYzZTWDNXR25sZjY3?=
- =?utf-8?B?em1MMWg3OWtuUWR1d1E3Nk5JVjJpVURNUjBKKzh0eVZ5dlhDdld3R2lWZHhM?=
- =?utf-8?B?aHd2OU5Cbk9jNUdJRHNWMjZXZEpTNHIyZW5GR0hTZ2VsSU8zSnFyMHY3anV6?=
- =?utf-8?B?d3MxeEVsSnpvNmFpYno3cEI5VzNZSTNXaUJZcmtlSVVYeVJYbEhyaVFPWWFD?=
- =?utf-8?B?cnYraFg4V2ZJOUs2MWFTcHpPVEhjZ2RNN051b010VnRjNDRiclFXQ25VYWlW?=
- =?utf-8?B?UGEyTFo5NytrNDhzTVk0UmRLNWkzRWNWZlZPM2xYcUFpRWVKVy9kQU9zempD?=
- =?utf-8?B?UjEyTFowMFY5aFAwL29xcU1adGgyZHlmWXdkTVYvSG4zZUlIOEpnL3ozcVg1?=
- =?utf-8?B?RUwrcmdWVVdMZU5pL2daZ2ZGSTBZTFFwaU1MdDhoTkFaNk83Mm10REZNUCtq?=
- =?utf-8?B?RVU0dDFWMC9sMFhUSnRORGlsZHlsZmJBQ0NHKzFDTzU2UzF3RjRBTWpWU1lp?=
- =?utf-8?B?OFplaUdTSlI4eDBIL3BXc3AyWDVxS3QxVWVvTHVzOWd5ODRPT3A2aWJmQXdU?=
- =?utf-8?B?cFZLbWJtck5TZGNOd1hOQXpqeTNYOGZGcGx6SlkvOGY2dm5ZQ0hRbzBJb2dE?=
- =?utf-8?B?ZmpYQTlNNU1TWmcxTlBmVm84VmY5SEtEQi9VWXdXMkpzb0lmYVhjaXhka3E4?=
- =?utf-8?B?NXIxNGtLSmhrbWhCS0Jkd0hQblRmRW5jWWxwN0d1QnhVU3J4c1dLY0FocDZM?=
- =?utf-8?B?enpHVFNFbml6WWxoWi8zVDdYeGdaaGNsRW1IdjBWUHVlS2VVL0NOcXBTZXNs?=
- =?utf-8?B?Rmxtb0ppZUVxeEk0bFdXc0doMnA2UHpPWERwVWVBOTBCTC9QeXdFcnE5SUY4?=
- =?utf-8?B?TWJYdHd0a3FHSGZTeno4aXdkQVJUT202d0VYZjIzVXc2cVZPa0VWK2tEWTFz?=
- =?utf-8?B?aEViWGt5VmkxSzVaK2ZaeDNsWUc3VTU0UjM0QjRmUWJ2TXN4dDhPcnNRcUFl?=
- =?utf-8?B?cW1yUHZCaWZxYXdVeDZtY2VZdHlDL1JRdmpHdWtZNFVIV1VNeFVtY3pPRXR3?=
- =?utf-8?B?VHFvNTE3M0hUL3hDMSthUGhHNjI1bDcxL3A0N1RjajRhTW12TzVhYlR2MzM5?=
- =?utf-8?B?QXNVQzhQZG1iekNYMmdsSC9IWFdpcXgwTVRlQmx1TzlDV2hVaFpOM0tsOW5B?=
- =?utf-8?B?cXdjd0xGZmFSZUdpeE95UGxEaW9zNWEzbEJvTVlmVVJzclJFN2dpUjJoY0ty?=
- =?utf-8?B?RzhYSzNaNEVvSXhoUUhScm16ZWtQODJYd2VUM0ZPZWxtM3BKS1lUSkxKczhW?=
- =?utf-8?B?Y0lEdHNvb3lGUURITzFLQkVsbHExZlJsMk9McG5FVXhQa1VmenRGQlRmVnFV?=
- =?utf-8?B?T3o2ZWZWT0FCc1paaU0zeXI5emY0NWt3RnRoVWxaU2xtdEtoZzc3aFFiMjNx?=
- =?utf-8?B?L0F5amgyWFJQLy85MHBBZGJnWlUrY3NwcXliQm5aK3QxdW0rOTYzK1loM3NP?=
- =?utf-8?B?SlZ2aHF4eVI2RDdUclNybFZ2R2dUNzNtNno2TlJjRWZBTjk3NVJzZHE3WjR4?=
- =?utf-8?B?dHBxNHBoYUk3VGltRzVoSzlUc1NNbnU5S3JlWTN6eUs3N3Q3NXVremRwSzY3?=
- =?utf-8?B?eUU0eUxFLzRMdDRzdnkwcnFqaDFydVVmcjRCMUM5VTFjK3gxL2FLTnFVaGtC?=
- =?utf-8?B?eFdzazZaK0dhY0VOdXYvcWVoY0R6c25Ga3ZwSFd2VUNBS1FSNEpmMWpsS1Rr?=
- =?utf-8?B?NnBTWU9uRSt5K3JGR1NhSXdjMTUrTG9BTEFPMjFZM3Q3a1hNb3JMYWhReGE1?=
- =?utf-8?B?WmRrWlJ5YW5uQUxNTHVIVHlPZDBON2thdU9FTndtT2RxRnU3V29Va3paUWNF?=
- =?utf-8?B?MlMyNlVPTEVDSllhenVwUTAvMkZKOWd4N1puQkNKTGQ4SWY1cXl0em9FTHEr?=
- =?utf-8?B?RFRYK1NCQVJGTHZ2UnJrVUtCZDdQOVJSRFFiVDlaOFdUMEp4dkdsL0YySEh2?=
- =?utf-8?Q?ZtsWZvOEnlA+h3xf5E6b6RY=3D?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WVVEa0dhaytmRTNsTWc0QkNXUWdaZDlOSTVBaGVpZFVuMzBNZjFUYkFoRDN1?=
+ =?utf-8?B?eDdLWjgrSGRxbSt2WDZ1aEphYm9mRlpKY25XckkvOStpVXI4QWVTQUQ0TzU5?=
+ =?utf-8?B?cGJDaER3REg5a0J1ZDNncUdUdTJWOThsQjUzNFNoNWREb3p4V2hqeUtxaTNJ?=
+ =?utf-8?B?a0NQbVJIcHpLdXNQbVQ0NXppSncvV0oveWhsT3AxbzI4eWs0K2p5MDloRDhI?=
+ =?utf-8?B?T3A3bmRnWmZjeDI0NkdTNVh0dkp6bXNZc1RGVzMydnVZQktIdzkrMmFPbFgx?=
+ =?utf-8?B?ZkFBSXVzSm8yRTBTb2haQzh0djJtQlQ5NnVQak5vV0ZiRlNYY1FPODBpWEp3?=
+ =?utf-8?B?Vm9TU1J1OE1jdGJSbGRudWdlUzlpdFZSaHFxKzBHRVZSYTZLbitTY0xBNiti?=
+ =?utf-8?B?azZ1MTlTVDZKK0J3ZXhpRnVsYjhpR3F6TTJMcXFiekRQQXJwVkdaVE9QVkVY?=
+ =?utf-8?B?NmtLL2JCcjhnZHhzQXdjWnNuK05BZ0hGQTZIMzJQbGl0dHJpSlU5L21pbjUr?=
+ =?utf-8?B?d0xzaHV6b2syYytEOUl1UGRBTUdNNnN4c256bUpNN2VzS28rbmJFWEZKR0lU?=
+ =?utf-8?B?M1M2S1M1S2tLTENaVUZESGNsYUF6cHJ6Y044SGV1TGlOelA4cmhjNnBGU2Nh?=
+ =?utf-8?B?azgzVjYvMkFyeU1POWk5a3pNbFRFNXZyM01mN081QStDK0I2QitSZi92T05w?=
+ =?utf-8?B?RmNOcFpVZ3Mzbk1kWWpxZ0Ntb2JCYlJwWVZzY0gxM1ZMT0VEaVVPQ0lpdWlU?=
+ =?utf-8?B?NzFuT0JqYTk2dnJUUXFtK1doWWZSR3BQWGZNbTkyOWtuTGtSV0c1Mi9TQm9a?=
+ =?utf-8?B?WXUyc2tQdVkrNFF0TnJVcHBjaExXTUtLdjhlUElmTG51RTBOSXh5a2pnRmFu?=
+ =?utf-8?B?NWtFblIzNkY4ekxPdUdxUWo4NWFKdDF2OTZlazNrWi9CWkJQbU5kWGpHL20x?=
+ =?utf-8?B?RWV1WGFmMXRMcVY2dENFc2pOblIzVWFqTTJkeXBpZEhTZTA2RlhUUjNPUmk3?=
+ =?utf-8?B?SlNLazlQNFVGTUFtM3dIT2IvWHRMbVVkQWJPTEJDSlRqd09GY2t1WjdWa2JI?=
+ =?utf-8?B?Z0RlYUI2R2VsL3FOU2FnNnoyUTNZc0xkTW1tWW9VejFWRzgyb2N5K3JGR2tx?=
+ =?utf-8?B?Q0Zxei9oRkZ3MU55VmVqRE9rRVp0WVE5Z2xSd1BmcmU2Mm05UGcrRlM4Vlhv?=
+ =?utf-8?B?K3VnYjVJWGhWNkFZSkc1VFl3K2I5WStJbmY2YjgyT3NhQWVraEx5R201czB6?=
+ =?utf-8?B?VG9lMCtFMXhQOWVVR0xPbGZBR29SL3RraENZQ1IwRkV0UGt1dVVVTW5rcFg2?=
+ =?utf-8?B?RWNKdEk5V3Jrbm1td2pkSDBDRFFtMGNWV2dBNjhmUmtPWHZVWFhCc3V4YUti?=
+ =?utf-8?B?MVBRbm1DenNZK252emI5ay9PV2JoOGF2YUFaSXRsSEk3MXV6UGtEcUI1UVNG?=
+ =?utf-8?B?YkFSZ2MyQnBZdDlLY01QS2JBU0VObG5NUVZweDRaYU5OYmNSVVc3dVBlMGdp?=
+ =?utf-8?B?cjBJRE90NzY0SEltVWhJTFhaRkc1bkdpR0ttL1VRdjZPbCsxcnlBQ2ZyOUk3?=
+ =?utf-8?B?NlNDUWNRZ3RDdEt3N1BTemcyMjNYdGp5eU4yRkVoZFFkTWltUkUvZ1YwWTlI?=
+ =?utf-8?B?N1Z6azNVYTFOZUN0ODQrUUV3WWo4UFFlM1UyellaNlpBdmF2QTJHakNKNVFY?=
+ =?utf-8?B?NHJ3Z0FGQ0ZkMnhGU001UVBlakFWdUh0K1ZYbmtuRnplVE81Qk80dHhpZ3V4?=
+ =?utf-8?B?cDVPQjVoRno5bjY2SXAwemo1alZnNWpCRldad2N3dXh2WU1aRHJtaDBVSU1M?=
+ =?utf-8?B?M0JybTVwRHpXc3h6UXM1K05HMUx4bnYrSUtCK3NUc01nKzM0Nm9mQzZRUGZB?=
+ =?utf-8?B?VzRoR09nNDUzK1JFdk9PWVRmRWhNS0g4NFNFNlc5NEFaQmRUenpZR0lFemtx?=
+ =?utf-8?B?MWdnZFM1Q0xyK2ljZGFXVUxnVVdXcjNYR2h6QjhhdXhDWEE5R2xYUGNPd1lN?=
+ =?utf-8?B?RzBUdWlmRmRrM1NNTEFrUlJ6T2E2bHBwdkQ5d0MwKy9LVUo4NEs0Rm5MZHJW?=
+ =?utf-8?B?a2FpdS9BUTRmWkg1bDI1YXlLMmFUdlJCZzl2T2xkV3Brb3ozdGR6RWQwT3NU?=
+ =?utf-8?B?cjJyaVdWSkp5MjhzdCt2RGlNM0ZZZm15N3ZpVWFQeWFYK09lQTVESWpLbldm?=
+ =?utf-8?Q?Hg0zFpzcfE88Q1ZTp2eJ+4E=3D?=
 X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 50c616e1-389d-49ae-4c5d-08daf2499b2f
+X-MS-Exchange-CrossTenant-Network-Message-Id: f295908f-96ec-406f-8bca-08daf24a463e
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2023 13:58:37.7855
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jan 2023 14:03:24.7758
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KmpJzjUMMiB7DL/5vAy92UUtwk2rDbUWDF/wY+la7InpMW10jD7aDCfb1IfWh9peivW2hD5wovjDoXYAgPEtYR6A2pfbSKd6dUK3tW2xmihHGu+mT/rmKXC8AmNaJ26F
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR01MB3887
+X-MS-Exchange-CrossTenant-UserPrincipalName: AHLlFZ7BXoal/GCmg5/HdiDM/oRH11lIoUz902CUYbt+CDtOZbamDdrfXtYTJjSZmnhsOCzxONiFZXG1/KkpqQAft+R1S2yhLQwr4oH0J/j9LDvq2f4rHzl7uhdLdDfS
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR01MB7095
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
@@ -132,93 +133,104 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 03-01-2023 09:56 am, Ganapatrao Kulkarni wrote:
-> 
-> 
-> On 29-12-2022 11:12 pm, Marc Zyngier wrote:
->> On Wed, 24 Aug 2022 07:03:04 +0100,
->> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>>
->>> In NV case, Shadow stage 2 page table is created using host hypervisor
->>> page table configuration like page size, block size etc. Also, the 
->>> shadow
->>> stage 2 table uses block level mapping if the Guest Hypervisor IPA is
->>> backed by the THP pages. However, this is resulting in illegal 
->>> mapping of
->>> NestedVM IPA to Host Hypervisor PA, when Guest Hypervisor and Host
->>> hypervisor are configured with different pagesize.
->>>
->>> Adding fix to avoid block level mapping in stage 2 mapping if
->>> max_map_size is smaller than the block size.
->>>
->>> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
->>> ---
->>>   arch/arm64/kvm/mmu.c | 2 +-
->>>   1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
->>> index 6caa48da1b2e..3d4b53f153a1 100644
->>> --- a/arch/arm64/kvm/mmu.c
->>> +++ b/arch/arm64/kvm/mmu.c
->>> @@ -1304,7 +1304,7 @@ static int user_mem_abort(struct kvm_vcpu 
->>> *vcpu, phys_addr_t fault_ipa,
->>>        * backed by a THP and thus use block mapping if possible.
->>>        */
->>>       if (vma_pagesize == PAGE_SIZE &&
->>> -        !(max_map_size == PAGE_SIZE || device)) {
->>> +        !(max_map_size < PMD_SIZE || device)) {
->>>           if (fault_status == FSC_PERM && fault_granule > PAGE_SIZE)
->>>               vma_pagesize = fault_granule;
->>>           else
->>
->> That's quite a nice catch. I guess this was the main issue with
->> running 64kB L1 on a 4kB L0? Now, I'm not that fond of the fix itself,
->> and I think max_map_size should always represent something that is a
->> valid size *on the host*, specially when outside of NV-specific code.
->>
-> 
-> Thanks Marc, yes this patch was to fix the issue seen with L1 64K and L0 
-> 4K page size.
-> 
->> How about something like this instead:
->>
->> @@ -1346,6 +1346,11 @@ static int user_mem_abort(struct kvm_vcpu 
->> *vcpu, phys_addr_t fault_ipa,
->>            * table uses at least as big a mapping.
->>            */
->>           max_map_size = min(kvm_s2_trans_size(nested), max_map_size);
->> +
 
-Would be good to add brief comment about the changes.
->> +        if (max_map_size >= PMD_SIZE && max_map_size < PUD_SIZE)
->> +            max_map_size = PMD_SIZE;
->> +        else if (max_map_size >= PAGE_SIZE && max_map_size < PMD_SIZE)
->> +            max_map_size = PAGE_SIZE;
->>       }
->>       vma_pagesize = min(vma_pagesize, max_map_size);
+On 09-01-2023 07:14 pm, Marc Zyngier wrote:
+> On Mon, 09 Jan 2023 12:25:13 +0000,
+> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
 >>
 >>
->> Admittedly, this is a lot uglier than your fix. But it keep the nested
->> horror localised, and doesn't risk being reverted by accident by
->> people who would not take NV into account (can't blame them, really).
-
-I agree, it makes sense to keep the changes specific to NV under nested 
-scope.
-
+>> Hi Marc,
 >>
->> Can you please give it a go?
-
-This diff works as well.
+>> On 29-12-2022 06:30 pm, Marc Zyngier wrote:
+>>> On Wed, 24 Aug 2022 07:03:02 +0100,
+>>> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+>>>>
+>>>> From: D Scott Phillips <scott@os.amperecomputing.com>
+>>>>
+>>>> The timer emulation logic goes into an infinite loop when the NestedVM(L2)
+>>>> timer is being emulated.
+>>>>
+>>>> While the CPU is executing in L1 context, the L2 timers are emulated using
+>>>> host hrtimer. When the delta of cval and current time reaches zero, the
+>>>> vtimer interrupt is fired/forwarded to L2, however the emulation function
+>>>> in Host-Hypervisor(L0) is still restarting the hrtimer with an expiry time
+>>>> set to now, triggering hrtimer to fire immediately and resulting in a
+>>>> continuous trigger of hrtimer and endless looping in the timer emulation.
+>>>>
+>>>> Adding a fix to avoid restarting of the hrtimer if the interrupt is
+>>>> already fired.
+>>>>
+>>>> Signed-off-by: D Scott Phillips <scott@os.amperecomputing.com>
+>>>> Signed-off-by: Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+>>>> ---
+>>>>    arch/arm64/kvm/arch_timer.c | 3 ++-
+>>>>    1 file changed, 2 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+>>>> index 2371796b1ab5..27a6ec46803a 100644
+>>>> --- a/arch/arm64/kvm/arch_timer.c
+>>>> +++ b/arch/arm64/kvm/arch_timer.c
+>>>> @@ -472,7 +472,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
+>>>>    		return;
+>>>>    	}
+>>>>    -	soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+>>>> +	if (!ctx->irq.level)
+>>>> +		soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+>>>>    }
+>>>>      static void timer_save_state(struct arch_timer_context *ctx)
+>>>
+>>> I think this is a regression introduced by bee038a67487 ("KVM:
+>>> arm/arm64: Rework the timer code to use a timer_map"), and you can see
+>>> it because the comment in this function doesn't make much sense
+>>> anymore.
+>>
+>> OK, check was removed while rework in bee038a67487.
+>>>
+>>> Does the following work for you, mostly restoring the original code?
+>>
+>> Below diff too works and avoids the unnecessary soft timer restarts
+>> with zero delta.
+>>>
+>>> Thanks,
+>>>
+>>> 	M.
+>>>
+>>> diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+>>> index ad2a5df88810..4945c5b96f05 100644
+>>> --- a/arch/arm64/kvm/arch_timer.c
+>>> +++ b/arch/arm64/kvm/arch_timer.c
+>>> @@ -480,7 +480,7 @@ static void timer_emulate(struct arch_timer_context *ctx)
+>>>    	 * scheduled for the future.  If the timer cannot fire at all,
+>>>    	 * then we also don't need a soft timer.
+>>>    	 */
+>>> -	if (!kvm_timer_irq_can_fire(ctx)) {
+>>> +	if (should_fire || !kvm_timer_irq_can_fire(ctx)) {
+>>
+>> Now, aligns to comment.
+>>>    		soft_timer_cancel(&ctx->hrtimer);
+>>>    		return;
+>>>    	}
+>>>
+>>
+>> Shall I resend this patch as regression fix of bee038a67487?
 > 
-> Sure, I will try this and update at the earliest.
->>
->> Thanks,
->>
->>     M.
->>
+> I already have a patch written for this at [1], also getting rid of
+> the soft_timer_cancel() call in the process (as it doesn't make much
+> sense either).
+
+OK, thanks.
+> 
+> Please give it a go if you have a chance (though the whole branch
+> might be of interest to you...).
+
+Sure, I will try this branch.
 > 
 > Thanks,
-> Ganapat
+> 
+> 	M.
+> 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/commit/?h=kvm-arm64/nv-6.2-WIP&id=effdcfa175c374a1740f60642d221ad2e930c978
+> 
 
 Thanks,
 Ganapat
