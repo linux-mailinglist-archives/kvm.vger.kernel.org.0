@@ -2,157 +2,171 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6FB4C66306B
-	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 20:32:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A7C3E663098
+	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 20:41:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237494AbjAITcR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 14:32:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37100 "EHLO
+        id S237499AbjAITkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 14:40:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237192AbjAITcN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 14:32:13 -0500
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20C5117429
-        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 11:32:10 -0800 (PST)
-Received: by mail-pf1-x42a.google.com with SMTP id x4so2822273pfj.1
-        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 11:32:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MS9c8pSDmVucTZdPdHhH3mdXKbPND6bL5OXnhsaz428=;
-        b=sOIFmmww5t87chNqg4RrjKvRSK55mbJUfkLlDwVdXFzdUVNQpuL8j+67d+DkgdzGV/
-         cY+1zKjyGAv7inACtQNgX5uUKu4ApW+iH+DVN7GkXfrRLLF2Mvo9WifnFmurzCTgdAvo
-         yO0VsoKDonS/b5FpljJp4kIUzSG1uLseP8M04BYadiPR3LnDKhEB8JDIFZ6XY2cYQ9Ip
-         q/lAxkFfWGCi4n140C5isaU+LhXs1upwAI92uUGwcJ28pRBl0VFZtoKmw+InBC55cTsl
-         h4qHQp+F6duxw8RJ/SXhE+ei/WHcJpuK0DK+gQrpAmJlxVZpoBxyR4o9mafVKF6RyDWB
-         AG3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MS9c8pSDmVucTZdPdHhH3mdXKbPND6bL5OXnhsaz428=;
-        b=Wk7orOG1y/huBis7uQ8VjipRBwqbprCEChtwOTDzyWDelilFTeS695WOKy0XIfLrd/
-         pwYK7kTozTrJ4FZfpvCsEqTMNgvZaV8LfgDGJdrFocD7nZjXC8wfXObHmdPxCPQF22Bo
-         Nzw9897EA6KZgllnhgh5ql2Rx2Pci855RyuMhhF4XUsVSor3md2gvc1BRKRjeCaJyvpo
-         78gpNzGk0uZ6GuNBtC3BlYY/cstqQ+AO3CS/PwfK622PvsrkDZlT1XPQIM5TZMr9n5lJ
-         iE1gjJkc8vnBFwHXScEMNU4tRHBe2e+ugkIyI0k+GLAaw/U6PnXoVrBXz4K7rpMBU9RA
-         MQpQ==
-X-Gm-Message-State: AFqh2kpjUbQHsD07zEfLvnbxYyDh0IT4p+M5qp//r/RQum+Ne74UmS4j
-        hcab2ceWGwPZ9TWSRKRS9DvYvw==
-X-Google-Smtp-Source: AMrXdXsOvwNIYYmxRZ1A4P2qL2M11DO9ETy3xVnstT6ROBE9IIpgFgsb6iMlmsjwANei+MKsQQb7Fw==
-X-Received: by 2002:aa7:973c:0:b0:574:8995:c0d0 with SMTP id k28-20020aa7973c000000b005748995c0d0mr742042pfg.1.1673292729425;
-        Mon, 09 Jan 2023 11:32:09 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 194-20020a6214cb000000b005809d382016sm6429041pfu.74.2023.01.09.11.32.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Jan 2023 11:32:09 -0800 (PST)
-Date:   Mon, 9 Jan 2023 19:32:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     Jarkko Sakkinen <jarkko@kernel.org>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 3/9] KVM: Extend the memslot to support fd-based
- private memory
-Message-ID: <Y7xrtf9FCuYRYm1q@google.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
- <Y7azFdnnGAdGPqmv@kernel.org>
- <20230106094000.GA2297836@chaop.bj.intel.com>
+        with ESMTP id S236629AbjAITkj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 14:40:39 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887A176801;
+        Mon,  9 Jan 2023 11:40:36 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 309INvA5005048;
+        Mon, 9 Jan 2023 19:40:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=QyKqcW400I7fdGBwWxCZ2QGqWWUUfCAvtddLjZAuzhM=;
+ b=WthHWu2Ty/j5+16LcQpum2P2laRu3PBjiDNgPGzaw9nPTSN3R7g9ZvjPT6dJPU058R+t
+ f1UuJNWNKK6zdf44ZX0sScqYOLKtJwrbFwEBCBLY13jj4RVrHfuACV7XtdR78eD93EQv
+ Z2rur9frkyBZeP8ftPt8B7UteMWL8FAGUqdugD4Z2/iK1HOUjn3uQkE9bXisdcyfc4Gr
+ FHmDS4Y6z/gZwMt8Cyp7lrBw13e7Ul8SOw725PHR5Rh2hKTP3H3qvo56tXVkQ40qA5b5
+ HyxzaXpFR3kHCDV+oStUV1kiwTFOG/SB5rhFS1/xcNzoZx/FME5d6soUseKE5B/Aprv7 Mg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3myjasyefw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Jan 2023 19:40:33 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 309J8lxv021500;
+        Mon, 9 Jan 2023 19:40:33 GMT
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3myjasyefq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Jan 2023 19:40:33 +0000
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 309IxVms029729;
+        Mon, 9 Jan 2023 19:40:32 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
+        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3my0c7gy6v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 Jan 2023 19:40:32 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 309JeUsZ4063868
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 9 Jan 2023 19:40:30 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 44EAF58054;
+        Mon,  9 Jan 2023 19:40:30 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D1F3658045;
+        Mon,  9 Jan 2023 19:40:28 +0000 (GMT)
+Received: from [9.160.171.221] (unknown [9.160.171.221])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Mon,  9 Jan 2023 19:40:28 +0000 (GMT)
+Message-ID: <3a1863b1-f0f2-92a6-09c4-eab1faafcd41@linux.ibm.com>
+Date:   Mon, 9 Jan 2023 14:40:28 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230106094000.GA2297836@chaop.bj.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 7/7] s390/vfio_ap: always clean up IRQ resources
+Content-Language: en-US
+To:     Halil Pasic <pasic@linux.ibm.com>
+Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
+        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
+        alex.williamson@redhat.com, kwankhede@nvidia.com,
+        fiuczy@linux.ibm.com
+References: <20221213154437.15480-1-akrowiak@linux.ibm.com>
+ <20221213154437.15480-8-akrowiak@linux.ibm.com>
+ <20221219151007.639dff5f.pasic@linux.ibm.com>
+ <7b6d7e91-ba00-6486-39ae-91fca30b2cfb@linux.ibm.com>
+ <20221220182407.5959a4b6.pasic@linux.ibm.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20221220182407.5959a4b6.pasic@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: aXW4Uzq5MvLmCkoZBv9Qd31NJIr6vMUx
+X-Proofpoint-ORIG-GUID: _YGSmIYlAhw2DvPq9EdmY1vbisvdMPDp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-09_13,2023-01-09_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 mlxlogscore=999 clxscore=1015 spamscore=0 bulkscore=0
+ suspectscore=0 priorityscore=1501 adultscore=0 malwarescore=0
+ impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301090136
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 06, 2023, Chao Peng wrote:
-> On Thu, Jan 05, 2023 at 11:23:01AM +0000, Jarkko Sakkinen wrote:
-> > On Fri, Dec 02, 2022 at 02:13:41PM +0800, Chao Peng wrote:
-> > > To make future maintenance easy, internally use a binary compatible
-> > > alias struct kvm_user_mem_region to handle both the normal and the
-> > > '_ext' variants.
-> > 
-> > Feels bit hacky IMHO, and more like a completely new feature than
-> > an extension.
-> > 
-> > Why not just add a new ioctl? The commit message does not address
-> > the most essential design here.
-> 
-> Yes, people can always choose to add a new ioctl for this kind of change
-> and the balance point here is we want to also avoid 'too many ioctls' if
-> the functionalities are similar.  The '_ext' variant reuses all the
-> existing fields in the 'normal' variant and most importantly KVM
-> internally can reuse most of the code. I certainly can add some words in
-> the commit message to explain this design choice.
 
-After seeing the userspace side of this, I agree with Jarkko; overloading
-KVM_SET_USER_MEMORY_REGION is a hack.  E.g. the size validation ends up being
-bogus, and userspace ends up abusing unions or implementing kvm_user_mem_region
-itself.
+On 12/20/22 12:24 PM, Halil Pasic wrote:
+> On Tue, 20 Dec 2022 09:33:03 -0500
+> Anthony Krowiak <akrowiak@linux.ibm.com> wrote:
+>
+>> On 12/19/22 9:10 AM, Halil Pasic wrote:
+>>> On Tue, 13 Dec 2022 10:44:37 -0500
+>>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
+>>>   
+>>>> Clean up IRQ resources even when a PQAP(ZAPQ) function fails with an error
+>>>> not handled by a case statement.
+>>> Why?
+>>
+>> If the ZAPQ failed, then instructions submitted to the same queue will
+>> likewise fail. Are you saying it's not safe to assume, therefore, that
+>> interrupts will not be occurring?
+> Right. We are talking about the default branch here, and I suppose, the
+> codes where we know that it is safe to assume that no reset is needed
+> handled separately (AP_RESPONSE_DECONFIGURED).
+>
+> I'm not convinced that if we take the default branch we can safely
+> assume, that we won't see any interrupts.
+>
+> For example consider hot-unplug as done by KVM. We modify the
+> CRYCB/APCB with all vCPUS take out of SIE, but we don't keep
+> the vCPUs out of SIE until the resets of the unpugged queues
+> are done, and we don't do any extra interrupt disablement
+> with all vCPUs keept out of SIE. So I believe currently there
+> may be a window where the guest can observe a 01 but the
+> interrupts are still live. That may be a bug, but IMHO it ain't clear
+> cut.
+>
+> But it is not just about interrupts. Before we returned an error
+> code, which gets propagated to the userspace if this reset was
+> triggered via the ioctl.
+>
+> With this change, ret seems to be uninitialized when returned
+> if we take the code path which you change here. So we would
+> end up logging a warning and returning garbage?
 
-It feels absolutely ridiculous, but I think the best option is to do:
 
-#define KVM_SET_USER_MEMORY_REGION2 _IOW(KVMIO, 0x49, \
-					 struct kvm_userspace_memory_region2)
+That was an oversight. The -EIO value was returned previously, so the 
+ret = -EIO should be set in the default case.
 
-/* for KVM_SET_USER_MEMORY_REGION2 */
-struct kvm_user_mem_region2 {
-	__u32 slot;
-	__u32 flags;
-	__u64 guest_phys_addr;
-	__u64 memory_size;
-	__u64 userspace_addr;
-	__u64 restricted_offset;
-	__u32 restricted_fd;
-	__u32 pad1;
-	__u64 pad2[14];
-}
 
-And it's consistent with other KVM ioctls(), e.g. KVM_SET_CPUID2.
+>
+> One could also debate, whether RCs introduced down the road
+> can affect the logic here (even if the statement "if we
+> see an RC other that 00 and 02, we don't need to pursue a
+> reset any further, and interrpts are disabled" were to be
+> guaranteed to be true now, new RCs could theoretically mess
+> this up).
 
-Regarding the userspace side of things, please include Vishal's selftests in v11,
-it's impossible to properly review the uAPI changes without seeing the userspace
-side of things.  I'm in the process of reviewing Vishal's v2[*], I'll try to
-massage it into a set of patches that you can incorporate into your series.
 
-[*] https://lore.kernel.org/all/20221205232341.4131240-1-vannapurve@google.com
+I think that would be the case regardless of this change. If new RCs are 
+introduced, this function ought to be revisited anyway and appropriate 
+changes made.
+
+
+>
+>   
+>>
+>>> I'm afraid this is a step in the wrong direction...
+>>
+>> Please explain why.
+>>
+> Sorry, I kept this brief because IMHO it is your job to tell us why
+> this needs to be changed. But I gave in, as you see.
+>
+> Regards,
+> Halil
