@@ -2,171 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A7C3E663098
-	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 20:41:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0C676630CB
+	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 20:52:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237499AbjAITkm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 14:40:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44226 "EHLO
+        id S237470AbjAITwf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 14:52:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236629AbjAITkj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 14:40:39 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 887A176801;
-        Mon,  9 Jan 2023 11:40:36 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 309INvA5005048;
-        Mon, 9 Jan 2023 19:40:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=QyKqcW400I7fdGBwWxCZ2QGqWWUUfCAvtddLjZAuzhM=;
- b=WthHWu2Ty/j5+16LcQpum2P2laRu3PBjiDNgPGzaw9nPTSN3R7g9ZvjPT6dJPU058R+t
- f1UuJNWNKK6zdf44ZX0sScqYOLKtJwrbFwEBCBLY13jj4RVrHfuACV7XtdR78eD93EQv
- Z2rur9frkyBZeP8ftPt8B7UteMWL8FAGUqdugD4Z2/iK1HOUjn3uQkE9bXisdcyfc4Gr
- FHmDS4Y6z/gZwMt8Cyp7lrBw13e7Ul8SOw725PHR5Rh2hKTP3H3qvo56tXVkQ40qA5b5
- HyxzaXpFR3kHCDV+oStUV1kiwTFOG/SB5rhFS1/xcNzoZx/FME5d6soUseKE5B/Aprv7 Mg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3myjasyefw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Jan 2023 19:40:33 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 309J8lxv021500;
-        Mon, 9 Jan 2023 19:40:33 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3myjasyefq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Jan 2023 19:40:33 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 309IxVms029729;
-        Mon, 9 Jan 2023 19:40:32 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
-        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3my0c7gy6v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 09 Jan 2023 19:40:32 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 309JeUsZ4063868
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 9 Jan 2023 19:40:30 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44EAF58054;
-        Mon,  9 Jan 2023 19:40:30 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D1F3658045;
-        Mon,  9 Jan 2023 19:40:28 +0000 (GMT)
-Received: from [9.160.171.221] (unknown [9.160.171.221])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Mon,  9 Jan 2023 19:40:28 +0000 (GMT)
-Message-ID: <3a1863b1-f0f2-92a6-09c4-eab1faafcd41@linux.ibm.com>
-Date:   Mon, 9 Jan 2023 14:40:28 -0500
+        with ESMTP id S237418AbjAITwV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 14:52:21 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E18CD50;
+        Mon,  9 Jan 2023 11:52:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673293939; x=1704829939;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rblSatFgkQX+6uOg/BWjvl2hRNBzPB7DjbscdtDtOdQ=;
+  b=g2StAJWisJzm3rXIN8+dE8YOWPxId/ofDw4qYRD7VDXkCITXttUNiNR2
+   y0g+Nv8voIYaMtE61XAIwVXT5HgjyLJz5rzBdkksUYyLRAMzZ7+c7g9Fo
+   7ejT2zzEhn3Tk+3e7keW6ARcGfnl1k29gLsEi532ztO+Ee/GkUgAmydKC
+   HSRStgTY0LPa5X3iQILdUN3X5fsSDGQX9MiALYLezBEb486Z8Zj8kJGFK
+   JeVfkUMz1c5Nh24yQ6l4vy/E1vZYB0+GVBCpb9hSnsiZ42135AmPCi0Fj
+   EOMsak7rykW7UC5wdXift1qVIv4wmphkN5RWvatbYqr/0C2rkHCMhYA7M
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10585"; a="306481855"
+X-IronPort-AV: E=Sophos;i="5.96,311,1665471600"; 
+   d="scan'208";a="306481855"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2023 11:52:19 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10585"; a="985504267"
+X-IronPort-AV: E=Sophos;i="5.96,311,1665471600"; 
+   d="scan'208";a="985504267"
+Received: from swapnadi-mobl2.amr.corp.intel.com (HELO [10.209.29.117]) ([10.209.29.117])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2023 11:52:17 -0800
+Message-ID: <bea7dbd0-f6ec-5103-9d00-9617154d6be9@intel.com>
+Date:   Mon, 9 Jan 2023 11:52:16 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH 7/7] s390/vfio_ap: always clean up IRQ resources
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v8 06/16] x86/virt/tdx: Get information about TDX module
+ and TDX-capable memory
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <cover.1670566861.git.kai.huang@intel.com>
+ <7c21a3de810397901bade0b1021912bbbf2d18bd.1670566861.git.kai.huang@intel.com>
+ <d1093b3e-cdab-b138-d488-19b9456be978@intel.com>
+ <e605ce95f1b92fae630bf6abb801774bc28d8072.camel@intel.com>
 Content-Language: en-US
-To:     Halil Pasic <pasic@linux.ibm.com>
-Cc:     linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, jjherne@linux.ibm.com, freude@linux.ibm.com,
-        borntraeger@de.ibm.com, cohuck@redhat.com, mjrosato@linux.ibm.com,
-        alex.williamson@redhat.com, kwankhede@nvidia.com,
-        fiuczy@linux.ibm.com
-References: <20221213154437.15480-1-akrowiak@linux.ibm.com>
- <20221213154437.15480-8-akrowiak@linux.ibm.com>
- <20221219151007.639dff5f.pasic@linux.ibm.com>
- <7b6d7e91-ba00-6486-39ae-91fca30b2cfb@linux.ibm.com>
- <20221220182407.5959a4b6.pasic@linux.ibm.com>
-From:   Anthony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <20221220182407.5959a4b6.pasic@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <e605ce95f1b92fae630bf6abb801774bc28d8072.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aXW4Uzq5MvLmCkoZBv9Qd31NJIr6vMUx
-X-Proofpoint-ORIG-GUID: _YGSmIYlAhw2DvPq9EdmY1vbisvdMPDp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-09_13,2023-01-09_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
- lowpriorityscore=0 mlxlogscore=999 clxscore=1015 spamscore=0 bulkscore=0
- suspectscore=0 priorityscore=1501 adultscore=0 malwarescore=0
- impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301090136
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-On 12/20/22 12:24 PM, Halil Pasic wrote:
-> On Tue, 20 Dec 2022 09:33:03 -0500
-> Anthony Krowiak <akrowiak@linux.ibm.com> wrote:
->
->> On 12/19/22 9:10 AM, Halil Pasic wrote:
->>> On Tue, 13 Dec 2022 10:44:37 -0500
->>> Tony Krowiak <akrowiak@linux.ibm.com> wrote:
->>>   
->>>> Clean up IRQ resources even when a PQAP(ZAPQ) function fails with an error
->>>> not handled by a case statement.
->>> Why?
+On 1/9/23 02:25, Huang, Kai wrote:
+> On Fri, 2023-01-06 at 09:46 -0800, Dave Hansen wrote:
+...
+>>> Note not all members in the 1024 bytes TDX module information are used
+>>> (even by the KVM).
 >>
->> If the ZAPQ failed, then instructions submitted to the same queue will
->> likewise fail. Are you saying it's not safe to assume, therefore, that
->> interrupts will not be occurring?
-> Right. We are talking about the default branch here, and I suppose, the
-> codes where we know that it is safe to assume that no reset is needed
-> handled separately (AP_RESPONSE_DECONFIGURED).
->
-> I'm not convinced that if we take the default branch we can safely
-> assume, that we won't see any interrupts.
->
-> For example consider hot-unplug as done by KVM. We modify the
-> CRYCB/APCB with all vCPUS take out of SIE, but we don't keep
-> the vCPUs out of SIE until the resets of the unpugged queues
-> are done, and we don't do any extra interrupt disablement
-> with all vCPUs keept out of SIE. So I believe currently there
-> may be a window where the guest can observe a 01 but the
-> interrupts are still live. That may be a bug, but IMHO it ain't clear
-> cut.
->
-> But it is not just about interrupts. Before we returned an error
-> code, which gets propagated to the userspace if this reset was
-> triggered via the ioctl.
->
-> With this change, ret seems to be uninitialized when returned
-> if we take the code path which you change here. So we would
-> end up logging a warning and returning garbage?
+>> I'm not sure what this has to do with anything.
+> 
+> You mentioned in v7 that:
+>>>> This is also a great place to mention that the tdsysinfo_struct
+contains
+>>> a *lot* of gunk which will not be used for a bit or that may never get
+>>> used.
+> 
+> https://lore.kernel.org/linux-mm/cc195eb6499cf021b4ce2e937200571915bfe66f.camel@intel.com/T/#m168e619aac945fa418ccb1d6652113003243d895
+> 
+> Perhaps I misunderstood something but I was trying to address this.
+> 
+> Should I remove this sentence?
 
+If someone goes looking at this patch, the see tdsysinfo_struct with
+something like two dozen defined fields.  But, very few of them get used
+in this patch.  Why?  Just saying that they are unused is a bit silly.
 
-That was an oversight. The -EIO value was returned previously, so the 
-ret = -EIO should be set in the default case.
+	The 'tdsysinfo_struct' is fairly large (1k) and contains a lot
+	of info about the TD.  Fully define the entire structure, but
+	only use the fields necessary to build the PAMT and TDMRs and
+	pr_info() some basics about the module.
 
+	The rest of the fields will get used... (by kvm?  never??)
 
->
-> One could also debate, whether RCs introduced down the road
-> can affect the logic here (even if the statement "if we
-> see an RC other that 00 and 02, we don't need to pursue a
-> reset any further, and interrpts are disabled" were to be
-> guaranteed to be true now, new RCs could theoretically mess
-> this up).
-
-
-I think that would be the case regardless of this change. If new RCs are 
-introduced, this function ought to be revisited anyway and appropriate 
-changes made.
-
-
->
->   
+...
+>>> +	struct tdsysinfo_struct *sysinfo = &PADDED_STRUCT(tdsysinfo);
+>>> +	int ret;
+>>> +
+>>> +	ret = tdx_get_sysinfo(sysinfo, cmr_array);
+>>> +	if (ret)
+>>> +		goto out;
+>>> +
+>>>  	/*
+>>>  	 * TODO:
+>>>  	 *
+>>> -	 *  - Get TDX module information and TDX-capable memory regions.
+>>>  	 *  - Build the list of TDX-usable memory regions.
+>>>  	 *  - Construct a list of TDMRs to cover all TDX-usable memory
+>>>  	 *    regions.
+>>> @@ -166,7 +239,9 @@ static int init_tdx_module(void)
+>>>  	 *
+>>>  	 *  Return error before all steps are done.
+>>>  	 */
+>>> -	return -EINVAL;
+>>> +	ret = -EINVAL;
+>>> +out:
+>>> +	return ret;
+>>>  }
 >>
->>> I'm afraid this is a step in the wrong direction...
->>
->> Please explain why.
->>
-> Sorry, I kept this brief because IMHO it is your job to tell us why
-> this needs to be changed. But I gave in, as you see.
->
-> Regards,
-> Halil
+>> I'm going to be lazy and not look into the future.  But, you don't need
+>> the "out:" label here, yet.  It doesn'serve any purpose like this, so
+>> why introduce it here?
+> 
+> The 'out' label is here because of below code:
+> 
+> 	ret = tdx_get_sysinfo(...);
+> 	if (ret)
+> 		goto out;
+> 
+> If I don't have 'out' label here in this patch, do you mean something below?
+> 
+> 	ret = tdx_get_sysinfo(...);
+> 	if (ret)
+> 		return ret;
+> 
+> 	/*
+> 	 * TODO:
+> 	 * ...
+> 	 * Return error before all steps are done.
+> 	 */
+> 	return -EINVAL;
+
+Yes, if you remove the 'out:' label like you've shown in your reply,
+it's actually _less_ code.  The labels are really only necessary when
+you have common work to "undo" something before returning from the
+function.  Here, you can just return.
+
