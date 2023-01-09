@@ -2,287 +2,142 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C46E9662BB9
-	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 17:52:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 50F79662BDA
+	for <lists+kvm@lfdr.de>; Mon,  9 Jan 2023 17:57:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235285AbjAIQwd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 11:52:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45892 "EHLO
+        id S230185AbjAIQ4n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 11:56:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237060AbjAIQwC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 11:52:02 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18CE03D9C2;
-        Mon,  9 Jan 2023 08:51:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673283084; x=1704819084;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ZucqOk+67Amc2gmLvmM/sbP9UykF6LcnNs8CXy0bFGQ=;
-  b=JFhFVnxL7ZCGSgQrMarjhC+HctoYMxeRPadHvtlrdywB59QkmRzbGJKi
-   LhWLKHSkQkH1q2n1by80xu6fLIi4agRkFvNRUODsCyosMX5nStbpEClGH
-   FdJPGgpKIkXxcU2a2jdy/50+vyeCjkFnYWDbdf8Hre+XgbHXdiBA3STUN
-   YJmXXKUH8jmlLdgWgbnjr/dpNmWoLPZB6C5q/RkXlSFtkdgKrieNTrALH
-   HI4OWY/38Xd1PIJtxHB6fRXUoLEUvYrOAPUOpmNwu7FJWDkoX5tO9oqzA
-   lck+AHbcCcQDgY28lALZA11l599H4gAmyP6zvGoF3tDT1CMDScfVriI/z
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10585"; a="306438461"
-X-IronPort-AV: E=Sophos;i="5.96,311,1665471600"; 
-   d="scan'208";a="306438461"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2023 08:51:23 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10585"; a="780747840"
-X-IronPort-AV: E=Sophos;i="5.96,311,1665471600"; 
-   d="scan'208";a="780747840"
-Received: from swapnadi-mobl2.amr.corp.intel.com (HELO [10.209.29.117]) ([10.209.29.117])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2023 08:51:21 -0800
-Message-ID: <e02fd75d-e9d4-15f1-eb9c-31cf3cc9ddc1@intel.com>
-Date:   Mon, 9 Jan 2023 08:51:20 -0800
+        with ESMTP id S237370AbjAIQ4H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 11:56:07 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C2023DBC7
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 08:55:39 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id p24so10136140plw.11
+        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 08:55:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=81sjJWzHO6Ovjo5Gl60AAk0+/2Zuzb6zOrT24WH6r3o=;
+        b=OOJuw8OWU9nGb+CL4TUgcpiaj0SA2J1CLUj7NLENcLFdDRo7NoHkTYncpkkO8iVYRl
+         74LR+OZkKxRfS5/+S70XDs2suGpDD6t9Hkh0kUhKuWlV9iwZpbsPPDe3G2gtcCd3m4nw
+         jkzOl8rELfTy/SlBdk23Ea03QIoTSoMfnf+EXS6eQOBKw7jDv0FTj3yFjQUvJjfapk4T
+         kf0Zy5ZqxRUUFZpsVxuA5H0Hw8apONfzLomEcmRWF/IHy93TJuSvzGiXQ8CJ/tb6x6h9
+         egX2evheI9vwF5TD/jWWy9FQg5kL0XyYYoEFICAoU2fjCkLhF9MUnLleCSPuBSDqBe0M
+         DX8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=81sjJWzHO6Ovjo5Gl60AAk0+/2Zuzb6zOrT24WH6r3o=;
+        b=fR0KKPSw5wNSYxcCxfmDc3i/yaOJ2yb0OMCd7UaqeOoQtp5gBEpmGDhfFT5L5w4uL8
+         zkORWAFmU3qvXbHM2QwxH9Ev0OiEH97Oebe95Gk8lRrREWNy5TP3KVA8T9vOeEoQI/uR
+         YhjTQ1sU9tiyoN812fwYZ8c3UTGYOA5pCoNeY7H4Pc5yKwyjJctfUKFnuQAD9s9XnhnY
+         wTij11EmfqaEM0pKSxw4gckdOlXUc2fubGEaoSpIjFZCvZ0JAzzwh0Nxov5dyFXA7lBJ
+         ArzNcQubjFqVXC2PIkL1TUKK77Ci9VSxTpVmzkWu++sNzR4dMycWT7rWjq0zs8ngUs6i
+         cUGA==
+X-Gm-Message-State: AFqh2kpR4InZGUTbyjVdMrW52m2zS17G/XbrWujgX+ADCIcK1suqR2wd
+        92q7lpCedkx5jeULsLHYHrrzgonWiHh3iFbVKjy6uQ==
+X-Google-Smtp-Source: AMrXdXsPdoZHVqBzLP7WRcXcNC4Xd6GTdeUcwaefhv8fy9Lwb6M6BmFfgkXiH/ADLsV/yr8LRaT3J6DHlJCmHzvZGPY=
+X-Received: by 2002:a17:902:82cb:b0:192:a04b:c624 with SMTP id
+ u11-20020a17090282cb00b00192a04bc624mr2581882plz.134.1673283338843; Mon, 09
+ Jan 2023 08:55:38 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v8 07/16] x86/virt/tdx: Use all system memory when
- initializing TDX module as TDX memory
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1670566861.git.kai.huang@intel.com>
- <8aab33a7db7a408beb403950e21f693b0b0f1f2b.1670566861.git.kai.huang@intel.com>
- <e7b682a1-abdf-ce73-f262-8b7ce946e78e@intel.com>
- <bc11552572428c3b29b67852b062c387ecd7be45.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <bc11552572428c3b29b67852b062c387ecd7be45.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-63-michael.roth@amd.com>
+ <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
+In-Reply-To: <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
+From:   Dionna Amalie Glaze <dionnaglaze@google.com>
+Date:   Mon, 9 Jan 2023 08:55:27 -0800
+Message-ID: <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
+Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
+To:     Dov Murik <dovmurik@linux.ibm.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/9/23 03:48, Huang, Kai wrote:
-...
->>>>> This approach works as in practice all boot-time present DIMMs are TDX
->>>>> convertible memory.  However, if any non-TDX-convertible memory has been
->>>>> hot-added (i.e. CXL memory via kmem driver) before initializing the TDX
->>>>> module, the module initialization will fail.
->>>
->>> I really don't know what this is trying to say.
-> 
-> My intention is to explain and call out that such design (use all memory regions
-> in memblock at the time of module initialization) works in practice, as long as
-> non-CMR memory hasn't been added via memory hotplug.
-> 
-> Not sure if it is necessary, but I was thinking it may help reviewer to judge
-> whether such design is acceptable.
+> > +
+> > +static int snp_set_instance_certs(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> > +{
+> [...]
+>
+> Here we set the length to the page-aligned value, but we copy only
+> params.cert_len bytes.  If there are two subsequent
+> snp_set_instance_certs() calls where the second one has a shorter
+> length, we might "keep" some leftover bytes from the first call.
+>
+> Consider:
+> 1. snp_set_instance_certs(certs_addr point to "AAA...", certs_len=8192)
+> 2. snp_set_instance_certs(certs_addr point to "BBB...", certs_len=4097)
+>
+> If I understand correctly, on the second call we'll copy 4097 "BBB..."
+> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
+> 1) & PAGE_MASK which will be 8192.
+>
+> Later when fetching the certs (for the extended report or in
+> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
+> filled with 4097 BBBs and 4095 leftover AAAs.
+>
+> Maybe zero sev->snp_certs_data entirely before writing to it?
+>
 
-This is yet another case where you've mechanically described the "what",
-but left out the implications or the underlying basis "why".
-
-I'd take a more methodical approach to describe what is going on here.
-List the steps that must occur, or at least *one* example of those steps
-and how they intereact with the code in this patch.  Then, explain the
-fallout.
-
-I also don't think it's quite right to call out "CXL memory via kmem
-driver".  If the CXL memory was "System RAM", it should get covered by a
-CMR and TDMR.  The kmem driver can still go wild with it.
-
->>> *How* and *why* does this module initialization failure occur?
-> 
-> If we pass any non-CMR memory to the TDX module, the SEAMCALL (TDH.SYS.CONFIG)
-> will fail.
-
-I'm frankly lost now.  Please go back and try to explain this better.
-Let me know if you want to iterate on this faster than resending this
-series five more times.  I've got some ideas.
-
->>>>> This can also be enhanced in the future, i.e. by allowing adding non-TDX
->>>>> memory to a separate NUMA node.  In this case, the "TDX-capable" nodes
->>>>> and the "non-TDX-capable" nodes can co-exist, but the kernel/userspace
->>>>> needs to guarantee memory pages for TDX guests are always allocated from
->>>>> the "TDX-capable" nodes.
->>>
->>> Why does it need to be enhanced?  What's the problem?
-> 
-> The problem is after TDX module initialization, no more memory can be hot-added
-> to the page allocator.
-> 
-> Kirill suggested this may not be ideal. With the existing NUMA ABIs we can
-> actually have both TDX-capable and non-TDX-capable NUMA nodes online. We can
-> bind TDX workloads to TDX-capable nodes while other non-TDX workloads can
-> utilize all memory.
-> 
-> But probably it is not necessarily to call out in the changelog?
-
-Let's say that we add this TDX-compatible-node ABI in the future.  What
-will old code do that doesn't know about this ABI?
-
-...
->>>>> +       list_for_each_entry(tmb, &tdx_memlist, list) {
->>>>> +               /*
->>>>> +                * The new range is TDX memory if it is fully covered by
->>>>> +                * any TDX memory block.
->>>>> +                *
->>>>> +                * Note TDX memory blocks are originated from memblock
->>>>> +                * memory regions, which can only be contiguous when two
->>>>> +                * regions have different NUMA nodes or flags.  Therefore
->>>>> +                * the new range cannot cross multiple TDX memory blocks.
->>>>> +                */
->>>>> +               if (start_pfn >= tmb->start_pfn && end_pfn <= tmb->end_pfn)
->>>>> +                       return true;
->>>>> +       }
->>>>> +       return false;
->>>>> +}
->>>
->>> I don't really like that comment.  It should first state its behavior
->>> and assumptions, like:
->>>
->>>     This check assumes that the start_pfn<->end_pfn range does not
->>>     cross multiple tdx_memlist entries.
->>>
->>> Only then should it describe why that is OK:
->>>
->>>     A single memory hotplug even across mutliple memblocks (from
->>>     which tdx_memlist entries are derived) is impossible.  ... then
->>>     actually explain
->>>
-> 
-> How about below?
-> 
->         /*
->          * This check assumes that the start_pfn<->end_pfn range does not cross
->          * multiple tdx_memlist entries. A single memory hotplug event across
->          * multiple memblocks (from which tdx_memlist entries are derived) is
->          * impossible. That means start_pfn<->end_pfn range cannot exceed a
->          * tdx_memlist entry, and the new range is TDX memory if it is fully
->          * covered by any tdx_memlist entry.
->          */
-
-I was hoping you would actually explain why it is impossible.
-
-Is there something fundamental that keeps a memory area that spans two
-nodes from being removed and then a new area added that is comprised of
-a single node?
-
-Boot time:
-
-	| memblock  |  memblock |
-	<--Node=0--> <--Node=1-->
-
-Funky hotplug... nothing to see here, then:
-
-	<--------Node=2-------->
-
-I would believe that there is no current bare-metal TDX system that has
-an implementation like this.  But, the comments above speak like it's
-fundamentally impossible.  That should be clarified.
-
-In other words, that comment talks about memblock attributes as being
-the core underlying reason that that simplified check is OK.  Is that
-it, or is it really the reduced hotplug feature set on TDX systems?
+Yes, I agree it should be zeroed, at least if the previous length is
+greater than the new length. Good catch.
 
 
-...
->>>>> +        * Build the list of "TDX-usable" memory regions which cover all
->>>>> +        * pages in the page allocator to guarantee that.  Do it while
->>>>> +        * holding mem_hotplug_lock read-lock as the memory hotplug code
->>>>> +        * path reads the @tdx_memlist to reject any new memory.
->>>>> +        */
->>>>> +       get_online_mems();
->>>
->>> Oh, it actually uses the memory hotplug locking for list protection.
->>> That's at least a bit subtle.  Please document that somewhere in the
->>> functions that actually manipulate the list.
-> 
-> add_tdx_memblock() and free_tdx_memlist() eventually calls list_add_tail() and
-> list_del() to manipulate the list, but they actually takes 'struct list_head
-> *tmb_list' as argument. 'tdx_memlist' is passed to build_tdx_memlist() as input.
-> 
-> Do you mean document the locking around the implementation of add_tdx_memblock()
-> and free_tdx_memlist()?
-> 
-> Or should we just mention it around the 'tdx_memlist' variable?
-> 
-> /* All TDX-usable memory regions. Protected by memory hotplug locking. */
-> static LIST_HEAD(tdx_memlist);
+> Related question (not only for this patch) regarding snp_certs_data
+> (host or per-instance): why is its size page-aligned at all? why is it
+> limited by 16KB or 20KB? If I understand correctly, for SNP, this buffer
+> is never sent to the PSP.
+>
 
-I don't think I'd hate it being in all three spots.  Also "protected by
-memory hotplug locking" is pretty generic.  Please be more specific.
+The buffer is meant to be copied into the guest driver following the
+GHCB extended guest request protocol. The data to copy back are
+expected to be in 4K page granularity.
 
->>> I think it's also worth saying something here about the high-level
->>> effects of what's going on:
->>>
->>>     Take a snapshot of the memory configuration (memblocks).  This
->>>     snapshot will be used to enable TDX support for *this* memory
->>>     configuration only.  Use a memory hotplug notifier to ensure
->>>     that no other RAM can be added outside of this configuration.
->>>
->>> That's it, right?
-> 
-> Yes. I'll somehow include above into the comment around get_online_mems().
-> 
-> But should I move "Use a memory hotplug notifier ..." part to:
-> 
->         err = register_memory_notifier(&tdx_memory_nb);
-> 
-> because this is where we actually use the memory hotplug notifier?
+> [...]
+> >
+> > -#define SEV_FW_BLOB_MAX_SIZE 0x4000  /* 16KB */
+> > +#define SEV_FW_BLOB_MAX_SIZE 0x5000  /* 20KB */
+> >
+>
+> This has effects in drivers/crypto/ccp/sev-dev.c
+>                                                                (for
+> example in alloc_snp_host_map).  Is that OK?
+>
 
-I actually want that snippet in the changelog.
+No, this was a mistake of mine because I was using a bloated data
+encoding that needed 5 pages for the GUID table plus 4 small
+certificates. I've since fixed that in our user space code.
+We shouldn't change this size and instead wait for a better size
+negotiation protocol between the guest and host to avoid this awkward
+hard-coding.
 
->>>>> +       ret = build_tdx_memlist(&tdx_memlist);
->>>>> +       if (ret)
->>>>> +               goto out;
->>>>> +
->>>>>         /*
->>>>>          * TODO:
->>>>>          *
->>>>> -        *  - Build the list of TDX-usable memory regions.
->>>>>          *  - Construct a list of TDMRs to cover all TDX-usable memory
->>>>>          *    regions.
->>>>>          *  - Pick up one TDX private KeyID as the global KeyID.
->>>>> @@ -241,6 +394,11 @@ static int init_tdx_module(void)
->>>>>          */
->>>>>         ret = -EINVAL;
->>>>>  out:
->>>>> +       /*
->>>>> +        * @tdx_memlist is written here and read at memory hotplug time.
->>>>> +        * Lock out memory hotplug code while building it.
->>>>> +        */
->>>>> +       put_online_mems();
->>>>>         return ret;
->>>>>  }
->>>
->>> You would also be wise to have the folks who do a lot of memory hotplug
->>> work today look at this sooner rather than later.  I _think_ what you
->>> have here is OK, but I'm really rusty on the code itself.
->>>
-> 
-> Thanks for advice. Will do.
-> 
 
+-- 
+-Dionna Glaze, PhD (she/her)
