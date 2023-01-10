@@ -2,48 +2,48 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E0566645E1
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 17:19:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3F3A36645F8
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 17:25:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238653AbjAJQT0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 11:19:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42170 "EHLO
+        id S234719AbjAJQZv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 11:25:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238834AbjAJQTP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 11:19:15 -0500
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4F936E42B;
-        Tue, 10 Jan 2023 08:18:48 -0800 (PST)
+        with ESMTP id S238618AbjAJQZo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 11:25:44 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F549BC0D;
+        Tue, 10 Jan 2023 08:25:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673367528; x=1704903528;
+  t=1673367943; x=1704903943;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=HzAV4h4PwTOTMezU8bvkGgKpyYb8PNekRFDWu1NI97I=;
-  b=KvfghNC29qm/LS9KMsWr1imY1TthHjzbVvzSXOUF3ok+wQdRuhXZnDjJ
-   LVvkL7Ot3F+x4YTz03fZdXvOk1f+7cajnGtXeE6A9U0YWSXFwi3mPMic5
-   t0whrDC8UsxlT09v5wm2WorsZYCJnch7GElZChnE1rRCYZKTwOfKrHWv/
-   DzbsCjvBOu49ShQXRbqoF962d40dc32dqZhoeRG2poLHw4pd6ZdJk0h0i
-   lycx92MkPO6Q8bJ3p+bqy35VD3iqcvagZ0KxhO839BrYfp20TUn3+sEWH
-   C1m96k9i4g77Dhs4wM8q6cp7a9tWgSAJTbHodX3qcoPepxi3ZIGwUgHZe
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="320874904"
+  bh=eJNdrQV4oRElpWQ+CG8bXg+giTuMt6NAEdhJm7LZmYo=;
+  b=AV2gHCKL6SKKyaQZz7ho1hV9a2PLranfPN/0BVG2UqHPZFoGY7RpIKvO
+   QH5Ejz5v9F72x4TyapvanzmWjMMmdWHwfE5pIlxYApv4bJSgkqcyl4L5p
+   PCnZv6QHZBAypeLRA0QyKjoSFSvIRgHPaQ4epcp8j/o4gQiFrBS+gCfYi
+   T180ZWSKzRLL7v7b+1IBhUCn4Jv689+IVSMdn0d9RPLoc7z71u14FldtZ
+   YIvBVV/asZ6HKPl3SsSw0N4f93QXN0MoOgOEUX6+xDDG7A88w3YUP8b4u
+   Yfl+RNURxEoLU1yTnwuiKjmYWT4V6UPv/P0KjeCXKzusNxDxnf+qUnel3
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="302890704"
 X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
-   d="scan'208";a="320874904"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 08:18:48 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="725596337"
+   d="scan'208";a="302890704"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 08:25:43 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="607011593"
 X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
-   d="scan'208";a="725596337"
+   d="scan'208";a="607011593"
 Received: from svenka7-mobl1.amr.corp.intel.com (HELO [10.209.63.27]) ([10.209.63.27])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 08:18:47 -0800
-Message-ID: <16f23950-2a27-29de-c0b4-e5f2d927c8b4@intel.com>
-Date:   Tue, 10 Jan 2023 08:18:46 -0800
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 08:25:42 -0800
+Message-ID: <755f94aa-a0cc-b7d6-ce8a-a81ff4f598da@intel.com>
+Date:   Tue, 10 Jan 2023 08:25:42 -0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.1
-Subject: Re: [PATCH v8 07/16] x86/virt/tdx: Use all system memory when
- initializing TDX module as TDX memory
+Subject: Re: [PATCH v8 12/16] x86/virt/tdx: Designate the global KeyID and
+ configure the TDX module
 Content-Language: en-US
 To:     "Huang, Kai" <kai.huang@intel.com>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
@@ -56,31 +56,29 @@ Cc:     "Luck, Tony" <tony.luck@intel.com>,
         "Christopherson,, Sean" <seanjc@google.com>,
         "Chatre, Reinette" <reinette.chatre@intel.com>,
         "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
         "linux-mm@kvack.org" <linux-mm@kvack.org>,
         "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "peterz@infradead.org" <peterz@infradead.org>,
         "Shahar, Sagi" <sagis@google.com>,
         "imammedo@redhat.com" <imammedo@redhat.com>,
         "Gao, Chao" <chao.gao@intel.com>,
         "Brown, Len" <len.brown@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
         "sathyanarayanan.kuppuswamy@linux.intel.com" 
         <sathyanarayanan.kuppuswamy@linux.intel.com>,
         "Huang, Ying" <ying.huang@intel.com>,
         "Williams, Dan J" <dan.j.williams@intel.com>
 References: <cover.1670566861.git.kai.huang@intel.com>
- <8aab33a7db7a408beb403950e21f693b0b0f1f2b.1670566861.git.kai.huang@intel.com>
- <e7b682a1-abdf-ce73-f262-8b7ce946e78e@intel.com>
- <bc11552572428c3b29b67852b062c387ecd7be45.camel@intel.com>
- <e02fd75d-e9d4-15f1-eb9c-31cf3cc9ddc1@intel.com>
- <a5d4de8b074b6d1a34bd3d424c5c4f0d677ec15f.camel@intel.com>
+ <d7b01f396908da796644e58298a34c1f8a140be7.1670566861.git.kai.huang@intel.com>
+ <e1a55f50-efc0-5098-1a2d-f0eaa0b51a82@intel.com>
+ <748adb0e8df5f804371f0587ed8fef1184177484.camel@intel.com>
 From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <a5d4de8b074b6d1a34bd3d424c5c4f0d677ec15f.camel@intel.com>
+In-Reply-To: <748adb0e8df5f804371f0587ed8fef1184177484.camel@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,72 +86,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/10/23 04:09, Huang, Kai wrote:
-> On Mon, 2023-01-09 at 08:51 -0800, Dave Hansen wrote:
->> On 1/9/23 03:48, Huang, Kai wrote:
->>>>>>> This can also be enhanced in the future, i.e. by allowing adding non-TDX
->>>>>>> memory to a separate NUMA node.  In this case, the "TDX-capable" nodes
->>>>>>> and the "non-TDX-capable" nodes can co-exist, but the kernel/userspace
->>>>>>> needs to guarantee memory pages for TDX guests are always allocated from
->>>>>>> the "TDX-capable" nodes.
->>>>>
->>>>> Why does it need to be enhanced?  What's the problem?
+On 1/10/23 02:48, Huang, Kai wrote:
 >>>
->>> The problem is after TDX module initialization, no more memory can be hot-added
->>> to the page allocator.
->>>
->>> Kirill suggested this may not be ideal. With the existing NUMA ABIs we can
->>> actually have both TDX-capable and non-TDX-capable NUMA nodes online. We can
->>> bind TDX workloads to TDX-capable nodes while other non-TDX workloads can
->>> utilize all memory.
->>>
->>> But probably it is not necessarily to call out in the changelog?
->>
->> Let's say that we add this TDX-compatible-node ABI in the future.  What
->> will old code do that doesn't know about this ABI?
+>>> +   /*
+>>> +    * Use the first private KeyID as the global KeyID, and pass
+>>> +    * it along with the TDMRs to the TDX module.
+>>> +    */
+>>> +   ret = config_tdx_module(&tdmr_list, tdx_keyid_start);
+>>> +   if (ret)
+>>> +           goto out_free_pamts;
+>> This is "consuming" tdx_keyid_start.  Does it need to get incremented
+>> since the first guest can't use this KeyID now?
 > 
-> Right.  The old app will break w/o knowing the new ABI.  One resolution, I
-> think, is we don't introduce new userspace ABI, but hide "TDX-capable" and "non-
-> TDX-capable" nodes in the kernel, and let kernel to enforce always allocating
-> TDX guest memory from those "TDX-capable" nodes.
-
-That doesn't actually hide all of the behavior from users.  Let's say
-they do:
-
-	numactl --membind=6 qemu-kvm ...
-
-In other words, take all of this guest's memory and put it on node 6.
-There lots of free memory on node 6 which is TDX-*IN*compatible.  Then,
-they make it a TDX guest:
-
-	numactl --membind=6 qemu-kvm -tdx ...
-
-What happens?  Does the kernel silently ignore the --membind=6?  Or does
-it return -ENOMEM somewhere and confuse the user who has *LOTS* of free
-memory on node 6.
-
-In other words, I don't think the kernel can just enforce this
-internally and hide it from userspace.
-
->> Is there something fundamental that keeps a memory area that spans two
->> nodes from being removed and then a new area added that is comprised of
->> a single node?
->> Boot time:
->>
->> 	| memblock  |  memblock |
->> 	<--Node=0--> <--Node=1-->
->>
->> Funky hotplug... nothing to see here, then:
->>
->> 	<--------Node=2-------->
+> It depends on how we treat 'tdx_keyid_start'.  If it means the first _usable_
+> KeyID for KVM, then we should increase it; but if it only used for the hardware-
+> enabled TDX KeyID range, then we don't need to increase it.
 > 
-> I must have missed something, but how can this happen?
+> Currently it is marked as __ro_after_init so my intention is the latter (also in
+> the spirit of keeping this series minimal).
 > 
-> I had memory that this cannot happen because the BIOS always allocates address
-> ranges for all NUMA nodes during machine boot.  Those address ranges don't
-> necessarily need to have DIMM fully populated but they don't change during
-> machine's runtime.
+> Eventually we will need to have functions to allocate/free TDX KeyIDs anyway for
+> KVM, but in that we can just treat 'tdx_keyid_start + 1' as the first usable
+> KeyID.
 
-Is your memory correct?  Is there evidence, or requirements in any
-specification to support your memory?
+So, basically, you're going to depend on the KVM code (which isn't in
+this series) to magically know exactly what this series did?  Then,
+you're expecting that this code will never change in a way that breaks
+this random KVM code?
+
+That's frankly awful.
+
+Make the variable read/write.  Call it tdx_guest_keyid_start, and
+increment it when you make a keyid unavailable for guest use.
+
 
