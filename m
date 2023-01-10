@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AE3B663744
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 03:24:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10FBC663745
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 03:24:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237843AbjAJCYs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 21:24:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53790 "EHLO
+        id S237819AbjAJCYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 9 Jan 2023 21:24:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237820AbjAJCYm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 21:24:42 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 249572F7AF
-        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 18:24:42 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id u3-20020a056a00124300b0056d4ab0c7cbso4352356pfi.7
-        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 18:24:42 -0800 (PST)
+        with ESMTP id S237802AbjAJCYo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 9 Jan 2023 21:24:44 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D7C1EEEE
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 18:24:43 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id d2-20020a170902cec200b001899479b1d8so7527337plg.22
+        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 18:24:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MOc6nDFQxL2+zMzMHVOY/zZ9XFhHWFGOwpzRU/kQJv4=;
-        b=giKA0LkehwnFAaJcxWDPj+9uugfdIq16i6d89COL3MpQpBHSdMfJ9ai8B/GNsiicdz
-         waa3+dABc6GxX+rusfAc1gaP6XzkrpGIi00AjbdmFPqbki6H8jAXkPw3Jcf3jXZDXMiS
-         qXNXBTPXkAvi97AZ1KuPRVCL5sk0w6opxw+DjBNx4zzc7ViUoMSNOXeh/5SOPDnai0WO
-         KqdaQ+T//2ENiD+cHLk4zBDULpMfmWA22SSrDHCxgNnwPLWwTZJhVi+F3glO7pYLwsXi
-         +5Lfdc7QG74jkXTkewy+fEtoBS3X18mhc5J2koQaC1bzpfRVu7rcApDO/2qlJHDGX9Jv
-         5hBQ==
+        bh=Sb/UL9N+TdW3lyMm25d4vAkbjgvwAOnK9Fl+rduzRIA=;
+        b=rEqCGz6t8QyQlPEI0NMPzk1i6EQpUrqa6XyEDrHbO0wHyeOeEfrPcIfaXWhoIk77s+
+         UJd9yLZ6nX5O36ou5ENtRg9HtJXknlVeiIy+PS0zgiJiZGktSr6V9oILhwEYoP/Rzv/9
+         rF1qj27evW3vgFYHed2IJLijv0bCseAxNKZq4DGaJRc/huiFJjonxXEIaFpoFPQGlYaE
+         206m63B4RZrIiKDikwfEW5iyncqvQUyQxqNe2td0EivnsXeT8nQkZsqYNgUBcInnikzD
+         BY+oKQJy7tU376nIBOiivhwFpd0AB+RuDVOYNx1jICIJU/s3lQB36RVg3j22zWX2b1GG
+         je8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MOc6nDFQxL2+zMzMHVOY/zZ9XFhHWFGOwpzRU/kQJv4=;
-        b=o1tHg5ABi0V0pX2YuzNY4hifzt3x7GZd6MRCf9cMO+bHge9IGR+5xNCd8nKnSq2S4Z
-         Y/Ly7MnO/XrE6ZiMslbXtVLECm1TRqoTvdzGAPFI7XtCYTDcZFEvVt1Q9WdRItNv7rMF
-         ka15Otk3u/+q2Ow/YoxYhjhCGr54tcPdIdeg/iyNGpRqPg6/T9mW6D+h5QBTWX2kb+kP
-         fPGDwASTnSXBWxXBaBiMNeWBsBTQq8OUGSmGxOkPaNL2J5LlTc8q44/lAyxJiTfEakSb
-         1Ss33yEZJbdYm2nCaTlBhAwJBQBByhjSJpmeEl/9R5hQrlz7m0jWwCYM5+q4jTrB9iNY
-         5+EQ==
-X-Gm-Message-State: AFqh2kpCXMJdIBACZvFAC1jUquIVCwvN076USolN+AJd8Wqb4XIflGvH
-        rzhoIg53U/InI0sfO+EyQ2k/QL5BOUIZj5wDFTwvDsBhWVd6H2IJ2mbD+Tixjwo4cP5rfkLOy2v
-        iJuPpIBe2bkeZhB4JHEHuMS0cmqXWzRAOWAytca+sVC4WZYp5HvGRBIGC5uZ6cp4=
-X-Google-Smtp-Source: AMrXdXtiP2AjlooOdh29gOi1ydGUgioJWHVFIDJdUdJK5lpaF4pioCqj/pDWU2ysBBrHgveL1sZl9eOQXlw7Bg==
+        bh=Sb/UL9N+TdW3lyMm25d4vAkbjgvwAOnK9Fl+rduzRIA=;
+        b=z5Rv4FifSTdfthIAk+Rd1V4VgiqhibON5PiMpEPna/7sNfjGWy3mGJlPpno9E6vOE1
+         U05YvT3M0Hlza8EUz3RAG9M4iruajVEGb0jza3raaczwgKwmtId8+tPxsAWvDywk7GlP
+         2AYCwNWkaDNKsJOpHAw5iR4nSXz6MosWj1tBCG+WqWioKEuK7yTuSigYcJmg/EY6jcVF
+         phbAsTlRu98vOaLYD51EH2UQYkSvZM//qGM1aVenp+FsYAsunbnIanJCGwCQsRv3IZsX
+         xzbDhg3r18OOE4sb3V6pSd5ZvM6zVlWFi/HwCmFwhM33hutD6Mnbpo7qFYl5nUkZH7Fs
+         K2DQ==
+X-Gm-Message-State: AFqh2krYlmCHsLPHv7e7JH5BjLcKim6YdpPYH2wPpzqiiBittuJzl/vJ
+        EwSRP88K8HhXhGTrzQruughyhR1Q9NTc+CUQ9JEM3IFSfECukqHmFTha8vB7VG0tZYMAupJYloY
+        kIalOsPJQGqFHJzkVvsLRgc92p0dCWybXHNy1gMO4ETadX86rQGS0kphtkeFuTao=
+X-Google-Smtp-Source: AMrXdXvlWGEjWfWcZbHDWIm9NmwSybJsE2rgL2m0oZSh7/z6aEYi0sv6dlvDGgg3uUUT97CYCNP50UyE+Oc6NA==
 X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a63:e046:0:b0:477:a381:84d with SMTP id
- n6-20020a63e046000000b00477a381084dmr4374577pgj.207.1673317481175; Mon, 09
- Jan 2023 18:24:41 -0800 (PST)
-Date:   Tue, 10 Jan 2023 02:24:31 +0000
+ (user=ricarkol job=sendgmr) by 2002:a05:6a00:a0f:b0:581:366c:64ff with SMTP
+ id p15-20020a056a000a0f00b00581366c64ffmr3772266pfh.85.1673317483224; Mon, 09
+ Jan 2023 18:24:43 -0800 (PST)
+Date:   Tue, 10 Jan 2023 02:24:32 +0000
 In-Reply-To: <20230110022432.330151-1-ricarkol@google.com>
 Mime-Version: 1.0
 References: <20230110022432.330151-1-ricarkol@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230110022432.330151-4-ricarkol@google.com>
-Subject: [PATCH 3/4] KVM: selftests: aarch64: Fix check of dirty log PT write
+Message-ID: <20230110022432.330151-5-ricarkol@google.com>
+Subject: [PATCH 4/4] KVM: selftests: aarch64: Test read-only PT memory regions
 From:   Ricardo Koller <ricarkol@google.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev
 Cc:     pbonzini@redhat.com, maz@kernel.org, alexandru.elisei@arm.com,
@@ -69,54 +69,98 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The dirty log checks are mistakenly testing the first page in the page
-table (PT) memory region instead of the page holding the test data page
-PTE.  This wasn't an issue before commit "KVM: arm64: Fix handling of S1PTW
-S2 fault on RO memslots" as all PT pages (including the first page) were
-treated as writes.
+Extend the read-only memslot tests in page_fault_test to test read-only PT
+(Page table) memslots. Note that this was not allowed before commit "KVM:
+arm64: Fix handling of S1PTW S2 fault on RO memslots" as all S1PTW faults
+were treated as writes which resulted in an (unrecoverable) exception
+inside the guest.
 
-Fix the page_fault_test dirty logging tests by checking for the right page:
-the one for the PTE of the data test page.
-
-Fixes: a4edf25b3e25 ("KVM: selftests: aarch64: Add dirty logging tests into page_fault_test")
 Signed-off-by: Ricardo Koller <ricarkol@google.com>
 ---
- tools/testing/selftests/kvm/aarch64/page_fault_test.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ .../selftests/kvm/aarch64/page_fault_test.c        | 14 +++++++++-----
+ 1 file changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-index 1a3bb2bd8657..2e2178a7d0d8 100644
+index 2e2178a7d0d8..2f81d68e876c 100644
 --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
 +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
-@@ -470,9 +470,12 @@ static bool handle_cmd(struct kvm_vm *vm, int cmd)
- {
- 	struct userspace_mem_region *data_region, *pt_region;
- 	bool continue_test = true;
-+	uint64_t pte_gpa, pte_pg;
+@@ -831,6 +831,7 @@ static void help(char *name)
+ {										\
+ 	.name			= SCAT3(ro_memslot, _access, _with_af),		\
+ 	.data_memslot_flags	= KVM_MEM_READONLY,				\
++	.pt_memslot_flags	= KVM_MEM_READONLY,				\
+ 	.guest_prepare		= { _PREPARE(_access) },			\
+ 	.guest_test		= _access,					\
+ 	.mmio_handler		= _mmio_handler,				\
+@@ -841,6 +842,7 @@ static void help(char *name)
+ {										\
+ 	.name			= SCAT2(ro_memslot_no_syndrome, _access),	\
+ 	.data_memslot_flags	= KVM_MEM_READONLY,				\
++	.pt_memslot_flags	= KVM_MEM_READONLY,				\
+ 	.guest_test		= _access,					\
+ 	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
+ 	.expected_events	= { .fail_vcpu_runs = 1 },			\
+@@ -851,7 +853,7 @@ static void help(char *name)
+ {										\
+ 	.name			= SCAT3(ro_memslot, _access, _with_af),		\
+ 	.data_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
+-	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
++	.pt_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
+ 	.guest_prepare		= { _PREPARE(_access) },			\
+ 	.guest_test		= _access,					\
+ 	.guest_test_check	= { _test_check },				\
+@@ -863,7 +865,7 @@ static void help(char *name)
+ {										\
+ 	.name			= SCAT2(ro_memslot_no_syn_and_dlog, _access),	\
+ 	.data_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
+-	.pt_memslot_flags	= KVM_MEM_LOG_DIRTY_PAGES,			\
++	.pt_memslot_flags	= KVM_MEM_READONLY | KVM_MEM_LOG_DIRTY_PAGES,	\
+ 	.guest_test		= _access,					\
+ 	.guest_test_check	= { _test_check },				\
+ 	.fail_vcpu_run_handler	= fail_vcpu_run_mmio_no_syndrome_handler,	\
+@@ -875,6 +877,7 @@ static void help(char *name)
+ {										\
+ 	.name			= SCAT2(ro_memslot_uffd, _access),		\
+ 	.data_memslot_flags	= KVM_MEM_READONLY,				\
++	.pt_memslot_flags	= KVM_MEM_READONLY,				\
+ 	.mem_mark_cmd		= CMD_HOLE_DATA | CMD_HOLE_PT,			\
+ 	.guest_prepare		= { _PREPARE(_access) },			\
+ 	.guest_test		= _access,					\
+@@ -890,6 +893,7 @@ static void help(char *name)
+ {										\
+ 	.name			= SCAT2(ro_memslot_no_syndrome, _access),	\
+ 	.data_memslot_flags	= KVM_MEM_READONLY,				\
++	.pt_memslot_flags	= KVM_MEM_READONLY,				\
+ 	.mem_mark_cmd		= CMD_HOLE_DATA | CMD_HOLE_PT,			\
+ 	.guest_test		= _access,					\
+ 	.uffd_data_handler	= _uffd_data_handler,				\
+@@ -1024,7 +1028,7 @@ static struct test_desc tests[] = {
+ 				guest_check_write_in_dirty_log,
+ 				guest_check_s1ptw_wr_in_dirty_log),
+ 	/*
+-	 * Try accesses when the data memory region is marked read-only
++	 * Access when both the PT and data regions are marked read-only
+ 	 * (with KVM_MEM_READONLY). Writes with a syndrome result in an
+ 	 * MMIO exit, writes with no syndrome (e.g., CAS) result in a
+ 	 * failed vcpu run, and reads/execs with and without syndroms do
+@@ -1040,7 +1044,7 @@ static struct test_desc tests[] = {
+ 	TEST_RO_MEMSLOT_NO_SYNDROME(guest_st_preidx),
  
- 	data_region = vm_get_mem_region(vm, MEM_REGION_TEST_DATA);
- 	pt_region = vm_get_mem_region(vm, MEM_REGION_PT);
-+	pte_gpa = addr_hva2gpa(vm, virt_get_pte_hva(vm, TEST_GVA));
-+	pte_pg = (pte_gpa - pt_region->region.guest_phys_addr) / getpagesize();
+ 	/*
+-	 * Access when both the data region is both read-only and marked
++	 * The PT and data regions are both read-only and marked
+ 	 * for dirty logging at the same time. The expected result is that
+ 	 * for writes there should be no write in the dirty log. The
+ 	 * readonly handling is the same as if the memslot was not marked
+@@ -1065,7 +1069,7 @@ static struct test_desc tests[] = {
+ 						  guest_check_no_write_in_dirty_log),
  
- 	if (cmd == CMD_SKIP_TEST)
- 		continue_test = false;
-@@ -485,13 +488,13 @@ static bool handle_cmd(struct kvm_vm *vm, int cmd)
- 		TEST_ASSERT(check_write_in_dirty_log(vm, data_region, 0),
- 			    "Missing write in dirty log");
- 	if (cmd & CMD_CHECK_S1PTW_WR_IN_DIRTY_LOG)
--		TEST_ASSERT(check_write_in_dirty_log(vm, pt_region, 0),
-+		TEST_ASSERT(check_write_in_dirty_log(vm, pt_region, pte_pg),
- 			    "Missing s1ptw write in dirty log");
- 	if (cmd & CMD_CHECK_NO_WRITE_IN_DIRTY_LOG)
- 		TEST_ASSERT(!check_write_in_dirty_log(vm, data_region, 0),
- 			    "Unexpected write in dirty log");
- 	if (cmd & CMD_CHECK_NO_S1PTW_WR_IN_DIRTY_LOG)
--		TEST_ASSERT(!check_write_in_dirty_log(vm, pt_region, 0),
-+		TEST_ASSERT(!check_write_in_dirty_log(vm, pt_region, pte_pg),
- 			    "Unexpected s1ptw write in dirty log");
- 
- 	return continue_test;
+ 	/*
+-	 * Access when the data region is both read-only and punched with
++	 * The PT and data regions are both read-only and punched with
+ 	 * holes tracked with userfaultfd.  The expected result is the
+ 	 * union of both userfaultfd and read-only behaviors. For example,
+ 	 * write accesses result in a userfaultfd write fault and an MMIO
 -- 
 2.39.0.314.g84b9a713c41-goog
 
