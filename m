@@ -2,141 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E6C6664BFF
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 20:08:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A3C3F664C03
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 20:09:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239720AbjAJTIZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 14:08:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47510 "EHLO
+        id S239578AbjAJTIv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 14:08:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239743AbjAJTID (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 14:08:03 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2046.outbound.protection.outlook.com [40.107.220.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08A7C5A8A3;
-        Tue, 10 Jan 2023 11:06:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CjZCsQiDM8vZPgXd4//NRscdFRjkiCeSN4rsLo1tJm37xhobe03waDOkh8v3oHMystNtfXEObOEQqS9mEO/wOvKx5ukqh2sPLvxkNi/e11ZsheRF0JI1nHtnhtfIoIg4TkaqtS0XJxWq0dhmtQ5o1BxghUbTcuIdelX8+LtyebzjWPsS3+0HwW+e+zBkWo8w1+lQWO8AEKH8OL4ABMaVRVPg1upkVaNMvkfMUoccpLkXaueX8HHMenRKCUpnSdDJqmX3pHsSDzgQ8WwTfx6QujsIqu/WmZoUJe7ISELnNVBgrk2CG1T6BJrPGrGrMRdt0DxJ4gVfaQFps8RKZG22Rg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UXv9uuh00uY791GCkizPR5dW2JuXiJ6sjpkZy6bTjf0=;
- b=fBc1x+w277lXiD5zgsBc32NQ9UU1Hv6rFlH59f+y+MgjoyoaQsC1JVoMiFqAQsn8Q1z4Q66MRGemNkgrUz+traFQO8qmf6qAcf9tNPKukZ+2AzzTxJ6VtSn5wnEnAvVY18LLEVAghxq43jZTwKRF5DOnNeHtTpgpJeS70nsWyUNYHkoLD1qEfcZZXcvVHzsbil/5y94WS2HDdaLGEbxJhweslLdYi/SYzPeLxnRWoYYc/0iImlnj+a4nJqc7KX4q0iPfEMpW8qW2qZuZXXcoGeyEQ2FbZ4LlDoXzRiHarn1qEpYGWDWj1dSdSCVFsbn+BEhBIG7li9mhSJy7M0E1NA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UXv9uuh00uY791GCkizPR5dW2JuXiJ6sjpkZy6bTjf0=;
- b=4SefMu3Cwi3e+VV5XfH/4VK9ja2mJP14sP7Cuo3eAYncXW4uoXVX1KRTvP/wHX0xxHMd5ugNtm8Kml84+4uQ4epFCuQLvYZ6Es6qJULt/T062E8svDH1suBHJqkIAzbEpzSaIVgtrKgclAaC6CalN+HctlMinbjtNHDUCMu0dNk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by PH7PR12MB6665.namprd12.prod.outlook.com (2603:10b6:510:1a7::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Tue, 10 Jan
- 2023 19:06:42 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::8200:4042:8db4:63d7]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::8200:4042:8db4:63d7%4]) with mapi id 15.20.5986.018; Tue, 10 Jan 2023
- 19:06:42 +0000
-Message-ID: <41c493a4-9f3f-159a-f58b-a5bbff2c128d@amd.com>
-Date:   Tue, 10 Jan 2023 13:06:38 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH kernel v2 2/3] KVM: SEV: Enable data breakpoints in SEV-ES
-Content-Language: en-US
-To:     Borislav Petkov <bp@alien8.de>, Alexey Kardashevskiy <aik@amd.com>
-Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Tony Luck <tony.luck@intel.com>,
+        with ESMTP id S239768AbjAJTIQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 14:08:16 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C1F26422
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 11:07:20 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id b17so6701005pld.7
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 11:07:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=P1yZ2rNXY9+OCT2MctvfeqyzaEmRMSdK9cnP/qUD3es=;
+        b=HulWpN3OqpO54u6cPuVDdQltxY/fxlzGQnBNBhw9p/WwPEBiviSDJ+JEav0A4p0BDi
+         nQClbKn2krzf5xzUUul+xfQ8+E1acsIqjE6fn5x3WvfOD+FBBySt0bobCk8SE4P1QA3v
+         3KIrMOnr1JuzERZButT5IVawEs1vynARr/7ba+m78yiqXzdckTfhlP731gneYD7nyujQ
+         paJALe1Nyup2BVE5u8lyjJ4J8N6Co38Yz/vlve8RoldnjQ2zltx+NygJ8UqCyheJkI8f
+         zVLNU/dttLt1LZsEOxDgd9Ha/N5pZTykObvqt+m8SFb27i765m8hmcimiImBfGOWVGH5
+         xzQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P1yZ2rNXY9+OCT2MctvfeqyzaEmRMSdK9cnP/qUD3es=;
+        b=1CRmLU9U5JuBP0NprjQLKaABg8bPeqAHFD5WR4oJrsUSqaBScJYhfiBfT+/Yw0xHs5
+         tQVmMtzZHqPlIL5POeYN1w95RKYWkxfeIF7LNr5Hb55yi09euncFnXSKpTAyCppbKcqK
+         8bAA2Ttdm2jM4dKMUdY7sTgGFBzyoKnvuAgqvgUqpS5QCcYfH6q5+/rVoPwRNcaQpVDq
+         KJKFSbOMqKVCQvQYp7+8bj4fy7eEZ3GxApAg22Myj9oBcodh/k+/4QjzDbaOscbq8JZU
+         ZeZtzxjCSMeY/8+yIAQY4h2ps3yIwCSaPeub8pMzBJzrHMIen86xvHdMR81gDX9UiahY
+         OSSg==
+X-Gm-Message-State: AFqh2koWCKm79dAZI2nxsnoB7VD2QCTQzaEzuaxzKodUWU0fZp23milw
+        jO0xCsXEKB+Ltx7kl+9M7QiYvQ==
+X-Google-Smtp-Source: AMrXdXvPJCjnKjpu/C3fOnUqxkmb0rowb3o4CPE21MAZXvaWlO9x+E+NcO57ODSh2Du+60yMYtseqQ==
+X-Received: by 2002:a05:6a20:1394:b0:b5:a970:8d5a with SMTP id w20-20020a056a20139400b000b5a9708d5amr152380pzh.0.1673377639322;
+        Tue, 10 Jan 2023 11:07:19 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id r4-20020aa79624000000b0056bd1bf4243sm8484018pfg.53.2023.01.10.11.07.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Jan 2023 11:07:18 -0800 (PST)
+Date:   Tue, 10 Jan 2023 19:07:15 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Emanuele Giuseppe Esposito <eesposit@redhat.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org,
         Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Sandipan Das <sandipan.das@amd.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Jan Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>,
-        Huang Rui <ray.huang@amd.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-References: <20221209043804.942352-1-aik@amd.com>
- <20221209043804.942352-3-aik@amd.com> <Y72nyuKT+VJYiEUi@zn.tnic>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <Y72nyuKT+VJYiEUi@zn.tnic>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: CH2PR10CA0004.namprd10.prod.outlook.com
- (2603:10b6:610:4c::14) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
+        Gautam Menghani <gautammenghani201@gmail.com>,
+        Zeng Guang <guang.zeng@intel.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Jim Mattson <jmattson@google.com>,
+        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [RFC PATCH 1/2] KVM: x86: update APIC_ID also when disabling
+ x2APIC in kvm_lapic_set_baseg
+Message-ID: <Y723YwUj/0+U++jI@google.com>
+References: <20230109130605.2013555-1-eesposit@redhat.com>
+ <20230109130605.2013555-2-eesposit@redhat.com>
+ <c61ce1a6393a108c76e53cb99249aba5ab318e07.camel@redhat.com>
+ <Y7w/bYP4VGqoVcjH@google.com>
+ <5664d006-9452-2033-5605-48aa0ee77ca8@redhat.com>
+ <fa0758f5-abd1-ad09-3878-adf296c7aac5@redhat.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|PH7PR12MB6665:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9d9c706f-e49c-4a44-e346-08daf33dcf0c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vqmwbWRtI5oCRqp0VuQvbxKSEPVwifJJgBrcs6wCNoFCFKHZx2nk2+qmkU7tyUMGIYBE2fYzhk59BzUOY78td9OMDHw1K3R5bKIL6XeI8hZx76VHftW9J+7i6LVKc8P3yO33Nf6bW/+biTfp+VcZxqEFDh4M6xtEEe8J3mymwun0JFCXQxDlqzZVXu5Ilbr6xl7ntmIQbPl0Q39DJ8ecX9yx7O2Xx1yipEUdupg5KPxM+gVZFU2xFn8dnJeqX2A2QXnbut/YfNQY+8ONWeNmQ0LVP7zlPfyGq/4aNW7Qk87wclTOYwOtMpN/NPFMZ3wMY9fWoBN+3rnOZXpWEiW5NorEeNgsrsCO+ZW8aG/hDh5QQfdxe67ERMk8hURhOYfW7rdkftaqoXNnNjA3XlQ3ChGmSqRSBn1UUXU+4taYlWtYisRUXxz4SNo+05KJeAMTYKht2urGwC2eB8OAi1RXsWJ36gk0WkNOtAL97w+CdbkKGx96uH76BEmR0pjtnmgT9G5xV5u//aZzTkvzLKm/cJ0QYRpPS2poAkL6fD0Zo7JZzJ1LsuSJI0PVnI2qRppd1XsB09I7ny/6LPlZxXfObxKBNpOXinEMJWwvUsEEXlhxxyX9cT+yfbWkgKU9Eb/zeJpD/0BTPMIDpqIf0T4xL5W0SYZIEEnK2AQDBvsrA/RqVeq63uMPfxfYorl121v7MlO9DAreTpiCDz19Lx2GXeL0QsoBhM/aV42pzEgb8+c=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(346002)(136003)(366004)(39860400002)(376002)(451199015)(31686004)(36756003)(8676002)(66946007)(66556008)(4326008)(7416002)(8936002)(5660300002)(2906002)(66476007)(38100700002)(83380400001)(31696002)(86362001)(478600001)(6486002)(316002)(54906003)(6666004)(6636002)(110136005)(41300700001)(53546011)(2616005)(186003)(6506007)(26005)(6512007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WlVFME55cTlzekRrdWJuamxnTDJxVW1PVC9Pc0NhVVZONmVCWHJ0Wlp5Wm5y?=
- =?utf-8?B?TGRucGF0TDZTdkZveVFaNGlNbWtxYlVSaDUzVjd6TlNMRitLY0ZkN3R6Smx1?=
- =?utf-8?B?YXJqZjBvS0dzdHBrakZuQUFUWGRBbFVhYXowbkJDSEtZTEQ5bTQ4VU94aGhC?=
- =?utf-8?B?MllZVDNUclhJQTJhS00vclo1ZS9wVmJkYVNwYjNrZWorZnp1VlY0Vmc2UzIr?=
- =?utf-8?B?S1BqWnNOcWF1Z2xPMmNPNllOZU40UTV6a2UzRDUyMzZMQ2p4MGJ0VW9SdDNV?=
- =?utf-8?B?QnJEcG9aYWZWVzdlNUl1QldLdlgrRCtzQWtSNHJGL0hhb3lCbXZIbEk1NXdi?=
- =?utf-8?B?cCtjQlBTalRITTBzQld6TXJHejRxSllVZmZTdmxUOXhWR3FlM2FPR0NDU1Vn?=
- =?utf-8?B?U1E5SG52TGdzN1ZLK0gvZkN0YU5SR0xFbDhpVHY0aU1yM3dndjNaWTFYbWY1?=
- =?utf-8?B?a0VxNm05bmE3UDlBUkM5QWZNdStNUFI1eEVWMzNCbUJ3a3pxVnZvbElBWm56?=
- =?utf-8?B?MnZIMGFiUyt3dkt4eENIalBYYkd1cndtZTg3TVc0YzJDUXBVZHRpY29rc0pl?=
- =?utf-8?B?U0txampUeVFoM2ROV2txdDVTcFBNZEptTTE2RzI5a3JEbGh6Z3VwS3lSWlox?=
- =?utf-8?B?ZnBHK3laR2pLSUlaRFVFN0tIVmt3QVh2SmQwVDA3d0hKMTF1NjhvYXZPMkRt?=
- =?utf-8?B?TytxRUluVEFKcWpLRWJpWURXNklPQ2hxREZ6N0cxMFlkT3Z2eEdna0d5V2Fk?=
- =?utf-8?B?ZWNYTjh4eXkvVHEyVWNrcDhEaXpsNWFmZ042eDJDTTRuM1hpb2xJWXJ6QUIv?=
- =?utf-8?B?N0VMdzJ5QW9wZmg1cWFwSXExc1l3dkdRd2dtYm9iTEpLK3c2YmJZalRnOFJn?=
- =?utf-8?B?MStDRjROVkI4OGw1NG5FRXhQY05jcHo1NEsrVkVYRHdCYXFKVlNUZEFuY2Nq?=
- =?utf-8?B?a0lhTEFWWGk3Rmw3UUY4R2YvK09ac0JwOEpiOGtyemU1SkRTcHQ3dGtIbHlS?=
- =?utf-8?B?dEQ3SmsxREE2UzllZWVxWkU0ZHc0Q3NQaXZwRmhyTXl0ZUZ4RkZuU01PcnRo?=
- =?utf-8?B?QUp2NHFDNmVDb0RXUFFQRkczVjhDb3FNZXh0TURmakZvL3ZhbW5iaU9sNHJ2?=
- =?utf-8?B?Sm12a2Fsc0hySXJIa0toazVxT3lQZXUyQUIxT2dXWXhXWmE0UWpUc21TN05J?=
- =?utf-8?B?Q2psWkd4MUIwL0ZPSTc0MlZwZXVFSGhuM3huclo4ekMxQVR4QTBFbENoMTFH?=
- =?utf-8?B?d29NZlhGUXRNcERMRmVyWG1yZEdPRHpsTUVJa0pudHQ1MUhYTFFYNlNmOERK?=
- =?utf-8?B?Nk9XUzRJMUFPR0o3Z04wang2aE03Nk1JOVhJYUxhL0Q1cExUaWRjd3dVaTJX?=
- =?utf-8?B?MEZEbVAvbFdmaTUvUkIrRUxWaVl4ZVBRQndWckNwUlcwVlF6Ujc3UDQzSHA4?=
- =?utf-8?B?YmRpZmhHblNJdEE0ZjZSU1dKa0thNXEyNHZCVVZScVRFQlR1WHh0MHBEL3NK?=
- =?utf-8?B?S1VXSmE3SWc3bTdwNEY2OW9UdXhKbnUydHdBTERRWExaYkVoZXJKMDAyZUJj?=
- =?utf-8?B?dUNKV2F0TlhIZ1ZBK0dRUHlxTFpWcTBaMkd0a0tFVVltc1dFQUV2dEpSTmlw?=
- =?utf-8?B?cnZQdUdha0crTUY2eURmdEZ2L3kvNVdYSklJUmhCYlFDNXlITjZjWThMSFF0?=
- =?utf-8?B?YzMvdnExNG9wMmZocWF6MXpRMUgyanFybUc3bTlCMzZMTzBsaW5pWDhZZHBI?=
- =?utf-8?B?eFl1WThsOGZvUk9NMmhFcXA4akM5Tm01WTZlT3NjME5VZGd0QnNlOEl2SW1v?=
- =?utf-8?B?d0xJZnlwZ2xvTS9xNmFTMW1LUVBmd2Zad0NhYXdXNXJ4bnV3TDZYUm55M0tZ?=
- =?utf-8?B?NmtMczlUTUI5Q3ViRGN3enNJbVN0UTlIVWg1aUl5clhvSzFoN0NXMjR2ejYw?=
- =?utf-8?B?RUpucDdiU3RodlJIQ3czaDdlY1lkaWdZVldPdithM1NHNHdYL01aeGx1c0pT?=
- =?utf-8?B?T1RrbVZwU2NOWW5PQU1oV1lhZE0rUzViTjl4Q2tDT1ZsN3hzREdNSjhKdTZQ?=
- =?utf-8?B?N0kxYkNLcVRONEdqUGsvNDVPSEltZFY4RW1wL1NNeE1KYllZWmVoQkszbTlU?=
- =?utf-8?Q?b7qMoprfy19yUyOYfBmn7NU5n?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d9c706f-e49c-4a44-e346-08daf33dcf0c
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2023 19:06:42.7534
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6rxF1VjkMiXXljRU+gAvWOaf3u4nhL8hjmg89xAWaoNyx2mOIMYK82TrEIYFH6CAdzvcijDmEvZK8sKyvMgF4Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6665
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fa0758f5-abd1-ad09-3878-adf296c7aac5@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -144,76 +88,177 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/10/23 12:00, Borislav Petkov wrote:
-> On Fri, Dec 09, 2022 at 03:38:03PM +1100, Alexey Kardashevskiy wrote:
->>
+On Tue, Jan 10, 2023, Paolo Bonzini wrote:
+> On 1/10/23 13:16, Emanuele Giuseppe Esposito wrote:
+> > I think the test in patch 2 I wrote gives a better idea on what I am
+> > trying to fix:
 
->> "DR7 access must remain intercepted for an SEV-ES guest" - I could not
->> figure out the exact reasoning why it is there in the first place,
->> IIUC this is to prevent loop of #DBs in the VM.
-> 
-> Let's ask Mr. Lendacky:
-> 
-> 8d4846b9b150 ("KVM: SVM: Prevent debugging under SEV-ES")
+Tests and descriptions of expected s vs. actual behavior explain what _you_ think
+should happen, but don't help explain what higher level bug is being fixed.  IIUC,
+QEMU emulates RESET and expects the xAPIC ID to be re-initialized.  That's the
+info that should be provided in the changelog since it ties KVM behavior to a
+real world userspace emulating actual hardware behavior.
 
-The DR7 requirements were to prevent a malicious SEV-ES guest from setting 
-up data breakpoints on the #VC IDT entry/stack and causing an infinite loop.
+> > if we are transitioning from x2APIC to xAPIC (RESET I
+> > would say, even though I am not sure if userspace really does it in the
+> > way I do it in the test, ie through KVM_SET_MSRS), the APIC_ID is not
+> > updated back in the right bits, and we can see that by querying the ID
+> > with KVM_GET_LAPIC after disabling x2APIC.
+> > 
+> > Now, if the way I reproduce this issue is correct, it is indeed a bug
+> > and needs to be fixed with the fix in patch 1 or something similar.
+> > I think it won't really make any difference if instead following what
+> > the doc says (x2APIC -> disabled -> xAPIC) we directly do x2APIC -> xAPIC.
+> 
+> Yes, the default value at reset is xAPIC mode, so a reset will do a
+> KVM_SET_MSRS that clears X2APIC_ENABLE but leaves
+> MSR_IA32_APICBASE_ENABLE set.
+> 
+> So, if I understand correctly...
+> 
+> > The test in patch 2 started being developed to test ef40757743b47 ("KVM:
+> > x86: fix APICv/x2AVIC disabled when vm reboot by itself") even though I
+> > honestly didn't really understand how to replicate that bug (see cover
+> > letter) and instead I found this other possibility that still manages to
+> > screw APIC_ID.
+> 
+> ... what you're saying is that there were two different bugs, but one
+> fixing any one of them was enough to prevent the symptoms shown by
+> commit ef40757743b47?  That is:
+> 
+> - the APICv inhibit was set by KVM_GET_LAPIC because it called
+> kvm_lapic_xapic_id_updated(), and the call was unnecessary as fixed in
+> commit ef40757743b47;
+> 
+> - however, there is no reason for the vCPU ID to be mismatched.  It
+> happened because the code didn't handle the host-initiated x2APIC->xAPIC
+> case and thus lacked a call to kvm_apic_set_xapic_id().
+> 
+> If so, I think the idea of the patch is fine.
+> 
+> Just one thing: your patch also changes the APIC_ID on the
+> x2APIC->disabled transition, not just the "forbidden" (i.e. host-
+> initiated only) x2APIC->xAPIC transition.  I think  this is okay too: the
+> manual says:
+>
+>    10.4.3 Enabling or Disabling the Local APIC
+> 
+>    When IA32_APIC_BASE[11] is set to 0, prior initialization to the APIC
+>    may be lost and the APIC may return to the state described in Section
+>    10.4.7.1, “Local APIC State After Power-Up or Reset.”
+> 
+>    10.4.7.1 Local APIC State After Power-Up or Reset
+> 
+>    ... The local APIC ID register is set to a unique APIC ID. ...
+> 
+> (which must be an xAPIC ID) and this is what your patch does.
 
-Thanks,
-Tom
+Ugh, couldn't find that yesterday.  It's actually irrelevant though, KVM already
+stuffs the APIC ID when the APIC goes from DISABLED to ENABLED (xAPIC) since commit:
 
-> 
->> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
->> index efaaef2b7ae1..800ea2a778cc 100644
->> --- a/arch/x86/kvm/svm/sev.c
->> +++ b/arch/x86/kvm/svm/sev.c
->> @@ -21,6 +21,7 @@
->>   #include <asm/pkru.h>
->>   #include <asm/trapnr.h>
->>   #include <asm/fpu/xcr.h>
->> +#include <asm/debugreg.h>
->>   
->>   #include "mmu.h"
->>   #include "x86.h"
->> @@ -52,11 +53,21 @@ module_param_named(sev, sev_enabled, bool, 0444);
->>   /* enable/disable SEV-ES support */
->>   static bool sev_es_enabled = true;
->>   module_param_named(sev_es, sev_es_enabled, bool, 0444);
->> +
->> +/* enable/disable SEV-ES DebugSwap support */
->> +static bool sev_es_debug_swap_enabled = true;
->> +module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0644);
->>   #else
->>   #define sev_enabled false
->>   #define sev_es_enabled false
->> +#define sev_es_debug_swap false
->>   #endif /* CONFIG_KVM_AMD_SEV */
->>   
->> +bool sev_es_is_debug_swap_enabled(void)
->> +{
->> +	return sev_es_debug_swap_enabled;
->> +}
->> +
->>   static u8 sev_enc_bit;
->>   static DECLARE_RWSEM(sev_deactivate_lock);
->>   static DEFINE_MUTEX(sev_bitmap_lock);
->> @@ -604,6 +615,9 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
->>   	save->xss  = svm->vcpu.arch.ia32_xss;
->>   	save->dr6  = svm->vcpu.arch.dr6;
->>   
->> +	if (sev_es_is_debug_swap_enabled())
->> +		save->sev_features |= SVM_SEV_FEAT_DEBUG_SWAP;
->> +
->>   	pr_debug("Virtual Machine Save Area (VMSA):\n");
->>   	print_hex_dump_debug("", DUMP_PREFIX_NONE, 16, 1, save, sizeof(*save), false);
->>   
->> @@ -2249,6 +2263,9 @@ void __init sev_hardware_setup(void)
->>   out:
->>   	sev_enabled = sev_supported;
->>   	sev_es_enabled = sev_es_supported;
->> +	if (sev_es_debug_swap_enabled)
->> +		sev_es_debug_swap_enabled = sev_es_enabled &&
->> +			boot_cpu_has(X86_FEATURE_NO_NESTED_DATA_BP);
-> 
-> check_for_deprecated_apis: WARNING: arch/x86/kvm/svm/sev.c:2268: Do not use boot_cpu_has() - use cpu_feature_enabled() instead.
-> 
+  49bd29ba1dbd ("KVM: x86: reset APIC ID when enabling LAPIC")
+
+For giggles, and because I misread that like 5 times, I tested on hardware.  Intel
+CPUs since at least Haswell make the APIC ID read-only, i.e. it's a moot point on
+Intel these days.  But on AMD, the APIC ID is preserved across disabling => enabling
+xAPIC.
+
+> In fact perhaps you can change the code further to invoke
+> kvm_lapic_reset() after static_branch_inc(&apic_hw_disabled.key)?  It's
+> just a bit messy that you have a call back to kvm_lapic_set_base() in
+> there, so perhaps something like this can help:
+
+I'd rather not touch kvm_lapic_reset().  KVM doesn't emulate RESET, and I don't
+want to make assumptions about why userspace is forcing x2APIC => xAPIC.  If
+userspace wants to propery emulate RESET, it can use KVM_SET_LAPIC.
+
+My preference is to do a light tweak on the original patch, with a rewritten
+shortlog and changelog.  And because I spent way, way too much time digging into
+this, I went a bit overboard...
+
+From: Sean Christopherson <seanjc@google.com>
+Date: Tue, 10 Jan 2023 10:40:33 -0800
+Subject: [PATCH] KVM: x86: Reinitialize xAPIC ID when userspace forces x2APIC
+ => xAPIC
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Reinitialize the xAPIC ID to the vCPU ID when userspace forces the APIC
+to transition directly from x2APIC to xAPIC mode, e.g. to emulate RESET.
+KVM already stuffs the xAPIC ID when the APIC is transitioned from
+DISABLED to xAPIC (commit 49bd29ba1dbd ("KVM: x86: reset APIC ID when
+enabling LAPIC")), i.e. userspace is conditioned to expect KVM to update
+the xAPIC ID, but KVM doesn't handle the architecturally-impossible case
+where userspace forces x2APIC=>xAPIC via KVM_SET_MSRS.
+
+On its own, the "bug" is benign, as userspace emulation of RESET will also
+stuff APIC registers via KVM_SET_LAPIC, i.e. will manually set the xAPIC
+ID.  However, commit 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on
+changes to APIC ID or APIC base") introduced a bug, fixed by commit
+commit ef40757743b4 ("KVM: x86: fix APICv/x2AVIC disabled when vm reboot
+by itself"), that caused KVM to fail to properly update the xAPIC ID when
+handling KVM_SET_LAPIC.  Refresh the xAPIC ID even though it's not
+strictly necessary so that KVM provides consistent behavior.
+
+Note, KVM follows Intel architecture with regard to handling the xAPIC ID
+and x2APIC IDs across mode transitions.  For the APIC DISABLED case
+(commit 49bd29ba1dbd), Intel's SDM says the xAPIC ID _may_ be
+reinitialized
+
+    10.4.3 Enabling or Disabling the Local APIC
+
+    When IA32_APIC_BASE[11] is set to 0, prior initialization to the APIC
+    may be lost and the APIC may return to the state described in Section
+    10.4.7.1, “Local APIC State After Power-Up or Reset.”
+
+    10.4.7.1 Local APIC State After Power-Up or Reset
+
+    ... The local APIC ID register is set to a unique APIC ID. ...
+
+i.e. KVM's behavior is legal as per Intel's architecture.   In practice,
+Intel's behavior is N/A as modern Intel CPUs (since at least Haswell) make
+the xAPIC ID fully read-only.
+
+And for xAPIC => x2APIC transitions (commit 257b9a5faab5 ("KVM: x86: use
+correct APIC ID on x2APIC transition")), Intel's SDM says:
+
+  Any APIC ID value written to the memory-mapped local APIC ID register
+  is not preserved.
+
+AMD's APM says nothing (that I could find) about the xAPIC ID when the
+APIC is DISABLED, but testing on bare metal (Rome) shows that the xAPIC ID
+is preserved when the APIC is DISABLED and re-enabled in xAPIC mode.  AMD
+also preserves the xAPIC ID when the APIC is transitioned from xAPIC to
+x2APIC, i.e. allows a backdoor write of the x2APIC ID, which is again not
+emulated by KVM.
+
+Reported-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/lapic.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index 80f92cbc4029..79141d76ad49 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2485,8 +2485,12 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
+ 		}
+ 	}
+ 
+-	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE))
+-		kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
++	if ((old_value ^ value) & X2APIC_ENABLE) {
++		if (value & X2APIC_ENABLE)
++			kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
++		else if (value & MSR_IA32_APICBASE_ENABLE)
++			kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
++	}
+ 
+ 	if ((old_value ^ value) & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE)) {
+ 		kvm_make_request(KVM_REQ_APICV_UPDATE, vcpu);
+
+base-commit: 91dc252b0dbb6879e4067f614df1e397fec532a1
+-- 
+
