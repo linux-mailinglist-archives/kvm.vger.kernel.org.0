@@ -2,91 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30D9A664044
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 13:19:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C9655664049
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 13:19:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238285AbjAJMTZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 07:19:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60262 "EHLO
+        id S230266AbjAJMTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 07:19:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238363AbjAJMSU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 07:18:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B03110EE
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 04:16:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673353016;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=/VBegRFUI9M946r5K4XKBTlecjNtq9+i9FsUOMeXf0I=;
-        b=Qe7GML+k2SEcAzhg4/LHfw/UKRwtBYBIzVKtTXsEL84NX2Pj2d6luKveTym1J7s5s6LRZV
-        MWo9N4Tpv8jf3llk0xfTbEUOu/a0bRWNkMYx1Fu9rVP9ushY5Fhy0/EFYlhm8Kj2w8x5ix
-        XSPijM9h+2GOykiNUfbK81VSaHNd9gg=
-Received: from mail-ua1-f72.google.com (mail-ua1-f72.google.com
- [209.85.222.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-235-u9C8nSUHOme3fjxZ3GoCqw-1; Tue, 10 Jan 2023 07:16:51 -0500
-X-MC-Unique: u9C8nSUHOme3fjxZ3GoCqw-1
-Received: by mail-ua1-f72.google.com with SMTP id y10-20020ab0560a000000b003af33bfa8c4so5430557uaa.21
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 04:16:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/VBegRFUI9M946r5K4XKBTlecjNtq9+i9FsUOMeXf0I=;
-        b=qwyGmeFaZuWycjUcNHOz1k7e1UDR094LJT13tK+Rr9y+IYKQZS3bwpHiyMG4mKwM34
-         7JeWBbascObvld1AiC5Q14/hU13X4F8lG0xAh3GXI21wDg/l1h87+ey3QxdVPDqtimfY
-         t1EfAIRuYiy3BlHc5xb7tH9cbAPqrLkyZ5sFVsQeYqeKJLD5/cEucGxnRLiiLF39wDiW
-         mUrQ2yC183dSeUkZPWSIedsJxEBtSZLF7y4afPvQhtI7ctFZ1XGabgs/2NkbRCbNLmWv
-         lcHlLclLujW8hfZ39axu2NtJy0wkDjfnPJrYz+w0DHdyy0Gbe/TIik9/S/nvyG08vLt3
-         1+1w==
-X-Gm-Message-State: AFqh2koekVlMG1+MlSXWgD/2nn/k2VBpr80jpGmXJdkJ588irb2f9kvG
-        PajGf2Bhh59NyJ0R6d5kv3OCWXLQfj4QFwjV3ytVVo/kHCwgnTZ7fwPd1ePLJb+IBC6oPlMdPyB
-        WZpqP+lHjtFFZ
-X-Received: by 2002:a67:f455:0:b0:3ca:6d6b:bcaf with SMTP id r21-20020a67f455000000b003ca6d6bbcafmr26834228vsn.29.1673353009708;
-        Tue, 10 Jan 2023 04:16:49 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuUTKcI/fRyAlKDhNxr3HKrEFM4cjfX+H6/x9o1D6WHwkRTwjoaVbwT1FFiguCw9h2GsrAX8g==
-X-Received: by 2002:a67:f455:0:b0:3ca:6d6b:bcaf with SMTP id r21-20020a67f455000000b003ca6d6bbcafmr26834220vsn.29.1673353009415;
-        Tue, 10 Jan 2023 04:16:49 -0800 (PST)
-Received: from [192.168.149.123] (58.254.164.109.static.wline.lns.sme.cust.swisscom.ch. [109.164.254.58])
-        by smtp.gmail.com with ESMTPSA id bm39-20020a05620a19a700b00704d8ad2e11sm7001400qkb.42.2023.01.10.04.16.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jan 2023 04:16:48 -0800 (PST)
-Message-ID: <5664d006-9452-2033-5605-48aa0ee77ca8@redhat.com>
-Date:   Tue, 10 Jan 2023 13:16:43 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [RFC PATCH 1/2] KVM: x86: update APIC_ID also when disabling
- x2APIC in kvm_lapic_set_base
-To:     Sean Christopherson <seanjc@google.com>,
-        Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Shuah Khan <shuah@kernel.org>,
-        Gautam Menghani <gautammenghani201@gmail.com>,
-        Zeng Guang <guang.zeng@intel.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Jim Mattson <jmattson@google.com>,
-        linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20230109130605.2013555-1-eesposit@redhat.com>
- <20230109130605.2013555-2-eesposit@redhat.com>
- <c61ce1a6393a108c76e53cb99249aba5ab318e07.camel@redhat.com>
- <Y7w/bYP4VGqoVcjH@google.com>
-Content-Language: de-CH
-From:   Emanuele Giuseppe Esposito <eesposit@redhat.com>
-In-Reply-To: <Y7w/bYP4VGqoVcjH@google.com>
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S238502AbjAJMSo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 07:18:44 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2135.outbound.protection.outlook.com [40.107.223.135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C4FE3F
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 04:17:34 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hQoDPbWSR47eqGQZAW9ovY87jMTaKDAV5Ka8AITPXe0qx2P23ae7HAMi3ypBExEqD3nH00wiOY3ilFuQW73J1dBauhkxIKr5CT7y6sxkLsTwwcoAw183S3VPIC2O9msrsruc1o1Ma/63yJ0i74HejI80JwWQdf7P4n7XR41z8wkdjmDIkJwhAColX3YESL1GpyYGFHB5t2+PViYBieHR3SC8gpTOky4qyVnyimKrJ0/kdN4d0c4Tpyz2K/2cFtGmeHesg0EBDBfUGMpNylpvSdsEsxliN2oNWo4IVbe9UNJQt6YnMyXxDdVLGB+qNVgTbyXqGqfC8iiWuQ7YLg9oEQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=knXql5QwtYBSYDOuXVs+pfF8BJ9eouPjFtqTfHGmE84=;
+ b=K3v2ySKo9pO3EzCzr8JnEAiquoAla4fayj1ZrKEfxlwjChUsi1p0knu+b1/XarnwKg5dkkjBLFglXkr9ESafNMRRIV81jhgstW9fmjVCBJoHSYtuLtntQ/CWd5m1keP5POzq/02U49ZDRhbEkF4LoyZ028B93MR4XqtBlb5i1nuRz2wbwDdEtuS0xmctypmKVDtoQoIiZe2w4WT/BXg8qatWVlJ4vDFdymtHaMsgFQca0AzKabijTU4AGuSeaNAjVbj9YRJrjpsvf30s/KiLh9mT/l99DHxDC0yCHJuGHv6So1ITlt0TjEja8I5jmsYE3sBUoDZPjwxVtlx2ZoyP5g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=os.amperecomputing.com; dkim=pass
+ header.d=os.amperecomputing.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=os.amperecomputing.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=knXql5QwtYBSYDOuXVs+pfF8BJ9eouPjFtqTfHGmE84=;
+ b=qH/vu41zLsenpy86a1QX+lst1j30UQlAJ9KEVTTEUv//VPpf8DBqWVKeH+zzZsXwR/mtRUqSU2Wgy8b/8U4Xt26TbgYZmrZP4EfTBwwi6ghsw4HkLSI20TQhQrTP5DxxeZg6FdEd5p307f6gym8FIn9TjHi8R0UFuFaDuhCSTIo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
+Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
+ SJ0PR01MB6333.prod.exchangelabs.com (2603:10b6:a03:293::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5986.18; Tue, 10 Jan 2023 12:17:30 +0000
+Received: from DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::6b5b:1242:818c:e70d]) by DM8PR01MB6824.prod.exchangelabs.com
+ ([fe80::6b5b:1242:818c:e70d%6]) with mapi id 15.20.5986.018; Tue, 10 Jan 2023
+ 12:17:30 +0000
+Message-ID: <6171dc7c-5d83-d378-db9e-d94f27afe43a@os.amperecomputing.com>
+Date:   Tue, 10 Jan 2023 17:47:20 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH 0/3] KVM: arm64: nv: Fixes for Nested Virtualization
+ issues
+Content-Language: en-US
+To:     maz@kernel.org
+Cc:     catalin.marinas@arm.com, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, scott@os.amperecomputing.com,
+        Darren Hart <darren@os.amperecomputing.com>
+References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+In-Reply-To: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-ClientProxiedBy: SG2PR03CA0085.apcprd03.prod.outlook.com
+ (2603:1096:4:7c::13) To DM8PR01MB6824.prod.exchangelabs.com
+ (2603:10b6:8:23::24)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|SJ0PR01MB6333:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f09c2e0-3432-449d-01fa-08daf304a4c3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 6/6niu1WeN1qBoVPD+1V+xkQyLyHmYTMl1vrmuSUdPxB0RX930G6MYBpFAYF2v6Nwiv6Gt/UTx0wOlDMPiWdTS9iId4xlWlD5U7e54BTm16dQXMHjZHTiecuHFC55wHw7Iq+6pMUyRZ/yViJAV2H4fuo5HlTIoDMciwOEpy59rVdPp+KVskNU68wg9BGQ2UolD/AqYoo2dwq3ieDykfEwDRbbA/4SjfK+DDrAh6bqB8ZPzSE0aIt3NIIdt5a+YoeMMYXQjgEnHU5Kvt3MNewSTPuUsWAUwrBNH9a0GmGczmcDtfywB/MWwIa23xS5A+56wmLPPVPyknHTdh3NksqmC4LmiXnX5jtWe+bczfrX0CJBhxrYh+yEvpoSEzSGs4lYY0ukqBvRp6xKLrzpGVM0koC0Sfvz3CklRaTt4VAWUf1ylEviPK3oDbyKc5Zc+wP0A1zXGqLnsAOqgHT1hoHBSA22Psf2RFJPjrZRuPSkB1MkVHyYcWn0ZtfoeVjwfXHtNPPjAp71EOQFZ3q9218MRqTcf0MsYWClR9x2zjLqNS65kOhKdDwQ1iEq15Wc0RlqCS/7MA05Pk5fdQEL7tgCGPsU7H8a+0weIErdPMGjA4SxA8tTEC26PxFJHbg5yJctZ0V/agcEJsGdNA2RcEjGwWgIsEz+XM91plO60aUbxxdXw7JEwq2LHDMBOUoAGLwFFN00EfAvSw3y1PgY+UcZMwTsvHZ7rQQIrZ2U4xThF0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39850400004)(396003)(366004)(136003)(346002)(376002)(451199015)(83380400001)(41300700001)(66946007)(38100700002)(66476007)(8676002)(66556008)(4326008)(5660300002)(107886003)(8936002)(2616005)(186003)(6512007)(53546011)(478600001)(6506007)(26005)(966005)(6486002)(31696002)(86362001)(6666004)(6916009)(316002)(2906002)(31686004)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SXMxYjlreityVDhsMVU4OElKMlhNSHp4ckIvYVlIcFd5cnJBSEhrb3hvZkRB?=
+ =?utf-8?B?RFowV28xbWxVRmV1QlpRMklHcW0wSUdRdHFsaTNSRnYrdytjMWhuc0dXMGk0?=
+ =?utf-8?B?ZkM5ZE42Nld4Q2I2anIvVzhscnZScU9ValhOZVViY3p3QmRCYVc4dWxFM3hW?=
+ =?utf-8?B?L0RQeXNqRkxpTE84NVhIZE0vN1VLMlNyclF4MTQ5djRMSnREZys1VFovVnNw?=
+ =?utf-8?B?aE95KzZZVldlblV4ZUpHRnNhVGZ6eEZQbEZQYTJ4d21RWTlzQ2hOdEtyMWNR?=
+ =?utf-8?B?Z250cGRubzl5dkQxbnFCWHhBWUhKY3lSQ1NBSHZOYW9HZllzMWd4Q3Vabmdr?=
+ =?utf-8?B?dFZCelR3TTdrQS95Tms4eU56cXpFdEw4VTFZS1AycDBDZ1BQa3N4OEtlUlpX?=
+ =?utf-8?B?YUgyNHNJdHV3ZXg1QnVpL0FYZmVITDgwMTJGYjFPck5CTzVKNUlZWlAyTk5u?=
+ =?utf-8?B?bjNjQnNzQndHbk10T1ptTWt0TjQ5QXlDRWRCT09ObG01TlRsSTM0VVJrUjJl?=
+ =?utf-8?B?SFNVczBSSWxPOWVLVGtGbWFMNnB3Q0JmUkt1NmxjbTdqQ3ZTTXlEMkp3QXlX?=
+ =?utf-8?B?dG13SkxQWTdDSnpTODFPWUNndXh6VmNBWkJYZ0dGa3pYZzlONjFVVmNYaFZl?=
+ =?utf-8?B?c3QreGxKUzFhMHNVZzF2SHBGazdkd2p6c1k4bzBhdlJJZVBnN2hEaDYxT1ZM?=
+ =?utf-8?B?eXNwS090VFZtQnY1bTBkcjl5aVBsOTNYMWExUkExMlBEbEpUZEZheS94c2wx?=
+ =?utf-8?B?dGZSRkdIOXl2RzliSEJBSGJKdUhLaVdoV1hGTDY3UjN4Yk9lRmp4a3Q5dkpG?=
+ =?utf-8?B?YXM4SEhpemdHbHk5YnJJT2QxeHdOeWcwNzZPQVg1WWtxWGtuVE15anZ1SUU5?=
+ =?utf-8?B?bWNlTDEwQVhCQnBHalpEd01PRWgwTC9pK3hJemtFRUFaWDZzdDlXSlhwSXhU?=
+ =?utf-8?B?UXU5Q1ZRKy8zRFk5SCtLSDFjWWI2dkNYeXRHcTdoVkpyeWd0V0wxY1pZc0tC?=
+ =?utf-8?B?OEdhVTI5SHV4RTNleEpJMmxiNHhvUm1iN1RUeG8yalpSaGNGWDYzVWhaWGh1?=
+ =?utf-8?B?QjAwdTdzb3J5N0Y5WDhucmtRSW8yWitUNFN2MWxMYTZQSC9nZENMK2lFVjIz?=
+ =?utf-8?B?Vng1U2NDNGYwZ0hSQld2elpWVnQvZVAyaTBpUmdPaFFNWGkvZUR5UWF2MjJ3?=
+ =?utf-8?B?NVpSaGtlQlcxRlhtV1lBVGFZaW91bHkzcm5LazJKUkc5eCtsN1NOVVRhM0li?=
+ =?utf-8?B?di9CZXQ2V3RpckswWHU4RmZ4QXJZN2xVTzZITFhMQ2F2V3hFRXdoUkhKMkcr?=
+ =?utf-8?B?cWJtd0pua0dTcHhWTU1HWWxjei9mMkR5ZDdzbDREa2RGaTB1emNpZUQvZ3Jl?=
+ =?utf-8?B?YmNISy9DSDZ1NkVSa0daajZlTVpoblhPK0FPcS8weGNJMm1FdDBFTGR6Uklp?=
+ =?utf-8?B?azBOeDFOd1pzVEw3NGpLekdtc2YwRWhoQURhYktJVnl3QlZnQjA0U1k4Y0Fs?=
+ =?utf-8?B?Yk9XVmZQbWJWd3EvT0NEd0UrVjdJYmt4RUV5ZkdDQTFYdGUxdE5tSExUVGhZ?=
+ =?utf-8?B?T2RyRkp4dDk1c0RTOXhDOTVBSE9xNkpJU1VFUWJ2Q1M2RjhCMEppcUVRVGdz?=
+ =?utf-8?B?N3EzemI2SllJdE8rUmRXckhjLzhPZ3FGZGs4K0h3Z2Zzcm9wd1UrWm9aSW1i?=
+ =?utf-8?B?T284cTJjTW9ZWGNrYkcrQnpqY0pQNE81ZXU3cXNFZGFieFQ4UFRYSFZVUys1?=
+ =?utf-8?B?T20xbmxwK3VuRERzdVVzUTAycm95THZtQ3krZWs0OGVadTdib0ZpdUpIOU5a?=
+ =?utf-8?B?UkpMdkxTKzJuRm5vTzdTdVc1VGE2Mm1HK1JIUllBdG8zM1lCOXlVYVpUVUhX?=
+ =?utf-8?B?cTdFVnNPSVhubEN5ZjZBTDdyOVk5eUZ3SkZjczlrR1dqVVNWV2xhQlppY1Y0?=
+ =?utf-8?B?eVBnY3plS3YxS0NaczdTS3lkVG84TTI2SjN3MkdaOXNlY2IyeUxwYklwUmVI?=
+ =?utf-8?B?dEhUb3FsRUlySTNWME5VclB0cWJKQ0IrV2swcDNMbUFJbjIrTVdOSWdZRXNC?=
+ =?utf-8?B?dUVGVmw1U3ZjbTg5ODBuTkovZmplN0ZpQkRqWWNhOU4vQng4ZFZQMVhMV3Nw?=
+ =?utf-8?B?L0FBK1pvY2tVc2doMWMzSFZ2TTNXZ3F6bnNsZVFkY2dudXNCaE9MMUt1WnBN?=
+ =?utf-8?Q?xU7WdMIAGa3vtXGWKpf9BVtyFXlSbmcXPSoy295KmqUj?=
+X-OriginatorOrg: os.amperecomputing.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f09c2e0-3432-449d-01fa-08daf304a4c3
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2023 12:17:29.8509
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: KbVGstKdpi/YV/7PMNHEf0kmT8gV3GhuzCYVjKgqcdhZcLByR+2sIeu5yfSt8yrPSlMP3FsDxFRiBgqgXGaxWK2TR7iikBXPfUVZe/ORsnyjPiuaPu2+A7kheqwWVRRC
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB6333
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -94,108 +129,73 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+Hi Marc,
 
-Am 09/01/2023 um 17:23 schrieb Sean Christopherson:
-> On Mon, Jan 09, 2023, Maxim Levitsky wrote:
->> On Mon, 2023-01-09 at 08:06 -0500, Emanuele Giuseppe Esposito wrote:
->>> If KVM_SET_MSR firstly enables and then disables x2APIC, make sure
->>> APIC_ID is actually updated correctly, since bits and offset differ from
->>> xAPIC and x2APIC.
->>>
->>> Currently this is not handled correctly, as kvm_set_apic_base() will
->>> have msr_info->host_initiated, so switching from x2APIC to xAPIC won't
->>> fail, but kvm_lapic_set_base() does not handle the case.
->>>
->>> Fixes: 8d860bbeedef ("kvm: vmx: Basic APIC virtualization controls have three settings")
->>> Signed-off-by: Emanuele Giuseppe Esposito <eesposit@redhat.com>
->>> ---
->>>  arch/x86/kvm/lapic.c | 8 ++++++--
->>>  1 file changed, 6 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
->>> index 4efdb4a4d72c..df0a50099aa2 100644
->>> --- a/arch/x86/kvm/lapic.c
->>> +++ b/arch/x86/kvm/lapic.c
->>> @@ -2394,8 +2394,12 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
->>>  		}
->>>  	}
->>>  
->>> -	if (((old_value ^ value) & X2APIC_ENABLE) && (value & X2APIC_ENABLE))
->>> -		kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
->>> +	if ((old_value ^ value) & X2APIC_ENABLE) {
->>> +		if (value & X2APIC_ENABLE)
->>> +			kvm_apic_set_x2apic_id(apic, vcpu->vcpu_id);
->>> +		else
->>> +			kvm_apic_set_xapic_id(apic, vcpu->vcpu_id);
->>> +	}
->>>  
->>>  	if ((old_value ^ value) & (MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE)) {
->>>  		kvm_vcpu_update_apicv(vcpu);
->>
->>
->> I don't think that this patch is 100% needed in a strict sense, but I don't
->> object to it either.
+On 24-08-2022 11:33 am, Ganapatrao Kulkarni wrote:
+> This series contains 3 fixes which were found while testing
+> ARM64 Nested Virtualization patch series.
 > 
-> I'd prefer not to go this route, I assume/suspect there's a diffferent underlying
-> issue that is the real problem.
+> First patch avoids the restart of hrtimer when timer interrupt is
+> fired/forwarded to Guest-Hypervisor.
 > 
->> The switch between x2apic and xapic mode is not allowed by X86 spec, while
->> vise versa is allowed and I think that the spec says that in this case APIC
->> ID is restored to its default value.
+> Second patch fixes the vtimer interrupt drop from the Guest-Hypervisor.
 > 
-> No, APIC ID is initialized on RESET, but AFAIK it's preserved for all other
-> transitions.  It's definitely preserved on INIT (doesn't touch the enable bit),
-> and this snippet from the SDM more or less says the APIC ID is preserved when it's
-> disabled in IA32_APIC_BASE.
+> Third patch fixes the NestedVM boot hang seen when Guest Hypersior
+> configured with 64K pagesize where as Host Hypervisor with 4K.
 > 
->   From the disabled state, the only valid x2APIC transition using IA32_APIC_BASE
->   is to the xAPIC mode (EN= 1, EXTD = 0). Thus the only means to transition from
->   x2APIC mode to xAPIC mode is a two-step process:
-> 
->    - first transition from x2APIC mode to local APIC disabled mode (EN= 0, EXTD = 0),
->    - followed by another transition from disabled mode to xAPIC mode (EN= 1, EXTD= 0).
-> 
->   Consequently, all the APIC register states in the x2APIC, except for the x2APIC ID
->   (32 bits), are not preserved across mode transitions.
-> 
-> And for RESET vs. INIT
-> 
->   A reset in this state places the x2APIC in xAPIC mode. All APIC registers
->   (including the local APIC ID register) are initialized as described in Section
->   10.12.5.1.
-> 
->   An INIT in this state keeps the x2APIC in the x2APIC mode. The state of the
->   local APIC ID register is preserved (all 32 bits). However, all the other APIC
->   registers are initialized as a result of the INIT transition.
-> 
-> Emanuele, what is the actual issue you are trying to fix?  E.g. is APICv left
-> inihibited after an emulated RESET?  Something else?
+> These patches are rebased on Nested Virtualization V6 patchset[1].
 
-I think the test in patch 2 I wrote gives a better idea on what I am
-trying to fix: if we are transitioning from x2APIC to xAPIC (RESET I
-would say, even though I am not sure if userspace really does it in the
-way I do it in the test, ie through KVM_SET_MSRS), the APIC_ID is not
-updated back in the right bits, and we can see that by querying the ID
-with KVM_GET_LAPIC after disabling x2APIC.
+If I boot a Guest Hypervisor with more cores and then booting of a 
+NestedVM with equal number of cores or booting multiple 
+NestedVMs(simultaneously) with lower number of cores is resulting in 
+very slow booting and some time RCU soft-lockup of a NestedVM. This I 
+have debugged and turned out to be due to many SGI are getting asserted 
+to all vCPUs of a Guest-Hypervisor when Guest-Hypervisor KVM code 
+prepares NestedVM for WFI wakeup/return.
 
-Now, if the way I reproduce this issue is correct, it is indeed a bug
-and needs to be fixed with the fix in patch 1 or something similar.
-I think it won't really make any difference if instead following what
-the doc says (x2APIC -> disabled -> xAPIC) we directly do x2APIC -> xAPIC.
+When Guest Hypervisor prepares NestedVM while returning/resuming from 
+WFI, it is loading guest-context,  vGIC and timer contexts etc.
+The function gic_poke_irq (called from irq_set_irqchip_state with 
+spinlock held) writes to register GICD_ISACTIVER in Guest-Hypervisor's 
+KVM code resulting in mem-abort trap to Host Hypervisor. Host Hypervisor 
+as part of handling the guest mem abort, function io_mem_abort is called 
+  in turn vgic_mmio_write_sactive, which prepares every vCPU of Guest 
+Hypervisor by calling SGI. The number of SGI/IPI calls goes 
+exponentially high when more and more cores are used to boot Guest 
+Hypervisor.
 
-The test in patch 2 started being developed to test ef40757743b47 ("KVM:
-x86: fix APICv/x2AVIC disabled when vm reboot by itself") even though I
-honestly didn't really understand how to replicate that bug (see cover
-letter) and instead I found this other possibility that still manages to
-screw APIC_ID.
+Code trace:
+At Guest-hypervisor: 
+kvm_timer_vcpu_load->kvm_timer_vcpu_load_gic->set_timer_irq_phys_active->
+irq_set_irqchip_state->gic_poke_irq
 
-Hope this clarifies it a little,
-Emanuele
+At Host-Hypervisor: io_mem_abort-> 
+kvm_io_bus_write->__kvm_io_bus_write->dispatch_mmio_write->
+vgic_mmio_write_sactive->vgic_access_active_prepare->
+kvm_kick_many_cpus->smp_call_function_many
 
-  Stuffing APIC state from
-> userspace should do the right thing after commit ef40757743b4 ("KVM: x86: fix
-> APICv/x2AVIC disabled when vm reboot by itself") and this patch:
+I am currently working around this with "nohlt" kernel param to 
+NestedVM. Any suggestions to handle/fix this case/issue and avoid the 
+slowness of booting of NestedVM with more cores?
+
+Note: Guest-Hypervisor and NestedVM are using default kernel installed 
+using Fedora 36 iso.
+
 > 
->   https://lore.kernel.org/all/20230106011306.85230-33-seanjc@google.com
+> [1] https://www.spinics.net/lists/kvm/msg265656.html
+> 
+> D Scott Phillips (1):
+>    KVM: arm64: nv: only emulate timers that have not yet fired
+> 
+> Ganapatrao Kulkarni (2):
+>    KVM: arm64: nv: Emulate ISTATUS when emulated timers are fired.
+>    KVM: arm64: nv: Avoid block mapping if max_map_size is smaller than
+>      block size.
+> 
+>   arch/arm64/kvm/arch_timer.c | 8 +++++++-
+>   arch/arm64/kvm/mmu.c        | 2 +-
+>   2 files changed, 8 insertions(+), 2 deletions(-)
 > 
 
+Thanks,
+Ganapat
