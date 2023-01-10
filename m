@@ -2,293 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 70EE16647BB
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 18:51:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74A61664809
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 19:03:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235081AbjAJRv3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 12:51:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36212 "EHLO
+        id S235174AbjAJSDp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 13:03:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234904AbjAJRvS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 12:51:18 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19DF5F912
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:51:17 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id bx21-20020a056a00429500b00582d85bb03bso5546170pfb.16
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:51:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kovpab8ufZORC8OQwD/Ffe4tjc6Lhn/m/+zBtc75xtg=;
-        b=jMZkxMMsqWv4TR7GzZ0A7yhf0SNqy4OOCj6DEGOQl/IHadL2JpeOyeLieFcExLaRH+
-         nC7f/8hRRK2ZDY8aJJS7Isg8WIjwIqAAP3IDu3db0HKTcWPRoWdVX1XSuF+7WySHus97
-         UC5xJljIGHCht8YAYZgSXXAMH42IdS9I42o0QHTMnN1Of3nWaBtQixI6ZDup12CBJQnL
-         02FdR3pDScSNA4le2Wc+FdRUb3KHDY3NQb7agC5kIDo40Jh7nROKzfi/rV4ABfS00M8n
-         2bz7L5pb9uXenODU9xH+unSgUVvxe3BdcNIMWg3FcoFhvIWRhR4p+mAgEL7y8SdmAj5+
-         9P7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kovpab8ufZORC8OQwD/Ffe4tjc6Lhn/m/+zBtc75xtg=;
-        b=2cFnjrYlNeliGcgCVpC8RXhf6FvFy5Aam5BCI7e7DjiCIYpYLL7zwy2p7pa19gdGSP
-         xiCQvYmsm8YmHS2kKrvlU0Ev5lT27BEyYDaACNLUokloXwDxKqu9/nqBTEsivFUOH/Ma
-         4P+gDzEP40AOMpcPdNoNJY/14DS3++x0LpaIoSfn1FVjRHzQWMwDO748ITZHRKKcYQpK
-         8hNB/I1jbRgx2+zTsB1XrAugxY5TEPFZTZlM3JAFBFFfmtqtMGwZZMPwtv1zTz4Iumtl
-         PqGMQgm7XihI4hZlIDXEvVAmiJaWDrXU2roITZcYOm0NdNXNB1Z9QJ6rIKUC/xWwDnfr
-         pvkg==
-X-Gm-Message-State: AFqh2kpnQCn2UZb1VoCSvqVnX+m1BTf/MiVUsynqd1K0/6jqbsQY97Rr
-        OYRjFAFbit+EYm6cTE23RACacCMz0Nr96UXwbdcl4JAYZRtqUzUbdjyjJIWw5swrwjr/jKHgRDa
-        fCUc++hxFS1wKCC4Rn+7vZIhMwusBxAks8+Ve+Rm/2UaVfLYpdgB+94M0JQ==
-X-Google-Smtp-Source: AMrXdXtROTaAuScbQiP5lFAmT1xtN9L9Dqm038NELJz/DOHnZMYDutBsJxvjLk/8D/IZFYJyMBlpKlEadsk=
-X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:8358:4c2a:eae1:4752])
- (user=pgonda job=sendgmr) by 2002:a17:90a:206:b0:226:9980:67f3 with SMTP id
- c6-20020a17090a020600b00226998067f3mr280pjc.1.1673373076771; Tue, 10 Jan 2023
- 09:51:16 -0800 (PST)
-Date:   Tue, 10 Jan 2023 09:50:57 -0800
-In-Reply-To: <20230110175057.715453-1-pgonda@google.com>
-Message-Id: <20230110175057.715453-8-pgonda@google.com>
-Mime-Version: 1.0
-References: <20230110175057.715453-1-pgonda@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Subject: [PATCH V6 7/7] KVM: selftests: Add simple sev vm testing
-From:   Peter Gonda <pgonda@google.com>
-To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Peter Gonda <pgonda@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
+        with ESMTP id S235395AbjAJSDP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 13:03:15 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC38327;
+        Tue, 10 Jan 2023 10:00:48 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 65ABB1EC0528;
+        Tue, 10 Jan 2023 19:00:47 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1673373647;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=/dYhmS2NZxWY/VFZHy6ajrVuqyokrP3tFv8//sZMydY=;
+        b=ks1+TdpGuJ2W4YpBrD56LtdKuPidjM6q5+mPo9BQJSn73a0oXd0+luPdORVeqezXA8KtTv
+        9XReJmQFsz2UtX17EBZDvYJsT3tKTc7PXd/W75P0CGz8VjQh6VbIWF0pApMZlXnq4BUAKf
+        UyNTl2EybWpgMbXpBl3MG0KyGptw9i0=
+Date:   Tue, 10 Jan 2023 19:00:42 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Alexey Kardashevskiy <aik@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     kvm@vger.kernel.org, x86@kernel.org, linux-kernel@vger.kernel.org,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
         Sean Christopherson <seanjc@google.com>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        Andrew Jones <andrew.jones@linux.dev>,
-        Michael Roth <michael.roth@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        Sandipan Das <sandipan.das@amd.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Jan Kara <jack@suse.cz>, Ingo Molnar <mingo@redhat.com>,
+        Huang Rui <ray.huang@amd.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH kernel v2 2/3] KVM: SEV: Enable data breakpoints in SEV-ES
+Message-ID: <Y72nyuKT+VJYiEUi@zn.tnic>
+References: <20221209043804.942352-1-aik@amd.com>
+ <20221209043804.942352-3-aik@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221209043804.942352-3-aik@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A very simple of booting SEV guests that checks related CPUID bits. This
-is a stripped down version of "[PATCH v2 08/13] KVM: selftests: add SEV
-boot tests" from Michael but much simpler.
+On Fri, Dec 09, 2022 at 03:38:03PM +1100, Alexey Kardashevskiy wrote:
+> AMD Milan (Fam 19h) introduces support for the swapping, as type 'B',
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Vishal Annapurve <vannapurve@google.com>
-Cc: Ackerley Tng <ackerleytng@google.com>
-cc: Andrew Jones <andrew.jones@linux.dev>
-Suggested-by: Michael Roth <michael.roth@amd.com>
-Signed-off-by: Peter Gonda <pgonda@google.com>
----
- tools/testing/selftests/kvm/.gitignore        | 84 +++++++++++++++++++
- tools/testing/selftests/kvm/Makefile          |  1 +
- .../selftests/kvm/x86_64/sev_all_boot_test.c  | 84 +++++++++++++++++++
- 3 files changed, 169 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
+"type B" means nothing to people who don't have an intimate APM knowledge.
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 6d9381d60172..6d826957c6ae 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -1,7 +1,91 @@
- # SPDX-License-Identifier: GPL-2.0-only
-+<<<<<<< HEAD
- *
- !/**/
- !*.c
- !*.h
- !*.S
- !*.sh
-+=======
-+/aarch64/aarch32_id_regs
-+/aarch64/arch_timer
-+/aarch64/debug-exceptions
-+/aarch64/get-reg-list
-+/aarch64/hypercalls
-+/aarch64/psci_test
-+/aarch64/vcpu_width_config
-+/aarch64/vgic_init
-+/aarch64/vgic_irq
-+/s390x/memop
-+/s390x/resets
-+/s390x/sync_regs_test
-+/s390x/tprot
-+/x86_64/amx_test
-+/x86_64/cpuid_test
-+/x86_64/cr4_cpuid_sync_test
-+/x86_64/debug_regs
-+/x86_64/evmcs_test
-+/x86_64/emulator_error_test
-+/x86_64/fix_hypercall_test
-+/x86_64/get_msr_index_features
-+/x86_64/kvm_clock_test
-+/x86_64/kvm_pv_test
-+/x86_64/hyperv_clock
-+/x86_64/hyperv_cpuid
-+/x86_64/hyperv_features
-+/x86_64/hyperv_svm_test
-+/x86_64/max_vcpuid_cap_test
-+/x86_64/mmio_warning_test
-+/x86_64/monitor_mwait_test
-+/x86_64/nested_exceptions_test
-+/x86_64/nx_huge_pages_test
-+/x86_64/platform_info_test
-+/x86_64/pmu_event_filter_test
-+/x86_64/set_boot_cpu_id
-+/x86_64/set_sregs_test
-+/x86_64/sev_all_boot_test
-+/x86_64/sev_migrate_tests
-+/x86_64/smm_test
-+/x86_64/state_test
-+/x86_64/svm_vmcall_test
-+/x86_64/svm_int_ctl_test
-+/x86_64/svm_nested_soft_inject_test
-+/x86_64/sync_regs_test
-+/x86_64/tsc_msrs_test
-+/x86_64/tsc_scaling_sync
-+/x86_64/ucna_injection_test
-+/x86_64/userspace_io_test
-+/x86_64/userspace_msr_exit_test
-+/x86_64/vmx_apic_access_test
-+/x86_64/vmx_close_while_nested_test
-+/x86_64/vmx_dirty_log_test
-+/x86_64/vmx_exception_with_invalid_guest_state
-+/x86_64/vmx_invalid_nested_guest_state
-+/x86_64/vmx_msrs_test
-+/x86_64/vmx_preemption_timer_test
-+/x86_64/vmx_set_nested_state_test
-+/x86_64/vmx_tsc_adjust_test
-+/x86_64/vmx_nested_tsc_scaling_test
-+/x86_64/xapic_ipi_test
-+/x86_64/xapic_state_test
-+/x86_64/xen_shinfo_test
-+/x86_64/xen_vmcall_test
-+/x86_64/xss_msr_test
-+/x86_64/vmx_pmu_caps_test
-+/x86_64/triple_fault_event_test
-+/access_tracking_perf_test
-+/demand_paging_test
-+/dirty_log_test
-+/dirty_log_perf_test
-+/hardware_disable_test
-+/kvm_create_max_vcpus
-+/kvm_page_table_test
-+/max_guest_memory_test
-+/memslot_modification_stress_test
-+/memslot_perf_test
-+/rseq_test
-+/set_memory_region_test
-+/steal_time
-+/kvm_binary_stats_test
-+/system_counter_offset_test
-+>>>>>>> KVM: selftests: Add simple sev vm testing
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index b7cfb15712d1..66d7ab3da990 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -111,6 +111,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
- TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_caps_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
- TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
-+TEST_GEN_PROGS_x86_64 += x86_64/sev_all_boot_test
- TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
- TEST_GEN_PROGS_x86_64 += x86_64/amx_test
- TEST_GEN_PROGS_x86_64 += x86_64/max_vcpuid_cap_test
-diff --git a/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c b/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
-new file mode 100644
-index 000000000000..e9e4d7305bc1
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
-@@ -0,0 +1,84 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Basic SEV boot tests.
-+ *
-+ */
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <sys/ioctl.h>
-+
-+#include "test_util.h"
-+#include "kvm_util.h"
-+#include "processor.h"
-+#include "svm_util.h"
-+#include "linux/psp-sev.h"
-+#include "sev.h"
-+
-+#define NR_SYNCS 1
-+
-+#define MSR_AMD64_SEV_BIT  1
-+
-+static void guest_run_loop(struct kvm_vcpu *vcpu)
-+{
-+	struct ucall uc;
-+	int i;
-+
-+	for (i = 0; i <= NR_SYNCS; ++i) {
-+		vcpu_run(vcpu);
-+		switch (get_ucall(vcpu, &uc)) {
-+		case UCALL_SYNC:
-+			continue;
-+		case UCALL_DONE:
-+			return;
-+		case UCALL_ABORT:
-+			REPORT_GUEST_ASSERT(uc);
-+		default:
-+			TEST_FAIL("Unexpected exit: %s",
-+				  exit_reason_str(vcpu->run->exit_reason));
-+		}
-+	}
-+}
-+
-+static void is_sev_enabled(void)
-+{
-+	uint64_t sev_status;
-+
-+	GUEST_ASSERT(this_cpu_has(X86_FEATURE_SEV));
-+
-+	sev_status = rdmsr(MSR_AMD64_SEV);
-+	GUEST_ASSERT(sev_status & 0x1);
-+}
-+
-+static void guest_sev_code(void)
-+{
-+	GUEST_SYNC(1);
-+
-+	is_sev_enabled();
-+
-+	GUEST_DONE();
-+}
-+
-+static void test_sev(void *guest_code, uint64_t policy)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+
-+	vm = vm_sev_create_with_one_vcpu(policy, guest_code, &vcpu);
-+	TEST_ASSERT(vm, "vm_sev_create_with_one_vcpu() failed to create VM\n");
-+
-+	guest_run_loop(vcpu);
-+
-+	kvm_vm_free(vm);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	TEST_REQUIRE(is_kvm_sev_supported());
-+
-+	test_sev(guest_sev_code, SEV_POLICY_NO_DBG);
-+	test_sev(guest_sev_code, 0);
-+
-+	return 0;
-+}
+Let's try again, this time with a more accessible formulation:
+
+"The debug registers are handled a bit differently when doing a world switch of a
+SEV-ES guest: the guest debug registers values are saved and restored as usual
+and as one would expect.
+
+The *host* debug registers are not saved to the host save area so if the
+host is doing any debug activity, that host should take care to stash its debug
+registers values into the host save area before running guests.
+
+See Table B-3. Swap Types and the AMD APM volume 2."
+
+And now you can go into detail explaining which regs exactly and so on.
+
+> of DR[0-3] and DR[0-3]_ADDR_MASK registers. Software enables this by
+> setting SEV_FEATURES[5] (called "DebugSwap") in the VMSA which makes
+> data breakpoints work in SEV-ES VMs.
+>
+> For type 'B' swaps the hardware saves/restores the VM state on
+> VMEXIT/VMRUN in VMSA, and restores the host state on VMEXIT.
+
+Yeah, close but I'd prefer a more detailed explanation and a reference to the
+APM so that people can follow and read more info if needed.
+> 
+> Enable DebugSwap in VMSA but only if CPUID Fn80000021_EAX[0]
+> ("NoNestedDataBp", "Processor ignores nested data breakpoints") is
+> supported by the SOC as otherwise a malicious guest can cause
+> the infinite #DB loop DoS.
+> 
+> Save DR[0-3] / DR[0-3]_ADDR_MASK in the host save area before VMRUN
+> as type 'B' swap does not do this part.
+> 
+> Eliminate DR7 and #DB intercepts as:
+> - they are not needed when DebugSwap is supported;
+> - #VC for these intercepts is most likely not supported anyway and
+> kills the VM.
+> Keep DR7 intercepted unless DebugSwap enabled to prevent
+> the infinite #DB loop DoS.
+> 
+> Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+> ---
+> Changes:
+> v2:
+> * debug_swap moved from vcpu to module_param
+> * rewrote commit log
+> 
+> ---
+> 
+> "DR7 access must remain intercepted for an SEV-ES guest" - I could not
+> figure out the exact reasoning why it is there in the first place,
+> IIUC this is to prevent loop of #DBs in the VM.
+
+Let's ask Mr. Lendacky:
+
+8d4846b9b150 ("KVM: SVM: Prevent debugging under SEV-ES")
+
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index efaaef2b7ae1..800ea2a778cc 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -21,6 +21,7 @@
+>  #include <asm/pkru.h>
+>  #include <asm/trapnr.h>
+>  #include <asm/fpu/xcr.h>
+> +#include <asm/debugreg.h>
+>  
+>  #include "mmu.h"
+>  #include "x86.h"
+> @@ -52,11 +53,21 @@ module_param_named(sev, sev_enabled, bool, 0444);
+>  /* enable/disable SEV-ES support */
+>  static bool sev_es_enabled = true;
+>  module_param_named(sev_es, sev_es_enabled, bool, 0444);
+> +
+> +/* enable/disable SEV-ES DebugSwap support */
+> +static bool sev_es_debug_swap_enabled = true;
+> +module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0644);
+>  #else
+>  #define sev_enabled false
+>  #define sev_es_enabled false
+> +#define sev_es_debug_swap false
+>  #endif /* CONFIG_KVM_AMD_SEV */
+>  
+> +bool sev_es_is_debug_swap_enabled(void)
+> +{
+> +	return sev_es_debug_swap_enabled;
+> +}
+> +
+>  static u8 sev_enc_bit;
+>  static DECLARE_RWSEM(sev_deactivate_lock);
+>  static DEFINE_MUTEX(sev_bitmap_lock);
+> @@ -604,6 +615,9 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>  	save->xss  = svm->vcpu.arch.ia32_xss;
+>  	save->dr6  = svm->vcpu.arch.dr6;
+>  
+> +	if (sev_es_is_debug_swap_enabled())
+> +		save->sev_features |= SVM_SEV_FEAT_DEBUG_SWAP;
+> +
+>  	pr_debug("Virtual Machine Save Area (VMSA):\n");
+>  	print_hex_dump_debug("", DUMP_PREFIX_NONE, 16, 1, save, sizeof(*save), false);
+>  
+> @@ -2249,6 +2263,9 @@ void __init sev_hardware_setup(void)
+>  out:
+>  	sev_enabled = sev_supported;
+>  	sev_es_enabled = sev_es_supported;
+> +	if (sev_es_debug_swap_enabled)
+> +		sev_es_debug_swap_enabled = sev_es_enabled &&
+> +			boot_cpu_has(X86_FEATURE_NO_NESTED_DATA_BP);
+
+check_for_deprecated_apis: WARNING: arch/x86/kvm/svm/sev.c:2268: Do not use boot_cpu_has() - use cpu_feature_enabled() instead.
+
 -- 
-2.39.0.314.g84b9a713c41-goog
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
