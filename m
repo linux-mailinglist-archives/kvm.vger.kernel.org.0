@@ -2,162 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91CFA6643C2
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 15:56:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7391A6643F5
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 16:03:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238733AbjAJOzm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 09:55:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36238 "EHLO
+        id S234109AbjAJPDK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 10:03:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238819AbjAJOzM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 09:55:12 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BB521DDD2;
-        Tue, 10 Jan 2023 06:55:08 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30AEH2WQ032630;
-        Tue, 10 Jan 2023 14:54:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=8rRpFagcUrDG39oi0NySaX6L60RGxoRtvw3fFkRTIHs=;
- b=SKvVC3Q2RczX2zZJHsY1+x6zrtAArGMYxzHlUHGE+WwEGwoAgwCIS9/jYuALLkZu3uZo
- haZ7BUdFlWrVBhbl+Ti7NzOzyJvL6NnzHa3zATJer1PsZqfuaqbr6GgbYfXpyN89K0Dv
- SavB0CIy3XXdwph06W/5LY7YQgaczqkSMA39Md6XqKJJezdjAtAAUqTbBSfKxxn5Ri/b
- GDO7EiJzJSJEmjSeSmxH8veVbkCqoy2pDUx2hLunXKEHKsYXQkx19WQbpttEeDp5AIW2
- 7NkGUCYh9O/dqQxouVjr2CJL9ljpyfryS9ok9cW0Bzn+36zdad3a9SQub0oEGXPOwlE/ rg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n19n2s43w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Jan 2023 14:54:56 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30AEH4fL032719;
-        Tue, 10 Jan 2023 14:54:56 GMT
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n19n2s43q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Jan 2023 14:54:55 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30ABv0g5010169;
-        Tue, 10 Jan 2023 14:54:55 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
-        by ppma03wdc.us.ibm.com (PPS) with ESMTPS id 3my0c7a9vv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 10 Jan 2023 14:54:55 +0000
-Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
-        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30AEsrMi56099234
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Jan 2023 14:54:53 GMT
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B500658045;
-        Tue, 10 Jan 2023 14:54:53 +0000 (GMT)
-Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 86C4B58052;
-        Tue, 10 Jan 2023 14:54:52 +0000 (GMT)
-Received: from [9.160.171.221] (unknown [9.160.171.221])
-        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 10 Jan 2023 14:54:52 +0000 (GMT)
-Message-ID: <b317380e-26bf-b478-4aea-0355e0de4017@linux.ibm.com>
-Date:   Tue, 10 Jan 2023 09:54:51 -0500
+        with ESMTP id S233300AbjAJPDE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 10:03:04 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1155AC70;
+        Tue, 10 Jan 2023 07:02:38 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id n12so12666627pjp.1;
+        Tue, 10 Jan 2023 07:02:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hnA+uHCy6P7PsRxtJOnvckRetO3eFNxuDZZIKa1zGWA=;
+        b=dhgyhtsB5aZlrR6UFvRwSLqV6ez6fA1AQxxivKlkF5lUcN1PMBqReoL8t5AZTpqGvi
+         UCBKIzURulQig3MfXAyebDMzTRJqgUduJGsszrybT8zYH+WY0avP8ch2bufY+DmIaAaD
+         5/XO0WULz3Xlf4Cei6Eh7uviB6LxrdSI/roctxmwXUhHRPP/sKpYwDeWpY1ITsAVHCfz
+         IW5uPiM2kLC7x4c0ZlhZEAGgM9KHi3UawsugGer8SPXd796TUjOedpxdxSf6MKUgzoAz
+         ecyP2q8F5mxr3ZTq7ECE8hpY0DUbFRn0dOBkK9yCo8C95HVCoIh1MoZTWYKgZvECqc03
+         pDJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hnA+uHCy6P7PsRxtJOnvckRetO3eFNxuDZZIKa1zGWA=;
+        b=gP0x8kxkgpwZ7NN/OpDkQcsBW9e2fSsqVuTim36zMK666c59cOaciToWOOZKbB3qKx
+         p4UZD2KXH2Ep6+kzdRS3x+MRdzhM4KGT6lO8dlbvD7DmjHacXUTqohq5w3fnsUQfw08T
+         yRCVM/9yV7Duucqz6rHsCGiMPxajNxy2UiXeB0K2yDB7MCJrT0ed7Uas2O7A0Z814Gwo
+         fFm3uhy+kC4nogKV7vrhrTAcdJGDXB3xOnITVno9x60wuoS+nfeDBVJbwqcdDzvISlq0
+         PC3xSnTdJ8GKkZEYa/MnV54FaujwlpXvJXJwCfxWpBuU7E2CQNxvm/ads9PY2Rrh9soZ
+         sHMQ==
+X-Gm-Message-State: AFqh2krFAy7LzHoZu/5oldyWFfGSzzZgsT64GiUoND5I54co+KCZ8+4F
+        z99CeKcfjwWMVTTyFYZPov17lkCsbnxIFA==
+X-Google-Smtp-Source: AMrXdXt5tCuAAgKwaXBm87V1iTA5iPygkUHNDS3T7BPy7wXrUHqdHL9awf4YImc6EgBEH8F54ej01g==
+X-Received: by 2002:a17:90b:3758:b0:225:d698:69b9 with SMTP id ne24-20020a17090b375800b00225d69869b9mr61179882pjb.17.1673362958320;
+        Tue, 10 Jan 2023 07:02:38 -0800 (PST)
+Received: from localhost.localdomain ([185.216.119.110])
+        by smtp.googlemail.com with ESMTPSA id qe9-20020a17090b4f8900b001df264610c4sm2534681pjb.0.2023.01.10.07.02.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Jan 2023 07:02:38 -0800 (PST)
+From:   Wang Yong <yongw.kernel@gmail.com>
+To:     corbet@lwn.net, pbonzini@redhat.com, kchamart@redhat.com
+Cc:     linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Wang Yong <yongw.kernel@gmail.com>
+Subject: [PATCH] Documentation: KVM: fix typos in running-nested-guests.rst
+Date:   Tue, 10 Jan 2023 15:00:46 +0000
+Message-Id: <20230110150046.549755-1-yongw.kernel@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH 1/4] vfio-mdev: allow building the samples into the kernel
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Kirti Wankhede <kwankhede@nvidia.com>
-Cc:     Halil Pasic <pasic@linux.ibm.com>,
-        Jason Herne <jjherne@linux.ibm.com>,
-        Zhenyu Wang <zhenyuw@linux.intel.com>,
-        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, intel-gfx@lists.freedesktop.org
-References: <20230110091009.474427-1-hch@lst.de>
- <20230110091009.474427-2-hch@lst.de>
-From:   Anthony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <20230110091009.474427-2-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: eM4ZKbFUWuZCkdT4oZussBlXFXvLydrI
-X-Proofpoint-GUID: 3LZ2Q-1FvI8p116IQXqMi2vlHuWNvdf-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-10_04,2023-01-10_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- impostorscore=0 suspectscore=0 bulkscore=0 mlxscore=0 spamscore=0
- malwarescore=0 adultscore=0 phishscore=0 clxscore=1015 mlxlogscore=999
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301100088
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+change "gues" to "guest" and remove redundant ")".
 
-On 1/10/23 4:10 AM, Christoph Hellwig wrote:
-> There is nothing in the vfio-mdev sample drivers that requires building
-> them as modules, so remove that restriction.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->   samples/Kconfig | 16 ++++++++--------
->   1 file changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/samples/Kconfig b/samples/Kconfig
-> index 0d81c00289ee36..f1b8d4ff123036 100644
-> --- a/samples/Kconfig
-> +++ b/samples/Kconfig
-> @@ -184,23 +184,23 @@ config SAMPLE_UHID
->   	  Build UHID sample program.
->   
->   config SAMPLE_VFIO_MDEV_MTTY
-> -	tristate "Build VFIO mtty example mediated device sample code -- loadable modules only"
-> -	depends on VFIO_MDEV && m
-> +	tristate "Build VFIO mtty example mediated device sample code"
-> +	depends on VFIO_MDEV
+Signed-off-by: Wang Yong <yongw.kernel@gmail.com>
+---
+ Documentation/virt/kvm/x86/running-nested-guests.rst | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
+diff --git a/Documentation/virt/kvm/x86/running-nested-guests.rst b/Documentation/virt/kvm/x86/running-nested-guests.rst
+index a27e6768d900..71136fe1723b 100644
+--- a/Documentation/virt/kvm/x86/running-nested-guests.rst
++++ b/Documentation/virt/kvm/x86/running-nested-guests.rst
+@@ -150,7 +150,7 @@ able to start an L1 guest with::
+     $ qemu-kvm -cpu host [...]
+ 
+ The above will pass through the host CPU's capabilities as-is to the
+-gues); or for better live migration compatibility, use a named CPU
++guest, or for better live migration compatibility, use a named CPU
+ model supported by QEMU. e.g.::
+ 
+     $ qemu-kvm -cpu Haswell-noTSX-IBRS,vmx=on
+-- 
+2.25.1
 
-Admittedly, I'm not very fluent with Kconfig, but in patch 2 you stated, 
-"VFIO_MDEV is just a library with helpers for the drivers. Stop making 
-it a user choice and just select it by the drivers that use the 
-helpers". Why are you not selecting it here?
-
-
->   	help
->   	  Build a virtual tty sample driver for use as a VFIO
->   	  mediated device
->   
->   config SAMPLE_VFIO_MDEV_MDPY
-> -	tristate "Build VFIO mdpy example mediated device sample code -- loadable modules only"
-> -	depends on VFIO_MDEV && m
-> +	tristate "Build VFIO mdpy example mediated device sample code"
-> +	depends on VFIO_MDEV
->   	help
->   	  Build a virtual display sample driver for use as a VFIO
->   	  mediated device.  It is a simple framebuffer and supports
->   	  the region display interface (VFIO_GFX_PLANE_TYPE_REGION).
->   
->   config SAMPLE_VFIO_MDEV_MDPY_FB
-> -	tristate "Build VFIO mdpy example guest fbdev driver -- loadable module only"
-> -	depends on FB && m
-> +	tristate "Build VFIO mdpy example guest fbdev driver"
-> +	depends on FB
->   	select FB_CFB_FILLRECT
->   	select FB_CFB_COPYAREA
->   	select FB_CFB_IMAGEBLIT
-> @@ -208,8 +208,8 @@ config SAMPLE_VFIO_MDEV_MDPY_FB
->   	  Guest fbdev driver for the virtual display sample driver.
->   
->   config SAMPLE_VFIO_MDEV_MBOCHS
-> -	tristate "Build VFIO mdpy example mediated device sample code -- loadable modules only"
-> -	depends on VFIO_MDEV && m
-> +	tristate "Build VFIO mdpy example mediated device sample code"
-> +	depends on VFIO_MDEV
->   	select DMA_SHARED_BUFFER
->   	help
->   	  Build a virtual display sample driver for use as a VFIO
