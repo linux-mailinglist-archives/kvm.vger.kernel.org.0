@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF7206646F1
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 18:04:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7EDBB6646F2
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 18:04:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238160AbjAJREV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 12:04:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40896 "EHLO
+        id S238840AbjAJREY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 12:04:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238731AbjAJREI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 12:04:08 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F27E479F9
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:04:05 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id w185-20020a6382c2000000b004b1fcf39c18so3339400pgd.13
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:04:05 -0800 (PST)
+        with ESMTP id S238163AbjAJREK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 12:04:10 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0735448818
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:04:07 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id r126-20020a632b84000000b004393806c06eso5459610pgr.4
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:04:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8Ws5IUpXIyeNK/XDOwuvqUqUTKu8gu/OI2LdlzUr+E=;
-        b=gZVxF/BfVlRdNYXvJyQ6RaZ7II5GGqwItg0GdnKWPUevuCVgZ/ywpOqZEqAAFHm4Hk
-         OfVySUb20PeRm7NOIK/I+bP79UQh0VALmRZCKjEwkdO54WkeN2ZdRZN/lO3WYiPBZ7+Q
-         uaiHd4zj8VWaHvnApQJRLuqwWvzVE7BfBaW3AgPvI7UD36ykM3bruVohqF6ECmymNNBW
-         KmWESbetIQUGBAAZ2JE04V2CFWQVu3aRI4/SiRxxawxqZLf7SoduCXd0Lrx4vARkHWF/
-         FbU1WDw+j029R0MvUn6L2QEPPS9oFEKKyE0g38r+Lwv4ZZmIbk0mEqdZL67vYjVpC6Om
-         PGWw==
+        bh=zDFARFhQrpAenP30BalxIxt+DEVD8SrcDZuB3VTocFM=;
+        b=RHVPby6d8YK0kNfyU4XbKbG9K0HrUPnMsx0zAVhYrwSEV1QvBOHDlns6vmL9HKJ0UX
+         GTV1YXGFFi4qGGJzyDg70Bx23T/qk2m26IgQALGM9rhR0g1JyC0TbB4bIJ2Xw18fkNGl
+         nOe59Ycux7gfu9Nmrbgz/R3/UuxVbrAk+IPG6nCPV99PZFoM0pXgOWGMXEgZm38uvpKf
+         BBtJSb+cZOh9q9M9xGRmKPfF2dqWJWcjbhSQ7+/lvN18gTEm0VeYT2whIwJ0qMP5QdaY
+         xG+z0S3/VWFyBnre6JlMVaycb/zTlF+EpxEJG1SUEa/ACow0BwLNJ1OBHer+Mgv9oE+1
+         bY6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8Ws5IUpXIyeNK/XDOwuvqUqUTKu8gu/OI2LdlzUr+E=;
-        b=ZSQFK74JP9aswgsqzoIhL76z5Qa1bO4N0ctI+stWQMx0c7ZnW2Ayew1nK1qs/PZ8nt
-         xgBCI5fdKRZ7wExpvO4c4nconRWzspLtQ2xI4mzfEOvFBkF+V+pH01JJUw93wVJJiChU
-         uoDwPtGw2jjS1t+3vYhIZFRFq19esWGCI7wiuPVNKT+mNZmTlmKZWvsrE881oB2qA4S/
-         rqPtH/mtnu3wSbaSkOpeAUEyyfiIk3JmTz/nNyHmHmFxAreOG+vA39ektuys3LNeWy5V
-         PnrpXcOX3prlA5SokumQ6kArDD8i+i2yWpFRUD2u4vRNhQM2Nkv8nm2ixgO1QX8rFtfW
-         tNLg==
-X-Gm-Message-State: AFqh2krCX81TBCDnMJ21P64b92UoaO8g1Innh6LajmahoxDQdUJqq9yv
-        G7IWCqG0zRiRlywuld4oSMZKW7n7ljcExbHxiYBOWbcH9JJ73wYlkqKFhfWrYdnvbY8Bh8cWV46
-        bJVhx0JuHmSNa/WW/s1vZUvTaSvA+yxPiAPoJ1xX3jSJ90doQxXlOcORyWw==
-X-Google-Smtp-Source: AMrXdXvlZhL3goSDj1HZohFk5h5owOCC5IfcErxsRF65ck1Qw/ngnjeT3pk3EYcQEglM12ywX+MaqQxBr40=
+        bh=zDFARFhQrpAenP30BalxIxt+DEVD8SrcDZuB3VTocFM=;
+        b=OaOUb7e6QDjg2jLrN4E9uISwt8JzHGJ7MQCdk1lyw1jBtsRbMam2gtWI7iUqWEMoqo
+         WCydSK+7Y3BcC4ZeAP/F5vqzw/mZyXVCtyPHiedN7i0NmkEdzTPvFpis1kSzKtHEw+46
+         kOwDwCnOpGqeyZ5zeqT8kUL8mH1mcS+uhg6yYZeAroJGlYvNeaqPna8ske8BXKgWxIto
+         s5kkRZoGQiOuV2UqnrF04j1opUv11EgzyOl/H6zdLJF70DvqSdlhobX4nOe8lzfzC4vJ
+         kP8u3SjR8Q7xwEZyhGKseSNXfhyz6FfcT7vrt9r8wfIS/ARTmKyggITRWrYgmvWj3JKa
+         vLgA==
+X-Gm-Message-State: AFqh2kpdHAb6T7hG2wBeAmgiMvGHdJZb01HddrK4MdhzCsp/HOfQbjRY
+        f4OJFqLV3aH0oanBft5NE5lk740wNk+zuFT9oycBhZMriQvxQy+omtQoWLXi+U/wE5WM0qy6l1e
+        ehP3y2SHBhoknlXbBni39TJtcB8F1FAAqY3eE9VCHqb6U71E4QTqZbUx1mg==
+X-Google-Smtp-Source: AMrXdXva5uhx3s+CWvKnDITDXLw6FXzMzy/SFM+KhQeIxW43fE2yM0tyQftMFsZ/tCmuuFkx7QZfCuLCIiY=
 X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:8358:4c2a:eae1:4752])
- (user=pgonda job=sendgmr) by 2002:a17:902:704a:b0:189:f708:9b6e with SMTP id
- h10-20020a170902704a00b00189f7089b6emr4156140plt.20.1673370244904; Tue, 10
- Jan 2023 09:04:04 -0800 (PST)
-Date:   Tue, 10 Jan 2023 09:03:53 -0800
+ (user=pgonda job=sendgmr) by 2002:a17:902:c94d:b0:191:24d1:3b31 with SMTP id
+ i13-20020a170902c94d00b0019124d13b31mr3005144pla.94.1673370246455; Tue, 10
+ Jan 2023 09:04:06 -0800 (PST)
+Date:   Tue, 10 Jan 2023 09:03:54 -0800
 In-Reply-To: <20230110170358.633793-1-pgonda@google.com>
-Message-Id: <20230110170358.633793-3-pgonda@google.com>
+Message-Id: <20230110170358.633793-4-pgonda@google.com>
 Mime-Version: 1.0
 References: <20230110170358.633793-1-pgonda@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Subject: [PATCH V6 2/7] KVM: selftests: add hooks for managing protected guest memory
+Subject: [PATCH V6 3/7] KVM: selftests: handle protected bits in page tables
 From:   Peter Gonda <pgonda@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Peter Gonda <pgonda@google.com>,
@@ -73,10 +73,13 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add kvm_vm.protected metadata. Protected VMs memory, potentially
-register and other state may not be accessible to KVM. This combined
-with a new protected_phy_pages bitmap will allow the selftests to check
-if a given pages is accessible.
+SEV guests rely on an encyption bit which resides within the range that
+current code treats as address bits. Guest code will expect these bits
+to be set appropriately in their page tables, whereas the rest of the
+kvm_util functions will generally expect these bits to not be present.
+Introduce pte_me_mask and struct kvm_vm_arch to allow for arch specific
+address tagging. Currently just adding x86 c_bit and s_bit support for
+SEV and TDX.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
@@ -86,107 +89,232 @@ cc: Andrew Jones <andrew.jones@linux.dev>
 Originally-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Peter Gonda <pgonda@google.com>
 ---
- .../selftests/kvm/include/kvm_util_base.h        | 14 ++++++++++++--
- tools/testing/selftests/kvm/lib/kvm_util.c       | 16 +++++++++++++---
- 2 files changed, 25 insertions(+), 5 deletions(-)
+ tools/arch/arm64/include/asm/kvm_host.h       |  7 +++++++
+ tools/arch/riscv/include/asm/kvm_host.h       |  7 +++++++
+ tools/arch/s390/include/asm/kvm_host.h        |  7 +++++++
+ tools/arch/x86/include/asm/kvm_host.h         | 13 ++++++++++++
+ .../selftests/kvm/include/kvm_util_base.h     | 19 +++++++++++++++++
+ tools/testing/selftests/kvm/lib/kvm_util.c    | 21 ++++++++++++++++++-
+ .../selftests/kvm/lib/x86_64/processor.c      | 17 ++++++++++++---
+ 7 files changed, 87 insertions(+), 4 deletions(-)
+ create mode 100644 tools/arch/arm64/include/asm/kvm_host.h
+ create mode 100644 tools/arch/riscv/include/asm/kvm_host.h
+ create mode 100644 tools/arch/s390/include/asm/kvm_host.h
+ create mode 100644 tools/arch/x86/include/asm/kvm_host.h
 
+diff --git a/tools/arch/arm64/include/asm/kvm_host.h b/tools/arch/arm64/include/asm/kvm_host.h
+new file mode 100644
+index 000000000000..218f5cdf0d86
+--- /dev/null
++++ b/tools/arch/arm64/include/asm/kvm_host.h
+@@ -0,0 +1,7 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef _TOOLS_LINUX_ASM_ARM64_KVM_HOST_H
++#define _TOOLS_LINUX_ASM_ARM64_KVM_HOST_H
++
++struct kvm_vm_arch {};
++
++#endif  // _TOOLS_LINUX_ASM_ARM64_KVM_HOST_H
+diff --git a/tools/arch/riscv/include/asm/kvm_host.h b/tools/arch/riscv/include/asm/kvm_host.h
+new file mode 100644
+index 000000000000..c8280d5659ce
+--- /dev/null
++++ b/tools/arch/riscv/include/asm/kvm_host.h
+@@ -0,0 +1,7 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef _TOOLS_LINUX_ASM_RISCV_KVM_HOST_H
++#define _TOOLS_LINUX_ASM_RISCV_KVM_HOST_H
++
++struct kvm_vm_arch {};
++
++#endif  // _TOOLS_LINUX_ASM_RISCV_KVM_HOST_H
+diff --git a/tools/arch/s390/include/asm/kvm_host.h b/tools/arch/s390/include/asm/kvm_host.h
+new file mode 100644
+index 000000000000..4c4c1c1e4bf8
+--- /dev/null
++++ b/tools/arch/s390/include/asm/kvm_host.h
+@@ -0,0 +1,7 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef _TOOLS_LINUX_ASM_S390_KVM_HOST_H
++#define _TOOLS_LINUX_ASM_S390_KVM_HOST_H
++
++struct kvm_vm_arch {};
++
++#endif  // _TOOLS_LINUX_ASM_S390_KVM_HOST_H
+diff --git a/tools/arch/x86/include/asm/kvm_host.h b/tools/arch/x86/include/asm/kvm_host.h
+new file mode 100644
+index 000000000000..d8f48fe835fb
+--- /dev/null
++++ b/tools/arch/x86/include/asm/kvm_host.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
++#ifndef _TOOLS_LINUX_ASM_X86_KVM_HOST_H
++#define _TOOLS_LINUX_ASM_X86_KVM_HOST_H
++
++#include <stdbool.h>
++#include <stdint.h>
++
++struct kvm_vm_arch {
++	uint64_t c_bit;
++	uint64_t s_bit;
++};
++
++#endif  // _TOOLS_LINUX_ASM_X86_KVM_HOST_H
 diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index fbc2a79369b8..015b59a0b80e 100644
+index 015b59a0b80e..f84d7777d5ca 100644
 --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
 +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -45,6 +45,7 @@ typedef uint64_t vm_vaddr_t; /* Virtual Machine (Guest) virtual address */
- struct userspace_mem_region {
- 	struct kvm_userspace_memory_region region;
- 	struct sparsebit *unused_phy_pages;
-+	struct sparsebit *protected_phy_pages;
- 	int fd;
- 	off_t offset;
- 	enum vm_mem_backing_src_type backing_src_type;
-@@ -111,6 +112,9 @@ struct kvm_vm {
+@@ -17,6 +17,8 @@
+ #include "linux/rbtree.h"
+ 
+ #include <asm/atomic.h>
++#include <asm/kvm.h>
++#include <asm/kvm_host.h>
+ 
+ #include <sys/ioctl.h>
+ 
+@@ -111,6 +113,9 @@ struct kvm_vm {
+ 	vm_vaddr_t idt;
  	vm_vaddr_t handlers;
  	uint32_t dirty_ring_size;
- 
-+	/* VM protection enabled: SEV, etc*/
-+	bool protected;
++	uint64_t gpa_protected_mask;
 +
- 	/* Cache of information for binary stats interface */
- 	int stats_fd;
- 	struct kvm_stats_header stats_header;
-@@ -679,10 +683,16 @@ const char *exit_reason_str(unsigned int exit_reason);
++	struct kvm_vm_arch arch;
  
- vm_paddr_t vm_phy_page_alloc(struct kvm_vm *vm, vm_paddr_t paddr_min,
- 			     uint32_t memslot);
--vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
--			      vm_paddr_t paddr_min, uint32_t memslot);
-+vm_paddr_t _vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-+			      vm_paddr_t paddr_min, uint32_t memslot, bool protected);
- vm_paddr_t vm_alloc_page_table(struct kvm_vm *vm);
+ 	/* VM protection enabled: SEV, etc*/
+ 	bool protected;
+@@ -162,6 +167,7 @@ enum vm_guest_mode {
+ 	VM_MODE_P40V48_16K,
+ 	VM_MODE_P40V48_64K,
+ 	VM_MODE_PXXV48_4K,	/* For 48bits VA but ANY bits PA */
++	VM_MODE_PXXV48_4K_SEV,	/* For 48bits VA but ANY bits PA */
+ 	VM_MODE_P47V64_4K,
+ 	VM_MODE_P44V64_4K,
+ 	VM_MODE_P36V48_4K,
+@@ -441,6 +447,17 @@ void *addr_gva2hva(struct kvm_vm *vm, vm_vaddr_t gva);
+ vm_paddr_t addr_hva2gpa(struct kvm_vm *vm, void *hva);
+ void *addr_gpa2alias(struct kvm_vm *vm, vm_paddr_t gpa);
  
-+static inline vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-+					    vm_paddr_t paddr_min, uint32_t memslot)
++
++static inline vm_paddr_t vm_untag_gpa(struct kvm_vm *vm, vm_paddr_t gpa)
 +{
-+	return _vm_phy_pages_alloc(vm, num, paddr_min, memslot, vm->protected);
++	return gpa & ~vm->gpa_protected_mask;
 +}
 +
- /*
-  * ____vm_create() does KVM_CREATE_VM and little else.  __vm_create() also
-  * loads the test binary into guest memory and creates an IRQ chip (x86 only).
++static inline vm_paddr_t vm_tag_gpa(struct kvm_vm *vm, vm_paddr_t gpa)
++{
++	return gpa | vm->gpa_protected_mask;
++}
++
+ void vcpu_run(struct kvm_vcpu *vcpu);
+ int _vcpu_run(struct kvm_vcpu *vcpu);
+ 
+@@ -917,4 +934,6 @@ void kvm_selftest_arch_init(void);
+ 
+ void kvm_arch_vm_post_create(struct kvm_vm *vm);
+ 
++bool vm_is_gpa_protected(struct kvm_vm *vm, vm_paddr_t paddr);
++
+ #endif /* SELFTEST_KVM_UTIL_BASE_H */
 diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 56d5ea949cbb..63913b219b42 100644
+index 63913b219b42..ba771c2d949d 100644
 --- a/tools/testing/selftests/kvm/lib/kvm_util.c
 +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -663,6 +663,7 @@ static void __vm_mem_region_delete(struct kvm_vm *vm,
- 	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION, &region->region);
- 
- 	sparsebit_free(&region->unused_phy_pages);
-+	sparsebit_free(&region->protected_phy_pages);
- 	ret = munmap(region->mmap_start, region->mmap_size);
- 	TEST_ASSERT(!ret, __KVM_SYSCALL_ERROR("munmap()", ret));
- 	if (region->fd >= 0) {
-@@ -1010,6 +1011,7 @@ void vm_userspace_mem_region_add(struct kvm_vm *vm,
- 
- 	region->backing_src_type = src_type;
- 	region->unused_phy_pages = sparsebit_alloc();
-+	region->protected_phy_pages = sparsebit_alloc();
- 	sparsebit_set_num(region->unused_phy_pages,
- 		guest_paddr >> vm->page_shift, npages);
- 	region->region.slot = slot;
-@@ -1799,6 +1801,10 @@ void vm_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
- 			region->host_mem);
- 		fprintf(stream, "%*sunused_phy_pages: ", indent + 2, "");
- 		sparsebit_dump(stream, region->unused_phy_pages, 0);
-+		if (vm->protected) {
-+			fprintf(stream, "%*sprotected_phy_pages: ", indent + 2, "");
-+			sparsebit_dump(stream, region->protected_phy_pages, 0);
-+		}
- 	}
- 	fprintf(stream, "%*sMapped Virtual Pages:\n", indent, "");
- 	sparsebit_dump(stream, vm->vpages_mapped, indent + 2);
-@@ -1895,8 +1901,9 @@ const char *exit_reason_str(unsigned int exit_reason)
-  * and their base address is returned. A TEST_ASSERT failure occurs if
-  * not enough pages are available at or above paddr_min.
+@@ -1451,9 +1451,10 @@ void virt_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr,
+  * address providing the memory to the vm physical address is returned.
+  * A TEST_ASSERT failure occurs if no region containing gpa exists.
   */
--vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
--			      vm_paddr_t paddr_min, uint32_t memslot)
-+vm_paddr_t _vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
-+			       vm_paddr_t paddr_min, uint32_t memslot,
-+			       bool protected)
+-void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa)
++void *addr_gpa2hva(struct kvm_vm *vm, vm_paddr_t gpa_tagged)
  {
  	struct userspace_mem_region *region;
- 	sparsebit_idx_t pg, base;
-@@ -1929,8 +1936,11 @@ vm_paddr_t vm_phy_pages_alloc(struct kvm_vm *vm, size_t num,
- 		abort();
- 	}
++	vm_paddr_t gpa = vm_untag_gpa(vm, gpa_tagged);
  
--	for (pg = base; pg < base + num; ++pg)
-+	for (pg = base; pg < base + num; ++pg) {
- 		sparsebit_clear(region->unused_phy_pages, pg);
-+		if (protected)
-+			sparsebit_set(region->protected_phy_pages, pg);
-+	}
+ 	region = userspace_mem_region_find(vm, gpa, gpa);
+ 	if (!region) {
+@@ -2147,3 +2148,21 @@ void __attribute((constructor)) kvm_selftest_init(void)
  
- 	return base * vm->page_size;
+ 	kvm_selftest_arch_init();
  }
++
++bool vm_is_gpa_protected(struct kvm_vm *vm, vm_paddr_t paddr)
++{
++	sparsebit_idx_t pg = 0;
++	struct userspace_mem_region *region;
++
++	if (!vm->protected)
++		return false;
++
++	region = userspace_mem_region_find(vm, paddr, paddr);
++	if (!region) {
++		TEST_FAIL("No vm physical memory at 0x%lx", paddr);
++		return false;
++	}
++
++	pg = paddr >> vm->page_shift;
++	return sparsebit_is_set(region->protected_phy_pages, pg);
++}
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+index acfa1d01e7df..d03cefd9f6cd 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
++++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+@@ -127,6 +127,7 @@ void virt_arch_pgd_alloc(struct kvm_vm *vm)
+ 	/* If needed, create page map l4 table. */
+ 	if (!vm->pgd_created) {
+ 		vm->pgd = vm_alloc_page_table(vm);
++
+ 		vm->pgd_created = true;
+ 	}
+ }
+@@ -153,13 +154,16 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
+ 				       int target_level)
+ {
+ 	uint64_t *pte = virt_get_pte(vm, parent_pte, vaddr, current_level);
++	uint64_t paddr_raw = vm_untag_gpa(vm, paddr);
+ 
+ 	if (!(*pte & PTE_PRESENT_MASK)) {
+ 		*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK;
+ 		if (current_level == target_level)
+-			*pte |= PTE_LARGE_MASK | (paddr & PHYSICAL_PAGE_MASK);
+-		else
++			*pte |= PTE_LARGE_MASK | (paddr_raw & PHYSICAL_PAGE_MASK);
++		else {
+ 			*pte |= vm_alloc_page_table(vm) & PHYSICAL_PAGE_MASK;
++		}
++
+ 	} else {
+ 		/*
+ 		 * Entry already present.  Assert that the caller doesn't want
+@@ -197,6 +201,8 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+ 		    "Physical address beyond maximum supported,\n"
+ 		    "  paddr: 0x%lx vm->max_gfn: 0x%lx vm->page_size: 0x%x",
+ 		    paddr, vm->max_gfn, vm->page_size);
++	TEST_ASSERT(vm_untag_gpa(vm, paddr) == paddr,
++		    "Unexpected bits in paddr: %lx", paddr);
+ 
+ 	/*
+ 	 * Allocate upper level page tables, if not already present.  Return
+@@ -219,6 +225,11 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
+ 	TEST_ASSERT(!(*pte & PTE_PRESENT_MASK),
+ 		    "PTE already present for 4k page at vaddr: 0x%lx\n", vaddr);
+ 	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
++
++	if (vm_is_gpa_protected(vm, paddr))
++		*pte |= vm->arch.c_bit;
++	else
++		*pte |= vm->arch.s_bit;
+ }
+ 
+ void virt_arch_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr)
+@@ -493,7 +504,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
+ 	 * No need for a hugepage mask on the PTE, x86-64 requires the "unused"
+ 	 * address bits to be zero.
+ 	 */
+-	return PTE_GET_PA(*pte) | (gva & ~HUGEPAGE_MASK(level));
++	return vm_untag_gpa(vm, PTE_GET_PA(*pte)) | (gva & ~HUGEPAGE_MASK(level));
+ }
+ 
+ static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
 -- 
 2.39.0.314.g84b9a713c41-goog
 
