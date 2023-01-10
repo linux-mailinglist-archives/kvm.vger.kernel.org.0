@@ -2,31 +2,31 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C19CB663C68
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 10:11:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 716DC663C64
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 10:11:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231574AbjAJJLI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 04:11:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55848 "EHLO
+        id S237980AbjAJJLD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 04:11:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238091AbjAJJKd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235755AbjAJJKd (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 10 Jan 2023 04:10:33 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5894712A9D;
-        Tue, 10 Jan 2023 01:10:24 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB23F193F4;
+        Tue, 10 Jan 2023 01:10:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=ilW/+oMS6xyhiJ7nlSWBvOeAci9rF+B8WNLBPFn+Q98=; b=kLeHrG0G/AVkShluVF92oCywvn
-        IMwTJrRl8EfbWePjVS9R9lqysI8okcNiT69Pns+iEiKcma0CIS8fk6eExEbkFJVZO/Y00SseK4Rho
-        ausAIpEd1nI8ier5zJZ45RTfSQE5Fhe16+6prazOcVI6rVMbW+3nYWE7Ncc2t10H1/wt6JJ1JAnCp
-        wA3WR4lPyGZBkN0Y9dgSKNspa+jk+EqEtXd4lTwWSL0atyKi9SIY5Gh9P4KYzaxBq6TtB96zs2kqu
-        ufrgpfKd+Wf9zsjKoXbj2bLQ9eKir9DXaKWbvSlYT4Q/uvOCAg+52h2aNVblGNfgHqMHghjmMLFt6
-        9ECv/HsQ==;
+        bh=Ss9q/iqMqNOstrbvF4lK/i2u58Z0DHgqmVOGxEGUPsI=; b=fgXnureZyJQf/EnjrziAVkti/l
+        g1bOH0htz3Tv9vnFnNv4S90usEq26dSYsfWbE2adrHT9VvLGBHmIDKap0khBwF7kgbdhJOftY2dkB
+        IjoZhrH7/IefJPfv0V2SMDG64jGeutnOMRdDKNKDzA2XV8PWA2OUp6/HaIlD4f5wjN1WnurVLzQiV
+        nJ8RWn2CVDrrpvJugIDvb8tSATKaN4tMuNEYHIS5gVTWFU1JtRZoegGNAEnnJFr+78RIlSn3eyhXK
+        UDO/mvITCJ2s1k2e5lrxW6hQFKnzZSCBxJch1YLDt6fvCiyeoWDBhZ/GBaBL/5j7D+BVk0jvx8GHR
+        SvZpOWog==;
 Received: from [2001:4bb8:181:656b:cb3a:c552:3fcc:12a6] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pFAe9-0060bK-GZ; Tue, 10 Jan 2023 09:10:17 +0000
+        id 1pFAeC-0060c3-43; Tue, 10 Jan 2023 09:10:20 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Alex Williamson <alex.williamson@redhat.com>,
         Kirti Wankhede <kwankhede@nvidia.com>
@@ -36,9 +36,9 @@ Cc:     Tony Krowiak <akrowiak@linux.ibm.com>,
         Zhenyu Wang <zhenyuw@linux.intel.com>,
         Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org, intel-gfx@lists.freedesktop.org
-Subject: [PATCH 2/4] vfio-mdev: turn VFIO_MDEV into a selectable symbol
-Date:   Tue, 10 Jan 2023 10:10:07 +0100
-Message-Id: <20230110091009.474427-3-hch@lst.de>
+Subject: [PATCH 3/4] vfio-mdev: move the mtty usage documentation
+Date:   Tue, 10 Jan 2023 10:10:08 +0100
+Message-Id: <20230110091009.474427-4-hch@lst.de>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20230110091009.474427-1-hch@lst.de>
 References: <20230110091009.474427-1-hch@lst.de>
@@ -55,141 +55,234 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-VFIO_MDEV is just a library with helpers for the drivers.  Stop making
-it a user choice and just select it by the drivers that use the helpers.
+Move the documentation on how to use mtty to samples/vfio-mdev/README.rst
+as it is in no way related to the vfio API.  This matches how the bpf
+and pktgen samples are documented.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- Documentation/s390/vfio-ap.rst    | 1 -
- arch/s390/Kconfig                 | 6 ++++--
- arch/s390/configs/debug_defconfig | 1 -
- arch/s390/configs/defconfig       | 1 -
- drivers/gpu/drm/i915/Kconfig      | 2 +-
- drivers/vfio/mdev/Kconfig         | 8 +-------
- samples/Kconfig                   | 6 +++---
- 7 files changed, 9 insertions(+), 16 deletions(-)
+ .../driver-api/vfio-mediated-device.rst       | 100 ------------------
+ samples/vfio-mdev/README.rst                  | 100 ++++++++++++++++++
+ 2 files changed, 100 insertions(+), 100 deletions(-)
+ create mode 100644 samples/vfio-mdev/README.rst
 
-diff --git a/Documentation/s390/vfio-ap.rst b/Documentation/s390/vfio-ap.rst
-index 00f4a04f6d4c6a..d46e98c7c1ec6c 100644
---- a/Documentation/s390/vfio-ap.rst
-+++ b/Documentation/s390/vfio-ap.rst
-@@ -553,7 +553,6 @@ These are the steps:
-    * ZCRYPT
-    * S390_AP_IOMMU
-    * VFIO
--   * VFIO_MDEV
-    * KVM
+diff --git a/Documentation/driver-api/vfio-mediated-device.rst b/Documentation/driver-api/vfio-mediated-device.rst
+index fdf7d69378ec4a..d4267243b4f525 100644
+--- a/Documentation/driver-api/vfio-mediated-device.rst
++++ b/Documentation/driver-api/vfio-mediated-device.rst
+@@ -270,106 +270,6 @@ these callbacks are supported in the TYPE1 IOMMU module. To enable them for
+ other IOMMU backend modules, such as PPC64 sPAPR module, they need to provide
+ these two callback functions.
  
-    If using make menuconfig select the following to build the vfio_ap module::
-diff --git a/arch/s390/Kconfig b/arch/s390/Kconfig
-index 318fce77601d35..60fddcdad495e6 100644
---- a/arch/s390/Kconfig
-+++ b/arch/s390/Kconfig
-@@ -705,7 +705,8 @@ config EADM_SCH
- config VFIO_CCW
- 	def_tristate n
- 	prompt "Support for VFIO-CCW subchannels"
--	depends on S390_CCW_IOMMU && VFIO_MDEV
-+	depends on S390_CCW_IOMMU
-+	select VFIO_MDEV
- 	help
- 	  This driver allows usage of I/O subchannels via VFIO-CCW.
- 
-@@ -715,7 +716,8 @@ config VFIO_CCW
- config VFIO_AP
- 	def_tristate n
- 	prompt "VFIO support for AP devices"
--	depends on S390_AP_IOMMU && VFIO_MDEV && KVM
-+	depends on S390_AP_IOMMU && KVM
-+	select VFIO_MDEV
- 	depends on ZCRYPT
- 	help
- 	  This driver grants access to Adjunct Processor (AP) devices
-diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
-index 2a827002934bc6..e78fc3ba7d442a 100644
---- a/arch/s390/configs/debug_defconfig
-+++ b/arch/s390/configs/debug_defconfig
-@@ -596,7 +596,6 @@ CONFIG_SYNC_FILE=y
- CONFIG_VFIO=m
- CONFIG_VFIO_PCI=m
- CONFIG_MLX5_VFIO_PCI=m
--CONFIG_VFIO_MDEV=m
- CONFIG_VIRTIO_PCI=m
- CONFIG_VIRTIO_BALLOON=m
- CONFIG_VIRTIO_INPUT=y
-diff --git a/arch/s390/configs/defconfig b/arch/s390/configs/defconfig
-index fb780e80e4c8f7..f7eb2e527b6e65 100644
---- a/arch/s390/configs/defconfig
-+++ b/arch/s390/configs/defconfig
-@@ -585,7 +585,6 @@ CONFIG_SYNC_FILE=y
- CONFIG_VFIO=m
- CONFIG_VFIO_PCI=m
- CONFIG_MLX5_VFIO_PCI=m
--CONFIG_VFIO_MDEV=m
- CONFIG_VIRTIO_PCI=m
- CONFIG_VIRTIO_BALLOON=m
- CONFIG_VIRTIO_INPUT=y
-diff --git a/drivers/gpu/drm/i915/Kconfig b/drivers/gpu/drm/i915/Kconfig
-index 3efce05d7b57ca..d06da455253cdb 100644
---- a/drivers/gpu/drm/i915/Kconfig
-+++ b/drivers/gpu/drm/i915/Kconfig
-@@ -116,9 +116,9 @@ config DRM_I915_GVT_KVMGT
- 	depends on X86
- 	depends on 64BIT
- 	depends on KVM
--	depends on VFIO_MDEV
- 	select DRM_I915_GVT
- 	select KVM_EXTERNAL_WRITE_TRACKING
-+	select VFIO_MDEV
- 
- 	help
- 	  Choose this option if you want to enable Intel GVT-g graphics
-diff --git a/drivers/vfio/mdev/Kconfig b/drivers/vfio/mdev/Kconfig
-index 646dbed44eb283..e5fb84e0796507 100644
---- a/drivers/vfio/mdev/Kconfig
-+++ b/drivers/vfio/mdev/Kconfig
-@@ -1,10 +1,4 @@
- # SPDX-License-Identifier: GPL-2.0-only
- 
- config VFIO_MDEV
--	tristate "Mediated device driver framework"
--	default n
--	help
--	  Provides a framework to virtualize devices.
--	  See Documentation/driver-api/vfio-mediated-device.rst for more details.
+-Using the Sample Code
+-=====================
 -
--	  If you don't know what do here, say N.
-+	tristate
-diff --git a/samples/Kconfig b/samples/Kconfig
-index f1b8d4ff123036..56b191d128d88f 100644
---- a/samples/Kconfig
-+++ b/samples/Kconfig
-@@ -185,14 +185,14 @@ config SAMPLE_UHID
+-mtty.c in samples/vfio-mdev/ directory is a sample driver program to
+-demonstrate how to use the mediated device framework.
+-
+-The sample driver creates an mdev device that simulates a serial port over a PCI
+-card.
+-
+-1. Build and load the mtty.ko module.
+-
+-   This step creates a dummy device, /sys/devices/virtual/mtty/mtty/
+-
+-   Files in this device directory in sysfs are similar to the following::
+-
+-     # tree /sys/devices/virtual/mtty/mtty/
+-        /sys/devices/virtual/mtty/mtty/
+-        |-- mdev_supported_types
+-        |   |-- mtty-1
+-        |   |   |-- available_instances
+-        |   |   |-- create
+-        |   |   |-- device_api
+-        |   |   |-- devices
+-        |   |   `-- name
+-        |   `-- mtty-2
+-        |       |-- available_instances
+-        |       |-- create
+-        |       |-- device_api
+-        |       |-- devices
+-        |       `-- name
+-        |-- mtty_dev
+-        |   `-- sample_mtty_dev
+-        |-- power
+-        |   |-- autosuspend_delay_ms
+-        |   |-- control
+-        |   |-- runtime_active_time
+-        |   |-- runtime_status
+-        |   `-- runtime_suspended_time
+-        |-- subsystem -> ../../../../class/mtty
+-        `-- uevent
+-
+-2. Create a mediated device by using the dummy device that you created in the
+-   previous step::
+-
+-     # echo "83b8f4f2-509f-382f-3c1e-e6bfe0fa1001" >	\
+-              /sys/devices/virtual/mtty/mtty/mdev_supported_types/mtty-2/create
+-
+-3. Add parameters to qemu-kvm::
+-
+-     -device vfio-pci,\
+-      sysfsdev=/sys/bus/mdev/devices/83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
+-
+-4. Boot the VM.
+-
+-   In the Linux guest VM, with no hardware on the host, the device appears
+-   as  follows::
+-
+-     # lspci -s 00:05.0 -xxvv
+-     00:05.0 Serial controller: Device 4348:3253 (rev 10) (prog-if 02 [16550])
+-             Subsystem: Device 4348:3253
+-             Physical Slot: 5
+-             Control: I/O+ Mem- BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr-
+-     Stepping- SERR- FastB2B- DisINTx-
+-             Status: Cap- 66MHz- UDF- FastB2B- ParErr- DEVSEL=medium >TAbort-
+-     <TAbort- <MAbort- >SERR- <PERR- INTx-
+-             Interrupt: pin A routed to IRQ 10
+-             Region 0: I/O ports at c150 [size=8]
+-             Region 1: I/O ports at c158 [size=8]
+-             Kernel driver in use: serial
+-     00: 48 43 53 32 01 00 00 02 10 02 00 07 00 00 00 00
+-     10: 51 c1 00 00 59 c1 00 00 00 00 00 00 00 00 00 00
+-     20: 00 00 00 00 00 00 00 00 00 00 00 00 48 43 53 32
+-     30: 00 00 00 00 00 00 00 00 00 00 00 00 0a 01 00 00
+-
+-     In the Linux guest VM, dmesg output for the device is as follows:
+-
+-     serial 0000:00:05.0: PCI INT A -> Link[LNKA] -> GSI 10 (level, high) -> IRQ 10
+-     0000:00:05.0: ttyS1 at I/O 0xc150 (irq = 10) is a 16550A
+-     0000:00:05.0: ttyS2 at I/O 0xc158 (irq = 10) is a 16550A
+-
+-
+-5. In the Linux guest VM, check the serial ports::
+-
+-     # setserial -g /dev/ttyS*
+-     /dev/ttyS0, UART: 16550A, Port: 0x03f8, IRQ: 4
+-     /dev/ttyS1, UART: 16550A, Port: 0xc150, IRQ: 10
+-     /dev/ttyS2, UART: 16550A, Port: 0xc158, IRQ: 10
+-
+-6. Using minicom or any terminal emulation program, open port /dev/ttyS1 or
+-   /dev/ttyS2 with hardware flow control disabled.
+-
+-7. Type data on the minicom terminal or send data to the terminal emulation
+-   program and read the data.
+-
+-   Data is loop backed from hosts mtty driver.
+-
+-8. Destroy the mediated device that you created::
+-
+-     # echo 1 > /sys/bus/mdev/devices/83b8f4f2-509f-382f-3c1e-e6bfe0fa1001/remove
+-
+ References
+ ==========
  
- config SAMPLE_VFIO_MDEV_MTTY
- 	tristate "Build VFIO mtty example mediated device sample code"
--	depends on VFIO_MDEV
-+	select VFIO_MDEV
- 	help
- 	  Build a virtual tty sample driver for use as a VFIO
- 	  mediated device
- 
- config SAMPLE_VFIO_MDEV_MDPY
- 	tristate "Build VFIO mdpy example mediated device sample code"
--	depends on VFIO_MDEV
-+	select VFIO_MDEV
- 	help
- 	  Build a virtual display sample driver for use as a VFIO
- 	  mediated device.  It is a simple framebuffer and supports
-@@ -209,7 +209,7 @@ config SAMPLE_VFIO_MDEV_MDPY_FB
- 
- config SAMPLE_VFIO_MDEV_MBOCHS
- 	tristate "Build VFIO mdpy example mediated device sample code"
--	depends on VFIO_MDEV
-+	select VFIO_MDEV
- 	select DMA_SHARED_BUFFER
- 	help
- 	  Build a virtual display sample driver for use as a VFIO
+diff --git a/samples/vfio-mdev/README.rst b/samples/vfio-mdev/README.rst
+new file mode 100644
+index 00000000000000..b52eb37739c039
+--- /dev/null
++++ b/samples/vfio-mdev/README.rst
+@@ -0,0 +1,100 @@
++Using the mtty vfio-mdev sample code
++====================================
++
++mtty is a sample vfio-mdev driver that demonstrates how to use the mediated
++device framework.
++
++The sample driver creates an mdev device that simulates a serial port over a PCI
++card.
++
++1. Build and load the mtty.ko module.
++
++   This step creates a dummy device, /sys/devices/virtual/mtty/mtty/
++
++   Files in this device directory in sysfs are similar to the following::
++
++     # tree /sys/devices/virtual/mtty/mtty/
++        /sys/devices/virtual/mtty/mtty/
++        |-- mdev_supported_types
++        |   |-- mtty-1
++        |   |   |-- available_instances
++        |   |   |-- create
++        |   |   |-- device_api
++        |   |   |-- devices
++        |   |   `-- name
++        |   `-- mtty-2
++        |       |-- available_instances
++        |       |-- create
++        |       |-- device_api
++        |       |-- devices
++        |       `-- name
++        |-- mtty_dev
++        |   `-- sample_mtty_dev
++        |-- power
++        |   |-- autosuspend_delay_ms
++        |   |-- control
++        |   |-- runtime_active_time
++        |   |-- runtime_status
++        |   `-- runtime_suspended_time
++        |-- subsystem -> ../../../../class/mtty
++        `-- uevent
++
++2. Create a mediated device by using the dummy device that you created in the
++   previous step::
++
++     # echo "83b8f4f2-509f-382f-3c1e-e6bfe0fa1001" >	\
++              /sys/devices/virtual/mtty/mtty/mdev_supported_types/mtty-2/create
++
++3. Add parameters to qemu-kvm::
++
++     -device vfio-pci,\
++      sysfsdev=/sys/bus/mdev/devices/83b8f4f2-509f-382f-3c1e-e6bfe0fa1001
++
++4. Boot the VM.
++
++   In the Linux guest VM, with no hardware on the host, the device appears
++   as  follows::
++
++     # lspci -s 00:05.0 -xxvv
++     00:05.0 Serial controller: Device 4348:3253 (rev 10) (prog-if 02 [16550])
++             Subsystem: Device 4348:3253
++             Physical Slot: 5
++             Control: I/O+ Mem- BusMaster- SpecCycle- MemWINV- VGASnoop- ParErr-
++     Stepping- SERR- FastB2B- DisINTx-
++             Status: Cap- 66MHz- UDF- FastB2B- ParErr- DEVSEL=medium >TAbort-
++     <TAbort- <MAbort- >SERR- <PERR- INTx-
++             Interrupt: pin A routed to IRQ 10
++             Region 0: I/O ports at c150 [size=8]
++             Region 1: I/O ports at c158 [size=8]
++             Kernel driver in use: serial
++     00: 48 43 53 32 01 00 00 02 10 02 00 07 00 00 00 00
++     10: 51 c1 00 00 59 c1 00 00 00 00 00 00 00 00 00 00
++     20: 00 00 00 00 00 00 00 00 00 00 00 00 48 43 53 32
++     30: 00 00 00 00 00 00 00 00 00 00 00 00 0a 01 00 00
++
++     In the Linux guest VM, dmesg output for the device is as follows:
++
++     serial 0000:00:05.0: PCI INT A -> Link[LNKA] -> GSI 10 (level, high) -> IRQ 10
++     0000:00:05.0: ttyS1 at I/O 0xc150 (irq = 10) is a 16550A
++     0000:00:05.0: ttyS2 at I/O 0xc158 (irq = 10) is a 16550A
++
++
++5. In the Linux guest VM, check the serial ports::
++
++     # setserial -g /dev/ttyS*
++     /dev/ttyS0, UART: 16550A, Port: 0x03f8, IRQ: 4
++     /dev/ttyS1, UART: 16550A, Port: 0xc150, IRQ: 10
++     /dev/ttyS2, UART: 16550A, Port: 0xc158, IRQ: 10
++
++6. Using minicom or any terminal emulation program, open port /dev/ttyS1 or
++   /dev/ttyS2 with hardware flow control disabled.
++
++7. Type data on the minicom terminal or send data to the terminal emulation
++   program and read the data.
++
++   Data is loop backed from hosts mtty driver.
++
++8. Destroy the mediated device that you created::
++
++     # echo 1 > /sys/bus/mdev/devices/83b8f4f2-509f-382f-3c1e-e6bfe0fa1001/remove
++
 -- 
 2.35.1
 
