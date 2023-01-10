@@ -2,111 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4258C6637F3
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 04:56:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A9B496638D2
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 06:53:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229457AbjAJD43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 9 Jan 2023 22:56:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57216 "EHLO
+        id S230373AbjAJFw7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 00:52:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbjAJD42 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 9 Jan 2023 22:56:28 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFE5465AD
-        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 19:56:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673322986; x=1704858986;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8ajCkSHry4NIrwT7/4XludrLIcCGvRD3NpKMW4naOgU=;
-  b=mUlZswwkTBHoOUKMWmFVQaTWoi9PTlp11/lF+kt5h8+aGIfg7ly2W4WP
-   H7tAhQtODtZWaVl+4ghLSC7ZewkBvnDoi0I3ZfEHoU49rw0YcNHgBHNGf
-   FEwH2qY4O472lQpAzX+b8S373BpAYpw9Xt3y+uqyWJxzbHF97KAxr7xuv
-   ad8INwg7gHuHjDrmXBAAL/NiFiMh7eDczwo4s09uBuJfXFZc5PISva97g
-   dCe+fdb8MKWa8mVuxjKDEgXCygrH5KW+tTg8OrcNekCFXtmEMyTUd7cHv
-   5mi+/j5zQBlHkL8lxQuXXXmHDON4o59lWrA3npAA5iPYGwkhLGcf4R2hv
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10585"; a="321752218"
-X-IronPort-AV: E=Sophos;i="5.96,314,1665471600"; 
-   d="scan'208";a="321752218"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jan 2023 19:56:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10585"; a="764570598"
-X-IronPort-AV: E=Sophos;i="5.96,314,1665471600"; 
-   d="scan'208";a="764570598"
-Received: from sqa-gate.sh.intel.com (HELO robert-ivt.tsp.org) ([10.239.48.212])
-  by fmsmga002.fm.intel.com with ESMTP; 09 Jan 2023 19:56:25 -0800
-Message-ID: <46da749bab77d680c37c9e4fcce34073a466923e.camel@linux.intel.com>
-Subject: Re: [PATCH v3 2/9] KVM: x86: Add CR4.LAM_SUP in guest owned bits
-From:   Robert Hoo <robert.hu@linux.intel.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, kirill.shutemov@linux.intel.com,
-        kvm@vger.kernel.org, Jingqi Liu <jingqi.liu@intel.com>
-Date:   Tue, 10 Jan 2023 11:56:24 +0800
-In-Reply-To: <Y7xA53sLxCwzfvgD@google.com>
-References: <20221209044557.1496580-1-robert.hu@linux.intel.com>
-         <20221209044557.1496580-3-robert.hu@linux.intel.com>
-         <Y7i+/3KbqUto76AR@google.com>
-         <5f2f0a44fbb1a2eab36183dfc2fcaf53e1109793.camel@linux.intel.com>
-         <Y7xA53sLxCwzfvgD@google.com>
+        with ESMTP id S230312AbjAJFwG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 00:52:06 -0500
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8383941D70
+        for <kvm@vger.kernel.org>; Mon,  9 Jan 2023 21:50:35 -0800 (PST)
+Received: by mail-pf1-x434.google.com with SMTP id h7so3765808pfq.4
+        for <kvm@vger.kernel.org>; Mon, 09 Jan 2023 21:50:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=JOUhOZSlmXFHrfw3S1GaBPaFMlh3z5ZEWqn41g9S5Ko=;
+        b=UaycJRgTsqOzVALgtWgM56Ei4nmGn5Q3uZXaA4EexEuuDjZjCiylhl2zJXf7j/oNX7
+         +a/ZwP52116qTxu0kJcdU3ICt3P+LoMeY2KfkGEwOSkwnwSBSpYlF7c6uizTgVp0rsdg
+         07iqzbJIv4nie+SyXz/KKrvWwO6jqNSeGGeGPhedBOvvGBZ8NljIOv9wla80O0xqvtC7
+         Sl9idgpSWAO/WCn8qJMdm71A6lOwUO+uBa8t6XgomgKhDodfar6mlopAqw3SASe6cagJ
+         DIp7HtYTM/P27sd9hTpm1E1+JAil0LhGqNzC8obfspIeiLWwuoOEjcSggHbbAfQ6zRBp
+         6USA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JOUhOZSlmXFHrfw3S1GaBPaFMlh3z5ZEWqn41g9S5Ko=;
+        b=eX9wWQGBvgV+OW88WSMsKMekMxhXxpVaZZZlXyPBhA4FulHklrrB8khbNcnKMVY44W
+         ViVqIFirEw7api0XxZUsxfhkHdskkHFy2ZmrfT9fUyiqojPEhgRSK2yLCLrTXD5BZo32
+         0RRngeBIPIBXJ+V/bpQEcfp3uDrtfNNrs2C05azVMXo6hPSdTyGKVuTvnq3wgWpI0lrU
+         Jx483pg3sBnPxLYOR4RmQ3RO06tFFmEsgz15QnAS5uLY74NgcYuR65zioANWQAPAFXcd
+         hdxmv6SzwDdqIUlqI62m5f/v0VhDJvkaimtLg6+IfIuo5r51Hjbg+QASLHSDkG81oOic
+         nauQ==
+X-Gm-Message-State: AFqh2krq3y4ijtVot5qapjs48pn7ahuO8tBrFFvmxjAoxeFtl3DqFf0W
+        WwXgpoG/pyAUEpWcpm0iMAXTBAVFGKyIwJJJwWP2oe0Gd0WoU9gbiCs=
+X-Google-Smtp-Source: AMrXdXuiSTzgHe3ZlWnQSlCLlfsU67QOuqUdkb3Vh86x1KlYT9Dm7UrWXt5myDp5MN0bTM7uJTy2K61dylYmwPBX0eY=
+X-Received: by 2002:a62:5283:0:b0:576:a748:8fa3 with SMTP id
+ g125-20020a625283000000b00576a7488fa3mr5121698pfb.37.1673329834528; Mon, 09
+ Jan 2023 21:50:34 -0800 (PST)
+MIME-Version: 1.0
+References: <20221230035928.3423990-1-reijiw@google.com> <20221230035928.3423990-2-reijiw@google.com>
+ <Y7sUggVq+D6R82qK@thinky-boi>
+In-Reply-To: <Y7sUggVq+D6R82qK@thinky-boi>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Mon, 9 Jan 2023 21:50:18 -0800
+Message-ID: <CAAeT=FwRO49JdANRWGJBj41ef+YyokOw6rw6VO174ESJrcKv7A@mail.gmail.com>
+Subject: Re: [PATCH 1/7] KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
+        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-10.el7) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 2023-01-09 at 16:29 +0000, Sean Christopherson wrote:
-> On Sat, Jan 07, 2023, Robert Hoo wrote:
-> > On Sat, 2023-01-07 at 00:38 +0000, Sean Christopherson wrote:
-> > > On Fri, Dec 09, 2022, Robert Hoo wrote:
-> > > > If LAM enabled, CR4.LAM_SUP is owned by guest; otherwise,
-> > > > reserved.
-> > > 
-> > > Why is it passed through to the guest?
-> > 
-> > I think no need to intercept guest's control over CR4.LAM_SUP,
-> > which
-> > controls LAM appliance to supervisor mode address.
-> 
-> That's not a sufficient justification.  KVM doesn't strictly need to
-> intercept
-> most CR4 bits, 
+Hi Oliver,
 
-Yeah, that's also my experiential understanding.
+On Sun, Jan 8, 2023 at 11:07 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> On Thu, Dec 29, 2022 at 07:59:22PM -0800, Reiji Watanabe wrote:
+> > On vCPU reset, PMCNTEN{SET,CLR}_EL1 and PMOVS{SET,CLR}_EL1 for
+> > a vCPU are reset by reset_pmu_reg(). This function clears RAZ bits
+> > of those registers corresponding to unimplemented event counters
+> > on the vCPU, and sets bits corresponding to implemented event counters
+> > to a predefined pseudo UNKNOWN value (some bits are set to 1).
+> >
+> > The function identifies (un)implemented event counters on the
+> > vCPU based on the PMCR_EL1.N value on the host. Using the host
+> > value for this would be problematic when KVM supports letting
+> > userspace set PMCR_EL1.N to a value different from the host value
+> > (some of the RAZ bits of those registers could end up being set to 1).
+> >
+> > Fix reset_pmu_reg() to clear the registers so that it can ensure
+> > that all the RAZ bits are cleared even when the PMCR_EL1.N value
+> > for the vCPU is different from the host value.
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 10 +---------
+> >  1 file changed, 1 insertion(+), 9 deletions(-)
+> >
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index c6cbfe6b854b..ec4bdaf71a15 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -604,19 +604,11 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+> >
+> >  static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> >  {
+> > -     u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> > -
+> >       /* No PMU available, any PMU reg may UNDEF... */
+> >       if (!kvm_arm_support_pmu_v3())
+> >               return;
+> >
+> > -     n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> > -     n &= ARMV8_PMU_PMCR_N_MASK;
+> > -     if (n)
+> > -             mask |= GENMASK(n - 1, 0);
+> > -
+> > -     reset_unknown(vcpu, r);
+> > -     __vcpu_sys_reg(vcpu, r->reg) &= mask;
+> > +     __vcpu_sys_reg(vcpu, r->reg) = 0;
+>
+> I've personally found KVM's UNKNOWN reset value to be tremendously
+> useful in debugging guest behavior, as seeing that value is quite a
+> 'smoking gun' IMO.
+>
+> Rather than zeroing the entire register, is it possible to instead
+> derive the mask based on what userspace wrote to PMCR_EL1.N instead of
+> what's in hardware?
 
-> but not intercepting has performance implications, e.g. KVM needs
-> to do a VMREAD(GUEST_CR4) to get LAM_SUP if the bit is pass
-> through.  
+Yeah, it's feasible.
+Then, I am considering having KVM to clear new RAZ bits of those
+registers based on the new PMCR_EL0.N value that userspace sets
+when userspace updates PMCR_EL0.N, as clearing the new RAZ bits
+should be done anyway by either KVM or userspace.
+What do you think ?
 
-Right. On the other hand, intercepting has performance penalty by vm-
-exit, and much heavier. So, trade-off, right?
-
-> As a base
-> rule, KVM intercepts CR4 bits unless there's a reason not to, e.g. if
-> the CR4 bit
-> in question is written frequently by real guests and/or never
-> consumed by KVM.
-
-From these 2 points to judge:
-CR4.LAM_SUP is written frequently by guest? I'm not sure, as native
-kernel enabling patch has LAM_U57 only yet, not sure its control will
-be per-process/thread or whole kernel-level. If it its use case is
-kasan kind of, would you expect it will be frequently guest written?
-
-Never consumed by KVM? false, e.g. kvm_untagged_addr() will read this
-bit. But not frequently, I think, at least by this patch set.
-
-So in general, you suggestion/preference? I'm all right on both
-choices.
-
-
-
+Thank you,
+Reiji
