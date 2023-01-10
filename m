@@ -2,169 +2,147 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D8BD0664241
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 14:49:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 307366642C1
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 15:06:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233431AbjAJNtU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 08:49:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42512 "EHLO
+        id S233719AbjAJOG2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 09:06:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232769AbjAJNtK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 08:49:10 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2069.outbound.protection.outlook.com [40.107.94.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FC854E434;
-        Tue, 10 Jan 2023 05:49:09 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AaNpA/82wHCfrzWU6it4n6UKDbiptW0cSMGXQrMQ+zbZkNIdIpk3N9ayDigZDO7A0A+dra80RdhZPNrfO0f4XZQJS3ueOc5PSL+zq4XmlXMYKGZd9O83M0dS0RoQ1ntCIh+r2REgTauKdwfJp7Mzwqwtx9JgAnPSiSaKiBxk+c8O+r5xBEWbmXhFKPR1iO9aEJhwafFsW0HjP3ecyYa5NxunaFP7qvIT0Y1dUFl2ZRCCOrX6UjKDExtGCLd6Z+AF2wTIhJ2Ttp/clldLI64X9iF801Zt9o/E8rHbYSzYIdg7UyS8J1ybiCmOv5+6SGz6RwOSrsvoJHg1zseFzMcN7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=30ADi7SmKKflsICxuEjPFnULaxwBK2WQ2Aqgoh2hZ+c=;
- b=By+cSx/3Gp7D9HDDlmVZJasafn8Sn0rmVZdRE+bTkOCcymLbwQp/teXgRrh2B0hDHPotKkvS087NYFuq8rQvw7M8rAiWfLRW8oMrcF+0lGeZ+UpxXt68IZFm4JXzeypr90x+YmAmNO/l6Oz7SWfWVQCrlBuB33Jb9aG/SHwlpTxugI/3OGW47h4Fm4NJfjqJnd2unrSAAzE9oS1b0OWybd8cshsPxchB8i0oYN7h6LOgItZGkNRxYzSdddS4GBr46hcwkRNoYlurwkkvX0EDH5HK4Z5ffjeIQxFHYWKgBUFxqcTadAAWUG2nMAUuCBIEUul4gpaNlsI8AzAfrawN1w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=30ADi7SmKKflsICxuEjPFnULaxwBK2WQ2Aqgoh2hZ+c=;
- b=XLCIeAQl4zn/p2iKytEzwH7d8oENEsQEeyb5onI5H3fXu11lOtKI+sceaHc6tm//7tWNVOh9F92MiP+QbVMV0wlvM0ELg5OIhbHftieNtp1isRImTqAwUUZKYba4kaBYpqZrA5ffwS+tCdCTfn/g0lUtl4GcMrcUvYd2xna9TdLwkfm967iGPCQIJ1NfylpsbF1O/rQwdLuRzJEe5iR0CrVjkKcIpT27DQKDM7yjCvNyWs8sojCJ4cKz0TXzvLyA3ssZ92aybavJERdoJS4dLtvE8872MtTL1CQWaBFyKwS5/GCSoLd9nqsVDEvE7C5IsRpL6UBzXFrrHmznvZ2X2Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB5998.namprd12.prod.outlook.com (2603:10b6:510:1da::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Tue, 10 Jan
- 2023 13:49:07 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%8]) with mapi id 15.20.5986.018; Tue, 10 Jan 2023
- 13:49:07 +0000
-Date:   Tue, 10 Jan 2023 09:49:01 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Cc:     Yi Liu <yi.l.liu@intel.com>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        zhukeqian <zhukeqian1@huawei.com>
-Subject: Re: [PATCH v4 00/17] IOMMUFD Generic interface
-Message-ID: <Y71szSt7jRFKTMcl@nvidia.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
- <3a20e56423f544dab312bca1bcb56ce4@huawei.com>
- <000cf099-9824-39b8-3719-cf43b33ae1ef@intel.com>
- <36b0fdac061e4680b5966d2774f0026a@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <36b0fdac061e4680b5966d2774f0026a@huawei.com>
-X-ClientProxiedBy: FR1P152CA0137.LAMP152.PROD.OUTLOOK.COM
- (2603:10d6:200:22::29) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5998:EE_
-X-MS-Office365-Filtering-Correlation-Id: 667fee0c-6cdd-4d58-9b66-08daf3117180
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: boQATzeObUbGsTbvM1Kzc/LV3D2IXC9AmS9a1OH3y2yw8aQjrWRYlE26ZMgz/kudCjnTRvGel/lMXggsmszCsT9tmFFm8QecMCsBg3UXMogrwm+66lYFwJzGv05TNrK9uuto1XIzpznLiif/wmxRC3vEB7ni6rGJTPiTLXf8ObAoDhmLAyZEG9BQuRSeyjORiDli5R+ZSZ+SE0QMygf1GoUahmPvKCGVgKBt/JsN95366sIHBHGJplBK9Ov6P9to5mkpJt2vDzEB3Pdos0mvNjSYSlFs+GnIDyWhs7gLsLdZci9w/P43WDmqG2l0+FAjewsbA142/OsGPVa++apD2y85VQlYFS02kjApqzSbXZfdvmEdw6vUuYRXvpCySNjZCwj9s/6ivNeIl9EF5lBsozN5Mbvodz9GjH80h+TOPPcKKF4m+PM4F2MxqLMnxE3dRybeuazoPnHOjDLbH9L5PtPxGbLbNOmrW4tvsa4F1aIIslmhHLdexwfjIF6Qx02wLfijC0Wlh5cHU9+KQUzwpzfz3K6akw+onCyeg1C4lATzSaKMhV6Q3zIFL4bDTbArBKdgJk4CC1CCPREVb68krRhmt5QByCIKtsNZQkoCeDHZ9S1AfmgZIWyB6MZFKKiXUzRCObQdzjqfLuamKniAqVoZs6X4y0aqsC1v5V8zG+/TlzMcJywVr8StK5tE7QdySWXSiAWG2vvE0apnFTn4FGo0u2Lwe02HnkCq8d1SQ0td7mzl2a4nUMjFdf4puC+t0+KX7+RhOKs+IKHlIaTBhg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(396003)(346002)(136003)(39860400002)(376002)(451199015)(8936002)(2906002)(5660300002)(7406005)(41300700001)(7416002)(4744005)(4326008)(316002)(6916009)(8676002)(66556008)(66476007)(66946007)(54906003)(26005)(6512007)(2616005)(38100700002)(186003)(86362001)(966005)(36756003)(478600001)(6486002)(6506007)(6666004)(41533002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?tRA5BmOetzxvl9+QlnNypyonrV8ncaL7mJvDrQ2Bj6qf7p86RO7vL94JZvzN?=
- =?us-ascii?Q?zSJtOO0dcm0p/Z/BTmPaV4B1RMmFYxt75Tp5djJGcm9nntsH7rqbkCUfCS3z?=
- =?us-ascii?Q?SeNID29mz+BSM91HvY8rzj5z/KAsXYL+276yYj9UTjdYi9FhGZbvKJKpOXR/?=
- =?us-ascii?Q?hsWfW6p7yym6sqbSK8NHgxGtm3lZT+nj/AK7y9wnUYRyjRQ01ge8j8Nwp78m?=
- =?us-ascii?Q?rhUHY8NKIhli7U47wrWfttt5rbg+9RCrtgWZlPFDAFJl0zYgw5HLLKBCpOKk?=
- =?us-ascii?Q?MJI8JqWnmk53wjuJnusPY/ebBfW0FGqOGLyJd0VcC9iB0ymEky9Xtd005FpZ?=
- =?us-ascii?Q?QzxQY/+wO1xgKFm549XCh8ZV2BLBmYXmRBrREKcqQ1yMM1Skz2ylASTsmmwB?=
- =?us-ascii?Q?B2G6yccK1wQjlIjCrBFRfwOe5LVsMIyRamvAUGi0hPc7ec/H1CkqbuCnzrDe?=
- =?us-ascii?Q?6ZucNiR4ZJ+e6TQ1EAbfibzHaEcO/ts3wrIQbMji2rNfbkFlldWsdsvCGleD?=
- =?us-ascii?Q?i2OqQHbd/Gb2uJVdCuIPl2FMwKbjXth1cZPRzbSNCOqXj1RBWSF5SwC6oNMZ?=
- =?us-ascii?Q?KyVYsNJhWSLNm+Fq5x6wnNfpil8riSYuTgSOQJWFPz/4rsqqV6FC19FJer8x?=
- =?us-ascii?Q?wCmqZvhqBO92Qvlan6Cd/mP85jfHrEn/qfJgiqT+E3vHy8XGA89VAwIyPFM8?=
- =?us-ascii?Q?oi9o8Q8HAAzlfVjDeaXXIO+/qftQX0kO4GDtjNoIOsglMR/F9FyWfHK0yNZw?=
- =?us-ascii?Q?dp+EDwqMRuAmG/7Nv30QNOF9bu0y3dBNOTH14NW3k7Vb1srBqnvrZVrvpw0s?=
- =?us-ascii?Q?zn3s7Ol/GYRPiwjQcZdh0nwYjCYyy0s6PUGdgwZz94pdps7tlqMLAQOFCOrS?=
- =?us-ascii?Q?UmcpWT/+HzgP4r+IiFpdY5tcGJESCOCgk7USw4egjbx8gn3aKRIxnKsVeBy4?=
- =?us-ascii?Q?fwEk5RM4GwODnOS49abr2vl/tgKAtotnyOfQOffgfPTSbXHZajMGyqVbUR3V?=
- =?us-ascii?Q?oM1ljEeCLINdHI44J5duscedf1uv72HiUabcitu6N5gnBvhwGUG464YkrgdF?=
- =?us-ascii?Q?BMzaG6oOHed2A27YdBVJg8les79hlcwggfL5CIR7HI7JBpctdz4WNYK0tnLl?=
- =?us-ascii?Q?QKTydwbILLkxTi0R9r6zJnUQwtZw2LU4xOyxs311+drjn7MaN5meDtAl2Lag?=
- =?us-ascii?Q?ZtMbxPJyefZHJ+zjX4zuTLkDHmRXnFO9Qfl1mGaYywwdB9ZGcPG+/x/nXqzV?=
- =?us-ascii?Q?sSdfFotAvPAMP6zRqJuUE3m+beZcEfcMxFk1TXpgIt7TjR7oJlEHvvkf/Ze4?=
- =?us-ascii?Q?kD0nouLZqqNqH1F4j4tpljzt8K6z+hecItEez72ahTeASu7H8FhBiFXlvEfU?=
- =?us-ascii?Q?COcpFlCq5MuHLOr4Wqmb1CmmCPp6NjJ+JVfFkx1lER73h5EltnoEe2enghwX?=
- =?us-ascii?Q?z3q4feyx0JjK4kZPHXoxaVh8PhbIREl1Sj+uvNmD9wkQMRq7sCfvFfhKEHsc?=
- =?us-ascii?Q?duZm0+vV8TGPIDgRfFdy/vWZkezx4l4+VdruxPNUR47T64a7aVCbxrvKZXWQ?=
- =?us-ascii?Q?Wknx8APNnzlzMypqFtkCs7xkFIyQSfSdnCZFV+0J?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 667fee0c-6cdd-4d58-9b66-08daf3117180
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2023 13:49:07.3577
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rlQlY9Q0Yi7gfMp2B20Bx6d5QoDYbX9/26oLBHnZVXzhp6hfmGtuTFtbXAbNM2Fs
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5998
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+        with ESMTP id S233295AbjAJOFn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 09:05:43 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8AC8E999
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 06:05:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E2D2961746
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 14:05:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C187C433D2;
+        Tue, 10 Jan 2023 14:05:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673359523;
+        bh=vepTwpGabLDJ6q7ywSRSXtC0H5Q/1f/zT+b9nWkXj7c=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qc/rSNy1YWWckpBlyTce2AdDS3TnzVzoNt2ezlb36MQs/TzJT+AchonGSoYkfo/Cl
+         qtPpK4rBbGyvXcWWVaGFbYSpAAUBF8K3aVzEqj5Jmw5MSBGofHmt5O6tz5Rrzcmtlw
+         j5debYwx9LDUzRVipLZlTt84FB3UqIAS1HKnI5rQDvFCSSm1y9qz6Z57iY0+G6QLmJ
+         knbcDb9BYkZTevD0lcSme0Rfl74s61bkBBhSpBiJ028jJCmcPBvtgd+ZgZ/t63wzaa
+         KT8n6nb5pw080UWgRFxS0A0l/qhI3WtwJnhHScMcO1uBzfSOpISRSkmv/5QQOg9TyR
+         as8LSGHYrOjwQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pFFFg-000bro-Sa;
+        Tue, 10 Jan 2023 14:05:21 +0000
+Date:   Tue, 10 Jan 2023 14:05:20 +0000
+Message-ID: <86cz7mo57j.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     catalin.marinas@arm.com, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, scott@os.amperecomputing.com,
+        Darren Hart <darren@os.amperecomputing.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: nv: Fixes for Nested Virtualization issues
+In-Reply-To: <6171dc7c-5d83-d378-db9e-d94f27afe43a@os.amperecomputing.com>
+References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+        <6171dc7c-5d83-d378-db9e-d94f27afe43a@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, scott@os.amperecomputing.com, darren@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 11:35:59AM +0000, Shameerali Kolothum Thodi wrote:
+Hi Ganapatrao,
 
-> Thanks for that. I attempted ARM vSVA support based on your above branch
-> and related Qemu branch. With few hacks and additional patches the prototype
-> code works well on HiSilicon ARM platform. 
+On Tue, 10 Jan 2023 12:17:20 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> 
+> Hi Marc,
+> 
+> On 24-08-2022 11:33 am, Ganapatrao Kulkarni wrote:
+> > This series contains 3 fixes which were found while testing
+> > ARM64 Nested Virtualization patch series.
+> > 
+> > First patch avoids the restart of hrtimer when timer interrupt is
+> > fired/forwarded to Guest-Hypervisor.
+> > 
+> > Second patch fixes the vtimer interrupt drop from the Guest-Hypervisor.
+> > 
+> > Third patch fixes the NestedVM boot hang seen when Guest Hypersior
+> > configured with 64K pagesize where as Host Hypervisor with 4K.
+> > 
+> > These patches are rebased on Nested Virtualization V6 patchset[1].
+> 
+> If I boot a Guest Hypervisor with more cores and then booting of a
+> NestedVM with equal number of cores or booting multiple
+> NestedVMs(simultaneously) with lower number of cores is resulting in
+> very slow booting and some time RCU soft-lockup of a NestedVM. This I
+> have debugged and turned out to be due to many SGI are getting
+> asserted to all vCPUs of a Guest-Hypervisor when Guest-Hypervisor KVM
+> code prepares NestedVM for WFI wakeup/return.
+> 
+> When Guest Hypervisor prepares NestedVM while returning/resuming from
+> WFI, it is loading guest-context,  vGIC and timer contexts etc.
+> The function gic_poke_irq (called from irq_set_irqchip_state with
+> spinlock held) writes to register GICD_ISACTIVER in Guest-Hypervisor's
+> KVM code resulting in mem-abort trap to Host Hypervisor. Host
+> Hypervisor as part of handling the guest mem abort, function
+> io_mem_abort is called  in turn vgic_mmio_write_sactive, which
+> prepares every vCPU of Guest Hypervisor by calling SGI. The number of
+> SGI/IPI calls goes exponentially high when more and more cores are
+> used to boot Guest Hypervisor.
 
-Nice!
- 
-> Please find the corresponding branches ere,
-> https://github.com/hisilicon/kernel-dev/tree/iommufd-v6.1-rc3-nesting-arm-vSVA
+This really isn't surprising. NV combined with oversubscribing is
+bound to be absolutely terrible. The write to GICD_ISACTIVER is
+only symptomatic of the interrupt amplification problem that already
+exists without NV (any IPI in a guest is likely to result in at least
+one IPI in the host).
 
-We need to have a big think about how the PASID/PRI caps should be
-working in VFIO..
+Short of having direct injection of interrupts for *all* interrupts,
+you end-up with this sort of emulation that relies on being able to
+synchronise all CPUs. Is it bad? Yes. Very.
 
-The whole PRI thing needs to be its own series and need a careful look
+> 
+> Code trace:
+> At Guest-hypervisor:
+> kvm_timer_vcpu_load->kvm_timer_vcpu_load_gic->set_timer_irq_phys_active->
+> irq_set_irqchip_state->gic_poke_irq
+> 
+> At Host-Hypervisor: io_mem_abort->
+> kvm_io_bus_write->__kvm_io_bus_write->dispatch_mmio_write->
+> vgic_mmio_write_sactive->vgic_access_active_prepare->
+> kvm_kick_many_cpus->smp_call_function_many
+> 
+> I am currently working around this with "nohlt" kernel param to
+> NestedVM. Any suggestions to handle/fix this case/issue and avoid the
+> slowness of booting of NestedVM with more cores?
 
-Can you also look at the dirty tracking stuff? I'd really like to see
-that done for the huawei vfio live migration driver
+At the moment, I'm focussing on correctness rather than performance.
+
+Maybe we can restrict the conditions in which we perform this
+synchronisation, but that's pretty low on my radar at the moment. Once
+things are in a state that can be merged and that works correctly, we
+can look into it.
 
 Thanks,
-Jason
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
