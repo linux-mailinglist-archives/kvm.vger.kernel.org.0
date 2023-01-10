@@ -2,129 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 288106644E1
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 16:32:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20AC16644F1
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 16:34:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234767AbjAJPbi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 10:31:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39224 "EHLO
+        id S238789AbjAJPdy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 10:33:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239122AbjAJPay (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 10:30:54 -0500
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B15DD2EC;
-        Tue, 10 Jan 2023 07:30:52 -0800 (PST)
-Received: from lhrpeml100006.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4NrvsN0FpRz67N2W;
-        Tue, 10 Jan 2023 23:30:48 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml100006.china.huawei.com (7.191.160.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.34; Tue, 10 Jan 2023 15:30:49 +0000
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2375.034;
- Tue, 10 Jan 2023 15:30:49 +0000
-From:   Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To:     Joao Martins <joao.m.martins@oracle.com>,
-        Jason Gunthorpe <jgg@nvidia.com>
-CC:     Yi Liu <yi.l.liu@intel.com>,
-        "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        David Woodhouse <dwmw2@infradead.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "llvm@lists.linux.dev" <llvm@lists.linux.dev>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Miguel Ojeda <ojeda@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Tom Rix <trix@redhat.com>, Will Deacon <will@kernel.org>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        "Chaitanya Kulkarni" <chaitanyak@nvidia.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "Daniel Jordan" <daniel.m.jordan@oracle.com>,
-        David Gibson <david@gibson.dropbear.id.au>,
-        Eric Auger <eric.auger@redhat.com>,
-        "Eric Farman" <farman@linux.ibm.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Nicolin Chen <nicolinc@nvidia.com>,
-        "Niklas Schnelle" <schnelle@linux.ibm.com>,
-        zhukeqian <zhukeqian1@huawei.com>
-Subject: RE: [PATCH v4 00/17] IOMMUFD Generic interface
-Thread-Topic: [PATCH v4 00/17] IOMMUFD Generic interface
-Thread-Index: AQHY8wv6WqOaN9m/WUKJgvcZCnpZkK454qzggAFgXgCAXKMbQIAAKFmAgAAYaYCAAAM8UA==
-Date:   Tue, 10 Jan 2023 15:30:49 +0000
-Message-ID: <dc7ffdc5f38248caaaabac5a66de85bb@huawei.com>
-References: <0-v4-0de2f6c78ed0+9d1-iommufd_jgg@nvidia.com>
-        <3a20e56423f544dab312bca1bcb56ce4@huawei.com>
-        <000cf099-9824-39b8-3719-cf43b33ae1ef@intel.com>
-        <36b0fdac061e4680b5966d2774f0026a@huawei.com> <Y71szSt7jRFKTMcl@nvidia.com>
- <5481b0e8-84dc-52a9-c99f-1df3417328d6@oracle.com>
-In-Reply-To: <5481b0e8-84dc-52a9-c99f-1df3417328d6@oracle.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.202.227.178]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S239115AbjAJPdK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 10:33:10 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C913186;
+        Tue, 10 Jan 2023 07:33:08 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30AFPrDw021470;
+        Tue, 10 Jan 2023 15:33:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4denREQZKmsoUZHgTVtUIfzFE1J9K1MAH3zJdHfo8CE=;
+ b=Y4gn2dyas/FTlgKUihjMgveWOv3oRo/2i5++R7TXN9F++o+LBj9h76tfNIZhzyi2K/yC
+ DzVTZRroQxyaSDxlTQ2IrO6RDKMAHRAYxA/xcEQ0dxJf2N+jxFp4k6yXk6kKuK5tzjkG
+ rVC1MWMPuzWnQwIPt6O/I4aGP+IYa8z+mZ++Fl+XHR4B2vdA6Jd8vFIydOXpWxJw+96v
+ lK7OFe+M3kl1f7F5UCNVvuYS9ITc1IYImreJVNiDu4nQEqdqw1fpYw1cbxTy5a5kxGhe
+ riQu4wCenHAxRUexl8inny+CDfnprC1a+c/GpMmwdfyYPROg0joMBHmH3pKUZ+wlf96t 0g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1ane05kn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Jan 2023 15:32:59 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30AFQQ73022580;
+        Tue, 10 Jan 2023 15:32:59 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1ane05jx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Jan 2023 15:32:59 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30AFD5Ld009734;
+        Tue, 10 Jan 2023 15:32:58 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([9.208.129.120])
+        by ppma03wdc.us.ibm.com (PPS) with ESMTPS id 3my0c7afyd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Jan 2023 15:32:58 +0000
+Received: from smtpav04.wdc07v.mail.ibm.com (smtpav04.wdc07v.mail.ibm.com [10.39.53.231])
+        by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30AFWvOj62652750
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Jan 2023 15:32:57 GMT
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 06E2B58058;
+        Tue, 10 Jan 2023 15:32:57 +0000 (GMT)
+Received: from smtpav04.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E088958052;
+        Tue, 10 Jan 2023 15:32:55 +0000 (GMT)
+Received: from [9.160.171.221] (unknown [9.160.171.221])
+        by smtpav04.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 10 Jan 2023 15:32:55 +0000 (GMT)
+Message-ID: <a24f261b-6a02-5988-47b3-1cfc57fa6da8@linux.ibm.com>
+Date:   Tue, 10 Jan 2023 10:32:55 -0500
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 1/4] vfio-mdev: allow building the samples into the kernel
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        Kirti Wankhede <kwankhede@nvidia.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gfx@lists.freedesktop.org
+References: <20230110091009.474427-1-hch@lst.de>
+ <20230110091009.474427-2-hch@lst.de>
+ <b317380e-26bf-b478-4aea-0355e0de4017@linux.ibm.com>
+ <20230110152722.GB9485@lst.de>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <20230110152722.GB9485@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 9RaJsYmBh65_a6LbtTbqBdT8Ncd5KuzB
+X-Proofpoint-GUID: w8k4qKyGVXxjLKu6IswKeoqvMKz_nNGV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-10_06,2023-01-10_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ mlxlogscore=919 spamscore=0 priorityscore=1501 adultscore=0 clxscore=1011
+ bulkscore=0 suspectscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2301100094
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSm9hbyBNYXJ0aW5zIFtt
-YWlsdG86am9hby5tLm1hcnRpbnNAb3JhY2xlLmNvbV0NCj4gU2VudDogMTAgSmFudWFyeSAyMDIz
-IDE1OjE2DQo+IFRvOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPjsgU2hhbWVlcmFs
-aSBLb2xvdGh1bSBUaG9kaQ0KPiA8c2hhbWVlcmFsaS5rb2xvdGh1bS50aG9kaUBodWF3ZWkuY29t
-Pg0KPiBDYzogWWkgTGl1IDx5aS5sLmxpdUBpbnRlbC5jb20+OyBicGZAdmdlci5rZXJuZWwub3Jn
-OyBKb25hdGhhbiBDb3JiZXQNCj4gPGNvcmJldEBsd24ubmV0PjsgRGF2aWQgV29vZGhvdXNlIDxk
-d213MkBpbmZyYWRlYWQub3JnPjsNCj4gaW9tbXVAbGlzdHMubGludXguZGV2OyBKb2VyZyBSb2Vk
-ZWwgPGpvcm9AOGJ5dGVzLm9yZz47IEtldmluIFRpYW4NCj4gPGtldmluLnRpYW5AaW50ZWwuY29t
-PjsgbGludXgtZG9jQHZnZXIua2VybmVsLm9yZzsNCj4gbGludXgta3NlbGZ0ZXN0QHZnZXIua2Vy
-bmVsLm9yZzsgbGx2bUBsaXN0cy5saW51eC5kZXY7IE5hdGhhbiBDaGFuY2VsbG9yDQo+IDxuYXRo
-YW5Aa2VybmVsLm9yZz47IE5pY2sgRGVzYXVsbmllcnMgPG5kZXNhdWxuaWVyc0Bnb29nbGUuY29t
-PjsgTWlndWVsDQo+IE9qZWRhIDxvamVkYUBrZXJuZWwub3JnPjsgUm9iaW4gTXVycGh5IDxyb2Jp
-bi5tdXJwaHlAYXJtLmNvbT47IFNodWFoDQo+IEtoYW4gPHNodWFoQGtlcm5lbC5vcmc+OyBTdXJh
-dmVlIFN1dGhpa3VscGFuaXQNCj4gPHN1cmF2ZWUuc3V0aGlrdWxwYW5pdEBhbWQuY29tPjsgVG9t
-IFJpeCA8dHJpeEByZWRoYXQuY29tPjsgV2lsbA0KPiBEZWFjb24gPHdpbGxAa2VybmVsLm9yZz47
-IEFsZXggV2lsbGlhbXNvbiA8YWxleC53aWxsaWFtc29uQHJlZGhhdC5jb20+Ow0KPiBMdSBCYW9s
-dSA8YmFvbHUubHVAbGludXguaW50ZWwuY29tPjsgQ2hhaXRhbnlhIEt1bGthcm5pDQo+IDxjaGFp
-dGFueWFrQG52aWRpYS5jb20+OyBDb3JuZWxpYSBIdWNrIDxjb2h1Y2tAcmVkaGF0LmNvbT47IERh
-bmllbA0KPiBKb3JkYW4gPGRhbmllbC5tLmpvcmRhbkBvcmFjbGUuY29tPjsgRGF2aWQgR2lic29u
-DQo+IDxkYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXU+OyBFcmljIEF1Z2VyIDxlcmljLmF1Z2Vy
-QHJlZGhhdC5jb20+OyBFcmljDQo+IEZhcm1hbiA8ZmFybWFuQGxpbnV4LmlibS5jb20+OyBKYXNv
-biBXYW5nIDxqYXNvd2FuZ0ByZWRoYXQuY29tPjsNCj4gSmVhbi1QaGlsaXBwZSBCcnVja2VyIDxq
-ZWFuLXBoaWxpcHBlQGxpbmFyby5vcmc+OyBrdm1Admdlci5rZXJuZWwub3JnOw0KPiBNYXR0aGV3
-IFJvc2F0byA8bWpyb3NhdG9AbGludXguaWJtLmNvbT47IE1pY2hhZWwgUy4gVHNpcmtpbg0KPiA8
-bXN0QHJlZGhhdC5jb20+OyBOaWNvbGluIENoZW4gPG5pY29saW5jQG52aWRpYS5jb20+OyBOaWts
-YXMgU2NobmVsbGUNCj4gPHNjaG5lbGxlQGxpbnV4LmlibS5jb20+OyB6aHVrZXFpYW4gPHpodWtl
-cWlhbjFAaHVhd2VpLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCB2NCAwMC8xN10gSU9NTVVG
-RCBHZW5lcmljIGludGVyZmFjZQ0KPiANCj4gT24gMTAvMDEvMjAyMyAxMzo0OSwgSmFzb24gR3Vu
-dGhvcnBlIHdyb3RlOg0KPiA+IENhbiB5b3UgYWxzbyBsb29rIGF0IHRoZSBkaXJ0eSB0cmFja2lu
-ZyBzdHVmZj8gSSdkIHJlYWxseSBsaWtlIHRvIHNlZQ0KPiA+IHRoYXQgZG9uZSBmb3IgdGhlIGh1
-YXdlaSB2ZmlvIGxpdmUgbWlncmF0aW9uIGRyaXZlcg0KPiA+DQo+IA0KPiBIZSBkaWQgbG9vayBh
-bmQgcHJvdmlkZXMgY29tbWVudHMgYmFzZWQgb24gaGlzIHRlc3Rpbmcgb2YgdGhlIGluaXRpYWwg
-c2VyaWVzDQo+IChJSVVDIGZyb20gd2hhdCB3ZSBzcG9rZSBhdCBMUEMpLiB2MiBzaG91bGQgYmUg
-c2ltcGxlciwgdGhvdWdoIEkgYW0gc3RpbGwNCj4gd29ya2luZyBpdCBvdXQgdGhlIG1lcmdpbmcg
-b2YgdW5pdCB0ZXN0cyBpbnRvIGlvbW11ZmQuDQo+IA0KPiBNeSBwbGFuIG9uY2UgSSBwb3N0IHRo
-ZSB2MiB3YXMgdG8gaGFuZG92ZXIgdGhlIFNNTVV2MyBwYXJ0IGJhY2sgdG8NCj4gU2hhbWVlcmFs
-aQ0KPiBnaXZlbiB0aGUgZmFjdCBoZSBoYXMgaGFyZHdhcmUgdGhhdCBoYXMgdGhlIGZlYXR1cmUg
-YW5kIGNhbiBpdGVyYXRlIG1vcmUNCj4gbWVhbmluZ2Z1bGx5IHRoYW4gbWUuDQoNCk5vIHByb2Js
-ZW0uIEhhcHB5IHRvIGhlbHAuDQoNClRoYW5rcywNClNoYW1lZXINCg==
+
+On 1/10/23 10:27 AM, Christoph Hellwig wrote:
+> On Tue, Jan 10, 2023 at 09:54:51AM -0500, Anthony Krowiak wrote:
+>>> +	tristate "Build VFIO mtty example mediated device sample code"
+>>> +	depends on VFIO_MDEV
+>>
+>> Admittedly, I'm not very fluent with Kconfig, but in patch 2 you stated,
+>> "VFIO_MDEV is just a library with helpers for the drivers. Stop making it a
+>> user choice and just select it by the drivers that use the helpers". Why
+>> are you not selecting it here?
+> Because this changes one thing at a time.  Patch 2 then switches this
+> depends to a select.
+
+
+My bad, I missed it.
+
+Reviewed-by: Tony Krowiak <akrowiak@linux.ibm.com>
+
+
