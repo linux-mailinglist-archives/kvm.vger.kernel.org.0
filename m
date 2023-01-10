@@ -2,135 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91A47664C17
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 20:12:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D830664C26
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 20:16:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239665AbjAJTMe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 14:12:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54502 "EHLO
+        id S235298AbjAJTQH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 14:16:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239820AbjAJTMZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 14:12:25 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 296364F103;
-        Tue, 10 Jan 2023 11:12:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673377936; x=1704913936;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=idaSyTc/ks4CE89dkqypMQwFMcAUjyVafAw9EG5/p1Y=;
-  b=SPHSRtPLj9bckQDAopi8zfmjK/c9fRfTq/9QBKhgv5Nj/8vEJJ3vOMA6
-   Dtd/IbuMDHfo2avI92Vf0Dmdla/FrqeejBhTDr+7ByjzkrRWh3PfcmM6v
-   0dA1eOf4utWkLgGd50JRMOiJUhkAJmDHbYvEoA0+Dk3f3NlPjxmP5njvf
-   G9koVM5i9dUgPfGx+SfwwJRCg92lwXNNNZ7Rldu2jT4uXXE0EgKwJwAJa
-   y1TkOP4IbVZOBGyhkKeKoh/lfz+rJoOxm+ZHjV79z2+P3IFzJ7Dqcwd43
-   09in4hRLWEKwTMe11Jx2InohKllfz5Arj7Tn4+mvKA5D9awKkY+fKUP93
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="350458233"
-X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
-   d="scan'208";a="350458233"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 11:12:14 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="607086563"
-X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
-   d="scan'208";a="607086563"
-Received: from svenka7-mobl1.amr.corp.intel.com (HELO [10.209.63.27]) ([10.209.63.27])
-  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 11:12:13 -0800
-Message-ID: <56cdb6e6-e25c-aba9-7bb3-323281e65249@intel.com>
-Date:   Tue, 10 Jan 2023 11:12:13 -0800
+        with ESMTP id S235260AbjAJTQE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 14:16:04 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9747F08;
+        Tue, 10 Jan 2023 11:15:57 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30AIi4fT025981;
+        Tue, 10 Jan 2023 19:15:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8qLRSieZJKfiFTp09cd3lxTGmbf7d8GkKTXy8vOVObs=;
+ b=rjuuulTF635OLwG5dI3ZK9jbc2+wAoyiPmARf3DNRQSvKfEVyP1vxbZqqWoS7okGsGxA
+ 7Zp93N8mag8gPTVTKvwfmiUG0ACmmQQD2pVC7tyX90QlWBfcb9TVQtX1+GUJhJVe8doO
+ F/EAr/uARa0hLC5qLq+OEYcK4lZPkgxeqMIJw7w9riNT1KIvGe1RKEfgog2zwbkeUDNf
+ xGz7ln8/x13s00gUQLMUfGsQhF8qCNj2fNPhGiDMetDARmcTCVtsDSfTsRfTu9RqBSDh
+ pxG6BCf9/VUu6mkINwCGdSofc5x44Klqr3z1M8OF7DpZaeqgosHLMXjj9Fv2tpEgF5C4 bg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1dj9gqwa-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Jan 2023 19:15:56 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30AIoYMI017576;
+        Tue, 10 Jan 2023 19:15:56 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1dj9gqvd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Jan 2023 19:15:56 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30AIeVnD024687;
+        Tue, 10 Jan 2023 19:15:54 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3my0c6nb3p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 Jan 2023 19:15:54 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30AJFo0t25035302
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 Jan 2023 19:15:51 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D2AFE20040;
+        Tue, 10 Jan 2023 19:15:50 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6CF7E2004D;
+        Tue, 10 Jan 2023 19:15:50 +0000 (GMT)
+Received: from [9.171.9.121] (unknown [9.171.9.121])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 10 Jan 2023 19:15:50 +0000 (GMT)
+Message-ID: <f4203dea-93a9-6903-d635-c36ff47337c9@linux.ibm.com>
+Date:   Tue, 10 Jan 2023 20:15:50 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v8 08/16] x86/virt/tdx: Add placeholder to construct TDMRs
- to cover all TDX memory regions
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v2] KVM: s390: interrupt: use READ_ONCE() before cmpxchg()
 Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1670566861.git.kai.huang@intel.com>
- <ef6fe9247007ee8e15272de01ded1e0a9152be02.1670566861.git.kai.huang@intel.com>
- <c70c30fb-073f-4355-c6a6-052d013a99da@intel.com>
- <81b814f096513e69e3099ab2b54034deadf8d7fd.camel@intel.com>
- <92aba287-c839-8841-a9f7-28a2c0b3097a@intel.com>
- <cba4c7295b157dc5d0d88b73f335899f0aa5a21c.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <cba4c7295b157dc5d0d88b73f335899f0aa5a21c.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Heiko Carstens <hca@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230109145456.2895385-1-hca@linux.ibm.com>
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20230109145456.2895385-1-hca@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_HI,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: W9Jlib-x6Ip48vHTvV5S9c5z7zPigdX7
+X-Proofpoint-ORIG-GUID: jqIG8YIw-bxIsQrSNz78ZG2_QqzRyp7y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-10_07,2023-01-10_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=888
+ malwarescore=0 suspectscore=0 spamscore=0 priorityscore=1501 adultscore=0
+ phishscore=0 clxscore=1011 bulkscore=0 lowpriorityscore=0 mlxscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301100124
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/9/23 18:23, Huang, Kai wrote:
-> On Mon, 2023-01-09 at 16:47 -0800, Dave Hansen wrote:
->> On 1/9/23 16:40, Huang, Kai wrote:
->>> On Fri, 2023-01-06 at 11:24 -0800, Dave Hansen wrote:
->> ...
->>>> Also, tdmr_sz and max_tdmrs can both be derived from 'sysinfo'.  Do they
->>>> really need to be stored here?
->>>
->>> It's not mandatory to keep them here.  I did it mainly because I want to avoid
->>> passing 'sysinfo' as argument for almost all functions related to constructing
->>> TDMRs.
->>
->> I don't think it hurts readability that much.  On the contrary, it makes
->> it more clear what data is needed for initialization.
+
+
+Am 09.01.23 um 15:54 schrieb Heiko Carstens:
+> Use READ_ONCE() before cmpxchg() to prevent that the compiler generates
+> code that fetches the to be compared old value several times from memory.
 > 
-> Sorry one thing I forgot to mention is if we keep 'tdmr_sz' in 'struct
-> tdmr_info_list', it only needs to be calculated at once when allocating the
-> buffer.  Otherwise, we need to calculate it based on sysinfo-
-> max_reserved_per_tdmr each time we want to get a TDMR at a given index.
+> Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 
-What's the problem with recalculating it?  It is calculated like this:
+Looks sane.
 
-	tdmr_sz = ALIGN(constant1 + constant2 * variable);
+Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-So, what's the problem?  You're concerned about too many multiplications?
+In case you want to take it via the s390 tree:
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-> To me putting relevant fields (tdmrs, tdmr_sz, max_tdmrs, nr_consumed_tdmrs)
-> together makes how the TDMR list is organized more clear.  But please let me
-> know if you prefer removing 'tdmr_sz' and 'max_tdmrs'.
+> ---
 > 
-> Btw, if we remove 'tdmr_sz' and 'max_tdmrs', even nr_consumed_tdmrs is not
-> absolutely necessary here.  It can be a local variable of init_tdx_module() (as
-> shown in v7), and the 'struct tdmr_info_list' will only have the 'tdmrs' member
-> (as you commented in v7):
+> v2: make it compile
 > 
-> https://lore.kernel.org/linux-mm/cc195eb6499cf021b4ce2e937200571915bfe66f.camel@intel.com/T/#mb9826e2bcf8bf6399c13cc5f95a948fe4b3a46d9
+> arch/s390/kvm/interrupt.c | 12 ++++++++----
+>   1 file changed, 8 insertions(+), 4 deletions(-)
 > 
-> Please let me know what's your preference?
-
-I dunno.  My gut says that passing sysinfo around and just deriving the
-sizes values from that with helpers is the best way.  'struct
-tdmr_info_list' isn't a horrible idea in and of itself, but I think it's
-a confusing structure because it's not clear how the pieces fit together
-when half of it is *required* and the other half is just for some kind
-of perceived convenience.
-
+> diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
+> index 1dae78deddf2..ab26aa53ee37 100644
+> --- a/arch/s390/kvm/interrupt.c
+> +++ b/arch/s390/kvm/interrupt.c
+> @@ -83,8 +83,9 @@ static int sca_inject_ext_call(struct kvm_vcpu *vcpu, int src_id)
+>   		struct esca_block *sca = vcpu->kvm->arch.sca;
+>   		union esca_sigp_ctrl *sigp_ctrl =
+>   			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> -		union esca_sigp_ctrl new_val = {0}, old_val = *sigp_ctrl;
+> +		union esca_sigp_ctrl new_val = {0}, old_val;
+>   
+> +		old_val = READ_ONCE(*sigp_ctrl);
+>   		new_val.scn = src_id;
+>   		new_val.c = 1;
+>   		old_val.c = 0;
+> @@ -95,8 +96,9 @@ static int sca_inject_ext_call(struct kvm_vcpu *vcpu, int src_id)
+>   		struct bsca_block *sca = vcpu->kvm->arch.sca;
+>   		union bsca_sigp_ctrl *sigp_ctrl =
+>   			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> -		union bsca_sigp_ctrl new_val = {0}, old_val = *sigp_ctrl;
+> +		union bsca_sigp_ctrl new_val = {0}, old_val;
+>   
+> +		old_val = READ_ONCE(*sigp_ctrl);
+>   		new_val.scn = src_id;
+>   		new_val.c = 1;
+>   		old_val.c = 0;
+> @@ -126,16 +128,18 @@ static void sca_clear_ext_call(struct kvm_vcpu *vcpu)
+>   		struct esca_block *sca = vcpu->kvm->arch.sca;
+>   		union esca_sigp_ctrl *sigp_ctrl =
+>   			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> -		union esca_sigp_ctrl old = *sigp_ctrl;
+> +		union esca_sigp_ctrl old;
+>   
+> +		old = READ_ONCE(*sigp_ctrl);
+>   		expect = old.value;
+>   		rc = cmpxchg(&sigp_ctrl->value, old.value, 0);
+>   	} else {
+>   		struct bsca_block *sca = vcpu->kvm->arch.sca;
+>   		union bsca_sigp_ctrl *sigp_ctrl =
+>   			&(sca->cpu[vcpu->vcpu_id].sigp_ctrl);
+> -		union bsca_sigp_ctrl old = *sigp_ctrl;
+> +		union bsca_sigp_ctrl old;
+>   
+> +		old = READ_ONCE(*sigp_ctrl);
+>   		expect = old.value;
+>   		rc = cmpxchg(&sigp_ctrl->value, old.value, 0);
+>   	}
