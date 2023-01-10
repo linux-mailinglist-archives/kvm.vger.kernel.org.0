@@ -2,126 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9655664049
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 13:19:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E9B766640D3
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 13:47:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230266AbjAJMTq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 07:19:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59950 "EHLO
+        id S238466AbjAJMrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 07:47:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238502AbjAJMSo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 07:18:44 -0500
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2135.outbound.protection.outlook.com [40.107.223.135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C4FE3F
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 04:17:34 -0800 (PST)
+        with ESMTP id S238332AbjAJMrt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 07:47:49 -0500
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on20629.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe5a::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B64C55006C;
+        Tue, 10 Jan 2023 04:47:47 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hQoDPbWSR47eqGQZAW9ovY87jMTaKDAV5Ka8AITPXe0qx2P23ae7HAMi3ypBExEqD3nH00wiOY3ilFuQW73J1dBauhkxIKr5CT7y6sxkLsTwwcoAw183S3VPIC2O9msrsruc1o1Ma/63yJ0i74HejI80JwWQdf7P4n7XR41z8wkdjmDIkJwhAColX3YESL1GpyYGFHB5t2+PViYBieHR3SC8gpTOky4qyVnyimKrJ0/kdN4d0c4Tpyz2K/2cFtGmeHesg0EBDBfUGMpNylpvSdsEsxliN2oNWo4IVbe9UNJQt6YnMyXxDdVLGB+qNVgTbyXqGqfC8iiWuQ7YLg9oEQ==
+ b=lXp3XIqRkEHh8wN0BjeGSLEX+LpruwMuIU2qRa7l1Cfa6mRu29chDKQkvKTEjvmP0Mvw96RaeP0WltClek9/iD5V+JNzAkp4YwpYbBBlDAYkStArsqpKSV7A/6+Fo09eDsCnJM3yjXsQPIarRphPRUEVcQKOaMYm/RKVHCTcei7MzUuSOw3MLOOEBoEBxBfhpvBSYG1/UMPe2AzdmszwbvwaAsK6wZ5DFEbRxwuwK1+ICiimB53AO2X38Y//MLcM/bD8kAKiheRFR4zfhMGFOSbr5RHM6JSXpaFJtjFbm6+k6ckI0H8Ky0UDcBrMPytgFY2OicO5379RYUO4jP1YwA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=knXql5QwtYBSYDOuXVs+pfF8BJ9eouPjFtqTfHGmE84=;
- b=K3v2ySKo9pO3EzCzr8JnEAiquoAla4fayj1ZrKEfxlwjChUsi1p0knu+b1/XarnwKg5dkkjBLFglXkr9ESafNMRRIV81jhgstW9fmjVCBJoHSYtuLtntQ/CWd5m1keP5POzq/02U49ZDRhbEkF4LoyZ028B93MR4XqtBlb5i1nuRz2wbwDdEtuS0xmctypmKVDtoQoIiZe2w4WT/BXg8qatWVlJ4vDFdymtHaMsgFQca0AzKabijTU4AGuSeaNAjVbj9YRJrjpsvf30s/KiLh9mT/l99DHxDC0yCHJuGHv6So1ITlt0TjEja8I5jmsYE3sBUoDZPjwxVtlx2ZoyP5g==
+ bh=k+1fRhlrzf7Xuhq0OpbZEIOs7cx+71g0G63hKIspmEA=;
+ b=YZI8W50ULhT9l9cg4X/xfsmcL5D0ifIg/a/g8xcisHQGfDYWJeiCxvR7B93PKWsYpADa4x/Bor8ANhcayG3ovFh0xDDHY7BZeKJ/DxDXYrKrrw+TMDlhNWkje/w9RqZ/nwqh2xeER69v1xhm3oPLEjVePGlI2TteOsw0BJdWPhrIM9zPTH4bcWaOsX0cG+8wJsNzVl7R8w4avyvfclzCI+e4UiJVaeExmi8SDPG5yS4md00gPX9ihV/94l7voqKCjIl9JGXeaZVJp+jFAM4cyh6+IcY+il8Y5xBuE9dxrtVGe1OaG3z2XfVxQiUVhdzw8iQJOP7DxsocE8iMEphwKw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=knXql5QwtYBSYDOuXVs+pfF8BJ9eouPjFtqTfHGmE84=;
- b=qH/vu41zLsenpy86a1QX+lst1j30UQlAJ9KEVTTEUv//VPpf8DBqWVKeH+zzZsXwR/mtRUqSU2Wgy8b/8U4Xt26TbgYZmrZP4EfTBwwi6ghsw4HkLSI20TQhQrTP5DxxeZg6FdEd5p307f6gym8FIn9TjHi8R0UFuFaDuhCSTIo=
+ bh=k+1fRhlrzf7Xuhq0OpbZEIOs7cx+71g0G63hKIspmEA=;
+ b=Bc4m+Kqc04u3fHTxcJVPBunLfmmXPcDhRCYQPTUfgGkz2fU+c0EnV4QrUKSc3KPJOLXuXykw8S65f9R5qx9KbnHNrnGcdaWeSqhD8J+93MfWLPzFXY+/8Twfj1Y1tswXarXvZ1Yzobd3cwRyNS3uIveqkULqpdxJbFM5AFUNb+8=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- SJ0PR01MB6333.prod.exchangelabs.com (2603:10b6:a03:293::19) with Microsoft
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB2810.namprd12.prod.outlook.com (2603:10b6:5:41::21) by
+ CY5PR12MB6321.namprd12.prod.outlook.com (2603:10b6:930:22::20) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5986.18; Tue, 10 Jan 2023 12:17:30 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::6b5b:1242:818c:e70d]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::6b5b:1242:818c:e70d%6]) with mapi id 15.20.5986.018; Tue, 10 Jan 2023
- 12:17:30 +0000
-Message-ID: <6171dc7c-5d83-d378-db9e-d94f27afe43a@os.amperecomputing.com>
-Date:   Tue, 10 Jan 2023 17:47:20 +0530
+ 15.20.5944.19; Tue, 10 Jan 2023 12:47:44 +0000
+Received: from DM6PR12MB2810.namprd12.prod.outlook.com
+ ([fe80::c2ca:f7ae:4ba4:eff5]) by DM6PR12MB2810.namprd12.prod.outlook.com
+ ([fe80::c2ca:f7ae:4ba4:eff5%2]) with mapi id 15.20.5986.018; Tue, 10 Jan 2023
+ 12:47:44 +0000
+Message-ID: <af54107e-a509-8f95-6044-b155539a590d@amd.com>
+Date:   Tue, 10 Jan 2023 13:47:31 +0100
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH 0/3] KVM: arm64: nv: Fixes for Nested Virtualization
- issues
+ Thunderbird/102.6.0
+Subject: Re: [RFC PATCH V2 15/18] x86/sev: Add a #HV exception handler
+To:     Tianyu Lan <ltykernel@gmail.com>, luto@kernel.org,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        tiala@microsoft.com, kirill@shutemov.name,
+        jiangshan.ljs@antgroup.com, peterz@infradead.org,
+        ashish.kalra@amd.com, srutherford@google.com,
+        akpm@linux-foundation.org, anshuman.khandual@arm.com,
+        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
+        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
+        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
+        michael.roth@amd.com, thomas.lendacky@amd.com,
+        venu.busireddy@oracle.com, sterritt@google.com,
+        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org
+References: <20221119034633.1728632-1-ltykernel@gmail.com>
+ <20221119034633.1728632-16-ltykernel@gmail.com>
 Content-Language: en-US
-To:     maz@kernel.org
-Cc:     catalin.marinas@arm.com, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, scott@os.amperecomputing.com,
-        Darren Hart <darren@os.amperecomputing.com>
-References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
-From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-In-Reply-To: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+From:   "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <20221119034633.1728632-16-ltykernel@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SG2PR03CA0085.apcprd03.prod.outlook.com
- (2603:1096:4:7c::13) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+X-ClientProxiedBy: CH0PR03CA0217.namprd03.prod.outlook.com
+ (2603:10b6:610:e7::12) To DM6PR12MB2810.namprd12.prod.outlook.com
+ (2603:10b6:5:41::21)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|SJ0PR01MB6333:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7f09c2e0-3432-449d-01fa-08daf304a4c3
+X-MS-TrafficTypeDiagnostic: DM6PR12MB2810:EE_|CY5PR12MB6321:EE_
+X-MS-Office365-Filtering-Correlation-Id: 023e6a22-8ea3-4428-41e9-08daf308de48
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 6/6niu1WeN1qBoVPD+1V+xkQyLyHmYTMl1vrmuSUdPxB0RX930G6MYBpFAYF2v6Nwiv6Gt/UTx0wOlDMPiWdTS9iId4xlWlD5U7e54BTm16dQXMHjZHTiecuHFC55wHw7Iq+6pMUyRZ/yViJAV2H4fuo5HlTIoDMciwOEpy59rVdPp+KVskNU68wg9BGQ2UolD/AqYoo2dwq3ieDykfEwDRbbA/4SjfK+DDrAh6bqB8ZPzSE0aIt3NIIdt5a+YoeMMYXQjgEnHU5Kvt3MNewSTPuUsWAUwrBNH9a0GmGczmcDtfywB/MWwIa23xS5A+56wmLPPVPyknHTdh3NksqmC4LmiXnX5jtWe+bczfrX0CJBhxrYh+yEvpoSEzSGs4lYY0ukqBvRp6xKLrzpGVM0koC0Sfvz3CklRaTt4VAWUf1ylEviPK3oDbyKc5Zc+wP0A1zXGqLnsAOqgHT1hoHBSA22Psf2RFJPjrZRuPSkB1MkVHyYcWn0ZtfoeVjwfXHtNPPjAp71EOQFZ3q9218MRqTcf0MsYWClR9x2zjLqNS65kOhKdDwQ1iEq15Wc0RlqCS/7MA05Pk5fdQEL7tgCGPsU7H8a+0weIErdPMGjA4SxA8tTEC26PxFJHbg5yJctZ0V/agcEJsGdNA2RcEjGwWgIsEz+XM91plO60aUbxxdXw7JEwq2LHDMBOUoAGLwFFN00EfAvSw3y1PgY+UcZMwTsvHZ7rQQIrZ2U4xThF0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39850400004)(396003)(366004)(136003)(346002)(376002)(451199015)(83380400001)(41300700001)(66946007)(38100700002)(66476007)(8676002)(66556008)(4326008)(5660300002)(107886003)(8936002)(2616005)(186003)(6512007)(53546011)(478600001)(6506007)(26005)(966005)(6486002)(31696002)(86362001)(6666004)(6916009)(316002)(2906002)(31686004)(43740500002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: M9kHCBTXWxE92hqntUH5isaj1m7u4uOgprfXyKK5BMMd7zoO5MVi4fM4UGjXeOwg7XjZ9yZvTgKsVIMlHlOhBvQA1aWXZOh47R8ZrpkWR6HocYRQpbdLjkO9IWP72PHUmGqkQFGcS2qUScefea06cB977xwLhs5TDjzBCI/0F20gWfyF/PhDPR39PIP6oEnGOeBIuw8HrfjMv3OeXStQc/VGRo3JSUpM7gh4ZCJi5tQaip33VDrwZNq04O7tU3YEpsZbvRu/xUje2gX9nJEvsq/r8f20AGk3wYySUZFrtVT3Ri5u8YIdBj04P4s6a8C0I8VExIUxlhE9RbrmZ0ix06ARr47693cNH6/tj616VwEQ6gSM1kLvBQdS01c2ozk5pTDuip4IOjUHDZXc3Bs1tyD7pn1pEHa6y3k6XLIDGtRkPDqrUjkI0embrQgb3qzj8SuKylZnCdoPhutNlhDhD2CpLD642W7KzZCYi0FjwDP38KXDWDEaCNwzpRiPD0yFIZLAg/yxBsKFfKCr7GqiFgFy4+mqwMGs5Zgm6deQJEqq1PVnvWrWHDjMSxJmAtHRfYkveWiwr390STTH1dVXTLYUETSA6Z6GT1aDcWVWqrPX7e4itzzKZ7pdg1e7Jcx3hi7Lq5rm77gnIcfaI580MPYedQqAzioYPNX8QEGF2cTQ2GCvkMG+r/YjSvcoacQzEGCUBzWWER2PhnLqarjvEZHQdUNiCEldwcdNJicg95kss2M7J6rwsvRPJExmFxZ6
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2810.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(396003)(366004)(39860400002)(376002)(136003)(451199015)(41300700001)(8676002)(5660300002)(6666004)(478600001)(316002)(66556008)(66476007)(66899015)(66946007)(8936002)(4326008)(7416002)(45080400002)(2906002)(6486002)(921005)(6506007)(30864003)(38100700002)(86362001)(186003)(26005)(6512007)(2616005)(36756003)(7406005)(31686004)(83380400001)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SXMxYjlreityVDhsMVU4OElKMlhNSHp4ckIvYVlIcFd5cnJBSEhrb3hvZkRB?=
- =?utf-8?B?RFowV28xbWxVRmV1QlpRMklHcW0wSUdRdHFsaTNSRnYrdytjMWhuc0dXMGk0?=
- =?utf-8?B?ZkM5ZE42Nld4Q2I2anIvVzhscnZScU9ValhOZVViY3p3QmRCYVc4dWxFM3hW?=
- =?utf-8?B?L0RQeXNqRkxpTE84NVhIZE0vN1VLMlNyclF4MTQ5djRMSnREZys1VFovVnNw?=
- =?utf-8?B?aE95KzZZVldlblV4ZUpHRnNhVGZ6eEZQbEZQYTJ4d21RWTlzQ2hOdEtyMWNR?=
- =?utf-8?B?Z250cGRubzl5dkQxbnFCWHhBWUhKY3lSQ1NBSHZOYW9HZllzMWd4Q3Vabmdr?=
- =?utf-8?B?dFZCelR3TTdrQS95Tms4eU56cXpFdEw4VTFZS1AycDBDZ1BQa3N4OEtlUlpX?=
- =?utf-8?B?YUgyNHNJdHV3ZXg1QnVpL0FYZmVITDgwMTJGYjFPck5CTzVKNUlZWlAyTk5u?=
- =?utf-8?B?bjNjQnNzQndHbk10T1ptTWt0TjQ5QXlDRWRCT09ObG01TlRsSTM0VVJrUjJl?=
- =?utf-8?B?SFNVczBSSWxPOWVLVGtGbWFMNnB3Q0JmUkt1NmxjbTdqQ3ZTTXlEMkp3QXlX?=
- =?utf-8?B?dG13SkxQWTdDSnpTODFPWUNndXh6VmNBWkJYZ0dGa3pYZzlONjFVVmNYaFZl?=
- =?utf-8?B?c3QreGxKUzFhMHNVZzF2SHBGazdkd2p6c1k4bzBhdlJJZVBnN2hEaDYxT1ZM?=
- =?utf-8?B?eXNwS090VFZtQnY1bTBkcjl5aVBsOTNYMWExUkExMlBEbEpUZEZheS94c2wx?=
- =?utf-8?B?dGZSRkdIOXl2RzliSEJBSGJKdUhLaVdoV1hGTDY3UjN4Yk9lRmp4a3Q5dkpG?=
- =?utf-8?B?YXM4SEhpemdHbHk5YnJJT2QxeHdOeWcwNzZPQVg1WWtxWGtuVE15anZ1SUU5?=
- =?utf-8?B?bWNlTDEwQVhCQnBHalpEd01PRWgwTC9pK3hJemtFRUFaWDZzdDlXSlhwSXhU?=
- =?utf-8?B?UXU5Q1ZRKy8zRFk5SCtLSDFjWWI2dkNYeXRHcTdoVkpyeWd0V0wxY1pZc0tC?=
- =?utf-8?B?OEdhVTI5SHV4RTNleEpJMmxiNHhvUm1iN1RUeG8yalpSaGNGWDYzVWhaWGh1?=
- =?utf-8?B?QjAwdTdzb3J5N0Y5WDhucmtRSW8yWitUNFN2MWxMYTZQSC9nZENMK2lFVjIz?=
- =?utf-8?B?Vng1U2NDNGYwZ0hSQld2elpWVnQvZVAyaTBpUmdPaFFNWGkvZUR5UWF2MjJ3?=
- =?utf-8?B?NVpSaGtlQlcxRlhtV1lBVGFZaW91bHkzcm5LazJKUkc5eCtsN1NOVVRhM0li?=
- =?utf-8?B?di9CZXQ2V3RpckswWHU4RmZ4QXJZN2xVTzZITFhMQ2F2V3hFRXdoUkhKMkcr?=
- =?utf-8?B?cWJtd0pua0dTcHhWTU1HWWxjei9mMkR5ZDdzbDREa2RGaTB1emNpZUQvZ3Jl?=
- =?utf-8?B?YmNISy9DSDZ1NkVSa0daajZlTVpoblhPK0FPcS8weGNJMm1FdDBFTGR6Uklp?=
- =?utf-8?B?azBOeDFOd1pzVEw3NGpLekdtc2YwRWhoQURhYktJVnl3QlZnQjA0U1k4Y0Fs?=
- =?utf-8?B?Yk9XVmZQbWJWd3EvT0NEd0UrVjdJYmt4RUV5ZkdDQTFYdGUxdE5tSExUVGhZ?=
- =?utf-8?B?T2RyRkp4dDk1c0RTOXhDOTVBSE9xNkpJU1VFUWJ2Q1M2RjhCMEppcUVRVGdz?=
- =?utf-8?B?N3EzemI2SllJdE8rUmRXckhjLzhPZ3FGZGs4K0h3Z2Zzcm9wd1UrWm9aSW1i?=
- =?utf-8?B?T284cTJjTW9ZWGNrYkcrQnpqY0pQNE81ZXU3cXNFZGFieFQ4UFRYSFZVUys1?=
- =?utf-8?B?T20xbmxwK3VuRERzdVVzUTAycm95THZtQ3krZWs0OGVadTdib0ZpdUpIOU5a?=
- =?utf-8?B?UkpMdkxTKzJuRm5vTzdTdVc1VGE2Mm1HK1JIUllBdG8zM1lCOXlVYVpUVUhX?=
- =?utf-8?B?cTdFVnNPSVhubEN5ZjZBTDdyOVk5eUZ3SkZjczlrR1dqVVNWV2xhQlppY1Y0?=
- =?utf-8?B?eVBnY3plS3YxS0NaczdTS3lkVG84TTI2SjN3MkdaOXNlY2IyeUxwYklwUmVI?=
- =?utf-8?B?dEhUb3FsRUlySTNWME5VclB0cWJKQ0IrV2swcDNMbUFJbjIrTVdOSWdZRXNC?=
- =?utf-8?B?dUVGVmw1U3ZjbTg5ODBuTkovZmplN0ZpQkRqWWNhOU4vQng4ZFZQMVhMV3Nw?=
- =?utf-8?B?L0FBK1pvY2tVc2doMWMzSFZ2TTNXZ3F6bnNsZVFkY2dudXNCaE9MMUt1WnBN?=
- =?utf-8?Q?xU7WdMIAGa3vtXGWKpf9BVtyFXlSbmcXPSoy295KmqUj?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f09c2e0-3432-449d-01fa-08daf304a4c3
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aGJtcXJSTDJSYXZzWFJXaFpEM2pSZExGWWtjY0tJVWNTQ1RVSjlUelY1NGh0?=
+ =?utf-8?B?L1hRd3lHM1BJMFViVk5qTmNIczZSWlV2anA5L0d2anZJWnJiNDFOWEs4U1Za?=
+ =?utf-8?B?S3NKdGVrczJsd1pNcFV5bldkd0RPUnJKZVBpaTdwT3Q5Wm9uZ0RNd2d0MDhr?=
+ =?utf-8?B?bVdrMVhmNCswc3pvY2VISFdCcGxNUXJhd1YvVHBpMXNQQW5DTUQ2bWtRMFZO?=
+ =?utf-8?B?dGxsZW1ON3Y2ekV1a2dGelJ0eS94Y2hvcDNwVjJOOWxITE9zcTJpTjhyWXJ2?=
+ =?utf-8?B?clpKM1JJTnpGTkYxVmVWbG5CbTV4UXFIcWwydXBWbDM4dGg5eGF3cU1XRURN?=
+ =?utf-8?B?S0Q1YlJJN3d4Z3oyTzhmalY5em1rSm83bFpMeUt2MXlORUROdVFNMXQwRTZK?=
+ =?utf-8?B?NTBmZmV6OFo3N1BZNlVRUGpuYkJQVThhUHFrWllZQ0VtVXdMOUlOVFFsYXA3?=
+ =?utf-8?B?V2F1Nk5Qd0MwZUZYMCtLWHNmMkIzQlhLTjdvQnl0eFl2YnJQT2xzQ2NOUnlE?=
+ =?utf-8?B?aDNicUpIVlRkVDlKZXREMlB3MHN2TE56Tm9WS0l4dURlc3BkMVZQdlBSczl6?=
+ =?utf-8?B?bHVLcy8yY2FXbk5UZE5jdCswMWswMVpzZGNCajU1enlYL084UjNmekg0YmZo?=
+ =?utf-8?B?T0JuVFlwbytTWGRwWEQ3aG9rakc2QVZ1R0JNaUIyV0NLVGViN0lUbC9GL1B3?=
+ =?utf-8?B?dk5ib0toclprMWJteUI5ZldoazZMOWtCeUk1Q3ArSHU4MWlaeGZWWnJaNVJs?=
+ =?utf-8?B?S3RJaUdxbGg0aFlMb203TkJWMy9nZkZtYzdFNW1wRVFXdGE3OE9LZUN1QS8r?=
+ =?utf-8?B?U0tTM2FOU1Rtb01xLzViSjFxSjFlUlNETCt0c2VhQUdkUDhNL01lNGF5QlNz?=
+ =?utf-8?B?L1VwRTBJUjNySnFVSHFEN3hlTk1nc1d1d2h1TVRySHRhMFQ3ZEtKSytCKzE3?=
+ =?utf-8?B?UWRCUUpsR0Q1TnQrdzZldVJNV1kwVVVHRFcxR0VJQ25iUWFOTVpzb041QkV3?=
+ =?utf-8?B?RXZraGZqMERDV0RqVlc1U1ZJNUI5S1FtMVNjUUMxV1pna1BtYWN4ZWZuY1Ft?=
+ =?utf-8?B?SU9jenFub2hwc3NEMmdOQUZHYzZHMENhSHRZczFXeEVzZi9tUHZzbGNVZWY3?=
+ =?utf-8?B?NWVqSmZlUlpyWml0c2MyNzQwTUFFMmRVdHJNNVJodGx6MnlGbzIwWWo4ZDQ3?=
+ =?utf-8?B?SzNNRmRsUWVKK3ZMSHBJaGlrVkFBVU13VUd2NUs4blhEcHRPeWRYSFNDc3Nq?=
+ =?utf-8?B?R25teERDVDdpbVFpazFpRXVjZlJ3dTJiQVlJd2NCd2xxenBObXgrVWlPbU9v?=
+ =?utf-8?B?bExNL0VSTS9nWHpCKzNOR3VQNzdGSXExVlpvRFQ1RnNnaG4ybmpuMzRIdXJW?=
+ =?utf-8?B?RmRPWjlDUTRJZncrbGo5WlFlWGZzbFNFQ2RmR2tNRksrZVplMU0wYTdPNUxp?=
+ =?utf-8?B?SkExeGw4SDI0YWoyUnpvNm9ZZStvb0k5UENWZU5TUE1KMXJvRUY3bVB2Wm1w?=
+ =?utf-8?B?cWh3V2pod3JZbmY4eGR5bDJGaVduUkxnNFZvZDFPbUcxOVVDL0xCV1lITVZH?=
+ =?utf-8?B?SnFEU1E4dGtsMlgzbzk0MnJ5Y0lGU2tjM2JxVVlzQkp5ZFIrcWtSYlpFUm90?=
+ =?utf-8?B?VmxTenlVZFpUdUN1UURUNlBUKzVCN0trdSs3cENMbkdMMFZmeGpqNk94RHFu?=
+ =?utf-8?B?ajhWS0N1SXEwOTNDSjRVWWZ1RUxDWHlSN1BSZUtzQThXYm9ZOCtSR1ZLSEpi?=
+ =?utf-8?B?eDk2YTBmc1NndTdxL1ZVWUdyQ29ybmYrMGoxeXF2WjJRakRTNWJHV0FZKzQv?=
+ =?utf-8?B?Rm5uUEtVa2tpVjNMTTJ0YmFMSXBpYjNOc1JubC9pQ0hiRVFrdzZHNGRYQW45?=
+ =?utf-8?B?bTVvTnV4b2dSZEV2TmNkVnhvWHhmMlJYUmg3SFFMaDZHNVJsZmJadnRCZlU4?=
+ =?utf-8?B?YmhJWDlEYmlLQ0pnWE9ZTFNvMG8yRXg1SElYMHNOVXFNZi9nMEN0V3FiMEtk?=
+ =?utf-8?B?cVVSQWtueTY1M1RiN0t3UXF1WXlrQ0h5Z3NxS1laaXdWVDU3eXVUd3ZmRHZH?=
+ =?utf-8?B?UE5LTDJhNUxOQTZlMFUwSjVCYjhPQ2daTVU2LzJ4VXhIMW1OSjFaZUdyZFVp?=
+ =?utf-8?Q?eRJETnFZJnoj/F3TDt+g5PPyB?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 023e6a22-8ea3-4428-41e9-08daf308de48
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2810.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2023 12:17:29.8509
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jan 2023 12:47:44.3880
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: KbVGstKdpi/YV/7PMNHEf0kmT8gV3GhuzCYVjKgqcdhZcLByR+2sIeu5yfSt8yrPSlMP3FsDxFRiBgqgXGaxWK2TR7iikBXPfUVZe/ORsnyjPiuaPu2+A7kheqwWVRRC
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR01MB6333
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: oBkBbaOJS7lb2kPOzhVEcsB2IhdbNiLzgD+s1D5iAVBLmMHz9uQj2gFr/ytn73+rsNiDZ8eb6PH8cTvnbb+/BA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6321
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -129,73 +136,371 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-Hi Marc,
+> Add a #HV exception handler that uses IST stack.
+> 
+> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
+> ---
+>   arch/x86/entry/entry_64.S             | 58 +++++++++++++++++++++++++++
+>   arch/x86/include/asm/cpu_entry_area.h |  6 +++
+>   arch/x86/include/asm/idtentry.h       | 39 +++++++++++++++++-
+>   arch/x86/include/asm/page_64_types.h  |  1 +
+>   arch/x86/include/asm/trapnr.h         |  1 +
+>   arch/x86/include/asm/traps.h          |  1 +
+>   arch/x86/kernel/cpu/common.c          |  1 +
+>   arch/x86/kernel/dumpstack_64.c        |  9 ++++-
+>   arch/x86/kernel/idt.c                 |  1 +
+>   arch/x86/kernel/sev.c                 | 53 ++++++++++++++++++++++++
+>   arch/x86/mm/cpu_entry_area.c          |  2 +
+>   11 files changed, 169 insertions(+), 3 deletions(-)
+> 
+> diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+> index 9953d966d124..b2059df43c57 100644
+> --- a/arch/x86/entry/entry_64.S
+> +++ b/arch/x86/entry/entry_64.S
+> @@ -560,6 +560,64 @@ SYM_CODE_START(\asmsym)
+>   .Lfrom_usermode_switch_stack_\@:
+>   	idtentry_body user_\cfunc, has_error_code=1
+>   
+> +_ASM_NOKPROBE(\asmsym)
+> +SYM_CODE_END(\asmsym)
+> +.endm
+> +/*
+> + * idtentry_hv - Macro to generate entry stub for #HV
+> + * @vector:		Vector number
+> + * @asmsym:		ASM symbol for the entry point
+> + * @cfunc:		C function to be called
+> + *
+> + * The macro emits code to set up the kernel context for #HV. The #HV handler
+> + * runs on an IST stack and needs to be able to support nested #HV exceptions.
+> + *
+> + * To make this work the #HV entry code tries its best to pretend it doesn't use
+> + * an IST stack by switching to the task stack if coming from user-space (which
+> + * includes early SYSCALL entry path) or back to the stack in the IRET frame if
+> + * entered from kernel-mode.
+> + *
+> + * If entered from kernel-mode the return stack is validated first, and if it is
+> + * not safe to use (e.g. because it points to the entry stack) the #HV handler
+> + * will switch to a fall-back stack (HV2) and call a special handler function.
+> + *
+> + * The macro is only used for one vector, but it is planned to be extended in
+> + * the future for the #HV exception.
 
-On 24-08-2022 11:33 am, Ganapatrao Kulkarni wrote:
-> This series contains 3 fixes which were found while testing
-> ARM64 Nested Virtualization patch series.
-> 
-> First patch avoids the restart of hrtimer when timer interrupt is
-> fired/forwarded to Guest-Hypervisor.
-> 
-> Second patch fixes the vtimer interrupt drop from the Guest-Hypervisor.
-> 
-> Third patch fixes the NestedVM boot hang seen when Guest Hypersior
-> configured with 64K pagesize where as Host Hypervisor with 4K.
-> 
-> These patches are rebased on Nested Virtualization V6 patchset[1].
-
-If I boot a Guest Hypervisor with more cores and then booting of a 
-NestedVM with equal number of cores or booting multiple 
-NestedVMs(simultaneously) with lower number of cores is resulting in 
-very slow booting and some time RCU soft-lockup of a NestedVM. This I 
-have debugged and turned out to be due to many SGI are getting asserted 
-to all vCPUs of a Guest-Hypervisor when Guest-Hypervisor KVM code 
-prepares NestedVM for WFI wakeup/return.
-
-When Guest Hypervisor prepares NestedVM while returning/resuming from 
-WFI, it is loading guest-context,  vGIC and timer contexts etc.
-The function gic_poke_irq (called from irq_set_irqchip_state with 
-spinlock held) writes to register GICD_ISACTIVER in Guest-Hypervisor's 
-KVM code resulting in mem-abort trap to Host Hypervisor. Host Hypervisor 
-as part of handling the guest mem abort, function io_mem_abort is called 
-  in turn vgic_mmio_write_sactive, which prepares every vCPU of Guest 
-Hypervisor by calling SGI. The number of SGI/IPI calls goes 
-exponentially high when more and more cores are used to boot Guest 
-Hypervisor.
-
-Code trace:
-At Guest-hypervisor: 
-kvm_timer_vcpu_load->kvm_timer_vcpu_load_gic->set_timer_irq_phys_active->
-irq_set_irqchip_state->gic_poke_irq
-
-At Host-Hypervisor: io_mem_abort-> 
-kvm_io_bus_write->__kvm_io_bus_write->dispatch_mmio_write->
-vgic_mmio_write_sactive->vgic_access_active_prepare->
-kvm_kick_many_cpus->smp_call_function_many
-
-I am currently working around this with "nohlt" kernel param to 
-NestedVM. Any suggestions to handle/fix this case/issue and avoid the 
-slowness of booting of NestedVM with more cores?
-
-Note: Guest-Hypervisor and NestedVM are using default kernel installed 
-using Fedora 36 iso.
-
-> 
-> [1] https://www.spinics.net/lists/kvm/msg265656.html
-> 
-> D Scott Phillips (1):
->    KVM: arm64: nv: only emulate timers that have not yet fired
-> 
-> Ganapatrao Kulkarni (2):
->    KVM: arm64: nv: Emulate ISTATUS when emulated timers are fired.
->    KVM: arm64: nv: Avoid block mapping if max_map_size is smaller than
->      block size.
-> 
->   arch/arm64/kvm/arch_timer.c | 8 +++++++-
->   arch/arm64/kvm/mmu.c        | 2 +-
->   2 files changed, 8 insertions(+), 2 deletions(-)
-> 
+Noticed same comment line in the #VC exception handling section (macro 
+idtentry_vc). Just wondering we need to remove this line as the patch 
+being proposed for the #HV exception handling? unless this is planned to 
+be extended in some other way.
 
 Thanks,
-Ganapat
+Pankaj
+
+> + */
+> +.macro idtentry_hv vector asmsym cfunc
+> +SYM_CODE_START(\asmsym)
+> +	UNWIND_HINT_IRET_REGS
+> +	ASM_CLAC
+> +	pushq	$-1			/* ORIG_RAX: no syscall to restart */
+> +
+> +	testb	$3, CS-ORIG_RAX(%rsp)
+> +	jnz	.Lfrom_usermode_switch_stack_\@
+> +
+> +	call	paranoid_entry
+> +
+> +	UNWIND_HINT_REGS
+> +
+> +	/*
+> +	 * Switch off the IST stack to make it free for nested exceptions.
+> +	 */
+> +	movq	%rsp, %rdi		/* pt_regs pointer */
+> +	call	hv_switch_off_ist
+> +	movq	%rax, %rsp		/* Switch to new stack */
+> +
+> +	UNWIND_HINT_REGS
+> +
+> +	/* Update pt_regs */
+> +	movq	ORIG_RAX(%rsp), %rsi	/* get error code into 2nd argument*/
+> +	movq	$-1, ORIG_RAX(%rsp)	/* no syscall to restart */
+> +
+> +	movq	%rsp, %rdi		/* pt_regs pointer */
+> +	call	kernel_\cfunc
+> +
+> +	jmp	paranoid_exit
+> +
+> +.Lfrom_usermode_switch_stack_\@:
+> +	idtentry_body user_\cfunc, has_error_code=1
+> +
+>   _ASM_NOKPROBE(\asmsym)
+>   SYM_CODE_END(\asmsym)
+>   .endm
+> diff --git a/arch/x86/include/asm/cpu_entry_area.h b/arch/x86/include/asm/cpu_entry_area.h
+> index 75efc4c6f076..f173a16cfc59 100644
+> --- a/arch/x86/include/asm/cpu_entry_area.h
+> +++ b/arch/x86/include/asm/cpu_entry_area.h
+> @@ -30,6 +30,10 @@
+>   	char	VC_stack[optional_stack_size];			\
+>   	char	VC2_stack_guard[guardsize];			\
+>   	char	VC2_stack[optional_stack_size];			\
+> +	char	HV_stack_guard[guardsize];			\
+> +	char	HV_stack[optional_stack_size];			\
+> +	char	HV2_stack_guard[guardsize];			\
+> +	char	HV2_stack[optional_stack_size];			\
+>   	char	IST_top_guard[guardsize];			\
+>   
+>   /* The exception stacks' physical storage. No guard pages required */
+> @@ -52,6 +56,8 @@ enum exception_stack_ordering {
+>   	ESTACK_MCE,
+>   	ESTACK_VC,
+>   	ESTACK_VC2,
+> +	ESTACK_HV,
+> +	ESTACK_HV2,
+>   	N_EXCEPTION_STACKS
+>   };
+>   
+> diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+> index 72184b0b2219..652fea10d377 100644
+> --- a/arch/x86/include/asm/idtentry.h
+> +++ b/arch/x86/include/asm/idtentry.h
+> @@ -317,6 +317,19 @@ static __always_inline void __##func(struct pt_regs *regs)
+>   	__visible noinstr void kernel_##func(struct pt_regs *regs, unsigned long error_code);	\
+>   	__visible noinstr void   user_##func(struct pt_regs *regs, unsigned long error_code)
+>   
+> +
+> +/**
+> + * DECLARE_IDTENTRY_HV - Declare functions for the HV entry point
+> + * @vector:	Vector number (ignored for C)
+> + * @func:	Function name of the entry point
+> + *
+> + * Maps to DECLARE_IDTENTRY_RAW, but declares also the user C handler.
+> + */
+> +#define DECLARE_IDTENTRY_HV(vector, func)				\
+> +	DECLARE_IDTENTRY_RAW_ERRORCODE(vector, func);			\
+> +	__visible noinstr void kernel_##func(struct pt_regs *regs);	\
+> +	__visible noinstr void   user_##func(struct pt_regs *regs)
+> +
+>   /**
+>    * DEFINE_IDTENTRY_IST - Emit code for IST entry points
+>    * @func:	Function name of the entry point
+> @@ -376,6 +389,26 @@ static __always_inline void __##func(struct pt_regs *regs)
+>   #define DEFINE_IDTENTRY_VC_USER(func)				\
+>   	DEFINE_IDTENTRY_RAW_ERRORCODE(user_##func)
+>   
+> +/**
+> + * DEFINE_IDTENTRY_HV_KERNEL - Emit code for HV injection handler
+> + *			       when raised from kernel mode
+> + * @func:	Function name of the entry point
+> + *
+> + * Maps to DEFINE_IDTENTRY_RAW
+> + */
+> +#define DEFINE_IDTENTRY_HV_KERNEL(func)					\
+> +	DEFINE_IDTENTRY_RAW(kernel_##func)
+> +
+> +/**
+> + * DEFINE_IDTENTRY_HV_USER - Emit code for HV injection handler
+> + *			     when raised from user mode
+> + * @func:	Function name of the entry point
+> + *
+> + * Maps to DEFINE_IDTENTRY_RAW
+> + */
+> +#define DEFINE_IDTENTRY_HV_USER(func)					\
+> +	DEFINE_IDTENTRY_RAW(user_##func)
+> +
+>   #else	/* CONFIG_X86_64 */
+>   
+>   /**
+> @@ -465,6 +498,9 @@ __visible noinstr void func(struct pt_regs *regs,			\
+>   # define DECLARE_IDTENTRY_VC(vector, func)				\
+>   	idtentry_vc vector asm_##func func
+>   
+> +# define DECLARE_IDTENTRY_HV(vector, func)				\
+> +	idtentry_hv vector asm_##func func
+> +
+>   #else
+>   # define DECLARE_IDTENTRY_MCE(vector, func)				\
+>   	DECLARE_IDTENTRY(vector, func)
+> @@ -622,9 +658,10 @@ DECLARE_IDTENTRY_RAW_ERRORCODE(X86_TRAP_DF,	xenpv_exc_double_fault);
+>   DECLARE_IDTENTRY_ERRORCODE(X86_TRAP_CP,	exc_control_protection);
+>   #endif
+>   
+> -/* #VC */
+> +/* #VC & #HV */
+>   #ifdef CONFIG_AMD_MEM_ENCRYPT
+>   DECLARE_IDTENTRY_VC(X86_TRAP_VC,	exc_vmm_communication);
+> +DECLARE_IDTENTRY_HV(X86_TRAP_HV,	exc_hv_injection);
+>   #endif
+>   
+>   #ifdef CONFIG_XEN_PV
+> diff --git a/arch/x86/include/asm/page_64_types.h b/arch/x86/include/asm/page_64_types.h
+> index e9e2c3ba5923..0bd7dab676c5 100644
+> --- a/arch/x86/include/asm/page_64_types.h
+> +++ b/arch/x86/include/asm/page_64_types.h
+> @@ -29,6 +29,7 @@
+>   #define	IST_INDEX_DB		2
+>   #define	IST_INDEX_MCE		3
+>   #define	IST_INDEX_VC		4
+> +#define	IST_INDEX_HV		5
+>   
+>   /*
+>    * Set __PAGE_OFFSET to the most negative possible address +
+> diff --git a/arch/x86/include/asm/trapnr.h b/arch/x86/include/asm/trapnr.h
+> index f5d2325aa0b7..c6583631cecb 100644
+> --- a/arch/x86/include/asm/trapnr.h
+> +++ b/arch/x86/include/asm/trapnr.h
+> @@ -26,6 +26,7 @@
+>   #define X86_TRAP_XF		19	/* SIMD Floating-Point Exception */
+>   #define X86_TRAP_VE		20	/* Virtualization Exception */
+>   #define X86_TRAP_CP		21	/* Control Protection Exception */
+> +#define X86_TRAP_HV		28	/* HV injected exception in SNP restricted mode */
+>   #define X86_TRAP_VC		29	/* VMM Communication Exception */
+>   #define X86_TRAP_IRET		32	/* IRET Exception */
+>   
+> diff --git a/arch/x86/include/asm/traps.h b/arch/x86/include/asm/traps.h
+> index 47ecfff2c83d..6795d3e517d6 100644
+> --- a/arch/x86/include/asm/traps.h
+> +++ b/arch/x86/include/asm/traps.h
+> @@ -16,6 +16,7 @@ asmlinkage __visible notrace
+>   struct pt_regs *fixup_bad_iret(struct pt_regs *bad_regs);
+>   void __init trap_init(void);
+>   asmlinkage __visible noinstr struct pt_regs *vc_switch_off_ist(struct pt_regs *eregs);
+> +asmlinkage __visible noinstr struct pt_regs *hv_switch_off_ist(struct pt_regs *eregs);
+>   #endif
+>   
+>   extern bool ibt_selftest(void);
+> diff --git a/arch/x86/kernel/cpu/common.c b/arch/x86/kernel/cpu/common.c
+> index 3e508f239098..87afa3a4c8b1 100644
+> --- a/arch/x86/kernel/cpu/common.c
+> +++ b/arch/x86/kernel/cpu/common.c
+> @@ -2165,6 +2165,7 @@ static inline void tss_setup_ist(struct tss_struct *tss)
+>   	tss->x86_tss.ist[IST_INDEX_MCE] = __this_cpu_ist_top_va(MCE);
+>   	/* Only mapped when SEV-ES is active */
+>   	tss->x86_tss.ist[IST_INDEX_VC] = __this_cpu_ist_top_va(VC);
+> +	tss->x86_tss.ist[IST_INDEX_HV] = __this_cpu_ist_top_va(HV);
+>   }
+>   
+>   #else /* CONFIG_X86_64 */
+> diff --git a/arch/x86/kernel/dumpstack_64.c b/arch/x86/kernel/dumpstack_64.c
+> index 6c5defd6569a..23aa5912c87a 100644
+> --- a/arch/x86/kernel/dumpstack_64.c
+> +++ b/arch/x86/kernel/dumpstack_64.c
+> @@ -26,11 +26,14 @@ static const char * const exception_stack_names[] = {
+>   		[ ESTACK_MCE	]	= "#MC",
+>   		[ ESTACK_VC	]	= "#VC",
+>   		[ ESTACK_VC2	]	= "#VC2",
+> +		[ ESTACK_HV	]	= "#HV",
+> +		[ ESTACK_HV2	]	= "#HV2",
+> +		
+>   };
+>   
+>   const char *stack_type_name(enum stack_type type)
+>   {
+> -	BUILD_BUG_ON(N_EXCEPTION_STACKS != 6);
+> +	BUILD_BUG_ON(N_EXCEPTION_STACKS != 8);
+>   
+>   	if (type == STACK_TYPE_TASK)
+>   		return "TASK";
+> @@ -89,6 +92,8 @@ struct estack_pages estack_pages[CEA_ESTACK_PAGES] ____cacheline_aligned = {
+>   	EPAGERANGE(MCE),
+>   	EPAGERANGE(VC),
+>   	EPAGERANGE(VC2),
+> +	EPAGERANGE(HV),
+> +	EPAGERANGE(HV2),
+>   };
+>   
+>   static __always_inline bool in_exception_stack(unsigned long *stack, struct stack_info *info)
+> @@ -98,7 +103,7 @@ static __always_inline bool in_exception_stack(unsigned long *stack, struct stac
+>   	struct pt_regs *regs;
+>   	unsigned int k;
+>   
+> -	BUILD_BUG_ON(N_EXCEPTION_STACKS != 6);
+> +	BUILD_BUG_ON(N_EXCEPTION_STACKS != 8);
+>   
+>   	begin = (unsigned long)__this_cpu_read(cea_exception_stacks);
+>   	/*
+> diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+> index a58c6bc1cd68..48c0a7e1dbcb 100644
+> --- a/arch/x86/kernel/idt.c
+> +++ b/arch/x86/kernel/idt.c
+> @@ -113,6 +113,7 @@ static const __initconst struct idt_data def_idts[] = {
+>   
+>   #ifdef CONFIG_AMD_MEM_ENCRYPT
+>   	ISTG(X86_TRAP_VC,		asm_exc_vmm_communication, IST_INDEX_VC),
+> +	ISTG(X86_TRAP_HV,		asm_exc_hv_injection, IST_INDEX_HV),
+>   #endif
+>   
+>   	SYSG(X86_TRAP_OF,		asm_exc_overflow),
+> diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+> index a428c62330d3..b54ee3ba37b0 100644
+> --- a/arch/x86/kernel/sev.c
+> +++ b/arch/x86/kernel/sev.c
+> @@ -2004,6 +2004,59 @@ DEFINE_IDTENTRY_VC_USER(exc_vmm_communication)
+>   	irqentry_exit_to_user_mode(regs);
+>   }
+>   
+> +static bool hv_raw_handle_exception(struct pt_regs *regs)
+> +{
+> +	return false;
+> +}
+> +
+> +static __always_inline bool on_hv_fallback_stack(struct pt_regs *regs)
+> +{
+> +	unsigned long sp = (unsigned long)regs;
+> +
+> +	return (sp >= __this_cpu_ist_bottom_va(HV2) && sp < __this_cpu_ist_top_va(HV2));
+> +}
+> +
+> +DEFINE_IDTENTRY_HV_USER(exc_hv_injection)
+> +{
+> +	irqentry_enter_from_user_mode(regs);
+> +	instrumentation_begin();
+> +
+> +	if (!hv_raw_handle_exception(regs)) {
+> +		/*
+> +		 * Do not kill the machine if user-space triggered the
+> +		 * exception. Send SIGBUS instead and let user-space deal
+> +		 * with it.
+> +		 */
+> +		force_sig_fault(SIGBUS, BUS_OBJERR, (void __user *)0);
+> +	}
+> +
+> +	instrumentation_end();
+> +	irqentry_exit_to_user_mode(regs);
+> +}
+> +
+> +DEFINE_IDTENTRY_HV_KERNEL(exc_hv_injection)
+> +{
+> +	irqentry_state_t irq_state;
+> +
+> +	irq_state = irqentry_nmi_enter(regs);
+> +	instrumentation_begin();
+> +
+> +	if (!hv_raw_handle_exception(regs)) {
+> +		pr_emerg("PANIC: Unhandled #HV exception in kernel space\n");
+> +
+> +		/* Show some debug info */
+> +		show_regs(regs);
+> +
+> +		/* Ask hypervisor to sev_es_terminate */
+> +		sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SEV_ES_GEN_REQ);
+> +
+> +		panic("Returned from Terminate-Request to Hypervisor\n");
+> +	}
+> +
+> +	instrumentation_end();
+> +	irqentry_nmi_exit(regs, irq_state);
+> +}
+> +
+>   bool __init handle_vc_boot_ghcb(struct pt_regs *regs)
+>   {
+>   	unsigned long exit_code = regs->orig_ax;
+> diff --git a/arch/x86/mm/cpu_entry_area.c b/arch/x86/mm/cpu_entry_area.c
+> index 6c2f1b76a0b6..8b1670fa2b81 100644
+> --- a/arch/x86/mm/cpu_entry_area.c
+> +++ b/arch/x86/mm/cpu_entry_area.c
+> @@ -115,6 +115,8 @@ static void __init percpu_setup_exception_stacks(unsigned int cpu)
+>   		if (cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT)) {
+>   			cea_map_stack(VC);
+>   			cea_map_stack(VC2);
+> +			cea_map_stack(HV);
+> +			cea_map_stack(HV2);
+>   		}
+>   	}
+>   }
+
