@@ -2,94 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AD96B664E4E
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 22:52:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EF5DE664E5A
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 22:56:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232261AbjAJVw0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 16:52:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52926 "EHLO
+        id S232382AbjAJV4m (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 16:56:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230161AbjAJVwY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 16:52:24 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C93DDFF5
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 13:52:23 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id p2-20020a17090a74c200b00226cc39b0afso5453577pjl.2
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 13:52:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=l82ntIFd7MfJAb7UiGfLmOAfwMt4TTGXS4HxL44y3uE=;
-        b=Uz9zoI5PIuJEA3ZBY0NKTCrxWY1gEr3XrAkrjbc0mNIWWEKtyjhjkJbdAWwFHsA5mz
-         42BBPxGHZOuY1lZXGJ8yo7K4veyW+s+7BDy00DwsX81abu/bJLJvQTyDLFNksvvnqHrY
-         Ss0cd47ymETSaSkxU2VtFh/UunHB1akrwCg4KcTsRV+2KAcpx45/1Y45D5+bQX2Oi+Ew
-         DDiPDHUQINNAXGRYONFlkS8VHXXSzrHUhusni7eGl2JPO9fpeGLmsKNNdgV/gDwacsWh
-         LFXCZ0NI7yjO/A5Kbrs8iQUInwWmRt3pU/ufQNBFCS03eoIWa8DmPo6pKlGhZ4/5MxtT
-         WA4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=l82ntIFd7MfJAb7UiGfLmOAfwMt4TTGXS4HxL44y3uE=;
-        b=UVnt52Xm04WPn4pNdrtyeMMz/mvVUsIlYuZk8rIkX0UYsR2B2OvlJz4JrMipgPnn2H
-         wpDdyUe02o5XiyFOM/kqnCRF6mV5Ga8nO6mD1z82LMdXvGvaYgA4J+cB0MIlPnzOSYqg
-         mI920j/DrwP0nTDBGqO9Hj/X/qe0tSP926dvpiPWGlo+EhT6MTZtUeHslL2qbWZChqW/
-         9oodThwusvoAHQdjBeCDBcsmc+uCzFufLqMzeZfzWNgxLvO/8Cl4jtFKOIh9O7ICFwRa
-         1f6/tXD1qfZVdYtxPvoMWgUKqjmFJp+NBpK1keCqlOOlSuxw2iy0j63nUd669F+Qt6ls
-         Ku5w==
-X-Gm-Message-State: AFqh2krmW/vxYOsawgy5BNX51aTb4370RjJ1uIMwAo3qJtHIVs4AzM5t
-        Xzzh5DofEPl+UyrSUssA1cg/DEu0raaS
-X-Google-Smtp-Source: AMrXdXstAIFHK82xxA5xKyMtQGZenpxd6q1WUBPtqRilf0ydCgzQse3nEmc5uf3aIs86K21xX17SjCa3bzB9
-X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
- (user=vipinsh job=sendgmr) by 2002:aa7:82cb:0:b0:578:3ec0:f264 with SMTP id
- f11-20020aa782cb000000b005783ec0f264mr5821763pfn.22.1673387542828; Tue, 10
- Jan 2023 13:52:22 -0800 (PST)
-Date:   Tue, 10 Jan 2023 13:52:03 -0800
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230110215203.4144627-1-vipinsh@google.com>
-Subject: [Patch] KVM: selftests: Make reclaim_period_ms input always be positive
-From:   Vipin Sharma <vipinsh@google.com>
-To:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S233418AbjAJV4g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 16:56:36 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B53BDF89
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 13:55:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 01C29B819B4
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 21:55:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FB96C433D2;
+        Tue, 10 Jan 2023 21:55:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673387748;
+        bh=sFugDj6Iq2B5+3uwAQWP4qGymuLbH8bh5FbmajTo6ZU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=ueLMRqY1e49MT71yDO1fHXjdfzxao1JqlzzqnmhaHqrS7XlWK5FMGTvrbzclrGzFJ
+         1vQjV9fRt4mOXOzPVNipeBK7XYUz5OKQ1HFQ7hFIhwnGe3uFesTIZDAjhG6Cq0PqRA
+         ZsfGUfwZ9BYaV7SPs47lDzur/vx45eEhsPTz64k7rWtGuMwWMD42Tn5DtDppZsmIyh
+         yNsbd9AbDxYRwFSLqZ9TNtR704mQMawNYsNA0TYrZnnxi2M03FmMWLgWDlAJKRWscA
+         xMQ2ktod2YLyq8Qox3UGvmT6Hs+faQoc7azeHVdjvDER1FDuq2sGI60f0srzfc+geE
+         cWmEWeSerSzow==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pFMaw-000htF-Ar;
+        Tue, 10 Jan 2023 21:55:46 +0000
+Date:   Tue, 10 Jan 2023 21:54:39 +0000
+Message-ID: <87o7r6dpi8.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+Cc:     catalin.marinas@arm.com, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, scott@os.amperecomputing.com,
+        Darren Hart <darren@os.amperecomputing.com>
+Subject: Re: [PATCH 0/3] KVM: arm64: nv: Fixes for Nested Virtualization issues
+In-Reply-To: <6171dc7c-5d83-d378-db9e-d94f27afe43a@os.amperecomputing.com>
+References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
+        <6171dc7c-5d83-d378-db9e-d94f27afe43a@os.amperecomputing.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, scott@os.amperecomputing.com, darren@os.amperecomputing.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-reclaim_period_ms used to be positive only but the commit 0001725d0f9b
-("KVM: selftests: Add atoi_positive() and atoi_non_negative() for input
-validation") incorrectly changed it to non-negative validation.
+On Tue, 10 Jan 2023 12:17:20 +0000,
+Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
+> 
+> I am currently working around this with "nohlt" kernel param to
+> NestedVM. Any suggestions to handle/fix this case/issue and avoid the
+> slowness of booting of NestedVM with more cores?
+> 
+> Note: Guest-Hypervisor and NestedVM are using default kernel installed
+> using Fedora 36 iso.
 
-Change validation to allow only positive input.
+Despite what I said earlier, I have a vague idea here, thanks to the
+interesting call traces that you provided (this is really awesome work
+BTW, given how hard it is to trace things across 3 different kernels).
 
-Signed-off-by: Vipin Sharma <vipinsh@google.com>
-Reported-by: Ben Gardon <bgardon@google.com>
----
- tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+We can slightly limit the impact of the prepare/finish sequence if the
+guest hypervisor only accesses the active registers for SGIs/PPIs on
+the vcpu that owns them, forbidding any cross-CPU-to-redistributor
+access.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-index ea0978f22db8..251794f83719 100644
---- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
-@@ -241,7 +241,7 @@ int main(int argc, char **argv)
- 	while ((opt = getopt(argc, argv, "hp:t:r")) != -1) {
- 		switch (opt) {
- 		case 'p':
--			reclaim_period_ms = atoi_non_negative("Reclaim period", optarg);
-+			reclaim_period_ms = atoi_positive("Reclaim period", optarg);
- 			break;
- 		case 't':
- 			token = atoi_paranoid(optarg);
+Something along these lines, which is only boot-tested. Let me know
+how this fares for you.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c b/arch/arm64/kvm/vgic/vgic-mmio.c
+index b32d434c1d4a..1cca45be5335 100644
+--- a/arch/arm64/kvm/vgic/vgic-mmio.c
++++ b/arch/arm64/kvm/vgic/vgic-mmio.c
+@@ -473,9 +473,10 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
+  * active state can be overwritten when the VCPU's state is synced coming back
+  * from the guest.
+  *
+- * For shared interrupts as well as GICv3 private interrupts, we have to
+- * stop all the VCPUs because interrupts can be migrated while we don't hold
+- * the IRQ locks and we don't want to be chasing moving targets.
++ * For shared interrupts as well as GICv3 private interrupts accessed from the
++ * non-owning CPU, we have to stop all the VCPUs because interrupts can be
++ * migrated while we don't hold the IRQ locks and we don't want to be chasing
++ * moving targets.
+  *
+  * For GICv2 private interrupts we don't have to do anything because
+  * userspace accesses to the VGIC state already require all VCPUs to be
+@@ -484,7 +485,8 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu *vcpu,
+  */
+ static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+ {
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
++	if ((vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 &&
++	     vcpu == kvm_get_running_vcpu()) ||
+ 	    intid >= VGIC_NR_PRIVATE_IRQS)
+ 		kvm_arm_halt_guest(vcpu->kvm);
+ }
+@@ -492,7 +494,8 @@ static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 intid)
+ /* See vgic_access_active_prepare */
+ static void vgic_access_active_finish(struct kvm_vcpu *vcpu, u32 intid)
+ {
+-	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
++	if ((vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 &&
++	     vcpu == kvm_get_running_vcpu()) ||
+ 	    intid >= VGIC_NR_PRIVATE_IRQS)
+ 		kvm_arm_resume_guest(vcpu->kvm);
+ }
+
 -- 
-2.39.0.314.g84b9a713c41-goog
-
+Without deviation from the norm, progress is not possible.
