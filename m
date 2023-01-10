@@ -2,115 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3C85D66446C
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 16:19:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A66B664486
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 16:24:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238202AbjAJPTw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 10:19:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54952 "EHLO
+        id S234020AbjAJPXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 10:23:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238428AbjAJPTs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 10:19:48 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 433585BA34;
-        Tue, 10 Jan 2023 07:19:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673363988; x=1704899988;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=19LiZ+HqQL5Doh9UbMQEiLpyHqyJB3yalB7IXIegZGI=;
-  b=gjX7z5yBGt34xq4qz63go6fFcIC9psG+T/ZWHTieHmV7wu3qS4LmbYf2
-   pzoLb1+TazcwoprG4zrNMSxzQjBNzuzmb1/X8TrMojUfA6sT6o/Yy2Ucn
-   6dpGM+36Un1qiDgPqF/RtSXwU5aSHH2/Kc3tITomvfGBEqqw7aIiuauXk
-   hPd0+22l9a+FMQt91o5lr6hA08hPHmvNFSueWStEKF0dXBzWPKQO4sK96
-   683RX7V5/kXqXPTYUCFz2J4Q8QUs8IoKjVX/dmf6gRIQmfdKBh9OGEZGc
-   rJiuEvYUyxFUQq4zCJzr8zPDpoSlXk525l7U0dlum9qEbdMKfEpTKP8Ib
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="310969213"
-X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
-   d="scan'208";a="310969213"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 07:19:47 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="657088890"
-X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
-   d="scan'208";a="657088890"
-Received: from svenka7-mobl1.amr.corp.intel.com (HELO [10.209.63.27]) ([10.209.63.27])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 07:19:47 -0800
-Message-ID: <3bfe283e-6a90-54cb-1ba2-45ce6d022206@intel.com>
-Date:   Tue, 10 Jan 2023 07:19:46 -0800
+        with ESMTP id S238969AbjAJPX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 10:23:28 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A59705C93D
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 07:23:15 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id bt23so18945046lfb.5
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 07:23:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Xei/D1xFFLE5WpxaBE/Tg4Sb4JRRguY1a3omXhNRdNQ=;
+        b=ksjpe3ePskHcWnV5GTQFpREDCBhu/f/GUrq/ztAX0yjA5OuQ+DutOkLZMxTHo/I+oT
+         gSOsKR2CYx0y6FaPPb135ztWWumo2ihZo6Ahtz3tgU5mTzh1iUVqE/qC696Px6TF03zB
+         HJ2wfcTzzjh0RCQoPte6n7r2FXr0+ml9tuu2hdvhnf1kixXGHUUotiiqqOagwsRCu4tH
+         IfshrT0GjPV1fvD03OZ9Iy/w/vDEEyqakIvbgzh/c02+8JdjVRht0JGh1ozXSnsYeKhF
+         ci6m6qdmPoXCnxYdZT2PubbzQgh5LkWDPkj0xHHait+gqehjaPIYZrb0xA5uQaMFqCZD
+         GQXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Xei/D1xFFLE5WpxaBE/Tg4Sb4JRRguY1a3omXhNRdNQ=;
+        b=YuZTWmnu8/IkKYds1eP1KuxZsRdpohInYAA1G25v0GAzrpLFCK+eFBF/8QTzeuYMu4
+         Iz5jvnDUoRrhSsQ6s03RzNA5Lc/nzdSnjTMsSdg/tlM8TFnDJr8PZCEOMotXtoJZNY+w
+         GL9lCGhsMgshb4ajoxZ/iS5UjH6KrkVgLQImQL0kT0/GlILQXT33ZvS71+RePUOxU7UZ
+         dmwkvlemSMaMW8mkSnkcbbXY9h/KjrfJMw3UXmkw1fnHd/IQgdxl8pQa1yU6c5V8h+8F
+         phLDP3+8sAWkASUdAyLoQSYaZDk5x2H9efTsuS/Al/fVJB+5IvL4vxl+edB5BTYTqeAX
+         y/oA==
+X-Gm-Message-State: AFqh2kr0a93nheZTbUzJV3OlhiDw3xv3qqoS4Nqs7jbnm7HfBVv0hU/r
+        aW4ugGt65qv8zcuJtVkVkYS0BWUKWBlg0RquZk8VOg==
+X-Google-Smtp-Source: AMrXdXutwwZyshi7xoMMAtLcru6vJQ0zecDlsCbhc0a61fPAh5s83V9KF6oInnQ7VfNNGFDxOOjHvS4HTidsTLJf/lM=
+X-Received: by 2002:ac2:5e7c:0:b0:4c3:d803:4427 with SMTP id
+ a28-20020ac25e7c000000b004c3d8034427mr2883098lfr.170.1673364193464; Tue, 10
+ Jan 2023 07:23:13 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v8 11/16] x86/virt/tdx: Designate reserved areas for all
- TDMRs
-Content-Language: en-US
-To:     "Huang, Kai" <kai.huang@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc:     "Luck, Tony" <tony.luck@intel.com>,
-        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "Chatre, Reinette" <reinette.chatre@intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "imammedo@redhat.com" <imammedo@redhat.com>,
-        "Gao, Chao" <chao.gao@intel.com>,
-        "Brown, Len" <len.brown@intel.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "sathyanarayanan.kuppuswamy@linux.intel.com" 
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        "Huang, Ying" <ying.huang@intel.com>,
-        "Williams, Dan J" <dan.j.williams@intel.com>
-References: <cover.1670566861.git.kai.huang@intel.com>
- <27dcd2781a450b3f77a2aec833de6a3669bc0fb8.1670566861.git.kai.huang@intel.com>
- <2d7d2824-7aa7-5f96-d79b-b44ff7fe2ef9@intel.com>
- <b971cd8b4e6ce9e96c6b4c6192adb74cc6722d54.camel@intel.com>
- <778a6c80-a955-620d-a82a-c2ca82f26363@intel.com>
- <24ea02aa4db7d470adeb7a64b7692d8bd5a428ca.camel@intel.com>
-From:   Dave Hansen <dave.hansen@intel.com>
-In-Reply-To: <24ea02aa4db7d470adeb7a64b7692d8bd5a428ca.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-63-michael.roth@amd.com>
+ <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com> <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
+ <54ff7326-e3a4-945f-1f60-e73dd8865527@amd.com> <a3ecd9fc-11f8-49b6-09a2-349df815d2cf@linux.ibm.com>
+ <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
+In-Reply-To: <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
+From:   Peter Gonda <pgonda@google.com>
+Date:   Tue, 10 Jan 2023 08:23:01 -0700
+Message-ID: <CAMkAt6rMwiHoNWLtrdN8g8Ghv8yN8f8fZQBBkXvUdDpdtovPzg@mail.gmail.com>
+Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
+To:     Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Dov Murik <dovmurik@linux.ibm.com>,
+        Dionna Amalie Glaze <dionnaglaze@google.com>,
+        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/10/23 03:01, Huang, Kai wrote:
-> On Mon, 2023-01-09 at 17:22 -0800, Dave Hansen wrote:
->> On 1/9/23 17:19, Huang, Kai wrote:
->>>> It's probably also worth noting *somewhere* that there's a balance to be
->>>> had between TDMRs and reserved areas.  A system that is running out of
->>>> reserved areas in a TDMR could split a TDMR to get more reserved areas.
->>>> A system that has run out of TDMRs could relatively easily coalesce two
->>>> adjacent TDMRs (before the PAMTs are allocated) and use a reserved area
->>>> if there was a gap between them.
->>> We can add above to the changelog of this patch, or the patch 09 ("x86/virt/tdx:
->>> Fill out TDMRs to cover all TDX memory regions").  The latter perhaps is better
->>> since that patch is the first place where the balance of TDMRs and reserved
->>> areas is related.
->>>
->>> What is your suggestion?
->> Just put it close to the code that actually hits the problem so the
->> potential solution is close at hand to whoever hits the problem.
->>
-> Sorry to double check: the code which hits the problem is the 'if (idx >=
-> max_reserved_per_tdmr)' check in tdmr_add_rsvd_area(), so I think I can add
-> right before this check?
+On Tue, Jan 10, 2023 at 8:10 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>
+> On 1/10/23 01:10, Dov Murik wrote:
+> > Hi Tom,
+> >
+> > On 10/01/2023 0:27, Tom Lendacky wrote:
+> >> On 1/9/23 10:55, Dionna Amalie Glaze wrote:
+> >>>>> +
+> >>>>> +static int snp_set_instance_certs(struct kvm *kvm, struct
+> >>>>> kvm_sev_cmd *argp)
+> >>>>> +{
+> >>>> [...]
+> >>>>
+> >>>> Here we set the length to the page-aligned value, but we copy only
+> >>>> params.cert_len bytes.  If there are two subsequent
+> >>>> snp_set_instance_certs() calls where the second one has a shorter
+> >>>> length, we might "keep" some leftover bytes from the first call.
+> >>>>
+> >>>> Consider:
+> >>>> 1. snp_set_instance_certs(certs_addr point to "AAA...", certs_len=8192)
+> >>>> 2. snp_set_instance_certs(certs_addr point to "BBB...", certs_len=4097)
+> >>>>
+> >>>> If I understand correctly, on the second call we'll copy 4097 "BBB..."
+> >>>> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
+> >>>> 1) & PAGE_MASK which will be 8192.
+> >>>>
+> >>>> Later when fetching the certs (for the extended report or in
+> >>>> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
+> >>>> filled with 4097 BBBs and 4095 leftover AAAs.
+> >>>>
+> >>>> Maybe zero sev->snp_certs_data entirely before writing to it?
+> >>>>
+> >>>
+> >>> Yes, I agree it should be zeroed, at least if the previous length is
+> >>> greater than the new length. Good catch.
+> >>>
+> >>>
+> >>>> Related question (not only for this patch) regarding snp_certs_data
+> >>>> (host or per-instance): why is its size page-aligned at all? why is it
+> >>>> limited by 16KB or 20KB? If I understand correctly, for SNP, this buffer
+> >>>> is never sent to the PSP.
+> >>>>
+> >>>
+> >>> The buffer is meant to be copied into the guest driver following the
+> >>> GHCB extended guest request protocol. The data to copy back are
+> >>> expected to be in 4K page granularity.
+> >>
+> >> I don't think the data has to be in 4K page granularity. Why do you
+> >> think it does?
+> >>
+> >
+> > I looked at AMD publication 56421 SEV-ES Guest-Hypervisor Communication
+> > Block Standardization (July 2022), page 37.  The table says:
+> >
+> > --------------
+> >
+> > NAE Event: SNP Extended Guest Request
+> >
+> > Notes:
+> >
+> > RAX will have the guest physical address of the page(s) to hold returned
+> > data
+> >
+> > RBX
+> > State to Hypervisor: will contain the number of guest contiguous
+> > pages supplied to hold returned data
+> > State from Hypervisor: on error will contain the number of guest
+> > contiguous pages required to hold the data to be returned
+> >
+> > ...
+> >
+> > The request page, response page and data page(s) must be assigned to the
+> > hypervisor (shared).
+> >
+> > --------------
+> >
+> >
+> > According to this spec, it looks like the sizes are communicated as
+> > number of pages in RBX.  So the data should start at a 4KB alignment
+> > (this is verified in snp_handle_ext_guest_request()) and its length
+> > should be 4KB-aligned, as Dionna noted.
+>
+> That only indicates how many pages are required to hold the data, but the
+> hypervisor only has to copy however much data is present. If the data is
+> 20 bytes, then you only have to copy 20 bytes. If the user supplied 0 for
+> the number of pages, then the code returns 1 in RBX to indicate that one
+> page is required to hold the 20 bytes.
+>
+> >
+> > I see no reason (in the spec and in the kernel code) for the data length
+> > to be limited to 16KB (SEV_FW_BLOB_MAX_SIZE) but I might be missing some
+> > flow because Dionna ran into this limit.
+>
+> Correct, there is no limit. I believe that SEV_FW_BLOB_MAX_SIZE is a way
+> to keep the memory usage controlled because data is coming from userspace
+> and it isn't expected that the data would be larger than that.
+>
+> I'm not sure if that was in from the start or as a result of a review
+> comment. Not sure what is the best approach is.
 
-Please just hack together how you think it should look and either reply
-with an updated patch, or paste the relevant code snippet in your reply.
- That'll keep me from having to go chase this code back down.
+This was discussed a bit in the guest driver changes recently too that
+SEV_FW_BLOB_MAX_SIZE is used in the guest driver code for the max cert
+length. We discussed increasing the limit there after fixing the IV
+reuse issue.
 
+Maybe we could introduce SEV_CERT_BLOB_MAX_SIZE here to be more clear
+there is no firmware based limit? Then we could switch the guest
+driver to use that too. Dionna confirmed 4 pages is enough for our
+current usecase, Dov would you recommend something larger to start?
+
+>
+> Thanks,
+> Tom
+>
+> >
+> >
+> > -Dov
+> >
+> >
+> >
+> >> Thanks,
+> >> Tom
+> >>
+> >>>
+> >>>> [...]
+> >>>>>
+> >>>>> -#define SEV_FW_BLOB_MAX_SIZE 0x4000  /* 16KB */
+> >>>>> +#define SEV_FW_BLOB_MAX_SIZE 0x5000  /* 20KB */
+> >>>>>
+> >>>>
+> >>>> This has effects in drivers/crypto/ccp/sev-dev.c
+> >>>>                                                                  (for
+> >>>> example in alloc_snp_host_map).  Is that OK?
+> >>>>
+> >>>
+> >>> No, this was a mistake of mine because I was using a bloated data
+> >>> encoding that needed 5 pages for the GUID table plus 4 small
+> >>> certificates. I've since fixed that in our user space code.
+> >>> We shouldn't change this size and instead wait for a better size
+> >>> negotiation protocol between the guest and host to avoid this awkward
+> >>> hard-coding.
+> >>>
+> >>>
