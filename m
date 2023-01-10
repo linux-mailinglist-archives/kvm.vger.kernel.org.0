@@ -2,228 +2,213 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A66B664486
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 16:24:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C8D36644A3
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 16:26:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234020AbjAJPXp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 10:23:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
+        id S238891AbjAJP0X (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 10:26:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238969AbjAJPX2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 10:23:28 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A59705C93D
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 07:23:15 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id bt23so18945046lfb.5
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 07:23:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xei/D1xFFLE5WpxaBE/Tg4Sb4JRRguY1a3omXhNRdNQ=;
-        b=ksjpe3ePskHcWnV5GTQFpREDCBhu/f/GUrq/ztAX0yjA5OuQ+DutOkLZMxTHo/I+oT
-         gSOsKR2CYx0y6FaPPb135ztWWumo2ihZo6Ahtz3tgU5mTzh1iUVqE/qC696Px6TF03zB
-         HJ2wfcTzzjh0RCQoPte6n7r2FXr0+ml9tuu2hdvhnf1kixXGHUUotiiqqOagwsRCu4tH
-         IfshrT0GjPV1fvD03OZ9Iy/w/vDEEyqakIvbgzh/c02+8JdjVRht0JGh1ozXSnsYeKhF
-         ci6m6qdmPoXCnxYdZT2PubbzQgh5LkWDPkj0xHHait+gqehjaPIYZrb0xA5uQaMFqCZD
-         GQXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xei/D1xFFLE5WpxaBE/Tg4Sb4JRRguY1a3omXhNRdNQ=;
-        b=YuZTWmnu8/IkKYds1eP1KuxZsRdpohInYAA1G25v0GAzrpLFCK+eFBF/8QTzeuYMu4
-         Iz5jvnDUoRrhSsQ6s03RzNA5Lc/nzdSnjTMsSdg/tlM8TFnDJr8PZCEOMotXtoJZNY+w
-         GL9lCGhsMgshb4ajoxZ/iS5UjH6KrkVgLQImQL0kT0/GlILQXT33ZvS71+RePUOxU7UZ
-         dmwkvlemSMaMW8mkSnkcbbXY9h/KjrfJMw3UXmkw1fnHd/IQgdxl8pQa1yU6c5V8h+8F
-         phLDP3+8sAWkASUdAyLoQSYaZDk5x2H9efTsuS/Al/fVJB+5IvL4vxl+edB5BTYTqeAX
-         y/oA==
-X-Gm-Message-State: AFqh2kr0a93nheZTbUzJV3OlhiDw3xv3qqoS4Nqs7jbnm7HfBVv0hU/r
-        aW4ugGt65qv8zcuJtVkVkYS0BWUKWBlg0RquZk8VOg==
-X-Google-Smtp-Source: AMrXdXutwwZyshi7xoMMAtLcru6vJQ0zecDlsCbhc0a61fPAh5s83V9KF6oInnQ7VfNNGFDxOOjHvS4HTidsTLJf/lM=
-X-Received: by 2002:ac2:5e7c:0:b0:4c3:d803:4427 with SMTP id
- a28-20020ac25e7c000000b004c3d8034427mr2883098lfr.170.1673364193464; Tue, 10
- Jan 2023 07:23:13 -0800 (PST)
+        with ESMTP id S238936AbjAJPZ4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 10:25:56 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A95D08F28D
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 07:25:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:Date:Cc:To:
+        From:Subject:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=T8Obw+7sjFmbKysBeUKTza7vyg9gBvKU2wHfICs3Syc=; b=RsAejYPzPUIkQLba5Ot9s2f1dT
+        8wu5KzgGfebovUBs9s9arHC5bW6d+V0mj4/R9Oyi8V4bcnj/5xIUBQWgOJd93ixxuHeizy+iu2BfH
+        0Un4EUi6AQ3ZCW/yl3M0mj1MBrM/YXvxHQYEIOrVWiTrbruOoZjw4Cmd/bMPufVMi7VHOZsDu04Lb
+        GD9wASEDtPytUB8VP/sZ1SvZ0Mm2CIt075zLIH5X6GtnKrOruoD7yfZYXLiUacUxv+B+CFaI5tKfH
+        UE4klWlyIZKEyhX0XxlH9lRyUxhqNU3VdzVndlnx7DGwCd4YUOgSvR9tU8xeo4N3FVya3hAIRjuih
+        vg2pNr6w==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pFGVO-003K6I-FX; Tue, 10 Jan 2023 15:25:38 +0000
+Message-ID: <99b1da6ca8293b201fe0a89fd973a9b2f70dc450.camel@infradead.org>
+Subject: [PATCH] KVM: x86/xen: Fix lockdep warning on "recursive" gpc locking
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, paul <paul@xen.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>
+Date:   Tue, 10 Jan 2023 15:25:24 +0000
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-diUk5hitFg8IKjQJNY5V"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-63-michael.roth@amd.com>
- <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com> <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
- <54ff7326-e3a4-945f-1f60-e73dd8865527@amd.com> <a3ecd9fc-11f8-49b6-09a2-349df815d2cf@linux.ibm.com>
- <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
-In-Reply-To: <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
-From:   Peter Gonda <pgonda@google.com>
-Date:   Tue, 10 Jan 2023 08:23:01 -0700
-Message-ID: <CAMkAt6rMwiHoNWLtrdN8g8Ghv8yN8f8fZQBBkXvUdDpdtovPzg@mail.gmail.com>
-Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
-To:     Tom Lendacky <thomas.lendacky@amd.com>
-Cc:     Dov Murik <dovmurik@linux.ibm.com>,
-        Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 8:10 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
->
-> On 1/10/23 01:10, Dov Murik wrote:
-> > Hi Tom,
-> >
-> > On 10/01/2023 0:27, Tom Lendacky wrote:
-> >> On 1/9/23 10:55, Dionna Amalie Glaze wrote:
-> >>>>> +
-> >>>>> +static int snp_set_instance_certs(struct kvm *kvm, struct
-> >>>>> kvm_sev_cmd *argp)
-> >>>>> +{
-> >>>> [...]
-> >>>>
-> >>>> Here we set the length to the page-aligned value, but we copy only
-> >>>> params.cert_len bytes.  If there are two subsequent
-> >>>> snp_set_instance_certs() calls where the second one has a shorter
-> >>>> length, we might "keep" some leftover bytes from the first call.
-> >>>>
-> >>>> Consider:
-> >>>> 1. snp_set_instance_certs(certs_addr point to "AAA...", certs_len=8192)
-> >>>> 2. snp_set_instance_certs(certs_addr point to "BBB...", certs_len=4097)
-> >>>>
-> >>>> If I understand correctly, on the second call we'll copy 4097 "BBB..."
-> >>>> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
-> >>>> 1) & PAGE_MASK which will be 8192.
-> >>>>
-> >>>> Later when fetching the certs (for the extended report or in
-> >>>> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
-> >>>> filled with 4097 BBBs and 4095 leftover AAAs.
-> >>>>
-> >>>> Maybe zero sev->snp_certs_data entirely before writing to it?
-> >>>>
-> >>>
-> >>> Yes, I agree it should be zeroed, at least if the previous length is
-> >>> greater than the new length. Good catch.
-> >>>
-> >>>
-> >>>> Related question (not only for this patch) regarding snp_certs_data
-> >>>> (host or per-instance): why is its size page-aligned at all? why is it
-> >>>> limited by 16KB or 20KB? If I understand correctly, for SNP, this buffer
-> >>>> is never sent to the PSP.
-> >>>>
-> >>>
-> >>> The buffer is meant to be copied into the guest driver following the
-> >>> GHCB extended guest request protocol. The data to copy back are
-> >>> expected to be in 4K page granularity.
-> >>
-> >> I don't think the data has to be in 4K page granularity. Why do you
-> >> think it does?
-> >>
-> >
-> > I looked at AMD publication 56421 SEV-ES Guest-Hypervisor Communication
-> > Block Standardization (July 2022), page 37.  The table says:
-> >
-> > --------------
-> >
-> > NAE Event: SNP Extended Guest Request
-> >
-> > Notes:
-> >
-> > RAX will have the guest physical address of the page(s) to hold returned
-> > data
-> >
-> > RBX
-> > State to Hypervisor: will contain the number of guest contiguous
-> > pages supplied to hold returned data
-> > State from Hypervisor: on error will contain the number of guest
-> > contiguous pages required to hold the data to be returned
-> >
-> > ...
-> >
-> > The request page, response page and data page(s) must be assigned to the
-> > hypervisor (shared).
-> >
-> > --------------
-> >
-> >
-> > According to this spec, it looks like the sizes are communicated as
-> > number of pages in RBX.  So the data should start at a 4KB alignment
-> > (this is verified in snp_handle_ext_guest_request()) and its length
-> > should be 4KB-aligned, as Dionna noted.
->
-> That only indicates how many pages are required to hold the data, but the
-> hypervisor only has to copy however much data is present. If the data is
-> 20 bytes, then you only have to copy 20 bytes. If the user supplied 0 for
-> the number of pages, then the code returns 1 in RBX to indicate that one
-> page is required to hold the 20 bytes.
->
-> >
-> > I see no reason (in the spec and in the kernel code) for the data length
-> > to be limited to 16KB (SEV_FW_BLOB_MAX_SIZE) but I might be missing some
-> > flow because Dionna ran into this limit.
->
-> Correct, there is no limit. I believe that SEV_FW_BLOB_MAX_SIZE is a way
-> to keep the memory usage controlled because data is coming from userspace
-> and it isn't expected that the data would be larger than that.
->
-> I'm not sure if that was in from the start or as a result of a review
-> comment. Not sure what is the best approach is.
 
-This was discussed a bit in the guest driver changes recently too that
-SEV_FW_BLOB_MAX_SIZE is used in the guest driver code for the max cert
-length. We discussed increasing the limit there after fixing the IV
-reuse issue.
+--=-diUk5hitFg8IKjQJNY5V
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Maybe we could introduce SEV_CERT_BLOB_MAX_SIZE here to be more clear
-there is no firmware based limit? Then we could switch the guest
-driver to use that too. Dionna confirmed 4 pages is enough for our
-current usecase, Dov would you recommend something larger to start?
+From: David Woodhouse <dwmw@amazon.co.uk>
 
->
-> Thanks,
-> Tom
->
-> >
-> >
-> > -Dov
-> >
-> >
-> >
-> >> Thanks,
-> >> Tom
-> >>
-> >>>
-> >>>> [...]
-> >>>>>
-> >>>>> -#define SEV_FW_BLOB_MAX_SIZE 0x4000  /* 16KB */
-> >>>>> +#define SEV_FW_BLOB_MAX_SIZE 0x5000  /* 20KB */
-> >>>>>
-> >>>>
-> >>>> This has effects in drivers/crypto/ccp/sev-dev.c
-> >>>>                                                                  (for
-> >>>> example in alloc_snp_host_map).  Is that OK?
-> >>>>
-> >>>
-> >>> No, this was a mistake of mine because I was using a bloated data
-> >>> encoding that needed 5 pages for the GUID table plus 4 small
-> >>> certificates. I've since fixed that in our user space code.
-> >>> We shouldn't change this size and instead wait for a better size
-> >>> negotiation protocol between the guest and host to avoid this awkward
-> >>> hard-coding.
-> >>>
-> >>>
+In commit 5ec3289b31 ("KVM: x86/xen: Compatibility fixes for shared runstat=
+e
+area") we declared it safe to obtain two gfn_to_pfn_cache locks at the same
+time:
+	/*
+	 * The guest's runstate_info is split across two pages and we
+	 * need to hold and validate both GPCs simultaneously. We can
+	 * declare a lock ordering GPC1 > GPC2 because nothing else
+	 * takes them more than one at a time.
+	 */
+
+However, we forgot to tell lockdep. Do so, by setting a subclass on the
+first lock before taking the second.
+
+Fixes: 5ec3289b31 ("KVM: x86/xen: Compatibility fixes for shared runstate a=
+rea")
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/x86/kvm/xen.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 402d9a34552c..07e61cc9881e 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -305,8 +305,10 @@ static void kvm_xen_update_runstate_guest(struct kvm_v=
+cpu *v, bool atomic)
+ 		 * The guest's runstate_info is split across two pages and we
+ 		 * need to hold and validate both GPCs simultaneously. We can
+ 		 * declare a lock ordering GPC1 > GPC2 because nothing else
+-		 * takes them more than one at a time.
++		 * takes them more than one at a time. Set a subclass on the
++		 * gpc1 lock to make lockdep shut up about it.
+ 		 */
++		lock_set_subclass(&gpc1->lock.dep_map, 1, _THIS_IP_);
+ 		read_lock(&gpc2->lock);
+=20
+ 		if (!kvm_gpc_check(gpc2, user_len2)) {
+--=20
+2.35.3
+
+
+
+--=-diUk5hitFg8IKjQJNY5V
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTEwMTUyNTI0WjAvBgkqhkiG9w0BCQQxIgQg/NEABYw+
+faWd4LhU0azUOICSzvE6YcH2B7n/e2BNC50wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCakulY5HzPKOSIIqArf42wEg/KIYwGO96i
+k/ozgt55F8iI1yubrK94DOkBj+B191BAOEg7GvQ69SAfLjt/8o1Csa2N1Bt2m2MrXo9SomybfBgu
+Y1pshajH7sTGkyXlfPGWLB797LTjc7zmoe4pVmfwX6rBDM5tlJkAOPyF3t+N8ALXoGc4aagKtgyr
+cvZlv4PQx0n5a/lqKG6CQG61z4rbYBl8BaESDyuhKcMhxxntO0VrNFhpt1EnT5Ry37qJbRxJQgbi
+Z1X4l2Uxl53mqQROp5nAxeFZLXGtgaGbQO+7hDqYuj1ITltQeJZI+zNksLGlKnCcH+tORi2+1f4N
+P0pD2O00ohMg9qa6ZmjLKEV2J8EV84YAbru8KOYWsuiN9/ABi7uc0JPZXSo27V0v9V+fCpmdx22O
+pnXu+kkN/H/F+y6yefG0eh7YH1b80f47gHleET/YWWQuGwlSdODH5P4wMFnuaArFzVXX1eKSE9OD
+r+Rbp98RwehFSlLc0oVczfboidc49tXY/WNMDfrPcE3Mdsgch4T+sFvlomD+MBG3fli1xYUb7WK/
+0dNLVleoFLvOvrm2itC+dL61MJwB5+y8L5jOqZCjhb+7i0bUXZTwlUEID+RV7HHVO1uy0286GII/
+sXrLU3YpUfbWjPiroZ2Gq8E+IbgfAYcswk8VX8e07QAAAAAAAA==
+
+
+--=-diUk5hitFg8IKjQJNY5V--
