@@ -2,58 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D8F06646F4
-	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 18:04:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6DC236646F6
+	for <lists+kvm@lfdr.de>; Tue, 10 Jan 2023 18:04:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238747AbjAJREb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 12:04:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
+        id S238731AbjAJREd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 12:04:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238540AbjAJREM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 12:04:12 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B3E44C42
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:04:12 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id a18-20020a62bd12000000b0056e7b61ec78so5496907pff.17
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:04:12 -0800 (PST)
+        with ESMTP id S238782AbjAJREP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 12:04:15 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7EBE3FA1F
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:04:13 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id w18-20020a170902e89200b00192e2fde1ceso8866145plg.20
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 09:04:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wd8IRDcm/I+X4nIj9mIHk75KksnNCPDW6vKldjVyscc=;
-        b=sXj2PNkyoMv/M5+nsVqLWsJP641hr0cV8y9ddDpJOvUNXV1XuSoarlapj938jgSnhS
-         7rNRsSXpXqyhkaSWdzHRtCItCxinKVzUL1Jr1X2XUz/VU3KzXYASlQpsAGFOkCjC/8vm
-         +eddG+vkUrudOO9iwYbhlgBEhcUgq5bqdYfWPPmLUFBBXflINQYNwrKNDdfkdHCjoXTX
-         84PKqSQ6IiMWLXX9QaOsjUuZzZpfKP+/yBlcRPZOUYMK6H4Fnv4fDdpDqUs4SEqBh9l9
-         IR2wCyk7YMUJQxWDCYE21/tnCf/pN3Bv7lV2XR8opOHl/r0GYPJGKrmX6e+s+8QzWWej
-         h6Fg==
+        bh=gvKL4k+XqEeisXjOR1hp0hVtRqo/3Kp5ZonU9eu80yA=;
+        b=iIzKSXstbSiXpvxF6yKduBL27q8nJbT0Cs4TQGd0JKtIHbRHP8YnNRy78gdvaOtC6a
+         aHHnN5TYEBAY711auQ28mUe3AxSqtLz5JbGH8P1yXFx8VEQO8AaNigEVsPJ1/9SGLPqI
+         rvLhgHhEdwfAMPC25w5ixwYTVXpCc9qegq59oqTSRb7NHwljqAjPEoaHtIIby3VphxuP
+         wcnz4xCNrXZl85aCf6iBZ1SdqO1c3NpgnBGVvrRDqoRAO5w+xPVbAWsw4MEZ1U/qzUI3
+         BmRHVcpVsZjVEjReTm9Vlclxzh4XQj6+WJ3+SznPAZc7b/zneOch8NPthSlGmcuQs3sf
+         HvcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:references:mime-version:message-id:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Wd8IRDcm/I+X4nIj9mIHk75KksnNCPDW6vKldjVyscc=;
-        b=O1KpFOOdMKrR/pj69vqxGaWJ2hGfp0+M9Ko7BUtW5Wgb+st7QLbZgJFGgbN5dUW5Fm
-         KcJ2mCtV3mE5iHKKJreLuxb8edHmvt1abjU4XQvQqKUU58ByjIK0qgbgRIYEka7xKO3S
-         CWWrZDvT2dNKcZghu/MVHVNlM5YDx4nosr6UReVVBpTDElbXi+reohtddBRbWqTERdwI
-         VY0vd7g5HJbo+NuPpOTD5tS2H8V3VtXo2kMRfurRic7dNXL7KkCDFsC93CtVJEtm3eXM
-         GlGlx/WUMQ4dZaBadLNOC4biykfa3tJUBIOZHgKj3k8h82Fi8qcvFaVqkF2WD+wvtPqi
-         wJTQ==
-X-Gm-Message-State: AFqh2kpqtOSNtB3Hf5byBDKrgkEjBHsmO2yxBvlGh081ueNcd37yqQWx
-        T8wvcquTssaR6IbbJ/kCswKZHoLBBwkXOktkrj/r0mvDLa/h7PvaXXH4E1COeB+oJtADg2l18Dd
-        bz+N2b2n/3JKdyJkgzPuOuMd1ASuUcBxwjJ9zJvG6wHzRFIoOyYnZdr3b9w==
-X-Google-Smtp-Source: AMrXdXszK0rmsMkcBRtmXc4668zB9ryouhknfZXU3pTVF/td7AQOuETq73YFekoXrqc2NHF3PrMnIsCgsyw=
+        bh=gvKL4k+XqEeisXjOR1hp0hVtRqo/3Kp5ZonU9eu80yA=;
+        b=EjyX8AYfrtC/lZxNf/seDGnXlA3bhHFhFN8Hh6/Pjm4W4QA7kLBWtK3GHERzTGnqCT
+         L5/+AqIUbGtAtqR0GlVoVPyThSyVqUSh6DAtWJ4SCYYopbS7l5F/WZCd6xnDBzlILEES
+         CtnWh3LFsfrz6gEiSr6hSY5kpruY75PJUh+9b7+yXWsJjw9HfgcLq9M7H149GE9umieg
+         DaxMDIZD2Wck3jcieeaHHrZOa0FeUBAHU/Vq0yAJneIWVwZCKpGiVt40+Hz/NkzkXl8V
+         ivpOHKj+aJ4pUtLmPa9K6bMUClb+HptRCsr+62lnpOWyD/5WswXoqwVSDEiZ+/cIsEpl
+         0oCg==
+X-Gm-Message-State: AFqh2kr51EpcXNOiqEK8ttQ13DpcCQMRGn9By9xGozadgMhATtWnyVUg
+        M3PhiSx+bJl3CBjlbb6+lqmFNdbTSfNgNeP9RcIaGA1Qpt+rJICMqRLBRBwh5+nrKYeoRRGRwqd
+        /PLyCD0z/rEze3pCrQcwNG8owg8J/B4QNGiqJb9jRel5VmXpt5DybVtqw1g==
+X-Google-Smtp-Source: AMrXdXt2w5EXn75AVqQHDDOHPGlIRoih9Q3KbyTCSxT6Ga8XjmqDeVOFukPqrYWe8H+canmOGL+Ehv5eU30=
 X-Received: from pgonda1.kir.corp.google.com ([2620:0:1008:11:8358:4c2a:eae1:4752])
- (user=pgonda job=sendgmr) by 2002:a63:5c54:0:b0:49d:7f4c:f695 with SMTP id
- n20-20020a635c54000000b0049d7f4cf695mr3213615pgm.311.1673370251512; Tue, 10
- Jan 2023 09:04:11 -0800 (PST)
-Date:   Tue, 10 Jan 2023 09:03:57 -0800
+ (user=pgonda job=sendgmr) by 2002:a05:6a00:15cc:b0:582:5cc8:d854 with SMTP id
+ o12-20020a056a0015cc00b005825cc8d854mr2885250pfu.16.1673370253071; Tue, 10
+ Jan 2023 09:04:13 -0800 (PST)
+Date:   Tue, 10 Jan 2023 09:03:58 -0800
 In-Reply-To: <20230110170358.633793-1-pgonda@google.com>
-Message-Id: <20230110170358.633793-7-pgonda@google.com>
+Message-Id: <20230110170358.633793-8-pgonda@google.com>
 Mime-Version: 1.0
 References: <20230110170358.633793-1-pgonda@google.com>
 X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Subject: [PATCH V6 6/7] KVM: selftests: Update ucall pool to allocate from
- shared memory
+Subject: [PATCH V6 7/7] KVM: selftests: Add simple sev vm testing
 From:   Peter Gonda <pgonda@google.com>
 To:     kvm@vger.kernel.org
 Cc:     Peter Gonda <pgonda@google.com>,
@@ -61,7 +60,8 @@ Cc:     Peter Gonda <pgonda@google.com>,
         Sean Christopherson <seanjc@google.com>,
         Vishal Annapurve <vannapurve@google.com>,
         Ackerly Tng <ackerleytng@google.com>,
-        Andrew Jones <andrew.jones@linux.dev>
+        Andrew Jones <andrew.jones@linux.dev>,
+        Michael Roth <michael.roth@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -73,34 +73,222 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Update the per VM ucall_header allocation from vm_vaddr_alloc() to
-vm_vaddr_alloc_shared(). This allows encrypted guests to use ucall pools
-by placing their shared ucall structures in unencrypted (shared) memory.
-No behavior change for non encrypted guests.
+A very simple of booting SEV guests that checks related CPUID bits. This
+is a stripped down version of "[PATCH v2 08/13] KVM: selftests: add SEV
+boot tests" from Michael but much simpler.
 
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Sean Christopherson <seanjc@google.com>
 Cc: Vishal Annapurve <vannapurve@google.com>
 Cc: Ackerly Tng <ackerleytng@google.com>
 cc: Andrew Jones <andrew.jones@linux.dev>
+Suggested-by: Michael Roth <michael.roth@amd.com>
 Signed-off-by: Peter Gonda <pgonda@google.com>
 ---
- tools/testing/selftests/kvm/lib/ucall_common.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/kvm/.gitignore        | 84 +++++++++++++++++++
+ tools/testing/selftests/kvm/Makefile          |  1 +
+ .../selftests/kvm/x86_64/sev_all_boot_test.c  | 84 +++++++++++++++++++
+ 3 files changed, 169 insertions(+)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
 
-diff --git a/tools/testing/selftests/kvm/lib/ucall_common.c b/tools/testing/selftests/kvm/lib/ucall_common.c
-index 2f0e2ea941cc..99ef4866a001 100644
---- a/tools/testing/selftests/kvm/lib/ucall_common.c
-+++ b/tools/testing/selftests/kvm/lib/ucall_common.c
-@@ -24,7 +24,7 @@ void ucall_init(struct kvm_vm *vm, vm_paddr_t mmio_gpa)
- 	vm_vaddr_t vaddr;
- 	int i;
- 
--	vaddr = __vm_vaddr_alloc(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR, MEM_REGION_DATA);
-+	vaddr = vm_vaddr_alloc_shared(vm, sizeof(*hdr), KVM_UTIL_MIN_VADDR);
- 	hdr = (struct ucall_header *)addr_gva2hva(vm, vaddr);
- 	memset(hdr, 0, sizeof(*hdr));
- 
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 6d9381d60172..6d826957c6ae 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -1,7 +1,91 @@
+ # SPDX-License-Identifier: GPL-2.0-only
++<<<<<<< HEAD
+ *
+ !/**/
+ !*.c
+ !*.h
+ !*.S
+ !*.sh
++=======
++/aarch64/aarch32_id_regs
++/aarch64/arch_timer
++/aarch64/debug-exceptions
++/aarch64/get-reg-list
++/aarch64/hypercalls
++/aarch64/psci_test
++/aarch64/vcpu_width_config
++/aarch64/vgic_init
++/aarch64/vgic_irq
++/s390x/memop
++/s390x/resets
++/s390x/sync_regs_test
++/s390x/tprot
++/x86_64/amx_test
++/x86_64/cpuid_test
++/x86_64/cr4_cpuid_sync_test
++/x86_64/debug_regs
++/x86_64/evmcs_test
++/x86_64/emulator_error_test
++/x86_64/fix_hypercall_test
++/x86_64/get_msr_index_features
++/x86_64/kvm_clock_test
++/x86_64/kvm_pv_test
++/x86_64/hyperv_clock
++/x86_64/hyperv_cpuid
++/x86_64/hyperv_features
++/x86_64/hyperv_svm_test
++/x86_64/max_vcpuid_cap_test
++/x86_64/mmio_warning_test
++/x86_64/monitor_mwait_test
++/x86_64/nested_exceptions_test
++/x86_64/nx_huge_pages_test
++/x86_64/platform_info_test
++/x86_64/pmu_event_filter_test
++/x86_64/set_boot_cpu_id
++/x86_64/set_sregs_test
++/x86_64/sev_all_boot_test
++/x86_64/sev_migrate_tests
++/x86_64/smm_test
++/x86_64/state_test
++/x86_64/svm_vmcall_test
++/x86_64/svm_int_ctl_test
++/x86_64/svm_nested_soft_inject_test
++/x86_64/sync_regs_test
++/x86_64/tsc_msrs_test
++/x86_64/tsc_scaling_sync
++/x86_64/ucna_injection_test
++/x86_64/userspace_io_test
++/x86_64/userspace_msr_exit_test
++/x86_64/vmx_apic_access_test
++/x86_64/vmx_close_while_nested_test
++/x86_64/vmx_dirty_log_test
++/x86_64/vmx_exception_with_invalid_guest_state
++/x86_64/vmx_invalid_nested_guest_state
++/x86_64/vmx_msrs_test
++/x86_64/vmx_preemption_timer_test
++/x86_64/vmx_set_nested_state_test
++/x86_64/vmx_tsc_adjust_test
++/x86_64/vmx_nested_tsc_scaling_test
++/x86_64/xapic_ipi_test
++/x86_64/xapic_state_test
++/x86_64/xen_shinfo_test
++/x86_64/xen_vmcall_test
++/x86_64/xss_msr_test
++/x86_64/vmx_pmu_caps_test
++/x86_64/triple_fault_event_test
++/access_tracking_perf_test
++/demand_paging_test
++/dirty_log_test
++/dirty_log_perf_test
++/hardware_disable_test
++/kvm_create_max_vcpus
++/kvm_page_table_test
++/max_guest_memory_test
++/memslot_modification_stress_test
++/memslot_perf_test
++/rseq_test
++/set_memory_region_test
++/steal_time
++/kvm_binary_stats_test
++/system_counter_offset_test
++>>>>>>> KVM: selftests: Add simple sev vm testing
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index b7cfb15712d1..66d7ab3da990 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -111,6 +111,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/tsc_msrs_test
+ TEST_GEN_PROGS_x86_64 += x86_64/vmx_pmu_caps_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xen_shinfo_test
+ TEST_GEN_PROGS_x86_64 += x86_64/xen_vmcall_test
++TEST_GEN_PROGS_x86_64 += x86_64/sev_all_boot_test
+ TEST_GEN_PROGS_x86_64 += x86_64/sev_migrate_tests
+ TEST_GEN_PROGS_x86_64 += x86_64/amx_test
+ TEST_GEN_PROGS_x86_64 += x86_64/max_vcpuid_cap_test
+diff --git a/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c b/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
+new file mode 100644
+index 000000000000..e9e4d7305bc1
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/sev_all_boot_test.c
+@@ -0,0 +1,84 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Basic SEV boot tests.
++ *
++ */
++#include <fcntl.h>
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++#include <sys/ioctl.h>
++
++#include "test_util.h"
++#include "kvm_util.h"
++#include "processor.h"
++#include "svm_util.h"
++#include "linux/psp-sev.h"
++#include "sev.h"
++
++#define NR_SYNCS 1
++
++#define MSR_AMD64_SEV_BIT  1
++
++static void guest_run_loop(struct kvm_vcpu *vcpu)
++{
++	struct ucall uc;
++	int i;
++
++	for (i = 0; i <= NR_SYNCS; ++i) {
++		vcpu_run(vcpu);
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_SYNC:
++			continue;
++		case UCALL_DONE:
++			return;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++		default:
++			TEST_FAIL("Unexpected exit: %s",
++				  exit_reason_str(vcpu->run->exit_reason));
++		}
++	}
++}
++
++static void is_sev_enabled(void)
++{
++	uint64_t sev_status;
++
++	GUEST_ASSERT(this_cpu_has(X86_FEATURE_SEV));
++
++	sev_status = rdmsr(MSR_AMD64_SEV);
++	GUEST_ASSERT(sev_status & 0x1);
++}
++
++static void guest_sev_code(void)
++{
++	GUEST_SYNC(1);
++
++	is_sev_enabled();
++
++	GUEST_DONE();
++}
++
++static void test_sev(void *guest_code, uint64_t policy)
++{
++	struct kvm_vm *vm;
++	struct kvm_vcpu *vcpu;
++
++	vm = vm_sev_create_with_one_vcpu(policy, guest_code, &vcpu);
++	TEST_ASSERT(vm, "vm_sev_create_with_one_vcpu() failed to create VM\n");
++
++	guest_run_loop(vcpu);
++
++	kvm_vm_free(vm);
++}
++
++int main(int argc, char *argv[])
++{
++	TEST_REQUIRE(is_kvm_sev_supported());
++
++	test_sev(guest_sev_code, SEV_POLICY_NO_DBG);
++	test_sev(guest_sev_code, 0);
++
++	return 0;
++}
 -- 
 2.39.0.314.g84b9a713c41-goog
 
