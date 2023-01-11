@@ -2,129 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C8F87665674
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 09:49:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79E18665675
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 09:49:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236094AbjAKIt2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 03:49:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58470 "EHLO
+        id S231683AbjAKItb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 03:49:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232515AbjAKItJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 03:49:09 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2106.outbound.protection.outlook.com [40.107.100.106])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162C5D133
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 00:49:07 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mMthE0XWACTmEdBS/6rCIih1XZFz8FaW8EMY4tXQZYrIVlLguC5pfjfPMvDYHIsLDkX/ZC4+ud42BrTy4Rno7P2GB4yteFV02EPs+yMPLL7OeSoj0sQlfhKDtYQsbiJnQDzQ5CUJT37OX7xZz2REIu2inu76L7jPPt9NyREn64PzESU59FEjK/iooLjs09iNw2BtcykWLThsYhJCqSJA7LEXDkxQmN2myJ+SkWIS1SjTS/yiIT1WYd2xyeln7I9tIeomFESemE2nARpWPatyEaw2CJ9IbiffvruxqeKzgPpA4NMFg+oOR08IzPwUteblhO5vNszj3VxKGtBm0186lg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XFjEiL+rZ23ym2OvVi1W3m1sRu9ohKYnUMUNxA8M8xU=;
- b=f2w/Mow8ivl5PwpsVxXmCWtyKvhT0vor6XlTmN10G1PKoKt33Dqo1ZSINPMsTyKVAA/oWDtGTnRIaNyo9lpDVpbQVX7JUbCUUmsAIo6bSryOc11a3GDXouf6OLM/9PcMxriCr/w2F8ELtcGv0mT/f12bnw5ysKvkvnN7m5WjvpX8I7RqlEPSmK5kaCv6pvYgX+uJ3iuk5n4hBVxjt3t55ODCW5NZ4TexalKjOGDI1sbXN6dd0m72yqATST2eBU2VlElRqLNtc+Q8rL8ZCd1Bxxqib9RDhZVr36bqX3AjF+RzujuVg0WwIWeoJfzzTOLZU2AlSG4qFLBpjY0mvZTlgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=os.amperecomputing.com; dkim=pass
- header.d=os.amperecomputing.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=os.amperecomputing.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XFjEiL+rZ23ym2OvVi1W3m1sRu9ohKYnUMUNxA8M8xU=;
- b=LHsyHNnwspeSsjmtM+EHr2MkYQ4YQJP2jGNArEZb3hlFNQ9B8XwiNPQrPnsaSBYE6ffonJkza+/wEBLfQ+25ZQvobUwaqCjog7QgZgOX/GRDeM3UY7jWXqsw0K/lmEDyLJJwtWcLB34zMnUqk+Oc6fvyreQ/tc1BqBGzXUmAXUU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=os.amperecomputing.com;
-Received: from DM8PR01MB6824.prod.exchangelabs.com (2603:10b6:8:23::24) by
- BN6PR0101MB3170.prod.exchangelabs.com (2603:10b6:405:31::31) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6002.13; Wed, 11 Jan 2023 08:49:05 +0000
-Received: from DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::6b5b:1242:818c:e70d]) by DM8PR01MB6824.prod.exchangelabs.com
- ([fe80::6b5b:1242:818c:e70d%6]) with mapi id 15.20.5986.018; Wed, 11 Jan 2023
- 08:49:05 +0000
-Message-ID: <b8928355-9448-a6b3-1be8-05d29ea6f121@os.amperecomputing.com>
-Date:   Wed, 11 Jan 2023 14:18:55 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH 0/3] KVM: arm64: nv: Fixes for Nested Virtualization
- issues
-Content-Language: en-US
-From:   Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     catalin.marinas@arm.com, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, scott@os.amperecomputing.com,
-        Darren Hart <darren@os.amperecomputing.com>
-References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
- <6171dc7c-5d83-d378-db9e-d94f27afe43a@os.amperecomputing.com>
- <87o7r6dpi8.wl-maz@kernel.org>
- <4d952300-0681-41ff-b416-38fbae4ebea6@os.amperecomputing.com>
-In-Reply-To: <4d952300-0681-41ff-b416-38fbae4ebea6@os.amperecomputing.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SG2PR06CA0230.apcprd06.prod.outlook.com
- (2603:1096:4:ac::14) To DM8PR01MB6824.prod.exchangelabs.com
- (2603:10b6:8:23::24)
+        with ESMTP id S231997AbjAKIt1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 03:49:27 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FA1D133
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 00:49:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0mTOdl3fVwD22uDagSV+iOM10JoiaOfOnnp/CUz69Os=; b=ZnntvOBV0qqm1I4OY+UBcgLYV+
+        n6mthdLzTVqjoCl3Rbloy9BDaoI+j8wpSvlvVNolntbvs9HMtXsXzVZQVMSv4qsrv6xlM5SIr4HD6
+        rCGUzQ9WDcPjkpFcKXWnsMmnpuLRkLVbpAXnVZe2eQXrhxDayqWXkkA0fadnvThJmz8DxnHho316B
+        s80TggUzYMZ6NcdCuBzjWakRCd1GcVmp2RjSMVlCDFJCtg/BPnLpMck6Trbkgv0chcmCXcWEGHIib
+        oNa39zaNSbBdcyZjiKbA38M5aGjE9Vr6gkS6P/mHvIDQNEeYnkp1LgJH/wysEzentIeF/Q+bUMjuf
+        uEbjbuFQ==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pFWnX-003xzQ-DJ; Wed, 11 Jan 2023 08:49:27 +0000
+Message-ID: <60b4f074ee21c0c601321cd7ee8e4a55967fbfae.camel@infradead.org>
+Subject: Re: [PATCH 1/2] KVM: x86: Fix deadlock in
+ kvm_vm_ioctl_set_msr_filter()
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Michal Luczaj <mhal@rbox.co>
+Cc:     kvm@vger.kernel.org, paul@xen.org,
+        Peter Zijlstra <peterz@infradead.org>
+Date:   Wed, 11 Jan 2023 08:49:13 +0000
+In-Reply-To: <825aef8e14c1aeaf1870ac3e1510a6e1fe71129d.camel@infradead.org>
+References: <a03a298d-dfd0-b1ed-2375-311044054f1a@redhat.com>
+         <20221229211737.138861-1-mhal@rbox.co>
+         <20221229211737.138861-2-mhal@rbox.co> <Y7RjL+0Sjbm/rmUv@google.com>
+         <c33180be-a5cc-64b1-f2e5-6a1a5dd0d996@rbox.co>
+         <Y7dN0Negds7XUbvI@google.com>
+         <3a4ab7b0-67f3-f686-0471-1ae919d151b5@redhat.com>
+         <f3b61f1c0b92af97a285c9e05f1ac99c1940e5a9.camel@infradead.org>
+         <9cd3c43b-4bfe-cf4e-f97e-a0c840574445@redhat.com>
+         <825aef8e14c1aeaf1870ac3e1510a6e1fe71129d.camel@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-RHGjyDu6zxPBQGJYEeq+"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM8PR01MB6824:EE_|BN6PR0101MB3170:EE_
-X-MS-Office365-Filtering-Correlation-Id: 528aca17-0c56-4a2b-6e86-08daf3b0b1e0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 2cGvaPruEFi0KsHm5gTFm4toHpLk0jqtcUQ0qGvmC86Dv8utjKJXgMx5LK4EEGrCfHYsPDl8HMrGjgJtZUu5guas13QGAvtWmkYjiu8VX3A+WAwOPLtaaxQSU42jnmLDjqjpalagKFvZyshOloOP14qPN1LsgEZ0YVXr9t3xb4143GbqcAGRXh3X6KK5CzBYma0uJugbzFAGZkOa/Z2M/ZtbfDDGqQtF1n9JsXw8Z8UoPfKZqocbLgz7akxQjHQPqA4EIarVNTvncqmeDxN/AUgR389LVLWcqBHPddOoM5Ivgv+zWJMAmQkdS04gsGZpwCCtFMVINXg6hsv8zaKai9TVUyISjQ2nrQauYSQIYVtax/bcA71Th+jWvF1KPmToV3TCz8WF4pVdAQkpI1kfcosmqFCKuW89N7wAfeSa+UdW/zzGV6B4ZFTEWkBJgidVZceOlDSv40iiDyf+jq3mFeyr6r9qeHTgy4msLrjC6IZNcjZPjL83nJAs6lWpqQFiwHJOgJDqZSjdWbDy5RPVLkeAgQC0yXRkr1Hf9P6EXob9dKV5izmxBgXxxYuot0CtxXKMFBUiw6MLl9tv4Hdf2RFm/M+ApiJ+NZgvVZoCDHD4N2ny0nAjDhIOc54XDbLzy0mnq/RHyjhe0vq9IF48V+m7OE1PIoypv0HHcK+q86Azit3BET+p1TcIHlm0R6H3zzyOVcoyZ+9VP+UzJiThrA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR01MB6824.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(39850400004)(136003)(396003)(376002)(346002)(451199015)(31686004)(107886003)(6666004)(8936002)(41300700001)(66556008)(66476007)(66946007)(6916009)(8676002)(4326008)(316002)(2616005)(2906002)(5660300002)(31696002)(6486002)(86362001)(478600001)(186003)(26005)(53546011)(6512007)(6506007)(83380400001)(38100700002)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QmE3OWEvenV1SmtDeUVNS0gycUpoRlY5RWRIbGV6ZG1GZlAyUkNmams1UGs4?=
- =?utf-8?B?WVBNdUpldVpadkFNSEsyc1l3TisxbGQ1WEo1VGVqeXBWbW9VWUlDdDhPY1c4?=
- =?utf-8?B?TUdabEZlYUJ3K2ZodEJ4WEd2WVdzbTZJeDdPT2JRRWc4cDZEY25CQ3RjQmQ1?=
- =?utf-8?B?TW84NEF3T1V6QmZGL0p1TXh3QmxnTzdVclhFelg3VUZndm5ZUktRclNOZisz?=
- =?utf-8?B?c0FzTW50V3N5NHpSYWRvNW1QM1pkdmRzaUh2MnJ1ZjkvbjFWRG1icDhQYVFz?=
- =?utf-8?B?UHBzZUlHdGZ6MmxDQVlRMWt3ajlrWWpBUG5xdzc4enEybTMyUGQySWJ5dm9J?=
- =?utf-8?B?M1VudnRTcjFkUndxWkFYY29pT2s5OG1EdVNmZ0hPK0FPYkJVcTBiUTkvS1dm?=
- =?utf-8?B?NlRSQkxhdkY0YmoyRVJrM0hQVzA4RG0wbW1MWW1nTmRuaHZUQjA4SmIzU3l3?=
- =?utf-8?B?R0VFclIvN3dYMXB5ZHZBZDJncUplenhoamxLN1VOY3lYSGFYUzZHSGNSZ3cr?=
- =?utf-8?B?elk4WXJUOWtRSVo2RkFWbFF2ejlKYlQvTU9kdEIwQkt3UTdpdTFWaG5uTTNj?=
- =?utf-8?B?NlRvYlVRN3JqZCt3eHh1bVVHTTJlY2szSHdHZkVzMmhLNHVhWDRzQ2E0aVlG?=
- =?utf-8?B?aU5pT0E4UHQ0SEFkL2dsNlhXSTdxS3ZqQVFaZWY4Z3lTRHBnZGtjS0V1M1hm?=
- =?utf-8?B?MHNKbkx1Y1hJcWNGTFJranJxd0tlaGtPZkpwMUpmdklzSkYyQkZGaS9ocWVI?=
- =?utf-8?B?Z3ZtNktxRkZ2KzVzampqUEFZeUR2VnhXMkRLcHkzTVc3STZOeUMvc2VjbGpO?=
- =?utf-8?B?NHF5SFpMS3B0UnBSc1JvYk9UM0hrRXlGMjlzbVdUV2hRSEFhbTJ5dmU2Z0tB?=
- =?utf-8?B?eERoTzQvQ1ZzRHRoRFgyVzBuUFJDeVVEZmlmOTZlcmd3a1pOS0xjL0RoUDhX?=
- =?utf-8?B?YmN0TlBaTEJVem9VbSt4MmJ2TWtRdFUzMXNwSlhVKzZ6WFEwU2pOYmR2YnVJ?=
- =?utf-8?B?R3o0MUVab3cra09UME1qVmZhanYvdFBDOHdCSHFyZUFOdXJHWXowcHpYbTFa?=
- =?utf-8?B?ZTVWd1h4N1NIKzFBZXlTU3NkQVBKbUF2UmJnV3Z0V213azBxV1UzeHI1STFK?=
- =?utf-8?B?UEpJMjgySnpFNUI1bkNGeTdVL2NoaFp4MjZmUWQxV1FLcGg3RGFOeWxPMmtV?=
- =?utf-8?B?WFNSK0RhZW9WZUJuaWNpNEhHTUx1R0psR25WMEdNaEhHYXlrdlBpNnNYT3F3?=
- =?utf-8?B?VWp4bVRrYjExcjlNK1ZxOVlwK0dYakx6eWdiakV3Z3lYanJxWjN0WkMydlAx?=
- =?utf-8?B?YlBqc1VZSDRzOVVWS25Oc3NVMy9qN0hmYVdWakU5TUtTbk9nV0w2SzhBc2JN?=
- =?utf-8?B?VVIvRzBOdm1GQmc0QmpzL0hMb3IvQXEzS01WRGpJdjN5WFZhUmZ5aGM4dUVD?=
- =?utf-8?B?QTZUc0RtT3hEVW1ZdmdjMWttaHE5K2cxc3JMZ2xvMFpoa2l4eTNHeHNNalFq?=
- =?utf-8?B?QkNQZWtXVGdsS0I5bWFrbW1LQ3BnMEp5WVcyZ0w1N3dCR0lpQU5QMnZTYkJ5?=
- =?utf-8?B?Wi9HUkdVVUx6dU9LaUdqYmlpSllBNHVCb1B1UHF6eU1ma3pqcGNJRUx2SjdY?=
- =?utf-8?B?UWhtWG5yTk5EUWgvQy9wZjlGa1NuUlNzdXdvcjAwRE16M1VUbnExUkc2Nm9p?=
- =?utf-8?B?WktpWVdwNlpnSWRnS0g4U0JWWE85NlRsYzJmRlliNjZDaDdpTXZuKytEMzI3?=
- =?utf-8?B?S2l6c1E2ajlYWHJjUWVkbU1BRkJNQitwUTkvWGJhSjkyV3d1eEQyUnVYdTE3?=
- =?utf-8?B?RkI0OSs1UkRQeW4vRjZKMGc1Y3VBZHRhTyt5SVB3ZDBHOW9lQVdHbzNRT0dU?=
- =?utf-8?B?aWxVVlQ0Z05MaklEOS9WUHZ0S2lsZGFCTis0NVZ5NktiYnp1SFpYZ3lOdFZi?=
- =?utf-8?B?cHVUWHBnWnFFTE1PZ3ZFU2kvbWgxRFVKWHorN0IzcUNMUjBNYUF5WE0vQzZ1?=
- =?utf-8?B?aEZub0w4cVNhenpSZjZxZ0s1UVVmelR2c2ZUS0tzSlVjclBjMnhUUFZnVm1y?=
- =?utf-8?B?QW04OVBUeCtkY2pmQXVBR2NlOFZtT1MrVlhLM2V3alBLZGxnSWVialU2WkRn?=
- =?utf-8?B?OVpYSHNmcUUwTzR3MHV6M2plMVp3dUdDWExhLzVNN2NrdlM2UXZHa1hkaUlu?=
- =?utf-8?Q?PAP6ZJsQSowM9ny3bcYO5kE=3D?=
-X-OriginatorOrg: os.amperecomputing.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 528aca17-0c56-4a2b-6e86-08daf3b0b1e0
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR01MB6824.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2023 08:49:05.1821
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 57tev0IPDdf0sy2yoDY8qqMjcTAFk74D9V1IKVqBfN2iMCbe66BiH0jPkzemdTfB2dwMYyGU0a5dwv71aTVbWNsSIHySUt4G/TQJOTBmK83iyzL36oThJnTqD+6LLR+z
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR0101MB3170
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -132,100 +62,250 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
+--=-RHGjyDu6zxPBQGJYEeq+
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11-01-2023 02:16 pm, Ganapatrao Kulkarni wrote:
-> 
-> 
-> On 11-01-2023 03:24 am, Marc Zyngier wrote:
->> On Tue, 10 Jan 2023 12:17:20 +0000,
->> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>>
->>> I am currently working around this with "nohlt" kernel param to
->>> NestedVM. Any suggestions to handle/fix this case/issue and avoid the
->>> slowness of booting of NestedVM with more cores?
->>>
->>> Note: Guest-Hypervisor and NestedVM are using default kernel installed
->>> using Fedora 36 iso.
->>
->> Despite what I said earlier, I have a vague idea here, thanks to the
->> interesting call traces that you provided (this is really awesome work
->> BTW, given how hard it is to trace things across 3 different kernels).
->>
->> We can slightly limit the impact of the prepare/finish sequence if the
->> guest hypervisor only accesses the active registers for SGIs/PPIs on
->> the vcpu that owns them, forbidding any cross-CPU-to-redistributor
->> access.
->>
->> Something along these lines, which is only boot-tested. Let me know
->> how this fares for you.
->>
->> Thanks,
->>
->>     M.
->>
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c 
->> b/arch/arm64/kvm/vgic/vgic-mmio.c
->> index b32d434c1d4a..1cca45be5335 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
->> @@ -473,9 +473,10 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu 
->> *vcpu,
->>    * active state can be overwritten when the VCPU's state is synced 
->> coming back
->>    * from the guest.
->>    *
->> - * For shared interrupts as well as GICv3 private interrupts, we have to
->> - * stop all the VCPUs because interrupts can be migrated while we 
->> don't hold
->> - * the IRQ locks and we don't want to be chasing moving targets.
->> + * For shared interrupts as well as GICv3 private interrupts accessed 
->> from the
->> + * non-owning CPU, we have to stop all the VCPUs because interrupts 
->> can be
->> + * migrated while we don't hold the IRQ locks and we don't want to be 
->> chasing
->> + * moving targets.
->>    *
->>    * For GICv2 private interrupts we don't have to do anything because
->>    * userspace accesses to the VGIC state already require all VCPUs to be
->> @@ -484,7 +485,8 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu 
->> *vcpu,
->>    */
->>   static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 
->> intid)
->>   {
->> -    if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
->> +    if ((vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 &&
->> +         vcpu == kvm_get_running_vcpu()) ||
-> 
-> Thanks Marc for the patch!
-> 
-> I think, you mean not equal to?
-Sorry, I did not see your follow up email.
+On Tue, 2023-01-10 at 19:17 +0000, David Woodhouse wrote:
+> On Tue, 2023-01-10 at 15:10 +0100, Paolo Bonzini wrote:
+> > On 1/10/23 13:55, David Woodhouse wrote:
+> > > > However, I
+> > > > completely forgot the sev_lock_vcpus_for_migration case, which is t=
+he
+> > > > exception that... well, disproves the rule.
+> > > >=20
+> > > But because it's an exception and rarely happens in practice, lockdep
+> > > didn't notice and keep me honest sooner? Can we take them in that ord=
+er
+> > > just for fun at startup, to make sure lockdep knows?
+> >=20
+> > Sure, why not.=C2=A0 Out of curiosity, is this kind of "priming" a thin=
+g
+> > elsewhere in the kernel
+>=20
+> I did this:
+>=20
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -461,6 +461,11 @@ void *kvm_mmu_memory_cache_alloc(struct kvm_mmu_memo=
+ry_cache *mc)
+> =C2=A0static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, u=
+nsigned id)
+> =C2=A0{
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_init(&vcpu->mutex);
+> +
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Ensure that lockdep knows vcpu->=
+mutex is taken *inside* kvm->lock */
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_lock(&vcpu->mutex);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_unlock(&vcpu->mutex);
+> +
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->cpu =3D -1;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->kvm =3D kvm;
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 vcpu->vcpu_id =3D id;
+>=20
+>=20
+> What I got when I ran xen_shinfo_test was... not what I expected:
+>=20
+>=20
+> [13890.148203] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [13890.148205] WARNING: possible circular locking dependency detected
+> [13890.148207] 6.1.0-rc4+ #1024 Tainted: G=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 I E=C2=A0=C2=A0=C2=A0=C2=A0=20
+> [13890.148209] ------------------------------------------------------
+> [13890.148210] xen_shinfo_test/13326 is trying to acquire lock:
+> [13890.148212] ffff888107d493b0 (&gpc->lock){....}-{2:2}, at: kvm_xen_upd=
+ate_runstate_guest+0xf2/0x4e0 [kvm]
+> [13890.148285]=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 but task is already holding lock:
+> [13890.148287] ffff88887f671718 (&rq->__lock){-.-.}-{2:2}, at: __schedule=
++0x84/0x7c0
+> [13890.148295]=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 which lock already depends on the new lock.
+>=20
 
-> +           vcpu != kvm_get_running_vcpu()) ||
-> 
-> With the change to not-equal, the issue is fixed and I could see the 
-> NestedVM booting is pretty fast with higher number of cores as well.
-> 
->>           intid >= VGIC_NR_PRIVATE_IRQS)
->>           kvm_arm_halt_guest(vcpu->kvm);
->>   }
->> @@ -492,7 +494,8 @@ static void vgic_access_active_prepare(struct 
->> kvm_vcpu *vcpu, u32 intid)
->>   /* See vgic_access_active_prepare */
->>   static void vgic_access_active_finish(struct kvm_vcpu *vcpu, u32 intid)
->>   {
->> -    if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
->> +    if ((vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 &&
->> +         vcpu == kvm_get_running_vcpu()) ||
-> 
-> Same, not equal to.
->>           intid >= VGIC_NR_PRIVATE_IRQS)
->>           kvm_arm_resume_guest(vcpu->kvm);
->>   }
->>
-> 
-> 
-> Thanks,
-> Ganapat
+...
+
+> [13890.148997] Chain exists of:
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 &gpc->lock --> &p->pi_lock --> &rq->__lock
+
+
+I believe that's because of the priority inheritance check which
+happens when there's *contention* for gpc->lock.
+
+But in the majority of cases, anything taking a write lock on that (and
+thus causing contention) is going to be invalidating the cache *anyway*
+and causing us to abort.=C2=A0Or revalidating it, I suppose. But either way
+we're racing with seeing an invalid state.=20
+
+In which case we much as well just make it a trylock. Doing so *only*
+for the scheduling-out atomic code path looks a bit like this... is
+there a prettier way?
+
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 07e61cc9881e..c444948ab1ac 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -272,7 +272,12 @@ static void kvm_xen_update_runstate_guest(struct kvm_v=
+cpu *v, bool atomic)
+ 	 * Attempt to obtain the GPC lock on *both* (if there are two)
+ 	 * gfn_to_pfn caches that cover the region.
+ 	 */
+-	read_lock_irqsave(&gpc1->lock, flags);
++	local_irq_save(flags);
++	if (!read_trylock(&gpc1->lock)) {
++		if (atomic)
++			return;
++		read_lock(&gpc1->lock);
++	}
+ 	while (!kvm_gpc_check(gpc1, user_len1)) {
+ 		read_unlock_irqrestore(&gpc1->lock, flags);
+=20
+@@ -283,7 +288,7 @@ static void kvm_xen_update_runstate_guest(struct kvm_vc=
+pu *v, bool atomic)
+ 		if (kvm_gpc_refresh(gpc1, user_len1))
+ 			return;
+=20
+-		read_lock_irqsave(&gpc1->lock, flags);
++		goto retry;
+ 	}
+=20
+ 	if (likely(!user_len2)) {
+@@ -309,7 +314,13 @@ static void kvm_xen_update_runstate_guest(struct kvm_v=
+cpu *v, bool atomic)
+ 		 * gpc1 lock to make lockdep shut up about it.
+ 		 */
+ 		lock_set_subclass(&gpc1->lock.dep_map, 1, _THIS_IP_);
+-		read_lock(&gpc2->lock);
++		if (!read_trylock(&gpc2->lock)) {
++			if (atomic) {
++				read_unlock_irqrestore(&gpc1->lock, flags);
++				return;
++			}
++			read_lock(&gpc2->lock);
++		}
+=20
+ 		if (!kvm_gpc_check(gpc2, user_len2)) {
+ 			read_unlock(&gpc2->lock);
+--=20
+2.35.3
+
+
+
+--=-RHGjyDu6zxPBQGJYEeq+
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTExMDg0OTEzWjAvBgkqhkiG9w0BCQQxIgQg+z9w8j4B
+bWWgSAScRq4Kdy7iFnAafIMPPV6ES2UXIzMwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBkaLf3gcrUC1qHkqO8Lr0k/QagG8yh3F2K
+iidquDuinDw0Js7MgEmPRLepKKguS3F63r3zKlEPCaQc/izdH4ylUWqCHZXIQvFn8ncuf3ycgXtB
+iAZVWkWFsvpESxb6T4QgMhzddQ6XQcwwe5W/sD640jrCXHupRUXnXzLK61svWOlrJj5gB4eBBrd+
+UWq0Wg85Se/ffhYUC+qyaSVySiJXwI2QV76eRZYSXMf7WUKxWjO7Mi1ZcbbaOggjceex63Gx0ZmO
+UnkYcZV9YtQ3sLSbG5YP9rwYRWeMZYpbmYgi0paTbMpVDVVlJL9XdY0o9K0BAHRbEqDYZBIlyoj/
+hrMg0v0ZQexzBm6Sg3Lk8dqoLgT0hUYWkHHlv+0EH1BRrO9SC4BORfIvJh8CBO8UaIEx4L0fNFjm
+k55+4JKvdD/zan64RBDQgadQrw0I7zQrgT2+IkM7fcK6Zb6I5EXfBhnJkrkSOVm0W9H6edGtBgnv
+0Dx9nPdXDXuFbsgTMQuZXnG41nPAdTYIeYWP6uz++19/HXPNj0c2CVzsoT2e9RYwt6mQjE9x5TEL
+Orw4ADetj1a3mboTez0Bf9ZLC42kldVE067Ne5gGuW8/UNB2XInjYRppLroWxYvySMZdVlzOP6M/
+XtT5d6Ra2dGJNdnEZFjvQORTEGN9Ev2GbkENSW2a2AAAAAAAAA==
+
+
+--=-RHGjyDu6zxPBQGJYEeq+--
