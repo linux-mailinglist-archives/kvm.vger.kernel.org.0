@@ -2,331 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28C6A6657A7
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 10:38:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C9806657D5
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 10:43:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235919AbjAKJiC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 04:38:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37486 "EHLO
+        id S232249AbjAKJmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 04:42:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234190AbjAKJhQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 04:37:16 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 684C95FB9;
-        Wed, 11 Jan 2023 01:35:59 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30B8ESKJ028778;
-        Wed, 11 Jan 2023 09:35:55 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cMeLYwUHJaBzrxiVs1Yme3g+08qNmcBVEEaCE/QuFuE=;
- b=BPhgPtd8LSHcE4dDX1aEWS9D+0j0Djq2phhfyFH+7c9hDzbDxXm/x1S9dkZdiGieGZTl
- xxnMZGtsqpd/fIHAxvk7LUXf7csuUuABLiKzBVk/7vwsLTIDGEF1H5lGS1WDKeyByUZk
- l3AH9Elz0Nqki/kAGQhpuIHqHHsOe6xYrJt3Bjm1aKpjI83wXRxE4ksdkz+mQoFADaAy
- zmXZx3k1ALkx03MNkZJ8SQnugEhiTLrIR9h1qXplhuc4gSIR0O7yD9A/WmqdGghJ6XOS
- +Zpb6jM1ZmM/vSc3CRjJaWDOB8xsunzz3rC3yuxVSD4/SQo8UtQ+k3h07esy9z+AgPBi YQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1se8spw7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Jan 2023 09:35:55 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30B8lSZt027166;
-        Wed, 11 Jan 2023 09:35:54 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1se8spvr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Jan 2023 09:35:54 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30B1cr7K001499;
-        Wed, 11 Jan 2023 09:35:52 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3n1kmrrdfh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 11 Jan 2023 09:35:52 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30B9ZmHm44564878
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 11 Jan 2023 09:35:48 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8172620049;
-        Wed, 11 Jan 2023 09:35:48 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CC36820040;
-        Wed, 11 Jan 2023 09:35:47 +0000 (GMT)
-Received: from [9.171.7.243] (unknown [9.171.7.243])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 11 Jan 2023 09:35:47 +0000 (GMT)
-Message-ID: <02b34aa1-d71a-99cc-77db-3613f881b1a8@linux.ibm.com>
-Date:   Wed, 11 Jan 2023 10:35:47 +0100
+        with ESMTP id S235627AbjAKJlj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 04:41:39 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6A6D6B
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 01:37:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=asDDLkhhiVe8MatzoaV5vyaHB/p2X1IB9PzQ1tQv9UA=; b=pSM9VHjuduHfkTk520DkWAYvI6
+        DtX6eCDu87iE5K+My7WzLmFzT3xnmqtMUqae2B+Rh32rNrk7pq2x4zkWWDvvxB/3whfq+5vPV+Hxy
+        x0fjYUjObQzu3xP8+iMPfFk6Uby29j1tRL4aVWddio5KhLCEI2+gPoi/MqyvS44DZVIBqVHICFYk0
+        QNferzVJemrM9UJZ4xaoDrmVm2ekpRPHAMXDvQfoXA+WklH8FsPkhLEZh3xxAgm0aJjxf2a2gmm0D
+        5hNcuRHn87v86Qid2eJdk3skLAkEZeLlzp9vrpdyHfnejStrpfc3/H1r4pLmiAaQxDRUnC7WrQFC0
+        JTzZJgNw==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pFXYa-0040AZ-Kw; Wed, 11 Jan 2023 09:38:04 +0000
+Message-ID: <03f0a9ddf3db211d969ff4eb4e0aeb8789683776.camel@infradead.org>
+Subject: [PATCH 2/3] KVM: x86/xen: Fix potential deadlock in
+ kvm_xen_update_runstate_guest()
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>, paul <paul@xen.org>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     kvm <kvm@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>,
+        Michal Luczaj <mhal@rbox.co>
+Date:   Wed, 11 Jan 2023 09:37:50 +0000
+In-Reply-To: <99b1da6ca8293b201fe0a89fd973a9b2f70dc450.camel@infradead.org>
+References: <99b1da6ca8293b201fe0a89fd973a9b2f70dc450.camel@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-IWHO8Jp3ZGY1dMw0kU5m"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20230110202632.2533978-1-scgl@linux.ibm.com>
- <20230110202632.2533978-2-scgl@linux.ibm.com>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v5 01/10] KVM: s390: Extend MEM_OP ioctl by storage key
- checked cmpxchg
-In-Reply-To: <20230110202632.2533978-2-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: R-wYDDAboRiZQoxtd8tpSPq3PipSCmYE
-X-Proofpoint-ORIG-GUID: Nn_TKUpmqH_yDJdF5Ziso0mC49lII-sd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-11_04,2023-01-10_03,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- mlxlogscore=999 suspectscore=0 spamscore=0 phishscore=0 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 clxscore=1011 malwarescore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2301110073
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/10/23 21:26, Janis Schoetterl-Glausch wrote:
-> User space can use the MEM_OP ioctl to make storage key checked reads
-> and writes to the guest, however, it has no way of performing atomic,
-> key checked, accesses to the guest.
-> Extend the MEM_OP ioctl in order to allow for this, by adding a cmpxchg
-> mode. For now, support this mode for absolute accesses only.
-> 
-> This mode can be use, for example, to set the device-state-change
-> indicator and the adapter-local-summary indicator atomically.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> ---
->   include/uapi/linux/kvm.h |   7 +++
->   arch/s390/kvm/gaccess.h  |   3 ++
->   arch/s390/kvm/gaccess.c  | 102 +++++++++++++++++++++++++++++++++++++++
->   arch/s390/kvm/kvm-s390.c |  41 +++++++++++++++-
->   4 files changed, 151 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 55155e262646..452f43c1cc34 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -583,6 +583,8 @@ struct kvm_s390_mem_op {
->   		struct {
->   			__u8 ar;	/* the access register number */
->   			__u8 key;	/* access key, ignored if flag unset */
-> +			__u8 pad1[6];	/* ignored */
-> +			__u64 old_addr;	/* ignored if flag unset */
->   		};
->   		__u32 sida_offset; /* offset into the sida */
->   		__u8 reserved[32]; /* ignored */
-> @@ -599,6 +601,11 @@ struct kvm_s390_mem_op {
->   #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
->   #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
->   #define KVM_S390_MEMOP_F_SKEY_PROTECTION	(1ULL << 2)
-> +#define KVM_S390_MEMOP_F_CMPXCHG		(1ULL << 3)
-> +/* flags specifying extension support */
 
-Would that fit behind the bit shifts without getting into the "line too 
-long" territory?
+--=-IWHO8Jp3ZGY1dMw0kU5m
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-> +#define KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG 0x2
-
-\n please
-
-> +/* Non program exception return codes (pgm codes are 16 bit) */
-> +#define KVM_S390_MEMOP_R_NO_XCHG		(1 << 16)
->   
->   /* for KVM_INTERRUPT */
->   struct kvm_interrupt {
-> diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
-> index 9408d6cc8e2c..92a3b9fb31ec 100644
-> --- a/arch/s390/kvm/gaccess.h
-> +++ b/arch/s390/kvm/gaccess.h
-> @@ -206,6 +206,9 @@ int access_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
->   int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
->   		      void *data, unsigned long len, enum gacc_mode mode);
->   
-> +int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
-> +			       __uint128_t *old, __uint128_t new, u8 access_key);
-> +
->   /**
->    * write_guest_with_key - copy data from kernel space to guest space
->    * @vcpu: virtual cpu
-> diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-> index 0243b6e38d36..6165e761a637 100644
-> --- a/arch/s390/kvm/gaccess.c
-> +++ b/arch/s390/kvm/gaccess.c
-> @@ -1161,6 +1161,108 @@ int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
->   	return rc;
->   }
->   
-> +/**
-> + * cmpxchg_guest_abs_with_key() - Perform cmpxchg on guest absolute address.
-> + * @kvm: Virtual machine instance.
-> + * @gpa: Absolute guest address of the location to be changed.
-> + * @len: Operand length of the cmpxchg, required: 1 <= len <= 16. Providing a
-> + *       non power of two will result in failure.
-> + * @old_addr: Pointer to old value. If the location at @gpa contains this value, the
-> + *         exchange will succeed. After calling cmpxchg_guest_abs_with_key() *@old
-> + *         contains the value at @gpa before the attempt to exchange the value.
-> + * @new: The value to place at @gpa.
-> + * @access_key: The access key to use for the guest access.
-> + *
-> + * Atomically exchange the value at @gpa by @new, if it contains *@old.
-> + * Honors storage keys.
-> + *
-> + * Return: * 0: successful exchange
-> + *         * 1: exchange unsuccessful
-> + *         * a program interruption code indicating the reason cmpxchg could
-> + *           not be attempted
-
- > 1 Access related program interruption code indicating the reason 
-cmpxchg could not be attempted
-
-< 1 Kernel / input data error codes
-
-> + *         * -EINVAL: address misaligned or len not power of two
-> + *         * -EAGAIN: transient failure (len 1 or 2)
-> + *         * -EOPNOTSUPP: read-only memslot (should never occur)
-
-Would PGM_PROTECTED also make sense here instead of EOPNOTSUPP?
-
-> + */
-> +int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
-> +			       __uint128_t *old_addr, __uint128_t new,
-> +			       u8 access_key)
-> +{
-> +	gfn_t gfn = gpa >> PAGE_SHIFT;
-> +	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
-> +	bool writable;
-> +	hva_t hva;
-> +	int ret;
-> +
-> +	if (!IS_ALIGNED(gpa, len))
-> +		return -EINVAL;
-> +
-> +	hva = gfn_to_hva_memslot_prot(slot, gfn, &writable);
-> +	if (kvm_is_error_hva(hva))
-> +		return PGM_ADDRESSING;
-> +	/*
-> +	 * Check if it's a read-only memslot, even though that cannot occur
-> +	 * since those are unsupported.
-> +	 * Don't try to actually handle that case.
-> +	 */
-> +	if (!writable)
-> +		return -EOPNOTSUPP;
-> +
-[...]
->   /**
->    * guest_translate_address_with_key - translate guest logical into guest absolute address
->    * @vcpu: virtual cpu
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index e4890e04b210..56f4f6ddd5bb 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -584,7 +584,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_S390_VCPU_RESETS:
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   	case KVM_CAP_S390_DIAG318:
-> -	case KVM_CAP_S390_MEM_OP_EXTENSION:
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> @@ -598,6 +597,14 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_S390_MEM_OP:
->   		r = MEM_OP_MAX_SIZE;
->   		break;
-> +	case KVM_CAP_S390_MEM_OP_EXTENSION:
-> +		/*
-> +		 * Flag bits indicating which extensions are supported.
-> +		 * The first extension doesn't use a flag, but pretend it does,
-> +		 * this way that can be changed in the future.
-> +		 */
-> +		r = KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG | 1;
-> +		break;
->   	case KVM_CAP_NR_VCPUS:
->   	case KVM_CAP_MAX_VCPUS:
->   	case KVM_CAP_MAX_VCPU_ID:
-> @@ -2772,12 +2779,19 @@ static bool access_key_invalid(u8 access_key)
->   static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   {
->   	void __user *uaddr = (void __user *)mop->buf;
-> +	void __user *old_addr = (void __user *)mop->old_addr;
-> +	union {
-> +		__uint128_t quad;
-> +		char raw[sizeof(__uint128_t)];
-> +	} old = { .quad = 0}, new = { .quad = 0 };
-> +	unsigned int off_in_quad = sizeof(new) - mop->size;
->   	u64 supported_flags;
->   	void *tmpbuf = NULL;
->   	int r, srcu_idx;
->   
->   	supported_flags = KVM_S390_MEMOP_F_SKEY_PROTECTION
-> -			  | KVM_S390_MEMOP_F_CHECK_ONLY;
-> +			  | KVM_S390_MEMOP_F_CHECK_ONLY
-> +			  | KVM_S390_MEMOP_F_CMPXCHG;
->   	if (mop->flags & ~supported_flags || !mop->size)
->   		return -EINVAL;
->   	if (mop->size > MEM_OP_MAX_SIZE)
-> @@ -2799,6 +2813,21 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   	} else {
->   		mop->key = 0;
->   	}
-> +	if (mop->flags & KVM_S390_MEMOP_F_CMPXCHG) {
-> +		/*
-> +		 * This validates off_in_quad. Checking that size is a power
-> +		 * of two is not necessary, as cmpxchg_guest_abs_with_key
-> +		 * takes care of that
-> +		 */
-> +		if (mop->size > sizeof(new))
-> +			return -EINVAL;
-
-!mop->size || mop->size > sizeof(new)
+RnJvbTogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5jby51az4KClRoZSBrdm1feGVuX3Vw
+ZGF0ZV9ydW5zdGF0ZV9ndWVzdCgpIGZ1bmN0aW9uIGNhbiBiZSBjYWxsZWQgd2hlbiB0aGUgdkNQ
+VQppcyBiZWluZyBzY2hlZHVsZWQgb3V0LCBmcm9tIGEgcHJlZW1wdCBub3RpZmllci4gSXQgKm9w
+cG9ydHVuaXN0aWNhbGx5Kgp1cGRhdGVzIHRoZSBydW5zdGF0ZSBhcmVhIGluIHRoZSBndWVzdCBt
+ZW1vcnksIGlmIHRoZSBnZm5fdG9fcGZuX2NhY2hlCndoaWNoIGNhY2hlcyB0aGUgYXBwcm9wcmlh
+dGUgYWRkcmVzcyBpcyBzdGlsbCB2YWxpZC4KCklmIHRoZXJlIGlzICpjb250ZW50aW9uKiB3aGVu
+IGl0IGF0dGVtcHRzIHRvIG9idGFpbiBncGMtPmxvY2ssIHRoZW4KbG9ja2luZyBpbnNpZGUgdGhl
+IHByaW9yaXR5IGluaGVyaXRhbmNlIGNoZWNrcyBtYXkgY2F1c2UgYSBkZWFkbG9jay4KTG9ja2Rl
+cCByZXBvcnRzOgoKWzEzODkwLjE0ODk5N10gQ2hhaW4gZXhpc3RzIG9mOgrCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoCAmZ3BjLT5sb2NrIC0tPiAmcC0+cGlfbG9jayAtLT4gJnJxLT5f
+X2xvY2sKClsxMzg5MC4xNDkwMDJdwqAgUG9zc2libGUgdW5zYWZlIGxvY2tpbmcgc2NlbmFyaW86
+CgpbMTM4OTAuMTQ5MDAzXcKgwqDCoMKgwqDCoMKgIENQVTDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoCBDUFUxClsxMzg5MC4xNDkwMDRdwqDCoMKgwqDCoMKgwqAgLS0tLcKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC0tLS0KWzEzODkwLjE0OTAwNV3C
+oMKgIGxvY2soJnJxLT5fX2xvY2spOwpbMTM4OTAuMTQ5MDA3XcKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGxvY2soJnAtPnBpX2xv
+Y2spOwpbMTM4OTAuMTQ5MDA5XcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGxvY2soJnJxLT5fX2xvY2spOwpbMTM4OTAuMTQ5MDEx
+XcKgwqAgbG9jaygmZ3BjLT5sb2NrKTsKWzEzODkwLjE0OTAxM10KwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgICoqKiBERUFETE9DSyAqKioKCkluIHRoZSBnZW5lcmFsIGNhc2UsIGlmIHRo
+ZXJlJ3MgY29udGVudGlvbiBmb3IgYSByZWFkIGxvY2sgb24gZ3BjLT5sb2NrLAp0aGF0J3MgZ29p
+bmcgdG8gYmUgYmVjYXVzZSBzb21ldGhpbmcgZWxzZSBpcyBlaXRoZXIgaW52YWxpZGF0aW5nIG9y
+CnJldmFsaWRhdGluZyB0aGUgY2FjaGUuIEVpdGhlciB3YXksIHdlJ3ZlIHJhY2VkIHdpdGggc2Vl
+aW5nIGl0IGluIGFuCmludmFsaWQgc3RhdGUsIGluIHdoaWNoIGNhc2Ugd2Ugd291bGQgaGF2ZSBh
+Ym9ydGVkIHRoZSBvcHBvcnR1bmlzdGljCnVwZGF0ZSBhbnl3YXkuCgpTbyBpbiB0aGUgJ2F0b21p
+YycgY2FzZSB3aGVuIGNhbGxlZCBmcm9tIHRoZSBwcmVlbXB0IG5vdGlmaWVyLCBqdXN0CnN3aXRj
+aCB0byB1c2luZyByZWFkX3RyeWxvY2soKSBhbmQgYXZvaWQgdGhlIFBJIGhhbmRsaW5nIGFsdG9n
+ZXRoZXIuCgpTaWduZWQtb2ZmLWJ5OiBEYXZpZCBXb29kaG91c2UgPGR3bXdAYW1hem9uLmNvLnVr
+PgotLS0KCkZpcnN0IHBhdGNoIGluIHRoaXMgc2VyaWVzIHdhcyAnW1BBVENIXSBLVk06IHg4Ni94
+ZW46IEZpeCBsb2NrZGVwCndhcm5pbmcgb24gInJlY3Vyc2l2ZSIgZ3BjIGxvY2tpbmcnIGJ1dCBu
+b3cgdGhlcmUgYXJlIHRocmVlLgoKCsKgYXJjaC94ODYva3ZtL3hlbi5jIHwgMTcgKysrKysrKysr
+KysrKystLS0KwqAxIGZpbGUgY2hhbmdlZCwgMTQgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMo
+LSkKCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veGVuLmMgYi9hcmNoL3g4Ni9rdm0veGVuLmMK
+aW5kZXggMDdlNjFjYzk4ODFlLi5jNDQ0OTQ4YWIxYWMgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2t2
+bS94ZW4uYworKysgYi9hcmNoL3g4Ni9rdm0veGVuLmMKQEAgLTI3Miw3ICsyNzIsMTIgQEAgc3Rh
+dGljIHZvaWQga3ZtX3hlbl91cGRhdGVfcnVuc3RhdGVfZ3Vlc3Qoc3RydWN0IGt2bV92Y3B1ICp2
+LCBib29sIGF0b21pYykKwqDCoMKgwqDCoMKgwqDCoCAqIEF0dGVtcHQgdG8gb2J0YWluIHRoZSBH
+UEMgbG9jayBvbiAqYm90aCogKGlmIHRoZXJlIGFyZSB0d28pCsKgwqDCoMKgwqDCoMKgwqAgKiBn
+Zm5fdG9fcGZuIGNhY2hlcyB0aGF0IGNvdmVyIHRoZSByZWdpb24uCsKgwqDCoMKgwqDCoMKgwqAg
+Ki8KLcKgwqDCoMKgwqDCoMKgcmVhZF9sb2NrX2lycXNhdmUoJmdwYzEtPmxvY2ssIGZsYWdzKTsK
+K8KgwqDCoMKgwqDCoMKgbG9jYWxfaXJxX3NhdmUoZmxhZ3MpOworwqDCoMKgwqDCoMKgwqBpZiAo
+IXJlYWRfdHJ5bG9jaygmZ3BjMS0+bG9jaykpIHsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoGlmIChhdG9taWMpCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgcmV0dXJuOworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmVhZF9sb2NrKCZn
+cGMxLT5sb2NrKTsKK8KgwqDCoMKgwqDCoMKgfQrCoMKgwqDCoMKgwqDCoMKgd2hpbGUgKCFrdm1f
+Z3BjX2NoZWNrKGdwYzEsIHVzZXJfbGVuMSkpIHsKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqByZWFkX3VubG9ja19pcnFyZXN0b3JlKCZncGMxLT5sb2NrLCBmbGFncyk7CsKgCkBAIC0y
+ODMsNyArMjg4LDcgQEAgc3RhdGljIHZvaWQga3ZtX3hlbl91cGRhdGVfcnVuc3RhdGVfZ3Vlc3Qo
+c3RydWN0IGt2bV92Y3B1ICp2LCBib29sIGF0b21pYykKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqBpZiAoa3ZtX2dwY19yZWZyZXNoKGdwYzEsIHVzZXJfbGVuMSkpCsKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybjsKwqAKLcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJlYWRfbG9ja19pcnFzYXZlKCZncGMxLT5sb2NrLCBmbGFn
+cyk7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIHJldHJ5OwrCoMKgwqDCoMKg
+wqDCoMKgfQrCoArCoMKgwqDCoMKgwqDCoMKgaWYgKGxpa2VseSghdXNlcl9sZW4yKSkgewpAQCAt
+MzA5LDcgKzMxNCwxMyBAQCBzdGF0aWMgdm9pZCBrdm1feGVuX3VwZGF0ZV9ydW5zdGF0ZV9ndWVz
+dChzdHJ1Y3Qga3ZtX3ZjcHUgKnYsIGJvb2wgYXRvbWljKQrCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoCAqIGdwYzEgbG9jayB0byBtYWtlIGxvY2tkZXAgc2h1dCB1cCBhYm91dCBpdC4K
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqBsb2NrX3NldF9zdWJjbGFzcygmZ3BjMS0+bG9jay5kZXBfbWFwLCAxLCBfVEhJ
+U19JUF8pOwotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmVhZF9sb2NrKCZncGMyLT5s
+b2NrKTsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmICghcmVhZF90cnlsb2NrKCZn
+cGMyLT5sb2NrKSkgeworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoGlmIChhdG9taWMpIHsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmVhZF91bmxvY2tfaXJxcmVzdG9yZSgmZ3BjMS0+bG9j
+aywgZmxhZ3MpOworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqByZXR1cm47CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgfQorwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoHJlYWRfbG9jaygmZ3BjMi0+bG9jayk7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqB9CsKgCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKCFrdm1fZ3BjX2No
+ZWNrKGdwYzIsIHVzZXJfbGVuMikpIHsKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgcmVhZF91bmxvY2soJmdwYzItPmxvY2spOwotLSAKMi4zNC4xCgoK
 
 
-> +		if (mop->op != KVM_S390_MEMOP_ABSOLUTE_WRITE)
-> +			return -EINVAL;
-> +		if (copy_from_user(&new.raw[off_in_quad], uaddr, mop->size))
-> +			return -EFAULT;
-> +		if (copy_from_user(&old.raw[off_in_quad], old_addr, mop->size))
-> +			return -EFAULT;
-> +	}
->   	if (!(mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY)) {
->   		tmpbuf = vmalloc(mop->size);
->   		if (!tmpbuf)
-> @@ -2829,6 +2858,14 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   	case KVM_S390_MEMOP_ABSOLUTE_WRITE: {
->   		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
->   			r = check_gpa_range(kvm, mop->gaddr, mop->size, GACC_STORE, mop->key);
-> +		} else if (mop->flags & KVM_S390_MEMOP_F_CMPXCHG) {
-> +			r = cmpxchg_guest_abs_with_key(kvm, mop->gaddr, mop->size,
-> +						       &old.quad, new.quad, mop->key);
-> +			if (r == 1) {
-> +				r = KVM_S390_MEMOP_R_NO_XCHG;
+--=-IWHO8Jp3ZGY1dMw0kU5m
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-Why don't we return KVM_S390_MEMOP_R_NO_XCHG from 
-cmpxchg_guest_abs_with_key instead of aliasing 1 here?
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTExMDkzNzUwWjAvBgkqhkiG9w0BCQQxIgQgrB48TgOa
+x7uCZcskMYlwpL9/V8AbaegLyl15qumpgcUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAKgoMlQMwDAb9YJsgqhNdOeJoDIi8ri2V+
+7QZNSR4BBrlPtFeMP4hKhioa46MEB+/bOtPiaOfqjA2TEULMHenLiF0Jwlis/r8dUKLSglODgp8g
+h8o1G9MbqdQ2Ym+JGfACZe9/Mj0EL+Exhcfd3Ta9TQE5DvsbLolq0/dFf2+VZ6EjeL629U6mxfzd
+leEw/amgHdLh7lV97QNioICpsF44zIzgFzR/XL5zeQ755cI74G4/bNVXWV2KUjKGw3B7JD6pgvrj
+qX8EZwzu5cdznLjnIjq+HJBrZZtEOPCxjn+UlWj/TVk/+NJJDRIEMPeMTAF8vB+wZOYx6TPnw/QU
+O14T54DWRQrN0VirLyVgs6Q6/lICVhc19NPCdBVk3bKwXMSEdKQXpOmJuG8NGP/7OtpzvhodlvVg
+PCUjTqwdExea+p139Sb1r2n0NWfe3sKS0atXEw46hz5XVyX2YYXrSJgX07lWZSuFGJrTHccjO/vB
+/FsKCsupBsluWlLC4TUDcy4syh1WieiePp6A0DJVcUxKStj+9i1EYpZEBG3i5ws26VVYu0VHFDk0
+OcL/J2mH9+pBiCQq3Ty/QFqVqyMNlCtpnxi2IqaxxoBN+kByd5NeMDnTk/orZNfyzBn7sOhhQTVH
+eATv0C/FXZ79+qalDp2SUCus8FcQt65QFSIV+EFk5wAAAAAAAA==
 
-> +				if (copy_to_user(old_addr, &old.raw[off_in_quad], mop->size))
-> +					r = -EFAULT;
-> +			}
->   		} else {
->   			if (copy_from_user(tmpbuf, uaddr, mop->size)) {
->   				r = -EFAULT;
 
+--=-IWHO8Jp3ZGY1dMw0kU5m--
