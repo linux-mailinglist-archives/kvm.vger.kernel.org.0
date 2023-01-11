@@ -2,38 +2,38 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D9826662B6
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 19:22:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 463586662B8
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 19:23:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235627AbjAKSWm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 13:22:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33294 "EHLO
+        id S235533AbjAKSXS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 13:23:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235376AbjAKSWU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 13:22:20 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D336555B2;
-        Wed, 11 Jan 2023 10:22:07 -0800 (PST)
+        with ESMTP id S234623AbjAKSXL (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 13:23:11 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D842455B2;
+        Wed, 11 Jan 2023 10:23:10 -0800 (PST)
 From:   Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1673461325;
+        s=2020; t=1673461389;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=jxIOvx/FOCrvFSWu5Y1mdP4fKAkQqLE1G0W7dNcBaVE=;
-        b=tFTGDfgJ9VfFpcWmk4eIX3n8W5MJiSRlNfaUZbeot2kdGccBKC9BCfKn8bLoHX36YwGHjh
-        D3zj8bnRuJ/Si4rujs7Zt88o4RNqyt0NUZkzQ3KsGZrPMHS8w5Lai2yJC9jxNi81fo1Q++
-        Ydn2oOb+PzHgOeIUzbtOjcl6M7qFCUqZqjWa4QBa7YU6wiP86ri3UZ6Ai1efJO79j6T9qz
-        z+TBMVlZHh1cwBMWzjBmGEnxmTm/AS2Ux+EiabpUR91W7qq4ECv6dLHaqxl0UNhnqNKbq3
-        j+/ZEOs+eIOW2K68+EAJV6YXdD/CuIXTe8UIavoG/hRacktU4bjXzQ0cMBShgA==
+        bh=/vMqcs3d/mQXSbj2yIxtSqUpEXzHA4uoYUEBxosyu6A=;
+        b=pIQg6pyY0w4XO9bR3CcnGPeNxLEQwXr4ATdOnewL1XufZswdlaNB1lX+AbKqpIKO096KRz
+        kwkwNyDReRag2iZxJEYqBt2tQgC4hWu2mXJA8YDaj2hdW274/vZqkNf4JTPqzeCtyP/35P
+        ImWjaqQNgB2l2P2/b/wEiovvdgAlJGMfFDKDN4mS2ZuS16OxPbb1euTx2ptE7KQC602Sc2
+        3Nb3QC+yMaGb+90nl1RtbEG84uHfdXAxgOUFgFs3aqIZ8O6wiIcaoMU3lFGN9mrrblwr/J
+        uNCXznRa0l6Glxuzs5i4l6T/oJgZc9uv4KL9/4jt3MwWbytk4+c6TqQHWBmmDQ==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1673461325;
+        s=2020e; t=1673461389;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=jxIOvx/FOCrvFSWu5Y1mdP4fKAkQqLE1G0W7dNcBaVE=;
-        b=a3HiVVOcV1Onqj6bTQon3HiFaq5CKrJFRoRLQHmrHQwjYlib3nw36Pp4wjMnnn0kI9MLiW
-        PKFpJ6qzEb62pvAA==
+        bh=/vMqcs3d/mQXSbj2yIxtSqUpEXzHA4uoYUEBxosyu6A=;
+        b=u1oEAJ2Vkn4Rr+vY8LJ8BhU1HHgnxfpu5AoG7tZW6UaUez7wwrqIeoDg+4fWAj36ZmcHp6
+        LKrS0zoKjBPZKYDQ==
 To:     Jason Gunthorpe <jgg@nvidia.com>,
         Alexander Gordeev <agordeev@linux.ibm.com>,
         Alex Williamson <alex.williamson@redhat.com>,
@@ -59,12 +59,12 @@ Cc:     Bharat Bhushan <bharat.bhushan@nxp.com>,
         Matthew Rosato <mjrosato@linux.ibm.com>,
         Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
         Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH iommufd v3 5/9] irq: Remove unused
- irq_domain_check_msi_remap() code
-In-Reply-To: <5-v3-3313bb5dd3a3+10f11-secure_msi_jgg@nvidia.com>
-References: <5-v3-3313bb5dd3a3+10f11-secure_msi_jgg@nvidia.com>
-Date:   Wed, 11 Jan 2023 19:22:05 +0100
-Message-ID: <87bkn5hqya.ffs@tglx>
+Subject: Re: [PATCH iommufd v3 6/9] irq: Rename IRQ_DOMAIN_MSI_REMAP to
+ IRQ_DOMAIN_ISOLATED_MSI
+In-Reply-To: <6-v3-3313bb5dd3a3+10f11-secure_msi_jgg@nvidia.com>
+References: <6-v3-3313bb5dd3a3+10f11-secure_msi_jgg@nvidia.com>
+Date:   Wed, 11 Jan 2023 19:23:08 +0100
+Message-ID: <878ri9hqwj.ffs@tglx>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -78,9 +78,7 @@ X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Jan 05 2023 at 15:33, Jason Gunthorpe wrote:
 
-Prefix: genirq/irqdomain:
-
-git log --online $FILEPATH gives you usually a pretty good hint for the prefix.
+Comment about prefix allplies here as well...
 
 Other than that:
 
