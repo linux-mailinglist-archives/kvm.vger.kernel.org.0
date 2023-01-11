@@ -2,79 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9C67666617D
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:13:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A047E666188
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:15:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232469AbjAKRNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 12:13:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44902 "EHLO
+        id S232967AbjAKRPa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 12:15:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234409AbjAKRN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 12:13:28 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9873F59C
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:13:27 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id c8-20020a17090a4d0800b00225c3614161so20715585pjg.5
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:13:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7xoqM2b4yU5Wgrth55wL+NVhuuSQRsysOAOffMfb2Zs=;
-        b=UTHw9GP46gMj4w7BoWTjll73gGs6xDrYov0a9OBFb+A+fCEnj/lNlk/PdejnbXURqO
-         Bjaa3RzcOfRgNZwW4y4wEquG1PiGvWa+mDFtnWW0uykLypatPgx5G7+4SERoq1k+dvQG
-         xFFX2kzEYRvqMO5becq4T5XslALlZk0R4OFnPNGloW7hFS7+kr3EIBznbqo0ZIAm8A1H
-         +p3Zp0frWYwjCW7td3rratlrAVtlk1S+6jOhrJ+M/+CWMO1tC4v7PVqrV9Thc4XztjhF
-         1CE9QPZeiFYhJRLTxvImYXddOrBCNoD718EF13VjvKDTA1rmkfHp64GNv01N55tZjVL5
-         n6Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7xoqM2b4yU5Wgrth55wL+NVhuuSQRsysOAOffMfb2Zs=;
-        b=OmaP+KztDNAVQWTOlALmIn7bWvXe16KwVgdGYt8H9MjhpZss95C+pbq0M2faum/68Y
-         c1kUMPRkxMi8BH6QbpiBie2WGl+yTfSyoN75CW+2DLgF+8WwYNsAs82uPswNSXPuai+u
-         xbwIuyiFJK0h5LTEdwkvV1hhjjVnj0KV8ljCiZMj9GwP0FXwIqspjF5w7a+1gPFYyaoE
-         G9S9eRqmah+kLRp9xl+u2vY1Ivr72seiSFZb1YcUvmSMS+SWiuVkWpOQNRLRV7gYoPAH
-         +dKrgFTJiEQIeQU5eJrY1wTs9Pn/Wkzgz3nfy4zMo5diJosHbJIX3VRgtl0qEgqPsDMo
-         wfpw==
-X-Gm-Message-State: AFqh2ko9h6/KLY3gE5M7hNVRPPiLMynl8KOi9V1Gld9/awwI/J1NKEmR
-        tcwlpiwE5FEpA94t+8Nn7kL7ZQ==
-X-Google-Smtp-Source: AMrXdXvZV+eSwBO+qB3Cyv97/dRNyiGborDMC+PfJG2AQCDQ93hQgMsB7NAdTQYHGQJUGIn+huvG/w==
-X-Received: by 2002:a17:90a:9503:b0:227:679:17df with SMTP id t3-20020a17090a950300b00227067917dfmr499019pjo.0.1673457207330;
-        Wed, 11 Jan 2023 09:13:27 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id e13-20020a63e00d000000b00485cbedd34bsm8852733pgh.89.2023.01.11.09.13.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 09:13:26 -0800 (PST)
-Date:   Wed, 11 Jan 2023 17:13:23 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-        David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
-        Trigger Huang <Trigger.Huang@gmail.com>,
-        Gert Wollny <gert.wollny@collabora.com>,
-        Antonio Caggiano <antonio.caggiano@collabora.com>,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
-        kernel@collabora.com, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
-Message-ID: <Y77uM/X94DtKXtK0@google.com>
-References: <20220815095423.11131-1-dmitry.osipenko@collabora.com>
- <8230a356-be38-f228-4a8e-95124e8e8db6@amd.com>
- <YxenK8xZHC6Q4Eu4@phenom.ffwll.local>
- <YxeoEr6xAtlZ+IrU@phenom.ffwll.local>
+        with ESMTP id S234474AbjAKRPV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 12:15:21 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0381513F86
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:15:20 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30BGUgqW032273;
+        Wed, 11 Jan 2023 17:15:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=9sxcrTQdD4oH23FESbyUcgXBPeiJ+qNe4My9X6jF0ls=;
+ b=DOAEJ/+whbk7XVtVmqz7asnLkcD6jgPHorwkY+/sLbXsZpxyyRO8djDAWrWi1TUs3fsp
+ kXvhwPoCHivHEU7ZEhC+hTGskaTFS93KDuy+aY18owfmDLPVjwVCqkW3IPg9EuHnZYQi
+ K7Ygw7jOLOAVpBjxpOtqLchuQh2DCdylJxaE9xbQaEmWuEyh1Z8dxhrsftCdc7Efn06X
+ fabJC8W22x4tikdzBDcVpv/3jVoOT0QauLS4P0kvBUM4f42R/eGEUnkIwfe8iSQZfDPT
+ SchtTdTFezLeuvqc70ELRyIfdsBU602GpfD6AKTnlQEt64CZQNb6V+EgYZp6yqei97mf Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n20pv1dt1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 17:15:05 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30BGVipS003953;
+        Wed, 11 Jan 2023 17:15:05 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n20pv1ds1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 17:15:04 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30BGp7l5003295;
+        Wed, 11 Jan 2023 17:15:02 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3n1kmtgvy1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 17:15:02 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30BHEwSn45679096
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Jan 2023 17:14:58 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8E9A920040;
+        Wed, 11 Jan 2023 17:14:58 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2C68220043;
+        Wed, 11 Jan 2023 17:14:58 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.175.58])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 11 Jan 2023 17:14:58 +0000 (GMT)
+Message-ID: <cf0ce650d86e9a1fae7477d1ed8e49d87fc4d9d2.camel@linux.ibm.com>
+Subject: Re: [PATCH v14 03/11] target/s390x/cpu topology: handle STSI(15)
+ and build the SYSIB
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        frankja@linux.ibm.com
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Wed, 11 Jan 2023 18:14:58 +0100
+In-Reply-To: <5cf19913-b2d7-d72d-4332-27aa484f72e4@redhat.com>
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+         <20230105145313.168489-4-pmorel@linux.ibm.com>
+         <5cf19913-b2d7-d72d-4332-27aa484f72e4@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YxeoEr6xAtlZ+IrU@phenom.ffwll.local>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 2RPftDXXClV8p8RsqWFBIY13IFxYhvlA
+X-Proofpoint-GUID: zcRf8ooUXzQAH50TiRAVlWbAM0N0D9SR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-11_07,2023-01-11_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 adultscore=0
+ suspectscore=0 spamscore=0 clxscore=1015 lowpriorityscore=0
+ mlxlogscore=806 mlxscore=0 phishscore=0 impostorscore=0 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301110125
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,48 +99,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Sep 06, 2022, Daniel Vetter wrote:
-> On Tue, Sep 06, 2022 at 10:01:47PM +0200, Daniel Vetter wrote:
-> > On Mon, Aug 15, 2022 at 12:05:19PM +0200, Christian König wrote:
-> > > Am 15.08.22 um 11:54 schrieb Dmitry Osipenko:
-> > > > Higher order pages allocated using alloc_pages() aren't refcounted and they
-> > > > need to be refcounted, otherwise it's impossible to map them by KVM. This
-> > > > patch sets the refcount of the tail pages and fixes the KVM memory mapping
-> > > > faults.
-> > > > 
-> > > > Without this change guest virgl driver can't map host buffers into guest
-> > > > and can't provide OpenGL 4.5 profile support to the guest. The host
-> > > > mappings are also needed for enabling the Venus driver using host GPU
-> > > > drivers that are utilizing TTM.
-> > > > 
-> > > > Based on a patch proposed by Trigger Huang.
-> > > 
-> > > Well I can't count how often I have repeated this: This is an absolutely
-> > > clear NAK!
-> > > 
-> > > TTM pages are not reference counted in the first place and because of this
-> > > giving them to virgl is illegal.
-> > > 
-> > > Please immediately stop this completely broken approach. We have discussed
-> > > this multiple times now.
-> > 
-> > Yeah we need to get this stuff closed for real by tagging them all with
-> > VM_IO or VM_PFNMAP asap.
-> 
-> For a bit more context: Anything mapping a bo should be VM_SPECIAL. And I
-> think we should add the checks to the gem and dma-buf mmap functions to
-> validate for that, and fix all the fallout.
-> 
-> Otherwise this dragon keeps resurrecting ...
-> 
-> VM_SPECIAL _will_ block get_user_pages, which will block everyone from
-> even trying to refcount this stuff.
+On Tue, 2023-01-10 at 15:29 +0100, Thomas Huth wrote:
+> On 05/01/2023 15.53, Pierre Morel wrote:
+> > On interception of STSI(15.1.x) the System Information Block
+> > (SYSIB) is built from the list of pre-ordered topology entries.
+> >=20
+> > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > ---
+>=20
+[...]
 
-FWIW, IIUC that won't change the KVM story.  KVM acquires the PFN for these pages
-via follow_pte(), not by gup().  Details are in a different strand of this thread[*].
+> > +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar=
+)
+> > +{
+> > +    union {
+> > +        char place_holder[S390_TOPOLOGY_SYSIB_SIZE];
+> > +        SysIB_151x sysib;
+> > +    } buffer QEMU_ALIGNED(8) =3D {};
+> > +    int len;
+> > +
+> > +    if (!s390_has_topology() || sel2 < 2 || sel2 > SCLP_READ_SCP_INFO_=
+MNEST) {
+> > +        setcc(cpu, 3);
+> > +        return;
+> > +    }
+> > +
+> > +    len =3D setup_stsi(cpu, &buffer.sysib, sel2);
+> > +
+> > +    if (len > 4096) {
+>=20
+> Maybe use TARGET_PAGE_SIZE instead of 4096 ?
 
-If TTM pages aren't tied into mmu_notifiers, then I believe the only solution is
-to not allow them to be mapped into user page tables.  If they are tied into
-mmu_notifiers, then this is fully a KVM limitation that we are (slowly) resolving.
-
-[*] https://lore.kernel.org/all/Y77sQZI0IfFVx7Jo@google.com
+sizeof(SysIB) would be preferable IMO.
+>=20
+> > +        setcc(cpu, 3);
+> > +        return;
+> > +    }
