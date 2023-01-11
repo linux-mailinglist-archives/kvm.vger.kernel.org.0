@@ -2,550 +2,241 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ABC0E66574F
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 10:22:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 57BE9665752
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 10:23:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236031AbjAKJWQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 04:22:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55624 "EHLO
+        id S231975AbjAKJXn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 04:23:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238620AbjAKJVp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 04:21:45 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B8E5F80
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 01:21:42 -0800 (PST)
-Received: from [2a02:8108:963f:de38:eca4:7d19:f9a2:22c5]; authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1pFXIi-0001T4-Fg; Wed, 11 Jan 2023 10:21:40 +0100
-Message-ID: <68667bda-ac6a-d2cf-d8d3-a308d7181650@leemhuis.info>
-Date:   Wed, 11 Jan 2023 10:21:39 +0100
+        with ESMTP id S235676AbjAKJXc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 04:23:32 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C60705F44;
+        Wed, 11 Jan 2023 01:23:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673429011; x=1704965011;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=yDKqDdydGWahKrNwF/gDZ9J0gcQm1Uf09tAnJgVwkq8=;
+  b=VR7kxL5r73VXKZJcjEsa+W9/AfvopAINoHdXH78tLGdmsu6wDHQs0N/P
+   4R9DLhamal7jseMHOmsSF505dHv05AP3pcPtxbZ+kLlhD4mivZW5vZrpy
+   7uS3+dLdeF2N2Ddu7jJnSOKCq5FOcQ6audTBtR3XuVjTY9G07NBNEKZkX
+   2LEGW7NnObkg2VmtMovhRC6tg5KGAgVPwOTWyWyNOpShAPjZJod/5xSzD
+   Q6p2rFmX90iVpp96+TvArxsbvWLWbPoUMeODW5gXOSSefJlc7bFyt65pL
+   +DEqtGtt0ZCwc0gRJfzHcx/hbDe3rwCXThijVPa5XVSIa0C6N7iAVg9VO
+   w==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="322069935"
+X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
+   d="scan'208";a="322069935"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jan 2023 01:23:30 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="687863094"
+X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
+   d="scan'208";a="687863094"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga008.jf.intel.com with ESMTP; 11 Jan 2023 01:23:30 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 11 Jan 2023 01:23:29 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Wed, 11 Jan 2023 01:23:29 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.173)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Wed, 11 Jan 2023 01:23:29 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lNvCEeArVzNwVxCf808o6gP0Bcl2YGrrXzJ6FtYStzHMvvQ10KADPZNYmxMPO9wUtRNn/frReeDqkHGbPbV4XEk8jRMvG/pxh1ELvLJaGsPsv45Q0sBMhOypMjxgJz+GEgspD8agGXhKvV0ft69V1K2PQcxNyWGgimIzQadse0ymWAmnedZmP+Z5dgdF7g4iiQh8gE1W+iWyEr+OPqwLM4XuX3QTkg6gIjOSuENH6tOr2+ONBvxOgddxGbGO/i5/gJznmNAYN5rnaeR9GIqNc96PRr4iSJhrZOy/QTEDi/c7oqx6grXwg3reDEVM9AlMl1LJaHGNZRByibRtbH/ipQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yDKqDdydGWahKrNwF/gDZ9J0gcQm1Uf09tAnJgVwkq8=;
+ b=Al/kzSVVGzSvcFZmUO3uRt9/z1e5XZ8Ec3DJk4Jtj8LxWcCHv5VlfJNP8Xy4n7UooNOMI3XmXcYvBP4+9UwHjHYpQRCbJ8e8beWBegv/Pjuea/86gNs6fWxaMNN/MyDGu63FQ/NfPaegODmAA6M5ZJTNjkGWPWFyt/Zrb5f6yd1uUhXllGYiDi38LBqtb7z8okaE1JoYFU5vpsNTcKUOI7WtJILXrfHnBfu9kWtPaiZdiJxdysYNbjlS6UJYwN+PG2l2BTG6+TUGY6bakITWcNWF+1TJuVUk/RCHt34b8+mGDbmi/leDv762E7ACOlE5VLMPZ7R7qzKMfp82NBiilw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH7PR11MB5983.namprd11.prod.outlook.com (2603:10b6:510:1e2::13)
+ by CH3PR11MB7179.namprd11.prod.outlook.com (2603:10b6:610:142::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Wed, 11 Jan
+ 2023 09:23:25 +0000
+Received: from PH7PR11MB5983.namprd11.prod.outlook.com
+ ([fe80::ed5d:ddf5:d289:3076]) by PH7PR11MB5983.namprd11.prod.outlook.com
+ ([fe80::ed5d:ddf5:d289:3076%9]) with mapi id 15.20.5986.018; Wed, 11 Jan 2023
+ 09:23:25 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Hansen, Dave" <dave.hansen@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+Subject: Re: [PATCH v8 08/16] x86/virt/tdx: Add placeholder to construct TDMRs
+ to cover all TDX memory regions
+Thread-Topic: [PATCH v8 08/16] x86/virt/tdx: Add placeholder to construct
+ TDMRs to cover all TDX memory regions
+Thread-Index: AQHZC5gPYUqEVXDsYU2zS2Qoxtth0K6R8eiAgAUPNACAAAIIAIAAGroAgAEZ1YCAAO3QgA==
+Date:   Wed, 11 Jan 2023 09:23:24 +0000
+Message-ID: <3fb1ee94ed64d0d36db355c77ac154006bf6cafd.camel@intel.com>
+References: <cover.1670566861.git.kai.huang@intel.com>
+         <ef6fe9247007ee8e15272de01ded1e0a9152be02.1670566861.git.kai.huang@intel.com>
+         <c70c30fb-073f-4355-c6a6-052d013a99da@intel.com>
+         <81b814f096513e69e3099ab2b54034deadf8d7fd.camel@intel.com>
+         <92aba287-c839-8841-a9f7-28a2c0b3097a@intel.com>
+         <cba4c7295b157dc5d0d88b73f335899f0aa5a21c.camel@intel.com>
+         <56cdb6e6-e25c-aba9-7bb3-323281e65249@intel.com>
+In-Reply-To: <56cdb6e6-e25c-aba9-7bb3-323281e65249@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.44.4 (3.44.4-2.fc36) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR11MB5983:EE_|CH3PR11MB7179:EE_
+x-ms-office365-filtering-correlation-id: 6d9b0b17-ba4d-4f9f-2719-08daf3b57db1
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pAJiY8PgqSpOJKFh3okQIQfbZ1DUXYdh58rJFVkM37Quz6nSIc1uFzo3SWgXeXvRSwdJ+t2CNVnNhlFNNZgsCrpXP/jqG3SW6WobkA2t71lyCAK7/B37D4Mazyc3td/Lc/LSCZEuJvYtf1Ft1ufrT9iffr/sFZO45dQCRoiQOCrec0sy6e+JbwYbvj1/GJ9JMoW8XV6Fh6LQeweBTajPX3c3OhuGXINTUpwFxsof2K/PNsAx7pBvf2z+rJowwMV0AKZ/6udLLKLbHEtZcpnoyYHiFNzTAEwn2/trfAPFQsKkVKxLbn4s1Vr6Wbft0RwqiA/V7V5Q8D1wqAmZlW7T5S1M67VlfI3zSX86pcZ2mKydNIiDeRcKxz8jFbAo8EzojpAMx1MSjl/5vesga3jWsgwAMNcREvjc4WidP+IS0M8Fpecxkgr8sv0I4RRBQ/OxeP09davK5lq9BGlWM1nESKHQyUY2kHDnmKvtxn235hOimx6pnQXe6/0U1Zg8sM9zJL1QiuXRa6oWPkhYMzbGN1iUSHi5QexPfxupOYPzYEQesxGvven8gZCkDSIsEdw6qV5iMwl8+Ea/jkrq2cwu00hKDb3AKTz5n8w/CDudQAjabVLICscY9YGwGUt3NCOUScgiq3lx/Nd76KWyXuR/GYKJZx7v+9lJ7WmQ5jZ1otc2kveJkQ+02zq85NcZ0cIENfQlJAUFo/FK6B1FGNFr4kUesh+7/exhtGmtj7CVMm0=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB5983.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(376002)(396003)(346002)(366004)(39860400002)(451199015)(8676002)(64756008)(76116006)(66946007)(66556008)(66476007)(316002)(4326008)(110136005)(38070700005)(54906003)(2906002)(5660300002)(8936002)(66446008)(71200400001)(41300700001)(7416002)(36756003)(53546011)(966005)(6486002)(478600001)(6506007)(82960400001)(122000001)(38100700002)(2616005)(26005)(6512007)(86362001)(186003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V1VxQitiSDY5R0dtWUdoTDhWczdhSWRFcisrcW5UMkJtSVFMblg3cGFEUFVM?=
+ =?utf-8?B?ZC94bHZ3dHBsSG40TkU5eWI0bXBRL052SmZJV1JORWNnb21UV0h5YzlrdTFO?=
+ =?utf-8?B?Smd1aEhKUm91Q3BYSUs1b0htYjU3V1FhOC83UVdNNUxtVVVsbmwvRDd6NDV4?=
+ =?utf-8?B?OEp1QzQrSGtFZWZIa2M3R05yam9rTGYrU3VVRkNCeDVkUi93NjhXTkdOMGlP?=
+ =?utf-8?B?djhzRDBxZW9WRXdZRmtFaUNuS1ZOWDZvZTlqQ2l1czNaR0VUSFhkblZPcmNJ?=
+ =?utf-8?B?RDIvM3dsaTA4d0ZoeG92L3F2d1duS1BGa2xRVklVd3ZSN21pL3NnOVZmZ01w?=
+ =?utf-8?B?TGcyRVZtTVE4Z1czZjU3Z3A3NnUyWHd6WE56RjVOVmdtWXA0U0cyaHZQWktq?=
+ =?utf-8?B?bDh6R1RhTmxDaVZIdTY1WE9HOExUMGZvTFg3N3ZPWjZFQWJDU3YyQVVGMVl2?=
+ =?utf-8?B?aEUrNlRtRU15Q1hYRkUzZ1hZdE5nSGl4SEFJNVR4amJ4RitFUmdiVWZpNEJx?=
+ =?utf-8?B?VHdhYVFuOXNES2EwOHVTb0N1cWdPNU1wK1ZjeUZUZHJlcHlDNll6MzlpRGox?=
+ =?utf-8?B?OHJwcUFSbUYvZEZqSE1HbWNEeE1zK1pyOXJrVzVGZTMweS9zR3ZCVFhocjFW?=
+ =?utf-8?B?MEdpaHZGTmIxdStzQi9ia2tLejRLbzBJTEdrZE5xcjBlZE8yVXZhT0wrc0xy?=
+ =?utf-8?B?SzdQRXh0Q2RUYzgyWXZSRmk2Y2d4eXhMdkM5c3IxWHNFV3R4Vng5MXNRUlph?=
+ =?utf-8?B?cWE5MGNYNWNPUTlQajZTTmNPa2pmY3NWR2Y0YUdmYzFybnpIc0VYRkk5SWZY?=
+ =?utf-8?B?U00wK1EyVHZLWi94eVZvVDFoUXVKTno2ZmZnb0p0SXRILzlscE05M0V2eFll?=
+ =?utf-8?B?eG1PM0NFSG5oUVNLVytocEVPN2hCb3M3bUhvK0R3cWtDaVByNndjckJTNDRG?=
+ =?utf-8?B?MWZQSWdHdW9LdUdNK0g3a2pMSFFzMXN5VUNiSzdZeVArb0VWNXptNDhjVHBP?=
+ =?utf-8?B?RjFTc2l2Mzh2czdBdkp1M05oM00xMVdSTW1DZUZJNTV3VSsrY2VaSktFMnRo?=
+ =?utf-8?B?bmk4dkNQZlJjSEhiVFh0UktVS0IxdFJLMjV5bjlJSlBNT1ZnSjBRSlRocU1U?=
+ =?utf-8?B?Q1Yvd1ZTdGU4WnQ1S0RMWkczWGNlVk5rTlpSRDNvcWg0WnhDbWlUbXVkQzR6?=
+ =?utf-8?B?T2lGVllyZDJwSElMdjBqVVg3RXRYcE8yRU1rUnp6T2MvV2lPZXpHK1RyNDRl?=
+ =?utf-8?B?NFNIU0llV1I3WTF5SXZCTnF2bW5qSFFic1UxRmRsT3g5d1dJQmNSWnArSzRm?=
+ =?utf-8?B?dTljeTVQNmQ1QWFrOXdsUmhZRXVSbEJBbUYwMzdvYmlWVHlPc1J2d2MvZ2tn?=
+ =?utf-8?B?YVpKSHBVRGxpTTdPWjdpQkhDT1hxK05WaXgvOE9wVzNNZWJ5di9HVG1sTUlV?=
+ =?utf-8?B?VmZXeC9Ub09ZUUZnQmE2aWl4aWdEb3ZEZVBxbXlxNjE3QlkyYnZETndCeFl3?=
+ =?utf-8?B?VEtjK1hnQWJTay9iT3IxbHUzRDhqYXRkRlZhWFBOK2kyQ3ozcnNZdkQwbGtU?=
+ =?utf-8?B?OXFZZjRKclY1S1JaaXhVbDBNbmxjek01V1FLanNBWUxoOUg1U0FlcXMrOXoy?=
+ =?utf-8?B?ZCtsTnJOV1ppbnRkZEJ1WDFlVVNlRTNZeGVHdHpTa2J0K0xVR3cwWStFcjhx?=
+ =?utf-8?B?WFJWRDk3cmdRVkEvS2h2WGU2NmYybFZ0a0gzdFRwSVBaZEovK1JmMmpXdlQ2?=
+ =?utf-8?B?alpxK2JUcTY2dzVNTlZ6RVI1ZE9lOENqVFJXNjZoa2o4akJyR2V2MVNuSVpE?=
+ =?utf-8?B?OGtNQm40Nk40bHlWNVZRV0E5TDZPRHRKZHZKTXVVWEdzTFVHSkY1Z2Fsbngv?=
+ =?utf-8?B?eHo4cG91dms1eDJoMS8wODFuQlBhMkFJNGIvcFl6dFFsWGozWk5vZ1VzMUI5?=
+ =?utf-8?B?Y3JIdzlWOS9CbG80dUxNeTRJMk85Ui93NWNYOW9tNkdGZExHbFR2REJuYkcx?=
+ =?utf-8?B?Wk9mNmhEWmh5RFFsR2hjZSs5YkQ5c1F4dDhBOEVLakR3aVhOTXc2SmdTMHNi?=
+ =?utf-8?B?azQ3ZzZybFZJZ3BXTWxFbWtJcjFFNGc5ZjNLbjcxQjBFU0owcjlNQk1tNzVr?=
+ =?utf-8?B?cWQ0aVo5VUNaa2hveG1MbitBQmV2NXRuTlRzcEtqSXVyS1BuT1JLQjBuWTZP?=
+ =?utf-8?B?cVE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <FCB124669051D244B76DD53BA75B5C7F@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: Stalls in qemu with host running 6.1 (everything stuck at
- mmap_read_lock())
-Content-Language: en-US, de-DE
-To:     Jiri Slaby <jirislaby@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        mm <linux-mm@kvack.org>
-Cc:     yuzhao@google.com, Michal Hocko <MHocko@suse.com>,
-        Vlastimil Babka <vbabka@suse.cz>, shy828301@gmail.com,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <b8017e09-f336-3035-8344-c549086c2340@kernel.org>
-From:   "Linux kernel regression tracking (#adding)" 
-        <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <b8017e09-f336-3035-8344-c549086c2340@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1673428903;739c8807;
-X-HE-SMSGID: 1pFXIi-0001T4-Fg
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB5983.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6d9b0b17-ba4d-4f9f-2719-08daf3b57db1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jan 2023 09:23:24.8979
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eYEK7Y8o0tKXBbejY6Twe0ufU9D/tDI26lbe4AHUaWqGDnR7k87sIJPGnuKecut5UK/yJHOroGavdPg65s06sA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7179
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-[CCing the regression list, as it should be in the loop for regressions:
-https://docs.kernel.org/admin-guide/reporting-regressions.html]
-
-[TLDR: I'm adding this report to the list of tracked Linux kernel
-regressions; the text you find below is based on a few templates
-paragraphs you might have encountered already in similar form.
-See link in footer if these mails annoy you.]
-
-On 11.01.23 09:00, Jiri Slaby wrote:
-> Hi,
-> 
-> after I updated the host from 6.0 to 6.1 (being at 6.1.4 ATM), my qemu
-> VMs started stalling (and the host at the same point too). It doesn't
-> happen right after boot, maybe a suspend-resume cycle is needed (or
-> longer uptime, or a couple of qemu VM starts, or ...). But when it
-> happens, it happens all the time till the next reboot.
-
-Thanks for the report. To be sure the issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
-tracking bot:
-
-#regzbot ^introduced v6.0..v6.1
-#regzbot title stalls in qemu with host running 6.1 (everything stuck at
-mmap_read_lock())
-#regzbot ignore-activity
-
-This isn't a regression? This issue or a fix for it are already
-discussed somewhere else? It was fixed already? You want to clarify when
-the regression started to happen? Or point out I got the title or
-something else totally wrong? Then just reply and tell me -- ideally
-while also telling regzbot about it, as explained by the page listed in
-the footer of this mail.
-
-Developers: When fixing the issue, remember to add 'Link:' tags pointing
-to the report (the parent of this mail). See page linked in footer for
-details.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
-
-> Older guest's kernels/distros are affected as well as Win10.
-> 
-> In guests, I see for example stalls in memset_orig or
-> smp_call_function_many_cond -- traces below.
-> 
-> qemu-kvm-7.1.0-13.34.x86_64 from openSUSE.
-> 
-> It's quite interesting that:
->   $ cat /proc/<PID_OF_QEMU>/cmdline
-> is stuck at read:
-> 
-> openat(AT_FDCWD, "/proc/12239/cmdline", O_RDONLY) = 3
-> newfstatat(3, "", {st_mode=S_IFREG|0444, st_size=0, ...}, AT_EMPTY_PATH)
-> = 0
-> fadvise64(3, 0, 0, POSIX_FADV_SEQUENTIAL) = 0
-> mmap(NULL, 139264, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1,
-> 0) = 0x7f22f0487000
-> read(3, ^C^C^C^\^C
-> 
-> too. So I dumped blocked tasks (sysrq-w) on _host_ (see below) and
-> everything seems to stall on mmap_read_lock() or
-> mmap_write_lock_killable(). I don't see the hog (the one actually
-> _having_ and sitting on the (presumably write) lock) in the dump though.
-> I will perhaps boot a LOCKDEP-enabled kernel, so that I can do sysrq-d
-> next time and see the holder.
-> 
-> 
-> There should be enough free memory (note caches at 8G):
->                total        used        free      shared  buff/cache
-> available
-> Mem:            15Gi        10Gi       400Mi       2,5Gi       8,0Gi  
-> 5,0Gi
-> Swap:             0B          0B          0B
-> 
-> 
-> I rmmoded kvm-intel now, so:
->   qemu-kvm: failed to initialize kvm: No such file or directory
->   qemu-kvm: falling back to tcg
-> and it behaves the same (more or less expected).
-> 
-> Is this known? Any idea how to debug this? Or maybe someone (I CCed a
-> couple of guys who Acked mmap_*_lock() shuffling patches in 6.1) has a
-> clue? Bisection is hard as it reproduces only under certain unknown
-> circumstances.
-> 
-> 
-> 
-> 
-> Now the promised dumps:
-> 
->> sysrq: Show Blocked State
->> task:plasmashell     state:D stack:0     pid:2064  ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  down_read_killable+0x3d/0xa0
->>  __access_remote_vm+0x4c/0x370
->>  proc_pid_cmdline_read+0x17a/0x3c0
->>  vfs_read+0xa2/0x2c0
->>  ksys_read+0x63/0xe0
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7fda6b70795c
->> RSP: 002b:00007ffdd7b108b0 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
->> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fda6b70795c
->> RDX: 0000000000004000 RSI: 00007ffdd7b10a20 RDI: 0000000000000028
->> RBP: 000056536a70f610 R08: 0000000000000000 R09: 0000000000004000
->> R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000004000
->> R13: 0000000000004000 R14: 00007ffdd7b10a20 R15: 00007ffdd7b10a20
->>  </TASK>
->> task:qemu-kvm        state:D stack:0     pid:12249 ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  do_user_addr_fault+0x413/0x690
->>  exc_page_fault+0x66/0x150
->>  asm_exc_page_fault+0x22/0x30
->> RIP: 0033:0x55fc42ea2e9e
->> RSP: 002b:00007f054e5391c8 EFLAGS: 00010246
->> RAX: 00007f052aa01041 RBX: 0000000000000005 RCX: 0000000000000000
->> RDX: 00007f052aa01040 RSI: 000000000000008b RDI: 00007f0544000b70
->> RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000005
->> R10: 0000000000000003 R11: 0000000000000d60 R12: 00007f0544000b70
->> R13: fffffffffffffff0 R14: 000000000000000c R15: 00007f054400a510
->>  </TASK>
->> task:qemu-kvm        state:D stack:0     pid:12251 ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_write_slowpath+0x358/0x6a0
->>  down_write_killable+0x60/0x80
->>  do_mprotect_pkey+0xe9/0x430
->>  __x64_sys_mprotect+0x1b/0x30
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f05514a8ccb
->> RSP: 002b:00007f054d536fa8 EFLAGS: 00000206 ORIG_RAX: 000000000000000a
->> RAX: ffffffffffffffda RBX: 00007f042c000030 RCX: 00007f05514a8ccb
->> RDX: 0000000000000003 RSI: 0000000000001000 RDI: 00007f042d304000
->> RBP: 0000000000000430 R08: 0000000001304000 R09: 0000000001305000
->> R10: 00007f042d303bf0 R11: 0000000000000206 R12: 0000000000000410
->> R13: 0000000000001000 R14: 0000000000000450 R15: 0000000000000000
->>  </TASK>
->> task:qemu-kvm        state:D stack:0     pid:12252 ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  do_user_addr_fault+0x413/0x690
->>  exc_page_fault+0x66/0x150
->>  asm_exc_page_fault+0x22/0x30
->> RIP: 0033:0x55fc42ea6217
->> RSP: 002b:00007f054cd361d0 EFLAGS: 00010246
->> RAX: 00007f052c593fff RBX: 00007f0500000018 RCX: 0000000000000000
->> RDX: 00007f052c593ffe RSI: 00000000000000e9 RDI: 00007f0430000b70
->> RBP: 00007f0430000b70 R08: 0000000000000000 R09: 0000000000000000
->> R10: 0000000000000000 R11: ffffffffd3a6c015 R12: 000000000000000c
->> R13: 0000000000000030 R14: 0000000000000080 R15: 00007f043000bad8
->>  </TASK>
->> task:qemu-kvm        state:D stack:0     pid:12299 ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  do_madvise.part.0+0xe2/0x2a0
->>  __x64_sys_madvise+0x5a/0x70
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f05514a8dab
->> RSP: 002b:00007f054f381758 EFLAGS: 00000206 ORIG_RAX: 000000000000001c
->> RAX: ffffffffffffffda RBX: 00007f054eb82000 RCX: 00007f05514a8dab
->> RDX: 0000000000000004 RSI: 00000000007fb000 RDI: 00007f054eb82000
->> RBP: 0000000000801000 R08: 000055fc45749778 R09: 000055fc45749798
->> R10: 0000000000000008 R11: 0000000000000206 R12: fffffffffffffb68
->> R13: 000000000000000b R14: 00007fff19b2efe0 R15: 00007f054eb82000
->>  </TASK>
->> task:qemu-kvm        state:D stack:0     pid:12300 ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  do_madvise.part.0+0xe2/0x2a0
->>  __x64_sys_madvise+0x5a/0x70
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f05514a8dab
->> RSP: 002b:00007f041b4b7758 EFLAGS: 00000206 ORIG_RAX: 000000000000001c
->> RAX: ffffffffffffffda RBX: 00007f041acb8000 RCX: 00007f05514a8dab
->> RDX: 0000000000000004 RSI: 00000000007fb000 RDI: 00007f041acb8000
->> RBP: 0000000000801000 R08: 000055fc45749778 R09: 000055fc45749798
->> R10: 0000000000000008 R11: 0000000000000206 R12: fffffffffffffb68
->> R13: 000000000000000b R14: 00007fff19b2efe0 R15: 00007f041acb8000
->>  </TASK>
->> task:qemu-kvm        state:D stack:0     pid:12301 ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  do_madvise.part.0+0xe2/0x2a0
->>  __x64_sys_madvise+0x5a/0x70
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f05514a8dab
->> RSP: 002b:00007f041acb6758 EFLAGS: 00000206 ORIG_RAX: 000000000000001c
->> RAX: ffffffffffffffda RBX: 00007f041a4b7000 RCX: 00007f05514a8dab
->> RDX: 0000000000000004 RSI: 00000000007fb000 RDI: 00007f041a4b7000
->> RBP: 0000000000801000 R08: 0000000000000005 R09: 0000000000001d4c
->> R10: 0000000000000008 R11: 0000000000000206 R12: fffffffffffffb68
->> R13: 000000000000000b R14: 00007fff19b2efe0 R15: 00007f041a4b7000
->>  </TASK>
->> task:qemu-kvm        state:D stack:0     pid:12309 ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  do_madvise.part.0+0xe2/0x2a0
->>  __x64_sys_madvise+0x5a/0x70
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f05514a8dab
->> RSP: 002b:00007f041a4b5758 EFLAGS: 00000206 ORIG_RAX: 000000000000001c
->> RAX: ffffffffffffffda RBX: 00007f0419cb6000 RCX: 00007f05514a8dab
->> RDX: 0000000000000004 RSI: 00000000007fb000 RDI: 00007f0419cb6000
->> RBP: 0000000000801000 R08: 000055fc45749778 R09: 000055fc45749798
->> R10: 0000000000000008 R11: 0000000000000206 R12: fffffffffffffb68
->> R13: 000000000000000b R14: 00007fff19b2efe0 R15: 00007f0419cb6000
->>  </TASK>
->> task:qemu-kvm        state:D stack:0     pid:12310 ppid:1905
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  do_madvise.part.0+0xe2/0x2a0
->>  __x64_sys_madvise+0x5a/0x70
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f05514a8dab
->> RSP: 002b:00007f04178b3758 EFLAGS: 00000206 ORIG_RAX: 000000000000001c
->> RAX: ffffffffffffffda RBX: 00007f04170b4000 RCX: 00007f05514a8dab
->> RDX: 0000000000000004 RSI: 00000000007fb000 RDI: 00007f04170b4000
->> RBP: 0000000000801000 R08: 000055fc45749778 R09: 000055fc45749798
->> R10: 0000000000000008 R11: 0000000000000206 R12: fffffffffffffb68
->> R13: 0000000000000000 R14: 00007f041a4b5300 R15: 00007f04170b4000
->>  </TASK>
->> task:ps              state:D stack:0     pid:12395 ppid:5727
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  down_read_killable+0x3d/0xa0
->>  __access_remote_vm+0x4c/0x370
->>  proc_pid_cmdline_read+0x17a/0x3c0
->>  vfs_read+0xa2/0x2c0
->>  ksys_read+0x63/0xe0
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f02fa455921
->> RSP: 002b:00007ffca71c5828 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
->> RAX: ffffffffffffffda RBX: 00007f02f9f53010 RCX: 00007f02fa455921
->> RDX: 0000000000020000 RSI: 00007f02f9f53010 RDI: 0000000000000006
->> RBP: 0000000000000020 R08: 0000000000000000 R09: 0000000000000073
->> R10: 0000000000000000 R11: 0000000000000246 R12: 00007f02f9f53010
->> R13: 0000000000000006 R14: 0000000000000000 R15: 0000000000000000
->>  </TASK>
->> task:htop            state:D stack:0     pid:12400 ppid:4676
-> flags:0x00000002
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  down_read_killable+0x3d/0xa0
->>  __access_remote_vm+0x4c/0x370
->>  proc_pid_cmdline_read+0x17a/0x3c0
->>  vfs_read+0xa2/0x2c0
->>  ksys_read+0x63/0xe0
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7f4284748921
->> RSP: 002b:00007ffc88c25398 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
->> RAX: ffffffffffffffda RBX: 0000000000001000 RCX: 00007f4284748921
->> RDX: 0000000000001000 RSI: 00007ffc88c25490 RDI: 0000000000000007
->> RBP: 00007ffc88c25490 R08: 0000563dd4c68ab0 R09: 0000000000000000
->> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
->> R13: 0000000000000007 R14: 00007ffc88c265a0 R15: 0000563dd4ca46c0
->>  </TASK>
->> task:htop            state:D stack:0     pid:12416 ppid:4595
-> flags:0x00000006
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  down_read_killable+0x3d/0xa0
->>  __access_remote_vm+0x4c/0x370
->>  proc_pid_cmdline_read+0x17a/0x3c0
->>  vfs_read+0xa2/0x2c0
->>  ksys_read+0x63/0xe0
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7fe4d1b7f921
->> RSP: 002b:00007ffc8603e788 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
->> RAX: ffffffffffffffda RBX: 0000000000001000 RCX: 00007fe4d1b7f921
->> RDX: 0000000000001000 RSI: 00007ffc8603e880 RDI: 0000000000000007
->> RBP: 00007ffc8603e880 R08: 00005602572e7a20 R09: 0000000000000000
->> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
->> R13: 0000000000000007 R14: 00007ffc8603f990 R15: 000056025735d540
->>  </TASK>
->> task:htop            state:D stack:0     pid:12464 ppid:12441
-> flags:0x00000006
->> Call Trace:
->>  <TASK>
->>  __schedule+0x360/0x1350
->>  schedule+0x5a/0xd0
->>  rwsem_down_read_slowpath+0x272/0x4c0
->>  down_read_killable+0x3d/0xa0
->>  __access_remote_vm+0x4c/0x370
->>  proc_pid_cmdline_read+0x17a/0x3c0
->>  vfs_read+0xa2/0x2c0
->>  ksys_read+0x63/0xe0
->>  do_syscall_64+0x58/0x80
->>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
->> RIP: 0033:0x7fb1e298f921
->> RSP: 002b:00007ffe419c8c78 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
->> RAX: ffffffffffffffda RBX: 0000000000001000 RCX: 00007fb1e298f921
->> RDX: 0000000000001000 RSI: 00007ffe419c8d70 RDI: 0000000000000007
->> RBP: 00007ffe419c8d70 R08: 0000565345f95680 R09: 0000000000000000
->> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
->> R13: 0000000000000007 R14: 00007ffe419c9e80 R15: 0000565345fd0470
->>  </TASK>
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> 
-> Guest lockups:
-> 
-> 
-> 
->> BUG: workqueue lockup - pool cpus=3 node=0 flags=0x0 nice=0 stuck for
-> 49s!
->> Showing busy workqueues and worker pools:
->> workqueue mm_percpu_wq: flags=0x8
->>   pwq 6: cpus=3 node=0 flags=0x0 nice=0 active=2/256 refcnt=4
->>     pending: vmstat_update, lru_add_drain_per_cpu BAR(49)
->> rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
->> watchdog: BUG: soft lockup - CPU#2 stuck for 211s! [jbd2/sda1-8:373]
->> Modules linked in: af_packet rfkill ...
->> CPU: 2 PID: 373 Comm: jbd2/sda1-8 Kdump: loaded Not tainted
-> 6.1.4-rc1-1.gbc1c341-default #1 openSUSE Tumbleweed (unreleased)
-> 0c91ab593caf7d5045d7e3b6ff751ade7e57ec84
->> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->> RIP: 0010:memset_orig+0x33/0xb0
->> Code: 01 01 01 01 01 01 01 01 48 0f af c1 41 89 f9 41 83 e1 07 75 74
-> 48 89 d1 48 c1 e9 06 74 39 66 0f 1f 84 00 00 00 00 00 48 ff c9 <48> 89
-> 07 48 89 47 08 48 89 47 10 48 89 47 18 48 89 47 20 48 89 47
->> RSP: 0018:ffffbd1fc0487d08 EFLAGS: 00010216
->> RAX: 0000000000000000 RBX: ffff9fdb1b619138 RCX: 000000000000003f
->> RDX: 0000000000001000 RSI: 0000000000000000 RDI: ffff9fdb39f19000
->> RBP: ffff9fdb0054f000 R08: ffff9fdb0565cb00 R09: 0000000000000000
->> R10: ffff9fdb39f19000 R11: ffff9fdb442d71c0 R12: 0000000001000000
->> R13: ffff9fdb05079800 R14: ffff9fdb01658870 R15: ffff9fdb01658870
->> FS:  0000000000000000(0000) GS:ffff9fdb40d00000(0000)
-> knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00005635dbce3fb8 CR3: 0000000103d54000 CR4: 00000000000006e0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>  <TASK>
->>  jbd2_journal_get_descriptor_buffer+0x88/0xf0 [jbd2
-> 3adb6041f8aa59fe471169b0e9945d8c67491cc7]
->>  jbd2_journal_commit_transaction+0x9e0/0x18b0 [jbd2
-> 3adb6041f8aa59fe471169b0e9945d8c67491cc7]
->>  kjournald2+0xa9/0x260 [jbd2 3adb6041f8aa59fe471169b0e9945d8c67491cc7]
->>  kthread+0xda/0x100
->>  ret_from_fork+0x22/0x30
->>  </TASK>
-> 
-> 
-> ========================================
-> 
-> 
->> watchdog: BUG: soft lockup - CPU#2 stuck for 26s! [kworker/2:2:134]
->> Modules linked in: af_packet rfkill ...
->> Supported: No, Unreleased kernel
->> CPU: 2 PID: 134 Comm: kworker/2:2 Not tainted
-> 5.14.21-150500.86.gca1fbb8-default #1 SLE15-SP5 (unreleased)
-> f54a3c78ee6447e20bc183538de8800cbe783c87
->> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->> Workqueue: events drm_fb_helper_damage_work [drm_kms_helper]
->> RIP: 0010:smp_call_function_many_cond+0x123/0x560
->> Code: ef e8 71 22 42 00 3b 05 2f 2c bd 01 89 c5 73 24 48 63 c5 49 8b
-> 7d 00 48 03 3c c5 a0 bb 42 b1 66 90 8b 47 08 a8 01 74 0a f3 90 <8b> 57
-> 08 83 e2 01 75 f6 eb c7 48 83 c4 48 5b 5d 41 5c 41 5d 41 5e
->> RSP: 0018:ffff9eff00227c68 EFLAGS: 00000202
->> RAX: 0000000000000011 RBX: 0000000000000001 RCX: 0000000000000000
->> RDX: 0000000000000001 RSI: 0000000000000000 RDI: ffff89a1c0dba8c0
->> RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000000
->> R10: 0000000000000003 R11: 0000000000000000 R12: ffff89a1c0d34b00
->> R13: ffff89a1c0d34b00 R14: 0000000000000000 R15: 0000000000000003
->> FS:  0000000000000000(0000) GS:ffff89a1c0d00000(0000)
-> knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 0000561f1be53000 CR3: 00000001024e6000 CR4: 00000000000006e0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>  <TASK>
->>  on_each_cpu_cond_mask+0x25/0x40
->>  __purge_vmap_area_lazy+0xba/0x6d0
->>  free_vmap_area_noflush+0x214/0x2f0
->>  remove_vm_area+0x80/0x90
->>  __vunmap+0x5e/0x260
->>  drm_gem_shmem_vunmap+0x6f/0x90 [drm_shmem_helper
-> b732157accb2fabb75791e2dc3d5d21a30cf33cb]
->>  drm_gem_vunmap+0x24/0x50 [drm 14b5c4e21fb011b0159efe14dd82da3407d64716]
->>  drm_fb_helper_damage_work+0x16f/0x2f0 [drm_kms_helper
-> b697aeb79f8910d3e952c8c60069f3e3382437ae]
->>  process_one_work+0x267/0x440
->>  worker_thread+0x2d/0x3d0
->>  kthread+0x156/0x180
->>  ret_from_fork+0x22/0x30
->>  </TASK>
-> 
-> 
-> ========================================
-> 
-> 
->> watchdog: BUG: soft lockup - CPU#0 stuck for 319s! [watchdogd:57]
->> watchdog: BUG: soft lockup - CPU#3 stuck for 348s! [repo2solv:1139]
->> Modules linked in: af_packet rfkill nls_iso8859_1 nls_cp437
-> snd_hda_codec_generic ledtrig_audio snd_hda_intel snd_intel_dspcfg
-> snd_intel_sdw_acpi snd_hda_codec snd_hda_core snd_hwdep vfat snd_pcm fat
-> iTCO_wdt snd_timer ppdev virtio_net intel_pmc_bxt tiny_power_button
-> i2c_i801 iTCO_vend>
->> CPU: 3 PID: 1139 Comm: repo2solv Kdump: loaded Not tainted
-> 6.1.4-rc1-1.gbc1c341-default #1 openSUSE Tumbleweed (unreleased)
-> 0c91ab593caf7d5045d7e3b6ff751ade7e57ec84
->> Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
->> RIP: 0010:clear_page_orig+0x12/0x40
->> Code: 5d c3 cc cc cc cc cc cc b9 00 02 00 00 31 c0 f3 48 ab c3 cc cc
-> cc cc 90 31 c0 b9 40 00 00 00 66 0f 1f 84 00 00 00 00 00 ff c9 <48> 89
-> 07 48 89 47 08 48 89 47 10 48 89 47 18 48 89 47 20 48 89 47
->> RSP: 0000:ffffb644c0da3be8 EFLAGS: 00010216
->> RAX: 0000000000000000 RBX: fffffccec4828000 RCX: 000000000000003f
->> RDX: fffffccec4828000 RSI: fffffccec4828040 RDI: ffffa04a20a00000
->> RBP: 0000000000000000 R08: ffffb644c0da3d10 R09: 0000000000028b29
->> R10: 0000000000000010 R11: ffffa04a441d51c0 R12: 0000000000140dca
->> R13: 0000000000000040 R14: 0000000000000001 R15: 0000000000000286
->> FS:  00007f91de710f80(0000) GS:ffffa04a40d80000(0000)
-> knlGS:0000000000000000
->> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->> CR2: 00007f91de3d3000 CR3: 0000000101f86000 CR4: 00000000000006e0
->> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
->> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
->> Call Trace:
->>  <TASK>
->>  post_alloc_hook+0xa9/0xe0
->>  get_page_from_freelist+0x4d9/0x1590
->>  __alloc_pages+0xec/0x240
->>  __folio_alloc+0x17/0x50
->>  vma_alloc_folio+0x9c/0x370
->>  __handle_mm_fault+0x942/0xfe0
->>  handle_mm_fault+0xdb/0x2d0
->>  do_user_addr_fault+0x1ba/0x690
->>  exc_page_fault+0x66/0x150
->>  asm_exc_page_fault+0x22/0x30
-> 
-> thanks,
+T24gVHVlLCAyMDIzLTAxLTEwIGF0IDExOjEyIC0wODAwLCBIYW5zZW4sIERhdmUgd3JvdGU6DQo+
+IE9uIDEvOS8yMyAxODoyMywgSHVhbmcsIEthaSB3cm90ZToNCj4gPiBPbiBNb24sIDIwMjMtMDEt
+MDkgYXQgMTY6NDcgLTA4MDAsIERhdmUgSGFuc2VuIHdyb3RlOg0KPiA+ID4gT24gMS85LzIzIDE2
+OjQwLCBIdWFuZywgS2FpIHdyb3RlOg0KPiA+ID4gPiBPbiBGcmksIDIwMjMtMDEtMDYgYXQgMTE6
+MjQgLTA4MDAsIERhdmUgSGFuc2VuIHdyb3RlOg0KPiA+ID4gLi4uDQo+ID4gPiA+ID4gQWxzbywg
+dGRtcl9zeiBhbmQgbWF4X3RkbXJzIGNhbiBib3RoIGJlIGRlcml2ZWQgZnJvbSAnc3lzaW5mbycu
+ICBEbyB0aGV5DQo+ID4gPiA+ID4gcmVhbGx5IG5lZWQgdG8gYmUgc3RvcmVkIGhlcmU/DQo+ID4g
+PiA+IA0KPiA+ID4gPiBJdCdzIG5vdCBtYW5kYXRvcnkgdG8ga2VlcCB0aGVtIGhlcmUuICBJIGRp
+ZCBpdCBtYWlubHkgYmVjYXVzZSBJIHdhbnQgdG8gYXZvaWQNCj4gPiA+ID4gcGFzc2luZyAnc3lz
+aW5mbycgYXMgYXJndW1lbnQgZm9yIGFsbW9zdCBhbGwgZnVuY3Rpb25zIHJlbGF0ZWQgdG8gY29u
+c3RydWN0aW5nDQo+ID4gPiA+IFRETVJzLg0KPiA+ID4gDQo+ID4gPiBJIGRvbid0IHRoaW5rIGl0
+IGh1cnRzIHJlYWRhYmlsaXR5IHRoYXQgbXVjaC4gIE9uIHRoZSBjb250cmFyeSwgaXQgbWFrZXMN
+Cj4gPiA+IGl0IG1vcmUgY2xlYXIgd2hhdCBkYXRhIGlzIG5lZWRlZCBmb3IgaW5pdGlhbGl6YXRp
+b24uDQo+ID4gDQo+ID4gU29ycnkgb25lIHRoaW5nIEkgZm9yZ290IHRvIG1lbnRpb24gaXMgaWYg
+d2Uga2VlcCAndGRtcl9zeicgaW4gJ3N0cnVjdA0KPiA+IHRkbXJfaW5mb19saXN0JywgaXQgb25s
+eSBuZWVkcyB0byBiZSBjYWxjdWxhdGVkIGF0IG9uY2Ugd2hlbiBhbGxvY2F0aW5nIHRoZQ0KPiA+
+IGJ1ZmZlci4gIE90aGVyd2lzZSwgd2UgbmVlZCB0byBjYWxjdWxhdGUgaXQgYmFzZWQgb24gc3lz
+aW5mby0NCj4gPiBtYXhfcmVzZXJ2ZWRfcGVyX3RkbXIgZWFjaCB0aW1lIHdlIHdhbnQgdG8gZ2V0
+IGEgVERNUiBhdCBhIGdpdmVuIGluZGV4Lg0KPiANCj4gV2hhdCdzIHRoZSBwcm9ibGVtIHdpdGgg
+cmVjYWxjdWxhdGluZyBpdD8gIEl0IGlzIGNhbGN1bGF0ZWQgbGlrZSB0aGlzOg0KPiANCj4gCXRk
+bXJfc3ogPSBBTElHTihjb25zdGFudDEgKyBjb25zdGFudDIgKiB2YXJpYWJsZSk7DQo+IA0KPiBT
+bywgd2hhdCdzIHRoZSBwcm9ibGVtPyAgWW91J3JlIGNvbmNlcm5lZCBhYm91dCB0b28gbWFueSBt
+dWx0aXBsaWNhdGlvbnM/DQoNCk5vIHByb2JsZW0uICBJIGRvbid0IGhhdmUgY29uY2VybiBhYm91
+dCBtdWx0aXBsaWNhdGlvbnMsIGJ1dCBzaW5jZSB0aGV5IGNhbiBiZQ0KYXZvaWRlZCwgSSB0aG91
+Z2h0IHBlcmhhcHMgaXQncyBiZXR0ZXIgdG8gYXZvaWQuDQoNClNvIEkgYW0gZmluZSB3aXRoIGVp
+dGhlciB3YXksIG5vIHByb2JsZW0uDQoNCj4gDQo+ID4gVG8gbWUgcHV0dGluZyByZWxldmFudCBm
+aWVsZHMgKHRkbXJzLCB0ZG1yX3N6LCBtYXhfdGRtcnMsIG5yX2NvbnN1bWVkX3RkbXJzKQ0KPiA+
+IHRvZ2V0aGVyIG1ha2VzIGhvdyB0aGUgVERNUiBsaXN0IGlzIG9yZ2FuaXplZCBtb3JlIGNsZWFy
+LiAgQnV0IHBsZWFzZSBsZXQgbWUNCj4gPiBrbm93IGlmIHlvdSBwcmVmZXIgcmVtb3ZpbmcgJ3Rk
+bXJfc3onIGFuZCAnbWF4X3RkbXJzJy4NCj4gPiANCj4gPiBCdHcsIGlmIHdlIHJlbW92ZSAndGRt
+cl9zeicgYW5kICdtYXhfdGRtcnMnLCBldmVuIG5yX2NvbnN1bWVkX3RkbXJzIGlzIG5vdA0KPiA+
+IGFic29sdXRlbHkgbmVjZXNzYXJ5IGhlcmUuICBJdCBjYW4gYmUgYSBsb2NhbCB2YXJpYWJsZSBv
+ZiBpbml0X3RkeF9tb2R1bGUoKSAoYXMNCj4gPiBzaG93biBpbiB2NyksIGFuZCB0aGUgJ3N0cnVj
+dCB0ZG1yX2luZm9fbGlzdCcgd2lsbCBvbmx5IGhhdmUgdGhlICd0ZG1ycycgbWVtYmVyDQo+ID4g
+KGFzIHlvdSBjb21tZW50ZWQgaW4gdjcpOg0KPiA+IA0KPiA+IGh0dHBzOi8vbG9yZS5rZXJuZWwu
+b3JnL2xpbnV4LW1tL2NjMTk1ZWI2NDk5Y2YwMjFiNGNlMmU5MzcyMDA1NzE5MTViZmU2NmYuY2Ft
+ZWxAaW50ZWwuY29tL1QvI21iOTgyNmUyYmNmOGJmNjM5OWMxM2NjNWY5NWE5NDhmZTRiM2E0NmQ5
+DQo+ID4gDQo+ID4gUGxlYXNlIGxldCBtZSBrbm93IHdoYXQncyB5b3VyIHByZWZlcmVuY2U/DQo+
+IA0KPiBJIGR1bm5vLiAgTXkgZ3V0IHNheXMgdGhhdCBwYXNzaW5nIHN5c2luZm8gYXJvdW5kIGFu
+ZCBqdXN0IGRlcml2aW5nIHRoZQ0KPiBzaXplcyB2YWx1ZXMgZnJvbSB0aGF0IHdpdGggaGVscGVy
+cyBpcyB0aGUgYmVzdCB3YXkuICAnc3RydWN0DQo+IHRkbXJfaW5mb19saXN0JyBpc24ndCBhIGhv
+cnJpYmxlIGlkZWEgaW4gYW5kIG9mIGl0c2VsZiwgYnV0IEkgdGhpbmsgaXQncw0KPiBhIGNvbmZ1
+c2luZyBzdHJ1Y3R1cmUgYmVjYXVzZSBpdCdzIG5vdCBjbGVhciBob3cgdGhlIHBpZWNlcyBmaXQg
+dG9nZXRoZXINCj4gd2hlbiBoYWxmIG9mIGl0IGlzICpyZXF1aXJlZCogYW5kIHRoZSBvdGhlciBo
+YWxmIGlzIGp1c3QgZm9yIHNvbWUga2luZA0KPiBvZiBwZXJjZWl2ZWQgY29udmVuaWVuY2UuDQo+
+IA0KDQpTdXJlLiAgTm8gbW9yZSBhcmd1bWVudCBhYm91dCB0aGlzLg0KDQpIb3dldmVyLCBmb3Ig
+dGhlIHNha2Ugb2Ygbm90IGFkZGluZyBtb3JlIHJldmlldyBidXJkZW4gdG8geW91LCBob3cgYWJv
+dXQga2VlcGluZw0KdGhlICdzdHJ1Y3QgdGRtcl9pbmZvX2xpc3QnIGFzIGlzIHRoaXMgdGltZT8g
+IE9mIGNvdXJzZSBJIGFtIHdpbGxpbmcgdG8gcmVtb3ZlDQp0aGUgJ3RkbXJfc3onIGFuZCAnbWF4
+X3RkbXJzJyBmcm9tICdzdHJ1Y3QgdGRtcl9pbmZvX2xpc3QnIGJ1dCBvbmx5IGtlZXAgJ3RkbXJz
+Jw0KYW5kICducl9jb25zdW1lZF90ZG1ycycgaWYgeW91IGFyZSB3aWxpbmcgb3Igd2FudCB0byBs
+b29rIGF0IHdoYXQgd2lsbCB0aGUgbmV3DQpjb2RlIGxvb2sgbGlrZS4NCg0KUGxlYXNlIGxldCBt
+ZSBrbm93Pw0K
