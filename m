@@ -2,192 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 66D0E666160
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:07:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 45F2966619E
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:21:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234387AbjAKRHb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 12:07:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39248 "EHLO
+        id S235062AbjAKRU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 12:20:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238792AbjAKRGs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 12:06:48 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC1BD32276
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:05:10 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id w3so17437994ply.3
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:05:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oDP9iHBz114gTPVon7+29iOp7H+9gVmvkP1sBBtZVDA=;
-        b=fJF1iA21Eh2Ps4YUG5BTSRAlKr8ewtW0a/S0d61RuFJnx5BLNsRr7So6UdDtgMe5iG
-         9WBXJelltOenGOc6m7LAPpTpasCUh002+Mfoi87hGTXHAlo79u5Y2689VNmCUoB+ZNEq
-         nXnke2ST7CeYJdq2c1cv0FMX5oao34vkAePIjWt/a8zU5K2gUR1hauI8esZEUaq2mB0H
-         U3VrTTIgxzQp3MLFL+Z2FLi0rgquIKmfcqQ/FT8djk+IryiB6xlR2CAQLi4A6IAMGPnF
-         mSczaPgLDxyVlW0K0mBBzgVzeTlYMuLmooheNK8bJaqkobZ1NkpWcuu43dnrCB9TiyeE
-         es6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oDP9iHBz114gTPVon7+29iOp7H+9gVmvkP1sBBtZVDA=;
-        b=UWLv5ToMPqIqM7tG7ove/+w5jdOFq19O2opw9EZzrH5HOSIXOsc03F6GsiV6DgQknC
-         A1iAmqqo11bOSByLk+vY9Ou8+dVKG5RBSFwaPlh/jLTNvkrR4QQ4E7QRAQ0RK6v3Tfme
-         GPdM9Epqw6znQpEaocdDniZHiEkGByRn9C0MFdcu5VT5BWxxUQ7hC/rOHwdv3CWQYA45
-         ZoOKTn1qfv0UU61Fwa3aMmTNlLPfh1A8nDjmSMMEL72+tPy8crcK6GC7F2vbOppUNs4Q
-         CzsNE6eC9BxBiuYdbFjlTjEr05PRtkCBDCQyEO2N2Zui4MZRwq6tPI3KovHmKKpH2jIU
-         d5tw==
-X-Gm-Message-State: AFqh2kqd/rpSQwm0lCB0VtbsPdIdDa/AHyKmZRZQlLzluwEPYMPp6FK1
-        2XdUWbJ25RkY3HLn+SMwoqNkCQ==
-X-Google-Smtp-Source: AMrXdXvW3zNVUD8bGcENqOAYjNvZPQigzdhvIDDoRaz3qi0HGFDLAJOGIn22pNrZ1lJH0/9OE/PhFQ==
-X-Received: by 2002:a17:90b:274b:b0:219:f970:5119 with SMTP id qi11-20020a17090b274b00b00219f9705119mr425092pjb.1.1673456710117;
-        Wed, 11 Jan 2023 09:05:10 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id l17-20020a170903245100b001890cbd1ff1sm10482685pls.149.2023.01.11.09.05.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 09:05:09 -0800 (PST)
-Date:   Wed, 11 Jan 2023 17:05:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>
-Cc:     Dmitry Osipenko <dmitry.osipenko@collabora.com>,
-        David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Trigger Huang <Trigger.Huang@gmail.com>,
-        Gert Wollny <gert.wollny@collabora.com>,
-        Antonio Caggiano <antonio.caggiano@collabora.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
-        kernel@collabora.com, virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
-Message-ID: <Y77sQZI0IfFVx7Jo@google.com>
-References: <8f749cd0-9a04-7c72-6a4f-a42d501e1489@amd.com>
- <5340d876-62b8-8a64-aa6d-7736c2c8710f@collabora.com>
- <594f1013-b925-3c75-be61-2d649f5ca54e@amd.com>
- <6893d5e9-4b60-0efb-2a87-698b1bcda63e@collabora.com>
- <73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com>
- <c9d89644-409e-0363-69f0-a3b8f2ef0ae4@collabora.com>
- <6effcd33-8cc3-a4e0-3608-b9cef7a76da7@collabora.com>
- <ff28e1b4-cda2-14b8-b9bf-10706ae52cac@collabora.com>
- <48b5dd12-b0df-3cc6-a72d-f35156679844@collabora.com>
- <b1963713-4df6-956f-c16f-81a0cf1a978b@amd.com>
+        with ESMTP id S234506AbjAKRUs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 12:20:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6786B3057E;
+        Wed, 11 Jan 2023 09:20:47 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 9C9FCB81B79;
+        Wed, 11 Jan 2023 17:20:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0514FC433F0;
+        Wed, 11 Jan 2023 17:20:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673457644;
+        bh=pzDOm0E4vq1cIaLcDnzebNoZMoYCJhuWx2pQVYQ7bEA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=WM7u8gMYzSIA8VJEAQs0L0tETJKkdVaad0i42V/bQ+Fnl/KC3UNWHC8L/rzRTQL/E
+         pCsd2unfZkHENbQ3hQq8O6EjDMQdvxbuTQzPudVJm+WFf35j2h/1wRYoZdB6k/biaU
+         384ybprfkuqjSO7CMme/BbyI3B8QH1jzapuuQcaHZGAPlDTPyOxzrTXbVy42BEGXh4
+         K22+Cbyc17bwvz9KJ9W/V1z7X7so+9ygNatjS/XHgCK6sntu8yDB+aoOO+HiVlLSmx
+         i4M8+eJ/NKH+0f2aSr536YePC8UU0HZQIyKPUIKTOBP9MCqZCwCs2YIdx/34oMm30W
+         qO4phnIGjz5Ww==
+From:   Jisheng Zhang <jszhang@kernel.org>
+To:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Heiko Stuebner <heiko@sntech.de>
+Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: [PATCH v3 00/13] riscv: improve boot time isa extensions handling
+Date:   Thu, 12 Jan 2023 01:10:14 +0800
+Message-Id: <20230111171027.2392-1-jszhang@kernel.org>
+X-Mailer: git-send-email 2.38.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b1963713-4df6-956f-c16f-81a0cf1a978b@amd.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Aug 18, 2022, Christian König wrote:
-> Am 18.08.22 um 01:13 schrieb Dmitry Osipenko:
-> > On 8/18/22 01:57, Dmitry Osipenko wrote:
-> > > On 8/15/22 18:54, Dmitry Osipenko wrote:
-> > > > On 8/15/22 17:57, Dmitry Osipenko wrote:
-> > > > > On 8/15/22 16:53, Christian König wrote:
-> > > > > > Am 15.08.22 um 15:45 schrieb Dmitry Osipenko:
-> > > > > > > [SNIP]
-> > > > > > > > Well that comment sounds like KVM is doing the right thing, so I'm
-> > > > > > > > wondering what exactly is going on here.
-> > > > > > > KVM actually doesn't hold the page reference, it takes the temporal
-> > > > > > > reference during page fault and then drops the reference once page is
-> > > > > > > mapped, IIUC. Is it still illegal for TTM? Or there is a possibility for
-> > > > > > > a race condition here?
-> > > > > > > 
-> > > > > > Well the question is why does KVM grab the page reference in the first
-> > > > > > place?
-> > > > > > 
-> > > > > > If that is to prevent the mapping from changing then yes that's illegal
-> > > > > > and won't work. It can always happen that you grab the address, solve
-> > > > > > the fault and then immediately fault again because the address you just
-> > > > > > grabbed is invalidated.
-> > > > > > 
-> > > > > > If it's for some other reason than we should probably investigate if we
-> > > > > > shouldn't stop doing this.
+Generally, riscv ISA extensions are fixed for any specific hardware
+platform, so a hart's features won't change after booting, this
+chacteristic makes it straightforward to use a static branch to check
+a specific ISA extension is supported or not to optimize performance.
 
-...
+However, some ISA extensions such as SVPBMT and ZICBOM are handled
+via. the alternative sequences.
 
-> > > > If we need to bump the refcount only for VM_MIXEDMAP and not for
-> > > > VM_PFNMAP, then perhaps we could add a flag for that to the kvm_main
-> > > > code that will denote to kvm_release_page_clean whether it needs to put
-> > > > the page?
-> > > The other variant that kind of works is to mark TTM pages reserved using
-> > > SetPageReserved/ClearPageReserved, telling KVM not to mess with the page
-> > > struct. But the potential consequences of doing this are unclear to me.
-> > > 
-> > > Christian, do you think we can do it?
-> > Although, no. It also doesn't work with KVM without additional changes
-> > to KVM.
-> 
-> Well my fundamental problem is that I can't fit together why KVM is grabing
-> a page reference in the first place.
+Basically, for ease of maintenance, we prefer to use static branches
+in C code, but recently, Samuel found that the static branch usage in
+cpu_relax() breaks building with CONFIG_CC_OPTIMIZE_FOR_SIZE[1]. As
+Samuel pointed out, "Having a static branch in cpu_relax() is
+problematic because that function is widely inlined, including in some
+quite complex functions like in the VDSO. A quick measurement shows
+this static branch is responsible by itself for around 40% of the jump
+table."
 
-It's to workaround a deficiency in KVM.
+Samuel's findings pointed out one of a few downsides of static branches
+usage in C code to handle ISA extensions detected at boot time:
+static branch's metadata in the __jump_table section, which is not
+discarded after ISA extensions are finalized, wastes some space.
 
-> See the idea of the page reference is that you have one reference is that
-> you count the reference so that the memory is not reused while you access
-> it, e.g. for I/O or mapping it into different address spaces etc...
-> 
-> But none of those use cases seem to apply to KVM. If I'm not totally
-> mistaken in KVM you want to make sure that the address space mapping, e.g.
-> the translation between virtual and physical address, don't change while you
-> handle it, but grabbing a page reference is the completely wrong approach
-> for that.
+I want to try to solve the issue for all possible dynamic handling of
+ISA extensions at boot time. Inspired by Mark[2], this patch introduces
+riscv_has_extension_*() helpers, which work like static branches but
+are patched using alternatives, thus the metadata can be freed after
+patching.
 
-TL;DR: 100% agree, and we're working on fixing this in KVM, but were still months
-away from a full solution.
+Hi Heiko,
 
-Yep.  KVM uses mmu_notifiers to react to mapping changes, with a few caveats that
-we are (slowly) fixing, though those caveats are only tangentially related.
+I combined your code and my code into patch1, since one of the key
+patch in the merged "Allow calls in alternatives" series rolled
+back to your v1. So I added your Co-developed-by and Signed-off-by
+thanks
 
-The deficiency in KVM is that KVM's internal APIs to translate a virtual address
-to a physical address spit out only the resulting host PFN.  The details of _how_
-that PFN was acquired are not captured.  Specifically, KVM loses track of whether
-or not a PFN was acquired via gup() or follow_pte() (KVM is very permissive when
-it comes to backing guest memory).
+Since v2
+ - rebase on riscv-next
+ - collect Reviewed-by tag
+ - fix jal imm construction
+ - combine Heiko's code and my code for jal patching, thus add
+   Co-developed-by tag
+ - address comments from Conor
 
-Because gup() gifts the caller a reference, that means KVM also loses track of
-whether or not KVM holds a page refcount.  To avoid pinning guest memory, KVM does
-quickly put the reference gifted by gup(), but because KVM doesn't _know_ if it
-holds a reference, KVM uses a heuristic, which is essentially "is the PFN associated
-with a 'normal' struct page?".
+Since v1
+ - rebase on v6.1-rc7 + Heiko's alternative improvements[3]
+ - collect Reviewed-by tag
+ - add one patch to update jal offsets in patched alternatives
+ - add one patch to switch to relative alternative entries
+ - add patches to patch vdso
 
-   /*
-    * Returns a 'struct page' if the pfn is "valid" and backed by a refcounted
-    * page, NULL otherwise.  Note, the list of refcounted PG_reserved page types
-    * is likely incomplete, it has been compiled purely through people wanting to
-    * back guest with a certain type of memory and encountering issues.
-    */
-   struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn)
+[1]https://lore.kernel.org/linux-riscv/20220922060958.44203-1-samuel@sholland.org/
+[2]https://lore.kernel.org/linux-arm-kernel/20220912162210.3626215-8-mark.rutland@arm.com/
+[3]https://lore.kernel.org/linux-riscv/20221130225614.1594256-1-heiko@sntech.de/
 
-That heuristic also triggers if follow_pte() resolves to a PFN that is associated
-with a "struct page", and so to avoid putting a reference it doesn't own, KVM does
-the silly thing of manually getting a reference immediately after follow_pte().
 
-And that in turn gets tripped up non-refcounted tail pages because KVM sees a
-normal, valid "struct page" and assumes it's refcounted.  To fudge around that
-issue, KVM requires "struct page" memory to be refcounted.
+Andrew Jones (1):
+  riscv: KVM: Switch has_svinval() to riscv_has_extension_unlikely()
 
-The long-term solution is to refactor KVM to precisely track whether or not KVM
-holds a reference.  Patches have been prosposed to do exactly that[1], but they
-were put on hold due to the aforementioned caveats with mmu_notifiers.  The
-caveats are that most flows where KVM plumbs a physical address into hardware
-structures aren't wired up to KVM's mmu_notifier.
+Jisheng Zhang (12):
+  riscv: fix jal offsets in patched alternatives
+  riscv: move riscv_noncoherent_supported() out of ZICBOM probe
+  riscv: cpufeature: detect RISCV_ALTERNATIVES_EARLY_BOOT earlier
+  riscv: hwcap: make ISA extension ids can be used in asm
+  riscv: cpufeature: extend riscv_cpufeature_patch_func to all ISA
+    extensions
+  riscv: introduce riscv_has_extension_[un]likely()
+  riscv: fpu: switch has_fpu() to riscv_has_extension_likely()
+  riscv: module: move find_section to module.h
+  riscv: switch to relative alternative entries
+  riscv: alternative: patch alternatives in the vDSO
+  riscv: cpu_relax: switch to riscv_has_extension_likely()
+  riscv: remove riscv_isa_ext_keys[] array and related usage
 
-KVM could support non-refcounted struct page memory without first fixing the
-mmu_notifier issues, but I was (and still am) concerned that that would create an
-even larger hole in KVM until the mmu_notifier issues are sorted out[2].
- 
-[1] https://lore.kernel.org/all/20211129034317.2964790-1-stevensd@google.com
-[2] https://lore.kernel.org/all/Ydhq5aHW+JFo15UF@google.com
+ arch/riscv/errata/sifive/errata.c           |  4 +-
+ arch/riscv/errata/thead/errata.c            | 11 ++-
+ arch/riscv/include/asm/alternative-macros.h | 20 ++---
+ arch/riscv/include/asm/alternative.h        | 12 +--
+ arch/riscv/include/asm/errata_list.h        |  9 +-
+ arch/riscv/include/asm/hwcap.h              | 97 +++++++++++----------
+ arch/riscv/include/asm/insn.h               | 27 ++++++
+ arch/riscv/include/asm/module.h             | 16 ++++
+ arch/riscv/include/asm/switch_to.h          |  3 +-
+ arch/riscv/include/asm/vdso.h               |  4 +
+ arch/riscv/include/asm/vdso/processor.h     |  2 +-
+ arch/riscv/kernel/alternative.c             | 52 +++++++++++
+ arch/riscv/kernel/cpufeature.c              | 78 +++--------------
+ arch/riscv/kernel/module.c                  | 15 ----
+ arch/riscv/kernel/setup.c                   |  3 +
+ arch/riscv/kernel/vdso.c                    |  5 --
+ arch/riscv/kernel/vdso/vdso.lds.S           |  7 ++
+ arch/riscv/kvm/tlb.c                        |  3 +-
+ 18 files changed, 206 insertions(+), 162 deletions(-)
+
+-- 
+2.38.1
+
