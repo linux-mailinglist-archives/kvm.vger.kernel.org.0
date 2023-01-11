@@ -2,67 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DB9616665E1
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 22:55:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 62ECA6665ED
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 23:03:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235039AbjAKVzd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 16:55:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53352 "EHLO
+        id S235870AbjAKWDN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 17:03:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232768AbjAKVz1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 16:55:27 -0500
-Received: from mail-il1-x14a.google.com (mail-il1-x14a.google.com [IPv6:2607:f8b0:4864:20::14a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEF2962F0
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 13:55:26 -0800 (PST)
-Received: by mail-il1-x14a.google.com with SMTP id n15-20020a056e021baf00b0030387c2e1d3so11875586ili.5
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 13:55:26 -0800 (PST)
+        with ESMTP id S231307AbjAKWDK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 17:03:10 -0500
+Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0544462D8
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 14:03:10 -0800 (PST)
+Received: by mail-vk1-xa33.google.com with SMTP id s192so5595196vka.3
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 14:03:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+Lc80XI6+/XFtzqxxXoccg5ZlmmZp+XMvjzGNjlgdY=;
-        b=pr0T7+PBBqvw8ZDsfjBgUZvMxddbqCU2+hLCUXb5Q/KNZ5wGdziczOEwtEzvV4FSxp
-         Bl7Jra9HhzQ7/NUopse/UBLr5cK8fb8aRnbZB4+PDoHIJaOxwmc8kNpy76z7d2wd8su8
-         l+I2M3eQ+g5rzaSJvRtvE8KU+d2Up0JrW5+6yhGfU8i/lZ+Mk/yuaUyDYMeIlsEWzmwz
-         E+1q8xjwP0deCiIJ9yVWd7lyka48i5ZQ1jYV9CcEC95pHA8TopwNRc2BfRi+ExZmVDce
-         DL2JkDQnLsjTrP/O58FSpAlsql0DlR91nWEuYFn3KMiALJYfBbu7/RPhPlfbJZzt88IK
-         Bevw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=VmuBCsBxf7mGeczzGNyI3TdKv9UghiIBbcHCLEfGXdM=;
+        b=KaFTBvuzzUGYrZ+Ybzzensoen8m4E/m1o7K4b71m0FAGmqXFaMaSDRpu++B6Ok8oEN
+         f3AcgLUCTslQoRgcV0s1D9QvNshpfhIR+qlWY6vwFY1TfMF9YQnfQPliZMfGmRAiprbI
+         pUAcF6HuklZsxetyIsR2eHH/vqwElPE6YbIc1EbrZXi6ioYulQFGj8ttyHhyDZg2vBtq
+         cMclNpu7P4tPWSwrhP9Zjh5lS02JfSBEqc2YWOlY2KpDaZ90HK1u0Jua1HGRTY7+k51P
+         nUwy47oXH5x3JUGxumq4hpvIuGGPUvThPNATphMrf4MTz3ejPeTtio0IY+n1vSzMz3hh
+         oSRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5+Lc80XI6+/XFtzqxxXoccg5ZlmmZp+XMvjzGNjlgdY=;
-        b=QpbHPswuiaBzQkxz5PDBGM/IsuyzUb1yuyPhZ/4DQxVE6pTx7+4K0X4F3c5XWLd5DH
-         f8lEDey10womhR1HPxhDNrLbSoEqLY2bkaFNczImHQNoZZNC2Ee0H4kfGiThofjckcut
-         VEv5cLesPHpsIhZ8yfhyDxNHZylVhT0CmR0V3zTGRYo8qesbUAmLL9JR1VFhCgOJ2Hqm
-         Ml1l7MXprMwaGPHA7nNfv8NUG4lp0h+x1RMGqYkU2GP8oYh2QmVEKb/L6kFkSC5nZHzG
-         2/fzw+bVZr3cREfGZHUybeA0fa0oEVwj0286Zp7AGRB7y6sQDAMBqMYIFUqMegA73Iap
-         0FJQ==
-X-Gm-Message-State: AFqh2koghuTLCtlQdCVzUsRBwKRt1mgmP5w8/+sGveo9t9Kvyky/A1Yz
-        fs7e792frerAKlfPmdYY1bEvOnxti+6Z4FCCxA==
-X-Google-Smtp-Source: AMrXdXulAe/2ABqltLbTgZW1LSdHJugjxwY87bzglaZvzTwnfUG6Pl+BSLM/nDkAXj74lzq+bOcj5pSZe+zjuAIXNw==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a92:d6cd:0:b0:30d:b0fe:852f with SMTP
- id z13-20020a92d6cd000000b0030db0fe852fmr1171090ilp.126.1673474126135; Wed,
- 11 Jan 2023 13:55:26 -0800 (PST)
-Date:   Wed, 11 Jan 2023 21:54:22 +0000
-In-Reply-To: <20230111215422.2153645-1-coltonlewis@google.com>
-Mime-Version: 1.0
-References: <20230111215422.2153645-1-coltonlewis@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230111215422.2153645-2-coltonlewis@google.com>
-Subject: [kvm-unit-tests PATCH v2 1/1] arm: Replace MAX_SMP probe loop in
- favor of reading directly
-From:   Colton Lewis <coltonlewis@google.com>
-To:     thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com,
-        andrew.jones@linux.dev, imbrenda@linux.ibm.com, marcorr@google.com,
-        alexandru.elisei@arm.com, oliver.upton@linux.dev
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        Colton Lewis <coltonlewis@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VmuBCsBxf7mGeczzGNyI3TdKv9UghiIBbcHCLEfGXdM=;
+        b=PZ2+qbEzsCbusPMJDNPt6yhDSLQhFdCP82OYF2fgR9Ow1tWNOSbkyw4WsWUpj2qS/i
+         0yMrWMJFlbU6ahbekhsTqYIYnRReEMsqpWFl4SGjHEqtx3RHIlOs7J3APbaX5phZr9Ut
+         tKWEjuLsV8XBCdA6VLpViI0Ppdmb5ZYGP2YkOSST+n57g7uZN29ZlUelevD07Zxmqdl1
+         dolnjxY7SPYFnL+T7z2az8E08osotn6KCBdzEE06youWSJwEkion/d8XM8/MJdUEtyal
+         QOi0I2pR5D7aNLdDyGyEU4a99etvwA/9PP1gC5fYeTnM1ZeHVh+Fynman6uZxZ4cftv5
+         b+cg==
+X-Gm-Message-State: AFqh2kplTM9f3ucDCpheAgxfkFfq/PTSN9vA5vLcrinSbEDVthLl71JD
+        yOHZbdamGmLzXqgZeyyVN0foF2ZfpgYa8Oqq4zeM4A==
+X-Google-Smtp-Source: AMrXdXtcFHbwzLgHpc/Ot7k4Klal50U1YIc7w99emrc4gOqh/WvQIQDDdPtwam+4svMTdbiQSZu9m1B21/H1BRUa4e0=
+X-Received: by 2002:a1f:aa15:0:b0:3d5:dcb7:5f88 with SMTP id
+ t21-20020a1faa15000000b003d5dcb75f88mr5238304vke.37.1673474588933; Wed, 11
+ Jan 2023 14:03:08 -0800 (PST)
+MIME-Version: 1.0
+References: <cover.1667110240.git.isaku.yamahata@intel.com> <99e5fcf2a7127347816982355fd4141ee1038a54.1667110240.git.isaku.yamahata@intel.com>
+In-Reply-To: <99e5fcf2a7127347816982355fd4141ee1038a54.1667110240.git.isaku.yamahata@intel.com>
+From:   Erdem Aktas <erdemaktas@google.com>
+Date:   Wed, 11 Jan 2023 14:02:58 -0800
+Message-ID: <CAAYXXYwQ_qBbug85QgMMN376FSZqoZypbTm9Gzc9wgY88AxX+w@mail.gmail.com>
+Subject: Re: [PATCH v10 005/108] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,55 +71,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Replace the MAX_SMP probe loop in favor of reading a number directly
-from the QEMU error message. This is equally safe as the existing code
-because the error message has had the same format as long as it has
-existed, since QEMU v2.10. The final number before the end of the
-error message line indicates the max QEMU supports. A short awk
-program is used to extract the number, which becomes the new MAX_SMP
-value.
+On Sat, Oct 29, 2022 at 11:24 PM <isaku.yamahata@intel.com> wrote:
+>
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-This loop logic is broken for machines with a number of CPUs that
-isn't a power of two. A machine with 8 CPUs will test with MAX_SMP=8
-but a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 2 ==
-6. This can, in rare circumstances, lead to different test results
-depending only on the number of CPUs the machine has.
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> +{
+> +       int r;
+> +
+> +       if (!enable_ept) {
+> +               pr_warn("Cannot enable TDX with EPT disabled\n");
+> +               return -EINVAL;
+> +       }
+> +
+> +       /* MOVDIR64B instruction is needed. */
+> +       if (!static_cpu_has(X86_FEATURE_MOVDIR64B)) {
+> +               pr_warn("Cannot enable TDX with MOVDIR64B supported ");
+> +               return -ENODEV;
+> +       }
+> +
+> +       /* TDX requires VMX. */
+> +       r = vmxon_all();
+> +       if (!r)
+> +               r = tdx_module_setup();
+> +       vmxoff_all();
 
-A previous comment explains the loop should only apply to kernels
-<=v4.3 on arm and suggests deletion when it becomes tiresome to
-maintian. However, it is always theoretically possible to test on a
-machine that has more CPUs than QEMU supports, so it makes sense to
-leave some check in place.
-
-Signed-off-by: Colton Lewis <coltonlewis@google.com>
----
- scripts/runtime.bash | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-index f8794e9..4377e75 100644
---- a/scripts/runtime.bash
-+++ b/scripts/runtime.bash
-@@ -188,12 +188,10 @@ function run()
- # Probe for MAX_SMP, in case it's less than the number of host cpus.
- #
- # This probing currently only works for ARM, as x86 bails on another
--# error first. Also, this probing isn't necessary for any ARM hosts
--# running kernels later than v4.3, i.e. those including ef748917b52
--# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
--# point when maintaining the while loop gets too tiresome, we can
--# just remove it...
--while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
--		|& grep -qi 'exceeds max CPUs'; do
--	MAX_SMP=$((MAX_SMP >> 1))
--done
-+# error first. The awk program takes the last number from the QEMU
-+# error message, which gives the allowable MAX_SMP.
-+if $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-+      |& grep -qi 'exceeds max CPUs'; then
-+	GET_LAST_NUM='/exceeds max CPUs/ {match($0, /[[:digit:]]+)$/); print substr($0, RSTART, RLENGTH-1)}'
-+	MAX_SMP=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& awk "$GET_LAST_NUM")
-+fi
--- 
-2.39.0.314.g84b9a713c41-goog
-
+if few CPUs have VMX enabled, this will disable VMX in all of them.
+Depending on what enabled VMX on those CPUs, would this not cause
+kernel crashes/problems?
