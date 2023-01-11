@@ -2,187 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82BF7666593
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 22:24:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 74BE066659A
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 22:25:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235503AbjAKVYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 16:24:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42482 "EHLO
+        id S235775AbjAKVZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 16:25:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235513AbjAKVYk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 16:24:40 -0500
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E7BB4087C;
-        Wed, 11 Jan 2023 13:24:37 -0800 (PST)
-Received: from [192.168.2.218] (unknown [109.252.117.89])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: dmitry.osipenko)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id 95C896602DA2;
-        Wed, 11 Jan 2023 21:24:34 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1673472276;
-        bh=yjvk/0iHuNc/6gjXb7iSX0HCbGV45DhPyBUVGUboafg=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=S2AAaU9eH0N/eTke6q3vQol0nEyoxzD+ib+vRiMLxKxzbOTNGmD32bFW/5pM9GCcx
-         wTlRvYH1lYn4sow4cU8HytoxBVBX8yBiVtZ3wIujKwRfeqW1Y5ZrxCJqtxbDxh5Gp5
-         DraN21bg3GYCJDG5nQ1/xK1/Lf4wjhBVUwxjUkAKfDAbi2NIawf2J7L170fePjY+uY
-         PWa6T/JNGT0jwH6ZkO1oWRDVfHJDCEeb5v+63573hPDybMVWqxgQu8KBv2rC3RAyIx
-         qd631w8Ey91yhCNY9/uLi/AwAxwZ8KmaigPHk1u7Y85uVelplDxi7z01upCcl4i/84
-         NjMvujsiapnZw==
-Message-ID: <77d0dece-8139-f292-a4de-84e91eaed64b@collabora.com>
-Date:   Thu, 12 Jan 2023 00:24:30 +0300
+        with ESMTP id S235347AbjAKVZW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 16:25:22 -0500
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C997BD2FF
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 13:25:21 -0800 (PST)
+Received: by mail-pj1-x102c.google.com with SMTP id o8-20020a17090a9f8800b00223de0364beso21405052pjp.4
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 13:25:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=isiHwCTIoSENRpWwMehTehvClsZpOj/mU5tiBrBvyOg=;
+        b=KODnx62o2YITMkZtLn5TAKhNM9ViUaeHdj9VjXJu/gHD+gH9FMAwMdxd9S9Ntb2qD/
+         WxCsAxQoAwpJ/OxsMAX75z+niJFc+AWtYUiS09V5oCcA39kxAPcD4ncfHMGHdmWgwKfb
+         gDzFgredSbRch4xBb/p8uj1iYCpaT5ViMVW6ljLuHgP3fLV0sFbvdJOLyZC7mr3G7lJR
+         V2L0JRHU8Pn/bXdRzrYsj34McL+Fn+7ElCL1BqVozAQy9Oz89HURV7QDAD8c02CkHhAS
+         2VoM0J9NnsuXREtxE89v9ZJBaoOetEiqm/n0lbZYIcjAOHyhpDq35tURWsqq27L1V9FF
+         /7fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=isiHwCTIoSENRpWwMehTehvClsZpOj/mU5tiBrBvyOg=;
+        b=Z2w4Fgti5MDDVeY1BRJUOTQa87QAwyYalWaF+kR0fF//MAaPcsUBO/+hb4PdNHRRZl
+         1D9nvVnJ4jqlXtSYtG1qpiJU2n6ltciclVLbp1fCpTs/rMpm+Xep/Y7WunzOJG9p+XAv
+         W717pCPE0ioBa3WttAJ+zxDpbEWzvITHoDtzH6fb8JK0ZaqpwMqHuLnCKYM0rLZbSgef
+         qwncYe1UTNwN90V5Mq8A3jA1QMzHMb9JiptZr27thf0v77dJ9fBVlMA5ZHJDBTUGBZQT
+         GXxHMZED2PLvGH8pQPalUhUMScrDumUolb5zPfHNRPSSq0CeV3nlTxRooNUGb0VfMNmf
+         GXPw==
+X-Gm-Message-State: AFqh2kprxcNYpJbQKSplzunA4eum1s+6zNo+m0/asj9O/BMJhVqZ8gxa
+        8HvMYbEndHSZhpSH0Qw/edJW/A==
+X-Google-Smtp-Source: AMrXdXvKRkQZXBDq3VgD7eMaL2oaCGMXrXbnpTAy1wa0mbklDqdGfRFLsGOVTct14OhG9MnRmRGavw==
+X-Received: by 2002:a05:6a21:33a1:b0:ac:af5c:2970 with SMTP id yy33-20020a056a2133a100b000acaf5c2970mr588164pzb.3.1673472321232;
+        Wed, 11 Jan 2023 13:25:21 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id w11-20020aa79a0b000000b00580e679dcf2sm10368318pfj.157.2023.01.11.13.25.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jan 2023 13:25:20 -0800 (PST)
+Date:   Wed, 11 Jan 2023 21:25:17 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     pbonzini@redhat.com, bgardon@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [Patch v2] KVM: selftests: Make reclaim_period_ms input always
+ be positive
+Message-ID: <Y78pPcNuXsjpE3DZ@google.com>
+References: <20230111183408.104491-1-vipinsh@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
-To:     Sean Christopherson <seanjc@google.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
-Cc:     David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Trigger Huang <Trigger.Huang@gmail.com>,
-        Gert Wollny <gert.wollny@collabora.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
-        kernel@collabora.com, virtualization@lists.linux-foundation.org,
-        Bob Beckett <bbeckett@collabora.com>
-References: <8f749cd0-9a04-7c72-6a4f-a42d501e1489@amd.com>
- <5340d876-62b8-8a64-aa6d-7736c2c8710f@collabora.com>
- <594f1013-b925-3c75-be61-2d649f5ca54e@amd.com>
- <6893d5e9-4b60-0efb-2a87-698b1bcda63e@collabora.com>
- <73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com>
- <c9d89644-409e-0363-69f0-a3b8f2ef0ae4@collabora.com>
- <6effcd33-8cc3-a4e0-3608-b9cef7a76da7@collabora.com>
- <ff28e1b4-cda2-14b8-b9bf-10706ae52cac@collabora.com>
- <48b5dd12-b0df-3cc6-a72d-f35156679844@collabora.com>
- <b1963713-4df6-956f-c16f-81a0cf1a978b@amd.com> <Y77sQZI0IfFVx7Jo@google.com>
-Content-Language: en-US
-From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
-In-Reply-To: <Y77sQZI0IfFVx7Jo@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230111183408.104491-1-vipinsh@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hello Sean,
+On Wed, Jan 11, 2023, Vipin Sharma wrote:
+> reclaim_period_ms use to be positive only but the commit 0001725d0f9b
+> ("KVM: selftests: Add atoi_positive() and atoi_non_negative() for input
+> validation") incorrectly changed it to non-negative validation.
+> 
+> Change validation to allow only positive input.
+> 
+> Fixes: 0001725d0f9b ("KVM: selftests: Add atoi_positive() and atoi_non_negative() for input validation")
+> Signed-off-by: Vipin Sharma <vipinsh@google.com>
+> Reported-by: Ben Gardon <bgardon@google.com>
+> Reviewed-by: Ben Gardon <bgardon@google.com>
+> ---
 
-On 1/11/23 20:05, Sean Christopherson wrote:
-> On Thu, Aug 18, 2022, Christian König wrote:
->> Am 18.08.22 um 01:13 schrieb Dmitry Osipenko:
->>> On 8/18/22 01:57, Dmitry Osipenko wrote:
->>>> On 8/15/22 18:54, Dmitry Osipenko wrote:
->>>>> On 8/15/22 17:57, Dmitry Osipenko wrote:
->>>>>> On 8/15/22 16:53, Christian König wrote:
->>>>>>> Am 15.08.22 um 15:45 schrieb Dmitry Osipenko:
->>>>>>>> [SNIP]
->>>>>>>>> Well that comment sounds like KVM is doing the right thing, so I'm
->>>>>>>>> wondering what exactly is going on here.
->>>>>>>> KVM actually doesn't hold the page reference, it takes the temporal
->>>>>>>> reference during page fault and then drops the reference once page is
->>>>>>>> mapped, IIUC. Is it still illegal for TTM? Or there is a possibility for
->>>>>>>> a race condition here?
->>>>>>>>
->>>>>>> Well the question is why does KVM grab the page reference in the first
->>>>>>> place?
->>>>>>>
->>>>>>> If that is to prevent the mapping from changing then yes that's illegal
->>>>>>> and won't work. It can always happen that you grab the address, solve
->>>>>>> the fault and then immediately fault again because the address you just
->>>>>>> grabbed is invalidated.
->>>>>>>
->>>>>>> If it's for some other reason than we should probably investigate if we
->>>>>>> shouldn't stop doing this.
-> 
-> ...
-> 
->>>>> If we need to bump the refcount only for VM_MIXEDMAP and not for
->>>>> VM_PFNMAP, then perhaps we could add a flag for that to the kvm_main
->>>>> code that will denote to kvm_release_page_clean whether it needs to put
->>>>> the page?
->>>> The other variant that kind of works is to mark TTM pages reserved using
->>>> SetPageReserved/ClearPageReserved, telling KVM not to mess with the page
->>>> struct. But the potential consequences of doing this are unclear to me.
->>>>
->>>> Christian, do you think we can do it?
->>> Although, no. It also doesn't work with KVM without additional changes
->>> to KVM.
->>
->> Well my fundamental problem is that I can't fit together why KVM is grabing
->> a page reference in the first place.
-> 
-> It's to workaround a deficiency in KVM.
-> 
->> See the idea of the page reference is that you have one reference is that
->> you count the reference so that the memory is not reused while you access
->> it, e.g. for I/O or mapping it into different address spaces etc...
->>
->> But none of those use cases seem to apply to KVM. If I'm not totally
->> mistaken in KVM you want to make sure that the address space mapping, e.g.
->> the translation between virtual and physical address, don't change while you
->> handle it, but grabbing a page reference is the completely wrong approach
->> for that.
-> 
-> TL;DR: 100% agree, and we're working on fixing this in KVM, but were still months
-> away from a full solution.
-> 
-> Yep.  KVM uses mmu_notifiers to react to mapping changes, with a few caveats that
-> we are (slowly) fixing, though those caveats are only tangentially related.
-> 
-> The deficiency in KVM is that KVM's internal APIs to translate a virtual address
-> to a physical address spit out only the resulting host PFN.  The details of _how_
-> that PFN was acquired are not captured.  Specifically, KVM loses track of whether
-> or not a PFN was acquired via gup() or follow_pte() (KVM is very permissive when
-> it comes to backing guest memory).
-> 
-> Because gup() gifts the caller a reference, that means KVM also loses track of
-> whether or not KVM holds a page refcount.  To avoid pinning guest memory, KVM does
-> quickly put the reference gifted by gup(), but because KVM doesn't _know_ if it
-> holds a reference, KVM uses a heuristic, which is essentially "is the PFN associated
-> with a 'normal' struct page?".
-> 
->    /*
->     * Returns a 'struct page' if the pfn is "valid" and backed by a refcounted
->     * page, NULL otherwise.  Note, the list of refcounted PG_reserved page types
->     * is likely incomplete, it has been compiled purely through people wanting to
->     * back guest with a certain type of memory and encountering issues.
->     */
->    struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn)
-> 
-> That heuristic also triggers if follow_pte() resolves to a PFN that is associated
-> with a "struct page", and so to avoid putting a reference it doesn't own, KVM does
-> the silly thing of manually getting a reference immediately after follow_pte().
-> 
-> And that in turn gets tripped up non-refcounted tail pages because KVM sees a
-> normal, valid "struct page" and assumes it's refcounted.  To fudge around that
-> issue, KVM requires "struct page" memory to be refcounted.
-> 
-> The long-term solution is to refactor KVM to precisely track whether or not KVM
-> holds a reference.  Patches have been prosposed to do exactly that[1], but they
-> were put on hold due to the aforementioned caveats with mmu_notifiers.  The
-> caveats are that most flows where KVM plumbs a physical address into hardware
-> structures aren't wired up to KVM's mmu_notifier.
-> 
-> KVM could support non-refcounted struct page memory without first fixing the
-> mmu_notifier issues, but I was (and still am) concerned that that would create an
-> even larger hole in KVM until the mmu_notifier issues are sorted out[2].
->  
-> [1] https://lore.kernel.org/all/20211129034317.2964790-1-stevensd@google.com
-> [2] https://lore.kernel.org/all/Ydhq5aHW+JFo15UF@google.com
-
-Thanks for the summary! Indeed, it's the KVM side that needs to be
-patched. Couple months ago I found that a non-TTM i915 driver also
-suffers from the same problem because it uses huge pages that we want
-map to a guest. So we definitely will need to fix the KVM side.
-
--- 
-Best regards,
-Dmitry
-
+Reviewed-by: Sean Christopherson <seanjc@google.com>
