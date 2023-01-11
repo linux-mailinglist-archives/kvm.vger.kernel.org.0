@@ -2,49 +2,52 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 25A3B66588C
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 11:05:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7364B66588A
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 11:05:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238284AbjAKKEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 05:04:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60648 "EHLO
+        id S235982AbjAKKEo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 05:04:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239297AbjAKKDl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 05:03:41 -0500
+        with ESMTP id S239475AbjAKKDu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 05:03:50 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72E3C33B;
-        Wed, 11 Jan 2023 02:00:38 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C8CBDFEA;
+        Wed, 11 Jan 2023 02:00:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=gtUnWvOq0Tv3Rog3AzXlM5oDAQWs+ZNGSYH5rPHcNOw=; b=W/bVxTZCRA/CwxLvzV2a6CwDA2
-        VozrtnsiBnXzk6jMDQuM5KtWTO6kWiv4R77u/QA95YIudRUknFdt+TVcA50WJonqoz1FOH76o13L3
-        dUfSGsPD+2HCf+p685OHQBq4mpIabi7a5e3KprmmzVu6Y+HFahCvcPsB5EBqghbnDE5TaUPhUcGTJ
-        WmFMM5JVaM/5ur5QBTofs19XG8Byz1B73Mvt0dO3qX9C8bbOJTqK80vddwt4Hf6TWMwaWEXzkz5Xc
-        7KdSo2f6vxFSLZJ5etFSRnSn28Y3vaXvKD54nixu1SDAuFmDcK3yxUDQwbkjgjJ3UnJd+GHnoktVu
-        q/GWZ4dA==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+        bh=QTPVTKNqATKtQW82I4C8pCyzH/+bIzUEXeJ6Ghw5pok=; b=P3kcRxE7uzo+Y8dmUu/iJrK7hl
+        F8osY8n0VaDEt2J7x4qBbijTBIWKJO2362zN+eZ1WVjg+nc0z3pim5m5VGIYfiuLovCRyHZ1bZeed
+        b2y4kSw1J/x2MCWfWs03QJPo7bwKwvy2X56W4EDJvNEvfLNperiG6Y3y0vOjSaqxD3qQnXn2FlSmA
+        Ej8vbmSY7sDXWvxuD8feT8IYJ4HphQ0M5jfFCUHj5sgXWJp7F1F5NajARqcFpJRlDogNXzJ8GgVaS
+        Al2e6qISqxRSGJoECde9WfgDX1Z3ueZRCkIqVaTgF+i/wHGWKihxhXgYzXlB3XxOGZtKfAMr3Mph3
+        zGoFDBbg==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pFXuT-00417y-Mq; Wed, 11 Jan 2023 10:00:41 +0000
-Message-ID: <7cd31f8e7d5ec4658ab8e945c2b771fd55a0b101.camel@infradead.org>
-Subject: Re: [PATCH v7 1/2] KVM: x86/cpuid: generalize
- kvm_update_kvm_cpuid_base() and also capture limit
+        id 1pFXuq-00419Q-AI; Wed, 11 Jan 2023 10:01:04 +0000
+Message-ID: <477edcdff6507e35793c1cb9a97101d01425cff9.camel@infradead.org>
+Subject: Re: [PATCH v7 2/2] KVM: x86/xen: update Xen CPUID Leaf 4 (tsc info)
+ sub-leaves, if present
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paul Durrant <pdurrant@amazon.com>, x86@kernel.org,
         kvm@vger.kernel.org, xen-devel@lists.xenproject.org,
         linux-kernel@vger.kernel.org
 Cc:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
+        Juergen Gross <jgross@suse.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Thomas Gleixner <tglx@linutronix.de>,
         Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>
-Date:   Wed, 11 Jan 2023 10:00:27 +0000
-In-Reply-To: <20230106103600.528-2-pdurrant@amazon.com>
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Date:   Wed, 11 Jan 2023 10:00:50 +0000
+In-Reply-To: <20230106103600.528-3-pdurrant@amazon.com>
 References: <20230106103600.528-1-pdurrant@amazon.com>
-         <20230106103600.528-2-pdurrant@amazon.com>
+         <20230106103600.528-3-pdurrant@amazon.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-f3qb3SVQBInmnod430iv"
+        boundary="=-sPgM3fl2soxIlK/U1gLd"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -58,25 +61,24 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-f3qb3SVQBInmnod430iv
+--=-sPgM3fl2soxIlK/U1gLd
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-01-06 at 10:35 +0000, Paul Durrant wrote:
-> A subsequent patch will need to acquire the CPUID leaf range for emulated
-> Xen so explicitly pass the signature of the hypervisor we're interested i=
+On Fri, 2023-01-06 at 10:36 +0000, Paul Durrant wrote:
+> The scaling information in subleaf 1 should match the values set by KVM i=
 n
-> to the new function. Also introduce a new kvm_hypervisor_cpuid structure
-> so we can neatly store both the base and limit leaf indices.
+> the 'vcpu_info' sub-structure 'time_info' (a.k.a. pvclock_vcpu_time_info)
+> which is shared with the guest, but is not directly available to the VMM.
+> The offset values are not set since a TSC offset is already applied.
+> The TSC frequency should also be set in sub-leaf 2.
 >=20
 > Signed-off-by: Paul Durrant <pdurrant@amazon.com>
 > ---
 
-
 Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-
---=-f3qb3SVQBInmnod430iv
+--=-sPgM3fl2soxIlK/U1gLd
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -168,24 +170,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTExMTAwMDI3WjAvBgkqhkiG9w0BCQQxIgQgLVDKcKpc
-s/0Xl+zEpzb59ornBDJqO0R8sz9mYsHaa+owgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTExMTAwMDUwWjAvBgkqhkiG9w0BCQQxIgQgNgV5GBjJ
+lHIlCxWgQgdiehi/uQV1nV77Zej1Pn52QJAwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCnMR6Zpf9PuUzry9agQlFeDFJ9824fgOPU
-QjTNjVgEmb6oHW06B53qOlhnU/Jf1t9+JTpID4GfOwO67Xc1Hj2Za0sOouHWWSpSVKt6ynO2G7I4
-xj0Bsdr9iQTm/PBYo1t42lrMikj55LK60XteEjAvt0w7tKSerdQKUAcG8PYjBY1VQfD9FLHzoIbs
-o+qJfneWp8QLFyx8M6fJsKMyJ20+rYUAGRxdfTkk4fkjW/RYW1D2d9j15y5DwI0WAFztZZugA35T
-peQZYKpDzQGT1OJ9wY5mnS7CRqmXGabk0R0xegjtgv3SbkjreO834yhl9yPvlwJUJ4L+wyZqAMXs
-4vKZqQonc5nmyTdcXJt5qskpMKBMVcN50/Xc8VC1yXeRqWP3ZCiuyDCydQvUnl5utqIQArxI0zhf
-6WrnFOI9cl/1BGeTDAk3YKxnzjB696iBADIlqfpBKERS6ZT3maAvuFgsKpDcHXCs3B5qkEW1qizT
-uu/nz1vSdG/8ShRhkBJ9eYvsyv1OUBJvtDA+WCaZL/E9jV612X1tSZGlMNYbz3nH0Y+r/fce6zu2
-hX20NrFIbY80NyjHgVBFFtKHwA67Y4EFkmccFdBkx3LRqtagyrfMTfHBTpQSEHPpGCfRLy62fuQy
-U2Jr1x4txafZ38DYH2cSdWYR9ORtZa2O/ahNku+6vQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBwxZg89Rk6L/cCUA5Nx4P1NkkYNFssNrSZ
+GUADoVY7R9peuMmOR0FteSbXSZqbiqnM11MxDDte2HhwCIJlNBGJtTj/doHrdBMCocWKJ99uBPgJ
+4su7WohSzAWhr5oVJHOKIfo11jjX/t7tWJly7PFqcZSa3Jr0/d7RV5qPsueTYmcRBEgcjxO1akNE
+ea8JSAISLKoxTUGgKx4KKrdik/1RV/rAi9nt40d4c2ltbVJV3M+ACo4msttBt6G4hF2cDpzjJz6E
+of6y2C34eiM+9gJYkWokcrsKaLAW5TZpQjEwY9H2RZWZySZ8CeTWKxaX6vxdZgwLb7FUrTsaOMns
+schYhvs9bVnZbv5Kqof9ZsMFTyJOuREWudGeymrQ8eAUGPx9tqiRZaYVq226xVQ1Wg9viCzbVxPF
+UIAdkH+Q70e3yDILny9c2lkFMlO6xcCMzZv8DMEMPAuaEV8skUbZ9/53hx4J27ROWbqwJKKFORkf
+c2adKpl0R7sZb69h28oyy3ibdUyF+vRTW6xGIiVvab9eV5xxvKGUaDqRrwtDGTyXtj8QgTON0/6j
+s9EM9ZsJIfXv/Jm68aCLRSlZnVZZ6MGN7QHVQnHdcqNnzUf1rQybxT26Oe8w83azF1g3ggSHQoUO
+q8Zm4PR/bksmIE31o22eRAT8T5EGh2YXTTNaByHpiQAAAAAAAA==
 
 
---=-f3qb3SVQBInmnod430iv--
+--=-sPgM3fl2soxIlK/U1gLd--
