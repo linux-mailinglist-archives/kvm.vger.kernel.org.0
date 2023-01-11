@@ -2,153 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C19946661BA
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:22:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C67666617D
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:13:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239533AbjAKRW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 12:22:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49824 "EHLO
+        id S232469AbjAKRNf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 12:13:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239340AbjAKRVj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 12:21:39 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D8CA33D56;
-        Wed, 11 Jan 2023 09:21:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id EAAEEB81C8B;
-        Wed, 11 Jan 2023 17:21:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F416BC433EF;
-        Wed, 11 Jan 2023 17:21:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673457685;
-        bh=nQ/FgwW4vCV/82AO+CiVvxSVywwFvyd81VlYJvv3+mQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cu4MF1WU8L/w1VT9eJ9YbvvwI+Npsyq9vX5U3+o8YY37j9vHLXpaHY46RsetWAQ1r
-         D/IgBo5kWDJ005wyMDlWxFogQB8ActEQXei0EwPYWaYHnJhGAPBzp7aI/I4g9ShW2i
-         xCwZxvgoa2K+B81APqxdPMaa5SLNwyUhMob6jjYE6yngCXRtB3vAwYWDjBk5IymH9h
-         gRIIrk9sAMms/3pyqsV5FE8iLFMPIRdaG2cVyAkTrgLg9M0VfDjgKL40FQUj4NlmAy
-         4u7lk9K6qWkPCCcaDQnrsbRvADI8G4uMZ1FyEVA2MJM6+3nFJLbKRjEG2kXGG1lNfY
-         8K5N+x+lDHHGQ==
-From:   Jisheng Zhang <jszhang@kernel.org>
-To:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>
-Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Conor Dooley <conor.dooley@microchip.com>,
-        Guo Ren <guoren@kernel.org>
-Subject: [PATCH v3 13/13] riscv: remove riscv_isa_ext_keys[] array and related usage
-Date:   Thu, 12 Jan 2023 01:10:27 +0800
-Message-Id: <20230111171027.2392-14-jszhang@kernel.org>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230111171027.2392-1-jszhang@kernel.org>
-References: <20230111171027.2392-1-jszhang@kernel.org>
+        with ESMTP id S234409AbjAKRN2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 12:13:28 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9873F59C
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:13:27 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id c8-20020a17090a4d0800b00225c3614161so20715585pjg.5
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:13:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7xoqM2b4yU5Wgrth55wL+NVhuuSQRsysOAOffMfb2Zs=;
+        b=UTHw9GP46gMj4w7BoWTjll73gGs6xDrYov0a9OBFb+A+fCEnj/lNlk/PdejnbXURqO
+         Bjaa3RzcOfRgNZwW4y4wEquG1PiGvWa+mDFtnWW0uykLypatPgx5G7+4SERoq1k+dvQG
+         xFFX2kzEYRvqMO5becq4T5XslALlZk0R4OFnPNGloW7hFS7+kr3EIBznbqo0ZIAm8A1H
+         +p3Zp0frWYwjCW7td3rratlrAVtlk1S+6jOhrJ+M/+CWMO1tC4v7PVqrV9Thc4XztjhF
+         1CE9QPZeiFYhJRLTxvImYXddOrBCNoD718EF13VjvKDTA1rmkfHp64GNv01N55tZjVL5
+         n6Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7xoqM2b4yU5Wgrth55wL+NVhuuSQRsysOAOffMfb2Zs=;
+        b=OmaP+KztDNAVQWTOlALmIn7bWvXe16KwVgdGYt8H9MjhpZss95C+pbq0M2faum/68Y
+         c1kUMPRkxMi8BH6QbpiBie2WGl+yTfSyoN75CW+2DLgF+8WwYNsAs82uPswNSXPuai+u
+         xbwIuyiFJK0h5LTEdwkvV1hhjjVnj0KV8ljCiZMj9GwP0FXwIqspjF5w7a+1gPFYyaoE
+         G9S9eRqmah+kLRp9xl+u2vY1Ivr72seiSFZb1YcUvmSMS+SWiuVkWpOQNRLRV7gYoPAH
+         +dKrgFTJiEQIeQU5eJrY1wTs9Pn/Wkzgz3nfy4zMo5diJosHbJIX3VRgtl0qEgqPsDMo
+         wfpw==
+X-Gm-Message-State: AFqh2ko9h6/KLY3gE5M7hNVRPPiLMynl8KOi9V1Gld9/awwI/J1NKEmR
+        tcwlpiwE5FEpA94t+8Nn7kL7ZQ==
+X-Google-Smtp-Source: AMrXdXvZV+eSwBO+qB3Cyv97/dRNyiGborDMC+PfJG2AQCDQ93hQgMsB7NAdTQYHGQJUGIn+huvG/w==
+X-Received: by 2002:a17:90a:9503:b0:227:679:17df with SMTP id t3-20020a17090a950300b00227067917dfmr499019pjo.0.1673457207330;
+        Wed, 11 Jan 2023 09:13:27 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id e13-20020a63e00d000000b00485cbedd34bsm8852733pgh.89.2023.01.11.09.13.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 11 Jan 2023 09:13:26 -0800 (PST)
+Date:   Wed, 11 Jan 2023 17:13:23 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        Dmitry Osipenko <dmitry.osipenko@collabora.com>,
+        David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
+        Trigger Huang <Trigger.Huang@gmail.com>,
+        Gert Wollny <gert.wollny@collabora.com>,
+        Antonio Caggiano <antonio.caggiano@collabora.com>,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
+        kernel@collabora.com, virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
+Message-ID: <Y77uM/X94DtKXtK0@google.com>
+References: <20220815095423.11131-1-dmitry.osipenko@collabora.com>
+ <8230a356-be38-f228-4a8e-95124e8e8db6@amd.com>
+ <YxenK8xZHC6Q4Eu4@phenom.ffwll.local>
+ <YxeoEr6xAtlZ+IrU@phenom.ffwll.local>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <YxeoEr6xAtlZ+IrU@phenom.ffwll.local>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-All users have switched to riscv_has_extension_*, remove unused
-definitions, vars and related setting code.
+On Tue, Sep 06, 2022, Daniel Vetter wrote:
+> On Tue, Sep 06, 2022 at 10:01:47PM +0200, Daniel Vetter wrote:
+> > On Mon, Aug 15, 2022 at 12:05:19PM +0200, Christian König wrote:
+> > > Am 15.08.22 um 11:54 schrieb Dmitry Osipenko:
+> > > > Higher order pages allocated using alloc_pages() aren't refcounted and they
+> > > > need to be refcounted, otherwise it's impossible to map them by KVM. This
+> > > > patch sets the refcount of the tail pages and fixes the KVM memory mapping
+> > > > faults.
+> > > > 
+> > > > Without this change guest virgl driver can't map host buffers into guest
+> > > > and can't provide OpenGL 4.5 profile support to the guest. The host
+> > > > mappings are also needed for enabling the Venus driver using host GPU
+> > > > drivers that are utilizing TTM.
+> > > > 
+> > > > Based on a patch proposed by Trigger Huang.
+> > > 
+> > > Well I can't count how often I have repeated this: This is an absolutely
+> > > clear NAK!
+> > > 
+> > > TTM pages are not reference counted in the first place and because of this
+> > > giving them to virgl is illegal.
+> > > 
+> > > Please immediately stop this completely broken approach. We have discussed
+> > > this multiple times now.
+> > 
+> > Yeah we need to get this stuff closed for real by tagging them all with
+> > VM_IO or VM_PFNMAP asap.
+> 
+> For a bit more context: Anything mapping a bo should be VM_SPECIAL. And I
+> think we should add the checks to the gem and dma-buf mmap functions to
+> validate for that, and fix all the fallout.
+> 
+> Otherwise this dragon keeps resurrecting ...
+> 
+> VM_SPECIAL _will_ block get_user_pages, which will block everyone from
+> even trying to refcount this stuff.
 
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-Reviewed-by: Heiko Stuebner <heiko@sntech.de>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-Reviewed-by: Guo Ren <guoren@kernel.org>
----
- arch/riscv/include/asm/hwcap.h | 31 -------------------------------
- arch/riscv/kernel/cpufeature.c |  9 ---------
- 2 files changed, 40 deletions(-)
+FWIW, IIUC that won't change the KVM story.  KVM acquires the PFN for these pages
+via follow_pte(), not by gup().  Details are in a different strand of this thread[*].
 
-diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-index 1767a9ce1a04..e3749bee5c24 100644
---- a/arch/riscv/include/asm/hwcap.h
-+++ b/arch/riscv/include/asm/hwcap.h
-@@ -60,19 +60,6 @@ enum {
- 
- extern unsigned long elf_hwcap;
- 
--
--/*
-- * This enum represents the logical ID for each RISC-V ISA extension static
-- * keys. We can use static key to optimize code path if some ISA extensions
-- * are available.
-- */
--enum riscv_isa_ext_key {
--	RISCV_ISA_EXT_KEY_FPU,		/* For 'F' and 'D' */
--	RISCV_ISA_EXT_KEY_ZIHINTPAUSE,
--	RISCV_ISA_EXT_KEY_SVINVAL,
--	RISCV_ISA_EXT_KEY_MAX,
--};
--
- struct riscv_isa_ext_data {
- 	/* Name of the extension displayed to userspace via /proc/cpuinfo */
- 	char uprop[RISCV_ISA_EXT_NAME_LEN_MAX];
-@@ -80,24 +67,6 @@ struct riscv_isa_ext_data {
- 	unsigned int isa_ext_id;
- };
- 
--extern struct static_key_false riscv_isa_ext_keys[RISCV_ISA_EXT_KEY_MAX];
--
--static __always_inline int riscv_isa_ext2key(int num)
--{
--	switch (num) {
--	case RISCV_ISA_EXT_f:
--		return RISCV_ISA_EXT_KEY_FPU;
--	case RISCV_ISA_EXT_d:
--		return RISCV_ISA_EXT_KEY_FPU;
--	case RISCV_ISA_EXT_ZIHINTPAUSE:
--		return RISCV_ISA_EXT_KEY_ZIHINTPAUSE;
--	case RISCV_ISA_EXT_SVINVAL:
--		return RISCV_ISA_EXT_KEY_SVINVAL;
--	default:
--		return -EINVAL;
--	}
--}
--
- static __always_inline bool
- riscv_has_extension_likely(const unsigned long ext)
- {
-diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-index c394cde2560b..5591d45e96b5 100644
---- a/arch/riscv/kernel/cpufeature.c
-+++ b/arch/riscv/kernel/cpufeature.c
-@@ -29,9 +29,6 @@ unsigned long elf_hwcap __read_mostly;
- /* Host ISA bitmap */
- static DECLARE_BITMAP(riscv_isa, RISCV_ISA_EXT_MAX) __read_mostly;
- 
--DEFINE_STATIC_KEY_ARRAY_FALSE(riscv_isa_ext_keys, RISCV_ISA_EXT_KEY_MAX);
--EXPORT_SYMBOL(riscv_isa_ext_keys);
--
- /**
-  * riscv_isa_extension_base() - Get base extension word
-  *
-@@ -266,12 +263,6 @@ void __init riscv_fill_hwcap(void)
- 		if (elf_hwcap & BIT_MASK(i))
- 			print_str[j++] = (char)('a' + i);
- 	pr_info("riscv: ELF capabilities %s\n", print_str);
--
--	for_each_set_bit(i, riscv_isa, RISCV_ISA_EXT_MAX) {
--		j = riscv_isa_ext2key(i);
--		if (j >= 0)
--			static_branch_enable(&riscv_isa_ext_keys[j]);
--	}
- }
- 
- #ifdef CONFIG_RISCV_ALTERNATIVE
--- 
-2.38.1
+If TTM pages aren't tied into mmu_notifiers, then I believe the only solution is
+to not allow them to be mapped into user page tables.  If they are tied into
+mmu_notifiers, then this is fully a KVM limitation that we are (slowly) resolving.
 
+[*] https://lore.kernel.org/all/Y77sQZI0IfFVx7Jo@google.com
