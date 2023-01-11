@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 140EA6661B6
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:21:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C19946661BA
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:22:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238775AbjAKRVy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 12:21:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49858 "EHLO
+        id S239533AbjAKRW1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 12:22:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238814AbjAKRVZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 12:21:25 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20FC8321B2;
-        Wed, 11 Jan 2023 09:21:25 -0800 (PST)
+        with ESMTP id S239340AbjAKRVj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 12:21:39 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D8CA33D56;
+        Wed, 11 Jan 2023 09:21:28 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C9786B81B79;
-        Wed, 11 Jan 2023 17:21:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10B50C433D2;
-        Wed, 11 Jan 2023 17:21:19 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id EAAEEB81C8B;
+        Wed, 11 Jan 2023 17:21:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F416BC433EF;
+        Wed, 11 Jan 2023 17:21:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673457682;
-        bh=iakCU13SXpMb3pcvjfiiLXGeB5RnCPEYfg/spzK7YxA=;
+        s=k20201202; t=1673457685;
+        bh=nQ/FgwW4vCV/82AO+CiVvxSVywwFvyd81VlYJvv3+mQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QyqAUwJGdNtBpzR4nntbs1iPUTkBKiOHAmXK9MifYRWMELikATG4WriMLqpDgxpov
-         cHYLSZFLH9EHn+oPMBvxgIhq8JwB69mMxlGzCWFVKKq5oUvR6NH/KoHX0MPpkBDaQu
-         j4Z0J//elt3BJwT1UORJJ0DODp8Jh2NMZOlPbOeTRciGJfooU/7fF3FQLKz3+7BxtO
-         YHcf4fCfc5HvTlUc8IQlW1PW5Nemzwft1lPPwWrdHYdLhltZif8x69g+9WgKM0ezE+
-         kjAConnZz54KiT8BYnQ/k4YcSufpdk1aw3s3x0HWqArA+muds8k8lw81cVsfeS4DLU
-         XT5HZ9ozU1fdg==
+        b=cu4MF1WU8L/w1VT9eJ9YbvvwI+Npsyq9vX5U3+o8YY37j9vHLXpaHY46RsetWAQ1r
+         D/IgBo5kWDJ005wyMDlWxFogQB8ActEQXei0EwPYWaYHnJhGAPBzp7aI/I4g9ShW2i
+         xCwZxvgoa2K+B81APqxdPMaa5SLNwyUhMob6jjYE6yngCXRtB3vAwYWDjBk5IymH9h
+         gRIIrk9sAMms/3pyqsV5FE8iLFMPIRdaG2cVyAkTrgLg9M0VfDjgKL40FQUj4NlmAy
+         4u7lk9K6qWkPCCcaDQnrsbRvADI8G4uMZ1FyEVA2MJM6+3nFJLbKRjEG2kXGG1lNfY
+         8K5N+x+lDHHGQ==
 From:   Jisheng Zhang <jszhang@kernel.org>
 To:     Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -41,10 +41,11 @@ To:     Paul Walmsley <paul.walmsley@sifive.com>,
 Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
         Andrew Jones <ajones@ventanamicro.com>,
+        Conor Dooley <conor.dooley@microchip.com>,
         Guo Ren <guoren@kernel.org>
-Subject: [PATCH v3 12/13] riscv: KVM: Switch has_svinval() to riscv_has_extension_unlikely()
-Date:   Thu, 12 Jan 2023 01:10:26 +0800
-Message-Id: <20230111171027.2392-13-jszhang@kernel.org>
+Subject: [PATCH v3 13/13] riscv: remove riscv_isa_ext_keys[] array and related usage
+Date:   Thu, 12 Jan 2023 01:10:27 +0800
+Message-Id: <20230111171027.2392-14-jszhang@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230111171027.2392-1-jszhang@kernel.org>
 References: <20230111171027.2392-1-jszhang@kernel.org>
@@ -59,31 +60,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Andrew Jones <ajones@ventanamicro.com>
+All users have switched to riscv_has_extension_*, remove unused
+definitions, vars and related setting code.
 
-Switch has_svinval() from static branch to the new helper
-riscv_has_extension_unlikely().
-
-Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 Reviewed-by: Guo Ren <guoren@kernel.org>
 ---
- arch/riscv/kvm/tlb.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ arch/riscv/include/asm/hwcap.h | 31 -------------------------------
+ arch/riscv/kernel/cpufeature.c |  9 ---------
+ 2 files changed, 40 deletions(-)
 
-diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
-index 309d79b3e5cd..aa3da18ad873 100644
---- a/arch/riscv/kvm/tlb.c
-+++ b/arch/riscv/kvm/tlb.c
-@@ -15,8 +15,7 @@
- #include <asm/hwcap.h>
- #include <asm/insn-def.h>
+diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+index 1767a9ce1a04..e3749bee5c24 100644
+--- a/arch/riscv/include/asm/hwcap.h
++++ b/arch/riscv/include/asm/hwcap.h
+@@ -60,19 +60,6 @@ enum {
  
--#define has_svinval()	\
--	static_branch_unlikely(&riscv_isa_ext_keys[RISCV_ISA_EXT_KEY_SVINVAL])
-+#define has_svinval()	riscv_has_extension_unlikely(RISCV_ISA_EXT_SVINVAL)
+ extern unsigned long elf_hwcap;
  
- void kvm_riscv_local_hfence_gvma_vmid_gpa(unsigned long vmid,
- 					  gpa_t gpa, gpa_t gpsz,
+-
+-/*
+- * This enum represents the logical ID for each RISC-V ISA extension static
+- * keys. We can use static key to optimize code path if some ISA extensions
+- * are available.
+- */
+-enum riscv_isa_ext_key {
+-	RISCV_ISA_EXT_KEY_FPU,		/* For 'F' and 'D' */
+-	RISCV_ISA_EXT_KEY_ZIHINTPAUSE,
+-	RISCV_ISA_EXT_KEY_SVINVAL,
+-	RISCV_ISA_EXT_KEY_MAX,
+-};
+-
+ struct riscv_isa_ext_data {
+ 	/* Name of the extension displayed to userspace via /proc/cpuinfo */
+ 	char uprop[RISCV_ISA_EXT_NAME_LEN_MAX];
+@@ -80,24 +67,6 @@ struct riscv_isa_ext_data {
+ 	unsigned int isa_ext_id;
+ };
+ 
+-extern struct static_key_false riscv_isa_ext_keys[RISCV_ISA_EXT_KEY_MAX];
+-
+-static __always_inline int riscv_isa_ext2key(int num)
+-{
+-	switch (num) {
+-	case RISCV_ISA_EXT_f:
+-		return RISCV_ISA_EXT_KEY_FPU;
+-	case RISCV_ISA_EXT_d:
+-		return RISCV_ISA_EXT_KEY_FPU;
+-	case RISCV_ISA_EXT_ZIHINTPAUSE:
+-		return RISCV_ISA_EXT_KEY_ZIHINTPAUSE;
+-	case RISCV_ISA_EXT_SVINVAL:
+-		return RISCV_ISA_EXT_KEY_SVINVAL;
+-	default:
+-		return -EINVAL;
+-	}
+-}
+-
+ static __always_inline bool
+ riscv_has_extension_likely(const unsigned long ext)
+ {
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index c394cde2560b..5591d45e96b5 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -29,9 +29,6 @@ unsigned long elf_hwcap __read_mostly;
+ /* Host ISA bitmap */
+ static DECLARE_BITMAP(riscv_isa, RISCV_ISA_EXT_MAX) __read_mostly;
+ 
+-DEFINE_STATIC_KEY_ARRAY_FALSE(riscv_isa_ext_keys, RISCV_ISA_EXT_KEY_MAX);
+-EXPORT_SYMBOL(riscv_isa_ext_keys);
+-
+ /**
+  * riscv_isa_extension_base() - Get base extension word
+  *
+@@ -266,12 +263,6 @@ void __init riscv_fill_hwcap(void)
+ 		if (elf_hwcap & BIT_MASK(i))
+ 			print_str[j++] = (char)('a' + i);
+ 	pr_info("riscv: ELF capabilities %s\n", print_str);
+-
+-	for_each_set_bit(i, riscv_isa, RISCV_ISA_EXT_MAX) {
+-		j = riscv_isa_ext2key(i);
+-		if (j >= 0)
+-			static_branch_enable(&riscv_isa_ext_keys[j]);
+-	}
+ }
+ 
+ #ifdef CONFIG_RISCV_ALTERNATIVE
 -- 
 2.38.1
 
