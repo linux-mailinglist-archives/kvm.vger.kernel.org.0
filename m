@@ -2,180 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA28C66625A
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 18:56:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 04EDD66627D
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 19:07:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233828AbjAKR41 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 12:56:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46840 "EHLO
+        id S235046AbjAKSHC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 13:07:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231848AbjAKR4T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 12:56:19 -0500
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC1913F7B
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:56:18 -0800 (PST)
-Received: by mail-wr1-x42b.google.com with SMTP id e3so6652724wru.13
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 09:56:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iATtwX45ufevzGDCQk6FprOJLywVs059/Zoh+UqczYk=;
-        b=oHmNoS5cGMmc4TMWWpwfbgeQ0tDKdN4IhHoVwR8mNEI0Apy9bv+5hVi4JYXKYlzaoN
-         UWkNzMkI8H/sPR1qDuxOUdv2Na+csxtsLqVWd62z8U6urrXwYkcGbwGjf/7hCW4AKFQm
-         EaT0pHS+rJ7NtVH9/wC8elXCHT0D5AHVPufa2gQhUXePqahPkaX+JqSuqs1qnftV5BLg
-         f3zkMVLgVNvaDCh61ZnLDK6QugohhnwOPYWE6IxKQaW5LwmwY7hRNmhhiD7SAb5lVY9Q
-         FJ6/K6MhV/8l1/scnfsGPmFMIfOG183LDroX+o01Bp9nC+4T090vIPN33+X23vZHo8Hr
-         dsAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iATtwX45ufevzGDCQk6FprOJLywVs059/Zoh+UqczYk=;
-        b=opA7tUACAleGMtJapzNwpsGLPQzhE4rjhGPjx6xAEjCForCgrexE9YW2YO1OIpSgjM
-         uAFlqw+IyUujGwtDY1dhynlVZBlqd3V0btcG1nc1gv9BDjWaID2aZn5OiOSco5Zn40/F
-         3UzTpRCMikQPVH+P6H1B1NwhygfKAsBVS72hIf1Jsf3CBKj0Odm8lhj7CnVa/Mao5AWu
-         BBCGe4MzFqOYFG9taIdjQna5XtVhUCCKWh1Vaz3/NvKPOPkqRQM+NPvMh93OSej8Fl63
-         WKP4uYctbHzTLLhFKWeMnOr1IncfhksDo45FZ+CQxYe9hqqOW4FbdAWzcmnkRep8mvPN
-         0AMg==
-X-Gm-Message-State: AFqh2krtdLQZPVz2v7/Hv41/QiSGS/aAaXYMPaFP7AnHuXrSmJ3qXKNK
-        Ip0G3NY6op3owSmnRMQYFVIV1w==
-X-Google-Smtp-Source: AMrXdXtF/CJ1z+mSVHqSfXPznFXga6/+3peruKnsc6Yyigv0V5rinWx4z34Y3uC7wHeAaIrU2EeLyA==
-X-Received: by 2002:a5d:5592:0:b0:2a2:4313:e880 with SMTP id i18-20020a5d5592000000b002a24313e880mr15167085wrv.61.1673459776750;
-        Wed, 11 Jan 2023 09:56:16 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id c13-20020adffb0d000000b00241fde8fe04sm14243618wrr.7.2023.01.11.09.56.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 09:56:16 -0800 (PST)
-Date:   Wed, 11 Jan 2023 18:56:15 +0100
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Jisheng Zhang <jszhang@kernel.org>
-Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        Heiko Stuebner <heiko.stuebner@vrull.eu>
-Subject: Re: [PATCH v3 01/13] riscv: fix jal offsets in patched alternatives
-Message-ID: <20230111175615.p7vpq6joyrzomcmz@orel>
-References: <20230111171027.2392-1-jszhang@kernel.org>
- <20230111171027.2392-2-jszhang@kernel.org>
+        with ESMTP id S233287AbjAKSG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 13:06:59 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE59718B3F
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 10:06:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=l7BrqUCQb2EbrTTkRXkEhnBux6/v/whpCzUw9p5ijwk=; b=qza/6FpTnj5l6d16tGNcGYojFq
+        KgVZGjbYIJIESn1jpflPQEpu6ZSmCs8XEhf7vY2RxUUGZGPmiYcy/pjfH9BR8uabfVvuhFU+EO+hr
+        hJUUZ6G8do4EHheZK/ecgS0TEyt7r2acyAUfk5H0zld/jrlpNDMhIIJ8JY0eZwOJvq2dg9N0GmQUi
+        yFUNK82u4c2Yu+Da0kb5ESBJinFyMUKJm2rSVn6DASqR2YXaEjRLI0B7AAzYmyF/nBjyWjKJsnNV2
+        M09x3OqQvsgxxpVd3CrArHoXIB0tMeKtB364FnYn3OFr0tS1mmV0nmpMjGaemwLKqmyvftolB/4/C
+        WEi7+tJA==;
+Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pFfVA-004MOt-Uj; Wed, 11 Jan 2023 18:07:05 +0000
+Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pFfUx-0003kO-2U; Wed, 11 Jan 2023 18:06:51 +0000
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     kvm@vger.kernel.org
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, paul <paul@xen.org>,
+        Sean Christopherson <seanjc@google.com>,
+        Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH v2 1/4] KVM: x86/xen: Fix lockdep warning on "recursive" gpc locking
+Date:   Wed, 11 Jan 2023 18:06:48 +0000
+Message-Id: <20230111180651.14394-1-dwmw2@infradead.org>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230111171027.2392-2-jszhang@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Sender: David Woodhouse <dwmw2@infradead.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 01:10:15AM +0800, Jisheng Zhang wrote:
-> Alternatives live in a different section, so offsets used by jal
-> instruction will point to wrong locations after the patch got applied.
-> 
-> Similar to arm64, adjust the location to consider that offset.
-> 
-> Co-developed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
-> Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> ---
->  arch/riscv/include/asm/insn.h   | 27 +++++++++++++++++++++++++++
->  arch/riscv/kernel/alternative.c | 27 +++++++++++++++++++++++++++
->  2 files changed, 54 insertions(+)
-> 
-> diff --git a/arch/riscv/include/asm/insn.h b/arch/riscv/include/asm/insn.h
-> index 98453535324a..1d2df245d0bd 100644
-> --- a/arch/riscv/include/asm/insn.h
-> +++ b/arch/riscv/include/asm/insn.h
-> @@ -291,6 +291,33 @@ static __always_inline bool riscv_insn_is_branch(u32 code)
->  	(RVC_X(x_, RVC_B_IMM_7_6_OPOFF, RVC_B_IMM_7_6_MASK) << RVC_B_IMM_7_6_OFF) | \
->  	(RVC_IMM_SIGN(x_) << RVC_B_IMM_SIGN_OFF); })
->  
-> +/*
-> + * Get the immediate from a J-type instruction.
-> + *
-> + * @insn: instruction to process
-> + * Return: immediate
-> + */
-> +static inline s32 riscv_insn_extract_jtype_imm(u32 insn)
-> +{
-> +	return RV_EXTRACT_JTYPE_IMM(insn);
-> +}
-> +
-> +/*
-> + * Update a J-type instruction with an immediate value.
-> + *
-> + * @insn: pointer to the jtype instruction
-> + * @imm: the immediate to insert into the instruction
-> + */
-> +static inline void riscv_insn_insert_jtype_imm(u32 *insn, s32 imm)
-> +{
-> +	/* drop the old IMMs, all jal IMM bits sit at 31:12 */
-> +	*insn &= ~GENMASK(31, 12);
-> +	*insn |= (RV_X(imm, RV_J_IMM_10_1_OFF, RV_J_IMM_10_1_MASK) << RV_J_IMM_10_1_OPOFF) |
-> +		 (RV_X(imm, RV_J_IMM_11_OFF, RV_J_IMM_11_MASK) << RV_J_IMM_11_OPOFF) |
-> +		 (RV_X(imm, RV_J_IMM_19_12_OFF, RV_J_IMM_19_12_MASK) << RV_J_IMM_19_12_OPOFF) |
-> +		 (RV_X(imm, RV_J_IMM_SIGN_OFF, 1) << RV_J_IMM_SIGN_OPOFF);
-> +}
-> +
->  /*
->   * Put together one immediate from a U-type and I-type instruction pair.
->   *
-> diff --git a/arch/riscv/kernel/alternative.c b/arch/riscv/kernel/alternative.c
-> index 6212ea0eed72..3d4f1f32c7f6 100644
-> --- a/arch/riscv/kernel/alternative.c
-> +++ b/arch/riscv/kernel/alternative.c
-> @@ -79,6 +79,21 @@ static void riscv_alternative_fix_auipc_jalr(void *ptr, u32 auipc_insn,
->  	patch_text_nosync(ptr, call, sizeof(u32) * 2);
->  }
->  
-> +static void riscv_alternative_fix_jal(void *ptr, u32 jal_insn, int patch_offset)
-> +{
-> +	s32 imm;
-> +
-> +	/* get and adjust new target address */
-> +	imm = riscv_insn_extract_jtype_imm(jal_insn);
-> +	imm -= patch_offset;
-> +
-> +	/* update instruction */
-> +	riscv_insn_insert_jtype_imm(&jal_insn, imm);
-> +
-> +	/* patch the call place again */
-> +	patch_text_nosync(ptr, &jal_insn, sizeof(u32));
-> +}
-> +
->  void riscv_alternative_fix_offsets(void *alt_ptr, unsigned int len,
->  				      int patch_offset)
->  {
-> @@ -106,6 +121,18 @@ void riscv_alternative_fix_offsets(void *alt_ptr, unsigned int len,
->  			riscv_alternative_fix_auipc_jalr(alt_ptr + i * sizeof(u32),
->  							 insn, insn2, patch_offset);
->  		}
-> +
-> +		if (riscv_insn_is_jal(insn)) {
-> +			s32 imm = riscv_insn_extract_jtype_imm(insn);
-> +
-> +			/* Don't modify jumps inside the alternative block */
-> +			if ((alt_ptr + i * sizeof(u32) + imm) >= alt_ptr &&
-> +			    (alt_ptr + i * sizeof(u32) + imm) < (alt_ptr + len))
-> +				continue;
-> +
-> +			riscv_alternative_fix_jal(alt_ptr + i * sizeof(u32),
-> +						  insn, patch_offset);
-> +		}
->  	}
->  }
->  
-> -- 
-> 2.38.1
->
+From: David Woodhouse <dwmw@amazon.co.uk>
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+In commit 5ec3289b31 ("KVM: x86/xen: Compatibility fixes for shared runstate
+area") we declared it safe to obtain two gfn_to_pfn_cache locks at the same
+time:
+	/*
+	 * The guest's runstate_info is split across two pages and we
+	 * need to hold and validate both GPCs simultaneously. We can
+	 * declare a lock ordering GPC1 > GPC2 because nothing else
+	 * takes them more than one at a time.
+	 */
+
+However, we forgot to tell lockdep. Do so, by setting a subclass on the
+first lock before taking the second.
+
+Fixes: 5ec3289b31 ("KVM: x86/xen: Compatibility fixes for shared runstate area")
+Suggested-by: Peter Zijlstra <peterz@infradead.org>
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/x86/kvm/xen.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+index 402d9a34552c..07e61cc9881e 100644
+--- a/arch/x86/kvm/xen.c
++++ b/arch/x86/kvm/xen.c
+@@ -305,8 +305,10 @@ static void kvm_xen_update_runstate_guest(struct kvm_vcpu *v, bool atomic)
+ 		 * The guest's runstate_info is split across two pages and we
+ 		 * need to hold and validate both GPCs simultaneously. We can
+ 		 * declare a lock ordering GPC1 > GPC2 because nothing else
+-		 * takes them more than one at a time.
++		 * takes them more than one at a time. Set a subclass on the
++		 * gpc1 lock to make lockdep shut up about it.
+ 		 */
++		lock_set_subclass(&gpc1->lock.dep_map, 1, _THIS_IP_);
+ 		read_lock(&gpc2->lock);
+ 
+ 		if (!kvm_gpc_check(gpc2, user_len2)) {
+-- 
+2.35.3
+
