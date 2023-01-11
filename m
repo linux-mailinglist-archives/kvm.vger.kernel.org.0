@@ -2,158 +2,110 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5744A665A7B
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 12:40:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B883A665B18
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 13:11:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231603AbjAKLkn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 06:40:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37766 "EHLO
+        id S232457AbjAKMLp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 07:11:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238209AbjAKLkD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 06:40:03 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12D972AFD
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 03:39:22 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C2C36B81AD3
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 11:39:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FB5EC433EF;
-        Wed, 11 Jan 2023 11:39:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673437159;
-        bh=fo9Qg5i5zJ2ROT8P7R3Q3bCXwhSIdxzGySVAKM8a5/g=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=C1OtgBbfa4iGPLTALKhnlhxpUu0xDibBGnt63TPVDD60oI9Rwny6cH4S3WsOi8PdL
-         YSGSd0BjvYCsXl1BahI60hz4Ai1NOAtvoOHlnGWNjfiyH1dOfd4oUirOI9GfHEIC0Q
-         uYaM2CEMdcPAf+C3Ee20LykXfc/nfI0OFbmDhlm+fOagBJHTyjTbX0+bMT8tmPcaFF
-         gOSItmmBl6DIQy9kTpuEmiehDyeIg55JBBqerm3+cV2+8XjSifB/q1b5js298A8jwc
-         DiuCSeNs/KhQ7BawmdMTKs54ybJq1W3Sxvta2Bej9dJi915ZRgc7xeIJugrdXex+d1
-         3uBeMHGd6mVeg==
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pFZRs-000r0M-M6;
-        Wed, 11 Jan 2023 11:39:17 +0000
+        with ESMTP id S233456AbjAKMLg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 07:11:36 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02664D8F;
+        Wed, 11 Jan 2023 04:11:36 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30BBG4jo001977;
+        Wed, 11 Jan 2023 12:11:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=pp1; bh=skNIDLkNuOS2uXYldF2DcYdMTiB4OnILt7WANkAQoR8=;
+ b=PPR96e7dxIffZoaa4Q1S2uywu7jK6pF7E36ofdWYkrTGxY6ZRH+CwobjHa82QUImWEQD
+ JZGMTHFFWLflPFYQYsmbWKcZ0DoVsas6VqgDYPnw/39vZLKiU6aASEQqRXpff1Bevfrf
+ vMVJknez0ip7X6UrawsqJq9KD3lNK9lk55H0mA2u+Qsxo0wJpTVDrfWYX5UTu0kQnhp6
+ zT+n3hTTp81yghGMU9PFuOGMDYRwMl1cn2ELTrMJ8S5yZkGs31O6/6/qx6p6TVXaojgd
+ tNZb861ZG1XNBfUixFb99Ig41ckEXmMK69DqX7gHqMHHXIeVWJ2CPob05bG4YgBmBUlo dA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1v359605-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 12:11:35 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30BBrWng011382;
+        Wed, 11 Jan 2023 12:11:35 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1v3595yj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 12:11:35 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30B1R79l030779;
+        Wed, 11 Jan 2023 12:11:32 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3n1kf7gtdq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 12:11:32 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30BCBTKX42598850
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Jan 2023 12:11:29 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1BA0620049;
+        Wed, 11 Jan 2023 12:11:29 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A9DF020040;
+        Wed, 11 Jan 2023 12:11:28 +0000 (GMT)
+Received: from osiris (unknown [9.171.72.122])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Wed, 11 Jan 2023 12:11:28 +0000 (GMT)
+Date:   Wed, 11 Jan 2023 13:11:27 +0100
+From:   Heiko Carstens <hca@linux.ibm.com>
+To:     Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] KVM: s390: interrupt: use READ_ONCE() before cmpxchg()
+Message-ID: <Y76nb+2tTERSszfP@osiris>
+References: <20230109145456.2895385-1-hca@linux.ibm.com>
+ <f4203dea-93a9-6903-d635-c36ff47337c9@linux.ibm.com>
 MIME-Version: 1.0
-Date:   Wed, 11 Jan 2023 11:39:16 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Cc:     catalin.marinas@arm.com, will@kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, scott@os.amperecomputing.com,
-        Darren Hart <darren@os.amperecomputing.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: nv: Fixes for Nested Virtualization
- issues
-In-Reply-To: <4d952300-0681-41ff-b416-38fbae4ebea6@os.amperecomputing.com>
-References: <20220824060304.21128-1-gankulkarni@os.amperecomputing.com>
- <6171dc7c-5d83-d378-db9e-d94f27afe43a@os.amperecomputing.com>
- <87o7r6dpi8.wl-maz@kernel.org>
- <4d952300-0681-41ff-b416-38fbae4ebea6@os.amperecomputing.com>
-User-Agent: Roundcube Webmail/1.4.13
-Message-ID: <2169cc83d3015727f5f486844c8c4647@kernel.org>
-X-Sender: maz@kernel.org
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: gankulkarni@os.amperecomputing.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, scott@os.amperecomputing.com, darren@os.amperecomputing.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f4203dea-93a9-6903-d635-c36ff47337c9@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: q8MITHyDDcFW0naIlSJCWeS-1AziEiaX
+X-Proofpoint-ORIG-GUID: vkzoQUqH3bFWkezvlncQUdImcB7Y8pnf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-11_05,2023-01-11_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 bulkscore=0 clxscore=1015 adultscore=0 phishscore=0
+ spamscore=0 priorityscore=1501 mlxscore=0 mlxlogscore=455 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301110089
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-01-11 08:46, Ganapatrao Kulkarni wrote:
-> On 11-01-2023 03:24 am, Marc Zyngier wrote:
->> On Tue, 10 Jan 2023 12:17:20 +0000,
->> Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com> wrote:
->>> 
->>> I am currently working around this with "nohlt" kernel param to
->>> NestedVM. Any suggestions to handle/fix this case/issue and avoid the
->>> slowness of booting of NestedVM with more cores?
->>> 
->>> Note: Guest-Hypervisor and NestedVM are using default kernel 
->>> installed
->>> using Fedora 36 iso.
->> 
->> Despite what I said earlier, I have a vague idea here, thanks to the
->> interesting call traces that you provided (this is really awesome work
->> BTW, given how hard it is to trace things across 3 different kernels).
->> 
->> We can slightly limit the impact of the prepare/finish sequence if the
->> guest hypervisor only accesses the active registers for SGIs/PPIs on
->> the vcpu that owns them, forbidding any cross-CPU-to-redistributor
->> access.
->> 
->> Something along these lines, which is only boot-tested. Let me know
->> how this fares for you.
->> 
->> Thanks,
->> 
->> 	M.
->> 
->> diff --git a/arch/arm64/kvm/vgic/vgic-mmio.c 
->> b/arch/arm64/kvm/vgic/vgic-mmio.c
->> index b32d434c1d4a..1cca45be5335 100644
->> --- a/arch/arm64/kvm/vgic/vgic-mmio.c
->> +++ b/arch/arm64/kvm/vgic/vgic-mmio.c
->> @@ -473,9 +473,10 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu 
->> *vcpu,
->>    * active state can be overwritten when the VCPU's state is synced 
->> coming back
->>    * from the guest.
->>    *
->> - * For shared interrupts as well as GICv3 private interrupts, we have 
->> to
->> - * stop all the VCPUs because interrupts can be migrated while we 
->> don't hold
->> - * the IRQ locks and we don't want to be chasing moving targets.
->> + * For shared interrupts as well as GICv3 private interrupts accessed 
->> from the
->> + * non-owning CPU, we have to stop all the VCPUs because interrupts 
->> can be
->> + * migrated while we don't hold the IRQ locks and we don't want to be 
->> chasing
->> + * moving targets.
->>    *
->>    * For GICv2 private interrupts we don't have to do anything because
->>    * userspace accesses to the VGIC state already require all VCPUs to 
->> be
->> @@ -484,7 +485,8 @@ int vgic_uaccess_write_cpending(struct kvm_vcpu 
->> *vcpu,
->>    */
->>   static void vgic_access_active_prepare(struct kvm_vcpu *vcpu, u32 
->> intid)
->>   {
->> -	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 ||
->> +	if ((vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3 &&
->> +	     vcpu == kvm_get_running_vcpu()) ||
+On Tue, Jan 10, 2023 at 08:15:50PM +0100, Christian Borntraeger wrote:
+> Am 09.01.23 um 15:54 schrieb Heiko Carstens:
+> > Use READ_ONCE() before cmpxchg() to prevent that the compiler generates
+> > code that fetches the to be compared old value several times from memory.
+> > 
+> > Signed-off-by: Heiko Carstens <hca@linux.ibm.com>
 > 
-> Thanks Marc for the patch!
+> Looks sane.
 > 
-> I think, you mean not equal to?
-> +           vcpu != kvm_get_running_vcpu()) ||
+> Reviewed-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> 
+> In case you want to take it via the s390 tree:
+> Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
-Yeah, exactly. I woke up this morning realising this patch was
-*almost* right. Don't write patches like this after a long day
-at work...
+Given that there don't seem to be any pending s390 specific patches I
+take it via the s390 tree.
 
-> With the change to not-equal, the issue is fixed and I could see the
-> NestedVM booting is pretty fast with higher number of cores as well.
-
-Good, thanks for testing it. I'll roll up an actual patch for that
-and stick it in the monster queue.
-
-Cheers,
-
-        M.
--- 
-Jazz is not dead. It just smells funny...
+Applied.
