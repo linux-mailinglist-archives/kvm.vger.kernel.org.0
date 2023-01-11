@@ -2,100 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 218606662BB
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 19:23:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F0CAD6662D3
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 19:31:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232575AbjAKSXz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 13:23:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34258 "EHLO
+        id S234740AbjAKSbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 13:31:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234623AbjAKSXw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 13:23:52 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C56C42AD6;
-        Wed, 11 Jan 2023 10:23:51 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1673461430;
+        with ESMTP id S235225AbjAKSbS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 13:31:18 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA4E3373AB
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 10:30:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673461837;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0XdYOxf5IvaZ791CzYFKpi5kuwlt+Hcy+whwpGU2iKA=;
-        b=Ae+LlW3Q3ok6fnWD1oXZO6e7mjhEwgy8OG8OT6aa6okKgmmZGi5m4/VhaY7q1wDQlaUQCy
-        Sc8RUZgerGHje/p9jr/sAoCBMGiQqKM40DTMujxoL9JvCY9tcN6hFal+54kQYhxnMDFMfe
-        f4vGHqHJrYNmbsQmxYrjZ5ixAJ9CDCOmfy2iJ7C99mZWpzwv3KgYq/1253iuh7s50W7z39
-        HQVCbPOzkk0D5SjqY20anpfSoNVWK9qFZuE8YbIK8fwlZTxFWzptgKwJZQi+a9dc7lXm2e
-        BBLcdtf9wjtjpeGqJxBDDTN3CseX4nfnOqUx+oeVTVMK9hM9IWqBuE6boNIyww==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1673461430;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0XdYOxf5IvaZ791CzYFKpi5kuwlt+Hcy+whwpGU2iKA=;
-        b=0Czc8KM7MVVZOR6h6RaYKGhrxCjjedxX3menb6s4MyXluhbbb2RMzuDUcbd5TYOT18d/ra
-        7PAmVwHPUc96CNAg==
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, iommu@lists.linux.dev,
-        Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Will Deacon <will@kernel.org>
-Cc:     Bharat Bhushan <bharat.bhushan@nxp.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Auger <eric.auger@redhat.com>,
-        Eric Farman <farman@linux.ibm.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Tomasz Nowicki <tomasz.nowicki@caviumnetworks.com>,
-        Will Deacon <will.deacon@arm.com>
-Subject: Re: [PATCH iommufd v3 7/9] iommu/x86: Replace IOMMU_CAP_INTR_REMAP
- with IRQ_DOMAIN_FLAG_ISOLATED_MSI
-In-Reply-To: <7-v3-3313bb5dd3a3+10f11-secure_msi_jgg@nvidia.com>
-References: <7-v3-3313bb5dd3a3+10f11-secure_msi_jgg@nvidia.com>
-Date:   Wed, 11 Jan 2023 19:23:49 +0100
-Message-ID: <875yddhqve.ffs@tglx>
+         content-transfer-encoding:content-transfer-encoding;
+        bh=DsHR+gK9NXOoSaKdGDYaK34gTAYNmEFxKqyOr6ZMcO4=;
+        b=XvKYhcsNoXuK3xFNDIhTijClPODc7arTJxiaDO738c5JXvxl7J5XxmxLDDCWdiqTBgw8pS
+        YUxkmQuoVc+1BqDJAi0mR3sn76rKD9HqCo6qMbhwp1NkDqP3E+UftOEsiX1I8dU0zkgalC
+        eThmgrNfPtaqIkUm+9ns+Jzfy+lYpJM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-589-lodOvzh5NXicVlPIqy2l4A-1; Wed, 11 Jan 2023 13:30:33 -0500
+X-MC-Unique: lodOvzh5NXicVlPIqy2l4A-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9B8708030A0;
+        Wed, 11 Jan 2023 18:30:32 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 777C7140EBF5;
+        Wed, 11 Jan 2023 18:30:32 +0000 (UTC)
+From:   Paolo Bonzini <pbonzini@redhat.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     dwmw@amazon.co.uk, seanjc@google.com
+Subject: [PATCH] Documentation: kvm: fix SRCU locking order docs
+Date:   Wed, 11 Jan 2023 13:30:31 -0500
+Message-Id: <20230111183031.2449668-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 05 2023 at 15:33, Jason Gunthorpe wrote:
-> On x86 platforms when the HW can support interrupt remapping the iommu
-> driver creates an irq_domain for the IR hardware and creates a child MSI
-> irq_domain.
->
-> When the global irq_remapping_enabled is set, the IR MSI domain is
-> assigned to the PCI devices (by intel_irq_remap_add_device(), or
-> amd_iommu_set_pci_msi_domain()) making those devices have the isolated MSI
-> property.
->
-> Due to how interrupt domains work, setting IRQ_DOMAIN_FLAG_ISOLATED_MSI on
-> the parent IR domain will cause all struct devices attached to it to
-> return true from msi_device_has_isolated_msi(). This replaces the
-> IOMMU_CAP_INTR_REMAP flag as all places using IOMMU_CAP_INTR_REMAP also
-> call msi_device_has_isolated_msi()
->
-> Set the flag and delete the cap.
->
-> Tested-by: Matthew Rosato <mjrosato@linux.ibm.com>
-> Reviewed-by: Kevin Tian <kevin.tian@intel.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+kvm->srcu is taken in KVM_RUN and several other vCPU ioctls, therefore
+vcpu->mutex is susceptible to the same deadlock that is documented
+for kvm->slots_lock.  The same holds for kvm->lock, since kvm->lock
+is held outside vcpu->mutex.  Fix the documentation and rearrange it
+to highlight the difference between these locks and kvm->slots_arch_lock,
+and how kvm->slots_arch_lock can be useful while processing a vmexit.
 
-Acked-by: Thomas Gleixner <tglx@linutronix.de>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Documentation/virt/kvm/locking.rst | 23 ++++++++++++-----------
+ 1 file changed, 12 insertions(+), 11 deletions(-)
+
+diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
+index 897ca39b72bf..53826098183e 100644
+--- a/Documentation/virt/kvm/locking.rst
++++ b/Documentation/virt/kvm/locking.rst
+@@ -24,17 +24,18 @@ The acquisition orders for mutexes are as follows:
+ 
+ For SRCU:
+ 
+-- ``synchronize_srcu(&kvm->srcu)`` is called _inside_
+-  the kvm->slots_lock critical section, therefore kvm->slots_lock
+-  cannot be taken inside a kvm->srcu read-side critical section.
+-  Instead, kvm->slots_arch_lock is released before the call
+-  to ``synchronize_srcu()`` and _can_ be taken inside a
+-  kvm->srcu read-side critical section.
+-
+-- kvm->lock is taken inside kvm->srcu, therefore
+-  ``synchronize_srcu(&kvm->srcu)`` cannot be called inside
+-  a kvm->lock critical section.  If you cannot delay the
+-  call until after kvm->lock is released, use ``call_srcu``.
++- ``synchronize_srcu(&kvm->srcu)`` is called inside critical sections
++  for kvm->lock, vcpu->mutex and kvm->slots_lock.  These locks _cannot_
++  be taken inside a kvm->srcu read-side critical section; that is, the
++  following is broken::
++
++      srcu_read_lock(&kvm->srcu);
++      mutex_lock(&kvm->slots_lock);
++
++- kvm->slots_arch_lock instead is released before the call to
++  ``synchronize_srcu()``.  It _can_ therefore be taken inside a
++  kvm->srcu read-side critical section, for example while processing
++  a vmexit.
+ 
+ On x86:
+ 
+-- 
+2.39.0
+
