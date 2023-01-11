@@ -2,219 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1213F66651C
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 21:53:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 82BF7666593
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 22:24:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234899AbjAKUxn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 15:53:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55336 "EHLO
+        id S235503AbjAKVYo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 16:24:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235042AbjAKUxk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 15:53:40 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6273DBE4
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 12:53:39 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id p24so18037862plw.11
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 12:53:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0ltp+seogK+PxaVsEYogy95r8h77BHMwLLlXz9DiN8w=;
-        b=ZkKElg+8IcsEScy6KU15ENBM4hY2OLh2JUmXtCiQe9D357/FhbWQQdTbJ+XgevOLlQ
-         eZWwyGY8JM8invv4+POFOm46+9jGIVnHl7vXs4qg8G3YJh+ukYRpWYpSdKzWqldYdRag
-         Iuf2HPbQaTOscBk6xESwqqLMjSShui4NJxKzidDiJuFixDGvCf5v0LD7uVodNAW+2KUx
-         SbP0aqJY7HzBnc9JRoNoGs/f86bvYvaRMrkMrolcBaBu6QTt34OHz9uDQrqfCQ7AhQsp
-         Nn0A0msUsx1Z16wvpmKtG8iKTJopRdDqNCgbtFp3Zt36U360mVfWc0WG+obDtljR4h9+
-         jOBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0ltp+seogK+PxaVsEYogy95r8h77BHMwLLlXz9DiN8w=;
-        b=148Mk0Ea/6XzD1zy6aLgPSvfI7snt/Z5ev7AtxCQakttBapB/GE5yhwgQRYs5T9yFL
-         U0KcyaY9Op7Jyp2gfDiP/bXX+YuoVfwJ+A7HRgZgk9Tpar62DDBb4Gzqlw5D6BXwz35A
-         cgzTxR7w5SxhIZWspQuPvVg8ztljbSxyRjZdCufUApwms2Iviee8766VMDg9Mc/qHKkJ
-         rTPMhC8OhC4R5WVZmZFRGoENb2HWTJGCXro/B50CljTE+GWq4qNTMnj446NMi2ff1B5v
-         g4u/fVmPY335S6Vj276YWT9+JdmegOp+AzUE3agLv9oNHiwr1YwPfPOFcl6/6UF8Py0l
-         4ECQ==
-X-Gm-Message-State: AFqh2kqY2mS99xPBioIzgwQLO15WpAHOZ6zplW3iVz5q1s5uoS1IUC5X
-        HphhpSIagAOq9CtX69i1z9twrQ==
-X-Google-Smtp-Source: AMrXdXtc4CpOFmwV1Hw4NH/1QoEjdUGEehsu8+s0heNHbjQKL27VEfPV1Z8tPmwPD/xRgsHw1J4USA==
-X-Received: by 2002:a05:6a20:c527:b0:9d:c38f:9bdd with SMTP id gm39-20020a056a20c52700b0009dc38f9bddmr581152pzb.2.1673470418329;
-        Wed, 11 Jan 2023 12:53:38 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d11-20020a170902654b00b001895d87225csm10569179pln.182.2023.01.11.12.53.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 12:53:37 -0800 (PST)
-Date:   Wed, 11 Jan 2023 20:53:34 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        alex.williamson@redhat.com, pbonzini@redhat.com, cohuck@redhat.com,
-        farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, akrowiak@linux.ibm.com,
-        jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: async kvm_destroy_vm for vfio devices
-Message-ID: <Y78hzsHiwaFpL60+@google.com>
-References: <20230109201037.33051-1-mjrosato@linux.ibm.com>
- <20230109201037.33051-2-mjrosato@linux.ibm.com>
- <Y78UCz5oeuntSQtK@google.com>
- <Y78Wk2/P5+gLMdpk@nvidia.com>
+        with ESMTP id S235513AbjAKVYk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 16:24:40 -0500
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E7BB4087C;
+        Wed, 11 Jan 2023 13:24:37 -0800 (PST)
+Received: from [192.168.2.218] (unknown [109.252.117.89])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: dmitry.osipenko)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id 95C896602DA2;
+        Wed, 11 Jan 2023 21:24:34 +0000 (GMT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1673472276;
+        bh=yjvk/0iHuNc/6gjXb7iSX0HCbGV45DhPyBUVGUboafg=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=S2AAaU9eH0N/eTke6q3vQol0nEyoxzD+ib+vRiMLxKxzbOTNGmD32bFW/5pM9GCcx
+         wTlRvYH1lYn4sow4cU8HytoxBVBX8yBiVtZ3wIujKwRfeqW1Y5ZrxCJqtxbDxh5Gp5
+         DraN21bg3GYCJDG5nQ1/xK1/Lf4wjhBVUwxjUkAKfDAbi2NIawf2J7L170fePjY+uY
+         PWa6T/JNGT0jwH6ZkO1oWRDVfHJDCEeb5v+63573hPDybMVWqxgQu8KBv2rC3RAyIx
+         qd631w8Ey91yhCNY9/uLi/AwAxwZ8KmaigPHk1u7Y85uVelplDxi7z01upCcl4i/84
+         NjMvujsiapnZw==
+Message-ID: <77d0dece-8139-f292-a4de-84e91eaed64b@collabora.com>
+Date:   Thu, 12 Jan 2023 00:24:30 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y78Wk2/P5+gLMdpk@nvidia.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v1] drm/ttm: Refcount allocated tail pages
+To:     Sean Christopherson <seanjc@google.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>
+Cc:     David Airlie <airlied@linux.ie>, Huang Rui <ray.huang@amd.com>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Trigger Huang <Trigger.Huang@gmail.com>,
+        Gert Wollny <gert.wollny@collabora.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+        Dmitry Osipenko <digetx@gmail.com>, kvm@vger.kernel.org,
+        kernel@collabora.com, virtualization@lists.linux-foundation.org,
+        Bob Beckett <bbeckett@collabora.com>
+References: <8f749cd0-9a04-7c72-6a4f-a42d501e1489@amd.com>
+ <5340d876-62b8-8a64-aa6d-7736c2c8710f@collabora.com>
+ <594f1013-b925-3c75-be61-2d649f5ca54e@amd.com>
+ <6893d5e9-4b60-0efb-2a87-698b1bcda63e@collabora.com>
+ <73e5ed8d-0d25-7d44-8fa2-e1d61b1f5a04@amd.com>
+ <c9d89644-409e-0363-69f0-a3b8f2ef0ae4@collabora.com>
+ <6effcd33-8cc3-a4e0-3608-b9cef7a76da7@collabora.com>
+ <ff28e1b4-cda2-14b8-b9bf-10706ae52cac@collabora.com>
+ <48b5dd12-b0df-3cc6-a72d-f35156679844@collabora.com>
+ <b1963713-4df6-956f-c16f-81a0cf1a978b@amd.com> <Y77sQZI0IfFVx7Jo@google.com>
+Content-Language: en-US
+From:   Dmitry Osipenko <dmitry.osipenko@collabora.com>
+In-Reply-To: <Y77sQZI0IfFVx7Jo@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 11, 2023, Jason Gunthorpe wrote:
-> On Wed, Jan 11, 2023 at 07:54:51PM +0000, Sean Christopherson wrote:
+Hello Sean,
+
+On 1/11/23 20:05, Sean Christopherson wrote:
+> On Thu, Aug 18, 2022, Christian König wrote:
+>> Am 18.08.22 um 01:13 schrieb Dmitry Osipenko:
+>>> On 8/18/22 01:57, Dmitry Osipenko wrote:
+>>>> On 8/15/22 18:54, Dmitry Osipenko wrote:
+>>>>> On 8/15/22 17:57, Dmitry Osipenko wrote:
+>>>>>> On 8/15/22 16:53, Christian König wrote:
+>>>>>>> Am 15.08.22 um 15:45 schrieb Dmitry Osipenko:
+>>>>>>>> [SNIP]
+>>>>>>>>> Well that comment sounds like KVM is doing the right thing, so I'm
+>>>>>>>>> wondering what exactly is going on here.
+>>>>>>>> KVM actually doesn't hold the page reference, it takes the temporal
+>>>>>>>> reference during page fault and then drops the reference once page is
+>>>>>>>> mapped, IIUC. Is it still illegal for TTM? Or there is a possibility for
+>>>>>>>> a race condition here?
+>>>>>>>>
+>>>>>>> Well the question is why does KVM grab the page reference in the first
+>>>>>>> place?
+>>>>>>>
+>>>>>>> If that is to prevent the mapping from changing then yes that's illegal
+>>>>>>> and won't work. It can always happen that you grab the address, solve
+>>>>>>> the fault and then immediately fault again because the address you just
+>>>>>>> grabbed is invalidated.
+>>>>>>>
+>>>>>>> If it's for some other reason than we should probably investigate if we
+>>>>>>> shouldn't stop doing this.
 > 
-> > Something feels off.  If KVM's refcount is 0, then accessing device->group->kvm
-> > in vfio_device_open() can't happen unless there's a refcounting bug somewhere.
+> ...
 > 
-> The problem is in close, not open.
-
-The deadlock problem is, yes.  My point is that if group_lock needs to be taken
-when nullifying group->kvm during kvm_vfio_destroy(), then there is also a refcounting
-prolem with respect to open().  If there is no refcounting problem, then nullifying
-group->kvm during kvm_vfio_destroy() is unnecessary (but again, I doubt this is
-the case).
-
-The two things aren't directly related, but it seems possible to solve both while
-making this all slightly less ugly.  Well, at least from KVM's perspective, whether
-or not it'd be an improvement on the VFIO side is definitely debatable.
-
-> Specifically it would be very hard to avoid holding the group_lock
-> during close which is when the put is done.
+>>>>> If we need to bump the refcount only for VM_MIXEDMAP and not for
+>>>>> VM_PFNMAP, then perhaps we could add a flag for that to the kvm_main
+>>>>> code that will denote to kvm_release_page_clean whether it needs to put
+>>>>> the page?
+>>>> The other variant that kind of works is to mark TTM pages reserved using
+>>>> SetPageReserved/ClearPageReserved, telling KVM not to mess with the page
+>>>> struct. But the potential consequences of doing this are unclear to me.
+>>>>
+>>>> Christian, do you think we can do it?
+>>> Although, no. It also doesn't work with KVM without additional changes
+>>> to KVM.
+>>
+>> Well my fundamental problem is that I can't fit together why KVM is grabing
+>> a page reference in the first place.
 > 
-> > Rather than force devices to get KVM references, why not handle that in common
-> > VFIO code and drop KVM refcountin from devices?  Worst case scenario KVM is pinned
-> > by a device that doesn't need KVM but is in a group associated with KVM.  If that's
-> > a concern, it seems easy enough to add a flag to vfio_device_ops to enumerate
-> > whether or not the device depends on KVM.
+> It's to workaround a deficiency in KVM.
 > 
-> We can't make cross-dependencies between kvm and core VFIO - it is why
-> so much of this is soo ugly.
+>> See the idea of the page reference is that you have one reference is that
+>> you count the reference so that the memory is not reused while you access
+>> it, e.g. for I/O or mapping it into different address spaces etc...
+>>
+>> But none of those use cases seem to apply to KVM. If I'm not totally
+>> mistaken in KVM you want to make sure that the address space mapping, e.g.
+>> the translation between virtual and physical address, don't change while you
+>> handle it, but grabbing a page reference is the completely wrong approach
+>> for that.
+> 
+> TL;DR: 100% agree, and we're working on fixing this in KVM, but were still months
+> away from a full solution.
+> 
+> Yep.  KVM uses mmu_notifiers to react to mapping changes, with a few caveats that
+> we are (slowly) fixing, though those caveats are only tangentially related.
+> 
+> The deficiency in KVM is that KVM's internal APIs to translate a virtual address
+> to a physical address spit out only the resulting host PFN.  The details of _how_
+> that PFN was acquired are not captured.  Specifically, KVM loses track of whether
+> or not a PFN was acquired via gup() or follow_pte() (KVM is very permissive when
+> it comes to backing guest memory).
+> 
+> Because gup() gifts the caller a reference, that means KVM also loses track of
+> whether or not KVM holds a page refcount.  To avoid pinning guest memory, KVM does
+> quickly put the reference gifted by gup(), but because KVM doesn't _know_ if it
+> holds a reference, KVM uses a heuristic, which is essentially "is the PFN associated
+> with a 'normal' struct page?".
+> 
+>    /*
+>     * Returns a 'struct page' if the pfn is "valid" and backed by a refcounted
+>     * page, NULL otherwise.  Note, the list of refcounted PG_reserved page types
+>     * is likely incomplete, it has been compiled purely through people wanting to
+>     * back guest with a certain type of memory and encountering issues.
+>     */
+>    struct page *kvm_pfn_to_refcounted_page(kvm_pfn_t pfn)
+> 
+> That heuristic also triggers if follow_pte() resolves to a PFN that is associated
+> with a "struct page", and so to avoid putting a reference it doesn't own, KVM does
+> the silly thing of manually getting a reference immediately after follow_pte().
+> 
+> And that in turn gets tripped up non-refcounted tail pages because KVM sees a
+> normal, valid "struct page" and assumes it's refcounted.  To fudge around that
+> issue, KVM requires "struct page" memory to be refcounted.
+> 
+> The long-term solution is to refactor KVM to precisely track whether or not KVM
+> holds a reference.  Patches have been prosposed to do exactly that[1], but they
+> were put on hold due to the aforementioned caveats with mmu_notifiers.  The
+> caveats are that most flows where KVM plumbs a physical address into hardware
+> structures aren't wired up to KVM's mmu_notifier.
+> 
+> KVM could support non-refcounted struct page memory without first fixing the
+> mmu_notifier issues, but I was (and still am) concerned that that would create an
+> even larger hole in KVM until the mmu_notifier issues are sorted out[2].
+>  
+> [1] https://lore.kernel.org/all/20211129034317.2964790-1-stevensd@google.com
+> [2] https://lore.kernel.org/all/Ydhq5aHW+JFo15UF@google.com
 
-Ugh, right, modules for everyone.
+Thanks for the summary! Indeed, it's the KVM side that needs to be
+patched. Couple months ago I found that a non-TTM i915 driver also
+suffers from the same problem because it uses huge pages that we want
+map to a guest. So we definitely will need to fix the KVM side.
 
-> The few device drivers that unavoidably have KVM involvment already
-> have a KVM module dependency, so they can safely do the get/put
-
-Rather than store a "struct kvm *" in vfio_device, what about adding a new set
-of optional ops to get/put KVM references?  Having dedicated KVM ops is gross,
-but IMO it's less gross than backdooring the KVM pointer into open_device() by
-stashing KVM into the device, e.g. it formalizes the VFIO API for devices that
-depend on KVM instead of making devices pinky-swear to grab a reference during
-open_device().
-
-To further harden things, KVM could export only kvm_get_safe_kvm() if there are
-no vendor modules.  I.e. make kvm_get_kvm() an internal-only helper when possible
-and effectively force VFIO devices to use the safe variant.  That would work even
-x86, as kvm_get_kvm() wouldn't be exported if neither KVM_AMD nor KVM_INTEL is
-built as a module.
-
----
- drivers/vfio/vfio_main.c | 20 +++++++++++++-------
- include/linux/vfio.h     |  9 +++++++--
- 2 files changed, 20 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 6e8804fe0095..b3a84d65baa6 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -772,7 +772,12 @@ static struct file *vfio_device_open(struct vfio_device *device)
- 		 * reference and release it during close_device.
- 		 */
- 		mutex_lock(&device->group->group_lock);
--		device->kvm = device->group->kvm;
-+
-+		if (device->kvm_ops && device->group->kvm) {
-+			ret = device->kvm_ops->get_kvm(device->group->kvm);
-+			if (ret)
-+				goto err_undo_count;
-+		}
- 
- 		if (device->ops->open_device) {
- 			ret = device->ops->open_device(device);
-@@ -823,8 +828,9 @@ static struct file *vfio_device_open(struct vfio_device *device)
- err_undo_count:
- 	mutex_unlock(&device->group->group_lock);
- 	device->open_count--;
--	if (device->open_count == 0 && device->kvm)
--		device->kvm = NULL;
-+	if (device->open_count == 0 && device->kvm_ops)
-+		device->kvm_ops->put_kvm();
-+
- 	mutex_unlock(&device->dev_set->lock);
- 	module_put(device->dev->driver->owner);
- err_unassign_container:
-@@ -1039,8 +1045,8 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
- 	}
- 	mutex_unlock(&device->group->group_lock);
- 	device->open_count--;
--	if (device->open_count == 0)
--		device->kvm = NULL;
-+	if (device->open_count == 0 && device->kvm_ops)
-+		device->kvm_ops->put_kvm();
- 	mutex_unlock(&device->dev_set->lock);
- 
- 	module_put(device->dev->driver->owner);
-@@ -1656,8 +1662,8 @@ EXPORT_SYMBOL_GPL(vfio_file_enforced_coherent);
-  * @file: VFIO group file
-  * @kvm: KVM to link
-  *
-- * When a VFIO device is first opened the KVM will be available in
-- * device->kvm if one was associated with the group.
-+ * When a VFIO device is first opened, the device's kvm_ops->get_kvm() will be
-+ * invoked with the KVM instance associated with the group (if applicable).
-  */
- void vfio_file_set_kvm(struct file *file, struct kvm *kvm)
- {
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index fdd393f70b19..d6dcbe0546bf 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -18,6 +18,11 @@
- 
- struct kvm;
- 
-+struct vfio_device_kvm_ops {
-+	int (*get_kvm)(struct kvm *kvm);
-+	void (*put_kvm)(void);
-+};
-+
- /*
-  * VFIO devices can be placed in a set, this allows all devices to share this
-  * structure and the VFIO core will provide a lock that is held around
-@@ -43,8 +48,8 @@ struct vfio_device {
- 	struct vfio_device_set *dev_set;
- 	struct list_head dev_set_list;
- 	unsigned int migration_flags;
--	/* Driver must reference the kvm during open_device or never touch it */
--	struct kvm *kvm;
-+
-+	const struct vfio_device_kvm_ops *kvm_ops;
- 
- 	/* Members below here are private, not for driver use */
- 	unsigned int index;
-
-base-commit: d52444c7a90fc551b4c3b0bda7d3f0b2ca9fc84d
 -- 
+Best regards,
+Dmitry
 
