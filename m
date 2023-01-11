@@ -2,44 +2,44 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C9806657D5
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 10:43:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE9DA6657D1
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 10:42:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232249AbjAKJmc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 04:42:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43090 "EHLO
+        id S231598AbjAKJma (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 04:42:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235627AbjAKJlj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S235829AbjAKJlj (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 11 Jan 2023 04:41:39 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B6A6D6B
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 01:37:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40768D9F
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 01:38:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=asDDLkhhiVe8MatzoaV5vyaHB/p2X1IB9PzQ1tQv9UA=; b=pSM9VHjuduHfkTk520DkWAYvI6
-        DtX6eCDu87iE5K+My7WzLmFzT3xnmqtMUqae2B+Rh32rNrk7pq2x4zkWWDvvxB/3whfq+5vPV+Hxy
-        x0fjYUjObQzu3xP8+iMPfFk6Uby29j1tRL4aVWddio5KhLCEI2+gPoi/MqyvS44DZVIBqVHICFYk0
-        QNferzVJemrM9UJZ4xaoDrmVm2ekpRPHAMXDvQfoXA+WklH8FsPkhLEZh3xxAgm0aJjxf2a2gmm0D
-        5hNcuRHn87v86Qid2eJdk3skLAkEZeLlzp9vrpdyHfnejStrpfc3/H1r4pLmiAaQxDRUnC7WrQFC0
-        JTzZJgNw==;
+        bh=2fDiKDpHWQxPlgiPnPqPDR3+XIqmos/N+hJoBE0bo5Q=; b=qqhYbpDRxaw+n8ruRSimOqxTQU
+        c9MaukGhM982W6SpZGgstAaVYbI/MXo056puJ3HoDinx0+YGXxuCrrF9tBNIZm2O2naeCfrdhqtSa
+        0z5KhB3fPpuPCgN+jAhz+K3ttbv0kUYX7shh/iP8QD5wQbCzTV+/ziti48XxtTf2nSsm/Kg9rZYVo
+        uBRSOW1gYpWg4L/vQ3NO/3jko+BxPpg3kfy4sprgh7wSFSFoJG5k+xykQyuIzPwMkdNVm8h6ExdI5
+        rb3Q43G72xRjJVEKJRQSXY00zpJ/K/VG2synjRgNblbKaaOMfkfrqHsH+ucP0T/A5WItDDDBazFyc
+        O4tM1L4g==;
 Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pFXYa-0040AZ-Kw; Wed, 11 Jan 2023 09:38:04 +0000
-Message-ID: <03f0a9ddf3db211d969ff4eb4e0aeb8789683776.camel@infradead.org>
-Subject: [PATCH 2/3] KVM: x86/xen: Fix potential deadlock in
- kvm_xen_update_runstate_guest()
+        id 1pFXYg-0040BG-DI; Wed, 11 Jan 2023 09:38:10 +0000
+Message-ID: <83b174d505d47967f3c8762d231b69b6fc48d80a.camel@infradead.org>
+Subject: [PATCH 3/3] KVM: Ensure lockdep knows about kvm->lock vs.
+ vcpu->mutex ordering rule
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>, paul <paul@xen.org>,
         Sean Christopherson <seanjc@google.com>
 Cc:     kvm <kvm@vger.kernel.org>, Peter Zijlstra <peterz@infradead.org>,
         Michal Luczaj <mhal@rbox.co>
-Date:   Wed, 11 Jan 2023 09:37:50 +0000
+Date:   Wed, 11 Jan 2023 09:37:57 +0000
 In-Reply-To: <99b1da6ca8293b201fe0a89fd973a9b2f70dc450.camel@infradead.org>
 References: <99b1da6ca8293b201fe0a89fd973a9b2f70dc450.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-IWHO8Jp3ZGY1dMw0kU5m"
+        boundary="=-BMG7SHMsKoCKosVrIdpn"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -53,84 +53,55 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-IWHO8Jp3ZGY1dMw0kU5m
+--=-BMG7SHMsKoCKosVrIdpn
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: quoted-printable
 
-RnJvbTogRGF2aWQgV29vZGhvdXNlIDxkd213QGFtYXpvbi5jby51az4KClRoZSBrdm1feGVuX3Vw
-ZGF0ZV9ydW5zdGF0ZV9ndWVzdCgpIGZ1bmN0aW9uIGNhbiBiZSBjYWxsZWQgd2hlbiB0aGUgdkNQ
-VQppcyBiZWluZyBzY2hlZHVsZWQgb3V0LCBmcm9tIGEgcHJlZW1wdCBub3RpZmllci4gSXQgKm9w
-cG9ydHVuaXN0aWNhbGx5Kgp1cGRhdGVzIHRoZSBydW5zdGF0ZSBhcmVhIGluIHRoZSBndWVzdCBt
-ZW1vcnksIGlmIHRoZSBnZm5fdG9fcGZuX2NhY2hlCndoaWNoIGNhY2hlcyB0aGUgYXBwcm9wcmlh
-dGUgYWRkcmVzcyBpcyBzdGlsbCB2YWxpZC4KCklmIHRoZXJlIGlzICpjb250ZW50aW9uKiB3aGVu
-IGl0IGF0dGVtcHRzIHRvIG9idGFpbiBncGMtPmxvY2ssIHRoZW4KbG9ja2luZyBpbnNpZGUgdGhl
-IHByaW9yaXR5IGluaGVyaXRhbmNlIGNoZWNrcyBtYXkgY2F1c2UgYSBkZWFkbG9jay4KTG9ja2Rl
-cCByZXBvcnRzOgoKWzEzODkwLjE0ODk5N10gQ2hhaW4gZXhpc3RzIG9mOgrCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCAmZ3BjLT5sb2NrIC0tPiAmcC0+cGlfbG9jayAtLT4gJnJxLT5f
-X2xvY2sKClsxMzg5MC4xNDkwMDJdwqAgUG9zc2libGUgdW5zYWZlIGxvY2tpbmcgc2NlbmFyaW86
-CgpbMTM4OTAuMTQ5MDAzXcKgwqDCoMKgwqDCoMKgIENQVTDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoCBDUFUxClsxMzg5MC4xNDkwMDRdwqDCoMKgwqDCoMKgwqAgLS0tLcKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC0tLS0KWzEzODkwLjE0OTAwNV3C
-oMKgIGxvY2soJnJxLT5fX2xvY2spOwpbMTM4OTAuMTQ5MDA3XcKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGxvY2soJnAtPnBpX2xv
-Y2spOwpbMTM4OTAuMTQ5MDA5XcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIGxvY2soJnJxLT5fX2xvY2spOwpbMTM4OTAuMTQ5MDEx
-XcKgwqAgbG9jaygmZ3BjLT5sb2NrKTsKWzEzODkwLjE0OTAxM10KwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgICoqKiBERUFETE9DSyAqKioKCkluIHRoZSBnZW5lcmFsIGNhc2UsIGlmIHRo
-ZXJlJ3MgY29udGVudGlvbiBmb3IgYSByZWFkIGxvY2sgb24gZ3BjLT5sb2NrLAp0aGF0J3MgZ29p
-bmcgdG8gYmUgYmVjYXVzZSBzb21ldGhpbmcgZWxzZSBpcyBlaXRoZXIgaW52YWxpZGF0aW5nIG9y
-CnJldmFsaWRhdGluZyB0aGUgY2FjaGUuIEVpdGhlciB3YXksIHdlJ3ZlIHJhY2VkIHdpdGggc2Vl
-aW5nIGl0IGluIGFuCmludmFsaWQgc3RhdGUsIGluIHdoaWNoIGNhc2Ugd2Ugd291bGQgaGF2ZSBh
-Ym9ydGVkIHRoZSBvcHBvcnR1bmlzdGljCnVwZGF0ZSBhbnl3YXkuCgpTbyBpbiB0aGUgJ2F0b21p
-YycgY2FzZSB3aGVuIGNhbGxlZCBmcm9tIHRoZSBwcmVlbXB0IG5vdGlmaWVyLCBqdXN0CnN3aXRj
-aCB0byB1c2luZyByZWFkX3RyeWxvY2soKSBhbmQgYXZvaWQgdGhlIFBJIGhhbmRsaW5nIGFsdG9n
-ZXRoZXIuCgpTaWduZWQtb2ZmLWJ5OiBEYXZpZCBXb29kaG91c2UgPGR3bXdAYW1hem9uLmNvLnVr
-PgotLS0KCkZpcnN0IHBhdGNoIGluIHRoaXMgc2VyaWVzIHdhcyAnW1BBVENIXSBLVk06IHg4Ni94
-ZW46IEZpeCBsb2NrZGVwCndhcm5pbmcgb24gInJlY3Vyc2l2ZSIgZ3BjIGxvY2tpbmcnIGJ1dCBu
-b3cgdGhlcmUgYXJlIHRocmVlLgoKCsKgYXJjaC94ODYva3ZtL3hlbi5jIHwgMTcgKysrKysrKysr
-KysrKystLS0KwqAxIGZpbGUgY2hhbmdlZCwgMTQgaW5zZXJ0aW9ucygrKSwgMyBkZWxldGlvbnMo
-LSkKCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0veGVuLmMgYi9hcmNoL3g4Ni9rdm0veGVuLmMK
-aW5kZXggMDdlNjFjYzk4ODFlLi5jNDQ0OTQ4YWIxYWMgMTAwNjQ0Ci0tLSBhL2FyY2gveDg2L2t2
-bS94ZW4uYworKysgYi9hcmNoL3g4Ni9rdm0veGVuLmMKQEAgLTI3Miw3ICsyNzIsMTIgQEAgc3Rh
-dGljIHZvaWQga3ZtX3hlbl91cGRhdGVfcnVuc3RhdGVfZ3Vlc3Qoc3RydWN0IGt2bV92Y3B1ICp2
-LCBib29sIGF0b21pYykKwqDCoMKgwqDCoMKgwqDCoCAqIEF0dGVtcHQgdG8gb2J0YWluIHRoZSBH
-UEMgbG9jayBvbiAqYm90aCogKGlmIHRoZXJlIGFyZSB0d28pCsKgwqDCoMKgwqDCoMKgwqAgKiBn
-Zm5fdG9fcGZuIGNhY2hlcyB0aGF0IGNvdmVyIHRoZSByZWdpb24uCsKgwqDCoMKgwqDCoMKgwqAg
-Ki8KLcKgwqDCoMKgwqDCoMKgcmVhZF9sb2NrX2lycXNhdmUoJmdwYzEtPmxvY2ssIGZsYWdzKTsK
-K8KgwqDCoMKgwqDCoMKgbG9jYWxfaXJxX3NhdmUoZmxhZ3MpOworwqDCoMKgwqDCoMKgwqBpZiAo
-IXJlYWRfdHJ5bG9jaygmZ3BjMS0+bG9jaykpIHsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoGlmIChhdG9taWMpCivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgcmV0dXJuOworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmVhZF9sb2NrKCZn
-cGMxLT5sb2NrKTsKK8KgwqDCoMKgwqDCoMKgfQrCoMKgwqDCoMKgwqDCoMKgd2hpbGUgKCFrdm1f
-Z3BjX2NoZWNrKGdwYzEsIHVzZXJfbGVuMSkpIHsKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqByZWFkX3VubG9ja19pcnFyZXN0b3JlKCZncGMxLT5sb2NrLCBmbGFncyk7CsKgCkBAIC0y
-ODMsNyArMjg4LDcgQEAgc3RhdGljIHZvaWQga3ZtX3hlbl91cGRhdGVfcnVuc3RhdGVfZ3Vlc3Qo
-c3RydWN0IGt2bV92Y3B1ICp2LCBib29sIGF0b21pYykKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqBpZiAoa3ZtX2dwY19yZWZyZXNoKGdwYzEsIHVzZXJfbGVuMSkpCsKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJldHVybjsKwqAKLcKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoHJlYWRfbG9ja19pcnFzYXZlKCZncGMxLT5sb2NrLCBmbGFn
-cyk7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBnb3RvIHJldHJ5OwrCoMKgwqDCoMKg
-wqDCoMKgfQrCoArCoMKgwqDCoMKgwqDCoMKgaWYgKGxpa2VseSghdXNlcl9sZW4yKSkgewpAQCAt
-MzA5LDcgKzMxNCwxMyBAQCBzdGF0aWMgdm9pZCBrdm1feGVuX3VwZGF0ZV9ydW5zdGF0ZV9ndWVz
-dChzdHJ1Y3Qga3ZtX3ZjcHUgKnYsIGJvb2wgYXRvbWljKQrCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoCAqIGdwYzEgbG9jayB0byBtYWtlIGxvY2tkZXAgc2h1dCB1cCBhYm91dCBpdC4K
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgKi8KwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqBsb2NrX3NldF9zdWJjbGFzcygmZ3BjMS0+bG9jay5kZXBfbWFwLCAxLCBfVEhJ
-U19JUF8pOwotwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmVhZF9sb2NrKCZncGMyLT5s
-b2NrKTsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGlmICghcmVhZF90cnlsb2NrKCZn
-cGMyLT5sb2NrKSkgeworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoGlmIChhdG9taWMpIHsKK8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgcmVhZF91bmxvY2tfaXJxcmVzdG9yZSgmZ3BjMS0+bG9j
-aywgZmxhZ3MpOworwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqByZXR1cm47CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgfQorwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoHJlYWRfbG9jaygmZ3BjMi0+bG9jayk7CivCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqB9CsKgCsKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKCFrdm1fZ3BjX2No
-ZWNrKGdwYzIsIHVzZXJfbGVuMikpIHsKwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgcmVhZF91bmxvY2soJmdwYzItPmxvY2spOwotLSAKMi4zNC4xCgoK
+From: David Woodhouse <dwmw@amazon.co.uk>
+
+Documentation/virt/kvm/locking.rst tells us that kvm->lock is taken outside
+vcpu->mutex. But that doesn't actually happen very often; it's only in
+some esoteric cases like migration with AMD SEV. This means that lockdep
+usually doesn't notice, and doesn't do its job of keeping us honest.
+
+Ensure that lockdep *always* knows about the ordering of these two locks,
+by briefly taking vcpu->mutex in kvm_vm_ioctl_create_vcpu() while kvm->lock
+is held.
+
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+=C2=A0virt/kvm/kvm_main.c | 7 +++++++
+=C2=A01 file changed, 7 insertions(+)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 07bf29450521..5814037148bd 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -3924,6 +3924,13 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm,=
+ u32 id)
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
+=C2=A0
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mutex_lock(&kvm->lock);
++
++#ifdef CONFIG_LOCKDEP
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0/* Ensure that lockdep knows vcp=
+u->mutex is taken *inside* kvm->lock */
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mutex_lock(&vcpu->mutex);
++=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0mutex_unlock(&vcpu->mutex);
++#endif
++
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (kvm_get_vcpu_by_id(kvm,=
+ id)) {
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0r =3D -EEXIST;
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0goto unlock_vcpu_destroy;
+--=20
+2.34.1
 
 
---=-IWHO8Jp3ZGY1dMw0kU5m
+
+--=-BMG7SHMsKoCKosVrIdpn
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -222,24 +193,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTExMDkzNzUwWjAvBgkqhkiG9w0BCQQxIgQgrB48TgOa
-x7uCZcskMYlwpL9/V8AbaegLyl15qumpgcUwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTExMDkzNzU3WjAvBgkqhkiG9w0BCQQxIgQgvgWDLOVY
+Sd3PGESreFyzGZ7w7CvtaKvAAVM3GNU44B0wgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAKgoMlQMwDAb9YJsgqhNdOeJoDIi8ri2V+
-7QZNSR4BBrlPtFeMP4hKhioa46MEB+/bOtPiaOfqjA2TEULMHenLiF0Jwlis/r8dUKLSglODgp8g
-h8o1G9MbqdQ2Ym+JGfACZe9/Mj0EL+Exhcfd3Ta9TQE5DvsbLolq0/dFf2+VZ6EjeL629U6mxfzd
-leEw/amgHdLh7lV97QNioICpsF44zIzgFzR/XL5zeQ755cI74G4/bNVXWV2KUjKGw3B7JD6pgvrj
-qX8EZwzu5cdznLjnIjq+HJBrZZtEOPCxjn+UlWj/TVk/+NJJDRIEMPeMTAF8vB+wZOYx6TPnw/QU
-O14T54DWRQrN0VirLyVgs6Q6/lICVhc19NPCdBVk3bKwXMSEdKQXpOmJuG8NGP/7OtpzvhodlvVg
-PCUjTqwdExea+p139Sb1r2n0NWfe3sKS0atXEw46hz5XVyX2YYXrSJgX07lWZSuFGJrTHccjO/vB
-/FsKCsupBsluWlLC4TUDcy4syh1WieiePp6A0DJVcUxKStj+9i1EYpZEBG3i5ws26VVYu0VHFDk0
-OcL/J2mH9+pBiCQq3Ty/QFqVqyMNlCtpnxi2IqaxxoBN+kByd5NeMDnTk/orZNfyzBn7sOhhQTVH
-eATv0C/FXZ79+qalDp2SUCus8FcQt65QFSIV+EFk5wAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBHxzeWL5VmbxPViDeTnWELKdoPs7lIt1ce
+HGcohQMmAOITOHba3cNxJoiNnXdM9YezCvpouyJdekTnAx2yWi9T1m1nDp0LPvsS3T8331YC+OiH
+cbHjelT4ah7GRhRZV2r5NNNNMZZN+e4cCjki9JER2h0Er0j1PYZCDn7sl/JWGCOg+fmiLeyBc87f
+1JlfHu6kg0YXilqphgLHfzr62EAj6hbJ85Dkv7T1KhM3ry43L2Px8Gx5/351j1lj34OiMlaaAWMI
+Q13P3ivIEcf1ExHfSBOd9x/hkB/xvX2HPCXKipAVyE+X8CcdSqadBl5puLjLY7fdUd4AOKsSHCHp
+xMEc1oCaBknvL6ZZXyCanh6tIDpSBIplJegsaCTq6Cc72EWRZvlmHLQVqSZBH9X9igx0FgwV0o3V
+1dgTedLB/U6Ahj7YKNpa2axSIihTfqaSpMfXyP60rxXJ7MLctb/GvNGig3UXxmDBicyN6sQGfD6f
+tYNtXFja9orIBTI/gzt2YzQd3jBzrPbGguWxzexCS24vkbzQQmCxYspSvObj9ZlXe9tfo3tWWvGe
+iIQP8WFAHhECBDPiQe0WcST9BRbXZDqJfOtcd0NkZuvcWzFXu2+OmTHjx9bychJvBnSBrv+w1eM6
+YW+vWZZA9NQcZZSY6Hyyqb7d+ftS7kPznKbLgePFgwAAAAAAAA==
 
 
---=-IWHO8Jp3ZGY1dMw0kU5m--
+--=-BMG7SHMsKoCKosVrIdpn--
