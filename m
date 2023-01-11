@@ -2,387 +2,245 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 278786654C7
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 07:46:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C82C665522
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 08:27:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231929AbjAKGqI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 01:46:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51632 "EHLO
+        id S235731AbjAKH14 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 02:27:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231694AbjAKGqF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 01:46:05 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2057.outbound.protection.outlook.com [40.107.94.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3568921BE;
-        Tue, 10 Jan 2023 22:46:04 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nyfwlzil95HSlPC1zjKbAg7hxGO2GGW0dLBNRa/PA9Q9QD6tWeMeX7pCBpbu8zKJx3aLXxhX3W1govruK8U97UsoRLLBUbX1Eb1+/U8KtEnn9w8Jol7lI8VLnp93zl1XW08QkWh8dudUSX7eqpl4u2Hax+AiDOlFNSgzD2YzTLCeQT66kWgoJZnGSwU1uqululssat6lhX+cMaK3aAuyRy4e8lv6iYRDilpLi7Mcq5QKt2Icoolsqa+S0tGfCvIKXXCz4yZTTFNelK/p81ARRSSiQvR7+T3PUtup5PWggHUap9hdzRybHGLnaHjO+hBRTTZ5NGyBPF9ImpPiCTcVnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kvYG36sDU2hdu8ouZWIl90XkRWHIg84wVo+9LXhVAjI=;
- b=kChA9EaRtzpLK7NVPoVujwh5dOOe7hHwp0S61KuNQOU+TO7hInElprq5dHxZmGTtaICIK3zLRHVzqB+6V4CDs85yYnhD7IYcdOlSUET+MCfVS8JuMF/fcxWnhJ5drjuKtD7u47DKSJekaDx8iuYazR0JpCN24WIDmg+4WdMuuk2co8fj350R/QGDahBlBQHyr4RXpCvpDAQWdL2rGniRTq6SSGRl28AEWW7VmbbbSDwWfd5oNNcL8IGIbLMjUvU2BZgAYT/FeXqopr+4bxsI/j02MpBreCpazMmbAec0WytTgFYmJhovgA9rbMLWKHsZNN0XKOk11TXooAc2cdgS7Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kvYG36sDU2hdu8ouZWIl90XkRWHIg84wVo+9LXhVAjI=;
- b=erdSMSFDLyRilyJstduIRcW+RN2EDGkA3Oa18iHmOidlYtbhuv2nrE/DYsCcCpT3N3if2FsboOLaENiTKeH1sJ9snnQfoNQIho7g6Cw9WMYul8AakZs0q2h/byPUaIKBmsQ+gUtX7tv9H7c5kAP642qjw2OkjSFjApgLG2Wt1FU=
-Received: from DS7PR03CA0057.namprd03.prod.outlook.com (2603:10b6:5:3b5::32)
- by IA1PR12MB6042.namprd12.prod.outlook.com (2603:10b6:208:3d6::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Wed, 11 Jan
- 2023 06:46:00 +0000
-Received: from DS1PEPF0000E63E.namprd02.prod.outlook.com
- (2603:10b6:5:3b5:cafe::ad) by DS7PR03CA0057.outlook.office365.com
- (2603:10b6:5:3b5::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18 via Frontend
- Transport; Wed, 11 Jan 2023 06:46:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF0000E63E.mail.protection.outlook.com (10.167.17.196) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6002.11 via Frontend Transport; Wed, 11 Jan 2023 06:46:00 +0000
-Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Wed, 11 Jan
- 2023 00:45:55 -0600
-From:   Nikunj A Dadhania <nikunj@amd.com>
-To:     <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
-        <kvm@vger.kernel.org>, <bp@alien8.de>
-CC:     <mingo@redhat.com>, <tglx@linutronix.de>,
-        <dave.hansen@linux.intel.com>, <seanjc@google.com>,
-        <pbonzini@redhat.com>, <thomas.lendacky@amd.com>, <nikunj@amd.com>,
-        <michael.roth@amd.com>, David Rientjes <rientjes@google.com>,
-        <stable@kernel.org>
-Subject: [PATCH v4] x86/sev: Add SEV-SNP guest feature negotiation support
-Date:   Wed, 11 Jan 2023 12:15:22 +0530
-Message-ID: <20230111064522.957859-1-nikunj@amd.com>
-X-Mailer: git-send-email 2.32.0
+        with ESMTP id S235641AbjAKH1u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 02:27:50 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E623331A;
+        Tue, 10 Jan 2023 23:27:47 -0800 (PST)
+Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30B7DoLq009757;
+        Wed, 11 Jan 2023 07:26:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=bJaGhzuZvR6IABqF8ZAnYUhk8yUitqZDm487hDCv2iI=;
+ b=e5l1zoDEzM/oIR9UHwpA1OPByGk/SEZnxOPBF9pnh+eRHiXXF0oces8jr/tKCEoeE7Em
+ XCGNk5jhMt+YWzW/edepOh9im6W4g7EbynW9YxESvPeJJj41Ol2HMQ7pI0q7eCdHehGG
+ 93UY5B21l3oVy3mNsX8gVgx2paAeDoTWvFm9XAx1Ol+kFuEtf8hBE6x6bhPJhPgHlkft
+ 5h4lkIjt+jUPJ88ZtzENaA9xiQhTqIo4RZJk777naFPEFb5xhiEPMG3YAp5yE7nMnpD/
+ CU1sGxIUJwXt5lBWJ43qdjIaZeA08y/ZwSABJkLmi5P0fFcz3zYynW0Kp57/7po1j96A dQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1rhu87ha-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 07:26:33 +0000
+Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30B7I62h022293;
+        Wed, 11 Jan 2023 07:26:32 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1rhu87gx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 07:26:32 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30B54gj2014428;
+        Wed, 11 Jan 2023 07:26:31 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([9.208.130.99])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3n1kv51j16-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 07:26:30 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+        by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30B7QTfo29622816
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Jan 2023 07:26:29 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 171FE58053;
+        Wed, 11 Jan 2023 07:26:29 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D714358043;
+        Wed, 11 Jan 2023 07:26:19 +0000 (GMT)
+Received: from [9.148.12.120] (unknown [9.148.12.120])
+        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 11 Jan 2023 07:26:19 +0000 (GMT)
+Message-ID: <80ed8c14-1e00-166c-0754-42707b568562@linux.ibm.com>
+Date:   Wed, 11 Jan 2023 09:26:18 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000E63E:EE_|IA1PR12MB6042:EE_
-X-MS-Office365-Filtering-Correlation-Id: 08fe61f0-205c-4bcd-484f-08daf39f8048
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lWCkm5lH3G55qjwxdhYETy3YpSJSGqreECzRxKEu+uihsFw3zlXEDWcLxLBguOuke5ieZAIaSwaNO9JBjJC/HzJvx2Fvi9OaARl+3Yh6QlHaMLXldVOixmN0luOitOTH4wu57TAAs7u3yo2dPYLHlF+FLplneFIt7TftfPtBwsPcbEExN3clufGTz0ohs6VfVsGHTMr+PHUvPiv2LvMV9UnWf3T58JmXTNxRK/uYfXkwHM/uRTc5i+I6Fp0mc+cGntENSxukkAgZAD2cGkqUZs5SSGUM/IzFwzu766bKig45SnLh+zWxIYcMM40moxiepAd04UOGpiqLMe3Bn7OcLNWFqQxOEDvobfAHfvCNsBIBfchS33wXrkJGlYi48hOwPZQ70B6+wK0683RAaAQvKqjxPM4BFhxxS2bjqliaytaU4Nw/wtpXSmSVXoT1D4O2/CseuX6RJ0yfi8C716huL5kMtSqCcVgDD4P5JOOEuJ0gwxdKGEgdVAx96AHK5eMeIA5Si/KFfm7k4shg6fjgjA0ANncO8ytF0ygl2TcguenD+KrX0qkpkVvJDKcbWV/dhR5n39Tw+Wlb726m6Ks9nkAHhMU+0mgy/CxHrvbcjEfzUjvu3bolEf0X2SknJoip+Wj2Vi0uYREuJREBcloxBUBIrmK9J3fzy+qZHW69BU7QGVt+HDg5iA295k+GhWF6RGDnf2g0peZaG4IiYn74AesP/XlHaKcJFQr3hjR1N2+3aqub5/VyZ+33STr0Tsl7j/KCil/q7g2SPg2/dlA+4XoxzwBRxrI7yklstv4kIHxewZRWGan6UgUV4YqfGTiq
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(39860400002)(346002)(376002)(451199015)(36840700001)(40470700004)(46966006)(186003)(1076003)(40480700001)(316002)(5660300002)(30864003)(7696005)(16526019)(26005)(966005)(7416002)(478600001)(2616005)(40460700003)(47076005)(110136005)(336012)(4326008)(54906003)(8676002)(70206006)(41300700001)(70586007)(82310400005)(83380400001)(8936002)(36756003)(426003)(6666004)(36860700001)(82740400003)(356005)(2906002)(81166007)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2023 06:46:00.2979
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08fe61f0-205c-4bcd-484f-08daf39f8048
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E63E.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB6042
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
+Content-Language: en-US
+To:     Peter Gonda <pgonda@google.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>
+Cc:     Dionna Amalie Glaze <dionnaglaze@google.com>,
+        Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com, Dov Murik <dovmurik@linux.ibm.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-63-michael.roth@amd.com>
+ <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
+ <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
+ <54ff7326-e3a4-945f-1f60-e73dd8865527@amd.com>
+ <a3ecd9fc-11f8-49b6-09a2-349df815d2cf@linux.ibm.com>
+ <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
+ <CAMkAt6rMwiHoNWLtrdN8g8Ghv8yN8f8fZQBBkXvUdDpdtovPzg@mail.gmail.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+In-Reply-To: <CAMkAt6rMwiHoNWLtrdN8g8Ghv8yN8f8fZQBBkXvUdDpdtovPzg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VM1eKCuyhDEX_d4qbaiVCVOno4JqwtpX
+X-Proofpoint-ORIG-GUID: pdXzmNaWViZBcZNPR3P4d2ZBgKoW_aSW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-11_03,2023-01-10_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ impostorscore=0 priorityscore=1501 mlxlogscore=999 spamscore=0
+ phishscore=0 bulkscore=0 malwarescore=0 suspectscore=0 lowpriorityscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301110054
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The hypervisor can enable various new features (SEV_FEATURES[1:63])
-and start the SNP guest. Some of these features need guest side
-implementation. If any of these features are enabled without guest
-side implementation, the behavior of the SNP guest will be undefined.
-The SNP guest boot may fail in a non-obvious way making it difficult
-to debug.
+Hi Peter,
 
-Instead of allowing the guest to continue and have it fail randomly
-later, detect this early and fail gracefully.
+On 10/01/2023 17:23, Peter Gonda wrote:
+> On Tue, Jan 10, 2023 at 8:10 AM Tom Lendacky <thomas.lendacky@amd.com> wrote:
+>>
+>> On 1/10/23 01:10, Dov Murik wrote:
+>>> Hi Tom,
+>>>
+>>> On 10/01/2023 0:27, Tom Lendacky wrote:
+>>>> On 1/9/23 10:55, Dionna Amalie Glaze wrote:
+>>>>>>> +
+>>>>>>> +static int snp_set_instance_certs(struct kvm *kvm, struct
+>>>>>>> kvm_sev_cmd *argp)
+>>>>>>> +{
+>>>>>> [...]
+>>>>>>
+>>>>>> Here we set the length to the page-aligned value, but we copy only
+>>>>>> params.cert_len bytes.  If there are two subsequent
+>>>>>> snp_set_instance_certs() calls where the second one has a shorter
+>>>>>> length, we might "keep" some leftover bytes from the first call.
+>>>>>>
+>>>>>> Consider:
+>>>>>> 1. snp_set_instance_certs(certs_addr point to "AAA...", certs_len=8192)
+>>>>>> 2. snp_set_instance_certs(certs_addr point to "BBB...", certs_len=4097)
+>>>>>>
+>>>>>> If I understand correctly, on the second call we'll copy 4097 "BBB..."
+>>>>>> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
+>>>>>> 1) & PAGE_MASK which will be 8192.
+>>>>>>
+>>>>>> Later when fetching the certs (for the extended report or in
+>>>>>> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
+>>>>>> filled with 4097 BBBs and 4095 leftover AAAs.
+>>>>>>
+>>>>>> Maybe zero sev->snp_certs_data entirely before writing to it?
+>>>>>>
+>>>>>
+>>>>> Yes, I agree it should be zeroed, at least if the previous length is
+>>>>> greater than the new length. Good catch.
+>>>>>
+>>>>>
+>>>>>> Related question (not only for this patch) regarding snp_certs_data
+>>>>>> (host or per-instance): why is its size page-aligned at all? why is it
+>>>>>> limited by 16KB or 20KB? If I understand correctly, for SNP, this buffer
+>>>>>> is never sent to the PSP.
+>>>>>>
+>>>>>
+>>>>> The buffer is meant to be copied into the guest driver following the
+>>>>> GHCB extended guest request protocol. The data to copy back are
+>>>>> expected to be in 4K page granularity.
+>>>>
+>>>> I don't think the data has to be in 4K page granularity. Why do you
+>>>> think it does?
+>>>>
+>>>
+>>> I looked at AMD publication 56421 SEV-ES Guest-Hypervisor Communication
+>>> Block Standardization (July 2022), page 37.  The table says:
+>>>
+>>> --------------
+>>>
+>>> NAE Event: SNP Extended Guest Request
+>>>
+>>> Notes:
+>>>
+>>> RAX will have the guest physical address of the page(s) to hold returned
+>>> data
+>>>
+>>> RBX
+>>> State to Hypervisor: will contain the number of guest contiguous
+>>> pages supplied to hold returned data
+>>> State from Hypervisor: on error will contain the number of guest
+>>> contiguous pages required to hold the data to be returned
+>>>
+>>> ...
+>>>
+>>> The request page, response page and data page(s) must be assigned to the
+>>> hypervisor (shared).
+>>>
+>>> --------------
+>>>
+>>>
+>>> According to this spec, it looks like the sizes are communicated as
+>>> number of pages in RBX.  So the data should start at a 4KB alignment
+>>> (this is verified in snp_handle_ext_guest_request()) and its length
+>>> should be 4KB-aligned, as Dionna noted.
+>>
+>> That only indicates how many pages are required to hold the data, but the
+>> hypervisor only has to copy however much data is present. If the data is
+>> 20 bytes, then you only have to copy 20 bytes. If the user supplied 0 for
+>> the number of pages, then the code returns 1 in RBX to indicate that one
+>> page is required to hold the 20 bytes.
+>>
+>>>
+>>> I see no reason (in the spec and in the kernel code) for the data length
+>>> to be limited to 16KB (SEV_FW_BLOB_MAX_SIZE) but I might be missing some
+>>> flow because Dionna ran into this limit.
+>>
+>> Correct, there is no limit. I believe that SEV_FW_BLOB_MAX_SIZE is a way
+>> to keep the memory usage controlled because data is coming from userspace
+>> and it isn't expected that the data would be larger than that.
+>>
+>> I'm not sure if that was in from the start or as a result of a review
+>> comment. Not sure what is the best approach is.
+> 
+> This was discussed a bit in the guest driver changes recently too that
+> SEV_FW_BLOB_MAX_SIZE is used in the guest driver code for the max cert
+> length. We discussed increasing the limit there after fixing the IV
+> reuse issue.
 
-SEV_STATUS MSR indicates features which the hypervisor has enabled.
-While booting, SNP guests should ascertain that all the enabled
-features have guest side implementation. In case any feature is not
-implemented in the guest, the guest terminates booting with GHCB
-protocol Non-Automatic Exit(NAE) termination request event[1]. Populate
-SW_EXITINFO2 with mask of unsupported features that the hypervisor
-can easily report to the user.
+I see it now.
 
-More details in AMD64 APM[2] Vol 2: 15.34.10 SEV_STATUS MSR
+(Joerg, maybe we should add F:drivers/virt/coco/ to the MAINTAINERS list
+so that patches there are hopefully sent to linux-coco?)
 
-[1] https://developer.amd.com/wp-content/resources/56421.pdf
-    4.1.13 Termination Request
 
-[2] https://www.amd.com/system/files/TechDocs/40332_4.05.pdf
+> 
+> Maybe we could introduce SEV_CERT_BLOB_MAX_SIZE here to be more clear
+> there is no firmware based limit? Then we could switch the guest
+> driver to use that too. Dionna confirmed 4 pages is enough for our
+> current usecase, Dov would you recommend something larger to start?
+> 
 
-Fixes: cbd3d4f7c4e5 ("x86/sev: Check SEV-SNP features support")
-CC: Borislav Petkov <bp@alien8.de>
-CC: David Rientjes <rientjes@google.com>
-CC: Michael Roth <michael.roth@amd.com>
-CC: Tom Lendacky <thomas.lendacky@amd.com>
-CC: <stable@kernel.org>
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+Introducing a new constant sounds good to me (and use the same constant
+in the guest driver).
 
----
+I think 4 pages are OK; I also don't see real harm in increasing this
+limit to 1 MB (if the host+guest agree to pass more stuff there, besides
+certificates).  But maybe that's just abusing this channel, and for
+other data we should use other mechanisms (like vsock).
 
-Changes:
-v3:
-* Use GHCB protocol NAE termination event SEV-SNP feature(s)
-  not supported along with SW_EXITINFO2 containing mask of the
-  unsupported features. Need handling of this event on the HV.
-* Add the SNP features check initialize_identity_maps() when the
-  boot GHCB page can be initialized and used.
-* Fixed sphinx warnings in documentation
-
-v2:
-* Updated Documentation/x86/amd-memory-encryption.rst
-* Address review feedback from Boris/Tom
-
-v1:
-* Dropped _ENABLED from the feature bits
-* Use approprate macro/function names and move closer to the function where
-  it is used.
-* More details added to the commit message and comments
-* Fixed compilation issue
----
- Documentation/x86/amd-memory-encryption.rst | 36 +++++++++++++
- arch/x86/boot/compressed/head_64.S          | 10 ++++
- arch/x86/boot/compressed/misc.h             |  2 +
- arch/x86/boot/compressed/sev.c              | 59 +++++++++++++++++++++
- arch/x86/include/asm/msr-index.h            | 20 +++++++
- arch/x86/include/asm/sev-common.h           |  1 +
- arch/x86/include/uapi/asm/svm.h             | 10 ++++
- 7 files changed, 138 insertions(+)
-
-diff --git a/Documentation/x86/amd-memory-encryption.rst b/Documentation/x86/amd-memory-encryption.rst
-index a1940ebe7be5..b3adc39d7735 100644
---- a/Documentation/x86/amd-memory-encryption.rst
-+++ b/Documentation/x86/amd-memory-encryption.rst
-@@ -95,3 +95,39 @@ by supplying mem_encrypt=on on the kernel command line.  However, if BIOS does
- not enable SME, then Linux will not be able to activate memory encryption, even
- if configured to do so by default or the mem_encrypt=on command line parameter
- is specified.
-+
-+Secure Nested Paging (SNP)
-+==========================
-+
-+SEV-SNP introduces new features (SEV_FEATURES[1:63]) which can be enabled
-+by the hypervisor for security enhancements. Some of these features need
-+guest side implementation to function correctly. The below table lists the
-+expected guest behavior with various possible scenarios of guest/hypervisor
-+SNP feature support.
-+
-++-----------------+---------------+---------------+------------------+
-+| Feature Enabled | Guest needs   | Guest has     | Guest boot       |
-+| by the HV       | implementation| implementation| behaviour        |
-++=================+===============+===============+==================+
-+|      No         |      No       |      No       |     Boot         |
-+|                 |               |               |                  |
-++-----------------+---------------+---------------+------------------+
-+|      No         |      Yes      |      No       |     Boot         |
-+|                 |               |               |                  |
-++-----------------+---------------+---------------+------------------+
-+|      No         |      Yes      |      Yes      |     Boot         |
-+|                 |               |               |                  |
-++-----------------+---------------+---------------+------------------+
-+|      Yes        |      No       |      No       | Boot with        |
-+|                 |               |               | feature enabled  |
-++-----------------+---------------+---------------+------------------+
-+|      Yes        |      Yes      |      No       | Graceful boot    |
-+|                 |               |               | failure          |
-++-----------------+---------------+---------------+------------------+
-+|      Yes        |      Yes      |      Yes      | Boot with        |
-+|                 |               |               | feature enabled  |
-++-----------------+---------------+---------------+------------------+
-+
-+More details in AMD64 APM[1] Vol 2: 15.34.10 SEV_STATUS MSR
-+
-+[1] https://www.amd.com/system/files/TechDocs/40332_4.05.pdf
-diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
-index a75712991df3..22037443e958 100644
---- a/arch/x86/boot/compressed/head_64.S
-+++ b/arch/x86/boot/compressed/head_64.S
-@@ -557,6 +557,16 @@ SYM_FUNC_START_LOCAL_NOALIGN(.Lrelocated)
- 	/* Pass boot_params to initialize_identity_maps() */
- 	movq	(%rsp), %rdi
- 	call	initialize_identity_maps
-+
-+#ifdef CONFIG_AMD_MEM_ENCRYPT
-+	/*
-+	 * Now that the required page table and mappings are done, early boot ghcb
-+	 * page can be setup and used. Check for SNP guest/HV feature compatibility
-+	 * and terminate the guest providing exit information in boot ghcb.
-+	 */
-+	call	snp_check_features
-+#endif
-+
- 	popq	%rsi
- 
- /*
-diff --git a/arch/x86/boot/compressed/misc.h b/arch/x86/boot/compressed/misc.h
-index 62208ec04ca4..0bc3639be1f8 100644
---- a/arch/x86/boot/compressed/misc.h
-+++ b/arch/x86/boot/compressed/misc.h
-@@ -126,6 +126,7 @@ static inline void console_init(void)
- 
- #ifdef CONFIG_AMD_MEM_ENCRYPT
- void sev_enable(struct boot_params *bp);
-+void snp_check_features(void);
- void sev_es_shutdown_ghcb(void);
- extern bool sev_es_check_ghcb_fault(unsigned long address);
- void snp_set_page_private(unsigned long paddr);
-@@ -143,6 +144,7 @@ static inline void sev_enable(struct boot_params *bp)
- 	if (bp)
- 		bp->cc_blob_address = 0;
- }
-+static void snp_check_features(void) { }
- static inline void sev_es_shutdown_ghcb(void) { }
- static inline bool sev_es_check_ghcb_fault(unsigned long address)
- {
-diff --git a/arch/x86/boot/compressed/sev.c b/arch/x86/boot/compressed/sev.c
-index c93930d5ccbd..a26a5d6949c3 100644
---- a/arch/x86/boot/compressed/sev.c
-+++ b/arch/x86/boot/compressed/sev.c
-@@ -270,6 +270,65 @@ static void enforce_vmpl0(void)
- 		sev_es_terminate(SEV_TERM_SET_LINUX, GHCB_TERM_NOT_VMPL0);
- }
- 
-+/*
-+ * SNP_FEATURES_IMPL_REQ is the mask of SNP features that will need
-+ * guest side implementation for proper functioning of the guest. If any
-+ * of these features are enabled in the hypervisor but are lacking guest
-+ * side implementation, the behavior of the guest will be undefined. The
-+ * guest could fail in non-obvious way making it difficult to debug.
-+ *
-+ * As the behavior of reserved feature bits is unknown to be on the
-+ * safe side add them to the required features mask.
-+ */
-+#define SNP_FEATURES_IMPL_REQ	(MSR_AMD64_SNP_VTOM |			\
-+				MSR_AMD64_SNP_REFLECT_VC |		\
-+				MSR_AMD64_SNP_RESTRICTED_INJ |		\
-+				MSR_AMD64_SNP_ALT_INJ |			\
-+				MSR_AMD64_SNP_DEBUG_SWAP |		\
-+				MSR_AMD64_SNP_VMPL_SSS |		\
-+				MSR_AMD64_SNP_SECURE_TSC |		\
-+				MSR_AMD64_SNP_VMGEXIT_PARAM |		\
-+				MSR_AMD64_SNP_VMSA_REG_PROTECTION |	\
-+				MSR_AMD64_SNP_RESERVED_BIT13 |		\
-+				MSR_AMD64_SNP_RESERVED_BIT15 |		\
-+				MSR_AMD64_SNP_RESERVED_MASK)
-+
-+/*
-+ * SNP_FEATURES_PRESENT is the mask of SNP features that are implemented
-+ * by the guest kernel. As and when a new feature is implemented in the
-+ * guest kernel, a corresponding bit should be added to the mask.
-+ */
-+#define SNP_FEATURES_PRESENT (0)
-+
-+void snp_check_features(void)
-+{
-+	u64 unsupported_features;
-+
-+	if (!(sev_status & MSR_AMD64_SEV_SNP_ENABLED))
-+		return;
-+
-+	/*
-+	 * Terminate the boot if hypervisor has enabled any feature
-+	 * lacking guest side implementation.
-+	 */
-+	unsupported_features = sev_status & SNP_FEATURES_IMPL_REQ & ~SNP_FEATURES_PRESENT;
-+	if (unsupported_features) {
-+		u64 exit_info_1 = SVM_VMGEXIT_TERM_REASON(SVM_VMGEXIT_TERM_REASON_SET,
-+							  SVM_VMGEXIT_TERM_SNP_FEAT_UNSUPPORTED);
-+
-+		if (!boot_ghcb && !early_setup_ghcb())
-+			sev_es_terminate(SEV_TERM_SET_GEN, GHCB_SNP_FEAT_NOT_IMPLEMENTED);
-+
-+		ghcb_set_sw_exit_code(boot_ghcb, SVM_VMGEXIT_TERM_REQUEST);
-+		ghcb_set_sw_exit_info_1(boot_ghcb, exit_info_1);
-+		ghcb_set_sw_exit_info_2(boot_ghcb, unsupported_features);
-+		sev_es_wr_ghcb_msr(__pa(boot_ghcb));
-+		VMGEXIT();
-+		while (true)
-+			asm volatile("hlt\n" : : : "memory");
-+	}
-+}
-+
- void sev_enable(struct boot_params *bp)
- {
- 	unsigned int eax, ebx, ecx, edx;
-diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
-index 37ff47552bcb..d3fe82c5d6b6 100644
---- a/arch/x86/include/asm/msr-index.h
-+++ b/arch/x86/include/asm/msr-index.h
-@@ -566,6 +566,26 @@
- #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
- #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
- 
-+/* SNP feature bits enabled by the hypervisor */
-+#define MSR_AMD64_SNP_VTOM			BIT_ULL(3)
-+#define MSR_AMD64_SNP_REFLECT_VC		BIT_ULL(4)
-+#define MSR_AMD64_SNP_RESTRICTED_INJ		BIT_ULL(5)
-+#define MSR_AMD64_SNP_ALT_INJ			BIT_ULL(6)
-+#define MSR_AMD64_SNP_DEBUG_SWAP		BIT_ULL(7)
-+#define MSR_AMD64_SNP_PREVENT_HOST_IBS		BIT_ULL(8)
-+#define MSR_AMD64_SNP_BTB_ISOLATION		BIT_ULL(9)
-+#define MSR_AMD64_SNP_VMPL_SSS			BIT_ULL(10)
-+#define MSR_AMD64_SNP_SECURE_TSC		BIT_ULL(11)
-+#define MSR_AMD64_SNP_VMGEXIT_PARAM		BIT_ULL(12)
-+#define MSR_AMD64_SNP_IBS_VIRT			BIT_ULL(14)
-+#define MSR_AMD64_SNP_VMSA_REG_PROTECTION	BIT_ULL(16)
-+#define MSR_AMD64_SNP_SMT_PROTECTION		BIT_ULL(17)
-+
-+/* SNP feature bits reserved for future use. */
-+#define MSR_AMD64_SNP_RESERVED_BIT13		BIT_ULL(13)
-+#define MSR_AMD64_SNP_RESERVED_BIT15		BIT_ULL(15)
-+#define MSR_AMD64_SNP_RESERVED_MASK		GENMASK_ULL(63, 18)
-+
- #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
- 
- /* AMD Collaborative Processor Performance Control MSRs */
-diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/sev-common.h
-index b8357d6ecd47..db60cbb01b31 100644
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@ -148,6 +148,7 @@ struct snp_psc_desc {
- #define GHCB_SEV_ES_GEN_REQ		0
- #define GHCB_SEV_ES_PROT_UNSUPPORTED	1
- #define GHCB_SNP_UNSUPPORTED		2
-+#define GHCB_SNP_FEAT_NOT_IMPLEMENTED	3
- 
- /* Linux-specific reason codes (used with reason set 1) */
- #define SEV_TERM_SET_LINUX		1
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index f69c168391aa..5bd81adfb114 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -116,6 +116,16 @@
- #define SVM_VMGEXIT_AP_CREATE			1
- #define SVM_VMGEXIT_AP_DESTROY			2
- #define SVM_VMGEXIT_HV_FEATURES			0x8000fffd
-+#define SVM_VMGEXIT_TERM_REQUEST		0x8000fffe
-+#define SVM_VMGEXIT_TERM_REASON_SET		0
-+#define SVM_VMGEXIT_TERM_GENERAL		0
-+#define SVM_VMGEXIT_TERM_SEVES			1
-+#define SVM_VMGEXIT_TERM_SNP_FEAT_UNSUPPORTED	2
-+#define SVM_VMGEXIT_TERM_REASON(reason_set, reason_code)	\
-+	/* SW_EXITINFO1[3:0] */					\
-+	(((((u64)reason_set) &  0xf)) |				\
-+	/* SW_EXITINFO1[11:4] */				\
-+	((((u64)reason_code) & 0xff) << 4))
- #define SVM_VMGEXIT_UNSUPPORTED_EVENT		0x8000ffff
- 
- /* Exit code reserved for hypervisor/software use */
--- 
-2.32.0
+-Dov
 
