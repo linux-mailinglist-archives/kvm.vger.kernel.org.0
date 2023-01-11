@@ -2,102 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3880C66560C
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 09:28:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 374E9665619
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 09:31:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231788AbjAKI1p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 03:27:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43340 "EHLO
+        id S232055AbjAKIb2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 03:31:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238052AbjAKI1F (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 03:27:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 672EF6557
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 00:25:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673425520;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S229932AbjAKIbZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 03:31:25 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFE16FCE
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 00:31:23 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 7394916F67;
+        Wed, 11 Jan 2023 08:31:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1673425882; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Z9BqbleyIskxpRXIgDkvfJFpA17h9Qu7BSswmKTjpxs=;
-        b=Vp011uveWAFidbpxSQeikU0aUoLMQDXzeHzV9YnDW10AFzZnYisWLkZCAkHFsyTQ2BKb7I
-        X08wKZtGA4zSb5bMM8AwzaUiQ6eFSagl+06OLST1hyi5ZEmBhWHU4gNSGQdqlNfZqKEn+a
-        vhqRB04VUqPK/ER2V4qgD/62H1D2mek=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-150-iWuyHlwNNk-aMt3aGx4HMw-1; Wed, 11 Jan 2023 03:25:19 -0500
-X-MC-Unique: iWuyHlwNNk-aMt3aGx4HMw-1
-Received: by mail-qv1-f69.google.com with SMTP id r10-20020ad4522a000000b004d28fcbfe17so8025424qvq.4
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 00:25:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z9BqbleyIskxpRXIgDkvfJFpA17h9Qu7BSswmKTjpxs=;
-        b=A2zSK9T50qN1baNyiL+peATGTtSatIOYDeEX8pusN5AVJJJjfRAlNK9m1/DPi9R68q
-         3COz4yVGTA2Cwk4zv8WIUDwLAib2WofA71E4ee5j2UCqpoPjT45KiFnLaqEHwqA/nC+N
-         i7G9zzl1DlSrRkq+VmfZ9OXhdiUOHo5tDDFf/pWCGAEcn9mthB0HWbmUKbFL/+oczhSj
-         tmh3gOTFICf3ZgGm197XrhcnkUkZ2fnvRPqbacF5gNNMx20UGSG4Iwx9HlhBDvvBNXOj
-         apOruswwi6RAGlXy1YVPk9JTH8mpiifRMf8Ra3VRL7POzm06EbuWi5wFoYpykdEb8BzD
-         ci8g==
-X-Gm-Message-State: AFqh2krhA2qJxyymge7To7k9GW9WfiC++v8+Haz+MNWClZZLqscxNR03
-        aeh+NDLuusIHcs535yUI6scx+vgb69p6NS/uJqdbQjLcng/2b9gN8pvyW/x8gQJrhOvKU9b4Rpn
-        aQ02Zippj4/OC
-X-Received: by 2002:ac8:6f19:0:b0:3a9:84bd:7cc5 with SMTP id bs25-20020ac86f19000000b003a984bd7cc5mr109481132qtb.39.1673425518776;
-        Wed, 11 Jan 2023 00:25:18 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvypWklvz3km9uYoBB0qv32xq21YlcTjpjh3KzgK6avNFjv4jYlLRNPx/BLDFKbo966A5oWEQ==
-X-Received: by 2002:ac8:6f19:0:b0:3a9:84bd:7cc5 with SMTP id bs25-20020ac86f19000000b003a984bd7cc5mr109481108qtb.39.1673425518406;
-        Wed, 11 Jan 2023 00:25:18 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-244.retail.telecomitalia.it. [79.46.200.244])
-        by smtp.gmail.com with ESMTPSA id c8-20020ac86608000000b003a4f435e381sm7226084qtp.18.2023.01.11.00.25.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 00:25:17 -0800 (PST)
-Date:   Wed, 11 Jan 2023 09:25:13 +0100
-From:   Stefano Garzarella <sgarzare@redhat.com>
-To:     liming.wu@jaguarmicro.com
-Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, 398776277@qq.com
-Subject: Re: [PATCH] vhost: remove unused paramete
-Message-ID: <20230111082513.weu6go5k2nyfvkjh@sgarzare-redhat>
-References: <20230110024445.303-1-liming.wu@jaguarmicro.com>
+        bh=oub3vFhESlSmnZ3siI+/gjjg/Dwj1NqJPNyjl/9KfIQ=;
+        b=cmuaLl7/52pfKxXUc/CBXEiqKnPqLpQWCowccOGASSIbzhEdDU1PcadMlGNfelOEeS253n
+        ieQeV/pM1Hoiy2NrnFHJWhXDGxSQSohTJtBMOF6FbkZpu4vJMh4i2+Kn9jgKphqnyao8NA
+        Al0ZewKR17ODODZJfuuTf6aiYiT5Oag=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 5215113591;
+        Wed, 11 Jan 2023 08:31:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 9cEiEdpzvmOURgAAMHmgww
+        (envelope-from <mhocko@suse.com>); Wed, 11 Jan 2023 08:31:22 +0000
+Date:   Wed, 11 Jan 2023 09:31:21 +0100
+From:   Michal Hocko <mhocko@suse.com>
+To:     Jiri Slaby <jirislaby@kernel.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        mm <linux-mm@kvack.org>, yuzhao@google.com,
+        Vlastimil Babka <vbabka@suse.cz>, shy828301@gmail.com
+Subject: Re: Stalls in qemu with host running 6.1 (everything stuck at
+ mmap_read_lock())
+Message-ID: <Y75z2Ran1+Iw+L6+@dhcp22.suse.cz>
+References: <b8017e09-f336-3035-8344-c549086c2340@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230110024445.303-1-liming.wu@jaguarmicro.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <b8017e09-f336-3035-8344-c549086c2340@kernel.org>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 10:44:45AM +0800, liming.wu@jaguarmicro.com wrote:
->From: Liming Wu <liming.wu@jaguarmicro.com>
->
->"enabled" is defined in vhost_init_device_iotlb,
->but it is never used. Let's remove it.
->
->Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
->---
-> drivers/vhost/net.c   | 2 +-
-> drivers/vhost/vhost.c | 2 +-
-> drivers/vhost/vhost.h | 2 +-
-> drivers/vhost/vsock.c | 2 +-
-> 4 files changed, 4 insertions(+), 4 deletions(-)
+On Wed 11-01-23 09:00:04, Jiri Slaby wrote:
+> Hi,
+> 
+> after I updated the host from 6.0 to 6.1 (being at 6.1.4 ATM), my qemu VMs
+> started stalling (and the host at the same point too). It doesn't happen
+> right after boot, maybe a suspend-resume cycle is needed (or longer uptime,
+> or a couple of qemu VM starts, or ...). But when it happens, it happens all
+> the time till the next reboot.
+> 
+> Older guest's kernels/distros are affected as well as Win10.
+> 
+> In guests, I see for example stalls in memset_orig or
+> smp_call_function_many_cond -- traces below.
+> 
+> qemu-kvm-7.1.0-13.34.x86_64 from openSUSE.
+> 
+> It's quite interesting that:
+>   $ cat /proc/<PID_OF_QEMU>/cmdline
+> is stuck at read:
+> 
+> openat(AT_FDCWD, "/proc/12239/cmdline", O_RDONLY) = 3
+> newfstatat(3, "", {st_mode=S_IFREG|0444, st_size=0, ...}, AT_EMPTY_PATH) = 0
+> fadvise64(3, 0, 0, POSIX_FADV_SEQUENTIAL) = 0
+> mmap(NULL, 139264, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) =
+> 0x7f22f0487000
+> read(3, ^C^C^C^\^C
 
-Little typo in the title s/paramete/parameter.
+This will require mmap_lock for read as well. And that is blocked
+because there is a pending writer as well.
+[...]
+ 
+> Is this known? Any idea how to debug this?
 
-A part of that, the patch LGTM:
+I would recommend taking a crashdump when the host is in that state and
+examine the state of the blocked lock. Dump will hopefully give you more
+information about potential holder of the lock. If it is blocked on
+writer then you should get the owner task. If it is in read mode then
+this can get more tricky because the exact owner might be different from
+the recorded one. Anyway the full list of tasks and their backtraces
+could tell more.
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+HTH
 
-Thanks,
-Stefano
-
+-- 
+Michal Hocko
+SUSE Labs
