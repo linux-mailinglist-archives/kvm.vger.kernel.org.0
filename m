@@ -2,73 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8E25A665253
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 04:26:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 90CBD6652AC
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 05:10:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231201AbjAKD0r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 22:26:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37236 "EHLO
+        id S234853AbjAKEK0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 23:10:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232833AbjAKD0p (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 22:26:45 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B4E264B
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 19:26:43 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id a30so10423790pfr.6
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 19:26:43 -0800 (PST)
+        with ESMTP id S231952AbjAKEKV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 23:10:21 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17DE9F584
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 20:10:19 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id o8-20020a17090a9f8800b00223de0364beso18661258pjp.4
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 20:10:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=igel-co-jp.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=alncDRdItzGVC9H0nB2eZTIUdgfc1NKFCap3fed5pds=;
-        b=izrilxH9gs69Tz2WgBhBHAOEXPd+T4IF7O/CMa7SyYp2QGRWxPzhxVkJ+wfJMx00MD
-         tvv036Af6sjwa+nP5DEZ6RqOob4aQpgI8fq+CnV2StFy9fDUcc9cmvGlU2lilVhRng6/
-         Ft+V58ocfNByYVhXN6O1/8YKqLLOD+rvPA9HZWo8RWDNt+5QQ4AdYg+TokKoQt8IBTNz
-         +KbvRdpjnbXkDE7SaIT2906Xlo1FVl9QCwQAV09+o4N7kU0Pjn8SbMiZ08lRekNTQdW+
-         se8YF6It/blHmhdh/2cg+FcGFzWIZ6Y6fHufzonT76GlZSoZ9eWqqiz4dHRw+viitZla
-         yBfw==
+        bh=InTV3x0nIeGund/c1wpkRJXAGYhtxh6bQyY7aWznSlo=;
+        b=c2iRBpyISw5H7ycUbRecfsa6iOX/KfAzCfk4wdt2xQkIreYeVLgA+LkekNGV2jgMi3
+         J2pTHTyeVY88xeNh3VSG0WmAi6Y+NL3jUWFG0QrXP+ZweEnDTZZDDwJ3hpzO+tg8T9bk
+         PLMToXokdE12d3qcHYfgr0sfaUmaoFPCA3j6PxjTKxf47WeCBkUC21wIme54O8zuSbK1
+         RT5IOnHCizrs81R7+Jzdmr1yKW+TnmvqgmMCsxbTwc7xSMt58Lq2jn2JcfUiVqaD/QR/
+         6cGkHOwDEnzvD1wdjXeppFZKuuB9+Dc3mbTGBMY6zdELlLvl4iTfDBOKtJH0kowT6W0o
+         bpTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=alncDRdItzGVC9H0nB2eZTIUdgfc1NKFCap3fed5pds=;
-        b=Peiw/t3eb7VSO9nt5Am/iQvVfoEnzDnQEwOoF2rL9b5nAoHjZBeuNQPLHRZ31y415m
-         nN7QK5mkH+xcwGmsUNBwoYztbY6lSGz9w/MlgBRfVjWdnBAGtCxws4cXFkjvMO+mMT4c
-         QdJqDRLCuKIq3MbNE3JOkF7pPOanbmK2dmTe/yHoTDaRUmFVoRfJOUoXFSrJkbSImmQL
-         UvbOoRdwVazddI1TOa7Iaehev0daeN32n8Avac6P7rh+2Ng6UJHSGWyYtjulYwSKzPZ9
-         OPsnUysSRvKdkbnt7sd8wy9822YzvyMMLJ5nu+7IeKeIMhn3mWXtg5vLkpg26h42oDZy
-         l7rA==
-X-Gm-Message-State: AFqh2kpqHxXuV+KpPWZIMjlTIY9v9E/xMbFT4DIAZFqBQb6/ppp5jkqc
-        0O8dHnaleCVK7ZCxxT/zWsEVdw==
-X-Google-Smtp-Source: AMrXdXtPEgDn7RC/sWl6ItzRrxeRyhA6Zhw0n5qUmtAeOTEJJiIJPYEoz6/9OW7xMf2mBV7popeSOw==
-X-Received: by 2002:a05:6a00:1813:b0:582:a492:f302 with SMTP id y19-20020a056a00181300b00582a492f302mr34855118pfa.16.1673407603186;
-        Tue, 10 Jan 2023 19:26:43 -0800 (PST)
+        bh=InTV3x0nIeGund/c1wpkRJXAGYhtxh6bQyY7aWznSlo=;
+        b=LivOaEd0TunwDmqdX96PGo7lY1BTOaRgWm2iSPvtjeIHtMSNs90qWQS3ntMCvob4rw
+         O48VKVgLSeHKvp4cJbjYNzn8/R9kADFpkhnfOn6nyqGQclGNcumxZz2qcHKpkCCdemZB
+         WGKEkIXNtXwgCiInGpYFMGpj4UCi5BmKyIQ+JZ2OiuREYRXsL2Aa9mcHRk1MF7qeRxRJ
+         UbkFqA5YFMoG/AwWHCVWweE1NxveZ3fVO4QNY7nJ55OpDJ6VIMHfLKEuazP07KPcWfob
+         1+nQtLDYki5KKEU2kgAHrstbQk6Icwzvuau55RBkAuzcJFgts7VzsppfTNC21uORb8vJ
+         7U8g==
+X-Gm-Message-State: AFqh2kq78ozhBxZFQEd1rU6gRBC54IAkFVPMCXUve8LFbx6rx7Kv59lD
+        sAbn2MtVUjjjte8Nj/uGktV0ww==
+X-Google-Smtp-Source: AMrXdXtWl7YHdgwUhpAvDq5+RjhyNXwkTv0/Zqz+qGGtk8BujXt8P0WKoUQIJlfis7zDPGtaUk3mZA==
+X-Received: by 2002:a17:902:8688:b0:192:fc9c:a238 with SMTP id g8-20020a170902868800b00192fc9ca238mr19906362plo.66.1673410218512;
+        Tue, 10 Jan 2023 20:10:18 -0800 (PST)
 Received: from [10.16.128.218] (napt.igel.co.jp. [219.106.231.132])
-        by smtp.gmail.com with ESMTPSA id t2-20020aa79462000000b00582a224e738sm8820334pfq.63.2023.01.10.19.26.40
+        by smtp.gmail.com with ESMTPSA id j14-20020a170903024e00b00189667acf19sm8914775plh.95.2023.01.10.20.10.16
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 Jan 2023 19:26:42 -0800 (PST)
-Message-ID: <18a0a7cd-0601-0ff6-12d7-353819692155@igel.co.jp>
-Date:   Wed, 11 Jan 2023 12:26:38 +0900
+        Tue, 10 Jan 2023 20:10:18 -0800 (PST)
+Message-ID: <28b421af-838d-e70a-ec95-2f14f21e3a90@igel.co.jp>
+Date:   Wed, 11 Jan 2023 13:10:15 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
  Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [RFC PATCH 2/9] vringh: remove vringh_iov and unite to
- vringh_kiov
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+Subject: Re: [RFC PATCH 4/9] vringh: unify the APIs for all accessors
+Content-Language: en-US
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
         Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
         virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
         linux-kernel@vger.kernel.org
 References: <20221227022528.609839-1-mie@igel.co.jp>
- <20221227022528.609839-3-mie@igel.co.jp>
- <CACGkMEtAaYpuZtS0gx_m931nFzcvqSNK9BhvUZH_tZXTzjgQCg@mail.gmail.com>
- <CANXvt5rfXDYa0nLzKW5-Q-hjhw-19npXVneqBO1TcsariU6rWg@mail.gmail.com>
- <CACGkMEvmZ5MEX4WMa3JhzT404C2uhsNk0nnkYBRtvLPhNTSzHQ@mail.gmail.com>
-Content-Language: en-US
+ <20221227022528.609839-5-mie@igel.co.jp>
+ <20221227020007-mutt-send-email-mst@kernel.org>
+ <CANXvt5pRy-i7=_ikNkZPp2HcRmWZYNJYpjO_ieBJJVc90nds+A@mail.gmail.com>
+ <CANXvt5qUUOqB1CVgAk5KyL9sV+NsnJSKhatvdV12jH5=kBjjJw@mail.gmail.com>
+ <20221227075332-mutt-send-email-mst@kernel.org>
+ <CANXvt5qTbGi7p5Y7eVSjyHJ7MLjiMgGKyAM-LEkJZXvhtSh7vw@mail.gmail.com>
+ <20221228021354-mutt-send-email-mst@kernel.org>
 From:   Shunsuke Mie <mie@igel.co.jp>
-In-Reply-To: <CACGkMEvmZ5MEX4WMa3JhzT404C2uhsNk0nnkYBRtvLPhNTSzHQ@mail.gmail.com>
+In-Reply-To: <20221228021354-mutt-send-email-mst@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -81,202 +83,271 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
-On 2022/12/28 15:36, Jason Wang wrote:
-> On Tue, Dec 27, 2022 at 3:06 PM Shunsuke Mie <mie@igel.co.jp> wrote:
->> 2022年12月27日(火) 15:04 Jason Wang <jasowang@redhat.com>:
->>> On Tue, Dec 27, 2022 at 10:25 AM Shunsuke Mie <mie@igel.co.jp> wrote:
->>>> struct vringh_iov is defined to hold userland addresses. However, to use
->>>> common function, __vring_iov, finally the vringh_iov converts to the
->>>> vringh_kiov with simple cast. It includes compile time check code to make
->>>> sure it can be cast correctly.
+On 2022/12/28 16:20, Michael S. Tsirkin wrote:
+> On Wed, Dec 28, 2022 at 11:24:10AM +0900, Shunsuke Mie wrote:
+>> 2022年12月27日(火) 23:37 Michael S. Tsirkin <mst@redhat.com>:
+>>> On Tue, Dec 27, 2022 at 07:22:36PM +0900, Shunsuke Mie wrote:
+>>>> 2022年12月27日(火) 16:49 Shunsuke Mie <mie@igel.co.jp>:
+>>>>> 2022年12月27日(火) 16:04 Michael S. Tsirkin <mst@redhat.com>:
+>>>>>> On Tue, Dec 27, 2022 at 11:25:26AM +0900, Shunsuke Mie wrote:
+>>>>>>> Each vringh memory accessors that are for user, kern and iotlb has own
+>>>>>>> interfaces that calls common code. But some codes are duplicated and that
+>>>>>>> becomes loss extendability.
+>>>>>>>
+>>>>>>> Introduce a struct vringh_ops and provide a common APIs for all accessors.
+>>>>>>> It can bee easily extended vringh code for new memory accessor and
+>>>>>>> simplified a caller code.
+>>>>>>>
+>>>>>>> Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
+>>>>>>> ---
+>>>>>>>   drivers/vhost/vringh.c | 667 +++++++++++------------------------------
+>>>>>>>   include/linux/vringh.h | 100 +++---
+>>>>>>>   2 files changed, 225 insertions(+), 542 deletions(-)
+>>>>>>>
+>>>>>>> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
+>>>>>>> index aa3cd27d2384..ebfd3644a1a3 100644
+>>>>>>> --- a/drivers/vhost/vringh.c
+>>>>>>> +++ b/drivers/vhost/vringh.c
+>>>>>>> @@ -35,15 +35,12 @@ static __printf(1,2) __cold void vringh_bad(const char *fmt, ...)
+>>>>>>>   }
+>>>>>>>
+>>>>>>>   /* Returns vring->num if empty, -ve on error. */
+>>>>>>> -static inline int __vringh_get_head(const struct vringh *vrh,
+>>>>>>> -                                 int (*getu16)(const struct vringh *vrh,
+>>>>>>> -                                               u16 *val, const __virtio16 *p),
+>>>>>>> -                                 u16 *last_avail_idx)
+>>>>>>> +static inline int __vringh_get_head(const struct vringh *vrh, u16 *last_avail_idx)
+>>>>>>>   {
+>>>>>>>        u16 avail_idx, i, head;
+>>>>>>>        int err;
+>>>>>>>
+>>>>>>> -     err = getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
+>>>>>>> +     err = vrh->ops.getu16(vrh, &avail_idx, &vrh->vring.avail->idx);
+>>>>>>>        if (err) {
+>>>>>>>                vringh_bad("Failed to access avail idx at %p",
+>>>>>>>                           &vrh->vring.avail->idx);
+>>>>>> I like that this patch removes more lines of code than it adds.
+>>>>>>
+>>>>>> However one of the design points of vringh abstractions is that they were
+>>>>>> carefully written to be very low overhead.
+>>>>>> This is why we are passing function pointers to inline functions -
+>>>>>> compiler can optimize that out.
+>>>>>>
+>>>>>> I think that introducing ops indirect functions calls here is going to break
+>>>>>> these assumptions and hurt performance.
+>>>>>> Unless compiler can somehow figure it out and optimize?
+>>>>>> I don't see how it's possible with ops pointer in memory
+>>>>>> but maybe I'm wrong.
+>>>>> I think your concern is correct. I have to understand the compiler
+>>>>> optimization and redesign this approach If it is needed.
+>>>>>> Was any effort taken to test effect of these patches on performance?
+>>>>> I just tested vringh_test and already faced little performance reduction.
+>>>>> I have to investigate that, as you said.
+>>>> I attempted to test with perf. I found that the performance of patched code
+>>>> is almost the same as the upstream one. However, I have to investigate way
+>>>> this patch leads to this result, also the profiling should be run on
+>>>> more powerful
+>>>> machines too.
 >>>>
->>>> To simplify the code, this patch removes the struct vringh_iov and unifies
->>>> APIs to struct vringh_kiov.
+>>>> environment:
+>>>> $ grep 'model name' /proc/cpuinfo
+>>>> model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+>>>> model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+>>>> model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
+>>>> model name      : Intel(R) Core(TM) i3-7020U CPU @ 2.30GHz
 >>>>
->>>> Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
->>> While at this, I wonder if we need to go further, that is, switch to
->>> using an iov iterator instead of a vringh customized one.
->> I didn't see the iov iterator yet, thank you for informing me.
->> Is that iov_iter? https://lwn.net/Articles/625077/
-> Exactly.
+>>>> results:
+>>>> * for patched code
+>>>>   Performance counter stats for 'nice -n -20 ./vringh_test_patched
+>>>> --parallel --eventidx --fast-vringh --indirect --virtio-1' (20 runs):
+>>>>
+>>>>            3,028.05 msec task-clock                #    0.995 CPUs
+>>>> utilized            ( +-  0.12% )
+>>>>              78,150      context-switches          #   25.691 K/sec
+>>>>                 ( +-  0.00% )
+>>>>                   5      cpu-migrations            #    1.644 /sec
+>>>>                 ( +-  3.33% )
+>>>>                 190      page-faults               #   62.461 /sec
+>>>>                 ( +-  0.41% )
+>>>>       6,919,025,222      cycles                    #    2.275 GHz
+>>>>                 ( +-  0.13% )
+>>>>       8,990,220,160      instructions              #    1.29  insn per
+>>>> cycle           ( +-  0.04% )
+>>>>       1,788,326,786      branches                  #  587.899 M/sec
+>>>>                 ( +-  0.05% )
+>>>>           4,557,398      branch-misses             #    0.25% of all
+>>>> branches          ( +-  0.43% )
+>>>>
+>>>>             3.04359 +- 0.00378 seconds time elapsed  ( +-  0.12% )
+>>>>
+>>>> * for upstream code
+>>>>   Performance counter stats for 'nice -n -20 ./vringh_test_base
+>>>> --parallel --eventidx --fast-vringh --indirect --virtio-1' (10 runs):
+>>>>
+>>>>            3,058.41 msec task-clock                #    0.999 CPUs
+>>>> utilized            ( +-  0.14% )
+>>>>              78,149      context-switches          #   25.545 K/sec
+>>>>                 ( +-  0.00% )
+>>>>                   5      cpu-migrations            #    1.634 /sec
+>>>>                 ( +-  2.67% )
+>>>>                 194      page-faults               #   63.414 /sec
+>>>>                 ( +-  0.43% )
+>>>>       6,988,713,963      cycles                    #    2.284 GHz
+>>>>                 ( +-  0.14% )
+>>>>       8,512,533,269      instructions              #    1.22  insn per
+>>>> cycle           ( +-  0.04% )
+>>>>       1,638,375,371      branches                  #  535.549 M/sec
+>>>>                 ( +-  0.05% )
+>>>>           4,428,866      branch-misses             #    0.27% of all
+>>>> branches          ( +- 22.57% )
+>>>>
+>>>>             3.06085 +- 0.00420 seconds time elapsed  ( +-  0.14% )
+>>>
+>>> How you compiled it also matters. ATM we don't enable retpolines
+>>> and it did not matter since we didn't have indirect calls,
+>>> but we should. Didn't yet investigate how to do that for virtio tools.
+>> I think the retpolines certainly affect performance. Thank you for pointing
+>> it out. I'd like to start the investigation that how to apply the
+>> retpolines to the
+>> virtio tools.
+>>>>> Thank you for your comments.
+>>>>>> Thanks!
+>>>>>>
+>>>>>>
+>>>>> Best,
+>>>>> Shunsuke.
+> This isn't all that trivial if we want this at runtime.
+> But compile time is kind of easy.
+> See Documentation/admin-guide/hw-vuln/spectre.rst
 
-I've investigated the iov_iter, vhost and related APIs. As a result, I
-think that it is not easy to switch to use the iov_iter. Because, the
-design of vhost and vringh is different.
+Thank you for showing it.
 
-The iov_iter has vring desc info and meta data of transfer method. The
-vhost provides generic transfer function for the iov_iter. In constrast,
-vringh_iov just has vring desc info. The vringh provides transfer functions
-for each methods.
 
-In the future, it is better to use common data structure and APIs between
-vhost and vringh (or merge completely), but it requires a lot of 
-changes, so I'd like to just
-organize data structure in vringh as a first step in this patch.
+I followed the document and added options to CFLAGS to the tools Makefile.
 
+That is
+
+---
+
+diff --git a/tools/virtio/Makefile b/tools/virtio/Makefile
+index 1b25cc7c64bb..7b7139d97d74 100644
+--- a/tools/virtio/Makefile
++++ b/tools/virtio/Makefile
+@@ -4,7 +4,7 @@ test: virtio_test vringh_test
+  virtio_test: virtio_ring.o virtio_test.o
+  vringh_test: vringh_test.o vringh.o virtio_ring.o
+
+-CFLAGS += -g -O2 -Werror -Wno-maybe-uninitialized -Wall -I. 
+-I../include/ -I ../../usr/include/ -Wno-pointer-sign 
+-fno-strict-overflow -fno-strict-aliasing -fno-common -MMD 
+-U_FORTIFY_SOURCE -include ../../include/linux/kconfig.h
++CFLAGS += -g -O2 -Werror -Wno-maybe-uninitialized -Wall -I. 
+-I../include/ -I ../../usr/include/ -Wno-pointer-sign 
+-fno-strict-overflow -fno-strict-aliasing -fno-common -MMD 
+-U_FORTIFY_SOURCE -include ../../include/linux/kconfig.h 
+-mfunction-return=thunk -fcf-protection=none -mindirect-branch-register
+  CFLAGS += -pthread
+  LDFLAGS += -pthread
+  vpath %.c ../../drivers/virtio ../../drivers/vhost
+---
+
+And results of evaluation are following:
+
+- base with retpoline
+
+$ sudo perf stat --repeat 20 -- nice -n -20 ./vringh_test_retp_origin 
+--parallel --eventidx --fast-vringh
+Using CPUS 0 and 3
+Guest: notified 0, pinged 98040
+Host: notified 98040, pinged 0
+...
+
+  Performance counter stats for 'nice -n -20 ./vringh_test_retp_origin 
+--parallel --eventidx --fast-vringh' (20 runs):
+
+           6,228.33 msec task-clock                #    1.004 CPUs 
+utilized            ( +-  0.05% )
+            196,110      context-switches          #   31.616 
+K/sec                    ( +-  0.00% )
+                  6      cpu-migrations            #    0.967 
+/sec                     ( +-  2.39% )
+                205      page-faults               #   33.049 
+/sec                     ( +-  0.46% )
+     14,218,527,987      cycles                    #    2.292 
+GHz                      ( +-  0.05% )
+     10,342,897,254      instructions              #    0.73  insn per 
+cycle           ( +-  0.02% )
+      2,310,572,989      branches                  #  372.500 
+M/sec                    ( +-  0.03% )
+        178,273,068      branch-misses             #    7.72% of all 
+branches          ( +-  0.04% )
+
+            6.20406 +- 0.00308 seconds time elapsed  ( +-  0.05% )
+
+- patched (unified APIs) with retpoline
+
+$ sudo perf stat --repeat 20 -- nice -n -20 ./vringh_test_retp_patched 
+--parallel --eventidx --fast-vringh
+Using CPUS 0 and 3
+Guest: notified 0, pinged 98040
+Host: notified 98040, pinged 0
+...
+
+  Performance counter stats for 'nice -n -20 ./vringh_test_retp_patched 
+--parallel --eventidx --fast-vringh' (20 runs):
+
+           6,103.94 msec task-clock                #    1.001 CPUs 
+utilized            ( +-  0.03% )
+            196,125      context-switches          #   32.165 
+K/sec                    ( +-  0.00% )
+                  7      cpu-migrations            #    1.148 
+/sec                     ( +-  1.56% )
+                196      page-faults               #   32.144 
+/sec                     ( +-  0.41% )
+     13,933,055,778      cycles                    #    2.285 
+GHz                      ( +-  0.03% )
+     10,309,004,718      instructions              #    0.74  insn per 
+cycle           ( +-  0.03% )
+      2,368,447,519      branches                  #  388.425 
+M/sec                    ( +-  0.04% )
+        211,364,886      branch-misses             #    8.94% of all 
+branches          ( +-  0.05% )
+
+            6.09888 +- 0.00155 seconds time elapsed  ( +-  0.03% )
+
+As a result, at the patched code, the branch-misses was increased but
+elapsed time became faster than the based code. The number of 
+page-faults was
+a little different. I'm suspicious of that the page-fault penalty leads the
+performance result.
+
+I think that a pattern of memory access for data is same with those, but
+for instruction is different. Actually a code size (.text segment) was a
+little smaller. 0x6a65 and 0x63f5.
+
+$ readelf -a ./vringh_test_retp_origin |grep .text -1
+        0000000000000008  0000000000000008  AX       0     0     8
+   [14] .text             PROGBITS         0000000000001230 00001230
+        0000000000006a65  0000000000000000  AX       0     0     16
+--
+    02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym 
+.dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt
+    03     .init .plt .plt.got .text .fini
+    04     .rodata .eh_frame_hdr .eh_frame
+
+
+$ readelf -a ./vringh_test_retp_patched |grep .text -1
+        0000000000000008  0000000000000008  AX       0     0     8
+   [14] .text             PROGBITS         0000000000001230 00001230
+        00000000000063f5  0000000000000000  AX       0     0     16
+--
+    02     .interp .note.gnu.build-id .note.ABI-tag .gnu.hash .dynsym 
+.dynstr .gnu.version .gnu.version_r .rela.dyn .rela.plt
+    03     .init .plt .plt.got .text .fini
+    04     .rodata .eh_frame_hdr .eh_frame
+
+I'll keep this investigation. I was wondering if you could comment me.
 
 Best
 
-> Thanks
 >
->>> Thanks
->>>
->>>> ---
->>>>   drivers/vhost/vringh.c | 32 ++++++------------------------
->>>>   include/linux/vringh.h | 45 ++++--------------------------------------
->>>>   2 files changed, 10 insertions(+), 67 deletions(-)
->>>>
->>>> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
->>>> index 828c29306565..aa3cd27d2384 100644
->>>> --- a/drivers/vhost/vringh.c
->>>> +++ b/drivers/vhost/vringh.c
->>>> @@ -691,8 +691,8 @@ EXPORT_SYMBOL(vringh_init_user);
->>>>    * calling vringh_iov_cleanup() to release the memory, even on error!
->>>>    */
->>>>   int vringh_getdesc_user(struct vringh *vrh,
->>>> -                       struct vringh_iov *riov,
->>>> -                       struct vringh_iov *wiov,
->>>> +                       struct vringh_kiov *riov,
->>>> +                       struct vringh_kiov *wiov,
->>>>                          bool (*getrange)(struct vringh *vrh,
->>>>                                           u64 addr, struct vringh_range *r),
->>>>                          u16 *head)
->>>> @@ -708,26 +708,6 @@ int vringh_getdesc_user(struct vringh *vrh,
->>>>          if (err == vrh->vring.num)
->>>>                  return 0;
->>>>
->>>> -       /* We need the layouts to be the identical for this to work */
->>>> -       BUILD_BUG_ON(sizeof(struct vringh_kiov) != sizeof(struct vringh_iov));
->>>> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, iov) !=
->>>> -                    offsetof(struct vringh_iov, iov));
->>>> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, i) !=
->>>> -                    offsetof(struct vringh_iov, i));
->>>> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, used) !=
->>>> -                    offsetof(struct vringh_iov, used));
->>>> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, max_num) !=
->>>> -                    offsetof(struct vringh_iov, max_num));
->>>> -       BUILD_BUG_ON(sizeof(struct iovec) != sizeof(struct kvec));
->>>> -       BUILD_BUG_ON(offsetof(struct iovec, iov_base) !=
->>>> -                    offsetof(struct kvec, iov_base));
->>>> -       BUILD_BUG_ON(offsetof(struct iovec, iov_len) !=
->>>> -                    offsetof(struct kvec, iov_len));
->>>> -       BUILD_BUG_ON(sizeof(((struct iovec *)NULL)->iov_base)
->>>> -                    != sizeof(((struct kvec *)NULL)->iov_base));
->>>> -       BUILD_BUG_ON(sizeof(((struct iovec *)NULL)->iov_len)
->>>> -                    != sizeof(((struct kvec *)NULL)->iov_len));
->>>> -
->>>>          *head = err;
->>>>          err = __vringh_iov(vrh, *head, (struct vringh_kiov *)riov,
->>>>                             (struct vringh_kiov *)wiov,
->>>> @@ -740,14 +720,14 @@ int vringh_getdesc_user(struct vringh *vrh,
->>>>   EXPORT_SYMBOL(vringh_getdesc_user);
->>>>
->>>>   /**
->>>> - * vringh_iov_pull_user - copy bytes from vring_iov.
->>>> + * vringh_iov_pull_user - copy bytes from vring_kiov.
->>>>    * @riov: the riov as passed to vringh_getdesc_user() (updated as we consume)
->>>>    * @dst: the place to copy.
->>>>    * @len: the maximum length to copy.
->>>>    *
->>>>    * Returns the bytes copied <= len or a negative errno.
->>>>    */
->>>> -ssize_t vringh_iov_pull_user(struct vringh_iov *riov, void *dst, size_t len)
->>>> +ssize_t vringh_iov_pull_user(struct vringh_kiov *riov, void *dst, size_t len)
->>>>   {
->>>>          return vringh_iov_xfer(NULL, (struct vringh_kiov *)riov,
->>>>                                 dst, len, xfer_from_user);
->>>> @@ -755,14 +735,14 @@ ssize_t vringh_iov_pull_user(struct vringh_iov *riov, void *dst, size_t len)
->>>>   EXPORT_SYMBOL(vringh_iov_pull_user);
->>>>
->>>>   /**
->>>> - * vringh_iov_push_user - copy bytes into vring_iov.
->>>> + * vringh_iov_push_user - copy bytes into vring_kiov.
->>>>    * @wiov: the wiov as passed to vringh_getdesc_user() (updated as we consume)
->>>>    * @src: the place to copy from.
->>>>    * @len: the maximum length to copy.
->>>>    *
->>>>    * Returns the bytes copied <= len or a negative errno.
->>>>    */
->>>> -ssize_t vringh_iov_push_user(struct vringh_iov *wiov,
->>>> +ssize_t vringh_iov_push_user(struct vringh_kiov *wiov,
->>>>                               const void *src, size_t len)
->>>>   {
->>>>          return vringh_iov_xfer(NULL, (struct vringh_kiov *)wiov,
->>>> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
->>>> index 1991a02c6431..733d948e8123 100644
->>>> --- a/include/linux/vringh.h
->>>> +++ b/include/linux/vringh.h
->>>> @@ -79,18 +79,6 @@ struct vringh_range {
->>>>          u64 offset;
->>>>   };
->>>>
->>>> -/**
->>>> - * struct vringh_iov - iovec mangler.
->>>> - *
->>>> - * Mangles iovec in place, and restores it.
->>>> - * Remaining data is iov + i, of used - i elements.
->>>> - */
->>>> -struct vringh_iov {
->>>> -       struct iovec *iov;
->>>> -       size_t consumed; /* Within iov[i] */
->>>> -       unsigned i, used, max_num;
->>>> -};
->>>> -
->>>>   /**
->>>>    * struct vringh_kiov - kvec mangler.
->>>>    *
->>>> @@ -113,44 +101,19 @@ int vringh_init_user(struct vringh *vrh, u64 features,
->>>>                       vring_avail_t __user *avail,
->>>>                       vring_used_t __user *used);
->>>>
->>>> -static inline void vringh_iov_init(struct vringh_iov *iov,
->>>> -                                  struct iovec *iovec, unsigned num)
->>>> -{
->>>> -       iov->used = iov->i = 0;
->>>> -       iov->consumed = 0;
->>>> -       iov->max_num = num;
->>>> -       iov->iov = iovec;
->>>> -}
->>>> -
->>>> -static inline void vringh_iov_reset(struct vringh_iov *iov)
->>>> -{
->>>> -       iov->iov[iov->i].iov_len += iov->consumed;
->>>> -       iov->iov[iov->i].iov_base -= iov->consumed;
->>>> -       iov->consumed = 0;
->>>> -       iov->i = 0;
->>>> -}
->>>> -
->>>> -static inline void vringh_iov_cleanup(struct vringh_iov *iov)
->>>> -{
->>>> -       if (iov->max_num & VRINGH_IOV_ALLOCATED)
->>>> -               kfree(iov->iov);
->>>> -       iov->max_num = iov->used = iov->i = iov->consumed = 0;
->>>> -       iov->iov = NULL;
->>>> -}
->>>> -
->>>>   /* Convert a descriptor into iovecs. */
->>>>   int vringh_getdesc_user(struct vringh *vrh,
->>>> -                       struct vringh_iov *riov,
->>>> -                       struct vringh_iov *wiov,
->>>> +                       struct vringh_kiov *riov,
->>>> +                       struct vringh_kiov *wiov,
->>>>                          bool (*getrange)(struct vringh *vrh,
->>>>                                           u64 addr, struct vringh_range *r),
->>>>                          u16 *head);
->>>>
->>>>   /* Copy bytes from readable vsg, consuming it (and incrementing wiov->i). */
->>>> -ssize_t vringh_iov_pull_user(struct vringh_iov *riov, void *dst, size_t len);
->>>> +ssize_t vringh_iov_pull_user(struct vringh_kiov *riov, void *dst, size_t len);
->>>>
->>>>   /* Copy bytes into writable vsg, consuming it (and incrementing wiov->i). */
->>>> -ssize_t vringh_iov_push_user(struct vringh_iov *wiov,
->>>> +ssize_t vringh_iov_push_user(struct vringh_kiov *wiov,
->>>>                               const void *src, size_t len);
->>>>
->>>>   /* Mark a descriptor as used. */
->>>> --
->>>> 2.25.1
->>>>
->> Best,
->> Shunsuke
->>
