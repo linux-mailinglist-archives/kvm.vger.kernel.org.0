@@ -2,68 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A130665051
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 01:18:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 48F3766505F
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 01:31:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232123AbjAKASk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 19:18:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40790 "EHLO
+        id S235603AbjAKAbC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 19:31:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235574AbjAKASa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 19:18:30 -0500
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4220114018
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 16:18:27 -0800 (PST)
-Received: by mail-qt1-x82c.google.com with SMTP id v14so12501159qtq.3
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 16:18:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mkUelddT52dMhaIz46/bDTKpMbObeBPSL3ul3pn2Ees=;
-        b=H0Tg9UtjN3Euh2L3KR4vJ3iNxhOkDwGVzmRsf6uKGrnPd8NYDrQouYnC4I0YSI5i1X
-         BiLYdJDw+ihKaw7EFYU4AbEjGAC6NvCLwOMf7I1IvB4csdYDUc+RrOZIyyqbAOvDia5B
-         /qgyu6eiSdI71j0UGGGx+S0AJvgTlwEv9Pzrs3/x7EXAQJ0SAin4VD37n/NcMLT/O6H/
-         sUDt9jvDUfPslQnZc99goUncSh9k8m+FMcRECtxuUdGL/xVivoMpZbn+O01GJl60nleN
-         YKs2r8Vq5BNa+k/6CgC3oUMOfA3nQ7b4hC4CJs5cQNAhCl1FRHWUTFhVS9/gX9AfW6vS
-         RVzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mkUelddT52dMhaIz46/bDTKpMbObeBPSL3ul3pn2Ees=;
-        b=PZnjljKJAZiHmUxHguwz99vGUDzidinZGqNQ6nucDkLzRqj+ruHkkYZsD/PM15UUCj
-         nv0KoXPukPjuaq2LoVs/l2kuIoj90gCu+F34OkAAM6W94Vh+9qwXOzTZrvLE7E93KIek
-         J0xfso1VOMiUytHLiWVl7NEtcVgcfdiYUzCcOgayZEZ4kKaxi87UhMST2ImBGMwkQpPZ
-         p21IhalNPxneCJ80BPwjSoEMjtplfNOlijYrlc/9A69Rm+8WsNhQNIdvkhg4l6LmSCme
-         vVIUyjSj3ijpcBtIdIOqkhVJDw4EbOFkUTddNRNHYlpOPvpBijH2O6Cwbeun1kcPpAhd
-         Kztg==
-X-Gm-Message-State: AFqh2kpnl1aE1FY3bFJw7L/Av8NC91dqKSbWxXN8GEbNyb88ilkROr9u
-        DLoNHCcOvIoje/4A+0RTz3+0fUO8xoga/e93iIzSUA==
-X-Google-Smtp-Source: AMrXdXuhgcUdH/AGtyPPRRardKfs4c4A9elwj8I8dGo1sRndHi0yVG3afsxaNVELH/dx/oGXvwStghvWf4Ykxv/PXDU=
-X-Received: by 2002:ac8:6b8a:0:b0:3a7:e237:83dd with SMTP id
- z10-20020ac86b8a000000b003a7e23783ddmr3201868qts.219.1673396306122; Tue, 10
- Jan 2023 16:18:26 -0800 (PST)
+        with ESMTP id S235626AbjAKAa5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 19:30:57 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CBFA5471A;
+        Tue, 10 Jan 2023 16:30:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673397048; x=1704933048;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JUviILzDclP6dIdqFUr0ki8G4FQJgb1JbwWGsrEAaus=;
+  b=PRArehwiyDw2aGpEAVw7qPLK6c9T2Kq2v0qf7XGN3HGE2kAVkhSTKMBW
+   Ibz6RbwfPB0iMKnLd6a+MbATvtXeA5WFlmFiN0SFqC4vA0Fd1cmxTYOWb
+   n/1C/iWQxE26rVF6tLQaKPtlDN/aORk7N8+ml0TDIei1TCAMmBSsLuaTG
+   SQP7UaFsqvGLgXv4oizu/nKFbmIBNQ8eqMsQStjho8rpHdinwc+cdZ5Oc
+   L8qL51srtNxx90GJ2gupXhl1HHZn22aiV9BeSEB0hlmRuMs4rCWM4mmRU
+   8OwY/XLqz+oYynyDlQgP4hYedt4NqGgwiariD8q562YXJbtrfoLVvN8yu
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="303665223"
+X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
+   d="scan'208";a="303665223"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 16:30:48 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10586"; a="725719077"
+X-IronPort-AV: E=Sophos;i="5.96,315,1665471600"; 
+   d="scan'208";a="725719077"
+Received: from svenka7-mobl1.amr.corp.intel.com (HELO [10.209.63.27]) ([10.209.63.27])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jan 2023 16:30:47 -0800
+Message-ID: <c5a08366-ddc2-a26f-fffa-c2b0ac4e45b4@intel.com>
+Date:   Tue, 10 Jan 2023 16:30:46 -0800
 MIME-Version: 1.0
-References: <20221228192438.2835203-1-vannapurve@google.com>
- <20221228192438.2835203-5-vannapurve@google.com> <Y7xbC+leVdO0TRVE@google.com>
-In-Reply-To: <Y7xbC+leVdO0TRVE@google.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Tue, 10 Jan 2023 16:18:15 -0800
-Message-ID: <CAGtprH_F-U799DT9OkrC=pEQJYt0=Tj2WWuKuczm6z2ftUZuQA@mail.gmail.com>
-Subject: Re: [V4 PATCH 4/4] KVM: selftests: x86: Invoke kvm hypercall as per
- host cpu
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        shuah@kernel.org, bgardon@google.com, oupton@google.com,
-        peterx@redhat.com, vkuznets@redhat.com, dmatlack@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v8 15/16] x86/virt/tdx: Flush cache in kexec() when TDX is
+ enabled
+Content-Language: en-US
+To:     "Huang, Kai" <kai.huang@intel.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc:     "Luck, Tony" <tony.luck@intel.com>,
+        "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+        "ak@linux.intel.com" <ak@linux.intel.com>,
+        "Wysocki, Rafael J" <rafael.j.wysocki@intel.com>,
+        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "Chatre, Reinette" <reinette.chatre@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "imammedo@redhat.com" <imammedo@redhat.com>,
+        "Gao, Chao" <chao.gao@intel.com>,
+        "Brown, Len" <len.brown@intel.com>,
+        "peterz@infradead.org" <peterz@infradead.org>,
+        "sathyanarayanan.kuppuswamy@linux.intel.com" 
+        <sathyanarayanan.kuppuswamy@linux.intel.com>,
+        "Huang, Ying" <ying.huang@intel.com>,
+        "Williams, Dan J" <dan.j.williams@intel.com>
+References: <cover.1670566861.git.kai.huang@intel.com>
+ <ee5185e1727c3cd8bd51dbf9fcec95d432100d12.1670566861.git.kai.huang@intel.com>
+ <ba0fdee9-148b-b0b9-ecde-2610eff02ba1@intel.com>
+ <6f959f494f0fb3dedfa963c3d6a0ce7f395b745d.camel@intel.com>
+ <944ffd4b-3090-e068-a649-b9a84add8395@intel.com>
+ <b84232220d03889321248ffb82739c64204cc4af.camel@intel.com>
+From:   Dave Hansen <dave.hansen@intel.com>
+In-Reply-To: <b84232220d03889321248ffb82739c64204cc4af.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,29 +88,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 9, 2023 at 10:21 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> KVM: selftests: Use host's native hypercall instruction in kvm_hypercall()
->
-> On Wed, Dec 28, 2022, Vishal Annapurve wrote:
-> > Invoke vmcall/vmmcall instructions from kvm_hypercall as per host CPU
->
-> () for functions, i.e. kvm_hypercall().
->
-> > type.
->
-> s/type/vendor, "type" is too generic.
->
-> > CVMs and current kvm_hyerpcall callers need to execute hypercall
->
-> CVM isn't a not ubiquitous acronym.  I would avoid it entirely because "CVM"
-> doesn't strictly imply memory encryption, e.g. KVM could still patch the guest in
-> a pKVM-like implementation.
->
->   Use the host CPU's native hypercall instruction, i.e. VMCALL vs. VMMCALL,
->   in kvm_hypercall(), as relying on KVM to patch in the native hypercall on
->   a #UD for the "wrong" hypercall requires KVM_X86_QUIRK_FIX_HYPERCALL_INSN
->   to be enabled and flat out doesn't work if guest memory is encrypted with
->   a private key, e.g. for SEV VMs.
+On 1/10/23 16:13, Huang, Kai wrote:
+> On Tue, 2023-01-10 at 07:27 -0800, Dave Hansen wrote:
+...
+>> Think about it this way: kexec() is modifying persistent (across kexec)
+>> state to get the system ready for the new kernel.  The caches are
+>> persistent state.  Devices have persistent state.  Memory state persists
+>> across kexec().  The memory integrity metadata persists.
+>>
+>> What persistent state does a conversion to KeyID-0 affect?  It resets
+>> the integrity metadata and the memory contents.
+>>
+>> Kexec leaves memory contents in place and doesn't zero them, so memory
+>> contents don't matter.  The integrity metadata also doesn't matter
+>> because the memory will be used as KeyID-0 and that KeyID doesn't read
+>> the integrity metadata.
+> 
+> Right.  So I guess we just need to call out the new kernel will use memory as
+> KeyID-0?
 
-Ack, this makes sense.
+Not even that.
+
+Say the new kernel wanted to use the memory as KeyID-3.  What would it
+do?  It would *ASSUME* that the memory *WASN'T* KeyID-3.  It would
+convert it to KeyID-3.  That conversion would work from *any* KeyID.
+
+So:
+
+	KeyID-0: OK, because it has no integrity enforcement
+	KeyID-1: OK, new kernel will convert the page
+	KeyID-2: OK, new kernel will convert the page
+	...
+	KeyID-$MAX: OK, new kernel will convert the page
+
+So, "OK" everywhere.  Nothing to do... anywhere.
+
+Either I'm totally missing how this works, or you're desperately trying
+to make this more complicated than it is.
+
