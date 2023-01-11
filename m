@@ -2,69 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 74BE066659A
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 22:25:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B738C6665E2
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 22:55:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235775AbjAKVZh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 16:25:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42970 "EHLO
+        id S235619AbjAKVzf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 16:55:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235347AbjAKVZW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 16:25:22 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C997BD2FF
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 13:25:21 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id o8-20020a17090a9f8800b00223de0364beso21405052pjp.4
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 13:25:21 -0800 (PST)
+        with ESMTP id S232509AbjAKVz0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 16:55:26 -0500
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF82062DD
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 13:55:25 -0800 (PST)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4c0fe6e3f13so174414057b3.0
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 13:55:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=isiHwCTIoSENRpWwMehTehvClsZpOj/mU5tiBrBvyOg=;
-        b=KODnx62o2YITMkZtLn5TAKhNM9ViUaeHdj9VjXJu/gHD+gH9FMAwMdxd9S9Ntb2qD/
-         WxCsAxQoAwpJ/OxsMAX75z+niJFc+AWtYUiS09V5oCcA39kxAPcD4ncfHMGHdmWgwKfb
-         gDzFgredSbRch4xBb/p8uj1iYCpaT5ViMVW6ljLuHgP3fLV0sFbvdJOLyZC7mr3G7lJR
-         V2L0JRHU8Pn/bXdRzrYsj34McL+Fn+7ElCL1BqVozAQy9Oz89HURV7QDAD8c02CkHhAS
-         2VoM0J9NnsuXREtxE89v9ZJBaoOetEiqm/n0lbZYIcjAOHyhpDq35tURWsqq27L1V9FF
-         /7fQ==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vk+h98K5lBZ1bCzuFSe+82Rbn+wHuQAUnYI8WkMMMOI=;
+        b=avMM2JU0X4lmETlxVdkMkrdrPhQ0b4xrnVCw/NaGabIDJr0OT0NUtFBKXlZmftj/+k
+         3KrqnKWiGt7v7zoD1zgZDz4qkgJTIlX4BpatPOYrvsea4b0w821NOOAVtaflI2/UuCVb
+         xLMflreox6WdGXOtrVHDkURwde2QyGfn3/XPhHeqy7OajAc0aUr9/+88PUHyZKJa/1eb
+         t8XNhqmWQHrmwFQ0r0kPvYu+7TRPjrN06Yseiw0Wa31UArMRIKqshMf7+F4kcyMhJP2V
+         BNz2CSvzoR15/Y5dmbdjLUkz6v64fSKDJKlutFwBeXbb3Wc7nnO1051ySIR1mGcgQPq2
+         wsVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=isiHwCTIoSENRpWwMehTehvClsZpOj/mU5tiBrBvyOg=;
-        b=Z2w4Fgti5MDDVeY1BRJUOTQa87QAwyYalWaF+kR0fF//MAaPcsUBO/+hb4PdNHRRZl
-         1D9nvVnJ4jqlXtSYtG1qpiJU2n6ltciclVLbp1fCpTs/rMpm+Xep/Y7WunzOJG9p+XAv
-         W717pCPE0ioBa3WttAJ+zxDpbEWzvITHoDtzH6fb8JK0ZaqpwMqHuLnCKYM0rLZbSgef
-         qwncYe1UTNwN90V5Mq8A3jA1QMzHMb9JiptZr27thf0v77dJ9fBVlMA5ZHJDBTUGBZQT
-         GXxHMZED2PLvGH8pQPalUhUMScrDumUolb5zPfHNRPSSq0CeV3nlTxRooNUGb0VfMNmf
-         GXPw==
-X-Gm-Message-State: AFqh2kprxcNYpJbQKSplzunA4eum1s+6zNo+m0/asj9O/BMJhVqZ8gxa
-        8HvMYbEndHSZhpSH0Qw/edJW/A==
-X-Google-Smtp-Source: AMrXdXvKRkQZXBDq3VgD7eMaL2oaCGMXrXbnpTAy1wa0mbklDqdGfRFLsGOVTct14OhG9MnRmRGavw==
-X-Received: by 2002:a05:6a21:33a1:b0:ac:af5c:2970 with SMTP id yy33-20020a056a2133a100b000acaf5c2970mr588164pzb.3.1673472321232;
-        Wed, 11 Jan 2023 13:25:21 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w11-20020aa79a0b000000b00580e679dcf2sm10368318pfj.157.2023.01.11.13.25.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 13:25:20 -0800 (PST)
-Date:   Wed, 11 Jan 2023 21:25:17 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vipin Sharma <vipinsh@google.com>
-Cc:     pbonzini@redhat.com, bgardon@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Patch v2] KVM: selftests: Make reclaim_period_ms input always
- be positive
-Message-ID: <Y78pPcNuXsjpE3DZ@google.com>
-References: <20230111183408.104491-1-vipinsh@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230111183408.104491-1-vipinsh@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vk+h98K5lBZ1bCzuFSe+82Rbn+wHuQAUnYI8WkMMMOI=;
+        b=Q8puAtl9J/j33Q5TL/G7VtXL9z9xxExcBkkNyhXUUFFYAMRh2asnRLl9hDxn3ZzR2s
+         g9GNCm+5uM8hmdeDtMpmdoBp/EJvYw7F9ia9Ka5F4HjEzqkltt6TWr/NN+Qr+1uK9Sqb
+         q1BNzN+HbKf1nZBSaTQ3YsShiO04GPGRo5rke3jWXD/9Y3WFNtZ5Kae3EtC+uGWz+PmI
+         iJ3+qZdpDO7Q3fgZoFbWhlFDVBlaxd30J8b3QOEtB/7x9t6QgO74owZ0mwXCYPuAoOi0
+         bfe48FjzIbO6oSPpxdIAONd3OJNmlAP3JW3f4iUqHqMKuckmCTOMZbOzIj2Zy7Hlj0mX
+         xaGw==
+X-Gm-Message-State: AFqh2kr8PFq72icvW6ANuD3uIaQPKz7wo/TCEWwkvWR0+6etlLwA7gOq
+        YT0LwQ1WoeBgdgOQ96KkVtsWGF0OY8sNAVZjTA==
+X-Google-Smtp-Source: AMrXdXsNW5o4o7MCk0DjPQAefT6HrLTRimvDYJJbr5zamKD8u3tg+gV411xOco5ktrlIKB7JLt7x6+h8uRXsJcjVSQ==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a25:4188:0:b0:703:2633:87c1 with SMTP
+ id o130-20020a254188000000b00703263387c1mr3074882yba.132.1673474125182; Wed,
+ 11 Jan 2023 13:55:25 -0800 (PST)
+Date:   Wed, 11 Jan 2023 21:54:21 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20230111215422.2153645-1-coltonlewis@google.com>
+Subject: [kvm-unit-tests PATCH v2 0/1] Replace MAX_SMP probe loop
+From:   Colton Lewis <coltonlewis@google.com>
+To:     thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com,
+        andrew.jones@linux.dev, imbrenda@linux.ibm.com, marcorr@google.com,
+        alexandru.elisei@arm.com, oliver.upton@linux.dev
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,17 +67,20 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 11, 2023, Vipin Sharma wrote:
-> reclaim_period_ms use to be positive only but the commit 0001725d0f9b
-> ("KVM: selftests: Add atoi_positive() and atoi_non_negative() for input
-> validation") incorrectly changed it to non-negative validation.
-> 
-> Change validation to allow only positive input.
-> 
-> Fixes: 0001725d0f9b ("KVM: selftests: Add atoi_positive() and atoi_non_negative() for input validation")
-> Signed-off-by: Vipin Sharma <vipinsh@google.com>
-> Reported-by: Ben Gardon <bgardon@google.com>
-> Reviewed-by: Ben Gardon <bgardon@google.com>
-> ---
+v2:
 
-Reviewed-by: Sean Christopherson <seanjc@google.com>
+Instead of deleting the probe loop, replace it with reading QEMU error
+output.
+
+v1:
+
+https://lore.kernel.org/kvm/20221219185250.631503-1-coltonlewis@google.com/
+
+Colton Lewis (1):
+  arm: Replace MAX_SMP probe loop in favor of reading directly
+
+ scripts/runtime.bash | 16 +++++++---------
+ 1 file changed, 7 insertions(+), 9 deletions(-)
+
+--
+2.39.0.314.g84b9a713c41-goog
