@@ -2,53 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0CAD6662D3
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 19:31:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 136D46662D7
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 19:34:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234740AbjAKSbd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 13:31:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37728 "EHLO
+        id S232575AbjAKSeN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 13:34:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235225AbjAKSbS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 13:31:18 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA4E3373AB
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 10:30:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673461837;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=DsHR+gK9NXOoSaKdGDYaK34gTAYNmEFxKqyOr6ZMcO4=;
-        b=XvKYhcsNoXuK3xFNDIhTijClPODc7arTJxiaDO738c5JXvxl7J5XxmxLDDCWdiqTBgw8pS
-        YUxkmQuoVc+1BqDJAi0mR3sn76rKD9HqCo6qMbhwp1NkDqP3E+UftOEsiX1I8dU0zkgalC
-        eThmgrNfPtaqIkUm+9ns+Jzfy+lYpJM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-589-lodOvzh5NXicVlPIqy2l4A-1; Wed, 11 Jan 2023 13:30:33 -0500
-X-MC-Unique: lodOvzh5NXicVlPIqy2l4A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9B8708030A0;
-        Wed, 11 Jan 2023 18:30:32 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 777C7140EBF5;
-        Wed, 11 Jan 2023 18:30:32 +0000 (UTC)
-From:   Paolo Bonzini <pbonzini@redhat.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     dwmw@amazon.co.uk, seanjc@google.com
-Subject: [PATCH] Documentation: kvm: fix SRCU locking order docs
-Date:   Wed, 11 Jan 2023 13:30:31 -0500
-Message-Id: <20230111183031.2449668-1-pbonzini@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        with ESMTP id S229578AbjAKSeM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 13:34:12 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6882913F9E
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 10:34:11 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id w9-20020a05690210c900b007b20e8d0c99so16878339ybu.0
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 10:34:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9KIwZTDSAmIppW3arQta89dBIMqNXF0skn62yduf4ZQ=;
+        b=kV0DACr/rMJL2hpaEWN48WWzxdmEyQ0AC0c60/Ewbaxmpiq5TIs95p82ilfqdeC37y
+         B2oI9ku51dzp4rQOImG6HlFD6HTrsAAF5NGk0kfv0Kahgs8FBxJzFLyoDao2N/SI4xRX
+         d+zEQR3NkU9Vz77KEfcWoOW4RAjpHLaXicTtxJx8XxgYdrYZMJ46bxZInqvJh58NxSeV
+         ntPbtTHhqOhYrVFkZw0ZygJw7NQWraxPLUPxTAFLd2X529uP5NiFygcpoDj9AxwiSMiw
+         f8KjApR0+QuglrZZHB4zG65nPI9sa7DJfcPOjgFq2mtTLkxAslwKct+GeOUe44gD7XPV
+         yqww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9KIwZTDSAmIppW3arQta89dBIMqNXF0skn62yduf4ZQ=;
+        b=we3R+mnEebGvsQKlcS6ze2+194MIci/GqMzZQKDDQ3cIs8YZZUjpmnPjdRZQ1/QMiJ
+         kZroeAyNrZXJbVnInv62ZAZ5oXr8VeCR4JzJ+95pIAuJ1CMjxtthi/4VTzzrTplFyKPc
+         MWZ25Ka6phHYaQB2Kc+gA8SKhCbp9G/kPitPQAiOQV2InT1VMR686FMnYrAwcgXzwb7U
+         z8uZyv+vbt4sb/lzkuLH8Q7j9Fu1OLOyCe8YSZPh/rEM00jsgy8TMqNbwlo5gTU22CKD
+         sjPOOU65mztKf3QwsbwbOYe8dx/irpIjn+Of7wgnTdvQCupr/6KTg/TxWq8cTPJdzXh+
+         DN3Q==
+X-Gm-Message-State: AFqh2krTFdtF398fz1tdfsnFREG+HH+PpudixU0op0t0S8NfhNLMkhOi
+        BWZMVazATs4p0j91ES0lenm7oUSeIo/9
+X-Google-Smtp-Source: AMrXdXvQBrek+QKvBaZd+mrabbLY7khNP7e9pQGNB6+CMZGEjPvfFHANzOZ3Aj+gMUE4UqCdKSimwoCRc0fK
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a25:cecb:0:b0:7c1:3a0:e48d with SMTP id
+ x194-20020a25cecb000000b007c103a0e48dmr388967ybe.183.1673462050697; Wed, 11
+ Jan 2023 10:34:10 -0800 (PST)
+Date:   Wed, 11 Jan 2023 10:34:08 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20230111183408.104491-1-vipinsh@google.com>
+Subject: [Patch v2] KVM: selftests: Make reclaim_period_ms input always be positive
+From:   Vipin Sharma <vipinsh@google.com>
+To:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -56,52 +65,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-kvm->srcu is taken in KVM_RUN and several other vCPU ioctls, therefore
-vcpu->mutex is susceptible to the same deadlock that is documented
-for kvm->slots_lock.  The same holds for kvm->lock, since kvm->lock
-is held outside vcpu->mutex.  Fix the documentation and rearrange it
-to highlight the difference between these locks and kvm->slots_arch_lock,
-and how kvm->slots_arch_lock can be useful while processing a vmexit.
+reclaim_period_ms use to be positive only but the commit 0001725d0f9b
+("KVM: selftests: Add atoi_positive() and atoi_non_negative() for input
+validation") incorrectly changed it to non-negative validation.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Change validation to allow only positive input.
+
+Fixes: 0001725d0f9b ("KVM: selftests: Add atoi_positive() and atoi_non_negative() for input validation")
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+Reported-by: Ben Gardon <bgardon@google.com>
+Reviewed-by: Ben Gardon <bgardon@google.com>
 ---
- Documentation/virt/kvm/locking.rst | 23 ++++++++++++-----------
- 1 file changed, 12 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-index 897ca39b72bf..53826098183e 100644
---- a/Documentation/virt/kvm/locking.rst
-+++ b/Documentation/virt/kvm/locking.rst
-@@ -24,17 +24,18 @@ The acquisition orders for mutexes are as follows:
- 
- For SRCU:
- 
--- ``synchronize_srcu(&kvm->srcu)`` is called _inside_
--  the kvm->slots_lock critical section, therefore kvm->slots_lock
--  cannot be taken inside a kvm->srcu read-side critical section.
--  Instead, kvm->slots_arch_lock is released before the call
--  to ``synchronize_srcu()`` and _can_ be taken inside a
--  kvm->srcu read-side critical section.
--
--- kvm->lock is taken inside kvm->srcu, therefore
--  ``synchronize_srcu(&kvm->srcu)`` cannot be called inside
--  a kvm->lock critical section.  If you cannot delay the
--  call until after kvm->lock is released, use ``call_srcu``.
-+- ``synchronize_srcu(&kvm->srcu)`` is called inside critical sections
-+  for kvm->lock, vcpu->mutex and kvm->slots_lock.  These locks _cannot_
-+  be taken inside a kvm->srcu read-side critical section; that is, the
-+  following is broken::
-+
-+      srcu_read_lock(&kvm->srcu);
-+      mutex_lock(&kvm->slots_lock);
-+
-+- kvm->slots_arch_lock instead is released before the call to
-+  ``synchronize_srcu()``.  It _can_ therefore be taken inside a
-+  kvm->srcu read-side critical section, for example while processing
-+  a vmexit.
- 
- On x86:
- 
+v2:
+- Added Fixes and Reviewed-by tags
+
+v1: https://lore.kernel.org/lkml/20230110215203.4144627-1-vipinsh@google.com/
+
+ tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+index ea0978f22db8..251794f83719 100644
+--- a/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
++++ b/tools/testing/selftests/kvm/x86_64/nx_huge_pages_test.c
+@@ -241,7 +241,7 @@ int main(int argc, char **argv)
+ 	while ((opt = getopt(argc, argv, "hp:t:r")) != -1) {
+ 		switch (opt) {
+ 		case 'p':
+-			reclaim_period_ms = atoi_non_negative("Reclaim period", optarg);
++			reclaim_period_ms = atoi_positive("Reclaim period", optarg);
+ 			break;
+ 		case 't':
+ 			token = atoi_paranoid(optarg);
 -- 
-2.39.0
+2.39.0.314.g84b9a713c41-goog
 
