@@ -2,168 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AEF2F665899
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 11:09:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5D64E6658C0
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 11:14:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232323AbjAKKJE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 05:09:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35982 "EHLO
+        id S238469AbjAKKNN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 05:13:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238714AbjAKKIe (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 05:08:34 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C68CC9
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 02:04:15 -0800 (PST)
+        with ESMTP id S239024AbjAKKM3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 05:12:29 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 527A81CE
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 02:10:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673431454;
+        s=mimecast20190719; t=1673431823;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ws57bKhCFEIuKPB2whL4Z/ylGixJw3tf3/cpkOfXajE=;
-        b=I2+0aDaSeR2AYgQHwKjwjqdMJN4z5iG9Wb9WobqHVDCFj2bGIRwTGiE24og4qRcOlZVLvc
-        iGlL/mbmzRiARLQ3+OVsmSOWE1nT7Ydvm3GXhc/BoE9nZUpMX6uCWjBXmgQWXEymGeXWjA
-        z0O0+w+nWQ0UitDzqrUqln9dPvGZur8=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ab2T4X7uK9fotwvUe5iK/l1jUo4Z6arsl3GYiaGQgIA=;
+        b=M4X2l4BFMCIlF+zjV7yZ3Ma8InVsGHTSnYw50/ChVhMEj51/82gT74Fy3A/+NTgHSDvStX
+        98qJnCcfSCYVrc5GeILHQdMTCFo/49wSkim2+3V6m0MlCiWyGXbhXOiL7YSoZzkeso2+dH
+        IsZYt0smjq51UBFfB9BmrZH4poHYf1A=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-658-n1MRTyPPMIyFHzaawf4-bg-1; Wed, 11 Jan 2023 05:04:13 -0500
-X-MC-Unique: n1MRTyPPMIyFHzaawf4-bg-1
-Received: by mail-vs1-f71.google.com with SMTP id k124-20020a672482000000b003ceea654c04so3167264vsk.11
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 02:04:13 -0800 (PST)
+ us-mta-385-Z0mZnSDcOoaXnxXAKnBlIw-1; Wed, 11 Jan 2023 05:10:22 -0500
+X-MC-Unique: Z0mZnSDcOoaXnxXAKnBlIw-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-4c57d19de6fso129989127b3.20
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 02:10:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ws57bKhCFEIuKPB2whL4Z/ylGixJw3tf3/cpkOfXajE=;
-        b=WoV18gr3+DmAH+ziXNxo8oHfttMHH+ehujnmizcW/N9rVOWLnTyrMLAeC4vBkQBm5L
-         2+7c9rpn11pCqqODfgQ6ogq3c/PPLsHuLtvRQ0d4ijQIosO9jItg6YWbsXX+6jE1l4I1
-         i9Mf+5CEPb/RUzzYNc2Ayf6VrA/9MN+JvPsId7nZR34lpwkXAIq0wWUi/A/Rwca2Yw46
-         waAmMPlXFg62AOvr2pgso0fOHPZHgYHGSHKAbFMIqU6frofH62npVGIKa5T1W3k7I1of
-         +V38zSOWxUiN+98XnLs9ZpmJC4PR7Sb8avzqJ8pxiMmfgO6eYILJ7UijvXXn++gYQmWK
-         3ewA==
-X-Gm-Message-State: AFqh2koU097t/LUUeroLM5MhtSMLtQZ2J19IQArXCFfxtr2ychmld00i
-        bTYCnK9V5sreHeykbC3t7b9IgnifdcmMK05zcfBA/uMMQRxkDb6YiWnXL4fsvUZ33bibrIDosYs
-        l7mn08OdyYzH4
-X-Received: by 2002:a67:e208:0:b0:3c7:f2c1:93b9 with SMTP id g8-20020a67e208000000b003c7f2c193b9mr34245224vsa.4.1673431453040;
-        Wed, 11 Jan 2023 02:04:13 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvjnzgsgJJgjCqD3C1Cyv45Y2MgPPRJorKUF4GN0qROCnrOdLUxHQmLxeI8bgmisnsGaMoauw==
-X-Received: by 2002:a67:e208:0:b0:3c7:f2c1:93b9 with SMTP id g8-20020a67e208000000b003c7f2c193b9mr34245203vsa.4.1673431452785;
-        Wed, 11 Jan 2023 02:04:12 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-176-91.web.vodafone.de. [109.43.176.91])
-        by smtp.gmail.com with ESMTPSA id u8-20020a37ab08000000b00702311aea78sm8652658qke.82.2023.01.11.02.04.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Jan 2023 02:04:12 -0800 (PST)
-Message-ID: <69555196-ffde-8176-24d9-b8935fe6f365@redhat.com>
-Date:   Wed, 11 Jan 2023 11:04:07 +0100
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ab2T4X7uK9fotwvUe5iK/l1jUo4Z6arsl3GYiaGQgIA=;
+        b=KjGX5+dTklAr3A2/OmGX69BTUZSqF2f2Bwqzd4qBOU5rcAeShSC6Z2FNCITDqwOGxE
+         rVOohf0kR7heIGu7y0njisrtRN6LbtZ0IjAvSr0A2JD1ZasiXfJxtl3E9gztjeXA8Az8
+         v3xQnX2kaeYdZjo5LS4/clOPX7sUgZYynqc111GO3TI1CXHyPzq3Kc5IMRm31VQO5/wo
+         K5eyEbP9bxP8uzNGeYrd938709DPaw9LQXYmBj3Of5/ipPGWf8Yqv7UIM/T3AzJ+84TL
+         xxEMYRq63HsyB/i6SAFSoCjPPWslhkqEHMI1FnySaNM1fBj3IfpLRqt4/EWdiPv0s6X2
+         4dSQ==
+X-Gm-Message-State: AFqh2kreWqikZKppcCLWuUAeR4XjaoZUqrPsPYxqi8/479G3MFvPb2MC
+        9sjxpxZMpuj3W8OGv4UR8do9xNr5OQttieq77RUZYFZqBTbQ9PQ/1hc4za0GcSsf5EJFeUauI7N
+        en6i9JGchVCF+altuleJs1QrGIy3H
+X-Received: by 2002:a81:5292:0:b0:483:813:c70f with SMTP id g140-20020a815292000000b004830813c70fmr272926ywb.266.1673431821538;
+        Wed, 11 Jan 2023 02:10:21 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXut4p3VM0yD8/5Y4e83a1nRa6qrlSf+k+n4EPYQisWAsKUOCyCccCCErr1GqDDIKIaj6eC/6aeEH21xladYy/s=
+X-Received: by 2002:a81:5292:0:b0:483:813:c70f with SMTP id
+ g140-20020a815292000000b004830813c70fmr272918ywb.266.1673431821306; Wed, 11
+ Jan 2023 02:10:21 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v14 07/11] target/s390x/cpu topology: activating CPU
- topology
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-8-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230105145313.168489-8-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20230110024445.303-1-liming.wu@jaguarmicro.com>
+In-Reply-To: <20230110024445.303-1-liming.wu@jaguarmicro.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Wed, 11 Jan 2023 11:09:45 +0100
+Message-ID: <CAJaqyWeuZtx8mUB+jTPVcuiryXpjo09sbvv2QQA2C1-ASMWE1g@mail.gmail.com>
+Subject: Re: [PATCH] vhost: remove unused paramete
+To:     liming.wu@jaguarmicro.com
+Cc:     "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, kvm@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, 398776277@qq.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 05/01/2023 15.53, Pierre Morel wrote:
-> The KVM capability, KVM_CAP_S390_CPU_TOPOLOGY is used to
+On Tue, Jan 10, 2023 at 3:46 AM <liming.wu@jaguarmicro.com> wrote:
+>
+> From: Liming Wu <liming.wu@jaguarmicro.com>
+>
+> "enabled" is defined in vhost_init_device_iotlb,
+> but it is never used. Let's remove it.
+>
+> Signed-off-by: Liming Wu <liming.wu@jaguarmicro.com>
 
-Remove the "," in above line?
+Reviewed-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
 
-> activate the S390_FEAT_CONFIGURATION_TOPOLOGY feature and
-> the topology facility for the guest in the case the topology
+Thanks!
 
-I'd like to suggest to add "in the host CPU model" after "facility".
-
-> is available in QEMU and in KVM.
-> 
-> The feature is disabled by default and fenced for SE
-> (secure execution).
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->   hw/s390x/cpu-topology.c   |  2 +-
->   target/s390x/cpu_models.c |  1 +
->   target/s390x/kvm/kvm.c    | 13 +++++++++++++
->   3 files changed, 15 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
-> index e6b4692581..b69955a1cd 100644
-> --- a/hw/s390x/cpu-topology.c
-> +++ b/hw/s390x/cpu-topology.c
-> @@ -52,7 +52,7 @@ static int s390_socket_nb(s390_topology_id id)
->    */
->   bool s390_has_topology(void)
->   {
-> -    return false;
-> +    return s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY);
->   }
->   
->   /**
-> diff --git a/target/s390x/cpu_models.c b/target/s390x/cpu_models.c
-> index c3a4f80633..3f05e05fd3 100644
-> --- a/target/s390x/cpu_models.c
-> +++ b/target/s390x/cpu_models.c
-> @@ -253,6 +253,7 @@ bool s390_has_feat(S390Feat feat)
->           case S390_FEAT_SIE_CMMA:
->           case S390_FEAT_SIE_PFMFI:
->           case S390_FEAT_SIE_IBS:
-> +        case S390_FEAT_CONFIGURATION_TOPOLOGY:
->               return false;
->               break;
->           default:
-> diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-> index fb63be41b7..4e2a2ff516 100644
-> --- a/target/s390x/kvm/kvm.c
-> +++ b/target/s390x/kvm/kvm.c
-> @@ -2470,6 +2470,19 @@ void kvm_s390_get_host_cpu_model(S390CPUModel *model, Error **errp)
->           set_bit(S390_FEAT_UNPACK, model->features);
->       }
->   
-> +    /*
-> +     * If we have support for CPU Topology prevent overrule
-> +     * S390_FEAT_CONFIGURATION_TOPOLOGY with S390_FEAT_DISABLE_CPU_TOPOLOGY
-
-That S390_FEAT_DISABLE_CPU_TOPOLOGY looks like a leftover from v12 ?
-
-Apart from that, patch looks fine to me now.
-
-  Thomas
-
-
-> +     * implemented in KVM, activate the CPU TOPOLOGY feature.
-> +     */
-> +    if (kvm_check_extension(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY)) {
-> +        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_S390_CPU_TOPOLOGY, 0) < 0) {
-> +            error_setg(errp, "KVM: Error enabling KVM_CAP_S390_CPU_TOPOLOGY");
-> +            return;
-> +        }
-> +        set_bit(S390_FEAT_CONFIGURATION_TOPOLOGY, model->features);
-> +    }
-> +
->       /* We emulate a zPCI bus and AEN, therefore we don't need HW support */
->       set_bit(S390_FEAT_ZPCI, model->features);
->       set_bit(S390_FEAT_ADAPTER_EVENT_NOTIFICATION, model->features);
+>  drivers/vhost/net.c   | 2 +-
+>  drivers/vhost/vhost.c | 2 +-
+>  drivers/vhost/vhost.h | 2 +-
+>  drivers/vhost/vsock.c | 2 +-
+>  4 files changed, 4 insertions(+), 4 deletions(-)
+>
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index 9af19b0cf3b7..135e23254a26 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -1642,7 +1642,7 @@ static int vhost_net_set_features(struct vhost_net =
+*n, u64 features)
+>                 goto out_unlock;
+>
+>         if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
+> -               if (vhost_init_device_iotlb(&n->dev, true))
+> +               if (vhost_init_device_iotlb(&n->dev))
+>                         goto out_unlock;
+>         }
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index cbe72bfd2f1f..34458e203716 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -1729,7 +1729,7 @@ long vhost_vring_ioctl(struct vhost_dev *d, unsigne=
+d int ioctl, void __user *arg
+>  }
+>  EXPORT_SYMBOL_GPL(vhost_vring_ioctl);
+>
+> -int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled)
+> +int vhost_init_device_iotlb(struct vhost_dev *d)
+>  {
+>         struct vhost_iotlb *niotlb, *oiotlb;
+>         int i;
+> diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
+> index d9109107af08..4bfa10e52297 100644
+> --- a/drivers/vhost/vhost.h
+> +++ b/drivers/vhost/vhost.h
+> @@ -221,7 +221,7 @@ ssize_t vhost_chr_read_iter(struct vhost_dev *dev, st=
+ruct iov_iter *to,
+>                             int noblock);
+>  ssize_t vhost_chr_write_iter(struct vhost_dev *dev,
+>                              struct iov_iter *from);
+> -int vhost_init_device_iotlb(struct vhost_dev *d, bool enabled);
+> +int vhost_init_device_iotlb(struct vhost_dev *d);
+>
+>  void vhost_iotlb_map_free(struct vhost_iotlb *iotlb,
+>                           struct vhost_iotlb_map *map);
+> diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+> index a2b374372363..1ffa36eb3efb 100644
+> --- a/drivers/vhost/vsock.c
+> +++ b/drivers/vhost/vsock.c
+> @@ -829,7 +829,7 @@ static int vhost_vsock_set_features(struct vhost_vsoc=
+k *vsock, u64 features)
+>         }
+>
+>         if ((features & (1ULL << VIRTIO_F_ACCESS_PLATFORM))) {
+> -               if (vhost_init_device_iotlb(&vsock->dev, true))
+> +               if (vhost_init_device_iotlb(&vsock->dev))
+>                         goto err;
+>         }
+>
+> --
+> 2.25.1
+>
 
