@@ -2,120 +2,144 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 76CBC6650A7
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 01:56:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B02F665146
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 02:52:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233836AbjAKA4D (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 10 Jan 2023 19:56:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55648 "EHLO
+        id S233245AbjAKBwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 10 Jan 2023 20:52:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232858AbjAKA4B (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 10 Jan 2023 19:56:01 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68DF113F91
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 16:56:00 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id fz16-20020a17090b025000b002269d6c2d83so2697927pjb.0
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 16:56:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=LHHWINXpgWQ8X1RAhvss5tXTw045jI9Q+hmOj82PhHI=;
-        b=d/h1K4XBhTxSg/yHUwV3qQNrApxphNvm5Vp1r0ZcR9pHOL+fcE/39lQe08nRfIRxiL
-         Aoy0tXLXOFI8chfV1dYnPzmP59cL6yK6xes1mqiwgKc/zfg/3FvPSZ3JRktgoRkhJZcP
-         BwYIKVPCBgr92oVndlNVEoOx65hYEboe2akrICqwOEro1PTyZX+vVxkrZtv8uRex9kAK
-         TDG9nL4T8nWs+9E7DdCVNVrkbrrBq2jEtkt3hGrYU289eCUCdoqSlJdR2G1eJ1QarvSx
-         pX2YIsrm1wvOzqTJxiAzh/LnVpR5TVfxnJHZXDwj46leHPhj4Z29I6+kBlp1TYSlvqky
-         mqOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=LHHWINXpgWQ8X1RAhvss5tXTw045jI9Q+hmOj82PhHI=;
-        b=dJ3OSMfApJ196HVTp4cKiCltZzLWiMrpFlCSEZmm2zJpXQe1xG1eeZ0ndS2zjoOoI7
-         MsL8xyIUVOPM6UlecuxKIemtsRgSOvzM7BXMwhxJhXMp8bOw3KvV7mWTVVSGES1/ys1+
-         M2cxPRhaDhztGq1kunVponoOW3BR8J4oy0NqWG1A9jLHwXMc8xZ/sjVoCmBsGiM63Qqa
-         +SuT3LXLRrX3zQTNlutriQeXLImFw6Y28XuljTTQyibBe1Y+hpchM0ArkFCssVwAFGwS
-         GXwSKrkN2kv2nqw0URDIdb+p/gzVS3TCZeGQrnn48i0mkYd4lu1eppIHYzqLPp9ucYlf
-         h1HQ==
-X-Gm-Message-State: AFqh2ko8XVAnCKWciG/NTaPYXhSt1rpPRGayAGAF8GPQTogR9+W25R/D
-        OKa509MgAt+LBNmA9UDiPzwvGVNJOr8EIZ7aqPoajg==
-X-Google-Smtp-Source: AMrXdXsYHS/aIJUbc2lrM9W3MRvphUJ+CDg/fAUxo0yMmZfAo9p7h4JAVlo2dZNdQzVfYPqUU13hauz2CKYXF9nuFWw=
-X-Received: by 2002:a17:90a:2a82:b0:227:1d0b:5379 with SMTP id
- j2-20020a17090a2a8200b002271d0b5379mr842064pjd.103.1673398559752; Tue, 10 Jan
- 2023 16:55:59 -0800 (PST)
-MIME-Version: 1.0
-References: <20221230035928.3423990-1-reijiw@google.com> <Y7zG3B3DmFZLU200@google.com>
-In-Reply-To: <Y7zG3B3DmFZLU200@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 10 Jan 2023 16:55:43 -0800
-Message-ID: <CAAeT=FzJozO+qW3VbiF2ojfDqcf_WTMohh45uxfiUBVfF5bHaQ@mail.gmail.com>
-Subject: Re: [PATCH 0/7] KVM: arm64: PMU: Allow userspace to limit the number
- of PMCs on vCPU
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
+        with ESMTP id S231455AbjAKBwq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 10 Jan 2023 20:52:46 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E887B6163
+        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 17:52:44 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A15FCB81A6A
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 01:52:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 500AEC433D2
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 01:52:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673401962;
+        bh=PRWRQlu7g9TlSoF6FCBN42YjmVN43cRAI7cKQ9me5i4=;
+        h=From:To:Subject:Date:From;
+        b=FU41P0tZJq52v7fjVevCt/AEvAb4IwjyJXGlCn3XYfe2/fJ46UzgeTx7tYyWm/hNL
+         eExTiz95iCx1svYo94VmisGr0DsOFTk3j+s5WSPIYzOCqc0NnPnNZe9Fg53P/5H60S
+         OQorXAZh4SV0iXCxhOBTnG32+yyCSbD8ty4doTDfOVR+8INCwOhhLPD4xXgYlisEue
+         JFvaNwfW0SaXeR/HzKyOUT+LOCpun/9A8Z5pR9YTOryeyRhdKHNgxBHwix8Dqv4J+y
+         e9reAZkM6MajDlY0dJZ1pZxhhppy+KPYcN8xSX4TyoQ0bs6SI91rpZb47fHj/uURX9
+         51R2Bz4mNGgyw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id 3969BC43141; Wed, 11 Jan 2023 01:52:42 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216910] New: Test Assertion failure in kvm selftest rseq_test
+Date:   Wed, 11 Jan 2023 01:52:41 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: lixiao.yang@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-216910-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216910
 
-On Mon, Jan 9, 2023 at 6:01 PM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> Hi Reiji,
->
-> On Thu, Dec 29, 2022 at 07:59:21PM -0800, Reiji Watanabe wrote:
-> > The goal of this series is to allow userspace to limit the number
-> > of PMU event counters on the vCPU.
-> >
-> > The number of PMU event counters is indicated in PMCR_EL0.N.
-> > For a vCPU with PMUv3 configured, its value will be the same as
-> > the host value by default. Userspace can set PMCR_EL0.N for the
-> > vCPU to a lower value than the host value, using KVM_SET_ONE_REG.
-> > However, it is practically unsupported, as KVM resets PMCR_EL0.N
-> > to the host value on vCPU reset and some KVM code uses the host
-> > value to identify (un)implemented event counters on the vCPU.
-> >
-> > This series will ensure that the PMCR_EL0.N value is preserved
-> > on vCPU reset and that KVM doesn't use the host value
-> > to identify (un)implemented event counters on the vCPU.
-> > This allows userspace to limit the number of the PMU event
-> > counters on the vCPU.
->
-> I just wanted to bring up the conversation we had today on the list as
-> it is a pretty relevant issue.
->
-> KVM currently allows any value to be written to PMCR_EL0.N, meaning that
-> userspace could advertize more PMCs than are supported by the system.
->
-> IDK if Marc feels otherwise, but it doesn't seem like we should worry
-> about ABI change here (i.e. userspace can no longer write junk to the
-> register) as KVM has advertized the correct value to userspace. The only
-> case that breaks would be a userspace that intentionally sets PMCR_EL0.N
-> to something larger than the host. As accesses to unadvertized PMC
-> indices is CONSTRAINED UNPRED behavior, I'm having a hard time coming up
-> with a use case.
+            Bug ID: 216910
+           Summary: Test Assertion failure in kvm selftest rseq_test
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 6.1
+          Hardware: Intel
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: lixiao.yang@intel.com
+        Regression: No
 
-Yes, I agree with that. I will be looking at adding the validation
-of the register field for the v2.
+Environment:
+Processor: Intel(R) Xeon(R) Platinum 8487C (Sapphire Rapids)
+CPU Architecture: x86_64
+Host OS: Red Hat Enterprise Linux 9 (Ootpa)
+Host kernel: Linux 6.1 release
+gcc: gcc (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)
+Host kernel source:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+Branch: master
+Commit: 830b3c68
 
-Thank you,
-Reiji
+Qemu source: https://git.qemu.org/git/qemu.git
+Branch: master
+Commit: 5204b499
+
+Bug Detailed Description:
+Test assertion failure happens in kvm selftest rseq_test on the linux 6.1
+release kernel.=20
+
+=3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+=C2=A0 rseq_test.c:268: i > (NR_TASK_MIGRATIONS / 2)
+=C2=A0 pid=3D867071 tid=3D867071 errno=3D4 - Interrupted system call
+=C2=A0 =C2=A0 =C2=A01 =C2=A00x000000000040281d: main at rseq_test.c:268
+=C2=A0 =C2=A0 =C2=A02 =C2=A00x00007f8ef9444e4f: ?? ??:0
+=C2=A0 =C2=A0 =C2=A03 =C2=A00x00007f8ef9444efb: ?? ??:0
+=C2=A0 =C2=A0 =C2=A04 =C2=A00x00000000004028b4: _start at ??:?
+=C2=A0 Only performed 2511 KVM_RUNs, task stalled too much?
+
+
+Reproducing Steps:
+
+git clone=C2=A0https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/lin=
+ux.git
+cd linux && git checkout v6.1 && make headers_install
+cd tools/testing/selftests/kvm && make
+./rseq_test
+
+Actual Result:
+=3D=3D=3D=3D Test Assertion Failure =3D=3D=3D=3D
+=C2=A0 rseq_test.c:268: i > (NR_TASK_MIGRATIONS / 2)
+=C2=A0 pid=3D867071 tid=3D867071 errno=3D4 - Interrupted system call
+=C2=A0 =C2=A0 =C2=A01 =C2=A00x000000000040281d: main at rseq_test.c:268
+=C2=A0 =C2=A0 =C2=A02 =C2=A00x00007f8ef9444e4f: ?? ??:0
+=C2=A0 =C2=A0 =C2=A03 =C2=A00x00007f8ef9444efb: ?? ??:0
+=C2=A0 =C2=A0 =C2=A04 =C2=A00x00000000004028b4: _start at ??:?
+=C2=A0 Only performed 2511 KVM_RUNs, task stalled too much?
+
+
+Expected Result:
+Successfully executed
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
