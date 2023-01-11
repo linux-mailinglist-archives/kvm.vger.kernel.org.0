@@ -2,113 +2,109 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B952666068
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 17:27:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 585FE666107
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 17:55:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233524AbjAKQ1X (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 11:27:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34368 "EHLO
+        id S235347AbjAKQzJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 11:55:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239689AbjAKQ0z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 11:26:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD4F39F8D
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 08:23:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673454187;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bAzX0I8qhNQFozyjHTOv5miI6bc1TzOt0NGHpESsMAQ=;
-        b=Rpc2H4zbMZ9lrVT2TNyW8YFfb8f8SvPGwwRxjxDfo4ywItxSQUI+Yp1yfMv0arhb0M7XTw
-        hOQ38JdYPrpq0NQC+hS2GJhPvfd10olrUsgWCEn1TxyDK8GhGj0O6WOq3fliVhMDr3L9ND
-        8EnBUnZGQaqRDsX4x2uFWehUAL0qi7Y=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-672-zt_H5V1dMyaZ37STa6ZDcg-1; Wed, 11 Jan 2023 11:23:06 -0500
-X-MC-Unique: zt_H5V1dMyaZ37STa6ZDcg-1
-Received: by mail-wr1-f70.google.com with SMTP id y5-20020adfc7c5000000b002bc02b72d2dso2134301wrg.19
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 08:23:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bAzX0I8qhNQFozyjHTOv5miI6bc1TzOt0NGHpESsMAQ=;
-        b=L2DXr8V/cl5L2fOwMj7UJl6T/WlxW6i9EEAoNGWFSuL+bRtkf/KcoRXHbPDE0tjgB8
-         WA8YzWMVz5sz5sm0PAir7Ikq18/KWkpCo4/hZ1KTp9vaxmNI4Pag+uM6/98A/PViSpnK
-         y6Czvw0OAxO7zxlINeIW6vZcrlvc5K7n6lSR8mrPrlhqgtAJ/6lTElC0nU9nXJumuOeq
-         VWokcRqtFjRtf/YCihDxOC5Tbs/HYOwNYZH6fIwWVNUgOnfw5uC/MSZEQ4gC+3jI3+62
-         +X1Tts2S028Pd61lTaMo+PxFd/IfjGTQH9oZ9SQJ8frH9ysXgM+EdnFrYCvWagCMVI2n
-         V0aA==
-X-Gm-Message-State: AFqh2kpcWHm6+2uy15tw6aEZrEKzytcPVqddz/k/I0u8PWo4x2XTjAVf
-        dDrrKHJCP6FXzi4GLv4uTyiW+Z5xyMahPamfMUVHiqhYgnRe+MEXCZIIOsf4HhjFFi68j18Fwom
-        l82xvLHLNYohg
-X-Received: by 2002:a7b:ce06:0:b0:3cf:a483:3100 with SMTP id m6-20020a7bce06000000b003cfa4833100mr52806211wmc.3.1673454185097;
-        Wed, 11 Jan 2023 08:23:05 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtLvuQHiCtmyqnm4CLAs4LBNQIvAx3luYBZ9kZsu5kzE6A6u6fOimphXyAb5WqlrOBkfqsJsQ==
-X-Received: by 2002:a7b:ce06:0:b0:3cf:a483:3100 with SMTP id m6-20020a7bce06000000b003cfa4833100mr52806198wmc.3.1673454184874;
-        Wed, 11 Jan 2023 08:23:04 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:4783:a68:c1ee:15c5? ([2001:b07:6468:f312:4783:a68:c1ee:15c5])
-        by smtp.googlemail.com with ESMTPSA id v10-20020a05600c444a00b003d998412db6sm25266750wmn.28.2023.01.11.08.23.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 11 Jan 2023 08:23:04 -0800 (PST)
-Message-ID: <8333e62b-8bb6-981f-ba07-d867ec61657e@redhat.com>
-Date:   Wed, 11 Jan 2023 17:23:00 +0100
+        with ESMTP id S235459AbjAKQyl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 11:54:41 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EBC018B0C
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 08:54:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=8H4AwAA/6i7aWAECp9a70v+AONnnkOC/ud5i95CYL4g=; b=qrSRycd5iOyDO6hyWyn+oMeKlx
+        H5EH3bZkJ0ozOy301sRdZoaqsViqKaYMfbszlTKY/uDoXBQJQn9iM9kuj0HmqlYSsSO8WpKm8M9tw
+        V9DnplDTyDvAmBd2dlHTb2kaJEL8rHOeB+lhiZoraUrMRd2gVqPUaEtxzizdgJLVDsSehLceIzS5m
+        TzWqiyMH/BSK4O+eI7DME1B9BeCkKthwyppAlWk4qyOTqtO5TrjcjIWa8K4VnkKzytE9gF+cmpNHJ
+        8DTmQJDVsRC+IfanV/5d4YU9i44JeYMUv4PLCesJAzYT9+AZmIYXv8m1mjIp879wZCaTZOUBalD/d
+        wi8kue2Q==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pFeMq-003kGf-08;
+        Wed, 11 Jan 2023 16:54:24 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 1AA4D300472;
+        Wed, 11 Jan 2023 17:54:29 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 0069C2CA25088; Wed, 11 Jan 2023 17:54:28 +0100 (CET)
+Date:   Wed, 11 Jan 2023 17:54:28 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     David Woodhouse <dwmw2@infradead.org>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, paul <paul@xen.org>,
+        Sean Christopherson <seanjc@google.com>,
+        kvm <kvm@vger.kernel.org>, Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH 2/3] KVM: x86/xen: Fix potential deadlock in
+ kvm_xen_update_runstate_guest()
+Message-ID: <Y77pxBsxac0z71RI@hirez.programming.kicks-ass.net>
+References: <99b1da6ca8293b201fe0a89fd973a9b2f70dc450.camel@infradead.org>
+ <03f0a9ddf3db211d969ff4eb4e0aeb8789683776.camel@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 11/14] KVM: selftests: Disable
- "gnu-variable-sized-type-not-at-end" warning
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Marc Zyngier <maz@kernel.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Nathan Chancellor <nathan@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Tom Rix <trix@redhat.com>, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-riscv@lists.infradead.org,
-        llvm@lists.linux.dev, linux-kernel@vger.kernel.org,
-        Ricardo Koller <ricarkol@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-References: <20221213001653.3852042-1-seanjc@google.com>
- <20221213001653.3852042-12-seanjc@google.com>
- <CAKwvOdnRQQb9YbH=MgDymBmmjYgajc8tkyjbJVxjpA5zDZpNTQ@mail.gmail.com>
- <Y5ffxebJ/eRzEXh+@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <Y5ffxebJ/eRzEXh+@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <03f0a9ddf3db211d969ff4eb4e0aeb8789683776.camel@infradead.org>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 12/13/22 03:13, Sean Christopherson wrote:
-> AFAICT, gcc stopped treating unknown "-Wno" flags as unconditional errors starting
-> with gcc-4.4, and the kernel's min supported version is 5.1.  gcc-4.4 through
-> gcc-9.5 all print a mild warning if there's a different error, but otherwise
-> silently ignore the uknown "-Wno".
-> 
->    cc1: warning: unrecognized command line option '-Wno-gnu-variable-sized-type-not-at-end'
+On Wed, Jan 11, 2023 at 09:37:50AM +0000, David Woodhouse wrote:
+> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
+> index 07e61cc9881e..c444948ab1ac 100644
+> --- a/arch/x86/kvm/xen.c
+> +++ b/arch/x86/kvm/xen.c
+> @@ -272,7 +272,12 @@ static void kvm_xen_update_runstate_guest(struct kvm=
+_vcpu *v, bool atomic)
+> =A0=A0=A0=A0=A0=A0=A0=A0 * Attempt to obtain the GPC lock on *both* (if t=
+here are two)
+> =A0=A0=A0=A0=A0=A0=A0=A0 * gfn_to_pfn caches that cover the region.
+> =A0=A0=A0=A0=A0=A0=A0=A0 */
+> -=A0=A0=A0=A0=A0=A0=A0read_lock_irqsave(&gpc1->lock, flags);
+> +=A0=A0=A0=A0=A0=A0=A0local_irq_save(flags);
+> +=A0=A0=A0=A0=A0=A0=A0if (!read_trylock(&gpc1->lock)) {
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0if (atomic)
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0ret=
+urn;
+> +=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0read_lock(&gpc1->lock);
+> +=A0=A0=A0=A0=A0=A0=A0}
+> =A0=A0=A0=A0=A0=A0=A0=A0while (!kvm_gpc_check(gpc1, user_len1)) {
+> =A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0=A0read_unlock_irqrestore(&g=
+pc1->lock, flags);
+> =A0
 
-scripts/Makefile.compiler has cc-disable-warning for this, we can copy 
-it to tools/.
+There might be a problem with this pattern that would be alleviated when
+written like:
 
-Paolo
+	local_irq_save(flags);
+	if (atomic) {
+		if (!read_trylock(&gpc1->lock)) {
+			local_irq_restore(flags);
+			return;
+		}
+	} else {
+		read_lock(&gpc1->lock);
+	}
 
+(also note you forgot the irq_restore on the exit path)
+
+Specifically the problem is that trylock will not trigger the regular
+lockdep machinery since it doesn't wait and hence cannot cause a
+deadlock. With your form the trylock is the common case and lockdep will
+only trigger (observe any potential cycles) if/when this hits
+contention.
+
+By using an unconditional read_lock() for the !atomic case this is
+avoided.
