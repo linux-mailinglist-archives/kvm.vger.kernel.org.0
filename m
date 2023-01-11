@@ -2,318 +2,267 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88524665E1F
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 15:36:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE6FE665E2C
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 15:41:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239472AbjAKOgo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 09:36:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48986 "EHLO
+        id S233770AbjAKOlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 09:41:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238964AbjAKOgQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 09:36:16 -0500
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1041632180;
-        Wed, 11 Jan 2023 06:32:40 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jH2Pv5+dn/WkPDFchI0T4NsnAjNypOnRQFx4rUz+kc+FZBcsSwMm38fJmRu71T2ok0aKsHNCICCQH5j7j70MWuRbGnbWkoEzcLIg6xL4o0A2vWHyV9lYUQPhuRiuB6X2sicGT7E0Pkfm/m6PjbSFFbINcGdslusHUCMR9dUba8goCFdhlP2Vl0MfU90lg/BpiO+DljdgRQ9sC6DieHryTFXL2F0BQtDVXjHi+aiyGZ3eddMDJ0/zYPk5Izv32io/UkF3T6Man4n4S629wZUmz8Cbs5snlot2wMmGjpTmGG40TejPEmhQ5f4RipnLzPrVaoT0PzR71lSMuAwbmjYFaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bfdMHRWYMnxhSuc30Yxqe6k74+cHW1tPOmzIkD68Mqg=;
- b=ZHP0dqEozsWtZ0ZiLU8YKnjxCAQrR25p1pQm1rO3ddEMZA4OkNde4BMnsD6rWiiJ3UCkmg66A+m5McdCSC9PFirN8V0FrENfh+K6pKcxmGp8wk18hf6e0xXP0FWJ+2c1ch9b/Sh374dT8qs/Gp5n125+MUchW3QyjEt05I5HWRT+Z4x6LeczH/itz5f6sU7MTmdYidURqtVq5AkVdnSQrJsLBFBlOVW7hfSw0DXHjBf/3DlzIBKz/7TXnfC0XF133M+6BM8Ikp8FOC/s+RCg4nY4+S0Q25jEQQByv3iisHqSpcQnlKKnVctnQkQKnXlt6iQISg1uvoWisSv0abI4Hw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bfdMHRWYMnxhSuc30Yxqe6k74+cHW1tPOmzIkD68Mqg=;
- b=NXxPzjRKbK6yO92+KJ9/g3EK8muSa8kVhszQAeAA5LwcwIkV+m8zK2ivqt6HSgZ2w48R57TTCbWHNn0fUR65MBigTpkEH7L4e9EMTHZfOxxwLzEQbrJxRmqU/JTyu3G+1BucV7ktFdfsMvQDY2A+8LV1LXvNxJk+3gq+Jacd7YQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com (2603:10b6:5:398::12)
- by MW4PR12MB7032.namprd12.prod.outlook.com (2603:10b6:303:20a::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Wed, 11 Jan
- 2023 14:32:36 +0000
-Received: from DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::8200:4042:8db4:63d7]) by DM4PR12MB5229.namprd12.prod.outlook.com
- ([fe80::8200:4042:8db4:63d7%3]) with mapi id 15.20.6002.013; Wed, 11 Jan 2023
- 14:32:36 +0000
-Message-ID: <d6b835e0-43e7-e5ae-e291-6ff0611cc817@amd.com>
-Date:   Wed, 11 Jan 2023 08:32:32 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
-Content-Language: en-US
-To:     Dov Murik <dovmurik@linux.ibm.com>,
-        Dionna Amalie Glaze <dionnaglaze@google.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
+        with ESMTP id S239272AbjAKOlN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 09:41:13 -0500
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED65ACF9;
+        Wed, 11 Jan 2023 06:40:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.de; s=s31663417;
+        t=1673447931; bh=KGDHyrq93FiiZx1EhWmtnBQOkzL5jkL4/UViqKUSfL4=;
+        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=T1i/unbasWn85o+aPTED4yXFVg7aLTucnQyk8ryAaSmEqmPCfyf+rETycugwO24rQ
+         fF7XuH5tCyDA/r2I+smEDWAhExcHBWpcZo/bQzLzrLCJxB4Ity0JowhbE41cCDZr5z
+         v0oaGYPBY5pBnLO0otKZQRVpojZvkUqmEy7xCoqCuex4IL+xRZ23QY9UdK9HeSVVOq
+         phoPQrIJj5wX3fJBvaPOslFYXdFXFVlCeWDI7sgfOwjWq9YlXJXvUd5mBjszRoyVSi
+         aibeKXgnonXYZ0Knv71UPYJBj3HWkamsneodQ2Oaw5uKdGPtiuB8p1EDavrOJ70UtA
+         jai1ONqaNRt3A==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from localhost ([134.147.254.72]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MCsPy-1p6qoF0gMa-008niX; Wed, 11
+ Jan 2023 15:38:51 +0100
+Date:   Wed, 11 Jan 2023 15:38:36 +0100
+From:   Tom Dohrmann <erbse.13@gmx.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
-        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
-        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
-        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
-        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
-        rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com, Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v7 47/64] KVM: SVM: Add support to handle MSR based
+ Page State Change VMGEXIT
+Message-ID: <Y77J7C2E9Xd1QcmZ@notebook>
 References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-63-michael.roth@amd.com>
- <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
- <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
- <54ff7326-e3a4-945f-1f60-e73dd8865527@amd.com>
- <a3ecd9fc-11f8-49b6-09a2-349df815d2cf@linux.ibm.com>
- <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
- <9f221719-7ab3-3e87-7d66-a4ca6ce0e794@linux.ibm.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-In-Reply-To: <9f221719-7ab3-3e87-7d66-a4ca6ce0e794@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: CH2PR08CA0020.namprd08.prod.outlook.com
- (2603:10b6:610:5a::30) To DM4PR12MB5229.namprd12.prod.outlook.com
- (2603:10b6:5:398::12)
+ <20221214194056.161492-48-michael.roth@amd.com>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5229:EE_|MW4PR12MB7032:EE_
-X-MS-Office365-Filtering-Correlation-Id: 76812c0f-ca7f-459c-3fce-08daf3e0aecc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UOV7WxsKmL6PtHJNZjURnjRphvyN5CYU4VNvIdXK5548hApTBNXHSUb52jG3i0m8TRJYfeK7Yyqa06AG+v4tcBbZ8jwwAFQnf8gy20bqtbjAaJgLFapAXivncaAlqR3TmMuq9viz2fRAZteFC6tE35QWal5Xo8A8U/texAHXuqzrsIai+/Iqxb9zWpTfpYRcnOBPl2qJY0jqgN0NwDWgq62w1Pyoxptet0n9s1XhKs1xlPwJO16TSrpy9lMyP6uGOSloleVTFKG6Szu+p/nBZEv6xah7auNcRkI8ZC2hE9lmDb/+UczuDqs0XoAwD5RwNAiszGEW06G4K5ecR5AvOalkRbsLydw+Ut16++pESkt7V57H9/7HdO63W9tkmE3iMiX/svOpk9optBjSY4wicrE94nBnTTU55Pb/uzzHdxZYFjrmHbQxDI9S0D5PIJLQdauhthnKCaH6fPLkK+/j23awoV1gRHi8L1xkkjp7vknYKCNpabqNJXM2qZvh4wqc6hYiBe53kbm37893TfHQMu3p3flL+vXAlQAOSVaC2IsnyWT0SM1Yvx0rk4dLq7wenPgVbaQd773UkiQJR7Im/4JlQTAeSyh7Jx3oQpv/Vhk7I1GQiWgq2T78XNNqg4naXClLWQP5chtx11wRMl+vdqNnkxXJkd8RVwRQUgKH7dRlaYa8m1FcFtxptTQq4xqNY8r4ms2CdUc2gAKcX/HOzusHJvCKctiaTSyGl57jBk0=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5229.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(136003)(396003)(39860400002)(366004)(451199015)(66946007)(110136005)(2616005)(4326008)(41300700001)(8676002)(316002)(66476007)(66556008)(36756003)(86362001)(31696002)(83380400001)(8936002)(38100700002)(5660300002)(7416002)(7406005)(6486002)(2906002)(6506007)(6512007)(53546011)(31686004)(478600001)(186003)(26005)(6666004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d1lHN1NLTjdUK3p4cytjOENwVXNtZWNnQnkzMjd5dzVyZ1JkMVoyRVFsNzR5?=
- =?utf-8?B?bHA3SG1QZG9naXBCRzBLcEI1ZkllRXNqREtpMEtSMzJ5SjFtcGswUXUvTkZW?=
- =?utf-8?B?RDdvU3lBSXZWVnlvNGJoK3U4Z2VZNnpkQjh0WDR2YTVjYlVBaGxpUGtueU5S?=
- =?utf-8?B?MndpMlQ4dXpaSHdqV2ZWZ2ZlWVhYMEsyQ1dGUjJOYisrN1lFSHZrZ1ZGVGEz?=
- =?utf-8?B?MnBSdDI2c0tFOHJNYnpCYUdhV3JrdlVGdnUybWV1SDEzWG1YSEYwRHNoRXBS?=
- =?utf-8?B?MWg5NE13RDJ1Rmw4OHMzSDFnWmczU3Z0NFlNa2t6aGljNjk3NkhYaUJRRVdu?=
- =?utf-8?B?eEFmZGVRMU14Vmd2aTVvTXNsYTRQWC9pOWRlOGV0M0thY2lkOG5pSkxvQ09U?=
- =?utf-8?B?M0piVzhlT0ZSczF1T2pGTlBrTC9Lcy9OQmUrU2pMdjg0V0RLRjRTSVl2TUQr?=
- =?utf-8?B?bEtvT0lMQllvYnJuWTF4SGF1T3dxYzhaY3ZwMTZGTDYyY2RNRXNOcld5U0Uz?=
- =?utf-8?B?bVhkUDY0cU9ncmdRSER5Z2dZT1dxQ3dDY2VubS8xRFk3ZE1BMzkyRTJDcXdk?=
- =?utf-8?B?SVJuazVDM3U5bnF2U1lCV1NCWHdRQUNaVjQ5SVZZRU1hYStveHZPVE1QWkdM?=
- =?utf-8?B?QTkrU0YrbDRtNzJyM2VXNFJhckhHdlJGcFpWRWRCR1hJQWpGcjJpbi9CbS9D?=
- =?utf-8?B?VEdOWEo5U2lxVThXYVZTalBUTVc2RHJCZG83K2czZmQzSEhRcUxLTHJjdUlB?=
- =?utf-8?B?SFBOLy9UNHY2NFlwcnJtRjFOWE1PaENKTXpsK0dTcytvbmNsSHV2VGlBWU41?=
- =?utf-8?B?eGZrWFRsVUgvZys5ZDJ2UEN4dXRQOTRPY2JIeDhGZkNVSHRPblNmZkN3SlJu?=
- =?utf-8?B?MW5ZeGh6c2o4aXpYSEZVNVorVUVxTjVDMFFncGJlRmRqVGxlbkdaRkttMlRz?=
- =?utf-8?B?VTFkd3VvY3NITDlNdSszbXdaQWFhaEZpamRYZ2pFTUZpd3hNRjV4UGM1aDAr?=
- =?utf-8?B?UWl3a29UeEwwaGFXQjFmNDJjS1RjbzRLeFRBZVVWR3cwbzJSTG9qdURpaytN?=
- =?utf-8?B?eGFTUDJUY2NCaFF4RXhzY2Z5Ym5ZZllmUjdwbmZnK3pncUNNNzJpRGJ3cEky?=
- =?utf-8?B?akxya0ZzOVFxdUdBbVNHZVoybVZTK0FldG5JcC95OUNGN1U2c1JFdTdMVWxS?=
- =?utf-8?B?alc5TkF6MERBemJIV2t6WHNkTmlQTVVVRXpuSmU2enl5MHRiSG4xUlUyMUY5?=
- =?utf-8?B?TmtsSEF5S3FxQUF1ZytZTmJRM0pWQjJ1eE1kOFZpM1k3NGpGNXFHZ2tYQmpH?=
- =?utf-8?B?Slh4cndVTFh6dXB0cDUxSGJ6ak5xd1pyZ3lWam9YSmEzcnY2cEdpeDBKRE9o?=
- =?utf-8?B?dkJVZ2pHNkMxNURlWHc5Qk1YTS9QT2ZIdlhsZDRwZnY2RVM1V2ZHWEJ0Uld2?=
- =?utf-8?B?WEJ4MDVnWllTSFJwbWJLWXR0WTM2V2hWaWNqbVhHTkFIQThSaUcvSStycWxN?=
- =?utf-8?B?VVhTeUVuVzhzMUR4OTNReWxMZHhHZkUzZkJSM0VKMmZNc1ZtdVU2ZkZORmQ1?=
- =?utf-8?B?cUg5bEhCUzRpK2pGc1ZWZjY4QjNTQUQyTjNWWlNUUTJGWVNlZEYra2puNFJR?=
- =?utf-8?B?SXExYUZXVWt5Znd2QTdqeXM5c0lHaWp1Z0xPeGkwSDJ0dnVtN2pBanZFUTRY?=
- =?utf-8?B?anV0MTFpUktOOGdZQ2VYT2NJSGs2dVJMMVRZYW5ZdnpWUUo4V2xFbnhqMjRE?=
- =?utf-8?B?bkl0c2x2MFIzWDlnb0l3SXFVeVpTVXNEeEtlbEsrd3lnTjlHSHZ5M294eERQ?=
- =?utf-8?B?aUhYQTh6QVlvWXF0R1ByeUtkNnRzdDFQZXdnZHBxMk0zN2lENCtWaE1OdlhM?=
- =?utf-8?B?UnV5ZHZ2QjRxZjNjYVFIWWQwVC80K2VKcG8vMzhxK2RzWU1semtRUXI1Vm5v?=
- =?utf-8?B?aFVnM1dLbHhBV3BVM2lDdlJyUnU5TTF3bm5kQ3FnNnpvdmFaSjhCUU1sMXhF?=
- =?utf-8?B?M1pTbmF0UTMvd3VSOWlyRm51eHhFZThWZVZwZmhSM3VqbDBzRWhHN3R4U2JH?=
- =?utf-8?B?MWxxZEFjTHc5OXBtNGFzbm1PaDJvRFJ0UHpzbVo4bUxLWUlCdnprUUdDeEhS?=
- =?utf-8?Q?WSnBOeYvIEJXwt6GeAk3F8w7D?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 76812c0f-ca7f-459c-3fce-08daf3e0aecc
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5229.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jan 2023 14:32:35.9222
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uLLFQrYnxw5ZcQvmmmPIwOps3F5eD13vxy7iiKOtgrzdTAN4/1N6A5Jx4m7w+QOyAC+f8b6d99olVVT2AKm2sw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7032
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221214194056.161492-48-michael.roth@amd.com>
+X-Provags-ID: V03:K1:fyBxy7/U5oJ/3CUIg8Fre+QtVDGfqDpzpl+I0WKzziUfm4MtvXH
+ AN3QAiMSkM5UBh+zOT1MtudGYJsm/9WAwTwuQVrW9T1IKHRY/XUiKRphImWDNWTF9ABn9xS
+ j/kH6EL/jxWkwofoHGGaOkbeNgGASfqpYy+Y8tEvaCU+RPPS/pXtABfeyrJlD6mKnOtM+Ku
+ xbRNGzskdvgqgPvCL3wtA==
+UI-OutboundReport: notjunk:1;M01:P0:dH+xw7ymR9w=;cLUfesrjFWuy3u94c3rIF8n1+Nx
+ Te1okBEsYhishwY+PSwiZ9P45qQcafKVEnwg3kwi7G7qUJE90dCwVjb61fzHJIflyBk7bp8S8
+ lWAvq0IlNkcNvdGdX61wK824zpC/0hO/MFKDUQGAYyifvcDl+VBfjTpBv/PYwzL3rER+wz4xZ
+ is1MgUjXQdM3U403EuPgq2Ian1vDg1IaXwLA5IFBxk8344enYegAvdZuBir+BVdQ3yTkcTULi
+ F3LMNqn/aznyBRhKXh6k+YVoMV7rGaUlIVU0CkwOXrmJYnJZHZD81KhdCQ82AidNp2FwShiXr
+ HKj8LP8ZM6os69A3u20QKAww3ocLBz1hvdabDtXGfK/rn5PO1JEmBfJi8SXEUy4rxKIEjaJ24
+ feK7F6jUf4wmyKAL1iZbQQoYprtKQ2nnJblgjepW9Q98t4ejFpmHKRjaO7C2jh4/tTRJjMoto
+ CNcjQ2u8My7e94rboXSXB6DD/4UjK4e5FbIe//pVhikhjqKtE8bpG1Ndt/kjdDR92aqZBlbmc
+ zqMan439EU+mrtTqeeNIH/Gk3HNX/xhlm+eY5rrVjus9a3lFqtsYazgVbUPfPWfpcilNnAod4
+ buXxXnm/JwKKOWc2Rpm/8azzTVFxqcUqZAA4ZbpBWIUO6jgJjt10WwyrbWQZzB5pA7HohRjx6
+ LsCd8d38mENFHkKleNmaFZwOgltfEcW7/EIN5iAySLJB/xs++G7f4MCCj7WxMWxOZOn9VYxI1
+ euOwd8rDf/dp1TBKgqbq3uB9ERjjI6yEssBhsBoMikcgZT7aN7hix/C/zbvgwzXkj2BuD5YBy
+ IeWGwk6ftwt+oCAZiRTr/BynKmVaWZy4DdRIO3dHZMSkk0CklYUyCyKKDUijX0qiQaTluWlVB
+ eMvyTAjNqfTFqMfTP+1LH3WPIHxALQ13f5Yo48Fhw1v5VuFn6+j8WYM5pHjGt//AqZq2rL2rV
+ 7WQk5LKZadDRgYgVCTSLA378BFk=
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS,T_FILL_THIS_FORM_SHORT autolearn=ham autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/11/23 00:00, Dov Murik wrote:
-> 
-> 
-> On 10/01/2023 17:10, Tom Lendacky wrote:
->> On 1/10/23 01:10, Dov Murik wrote:
->>> Hi Tom,
->>>
->>> On 10/01/2023 0:27, Tom Lendacky wrote:
->>>> On 1/9/23 10:55, Dionna Amalie Glaze wrote:
->>>>>>> +
->>>>>>> +static int snp_set_instance_certs(struct kvm *kvm, struct
->>>>>>> kvm_sev_cmd *argp)
->>>>>>> +{
->>>>>> [...]
->>>>>>
->>>>>> Here we set the length to the page-aligned value, but we copy only
->>>>>> params.cert_len bytes.  If there are two subsequent
->>>>>> snp_set_instance_certs() calls where the second one has a shorter
->>>>>> length, we might "keep" some leftover bytes from the first call.
->>>>>>
->>>>>> Consider:
->>>>>> 1. snp_set_instance_certs(certs_addr point to "AAA...",
->>>>>> certs_len=8192)
->>>>>> 2. snp_set_instance_certs(certs_addr point to "BBB...",
->>>>>> certs_len=4097)
->>>>>>
->>>>>> If I understand correctly, on the second call we'll copy 4097 "BBB..."
->>>>>> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
->>>>>> 1) & PAGE_MASK which will be 8192.
->>>>>>
->>>>>> Later when fetching the certs (for the extended report or in
->>>>>> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
->>>>>> filled with 4097 BBBs and 4095 leftover AAAs.
->>>>>>
->>>>>> Maybe zero sev->snp_certs_data entirely before writing to it?
->>>>>>
->>>>>
->>>>> Yes, I agree it should be zeroed, at least if the previous length is
->>>>> greater than the new length. Good catch.
->>>>>
->>>>>
->>>>>> Related question (not only for this patch) regarding snp_certs_data
->>>>>> (host or per-instance): why is its size page-aligned at all? why is it
->>>>>> limited by 16KB or 20KB? If I understand correctly, for SNP, this
->>>>>> buffer
->>>>>> is never sent to the PSP.
->>>>>>
->>>>>
->>>>> The buffer is meant to be copied into the guest driver following the
->>>>> GHCB extended guest request protocol. The data to copy back are
->>>>> expected to be in 4K page granularity.
->>>>
->>>> I don't think the data has to be in 4K page granularity. Why do you
->>>> think it does?
->>>>
->>>
->>> I looked at AMD publication 56421 SEV-ES Guest-Hypervisor Communication
->>> Block Standardization (July 2022), page 37.  The table says:
->>>
->>> --------------
->>>
->>> NAE Event: SNP Extended Guest Request
->>>
->>> Notes:
->>>
->>> RAX will have the guest physical address of the page(s) to hold returned
->>> data
->>>
->>> RBX
->>> State to Hypervisor: will contain the number of guest contiguous
->>> pages supplied to hold returned data
->>> State from Hypervisor: on error will contain the number of guest
->>> contiguous pages required to hold the data to be returned
->>>
->>> ...
->>>
->>> The request page, response page and data page(s) must be assigned to the
->>> hypervisor (shared).
->>>
->>> --------------
->>>
->>>
->>> According to this spec, it looks like the sizes are communicated as
->>> number of pages in RBX.  So the data should start at a 4KB alignment
->>> (this is verified in snp_handle_ext_guest_request()) and its length
->>> should be 4KB-aligned, as Dionna noted.
->>
->> That only indicates how many pages are required to hold the data, but
->> the hypervisor only has to copy however much data is present. If the
->> data is 20 bytes, then you only have to copy 20 bytes. If the user
->> supplied 0 for the number of pages, then the code returns 1 in RBX to
->> indicate that one page is required to hold the 20 bytes.
->>
-> 
-> 
-> Maybe it should only copy 20 bytes, but current implementation copies
-> whole 4KB pages:
-> 
-> 
->          if (sev->snp_certs_len)
->                  data_npages = sev->snp_certs_len >> PAGE_SHIFT;
->          ...
->          ...
->          /* Copy the certificate blob in the guest memory */
->          if (data_npages &&
->              kvm_write_guest(kvm, data_gpa, sev->snp_certs_data, data_npages << PAGE_SHIFT))
->                  rc = SEV_RET_INVALID_ADDRESS;
-> 
-> 
-> (elsewhere we ensure that sev->snp_certs_len is page-aligned, so the assignment
-> to data_npages is in fact correct even though looks off-by-one; aside, maybe it's
-> better to use some DIV_ROUND_UP macro anywhere we calculate the number of
-> needed pages.)
+On Wed, Dec 14, 2022 at 01:40:39PM -0600, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+>
+> SEV-SNP VMs can ask the hypervisor to change the page state in the RMP
+> table to be private or shared using the Page State Change MSR protocol
+> as defined in the GHCB specification.
+>
+> Forward these requests to userspace via KVM_EXIT_VMGEXIT so the VMM can
+> issue the KVM ioctls to update the page state accordingly.
+>
+> Co-developed-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> ---
+>  arch/x86/include/asm/sev-common.h |  9 ++++++++
+>  arch/x86/kvm/svm/sev.c            | 25 +++++++++++++++++++++++
+>  arch/x86/kvm/trace.h              | 34 +++++++++++++++++++++++++++++++
+>  arch/x86/kvm/x86.c                |  1 +
+>  4 files changed, 69 insertions(+)
+>
+> diff --git a/arch/x86/include/asm/sev-common.h b/arch/x86/include/asm/se=
+v-common.h
+> index 0a9055cdfae2..ee38f7408470 100644
+> --- a/arch/x86/include/asm/sev-common.h
+> +++ b/arch/x86/include/asm/sev-common.h
+> @@ -93,6 +93,10 @@ enum psc_op {
+>  };
+>
+>  #define GHCB_MSR_PSC_REQ		0x014
+> +#define GHCB_MSR_PSC_GFN_POS		12
+> +#define GHCB_MSR_PSC_GFN_MASK		GENMASK_ULL(39, 0)
+> +#define GHCB_MSR_PSC_OP_POS		52
+> +#define GHCB_MSR_PSC_OP_MASK		0xf
+>  #define GHCB_MSR_PSC_REQ_GFN(gfn, op)			\
+>  	/* GHCBData[55:52] */				\
+>  	(((u64)((op) & 0xf) << 52) |			\
+> @@ -102,6 +106,11 @@ enum psc_op {
+>  	GHCB_MSR_PSC_REQ)
+>
+>  #define GHCB_MSR_PSC_RESP		0x015
+> +#define GHCB_MSR_PSC_ERROR_POS		32
+> +#define GHCB_MSR_PSC_ERROR_MASK		GENMASK_ULL(31, 0)
+> +#define GHCB_MSR_PSC_ERROR		GENMASK_ULL(31, 0)
+> +#define GHCB_MSR_PSC_RSVD_POS		12
+> +#define GHCB_MSR_PSC_RSVD_MASK		GENMASK_ULL(19, 0)
+>  #define GHCB_MSR_PSC_RESP_VAL(val)			\
+>  	/* GHCBData[63:32] */				\
+>  	(((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index d7b467b620aa..d7988629073b 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -29,6 +29,7 @@
+>  #include "svm_ops.h"
+>  #include "cpuid.h"
+>  #include "trace.h"
+> +#include "mmu.h"
+>
+>  #ifndef CONFIG_KVM_AMD_SEV
+>  /*
+> @@ -3350,6 +3351,23 @@ static void set_ghcb_msr(struct vcpu_svm *svm, u6=
+4 value)
+>  	svm->vmcb->control.ghcb_gpa =3D value;
+>  }
+>
+> +/*
+> + * TODO: need to get the value set by userspace in vcpu->run->vmgexit.g=
+hcb_msr
+> + * and process that here accordingly.
+> + */
+> +static int snp_complete_psc_msr_protocol(struct kvm_vcpu *vcpu)
+> +{
+> +	struct vcpu_svm *svm =3D to_svm(vcpu);
+> +
+> +	set_ghcb_msr_bits(svm, 0,
+> +			  GHCB_MSR_PSC_ERROR_MASK, GHCB_MSR_PSC_ERROR_POS);
+> +
+> +	set_ghcb_msr_bits(svm, 0, GHCB_MSR_PSC_RSVD_MASK, GHCB_MSR_PSC_RSVD_PO=
+S);
+> +	set_ghcb_msr_bits(svm, GHCB_MSR_PSC_RESP, GHCB_MSR_INFO_MASK, GHCB_MSR=
+_INFO_POS);
+> +
+> +	return 1; /* resume */
+> +}
+> +
+>  static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
+>  {
+>  	struct vmcb_control_area *control =3D &svm->vmcb->control;
+> @@ -3450,6 +3468,13 @@ static int sev_handle_vmgexit_msr_protocol(struct=
+ vcpu_svm *svm)
+>  				  GHCB_MSR_INFO_POS);
+>  		break;
+>  	}
+> +	case GHCB_MSR_PSC_REQ:
+> +		vcpu->run->exit_reason =3D KVM_EXIT_VMGEXIT;
+> +		vcpu->run->vmgexit.ghcb_msr =3D control->ghcb_gpa;
+> +		vcpu->arch.complete_userspace_io =3D snp_complete_psc_msr_protocol;
+> +
+> +		ret =3D -1;
+> +		break;
 
-Hmmm... yeah, not sure why it was implemented that way, I guess it can 
-always be changed later if desired.
+What's the reasoning behind returning an error (-1) here? This error bubbl=
+es all
+the way up to the `KVM_RUN` ioctl. Would it be more appropriate to return =
+0?
+Returning 0 would cause a VM exit without indicating an error to userspace=
+.
 
-> 
-> Also -- how does the guest know they got only 20 bytes and not 4096? Do they have
-> to read all the 'struct cert_table' entries at the beginning of the received data?
+>  	case GHCB_MSR_TERM_REQ: {
+>  		u64 reason_set, reason_code;
+>
+> diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+> index 83843379813e..65861d2d086c 100644
+> --- a/arch/x86/kvm/trace.h
+> +++ b/arch/x86/kvm/trace.h
+> @@ -7,6 +7,7 @@
+>  #include <asm/svm.h>
+>  #include <asm/clocksource.h>
+>  #include <asm/pvclock-abi.h>
+> +#include <asm/sev-common.h>
+>
+>  #undef TRACE_SYSTEM
+>  #define TRACE_SYSTEM kvm
+> @@ -1831,6 +1832,39 @@ TRACE_EVENT(kvm_vmgexit_msr_protocol_exit,
+>  		  __entry->vcpu_id, __entry->ghcb_gpa, __entry->result)
+>  );
+>
+> +/*
+> + * Tracepoint for the SEV-SNP page state change processing
+> + */
+> +#define psc_operation					\
+> +	{SNP_PAGE_STATE_PRIVATE, "private"},		\
+> +	{SNP_PAGE_STATE_SHARED,  "shared"}		\
+> +
+> +TRACE_EVENT(kvm_snp_psc,
+> +	TP_PROTO(unsigned int vcpu_id, u64 pfn, u64 gpa, u8 op, int level),
+> +	TP_ARGS(vcpu_id, pfn, gpa, op, level),
+> +
+> +	TP_STRUCT__entry(
+> +		__field(int, vcpu_id)
+> +		__field(u64, pfn)
+> +		__field(u64, gpa)
+> +		__field(u8, op)
+> +		__field(int, level)
+> +	),
+> +
+> +	TP_fast_assign(
+> +		__entry->vcpu_id =3D vcpu_id;
+> +		__entry->pfn =3D pfn;
+> +		__entry->gpa =3D gpa;
+> +		__entry->op =3D op;
+> +		__entry->level =3D level;
+> +	),
+> +
+> +	TP_printk("vcpu %u, pfn %llx, gpa %llx, op %s, level %d",
+> +		  __entry->vcpu_id, __entry->pfn, __entry->gpa,
+> +		  __print_symbolic(__entry->op, psc_operation),
+> +		  __entry->level)
+> +);
+> +
+>  #endif /* _TRACE_KVM_H */
+>
+>  #undef TRACE_INCLUDE_PATH
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 732f9cbbadb5..08dd1ef7e136 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -13481,6 +13481,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_enter);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_enter);
+>  EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
+> +EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_snp_psc);
+>
+>  static int __init kvm_x86_init(void)
+>  {
+> --
+> 2.25.1
+>
 
-Yes, they should walk the cert table entries.
-
-Thanks,
-Tom
-
-> 
-> -Dov
-> 
-> 
->>>
->>> I see no reason (in the spec and in the kernel code) for the data length
->>> to be limited to 16KB (SEV_FW_BLOB_MAX_SIZE) but I might be missing some
->>> flow because Dionna ran into this limit.
->>
->> Correct, there is no limit. I believe that SEV_FW_BLOB_MAX_SIZE is a way
->> to keep the memory usage controlled because data is coming from
->> userspace and it isn't expected that the data would be larger than that.
->>
->> I'm not sure if that was in from the start or as a result of a review
->> comment. Not sure what is the best approach is.
->>
->> Thanks,
->> Tom
->>
->>>
->>>
->>> -Dov
->>>
->>>
->>>
->>>> Thanks,
->>>> Tom
->>>>
->>>>>
->>>>>> [...]
->>>>>>>
->>>>>>> -#define SEV_FW_BLOB_MAX_SIZE 0x4000  /* 16KB */
->>>>>>> +#define SEV_FW_BLOB_MAX_SIZE 0x5000  /* 20KB */
->>>>>>>
->>>>>>
->>>>>> This has effects in drivers/crypto/ccp/sev-dev.c
->>>>>>                                                                   (for
->>>>>> example in alloc_snp_host_map).  Is that OK?
->>>>>>
->>>>>
->>>>> No, this was a mistake of mine because I was using a bloated data
->>>>> encoding that needed 5 pages for the GUID table plus 4 small
->>>>> certificates. I've since fixed that in our user space code.
->>>>> We shouldn't change this size and instead wait for a better size
->>>>> negotiation protocol between the guest and host to avoid this awkward
->>>>> hard-coding.
->>>>>
->>>>>
+Regards, Tom
