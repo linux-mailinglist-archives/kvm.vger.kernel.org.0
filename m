@@ -2,320 +2,276 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D6AB466540A
-	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 06:55:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F1035665420
+	for <lists+kvm@lfdr.de>; Wed, 11 Jan 2023 07:01:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231596AbjAKFzt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 00:55:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53728 "EHLO
+        id S231463AbjAKGBj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 01:01:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232465AbjAKFzp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 00:55:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF6A8AE79
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 21:55:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673416501;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2QaLGbA/auVkkHt3S1yCaMOL0LGZnHy0mTSjzASi2TM=;
-        b=IkEjxfFnvWdA8bbkuFo5RnuJ3I+K3/pFVxatpqyNWUAEY2cAGQCezZCmUdYlQqxYEo5t6b
-        5rGYZ65uIpCbA0KseBhsKczNWvkE6Ja3aAsEaPW+tBDRTefJ9rGv9LyxyDbvf2SYNuPg6y
-        7CukapG7KP8cEmjCUJjM6jp3eUaAE+Y=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-28-5tMkcvz6P5aBdAsKgAYp4Q-1; Wed, 11 Jan 2023 00:54:59 -0500
-X-MC-Unique: 5tMkcvz6P5aBdAsKgAYp4Q-1
-Received: by mail-oi1-f199.google.com with SMTP id i206-20020aca3bd7000000b003642b026c08so3633959oia.6
-        for <kvm@vger.kernel.org>; Tue, 10 Jan 2023 21:54:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2QaLGbA/auVkkHt3S1yCaMOL0LGZnHy0mTSjzASi2TM=;
-        b=LifazfKAHGODK7oYzmy/8Vp+lPOdjHizBoNroxRkXW1hNwQwwDtpmOvO+6M/dZ3G+D
-         fofCLdL3F2Jsz+IPTtrxmX79bjWdKev6p5CMYZxtfB4L2T9L+OHM6yiFOGHiYOoXVN35
-         6amW1M/Hdh3i/cX1q7rMXMWOZTjkyC8UkWRRzjk4CsFdQJdpdi22bZC7rXgdDiJ/J8LU
-         fNV7CtqBjUEJ5yCUmVFpZUN08x0ZqwO0leN1FQqnmp0WEDS/n/arZJjAovqewuLNrXsj
-         RObwm3rh5/JD8H9aIecEFTymDY17z83ehja9niKVnQXZ1ul4FuBPlTy95dUT5V1Rv1+F
-         o9AQ==
-X-Gm-Message-State: AFqh2kocdmcq1tUWNQE1YDKB7T9s3bNvUix3CLJpkNp1t0Ri8Jsl9MQ2
-        Ipl/A32n5Ie5oVM22mS4QexekUB4eSu9Ztk2hssRNlKrn6sx9RAoMtV2GuWhzBG4gjl4BdkA9uQ
-        OnYoibzLCcjzydKebKttZmx+UU1kY
-X-Received: by 2002:a54:4e89:0:b0:35c:303d:fe37 with SMTP id c9-20020a544e89000000b0035c303dfe37mr3104775oiy.35.1673416498901;
-        Tue, 10 Jan 2023 21:54:58 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXs7Pcd5hAhHUVfkAiJZKDPAqISOY6JH4N8DrXmnBv2nFKpYbwPgNUa2bCZjQ76vdprk/AP+0MaVbiBxAY7PylY=
-X-Received: by 2002:a54:4e89:0:b0:35c:303d:fe37 with SMTP id
- c9-20020a544e89000000b0035c303dfe37mr3104772oiy.35.1673416498603; Tue, 10 Jan
- 2023 21:54:58 -0800 (PST)
+        with ESMTP id S230264AbjAKGBe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 01:01:34 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C97906403;
+        Tue, 10 Jan 2023 22:01:31 -0800 (PST)
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30B507W4017051;
+        Wed, 11 Jan 2023 06:00:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=JeGhnzut3aONHOLNQdpkcO3W1wcJUXaxe0FrjSoYtD4=;
+ b=Z4UEy0h62M5J0bT0RPLeTpLg5UANE/9oZu+4HWHkn1EQAP3cyGxZq1o/twwFm8C2vlCk
+ gmZ7Z6E05rGAoi97/Nbu9Lpb37qoNEj1uqVtrnHe9R1kZYLndChUDGW9JG7MF8qJWNxC
+ I1UP9Mn+Cs1vdTCo1loa1IOHYhJ9heJkPhUSa0Koqyg39zh8cm/HqP6wVdlweAkd4YWN
+ 6Ei9DjtmZNhnwOue2VnVXRSlTL3BV4IzSDW31gs9tnxNRGMna+Rs0QL+rc/3dMDksb7M
+ OWKM1t1V3tGsSPQRdQOnYJt4aM4SDARJvzPV26wDqaw3wY4aHYXKupcG/dUoRdzEJ7hK bQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1pjvs1ds-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 06:00:23 +0000
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30B51KeX023497;
+        Wed, 11 Jan 2023 06:00:22 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n1pjvs1cr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 06:00:22 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30B57Gp7014454;
+        Wed, 11 Jan 2023 06:00:20 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([9.208.129.113])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3n1kv5148r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 11 Jan 2023 06:00:20 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+        by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30B60IoC9765470
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 11 Jan 2023 06:00:18 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5C5485805D;
+        Wed, 11 Jan 2023 06:00:18 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C1E9958059;
+        Wed, 11 Jan 2023 06:00:08 +0000 (GMT)
+Received: from [9.160.182.241] (unknown [9.160.182.241])
+        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 11 Jan 2023 06:00:08 +0000 (GMT)
+Message-ID: <9f221719-7ab3-3e87-7d66-a4ca6ce0e794@linux.ibm.com>
+Date:   Wed, 11 Jan 2023 08:00:05 +0200
 MIME-Version: 1.0
-References: <20221227022528.609839-1-mie@igel.co.jp> <20221227022528.609839-3-mie@igel.co.jp>
- <CACGkMEtAaYpuZtS0gx_m931nFzcvqSNK9BhvUZH_tZXTzjgQCg@mail.gmail.com>
- <CANXvt5rfXDYa0nLzKW5-Q-hjhw-19npXVneqBO1TcsariU6rWg@mail.gmail.com>
- <CACGkMEvmZ5MEX4WMa3JhzT404C2uhsNk0nnkYBRtvLPhNTSzHQ@mail.gmail.com> <18a0a7cd-0601-0ff6-12d7-353819692155@igel.co.jp>
-In-Reply-To: <18a0a7cd-0601-0ff6-12d7-353819692155@igel.co.jp>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 11 Jan 2023 13:54:47 +0800
-Message-ID: <CACGkMEsVeE9G=-OkvazGu_EtfKgD8iakon54iLgFFPWYJSSekg@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/9] vringh: remove vringh_iov and unite to vringh_kiov
-To:     Shunsuke Mie <mie@igel.co.jp>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
+Content-Language: en-US
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Dionna Amalie Glaze <dionnaglaze@google.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, hpa@zytor.com, ardb@kernel.org,
+        pbonzini@redhat.com, seanjc@google.com, vkuznets@redhat.com,
+        wanpengli@tencent.com, jmattson@google.com, luto@kernel.org,
+        dave.hansen@linux.intel.com, slp@redhat.com, pgonda@google.com,
+        peterz@infradead.org, srinivas.pandruvada@linux.intel.com,
+        rientjes@google.com, tobin@ibm.com, bp@alien8.de, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, harald@profian.com,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-63-michael.roth@amd.com>
+ <1c02cc0d-9f0c-cf4a-b012-9932f551dd83@linux.ibm.com>
+ <CAAH4kHbhFezeY3D_qoMQBLuFzWNDQF2YLQ-FW_dp5itHShKUWw@mail.gmail.com>
+ <54ff7326-e3a4-945f-1f60-e73dd8865527@amd.com>
+ <a3ecd9fc-11f8-49b6-09a2-349df815d2cf@linux.ibm.com>
+ <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+In-Reply-To: <1047996c-309b-6839-fdd7-265fc51eb07a@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: CGUpOSk59-8lM1A-u-PDDfl8E-WEk1pM
+X-Proofpoint-ORIG-GUID: 9lZgPYk5Qi8FOUkUcZQv0HbQT_0ly4Lr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-11_01,2023-01-10_03,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 clxscore=1015 mlxscore=0 suspectscore=0 phishscore=0
+ adultscore=0 spamscore=0 mlxlogscore=999 impostorscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301110042
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 11, 2023 at 11:27 AM Shunsuke Mie <mie@igel.co.jp> wrote:
->
->
-> On 2022/12/28 15:36, Jason Wang wrote:
-> > On Tue, Dec 27, 2022 at 3:06 PM Shunsuke Mie <mie@igel.co.jp> wrote:
-> >> 2022=E5=B9=B412=E6=9C=8827=E6=97=A5(=E7=81=AB) 15:04 Jason Wang <jasow=
-ang@redhat.com>:
-> >>> On Tue, Dec 27, 2022 at 10:25 AM Shunsuke Mie <mie@igel.co.jp> wrote:
-> >>>> struct vringh_iov is defined to hold userland addresses. However, to=
- use
-> >>>> common function, __vring_iov, finally the vringh_iov converts to the
-> >>>> vringh_kiov with simple cast. It includes compile time check code to=
- make
-> >>>> sure it can be cast correctly.
-> >>>>
-> >>>> To simplify the code, this patch removes the struct vringh_iov and u=
-nifies
-> >>>> APIs to struct vringh_kiov.
-> >>>>
-> >>>> Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
-> >>> While at this, I wonder if we need to go further, that is, switch to
-> >>> using an iov iterator instead of a vringh customized one.
-> >> I didn't see the iov iterator yet, thank you for informing me.
-> >> Is that iov_iter? https://lwn.net/Articles/625077/
-> > Exactly.
->
-> I've investigated the iov_iter, vhost and related APIs. As a result, I
-> think that it is not easy to switch to use the iov_iter. Because, the
-> design of vhost and vringh is different.
 
-Yes, but just to make sure we are on the same page, the reason I
-suggest iov_iter for vringh is that the vringh itself has customized
-iter equivalent, e.g it has iter for kernel,user, or even iotlb. At
-least the kernel and userspace part could be switched to iov_iter.
-Note that it has nothing to do with vhost.
 
->
-> The iov_iter has vring desc info and meta data of transfer method. The
-> vhost provides generic transfer function for the iov_iter. In constrast,
-> vringh_iov just has vring desc info. The vringh provides transfer functio=
-ns
-> for each methods.
->
-> In the future, it is better to use common data structure and APIs between
-> vhost and vringh (or merge completely), but it requires a lot of
-> changes, so I'd like to just
-> organize data structure in vringh as a first step in this patch.
+On 10/01/2023 17:10, Tom Lendacky wrote:
+> On 1/10/23 01:10, Dov Murik wrote:
+>> Hi Tom,
+>>
+>> On 10/01/2023 0:27, Tom Lendacky wrote:
+>>> On 1/9/23 10:55, Dionna Amalie Glaze wrote:
+>>>>>> +
+>>>>>> +static int snp_set_instance_certs(struct kvm *kvm, struct
+>>>>>> kvm_sev_cmd *argp)
+>>>>>> +{
+>>>>> [...]
+>>>>>
+>>>>> Here we set the length to the page-aligned value, but we copy only
+>>>>> params.cert_len bytes.  If there are two subsequent
+>>>>> snp_set_instance_certs() calls where the second one has a shorter
+>>>>> length, we might "keep" some leftover bytes from the first call.
+>>>>>
+>>>>> Consider:
+>>>>> 1. snp_set_instance_certs(certs_addr point to "AAA...",
+>>>>> certs_len=8192)
+>>>>> 2. snp_set_instance_certs(certs_addr point to "BBB...",
+>>>>> certs_len=4097)
+>>>>>
+>>>>> If I understand correctly, on the second call we'll copy 4097 "BBB..."
+>>>>> bytes into the to_certs buffer, but length will be (4096 + PAGE_SIZE -
+>>>>> 1) & PAGE_MASK which will be 8192.
+>>>>>
+>>>>> Later when fetching the certs (for the extended report or in
+>>>>> snp_get_instance_certs()) the user will get a buffer of 8192 bytes
+>>>>> filled with 4097 BBBs and 4095 leftover AAAs.
+>>>>>
+>>>>> Maybe zero sev->snp_certs_data entirely before writing to it?
+>>>>>
+>>>>
+>>>> Yes, I agree it should be zeroed, at least if the previous length is
+>>>> greater than the new length. Good catch.
+>>>>
+>>>>
+>>>>> Related question (not only for this patch) regarding snp_certs_data
+>>>>> (host or per-instance): why is its size page-aligned at all? why is it
+>>>>> limited by 16KB or 20KB? If I understand correctly, for SNP, this
+>>>>> buffer
+>>>>> is never sent to the PSP.
+>>>>>
+>>>>
+>>>> The buffer is meant to be copied into the guest driver following the
+>>>> GHCB extended guest request protocol. The data to copy back are
+>>>> expected to be in 4K page granularity.
+>>>
+>>> I don't think the data has to be in 4K page granularity. Why do you
+>>> think it does?
+>>>
+>>
+>> I looked at AMD publication 56421 SEV-ES Guest-Hypervisor Communication
+>> Block Standardization (July 2022), page 37.  The table says:
+>>
+>> --------------
+>>
+>> NAE Event: SNP Extended Guest Request
+>>
+>> Notes:
+>>
+>> RAX will have the guest physical address of the page(s) to hold returned
+>> data
+>>
+>> RBX
+>> State to Hypervisor: will contain the number of guest contiguous
+>> pages supplied to hold returned data
+>> State from Hypervisor: on error will contain the number of guest
+>> contiguous pages required to hold the data to be returned
+>>
+>> ...
+>>
+>> The request page, response page and data page(s) must be assigned to the
+>> hypervisor (shared).
+>>
+>> --------------
+>>
+>>
+>> According to this spec, it looks like the sizes are communicated as
+>> number of pages in RBX.  So the data should start at a 4KB alignment
+>> (this is verified in snp_handle_ext_guest_request()) and its length
+>> should be 4KB-aligned, as Dionna noted.
+> 
+> That only indicates how many pages are required to hold the data, but
+> the hypervisor only has to copy however much data is present. If the
+> data is 20 bytes, then you only have to copy 20 bytes. If the user
+> supplied 0 for the number of pages, then the code returns 1 in RBX to
+> indicate that one page is required to hold the 20 bytes.
+> 
 
-That's fine.
 
-Thansk
+Maybe it should only copy 20 bytes, but current implementation copies
+whole 4KB pages:
 
->
->
-> Best
->
-> > Thanks
-> >
-> >>> Thanks
-> >>>
-> >>>> ---
-> >>>>   drivers/vhost/vringh.c | 32 ++++++------------------------
-> >>>>   include/linux/vringh.h | 45 ++++----------------------------------=
-----
-> >>>>   2 files changed, 10 insertions(+), 67 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> >>>> index 828c29306565..aa3cd27d2384 100644
-> >>>> --- a/drivers/vhost/vringh.c
-> >>>> +++ b/drivers/vhost/vringh.c
-> >>>> @@ -691,8 +691,8 @@ EXPORT_SYMBOL(vringh_init_user);
-> >>>>    * calling vringh_iov_cleanup() to release the memory, even on err=
-or!
-> >>>>    */
-> >>>>   int vringh_getdesc_user(struct vringh *vrh,
-> >>>> -                       struct vringh_iov *riov,
-> >>>> -                       struct vringh_iov *wiov,
-> >>>> +                       struct vringh_kiov *riov,
-> >>>> +                       struct vringh_kiov *wiov,
-> >>>>                          bool (*getrange)(struct vringh *vrh,
-> >>>>                                           u64 addr, struct vringh_ra=
-nge *r),
-> >>>>                          u16 *head)
-> >>>> @@ -708,26 +708,6 @@ int vringh_getdesc_user(struct vringh *vrh,
-> >>>>          if (err =3D=3D vrh->vring.num)
-> >>>>                  return 0;
-> >>>>
-> >>>> -       /* We need the layouts to be the identical for this to work =
-*/
-> >>>> -       BUILD_BUG_ON(sizeof(struct vringh_kiov) !=3D sizeof(struct v=
-ringh_iov));
-> >>>> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, iov) !=3D
-> >>>> -                    offsetof(struct vringh_iov, iov));
-> >>>> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, i) !=3D
-> >>>> -                    offsetof(struct vringh_iov, i));
-> >>>> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, used) !=3D
-> >>>> -                    offsetof(struct vringh_iov, used));
-> >>>> -       BUILD_BUG_ON(offsetof(struct vringh_kiov, max_num) !=3D
-> >>>> -                    offsetof(struct vringh_iov, max_num));
-> >>>> -       BUILD_BUG_ON(sizeof(struct iovec) !=3D sizeof(struct kvec));
-> >>>> -       BUILD_BUG_ON(offsetof(struct iovec, iov_base) !=3D
-> >>>> -                    offsetof(struct kvec, iov_base));
-> >>>> -       BUILD_BUG_ON(offsetof(struct iovec, iov_len) !=3D
-> >>>> -                    offsetof(struct kvec, iov_len));
-> >>>> -       BUILD_BUG_ON(sizeof(((struct iovec *)NULL)->iov_base)
-> >>>> -                    !=3D sizeof(((struct kvec *)NULL)->iov_base));
-> >>>> -       BUILD_BUG_ON(sizeof(((struct iovec *)NULL)->iov_len)
-> >>>> -                    !=3D sizeof(((struct kvec *)NULL)->iov_len));
-> >>>> -
-> >>>>          *head =3D err;
-> >>>>          err =3D __vringh_iov(vrh, *head, (struct vringh_kiov *)riov=
-,
-> >>>>                             (struct vringh_kiov *)wiov,
-> >>>> @@ -740,14 +720,14 @@ int vringh_getdesc_user(struct vringh *vrh,
-> >>>>   EXPORT_SYMBOL(vringh_getdesc_user);
-> >>>>
-> >>>>   /**
-> >>>> - * vringh_iov_pull_user - copy bytes from vring_iov.
-> >>>> + * vringh_iov_pull_user - copy bytes from vring_kiov.
-> >>>>    * @riov: the riov as passed to vringh_getdesc_user() (updated as =
-we consume)
-> >>>>    * @dst: the place to copy.
-> >>>>    * @len: the maximum length to copy.
-> >>>>    *
-> >>>>    * Returns the bytes copied <=3D len or a negative errno.
-> >>>>    */
-> >>>> -ssize_t vringh_iov_pull_user(struct vringh_iov *riov, void *dst, si=
-ze_t len)
-> >>>> +ssize_t vringh_iov_pull_user(struct vringh_kiov *riov, void *dst, s=
-ize_t len)
-> >>>>   {
-> >>>>          return vringh_iov_xfer(NULL, (struct vringh_kiov *)riov,
-> >>>>                                 dst, len, xfer_from_user);
-> >>>> @@ -755,14 +735,14 @@ ssize_t vringh_iov_pull_user(struct vringh_iov=
- *riov, void *dst, size_t len)
-> >>>>   EXPORT_SYMBOL(vringh_iov_pull_user);
-> >>>>
-> >>>>   /**
-> >>>> - * vringh_iov_push_user - copy bytes into vring_iov.
-> >>>> + * vringh_iov_push_user - copy bytes into vring_kiov.
-> >>>>    * @wiov: the wiov as passed to vringh_getdesc_user() (updated as =
-we consume)
-> >>>>    * @src: the place to copy from.
-> >>>>    * @len: the maximum length to copy.
-> >>>>    *
-> >>>>    * Returns the bytes copied <=3D len or a negative errno.
-> >>>>    */
-> >>>> -ssize_t vringh_iov_push_user(struct vringh_iov *wiov,
-> >>>> +ssize_t vringh_iov_push_user(struct vringh_kiov *wiov,
-> >>>>                               const void *src, size_t len)
-> >>>>   {
-> >>>>          return vringh_iov_xfer(NULL, (struct vringh_kiov *)wiov,
-> >>>> diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-> >>>> index 1991a02c6431..733d948e8123 100644
-> >>>> --- a/include/linux/vringh.h
-> >>>> +++ b/include/linux/vringh.h
-> >>>> @@ -79,18 +79,6 @@ struct vringh_range {
-> >>>>          u64 offset;
-> >>>>   };
-> >>>>
-> >>>> -/**
-> >>>> - * struct vringh_iov - iovec mangler.
-> >>>> - *
-> >>>> - * Mangles iovec in place, and restores it.
-> >>>> - * Remaining data is iov + i, of used - i elements.
-> >>>> - */
-> >>>> -struct vringh_iov {
-> >>>> -       struct iovec *iov;
-> >>>> -       size_t consumed; /* Within iov[i] */
-> >>>> -       unsigned i, used, max_num;
-> >>>> -};
-> >>>> -
-> >>>>   /**
-> >>>>    * struct vringh_kiov - kvec mangler.
-> >>>>    *
-> >>>> @@ -113,44 +101,19 @@ int vringh_init_user(struct vringh *vrh, u64 f=
-eatures,
-> >>>>                       vring_avail_t __user *avail,
-> >>>>                       vring_used_t __user *used);
-> >>>>
-> >>>> -static inline void vringh_iov_init(struct vringh_iov *iov,
-> >>>> -                                  struct iovec *iovec, unsigned num=
-)
-> >>>> -{
-> >>>> -       iov->used =3D iov->i =3D 0;
-> >>>> -       iov->consumed =3D 0;
-> >>>> -       iov->max_num =3D num;
-> >>>> -       iov->iov =3D iovec;
-> >>>> -}
-> >>>> -
-> >>>> -static inline void vringh_iov_reset(struct vringh_iov *iov)
-> >>>> -{
-> >>>> -       iov->iov[iov->i].iov_len +=3D iov->consumed;
-> >>>> -       iov->iov[iov->i].iov_base -=3D iov->consumed;
-> >>>> -       iov->consumed =3D 0;
-> >>>> -       iov->i =3D 0;
-> >>>> -}
-> >>>> -
-> >>>> -static inline void vringh_iov_cleanup(struct vringh_iov *iov)
-> >>>> -{
-> >>>> -       if (iov->max_num & VRINGH_IOV_ALLOCATED)
-> >>>> -               kfree(iov->iov);
-> >>>> -       iov->max_num =3D iov->used =3D iov->i =3D iov->consumed =3D =
-0;
-> >>>> -       iov->iov =3D NULL;
-> >>>> -}
-> >>>> -
-> >>>>   /* Convert a descriptor into iovecs. */
-> >>>>   int vringh_getdesc_user(struct vringh *vrh,
-> >>>> -                       struct vringh_iov *riov,
-> >>>> -                       struct vringh_iov *wiov,
-> >>>> +                       struct vringh_kiov *riov,
-> >>>> +                       struct vringh_kiov *wiov,
-> >>>>                          bool (*getrange)(struct vringh *vrh,
-> >>>>                                           u64 addr, struct vringh_ra=
-nge *r),
-> >>>>                          u16 *head);
-> >>>>
-> >>>>   /* Copy bytes from readable vsg, consuming it (and incrementing wi=
-ov->i). */
-> >>>> -ssize_t vringh_iov_pull_user(struct vringh_iov *riov, void *dst, si=
-ze_t len);
-> >>>> +ssize_t vringh_iov_pull_user(struct vringh_kiov *riov, void *dst, s=
-ize_t len);
-> >>>>
-> >>>>   /* Copy bytes into writable vsg, consuming it (and incrementing wi=
-ov->i). */
-> >>>> -ssize_t vringh_iov_push_user(struct vringh_iov *wiov,
-> >>>> +ssize_t vringh_iov_push_user(struct vringh_kiov *wiov,
-> >>>>                               const void *src, size_t len);
-> >>>>
-> >>>>   /* Mark a descriptor as used. */
-> >>>> --
-> >>>> 2.25.1
-> >>>>
-> >> Best,
-> >> Shunsuke
-> >>
->
 
+        if (sev->snp_certs_len)
+                data_npages = sev->snp_certs_len >> PAGE_SHIFT;
+        ...
+        ...
+        /* Copy the certificate blob in the guest memory */
+        if (data_npages &&
+            kvm_write_guest(kvm, data_gpa, sev->snp_certs_data, data_npages << PAGE_SHIFT))
+                rc = SEV_RET_INVALID_ADDRESS;
+
+
+(elsewhere we ensure that sev->snp_certs_len is page-aligned, so the assignment
+to data_npages is in fact correct even though looks off-by-one; aside, maybe it's
+better to use some DIV_ROUND_UP macro anywhere we calculate the number of
+needed pages.)
+
+Also -- how does the guest know they got only 20 bytes and not 4096? Do they have
+to read all the 'struct cert_table' entries at the beginning of the received data?
+
+-Dov
+
+
+>>
+>> I see no reason (in the spec and in the kernel code) for the data length
+>> to be limited to 16KB (SEV_FW_BLOB_MAX_SIZE) but I might be missing some
+>> flow because Dionna ran into this limit.
+> 
+> Correct, there is no limit. I believe that SEV_FW_BLOB_MAX_SIZE is a way
+> to keep the memory usage controlled because data is coming from
+> userspace and it isn't expected that the data would be larger than that.
+> 
+> I'm not sure if that was in from the start or as a result of a review
+> comment. Not sure what is the best approach is.
+> 
+> Thanks,
+> Tom
+> 
+>>
+>>
+>> -Dov
+>>
+>>
+>>
+>>> Thanks,
+>>> Tom
+>>>
+>>>>
+>>>>> [...]
+>>>>>>
+>>>>>> -#define SEV_FW_BLOB_MAX_SIZE 0x4000  /* 16KB */
+>>>>>> +#define SEV_FW_BLOB_MAX_SIZE 0x5000  /* 20KB */
+>>>>>>
+>>>>>
+>>>>> This has effects in drivers/crypto/ccp/sev-dev.c
+>>>>>                                                                  (for
+>>>>> example in alloc_snp_host_map).  Is that OK?
+>>>>>
+>>>>
+>>>> No, this was a mistake of mine because I was using a bloated data
+>>>> encoding that needed 5 pages for the GUID table plus 4 small
+>>>> certificates. I've since fixed that in our user space code.
+>>>> We shouldn't change this size and instead wait for a better size
+>>>> negotiation protocol between the guest and host to avoid this awkward
+>>>> hard-coding.
+>>>>
+>>>>
