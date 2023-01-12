@@ -2,59 +2,74 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0AAD66793C
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 16:29:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB024667983
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 16:39:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233557AbjALP3k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 10:29:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43404 "EHLO
+        id S240163AbjALPjF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 10:39:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240425AbjALP2d (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 10:28:33 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FCAFC78;
-        Thu, 12 Jan 2023 07:20:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id E5A8ACE1E5E;
-        Thu, 12 Jan 2023 15:20:50 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0AD5C433EF;
-        Thu, 12 Jan 2023 15:20:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673536849;
-        bh=BCtqMXLEe/UrckfTQBcikiufFT6uV7gISnRdD1HnshI=;
-        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-        b=rLIAB4+YH0UkEjySHkRENtPC/rBWbpv589rl+z7ZX09HHf3UqIEsEYEaOSAFTkLhH
-         Xp8o8rGAg+HFhCmfPublTEgYRnW3MkEvPuprCQm7z5gyJG2R0ZlkTkv+llEUd/qhT9
-         9hX143H78hyJzyub1ma/iIkrxUozsRG2th0G0+TgBBkdhWsbrmO4307R55MVVFoJ9U
-         d+KyF3qo+ozgNPR2vuugPofojy6gHDiU0BSiW4laDRPOoqnnWv59bmyORkJzRajufJ
-         t8v6oABnPEVmBdBJMjusHsRGRai3V4AbFqK75vsPhb8fHZo4sEMLIDoenZ/lTMrAjQ
-         ZaZGtbbqXRi7A==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-        id 933835C0AF8; Thu, 12 Jan 2023 07:20:48 -0800 (PST)
-Date:   Thu, 12 Jan 2023 07:20:48 -0800
-From:   "Paul E. McKenney" <paulmck@kernel.org>
-To:     David Woodhouse <dwmw2@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, seanjc@google.com,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Josh Triplett <josh@joshtriplett.org>, rcu@vger.kernel.org,
-        Michal Luczaj <mhal@rbox.co>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH] Documentation: kvm: fix SRCU locking order docs
-Message-ID: <20230112152048.GJ4028633@paulmck-ThinkPad-P17-Gen-1>
-Reply-To: paulmck@kernel.org
-References: <20230111183031.2449668-1-pbonzini@redhat.com>
- <a14a13a690277d4cc95a4b26aa2d9a4d9b392a74.camel@infradead.org>
+        with ESMTP id S240527AbjALPih (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 10:38:37 -0500
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FB543E870
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 07:29:51 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id cf18so39288150ejb.5
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 07:29:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8/isyiyYelhWoqLBrchcU6kVdh+9vrvHgcSQ4B34VDk=;
+        b=EHXEPMdHmrWk+ItDBSbevZ7FKIVT2z/y/V/evYel++jimsmR9bFWMPp7WqE6UN+YvL
+         RDbux7qimlEb1uerL46yDQtO4G6x0y1GHxlawDNfRZSDxM9b7KMZSJqztnGI7iOjMev3
+         1v1MuXtk2iw64DJofXWodWqeFolVm68ptqoUp0Y6FBlWq6Vutpj0hAkv3wLVotql+pqy
+         nXF/xzccAL7R82rNoeAGa+6cdwCAl2ZzbV8mYFX9tOyfIIMtCkjRdNITIfUhXespCOgA
+         VIp6DD5fOeR8UtvqFw8VlK0XN39nCmQanhi86vdD78YcjEQ2IItfm/VuatWl427DHlOQ
+         UaTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8/isyiyYelhWoqLBrchcU6kVdh+9vrvHgcSQ4B34VDk=;
+        b=5nIXyZrZKMrSjUTUnw1+H4eG7rjVQNEyUDU9E89LQhrX+C/eyktvgD3E0eblUPC6Yy
+         UEn/U6Lp2pNkSgAGNRPhv3RaEtDCFTnnM5q7mNpv/1hxuIJ0LtnufUuV1JM01U8DBFes
+         jJ310fxfeObQYYwCtjew1fs3SwYXX8QcmbxHxakCkJ+TEutDEi3jlhdlr/RzjoA34B6f
+         UVHX6e45X1LBHOJ6njxOjSgp8f/HEpbLP4evaeVJFBGhuUpG8UEhfR4LLv4JSMEkmyec
+         Q3McP0DdgNHMrbRz3BPq2nm9RZVrRTvqNFgGhg1ESetAED5yD1qYlin+b1vqPQI3ftCm
+         z/hQ==
+X-Gm-Message-State: AFqh2ko8dYUgNSGZQ++mpsn7Hqbr4xy8ey+1p8SZr34dkqebx+H/eDEe
+        g/y1bMDQ2RjyDjpS50derCbGOg==
+X-Google-Smtp-Source: AMrXdXtLIWC/6uofx+GH6S+slsg0mbN3K3oswo4+1Ak1svK8dtWQlCW6M2ef7Eyxexwr//lJ8Goyrg==
+X-Received: by 2002:a17:907:a643:b0:83c:7308:b2ed with SMTP id vu3-20020a170907a64300b0083c7308b2edmr67733986ejc.17.1673537389632;
+        Thu, 12 Jan 2023 07:29:49 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id u21-20020a1709064ad500b00855d6ed60desm3551043ejt.192.2023.01.12.07.29.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jan 2023 07:29:49 -0800 (PST)
+Date:   Thu, 12 Jan 2023 16:29:48 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Atish Patra <atishp@rivosinc.com>
+Cc:     linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Guo Ren <guoren@kernel.org>, kvm-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Sergey Matyukevich <sergey.matyukevich@syntacore.com>,
+        Eric Lin <eric.lin@sifive.com>, Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v2 07/11] RISC-V: KVM: Add SBI PMU extension support
+Message-ID: <20230112152948.3vagzedhegbj4jbj@orel>
+References: <20221215170046.2010255-1-atishp@rivosinc.com>
+ <20221215170046.2010255-8-atishp@rivosinc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a14a13a690277d4cc95a4b26aa2d9a4d9b392a74.camel@infradead.org>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+In-Reply-To: <20221215170046.2010255-8-atishp@rivosinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -62,56 +77,159 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 08:24:16AM +0000, David Woodhouse wrote:
-> On Wed, 2023-01-11 at 13:30 -0500, Paolo Bonzini wrote:
-> > 
-> > +- ``synchronize_srcu(&kvm->srcu)`` is called inside critical sections
-> > +  for kvm->lock, vcpu->mutex and kvm->slots_lock.  These locks _cannot_
-> > +  be taken inside a kvm->srcu read-side critical section; that is, the
-> > +  following is broken::
-> > +
-> > +      srcu_read_lock(&kvm->srcu);
-> > +      mutex_lock(&kvm->slots_lock);
-> > +
+On Thu, Dec 15, 2022 at 09:00:42AM -0800, Atish Patra wrote:
+> SBI PMU extension allows KVM guests to configure/start/stop/query about
+> the PMU counters in virtualized enviornment as well.
 > 
-> "Don't tell me. Tell lockdep!"
+> In order to allow that, KVM implements the entire SBI PMU extension.
 > 
-> Did we conclude in
-> https://lore.kernel.org/kvm/122f38e724aae9ae8ab474233da1ba19760c20d2.camel@infradead.org/
-> that lockdep *could* be clever enough to catch a violation of this rule
-> by itself?
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  arch/riscv/kvm/Makefile       |  2 +-
+>  arch/riscv/kvm/vcpu_sbi.c     | 11 +++++
+>  arch/riscv/kvm/vcpu_sbi_pmu.c | 86 +++++++++++++++++++++++++++++++++++
+>  3 files changed, 98 insertions(+), 1 deletion(-)
+>  create mode 100644 arch/riscv/kvm/vcpu_sbi_pmu.c
 > 
-> The general case of the rule would be that 'if mutex A is taken in a
-> read-section for SCRU B, then any synchronize_srcu(B) while mutex A is
-> held shall be verboten'. And vice versa.
-> 
-> If we can make lockdep catch it automatically, yay!
+> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+> index 5de1053..278e97c 100644
+> --- a/arch/riscv/kvm/Makefile
+> +++ b/arch/riscv/kvm/Makefile
+> @@ -25,4 +25,4 @@ kvm-y += vcpu_sbi_base.o
+>  kvm-y += vcpu_sbi_replace.o
+>  kvm-y += vcpu_sbi_hsm.o
+>  kvm-y += vcpu_timer.o
+> -kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_pmu.o
+> +kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_pmu.o vcpu_sbi_pmu.o
+> diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+> index 50c5472..3b8b84e8 100644
+> --- a/arch/riscv/kvm/vcpu_sbi.c
+> +++ b/arch/riscv/kvm/vcpu_sbi.c
+> @@ -20,6 +20,16 @@ static const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_v01 = {
+>  };
+>  #endif
+>  
+> +#ifdef CONFIG_RISCV_PMU_SBI
+> +extern const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu;
+> +#else
+> +static const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu = {
+> +	.extid_start = -1UL,
+> +	.extid_end = -1UL,
+> +	.handler = NULL,
+> +};
+> +#endif
+> +
+>  static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
+>  	&vcpu_sbi_ext_v01,
+>  	&vcpu_sbi_ext_base,
+> @@ -28,6 +38,7 @@ static const struct kvm_vcpu_sbi_extension *sbi_ext[] = {
+>  	&vcpu_sbi_ext_rfence,
+>  	&vcpu_sbi_ext_srst,
+>  	&vcpu_sbi_ext_hsm,
+> +	&vcpu_sbi_ext_pmu,
+>  	&vcpu_sbi_ext_experimental,
+>  	&vcpu_sbi_ext_vendor,
+>  };
+> diff --git a/arch/riscv/kvm/vcpu_sbi_pmu.c b/arch/riscv/kvm/vcpu_sbi_pmu.c
+> new file mode 100644
+> index 0000000..223752f
+> --- /dev/null
+> +++ b/arch/riscv/kvm/vcpu_sbi_pmu.c
+> @@ -0,0 +1,86 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (c) 2022 Rivos Inc
+> + *
+> + * Authors:
+> + *     Atish Patra <atishp@rivosinc.com>
+> + */
+> +
+> +#include <linux/errno.h>
+> +#include <linux/err.h>
+> +#include <linux/kvm_host.h>
+> +#include <asm/csr.h>
+> +#include <asm/sbi.h>
+> +#include <asm/kvm_vcpu_sbi.h>
+> +
+> +static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> +				   struct kvm_vcpu_sbi_ext_data *edata,
+> +				   struct kvm_cpu_trap *utrap)
+> +{
+> +	int ret = 0;
+> +	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
+> +	struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+> +	unsigned long funcid = cp->a6;
+> +	uint64_t temp;
+> +
+> +	/* Return not supported if PMU is not initialized */
+> +	if (!kvpmu->init_done)
+> +		return -EINVAL;
+> +
+> +	switch (funcid) {
+> +	case SBI_EXT_PMU_NUM_COUNTERS:
+> +		ret = kvm_riscv_vcpu_pmu_num_ctrs(vcpu, edata);
+> +		break;
+> +	case SBI_EXT_PMU_COUNTER_GET_INFO:
+> +		ret = kvm_riscv_vcpu_pmu_ctr_info(vcpu, cp->a0, edata);
+> +		break;
+> +	case SBI_EXT_PMU_COUNTER_CFG_MATCH:
+> +#if defined(CONFIG_32BIT)
+> +		temp = ((uint64_t)cp->a5 << 32) | cp->a4;
+> +#else
+> +		temp = cp->a4;
+> +#endif
+> +		ret = kvm_riscv_vcpu_pmu_ctr_cfg_match(vcpu, cp->a0, cp->a1,
+> +						       cp->a2, cp->a3, temp, edata);
+> +		break;
+> +	case SBI_EXT_PMU_COUNTER_START:
+> +#if defined(CONFIG_32BIT)
+> +		temp = ((uint64_t)cp->a4 << 32) | cp->a3;
+> +#else
+> +		temp = cp->a3;
+> +#endif
+> +		ret = kvm_riscv_vcpu_pmu_ctr_start(vcpu, cp->a0, cp->a1, cp->a2,
+> +						   temp, edata);
+> +		break;
+> +	case SBI_EXT_PMU_COUNTER_STOP:
+> +		ret = kvm_riscv_vcpu_pmu_ctr_stop(vcpu, cp->a0, cp->a1, cp->a2, edata);
+> +		break;
+> +	case SBI_EXT_PMU_COUNTER_FW_READ:
+> +		ret = kvm_riscv_vcpu_pmu_ctr_read(vcpu, cp->a0, edata);
+> +		break;
+> +	default:
+> +		edata->err_val = SBI_ERR_NOT_SUPPORTED;
+> +	}
+> +
+> +
+> +	return ret;
+> +}
+> +
+> +unsigned long kvm_sbi_ext_pmu_probe(struct kvm_vcpu *vcpu, unsigned long extid)
+> +{
+> +	struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+> +
+> +	/*
+> +	 * PMU Extension is only available to guests if privilege mode filtering
+> +	 * is available. Otherwise, guest will always count events while the
+> +	 * execution is in hypervisor mode.
+> +	 */
+> +	return kvpmu->init_done && riscv_isa_extension_available(NULL, SSCOFPMF);
 
-Unfortunately, lockdep needs to see a writer to complain, and that patch
-just adds a reader.  And adding that writer would make lockdep complain
-about things that are perfectly fine.  It should be possible to make
-lockdep catch this sort of thing, but from what I can see, doing so
-requires modifications to lockdep itself.
+Assuming we're only supporting homogeneous systems, then can't we just
+check for Sscofpmf at PMU init time? When the extension isn't present
+we'd fail to init and then here init_done wouldn't be set.
 
-> If not, I'm inclined to suggest that we have explicit wrappers of our
-> own for kvm_mutex_lock() which will do the check directly.
+> +}
+> +
+> +const struct kvm_vcpu_sbi_extension vcpu_sbi_ext_pmu = {
+> +	.extid_start = SBI_EXT_PMU,
+> +	.extid_end = SBI_EXT_PMU,
+> +	.handler = kvm_sbi_ext_pmu_handler,
+> +	.probe = kvm_sbi_ext_pmu_probe,
+> +};
+> -- 
+> 2.25.1
+>
 
-This does allow much more wiggle room.  For example, you guys could decide
-to let lockdep complain about things that other SRCU users want to do.
-For completeness, here is one such scenario:
-
-CPU 0:  read_lock(&rla); srcu_read_lock(&srcua); ...
-
-CPU 1:  srcu_read_lock(&srcua); read_lock(&rla); ...
-
-CPU 2:  synchronize_srcu(&srcua);
-
-CPU 3: 	write_lock(&rla); ...
-
-If you guys are OK with lockdep complaining about this, then doing a
-currently mythical rcu_write_acquire()/rcu_write_release() pair around
-your calls to synchronize_srcu() should catch the other issue.
-
-And probably break something else, but you have to start somewhere!  ;-)
-
-							Thanx, Paul
+Thanks,
+drew
