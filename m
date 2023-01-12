@@ -2,58 +2,58 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2E43A667E56
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 19:45:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E2E7667E5D
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 19:47:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239706AbjALSpZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 13:45:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49356 "EHLO
+        id S231877AbjALSrx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 13:47:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232618AbjALSpA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 13:45:00 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ED2D20C
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 10:18:17 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id 200so8242461pfx.7
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 10:18:17 -0800 (PST)
+        with ESMTP id S233413AbjALSr0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 13:47:26 -0500
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06683820C0
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 10:19:57 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id i65so10946421pfc.0
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 10:19:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=imZPqnzDLF2i+5vb28S1oLdL2hZHuB+mTkpveovIShk=;
-        b=8VPUwINSyiSI8p+IdNef4gnXqazXTASW8rBSVLlDYvmPraC9doolFMbw3zp/AJjK6m
-         Rf7FeuSH8EFiRzhi8a2coSTBWG6ltnJghPB4eoWhm645OGLNdAbbP0i3HCo+H7/+/R+h
-         +3QmsyeDcsezIxnvJ/Bux8S2zdsvWQBPmE1Z2/XCBemjEz1NAd1qMe6yF7K4ormQQJwm
-         nVWCX4gWlYISWrLoo03A7nPZIkgjtpVyNAZOZJ3PKyvMPuz6/ibPdUHSXJaVI5Mokhdb
-         FOFv8/88KlRvqTyZaxBzoOcZ7KQWg6A/RhfCMAXEySD2Num6gP/vrdCa/hkP0F5cLPx5
-         +jIQ==
+        bh=0XqZSkBjF0/NwCudxK7VyjrIpDSZ4UaVvor7D5Au+9I=;
+        b=Nss6QjOj2gWAnAUZSZ/Om/bvUd0ReXJo7t3e+0oHUVC0Dcr0a+a15NlUkN1pPkdNjI
+         xqJouLOLu6WulABRRjr2EE8ABIhfopSfsqApSd3bBpqeKqcWQknlDmtwAnudN+zJ7Y0O
+         tCQIhs+JofA7eoEN2kcocsbiz/R/AazVdN0xuYpe8+2yWT7P78IqnNkOWsgwnC05suE+
+         Teec6JjBKNr3pGUiteMTH1/5Aprxv2ExecE4R5B/AThLZaTlT1/9bTMPaBNaJ1E47PbW
+         SWrrj+6IYPGVrdXP9Mi9zdenICE6ibCfm4uO8gdqzKJo8G2C5yU2z34+JDcT3YVdMnoT
+         USXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=imZPqnzDLF2i+5vb28S1oLdL2hZHuB+mTkpveovIShk=;
-        b=INBDgDcXzO6C0Tt42VPZsCcywTvUzI2W5Hqfy0L18VTdEq6fSV7CPgpFHwgknV2+HL
-         FvrsUFP2eaX9rAGRk3tm/UPTX62gZiNcZ7yuiTVhw45oZCyahbnfAO9lvSzhYZYQrAyr
-         6nByiBe3rtzCbMn15r+N0PZ6kPOWFgFK51CXG86+jT9yaEm2pKTFPhOOtWItTlGvCd0d
-         SO8Krx+sXoSGULFyX4zlQhRILHivvc/QxsbIBrmB5bWixNhtSJTXPk/AFUxVVG/9UlZe
-         AaWT2IpwCluZt4SovwXAOMpdDbC7PoWt0gCMG7hmcVmiC1rwEB5shHCVHd+7qHSG+C7V
-         9pdA==
-X-Gm-Message-State: AFqh2krpsveSmw0HKtQhg1qGjrpTjtHLqQpG+RtIGauwUlTYnZFfAu46
-        Gidb0FR0HiUmsJyrougorXa/ntiIjT8hYEHsB8bIfQ==
-X-Google-Smtp-Source: AMrXdXs4LmKDqs/bftcofPxFVGYVQUr5DcCTiOz9NFVAYiCNRH8NqmJaD8MgxRimG8MqrplGeje8Ej8e82AA9dGt8Vs=
-X-Received: by 2002:a63:d902:0:b0:490:597e:1c0a with SMTP id
- r2-20020a63d902000000b00490597e1c0amr3599808pgg.309.1673547496600; Thu, 12
- Jan 2023 10:18:16 -0800 (PST)
+        bh=0XqZSkBjF0/NwCudxK7VyjrIpDSZ4UaVvor7D5Au+9I=;
+        b=SW53i2q323nsTzw21cT1o36TFuQAonNBhtGH1pVSgpt97X7KMshavHE1b+puOCW9Mq
+         LOmEw8i1+5t4tXt3/kaFZ4Q7SjDcnyeqCAK5ZO6Z8ISJLAzACR+v5tZLZjVhiuXiVD5r
+         WaQI9MLXgx/pAVevZl/WjjZEu71nnv4g+ey3lQRf3iuGKqFRAk+Xojsmu4W2txBphozS
+         cb+cRwrXPpCjyLSKTIg/pD1Bi3b0Jijw74xsmx0YrDte5NA9DccBnU2AjTbWM6xQztww
+         BsUwGsnOPCqIVqA3EatrNQ6ngNzMdLQUBPfAgCqAEndOfUPZxkgmdMrJ4qevNYT4ZmCx
+         XQlQ==
+X-Gm-Message-State: AFqh2kqSRs4Xd8CXXE3OhORjRD/5J3+Qke+Pd1hwqEZD74ENao19dCde
+        MaDCTjjqs/A0woakxFe9/we9DgysuBkiXHd7gGqSFw==
+X-Google-Smtp-Source: AMrXdXsMZYU+ot9pUjM6sBfBWlHRs5OKPeSzQPbNaLx2GTCzg8mr/58dc6ua+GqpoYiouuO1ycmVhn1xvGW01o0l2Ac=
+X-Received: by 2002:a63:d14a:0:b0:479:5a45:6d32 with SMTP id
+ c10-20020a63d14a000000b004795a456d32mr3854918pgj.138.1673547597227; Thu, 12
+ Jan 2023 10:19:57 -0800 (PST)
 MIME-Version: 1.0
-References: <20221215170046.2010255-1-atishp@rivosinc.com> <20221215170046.2010255-2-atishp@rivosinc.com>
- <20230112100608.d7tnvhbotjfctlgk@orel>
-In-Reply-To: <20230112100608.d7tnvhbotjfctlgk@orel>
+References: <20221215170046.2010255-1-atishp@rivosinc.com> <20221215170046.2010255-3-atishp@rivosinc.com>
+ <20230112102141.chpcqzoko25s2cak@orel>
+In-Reply-To: <20230112102141.chpcqzoko25s2cak@orel>
 From:   Atish Kumar Patra <atishp@rivosinc.com>
-Date:   Thu, 12 Jan 2023 10:18:05 -0800
-Message-ID: <CAHBxVyESkQ9Krmn-44f-A8hYzMrZBtBfq15fdx-sHDQfkBMtKQ@mail.gmail.com>
-Subject: Re: [PATCH v2 01/11] RISC-V: Define helper functions expose hpm
- counter width and count
+Date:   Thu, 12 Jan 2023 10:19:46 -0800
+Message-ID: <CAHBxVyG0mmVJDg0MUG0FMhQM11xrk6dTw9Hc1YntVE+9qdbfOg@mail.gmail.com>
+Subject: Re: [PATCH v2 02/11] RISC-V: KVM: Define a probe function for SBI
+ extension data structures
 To:     Andrew Jones <ajones@ventanamicro.com>
 Cc:     linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>,
         Atish Patra <atishp@atishpatra.org>,
@@ -74,130 +74,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 2:06 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+On Thu, Jan 12, 2023 at 2:21 AM Andrew Jones <ajones@ventanamicro.com> wrote:
 >
-> On Thu, Dec 15, 2022 at 09:00:36AM -0800, Atish Patra wrote:
-> > KVM module needs to know how many hardware counters and the counter
-> > width that the platform supports. Otherwise, it will not be able to show
-> > optimal value of virtual counters to the guest. The virtual hardware
-> > counters also need to have the same width as the logical hardware
-> > counters for simplicity. However, there shouldn't be mapping between
-> > virtual hardware counters and logical hardware counters. As we don't
-> > support hetergeneous harts or counters with different width as of now,
-> > the implementation relies on the counter width of the first available
-> > programmable counter.
+> On Thu, Dec 15, 2022 at 09:00:37AM -0800, Atish Patra wrote:
+> > Currently the probe function just checks if an SBI extension is
+> > registered or not. However, the extension may not want to advertise
+> > itself depending on some other condition.
+> > An additional extension specific probe function will allow
+> > extensions to decide if they want to be advertised to the caller or
+> > not. Any extension that does not require additional dependency checks
+> > can avoid implementing this function.
 > >
 > > Signed-off-by: Atish Patra <atishp@rivosinc.com>
 > > ---
-> >  drivers/perf/riscv_pmu_sbi.c   | 35 +++++++++++++++++++++++++++++++++-
-> >  include/linux/perf/riscv_pmu.h |  3 +++
-> >  2 files changed, 37 insertions(+), 1 deletion(-)
+> >  arch/riscv/include/asm/kvm_vcpu_sbi.h |  3 +++
+> >  arch/riscv/kvm/vcpu_sbi_base.c        | 13 +++++++++++--
+> >  2 files changed, 14 insertions(+), 2 deletions(-)
 > >
-> > diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
-> > index 3852c18..65d4aa4 100644
-> > --- a/drivers/perf/riscv_pmu_sbi.c
-> > +++ b/drivers/perf/riscv_pmu_sbi.c
-> > @@ -49,6 +49,9 @@ static const struct attribute_group *riscv_pmu_attr_groups[] = {
-> >  static union sbi_pmu_ctr_info *pmu_ctr_list;
-> >  static unsigned int riscv_pmu_irq;
+> > diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> > index f79478a..61dac1b 100644
+> > --- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> > +++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
+> > @@ -29,6 +29,9 @@ struct kvm_vcpu_sbi_extension {
+> >       int (*handler)(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> >                      unsigned long *out_val, struct kvm_cpu_trap *utrap,
+> >                      bool *exit);
+> > +
+> > +     /* Extension specific probe function */
+> > +     unsigned long (*probe)(struct kvm_vcpu *vcpu, unsigned long extid);
+>
+> It doesn't seem like the extid parameter should be necessary since the
+> probe function is specific to the extension, but it doesn't hurt either.
+>
+
+Yeah. You are correct. I will drop it. Thanks.
+
+> >  };
 > >
-> > +/* Cache the available counters in a bitmask */
-> > +unsigned long cmask;
->
-> I presume this can be static since it's not getting added to the header.
-> And don't we need this to be a long long for rv32? We should probably
-> just use u64.
->
-
-Yeah. u64 would be better. I will change it along with static. Thanks.
-
-> > +
-> >  struct sbi_pmu_event_data {
-> >       union {
-> >               union {
-> > @@ -264,6 +267,37 @@ static bool pmu_sbi_ctr_is_fw(int cidx)
-> >       return (info->type == SBI_PMU_CTR_TYPE_FW) ? true : false;
-> >  }
-> >
-> > +/*
-> > + * Returns the counter width of a programmable counter and number of hardware
-> > + * counters. As we don't support heterneous CPUs yet, it is okay to just
->
-> heterogeneous
->
-
-Fixed.
-
-> > + * return the counter width of the first programmable counter.
-> > + */
-> > +int riscv_pmu_get_hpm_info(u32 *hw_ctr_width, u32 *num_hw_ctr)
-> > +{
-> > +     int i;
-> > +     union sbi_pmu_ctr_info *info;
-> > +     u32 hpm_width = 0, hpm_count = 0;
-> > +
-> > +     if (!cmask)
-> > +             return -EINVAL;
-> > +
-> > +     for_each_set_bit(i, &cmask, RISCV_MAX_COUNTERS) {
-> > +             info = &pmu_ctr_list[i];
-> > +             if (!info)
-> > +                     continue;
-> > +             if (!hpm_width && (info->csr != CSR_CYCLE) && (info->csr != CSR_INSTRET))
->
-> nit: No need for () around the != expressions
->
-
-Fixed.
-
-> > +                     hpm_width = info->width;
-> > +             if (info->type == SBI_PMU_CTR_TYPE_HW)
-> > +                     hpm_count++;
-> > +     }
-> > +
-> > +     *hw_ctr_width = hpm_width;
-> > +     *num_hw_ctr = hpm_count;
-> > +
-> > +     return 0;
-> > +}
-> > +EXPORT_SYMBOL(riscv_pmu_get_hpm_info);
->
-> EXPORT_SYMBOL_GPL ?
->
-
-Is that mandatory ? I have seen usage of both in arch/riscv and other
-places though.
-I am also not sure if any other non-GPL module should/need access to this.
-
-> > +
-> >  static int pmu_sbi_ctr_get_idx(struct perf_event *event)
+> >  void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu, struct kvm_run *run);
+> > diff --git a/arch/riscv/kvm/vcpu_sbi_base.c b/arch/riscv/kvm/vcpu_sbi_base.c
+> > index 5d65c63..89e2415 100644
+> > --- a/arch/riscv/kvm/vcpu_sbi_base.c
+> > +++ b/arch/riscv/kvm/vcpu_sbi_base.c
+> > @@ -19,6 +19,7 @@ static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
 > >  {
-> >       struct hw_perf_event *hwc = &event->hw;
-> > @@ -798,7 +832,6 @@ static void riscv_pmu_destroy(struct riscv_pmu *pmu)
-> >  static int pmu_sbi_device_probe(struct platform_device *pdev)
-> >  {
-> >       struct riscv_pmu *pmu = NULL;
-> > -     unsigned long cmask = 0;
-> >       int ret = -ENODEV;
-> >       int num_counters;
+> >       int ret = 0;
+> >       struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
+> > +     const struct kvm_vcpu_sbi_extension *sbi_ext;
 > >
-> > diff --git a/include/linux/perf/riscv_pmu.h b/include/linux/perf/riscv_pmu.h
-> > index e17e86a..a1c3f77 100644
-> > --- a/include/linux/perf/riscv_pmu.h
-> > +++ b/include/linux/perf/riscv_pmu.h
-> > @@ -73,6 +73,9 @@ void riscv_pmu_legacy_skip_init(void);
-> >  static inline void riscv_pmu_legacy_skip_init(void) {};
-> >  #endif
-> >  struct riscv_pmu *riscv_pmu_alloc(void);
-> > +#ifdef CONFIG_RISCV_PMU_SBI
-> > +int riscv_pmu_get_hpm_info(u32 *hw_ctr_width, u32 *num_hw_ctr);
-> > +#endif
-> >
-> >  #endif /* CONFIG_RISCV_PMU */
-> >
+> >       switch (cp->a6) {
+> >       case SBI_EXT_BASE_GET_SPEC_VERSION:
+> > @@ -43,8 +44,16 @@ static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+> >                        */
+> >                       kvm_riscv_vcpu_sbi_forward(vcpu, run);
+> >                       *exit = true;
+> > -             } else
+> > -                     *out_val = kvm_vcpu_sbi_find_ext(cp->a0) ? 1 : 0;
+> > +             } else {
+> > +                     sbi_ext = kvm_vcpu_sbi_find_ext(cp->a0);
+> > +                     if (sbi_ext) {
+> > +                             if (sbi_ext->probe)
+> > +                                     *out_val = sbi_ext->probe(vcpu, cp->a0);
+> > +                             else
+> > +                                     *out_val = 1;
+> > +                     } else
+> > +                             *out_val = 0;
+> > +             }
+> >               break;
+> >       case SBI_EXT_BASE_GET_MVENDORID:
+> >               *out_val = vcpu->arch.mvendorid;
 > > --
 > > 2.25.1
 > >
 >
-> Thanks,
-> drew
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
