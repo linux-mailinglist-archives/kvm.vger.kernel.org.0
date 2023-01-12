@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3B6AE667B4F
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 17:41:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E5057667B53
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 17:41:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240645AbjALQlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 11:41:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41964 "EHLO
+        id S240655AbjALQle (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 11:41:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239134AbjALQhd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 11:37:33 -0500
+        with ESMTP id S239693AbjALQhg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 11:37:36 -0500
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B723140FA;
-        Thu, 12 Jan 2023 08:33:53 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C11915F27;
+        Thu, 12 Jan 2023 08:33:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673541233; x=1705077233;
+  t=1673541234; x=1705077234;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=IrMgL5L0+5vJWFAChbo9zwiHS6DM3k7Plua0iODYg10=;
-  b=QUKiHJ8WT6yLWoVp4lYfgZucIDQhDhZu/c1dy7Cz0XgFs0np4wqUPxpD
-   y3UVtfqYD8SxbkEzono2v/7iJ7xokhLpVewllGXop3E3yllKaEo8NxUgZ
-   P31Zza8c8tmGS6eR12E76K+HogqzuMNfJnLLVhfJqGfDXnL8dFYY5aTGZ
-   vjJCsjiqgwhco4tv7bTOODJtXXs7aK/HsbSIJ2rVrAcTiwP+i5cdKe/Rj
-   NHhX1FThj+X/0dihqP0ziObvNu80AAxObSsV5O6ALD7VEGVE8D3N0i3Zs
-   i89FFWVvlFuHOSO40+1A9eDiwfsKvulrZs48/ZOMl6llh/439Xc+mlyPK
+  bh=bcDa4fYN1iV6Ek3rgxou0zEqNM1V2Xv6HRciLpFuqcE=;
+  b=lvaUbGtInSVYpop8NVoGUNx6jeK+24smXCHmLVnfVsjXzTVQdEjiM6Mw
+   iMDJgWzN5PJOQKX6w2qWDqBHv5j343lAOPbIyJqaKXySINXiz/PSvzYTU
+   S5uplt3Cmhj/d6EMXR5finVKsd7AUumlgWGJipOHixcwOcWtu8Cksdt/7
+   O4A98hM0L3UtK1eBRWAddACafumkbrZwUFm88g9DykuNOR6VxqxW5dC3t
+   gN+CUtIxIstqWsUkiRJsrh69iQZFyBPVs0Gf+XPoOC/xgHA97fyxPLbmO
+   eM1KHUDmJKJszFqqKv1Sqdx7Rirc0R0DHnCQdM36YCO1MZXnlMwnUGJYD
    Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="323811699"
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="323811702"
 X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="323811699"
+   d="scan'208";a="323811702"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:21 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="721151666"
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="721151670"
 X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="721151666"
+   d="scan'208";a="721151670"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:21 -0800
 From:   isaku.yamahata@intel.com
@@ -44,9 +44,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>
-Subject: [PATCH v11 013/113] x86/cpu: Add helper functions to allocate/free TDX private host key id
-Date:   Thu, 12 Jan 2023 08:31:21 -0800
-Message-Id: <241994f1f6782753f3307fe999a3dad434477c16.1673539699.git.isaku.yamahata@intel.com>
+Subject: [PATCH v11 014/113] x86/virt/tdx: Add a helper function to return system wide info about TDX module
+Date:   Thu, 12 Jan 2023 08:31:22 -0800
+Message-Id: <3c7b93a184e36729aeaad2df2b5f450fb564ee92.1673539699.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1673539699.git.isaku.yamahata@intel.com>
 References: <cover.1673539699.git.isaku.yamahata@intel.com>
@@ -63,109 +63,283 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-TDX private host key id (HKID) is assigned to guest TD.  The memory
-controller encrypts guest TD memory with the assigned TDX HKID.  Add helper
-functions to allocate/free TDX private HKID so that TDX KVM can manage it.
-
-Also export the global TDX private HKID that is used to encrypt TDX module,
-its memory and some dynamic data (TDR).  When VMM releasing encrypted page
-to reuse it, the page needs to be flushed with the used HKID.  VMM needs
-the global TDX private HKID to flush such pages.
+TDX KVM needs system-wide information about the TDX module, struct
+tdsysinfo_struct.  Add a helper function tdx_get_sysinfo() to return it
+instead of KVM getting it with various error checks.  Make KVM call the
+function and stash the info.  Move out the struct definition about it to
+common place arch/x86/include/asm/tdx.h.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/tdx.h  | 12 ++++++++++++
- arch/x86/virt/vmx/tdx/tdx.c | 35 +++++++++++++++++++++++++++++++++++
- 2 files changed, 47 insertions(+)
+ arch/x86/include/asm/tdx.h  | 54 +++++++++++++++++++++++++++++++++++++
+ arch/x86/kvm/vmx/tdx.c      | 49 ++++++++++++++++++++++++++++++++-
+ arch/x86/virt/vmx/tdx/tdx.c | 21 ++++++++++++---
+ arch/x86/virt/vmx/tdx/tdx.h | 51 -----------------------------------
+ 4 files changed, 119 insertions(+), 56 deletions(-)
 
 diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-index 0f71d3856ede..ed9cf61ff8b4 100644
+index ed9cf61ff8b4..2ca6e8ce1e43 100644
 --- a/arch/x86/include/asm/tdx.h
 +++ b/arch/x86/include/asm/tdx.h
-@@ -107,11 +107,23 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
+@@ -105,6 +105,58 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
+ #endif /* CONFIG_INTEL_TDX_GUEST && CONFIG_KVM_GUEST */
+ 
  #ifdef CONFIG_INTEL_TDX_HOST
++struct tdx_cpuid_config {
++	u32	leaf;
++	u32	sub_leaf;
++	u32	eax;
++	u32	ebx;
++	u32	ecx;
++	u32	edx;
++} __packed;
++
++#define TDSYSINFO_STRUCT_SIZE		1024
++#define TDSYSINFO_STRUCT_ALIGNMENT	1024
++
++/*
++ * The size of this structure itself is flexible.  The actual structure
++ * passed to TDH.SYS.INFO must be padded to TDSYSINFO_STRUCT_SIZE and be
++ * aligned to TDSYSINFO_STRUCT_ALIGNMENT using DECLARE_PADDED_STRUCT().
++ */
++struct tdsysinfo_struct {
++	/* TDX-SEAM Module Info */
++	u32	attributes;
++	u32	vendor_id;
++	u32	build_date;
++	u16	build_num;
++	u16	minor_version;
++	u16	major_version;
++	u8	reserved0[14];
++	/* Memory Info */
++	u16	max_tdmrs;
++	u16	max_reserved_per_tdmr;
++	u16	pamt_entry_size;
++	u8	reserved1[10];
++	/* Control Struct Info */
++	u16	tdcs_base_size;
++	u8	reserved2[2];
++	u16	tdvps_base_size;
++	u8	tdvps_xfam_dependent_size;
++	u8	reserved3[9];
++	/* TD Capabilities */
++	u64	attributes_fixed0;
++	u64	attributes_fixed1;
++	u64	xfam_fixed0;
++	u64	xfam_fixed1;
++	u8	reserved4[32];
++	u32	num_cpuid_config;
++	/*
++	 * The actual number of CPUID_CONFIG depends on above
++	 * 'num_cpuid_config'.
++	 */
++	DECLARE_FLEX_ARRAY(struct tdx_cpuid_config, cpuid_configs);
++} __packed;
++
++const struct tdsysinfo_struct *tdx_get_sysinfo(void);
  bool platform_tdx_enabled(void);
  int tdx_enable(void);
-+/*
-+ * Key id globally used by TDX module: TDX module maps TDR with this TDX global
-+ * key id.  TDR includes key id assigned to the TD.  Then TDX module maps other
-+ * TD-related pages with the assigned key id.  TDR requires this TDX global key
-+ * id for cache flush unlike other TD-related pages.
-+ */
-+extern u32 tdx_global_keyid __read_mostly;
-+int tdx_keyid_alloc(void);
-+void tdx_keyid_free(int keyid);
-+
+ /*
+@@ -120,6 +172,8 @@ void tdx_keyid_free(int keyid);
  u64 __seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
  	       struct tdx_module_output *out);
  #else	/* !CONFIG_INTEL_TDX_HOST */
++struct tdsysinfo_struct;
++static inline const struct tdsysinfo_struct *tdx_get_sysinfo(void) { return NULL; }
  static inline bool platform_tdx_enabled(void) { return false; }
  static inline int tdx_enable(void)  { return -EINVAL; }
-+static inline int tdx_keyid_alloc(void) { return -EOPNOTSUPP; }
-+static inline void tdx_keyid_free(int keyid) { }
- #endif	/* CONFIG_INTEL_TDX_HOST */
+ static inline int tdx_keyid_alloc(void) { return -EOPNOTSUPP; }
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 6c7d9ec53046..2adf5551ab26 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -11,9 +11,34 @@
+ #undef pr_fmt
+ #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
  
- #endif /* !__ASSEMBLY__ */
++#define TDX_MAX_NR_CPUID_CONFIGS					\
++	((TDSYSINFO_STRUCT_SIZE -					\
++		offsetof(struct tdsysinfo_struct, cpuid_configs))	\
++		/ sizeof(struct tdx_cpuid_config))
++
++struct tdx_capabilities {
++	u8 tdcs_nr_pages;
++	u8 tdvpx_nr_pages;
++
++	u64 attrs_fixed0;
++	u64 attrs_fixed1;
++	u64 xfam_fixed0;
++	u64 xfam_fixed1;
++
++	u32 nr_cpuid_configs;
++	struct tdx_cpuid_config cpuid_configs[TDX_MAX_NR_CPUID_CONFIGS];
++};
++
++/* Capabilities of KVM + the TDX module. */
++static struct tdx_capabilities tdx_caps;
++
+ static int __init tdx_module_setup(void)
+ {
+-	int ret;
++	const struct tdsysinfo_struct *tdsysinfo;
++	int ret = 0;
++
++	BUILD_BUG_ON(sizeof(*tdsysinfo) > TDSYSINFO_STRUCT_SIZE);
++	BUILD_BUG_ON(TDX_MAX_NR_CPUID_CONFIGS != 37);
+ 
+ 	ret = tdx_enable();
+ 	if (ret) {
+@@ -21,6 +46,28 @@ static int __init tdx_module_setup(void)
+ 		return ret;
+ 	}
+ 
++	tdsysinfo = tdx_get_sysinfo();
++	if (tdsysinfo->num_cpuid_config > TDX_MAX_NR_CPUID_CONFIGS)
++		return -EIO;
++
++	tdx_caps = (struct tdx_capabilities) {
++		.tdcs_nr_pages = tdsysinfo->tdcs_base_size / PAGE_SIZE,
++		/*
++		 * TDVPS = TDVPR(4K page) + TDVPX(multiple 4K pages).
++		 * -1 for TDVPR.
++		 */
++		.tdvpx_nr_pages = tdsysinfo->tdvps_base_size / PAGE_SIZE - 1,
++		.attrs_fixed0 = tdsysinfo->attributes_fixed0,
++		.attrs_fixed1 = tdsysinfo->attributes_fixed1,
++		.xfam_fixed0 =	tdsysinfo->xfam_fixed0,
++		.xfam_fixed1 = tdsysinfo->xfam_fixed1,
++		.nr_cpuid_configs = tdsysinfo->num_cpuid_config,
++	};
++	if (!memcpy(tdx_caps.cpuid_configs, tdsysinfo->cpuid_configs,
++			tdsysinfo->num_cpuid_config *
++			sizeof(struct tdx_cpuid_config)))
++		return -EIO;
++
+ 	pr_info("TDX is supported.\n");
+ 	return 0;
+ }
 diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-index eba7e62cebec..d18ab5c4d447 100644
+index d18ab5c4d447..65c0024fd3a9 100644
 --- a/arch/x86/virt/vmx/tdx/tdx.c
 +++ b/arch/x86/virt/vmx/tdx/tdx.c
-@@ -51,6 +51,10 @@ static DEFINE_MUTEX(tdx_module_lock);
- /* All TDX-usable memory regions */
- static LIST_HEAD(tdx_memlist);
+@@ -279,7 +279,7 @@ static void print_cmrs(struct cmr_info *cmr_array, int nr_cmrs)
+  * kernel stack.  @sysinfo must have been padded to have enough room
+  * to save the TDSYSINFO_STRUCT.
+  */
+-static int tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
++static int __tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
+ 			   struct cmr_info *cmr_array)
+ {
+ 	struct tdx_module_output out;
+@@ -308,6 +308,21 @@ static int tdx_get_sysinfo(struct tdsysinfo_struct *sysinfo,
+ 	return 0;
+ }
  
-+/* TDX module global KeyID.  Used in TDH.SYS.CONFIG ABI. */
-+u32 tdx_global_keyid __read_mostly;
-+EXPORT_SYMBOL_GPL(tdx_global_keyid);
++static DECLARE_PADDED_STRUCT(tdsysinfo_struct, tdsysinfo,
++			     TDSYSINFO_STRUCT_SIZE, TDSYSINFO_STRUCT_ALIGNMENT);
++
++const struct tdsysinfo_struct *tdx_get_sysinfo(void)
++{
++	const struct tdsysinfo_struct *r = NULL;
++
++	mutex_lock(&tdx_module_lock);
++	if (tdx_module_status == TDX_MODULE_INITIALIZED)
++		r = &PADDED_STRUCT(tdsysinfo);
++	mutex_unlock(&tdx_module_lock);
++	return r;
++}
++EXPORT_SYMBOL_GPL(tdx_get_sysinfo);
 +
  /*
-  * tdx_keyid_start and nr_tdx_keyids indicate that TDX is uninitialized.
-  * This is used in TDX initialization error paths to take it from
-@@ -132,6 +136,31 @@ static struct notifier_block tdx_memory_nb = {
- 	.notifier_call = tdx_memory_notifier,
- };
- 
-+/* TDX KeyID pool */
-+static DEFINE_IDA(tdx_keyid_pool);
-+
-+int tdx_keyid_alloc(void)
-+{
-+	if (WARN_ON_ONCE(!tdx_keyid_start || !nr_tdx_keyids))
-+		return -EINVAL;
-+
-+	/* The first keyID is reserved for the global key. */
-+	return ida_alloc_range(&tdx_keyid_pool, tdx_keyid_start + 1,
-+			       tdx_keyid_start + nr_tdx_keyids - 1,
-+			       GFP_KERNEL);
-+}
-+EXPORT_SYMBOL_GPL(tdx_keyid_alloc);
-+
-+void tdx_keyid_free(int keyid)
-+{
-+	/* keyid = 0 is reserved. */
-+	if (WARN_ON_ONCE(keyid <= 0))
-+		return;
-+
-+	ida_free(&tdx_keyid_pool, keyid);
-+}
-+EXPORT_SYMBOL_GPL(tdx_keyid_free);
-+
- static int __init tdx_init(void)
- {
- 	int err;
-@@ -1161,6 +1190,12 @@ static int init_tdx_module(void)
+  * Add a memory region as a TDX memory block.  The caller must make sure
+  * all memory regions are added in address ascending order and don't
+@@ -1118,8 +1133,6 @@ static int init_tdx_module(void)
+ 	 * They are 1024 bytes and 512 bytes respectively but it's fine to
+ 	 * keep them in the stack as this function is only called once.
+ 	 */
+-	DECLARE_PADDED_STRUCT(tdsysinfo_struct, tdsysinfo,
+-			TDSYSINFO_STRUCT_SIZE, TDSYSINFO_STRUCT_ALIGNMENT);
+ 	struct cmr_info cmr_array[MAX_CMRS] __aligned(CMR_INFO_ARRAY_ALIGNMENT);
+ 	struct tdsysinfo_struct *sysinfo = &PADDED_STRUCT(tdsysinfo);
+ 	struct tdmr_info_list tdmr_list;
+@@ -1134,7 +1147,7 @@ static int init_tdx_module(void)
  	if (ret)
- 		goto out_free_pamts;
+ 		goto out;
  
-+	/*
-+	 * Reserve the first TDX KeyID as global KeyID to protect
-+	 * TDX module metadata.
-+	 */
-+	tdx_global_keyid = tdx_keyid_start;
-+
- 	/* Initialize TDMRs to complete the TDX module initialization */
- 	ret = init_tdmrs(&tdmr_list);
+-	ret = tdx_get_sysinfo(sysinfo, cmr_array);
++	ret = __tdx_get_sysinfo(sysinfo, cmr_array);
  	if (ret)
+ 		goto out;
+ 
+diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
+index 8abfbcc23be1..9658cd89b579 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.h
++++ b/arch/x86/virt/vmx/tdx/tdx.h
+@@ -34,15 +34,6 @@ struct cmr_info {
+ #define MAX_CMRS			32
+ #define CMR_INFO_ARRAY_ALIGNMENT	512
+ 
+-struct cpuid_config {
+-	u32	leaf;
+-	u32	sub_leaf;
+-	u32	eax;
+-	u32	ebx;
+-	u32	ecx;
+-	u32	edx;
+-} __packed;
+-
+ #define DECLARE_PADDED_STRUCT(type, name, size, alignment)	\
+ 	struct type##_padded {					\
+ 		union {						\
+@@ -53,48 +44,6 @@ struct cpuid_config {
+ 
+ #define PADDED_STRUCT(name)	(name##_padded.name)
+ 
+-#define TDSYSINFO_STRUCT_SIZE		1024
+-#define TDSYSINFO_STRUCT_ALIGNMENT	1024
+-
+-/*
+- * The size of this structure itself is flexible.  The actual structure
+- * passed to TDH.SYS.INFO must be padded to TDSYSINFO_STRUCT_SIZE and be
+- * aligned to TDSYSINFO_STRUCT_ALIGNMENT using DECLARE_PADDED_STRUCT().
+- */
+-struct tdsysinfo_struct {
+-	/* TDX-SEAM Module Info */
+-	u32	attributes;
+-	u32	vendor_id;
+-	u32	build_date;
+-	u16	build_num;
+-	u16	minor_version;
+-	u16	major_version;
+-	u8	reserved0[14];
+-	/* Memory Info */
+-	u16	max_tdmrs;
+-	u16	max_reserved_per_tdmr;
+-	u16	pamt_entry_size;
+-	u8	reserved1[10];
+-	/* Control Struct Info */
+-	u16	tdcs_base_size;
+-	u8	reserved2[2];
+-	u16	tdvps_base_size;
+-	u8	tdvps_xfam_dependent_size;
+-	u8	reserved3[9];
+-	/* TD Capabilities */
+-	u64	attributes_fixed0;
+-	u64	attributes_fixed1;
+-	u64	xfam_fixed0;
+-	u64	xfam_fixed1;
+-	u8	reserved4[32];
+-	u32	num_cpuid_config;
+-	/*
+-	 * The actual number of CPUID_CONFIG depends on above
+-	 * 'num_cpuid_config'.
+-	 */
+-	DECLARE_FLEX_ARRAY(struct cpuid_config, cpuid_configs);
+-} __packed;
+-
+ struct tdmr_reserved_area {
+ 	u64 offset;
+ 	u64 size;
 -- 
 2.25.1
 
