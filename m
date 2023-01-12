@@ -2,67 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7836667F4D
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 20:30:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B644466845A
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 21:53:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240413AbjALTa2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 14:30:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48548 "EHLO
+        id S232594AbjALUxE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 15:53:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235201AbjALT2i (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 14:28:38 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9B4FDD4
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 11:23:01 -0800 (PST)
+        with ESMTP id S234846AbjALUwe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 15:52:34 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03305D895;
+        Thu, 12 Jan 2023 12:25:09 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A1181B8201C
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:23:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 529BBC4339C;
-        Thu, 12 Jan 2023 19:22:59 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4BF5462174;
+        Thu, 12 Jan 2023 20:25:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C079C433F0;
+        Thu, 12 Jan 2023 20:25:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673551379;
-        bh=R76HaO8qoXwTusW877BsCKlHkjCFGvuoQfdtYgi9v/k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VbiwN11mdCL4NF3zh9oVfHnhAZhJ6oUdGfxUc1sEgKtfXUjyR5Kw+aeev4e5MbDsQ
-         bVF1ABIIBq20Zr9d+DcNn4fQGJ2UJolnYfu5Np3GiFym9umq4YruOl4XwjNR7obzZA
-         bbhhvS1ZxY+GgzS/7uDyWRgNN3RauNbtHP9g6EjVtuQYh1n0V6i796QSeVfoDgsCup
-         oKxjkuWAFu2EbS6pymQ9c1iX13Yj2U/0TF01wASo1jpEEWmjcxFpmrj2tlWsOvR6Xv
-         uSwamyDi7C20UJwAn1NJaYI1Ac6LR1Z+cxz2VZcfy7c4FU2lqjyoOxpvg4WDtmEX0S
-         cUAraQsLK9D4w==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pG37U-001IWu-KI;
-        Thu, 12 Jan 2023 19:20:12 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 68/68] KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV is on
-Date:   Thu, 12 Jan 2023 19:19:27 +0000
-Message-Id: <20230112191927.1814989-69-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
-References: <20230112191927.1814989-1-maz@kernel.org>
+        s=k20201202; t=1673555108;
+        bh=9zwIgfryghF/hPAyByTTWjUD8VVtMbRU5rfWoB9mj9g=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=K8gV+ziX4Q793ObSyocCG05xJsThWXKzS7TRBVtdKpg/OBjlzXUUQSr6oAlgo6f3B
+         xZIbkkRBpDgshI1VPcOjoX0pfF4b7wGjjpdyUE2HntCz9/Zs6FI15m/9VqD5zbulNV
+         n1zujl8AhaXgAF5C5/CgG9jNGffgadIH/B0XanePieaHUHFATgKT5zZhxyrnBUqltA
+         GVfYV4XeH0OY23RrukX0/07SCr6YqCDjt4NN4x8vIoDYFYL5oaXGIMowOImLtuNin9
+         gBoim/cppZw84M6yh7odJkWkTqDfofoPvL9s1PTkGtkgZLouMidrsOlMTn08t+2bzG
+         OsKOT/IAaRswA==
+Date:   Thu, 12 Jan 2023 20:25:03 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Heiko =?iso-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 01/13] riscv: fix jal offsets in patched alternatives
+Message-ID: <Y8Bsn5Q0HYMNOt/R@spud>
+References: <20230111171027.2392-1-jszhang@kernel.org>
+ <20230111171027.2392-2-jszhang@kernel.org>
+ <3268358.687JKscXgg@diego>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Ua1i9Pzh5KF+R9ch"
+Content-Disposition: inline
+In-Reply-To: <3268358.687JKscXgg@diego>
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -72,84 +61,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Although FEAT_ECV allows us to correctly enable the timers, it also
-reduces performances pretty badly (a L2 guest doing a lot of virtio
-emulated in L1 userspace results in a 30% degradation).
 
-Mitigate this by emulating the CTL/CVAL register reads in the
-inner run loop, without returning to the general kernel. This halves
-the overhead described above.
+--Ua1i9Pzh5KF+R9ch
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/vhe/switch.c | 49 +++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
+On Thu, Jan 12, 2023 at 12:31:59AM +0100, Heiko St=FCbner wrote:
+> Am Mittwoch, 11. Januar 2023, 18:10:15 CET schrieb Jisheng Zhang:
+> > Alternatives live in a different section, so offsets used by jal
+> > instruction will point to wrong locations after the patch got applied.
+> >=20
+> > Similar to arm64, adjust the location to consider that offset.
+> >=20
+> > Co-developed-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+> > Signed-off-by: Heiko Stuebner <heiko.stuebner@vrull.eu>
+> > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+>=20
+> looks good, thanks for fixing the issues Andrew and Conor pointed
+> out in the variant in my zbb series. I've now switched over to this one.
+>=20
+> I guess as you said, we really should separate this out into a single pat=
+ch
+> [or if Palmer is fine with that, just pick this one patch to apply until =
+the
+> rest is ready]
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index a3555b90d9e1..a9ac61505a86 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -201,11 +201,60 @@ static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	return true;
- }
- 
-+static bool kvm_hyp_handle_ecv(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	u64 esr, val;
-+
-+	/*
-+	 * Having FEAT_ECV allows for a better quality of timer emulation.
-+	 * However, this comes at a huge cost in terms of traps. Try and
-+	 * satisfy the reads without returning to the kernel if we can.
-+	 */
-+	if (!cpus_have_final_cap(ARM64_HAS_ECV))
-+		return false;
-+
-+	if (!vcpu_has_nv2(vcpu))
-+		return false;
-+
-+	esr = kvm_vcpu_get_esr(vcpu);
-+	if ((esr & ESR_ELx_SYS64_ISS_DIR_MASK) != ESR_ELx_SYS64_ISS_DIR_READ)
-+		return false;
-+
-+	switch (esr_sys64_to_sysreg(esr)) {
-+	case SYS_CNTP_CTL_EL02:
-+	case SYS_CNTP_CTL_EL0:
-+		val = __vcpu_sys_reg(vcpu, CNTP_CTL_EL0);
-+		break;
-+	case SYS_CNTP_CVAL_EL02:
-+	case SYS_CNTP_CVAL_EL0:
-+		val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
-+		break;
-+	case SYS_CNTV_CTL_EL02:
-+	case SYS_CNTV_CTL_EL0:
-+		val = __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
-+		break;
-+	case SYS_CNTV_CVAL_EL02:
-+	case SYS_CNTV_CVAL_EL0:
-+		val = __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	vcpu_set_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu), val);
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
-+
- static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
- 		return true;
- 
-+	if (kvm_hyp_handle_ecv(vcpu, exit_code))
-+		return true;
-+
- 	return kvm_hyp_handle_sysreg(vcpu, exit_code);
- }
- 
--- 
-2.34.1
+Splitting it out may make it easier to flag for him during the pw sync
+next week? Either way, I'm fine w/ it..
 
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+
+
+--Ua1i9Pzh5KF+R9ch
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY8BsnwAKCRB4tDGHoIJi
+0o5zAP9jGqZSSAdRHCE3N4G2XUAYUpvR8Zxi0U0OiGGa5Sr1eAEAng/g1Dt5Slg6
+suspJyY0z/VoCFEReP2eDtHoy6Qzagw=
+=+jG3
+-----END PGP SIGNATURE-----
+
+--Ua1i9Pzh5KF+R9ch--
