@@ -2,273 +2,152 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E4FD666D1F
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 09:57:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81E6A666E36
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 10:29:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239768AbjALI5l (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 03:57:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49722 "EHLO
+        id S239532AbjALJ3U (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 04:29:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239788AbjALI4W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 03:56:22 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FDC050077
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 00:54:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=CyqsjdHxbkVQSQZDkOCfYLsyQe4AMo8nwMNz5gEA1J0=; b=AA1xyHIKBGI3i2Swu7ZqKahQBi
-        Eg9JgdbmSHeZtOveJAdn9wRGyEFSjR7qsfxBQcHihmOigOWNTISazdQYARK6mnJP3A5QBPWW2DMAO
-        sbC0drHPnPC6+MKTdqPnLYjzMXRoca7yvUg1sF1WC/0LoNSrjtFF4u8FdyIrmPJ/HFXzr0j5/MK2D
-        WXdilY2aGFGQ1VjJNw4k+L2GxWwbCENHIsvC5pDbIZ6+scwy/zJdoYuCok6rgrMTSxKQDml+mApgx
-        Xb5nfT+F/sBTO9IPUNG2q/u3KiG2wgIvoM6DP56uVChowJ8V2dGmiafPXNmSr45iuI0zfWsKKNWQH
-        /kUzlXcg==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pFtMJ-004vLl-VM; Thu, 12 Jan 2023 08:54:52 +0000
-Message-ID: <0177dced46063f5fcecf68de3e9fc6451c943645.camel@infradead.org>
-Subject: Re: [PATCH v2 4/4] KVM: x86/xen: Avoid deadlock by adding
- kvm->arch.xen.xen_lock leaf node lock
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Cc:     Peter Zijlstra <peterz@infradead.org>, paul <paul@xen.org>,
-        Sean Christopherson <seanjc@google.com>,
-        Michal Luczaj <mhal@rbox.co>
-Date:   Thu, 12 Jan 2023 08:54:38 +0000
-In-Reply-To: <0e1b1673-a6f2-1f61-eb51-d9d4d6194a2a@redhat.com>
-References: <20230111180651.14394-1-dwmw2@infradead.org>
-         <20230111180651.14394-4-dwmw2@infradead.org>
-         <0e1b1673-a6f2-1f61-eb51-d9d4d6194a2a@redhat.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-bhxvmknvatmEB61gQRYq"
-User-Agent: Evolution 3.44.4-0ubuntu1 
+        with ESMTP id S239586AbjALJ2t (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 04:28:49 -0500
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E83BF4D72A
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 01:21:44 -0800 (PST)
+Received: by mail-ej1-x629.google.com with SMTP id u19so43161387ejm.8
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 01:21:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=kqb6Iris8XWiiMxft3j9JHa7v06d0Pz4gSRMhwJTQx0=;
+        b=n/F6PNUGVNPoZrDebVKmVpiZJ+hGLnh9tTOom2GkMxmVqhiyluaHAS2mBeZ+cssrXK
+         bLQjy0nWfHpIxez+jYZWgkjA6OiUnTKL9YEYoI+7cP76G0AvRrsmQ6wjpXoccCUStBP4
+         0csRTNp5wI1csOg0vSp1k0usXDWeatgNKt9JkZu3PIUlq14P4jCWeYU5bG9GnOsazUu4
+         QVEtXP5nka4fCPL3IId1dI4rA43UPGnDlpgPPN+StdxX1bn1GEK7MMAof+79Yt3iU1zM
+         jcokevDrio0CVEdvkfLF9M8n9gAW8KKaXiQTLBNrINIAJ4SDfUoH5IwDkpkGi1+jcQP8
+         ee3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=kqb6Iris8XWiiMxft3j9JHa7v06d0Pz4gSRMhwJTQx0=;
+        b=v6kQ9EVAaTRmtX95vx3P6NcWTnDBN8H6AEX2xPEmLPperGbPMGO7VwB6HjS0+0+i/I
+         34ZWXHrHLLmu9IuUyzM4QK2Di9WXs+cETWEZIRaGPT74FYuBuXE0omYKwOTYiV11Moe4
+         cpwXmSRe8AUX8rL5/4OD16m5IgBXNrgC+8DDNDLv8XIY4/YKtMnpdA3XwVcefL5CMq+0
+         eLbILGeJkKrZcen6xdiHbYjdGte6EGiVeX9C1jnYd6f+TrFMvhUmp1Hxmg46FX+KaBGx
+         PXDSHwrVSfPj60SE781FlHxtu/KSUMiu8BwvSoeP6pWKXiFTFraKwtpA2b+n0CRkC1lz
+         i0Xg==
+X-Gm-Message-State: AFqh2krsYuKKBmCiTSvkZqfayEaYVyXuZrvIGjkVNC+PhTy3AG4BAePv
+        mWeLXwIT7WtO+D8rTHU517bc7Q==
+X-Google-Smtp-Source: AMrXdXtlLbGsD7vOfKM14h8N4DFizPIig28V7mzUwlWavZAZ0XBiIpC8ynNkF7zMf6Uiq65IATUG/w==
+X-Received: by 2002:a17:906:34db:b0:842:3920:df75 with SMTP id h27-20020a17090634db00b008423920df75mr66807232ejb.33.1673515303467;
+        Thu, 12 Jan 2023 01:21:43 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id y16-20020a1709063a9000b0084ce5d5d21bsm7189751ejd.22.2023.01.12.01.21.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jan 2023 01:21:43 -0800 (PST)
+Date:   Thu, 12 Jan 2023 10:21:36 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Heiko =?utf-8?Q?St=C3=BCbner?= <heiko@sntech.de>
+Cc:     Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 05/13] riscv: cpufeature: extend
+ riscv_cpufeature_patch_func to all ISA extensions
+Message-ID: <20230112092136.f2g43hrhmrqouy4y@orel>
+References: <20230111171027.2392-1-jszhang@kernel.org>
+ <20230111171027.2392-6-jszhang@kernel.org>
+ <2398293.3Lj2Plt8kZ@diego>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2398293.3Lj2Plt8kZ@diego>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jan 12, 2023 at 12:29:57AM +0100, Heiko Stübner wrote:
+> Hi Jisheng.
+> 
+> Am Mittwoch, 11. Januar 2023, 18:10:19 CET schrieb Jisheng Zhang:
+> > riscv_cpufeature_patch_func() currently only scans a limited set of
+> > cpufeatures, explicitly defined with macros. Extend it to probe for all
+> > ISA extensions.
+> > 
+> > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+> > ---
+> >  arch/riscv/include/asm/errata_list.h |  9 ++--
+> >  arch/riscv/kernel/cpufeature.c       | 63 ++++------------------------
+> >  2 files changed, 11 insertions(+), 61 deletions(-)
+> 
+> hmmm ... I do see a somewhat big caveat for this.
+> and would like to take back my Reviewed-by for now
+> 
+> 
+> With this change we would limit the patchable cpufeatures to actual
+> riscv extensions. But cpufeatures can also be soft features like
+> how performant the core handles unaligned accesses.
 
---=-bhxvmknvatmEB61gQRYq
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I agree that this needs to be addressed and Jisheng also raised this
+yesterday here [*]. It seems we need the concept of cpufeatures, which
+may be extensions or non-extensions.
 
-On Wed, 2023-01-11 at 23:42 +0100, Paolo Bonzini wrote:
-> On 1/11/23 19:06, David Woodhouse wrote:
-> > From: David Woodhouse <dwmw@amazon.co.uk>
-> >=20
-> > In commit 14243b387137a ("KVM: x86/xen: Add KVM_IRQ_ROUTING_XEN_EVTCHN
-> > and event channel delivery") the clever version of me left some helpful
-> > notes for those who would come after him:
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * For the irqfd workqu=
-eue, using the main kvm->lock mutex is
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * fine since this func=
-tion is invoked from kvm_set_irq() with
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * no other lock held, =
-no srcu. In future if it will be called
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * directly from a vCPU=
- thread (e.g. on hypercall for an IPI)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * then it may need to =
-switch to using a leaf-node mutex for
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * serializing the shar=
-ed_info mapping.
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_lock(&kvm->lock);
-> >=20
-> > In commit 2fd6df2f2b47 ("KVM: x86/xen: intercept EVTCHNOP_send from gue=
-sts")
-> > the other version of me ran straight past that comment without reading =
-it,
-> > and introduced a potential deadlock by taking vcpu->mutex and kvm->lock
-> > in the wrong order.
-> >=20
-> > Solve this as originally suggested, by adding a leaf-node lock in the X=
-en
-> > state rather than using kvm->lock for it.
-> >=20
-> > Fixes: 2fd6df2f2b47 ("KVM: x86/xen: intercept EVTCHNOP_send from guests=
-")
-> > Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
->=20
-> Same as my patch except that this one is for an older tree and is
-> missing this:
->=20
-> @@ -1958,7 +1950,7 @@ static int kvm_xen_eventfd_reset(struct kvm *kvm)
-> =C2=A0=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0all_evtchnfds =3D kmalloc=
-_array(n, sizeof(struct evtchnfd *), GFP_KERNEL);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (!all_evtchnfds) {
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0mutex_unlock(&kvm->lock);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0mutex_unlock(&kvm->arch.xen.xen_lock);
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0return -ENOMEM;
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0}
->=20
+[*] https://lore.kernel.org/all/Y77xyNPNqnFQUqAx@xhacker/
 
+> 
+> See Palmer's series [0].
+> 
+> 
+> Also this essentially codifies that each ALTERNATIVE can only ever
+> be attached to exactly one extension.
+> 
+> But contrary to vendor-errata, it is very likely that we will need
+> combinations of different extensions for some alternatives in the future.
 
-I was basing it on kvm/queue; should I have been using kvm/next? I had
-noted the absence of that deadlock fix; I think I said to Sean that we
-might even be able to revert it... but we can't. We do still take this
-new xen_lock in a kvm->scru read section just as we did kvm->lock. So
-we still can't call synchronize_scru() with it held.
+One possible approach may be to combine extensions/non-extensions at boot
+time into pseudo-cpufeatures. Then, alternatives can continue attaching to
+a single "feature". (I'm not saying that's a better approach than the
+bitmap, I'm just suggesting it as something else to consider.)
 
+Thanks,
+drew
 
-> FWIW my commit message was this:
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0 Using kvm->lock is incorrect because the rule is=
- that kvm->lock is held
-> =C2=A0=C2=A0=C2=A0=C2=A0 outside vcpu->mutex.=C2=A0 This is relatively ra=
-re and generally the locks
-> =C2=A0=C2=A0=C2=A0=C2=A0 are held independently, which is why the incorre=
-ct use did not cause
-> =C2=A0=C2=A0=C2=A0=C2=A0 deadlocks left and right; on x86 in fact it only=
- happens for SEV's
-> =C2=A0=C2=A0=C2=A0=C2=A0 move-context ioctl, a niche feature whose inters=
-ection with Xen is
-> =C2=A0=C2=A0=C2=A0=C2=A0 pretty much empty.=C2=A0 But still, locking rule=
-s are locking rules and
-> =C2=A0=C2=A0=C2=A0=C2=A0 the comment in kvm_xen_set_evtchn already hinted=
- that using a separate
-> =C2=A0=C2=A0=C2=A0=C2=A0 leaf mutex would be needed as soon as event chan=
-nel hypercalls would
-> =C2=A0=C2=A0=C2=A0=C2=A0 be supported.
-
-
-I can be a lot ruder about my own mental capacity in a commit message
-than you can :)
-
-> Queued all four, thanks.
->=20
-
-Thanks.
-
-Did you get the QEMU bits running? If built from my xenfv branch it
-should boot fairly much any stock Linux guest image as long as the
-distro kernel has Xen support (which most do). And use SATA for the
-disk, as noted.
-
-  -accel kvm,xen-version=3D0x4000a,kernel-irqchip=3Dsplit
-
---=-bhxvmknvatmEB61gQRYq
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTEyMDg1NDM4WjAvBgkqhkiG9w0BCQQxIgQgKnMHeWry
-/ljvG0jiZfbssDwaZoWt8DtPp6Vjenw1gzQwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAexPN/X/86YVGAP57OWi7QH1QgsScUQMBY
-nbbhaiHGA2+oPEalBWRkwSYG7Ea+gv0P3MNzzOAfyeQHIlQNZIXXRyH3m9YPdoqPkY4agz5gzazU
-3707c3llJZQuciDdt0H7lKpAEyT0DSsfKVKaVE17EV7j7+g6tyCTgXHKmv/wshhYl1yzNG+ZiK+i
-gHT0ySCS44M8MXYBw2e+dWIG79CLB/JueIXMpNNDAt1WRFsnRWxiF/FkXcZgENusQV8CVrSKBRZB
-QkimMOsT7Tc4qWmgptzeMeWY2P9gdLpW8CtXcXXXdKyBNdB08Zb4FoTc0QnUMOgudr1aHg4nmcr5
-hd4eRqKTwX887uGE2XV8LFWKoEhZtbGA6IuGxb8qVt1C12q3aVJbkqq3ACWCeNeJMvf796SdN0Fa
-/xveiltQVo2Wn5NG8E+kx6K+rHo4mYFc5V6/0kvHwk808pLi5DlJeGwM+OJxVEV1uxPIkrsJUxWB
-A21B2Yp2tttSktsjt7jfsG5PFFkejNjsDlzGSe0+44127dFxsFkNvhp84mQU87+ue5omChmwUfYC
-jyymQfbURhAUVKLppaTbTivNaaYPsVM8Uxp5TvtqHOkcTTepGH5s/2RFsRzav+Asho/mJ08Nq4oI
-yfLh3d4kgLy02bZi0jLyEOjOzizMGu6tfLBsf1/XqQAAAAAAAA==
-
-
---=-bhxvmknvatmEB61gQRYq--
+> 
+> In my optimization quest, I found that it's actually pretty neat to
+> convert the errata-id for cpufeatures to a bitfield [1], because then it's
+> possible to just combine extensions into said bitfield [2]:
+> 
+> 	ALTERNATIVE_2("nop",
+> 		      "j strcmp_zbb_unaligned", 0, CPUFEATURE_ZBB | CPUFEATURE_FAST_UNALIGNED, 0, CONFIG_RISCV_ISA_ZBB,
+> 		      "j variant_zbb", 0, CPUFEATURE_ZBB, CPUFEATURE_FAST_UNALIGNED, CONFIG_RISCV_ISA_ZBB)
+> 
+> [the additional field there models a "not" component]
+> 
+> So I really feel this would limit us quite a bit.
+> 
+> 
+> Heiko
+> 
+> 
+> 
+> [0] https://git.kernel.org/pub/scm/linux/kernel/git/palmer/linux.git/commit/?h=riscv-hwprobe-v1&id=510c491cb9d87dcbdc91c63558dc704968723240
+> [1] https://github.com/mmind/linux-riscv/commit/f57a896122ee7e666692079320fc35829434cf96
+> [2] https://github.com/mmind/linux-riscv/commit/8cef615dab0c00ad68af2651ee5b93d06be17f27#diff-194cb8a86f9fb9b03683295f21c8f46b456a9f94737f01726ddbcbb9e3aace2cR12
+> 
+> 
