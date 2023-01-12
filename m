@@ -2,39 +2,39 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B15DA667C45
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 18:12:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61573667C47
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 18:12:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240583AbjALRML (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 12:12:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39986 "EHLO
+        id S240483AbjALRMq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 12:12:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236181AbjALRLi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 12:11:38 -0500
+        with ESMTP id S230124AbjALRMK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 12:12:10 -0500
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44EEF7CBC8;
-        Thu, 12 Jan 2023 08:48:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6C17CDF0;
+        Thu, 12 Jan 2023 08:48:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673542108; x=1705078108;
+  t=1673542136; x=1705078136;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KQ1XXWMbHl0MYIHVHrHXAlrv8TLu2HVtsjPVNJosGr4=;
-  b=DyMXvunT/OLYrUiV63qk4rmlccFCeEiFeUb586hMO5JCo9351FlWdf4e
-   fpq4X9M1Rb4QzFncFts4DZWe5dmtpnLa18xwiJyZeMLd8mUwU7CnGcd5q
-   sKqUx6CuA9WueqGxRfPdwdFvR8EL1TrPFaTsK+qoM0RgY/B/PGEAEDm1c
-   iTmO86ipF0jILI85HHtxIHb7av84Z0dBfFt90SOJUdCG+Y+CMOASxzVcd
-   4olVKbKkrGBf9u360GSaOfzQ/adql/eVjPgzY6+SoxEycCdXF08z6XROr
-   tjXWjYG7zgtXGDxtmz9WymcyX+APM+JRz/YDmgqWqhwnj4IpJN9JRus/l
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="323816295"
+  bh=nIjTfGGdZyqyIE1lEPQNVb+HiQZclRMOxDxgV3JrZtc=;
+  b=T+Hd8tbV8PoTcRCNP9RfLHpdw06LN2dK1aHFATihCwJr2TEKSQuKsCev
+   mCgwewB4NJPyL63wCDZa2p7n+GqoCgnff4vNBjgRzeXIJtZrqfWc9BnIJ
+   Wot1oK/wYIfjaYa4f7aTXPbsqUwoi4Sx8YZAzKd3wmJIl0zyjXmRmFEAB
+   AxDymcwJ0AV4GJN3hXY5ICvPrAkWZ+qcCD38uIP58xw5HTD6gcqBD/emH
+   7reD/wc4A3XSmu1l11QCveEK/xSE34ZEeJb93+eXE2HD5ydkGytnz77p2
+   qF6LcSXMOnqF+Kmil1ZrfjkA7YIn9MFL3hzMao1rHCZMn5WvM7dVa7weK
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="323816299"
 X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="323816295"
+   d="scan'208";a="323816299"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
   by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:44:17 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="986658335"
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="986658338"
 X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="986658335"
+   d="scan'208";a="986658338"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
   by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:44:16 -0800
 From:   isaku.yamahata@intel.com
@@ -45,9 +45,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>,
         Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: [RFC PATCH v3 05/16] KVM: TDX: Pass size to reclaim_page()
-Date:   Thu, 12 Jan 2023 08:43:57 -0800
-Message-Id: <ffbfe8f9f548e0f3ab5fec18395697eac54cdc03.1673541292.git.isaku.yamahata@intel.com>
+Subject: [RFC PATCH v3 06/16] KVM: TDX: Update tdx_sept_{set,drop}_private_spte() to support large page
+Date:   Thu, 12 Jan 2023 08:43:58 -0800
+Message-Id: <591f477bd44f0cfbc7475194be32e9f771c3f2f8.1673541292.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1673541292.git.isaku.yamahata@intel.com>
 References: <cover.1673541292.git.isaku.yamahata@intel.com>
@@ -64,115 +64,150 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 
-A 2MB large page can be tdh_mem_page_aug()'ed to TD directly. In this case,
-it needs to reclaim and clear the page as 2MB size.
+Allow large page level AUG and REMOVE for TDX pages.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/kvm/vmx/tdx.c | 26 ++++++++++++++++----------
- 1 file changed, 16 insertions(+), 10 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 63 +++++++++++++++++++++---------------------
+ 1 file changed, 32 insertions(+), 31 deletions(-)
 
 diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 1bc07dfe765a..8bc8fd7f28eb 100644
+index 8bc8fd7f28eb..d7be634edf3c 100644
 --- a/arch/x86/kvm/vmx/tdx.c
 +++ b/arch/x86/kvm/vmx/tdx.c
-@@ -184,14 +184,17 @@ void tdx_hardware_disable(void)
- 		tdx_disassociate_vp(&tdx->vcpu);
- }
- 
--static void tdx_clear_page(unsigned long page_pa)
-+static void tdx_clear_page(unsigned long page_pa, int size)
- {
- 	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
- 	void *page = __va(page_pa);
- 	unsigned long i;
- 
-+	WARN_ON_ONCE(size % PAGE_SIZE);
-+
- 	if (!static_cpu_has(X86_FEATURE_MOVDIR64B)) {
--		clear_page(page);
-+		for (i = 0; i < size; i += PAGE_SIZE)
-+			clear_page(page + i);
- 		return;
+@@ -1322,11 +1322,12 @@ static void tdx_measure_page(struct kvm_tdx *kvm_tdx, hpa_t gpa, int size)
  	}
- 
-@@ -205,7 +208,7 @@ static void tdx_clear_page(unsigned long page_pa)
- 	 * The cache line could be poisoned (even without MKTME-i), clear the
- 	 * poison bit.
- 	 */
--	for (i = 0; i < PAGE_SIZE; i += 64)
-+	for (i = 0; i < size; i += 64)
- 		movdir64b(page + i, zero_page);
- 	/*
- 	 * MOVDIR64B store uses WC buffer.  Prevent following memory reads
-@@ -214,7 +217,8 @@ static void tdx_clear_page(unsigned long page_pa)
- 	__mb();
  }
  
--static int tdx_reclaim_page(hpa_t pa, bool do_wb, u16 hkid)
-+static int tdx_reclaim_page(hpa_t pa, enum pg_level level,
-+			    bool do_wb, u16 hkid)
+-static void tdx_unpin(struct kvm *kvm, kvm_pfn_t pfn)
++static void tdx_unpin(struct kvm *kvm, kvm_pfn_t pfn, int level)
  {
- 	struct tdx_module_output out;
+-	struct page *page = pfn_to_page(pfn);
++	int i;
+ 
+-	put_page(page);
++	for (i = 0; i < KVM_PAGES_PER_HPAGE(level); i++)
++		put_page(pfn_to_page(pfn + i));
+ }
+ 
+ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+@@ -1340,6 +1341,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	hpa_t source_pa;
+ 	bool measure;
  	u64 err;
-@@ -232,8 +236,10 @@ static int tdx_reclaim_page(hpa_t pa, bool do_wb, u16 hkid)
- 		pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
- 		return -EIO;
- 	}
-+	/* out.r8 == tdx sept page level */
-+	WARN_ON_ONCE(out.r8 != pg_level_to_tdx_sept_level(level));
++	int i;
  
--	if (do_wb) {
-+	if (do_wb && level == PG_LEVEL_4K) {
- 		/*
- 		 * Only TDR page gets into this path.  No contention is expected
- 		 * because of the last page of TD.
-@@ -245,7 +251,7 @@ static int tdx_reclaim_page(hpa_t pa, bool do_wb, u16 hkid)
+ 	/*
+ 	 * Because restricted mem doesn't support page migration with
+@@ -1349,22 +1351,19 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	 * TODO: Once restricted mem introduces callback on page migration,
+ 	 * implement it and remove get_page/put_page().
+ 	 */
+-	get_page(pfn_to_page(pfn));
++	for (i = 0; i < KVM_PAGES_PER_HPAGE(level); i++)
++		get_page(pfn_to_page(pfn + i));
+ 
+ 	/* Build-time faults are induced and handled via TDH_MEM_PAGE_ADD. */
+ 	if (likely(is_td_finalized(kvm_tdx))) {
+-		/* TODO: handle large pages. */
+-		if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
+-			return -EINVAL;
+-
+ 		err = tdh_mem_page_aug(kvm_tdx->tdr_pa, gpa, tdx_level, hpa, &out);
+ 		if (err == TDX_ERROR_SEPT_BUSY) {
+-			tdx_unpin(kvm, pfn);
++			tdx_unpin(kvm, pfn, level);
+ 			return -EAGAIN;
  		}
+ 		if (KVM_BUG_ON(err, kvm)) {
+ 			pr_tdx_error(TDH_MEM_PAGE_AUG, err, &out);
+-			tdx_unpin(kvm, pfn);
++			tdx_unpin(kvm, pfn, level);
+ 			return -EIO;
+ 		}
+ 		return 0;
+@@ -1387,7 +1386,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	 * always uses vcpu 0's page table and protected by vcpu->mutex).
+ 	 */
+ 	if (KVM_BUG_ON(kvm_tdx->source_pa == INVALID_PAGE, kvm)) {
+-		tdx_unpin(kvm, pfn);
++		tdx_unpin(kvm, pfn, level);
+ 		return -EINVAL;
  	}
  
--	tdx_clear_page(pa);
-+	tdx_clear_page(pa, KVM_HPAGE_SIZE(level));
- 	return 0;
- }
+@@ -1405,7 +1404,7 @@ static int tdx_sept_set_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	} while (err == TDX_ERROR_SEPT_BUSY);
+ 	if (KVM_BUG_ON(err, kvm)) {
+ 		pr_tdx_error(TDH_MEM_PAGE_ADD, err, &out);
+-		tdx_unpin(kvm, pfn);
++		tdx_unpin(kvm, pfn, level);
+ 		return -EIO;
+ 	} else if (measure)
+ 		tdx_measure_page(kvm_tdx, gpa, KVM_HPAGE_SIZE(level));
+@@ -1422,11 +1421,9 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+ 	gpa_t gpa = gfn_to_gpa(gfn);
+ 	hpa_t hpa = pfn_to_hpa(pfn);
+ 	hpa_t hpa_with_hkid;
++	int r = 0;
+ 	u64 err;
+-
+-	/* TODO: handle large pages. */
+-	if (KVM_BUG_ON(level != PG_LEVEL_4K, kvm))
+-		return -EINVAL;
++	int i;
  
-@@ -259,7 +265,7 @@ static void tdx_reclaim_td_page(unsigned long td_page_pa)
- 	 * was already flushed by TDH.PHYMEM.CACHE.WB before here, So
- 	 * cache doesn't need to be flushed again.
- 	 */
--	if (WARN_ON(tdx_reclaim_page(td_page_pa, false, 0)))
-+	if (WARN_ON(tdx_reclaim_page(td_page_pa, PG_LEVEL_4K, false, 0)))
- 		/* If reclaim failed, leak the page. */
- 		return;
- 	free_page((unsigned long)__va(td_page_pa));
-@@ -436,7 +442,7 @@ void tdx_vm_free(struct kvm *kvm)
- 	 * while operating on TD (Especially reclaiming TDCS).  Cache flush with
- 	 * TDX global HKID is needed.
- 	 */
--	if (tdx_reclaim_page(kvm_tdx->tdr_pa, true, tdx_global_keyid))
-+	if (tdx_reclaim_page(kvm_tdx->tdr_pa, PG_LEVEL_4K, true, tdx_global_keyid))
- 		return;
- 
- 	free_page((unsigned long)__va(kvm_tdx->tdr_pa));
-@@ -1427,7 +1433,7 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
- 		 * The HKID assigned to this TD was already freed and cache
- 		 * was already flushed. We don't have to flush again.
- 		 */
--		err = tdx_reclaim_page(hpa, false, 0);
-+		err = tdx_reclaim_page(hpa, level, false, 0);
+ 	if (!is_hkid_assigned(kvm_tdx)) {
+ 		/*
+@@ -1436,7 +1433,7 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+ 		err = tdx_reclaim_page(hpa, level, false, 0);
  		if (KVM_BUG_ON(err, kvm))
  			return -EIO;
- 		tdx_unpin(kvm, pfn);
-@@ -1566,7 +1572,7 @@ static int tdx_sept_free_private_spt(struct kvm *kvm, gfn_t gfn,
- 	 * already flushed. We don't have to flush again.
- 	 */
- 	if (!is_hkid_assigned(kvm_tdx))
--		return tdx_reclaim_page(__pa(private_spt), false, 0);
-+		return tdx_reclaim_page(__pa(private_spt), PG_LEVEL_4K, false, 0);
+-		tdx_unpin(kvm, pfn);
++		tdx_unpin(kvm, pfn, level);
+ 		return 0;
+ 	}
  
- 	/*
- 	 * free_private_spt() is (obviously) called when a shadow page is being
+@@ -1453,21 +1450,25 @@ static int tdx_sept_drop_private_spte(struct kvm *kvm, gfn_t gfn,
+ 		return -EIO;
+ 	}
+ 
+-	hpa_with_hkid = set_hkid_to_hpa(hpa, (u16)kvm_tdx->hkid);
+-	do {
+-		/*
+-		 * TDX_OPERAND_BUSY can happen on locking PAMT entry.  Because
+-		 * this page was removed above, other thread shouldn't be
+-		 * repeatedly operating on this page.  Just retry loop.
+-		 */
+-		err = tdh_phymem_page_wbinvd(hpa_with_hkid);
+-	} while (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX));
+-	if (KVM_BUG_ON(err, kvm)) {
+-		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
+-		return -EIO;
++	for (i = 0; i < KVM_PAGES_PER_HPAGE(level); i++) {
++		hpa_with_hkid = set_hkid_to_hpa(hpa, (u16)kvm_tdx->hkid);
++		do {
++			/*
++			 * TDX_OPERAND_BUSY can happen on locking PAMT entry.
++			 * Because this page was removed above, other thread
++			 * shouldn't be repeatedly operating on this page.
++			 * Simple retry should work.
++			 */
++			err = tdh_phymem_page_wbinvd(hpa_with_hkid);
++		} while (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX));
++		if (KVM_BUG_ON(err, kvm)) {
++			pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
++			r = -EIO;
++		} else
++			tdx_unpin(kvm, pfn + i, PG_LEVEL_4K);
++		hpa += PAGE_SIZE;
+ 	}
+-	tdx_unpin(kvm, pfn);
+-	return 0;
++	return r;
+ }
+ 
+ static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
 -- 
 2.25.1
 
