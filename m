@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF66166725D
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 13:39:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 20CC1667260
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 13:39:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230135AbjALMjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 07:39:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60138 "EHLO
+        id S230155AbjALMjJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 07:39:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230124AbjALMi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 07:38:56 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C25363E85F
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 04:38:55 -0800 (PST)
+        with ESMTP id S230118AbjALMi6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 07:38:58 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A65B4916B
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 04:38:57 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5F48060AB2
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 12:38:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5A6DC433D2;
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2AA84B81E5E
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 12:38:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1B71C433F1;
         Thu, 12 Jan 2023 12:38:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1673527134;
-        bh=+LEeLMYkd9RkMQSIuh1SSyTKV795y+lqyBKTQSXPkNA=;
-        h=From:To:Cc:Subject:Date:From;
-        b=b42dJms9soLm/YDE2LeMzTf4lI5WlvRJ96yQfMOuoPnmjY2QXoomjBnc/9Gu797U9
-         zbDCKso8jzmby21abrxmUhzzE9WPOHPw8U/nNUQdx4DXy1lNIvSJpzmuvZ9UOjeqQ4
-         ZwbAGlgVU8c0QdsnmCXLqx+3LKIDvo5Ljpkd8urk51rai4MFkovdgoCuabIIuYhSzU
-         xf2tmzMHKP0p8xSdCWFDbvKw1j9ONIi4caM7IwB7HA9zwrsHg3TcEvTSE6h0rNqI+H
-         VbmouXa09RwN/m0qnVv+8BFapYbYOQDk8Wtg2GEL/+bhb/8i/di7YcVzUKMoTVIPGU
-         aF1nBpbTGnDJA==
+        bh=kutdzrND1pid6FPUYt9eecsxom0FpIqL/qLgOv8lCl4=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=TED+bZMqOLy54eykQ0yuNM2Wt30FHtUyr64JzcKaM9YYOVthRasNEAoKqAjf+LVxV
+         sGvjKsScjNDNRkHVJMI9J18zK394OBFvxqf6UUVxM7ema50HICVOLJrYHYBoTEKIJr
+         vU0anSZHrY+xH0I36bHeK+GZu4OE8J/C8vER2AkIm2IBQ4NDBLMwp0cPH06qAz1tea
+         RrS98p6yEJGryzeCMiROEhr3pcFSk9gakHvKAUuzGVdYTzroNUJIKxVuaHifndfCD/
+         Rl7+Kjg34lHFEFva+u1asWFpMC7lk9usTJlWYKaeC/yjq7gVaH8C9lDLzYRl392huM
+         c1iHwcPopZ9Aw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pFwr6-001BBa-F2;
+        id 1pFwr6-001BBa-N4;
         Thu, 12 Jan 2023 12:38:52 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     linux-arm-kernel@lists.infradead.org,
@@ -47,10 +47,12 @@ Cc:     D Scott Phillips <scott@os.amperecomputing.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 0/3] KVM: arm64: timer fixes and optimisations
-Date:   Thu, 12 Jan 2023 12:38:26 +0000
-Message-Id: <20230112123829.458912-1-maz@kernel.org>
+Subject: [PATCH 1/3] KVM: arm64: Don't arm a hrtimer for an already pending timer
+Date:   Thu, 12 Jan 2023 12:38:27 +0000
+Message-Id: <20230112123829.458912-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230112123829.458912-1-maz@kernel.org>
+References: <20230112123829.458912-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
@@ -66,31 +68,45 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Having been busy on the NV front the past few weeks, I collected a
-small set of fixes/improvements that make sense even outside of NV.
+When fully emulating a timer, we back it with a hrtimer that is
+armver on vcpu_load(). However, we do this even if the timer is
+already pending.
 
-The first one is an interesting fix (actually a regression introduced
-by the initial set of NV-related patches) reported by Scott and
-Ganapatrao, where we fail to recognise that a timer that has fired
-doesn't need to fire again. And again.
+This causes spurious interrupts to be taken, though the guest
+doesn't observe them (the interrupt is already pending).
 
-The second patch is a definite performance improvement on nVHE systems
-when accessing the emulated physical timer. It also makes NV bearable
-in some conditions (with FEAT_ECV, for example).
+Although this is a waste of precious cycles, this isn't the
+end of the world with the current state of KVM. However, this
+can lead to a situation where a guest doesn't make forward
+progress anymore with NV.
 
-The last patch is more of a sanity check. There is no reason to BUG()
-if we can avoid it at all and kill the guest instead!
+Fix it by checking that if the timer is already pending
+before arming a new hrtimer. Also drop the hrtimer cancelling,
+which is useless, by construction.
 
-These patches are 6.3 candidates, although the first one could be a
-6.2 fix.
+Reported-by: D Scott Phillips <scott@os.amperecomputing.com>
+Fixes: bee038a67487 ("KVM: arm/arm64: Rework the timer code to use a timer_map")
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/arch_timer.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-	M.
+diff --git a/arch/arm64/kvm/arch_timer.c b/arch/arm64/kvm/arch_timer.c
+index bb24a76b4224..587d87aec33f 100644
+--- a/arch/arm64/kvm/arch_timer.c
++++ b/arch/arm64/kvm/arch_timer.c
+@@ -428,10 +428,8 @@ static void timer_emulate(struct arch_timer_context *ctx)
+ 	 * scheduled for the future.  If the timer cannot fire at all,
+ 	 * then we also don't need a soft timer.
+ 	 */
+-	if (!kvm_timer_irq_can_fire(ctx)) {
+-		soft_timer_cancel(&ctx->hrtimer);
++	if (should_fire || !kvm_timer_irq_can_fire(ctx))
+ 		return;
+-	}
+ 
+ 	soft_timer_start(&ctx->hrtimer, kvm_timer_compute_delta(ctx));
+ }
+-- 
+2.34.1
 
-Marc Zyngier (3):
-  KVM: arm64: Don't arm a hrtimer for an already pending timer
-  KVM: arm64: Reduce overhead of trapped timer sysreg accesses
-  KVM: arm64: timers: Don't BUG() on unhandled timer trap
-
- arch/arm64/kvm/arch_timer.c | 77 +++++++++++++++++++++++--------------
- arch/arm64/kvm/sys_regs.c   |  4 +-
- 2 files changed, 52 insertions(+), 29 deletions(-)
