@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F3EC7667F45
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 20:30:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 53477667F4E
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 20:30:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240492AbjALTaF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 14:30:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51876 "EHLO
+        id S240184AbjALT2c (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 14:28:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240477AbjALT2a (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 14:28:30 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 201C340C10
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 11:22:46 -0800 (PST)
+        with ESMTP id S240293AbjALT1n (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 14:27:43 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175991DF0D
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 11:21:55 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id CF8D0B81FF6
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:22:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82B0AC433EF;
-        Thu, 12 Jan 2023 19:22:43 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id A03A6CE1FA7
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:21:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3215C433EF;
+        Thu, 12 Jan 2023 19:21:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673551363;
-        bh=ZEg4zb/9ebtpMhM86pt1jo0QNpWAR3VBYwPDnl2tHXA=;
+        s=k20201202; t=1673551311;
+        bh=iDrsc66lKjV0pmDY1CpGa7iKWDodSz97UcK2KOP4CXA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=luMuNf2gwSnXkIt5mcNpoOo7WDBvoLSXDgzuX+1T+iK3jE64ksq8sAuDCOcK9M0k7
-         RRPM0pzte1JKCY+X1To9G83Y1UhFfE1mlUBzQZxo4rpEDpCY80PIAVNOsZ+BekrWey
-         DrFPKP8N34wAEftbPE0AKge26Dvo4Zacn6qe2HIlFXAmMb2h0Hf/UxSBPE3l1NpiuC
-         y0KcWx7ubnMhTPcaER48FpAt6UPZuhpsntFwItqaOM3CBC6qydynBW7azIKb2aUdgz
-         G5k79rlWyMN61ZYfoiVgrrwS0AxoU/nrGJmVg2DwwpFwIuqMeJ2w+LHTMT/Gzqe4jA
-         Y1Gs76fBvIGaA==
+        b=b39pEJdUUyx0CNFkcEvq8WauNF2SQsdG/pderJMbrqG+k8bQbvlm8Pm2sd3xANjK+
+         8/nOAMBGAC+eSbBTV71CIr2/ZnW8gK4FUt8WA52TOTzlSJlGF+UyrpIsdwJbaW0SMy
+         JfvSRYSYYNlQK4G5kX5YnS1qCHhEIlO1K6TPycSVlIOg6GVqL0dZznz5eJTMDI55JF
+         +KzpvZ00jCmV9SBDBdXAjlhuKFEDsBvrc99pU8UQ7HNP9xB/F/I2ehs+viwvbq3/UY
+         Rq+wB4fErctt3dCidtebv4SnORQEA1+qfvYl15HbpqLvIRX7OvXDT4MYiL43DNCbb2
+         4YjCCaDOTIYUA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pG37G-001IWu-Ly;
-        Thu, 12 Jan 2023 19:19:59 +0000
+        id 1pG37H-001IWu-79;
+        Thu, 12 Jan 2023 19:20:00 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -51,9 +51,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 37/68] KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
-Date:   Thu, 12 Jan 2023 19:18:56 +0000
-Message-Id: <20230112191927.1814989-38-maz@kernel.org>
+Subject: [PATCH v7 38/68] KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+Date:   Thu, 12 Jan 2023 19:18:57 +0000
+Message-Id: <20230112191927.1814989-39-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -72,89 +72,234 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When mapping a page in a shadow stage-2, special care must be
-taken not to be more permissive than the guest is (writable or
-readable page when the guest hasn't set that permission).
+From: Christoffer Dall <christoffer.dall@linaro.org>
 
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
+Unmap/flush shadow stage 2 page tables for the nested VMs as well as the
+stage 2 page table for the guest hypervisor.
+
+Note: A bunch of the code in mmu.c relating to MMU notifiers is
+currently dealt with in an extremely abrupt way, for example by clearing
+out an entire shadow stage-2 table. This will be handled in a more
+efficient way using the reverse mapping feature in a later version of
+the patch series.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@linaro.org>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h | 15 +++++++++++++++
- arch/arm64/kvm/mmu.c                | 14 +++++++++++++-
- arch/arm64/kvm/nested.c             |  2 +-
- 3 files changed, 29 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_mmu.h    |  3 +++
+ arch/arm64/include/asm/kvm_nested.h |  3 +++
+ arch/arm64/kvm/mmu.c                | 31 +++++++++++++++++++----
+ arch/arm64/kvm/nested.c             | 39 +++++++++++++++++++++++++++++
+ 4 files changed, 71 insertions(+), 5 deletions(-)
 
+diff --git a/arch/arm64/include/asm/kvm_mmu.h b/arch/arm64/include/asm/kvm_mmu.h
+index 1eb626703a4f..8100d917741a 100644
+--- a/arch/arm64/include/asm/kvm_mmu.h
++++ b/arch/arm64/include/asm/kvm_mmu.h
+@@ -165,6 +165,8 @@ int create_hyp_io_mappings(phys_addr_t phys_addr, size_t size,
+ 			   void __iomem **haddr);
+ int create_hyp_exec_mappings(phys_addr_t phys_addr, size_t size,
+ 			     void **haddr);
++void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
++			    phys_addr_t addr, phys_addr_t end);
+ void free_hyp_pgds(void);
+ 
+ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size);
+@@ -173,6 +175,7 @@ int kvm_init_stage2_mmu(struct kvm *kvm, struct kvm_s2_mmu *mmu, unsigned long t
+ void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu);
+ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ 			  phys_addr_t pa, unsigned long size, bool writable);
++void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end);
+ 
+ int kvm_handle_guest_abort(struct kvm_vcpu *vcpu);
+ 
 diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 80371dea3652..fc96873b6dfe 100644
+index fc96873b6dfe..282fe63ed7b2 100644
 --- a/arch/arm64/include/asm/kvm_nested.h
 +++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -91,6 +91,21 @@ static inline u32 kvm_s2_trans_esr(struct kvm_s2_trans *trans)
- 	return trans->esr;
- }
- 
-+static inline bool kvm_s2_trans_readable(struct kvm_s2_trans *trans)
-+{
-+	return trans->readable;
-+}
-+
-+static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
-+{
-+	return trans->writable;
-+}
-+
-+static inline bool kvm_s2_trans_executable(struct kvm_s2_trans *trans)
-+{
-+	return !(trans->upper_attr & BIT(54));
-+}
-+
- extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
- 			      struct kvm_s2_trans *result);
- 
+@@ -112,6 +112,9 @@ extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
+ extern int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu,
+ 				    struct kvm_s2_trans *trans);
+ extern int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2);
++extern void kvm_nested_s2_wp(struct kvm *kvm);
++extern void kvm_nested_s2_unmap(struct kvm *kvm);
++extern void kvm_nested_s2_flush(struct kvm *kvm);
+ int handle_wfx_nested(struct kvm_vcpu *vcpu, bool is_wfe);
+ extern bool __forward_traps(struct kvm_vcpu *vcpu, unsigned int reg,
+ 			    u64 control_bit);
 diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index cb64e52b6cc5..0392c47f1fcd 100644
+index 0392c47f1fcd..c8fe62b0f76d 100644
 --- a/arch/arm64/kvm/mmu.c
 +++ b/arch/arm64/kvm/mmu.c
-@@ -1402,6 +1402,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (exec_fault && device)
- 		return -ENOEXEC;
+@@ -244,13 +244,20 @@ void kvm_unmap_stage2_range(struct kvm_s2_mmu *mmu, phys_addr_t start, u64 size)
+ 	__unmap_stage2_range(mmu, start, size, true);
+ }
  
-+	/*
-+	 * Potentially reduce shadow S2 permissions to match the guest's own
-+	 * S2. For exec faults, we'd only reach this point if the guest
-+	 * actually allowed it (see kvm_s2_handle_perm_fault).
-+	 */
-+	if (nested) {
-+		writable &= kvm_s2_trans_writable(nested);
-+		if (!kvm_s2_trans_readable(nested))
-+			prot &= ~KVM_PGTABLE_PROT_R;
-+	}
++void kvm_stage2_flush_range(struct kvm_s2_mmu *mmu,
++			    phys_addr_t addr, phys_addr_t end)
++{
++	stage2_apply_range_resched(kvm_s2_mmu_to_kvm(mmu), addr, end, kvm_pgtable_stage2_flush);
++}
 +
- 	read_lock(&kvm->mmu_lock);
- 	pgt = vcpu->arch.hw_mmu->pgt;
- 	if (mmu_invalidate_retry(kvm, mmu_seq))
-@@ -1439,7 +1450,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ static void stage2_flush_memslot(struct kvm *kvm,
+ 				 struct kvm_memory_slot *memslot)
+ {
+ 	phys_addr_t addr = memslot->base_gfn << PAGE_SHIFT;
+ 	phys_addr_t end = addr + PAGE_SIZE * memslot->npages;
++	struct kvm_s2_mmu *mmu = &kvm->arch.mmu;
  
- 	if (device)
- 		prot |= KVM_PGTABLE_PROT_DEVICE;
--	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC))
-+	else if (cpus_have_const_cap(ARM64_HAS_CACHE_DIC) &&
-+		 (!nested || kvm_s2_trans_executable(nested)))
- 		prot |= KVM_PGTABLE_PROT_X;
+-	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_flush);
++	kvm_stage2_flush_range(mmu, addr, end);
+ }
  
- 	/*
+ /**
+@@ -273,6 +280,8 @@ static void stage2_flush_vm(struct kvm *kvm)
+ 	kvm_for_each_memslot(memslot, bkt, slots)
+ 		stage2_flush_memslot(kvm, memslot);
+ 
++	kvm_nested_s2_flush(kvm);
++
+ 	write_unlock(&kvm->mmu_lock);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+ }
+@@ -867,6 +876,8 @@ void stage2_unmap_vm(struct kvm *kvm)
+ 	kvm_for_each_memslot(memslot, bkt, slots)
+ 		stage2_unmap_memslot(kvm, memslot);
+ 
++	kvm_nested_s2_unmap(kvm);
++
+ 	write_unlock(&kvm->mmu_lock);
+ 	mmap_read_unlock(current->mm);
+ 	srcu_read_unlock(&kvm->srcu, idx);
+@@ -965,12 +976,12 @@ int kvm_phys_addr_ioremap(struct kvm *kvm, phys_addr_t guest_ipa,
+ }
+ 
+ /**
+- * stage2_wp_range() - write protect stage2 memory region range
++ * kvm_stage2_wp_range() - write protect stage2 memory region range
+  * @mmu:        The KVM stage-2 MMU pointer
+  * @addr:	Start address of range
+  * @end:	End address of range
+  */
+-static void stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
++void kvm_stage2_wp_range(struct kvm_s2_mmu *mmu, phys_addr_t addr, phys_addr_t end)
+ {
+ 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
+ 	stage2_apply_range_resched(kvm, addr, end, kvm_pgtable_stage2_wrprotect);
+@@ -1002,7 +1013,8 @@ static void kvm_mmu_wp_memory_region(struct kvm *kvm, int slot)
+ 	end = (memslot->base_gfn + memslot->npages) << PAGE_SHIFT;
+ 
+ 	write_lock(&kvm->mmu_lock);
+-	stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_nested_s2_wp(kvm);
+ 	write_unlock(&kvm->mmu_lock);
+ 	kvm_flush_remote_tlbs(kvm);
+ }
+@@ -1026,7 +1038,7 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 	phys_addr_t start = (base_gfn +  __ffs(mask)) << PAGE_SHIFT;
+ 	phys_addr_t end = (base_gfn + __fls(mask) + 1) << PAGE_SHIFT;
+ 
+-	stage2_wp_range(&kvm->arch.mmu, start, end);
++	kvm_stage2_wp_range(&kvm->arch.mmu, start, end);
+ }
+ 
+ /*
+@@ -1041,6 +1053,7 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 		gfn_t gfn_offset, unsigned long mask)
+ {
+ 	kvm_mmu_write_protect_pt_masked(kvm, slot, gfn_offset, mask);
++	kvm_nested_s2_wp(kvm);
+ }
+ 
+ static void kvm_send_hwpoison_signal(unsigned long address, short lsb)
+@@ -1690,6 +1703,7 @@ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			     (range->end - range->start) << PAGE_SHIFT,
+ 			     range->may_block);
+ 
++	kvm_nested_s2_unmap(kvm);
+ 	return false;
+ }
+ 
+@@ -1724,6 +1738,7 @@ bool kvm_set_spte_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 			       PAGE_SIZE, __pfn_to_phys(pfn),
+ 			       KVM_PGTABLE_PROT_R, NULL, 0);
+ 
++	kvm_nested_s2_unmap(kvm);
+ 	return false;
+ }
+ 
+@@ -1742,6 +1757,11 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+ 					range->start << PAGE_SHIFT);
+ 	pte = __pte(kpte);
+ 	return pte_valid(pte) && pte_young(pte);
++
++	/*
++	 * TODO: Handle nested_mmu structures here using the reverse mapping in
++	 * a later version of patch series.
++	 */
+ }
+ 
+ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+@@ -1974,6 +1994,7 @@ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 
+ 	write_lock(&kvm->mmu_lock);
+ 	kvm_unmap_stage2_range(&kvm->arch.mmu, gpa, size);
++	kvm_nested_s2_unmap(kvm);
+ 	write_unlock(&kvm->mmu_lock);
+ }
+ 
 diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 5fb5e93248c1..dc74c9b8db89 100644
+index dc74c9b8db89..4356af6cbed0 100644
 --- a/arch/arm64/kvm/nested.c
 +++ b/arch/arm64/kvm/nested.c
-@@ -488,7 +488,7 @@ int kvm_s2_handle_perm_fault(struct kvm_vcpu *vcpu, struct kvm_s2_trans *trans)
- 		return 0;
+@@ -512,6 +512,45 @@ int kvm_inject_s2_fault(struct kvm_vcpu *vcpu, u64 esr_el2)
+ 	return kvm_inject_nested_sync(vcpu, esr_el2);
+ }
  
- 	if (kvm_vcpu_trap_is_iabt(vcpu)) {
--		forward_fault = (trans->upper_attr & BIT(54));
-+		forward_fault = !kvm_s2_trans_executable(trans);
- 	} else {
- 		bool write_fault = kvm_is_write_fault(vcpu);
- 
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_wp(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_stage2_wp_range(mmu, 0, kvm_phys_size(kvm));
++	}
++}
++
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_unmap(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_unmap_stage2_range(mmu, 0, kvm_phys_size(kvm));
++	}
++}
++
++/* expects kvm->mmu_lock to be held */
++void kvm_nested_s2_flush(struct kvm *kvm)
++{
++	int i;
++
++	for (i = 0; i < kvm->arch.nested_mmus_size; i++) {
++		struct kvm_s2_mmu *mmu = &kvm->arch.nested_mmus[i];
++
++		if (kvm_s2_mmu_valid(mmu))
++			kvm_stage2_flush_range(mmu, 0, kvm_phys_size(kvm));
++	}
++}
++
+ void kvm_arch_flush_shadow_all(struct kvm *kvm)
+ {
+ 	int i;
 -- 
 2.34.1
 
