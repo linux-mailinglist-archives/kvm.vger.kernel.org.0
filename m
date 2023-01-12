@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F2B2667B76
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 17:42:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C322667B7C
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 17:43:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240751AbjALQmw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 11:42:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41932 "EHLO
+        id S240380AbjALQnF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 11:43:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240191AbjALQic (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 11:38:32 -0500
+        with ESMTP id S240183AbjALQib (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 11:38:31 -0500
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 004621B1F5;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE8EE1B1DA;
         Thu, 12 Jan 2023 08:34:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1673541242; x=1705077242;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=fzfH/3YnMqv/n7N81vfkAd7VcbvYv4mcwvG0nN3kRbE=;
-  b=dBJEz942FVENY9VjohycvccDXNVMT267B++ykzCjTIpL1JEPY524MBF5
-   G3j8MUVVfCEyvMv5rXUUD1JrV2RNdHbOeNWf7gtxM7Vntqi2QGTWvQHDU
-   QtZ9u2baRyJ8VZCDIsgdVMuxofIWYcwkj3NIAKiCExtSQ/qX6Dkyt4PIc
-   FtQ+xiESLO5vb6glUEIi131kZMdTTGCDXqI61E0FtmuvTbSHmK3ijR4LI
-   Udv+244g4+vGShct4FySYlo3qoei9nli46fhdBdNUj2ZulxMV0VURfYHe
-   xt4lKOA9yVQKnnkCUZIs5aAwTdd/fitzGxdGfs88b83j1zxCXX+xuXG/K
+  bh=8tKpWJ6dGu0PFUpmHJd6TKXbCbQWdvtgkc200MFqP1s=;
+  b=gfJCV5HIKJXZJBNfF9nbEnoYqjlA+jWwaG+9j8+s39LHYYXf+i85XZX5
+   ATYYVZ1u15DFQ2ARh3OxiTz1TyS5HVZXaLpLkn8/pKj0Sli/5CtIQY2qp
+   7ZwVvlor072BUvrSYAvAVBGoP7vQkDRJ+eOX1jnJRKFEoFsHXKbG6eRjo
+   RN9uCeb0taWD9fmmsZ6wlcJf9+oFPlDfkManQDx9xLR+NcTBDQvWJsBBj
+   iLKEKofZ+MoKi0U0ZZCLy1h9yVhyR68qgix1RTc1+dSJZ5cU8eucN2KG2
+   MdEcO7diPbDLyrD+5FZ10xOK6xST1JJ3iYXY9qI3Gq60aWc6xtm+V4iaT
    w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="323811848"
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="323811852"
 X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="323811848"
+   d="scan'208";a="323811852"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:26 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="721151774"
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:27 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="721151777"
 X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="721151774"
+   d="scan'208";a="721151777"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:26 -0800
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:27 -0800
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
@@ -44,9 +44,9 @@ Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
         David Matlack <dmatlack@google.com>
-Subject: [PATCH v11 041/113] KVM: x86/mmu: Add a private pointer to struct kvm_mmu_page
-Date:   Thu, 12 Jan 2023 08:31:49 -0800
-Message-Id: <c953b9fedf0eaca37be274f5efa3de44afde7a95.1673539699.git.isaku.yamahata@intel.com>
+Subject: [PATCH v11 042/113] KVM: Add flags to struct kvm_gfn_range
+Date:   Thu, 12 Jan 2023 08:31:50 -0800
+Message-Id: <3e5e7c40608e9fc1b3aff53fca0ba9b3a37744b3.1673539699.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1673539699.git.isaku.yamahata@intel.com>
 References: <cover.1673539699.git.isaku.yamahata@intel.com>
@@ -63,221 +63,75 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-For private GPA, CPU refers a private page table whose contents are
-encrypted.  The dedicated APIs to operate on it (e.g. updating/reading its
-PTE entry) are used and their cost is expensive.
-
-When KVM resolves KVM page fault, it walks the page tables.  To reuse the
-existing KVM MMU code and mitigate the heavy cost to directly walk private
-page table, allocate one more page to copy the dummy page table for KVM MMU
-code to directly walk.  Resolve KVM page fault with the existing code, and
-do additional operations necessary for the private page table.  To
-distinguish such cases, the existing KVM page table is called a shared page
-table (i.e. not associated with private page table), and the page table
-with private page table is called a private page table.  The relationship
-is depicted below.
-
-Add a private pointer to struct kvm_mmu_page for private page table and
-add helper functions to allocate/initialize/free a private page table
-page.
-
-              KVM page fault                     |
-                     |                           |
-                     V                           |
-        -------------+----------                 |
-        |                      |                 |
-        V                      V                 |
-     shared GPA           private GPA            |
-        |                      |                 |
-        V                      V                 |
-    shared PT root      dummy PT root            |    private PT root
-        |                      |                 |           |
-        V                      V                 |           V
-     shared PT            dummy PT ----propagate---->   private PT
-        |                      |                 |           |
-        |                      \-----------------+------\    |
-        |                                        |      |    |
-        V                                        |      V    V
-  shared guest page                              |    private guest page
-                                                 |
-                           non-encrypted memory  |    encrypted memory
-                                                 |
-PT: page table
-- Shared PT is visible to KVM and it is used by CPU.
-- Private PT is used by CPU but it is invisible to KVM.
-- Dummy PT is visible to KVM but not used by CPU.  It is used to
-  propagate PT change to the actual private PT which is used by CPU.
+kvm_unmap_gfn_range() needs to know the reason of the callback for TDX.
+mmu notifier, set memattr ioctl or restrictedmem notifier.  Based on the
+reason, TDX changes the behavior.  For mmu notifier, it's the operation on
+shared memory slot to zap shared PTE.  For set memattr, it's the operation
+of private<->shared conversion, zap the original PTE.  For restrictedmem,
+it's punching a hole of the range, zap the corresponding PTE.
 
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 ---
- arch/x86/include/asm/kvm_host.h |  5 ++
- arch/x86/kvm/mmu/mmu.c          |  8 ++++
- arch/x86/kvm/mmu/mmu_internal.h | 83 +++++++++++++++++++++++++++++++--
- arch/x86/kvm/mmu/tdp_mmu.c      |  1 +
- 4 files changed, 93 insertions(+), 4 deletions(-)
+ include/linux/kvm_host.h | 9 ++++++++-
+ virt/kvm/kvm_main.c      | 5 ++++-
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 1bcd118eef31..d1cc1e95108e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -814,6 +814,11 @@ struct kvm_vcpu_arch {
- 	struct kvm_mmu_memory_cache mmu_shadow_page_cache;
- 	struct kvm_mmu_memory_cache mmu_shadowed_info_cache;
- 	struct kvm_mmu_memory_cache mmu_page_header_cache;
-+	/*
-+	 * This cache is to allocate private page table. E.g.  Secure-EPT used
-+	 * by the TDX module.
-+	 */
-+	struct kvm_mmu_memory_cache mmu_private_spt_cache;
- 
- 	/*
- 	 * QEMU userspace and the guest each have their own FPU state.
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 801ef6c41847..c943ea003b72 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -655,6 +655,13 @@ static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
- 	struct kvm_mmu_memory_cache *mc = &vcpu->arch.mmu_shadow_page_cache;
- 	int start, end, i, r;
- 
-+	if (kvm_gfn_shared_mask(vcpu->kvm)) {
-+		r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_private_spt_cache,
-+					       PT64_ROOT_MAX_LEVEL);
-+		if (r)
-+			return r;
-+	}
-+
- 	start = kvm_mmu_memory_cache_nr_free_objects(mc);
- 	r = kvm_mmu_topup_memory_cache(mc, PT64_ROOT_MAX_LEVEL);
- 
-@@ -704,6 +711,7 @@ static void mmu_free_memory_caches(struct kvm_vcpu *vcpu)
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_pte_list_desc_cache);
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadow_page_cache);
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_shadowed_info_cache);
-+	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_private_spt_cache);
- 	kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_header_cache);
- }
- 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index a20b54060bc8..6743c5868ff2 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -93,7 +93,23 @@ struct kvm_mmu_page {
- 		int root_count;
- 		refcount_t tdp_mmu_root_count;
- 	};
--	unsigned int unsync_children;
-+	union {
-+		struct {
-+			unsigned int unsync_children;
-+			/*
-+			 * Number of writes since the last time traversal
-+			 * visited this page.
-+			 */
-+			atomic_t write_flooding_count;
-+		};
-+#ifdef CONFIG_KVM_MMU_PRIVATE
-+		/*
-+		 * Associated private shadow page table, e.g. Secure-EPT page
-+		 * passed to the TDX module.
-+		 */
-+		void *private_spt;
-+#endif
-+	};
- 	union {
- 		struct kvm_rmap_head parent_ptes; /* rmap pointers to parent sptes */
- 		tdp_ptep_t ptep;
-@@ -122,9 +138,6 @@ struct kvm_mmu_page {
- 	int clear_spte_count;
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index cd1f3634dd6a..0c3b9cf0a731 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -256,12 +256,19 @@ bool kvm_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ int kvm_async_pf_wakeup_all(struct kvm_vcpu *vcpu);
  #endif
  
--	/* Number of writes since the last time traversal visited this page.  */
--	atomic_t write_flooding_count;
--
- #ifdef CONFIG_X86_64
- 	/* Used for freeing the page asynchronously if it is a TDP MMU page. */
- 	struct rcu_head rcu_head;
-@@ -148,6 +161,68 @@ static inline bool is_private_sp(const struct kvm_mmu_page *sp)
- 	return kvm_mmu_page_role_is_private(sp->role);
- }
++#define KVM_GFN_RANGE_FLAGS_RESTRICTED_MEM	BIT(0)
++#define KVM_GFN_RANGE_FLAGS_SET_MEM_ATTR	BIT(1)
++
+ struct kvm_gfn_range {
+ 	struct kvm_memory_slot *slot;
+ 	gfn_t start;
+ 	gfn_t end;
+-	pte_t pte;
++	union {
++		pte_t pte;
++		u64 attrs;
++	};
+ 	bool may_block;
++	unsigned int flags;
+ };
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
  
-+#ifdef CONFIG_KVM_MMU_PRIVATE
-+static inline void *kvm_mmu_private_spt(struct kvm_mmu_page *sp)
-+{
-+	return sp->private_spt;
-+}
-+
-+static inline void kvm_mmu_init_private_spt(struct kvm_mmu_page *sp, void *private_spt)
-+{
-+	sp->private_spt = private_spt;
-+}
-+
-+static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-+{
-+	bool is_root = vcpu->arch.root_mmu.root_role.level == sp->role.level;
-+
-+	KVM_BUG_ON(!kvm_mmu_page_role_is_private(sp->role), vcpu->kvm);
-+	if (is_root)
-+		/*
-+		 * Because TDX module assigns root Secure-EPT page and set it to
-+		 * Secure-EPTP when TD vcpu is created, secure page table for
-+		 * root isn't needed.
-+		 */
-+		sp->private_spt = NULL;
-+	else {
-+		/*
-+		 * Because the TDX module doesn't trust VMM and initializes
-+		 * the pages itself, KVM doesn't initialize them.  Allocate
-+		 * pages with garbage and give them to the TDX module.
-+		 */
-+		sp->private_spt = kvm_mmu_memory_cache_alloc(&vcpu->arch.mmu_private_spt_cache);
-+		/*
-+		 * Because mmu_private_spt_cache is topped up before staring kvm
-+		 * page fault resolving, the allocation above shouldn't fail.
-+		 */
-+		WARN_ON_ONCE(!sp->private_spt);
-+	}
-+}
-+
-+static inline void kvm_mmu_free_private_spt(struct kvm_mmu_page *sp)
-+{
-+	if (sp->private_spt)
-+		free_page((unsigned long)sp->private_spt);
-+}
-+#else
-+static inline void *kvm_mmu_private_spt(struct kvm_mmu_page *sp)
-+{
-+	return NULL;
-+}
-+
-+static inline void kvm_mmu_init_private_spt(struct kvm_mmu_page *sp, void *private_spt)
-+{
-+}
-+
-+static inline void kvm_mmu_alloc_private_spt(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
-+{
-+}
-+
-+static inline void kvm_mmu_free_private_spt(struct kvm_mmu_page *sp)
-+{
-+}
-+#endif
-+
- static inline bool kvm_mmu_page_ad_need_write_protect(struct kvm_mmu_page *sp)
- {
- 	/*
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 6c3ce4121a46..55ebb7f2b275 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -82,6 +82,7 @@ void kvm_mmu_uninit_tdp_mmu(struct kvm *kvm)
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 6c61b71b56d2..aef8802b188e 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -669,6 +669,7 @@ static __always_inline int __kvm_handle_hva_range(struct kvm *kvm,
+ 			gfn_range.start = hva_to_gfn_memslot(hva_start, slot);
+ 			gfn_range.end = hva_to_gfn_memslot(hva_end + PAGE_SIZE - 1, slot);
+ 			gfn_range.slot = slot;
++			gfn_range.flags = 0;
  
- static void tdp_mmu_free_sp(struct kvm_mmu_page *sp)
- {
-+	kvm_mmu_free_private_spt(sp);
- 	free_page((unsigned long)sp->spt);
- 	kmem_cache_free(mmu_page_header_cache, sp);
- }
+ 			if (!locked) {
+ 				locked = true;
+@@ -971,6 +972,7 @@ static void kvm_restrictedmem_invalidate_begin(struct restrictedmem_notifier *no
+ 	gfn_range.slot = slot;
+ 	gfn_range.pte = __pte(0);
+ 	gfn_range.may_block = true;
++	gfn_range.flags = KVM_GFN_RANGE_FLAGS_RESTRICTED_MEM;
+ 
+ 	idx = srcu_read_lock(&kvm->srcu);
+ 	KVM_MMU_LOCK(kvm);
+@@ -2511,8 +2513,9 @@ static void kvm_unmap_mem_range(struct kvm *kvm, gfn_t start, gfn_t end,
+ 	int i;
+ 	int r = 0;
+ 
+-	gfn_range.pte = __pte(0);
++	gfn_range.attrs = attrs;
+ 	gfn_range.may_block = true;
++	gfn_range.flags = KVM_GFN_RANGE_FLAGS_SET_MEM_ATTR;
+ 
+ 	for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+ 		slots = __kvm_memslots(kvm, i);
 -- 
 2.25.1
 
