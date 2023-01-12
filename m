@@ -2,333 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DDB9666B06
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 06:57:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D293666B16
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 07:07:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236696AbjALF5F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 00:57:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60224 "EHLO
+        id S238603AbjALGHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 01:07:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236529AbjALF5E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 00:57:04 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47E11CFE3
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 21:57:02 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id o7-20020a17090a0a0700b00226c9b82c3aso19691944pjo.3
-        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 21:57:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=FccKUfbHyylDDoPjn7qZyrSP0H0soQqxoVXZoIBm/II=;
-        b=CwSk/D/LJm0WdN/2/A/0NIkigAlM5tSw4X4uoxtnodtBoRqVjrnJ5JFyzHM0jDa2lt
-         z1SEeB1/qTeMHDv4pO8I2Xu8vLVdCbyYtufeZU8oefg8KP2LtDSna7+7DRHS5ir0zhmC
-         F1Ks1iqJJKC0KJ87JIrCJbICYdbKtRqEQVjB3g/GrLTDWJh+gtiD1py/X0ouEJtoXFE+
-         Y4DKfcZYwK+FKW4ArQomr0undnrxxUKp8o4tqe08e0qTpK/AmVnaIH2vz6hH4dSm6fFr
-         2SbdtCpYQqleult/37UdGDUs4MAJ9l4qfk008AbqxeNANgMAyTxKlRK2rji3YDAFQbkM
-         ZJ3Q==
+        with ESMTP id S236007AbjALGHb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 01:07:31 -0500
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02F353AB06
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 22:07:30 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id i15so25446825edf.2
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 22:07:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FccKUfbHyylDDoPjn7qZyrSP0H0soQqxoVXZoIBm/II=;
-        b=k3bpv3/Oh69qZJQDCO96wligBfFMmnRSM+iHAd0drBl2zufnZ9FyRHaLv62AlqRjoA
-         GPGMMIFfzLkxqYHLQb+xXOFEWRIn5s+7AAQ8wtK7srXQfzjupfI9uGyLOM0MkTfJVB0J
-         htcaBlzV51Jd4C0TfD/MxuFfP2bqnAsh/BtptLTH1kERZTwCaGkwkg5VdR4g/8EJFJd/
-         YFxwxhwBxfPImrsR0ryyyy1hQy5ykUaNLAEWWJDUWTze+71fBsDVuYJ4dWigkkw0TIqZ
-         sUJXTyf6llBKM5E5woK3nWhzYJL7Cb+H5Gbi022b4zb9WkFqq8g+/O/2jJq5BVJSK1fJ
-         KAiA==
-X-Gm-Message-State: AFqh2kqLfkUmd0hi5uf684abkcZzpgYyOAChVHja4sTeVoKasYLZ7/Gi
-        A2iXcmLPbS+zIyMKA48yNa+uP97Q1JBn1IUIje9+IZG/PmvDOqhEqPw=
-X-Google-Smtp-Source: AMrXdXu5en3bHy4+sUUjgbsYsBC/X8naWSSFyF6Sd/zJH1PscFq+D0rEAEwSVGJ5hUHrEQBC2IyH7pEhHZwGABFc984=
-X-Received: by 2002:a17:902:bf07:b0:194:5c63:363b with SMTP id
- bi7-20020a170902bf0700b001945c63363bmr144776plb.154.1673503021915; Wed, 11
- Jan 2023 21:57:01 -0800 (PST)
+        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xxs907cg45HJfbSdyVtEwlDTCuCMeZ4+KqX2Ba3eYak=;
+        b=WU1o/HYLWDQjfZ41hVNsMR7k274UHpBgSpktFyjkcS2mj+RBihrbvd2CrppfdkAOl+
+         z9Uat1ShoxPqewIYU+oGsQNrnDLomI9G/KqF1kZeD2rF/VzH4C4O6wQuajgBVY4MRX2/
+         7kP+VRiDRkvfiM2QOUX38J8qYFDCwZJduBrIsW0PDyENCOaXVLGsLbFeTMTcnDfff0bP
+         qBy3WfO9/GKZK+bGZQrj/j9eIP6J02uZgiR2BqDgN7TxzENojlUxVY76AW4I6o/FNXVj
+         Ov8NTWYVyV4ZZpjFYFnsvJc8+RqDNysfhmvl87k+OZ6kxfr1Ri49wAigwlCBY82Gtyjm
+         roiA==
+X-Gm-Message-State: AFqh2kql5IoKT40R/j92djz/R+Fbms9c7F6HMYS2CiPh5sBdXMdpIjNj
+        XCzKt+SXZyYsyjgt7Sjr/Zg=
+X-Google-Smtp-Source: AMrXdXsKXJv3OYoZfWb8ZotNtyjw7yMtRZm1Z7IeSGCwm5kkx19eyinzkjp+kn6SJHwEb8PP6vtIzg==
+X-Received: by 2002:a05:6402:1149:b0:482:d62c:cde with SMTP id g9-20020a056402114900b00482d62c0cdemr59638228edw.13.1673503648114;
+        Wed, 11 Jan 2023 22:07:28 -0800 (PST)
+Received: from [192.168.1.49] (185-219-167-24-static.vivo.cz. [185.219.167.24])
+        by smtp.gmail.com with ESMTPSA id g11-20020a056402428b00b004722d7e8c7csm6768666edc.14.2023.01.11.22.07.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 11 Jan 2023 22:07:27 -0800 (PST)
+Message-ID: <7aa90802-d25c-baa3-9c03-2502ad3c708a@kernel.org>
+Date:   Thu, 12 Jan 2023 07:07:26 +0100
 MIME-Version: 1.0
-References: <20230109211754.67144-1-ricarkol@google.com> <20230109211754.67144-3-ricarkol@google.com>
-In-Reply-To: <20230109211754.67144-3-ricarkol@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 11 Jan 2023 21:56:45 -0800
-Message-ID: <CAAeT=Fz1PHytw2rhn7pxbr1aFuvWLTJGnr9vidUqNt=tCKpvuw@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3 2/4] arm: pmu: Prepare for testing
- 64-bit overflows
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        andrew.jones@linux.dev, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, oliver.upton@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Content-Language: en-US
+To:     Pedro Falcato <pedro.falcato@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        mm <linux-mm@kvack.org>, yuzhao@google.com,
+        Michal Hocko <MHocko@suse.com>,
+        Vlastimil Babka <vbabka@suse.cz>, shy828301@gmail.com
+References: <b8017e09-f336-3035-8344-c549086c2340@kernel.org>
+ <CAKbZUD0Tqct_G9OcO8ocdH1J_YvLSEod-ofr97hsyoHgcvBwuw@mail.gmail.com>
+From:   Jiri Slaby <jirislaby@kernel.org>
+Subject: Re: Stalls in qemu with host running 6.1 (everything stuck at
+ mmap_read_lock())
+In-Reply-To: <CAKbZUD0Tqct_G9OcO8ocdH1J_YvLSEod-ofr97hsyoHgcvBwuw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+Hi,
 
-On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
->
-> PMUv3p5 adds a knob, PMCR_EL0.LP == 1, that allows overflowing at 64-bits
-> instead of 32. Prepare by doing these 3 things:
->
-> 1. Add a "bool overflow_at_64bits" argument to all tests checking
->    overflows.
-> 2. Extend satisfy_prerequisites() to check if the machine supports
->    "overflow_at_64bits".
-> 3. Refactor the test invocations to use the new "run_test()" which adds a
->    report prefix indicating whether the test uses 64 or 32-bit overflows.
->
-> A subsequent commit will actually add the 64-bit overflow tests.
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> ---
->  arm/pmu.c | 92 ++++++++++++++++++++++++++++++++-----------------------
->  1 file changed, 53 insertions(+), 39 deletions(-)
->
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 7f0794d..0d06b59 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -164,13 +164,13 @@ static void pmu_reset(void)
->  /* event counter tests only implemented for aarch64 */
->  static void test_event_introspection(void) {}
->  static void test_event_counter_config(void) {}
-> -static void test_basic_event_count(void) {}
-> -static void test_mem_access(void) {}
-> -static void test_sw_incr(void) {}
-> -static void test_chained_counters(void) {}
-> -static void test_chained_sw_incr(void) {}
-> -static void test_chain_promotion(void) {}
-> -static void test_overflow_interrupt(void) {}
-> +static void test_basic_event_count(bool overflow_at_64bits) {}
-> +static void test_mem_access(bool overflow_at_64bits) {}
-> +static void test_sw_incr(bool overflow_at_64bits) {}
-> +static void test_chained_counters(bool unused) {}
-> +static void test_chained_sw_incr(bool unused) {}
-> +static void test_chain_promotion(bool unused) {}
-> +static void test_overflow_interrupt(bool overflow_at_64bits) {}
->
->  #elif defined(__aarch64__)
->  #define ID_AA64DFR0_PERFMON_SHIFT 8
-> @@ -416,6 +416,7 @@ static bool satisfy_prerequisites(uint32_t *events, unsigned int nb_events)
->                         return false;
->                 }
->         }
-> +
+On 12. 01. 23, 1:37, Pedro Falcato wrote:
+> I just want to chime in and say that I've also hit this regression
+> right as I (Arch) updated to 6.1 a few weeks ago.
+> This completely ruined my qemu workflow such that I had to fallback to
+> using an LTS kernel.
+> 
+> Some data I've gathered:
+> 1) It seems to not happen right after booting - I'm unsure if this is
+> due to memory pressure or less CPU load or any other factor
 
-Nit: Unnecessary addition of the line.
++1 as I wrote.
 
->         return true;
->  }
->
-> @@ -435,13 +436,24 @@ static uint64_t pmevcntr_mask(void)
->         return (uint32_t)~0;
->  }
->
-> -static void test_basic_event_count(void)
-> +static bool check_overflow_prerequisites(bool overflow_at_64bits)
-> +{
-> +       if (overflow_at_64bits && pmu.version < ID_DFR0_PMU_V3_8_5) {
-> +               report_skip("Skip test as 64 overflows need FEAT_PMUv3p5");
-> +               return false;
-> +       }
-> +
-> +       return true;
-> +}
-> +
-> +static void test_basic_event_count(bool overflow_at_64bits)
->  {
->         uint32_t implemented_counter_mask, non_implemented_counter_mask;
->         uint32_t counter_mask;
->         uint32_t events[] = {CPU_CYCLES, INST_RETIRED};
->
-> -       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> +           !check_overflow_prerequisites(overflow_at_64bits))
->                 return;
->
->         implemented_counter_mask = BIT(pmu.nb_implemented_counters) - 1;
-> @@ -515,12 +527,13 @@ static void test_basic_event_count(void)
->                 "check overflow happened on #0 only");
->  }
->
-> -static void test_mem_access(void)
-> +static void test_mem_access(bool overflow_at_64bits)
->  {
->         void *addr = malloc(PAGE_SIZE);
->         uint32_t events[] = {MEM_ACCESS, MEM_ACCESS};
->
-> -       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> +           !check_overflow_prerequisites(overflow_at_64bits))
->                 return;
->
->         pmu_reset();
-> @@ -551,13 +564,14 @@ static void test_mem_access(void)
->                         read_sysreg(pmovsclr_el0));
->  }
->
-> -static void test_sw_incr(void)
-> +static void test_sw_incr(bool overflow_at_64bits)
->  {
->         uint32_t events[] = {SW_INCR, SW_INCR};
->         uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
->         int i;
->
-> -       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> +           !check_overflow_prerequisites(overflow_at_64bits))
->                 return;
->
->         pmu_reset();
-> @@ -597,7 +611,7 @@ static void test_sw_incr(void)
->                 "overflow on counter #0 after 100 SW_INCR");
->  }
->
-> -static void test_chained_counters(void)
-> +static void test_chained_counters(bool unused)
->  {
->         uint32_t events[] = {CPU_CYCLES, CHAIN};
->
-> @@ -638,7 +652,7 @@ static void test_chained_counters(void)
->         report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
->  }
->
-> -static void test_chained_sw_incr(void)
-> +static void test_chained_sw_incr(bool unused)
->  {
->         uint32_t events[] = {SW_INCR, CHAIN};
->         uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-> @@ -691,7 +705,7 @@ static void test_chained_sw_incr(void)
->                     read_regn_el0(pmevcntr, 0), read_regn_el0(pmevcntr, 1));
->  }
->
-> -static void test_chain_promotion(void)
-> +static void test_chain_promotion(bool unused)
->  {
->         uint32_t events[] = {MEM_ACCESS, CHAIN};
->         void *addr = malloc(PAGE_SIZE);
-> @@ -840,13 +854,14 @@ static bool expect_interrupts(uint32_t bitmap)
->         return true;
->  }
->
-> -static void test_overflow_interrupt(void)
-> +static void test_overflow_interrupt(bool overflow_at_64bits)
->  {
->         uint32_t events[] = {MEM_ACCESS, SW_INCR};
->         void *addr = malloc(PAGE_SIZE);
->         int i;
->
-> -       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
-> +       if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> +           !check_overflow_prerequisites(overflow_at_64bits))
->                 return;
->
->         gic_enable_defaults();
-> @@ -1070,6 +1085,19 @@ static bool pmu_probe(void)
->         return true;
->  }
->
-> +static void run_test(char *name, void (*test)(bool), bool overflow_at_64bits)
-> +{
-> +       const char *prefix = overflow_at_64bits ? "64-bit overflows" : "32-bit overflows";
-> +
-> +       report_prefix_push(name);
-> +       report_prefix_push(prefix);
-> +
-> +       test(overflow_at_64bits);
-> +
-> +       report_prefix_pop();
-> +       report_prefix_pop();
-> +}
-> +
->  int main(int argc, char *argv[])
->  {
->         int cpi = 0;
-> @@ -1102,33 +1130,19 @@ int main(int argc, char *argv[])
->                 test_event_counter_config();
->                 report_prefix_pop();
->         } else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_basic_event_count();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_basic_event_count, false);
->         } else if (strcmp(argv[1], "pmu-mem-access") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_mem_access();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_mem_access, false);
->         } else if (strcmp(argv[1], "pmu-sw-incr") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_sw_incr();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_sw_incr, false);
->         } else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_chained_counters();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_chained_counters, false);
->         } else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_chained_sw_incr();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_chained_sw_incr, false);
->         } else if (strcmp(argv[1], "pmu-chain-promotion") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_chain_promotion();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_chain_promotion, false);
->         } else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
-> -               report_prefix_push(argv[1]);
-> -               test_overflow_interrupt();
-> -               report_prefix_pop();
-> +               run_test(argv[1], test_overflow_interrupt, false);
->         } else {
->                 report_abort("Unknown sub-test '%s'", argv[1]);
->         }
+> 2) It seems to intensify after swapping a fair amount? At least this
+> has been my experience.
 
-Perhaps it might be useful to generalize run_test() a bit more so that it
-can be used for other existing test cases as well ?
-(e.g. "pmu-event-counter-config", etc)
----
-i.e (The following are not all of the changes though).
+I have no swap.
 
--static void run_test(char *name, void (*test)(bool), bool overflow_at_64bits)
-+static void run_test(const char *name, const char *prefix, void
-(*test)(bool), void *arg)
- {
--       const char *prefix = overflow_at_64bits ? "64-bit overflows" :
-"32-bit overflows";
--
-        report_prefix_push(name);
-        report_prefix_push(prefix);
+> 3) The largest slowdown seems to be when qemu is booting the guest,
+> possibly during heavy memory allocation - problems range from "takes
+> tens of seconds to boot" to "qemu is completely blocked and needs a
+> SIGKILL spam".
 
--       test(overflow_at_64bits);
-+       test(arg);
++1
 
-        report_prefix_pop();
-        report_prefix_pop();
- }
+> 4) While traditional process monitoring tools break (likely due to
+> mmap_lock getting hogged), I can (empirically, using /bin/free) tell
+> that the system seems to be swapping in/out quite a fair bit
 
-+static void run_event_test(char *name, void (*test)(bool), bool
-overflow_at_64bits)
-+{
-+       const char *prefix = overflow_at_64bits ? "64-bit overflows" :
-"32-bit overflows";
-+
-+       run_test(name, prefix, test, (void *)overflow_at_64bits);
-+}
----
+Yes, htop/top/ps and such are stuck at the read of /proc/<pid>/cmdline 
+as I wrote (waiting for the mmap lock).
 
-Having said that, the patch already improves the code,
-and I don't see any issue.
+> My 4) is particularly confusing to me as I had originally blamed the
+> problem on the MGLRU changes, while you don't seem to be swapping at
+> all.
+> Could this be related to the maple tree patches? Should we CC both the
+> MGLRU folks and the maple folks?
+> 
+> I have little insight into what the kernel's state actually is apart
+> from this - perf seems to break, and I have no kernel debugger as this
+> is my live personal machine :/
+> I would love it if someone hinted to possible things I/we could try in
+> order to track this down. Is this not git-bisectable at all?
 
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
+I have rebooted to a fresh kernel which 1) have lockdep enabled, and 2) 
+I have debuginfo for. So next time this happens, I can print held locks 
+and dump a kcore (kdump is set up).
 
-Thank you,
-Reiji
+regards,
+-- 
+js
+suse labs
+
