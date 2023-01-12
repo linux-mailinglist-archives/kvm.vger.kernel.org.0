@@ -2,75 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 658F0666976
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 04:12:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36A166669ED
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 05:03:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235870AbjALDMH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 11 Jan 2023 22:12:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58910 "EHLO
+        id S236343AbjALEDm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 11 Jan 2023 23:03:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234465AbjALDME (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 11 Jan 2023 22:12:04 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D95049164;
-        Wed, 11 Jan 2023 19:12:03 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id y1so18887660plb.2;
-        Wed, 11 Jan 2023 19:12:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hZGA7rVAPUu/uB255K6JoKHkYFSrz5XmoEcLH/bhVQ8=;
-        b=DUrZfbu0qwZ+0tkn4hivdO2hoJLgPiBKmNYUvXW0DAlVJ+wlqg4DoFamqFZ9HGpyVu
-         TgxAHjnFHkUsxDSW9Ng2h+iYfxg9UtB95cA/RNhKdAnOOGy0hsiVNp+fLMBVj66mEel2
-         tEXVs9PQ/OF2rsAP9nkkNhrJAJvOdVW4pOQMSY+LN+GLrwLypUW4UqoPpUQ7sTggjRo6
-         ZbtAK+XwUN0d94C+bYWu9hPQ8ju/qmVRu8JV3CwEzM8XABmYpASs4K12/wTm1tV7307D
-         E6mE8h4hM72tmdPHeWepfezgTRShrY4EZcZ5AQQihnhq41MEmkC3qxOp53Vj43ViUtCe
-         LKhw==
+        with ESMTP id S235573AbjALEDh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 11 Jan 2023 23:03:37 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC2DC4BD6E
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 20:02:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673496168;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9Ead6NbYjGEcOLExh9Mv61ETFXQQrhvNXO4fmiWeGhg=;
+        b=SM57v6Fy6RLpJYzThdkqInXSkLBBZW4mqglQjKbgRg8lRHP2nOKjDKobdoAL+qEyxdQEKj
+        rgwwJmratw+yX0SKKQh+BoWm55ntWgMhSgece0A7xjRynSOOgiYizZsQ7aZdCcNL+tgGYx
+        6fFVelosa+DV1XUFguqGhCWIAyXhl1k=
+Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
+ [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-125-u7DyO_I6OMWVtNc2RVQpHQ-1; Wed, 11 Jan 2023 23:02:47 -0500
+X-MC-Unique: u7DyO_I6OMWVtNc2RVQpHQ-1
+Received: by mail-oo1-f72.google.com with SMTP id y19-20020a4a9c13000000b004e3c9193e5eso6369347ooj.11
+        for <kvm@vger.kernel.org>; Wed, 11 Jan 2023 20:02:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hZGA7rVAPUu/uB255K6JoKHkYFSrz5XmoEcLH/bhVQ8=;
-        b=gqzjjMTd88FeO1TwT/Zzdt+0TqMM+kywJMBchCH2WU+7iawO4HUefKxA16PD8xqP9w
-         8JMUlc7igxUE2Nupz3fF6mGsi+GuYqta+WFTQQ+n0BNCvnJ67z2HF5DCwe2GNzhvw3r8
-         jSobvHCedgdlF1NMGVT9EYWhaSUKM58Ws+bfPm0bz2UGU/Bq5UaB1Z7VVZxJcT640fUB
-         HS+ajG4Rc+ltOC2orqR0fWdRVQzEt8nTu2y3gUgOjS/Mfs3xv3EBcS/IOq6rZuIo4T5F
-         Pv3EVsxWSJ5tsW+qOwHUFoHmoK5lAFIyx5EztHIdzA4s+R4RAwZBxT8FISCdhM04coh3
-         rSaA==
-X-Gm-Message-State: AFqh2kpzilNciYvXbrjUcNwl7rOX9AMO7A730qQGdNsB2IgdYIszchLf
-        sbBqbt7we/+S1lzcoVUoKgE=
-X-Google-Smtp-Source: AMrXdXtB1WTseKUSthwdr3p/3ApvHsPQZy/4AjJuOCnDhggZ6pNfgzyRpS8RHOaTT6CT6yN/UX0KgQ==
-X-Received: by 2002:a17:902:ec89:b0:186:b063:32e with SMTP id x9-20020a170902ec8900b00186b063032emr106429986plg.62.1673493122401;
-        Wed, 11 Jan 2023 19:12:02 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id y14-20020a634b0e000000b00476c2180dbcsm8996921pga.29.2023.01.11.19.12.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Jan 2023 19:12:02 -0800 (PST)
-Date:   Wed, 11 Jan 2023 19:12:01 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
-To:     "Wang, Lei" <lei4.wang@intel.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-Subject: Re: [PATCH v10 021/108] KVM: TDX: initialize VM with TDX specific
- parameters
-Message-ID: <20230112031201.GB2034518@ls.amr.corp.intel.com>
-References: <cover.1667110240.git.isaku.yamahata@intel.com>
- <ebb4beadff8e117d0fb643af4ee310b6608679bf.1667110240.git.isaku.yamahata@intel.com>
- <f9d7c13e-e96c-2afd-4c8b-cb7f17d61445@intel.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9Ead6NbYjGEcOLExh9Mv61ETFXQQrhvNXO4fmiWeGhg=;
+        b=WPcl2WvqVPp9GsxRMMxf0WihCqmzz9eJp8hLyoziQhAAjnBhAnbQpMNIkNUwRwv19R
+         WfqCNM75P1EDVRrkDZ2ef6T9Pc2YZNVmwfvSD/xBDc8KawK5aoUfL76vo0mE0wBQGade
+         gnmYyBKF8SJHUdqVmlLwRXTUa04Pv7xBkqbJvIR5MZgndkg5FwAczqsNeMQHZpv5qOmS
+         hGfEz2xbKnsDNSMxJHe0p8z1KMUxLoJH4MSsSS+evq+Cp7h/Wxx7mOBdhif8lP0Pludw
+         l8dPdfXYtuLdTrVKp2MCOxAHzyoIzhjDZqfyWE3n0ZOmg2uf+SFeqKf0Q2pypu3H/m/c
+         vs8A==
+X-Gm-Message-State: AFqh2kpC7dRcVi1dHbpdPxSwGrwSE3awx5CEVSJ/8rydhRhAMSzhLXDQ
+        G2i8BYVlI6wuTOT6TD6A428gL/SulUXkvIta4i+5QZsbHfqRX2tENAx+I98OOlJi/5TWI4kXHgO
+        viSftZ9tjtdtP2u8Og0+bknZe/eeU
+X-Received: by 2002:a05:6870:4413:b0:144:a97b:1ae2 with SMTP id u19-20020a056870441300b00144a97b1ae2mr4131306oah.35.1673496166794;
+        Wed, 11 Jan 2023 20:02:46 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXs23GgCUjE+n1ZMX3l44UXf7JP96onjuoMkRSJyeIQHYTd/0zJHvVdCU1raqdOjILjzA9GfGaIqELD3q2P6bPU=
+X-Received: by 2002:a05:6870:4413:b0:144:a97b:1ae2 with SMTP id
+ u19-20020a056870441300b00144a97b1ae2mr4131300oah.35.1673496166467; Wed, 11
+ Jan 2023 20:02:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <f9d7c13e-e96c-2afd-4c8b-cb7f17d61445@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230111060730.24779-1-jasowang@redhat.com> <Y78Lfmzr6s1BU3ri@fedora>
+In-Reply-To: <Y78Lfmzr6s1BU3ri@fedora>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 12 Jan 2023 12:02:35 +0800
+Message-ID: <CACGkMEukZ42N4ZNbGvn6gr3C74aAbFpot-4Zeyp0GL7LmS9tRw@mail.gmail.com>
+Subject: Re: [PATCH] vhost-scsi: unbreak any layout for response
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     mst@redhat.com, pbonzini@redhat.com, bcodding@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Nicholas Bellinger <nab@linux-iscsi.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,192 +75,172 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 03:59:08PM +0800,
-"Wang, Lei" <lei4.wang@intel.com> wrote:
-
-> On 10/30/2022 2:22 PM, isaku.yamahata@intel.com wrote:
-> > From: Xiaoyao Li <xiaoyao.li@intel.com>
-> > 
-> > TDX requires additional parameters for TDX VM for confidential execution to
-> > protect its confidentiality of its memory contents and its CPU state from
-> > any other software, including VMM. When creating guest TD VM before
-> > creating vcpu, the number of vcpu, TSC frequency (that is same among
-> > vcpus. and it can't be changed.)  CPUIDs which is emulated by the TDX
-> > module. It means guest can trust those CPUIDs. and sha384 values for
-> > measurement.
-> > 
-> > Add new subcommand, KVM_TDX_INIT_VM, to pass parameters for TDX guest.  It
-> > assigns encryption key to the TDX guest for memory encryption.  TDX
-> > encrypts memory per-guest bases.  It assigns device model passes per-VM
-> > parameters for the TDX guest.  The maximum number of vcpus, tsc frequency
-> > (TDX guest has fised VM-wide TSC frequency. not per-vcpu.  The TDX guest
-> > can not change it.), attributes (production or debug), available extended
-> > features (which is reflected into guest XCR0, IA32_XSS MSR), cpuids, sha384
-> > measurements, and etc.
-> > 
-> > This subcommand is called before creating vcpu and KVM_SET_CPUID2, i.e.
-> > cpuids configurations aren't available yet.  So CPUIDs configuration values
-> > needs to be passed in struct kvm_init_vm.  It's device model responsibility
-> 
-> I suppose this should be kvm_tdx_init_vm.
-> 
-> > to make this cpuid config for KVM_TDX_INIT_VM and KVM_SET_CPUID2.
-> > 
-> > Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+On Thu, Jan 12, 2023 at 3:18 AM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+>
+> On Wed, Jan 11, 2023 at 02:07:30PM +0800, Jason Wang wrote:
+> > Al Viro said:
+> >
+> > """
+> > Since "vhost/scsi: fix reuse of &vq->iov[out] in response"
+> > we have this:
+> >                 cmd->tvc_resp_iov = vq->iov[vc.out];
+> >                 cmd->tvc_in_iovs = vc.in;
+> > combined with
+> >                 iov_iter_init(&iov_iter, ITER_DEST, &cmd->tvc_resp_iov,
+> >                               cmd->tvc_in_iovs, sizeof(v_rsp));
+> > in vhost_scsi_complete_cmd_work().  We used to have ->tvc_resp_iov
+> > _pointing_ to vq->iov[vc.out]; back then iov_iter_init() asked to
+> > set an iovec-backed iov_iter over the tail of vq->iov[], with
+> > length being the amount of iovecs in the tail.
+> >
+> > Now we have a copy of one element of that array.  Fortunately, the members
+> > following it in the containing structure are two non-NULL kernel pointers,
+> > so copy_to_iter() will not copy anything beyond the first iovec - kernel
+> > pointer is not (on the majority of architectures) going to be accepted by
+> > access_ok() in copyout() and it won't be skipped since the "length" (in
+> > reality - another non-NULL kernel pointer) won't be zero.
+> >
+> > So it's not going to give a guest-to-qemu escalation, but it's definitely
+> > a bug.  Frankly, my preference would be to verify that the very first iovec
+> > is long enough to hold rsp_size.  Due to the above, any users that try to
+> > give us vq->iov[vc.out].iov_len < sizeof(struct virtio_scsi_cmd_resp)
+> > would currently get a failure in vhost_scsi_complete_cmd_work()
+> > anyway.
+> > """
+> >
+> > However, the spec doesn't say anything about the legacy descriptor
+> > layout for the respone. So this patch tries to not assume the response
+> > to reside in a single separate descriptor which is what commit
+> > 79c14141a487 ("vhost/scsi: Convert completion path to use") tries to
+> > achieve towards to ANY_LAYOUT.
+> >
+> > This is done by allocating and using dedicate resp iov in the
+> > command. To be safety, start with UIO_MAXIOV to be consistent with the
+> > vhost core.
+> >
+> > Testing with the hacked virtio-scsi driver that use 1 descriptor for 1
+> > byte in the response.
+> >
+> > Reported-by: Al Viro <viro@zeniv.linux.org.uk>
+> > Cc: Benjamin Coddington <bcodding@redhat.com>
+> > Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+> > Fixes: a77ec83a5789 ("vhost/scsi: fix reuse of &vq->iov[out] in response")
+> > Signed-off-by: Jason Wang <jasowang@redhat.com>
 > > ---
-> >  arch/x86/include/asm/tdx.h            |   3 +
-> >  arch/x86/include/uapi/asm/kvm.h       |  31 +++
-> >  arch/x86/kvm/vmx/tdx.c                | 296 ++++++++++++++++++++++----
-> >  arch/x86/kvm/vmx/tdx.h                |  22 ++
-> >  tools/arch/x86/include/uapi/asm/kvm.h |  33 +++
-> >  5 files changed, 347 insertions(+), 38 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
-> > index cd304d323d33..05ac4bfc8f8a 100644
-> > --- a/arch/x86/include/asm/tdx.h
-> > +++ b/arch/x86/include/asm/tdx.h
-> > @@ -131,6 +131,9 @@ static inline long tdx_kvm_hypercall(unsigned int nr, unsigned long p1,
-> >  #endif /* CONFIG_INTEL_TDX_GUEST && CONFIG_KVM_GUEST */
-> >  
-> >  #ifdef CONFIG_INTEL_TDX_HOST
-> > +
-> > +/* -1 indicates CPUID leaf with no sub-leaves. */
-> > +#define TDX_CPUID_NO_SUBLEAF	((u32)-1)
-> >  struct tdx_cpuid_config {
-> >  	u32	leaf;
-> >  	u32	sub_leaf;
-> > diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> > index 2ad9666e02a5..26661879c031 100644
-> > --- a/arch/x86/include/uapi/asm/kvm.h
-> > +++ b/arch/x86/include/uapi/asm/kvm.h
-> > @@ -538,6 +538,7 @@ struct kvm_pmu_event_filter {
-> >  /* Trust Domain eXtension sub-ioctl() commands. */
-> >  enum kvm_tdx_cmd_id {
-> >  	KVM_TDX_CAPABILITIES = 0,
-> > +	KVM_TDX_INIT_VM,
-> >  
-> >  	KVM_TDX_CMD_NR_MAX,
-> >  };
-> > @@ -583,4 +584,34 @@ struct kvm_tdx_capabilities {
-> >  	struct kvm_tdx_cpuid_config cpuid_configs[0];
-> >  };
-> >  
-> > +struct kvm_tdx_init_vm {
-> > +	__u64 attributes;
-> > +	__u64 mrconfigid[6];	/* sha384 digest */
-> > +	__u64 mrowner[6];	/* sha384 digest */
-> > +	__u64 mrownerconfig[6];	/* sha348 digest */
-> > +	union {
-> > +		/*
-> > +		 * KVM_TDX_INIT_VM is called before vcpu creation, thus before
-> > +		 * KVM_SET_CPUID2.  CPUID configurations needs to be passed.
-> > +		 *
-> > +		 * This configuration supersedes KVM_SET_CPUID{,2}.
-> > +		 * The user space VMM, e.g. qemu, should make them consistent
-> > +		 * with this values.
-> > +		 * sizeof(struct kvm_cpuid_entry2) * KVM_MAX_CPUID_ENTRIES(256)
-> > +		 * = 8KB.
-> > +		 */
-> > +		struct {
-> > +			struct kvm_cpuid2 cpuid;
-> > +			/* 8KB with KVM_MAX_CPUID_ENTRIES. */
-> > +			struct kvm_cpuid_entry2 entries[];
-> > +		};
-> > +		/*
-> > +		 * For future extensibility.
-> > +		 * The size(struct kvm_tdx_init_vm) = 16KB.
-> > +		 * This should be enough given sizeof(TD_PARAMS) = 1024
-> > +		 */
-> > +		__u64 reserved[2029];
-> > +	};
-> > +};
-> > +
-> >  #endif /* _ASM_X86_KVM_H */
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index d77709a6da51..54045e0576e7 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -284,6 +284,205 @@ static int tdx_do_tdh_mng_key_config(void *param)
-> >  int tdx_vm_init(struct kvm *kvm)
-> >  {
-> >  	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
-> > +
-> > +	kvm_tdx->hkid = -1;
-> > +
-> > +	/*
-> > +	 * This function initializes only KVM software construct.  It doesn't
-> > +	 * initialize TDX stuff, e.g. TDCS, TDR, TDCX, HKID etc.
-> > +	 * It is handled by KVM_TDX_INIT_VM, __tdx_td_init().
-> > +	 */
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +int tdx_dev_ioctl(void __user *argp)
-> > +{
-> > +	struct kvm_tdx_capabilities __user *user_caps;
-> > +	struct kvm_tdx_capabilities caps;
-> > +	struct kvm_tdx_cmd cmd;
-> > +
-> > +	BUILD_BUG_ON(sizeof(struct kvm_tdx_cpuid_config) !=
-> > +		     sizeof(struct tdx_cpuid_config));
-> > +
-> > +	if (copy_from_user(&cmd, argp, sizeof(cmd)))
-> > +		return -EFAULT;
-> > +	if (cmd.flags || cmd.error || cmd.unused)
-> > +		return -EINVAL;
-> > +	/*
-> > +	 * Currently only KVM_TDX_CAPABILITIES is defined for system-scoped
-> > +	 * mem_enc_ioctl().
-> > +	 */
-> > +	if (cmd.id != KVM_TDX_CAPABILITIES)
-> > +		return -EINVAL;
-> > +
-> > +	user_caps = (void __user *)cmd.data;
-> > +	if (copy_from_user(&caps, user_caps, sizeof(caps)))
-> > +		return -EFAULT;
-> > +
-> > +	if (caps.nr_cpuid_configs < tdx_caps.nr_cpuid_configs)
-> > +		return -E2BIG;
-> > +
-> > +	caps = (struct kvm_tdx_capabilities) {
-> > +		.attrs_fixed0 = tdx_caps.attrs_fixed0,
-> > +		.attrs_fixed1 = tdx_caps.attrs_fixed1,
-> > +		.xfam_fixed0 = tdx_caps.xfam_fixed0,
-> > +		.xfam_fixed1 = tdx_caps.xfam_fixed1,
-> > +		.nr_cpuid_configs = tdx_caps.nr_cpuid_configs,
-> > +		.padding = 0,
-> > +	};
-> > +
-> > +	if (copy_to_user(user_caps, &caps, sizeof(caps)))
-> > +		return -EFAULT;
-> > +	if (copy_to_user(user_caps->cpuid_configs, &tdx_caps.cpuid_configs,
-> > +			 tdx_caps.nr_cpuid_configs *
-> > +			 sizeof(struct tdx_cpuid_config)))
-> > +		return -EFAULT;
-> > +
-> > +	return 0;
-> > +}
-> 
-> tdx_dev_ioctl() is introduced in previous patch with the same code added here,
-> which means this is just a place change and it will confuse reviewers. Is it
-> neccesary to do so?
+> >  drivers/vhost/scsi.c | 21 +++++++++++++++++----
+> >  1 file changed, 17 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+> > index dca6346d75b3..7d6d70072603 100644
+> > --- a/drivers/vhost/scsi.c
+> > +++ b/drivers/vhost/scsi.c
+> > @@ -80,7 +80,7 @@ struct vhost_scsi_cmd {
+> >       struct scatterlist *tvc_prot_sgl;
+> >       struct page **tvc_upages;
+> >       /* Pointer to response header iovec */
+> > -     struct iovec tvc_resp_iov;
+> > +     struct iovec *tvc_resp_iov;
+> >       /* Pointer to vhost_scsi for our device */
+> >       struct vhost_scsi *tvc_vhost;
+> >       /* Pointer to vhost_virtqueue for the cmd */
+> > @@ -563,7 +563,7 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
+> >               memcpy(v_rsp.sense, cmd->tvc_sense_buf,
+> >                      se_cmd->scsi_sense_length);
+> >
+> > -             iov_iter_init(&iov_iter, ITER_DEST, &cmd->tvc_resp_iov,
+> > +             iov_iter_init(&iov_iter, ITER_DEST, cmd->tvc_resp_iov,
+> >                             cmd->tvc_in_iovs, sizeof(v_rsp));
+> >               ret = copy_to_iter(&v_rsp, sizeof(v_rsp), &iov_iter);
+> >               if (likely(ret == sizeof(v_rsp))) {
+> > @@ -594,6 +594,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
+> >       struct vhost_scsi_cmd *cmd;
+> >       struct vhost_scsi_nexus *tv_nexus;
+> >       struct scatterlist *sg, *prot_sg;
+> > +     struct iovec *tvc_resp_iov;
+> >       struct page **pages;
+> >       int tag;
+> >
+> > @@ -613,6 +614,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
+> >       sg = cmd->tvc_sgl;
+> >       prot_sg = cmd->tvc_prot_sgl;
+> >       pages = cmd->tvc_upages;
+> > +     tvc_resp_iov = cmd->tvc_resp_iov;
+> >       memset(cmd, 0, sizeof(*cmd));
+> >       cmd->tvc_sgl = sg;
+> >       cmd->tvc_prot_sgl = prot_sg;
+> > @@ -625,6 +627,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
+> >       cmd->tvc_data_direction = data_direction;
+> >       cmd->tvc_nexus = tv_nexus;
+> >       cmd->inflight = vhost_scsi_get_inflight(vq);
+> > +     cmd->tvc_resp_iov = tvc_resp_iov;
+> >
+> >       memcpy(cmd->tvc_cdb, cdb, VHOST_SCSI_MAX_CDB_SIZE);
+> >
+> > @@ -935,7 +938,7 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
+> >       struct iov_iter in_iter, prot_iter, data_iter;
+> >       u64 tag;
+> >       u32 exp_data_len, data_direction;
+> > -     int ret, prot_bytes, c = 0;
+> > +     int ret, prot_bytes, i, c = 0;
+> >       u16 lun;
+> >       u8 task_attr;
+> >       bool t10_pi = vhost_has_feature(vq, VIRTIO_SCSI_F_T10_PI);
+> > @@ -1092,7 +1095,8 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
+> >               }
+> >               cmd->tvc_vhost = vs;
+> >               cmd->tvc_vq = vq;
+> > -             cmd->tvc_resp_iov = vq->iov[vc.out];
+> > +             for (i = 0; i < vc.in ; i++)
+> > +                     cmd->tvc_resp_iov[i] = vq->iov[vc.out + i];
+>
+> Where is the guarantee that vc.in < UIO_MAXIOV?
+>
 
-Right. Somehow diff was also confused. I'll try to twist the previous patch to
-introduce __tdx_td_init() with the previous patch.
+We limit it here in the vhost_virtqueue structure:
 
+        struct iovec iov[UIO_MAXIOV];
 
-...
+And we pass sizeof(vq->iov) to vhost_get_vq_desc():
 
-> > +static inline bool is_td_initialized(struct kvm *kvm)
-> > +{
-> > +	return to_kvm_tdx(kvm)->hkid > 0;
-> > +}
-> 
-> There is a similar function, is_hkid_assigned(), which is previously defined. Do
-> you think redefining a new function here will bring code redundency?
+        vc->head = vhost_get_vq_desc(vq, vq->iov,
+                                     ARRAY_SIZE(vq->iov), &vc->out, &vc->in,
+                                     NULL, NULL);
 
-I'll drop this function and replace it with is_hkid_assigned().
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+> >               cmd->tvc_in_iovs = vc.in;
+> >
+> >               pr_debug("vhost_scsi got command opcode: %#02x, lun: %d\n",
+> > @@ -1461,6 +1465,7 @@ static void vhost_scsi_destroy_vq_cmds(struct vhost_virtqueue *vq)
+> >               kfree(tv_cmd->tvc_sgl);
+> >               kfree(tv_cmd->tvc_prot_sgl);
+> >               kfree(tv_cmd->tvc_upages);
+> > +             kfree(tv_cmd->tvc_resp_iov);
+> >       }
+> >
+> >       sbitmap_free(&svq->scsi_tags);
+> > @@ -1508,6 +1513,14 @@ static int vhost_scsi_setup_vq_cmds(struct vhost_virtqueue *vq, int max_cmds)
+> >                       goto out;
+> >               }
+> >
+> > +             tv_cmd->tvc_resp_iov = kcalloc(UIO_MAXIOV,
+> > +                                            sizeof(struct page *),
+> > +                                            GFP_KERNEL);
+>
+> Should sizeof(struct page *) be sizeof(struct iovec)?
+
+Yes, I will fix it.
+
+Thanks
+
+>
+> > +             if (!tv_cmd->tvc_resp_iov) {
+> > +                     pr_err("Unable to allocate tv_cmd->tvc_resp_iov\n");
+> > +                     goto out;
+> > +             }
+> > +
+> >               tv_cmd->tvc_prot_sgl = kcalloc(VHOST_SCSI_PREALLOC_PROT_SGLS,
+> >                                              sizeof(struct scatterlist),
+> >                                              GFP_KERNEL);
+> > --
+> > 2.25.1
+> >
+
