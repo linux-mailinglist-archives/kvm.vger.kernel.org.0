@@ -2,52 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 12F61667BA7
+	by mail.lfdr.de (Postfix) with ESMTP id 5E1DF667BA8
 	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 17:45:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241096AbjALQoO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 11:44:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41992 "EHLO
+        id S241116AbjALQoQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 11:44:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240333AbjALQis (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 11:38:48 -0500
+        with ESMTP id S240349AbjALQiu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 11:38:50 -0500
 Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 699711DF35;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86607271AA;
         Thu, 12 Jan 2023 08:34:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1673541249; x=1705077249;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=SjSfZegdmweSOVkOZBBi7xj1NT4xg9DbSG4FLSUQzGQ=;
-  b=QLDb3UbGm5ODaoghPkl8kmxvXzgKCdVhqcQFt8Z3ukAAAJHxQ2kefiaw
-   sR2tR8/70rvrAJ+EmyE4qWamRHzJDhQsP6KiPP8rg3jv6ebqC5n1DXWFf
-   JIr0iaqF5maWUbA/l9f15J2nZnuPDOtJ7YBeC72P3f/QAYnJcll4W6tso
-   HFUh86B3NPBkjJLRg20Xhg/vW3iVpzs8ZuhPg8oFuFyv4ipQeJr8szbPr
-   GKk1husLJ8jULk7KzwxoEwBcdA6rqjf+7SPo8atLvkKFiYnIF7FchSilU
-   2L1I6nrCzQGB1hWP960EFnn7+3LzFqaXSzMprnX7cV29RvKEHlWmiGO1R
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="323811992"
+  bh=XIBHMW1eyVfCY7IFUGtMBBW4XDJDqjOi2Ou1UwPM7wg=;
+  b=iXY7hPKARGsYv9bvPp9TiJ8C5V1eXHVXfJQ8KStnOZ2RBV6GLHOY85cQ
+   KDA8MZqpwRHvx3Z/1gPla8c48+gVbNj4SducGrz3T531mRi8Tb4YVm3iS
+   iUgiL28B+maC7AD+e9BEJWwpREL7BbSwcgy9s/39lFa5o96uw3QBxty6e
+   IUCGiSPNOfP3t642aAIbV7l2SX2z0YmbJtJg5Ql9pnOzynanUFQSWVHxk
+   g/SZLETkrj6dKmFJUXGmaDvVfq+M8c/OMlYtsGxOhuL/fhMaV/pJC9nw0
+   dldqztMWQ3pDrL/+lfAW1WueS5p0VhBtjiYu7pXqLSwz4YGCri3sVy1oD
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="323811996"
 X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="323811992"
+   d="scan'208";a="323811996"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:31 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="721151874"
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:32 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10588"; a="721151877"
 X-IronPort-AV: E=Sophos;i="5.97,211,1669104000"; 
-   d="scan'208";a="721151874"
+   d="scan'208";a="721151877"
 Received: from ls.sc.intel.com (HELO localhost) ([143.183.96.54])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:31 -0800
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jan 2023 08:33:32 -0800
 From:   isaku.yamahata@intel.com
 To:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Cc:     isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
         Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
         Sean Christopherson <seanjc@google.com>,
         Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Chao Gao <chao.gao@intel.com>
-Subject: [PATCH v11 068/113] KVM: x86: Allow to update cached values in kvm_user_return_msrs w/o wrmsr
-Date:   Thu, 12 Jan 2023 08:32:16 -0800
-Message-Id: <877ae947a214b946840e35fac9ef6724411fe2d6.1673539699.git.isaku.yamahata@intel.com>
+        David Matlack <dmatlack@google.com>
+Subject: [PATCH v11 069/113] KVM: TDX: restore user ret MSRs
+Date:   Thu, 12 Jan 2023 08:32:17 -0800
+Message-Id: <239f6056d8109c5e94eb4e8eda54e5649bd1976c.1673539699.git.isaku.yamahata@intel.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1673539699.git.isaku.yamahata@intel.com>
 References: <cover.1673539699.git.isaku.yamahata@intel.com>
@@ -62,90 +61,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Chao Gao <chao.gao@intel.com>
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-Several MSRs are constant and only used in userspace(ring 3).  But VMs may
-have different values.  KVM uses kvm_set_user_return_msr() to switch to
-guest's values and leverages user return notifier to restore them when the
-kernel is to return to userspace.  To eliminate unnecessary wrmsr, KVM also
-caches the value it wrote to an MSR last time.
+Several user ret MSRs are clobbered on TD exit.  Restore those values on
+TD exit and before returning to ring 3.
 
-TDX module unconditionally resets some of these MSRs to architectural INIT
-state on TD exit.  It makes the cached values in kvm_user_return_msrs are
-inconsistent with values in hardware.  This inconsistency needs to be
-fixed.  Otherwise, it may mislead kvm_on_user_return() to skip restoring
-some MSRs to the host's values.  kvm_set_user_return_msr() can help correct
-this case, but it is not optimal as it always does a wrmsr.  So, introduce
-a variation of kvm_set_user_return_msr() to update cached values and skip
-that wrmsr.
-
-Signed-off-by: Chao Gao <chao.gao@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 +
- arch/x86/kvm/x86.c              | 25 ++++++++++++++++++++-----
- 2 files changed, 21 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/tdx.c | 43 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 487ff9f4fe1a..91093622f7ba 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2154,6 +2154,7 @@ int kvm_pv_send_ipi(struct kvm *kvm, unsigned long ipi_bitmap_low,
- int kvm_add_user_return_msr(u32 msr);
- int kvm_find_user_return_msr(u32 msr);
- int kvm_set_user_return_msr(unsigned index, u64 val, u64 mask);
-+void kvm_user_return_update_cache(unsigned int index, u64 val);
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index 7bd47a76c96c..4bd651b31172 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -461,6 +461,28 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	vcpu->kvm->vm_bugged = true;
+ }
  
- static inline bool kvm_is_supported_user_return_msr(u32 msr)
++struct tdx_uret_msr {
++	u32 msr;
++	unsigned int slot;
++	u64 defval;
++};
++
++static struct tdx_uret_msr tdx_uret_msrs[] = {
++	{.msr = MSR_SYSCALL_MASK,},
++	{.msr = MSR_STAR,},
++	{.msr = MSR_LSTAR,},
++	{.msr = MSR_TSC_AUX,},
++};
++
++static void tdx_user_return_update_cache(void)
++{
++	int i;
++
++	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++)
++		kvm_user_return_update_cache(tdx_uret_msrs[i].slot,
++					     tdx_uret_msrs[i].defval);
++}
++
+ static void tdx_restore_host_xsave_state(struct kvm_vcpu *vcpu)
  {
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 7785225f03ec..a3da2526dfda 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -430,6 +430,15 @@ static void kvm_user_return_msr_cpu_online(void)
+ 	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+@@ -500,6 +522,7 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
+ 
+ 	tdx_vcpu_enter_exit(vcpu, tdx);
+ 
++	tdx_user_return_update_cache();
+ 	tdx_restore_host_xsave_state(vcpu);
+ 	tdx->host_state_need_restore = true;
+ 
+@@ -1581,6 +1604,26 @@ int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+ 		return -EINVAL;
  	}
- }
  
-+static void kvm_user_return_register_notifier(struct kvm_user_return_msrs *msrs)
-+{
-+	if (!msrs->registered) {
-+		msrs->urn.on_user_return = kvm_on_user_return;
-+		user_return_notifier_register(&msrs->urn);
-+		msrs->registered = true;
++	for (i = 0; i < ARRAY_SIZE(tdx_uret_msrs); i++) {
++		/*
++		 * Here it checks if MSRs (tdx_uret_msrs) can be saved/restored
++		 * before returning to user space.
++		 *
++		 * this_cpu_ptr(user_return_msrs)->registered isn't checked
++		 * because the registration is done at vcpu runtime by
++		 * kvm_set_user_return_msr().
++		 * Here is setting up cpu feature before running vcpu,
++		 * registered is already false.
++		 */
++		tdx_uret_msrs[i].slot = kvm_find_user_return_msr(tdx_uret_msrs[i].msr);
++		if (tdx_uret_msrs[i].slot == -1) {
++			/* If any MSR isn't supported, it is a KVM bug */
++			pr_err("MSR %x isn't included by kvm_find_user_return_msr\n",
++				tdx_uret_msrs[i].msr);
++			return -EIO;
++		}
 +	}
-+}
 +
- int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
- {
- 	unsigned int cpu = smp_processor_id();
-@@ -444,15 +453,21 @@ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
- 		return 1;
- 
- 	msrs->values[slot].curr = value;
--	if (!msrs->registered) {
--		msrs->urn.on_user_return = kvm_on_user_return;
--		user_return_notifier_register(&msrs->urn);
--		msrs->registered = true;
--	}
-+	kvm_user_return_register_notifier(msrs);
- 	return 0;
- }
- EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
- 
-+/* Update the cache, "curr", and register the notifier */
-+void kvm_user_return_update_cache(unsigned int slot, u64 value)
-+{
-+	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
-+
-+	msrs->values[slot].curr = value;
-+	kvm_user_return_register_notifier(msrs);
-+}
-+EXPORT_SYMBOL_GPL(kvm_user_return_update_cache);
-+
- static void drop_user_return_notifiers(void)
- {
- 	unsigned int cpu = smp_processor_id();
+ 	max_pkgs = topology_max_packages();
+ 	tdx_mng_key_config_lock = kcalloc(max_pkgs, sizeof(*tdx_mng_key_config_lock),
+ 				   GFP_KERNEL);
 -- 
 2.25.1
 
