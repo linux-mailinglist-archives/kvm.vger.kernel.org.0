@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 672066671B5
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 13:09:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5B7906671D6
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 13:14:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231580AbjALMJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 07:09:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46040 "EHLO
+        id S230027AbjALMOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 07:14:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47198 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232095AbjALMIb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 07:08:31 -0500
+        with ESMTP id S235311AbjALMNh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 07:13:37 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E73510069
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 04:03:09 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7A0CFF
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 04:10:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673524988;
+        s=mimecast20190719; t=1673525431;
         h=from:from:reply-to:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:mime-version:mime-version:
          content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=A1S8oagK+OmCaCCRKTqwkjbTVJtpuqKSC2zdNhDLc8E=;
-        b=NFkdxq95uKwFFDXTjlwt+0YCZLZN4TJFDb1bHQeYafuiwO6GTPfD9MLHoT+lslKFNk16vs
-        fpKVL8tSkNEWi8vl8ZSxa5hf2uuJKtIcUaSgpT0v/Wl98wMuQx1nq7vgtGgGoS0m1D+fk+
-        auf7mFA3ChnVvkVMUNQlgny2NIwsGI8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=m7ctaQSqwJCI8HWipVGgCP7kRuDp6u50d7Qpz/siyqg=;
+        b=boYypGOIer8qnRi+GRIu8AkzfJuZBhyI9ghZkP/36s9AxEwJwldCiTcSNso17lGpenySgG
+        9FNNx1/x2HPeTVOaZhE1EGDgzKwyNrcbvDq3R4YkyrwaI1c7Kkb6F+2gzQB0Ys4/7+86b+
+        sK/UT5IvW86ohYT6ic92lYuSE8x/+9E=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-543-wqd-U0ZhPp6H7UtVMoWi6g-1; Thu, 12 Jan 2023 07:03:07 -0500
-X-MC-Unique: wqd-U0ZhPp6H7UtVMoWi6g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-655-6czC9ptYO4qvkpmqbRPPwg-1; Thu, 12 Jan 2023 07:10:28 -0500
+X-MC-Unique: 6czC9ptYO4qvkpmqbRPPwg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F4881C00417;
-        Thu, 12 Jan 2023 12:03:06 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2D3C4802C1C;
+        Thu, 12 Jan 2023 12:10:27 +0000 (UTC)
 Received: from redhat.com (unknown [10.33.36.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 82ECB40ED784;
-        Thu, 12 Jan 2023 12:03:03 +0000 (UTC)
-Date:   Thu, 12 Jan 2023 12:03:01 +0000
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC12E140EBF5;
+        Thu, 12 Jan 2023 12:10:24 +0000 (UTC)
+Date:   Thu, 12 Jan 2023 12:10:22 +0000
 From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To:     Pierre Morel <pmorel@linux.ibm.com>
 Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
@@ -47,18 +47,18 @@ Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
         marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
         seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
         frankja@linux.ibm.com, clg@kaod.org
-Subject: Re: [PATCH v14 08/11] qapi/s390/cpu topology:  change-topology
- monitor command
-Message-ID: <Y7/29cONlVoKukIP@redhat.com>
+Subject: Re: [PATCH v14 09/11] qapi/s390/cpu topology: monitor query topology
+ information
+Message-ID: <Y7/4rm9JYihUpLS1@redhat.com>
 Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-9-pmorel@linux.ibm.com>
+ <20230105145313.168489-10-pmorel@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20230105145313.168489-9-pmorel@linux.ibm.com>
+In-Reply-To: <20230105145313.168489-10-pmorel@linux.ibm.com>
 User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -69,83 +69,109 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 03:53:10PM +0100, Pierre Morel wrote:
-> The modification of the CPU attributes are done through a monitor
-> commands.
-> 
-> It allows to move the core inside the topology tree to optimise
-> the cache usage in the case the host's hypervizor previously
-> moved the CPU.
-> 
-> The same command allows to modifiy the CPU attributes modifiers
-> like polarization entitlement and the dedicated attribute to notify
-> the guest if the host admin modified scheduling or dedication of a vCPU.
-> 
-> With this knowledge the guest has the possibility to optimize the
-> usage of the vCPUs.
+On Thu, Jan 05, 2023 at 03:53:11PM +0100, Pierre Morel wrote:
+> Reporting the current topology informations to the admin through
+> the QEMU monitor.
 > 
 > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  qapi/machine-target.json |  29 ++++++++
->  include/monitor/hmp.h    |   1 +
->  hw/s390x/cpu-topology.c  | 141 +++++++++++++++++++++++++++++++++++++++
->  hmp-commands.hx          |  16 +++++
->  4 files changed, 187 insertions(+)
+>  qapi/machine-target.json | 66 ++++++++++++++++++++++++++++++++++
+>  include/monitor/hmp.h    |  1 +
+>  hw/s390x/cpu-topology.c  | 76 ++++++++++++++++++++++++++++++++++++++++
+>  hmp-commands-info.hx     | 16 +++++++++
+>  4 files changed, 159 insertions(+)
 > 
 > diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index 2e267fa458..75b0aa254d 100644
+> index 75b0aa254d..927618a78f 100644
 > --- a/qapi/machine-target.json
 > +++ b/qapi/machine-target.json
-> @@ -342,3 +342,32 @@
->                     'TARGET_S390X',
->                     'TARGET_MIPS',
->                     'TARGET_LOONGARCH64' ] } }
+> @@ -371,3 +371,69 @@
+>    },
+>    'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
+>  }
 > +
 > +##
-> +# @change-topology:
+> +# @S390CpuTopology:
 > +#
-> +# @core: the vCPU ID to be moved
-> +# @socket: the destination socket where to move the vCPU
-> +# @book: the destination book where to move the vCPU
+> +# CPU Topology information
+> +#
 > +# @drawer: the destination drawer where to move the vCPU
-
-This movement can be done while the guest OS is running ?
-What happens to guest OS apps ? Every I know will read
-topology once and assume it never changes at runtime.
-
-What's the use case for wanting to re-arrange topology in
-this manner ? It feels like its going to be a recipe for
-hard to diagnose problems, as much code in libvirt and apps
-above will assuming the vCPU IDs are assigned sequentially
-starting from node=0,book=0,drawer=0,socket=0,core=0,
-incrementing core, then incrementing socket, then
-incrementing drawer, etc.
-
+> +#
+> +# @book: the destination book where to move the vCPU
+> +#
+> +# @socket: the destination socket where to move the vCPU
+> +#
 > +# @polarity: optional polarity, default is last polarity set by the guest
+> +#
 > +# @dedicated: optional, if the vCPU is dedicated to a real CPU
 > +#
-> +# Modifies the topology by moving the CPU inside the topology
-> +# tree or by changing a modifier attribute of a CPU.
+> +# @origin: offset of the first bit of the core mask
 > +#
-> +# Returns: Nothing on success, the reason on failure.
+> +# @mask: mask of the cores sharing the same topology
 > +#
-> +# Since: <next qemu stable release, eg. 1.0>
+> +# Since: 8.0
 > +##
-> +{ 'command': 'change-topology',
-
-'set-cpu-topology'
-
+> +{ 'struct': 'S390CpuTopology',
 > +  'data': {
-> +      'core': 'int',
-> +      'socket': 'int',
-> +      'book': 'int',
 > +      'drawer': 'int',
-> +      '*polarity': 'int',
-> +      '*dedicated': 'bool'
+> +      'book': 'int',
+> +      'socket': 'int',
+> +      'polarity': 'int',
+> +      'dedicated': 'bool',
+> +      'origin': 'int',
+> +      'mask': 'str'
 > +  },
 > +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
 > +}
+> +
+> +##
+> +# @query-topology:
+> +#
+> +# Return information about CPU Topology
+> +#
+> +# Returns a @CpuTopology instance describing the CPU Toplogy
+> +# being currently used by QEMU.
+> +#
+> +# Since: 8.0
+> +#
+> +# Example:
+> +#
+> +# -> { "execute": "cpu-topology" }
+> +# <- {"return": [
+> +#     {
+> +#         "drawer": 0,
+> +#         "book": 0,
+> +#         "socket": 0,
+> +#         "polarity": 0,
+> +#         "dedicated": true,
+> +#         "origin": 0,
+> +#         "mask": 0xc000000000000000,
+> +#     },
+> +#    ]
+> +#   }
+> +#
+> +##
+> +{ 'command': 'query-topology',
+> +  'returns': ['S390CpuTopology'],
+> +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
+> +}
 
+IIUC, you're using @mask as a way to compress the array returned
+from query-topology, so that it doesn't have any repeated elements
+with the same data. I guess I can understand that desire when the
+core count can get very large, this can have a large saving.
+
+The downside of using @mask, is that now you require the caller
+to parse the string to turn it into a bitmask and expand the
+data. Generally this is considered a bit of an anti-pattern in
+QAPI design - we don't want callers to have to further parse
+the data to extract information, we want to directly consumable
+from the parsed JSON doc.
+
+We already have 'query-cpus-fast' wich returns one entry for
+each CPU. In fact why do we need to add query-topology at all.
+Can't we just add book-id / drawer-id / polarity / dedicated
+to the query-cpus-fast result ?
 
 With regards,
 Daniel
