@@ -2,149 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C973668813
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 01:04:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CECDE6687D6
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 00:30:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231718AbjAMAEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 19:04:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54240 "EHLO
+        id S232661AbjALXaB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 18:30:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232523AbjAMAEh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 19:04:37 -0500
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5863F101E3;
-        Thu, 12 Jan 2023 16:04:36 -0800 (PST)
-Received: by mail-pf1-x435.google.com with SMTP id y5so15007626pfe.2;
-        Thu, 12 Jan 2023 16:04:36 -0800 (PST)
+        with ESMTP id S232172AbjALXaA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 18:30:00 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C699544F2
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 15:29:59 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id a30so14953535pfr.6
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 15:29:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vMn7hkK3bLSkDVAJzCnb41079ImalXSJzjCGEjodsqA=;
-        b=b7Mhb6rCYs8+WWDA6jBKmxcZDYLgCfumHM3xZIhhReAKnBYHNU/9yaqb4YPs1F5fMh
-         upBsRCFo6euITn7IcfNmcDX7gLzmqvQ7MVzWOYzSGFndXXptMwRKL9DtSzHI0ex9+Qvz
-         xft0QSnl3flMHAhzR9ILbmZsBMYehM9wBk7uGTTd/zuVKILgxZXUlrnCkLzOwvJJmgMj
-         jJIHkOc+J6B+jRFZL9rh6/cZqQdlxqCWNEiTCpqd4pniNoEMoykel/q6Nx46x4rJpc1I
-         xh8NFIXl0Apout5eNBhbE5w+vOQdhyepcNNfpGj4WvP2Ef6RrxiXZp4m8VgGSv5LzS2/
-         N1VA==
+        bh=SHCvT7wXhmjcdrY7ZciTjWwkM6hHEFK0c3kr7hoBtAI=;
+        b=ctCtdF94uRfNtxj/svWJF4NSsYdcvFve3xy3/rA8RydeTZ7UjWoTdqG7u996S2CKI/
+         TehMGCzH40R8wzRHE6l/Qg7QIpGqgUVlPVx5uj/NZKO5kr67dJpoaxvPHITVJXyFOLHv
+         XI3GC6OsKxboq+O8C/C5L6uBMgxgdkOV1ixRpFq9POB1J6aJKL1Uv59KlorrracbhXqB
+         8typO4QQIPx+dtHB1y8GmaHatYoZsRzusYcwur5NGt7FKgqOdZb2xyUU4Agsx6TE09Wv
+         rHhRLzbjoiEUBC8V4zaAkLFmE/QRWlPIeog/ftIYZCpg54BM2sFvRygIwk8+bRY8eR4u
+         eCug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=vMn7hkK3bLSkDVAJzCnb41079ImalXSJzjCGEjodsqA=;
-        b=YurtN8U62NqIbagmep1f7/Ak2uzLoeQcqDMscuC8LoUpYAjyKFEnaMBD8515yyaqZ3
-         klrWI+6JQ7m+EB1weKlcUeNukkvSm/0tC30QysDqeiP4rY+EbUSalmoowUNF2qxmHP/r
-         nQZ6tbEKIiHUFeqkWL4wtR4jvqSvjYCcrUk0C2IOlF2Hp8/1IY8/YMAkNLyMp/7XEe2b
-         cf9jW3HiQBtpp0ZumpzCx7XYq7GLXdERg5T8zh/HWPlGsf1Hx2YuNLxcpdHyl3C6Vuw7
-         q2V+sjonF262DW0jlfD4631hVUw+Zw656nQw9gvTjIrN/cxsCFRKJU7ZCMIpo5AIQetu
-         m19g==
-X-Gm-Message-State: AFqh2kqIrMgEqMQM75ya4SUID92lgkEp7yoB1sAKYN6UR88OG3znrIGM
-        FAwQGoJSEReGFC6focGv6IY=
-X-Google-Smtp-Source: AMrXdXtoSVwx8a5QnSDfDdo6vZOtrGuGyhLOotfoZsEuv4hhzqBN6KwlHyhQPaAiSbZdkjr772MOgA==
-X-Received: by 2002:aa7:9d92:0:b0:58a:aaa3:f72e with SMTP id f18-20020aa79d92000000b0058aaaa3f72emr8569284pfq.6.1673568275659;
-        Thu, 12 Jan 2023 16:04:35 -0800 (PST)
-Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
-        by smtp.gmail.com with ESMTPSA id q20-20020aa79834000000b0058134d2df41sm11447068pfl.146.2023.01.12.16.04.34
+        bh=SHCvT7wXhmjcdrY7ZciTjWwkM6hHEFK0c3kr7hoBtAI=;
+        b=XTm8cmogIXahhUzxt7oTrVOyPqckb5/e771oBufxzZcBcN2MwkiQcRR7EZzhhekWXR
+         eQPfcJuSKsE98FAImck7YVM4ts5o69GtBNaUB+mM5vvf2rB0zXdEBXzUIrmB/1DBiAuF
+         jy1RBqd5FayDmAQzkSy5fcvLt89MswW4xEj5xTyg9mUt2YGX8zkH/kVtOFJ8DExivywy
+         NjzRMJYiGVLSaLaJppYqLAV5X3iNSGnBMeERTY/tZBoN9OKdy6VUeJonTXiirwavLaLj
+         /yFRdy9g9zzik1m10yvh9jxAO3td26puHwCt2/OOfY1O8g7OL+rSuYAx6RybjvLmV7Sr
+         af/g==
+X-Gm-Message-State: AFqh2kqfKBqUqXfyiT1tM/wP19BO9NqxTBOWSIVUjyoTWIHXiqnvbMRj
+        T2UR3i55hUv6NcCFufD1+YO5DA==
+X-Google-Smtp-Source: AMrXdXtbHXwlb7QCOirDHbnB+4X6BOCeHXpVkWh3Dab4zeJLYVt/vQh0K+r8OkjQmzQev1L+tq2hCQ==
+X-Received: by 2002:a05:6a00:4514:b0:574:8995:c0d0 with SMTP id cw20-20020a056a00451400b005748995c0d0mr1044208pfb.1.1673566198371;
+        Thu, 12 Jan 2023 15:29:58 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id m190-20020a6258c7000000b005821c109cebsm7829231pfb.199.2023.01.12.15.29.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jan 2023 16:04:35 -0800 (PST)
-Date:   Thu, 22 Dec 2022 06:12:29 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Paolo Abeni <pabeni@redhat.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Cong Wang <cong.wang@bytedance.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Eric Dumazet <edumazet@google.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next v9] virtio/vsock: replace virtio_vsock_pkt with
- sk_buff
-Message-ID: <Y6P1TawSu9xRIQMq@bullseye>
-References: <20230107002937.899605-1-bobby.eshleman@bytedance.com>
- <91593e9c8a475a26a465369f6caff86ac5d662e3.camel@redhat.com>
- <5042e5c6e57a3f99895616c891512e482bf6ed28.camel@redhat.com>
+        Thu, 12 Jan 2023 15:29:56 -0800 (PST)
+Date:   Thu, 12 Jan 2023 23:29:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>, pbonzini@redhat.com,
+        jgg@nvidia.com, cohuck@redhat.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] vfio: fix potential deadlock on vfio group lock
+Message-ID: <Y8CX8YwT/T9v4U/D@google.com>
+References: <20230112203844.41179-1-mjrosato@linux.ibm.com>
+ <20230112140517.6db5b346.alex.williamson@redhat.com>
+ <bce7912a-f904-b5a3-d234-c3e2c42d9e54@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5042e5c6e57a3f99895616c891512e482bf6ed28.camel@redhat.com>
-X-Spam-Status: No, score=1.3 required=5.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
+In-Reply-To: <bce7912a-f904-b5a3-d234-c3e2c42d9e54@linux.ibm.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
-X-Spam-Level: *
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 03:45:32PM +0100, Paolo Abeni wrote:
-> On Tue, 2023-01-10 at 09:36 +0100, Paolo Abeni wrote:
-> > On Sat, 2023-01-07 at 00:29 +0000, Bobby Eshleman wrote:
-> > > This commit changes virtio/vsock to use sk_buff instead of
-> > > virtio_vsock_pkt. Beyond better conforming to other net code, using
-> > > sk_buff allows vsock to use sk_buff-dependent features in the future
-> > > (such as sockmap) and improves throughput.
-> > > 
-> > > This patch introduces the following performance changes:
-> > > 
-> > > Tool/Config: uperf w/ 64 threads, SOCK_STREAM
-> > > Test Runs: 5, mean of results
-> > > Before: commit 95ec6bce2a0b ("Merge branch 'net-ipa-more-endpoints'")
-> > > 
-> > > Test: 64KB, g2h
-> > > Before: 21.63 Gb/s
-> > > After: 25.59 Gb/s (+18%)
-> > > 
-> > > Test: 16B, g2h
-> > > Before: 11.86 Mb/s
-> > > After: 17.41 Mb/s (+46%)
-> > > 
-> > > Test: 64KB, h2g
-> > > Before: 2.15 Gb/s
-> > > After: 3.6 Gb/s (+67%)
-> > > 
-> > > Test: 16B, h2g
-> > > Before: 14.38 Mb/s
-> > > After: 18.43 Mb/s (+28%)
-> > > 
-> > > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> > > Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-> > > Acked-by: Paolo Abeni <pabeni@redhat.com>
-> > > ---
-> > > 
-> > > Tested using vsock_test g2h and h2g.  I'm not sure if it is standard
-> > > practice here to carry Acks and Reviews forward to future versions, but
-> > > I'm doing that here to hopefully make life easier for maintainers.
-> > > Please let me know if it is not standard practice.
-> > 
-> > As Jakub noted, there is no clear rule for tag passing across different
-> > patch revisions.
-> > 
-> > Here, given the complexity of the patch and the not trivial list of
-> > changes, I would have preferred you would have dropped my tag.
-> > 
-> > > Changes in v9:
-> > > - check length in rx header
-> > > - guard alloactor from small requests
-> > > - squashed fix for v8 bug reported by syzbot:
-> > >     syzbot+30b72abaa17c07fe39dd@syzkaller.appspotmail.com
-> > 
-> > It's not clear to me what/where is the fix exactly, could you please
-> > clarify?
-> 
-> Reading the syzkaller report, it looks like iov_length() in
-> vhost_vsock_alloc_pkt() can not be trusted to carry a reasonable value.
-> 
-> As such, don't you additionally need to ensure/check that iov_length()
-> is greater or equal to sizeof(virtio_vsock_hdr) ?
+On Thu, Jan 12, 2023, Matthew Rosato wrote:
+> On 1/12/23 4:05 PM, Alex Williamson wrote:
+> > On Thu, 12 Jan 2023 15:38:44 -0500
+> > Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> >> @@ -344,6 +345,35 @@ static bool vfio_assert_device_open(struct vfio_device *device)
+> >>  	return !WARN_ON_ONCE(!READ_ONCE(device->open_count));
+> >>  }
+> >>  
+> >> +static bool vfio_kvm_get_kvm_safe(struct kvm *kvm)
+> >> +{
+> >> +	bool (*fn)(struct kvm *kvm);
+> >> +	bool ret;
+> >> +
+> >> +	fn = symbol_get(kvm_get_kvm_safe);
+> >> +	if (WARN_ON(!fn))
 
-Yep, the check is in virtio_vsock_alloc_skb() (a good central point that
-both vhost/virtio call into), returning NULL and allocating nothing if
-the size is nonsense.
+In a related vein to Alex's comments about error handling, this should not WARN.
+WARNing during vfio_kvm_put_kvm() makes sense, but the "get" is somewhat blind.
 
-Thanks,
-Bobby
+> >> +		return false;
+> >> +
+> >> +	ret = fn(kvm);
+> >> +
+> >> +	symbol_put(kvm_get_kvm_safe);
+> >> +
+> >> +	return ret;
+> >> +}
+> >> +
+> >> +static void vfio_kvm_put_kvm(struct kvm *kvm)
+> >> +{
+> >> +	void (*fn)(struct kvm *kvm);
+> >> +
+> >> +	fn = symbol_get(kvm_put_kvm);
+> >> +	if (WARN_ON(!fn))
+> >> +		return;
+> >> +
+> >> +	fn(kvm);
+> >> +
+> >> +	symbol_put(kvm_put_kvm);
+> >> +}
