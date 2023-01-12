@@ -2,164 +2,321 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4D94466727C
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 13:45:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08CA666728A
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 13:49:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229939AbjALMpr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 07:45:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36214 "EHLO
+        id S230408AbjALMtM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 07:49:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229569AbjALMpp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 07:45:45 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2046.outbound.protection.outlook.com [40.107.94.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B3C25F;
-        Thu, 12 Jan 2023 04:45:41 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kOYLFcHowxcle05aQMdUmWU1dDIwb6v945T1uvq0ggNXCi7P5z1A9TQ3Z7QkUAcDng3Ud6PvwNetCdJRWOYdGxCU+FImy32SE+vsLguD026YD8ZaSsuqvamS+kTRSeo88opXgpct2PHQKJoo7BQ9Nct+AzsMI+fFmC9431bu/+QPLX+4yM4X6vwb79nE/8+gh4F7iM2dcwiTxGkldwE/hr6J7eq52rXTy/4MBE7u+1TQwf1jYQGV6QUzavJZJLsQD6Erb5y6XQdx3StmQTJD4rtzhPEJvE7F4bGCjTI263iQ+h7tNf1OTkRYvR6KCnboV5Vll0bRXzoTv82U+QnraA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=w6TpwpFPR7yvYZV+7IuCA2Kf/fjOJsrI8EwxCYjuiaA=;
- b=fPyrRle/ByyjBEwdMrtQ8o0TqC2iG2lX1l0VMXheWruZ1HvXjRUIoWIPXOrGyj2sOTaWuEbUQHj6tZt3l/Oa2ogz+5Z6isKojZ5cPiYJv2vPYfLElhp2vQtQXRLwcFZe2xIN22HyTTUnrwCn5AX19AKDXgSXWVRbAlaIZpnmr+JsPAB9OD8eLuJ6u9aAy3wSNWko4ySrgN/tOyoY3tI5J0h9GWP39VoP4ECOm4InrzSvJQkp+aR6g4/qqOihcnk5ElqzWhu0ILHCYwbm0i4Owv+cd3KFdnTRm02TVT1CJn4qNpzDiHOlLwErh96fC1QNVrqVAdnqhXeUhJ2Jr3fkIA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=w6TpwpFPR7yvYZV+7IuCA2Kf/fjOJsrI8EwxCYjuiaA=;
- b=h1Ayt6+mJXahI5Xkv0nSIfK++5/rnCuh2viWsYn32f4l+eN2eSjGp/FS9a9AfwCktSn90zmxFz9xXPQVnhCxHw1Zb2IxERh2TmeURI0WTYDoqD4bLzG4QrSsj8/hDa3ve0fVsT3bNEGbbpewuCU2fWle+g88t6iPX0mnBRKEDh/lgQuZUiuzjcNW95bTWgn3m7GQDmMlD6J0NpKmeRXGvkg2zpKjw/vKABUzo8UUiTNachPTU7kipnLkUUjT6u+VT5193deP5krowkvVzRmIVUMiWCQt6TEC9Ovz442MDHmSTRr/3geKWr5+2p/wijaJxA+e9YKzOK/LRzXIoxDCKg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by DS0PR12MB7653.namprd12.prod.outlook.com (2603:10b6:8:13e::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Thu, 12 Jan
- 2023 12:45:39 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.6002.013; Thu, 12 Jan 2023
- 12:45:39 +0000
-Date:   Thu, 12 Jan 2023 08:45:38 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
-        alex.williamson@redhat.com, pbonzini@redhat.com, cohuck@redhat.com,
-        farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, akrowiak@linux.ibm.com,
-        jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: async kvm_destroy_vm for vfio devices
-Message-ID: <Y8AA8r5MzKQIF8I7@nvidia.com>
-References: <20230109201037.33051-1-mjrosato@linux.ibm.com>
- <20230109201037.33051-2-mjrosato@linux.ibm.com>
- <Y78UCz5oeuntSQtK@google.com>
- <Y78Wk2/P5+gLMdpk@nvidia.com>
- <Y78hzsHiwaFpL60+@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y78hzsHiwaFpL60+@google.com>
-X-ClientProxiedBy: MN2PR17CA0029.namprd17.prod.outlook.com
- (2603:10b6:208:15e::42) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+        with ESMTP id S231379AbjALMs3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 07:48:29 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3920D4A958;
+        Thu, 12 Jan 2023 04:48:28 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30CCVSN9032396;
+        Thu, 12 Jan 2023 12:48:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=x/yd7iWJ6qTiANjCFcEAOKc6MU3jjvLtKOzoy6Qz3o0=;
+ b=fWJUU8kcdEcjL9Q2APfi7Mt9xDRlNFQc77iQW0azKE9e36j3/5+puLIc6Tz4jJXLkV8b
+ qvJsutNv70Rk2NFQ5AS44UkbNVF6Hyq5wzrfKTHRsBci0Gx/BBwcdAj3DYa/UkAFQzo9
+ qBPa2Kz6CIp3tMnrQWPn6PnrBuzowMgGCadFBSZpNoVtJ4lY0Sc3OwdX40h+x4NaAFgB
+ Ftf8MkBXFOBJJHsYVxT/aurHWof2WNnjhF5Ncx+RFspxrbHoYsjkGukos0Q/pk9MXaNM
+ HszMZTaApqU9Qos29Qzbr9pVoM/D/PY6SDVVH1CgQToaPTsPQL9y2FGe5OG4mFb9knWm Tg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n2j9q0b4f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Jan 2023 12:48:24 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30CCWO0X007593;
+        Thu, 12 Jan 2023 12:48:23 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n2j9q0b3t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Jan 2023 12:48:23 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30C3RLAk004503;
+        Thu, 12 Jan 2023 12:48:21 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n1kkytfam-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 Jan 2023 12:48:20 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30CCmHYc22675792
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 12 Jan 2023 12:48:17 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6323F2004D;
+        Thu, 12 Jan 2023 12:48:17 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0F2BF2004B;
+        Thu, 12 Jan 2023 12:48:17 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.152.120])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 12 Jan 2023 12:48:17 +0000 (GMT)
+Message-ID: <0d890ba62e5117756445323def2096e5e39b2351.camel@linux.ibm.com>
+Subject: Re: [PATCH v5 01/10] KVM: s390: Extend MEM_OP ioctl by storage key
+ checked cmpxchg
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+Date:   Thu, 12 Jan 2023 13:48:16 +0100
+In-Reply-To: <4c5a7fd1-9996-a191-dd93-087554e93923@linux.ibm.com>
+References: <20230110202632.2533978-1-scgl@linux.ibm.com>
+         <20230110202632.2533978-2-scgl@linux.ibm.com>
+         <02b34aa1-d71a-99cc-77db-3613f881b1a8@linux.ibm.com>
+         <bcc971f8acc670bb05e44451f027458dcea1f095.camel@linux.ibm.com>
+         <4c5a7fd1-9996-a191-dd93-087554e93923@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|DS0PR12MB7653:EE_
-X-MS-Office365-Filtering-Correlation-Id: 734563cc-8897-432f-bc6d-08daf49ae8d7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PghqCEpp6bB48sV/220GE7RASbiVpBMHewP9tILCxzi15/5PsNKuzs3ZcFajSf5Dn8JbPNnrSErYqKbva+fEmUIfuAzxQVOBCo9rY43LKFSuKJHOsMzlvSGeSD7yHw49VBLw6crDcmAyrijSYAljINrRTNHMThEKLvyXx7UC1Ek9RDnXuX0TPRHxdZLWVowRBAUgmAddviv6vWr8Z7RauLAViaGpuEWSQrphKLF5tTnWCS23kSEAS1xryOwkPNtfZAs3sdl42Wr3ohbybT98yqe0g2wg3UBrQpoQlY0nxEY3gvqjt//36coZM8hWt4Gy3APdJuTeNsEfON+5TKoCEWIiQ7+DVEc1HGc0+rVh6Imwr4tXMZjEObdiAU4TBe5pffJetGyN3LymjOcHI1vffC0TZqHjVpim4T4Ypa/HxfhDnDI7330LzeympTdgCWzZpAEZe9Sw4UvreRFFHEib9x0xr3i2OyTGN0/VQ+18MDU/y1L8E3MaG5lrmpKizVx2Q3Ls5PotRKu6i32HkcuMT6+TRlmE160Sp6Ak+dP3fl/uOvoQV5EUEdFJukt7DpjAUTCnlJ5HnUq3qbky2YAoBZnoANfHjRSZMXDo5pItLGmcJpUvffLhxqM+AO/4NujtpCjRQ+0XXhyZ3SxVHiu4/g==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(366004)(136003)(346002)(39860400002)(396003)(451199015)(86362001)(36756003)(7416002)(8936002)(6486002)(5660300002)(66946007)(4326008)(41300700001)(83380400001)(6506007)(478600001)(26005)(2616005)(6512007)(186003)(66476007)(6916009)(316002)(8676002)(66556008)(38100700002)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?54mWQ92qST0akzdhoVEp49BocPKUwZe/Ir7PGl5zkfdFY9oQ8rX7d7CKHl1+?=
- =?us-ascii?Q?0npjt6kRA+5enHLkCTkvNX5xYWCS2MV/S144uNEM8J4kMziAfiZ84GAcPyXK?=
- =?us-ascii?Q?IgzHvOXvIZPDU/zCvFLTfyDupaYLxafk/BwjO8zWWdohDtVnvAAQHD9pwh8i?=
- =?us-ascii?Q?AoIzZ0zzwq2ubX4kDrsAnw9w8y7XdSX0gs/QgoRJrt6FemFu1CmyCVD8LoRq?=
- =?us-ascii?Q?wzpXKfJNR8TDZYLNJhVjWBV7QKo8xjpp4BprRNooOApgk08vKP02T5LU4i1M?=
- =?us-ascii?Q?sasaYiX0ulpmV8BuVrZ/HaG62R72jYOy8X3G+v+K+bHVo1ektiznu0+x+wZw?=
- =?us-ascii?Q?4r2U09ePU82bj5KUWmJe+ZEuw1sqpXhMqrUGz2hB53nRhEkRibOW4hlxWzQn?=
- =?us-ascii?Q?INaExAwS+AG17wMIlRsGtzu+uR6AVxOpF/pEWOiLpbFRdqjbPpzrDoM/W4T5?=
- =?us-ascii?Q?b3k8/BCU7tbSvBlxnPqZHhcO/TkAtOl2sduMxDKgaN4ELnmZvBJmPaSj0BD5?=
- =?us-ascii?Q?7p6X/gTrpZNOcsvAA+84Q+wd5GYLaqf5IuWLm7wX4wN0nqYXtxv56R66539b?=
- =?us-ascii?Q?Un8ZW+oqVw6cUHtL/NqyE1fuvUrHBdtAnNTsi73sC0eFn8M/tCVFf1TZU+dp?=
- =?us-ascii?Q?i4iHkkU82LYvVynUQu8FzNyJt8Gnhvtc+aQT8fg1IDOcshmItM8T22PpdU3G?=
- =?us-ascii?Q?9fPNqRyCxZOl1bogCWsftCfj0l0KDBzoBTIqCCDLuaEe1Ecd+YlQXI6DthXM?=
- =?us-ascii?Q?JneFR2GotFWRtWeOdwYxLz7iE1UvDm7MDti7OkyTgKX9FIhs5UtjinAhSdvE?=
- =?us-ascii?Q?TkY5x+47pIkeo6ieRlkx2DyrX4U+pjlrpYZ6RH5wzL2jKYIRQFF0jrjCw4xO?=
- =?us-ascii?Q?JyYnb7LZcoqXLXjKvgWO5TtANi1vgMo6CY7zQDeMyQFdByVPW1wkXUKXm4Ii?=
- =?us-ascii?Q?4JCzcDvMDlY8RwKXwQAAjHSYkKsc2T2DsyGZt05c9rZ3tlW8G4gTBGIdM7Cd?=
- =?us-ascii?Q?sovScu27S+sE59AIhrazm+jjoV0AjVq3lEvBYHAVjUHDajtpsIJJ2UuZMyr7?=
- =?us-ascii?Q?DnwQ1aTubjWtW1vqOzvu0lHpy7V5/ODzTLAaXiNYTrMJH/nv+ZbkFHPXStfl?=
- =?us-ascii?Q?wsTsKQYYOIoYC6Pq6LNEcXpMHsDQXI/z9cLRuboaDiWak8Me+GcKl2O5/mvW?=
- =?us-ascii?Q?oQFDAZgfBCAjzQGWnXiwGVFJfpPMnVTBeFYnyACWaIuxQ+5j0dEDMIMHddvW?=
- =?us-ascii?Q?OHjq4VurA2X4J2vwi4o4jszYO/Y2AN8vxSdpprE9JdGSALAo3kqdP/vGOFOi?=
- =?us-ascii?Q?joCrjMFUZr3sIE0mk/QohVdcF2O96eunhmhWfL/qDUPnsEvqO9gadlZuOPSf?=
- =?us-ascii?Q?Es7FxHes4RSj8SX3pSrQ27almg88G7Cb2DEEuXJsbNGjuRN+ZwVwR+TnJ+4I?=
- =?us-ascii?Q?vS6tMG45a/j3c9wSJS5RPzqdqkCgZxkpHeGvk2fqDUuDiZgCbMcSIq06KfMV?=
- =?us-ascii?Q?CYyi2umuN1Kq3rzTik5WvM/Wn7cztk1blB40mpGpI6SBReZLbcf+7S1xRXac?=
- =?us-ascii?Q?XaOFypOtYUvA50RLp4tTzT6a5CGnN55V08xx729R?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 734563cc-8897-432f-bc6d-08daf49ae8d7
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2023 12:45:39.6189
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2kepHIonZJlzhi2KscXV5i31gjXeKRJLPgJLKW4+QrMDbazXhG0l3jc7LVOhcLhV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7653
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: hVWLBcPSQo0LCgx_RgCf_160ScAaEkiv
+X-Proofpoint-ORIG-GUID: Zs2Md71SUDY57Nxr4qyuGrahlanRfpFA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
+ definitions=2023-01-12_07,2023-01-12_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0 mlxlogscore=999
+ adultscore=0 phishscore=0 malwarescore=0 clxscore=1015 mlxscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301120089
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 11, 2023 at 08:53:34PM +0000, Sean Christopherson wrote:
-> On Wed, Jan 11, 2023, Jason Gunthorpe wrote:
-> > On Wed, Jan 11, 2023 at 07:54:51PM +0000, Sean Christopherson wrote:
-> > 
-> > > Something feels off.  If KVM's refcount is 0, then accessing device->group->kvm
-> > > in vfio_device_open() can't happen unless there's a refcounting bug somewhere.
-> > 
-> > The problem is in close, not open.
-> 
-> The deadlock problem is, yes.  My point is that if group_lock needs to be taken
-> when nullifying group->kvm during kvm_vfio_destroy(), then there is also a refcounting
-> prolem with respect to open().  If there is no refcounting problem, then nullifying
-> group->kvm during kvm_vfio_destroy() is unnecessary (but again, I doubt this is
-> the case).
+On Wed, 2023-01-11 at 18:26 +0100, Janosch Frank wrote:
+> On 1/11/23 16:19, Janis Schoetterl-Glausch wrote:
+> > On Wed, 2023-01-11 at 10:35 +0100, Janosch Frank wrote:
+> > > On 1/10/23 21:26, Janis Schoetterl-Glausch wrote:
+> > > > User space can use the MEM_OP ioctl to make storage key checked rea=
+ds
+> > > > and writes to the guest, however, it has no way of performing atomi=
+c,
+> > > > key checked, accesses to the guest.
+> > > > Extend the MEM_OP ioctl in order to allow for this, by adding a cmp=
+xchg
+> > > > mode. For now, support this mode for absolute accesses only.
+> > > >=20
+> > > > This mode can be use, for example, to set the device-state-change
+> > > > indicator and the adapter-local-summary indicator atomically.
+> > > >=20
+> > > > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> > > > ---
+> > > >    include/uapi/linux/kvm.h |   7 +++
+> > > >    arch/s390/kvm/gaccess.h  |   3 ++
+> > > >    arch/s390/kvm/gaccess.c  | 102 +++++++++++++++++++++++++++++++++=
+++++++
+> > > >    arch/s390/kvm/kvm-s390.c |  41 +++++++++++++++-
+> > > >    4 files changed, 151 insertions(+), 2 deletions(-)
+> > > >=20
+> > > > diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> > > > index 55155e262646..452f43c1cc34 100644
+> > > > --- a/include/uapi/linux/kvm.h
+> > > > +++ b/include/uapi/linux/kvm.h
+> > > > @@ -583,6 +583,8 @@ struct kvm_s390_mem_op {
+> > > >    		struct {
+> > > >    			__u8 ar;	/* the access register number */
+> > > >    			__u8 key;	/* access key, ignored if flag unset */
+> > > > +			__u8 pad1[6];	/* ignored */
+> > > > +			__u64 old_addr;	/* ignored if flag unset */
+>=20
+> Which flag?
+> Maybe that would be clearer with a cmpxchg_ prefix.
 
-IIRC the drivers are supposed to use one of the refcount not zero
-incrs to counteract this, but I never checked they do..
+Yes.
+>=20
+> > > >    		};
+> > > >    		__u32 sida_offset; /* offset into the sida */
+> > > >    		__u8 reserved[32]; /* ignored */
+> > > > @@ -599,6 +601,11 @@ struct kvm_s390_mem_op {
+> > > >    #define KVM_S390_MEMOP_F_CHECK_ONLY		(1ULL << 0)
+> > > >    #define KVM_S390_MEMOP_F_INJECT_EXCEPTION	(1ULL << 1)
+> > > >    #define KVM_S390_MEMOP_F_SKEY_PROTECTION	(1ULL << 2)
+> > > > +#define KVM_S390_MEMOP_F_CMPXCHG		(1ULL << 3)
+> > > > +/* flags specifying extension support */
+>=20
+> via KVM_CAP_S390_MEM_OP_EXTENSION
+>=20
+> This is part of the CAP api but is nestled between the memop api.
+> I'm not entirely happy about that.
 
-Yi is working on a patch to change things so vfio drops the kvm
-pointer when the kvm file closes, not when the reference goes to 0
-to avoid a refcount cycle problem which should also solve that.
+Yes, I wasn't sure where to put it.
+>=20
+> > >=20
+> > > Would that fit behind the bit shifts without getting into the "line t=
+oo
+> > > long" territory?
+> >=20
+> > Bit shifts or the next line?
+>=20
+> Seems like I didn't see that this is grouped to the next line so forget=
+=20
+> about my comment.
+>=20
+> > >=20
+> > > \n please
+> >=20
+> > Not sure about all that, this is the way it looks right now:
+> >=20
+> > /* types for kvm_s390_mem_op->op */
+> > #define KVM_S390_MEMOP_LOGICAL_READ     0
+> > #define KVM_S390_MEMOP_LOGICAL_WRITE    1
+> > #define KVM_S390_MEMOP_SIDA_READ        2
+> > #define KVM_S390_MEMOP_SIDA_WRITE       3
+> > #define KVM_S390_MEMOP_ABSOLUTE_READ    4
+> > #define KVM_S390_MEMOP_ABSOLUTE_WRITE   5
+>=20
+> > /* flags for kvm_s390_mem_op->flags */
+> > #define KVM_S390_MEMOP_F_CHECK_ONLY             (1ULL << 0)
+> > #define KVM_S390_MEMOP_F_INJECT_EXCEPTION       (1ULL << 1)
+> > #define KVM_S390_MEMOP_F_SKEY_PROTECTION        (1ULL << 2)
+> > #define KVM_S390_MEMOP_F_CMPXCHG                (1ULL << 3)
+>=20
+> > /* flags specifying extension support */
+>=20
+> > #define KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG 0x2
+>=20
+> #define KVM_S390_MEMOP_EXTENSION_CAP_ABSOLUTE 1 << 0
 
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index 6e8804fe0095..b3a84d65baa6 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -772,7 +772,12 @@ static struct file *vfio_device_open(struct vfio_device *device)
->  		 * reference and release it during close_device.
->  		 */
->  		mutex_lock(&device->group->group_lock);
-> -		device->kvm = device->group->kvm;
-> +
-> +		if (device->kvm_ops && device->group->kvm) {
-> +			ret = device->kvm_ops->get_kvm(device->group->kvm);
+Unfortunately, I designed this badly for the first memop extension,
+the absolute memop is supported if extension_cap > 0.
+But we can always also set bit 0 in that case.
 
-At this point I'd rather just use the symbol get stuff like kvm does
-and call the proper functions.
+> #define KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG 1 << 1
+>=20
+> Or maybe BASE instead of ABSOLUTE
+>=20
+>=20
+> > /* Non program exception return codes (pgm codes are 16 bit) */
+> > #define KVM_S390_MEMOP_R_NO_XCHG                (1 << 16)
+> >=20
+> > Seems consistent to me.
+>=20
+> Consistent and hardly readable once you add two more "categories" of valu=
+es.
 
-Jason
+I'll add newlines then.
+>=20
+> > >=20
+> > > > +/* Non program exception return codes (pgm codes are 16 bit) */
+> > > > +#define KVM_S390_MEMOP_R_NO_XCHG		(1 << 16)
+> > > >   =20
+> > > >    /* for KVM_INTERRUPT */
+> > > >    struct kvm_interrupt {
+> > > > diff --git a/arch/s390/kvm/gaccess.h b/arch/s390/kvm/gaccess.h
+> > > > index 9408d6cc8e2c..92a3b9fb31ec 100644
+> > > > --- a/arch/s390/kvm/gaccess.h
+> > > > +++ b/arch/s390/kvm/gaccess.h
+> > > > @@ -206,6 +206,9 @@ int access_guest_with_key(struct kvm_vcpu *vcpu=
+, unsigned long ga, u8 ar,
+> > > >    int access_guest_real(struct kvm_vcpu *vcpu, unsigned long gra,
+> > > >    		      void *data, unsigned long len, enum gacc_mode mode);
+> > > >   =20
+> > > > +int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len=
+,
+> > > > +			       __uint128_t *old, __uint128_t new, u8 access_key);
+> > > > +
+> > > >    /**
+> > > >     * write_guest_with_key - copy data from kernel space to guest s=
+pace
+> > > >     * @vcpu: virtual cpu
+> > > > diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
+> > > > index 0243b6e38d36..6165e761a637 100644
+> > > > --- a/arch/s390/kvm/gaccess.c
+> > > > +++ b/arch/s390/kvm/gaccess.c
+> > > > @@ -1161,6 +1161,108 @@ int access_guest_real(struct kvm_vcpu *vcpu=
+, unsigned long gra,
+> > > >    	return rc;
+> > > >    }
+> > > >   =20
+> > > > +/**
+> > > > + * cmpxchg_guest_abs_with_key() - Perform cmpxchg on guest absolut=
+e address.
+> > > > + * @kvm: Virtual machine instance.
+> > > > + * @gpa: Absolute guest address of the location to be changed.
+> > > > + * @len: Operand length of the cmpxchg, required: 1 <=3D len <=3D =
+16. Providing a
+> > > > + *       non power of two will result in failure.
+> > > > + * @old_addr: Pointer to old value. If the location at @gpa contai=
+ns this value, the
+> > > > + *         exchange will succeed. After calling cmpxchg_guest_abs_=
+with_key() *@old
+> > > > + *         contains the value at @gpa before the attempt to exchan=
+ge the value.
+> > > > + * @new: The value to place at @gpa.
+> > > > + * @access_key: The access key to use for the guest access.
+> > > > + *
+> > > > + * Atomically exchange the value at @gpa by @new, if it contains *=
+@old.
+> > > > + * Honors storage keys.
+> > > > + *
+> > > > + * Return: * 0: successful exchange
+> > > > + *         * 1: exchange unsuccessful
+> > > > + *         * a program interruption code indicating the reason cmp=
+xchg could
+> > > > + *           not be attempted
+> > >=20
+> > >   > 1 Access related program interruption code indicating the reason
+> > > cmpxchg could not be attempted
+> > >=20
+> > > < 1 Kernel / input data error codes
+> >=20
+> > I think I'll do it like I said in the email to Thomas, that way it's ma=
+ximally
+> > explicit about the return values one might get.
+>=20
+> This shows me that we're overloading the return value way too much.
+> Not just of this function but also of the memop with=20
+> KVM_S390_MEMOP_R_NO_XCHG.
+>=20
+> A return of < 0, 0, 1 and a passed int reference for the PGM codes=20
+> that's updated if the rc is 1 would make this clearer.
+
+The return code is complicated, using effectively two return codes does cle=
+anly
+separate the possible error types, but also means one has to check two retu=
+rn codes.
+I'm fine with that, but in that case it shouldn't be the PGM code that gets=
+ separated,
+but the success of the xchg. So <0 kernel error, >0 PGM code, like everywhe=
+re else
+and =3D=3D0 -> check *success.
+>=20
+> Btw. could a user specify check + cmpxchange as the flags?
+> Are we checking that and I've missed to see such a check?
+
+Yes, what that does is basically to check if the cmpxchg args are valid.
+Then it checks if the target address is writable.
+Not much code necessary for that other than not doing the cmpxchg if check_=
+only
+is set.
+>=20
+>=20
+> I don't like that we throw in yet another feature as a flag thereby=20
+> blowing up kvm_s390_vm_mem_op() and adding new branches to it. I'll need=
+=20
+> to think about that some more.
+>=20
+[...]
+
