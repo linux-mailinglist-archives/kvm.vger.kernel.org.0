@@ -2,181 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B7906671D6
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 13:14:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CF66166725D
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 13:39:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230027AbjALMOD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 07:14:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47198 "EHLO
+        id S230135AbjALMjA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 07:39:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235311AbjALMNh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 07:13:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA7A0CFF
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 04:10:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673525431;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-         content-type:content-type:in-reply-to:in-reply-to:  references:references;
-        bh=m7ctaQSqwJCI8HWipVGgCP7kRuDp6u50d7Qpz/siyqg=;
-        b=boYypGOIer8qnRi+GRIu8AkzfJuZBhyI9ghZkP/36s9AxEwJwldCiTcSNso17lGpenySgG
-        9FNNx1/x2HPeTVOaZhE1EGDgzKwyNrcbvDq3R4YkyrwaI1c7Kkb6F+2gzQB0Ys4/7+86b+
-        sK/UT5IvW86ohYT6ic92lYuSE8x/+9E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-655-6czC9ptYO4qvkpmqbRPPwg-1; Thu, 12 Jan 2023 07:10:28 -0500
-X-MC-Unique: 6czC9ptYO4qvkpmqbRPPwg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S230124AbjALMi4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 07:38:56 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C25363E85F
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 04:38:55 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2D3C4802C1C;
-        Thu, 12 Jan 2023 12:10:27 +0000 (UTC)
-Received: from redhat.com (unknown [10.33.36.222])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC12E140EBF5;
-        Thu, 12 Jan 2023 12:10:24 +0000 (UTC)
-Date:   Thu, 12 Jan 2023 12:10:22 +0000
-From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>
-Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
-        borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        frankja@linux.ibm.com, clg@kaod.org
-Subject: Re: [PATCH v14 09/11] qapi/s390/cpu topology: monitor query topology
- information
-Message-ID: <Y7/4rm9JYihUpLS1@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-10-pmorel@linux.ibm.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5F48060AB2
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 12:38:55 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5A6DC433D2;
+        Thu, 12 Jan 2023 12:38:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673527134;
+        bh=+LEeLMYkd9RkMQSIuh1SSyTKV795y+lqyBKTQSXPkNA=;
+        h=From:To:Cc:Subject:Date:From;
+        b=b42dJms9soLm/YDE2LeMzTf4lI5WlvRJ96yQfMOuoPnmjY2QXoomjBnc/9Gu797U9
+         zbDCKso8jzmby21abrxmUhzzE9WPOHPw8U/nNUQdx4DXy1lNIvSJpzmuvZ9UOjeqQ4
+         ZwbAGlgVU8c0QdsnmCXLqx+3LKIDvo5Ljpkd8urk51rai4MFkovdgoCuabIIuYhSzU
+         xf2tmzMHKP0p8xSdCWFDbvKw1j9ONIi4caM7IwB7HA9zwrsHg3TcEvTSE6h0rNqI+H
+         VbmouXa09RwN/m0qnVv+8BFapYbYOQDk8Wtg2GEL/+bhb/8i/di7YcVzUKMoTVIPGU
+         aF1nBpbTGnDJA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pFwr6-001BBa-F2;
+        Thu, 12 Jan 2023 12:38:52 +0000
+From:   Marc Zyngier <maz@kernel.org>
+To:     linux-arm-kernel@lists.infradead.org,
+        <kvmarm@lists.cs.columbia.edu>, <kvmarm@lists.linux.dev>,
+        kvm@vger.kernel.org
+Cc:     D Scott Phillips <scott@os.amperecomputing.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 0/3] KVM: arm64: timer fixes and optimisations
+Date:   Thu, 12 Jan 2023 12:38:26 +0000
+Message-Id: <20230112123829.458912-1-maz@kernel.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20230105145313.168489-10-pmorel@linux.ibm.com>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu, kvmarm@lists.linux.dev, kvm@vger.kernel.org, scott@os.amperecomputing.com, gankulkarni@os.amperecomputing.com, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 03:53:11PM +0100, Pierre Morel wrote:
-> Reporting the current topology informations to the admin through
-> the QEMU monitor.
-> 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> ---
->  qapi/machine-target.json | 66 ++++++++++++++++++++++++++++++++++
->  include/monitor/hmp.h    |  1 +
->  hw/s390x/cpu-topology.c  | 76 ++++++++++++++++++++++++++++++++++++++++
->  hmp-commands-info.hx     | 16 +++++++++
->  4 files changed, 159 insertions(+)
-> 
-> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
-> index 75b0aa254d..927618a78f 100644
-> --- a/qapi/machine-target.json
-> +++ b/qapi/machine-target.json
-> @@ -371,3 +371,69 @@
->    },
->    'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
->  }
-> +
-> +##
-> +# @S390CpuTopology:
-> +#
-> +# CPU Topology information
-> +#
-> +# @drawer: the destination drawer where to move the vCPU
-> +#
-> +# @book: the destination book where to move the vCPU
-> +#
-> +# @socket: the destination socket where to move the vCPU
-> +#
-> +# @polarity: optional polarity, default is last polarity set by the guest
-> +#
-> +# @dedicated: optional, if the vCPU is dedicated to a real CPU
-> +#
-> +# @origin: offset of the first bit of the core mask
-> +#
-> +# @mask: mask of the cores sharing the same topology
-> +#
-> +# Since: 8.0
-> +##
-> +{ 'struct': 'S390CpuTopology',
-> +  'data': {
-> +      'drawer': 'int',
-> +      'book': 'int',
-> +      'socket': 'int',
-> +      'polarity': 'int',
-> +      'dedicated': 'bool',
-> +      'origin': 'int',
-> +      'mask': 'str'
-> +  },
-> +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
-> +}
-> +
-> +##
-> +# @query-topology:
-> +#
-> +# Return information about CPU Topology
-> +#
-> +# Returns a @CpuTopology instance describing the CPU Toplogy
-> +# being currently used by QEMU.
-> +#
-> +# Since: 8.0
-> +#
-> +# Example:
-> +#
-> +# -> { "execute": "cpu-topology" }
-> +# <- {"return": [
-> +#     {
-> +#         "drawer": 0,
-> +#         "book": 0,
-> +#         "socket": 0,
-> +#         "polarity": 0,
-> +#         "dedicated": true,
-> +#         "origin": 0,
-> +#         "mask": 0xc000000000000000,
-> +#     },
-> +#    ]
-> +#   }
-> +#
-> +##
-> +{ 'command': 'query-topology',
-> +  'returns': ['S390CpuTopology'],
-> +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
-> +}
+Having been busy on the NV front the past few weeks, I collected a
+small set of fixes/improvements that make sense even outside of NV.
 
-IIUC, you're using @mask as a way to compress the array returned
-from query-topology, so that it doesn't have any repeated elements
-with the same data. I guess I can understand that desire when the
-core count can get very large, this can have a large saving.
+The first one is an interesting fix (actually a regression introduced
+by the initial set of NV-related patches) reported by Scott and
+Ganapatrao, where we fail to recognise that a timer that has fired
+doesn't need to fire again. And again.
 
-The downside of using @mask, is that now you require the caller
-to parse the string to turn it into a bitmask and expand the
-data. Generally this is considered a bit of an anti-pattern in
-QAPI design - we don't want callers to have to further parse
-the data to extract information, we want to directly consumable
-from the parsed JSON doc.
+The second patch is a definite performance improvement on nVHE systems
+when accessing the emulated physical timer. It also makes NV bearable
+in some conditions (with FEAT_ECV, for example).
 
-We already have 'query-cpus-fast' wich returns one entry for
-each CPU. In fact why do we need to add query-topology at all.
-Can't we just add book-id / drawer-id / polarity / dedicated
-to the query-cpus-fast result ?
+The last patch is more of a sanity check. There is no reason to BUG()
+if we can avoid it at all and kill the guest instead!
 
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+These patches are 6.3 candidates, although the first one could be a
+6.2 fix.
 
+	M.
+
+Marc Zyngier (3):
+  KVM: arm64: Don't arm a hrtimer for an already pending timer
+  KVM: arm64: Reduce overhead of trapped timer sysreg accesses
+  KVM: arm64: timers: Don't BUG() on unhandled timer trap
+
+ arch/arm64/kvm/arch_timer.c | 77 +++++++++++++++++++++++--------------
+ arch/arm64/kvm/sys_regs.c   |  4 +-
+ 2 files changed, 52 insertions(+), 29 deletions(-)
