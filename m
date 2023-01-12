@@ -2,224 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58364666BD0
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 08:49:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 81440666BF0
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 09:01:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236520AbjALHtL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 02:49:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36354 "EHLO
+        id S231469AbjALIBM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 03:01:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239211AbjALHtC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 02:49:02 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF4C141D5C;
-        Wed, 11 Jan 2023 23:48:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1673509736; x=1705045736;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=vMUmhc0Tn/B+KYMP/tYkNeijDWua0V32T+gVHgjqFtE=;
-  b=Tv0DG1qvtRg0r8tFtBxqawtJqZNEKeq8JfZnZalhvI5OyrhjRFVeXCZw
-   YUqVJDU+ioztd4gWPABdM6d5NCrfaYLQoKXqQ/7saf/RvaSqRY3fL+72F
-   VJXKjHSKa95fISy4X6zCUHo8i1vmfae7Te09V7CQ/vB5A8LlmBh4Qjw/M
-   pLFSkRkJNxtub+65pv130YGtm1/ETXUrBqhutcVNY/JBJscjTiLKoPBUJ
-   o8KWVuJ2jecsE42cz9AgGWrCM1Tt03HSPAP5fpfg13MqaKkVTIdkU1kcL
-   KzEEnZVx7sxBYe8vpRlOwoldvBb/3En7Z3SISe1cX+KwqeBs24A2HCIBo
-   g==;
-X-IronPort-AV: E=Sophos;i="5.96,319,1665471600"; 
-   d="asc'?scan'208";a="131964178"
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 12 Jan 2023 00:48:54 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 12 Jan 2023 00:48:54 -0700
-Received: from wendy (10.10.115.15) by chn-vm-ex01.mchp-main.com
- (10.10.85.143) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16 via Frontend
- Transport; Thu, 12 Jan 2023 00:48:52 -0700
-Date:   Thu, 12 Jan 2023 07:48:29 +0000
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     Jisheng Zhang <jszhang@kernel.org>
-CC:     Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        <linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <kvm@vger.kernel.org>, <kvm-riscv@lists.infradead.org>,
-        Guo Ren <guoren@kernel.org>,
-        Andrew Jones <ajones@ventanamicro.com>
-Subject: Re: [PATCH v3 10/13] riscv: alternative: patch alternatives in the
- vDSO
-Message-ID: <Y7+7TRv7+V0nKNiZ@wendy>
-References: <20230111171027.2392-1-jszhang@kernel.org>
- <20230111171027.2392-11-jszhang@kernel.org>
+        with ESMTP id S231278AbjALIBH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 03:01:07 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D2FB5FFB
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 00:00:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673510418;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4bxeZcxobHQBs+caVgx7QtjuGc0zW2B7T+w1D6B7yIs=;
+        b=hzPi8dN91BaMEu2SIpJrLvlE6mHj4hVJTHP9hzhEHH4LmJNH0PkxtJ1qefn80yJ207VBtl
+        6w2atXDz/YAvW4fDUWOb6wev3d6a7eRk67SnszqTc7BNxABAzEOUSKMn4GVmX0O4ah2pGy
+        cnrwxIH2oim4RVbuZmPnlPOwiaxZCY0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-335-mzbBsdrqN4u49VuPcHL0Sw-1; Thu, 12 Jan 2023 03:00:16 -0500
+X-MC-Unique: mzbBsdrqN4u49VuPcHL0Sw-1
+Received: by mail-wr1-f69.google.com with SMTP id k18-20020adfb352000000b002bdd0a7a2b5so272945wrd.0
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 00:00:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4bxeZcxobHQBs+caVgx7QtjuGc0zW2B7T+w1D6B7yIs=;
+        b=7U8T/Vf+4u8yKw9T9QsvR+vIpLdw7tisVARcPE+Vw9QhklzupKFXcEAcYtdffeHDl4
+         772Ml4WCSfmFLa34KHS4JPKN28M8tf3beZvthkzlFlfc/vME6BZD5luZMQBXaUJ4IxrO
+         zIwPVH31r88GdbWsCoE4WWJLx5n/D6R45XEMjYXsP6jWsi3IBSDn+tjKacvaERwSbRsb
+         orNiGZ34ktsSt2BLsVNNDqSewe6ve2jcv1SmUHScSyz1Ka6JxOXmrbA/aqHmDNKQQPc6
+         IfIotQdlx/4JMrcS2rGYwTWi6nt5nINJy6j/pJ23L1w+OYFzhUnZe7nZOFEMksXrkAVy
+         DCpg==
+X-Gm-Message-State: AFqh2kpTELrSJFcSdjbpvRD8BE1ncrSQZT0WDCFKHz3a5UBl85FH1+PJ
+        37AzE1PgrgP8WE1YFEY+ycoAOgTjoLTlKqP2dSwyI2S4w6rEBN+6n368mkz9KeqsSB2EUdIf02q
+        NOV28UmbVTYbz
+X-Received: by 2002:adf:ed02:0:b0:2bc:841d:b831 with SMTP id a2-20020adfed02000000b002bc841db831mr6912560wro.55.1673510415270;
+        Thu, 12 Jan 2023 00:00:15 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuoa4dXhmYE4b3KwciATEgeFMtHH9C0oC/fg2IU8EfNvBezXHmgYthq/F6bTZN3iYm6yCmxyQ==
+X-Received: by 2002:adf:ed02:0:b0:2bc:841d:b831 with SMTP id a2-20020adfed02000000b002bc841db831mr6912539wro.55.1673510415022;
+        Thu, 12 Jan 2023 00:00:15 -0800 (PST)
+Received: from [192.168.0.2] (ip-109-43-177-128.web.vodafone.de. [109.43.177.128])
+        by smtp.gmail.com with ESMTPSA id u14-20020adfdd4e000000b002366e3f1497sm15893339wrm.6.2023.01.12.00.00.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Jan 2023 00:00:14 -0800 (PST)
+Message-ID: <b4469973-1e3d-7efd-f78a-8afc46f4e3bd@redhat.com>
+Date:   Thu, 12 Jan 2023 09:00:12 +0100
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="6yQljiZjzbsXjRJM"
-Content-Disposition: inline
-In-Reply-To: <20230111171027.2392-11-jszhang@kernel.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v14 08/11] qapi/s390/cpu topology: change-topology monitor
+ command
+Content-Language: en-US
+From:   Thomas Huth <thuth@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        scgl@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
+        clg@kaod.org
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+ <20230105145313.168489-9-pmorel@linux.ibm.com>
+ <999a31e0-56f4-6d14-f264-320f51f259af@redhat.com>
+In-Reply-To: <999a31e0-56f4-6d14-f264-320f51f259af@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---6yQljiZjzbsXjRJM
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 11/01/2023 11.09, Thomas Huth wrote:
+> On 05/01/2023 15.53, Pierre Morel wrote:
+>> The modification of the CPU attributes are done through a monitor
+>> commands.
+> 
+> s/commands/command/
+> 
+>> It allows to move the core inside the topology tree to optimise
+>> the cache usage in the case the host's hypervizor previously
+> 
+> s/hypervizor/hypervisor/
+> 
+>> moved the CPU.
+>>
+>> The same command allows to modifiy the CPU attributes modifiers
+> 
+> s/modifiy/modify/
+> 
+>> like polarization entitlement and the dedicated attribute to notify
+>> the guest if the host admin modified scheduling or dedication of a vCPU.
+>>
+>> With this knowledge the guest has the possibility to optimize the
+>> usage of the vCPUs.
+> 
+> Hmm, who is supposed to call this QMP command in the future? Will there be a 
+> new daemon monitoring the CPU changes in the host? Or will there be a 
+> libvirt addition for this? ... Seems like I still miss the big picture here...
 
-Hey Jisheng,
+Or if this is just about to provide an API for future experiments, I'd 
+rather suggest to introduce the new commands with a "x-" prefix to mark them 
+as experimental (so we would also not need to go through the deprecation 
+process in case they don't work out as expected in the future).
 
-On Thu, Jan 12, 2023 at 01:10:24AM +0800, Jisheng Zhang wrote:
-> Make it possible to use alternatives in the vDSO, so that better
-> implementations can be used if possible.
->=20
-> Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-> Reviewed-by: Guo Ren <guoren@kernel.org>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+  Thomas
 
-FYI, from this patch onwards the rv32 build is broken.
-Should be reproduceable with the in-tree rv32_defconfig.
-
-Unfortunately no logs for you, I've got a CI bug to fix!
-
-Thanks,
-Conor.
-
-> ---
->  arch/riscv/include/asm/vdso.h     |  4 ++++
->  arch/riscv/kernel/alternative.c   | 25 +++++++++++++++++++++++++
->  arch/riscv/kernel/vdso.c          |  5 -----
->  arch/riscv/kernel/vdso/vdso.lds.S |  7 +++++++
->  4 files changed, 36 insertions(+), 5 deletions(-)
->=20
-> diff --git a/arch/riscv/include/asm/vdso.h b/arch/riscv/include/asm/vdso.h
-> index a7644f46d0e5..f891478829a5 100644
-> --- a/arch/riscv/include/asm/vdso.h
-> +++ b/arch/riscv/include/asm/vdso.h
-> @@ -28,8 +28,12 @@
->  #define COMPAT_VDSO_SYMBOL(base, name)						\
->  	(void __user *)((unsigned long)(base) + compat__vdso_##name##_offset)
-> =20
-> +extern char compat_vdso_start[], compat_vdso_end[];
-> +
->  #endif /* CONFIG_COMPAT */
-> =20
-> +extern char vdso_start[], vdso_end[];
-> +
->  #endif /* !__ASSEMBLY__ */
-> =20
->  #endif /* CONFIG_MMU */
-> diff --git a/arch/riscv/kernel/alternative.c b/arch/riscv/kernel/alternat=
-ive.c
-> index 3d4f1f32c7f6..a883a309139f 100644
-> --- a/arch/riscv/kernel/alternative.c
-> +++ b/arch/riscv/kernel/alternative.c
-> @@ -11,7 +11,9 @@
->  #include <linux/cpu.h>
->  #include <linux/uaccess.h>
->  #include <asm/alternative.h>
-> +#include <asm/module.h>
->  #include <asm/sections.h>
-> +#include <asm/vdso.h>
->  #include <asm/vendorid_list.h>
->  #include <asm/sbi.h>
->  #include <asm/csr.h>
-> @@ -160,6 +162,27 @@ static void __init_or_module _apply_alternatives(str=
-uct alt_entry *begin,
->  				stage);
->  }
-> =20
-> +static void __init apply_vdso_alternatives(void)
-> +{
-> +	const struct elf64_hdr *hdr;
-> +	const struct elf64_shdr *shdr;
-> +	const struct elf64_shdr *alt;
-> +	struct alt_entry *begin, *end;
-> +
-> +	hdr =3D (struct elf64_hdr *)vdso_start;
-> +	shdr =3D (void *)hdr + hdr->e_shoff;
-> +	alt =3D find_section(hdr, shdr, ".alternative");
-> +	if (!alt)
-> +		return;
-> +
-> +	begin =3D (void *)hdr + alt->sh_offset,
-> +	end =3D (void *)hdr + alt->sh_offset + alt->sh_size,
-> +
-> +	_apply_alternatives((struct alt_entry *)begin,
-> +			    (struct alt_entry *)end,
-> +			    RISCV_ALTERNATIVES_BOOT);
-> +}
-> +
->  void __init apply_boot_alternatives(void)
->  {
->  	/* If called on non-boot cpu things could go wrong */
-> @@ -168,6 +191,8 @@ void __init apply_boot_alternatives(void)
->  	_apply_alternatives((struct alt_entry *)__alt_start,
->  			    (struct alt_entry *)__alt_end,
->  			    RISCV_ALTERNATIVES_BOOT);
-> +
-> +	apply_vdso_alternatives();
->  }
-> =20
->  /*
-> diff --git a/arch/riscv/kernel/vdso.c b/arch/riscv/kernel/vdso.c
-> index e410275918ac..4e631c098f4d 100644
-> --- a/arch/riscv/kernel/vdso.c
-> +++ b/arch/riscv/kernel/vdso.c
-> @@ -22,11 +22,6 @@ struct vdso_data {
->  };
->  #endif
-> =20
-> -extern char vdso_start[], vdso_end[];
-> -#ifdef CONFIG_COMPAT
-> -extern char compat_vdso_start[], compat_vdso_end[];
-> -#endif
-> -
->  enum vvar_pages {
->  	VVAR_DATA_PAGE_OFFSET,
->  	VVAR_TIMENS_PAGE_OFFSET,
-> diff --git a/arch/riscv/kernel/vdso/vdso.lds.S b/arch/riscv/kernel/vdso/v=
-dso.lds.S
-> index 150b1a572e61..4a0606633290 100644
-> --- a/arch/riscv/kernel/vdso/vdso.lds.S
-> +++ b/arch/riscv/kernel/vdso/vdso.lds.S
-> @@ -40,6 +40,13 @@ SECTIONS
->  	. =3D 0x800;
->  	.text		: { *(.text .text.*) }		:text
-> =20
-> +	. =3D ALIGN(4);
-> +	.alternative : {
-> +		__alt_start =3D .;
-> +		*(.alternative)
-> +		__alt_end =3D .;
-> +	}
-> +
->  	.data		: {
->  		*(.got.plt) *(.got)
->  		*(.data .data.* .gnu.linkonce.d.*)
-> --=20
-> 2.38.1
->=20
-
---6yQljiZjzbsXjRJM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY7+7PwAKCRB4tDGHoIJi
-0uEeAQD9G+uLbu+8Gxiocxeb/U5F/Z622cqxCP2S5hcdl9HrxAEA5R0sXrC2ZRY9
-VB1eNSPNCHca9c/1ktnoYwr7MSa5TQc=
-=LDuC
------END PGP SIGNATURE-----
-
---6yQljiZjzbsXjRJM--
