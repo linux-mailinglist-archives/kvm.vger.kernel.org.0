@@ -2,115 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BDC6667D5E
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 19:04:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1553667D64
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 19:05:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240194AbjALSEZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 13:04:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43114 "EHLO
+        id S240321AbjALSFF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 13:05:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45304 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240203AbjALSDZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 13:03:25 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 093651DF30
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 09:27:28 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30CG8XhB011434;
-        Thu, 12 Jan 2023 17:27:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=vN1jvqgjM0zVGr4WeSIh964xj2hZDvl547Ay/qCWPog=;
- b=K5PHVi04ftrptb0NAHBcSN2/VUfRj0lttoZEEF9z74VXV3Thqu0xblNjJLpGiiF47c8S
- V+XNwu3eB6tCV8JcxKP2sQGv3t6VMbl5HLMuZtTaCTPsKWMZxgiz/yVa/Z7oUEVZCxOA
- acCIeqJoXaiOekG5g2We26PfpUN+x1L0/wp4nKFxkkfqeLXv37uNBS/P5e+fjL//ccUA
- wgpx2guez269LW4QVWHp5rQLX7DV8xTvypKmf6O+Tst7xEcMC4K8ziD08aW3BIWOd+GR
- 7KAS9hGSfBcYC147aCLFFTb7hrqtCOM0ZbajJyEQvHBC/ZNNIgJn5EYBNYbJ1fMNyxoY fw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n2mxwjtvs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Jan 2023 17:27:11 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30CGGNKK010086;
-        Thu, 12 Jan 2023 17:27:10 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n2mxwjtv3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Jan 2023 17:27:10 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30CF2XpC004531;
-        Thu, 12 Jan 2023 17:27:08 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n1kkytsr9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 12 Jan 2023 17:27:08 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30CHR4Rs48562658
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 12 Jan 2023 17:27:04 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B769E20043;
-        Thu, 12 Jan 2023 17:27:04 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4E44620040;
-        Thu, 12 Jan 2023 17:27:04 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.152.120])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 12 Jan 2023 17:27:04 +0000 (GMT)
-Message-ID: <71b5c6d559cec1eeb003ef7bc892a81da4efa613.camel@linux.ibm.com>
-Subject: Re: [PATCH v14 09/11] qapi/s390/cpu topology: monitor query
- topology information
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     "Daniel P." =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>,
-        Pierre Morel <pmorel@linux.ibm.com>
-Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
-        borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        clg@kaod.org
-Date:   Thu, 12 Jan 2023 18:27:04 +0100
-In-Reply-To: <Y7/4rm9JYihUpLS1@redhat.com>
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
-         <20230105145313.168489-10-pmorel@linux.ibm.com>
-         <Y7/4rm9JYihUpLS1@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
+        with ESMTP id S240250AbjALSDl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 13:03:41 -0500
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2064.outbound.protection.outlook.com [40.107.212.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7E25C914;
+        Thu, 12 Jan 2023 09:27:44 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nDMxsEuoY5b/D8HBIH/+I6dRcg8oH2hSe6jlHC1ZIbTtPogWLUbE13PS12Y/6MGIQa6kXpte/RF3p4guwH6FOgCPrlIrNeT7fc25i1lUPYtiPaWua7kQPAMKuaKBkrGd4IIfPzdiz/SNUDNEYUI4hTNQZHoKLL/eAoEVkViEBKKpP+QCtb3Gdnb2Tnss1mbEO9rgvv7HrUAIH4m2VJ5bR8tnu64DjFFguFQN4Pa4HTAk4MQLccXx9yl0fWtV2UgAHFD4WtTjyKg3C19frHhOmytpN+3pgWQp1ICEclKzdkp8Y0DBVc3i0wEzhbS7bD8zSlNjKakBHnK9DEKddY3Tfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=KgG8s95c5VJmO34B6QjgfBvoCz1p0SQOx5xuTgtIwWI=;
+ b=XSGjjGAWoqtsG0OtqHW/Bm7eZWZb+vJh6MIvOYE/xHi29s/hhH5K2fOja52283uEuO6cSE4N42WLqOcO/iPLqR3vOYB19+55LUf0LYHta3cl8KAm+G+6gVZtXguJDr7BVwLD2ARPLei43r8swGw0VnX0PWB1BpkRXeem1j0c045KlHfLKgPUf7ym1Mml+pbbpK0RHXeSxV2ZYY2rKM7z7usfsezb6b3GH75Iq7BcRV9l6A2GIL1s3jwzzupxK0hYZnQLqeKAYvma+JmLvEhizbn6pwT+Ef4qMXZ8jA1N+pS4flQ7RSh5QXx1SXk3/xn6LC3Hq7d+7k31Lnhnddkp/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KgG8s95c5VJmO34B6QjgfBvoCz1p0SQOx5xuTgtIwWI=;
+ b=uUdT2yYrRxuy9kV6JfAra6Zbj3yZspNNWqmDGTpQNlCVXNkmxCYHz74coU68B+XB8EN8Qi/7N8Zc502EZqmYG/xMJv6bvKbHaWUD0zZL6JwcY1+h3AaEYo0Fac9A+esJ2Hy1HhMVe0laS1pphtbH8BVP4NAdCWlEee2lVcrxPHM0F0yS0Pr1XPqK507dF0E9JHadmPvkjBHXH/6fUYqE3FQTjlrSRnaN6ymnHh9RbNmBSrwokic8zHqPAAZSaUM0CZlanHwuXdyMDIS8VNwRhoOS3FqBbmJMMPWpHewb7F+8yw5efxKbgzJPdFavJS/j59O0cIpAjEq2+XNxxv1iYA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SA0PR12MB7463.namprd12.prod.outlook.com (2603:10b6:806:24b::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.10; Thu, 12 Jan
+ 2023 17:27:42 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.6002.013; Thu, 12 Jan 2023
+ 17:27:42 +0000
+Date:   Thu, 12 Jan 2023 13:27:41 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     Matthew Rosato <mjrosato@linux.ibm.com>
+Cc:     Sean Christopherson <seanjc@google.com>,
+        alex.williamson@redhat.com, pbonzini@redhat.com, cohuck@redhat.com,
+        farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com, akrowiak@linux.ibm.com,
+        jjherne@linux.ibm.com, pasic@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] KVM: async kvm_destroy_vm for vfio devices
+Message-ID: <Y8BDDQi9W86UfszF@nvidia.com>
+References: <20230109201037.33051-1-mjrosato@linux.ibm.com>
+ <20230109201037.33051-2-mjrosato@linux.ibm.com>
+ <Y78UCz5oeuntSQtK@google.com>
+ <Y78Wk2/P5+gLMdpk@nvidia.com>
+ <Y78hzsHiwaFpL60+@google.com>
+ <Y8AA8r5MzKQIF8I7@nvidia.com>
+ <f7c39317-92a4-520e-8e69-a8606cd40e9a@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f7c39317-92a4-520e-8e69-a8606cd40e9a@linux.ibm.com>
+X-ClientProxiedBy: BL1P221CA0011.NAMP221.PROD.OUTLOOK.COM
+ (2603:10b6:208:2c5::23) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: LgeW_IICXk1FO9v4a4v7uNHATwrjbAr6
-X-Proofpoint-ORIG-GUID: XyyPblxnUwiwwbKzU3acReXT20EZG-AH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.545,FMLib:17.11.122.1
- definitions=2023-01-12_08,2023-01-12_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- suspectscore=0 adultscore=0 lowpriorityscore=0 clxscore=1015 bulkscore=0
- spamscore=0 mlxscore=0 impostorscore=0 malwarescore=0 priorityscore=1501
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301120124
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA0PR12MB7463:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7f46d4fe-62cb-4b14-8df2-08daf4c24f6d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: tNeLnxMM39MrrWEa4uEn8eEcAbGVCUonAJJR48nXUsHdr2mpyBiCzvKTaqRcQUq1B63Cu93KYscGooK3q1rjP9hbjUGv32SVctsq2cxsW8pAVXLlU4e1dSAVwE1mbVjLez7cfI19oBKFCztyBFu8xpjSYy0mldOFvZdLrQD1PUHZvp4cj6rQuZHO4K/hVdwDtH2Cq2LVp3P7f1jr2lcgPkN64SiHB6RhHbiUFnd5jbulnGFqyBB2YY/DJO5MUFfUcNdQT3A4pQ436B6bpGqSLg9Z+vtWQmvUP7obk5W4jRrsfzb19SvyAd4ezJwQIVQxPfiKxT11ooazeCvBv0eBhsnGBcvhOSS6K6Vq2JDrWaa7ue1B83e/qwuYRJwhArc1Zl1P+W6m9o2q/9a0lZfc3opr8qkMvSv7h4tKpafg3slfw2eiXL1q6suJDmb995x1iPkpwBAymUmnHjEsNZQSK6ZVLSr3HpD9kooZK1SayBQHi4HdSMJ9oVx7WLnZaEW3V7/Z/jDpR6lLivdeY4UC/UJHNSPx5ubvI0kXjoQWrmgMU7Mva0705wVlO7WUwzCPCiRctpQsO+50RF19zW9YhGJiuPVKVpcELl9MPpyYqItYcAuU1/0nydVAiZI4u0SOcQdFUxiMnFwAr7Dgr1pr2A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(136003)(39860400002)(396003)(346002)(376002)(451199015)(6486002)(478600001)(316002)(2906002)(36756003)(86362001)(186003)(6506007)(6512007)(83380400001)(2616005)(26005)(38100700002)(8936002)(66476007)(8676002)(66556008)(4326008)(6916009)(7416002)(66946007)(5660300002)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?O6P/K9OMRkVNoyLk6BMATJ58EfNc6TAkKgpJJ5CG1dQYo1wuEYKORv5D2euR?=
+ =?us-ascii?Q?z91zqL5R3xeua7W2UcimdehzehqBkUVWNAeCVLAMpCeklNV/bksDOQVrKZ1u?=
+ =?us-ascii?Q?/hxIgKRX81cXgWR+BAooauqr5A2KboMrihaeVKn+2qjAZlIXaOf9G3llz0XX?=
+ =?us-ascii?Q?ZrngCaL8G3e3e/voOvd96XCA5uRP0+9sbSXn0CqBpIm80HxKvRbAKJuHzmji?=
+ =?us-ascii?Q?Yl0hFvzEHdK2xGp7JTAowmjn76T6d2DkpB1/dJapOO1Dzd+NmkATFRQQmSQ1?=
+ =?us-ascii?Q?XAd574O6YrSxse39AUDtblpd5OdyGLl96BljkGIrw+6PfQMreJE1S2cNeQon?=
+ =?us-ascii?Q?ckHzuWaAL/mv17lK+nxkPsnBvrbCcLnCFyk0oE8Nolbjb5nI7stexzHAwSj9?=
+ =?us-ascii?Q?SpWcEv91uTh6/J+C2Nkxb1HEz8oHNiOXGejcKyYYT82dyQ4jKNHcGIIiVZE5?=
+ =?us-ascii?Q?ZUOL9s16z8ESDfr794B1kNvxTTaE55hw+Rt/AiQFeb9UDkVRG5fs/YRPzNno?=
+ =?us-ascii?Q?I26mWmXCFSmIOlOc46+D9I+SepIwjd6IryYF6YSypND0nQs/ibchUvvo92KS?=
+ =?us-ascii?Q?zVdVh6pdV2asLRsyd+qf0H6j+HUL91roT7Mral3D5J0gTDiniqf4jXtxd3TJ?=
+ =?us-ascii?Q?hj1a+6SVjhjj2TRzau3x3/KCPqfiYhjgPl7m9sOY6yazPGPhe23MoClNCD9d?=
+ =?us-ascii?Q?i//lgIeFnzkSdvdQFAscTl8bHdGCo9gNmVTqICg+okVxm46+dVpF6WrGOzv5?=
+ =?us-ascii?Q?e8YIBdf9R2WKFUr6OQ6WGKLxXjGIgvyFhqk+KMBvzZl/Cwh5sAeOfctPhNW1?=
+ =?us-ascii?Q?Zd8a6pRyqfsHKf/mm2uS7V+8wJ/po/ui72CFhh8g1E9jS6jLEDK49fpF6ZfF?=
+ =?us-ascii?Q?PBEDT3c4ZVUTOXZwQd0haCz9Z/HAa9a2C2Zjikn3nnbcNVCliVFWG0dRuV8z?=
+ =?us-ascii?Q?/yFBjzCXu0TrldDxkG6gBCyls/EoFSQ9glx0T4utjv49NksyKXzy2jNzcWo6?=
+ =?us-ascii?Q?7f4U+WgnOirSBMFr4G60LMEl2OgUTNCjTPYPGuPO2cWio0nfyqlfo6z7y39P?=
+ =?us-ascii?Q?5NtXo/04tMea+Gzab94cSEPpvdsOEsLsxqApu7KIu94owy2HakamIdI7ONAd?=
+ =?us-ascii?Q?97YZMjI6ZnUqalY0aK5cpG3+sGUJR5/+efJcAfhJvqYZPWDOp7en3dKHMb+K?=
+ =?us-ascii?Q?t5mr2w9LtzL6+hhkBc1aC6bSfBDx7NJH+bYOCAzMCeB8bf45XBgaiOq514ac?=
+ =?us-ascii?Q?jYaBRar0htmJ+Ku2mH92vySF78xD3sfx68r8LxTiKyFq6ROm0kohyiQ3FXUy?=
+ =?us-ascii?Q?RbYAMuPRmJbadDg/zUy+AsxYZk44y7ou1cKsC2pm420jNU397LGDqU2u69DH?=
+ =?us-ascii?Q?I2ItXrbH9nVFXYcE3oWxeX/BRM8llsUx8zlZ4v8z3Ppyj8Z/EJrdtfBk2YSp?=
+ =?us-ascii?Q?nC9b9JnrGuicWS6iq0o2kT3vge731Yb2IOzLvYAPcfqvskBtDfBGZ8jI9YSe?=
+ =?us-ascii?Q?ehBTeIPT9MEA08/une6/xj5W4x+T5oENHo79/F1ybmbBz/KN6mf4VLFME6wH?=
+ =?us-ascii?Q?gjpU8vUmZuFZKVHpikF98Y73Fe52Oc24rAlx1A4B?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f46d4fe-62cb-4b14-8df2-08daf4c24f6d
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jan 2023 17:27:42.2740
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ++ipFJ8JeXQ26INqwLyhOglearOHip6ePI6X/XAw1w/mNmErT2SxLOD7MchR2qzz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB7463
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2023-01-12 at 12:10 +0000, Daniel P. Berrang=C3=A9 wrote
+On Thu, Jan 12, 2023 at 12:21:17PM -0500, Matthew Rosato wrote:
 
-[...]
->=20
-> We already have 'query-cpus-fast' wich returns one entry for
-> each CPU. In fact why do we need to add query-topology at all.
-> Can't we just add book-id / drawer-id / polarity / dedicated
-> to the query-cpus-fast result ?
+> So should I work up a v2 that does symbol gets for kvm_get_kvm_safe
+> and kvm_put_kvm from vfio_main and drop kvm_put_kvm_async?  Or is
+> the patch Yi is working on changing things such that will also
+> address the deadlock issue?
 
-Is there an existing command for setting cpu properties, also?
->=20
-> With regards,
-> Daniel
+I don't think Yi's part will help
+
+> +361,22 @@ static int vfio_device_first_open(struct vfio_device
+> *device, if (ret) goto err_module_put;
+>  
+> +       if (kvm && !vfio_kvm_get(kvm)) {
+
+Do call it kvm_get_safe though
+
+> +               ret = -ENOENT;
+> +               goto err_unuse_iommu;
+> +       }
+>         device->kvm = kvm;
+>         if (device->ops->open_device) {
+>                 ret = device->ops->open_device(device);
+>                 if (ret)
+> -                       goto err_unuse_iommu;
+> +                       goto err_put_kvm;
+>         }
+>         return 0;
+>  
+> -err_unuse_iommu:
+> +err_put_kvm:
+> +       vfio_put_kvm(kvm);
+>         device->kvm = NULL;
+> +err_unuse_iommu:
+>         if (iommufd)
+>                 vfio_iommufd_unbind(device);
+>         else
+> @@ -465,6 +471,9 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+>  
+>         vfio_device_group_close(device);
+>  
+> +       if (device->open_count == 0 && device->group->kvm)
+> +               vfio_kvm_put(device->group->kvm);
+> +
+
+No, you can't touch group->kvm without holding the group lock,
+that is the whole point of the problem..
+
+This has to be device->kvm
+
+Jason
 
