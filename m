@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58C2A667F3E
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 20:29:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EA14E667F15
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 20:27:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240612AbjALT3i (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 14:29:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48636 "EHLO
+        id S240117AbjALT11 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 14:27:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240421AbjALT2T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 14:28:19 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 968393E0EE
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 11:22:29 -0800 (PST)
+        with ESMTP id S239901AbjALT0v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 14:26:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05E26FEF
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 11:20:52 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 38CEFB82019
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:22:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D5299C433F1;
-        Thu, 12 Jan 2023 19:22:26 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 39FFE62086
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:20:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 967E5C433F1;
+        Thu, 12 Jan 2023 19:20:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673551346;
-        bh=YNMtW6qYRgKEUFaPKzZRjN4rCL/DaY441LVttCXbAOM=;
+        s=k20201202; t=1673551251;
+        bh=TlJtz0XtzrPZ/3Di6kzUruT+R+5mVn0pMDj2qb6ZKGA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=dwlecoCytOLWONq6+gHt78Dzq1zToL1fDjq4/ogfOrlGBe+PGrkEtzJrbGMSAC6ME
-         Ug9IuBL5l4k25JftmI2T5sPl+pZrSAez6wemSpU+D+iPJLiV0tLNuNa83Ct+OgOPc9
-         //Lf71VLmYjkaTdKNPFBChj8cJ7fJKgHdaTTOe+Olzskvfncga1ugP/hzD99LTr2+m
-         OqVvk4cpsVg1W7eGmLk8VnfWqRUTeYDJGXjq0Pk4NVktyuuC1UjYi6GbPfoIdClF04
-         eambVvEsBBr4/O9nRHmKSp92LSH28+O56tCO/YjTMqCQX/6wlhGTysmW67cM7ckYBB
-         JYu7NJtoHr95g==
+        b=YuHa7UD5pXrW2xwtt0YnnzdndpVjsuOXNqghnpThOds32PI8kxo1Mb1FCuhUEbsNA
+         ElyPjJq7xxLRciBSxb4/mSPxEIZm8BfD805RnpWTeq/DSK5f9AEIWSSEcrlzSf4Ufn
+         /4CxnzUBquPRRbZK2/Ca1Nc3EswiiZpb0Wip36yS7AGcpUxIC/8yJEWMJNGcTojh5i
+         K+bcJ4tRp/1tQQpqFqFW19uBysaCtZ00G0sOcGx5fAESEmO4Fx4nATpo/oKTN3OxYr
+         rLGEI7Wcb30UvWfAqBN3RxUMhw4n7n1oQshEoNan8ofcckeO8yBbcO7PhgR39+t2Gt
+         EA1Mlzjd5HgKw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pG372-001IWu-Tf;
+        id 1pG373-001IWu-5w;
         Thu, 12 Jan 2023 19:19:45 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 22/68] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
-Date:   Thu, 12 Jan 2023 19:18:41 +0000
-Message-Id: <20230112191927.1814989-23-maz@kernel.org>
+Subject: [PATCH v7 23/68] KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
+Date:   Thu, 12 Jan 2023 19:18:42 +0000
+Message-Id: <20230112191927.1814989-24-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -74,66 +74,119 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
-they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
+Forward traps due to FP/ASIMD register accesses to the virtual EL2
+if virtual CPTR_EL2.TFP is set (with HCR_EL2.E2H == 0) or
+CPTR_EL2.FPEN is configure to do so (with HCR_EL2.E2h == 1).
 
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+[maz: account for HCR_EL2.E2H when testing for TFP/FPEN, with
+ all the hard work actually being done by Chase Conklin]
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_emulate.h | 14 ++++++++++++++
- arch/arm64/kvm/handle_exit.c         |  6 +++++-
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_emulate.h    | 25 +++++++++++++++++++++++++
+ arch/arm64/kvm/handle_exit.c            | 16 ++++++++++++----
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  8 ++++++--
+ 3 files changed, 43 insertions(+), 6 deletions(-)
 
 diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 0636475693ec..ea73377693af 100644
+index ea73377693af..d90de6666259 100644
 --- a/arch/arm64/include/asm/kvm_emulate.h
 +++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -17,6 +17,7 @@
- #include <asm/esr.h>
- #include <asm/kvm_arm.h>
- #include <asm/kvm_hyp.h>
-+#include <asm/kvm_nested.h>
- #include <asm/ptrace.h>
- #include <asm/cputype.h>
- #include <asm/virt.h>
-@@ -337,6 +338,19 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
- 	return vcpu->arch.fault.esr_el2;
+@@ -11,6 +11,7 @@
+ #ifndef __ARM64_KVM_EMULATE_H__
+ #define __ARM64_KVM_EMULATE_H__
+ 
++#include <linux/bitfield.h>
+ #include <linux/kvm_host.h>
+ 
+ #include <asm/debug-monitors.h>
+@@ -333,6 +334,30 @@ static inline bool vcpu_mode_priv(const struct kvm_vcpu *vcpu)
+ 	return mode != PSR_MODE_EL0t;
  }
  
-+static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
++static inline bool guest_hyp_fpsimd_traps_enabled(const struct kvm_vcpu *vcpu)
 +{
-+	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
-+	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++	u64 val;
 +
-+	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
++	if (!vcpu_has_nv(vcpu))
 +		return false;
 +
-+	return ((is_wfe && (hcr_el2 & HCR_TWE)) ||
-+		(!is_wfe && (hcr_el2 & HCR_TWI)));
++	val = vcpu_read_sys_reg(vcpu, CPTR_EL2);
++
++	if (!vcpu_el2_e2h_is_set(vcpu))
++		return (val & CPTR_EL2_TFP);
++
++	switch (FIELD_GET(CPACR_ELx_FPEN, val)) {
++	case 0b00:
++	case 0b10:
++		return true;
++	case 0b01:
++		return vcpu_el2_tge_is_set(vcpu) && !vcpu_is_el2(vcpu);
++	case 0b11:
++	default:		/* GCC is dumb */
++		return false;
++	}
 +}
 +
- static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
  {
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
+ 	return vcpu->arch.fault.esr_el2;
 diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index b0c343c4e062..ea73b47b99ac 100644
+index ea73b47b99ac..2aefe35409c9 100644
 --- a/arch/arm64/kvm/handle_exit.c
 +++ b/arch/arm64/kvm/handle_exit.c
-@@ -124,8 +124,12 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
- static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
- {
- 	u64 esr = kvm_vcpu_get_esr(vcpu);
-+	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
+@@ -97,11 +97,19 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ }
  
--	if (esr & ESR_ELx_WFx_ISS_WFE) {
-+	if (guest_hyp_wfx_traps_enabled(vcpu))
+ /*
+- * Guest access to FP/ASIMD registers are routed to this handler only
+- * when the system doesn't support FP/ASIMD.
++ * This handles the cases where the system does not support FP/ASIMD or when
++ * we are running nested virtualization and the guest hypervisor is trapping
++ * FP/ASIMD accesses by its guest guest.
++ *
++ * All other handling of guest vs. host FP/ASIMD register state is handled in
++ * fixup_guest_exit().
+  */
+-static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
++static int kvm_handle_fpasimd(struct kvm_vcpu *vcpu)
+ {
++	if (guest_hyp_fpsimd_traps_enabled(vcpu))
 +		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
 +
-+	if (is_wfe) {
- 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
- 		vcpu->stat.wfe_exit_stat++;
- 	} else {
++	/* This is the case when the system doesn't support FP/ASIMD. */
+ 	kvm_inject_undefined(vcpu);
+ 	return 1;
+ }
+@@ -263,7 +271,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_BREAKPT_LOW]= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BKPT32]	= kvm_handle_guest_debug,
+ 	[ESR_ELx_EC_BRK64]	= kvm_handle_guest_debug,
+-	[ESR_ELx_EC_FP_ASIMD]	= handle_no_fpsimd,
++	[ESR_ELx_EC_FP_ASIMD]	= kvm_handle_fpasimd,
+ 	[ESR_ELx_EC_PAC]	= kvm_handle_ptrauth,
+ };
+ 
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index e0bcaf000251..f458c2439271 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -174,8 +174,12 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	sve_guest = vcpu_has_sve(vcpu);
+ 	esr_ec = kvm_vcpu_trap_get_class(vcpu);
+ 
+-	/* Don't handle SVE traps for non-SVE vcpus here: */
+-	if (!sve_guest && esr_ec != ESR_ELx_EC_FP_ASIMD)
++	/*
++	 * Don't handle SVE traps for non-SVE vcpus here. This
++	 * includes NV guests for the time being.
++	 */
++	if (!sve_guest && (esr_ec != ESR_ELx_EC_FP_ASIMD ||
++			   guest_hyp_fpsimd_traps_enabled(vcpu)))
+ 		return false;
+ 
+ 	/* Valid trap.  Switch the context: */
 -- 
 2.34.1
 
