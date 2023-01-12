@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1924667F4F
-	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 20:30:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 737C5667F57
+	for <lists+kvm@lfdr.de>; Thu, 12 Jan 2023 20:30:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240671AbjALT3M (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 14:29:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49990 "EHLO
+        id S240589AbjALTal (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 14:30:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240478AbjALT16 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 14:27:58 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC063C396
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 11:22:02 -0800 (PST)
+        with ESMTP id S240536AbjALT2J (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 14:28:09 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA4273AB23
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 11:22:11 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F21E2B81FF6
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:22:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 925E8C433EF;
-        Thu, 12 Jan 2023 19:21:59 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 567B562086
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:22:11 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BB9DAC433D2;
+        Thu, 12 Jan 2023 19:22:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673551319;
-        bh=Sk00U+VQdkG7CswbUVuucvcoLH95GMpGcZOkq+azRzI=;
+        s=k20201202; t=1673551330;
+        bh=B/M6lxxsxpCU9eGC+7JvpNjTQ6Y14PwCnEPqKVvjPss=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cKr6LETXEQ39uUksHkCqcW4Rslyl9DG/XErVjvuPfm//JtVdIMLgq8f5fHFHQx8Z+
-         moeqKW57j9qc1k5N9Ymz3cODNAEefq1h3BQodXh+3jl5yrn0hZEnbE7xDDXud/+wKB
-         eeLvFp4EVf895lkOMK4/MQiX07rXMqebYoIdnCUCAoOlnDHs4am1Lh361pcePhXOKY
-         eLL8EKeJqnstFUOaEajS1V2OqgJCjOxX2sVnNLWmNQbPJm2B2QHy21knQSyaurmdV6
-         M4y9jJGK6TsNC2Pwa8nasLTACF2lHIg6ohgRGkU8V9VtUofr5xjWP+UoKcQmzlKa5R
-         5oqcjLeRULdaw==
+        b=AgIgZd2Bw6o6qeX6ZHBsOX34XAVXnJLaM0A9rkatDqanImTiDcIcRClx/LeJpP7D8
+         KIWNzNnFm+CiEivatPRFqY9/XSAyHo2dwK5q2ADz9/WO0kMgLsV287s6t1AudvANcc
+         StTrobAy1+ipiA+nRltRD3urCWQq+8lCwl3XPqYWnfc5qgoTIIdaF/cCe5CcEiU2QI
+         KJezZi7YMRq0mLsNFqMq/y21nQew4hcxvPZkfk7nQjcbKukcB9AtgSU9cGUm5EA4zc
+         nQBnNwvzvQxl5rxpymAK+eQ0CSosiVedflVfAH80kbFGH/e4zvahOXR4sgpX/T3/d8
+         992BBafum3RhA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pG37P-001IWu-DD;
+        id 1pG37P-001IWu-KC;
         Thu, 12 Jan 2023 19:20:07 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v7 47/68] KVM: arm64: nv: Don't load the GICv4 context on entering a nested guest
-Date:   Thu, 12 Jan 2023 19:19:06 +0000
-Message-Id: <20230112191927.1814989-48-maz@kernel.org>
+Subject: [PATCH v7 48/68] KVM: arm64: nv: vgic: Emulate the HW bit in software
+Date:   Thu, 12 Jan 2023 19:19:07 +0000
+Message-Id: <20230112191927.1814989-49-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230112191927.1814989-1-maz@kernel.org>
 References: <20230112191927.1814989-1-maz@kernel.org>
@@ -72,48 +72,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When entering a nested guest (vgic_state_is_nested() == true),
-special care must be taken *not* to make the vPE resident, as
-these are interrupts targetting the L1 guest, and not any
-nested guest.
+From: Christoffer Dall <christoffer.dall@arm.com>
 
-By not making the vPE resident, we guarantee that the delivery
-of an vLPI will result in a doorbell, forcing an exit from the
-nested guest and a switch to the L1 guest to handle the interrupt.
+Should the guest hypervisor use the HW bit in the LRs, we need to
+emulate the deactivation from the L2 guest into the L1 distributor
+emulation, which is handled by L0.
 
+It's all good fun.
+
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/vgic/vgic-v3.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_hyp.h     |  2 ++
+ arch/arm64/kvm/hyp/vgic-v3-sr.c      |  2 +-
+ arch/arm64/kvm/vgic/vgic-v3-nested.c | 32 ++++++++++++++++++++++++++++
+ arch/arm64/kvm/vgic/vgic.c           |  6 ++++--
+ include/kvm/arm_vgic.h               |  1 +
+ 5 files changed, 40 insertions(+), 3 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 57cfa7255f37..33de8a4644a0 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -755,8 +755,8 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_hyp.h b/arch/arm64/include/asm/kvm_hyp.h
+index 6797eafe7890..bd4ef970ecfa 100644
+--- a/arch/arm64/include/asm/kvm_hyp.h
++++ b/arch/arm64/include/asm/kvm_hyp.h
+@@ -57,6 +57,8 @@ DECLARE_PER_CPU(struct kvm_nvhe_init_params, kvm_init_params);
  
- 	if (vgic_state_is_nested(vcpu))
- 		vgic_v3_load_nested(vcpu);
--
--	WARN_ON(vgic_v4_load(vcpu));
-+	else
-+		WARN_ON(vgic_v4_load(vcpu));
+ int __vgic_v2_perform_cpuif_access(struct kvm_vcpu *vcpu);
+ 
++u64 __gic_v3_get_lr(unsigned int lr);
++
+ void __vgic_v3_save_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_restore_state(struct vgic_v3_cpu_if *cpu_if);
+ void __vgic_v3_activate_traps(struct vgic_v3_cpu_if *cpu_if);
+diff --git a/arch/arm64/kvm/hyp/vgic-v3-sr.c b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+index 6cb638b184b1..75152c1ce646 100644
+--- a/arch/arm64/kvm/hyp/vgic-v3-sr.c
++++ b/arch/arm64/kvm/hyp/vgic-v3-sr.c
+@@ -18,7 +18,7 @@
+ #define vtr_to_nr_pre_bits(v)		((((u32)(v) >> 26) & 7) + 1)
+ #define vtr_to_nr_apr_regs(v)		(1 << (vtr_to_nr_pre_bits(v) - 5))
+ 
+-static u64 __gic_v3_get_lr(unsigned int lr)
++u64 __gic_v3_get_lr(unsigned int lr)
+ {
+ 	switch (lr & 0xf) {
+ 	case 0:
+diff --git a/arch/arm64/kvm/vgic/vgic-v3-nested.c b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+index ab8ddf490b31..e88c75e79010 100644
+--- a/arch/arm64/kvm/vgic/vgic-v3-nested.c
++++ b/arch/arm64/kvm/vgic/vgic-v3-nested.c
+@@ -140,6 +140,38 @@ static void vgic_v3_fixup_shadow_lr_state(struct kvm_vcpu *vcpu)
+ 	}
  }
  
- void vgic_v3_vmcr_sync(struct kvm_vcpu *vcpu)
-@@ -774,6 +774,12 @@ void vgic_v3_put(struct kvm_vcpu *vcpu)
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu)
++{
++	struct vgic_v3_cpu_if *cpu_if = vcpu_nested_if(vcpu);
++	struct vgic_v3_cpu_if *s_cpu_if = vcpu_shadow_if(vcpu);
++	struct vgic_irq *irq;
++	int i;
++
++	for (i = 0; i < s_cpu_if->used_lrs; i++) {
++		u64 lr = cpu_if->vgic_lr[i];
++		int l1_irq;
++
++		if (!(lr & ICH_LR_HW) || !(lr & ICH_LR_STATE))
++			continue;
++
++		/*
++		 * If we had a HW lr programmed by the guest hypervisor, we
++		 * need to emulate the HW effect between the guest hypervisor
++		 * and the nested guest.
++		 */
++		l1_irq = (lr & ICH_LR_PHYS_ID_MASK) >> ICH_LR_PHYS_ID_SHIFT;
++		irq = vgic_get_irq(vcpu->kvm, vcpu, l1_irq);
++		if (!irq)
++			continue; /* oh well, the guest hyp is broken */
++
++		lr = __gic_v3_get_lr(i);
++		if (!(lr & ICH_LR_STATE))
++			irq->active = false;
++
++		vgic_put_irq(vcpu->kvm, irq);
++	}
++}
++
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu)
  {
- 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
+ 	struct vgic_cpu *vgic_cpu = &vcpu->arch.vgic_cpu;
+diff --git a/arch/arm64/kvm/vgic/vgic.c b/arch/arm64/kvm/vgic/vgic.c
+index 2c5a4bb6b2f9..05809462e199 100644
+--- a/arch/arm64/kvm/vgic/vgic.c
++++ b/arch/arm64/kvm/vgic/vgic.c
+@@ -876,9 +876,11 @@ void kvm_vgic_sync_hwstate(struct kvm_vcpu *vcpu)
+ {
+ 	int used_lrs;
  
-+	/*
-+	 * vgic_v4_put will do nothing if we were not resident. This
-+	 * covers both the cases where we've blocked (we already have
-+	 * done a vgic_v4_put) and when running a nested guest (the
-+	 * vPE was never resident in order to generate a doorbell).
-+	 */
- 	WARN_ON(vgic_v4_put(vcpu, false));
+-	/* If nesting, this is a load/put affair, not flush/sync. */
+-	if (vgic_state_is_nested(vcpu))
++	/* If nesting, emulate the HW effect from L0 to L1 */
++	if (vgic_state_is_nested(vcpu)) {
++		vgic_v3_sync_nested(vcpu);
+ 		return;
++	}
  
- 	vgic_v3_vmcr_sync(vcpu);
+ 	/* An empty ap_list_head implies used_lrs == 0 */
+ 	if (list_empty(&vcpu->arch.vgic_cpu.ap_list_head))
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index a499ae3c2ce8..e2fb1ca89d10 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -398,6 +398,7 @@ void kvm_vgic_load(struct kvm_vcpu *vcpu);
+ void kvm_vgic_put(struct kvm_vcpu *vcpu);
+ void kvm_vgic_vmcr_sync(struct kvm_vcpu *vcpu);
+ 
++void vgic_v3_sync_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_load_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_put_nested(struct kvm_vcpu *vcpu);
+ void vgic_v3_handle_nested_maint_irq(struct kvm_vcpu *vcpu);
 -- 
 2.34.1
 
