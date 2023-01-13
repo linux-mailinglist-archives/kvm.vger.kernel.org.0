@@ -2,147 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB5D76697E0
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 14:00:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7C9E86697F1
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 14:04:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241476AbjAMNAz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 08:00:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39186 "EHLO
+        id S241338AbjAMNE3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 08:04:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232818AbjAMNAW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 08:00:22 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6325687F29;
-        Fri, 13 Jan 2023 04:46:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=oROQ5EhPcADKkRL2Rfifft9KU9gKCo4Ch5f3HILY9EU=; b=kuGaoVJ9CO+qeVGEzmqDWg1q/r
-        OPat1qM3uTjRAuHrK4UFNkO+E6ecuSNaHqqxJ9A5mixAwq+Cxn/Ii2hcSADQbADm5Lx3KGZR+Zrn+
-        367gEIapAnL50AMA8IDUSbgNLt3eYTfSEK+21NGu1pDyJL5xzPkjJLHs6adOWIdrLLmwdMBIr6Mwe
-        BJWZQuLxY4Jj/5uMJO8hSG4nqBYT+pbGmPud5jxV57IuCsTu0F91SNl5jcR1L94zdD0FIsb9HtlPr
-        mHZRzSnze9Cbfzor4AVyymHco67Pez0wCotqxfjKRtpA8sINJmDBbxp6uMka0X2cKWpjKO8LRAITt
-        PuFlX0jA==;
-Received: from i7.infradead.org ([2001:8b0:10b:1:21e:67ff:fecb:7a92])
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pGJRd-004Mi0-0z;
-        Fri, 13 Jan 2023 12:46:05 +0000
-Received: from dwoodhou by i7.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pGJRl-0002jr-Ip; Fri, 13 Jan 2023 12:46:13 +0000
-From:   David Woodhouse <dwmw2@infradead.org>
-To:     Boqun Feng <boqun.feng@gmail.com>, linux-kernel@vger.kernel.org,
-        rcu@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Waiman Long <longman@redhat.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
-        Joel Fernandes <joel@joelfernandes.org>,
-        Matthew Wilcox <willy@infradead.org>,
-        Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH 3/3] KVM: selftests: Add EVTCHNOP_send slow path test to xen_shinfo_test
-Date:   Fri, 13 Jan 2023 12:46:06 +0000
-Message-Id: <20230113124606.10221-4-dwmw2@infradead.org>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20230113124606.10221-1-dwmw2@infradead.org>
-References: <20230113065955.815667-1-boqun.feng@gmail.com>
- <20230113124606.10221-1-dwmw2@infradead.org>
+        with ESMTP id S240603AbjAMNDP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 08:03:15 -0500
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61AC55BA1B;
+        Fri, 13 Jan 2023 04:47:31 -0800 (PST)
+Received: by mail-lf1-x132.google.com with SMTP id bp15so32954080lfb.13;
+        Fri, 13 Jan 2023 04:47:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IEq2QVvNTIs2aFvCR54FRAq229D98dMIY7JkgaeUBBI=;
+        b=GlwGrViS6nigmIVsVN4sXo0B6eP6OnwLnKq8QZ6E+yYLN6xPA4q6tcDxqCGwhHgkUF
+         n0crzJwG2QLVLBHUeY9ptDz1Wn+65NsgcsghuZR50x+Xp97xr5ZhsavYhPK3YWJmkvRQ
+         UMaW72DHodER+1guniKWo6sEtG+rZ+/mOtrjhgrvM/uGm6siDjobh2NCF6sDmEbbqnvD
+         TAIQL08rRKSTrE3bNeS+ZsKVtVAQrjsO4p44nj60Sl8YnuFJZof7ixI7XSh5sodZs3QO
+         1JtLoK/n2LuAQ/KFw3E+gXVKGIlxC6lhXBUIcR/vsR8GvKL+xdaubcC4GjkHtD9NiScN
+         t/Tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IEq2QVvNTIs2aFvCR54FRAq229D98dMIY7JkgaeUBBI=;
+        b=p5+hCqAOf6jlhhMeUxferkazEnXsL3fatoi2pUcry5GirDPhOJAHCmoWNRJ20PILHI
+         ynvPSZevKxCsJZJBOQDRc14hl9d5f3bBpIaKHztONjYLn9cyQL4WZWnNuHYvhTovRnqg
+         uWm5E1ZzzGA4Nc63GNLFQIqSMdAqNseABhSe3yLAuy9vgxpAMc3P5RQdP0JSLtSVyRvM
+         iuH8umNvoFSZ/1JtHorUTPLACyW57iHifo6gUePhC5JQZGkF98H2VNJTSX2gXUJxKBQ8
+         o4zaM+eimsx5Oyu+teOfX08Ip64jqQR1vgwjgpLyykpicoKTIfJk/2Pv4ohkYqQ8WIyG
+         kVQg==
+X-Gm-Message-State: AFqh2kqUafTHaKxqASGuczzsSVMBWOjVrI1lCOUMOWAUDyulwz4z0SvR
+        NUzpLAPlcqDzwDjC7lp5Qpc=
+X-Google-Smtp-Source: AMrXdXtZzNTVb98//F8BC8feIfDYHihih8IYihAI8Ege1urRyrRZG+CW9oviZ7S2uKh5ExKe3s31ng==
+X-Received: by 2002:a05:6512:b9b:b0:4cc:98fe:191b with SMTP id b27-20020a0565120b9b00b004cc98fe191bmr887268lfv.5.1673614034287;
+        Fri, 13 Jan 2023 04:47:14 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id o16-20020ac24e90000000b004b5323639d8sm3834569lfr.155.2023.01.13.04.47.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jan 2023 04:47:14 -0800 (PST)
+Date:   Fri, 13 Jan 2023 14:47:12 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v11 013/113] x86/cpu: Add helper functions to
+ allocate/free TDX private host key id
+Message-ID: <20230113144712.00006f41@gmail.com>
+In-Reply-To: <241994f1f6782753f3307fe999a3dad434477c16.1673539699.git.isaku.yamahata@intel.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+        <241994f1f6782753f3307fe999a3dad434477c16.1673539699.git.isaku.yamahata@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: David Woodhouse <dwmw2@infradead.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: David Woodhouse <dwmw@amazon.co.uk>
+On Thu, 12 Jan 2023 08:31:21 -0800
+isaku.yamahata@intel.com wrote:
 
-When kvm_xen_evtchn_send() takes the slow path because the shinfo GPC
-needs to be revalidated, it used to violate the SRCU vs. kvm->lock
-locking rules and potentially cause a deadlock.
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> TDX private host key id (HKID) is assigned to guest TD.  The memory
+> controller encrypts guest TD memory with the assigned TDX HKID.  Add
+> helper functions to allocate/free TDX private HKID so that TDX KVM can
+> manage it.
+> 
+> Also export the global TDX private HKID that is used to encrypt TDX
+> module, its memory and some dynamic data (TDR).  When VMM releasing
+> encrypted page to reuse it, the page needs to be flushed with the used
+> HKID.  VMM needs the global TDX private HKID to flush such pages.
+> 
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/tdx.h  | 12 ++++++++++++
+>  arch/x86/virt/vmx/tdx/tdx.c | 35 +++++++++++++++++++++++++++++++++++
+>  2 files changed, 47 insertions(+)
+> 
+> diff --git a/arch/x86/include/asm/tdx.h b/arch/x86/include/asm/tdx.h
+> index 0f71d3856ede..ed9cf61ff8b4 100644
+> --- a/arch/x86/include/asm/tdx.h
+> +++ b/arch/x86/include/asm/tdx.h
+> @@ -107,11 +107,23 @@ static inline long tdx_kvm_hypercall(unsigned int
+> nr, unsigned long p1, #ifdef CONFIG_INTEL_TDX_HOST
+>  bool platform_tdx_enabled(void);
+>  int tdx_enable(void);
+> +/*
+> + * Key id globally used by TDX module: TDX module maps TDR with this
+> TDX global
+> + * key id.  TDR includes key id assigned to the TD.  Then TDX module
+> maps other
+> + * TD-related pages with the assigned key id.  TDR requires this TDX
+> global key
+> + * id for cache flush unlike other TD-related pages.
+> + */
+> +extern u32 tdx_global_keyid __read_mostly;
+> +int tdx_keyid_alloc(void);
+> +void tdx_keyid_free(int keyid);
+> +
+>  u64 __seamcall(u64 op, u64 rcx, u64 rdx, u64 r8, u64 r9,
+>  	       struct tdx_module_output *out);
+>  #else	/* !CONFIG_INTEL_TDX_HOST */
+>  static inline bool platform_tdx_enabled(void) { return false; }
+>  static inline int tdx_enable(void)  { return -EINVAL; }
+> +static inline int tdx_keyid_alloc(void) { return -EOPNOTSUPP; }
+> +static inline void tdx_keyid_free(int keyid) { }
+>  #endif	/* CONFIG_INTEL_TDX_HOST */
+>  
+>  #endif /* !__ASSEMBLY__ */
+> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+> index eba7e62cebec..d18ab5c4d447 100644
+> --- a/arch/x86/virt/vmx/tdx/tdx.c
+> +++ b/arch/x86/virt/vmx/tdx/tdx.c
+> @@ -51,6 +51,10 @@ static DEFINE_MUTEX(tdx_module_lock);
+>  /* All TDX-usable memory regions */
+>  static LIST_HEAD(tdx_memlist);
+>  
+> +/* TDX module global KeyID.  Used in TDH.SYS.CONFIG ABI. */
+> +u32 tdx_global_keyid __read_mostly;
+> +EXPORT_SYMBOL_GPL(tdx_global_keyid);
+> +
+>  /*
+>   * tdx_keyid_start and nr_tdx_keyids indicate that TDX is uninitialized.
+>   * This is used in TDX initialization error paths to take it from
+> @@ -132,6 +136,31 @@ static struct notifier_block tdx_memory_nb = {
+>  	.notifier_call = tdx_memory_notifier,
+>  };
+>  
+> +/* TDX KeyID pool */
+> +static DEFINE_IDA(tdx_keyid_pool);
+> +
+> +int tdx_keyid_alloc(void)
+> +{
+> +	if (WARN_ON_ONCE(!tdx_keyid_start || !nr_tdx_keyids))
+> +		return -EINVAL;
 
-Now that lockdep is learning to catch such things, make sure that code
-path is exercised by the selftest.
+Better mention that tdx_keyid_start and nr_tdx_keyids are defined in
+another patches.
 
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
----
- .../selftests/kvm/x86_64/xen_shinfo_test.c    | 31 +++++++++++++++++++
- 1 file changed, 31 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-index 644d614a9965..3adc2e11b094 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
-@@ -29,6 +29,9 @@
- #define DUMMY_REGION_GPA	(SHINFO_REGION_GPA + (3 * PAGE_SIZE))
- #define DUMMY_REGION_SLOT	11
- 
-+#define DUMMY_REGION_GPA_2	(SHINFO_REGION_GPA + (4 * PAGE_SIZE))
-+#define DUMMY_REGION_SLOT_2	12
-+
- #define SHINFO_ADDR	(SHINFO_REGION_GPA)
- #define VCPU_INFO_ADDR	(SHINFO_REGION_GPA + 0x40)
- #define PVTIME_ADDR	(SHINFO_REGION_GPA + PAGE_SIZE)
-@@ -57,6 +60,7 @@ enum {
- 	TEST_EVTCHN_SLOWPATH,
- 	TEST_EVTCHN_SEND_IOCTL,
- 	TEST_EVTCHN_HCALL,
-+	TEST_EVTCHN_HCALL_SLOWPATH,
- 	TEST_EVTCHN_HCALL_EVENTFD,
- 	TEST_TIMER_SETUP,
- 	TEST_TIMER_WAIT,
-@@ -270,6 +274,20 @@ static void guest_code(void)
- 
- 	guest_wait_for_irq();
- 
-+	GUEST_SYNC(TEST_EVTCHN_HCALL_SLOWPATH);
-+
-+	/* Same again, but this time the host has messed with memslots
-+	 * so it should take the slow path in kvm_xen_set_evtchn(). */
-+	__asm__ __volatile__ ("vmcall" :
-+			      "=a" (rax) :
-+			      "a" (__HYPERVISOR_event_channel_op),
-+			      "D" (EVTCHNOP_send),
-+			      "S" (&s));
-+
-+	GUEST_ASSERT(rax == 0);
-+
-+	guest_wait_for_irq();
-+
- 	GUEST_SYNC(TEST_EVTCHN_HCALL_EVENTFD);
- 
- 	/* Deliver "outbound" event channel to an eventfd which
-@@ -801,6 +819,19 @@ int main(int argc, char *argv[])
- 				alarm(1);
- 				break;
- 
-+			case TEST_EVTCHN_HCALL_SLOWPATH:
-+				TEST_ASSERT(!evtchn_irq_expected,
-+					    "Expected event channel IRQ but it didn't happen");
-+				shinfo->evtchn_pending[0] = 0;
-+
-+				if (verbose)
-+					printf("Testing guest EVTCHNOP_send direct to evtchn after memslot change\n");
-+				vm_userspace_mem_region_add(vm, VM_MEM_SRC_ANONYMOUS,
-+							    DUMMY_REGION_GPA_2, DUMMY_REGION_SLOT_2, 1, 0);
-+				evtchn_irq_expected = true;
-+				alarm(1);
-+				break;
-+
- 			case TEST_EVTCHN_HCALL_EVENTFD:
- 				TEST_ASSERT(!evtchn_irq_expected,
- 					    "Expected event channel IRQ but it didn't happen");
--- 
-2.35.3
+> +
+> +	/* The first keyID is reserved for the global key. */
+> +	return ida_alloc_range(&tdx_keyid_pool, tdx_keyid_start + 1,
+> +			       tdx_keyid_start + nr_tdx_keyids - 1,
+> +			       GFP_KERNEL);
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_keyid_alloc);
+> +
+> +void tdx_keyid_free(int keyid)
+> +{
+> +	/* keyid = 0 is reserved. */
+> +	if (WARN_ON_ONCE(keyid <= 0))
+> +		return;
+> +
+> +	ida_free(&tdx_keyid_pool, keyid);
+> +}
+> +EXPORT_SYMBOL_GPL(tdx_keyid_free);
+> +
+>  static int __init tdx_init(void)
+>  {
+>  	int err;
+> @@ -1161,6 +1190,12 @@ static int init_tdx_module(void)
+>  	if (ret)
+>  		goto out_free_pamts;
+>  
+> +	/*
+> +	 * Reserve the first TDX KeyID as global KeyID to protect
+> +	 * TDX module metadata.
+> +	 */
+> +	tdx_global_keyid = tdx_keyid_start;
+> +
+>  	/* Initialize TDMRs to complete the TDX module initialization */
+>  	ret = init_tdmrs(&tdmr_list);
+>  	if (ret)
 
