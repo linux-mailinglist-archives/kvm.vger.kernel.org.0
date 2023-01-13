@@ -2,68 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 609DA66A156
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 18:59:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2BD2A66A1AE
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 19:14:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230198AbjAMR7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 12:59:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39464 "EHLO
+        id S231192AbjAMSOu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 13:14:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230218AbjAMR7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 12:59:24 -0500
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 481638D384
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 09:52:20 -0800 (PST)
-Received: by mail-yb1-xb36.google.com with SMTP id v19so17386381ybv.1
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 09:52:20 -0800 (PST)
+        with ESMTP id S231283AbjAMSNw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 13:13:52 -0500
+Received: from mail-yw1-x1136.google.com (mail-yw1-x1136.google.com [IPv6:2607:f8b0:4864:20::1136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96634A7B6D;
+        Fri, 13 Jan 2023 10:05:34 -0800 (PST)
+Received: by mail-yw1-x1136.google.com with SMTP id 00721157ae682-4a2f8ad29d5so295541397b3.8;
+        Fri, 13 Jan 2023 10:05:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uBw89FU9UBpNOcN/n5tNPwSFMn3YhdoihkTziL0Dvbo=;
-        b=BfzyxH4VporMuNHWhb+dZbaHSPEl9xGOc/rSIBcSg9i67lbPstTJZ0rj227naupP8p
-         L8Re3drnraxXM+CItCIfqMXDtjqbRGCHbOX0KZhdLlqVWkt9qvMkHb1p/FNLkJOO8dT3
-         TgUYA9GgCOTcV0f6aX9vLB5r2+NITMf9/f/tGELhefImj/oNcP15cO5htpnS1fFPw25U
-         /2DWNbt6Ja5CEPOPwwCF5ueywByUjjRQ9WXqdMCLAa/IgOuuogm5nRfBrmmDdXBGGVta
-         wqdUqC+mNtY+q1/SrKbMh/kLKrVUU7Gl30hZDEnHQCCfiYrUsrwpred4sNp/B8B6Wbc0
-         BMBQ==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z4pto12rSouFh/dIEU2H2b7i14PEpI0T9dvCoGHqSWA=;
+        b=BpnMJiIhqYiZz3eigM1emJUaY9PCw/NmetqKfb/O8lZnOaBfZtSWXZzjNRwYtD9CVw
+         Uxf67lk8Qxx7EEqcggwL81GNDNjCzsrKRTHDDMzMQsYffiCYsLJrkHJXfuH0LCK3RibT
+         AqzLfsaXq7tAH3g6r7yA0AmCwbjg0P5PED6GBuoFRcVE+j/cWZufPTuxbPTc5kFp1hoP
+         C/grHHgFpJ1UQihJSYKdkK6tLRukmvXwb7omrNxLFnbV/va4DY7A3E8s2gnOdUixN+3x
+         W455CeOkNY3dTViTLWJw1OT+RBbfNU0h7eRJHJLsQwg11wHLWHq2uiwInBK7BOxJF8Pd
+         dETg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uBw89FU9UBpNOcN/n5tNPwSFMn3YhdoihkTziL0Dvbo=;
-        b=nJpFY3be44dekidhO08WUjZD04i4m0hx3io4sQNFEZ/SMAMY1HQLb6vVEex3sRccEP
-         ZhkDZX4HYwUzvUubJEN2ERQiXI+Fm29Gdj8jM8gp+0ucSncsKiD+LYq3tQmY4sBYAJrG
-         FIdhIuwjl36b0Pe9TVUveTCKpo+KxD7Yz54uIf1KwQHHYDOUY1FwHtsvopipcwtsfUUB
-         KUwL/nP9XQo80C31zNhBPG+hWXqN1axfXutX/XJUYfl0GWwcmIN6iIOxCjOfnzfYGrC/
-         n/Is+QWdT3z9ZhjY/bavoarRnChbaMerqmr7/n9LLNva6CoHXmO9TEkMzE1nNKCBP0RT
-         EaSg==
-X-Gm-Message-State: AFqh2kq8g7HnB/zt5hMEyF9tdA5CEElgLQu9sWriMLyeaw9u8tvyePMj
-        qx5RTyZk2V5e4NTCWZ3+/aaQ/00FBIzQWOouvYiazw==
-X-Google-Smtp-Source: AMrXdXvYN+uQtXM83ZOVJrgdDH7vZrt250uxujTe5BRq5UwAUrIE5JvOi/LNvWsGH+A96modUUeNRZFLOxJNXZ6z9aM=
-X-Received: by 2002:a25:7355:0:b0:7d2:a7e9:ece5 with SMTP id
- o82-20020a257355000000b007d2a7e9ece5mr71427ybc.132.1673632339085; Fri, 13 Jan
- 2023 09:52:19 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z4pto12rSouFh/dIEU2H2b7i14PEpI0T9dvCoGHqSWA=;
+        b=aNoRRBjOED+C4ZbDSrILeIEnuKLXioiJve5IQglXcNCQPuFa55ZRhUxL+KWleowLIU
+         rpGGzGjq934QfnhBBKsCnLNweMlmuBXtlQqnYuO02E2oXH66fUHn/YDRyP/+vFXqF+sv
+         gfwxhpaEr/FtQbZuKfSZ3bI1E8mOSforFbzEbntstQNt9yrckKU4e1cBrHUWZH51sAAk
+         4PImpaBbNFD1yT1gYBiSoqSnxRj1rrbuLmXyaAngJxzdtrkxpXbYPt4MzAAsf8bknOpY
+         ny7l7UbXIPUDYssW1ab7DE5I6YU9HQu0wfX3ezcayppo92COOFDlUI0M23Vy3i5R2bQX
+         FLMw==
+X-Gm-Message-State: AFqh2kq5Lf8b7eGOUScoqQBTl/Jg49rnYUhVh12B/eyeB47/NSwD6/G+
+        /8G2qTAI6E6xQ6pL+kIuruA=
+X-Google-Smtp-Source: AMrXdXtalijBBdCMZhQ8k7FyN+Oiyguirc34cGy+spxk2vmWC3AHP1oHn2Dyy/oD+Rs4wXKe4GAj5Q==
+X-Received: by 2002:a05:7500:2897:b0:ee:2795:1b41 with SMTP id de23-20020a057500289700b000ee27951b41mr4290706gab.20.1673633133188;
+        Fri, 13 Jan 2023 10:05:33 -0800 (PST)
+Received: from auth2-smtp.messagingengine.com (auth2-smtp.messagingengine.com. [66.111.4.228])
+        by smtp.gmail.com with ESMTPSA id t13-20020a05620a450d00b006fba0a389a4sm13204179qkp.88.2023.01.13.10.05.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jan 2023 10:05:32 -0800 (PST)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 9C66827C0054;
+        Fri, 13 Jan 2023 13:05:31 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Fri, 13 Jan 2023 13:05:31 -0500
+X-ME-Sender: <xms:aZ3BY-qoWGqcNKRKnvQs2pyB43z0nKMXiXle27FNu2kV3ZIZWcBJ3w>
+    <xme:aZ3BY8pDMNvXAuti_tQaaE5Mv_Hsp4jxxPPpU9kqIizmrhm83VoR2Z3wpZaAK6PKO
+    su7TfdSxwMDFJH8tQ>
+X-ME-Received: <xmr:aZ3BYzOxDFJPOk_6tNlHxfLNQguqTRbDR0n8ilQv8uFRA97V0ksImf_oNDQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrleekgddutdehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepuehoqhhu
+    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
+    htthgvrhhnpeehudfgudffffetuedtvdehueevledvhfelleeivedtgeeuhfegueeviedu
+    ffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    gsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdei
+    gedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfih
+    igmhgvrdhnrghmvg
+X-ME-Proxy: <xmx:aZ3BY96wgjDfxqkkvQNliEHTmo8TZMvZ8uMHDzkJwEUKicEB9an_DQ>
+    <xmx:aZ3BY96GeN-VuxoRwYh8u5YrxzCBTCR_Jju1Kw7fi-FDwx1MPFVvzA>
+    <xmx:aZ3BY9h8C8l7mTixeAvIczYmIu27p17yZZ5Q-fJTZ6wagd8kXFsNnA>
+    <xmx:a53BY-NDPVaEk5u2mXPQTDAkKFU-D77WYVlaAqfXfVSGyahlKcr5jA>
+Feedback-ID: iad51458e:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 13 Jan 2023 13:05:29 -0500 (EST)
+Date:   Fri, 13 Jan 2023 10:05:22 -0800
+From:   Boqun Feng <boqun.feng@gmail.com>
+To:     "Paul E. McKenney" <paulmck@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+        kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH 2/3] rcu: Equip sleepable RCU with lockdep dependency
+ graph checks
+Message-ID: <Y8GdYgSBtyKwf/qj@boqun-archlinux>
+References: <20230113065955.815667-1-boqun.feng@gmail.com>
+ <20230113065955.815667-3-boqun.feng@gmail.com>
+ <20230113112949.GX4028633@paulmck-ThinkPad-P17-Gen-1>
 MIME-Version: 1.0
-References: <20221221222418.3307832-1-bgardon@google.com> <20221221222418.3307832-8-bgardon@google.com>
-In-Reply-To: <20221221222418.3307832-8-bgardon@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Fri, 13 Jan 2023 09:51:43 -0800
-Message-ID: <CAHVum0dP8PaKGVsg9=9xawj2dOtBnq0YX-SSQ6kkmEjvk4yKKA@mail.gmail.com>
-Subject: Re: [RFC 07/14] KVM: x86/MMU: Cleanup shrinker interface with Shadow MMU
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Nagareddy Reddy <nspreddy@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230113112949.GX4028633@paulmck-ThinkPad-P17-Gen-1>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,181 +111,135 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 21, 2022 at 2:24 PM Ben Gardon <bgardon@google.com> wrote:
->
-> The MMU shrinker currently only operates on the Shadow MMU, but having
-> the entire implemenatation in shadow_mmu.c is awkward since much of the
-> function isn't Shadow MMU specific. There has also been talk of changing the
-> target of the shrinker to the MMU caches rather than already allocated page
-> tables. As a result, it makes sense to move some of the implementation back
-> to mmu.c.
->
-> No functional change intended.
->
-> Signed-off-by: Ben Gardon <bgardon@google.com>
-> ---
->  arch/x86/kvm/mmu/mmu.c        | 43 ++++++++++++++++++++++++
->  arch/x86/kvm/mmu/shadow_mmu.c | 62 ++++++++---------------------------
->  arch/x86/kvm/mmu/shadow_mmu.h |  3 +-
->  3 files changed, 58 insertions(+), 50 deletions(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index dd97e346c786..4c45a5b63356 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -3147,6 +3147,49 @@ static unsigned long mmu_shrink_count(struct shrinker *shrink,
->         return percpu_counter_read_positive(&kvm_total_used_mmu_pages);
->  }
->
-> +unsigned long mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
-> +{
-> +       struct kvm *kvm;
-> +       int nr_to_scan = sc->nr_to_scan;
-> +       unsigned long freed = 0;
-> +
-> +       mutex_lock(&kvm_lock);
-> +
-> +       list_for_each_entry(kvm, &vm_list, vm_list) {
-> +               /*
-> +                * Never scan more than sc->nr_to_scan VM instances.
-> +                * Will not hit this condition practically since we do not try
-> +                * to shrink more than one VM and it is very unlikely to see
-> +                * !n_used_mmu_pages so many times.
-> +                */
-> +               if (!nr_to_scan--)
-> +                       break;
-> +
-> +               /*
-> +                * n_used_mmu_pages is accessed without holding kvm->mmu_lock
-> +                * here. We may skip a VM instance errorneosly, but we do not
-> +                * want to shrink a VM that only started to populate its MMU
-> +                * anyway.
-> +                */
-> +               if (!kvm->arch.n_used_mmu_pages &&
-> +                   !kvm_shadow_mmu_has_zapped_obsolete_pages(kvm))
-> +                       continue;
-> +
-> +               freed = kvm_shadow_mmu_shrink_scan(kvm, sc->nr_to_scan);
-> +
-> +               /*
-> +                * unfair on small ones
-> +                * per-vm shrinkers cry out
-> +                * sadness comes quickly
-> +                */
-> +               list_move_tail(&kvm->vm_list, &vm_list);
-> +               break;
-> +       }
-> +
-> +       mutex_unlock(&kvm_lock);
-> +       return freed;
-> +}
-> +
->  static struct shrinker mmu_shrinker = {
->         .count_objects = mmu_shrink_count,
->         .scan_objects = mmu_shrink_scan,
-> diff --git a/arch/x86/kvm/mmu/shadow_mmu.c b/arch/x86/kvm/mmu/shadow_mmu.c
-> index 090b4788f7de..1259c4a3b140 100644
-> --- a/arch/x86/kvm/mmu/shadow_mmu.c
-> +++ b/arch/x86/kvm/mmu/shadow_mmu.c
-> @@ -3147,7 +3147,7 @@ void kvm_zap_obsolete_pages(struct kvm *kvm)
->         kvm_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
->  }
->
-> -static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
-> +bool kvm_shadow_mmu_has_zapped_obsolete_pages(struct kvm *kvm)
+On Fri, Jan 13, 2023 at 03:29:49AM -0800, Paul E. McKenney wrote:
+> On Thu, Jan 12, 2023 at 10:59:54PM -0800, Boqun Feng wrote:
+> > Although all flavors of RCU are annotated correctly with lockdep as
+> > recursive read locks, their 'check' parameter of lock_acquire() is
+> > unset. It means that RCU read locks are not added into the lockdep
+> > dependency graph therefore deadlock detection based on dependency graph
+> > won't catch deadlock caused by RCU. This is fine for "non-sleepable" RCU
+> > flavors since wait-context detection and other context based detection
+> > can catch these deadlocks. However for sleepable RCU, this is limited.
+> > 
+> > Actually we can detect the deadlocks caused by SRCU by 1) making
+> > srcu_read_lock() a 'check'ed recursive read lock and 2) making
+> > synchronize_srcu() a empty write lock critical section. Even better,
+> > with the newly introduced lock_sync(), we can avoid false positives
+> > about irq-unsafe/safe. So do it.
+> > 
+> > Note that NMI safe SRCU read side critical sections are currently not
+> > annonated, since step-by-step approach can help us deal with
+> > false-positives. These may be annotated in the future.
+> > 
+> > Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+> 
+> Nice, thank you!!!
+> 
+> Acked-by: Paul E. McKenney <paulmck@kernel.org>
+> 
+> Or if you would prefer that I take the series through -rcu, please just
+> let me know.
+> 
 
-Function renaming and removing static should be two separate commits.
+I prefer that the first two patches go through your tree, because it
+reduces the synchronization among locking, rcu and KVM trees to the
+synchronization betwen rcu and KVM trees.
 
->  {
->         return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
->  }
-> @@ -3416,60 +3416,24 @@ void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
->                 kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
->  }
->
-> -unsigned long mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
-> +unsigned long kvm_shadow_mmu_shrink_scan(struct kvm *kvm, int pages_to_free)
->  {
-> -       struct kvm *kvm;
-> -       int nr_to_scan = sc->nr_to_scan;
->         unsigned long freed = 0;
-> +       int idx;
->
-> -       mutex_lock(&kvm_lock);
-> -
-> -       list_for_each_entry(kvm, &vm_list, vm_list) {
-> -               int idx;
-> -               LIST_HEAD(invalid_list);
-> -
-> -               /*
-> -                * Never scan more than sc->nr_to_scan VM instances.
-> -                * Will not hit this condition practically since we do not try
-> -                * to shrink more than one VM and it is very unlikely to see
-> -                * !n_used_mmu_pages so many times.
-> -                */
-> -               if (!nr_to_scan--)
-> -                       break;
-> -               /*
-> -                * n_used_mmu_pages is accessed without holding kvm->mmu_lock
-> -                * here. We may skip a VM instance errorneosly, but we do not
-> -                * want to shrink a VM that only started to populate its MMU
-> -                * anyway.
-> -                */
-> -               if (!kvm->arch.n_used_mmu_pages &&
-> -                   !kvm_has_zapped_obsolete_pages(kvm))
-> -                       continue;
-> -
-> -               idx = srcu_read_lock(&kvm->srcu);
-> -               write_lock(&kvm->mmu_lock);
-> -
-> -               if (kvm_has_zapped_obsolete_pages(kvm)) {
-> -                       kvm_mmu_commit_zap_page(kvm,
-> -                             &kvm->arch.zapped_obsolete_pages);
-> -                       goto unlock;
-> -               }
-> +       idx = srcu_read_lock(&kvm->srcu);
-> +       write_lock(&kvm->mmu_lock);
->
-> -               freed = kvm_mmu_zap_oldest_mmu_pages(kvm, sc->nr_to_scan);
-> +       if (kvm_shadow_mmu_has_zapped_obsolete_pages(kvm)) {
-> +               kvm_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
-> +               goto out;
-> +       }
->
-> -unlock:
-> -               write_unlock(&kvm->mmu_lock);
-> -               srcu_read_unlock(&kvm->srcu, idx);
-> +       freed = kvm_mmu_zap_oldest_mmu_pages(kvm, pages_to_free);
->
-> -               /*
-> -                * unfair on small ones
-> -                * per-vm shrinkers cry out
-> -                * sadness comes quickly
-> -                */
-> -               list_move_tail(&kvm->vm_list, &vm_list);
-> -               break;
-> -       }
-> +out:
-> +       write_unlock(&kvm->mmu_lock);
-> +       srcu_read_unlock(&kvm->srcu, idx);
->
-> -       mutex_unlock(&kvm_lock);
->         return freed;
->  }
-> diff --git a/arch/x86/kvm/mmu/shadow_mmu.h b/arch/x86/kvm/mmu/shadow_mmu.h
-> index 20c65a0ea52c..9952aa1e86cf 100644
-> --- a/arch/x86/kvm/mmu/shadow_mmu.h
-> +++ b/arch/x86/kvm/mmu/shadow_mmu.h
-> @@ -99,7 +99,8 @@ void kvm_shadow_mmu_try_split_huge_pages(struct kvm *kvm,
->  void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
->                                     const struct kvm_memory_slot *slot);
->
-> -unsigned long mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc);
-> +bool kvm_shadow_mmu_has_zapped_obsolete_pages(struct kvm *kvm);
-> +unsigned long kvm_shadow_mmu_shrink_scan(struct kvm *kvm, int pages_to_free);
->
->  /* Exports from paging_tmpl.h */
->  gpa_t paging32_gva_to_gpa(struct kvm_vcpu *vcpu, struct kvm_mmu *mmu,
-> --
-> 2.39.0.314.g84b9a713c41-goog
->
+For patch #3, since it's not really ready yet, so I don't know, but I
+guess when it's finished, probably better go through -rcu.
+
+Regards,
+Boqun
+
+> 							Thanx, Paul
+> 
+> > ---
+> >  include/linux/srcu.h  | 23 +++++++++++++++++++++--
+> >  kernel/rcu/srcutiny.c |  2 ++
+> >  kernel/rcu/srcutree.c |  2 ++
+> >  3 files changed, 25 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/include/linux/srcu.h b/include/linux/srcu.h
+> > index 9b9d0bbf1d3c..a1595f8c5155 100644
+> > --- a/include/linux/srcu.h
+> > +++ b/include/linux/srcu.h
+> > @@ -102,6 +102,21 @@ static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
+> >  	return lock_is_held(&ssp->dep_map);
+> >  }
+> >  
+> > +static inline void srcu_lock_acquire(struct lockdep_map *map)
+> > +{
+> > +	lock_map_acquire_read(map);
+> > +}
+> > +
+> > +static inline void srcu_lock_release(struct lockdep_map *map)
+> > +{
+> > +	lock_map_release(map);
+> > +}
+> > +
+> > +static inline void srcu_lock_sync(struct lockdep_map *map)
+> > +{
+> > +	lock_map_sync(map);
+> > +}
+> > +
+> >  #else /* #ifdef CONFIG_DEBUG_LOCK_ALLOC */
+> >  
+> >  static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
+> > @@ -109,6 +124,10 @@ static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
+> >  	return 1;
+> >  }
+> >  
+> > +#define srcu_lock_acquire(m) do { } while (0)
+> > +#define srcu_lock_release(m) do { } while (0)
+> > +#define srcu_lock_sync(m) do { } while (0)
+> > +
+> >  #endif /* #else #ifdef CONFIG_DEBUG_LOCK_ALLOC */
+> >  
+> >  #define SRCU_NMI_UNKNOWN	0x0
+> > @@ -182,7 +201,7 @@ static inline int srcu_read_lock(struct srcu_struct *ssp) __acquires(ssp)
+> >  
+> >  	srcu_check_nmi_safety(ssp, false);
+> >  	retval = __srcu_read_lock(ssp);
+> > -	rcu_lock_acquire(&(ssp)->dep_map);
+> > +	srcu_lock_acquire(&(ssp)->dep_map);
+> >  	return retval;
+> >  }
+> >  
+> > @@ -226,7 +245,7 @@ static inline void srcu_read_unlock(struct srcu_struct *ssp, int idx)
+> >  {
+> >  	WARN_ON_ONCE(idx & ~0x1);
+> >  	srcu_check_nmi_safety(ssp, false);
+> > -	rcu_lock_release(&(ssp)->dep_map);
+> > +	srcu_lock_release(&(ssp)->dep_map);
+> >  	__srcu_read_unlock(ssp, idx);
+> >  }
+> >  
+> > diff --git a/kernel/rcu/srcutiny.c b/kernel/rcu/srcutiny.c
+> > index b12fb0cec44d..336af24e0fe3 100644
+> > --- a/kernel/rcu/srcutiny.c
+> > +++ b/kernel/rcu/srcutiny.c
+> > @@ -197,6 +197,8 @@ void synchronize_srcu(struct srcu_struct *ssp)
+> >  {
+> >  	struct rcu_synchronize rs;
+> >  
+> > +	srcu_lock_sync(&ssp->dep_map);
+> > +
+> >  	RCU_LOCKDEP_WARN(lockdep_is_held(ssp) ||
+> >  			lock_is_held(&rcu_bh_lock_map) ||
+> >  			lock_is_held(&rcu_lock_map) ||
+> > diff --git a/kernel/rcu/srcutree.c b/kernel/rcu/srcutree.c
+> > index ca4b5dcec675..408088c73e0e 100644
+> > --- a/kernel/rcu/srcutree.c
+> > +++ b/kernel/rcu/srcutree.c
+> > @@ -1267,6 +1267,8 @@ static void __synchronize_srcu(struct srcu_struct *ssp, bool do_norm)
+> >  {
+> >  	struct rcu_synchronize rcu;
+> >  
+> > +	srcu_lock_sync(&ssp->dep_map);
+> > +
+> >  	RCU_LOCKDEP_WARN(lockdep_is_held(ssp) ||
+> >  			 lock_is_held(&rcu_bh_lock_map) ||
+> >  			 lock_is_held(&rcu_lock_map) ||
+> > -- 
+> > 2.38.1
+> > 
