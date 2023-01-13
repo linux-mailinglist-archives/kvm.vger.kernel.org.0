@@ -2,67 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C9486696FD
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 13:29:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2596D66972F
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 13:35:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241471AbjAMM3n (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 07:29:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
+        id S241343AbjAMMeW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 07:34:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241665AbjAMM3I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 07:29:08 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91179167D7;
-        Fri, 13 Jan 2023 04:27:51 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id z9-20020a17090a468900b00226b6e7aeeaso24257972pjf.1;
-        Fri, 13 Jan 2023 04:27:51 -0800 (PST)
+        with ESMTP id S241359AbjAMMc2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 07:32:28 -0500
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F096DF7;
+        Fri, 13 Jan 2023 04:32:02 -0800 (PST)
+Received: by mail-lf1-x12a.google.com with SMTP id bf43so32930903lfb.6;
+        Fri, 13 Jan 2023 04:32:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=eW5T5YPDWz2scVPj5ewyPAEA8d0QvXFW6aERqKteFzM=;
-        b=hdnP4s+MPgeemfmJgGhQ2XkPsiziWn4o0/ZpO6bLXuqBztuGCXESJJY4iEnmidEAiI
-         WllXwkfToJUXI2p3w8NAmxmJT8NUEgA1jELNcZe9W/LeWz9msYT51pUSbpui26PXwLP6
-         iYfJo0aAWLBDWM1K4Y0ilVq72wswZo7iggC7lH98IAU9chHYHZQ5ATor+ng/P747tigD
-         FPaDhlGfsf1eRwYRU4ABaJG8Uu+d5jqQ6r0v8A8var6soBgYIkr8K0pyvcQX1mPZU1PW
-         H1eP1gw03sFB9ZBkYczdbnLyqY0uWjgBD+uE5Vl3xkumQ2PdFt1WsSqxPCnFcj7kb+5a
-         t1dw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XOgXDU+sHcMgYO1LMEdMpweA+Tux0A7aMScAVKQhHEU=;
+        b=o66J6PJSMzM+tgK7YfNlpO5IrrEsq25AeqvE/gU2AT5KCaDQJ1vyhuRAT6qb3wbc1K
+         aClBa6ISvdn5+xKYEK5rjmHt4UF6yIIFDm9V6tdDlFy3DmN1Ng6PllOS6BI3ADdEOUxt
+         ItpUAmN364gAB5gOqw5tfLvF7XYYglkLgOmu2r+9GgFbJSNIsHyC2m4s5KWFoOyC504u
+         q8CV2hdJb2pi5eb/yBfmilhzFedO7/jXk8IQZXueLOf48MdH51YnRL7PGF80/mJJ2746
+         OUdytYpJubB93XsAj1gYlt7JQFGwUXvacg2ikR+4vSv4LmCbSnNGrpzy2dwl2CWA4IkE
+         N6fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=eW5T5YPDWz2scVPj5ewyPAEA8d0QvXFW6aERqKteFzM=;
-        b=QUn/MmR5GMeIax/q7DAJ5YL4P+sYkyurMjzE70ikhuZkhaRxhBQC8dPqyKSuoIwYLN
-         I7cOYnYJBPtpNuP4CUWVOkSNDuPM+B+bYZmWE/blIcVXJ9fBHMDyUVQxBD6K31v/Y+KL
-         Sam/7GIu3SKQrCtrcqDNxGuRlPgOVgwNM8EcUb/gYlnSof0ZT9phYJRJDgbCQBo4XPgk
-         51c1djXblxF0vafwCM3MLZCg9+dMDxwAjoyqASohhkaQst11Ks8790MswVeJc1o6R3ML
-         NBf5v3kJeEgX3F5TVWCI0ahUjZ6HVVX1D3TXSwzhMeBffYAeaNGKJ/3odUlqoS4B5UQg
-         zHoQ==
-X-Gm-Message-State: AFqh2kqbQjBaMA8ZAnKGAUv6X+Dv18nOvCs4/pH3a+K57kS5Nl45SEkB
-        53QnEiRwng3dobS+dz4GT7RB0Nim3As=
-X-Google-Smtp-Source: AMrXdXt3ed0cf2ZJlvfkuHhGg2KJz2VSHHAY4GGUGo8lAoH5LAJPGppQ3cbtOPS9v3vQ1bR7u7QewQ==
-X-Received: by 2002:a05:6a20:a011:b0:b5:c7ed:3de1 with SMTP id p17-20020a056a20a01100b000b5c7ed3de1mr24768485pzj.0.1673612870324;
-        Fri, 13 Jan 2023 04:27:50 -0800 (PST)
-Received: from localhost ([47.88.5.130])
-        by smtp.gmail.com with ESMTPSA id b193-20020a621bca000000b005810c4286d6sm13653167pfb.0.2023.01.13.04.27.49
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 13 Jan 2023 04:27:49 -0800 (PST)
-From:   Lai Jiangshan <jiangshanlai@gmail.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
-Subject: [PATCH] kvm: x86/mmu: Simplify pte_list_{add|remove}
-Date:   Fri, 13 Jan 2023 20:29:10 +0800
-Message-Id: <20230113122910.672417-1-jiangshanlai@gmail.com>
-X-Mailer: git-send-email 2.19.1.6.gb485710b
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XOgXDU+sHcMgYO1LMEdMpweA+Tux0A7aMScAVKQhHEU=;
+        b=boYqV8Xse+hfI8ANNfg/V7Tk7o2opdHLkyRlFkGFxgbiJUb+nWY0iohwy1Tn8m7n9t
+         x4YVoPXdwE7uQEjCYcE0K1/BkOZr4b+d4nJJZ9YrYQstoiaoxwgn/KwM2ZqupjRSx+oQ
+         2jb880a6wo5T/zrAsRR4dw3wXizmYULKmGYpQtJYI9igD5qTJ8I4ollvZcXAgP7auPjk
+         OqFC0JRlsMKmwiun7ns/NIhoCvln6oMDStxxtHITggKK62keJV0IBqAN5cIpzITMNtq3
+         eRXJG48JHK426D6lSytjxVcoE88smQ8sbEM4eEjKtD6qxzCGyy/9bQASxOD3dktb5SUs
+         ARzA==
+X-Gm-Message-State: AFqh2kobWcWlkzmIf0DRROhuBPjloif792ZNYmxCv/e1ReIMYjkjhK8K
+        1jv5s9M8SHOfwXwinvZRHVg=
+X-Google-Smtp-Source: AMrXdXsuzBsv1KzpxBcNlAM2+V7RGH6XhifqV6BwmXVacZhUnICO6vz0bs9BupERItG8lhmqQii78g==
+X-Received: by 2002:a19:5517:0:b0:4b5:a7c7:9dc4 with SMTP id n23-20020a195517000000b004b5a7c79dc4mr5068279lfe.3.1673613120892;
+        Fri, 13 Jan 2023 04:32:00 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id p36-20020a05651213a400b00492b494c4e8sm3818467lfa.298.2023.01.13.04.32.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Jan 2023 04:32:00 -0800 (PST)
+Date:   Fri, 13 Jan 2023 14:31:58 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v11 004/113] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+Message-ID: <20230113143158.00006ca5@gmail.com>
+In-Reply-To: <60c842f347eaecdd0673bdc63acd95b82eeeda9c.1673539699.git.isaku.yamahata@intel.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+        <60c842f347eaecdd0673bdc63acd95b82eeeda9c.1673539699.git.isaku.yamahata@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -73,169 +77,249 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+On Thu, 12 Jan 2023 08:31:12 -0800
+isaku.yamahata@intel.com wrote:
 
-Simplify pte_list_{add|remove} by ensuring all the non-head pte_list_desc
-to be full and addition/removal actions being performed on the head.
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> TDX requires several initialization steps for KVM to create guest TDs.
+> Detect CPU feature, enable VMX (TDX is based on VMX), detect the TDX
+> module availability, and initialize it.  This patch implements those
+> steps.
+> 
+> There are several options on when to initialize the TDX module.  A.)
+> kernel module loading time, B.) the first guest TD creation time.  A.)
+> was chosen. With B.), a user may hit an error of the TDX initialization
+> when trying to create the first guest TD.  The machine that fails to
+> initialize the TDX module can't boot any guest TD further.  Such failure
+> is undesirable and a surprise because the user expects that the machine
+> can accommodate guest TD, but actually not.  So A.) is better than B.).
+> 
+> Introduce a module parameter, enable_tdx, to explicitly enable TDX KVM
+> support.  It's off by default to keep same behavior for those who don't
+> use TDX.  Implement hardware_setup method to detect TDX feature of CPU.
+> Because TDX requires all present CPUs to enable VMX (VMXON).  The x86
+> specific kvm_arch_post_hardware_enable_setup overrides the existing weak
+> symbol of kvm_arch_post_hardware_enable_setup which is called at the KVM
+> module initialization.
+> 
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/Makefile      |  1 +
+>  arch/x86/kvm/vmx/main.c    | 33 +++++++++++++++++++++++-----
+>  arch/x86/kvm/vmx/tdx.c     | 44 ++++++++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/vmx.c     | 39 +++++++++++++++++++++++++++++++++
+>  arch/x86/kvm/vmx/x86_ops.h | 10 +++++++++
+>  5 files changed, 122 insertions(+), 5 deletions(-)
+>  create mode 100644 arch/x86/kvm/vmx/tdx.c
+> 
+> diff --git a/arch/x86/kvm/Makefile b/arch/x86/kvm/Makefile
+> index 0e894ae23cbc..4b01ab842ab7 100644
+> --- a/arch/x86/kvm/Makefile
+> +++ b/arch/x86/kvm/Makefile
+> @@ -25,6 +25,7 @@ kvm-$(CONFIG_KVM_SMM)	+= smm.o
+>  kvm-intel-y		+= vmx/vmx.o vmx/vmenter.o vmx/pmu_intel.o
+> vmx/vmcs12.o \ vmx/hyperv.o vmx/nested.o vmx/posted_intr.o vmx/main.o
+>  kvm-intel-$(CONFIG_X86_SGX_KVM)	+= vmx/sgx.o
+> +kvm-intel-$(CONFIG_INTEL_TDX_HOST)	+= vmx/tdx.o
+>  
+>  kvm-amd-y		+= svm/svm.o svm/vmenter.o svm/pmu.o
+> svm/nested.o svm/avic.o \ svm/sev.o svm/hyperv.o
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 18f659d1d456..f5d1166d2718 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -7,6 +7,22 @@
+>  #include "pmu.h"
+>  #include "tdx.h"
+>  
+> +static bool enable_tdx __ro_after_init =
+> IS_ENABLED(CONFIG_INTEL_TDX_HOST); +module_param_named(tdx, enable_tdx,
+> bool, 0444); +
 
-To make pte_list_add() return a count as before, @tail_count is also
-added to the struct pte_list_desc.
+The comments says "TDX is off by default". It seems default on/off is controlled
+by the kernel configuration here.
 
-No visible performace is changed in tests.  But pte_list_add() is no longer
-shown in the perf result for the COWed pages even the guest forks millions
-of tasks.
+> +static __init int vt_hardware_setup(void)
+> +{
+> +	int ret;
+> +
+> +	ret = vmx_hardware_setup();
+> +	if (ret)
+> +		return ret;
+> +
+> +	enable_tdx = enable_tdx && !tdx_hardware_setup(&vt_x86_ops);
+> +
+> +	return 0;
+> +}
+> +
+>  struct kvm_x86_ops vt_x86_ops __initdata = {
+>  	.name = KBUILD_MODNAME,
+>  
+> @@ -149,7 +165,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>  };
+>  
+>  struct kvm_x86_init_ops vt_init_ops __initdata = {
+> -	.hardware_setup = vmx_hardware_setup,
+> +	.hardware_setup = vt_hardware_setup,
+>  	.handle_intel_pt_intr = NULL,
+>  
+>  	.runtime_ops = &vt_x86_ops,
+> @@ -182,10 +198,17 @@ static int __init vt_init(void)
+>  	 * Common KVM initialization _must_ come last, after this,
+> /dev/kvm is
+>  	 * exposed to userspace!
+>  	 */
+> -	vt_x86_ops.vm_size = max(sizeof(struct kvm_vmx), sizeof(struct
+> kvm_tdx));
+> -	vcpu_size = max(sizeof(struct vcpu_vmx), sizeof(struct
+> vcpu_tdx));
+> -	vcpu_align = max(__alignof__(struct vcpu_vmx),
+> -			 __alignof__(struct vcpu_tdx));
+> +	vt_x86_ops.vm_size = sizeof(struct kvm_vmx);
+> +	vcpu_size = sizeof(struct vcpu_vmx);
+> +	vcpu_align = __alignof__(struct vcpu_vmx);
+> +	if (enable_tdx) {
+> +		vt_x86_ops.vm_size = max_t(unsigned int,
+> vt_x86_ops.vm_size,
+> +					   sizeof(struct kvm_tdx));
+> +		vcpu_size = max_t(unsigned int, vcpu_size,
+> +				  sizeof(struct vcpu_tdx));
+> +		vcpu_align = max_t(unsigned int, vcpu_align,
+> +				   __alignof__(struct vcpu_tdx));
+> +	}
+>  	r = kvm_init(vcpu_size, vcpu_align, THIS_MODULE);
+>  	if (r)
+>  		goto err_kvm_init;
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> new file mode 100644
+> index 000000000000..d7a276118940
+> --- /dev/null
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -0,0 +1,44 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <linux/cpu.h>
+> +
+> +#include <asm/tdx.h>
+> +
+> +#include "capabilities.h"
+> +#include "x86_ops.h"
+> +#include "tdx.h"
+> +#include "x86.h"
+> +
+> +#undef pr_fmt
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +static int __init tdx_module_setup(void)
+> +{
+> +	int ret;
+> +
 
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
----
- arch/x86/kvm/mmu/mmu.c | 77 +++++++++++++++++++++---------------------
- 1 file changed, 38 insertions(+), 39 deletions(-)
+Better mention the tdx_enable() is implemented in another patch? But I guess
+we need a wrapper here so that the compilation would succeed.
 
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 55c9fcd6ed4f..fc64f5f0822f 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -131,10 +131,16 @@ module_param(dbg, bool, 0644);
- struct pte_list_desc {
- 	struct pte_list_desc *more;
- 	/*
--	 * Stores number of entries stored in the pte_list_desc.  No need to be
--	 * u64 but just for easier alignment.  When PTE_LIST_EXT, means full.
-+	 * @spte_count: Stores number of entries stored in the pte_list_desc.
-+	 * When PTE_LIST_EXT, means full.  All the non-head pte_list_desc must
-+	 * be full.
-+	 *
-+	 * @tail_count: Stores number of entries stored in its tail descriptions.
-+	 *
-+	 * No need to be u32 but just for easier alignment.
- 	 */
--	u64 spte_count;
-+	u32 spte_count;
-+	u32 tail_count;
- 	u64 *sptes[PTE_LIST_EXT];
- };
- 
-@@ -917,22 +923,25 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
- 		desc->sptes[0] = (u64 *)rmap_head->val;
- 		desc->sptes[1] = spte;
- 		desc->spte_count = 2;
-+		desc->tail_count = 0;
- 		rmap_head->val = (unsigned long)desc | 1;
- 		++count;
- 	} else {
- 		rmap_printk("%p %llx many->many\n", spte, *spte);
- 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
--		while (desc->spte_count == PTE_LIST_EXT) {
--			count += PTE_LIST_EXT;
--			if (!desc->more) {
--				desc->more = kvm_mmu_memory_cache_alloc(cache);
--				desc = desc->more;
--				desc->spte_count = 0;
--				break;
--			}
--			desc = desc->more;
-+		count = desc->tail_count + desc->spte_count;
-+		/*
-+		 * When the head pte_list_desc is full, the whole list must
-+		 * be full since all the non-head pte_list_desc are full.
-+		 * So just allocate a new head.
-+		 */
-+		if (desc->spte_count == PTE_LIST_EXT) {
-+			desc = kvm_mmu_memory_cache_alloc(cache);
-+			desc->more = (struct pte_list_desc *)(rmap_head->val & ~1ul);
-+			desc->spte_count = 0;
-+			desc->tail_count = count;
-+			rmap_head->val = (unsigned long)desc | 1;
- 		}
--		count += desc->spte_count;
- 		desc->sptes[desc->spte_count++] = spte;
- 	}
- 	return count;
-@@ -940,30 +949,30 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
- 
- static void
- pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
--			   struct pte_list_desc *desc, int i,
--			   struct pte_list_desc *prev_desc)
-+			   struct pte_list_desc *desc, int i)
- {
--	int j = desc->spte_count - 1;
-+	struct pte_list_desc *head_desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
-+	int j = head_desc->spte_count - 1;
- 
--	desc->sptes[i] = desc->sptes[j];
--	desc->sptes[j] = NULL;
--	desc->spte_count--;
--	if (desc->spte_count)
-+	/*
-+	 * Grab an entry from the head pte_list_desc to ensure that
-+	 * the non-head pte_list_desc are full.
-+	 */
-+	desc->sptes[i] = head_desc->sptes[j];
-+	head_desc->sptes[j] = NULL;
-+	head_desc->spte_count--;
-+	if (head_desc->spte_count)
- 		return;
--	if (!prev_desc && !desc->more)
-+	if (!head_desc->more)
- 		rmap_head->val = 0;
- 	else
--		if (prev_desc)
--			prev_desc->more = desc->more;
--		else
--			rmap_head->val = (unsigned long)desc->more | 1;
--	mmu_free_pte_list_desc(desc);
-+		rmap_head->val = (unsigned long)head_desc->more | 1;
-+	mmu_free_pte_list_desc(head_desc);
- }
- 
- static void pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
- {
- 	struct pte_list_desc *desc;
--	struct pte_list_desc *prev_desc;
- 	int i;
- 
- 	if (!rmap_head->val) {
-@@ -979,16 +988,13 @@ static void pte_list_remove(u64 *spte, struct kvm_rmap_head *rmap_head)
- 	} else {
- 		rmap_printk("%p many->many\n", spte);
- 		desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
--		prev_desc = NULL;
- 		while (desc) {
- 			for (i = 0; i < desc->spte_count; ++i) {
- 				if (desc->sptes[i] == spte) {
--					pte_list_desc_remove_entry(rmap_head,
--							desc, i, prev_desc);
-+					pte_list_desc_remove_entry(rmap_head, desc, i);
- 					return;
- 				}
- 			}
--			prev_desc = desc;
- 			desc = desc->more;
- 		}
- 		pr_err("%s: %p many->many\n", __func__, spte);
-@@ -1035,7 +1041,6 @@ static bool kvm_zap_all_rmap_sptes(struct kvm *kvm,
- unsigned int pte_list_count(struct kvm_rmap_head *rmap_head)
- {
- 	struct pte_list_desc *desc;
--	unsigned int count = 0;
- 
- 	if (!rmap_head->val)
- 		return 0;
-@@ -1043,13 +1048,7 @@ unsigned int pte_list_count(struct kvm_rmap_head *rmap_head)
- 		return 1;
- 
- 	desc = (struct pte_list_desc *)(rmap_head->val & ~1ul);
--
--	while (desc) {
--		count += desc->spte_count;
--		desc = desc->more;
--	}
--
--	return count;
-+	return desc->tail_count + desc->spte_count;
- }
- 
- static struct kvm_rmap_head *gfn_to_rmap(gfn_t gfn, int level,
--- 
-2.19.1.6.gb485710b
+> +	ret = tdx_enable();
+> +	if (ret) {
+> +		pr_info("Failed to initialize TDX module.\n");
+> +		return ret;
+> +	}
+> +
+> +	pr_info("TDX is supported.\n");
+> +	return 0;
+> +}
+> +
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops)
+> +{
+> +	int r;
+> +
+> +	if (!enable_ept) {
+> +		pr_warn("Cannot enable TDX with EPT disabled\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* TDX requires VMX. */
+> +	r = vmxon_all();
+> +	if (!r)
+> +		r = tdx_module_setup();
+> +	vmxoff_all();
+> +
+> +	return r;
+> +}
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index 5de1792c9902..5dc7687dcf16 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -8147,6 +8147,45 @@ static unsigned int vmx_handle_intel_pt_intr(void)
+>  	return 1;
+>  }
+>  
+> +static __init void vmxon(void *arg)
+> +{
+> +	int cpu = raw_smp_processor_id();
+> +	u64 phys_addr = __pa(per_cpu(vmxarea, cpu));
+> +	atomic_t *failed = arg;
+> +	int r;
+> +
+> +	if (cr4_read_shadow() & X86_CR4_VMXE) {
+> +		r = -EBUSY;
+> +		goto out;
+> +	}
+> +
+> +	r = kvm_cpu_vmxon(phys_addr);
+> +out:
+> +	if (r)
+> +		atomic_inc(failed);
+> +}
+> +
+> +__init int vmxon_all(void)
+> +{
+> +	atomic_t failed = ATOMIC_INIT(0);
+> +
+> +	on_each_cpu(vmxon, &failed, 1);
+> +
+> +	if (atomic_read(&failed))
+> +		return -EBUSY;
+> +	return 0;
+> +}
+> +
+> +static __init void vmxoff(void *junk)
+> +{
+> +	cpu_vmxoff();
+> +}
+> +
+> +__init void vmxoff_all(void)
+> +{
+> +	on_each_cpu(vmxoff, NULL, 1);
+> +}
+> +
+>  static __init void vmx_setup_user_return_msrs(void)
+>  {
+>  
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 051b5c4b5c2f..fbc57fcbdd21 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -20,6 +20,10 @@ bool kvm_is_vmx_supported(void);
+>  int __init vmx_init(void);
+>  void vmx_exit(void);
+>  
+> +__init int vmxon_all(void);
+> +__init void vmxoff_all(void);
+> +__init int vmx_hardware_setup(void);
+> +
+>  extern struct kvm_x86_ops vt_x86_ops __initdata;
+>  extern struct kvm_x86_init_ops vt_init_ops __initdata;
+>  
+> @@ -133,4 +137,10 @@ void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu);
+>  #endif
+>  void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>  
+> +#ifdef CONFIG_INTEL_TDX_HOST
+> +int __init tdx_hardware_setup(struct kvm_x86_ops *x86_ops);
+> +#else
+> +static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) {
+> return 0; } +#endif
+> +
+>  #endif /* __KVM_X86_VMX_X86_OPS_H */
 
