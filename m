@@ -2,131 +2,185 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 755E466980A
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 14:07:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8EA566982F
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 14:15:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241766AbjAMNHg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 08:07:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44152 "EHLO
+        id S241853AbjAMNPo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 08:15:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241665AbjAMNG7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 08:06:59 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 151F611A;
-        Fri, 13 Jan 2023 04:55:11 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id o7so22029732ljj.8;
-        Fri, 13 Jan 2023 04:55:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xalR/ir655qeRseiVE4P585Bye5lQQNNDDYwDuo4SIE=;
-        b=oh6ybk8PhTUWE92m+MMPdFdxpV7LuNfsUuGykNvGYkohtJVS0fkgJryO2HwUN6UF6G
-         ZUIVUhnu9N+KHSwq30U0kMzoWmkFjN3U0w0xr9QTjKkDLX5nfMM1WAyCKPPLRTl0GAre
-         BL0GNqJVoLD7DQrALmVM2ikl2lvOoOChVsyToKFO1W9ZPN4O2kAGAREIFwFbCTvi33CH
-         YUhwDGn7K7/8gXstCOKwVUGWl7/ES9x12fi0kwQCECe541u9WIrccixMD82xq9mhn/vN
-         E6clG8po+YLLkGVsk1YwgOFsxtg1x9Yw4K2u1oTKr4+HrlhyA1nAPQjcZR2lQtPAPTrU
-         RC1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xalR/ir655qeRseiVE4P585Bye5lQQNNDDYwDuo4SIE=;
-        b=DfJhII4E+DpoMO3n3pXko/2AmrPm/3hC6/Ll+CNknIZjRDSoos8tA6U9J7SufLYUiE
-         FidjH4GXwZeBBeOYK8fnIex0ByJTxVQoFuVCBSiMbYdtQ8yz3A7JQnyd/DNEOmcaoQGo
-         lypKRBvYfgZl8ozoLFFIvHfyi0k7veMCBwFiUcw64VZM1c29DcvC1FqaFRojDaNC8lMW
-         fn5zTzzwIss4rRR0w8ZmhFzoeomtsJkvxKQtYKt6XsFUXonqZ+51tqsEkLQfoYWfBl/f
-         cWMpYzNN/9ceFwI3ez3vFCsxTo6BgIgGgP6dkgZz/xL8f/GbKQqNuycKFMcHzhg1XDiS
-         Yj9Q==
-X-Gm-Message-State: AFqh2kqFl6X41NwWXjYsVr0V/qZhfdoGgsOGVFhwD9UA8JmtBAzx/S4V
-        zj1UWnsTXQEER6VthiKhlNFSRlW2fSU=
-X-Google-Smtp-Source: AMrXdXu3v6yClWLc1DVZ1oit56eWJfk3iMrEBisr4S2fQ+/vRjdI/U8Qu58rqoSCsDrt0JI1ntBElw==
-X-Received: by 2002:a05:651c:1955:b0:281:bff:3667 with SMTP id bs21-20020a05651c195500b002810bff3667mr3209414ljb.1.1673614509135;
-        Fri, 13 Jan 2023 04:55:09 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id g17-20020a2eb5d1000000b0027fd93e9043sm2528210ljn.113.2023.01.13.04.55.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jan 2023 04:55:08 -0800 (PST)
-Date:   Fri, 13 Jan 2023 14:55:07 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v11 017/113] KVM: Support KVM_CAP_MAX_VCPUS for
- KVM_ENABLE_CAP
-Message-ID: <20230113145507.0000115c@gmail.com>
-In-Reply-To: <01e061779b88ce4d32bbe483ed2bd3224cd8e330.1673539699.git.isaku.yamahata@intel.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
-        <01e061779b88ce4d32bbe483ed2bd3224cd8e330.1673539699.git.isaku.yamahata@intel.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        with ESMTP id S241735AbjAMNPG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 08:15:06 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78AB65B48F;
+        Fri, 13 Jan 2023 05:04:34 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30DCYkaS016890;
+        Fri, 13 Jan 2023 13:04:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : from : to : cc : references : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=ww6zMmjTcnOLd/peXe5T2gKR2lL/++unddACNTL4kJ8=;
+ b=H3dv/E+QZqHv4LgfcKoViCe4Mpgl+CB6l0LT6YAW+rMiqwLLkvIzrxOLa5UzkCRK0dwQ
+ vYkD0yIDHcrnfcara6SvzkESH9Rbmm73hasJZWM8tTRuog4Dn2qfFgkRzGBSchbs2gOv
+ p2XeFK1aJGa8gzL09TbFDqSlQsws++g56qDY4/zbqJQM82ydXAs9bhoFhiaNAkAqeTad
+ MizVRbC14FqvWaL7GllIcbMSseQLYm39YRHvHSjIuhh3Ga5iYGWIsjnSfKo8iI71dlDe
+ Wr9jufOssSeMHZ9Y+eHglIB94E/tIC0Q6cXOIC9xb3O3UojGhUKWbAvsf6hys/tQl5o7 pQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n3745h1b3-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Jan 2023 13:04:26 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30DCaYZO025455;
+        Fri, 13 Jan 2023 13:04:25 GMT
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n3745h1au-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Jan 2023 13:04:25 +0000
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30D9nr6A018953;
+        Fri, 13 Jan 2023 13:04:24 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
+        by ppma02wdc.us.ibm.com (PPS) with ESMTPS id 3n1knv7mmf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 13 Jan 2023 13:04:24 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+        by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30DD4Nmd61931944
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 13 Jan 2023 13:04:23 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0C66358056;
+        Fri, 13 Jan 2023 13:04:23 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9151A5804E;
+        Fri, 13 Jan 2023 13:04:20 +0000 (GMT)
+Received: from [9.160.94.233] (unknown [9.160.94.233])
+        by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 13 Jan 2023 13:04:20 +0000 (GMT)
+Message-ID: <1b45ee50-4b5d-8baf-a7ac-213d93810bee@linux.ibm.com>
+Date:   Fri, 13 Jan 2023 08:04:20 -0500
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v2] vfio: fix potential deadlock on vfio group lock
+Content-Language: en-US
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+To:     alex.williamson@redhat.com, pbonzini@redhat.com
+Cc:     jgg@nvidia.com, cohuck@redhat.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, seanjc@google.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
+References: <20230112203844.41179-1-mjrosato@linux.ibm.com>
+In-Reply-To: <20230112203844.41179-1-mjrosato@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FK2FA6y0FMkvmXlctVD_onLmjziCsCtV
+X-Proofpoint-GUID: fpYPBVu0flP9NM919a5cnTgN6lCDkcUT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-13_05,2023-01-13_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 impostorscore=0 malwarescore=0 priorityscore=1501
+ mlxlogscore=999 suspectscore=0 bulkscore=0 mlxscore=0 adultscore=0
+ phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301130083
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Jan 2023 08:31:25 -0800
-isaku.yamahata@intel.com wrote:
-
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On 1/12/23 3:38 PM, Matthew Rosato wrote:
+> Currently it is possible that the final put of a KVM reference comes from
+> vfio during its device close operation.  This occurs while the vfio group
+> lock is held; however, if the vfio device is still in the kvm device list,
+> then the following call chain could result in a deadlock:
 > 
-> TDX attestation includes the maximum number of vcpu that the guest can
-> accommodate.  For that, the maximum number of vcpu needs to be specified
-> instead of constant, KVM_MAX_VCPUS.  Make KVM_ENABLE_CAP support
-> KVM_CAP_MAX_VCPUS.
+> kvm_put_kvm
+>  -> kvm_destroy_vm
+>   -> kvm_destroy_devices
+>    -> kvm_vfio_destroy
+>     -> kvm_vfio_file_set_kvm
+>      -> vfio_file_set_kvm
+>       -> group->group_lock/group_rwsem
 > 
-> Suggested-by: Sagi Shahar <sagis@google.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Avoid this scenario by having vfio core code acquire a KVM reference
+> the first time a device is opened and hold that reference until the
+> device fd is closed, at a point after the group lock has been released.
+> 
+> Fixes: 421cfe6596f6 ("vfio: remove VFIO_GROUP_NOTIFY_SET_KVM")
+> Reported-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
 > ---
->  virt/kvm/kvm_main.c | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
+> Changes from v1:
+> * Re-write using symbol get logic to get kvm ref during first device
+>   open, release the ref during device fd close after group lock is
+>   released
+> * Drop kvm get/put changes to drivers; now that vfio core holds a
+>   kvm ref until sometime after the device_close op is called, it
+>   should be fine for drivers to get and put their own references to it.
+> ---
+>  drivers/vfio/group.c     |  6 ++---
+>  drivers/vfio/vfio_main.c | 48 +++++++++++++++++++++++++++++++++++++---
+>  include/linux/vfio.h     |  1 -
+>  3 files changed, 48 insertions(+), 7 deletions(-)
 > 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index a235b628b32f..1cfa7da92ad0 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4945,7 +4945,27 @@ static int kvm_vm_ioctl_enable_cap_generic(struct
-> kvm *kvm, }
->  
->  		mutex_unlock(&kvm->slots_lock);
-> +		return r;
-> +	}
-> +	case KVM_CAP_MAX_VCPUS: {
-
-Better mention the KVM_CAP_MAX_VCPUS defined in XXX patch in the comments.
-
-> +		int r;
->  
-> +		if (cap->flags || cap->args[0] == 0)
-> +			return -EINVAL;
-> +		if (cap->args[0] >  kvm_vm_ioctl_check_extension(kvm,
-> KVM_CAP_MAX_VCPUS))
-> +			return -E2BIG;
-> +
-> +		mutex_lock(&kvm->lock);
-> +		/* Only decreasing is allowed. */
-> +		if (cap->args[0] > kvm->max_vcpus)
-> +			r = -E2BIG;
-> +		else if (kvm->created_vcpus)
-> +			r = -EBUSY;
-> +		else {
-> +			kvm->max_vcpus = cap->args[0];
-> +			r = 0;
-> +		}
-> +		mutex_unlock(&kvm->lock);
->  		return r;
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index bb24b2f0271e..2b0da82f82f4 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -165,9 +165,9 @@ static int vfio_device_group_open(struct vfio_device *device)
 >  	}
->  	default:
+>  
+>  	/*
+> -	 * Here we pass the KVM pointer with the group under the lock.  If the
+> -	 * device driver will use it, it must obtain a reference and release it
+> -	 * during close_device.
+> +	 * Here we pass the KVM pointer with the group under the lock.  A
+> +	 * reference will be obtained the first time the device is opened and
+> +	 * will be held until the device fd is closed.
+>  	 */
+>  	ret = vfio_device_open(device, device->group->iommufd,
+>  			       device->group->kvm);
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 5177bb061b17..c969e2a0ecd3 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -16,6 +16,7 @@
+>  #include <linux/fs.h>
+>  #include <linux/idr.h>
+>  #include <linux/iommu.h>
+> +#include <linux/kvm_host.h>
+
+Ugh, looks like including linux/kvm_host.h here breaks architectures that don't have an arch/*/include/uapi/asm/kvm.h
+
+AFAICT this should be implicit with the CONFIG_HAVE_KVM bool, so unless someone has a better idea, to avoid I think we can key off of CONFIG_HAVE_KVM like so...
+
+#ifdef CONFIG_HAVE_KVM
+#include <linux/kvm_host.h>
+#endif
+
+[...]
+
+#ifdef CONFIG_HAVE_KVM
+[...symbol_get implementation here...]
+#else
+static bool vfio_kvm_get_kvm_safe(struct kvm *kvm)
+{
+	return false;
+}
+static void vfio_kvm_put_kvm(struct kvm *kvm)
+{
+
+}
+#endif
+
 
