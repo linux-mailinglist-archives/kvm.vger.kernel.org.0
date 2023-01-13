@@ -2,77 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 639D8668F60
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 08:42:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D827E669164
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 09:43:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236402AbjAMHmb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 02:42:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35550 "EHLO
+        id S240140AbjAMInW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 03:43:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234653AbjAMHmH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 02:42:07 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD7371A839
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 23:42:06 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id i9so30095196edj.4
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 23:42:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nsdFs6pzrliWUStfNOl1FM9T1mI6Xi1uicxIBR+DHR0=;
-        b=bxg1JS8fp+9+/+7/09+z6yzY2UJpMRs52IaTtZs4uChAsUtbFr3/5xjnZ2k8aPLFrI
-         EC7tEE24pKzHsigOYR9z4BFbxC3/iEJXOK4WREzE3Z5Tcyny0ZpGcnLUIEMwUotRlpcw
-         lZM6FwML+lEJGVYZbFzIBaHIBU3qh2tCXZauGMuuEutvJfiZlhEMsdpTJct0SRkdCtng
-         sarYsRN7TiRqDEFGwgYGG3cYJ9RZYwCGxxBJASK4jBlhtMTWrFsmRl8cyIlCAj3WdBJj
-         Lav4o1Cr+KDqYPabyg43TRivHDBRAqpf8rmkN2uM/3MbrhNm/ZyVGTnJiuNAXW6Dlo1s
-         exyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nsdFs6pzrliWUStfNOl1FM9T1mI6Xi1uicxIBR+DHR0=;
-        b=b8YMhkRbzXIN0fMS4JwHtekbRTNTg+U8NJGUttqt4W1R0goTp8oKK5DhDbyjy1gzSS
-         XgA7DVNteMxysathPVXr+s4x4wtwSy58lYyyzA1mJ8Jo/7kpRjf8uLJaXHyvzESOcaQ4
-         +f2f/LfRZAvac3zOw5zFhDdn5clC63f6E88UPFd7PfacKIbppGgp5v3eLVbzhBfCQzEj
-         RwjfcAL53SoO2JLZS5A/+jSeUXo0bmJ1MGfoiWzH5OwmCRPlGT1fsHAEwyMnnpOlVKsu
-         kvuhwA+/vAlFolAd1ksmi14JMOP2EYPmex7KWzmkijJLERUcvh5l+bGAGfTVctrjeKeA
-         JY2w==
-X-Gm-Message-State: AFqh2krFqO+gCxO9KP9dFN+h8T2dQdMra8KkVOsKmXzsflBX/5Dt4cUV
-        DNfGHrXcleTmln8TTiucfcr8d9BTiatkdfpO
-X-Google-Smtp-Source: AMrXdXtm2abt8YC1BnrO9ZablHgd7dzlkKrmOBXbgyyxB4FSNCxnE4tz+rAhG7qm5jh2MQ0HncQ+xQ==
-X-Received: by 2002:aa7:c393:0:b0:499:b604:4de6 with SMTP id k19-20020aa7c393000000b00499b6044de6mr14363452edq.25.1673595725444;
-        Thu, 12 Jan 2023 23:42:05 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id l15-20020aa7c3cf000000b00467481df198sm7904083edr.48.2023.01.12.23.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jan 2023 23:42:05 -0800 (PST)
-Date:   Fri, 13 Jan 2023 08:42:04 +0100
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Atish Kumar Patra <atishp@rivosinc.com>
-Cc:     linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Guo Ren <guoren@kernel.org>, kvm-riscv@lists.infradead.org,
-        kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Sergey Matyukevich <sergey.matyukevich@syntacore.com>,
-        Eric Lin <eric.lin@sifive.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v2 04/11] RISC-V: KVM: Modify SBI extension handler to
- return SBI error code
-Message-ID: <20230113074204.p3wmeer2o3penunt@orel>
-References: <20221215170046.2010255-1-atishp@rivosinc.com>
- <20221215170046.2010255-5-atishp@rivosinc.com>
- <20230112110444.jjbmgslr6dspxwbh@orel>
- <CAHBxVyEyMdk+vQ5wTgOF56UJs-zLtkVixDxXquTjoLyV6Vj21Q@mail.gmail.com>
+        with ESMTP id S240478AbjAMInM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 03:43:12 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2C9718BC
+        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 00:43:03 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 602A0B820AD
+        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 08:43:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0581CC433D2
+        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 08:43:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673599381;
+        bh=VWqFn2nrQ1VOr4bktq8hfDgfkve6UGFejZrigHJqfmY=;
+        h=From:To:Subject:Date:From;
+        b=TGpT7gep9UQMVbpoplrQJjgP1B/+xsavkDM1hDJrObiPOUqfNBuWc51lNU9r2E0Sp
+         ohHHqUKfkH844mMsTE9Y3tkXSqkunOvlKKuMZJMhWhzhg/HdRrtwluzIojh7wotAuH
+         NE0cyVWk9kRzKnlqHYKsqwCcLFnA3y6HI1W9Uj0OD1hBa1LlgxguOnmC5z85h/F87R
+         J0NpvG92XJqWKn8C6IvmxgYdbOtm/2jghr9ku3HykdZ54jU4/LadlNS2FounzYbc3T
+         gaSGBIVNsXEdO9apCL78If0d4DZx2+JOrz0C4xcwkIPCmKmRdEiCDCo2nL6TCeobx/
+         8we5tnPKoU+FQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+        id E3690C43144; Fri, 13 Jan 2023 08:43:00 +0000 (UTC)
+From:   bugzilla-daemon@kernel.org
+To:     kvm@vger.kernel.org
+Subject: [Bug 216923] New: kvm-unit-test pmu_pebs is skipped on SPR
+Date:   Fri, 13 Jan 2023 08:43:00 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: lixiao.yang@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-216923-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHBxVyEyMdk+vQ5wTgOF56UJs-zLtkVixDxXquTjoLyV6Vj21Q@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,31 +69,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 10:47:13AM -0800, Atish Kumar Patra wrote:
-> On Thu, Jan 12, 2023 at 3:04 AM Andrew Jones <ajones@ventanamicro.com> wrote:
-> >
-> > On Thu, Dec 15, 2022 at 09:00:39AM -0800, Atish Patra wrote:
-...
-> > > +      * and forwards the error to the userspace.
-> > > +      */
-> > > +     if (ret < 0) {
-> > > +             next_sepc = false;
-> > > +             goto ecall_done;
-> > > +     }
-> >
-> > Shouldn't this ret < 0 check go above the "Handle special error cases..."
-> > block?
-> >
-> 
-> Why ? I thought if an extension handler has both utrap updated and
-> returns an error,
-> user space redirection should take precedence. Let me know if it is wrong.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D216923
 
-My thinking was that utrap cannot be trusted if the handler returned an
-error. The handler may not even have had a chance to set it before hitting
-the error condition. IOW, we should check 'ret' right after the handler
-call. If it's < 0, then from the caller's perspective the handler didn't
-execute due to a KVM failure and it should be reported to userspace.
+            Bug ID: 216923
+           Summary: kvm-unit-test pmu_pebs is skipped on SPR
+           Product: Virtualization
+           Version: unspecified
+    Kernel Version: 6.1
+          Hardware: Intel
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: lixiao.yang@intel.com
+        Regression: No
 
-Thanks,
-drew
+Environment:
+Platform: Intel(R) Xeon(R) Platinum 8487C (Sapphire Rapids)
+CPU Architecture: x86_64
+Host OS: Red Hat Enterprise Linux 9 (Ootpa)
+Host kernel: Linux 6.1 release
+gcc: gcc (GCC) 11.2.1 20220127 (Red Hat 11.2.1-9)
+Host kernel source:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+Branch: master
+Commit: 830b3c68
+
+Qemu source: https://git.qemu.org/git/qemu.git
+Branch: master
+Commit: 5204b499
+
+kvm-unit-tests source: https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+Branch: master
+Commit: 7cefda524604fe1138333315ce06224d4d864dab
+
+Bug Detailed Description:
+kvm-unit-test pmu_pebs is skipped on the linux 6.1 release kernel on Sapphi=
+re
+Rapids. PEBS should be supported on SPR. However, the kvm-unit-test pmu_peb=
+s is
+skipped on SPR with linux 6.1 release kernel. In addition, kvm-unit-test
+pmu_pebs can pass on Ice Lake rather than being skipped.=20
+
+
+Reproducing Steps:
+
+git clone https://gitlab.com/kvm-unit-tests/kvm-unit-tests.git
+cd kvm-unit-tests
+./configure
+make standalone
+cd tests
+./pmu_pebs
+
+Actual Result:
+BUILD_HEAD=3D7cefda52
+timeout -k 1s --foreground 90s /usr/local/bin/qemu-system-x86_64 --no-reboot
+-nodefaults -device pc-testdev -device isa-debug-exit,iobase=3D0xf4,iosize=
+=3D0x4
+-vnc none -serial stdio -device pci-testdev -machine accel=3Dkvm -kernel
+/tmp/tmp.6qzCjJnrIy -smp 1 -cpu host,migratable=3Dno # -initrd
+/tmp/tmp.yEVIxAWSsB
+enabling apic
+smp: waiting for 0 APs
+paging enabled
+cr0 =3D 80010011
+cr3 =3D 1007000
+cr4 =3D 20
+PMU version: 2
+SKIP: PEBS not enumerated in PERF_CAPABILITIES
+SUMMARY: 1 tests, 1 skipped
+SKIP pmu_pebs (1 tests, 1 skipped)
+
+
+Expected Result:
+pmu_pebs successfully executed
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
