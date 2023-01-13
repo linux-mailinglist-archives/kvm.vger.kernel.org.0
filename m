@@ -2,302 +2,193 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE988669F52
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 18:13:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0572F669FE8
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 18:19:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229982AbjAMRNy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 12:13:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53582 "EHLO
+        id S230174AbjAMRS6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 12:18:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbjAMRNZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 12:13:25 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2DF6E89BEA;
-        Fri, 13 Jan 2023 09:11:47 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30DGHISV003143;
-        Fri, 13 Jan 2023 17:11:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=rmB3tNOfF0Nb80BWV6tyA3MrK480SPOHdQYPYzfIaAw=;
- b=tk+WdoeNY3GHmvOEt47ul0guggng+K3Y1oW3457egKdKkbBsAcre6o6U2KZYqlWm4hiE
- ZjH7n42XNtY3EmepVBAtgM+VBi7HuIkFEAVL3plggkG+sSITzVJAAN+v/eDsLlpdfYvH
- 4e3QL/jkNR+k04P6PR5biPDTWcu4tzHLfCAS6LR5AnvKGetKQtZWFj+4hMfktmFTluZf
- s6avs9eiSM+hzf5ZW0wHEkqwXYNu0suPVRMfh2KB60AYhBAhgFo2XZVWZuf9B+kWhevU
- /96sDhL1vAnhNZ4Rpp2968qgX7FhwGuydXZYSnzoN0YxcH6d7qErm4vFsNuksB2rELgb wA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n3apk1e3h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Jan 2023 17:11:39 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30DGLBT3018627;
-        Fri, 13 Jan 2023 17:11:38 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n3apk1e38-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Jan 2023 17:11:38 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30DF4L7i014717;
-        Fri, 13 Jan 2023 17:11:37 GMT
-Received: from smtprelay04.dal12v.mail.ibm.com ([9.208.130.102])
-        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3n1kv5n01y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 13 Jan 2023 17:11:37 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-        by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30DHBZNJ197232
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Jan 2023 17:11:36 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B715B58043;
-        Fri, 13 Jan 2023 17:11:35 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 380B25805F;
-        Fri, 13 Jan 2023 17:11:33 +0000 (GMT)
-Received: from li-2311da4c-2e09-11b2-a85c-c003041e9174.ibm.com.com (unknown [9.160.94.233])
-        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 13 Jan 2023 17:11:33 +0000 (GMT)
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     alex.williamson@redhat.com, pbonzini@redhat.com
-Cc:     jgg@nvidia.com, cohuck@redhat.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@linux.ibm.com,
-        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
-        akrowiak@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, seanjc@google.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3] vfio: fix potential deadlock on vfio group lock
-Date:   Fri, 13 Jan 2023 12:11:32 -0500
-Message-Id: <20230113171132.86057-1-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 2.39.0
+        with ESMTP id S229802AbjAMRSV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 12:18:21 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD9E69151C;
+        Fri, 13 Jan 2023 09:13:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=xKZzQLm4481MAkYjQuuWCB83GRbGQN4diSnDkd1Q3KE=; b=CZK4jHiZAgBlmxZ5W9gA2fH6og
+        iQK55DszA6tzKpMMvNV9ep5Sk0YeQ3k/3S7w3NOuOAnMsYRUea5RL0xvWrttvAaC90xYmydRmt1Ci
+        /Bj7m0bsAgal3G5yNyV3UQBS/N5vECzIn/bkbGvjwDzuThGUe7bT9zDEd0sci9bg3RgXihV79DGAK
+        oX6MneVhs6Mm+V4CHyn/0Y5KW/aknouxwgwAugwh8FV1fibsNHyodUMmZjUrC0pHV9XnP9rc2uHnq
+        txmNXJPQ4ZaxJ0QRnGwaBdbe6qpwyYsn6jqKc6IFf8FHluXge4EPNfMtpAr7Qcf0Y823kQ0CeHMxX
+        pdB+paxQ==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pGNcE-006HJd-Sx; Fri, 13 Jan 2023 17:13:19 +0000
+Message-ID: <ea5fe6ced5c167ab0cae7dc1609ddfb9fe521782.camel@infradead.org>
+Subject: Re: [PATCH 2/3] KVM: selftests: Use enum for test numbers in
+ xen_shinfo_test
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Boqun Feng <boqun.feng@gmail.com>, linux-kernel@vger.kernel.org,
+        rcu@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Luczaj <mhal@rbox.co>
+Date:   Fri, 13 Jan 2023 17:13:04 +0000
+In-Reply-To: <20230113124606.10221-3-dwmw2@infradead.org>
+References: <20230113065955.815667-1-boqun.feng@gmail.com>
+         <20230113124606.10221-1-dwmw2@infradead.org>
+         <20230113124606.10221-3-dwmw2@infradead.org>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-5Sz92Co1BWRP51WkckZo"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9vANe1Lemnb7dlBI2iIfePB6DG5MqF7U
-X-Proofpoint-GUID: S_fuYn6ObG9fDFiFS789j50vp3mf3-hc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-13_08,2023-01-13_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- clxscore=1015 suspectscore=0 mlxlogscore=999 lowpriorityscore=0
- phishscore=0 mlxscore=0 malwarescore=0 impostorscore=0 adultscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301130110
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently it is possible that the final put of a KVM reference comes from
-vfio during its device close operation.  This occurs while the vfio group
-lock is held; however, if the vfio device is still in the kvm device list,
-then the following call chain could result in a deadlock:
 
-kvm_put_kvm
- -> kvm_destroy_vm
-  -> kvm_destroy_devices
-   -> kvm_vfio_destroy
-    -> kvm_vfio_file_set_kvm
-     -> vfio_file_set_kvm
-      -> group->group_lock/group_rwsem
+--=-5Sz92Co1BWRP51WkckZo
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 
-Avoid this scenario by having vfio core code acquire a KVM reference
-the first time a device is opened and hold that reference until the
-device fd is closed, at a point after the group lock has been released.
+T24gRnJpLCAyMDIzLTAxLTEzIGF0IDEyOjQ2ICswMDAwLCBEYXZpZCBXb29kaG91c2Ugd3JvdGU6
+Cj4gQEAgLTQzOSw2ICs0NjksNyBAQCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQo+
+IMKgwqDCoMKgwqDCoMKgwqBib29sIHZlcmJvc2U7Cj4gwqDCoMKgwqDCoMKgwqDCoGludCByZXQ7
+Cj4gwqAKPiArwqDCoMKgwqDCoMKgwqBwcmludGYoIlRFU1RfRE9ORSBpcyAlZFxuIiwgVEVTVF9E
+T05FKTsKPiDCoMKgwqDCoMKgwqDCoMKgdmVyYm9zZSA9IGFyZ2MgPiAxICYmICghc3RybmNtcChh
+cmd2WzFdLCAiLXYiLCAzKSB8fAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAhc3RybmNtcChhcmd2WzFdLCAiLS12ZXJib3NlIiwg
+MTApKTsKPiDCoAoKRGFtbWl0Lgo=
 
-Fixes: 421cfe6596f6 ("vfio: remove VFIO_GROUP_NOTIFY_SET_KVM")
-Reported-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
-Changes from v2:
-* Re-arrange vfio_kvm_set_kvm_safe error path to still trigger
-  device_open with device->kvm=NULL (Alex)
-* get device->dev_set->lock when checking device->open_count (Alex)
-* but don't hold it over the kvm_put_kvm (Jason)
-* get kvm_put symbol upfront and stash it in device until close (Jason)
-* check CONFIG_HAVE_KVM to avoid build errors on architectures without
-  KVM support
 
-Changes from v1:
-* Re-write using symbol get logic to get kvm ref during first device
-  open, release the ref during device fd close after group lock is
-  released
-* Drop kvm get/put changes to drivers; now that vfio core holds a
-  kvm ref until sometime after the device_close op is called, it
-  should be fine for drivers to get and put their own references to it.
----
- drivers/vfio/group.c     |  6 ++--
- drivers/vfio/vfio_main.c | 78 +++++++++++++++++++++++++++++++++++++---
- include/linux/vfio.h     |  2 +-
- 3 files changed, 77 insertions(+), 9 deletions(-)
+--=-5Sz92Co1BWRP51WkckZo
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
 
-diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-index bb24b2f0271e..2b0da82f82f4 100644
---- a/drivers/vfio/group.c
-+++ b/drivers/vfio/group.c
-@@ -165,9 +165,9 @@ static int vfio_device_group_open(struct vfio_device *device)
- 	}
- 
- 	/*
--	 * Here we pass the KVM pointer with the group under the lock.  If the
--	 * device driver will use it, it must obtain a reference and release it
--	 * during close_device.
-+	 * Here we pass the KVM pointer with the group under the lock.  A
-+	 * reference will be obtained the first time the device is opened and
-+	 * will be held until the device fd is closed.
- 	 */
- 	ret = vfio_device_open(device, device->group->iommufd,
- 			       device->group->kvm);
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 5177bb061b17..dbdf16903d52 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -16,6 +16,9 @@
- #include <linux/fs.h>
- #include <linux/idr.h>
- #include <linux/iommu.h>
-+#ifdef CONFIG_HAVE_KVM
-+#include <linux/kvm_host.h>
-+#endif
- #include <linux/list.h>
- #include <linux/miscdevice.h>
- #include <linux/module.h>
-@@ -344,6 +347,57 @@ static bool vfio_assert_device_open(struct vfio_device *device)
- 	return !WARN_ON_ONCE(!READ_ONCE(device->open_count));
- }
- 
-+#ifdef CONFIG_HAVE_KVM
-+static bool vfio_kvm_get_kvm_safe(struct vfio_device *device, struct kvm *kvm)
-+{
-+	void (*pfn)(struct kvm *kvm);
-+	bool (*fn)(struct kvm *kvm);
-+	bool ret;
-+
-+	pfn = symbol_get(kvm_put_kvm);
-+	if (WARN_ON(!pfn))
-+		return false;
-+
-+	fn = symbol_get(kvm_get_kvm_safe);
-+	if (WARN_ON(!fn)) {
-+		symbol_put(kvm_put_kvm);
-+		return false;
-+	}
-+
-+	ret = fn(kvm);
-+	if (ret)
-+		device->put_kvm = pfn;
-+	else
-+		symbol_put(kvm_put_kvm);
-+
-+	symbol_put(kvm_get_kvm_safe);
-+
-+	return ret;
-+}
-+
-+static void vfio_kvm_put_kvm(struct vfio_device *device, struct kvm *kvm)
-+{
-+	if (WARN_ON(!device->put_kvm))
-+		return;
-+
-+	device->put_kvm(kvm);
-+
-+	device->put_kvm = NULL;
-+
-+	symbol_put(kvm_put_kvm);
-+}
-+#else
-+static bool vfio_kvm_get_kvm_safe(struct vfio_device *device, struct kvm *kvm)
-+{
-+	return false;
-+}
-+
-+static void vfio_kvm_put_kvm(struct vfio_device *device, struct kvm *kvm)
-+{
-+
-+}
-+#endif
-+
- static int vfio_device_first_open(struct vfio_device *device,
- 				  struct iommufd_ctx *iommufd, struct kvm *kvm)
- {
-@@ -361,16 +415,21 @@ static int vfio_device_first_open(struct vfio_device *device,
- 	if (ret)
- 		goto err_module_put;
- 
--	device->kvm = kvm;
-+	if (kvm && vfio_kvm_get_kvm_safe(device, kvm))
-+		device->kvm = kvm;
-+
- 	if (device->ops->open_device) {
- 		ret = device->ops->open_device(device);
- 		if (ret)
--			goto err_unuse_iommu;
-+			goto err_put_kvm;
- 	}
- 	return 0;
- 
--err_unuse_iommu:
--	device->kvm = NULL;
-+err_put_kvm:
-+	if (device->kvm) {
-+		vfio_kvm_put_kvm(device, device->kvm);
-+		device->kvm = NULL;
-+	}
- 	if (iommufd)
- 		vfio_iommufd_unbind(device);
- 	else
-@@ -387,7 +446,6 @@ static void vfio_device_last_close(struct vfio_device *device,
- 
- 	if (device->ops->close_device)
- 		device->ops->close_device(device);
--	device->kvm = NULL;
- 	if (iommufd)
- 		vfio_iommufd_unbind(device);
- 	else
-@@ -462,9 +520,19 @@ static inline void vfio_device_pm_runtime_put(struct vfio_device *device)
- static int vfio_device_fops_release(struct inode *inode, struct file *filep)
- {
- 	struct vfio_device *device = filep->private_data;
-+	struct kvm *kvm = NULL;
- 
- 	vfio_device_group_close(device);
- 
-+	mutex_lock(&device->dev_set->lock);
-+	if (device->open_count == 0 && device->kvm) {
-+		kvm = device->kvm;
-+		device->kvm = NULL;
-+	}
-+	mutex_unlock(&device->dev_set->lock);
-+	if (kvm)
-+		vfio_kvm_put_kvm(device, kvm);
-+
- 	vfio_device_put_registration(device);
- 
- 	return 0;
-diff --git a/include/linux/vfio.h b/include/linux/vfio.h
-index 35be78e9ae57..87ff862ff555 100644
---- a/include/linux/vfio.h
-+++ b/include/linux/vfio.h
-@@ -46,7 +46,6 @@ struct vfio_device {
- 	struct vfio_device_set *dev_set;
- 	struct list_head dev_set_list;
- 	unsigned int migration_flags;
--	/* Driver must reference the kvm during open_device or never touch it */
- 	struct kvm *kvm;
- 
- 	/* Members below here are private, not for driver use */
-@@ -58,6 +57,7 @@ struct vfio_device {
- 	struct list_head group_next;
- 	struct list_head iommu_entry;
- 	struct iommufd_access *iommufd_access;
-+	void (*put_kvm)(struct kvm *kvm);
- #if IS_ENABLED(CONFIG_IOMMUFD)
- 	struct iommufd_device *iommufd_device;
- 	struct iommufd_ctx *iommufd_ictx;
--- 
-2.39.0
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTEzMTcxMzA0WjAvBgkqhkiG9w0BCQQxIgQgOlMMkgkR
+SIMX1KJOqCvNC8a7r4pvk17uWKjilQzIXvwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgACnZnsEYBUQiTVFKAmRWCQzUOUr4i42o7g
+iqCXPxenwHxTsqiM0YbFzs8YGBubgeRggbVSGk+ADE4a54zm7FkF3SXnfYMXeZ5moT7V/qKhNdG6
+48HSMXb0PWiVxzZMKNUBm2tykmd4oIsrYjd+1Mr+xjb6ffd9q+k9T3uf2LJtMF8CDxTDTEyMw7DG
+oAbaFP1TV9h8oC7TwfK4zxwXpw5XDyjIPkhRIjcvlzAOop7yzDbb7Vj4wJJGvQUuR6otAjBvSP20
+PT0CEFh0M4a2pRyXRjUmRfOFmeqb3VM+tjb8r5Jz/jZGeAVRV2anseGNw0rcfQPO149BWMGMzphc
+0RmQ3xumD7Or/UbSvOy32ktJiWXshHuyl7cY3stObgI3s6dqFxTnVJCvAnCM7B41wTNY0qtP79gf
+ZDzbOHccR1N+7ZCSKKaOgrgePdXzw2+OELzjlGuy0rg/hCW0aHoU2aPbV8eso32veks5xsHpgWLR
+6FysHmYFeAypMZSOMJCv6Pn0I99dlJwnF1+yS2Vab5J9ExJQNdn+p+n6MSR4bF19z+mgDrvubR0r
+7fB5OwNTw+0wNWd5NHhOxRVfN/ljpNt1bnrlf421TQecwEyBJnjv4fiYgmRqKS0Vp2RrmwSIL2zB
+RsHrUq+cQori1zorA7+8ibhwJ+kMUw+lLNs5ClQUmwAAAAAAAA==
 
+
+--=-5Sz92Co1BWRP51WkckZo--
