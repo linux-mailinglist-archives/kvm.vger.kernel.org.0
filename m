@@ -2,354 +2,192 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C7CDD66A579
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 22:54:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E8FA66A58B
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 23:01:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231261AbjAMVy6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 16:54:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44836 "EHLO
+        id S230527AbjAMWBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 17:01:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231241AbjAMVys (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 16:54:48 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D5A089BFC
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 13:54:46 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id p24so24736487plw.11
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 13:54:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hhpii7kCapxhB0DJlYGUjw51omeyUMoY3UIeTjTnFe8=;
-        b=ZS8LNlcnnRbTeDNfK2GnjCI2FQe2seYywb27tQYC3rATL6nUcWgzHk9l/X49WuLcR7
-         MxufLxr4v5JyxI8Fk1Rsy+L0v3HCs2Ec8RosxfNd68idcjN8NrAd5lDB2yRN59zB7jGz
-         6llde0y8FGi0l0gklzTrCW0fHKCLbzGY3eEZyTr4IC7nOy4rj8dmCUa/Wmt4RvJB6d00
-         xnrtlDsZLljAn2dP16/btJGNbyLLNxO0CqLkw/NAE7vznaQRmtr0IXKeX+0obFYouInv
-         MbvsZmtjBoLbl3xae92pVeR0xrb1+kiQFuFIG6fid2t+s7JP6kK3JdHZJblcxSDNzPmx
-         SOng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hhpii7kCapxhB0DJlYGUjw51omeyUMoY3UIeTjTnFe8=;
-        b=XG3PPTmJBffGUz2WxX2EJh0Hm6xM+Exo13mB8dAdG/qZKZEb0dTdUrY+w0XonUoHwL
-         bUqQAblCD/uIqdSfQ+UksL/PtNM5MutBFSIJUuIfuSp+MW2DVh78i0QqUGQAH8Lr6ll5
-         HIqvfSEZ5p1wqE490iIx65Viu0CSdrG6dmtgGWfzT/joIccClPxuI8SlxX3RjZN6INir
-         pZ+ylKkeQaZbIsSifAHkkTU+sn/gPqO3DC4j9w5FB6Lkt3B3wNGi+ussgOGq3jmL2aFo
-         J0NMCO6vlkHsRikxt2NhgvUmwXMBnuFSRf5LbayOPAEhFuIE+2nZbEKy78OQdZDljVjK
-         P+Zg==
-X-Gm-Message-State: AFqh2kp6NVnlnW9CvtmJGSzAKiboHtSEBMFX2AO3+h1W6/phC0ny0w/7
-        Op3+1MprojmVdUtXrybMdtjbOA==
-X-Google-Smtp-Source: AMrXdXsrn0ksTbbdabw7JkYj7sG3I4DjLXmCZyLSNxH83QGpSuMFYShcdh0M4wmFmbDmEREMamklwA==
-X-Received: by 2002:a17:90b:274b:b0:219:f970:5119 with SMTP id qi11-20020a17090b274b00b00219f9705119mr1438871pjb.1.1673646885581;
-        Fri, 13 Jan 2023 13:54:45 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id r2-20020a17090a0ac200b002139459e121sm10013579pje.27.2023.01.13.13.54.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Jan 2023 13:54:45 -0800 (PST)
-Date:   Fri, 13 Jan 2023 21:54:41 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Message-ID: <Y8HTITl1+Oe0H7Gd@google.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
+        with ESMTP id S230303AbjAMWBr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 17:01:47 -0500
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2047.outbound.protection.outlook.com [40.107.92.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D908EE33;
+        Fri, 13 Jan 2023 14:01:45 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VUf3Fxi5zWHcblZuzg5+7dLwG7dZ1Rk2GClCH2GsdnJsN3YYxKD+idAAi+gRuJrG+uVEFdMOldvq3fGAl1+57MApqrQ9xvVt6iCinvCqlaefIFCUYUFY91Y5Y6bPSVDp9Ro2O6RPsqO80RsRNJMSYmsGBd8fjRz0b/HzglRF3BM3OaMOHXYtTD60xWCLvHMmg6EgBN3GT7M8AAkLO+J/AyAbzHWrBfJSvxav/6+D8JxXgfyKITcXBluVel6qARJDmevZVwudFvfs0rjQiBOPhON/4bKHY588P4kNq7ugjszjl79YmxFVUxwLbhbjCu5fsfdML3tHZT7hc/9wvTLrnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=umEPoImhx6JKpXbCpuifViAM++7+QEfHv252ZYY+oLw=;
+ b=Gqa6sZZD8I/+8lJ5j35AKvnqG+4J3dR1PPfckg2rPNotUzTpSr6edHp8YnK9+KNkYYErTc3pig9TcM3Onw+yl+7yhqhrOlaD4jAjUnrhqWgTl8r3SLa8U2EWbDK1t4p2VJ6VYEGSauiZCwHkzBFsDS7XxGku+YkQAnV7XPBAWMOX9Tb724b0oWiTJe9F0/qgqA1Yd9FwgierrOnv1kf9CefD1i5bFQgOPAkfjrpSHqBniZU4opb+ZIAqjFVeEJgEVFTXWZrzytmW5HIbDD/PRznDvS6TMK2UCPK5sciGKt8idhX9CJh3vt5WBX6lmW7y/kZ64DiYYK+FKV5Q+Al1fA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=umEPoImhx6JKpXbCpuifViAM++7+QEfHv252ZYY+oLw=;
+ b=pSozt6YPYsNiSN9Q4zGXitaXC0VQs9dPD/B6WLGYTkzhx8EdEe1RPK8mt6MApR2B7VjTfZW9KUS8Jdw6Xn+k8aKnGo1rlflcoru+M7qVFKVFHHpCVAtJz0yjamQktfB5NubZTzJkzOGsRq+cMF80cn0RixKSoSI9OVp1lPpWqy0M6YNq/2oURiC+AS7p0ygb29yxyCWvPR6nkxXuZA++9oaB9nBuq8qObOwJSJ/SEZr3jWKNrX5RCU8ujuqCSyh/CU9Lt15FDyqYA8ZogPuhr+Aq1ryTbheQdCCLTOhLs9OKcmh5CQHAfaIN+01+/eYtNoR8qQkFylQy751n44MA5w==
+Received: from DM6PR01CA0004.prod.exchangelabs.com (2603:10b6:5:296::9) by
+ MW4PR12MB5642.namprd12.prod.outlook.com (2603:10b6:303:187::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5986.18; Fri, 13 Jan 2023 22:01:43 +0000
+Received: from DM6NAM11FT087.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:296:cafe::59) by DM6PR01CA0004.outlook.office365.com
+ (2603:10b6:5:296::9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.16 via Frontend
+ Transport; Fri, 13 Jan 2023 22:01:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DM6NAM11FT087.mail.protection.outlook.com (10.13.172.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6002.13 via Frontend Transport; Fri, 13 Jan 2023 22:01:42 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 13 Jan
+ 2023 14:01:34 -0800
+Received: from dvt1-1.nvidia.com (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 13 Jan
+ 2023 14:01:33 -0800
+From:   Kechen Lu <kechenl@nvidia.com>
+To:     <kvm@vger.kernel.org>, <seanjc@google.com>, <pbonzini@redhat.com>
+CC:     <chao.gao@intel.com>, <shaoqin.huang@intel.com>,
+        <vkuznets@redhat.com>, <kechenl@nvidia.com>,
+        <linux-kernel@vger.kernel.org>
+Subject: [RFC PATCH v5 0/6] KVM: x86: add per-vCPU exits disable capability
+Date:   Fri, 13 Jan 2023 22:01:08 +0000
+Message-ID: <20230113220114.2437-1-kechenl@nvidia.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.126.231.37]
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT087:EE_|MW4PR12MB5642:EE_
+X-MS-Office365-Filtering-Correlation-Id: 93c589de-666d-4f88-2e6f-08daf5b1c169
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: RPuW2GqkPS2bYxufV5ir8FWL0dAqw380VI9Lzak32nIK8KgmBmtYe5VTUaK3Uvq1P5Ye/NfAIuNnld+GQq1X5yGjWzvK8krY6Sg2Y9bbIRW/NQS5/0hgBTBewPcBGzK2PgwV93rpBSKPWPx2kho/rIfTS3XEVaDsR8NjQsZeg4j31cHLdpK0ckAS1lpCj/3K8NmYGbNanvndSySRawyO2fAMSrZh5hGYX5bY5IrGr+Hu1Y7KkbZrH/5frI5UGMH3ZhyLdZCTXUYw22qEEghV2gfD/toYivi5XFgAoyMpZnO5QE8X0KpXwK8jWaHD/J/T03+17N69jW/jb5IqgqHZ6YCDYrreIG30JKNQ+YgGOhCuNx6A5LnbVrf0HQ32KB+7wQ3zHC/g7QCI6OPo2MC5jNnNzuMqOq7q13xCUiPFxoxrrg9bbSeMQfYM7ECe4zZp8vyuHuKCvJLGnAQh5N0RZE8kOmH2a+BkA/blQjCFhyvbD/kS5fFMAj53QWYnv9u2FB2pTF8DBY2MaoQEaRoDBOXc0oIRwPM8fymPqst2O2kNR4eQsz+Tj2hp1WKP29DmQIYwSgWd63XG2yscH9JwrX2CgHnaKswXHPAALSzQMYHYWJn6fQrVXe0oLSV4YpdS/yhJC4tJRcMe3WPdsHCZdQEz80ppzMyqoLNJUduAFtKNhzETQ68En3QMDK6p+3wcIP52E/Jm9AZsLy9cAJ2M0Q==
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(136003)(39860400002)(396003)(376002)(346002)(451199015)(40470700004)(46966006)(36840700001)(26005)(6666004)(36756003)(8936002)(2616005)(7696005)(1076003)(316002)(5660300002)(16526019)(40480700001)(186003)(40460700003)(4326008)(356005)(82740400003)(110136005)(41300700001)(70586007)(7636003)(478600001)(54906003)(8676002)(86362001)(70206006)(82310400005)(47076005)(83380400001)(2906002)(426003)(336012)(36860700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2023 22:01:42.7696
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 93c589de-666d-4f88-2e6f-08daf5b1c169
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT087.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5642
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Dec 02, 2022, Chao Peng wrote:
-> The system call is currently wired up for x86 arch.
+Summary
+===========
+Introduce support of vCPU-scoped ioctl with KVM_CAP_X86_DISABLE_EXITS
+cap for disabling exits to enable finer-grained VM exits disabling
+on per vCPU scales instead of whole guest. This patch series enabled
+the vCPU-scoped exits control and toggling.
 
-Building on other architectures (except for arm64 for some reason) yields:
+Motivation
+============
+In use cases like Windows guest running heavy CPU-bound
+workloads, disabling HLT VM-exits could mitigate host sched ctx switch
+overhead. Simply HLT disabling on all vCPUs could bring
+performance benefits, but if no pCPUs reserved for host threads, could
+happened to the forced preemption as host does not know the time to do
+the schedule for other host threads want to run. With this patch, we
+could only disable part of vCPUs HLT exits for one guest, this still
+keeps performance benefits, and also shows resiliency to host stressing
+workload running at the same time.
 
-  CALL    /.../scripts/checksyscalls.sh
-  <stdin>:1565:2: warning: #warning syscall memfd_restricted not implemented [-Wcpp]
+Performance and Testing
+=========================
+In the host stressing workload experiment with Windows guest heavy
+CPU-bound workloads, it shows good resiliency and having the ~3%
+performance improvement. E.g. Passmark running in a Windows guest
+with this patch disabling HLT exits on only half of vCPUs still
+showing 2.4% higher main score v/s baseline.
 
-Do we care?  It's the only such warning, which makes me think we either need to
-wire this up for all architectures, or explicitly document that it's unsupported.
+Tested everything on AMD machines.
 
-> Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> ---
+v4->v5 :
+- Drop the usage of KVM request, keep the VM-scoped exits disable
+  as the existing design, and only allow per-vCPU settings to
+  override the per-VM settings (Sean Christopherson)
+- Refactor the disable exits selftest without introducing any
+  new prerequisite patch, tests per-vCPU exits disable and overrides,
+  and per-VM exits disable
 
-...
+v3->v4 (Chao Gao) :
+- Use kvm vCPU request KVM_REQ_DISABLE_EXIT to perform the arch
+  VMCS updating (patch 5)
+- Fix selftests redundant arguments (patch 7)
+- Merge overlapped fix bits from patch 4 to patch 3
 
-> diff --git a/include/linux/restrictedmem.h b/include/linux/restrictedmem.h
-> new file mode 100644
-> index 000000000000..c2700c5daa43
-> --- /dev/null
-> +++ b/include/linux/restrictedmem.h
-> @@ -0,0 +1,71 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +#ifndef _LINUX_RESTRICTEDMEM_H
+v2->v3 (Sean Christopherson) :
+- Reject KVM_CAP_X86_DISABLE_EXITS if userspace disable MWAIT exits
+  when MWAIT is not allowed in guest (patch 3)
+- Make userspace able to re-enable previously disabled exits (patch 4)
+- Add mwait/pause/cstate exits flag toggling instead of only hlt
+  exits (patch 5)
+- Add selftests for KVM_CAP_X86_DISABLE_EXITS (patch 7)
 
-Missing
+v1->v2 (Sean Christopherson) :
+- Add explicit restriction for VM-scoped exits disabling to be called
+  before vCPUs creation (patch 1)
+- Use vCPU ioctl instead of 64bit vCPU bitmask (patch 5), and make exits
+  disable flags check purely for vCPU instead of VM (patch 2)
 
- #define _LINUX_RESTRICTEDMEM_H
+Best Regards,
+Kechen
 
-which causes fireworks if restrictedmem.h is included more than once.
+Kechen Lu (3):
+  KVM: x86: Move *_in_guest power management flags to vCPU scope
+  KVM: x86: add vCPU scoped toggling for disabled exits
+  KVM: selftests: Add tests for VM and vCPU cap
+    KVM_CAP_X86_DISABLE_EXITS
 
-> +#include <linux/file.h>
-> +#include <linux/magic.h>
-> +#include <linux/pfn_t.h>
+Sean Christopherson (3):
+  KVM: x86: only allow exits disable before vCPUs created
+  KVM: x86: Reject disabling of MWAIT interception when not allowed
+  KVM: x86: Let userspace re-enable previously disabled exits
 
-...
+ Documentation/virt/kvm/api.rst                |   8 +-
+ arch/x86/include/asm/kvm-x86-ops.h            |   1 +
+ arch/x86/include/asm/kvm_host.h               |   7 +
+ arch/x86/kvm/cpuid.c                          |   4 +-
+ arch/x86/kvm/lapic.c                          |   7 +-
+ arch/x86/kvm/svm/nested.c                     |   4 +-
+ arch/x86/kvm/svm/svm.c                        |  42 +-
+ arch/x86/kvm/vmx/vmx.c                        |  53 +-
+ arch/x86/kvm/x86.c                            |  69 ++-
+ arch/x86/kvm/x86.h                            |  16 +-
+ include/uapi/linux/kvm.h                      |   4 +-
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/x86_64/disable_exits_test.c | 457 ++++++++++++++++++
+ 13 files changed, 626 insertions(+), 47 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/disable_exits_test.c
 
-> +static inline int restrictedmem_get_page(struct file *file, pgoff_t offset,
-> +					 struct page **pagep, int *order)
-> +{
-> +	return -1;
+-- 
+2.34.1
 
-This should be a proper -errno, though in the current incarnation of things it's
-a moot point because no stub is needed.  KVM can (and should) easily provide its
-own stub for this one.
-
-> +}
-> +
-> +static inline bool file_is_restrictedmem(struct file *file)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline void restrictedmem_error_page(struct page *page,
-> +					    struct address_space *mapping)
-> +{
-> +}
-> +
-> +#endif /* CONFIG_RESTRICTEDMEM */
-> +
-> +#endif /* _LINUX_RESTRICTEDMEM_H */
-
-...
-
-> diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
-> new file mode 100644
-> index 000000000000..56953c204e5c
-> --- /dev/null
-> +++ b/mm/restrictedmem.c
-> @@ -0,0 +1,318 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include "linux/sbitmap.h"
-> +#include <linux/pagemap.h>
-> +#include <linux/pseudo_fs.h>
-> +#include <linux/shmem_fs.h>
-> +#include <linux/syscalls.h>
-> +#include <uapi/linux/falloc.h>
-> +#include <uapi/linux/magic.h>
-> +#include <linux/restrictedmem.h>
-> +
-> +struct restrictedmem_data {
-
-Any objection to simply calling this "restrictedmem"?  And then using either "rm"
-or "rmem" for local variable names?  I kept reading "data" as the underyling data
-being written to the page, as opposed to the metadata describing the restrictedmem
-instance.
-
-> +	struct mutex lock;
-> +	struct file *memfd;
-> +	struct list_head notifiers;
-> +};
-> +
-> +static void restrictedmem_invalidate_start(struct restrictedmem_data *data,
-> +					   pgoff_t start, pgoff_t end)
-> +{
-> +	struct restrictedmem_notifier *notifier;
-> +
-> +	mutex_lock(&data->lock);
-
-This can be a r/w semaphore instead of a mutex, that way punching holes at multiple
-points in the file can at least run the notifiers in parallel.  The actual allocation
-by shmem will still be serialized, but I think it's worth the simple optimization
-since zapping and flushing in KVM may be somewhat slow.
-
-> +	list_for_each_entry(notifier, &data->notifiers, list) {
-> +		notifier->ops->invalidate_start(notifier, start, end);
-
-Two major design issues that we overlooked long ago:
-
-  1. Blindly invoking notifiers will not scale.  E.g. if userspace configures a
-     VM with a large number of convertible memslots that are all backed by a
-     single large restrictedmem instance, then converting a single page will
-     result in a linear walk through all memslots.  I don't expect anyone to
-     actually do something silly like that, but I also never expected there to be
-     a legitimate usecase for thousands of memslots.
-
-  2. This approach fails to provide the ability for KVM to ensure a guest has
-     exclusive access to a page.  As discussed in the past, the kernel can rely
-     on hardware (and maybe ARM's pKVM implementation?) for those guarantees, but
-     only for SNP and TDX VMs.  For VMs where userspace is trusted to some extent,
-     e.g. SEV, there is value in ensuring a 1:1 association.
-
-     And probably more importantly, relying on hardware for SNP and TDX yields a
-     poor ABI and complicates KVM's internals.  If the kernel doesn't guarantee a
-     page is exclusive to a guest, i.e. if userspace can hand out the same page
-     from a restrictedmem instance to multiple VMs, then failure will occur only
-     when KVM tries to assign the page to the second VM.  That will happen deep
-     in KVM, which means KVM needs to gracefully handle such errors, and it means
-     that KVM's ABI effectively allows plumbing garbage into its memslots.
-
-Rather than use a simple list of notifiers, this appears to be yet another
-opportunity to use an xarray.  Supporting sharing of restrictedmem will be
-non-trivial, but IMO we should punt that to the future since it's still unclear
-exactly how sharing will work.
-
-An xarray will solve #1 by notifying only the consumers (memslots) that are bound
-to the affected range.
-
-And for #2, it's relatively straightforward (knock wood) to detect existing
-entries, i.e. if the user wants exclusive access to memory, then the bind operation
-can be reject if there's an existing entry.
-
-VERY lightly tested code snippet at the bottom (will provide link to fully worked
-code in cover letter).
-
-
-> +static long restrictedmem_punch_hole(struct restrictedmem_data *data, int mode,
-> +				     loff_t offset, loff_t len)
-> +{
-> +	int ret;
-> +	pgoff_t start, end;
-> +	struct file *memfd = data->memfd;
-> +
-> +	if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
-> +		return -EINVAL;
-> +
-> +	start = offset >> PAGE_SHIFT;
-> +	end = (offset + len) >> PAGE_SHIFT;
-> +
-> +	restrictedmem_invalidate_start(data, start, end);
-> +	ret = memfd->f_op->fallocate(memfd, mode, offset, len);
-> +	restrictedmem_invalidate_end(data, start, end);
-
-The lock needs to be end for the entire duration of the hole punch, i.e. needs to
-be taken before invalidate_start() and released after invalidate_end().  If a user
-(un)binds/(un)registers after invalidate_state(), it will see an unpaired notification,
-e.g. could leave KVM with incorrect notifier counts.
-
-> +
-> +	return ret;
-> +}
-
-What I ended up with for an xarray-based implementation.  I'm very flexible on
-names and whatnot, these are just what made sense to me.
-
-static long restrictedmem_punch_hole(struct restrictedmem *rm, int mode,
-				     loff_t offset, loff_t len)
-{
-	struct restrictedmem_notifier *notifier;
-	struct file *memfd = rm->memfd;
-	unsigned long index;
-	pgoff_t start, end;
-	int ret;
-
-	if (!PAGE_ALIGNED(offset) || !PAGE_ALIGNED(len))
-		return -EINVAL;
-
-	start = offset >> PAGE_SHIFT;
-	end = (offset + len) >> PAGE_SHIFT;
-
-	/*
-	 * Bindings must stable across invalidation to ensure the start+end
-	 * are balanced.
-	 */
-	down_read(&rm->lock);
-
-	xa_for_each_range(&rm->bindings, index, notifier, start, end)
-		notifier->ops->invalidate_start(notifier, start, end);
-
-	ret = memfd->f_op->fallocate(memfd, mode, offset, len);
-
-	xa_for_each_range(&rm->bindings, index, notifier, start, end)
-		notifier->ops->invalidate_end(notifier, start, end);
-
-	up_read(&rm->lock);
-
-	return ret;
-}
-
-int restrictedmem_bind(struct file *file, pgoff_t start, pgoff_t end,
-		       struct restrictedmem_notifier *notifier, bool exclusive)
-{
-	struct restrictedmem *rm = file->f_mapping->private_data;
-	int ret = -EINVAL;
-
-	down_write(&rm->lock);
-
-	/* Non-exclusive mappings are not yet implemented. */
-	if (!exclusive)
-		goto out_unlock;
-
-	if (!xa_empty(&rm->bindings)) {
-		if (exclusive != rm->exclusive)
-			goto out_unlock;
-
-		if (exclusive && xa_find(&rm->bindings, &start, end, XA_PRESENT))
-			goto out_unlock;
-	}
-
-	xa_store_range(&rm->bindings, start, end, notifier, GFP_KERNEL);
-	rm->exclusive = exclusive;
-	ret = 0;
-out_unlock:
-	up_write(&rm->lock);
-	return ret;
-}
-EXPORT_SYMBOL_GPL(restrictedmem_bind);
-
-void restrictedmem_unbind(struct file *file, pgoff_t start, pgoff_t end,
-			  struct restrictedmem_notifier *notifier)
-{
-	struct restrictedmem *rm = file->f_mapping->private_data;
-
-	down_write(&rm->lock);
-	xa_store_range(&rm->bindings, start, end, NULL, GFP_KERNEL);
-	synchronize_rcu();
-	up_write(&rm->lock);
-}
-EXPORT_SYMBOL_GPL(restrictedmem_unbind);
