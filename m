@@ -2,104 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 173B0668EE8
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 08:14:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AABAE668F32
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 08:26:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241184AbjAMHON (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 02:14:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50156 "EHLO
+        id S234479AbjAMH0C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 02:26:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241346AbjAMHNn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 02:13:43 -0500
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C3DF84629;
-        Thu, 12 Jan 2023 23:00:13 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id jr10so11152939qtb.7;
-        Thu, 12 Jan 2023 23:00:13 -0800 (PST)
+        with ESMTP id S241000AbjAMHZa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 02:25:30 -0500
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D68B96CFE5;
+        Thu, 12 Jan 2023 23:18:59 -0800 (PST)
+Received: by mail-qt1-x834.google.com with SMTP id a25so11304044qto.10;
+        Thu, 12 Jan 2023 23:18:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:feedback-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=bL7FAKnljET09Lz5o8O5NOQXfeYUZOAStn+hSKBeOpU=;
-        b=mLKdcXQfYIaVPGU/nFUcKanZjagSZZU1Zzk/zDGg8fyKkBdBUeD+aiZqGf4B15lcFD
-         XvLY6GMcL3ok/8LM6egXBh+JwQ3GpOSVTaGKk5iulFhBD8m9rlrXHCuI1vnALThnvgqJ
-         v4ItVyJtHmiBqkNzcFz3UFZyJPPEdfNxbk4cpw9aYJTT2WB9Gv9cW2Z/f+olVaRzztab
-         5+Syy19z6Gh5wnN48AzLIChROYG60r2xu3kc+YOAAvCFMnLRhaRirwxjqPRKExksHLlC
-         VF80TrC3GM+c5deULwcIDqZrB7ySmhHAE8S+VVd6OUf/K1SGAzJ6/ika3jnosRIFQI1y
-         KVLg==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=+z0/hUtMCEe+Sodh1Dnn7/1zn6Dfmpve/g4mWQscvnU=;
+        b=gMi4yBqvjYTeivpx6erYaQRng/JeBNDvpfW4l4cAXrLtAlv17q1L7nIsIGZshaFQJD
+         4O5FJPzLlKR95nqyv2DAtOwwLVZp99yWXEAW2NoU0BHd5pCj8iIKBftU6GS/Me5y6szE
+         uHI9z1wEuPcO7sPPJdoDWlt9UQ7Ba6kgRXvqDGDfziaLSAFGDhEs3eAvQOwLYTDmkGZg
+         SW0saiZXPYnBf5KuWl39sYyDxluKJ6NWLeMfKMlnzk52KJZ4P3zyuGziW/M6LVzVQ2D9
+         GxOLIeJi4EgvYudYTOQ+HSEH04z/eVnLpSMAOqGzuWmSWPt2erm64Tjoh1ZcX3gQNgjs
+         rEhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:feedback-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bL7FAKnljET09Lz5o8O5NOQXfeYUZOAStn+hSKBeOpU=;
-        b=Dpg5lvBqrdPF9STDISpT/AP7Bui9zYJMmO98zeh0unOZgBVArzClwgHWg5M6MUUlT4
-         uLYOrtl/UNLrzYnua5S5frrkdj7frukBJ7jMtMXP2IfakLbT5TtD4zMD45xfXl/o5WXu
-         MejvtyZ6ak5+TCWlSVoSUFBu/5VrBBo2+qBLQfYUvG/ej13Fs8W1Ho2UBb4gRU7DGGgl
-         bm2J+15rpQUPLNWJGt3HPdkSPBMdJ9zjJDn55HQbVxeK8JIkaAt3qOYV/4uN0ArESBUb
-         7Dc5QzS7x6Zw0ahkuOvurrkN3gsInuoTFHFcq+gJi7v9X17zBC4+/WNl9dlVbBRNN/Vn
-         i+SA==
-X-Gm-Message-State: AFqh2krakvt82rw+q2UC+lrt+cQaTtyqbs1Xvf2UnCXQxxGxtlo/5xNE
-        wiVr26f4JV2Njc3eeCXdl/c=
-X-Google-Smtp-Source: AMrXdXuIMNulWdH7ixWS7z9Lx70JG51NniRsnsm25d0tH8PwKh7R7JqGS38UxepwK9Kan+JJ+wcEuA==
-X-Received: by 2002:a05:622a:206:b0:3a7:eb36:5cb3 with SMTP id b6-20020a05622a020600b003a7eb365cb3mr141815642qtx.41.1673593209390;
-        Thu, 12 Jan 2023 23:00:09 -0800 (PST)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :feedback-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+z0/hUtMCEe+Sodh1Dnn7/1zn6Dfmpve/g4mWQscvnU=;
+        b=4fnGi8V6C1MalOAPExUD+TUpm0IQOUWBozzQS8LRZ7vN4mX9uEquVRveU3fI9KLkQ8
+         DJ2N6HmTDLIkMUgq2ki0EVEJb3baGXiHUz3EjVly3vEJHXnvdcuswtbOLQSQy3jJX45M
+         x2XCsxNzzPxu944XlBasRoGMTl96HTVMlTZZ7rpqikQmwRSmIEojkohpRC9DPTRW1Qso
+         rst1jrgzEGyAvUfie3TrDnKxNE+BIl1ZFbOfeFS90X0Kyv4CdXd6Jj/F+7H7p8f/iXQO
+         YfjfBVEk4mqCKG5z5PUfM1C0LDmc4PH8iwvPenAa9BE4bxoGXF0a7XMSrpRC10w84dWA
+         ng8Q==
+X-Gm-Message-State: AFqh2krCnQ8RHZACu0nk23gT3XBpJ3lLouxavZ52g/DTtHdyW06aXbyP
+        /oKznNrr2YtDx9xworxVF2c=
+X-Google-Smtp-Source: AMrXdXv+4L9qMRN8pXTWxPtd0XoDnknLpiUJASz0U0PwjOdpaxVPX/fatCYOVbdwQhYy/+TeE9bqxg==
+X-Received: by 2002:a05:622a:5c1a:b0:3a6:c4eb:2e52 with SMTP id gd26-20020a05622a5c1a00b003a6c4eb2e52mr115266387qtb.43.1673594339012;
+        Thu, 12 Jan 2023 23:18:59 -0800 (PST)
 Received: from auth2-smtp.messagingengine.com (auth2-smtp.messagingengine.com. [66.111.4.228])
-        by smtp.gmail.com with ESMTPSA id z26-20020ac8101a000000b003a70a675066sm10121892qti.79.2023.01.12.23.00.08
+        by smtp.gmail.com with ESMTPSA id z26-20020ac8101a000000b003a70a675066sm10138312qti.79.2023.01.12.23.18.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Jan 2023 23:00:08 -0800 (PST)
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailauth.nyi.internal (Postfix) with ESMTP id 6892327C005B;
-        Fri, 13 Jan 2023 02:00:08 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Fri, 13 Jan 2023 02:00:08 -0500
-X-ME-Sender: <xms:eAHBY1TXdxnY8Wk6_9nksFMgDH01vISVXi1gLxxE9-AGYM1TIpXctg>
-    <xme:eAHBY-xC4iTvmNWN21odyaOvWyl9uXcdU-sp-mg7p8KZYmOi8JALIK-qvBU2w_9PL
-    Un1LAVnoHex8InYpA>
-X-ME-Received: <xmr:eAHBY63eZk2uhPUj-t58Iv9QTNxPyA64bvS4YtrRByQZg2N8R1IDSPaapTY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrleejgddutdefucetufdoteggodetrfdotf
+        Thu, 12 Jan 2023 23:18:58 -0800 (PST)
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+        by mailauth.nyi.internal (Postfix) with ESMTP id 05D2D27C0054;
+        Fri, 13 Jan 2023 02:18:58 -0500 (EST)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute5.internal (MEProxy); Fri, 13 Jan 2023 02:18:58 -0500
+X-ME-Sender: <xms:4QXBYxgoeVoETsJsOoSd25V4FXonWZRGLIG34PCakAfKpvPzhkqtKw>
+    <xme:4QXBY2C-sW30f7WEh6nhvsNrPCcyN9-q6ZZH50SpZwQUn-EVRqA28iRAddC5pEDy1
+    YHqpvOvSbOBhJys3A>
+X-ME-Received: <xmr:4QXBYxGnmB3XTu-felmKZcawQ--DozNEG8m06UHp6BxjegQlbIMIGXkh8p4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrleejgddutdejucetufdoteggodetrfdotf
     fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
     uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepuehoqhhu
-    nhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrdgtohhmqeenucggtffrrg
-    htthgvrhhnpeegleejiedthedvheeggfejveefjeejkefgveffieeujefhueeigfegueeh
-    geeggfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
-    gsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhithihqdeiledvgeehtdei
-    gedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmhgrihhlrdgtohhmsehfih
-    igmhgvrdhnrghmvg
-X-ME-Proxy: <xmx:eAHBY9CpO_Mh_Q1ARxN3EWQR0tcpbu4F8EU9BWZeMq_-57SqAPf8Vw>
-    <xmx:eAHBY-jx-1LPBoHbT3VnWFuwpRP7jSvj0xQg9DwneQ1RaUh80RyQHg>
-    <xmx:eAHBYxoMY2PmPSY3OuIaS5JWWVwnlYAbHihGYQTvPgUt6a_6CQxgVw>
-    <xmx:eAHBY5VZOXMzb-CfPVOyudDWqynl4COZqopplNjBof8LObgSa4iCWw>
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttddunecuhfhrohhmpeeuohhq
+    uhhnucfhvghnghcuoegsohhquhhnrdhfvghnghesghhmrghilhdrtghomheqnecuggftrf
+    grthhtvghrnhepgfelheetkefgudetjeejkefhjeefvdeifedthfehgffgheehieeliefh
+    tdetheefnecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhht
+    hhhpvghrshhonhgrlhhithihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquh
+    hnrdhfvghngheppehgmhgrihhlrdgtohhmsehfihigmhgvrdhnrghmvg
+X-ME-Proxy: <xmx:4QXBY2TUp8Zn3QzMzdO5thttlDS1SVHPP5rrL9UNUurHc6dFI9gAEg>
+    <xmx:4QXBY-wKux4yE0QX43JLh88_oAV0SrmtCW09-GOhccFOQIBCutWXng>
+    <xmx:4QXBY85K6luKpC0kLNCwK6dmebthLvOU1Wna7fKk5GcDyqrjl93D5g>
+    <xmx:4gXBYw6tAI-PASSYUj768zg5_fKQYmiFrpp4kQIFfwEhsF8L4Z6feg>
 Feedback-ID: iad51458e:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 13 Jan 2023 02:00:07 -0500 (EST)
+ 13 Jan 2023 02:18:57 -0500 (EST)
+Date:   Thu, 12 Jan 2023 23:18:51 -0800
 From:   Boqun Feng <boqun.feng@gmail.com>
-To:     linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-        Waiman Long <longman@redhat.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
-        Joel Fernandes <joel@joelfernandes.org>,
+To:     "Paul E. McKenney" <paulmck@kernel.org>
+Cc:     David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, Joel Fernandes <joel@joelfernandes.org>,
         Matthew Wilcox <willy@infradead.org>,
-        Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH 3/3] WIP: locking/lockdep: selftests: Add selftests for SRCU
-Date:   Thu, 12 Jan 2023 22:59:55 -0800
-Message-Id: <20230113065955.815667-4-boqun.feng@gmail.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230113065955.815667-1-boqun.feng@gmail.com>
-References: <20230113065955.815667-1-boqun.feng@gmail.com>
+        Josh Triplett <josh@joshtriplett.org>, rcu@vger.kernel.org,
+        Michal Luczaj <mhal@rbox.co>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: Re: [PATCH] Documentation: kvm: fix SRCU locking order docs
+Message-ID: <Y8EF24o932lcshKs@boqun-archlinux>
+References: <20230111183031.2449668-1-pbonzini@redhat.com>
+ <a14a13a690277d4cc95a4b26aa2d9a4d9b392a74.camel@infradead.org>
+ <20230112152048.GJ4028633@paulmck-ThinkPad-P17-Gen-1>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230112152048.GJ4028633@paulmck-ThinkPad-P17-Gen-1>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -110,128 +107,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
----
- lib/locking-selftest.c | 71 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+On Thu, Jan 12, 2023 at 07:20:48AM -0800, Paul E. McKenney wrote:
+> On Thu, Jan 12, 2023 at 08:24:16AM +0000, David Woodhouse wrote:
+> > On Wed, 2023-01-11 at 13:30 -0500, Paolo Bonzini wrote:
+> > > 
+> > > +- ``synchronize_srcu(&kvm->srcu)`` is called inside critical sections
+> > > +  for kvm->lock, vcpu->mutex and kvm->slots_lock.  These locks _cannot_
+> > > +  be taken inside a kvm->srcu read-side critical section; that is, the
+> > > +  following is broken::
+> > > +
+> > > +      srcu_read_lock(&kvm->srcu);
+> > > +      mutex_lock(&kvm->slots_lock);
+> > > +
+> > 
+> > "Don't tell me. Tell lockdep!"
+> > 
+> > Did we conclude in
+> > https://lore.kernel.org/kvm/122f38e724aae9ae8ab474233da1ba19760c20d2.camel@infradead.org/
+> > that lockdep *could* be clever enough to catch a violation of this rule
+> > by itself?
+> > 
+> > The general case of the rule would be that 'if mutex A is taken in a
+> > read-section for SCRU B, then any synchronize_srcu(B) while mutex A is
+> > held shall be verboten'. And vice versa.
+> > 
+> > If we can make lockdep catch it automatically, yay!
+> 
+> Unfortunately, lockdep needs to see a writer to complain, and that patch
+> just adds a reader.  And adding that writer would make lockdep complain
+> about things that are perfectly fine.  It should be possible to make
+> lockdep catch this sort of thing, but from what I can see, doing so
+> requires modifications to lockdep itself.
+> 
 
-diff --git a/lib/locking-selftest.c b/lib/locking-selftest.c
-index 8d24279fad05..5fc206a2f9f1 100644
---- a/lib/locking-selftest.c
-+++ b/lib/locking-selftest.c
-@@ -60,6 +60,7 @@ __setup("debug_locks_verbose=", setup_debug_locks_verbose);
- #define LOCKTYPE_RTMUTEX 0x20
- #define LOCKTYPE_LL	0x40
- #define LOCKTYPE_SPECIAL 0x80
-+#define LOCKTYPE_SRCU	0x100
- 
- static struct ww_acquire_ctx t, t2;
- static struct ww_mutex o, o2, o3;
-@@ -100,6 +101,13 @@ static DEFINE_RT_MUTEX(rtmutex_D);
- 
- #endif
- 
-+#ifdef CONFIG_SRCU
-+static struct lock_class_key srcu_A_key;
-+static struct lock_class_key srcu_B_key;
-+static struct srcu_struct srcu_A;
-+static struct srcu_struct srcu_B;
-+#endif
-+
- /*
-  * Locks that we initialize dynamically as well so that
-  * e.g. X1 and X2 becomes two instances of the same class,
-@@ -1418,6 +1426,12 @@ static void reset_locks(void)
- 	memset(&ww_lockdep.acquire_key, 0, sizeof(ww_lockdep.acquire_key));
- 	memset(&ww_lockdep.mutex_key, 0, sizeof(ww_lockdep.mutex_key));
- 	local_irq_enable();
-+
-+#ifdef CONFIG_SRCU
-+	__init_srcu_struct(&srcu_A, "srcuA", &srcu_A_key);
-+	__init_srcu_struct(&srcu_B, "srcuB", &srcu_B_key);
-+#endif
-+
- }
- 
- #undef I
-@@ -2360,6 +2374,58 @@ static void ww_tests(void)
- 	pr_cont("\n");
- }
- 
-+static void srcu_ABBA(void)
-+{
-+	int ia, ib;
-+
-+	ia = srcu_read_lock(&srcu_A);
-+	synchronize_srcu(&srcu_B);
-+	srcu_read_unlock(&srcu_A, ia);
-+
-+	ib = srcu_read_lock(&srcu_B);
-+	synchronize_srcu(&srcu_A);
-+	srcu_read_unlock(&srcu_B, ib); // should fail
-+}
-+
-+static void srcu_mutex_ABBA(void)
-+{
-+	int ia;
-+
-+	mutex_lock(&mutex_A);
-+	synchronize_srcu(&srcu_A);
-+	mutex_unlock(&mutex_A);
-+
-+	ia = srcu_read_lock(&srcu_A);
-+	mutex_lock(&mutex_A);
-+	mutex_unlock(&mutex_A);
-+	srcu_read_unlock(&srcu_A, ia); // should fail
-+}
-+
-+static void srcu_irqsafe(void)
-+{
-+	int ia;
-+
-+	HARDIRQ_ENTER();
-+	ia = srcu_read_lock(&srcu_A);
-+	srcu_read_unlock(&srcu_A, ia);
-+	HARDIRQ_EXIT();
-+
-+	synchronize_srcu(&srcu_A); // should NOT fail
-+}
-+
-+static void srcu_tests(void)
-+{
-+	printk("  --------------------------------------------------------------------------\n");
-+	printk("  | SRCU tests |\n");
-+	printk("  ---------------\n");
-+	print_testname("ABBA read-sync/read-sync");
-+	dotest(srcu_ABBA, FAILURE, LOCKTYPE_SRCU);
-+	print_testname("ABBA mutex-sync/read-mutex");
-+	dotest(srcu_mutex_ABBA, FAILURE, LOCKTYPE_SRCU);
-+	print_testname("Irqsafe synchronize_srcu");
-+	dotest(srcu_irqsafe, SUCCESS, LOCKTYPE_SRCU);
-+	pr_cont("\n");
-+}
- 
- /*
-  * <in hardirq handler>
-@@ -2881,6 +2947,10 @@ void locking_selftest(void)
- 	printk("  --------------------------------------------------------------------------\n");
- 
- 	init_shared_classes();
-+#ifdef CONFIG_SRCU
-+	__init_srcu_struct(&srcu_A, "srcuA", &srcu_A_key);
-+	__init_srcu_struct(&srcu_B, "srcuB", &srcu_B_key);
-+#endif
- 	lockdep_set_selftest_task(current);
- 
- 	DO_TESTCASE_6R("A-A deadlock", AA);
-@@ -2965,6 +3035,7 @@ void locking_selftest(void)
- 	DO_TESTCASE_6x2x2RW("irq read-recursion #3", irq_read_recursion3);
- 
- 	ww_tests();
-+	srcu_tests();
- 
- 	force_read_lock_recursive = 0;
- 	/*
--- 
-2.38.1
+Please see if the follow patchset works:
 
+	https://lore.kernel.org/lkml/20230113065955.815667-1-boqun.feng@gmail.com
+
+"I have been called. I must answer. Always." ;-) 
+
+> > If not, I'm inclined to suggest that we have explicit wrappers of our
+> > own for kvm_mutex_lock() which will do the check directly.
+> 
+> This does allow much more wiggle room.  For example, you guys could decide
+> to let lockdep complain about things that other SRCU users want to do.
+> For completeness, here is one such scenario:
+> 
+> CPU 0:  read_lock(&rla); srcu_read_lock(&srcua); ...
+> 
+> CPU 1:  srcu_read_lock(&srcua); read_lock(&rla); ...
+> 
+> CPU 2:  synchronize_srcu(&srcua);
+> 
+> CPU 3: 	write_lock(&rla); ...
+> 
+> If you guys are OK with lockdep complaining about this, then doing a
+
+Actually lockdep won't complain about this, since srcu_read_lock() is
+always a recursive read lock, so it won't break other srcu_read_lock().
+FWIW if CPU2 or CPU3 does
+
+	write_lock(&rla); 
+	synchronize_srcu(&srcua);
+
+it's a deadlock (with CPU 1)
+
+Regards,
+Boqun
+
+> currently mythical rcu_write_acquire()/rcu_write_release() pair around
+> your calls to synchronize_srcu() should catch the other issue.
+> 
+> And probably break something else, but you have to start somewhere!  ;-)
+> 
+> 							Thanx, Paul
