@@ -2,192 +2,418 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 27D8666939F
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 11:03:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E589B669429
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 11:33:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235451AbjAMKDR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 05:03:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
+        id S240555AbjAMKdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 05:33:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241110AbjAMKCw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 05:02:52 -0500
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482663AC;
-        Fri, 13 Jan 2023 02:02:48 -0800 (PST)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30D9khAQ031574;
-        Fri, 13 Jan 2023 10:02:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- from : to : cc : subject : content-type : content-transfer-encoding :
- mime-version; s=corp-2022-7-12;
- bh=TOrxaIKfzLrWfd3AeCAdfJMYYwWfpFiqwhVLY3wBWsg=;
- b=kPiqi6Pf326k5co48Gve8AOOZBNXlfUXD1AMPjxJZPmpcCWtUpQ5h9OsG4NdBFEyCnsm
- 325IliMsx8M9Bt+3r6zHlJGX9nisYt5O/Zb7e+AK0Kd3SVarrJuebDW7bxaH4cxtlm81
- lhMbsyTyerG8vMsDz3gerwbE0uLWSgf8tqVpBRQxadkgd78sU+61wZRvLNZ30l7GuBPR
- pFVsULUWDkTxSYTxmwJxLePR7moSFuQ8OM0gFep/xSbUZcX2yicYg3LmlQXza8JqlIOJ
- pRsqf+YAe6B6hWLQ0u0PINWdleCOC4CQxomFfs2jN7p1xUu6VNc0U/8jSuSMw1W2Pt1v gw== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3my0btvdjb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Jan 2023 10:02:39 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 30D8diFP007424;
-        Fri, 13 Jan 2023 10:02:38 GMT
-Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2174.outbound.protection.outlook.com [104.47.56.174])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3n1k4ce52f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 Jan 2023 10:02:38 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=n0WmIpvYcrTpWA7RY5W7dCdz24sx2Ds5V+Le59DAP/TqYqlYogehjgqZx7jyhuBOaAcxqaAEnSjA33Db2Iog3//sWMw2aWId+IHCSkBaTGppAUqBTWh3C/Dqrn8Z30n9KPyxQ075WB+P9gOMwkH9rt1hG8FclFrtwcaWc0uiJI4X6+v28OOnYFtCspCjOqXly/y0sIxKGxNywAMRhTQd7J5AykrgnboDT4PuxNzfLx/teVnmw2aFoFI06ghcvRXDxBXytHo6dAfvXt4ktDBcgWO9ZLstVm7FEwB9tYJao2XoceajoCtqAuu7abFCf+aDAX7Zxw/dZvLRJaQzipHLVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TOrxaIKfzLrWfd3AeCAdfJMYYwWfpFiqwhVLY3wBWsg=;
- b=d3RejSZOqiCleZyFQCnV9+ZjQQt4hpLEnpZI34bG+q3XywcHBML5AzZjIzFP1R8xlZWf1v5ve9CqkgLzDDd8MFqSWJaPfn/fkKb/fKVkAoaFPG8NYyb8Ay06MaqL/7CIuAvdwXF31jZPkBaggUB6Dyp7sSroJi4hcE0NOrKwb1Db2HhUxVvA4tD7+yTjMqwyFcfZJTRjbQuJAQThLmwlXQS8n3Puh97wf1TP8O0XestCJcW5KsM2dOi31OTdUH8r0ab5PAQWatGCSWUHqVCBQxKSfFMhyxSeSE7Nd1tLpwiP+0pyXokQFMwLzHS9z3Gk76GHJKp2pKUAhsqm92WPng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TOrxaIKfzLrWfd3AeCAdfJMYYwWfpFiqwhVLY3wBWsg=;
- b=MrOQKIul0eNmz0jESCYfxsYGluzLvJMBljBgDxaaf1WTIk2A0LQTkCXLYVsuqko6qGCG9JPDM8rgwOMrGrfrdWaolbu++ZCiKJXr7nma9hoCYbR4X08qjRNs7IqoQNs28PEnAqtixQGeA5hQZoeVg4CwTWFYSDLX/pcPHvLmOBo=
-Received: from PH8PR10MB6290.namprd10.prod.outlook.com (2603:10b6:510:1c1::7)
- by PH7PR10MB5745.namprd10.prod.outlook.com (2603:10b6:510:125::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.9; Fri, 13 Jan
- 2023 10:02:36 +0000
-Received: from PH8PR10MB6290.namprd10.prod.outlook.com
- ([fe80::475f:4f66:d927:ea15]) by PH8PR10MB6290.namprd10.prod.outlook.com
- ([fe80::475f:4f66:d927:ea15%9]) with mapi id 15.20.6002.011; Fri, 13 Jan 2023
- 10:02:36 +0000
-Message-ID: <2322a626-ac5a-9400-82bf-3aaccc5fddb7@oracle.com>
-Date:   Fri, 13 Jan 2023 15:32:25 +0530
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.5.1
-Content-Language: en-US
-From:   Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-To:     stable@vger.kernel.org
-Cc:     pbonzini@redhat.com, shuah@kernel.org, kvm@vger.kernel.org,
-        LKML <linux-kernel@vger.kernel.org>,
-        Darren Kenny <darren.kenny@oracle.com>,
-        Liam Merwick <liam.merwick@oracle.com>,
-        Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Subject: 5.15.y backport request to fix compilation error in selftests/kvm
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SG2PR01CA0163.apcprd01.prod.exchangelabs.com
- (2603:1096:4:28::19) To PH8PR10MB6290.namprd10.prod.outlook.com
- (2603:10b6:510:1c1::7)
+        with ESMTP id S235451AbjAMKdr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 05:33:47 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD4B17423;
+        Fri, 13 Jan 2023 02:33:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
+        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=1rgoOUjXtpYcWXEy1lLUFpE40E7NnQoz12WECeLjv5U=; b=MOxhz+TOr799cqlR5kKt3WzGzN
+        24X649wq3+CVfCgy3NRsF9xnil5uDE8170wwCzFzs0y+bdZ6iROy56IwhO7VHvOWpdC8X7E+3rzes
+        hKeqZk1qS7cmysbpGboqJsqhAON5bDGy6Usq7TpkiGx3OFVsR+RqXki+loW6lKDn+OpXzIjLqZNYr
+        2GGaBCwc+pw9iGlT9siBcrWmnFZQ364I53jRQrYyn8ogpAdXs/fUBXPrRvda24pRj96FX6sVle862
+        hsdRFK6LNYIlSPErRn38TT7gYKxmpLDTiCpfBy6ux3EzBSVTgjxXK6Tktxuc57rWqj+KOF0Qy7VJC
+        EQCUerIg==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pGHNa-0060Wd-MP; Fri, 13 Jan 2023 10:33:46 +0000
+Message-ID: <023e131b3de80c4bc2b6711804a4769466b90c6f.camel@infradead.org>
+Subject: Re: [PATCH] Documentation: kvm: fix SRCU locking order docs
+From:   David Woodhouse <dwmw2@infradead.org>
+To:     Paolo Bonzini <pbonzini@redhat.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, Joel Fernandes <joel@joelfernandes.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Josh Triplett <josh@joshtriplett.org>, rcu@vger.kernel.org,
+        Michal Luczaj <mhal@rbox.co>,
+        Peter Zijlstra <peterz@infradead.org>
+Date:   Fri, 13 Jan 2023 10:33:33 +0000
+In-Reply-To: <d1d44f07-558c-e0ed-403e-61a854c868cb@redhat.com>
+References: <20230111183031.2449668-1-pbonzini@redhat.com>
+         <a14a13a690277d4cc95a4b26aa2d9a4d9b392a74.camel@infradead.org>
+         <20230112152048.GJ4028633@paulmck-ThinkPad-P17-Gen-1>
+         <Y8EF24o932lcshKs@boqun-archlinux>
+         <d1d44f07-558c-e0ed-403e-61a854c868cb@redhat.com>
+Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
+        boundary="=-R07t1ZgzRZNOXGItP/As"
+User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR10MB6290:EE_|PH7PR10MB5745:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7b97baf5-4666-495a-98d4-08daf54d4bbd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HE+Tb4Dd4xVLaZ+DRmOTcis3/KvmFJBdQ8TmgHV7wLMVeprl5p+sxVRltE98EK97RE+CrWT9qZRum9OC6zz7aigObsOoRhAwCwAqMcBZdQaD2uxgyxD8dEQkPEQyL7HWp89hUkd2MpDA4g4ipRgK21ap5itG79AWZx+SdqPm9u2HuIIc1OAH+UgI/C111sqmpM7Xwrxbwlh+Yl0b3Vs68RYgYjeTHkGYTevH9EPs+Bpx9OFrPECjvzFsj2NkPLD8P0i+tDHHkfxcM5KYtLkxxaufN1hVKHjkbJCvCxReKv+phKQiq8hXp+XzKBSRiRTOhRjKS+jR6veeM793DYfbMb7U40UDu6lOmrE4GIXWewDiq9eaSaEMJDxLsl4DdWL+e/vfKsUiG+NdGyoTk+2L8SxDkWBzdQJwdOBKqUTPS1pa4yrCq/qPJ2Rz0mUUBa7JaFbZimTOz2z9iwSixynDYdkiZgzGNUluD4u8GSqtABMc58FuIZUteh6mkBxYwEZ1YBvfL/O6/4KTu3UvBeC+dBDp00qNg59gjnt5Bf9oLvjAW7PTJK9X62LyB/koa9l/tYpoBE6Q7h4r/gcAYek6Dy17IZKSG5YVCpHVLWCX5U+FFdRWCX64SeSt3NDNnEPgvERLW3jnUpKTvBA6wjBGEFgE8LvR4Cw1E60i9kujgq6Q10DOXEgd15kUIjHS7NtLW/pnORxnJMrgeGl24YGm1bPWGyyvMdt5pYd4G4OI6do6ROpx3ojrcHmu8iRftkINwiUpaoctuVNX0nluFN872Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR10MB6290.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(346002)(366004)(396003)(39860400002)(136003)(451199015)(83380400001)(6486002)(966005)(31686004)(8936002)(6512007)(2616005)(186003)(38100700002)(26005)(5660300002)(316002)(41300700001)(54906003)(6506007)(31696002)(4326008)(8676002)(6916009)(86362001)(66476007)(107886003)(36756003)(6666004)(66946007)(478600001)(2906002)(66556008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VVU1U3pwdzZSRk5OaXpjRkpSdDEwTWlKRkJ4ZVFxTlEvYUhpTG9SNUYzRS9n?=
- =?utf-8?B?V2VaSHJpOE9wV3hOUXRab0gzYy9hbXp0RGpnWVR6a2RjWGhGYjFmOVRWNDY5?=
- =?utf-8?B?UXM1d1FwK3NIOC9vM0NwazkxbnV3VnZHZWxxN0JlUzFJYzd6ekZHMXhJZXpr?=
- =?utf-8?B?SUtUMWpiZTRQeVNFY0FLZzFPOTM4aVZ3TXNOdEwyWnNOV1B1dzhkY1VqZ1ox?=
- =?utf-8?B?UTV3L2NiY0VkK1QzSDlKc3kwUXo2L2orcWpyVGdoOVhwd1pOSG5CMmhWeG84?=
- =?utf-8?B?dVpzRm5NaVJpQXRZVjZWNjdCVUx2MVBqaVk4R3E1RmtnUFY0UHEwamVJdUZT?=
- =?utf-8?B?dUYzYW00TFp0UXRzMnFneDZIMk5YRm8wdC8rbzF0WTVEeThhdmpyQjgzRjYv?=
- =?utf-8?B?RlMyMkUrQjlxbS9KU0lKcU5lcjhNSk5KU0JkTU91Rm82aXlaekFEeEYvamFU?=
- =?utf-8?B?UE9hdXpxMTNjTHc2bFM5ZkNmbnZnQk51UTNieVNqTVNKWmw2QW8zdkc2MjZj?=
- =?utf-8?B?b2srcVBqWW44eGE2ZGtsSDV4Mjc2ais1UXVUZVgvSE0vWTNidDJNcU1HdUlz?=
- =?utf-8?B?WXJhRGFBc2JQbEpLenpzd3VqaTF2RnI1ckpLWkVqbE1aREdKTGxUNEdDM3Fn?=
- =?utf-8?B?eEZTV2tQNUNLQ3RBN05ycTZ0NFdHS3JLRDhvdG9UQlh3cVVaMTVIODlDVEYw?=
- =?utf-8?B?dWJiZzFudC94bmFKZFk3a3UxNkIrQ3BiY2FYN05Qb3BSTTQ0Wk1NbDdKazMx?=
- =?utf-8?B?d2dHRlJLWjc1eWVoMkM1OEJ1OXlERGIvdG05UGQxNDE3eEh0aGIway8zSDJT?=
- =?utf-8?B?YWlnVUw2WWVDV0txVWJYOHFKS0lLQnAyL25waFVGKzVqMUdBcTVYZnZxWDBh?=
- =?utf-8?B?cWhiL2Z3R0hUclZnamZyM0hIUW9vRTBlUzhrUUliVHQ0T0hoTmdsaVBVYm5n?=
- =?utf-8?B?WjBrZkZhMEdXcGh3SHhXTlVhNDdDbFNhR1V4TWNUbm5LOXh5bi9UMytsUEw1?=
- =?utf-8?B?cWNWQ05oa0M5aGZ3MGRqTDlZOGhJZ3VYa0FycnBrNG1RdktmQWo4UG9mby9E?=
- =?utf-8?B?R3JzS09ZY2ZZMHoxckdBSTZNajc4cURNUTdaN25McS9sVFBDbDR3bTd6ZzRQ?=
- =?utf-8?B?SXk3MXNqbm9xVVVKbnY3RlRmK2RvSGtkbFFjUUdvMVlUZjAyNVU5UVBBQXVm?=
- =?utf-8?B?RFIzK3Z4ZU51cXVPMmpNWUJCeFBKZDF2aFEzRXF3cXU4MmtJaldnMkwwQlhz?=
- =?utf-8?B?eWtocjZpYnZDQzAwVzNoRWV2YmJKTmVzOXdNZGc4N2gwZ1lrV2JLYkhRVGlo?=
- =?utf-8?B?WlFadENiUXZyUkVZNis3Y2JIVm54S3NRMWQrWVFMZmI5UWc5SHRpbGRPM0FU?=
- =?utf-8?B?cU5CSUxaUDZEZTNvcjJrRzJ1d2h1bGRYWmpyS3lyUnp3N3R5V1dUQVhOakJ1?=
- =?utf-8?B?QWFaeDFGZFhOWEVlSUR0cnRmZWk4N2EwakY0cEc0RGNVb1NycFBPNElGeFpJ?=
- =?utf-8?B?eUVBVlRVYXdqb1FKd2dxOFZ3T2tld2g1eFU1bHAzNkQxd1ZOamM5Ukk5eUJW?=
- =?utf-8?B?TkxNSmtuQ0EvTUpacTVHeWE5OE9URVlxUXM2Q1BaSnRnSndBUTczNkNqdXBI?=
- =?utf-8?B?Z1lNWFlCWmdOWjFqRHhLd3ovOGpUaFdMbXdVdndTZGJyS21qSEFTQTFFRTdp?=
- =?utf-8?B?MXFVL2dXV1VKZm1iMmhIbHdyazlSL2NuRjlGVTZvLzBGOHEyL2JwQWYxVWsx?=
- =?utf-8?B?YTJBelQwNnJHMFF5TXpLRmhXSWdQWmVHREVyTEVEL3FuQjlWOWZhbC9ESW9l?=
- =?utf-8?B?NzhiSVRRNGFRNldzVjRGUUtlQnRtUnoxU29HR3RTejhzWFNUNmR1dEY1cW5V?=
- =?utf-8?B?c3pYdkIyNmRPOXZBck1oeHFtMnVnSHZ3cHR5TDJLZnVaMnVreDEyN29YZzRH?=
- =?utf-8?B?Y1k3T1dTK1hXUWc4dkRMYUpMelNBajQ3UGJTSUo3WlQ2ZWc3cEphdGpDSkF4?=
- =?utf-8?B?UVhuU0JMa1IyZkFXeSt5NjBHYS94dUdUZVB4Q2NuOXdWWnhWOWtTdHRQVGVy?=
- =?utf-8?B?eDFJbVNRUERJNmVySDUrcUx3MmVueUhxVzNrZWZrWHQzSHpZYi8wS2dFTndx?=
- =?utf-8?B?ZEFUdm1qd25iSkNmQWwraVpCcStIMlE2SldQdVl0Y2VML3UxbmtVZU41aHlS?=
- =?utf-8?Q?/TWB/dKLY9QTmU4EHMyVcPo=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 1Lp/+1wVDygPGqZlDuu0F/aMVvACMqB4lQavaNMOR3vhjqQ9twwyXBO1/Akpt4kxr0Yv2yej0p8Gki272Xpp9tEIPlBOF2gTb+FtO9/QgoVZDSYuJtr3cSLqggXvLFKKwJPBkHv+heL0xww7j458CAYFx8FxCWjuJtY48140cbyIw1Xotl1t5J53AsLrZz3e2mTs8ZISbMW+wKB7UGrguh1++k7baypLXqsSn5sAQjxhILskvIQz+S/gk2wRCLVeToX8oY2iRjey+6A5xShzM3ACo5opi6JVyfOnH4UvfpsgDtVJMhY9lY6BWSLLvYSZwICI0VhOEVTrUEMaBDHvryUR4FmQXZ7Bwv72Dr4mh60GH1DnHDV91lrNCkZnTmrRf/y65o0kejGZ9vITufBBmhdZ/uuluj4IdXworKDXBcRcZdSfwyVRKP8ry6kWxlbkJP1sYB1fz8rVIhmaRTiC+cMlSKpD4FuRSE+FaN0nzjdIG7IQg52Isfd8yil8+aY0XKv0LxDMimMjXHTwah6doUv21uLK7yuW95bcNeApislk7ikU/UwJfKxAE1IFENWlLdLNi3edFws0DV9oNrCML5IiOKpmEzujjCFdCUFKfVfXNkMPLYYXLoRTFp8r0qEaOMRHu+wDab6EGxgGVdFhpVsUdMiCYGweUc3b4x55Ol9h6hr+H65ufv5wd0560uTGLLFhSRA36MxOovAiMWmRufE/Pz2almKmkjJSRJKs2diPjQn5lfLD84ptLzbr2y3ioY3LhG8RU6hauTi6wnV8XCvQJC5/lMvq9Reh0gn06YxAB3vosqw9VT6ROidGU1hB
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b97baf5-4666-495a-98d4-08daf54d4bbd
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR10MB6290.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2023 10:02:36.1474
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UUDQw2dvx1UQLRMiz+IbYVezcxeyZrNXE1Ff8tZcZbo/65ryZbJ/1BnMORyN4eGjAH4PELT+WM7Qmpt6+yK1780roTK8s/dkmAs5CsDTI/WZlkixuPjyPTdI0Apx+13C
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR10MB5745
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-13_04,2023-01-13_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0
- adultscore=0 spamscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- mlxlogscore=913 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301130068
-X-Proofpoint-GUID: JG2eCkR2PDH22yxnPg8ynKXtd3nxnu4c
-X-Proofpoint-ORIG-GUID: JG2eCkR2PDH22yxnPg8ynKXtd3nxnu4c
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi,
 
-On arm machine we have a compilation error while building 
-tools/testing/selftests/kvm/ with LTS 5.15.y kernel
+--=-R07t1ZgzRZNOXGItP/As
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-rseq_test.c: In function ‘main’:
-rseq_test.c:236:33: warning: implicit declaration of function ‘gettid’; 
-did you mean ‘getgid’? [-Wimplicit-function-declaration]
-           (void *)(unsigned long)gettid());
-                                  ^~~~~~
-                                  getgid
-/tmp/cc4Wfmv2.o: In function `main':
-/home/test/linux/tools/testing/selftests/kvm/rseq_test.c:236: undefined 
-reference to `gettid'
-collect2: error: ld returned 1 exit status
-make: *** [../lib.mk:151: 
-/home/test/linux/tools/testing/selftests/kvm/rseq_test] Error 1
-make: Leaving directory '/home/test/linux/tools/testing/selftests/kvm'
+On Fri, 2023-01-13 at 10:20 +0100, Paolo Bonzini wrote:
+> On 1/13/23 08:18, Boqun Feng wrote:
+> > On Thu, Jan 12, 2023 at 07:20:48AM -0800, Paul E. McKenney wrote:
+> > > On Thu, Jan 12, 2023 at 08:24:16AM +0000, David Woodhouse wrote:
+> > > > On Wed, 2023-01-11 at 13:30 -0500, Paolo Bonzini wrote:
+> > > > >=20
+> > > > > +- ``synchronize_srcu(&kvm->srcu)`` is called inside critical sec=
+tions
+> > > > > +=C2=A0 for kvm->lock, vcpu->mutex and kvm->slots_lock.=C2=A0 The=
+se locks _cannot_
+> > > > > +=C2=A0 be taken inside a kvm->srcu read-side critical section; t=
+hat is, the
+> > > > > +=C2=A0 following is broken::
+> > > > > +
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 srcu_read_lock(&kvm->srcu);
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_lock(&kvm->slots_lock);
+> > > > > +
+> > > >=20
+> > > > "Don't tell me. Tell lockdep!"
+> > > >=20
+> > > > Did we conclude in
+> > > > https://lore.kernel.org/kvm/122f38e724aae9ae8ab474233da1ba19760c20d=
+2.camel@infradead.org/
+> > > > that lockdep *could* be clever enough to catch a violation of this =
+rule
+> > > > by itself?
+> > > >=20
+> > > > The general case of the rule would be that 'if mutex A is taken in =
+a
+> > > > read-section for SCRU B, then any synchronize_srcu(B) while mutex A=
+ is
+> > > > held shall be verboten'. And vice versa.
+> > > >=20
+> > > > If we can make lockdep catch it automatically, yay!
+> > >=20
+> > > Unfortunately, lockdep needs to see a writer to complain, and that pa=
+tch
+> > > just adds a reader.=C2=A0 And adding that writer would make lockdep c=
+omplain
+> > > about things that are perfectly fine.=C2=A0 It should be possible to =
+make
+> > > lockdep catch this sort of thing, but from what I can see, doing so
+> > > requires modifications to lockdep itself.
+> > >=20
+> >=20
+> > Please see if the follow patchset works:
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0https://lore.kernel.org=
+/lkml/20230113065955.815667-1-boqun.feng@gmail.com
+> >=20
+> > "I have been called. I must answer. Always." ;-)
+
+Amazing! Thank you, Boqun!
+
+> It's missing an important testcase; if it passes (does not warn), then=
+=20
+> it should work:
+
+I think it does.
+
+I started with kvm/master from
+https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=3Dmaster so that
+lockdep didn't find other things to complain about first. I then:
+
+ =E2=80=A2 Dropped the last two commits, putting us back to using kvm->lock=
+ and
+   removing the dummy mutex lock that would have told lockdep that it's
+   a (different) problem.
+
+ =E2=80=A2 I then added Boqun's three commits
+
+ =E2=80=A2 Reverted a79b53aa so that the srcu_synchronize() deadlock return=
+s
+
+ =E2=80=A2 Couldn't reproduce with xen_shinfo_test, so added Michal's test =
+from
+   https://lore.kernel.org/kvm/15599980-bd2e-b6c2-1479-e1eef02da0b5@rbox.co=
+/
+
+The resulting tree is at
+https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/kvm-src=
+u-lockdep
 
 
-This is fixed by commit 561cafebb2cf97b0927b4fb0eba22de6200f682e upstream.
-Kernel version to apply: 5.15.y LTS
+Now when I run tools/testing/selftests/kvm/x86_64/deadlocks_test I do
+see lockdep complain about it (shown below; I have a cosmetic
+nit/request to make). If I restore the evtchn_reset fix then it also
+complains about kvm_xen_set_evtchn() vs. kvm_xen_kvm_set_attr(), and if
+I restore the xen_lock fix from the tip of kvm/master then Michal's
+deadlock_test passes and there are no complaints.
 
-Could we please backport the above fix onto 5.15.y LTS. It applies 
-cleanly and the kvm selftests compile properly after applying the patch.
+So everything seems to be working as it should... *except* for the fact
+that I don't quite understand why xen_shinfo_test didn't trigger the
+warning. Michal, I guess you already worked that out when you came up
+with your deadlock-test instead... is there something we should add to
+xen_shinfo_test that would mean it *would* have triggered? I even tried
+this:
 
-Liam pointed the same in [1]
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -1173,6 +1173,16 @@ static struct kvm *kvm_create_vm(unsigned long type,=
+ const char *fdname)
+        if (init_srcu_struct(&kvm->irq_srcu))
+                goto out_err_no_irq_srcu;
+=20
++#ifdef CONFIG_LOCKDEP
++       /*
++        * Ensure lockdep knows that it's not permitted to lock kvm->lock
++        * from a SRCU read section on kvm->srcu.
++        */
++       mutex_lock(&kvm->lock);
++       synchronize_srcu(&kvm->srcu);
++       mutex_unlock(&kvm->lock);
++#endif
++
+        refcount_set(&kvm->users_count, 1);
+        for (i =3D 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
+                for (j =3D 0; j < 2; j++) {
 
-Thanks,
-Harshit
 
-[1] 
-https://lore.kernel.org/all/fdfb143a-45c4-aaff-aa95-d20c076ff555@oracle.com/
+
+
+> [  845.474169] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [  845.474170] WARNING: possible circular locking dependency detected
+> [  845.474172] 6.2.0-rc3+ #1025 Tainted: G            E    =20
+> [  845.474175] ------------------------------------------------------
+> [  845.474176] deadlocks_test/22767 is trying to acquire lock:
+> [  845.474178] ffffc9000ba4b868 (&kvm->srcu){.+.+}-{0:0}, at: __synchroni=
+ze_srcu+0x5/0x170
+> [  845.474192]=20
+>                but task is already holding lock:
+> [  845.474194] ffffc9000ba423c0 (&kvm->lock){+.+.}-{3:3}, at: kvm_vm_ioct=
+l_set_msr_filter+0x188/0x220 [kvm]
+> [  845.474319]=20
+>                which lock already depends on the new lock.
+
+So the above part is good, and clearly tells me it was synchronize_srcu()
+
+> [  845.474320]=20
+>                the existing dependency chain (in reverse order) is:
+> [  845.474322]=20
+>                -> #1 (&kvm->lock){+.+.}-{3:3}:
+> [  845.474327]        __lock_acquire+0x4b4/0x940
+> [  845.474333]        lock_acquire.part.0+0xa8/0x210
+> [  845.474337]        __mutex_lock+0x94/0x920
+> [  845.474344]        kvm_xen_set_evtchn.part.0+0x6d/0x170 [kvm]
+> [  845.474437]        kvm_xen_inject_timer_irqs+0x79/0xa0 [kvm]
+> [  845.474529]        vcpu_run+0x20c/0x450 [kvm]
+> [  845.474618]        kvm_arch_vcpu_ioctl_run+0x1df/0x670 [kvm]
+> [  845.474707]        kvm_vcpu_ioctl+0x279/0x700 [kvm]
+> [  845.474783]        __x64_sys_ioctl+0x8a/0xc0
+> [  845.474787]        do_syscall_64+0x3b/0x90
+> [  845.474796]        entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [  845.474804]=20
+>                -> #0 (&kvm->srcu){.+.+}-{0:0}:
+> [  845.474809]        check_prev_add+0x8f/0xc20
+> [  845.474812]        validate_chain+0x3ba/0x450
+> [  845.474814]        __lock_acquire+0x4b4/0x940
+> [  845.474817]        lock_sync+0x99/0x110
+> [  845.474820]        __synchronize_srcu+0x4d/0x170
+> [  845.474824]        kvm_vm_ioctl_set_msr_filter+0x1a5/0x220 [kvm]
+. [  845.474907]        kvm_arch_vm_ioctl+0x8df/0xd50 [kvm]
+> [  845.474997]        kvm_vm_ioctl+0x5ca/0x800 [kvm]
+> [  845.475075]        __x64_sys_ioctl+0x8a/0xc0
+> [  845.475079]        do_syscall_64+0x3b/0x90
+> [  845.475084]        entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [  845.475089]=20
+>                other info that might help us debug this:
+>
+> [  845.475091]  Possible unsafe locking scenario:
+>
+> [  845.475092]        CPU0                    CPU1
+> [  845.475093]        ----                    ----
+> [  845.475095]   lock(&kvm->lock);
+> [  845.475098]                                lock(&kvm->srcu);
+> [  845.475101]                                lock(&kvm->lock);
+> [  845.475103]   lock(&kvm->srcu);
+> [  845.475106]=20
+>                 *** DEADLOCK ***
+
+But is there any chance the above could say 'synchronize_srcu' and
+'read_lock_srcu' in the appropriate places?
+
+> [  845.475108] 1 lock held by deadlocks_test/22767:
+> [  845.475110]  #0: ffffc9000ba423c0 (&kvm->lock){+.+.}-{3:3}, at: kvm_vm=
+_ioctl_set_msr_filter+0x188/0x220 [kvm]
+> [  845.475200]=20
+>                stack backtrace:
+> [  845.475202] CPU: 10 PID: 22767 Comm: deadlocks_test Tainted: G        =
+    E      6.2.0-rc3+ #1025
+> [  845.475206] Hardware name: Intel Corporation S2600CW/S2600CW, BIOS SE5=
+C610.86B.01.01.0008.021120151325 02/11/2015
+> [  845.475208] Call Trace:
+> [  845.475210]  <TASK>
+> [  845.475214]  dump_stack_lvl+0x56/0x73
+> [  845.475221]  check_noncircular+0x102/0x120
+> [  845.475229]  ? check_noncircular+0x7f/0x120
+> [  845.475236]  check_prev_add+0x8f/0xc20
+> [  845.475239]  ? add_chain_cache+0x10b/0x2d0
+> [  845.475244]  validate_chain+0x3ba/0x450
+> [  845.475249]  __lock_acquire+0x4b4/0x940
+> [  845.475253]  ? __synchronize_srcu+0x5/0x170
+> [  845.475258]  lock_sync+0x99/0x110
+> [  845.475261]  ? __synchronize_srcu+0x5/0x170
+> [  845.475265]  __synchronize_srcu+0x4d/0x170
+? [  845.475269]  ? mark_held_locks+0x49/0x80
+> [  845.475272]  ? _raw_spin_unlock_irqrestore+0x2d/0x60
+> [  845.475278]  ? __pfx_read_tsc+0x10/0x10
+> [  845.475286]  ? ktime_get_mono_fast_ns+0x3d/0x90
+> [  845.475292]  kvm_vm_ioctl_set_msr_filter+0x1a5/0x220 [kvm]
+> [  845.475380]  kvm_arch_vm_ioctl+0x8df/0xd50 [kvm]
+> [  845.475472]  ? __lock_acquire+0x4b4/0x940
+> [  845.475485]  kvm_vm_ioctl+0x5ca/0x800 [kvm]
+> [  845.475566]  ? lockdep_unregister_key+0x76/0x110
+> [  845.475575]  __x64_sys_ioctl+0x8a/0xc0
+> [  845.475579]  do_syscall_64+0x3b/0x90
+> [  845.475586]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [  845.475591] RIP: 0033:0x7f79de23fd1b
+> [  845.475595] Code: 73 01 c3 48 8b 0d 05 a1 1b 00 f7 d8 64 89 01 48 83 c=
+8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 10 00 00 00 0f 05 <=
+48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 a0 1b 00 f7 d8 64 89 01 48
+> [  845.475598] RSP: 002b:00007f79ddff7c98 EFLAGS: 00000246 ORIG_RAX: 0000=
+000000000010
+> [  845.475602] RAX: ffffffffffffffda RBX: 00007f79ddff8640 RCX: 00007f79d=
+e23fd1b
+> [  845.475605] RDX: 00007f79ddff7ca0 RSI: 000000004188aec6 RDI: 000000000=
+0000004
+> [  845.475607] RBP: 00007f79ddff85c0 R08: 0000000000000000 R09: 00007fffc=
+eb1ff2f
+> [  845.475609] R10: 0000000000000008 R11: 0000000000000246 R12: 00007f79d=
+dff7ca0
+> [  845.475611] R13: 0000000001c322a0 R14: 00007f79de2a05f0 R15: 000000000=
+0000000
+> [  845.475617]  </TASK>
+
+
+
+--=-R07t1ZgzRZNOXGItP/As
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Transfer-Encoding: base64
+
+MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
+ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
+EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
+FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
+aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
+EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
+VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
+aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
+ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
+QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
+rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
+ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
+U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
+DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
+BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
+dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
+BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
+QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
+CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
+xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
+IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
+kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
+eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
+KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
+1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
+OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
+x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
+5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
+DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
+VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
+UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
+MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
+ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
+oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
+SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
+xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
+RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
+bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
+NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
+KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
+5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
+C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
+gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
+VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
+MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
+by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
+b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
+BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
+QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
+c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
+AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
+qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
+v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
+Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
+tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
+Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
+YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
+ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
+IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
+ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
+GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
+h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
+9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
+P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
+2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
+BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
+7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
+lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
+lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
+AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
+Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
+FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
+BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
+cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
+aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
+LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
+BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
+cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
+Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
+lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
+WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
+hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
+IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
+dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
+NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
+xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTEzMTAzMzMzWjAvBgkqhkiG9w0BCQQxIgQgXQAtwnM7
+We7DjBHc/YOUNTBhHDp6Ci6LLzN5c+XMK+wwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
+A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
+dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
+DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
+MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
+Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCss4Id0pKSreyZUE/kOBAYDaGpgATCvWms
+HkEzq+G1zcGu+8MFvP0+B9TviKXMvTc7DrVoHLDjseBVuw+qUcZ+mlsbTMm1sc98yrKNpG7PrEN/
+ugg1tcSERCgjwb9qWw5tmAOlFn99WAW3DFpWj6bDEl4nB4qLSMXNjcG9QQp4irQF65T+G4ziLNaN
+zK9nQmv69eTFAD9M1PxcSFiI212PrvzzHl/CjpDH9G4Xm0AVfb6OMtuJIBT91vQZot0APPnEID0D
+Z3yMUMGYPj0c9mPyo6eNYXCxJ3TAhHiswPncocZowoWjfR/82+25eZymllMTkrCYud03ZHC24egB
+xF4u/R1dDfUsA9OTwMM4qgOGyXydZfNqP4q6VwASuVmjTY8LqeaOTss/qyGnLeoQUOSXYToLh5TT
+vpmuU8nONulNv9FAmuiukbdOD646wsvk71x6j6uv4Pf6iijLmj8Rmwgkg15dI1Bth0qrNZaRBVFP
+F8iMs6LVuxcyov1MFRJl73guHLFsG4XfsjogVRzfdZl48H97FOR8U2FHELlyLFKmVdB5Xf1RjjwN
+yEU0aYH1GwTvGPFptTIdERAYFPleM7ZEsYmulnUtjkyf0vj3IhwD7cYLTzPtn3fGfiOvkQ9PWZ21
+Ue5rGlk6Xt6T1Id7GiKcnfAs8AQPsgsfols/HHFgnwAAAAAAAA==
+
+
+--=-R07t1ZgzRZNOXGItP/As--
