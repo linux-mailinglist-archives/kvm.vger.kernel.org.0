@@ -2,55 +2,55 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4430366A127
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 18:50:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 609DA66A156
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 18:59:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230355AbjAMRun (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 12:50:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58786 "EHLO
+        id S230198AbjAMR7t (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 12:59:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230268AbjAMRuM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 12:50:12 -0500
-Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A38CB40C2C
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 09:43:37 -0800 (PST)
-Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-4bf16baa865so294201837b3.13
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 09:43:37 -0800 (PST)
+        with ESMTP id S230218AbjAMR7Y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 12:59:24 -0500
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 481638D384
+        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 09:52:20 -0800 (PST)
+Received: by mail-yb1-xb36.google.com with SMTP id v19so17386381ybv.1
+        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 09:52:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=K3cf7M2HST5gUl0uPAkYtSybv0fNWjrltQKA6GbBxJY=;
-        b=Ygm//Z2g+onRKYbQS0vNoeC1nzhfRqSsW+gOqXbrk/h7Cz/H7xToX2ASSqoKSRJOH7
-         Tep4FfwPic27k/r5ofzs7jQLzjjeVkpWixFYJdoMbjMhHu5MVZprtTq2iRFHJeUhrj9H
-         vekjWlBoi5NemFAARjoa+oxoeHkOd63bjKGE25QQ7VY3gjFwhVOFj5L8l4K/o7Txg8j4
-         FLAdcH1AaHSOJ/TI/rXG0yPwXJpkJiqNWC4qcxpkXy5SH6OUdfdGmjgUZ2lJVr+Aecep
-         Gh/woY4yY7UL3snvcVoCQN8mhSya+Y+E1kRwwWpFLubWEM9UeZv4H4Wiqtsa+R6X/ZLK
-         VkuQ==
+        bh=uBw89FU9UBpNOcN/n5tNPwSFMn3YhdoihkTziL0Dvbo=;
+        b=BfzyxH4VporMuNHWhb+dZbaHSPEl9xGOc/rSIBcSg9i67lbPstTJZ0rj227naupP8p
+         L8Re3drnraxXM+CItCIfqMXDtjqbRGCHbOX0KZhdLlqVWkt9qvMkHb1p/FNLkJOO8dT3
+         TgUYA9GgCOTcV0f6aX9vLB5r2+NITMf9/f/tGELhefImj/oNcP15cO5htpnS1fFPw25U
+         /2DWNbt6Ja5CEPOPwwCF5ueywByUjjRQ9WXqdMCLAa/IgOuuogm5nRfBrmmDdXBGGVta
+         wqdUqC+mNtY+q1/SrKbMh/kLKrVUU7Gl30hZDEnHQCCfiYrUsrwpred4sNp/B8B6Wbc0
+         BMBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=K3cf7M2HST5gUl0uPAkYtSybv0fNWjrltQKA6GbBxJY=;
-        b=v1DfwHh+qppEWU/GLpFr1tL36/fRdkfihcfP8363V2OqmzrAjKEkdocGLISj/5YK9o
-         ioFLOEU/HuKT40e875oqZsjrh/f+fHmNcX1G37OIQbthsXhZQz/BsjzOPWu/gF0AZctM
-         MY8PlrbCKhUR0i20YjR5I7knNiQE2Iab0z2HvRlMdqPo3e9wz9JRXSjxS5A6Y5JRGzEw
-         s8EYv52NDi5Xlwq4SiQVrtqAGLWqLZjSjyIL36RcwE7ZTa/fUiwmjSO+OkuY1obcgZlw
-         UUvTfeXTG35/DcpEZBVCwqbAnLVM1ugxRcF9T9H01vE6R/CYcF/27RkkZS25RtePOkxd
-         8IDw==
-X-Gm-Message-State: AFqh2kr84nfNfQksqFmnNczoBxlcsekI126U6K7O8AkSJzIMUvUsmBfo
-        cEnvhURZ14nNV/bAkJ8ILXTznuAkKSrVHqfz9TfLHg==
-X-Google-Smtp-Source: AMrXdXtwZgUt8m4FJdjhH8D8XRQ44vyMb4OoabTVzwW/Pc9Pezodd/AXEt2qRiL0uIAr2ycw+M+D4Ml+ZscoW7PcvQk=
-X-Received: by 2002:a81:6f42:0:b0:36f:f251:213b with SMTP id
- k63-20020a816f42000000b0036ff251213bmr2037205ywc.228.1673631816578; Fri, 13
- Jan 2023 09:43:36 -0800 (PST)
+        bh=uBw89FU9UBpNOcN/n5tNPwSFMn3YhdoihkTziL0Dvbo=;
+        b=nJpFY3be44dekidhO08WUjZD04i4m0hx3io4sQNFEZ/SMAMY1HQLb6vVEex3sRccEP
+         ZhkDZX4HYwUzvUubJEN2ERQiXI+Fm29Gdj8jM8gp+0ucSncsKiD+LYq3tQmY4sBYAJrG
+         FIdhIuwjl36b0Pe9TVUveTCKpo+KxD7Yz54uIf1KwQHHYDOUY1FwHtsvopipcwtsfUUB
+         KUwL/nP9XQo80C31zNhBPG+hWXqN1axfXutX/XJUYfl0GWwcmIN6iIOxCjOfnzfYGrC/
+         n/Is+QWdT3z9ZhjY/bavoarRnChbaMerqmr7/n9LLNva6CoHXmO9TEkMzE1nNKCBP0RT
+         EaSg==
+X-Gm-Message-State: AFqh2kq8g7HnB/zt5hMEyF9tdA5CEElgLQu9sWriMLyeaw9u8tvyePMj
+        qx5RTyZk2V5e4NTCWZ3+/aaQ/00FBIzQWOouvYiazw==
+X-Google-Smtp-Source: AMrXdXvYN+uQtXM83ZOVJrgdDH7vZrt250uxujTe5BRq5UwAUrIE5JvOi/LNvWsGH+A96modUUeNRZFLOxJNXZ6z9aM=
+X-Received: by 2002:a25:7355:0:b0:7d2:a7e9:ece5 with SMTP id
+ o82-20020a257355000000b007d2a7e9ece5mr71427ybc.132.1673632339085; Fri, 13 Jan
+ 2023 09:52:19 -0800 (PST)
 MIME-Version: 1.0
 References: <20221221222418.3307832-1-bgardon@google.com> <20221221222418.3307832-8-bgardon@google.com>
 In-Reply-To: <20221221222418.3307832-8-bgardon@google.com>
 From:   Vipin Sharma <vipinsh@google.com>
-Date:   Fri, 13 Jan 2023 09:43:00 -0800
-Message-ID: <CAHVum0cGYXyjzeoNs8jnS-oD8wz4QwX0VpD9a=U8d++xJNc62A@mail.gmail.com>
+Date:   Fri, 13 Jan 2023 09:51:43 -0800
+Message-ID: <CAHVum0dP8PaKGVsg9=9xawj2dOtBnq0YX-SSQ6kkmEjvk4yKKA@mail.gmail.com>
 Subject: Re: [RFC 07/14] KVM: x86/MMU: Cleanup shrinker interface with Shadow MMU
 To:     Ben Gardon <bgardon@google.com>
 Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
@@ -63,7 +63,7 @@ Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,15 +80,6 @@ On Wed, Dec 21, 2022 at 2:24 PM Ben Gardon <bgardon@google.com> wrote:
 > tables. As a result, it makes sense to move some of the implementation back
 > to mmu.c.
 >
-
-My recommendation is to move the whole function back to mmu.c instead
-of splitting. As all logic for shrinker will be contained in one place
-instead of spreading it over two files. kvm_shadow_mmu_shrink_scan(),
-the new function created in this patch, is not used anywhere else,
-there are already some functions which are getting exposed from shadow
-mmu in this patch, it will be cleaner to just expose the other
-functions needed by shrink_scan() and keep the implementation of
-shrink_scan same and at one place.
 > No functional change intended.
 >
 > Signed-off-by: Ben Gardon <bgardon@google.com>
@@ -162,6 +153,9 @@ shrink_scan same and at one place.
 >
 > -static bool kvm_has_zapped_obsolete_pages(struct kvm *kvm)
 > +bool kvm_shadow_mmu_has_zapped_obsolete_pages(struct kvm *kvm)
+
+Function renaming and removing static should be two separate commits.
+
 >  {
 >         return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
 >  }
