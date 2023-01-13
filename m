@@ -2,32 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E589B669429
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 11:33:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A3F7B66950E
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 12:11:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240555AbjAMKdx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 05:33:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37012 "EHLO
+        id S241410AbjAMLLl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 06:11:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235451AbjAMKdr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 05:33:47 -0500
+        with ESMTP id S241211AbjAMLKs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 06:10:48 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AD4B17423;
-        Fri, 13 Jan 2023 02:33:44 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F7B68C87;
+        Fri, 13 Jan 2023 03:03:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=1rgoOUjXtpYcWXEy1lLUFpE40E7NnQoz12WECeLjv5U=; b=MOxhz+TOr799cqlR5kKt3WzGzN
-        24X649wq3+CVfCgy3NRsF9xnil5uDE8170wwCzFzs0y+bdZ6iROy56IwhO7VHvOWpdC8X7E+3rzes
-        hKeqZk1qS7cmysbpGboqJsqhAON5bDGy6Usq7TpkiGx3OFVsR+RqXki+loW6lKDn+OpXzIjLqZNYr
-        2GGaBCwc+pw9iGlT9siBcrWmnFZQ364I53jRQrYyn8ogpAdXs/fUBXPrRvda24pRj96FX6sVle862
-        hsdRFK6LNYIlSPErRn38TT7gYKxmpLDTiCpfBy6ux3EzBSVTgjxXK6Tktxuc57rWqj+KOF0Qy7VJC
-        EQCUerIg==;
+        bh=OjMNFrMw9E14SVkRjzqTpbnFxm0iH4W3L8nYb4oGlTo=; b=XVRmZEVkHcqeWHpLDRNjIkOlU1
+        GumUqO4e7i1n6x9/hwK9dfSElbEcQd8DlgRpU+pTDVxFN98hm6U/lkWB0S5GpGbDjVznSuBtKNTtJ
+        N1Hqx/1ZMsi/RK7rKCZC1is3mV62YV5ypRIGaCK/4bOw1E2Uy1Nzv86PG5EGZw+z/Vg/RCSnbyLgV
+        GG5RQKLIJc+pQW/oJ/8v2D3HmIuxbP6Iotf+kUf6Dj6qrJiuaKaMKozoaAhSfX/PU2+EQ7DfI0qqy
+        oGl7n8FgKs+jS3DdVj66X8U+zMCmLQgrXKAACyViAf/3OLfzLjsfevjXqGoGfCgc5UWm4eRhIEuzn
+        pvuDEDyw==;
 Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pGHNa-0060Wd-MP; Fri, 13 Jan 2023 10:33:46 +0000
-Message-ID: <023e131b3de80c4bc2b6711804a4769466b90c6f.camel@infradead.org>
+        id 1pGHq7-0061vj-N7; Fri, 13 Jan 2023 11:03:17 +0000
+Message-ID: <41fad1dc90c2bef4f2f17f1495c2f85105707d9f.camel@infradead.org>
 Subject: Re: [PATCH] Documentation: kvm: fix SRCU locking order docs
 From:   David Woodhouse <dwmw2@infradead.org>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
@@ -39,15 +39,16 @@ Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Josh Triplett <josh@joshtriplett.org>, rcu@vger.kernel.org,
         Michal Luczaj <mhal@rbox.co>,
         Peter Zijlstra <peterz@infradead.org>
-Date:   Fri, 13 Jan 2023 10:33:33 +0000
-In-Reply-To: <d1d44f07-558c-e0ed-403e-61a854c868cb@redhat.com>
+Date:   Fri, 13 Jan 2023 11:03:02 +0000
+In-Reply-To: <023e131b3de80c4bc2b6711804a4769466b90c6f.camel@infradead.org>
 References: <20230111183031.2449668-1-pbonzini@redhat.com>
          <a14a13a690277d4cc95a4b26aa2d9a4d9b392a74.camel@infradead.org>
          <20230112152048.GJ4028633@paulmck-ThinkPad-P17-Gen-1>
          <Y8EF24o932lcshKs@boqun-archlinux>
          <d1d44f07-558c-e0ed-403e-61a854c868cb@redhat.com>
+         <023e131b3de80c4bc2b6711804a4769466b90c6f.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-R07t1ZgzRZNOXGItP/As"
+        boundary="=-faejZK8MwCv7sSfxNlYE"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -61,250 +62,219 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-R07t1ZgzRZNOXGItP/As
+--=-faejZK8MwCv7sSfxNlYE
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2023-01-13 at 10:20 +0100, Paolo Bonzini wrote:
-> On 1/13/23 08:18, Boqun Feng wrote:
-> > On Thu, Jan 12, 2023 at 07:20:48AM -0800, Paul E. McKenney wrote:
-> > > On Thu, Jan 12, 2023 at 08:24:16AM +0000, David Woodhouse wrote:
-> > > > On Wed, 2023-01-11 at 13:30 -0500, Paolo Bonzini wrote:
-> > > > >=20
-> > > > > +- ``synchronize_srcu(&kvm->srcu)`` is called inside critical sec=
-tions
-> > > > > +=C2=A0 for kvm->lock, vcpu->mutex and kvm->slots_lock.=C2=A0 The=
-se locks _cannot_
-> > > > > +=C2=A0 be taken inside a kvm->srcu read-side critical section; t=
-hat is, the
-> > > > > +=C2=A0 following is broken::
-> > > > > +
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 srcu_read_lock(&kvm->srcu);
-> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_lock(&kvm->slots_lock);
-> > > > > +
-> > > >=20
-> > > > "Don't tell me. Tell lockdep!"
-> > > >=20
-> > > > Did we conclude in
-> > > > https://lore.kernel.org/kvm/122f38e724aae9ae8ab474233da1ba19760c20d=
-2.camel@infradead.org/
-> > > > that lockdep *could* be clever enough to catch a violation of this =
-rule
-> > > > by itself?
-> > > >=20
-> > > > The general case of the rule would be that 'if mutex A is taken in =
-a
-> > > > read-section for SCRU B, then any synchronize_srcu(B) while mutex A=
- is
-> > > > held shall be verboten'. And vice versa.
-> > > >=20
-> > > > If we can make lockdep catch it automatically, yay!
-> > >=20
-> > > Unfortunately, lockdep needs to see a writer to complain, and that pa=
-tch
-> > > just adds a reader.=C2=A0 And adding that writer would make lockdep c=
-omplain
-> > > about things that are perfectly fine.=C2=A0 It should be possible to =
-make
-> > > lockdep catch this sort of thing, but from what I can see, doing so
-> > > requires modifications to lockdep itself.
-> > >=20
-> >=20
-> > Please see if the follow patchset works:
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0https://lore.kernel.org=
-/lkml/20230113065955.815667-1-boqun.feng@gmail.com
-> >=20
-> > "I have been called. I must answer. Always." ;-)
+On Fri, 2023-01-13 at 10:33 +0000, David Woodhouse wrote:
+>=20
+> So everything seems to be working as it should... *except* for the fact
+> that I don't quite understand why xen_shinfo_test didn't trigger the
+> warning. Michal, I guess you already worked that out when you came up
+> with your deadlock-test instead... is there something we should add to
+> xen_shinfo_test that would mean it *would* have triggered?
 
-Amazing! Thank you, Boqun!
+Got it. It only happens when kvm_xen_set_evtchn() takes the slow path
+when kvm_xen_set_evtchn_fast() fails. Not utterly sure why that works
+in your deadlock_test but I can make it happen in xen_shinfo_test just
+by invalidating the GPC by changing the memslots:
 
-> It's missing an important testcase; if it passes (does not warn), then=
+
+--- a/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xen_shinfo_test.c
+@@ -29,6 +29,9 @@
+ #define DUMMY_REGION_GPA       (SHINFO_REGION_GPA + (3 * PAGE_SIZE))
+ #define DUMMY_REGION_SLOT      11
 =20
-> it should work:
-
-I think it does.
-
-I started with kvm/master from
-https://git.kernel.org/pub/scm/virt/kvm/kvm.git/log/?h=3Dmaster so that
-lockdep didn't find other things to complain about first. I then:
-
- =E2=80=A2 Dropped the last two commits, putting us back to using kvm->lock=
- and
-   removing the dummy mutex lock that would have told lockdep that it's
-   a (different) problem.
-
- =E2=80=A2 I then added Boqun's three commits
-
- =E2=80=A2 Reverted a79b53aa so that the srcu_synchronize() deadlock return=
-s
-
- =E2=80=A2 Couldn't reproduce with xen_shinfo_test, so added Michal's test =
-from
-   https://lore.kernel.org/kvm/15599980-bd2e-b6c2-1479-e1eef02da0b5@rbox.co=
-/
-
-The resulting tree is at
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/kvm-src=
-u-lockdep
-
-
-Now when I run tools/testing/selftests/kvm/x86_64/deadlocks_test I do
-see lockdep complain about it (shown below; I have a cosmetic
-nit/request to make). If I restore the evtchn_reset fix then it also
-complains about kvm_xen_set_evtchn() vs. kvm_xen_kvm_set_attr(), and if
-I restore the xen_lock fix from the tip of kvm/master then Michal's
-deadlock_test passes and there are no complaints.
-
-So everything seems to be working as it should... *except* for the fact
-that I don't quite understand why xen_shinfo_test didn't trigger the
-warning. Michal, I guess you already worked that out when you came up
-with your deadlock-test instead... is there something we should add to
-xen_shinfo_test that would mean it *would* have triggered? I even tried
-this:
-
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1173,6 +1173,16 @@ static struct kvm *kvm_create_vm(unsigned long type,=
- const char *fdname)
-        if (init_srcu_struct(&kvm->irq_srcu))
-                goto out_err_no_irq_srcu;
-=20
-+#ifdef CONFIG_LOCKDEP
-+       /*
-+        * Ensure lockdep knows that it's not permitted to lock kvm->lock
-+        * from a SRCU read section on kvm->srcu.
-+        */
-+       mutex_lock(&kvm->lock);
-+       synchronize_srcu(&kvm->srcu);
-+       mutex_unlock(&kvm->lock);
-+#endif
++#define DUMMY_REGION_GPA_2     (SHINFO_REGION_GPA + (4 * PAGE_SIZE))
++#define DUMMY_REGION_SLOT_2    12
 +
-        refcount_set(&kvm->users_count, 1);
-        for (i =3D 0; i < KVM_ADDRESS_SPACE_NUM; i++) {
-                for (j =3D 0; j < 2; j++) {
+ #define SHINFO_ADDR    (SHINFO_REGION_GPA)
+ #define VCPU_INFO_ADDR (SHINFO_REGION_GPA + 0x40)
+ #define PVTIME_ADDR    (SHINFO_REGION_GPA + PAGE_SIZE)
+@@ -765,6 +768,8 @@ int main(int argc, char *argv[])
+=20
+                                if (verbose)
+                                        printf("Testing guest EVTCHNOP_send=
+ direct to evtchn\n");
++                               vm_userspace_mem_region_add(vm, VM_MEM_SRC_=
+ANONYMOUS,
++                                                           DUMMY_REGION_GP=
+A_2, DUMMY_REGION_SLOT_2, 1, 0);
+                                evtchn_irq_expected =3D true;
+                                alarm(1);
+                                break;
 
 
 
+I did also need the trick below. I'll send patches properly, keeping
+the fast path test and *adding* the slow one, instead of just changing
+it as above.
 
-> [  845.474169] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+I also validated that if I put back the evtchn_reset deadlock fix, and
+the separate xen_lock which is currently the tip of kvm/master, it all
+works without complaints (or deadlocks).
+
+>  I even tried this:
+>=20
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1173,6 +1173,16 @@ static struct kvm *kvm_create_vm(unsigned long typ=
+e, const char *fdname)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (init_srcu_struct(&kvm->irq=
+_srcu))
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 goto out_err_no_irq_srcu;
+> =C2=A0
+> +#ifdef CONFIG_LOCKDEP
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * Ensure lockdep knows that i=
+t's not permitted to lock kvm->lock
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 * from a SRCU read section on=
+ kvm->srcu.
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_lock(&kvm->lock);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 synchronize_srcu(&kvm->srcu);
+> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 mutex_unlock(&kvm->lock);
+> +#endif
+> +
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 refcount_set(&kvm->users_count=
+, 1);
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for (i =3D 0; i < KVM_ADDRESS_=
+SPACE_NUM; i++) {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 for (j =3D 0; j < 2; j++) {
+>=20
+>=20
+
+[   91.866348] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> [  845.474170] WARNING: possible circular locking dependency detected
-> [  845.474172] 6.2.0-rc3+ #1025 Tainted: G            E    =20
-> [  845.474175] ------------------------------------------------------
-> [  845.474176] deadlocks_test/22767 is trying to acquire lock:
-> [  845.474178] ffffc9000ba4b868 (&kvm->srcu){.+.+}-{0:0}, at: __synchroni=
-ze_srcu+0x5/0x170
-> [  845.474192]=20
->                but task is already holding lock:
-> [  845.474194] ffffc9000ba423c0 (&kvm->lock){+.+.}-{3:3}, at: kvm_vm_ioct=
-l_set_msr_filter+0x188/0x220 [kvm]
-> [  845.474319]=20
->                which lock already depends on the new lock.
+=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[   91.866349] WARNING: possible circular locking dependency detected
+[   91.866351] 6.2.0-rc3+ #1025 Tainted: G           OE    =20
+[   91.866353] ------------------------------------------------------
+[   91.866354] xen_shinfo_test/2938 is trying to acquire lock:
+[   91.866356] ffffc9000179e3c0 (&kvm->lock){+.+.}-{3:3}, at: kvm_xen_set_e=
+vtchn.part.0+0x6d/0x170 [kvm]
+[   91.866453]=20
+               but task is already holding lock:
+[   91.866454] ffffc900017a7868 (&kvm->srcu){.+.+}-{0:0}, at: vcpu_enter_gu=
+est.constprop.0+0xa89/0x1270 [kvm]
+[   91.866527]=20
+               which lock already depends on the new lock.
 
-So the above part is good, and clearly tells me it was synchronize_srcu()
+[   91.866528]=20
+               the existing dependency chain (in reverse order) is:
+[   91.866529]=20
+               -> #1 (&kvm->srcu){.+.+}-{0:0}:
+[   91.866532]        __lock_acquire+0x4b4/0x940
+[   91.866537]        lock_sync+0x99/0x110
+[   91.866540]        __synchronize_srcu+0x4d/0x170
+[   91.866543]        kvm_create_vm+0x271/0x6e0 [kvm]
+[   91.866621]        kvm_dev_ioctl+0x102/0x1c0 [kvm]
+[   91.866694]        __x64_sys_ioctl+0x8a/0xc0
+[   91.866697]        do_syscall_64+0x3b/0x90
+[   91.866701]        entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   91.866707]=20
+               -> #0 (&kvm->lock){+.+.}-{3:3}:
+[   91.866710]        check_prev_add+0x8f/0xc20
+[   91.866712]        validate_chain+0x3ba/0x450
+[   91.866714]        __lock_acquire+0x4b4/0x940
+[   91.866716]        lock_acquire.part.0+0xa8/0x210
+[   91.866717]        __mutex_lock+0x94/0x920
+[   91.866721]        kvm_xen_set_evtchn.part.0+0x6d/0x170 [kvm]
+[   91.866790]        kvm_xen_hcall_evtchn_send.constprop.0+0x138/0x1c0 [kv=
+m]
+[   91.866869]        kvm_xen_hypercall+0x475/0x5a0 [kvm]
+[   91.866938]        vmx_handle_exit+0xe/0x50 [kvm_intel]
+[   91.866955]        vcpu_enter_guest.constprop.0+0xb08/0x1270 [kvm]
+[   91.867034]        vcpu_run+0x1bd/0x450 [kvm]
+[   91.867100]        kvm_arch_vcpu_ioctl_run+0x1df/0x670 [kvm]
+[   91.867167]        kvm_vcpu_ioctl+0x279/0x700 [kvm]
+[   91.867229]        __x64_sys_ioctl+0x8a/0xc0
+[   91.867231]        do_syscall_64+0x3b/0x90
+[   91.867235]        entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   91.867238]=20
+               other info that might help us debug this:
 
-> [  845.474320]=20
->                the existing dependency chain (in reverse order) is:
-> [  845.474322]=20
->                -> #1 (&kvm->lock){+.+.}-{3:3}:
-> [  845.474327]        __lock_acquire+0x4b4/0x940
-> [  845.474333]        lock_acquire.part.0+0xa8/0x210
-> [  845.474337]        __mutex_lock+0x94/0x920
-> [  845.474344]        kvm_xen_set_evtchn.part.0+0x6d/0x170 [kvm]
-> [  845.474437]        kvm_xen_inject_timer_irqs+0x79/0xa0 [kvm]
-> [  845.474529]        vcpu_run+0x20c/0x450 [kvm]
-> [  845.474618]        kvm_arch_vcpu_ioctl_run+0x1df/0x670 [kvm]
-> [  845.474707]        kvm_vcpu_ioctl+0x279/0x700 [kvm]
-> [  845.474783]        __x64_sys_ioctl+0x8a/0xc0
-> [  845.474787]        do_syscall_64+0x3b/0x90
-> [  845.474796]        entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> [  845.474804]=20
->                -> #0 (&kvm->srcu){.+.+}-{0:0}:
-> [  845.474809]        check_prev_add+0x8f/0xc20
-> [  845.474812]        validate_chain+0x3ba/0x450
-> [  845.474814]        __lock_acquire+0x4b4/0x940
-> [  845.474817]        lock_sync+0x99/0x110
-> [  845.474820]        __synchronize_srcu+0x4d/0x170
-> [  845.474824]        kvm_vm_ioctl_set_msr_filter+0x1a5/0x220 [kvm]
-. [  845.474907]        kvm_arch_vm_ioctl+0x8df/0xd50 [kvm]
-> [  845.474997]        kvm_vm_ioctl+0x5ca/0x800 [kvm]
-> [  845.475075]        __x64_sys_ioctl+0x8a/0xc0
-> [  845.475079]        do_syscall_64+0x3b/0x90
-> [  845.475084]        entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> [  845.475089]=20
->                other info that might help us debug this:
->
-> [  845.475091]  Possible unsafe locking scenario:
->
-> [  845.475092]        CPU0                    CPU1
-> [  845.475093]        ----                    ----
-> [  845.475095]   lock(&kvm->lock);
-> [  845.475098]                                lock(&kvm->srcu);
-> [  845.475101]                                lock(&kvm->lock);
-> [  845.475103]   lock(&kvm->srcu);
-> [  845.475106]=20
->                 *** DEADLOCK ***
+[   91.867239]  Possible unsafe locking scenario:
 
-But is there any chance the above could say 'synchronize_srcu' and
-'read_lock_srcu' in the appropriate places?
+[   91.867240]        CPU0                    CPU1
+[   91.867241]        ----                    ----
+[   91.867242]   lock(&kvm->srcu);
+[   91.867244]                                lock(&kvm->lock);
+[   91.867246]                                lock(&kvm->srcu);
+[   91.867248]   lock(&kvm->lock);
+[   91.867249]=20
+                *** DEADLOCK ***
 
-> [  845.475108] 1 lock held by deadlocks_test/22767:
-> [  845.475110]  #0: ffffc9000ba423c0 (&kvm->lock){+.+.}-{3:3}, at: kvm_vm=
-_ioctl_set_msr_filter+0x188/0x220 [kvm]
-> [  845.475200]=20
->                stack backtrace:
-> [  845.475202] CPU: 10 PID: 22767 Comm: deadlocks_test Tainted: G        =
-    E      6.2.0-rc3+ #1025
-> [  845.475206] Hardware name: Intel Corporation S2600CW/S2600CW, BIOS SE5=
-C610.86B.01.01.0008.021120151325 02/11/2015
-> [  845.475208] Call Trace:
-> [  845.475210]  <TASK>
-> [  845.475214]  dump_stack_lvl+0x56/0x73
-> [  845.475221]  check_noncircular+0x102/0x120
-> [  845.475229]  ? check_noncircular+0x7f/0x120
-> [  845.475236]  check_prev_add+0x8f/0xc20
-> [  845.475239]  ? add_chain_cache+0x10b/0x2d0
-> [  845.475244]  validate_chain+0x3ba/0x450
-> [  845.475249]  __lock_acquire+0x4b4/0x940
-> [  845.475253]  ? __synchronize_srcu+0x5/0x170
-> [  845.475258]  lock_sync+0x99/0x110
-> [  845.475261]  ? __synchronize_srcu+0x5/0x170
-> [  845.475265]  __synchronize_srcu+0x4d/0x170
-? [  845.475269]  ? mark_held_locks+0x49/0x80
-> [  845.475272]  ? _raw_spin_unlock_irqrestore+0x2d/0x60
-> [  845.475278]  ? __pfx_read_tsc+0x10/0x10
-> [  845.475286]  ? ktime_get_mono_fast_ns+0x3d/0x90
-> [  845.475292]  kvm_vm_ioctl_set_msr_filter+0x1a5/0x220 [kvm]
-> [  845.475380]  kvm_arch_vm_ioctl+0x8df/0xd50 [kvm]
-> [  845.475472]  ? __lock_acquire+0x4b4/0x940
-> [  845.475485]  kvm_vm_ioctl+0x5ca/0x800 [kvm]
-> [  845.475566]  ? lockdep_unregister_key+0x76/0x110
-> [  845.475575]  __x64_sys_ioctl+0x8a/0xc0
-> [  845.475579]  do_syscall_64+0x3b/0x90
-> [  845.475586]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> [  845.475591] RIP: 0033:0x7f79de23fd1b
-> [  845.475595] Code: 73 01 c3 48 8b 0d 05 a1 1b 00 f7 d8 64 89 01 48 83 c=
-8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 10 00 00 00 0f 05 <=
-48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 a0 1b 00 f7 d8 64 89 01 48
-> [  845.475598] RSP: 002b:00007f79ddff7c98 EFLAGS: 00000246 ORIG_RAX: 0000=
-000000000010
-> [  845.475602] RAX: ffffffffffffffda RBX: 00007f79ddff8640 RCX: 00007f79d=
-e23fd1b
-> [  845.475605] RDX: 00007f79ddff7ca0 RSI: 000000004188aec6 RDI: 000000000=
-0000004
-> [  845.475607] RBP: 00007f79ddff85c0 R08: 0000000000000000 R09: 00007fffc=
-eb1ff2f
-> [  845.475609] R10: 0000000000000008 R11: 0000000000000246 R12: 00007f79d=
-dff7ca0
-> [  845.475611] R13: 0000000001c322a0 R14: 00007f79de2a05f0 R15: 000000000=
-0000000
-> [  845.475617]  </TASK>
+[   91.867250] 2 locks held by xen_shinfo_test/2938:
+[   91.867252]  #0: ffff88815a8800b0 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vc=
+pu_ioctl+0x77/0x700 [kvm]
+[   91.867318]  #1: ffffc900017a7868 (&kvm->srcu){.+.+}-{0:0}, at: vcpu_ent=
+er_guest.constprop.0+0xa89/0x1270 [kvm]
+[   91.867387]=20
+               stack backtrace:
+[   91.867389] CPU: 26 PID: 2938 Comm: xen_shinfo_test Tainted: G          =
+ OE      6.2.0-rc3+ #1025
+[   91.867392] Hardware name: Intel Corporation S2600CW/S2600CW, BIOS SE5C6=
+10.86B.01.01.0008.021120151325 02/11/2015
+[   91.867394] Call Trace:
+[   91.867395]  <TASK>
+[   91.867398]  dump_stack_lvl+0x56/0x73
+[   91.867403]  check_noncircular+0x102/0x120
+[   91.867409]  check_prev_add+0x8f/0xc20
+[   91.867411]  ? add_chain_cache+0x10b/0x2d0
+[   91.867415]  validate_chain+0x3ba/0x450
+[   91.867418]  __lock_acquire+0x4b4/0x940
+[   91.867421]  lock_acquire.part.0+0xa8/0x210
+[   91.867424]  ? kvm_xen_set_evtchn.part.0+0x6d/0x170 [kvm]
+[   91.867494]  ? rcu_read_lock_sched_held+0x43/0x70
+[   91.867498]  ? lock_acquire+0x102/0x140
+[   91.867501]  __mutex_lock+0x94/0x920
+[   91.867505]  ? kvm_xen_set_evtchn.part.0+0x6d/0x170 [kvm]
+[   91.867574]  ? find_held_lock+0x2b/0x80
+[   91.867578]  ? kvm_xen_set_evtchn.part.0+0x6d/0x170 [kvm]
+[   91.867647]  ? __lock_release+0x5f/0x170
+[   91.867652]  ? kvm_xen_set_evtchn.part.0+0x6d/0x170 [kvm]
+[   91.867721]  kvm_xen_set_evtchn.part.0+0x6d/0x170 [kvm]
+[   91.867791]  kvm_xen_hcall_evtchn_send.constprop.0+0x138/0x1c0 [kvm]
+[   91.867875]  kvm_xen_hypercall+0x475/0x5a0 [kvm]
+[   91.867947]  ? rcu_read_lock_sched_held+0x43/0x70
+[   91.867952]  vmx_handle_exit+0xe/0x50 [kvm_intel]
+[   91.867966]  vcpu_enter_guest.constprop.0+0xb08/0x1270 [kvm]
+[   91.868046]  ? lock_acquire.part.0+0xa8/0x210
+[   91.868050]  ? vcpu_run+0x1bd/0x450 [kvm]
+[   91.868117]  ? lock_acquire+0x102/0x140
+[   91.868121]  vcpu_run+0x1bd/0x450 [kvm]
+[   91.868189]  kvm_arch_vcpu_ioctl_run+0x1df/0x670 [kvm]
+[   91.868257]  kvm_vcpu_ioctl+0x279/0x700 [kvm]
+[   91.868322]  ? get_cpu_entry_area+0xb/0x30
+[   91.868327]  ? _raw_spin_unlock_irq+0x34/0x50
+[   91.868330]  ? do_setitimer+0x190/0x1e0
+[   91.868335]  __x64_sys_ioctl+0x8a/0xc0
+[   91.868338]  do_syscall_64+0x3b/0x90
+[   91.868341]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   91.868345] RIP: 0033:0x7f313103fd1b
+[   91.868348] Code: 73 01 c3 48 8b 0d 05 a1 1b 00 f7 d8 64 89 01 48 83 c8 =
+ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa b8 10 00 00 00 0f 05 <48=
+> 3d 01 f0 ff ff 73 01 c3 48 8b 0d d5 a0 1b 00 f7 d8 64 89 01 48
+[   91.868350] RSP: 002b:00007ffcdc02dba8 EFLAGS: 00000246 ORIG_RAX: 000000=
+0000000010
+[   91.868353] RAX: ffffffffffffffda RBX: 00007f31313d2000 RCX: 00007f31310=
+3fd1b
+[   91.868355] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 00000000000=
+00007
+[   91.868356] RBP: 00007f313139a6c0 R08: 000000000065a2f0 R09: 00000000000=
+00000
+[   91.868357] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000006=
+5c800
+[   91.868359] R13: 000000000000000a R14: 00007f31313d0ff1 R15: 00000000006=
+5a2a0
+[   91.868363]  </TASK>
 
 
-
---=-R07t1ZgzRZNOXGItP/As
+--=-faejZK8MwCv7sSfxNlYE
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -396,24 +366,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTEzMTAzMzMzWjAvBgkqhkiG9w0BCQQxIgQgXQAtwnM7
-We7DjBHc/YOUNTBhHDp6Ci6LLzN5c+XMK+wwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMTEzMTEwMzAyWjAvBgkqhkiG9w0BCQQxIgQgVUAKySm4
+F2qM9YrVpfwwCHU03tS34YWR7vK9BQfhOnEwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgCss4Id0pKSreyZUE/kOBAYDaGpgATCvWms
-HkEzq+G1zcGu+8MFvP0+B9TviKXMvTc7DrVoHLDjseBVuw+qUcZ+mlsbTMm1sc98yrKNpG7PrEN/
-ugg1tcSERCgjwb9qWw5tmAOlFn99WAW3DFpWj6bDEl4nB4qLSMXNjcG9QQp4irQF65T+G4ziLNaN
-zK9nQmv69eTFAD9M1PxcSFiI212PrvzzHl/CjpDH9G4Xm0AVfb6OMtuJIBT91vQZot0APPnEID0D
-Z3yMUMGYPj0c9mPyo6eNYXCxJ3TAhHiswPncocZowoWjfR/82+25eZymllMTkrCYud03ZHC24egB
-xF4u/R1dDfUsA9OTwMM4qgOGyXydZfNqP4q6VwASuVmjTY8LqeaOTss/qyGnLeoQUOSXYToLh5TT
-vpmuU8nONulNv9FAmuiukbdOD646wsvk71x6j6uv4Pf6iijLmj8Rmwgkg15dI1Bth0qrNZaRBVFP
-F8iMs6LVuxcyov1MFRJl73guHLFsG4XfsjogVRzfdZl48H97FOR8U2FHELlyLFKmVdB5Xf1RjjwN
-yEU0aYH1GwTvGPFptTIdERAYFPleM7ZEsYmulnUtjkyf0vj3IhwD7cYLTzPtn3fGfiOvkQ9PWZ21
-Ue5rGlk6Xt6T1Id7GiKcnfAs8AQPsgsfols/HHFgnwAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBv3vRbM8ZaxbDZC/5m9SSIgnwoHpNmM7gz
+yj/Dk/9SpfdVpZjkEjPpG19XSzRI0JqBXIMSx2K7A+xxT43QAgfnCr00M9snYGGwS5OSUn436Mmu
+FFLOuFgwMGuvWKcoViIdFkhNjeQb1gUMVvLWZnLGr9Xx7VAgFhLItjkTS7uWM6O9JzPw7x7mDDYm
+fc+vFIUP1EpjiLMw/HLcuseN2+afpwqeVJi7UCjQ7/RMPri9ePeb/+3jxl4aCH5NfrOeI/WP/FVH
+3iVIsfwISjBgOg/S0pMIRtR4r+oYdyfm+5R6DPsw7kgjXluFBa07mYbIQHPdfyNpQQJ/byHhLgGJ
+R4aW/ey+efdNRh0DrfU3JEJfHbEB7nhoPkwhotNN+x4FP2ZNDdeg4cFrp463+9SrslKzDX4XdZdC
+FSS7thPymukYq4/g4iWbOvIDeotlahza/wNI8aFijYSggRO4VshzjsTDLI0TOmda7dzifeu1P09d
+ztIqR0owHr1oCiAiGAa4bMHEHxd7DbJgtcP7bSyqyCU8qg5UwOaknZ0Cr1YE8CENrbNAVLn1wRSx
+CvoKPnkDy50gOz1X91m1InDkrohRUFXV7YwZArlREWBTusl0UYRGIE0T9yxTKqwqddxy/WdqRUXZ
+136KpB23kCD/0FNgymJZmLizjig5YtP6yXFedfIXLQAAAAAAAA==
 
 
---=-R07t1ZgzRZNOXGItP/As--
+--=-faejZK8MwCv7sSfxNlYE--
