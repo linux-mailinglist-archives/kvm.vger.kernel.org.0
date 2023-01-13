@@ -2,75 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71E7F66885F
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 01:26:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 49A156688CA
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 01:58:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231934AbjAMA0I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 19:26:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38766 "EHLO
+        id S232830AbjAMA5z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 12 Jan 2023 19:57:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231896AbjAMA0G (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 19:26:06 -0500
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81E2712AC1
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 16:26:01 -0800 (PST)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-4c24993965eso257161357b3.12
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 16:26:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=sF+Ifg4o7iFzS+LPlBmQjTys8EpS+9ESttiEgJFGACU=;
-        b=fCKxksn44CJkdiB1PH5pxEZAu6AcP2A/lM/D/czASmGMx0qAyeVpzssa6+FhbpHFtj
-         glp8/wKR6hMedZ8j8DsCiBaYRDxCsDd2ZBOyFkf1w/I0JvZbR270JI2KcjsT55SfCc5p
-         RJLQhxkm2LyKZXpeg67M0/0uk0qx0Qc7HiRQaekRaYDMpqyJKKxGWOMqwpOfGbQXxlUl
-         Q5SfBGFB3peVbSjia+6NQlLu4T9dIajvYLOESWH1zYz88rmsQRipIydKX2PRGGbcfbsL
-         KX8hOTspCa7WejAraBYWu4Z1WAcVudTz8k/8nCT1BKFrLE0bbH62yjrAutPuwyaWOhHY
-         B4Ag==
+        with ESMTP id S240117AbjAMA5r (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 12 Jan 2023 19:57:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B526D1EAC7
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 16:56:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673571418;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XG7oCthi1cz9qA5sCXs+Yfwmmh8peH0gCPI3GPwykJs=;
+        b=YwckGf1PUDaNVmEmlcvR31FLXZulJ8NRVEq7Q0w2OiaG/w6jDTSRC73upzHeYDceeuFI0T
+        u23Cg0wN+WM8rH7Jlz5v2hRygXkGi1+NBFqzcY7lceUS6R1+Chzz6dvh92buk87lSN0NQT
+        Sz9UkCOl4hRacFKvtfDHZVaqLjFrzwQ=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-473-auF583kxPmWA1cOs1_16Eg-1; Thu, 12 Jan 2023 19:56:52 -0500
+X-MC-Unique: auF583kxPmWA1cOs1_16Eg-1
+Received: by mail-il1-f200.google.com with SMTP id l13-20020a056e0212ed00b00304c6338d79so14896113iln.21
+        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 16:56:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sF+Ifg4o7iFzS+LPlBmQjTys8EpS+9ESttiEgJFGACU=;
-        b=E2czj76eP6wI0QyJJ9sSY/sYzBVGlibIXbkjBBmeT+tAPqwC3v8eWyNqeg33PK7U+l
-         JRPN5S48+N/0xqsHEA2Nyz+zPbGltKUpTpEc6stJnpFsnkitL5eQrHHf+2joFNotqsfB
-         cBELiXquxGBaWk30FlINPuN8f1RxQ/A4dPDt1zZrP/3eHg2P+BGYql8GZ/eG1BK4h9+Z
-         0qYt2fzpXiUsZh+i4f/06+Lx1xEJaO6l4kE0sFw0j6EhKeSL90G1TKnvI7D8C2bHX5Hr
-         +yyXO7RPdmFJVstI9y9rRoul6VNwilvWWfzvi/xt9vatvaaUsDZrg4bVKPQtWIU8TUO0
-         0HUw==
-X-Gm-Message-State: AFqh2kpr7/CW5SnkUFeVUkAK5xwIXDkaHRzuPdBiojGfEgB4CDhIBYQB
-        lE4MTNrPtHBUpVHp6ZT0N6J2gpuwJfxofSeZEn3sfw==
-X-Google-Smtp-Source: AMrXdXv4hI0nKL1ELl6lavzfPrvUORSRLkkrSP7WMMjeDcrilJExszKSJwDZB5dWXlHHELtJq9FSNlD6djOBACdVWBw=
-X-Received: by 2002:a81:1352:0:b0:4dc:4113:f224 with SMTP id
- 79-20020a811352000000b004dc4113f224mr316741ywt.455.1673569560616; Thu, 12 Jan
- 2023 16:26:00 -0800 (PST)
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XG7oCthi1cz9qA5sCXs+Yfwmmh8peH0gCPI3GPwykJs=;
+        b=shHSDYTv0EVUxCPI+dfbk7vCB8Bj+QWNj65jNrt4r0pco9J1Y3RSSwAfWcYz+k2Zcq
+         kbTTeBAH+ouN+6JmahsQI/EuCKtZM+Fy4Yqn3+ML3FVihqy7QMOKKhywvlwpKMBd+Zk5
+         4X3hVf8yzYaI8PvkL3QLTM7m+ptq0kuTYc+trckYiOrmkNWpzHb3hTCgEGLCBxCjGK24
+         PYlsnW5BvGydXYCtRzO+S9UG1tn5mE2srMKYNWGZMIPJmmm1sDCuSp8cn/HfMiYLdRDv
+         WyPxkV0Z0CueUhbdT1bE06hAYGO+OAnK1MT0iOIGm/98qTl0sP0gTmDkz8EbUERerKZZ
+         dADA==
+X-Gm-Message-State: AFqh2kre/cXRvcljAq4iNpePkClMAfq04d22Trl9/I25nH/hsLX1lObA
+        9OY4cCaV+BgN6So/7vuHAljWJi2ORCe+IW75z+49ZCULiNUwEpFxqfzE5fuyJjkhAYoC45wDi3M
+        AvGij64YngQNS
+X-Received: by 2002:a5d:8c88:0:b0:6f1:f493:7240 with SMTP id g8-20020a5d8c88000000b006f1f4937240mr6277485ion.3.1673571411476;
+        Thu, 12 Jan 2023 16:56:51 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvsA3h8dnBWYocee5XN2BqUQKDNeUrvNWtFiPzDqbJBlxeKo+IUAua2OcaVeTDIIuJpIjdmug==
+X-Received: by 2002:a5d:8c88:0:b0:6f1:f493:7240 with SMTP id g8-20020a5d8c88000000b006f1f4937240mr6277474ion.3.1673571411216;
+        Thu, 12 Jan 2023 16:56:51 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id e18-20020a022112000000b0039e048ad8e7sm5624918jaa.59.2023.01.12.16.56.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Jan 2023 16:56:50 -0800 (PST)
+Date:   Thu, 12 Jan 2023 17:56:48 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>, pbonzini@redhat.com,
+        jgg@nvidia.com, cohuck@redhat.com, farman@linux.ibm.com,
+        pmorel@linux.ibm.com, borntraeger@linux.ibm.com,
+        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
+        akrowiak@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] vfio: fix potential deadlock on vfio group lock
+Message-ID: <20230112175648.158dca5f.alex.williamson@redhat.com>
+In-Reply-To: <Y8CX8YwT/T9v4U/D@google.com>
+References: <20230112203844.41179-1-mjrosato@linux.ibm.com>
+        <20230112140517.6db5b346.alex.williamson@redhat.com>
+        <bce7912a-f904-b5a3-d234-c3e2c42d9e54@linux.ibm.com>
+        <Y8CX8YwT/T9v4U/D@google.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20221230162442.3781098-1-aaronlewis@google.com>
- <20221230162442.3781098-2-aaronlewis@google.com> <Y7R36wsXn3JqwfEv@google.com>
- <CAAAPnDHff-2XFdAgKdfTQnG_a4TCVqWN9wxEhUtiOfiOVMuRWA@mail.gmail.com>
- <c87904cb-ce6d-1cf4-5b58-4d588660e20f@intel.com> <Y8BPs2269itL+WQe@google.com>
- <a1308e46-c319-fb73-1fde-eb3b071c10e8@intel.com> <Y8Bcr9VBA/VLjAwd@google.com>
- <6f22cb44-1a29-cb41-51e3-cbe532686c54@intel.com> <Y8B5xIVChfatMio0@google.com>
- <f65d284f-4f06-739b-a555-37d2811acdf3@intel.com>
-In-Reply-To: <f65d284f-4f06-739b-a555-37d2811acdf3@intel.com>
-From:   Mingwei Zhang <mizhang@google.com>
-Date:   Thu, 12 Jan 2023 16:25:49 -0800
-Message-ID: <CAL715WKmJ1BSozF18MOp=jRvMh-28fLWqBJvg87MaK8aOh33cA@mail.gmail.com>
-Subject: Re: [PATCH v2 1/6] KVM: x86: Clear all supported MPX xfeatures if
- they are not all set
-To:     "Chang S. Bae" <chang.seok.bae@intel.com>
-Cc:     Aaron Lewis <aaronlewis@google.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>, "bp@suse.de" <bp@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,59 +88,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 1:33 PM Chang S. Bae <chang.seok.bae@intel.com> wrote:
->
-> On 1/12/2023 1:21 PM, Mingwei Zhang wrote:
-> >
-> > The only comment I would have is that it seems not following the least
-> > privilege principle as host process (QEMU) may not have the motivation
-> > to do any matrix multiplication. But this is a minor one.
-> >
-> > Since this enabling once per-process, I am wondering when after
-> > invocation of arch_prctl(2), all of the host threads will have a larger
-> > fp_state? If so, that might be a sizeable overhead since host userspace
-> > may have lots of threads doing various of other things, i.e., they may
-> > not be vCPU threads.
->
-> No, the permission request does not immediately result in the kernel's
-> XSAVE buffer expansion, but only when the state is about used. As
-> XFD-armed, the state use will raise #NM. Then, it will reallocate the
-> task's fpstate via this call chain:
->
-> #NM --> handle_xfd_event() --> xfd_enable_feature() --> fpstate_realloc()
->
-> Thanks,
-> Chang
+On Thu, 12 Jan 2023 23:29:53 +0000
+Sean Christopherson <seanjc@google.com> wrote:
 
-Thanks for the info. But I think you are talking about host level AMX
-enabling. This is known to me. I am asking about how AMX was enabled
-by QEMU and used by vCPU threads in the guest. After digging a little
-bit, I think I understand it now.
+> On Thu, Jan 12, 2023, Matthew Rosato wrote:
+> > On 1/12/23 4:05 PM, Alex Williamson wrote:  
+> > > On Thu, 12 Jan 2023 15:38:44 -0500
+> > > Matthew Rosato <mjrosato@linux.ibm.com> wrote:  
+> > >> @@ -344,6 +345,35 @@ static bool vfio_assert_device_open(struct vfio_device *device)
+> > >>  	return !WARN_ON_ONCE(!READ_ONCE(device->open_count));
+> > >>  }
+> > >>  
+> > >> +static bool vfio_kvm_get_kvm_safe(struct kvm *kvm)
+> > >> +{
+> > >> +	bool (*fn)(struct kvm *kvm);
+> > >> +	bool ret;
+> > >> +
+> > >> +	fn = symbol_get(kvm_get_kvm_safe);
+> > >> +	if (WARN_ON(!fn))  
+> 
+> In a related vein to Alex's comments about error handling, this should not WARN.
+> WARNing during vfio_kvm_put_kvm() makes sense, but the "get" is somewhat blind.
 
-So, it should be the following: (in fact, the guest fp_state is not
-allocated lazily but at the very beginning at KVM_SET_CPUID2 time).
+It's not exactly blind though, we wouldn't have a kvm pointer if the
+kvm-vfio device hadn't stuffed one into the group.  We only call into
+here if we have a non-NULL pointer, so it wouldn't simply be that the
+kvm module isn't available for this to fire, but more that we have an
+API change to make the symbol no longer exist.  A WARN for that doesn't
+seem unreasonable.  Thanks,
 
-  kvm_set_cpuid() / kvm_set_cpuid2() ->
-    kvm_check_cpuid() ->
-      fpu_enable_guest_xfd_features() ->
-        __xfd_enable_feature() ->
-          fpstate_realloc()
+Alex
 
-Note that KVM does intercept #NM for the guest, but only for the
-handling of XFD_ERR.
+> > >> +		return false;
+> > >> +
+> > >> +	ret = fn(kvm);
+> > >> +
+> > >> +	symbol_put(kvm_get_kvm_safe);
+> > >> +
+> > >> +	return ret;
+> > >> +}
+> > >> +
+> > >> +static void vfio_kvm_put_kvm(struct kvm *kvm)
+> > >> +{
+> > >> +	void (*fn)(struct kvm *kvm);
+> > >> +
+> > >> +	fn = symbol_get(kvm_put_kvm);
+> > >> +	if (WARN_ON(!fn))
+> > >> +		return;
+> > >> +
+> > >> +	fn(kvm);
+> > >> +
+> > >> +	symbol_put(kvm_put_kvm);
+> > >> +}  
+> 
 
-Prior to the kvm_set_cpuid() or kvm_set_cpuid2() call, the QEMU thread
-should ask for permission via arch_prctl(REQ_XCOMP_GUEST_PERM) in
-order to become a vCPU thread. Otherwise, the above call sequence will
-fail. Fortunately, asking-for-guest-permission is only needed once per
-process (per-VM).
-
-Because of the above, the non-vCPU threads do not need to create a
-larger fp_state unless/until they invoke kvm_set_cpuid() or
-kvm_set_cpuid2().
-
-Now, I think that closes the loop for me.
-
-Thanks.
-
--Mingwei
