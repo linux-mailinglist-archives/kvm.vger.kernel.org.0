@@ -2,90 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B39286698B1
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 14:36:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 68E6D669A07
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 15:26:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241647AbjAMNge (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 08:36:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35428 "EHLO
+        id S229586AbjAMOZj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 09:25:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241677AbjAMNfx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 08:35:53 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C37DDD4
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 05:28:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S231470AbjAMOYU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 09:24:20 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706F710FDF;
+        Fri, 13 Jan 2023 06:16:54 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C2E2D61CCC
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 13:28:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24E4CC433D2;
-        Fri, 13 Jan 2023 13:28:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673616497;
-        bh=p0imUzLtfN9VVvFHx51VODYdDfWqho2b57JiDvRO62k=;
-        h=From:To:Cc:Subject:Date:From;
-        b=tvkjA53rvtl38GhbLyIwUnmaBSUXtSQFTj6a8uhOgvm7kpJgxdiEEZMeWIB1kLC5I
-         gRaDW+cRVyqO10K0ywxnrEk8XFPpFVpYGsl8/PhaK9aPvQYKsxmItukkwFi5iIfcFk
-         vJNqOy+zEAgsan6p4IB9CerrCedRw7Ee0jVbdUvMR2gDbZuf0aK3Rzsj777AzuxK4i
-         lvVpXa3LDf7oUDaLd3Y2vx1VfgdKNuOGXaX/Wn3mtSxiqMbLKvZpmqiqSy0N7k4Kg2
-         1+1AMNE3HAmtIMtd3H8mOc5UCGhVj72TbJS/4giyyFTzzerVEdmuJJQEE3/NM+PheO
-         JI0MnuKfgjdJQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pGK6P-001WXZ-9H;
-        Fri, 13 Jan 2023 13:28:14 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-        kvm@vger.kernel.org
-Cc:     James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH] KVM: arm64: Drop Columbia-hosted mailing list
-Date:   Fri, 13 Jan 2023 13:28:09 +0000
-Message-Id: <20230113132809.1979119-1-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 5D5741EC04C1;
+        Fri, 13 Jan 2023 15:16:50 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1673619410;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=XYtqfhZKFK7PaSqp9fuWWHAp6AYDAbDdbgbeeBoQDPw=;
+        b=nYmdzgEuSjI5cCOeBGcx/PixXKD2yIek0jfY+hJjIFI4n5nwUrIuJrZNqewFOMW0YJBonI
+        cV9hqB9im51KA+msRMViQta8N3rmOPw5Gz0A4II5943TZ4R6nBUmwJZn3noP2dPeST1jHp
+        Pa1jJq/Qg1X5pvW7g+YHyx0RaQ4O4Rk=
+Date:   Fri, 13 Jan 2023 15:16:46 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, harald@profian.com,
+        Nikunj A Dadhania <nikunj@amd.com>,
+        chao.p.peng@linux.intel.com
+Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
+ to KVM
+Message-ID: <Y8FnzpJyPMYDl0CA@zn.tnic>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-4-michael.roth@amd.com>
+ <Y6Xd0ruz3kMij/5F@zn.tnic>
+ <20230105021419.rs23nfq44rv64tsd@amd.com>
+ <Y7bnE5bTUb6fQiX/@zn.tnic>
+ <20230105181741.q6mq37gvcjk5nbjg@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20230105181741.q6mq37gvcjk5nbjg@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-After many years of awesome service, the kvmarm mailing list hosted by
-Columbia is being decommissioned, and replaced by kvmarm@lists.linux.dev.
+On Thu, Jan 05, 2023 at 12:17:41PM -0600, Michael Roth wrote:
+> In the case of SEV, it would still be up to userspace whether or not it
+> actually wants to make use of UPM functionality like KVM_SET_MEMORY_ATTRIBUTES
+> and private memslots. Otherwise, to maintain backward-compatibility, 
+> userspace can do things as it has always done and continue running SEV without
+> relying on private memslots/KVM_SET_MEMORY_ATTRIBUTES or any of the new ioctls.
+> 
+> For SNP however it is required that userspace uses/implements UPM
+> functionality.
 
-Many thanks to Columbia for having hosted us for so long, and to the
-kernel.org folks for giving us a new home.
+Makes sense to me.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- MAINTAINERS | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6a0fc23455bd..d9a359a65d0f 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -11361,7 +11361,6 @@ R:	Oliver Upton <oliver.upton@linux.dev>
- R:	Zenghui Yu <yuzenghui@huawei.com>
- L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
- L:	kvmarm@lists.linux.dev
--L:	kvmarm@lists.cs.columbia.edu (deprecated, moderated for non-subscribers)
- S:	Maintained
- T:	git git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git
- F:	arch/arm64/include/asm/kvm*
 -- 
-2.34.1
+Regards/Gruss,
+    Boris.
 
+https://people.kernel.org/tglx/notes-about-netiquette
