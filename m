@@ -2,130 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6614E66A1C9
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 19:17:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B9E4766A1C7
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 19:17:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231173AbjAMSRJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 13:17:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53788 "EHLO
+        id S229510AbjAMSRH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 13:17:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbjAMSQG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 13:16:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D2BF12ACC
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 10:06:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673633165;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=hQvFnya6NFdzrd0uXGd+lLCU8K6l8CjIC+mc6Joc75c=;
-        b=btyPJbHf5HYYSwQNWBzWX9GMpe4BOOvMAldffV2WlXYEsDH8TYGa7JjPxayecU2t+RLP6V
-        Y9k1LPgn6Dcm4VoJGVI7PzCksf2rs+FPC/RYanZ5PV3HZZHYqtxTBJN8NZ5OZ5Nuffwmjy
-        CiSM68eVDbIRn48YN3t4I2MrwkUkSd4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-43-AV_anbmXOq60lu0JpcEU1Q-1; Fri, 13 Jan 2023 13:06:04 -0500
-X-MC-Unique: AV_anbmXOq60lu0JpcEU1Q-1
-Received: by mail-ed1-f71.google.com with SMTP id q10-20020a056402518a00b0048e5bc8cb74so15088201edd.5
-        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 10:06:04 -0800 (PST)
+        with ESMTP id S231201AbjAMSPz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 13:15:55 -0500
+Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D76C7B1DD
+        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 10:07:04 -0800 (PST)
+Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-4c15c4fc8ccso296006057b3.4
+        for <kvm@vger.kernel.org>; Fri, 13 Jan 2023 10:07:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qoxr5X5imkz2olyJUzF1rhC2GFm22yRwb2J/WfLDgXQ=;
+        b=dpxojtaZxe37je5lIn27UJw3451J9nTITh/73Iz7YPdEwivuYKLF+mEsM4TPJordCx
+         tOK6i53c6fxIEjCBN4osHXTal+EL8RJ4weGrEjHrGUgzIl6AREQAc6U4iFTNU3+bsei7
+         6WZcxhcmbCNrg/fGvcMuje4hfNbWEbtY4x1UnpXbSYuZcEZrAbMkS00736iqJbdgXsYc
+         MASpAof7wBsOjMKaeyzUTLKkqGlwKc/IIUfeKXiflNewBpGEHg/HZqhyChic8FNa34l1
+         wTQY6ezJ2la+PL0kJNHw/+bsAWL84qKZPUoQPZFqxZgk443sxu1O0HeFg8ImFTrlurLM
+         DXKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hQvFnya6NFdzrd0uXGd+lLCU8K6l8CjIC+mc6Joc75c=;
-        b=nRSz9YgdMcrT/DO4v82L0pMItd7fh+9/8KPnPQo7olgHzEHs+LH1UTAVNPsn4+oqm0
-         FTC/dpZYUmzi3u6AgW+FQAbI5OlyAZcCKapqq+yshVF+lRQAekDBmpAGN0LimZYW/rQR
-         omMyq/RUUO0grG5ng6A29/qJcIJp2Cp8VuZWpE3hjKuz21eloBBZwx/E3Dj05ZDr9nGU
-         MQ+9v6/Rm9/CTbb/kPY0qjs2qse58q3NDSCJBuQTz8o5QLIPgKEAIi9GdQlZfL8XgdIm
-         GYV/EBV0RUlGiFZ9InYHApP5CjeBlWWhGNilzrfhISVly8uZLRDoWQ6GCD9KKKt5XwiW
-         QP/w==
-X-Gm-Message-State: AFqh2kpVeaX/UESOkqdGcK5EHTHY/TCKhLnUXLQXjauTkJUdRbtiNHW6
-        xNA7NgT7Ofv1aXbseGymp0jwFpsBc4/Chrok+u4NcpHFHGOkBlQ0pX6truhRjun6vsayqo0PlYd
-        D5geEHTYPyGk/
-X-Received: by 2002:a17:906:7c58:b0:84d:4e9d:864a with SMTP id g24-20020a1709067c5800b0084d4e9d864amr15761302ejp.74.1673633163193;
-        Fri, 13 Jan 2023 10:06:03 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXt4OmwyB6O2jyNzsN9OMjhhAn2F5iRTGB3A9G+/HJ+y66pFH9MGlJvZurdSDSOqdub4DT7B+Q==
-X-Received: by 2002:a17:906:7c58:b0:84d:4e9d:864a with SMTP id g24-20020a1709067c5800b0084d4e9d864amr15761291ejp.74.1673633163017;
-        Fri, 13 Jan 2023 10:06:03 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:1c09:f536:3de6:228c? ([2001:b07:6468:f312:1c09:f536:3de6:228c])
-        by smtp.googlemail.com with ESMTPSA id la19-20020a170907781300b007aee7ca1199sm8819421ejc.10.2023.01.13.10.06.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 Jan 2023 10:06:02 -0800 (PST)
-Message-ID: <674ac894-12a2-c15f-72c5-878558a8005d@redhat.com>
-Date:   Fri, 13 Jan 2023 19:06:01 +0100
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qoxr5X5imkz2olyJUzF1rhC2GFm22yRwb2J/WfLDgXQ=;
+        b=owRutaPSgheUPAZRXANNLlBcFMZNaFYOvOpfqe9TU1AQpAjGopGa43twF1RhaLgZIk
+         Dw4Dj9THEO0etwKZzFkjsYFiw5hcUpeuHya1B5jjpoJF3Z/D536TyyMjKrr9V7tFXGT0
+         SogK/J+1iCO//k9nBmiRrvnC0j2E4lIlkApDnU1KhCctRhmB2ngvetaKw5l0FezGXlzl
+         R1BaVzHic63oQyTnZsyS3DXrsLf2I6TkJAI689+t4Zz2dtp6HvEx0cvKqkvkvmqjKnMG
+         cD4OiIfC1NtLmxq2im4L9JPxi4xXmQb+kkLzwK8TQ9pHHasa/ctD2ORvM3n8Fy6MFKw1
+         qxlg==
+X-Gm-Message-State: AFqh2kqhX8Wz09zRbS3ZgzTzPl4xA7F9PRm7piQMrHSvWIHBVKriTDA5
+        IotzacxV0Nw5RUsHsObRJc0omhIbU6RE3OPHEYkQ/w==
+X-Google-Smtp-Source: AMrXdXum2Aq9jKTZUMljeuJMdEobnuyptEBNDCpABh7ohWzPstzMjndzTJDzVcRD+Cv6ug9+n/QrfiUUmFF1+xaHyKs=
+X-Received: by 2002:a0d:d9c5:0:b0:4de:4c70:5504 with SMTP id
+ b188-20020a0dd9c5000000b004de4c705504mr368547ywe.318.1673633223864; Fri, 13
+ Jan 2023 10:07:03 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH 0/6] KVM: x86: x2APIC reserved bits/regs fixes
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marc Orr <marcorr@google.com>, Ben Gardon <bgardon@google.com>,
-        Venkatesh Srinivas <venkateshs@chromium.org>
-References: <20230107011025.565472-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230107011025.565472-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221221222418.3307832-1-bgardon@google.com> <20221221222418.3307832-4-bgardon@google.com>
+ <CANgfPd9d=rDxS2BeMRfXt1co1hPFJbDtF7vMe1r-XpTpOsYhNA@mail.gmail.com>
+In-Reply-To: <CANgfPd9d=rDxS2BeMRfXt1co1hPFJbDtF7vMe1r-XpTpOsYhNA@mail.gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Fri, 13 Jan 2023 10:06:27 -0800
+Message-ID: <CAHVum0dK+hoYWFguBns_ryg=te__WZbDh=2BkW6dt853RxTCYA@mail.gmail.com>
+Subject: Re: [RFC 03/14] KVM: x86/MMU: Move the Shadow MMU implementation to shadow_mmu.c
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Nagareddy Reddy <nspreddy@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/7/23 02:10, Sean Christopherson wrote:
-> Fixes for edge cases where KVM mishandles reserved bits/regs checks when
-> the vCPU is in x2APIC mode.
-> 
-> The first two patches were previously posted[*], but both patches were
-> broken (as posted against upstream), hence I took full credit for doing
-> the work and changed Marc to a reporter.
-> 
-> The VMX APICv fixes are for bugs found when writing tests.  *sigh*
-> I didn't Cc those to stable as the odds of breaking something when touching
-> the MSR bitmaps seemed higher than someone caring about a 10 year old bug.
-> 
-> AMD x2AVIC support may or may not suffer similar interception bugs, but I
-> don't have hardware to test and this already snowballed further than
-> expected...
-> 
-> [*] https://lore.kernel.org/kvm/20220525173933.1611076-1-venkateshs@chromium.org
+On Wed, Dec 21, 2022 at 2:40 PM Ben Gardon <bgardon@google.com> wrote:
+>
+> On Wed, Dec 21, 2022 at 2:24 PM Ben Gardon <bgardon@google.com> wrote:
+> >
+> > Cut and paste the implementation of the Shadow MMU to shadow_mmu.(c|h).
+> > This is a monsterously large commit, moving ~3500 lines. With such a
+> > large move, there's no way to make it easy. Do the move in one massive
+> > step to simplify dealing with merge conflicts and to make the git
+> > history a little easier to dig through. Several cleanup commits follow
+> > this one rather than preceed it so that their git history will remain
+> > easy to see.
+> >
+> > No functional change intended.
+> >
+> > Signed-off-by: Ben Gardon <bgardon@google.com>
+>
+> Woops, I guess this message bounced because the patch was just too long.
+> I can try to split it in two if folks would prefer, or just send a
+> list of the functions / definitions moved.
+>
 
-Looks good; please feel free to start gathering this in your tree for 6.3.
+Interesting, I can see this patch in my email client,
+lore.kernel.org/lkml but not in patchwork.kernel.org
 
-Next week I'll go through Ben's series as well as Aaron's "Clean up the 
-supported xfeatures" and others.
+One more way can be to move declarations to shadow_mmu.h first and
+then in subsequent patch move definitions to shadow_mmu.c. I do agree
+it won't reduce size much but it will make it easier to see which
+functions are becoming the part of API.
 
-Let me know if you would like me to queue anything of these instead, and 
-please remember to set up the tree in linux-next. :)
-
-Thanks,
-
-Paolo
-
-> Sean Christopherson (6):
->    KVM: x86: Inject #GP if WRMSR sets reserved bits in APIC Self-IPI
->    KVM: x86: Inject #GP on x2APIC WRMSR that sets reserved bits 63:32
->    KVM: x86: Mark x2APIC DFR reg as non-existent for x2APIC
->    KVM: x86: Split out logic to generate "readable" APIC regs mask to
->      helper
->    KVM: VMX: Always intercept accesses to unsupported "extended" x2APIC
->      regs
->    KVM: VMX: Intercept reads to invalid and write-only x2APIC registers
-> 
->   arch/x86/kvm/lapic.c   | 55 ++++++++++++++++++++++++++----------------
->   arch/x86/kvm/lapic.h   |  2 ++
->   arch/x86/kvm/vmx/vmx.c | 40 +++++++++++++++---------------
->   3 files changed, 57 insertions(+), 40 deletions(-)
-> 
-> 
-> base-commit: 91dc252b0dbb6879e4067f614df1e397fec532a1
-
+> > ---
+> >  arch/x86/kvm/debugfs.c          |    1 +
+> >  arch/x86/kvm/mmu/mmu.c          | 4526 ++++---------------------------
+> >  arch/x86/kvm/mmu/mmu_internal.h |    4 +-
+> >  arch/x86/kvm/mmu/shadow_mmu.c   | 3408 +++++++++++++++++++++++
+> >  arch/x86/kvm/mmu/shadow_mmu.h   |  145 +
+> >  5 files changed, 4086 insertions(+), 3998 deletions(-)
+> >
+>
+> ...
+>
+> > --
+> > 2.39.0.314.g84b9a713c41-goog
+> >
