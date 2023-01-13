@@ -2,171 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B3FB166A2B1
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 20:11:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DC7EE66A2B3
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 20:11:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbjAMTLZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 13 Jan 2023 14:11:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35574 "EHLO
+        id S229772AbjAMTLd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 14:11:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229510AbjAMTLY (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 13 Jan 2023 14:11:24 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB40C6369;
-        Fri, 13 Jan 2023 11:11:21 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        with ESMTP id S229670AbjAMTL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 14:11:27 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A26C6369;
+        Fri, 13 Jan 2023 11:11:24 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 7BF711EC0518;
-        Fri, 13 Jan 2023 20:11:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1673637080;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=uSenXaLo6u2BuPearjH6XYMPmRVbj/fPB2X9geCCSBQ=;
-        b=N4v11qcO3FHjovvV1c6EaFU2xeyguJlnWDJSyC8w+rf7M4BzksU9+WdDquv+1mHSgLIrOU
-        NqaFofzSkjTrLynioeH/8a5rGjWs2RFNEZSKoOHUAp0OTc4JkKP5IlN7DeXV3OGoQIjbsZ
-        duvJXqWfKJ71FJkX8JawNxzGZ60iono=
-Date:   Fri, 13 Jan 2023 20:11:14 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com,
-        Vishal Annapurve <vannapurve@google.com>
-Subject: Re: [PATCH RFC v7 10/64] KVM: SEV: Populate private memory fd during
- LAUNCH_UPDATE_DATA
-Message-ID: <Y8Gs0l1k4L96dP5V@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-11-michael.roth@amd.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id BB22EB821B0;
+        Fri, 13 Jan 2023 19:11:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AD6DC433EF;
+        Fri, 13 Jan 2023 19:11:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673637081;
+        bh=bHIIhizH0x9elSFRGRZmY8Z+v8Xf18Xr1lYyP8Iv3To=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=FYUNlt324w87cm1UzS8gVWt4BeWwft29cL1LfnX40kSspaKgi9S6a8TVQOczhWngk
+         5Ksxwa6mbvIBbzgLgoxHWVmw6A6273fwuvkERousOELE9Zw68O1eSHidCPT1O36gZP
+         mkUYDLy73XBvTSZtWmcWSYWptgr0pWvNJ4ifVHI2pFMXuCoXLXcoOPZ6Q3cy1BfEDt
+         9Q/4h81Vr98z8dQWTOaaRPtbGPInX/7ZryqqEm9NNlZQvcC2jRNzVcrqloCrmk3KQk
+         Hc3skvfdeU+i0EWkdNm0jFbKdtVKdZR7T7zZLf6/q4HZANylUMrEzRH64XwblWri8L
+         Wx8heXrdDjThQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+        id E08DD5C06D0; Fri, 13 Jan 2023 11:11:20 -0800 (PST)
+Date:   Fri, 13 Jan 2023 11:11:20 -0800
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Boqun Feng <boqun.feng@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+        kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH 2/3] rcu: Equip sleepable RCU with lockdep dependency
+ graph checks
+Message-ID: <20230113191120.GB4028633@paulmck-ThinkPad-P17-Gen-1>
+Reply-To: paulmck@kernel.org
+References: <20230113065955.815667-1-boqun.feng@gmail.com>
+ <20230113065955.815667-3-boqun.feng@gmail.com>
+ <20230113112949.GX4028633@paulmck-ThinkPad-P17-Gen-1>
+ <Y8GdYgSBtyKwf/qj@boqun-archlinux>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-11-michael.roth@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y8GdYgSBtyKwf/qj@boqun-archlinux>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:40:02PM -0600, Michael Roth wrote:
-> From: Vishal Annapurve <vannapurve@google.com>
+On Fri, Jan 13, 2023 at 10:05:22AM -0800, Boqun Feng wrote:
+> On Fri, Jan 13, 2023 at 03:29:49AM -0800, Paul E. McKenney wrote:
+> > On Thu, Jan 12, 2023 at 10:59:54PM -0800, Boqun Feng wrote:
+> > > Although all flavors of RCU are annotated correctly with lockdep as
+> > > recursive read locks, their 'check' parameter of lock_acquire() is
+> > > unset. It means that RCU read locks are not added into the lockdep
+> > > dependency graph therefore deadlock detection based on dependency graph
+> > > won't catch deadlock caused by RCU. This is fine for "non-sleepable" RCU
+> > > flavors since wait-context detection and other context based detection
+> > > can catch these deadlocks. However for sleepable RCU, this is limited.
+> > > 
+> > > Actually we can detect the deadlocks caused by SRCU by 1) making
+> > > srcu_read_lock() a 'check'ed recursive read lock and 2) making
+> > > synchronize_srcu() a empty write lock critical section. Even better,
+> > > with the newly introduced lock_sync(), we can avoid false positives
+> > > about irq-unsafe/safe. So do it.
+> > > 
+> > > Note that NMI safe SRCU read side critical sections are currently not
+> > > annonated, since step-by-step approach can help us deal with
+> > > false-positives. These may be annotated in the future.
+> > > 
+> > > Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+> > 
+> > Nice, thank you!!!
+> > 
+> > Acked-by: Paul E. McKenney <paulmck@kernel.org>
+> > 
+> > Or if you would prefer that I take the series through -rcu, please just
+> > let me know.
 > 
-> This change adds handling of HVA ranges to copy contents
+> I prefer that the first two patches go through your tree, because it
+> reduces the synchronization among locking, rcu and KVM trees to the
+> synchronization betwen rcu and KVM trees.
 
-s/This change adds handling of/Handle/
+Very well, I have queued and pushed these with the usual wordsmithing,
+thank you!
 
-> +static int sev_launch_update_priv_gfn_handler(struct kvm *kvm,
-> +					      struct kvm_gfn_range *range,
-> +					      struct kvm_sev_cmd *argp)
-> +{
-> +	struct sev_data_launch_update_data data;
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> +	gfn_t gfn;
-> +	kvm_pfn_t pfn;
-> +	struct kvm_memory_slot *memslot = range->slot;
-> +	int ret = 0;
-> +
-> +	data.reserved = 0;
-> +	data.handle = sev->handle;
-> +
-> +	for (gfn = range->start; gfn < range->end; gfn++) {
-> +		int order;
-> +		void *kvaddr;
-> +
-> +		ret = kvm_restricted_mem_get_pfn(memslot, gfn, &pfn, &order);
-> +		if (ret)
-> +			return ret;
-> +
-> +		kvaddr = pfn_to_kaddr(pfn);
-> +		if (!virt_addr_valid(kvaddr)) {
-> +			pr_err("Invalid kvaddr 0x%llx\n", (uint64_t)kvaddr);
+On the possibility of annotating __srcu_read_lock_nmisafe() and
+__srcu_read_unlock_nmisafe(), are those lockdep annotations themselves
+NMI-safe?
 
-Is that some debugging help leftover or what is that printk issued for?
+> For patch #3, since it's not really ready yet, so I don't know, but I
+> guess when it's finished, probably better go through -rcu.
 
-> +			ret = -EINVAL;
-> +			goto e_ret;
-> +		}
-> +
-> +		ret = kvm_read_guest_page(kvm, gfn, kvaddr, 0, PAGE_SIZE);
-> +		if (ret) {
-> +			pr_err("guest read failed 0x%x\n", ret);
-> +			goto e_ret;
-> +		}
-> +
-> +		if (!this_cpu_has(X86_FEATURE_SME_COHERENT))
+Please let me know when it is ready!
 
-check_for_deprecated_apis: WARNING: arch/x86/kvm/svm/sev.c:602: Do not use this_cpu_has() - use cpu_feature_enabled() instead.
+							Thanx, Paul
 
-> +			clflush_cache_range(kvaddr, PAGE_SIZE);
-> +
-> +		data.len = PAGE_SIZE;
-> +		data.address = __sme_set(pfn << PAGE_SHIFT);
-> +		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA, &data, &argp->error);
-> +		if (ret)
-> +			goto e_ret;
-> +		kvm_release_pfn_clean(pfn);
-> +	}
-> +	kvm_vm_set_region_attr(kvm, range->start, range->end,
-> +		true /* priv_attr */);
-
-No need to break that line.
-
-> +
-> +e_ret:
-> +	return ret;
-> +}
-> +
-> +static int sev_launch_update_gfn_handler(struct kvm *kvm, struct kvm_gfn_range *range,
-> +					 void *data)
-> +{
-> +	struct kvm_sev_cmd *argp = (struct kvm_sev_cmd *)data;
-> +
-> +	if (kvm_slot_can_be_private(range->slot))
-> +		return sev_launch_update_priv_gfn_handler(kvm, range, argp);
-> +
-> +	return sev_launch_update_shared_gfn_handler(kvm, range, argp);
-> +}
-> +
-> +static int sev_launch_update_data(struct kvm *kvm,
-> +		struct kvm_sev_cmd *argp)
-> +{
-> +	struct kvm_sev_launch_update_data params;
-> +
-> +	if (!sev_guest(kvm))
-> +		return -ENOTTY;
-> +
-> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
-> +		return -EFAULT;
-
-Not gonna check those user-supplied values for sanity?
-
-Or is this check
-
-        if (WARN_ON_ONCE(hva_end <= hva_start))
-                return -EINVAL;
-
-in kvm_vm_do_hva_range_op() enough?
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+> Regards,
+> Boqun
+> 
+> > 							Thanx, Paul
+> > 
+> > > ---
+> > >  include/linux/srcu.h  | 23 +++++++++++++++++++++--
+> > >  kernel/rcu/srcutiny.c |  2 ++
+> > >  kernel/rcu/srcutree.c |  2 ++
+> > >  3 files changed, 25 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/include/linux/srcu.h b/include/linux/srcu.h
+> > > index 9b9d0bbf1d3c..a1595f8c5155 100644
+> > > --- a/include/linux/srcu.h
+> > > +++ b/include/linux/srcu.h
+> > > @@ -102,6 +102,21 @@ static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
+> > >  	return lock_is_held(&ssp->dep_map);
+> > >  }
+> > >  
+> > > +static inline void srcu_lock_acquire(struct lockdep_map *map)
+> > > +{
+> > > +	lock_map_acquire_read(map);
+> > > +}
+> > > +
+> > > +static inline void srcu_lock_release(struct lockdep_map *map)
+> > > +{
+> > > +	lock_map_release(map);
+> > > +}
+> > > +
+> > > +static inline void srcu_lock_sync(struct lockdep_map *map)
+> > > +{
+> > > +	lock_map_sync(map);
+> > > +}
+> > > +
+> > >  #else /* #ifdef CONFIG_DEBUG_LOCK_ALLOC */
+> > >  
+> > >  static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
+> > > @@ -109,6 +124,10 @@ static inline int srcu_read_lock_held(const struct srcu_struct *ssp)
+> > >  	return 1;
+> > >  }
+> > >  
+> > > +#define srcu_lock_acquire(m) do { } while (0)
+> > > +#define srcu_lock_release(m) do { } while (0)
+> > > +#define srcu_lock_sync(m) do { } while (0)
+> > > +
+> > >  #endif /* #else #ifdef CONFIG_DEBUG_LOCK_ALLOC */
+> > >  
+> > >  #define SRCU_NMI_UNKNOWN	0x0
+> > > @@ -182,7 +201,7 @@ static inline int srcu_read_lock(struct srcu_struct *ssp) __acquires(ssp)
+> > >  
+> > >  	srcu_check_nmi_safety(ssp, false);
+> > >  	retval = __srcu_read_lock(ssp);
+> > > -	rcu_lock_acquire(&(ssp)->dep_map);
+> > > +	srcu_lock_acquire(&(ssp)->dep_map);
+> > >  	return retval;
+> > >  }
+> > >  
+> > > @@ -226,7 +245,7 @@ static inline void srcu_read_unlock(struct srcu_struct *ssp, int idx)
+> > >  {
+> > >  	WARN_ON_ONCE(idx & ~0x1);
+> > >  	srcu_check_nmi_safety(ssp, false);
+> > > -	rcu_lock_release(&(ssp)->dep_map);
+> > > +	srcu_lock_release(&(ssp)->dep_map);
+> > >  	__srcu_read_unlock(ssp, idx);
+> > >  }
+> > >  
+> > > diff --git a/kernel/rcu/srcutiny.c b/kernel/rcu/srcutiny.c
+> > > index b12fb0cec44d..336af24e0fe3 100644
+> > > --- a/kernel/rcu/srcutiny.c
+> > > +++ b/kernel/rcu/srcutiny.c
+> > > @@ -197,6 +197,8 @@ void synchronize_srcu(struct srcu_struct *ssp)
+> > >  {
+> > >  	struct rcu_synchronize rs;
+> > >  
+> > > +	srcu_lock_sync(&ssp->dep_map);
+> > > +
+> > >  	RCU_LOCKDEP_WARN(lockdep_is_held(ssp) ||
+> > >  			lock_is_held(&rcu_bh_lock_map) ||
+> > >  			lock_is_held(&rcu_lock_map) ||
+> > > diff --git a/kernel/rcu/srcutree.c b/kernel/rcu/srcutree.c
+> > > index ca4b5dcec675..408088c73e0e 100644
+> > > --- a/kernel/rcu/srcutree.c
+> > > +++ b/kernel/rcu/srcutree.c
+> > > @@ -1267,6 +1267,8 @@ static void __synchronize_srcu(struct srcu_struct *ssp, bool do_norm)
+> > >  {
+> > >  	struct rcu_synchronize rcu;
+> > >  
+> > > +	srcu_lock_sync(&ssp->dep_map);
+> > > +
+> > >  	RCU_LOCKDEP_WARN(lockdep_is_held(ssp) ||
+> > >  			 lock_is_held(&rcu_bh_lock_map) ||
+> > >  			 lock_is_held(&rcu_lock_map) ||
+> > > -- 
+> > > 2.38.1
+> > > 
