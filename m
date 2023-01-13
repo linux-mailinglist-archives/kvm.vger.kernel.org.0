@@ -2,69 +2,123 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 048F7668A6F
-	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 04:50:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1E25F668B5B
+	for <lists+kvm@lfdr.de>; Fri, 13 Jan 2023 06:31:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236952AbjAMDu1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 12 Jan 2023 22:50:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58298 "EHLO
+        id S229982AbjAMFbV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 13 Jan 2023 00:31:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234892AbjAMDuT (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 12 Jan 2023 22:50:19 -0500
-Received: from mail-oa1-x49.google.com (mail-oa1-x49.google.com [IPv6:2001:4860:4864:20::49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D5C163183
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:50:17 -0800 (PST)
-Received: by mail-oa1-x49.google.com with SMTP id 586e51a60fabf-155144f233dso7628555fac.22
-        for <kvm@vger.kernel.org>; Thu, 12 Jan 2023 19:50:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbzanLh7pJc2dr4z027O7I/0B3G+NEkna+fAGs8Wjw0=;
-        b=B6TbjRCZH4GEguyyIU/4c8chBAHZR6FNJQxuwVv3YbmMpBPbku5u3A9D+bFKHJUFyF
-         hQwDaMV8NA450eyaYqD8YR2ur/Jh+B9oDhSC/SFKpciuCTQpkhjAf6gk/dWoItiHyUXW
-         iWQR8uaNyImh5PkQ/fzxvczmg5Ka1x5XnaOWaG8JGUqHCyGTwYaa59e4JjE6vYi/aML2
-         KmNB1bEZ0/RRSnh2/a8l2ngJuglfbjFibifJbrhJdlOU/ao+anCG7iEfuf/Gyy56du8Z
-         Ejkk6A4rIhQ9DsET+hKJ0PBW6ZNpKy3uInig7yycjlS+ePeeX7jS1fhVjtX389tcbshL
-         VQGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbzanLh7pJc2dr4z027O7I/0B3G+NEkna+fAGs8Wjw0=;
-        b=fTfxvhstJblqVxanrR6bJi9jFdL4yT5Xd15iJ0q8bvS0x2yEoztIVgVPskOA4xI40p
-         oFgNClegODkV+sOILolxFXiveAhipc49rfOd7S1cpZbEhd7oXIRaRkdAMRLcpon0nqWW
-         Ljeemm7petb2QYPvPJ4uV13sHel9RajVpYZ2QDU/MiL03JekvOWqtq3TuUC8qf1NqnNx
-         ZOOCQOkFBGt7TQ3ybqsUhOOBgFL70BHNvIC9srJ2RpYcbQ2gTz8TXNAHAFkUxQ2AaWL8
-         phA3xMbJEnHNme1wAfk+LZCdUBRTTFCsD+2V7dPp7krJ08C8UAKCOlb3m2z+wtPObyK5
-         rn/w==
-X-Gm-Message-State: AFqh2kqxoznQKwGTXBHTPld6HErylrgk9wwxROO5X4pMmKRhp5kX8NKL
-        DjcblZf0cfNRBR7cozVjtsebrmP1mA5NPA==
-X-Google-Smtp-Source: AMrXdXv6ZBj69dDqx+ohh1LywVQGoT/+OOB5r6zNe09ZWC/QPPAi3gM64mtMaIHUmNspgolZBYFMIHmRFUQxwg==
-X-Received: from ricarkol4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1248])
- (user=ricarkol job=sendgmr) by 2002:a05:6870:63aa:b0:15e:dca1:7fd4 with SMTP
- id t42-20020a05687063aa00b0015edca17fd4mr141342oap.170.1673581816475; Thu, 12
- Jan 2023 19:50:16 -0800 (PST)
-Date:   Fri, 13 Jan 2023 03:50:00 +0000
-In-Reply-To: <20230113035000.480021-1-ricarkol@google.com>
-Mime-Version: 1.0
-References: <20230113035000.480021-1-ricarkol@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230113035000.480021-10-ricarkol@google.com>
-Subject: [PATCH 9/9] KVM: arm64: Use local TLBI on permission relaxation
-From:   Ricardo Koller <ricarkol@google.com>
-To:     pbonzini@redhat.com, maz@kernel.org, oupton@google.com,
-        yuzenghui@huawei.com, dmatlack@google.com
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        with ESMTP id S233217AbjAMFab (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 13 Jan 2023 00:30:31 -0500
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2053.outbound.protection.outlook.com [40.107.102.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C2686130D;
+        Thu, 12 Jan 2023 21:29:16 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DiThprUJtWEt/tVyEizNqGlIOSPl+MYVzg32CH6/Fu1xt98eQ6ZQWDd3nS10UY8Dr7gExNPC4+c8eo7J1FxojzlQyt7zM5WqPkOelxDzgucKsJ+wGmXwrcNXjjnB0ms8S/XdWPQq5dU7NRV1ZkUUjek1znyAIleMOX7b3f17peb/kumZCA5C9yyGYHS+ndhBfXULM9ie4WOUVDKC64sJV6lU9X0kgfLU6miW3IzV7ThshQYJg85KU5WwSb1zyX4I8u6sUExfmqBhmBSEK1/S+wRRcJbxDjFDroiZMBHFb8wnq9Tu81hAHGohJorrS9zzLjVZ5bsEUf4cv8GQ9SsFaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LdIDLJXk9V4ymMeIUFPDy1hLr4RddNVB4QAstKy5GTQ=;
+ b=Y/i+PZ5E4kCoRyhmuDHpiTk5HPbNnFBH1+VNFMIRgDyI20KxxQzVdV5ybVLyQZaaQc/5N8uv9F3jHEoLu28d0ZF5tTXHcou4zVNBrbuoMC6lkzCaatqxz1Xp2rLbTim4ogrCZe7yzNO3+Mj6ljMwpQ7e+qktUQwWJGfWZjuZngw2UGNpXP8aCVx9aAMswBmUvvSijNwqJTa5gJNMBvYIrTAs8Vg4yUSBBI0H5aS5cBaL5FUlm7+Xb/VADbPSJUgz5yZSg4KVNFahRKd/wwnwYMYHadEUhmnAqu9ZRGcker14EdfUgKo5vlhE0PY6Z72t+a8LUlfbAiXky1krpT1uhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LdIDLJXk9V4ymMeIUFPDy1hLr4RddNVB4QAstKy5GTQ=;
+ b=E6uz2N/qzPImN72ddcFGDX+9VJh4TF8dVbWkWG7zK2gEPFr4ahjAJl87SOR38U6EShZ5FZJak4IA3atT7a1JUhmwdKdHz60p8U4iI2hKDr+ydPnT07LG1ACvs/YaofidMIYal6C9f0UJcr33haiJlssaxAmsGYYjZ1DL4ECuoA4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ DM4PR12MB5183.namprd12.prod.outlook.com (2603:10b6:5:396::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5986.19; Fri, 13 Jan 2023 05:29:15 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::8079:86db:f2e5:7700]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::8079:86db:f2e5:7700%6]) with mapi id 15.20.5986.018; Fri, 13 Jan 2023
+ 05:29:15 +0000
+Message-ID: <bac878be-acaa-e373-f5fc-fb6b35964eb5@amd.com>
+Date:   Fri, 13 Jan 2023 10:59:01 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v5] x86/sev: Add SEV-SNP guest feature negotiation support
+To:     Tom Lendacky <thomas.lendacky@amd.com>,
+        linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        bp@alien8.de
+Cc:     mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+        seanjc@google.com, pbonzini@redhat.com, michael.roth@amd.com,
+        David Rientjes <rientjes@google.com>, stable@kernel.org
+References: <20230112084139.12615-1-nikunj@amd.com>
+ <4cf6a6aa-81f9-4fae-2a39-1825433f9ee4@amd.com>
+Content-Language: en-US
+From:   "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <4cf6a6aa-81f9-4fae-2a39-1825433f9ee4@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN2PR01CA0099.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:27::14) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|DM4PR12MB5183:EE_
+X-MS-Office365-Filtering-Correlation-Id: e5c67a55-fe5e-44e4-7d8e-08daf5271bbb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: IXl7ngI3C7SvtfUlncT+55atOKBh5u7Jw6n2PD2+ML5y4FC/P9qxIdmFbEZuDPHwZR9aJuKQr6Rc5N6WVz5G9ZdYDu5pbCVjvdSAiXumEdCzyUf0eSDZJOBiu0TFqdZ2GVsTOa5X9RKn/ivBt6gjAUhFdzxmqFyK7FD1YNZ7gA68aLMYrE4JbT9M2eBeDEIhuqf0Rau6XR07kTcMouq1mz3uGkuYhihQXxOa15RhLzOYqFDuCxXhJiNne87RHenrkXH1tZGCbd5pzk5IGN0ambD8bclMKeherbJBfiGyZ/COjlOKp7BaUavFoi4bROLVIG0Y7O1ghlDT8BrtB6cYWnyAHM3shdsQHMHwr9bIa74IPkkYhZEUDC05azaMRJMXvHh+xOG5dCFaWtVEKLebGjiT49c4oRxxQuWfuh1ZM/koSzkwZQZE8vGBFsbFDhHSy1dMY+dZIPSgLMq/DLzTKGC+InghYqRjf7V14aPyQG7MnBsUXUnoSMXVZewxngc2bam1JU63MxEDI/224lNvHVgxo3ZK00o5AdTDsO+ej4Kosv8Vygk4YKnsmjZ39KGeT25gtmmBDf5dLEAGRyDZLzAplG6A01OqGJAZqprbOWPtZRSiGz5pUk/u1Aql9Dboys2EC/L5gdBHEuhTcrpfsPpAnTPvAHo1wxFndR2Q94mBjTaSmEb3NAz+nz1wb7Tf82W+H1P4vTjHpi+prNkqKbYGF81I5AQiTX4n1pYdj3M=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(376002)(366004)(396003)(39860400002)(346002)(136003)(451199015)(31696002)(41300700001)(36756003)(5660300002)(6512007)(7416002)(8936002)(4744005)(53546011)(26005)(186003)(66946007)(478600001)(6486002)(6506007)(2616005)(6666004)(83380400001)(316002)(4326008)(8676002)(66476007)(66556008)(38100700002)(2906002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SVowMEFLWEk0aGdHSzEzSTlNakllcjVDNGdjSUw1NHVHaVZiSVdCMCtodDNr?=
+ =?utf-8?B?ZEFHcGI0RWlXRVRMY3dWUnpKTmtURWh4YmhkeWVPS2dKRXpoV1VPQUpsdTdN?=
+ =?utf-8?B?aEEvNWFzYmRac1JKNzFSNWRhZzNjS0p6UWlMTEtHdkt5R3p4aS84NFljNjQ4?=
+ =?utf-8?B?WWlNZTQyNnBhQ0FYOWdwYWVVenN3Mmo1aWhmZ0lZQlhydlZjcEIrcE42Z2cz?=
+ =?utf-8?B?YzZpUHB0dG5YOHJWNEJ3UlZFQStPcnZFV28yMVRrWkUveDg2SERXMWxRUXI4?=
+ =?utf-8?B?STJNZVZZOE5La0NWWGxESENvWXFXbkpDZ29ydmlvU1NZVElvTHpGV2dzbURy?=
+ =?utf-8?B?blNGUmw3L0ZUcVlxZ2licFFuTVo1amhjSE12KzU4TDB0czlOdVhPL01KRmpj?=
+ =?utf-8?B?TGx6SW01WUNod3BCM2lmaVNCYXhwcEZyaThSclpUeUJqU2I1RjllcXd2K2VV?=
+ =?utf-8?B?V2Zzb3BENGw4bDJ2NW1jMDlqU0FrZHJ6QjVoR3FEaW1lc0RKNGJhMWZoVGo4?=
+ =?utf-8?B?aDhFWTdiOUI1S1VpWGt1L1A4Vk1xWXo2OVJLT010UXloZ3J4UFFuVEE3eWJ3?=
+ =?utf-8?B?NThFQSsvSGF6aVBTUEVucWE1YmtRV3RRdm90OG8rK1ArUkNPblhPVWVRczNp?=
+ =?utf-8?B?enNzb1hGV0VtaHIrMWFCMVhCVVk1S2F0OHZNWjU5TG1weGFTMGx0Y2E5T3pR?=
+ =?utf-8?B?cVhsTytkYkg0bkllUGR5eGxUWVdISDR4UW1jVmdON245UmlmK1VKdG4wWlFB?=
+ =?utf-8?B?elhNZXFtT0UxdW4xS3hXTVBkWjdoVk9zbVJzZnVGRFd3WXI1blh5ZEZnc2ZD?=
+ =?utf-8?B?dDVMVkViWGtZamNJa0FRUzIrRWZsSmgxbk9VQ2JYSnMrdEtPVTNocjVBUS9Y?=
+ =?utf-8?B?ejlScDRISGlramgwN1FmN3NvNFNEVWlUQ3FTVnFZMEVadm5nUE45NW5wUkFX?=
+ =?utf-8?B?czE0S0dMenRoNGJNRFE2Vlo0YmRzVXRReVZkQ3RsZTNiaEhlaGpDY0cwS0ls?=
+ =?utf-8?B?UVNVN2pnWDVjRzdDVXZoNTNBNDBKTWpadE5nSzZZYU1YZUtQTjhuUzZZMFQx?=
+ =?utf-8?B?MzlyWmkrWEsrbEZtVVZOdEVRZXNsdHUxYnR0aisvc1E5NitLZTRzL0JzbXkv?=
+ =?utf-8?B?dmhXcUYzRDlidTlUdzhOU1RrOG9XakVCaUYzWXJWM25FQTRiM2d1V2F1b01x?=
+ =?utf-8?B?dXA5Z01FQm55RytxYUR3VzZxbFBCUW82bDcrWUtSVEhwS2xaWkNsMVdMbTYx?=
+ =?utf-8?B?dVBnWGZJMmtsR0xHbHQzOUZtQ3k2M1poc1EwaTRmMVNJZ2xHMVRPSTNHV2JZ?=
+ =?utf-8?B?eTQ2N215TmYvUkc2TmdFOTFqWDl4c2Q5cEVjWW1ic2c3YkgrWk5pRm1IUkdU?=
+ =?utf-8?B?eTkvazIwOHVXSHlLYUtQcmRLL29uQ3luL1hLd3dJSUl2OVFZalZuOFhUVVVt?=
+ =?utf-8?B?VExaYyt3VndFZXVoeXVnY2hrWm9PZk1jT1lLT1Q2MndlMDdnY0EvenpNS2c1?=
+ =?utf-8?B?L05udFRoNDVlRmRxejk5WmJBVWhvNVdLK3lKUjhYR2dpN3ArbEVtQmhJbHBx?=
+ =?utf-8?B?UGRUYmNCL3VIUlA2cTJ1UjRhT2NFam9FMWlDeWR4cDM4R1hGQ3Z6eE9qQ0kx?=
+ =?utf-8?B?c2NPRTRDZ2tLbmpSUXYwT3h3LzZJa3VqaC91YVAwYnU3OHZiL2NLQkJnRmIv?=
+ =?utf-8?B?a1k0aFdVZjNGT05oT0JGakl6VlNZUnc0MDh4QlhyY09LQVc5YnJ2WGdDWGpq?=
+ =?utf-8?B?TzdFUzA3QUNSTlNUbVVlWmlwOHBYZk8zVkJSeWFVSlVHemVZZUJQN1hIeTM5?=
+ =?utf-8?B?dXgxZTBqTnI0NzJXdnVhbDBMV0VqUkUzSWgvakQxWm9rMHJ5d0VFOVkyZHNL?=
+ =?utf-8?B?TlVnWElHcDlscHVLTmg4eno2WjNIUFNHcXgzZGkxQ1pVYWphc050a1FnNlVa?=
+ =?utf-8?B?RDAvOWpIT0V6TlRjckUyVTV4cXJ5R3luRWY0aGVkbjM0UnF3dnhBMDlKc3V3?=
+ =?utf-8?B?L2gxUndtdG1YeXJyN2t5aE9KK3JHOUllMmxZYUU3MThWSFUweVNpZk9OV2o4?=
+ =?utf-8?B?U1FLSm9ndHYzQzE0UHVIVWsxbWtER3g0VkFHZlhkVUFoS2t4b2U5cjdaeTA2?=
+ =?utf-8?Q?gFfmbsf5lKm4S6I/jmFSxoBHi?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5c67a55-fe5e-44e4-7d8e-08daf5271bbb
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Jan 2023 05:29:14.8679
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5aCZepI8c5TjUv3qCTxeJJJNAxi58zoihUho6LCmOHIKTH6jRTgnIq5RJnYTyCmSw0JkKgkm2IHtkHu+FuKDcg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5183
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,201 +126,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Marc Zyngier <maz@kernel.org>
 
-Broadcasted TLB invalidations (TLBI) are usually less performant than their
-local variant. In particular, we observed some implementations that take
-millliseconds to complete parallel broadcasted TLBIs.
 
-It's safe to use local, non-shareable, TLBIs when relaxing permissions on a
-PTE in the KVM case for a couple of reasons. First, according to the ARM
-Arm (DDI 0487H.a D5-4913), permission relaxation does not need
-break-before-make.  Second, KVM does not set the VTTBR_EL2.CnP bit, so each
-PE has its own TLB entry for the same page. KVM could tolerate that when
-doing permission relaxation (i.e., not having changes broadcasted to all
-PEs).
+On 12/01/23 20:12, Tom Lendacky wrote:
+> On 1/12/23 02:41, Nikunj A Dadhania wrote:
+>> +
+>> +        if (sev_es_get_ghcb_version() < 2 ||
+> 
+> I would just use ghcb_version directly here.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Ricardo Koller <ricarkol@google.com>
----
- arch/arm64/include/asm/kvm_asm.h   |  4 +++
- arch/arm64/kvm/hyp/nvhe/hyp-main.c | 10 ++++++
- arch/arm64/kvm/hyp/nvhe/tlb.c      | 54 ++++++++++++++++++++++++++++++
- arch/arm64/kvm/hyp/pgtable.c       |  2 +-
- arch/arm64/kvm/hyp/vhe/tlb.c       | 32 ++++++++++++++++++
- 5 files changed, 101 insertions(+), 1 deletion(-)
+Right, that will work.
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 43c3bc0f9544..bb17b2ead4c7 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -68,6 +68,7 @@ enum __kvm_host_smccc_func {
- 	__KVM_HOST_SMCCC_FUNC___kvm_vcpu_run,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_vm_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa,
-+	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid_ipa_nsh,
- 	__KVM_HOST_SMCCC_FUNC___kvm_tlb_flush_vmid,
- 	__KVM_HOST_SMCCC_FUNC___kvm_flush_cpu_context,
- 	__KVM_HOST_SMCCC_FUNC___kvm_timer_set_cntvoff,
-@@ -225,6 +226,9 @@ extern void __kvm_flush_vm_context(void);
- extern void __kvm_flush_cpu_context(struct kvm_s2_mmu *mmu);
- extern void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu, phys_addr_t ipa,
- 				     int level);
-+extern void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+					 phys_addr_t ipa,
-+					 int level);
- extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- 
- extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-index 728e01d4536b..c6bf1e49ca93 100644
---- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-+++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
-@@ -125,6 +125,15 @@ static void handle___kvm_tlb_flush_vmid_ipa(struct kvm_cpu_context *host_ctxt)
- 	__kvm_tlb_flush_vmid_ipa(kern_hyp_va(mmu), ipa, level);
- }
- 
-+static void handle___kvm_tlb_flush_vmid_ipa_nsh(struct kvm_cpu_context *host_ctxt)
-+{
-+	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-+	DECLARE_REG(phys_addr_t, ipa, host_ctxt, 2);
-+	DECLARE_REG(int, level, host_ctxt, 3);
-+
-+	__kvm_tlb_flush_vmid_ipa_nsh(kern_hyp_va(mmu), ipa, level);
-+}
-+
- static void handle___kvm_tlb_flush_vmid(struct kvm_cpu_context *host_ctxt)
- {
- 	DECLARE_REG(struct kvm_s2_mmu *, mmu, host_ctxt, 1);
-@@ -315,6 +324,7 @@ static const hcall_t host_hcall[] = {
- 	HANDLE_FUNC(__kvm_vcpu_run),
- 	HANDLE_FUNC(__kvm_flush_vm_context),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa),
-+	HANDLE_FUNC(__kvm_tlb_flush_vmid_ipa_nsh),
- 	HANDLE_FUNC(__kvm_tlb_flush_vmid),
- 	HANDLE_FUNC(__kvm_flush_cpu_context),
- 	HANDLE_FUNC(__kvm_timer_set_cntvoff),
-diff --git a/arch/arm64/kvm/hyp/nvhe/tlb.c b/arch/arm64/kvm/hyp/nvhe/tlb.c
-index d296d617f589..ef2b70587f93 100644
---- a/arch/arm64/kvm/hyp/nvhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/nvhe/tlb.c
-@@ -109,6 +109,60 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	/*
-+	 * If the host is running at EL1 and we have a VPIPT I-cache,
-+	 * then we must perform I-cache maintenance at EL2 in order for
-+	 * it to have an effect on the guest. Since the guest cannot hit
-+	 * I-cache lines allocated with a different VMID, we don't need
-+	 * to worry about junk out of guest reset (we nuke the I-cache on
-+	 * VMID rollover), but we do need to be careful when remapping
-+	 * executable pages for the same guest. This can happen when KSM
-+	 * takes a CoW fault on an executable page, copies the page into
-+	 * a page that was previously mapped in the guest and then needs
-+	 * to invalidate the guest view of the I-cache for that page
-+	 * from EL1. To solve this, we invalidate the entire I-cache when
-+	 * unmapping a page from a guest if we have a VPIPT I-cache but
-+	 * the host is running at EL1. As above, we could do better if
-+	 * we had the VA.
-+	 *
-+	 * The moral of this story is: if you have a VPIPT I-cache, then
-+	 * you should be running with VHE enabled.
-+	 */
-+	if (icache_is_vpipt())
-+		icache_inval_all_pou();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
-diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-index db9d1a28769b..7d694d12b5c4 100644
---- a/arch/arm64/kvm/hyp/pgtable.c
-+++ b/arch/arm64/kvm/hyp/pgtable.c
-@@ -1148,7 +1148,7 @@ int kvm_pgtable_stage2_relax_perms(struct kvm_pgtable *pgt, u64 addr,
- 	ret = stage2_update_leaf_attrs(pgt, addr, 1, set, clr, NULL, &level,
- 				       KVM_PGTABLE_WALK_SHARED);
- 	if (!ret)
--		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, pgt->mmu, addr, level);
-+		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa_nsh, pgt->mmu, addr, level);
- 	return ret;
- }
- 
-diff --git a/arch/arm64/kvm/hyp/vhe/tlb.c b/arch/arm64/kvm/hyp/vhe/tlb.c
-index 24cef9b87f9e..e69da550cdc5 100644
---- a/arch/arm64/kvm/hyp/vhe/tlb.c
-+++ b/arch/arm64/kvm/hyp/vhe/tlb.c
-@@ -111,6 +111,38 @@ void __kvm_tlb_flush_vmid_ipa(struct kvm_s2_mmu *mmu,
- 	__tlb_switch_to_host(&cxt);
- }
- 
-+void __kvm_tlb_flush_vmid_ipa_nsh(struct kvm_s2_mmu *mmu,
-+				  phys_addr_t ipa, int level)
-+{
-+	struct tlb_inv_context cxt;
-+
-+	dsb(nshst);
-+
-+	/* Switch to requested VMID */
-+	__tlb_switch_to_guest(mmu, &cxt);
-+
-+	/*
-+	 * We could do so much better if we had the VA as well.
-+	 * Instead, we invalidate Stage-2 for this IPA, and the
-+	 * whole of Stage-1. Weep...
-+	 */
-+	ipa >>= 12;
-+	__tlbi_level(ipas2e1, ipa, level);
-+
-+	/*
-+	 * We have to ensure completion of the invalidation at Stage-2,
-+	 * since a table walk on another CPU could refill a TLB with a
-+	 * complete (S1 + S2) walk based on the old Stage-2 mapping if
-+	 * the Stage-1 invalidation happened first.
-+	 */
-+	dsb(nsh);
-+	__tlbi(vmalle1);
-+	dsb(nsh);
-+	isb();
-+
-+	__tlb_switch_to_host(&cxt);
-+}
-+
- void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu)
- {
- 	struct tlb_inv_context cxt;
--- 
-2.39.0.314.g84b9a713c41-goog
+> But if you really want a function, that should be a pre-patch that also updates the other areas that directly use ghcb_version.
 
+There is only one such reference other than this one, will use ghcb_version directly.
+
+Regards
+Nikunj
+
+ 
