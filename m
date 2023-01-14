@@ -2,97 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BF70B66AAA7
-	for <lists+kvm@lfdr.de>; Sat, 14 Jan 2023 10:46:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B0C866AAB3
+	for <lists+kvm@lfdr.de>; Sat, 14 Jan 2023 10:49:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbjANJq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 14 Jan 2023 04:46:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37672 "EHLO
+        id S230096AbjANJtn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 14 Jan 2023 04:49:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229515AbjANJqz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 14 Jan 2023 04:46:55 -0500
-X-Greylist: delayed 450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 14 Jan 2023 01:46:54 PST
-Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 94FED172F
-        for <kvm@vger.kernel.org>; Sat, 14 Jan 2023 01:46:54 -0800 (PST)
-Received: from pop-os.home ([86.243.2.178])
-        by smtp.orange.fr with ESMTPA
-        id Gd0Qp24IHA7XxGd0RpTOKO; Sat, 14 Jan 2023 10:39:23 +0100
-X-ME-Helo: pop-os.home
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 14 Jan 2023 10:39:23 +0100
-X-ME-IP: 86.243.2.178
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        kvm@vger.kernel.org
-Subject: [PATCH v2] KVM: x86/mmu: Use kstrtobool() instead of strtobool()
-Date:   Sat, 14 Jan 2023 10:39:11 +0100
-Message-Id: <670882aa04dbdd171b46d3b20ffab87158454616.1673689135.git.christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S229823AbjANJtl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 14 Jan 2023 04:49:41 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206A34495;
+        Sat, 14 Jan 2023 01:49:41 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 4D853CE094D;
+        Sat, 14 Jan 2023 09:49:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03A94C433D2;
+        Sat, 14 Jan 2023 09:49:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1673689777;
+        bh=TT7LW8NCfKZAZ5tbf26aWuoR1X/W1r0kjlbWoecMFvQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ixzhz22seGNw/OP0JpgNyx/ah7L3JyrV6HZxGOsyv9U53FnmT+2AyfotkEyBXd/9T
+         C1QV5Xg58Azz/jTLhy7qNhErPV+/FLBI1TYB3ImiRwCaUp1zUZpWUYNfbM6pC6+dWa
+         jycK19ZGi2ZeybUJ4firnEn0q/mVtZu/a6N8+iK8=
+Date:   Sat, 14 Jan 2023 10:49:34 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Cc:     stable@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org,
+        kvm@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Darren Kenny <darren.kenny@oracle.com>,
+        Liam Merwick <liam.merwick@oracle.com>
+Subject: Re: 5.15.y backport request to fix compilation error in selftests/kvm
+Message-ID: <Y8J6rmzmwoZq4g19@kroah.com>
+References: <2322a626-ac5a-9400-82bf-3aaccc5fddb7@oracle.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <2322a626-ac5a-9400-82bf-3aaccc5fddb7@oracle.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-strtobool() is the same as kstrtobool().
-However, the latter is more used within the kernel.
+On Fri, Jan 13, 2023 at 03:32:25PM +0530, Harshit Mogalapalli wrote:
+> Hi,
+> 
+> On arm machine we have a compilation error while building
+> tools/testing/selftests/kvm/ with LTS 5.15.y kernel
+> 
+> rseq_test.c: In function ‘main’:
+> rseq_test.c:236:33: warning: implicit declaration of function ‘gettid’; did
+> you mean ‘getgid’? [-Wimplicit-function-declaration]
+>           (void *)(unsigned long)gettid());
+>                                  ^~~~~~
+>                                  getgid
+> /tmp/cc4Wfmv2.o: In function `main':
+> /home/test/linux/tools/testing/selftests/kvm/rseq_test.c:236: undefined
+> reference to `gettid'
+> collect2: error: ld returned 1 exit status
+> make: *** [../lib.mk:151:
+> /home/test/linux/tools/testing/selftests/kvm/rseq_test] Error 1
+> make: Leaving directory '/home/test/linux/tools/testing/selftests/kvm'
+> 
+> 
+> This is fixed by commit 561cafebb2cf97b0927b4fb0eba22de6200f682e upstream.
+> Kernel version to apply: 5.15.y LTS
+> 
+> Could we please backport the above fix onto 5.15.y LTS. It applies cleanly
+> and the kvm selftests compile properly after applying the patch.
 
-In order to remove strtobool() and slightly simplify kstrtox.h, switch to
-the other function name.
+Now queued up, thanks.
 
-While at it, include the corresponding header file (<linux/kstrtox.h>)
-
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
-This patch was already sent as a part of a serie ([1]) that axed all usages
-of strtobool().
-Most of the patches have been merged in -next.
-
-I synch'ed with latest -next and re-send the remaining ones as individual
-patches.
-
-Changes in v2:
-  - synch with latest -next.
-
-[1]: https://lore.kernel.org/all/cover.1667336095.git.christophe.jaillet@wanadoo.fr/
----
- arch/x86/kvm/mmu/mmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 9c7198544195..699f7eac5070 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -43,6 +43,7 @@
- #include <linux/uaccess.h>
- #include <linux/hash.h>
- #include <linux/kern_levels.h>
-+#include <linux/kstrtox.h>
- #include <linux/kthread.h>
- 
- #include <asm/page.h>
-@@ -6752,7 +6753,7 @@ static int set_nx_huge_pages(const char *val, const struct kernel_param *kp)
- 		new_val = 1;
- 	else if (sysfs_streq(val, "auto"))
- 		new_val = get_nx_auto_mode();
--	else if (strtobool(val, &new_val) < 0)
-+	else if (kstrtobool(val, &new_val) < 0)
- 		return -EINVAL;
- 
- 	__set_nx_huge_pages(new_val);
--- 
-2.34.1
-
+greg k-h
