@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8264C66B25C
-	for <lists+kvm@lfdr.de>; Sun, 15 Jan 2023 17:03:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E85DF66B25E
+	for <lists+kvm@lfdr.de>; Sun, 15 Jan 2023 17:03:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231488AbjAOQDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Jan 2023 11:03:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59630 "EHLO
+        id S231199AbjAOQDU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Jan 2023 11:03:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbjAOQCb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Jan 2023 11:02:31 -0500
+        with ESMTP id S231638AbjAOQCt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Jan 2023 11:02:49 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DAF512F0B;
-        Sun, 15 Jan 2023 08:01:04 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC4B4113D9;
+        Sun, 15 Jan 2023 08:01:10 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9063360DB7;
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BB75A60DB4;
+        Sun, 15 Jan 2023 16:00:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 734EEC433F2;
         Sun, 15 Jan 2023 16:00:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44865C433F0;
-        Sun, 15 Jan 2023 16:00:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673798447;
-        bh=s7J/q6ens2rvlMJbJ7trLTcT6RXo2JnK5jMkTSfRtMo=;
+        s=k20201202; t=1673798450;
+        bh=iakCU13SXpMb3pcvjfiiLXGeB5RnCPEYfg/spzK7YxA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pQqMj/xHEQwbw+5FY9+0PCbjT5rLLxbuoK4DmTfSFXurT3Rag8x+BAzog2vcqFeMw
-         6U2jKpV0OwE4QfTGaQkyCUdJUMf/73j6xR93psfXCrVvbfPpeAw6LkSz0A4GRX64tr
-         aG3tyewFjywmsFtWBDriVSfzmUCXUg8LCDH+7KKYecXx6XJx6HJdLhyKbTyx29Wa5p
-         onS52FZ6zDvxHF6VCjAI17qmsX2pvjfYuH9B2MjfQlHay5FcUtZSc0bJuBErg5EdiV
-         8isVTjjJyTfBZ54y3Wlv7uOd4b6aGOQLFDi/k/RuCiohdrq67LB7z5yGqvMaH1XsKj
-         At9z/v8HpdVaw==
+        b=YFsX2798RH2/WfNI9HHQCYXHNW1bUf1ArkkBSr69Rr2lJJvWGOiPDtVLiO1odYcFI
+         FiRlgOJJT+O3oSBPJ0I6r1UGoc11hDm4rE0KR/E09DmoKqrEr431OKEhw7gc7TdqLE
+         I+8EUgZEsz+2n/Fy1K+47j4wdpGdf3R3GIGQcEBmI5mUSKnqgll3HNaoritJ2htdTs
+         smqYlOT8WyotGQQDOC0I95gTulbUA63Tybo2OrIMd/dmjJdqTay9YPa5H9wwI5sTOe
+         J4BBsV4XlnNSpCaPkijrjtGIrRyaXWOcNa4JZ4p8HZggjQr6u7OvDiW90QeLe2aCur
+         CqHDyLBzZgEcA==
 From:   Jisheng Zhang <jszhang@kernel.org>
 To:     Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -43,9 +43,9 @@ To:     Paul Walmsley <paul.walmsley@sifive.com>,
 Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
         Guo Ren <guoren@kernel.org>
-Subject: [PATCH v4 11/13] riscv: cpu_relax: switch to riscv_has_extension_likely()
-Date:   Sun, 15 Jan 2023 23:49:51 +0800
-Message-Id: <20230115154953.831-12-jszhang@kernel.org>
+Subject: [PATCH v4 12/13] riscv: KVM: Switch has_svinval() to riscv_has_extension_unlikely()
+Date:   Sun, 15 Jan 2023 23:49:52 +0800
+Message-Id: <20230115154953.831-13-jszhang@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230115154953.831-1-jszhang@kernel.org>
 References: <20230115154953.831-1-jszhang@kernel.org>
@@ -60,31 +60,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Switch cpu_relax() from static branch to the new helper
-riscv_has_extension_likely()
+From: Andrew Jones <ajones@ventanamicro.com>
 
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+Switch has_svinval() from static branch to the new helper
+riscv_has_extension_unlikely().
+
+Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
 Reviewed-by: Guo Ren <guoren@kernel.org>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- arch/riscv/include/asm/vdso/processor.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/riscv/kvm/tlb.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/arch/riscv/include/asm/vdso/processor.h b/arch/riscv/include/asm/vdso/processor.h
-index fa70cfe507aa..edf0e25e43d1 100644
---- a/arch/riscv/include/asm/vdso/processor.h
-+++ b/arch/riscv/include/asm/vdso/processor.h
-@@ -10,7 +10,7 @@
+diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
+index 309d79b3e5cd..aa3da18ad873 100644
+--- a/arch/riscv/kvm/tlb.c
++++ b/arch/riscv/kvm/tlb.c
+@@ -15,8 +15,7 @@
+ #include <asm/hwcap.h>
+ #include <asm/insn-def.h>
  
- static inline void cpu_relax(void)
- {
--	if (!static_branch_likely(&riscv_isa_ext_keys[RISCV_ISA_EXT_KEY_ZIHINTPAUSE])) {
-+	if (!riscv_has_extension_likely(RISCV_ISA_EXT_ZIHINTPAUSE)) {
- #ifdef __riscv_muldiv
- 		int dummy;
- 		/* In lieu of a halt instruction, induce a long-latency stall. */
+-#define has_svinval()	\
+-	static_branch_unlikely(&riscv_isa_ext_keys[RISCV_ISA_EXT_KEY_SVINVAL])
++#define has_svinval()	riscv_has_extension_unlikely(RISCV_ISA_EXT_SVINVAL)
+ 
+ void kvm_riscv_local_hfence_gvma_vmid_gpa(unsigned long vmid,
+ 					  gpa_t gpa, gpa_t gpsz,
 -- 
 2.38.1
 
