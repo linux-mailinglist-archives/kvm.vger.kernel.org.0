@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2929E66B24C
-	for <lists+kvm@lfdr.de>; Sun, 15 Jan 2023 17:00:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14FE766B24E
+	for <lists+kvm@lfdr.de>; Sun, 15 Jan 2023 17:01:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230508AbjAOQAh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Jan 2023 11:00:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59702 "EHLO
+        id S231573AbjAOQBC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Jan 2023 11:01:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231512AbjAOQAa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Jan 2023 11:00:30 -0500
+        with ESMTP id S231539AbjAOQAt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Jan 2023 11:00:49 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0695D10AA3;
-        Sun, 15 Jan 2023 08:00:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DEDD10426;
+        Sun, 15 Jan 2023 08:00:30 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id AD5B2B80B86;
-        Sun, 15 Jan 2023 16:00:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1EE3C433F1;
-        Sun, 15 Jan 2023 16:00:21 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2252FB80B57;
+        Sun, 15 Jan 2023 16:00:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3D2FC4339B;
+        Sun, 15 Jan 2023 16:00:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673798424;
-        bh=MBqOT6Dn2xWnMUPTimSWb1S2FBQlANOrjBTxRpgF3Ec=;
+        s=k20201202; t=1673798427;
+        bh=EUOTCCvK3BHS1pXfvH2BWP1K07d19xWmUCZHwihqXEQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uMU+GHWCSYdVhoI7WVAMFlQhU+NeBibCeUvYzk/5xPRBFNdVnSTXTq5nmvqmd9zfH
-         jgceZoufvIXcLgPp8P+BoOfDjoFaFQIcIyIuI3a+Afi2oLYMm0DcoJpdPhBbxGOhO6
-         ZSYa/0a+MqDRktdr+zNZbWkoZuM7Era1qguDFp+dzGnS4tnez1C2O28nUJSCbUAuD4
-         D4E40d5fJ1bx+NmHtqHpK9AOusV/70vPmEebxSEPOILwR5eJuJ7SBrIq1w1pw/36MI
-         53iXIS9qQATCgdrnhuqJqQxngloJ22yEK5AxOfLek12SoRfoYaCPnX0apV38RcyuvQ
-         lyLMrd5kjGPRA==
+        b=IyaKhZ/O6P3f7A84a7Mw65DbbtwySU8FHZUpDYH5rMVUn5TACJ0lE35OOY2tMrSCt
+         lJp6+2oW4CX+R33fdtERPdljP4YWsgHv19MdNMi5SiHbKNVMQ3wyE+5X2/pHjVE0l+
+         hoV6VU4BGHlE+mYgCtrkDmAL+LkeXLtTIjQbYDyi4356m1BDtAvaU208rp/pC9QD9n
+         1Jr1e01kNzsfv+t92drf0Sc6Pw0MrtdEkw2AYvGVpQQ95eVR23t3GLmM8n/diSvSAK
+         4XtxUhihzUefRaNaGGnDWnr2vX6GvQkVmgGIEn/83x6uni6DB47U0FJK6U2nSLQFr4
+         vCqqiPbQzaVCg==
 From:   Jisheng Zhang <jszhang@kernel.org>
 To:     Paul Walmsley <paul.walmsley@sifive.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -42,9 +42,9 @@ To:     Paul Walmsley <paul.walmsley@sifive.com>,
         Andrew Jones <ajones@ventanamicro.com>
 Cc:     linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Subject: [PATCH v4 04/13] riscv: hwcap: make ISA extension ids can be used in asm
-Date:   Sun, 15 Jan 2023 23:49:44 +0800
-Message-Id: <20230115154953.831-5-jszhang@kernel.org>
+Subject: [PATCH v4 05/13] riscv: cpufeature: extend riscv_cpufeature_patch_func to all ISA extensions
+Date:   Sun, 15 Jan 2023 23:49:45 +0800
+Message-Id: <20230115154953.831-6-jszhang@kernel.org>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230115154953.831-1-jszhang@kernel.org>
 References: <20230115154953.831-1-jszhang@kernel.org>
@@ -59,88 +59,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-So that ISA extensions can be used in assembly files, convert the
-multi-letter RISC-V ISA extension IDs enums to macros.
-In order to make them visible, move the #ifndef __ASSEMBLY__ guard
-to a later point in the header
+riscv_cpufeature_patch_func() currently only scans a limited set of
+cpufeatures, explicitly defined with macros. Extend it to probe for all
+ISA extensions.
 
 Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-Reviewed-by: Heiko Stuebner <heiko@sntech.de>
 Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 ---
- arch/riscv/include/asm/hwcap.h | 45 ++++++++++++++++------------------
- 1 file changed, 21 insertions(+), 24 deletions(-)
+ arch/riscv/include/asm/errata_list.h |  9 ++--
+ arch/riscv/kernel/cpufeature.c       | 63 ++++------------------------
+ 2 files changed, 11 insertions(+), 61 deletions(-)
 
-diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-index 86328e3acb02..09a7767723f6 100644
---- a/arch/riscv/include/asm/hwcap.h
-+++ b/arch/riscv/include/asm/hwcap.h
-@@ -12,20 +12,6 @@
- #include <linux/bits.h>
- #include <uapi/asm/hwcap.h>
+diff --git a/arch/riscv/include/asm/errata_list.h b/arch/riscv/include/asm/errata_list.h
+index 4180312d2a70..274c6f889602 100644
+--- a/arch/riscv/include/asm/errata_list.h
++++ b/arch/riscv/include/asm/errata_list.h
+@@ -7,6 +7,7 @@
  
--#ifndef __ASSEMBLY__
--#include <linux/jump_label.h>
+ #include <asm/alternative.h>
+ #include <asm/csr.h>
++#include <asm/hwcap.h>
+ #include <asm/vendorid_list.h>
+ 
+ #ifdef CONFIG_ERRATA_SIFIVE
+@@ -22,10 +23,6 @@
+ #define	ERRATA_THEAD_NUMBER 3
+ #endif
+ 
+-#define	CPUFEATURE_SVPBMT 0
+-#define	CPUFEATURE_ZICBOM 1
+-#define	CPUFEATURE_NUMBER 2
+-
+ #ifdef __ASSEMBLY__
+ 
+ #define ALT_INSN_FAULT(x)						\
+@@ -55,7 +52,7 @@ asm(ALTERNATIVE("sfence.vma %0", "sfence.vma", SIFIVE_VENDOR_ID,	\
+ #define ALT_SVPBMT(_val, prot)						\
+ asm(ALTERNATIVE_2("li %0, 0\t\nnop",					\
+ 		  "li %0, %1\t\nslli %0,%0,%3", 0,			\
+-			CPUFEATURE_SVPBMT, CONFIG_RISCV_ISA_SVPBMT,	\
++			RISCV_ISA_EXT_SVPBMT, CONFIG_RISCV_ISA_SVPBMT,	\
+ 		  "li %0, %2\t\nslli %0,%0,%4", THEAD_VENDOR_ID,	\
+ 			ERRATA_THEAD_PBMT, CONFIG_ERRATA_THEAD_PBMT)	\
+ 		: "=r"(_val)						\
+@@ -129,7 +126,7 @@ asm volatile(ALTERNATIVE_2(						\
+ 	"add a0, a0, %0\n\t"						\
+ 	"2:\n\t"							\
+ 	"bltu a0, %2, 3b\n\t"						\
+-	"nop", 0, CPUFEATURE_ZICBOM, CONFIG_RISCV_ISA_ZICBOM,		\
++	"nop", 0, RISCV_ISA_EXT_ZICBOM, CONFIG_RISCV_ISA_ZICBOM,	\
+ 	"mv a0, %1\n\t"							\
+ 	"j 2f\n\t"							\
+ 	"3:\n\t"							\
+diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+index 37e8c5e69754..6db8b31d9149 100644
+--- a/arch/riscv/kernel/cpufeature.c
++++ b/arch/riscv/kernel/cpufeature.c
+@@ -275,58 +275,11 @@ void __init riscv_fill_hwcap(void)
+ }
+ 
+ #ifdef CONFIG_RISCV_ALTERNATIVE
+-static bool __init_or_module cpufeature_probe_svpbmt(unsigned int stage)
+-{
+-	if (!IS_ENABLED(CONFIG_RISCV_ISA_SVPBMT))
+-		return false;
+-
+-	if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+-		return false;
+-
+-	return riscv_isa_extension_available(NULL, SVPBMT);
+-}
+-
+-static bool __init_or_module cpufeature_probe_zicbom(unsigned int stage)
+-{
+-	if (!IS_ENABLED(CONFIG_RISCV_ISA_ZICBOM))
+-		return false;
+-
+-	if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+-		return false;
+-
+-	if (!riscv_isa_extension_available(NULL, ZICBOM))
+-		return false;
+-
+-	return true;
+-}
+-
 -/*
-- * This yields a mask that user programs can use to figure out what
-- * instruction set this cpu supports.
+- * Probe presence of individual extensions.
+- *
+- * This code may also be executed before kernel relocation, so we cannot use
+- * addresses generated by the address-of operator as they won't be valid in
+- * this context.
 - */
--#define ELF_HWCAP		(elf_hwcap)
+-static u32 __init_or_module cpufeature_probe(unsigned int stage)
+-{
+-	u32 cpu_req_feature = 0;
 -
--enum {
--	CAP_HWCAP = 1,
--};
+-	if (cpufeature_probe_svpbmt(stage))
+-		cpu_req_feature |= BIT(CPUFEATURE_SVPBMT);
 -
--extern unsigned long elf_hwcap;
+-	if (cpufeature_probe_zicbom(stage))
+-		cpu_req_feature |= BIT(CPUFEATURE_ZICBOM);
 -
- #define RISCV_ISA_EXT_a		('a' - 'a')
- #define RISCV_ISA_EXT_c		('c' - 'a')
- #define RISCV_ISA_EXT_d		('d' - 'a')
-@@ -46,22 +32,33 @@ extern unsigned long elf_hwcap;
- #define RISCV_ISA_EXT_BASE 26
+-	return cpu_req_feature;
+-}
+-
+ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
+ 						  struct alt_entry *end,
+ 						  unsigned int stage)
+ {
+-	u32 cpu_req_feature = cpufeature_probe(stage);
+ 	struct alt_entry *alt;
+-	u32 tmp;
  
- /*
-- * This enum represent the logical ID for each multi-letter RISC-V ISA extension.
-+ * These macros represent the logical ID for each multi-letter RISC-V ISA extension.
-  * The logical ID should start from RISCV_ISA_EXT_BASE and must not exceed
-  * RISCV_ISA_EXT_MAX. 0-25 range is reserved for single letter
-  * extensions while all the multi-letter extensions should define the next
-  * available logical extension id.
-  */
--enum riscv_isa_ext_id {
--	RISCV_ISA_EXT_SSCOFPMF = RISCV_ISA_EXT_BASE,
--	RISCV_ISA_EXT_SVPBMT,
--	RISCV_ISA_EXT_ZICBOM,
--	RISCV_ISA_EXT_ZIHINTPAUSE,
--	RISCV_ISA_EXT_SSTC,
--	RISCV_ISA_EXT_SVINVAL,
--	RISCV_ISA_EXT_ID_MAX
-+#define RISCV_ISA_EXT_SSCOFPMF		26
-+#define RISCV_ISA_EXT_SVPBMT		27
-+#define RISCV_ISA_EXT_ZICBOM		28
-+#define RISCV_ISA_EXT_ZIHINTPAUSE	29
-+#define RISCV_ISA_EXT_SSTC		30
-+#define RISCV_ISA_EXT_SVINVAL		31
-+
-+#ifndef __ASSEMBLY__
-+#include <linux/jump_label.h>
-+/*
-+ * This yields a mask that user programs can use to figure out what
-+ * instruction set this cpu supports.
-+ */
-+#define ELF_HWCAP		(elf_hwcap)
-+
-+enum {
-+	CAP_HWCAP = 1,
- };
--static_assert(RISCV_ISA_EXT_ID_MAX <= RISCV_ISA_EXT_MAX);
-+
-+extern unsigned long elf_hwcap;
-+
+ 	if (stage == RISCV_ALTERNATIVES_EARLY_BOOT)
+ 		return;
+@@ -334,18 +287,18 @@ void __init_or_module riscv_cpufeature_patch_func(struct alt_entry *begin,
+ 	for (alt = begin; alt < end; alt++) {
+ 		if (alt->vendor_id != 0)
+ 			continue;
+-		if (alt->errata_id >= CPUFEATURE_NUMBER) {
+-			WARN(1, "This feature id:%d is not in kernel cpufeature list",
++		if (alt->errata_id >= RISCV_ISA_EXT_MAX) {
++			WARN(1, "This extension id:%d is not in ISA extension list",
+ 				alt->errata_id);
+ 			continue;
+ 		}
  
- /*
-  * This enum represents the logical ID for each RISC-V ISA extension static
+-		tmp = (1U << alt->errata_id);
+-		if (cpu_req_feature & tmp) {
+-			patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
+-			riscv_alternative_fix_offsets(alt->old_ptr, alt->alt_len,
+-						      alt->old_ptr - alt->alt_ptr);
+-		}
++		if (!__riscv_isa_extension_available(NULL, alt->errata_id))
++			continue;
++
++		patch_text_nosync(alt->old_ptr, alt->alt_ptr, alt->alt_len);
++		riscv_alternative_fix_offsets(alt->old_ptr, alt->alt_len,
++					      alt->old_ptr - alt->alt_ptr);
+ 	}
+ }
+ #endif
 -- 
 2.38.1
 
