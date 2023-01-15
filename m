@@ -2,146 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0EE7166B012
-	for <lists+kvm@lfdr.de>; Sun, 15 Jan 2023 10:06:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3C71266B03A
+	for <lists+kvm@lfdr.de>; Sun, 15 Jan 2023 10:57:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230088AbjAOJGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Jan 2023 04:06:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38104 "EHLO
+        id S230354AbjAOJ5w (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Jan 2023 04:57:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229893AbjAOJGh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Jan 2023 04:06:37 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0424B463
-        for <kvm@vger.kernel.org>; Sun, 15 Jan 2023 01:05:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673773549;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=SgGQvfVNgJuj9/GzR9Kg0QVkCdAd9T5sROwhixs1ZQs=;
-        b=IsdV8GZsLm3Hyw2XUyLUu334BBsCQlC4qYQcvTR7JwStjx9C/r2ag4WCZ1Ju8x7bleisl1
-        Km4E3vZPLh6pXWiYUBSWo5QQ7jQVK36KQJmvS00BtY/FeUTfMA/VAhHOTYXhDOVGO6Q3jd
-        +NElTyJaGz0EsnPYaH1bneL5PKaHzbc=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-526-ZwWKBcTeMFOPFEL2j-Kuug-1; Sun, 15 Jan 2023 04:05:48 -0500
-X-MC-Unique: ZwWKBcTeMFOPFEL2j-Kuug-1
-Received: by mail-wm1-f71.google.com with SMTP id bi6-20020a05600c3d8600b003da1f6a7b20so2303608wmb.0
-        for <kvm@vger.kernel.org>; Sun, 15 Jan 2023 01:05:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SgGQvfVNgJuj9/GzR9Kg0QVkCdAd9T5sROwhixs1ZQs=;
-        b=a/dvyI91oToIYqt/yODORwWFS+9CFv3DTs84NDrAU4qwjuaoRBK/lQrBS+dNaAsjLN
-         hZxKrPvkwhIiwvWfQJWwH8SEnEn36+guNPBCLIUsnt+mma7YtDaRqqrIBTcWbXAIoE/O
-         G146YW89CGy8yqqnAGHlC7vvZhbbBOfvq87w83ROfGf0weOcMhuHk7FOpTqhvIFE7wr3
-         0o8KxtA0mfGolAjX3vEbZWdiT+F3X2q7bMNIAQTe6XNX9rtDzixBOojjec74wmxVcYur
-         c4QIbSKPVKnnrlx9fGa3fjMHyCm0ByOjHqtS4z2CSBFrc3IrkO5tZnvB+RRdpNu9ujBB
-         PSZw==
-X-Gm-Message-State: AFqh2kpn5QfV/rCjtqx40+wPpqbYOhKRS2vIGeyAF/RxgNXqjb57Q9SU
-        SoRg9ZUdglyVkHj0m3IWF29w3/TBzDNZKEJWlp1ZDLCy+sAJG35kc416wy6AZLhJ+ElYuWInkY7
-        y1+SiRYs468L7sVD1DVXOrwkXBBvAfnh8X6mjdtjueUzxgUx3PqI1JvpNhl5bEBiw
-X-Received: by 2002:a05:600c:4f48:b0:3c6:f7ff:6f87 with SMTP id m8-20020a05600c4f4800b003c6f7ff6f87mr64595639wmq.11.1673773546769;
-        Sun, 15 Jan 2023 01:05:46 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvG0UTe3PnFsXLNSWaN/0Y8lIxlhLDD8rQaPYwl7/ETxnfRiEClOA1ADPWsTTif+A21ALm0Qw==
-X-Received: by 2002:a05:600c:4f48:b0:3c6:f7ff:6f87 with SMTP id m8-20020a05600c4f4800b003c6f7ff6f87mr64595609wmq.11.1673773546510;
-        Sun, 15 Jan 2023 01:05:46 -0800 (PST)
-Received: from starship ([89.237.103.62])
-        by smtp.gmail.com with ESMTPSA id w12-20020a05600c474c00b003d1e1f421bfsm13685107wmo.10.2023.01.15.01.05.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Jan 2023 01:05:45 -0800 (PST)
-Message-ID: <49b74c43e4d6ba065b48f4a7c82759e28b4acc0f.camel@redhat.com>
-Subject: Re: [PATCH v2 00/11] SVM: vNMI (with my fixes)
-From:   Maxim Levitsky <mlevitsk@redhat.com>
-To:     kvm@vger.kernel.org
-Cc:     Sandipan Das <sandipan.das@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Babu Moger <babu.moger@amd.com>, linux-kernel@vger.kernel.org,
-        Jing Liu <jing2.liu@intel.com>,
-        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Sean Christopherson <seanjc@google.com>
-Date:   Sun, 15 Jan 2023 11:05:43 +0200
-In-Reply-To: <20221129193717.513824-1-mlevitsk@redhat.com>
-References: <20221129193717.513824-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S230215AbjAOJ5v (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Jan 2023 04:57:51 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 672C5C16C
+        for <kvm@vger.kernel.org>; Sun, 15 Jan 2023 01:57:47 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E5C5660C7C
+        for <kvm@vger.kernel.org>; Sun, 15 Jan 2023 09:57:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36CB8C433EF;
+        Sun, 15 Jan 2023 09:57:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673776666;
+        bh=T2l7rMVLYqkYyoSUDH5J6JWWdmQnXzqS7yg34bYgbq8=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FMDJas5Sfv9UtEXNDgm52QVJK6AJTXZzEnQLF884NsBvtV4z/whDoaiH5DzYh/v4f
+         06TayZ3xife+sVwMn+DQcVI7NnaeOiImlQuAFJDooez5fBF7AE780W/FGq2qg4VahI
+         ms5buo+KJMfRrJ0gFzdZM4kLBT+b26fKa96CJvxdDmXcJSO6ej87pCi+Da9Q6eWJX4
+         UecaHygbcSlc+mXzAlDt98yyjqI3szLIhLlJxzbJRZ824bM6Jseg4fJAqvSxpqABux
+         cc7gmYcr2k0IXrStU+VWc4IwUKaoN8WqU1bIyl3+0qcxahjxFsvGcN98iU86Ta3sOT
+         4rh95ZwkhEcwQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pGzln-001stx-T2;
+        Sun, 15 Jan 2023 09:57:43 +0000
+Date:   Sun, 15 Jan 2023 09:56:36 +0000
+Message-ID: <87h6wsdstn.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Shivam Kumar <shivam.kumar1@nutanix.com>
+Cc:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
+        james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com,
+        kvm@vger.kernel.org, Shaju Abraham <shaju.abraham@nutanix.com>,
+        Manish Mishra <manish.mishra@nutanix.com>,
+        Anurag Madnawat <anurag.madnawat@nutanix.com>
+Subject: Re: [PATCH v7 1/4] KVM: Implement dirty quota-based throttling of vcpus
+In-Reply-To: <4df8b276-595f-1ad7-4ce5-62435ea93032@nutanix.com>
+References: <20221113170507.208810-1-shivam.kumar1@nutanix.com>
+        <20221113170507.208810-2-shivam.kumar1@nutanix.com>
+        <86zgcpo00m.wl-maz@kernel.org>
+        <18b66b42-0bb4-4b32-e92c-3dce61d8e6a4@nutanix.com>
+        <86mt8iopb7.wl-maz@kernel.org>
+        <dfa49851-da9d-55f8-7dec-73a9cf985713@nutanix.com>
+        <86ilinqi3l.wl-maz@kernel.org>
+        <Y5DvJQWGwYRvlhZz@google.com>
+        <b55b79b1-9c47-960a-860b-b669ed78abc0@nutanix.com>
+        <eafbcd77-aab1-4e82-d53e-1bcc87225549@nutanix.com>
+        <874jtifpg0.wl-maz@kernel.org>
+        <77408d91-655a-6f51-5a3e-258e8ff7c358@nutanix.com>
+        <87r0w6dnor.wl-maz@kernel.org>
+        <4df8b276-595f-1ad7-4ce5-62435ea93032@nutanix.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: shivam.kumar1@nutanix.com, seanjc@google.com, pbonzini@redhat.com, james.morse@arm.com, borntraeger@linux.ibm.com, david@redhat.com, kvm@vger.kernel.org, shaju.abraham@nutanix.com, manish.mishra@nutanix.com, anurag.madnawat@nutanix.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 2022-11-29 at 21:37 +0200, Maxim Levitsky wrote:
-> Hi!
-> 
-> This is the vNMI patch series based on Santosh Shukla's vNMI patch series.
-> 
-> In this version of this patch series I addressed most of the review feedback
-> added some more refactoring and also I think fixed the issue with migration.
-> 
-> I only tested this on a machine which doesn't have vNMI, so this does need
-> some testing to ensure that nothing is broken.
-> 
-> Best regards,
->        Maxim Levitsky
-> 
-> Maxim Levitsky (9):
->   KVM: nSVM: don't sync back tlb_ctl on nested VM exit
->   KVM: nSVM: clean up the copying of V_INTR bits from vmcb02 to vmcb12
->   KVM: nSVM: explicitly raise KVM_REQ_EVENT on nested VM exit if L1
->     doesn't intercept interrupts
->   KVM: SVM: drop the SVM specific H_FLAGS
->   KVM: x86: emulator: stop using raw host flags
->   KVM: SVM: add wrappers to enable/disable IRET interception
->   KVM: x86: add a delayed hardware NMI injection interface
->   KVM: SVM: implement support for vNMI
->   KVM: nSVM: implement support for nested VNMI
-> 
-> Santosh Shukla (2):
->   x86/cpu: Add CPUID feature bit for VNMI
->   KVM: SVM: Add VNMI bit definition
-> 
->  arch/x86/include/asm/cpufeatures.h |   1 +
->  arch/x86/include/asm/kvm-x86-ops.h |   2 +
->  arch/x86/include/asm/kvm_host.h    |  24 +++--
->  arch/x86/include/asm/svm.h         |   7 ++
->  arch/x86/kvm/emulate.c             |  11 +--
->  arch/x86/kvm/kvm_emulate.h         |   7 +-
->  arch/x86/kvm/smm.c                 |   2 -
->  arch/x86/kvm/svm/nested.c          | 102 ++++++++++++++++---
->  arch/x86/kvm/svm/svm.c             | 154 ++++++++++++++++++++++-------
->  arch/x86/kvm/svm/svm.h             |  41 +++++++-
->  arch/x86/kvm/x86.c                 |  50 ++++++++--
->  11 files changed, 318 insertions(+), 83 deletions(-)
-> 
-> -- 
-> 2.26.3
+On Sat, 14 Jan 2023 13:07:44 +0000,
+Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
 > 
 > 
-Another kind ping on this patch series.
+> 
+> On 08/01/23 3:14 am, Marc Zyngier wrote:
+> > On Sat, 07 Jan 2023 17:24:24 +0000,
+> > Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> >> On 26/12/22 3:37 pm, Marc Zyngier wrote:
+> >>> On Sun, 25 Dec 2022 16:50:04 +0000,
+> >>> Shivam Kumar <shivam.kumar1@nutanix.com> wrote:
+> >>>> 
+> >>>> Hi Marc,
+> >>>> Hi Sean,
+> >>>> 
+> >>>> Please let me know if there's any further question or feedback.
+> >>> 
+> >>> My earlier comments still stand: the proposed API is not usable as a
+> >>> general purpose memory-tracking API because it counts faults instead
+> >>> of memory, making it inadequate except for the most trivial cases.
+> >>> And I cannot believe you were serious when you mentioned that you were
+> >>> happy to make that the API.
+> >>> 
+> >>> This requires some serious work, and this series is not yet near a
+> >>> state where it could be merged.
+> >>> 
+> >>> Thanks,
+> >>> 
+> >>> 	M.
+> >>> 
+> >> 
+> >> Hi Marc,
+> >> 
+> >> IIUC, in the dirty ring interface too, the dirty_index variable is
+> >> incremented in the mark_page_dirty_in_slot function and it is also
+> >> count-based. At least on x86, I am aware that for dirty tracking we
+> >> have uniform granularity as huge pages (2MB pages) too are broken into
+> >> 4K pages and bitmap is at 4K-granularity. Please let me know if it is
+> >> possible to have multiple page sizes even during dirty logging on
+> >> ARM. And if that is the case, I am wondering how we handle the bitmap
+> >> with different page sizes on ARM.
+> > 
+> > Easy. It *is* page-size, by the very definition of the API which
+> > explicitly says that a single bit represent one basic page. If you
+> > were to only break 1GB mappings into 2MB blocks, you'd have to mask
+> > 512 pages dirty at once, no question asked.
+> > 
+> > Your API is different because at no point it implies any relationship
+> > with any page size. As it stands, it is a useless API. I understand
+> > that you are only concerned with your particular use case, but that's
+> > nowhere good enough. And it has nothing to do with ARM. This is
+> > equally broken on *any* architecture.
+> > 
+> >> I agree that the notion of pages dirtied according to our
+> >> pages_dirtied variable depends on how we are handling the bitmap but
+> >> we expect the userspace to use the same granularity at which the dirty
+> >> bitmap is handled. I can capture this in documentation
+> > 
+> > But what does the bitmap have to do with any of this? This is not what
+> > your API is about. You are supposed to count dirtied memory, and you
+> > are counting page faults instead. No sane userspace can make any sense
+> > of that. You keep coupling the two, but that's wrong. This thing has
+> > to be useful on its own, not just for your particular, super narrow
+> > use case. And that's a shame because the general idea of a dirty quota
+> > is an interesting one.
+> > 
+> > If your sole intention is to capture in the documentation that the API
+> > is broken, then all I can do is to NAK the whole thing. Until you turn
+> > this page-fault quota into the dirty memory quota that you advertise,
+> > I'll continue to say no to it.
+> > 
+> > Thanks,
+> > 
+> > 	M.
+> > 
+> 
+> Thank you Marc for the suggestion. We can make dirty quota count
+> dirtied memory rather than faults.
+> 
+> run->dirty_quota -= page_size;
+>
+> We can raise a kvm request for exiting to userspace as soon as the
+> dirty quota of the vcpu becomes zero or negative. Please let me know
+> if this looks good to you.
 
-Best regards,
-	Maxim Levitsky
+It really depends what "page_size" represents here. If you mean
+"mapping size", then yes. If you really mean "page size", then no.
 
+Assuming this is indeed "mapping size", then it all depends on how
+this is integrated and how this is managed in a generic, cross
+architecture way.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
