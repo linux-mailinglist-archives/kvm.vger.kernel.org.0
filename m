@@ -2,35 +2,35 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2D8B166C1B5
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 15:14:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 07B4966C1F5
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 15:16:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232324AbjAPOOy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 09:14:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40732 "EHLO
+        id S232199AbjAPOQy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 09:16:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232500AbjAPONq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 09:13:46 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85A6725E08;
-        Mon, 16 Jan 2023 06:05:14 -0800 (PST)
+        with ESMTP id S232098AbjAPOOu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 09:14:50 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4BD32FCDD;
+        Mon, 16 Jan 2023 06:05:42 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 203BFB80FA3;
-        Mon, 16 Jan 2023 14:05:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFC69C433F2;
-        Mon, 16 Jan 2023 14:05:11 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6F6D7B80E93;
+        Mon, 16 Jan 2023 14:05:41 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0FA7BC433F1;
+        Mon, 16 Jan 2023 14:05:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1673877912;
-        bh=ssVnZrCTN+KYvMaSdEtcY+L24YAGnLtGwEcEJ5KZZVM=;
+        s=k20201202; t=1673877940;
+        bh=gVlEbhMRJccI0To3vf98R0QiVDMGDOSQFbQT4bZGtbw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=d0WZbRtxQWH5VeOUDONg2Z+pnRf6epapKbXWagka0iU8wA013qmeoq8/g0S+Ez8ex
-         FCakD8mnEepNV+Kb+YZEs9xDQHepivxRA++m/Rl3pF5goGxlLElDOA9jKCiUzrsVua
-         JoBIo4ydEofnrS19xvBzzTsPZAkJYDlwuz2A7HAcRxYuJgcAb5nO0BI1ZGZphrUXf4
-         KgR2QGTmeSO79vqxfBYyhsOh8iDuElqNTzgUnFSG1qnA6uDyMNfG6zrENk9BFRLYxf
-         rXqffq2o+LnCVlYPhOqm/t5KfQjCQaB0yMtRJkFNPYXrLoaDs1R2Xz8TgkAToULFpa
-         wHBOm0JFypOUw==
+        b=TjQd8JniZ+Vg4RcwLdlEZVdNJQZWnDII1AY7Plli6y9akBcbiUZasy40lAgzIWltx
+         QfBpawoxIUSvLfvpa2vR+XuMmMfKpIiCF9p4eN2+qkQTe/G8oT4lZL9sWfuZanwPAM
+         nodgx47epZyG3H7LtJp70bAvuoRKCFbFt+ddFxTwEGss2AWv2FOUl6lQ543yvugGpJ
+         TB9e25P4qRvqSitSBH3Ml6WPPm4EyDUt3Xy9wX+fdOlOi2PYoMYBRXXdgoY/fcB2i5
+         P+OUnxVAMT3DG5xwaS5U7D3A1cMBRykkO1oDcWRPk/zlJq+m8f/kHkXWoJA+CMiRfz
+         1j3OLeeLtal/Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Heiko Carstens <hca@linux.ibm.com>,
@@ -39,12 +39,12 @@ Cc:     Heiko Carstens <hca@linux.ibm.com>,
         Sasha Levin <sashal@kernel.org>, frankja@linux.ibm.com,
         gor@linux.ibm.com, agordeev@linux.ibm.com, kvm@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 13/17] KVM: s390: interrupt: use READ_ONCE() before cmpxchg()
-Date:   Mon, 16 Jan 2023 09:04:44 -0500
-Message-Id: <20230116140448.116034-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 11/16] KVM: s390: interrupt: use READ_ONCE() before cmpxchg()
+Date:   Mon, 16 Jan 2023 09:05:14 -0500
+Message-Id: <20230116140520.116257-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20230116140448.116034-1-sashal@kernel.org>
-References: <20230116140448.116034-1-sashal@kernel.org>
+In-Reply-To: <20230116140520.116257-1-sashal@kernel.org>
+References: <20230116140520.116257-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,7 +76,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 4 deletions(-)
 
 diff --git a/arch/s390/kvm/interrupt.c b/arch/s390/kvm/interrupt.c
-index b51ab19eb972..64d1dfe6dca5 100644
+index 8be5750fe5ac..a180fe54dc68 100644
 --- a/arch/s390/kvm/interrupt.c
 +++ b/arch/s390/kvm/interrupt.c
 @@ -81,8 +81,9 @@ static int sca_inject_ext_call(struct kvm_vcpu *vcpu, int src_id)
