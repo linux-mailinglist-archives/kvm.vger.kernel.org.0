@@ -2,187 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34DE966CDE9
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 18:48:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E90A266CE20
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 18:58:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235112AbjAPRs2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 12:48:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37522 "EHLO
+        id S232172AbjAPR6J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 12:58:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234945AbjAPRr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 12:47:58 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8845521F1
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 09:28:22 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30GF7j5x011982;
-        Mon, 16 Jan 2023 17:28:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=BXsiR46RezQbdgvDHoxnHJadI8F2TYhCrVj0OMr+Jbw=;
- b=eDxrSr4Nw0PdXteivw5JmLtimXsM+BZyGtPmb+2VN4q2dM5TuMxYjQ3uB3eefxyLJG3j
- g3ScLEiA4ECPEaWPU8N+wD5E/tZb5paT/uGz6o2IPpEH89mG15e+/eMgmn4LJzF9IQDj
- 2qoUxr639kjY/+kTM7ylxax2TWDQGCdABoCVz/UrOMWHuEaA3kvMIjW+ntbjav+8GGeZ
- OfJBqol0v+ZxwbTWiR1BJn+GOfofbs/Vc+u1dHLXgZwTDtODzTyJohnXttWhz8Ha2OvW
- Dq2jtwY7Tza1/+JrAiywCGkuwdMyrzaMDiokRP4pysG6JYrjg5psDIK4QkmWn5xfiD/A 0w== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n584n4c41-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 17:28:15 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30GHHU2V011439;
-        Mon, 16 Jan 2023 17:28:14 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n584n4c3f-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 17:28:14 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30GGVkTH004723;
-        Mon, 16 Jan 2023 17:28:12 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16jqx1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 17:28:12 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30GHS8XY24117742
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Jan 2023 17:28:08 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 16CCD20043;
-        Mon, 16 Jan 2023 17:28:08 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C9CF920040;
-        Mon, 16 Jan 2023 17:28:06 +0000 (GMT)
-Received: from [9.179.28.129] (unknown [9.179.28.129])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 16 Jan 2023 17:28:06 +0000 (GMT)
-Message-ID: <31bc88bc-d0c2-f172-939a-c7a42adb466d@linux.ibm.com>
-Date:   Mon, 16 Jan 2023 18:28:06 +0100
+        with ESMTP id S233071AbjAPR5o (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 12:57:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F40C85D116
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 09:36:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673890615;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=e7aEA9Zb0uDCPpMjGds8ZZV+xITOhP/XEPwhcG9Jlbk=;
+        b=SLmtowZ+EEoLjfNdgdgXWxPhR9xZDBM/KIGSqG1TNs++aBNSqS1e0VUNZ7TfTvfFCKV+n5
+        ZwxPOPCuPfM5+5Arx9b+bQi3yPv47sH8vDET/HQyJNl6C9KSbZOjVjVRR/SAYlTAF09+pn
+        g3RJZ3M4uTQig8axla+G+ChhJvRns/w=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-194-vcyPkahYMFmPiMC8GLo5Tg-1; Mon, 16 Jan 2023 12:36:46 -0500
+X-MC-Unique: vcyPkahYMFmPiMC8GLo5Tg-1
+Received: by mail-ej1-f71.google.com with SMTP id qf20-20020a1709077f1400b0086ec9755517so3294312ejc.15
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 09:36:46 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=e7aEA9Zb0uDCPpMjGds8ZZV+xITOhP/XEPwhcG9Jlbk=;
+        b=HMBwh4YjBFbljcLrX0IGaes2+sa0yUmIMoKKTJefNV6bdQg+Gx9LkK6zZwpgVRBzK4
+         yTX9eeF4oIgL4ELrq9JjQhNKLfq3LBAMzb0jTLcg9ZYNLBbtHesqrmty19S8zzbgK0En
+         G5W4n5AzrOMS0IIwyTNZM3QEF3iWBeqUhAh4F4sjfievBHs1ADdzvyNcGJgRC2Zslkmv
+         j0qUNpJT8c26/KsYzuBuIuBPpodeJpTFHAOIaADHlag/CO7FifZePZtobj7TJ87083f/
+         IxXamYJCzAj/WWRruT61LkpJJ8lAb8kNP07FS9OUHzjGnuoUV5/Xy5Pl4IrsCnmbNAui
+         7HqQ==
+X-Gm-Message-State: AFqh2krJnKzr3R+1GY0E0wYGBy86igXhrFc5sqTmkdeD4y2VtyLokvoE
+        ZSJwFhducxRpPaBEUhTE0if47Q+7Q1XrZJioMwKMWX8yB9yvplpc9y9UV/4qEG1jiMx88WUz1Py
+        8U/3lD+a0xeAk
+X-Received: by 2002:a17:906:cd0b:b0:84d:463f:3787 with SMTP id oz11-20020a170906cd0b00b0084d463f3787mr26828245ejb.5.1673890605560;
+        Mon, 16 Jan 2023 09:36:45 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvwkGf/AMfNoy3aPwRb/Z8qBXr1VRjGO1z90RbOn2KENCWUu1gPXT7V040gp3/OtMwrPzsLHg==
+X-Received: by 2002:a17:906:cd0b:b0:84d:463f:3787 with SMTP id oz11-20020a170906cd0b00b0084d463f3787mr26828236ejb.5.1673890605384;
+        Mon, 16 Jan 2023 09:36:45 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id e6-20020a170906314600b00781be3e7badsm12131965eje.53.2023.01.16.09.36.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Jan 2023 09:36:44 -0800 (PST)
+Message-ID: <456f6c15-3043-6da2-349d-c0c3880c1a55@redhat.com>
+Date:   Mon, 16 Jan 2023 18:36:43 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v14 01/11] s390x/cpu topology: adding s390 specificities
- to CPU topology
+ Thunderbird/102.5.1
+Subject: Re: [PATCH 2/3] rcu: Equip sleepable RCU with lockdep dependency
+ graph checks
 Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-2-pmorel@linux.ibm.com>
- <87039aeec020afbd28be77ad5f8d022126aba7bf.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <87039aeec020afbd28be77ad5f8d022126aba7bf.camel@linux.ibm.com>
+To:     paulmck@kernel.org, Boqun Feng <boqun.feng@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+        kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        David Woodhouse <dwmw2@infradead.org>, seanjc@google.com,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Luczaj <mhal@rbox.co>
+References: <20230113065955.815667-1-boqun.feng@gmail.com>
+ <20230113065955.815667-3-boqun.feng@gmail.com>
+ <20230113112949.GX4028633@paulmck-ThinkPad-P17-Gen-1>
+ <Y8GdYgSBtyKwf/qj@boqun-archlinux>
+ <20230113191120.GB4028633@paulmck-ThinkPad-P17-Gen-1>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230113191120.GB4028633@paulmck-ThinkPad-P17-Gen-1>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nS6bnC8lZ9O6Q6NphawOukC51OOxCpY9
-X-Proofpoint-GUID: CSA1M9GW0TnXMDfn4nO6ld5GE4zbtk4l
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-16_15,2023-01-13_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- impostorscore=0 malwarescore=0 phishscore=0 priorityscore=1501
- mlxlogscore=999 bulkscore=0 spamscore=0 adultscore=0 mlxscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301160127
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/13/23 17:58, Nina Schoetterl-Glausch wrote:
-> On Thu, 2023-01-05 at 15:53 +0100, Pierre Morel wrote:
->> S390 adds two new SMP levels, drawers and books to the CPU
->> topology.
->> The S390 CPU have specific toplogy features like dedication
->> and polarity to give to the guest indications on the host
->> vCPUs scheduling and help the guest take the best decisions
->> on the scheduling of threads on the vCPUs.
->>
->> Let us provide the SMP properties with books and drawers levels
->> and S390 CPU with dedication and polarity,
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   qapi/machine.json               | 14 ++++++++--
->>   include/hw/boards.h             | 10 ++++++-
->>   include/hw/s390x/cpu-topology.h | 23 ++++++++++++++++
->>   target/s390x/cpu.h              |  6 +++++
->>   hw/core/machine-smp.c           | 48 ++++++++++++++++++++++++++++-----
->>   hw/core/machine.c               |  4 +++
->>   hw/s390x/s390-virtio-ccw.c      |  2 ++
->>   softmmu/vl.c                    |  6 +++++
->>   target/s390x/cpu.c              | 10 +++++++
->>   qemu-options.hx                 |  6 +++--
->>   10 files changed, 117 insertions(+), 12 deletions(-)
->>   create mode 100644 include/hw/s390x/cpu-topology.h
->>
-> [...]
+On 1/13/23 20:11, Paul E. McKenney wrote:
+> On Fri, Jan 13, 2023 at 10:05:22AM -0800, Boqun Feng wrote:
+>> On Fri, Jan 13, 2023 at 03:29:49AM -0800, Paul E. McKenney wrote:
+>> I prefer that the first two patches go through your tree, because it
+>> reduces the synchronization among locking, rcu and KVM trees to the
+>> synchronization betwen rcu and KVM trees.
 > 
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 7d6d01325b..39ea63a416 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -131,6 +131,12 @@ struct CPUArchState {
->>   
->>   #if !defined(CONFIG_USER_ONLY)
->>       uint32_t core_id; /* PoP "CPU address", same as cpu_index */
->> +    int32_t socket_id;
->> +    int32_t book_id;
->> +    int32_t drawer_id;
->> +    int32_t dedicated;
->> +    int32_t polarity;
-> 
-> If I understood the architecture correctly, the polarity is a property of the configuration,
-> not the cpus. So this should be vertical_entitlement, and there should be a machine (?) property
-> specifying if the polarity is horizontal or vertical.
+> Very well, I have queued and pushed these with the usual wordsmithing,
+> thank you!
 
-You are right, considering PTF only, the documentation says PTF([01]) 
-does the following:
+I'm worried about this case:
 
-"... a process is initiated to place all CPUs in the configuration into 
-the polarization specified by the function code, ..."
+	CPU 0				CPU 1
+	--------------------		------------------
+	lock A				srcu lock B
+	srcu lock B			lock A
+	srcu unlock B			unlock A
+	unlock A			srcu unlock B
 
-So on one side the polarization property is explicitly set on the CPU, 
-and on the other side all CPU are supposed to be in the same 
-polarization state.
+While a bit unclean, there is nothing that downright forbids this; as 
+long as synchronize_srcu does not happen inside lock A, no deadlock can 
+occur.
 
-So yes we can make the horizontal/vertical a machine property.
-However, we do not need to set this tunable as the documentation says 
-that the machine always start with horizontal polarization.
+However, if srcu is replaced with an rwlock then lockdep should and does 
+report a deadlock.  Boqun, do you get a false positive or do your 
+patches correctly suppress this?
 
-On the other hand the documentation mixes a lot vertical with different 
-entitlement and horizontal polarization, for TLE order and slacks so I 
-prefer to keep the complete description of the polarization as CPU 
-properties in case we miss something.
+Paolo
 
-PTF([01]) are no performance bottle neck and the number of CPU is likely 
-to be small, even a maximum of 248 is possible KVM warns above 16 CPU so 
-the loop for setting all CPU inside PTF interception is not very 
-problematic I think.
-
-Doing like you say should simplify PTF interception (no loop) but 
-complicates (some more if/else) TLE handling and QMP information display 
-on CPU.
-So I will have a look at the implications and answer again on this.
-
-Thanks,
-
-Regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
