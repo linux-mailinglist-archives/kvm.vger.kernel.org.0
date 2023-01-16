@@ -2,222 +2,228 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED5D866B904
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 09:24:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 84DBC66B925
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 09:38:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232287AbjAPIYR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 03:24:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47536 "EHLO
+        id S232305AbjAPIir (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 03:38:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51422 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232035AbjAPIYP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 03:24:15 -0500
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2051.outbound.protection.outlook.com [40.107.94.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA081205D;
-        Mon, 16 Jan 2023 00:24:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T6o7wAwhtDNzKqYSnWHElxrdyYeq78RypF4TginRQqu+8M5mkfQ5nMTSPZH6dUxNMK1+abwmNf+NbqpuSkhGkK7569IYjIfuWvR8kJc5Be+U2vQzZnr8NNT9BjbD3jOOa6/iRHtW6VCcB6CpDtemXLHn4imDLryAIeRTNqOy9Boo3gprLM/RI6uNE5+FdXL2oXKn/1qaWt5gxYzXB9JG1fQbZl6gapc3z7h4t49vW9NWmhXu+y060LyAXTnnghyUPuPAS6zlo5yTlv+ktTElELYxkQ8lHhsxgqei8EQ1ma2FlVWOddNeW+7zrZONgcCCBgiYSUkk5aET2w1TU/CTaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=iCA+WWwt4p6a0LqEZaPpFYF4XG6uToQEmvNMAsfgPzQ=;
- b=VcXmbp2PFaRbMJbKQO35iMXLJ1uzvLlXUD4qnrpzZsANx1IFxY0opjtpYDw+fUGp2u20Ln6tp0Ftz2Kk2XEwsvlo6TLZZAj1Cw7KLlwPAYA4GT+BW/UhEtF3X683LQjIjW7ot28/8fBL1f20+HEHRhxc4ZUMmJmpv5/wmIKBHr+m654m/nbBPJVkjbx/c4JpnrZZ4O2k9R5I3csZpa7DOxdsPCdAA6HT6Rs8X5b8nW1CuEaFXWAotiu6bdqFnqKSig9T7fg2wLO9ojcmuKJSoiaynpasIa6FJ0kHTXox9fEApRAgwRc6WpST8Ra6KA5yVbNmqOZ3XuxUBIFSah1miw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=iCA+WWwt4p6a0LqEZaPpFYF4XG6uToQEmvNMAsfgPzQ=;
- b=eJ9A/XDDTNQxzIExUhSGy4OZon2RlDvbbzfcB45ucEBWEvatmbgQPyK1wk/Q7y/bxvfB9NcyDVMmNHZ9ORbCbFNFL9H4+ae1gXShhB+KBlnYDwdvNeF5NjQg6qyIjpmZ3rvpbCyQELGjlsjsf2PTX+6Ls0EGoft+9CyaBcI4CXU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- PH7PR12MB5595.namprd12.prod.outlook.com (2603:10b6:510:135::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Mon, 16 Jan
- 2023 08:24:10 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::8079:86db:f2e5:7700]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::8079:86db:f2e5:7700%6]) with mapi id 15.20.5986.018; Mon, 16 Jan 2023
- 08:24:10 +0000
-Message-ID: <4bca96ee-3665-5503-bb88-baae98e700e2@amd.com>
-Date:   Mon, 16 Jan 2023 13:53:56 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v5] x86/sev: Add SEV-SNP guest feature negotiation support
-Content-Language: en-US
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
-        dave.hansen@linux.intel.com, seanjc@google.com,
-        pbonzini@redhat.com, thomas.lendacky@amd.com, michael.roth@amd.com,
-        David Rientjes <rientjes@google.com>, stable@kernel.org
-References: <20230112084139.12615-1-nikunj@amd.com>
- <20230113135326.00006f06@gmail.com>
-From:   "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <20230113135326.00006f06@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0172.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:26::27) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+        with ESMTP id S232335AbjAPIie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 03:38:34 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6713125BA;
+        Mon, 16 Jan 2023 00:38:28 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id E713367565;
+        Mon, 16 Jan 2023 08:38:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1673858306; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rCTz8nPUFHfGm5/NFTvj8mMlaS89IAg2JXiWnIchUYI=;
+        b=b21kYzV7bIOMaYuzQfHskSyOZTKxY6IQXB61/wpa3u9Tg/5EoyBmM4UyU8gOAIxSLQITel
+        P3PSkg9pK712N5HheccAJJvufNIUBtCw7YXRx/cBFx94phXx5y74Mg0gExDjOhA8Rxb7pk
+        DQQQT5GtBi1fA4cuBQn0lgxqm5UyOGs=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 4258C139C2;
+        Mon, 16 Jan 2023 08:38:26 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id jXTKDgINxWMOFAAAMHmgww
+        (envelope-from <jgross@suse.com>); Mon, 16 Jan 2023 08:38:26 +0000
+Message-ID: <1375c16c-1a81-f845-f9e6-d698148c4ffc@suse.com>
+Date:   Mon, 16 Jan 2023 09:38:25 +0100
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|PH7PR12MB5595:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8c5eebdf-429a-4833-b79a-08daf79b0aa1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: z1GPCzpMJWV2LQed2A39Exrt0bwb/gTGnKNJMv3t3zL4jTccevnDBAw0vXNRyQVB8MEalJQv+GdLEj2+fMfwEuh4T2pojIp27wfvoWyzUeg2JulDVrpOE3Aszqx60PblF5HYIw1sw22ceuI6ELt5JBN3yHjQaycDkSRc3qMbgow+jUWypPaaaW2nZA7HM/c/Ya/RW8OhMJOox1TBQas7RBDeyNErFeKATrEg4EIxUah04Pi+k9OFTRkMe0/0UuoM+0k0fAsw5kB4ghjCjZDrwKtXoEyOSC0stbQun6q5OJDlHS+yok61ZNS1Hrnry9nkqVV37wlhRUEZtliGTCTQiBY/AMi0CPhJ+tUifjUJxPsqbqB3IT2AjnNpJHnlpL81LQsxPx+9kfvx0i5du9ZBDKg7fbvrSlufCJz+1//I4oy9ga5Ed+iqiAN2wEJaHKQPGyHv5qms2Nr5+XNw5TtAwm9xAQbB84dgnB5KYjso60mT9gwCgiqcBl9u4t0RKxKQcT4Lfx6MUxznnR2V+J18DpYyhHfq7xMFy4TqpTxdgMsCdGJnAzoPPfyjnkhQEOwnPhYh5I5NUc3mNxhMnXxO6UJmmm7sugVhX2rKCxegnCU3M7IRq9Otl1zWvzRbVs5e6xTf65RgQqlWL0v3FZA11pYYQz9/itg66iGhMVL9i5J1iZKC8D7ZQKjaVvEuXqNsUPI4LAZmkS2lDBHd1rEfKl/MqRPARB35699VzNN5dqdNpzmbUxye8gVw2i/AQ4Hwe4jU/g2eyD5G4HwbxBiWGA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(366004)(346002)(136003)(39860400002)(451199015)(36756003)(4326008)(66556008)(6666004)(66476007)(66946007)(5660300002)(41300700001)(83380400001)(26005)(8936002)(6512007)(186003)(478600001)(6486002)(966005)(6506007)(53546011)(8676002)(7416002)(6916009)(316002)(2616005)(31696002)(2906002)(38100700002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?anpLVWVYeXZLcXZlcGZ1ZjlQeW5hQW5BdUpWb2hpWnA1ZVNra212VHdxUUZq?=
- =?utf-8?B?cjZaeldKeElncGFSQWJRNXJFZXQ4d2RXYURISWpseFl0dmp0UlNnazNlQUxv?=
- =?utf-8?B?Wkh3dGx0VlQyRmNKaVU5WVhhNFc5R05EOWdYMnZSRVV1K2RPQjNXdGtZRmVp?=
- =?utf-8?B?SHdTZW82dXFHTnZkd2lKSmNPdGg2bEhESXlQeVBzTHZUczBHQlpzWEdmUHln?=
- =?utf-8?B?VTNQZ0VmcVBsSVdGOEVqdjVaem5sMlhQYnlCdXdsS00yN3ZsdWNNQ1FUZWRh?=
- =?utf-8?B?Z1grYUhvbGE0OUpXdlVjVmFCUVJ0bGhlL0h4alBEcWsrZXR1SVBXeVUwZ1dI?=
- =?utf-8?B?a0k2dWdRcFE3bkI2VjV2UFltcm14QTcwSHdtZENJcHd0M000a2RXeUJyRTN2?=
- =?utf-8?B?VTZuUXlNYnArQVJ1aVYrTEhzUVlXR3g5WmJLZWlMaEk5VHF0b3E0ZHJnZWg0?=
- =?utf-8?B?R2w1TktqNURIZy9sSXJKWC9DcWducmtEdnhsVGkwajBXdDdhdVVmODlQOGwy?=
- =?utf-8?B?MXdsQ2FtNkFQVnUyelFjRGNYV1RvcHZTdld5YXJFY3pMTDl3M2R4NjlXWjNp?=
- =?utf-8?B?eXFKVVpFL2x4TTNQdnNOK0FqNWdjVU1CeVFXTXBBM1d0R3FmaFY4RUxKcDE1?=
- =?utf-8?B?TXQxZ3pEeFFpdUNzV2ZleWM5RmpseGtFdms3c0xzTWRHR1IxcSszSkE0dkpN?=
- =?utf-8?B?WG5vMDN4Q3gvZE5hNTFFbVdya3d5ajBjNjZCeFlGZnJaRldiN2pjUzNCQzEx?=
- =?utf-8?B?TEViSmEyQWFVSGhub1QzbHVISTd0ejdZeEszM0YvWE9zTzFFVWJhTk8vb2ZS?=
- =?utf-8?B?bS9WT253eUhZVDJpT2ttQzRZQndFbER6Qk1yV0NrMXA0YTlWeHRvNHFPOEMx?=
- =?utf-8?B?SGM3dERkZWJySk1GNUxZa3ZUUnBtdEJFaGwyaEV4aEdsM0dWaVU4VXkvbmtD?=
- =?utf-8?B?Q3g5aEd5ckNucnlMRkcyQi9oczFEbS9YQURBU3pRdnNPR1FvNWhDcmVzSWFK?=
- =?utf-8?B?OFhKeVlSUmhlOTB0NDJzanYvNFY1K2dBMHNEVWFYa1FtSDhzcUhaelpEckJl?=
- =?utf-8?B?dEJTYWZoaFhaYnhJMkNpcUllc2RydDAycnRaU3RiWmVmTU8reTBxYjBMdkh6?=
- =?utf-8?B?bVVRQlA2anVjOERnSU9PZUxseDY5QjNhNE43SU1aSk9BaDFKaDV3WElxT1RT?=
- =?utf-8?B?cE44KzQzeEZ5dmU1L0E1RXR6M3VTMm5udDdjdDdtMkFyZzFnbDJmVnFXTTZM?=
- =?utf-8?B?UWJwZENHc010USs4ZDdzaEhRUjFRU3RpYS8zRjcxL2tJamVkeE1HY1hHK1BN?=
- =?utf-8?B?ZSs2TXl4ek1wWHU0MUkrWlQyWk9UYUI2L1JWNUNJNG5KN2d5OWhGc2tyTUtR?=
- =?utf-8?B?eTQ5Z1VFUVRPNUNvQmpsdGVEREMydStWT0xEUVE4enFvZUdJc2w4YmM0VTUz?=
- =?utf-8?B?VnRUS0s4aXNiTXVXZ0RNV3ZNdXRvV3BuYWk0Y3N0U3N1bE14K01kdG9GbDZS?=
- =?utf-8?B?TEcwdDlMckZSOE02S2dtWVM0c2pqZ09DRkVidlFSV0xwWHZLdkNydUxkeXM4?=
- =?utf-8?B?Q2lKQTFXQzF4NHlpZ3MyMWtjR0s3V0QwVzNQWXVaaU1CbjhCY2p2WEFMREFT?=
- =?utf-8?B?YkZ5SkNpdzAxZmRGOU12WklMLzM1L2JOd0RaZFZITTNGMExmSGJpZTRHSFlt?=
- =?utf-8?B?Q1F4elAzY3FNRkpPakg4ekVYWHpzYmkyek1xbWgvNHZtbjZXL3d1eDVqb1lF?=
- =?utf-8?B?ajNSUFRFT01kUTJZbU5sRTBRa0NURVJndUdHK3JBVnNoa0NuNFdRblRIRk5i?=
- =?utf-8?B?TmlJVUZ4blZ2Z0ZHRHM0aGZsaDdPOW5YWHFrbTBQaHhtSUMrM3d3a1I2ZHlE?=
- =?utf-8?B?bmliZ2V4em5UYWpYWmVNWU1GT3k0aVBXcU9DajdCVGFkSFNHVjlHZE9JN0hv?=
- =?utf-8?B?MGIwZWVQUHlJZ2hobDJOZWFVMUVwT01lL2VCVi9HSm95cE5Hb3RTdWUwbUxz?=
- =?utf-8?B?RW9HWWRkNTRVOFVMUjMwNnRsUkV3aTJ1V2ZkcWhscmRveEdrLzhZdTVwMkZY?=
- =?utf-8?B?OVpJRDJNWDE5Z1ptV1p0TlZ5Uk5wdzIvb29hRkhyTGZORGFGbUwxamR1Tk5J?=
- =?utf-8?Q?l0X9nKNjUGL0jQxcT/lEkeXOx?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c5eebdf-429a-4833-b79a-08daf79b0aa1
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2023 08:24:10.0626
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JcJVlXBbFgatd+NOLRIESi3BxZA0gvutbhIf3OaI6kNTc+nMktpQuIkGUJaeMN/YE8R0TUMASpCmfP+nZZlWuQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5595
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v2] x86/hotplug: Do not put offline vCPUs in mwait idle
+ state
+Content-Language: en-US
+To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
+        linux-kernel@vger.kernel.org
+Cc:     amakhalov@vmware.com, ganb@vmware.com, ankitja@vmware.com,
+        bordoloih@vmware.com, keerthanak@vmware.com, blamoreaux@vmware.com,
+        namit@vmware.com, Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Wyes Karny <wyes.karny@amd.com>,
+        Lewis Caroll <lewis.carroll@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>, x86@kernel.org,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+References: <20230116060134.80259-1-srivatsa@csail.mit.edu>
+From:   Juergen Gross <jgross@suse.com>
+In-Reply-To: <20230116060134.80259-1-srivatsa@csail.mit.edu>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------R20aP0MBAjebS9kz3CSWyaDC"
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 13/01/23 17:23, Zhi Wang wrote:
-> On Thu, 12 Jan 2023 14:11:39 +0530
-> Nikunj A Dadhania <nikunj@amd.com> wrote:
-> 
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------R20aP0MBAjebS9kz3CSWyaDC
+Content-Type: multipart/mixed; boundary="------------SKpCTbiCrL4RZ847sUVVOW7b";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>, linux-kernel@vger.kernel.org
+Cc: amakhalov@vmware.com, ganb@vmware.com, ankitja@vmware.com,
+ bordoloih@vmware.com, keerthanak@vmware.com, blamoreaux@vmware.com,
+ namit@vmware.com, Peter Zijlstra <peterz@infradead.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Wyes Karny <wyes.karny@amd.com>,
+ Lewis Caroll <lewis.carroll@amd.com>, Tom Lendacky
+ <thomas.lendacky@amd.com>, x86@kernel.org,
+ VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org
+Message-ID: <1375c16c-1a81-f845-f9e6-d698148c4ffc@suse.com>
+Subject: Re: [PATCH v2] x86/hotplug: Do not put offline vCPUs in mwait idle
+ state
+References: <20230116060134.80259-1-srivatsa@csail.mit.edu>
+In-Reply-To: <20230116060134.80259-1-srivatsa@csail.mit.edu>
 
->> diff --git a/Documentation/x86/amd-memory-encryption.rst
->> b/Documentation/x86/amd-memory-encryption.rst index
->> a1940ebe7be5..b3adc39d7735 100644 ---
->> a/Documentation/x86/amd-memory-encryption.rst +++
->> b/Documentation/x86/amd-memory-encryption.rst @@ -95,3 +95,39 @@ by
->> supplying mem_encrypt=on on the kernel command line.  However, if BIOS
->> does not enable SME, then Linux will not be able to activate memory
->> encryption, even if configured to do so by default or the mem_encrypt=on
->> command line parameter is specified. +
->> +Secure Nested Paging (SNP)
->> +==========================
->> +
->> +SEV-SNP introduces new features (SEV_FEATURES[1:63]) which can be
->> enabled +by the hypervisor for security enhancements. Some of these
->> features need +guest side implementation to function correctly. The
->> below table lists the +expected guest behavior with various possible
->> scenarios of guest/hypervisor +SNP feature support.
->> +
+--------------SKpCTbiCrL4RZ847sUVVOW7b
+Content-Type: multipart/mixed; boundary="------------dh2EUrC8xJ648HWyt0Ov3f0j"
 
-> "guest needs implementation" seems a little bit confusing. I suppose it 
-> means the feature is mandatory for the guest. 
+--------------dh2EUrC8xJ648HWyt0Ov3f0j
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-That is not correct. None of these features are mandatory for the guest.
-The hypervisor can enable this feature without the knowledge of guest 
-kernel support. So there should be a mechanism in the guest to detect this
-and fail the boot if needed.
+T24gMTYuMDEuMjMgMDc6MDEsIFNyaXZhdHNhIFMuIEJoYXQgd3JvdGU6DQo+IEZyb206ICJT
+cml2YXRzYSBTLiBCaGF0IChWTXdhcmUpIiA8c3JpdmF0c2FAY3NhaWwubWl0LmVkdT4NCj4g
+DQo+IFVuZGVyIGh5cGVydmlzb3JzIHRoYXQgc3VwcG9ydCBtd2FpdCBwYXNzdGhyb3VnaCwg
+YSB2Q1BVIGluIG13YWl0DQo+IENQVS1pZGxlIHN0YXRlIHJlbWFpbnMgaW4gZ3Vlc3QgY29u
+dGV4dCAoaW5zdGVhZCBvZiB5aWVsZGluZyB0byB0aGUNCj4gaHlwZXJ2aXNvciB2aWEgVk1F
+WElUKSwgd2hpY2ggaGVscHMgc3BlZWQgdXAgd2FrZXVwcyBmcm9tIGlkbGUuDQo+IA0KPiBI
+b3dldmVyLCB0aGlzIHJ1bnMgaW50byBwcm9ibGVtcyB3aXRoIENQVSBob3RwbHVnLCBiZWNh
+dXNlIHRoZSBMaW51eA0KPiBDUFUgb2ZmbGluZSBwYXRoIHByZWZlcnMgdG8gcHV0IHRoZSB2
+Q1BVLXRvLWJlLW9mZmxpbmVkIGluIG13YWl0DQo+IHN0YXRlLCB3aGVuZXZlciBtd2FpdCBp
+cyBhdmFpbGFibGUuIEFzIGEgcmVzdWx0LCBzaW5jZSBhIHZDUFUgaW4gbXdhaXQNCj4gcmVt
+YWlucyBpbiBndWVzdCBjb250ZXh0IGFuZCBkb2VzIG5vdCB5aWVsZCB0byB0aGUgaHlwZXJ2
+aXNvciwgYW4NCj4gb2ZmbGluZSB2Q1BVICphcHBlYXJzKiB0byBiZSAxMDAlIGJ1c3kgYXMg
+dmlld2VkIGZyb20gdGhlIGhvc3QsIHdoaWNoDQo+IHByZXZlbnRzIHRoZSBoeXBlcnZpc29y
+IGZyb20gcnVubmluZyBvdGhlciB2Q1BVcyBvciB3b3JrbG9hZHMgb24gdGhlDQo+IGNvcnJl
+c3BvbmRpbmcgcENQVS4gWyBOb3RlIHRoYXQgc3VjaCBhIHZDUFUgaXMgbm90IGFjdHVhbGx5
+IGJ1c3kNCj4gc3Bpbm5pbmcgdGhvdWdoOyBpdCByZW1haW5zIGluIG13YWl0IGlkbGUgc3Rh
+dGUgaW4gdGhlIGd1ZXN0IF0uDQo+IA0KPiBGaXggdGhpcyBieSBwcmV2ZW50aW5nIHRoZSB1
+c2Ugb2YgbXdhaXQgaWRsZSBzdGF0ZSBpbiB0aGUgdkNQVSBvZmZsaW5lDQo+IHBsYXlfZGVh
+ZCgpIHBhdGggZm9yIGFueSBoeXBlcnZpc29yLCBldmVuIGlmIG13YWl0IHN1cHBvcnQgaXMN
+Cj4gYXZhaWxhYmxlLg0KPiANCj4gU3VnZ2VzdGVkLWJ5OiBQZXRlciBaaWpsc3RyYSAoSW50
+ZWwpIDxwZXRlcnpAaW5mcmFkZWFkLm9yZz4NCj4gU2lnbmVkLW9mZi1ieTogU3JpdmF0c2Eg
+Uy4gQmhhdCAoVk13YXJlKSA8c3JpdmF0c2FAY3NhaWwubWl0LmVkdT4NCj4gQ2M6IFRob21h
+cyBHbGVpeG5lciA8dGdseEBsaW51dHJvbml4LmRlPg0KPiBDYzogUGV0ZXIgWmlqbHN0cmEg
+PHBldGVyekBpbmZyYWRlYWQub3JnPg0KPiBDYzogSW5nbyBNb2xuYXIgPG1pbmdvQHJlZGhh
+dC5jb20+DQo+IENjOiBCb3Jpc2xhdiBQZXRrb3YgPGJwQGFsaWVuOC5kZT4NCj4gQ2M6IERh
+dmUgSGFuc2VuIDxkYXZlLmhhbnNlbkBsaW51eC5pbnRlbC5jb20+DQo+IENjOiAiSC4gUGV0
+ZXIgQW52aW4iIDxocGFAenl0b3IuY29tPg0KPiBDYzogIlJhZmFlbCBKLiBXeXNvY2tpIiA8
+cmFmYWVsLmoud3lzb2NraUBpbnRlbC5jb20+DQo+IENjOiAiUGF1bCBFLiBNY0tlbm5leSIg
+PHBhdWxtY2tAa2VybmVsLm9yZz4NCj4gQ2M6IFd5ZXMgS2FybnkgPHd5ZXMua2FybnlAYW1k
+LmNvbT4NCj4gQ2M6IExld2lzIENhcm9sbCA8bGV3aXMuY2Fycm9sbEBhbWQuY29tPg0KPiBD
+YzogVG9tIExlbmRhY2t5IDx0aG9tYXMubGVuZGFja3lAYW1kLmNvbT4NCj4gQ2M6IEFsZXhl
+eSBNYWtoYWxvdiA8YW1ha2hhbG92QHZtd2FyZS5jb20+DQo+IENjOiBKdWVyZ2VuIEdyb3Nz
+IDxqZ3Jvc3NAc3VzZS5jb20+DQo+IENjOiB4ODZAa2VybmVsLm9yZw0KPiBDYzogVk13YXJl
+IFBWLURyaXZlcnMgUmV2aWV3ZXJzIDxwdi1kcml2ZXJzQHZtd2FyZS5jb20+DQo+IENjOiB2
+aXJ0dWFsaXphdGlvbkBsaXN0cy5saW51eC1mb3VuZGF0aW9uLm9yZw0KPiBDYzoga3ZtQHZn
+ZXIua2VybmVsLm9yZw0KPiBDYzogeGVuLWRldmVsQGxpc3RzLnhlbnByb2plY3Qub3JnDQoN
+ClJldmlld2VkLWJ5OiBKdWVyZ2VuIEdyb3NzIDxqZ3Jvc3NAc3VzZS5jb20+DQoNCg0KSnVl
+cmdlbg0KDQo=
+--------------dh2EUrC8xJ648HWyt0Ov3f0j
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-> If so, on the second row 
-> guest can boot without it. Some explanation? 
+-----BEGIN PGP PUBLIC KEY BLOCK-----
 
-In the first and second row, HV has not enabled the feature, so the 
-guest should boot fine irrespective of "Guest needs implementation".
+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
+jR/i1DG86lem3iBDXzXsZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
 
->> +|      No         |      No       |      No       |     Boot         |
+--------------dh2EUrC8xJ648HWyt0Ov3f0j--
 
->> +|      No         |      Yes      |      No       |     Boot         |
+--------------SKpCTbiCrL4RZ847sUVVOW7b--
 
+--------------R20aP0MBAjebS9kz3CSWyaDC
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
 
->> ++-----------------+---------------+---------------+------------------+
->> +| Feature Enabled | Guest needs   | Guest has     | Guest boot       |
->> +| by the HV       | implementation| implementation| behaviour        |
->> ++=================+===============+===============+==================+>> +|      No         |      No       |      No       |     Boot         |
->> +|                 |               |               |                  |
->> ++-----------------+---------------+---------------+------------------+
->> +|      No         |      Yes      |      No       |     Boot         |
->> +|                 |               |               |                  |
->> ++-----------------+---------------+---------------+------------------+
->> +|      No         |      Yes      |      Yes      |     Boot         |
->> +|                 |               |               |                  |
->> ++-----------------+---------------+---------------+------------------+
->> +|      Yes        |      No       |      No       | Boot with        |
->> +|                 |               |               | feature enabled  |
->> ++-----------------+---------------+---------------+------------------+
->> +|      Yes        |      Yes      |      No       | Graceful boot    |
->> +|                 |               |               | failure          |
->> ++-----------------+---------------+---------------+------------------+
->> +|      Yes        |      Yes      |      Yes      | Boot with        |
->> +|                 |               |               | feature enabled  |
->> ++-----------------+---------------+---------------+------------------+
->> +
->> +More details in AMD64 APM[1] Vol 2: 15.34.10 SEV_STATUS MSR
->> +
->> +[1] https://www.amd.com/system/files/TechDocs/40332_4.05.pdf
-> 
-> Probably update the link here as well.
+-----BEGIN PGP SIGNATURE-----
 
-Sure.
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmPFDQEFAwAAAAAACgkQsN6d1ii/Ey8W
+xwf/X/GKsP0H+Iit0bG9QeFgb0ohp08/y4PiVKqFcswlEHIG/fwFJtvHYFxlnQ0zVWBjO/ksowgv
+DKedL5giBFHXzjCu9xmCReFb/YlX2fqRQ9Nu/hfwO5Ckze6QcVgTtbzWxLhrb32MbydSpk/XXSBG
+94UJZBOFutx9O/ObihZfY1wO55GZwh7b655J3uIzv3y1RPVxg9joxGPRh2uubt4GLsiD5uSH3N6K
+qA0DSoPIgM/2cq3iNTb+TTx+YnFfV79+uP2nRbMkQ9XT2WqdC3WNSe/Wepv6RgcP+3jdaIxW8Xdo
+oFevc1mDroKpfdbB9i5I+DvLXnTCjERGqV1JZ0PmYQ==
+=L2a/
+-----END PGP SIGNATURE-----
 
->> diff --git a/arch/x86/include/uapi/asm/svm.h
->> b/arch/x86/include/uapi/asm/svm.h index f69c168391aa..a04fe07eb9a8 100644
->> --- a/arch/x86/include/uapi/asm/svm.h
->> +++ b/arch/x86/include/uapi/asm/svm.h
->> @@ -116,6 +116,12 @@
->>  #define SVM_VMGEXIT_AP_CREATE			1
->>  #define SVM_VMGEXIT_AP_DESTROY			2
->>  #define SVM_VMGEXIT_HV_FEATURES			0x8000fffd
->> +#define SVM_VMGEXIT_TERM_REQUEST		0x8000fffe
->> +#define SVM_VMGEXIT_TERM_REASON(reason_set, reason_code)	\
->> +	/* SW_EXITINFO1[3:0] */					\
->> +	(((((u64)reason_set) &  0xf)) |				\
->                                ^
-> One extra space before 0xf should be removed.
-
-Sure.
-
-Thanks for the review.
-
-Nikunj
-
+--------------R20aP0MBAjebS9kz3CSWyaDC--
