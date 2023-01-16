@@ -2,193 +2,389 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E16BE66BD18
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 12:44:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36CC666BF4E
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 14:15:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbjAPLoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 06:44:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33208 "EHLO
+        id S231439AbjAPNPA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 08:15:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229560AbjAPLoQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 06:44:16 -0500
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2054.outbound.protection.outlook.com [40.107.96.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F0354ED8;
-        Mon, 16 Jan 2023 03:44:15 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YIakE3MC5IYeaaWtLQvRmcjuw36+3MDkNKUqb2a+luv6LZtg4TQDhHewtBbkD8KSilC5USjvsSa+gWSY/PRF5ilgjRhl1IGqsM15hA3Ochl5HTwE6Wx7DBLF6MSbuFlqgYGNsQR9YWd29VAYe1uKdMCVpI2es8AiFKwHJcn617fvk3Pew5jtXO/oeg5W2UCpTVwarg+hsxZWCtZP9I9ovxqWkeV2luXWINCuGsLu1TjbPjgSgvL3wSGdfBaZvVnyxdPeKS0EjwTBmcCxdhBXFgSvJH5LY7667mxB2A9vnv40K2cSU4AE3zxi9M8eHO8e6whbjEtlgmwt5+Zp3tVBFg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Iwu3xG2+vTKYNmfK1wX6FKJMU7SBh65irVblb2rmrrE=;
- b=fMvdm2UmDyvF0MYwCoTGNHHSi24Cp2KOO0XsLYN5Cd329pahCLqWfQSNCC6fkZ3cC5KzpdIiWnelZp/yJt7rl494Dnl44KV5bkZygxyYrEjDx6ydWmzMph3+K+wh4GvuEUSIeeCcY38VmNsprCHjgP2+vldIzydHkCp/omZ1VbhdalsOqn2WTrDhdxM6pPldZGh3jFitoe+CouUHFwukJkoyKXPx2BtZrT/OcEySZq7cIQQ02ARtsRNJtR3SpaogpGADIxA6xmRs6GRr3p4P8+oByv0pR8KEAlSQYbbavUEYNVtP8knp0cM40Zp1PBFqytIeIHwJ6yehtVPHO+whiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Iwu3xG2+vTKYNmfK1wX6FKJMU7SBh65irVblb2rmrrE=;
- b=hNPLwWBoFlY+eMOVP4GpcnYM6/wMVknj4HZL7eFZOpVYVUNqWS/U+nwh73hVIB4ylMSY5Ooj16uAcOwZGJ0X0gBFJYkWGEz+ejZsPRDn9iOrGZ74mNpgNr2N6Y9RV4RUlG0wgPu1fA/S15plSxwowEXdZsy2cfvxgrIDXGTVEpQ=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- CH2PR12MB5004.namprd12.prod.outlook.com (2603:10b6:610:62::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5986.23; Mon, 16 Jan 2023 11:44:13 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::8079:86db:f2e5:7700]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::8079:86db:f2e5:7700%6]) with mapi id 15.20.5986.018; Mon, 16 Jan 2023
- 11:44:13 +0000
-Message-ID: <65a8732e-a569-517b-67c6-8c3670c0aab6@amd.com>
-Date:   Mon, 16 Jan 2023 17:13:56 +0530
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v5] x86/sev: Add SEV-SNP guest feature negotiation support
-Content-Language: en-US
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
-        bp@alien8.de, mingo@redhat.com, tglx@linutronix.de,
-        dave.hansen@linux.intel.com, seanjc@google.com,
-        pbonzini@redhat.com, thomas.lendacky@amd.com, michael.roth@amd.com,
-        David Rientjes <rientjes@google.com>, stable@kernel.org
-References: <20230112084139.12615-1-nikunj@amd.com>
- <20230113135326.00006f06@gmail.com>
- <4bca96ee-3665-5503-bb88-baae98e700e2@amd.com>
- <20230116133948.0000474b@gmail.com>
-From:   "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <20230116133948.0000474b@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: PN2PR01CA0182.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c01:e8::6) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+        with ESMTP id S231959AbjAPNOX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 08:14:23 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF26423C5E
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 05:11:44 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30GCpMkm019339;
+        Mon, 16 Jan 2023 13:11:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=zb+leUfWeLfjVKf/1vrXktEd/nb28mXCIoYaNpPH9y0=;
+ b=LmIFJnMTgYHZ3BnbIFoW12YWCxgCzZFyGHiHCZVm3yKjfxglI9xFG8Lsmu5ylHWnprkb
+ GzZFn5PxCpG4gW82J/sbUi49EhaHeAkpl6bRe1HXJJotpeq5oMvv5cMr0vNkWoaCqSvs
+ RDT6JX15t0tMK7Za2x6rttzfuS5+yrn+prVVXP+rotpF1JG9PCgz35nbYgvts1bP31hW
+ VweRxcfai7UhVlzS0UqkiPVvpyUG6AxBqWSw4m4DzXj7HvijTkgtD/PlDqUP/lK5dHdU
+ 8HbND8ysbsB9/E2Ay9xhWdfH65mSYfkmXNOkJ5BBks+eqYble0FtY0wnvf7FOZiEmsTQ EQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n56y20erw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Jan 2023 13:11:35 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30GCs2Lu012309;
+        Mon, 16 Jan 2023 13:11:34 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n56y20er9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Jan 2023 13:11:34 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30FGnq3F028466;
+        Mon, 16 Jan 2023 13:11:32 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3n3m16hsdt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Jan 2023 13:11:31 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30GDBSPl44171652
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Jan 2023 13:11:28 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1570320043;
+        Mon, 16 Jan 2023 13:11:28 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8AB832004D;
+        Mon, 16 Jan 2023 13:11:27 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.176.214])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 16 Jan 2023 13:11:27 +0000 (GMT)
+Message-ID: <270af9ebb128c7fe576895b2e204d901dae77c5e.camel@linux.ibm.com>
+Subject: Re: [PATCH v14 03/11] target/s390x/cpu topology: handle STSI(15)
+ and build the SYSIB
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Mon, 16 Jan 2023 14:11:27 +0100
+In-Reply-To: <20230105145313.168489-4-pmorel@linux.ibm.com>
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+         <20230105145313.168489-4-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|CH2PR12MB5004:EE_
-X-MS-Office365-Filtering-Correlation-Id: 24ed2e03-9b70-450b-8d72-08daf7b6fd1e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Qv0rJ21R2OJFVCGTd4ssJSvWYsUmcHnWwWU4XWLHlXogAIm6sXw/iVE6j/jXUst+YJ2kCnCQp+c62YMNhLMpNi36Z4kfdAnvpE1+xH2Cjb0ubGZ/QjykDi77gEKLE+locFt9Zb/KS4a3A5aZTBas2+9bscnnzLhTF+J/Ur7RpW7g57o6Tv7fE0GLpM54IPM7+xOQPZpv5SRsc0FuXKG0UXIlpVsTpHqEKSX/ujnCPvRwT9x28HMIEEwi6iqStMu6EXJ83eb6mbFB26olok5uJgWto+pJuA6OO9x800Zw1swp0wTteVLTET1HqCp2YAIhhWpU8Y9KCXe8SvabJHawXFcT+2Y/Z7Ws+HZ4GnSLp7v8/hUbzA/DR4Z1GYMs2uNF5BBbYy84cR9OOyiweaEDAC+7u+bOxcSeYkPelOuGmxTkrWklL0Vwde/fsxCCcgFg0cmPRtsg1ddFtAtESNakXm6/kY3umAmyQiQ2XKCfKnz4lGcQfDjF+INpRlcWOH3i6oHMCenrZWm7UOaXuPuJ6YlHwRCqQU/KwahjAnr2pG/HQ85cElI8/fhamw1mZgxqiw8xUaWg6w0WunPqSAd0y/X9SG+Osv8YsE8q00BiZlz7h/qUju400qqRWjUAmWHrvZ6OCWI9zyycvCC3zn4uGEThmRLioyDnRuH/lwbaM7Zhewc1sXCDDCfuKM0tdjnvDTnjMKa0xuZFViRDYMLd50mOBaJGhrRvFegakxnoBT8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(346002)(376002)(39860400002)(396003)(136003)(366004)(451199015)(2616005)(186003)(8676002)(6916009)(4326008)(66476007)(26005)(6512007)(66556008)(31686004)(66946007)(478600001)(6506007)(41300700001)(8936002)(5660300002)(2906002)(7416002)(83380400001)(6666004)(53546011)(316002)(38100700002)(31696002)(6486002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NFVSVG5ENWtoSEV0eUdWRFNtUkZKRkpzSUFQOG1GVnR1emk2amNaVnhEdWMv?=
- =?utf-8?B?c1FRN1RFb1Vmbmp3bGlUcUdDMCtrNFVEa1NTN1I3WUh6S3lDZVZ5Q3VzUlFa?=
- =?utf-8?B?R3h1M01FKzJQU0tpUHdmY08wVmxFMTU0N1gvMHVab2N5bEg2TnlaOVByRExO?=
- =?utf-8?B?OGZWWjVtdGd1MFJRaEdrMjFrZkdzcU5oMEpRcmNMdWpCdTVza0dwZVQ0N1oy?=
- =?utf-8?B?OWpXT2xnelFIK2JObDJOMHRvSTRTS0FQek9kYy9LQXNyUm96WG5hR2VwS0NQ?=
- =?utf-8?B?TmEydnVCSjdaZm9lRnEyelk3cFFQRnRvQk1UMHNlanB1Zzk0MTN6WGNIVXhV?=
- =?utf-8?B?MU9hSGdNK2d4UzFYdWN0QlJCZFl4ZFlYU2hkM3ByejR4NDVQYjVMVU0vaFNp?=
- =?utf-8?B?a0J6YlJPQVlaazF4Yk5iM3BiQUhEKzVJUytoaXpxRjlyaS9WVjdXZ09wbm93?=
- =?utf-8?B?VUpDc3BmYVhkLzQzRC9PYUlIY2JpeTlmQnl5R2RQRXZJN2Zvb0Y3MEZmK3Bp?=
- =?utf-8?B?L01yd28zZlFiVXcxc1lrZkxLOXZ4cDEwVjlxblZEaFVxNUc2Y0xSM1BBcGhO?=
- =?utf-8?B?eGxDSmF1M053b2prdUgxbERTSGxJMDlteVpESWRaaVhpUjZ4dHNVWitBbG93?=
- =?utf-8?B?dlAvTU8yWXRjKzlKdFprRGpNamlLOTFpWEx4bDA5aUlDSlhTRHB0SlM1c3Zk?=
- =?utf-8?B?V0UwZnVoUkpWWHdKcGM1UXoyUTRWREpZN25rcW12UzVlU0Q3ZFJlcWJncnBu?=
- =?utf-8?B?eUZQYWxaUkdOWU5TdUk4a1Z0d0VaelRWeCsxZ2wwd1A2OUp3bVhzdzJvQVJi?=
- =?utf-8?B?VHhWUndXQmJUQkdpUldONTZDNGtHU1pwVERZVlg3ZFFwbHgyRHYrdjRBMmZz?=
- =?utf-8?B?OXk4cHUrd0t1RFF0dTdrMDM5RVd0RU11OUhjMjE3SzByR0J1bVRtdEJCZkJ5?=
- =?utf-8?B?ZW1DY2xXbkN6elFLMHNYb1h3VzhlN000SjUwcXpKaDZPcDY2RCt3ME1XcU81?=
- =?utf-8?B?VVlOaXFaUHBSeTF1TUdNYUtYd3Z0ZjVUSldSWDZ0clZ4eFAxZlBOc1Nyam5U?=
- =?utf-8?B?VkRpUmtUQ3pvZFBQVTQxMW01dzFFaEdybmJYckpyaUU0eXRMLzF5d3UzdUJi?=
- =?utf-8?B?K0RDcVVBZlpPbjJZaWlJbEg2WEZTZUE4d1pFZnBmM1A5WHp0ZmtYbUlrNlNn?=
- =?utf-8?B?VVFDRVA0RVllMjFjcVJkWFc5ejA5SkVMT0JlSkhNdHFva2VPZzVJZ2NybXFC?=
- =?utf-8?B?bjJzelZXRUpTODJVVWdUUVptOENTY1Z0ZjZuZHVFUEx2YS9vK084cjRFWWVt?=
- =?utf-8?B?eTR2TUN3MzdPaEtTSHlheXVnRGJKNzR3ZFVDU2o0d1cyVlNpeUo5clAwdzI2?=
- =?utf-8?B?Qm96eWtRRmVzSjFpSm9ERGEydm5SUHBPSHRsUDg5cVFDU0lxYTdDNS9QQTYx?=
- =?utf-8?B?TE5LWTJkOVIzTnQrQzlzMVFyaTE0Y2lIZ08rRU1TRlRYMWR3T0p3T2hWSFZK?=
- =?utf-8?B?TEFqNGw0WFdLSjdXZXdmTCtWNUVGL01HUGFxWk9TaWNuK2Yrd3NEZDQ1d0V6?=
- =?utf-8?B?ckVhNHJ1c0wzZ0UySmVSdUxLSDZ1Z1hOZGYzY1J3MURFbTd0d1lVR2ZUdTcy?=
- =?utf-8?B?VEhtc3hFNnVmaUNtMjdHQ2pJZGxqRC94MjBSbHgveXJvTFRFVXlEM3BMTjRx?=
- =?utf-8?B?T1lTNmJoQzVrRnROd2NhQmVKRWREYmc2alIwU3B2dkRQZG1QRDBpZWY1UXVN?=
- =?utf-8?B?Nnd0NW5pRm5JK0h6emFsWHhkZmZ5ZXhqK2M4M1F0Z0NSd3g4cnU1dElHRGJX?=
- =?utf-8?B?emY5YWtheGhFbHYvNU1BSWlSZmxxVTdPdUtMQkZrK2t0ang3cGNISjMwVU9N?=
- =?utf-8?B?c3pzWEs1WHZGbUFiWVg3b0h6bnNwUnRoelBvOEs0THRGdTFya2lNUXV4Q24v?=
- =?utf-8?B?aHl1WFdHRmpYQzQyVUpDTnVTbFVsbVJheU9BTUF5ODMxcCtNY21TNmFUZnVs?=
- =?utf-8?B?Y1V6bDk2a1VyNnl4dDQvd2xQMCs4VEl0czZhV2Q4Q3VSTmV6SFN4d2FReEhl?=
- =?utf-8?B?Y0dnUk1WNDdJaUFPTlhkRTBhRWs3bC9EVGNoY21NaXl2dkIvOVJiUW93YXdz?=
- =?utf-8?Q?6zhY1n/bwa4mcvWCaoyEHm50r?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 24ed2e03-9b70-450b-8d72-08daf7b6fd1e
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2023 11:44:13.2998
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: B8heElon06Pn2zfHFF3WJjEnE//Th9ZlBvIdc+tEm2JYjLjPYc3imVVxx7TJPKuMXYFc3b7zJdvOYczYB2pRpQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5004
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: sceBu--vecAeHtgYRLMIHAvTeWJLikkf
+X-Proofpoint-GUID: ngcwY31qFPcBXvjMPVKate_W8r5plJoS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-16_10,2023-01-13_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 impostorscore=0 bulkscore=0 phishscore=0 mlxlogscore=999
+ spamscore=0 malwarescore=0 mlxscore=0 clxscore=1015 lowpriorityscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301160094
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/01/23 17:09, Zhi Wang wrote:
-> On Mon, 16 Jan 2023 13:53:56 +0530
-> "Nikunj A. Dadhania" <nikunj@amd.com> wrote:
-> 
->> On 13/01/23 17:23, Zhi Wang wrote:
->>> On Thu, 12 Jan 2023 14:11:39 +0530
->>> Nikunj A Dadhania <nikunj@amd.com> wrote:
->>>
->>
->>>> diff --git a/Documentation/x86/amd-memory-encryption.rst
->>>> b/Documentation/x86/amd-memory-encryption.rst index
->>>> a1940ebe7be5..b3adc39d7735 100644 ---
->>>> a/Documentation/x86/amd-memory-encryption.rst +++
->>>> b/Documentation/x86/amd-memory-encryption.rst @@ -95,3 +95,39 @@ by
->>>> supplying mem_encrypt=on on the kernel command line.  However, if BIOS
->>>> does not enable SME, then Linux will not be able to activate memory
->>>> encryption, even if configured to do so by default or the mem_encrypt=on
->>>> command line parameter is specified. +
->>>> +Secure Nested Paging (SNP)
->>>> +==========================
->>>> +
->>>> +SEV-SNP introduces new features (SEV_FEATURES[1:63]) which can be
->>>> enabled +by the hypervisor for security enhancements. Some of these
->>>> features need +guest side implementation to function correctly. The
->>>> below table lists the +expected guest behavior with various possible
->>>> scenarios of guest/hypervisor +SNP feature support.
->>>> +
->>
->>> "guest needs implementation" seems a little bit confusing. I suppose it 
->>> means the feature is mandatory for the guest. 
->>
->> That is not correct. None of these features are mandatory for the guest.
->> The hypervisor can enable this feature without the knowledge of guest 
->> kernel support. So there should be a mechanism in the guest to detect this
->> and fail the boot if needed.
->>
->>> If so, on the second row 
->>> guest can boot without it. Some explanation? 
->>
->> In the first and second row, HV has not enabled the feature, so the 
->> guest should boot fine irrespective of "Guest needs implementation".
->>
-> 
-> Feel free to educate me if I understand correctly or not:
-> 
-> There are two kinds of features in SEV_FEATURES:
-> 
-> 1. Features that HV can freely enable/disable and they won't distrub the guest.
-> 
-> HV   | Guest needs impl | Guest has impl    | Result
-> Y/N          N            X (not necessary)    Boot
-> 
-> 2. Features that a guest has to be aware of and handle when HV enables them.
-> 
-> HV   | Guest needs impl | Guest has impl | Result
-> N            Y            X (Dont care)     Boot
-> Y            Y                  N           Fail
-> Y            Y                  Y           Boot
+On Thu, 2023-01-05 at 15:53 +0100, Pierre Morel wrote:
+> On interception of STSI(15.1.x) the System Information Block
+> (SYSIB) is built from the list of pre-ordered topology entries.
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> ---
+>  include/hw/s390x/cpu-topology.h |   3 +
+>  include/hw/s390x/sclp.h         |   1 +
+>  target/s390x/cpu.h              |  78 ++++++++++++++++++
+>  target/s390x/kvm/cpu_topology.c | 136 ++++++++++++++++++++++++++++++++
+>  target/s390x/kvm/kvm.c          |   5 +-
+>  target/s390x/kvm/meson.build    |   3 +-
+>  6 files changed, 224 insertions(+), 2 deletions(-)
+>  create mode 100644 target/s390x/kvm/cpu_topology.c
+>=20
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topol=
+ogy.h
+> index b3fd752d8d..9571aa70e5 100644
+> --- a/include/hw/s390x/cpu-topology.h
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -41,6 +41,9 @@ typedef union s390_topology_id {
+>      };
+>  } s390_topology_id;
+>  #define TOPO_CPU_MASK       0x000000000000003fUL
+> +#define TOPO_SOCKET_MASK    0x0000ffffff000000UL
+> +#define TOPO_BOOK_MASK      0x0000ffff00000000UL
+> +#define TOPO_DRAWER_MASK    0x0000ff0000000000UL
+> =20
+>  typedef struct S390TopologyEntry {
+>      s390_topology_id id;
+> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> index d3ade40a5a..712fd68123 100644
+> --- a/include/hw/s390x/sclp.h
+> +++ b/include/hw/s390x/sclp.h
+> @@ -112,6 +112,7 @@ typedef struct CPUEntry {
+>  } QEMU_PACKED CPUEntry;
+> =20
+>  #define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET     128
+> +#define SCLP_READ_SCP_INFO_MNEST                2
+>  typedef struct ReadInfo {
+>      SCCBHeader h;
+>      uint16_t rnmax;
+> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+> index 39ea63a416..78988048dd 100644
+> --- a/target/s390x/cpu.h
+> +++ b/target/s390x/cpu.h
+> @@ -561,6 +561,25 @@ typedef struct SysIB_322 {
+>  } SysIB_322;
+>  QEMU_BUILD_BUG_ON(sizeof(SysIB_322) !=3D 4096);
+> =20
+> +#define S390_TOPOLOGY_MAG  6
+> +#define S390_TOPOLOGY_MAG6 0
+> +#define S390_TOPOLOGY_MAG5 1
+> +#define S390_TOPOLOGY_MAG4 2
+> +#define S390_TOPOLOGY_MAG3 3
+> +#define S390_TOPOLOGY_MAG2 4
+> +#define S390_TOPOLOGY_MAG1 5
+> +/* Configuration topology */
+> +typedef struct SysIB_151x {
+> +    uint8_t  reserved0[2];
+> +    uint16_t length;
+> +    uint8_t  mag[S390_TOPOLOGY_MAG];
+> +    uint8_t  reserved1;
+> +    uint8_t  mnest;
+> +    uint32_t reserved2;
+> +    char tle[];
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIB_151x;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) !=3D 16);
+> +
+>  typedef union SysIB {
+>      SysIB_111 sysib_111;
+>      SysIB_121 sysib_121;
+> @@ -568,9 +587,68 @@ typedef union SysIB {
+>      SysIB_221 sysib_221;
+>      SysIB_222 sysib_222;
+>      SysIB_322 sysib_322;
+> +    SysIB_151x sysib_151x;
+>  } SysIB;
+>  QEMU_BUILD_BUG_ON(sizeof(SysIB) !=3D 4096);
+> =20
+> +/*
+> + * CPU Topology List provided by STSI with fc=3D15 provides a list
+> + * of two different Topology List Entries (TLE) types to specify
+> + * the topology hierarchy.
+> + *
+> + * - Container Topology List Entry
+> + *   Defines a container to contain other Topology List Entries
+> + *   of any type, nested containers or CPU.
+> + * - CPU Topology List Entry
+> + *   Specifies the CPUs position, type, entitlement and polarization
+> + *   of the CPUs contained in the last Container TLE.
+> + *
+> + * There can be theoretically up to five levels of containers, QEMU
+> + * uses only one level, the socket level.
+> + *
+> + * A container of with a nesting level (NL) greater than 1 can only
+> + * contain another container of nesting level NL-1.
+> + *
+> + * A container of nesting level 1 (socket), contains as many CPU TLE
+> + * as needed to describe the position and qualities of all CPUs inside
+> + * the container.
+> + * The qualities of a CPU are polarization, entitlement and type.
+> + *
+> + * The CPU TLE defines the position of the CPUs of identical qualities
+> + * using a 64bits mask which first bit has its offset defined by
+> + * the CPU address orgin field of the CPU TLE like in:
+> + * CPU address =3D origin * 64 + bit position within the mask
+> + *
+> + */
+> +/* Container type Topology List Entry */
+> +/* Container type Topology List Entry */
+> +typedef struct SysIBTl_container {
+> +        uint8_t nl;
+> +        uint8_t reserved[6];
+> +        uint8_t id;
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_container;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) !=3D 8);
+> +
+> +/* CPU type Topology List Entry */
+> +typedef struct SysIBTl_cpu {
+> +        uint8_t nl;
+> +        uint8_t reserved0[3];
+> +        uint8_t reserved1:5;
+> +        uint8_t dedicated:1;
+> +        uint8_t polarity:2;
+> +        uint8_t type;
+> +        uint16_t origin;
+> +        uint64_t mask;
+> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_cpu;
+> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) !=3D 16);
+> +
+> +/* Max size of a SYSIB structure is when all CPU are alone in a containe=
+r */
+> +#define S390_TOPOLOGY_SYSIB_SIZE (sizeof(SysIB_151x) +                  =
+       \
+> +                                  S390_MAX_CPUS * (sizeof(SysIBTl_contai=
+ner) + \
+> +                                                   sizeof(SysIBTl_cpu)))
 
-Yes, that is correct understanding.
+I don't think this is accurate anymore, if you have drawers and books.
+In that case you could have 3 containers per 1 cpu.
+You could also use the maxcpus number at runtime instead of S390_MAX_CPUS.
+I also think you could do sizeof(SysIB) + sizeof(SysIBTl_cpu) if you check
+if the sysib overflows 4k while building it.
 
-Regards
-Nikunj
+> +
+> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar);
+> +
+>  /* MMU defines */
+>  #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin       =
+      */
+>  #define ASCE_SUBSPACE         0x200       /* subspace group control     =
+      */
+> diff --git a/target/s390x/kvm/cpu_topology.c b/target/s390x/kvm/cpu_topol=
+ogy.c
+> new file mode 100644
+> index 0000000000..3831a3264c
+> --- /dev/null
+> +++ b/target/s390x/kvm/cpu_topology.c
+> @@ -0,0 +1,136 @@
+> +/*
+> + * QEMU S390x CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (a=
+t
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#include "qemu/osdep.h"
+> +#include "cpu.h"
+> +#include "hw/s390x/pv.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/s390x/sclp.h"
+> +#include "hw/s390x/cpu-topology.h"
+> +
+> +static char *fill_container(char *p, int level, int id)
+> +{
+> +    SysIBTl_container *tle =3D (SysIBTl_container *)p;
+> +
+> +    tle->nl =3D level;
+> +    tle->id =3D id;
+> +    return p + sizeof(*tle);
+> +}
+> +
+> +static char *fill_tle_cpu(char *p, S390TopologyEntry *entry)
+> +{
+> +    SysIBTl_cpu *tle =3D (SysIBTl_cpu *)p;
+> +    s390_topology_id topology_id =3D entry->id;
+> +
+> +    tle->nl =3D 0;
+> +    tle->dedicated =3D topology_id.d;
+> +    tle->polarity =3D topology_id.p;
+> +    tle->type =3D topology_id.type;
+> +    tle->origin =3D topology_id.origin;
 
+You need to multiply that value by 64, no?
+And convert it to BE.
+
+> +    tle->mask =3D cpu_to_be64(entry->mask);
+> +    return p + sizeof(*tle);
+> +}
+> +
+> +static char *s390_top_set_level(char *p, int level)
+> +{
+> +    S390TopologyEntry *entry;
+> +    uint64_t last_socket =3D -1UL;
+> +    uint64_t last_book =3D -1UL;
+> +    uint64_t last_drawer =3D -1UL;
+
+-1UL looks funny to me, but there is nothing wrong with it.
+But I don't see a reason not to use int and initialize it with -1.
+
+> +    int drawer_cnt =3D 0;
+> +    int book_cnt =3D 0;
+> +    int socket_cnt =3D 0;
+> +
+> +    QTAILQ_FOREACH(entry, &s390_topology.list, next) {
+> +
+> +        if (level > 3 && (last_drawer !=3D entry->id.drawer)) {
+> +            book_cnt =3D 0;
+> +            socket_cnt =3D 0;
+> +            p =3D fill_container(p, 3, drawer_cnt++);
+> +            last_drawer =3D entry->id.id & TOPO_DRAWER_MASK;
+> +            p =3D fill_container(p, 2, book_cnt++);
+> +            last_book =3D entry->id.id & TOPO_BOOK_MASK;
+> +            p =3D fill_container(p, 1, socket_cnt++);
+> +            last_socket =3D entry->id.id & TOPO_SOCKET_MASK;
+> +            p =3D fill_tle_cpu(p, entry);
+> +        } else if (level > 2 && (last_book !=3D
+> +                                 (entry->id.id & TOPO_BOOK_MASK))) {
+> +            socket_cnt =3D 0;
+> +            p =3D fill_container(p, 2, book_cnt++);
+> +            last_book =3D entry->id.id & TOPO_BOOK_MASK;
+> +            p =3D fill_container(p, 1, socket_cnt++);
+> +            last_socket =3D entry->id.id & TOPO_SOCKET_MASK;
+> +            p =3D fill_tle_cpu(p, entry);
+> +        } else if (last_socket !=3D (entry->id.id & TOPO_SOCKET_MASK)) {
+> +            p =3D fill_container(p, 1, socket_cnt++);
+> +            last_socket =3D entry->id.id & TOPO_SOCKET_MASK;
+> +            p =3D fill_tle_cpu(p, entry);
+> +        } else {
+> +            p =3D fill_tle_cpu(p, entry);
+> +        }
+> +    }
+> +
+> +    return p;
+> +}
+
+I think you can do this a bit more readable and reduce redundancy.
+Pseudo code:
+
+foreach entry:
+	bool drawer_change =3D last_drawer !=3D current_drawer
+	bool book_change =3D drawer_change || last_book !=3D current_book
+	bool socket_change =3D book_change || last_socket !=3D current_socket
+
+	if (level > 3 && drawer_change)
+		reset book id
+		fill drawer container
+		drawer id++
+	if (level > 2 && book_change)
+		reset socket id
+		fill book container
+		book id++
+	if (socket_change)
+		fill socket container
+		socket id++
+	fill cpu entry
+
+	update last_drawer, _book, _socket
+
+You can also check after after every fill if the buffer has been overflowed=
+,
+that is if the function wrote more than sizeof(SysIB) - sizeof(SysIB_151x) =
+bytes.
+Or you check it once at the end if you increase the size of the buffer a bi=
+t.
+Then you don't need to allocate the absolute maximum.
+
+I think you could also use global ids for the containers.
+So directly use the drawer id from the entry,
+use (drawer id * smp.books) + book id, and so on.
+If you update last_* after setting *_changed you don't need to maintain ids=
+,
+you can just use last_*.
+
+
+[...]
