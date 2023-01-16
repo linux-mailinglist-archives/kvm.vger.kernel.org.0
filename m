@@ -2,404 +2,481 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C458D66C41B
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 16:39:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4133666C5F0
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 17:12:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229977AbjAPPji (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 10:39:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57126 "EHLO
+        id S232301AbjAPQMQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 11:12:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229603AbjAPPjg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 10:39:36 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58BF04EE8
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 07:39:34 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30GFPW07032467;
-        Mon, 16 Jan 2023 15:39:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=usAkRdnnKHJ6F/g9VPCoDhd0ZuYvopU6+VXWs1ypRuo=;
- b=Bs1xCx6mVYRrIcfMfhNqEQ5vuyEJSb4SPsgc/qsh5v0/0RG1dKuQEwdavULJ7DRYscuh
- 8j1c3z/VBB0ef+PCIl1Poi6LTuiiT0MvsAglijdEhUh9xSEEDmSN10cWUbPT65BcRTuj
- HFo0L/t/WErwHDgqiPvoI3MQ+PxZoQnnAo1l3LZhOwc9PHGOWIzjK1ygUb/WC3Uf58xn
- M9j+8nenQpCDjdt9XkVE+1X9LY643Ui2YBAHkGNj+be6F9SjRufiureVyCslxRJPMvBr
- pYTawAnTstlvcvd5eokLIgNREyq1AITf8r5br9lHw4xjzBodPCkd64IO5rAIs9AaQV64 VA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5971rar7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 15:39:26 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30GFQo1U003171;
-        Mon, 16 Jan 2023 15:39:26 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5971raqm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 15:39:26 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30GD0lRB004825;
-        Mon, 16 Jan 2023 15:39:24 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3n3m169w56-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 15:39:24 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30GFdKrm47972688
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Jan 2023 15:39:20 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 57F7920049;
-        Mon, 16 Jan 2023 15:39:20 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 127C320043;
-        Mon, 16 Jan 2023 15:39:19 +0000 (GMT)
-Received: from [9.179.28.129] (unknown [9.179.28.129])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 16 Jan 2023 15:39:18 +0000 (GMT)
-Message-ID: <34cd8a0c-963f-1480-9d31-4e8df84da932@linux.ibm.com>
-Date:   Mon, 16 Jan 2023 16:39:18 +0100
+        with ESMTP id S232340AbjAPQLv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 11:11:51 -0500
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43C152A177;
+        Mon, 16 Jan 2023 08:07:23 -0800 (PST)
+Received: by mail-lj1-x22c.google.com with SMTP id g14so30389866ljh.10;
+        Mon, 16 Jan 2023 08:07:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OXc23bmCxG5po7osEcqfCOuw4YGk+Pm4CKLTuwQSl9w=;
+        b=EVgJ7CdVDuIhT15uajggGniri9asjMeYDbR6QPO0vpC22FyfL0NSgh2ithyR6HriKr
+         gCiB+QBx9tqeE4OuG28JUYpMJOFoXahBdSVkhDvs0oDxh3dw0dCvNTcRdQ3xDEn5SawV
+         FM0x5/TtGp0dSTXh8gHdO4Wb1CNmQIbzmcIIQezywtYqmnPLY49tN+8R0XLWoxliacKJ
+         pFt8kHKqGsut6UVJ+h1VXjub+Oooywh5DwFRH88JvreQIw/IW5mEEe9Ptvwrlwr2gvrT
+         hj4/hvXoidiay0Mvmdd4IwtKNK6SKeJ3iu5kfhtLqFm+yiLoHIn98b+30qr83B1Vig/y
+         Fonw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OXc23bmCxG5po7osEcqfCOuw4YGk+Pm4CKLTuwQSl9w=;
+        b=iu3ENe9UMV4N673+M5nyR9HDlp36FdDVR/5dvuKgnJkkiQWy/VIv/3aOu68XlmiMOl
+         j/8ro8xkfsX0Ee8rIoaDbpRf4v/YhKd1eJ5HbtVGpgVn1avlTFREwlrRfWNEF8faDs9N
+         nM1/YapGYMqu6aoSO4ZjUv7y5nSs4UIBw3F4wy0dQwdg34NwpuQAxnVa4Pz+QdsqGOWf
+         7o46ljx71BpmZ64hxMdR1qnrElO4cuzBlROHpcVi8pB22quY7xX1t/o/Z5gxeLkQ3ZaK
+         rOPhqqwSQNZUXxOPzdnLo6et2ohFbag0mJ8qRJM9VvVX1HyjSseGXFTpTiZgYkLqS1IR
+         VI5Q==
+X-Gm-Message-State: AFqh2krG/xKw1OR/VYfjSGsRdy0OqsoADjkygdcNhnrfMX9Du7+Joks3
+        K6Xk1IdbyC5059QUH5DAWXo=
+X-Google-Smtp-Source: AMrXdXtitBcAkV5imDH5DI8ARH1Xu0byc0Ka+FLCaD5TVutura2sFyYQXe35dE21ba3vY9z4Rx02XQ==
+X-Received: by 2002:a2e:2a04:0:b0:277:a4b:56c9 with SMTP id q4-20020a2e2a04000000b002770a4b56c9mr26906ljq.0.1673885241243;
+        Mon, 16 Jan 2023 08:07:21 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id f27-20020a2eb5bb000000b0027fd72dd6a1sm1628731ljn.70.2023.01.16.08.07.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 Jan 2023 08:07:21 -0800 (PST)
+Date:   Mon, 16 Jan 2023 18:07:19 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>
+Subject: Re: [PATCH v11 024/113] KVM: TDX: Do TDX specific vcpu
+ initialization
+Message-ID: <20230116180719.000057c4@gmail.com>
+In-Reply-To: <c8f51a32315dce7d4f48d9ae6668da249e22a432.1673539699.git.isaku.yamahata@intel.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+        <c8f51a32315dce7d4f48d9ae6668da249e22a432.1673539699.git.isaku.yamahata@intel.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v14 03/11] target/s390x/cpu topology: handle STSI(15) and
- build the SYSIB
-Content-Language: en-US
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-4-pmorel@linux.ibm.com>
- <270af9ebb128c7fe576895b2e204d901dae77c5e.camel@linux.ibm.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <270af9ebb128c7fe576895b2e204d901dae77c5e.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7AnvtUePJSj-JuIsyUUQlhAnMR_qQwLX
-X-Proofpoint-ORIG-GUID: KAqqvSrAaVll11upmN4zbTc-85YK5JTz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-16_13,2023-01-13_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 phishscore=0 mlxlogscore=999
- suspectscore=0 adultscore=0 bulkscore=0 mlxscore=0 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301160116
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, 12 Jan 2023 08:31:32 -0800
+isaku.yamahata@intel.com wrote:
+
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+> 
+> TD guest vcpu need to be configured before ready to run which requests
+> addtional information from Device model (e.g. qemu), one 64bit value is
+> passed to vcpu's RCX as an initial value.  Repurpose KVM_MEMORY_ENCRYPT_OP
+> to vcpu-scope and add new sub-commands KVM_TDX_INIT_VCPU under it for such
+> additional vcpu configuration.
+> 
+
+Better add more details for this mystic value to save the review efforts.
+
+For exmaple, refining the above part as:
+
+----
+
+TD hands-off block(HOB) is used to pass the information from VMM to
+TD virtual firmware(TDVF). Before KVM calls Intel TDX module to launch
+TDVF, the address of HOB must be placed in the guest RCX.
+
+Extend KVM_MEMORY_ENCRYPT_OP to vcpu-scope and add new... so that
+TDH.VP.INIT can take the address of HOB from QEMU and place it in the
+guest RCX when initializing a TDX vCPU.
+
+----
+
+The below paragraph seems repeating the end of the first paragraph. Guess
+it can be refined or removed.
 
 
-On 1/16/23 14:11, Nina Schoetterl-Glausch wrote:
-> On Thu, 2023-01-05 at 15:53 +0100, Pierre Morel wrote:
->> On interception of STSI(15.1.x) the System Information Block
->> (SYSIB) is built from the list of pre-ordered topology entries.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   include/hw/s390x/cpu-topology.h |   3 +
->>   include/hw/s390x/sclp.h         |   1 +
->>   target/s390x/cpu.h              |  78 ++++++++++++++++++
->>   target/s390x/kvm/cpu_topology.c | 136 ++++++++++++++++++++++++++++++++
->>   target/s390x/kvm/kvm.c          |   5 +-
->>   target/s390x/kvm/meson.build    |   3 +-
->>   6 files changed, 224 insertions(+), 2 deletions(-)
->>   create mode 100644 target/s390x/kvm/cpu_topology.c
->>
->> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
->> index b3fd752d8d..9571aa70e5 100644
->> --- a/include/hw/s390x/cpu-topology.h
->> +++ b/include/hw/s390x/cpu-topology.h
->> @@ -41,6 +41,9 @@ typedef union s390_topology_id {
->>       };
->>   } s390_topology_id;
->>   #define TOPO_CPU_MASK       0x000000000000003fUL
->> +#define TOPO_SOCKET_MASK    0x0000ffffff000000UL
->> +#define TOPO_BOOK_MASK      0x0000ffff00000000UL
->> +#define TOPO_DRAWER_MASK    0x0000ff0000000000UL
->>   
->>   typedef struct S390TopologyEntry {
->>       s390_topology_id id;
->> diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
->> index d3ade40a5a..712fd68123 100644
->> --- a/include/hw/s390x/sclp.h
->> +++ b/include/hw/s390x/sclp.h
->> @@ -112,6 +112,7 @@ typedef struct CPUEntry {
->>   } QEMU_PACKED CPUEntry;
->>   
->>   #define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET     128
->> +#define SCLP_READ_SCP_INFO_MNEST                2
->>   typedef struct ReadInfo {
->>       SCCBHeader h;
->>       uint16_t rnmax;
->> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
->> index 39ea63a416..78988048dd 100644
->> --- a/target/s390x/cpu.h
->> +++ b/target/s390x/cpu.h
->> @@ -561,6 +561,25 @@ typedef struct SysIB_322 {
->>   } SysIB_322;
->>   QEMU_BUILD_BUG_ON(sizeof(SysIB_322) != 4096);
->>   
->> +#define S390_TOPOLOGY_MAG  6
->> +#define S390_TOPOLOGY_MAG6 0
->> +#define S390_TOPOLOGY_MAG5 1
->> +#define S390_TOPOLOGY_MAG4 2
->> +#define S390_TOPOLOGY_MAG3 3
->> +#define S390_TOPOLOGY_MAG2 4
->> +#define S390_TOPOLOGY_MAG1 5
->> +/* Configuration topology */
->> +typedef struct SysIB_151x {
->> +    uint8_t  reserved0[2];
->> +    uint16_t length;
->> +    uint8_t  mag[S390_TOPOLOGY_MAG];
->> +    uint8_t  reserved1;
->> +    uint8_t  mnest;
->> +    uint32_t reserved2;
->> +    char tle[];
->> +} QEMU_PACKED QEMU_ALIGNED(8) SysIB_151x;
->> +QEMU_BUILD_BUG_ON(sizeof(SysIB_151x) != 16);
->> +
->>   typedef union SysIB {
->>       SysIB_111 sysib_111;
->>       SysIB_121 sysib_121;
->> @@ -568,9 +587,68 @@ typedef union SysIB {
->>       SysIB_221 sysib_221;
->>       SysIB_222 sysib_222;
->>       SysIB_322 sysib_322;
->> +    SysIB_151x sysib_151x;
->>   } SysIB;
->>   QEMU_BUILD_BUG_ON(sizeof(SysIB) != 4096);
->>   
->> +/*
->> + * CPU Topology List provided by STSI with fc=15 provides a list
->> + * of two different Topology List Entries (TLE) types to specify
->> + * the topology hierarchy.
->> + *
->> + * - Container Topology List Entry
->> + *   Defines a container to contain other Topology List Entries
->> + *   of any type, nested containers or CPU.
->> + * - CPU Topology List Entry
->> + *   Specifies the CPUs position, type, entitlement and polarization
->> + *   of the CPUs contained in the last Container TLE.
->> + *
->> + * There can be theoretically up to five levels of containers, QEMU
->> + * uses only one level, the socket level.
->> + *
->> + * A container of with a nesting level (NL) greater than 1 can only
->> + * contain another container of nesting level NL-1.
->> + *
->> + * A container of nesting level 1 (socket), contains as many CPU TLE
->> + * as needed to describe the position and qualities of all CPUs inside
->> + * the container.
->> + * The qualities of a CPU are polarization, entitlement and type.
->> + *
->> + * The CPU TLE defines the position of the CPUs of identical qualities
->> + * using a 64bits mask which first bit has its offset defined by
->> + * the CPU address orgin field of the CPU TLE like in:
->> + * CPU address = origin * 64 + bit position within the mask
->> + *
->> + */
->> +/* Container type Topology List Entry */
->> +/* Container type Topology List Entry */
->> +typedef struct SysIBTl_container {
->> +        uint8_t nl;
->> +        uint8_t reserved[6];
->> +        uint8_t id;
->> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_container;
->> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) != 8);
->> +
->> +/* CPU type Topology List Entry */
->> +typedef struct SysIBTl_cpu {
->> +        uint8_t nl;
->> +        uint8_t reserved0[3];
->> +        uint8_t reserved1:5;
->> +        uint8_t dedicated:1;
->> +        uint8_t polarity:2;
->> +        uint8_t type;
->> +        uint16_t origin;
->> +        uint64_t mask;
->> +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_cpu;
->> +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) != 16);
->> +
->> +/* Max size of a SYSIB structure is when all CPU are alone in a container */
->> +#define S390_TOPOLOGY_SYSIB_SIZE (sizeof(SysIB_151x) +                         \
->> +                                  S390_MAX_CPUS * (sizeof(SysIBTl_container) + \
->> +                                                   sizeof(SysIBTl_cpu)))
-> 
-> I don't think this is accurate anymore, if you have drawers and books.
-> In that case you could have 3 containers per 1 cpu.
-> You could also use the maxcpus number at runtime instead of S390_MAX_CPUS.
-> I also think you could do sizeof(SysIB) + sizeof(SysIBTl_cpu) if you check
-> if the sysib overflows 4k while building it.
-
-Right.
-And I think your other proposal here under is better
+> Add callback for kvm vCPU-scoped operations of KVM_MEMORY_ENCRYPT_OP and
+> add a new subcommand, KVM_TDX_INIT_VCPU, for further vcpu initialization.
+>
 
 
-> 
->> +
->> +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar);
->> +
->>   /* MMU defines */
->>   #define ASCE_ORIGIN           (~0xfffULL) /* segment table origin             */
->>   #define ASCE_SUBSPACE         0x200       /* subspace group control           */
->> diff --git a/target/s390x/kvm/cpu_topology.c b/target/s390x/kvm/cpu_topology.c
->> new file mode 100644
->> index 0000000000..3831a3264c
->> --- /dev/null
->> +++ b/target/s390x/kvm/cpu_topology.c
->> @@ -0,0 +1,136 @@
->> +/*
->> + * QEMU S390x CPU Topology
->> + *
->> + * Copyright IBM Corp. 2022
->> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
->> + *
->> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
->> + * your option) any later version. See the COPYING file in the top-level
->> + * directory.
->> + */
->> +#include "qemu/osdep.h"
->> +#include "cpu.h"
->> +#include "hw/s390x/pv.h"
->> +#include "hw/sysbus.h"
->> +#include "hw/s390x/sclp.h"
->> +#include "hw/s390x/cpu-topology.h"
->> +
->> +static char *fill_container(char *p, int level, int id)
->> +{
->> +    SysIBTl_container *tle = (SysIBTl_container *)p;
->> +
->> +    tle->nl = level;
->> +    tle->id = id;
->> +    return p + sizeof(*tle);
->> +}
->> +
->> +static char *fill_tle_cpu(char *p, S390TopologyEntry *entry)
->> +{
->> +    SysIBTl_cpu *tle = (SysIBTl_cpu *)p;
->> +    s390_topology_id topology_id = entry->id;
->> +
->> +    tle->nl = 0;
->> +    tle->dedicated = topology_id.d;
->> +    tle->polarity = topology_id.p;
->> +    tle->type = topology_id.type;
->> +    tle->origin = topology_id.origin;
-> 
-> You need to multiply that value by 64, no?
-> And convert it to BE.
+PS: I am curious if the value of guest RCX on each VCPU will be configured
+differently? (It seems they are the same according to the code of tdx-qemu)
 
-Yes right, I already had this error, I must have lost it in a rebase.
+If yes, then it is just an approach to configure the value (even it is
+through TDH.VP.XXX). It should be configured in the domain level in KVM. The
+TDX vCPU creation and initialization can be moved into tdx_vcpu_create()
+and TDH.VP.INIT can take the value from a per-vm data structure.
+ 
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/include/asm/kvm-x86-ops.h    |   1 +
+>  arch/x86/include/asm/kvm_host.h       |   1 +
+>  arch/x86/include/uapi/asm/kvm.h       |   1 +
+>  arch/x86/kvm/vmx/main.c               |   9 ++
+>  arch/x86/kvm/vmx/tdx.c                | 147 +++++++++++++++++++++++++-
+>  arch/x86/kvm/vmx/tdx.h                |   7 ++
+>  arch/x86/kvm/vmx/x86_ops.h            |  10 +-
+>  arch/x86/kvm/x86.c                    |   6 ++
+>  tools/arch/x86/include/uapi/asm/kvm.h |   1 +
+>  9 files changed, 178 insertions(+), 5 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 1a27f3aee982..e3e9b1c2599b 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -123,6 +123,7 @@ KVM_X86_OP(enable_smi_window)
+>  #endif
+>  KVM_X86_OP_OPTIONAL(dev_mem_enc_ioctl)
+>  KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
+> +KVM_X86_OP_OPTIONAL(vcpu_mem_enc_ioctl)
+>  KVM_X86_OP_OPTIONAL(mem_enc_register_region)
+>  KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
+>  KVM_X86_OP_OPTIONAL(vm_copy_enc_context_from)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 30f4ddb18548..35773f925cc5 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1698,6 +1698,7 @@ struct kvm_x86_ops {
+>  
+>  	int (*dev_mem_enc_ioctl)(void __user *argp);
+>  	int (*mem_enc_ioctl)(struct kvm *kvm, void __user *argp);
+> +	int (*vcpu_mem_enc_ioctl)(struct kvm_vcpu *vcpu, void __user *argp);
+>  	int (*mem_enc_register_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+>  	int (*mem_enc_unregister_region)(struct kvm *kvm, struct kvm_enc_region *argp);
+>  	int (*vm_copy_enc_context_from)(struct kvm *kvm, unsigned int source_fd);
+> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+> index b8f28d86d4fd..9236c1699c48 100644
+> --- a/arch/x86/include/uapi/asm/kvm.h
+> +++ b/arch/x86/include/uapi/asm/kvm.h
+> @@ -536,6 +536,7 @@ struct kvm_pmu_event_filter {
+>  enum kvm_tdx_cmd_id {
+>  	KVM_TDX_CAPABILITIES = 0,
+>  	KVM_TDX_INIT_VM,
+> +	KVM_TDX_INIT_VCPU,
+>  
+>  	KVM_TDX_CMD_NR_MAX,
+>  };
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 59813ca05f36..23b3ffc3fe23 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -103,6 +103,14 @@ static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  	return tdx_vm_ioctl(kvm, argp);
+>  }
+>  
+> +static int vt_vcpu_mem_enc_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+> +{
+> +	if (!is_td_vcpu(vcpu))
+> +		return -EINVAL;
+> +
+> +	return tdx_vcpu_ioctl(vcpu, argp);
+> +}
+> +
+>  struct kvm_x86_ops vt_x86_ops __initdata = {
+>  	.name = KBUILD_MODNAME,
+>  
+> @@ -249,6 +257,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>  
+>  	.dev_mem_enc_ioctl = tdx_dev_ioctl,
+>  	.mem_enc_ioctl = vt_mem_enc_ioctl,
+> +	.vcpu_mem_enc_ioctl = vt_vcpu_mem_enc_ioctl,
+>  };
+>  
+>  struct kvm_x86_init_ops vt_init_ops __initdata = {
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index 099f0737a5aa..e2f5a07ad4e5 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -49,6 +49,11 @@ static __always_inline hpa_t set_hkid_to_hpa(hpa_t pa, u16 hkid)
+>  	return pa | ((hpa_t)hkid << boot_cpu_data.x86_phys_bits);
+>  }
+>  
+> +static inline bool is_td_vcpu_created(struct vcpu_tdx *tdx)
+> +{
+> +	return tdx->tdvpr_pa;
+> +}
+> +
+>  static inline bool is_td_created(struct kvm_tdx *kvm_tdx)
+>  {
+>  	return kvm_tdx->tdr_pa;
+> @@ -65,6 +70,11 @@ static inline bool is_hkid_assigned(struct kvm_tdx *kvm_tdx)
+>  	return kvm_tdx->hkid > 0;
+>  }
+>  
+> +static inline bool is_td_finalized(struct kvm_tdx *kvm_tdx)
+> +{
+> +	return kvm_tdx->finalized;
+> +}
+> +
+>  static void tdx_clear_page(unsigned long page_pa)
+>  {
+>  	const void *zero_page = (const void *) __va(page_to_phys(ZERO_PAGE(0)));
+> @@ -327,7 +337,21 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>  
+>  void tdx_vcpu_free(struct kvm_vcpu *vcpu)
+>  {
+> -	/* This is stub for now.  More logic will come. */
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> +	int i;
+> +
+> +	/* Can't reclaim or free pages if teardown failed. */
+> +	if (is_hkid_assigned(to_kvm_tdx(vcpu->kvm)))
+> +		return;
+> +
 
+Should we have an WARN_ON_ONCE here?
 
-> 
->> +    tle->mask = cpu_to_be64(entry->mask);
->> +    return p + sizeof(*tle);
->> +}
->> +
->> +static char *s390_top_set_level(char *p, int level)
->> +{
->> +    S390TopologyEntry *entry;
->> +    uint64_t last_socket = -1UL;
->> +    uint64_t last_book = -1UL;
->> +    uint64_t last_drawer = -1UL;
-> 
-> -1UL looks funny to me, but there is nothing wrong with it.
-> But I don't see a reason not to use int and initialize it with -1.
-> 
->> +    int drawer_cnt = 0;
->> +    int book_cnt = 0;
->> +    int socket_cnt = 0;
->> +
->> +    QTAILQ_FOREACH(entry, &s390_topology.list, next) {
->> +
->> +        if (level > 3 && (last_drawer != entry->id.drawer)) {
->> +            book_cnt = 0;
->> +            socket_cnt = 0;
->> +            p = fill_container(p, 3, drawer_cnt++);
->> +            last_drawer = entry->id.id & TOPO_DRAWER_MASK;
->> +            p = fill_container(p, 2, book_cnt++);
->> +            last_book = entry->id.id & TOPO_BOOK_MASK;
->> +            p = fill_container(p, 1, socket_cnt++);
->> +            last_socket = entry->id.id & TOPO_SOCKET_MASK;
->> +            p = fill_tle_cpu(p, entry);
->> +        } else if (level > 2 && (last_book !=
->> +                                 (entry->id.id & TOPO_BOOK_MASK))) {
->> +            socket_cnt = 0;
->> +            p = fill_container(p, 2, book_cnt++);
->> +            last_book = entry->id.id & TOPO_BOOK_MASK;
->> +            p = fill_container(p, 1, socket_cnt++);
->> +            last_socket = entry->id.id & TOPO_SOCKET_MASK;
->> +            p = fill_tle_cpu(p, entry);
->> +        } else if (last_socket != (entry->id.id & TOPO_SOCKET_MASK)) {
->> +            p = fill_container(p, 1, socket_cnt++);
->> +            last_socket = entry->id.id & TOPO_SOCKET_MASK;
->> +            p = fill_tle_cpu(p, entry);
->> +        } else {
->> +            p = fill_tle_cpu(p, entry);
->> +        }
->> +    }
->> +
->> +    return p;
->> +}
-> 
-> I think you can do this a bit more readable and reduce redundancy.
-> Pseudo code:
-> 
-> foreach entry:
-> 	bool drawer_change = last_drawer != current_drawer
-> 	bool book_change = drawer_change || last_book != current_book
-> 	bool socket_change = book_change || last_socket != current_socket
-> 
-> 	if (level > 3 && drawer_change)
-> 		reset book id
-> 		fill drawer container
-> 		drawer id++
-> 	if (level > 2 && book_change)
-> 		reset socket id
-> 		fill book container
-> 		book id++
-> 	if (socket_change)
-> 		fill socket container
-> 		socket id++
-> 	fill cpu entry
-> 
-> 	update last_drawer, _book, _socket
-> 
-> You can also check after after every fill if the buffer has been overflowed,
-> that is if the function wrote more than sizeof(SysIB) - sizeof(SysIB_151x) bytes.
-> Or you check it once at the end if you increase the size of the buffer a bit.
-> Then you don't need to allocate the absolute maximum.
-> 
-> I think you could also use global ids for the containers.
-> So directly use the drawer id from the entry,
-> use (drawer id * smp.books) + book id, and so on.
-> If you update last_* after setting *_changed you don't need to maintain ids,
-> you can just use last_*.
+> +	if (tdx->tdvpx_pa) {
+> +		for (i = 0; i < tdx_caps.tdvpx_nr_pages; i++)
+> +			tdx_reclaim_td_page(tdx->tdvpx_pa[i]);
+> +		kfree(tdx->tdvpx_pa);
+> +		tdx->tdvpx_pa = NULL;
+> +	}
+> +	tdx_reclaim_td_page(tdx->tdvpr_pa);
+> +	tdx->tdvpr_pa = 0;
+>  }
+>  
+>  void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> @@ -337,6 +361,8 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+>  	/* TDX doesn't support INIT event. */
+>  	if (WARN_ON_ONCE(init_event))
+>  		goto td_bugged;
+> +	if (WARN_ON_ONCE(is_td_vcpu_created(to_tdx(vcpu))))
+> +		goto td_bugged;
+>  
+>  	/* TDX rquires X2APIC. */
+>  	apic_base_msr.data = APIC_DEFAULT_PHYS_BASE | LAPIC_MODE_X2APIC;
+> @@ -791,6 +817,125 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+>  	return r;
+>  }
+>  
+> +static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> +	unsigned long *tdvpx_pa = NULL;
+> +	unsigned long tdvpr_pa;
+> +	unsigned long va;
+> +	int ret, i;
+> +	u64 err;
+> +
+> +	if (is_td_vcpu_created(tdx))
+> +		return -EINVAL;
+> +
+> +	va = __get_free_page(GFP_KERNEL_ACCOUNT);
+> +	if (!va)
+> +		return -ENOMEM;
+> +	tdvpr_pa = __pa(va);
+> +
+> +	tdvpx_pa = kcalloc(tdx_caps.tdvpx_nr_pages, sizeof(*tdx->tdvpx_pa),
+> +			   GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +	if (!tdvpx_pa) {
+> +		ret = -ENOMEM;
+> +		goto free_tdvpr;
+> +	}
+> +	for (i = 0; i < tdx_caps.tdvpx_nr_pages; i++) {
+> +		va = __get_free_page(GFP_KERNEL_ACCOUNT);
+> +		if (!va)
+> +			goto free_tdvpx;
+> +		tdvpx_pa[i] = __pa(va);
+> +	}
+> +
+> +	err = tdh_vp_create(kvm_tdx->tdr_pa, tdvpr_pa);
+> +	if (WARN_ON_ONCE(err)) {
+> +		ret = -EIO;
+> +		pr_tdx_error(TDH_VP_CREATE, err, NULL);
+> +		goto td_bugged_free_tdvpx;
+> +	}
+> +	tdx->tdvpr_pa = tdvpr_pa;
+> +
+> +	tdx->tdvpx_pa = tdvpx_pa;
+> +	for (i = 0; i < tdx_caps.tdvpx_nr_pages; i++) {
+> +		err = tdh_vp_addcx(tdx->tdvpr_pa, tdvpx_pa[i]);
+> +		if (WARN_ON_ONCE(err)) {
+> +			ret = -EIO;
+> +			pr_tdx_error(TDH_VP_ADDCX, err, NULL);
+> +			for (; i < tdx_caps.tdvpx_nr_pages; i++) {
+> +				free_page((unsigned long)__va(tdvpx_pa[i]));
+> +				tdvpx_pa[i] = 0;
+> +			}
+> +			goto td_bugged;
+> +		}
+> +	}
+> +
+> +	err = tdh_vp_init(tdx->tdvpr_pa, vcpu_rcx);
+> +	if (WARN_ON_ONCE(err)) {
+> +		ret = -EIO;
+> +		pr_tdx_error(TDH_VP_INIT, err, NULL);
+> +		goto td_bugged;
+> +	}
+> +
+> +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> +
+> +	return 0;
+> +
+> +td_bugged_free_tdvpx:
+> +	for (i = 0; i < tdx_caps.tdvpx_nr_pages; i++) {
+> +		free_page((unsigned long)__va(tdvpx_pa[i]));
+> +		tdvpx_pa[i] = 0;
+> +	}
+> +	kfree(tdvpx_pa);
+> +td_bugged:
+> +	vcpu->kvm->vm_bugged = true;
+> +	return ret;
+> +
+> +free_tdvpx:
+> +	for (i = 0; i < tdx_caps.tdvpx_nr_pages; i++)
+> +		if (tdvpx_pa[i])
+> +			free_page((unsigned long)__va(tdvpx_pa[i]));
+> +	kfree(tdvpx_pa);
+> +	tdx->tdvpx_pa = NULL;
+> +free_tdvpr:
+> +	if (tdvpr_pa)
+> +		free_page((unsigned long)__va(tdvpr_pa));
+> +	tdx->tdvpr_pa = 0;
+> +
+> +	return ret;
+> +}
 
-OK, seems better to me
-Thanks
+Same comments with using vm_bugged in the previous patch.
 
-Regards,
-Pierre
+> +
+> +int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(vcpu->kvm);
+> +	struct vcpu_tdx *tdx = to_tdx(vcpu);
+> +	struct kvm_tdx_cmd cmd;
+> +	int ret;
+> +
+> +	if (tdx->vcpu_initialized)
+> +		return -EINVAL;
+> +
+> +	if (!is_hkid_assigned(kvm_tdx) || is_td_finalized(kvm_tdx))
+> +		return -EINVAL;
+> +
+> +	if (copy_from_user(&cmd, argp, sizeof(cmd)))
+> +		return -EFAULT;
+> +
+> +	if (cmd.error || cmd.unused)
+> +		return -EINVAL;
+> +
+> +	/* Currently only KVM_TDX_INTI_VCPU is defined for vcpu operation. */
+> +	if (cmd.flags || cmd.id != KVM_TDX_INIT_VCPU)
+> +		return -EINVAL;
+> +
+> +	ret = tdx_td_vcpu_init(vcpu, (u64)cmd.data);
+> +	if (ret)
+> +		return ret;
+> +
+> +	tdx->vcpu_initialized = true;
+> +	return 0;
+> +}
+> +
+>  static int __init tdx_module_setup(void)
+>  {
+>  	const struct tdsysinfo_struct *tdsysinfo;
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index af7fdc1516d5..e909883d60fa 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -17,12 +17,19 @@ struct kvm_tdx {
+>  	u64 xfam;
+>  	int hkid;
+>  
+> +	bool finalized;
+> +
+>  	u64 tsc_offset;
+>  };
+>  
+>  struct vcpu_tdx {
+>  	struct kvm_vcpu	vcpu;
+>  
+> +	unsigned long tdvpr_pa;
+> +	unsigned long *tdvpx_pa;
+> +
+> +	bool vcpu_initialized;
+> +
+>  	/*
+>  	 * Dummy to make pmu_intel not corrupt memory.
+>  	 * TODO: Support PMU for TDX.  Future work.
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 37ab2cfd35bc..fba8d0800597 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -148,11 +148,12 @@ int tdx_vm_init(struct kvm *kvm);
+>  void tdx_mmu_release_hkid(struct kvm *kvm);
+>  void tdx_vm_free(struct kvm *kvm);
+>  
+> -int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+> -
+>  int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+>  void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+>  void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+> +
+> +int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+> +int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+>  #else
+>  static inline int tdx_hardware_setup(struct kvm_x86_ops *x86_ops) { return 0; }
+>  static inline void tdx_hardware_unsetup(void) {}
+> @@ -165,11 +166,12 @@ static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
+>  static inline void tdx_flush_shadow_all_private(struct kvm *kvm) {}
+>  static inline void tdx_vm_free(struct kvm *kvm) {}
+>  
+> -static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+> -
+>  static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+>  static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+>  static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
+> +
+> +static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+> +static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+>  #endif
+>  
+>  #endif /* __KVM_X86_VMX_X86_OPS_H */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e8bc66031a1d..d548d3af6428 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -5976,6 +5976,12 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+>  	case KVM_SET_DEVICE_ATTR:
+>  		r = kvm_vcpu_ioctl_device_attr(vcpu, ioctl, argp);
+>  		break;
+> +	case KVM_MEMORY_ENCRYPT_OP:
+> +		r = -ENOTTY;
+> +		if (!kvm_x86_ops.vcpu_mem_enc_ioctl)
+> +			goto out;
+> +		r = kvm_x86_ops.vcpu_mem_enc_ioctl(vcpu, argp);
+> +		break;
+>  	default:
+>  		r = -EINVAL;
+>  	}
+> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
+> index eb800965b589..6971f1288043 100644
+> --- a/tools/arch/x86/include/uapi/asm/kvm.h
+> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
+> @@ -531,6 +531,7 @@ struct kvm_pmu_event_filter {
+>  enum kvm_tdx_cmd_id {
+>  	KVM_TDX_CAPABILITIES = 0,
+>  	KVM_TDX_INIT_VM,
+> +	KVM_TDX_INIT_VCPU,
+>  
+>  	KVM_TDX_CMD_NR_MAX,
+>  };
 
-
-> 
-> 
-> [...]
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
