@@ -2,65 +2,92 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D3FFD66CECC
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 19:27:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1E1666CEEE
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 19:36:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234244AbjAPS1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 13:27:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39754 "EHLO
+        id S234788AbjAPSgz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 13:36:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233024AbjAPS0l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 13:26:41 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 958EC3A58B;
-        Mon, 16 Jan 2023 10:13:21 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 177A81EC054E;
-        Mon, 16 Jan 2023 19:13:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1673892800;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=i/kh1ilFTWPtG8UywoZ6jYpIHXmqf2pU9jgg6W4/tcs=;
-        b=BRT1B4yyAW2z+g8WbQ/stM+fatfcjgjLyNkdp+OUWrixORtyBSH0Kh6dDVwJm6rM+DnuXk
-        mXc5FpQRMgx5fR09DlWEwDIqF6jYvwkasW8eQ0P0kvsYtUkOoGPp6YnAyL56laqkWWepY8
-        QrALCXN4/E/JMamNCWpaqbRcjCGGeoA=
-Date:   Mon, 16 Jan 2023 19:13:15 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Kim Phillips <kim.phillips@amd.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>
-Cc:     x86@kernel.org, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 3/7] x86/cpu, kvm: Move the LFENCE_RDTSC / LFENCE
- always serializing feature
-Message-ID: <Y8WTnx/ukvdAEeoe@zn.tnic>
-References: <20230110224643.452273-1-kim.phillips@amd.com>
- <20230110224643.452273-5-kim.phillips@amd.com>
+        with ESMTP id S234619AbjAPSgV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 13:36:21 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 162A82ED53
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 10:25:35 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30GGiaNP004786
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dN+TNjUuR9Ij4IbsqwS6vZo5NWn66qyGvjrjNhB49gw=;
+ b=SnkViVhgKlX3F6vm+6eHwS2FNDEYNJ5tmB2SkuOhUYQ49ODNMLRn3lbdzuXKzDlVttl7
+ 2rdK7IxbpKP8D5o22Kj7PdHbFHT2DqGB/AO/3I7lso5Y5klmjvAVRrYCFmspHEQQa3Lb
+ n3Dg/NvdaG5acSJjpiBaM4oNfjzX/b9/ld8dgoS1EgLXcI/5oSUwLNqHlbu8UjmC+aXw
+ 8RsM17E0U34byv8cAI152MmNRaBgSi3uzq/72M9IFuyIF1BfaEP49yank1tqEPruciXK
+ FO9mE/rp2/SdhoTap7sh8uZ4+A+5p0Q0/8pqzVVqX9BW3nThSudk2rIgI2IJX3a6ypm6 JA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5ac3hv9b-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:34 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30GID2XB016275
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:33 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5ac3hv92-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Jan 2023 18:25:33 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30GI5EG2001386;
+        Mon, 16 Jan 2023 18:25:31 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16js9k-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 16 Jan 2023 18:25:31 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30GIPSed50987344
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 16 Jan 2023 18:25:28 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 36B5D20043;
+        Mon, 16 Jan 2023 18:25:28 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EAF9320040;
+        Mon, 16 Jan 2023 18:25:27 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.56])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Mon, 16 Jan 2023 18:25:27 +0000 (GMT)
+Date:   Mon, 16 Jan 2023 19:20:02 +0100
+From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>
+Cc:     <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH 3/9] s390x/Makefile: fix `*.gbin` target
+ dependencies
+Message-ID: <20230116192002.085f43b0@p-imbrenda>
+In-Reply-To: <20230116175757.71059-4-mhartmay@linux.ibm.com>
+References: <20230116175757.71059-1-mhartmay@linux.ibm.com>
+        <20230116175757.71059-4-mhartmay@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230110224643.452273-5-kim.phillips@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 7DdFMuGCNWoTuXwthkmUIoDnMFVpmB9i
+X-Proofpoint-GUID: 8cHrfw_Z2dnpglk71VutAQuUDyHr_fFF
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-16_15,2023-01-13_02,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 spamscore=0
+ bulkscore=0 phishscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2301160135
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,57 +95,36 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 10, 2023 at 04:46:39PM -0600, Kim Phillips wrote:
-> The LFENCE_RDTSC / LFENCE always serializing feature was a scattered bit
-> and open-coded for KVM in __do_cpuid_func().  Add it to its newly added
-> CPUID leaf 0x80000021 EAX proper, and propagate it in kvm_set_cpu_caps()
-> instead.
+On Mon, 16 Jan 2023 18:57:51 +0100
+Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
+
+> If the linker scripts change, then the .gbin binaries must be rebuilt.
 > 
-> Also drop the bit description comments now it's more self-describing.
-> 
-> Whilst there, switch to using the more efficient cpu_feature_enabled()
-> instead of static_cpu_has().
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+
+I think this should be merged into the previous patch
+
 > ---
->  arch/x86/include/asm/cpufeatures.h | 3 ++-
->  arch/x86/kvm/cpuid.c               | 9 ++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
+>  s390x/Makefile | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 0cd7b4afd528..79da8e492c0f 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -97,7 +97,7 @@
->  #define X86_FEATURE_SYSENTER32		( 3*32+15) /* "" sysenter in IA32 userspace */
->  #define X86_FEATURE_REP_GOOD		( 3*32+16) /* REP microcode works well */
->  #define X86_FEATURE_AMD_LBR_V2		( 3*32+17) /* AMD Last Branch Record Extension Version 2 */
-> -#define X86_FEATURE_LFENCE_RDTSC	( 3*32+18) /* "" LFENCE synchronizes RDTSC */
-> +/* FREE, was #define X86_FEATURE_LFENCE_RDTSC		( 3*32+18) "" LFENCE synchronizes RDTSC */
->  #define X86_FEATURE_ACC_POWER		( 3*32+19) /* AMD Accumulated Power Mechanism */
->  #define X86_FEATURE_NOPL		( 3*32+20) /* The NOPL (0F 1F) instructions */
->  #define X86_FEATURE_ALWAYS		( 3*32+21) /* "" Always-present feature */
-> @@ -428,6 +428,7 @@
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 660ff06f1e7c..b6bf2ed99afd 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -135,12 +135,12 @@ $(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
+>  $(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
+>  	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
 >  
->  /* AMD-defined Extended Feature 2 EAX, CPUID level 0x80000021 (EAX), word 20 */
->  #define X86_FEATURE_NO_NESTED_DATA_BP	(20*32+ 0) /* "" AMD No Nested Data Breakpoints */
-> +#define X86_FEATURE_LFENCE_RDTSC	(20*32+ 2) /* "" LFENCE always serializing / synchronizes RDTSC */
+> -$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o
+> +$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(SRCDIR)/s390x/snippets/asm/flat.lds
+>  	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/asm/flat.lds $<
+>  	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
+>  	truncate -s '%4096' $@
+>  
+> -$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
+> +$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SRCDIR)/s390x/snippets/c/flat.lds
+>  	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
+>  	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
+>  	truncate -s '%4096' $@
 
-Hmm, a synthetic bit which gets replaced with a vendor one and then the other
-vendors set it too. I don't see why that cannot work but we probably should be
-careful here.
-
-dhansen, am I missing an angle?
-
-Also, X86_FEATURE_LFENCE_RDTSC gets set in init_amd() along with setting
-DE_CFG[1]. I think you should check the new flag here first and avoid the
-setting if that flag is set. Just for good measure - not that it changes
-anything but still, it is cheap to do.
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
