@@ -2,129 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEFA466CEEC
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 19:36:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8196066CF38
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 19:56:39 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232798AbjAPSgs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 13:36:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44952 "EHLO
+        id S233087AbjAPS4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 13:56:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233090AbjAPSgS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 13:36:18 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C63912CC55
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 10:25:29 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30GHqP5W015067
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=yIsW69qyWXudJDtPodVt+05LuWzfgaEditIJsBmWqvo=;
- b=tEm/BSd6gTcce7T9bEgCyGF2gQemOULPixs48YpcL0Val45taJWGuN+NH73Z4q+iea/u
- i5ShTHxJYjXsfrlurJ3Wfre44VQoJA2hu2jO6VJlEXiRFiu5JfkAAfZom00zndDpVe3A
- acjzpfJLuLFtmm2kYpxs+Aw3/rT6ywDJF8AY1nwC/MxXBESrfIjnOJgmLm8o2kzRWC1g
- b93eWBvGepCziWhrPJT5RRxFmDRHfsabkamV9QK3coOtUqpsKAzgijWOdiVtD+8goj4n
- at1JLMSdEu/DRZW2PxH+7Ly5vJfBOEoY4K8lA7bFMslvldn45f83NmAE0IvAXSY5s01H gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n57cv6juh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:29 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30GILMIF012309
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:28 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n57cv6ju3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 18:25:28 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30GG2YON006209;
-        Mon, 16 Jan 2023 18:25:26 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n3knfjsgc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 18:25:26 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30GIPMdv42860960
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Jan 2023 18:25:22 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C260320040;
-        Mon, 16 Jan 2023 18:25:22 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C73B20043;
-        Mon, 16 Jan 2023 18:25:22 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 16 Jan 2023 18:25:22 +0000 (GMT)
-Date:   Mon, 16 Jan 2023 19:25:07 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>
-Cc:     <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 9/9] lib/linux/const.h: test for
- `__ASSEMBLER__` as well
-Message-ID: <20230116192507.0f422ee0@p-imbrenda>
-In-Reply-To: <20230116175757.71059-10-mhartmay@linux.ibm.com>
-References: <20230116175757.71059-1-mhartmay@linux.ibm.com>
-        <20230116175757.71059-10-mhartmay@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-Content-Type: text/plain; charset=US-ASCII
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UgGSe3FPEa1sPr6aiWdlYW8gYl7fUUJF
-X-Proofpoint-ORIG-GUID: KCqkAIHUg4XbW3viNLRpMydUH60o-i8P
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S230465AbjAPS4e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 13:56:34 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 329F318B35;
+        Mon, 16 Jan 2023 10:56:33 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C34B161117;
+        Mon, 16 Jan 2023 18:56:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A0F2C433EF;
+        Mon, 16 Jan 2023 18:56:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673895392;
+        bh=DuMYZOnr0bMZvp7GSH2TEtxIL4JXiMj6qVLcpIaZmVw=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=nNscdUa5yyar00y4JkXqh/nP1LwzCLEY3fydqzu6fthUBWQOwSIevYrYNrDeChQR3
+         D8F6MGD1axAjkWcOE9CUsxvsxv+drEgsIAI3kRi9eBVUNaybBz/SaSx+WO2PiUSYeu
+         ZAmA+HZE8m3lkKINt/rCVtquL3O/WI0gvQiI3NvuCbePGAdKsIsI3lyE0QSx5Fm2Mu
+         k6slx5iTdh2aeBbVdphF/sXLKgCDo1sBOiEjbXDVZQw18FqNKLJY7QpNCY90I21QBT
+         Y7FkrZ+SSN9B2j7NTeILgbOMm2VrGEaNX/MLj5EKYpM9tN/HfVUz6eIO76gITp2f6k
+         fdIdMW5fVn/uA==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+        id CB7385C0687; Mon, 16 Jan 2023 10:56:31 -0800 (PST)
+Date:   Mon, 16 Jan 2023 10:56:31 -0800
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Boqun Feng <boqun.feng@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, linux-kernel@vger.kernel.org,
+        rcu@vger.kernel.org, kvm@vger.kernel.org,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Waiman Long <longman@redhat.com>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        David Woodhouse <dwmw2@infradead.org>, seanjc@google.com,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH 2/3] rcu: Equip sleepable RCU with lockdep dependency
+ graph checks
+Message-ID: <20230116185631.GY2948950@paulmck-ThinkPad-P17-Gen-1>
+Reply-To: paulmck@kernel.org
+References: <20230113065955.815667-1-boqun.feng@gmail.com>
+ <20230113065955.815667-3-boqun.feng@gmail.com>
+ <20230113112949.GX4028633@paulmck-ThinkPad-P17-Gen-1>
+ <Y8GdYgSBtyKwf/qj@boqun-archlinux>
+ <20230113191120.GB4028633@paulmck-ThinkPad-P17-Gen-1>
+ <456f6c15-3043-6da2-349d-c0c3880c1a55@redhat.com>
+ <Y8WPWJ6TKg5ikZYr@Boquns-Mac-mini.local>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-16_15,2023-01-13_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 malwarescore=0
- spamscore=0 suspectscore=0 clxscore=1015 impostorscore=0 mlxscore=0
- mlxlogscore=963 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301160135
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y8WPWJ6TKg5ikZYr@Boquns-Mac-mini.local>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 Jan 2023 18:57:57 +0100
-Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
-
-> The macro `__ASSEMBLER__` is defined with value 1 when preprocessing
-> assembly language using gcc. [1] For s390x, we're using the preprocessor
-> for generating our linker scripts out of assembly file and therefore we
-> need this change.
+On Mon, Jan 16, 2023 at 09:54:32AM -0800, Boqun Feng wrote:
+> On Mon, Jan 16, 2023 at 06:36:43PM +0100, Paolo Bonzini wrote:
+> > On 1/13/23 20:11, Paul E. McKenney wrote:
+> > > On Fri, Jan 13, 2023 at 10:05:22AM -0800, Boqun Feng wrote:
+> > > > On Fri, Jan 13, 2023 at 03:29:49AM -0800, Paul E. McKenney wrote:
+> > > > I prefer that the first two patches go through your tree, because it
+> > > > reduces the synchronization among locking, rcu and KVM trees to the
+> > > > synchronization betwen rcu and KVM trees.
+> > > 
+> > > Very well, I have queued and pushed these with the usual wordsmithing,
+> > > thank you!
+> > 
+> > I'm worried about this case:
+> > 
+> > 	CPU 0				CPU 1
+> > 	--------------------		------------------
+> > 	lock A				srcu lock B
+> > 	srcu lock B			lock A
+> > 	srcu unlock B			unlock A
+> > 	unlock A			srcu unlock B
+> > 
+> > While a bit unclean, there is nothing that downright forbids this; as long
+> > as synchronize_srcu does not happen inside lock A, no deadlock can occur.
+> > 
 > 
-> [1] https://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
+> First, even with my change, lockdep won't report this as a deadlock
+> because srcu_read_lock() is annotated as a recursive (unfair) read lock
+> (the "read" parameter for lock_acquire() is 2) and in this case lockdep
+> knows that it won't cause deadlock.
 > 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-
-is this patch really needed? if so, why is it at the end of the series?
-
-> ---
->  lib/linux/const.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> For SRCU, the annotation mapping that is 1) srcu_read_lock() is marked
+> as recursive read lock and 2) synchronize_srcu() is marked as write lock
+> sync, recursive read locks themselves cannot cause deadlocks and lockdep
+> is aware of it.
 > 
-> diff --git a/lib/linux/const.h b/lib/linux/const.h
-> index c872bfd25e13..be114dc4a553 100644
-> --- a/lib/linux/const.h
-> +++ b/lib/linux/const.h
-> @@ -12,7 +12,7 @@
->   * leave it unchanged in asm.
->   */
->  
-> -#ifdef __ASSEMBLY__
-> +#if defined(__ASSEMBLY__) || defined(__ASSEMBLER__)
->  #define _AC(X,Y)	X
->  #define _AT(T,X)	X
->  #else
+> Will add a selftest for this later.
+> 
+> > However, if srcu is replaced with an rwlock then lockdep should and does
+> > report a deadlock.  Boqun, do you get a false positive or do your patches
+> 
+> To be more precise, to have a deadlock, the read lock on CPU 0 has to be
+> a *fair* read lock (i.e. non-recursive reader, the "read" parameter for
+> lock_acquire is 1)
+> 
+> > correctly suppress this?
+> 
+> I'm pretty sure that lockdep handles this ;-)
 
+And lockdep agrees, refusing to complain about the following:
+
+	idx = srcu_read_lock(&srcu1);
+	mutex_lock(&mut1);
+	mutex_unlock(&mut1);
+	srcu_read_unlock(&srcu1, idx);
+
+	mutex_lock(&mut1);
+	idx = srcu_read_lock(&srcu1);
+	srcu_read_unlock(&srcu1, idx);
+	mutex_unlock(&mut1);
+
+							Thanx, Paul
