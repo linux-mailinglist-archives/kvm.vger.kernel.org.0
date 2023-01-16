@@ -2,88 +2,88 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 96F7966CEEA
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 19:36:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2B1866CEED
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 19:36:53 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234974AbjAPSgm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 13:36:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44942 "EHLO
+        id S233348AbjAPSgw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 13:36:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233504AbjAPSgR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 13:36:17 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5E9E2CFE7
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 10:25:27 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30GHp2TS026206
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:27 GMT
+        with ESMTP id S234278AbjAPSgU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 13:36:20 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3607E2F7A9
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 10:25:33 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30GHda5q025765
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:32 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
  subject : message-id : in-reply-to : references : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=9HTjuVHUGhNMzF7pkIzmzk+udMW6JwHiqbGNoaLn9KI=;
- b=MonPuC1IxYsBq7QZ8KwIgqwnkTwspOgYLM2HPquqtR7meupvofpNped6y8ZQ5kFe9C2R
- lDSPmOYOf50//Otqby3d6TMiIqR3QZG/7Roue4u2Kl5A5Q5fdysFkANS5kH99zBcSajR
- rtKi4Fi65ce+jiD9G3pqEjLS5f0O2Fcv3IL9l9agKK2ydtbsXu/nVKPwwe6Iy8HL+mgz
- id4IPdOCjFBkOqXZNgz7x+UwE+sIrxfXTKkfYt2fMkavGSknUFHTN+Fdc6VeIWLByncE
- b8bI2gEavUnOqAzA3MFprAur6JYh0UK7J58o1BpHxIZqsx1H4hasrRvaLBgyRp2XmOqM hg== 
+ bh=uoIZF2dAZg10k07k12+Rf9w/f2wRyZbc1srbA/6xlXw=;
+ b=VdXoa6ENqtMOK97m4G9Vzj5gYKPGQhwXq3dFgMXIHY1iAcy93mrcPvxcmIJJWf4P1n4c
+ OxviKy/qxFXSMmh3MktNFlftO87KBnQPDwDwRfof52xvwJf9/p7AJ8XJb4LWbUDSKAZl
+ BO8ca4mmuuVnSQF7EDjMuhsYn27Qd+8gDQSWvsVSgB/8eSFkwGlRwV9thF3/DHwtRZpR
+ MMoasKFCPj6wzv8q2bF7BdOMKOm2t+cVePRSHJxML7+RVwqMqLRB6yYlz9arituT06jJ
+ 0zB+UVMyk/5KXLkanW2nGkEzUbr2JIjYG9n32TQ0kkskhtqdIrqOAUn09J7KTlqGGao2 zQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5bbh0k0x-1
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n58x1v5du-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:26 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30GHqskS030681
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:26 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5bbh0k0n-1
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:32 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30GIPVcM018518
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 18:25:31 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n58x1v5d5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 18:25:26 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30G3KH5k009464;
-        Mon, 16 Jan 2023 18:25:24 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3n3m16j0w5-1
+        Mon, 16 Jan 2023 18:25:31 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30GFV9HD004659;
+        Mon, 16 Jan 2023 18:25:30 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16js9h-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 16 Jan 2023 18:25:24 +0000
+        Mon, 16 Jan 2023 18:25:29 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30GIPLw952756962
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30GIPQ6L46662064
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 16 Jan 2023 18:25:21 GMT
+        Mon, 16 Jan 2023 18:25:26 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E120E20043;
-        Mon, 16 Jan 2023 18:25:20 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 6422120049;
+        Mon, 16 Jan 2023 18:25:26 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 95C8020040;
-        Mon, 16 Jan 2023 18:25:20 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 2480520040;
+        Mon, 16 Jan 2023 18:25:26 +0000 (GMT)
 Received: from p-imbrenda (unknown [9.152.224.56])
         by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 16 Jan 2023 18:25:20 +0000 (GMT)
-Date:   Mon, 16 Jan 2023 19:22:10 +0100
+        Mon, 16 Jan 2023 18:25:26 +0000 (GMT)
+Date:   Mon, 16 Jan 2023 19:23:45 +0100
 From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
 To:     Marc Hartmayer <mhartmay@linux.ibm.com>
 Cc:     <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
         David Hildenbrand <david@redhat.com>,
         Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
         Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 7/9] s390x: use C pre-processor for
- linker script generation
-Message-ID: <20230116192210.7243c77f@p-imbrenda>
-In-Reply-To: <20230116175757.71059-8-mhartmay@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH 8/9] s390x: use STACK_FRAME_SIZE macro in
+ linker scripts
+Message-ID: <20230116192345.7478e566@p-imbrenda>
+In-Reply-To: <20230116175757.71059-9-mhartmay@linux.ibm.com>
 References: <20230116175757.71059-1-mhartmay@linux.ibm.com>
-        <20230116175757.71059-8-mhartmay@linux.ibm.com>
+        <20230116175757.71059-9-mhartmay@linux.ibm.com>
 Organization: IBM
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Jrea09IjFgix5HG0nXfgfXSRentpM7wx
-X-Proofpoint-GUID: cEo-1WLODx_aSX_ZWioZXNNOoJ7OCYl1
+X-Proofpoint-GUID: wmfvJT-w21_euKbcxnLBDkOqGUbBqvYN
+X-Proofpoint-ORIG-GUID: 9NW8iFRKnv67b8CMDvSWEt22b96tNcVa
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
  definitions=2023-01-16_15,2023-01-13_02,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 malwarescore=0
- priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0
- mlxlogscore=999 clxscore=1015 lowpriorityscore=0 adultscore=0 mlxscore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ lowpriorityscore=0 malwarescore=0 adultscore=0 phishscore=0
+ priorityscore=1501 bulkscore=0 mlxlogscore=999 spamscore=0 mlxscore=0
  suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2212070000 definitions=main-2301160135
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -95,81 +95,58 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 16 Jan 2023 18:57:55 +0100
+On Mon, 16 Jan 2023 18:57:56 +0100
 Marc Hartmayer <mhartmay@linux.ibm.com> wrote:
 
-> Use the C pre-processor for the linker script generation. For example,
-> this enables us the use of constants in the "linker scripts" `*.lds.S`.
-
-please explain that the original .lds scripts are being renamed to
-.lds.S, and that the .lds are now generated.
-
+> Use the `STACK_FRAME_SIZE` macro instead of a hard-coded value of 160.
 > 
 > Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+
+merge patch 6 into this one
+
 > ---
->  .gitignore                                  | 1 +
->  s390x/Makefile                              | 6 ++++--
->  s390x/{flat.lds => flat.lds.S}              | 0
->  s390x/snippets/asm/{flat.lds => flat.lds.S} | 0
->  s390x/snippets/c/{flat.lds => flat.lds.S}   | 0
->  5 files changed, 5 insertions(+), 2 deletions(-)
->  rename s390x/{flat.lds => flat.lds.S} (100%)
->  rename s390x/snippets/asm/{flat.lds => flat.lds.S} (100%)
->  rename s390x/snippets/c/{flat.lds => flat.lds.S} (100%)
+>  s390x/flat.lds.S            | 4 +++-
+>  s390x/snippets/c/flat.lds.S | 6 ++++--
+>  2 files changed, 7 insertions(+), 3 deletions(-)
 > 
-> diff --git a/.gitignore b/.gitignore
-> index 601822d67325..29f352c5ceb6 100644
-> --- a/.gitignore
-> +++ b/.gitignore
-> @@ -31,3 +31,4 @@ cscope.*
->  /s390x/comm.key
->  /s390x/snippets/*/*.hdr
->  /s390x/snippets/*/*.*obj
-> +/s390x/**/*.lds
-
-why ** ?
-
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 31f6db11213d..45493160cdf8 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -76,7 +76,7 @@ CFLAGS += -fno-delete-null-pointer-checks
->  LDFLAGS += -nostdlib -Wl,--build-id=none
->  
->  # We want to keep intermediate files
-> -.PRECIOUS: %.o
-> +.PRECIOUS: %.o %.lds
->  
->  asm-offsets = lib/$(ARCH)/asm-offsets.h
->  include $(SRCDIR)/scripts/asm-offsets.mak
-> @@ -159,6 +159,8 @@ $(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SRCDI
->  %.hdr.obj: %.hdr
->  	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $< $@
->  
-> +%.lds: %.lds.S
-> +	$(CPP) $(autodepend-flags) $(CPPFLAGS) -P -C -o $@ $<
->  
->  .SECONDEXPANSION:
->  %.elf: $(FLATLIBS) $(asmlib) $(SRCDIR)/s390x/flat.lds $$(snippets-obj) $$(snippet-hdr-obj) %.o
-> @@ -211,7 +213,7 @@ $(snippet_asmlib): $$(patsubst %.o,%.S,$$@) $(asm-offsets)
->  
->  
->  arch_clean: asm_offsets_clean
-> -	$(RM) $(TEST_DIR)/*.{o,elf,bin} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d $(comm-key)
-> +	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d $(comm-key)
->  
->  generated-files = $(asm-offsets)
->  $(tests:.elf=.o) $(asmlib) $(cflatobjs): $(generated-files)
-> diff --git a/s390x/flat.lds b/s390x/flat.lds.S
-> similarity index 100%
-> rename from s390x/flat.lds
-> rename to s390x/flat.lds.S
-> diff --git a/s390x/snippets/asm/flat.lds b/s390x/snippets/asm/flat.lds.S
-> similarity index 100%
-> rename from s390x/snippets/asm/flat.lds
-> rename to s390x/snippets/asm/flat.lds.S
-> diff --git a/s390x/snippets/c/flat.lds b/s390x/snippets/c/flat.lds.S
-> similarity index 100%
-> rename from s390x/snippets/c/flat.lds
-> rename to s390x/snippets/c/flat.lds.S
+> diff --git a/s390x/flat.lds.S b/s390x/flat.lds.S
+> index 952f6cd457ed..0cb7e383cc76 100644
+> --- a/s390x/flat.lds.S
+> +++ b/s390x/flat.lds.S
+> @@ -1,3 +1,5 @@
+> +#include <asm/asm-offsets.h>
+> +
+>  SECTIONS
+>  {
+>  	.lowcore : {
+> @@ -44,6 +46,6 @@ SECTIONS
+>  	/*
+>  	 * stackptr set with initial stack frame preallocated
+>  	 */
+> -	stackptr = . - 160;
+> +	stackptr = . - STACK_FRAME_SIZE;
+>  	stacktop = .;
+>  }
+> diff --git a/s390x/snippets/c/flat.lds.S b/s390x/snippets/c/flat.lds.S
+> index 9e5eb66bec23..468b5f1eebe8 100644
+> --- a/s390x/snippets/c/flat.lds.S
+> +++ b/s390x/snippets/c/flat.lds.S
+> @@ -1,3 +1,5 @@
+> +#include <asm/asm-offsets.h>
+> +
+>  SECTIONS
+>  {
+>  	.lowcore : {
+> @@ -18,9 +20,9 @@ SECTIONS
+>  	. = 0x4000;
+>  	/*
+>  	 * The stack grows down from 0x4000 to 0x2000, we pre-allocoate
+> -	 * a frame via the -160.
+> +	 * a frame via the -STACK_FRAME_SIZE.
+>  	 */
+> -	stackptr = . - 160;
+> +	stackptr = . - STACK_FRAME_SIZE;
+>  	stacktop = .;
+>  	/* Start text 0x4000 */
+>  	.text : {
 
