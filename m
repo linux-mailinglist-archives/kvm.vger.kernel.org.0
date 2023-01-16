@@ -2,148 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A8B566B684
-	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 05:06:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F04066B689
+	for <lists+kvm@lfdr.de>; Mon, 16 Jan 2023 05:10:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231842AbjAPEGk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 15 Jan 2023 23:06:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49994 "EHLO
+        id S231792AbjAPEKN (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 15 Jan 2023 23:10:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231781AbjAPEGN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 15 Jan 2023 23:06:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1627383FB
-        for <kvm@vger.kernel.org>; Sun, 15 Jan 2023 20:05:14 -0800 (PST)
+        with ESMTP id S231705AbjAPEKK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 15 Jan 2023 23:10:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C8DF6A7B
+        for <kvm@vger.kernel.org>; Sun, 15 Jan 2023 20:09:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673841913;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        s=mimecast20190719; t=1673842163;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ohcJPZKvAgOpbS44T4QtlSyb+QSlTiMgmt0MSyKR4Gk=;
-        b=gNzeWJcBgdsN7HXhFHpeGZq8KS6LU3t/a36esTB5PkUdhDLu42xCezXxjkK3nEgwo3W8lO
-        8hTTbK6x7QdgKA7QE7OH+V8rAsO09zS5nNDJ6GvH1JaUWV88k1DjDjXGzLmQPUJGddzFnK
-        2p7ecTXGdGOMUvLAn0MH1hZn4yV5S84=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0qZnjnerpa+KpeW/HI5RMmgHX6mnqVnPsMFxOB3BvR0=;
+        b=ZeuJ1VauHHHPOig+Ukk07H6DM2ssdU/57b8nBjN2xqYRFDvnHszbXA8t81XnqV/zxzDSrp
+        OZk5qXP+pvSLd1J1/7pWcXgev5vrUaFRVokBdoeZH7SlQrlQu2SHn1D5cIyKKruRx7xH/j
+        m6wf1KvpnHdFvkCH0PaDn9Wbjla3nmQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-404-oZ03pT2jOM-OSGkw5ehlOg-1; Sun, 15 Jan 2023 23:05:08 -0500
-X-MC-Unique: oZ03pT2jOM-OSGkw5ehlOg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-611-1fawK7nqMNW092Z6_dHPeA-1; Sun, 15 Jan 2023 23:09:20 -0500
+X-MC-Unique: 1fawK7nqMNW092Z6_dHPeA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 61A6F3828883;
-        Mon, 16 Jan 2023 04:05:07 +0000 (UTC)
-Received: from gshan.redhat.com (vpn2-54-98.bne.redhat.com [10.64.54.98])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4DDB0492B05;
-        Mon, 16 Jan 2023 04:05:00 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 38336801779;
+        Mon, 16 Jan 2023 04:09:19 +0000 (UTC)
+Received: from [10.64.54.98] (vpn2-54-98.bne.redhat.com [10.64.54.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9B63E2166B26;
+        Mon, 16 Jan 2023 04:09:12 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH v10 4/7] KVM: arm64: Enable ring-based dirty memory
+ tracking
 From:   Gavin Shan <gshan@redhat.com>
-To:     kvmarm@lists.linux.dev
-Cc:     kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        corbet@lwn.net, james.morse@arm.com, suzuki.poulose@arm.com,
-        oliver.upton@linux.dev, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
-        eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
-        ardb@kernel.org, peterx@redhat.com, seanjc@google.com,
-        shan.gavin@gmail.com
-Subject: [PATCH 4/4] KVM: Improve warning report in mark_page_dirty_in_slot()
-Date:   Mon, 16 Jan 2023 12:04:05 +0800
-Message-Id: <20230116040405.260935-5-gshan@redhat.com>
-In-Reply-To: <20230116040405.260935-1-gshan@redhat.com>
-References: <20230116040405.260935-1-gshan@redhat.com>
+To:     Zenghui Yu <yuzenghui@huawei.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, maz@kernel.org, seanjc@google.com,
+        shuah@kernel.org, catalin.marinas@arm.com, andrew.jones@linux.dev,
+        ajones@ventanamicro.com, bgardon@google.com, dmatlack@google.com,
+        will@kernel.org, suzuki.poulose@arm.com, alexandru.elisei@arm.com,
+        pbonzini@redhat.com, peterx@redhat.com, oliver.upton@linux.dev,
+        zhenyzha@redhat.com, shan.gavin@gmail.com
+References: <20221110104914.31280-1-gshan@redhat.com>
+ <20221110104914.31280-5-gshan@redhat.com>
+ <e28ede67-1bc4-fb1e-9bea-60cc9bd85190@huawei.com>
+ <e3414ca2-c4a6-07b5-df41-9999fdb2445a@redhat.com>
+Message-ID: <c974528c-17c2-b24e-d975-c0d82377b2b0@redhat.com>
+Date:   Mon, 16 Jan 2023 15:09:10 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <e3414ca2-c4a6-07b5-df41-9999fdb2445a@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There are two warning reports about the dirty ring in the function.
-We have the wrong assumption that the dirty ring is always enabled when
-CONFIG_HAVE_KVM_DIRTY_RING is selected. This leads to warning messages
-about the dirty ring is reported even the dirty ring isn't enabled by
-the user space. Actually, the expected behaviour is to report the
-warning messages only when the dirty ring is enabled, instead of
-being configured.
+Hi Zenghui,
 
-Fix it by enabling the checks and warning reports when the dirty ring
-has been enabled by the user space.
+On 1/15/23 10:56 PM, Gavin Shan wrote:
+> On 1/15/23 10:20 PM, Zenghui Yu wrote:
+>> On 2022/11/10 18:49, Gavin Shan wrote:
+>>> Enable ring-based dirty memory tracking on ARM64:
+>>>
+>>>   - Enable CONFIG_HAVE_KVM_DIRTY_RING_ACQ_REL.
+>>>
+>>>   - Enable CONFIG_NEED_KVM_DIRTY_RING_WITH_BITMAP.
+>>>
+>>>   - Set KVM_DIRTY_LOG_PAGE_OFFSET for the ring buffer's physical page
+>>>     offset.
+>>>
+>>>   - Add ARM64 specific kvm_arch_allow_write_without_running_vcpu() to
+>>>     keep the site of saving vgic/its tables out of the no-running-vcpu
+>>>     radar.
+>>
+>> And we have KVM_DEV_ARM_VGIC_SAVE_PENDING_TABLES.. On receiving it, the
+>> emulated VGIC will write all pending bits (if any) into pending tables
+>> (which reside in guest memory) and doesn't require a running vcpu
+>> context.
+>>
+>> The no-running-vcpu WARN can be triggered with the
+>> kvm-unit-tests/its-pending-migration case. I run it using QEMU, which
+>> has nothing to do with the dirty ring atm.
+>>
+>> Or are there already discussions about it that I haven't noticed?
+>>
+>> |void mark_page_dirty_in_slot(struct kvm *kvm,
+>> |                 const struct kvm_memory_slot *memslot,
+>> |                 gfn_t gfn)
+>> |{
+>> |    WARN_ON_ONCE(!vcpu && !kvm_arch_allow_write_without_running_vcpu(kvm));
+>>
+> 
+> It's a new case we never noticed. Could you please share the QEMU command lines
+> to start the guest? I need to reproduce the issue on my side firstly.
+> 
+> The fix would be simply to extending kvm->arch.vgic.save_its_tables_in_progress
+> from 'bool' to a bit map (e.g. kvm->arch.vgic.dirty_guest_memory_flags) and introduce
+> two separate flags for ITS table and VGIC3 pending bits separately. Alternatively,
+> we can also introduce another 'bool kvm->arch.vgic.save_vgic_v3_tables_in_progress'
+> to cover the new case.
+> 
 
-Signed-off-by: Gavin Shan <gshan@redhat.com>
----
- include/linux/kvm_dirty_ring.h |  5 +++++
- virt/kvm/kvm_main.c            | 25 ++++++++++++++-----------
- 2 files changed, 19 insertions(+), 11 deletions(-)
+Please try the following series to see if the unexpected warning message disappears
+or not.
 
-diff --git a/include/linux/kvm_dirty_ring.h b/include/linux/kvm_dirty_ring.h
-index 4862c98d80d3..3fda0aa42858 100644
---- a/include/linux/kvm_dirty_ring.h
-+++ b/include/linux/kvm_dirty_ring.h
-@@ -42,6 +42,11 @@ static inline bool kvm_use_dirty_bitmap(struct kvm *kvm)
- 	return true;
- }
- 
-+static inline bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
-+{
-+	return false;
-+}
-+
- static inline int kvm_dirty_ring_alloc(struct kvm_dirty_ring *ring,
- 				       int index, u32 size)
- {
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 90f538433916..a35c32bc84e1 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3316,26 +3316,29 @@ void mark_page_dirty_in_slot(struct kvm *kvm,
- 			     const struct kvm_memory_slot *memslot,
- 		 	     gfn_t gfn)
- {
--	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-+	struct kvm_vcpu *vcpu;
- 	unsigned long rel_gfn;
- 	u32 slot;
- 
--#ifdef CONFIG_HAVE_KVM_DIRTY_RING
--	if (WARN_ON_ONCE(vcpu && vcpu->kvm != kvm))
--		return;
--
--	WARN_ON_ONCE(!vcpu && !kvm_arch_allow_write_without_running_vcpu(kvm));
--#endif
--
- 	if (!memslot || !kvm_slot_dirty_track_enabled(memslot))
- 		return;
- 
- 	rel_gfn = gfn - memslot->base_gfn;
- 	slot = (memslot->as_id << 16) | memslot->id;
- 
--	if (kvm->dirty_ring_size && vcpu)
--		kvm_dirty_ring_push(vcpu, slot, rel_gfn);
--	else if (memslot->dirty_bitmap)
-+	if (kvm->dirty_ring_size) {
-+		vcpu = kvm_get_running_vcpu();
-+		if (vcpu) {
-+			if (!WARN_ON_ONCE(vcpu->kvm != kvm))
-+				kvm_dirty_ring_push(vcpu, slot, rel_gfn);
-+
-+			return;
-+		}
-+
-+		WARN_ON_ONCE(!kvm_arch_allow_write_without_running_vcpu(kvm));
-+	}
-+
-+	if (memslot->dirty_bitmap)
- 		set_bit_le(rel_gfn, memslot->dirty_bitmap);
- }
- EXPORT_SYMBOL_GPL(mark_page_dirty_in_slot);
--- 
-2.23.0
+https://lore.kernel.org/kvmarm/20230116040405.260935-1-gshan@redhat.com/T/#t
+
+Thanks,
+Gavin
 
