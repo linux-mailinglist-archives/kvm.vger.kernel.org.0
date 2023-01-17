@@ -2,71 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 71875670B17
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 23:03:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 944BE670B41
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 23:08:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229897AbjAQWCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 17:02:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43680 "EHLO
+        id S229792AbjAQWIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 17:08:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229973AbjAQWA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 17:00:28 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B7884ABE6
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 12:45:05 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id a14-20020a17090a70ce00b00229a2f73c56so67561pjm.3
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 12:45:05 -0800 (PST)
+        with ESMTP id S229707AbjAQWGc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 17:06:32 -0500
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DB4247EEA
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 12:44:30 -0800 (PST)
+Received: by mail-ej1-x62f.google.com with SMTP id ud5so78300322ejc.4
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 12:44:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oWKAPx0Pojcsg+fK1nAbVjmM94b5PDw5fwkVwu0Em3I=;
-        b=hx4XaEC7ewSxO6NSCQSemOZrqGPFrRekc6QcTvrp5uzd2sSGCr++fpgMqkpc0dqDhZ
-         Ew9HHubd6+OtdqEFHBiBjHDNBdf3PvNedhfwQyHEQhm0gdcsq27Cf72lPuXXvUWbqDa6
-         2VAQSK8+tfpgNQ3b3pDChP94k8oz25X7ZFnwF34glw3MtAkdi/H/t9LrkVkuiwtMVrqY
-         mlICZKHXR5yOP/q9I5c7ffDYT+y4JeeZ0eXoMzyTBCytWIWjn6NeuG6ZTZHUmAfdr3ye
-         TJQcUfC3rPRINXe9SdGUAEC0B06c359JWsBQDwPrCtMeolqZXeOeAoxVPQLOqYXxyHtB
-         j4ag==
+        d=grsecurity.net; s=grsec;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fXwBXsjVQJZdCpgvR9RDOMw7BAY0UiJH/yPG4bb3O3g=;
+        b=XUDDTGy9/TAfXMpGQYay0b4GGosyJi6sWiFcJQkBadl4VSrhLY5/zdVGw0mI8bPqyf
+         fDm4Elqgd7PHIQU9dfqjN9VQlYYPPprltlOYJSWb+P9Ah3jO1KjegPlTQbgV/lrbge+l
+         23JelNoNYwj7U3OTD4frmfm/vJAIC6NhjTsDO34w0NO5VJc/YUXtETVOdOU/iPYodEeS
+         ZR9+94wzl9D38A3o2n6MC5pazdQQ5ReBWm9KMC5fRbqNaywdfVGEvwNxYI1s9nFUE1hJ
+         Umw1cQnJ8QzFurfJWdEiZyDy5MDJVDb2nlueROlm5k55s2fKLju6NYHiakaFz7Xj8iBl
+         lHtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oWKAPx0Pojcsg+fK1nAbVjmM94b5PDw5fwkVwu0Em3I=;
-        b=iGXqhK6aoDeLED/CySU4PIaQDVCEX603GtYBJPeG6Dg3vLJ2Q5L6W2qkbIQn9uirqQ
-         Ks1q50HqHeP9Ngi8ijJtz+wZ6GpjN/AaIpJy0/R9RGepLHk94cnzrf+MeQJAN9iaCqEZ
-         x9N7z38YrY9IQ6FiXdRd80YWwHFcYbK+LVgab646CUGNlyPYCIrmMcoJD/Xi8a8q+67U
-         dgYDYnpy4xfMOiPF1QQSe12men4xgzkjCQrC680Cplx6l+HO3qKk5mKNXtvEQtnL94Od
-         uQNmxty+uczPokOmp8f3i6Balj6yrDDksrtF6L4/mE2sluGmeJosoxqeaPOw951ojGyC
-         gfZw==
-X-Gm-Message-State: AFqh2koJ2yOUn1fx25e55IFEvr36MWyZnrZLA1cutvL8WHY0kqjtmA3Y
-        ETN/7Etp6V8WG1JwAd5VtFIhug==
-X-Google-Smtp-Source: AMrXdXt9ekLKfksbPLcfJZP4INwbWBVTiqegUNi6R0Q0OMy5BzbUynccucW8Dp4LRpo5sBLj4T30vQ==
-X-Received: by 2002:a05:6a20:93a4:b0:b8:e33c:f160 with SMTP id x36-20020a056a2093a400b000b8e33cf160mr220914pzh.0.1673988304593;
-        Tue, 17 Jan 2023 12:45:04 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id i9-20020a17090332c900b00189988a1a9esm21642236plr.135.2023.01.17.12.45.04
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fXwBXsjVQJZdCpgvR9RDOMw7BAY0UiJH/yPG4bb3O3g=;
+        b=HejkftXt4kiGyMuleuLkaS1jGVh9dQOC6C9oMHcf65Vm/kU5Dr6rBTPFwLQEpvSXc8
+         INbM1L+1cnST7z9Xv/G9dy3mGLXUjjjTrUGoWnZyngdXQ3LGxqZaCeiTb1/rOsPL1mt6
+         7WprYwcrwyEuLaNMRVZNGFw4QR1ZEGWHCTE5NYsTDBi54osQzZqXBe5wSjbLfypg0x1q
+         DI2ELEWt6vMZrlSGfJWgPixQwWrCWvIKof5dDsSizi5B8uF/gcanHBT/5MppQhcN1ud/
+         /mD//NkvWaisKu5E2G23g2gbUxLMnlOcJBOpLZ+4JwCSJ7ZaYvqDwARGxjrk/wy9zx2S
+         SROw==
+X-Gm-Message-State: AFqh2kqlbxkCm0YDxohqq5kHtD8xEQuNFl3TutMj88PestMNr2+TEDzu
+        uG2RxdQIrJHvYmZJJX1s5q25zC3Wu4Z9oT1h
+X-Google-Smtp-Source: AMrXdXsakl8ZadOCDEzWtsIiWqMawlGC5N4+A+lM/Xbx8Mj9kVv5yEkRKX+KizZ+onOTROGq8JqS1g==
+X-Received: by 2002:a17:906:b24c:b0:869:236c:ac41 with SMTP id ce12-20020a170906b24c00b00869236cac41mr4509290ejb.24.1673988268836;
+        Tue, 17 Jan 2023 12:44:28 -0800 (PST)
+Received: from nuc.fritz.box (p200300f6af098f00245ad18781b5e181.dip0.t-ipconnect.de. [2003:f6:af09:8f00:245a:d187:81b5:e181])
+        by smtp.gmail.com with ESMTPSA id k2-20020a170906970200b0073dbaeb50f6sm13477051ejx.169.2023.01.17.12.44.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 12:45:04 -0800 (PST)
-Date:   Tue, 17 Jan 2023 12:45:00 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Colton Lewis <coltonlewis@google.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        dmatlack@google.com, seanjc@google.com, bgardon@google.com,
-        oupton@google.com
-Subject: Re: [PATCH 3/3] KVM: selftests: Print summary stats of memory
- latency distribution
-Message-ID: <Y8cIzKf52fzf0/d4@google.com>
-References: <20221115173258.2530923-1-coltonlewis@google.com>
- <20221115173258.2530923-4-coltonlewis@google.com>
+        Tue, 17 Jan 2023 12:44:28 -0800 (PST)
+From:   Mathias Krause <minipli@grsecurity.net>
+To:     kvm@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Mathias Krause <minipli@grsecurity.net>
+Subject: [PATCH 0/3] KVM: MMU: performance tweaks for heavy CR0.WP users
+Date:   Tue, 17 Jan 2023 21:45:53 +0100
+Message-Id: <20230117204556.16217-1-minipli@grsecurity.net>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221115173258.2530923-4-coltonlewis@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=no
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,137 +70,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 05:32:58PM +0000, Colton Lewis wrote:
-> Print summary stats of the memory latency distribution in
-> nanoseconds. For every iteration, this prints the minimum, the
-> maximum, and the 50th, 90th, and 99th percentiles.
-> 
-> Stats are calculated by sorting the samples taken from all vcpus and
-> picking from the index corresponding with each percentile.
-> 
-> The conversion to nanoseconds needs the frequency of the Intel
-> timestamp counter, which is estimated by reading the counter before
-> and after sleeping for 1 second. This is not a pretty trick, but it
-> also exists in vmx_nested_tsc_scaling_test.c
-> 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-> ---
->  .../selftests/kvm/dirty_log_perf_test.c       |  2 +
->  .../selftests/kvm/include/perf_test_util.h    |  2 +
->  .../selftests/kvm/lib/perf_test_util.c        | 62 +++++++++++++++++++
->  3 files changed, 66 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> index 202f38a72851..2bc066bba460 100644
-> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
-> @@ -274,6 +274,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  	ts_diff = timespec_elapsed(start);
->  	pr_info("Populate memory time: %ld.%.9lds\n",
->  		ts_diff.tv_sec, ts_diff.tv_nsec);
-> +	perf_test_print_percentiles(vm, nr_vcpus);
->  
->  	/* Enable dirty logging */
->  	clock_gettime(CLOCK_MONOTONIC, &start);
-> @@ -304,6 +305,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
->  		vcpu_dirty_total = timespec_add(vcpu_dirty_total, ts_diff);
->  		pr_info("Iteration %d dirty memory time: %ld.%.9lds\n",
->  			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
-> +		perf_test_print_percentiles(vm, nr_vcpus);
->  
->  		clock_gettime(CLOCK_MONOTONIC, &start);
->  		get_dirty_log(vm, bitmaps, p->slots);
-> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
-> index 3d0b75ea866a..ca378c262f12 100644
-> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
-> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
-> @@ -47,6 +47,8 @@ struct perf_test_args {
->  
->  extern struct perf_test_args perf_test_args;
->  
-> +void perf_test_print_percentiles(struct kvm_vm *vm, int nr_vcpus);
-> +
->  struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
->  				   uint64_t vcpu_memory_bytes, int slots,
->  				   enum vm_mem_backing_src_type backing_src,
-> diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index 0311da76bae0..927d22421f7c 100644
-> --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -115,6 +115,68 @@ void perf_test_guest_code(uint32_t vcpu_idx)
->  	}
->  }
->  
-> +#if defined(__x86_64__)
-> +/* This could be determined with the right sequence of cpuid
-> + * instructions, but that's oddly complicated.
-> + */
-> +static uint64_t perf_test_intel_timer_frequency(void)
-> +{
-> +	uint64_t count_before;
-> +	uint64_t count_after;
-> +	uint64_t measured_freq;
-> +	uint64_t adjusted_freq;
-> +
-> +	count_before = perf_test_timer_read();
-> +	sleep(1);
-> +	count_after = perf_test_timer_read();
-> +
-> +	/* Using 1 second implies our units are in Hz already. */
-> +	measured_freq = count_after - count_before;
-> +	/* Truncate to the nearest MHz. Clock frequencies are round numbers. */
-> +	adjusted_freq = measured_freq / 1000000 * 1000000;
-> +
-> +	return adjusted_freq;
-> +}
-> +#endif
-> +
-> +static double perf_test_cycles_to_ns(double cycles)
-> +{
-> +#if defined(__aarch64__)
-> +	return cycles * (1e9 / timer_get_cntfrq());
-> +#elif defined(__x86_64__)
-> +	static uint64_t timer_frequency;
-> +
-> +	if (timer_frequency == 0)
-> +		timer_frequency = perf_test_intel_timer_frequency();
-> +
-> +	return cycles * (1e9 / timer_frequency);
-> +#else
-> +#warn __func__ " is not implemented for this architecture, will return 0"
-> +	return 0.0;
-> +#endif
-> +}
-> +
-> +/* compare function for qsort */
-> +static int perf_test_qcmp(const void *a, const void *b)
-> +{
-> +	return *(int *)a - *(int *)b;
-> +}
-> +
-> +void perf_test_print_percentiles(struct kvm_vm *vm, int nr_vcpus)
-> +{
-> +	uint64_t n_samples = nr_vcpus * SAMPLES_PER_VCPU;
-> +
-> +	sync_global_from_guest(vm, latency_samples);
-> +	qsort(latency_samples, n_samples, sizeof(uint64_t), &perf_test_qcmp);
-> +
-> +	pr_info("Latency distribution (ns) = min:%6.0lf, 50th:%6.0lf, 90th:%6.0lf, 99th:%6.0lf, max:%6.0lf\n",
-> +		perf_test_cycles_to_ns((double)latency_samples[0]),
-> +		perf_test_cycles_to_ns((double)latency_samples[n_samples / 2]),
-> +		perf_test_cycles_to_ns((double)latency_samples[n_samples * 9 / 10]),
-> +		perf_test_cycles_to_ns((double)latency_samples[n_samples * 99 / 100]),
-> +		perf_test_cycles_to_ns((double)latency_samples[n_samples - 1]));
-> +}
+This series is a resurrection of the missing pieces of Paolo's previous
+attempt[1] to avoid needless MMU roots unloading. The performance gap
+between TDP and legacy MMU is still existent, especially noticeable under
+grsecurity which implements kernel W^X by toggling CR0.WP, which happens
+very frequently.
 
-Latency distribution (ns) = min:   732, 50th:   792, 90th:   901, 99th:
-                                ^^^
-nit: would prefer to avoid the spaces 
+Patches 1-13 and 17 of the old series had been merged, but, unfortunately,
+the remaining parts never saw a v3. I therefore took care of these, took
+Sean's feedback into account[2] and simplified the whole approach to just
+handle the case we care most about explicitly.
 
-> +
->  void perf_test_setup_vcpus(struct kvm_vm *vm, int nr_vcpus,
->  			   struct kvm_vcpu *vcpus[],
->  			   uint64_t vcpu_memory_bytes,
-> -- 
-> 2.38.1.431.g37b22c650d-goog
-> 
+Patch 1 is a v3 of [3], addressing Sean's feedback.
+
+Patch 2 is specifically useful for grsecurity, as handle_cr() is by far
+*the* top vmexit reason.
+
+Patch 3 is the most important one, as it skips unloading the MMU roots for
+CR0.WP toggling.
+
+While patches 1 and 2 bring small performance improvements already, the big
+gains comes from patch 3.
+
+However, as the performance impact is huge (and my knowledge about KVM
+internals is little) it might very well be, I did miss an important aspect.
+But KVM tests ran fine, so did manual ones I did that explicitly poke around
+CR0.WP toggling corner cases.
+
+Please give it a look!
+
+This series builds on top of kvm.git/queue, namely commit de60733246ff
+("Merge branch 'kvm-hw-enable-refactor' into HEAD").
+
+Thanks,
+Mathias
+
+[1] https://lore.kernel.org/kvm/20220217210340.312449-1-pbonzini@redhat.com/
+[2] https://lore.kernel.org/kvm/YhATewkkO%2Fl4P9UN@google.com/
+[3] https://lore.kernel.org/kvm/YhAB1d1%2FnQbx6yvk@google.com/
+
+Mathias Krause (2):
+  KVM: VMX: avoid retpoline call for control register caused exits
+  KVM: x86: do not unload MMU roots when only toggling CR0.WP
+
+Paolo Bonzini (1):
+  KVM: x86/mmu: avoid indirect call for get_cr3
+
+ arch/x86/include/asm/kvm_host.h |  2 +-
+ arch/x86/kvm/mmu/mmu.c          | 38 +++++++++++++++++++++------------
+ arch/x86/kvm/mmu/paging_tmpl.h  |  2 +-
+ arch/x86/kvm/smm.c              |  4 ++--
+ arch/x86/kvm/vmx/nested.c       |  2 +-
+ arch/x86/kvm/vmx/vmx.c          |  2 ++
+ arch/x86/kvm/x86.c              | 28 ++++++++++++++++--------
+ 7 files changed, 50 insertions(+), 28 deletions(-)
+
+-- 
+2.39.0
+
