@@ -2,66 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1559D670B80
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 23:14:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71875670B17
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 23:03:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229808AbjAQWOf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 17:14:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56194 "EHLO
+        id S229897AbjAQWCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 17:02:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229977AbjAQWOC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 17:14:02 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED4E247ED9
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 12:43:40 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id d9so34742670pll.9
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 12:43:40 -0800 (PST)
+        with ESMTP id S229973AbjAQWA2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 17:00:28 -0500
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B7884ABE6
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 12:45:05 -0800 (PST)
+Received: by mail-pj1-x1030.google.com with SMTP id a14-20020a17090a70ce00b00229a2f73c56so67561pjm.3
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 12:45:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=G0p5tYXhYSLxtIPDRJH8NwfoKuO4FTadATNlTkpg1R0=;
-        b=X8al8sYl95OrHmh4lq3bYRT3wioJ0cMOz69pGVemf9qvs5eGMWkATvVYEONUIhSNqK
-         v45kvAs005FbhqmlCSEZRKitWGCtgHNoO3Y5m0kvtDJOBBiQE4N4p8F98c0fuUW1bVKE
-         KK0QanhBAyabsq0CGWcX+w4t/yEaJtHGgrrDszICLY04HiOssMgJiDnn0gn1JNRQGwIK
-         FIecSn14G/JzBariHtKHN+h7vBmrTRLt84Q5rF/+Vjus+9/pLv19klESxUAFHzSjjvUY
-         p0J55puxupqIj+pJtDgWtpqllg3A5NFWYivucvgzO8vHL+tXG92NX2GoFjN4IOJWXKRp
-         7KpQ==
+        bh=oWKAPx0Pojcsg+fK1nAbVjmM94b5PDw5fwkVwu0Em3I=;
+        b=hx4XaEC7ewSxO6NSCQSemOZrqGPFrRekc6QcTvrp5uzd2sSGCr++fpgMqkpc0dqDhZ
+         Ew9HHubd6+OtdqEFHBiBjHDNBdf3PvNedhfwQyHEQhm0gdcsq27Cf72lPuXXvUWbqDa6
+         2VAQSK8+tfpgNQ3b3pDChP94k8oz25X7ZFnwF34glw3MtAkdi/H/t9LrkVkuiwtMVrqY
+         mlICZKHXR5yOP/q9I5c7ffDYT+y4JeeZ0eXoMzyTBCytWIWjn6NeuG6ZTZHUmAfdr3ye
+         TJQcUfC3rPRINXe9SdGUAEC0B06c359JWsBQDwPrCtMeolqZXeOeAoxVPQLOqYXxyHtB
+         j4ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=G0p5tYXhYSLxtIPDRJH8NwfoKuO4FTadATNlTkpg1R0=;
-        b=FLjHkXD8oZFtBDPjiFOWXrcPoIOxdnWelpQj14dbwyr9oAXLeh6HIdTeeAEy0FpHiw
-         mKd8s6OZZy+Mrt/rPTMAGx7n8578s0WOoXsIczO7uux7XxMYpvFKwd2mrfJwsKWlaHdg
-         LrLRjU/bYCqoz1cLb34C+Q3cTr6NABfHyc32mffg77BM6yHpyXNc4KzW1+ILd5ilOGr9
-         LYzW5xeKMhEbzEbYzV5VOoX+Q5CZmTv9DpGmAQRaUSsgMJlO6U7F2oAlQxaHak5Xu2WP
-         61RlgKw1HWwIpgeO4Vs9jkrI0qKGTrKR/KyIthYAJeAfwHpePpNwLyd5hjU2psBtCG7X
-         ZV4w==
-X-Gm-Message-State: AFqh2krRXXxk7SbJrrMbeym0DAC7q/8fudT6d3jFgYK6F86QdxV0wg5O
-        af+TF0j73qz+ocMiIzyIgc2hsw==
-X-Google-Smtp-Source: AMrXdXvSzFoxX26S728cFKqYUWcTrxOpqcISFLk3ezBV9XhQi288snWt+UvU5s+8yNJEWltXIs92KA==
-X-Received: by 2002:a17:90b:3941:b0:225:e761:6d2b with SMTP id oe1-20020a17090b394100b00225e7616d2bmr2730770pjb.1.1673988219719;
-        Tue, 17 Jan 2023 12:43:39 -0800 (PST)
+        bh=oWKAPx0Pojcsg+fK1nAbVjmM94b5PDw5fwkVwu0Em3I=;
+        b=iGXqhK6aoDeLED/CySU4PIaQDVCEX603GtYBJPeG6Dg3vLJ2Q5L6W2qkbIQn9uirqQ
+         Ks1q50HqHeP9Ngi8ijJtz+wZ6GpjN/AaIpJy0/R9RGepLHk94cnzrf+MeQJAN9iaCqEZ
+         x9N7z38YrY9IQ6FiXdRd80YWwHFcYbK+LVgab646CUGNlyPYCIrmMcoJD/Xi8a8q+67U
+         dgYDYnpy4xfMOiPF1QQSe12men4xgzkjCQrC680Cplx6l+HO3qKk5mKNXtvEQtnL94Od
+         uQNmxty+uczPokOmp8f3i6Balj6yrDDksrtF6L4/mE2sluGmeJosoxqeaPOw951ojGyC
+         gfZw==
+X-Gm-Message-State: AFqh2koJ2yOUn1fx25e55IFEvr36MWyZnrZLA1cutvL8WHY0kqjtmA3Y
+        ETN/7Etp6V8WG1JwAd5VtFIhug==
+X-Google-Smtp-Source: AMrXdXt9ekLKfksbPLcfJZP4INwbWBVTiqegUNi6R0Q0OMy5BzbUynccucW8Dp4LRpo5sBLj4T30vQ==
+X-Received: by 2002:a05:6a20:93a4:b0:b8:e33c:f160 with SMTP id x36-20020a056a2093a400b000b8e33cf160mr220914pzh.0.1673988304593;
+        Tue, 17 Jan 2023 12:45:04 -0800 (PST)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id fa21-20020a17090af0d500b00223f495dc28sm19200323pjb.14.2023.01.17.12.43.39
+        by smtp.gmail.com with ESMTPSA id i9-20020a17090332c900b00189988a1a9esm21642236plr.135.2023.01.17.12.45.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 12:43:39 -0800 (PST)
-Date:   Tue, 17 Jan 2023 12:43:35 -0800
+        Tue, 17 Jan 2023 12:45:04 -0800 (PST)
+Date:   Tue, 17 Jan 2023 12:45:00 -0800
 From:   Ricardo Koller <ricarkol@google.com>
 To:     Colton Lewis <coltonlewis@google.com>
 Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
         dmatlack@google.com, seanjc@google.com, bgardon@google.com,
         oupton@google.com
-Subject: Re: [PATCH 2/3] KVM: selftests: Collect memory access latency samples
-Message-ID: <Y8cIdxp5k8HivVAe@google.com>
+Subject: Re: [PATCH 3/3] KVM: selftests: Print summary stats of memory
+ latency distribution
+Message-ID: <Y8cIzKf52fzf0/d4@google.com>
 References: <20221115173258.2530923-1-coltonlewis@google.com>
- <20221115173258.2530923-3-coltonlewis@google.com>
+ <20221115173258.2530923-4-coltonlewis@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221115173258.2530923-3-coltonlewis@google.com>
+In-Reply-To: <20221115173258.2530923-4-coltonlewis@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,123 +74,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 15, 2022 at 05:32:57PM +0000, Colton Lewis wrote:
-> Collect memory access latency measured in clock cycles.
+On Tue, Nov 15, 2022 at 05:32:58PM +0000, Colton Lewis wrote:
+> Print summary stats of the memory latency distribution in
+> nanoseconds. For every iteration, this prints the minimum, the
+> maximum, and the 50th, 90th, and 99th percentiles.
 > 
-> This introduces a dependency on the timers for ARM and x86. No other
-> architectures are implemented and their samples will all be 0.
+> Stats are calculated by sorting the samples taken from all vcpus and
+> picking from the index corresponding with each percentile.
 > 
-> Because keeping all samples is impractical due to the space required
-> in some cases (pooled memory w/ 64 vcpus would be 64 GB/vcpu * 64
-> vcpus * 250,000 samples/GB * 8 bytes/sample ~ 8 Gb extra memory just
-> for samples), resevior sampling is used to only keep a small number of
-
-nit: reservoir
-
-> samples per vcpu (1000 samples in this patch).
-
-Didn't see this before my previous comment. But, I guess it still
-applies: isn't it possible to know the number of events to store?  to
-avoid the "100" obtained via trial and error.
-
-> 
-> Resevoir sampling means despite keeping only a small number of
-> samples, each sample has an equal chance of making it to the
-> resevoir. Simple proofs of this can be found online. This makes the
-> resevoir a good representation of the distribution of samples and
-
-reservoir
-
-> enables calculation of reasonably accurate percentiles.
-> 
-> All samples are stored in a statically allocated flat array for ease
-> of combining them later. Samples are stored at an offset in this array
-> calculated by the vcpu index (so vcpu 5 sample 10 would be stored at
-> address sample_times + 5 * vcpu_idx + 10).
+> The conversion to nanoseconds needs the frequency of the Intel
+> timestamp counter, which is estimated by reading the counter before
+> and after sleeping for 1 second. This is not a pretty trick, but it
+> also exists in vmx_nested_tsc_scaling_test.c
 > 
 > Signed-off-by: Colton Lewis <coltonlewis@google.com>
 > ---
->  .../selftests/kvm/lib/perf_test_util.c        | 34 +++++++++++++++++--
->  1 file changed, 32 insertions(+), 2 deletions(-)
+>  .../selftests/kvm/dirty_log_perf_test.c       |  2 +
+>  .../selftests/kvm/include/perf_test_util.h    |  2 +
+>  .../selftests/kvm/lib/perf_test_util.c        | 62 +++++++++++++++++++
+>  3 files changed, 66 insertions(+)
 > 
+> diff --git a/tools/testing/selftests/kvm/dirty_log_perf_test.c b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> index 202f38a72851..2bc066bba460 100644
+> --- a/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> +++ b/tools/testing/selftests/kvm/dirty_log_perf_test.c
+> @@ -274,6 +274,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  	ts_diff = timespec_elapsed(start);
+>  	pr_info("Populate memory time: %ld.%.9lds\n",
+>  		ts_diff.tv_sec, ts_diff.tv_nsec);
+> +	perf_test_print_percentiles(vm, nr_vcpus);
+>  
+>  	/* Enable dirty logging */
+>  	clock_gettime(CLOCK_MONOTONIC, &start);
+> @@ -304,6 +305,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
+>  		vcpu_dirty_total = timespec_add(vcpu_dirty_total, ts_diff);
+>  		pr_info("Iteration %d dirty memory time: %ld.%.9lds\n",
+>  			iteration, ts_diff.tv_sec, ts_diff.tv_nsec);
+> +		perf_test_print_percentiles(vm, nr_vcpus);
+>  
+>  		clock_gettime(CLOCK_MONOTONIC, &start);
+>  		get_dirty_log(vm, bitmaps, p->slots);
+> diff --git a/tools/testing/selftests/kvm/include/perf_test_util.h b/tools/testing/selftests/kvm/include/perf_test_util.h
+> index 3d0b75ea866a..ca378c262f12 100644
+> --- a/tools/testing/selftests/kvm/include/perf_test_util.h
+> +++ b/tools/testing/selftests/kvm/include/perf_test_util.h
+> @@ -47,6 +47,8 @@ struct perf_test_args {
+>  
+>  extern struct perf_test_args perf_test_args;
+>  
+> +void perf_test_print_percentiles(struct kvm_vm *vm, int nr_vcpus);
+> +
+>  struct kvm_vm *perf_test_create_vm(enum vm_guest_mode mode, int nr_vcpus,
+>  				   uint64_t vcpu_memory_bytes, int slots,
+>  				   enum vm_mem_backing_src_type backing_src,
 > diff --git a/tools/testing/selftests/kvm/lib/perf_test_util.c b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> index a48904b64e19..0311da76bae0 100644
+> index 0311da76bae0..927d22421f7c 100644
 > --- a/tools/testing/selftests/kvm/lib/perf_test_util.c
 > +++ b/tools/testing/selftests/kvm/lib/perf_test_util.c
-> @@ -4,6 +4,9 @@
->   */
->  #include <inttypes.h>
+> @@ -115,6 +115,68 @@ void perf_test_guest_code(uint32_t vcpu_idx)
+>  	}
+>  }
 >  
-> +#if defined(__aarch64__)
-> +#include "aarch64/arch_timer.h"
+> +#if defined(__x86_64__)
+> +/* This could be determined with the right sequence of cpuid
+> + * instructions, but that's oddly complicated.
+> + */
+> +static uint64_t perf_test_intel_timer_frequency(void)
+> +{
+> +	uint64_t count_before;
+> +	uint64_t count_after;
+> +	uint64_t measured_freq;
+> +	uint64_t adjusted_freq;
+> +
+> +	count_before = perf_test_timer_read();
+> +	sleep(1);
+> +	count_after = perf_test_timer_read();
+> +
+> +	/* Using 1 second implies our units are in Hz already. */
+> +	measured_freq = count_after - count_before;
+> +	/* Truncate to the nearest MHz. Clock frequencies are round numbers. */
+> +	adjusted_freq = measured_freq / 1000000 * 1000000;
+> +
+> +	return adjusted_freq;
+> +}
 > +#endif
->  #include "kvm_util.h"
->  #include "perf_test_util.h"
->  #include "processor.h"
-> @@ -44,6 +47,18 @@ static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
->  /* Store all samples in a flat array so they can be easily sorted later. */
->  uint64_t latency_samples[SAMPLE_CAPACITY];
->  
-> +static uint64_t perf_test_timer_read(void)
+> +
+> +static double perf_test_cycles_to_ns(double cycles)
 > +{
 > +#if defined(__aarch64__)
-> +	return timer_get_cntct(VIRTUAL);
+> +	return cycles * (1e9 / timer_get_cntfrq());
 > +#elif defined(__x86_64__)
-> +	return rdtsc();
+> +	static uint64_t timer_frequency;
+> +
+> +	if (timer_frequency == 0)
+> +		timer_frequency = perf_test_intel_timer_frequency();
+> +
+> +	return cycles * (1e9 / timer_frequency);
 > +#else
 > +#warn __func__ " is not implemented for this architecture, will return 0"
-> +	return 0;
+> +	return 0.0;
 > +#endif
 > +}
 > +
->  /*
->   * Continuously write to the first 8 bytes of each page in the
->   * specified region.
-> @@ -59,6 +74,10 @@ void perf_test_guest_code(uint32_t vcpu_idx)
->  	int i;
->  	struct guest_random_state rand_state =
->  		new_guest_random_state(pta->random_seed + vcpu_idx);
-> +	uint64_t *latency_samples_offset = latency_samples + SAMPLES_PER_VCPU * vcpu_idx;
-> +	uint64_t count_before;
-> +	uint64_t count_after;
-> +	uint32_t maybe_sample;
->  
->  	gva = vcpu_args->gva;
->  	pages = vcpu_args->pages;
-> @@ -75,10 +94,21 @@ void perf_test_guest_code(uint32_t vcpu_idx)
->  
->  			addr = gva + (page * pta->guest_page_size);
->  
-> -			if (guest_random_u32(&rand_state) % 100 < pta->write_percent)
-> +			if (guest_random_u32(&rand_state) % 100 < pta->write_percent) {
-> +				count_before = perf_test_timer_read();
->  				*(uint64_t *)addr = 0x0123456789ABCDEF;
-> -			else
-> +				count_after = perf_test_timer_read();
-> +			} else {
-> +				count_before = perf_test_timer_read();
->  				READ_ONCE(*(uint64_t *)addr);
-> +				count_after = perf_test_timer_read();
-
-"count_before ... ACCESS count_after" could be moved to some macro,
-e.g.,:
-	t = MEASURE(READ_ONCE(*(uint64_t *)addr));
-
-> +			}
+> +/* compare function for qsort */
+> +static int perf_test_qcmp(const void *a, const void *b)
+> +{
+> +	return *(int *)a - *(int *)b;
+> +}
 > +
-> +			maybe_sample = guest_random_u32(&rand_state) % (i + 1);
-> +			if (i < SAMPLES_PER_VCPU)
-> +				latency_samples_offset[i] = count_after - count_before;
-> +			else if (maybe_sample < SAMPLES_PER_VCPU)
-> +				latency_samples_offset[maybe_sample] = count_after - count_before;
+> +void perf_test_print_percentiles(struct kvm_vm *vm, int nr_vcpus)
+> +{
+> +	uint64_t n_samples = nr_vcpus * SAMPLES_PER_VCPU;
+> +
+> +	sync_global_from_guest(vm, latency_samples);
+> +	qsort(latency_samples, n_samples, sizeof(uint64_t), &perf_test_qcmp);
+> +
+> +	pr_info("Latency distribution (ns) = min:%6.0lf, 50th:%6.0lf, 90th:%6.0lf, 99th:%6.0lf, max:%6.0lf\n",
+> +		perf_test_cycles_to_ns((double)latency_samples[0]),
+> +		perf_test_cycles_to_ns((double)latency_samples[n_samples / 2]),
+> +		perf_test_cycles_to_ns((double)latency_samples[n_samples * 9 / 10]),
+> +		perf_test_cycles_to_ns((double)latency_samples[n_samples * 99 / 100]),
+> +		perf_test_cycles_to_ns((double)latency_samples[n_samples - 1]));
+> +}
 
-I would prefer these reservoir sampling details to be in a helper, 
-e.g.,:
-	reservoir_sample_record(t, i);
+Latency distribution (ns) = min:   732, 50th:   792, 90th:   901, 99th:
+                                ^^^
+nit: would prefer to avoid the spaces 
 
->  		}
->  
->  		GUEST_SYNC(1);
+> +
+>  void perf_test_setup_vcpus(struct kvm_vm *vm, int nr_vcpus,
+>  			   struct kvm_vcpu *vcpus[],
+>  			   uint64_t vcpu_memory_bytes,
 > -- 
 > 2.38.1.431.g37b22c650d-goog
 > 
