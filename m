@@ -2,183 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 568DA66DEC7
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 14:28:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1925266DEFB
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 14:38:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234198AbjAQN2x (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 08:28:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60274 "EHLO
+        id S229600AbjAQNim (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 08:38:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232105AbjAQN2v (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 08:28:51 -0500
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2068.outbound.protection.outlook.com [40.107.237.68])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B2834C01;
-        Tue, 17 Jan 2023 05:28:50 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WRM0f8EmSHj0eOMpjtpFSEJa/RCkzuXV9HH/n/gWfQjKJL9j7y1KDccHPA2GkFkiFjvsPQxYyyPb2SApDFgWG7yye5sOywE/Th6rZ/E8gIqFffPs0O46V07PcbfwXkLetRB0Ym6JaHCTeFm59WDKsBurcO6ha0DPHouG+FR830feNKD17E4AtXkJqyhZ6bEldfnlYlDXAGWRdhzI6tQwEvZ/j+un+JCJ4xNzP6iWsi9gsNJuuy5oIUEESzhSLBW5yREWlECARQGyxtojzOkXZZf18r8k6t/Nv5Vv70VdHhR9UMw/b6m3atTCmZd1O6zf/c9r6MrlHqSKJAa8Zgomgg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a7Ck6qvdO21rqNebg+H3Bf44feASnVz8+E7RHkeP5Iw=;
- b=Atzv4VFcNM0NbnWPyM8TaKDfWLHCzA8GdsIzZiffXw5F6oXhMVaEPyVmgRsVoSF0GcLdZSpq3U9LRXdUlYweeY/9Ul+Fl+Z4IimqeP0I0kpUBTTjAg3CHXiL2gV0iNEUUjfiybSeaUOMMxW5G4KuMFIlJ3HZNG55TqhuiHd4zBH2cQmPa3YlZFo3zNT+xnQty44tDZ+kiR/YnH3F33Xsw8uQUPJZBkFfB/QlZVVn0xu3E41sjCMP+oAOfiU8E2n8uen59sGlPOoampfpGyIAlLnLLJGaWfa9yrf32DCZyGuy5i7rUKn9U/z54HtBdrPG/e9evDklPynAQ1NondsjAQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=a7Ck6qvdO21rqNebg+H3Bf44feASnVz8+E7RHkeP5Iw=;
- b=diaa30gB3O0WnVPnzY14PbtakuoF/s2Kcg9IGQsPpifD0lBROucWTSa0RZIVwIwVp09wG8meyhqY/QVI+ktPbwyre4BuxmZKAktAvhLEgsxKZL0r7ZB0ba3knLEnhh3/Yoattv7KXBxSLHZ9v4jRQdCJzomJBns7CtX6bdIfpdgjbin843qJGD3eNbD8aMgg4Lp28pcJKv944+pymxaei7vG10P+x/7i+/CL3ErI4yMX/i0flRWRPaRJMtpQRXSWAbpjGYB323QgxhXuSHPTg8mRGBOLN6rjbltXrLv2kNBblWnm0x0qSKc30b0Ufi50hQm8KoXuZq9WXEEorHB1JA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SJ0PR12MB8167.namprd12.prod.outlook.com (2603:10b6:a03:4e6::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Tue, 17 Jan
- 2023 13:28:48 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.6002.013; Tue, 17 Jan 2023
- 13:28:48 +0000
-Date:   Tue, 17 Jan 2023 09:28:46 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     "Tian, Kevin" <kevin.tian@intel.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
+        with ESMTP id S229673AbjAQNie (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 08:38:34 -0500
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 477EB59C6;
+        Tue, 17 Jan 2023 05:38:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673962713; x=1705498713;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=1YxIhrDQKE2lDqlUyO/ARVgD5QjeSGAHzdlrkVl5mCo=;
+  b=FVs309qlXE78B/GssbtiD3lcrLHRsXs0LWTpSX3bPI1VX5MnhjUqEIyK
+   QJP44sF2pnZSLspTukaj9oFzkmWPYZs3egj9PjEHMp9FwXrtSlaw6bh0R
+   zuaJ0c0tz0Wpy8vbZwPYZi7J/IEz7OIRGv23X16xlv9gHmII35eDXs09H
+   AA6G/MZqhrLlu1MmC1ZWljcI0i6v3EuwGGflRY8N5YV8TjTfiXQxShVxj
+   VswTR/Vo1DTBFZubbZyH7zsITbqoxlUgBG8I2rgZ+/L6Y6YZtzz36AwK1
+   gyxy9TC4vkKGuug6kKK9iG3tV8jjTys5v09lApvjGZ24gjyZ//07LfFWg
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="324748849"
+X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
+   d="scan'208";a="324748849"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2023 05:38:15 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="783240137"
+X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
+   d="scan'208";a="783240137"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.105])
+  by orsmga004.jf.intel.com with ESMTP; 17 Jan 2023 05:38:03 -0800
+Date:   Tue, 17 Jan 2023 21:30:15 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Binbin Wu <binbin.wu@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
         Joerg Roedel <joro@8bytes.org>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        "ath10k@lists.infradead.org" <ath10k@lists.infradead.org>,
-        "ath11k@lists.infradead.org" <ath11k@lists.infradead.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
-        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com" 
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
-        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>
-Subject: Re: [PATCH 7/8] iommu/intel: Support the gfp argument to the
- map_pages op
-Message-ID: <Y8aijhHjqqf6hjwL@nvidia.com>
-References: <0-v1-6e8b3997c46d+89e-iommu_map_gfp_jgg@nvidia.com>
- <7-v1-6e8b3997c46d+89e-iommu_map_gfp_jgg@nvidia.com>
- <BN9PR11MB52765EE38CA21BA27EEA06548CC69@BN9PR11MB5276.namprd11.prod.outlook.com>
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+Message-ID: <20230117133015.GE273037@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+ <c25f1f8c-f7c0-6a96-cd67-260df47f79a9@linux.intel.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52765EE38CA21BA27EEA06548CC69@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: MN2PR03CA0001.namprd03.prod.outlook.com
- (2603:10b6:208:23a::6) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SJ0PR12MB8167:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8c08f32f-97d3-4e4a-fb3b-08daf88ec3b1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gGdOSydR+wezMWCKxNRQtb9kcvrWccNBt8OBVOW9Gu4CD///byx9zPqALmWUKmHV89iAdXHyco1eWdf0yNUg/UgomQLANZhNZBH04CnenAx+KJUtgmQ6DDoNtbnROo2GEeUvJHr1wYvPnGyyIDS7sHIOHZy14Byr+3RE5fZbuY3cUEBZL2HVos8Eur2hAySK0jdycqYgkZRB8Ejcg3yBUuG4Mp6PXdwD/UAxcxmRh09AbZeFTt0iQdqpJ1Px34uIh3ErWxGWrMXRxyZrLK/HCd3En0wcgLiQ8pE8hBCBk14im5JqOSoYry2zD+OZpLKnjoGuAzHf72wvtOwgGv+lO5d8cmliuOzHmdvzqZKox5Tkrs8MyxgmTlFt7ihM471yIa6JCyy/uSxEsfT32pKCIErSqeZ6QSkg75n49n8RxeTmQtqSHJhqjpCDGxax88tX2QZSjG8J1ckWWfXWVHtQXbCqk0P6DbSBCxnYlURj4XvirupahnIRh2l9qbasuqbGDDFo/QgvPxRG+rTvmz65dggfjTnmq94fjMZ0r2xEPvwRBbzhK8Xrlin0h8YtLGp4osSUeIBgwNizTjuGhXhnw2J28BMiYBHpylh0J6+tk1FH0Dp7Tb257Xq4OSoCVDNHruEiNUyqCn2WU2ESYFBdiQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(376002)(396003)(366004)(136003)(346002)(84040400005)(451199015)(6916009)(66946007)(66476007)(66556008)(26005)(41300700001)(186003)(6512007)(8676002)(4326008)(2616005)(86362001)(36756003)(5660300002)(8936002)(54906003)(478600001)(83380400001)(6506007)(316002)(38100700002)(7416002)(6486002)(2906002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?SGjPp+g+3tYicaqyVbQDXvnPfoJE8rpi13E2wqIQ3NVe1AnEKEP3FF/Fk/c9?=
- =?us-ascii?Q?5iJJdGxrqLc0bhc3n+H4Us6lj/xbxJ4JVRX7A53SPGyJRgk1kEMkTqs2iaT8?=
- =?us-ascii?Q?ywgZ6DB2odUNdKl4LFA7p8sV8WWuZMEukoEMHIzo50KSogJe/fcgLHEsbJrd?=
- =?us-ascii?Q?VLVkXoijS6S6HRiqM1EmgV0Ds4Sp64uyaCNMSbFFHilQ1xzHQ0R7u7huXcsg?=
- =?us-ascii?Q?cB1+JDvrQ2VF61IHNDjXHEHSmBaIrMSPo7ZZPVFW+5nXeoQBKkt0+TdoE1is?=
- =?us-ascii?Q?25eU1B0ApbnUvZg2pnhpdhur5AHvS6Ix4de5GW/uOYHSTZt3Q2PVqql2W9pI?=
- =?us-ascii?Q?IACx+hlvjsjnQmT/Tmy4heaAk6H2NyMlLMdNwtmZi99v0FQnCqCS1e45fSvV?=
- =?us-ascii?Q?IQeU3xnrs0lyDR2jo1P74I+MCauVQQvAt7zA9KcE7TBvxt4T9FAmSwCOYn1H?=
- =?us-ascii?Q?xBD35HIV8nPzP25yu8bpKlAubhUmzYsc63SleBVv3EE8/H65Nioa10qS1ulS?=
- =?us-ascii?Q?tQolttI/x+rmfJor4VvtYjhxNWZz6doaHMCgdREPtPmGaVbH70ZQJvkwI6kK?=
- =?us-ascii?Q?yGZI33J0rhKrfPsR7GXGOljts7QuP7ztEP64ZDhlHLp1h7xhQcHEuYbNjALO?=
- =?us-ascii?Q?KKLJ0LuGkG3JLbfx7KTEGs3iQW1sfpZE1lbr+uLfTIJ+WiUaOZjqRR+C+Y2R?=
- =?us-ascii?Q?E6mlUWY8/HjB9Em7va3anektNi9z2PvUp2Y0vGEowupNS7AdvY89x5EQXpDX?=
- =?us-ascii?Q?gPKTW9dbT1gNA6T8PsHV9+7TrD1q8157BzBFJyFgn0yPL8Mk+qGcitWTcG9j?=
- =?us-ascii?Q?Tvy0ijGGW5bv5xlVkPOOjwKFAUUM270sVLs1YZzRp+Q/weLUFjf6veMAuvvc?=
- =?us-ascii?Q?5MHqn7VcP3ClJ+4rfBbq6d1OVJbcctehKTZ3YMFqPFC0G5H6qPLueDz4I+Ad?=
- =?us-ascii?Q?xEqcJy2SAiVrme+Bfa/js7IRvnWvsjPoi4gcazPOq+4kB6fwPcItHvMgdUPL?=
- =?us-ascii?Q?vcRo2LtTWkS2efFPxrm6H7wB6uerSR0McXpAoimZpXDXx6VlyKXDvsKQ1JV5?=
- =?us-ascii?Q?hThtH4fHt3yejUJQ79TYUR9GrY08VrGMJDu8zhCw0TqswfZWZhW5UXclfEug?=
- =?us-ascii?Q?5idM+5heWs1GQfoP9P/R2IIEglpYm2Cw56CDkclOLKTQ75aIYIxQKrMsWiHH?=
- =?us-ascii?Q?28U7+GDFGpn+oNIZIxB0sp/ndOyutZIoGz81QtmNyktlOD0l7Y6NRVkLL5GQ?=
- =?us-ascii?Q?QnjfANyEu3NTv99akz1gL2XV/tZIGmIA25WN25gNt3nLUPcELk0hucVCxAot?=
- =?us-ascii?Q?Ljh5hxOprPKNIW3Qt+uRRWBd4uZoC0bGSieYb6qNYeh4DeLQS/69s9nyw/7s?=
- =?us-ascii?Q?m2ZbnZ35dF1uvoGyNMEqP//RBm4MrFDY4oSG4uirnuh3h0tSzk1JRFZX1fm9?=
- =?us-ascii?Q?r4bRBpC0cFcRAkZ5MT3hZokx9wKEYVHVRplGI4ohl9YvBkhTRrJXQwyG41TH?=
- =?us-ascii?Q?F5oHqtmOVOgbd15hd5qxxqX4Sud0ag72LdYvkbuhkvNOjovZhfxCbIyrP+yn?=
- =?us-ascii?Q?i9yDNGVF6QLtaHZ1E9fYc3KcPBQVQcUuNq+u2cDj?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c08f32f-97d3-4e4a-fb3b-08daf88ec3b1
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jan 2023 13:28:48.0330
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: O1t9XnR4LrfHs2iOFsH6NoVgD4cLYVO6IShfpHChIMiiQJ2iyvQI1Vh0TLNT7kEl
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8167
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <c25f1f8c-f7c0-6a96-cd67-260df47f79a9@linux.intel.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 17, 2023 at 03:38:51AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Saturday, January 7, 2023 12:43 AM
-> > 
-> > @@ -2368,7 +2372,7 @@ static int iommu_domain_identity_map(struct
-> > dmar_domain *domain,
-> > 
-> >  	return __domain_mapping(domain, first_vpfn,
-> >  				first_vpfn, last_vpfn - first_vpfn + 1,
-> > -				DMA_PTE_READ|DMA_PTE_WRITE);
-> > +				DMA_PTE_READ|DMA_PTE_WRITE,
-> > GFP_KERNEL);
-> >  }
+On Tue, Jan 17, 2023 at 11:21:10AM +0800, Binbin Wu wrote:
 > 
-> Baolu, can you help confirm whether switching from GFP_ATOMIC to
-> GFP_KERNEL is OK in this path? it looks fine to me in a quick glance
-> but want to be conservative here.
-
-I checked it carefully myself as well, good to check again.
-
-> > @@ -4333,7 +4337,8 @@ static size_t intel_iommu_unmap(struct
-> > iommu_domain *domain,
+> On 12/2/2022 2:13 PM, Chao Peng wrote:
+> > In confidential computing usages, whether a page is private or shared is
+> > necessary information for KVM to perform operations like page fault
+> > handling, page zapping etc. There are other potential use cases for
+> > per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> > or exec-only, etc.) without having to modify memslots.
 > > 
-> >  	/* Cope with horrid API which requires us to unmap more than the
-> >  	   size argument if it happens to be a large-page mapping. */
-> > -	BUG_ON(!pfn_to_dma_pte(dmar_domain, iova >> VTD_PAGE_SHIFT,
-> > &level));
-> > +	BUG_ON(!pfn_to_dma_pte(dmar_domain, iova >> VTD_PAGE_SHIFT,
-> > &level,
-> > +			       GFP_ATOMIC));
+> > Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> > userspace to operate on the per-page memory attributes.
+> >    - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+> >      a guest memory range.
+> >    - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+> >      memory attributes.
+> > 
+> > KVM internally uses xarray to store the per-page memory attributes.
+> > 
+> > Suggested-by: Sean Christopherson <seanjc@google.com>
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com/
+> > ---
+> >   Documentation/virt/kvm/api.rst | 63 ++++++++++++++++++++++++++++
+> >   arch/x86/kvm/Kconfig           |  1 +
+> >   include/linux/kvm_host.h       |  3 ++
+> >   include/uapi/linux/kvm.h       | 17 ++++++++
 > 
-> with level==0 it implies it's only lookup w/o pgtable allocation. From this
-> angle it reads better to use a more relaxed gfp e.g. GFP_KERNEL here.
+> Should the changes introduced in this file also need to be added in
+> tools/include/uapi/linux/kvm.h ?
 
-We should only write GFP_KERNEL if it is actually a sleepable context
-because it will be mighty confusing if it isn't. I couldn't tell what
-the context is so I left it as ATOMIC.
+Yes I think. But I'm hesitate to include in this patch or not. I see
+many commits sync kernel kvm.h to tools's copy. Looks that is done
+periodically and with a 'pull' model.
 
-You are correct this is only just a lookup and so the value is never
-used / doesn't matter.
-
-Jason
+Chao
