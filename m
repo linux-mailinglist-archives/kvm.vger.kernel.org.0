@@ -2,64 +2,174 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CDCD966D4FC
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 04:31:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7B14C66D504
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 04:35:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235337AbjAQDbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 22:31:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41864 "EHLO
+        id S235348AbjAQDfR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 22:35:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42712 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235228AbjAQDbj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 22:31:39 -0500
+        with ESMTP id S235180AbjAQDfP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 22:35:15 -0500
 Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA1C722A18;
-        Mon, 16 Jan 2023 19:31:37 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C46322A18;
+        Mon, 16 Jan 2023 19:35:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673926297; x=1705462297;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=iNIFRXoIIeigES6/kp8dR8C8hZFjoaliN8kNP9bcdhs=;
-  b=HuZiDFeAxvYXNcMVwxBLvUsWb4y68pJ6mzfl1rbIzMKRW8rqE6UsJxeP
-   1GsqWIAuSTWpCAWRjcOBPG4LQrY2v52y+wLUNRmvDZvEEXqKM7vmtXjiJ
-   6sOelRrtD3zy7QZgqM5LxHAuokTM+ctWsgVtvcTnbpnoAp0dM3SqHsDeP
-   iN8dEXAY6Z8YoLvTVksgQo0/hmVsUAkSjua538CJKrLRkBvU7fe1v5TZa
-   6Zzm2aIXo34e5wSO4doaPU8Rv8BggtNVMZ7Tiijl0brcI/oWqiYrOh70V
-   Dzamrk2GxIfHh7Kpn2fSVq6xNWZypH9EdEgdMEzwaxQ+sCqNsm/9gK1i9
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="304289981"
+  t=1673926514; x=1705462514;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=X00iEq+wswc+M9vbDEREoKiAkIzRtUNwGnVmM3D89RM=;
+  b=jxxYVrx3J7/bOXAUhTYreCpmAS3azR+EdjRGJ9+QSVMAk/YcqeJZc7pq
+   zNw9SsQoJY17VF45oDYBn93eZVprHSNi4EwXMO4N4FOmWpzaw98y5DX9s
+   hq3eKxd478NZ674ldh9YJR57TAOzqTcJytQfB7lXeWrl2RCBF/6vVRX97
+   pTYhw+sdUawtPP3uPzoQCbcG+a0d81jpfD9tr5andmo7zBYg6A96/N4OY
+   wwUsswY7eNrQ9gYUduwvYC5UNNZTEstz7HewCinTksivNPYKydY1JQou4
+   f8VVl9M3W0bFeK/YbqkMID/OCU1HWI9bPmoI9aNH05DIfCLBC36PY1u1a
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="304290484"
 X-IronPort-AV: E=Sophos;i="5.97,222,1669104000"; 
-   d="scan'208";a="304289981"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2023 19:31:37 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="727652846"
+   d="scan'208";a="304290484"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2023 19:35:13 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="689658811"
 X-IronPort-AV: E=Sophos;i="5.97,222,1669104000"; 
-   d="scan'208";a="727652846"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.170.151]) ([10.249.170.151])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2023 19:31:34 -0800
-Message-ID: <c8d27583-dd29-897a-75b8-5bfbdf05c6d2@linux.intel.com>
-Date:   Tue, 17 Jan 2023 11:31:32 +0800
+   d="scan'208";a="689658811"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga008.jf.intel.com with ESMTP; 16 Jan 2023 19:35:11 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Mon, 16 Jan 2023 19:35:11 -0800
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Mon, 16 Jan 2023 19:35:10 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Mon, 16 Jan 2023 19:35:10 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Mon, 16 Jan 2023 19:35:10 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EMNb1P4q3ZVY3DFA7FnoI5Qf48pLFfqiXLZN6De1HE9M55n8Wx0rp9eujh2OTFDbYgSu0i0WXadqphrIjaEH2uJ93kDwRfCmy6TuStQlWkLsoC1XNuPd+pJx2HW+LZgo/9HtK5RFfPcwbFDTSCbn/PyaigFyTyOj1LC9d+kT4iaJ2u8XSHB1h2s6iyriFEZuz3t+T5xPTN5ZBKullhJDZ3TVEbNFd87oo5tFh961x+Io02ooKDvd/piBLdqBIkXpQb9WOcjt2KlWi1TNWC0gji42opji6ZHfVY14vCc4mfwTvaTzkkiQndpxGTv6iFbOb0O6/xbd57dJcspjm3o2Yg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4EKzyfBtFzH6GMPTOXGrg/m9TT2U3MVwV54cEkyYlME=;
+ b=BZFITOtnsruxg7zZxC49jGhFxywqT+xoNxP3wgMReLbuzVxBsbf2vW2vlIhy6KyOxcJ90NxFIUtSUSjN2GruHSBXTQVw1OO5cjhYSSSXJfkBhOB28Kh3yeuXEZyzeYMMuI6AR3ay60oGgXoLNqnCUFPtdzKsRxnMZYMQc0j+B+5yTtxP4hWKPyvSowcGlcunqidDqzbK8MXEK0ScbWPi3C2soWb5hsmmPDKCZZob7SP/k+v1JEBseTQ9lzwjbWSmWXI33cjzYVgYzM6Bpojiq8wUE/dfOFQgC/5OrOl5h6YG0HMVpULbMKGwRZwFw6mLfq7ecqOPWhXcLXDClne7Yg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SA2PR11MB4874.namprd11.prod.outlook.com (2603:10b6:806:f9::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Tue, 17 Jan
+ 2023 03:35:09 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d%9]) with mapi id 15.20.5986.023; Tue, 17 Jan 2023
+ 03:35:08 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>
+CC:     Alex Williamson <alex.williamson@redhat.com>,
+        "ath10k@lists.infradead.org" <ath10k@lists.infradead.org>,
+        "ath11k@lists.infradead.org" <ath11k@lists.infradead.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-arm-msm@vger.kernel.org" <linux-arm-msm@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-stm32@st-md-mailman.stormreply.com" 
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>
+Subject: RE: [PATCH 6/8] iommu/intel: Add a gfp parameter to
+ alloc_pgtable_page()
+Thread-Topic: [PATCH 6/8] iommu/intel: Add a gfp parameter to
+ alloc_pgtable_page()
+Thread-Index: AQHZIe30VE0qujIGcUC6i9HTWHZFcq6iBWPg
+Date:   Tue, 17 Jan 2023 03:35:08 +0000
+Message-ID: <BN9PR11MB5276A8193DE752CA8D8D89928CC69@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <0-v1-6e8b3997c46d+89e-iommu_map_gfp_jgg@nvidia.com>
+ <6-v1-6e8b3997c46d+89e-iommu_map_gfp_jgg@nvidia.com>
+In-Reply-To: <6-v1-6e8b3997c46d+89e-iommu_map_gfp_jgg@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA2PR11MB4874:EE_
+x-ms-office365-filtering-correlation-id: f21960e4-e56a-4178-aaeb-08daf83bd510
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: kCPbd2VtI1HW9VFIac27jep3abDo1i4Im+Uv8AxZ1tN9yPt0/8aIpXfHFm9C9TrreevF3r4wmJi9u1G5gddgUVyXMHFhURkL7nKKGJXFV++//a4xc7Gj6OGdPagnrL7UszLXdSlSbuqnMX0pyAXiH4L0HOwWTwnuFJEwWFiBE61FKe+3uyUh/HaliAXR9Pq7A+G4chDPHqwA/1SEXe5ZD0/GF2+27DJVQiOj6jTUv2C9ieo2BTr8TQylKdnXiefXf6SGefKyOtRjM8xffDp2zh0mbCs1Xcdtc8uOdAm/Uwl3U0Ac7xDJAiCi0EfvoFqPnkP35OrYJhxwFVjtbEz7IYis77hywANtyso/7iWLZG1ly/BmqlGbSQDMuMv6ZQlsL7KBUXcEsK0lzhhPDS1tpboUsSxr0PvcKejARjisobD4oCib08oqN5ojDNDWhEgkjS7u0O9/RTVlfaLbYK1iY4g9O1iN1LYiSqmuUPlu+aokgChs8Rf9FBE/gxnNpce+pdx9zsjwGyEmG5Ag8lVQT0AlxKAZUnYNJqwITPFKWLfeA7IW82Xlu+z5KcRWMtVvKFxxbPGhEIaovfnBRnZk9lo/ebzFkJRtSVzgQ8UF/KrJGlEn0ISusCKb1iE3Yf6k7rFruSC2A0y9zVlqaY8lSZ50Kr9GK1h8QQz+2JbYSXT5RhRru3TGRbiLl1j1nW1rQssI+oFnaHP6kKl7KOBc9A==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(396003)(366004)(136003)(376002)(39860400002)(451199015)(86362001)(558084003)(33656002)(186003)(9686003)(26005)(41300700001)(4326008)(64756008)(8676002)(66946007)(66556008)(66476007)(76116006)(66446008)(55016003)(71200400001)(316002)(7696005)(2906002)(6506007)(110136005)(54906003)(478600001)(122000001)(7416002)(38070700005)(38100700002)(52536014)(5660300002)(82960400001)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GlZf83d76V76P5/l5vgsCQfHdEbPTs/mAzZH7ATO8MQ9EWiwWs+tI0KbjA+v?=
+ =?us-ascii?Q?LpZjM5TMuVHAjmdgjjfcKNx4BCYu2nzH9kSCnhwZUOiVvadNyDD+P8GDpsO1?=
+ =?us-ascii?Q?8LBAqy/jMAlx0w2bY37rmgREn4i4guKqVYAaj0OpgDVt3TRWHocbGcHfURxC?=
+ =?us-ascii?Q?pNmkubPLizBNDXPY4ABY9gswfB2avrU7EIfNfeqpScTtOfqzyE1ZM3prNb0M?=
+ =?us-ascii?Q?FbJ3Z8kBb6e4KjWGDLpVnnxHOWamqKvebOldTBwLfIesXMqC86gCi7NuqLuE?=
+ =?us-ascii?Q?F+20vauyIXcZOfKYQhwF2rz5QNrgn/YUJY/jhW8P2k4iQc5uYjnuQRLygOUq?=
+ =?us-ascii?Q?VwyHtm+Olyfui3LCBsK7lo+BcoOOSU9JJv8Ts5RSCeWO54uK0sk9CbyULCSf?=
+ =?us-ascii?Q?AD1JDWzZCaVZVTZWfSCxyDX0r2dPQrZxDkGaZ1FqGvoAnZ2zKu1oas+4X5lK?=
+ =?us-ascii?Q?xu+49UGfOkmzOSAZttMwlsn8v60u2wEOWCjvqrIhQOu6+V/EU7+p1SNAwiqd?=
+ =?us-ascii?Q?yRCGKNs5LFWvQK/Vikd7Dt4DmSj4s13htCIMc0WsA65q5C9UKLmnHdQROcoD?=
+ =?us-ascii?Q?FOLxnknSIPvqKxeebg7TUP2M8h0NyWiyvVapYh1XtROzmekG9skYaYabPYEj?=
+ =?us-ascii?Q?8IvGaSTkBmyUGtOUnROtAtkmaSiodq58F+MYopsRv9Y+k0uHzSJURhRVMmm9?=
+ =?us-ascii?Q?NEiYkR4VFQ7vUgRUttxeZRGX27l5QMPYY/i/YTRv0qm//6n5ihMMoU/b4pPS?=
+ =?us-ascii?Q?4E/2xf/MIpKJf6Vysd8/f+Lb01K98lR4m0soO0X29DRnAzJO9VZtnvZ+ei+G?=
+ =?us-ascii?Q?9vdlzyeOjqNg/aIH3DszQ2cx/x2qwV3jU/Qmffn8qb/9Jjhqrna73HXb3Aaj?=
+ =?us-ascii?Q?6ASdX/iIL2r1cPP1Vu625rumuNfxSkz/XTqTC9Q60SutQgTiHecrV4fShtlr?=
+ =?us-ascii?Q?JrRwnE2L6wAT3H/qhedvUkekR5SrqMOMLzyD/NkELczNbac9nSFfoJyDPy9/?=
+ =?us-ascii?Q?+DcH5ZdVUS+tdk2gTHVp7hkLxsYB5lTZsLx9OE48zMzqXPINEzSF7Qk7c/rw?=
+ =?us-ascii?Q?bvxtURGhsZHZ5m+4v4Xpxk4d/KllcAB/To1zjvMT+/om7RsPAJb4AqNBovAJ?=
+ =?us-ascii?Q?2GKSVpZjlztOWkCaTcTuBStmOp5JJYCzFOIlDC0TOL4m9jHIDZ68MpVnSn9K?=
+ =?us-ascii?Q?PPoLkK4AuuRXdkBv3VelYBmCaR3lYmzoUDgTzA6rrn9E346bholfPdW6HGb+?=
+ =?us-ascii?Q?eA6K5g9uYccXuiwgEvYDQG3+ZNQNUXqvTRQaaqcaXhKN0bBVAawdSMkRa4ZM?=
+ =?us-ascii?Q?Zch4D07i368f1cAVV6TfG/sV8W1RoO8m2yAHckrf+O/CSc2Wf93Lx1/Roxpx?=
+ =?us-ascii?Q?9dYSJZHO+yHOiaKx76d/cKIOiPo/MkH8OU35fz1VnU4aZzc8u3cMcUEyO72Q?=
+ =?us-ascii?Q?nbEzukGhWU03XjlaSla1PrQ0/SwzaaNmDj3WNGR3l6xcoXIr98kL+BuzsoWy?=
+ =?us-ascii?Q?VJECxGaKcLCIWTjs0rmbfAENdUNyYO+kvELFayu42zxANTxjxIuNNNrKA8tT?=
+ =?us-ascii?Q?XQTvUZcCJ+7Zbiqe0pdp+Q0NQ2atBDMVSFsYr2yT?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v11 005/113] KVM: x86: Introduce vm_type to differentiate
- default VMs from confidential VMs
-To:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Xiaoyao Li <xiaoyao.li@intel.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
- <2184f7c8214f0114e8f77b19554ab4f7722836ac.1673539699.git.isaku.yamahata@intel.com>
-From:   Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <2184f7c8214f0114e8f77b19554ab4f7722836ac.1673539699.git.isaku.yamahata@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f21960e4-e56a-4178-aaeb-08daf83bd510
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2023 03:35:08.7432
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: aPJuTk1yQn9s5N4feLo+zGc8Xz4UGPDZgSWprDdqKQD+eAl0xPcnysejpNLvdO+J0Uqco+fUtpk3d8qs3PfjBw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4874
+X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
         SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,278 +177,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Saturday, January 7, 2023 12:43 AM
+>=20
+> @@ -2676,7 +2676,7 @@ static int copy_context_table(struct intel_iommu
+> *iommu,
+>  			if (!old_ce)
+>  				goto out;
+>=20
+> -			new_ce =3D alloc_pgtable_page(iommu->node);
+> +			new_ce =3D alloc_pgtable_page(iommu->node,
+> GFP_KERNEL);
 
-On 1/13/2023 12:31 AM, isaku.yamahata@intel.com wrote:
-> From: Sean Christopherson <sean.j.christopherson@intel.com>
->
-> Unlike default VMs, confidential VMs (Intel TDX and AMD SEV-ES) don't allow
-> some operations (e.g., memory read/write, register state access, etc).
->
-> Introduce vm_type to track the type of the VM to x86 KVM.  Other arch KVMs
-> already use vm_type, KVM_INIT_VM accepts vm_type, and x86 KVM callback
-> vm_init accepts vm_type.  So follow them.  Further, a different policy can
-> be made based on vm_type.  Define KVM_X86_DEFAULT_VM for default VM as
-> default and define KVM_X86_TDX_VM for Intel TDX VM.  The wrapper function
-> will be defined as "bool is_td(kvm) { return vm_type == VM_TYPE_TDX; }"
->
-> Add a capability KVM_CAP_VM_TYPES to effectively allow device model,
-> e.g. qemu, to query what VM types are supported by KVM.  This (introduce a
-> new capability and add vm_type) is chosen to align with other arch KVMs
-> that have VM types already.  Other arch KVMs uses
-
-uses -> use
-
-
-> different name
-name -> names
->   to query
-> supported vm types and there is no common name for it, so new name was
-> chosen.
->
-> Co-developed-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   Documentation/virt/kvm/api.rst        | 21 +++++++++++++++++++++
->   arch/x86/include/asm/kvm-x86-ops.h    |  1 +
->   arch/x86/include/asm/kvm_host.h       |  2 ++
->   arch/x86/include/uapi/asm/kvm.h       |  3 +++
->   arch/x86/kvm/svm/svm.c                |  6 ++++++
->   arch/x86/kvm/vmx/main.c               |  1 +
->   arch/x86/kvm/vmx/tdx.h                |  6 +-----
->   arch/x86/kvm/vmx/vmx.c                |  5 +++++
->   arch/x86/kvm/vmx/x86_ops.h            |  1 +
->   arch/x86/kvm/x86.c                    |  9 ++++++++-
->   include/uapi/linux/kvm.h              |  1 +
->   tools/arch/x86/include/uapi/asm/kvm.h |  3 +++
->   tools/include/uapi/linux/kvm.h        |  1 +
->   13 files changed, 54 insertions(+), 6 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 98459999273c..d2baa05f7c04 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -147,10 +147,31 @@ described as 'basic' will be available.
->   The new VM has no virtual cpus and no memory.
->   You probably want to use 0 as machine type.
->   
-> +X86:
-> +^^^^
-> +
-> +Supported vm type can be queried from KVM_CAP_VM_TYPES, which returns the
-> +bitmap of supported vm types. The 1-setting of bit @n means vm type with
-> +value @n is supported.
-> +
-> +S390:
-> +^^^^^
-> +
->   In order to create user controlled virtual machines on S390, check
->   KVM_CAP_S390_UCONTROL and use the flag KVM_VM_S390_UCONTROL as
->   privileged user (CAP_SYS_ADMIN).
->   
-> +MIPS:
-> +^^^^^
-> +
-> +To use hardware assisted virtualization on MIPS (VZ ASE) rather than
-> +the default trap & emulate implementation (which changes the virtual
-> +memory layout to fit in user mode), check KVM_CAP_MIPS_VZ and use the
-> +flag KVM_VM_MIPS_VZ.
-> +
-> +ARM64:
-> +^^^^^^
-> +
->   On arm64, the physical address size for a VM (IPA Size limit) is limited
->   to 40bits by default. The limit can be configured if the host supports the
->   extension KVM_CAP_ARM_VM_IPA_SIZE. When supported, use
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index dba2909e5ae2..59181b12ad70 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -20,6 +20,7 @@ KVM_X86_OP(hardware_disable)
->   KVM_X86_OP(hardware_unsetup)
->   KVM_X86_OP(has_emulated_msr)
->   KVM_X86_OP(vcpu_after_set_cpuid)
-> +KVM_X86_OP(is_vm_type_supported)
->   KVM_X86_OP(vm_init)
->   KVM_X86_OP_OPTIONAL(vm_destroy)
->   KVM_X86_OP_OPTIONAL_RET0(vcpu_precreate)
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 60dc8f1631de..c6ccfce7dc9e 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1212,6 +1212,7 @@ enum kvm_apicv_inhibit {
->   };
->   
->   struct kvm_arch {
-> +	unsigned long vm_type;
->   	unsigned long n_used_mmu_pages;
->   	unsigned long n_requested_mmu_pages;
->   	unsigned long n_max_mmu_pages;
-> @@ -1536,6 +1537,7 @@ struct kvm_x86_ops {
->   	bool (*has_emulated_msr)(struct kvm *kvm, u32 index);
->   	void (*vcpu_after_set_cpuid)(struct kvm_vcpu *vcpu);
->   
-> +	bool (*is_vm_type_supported)(unsigned long vm_type);
->   	unsigned int vm_size;
->   	int (*vm_init)(struct kvm *kvm);
->   	void (*vm_destroy)(struct kvm *kvm);
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index e48deab8901d..a4cca6bc6b06 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -529,4 +529,7 @@ struct kvm_pmu_event_filter {
->   #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
->   #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
->   
-> +#define KVM_X86_DEFAULT_VM	0
-> +#define KVM_X86_TDX_VM		1
-> +
->   #endif /* _ASM_X86_KVM_H */
-> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> index 799b24801d31..55f2e0a9b0f6 100644
-> --- a/arch/x86/kvm/svm/svm.c
-> +++ b/arch/x86/kvm/svm/svm.c
-> @@ -4682,6 +4682,11 @@ static void svm_vm_destroy(struct kvm *kvm)
->   	sev_vm_destroy(kvm);
->   }
->   
-> +static bool svm_is_vm_type_supported(unsigned long type)
-> +{
-> +	return type == KVM_X86_DEFAULT_VM;
-> +}
-> +
->   static int svm_vm_init(struct kvm *kvm)
->   {
->   	if (!pause_filter_count || !pause_filter_thresh)
-> @@ -4710,6 +4715,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
->   	.vcpu_free = svm_vcpu_free,
->   	.vcpu_reset = svm_vcpu_reset,
->   
-> +	.is_vm_type_supported = svm_is_vm_type_supported,
->   	.vm_size = sizeof(struct kvm_svm),
->   	.vm_init = svm_vm_init,
->   	.vm_destroy = svm_vm_destroy,
-> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> index f5d1166d2718..3b24e32077d6 100644
-> --- a/arch/x86/kvm/vmx/main.c
-> +++ b/arch/x86/kvm/vmx/main.c
-> @@ -34,6 +34,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
->   	.hardware_disable = vmx_hardware_disable,
->   	.has_emulated_msr = vmx_has_emulated_msr,
->   
-> +	.is_vm_type_supported = vmx_is_vm_type_supported,
->   	.vm_size = sizeof(struct kvm_vmx),
->   	.vm_init = vmx_vm_init,
->   	.vm_destroy = vmx_vm_destroy,
-> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> index 060bf48ec3d6..473013265bd8 100644
-> --- a/arch/x86/kvm/vmx/tdx.h
-> +++ b/arch/x86/kvm/vmx/tdx.h
-> @@ -15,11 +15,7 @@ struct vcpu_tdx {
->   
->   static inline bool is_td(struct kvm *kvm)
->   {
-> -	/*
-> -	 * TDX VM type isn't defined yet.
-> -	 * return kvm->arch.vm_type == KVM_X86_TDX_VM;
-> -	 */
-> -	return false;
-> +	return kvm->arch.vm_type == KVM_X86_TDX_VM;
->   }
->   
->   static inline bool is_td_vcpu(struct kvm_vcpu *vcpu)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 5dc7687dcf16..f1dea386d6c2 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7501,6 +7501,11 @@ int vmx_vcpu_create(struct kvm_vcpu *vcpu)
->   	return err;
->   }
->   
-> +bool vmx_is_vm_type_supported(unsigned long type)
-> +{
-> +	return type == KVM_X86_DEFAULT_VM;
-> +}
-> +
->   #define L1TF_MSG_SMT "L1TF CPU bug present and SMT on, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
->   #define L1TF_MSG_L1D "L1TF CPU bug present and virtualization mitigation disabled, data leak possible. See CVE-2018-3646 and https://www.kernel.org/doc/html/latest/admin-guide/hw-vuln/l1tf.html for details.\n"
->   
-> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
-> index fbc57fcbdd21..6980126bc32a 100644
-> --- a/arch/x86/kvm/vmx/x86_ops.h
-> +++ b/arch/x86/kvm/vmx/x86_ops.h
-> @@ -32,6 +32,7 @@ void vmx_hardware_unsetup(void);
->   int vmx_check_processor_compat(void);
->   int vmx_hardware_enable(void);
->   void vmx_hardware_disable(void);
-> +bool vmx_is_vm_type_supported(unsigned long type);
->   int vmx_vm_init(struct kvm *kvm);
->   void vmx_vm_destroy(struct kvm *kvm);
->   int vmx_vcpu_precreate(struct kvm *kvm);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 07e8ab791e37..68bff699096a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4535,6 +4535,11 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_X86_NOTIFY_VMEXIT:
->   		r = kvm_caps.has_notify_vmexit;
->   		break;
-> +	case KVM_CAP_VM_TYPES:
-> +		r = BIT(KVM_X86_DEFAULT_VM);
-> +		if (static_call(kvm_x86_is_vm_type_supported)(KVM_X86_TDX_VM))
-> +			r |= BIT(KVM_X86_TDX_VM);
-> +		break;
->   	default:
->   		break;
->   	}
-> @@ -12126,9 +12131,11 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->   	int ret;
->   	unsigned long flags;
->   
-> -	if (type)
-> +	if (!static_call(kvm_x86_is_vm_type_supported)(type))
->   		return -EINVAL;
->   
-> +	kvm->arch.vm_type = type;
-> +
->   	ret = kvm_page_track_init(kvm);
->   	if (ret)
->   		goto out;
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index 679d293ece0f..2a47fd0e51fd 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1212,6 +1212,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
->   #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
->   #define KVM_CAP_MEMORY_ATTRIBUTES 226
-> +#define KVM_CAP_VM_TYPES 227
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
-> diff --git a/tools/arch/x86/include/uapi/asm/kvm.h b/tools/arch/x86/include/uapi/asm/kvm.h
-> index 649e50a8f9dd..b67d2d59eb6c 100644
-> --- a/tools/arch/x86/include/uapi/asm/kvm.h
-> +++ b/tools/arch/x86/include/uapi/asm/kvm.h
-> @@ -524,4 +524,7 @@ struct kvm_pmu_event_filter {
->   #define KVM_VCPU_TSC_CTRL 0 /* control group for the timestamp counter (TSC) */
->   #define   KVM_VCPU_TSC_OFFSET 0 /* attribute for the TSC offset */
->   
-> +#define KVM_X86_DEFAULT_VM	0
-> +#define KVM_X86_TDX_VM		1
-> +
->   #endif /* _ASM_X86_KVM_H */
-> diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-> index 20522d4ba1e0..792a4889d1f4 100644
-> --- a/tools/include/uapi/linux/kvm.h
-> +++ b/tools/include/uapi/linux/kvm.h
-> @@ -1175,6 +1175,7 @@ struct kvm_ppc_resize_hpt {
->   #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
->   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
->   #define KVM_CAP_DIRTY_LOG_RING_WITH_BITMAP 225
-> +#define KVM_CAP_VM_TYPES 227
->   
->   #ifdef KVM_CAP_IRQ_ROUTING
->   
+GFP_ATOMIC
