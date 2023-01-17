@@ -2,578 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88C5766DFB5
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 14:57:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3B7DB66E0C4
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 15:33:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231314AbjAQN52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 08:57:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54152 "EHLO
+        id S232017AbjAQOdI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 09:33:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231599AbjAQN4w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 08:56:52 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1A43D084
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 05:56:14 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30HDgnWE019402;
-        Tue, 17 Jan 2023 13:55:59 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=K2EglMWMY9Achu743Wi1HWI8smes8b+0IqAFTL8sYz4=;
- b=p+4rAdw1Z9U03VAxcEqM1K1VUTjmKUNi9I0XLT445skuZbWvSgsdpUMH91meIzn33dm9
- 1ptl9NRxL00A+wMbMxDVD6osDaZJOZ55/c8GGrRPZ8+yisVtjb17MsgVQM+gYv5Mbq7a
- eU9MNbYSkbgd47jwBi2Dy2zjsCQqZSJlZ0KNOzCRKdifjpiJuFSEKgUxCXtq/NrUz7Z4
- UOfca0ZTSq1KhSclmLJD81gHNRm9SC8ZB7HLyUG5kcmg0j3VQWD6DSkj28RcCtu3Qfe8
- 9hoPeRfc2ng/ePhW1mctvfkisex1nBg/vknOMLMym3wW+SJgkzoxXG1PpmQPkLGRVOmO 4Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5p809n25-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Jan 2023 13:55:59 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30HCWr4d014414;
-        Tue, 17 Jan 2023 13:55:58 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5p809n1e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Jan 2023 13:55:58 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30H5HJPu017351;
-        Tue, 17 Jan 2023 13:55:56 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16kxcg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Jan 2023 13:55:56 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30HDtqg751577318
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Jan 2023 13:55:52 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7B1382004B;
-        Tue, 17 Jan 2023 13:55:52 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E1FF720040;
-        Tue, 17 Jan 2023 13:55:50 +0000 (GMT)
-Received: from [9.171.42.216] (unknown [9.171.42.216])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 17 Jan 2023 13:55:50 +0000 (GMT)
-Message-ID: <8063592a-971a-d029-e8ac-0fb6286199d5@linux.ibm.com>
-Date:   Tue, 17 Jan 2023 14:55:50 +0100
+        with ESMTP id S231969AbjAQOdA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 09:33:00 -0500
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96C813C2A3
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 06:32:58 -0800 (PST)
+Received: by mail-lf1-x12d.google.com with SMTP id x40so2327937lfu.12
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 06:32:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7yhLGsprr4iGbKzba+JN1VXXF3TeC3cedN8+F9epKwY=;
+        b=BWKfON0ONcZ0E/73kUupX7eOFbsTtnf5zb0RLvmJL0YAhZl6oEvSZL3c/NoN0rNReU
+         TIh5gjrwA6Bj/3YkDzJiL+Gls11L2i8ze76yowGZvwzeuvcwTzbo+PdTF5RRopZcOu67
+         rqK/5DXAz0Cu8iK48baqurCP3Q8SHLQ3+La3MGi7OSiOLM50rap2pv9+NepuA7fvXVkZ
+         JbAIYTYmlyf3SaXzCtregYhzAezlqMgzZgLa7aRWrX3Ls8Vi1NxO2mSedec1z7gAhtZm
+         CjRS/N1ff7V0fQ/RSJMzu/O50kqFBmQcx8Ep1MMWXZfAdBITG7gqeNKqSuVwb7ryK8UD
+         4kmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7yhLGsprr4iGbKzba+JN1VXXF3TeC3cedN8+F9epKwY=;
+        b=WOYvW/9i7P33ImscKyKf9OLQO69mhWOl7V0nDK2aD2KSC4z08iyxpLuo3SMyxkzQ9g
+         wwNtFObtRBqWeRCWliAm9QBzVr9Ib7YWUZINFHCHgI+ggCwwGAE75In5vbE2/C/KM73b
+         5z1hBSaL9/5Gh2XiKyrO/6D/5iR9RCmHFcLoPcVlKrWyE7eT4ay3WS3obDce9sMv9k5B
+         sv8+PTDvEEo25vbeMTz9aJuETsIVrG7cN/ls2k6CaOnDViaJqlAKpSkKfaNivOk/2Fav
+         ghK44UP3hPv7EWuP3QomG8ZkN4jc7JbzojGJM6+XCmDnI57eLqlTqLhVSrMTzjO/Pk6F
+         ygsQ==
+X-Gm-Message-State: AFqh2kofx76NjDjNyKpLExMnBZeiHR5dDne2LBkYRl4y+brPPiOaGHDD
+        AW8+Xdb2LYV7Bcdn194HP5Vg1L5sPT70KcmMGKY3Ew==
+X-Google-Smtp-Source: AMrXdXsPS/EHa9ll4sjoGtdooNfVuEuQvNaydQDhDfaDKMnyvvZ6mWGGNpzl0ThBONl2d+/I1rYOtZu/xqsiIx9Cz3Y=
+X-Received: by 2002:a05:6512:3b9b:b0:4d5:850a:8330 with SMTP id
+ g27-20020a0565123b9b00b004d5850a8330mr128086lfv.665.1673965976657; Tue, 17
+ Jan 2023 06:32:56 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v14 02/11] s390x/cpu topology: add topology entries on CPU
- hotplug
-To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-3-pmorel@linux.ibm.com>
- <666b9711b23d807525be06992fffd4d782ee80c7.camel@linux.ibm.com>
-Content-Language: en-US
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <666b9711b23d807525be06992fffd4d782ee80c7.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: f8nCsPfU5gNMBMh6kMPSMxhgij2A3FDI
-X-Proofpoint-ORIG-GUID: mZLhTPvhuTr4zyWd07Zl2wbTJ-DreB5y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-17_05,2023-01-17_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- malwarescore=0 adultscore=0 clxscore=1015 spamscore=0 impostorscore=0
- mlxscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301170112
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com> <Y8H5Z3e4hZkFxAVS@google.com>
+In-Reply-To: <Y8H5Z3e4hZkFxAVS@google.com>
+From:   Fuad Tabba <tabba@google.com>
+Date:   Tue, 17 Jan 2023 14:32:19 +0000
+Message-ID: <CA+EHjTyVfm5L0kch2rT1HwaDHjVOxnZozV2PKWViKY00igHawg@mail.gmail.com>
+Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Sean,
 
+On Sat, Jan 14, 2023 at 12:38 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Fri, Dec 02, 2022, Chao Peng wrote:
+> > This patch series implements KVM guest private memory for confidential
+> > computing scenarios like Intel TDX[1]. If a TDX host accesses
+> > TDX-protected guest memory, machine check can happen which can further
+> > crash the running host system, this is terrible for multi-tenant
+> > configurations. The host accesses include those from KVM userspace like
+> > QEMU. This series addresses KVM userspace induced crash by introducing
+> > new mm and KVM interfaces so KVM userspace can still manage guest memory
+> > via a fd-based approach, but it can never access the guest memory
+> > content.
+> >
+> > The patch series touches both core mm and KVM code. I appreciate
+> > Andrew/Hugh and Paolo/Sean can review and pick these patches. Any other
+> > reviews are always welcome.
+> >   - 01: mm change, target for mm tree
+> >   - 02-09: KVM change, target for KVM tree
+>
+> A version with all of my feedback, plus reworked versions of Vishal's selftest,
+> is available here:
+>
+>   git@github.com:sean-jc/linux.git x86/upm_base_support
+>
+> It compiles and passes the selftest, but it's otherwise barely tested.  There are
+> a few todos (2 I think?) and many of the commits need changelogs, i.e. it's still
+> a WIP.
+>
+> As for next steps, can you (handwaving all of the TDX folks) take a look at what
+> I pushed and see if there's anything horrifically broken, and that it still works
+> for TDX?
+>
+> Fuad (and pKVM folks) same ask for you with respect to pKVM.  Absolutely no rush
+> (and I mean that).
 
-On 1/13/23 19:15, Nina Schoetterl-Glausch wrote:
-> On Thu, 2023-01-05 at 15:53 +0100, Pierre Morel wrote:
->> The topology information are attributes of the CPU and are
->> specified during the CPU device creation.
->>
->> On hot plug, we gather the topology information on the core,
->> creates a list of topology entries, each entry contains a single
->> core mask of each core with identical topology and finaly we
-> s/finaly/finally/
+Thanks for sharing this. I've had a look at the patches, and have
+ported them to work with pKVM. At a high level, the new interface
+seems fine and it works with the arm64/pKVM port. I have a couple of
+comments regarding some of the details, but they can wait until v11 is
+posted.
 
-thx
-
->> orders the list in topological order.
-> s/orders/order/
-
-thx
-
->> The topological order is, from higher to lower priority:
->> - physical topology
->>      - drawer
->>      - book
->>      - socket
->>      - core origin, offset in 64bit increment from core 0.
->> - modifier attributes
->>      - CPU type
->>      - polarization entitlement
->>      - dedication
->>
->> The possibility to insert a CPU in a mask is dependent on the
->> number of cores allowed in a socket, a book or a drawer, the
->> checking is done during the hot plug of the CPU to have an
->> immediate answer.
->>
->> If the complete topology is not specified, the core is added
->> in the physical topology based on its core ID and it gets
->> defaults values for the modifier attributes.
->>
->> This way, starting QEMU without specifying the topology can
->> still get some adventage of the CPU topology.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   include/hw/s390x/cpu-topology.h |  48 ++++++
->>   hw/s390x/cpu-topology.c         | 293 ++++++++++++++++++++++++++++++++
->>   hw/s390x/s390-virtio-ccw.c      |  10 ++
->>   hw/s390x/meson.build            |   1 +
->>   4 files changed, 352 insertions(+)
->>   create mode 100644 hw/s390x/cpu-topology.c
->>
->> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
->> index d945b57fc3..b3fd752d8d 100644
->> --- a/include/hw/s390x/cpu-topology.h
->> +++ b/include/hw/s390x/cpu-topology.h
->> @@ -10,7 +10,11 @@
->>   #ifndef HW_S390X_CPU_TOPOLOGY_H
->>   #define HW_S390X_CPU_TOPOLOGY_H
->>   
->> +#include "qemu/queue.h"
->> +#include "hw/boards.h"
->> +
->>   #define S390_TOPOLOGY_CPU_IFL   0x03
->> +#define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
->>   
->>   #define S390_TOPOLOGY_POLARITY_HORIZONTAL      0x00
->>   #define S390_TOPOLOGY_POLARITY_VERTICAL_LOW    0x01
->> @@ -20,4 +24,48 @@
->>   #define S390_TOPOLOGY_SHARED    0x00
->>   #define S390_TOPOLOGY_DEDICATED 0x01
->>   
->> +typedef union s390_topology_id {
->> +    uint64_t id;
->> +    struct {
->> +        uint64_t level_6:8; /* byte 0 BE */
->> +        uint64_t level_5:8; /* byte 1 BE */
->> +        uint64_t drawer:8;  /* byte 2 BE */
->> +        uint64_t book:8;    /* byte 3 BE */
->> +        uint64_t socket:8;  /* byte 4 BE */
->> +        uint64_t rsrv:5;
->> +        uint64_t d:1;
->> +        uint64_t p:2;       /* byte 5 BE */
->> +        uint64_t type:8;    /* byte 6 BE */
->> +        uint64_t origin:2;
-> 
-> This is two bits because it's the core divided by 64, and we have 248 cores at most?
-> Where is this set?
-
-right, must be set so does the core offset in the mask.
-
-> 
->> +        uint64_t core:6;    /* byte 7 BE */
->> +    };
->> +} s390_topology_id;
-> 
-> This struct seems to do double duty, 1. it represents a cpu and 2. a topology entry.
-> You also use it for sorting.
-> I would suggest to just use a cpu object when referring to a specific cpu and
-> put the relevant fields directly into the topology entry.
-
-Yes, I can remove the core:6.
-After Thomas comment I will change all the bit field for uint8_t.
-I think we should not use the real topology entry here if we want to use 
-TGE in the future.
-
-> You get rid of the bit field that way.
-> You'd then need a comparison function for a cpu object and a topology entry.
-> As long as that isn't the only type pair that shouldn't be too ugly.
-> 
->> +#define TOPO_CPU_MASK       0x000000000000003fUL
->> +
->> +typedef struct S390TopologyEntry {
->> +    s390_topology_id id;
->> +    QTAILQ_ENTRY(S390TopologyEntry) next;
->> +    uint64_t mask;
->> +} S390TopologyEntry;
->> +
->> +typedef struct S390Topology {
->> +    QTAILQ_HEAD(, S390TopologyEntry) list;
->> +    uint8_t *sockets;
->> +    CpuTopology *smp;
->> +} S390Topology;
->> +
->> +#ifdef CONFIG_KVM
->> +bool s390_has_topology(void);
->> +void s390_topology_set_cpu(MachineState *ms, S390CPU *cpu, Error **errp);
->> +#else
->> +static inline bool s390_has_topology(void)
->> +{
->> +       return false;
->> +}
->> +static inline void s390_topology_set_cpu(MachineState *ms,
->> +                                         S390CPU *cpu,
->> +                                         Error **errp) {}
->> +#endif
->> +extern S390Topology s390_topology;
->> +
->>   #endif
->> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
->> new file mode 100644
->> index 0000000000..438055c612
->> --- /dev/null
->> +++ b/hw/s390x/cpu-topology.c
->> @@ -0,0 +1,293 @@
->> +/*
->> + * CPU Topology
->> + *
->> + * Copyright IBM Corp. 2022
->> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
->> +
->> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
->> + * your option) any later version. See the COPYING file in the top-level
->> + * directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "qemu/error-report.h"
->> +#include "hw/qdev-properties.h"
->> +#include "hw/boards.h"
->> +#include "qemu/typedefs.h"
->> +#include "target/s390x/cpu.h"
->> +#include "hw/s390x/s390-virtio-ccw.h"
->> +#include "hw/s390x/cpu-topology.h"
->> +
->> +/*
->> + * s390_topology is used to keep the topology information.
->> + * .list: queue the topology entries inside which
->> + *        we keep the information on the CPU topology.
->> + *
->> + * .smp: keeps track of the machine topology.
->> + *
->> + * .socket: tracks information on the count of cores per socket.
->> + *
->> + */
->> +S390Topology s390_topology = {
->> +    .list = QTAILQ_HEAD_INITIALIZER(s390_topology.list),
->> +    .sockets = NULL, /* will be initialized after the cpu model is realized */
-> 
-> I guess you should do the same for .smp then also.
-
-OK
-
-> 
->> +};
->> +
->> +/**
->> + * s390_socket_nb:
->> + * @id: s390_topology_id
->> + *
->> + * Returns the socket number used inside the socket array.
->> + */
->> +static int s390_socket_nb(s390_topology_id id)
->> +{
->> +    return (id.socket + 1) * (id.book + 1) * (id.drawer + 1);
-> 
-> This calculation doesn't make a whole lot of sense to me.
-> It's symmetric with regards to the variables, so (s=0 b=1 d=1)
-> will have the same result as (s=1 b=0 d=1).
-> You want the "global" socket number right?
-> So that would be (drawer * books_per_drawer + book) * sockets_per_book + socket.
-
-yes, already changed
-
-> 
->> +}
->> +
->> +/**
->> + * s390_has_topology:
->> + *
->> + * Return value: if the topology is supported by the machine.
->> + */
->> +bool s390_has_topology(void)
->> +{
->> +    return false;
->> +}
->> +
->> +/**
->> + * s390_topology_init:
->> + * @ms: the machine state where the machine topology is defined
->> + *
->> + * Keep track of the machine topology.
->> + * Allocate an array to keep the count of cores per socket.
->> + * The index of the array starts at socket 0 from book 0 and
->> + * drawer 0 up to the maximum allowed by the machine topology.
->> + */
->> +static void s390_topology_init(MachineState *ms)
->> +{
->> +    CpuTopology *smp = &ms->smp;
->> +
->> +    s390_topology.smp = smp;
->> +    if (!s390_topology.sockets) {
-> 
-> Is this function being called multiple times, or why the if?
-> Use an assert instead?
-
-I forgot to remove this test.
-The caller already check this.
-
-> 
->> +        s390_topology.sockets = g_new0(uint8_t, smp->sockets *
->> +                                       smp->books * smp->drawers);
->> +    }
->> +}
->> +
->> +/**
->> + * s390_topology_from_cpu:
->> + * @cpu: The S390CPU
->> + *
->> + * Initialize the topology id from the CPU environment.
->> + */
->> +static s390_topology_id s390_topology_from_cpu(S390CPU *cpu)
->> +{
->> +    s390_topology_id topology_id;
->> +
->> +    topology_id.core = cpu->env.core_id;
->> +    topology_id.type = cpu->env.cpu_type;
->> +    topology_id.p = cpu->env.polarity;
->> +    topology_id.d = cpu->env.dedicated;
->> +    topology_id.socket = cpu->env.socket_id;
->> +    topology_id.book = cpu->env.book_id;
->> +    topology_id.drawer = cpu->env.drawer_id;
->> +
->> +    return topology_id;
->> +}
->> +
->> +/**
->> + * s390_topology_set_entry:
->> + * @entry: Topology entry to setup
->> + * @id: topology id to use for the setup
->> + *
->> + * Set the core bit inside the topology mask and
->> + * increments the number of cores for the socket.
->> + */
->> +static void s390_topology_set_entry(S390TopologyEntry *entry,
-> 
-> Not sure if I like the name, what it does is to add a cpu to the entry.
-
-s390_topology_add_cpu_to_entry() ?
+Cheers,
+/fuad
 
 
 
-> 
->> +                                    s390_topology_id id)
->> +{
->> +    set_bit(63 - id.core, &entry->mask);
-> 
-> You need to subtract the origin first or that might be negative.
-
-yes, origin is not handled correctly
-
-> 
->> +    s390_topology.sockets[s390_socket_nb(id)]++;
->> +}
->> +
->> +/**
->> + * s390_topology_new_entry:
->> + * @id: s390_topology_id to add
->> + *
->> + * Allocate a new entry and initialize it.
->> + *
->> + * returns the newly allocated entry.
->> + */
->> +static S390TopologyEntry *s390_topology_new_entry(s390_topology_id id)
->> +{
->> +    S390TopologyEntry *entry;
->> +
->> +    entry = g_malloc0(sizeof(S390TopologyEntry));
->> +    entry->id.id = id.id & ~TOPO_CPU_MASK;
->> +    s390_topology_set_entry(entry, id);
->> +
->> +    return entry;
->> +}
->> +
->> +/**
->> + * s390_topology_insert:
->> + *
->> + * @id: s390_topology_id to insert.
->> + *
->> + * Parse the topology list to find if the entry already
->> + * exist and add the core in it.
->> + * If it does not exist, allocate a new entry and insert
->> + * it in the queue from lower id to greater id.
->> + */
->> +static void s390_topology_insert(s390_topology_id id)
->> +{
->> +    S390TopologyEntry *entry;
->> +    S390TopologyEntry *tmp = NULL;
->> +    uint64_t new_id;
->> +
->> +    new_id = id.id & ~TOPO_CPU_MASK;
->> +
->> +    /* First CPU to add to an entry */
->> +    if (QTAILQ_EMPTY(&s390_topology.list)) {
->> +        entry = s390_topology_new_entry(id);
->> +        QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
->> +        return;
->> +    }
->> +
->> +    QTAILQ_FOREACH(tmp, &s390_topology.list, next) {
->> +        if (new_id == tmp->id.id) {
->> +            s390_topology_set_entry(tmp, id);
->> +            return;
->> +        } else if (new_id < tmp->id.id) {
->> +            entry = s390_topology_new_entry(id);
->> +            QTAILQ_INSERT_BEFORE(tmp, entry, next);
->> +            return;
->> +        }
->> +    }
->> +
->> +    entry = s390_topology_new_entry(id);
->> +    QTAILQ_INSERT_TAIL(&s390_topology.list, entry, next);
-> 
-> Consider adding a sentinel entry "at infinity", then that whole code
-> would simplify.
-
-looks good, thanks.
-
-
-> 
->> +}
->> +
->> +/**
->> + * s390_topology_check:
->> + * @errp: Error pointer
->> + * id: s390_topology_id to be verified
->> + *
->> + * The function checks if the topology id fits inside the
->> + * system topology.
->> + */
->> +static void s390_topology_check(Error **errp, s390_topology_id id)
->> +{
->> +    CpuTopology *smp = s390_topology.smp;
->> +
->> +    if (id.socket > smp->sockets) {
->> +            error_setg(errp, "Unavailable socket: %d", id.socket);
->> +            return;
->> +    }
->> +    if (id.book > smp->books) {
->> +            error_setg(errp, "Unavailable book: %d", id.book);
->> +            return;
->> +    }
->> +    if (id.drawer > smp->drawers) {
->> +            error_setg(errp, "Unavailable drawer: %d", id.drawer);
->> +            return;
->> +    }
->> +    if (id.type != S390_TOPOLOGY_CPU_IFL) {
->> +            error_setg(errp, "Unknown cpu type: %d", id.type);
->> +            return;
->> +    }
->> +    /* Polarity and dedication can never be wrong */
->> +}
->> +
->> +/**
->> + * s390_topology_cpu_default:
->> + * @errp: Error pointer
->> + * @cpu: pointer to a S390CPU
->> + *
->> + * Setup the default topology for unset attributes.
->> + *
->> + * The function accept only all all default values or all set values
->> + * for the geometry topology.
->> + *
->> + * The function calculates the (drawer_id, book_id, socket_id)
->> + * topology by filling the cores starting from the first socket
->> + * (0, 0, 0) up to the last (smp->drawers, smp->books, smp->sockets).
->> + *
->> + */
->> +static void s390_topology_cpu_default(Error **errp, S390CPU *cpu)
->> +{
->> +    CpuTopology *smp = s390_topology.smp;
->> +    CPUS390XState *env = &cpu->env;
->> +
->> +    /* All geometry topology attributes must be set or all unset */
->> +    if ((env->socket_id < 0 || env->book_id < 0 || env->drawer_id < 0) &&
->> +        (env->socket_id >= 0 || env->book_id >= 0 || env->drawer_id >= 0)) {
->> +        error_setg(errp,
->> +                   "Please define all or none of the topology geometry attributes");
->> +        return;
->> +    }
->> +
->> +    /* Check if one of the geometry topology is unset */
->> +    if (env->socket_id < 0) {
->> +        /* Calculate default geometry topology attributes */
->> +        env->socket_id = (env->core_id / smp->cores) % smp->sockets;
->> +        env->book_id = (env->core_id / (smp->sockets * smp->cores)) %
->> +                       smp->books;
->> +        env->drawer_id = (env->core_id /
->> +                          (smp->books * smp->sockets * smp->cores)) %
->> +                         smp->drawers;
->> +    }
->> +}
->> +
->> +/**
->> + * s390_topology_set_cpu:
->> + * @ms: MachineState used to initialize the topology structure on
->> + *      first call.
->> + * @cpu: the new S390CPU to insert in the topology structure
->> + * @errp: the error pointer
->> + *
->> + * Called from CPU Hotplug to check and setup the CPU attributes
->> + * before to insert the CPU in the topology.
->> + */
->> +void s390_topology_set_cpu(MachineState *ms, S390CPU *cpu, Error **errp)
->> +{
->> +    Error *local_error = NULL;
-> 
-> Can't you just use ERRP_GUARD ?
-
-I do not think it is necessary and I find it obfuscating.
-So, should I?
-
-> 
->> +    s390_topology_id id;
->> +
->> +    /*
->> +     * We do not want to initialize the topology if the cpu model
->> +     * does not support topology consequently, we have to wait for
-> 
-> ", consequently," I think. Could you do the initialization some where else,
-> after you know what the cpu model is? Not that I object to doing it this way.
-> 
-
-I did not find a better place, it must be done after the CPU model is 
-initialize and before the first CPU is created.
-The cpu model is initialized during the early creation of the first cpu.
-
-Any idea?
-
-Thanks.
-
-Regards,
-Pierre
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
+> On my side, the two things on my mind are (a) tests and (b) downstream dependencies
+> (SEV and TDX).  For tests, I want to build a lists of tests that are required for
+> merging so that the criteria for merging are clear, and so that if the list is large
+> (haven't thought much yet), the work of writing and running tests can be distributed.
+>
+> Regarding downstream dependencies, before this lands, I want to pull in all the
+> TDX and SNP series and see how everything fits together.  Specifically, I want to
+> make sure that we don't end up with a uAPI that necessitates ugly code, and that we
+> don't miss an opportunity to make things simpler.  The patches in the SNP series to
+> add "legacy" SEV support for UPM in particular made me slightly rethink some minor
+> details.  Nothing remotely major, but something that needs attention since it'll
+> be uAPI.
+>
+> I'm off Monday, so it'll be at least Tuesday before I make any more progress on
+> my side.
+>
+> Thanks!
