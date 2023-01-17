@@ -2,196 +2,239 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2435E66E849
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 22:17:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DA6B366E864
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 22:27:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229682AbjAQVQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 16:16:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44118 "EHLO
+        id S229753AbjAQV07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 16:26:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229800AbjAQVPS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 16:15:18 -0500
-Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C3A693734
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 11:37:48 -0800 (PST)
-Received: by mail-pf1-x429.google.com with SMTP id i65so20915228pfc.0
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 11:37:48 -0800 (PST)
+        with ESMTP id S229807AbjAQVZi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 16:25:38 -0500
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482F8577CA;
+        Tue, 17 Jan 2023 11:44:49 -0800 (PST)
+Received: by mail-il1-x130.google.com with SMTP id a3so9984691ilp.6;
+        Tue, 17 Jan 2023 11:44:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=eh5fgoocbdbY9QY3UdCKSmuuIr/thlgxwnXp5dQZBHA=;
-        b=dPyGE1COVGOI2KxD4ZLRpUmZW5v859qkiMT9GvN9GjTLLr2HXvcvIzdCz+65WF/+hc
-         GwKOx2pfkRRPRPFbo1NhDhnPtvwv8c57ySRFvlbSLtCmAcGyV8cK2uIv1akauf2ioUQb
-         B5dC6Gwlk8iBjl3QS7sP3NdrFnJTR/ZvyBuXEf0vQN4TGZME4HMFDh5W05eFPRL5gya7
-         JNZUzS2z8spJybYAQhNsqiqcSfhEl/3LGQ7XGkHbGxBFS5LY46e9W5IyZifzJ+Ipx5Dc
-         7Kke/y2GOvvihori32lT7k7XBMlVabnhfOz42NjRhB7YB0LGgLN+KN4La6AHIDYgrF91
-         OA1A==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5JIbNrskGEup5Zw9WnSDYstYuiQFrpRXeEKVLHFV3c0=;
+        b=Un29ENV3PsO12mZsz1Cpw3Y/IMp3vk04r584klcjOGzNX+sa8IW8/Wuxt0OQ6D7Gw4
+         C1MXZ9FLRoZd859hYPW5w9pEKpvOvMAonjV50zSROBh753cvTyMOWKuwnutfICmWlDFa
+         3hiBekqoQ1z7Nk6DaEkOPb45ekRp5h0EMrb1L1ZgHJz2MmpHCVgInSbYQhjm0LUWZrtq
+         7DcvhB4WaKTWwBD5dir6jWbXvc1WhNzZMuas7skehZH+PWR55EnoReTUMBeqekUK0zoP
+         q+ecv690GH8Z1oRgQZhmdEsAyZD+d+y9gJ1qTgf7jILwnnIU+2gNXkW/s2Zoba8XckCm
+         8cfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eh5fgoocbdbY9QY3UdCKSmuuIr/thlgxwnXp5dQZBHA=;
-        b=zYOCrMatoEAmxG9V99skMfbKJeeMyI3wzSorrNNiAVvvY/1HhItYICNKCpy1o6fhg6
-         Onz0jkxio/xIQzZ1CjDYUCs/sdkh/tjmoGZrQvnC6u2X1A4deR3kU9I2mPiNDrxE6++J
-         cmj+xgmbJXH6wxj4h5nzXo3N9I3UL+e7XogUY+9pw7cppCJxIACESKAZTDJJHDYusR13
-         58vDPeBzXwmgLH5YIccplisLX4HeHo530AVj/EOZGG4w/31TC3zZDwrCnSw7hwP+j5HZ
-         FyQAxxup19RWMHmOMARIYAVFVA+FpQc5dyDj/KeNs4J1sDoZXU1XrkKxOumbW+oXyUbq
-         w7Ew==
-X-Gm-Message-State: AFqh2kozCV3KIK0AfxfvMP/LvQ2Na6Dpa2tE9+IRWteJ9PqTJBiFz1K4
-        tfKswyoS1sxtyueZir7a3gUj7w==
-X-Google-Smtp-Source: AMrXdXurGCNa2kIZ/S8QBvJlh8tXJdzBhwqU28rWYvwv+xXz++U+mQeB6H6I0y/IAho5jjXl+xswoA==
-X-Received: by 2002:a05:6a00:705:b0:58b:ca40:cd03 with SMTP id 5-20020a056a00070500b0058bca40cd03mr4808468pfl.15.1673984267715;
-        Tue, 17 Jan 2023 11:37:47 -0800 (PST)
-Received: from [192.168.5.146] (rrcs-173-198-77-218.west.biz.rr.com. [173.198.77.218])
-        by smtp.gmail.com with ESMTPSA id o189-20020a62cdc6000000b0058baa6586f3sm9512207pfg.135.2023.01.17.11.37.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jan 2023 11:37:47 -0800 (PST)
-Message-ID: <b92e6786-acc6-50ef-8804-e4e3ef4eb2d6@linaro.org>
-Date:   Tue, 17 Jan 2023 09:37:42 -1000
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5JIbNrskGEup5Zw9WnSDYstYuiQFrpRXeEKVLHFV3c0=;
+        b=l7rfoMpfFM6gMh8dARugXhGZskv2OGUwzdMB2rCY87dbrTOCkn7rEJlgkSC1dkk6pY
+         GMW6fMaHsMBgvEsgxx8Qw0ikzMPee/91VDUcCy3SrGaJiUr46yz6Ev3ixaAs1NtYhcX/
+         zlErW/LwD63NVYAqzUgIDE4ZS3IRXtyM7KI5NtDXVstU3I9pGwGq4cga8hFYPZ7rN2ya
+         sPRPiK/TXqM+QgZA9vmoou0PfLyp9c3Nv5HuVPgBIlYAF4UBRKwp4g542q8A4nW1Tonp
+         iJ9AxPVL/xBdmKGP339JwLAWj9hmtroRT932xQvqHBeGUhAlqMK1gPhkfmBWW94QAq7j
+         0U2g==
+X-Gm-Message-State: AFqh2krckBkMsd6JTUfClb0ZkWHQtnzW4Qz2p2Dgjjl3zCopUjDYjo+R
+        jOO0bmNeJlsjqo8TBdA9jNA=
+X-Google-Smtp-Source: AMrXdXtmzuxLQLKp1Cxoe2DdLdH+nQqgx5k4CpKJfmDeOkEgKxXNEHTIQcZD6PbeFLCzWIsJweqEpQ==
+X-Received: by 2002:a92:9501:0:b0:30e:f03e:a76e with SMTP id y1-20020a929501000000b0030ef03ea76emr624301ilh.2.1673984660274;
+        Tue, 17 Jan 2023 11:44:20 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id g12-20020a92d7cc000000b0030c332915aasm9428093ilq.49.2023.01.17.11.44.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jan 2023 11:44:19 -0800 (PST)
+Date:   Tue, 17 Jan 2023 21:44:14 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: Re: [PATCH v11 018/113] KVM: TDX: create/destroy VM structure
+Message-ID: <20230117214414.00003229@gmail.com>
+In-Reply-To: <Y8bFCb+rs25dKcMY@google.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+        <68fa413e61d7471657174bc7c83bde5c842e251f.1673539699.git.isaku.yamahata@intel.com>
+        <20230113151258.00006a6d@gmail.com>
+        <Y8F1uPsW56fVdhmC@google.com>
+        <20230114111621.00001840@gmail.com>
+        <Y8bFCb+rs25dKcMY@google.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v4 1/2] arm/kvm: add support for MTE
-Content-Language: en-US
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eric Auger <eauger@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>
-References: <20230111161317.52250-1-cohuck@redhat.com>
- <20230111161317.52250-2-cohuck@redhat.com>
-From:   Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20230111161317.52250-2-cohuck@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/11/23 06:13, Cornelia Huck wrote:
-> @@ -2136,7 +2136,7 @@ static void machvirt_init(MachineState *machine)
->   
->       if (vms->mte && (kvm_enabled() || hvf_enabled())) {
->           error_report("mach-virt: %s does not support providing "
-> -                     "MTE to the guest CPU",
-> +                     "emulated MTE to the guest CPU",
->                        kvm_enabled() ? "KVM" : "HVF");
+On Tue, 17 Jan 2023 15:55:53 +0000
+Sean Christopherson <seanjc@google.com> wrote:
 
-Not your bug, but noticing this should use current_accel_name().
+> On Sat, Jan 14, 2023, Zhi Wang wrote:
+> > On Fri, 13 Jan 2023 15:16:08 +0000 > Sean Christopherson <seanjc@google=
+.com> wrote:
+> >=20
+> > > On Fri, Jan 13, 2023, Zhi Wang wrote:
+> > > > Better add a FIXME: here as this has to be fixed later.
+> > >=20
+> > > No, leaking the page is all KVM can reasonably do here.  An improved
+> > > comment would be helpful, but no code change is required.
+> > > tdx_reclaim_page() returns an error if and only if there's an
+> > > unexpected, fatal error, e.g. a SEAMCALL with bad params, incorrect
+> > > concurrency in KVM, a TDX Module bug, etc.  Retrying at a later point=
+ is
+> > > highly unlikely to be successful.
+> >=20
+> > Hi:
+> >=20
+> > The word "leaking" sounds like a situation left unhandled temporarily.
+> >=20
+> > I checked the source code of the TDX module[1] for the possible reason =
+to
+> > fail when reviewing this patch:
+> >=20
+> > tdx-module-v1.0.01.01.zip\src\vmm_dispatcher\api_calls\tdh_phymem_page_=
+reclaim.c
+> > tdx-module-v1.0.01.01.zip\src\vmm_dispatcher\api_calls\tdh_phymem_page_=
+wbinvd.c
+> >=20
+> > a. Invalid parameters. For example, page is not aligned, PA HKID is not=
+ zero...
+> >=20
+> > For invalid parameters, a WARN_ON_ONCE() + return value is good enough =
+as
+> > that is how kernel handles similar situations. The caller takes the
+> > responsibility.
+> > =20
+> > b. Locks has been taken in TDX module. TDR page has been locked due to =
+another
+> > SEAMCALL, another SEAMCALL is doing PAMT walk and holding PAMT lock...=
+=20
+> >=20
+> > This needs to be improved later either by retry or taking tdx_lock to a=
+void
+> > TDX module fails on this.
+>=20
+> No, tdx_reclaim_page() already retries TDH.PHYMEM.PAGE.RECLAIM if the tar=
+get page
+> is contended (though I'd question the validity of even that), and TDH.PHY=
+MEM.PAGE.WBINVD
+> is performed only when reclaiming the TDR.  If there's contention when re=
+claiming
+> the TDR, then KVM effectively has a use-after-free bug, i.e. leaking the =
+page is
+> the least of our worries.
+>=20
 
-> +static inline bool arm_machine_has_tag_memory(void)
-> +{
-> +#ifndef CONFIG_USER_ONLY
-> +    Object *obj = object_dynamic_cast(qdev_get_machine(), TYPE_VIRT_MACHINE);
-> +
-> +    /* so far, only the virt machine has support for tag memory */
-> +    if (obj) {
-> +        VirtMachineState *vms = VIRT_MACHINE(obj);
-> +
-> +        return vms->mte;
-> +    }
-> +#endif
-> +    return false;
-> +}
+Hi:
 
-True for CONFIG_USER_ONLY, via page_get_target_data().
-You should have seen check-tcg test failures...
+Thanks for the reply. "Leaking" is the consquence of even failing in retry.=
+ I
+agree with this. But I was questioning if "retry" is really a correct and o=
+nly
+solution when encountering lock contention in the TDX module as I saw that =
+there
+are quite some magic numbers are going to be introduced because of "retry" =
+and
+there were discussions about times of retry should be 3 or 1000 in TDX guest
+on hyper-V patches. It doesn't sound right.
 
-> +void arm_cpu_mte_finalize(ARMCPU *cpu, Error **errp)
-> +{
-> +    bool enable_mte;
-> +
-> +    switch (cpu->prop_mte) {
-> +    case ON_OFF_AUTO_OFF:
-> +        enable_mte = false;
-> +        break;
-> +    case ON_OFF_AUTO_ON:
-> +        if (!kvm_enabled()) {
+Compare to an typical *kernel lock* case, an execution path can wait on a
+waitqueue and later will be woken up. We usually do contention-wait-and-ret=
+ry
+and we rarely just do contention and retry X times. In TDX case, I understa=
+nd
+that it is hard for the TDX module to provide similar solutions as an execu=
+tion
+path can't stay long in the TDX module.
 
-tcg_enabled(), here and everywhere else you test for !kvm.
+1) We can always take tdx_lock (linux kernel lock) when calling a SEAMCALL
+that touch the TDX internal locks. But the downside is we might lose some
+concurrency.
 
-> +#ifdef CONFIG_KVM
-> +        if (kvm_enabled() && !kvm_arm_mte_supported()) {
+2) As TDX module doesn't provide contention-and-wait, I guess the following
+approach might have been discussed when designing this "retry".
 
-kvm_arm.h should get a stub inline returning false, so that the ifdef is removed.
-See e.g. kvm_arm_sve_supported().
+KERNEL                          TDX MODULE
 
-> +    default: /* AUTO */
-> +        if (!kvm_enabled()) {
+SEAMCALL A   ->                 PATH A: Taking locks
 
-tcg_enabled.
+SEAMCALL B   ->                 PATH B: Contention on a lock
 
-> +    /* accelerator-specific enablement */
-> +    if (kvm_enabled()) {
-> +#ifdef CONFIG_KVM
-> +        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_ARM_MTE, 0)) {
-> +            error_setg(errp, "Failed to enable KVM_CAP_ARM_MTE");
+             <-                 Return "operand busy"
 
-Ideally this ifdef could go away as well.
+SEAMCALL B   -|
+              |  <- Wait on a kernel waitqueue
+SEAMCALL B  <-|
 
-> +        } else {
-> +            /* TODO: add proper migration support with MTE enabled */
-> +            if (!mte_migration_blocker) {
+SEAMCALL A   <-                 PATH A: Return
 
-Move the global variable here, as a local static?
+SEAMCALL A   -|
+              |  <- Wake up the waitqueue
+SEMACALL A  <-|=20
 
-I guess this check is to avoid adding one blocker per cpu?
-I would guess the cap doesn't need enabling more than once either?
+SEAMCALL B  ->                  PATH B: Taking the locks
+...
 
+Why not this scheme wasn't chosen?
 
-> +                error_setg(&mte_migration_blocker,
-> +                           "Live migration disabled due to MTE enabled");
-> +                if (migrate_add_blocker(mte_migration_blocker, NULL)) {
-
-You pass NULL to the migrate_add_blocker errp argument...
-
-> +                    error_setg(errp, "Failed to add MTE migration blocker");
-
-... then make up your own generic reason for why it failed.
-In this case it seems only related to another command-line option: --only-migratable.
-
-
-Anyway, I wonder about hiding all of this in target/arm/kvm.c:
-
-bool kvm_arm_enable_mte(Error *errp)
-{
-     static bool once = false;
-     Error *blocker;
-
-     if (once) {
-         return;
-     }
-     once = true;
-
-     if (kvm_vm_enable_cap(kvm_state, KVM_CAP_ARM_MTE, 0)) {
-         error_setg_errno(errp, "Failed to enable KVM_CAP_ARM_MTE");
-         return false;
-     }
-
-     blocker = g_new0(Error);
-     error_setg(blocker, "Live migration disabled....");
-     return !migrate_add_blocker(blocker, errp);
-}
-
-with
-
-static inline bool kvm_arm_enable_mte(Error *errp)
-{
-     g_assert_not_reached();
-}
-
-in the !CONFIG_KVM block in kvm_arm.h.
-
+>=20
+> On Thu, Jan 12, 2023 at 8:34 AM <isaku.yamahata@intel.com> wrote:
+> > +static int tdx_reclaim_page(hpa_t pa, bool do_wb, u16 hkid)
+> > +{
+> > + =A0 =A0 =A0 struct tdx_module_output out;
+> > + =A0 =A0 =A0 u64 err;
+> > +
+> > + =A0 =A0 =A0 do {
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D tdh_phymem_page_reclaim(pa, &out);
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* TDH.PHYMEM.PAGE.RECLAIM is allowed o=
+nly when TD is shutdown.
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* state. =A0i.e. destructing TD.
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* TDH.PHYMEM.PAGE.RECLAIM =A0requires =
+TDR and target page.
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* Because we're destructing TD, it's r=
+are to contend with TDR.
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+> > + =A0 =A0 =A0 } while (err =3D=3D (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RC=
+X));
+> > + =A0 =A0 =A0 if (WARN_ON_ONCE(err)) {
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err=
+, &out);
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EIO;
+> > + =A0 =A0 =A0 }
+> > +
+> > + =A0 =A0 =A0 if (do_wb) {
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* Only TDR page gets into this path. =
+=A0No contention is expected
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* because of the last page of TD.
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D tdh_phymem_page_wbinvd(set_hkid_t=
+o_hpa(pa, hkid));
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (WARN_ON_ONCE(err)) {
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pr_tdx_error(TDH_PHYMEM_P=
+AGE_WBINVD, err, NULL);
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EIO;
+> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
+> > + =A0 =A0 =A0 }
+> > +
+> > + =A0 =A0 =A0 tdx_clear_page(pa);
+> > + =A0 =A0 =A0 return 0;
+> > +}
 
