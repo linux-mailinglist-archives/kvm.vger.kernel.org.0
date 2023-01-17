@@ -2,64 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DBEEE670E86
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 01:22:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 61E33670E8D
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 01:24:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229772AbjARAWd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 19:22:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57562 "EHLO
+        id S229650AbjARAY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 19:24:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbjARAWG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 19:22:06 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3E6758662
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 15:36:51 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id pa16-20020a17090b265000b0020a71040b4cso13937517pjb.6
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 15:36:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HaUGak2G7cecQv8T9ZdGOoPgbZOZkSx+mC6eBv9kBwQ=;
-        b=lfQu6S8OD/g3UTfppdNZjL3V+WH3TrKQ3gxxL1Q4rD8vS+gFz+IU4eah9iTT39t2XG
-         1LUE4PY0gteSGFE5jDLQw4hvN6ykTZMti7nj0ZbzzxfGGRrXQpafvvi3aUwDOzfWbmR5
-         HKSuPwIwoffbU9hbC79l8nD1r0LcZmvXbLlb2SP0m8NuIsmhJkVio6VQwnbFqLXkkGG8
-         pzCB5yz+fTfX0bEtGkTKHuVVxnI18g3A720m6xyJnYItcvOMyHWutJjABIwsqHM9B//r
-         n67Vij47S+zooSes0Ns+Q+dljKrIflSygAuc4z6HFtMPrIRkbIXnTV9c8Qew18qXBIaG
-         dABw==
+        with ESMTP id S229750AbjARAYD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 19:24:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FEC2312D
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 15:38:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673998696;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TCBdlBJNdmbwC3QjgMYxTqXDEbjetxbmhE0qTYgBydc=;
+        b=Q2pG1gijKz5BBTF17Wi0fW6HNqpmdVd1AmYRgSgej9BvXWiua+LNDBnZXTHcIcYcvbM9Y4
+        O49LBh/Lqe9Q/ZjEs1xSGCWFk2KvYVpm/cLvKXQANK/qD/Rxn/mO1c7nmIP8B3HZBAlhsI
+        LIWYo3VG+iyPFglMjlIHHAmFs4A1oLc=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-292-TG3LIPZlNsq9iOug2YKr1g-1; Tue, 17 Jan 2023 18:38:14 -0500
+X-MC-Unique: TG3LIPZlNsq9iOug2YKr1g-1
+Received: by mail-io1-f70.google.com with SMTP id b21-20020a5d8d95000000b006fa39fbb94eso20210909ioj.17
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 15:38:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HaUGak2G7cecQv8T9ZdGOoPgbZOZkSx+mC6eBv9kBwQ=;
-        b=Aq6SElnKQQbM8TwzIu72UeTmp2gAAbymFm9qeLjfYqMr5rjgJcwsaggQVKKlhRTOnJ
-         O+j/q/rxSsE1WEvNy1j7LPPIn7CQYX9v8WN7NSl9j1lfmWmf/or0pX23rCRXT3fK3h2p
-         KG1vkYxefX10tkj5SpcF+AKy+7tk+CjrVFHg70+JZcpp2oRGrlOd/kx8oV8jhnqOraHl
-         7WYvxcdsNg+2gMoa9wNgB0yH0me8qVwsmpTsBZ/ygNhstf68uzHT3UFHr7fstgnibqF4
-         1A/J5mGIT1yZOtOwLFTBnSkYTWV3ntXhDNj/E9a3GXodslO8wim3JhAOTwxbGppegxfO
-         72ug==
-X-Gm-Message-State: AFqh2kpRLa3qusmWQ4yI/i5AuTDYd9p2LkpWZ93liyBmt9LnpvC2mkS8
-        uYo7QJAeUQR4Fr9isPbs9BdQjktOzDjC6li95w==
-X-Google-Smtp-Source: AMrXdXs9XtCfW7FcHAYBD8FdwiwULDpulbnJJBgeVPXNRbTxKFmc1P7VLn9MIitOOgcyXZHdLjpw+2N+aFSUUobVHg==
-X-Received: from ackerleytng-cloudtop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:b30])
- (user=ackerleytng job=sendgmr) by 2002:aa7:9a5c:0:b0:58d:ce71:97d7 with SMTP
- id x28-20020aa79a5c000000b0058dce7197d7mr321996pfj.76.1673998609046; Tue, 17
- Jan 2023 15:36:49 -0800 (PST)
-Date:   Tue, 17 Jan 2023 23:36:44 +0000
-In-Reply-To: <b406d6e22a768d7b4faa5f2d9dca338069359f9a.1667110240.git.isaku.yamahata@intel.com>
-Mime-Version: 1.0
-Message-ID: <diqzcz7cd983.fsf@ackerleytng-cloudtop-sg.c.googlers.com>
-Subject: Re: [PATCH v10 067/108] KVM: TDX: Add helper assembly function to TDX vcpu
-From:   Ackerley Tng <ackerleytng@google.com>
-To:     isaku.yamahata@intel.com
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@intel.com, isaku.yamahata@gmail.com,
-        pbonzini@redhat.com, erdemaktas@google.com, seanjc@google.com,
-        sagis@google.com, dmatlack@google.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TCBdlBJNdmbwC3QjgMYxTqXDEbjetxbmhE0qTYgBydc=;
+        b=Z1J0O6tFKsRRColLpewpJDqS6fiIMvorJ2N1lsWn/tXLjHSXIbwZnPlRrhSY2FxnMe
+         prjdwDDMHHy0ptPSbVYaaqCAxMzEOHTgH3LN6un2AMot6ESLZfDpCt6DhrWcRCCPOMIo
+         d01ISACQos89PhJlEucgav2gq9TfaMuZsSPDckZteeYr1pYV4O1Bt4vPWKDzlL8PNFLH
+         fGQwyy8F2P40eNSFOPDZQXda8xjNZW1y9N8rlvgV0K3t5xq8XSBs8vtytmzWv/HVIHU4
+         5DbzKUEfZd0IqncUiU1036mry4R7zyuDFsAKGiivX593aXtWHFM2sxzms5PW5bfIiWaj
+         7Pyg==
+X-Gm-Message-State: AFqh2koXr23842Zkst5D5zCHol/NHrDe1SowpUuDZ1FGywyUQ9eMQRXM
+        WXArWNFyx865ng53fizHXMhYkLVDGN9wh5nAdn1nNpwhiogwbOXQZ2uL0WnIyNipQ+e34HBUrA8
+        3a6+DLLoEyj7o
+X-Received: by 2002:a05:6e02:be5:b0:30f:1cc:d14b with SMTP id d5-20020a056e020be500b0030f01ccd14bmr4264398ilu.0.1673998694179;
+        Tue, 17 Jan 2023 15:38:14 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXv3MvNN/zHAZtBEsEXvR7KudEBMPCye4G8ZAL2tcAMHzzjVqjvnc6sIW/Zo4LZHQnAfuaYWfw==
+X-Received: by 2002:a05:6e02:be5:b0:30f:1cc:d14b with SMTP id d5-20020a056e020be500b0030f01ccd14bmr4264385ilu.0.1673998693915;
+        Tue, 17 Jan 2023 15:38:13 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id h18-20020a02cd32000000b003a2d93487easm2961179jaq.38.2023.01.17.15.38.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jan 2023 15:38:13 -0800 (PST)
+Date:   Tue, 17 Jan 2023 16:38:11 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <diana.craciun@oss.nxp.com>, <eric.auger@redhat.com>,
+        <maorg@nvidia.com>, <cohuck@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH V1 vfio 0/6] Move to use cgroups for userspace
+ persistent allocations
+Message-ID: <20230117163811.591b4d6f.alex.williamson@redhat.com>
+In-Reply-To: <20230108154427.32609-1-yishaih@nvidia.com>
+References: <20230108154427.32609-1-yishaih@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -67,201 +82,73 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Sun, 8 Jan 2023 17:44:21 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
 
-> TDX defines an API to run TDX vcpu with its own ABI.  Define an assembly
-> helper function to run TDX vcpu to hide the special ABI so that C code can
-> call it with function call ABI.
+> This series changes the vfio and its sub drivers to use
+> GFP_KERNEL_ACCOUNT for userspace persistent allocations.
+> 
+> The GFP_KERNEL_ACCOUNT option lets the memory allocator know that this
+> is untrusted allocation triggered from userspace and should be a subject
+> of kmem accountingis, and as such it is controlled by the cgroup
+> mechanism. [1]
+> 
+> As part of this change, we allow loading in mlx5 driver larger images
+> than 512 MB by dropping the arbitrary hard-coded value that we have
+> today and move to use the max device loading value which is for now 4GB.
+> 
+> In addition, the first patch from the series fixes a UBSAN note in mlx5
+> that was reported once the kernel was compiled with this option.
+> 
+> [1] https://www.kernel.org/doc/html/latest/core-api/memory-allocation.html
+> 
+> Changes from V0: https://www.spinics.net/lists/kvm/msg299508.html
+> Patch #2 - Fix MAX_LOAD_SIZE to use BIT_ULL instead of BIT as was
+>            reported by the krobot test.
+> 
+> Yishai
+> 
+> Jason Gunthorpe (1):
+>   vfio: Use GFP_KERNEL_ACCOUNT for userspace persistent allocations
+> 
+> Yishai Hadas (5):
+>   vfio/mlx5: Fix UBSAN note
+>   vfio/mlx5: Allow loading of larger images than 512 MB
+>   vfio/hisi: Use GFP_KERNEL_ACCOUNT for userspace persistent allocations
+>   vfio/fsl-mc: Use GFP_KERNEL_ACCOUNT for userspace persistent
+>     allocations
+>   vfio/platform: Use GFP_KERNEL_ACCOUNT for userspace persistent
+>     allocations
+> 
+>  drivers/vfio/container.c                      |  2 +-
+>  drivers/vfio/fsl-mc/vfio_fsl_mc.c             |  2 +-
+>  drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c        |  4 ++--
+>  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  4 ++--
+>  drivers/vfio/pci/mlx5/cmd.c                   | 17 +++++++++--------
+>  drivers/vfio/pci/mlx5/main.c                  | 19 ++++++++++---------
+>  drivers/vfio/pci/vfio_pci_config.c            |  6 +++---
+>  drivers/vfio/pci/vfio_pci_core.c              |  7 ++++---
+>  drivers/vfio/pci/vfio_pci_igd.c               |  2 +-
+>  drivers/vfio/pci/vfio_pci_intrs.c             | 10 ++++++----
+>  drivers/vfio/pci/vfio_pci_rdwr.c              |  2 +-
+>  drivers/vfio/platform/vfio_platform_common.c  |  2 +-
+>  drivers/vfio/platform/vfio_platform_irq.c     |  8 ++++----
+>  drivers/vfio/virqfd.c                         |  2 +-
+>  14 files changed, 46 insertions(+), 41 deletions(-)
 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> ---
->   arch/x86/kvm/vmx/vmenter.S | 157 +++++++++++++++++++++++++++++++++++++
->   1 file changed, 157 insertions(+)
+The type1 IOMMU backend is notably absent here among the core files, any
+reason?  Potentially this removes the dma_avail issue as a means to
+prevent userspace from creating an arbitrarily large number of DMA
+mappings, right?  For compatibility, this might mean setting the DMA
+entry limit to an excessive number instead as some use cases can
+already hit the U16_MAX limit now.
 
-> diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
-> index 8477d8bdd69c..9066eea1ede5 100644
-> --- a/arch/x86/kvm/vmx/vmenter.S
-> +++ b/arch/x86/kvm/vmx/vmenter.S
-> @@ -3,6 +3,7 @@
->   #include <asm/asm.h>
->   #include <asm/asm-offsets.h>
->   #include <asm/bitsperlong.h>
-> +#include <asm/errno.h>
->   #include <asm/kvm_vcpu_regs.h>
->   #include <asm/nospec-branch.h>
->   #include <asm/percpu.h>
-> @@ -31,6 +32,13 @@
->   #define VCPU_R15	__VCPU_REGS_R15 * WORD_SIZE
->   #endif
+Are there any compatibility issues we should expect with this change to
+accounting otherwise?
 
-> +#ifdef CONFIG_INTEL_TDX_HOST
-> +#define TDENTER 		0
-> +#define EXIT_REASON_TDCALL	77
-> +#define TDENTER_ERROR_BIT	63
-> +#define seamcall		.byte 0x66,0x0f,0x01,0xcf
-> +#endif
-> +
->   .section .noinstr.text, "ax"
+Also a nit, the commit logs have a persistent typo throughout
+"accountingis".  I can fix on commit or if we decide on a respin please
+fix.  Thanks,
 
->   /**
-> @@ -350,3 +358,152 @@ SYM_FUNC_START(vmx_do_interrupt_nmi_irqoff)
->   	pop %_ASM_BP
->   	RET
->   SYM_FUNC_END(vmx_do_interrupt_nmi_irqoff)
-> +
-> +#ifdef CONFIG_INTEL_TDX_HOST
-> +
-> +.pushsection .noinstr.text, "ax"
-> +
-> +/**
-> + * __tdx_vcpu_run - Call SEAMCALL(TDENTER) to run a TD vcpu
-> + * @tdvpr:	physical address of TDVPR
-> + * @regs:	void * (to registers of TDVCPU)
-> + * @gpr_mask:	non-zero if guest registers need to be loaded prior to  
-> TDENTER
-> + *
-> + * Returns:
-> + *	TD-Exit Reason
-> + *
-> + * Note: KVM doesn't support using XMM in its hypercalls, it's the HyperV
-> + *	 code's responsibility to save/restore XMM registers on TDVMCALL.
-> + */
-> +SYM_FUNC_START(__tdx_vcpu_run)
-> +	push %rbp
-> +	mov  %rsp, %rbp
-> +
-> +	push %r15
-> +	push %r14
-> +	push %r13
-> +	push %r12
-> +	push %rbx
-> +
-> +	/* Save @regs, which is needed after TDENTER to capture output. */
-> +	push %rsi
-> +
-> +	/* Load @tdvpr to RCX */
-> +	mov %rdi, %rcx
-> +
-> +	/* No need to load guest GPRs if the last exit wasn't a TDVMCALL. */
-> +	test %dx, %dx
-> +	je 1f
-> +
-> +	/* Load @regs to RAX, which will be clobbered with $TDENTER anyways. */
-> +	mov %rsi, %rax
-> +
-> +	mov VCPU_RBX(%rax), %rbx
-> +	mov VCPU_RDX(%rax), %rdx
-> +	mov VCPU_RBP(%rax), %rbp
-> +	mov VCPU_RSI(%rax), %rsi
-> +	mov VCPU_RDI(%rax), %rdi
-> +
-> +	mov VCPU_R8 (%rax),  %r8
-> +	mov VCPU_R9 (%rax),  %r9
-> +	mov VCPU_R10(%rax), %r10
-> +	mov VCPU_R11(%rax), %r11
-> +	mov VCPU_R12(%rax), %r12
-> +	mov VCPU_R13(%rax), %r13
-> +	mov VCPU_R14(%rax), %r14
-> +	mov VCPU_R15(%rax), %r15
-> +
-> +	/*  Load TDENTER to RAX.  This kills the @regs pointer! */
-> +1:	mov $TDENTER, %rax
-> +
-> +2:	seamcall
-> +
-> +	/*
-> +	 * Use same return value convention to tdxcall.S.
-> +	 * TDX_SEAMCALL_VMFAILINVALID doesn't conflict with any TDX status code.
-> +	 */
-> +	jnc 3f
-> +	mov $TDX_SEAMCALL_VMFAILINVALID, %rax
-> +	jmp 5f
-> +3:
-> +
-> +	/* Skip to the exit path if TDENTER failed. */
-> +	bt $TDENTER_ERROR_BIT, %rax
-> +	jc 5f
-> +
-> +	/* Temporarily save the TD-Exit reason. */
-> +	push %rax
-> +
-> +	/* check if TD-exit due to TDVMCALL */
-> +	cmp $EXIT_REASON_TDCALL, %ax
-> +
-> +	/* Reload @regs to RAX. */
-> +	mov 8(%rsp), %rax
-> +
-> +	/* Jump on non-TDVMCALL */
-> +	jne 4f
-> +
-> +	/* Save all output from SEAMCALL(TDENTER) */
-> +	mov %rbx, VCPU_RBX(%rax)
-> +	mov %rbp, VCPU_RBP(%rax)
-> +	mov %rsi, VCPU_RSI(%rax)
-> +	mov %rdi, VCPU_RDI(%rax)
-> +	mov %r10, VCPU_R10(%rax)
-> +	mov %r11, VCPU_R11(%rax)
-> +	mov %r12, VCPU_R12(%rax)
-> +	mov %r13, VCPU_R13(%rax)
-> +	mov %r14, VCPU_R14(%rax)
-> +	mov %r15, VCPU_R15(%rax)
-> +
-> +4:	mov %rcx, VCPU_RCX(%rax)
-> +	mov %rdx, VCPU_RDX(%rax)
-> +	mov %r8,  VCPU_R8 (%rax)
-> +	mov %r9,  VCPU_R9 (%rax)
-> +
-> +	/*
-> +	 * Clear all general purpose registers except RSP and RAX to prevent
-> +	 * speculative use of the guest's values.
-> +	 */
-> +	xor %rbx, %rbx
-> +	xor %rcx, %rcx
-> +	xor %rdx, %rdx
-> +	xor %rsi, %rsi
-> +	xor %rdi, %rdi
-> +	xor %rbp, %rbp
-> +	xor %r8,  %r8
-> +	xor %r9,  %r9
-> +	xor %r10, %r10
-> +	xor %r11, %r11
-> +	xor %r12, %r12
-> +	xor %r13, %r13
-> +	xor %r14, %r14
-> +	xor %r15, %r15
-> +
-> +	/* Restore the TD-Exit reason to RAX for return. */
-> +	pop %rax
-> +
-> +	/* "POP" @regs. */
-> +5:	add $8, %rsp
-> +	pop %rbx
-> +	pop %r12
-> +	pop %r13
-> +	pop %r14
-> +	pop %r15
-> +
-> +	pop %rbp
-> +	RET
-> +
-> +6:	cmpb $0, kvm_rebooting
-> +	je 1f
-> +	mov $TDX_SW_ERROR, %r12
+Alex
 
-While compiling the tree at
-https://github.com/intel/tdx/tree/kvm-upstream, it seems like
-compilation was failing because TDX_SW_ERROR was not defined. Perhaps
-asm/tdx.h needs to be added.
-
-> +	orq %r12, %rax
-> +	jmp 5b
-> +1:	ud2
-> +	/* Use FAULT version to know what fault happened. */
-> +	_ASM_EXTABLE_FAULT(2b, 6b)
-> +
-> +SYM_FUNC_END(__tdx_vcpu_run)
-> +
-> +.popsection
-> +
-> +#endif
-> --
-> 2.25.1
