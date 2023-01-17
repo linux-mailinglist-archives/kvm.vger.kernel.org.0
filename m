@@ -2,82 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B22F166D6E0
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 08:26:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC0A566D6FD
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 08:34:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235856AbjAQH0m (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 02:26:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60632 "EHLO
+        id S235937AbjAQHeT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 02:34:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235491AbjAQH02 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 02:26:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D58D122DC1
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 23:25:43 -0800 (PST)
+        with ESMTP id S235904AbjAQHd4 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 02:33:56 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6910298EE
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 23:31:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673940343;
+        s=mimecast20190719; t=1673940666;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=cw84Yju7w9gKFrSKtPL7xPNSf+GwDLpk8XHxQvhhr0o=;
-        b=K+L+n1HoEC3KS21xO0uSurq40GeNu0Trnf68zaAmiPQTuR+1TtiSyBAG+Lj7KF9NS7suuW
-        7EmCqTC2t7w6D3vIbaXmtuBS7bnqxRy+fLfBhi68kriuhLcNeu+4bqWHAxc3tz2au6qLUb
-        89HpweRKwA11WUHEnPbXICTPFHtA/ms=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=97RK27ckw8/r+KYWQgIrxRst7KulfFflGfzx+fO9zRs=;
+        b=QNa9hJ6f07PYhDzAnyhtOFFYKcjvHZ6QUXiB4NVc7T61UmKsI3yMvSLIhY1mhUUsND41+a
+        UFgbzXnECfJn5f3pi3YBaxK3y128Fqlu+P5rRYXp/7Y2tZ365FOLwDySpv8/3uazexRJ4G
+        LXI7edxzhN1hfvqQ69hGMrQMjD9NBLs=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-655-ol5bBr5fNMegw2Y52kH9zg-1; Tue, 17 Jan 2023 02:25:42 -0500
-X-MC-Unique: ol5bBr5fNMegw2Y52kH9zg-1
-Received: by mail-pf1-f197.google.com with SMTP id c5-20020aa78805000000b0058d983c708aso2239789pfo.22
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 23:25:42 -0800 (PST)
+ us-mta-638-QeUFNXWdMKyWHRJcTJEOdA-1; Tue, 17 Jan 2023 02:31:04 -0500
+X-MC-Unique: QeUFNXWdMKyWHRJcTJEOdA-1
+Received: by mail-qv1-f72.google.com with SMTP id r10-20020ad4522a000000b004d28fcbfe17so15524182qvq.4
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 23:31:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cw84Yju7w9gKFrSKtPL7xPNSf+GwDLpk8XHxQvhhr0o=;
-        b=2XMd70fAVBoEdO7mp3E0rtcHQFcNuoNCzNDwO+Ts4kEhzlMiPhVu56oD04N4S7ek++
-         3zIMJ4XCjwvOwJuKplDiFC9gMwDypQeIo8L5EK4kAV2NpKjY8fEmfMwiSUBM+uEIqHBT
-         6D6iCjvzgmGqRV/d7xBwndo5BmVf4FY1YzyQhsVoy2RYW4UMpp309+lXd60FJkmeUXl8
-         1mraqSQ+2BCQc5H4/UlS47ga4wp1NXUJJgiCvAlgAam/TVYeWUyaJyGo5N7qAdjCLSE/
-         y4ch23b96qPSf/PM/atMwWHtnC3KHOlrDj8cfgw+0wjTUw90Lsl98HRH1nxNZ0b7uVZL
-         7bNw==
-X-Gm-Message-State: AFqh2kp1/rsav0RD2ZrBXXFsG1lFC5IAY1wNtN31pJfZQ3HSeP7a9Wwg
-        r2J5RSDK6ngOaPzN9Eu0AoCRvSq/VXYJXuBCqd6LgBX0bIKPkftv/wMh17GXuz94T4Zt7ijyMQa
-        jR40SqBrdZrff
-X-Received: by 2002:a05:6a00:1d9f:b0:58d:b0fa:b06c with SMTP id z31-20020a056a001d9f00b0058db0fab06cmr572203pfw.2.1673940340615;
-        Mon, 16 Jan 2023 23:25:40 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXt0UTiKkfB6JIEw1SLnhkzfEJdF53LAEN301MosO5Q52ywY8yfSHDwLCATeOQ5pGWlB4MN0eA==
-X-Received: by 2002:a05:6a00:1d9f:b0:58d:b0fa:b06c with SMTP id z31-20020a056a001d9f00b0058db0fab06cmr572198pfw.2.1673940340382;
-        Mon, 16 Jan 2023 23:25:40 -0800 (PST)
-Received: from [10.72.13.64] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id f7-20020a623807000000b00589500f19d0sm15197326pfa.142.2023.01.16.23.25.35
+        bh=97RK27ckw8/r+KYWQgIrxRst7KulfFflGfzx+fO9zRs=;
+        b=DP6sbS82P+10kGDYSA4dbznaTam/4hzEVMJoqsycZpDa001qPcp9o94+4ARZihNZDX
+         w4MI8dIt74V9GbCIF1v+UucehgqXd2c9zenODUPDlmRIVaLuOhpzUjlknfUgJMaESH/c
+         q5U+p0IAOvoQRQO3ptXAe4u9xB1BTpBRouB7E/WCeMYtsBUOYniEiMt6JGHXSoOhL78G
+         2SIr8eLAc3+LC7fJviJoM09I4yjZLTn3a0gNJqt3a5xfpQDYZXcjUKZcpTXQIpzl9cyb
+         rgQzlSbQ8ownqJgSI6miwgj+3kHLqw60DKahf+GM3oz0QVutKB7MzMP8n5o/yvBIMrzo
+         Pptg==
+X-Gm-Message-State: AFqh2ko+pCkqX3tqJ5cfTkH83tUEkL2/dsNCTgsHE7OntJ0gbBpzkl7Z
+        R/hM8gxasbko3d6BgQuVLvTqbS+Gw+5Vx25uTnFYDmABVpirHGhCU6MlfsXdklVh6f/TjwnYfpB
+        ojf2sWgtuu0i4
+X-Received: by 2002:ac8:776f:0:b0:3a7:e426:2892 with SMTP id h15-20020ac8776f000000b003a7e4262892mr33783118qtu.28.1673940664017;
+        Mon, 16 Jan 2023 23:31:04 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtzZ7EW5Lb8eu56Fos1h5kpdcYpwG9mTkEqgzzm8sbzMR6n0vImc79K4Th2JSuaaB/pXAbRpg==
+X-Received: by 2002:ac8:776f:0:b0:3a7:e426:2892 with SMTP id h15-20020ac8776f000000b003a7e4262892mr33783104qtu.28.1673940663770;
+        Mon, 16 Jan 2023 23:31:03 -0800 (PST)
+Received: from [192.168.0.2] (ip-109-43-177-26.web.vodafone.de. [109.43.177.26])
+        by smtp.gmail.com with ESMTPSA id p16-20020a05620a057000b006fa12a74c53sm19391429qkp.61.2023.01.16.23.30.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jan 2023 23:25:39 -0800 (PST)
-Message-ID: <ce52d9fc-cd1f-9863-0f3a-b83eb0c36e5d@redhat.com>
-Date:   Tue, 17 Jan 2023 15:25:32 +0800
+        Mon, 16 Jan 2023 23:31:03 -0800 (PST)
+Message-ID: <cd9e0c88-c2a8-1eca-d146-3fd6639af3e7@redhat.com>
+Date:   Tue, 17 Jan 2023 08:30:58 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v2 0/8] KVM: arm64: PMU: Allow userspace to limit the
- number of PMCs on vCPU
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v14 08/11] qapi/s390/cpu topology: change-topology monitor
+ command
 Content-Language: en-US
-To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-        kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-References: <20230117013542.371944-1-reijiw@google.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230117013542.371944-1-reijiw@google.com>
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+ <20230105145313.168489-9-pmorel@linux.ibm.com>
+ <72baa5b42abe557cdf123889b33b845b405cc86c.camel@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <72baa5b42abe557cdf123889b33b845b405cc86c.camel@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -90,92 +88,69 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On 16/01/2023 22.09, Nina Schoetterl-Glausch wrote:
+> On Thu, 2023-01-05 at 15:53 +0100, Pierre Morel wrote:
+>> The modification of the CPU attributes are done through a monitor
+>> commands.
+>>
+>> It allows to move the core inside the topology tree to optimise
+>> the cache usage in the case the host's hypervizor previously
+>> moved the CPU.
+>>
+>> The same command allows to modifiy the CPU attributes modifiers
+>> like polarization entitlement and the dedicated attribute to notify
+>> the guest if the host admin modified scheduling or dedication of a vCPU.
+>>
+>> With this knowledge the guest has the possibility to optimize the
+>> usage of the vCPUs.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+...
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> index b69955a1cd..0faffe657e 100644
+>> --- a/hw/s390x/cpu-topology.c
+>> +++ b/hw/s390x/cpu-topology.c
+>> @@ -18,6 +18,10 @@
+>>   #include "target/s390x/cpu.h"
+>>   #include "hw/s390x/s390-virtio-ccw.h"
+>>   #include "hw/s390x/cpu-topology.h"
+>> +#include "qapi/qapi-commands-machine-target.h"
+>> +#include "qapi/qmp/qdict.h"
+>> +#include "monitor/hmp.h"
+>> +#include "monitor/monitor.h"
+>>   
+>>   /*
+>>    * s390_topology is used to keep the topology information.
+>> @@ -203,6 +207,21 @@ static void s390_topology_set_entry(S390TopologyEntry *entry,
+>>       s390_topology.sockets[s390_socket_nb(id)]++;
+>>   }
+>>   
+>> +/**
+>> + * s390_topology_clear_entry:
+>> + * @entry: Topology entry to setup
+>> + * @id: topology id to use for the setup
+>> + *
+>> + * Clear the core bit inside the topology mask and
+>> + * decrements the number of cores for the socket.
+>> + */
+>> +static void s390_topology_clear_entry(S390TopologyEntry *entry,
+>> +                                      s390_topology_id id)
+>> +{
+>> +    clear_bit(63 - id.core, &entry->mask);
+> 
+> This doesn't take the origin into account.
+> 
+>> +    s390_topology.sockets[s390_socket_nb(id)]--;
+> 
+> I suppose this function cannot run concurrently, so the same CPU doesn't get removed twice.
 
+QEMU has the so-called BQL - the Big Qemu Lock. Instructions handlers are 
+normally called with the lock taken, see qemu_mutex_lock_iothread() in 
+target/s390x/kvm/kvm.c.
 
-I have tested this patch set on an Ampere machine, and every thing works 
-fine.
+(if you feel unsure, you can add a "assert(qemu_mutex_iothread_locked())" 
+statement, but I think it is not necessary here)
 
-
-Tested-by: Shaoqin Huang <shahuang@redhat.com>
-
-On 1/17/23 09:35, Reiji Watanabe wrote:
-> The goal of this series is to allow userspace to limit the number
-> of PMU event counters on the vCPU. We need this to support migration
-> across systems that implement different numbers of counters.
->
-> The number of PMU event counters is indicated in PMCR_EL0.N.
-> For a vCPU with PMUv3 configured, its value will be the same as
-> the host value by default. Userspace can set PMCR_EL0.N for the
-> vCPU to a lower value than the host value, using KVM_SET_ONE_REG.
-> However, it is practically unsupported, as KVM resets PMCR_EL0.N
-> to the host value on vCPU reset and some KVM code uses the host
-> value to identify (un)implemented event counters on the vCPU.
->
-> This series will ensure that the PMCR_EL0.N value is preserved
-> on vCPU reset and that KVM doesn't use the host value
-> to identify (un)implemented event counters on the vCPU.
-> This allows userspace to limit the number of the PMU event
-> counters on the vCPU.
->
-> Patch 1 fixes reset_pmu_reg() to ensure that (RAZ) bits of
-> {PMCNTEN,PMOVS}{SET,CLR}_EL1 corresponding to unimplemented event
-> counters on the vCPU are reset to zero even when PMCR_EL0.N for
-> the vCPU is different from the host.
->
-> Patch 2 is a minor refactoring to use the default PMU register reset
-> function (reset_pmu_reg()) for PMUSERENR_EL0 and PMCCFILTR_EL0.
-> (With the Patch 1 change, reset_pmu_reg() can now be used for
-> those registers)
->
-> Patch 3 fixes reset_pmcr() to preserve PMCR_EL0.N for the vCPU on
-> vCPU reset.
->
-> Patch 4 adds the sys_reg's set_user() handler for the PMCR_EL0
-> to disallow userspace to set PMCR_EL0.N for the vCPU to a value
-> that is greater than the host value.
->
-> Patch 5-8 adds a selftest to verify reading and writing PMU registers
-> for implemented or unimplemented PMU event counters on the vCPU.
->
-> The series is based on v6.2-rc4.
->
-> v2:
->   - Added the sys_reg's set_user() handler for the PMCR_EL0 to
->     disallow userspace to set PMCR_EL0.N for the vCPU to a value
->     that is greater than the host value (and added a new test
->     case for this behavior). [Oliver]
->   - Added to the commit log of the patch 2 that PMUSERENR_EL0 and
->     PMCCFILTR_EL0 have UNKNOWN reset values.
->
-> v1: https://lore.kernel.org/all/20221230035928.3423990-1-reijiw@google.com/
->
-> Reiji Watanabe (8):
->    KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
->    KVM: arm64: PMU: Use reset_pmu_reg() for PMUSERENR_EL0 and
->      PMCCFILTR_EL0
->    KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value on vCPU reset
->    KVM: arm64: PMU: Disallow userspace to set PMCR.N greater than the
->      host value
->    tools: arm64: Import perf_event.h
->    KVM: selftests: aarch64: Introduce vpmu_counter_access test
->    KVM: selftests: aarch64: vPMU register test for implemented counters
->    KVM: selftests: aarch64: vPMU register test for unimplemented counters
->
->   arch/arm64/kvm/pmu-emul.c                     |   6 +
->   arch/arm64/kvm/sys_regs.c                     |  57 +-
->   tools/arch/arm64/include/asm/perf_event.h     | 258 +++++++
->   tools/testing/selftests/kvm/Makefile          |   1 +
->   .../kvm/aarch64/vpmu_counter_access.c         | 644 ++++++++++++++++++
->   .../selftests/kvm/include/aarch64/processor.h |   1 +
->   6 files changed, 954 insertions(+), 13 deletions(-)
->   create mode 100644 tools/arch/arm64/include/asm/perf_event.h
->   create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
->
->
-> base-commit: 5dc4c995db9eb45f6373a956eb1f69460e69e6d4
-
--- 
-Regards,
-Shaoqin
+  Thomas
 
