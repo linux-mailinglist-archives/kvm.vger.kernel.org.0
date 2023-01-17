@@ -2,115 +2,186 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6115E670C3F
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 23:58:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D9B13670C36
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 23:55:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229851AbjAQW6I (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 17:58:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51396 "EHLO
+        id S229698AbjAQWzc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 17:55:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbjAQW5g (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 17:57:36 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4394392B
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 13:39:20 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id a14-20020a17090a70ce00b00229a2f73c56so226269pjm.3
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 13:39:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hK7iCT/l53H8F02D5jWSmMF8OJg0mxY4hx/WOh8zXHQ=;
-        b=WeQcFSECVbAwjsxpoYAUDsDmT3LUgopGEqpjAQgQI1CIGKL0Aw2fjnbTlwHci2civl
-         f0Siy/nZinODvzTENbBnDhXli4GylTAUxiBI/VyHa82CtAxQ7gbT8igBoTEd5n4SA6vd
-         2VmR04LOt/8/0NYujHvKX8syEaz8kQJwSMYFMDQ4BPmRuvr2ZR8L8XlXcspW1n3KQlUu
-         tRz/LGOuU4EBu4uvrr8LdIIMT/ZsgrMo7ES4mwROwnXgemFdIR485MboWclY3XLZIjkF
-         MLFlKgyXOPpEStKfnPzGyUG5OnUhbxreOj1rEaGhEez7JwmuyyrERsC/ULIjoYV8fPbr
-         gPjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hK7iCT/l53H8F02D5jWSmMF8OJg0mxY4hx/WOh8zXHQ=;
-        b=rVR3KBXkMbDo8T0Nv7FE1ZCDkbmQuhwYIbV4tZhy861enrlhc/RpnJEWKXRTMeSAAk
-         NPgDtsptQIT8h78nEkqiYLrpJEpsHVjIDHN5iyk0DSNdaAE7k+xXkTQ3cPd+XBZKCXx/
-         GyxiLwauknFlSIa1tVLA/3vWbzim7+QtSMZKlZqMo6G7xnrJZdp1bzV85Cf/rwpZ19jg
-         RaZErW7CpqwZnsLqdw40LftLpsWfgR9k77jePcW7J9rxRfy6eqMHVu2iAklN2Afn/Is/
-         0uaFPFV5rbvPMqA6zdjXpqzgV7M//2lIn9xoHYrxlSvxK4Vb4+4zpSOnWRPtAItN7n4X
-         h++w==
-X-Gm-Message-State: AFqh2kqDwU8coPP0GMRGwe9/zAEbBezhFmGQboD41de+UwOa0NZMtyyn
-        ggqOgjGGQYjXZnSIyDnS8G1KWVbr/qj1sZyY
-X-Google-Smtp-Source: AMrXdXtz4++aL4Ab6dxo4T1C7BIxWZ7VFFwnA/Q6q1uy8e+3S2IXuSo+S89TSMhkxkMLQu5/dcJ+3g==
-X-Received: by 2002:a17:902:e808:b0:189:b910:c6d2 with SMTP id u8-20020a170902e80800b00189b910c6d2mr2989344plg.1.1673991560262;
-        Tue, 17 Jan 2023 13:39:20 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c4-20020a170903234400b0019338ecad52sm16912238plh.190.2023.01.17.13.39.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 13:39:19 -0800 (PST)
-Date:   Tue, 17 Jan 2023 21:39:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
-Subject: Re: [V2 PATCH 1/6] KVM: x86: Add support for testing private memory
-Message-ID: <Y8cVhFIM1EoLHO/V@google.com>
-References: <20221205232341.4131240-1-vannapurve@google.com>
- <20221205232341.4131240-2-vannapurve@google.com>
+        with ESMTP id S230126AbjAQWzC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 17:55:02 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA2258995;
+        Tue, 17 Jan 2023 13:41:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1673991732; x=1705527732;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=7ix15nMC2U1zfELvP0lVrV1RJFnBb48TEaInAoltv4Q=;
+  b=BlY2Ds3BlkgXNXIS3BeQnE9YwDA5eqrHnQQ2nBOvJjnx9o7fK1P84iSp
+   JSGBSe24gJkw29OnEz2FHpOn0hHSr59OlU5futGGXp/hthqIdIQn3sErz
+   Pvoy8KJlRGEvSZsxgDUIATD5tab6F0++EFI0chm0sLAgbAO+YBveDH8jP
+   ipWMOjn8/36HgWWn3odfaN9C/R/ndQ7P++ju8E9KvnRtgHwEUOxhvnuzN
+   lq0f5uPBNhS7sZ8d+JtZRU0jyCM+3PCzSmxVbhYw65zX2IZoP3j/9Tiie
+   /fI9dcbqDVE6TENZwBm4P5p8GQSZ5lgQQBJGuqcLndA0rmTaGxbUq9KKn
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10593"; a="312697061"
+X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
+   d="scan'208";a="312697061"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2023 13:41:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10593"; a="988286554"
+X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
+   d="scan'208";a="988286554"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga005.fm.intel.com with ESMTP; 17 Jan 2023 13:41:34 -0800
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Tue, 17 Jan 2023 13:41:32 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Tue, 17 Jan 2023 13:41:32 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Tue, 17 Jan 2023 13:41:32 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Tue, 17 Jan 2023 13:41:32 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=f0CuDWKBT143Mq6X47PGJzuq0uON39Zj5ZqGN9QYzsXnhY8SHpGhJathdwxYdyjTDcsW/Qk/PchzKga0C3+QxW5SYAr5pLYBns1sbwkQJ2oAYvMHRFF0/YwEcyHIVJSHuxwb7VLMSWnCFiOkOiUh0rNfKwrpSWqBYTw/cLWebmSW53zpBF1d5lTuroc23JAz2DxuMfTGmzeC07+fUiuqjH/bc6Yh8VdTEOuTCUqWmaKrUQRNkCvEL69e4NGlz0AOLH7R86dhMGN16oBOwY3oqtF825QpALOlVVLGK4dH/e9eZFdYlUhc8CKGgij8RTguiVzc/v6cqnCJ1ihYYoVNzw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7ix15nMC2U1zfELvP0lVrV1RJFnBb48TEaInAoltv4Q=;
+ b=kIIdy1wEIKjSxwIWZXg4eYmV7v1WIZ4cOzuNEysFUzcgcE97QfKlf5dYJyGovuzJ4QaD+OrSQLUJGh41Ch9K5BXt3vDeRl7cI/ZJwoSG36RdNQz6Jr64qdLka5zHh5N4U5Xkuhm+opoyFSoL1UWLmVfAGGXnMdY1pwtmswoJwvYuMT73zQhf0Rul36Q09pa2bzH0Oq9uNI+KRUjP+C7so5AEk9I7y5QZXBqLDP9LpuKLUGKm+Muh5vQpafrggkcgSTHQraULiX3GqFHx3OPl4itsmULtLBU4Jsh2Jp5lPTApzh4NStko92X7IjzIimuZtri/I9/hWN5ppZ9b8jwsmw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by CO1PR11MB4786.namprd11.prod.outlook.com (2603:10b6:303:94::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.13; Tue, 17 Jan
+ 2023 21:41:27 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::3f19:b226:ebf1:b04a]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::3f19:b226:ebf1:b04a%6]) with mapi id 15.20.5986.019; Tue, 17 Jan 2023
+ 21:41:27 +0000
+From:   "Huang, Kai" <kai.huang@intel.com>
+To:     "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
+CC:     "Christopherson,, Sean" <seanjc@google.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "dmatlack@google.com" <dmatlack@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: Re: [PATCH v11 004/113] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+Thread-Topic: [PATCH v11 004/113] KVM: TDX: Initialize the TDX module when
+ loading the KVM intel kernel module
+Thread-Index: AQHZJqUCdrDuDjzxh0a6CQQT8apxmq6cSMQAgAaEbQCAAF5pAA==
+Date:   Tue, 17 Jan 2023 21:41:27 +0000
+Message-ID: <e29642ea59d25d60d35c082d5772f644b41692ff.camel@intel.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+         <60c842f347eaecdd0673bdc63acd95b82eeeda9c.1673539699.git.isaku.yamahata@intel.com>
+         <20230113143158.00006ca5@gmail.com>
+         <20230117160330.GA2959778@ls.amr.corp.intel.com>
+In-Reply-To: <20230117160330.GA2959778@ls.amr.corp.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|CO1PR11MB4786:EE_
+x-ms-office365-filtering-correlation-id: 8795a9f6-08d3-4f3f-58e3-08daf8d3967b
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: bsA3sYREH/40oygr00lNedVLJ35NnzD6t1VUO4Dx4gQjRaJZFZ8Um4iYbPFon8ignKb9XT9ZLUX2yc9KsK2ZlBAKLOJSajN0ODuEgusvbDgSMDF0E6N5aa971TiWaMTmF7mrStLUiJgCp2TVmxqu20N4ishUaycwV7w3A4hE2O/vEq61F/bIgGNeZ/mxNqUT2KLg+ubB2TLWMh/h0T2aE/o33TM8QrBO/sv08hry4TxB6SFEE9rmlx/asInqF18uVKZKGdIbpvgSPz5meg41v2Ga81Y1YiGyyuLz91LQdW7OX05v+ciQFxjBwzXcJOUnZTV6elxTKbVb99R1SjeCFiJBQ5hhoQOurrSxElB4Ats+aAowJltou4wdfOviSkYIKSwEbM08T8NBgLQJigjNjEOTqvamCWNwiCRMwjtQkJ2+rNzURPKoi0dJan1yBzKcofJxjdvhX3rZ0EIEkLNWnKUX7zEM1sPgHWeeUp69LnLA7OaUctqOcn6/ldps/c0brfBN5Q9DxjaMbcGO1yQeT4GPRuXHloz4ECp+1ZF0R6uBsBEGug8l5T25FOMvRwiF6SSbwd4qJMZjUTK4xTRLSeUnJdMEbH0eC8zQdBb9/1ChFFHjkEpMWzmJth+ouBe4+nTJBNciXP8iXAX+ui7NVZCJr3KOXyMTh8Qi3+ZMrUnxhYH0BhQbkc6hs0tH16cZ0Z5cVR0/RsvVFtuYaER3hg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(366004)(396003)(136003)(39860400002)(376002)(451199015)(91956017)(64756008)(71200400001)(66946007)(66476007)(76116006)(6506007)(478600001)(186003)(83380400001)(6486002)(26005)(66556008)(6512007)(4326008)(41300700001)(8936002)(5660300002)(4744005)(2906002)(38100700002)(8676002)(66446008)(122000001)(36756003)(82960400001)(38070700005)(316002)(86362001)(2616005)(54906003)(110136005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?K1Ayc3dEcUNuaU5rY3BNaXNWUmEwOCs2dldMMHJkUk1LdnRKMjNDL1BHcENI?=
+ =?utf-8?B?S1JPVkF3OTlQYzJTblc1VDNuc3piTXdMV1lrRTFFTUxIL3Q5RDA3M1Y0TnBL?=
+ =?utf-8?B?NWNjbVdLVEpsM1ErdXJVWEhGZ2d4RnN0eXBzd000bkNuOU1kcG9Hdm5kN1hX?=
+ =?utf-8?B?YW1SaFI0ekJ2TnZCWEtJNGlSd0s4MCtLY1ZDbmtwUHJ6OXh6dUI0MHkvZGZr?=
+ =?utf-8?B?ZDg4MERXQmVUcUNBUGtKWkxLWVcwb24ycVp6V003OTlHR3I1VjFra2h1STNy?=
+ =?utf-8?B?ZS83QXpKL3pmQVk0a2U1M29yZ0t4ZGNVMDlQOVp0VllHWnNqMThjZ2hyT2ZD?=
+ =?utf-8?B?TC9FRndvUEpIUHRjL0RPSEFjNTJidU4vMjBqSlMzWm9oUnNoem5XSDRCenJP?=
+ =?utf-8?B?L0dSR3Q1VWtrT2c4RkV3THk0aHZaVVZzTW52RHBUbmRRN1lqYXBmVWRiMDJY?=
+ =?utf-8?B?L1dZNElMMCtIVDhNSW1XYzBPdWw4RGZNTFVhc2RESWNUZ3NwOEFuc1dnc1p5?=
+ =?utf-8?B?KzJTcmRvdEJyZEk0YlhQMUE2VjBqSDdOVzNIc3RkVFlteGIvZzlGTGVxWTJn?=
+ =?utf-8?B?UGpPajVEWnpUTVdGazRzbEE4N294QUJaTFZVMHBjZkY2T0dFOC93OEhIc2dG?=
+ =?utf-8?B?QWt5VlVnZmVNVlpmT2dkMmlvWHJjTWU2TlVNVko0V01MR3Jkc1VhQWx2NVhj?=
+ =?utf-8?B?OXdwNzJkVktFR0ZkZm1qOVdVMEhXRHlseTJIbnJqc0JlcC9IM1M5WHgyS2dW?=
+ =?utf-8?B?TXdjWm15R1pEcHl2M0dCUUtLT0E2Y0pjQnlzRjQ2ZnlPQjlFamJoU0V6aWxY?=
+ =?utf-8?B?bTdIVW5OTEJKOUhNWVp0Ty9hbVRQSmI0NUxVbDZSNUlpK2NKNjdpbHFjb3hu?=
+ =?utf-8?B?Y21MWlhOdDF0dUMwWktnUmp5UUM3OWxtemw0NnpHQXNFU2FuY3czZ2xsRTcx?=
+ =?utf-8?B?bHFxYkw5Y1VDV0E5LzJmemJEYTFLVmZBS1p5MzRXZmhQVWFQV0NQL3FrM3Ry?=
+ =?utf-8?B?QTd0WERPUjlYWmdrekprb0J6dGNFUEJQcUhxdlZKaU81RlVzZEpHb0RYZTBp?=
+ =?utf-8?B?Mmo2NjFha1cxSGVaMEl6QTJYeUtyV3pnU3RIem12Tll5endXRVNxT2lReno4?=
+ =?utf-8?B?VmJsSVNqVDduNVNhN3lKNlIzNFJXY1FsSE5FSjF6R0FlZ25yUXBQTzh1dzln?=
+ =?utf-8?B?Z0R4L0c2VTM5c1o5MlBjSE85YlBtZEFubHJ2Z3MvaVhBRXJBb3lrWk1od0J3?=
+ =?utf-8?B?ZFVETTRCUExzS0tBc1JUckRvbGFTS2pFL0VRckRWNnROSDYrNEJRTGVrcHQx?=
+ =?utf-8?B?cUorblBZU2t4TEUvS1g5WVpjdDZYbG0zR3REeDZVSWNLVVZjTUZPbGVUeXlw?=
+ =?utf-8?B?L0ttOHQ4Z2s1aWRIaHJzUlhLeG5VWS9rVWdubCtWcEdJREFVbXhuUmdmem52?=
+ =?utf-8?B?NDFYajlHS2xBUE5zNVY4OWhUOFlVN2tTRlJ1YnZJMTVrU0pEUWI4RkZHZGFy?=
+ =?utf-8?B?MlNsTGRENHV4VzVsNlBuLzFGZGZPVm9VVEE5VmVYS25FRm9QR3dGOVB4RzBi?=
+ =?utf-8?B?cEg1cklDV2FUY1VWcE1kN0NhTE8vcFNaSFQvdVlKL0dzeVM3RDNKTDBYUDdZ?=
+ =?utf-8?B?WnhYajJnc0FKYWozbEtiVG1jNWVTUERqRkg3c3NSbkxRWVE3WVJoQVRTTkdn?=
+ =?utf-8?B?M0JCT1ViQ1dIUGZiVFdoRWhOajRIeHhTK1RqeGE3TStRRjVsc3NYQm5WSW5R?=
+ =?utf-8?B?UGdwRlAxeml3QXlyTnE5Z0FhY2NwMlF3dFVoS1NER1VoUFp0YWw2UDJobU11?=
+ =?utf-8?B?V2srd21vRXVkejFwc2R6WGhLc28wRnlyN0YzV09pWUszeUkva2JOeTJUSVpj?=
+ =?utf-8?B?bit1VmFhanRNOHl0RksvcVBFSmpwWXRUcGlLbXRjaDN3T29iOFJWeWJ2bEE3?=
+ =?utf-8?B?b1RObkRZSDgvTUQrdGZiQ0o4a3BybHJWV2VJZVdzeS9URmYxeStFTnlSc1hs?=
+ =?utf-8?B?bC81QkFqSk9adFV3OEljM1JDYlFoTXc3MFc0ZTlPZWhUOUc4RE15V3RKQVVa?=
+ =?utf-8?B?T2VGQUl1ZTFqTTFmZ0pxbkhDaU83M2pCMjAyMndGVVN5bkFIZjJwNzBOdzhi?=
+ =?utf-8?B?YVlkY2FYdW5OeEx5R0k1MHFBNWZjcm4xRG00ZzQvaU9RZUJTV3hnRVNEN2F2?=
+ =?utf-8?B?c1E9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <8F597F497A9DBC4B8AD55F91BE55D3C0@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221205232341.4131240-2-vannapurve@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8795a9f6-08d3-4f3f-58e3-08daf8d3967b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2023 21:41:27.2175
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: erH3vcMVk/h34rpMxNGQi6vx8u+0ON6Rbj8iEKQfX/Xa0eFQ2zORS9JB9+AbpceKsivdLtozv/yD8NaKvorDbA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB4786
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 05, 2022, Vishal Annapurve wrote:
-> Introduce HAVE_KVM_PRIVATE_MEM_TESTING config to be able to test fd based
-> @@ -272,13 +274,15 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  		.rsvd = err & PFERR_RSVD_MASK,
->  		.user = err & PFERR_USER_MASK,
->  		.prefetch = prefetch,
-> -		.is_tdp = likely(vcpu->arch.mmu->page_fault == kvm_tdp_page_fault),
-> +		.is_tdp = is_tdp,
->  		.nx_huge_page_workaround_enabled =
->  			is_nx_huge_page_enabled(vcpu->kvm),
->  
->  		.max_level = KVM_MAX_HUGEPAGE_LEVEL,
->  		.req_level = PG_LEVEL_4K,
->  		.goal_level = PG_LEVEL_4K,
-> +		.is_private = IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING) && is_tdp &&
-> +				kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT),
-
-After looking at the SNP+UPM series, I think we should forego a dedicated Kconfig
-for testing and instead add a new VM type for UPM-capable guests.  The new type,
-e.g. KVM_X86_PROTECTED_VM, can then be used to leverage UPM for "legacy" SEV and
-SEV-ES guests, as well as for UPM-capable guests that don't utilize per-VM
-memory encryption, e.g. KVM selftests.
-
-Carrying test-only behavior is obviously never ideal, and it would pretty much have
-to be mutually exclusive with "real" usage of UPM, otherwise the KVM logics gets
-unnecessarily complex.
+T24gVHVlLCAyMDIzLTAxLTE3IGF0IDA4OjAzIC0wODAwLCBJc2FrdSBZYW1haGF0YSB3cm90ZToN
+Cj4gPiBCZXR0ZXIgbWVudGlvbiB0aGUgdGR4X2VuYWJsZSgpIGlzIGltcGxlbWVudGVkIGluIGFu
+b3RoZXIgcGF0Y2g/IEJ1dCBJIGd1ZXNzDQo+ID4gd2UgbmVlZCBhIHdyYXBwZXIgaGVyZSBzbyB0
+aGF0IHRoZSBjb21waWxhdGlvbiB3b3VsZCBzdWNjZWVkLg0KPiANCj4gVGhlIGNvdmVybGV0dGVy
+IG1lbnRpb25zIGl0LiBJJ2xsIG1ha2UgdGhlIGNvbW1pdCBtZXNzYWdlIG9mIHRoaXMgcGF0Y2gN
+Cj4gbWVudGlvbiBpdCBhbnl3YXkuDQoNCldoZW4gdGhpcyBzZXJpZXMgaXMgbWVyZ2VkLCB0aGUg
+VERYIGhvc3Qgc2VyaWVzIG11c3QgaGF2ZSBhbHJlYWR5IGJlZW4gbWVyZ2VkLg0KDQpZb3Ugb2J2
+aW91c2x5IGRvbid0IG5lZWQgdG8gc2F5IHNvbWV0aGluZyBsaWtlICJ0ZHhfZW5hYmxlKCkgaXMg
+aW1wbGVtZW50ZWQgaW4NCmFub3RoZXIgcGF0Y2gvc2VyaWVzIiBpbiBfY2hhbmdlbG9nXy4NCg==
