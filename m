@@ -2,102 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0345166E39E
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 17:34:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5E35A66E3D6
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 17:41:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229596AbjAQQeY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 11:34:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44426 "EHLO
+        id S233064AbjAQQlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 11:41:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50684 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229543AbjAQQeV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 11:34:21 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 816AE40BC9
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 08:34:20 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id a14-20020a17090a70ce00b00229a2f73c56so2639652pjm.3
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 08:34:20 -0800 (PST)
+        with ESMTP id S233040AbjAQQlD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 11:41:03 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095EA3F2AD
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 08:40:59 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id z1-20020a17090a66c100b00226f05b9595so19528425pjl.0
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 08:40:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RlZqHzGUK9sPKKEmcxJQVC8fJtWdk0oagrgJ42/FWUo=;
-        b=GagBZ/fJ0HIkXHzRy0CbCmfPpWlzsJy94tpCQ8EM447gdtHwUNdr+/0ms8CyEKLf1H
-         87BAPR3m4cGTNmHhS8FQWCA3jItdgTfg2O1y324ETrJm9wif/kqBuR0HABESY8b/QAXW
-         IdA3nGsd/k2ZqRgAvcYxZeCzmgBjDiOyukOBmUMFSdxgtarQPCrC3WBhG1hEtHyio7lz
-         MzrrcIHf6oGoCuyNiTRgvEzRwP444dif738YtJUGeanCHpbfef03LW6AovbhF8dvV0XM
-         1zN6puNvHyQtXK+RTTCXdAlDnDwIGobsKZXyE9Dho+bA5WDucJ5i+fSls2V2hPVXYH+n
-         HUjg==
+        bh=irxkDiWsgsAkQraKpHAy3FezkTWc4VGbQfrpFess5dk=;
+        b=dVR1vS237CQ6fCANi/KMAsjNONLjHgvT1LOU/w6ZtQMxQizjSeunk8CmqQPk5DZA7H
+         3NVI7tC+XsYK2dKreFABPpEfZwDDbMlOeTUb53Y/786BXRXTCV4JhmDwLHGNlsPGaIIi
+         XoAs96nSmGvK/jd0nfzgfCJHQUvlJ3kvAbKj6KhbYTRdMuawCmabzpvP9k2pg7enecGg
+         WjEGBEfLt6hrkQ81DyUkRL4PGmMbbiCwCokbvIOKWg84J7phuIiizEDkZm2daz1RDEKv
+         DEDIgY86twz9HMiKWKpi2hYmHGJqofjBBW91CSkGCHYlTug78PqXAH+LhHw4zxFp5sa1
+         kMJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RlZqHzGUK9sPKKEmcxJQVC8fJtWdk0oagrgJ42/FWUo=;
-        b=j2YIhDC4Zbzrgz1ew+XvKaBp2iIOeYkbZM9OcxC137FAGb0YKG8I9fmTWXjJRxPBLD
-         dvXD2uL4+KYRiGEjZ2ay1KwA05vyQRvRQ9PWN/0/bnxvqBvePj5HrfRzM+lqga5t2N29
-         YRuJpplqPC6bTFddMwdOQ8MAO10fcP/YJEwGv070zwMbtpN5T7a5o5e3Ipqk5VqeC3QU
-         IGM7tzV5otaPbv9gr1bc2SsQ7kLS7ejL23H+en9lfAlpYXQ2K2EwzJmJy+SU+1RIzQtc
-         YT/LbiYX6bf/cTy3cFGb8DJY/O6m6g4+7pQJIkqW9/F5Y5dGlY+MHhEwlJWTywjQ2vkD
-         W5Bg==
-X-Gm-Message-State: AFqh2ko5eOBDwn0+H4yaXobsvyQbz9i5ayZFamGclSv3FctzfxGJqoq5
-        1G/rGzYwcDyKW08KSVdn0sX/jQ==
-X-Google-Smtp-Source: AMrXdXsfdieWfN0MIWgnbSJR6LpHJOm0kOFvhc/mphSIUbDTi7tsqX9OyAWcQeZT7PRkx/BuaGfRaQ==
-X-Received: by 2002:a17:90a:9503:b0:227:679:17df with SMTP id t3-20020a17090a950300b00227067917dfmr2436705pjo.0.1673973259775;
-        Tue, 17 Jan 2023 08:34:19 -0800 (PST)
+        bh=irxkDiWsgsAkQraKpHAy3FezkTWc4VGbQfrpFess5dk=;
+        b=PyhRQbLMpKANv53Jb5q+8k9CyZ31zkgrKpEIj1NPrWVSACsCx0PT9od/IYy48lvfI3
+         jdotjrvNnhqKOk1m0FADmExFv0NoKoKEYjxgzui/GFtF1LxxSGcTX5AcP1sqAbNoX55v
+         BrhqL1RUEjCL3JImuv47zsfAZhNHIgw+q+ucZb2l3jap2R5zxpTbk5Oy5lDoPiUqEj6M
+         cRvwxrMPmInWcaNAd7/cJvaHTDCj5u8PAdH7xOuQ9F260Ke5ItH6Dw4bqxnOewZV7T8X
+         yXt0OmwuSp+2toEhnToMS3D63GNGnbX5ZT1JVFtJxsySQp2qS7eN6g99vpUmKyRW3O7F
+         rbWQ==
+X-Gm-Message-State: AFqh2kqsD2eiL2nmjlu58rDcocCrqTwX5/xKvELr9a37vxtRaxIVuzEo
+        wb552Ob3AsoHhmor1oSJigx3jg==
+X-Google-Smtp-Source: AMrXdXvPwz2MuaiP1Euf+cgYDEvPU/yYbL3k78WmQNLZNYzU9oSVx5lLJj3ijzHSeWgefTRb7xXwLA==
+X-Received: by 2002:a17:902:e808:b0:189:b910:c6d2 with SMTP id u8-20020a170902e80800b00189b910c6d2mr2832664plg.1.1673973658886;
+        Tue, 17 Jan 2023 08:40:58 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y7-20020a17090a474700b00219463262desm18118727pjg.39.2023.01.17.08.34.18
+        by smtp.gmail.com with ESMTPSA id s7-20020a170902988700b0017ec1b1bf9fsm21303359plp.217.2023.01.17.08.40.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 08:34:19 -0800 (PST)
-Date:   Tue, 17 Jan 2023 16:34:15 +0000
+        Tue, 17 Jan 2023 08:40:58 -0800 (PST)
+Date:   Tue, 17 Jan 2023 16:40:54 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Chao Peng <chao.p.peng@linux.intel.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
-        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Message-ID: <Y8bOB7VuVIsxoMcn@google.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
- <Y8HTITl1+Oe0H7Gd@google.com>
- <20230117124107.GA273037@chaop.bj.intel.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "dmatlack@google.com" <dmatlack@google.com>
+Subject: Re: [PATCH v11 025/113] KVM: TDX: Use private memory for TDX
+Message-ID: <Y8bPljsAF+lSnWtC@google.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+ <4c3f5462852af9fd0957bb7db0b04a6f2d5639ee.1673539699.git.isaku.yamahata@intel.com>
+ <b8f88a7b9b2ab00379e6b1afd6a7fdb409d35492.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230117124107.GA273037@chaop.bj.intel.com>
+In-Reply-To: <b8f88a7b9b2ab00379e6b1afd6a7fdb409d35492.camel@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -105,89 +80,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 17, 2023, Chao Peng wrote:
-> On Fri, Jan 13, 2023 at 09:54:41PM +0000, Sean Christopherson wrote:
-> > > +	list_for_each_entry(notifier, &data->notifiers, list) {
-> > > +		notifier->ops->invalidate_start(notifier, start, end);
+On Mon, Jan 16, 2023, Huang, Kai wrote:
+> On Thu, 2023-01-12 at 08:31 -0800, isaku.yamahata@intel.com wrote:
+> > From: Chao Peng <chao.p.peng@linux.intel.com>
 > > 
-> > Two major design issues that we overlooked long ago:
+> > Override kvm_arch_has_private_mem() to use fd-based private memory.
+> > Return true when a VM has a type of KVM_X86_TDX_VM.
 > > 
-> >   1. Blindly invoking notifiers will not scale.  E.g. if userspace configures a
-> >      VM with a large number of convertible memslots that are all backed by a
-> >      single large restrictedmem instance, then converting a single page will
-> >      result in a linear walk through all memslots.  I don't expect anyone to
-> >      actually do something silly like that, but I also never expected there to be
-> >      a legitimate usecase for thousands of memslots.
+> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >  arch/x86/kvm/x86.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
 > > 
-> >   2. This approach fails to provide the ability for KVM to ensure a guest has
-> >      exclusive access to a page.  As discussed in the past, the kernel can rely
-> >      on hardware (and maybe ARM's pKVM implementation?) for those guarantees, but
-> >      only for SNP and TDX VMs.  For VMs where userspace is trusted to some extent,
-> >      e.g. SEV, there is value in ensuring a 1:1 association.
-> > 
-> >      And probably more importantly, relying on hardware for SNP and TDX yields a
-> >      poor ABI and complicates KVM's internals.  If the kernel doesn't guarantee a
-> >      page is exclusive to a guest, i.e. if userspace can hand out the same page
-> >      from a restrictedmem instance to multiple VMs, then failure will occur only
-> >      when KVM tries to assign the page to the second VM.  That will happen deep
-> >      in KVM, which means KVM needs to gracefully handle such errors, and it means
-> >      that KVM's ABI effectively allows plumbing garbage into its memslots.
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index d548d3af6428..a8b555935fd8 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -13498,6 +13498,11 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+> >  }
+> >  EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
+> >  
+> > +bool kvm_arch_has_private_mem(struct kvm *kvm)
+> > +{
+> > +	return kvm->arch.vm_type == KVM_X86_TDX_VM;
+> > +}
+> > +
 > 
-> It may not be a valid usage, but in my TDX environment I do meet below
-> issue.
+> AMD's series has a different solution:
 > 
-> kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0x80000000 ua=0x7fe1ebfff000 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#1 flags=0x4 gpa=0xffc00000 size=0x400000 ua=0x7fe271579000 ret=0
-> kvm_set_user_memory AddrSpace#0 Slot#2 flags=0x4 gpa=0xfeda0000 size=0x20000 ua=0x7fe1ec09f000 ret=-22
+> https://lore.kernel.org/lkml/20221214194056.161492-3-michael.roth@amd.com/
 > 
-> Slot#2('SMRAM') is actually an alias into system memory(Slot#0) in QEMU
-> and slot#2 fails due to below exclusive check.
-> 
-> Currently I changed QEMU code to mark these alias slots as shared
-> instead of private but I'm not 100% confident this is correct fix.
+> I think somehow this needs to get aligned.
 
-That's a QEMU bug of sorts.  SMM is mutually exclusive with TDX, QEMU shouldn't
-be configuring SMRAM (or any SMM memslots for that matter) for TDX guests.
+Ya.  My thought is
 
-Actually, KVM should enforce that by disallowing SMM memslots for TDX guests.
-Ditto for SNP guests and UPM-backed SEV and SEV-ES guests.  I think it probably
-even makes sense to introduce that restriction in the base UPM support, e.g.
-something like the below.  That would unnecessarily prevent emulating SMM for
-KVM_X86_PROTECTED_VM types that aren't encrypted, but IMO that's an acceptable
-limitation until there's an actual use case for KVM_X86_PROTECTED_VM guests beyond
-SEV (my thought is that KVM_X86_PROTECTED_VM will mostly be a vehicle for selftests
-and UPM-based SEV and SEV-ES guests).
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 48b7bdad1e0a..0a8aac821cb0 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4357,6 +4357,14 @@ bool kvm_arch_has_private_mem(struct kvm *kvm)
-        return kvm->arch.vm_type != KVM_X86_DEFAULT_VM;
- }
- 
-+bool kvm_arch_nr_address_spaces(struct kvm *kvm)
-+{
-+       if (kvm->arch.vm_type != KVM_X86_DEFAULT_VM)
-+               return 1;
-+
-+       return KVM_ADDRESS_SPACE_NUM;
-+}
-+
- static bool kvm_is_vm_type_supported(unsigned long type)
+ bool kvm_arch_has_private_mem(struct kvm *kvm)
  {
-        return type == KVM_X86_DEFAULT_VM ||
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 97801d81ee42..e0a3fc819fe5 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2126,7 +2126,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
-             mem->restricted_offset + mem->memory_size < mem->restricted_offset ||
-             0 /* TODO: require gfn be aligned with restricted offset */))
-                return -EINVAL;
--       if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_MEM_SLOTS_NUM)
-+       if (as_id >= kvm_arch_nr_address_spaces(vm) || id >= KVM_MEM_SLOTS_NUM)
-                return -EINVAL;
-        if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
-                return -EINVAL;
+	return kvm->arch.vm_type != KVM_X86_DEFAULT_VM;
+ }
 
+where the VM types end up being:
+
+ #define KVM_X86_DEFAULT_VM	0
+ #define KVM_X86_PROTECTED_VM	1
+ #define KVM_X86_TDX_VM		2
+ #define KVM_X86_SNP_VM		3
+
+Don't spend too much time reworking the TDX series at this point, I'm going to do
+a trial run of combining UPM+TDX+SNP sometime in the next few weeks to see how all
+the pieces fit together, this is one of the common touchpoints that I'll make sure
+to look at.  Though if you have ideas on, by all means post them.
