@@ -2,57 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B1F566E1E1
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 16:17:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3D16666E292
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 16:45:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233571AbjAQPRO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 10:17:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52926 "EHLO
+        id S234012AbjAQPpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 10:45:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233477AbjAQPRD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 10:17:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BBA6302B6
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 07:16:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673968575;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=asTM0g0Ag1HWYFfqMWuusWwOifr4sTs9wZ4Ph94PRks=;
-        b=D6iOFiZIemfKDsq6AJYkrrrLQmaT9IMBVNxqsfgSG7lGjvujv/RqabdcYPOgQeADv5LP6x
-        LeqIWC91UygpKOrC4WK1b7JZORDORf/eQPoLMmqr+Yf0JNeyftatH3CRrYXBnkcRerYvlX
-        yK51fPk+lMCSD2wzCVfWuZiv0cfhDnA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-665-3VwgVySaOGu7fIeoVyop0w-1; Tue, 17 Jan 2023 10:16:09 -0500
-X-MC-Unique: 3VwgVySaOGu7fIeoVyop0w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CE44D3C5C966;
-        Tue, 17 Jan 2023 15:15:22 +0000 (UTC)
-Received: from qualcomm-amberwing-rep-06.khw4.lab.eng.bos.redhat.com (qualcomm-amberwing-rep-06.khw4.lab.eng.bos.redhat.com [10.19.240.11])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8383540C6EC4;
-        Tue, 17 Jan 2023 15:15:22 +0000 (UTC)
-From:   Eric Auger <eric.auger@redhat.com>
-To:     eric.auger.pro@gmail.com, eric.auger@redhat.com, mst@redhat.com,
-        jasowang@redhat.com, kvm@vger.kernel.org, netdev@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Cc:     peterx@redhat.com, lvivier@redhat.com
-Subject: [PATCH 2/2] vhost/net: Clear the pending messages when the backend is removed
-Date:   Tue, 17 Jan 2023 10:15:18 -0500
-Message-Id: <20230117151518.44725-3-eric.auger@redhat.com>
-In-Reply-To: <20230117151518.44725-1-eric.auger@redhat.com>
-References: <20230117151518.44725-1-eric.auger@redhat.com>
+        with ESMTP id S232306AbjAQPo2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 10:44:28 -0500
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A4EF4996D
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 07:42:09 -0800 (PST)
+Received: by mail-pl1-x62b.google.com with SMTP id k13so1343136plg.0
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 07:42:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=raIP5zSqF/STW+kTCBVQJ+PuTh0fIF3QkrpzqbxnVwM=;
+        b=Fboqqh9dagbWo2L8wq1Lo26iSaSU57WhxjC/fOz7ecCUNGGEDVLeXoK5K/pHZwcsFV
+         N9jlLxyCR6qNXQQ4U7mpMErHB3ZrEWyqQtK2JQndhA0MmCFiGJ+4PPhTRD0Wix0EL65j
+         MsYHUDHxtRNkvOQ0WUDga80seOuHKWPkpKj+FGWEAdrMpGI0dVnRWM5khsCPm4X7lwaH
+         x+1LaU365neNHCMM/NnCQEGLIUB0p9uhI/3oVwVMGYmas44XJFXRd2YVZkXp0yoqHUtJ
+         ciWpysAmyUCCthwpSIl7KFTDHsYIFtORoQMrRwss/5rncAUrPaGaZx9iAg7bu43XjA0x
+         fYcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=raIP5zSqF/STW+kTCBVQJ+PuTh0fIF3QkrpzqbxnVwM=;
+        b=7hG69Fh2vvEGG3IUq/xo8YM+ZbWNWASC9ZyZe7rj1a8gH7ukEND45amxHWrv6dj1ao
+         Lf4/1Zy77hhDwySENGO1xTVQzXD6neXCD5ZXVw331Q0w5SHIAu+OqXD+e5DGbf9ekCp/
+         4L00qStkSGabX0uhUIlz1LADYfegRNlR0pLJ1/LlJQ+rGEfB8RZEEVD9r2OYdAYRgPdm
+         cWE+ubmzZjws+fNE8Z4jOKYgJTqL6meElkseb+2F6Wa82lWYmHv32QcXP7AvOCaW6yMw
+         bIMa6ZFu/WsDvqHo8Xlqhwu+JsTsOQoNgw+RUUndyH9fL2il4Q5XfAFqm3gYpzIHiS1g
+         CyJg==
+X-Gm-Message-State: AFqh2kpFO309XC0ze2yg62dZmoy36hIbqF/IRhcshTBH9spo2Zi39aly
+        C0BjCqqYcoRJUgU+LlgdBEWdmkB+xCddYUwb
+X-Google-Smtp-Source: AMrXdXtc4FtedAeo9e0ZaQ0CoHayTm55NeSTXxytLBxVQsTrdtckjUUE0ev7gjaj6X6vcVC1fBOKfQ==
+X-Received: by 2002:a05:6a20:a883:b0:a4:efde:2ed8 with SMTP id ca3-20020a056a20a88300b000a4efde2ed8mr2357042pzb.0.1673970128358;
+        Tue, 17 Jan 2023 07:42:08 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id p10-20020a17090a348a00b00218d894fac3sm20692438pjb.3.2023.01.17.07.42.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jan 2023 07:42:07 -0800 (PST)
+Date:   Tue, 17 Jan 2023 15:42:04 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, maz@kernel.org, corbet@lwn.net,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        oliver.upton@linux.dev, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
+        eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
+        ardb@kernel.org, peterx@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH 4/4] KVM: Improve warning report in
+ mark_page_dirty_in_slot()
+Message-ID: <Y8bBzKF17IdZP9eF@google.com>
+References: <20230116040405.260935-1-gshan@redhat.com>
+ <20230116040405.260935-5-gshan@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230116040405.260935-5-gshan@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,81 +79,19 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-When the vhost iotlb is used along with a guest virtual iommu
-and the guest gets rebooted, some MISS messages may have been
-recorded just before the reboot and spuriously executed by
-the virtual iommu after the reboot.
+On Mon, Jan 16, 2023, Gavin Shan wrote:
+> There are two warning reports about the dirty ring in the function.
+> We have the wrong assumption that the dirty ring is always enabled when
+> CONFIG_HAVE_KVM_DIRTY_RING is selected.
 
-As vhost does not have any explicit reset user API,
-VHOST_NET_SET_BACKEND looks a reasonable point where to clear
-the pending messages, in case the backend is removed.
+No, it's not a wrong assumption, becuase it's not an assumption.  The intent is
+to warn irrespective of dirty ring/log enabling.  The orignal code actually warned
+irrespective of dirty ring support[1], again intentionally.  The
+CONFIG_HAVE_KVM_DIRTY_RING check was added because s390 can mark pages dirty from
+an worker thread[2] and s390 has no plans to support the dirty ring.
 
-Export vhost_clear_msg() and call it in vhost_net_set_backend()
-when fd == -1.
+The reason for warning even if dirty ring isn't enabled is so that bots can catch
+potential KVM bugs without having to set up a dirty ring or enable dirty logging.
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
-Suggested-by: Jason Wang <jasowang@redhat.com>
-Fixes: 6b1e6cc7855b0 ("vhost: new device IOTLB API")
-
----
-
-Without this patch, with QEMU virtio-iommu, on reboot, we get
-spurious messages such as
-
-qemu-kvm: virtio_iommu_translate no mapping for 0xff732800 for sid=1536
----
- drivers/vhost/net.c   | 3 +++
- drivers/vhost/vhost.c | 3 ++-
- drivers/vhost/vhost.h | 1 +
- 3 files changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 135e23254a26..383f8f2ae131 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1511,6 +1511,9 @@ static long vhost_net_set_backend(struct vhost_net *n, unsigned index, int fd)
- 	nvq = &n->vqs[index];
- 	mutex_lock(&vq->mutex);
- 
-+	if (fd == -1)
-+		vhost_clear_msg(&n->dev);
-+
- 	/* Verify that ring has been setup correctly. */
- 	if (!vhost_vq_access_ok(vq)) {
- 		r = -EFAULT;
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index 34458e203716..f11bdbe4c2c5 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -661,7 +661,7 @@ void vhost_dev_stop(struct vhost_dev *dev)
- }
- EXPORT_SYMBOL_GPL(vhost_dev_stop);
- 
--static void vhost_clear_msg(struct vhost_dev *dev)
-+void vhost_clear_msg(struct vhost_dev *dev)
- {
- 	struct vhost_msg_node *node, *n;
- 
-@@ -679,6 +679,7 @@ static void vhost_clear_msg(struct vhost_dev *dev)
- 
- 	spin_unlock(&dev->iotlb_lock);
- }
-+EXPORT_SYMBOL_GPL(vhost_clear_msg);
- 
- void vhost_dev_cleanup(struct vhost_dev *dev)
- {
-diff --git a/drivers/vhost/vhost.h b/drivers/vhost/vhost.h
-index 4bfa10e52297..1647b750169c 100644
---- a/drivers/vhost/vhost.h
-+++ b/drivers/vhost/vhost.h
-@@ -181,6 +181,7 @@ long vhost_dev_ioctl(struct vhost_dev *, unsigned int ioctl, void __user *argp);
- long vhost_vring_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp);
- bool vhost_vq_access_ok(struct vhost_virtqueue *vq);
- bool vhost_log_access_ok(struct vhost_dev *);
-+void vhost_clear_msg(struct vhost_dev *dev);
- 
- int vhost_get_vq_desc(struct vhost_virtqueue *,
- 		      struct iovec iov[], unsigned int iov_count,
--- 
-2.31.1
-
+[1] 2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU")
+[2] e09fccb5435d ("KVM: avoid warning on s390 in mark_page_dirty")
