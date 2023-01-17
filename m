@@ -2,156 +2,288 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 608EA66E5FC
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 19:30:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A94666E83C
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 22:14:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231249AbjAQS3y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 13:29:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54384 "EHLO
+        id S229695AbjAQVN4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 16:13:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231447AbjAQS0h (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 13:26:37 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE3EC4F869
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 09:58:09 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30HHFP6W031062;
-        Tue, 17 Jan 2023 17:58:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Yol5zcYT2UWas9NyFbTw0UPSVox0zawgOQRc3lmamYQ=;
- b=neJn2nB7I6wIv9cY6R6tUhLMEi3ABIjs2TX9z2sYt60eY0BxB8xsQRyVwRNu0I48Hv2X
- OWiKYehpR6iXnSxEIx1amR4hltyJ+n+z7pDbRiupCxWlMFkZg/045s9+h3mx5yZ4RXnF
- q1P7JNj9zzplg+FSgFibgTUE2+AIH6swQSAAwmGEqJ1MhA3vibPBKJXj2sIE0TYkHqMX
- /GgZHkgMEOrfV3U8YJbq+RzCbh7qrEwdw/7l7ltkXm0rclXiRSelnUTyhaLLKI+SIlbx
- NodWvbtgcOULa8I+2qJ5SpTyqbHxEE6frPjHWOaWlj14WY/RXwHaTyNQxCne9a9dEJBr sA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5ywjgwam-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Jan 2023 17:58:04 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30HHbwm8029157;
-        Tue, 17 Jan 2023 17:58:03 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5ywjgwa0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Jan 2023 17:58:03 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30H3BPcL030494;
-        Tue, 17 Jan 2023 17:58:01 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3n3m16k317-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 17 Jan 2023 17:58:01 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30HHvvQh46072104
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 17 Jan 2023 17:57:57 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BDBE920040;
-        Tue, 17 Jan 2023 17:57:57 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6994F20043;
-        Tue, 17 Jan 2023 17:57:56 +0000 (GMT)
-Received: from [9.171.42.216] (unknown [9.171.42.216])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 17 Jan 2023 17:57:56 +0000 (GMT)
-Message-ID: <16a553fd-9f0f-1289-90e3-6e401d838cf4@linux.ibm.com>
-Date:   Tue, 17 Jan 2023 18:57:56 +0100
+        with ESMTP id S229663AbjAQVMm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 16:12:42 -0500
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A22C74A21C
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 11:36:03 -0800 (PST)
+Received: by mail-pl1-x62a.google.com with SMTP id jl4so34583894plb.8
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 11:36:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/Y/+6b+/J99MLnqP/RvN51sj3DHWazl0lw52Vf0WKHU=;
+        b=mO/P06835gXK/fd1eBgp4cGBD2kC3K+6imr5T+2jtDjdUBhDC2ZA6VrIPZfU/f9xjC
+         IEFaPiulMS/0ZqDbxbtw2cJsM7Tc3tGTV1WEaKwKEM7/onV7W8gwNEZgbjFg1D9VPFPt
+         zOrBnI+uh6uL/yAkjlKRTpwIo5mbtRcjK3EEpUEcbJ7VVRL/gSQAf4SQnwHxKqHb/sTQ
+         MXdsYhc4zLlGvKOCRi98eQbAPaNpu9G8SHim8g88Gvn8/JWvst4ReoqQ54dQnmQu9Cx8
+         q4mO4VJKRFbwHLXOegE1kYwL9GcvTKshaR6/+a9qCY329OuOlMsj+GHmm1PrfY3+znUl
+         l0+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/Y/+6b+/J99MLnqP/RvN51sj3DHWazl0lw52Vf0WKHU=;
+        b=Emxvqet8TkHdN1Y7CepNRgxB+SchCI2xSvzjmbuKLYVb2g5kiGicfpKQCpoJ/KEXnP
+         b5iSS8BZs1AWhfVb0Cg5T48H9i5AgJKp3V3ClzFXs7YdHiH9RpbBZWllwVVEW78xXU63
+         tI7d0vOWJytdUNpXUkM/uKBqnygcrMjVURRG/Xj9Sa2qovQKbD6ZezeHkKPQW0KFossn
+         KvCu55UUXQHXmUw01wV4Y7MxnbNt/qGRiUtNSCgDSupRTm2ttcHm7w0DwFEbXv6Cq/iY
+         11nwuM+BZjyDgqtrfkweLQITvYiGBu+k/d4oXJKDJgMQj2mBx2PmnDRkf4hZ/xs7nz7I
+         7gJw==
+X-Gm-Message-State: AFqh2kqsYTae/9lxxaQBXwLjAeRnYxr1saeGj+xw7OXXll0Z5vtJKhiQ
+        0QIZSQ01zAtP061gymuiRyhaFw==
+X-Google-Smtp-Source: AMrXdXu1hk8ysrAGJplB4OjNB7xeVQaqK5fZ7KwLIxI5L/arUaD+5uicI01yTWHuGz/H+vtFbMLBdw==
+X-Received: by 2002:a05:6a20:93a4:b0:b8:e33c:f160 with SMTP id x36-20020a056a2093a400b000b8e33cf160mr178599pzh.0.1673984162308;
+        Tue, 17 Jan 2023 11:36:02 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id t1-20020a63d241000000b004c974bb9a4esm5296842pgi.83.2023.01.17.11.36.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jan 2023 11:36:01 -0800 (PST)
+Date:   Tue, 17 Jan 2023 19:35:58 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Chao Peng <chao.p.peng@linux.intel.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 9/9] KVM: Enable and expose KVM_MEM_PRIVATE
+Message-ID: <Y8b4nsMJm+4Hr/e0@google.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-10-chao.p.peng@linux.intel.com>
+ <Y8HwvTik/2avrCOU@google.com>
+ <20230117131251.GC273037@chaop.bj.intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v14 05/11] s390x/cpu topology: resetting the
- Topology-Change-Report
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-6-pmorel@linux.ibm.com>
- <f2433967-3c97-e4d7-9e2f-577b24c2369a@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <f2433967-3c97-e4d7-9e2f-577b24c2369a@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7AmUyFNnmRqyTTwhXkhgcFedY6aUKbXs
-X-Proofpoint-GUID: xcete7MXYjvD5wL_BxnNip6IP4PKxRuP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-17_08,2023-01-17_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- adultscore=0 mlxlogscore=999 clxscore=1015 malwarescore=0 mlxscore=0
- impostorscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0 spamscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301170140
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230117131251.GC273037@chaop.bj.intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/11/23 10:00, Thomas Huth wrote:
-> On 05/01/2023 15.53, Pierre Morel wrote:
->> During a subsystem reset the Topology-Change-Report is cleared
->> by the machine.
->> Let's ask KVM to clear the Modified Topology Change Report (MTCR)
->> bit of the SCA in the case of a subsystem reset.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
-> ...
->> diff --git a/target/s390x/kvm/kvm_s390x.h b/target/s390x/kvm/kvm_s390x.h
->> index f9785564d0..649dae5948 100644
->> --- a/target/s390x/kvm/kvm_s390x.h
->> +++ b/target/s390x/kvm/kvm_s390x.h
->> @@ -47,5 +47,6 @@ void kvm_s390_crypto_reset(void);
->>   void kvm_s390_restart_interrupt(S390CPU *cpu);
->>   void kvm_s390_stop_interrupt(S390CPU *cpu);
->>   void kvm_s390_set_diag318(CPUState *cs, uint64_t diag318_info);
->> +int kvm_s390_topology_set_mtcr(uint64_t attr);
->>   #endif /* KVM_S390X_H */
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index c98b93a15f..14798ca305 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -122,6 +122,7 @@ static void subsystem_reset(void)
->>               device_cold_reset(dev);
->>           }
->>       }
->> +    s390_cpu_topology_reset();
->>   }
+On Tue, Jan 17, 2023, Chao Peng wrote:
+> On Sat, Jan 14, 2023 at 12:01:01AM +0000, Sean Christopherson wrote:
+> > On Fri, Dec 02, 2022, Chao Peng wrote:
+> > > @@ -10357,6 +10364,12 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
+> > >  
+> > >  		if (kvm_check_request(KVM_REQ_UPDATE_CPU_DIRTY_LOGGING, vcpu))
+> > >  			static_call(kvm_x86_update_cpu_dirty_logging)(vcpu);
+> > > +
+> > > +		if (kvm_check_request(KVM_REQ_MEMORY_MCE, vcpu)) {
+> > > +			vcpu->run->exit_reason = KVM_EXIT_SHUTDOWN;
+> > 
+> > Synthesizing triple fault shutdown is not the right approach.  Even with TDX's
+> > MCE "architecture" (heavy sarcasm), it's possible that host userspace and the
+> > guest have a paravirt interface for handling memory errors without killing the
+> > host.
 > 
-> Would it make sense to add a "if (s390_has_topology())" check around the 
-> new line?
-
-Yes I think you are right, otherwise we may get a warning if the kernel 
-does not support resetting the topology.
-
+> Agree shutdown is not the correct choice. I see you made below change:
 > 
-> Anyway:
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva, PAGE_SHIFT, current)
 > 
+> The MCE may happen in any thread than KVM thread, sending siginal to
+> 'current' thread may not be the expected behavior.
+
+This is already true today, e.g. a #MC in memory that is mapped into the guest can
+be triggered by a host access.  Hrm, but in this case we actually have a KVM
+instance, and we know that the #MC is relevant to the KVM instance, so I agree
+that signaling 'current' is kludgy.
+
+>  Also how userspace can tell is the MCE on the shared page or private page?
+>  Do we care?
+
+We care.  I was originally thinking we could require userspace to keep track of
+things, but that's quite prescriptive and flawed, e.g. could race with conversions.
+
+One option would be to KVM_EXIT_MEMORY_FAULT, and then wire up a generic (not x86
+specific) KVM request to exit to userspace, e.g.
+
+		/* KVM_EXIT_MEMORY_FAULT */
+		struct {
+#define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
+#define KVM_MEMORY_EXIT_FLAG_HW_ERROR	(1ULL << 4)
+			__u64 flags;
+			__u64 gpa;
+			__u64 size;
+		} memory;
+
+But I'm not sure that's the correct approach.  It kinda feels like we're reinventing
+the wheel.  It seems like restrictedmem_get_page() _must_ be able to reject attempts
+to get a poisoned page, i.e. restrictedmem_get_page() should yield KVM_PFN_ERR_HWPOISON.
+Assuming that's the case, then I believe KVM simply needs to zap SPTEs in response
+to an error notification in order to force vCPUs to fault on the poisoned page.
+
+> > > +		return -EINVAL;
+> > >  	if (as_id >= KVM_ADDRESS_SPACE_NUM || id >= KVM_MEM_SLOTS_NUM)
+> > >  		return -EINVAL;
+> > >  	if (mem->guest_phys_addr + mem->memory_size < mem->guest_phys_addr)
+> > > @@ -2020,6 +2154,9 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > >  		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
+> > >  			return -EINVAL;
+> > >  	} else { /* Modify an existing slot. */
+> > > +		/* Private memslots are immutable, they can only be deleted. */
+> > 
+> > I'm 99% certain I suggested this, but if we're going to make these memslots
+> > immutable, then we should straight up disallow dirty logging, otherwise we'll
+> > end up with a bizarre uAPI.
 > 
+> But in my mind dirty logging will be needed in the very short time, when
+> live migration gets supported?
 
-Thanks,
+Ya, but if/when live migration support is added, private memslots will no longer
+be immutable as userspace will want to enable dirty logging only when a VM is
+being migrated, i.e. something will need to change.
 
-Regards,
-Pierre
+Given that it looks like we have clear line of sight to SEV+UPM guests, my
+preference would be to allow toggling dirty logging from the get-go.  It doesn't
+necessarily have to be in the first patch, e.g. KVM could initially reject
+KVM_MEM_LOG_DIRTY_PAGES + KVM_MEM_PRIVATE and then add support separately to make
+the series easier to review, test, and bisect.
+
+static int check_memory_region_flags(struct kvm *kvm,
+				     const struct kvm_userspace_memory_region2 *mem)
+{
+	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
+
+	if (kvm_arch_has_private_mem(kvm) &&
+	    ~(mem->flags & KVM_MEM_LOG_DIRTY_PAGES))
+		valid_flags |= KVM_MEM_PRIVATE;
 
 
+	...
+}
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+> > > +		if (mem->flags & KVM_MEM_PRIVATE)
+> > > +			return -EINVAL;
+> > >  		if ((mem->userspace_addr != old->userspace_addr) ||
+> > >  		    (npages != old->npages) ||
+> > >  		    ((mem->flags ^ old->flags) & KVM_MEM_READONLY))
+> > > @@ -2048,10 +2185,28 @@ int __kvm_set_memory_region(struct kvm *kvm,
+> > >  	new->npages = npages;
+> > >  	new->flags = mem->flags;
+> > >  	new->userspace_addr = mem->userspace_addr;
+> > > +	if (mem->flags & KVM_MEM_PRIVATE) {
+> > > +		new->restricted_file = fget(mem->restricted_fd);
+> > > +		if (!new->restricted_file ||
+> > > +		    !file_is_restrictedmem(new->restricted_file)) {
+> > > +			r = -EINVAL;
+> > > +			goto out;
+> > > +		}
+> > > +		new->restricted_offset = mem->restricted_offset;
+> 
+> I see you changed slot->restricted_offset type from loff_t to gfn_t and
+> used pgoff_t when doing the restrictedmem_bind/unbind(). Using page
+> index is reasonable KVM internally and sounds simpler than loff_t. But
+> we also need initialize it to page index here as well as changes in
+> another two cases. This is needed when restricted_offset != 0.
+
+Oof.  I'm pretty sure I completely missed that loff_t is used for byte offsets,
+whereas pgoff_t is a frame index. 
+
+Given that the restrictmem APIs take pgoff_t, I definitely think it makes sense
+to the index, but I'm very tempted to store pgoff_t instead of gfn_t, and name
+the field "index" to help connect the dots to the rest of kernel, where "pgoff_t index"
+is quite common.
+
+And looking at those bits again, we should wrap all of the restrictedmem fields
+with CONFIG_KVM_PRIVATE_MEM.  It'll require minor tweaks to __kvm_set_memory_region(),
+but I think will yield cleaner code (and internal APIs) overall.
+
+And wrap the three fields in an anonymous struct?  E.g. this is a little more
+versbose (restrictedmem instead restricted), but at first glance it doesn't seem
+to cause widespared line length issues.
+
+#ifdef CONFIG_KVM_PRIVATE_MEM
+	struct {
+		struct file *file;
+		pgoff_t index;
+		struct restrictedmem_notifier notifier;
+	} restrictedmem;
+#endif
+
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 547b92215002..49e375e78f30 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -2364,8 +2364,7 @@ static inline int kvm_restricted_mem_get_pfn(struct kvm_memory_slot *slot,
+>                                              gfn_t gfn, kvm_pfn_t *pfn,
+>                                              int *order)
+>  {
+> -       pgoff_t index = gfn - slot->base_gfn +
+> -                       (slot->restricted_offset >> PAGE_SHIFT);
+> +       pgoff_t index = gfn - slot->base_gfn + slot->restricted_offset;
+>         struct page *page;
+>         int ret;
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 01db35ddd5b3..7439bdcb0d04 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -935,7 +935,7 @@ static bool restrictedmem_range_is_valid(struct kvm_memory_slot *slot,
+>                                          pgoff_t start, pgoff_t end,
+>                                          gfn_t *gfn_start, gfn_t *gfn_end)
+>  {
+> -       unsigned long base_pgoff = slot->restricted_offset >> PAGE_SHIFT;
+> +       unsigned long base_pgoff = slot->restricted_offset;
+>  
+>         if (start > base_pgoff)
+>                 *gfn_start = slot->base_gfn + start - base_pgoff;
+> @@ -2275,7 +2275,7 @@ int __kvm_set_memory_region(struct kvm *kvm,
+>                         r = -EINVAL;
+>                         goto out;
+>                 }
+> -               new->restricted_offset = mem->restricted_offset;
+> +               new->restricted_offset = mem->restricted_offset >> PAGE_SHIFT;
+>         }
+>  
+>         r = kvm_set_memslot(kvm, old, new, change);
+> 
+> Chao
+> > > +	}
+> > > +
+> > > +	new->kvm = kvm;
+> > 
+> > Set this above, just so that the code flows better.
