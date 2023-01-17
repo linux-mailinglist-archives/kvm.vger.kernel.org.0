@@ -2,85 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 858FB670BB6
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 23:37:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83418670BC7
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 23:42:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229818AbjAQWha (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 17:37:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37314 "EHLO
+        id S229477AbjAQWmJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 17:42:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229800AbjAQWg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 17:36:58 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6A833EFF3
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 14:12:44 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id i65so21233440pfc.0
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 14:12:44 -0800 (PST)
+        with ESMTP id S229510AbjAQWlh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 17:41:37 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 708CE4FC30
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 14:27:12 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id 81-20020a250b54000000b007c002e178dfso26012531ybl.9
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 14:27:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M9YW+lwhjFOD4p6LmIXUirNO23qllr5fTwF/5IqDM2Y=;
-        b=QFG6GWHXqBMM7GsWXt3Hr4bJ1B2S7Xr4CFM24cED5KtkzBBs+b5GQ/86H/d4eHip+t
-         d9veLwx80rIkaBJsl3kKDBpXOkE5LZkY3Ab0vBUtS0ClC96ieweI0OrM/lOJjk75aCSW
-         +MITjt5k+UHflslBkemgH/xekPOCzoXOhsYMAzBLR/7oNX2or9JRoUyeG63I3MEVgcKr
-         p1iYGHI1R2nONABIlLsCF9zbJsT0O6Lyuwnekv6OMN+0rf8eod4J49iOK/auaEBu1Dy3
-         ebbHaHl3S/+6EtAVziSqJ39ASlZZrBZ4r05Mbvwxe1eOHeFdcea65lGPLDqz5rvNHT7U
-         25yg==
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dPBcRBsDAGoDfORsxWE6afj5vOW1Ynx1npcixEfl3Uk=;
+        b=XY97r+ZI3j1H8OMhxVXfjvk1gQTDhvUvtxa1ePQSQ6H7uq4fC7YyE4gXGjvpSJNc6X
+         K6np7KC/0asGiXRwoKcGTS7ArqhqLFJdAEJ4OaUjqRpa3Cd3Ofsmm/UVJJZpFJiV1mNC
+         SXW9QSH6Qs0DS/GTd5AVQMh+UfkB3hFrIdAyvcORcVe/UuJ+yNU5t9Ttto2FjsORd7hy
+         wAM0LMLySg/8hbPs7McH8Z9dkYDqVPvci4eBrZKda0+yeC82FrQYWS9ZE4ASiT21WoZV
+         uELrx25MrTxu1q7TiLLDOxh8LukWnjU/s0z4p9IJrcdJa9GQG+grT8rpl9BGRa8Yy7xW
+         ctXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M9YW+lwhjFOD4p6LmIXUirNO23qllr5fTwF/5IqDM2Y=;
-        b=zZI0V0J5ThDHAanIzTPCwg78uf49r5rDoCCU3T6AHTFNOX7WvETuMhKqXTRaOLnkT+
-         eNWBk/U4xenfuV7N5Da/O/vPok8bKjUD6xHYqxDS7TkXf/ZoVR/lOeqBpGKiUgwrjEUc
-         6Eu04jP4KbMwrOYsDVrmdPXpSsb3qaQpYZDI91yWhS6JZM9eMtjKChQj9t0lPpJCvUb4
-         b0t1LrYmYMUPY8iTBEPei9ErDQHm/8zO4shodPMWyIQpBnxrtm22ZnUQiqH1Wo+/mprb
-         oT5GpvYWRehTWvUMf+yMvm1AmZaESsqby29iIO8JdDL+ZdcgjIsIEDhm6zofejYyZkNK
-         91kg==
-X-Gm-Message-State: AFqh2kqKXXUjuCSaJqs6iQkhWxrg8sozOBopyqlIwJzLSDtsalLHoGQt
-        aF1pxj02LICdzHaajiReuLC2kA==
-X-Google-Smtp-Source: AMrXdXsxfo+xqmW7i1lvwa6CRHsBy8qgST2EYmwTSV2bp+gjyNC1TrUprRW0J90ZkExuFN7WkNsF/w==
-X-Received: by 2002:a05:6a00:a87:b0:582:13b5:d735 with SMTP id b7-20020a056a000a8700b0058213b5d735mr2626944pfl.0.1673993563929;
-        Tue, 17 Jan 2023 14:12:43 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id i24-20020aa796f8000000b0058d99337381sm5119064pfq.172.2023.01.17.14.12.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 14:12:43 -0800 (PST)
-Date:   Tue, 17 Jan 2023 22:12:40 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
-Subject: Re: [V2 PATCH 5/6] KVM: selftests: Add get_free_huge_2m_pages
-Message-ID: <Y8cdWKaZVXQFcO+i@google.com>
-References: <20221205232341.4131240-1-vannapurve@google.com>
- <20221205232341.4131240-6-vannapurve@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221205232341.4131240-6-vannapurve@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dPBcRBsDAGoDfORsxWE6afj5vOW1Ynx1npcixEfl3Uk=;
+        b=TjJ0iVr24PSerHA5CeUP+s0i4yf7sSBtmoWmoCQ8+DlCWZkQWGleyrcC0YS+x320er
+         M/vXkdkVQ/XxBdlUybnfrfkzrJQZEdneFb7kGrAAo4XAr5hPkHZ+79DjtYfWaS2WT9Uo
+         aXlvyjJVRrSKC+l0yCtm1paNvodhl2tnP25R50TY7hPBhBDOR3r4KjEBziXnxdW1zd8p
+         8Tttlh46azFHz1u5Bon5ckLBD7YwILKjznJ6ZgqCO8GSVXX3PlnNI3sY1zVuakMy5iiD
+         uewrlrM84XdyRZbCZnuAPRYMOAHRP2KzZsRTX4FgwNTXxOJsL9gA3mLAKc68RyBe3NNC
+         +1Ig==
+X-Gm-Message-State: AFqh2krg0IjKww38dT83NXtFRPce1ype4bjzuPO1WM3rRgOClTL7h3pH
+        Qw3bvvSxBhRb67aTAJ+UlgTe4VxUopouOQ==
+X-Google-Smtp-Source: AMrXdXvh6ecrbEC0lwAJglyrB/fMU1igRqBopN2uJY51WgGuIpzXrshKKLiXXuSAr9I+DiYzxm5a4Toi1grRTA==
+X-Received: from dmatlack-n2d-128.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:1309])
+ (user=dmatlack job=sendgmr) by 2002:a81:c91:0:b0:4e1:2b59:292d with SMTP id
+ 139-20020a810c91000000b004e12b59292dmr773670ywm.450.1673994431671; Tue, 17
+ Jan 2023 14:27:11 -0800 (PST)
+Date:   Tue, 17 Jan 2023 14:27:07 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
+Message-ID: <20230117222707.3949974-1-dmatlack@google.com>
+Subject: [PATCH] KVM: selftests: Stop assuming stats are contiguous in kvm_binary_stats_test
+From:   David Matlack <dmatlack@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Ricardo Koller <ricarkol@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        David Matlack <dmatlack@google.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,63 +67,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 05, 2022, Vishal Annapurve wrote:
-> Add an API to query free 2MB hugepages in the system.
-> 
-> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
-> ---
->  .../testing/selftests/kvm/include/test_util.h  |  1 +
->  tools/testing/selftests/kvm/lib/test_util.c    | 18 ++++++++++++++++++
->  2 files changed, 19 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/test_util.h b/tools/testing/selftests/kvm/include/test_util.h
-> index aea80071f2b8..3d1cc215940a 100644
-> --- a/tools/testing/selftests/kvm/include/test_util.h
-> +++ b/tools/testing/selftests/kvm/include/test_util.h
-> @@ -122,6 +122,7 @@ struct vm_mem_backing_src_alias {
->  bool thp_configured(void);
->  size_t get_trans_hugepagesz(void);
->  size_t get_def_hugetlb_pagesz(void);
-> +size_t get_free_huge_2mb_pages(void);
->  const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i);
->  size_t get_backing_src_pagesz(uint32_t i);
->  bool is_backing_src_hugetlb(uint32_t i);
-> diff --git a/tools/testing/selftests/kvm/lib/test_util.c b/tools/testing/selftests/kvm/lib/test_util.c
-> index d33b98bfe8a3..745573023b57 100644
-> --- a/tools/testing/selftests/kvm/lib/test_util.c
-> +++ b/tools/testing/selftests/kvm/lib/test_util.c
-> @@ -162,6 +162,24 @@ size_t get_trans_hugepagesz(void)
->  	return size;
->  }
->  
-> +size_t get_free_huge_2mb_pages(void)
+From: Jing Zhang <jingzhangos@google.com>
 
-I strongly prefer to follow the precedence set by other tests, which at this
-point means defaulting to non-huge pages.  I do think we need to make it easier
-and/or automatic to test hugepages, but I would like to tackle that problem
-separately.  E.g. a kernel built without hugepage support will fail the fopen()
-below.
+Remove the assumption from kvm_binary_stats_test that all stats are
+laid out contiguously in memory. The current stats in KVM are
+contiguously laid out in memory, but that may change in the future and
+the ABI specifically allows holes in the stats data (since each stat
+exposes its own offset).
 
-> +{
-> +	size_t free_pages;
-> +	FILE *f;
-> +	int ret;
-> +
-> +	f = fopen("/sys/kernel/mm/hugepages/hugepages-2048kB/free_hugepages", "r");
-> +	TEST_ASSERT(f != NULL, "Error in opening hugepages-2048kB/free_hugepages");
-> +
-> +	do {
-> +		ret = fscanf(f, "%ld", &free_pages);
-> +	} while (errno == EINTR);
-> +	TEST_ASSERT(ret < 1, "Error reading hugepages-2048kB/free_hugepages");
-> +	fclose(f);
-> +
-> +	return free_pages;
-> +}
-> +
->  size_t get_def_hugetlb_pagesz(void)
->  {
->  	char buf[64];
-> -- 
-> 2.39.0.rc0.267.gcb52ba06e7-goog
-> 
+While here drop the check that each stats' offset is less than
+size_data, as that is now always true by construction.
+
+Link: https://lore.kernel.org/kvm/20221208193857.4090582-9-dmatlack@google.com/
+Fixes: 0b45d58738cd ("KVM: selftests: Add selftest for KVM statistics data binary interface")
+Signed-off-by: Jing Zhang <jingzhangos@google.com>
+Signed-off-by: David Matlack <dmatlack@google.com>
+[Re-worded the commit message.]
+
+Signed-off-by: David Matlack <dmatlack@google.com>
+---
+ tools/testing/selftests/kvm/kvm_binary_stats_test.c | 10 +---------
+ 1 file changed, 1 insertion(+), 9 deletions(-)
+
+diff --git a/tools/testing/selftests/kvm/kvm_binary_stats_test.c b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+index 894417c96f70..a7001e29dc06 100644
+--- a/tools/testing/selftests/kvm/kvm_binary_stats_test.c
++++ b/tools/testing/selftests/kvm/kvm_binary_stats_test.c
+@@ -134,7 +134,7 @@ static void stats_test(int stats_fd)
+ 				    "Bucket size of stats (%s) is not zero",
+ 				    pdesc->name);
+ 		}
+-		size_data += pdesc->size * sizeof(*stats_data);
++		size_data = max(size_data, pdesc->offset + pdesc->size * sizeof(*stats_data));
+ 	}
+ 
+ 	/*
+@@ -149,14 +149,6 @@ static void stats_test(int stats_fd)
+ 	TEST_ASSERT(size_data >= header.num_desc * sizeof(*stats_data),
+ 		    "Data size is not correct");
+ 
+-	/* Check stats offset */
+-	for (i = 0; i < header.num_desc; ++i) {
+-		pdesc = get_stats_descriptor(stats_desc, i, &header);
+-		TEST_ASSERT(pdesc->offset < size_data,
+-			    "Invalid offset (%u) for stats: %s",
+-			    pdesc->offset, pdesc->name);
+-	}
+-
+ 	/* Allocate memory for stats data */
+ 	stats_data = malloc(size_data);
+ 	TEST_ASSERT(stats_data, "Allocate memory for stats data");
+
+base-commit: de60733246ff4545a0483140c1f21426b8d7cb7f
+prerequisite-patch-id: 42a76ce7cec240776c21f674e99e893a3a6bee58
+-- 
+2.39.0.246.g2a6d74b583-goog
+
