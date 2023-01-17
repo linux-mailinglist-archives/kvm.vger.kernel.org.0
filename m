@@ -2,153 +2,307 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61E33670E8D
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 01:24:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E28C6670E90
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 01:25:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229650AbjARAY2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 19:24:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58678 "EHLO
+        id S229584AbjARAYw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 19:24:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbjARAYD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 19:24:03 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39FEC2312D
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 15:38:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673998696;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TCBdlBJNdmbwC3QjgMYxTqXDEbjetxbmhE0qTYgBydc=;
-        b=Q2pG1gijKz5BBTF17Wi0fW6HNqpmdVd1AmYRgSgej9BvXWiua+LNDBnZXTHcIcYcvbM9Y4
-        O49LBh/Lqe9Q/ZjEs1xSGCWFk2KvYVpm/cLvKXQANK/qD/Rxn/mO1c7nmIP8B3HZBAlhsI
-        LIWYo3VG+iyPFglMjlIHHAmFs4A1oLc=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-292-TG3LIPZlNsq9iOug2YKr1g-1; Tue, 17 Jan 2023 18:38:14 -0500
-X-MC-Unique: TG3LIPZlNsq9iOug2YKr1g-1
-Received: by mail-io1-f70.google.com with SMTP id b21-20020a5d8d95000000b006fa39fbb94eso20210909ioj.17
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 15:38:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TCBdlBJNdmbwC3QjgMYxTqXDEbjetxbmhE0qTYgBydc=;
-        b=Z1J0O6tFKsRRColLpewpJDqS6fiIMvorJ2N1lsWn/tXLjHSXIbwZnPlRrhSY2FxnMe
-         prjdwDDMHHy0ptPSbVYaaqCAxMzEOHTgH3LN6un2AMot6ESLZfDpCt6DhrWcRCCPOMIo
-         d01ISACQos89PhJlEucgav2gq9TfaMuZsSPDckZteeYr1pYV4O1Bt4vPWKDzlL8PNFLH
-         fGQwyy8F2P40eNSFOPDZQXda8xjNZW1y9N8rlvgV0K3t5xq8XSBs8vtytmzWv/HVIHU4
-         5DbzKUEfZd0IqncUiU1036mry4R7zyuDFsAKGiivX593aXtWHFM2sxzms5PW5bfIiWaj
-         7Pyg==
-X-Gm-Message-State: AFqh2koXr23842Zkst5D5zCHol/NHrDe1SowpUuDZ1FGywyUQ9eMQRXM
-        WXArWNFyx865ng53fizHXMhYkLVDGN9wh5nAdn1nNpwhiogwbOXQZ2uL0WnIyNipQ+e34HBUrA8
-        3a6+DLLoEyj7o
-X-Received: by 2002:a05:6e02:be5:b0:30f:1cc:d14b with SMTP id d5-20020a056e020be500b0030f01ccd14bmr4264398ilu.0.1673998694179;
-        Tue, 17 Jan 2023 15:38:14 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXv3MvNN/zHAZtBEsEXvR7KudEBMPCye4G8ZAL2tcAMHzzjVqjvnc6sIW/Zo4LZHQnAfuaYWfw==
-X-Received: by 2002:a05:6e02:be5:b0:30f:1cc:d14b with SMTP id d5-20020a056e020be500b0030f01ccd14bmr4264385ilu.0.1673998693915;
-        Tue, 17 Jan 2023 15:38:13 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id h18-20020a02cd32000000b003a2d93487easm2961179jaq.38.2023.01.17.15.38.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 15:38:13 -0800 (PST)
-Date:   Tue, 17 Jan 2023 16:38:11 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yishai Hadas <yishaih@nvidia.com>
-Cc:     <jgg@nvidia.com>, <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
-        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
-        <diana.craciun@oss.nxp.com>, <eric.auger@redhat.com>,
-        <maorg@nvidia.com>, <cohuck@redhat.com>,
-        <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH V1 vfio 0/6] Move to use cgroups for userspace
- persistent allocations
-Message-ID: <20230117163811.591b4d6f.alex.williamson@redhat.com>
-In-Reply-To: <20230108154427.32609-1-yishaih@nvidia.com>
-References: <20230108154427.32609-1-yishaih@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        with ESMTP id S229768AbjARAYS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 19:24:18 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F333EFC9;
+        Tue, 17 Jan 2023 15:42:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2C2F461587;
+        Tue, 17 Jan 2023 23:42:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88D95C433EF;
+        Tue, 17 Jan 2023 23:42:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1673998970;
+        bh=2ikdQhWN8QnY8MY7pt8CC+l4LYugedIuQZfZ7a0yhEU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=r/1d4gQ7cape7g9hFv8XNl0XZBEZ0EVwPauBC4bqmnCoGOF+Xy+qUbw2jwW6F9vvZ
+         pVmYoRCzPA7YHryO/T0MH8YnOJXt0x4w2NzJ1ACiA5g/5vPjW519asy8n+GAnyMimK
+         sb06Z4wbntGBSR9tr8RZD6PYKrmIg1jc4sHeTiLeVELEsNxDwUkoohhtbCJEaQ7HRF
+         yI74gK0GdlqeWP0T8Y3RVRLOobjIJcMWIfHibmefBamQhUMzKiAdSE/SoUuntNsHbc
+         DNg0yxLMPeXtXszECrO3bClqp8i39Vug7emnDggHcfVbbg3/E6KmSMn+0e1TATY4XX
+         iowUzbxk9j9ag==
+Date:   Wed, 18 Jan 2023 01:42:45 +0200
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com,
+        Vishal Annapurve <vannapurve@google.com>
+Subject: Re: [PATCH RFC v7 10/64] KVM: SEV: Populate private memory fd during
+ LAUNCH_UPDATE_DATA
+Message-ID: <Y8cydYUfTUFwCh4K@kernel.org>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-11-michael.roth@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221214194056.161492-11-michael.roth@amd.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sun, 8 Jan 2023 17:44:21 +0200
-Yishai Hadas <yishaih@nvidia.com> wrote:
+On Wed, Dec 14, 2022 at 01:40:02PM -0600, Michael Roth wrote:
+> From: Vishal Annapurve <vannapurve@google.com>
+> 
+> This change adds handling of HVA ranges to copy contents
+> to private memory while doing sev launch update data.
+> 
+> mem_attr array is updated during LAUNCH_UPDATE_DATA to ensure
+> that encrypted memory is marked as private.
+> 
+> Signed-off-by: Vishal Annapurve <vannapurve@google.com>
+> [mdr: use gfn_to_hva_memslot_prot() for shared GFN handler to deal with
+>       read-only slots for ROMs]
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+>  arch/x86/kvm/svm/sev.c   | 99 ++++++++++++++++++++++++++++++++++++----
+>  include/linux/kvm_host.h |  1 +
+>  virt/kvm/kvm_main.c      | 27 ++++++++---
+>  3 files changed, 111 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index 69dbf17f0d6a..a7e4e3005786 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -493,23 +493,26 @@ static unsigned long get_num_contig_pages(unsigned long idx,
+>  	return pages;
+>  }
+>  
+> -static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+> +static int sev_launch_update_shared_gfn_handler(struct kvm *kvm,
+> +						struct kvm_gfn_range *range,
+> +						struct kvm_sev_cmd *argp)
+>  {
+>  	unsigned long vaddr, vaddr_end, next_vaddr, npages, pages, size, i;
+>  	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> -	struct kvm_sev_launch_update_data params;
+>  	struct sev_data_launch_update_data data;
+>  	struct page **inpages;
+>  	int ret;
+>  
+> -	if (!sev_guest(kvm))
+> -		return -ENOTTY;
+> -
+> -	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> -		return -EFAULT;
+> +	vaddr = gfn_to_hva_memslot_prot(range->slot, range->start, NULL);
+> +	pr_debug("%s: shared GFN: %llx, slot.id: %d, slot.base_gfn: %llx, slot.userspace_addr: %lx, slot.flags: %x, vaddr: %lx\n",
+> +		 __func__, range->start, range->slot->id, range->slot->base_gfn,
+> +		 range->slot->userspace_addr, range->slot->flags, vaddr);
+> +	if (kvm_is_error_hva(vaddr)) {
+> +		pr_err("vaddr is erroneous 0x%lx\n", vaddr);
+> +		return -EINVAL;
+> +	}
+>  
+> -	vaddr = params.uaddr;
+> -	size = params.len;
+> +	size = (range->end - range->start) << PAGE_SHIFT;
+>  	vaddr_end = vaddr + size;
+>  
+>  	/* Lock the user memory. */
+> @@ -561,6 +564,84 @@ static int sev_launch_update_data(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>  	return ret;
+>  }
+>  
+> +static int sev_launch_update_priv_gfn_handler(struct kvm *kvm,
+> +					      struct kvm_gfn_range *range,
+> +					      struct kvm_sev_cmd *argp)
+> +{
+> +	struct sev_data_launch_update_data data;
+> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+> +	gfn_t gfn;
+> +	kvm_pfn_t pfn;
+> +	struct kvm_memory_slot *memslot = range->slot;
+> +	int ret = 0;
+> +
+> +	data.reserved = 0;
+> +	data.handle = sev->handle;
+> +
+> +	for (gfn = range->start; gfn < range->end; gfn++) {
+> +		int order;
+> +		void *kvaddr;
+> +
+> +		ret = kvm_restricted_mem_get_pfn(memslot, gfn, &pfn, &order);
+> +		if (ret)
+> +			return ret;
+> +
+> +		kvaddr = pfn_to_kaddr(pfn);
+> +		if (!virt_addr_valid(kvaddr)) {
+> +			pr_err("Invalid kvaddr 0x%llx\n", (uint64_t)kvaddr);
+> +			ret = -EINVAL;
+> +			goto e_ret;
+> +		}
+> +
+> +		ret = kvm_read_guest_page(kvm, gfn, kvaddr, 0, PAGE_SIZE);
+> +		if (ret) {
+> +			pr_err("guest read failed 0x%x\n", ret);
+> +			goto e_ret;
+> +		}
+> +
+> +		if (!this_cpu_has(X86_FEATURE_SME_COHERENT))
+> +			clflush_cache_range(kvaddr, PAGE_SIZE);
+> +
+> +		data.len = PAGE_SIZE;
+> +		data.address = __sme_set(pfn << PAGE_SHIFT);
+> +		ret = sev_issue_cmd(kvm, SEV_CMD_LAUNCH_UPDATE_DATA, &data, &argp->error);
+> +		if (ret)
+> +			goto e_ret;
+> +		kvm_release_pfn_clean(pfn);
+> +	}
+> +	kvm_vm_set_region_attr(kvm, range->start, range->end,
+> +		true /* priv_attr */);
+> +
+> +e_ret:
+> +	return ret;
+> +}
+> +
+> +static int sev_launch_update_gfn_handler(struct kvm *kvm, struct kvm_gfn_range *range,
+> +					 void *data)
+> +{
+> +	struct kvm_sev_cmd *argp = (struct kvm_sev_cmd *)data;
+> +
+> +	if (kvm_slot_can_be_private(range->slot))
+> +		return sev_launch_update_priv_gfn_handler(kvm, range, argp);
+> +
+> +	return sev_launch_update_shared_gfn_handler(kvm, range, argp);
+> +}
+> +
+> +static int sev_launch_update_data(struct kvm *kvm,
+> +		struct kvm_sev_cmd *argp)
+> +{
+> +	struct kvm_sev_launch_update_data params;
+> +
+> +	if (!sev_guest(kvm))
+> +		return -ENOTTY;
+> +
+> +	if (copy_from_user(&params, (void __user *)(uintptr_t)argp->data, sizeof(params)))
+> +		return -EFAULT;
+> +
+> +	return kvm_vm_do_hva_range_op(kvm, params.uaddr, params.uaddr + params.len,
+> +		sev_launch_update_gfn_handler, argp);
+> +}
+> +
+>  static int sev_es_sync_vmsa(struct vcpu_svm *svm)
+>  {
+>  	struct sev_es_save_area *save = svm->sev_es.vmsa;
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 21a539ab17f6..33fa0b1435d3 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -973,6 +973,7 @@ int kvm_init(void *opaque, unsigned vcpu_size, unsigned vcpu_align,
+>  void kvm_exit(void);
+>  
+>  void kvm_get_kvm(struct kvm *kvm);
+> +int kvm_vm_set_region_attr(struct kvm *kvm, gfn_t start, gfn_t end, u64 attributes);
+>  bool kvm_get_kvm_safe(struct kvm *kvm);
+>  void kvm_put_kvm(struct kvm *kvm);
+>  bool file_is_kvm(struct file *file);
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 4ff7adaf6c56..1343070657d1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -747,6 +747,7 @@ int kvm_vm_do_hva_range_op(struct kvm *kvm, unsigned long hva_start,
+>  
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL_GPL(kvm_vm_do_hva_range_op);
+>  
+>  static __always_inline int kvm_handle_hva_range(struct mmu_notifier *mn,
+>  						unsigned long start,
+> @@ -2595,12 +2596,28 @@ static void kvm_unmap_mem_range(struct kvm *kvm, gfn_t start, gfn_t end,
+>  		kvm_flush_remote_tlbs(kvm);
+>  }
+>  
+> +int kvm_vm_set_region_attr(struct kvm *kvm, gfn_t start, gfn_t end,
+> +			   u64 attributes)
+> +{
+> +	gfn_t index;
+> +	void *entry;
+> +
+> +	entry = attributes ? xa_mk_value(attributes) : NULL;
+> +
+> +	for (index = start; index < end; index++)
+> +		if (xa_err(xa_store(&kvm->mem_attr_array, index, entry,
+> +				    GFP_KERNEL_ACCOUNT)))
+> +			break;
+> +
+> +	return index;
+> +}
+> +EXPORT_SYMBOL_GPL(kvm_vm_set_region_attr);
+> +
+>  static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+>  					   struct kvm_memory_attributes *attrs)
+>  {
+>  	gfn_t start, end;
+>  	unsigned long i;
+> -	void *entry;
+>  	int idx;
+>  	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+>  
+> @@ -2617,8 +2634,6 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+>  	start = attrs->address >> PAGE_SHIFT;
+>  	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+>  
+> -	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> -
+>  	if (kvm_arch_has_private_mem(kvm)) {
+>  		KVM_MMU_LOCK(kvm);
+>  		kvm_mmu_invalidate_begin(kvm);
+> @@ -2627,10 +2642,7 @@ static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+>  	}
+>  
+>  	mutex_lock(&kvm->lock);
+> -	for (i = start; i < end; i++)
+> -		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> -				    GFP_KERNEL_ACCOUNT)))
+> -			break;
+> +	i = kvm_vm_set_region_attr(kvm, start, end, attrs->attributes);
+>  	mutex_unlock(&kvm->lock);
+>  
+>  	if (kvm_arch_has_private_mem(kvm)) {
+> @@ -2793,6 +2805,7 @@ unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot,
+>  
+>  	return hva;
+>  }
+> +EXPORT_SYMBOL_GPL(gfn_to_hva_memslot_prot);
+>  
+>  unsigned long gfn_to_hva_prot(struct kvm *kvm, gfn_t gfn, bool *writable)
+>  {
+> -- 
+> 2.25.1
+> 
 
-> This series changes the vfio and its sub drivers to use
-> GFP_KERNEL_ACCOUNT for userspace persistent allocations.
-> 
-> The GFP_KERNEL_ACCOUNT option lets the memory allocator know that this
-> is untrusted allocation triggered from userspace and should be a subject
-> of kmem accountingis, and as such it is controlled by the cgroup
-> mechanism. [1]
-> 
-> As part of this change, we allow loading in mlx5 driver larger images
-> than 512 MB by dropping the arbitrary hard-coded value that we have
-> today and move to use the max device loading value which is for now 4GB.
-> 
-> In addition, the first patch from the series fixes a UBSAN note in mlx5
-> that was reported once the kernel was compiled with this option.
-> 
-> [1] https://www.kernel.org/doc/html/latest/core-api/memory-allocation.html
-> 
-> Changes from V0: https://www.spinics.net/lists/kvm/msg299508.html
-> Patch #2 - Fix MAX_LOAD_SIZE to use BIT_ULL instead of BIT as was
->            reported by the krobot test.
-> 
-> Yishai
-> 
-> Jason Gunthorpe (1):
->   vfio: Use GFP_KERNEL_ACCOUNT for userspace persistent allocations
-> 
-> Yishai Hadas (5):
->   vfio/mlx5: Fix UBSAN note
->   vfio/mlx5: Allow loading of larger images than 512 MB
->   vfio/hisi: Use GFP_KERNEL_ACCOUNT for userspace persistent allocations
->   vfio/fsl-mc: Use GFP_KERNEL_ACCOUNT for userspace persistent
->     allocations
->   vfio/platform: Use GFP_KERNEL_ACCOUNT for userspace persistent
->     allocations
-> 
->  drivers/vfio/container.c                      |  2 +-
->  drivers/vfio/fsl-mc/vfio_fsl_mc.c             |  2 +-
->  drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c        |  4 ++--
->  .../vfio/pci/hisilicon/hisi_acc_vfio_pci.c    |  4 ++--
->  drivers/vfio/pci/mlx5/cmd.c                   | 17 +++++++++--------
->  drivers/vfio/pci/mlx5/main.c                  | 19 ++++++++++---------
->  drivers/vfio/pci/vfio_pci_config.c            |  6 +++---
->  drivers/vfio/pci/vfio_pci_core.c              |  7 ++++---
->  drivers/vfio/pci/vfio_pci_igd.c               |  2 +-
->  drivers/vfio/pci/vfio_pci_intrs.c             | 10 ++++++----
->  drivers/vfio/pci/vfio_pci_rdwr.c              |  2 +-
->  drivers/vfio/platform/vfio_platform_common.c  |  2 +-
->  drivers/vfio/platform/vfio_platform_irq.c     |  8 ++++----
->  drivers/vfio/virqfd.c                         |  2 +-
->  14 files changed, 46 insertions(+), 41 deletions(-)
+Hmm.. but user space is still allowed to call KVM_SET_MEMORY_ATTRIBUTES
+with KVM_MEMORY_ATTRIBUTE_PRIVATE set? How do these behaviours complement
+each other?
 
-The type1 IOMMU backend is notably absent here among the core files, any
-reason?  Potentially this removes the dma_avail issue as a means to
-prevent userspace from creating an arbitrarily large number of DMA
-mappings, right?  For compatibility, this might mean setting the DMA
-entry limit to an excessive number instead as some use cases can
-already hit the U16_MAX limit now.
+SEV specific changes and kvm_vm_set_region_attr() definition should really
+be separate patches.
 
-Are there any compatibility issues we should expect with this change to
-accounting otherwise?
-
-Also a nit, the commit logs have a persistent typo throughout
-"accountingis".  I can fix on commit or if we decide on a respin please
-fix.  Thanks,
-
-Alex
-
+BR, Jarkko
