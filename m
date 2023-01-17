@@ -2,112 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B16066D285
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 00:05:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9713966D3D0
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 02:36:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235237AbjAPXFO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 18:05:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43592 "EHLO
+        id S234512AbjAQBgA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 20:36:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233680AbjAPXE3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 18:04:29 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2077.outbound.protection.outlook.com [40.107.220.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2847C2A9A3;
-        Mon, 16 Jan 2023 15:03:45 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=W2lAfnwtHPahxX9Y3zSrdeIcOFDMEpdYih/KYNVinzsJfl+cdOZfROyJIhp4UzqnTO7tChRamV/ImQCu4lrnRKcmPWtTy6aL4mXEsLNpUZtR3LEsWf91hHIKQS5QwicO7SfB4bMwxcDExQDsQVnzUhSKNzIf9jYvGXK2mG5kZi0ImTW8tRJmINfPQtMRCHRdislpd1DYt2D17mpuDVS8N5+jhUPvOd1wXUWZT1hb71KgyLY82v8eAwey77Lam1RKNbpoYv2cudlbS8wWsQCQiR+fbYLWnryrzUcNippe4FYOritqfcOq5Y2v0ZhKuQ4MkIXexOUH+45XEgm1BeD/mg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6QDdp4FWNCH5ZBi1okqkM/sQPm7Bh/OPFczx9KULuMM=;
- b=f/tWhq0DXwcmY8iB4vtxR9BymomBDUVu1UQsuEfrQEwX7CULyCuQlImXhTwTbXn12KedhcwsFHn2nmJdSn9UwfQZXLpwyOhD2At7gJzSbJkhJvtXXRWal8qx3oE+XVjOc5yak2mgoZcNRDVV1qUO5gtnUjTiz+dbwt04VO+0qVdxdQ5xi5br2lN4jMV4GRvpLwkyMwNiDEhCof3hSWts0llOFyy/lUOGQzIMEpBIo40ZBb7yVjBJG8hQlDXPDBWBnvKnb1aW0GvWzOanECTH+HGh+IVWQKAOAw4moR/8MuRlj2mowd5Gp3Nw2TvC7Uu1wavYtZqYEUX5dT1IRbEEYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6QDdp4FWNCH5ZBi1okqkM/sQPm7Bh/OPFczx9KULuMM=;
- b=mWsVsrdYqYoxx0BrNxSrFBBCSTLeSI6XcfJeOaRatC0rCmfgumaiLJy1j8xxnBiPUhzTsIGezZRs+VWGOK304WMeXaq+H2vve7T6bRb0K21uaXtNvkyIel5BNaEp6losWsdzGc/a3tX5LI61SJRJVISkM62j2/t5caPe7ky8wRE=
-Received: from DS7PR03CA0010.namprd03.prod.outlook.com (2603:10b6:5:3b8::15)
- by DS0PR12MB7510.namprd12.prod.outlook.com (2603:10b6:8:132::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Mon, 16 Jan
- 2023 23:03:41 +0000
-Received: from DS1PEPF0000B074.namprd05.prod.outlook.com
- (2603:10b6:5:3b8:cafe::2e) by DS7PR03CA0010.outlook.office365.com
- (2603:10b6:5:3b8::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.19 via Frontend
- Transport; Mon, 16 Jan 2023 23:03:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS1PEPF0000B074.mail.protection.outlook.com (10.167.17.5) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6002.11 via Frontend Transport; Mon, 16 Jan 2023 23:03:41 +0000
-Received: from fritz.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 16 Jan
- 2023 17:03:40 -0600
-From:   Kim Phillips <kim.phillips@amd.com>
-To:     <x86@kernel.org>
-CC:     Kim Phillips <kim.phillips@amd.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "Boris Ostrovsky" <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        "Paolo Bonzini" <pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        "Alexey Kardashevskiy" <aik@amd.com>, <kvm@vger.kernel.org>,
-        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v7 7/7] x86/cpu, kvm: Propagate the AMD Automatic IBRS feature to the guest
-Date:   Mon, 16 Jan 2023 17:01:59 -0600
-Message-ID: <20230116230159.1511393-8-kim.phillips@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230116230159.1511393-1-kim.phillips@amd.com>
-References: <20230116230159.1511393-1-kim.phillips@amd.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS1PEPF0000B074:EE_|DS0PR12MB7510:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7b655dbb-7406-4d11-0278-08daf815e955
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Va/F70FyosLkAyJ4xjDoL/GcR7+WMyBr9lp9PXaVA8dZ1SOet238HRkMHGGKa2jhS8aAGOYq87QdgIU7Ba9bo3apRL6kV7oDPLu2PMYBf5k/vj5N+Gq3c746g0TuAWhETIcr4as9m13QRSQqDF+jwUJ5IYO3OwXwqC8vwlk0bclFvMQ7j8av52lzDmmRgtRf+PWZjn6hC4+HDXXW+57+gFIs56lIgwX9HrynQ1E1CbRlVO9viRB8WJ71LTfavTEoK+v/rPklG3UWO7UTQqgxVGwgXOg4Q9DdSIbjLmvnNccPtUnUbfmgFYezj+DhmDVUZVw7uRjzXAQs14j1mRUP+w9/ZE0kDHj0G5Bu0hP2BHEsVhuYBoJy+cCrC/myggXZ/KlBo6jlkhZp1IuDJGq/6v/IWKFxfNtRHt2BPo5uutyzgqtIhEOMRb2CvDZbFxJhb5svHg60PF6ShUEGKvpq7zG80PMcX72POGFTr1dVqtYNSl+xXUDDdUfy6Tm27Gs4IX6mefKTmE6Wjvh/jGK9IGF0LJDGI8Z+858+oI2JEh1GsTr2GPCenzAz+SRMPjxih27MWiO0CHdsZRjyZxIFBTbheQPXcz23+0Dw3az+8A+a7OlcbiAiLIQUhmj6I415Je/J0fTGtAInZm5JoWCr4JlcsGlJiEzrEqz9qc0OawLA3H3J0O7O+dfsLh2WfCWLjajd+KSCDD7RoNZPKL0qUuLM6ItM1wEIDqLzjx2YYug=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(346002)(39860400002)(376002)(451199015)(36840700001)(40470700004)(46966006)(36756003)(6916009)(356005)(86362001)(8936002)(44832011)(70586007)(8676002)(70206006)(4326008)(2906002)(7416002)(81166007)(82740400003)(36860700001)(83380400001)(5660300002)(7696005)(40460700003)(316002)(6666004)(54906003)(41300700001)(40480700001)(82310400005)(478600001)(426003)(47076005)(2616005)(336012)(16526019)(1076003)(26005)(186003)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jan 2023 23:03:41.8228
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b655dbb-7406-4d11-0278-08daf815e955
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000B074.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB7510
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        with ESMTP id S232024AbjAQBf6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 20:35:58 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4987468D
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 17:35:56 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id a4-20020a5b0004000000b006fdc6aaec4fso32657247ybp.20
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 17:35:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cXMIKYVp+c4Sa+jsYUUChNh+35aTl0TzPBaHrVahGAc=;
+        b=Kvh4CvJ7GmN8kUkSghBYRl1ZQpcu4BzNDkpekiOpL3Zi+TsoDhh+x1YNSfTPW+lM6/
+         a2STHKxc+7l/h1aTCW0YLE+CCa4OqbXw5elBqpZbB3vnBHGCszGi7hVFHEgVB0ky8OTU
+         YAUBENoYICZpoO+Qs9Sm0k68XDt3eu8P7dV/2oodRpbCcKOeYbs0O8iXfS411dCEFjql
+         o7f8Uj3GdThd4dD+zxmYyezMDFpiaDmfaLn3QLaws7T9xWn2B6zDvgzM3pT7IEhSvXc0
+         Wbzq4s+4Y/ouGD/QXbo6/wgaklLZIaBBe91DnYNmMCvH6MCn3Mi+FPpDLcOKYsC5601/
+         xtlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cXMIKYVp+c4Sa+jsYUUChNh+35aTl0TzPBaHrVahGAc=;
+        b=SSFMWiPI5U+r40vhHtvYSOu7tOFOkh5qqAN1VOJsgT2AXtfayaw+3n6249zr91ew3Y
+         YeRHIxbZHr0Vi6ZgEfKGkAYCCBWLLD/jRrq+8LcelQto3JtnNKPWMQU1LnofM5/oQL9H
+         RMY5SHzgFACqx8ZORXlHhdI6Ms6AXTATEZYIcOP6rrnnFoGfyzVnO52IOZkmOaU3rp/a
+         NyJNI4No4+6kFvFHHAAp8Lh17AwQq77latFc3OinRhk6b+Dax57cd6WzsgU6mTKTIuK3
+         xZYhaaWcubtDpombkqV4YBM2H+ZechPU+mck7492/mJyRucwTA7/nbpFgDCFnMAk517a
+         xyPg==
+X-Gm-Message-State: AFqh2kqqiOqRsADgLRPruG5PSmKZ7SkOALPxlWeztVnSeMFQL1mOFOKM
+        VF3LcXoWTu3WYxI8hV4XXh/doRwwVAo=
+X-Google-Smtp-Source: AMrXdXuMkKUdTI8/EmoeRlROPqs4UPn1FtCKXJ+AbfVWp3HQ3sK8ZayDheDbCUEAVC0xjpf5YT/8oPb05YI=
+X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
+ (user=reijiw job=sendgmr) by 2002:a81:7408:0:b0:3cc:8ab:be2c with SMTP id
+ p8-20020a817408000000b003cc08abbe2cmr182266ywc.205.1673919356032; Mon, 16 Jan
+ 2023 17:35:56 -0800 (PST)
+Date:   Mon, 16 Jan 2023 17:35:34 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
+Message-ID: <20230117013542.371944-1-reijiw@google.com>
+Subject: [PATCH v2 0/8] KVM: arm64: PMU: Allow userspace to limit the number
+ of PMCs on vCPU
+From:   Reiji Watanabe <reijiw@google.com>
+To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
+Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>,
+        Reiji Watanabe <reijiw@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -115,57 +75,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add the AMD Automatic IBRS feature bit to those being
-propagated to the guest, and enable the guest EFER bit.
+The goal of this series is to allow userspace to limit the number
+of PMU event counters on the vCPU. We need this to support migration
+across systems that implement different numbers of counters.
 
-Signed-off-by: Kim Phillips <kim.phillips@amd.com>
----
- arch/x86/kvm/cpuid.c   | 2 +-
- arch/x86/kvm/svm/svm.c | 3 +++
- arch/x86/kvm/x86.c     | 3 +++
- 3 files changed, 7 insertions(+), 1 deletion(-)
+The number of PMU event counters is indicated in PMCR_EL0.N.
+For a vCPU with PMUv3 configured, its value will be the same as
+the host value by default. Userspace can set PMCR_EL0.N for the
+vCPU to a lower value than the host value, using KVM_SET_ONE_REG.
+However, it is practically unsupported, as KVM resets PMCR_EL0.N
+to the host value on vCPU reset and some KVM code uses the host
+value to identify (un)implemented event counters on the vCPU.
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 9ba75ad9d976..293ef07b34c3 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -743,7 +743,7 @@ void kvm_set_cpu_caps(void)
- 
- 	kvm_cpu_cap_mask(CPUID_8000_0021_EAX,
- 		F(NO_NESTED_DATA_BP) | F(LFENCE_RDTSC) | 0 /* SmmPgCfgLock */ |
--		F(NULL_SEL_CLR_BASE) | 0 /* PrefetchCtlMsr */
-+		F(NULL_SEL_CLR_BASE) | F(AUTOIBRS) | 0 /* PrefetchCtlMsr */
- 	);
- 	if (cpu_feature_enabled(X86_FEATURE_LFENCE_RDTSC))
- 		kvm_cpu_cap_set(X86_FEATURE_LFENCE_RDTSC);
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 9a194aa1a75a..60c7c880266b 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -4969,6 +4969,9 @@ static __init int svm_hardware_setup(void)
- 
- 	tsc_aux_uret_slot = kvm_add_user_return_msr(MSR_TSC_AUX);
- 
-+	if (boot_cpu_has(X86_FEATURE_AUTOIBRS))
-+		kvm_enable_efer_bits(EFER_AUTOIBRS);
-+
- 	/* Check for pause filtering support */
- 	if (!boot_cpu_has(X86_FEATURE_PAUSEFILTER)) {
- 		pause_filter_count = 0;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index da4bbd043a7b..8dd0cb230ef5 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1685,6 +1685,9 @@ static int do_get_msr_feature(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
- 
- static bool __kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer)
- {
-+	if (efer & EFER_AUTOIBRS && !guest_cpuid_has(vcpu, X86_FEATURE_AUTOIBRS))
-+		return false;
-+
- 	if (efer & EFER_FFXSR && !guest_cpuid_has(vcpu, X86_FEATURE_FXSR_OPT))
- 		return false;
- 
+This series will ensure that the PMCR_EL0.N value is preserved
+on vCPU reset and that KVM doesn't use the host value
+to identify (un)implemented event counters on the vCPU.
+This allows userspace to limit the number of the PMU event
+counters on the vCPU.
+
+Patch 1 fixes reset_pmu_reg() to ensure that (RAZ) bits of
+{PMCNTEN,PMOVS}{SET,CLR}_EL1 corresponding to unimplemented event
+counters on the vCPU are reset to zero even when PMCR_EL0.N for
+the vCPU is different from the host.
+
+Patch 2 is a minor refactoring to use the default PMU register reset
+function (reset_pmu_reg()) for PMUSERENR_EL0 and PMCCFILTR_EL0.
+(With the Patch 1 change, reset_pmu_reg() can now be used for
+those registers)
+
+Patch 3 fixes reset_pmcr() to preserve PMCR_EL0.N for the vCPU on
+vCPU reset.
+
+Patch 4 adds the sys_reg's set_user() handler for the PMCR_EL0
+to disallow userspace to set PMCR_EL0.N for the vCPU to a value
+that is greater than the host value.
+
+Patch 5-8 adds a selftest to verify reading and writing PMU registers
+for implemented or unimplemented PMU event counters on the vCPU.
+
+The series is based on v6.2-rc4.
+
+v2:
+ - Added the sys_reg's set_user() handler for the PMCR_EL0 to
+   disallow userspace to set PMCR_EL0.N for the vCPU to a value
+   that is greater than the host value (and added a new test
+   case for this behavior). [Oliver]
+ - Added to the commit log of the patch 2 that PMUSERENR_EL0 and
+   PMCCFILTR_EL0 have UNKNOWN reset values.
+
+v1: https://lore.kernel.org/all/20221230035928.3423990-1-reijiw@google.com/
+
+Reiji Watanabe (8):
+  KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
+  KVM: arm64: PMU: Use reset_pmu_reg() for PMUSERENR_EL0 and
+    PMCCFILTR_EL0
+  KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value on vCPU reset
+  KVM: arm64: PMU: Disallow userspace to set PMCR.N greater than the
+    host value
+  tools: arm64: Import perf_event.h
+  KVM: selftests: aarch64: Introduce vpmu_counter_access test
+  KVM: selftests: aarch64: vPMU register test for implemented counters
+  KVM: selftests: aarch64: vPMU register test for unimplemented counters
+
+ arch/arm64/kvm/pmu-emul.c                     |   6 +
+ arch/arm64/kvm/sys_regs.c                     |  57 +-
+ tools/arch/arm64/include/asm/perf_event.h     | 258 +++++++
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/aarch64/vpmu_counter_access.c         | 644 ++++++++++++++++++
+ .../selftests/kvm/include/aarch64/processor.h |   1 +
+ 6 files changed, 954 insertions(+), 13 deletions(-)
+ create mode 100644 tools/arch/arm64/include/asm/perf_event.h
+ create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+
+
+base-commit: 5dc4c995db9eb45f6373a956eb1f69460e69e6d4
 -- 
-2.34.1
+2.39.0.314.g84b9a713c41-goog
 
