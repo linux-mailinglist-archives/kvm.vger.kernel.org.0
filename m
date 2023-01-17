@@ -2,278 +2,262 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B32866D3DD
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 02:39:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D474666D3D5
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 02:37:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235159AbjAQBjm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 20:39:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43324 "EHLO
+        id S234743AbjAQBhY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 20:37:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235163AbjAQBj0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 20:39:26 -0500
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71C9F2A177
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 17:39:25 -0800 (PST)
-Received: by mail-pj1-x104a.google.com with SMTP id h1-20020a17090a470100b0022646263abfso13647474pjg.6
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 17:39:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9LL7tftOZDJOgLTiYp8vW+fAMrQll9LeJRbkYGzCLag=;
-        b=CnERzyszg/Hb8IMyVOaCBOb6VPyNNlkqXzRAf9wf5othQzIoLi4uWAD6qhsBW5gZf+
-         1GntiyuxXFijWyasescCQf47QiTCvgdtHBxGNRqbXVa97ytgJwiZ6FC2wjmgdF+dUp7M
-         uFsY2f2wwkKWBn/+L1f8L350SqvgdFMV6VO2pEVc/PdppISolmY47QJrR9kvq4wCnKlJ
-         rzEwYUFd0tz/RhmxZXod6ngEqnS2RrqLg1PAowS2zbOl4PpatL2+xeihH5V8sDiMK1EK
-         bhPVcLsjEID4+Qg+w7QcXOc6ZuxGHE3BfxgnVIp/RrqTD7qNILtatGB6gRybbH2/V/9X
-         CMpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9LL7tftOZDJOgLTiYp8vW+fAMrQll9LeJRbkYGzCLag=;
-        b=YJ/1o2UmHQMgjhBGyZGcrELgr6MI18iPkfu+VuEXyxIEWF99rTtBRXLG55D6quLiQ1
-         Rp1pk6sDhQa6q4D87b5WeXLIs9Abai/OLvZHd3Aqteqy2p0m3WH8RnFXNEV9qrppkdWa
-         UNhthrya1yw0nWcvDfYqmeZ3grMJPv2sJgtVx3M9VAy5P3O+eQe94xcfN70tJacWlv3L
-         0qUQuVei4yFDz7BZxSxiAuNevTuNy176yCCJPb/TPMh3bmyh4ccy7ZvO/Ok1x05doG2w
-         zMTL8Ld/U3zVY60tP3DLKirQ4+kpqnNbMiYAjSYRsKtjXe5unPHnDJCJScSlY1qfGSuH
-         ohKw==
-X-Gm-Message-State: AFqh2koBvQ+N6zX/I+2AeY4FOqOW7DMvA1ApD+v9MXuu5ivcHVU6yZZn
-        w5JqKmqYLtJdrpmxTyIqYDbo5x+S724=
-X-Google-Smtp-Source: AMrXdXve04ysOODIOGhktUl8uDzFzF2hsytI+az+ghuCP2ETz3X45JZkP9gwEd57jma4buGbY07kcuA7cgI=
-X-Received: from reijiw-west4.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:aa1])
- (user=reijiw job=sendgmr) by 2002:a05:6a00:440b:b0:58c:2309:b7e with SMTP id
- br11-20020a056a00440b00b0058c23090b7emr119824pfb.34.1673919564950; Mon, 16
- Jan 2023 17:39:24 -0800 (PST)
-Date:   Mon, 16 Jan 2023 17:35:42 -0800
-In-Reply-To: <20230117013542.371944-1-reijiw@google.com>
-Mime-Version: 1.0
-References: <20230117013542.371944-1-reijiw@google.com>
-X-Mailer: git-send-email 2.39.0.314.g84b9a713c41-goog
-Message-ID: <20230117013542.371944-9-reijiw@google.com>
-Subject: [PATCH v2 8/8] KVM: selftests: aarch64: vPMU register test for
- unimplemented counters
-From:   Reiji Watanabe <reijiw@google.com>
-To:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>,
-        Reiji Watanabe <reijiw@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S234918AbjAQBhU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 20:37:20 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C6DB23D90
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 17:36:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1673919399;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=OaLWp1o2d67rAK4VOTZ3mI0wZ9vtLhQhgbJPLb7b6EE=;
+        b=SpqjEp1MGUEwl6rme3+lPu54wrqeB7i2nsVr61i0elq4o+5Qt3O+CtPCfltzK6z9mRiDxJ
+        Sv0LkdQnr+IURMTlzUl1qL4wlqPG84/3KoDMt4cIP/Pb0K1vXf1jEOLwRjImG3FQftCHk/
+        cTeG7A46aDyzxsHgGG+XS0fl0WMiNMQ=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-635-CRqzrvs_P5CSQm69KHxHAA-1; Mon, 16 Jan 2023 20:36:35 -0500
+X-MC-Unique: CRqzrvs_P5CSQm69KHxHAA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 311FD3C0DDD1;
+        Tue, 17 Jan 2023 01:36:34 +0000 (UTC)
+Received: from [10.22.18.0] (unknown [10.22.18.0])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 520A653AA;
+        Tue, 17 Jan 2023 01:36:33 +0000 (UTC)
+Message-ID: <5375c559-8c67-3cef-11a9-abeecb75a09f@redhat.com>
+Date:   Mon, 16 Jan 2023 20:36:33 -0500
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH 4/3] locking/lockdep: Improve the deadlock scenario print
+ for sync and read lock
+Content-Language: en-US
+To:     Boqun Feng <boqun.feng@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+        kvm@vger.kernel.org, Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+        Lai Jiangshan <jiangshanlai@gmail.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Paolo Bonzini <pbonzini@redhat.com>, seanjc@google.com,
+        Joel Fernandes <joel@joelfernandes.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Michal Luczaj <mhal@rbox.co>
+References: <20230113065955.815667-1-boqun.feng@gmail.com>
+ <20230113235722.1226525-1-boqun.feng@gmail.com>
+ <221e35b8-88f5-5fc5-6961-6a8ce060a97b@redhat.com>
+ <Y8XRNdrW3t1jvpMF@boqun-archlinux>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <Y8XRNdrW3t1jvpMF@boqun-archlinux>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a new test case to the vpmu_counter_access test to check
-if PMU registers or their bits for unimplemented counters are not
-accessible or are RAZ, as expected.
+On 1/16/23 17:35, Boqun Feng wrote:
+> On Mon, Jan 16, 2023 at 05:21:09PM -0500, Waiman Long wrote:
+>> On 1/13/23 18:57, Boqun Feng wrote:
+>>> Lock scenario print is always a weak spot of lockdep splats. Improvement
+>>> can be made if we rework the dependency search and the error printing.
+>>>
+>>> However without touching the graph search, we can improve a little for
+>>> the circular deadlock case, since we have the to-be-added lock
+>>> dependency, and know whether these two locks are read/write/sync.
+>>>
+>>> In order to know whether a held_lock is sync or not, a bit was
+>>> "stolen" from ->references, which reduce our limit for the same lock
+>>> class nesting from 2^12 to 2^11, and it should still be good enough.
+>>>
+>>> Besides, since we now have bit in held_lock for sync, we don't need the
+>>> "hardirqoffs being 1" trick, and also we can avoid the __lock_release()
+>>> if we jump out of __lock_acquire() before the held_lock stored.
+>>>
+>>> With these changes, a deadlock case evolved with read lock and sync gets
+>>> a better print-out from:
+>>>
+>>> 	[...]  Possible unsafe locking scenario:
+>>> 	[...]
+>>> 	[...]        CPU0                    CPU1
+>>> 	[...]        ----                    ----
+>>> 	[...]   lock(srcuA);
+>>> 	[...]                                lock(srcuB);
+>>> 	[...]                                lock(srcuA);
+>>> 	[...]   lock(srcuB);
+>>>
+>>> to
+>>>
+>>> 	[...]  Possible unsafe locking scenario:
+>>> 	[...]
+>>> 	[...]        CPU0                    CPU1
+>>> 	[...]        ----                    ----
+>>> 	[...]   rlock(srcuA);
+>>> 	[...]                                lock(srcuB);
+>>> 	[...]                                lock(srcuA);
+>>> 	[...]   sync(srcuB);
+>>>
+>>> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+>>> ---
+>>>    include/linux/lockdep.h  |  3 ++-
+>>>    kernel/locking/lockdep.c | 48 ++++++++++++++++++++++++++--------------
+>>>    2 files changed, 34 insertions(+), 17 deletions(-)
+>>>
+>>> diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
+>>> index ba09df6a0872..febd7ecc225c 100644
+>>> --- a/include/linux/lockdep.h
+>>> +++ b/include/linux/lockdep.h
+>>> @@ -134,7 +134,8 @@ struct held_lock {
+>>>    	unsigned int read:2;        /* see lock_acquire() comment */
+>>>    	unsigned int check:1;       /* see lock_acquire() comment */
+>>>    	unsigned int hardirqs_off:1;
+>>> -	unsigned int references:12;					/* 32 bits */
+>>> +	unsigned int sync:1;
+>>> +	unsigned int references:11;					/* 32 bits */
+>>>    	unsigned int pin_count;
+>>>    };
+>>> diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
+>>> index cffa026a765f..4031d87f6829 100644
+>>> --- a/kernel/locking/lockdep.c
+>>> +++ b/kernel/locking/lockdep.c
+>>> @@ -1880,6 +1880,8 @@ print_circular_lock_scenario(struct held_lock *src,
+>>>    	struct lock_class *source = hlock_class(src);
+>>>    	struct lock_class *target = hlock_class(tgt);
+>>>    	struct lock_class *parent = prt->class;
+>>> +	int src_read = src->read;
+>>> +	int tgt_read = tgt->read;
+>>>    	/*
+>>>    	 * A direct locking problem where unsafe_class lock is taken
+>>> @@ -1907,7 +1909,10 @@ print_circular_lock_scenario(struct held_lock *src,
+>>>    	printk(" Possible unsafe locking scenario:\n\n");
+>>>    	printk("       CPU0                    CPU1\n");
+>>>    	printk("       ----                    ----\n");
+>>> -	printk("  lock(");
+>>> +	if (tgt_read != 0)
+>>> +		printk("  rlock(");
+>>> +	else
+>>> +		printk("  lock(");
+>>>    	__print_lock_name(target);
+>>>    	printk(KERN_CONT ");\n");
+>>>    	printk("                               lock(");
+>>> @@ -1916,7 +1921,12 @@ print_circular_lock_scenario(struct held_lock *src,
+>>>    	printk("                               lock(");
+>>>    	__print_lock_name(target);
+>>>    	printk(KERN_CONT ");\n");
+>>> -	printk("  lock(");
+>>> +	if (src_read != 0)
+>>> +		printk("  rlock(");
+>>> +	else if (src->sync)
+>>> +		printk("  sync(");
+>>> +	else
+>>> +		printk("  lock(");
+>>>    	__print_lock_name(source);
+>>>    	printk(KERN_CONT ");\n");
+>>>    	printk("\n *** DEADLOCK ***\n\n");
+>> src can be sync() but not the target. Is there a reason why that is the
+>> case?
+>>
+> The functions annotated by sync() don't create real critical sections,
+> so no lock dependency can be created from a sync(), for example:
+>
+> 	synchronize_srcu(A);
+> 	mutex_lock(B);
+>
+> no dependency from A to B. In the scenario case, if we see a dependency
+> target -> source, the target cannot be a lock_sync(). I will add better
+> documentation later.
+Right, the dependency won't happen since you reduce lock_sync() to 
+mostly do validate_chain() without actually storing it in the lock chain 
+which I did miss in my initial review. Without that, a dependency may 
+happen if an NMI happens between lock_acquire() and lock_release() in 
+lock_sync().
+>>> @@ -4530,7 +4540,13 @@ mark_usage(struct task_struct *curr, struct held_lock *hlock, int check)
+>>>    					return 0;
+>>>    		}
+>>>    	}
+>>> -	if (!hlock->hardirqs_off) {
+>>> +
+>>> +	/*
+>>> +	 * For lock_sync(), don't mark the ENABLED usage, since lock_sync()
+>>> +	 * creates no critical section and no extra dependency can be introduced
+>>> +	 * by interrupts
+>>> +	 */
+>>> +	if (!hlock->hardirqs_off && !hlock->sync) {
+>>>    		if (hlock->read) {
+>>>    			if (!mark_lock(curr, hlock,
+>>>    					LOCK_ENABLED_HARDIRQ_READ))
+>>> @@ -4909,7 +4925,7 @@ static int __lock_is_held(const struct lockdep_map *lock, int read);
+>>>    static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+>>>    			  int trylock, int read, int check, int hardirqs_off,
+>>>    			  struct lockdep_map *nest_lock, unsigned long ip,
+>>> -			  int references, int pin_count)
+>>> +			  int references, int pin_count, int sync)
+>>>    {
+>>>    	struct task_struct *curr = current;
+>>>    	struct lock_class *class = NULL;
+>>> @@ -4960,7 +4976,8 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+>>>    	class_idx = class - lock_classes;
+>>> -	if (depth) { /* we're holding locks */
+>>> +	if (depth && !sync) {
+>>> +		/* we're holding locks and the new held lock is not a sync */
+>>>    		hlock = curr->held_locks + depth - 1;
+>>>    		if (hlock->class_idx == class_idx && nest_lock) {
+>>>    			if (!references)
+>>> @@ -4994,6 +5011,7 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+>>>    	hlock->trylock = trylock;
+>>>    	hlock->read = read;
+>>>    	hlock->check = check;
+>>> +	hlock->sync = !!sync;
+>>>    	hlock->hardirqs_off = !!hardirqs_off;
+>>>    	hlock->references = references;
+>>>    #ifdef CONFIG_LOCK_STAT
+>>> @@ -5055,6 +5073,10 @@ static int __lock_acquire(struct lockdep_map *lock, unsigned int subclass,
+>>>    	if (!validate_chain(curr, hlock, chain_head, chain_key))
+>>>    		return 0;
+>>> +	/* For lock_sync(), we are done here since no actual critical section */
+>>> +	if (hlock->sync)
+>>> +		return 1;
+>>> +
+>>>    	curr->curr_chain_key = chain_key;
+>>>    	curr->lockdep_depth++;
+>>>    	check_chain_key(curr);
+>> Even with sync, there is still a corresponding lock_acquire() and
+>> lock_release(), you can't exit here without increasing lockdep_depth. That
+>> can cause underflow.
+>>
+> I actually remove the __lock_release() in lock_sync() in this patch, so
+> I think it's OK. But I must admit the whole submission is to give David
+> something to see whether the output is an improvement, so I probably
+> should separate the output changes and the lock_sync() internall into
+> two patches (and the later can also be folded into the introduction
+> patch).
 
-Signed-off-by: Reiji Watanabe <reijiw@google.com>
----
- .../kvm/aarch64/vpmu_counter_access.c         | 103 +++++++++++++++++-
- .../selftests/kvm/include/aarch64/processor.h |   1 +
- 2 files changed, 98 insertions(+), 6 deletions(-)
+I saw that now. You may not need to separate it into 2 patches since 
+there is some dependency between the two. You do have to document the 2 
+different changes in your patch description.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-index 54b69c76c824..a7e34d63808b 100644
---- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-+++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-@@ -5,8 +5,8 @@
-  * Copyright (c) 2022 Google LLC.
-  *
-  * This test checks if the guest can see the same number of the PMU event
-- * counters (PMCR_EL1.N) that userspace sets, and if the guest can access
-- * those counters.
-+ * counters (PMCR_EL1.N) that userspace sets, if the guest can access
-+ * those counters, and if the guest cannot access any other counters.
-  * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
-  */
- #include <kvm_util.h>
-@@ -179,6 +179,51 @@ struct pmc_accessor pmc_accessors[] = {
- 	{ read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
- };
- 
-+#define INVALID_EC	(-1ul)
-+uint64_t expected_ec = INVALID_EC;
-+uint64_t op_end_addr;
-+
-+static void guest_sync_handler(struct ex_regs *regs)
-+{
-+	uint64_t esr, ec;
-+
-+	esr = read_sysreg(esr_el1);
-+	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-+	GUEST_ASSERT_4(op_end_addr && (expected_ec == ec),
-+		       regs->pc, esr, ec, expected_ec);
-+
-+	/* Will go back to op_end_addr after the handler exits */
-+	regs->pc = op_end_addr;
-+
-+	/*
-+	 * Clear op_end_addr, and setting expected_ec to INVALID_EC
-+	 * as a sign that an exception has occurred.
-+	 */
-+	op_end_addr = 0;
-+	expected_ec = INVALID_EC;
-+}
-+
-+/*
-+ * Run the given operation that should trigger an exception with the
-+ * given exception class. The exception handler (guest_sync_handler)
-+ * will reset op_end_addr to 0, and expected_ec to INVALID_EC, and
-+ * will come back to the instruction at the @done_label.
-+ * The @done_label must be a unique label in this test program.
-+ */
-+#define TEST_EXCEPTION(ec, ops, done_label)		\
-+{							\
-+	extern int done_label;				\
-+							\
-+	WRITE_ONCE(op_end_addr, (uint64_t)&done_label);	\
-+	GUEST_ASSERT(ec != INVALID_EC);			\
-+	WRITE_ONCE(expected_ec, ec);			\
-+	dsb(ish);					\
-+	ops;						\
-+	asm volatile(#done_label":");			\
-+	GUEST_ASSERT(!op_end_addr);			\
-+	GUEST_ASSERT(expected_ec == INVALID_EC);	\
-+}
-+
- static void pmu_disable_reset(void)
- {
- 	uint64_t pmcr = read_sysreg(pmcr_el0);
-@@ -352,16 +397,38 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
- 		       pmc_idx, acc, read_data, read_data_prev);
- }
- 
-+/*
-+ * Tests for reading/writing registers for the unimplemented event counter
-+ * specified by @pmc_idx (>= PMCR_EL1.N).
-+ */
-+static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
-+{
-+	/*
-+	 * Reading/writing the event count/type registers should cause
-+	 * an UNDEFINED exception.
-+	 */
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx), inv_rd_cntr);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0), inv_wr_cntr);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx), inv_rd_typer);
-+	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0), inv_wr_typer);
-+	/*
-+	 * The bit corresponding to the (unimplemented) counter in
-+	 * {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers should be RAZ.
-+	 */
-+	test_bitmap_pmu_regs(pmc_idx, 1);
-+	test_bitmap_pmu_regs(pmc_idx, 0);
-+}
-+
- /*
-  * The guest is configured with PMUv3 with @expected_pmcr_n number of
-  * event counters.
-  * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
-- * if reading/writing PMU registers for implemented counters can work
-- * as expected.
-+ * if reading/writing PMU registers for implemented or unimplemented
-+ * counters can work as expected.
-  */
- static void guest_code(uint64_t expected_pmcr_n)
- {
--	uint64_t pmcr, pmcr_n;
-+	uint64_t pmcr, pmcr_n, unimp_mask;
- 	int i, pmc;
- 
- 	GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS);
-@@ -372,6 +439,14 @@ static void guest_code(uint64_t expected_pmcr_n)
- 	/* Make sure that PMCR_EL0.N indicates the value userspace set */
- 	GUEST_ASSERT_2(pmcr_n == expected_pmcr_n, pmcr_n, expected_pmcr_n);
- 
-+	/*
-+	 * Make sure that (RAZ) bits corresponding to unimplemented event
-+	 * counters in {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers are reset to zero.
-+	 * (NOTE: bits for implemented event counters are reset to UNKNOWN)
-+	 */
-+	unimp_mask = GENMASK_ULL(ARMV8_PMU_MAX_GENERAL_COUNTERS - 1, pmcr_n);
-+	check_bitmap_pmu_regs(unimp_mask, false);
-+
- 	/*
- 	 * Tests for reading/writing PMU registers for implemented counters.
- 	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-@@ -381,6 +456,14 @@ static void guest_code(uint64_t expected_pmcr_n)
- 			test_access_pmc_regs(&pmc_accessors[i], pmc);
- 	}
- 
-+	/*
-+	 * Tests for reading/writing PMU registers for unimplemented counters.
-+	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-+	 */
-+	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-+		for (pmc = pmcr_n; pmc < ARMV8_PMU_MAX_GENERAL_COUNTERS; pmc++)
-+			test_access_invalid_pmc_regs(&pmc_accessors[i], pmc);
-+	}
- 	GUEST_DONE();
- }
- 
-@@ -394,7 +477,7 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
- 	struct kvm_vm *vm;
- 	struct kvm_vcpu *vcpu;
- 	struct kvm_vcpu_init init;
--	uint8_t pmuver;
-+	uint8_t pmuver, ec;
- 	uint64_t dfr0, irq = 23;
- 	struct kvm_device_attr irq_attr = {
- 		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-@@ -407,11 +490,18 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
- 	};
- 
- 	vm = vm_create(1);
-+	vm_init_descriptor_tables(vm);
-+	/* Catch exceptions for easier debugging */
-+	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-+		vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
-+					guest_sync_handler);
-+	}
- 
- 	/* Create vCPU with PMUv3 */
- 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
- 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
- 	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-+	vcpu_init_descriptor_tables(vcpu);
- 	*gic_fd = vgic_v3_setup(vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
- 
- 	/* Make sure that PMUv3 support is indicated in the ID register */
-@@ -480,6 +570,7 @@ static void run_test(uint64_t pmcr_n)
- 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
- 	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
- 	aarch64_vcpu_setup(vcpu, &init);
-+	vcpu_init_descriptor_tables(vcpu);
- 	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
- 	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
- 
-diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-index 5f977528e09c..52d87809356c 100644
---- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-+++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-@@ -104,6 +104,7 @@ enum {
- #define ESR_EC_SHIFT		26
- #define ESR_EC_MASK		(ESR_EC_NUM - 1)
- 
-+#define ESR_EC_UNKNOWN		0x0
- #define ESR_EC_SVC64		0x15
- #define ESR_EC_IABT		0x21
- #define ESR_EC_DABT		0x25
--- 
-2.39.0.314.g84b9a713c41-goog
+Cheers,
+Longman
 
