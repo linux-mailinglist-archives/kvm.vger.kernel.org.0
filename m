@@ -2,82 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B808566D6D1
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 08:23:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 349FE66D6DD
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 08:26:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235588AbjAQHXd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 02:23:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60182 "EHLO
+        id S235699AbjAQH0L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 02:26:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234165AbjAQHXb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 02:23:31 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C715322A38
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 23:22:45 -0800 (PST)
+        with ESMTP id S235525AbjAQH0F (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 02:26:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 666FC22A38
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 23:25:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1673940165;
+        s=mimecast20190719; t=1673940323;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=pzn7dTDGTrlOkRWCaQu/SbyexaizuE+jqg3HyX8FiWc=;
-        b=MkJ6N/GrsKeP2aexao1maMerd91XGf79WLoUHwi0jckGfZmTPVRNJzcK//wxMC3Y/RfBYg
-        FDY9+f8KFMCcLdmSqYctZqDjEV/blasI9DJpfuHUvXyCJKWjg7m1+qBjEQWGP7rM7ONf1O
-        6zVw+GFdY01ADmmMnk+RnjyXy3s2jb8=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=O4zBoqJqPzwMibjvR7F5l/g+QNwG5fVvLTJIc31O8EI=;
+        b=VNz6yDjLMEwIhpEK+Y927xTAbusrAviFxcZPnPWCgMdtWHvwS8XauphKoSnSGPSHdfp3KQ
+        WEwDmdXgcmTKntJ7f363DHn4yfi9lNfomdgEcS0TRnHnUV0ftCm9HCXngwdu40LWTiMgIG
+        6/dzHxqii0WD+JxxHLvn538u68GKsUQ=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-586-Tvzs4BW-O4SFmmTrVw-LXg-1; Tue, 17 Jan 2023 02:22:43 -0500
-X-MC-Unique: Tvzs4BW-O4SFmmTrVw-LXg-1
-Received: by mail-qv1-f72.google.com with SMTP id k15-20020a0cd68f000000b00535261af1b1so960246qvi.13
-        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 23:22:43 -0800 (PST)
+ us-mta-137-65glM6RNNXWwTxnWCHyErg-1; Tue, 17 Jan 2023 02:25:22 -0500
+X-MC-Unique: 65glM6RNNXWwTxnWCHyErg-1
+Received: by mail-qv1-f70.google.com with SMTP id jh2-20020a0562141fc200b004c74bbb0affso15762722qvb.21
+        for <kvm@vger.kernel.org>; Mon, 16 Jan 2023 23:25:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pzn7dTDGTrlOkRWCaQu/SbyexaizuE+jqg3HyX8FiWc=;
-        b=Ycsi8QJFLM3GWds37z59NmoeVYywS08h4x5da2y5vXjwk0a2MYONMfpDo3LngNE6x5
-         MGVVJ2VECXWUJK0aiWqae8YGlmrVLNBdeWRUS9PAmovhapUo2OiX/FkzqfGAlN1Rfhjy
-         xs+tTiPgCKQp16rqSThLqLqluiQx25kShe6KPhE6+FUnUPEPGVqq2HiJjHpQKk065Xxu
-         YDcYD4PUiICzwXaPTmZWFBpmwyoEBfHpOSsFkC2/CQW+0TgKPe9fOrm9ZK0OGx2LNZXp
-         /Di8FwzYwaj56a5uvsPD4w23vtAJt9IuvCf6N7tqbvA/O1tAWrKjZNXEWn+s6ZXCSRYn
-         gJ2w==
-X-Gm-Message-State: AFqh2koTxfVGG/YZVgLyIOp5wsQOTQ8MESvcuaXMxkUyaTMRGSA8QBDq
-        I6g8Hl/x8ja78EXywqss5lcBY2/vRPSUjaNWfNTz7ZQLY3GtqrxK6ctr6f8XlCG8SlPDaRC5K7M
-        AjKYXoT22hDqp
-X-Received: by 2002:a05:6214:3019:b0:532:33e4:2d70 with SMTP id ke25-20020a056214301900b0053233e42d70mr4922914qvb.12.1673940163475;
-        Mon, 16 Jan 2023 23:22:43 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtnf8FrLDzX0dpt0O9w5aA9IBszjZhcPKD6+z07UWfqY2tgs2Lbj6uGeEQY508aZ5l1FOMZAA==
-X-Received: by 2002:a05:6214:3019:b0:532:33e4:2d70 with SMTP id ke25-20020a056214301900b0053233e42d70mr4922890qvb.12.1673940163244;
-        Mon, 16 Jan 2023 23:22:43 -0800 (PST)
+        bh=O4zBoqJqPzwMibjvR7F5l/g+QNwG5fVvLTJIc31O8EI=;
+        b=I3x7qFMII8c3d5hQUp4u9ncURpowNtutgm/6IRVsna7ylGI0WRWqaUpJODmr/D+qp1
+         N7uFRufZjfQcYRhUEeNJYZmfV1lIQ9xtUunrMOEoKcPFHhe4UrxnBZdBM1qBIBGbjfA5
+         T0EkQPDd27CvT79udbIwG4ILam3BRaSeB4GN+UdCEBPKAsQ6rW6BS4G6f6a4lw2zfzB6
+         Xd5S7U+wWRYPqcQFpQfqWSkDOjCNtWlPYZ7JoeRRF9hjnsn5E5n/da4UP3TxjR6Ey8X3
+         /2KPHq9GF97WZfz/0VQENqjmtP533E1jZK5ZTUhu3CtpsdQsTuWdovIRF1WnWVuSIPwk
+         yScQ==
+X-Gm-Message-State: AFqh2kqO68TtbVHrxw1SCqSrBwr3P3wuMHj/BjlbW3a5uWtANQdxGGGB
+        YPkHmhJH137S7R6ttqzATKmHMA9xRZ7QOhthDzAoxV+gLJWmk32YA1fv36vCbGrv5egE1fANAUn
+        tsgZVj3VcnOGJ
+X-Received: by 2002:ac8:5157:0:b0:3ab:28ea:d849 with SMTP id h23-20020ac85157000000b003ab28ead849mr2569594qtn.10.1673940321768;
+        Mon, 16 Jan 2023 23:25:21 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtaUo0fA+8zIftJnzJVB3TphzXIUKPSfzpt6Qm4mryPHeKyHHoyFrRHliHqQs+ezrX7a2pUPg==
+X-Received: by 2002:ac8:5157:0:b0:3ab:28ea:d849 with SMTP id h23-20020ac85157000000b003ab28ead849mr2569579qtn.10.1673940321537;
+        Mon, 16 Jan 2023 23:25:21 -0800 (PST)
 Received: from [192.168.0.2] (ip-109-43-177-26.web.vodafone.de. [109.43.177.26])
-        by smtp.gmail.com with ESMTPSA id v1-20020a05620a0f0100b006faf76e7c9asm19976616qkl.115.2023.01.16.23.22.39
+        by smtp.gmail.com with ESMTPSA id h18-20020a05620a401200b007064fa2c616sm5241268qko.66.2023.01.16.23.25.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 Jan 2023 23:22:42 -0800 (PST)
-Message-ID: <870effa2-4e98-2b1a-fd24-35247b04394b@redhat.com>
-Date:   Tue, 17 Jan 2023 08:22:37 +0100
+        Mon, 16 Jan 2023 23:25:21 -0800 (PST)
+Message-ID: <d997124c-5ef5-6a1a-51a8-3000bb8526e3@redhat.com>
+Date:   Tue, 17 Jan 2023 08:25:16 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
 Subject: Re: [PATCH v14 01/11] s390x/cpu topology: adding s390 specificities
  to CPU topology
 Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        borntraeger@de.ibm.com
+Cc:     qemu-devel@nongnu.org, pasic@linux.ibm.com,
         richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
         mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
         ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
         armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+        scgl@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
+        clg@kaod.org
 References: <20230105145313.168489-1-pmorel@linux.ibm.com>
  <20230105145313.168489-2-pmorel@linux.ibm.com>
- <87039aeec020afbd28be77ad5f8d022126aba7bf.camel@linux.ibm.com>
- <31bc88bc-d0c2-f172-939a-c7a42adb466d@linux.ibm.com>
+ <49d343fb-f41d-455a-8630-3db2650cfcd5@redhat.com>
+ <619b3ebd-094a-cd8b-697c-de08ba788978@linux.ibm.com>
 From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <31bc88bc-d0c2-f172-939a-c7a42adb466d@linux.ibm.com>
+In-Reply-To: <619b3ebd-094a-cd8b-697c-de08ba788978@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -90,32 +90,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 16/01/2023 18.28, Pierre Morel wrote:
+On 16/01/2023 17.32, Pierre Morel wrote:
 > 
-> 
-> On 1/13/23 17:58, Nina Schoetterl-Glausch wrote:
->> On Thu, 2023-01-05 at 15:53 +0100, Pierre Morel wrote:
->>> S390 adds two new SMP levels, drawers and books to the CPU
->>> topology.
->>> The S390 CPU have specific toplogy features like dedication
->>> and polarity to give to the guest indications on the host
->>> vCPUs scheduling and help the guest take the best decisions
->>> on the scheduling of threads on the vCPUs.
->>>
->>> Let us provide the SMP properties with books and drawers levels
->>> and S390 CPU with dedication and polarity,
->>>
->>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->>> ---
+> On 1/10/23 12:37, Thomas Huth wrote:
 ...
-> PTF([01]) are no performance bottle neck and the number of CPU is likely to 
-> be small, even a maximum of 248 is possible KVM warns above 16 CPU so the 
-> loop for setting all CPU inside PTF interception is not very problematic I 
-> think.
+>> Other question: Do we have "node-id"s on s390x? If not, is that similar to 
+>> books or drawers, i.e. just another word? If so, we should maybe rather 
+>> re-use "nodes" instead of introducing a new name for the same thing?
+> 
+> We have theoretically nodes-id on s390x, it is the level 5 of the topology, 
+> above drawers.
+> Currently it is not used in s390x topology, the maximum level returned to a 
+> LPAR host is 4.
+> I suppose that it adds a possibility to link several s390x with a fast network.
 
-KVM warns if you try to use more than the number of physical CPUs that you 
-have, not at hard-coded 16 CPUs. So if you've got an LPAR with 248 CPUs, 
-it's perfectly fine to use also 248 CPUs for your guest.
+Ok, thanks. So if nodes are indeed a concept on top of the other layers, and 
+we do not really support these on s390x yet, should we maybe forbid them on 
+s390x like we recently did with the "threads" in the recent machine types? 
+... to avoid that users try to use them with the wrong expectations?
 
   Thomas
+
 
