@@ -2,76 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3D16666E292
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 16:45:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FB3F66E2DD
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 16:56:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234012AbjAQPpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 10:45:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44174 "EHLO
+        id S230465AbjAQP4C (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 10:56:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232306AbjAQPo2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 10:44:28 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A4EF4996D
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 07:42:09 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id k13so1343136plg.0
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 07:42:09 -0800 (PST)
+        with ESMTP id S230039AbjAQPz7 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 10:55:59 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 588EE4C38
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 07:55:58 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id o13so29315564pjg.2
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 07:55:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=raIP5zSqF/STW+kTCBVQJ+PuTh0fIF3QkrpzqbxnVwM=;
-        b=Fboqqh9dagbWo2L8wq1Lo26iSaSU57WhxjC/fOz7ecCUNGGEDVLeXoK5K/pHZwcsFV
-         N9jlLxyCR6qNXQQ4U7mpMErHB3ZrEWyqQtK2JQndhA0MmCFiGJ+4PPhTRD0Wix0EL65j
-         MsYHUDHxtRNkvOQ0WUDga80seOuHKWPkpKj+FGWEAdrMpGI0dVnRWM5khsCPm4X7lwaH
-         x+1LaU365neNHCMM/NnCQEGLIUB0p9uhI/3oVwVMGYmas44XJFXRd2YVZkXp0yoqHUtJ
-         ciWpysAmyUCCthwpSIl7KFTDHsYIFtORoQMrRwss/5rncAUrPaGaZx9iAg7bu43XjA0x
-         fYcQ==
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UbgquiiX7N3OGbZUAey4uX+ltor2RNYMswldRrMABEY=;
+        b=jzu8BDcQXQEi5N0lmqcvWWqwPv/CoaFJwZGGPGN0yqOhoHz6ZuEuiNbiH8cBYNstFF
+         g2KXjCnA8E4OkMAwYq5gNWmrvelJL8U6H6xP3Mn/J3OhpgZMWpYT/CDiuIt8oLPkLqxZ
+         wqh6tjGMwu/awfI4GSyHfwCDwirBHRgui1tqoiPDxDkcvRZZD7B0al8/Qvr4N8PQJYBE
+         B9CuQlEK/8/YDtRW74IpaW/liZ2SVJtFWBNkUfsU0KecZbJJq6dNZ3w2HbCvN9XD4qoI
+         U41K2PsLl2VUf3SG1YluVNWxt4/Z0aUmt9al1sstjAQ3n2TW9sCPtdF0+dGsDIe06ljb
+         Dq2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=raIP5zSqF/STW+kTCBVQJ+PuTh0fIF3QkrpzqbxnVwM=;
-        b=7hG69Fh2vvEGG3IUq/xo8YM+ZbWNWASC9ZyZe7rj1a8gH7ukEND45amxHWrv6dj1ao
-         Lf4/1Zy77hhDwySENGO1xTVQzXD6neXCD5ZXVw331Q0w5SHIAu+OqXD+e5DGbf9ekCp/
-         4L00qStkSGabX0uhUIlz1LADYfegRNlR0pLJ1/LlJQ+rGEfB8RZEEVD9r2OYdAYRgPdm
-         cWE+ubmzZjws+fNE8Z4jOKYgJTqL6meElkseb+2F6Wa82lWYmHv32QcXP7AvOCaW6yMw
-         bIMa6ZFu/WsDvqHo8Xlqhwu+JsTsOQoNgw+RUUndyH9fL2il4Q5XfAFqm3gYpzIHiS1g
-         CyJg==
-X-Gm-Message-State: AFqh2kpFO309XC0ze2yg62dZmoy36hIbqF/IRhcshTBH9spo2Zi39aly
-        C0BjCqqYcoRJUgU+LlgdBEWdmkB+xCddYUwb
-X-Google-Smtp-Source: AMrXdXtc4FtedAeo9e0ZaQ0CoHayTm55NeSTXxytLBxVQsTrdtckjUUE0ev7gjaj6X6vcVC1fBOKfQ==
-X-Received: by 2002:a05:6a20:a883:b0:a4:efde:2ed8 with SMTP id ca3-20020a056a20a88300b000a4efde2ed8mr2357042pzb.0.1673970128358;
-        Tue, 17 Jan 2023 07:42:08 -0800 (PST)
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UbgquiiX7N3OGbZUAey4uX+ltor2RNYMswldRrMABEY=;
+        b=zr33zr+CKRzeZzfohR+MQve8J+BjxqzB65touFCggWCs/JF230kjvXCDANoACAyCcL
+         UIjdKIWAlNMcewzBWrqRA07Lq0ymrWNKLp7HSQkPsIxjKTKC/tjQ9rrj79Hye0XXgv6V
+         150hQZWCzpsg/GmmLUxfzoiVfrNCfyp/pVdmRPmhop+uA0AkGyCCmogOXjkUXpJ9vKXh
+         6n4xklxY+US2S4Jidf2wEb8OJ1vGqpGf7s/Efpq0A63Wlom6ZZR11DPBta8a1eZlgs0h
+         vFzZVaDsgRg6RtI1dk06Rgwro9L4+yWadWc/wwYtJJOTHyo5zyB4XAiv54XT9W7j+Aw2
+         kTFg==
+X-Gm-Message-State: AFqh2krTfcaZ7PJqG7JmhpHK2iewWFa9twjjLl4Kanx0iOti1fOSMMrJ
+        Y2jW4J3lJMn5yoP3oAcdk9rBMw==
+X-Google-Smtp-Source: AMrXdXtU4h4WpUPuHSkzluQ4H80BcZY2RsZAvMKNoxPZndfx5WIGX6pMpN7KnbrmaNRFaVh80/bHYA==
+X-Received: by 2002:a05:6a20:7d8d:b0:b8:c859:7fc4 with SMTP id v13-20020a056a207d8d00b000b8c8597fc4mr268884pzj.1.1673970957653;
+        Tue, 17 Jan 2023 07:55:57 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id p10-20020a17090a348a00b00218d894fac3sm20692438pjb.3.2023.01.17.07.42.07
+        by smtp.gmail.com with ESMTPSA id 127-20020a630985000000b004ba55bd69ddsm8969026pgj.57.2023.01.17.07.55.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 07:42:07 -0800 (PST)
-Date:   Tue, 17 Jan 2023 15:42:04 +0000
+        Tue, 17 Jan 2023 07:55:57 -0800 (PST)
+Date:   Tue, 17 Jan 2023 15:55:53 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, corbet@lwn.net,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        oliver.upton@linux.dev, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
-        eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
-        ardb@kernel.org, peterx@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH 4/4] KVM: Improve warning report in
- mark_page_dirty_in_slot()
-Message-ID: <Y8bBzKF17IdZP9eF@google.com>
-References: <20230116040405.260935-1-gshan@redhat.com>
- <20230116040405.260935-5-gshan@redhat.com>
+To:     Zhi Wang <zhi.wang.linux@gmail.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: Re: [PATCH v11 018/113] KVM: TDX: create/destroy VM structure
+Message-ID: <Y8bFCb+rs25dKcMY@google.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+ <68fa413e61d7471657174bc7c83bde5c842e251f.1673539699.git.isaku.yamahata@intel.com>
+ <20230113151258.00006a6d@gmail.com>
+ <Y8F1uPsW56fVdhmC@google.com>
+ <20230114111621.00001840@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20230116040405.260935-5-gshan@redhat.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230114111621.00001840@gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,19 +82,80 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 16, 2023, Gavin Shan wrote:
-> There are two warning reports about the dirty ring in the function.
-> We have the wrong assumption that the dirty ring is always enabled when
-> CONFIG_HAVE_KVM_DIRTY_RING is selected.
+On Sat, Jan 14, 2023, Zhi Wang wrote:
+> On Fri, 13 Jan 2023 15:16:08 +0000 > Sean Christopherson <seanjc@google.com> wrote:
+> 
+> > On Fri, Jan 13, 2023, Zhi Wang wrote:
+> > > Better add a FIXME: here as this has to be fixed later.
+> > 
+> > No, leaking the page is all KVM can reasonably do here.  An improved
+> > comment would be helpful, but no code change is required.
+> > tdx_reclaim_page() returns an error if and only if there's an
+> > unexpected, fatal error, e.g. a SEAMCALL with bad params, incorrect
+> > concurrency in KVM, a TDX Module bug, etc.  Retrying at a later point is
+> > highly unlikely to be successful.
+> 
+> Hi:
+> 
+> The word "leaking" sounds like a situation left unhandled temporarily.
+> 
+> I checked the source code of the TDX module[1] for the possible reason to
+> fail when reviewing this patch:
+> 
+> tdx-module-v1.0.01.01.zip\src\vmm_dispatcher\api_calls\tdh_phymem_page_reclaim.c
+> tdx-module-v1.0.01.01.zip\src\vmm_dispatcher\api_calls\tdh_phymem_page_wbinvd.c
+> 
+> a. Invalid parameters. For example, page is not aligned, PA HKID is not zero...
+> 
+> For invalid parameters, a WARN_ON_ONCE() + return value is good enough as
+> that is how kernel handles similar situations. The caller takes the
+> responsibility.
+>  
+> b. Locks has been taken in TDX module. TDR page has been locked due to another
+> SEAMCALL, another SEAMCALL is doing PAMT walk and holding PAMT lock... 
+> 
+> This needs to be improved later either by retry or taking tdx_lock to avoid
+> TDX module fails on this.
 
-No, it's not a wrong assumption, becuase it's not an assumption.  The intent is
-to warn irrespective of dirty ring/log enabling.  The orignal code actually warned
-irrespective of dirty ring support[1], again intentionally.  The
-CONFIG_HAVE_KVM_DIRTY_RING check was added because s390 can mark pages dirty from
-an worker thread[2] and s390 has no plans to support the dirty ring.
+No, tdx_reclaim_page() already retries TDH.PHYMEM.PAGE.RECLAIM if the target page
+is contended (though I'd question the validity of even that), and TDH.PHYMEM.PAGE.WBINVD
+is performed only when reclaiming the TDR.  If there's contention when reclaiming
+the TDR, then KVM effectively has a use-after-free bug, i.e. leaking the page is
+the least of our worries.
 
-The reason for warning even if dirty ring isn't enabled is so that bots can catch
-potential KVM bugs without having to set up a dirty ring or enable dirty logging.
 
-[1] 2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU")
-[2] e09fccb5435d ("KVM: avoid warning on s390 in mark_page_dirty")
+On Thu, Jan 12, 2023 at 8:34 AM <isaku.yamahata@intel.com> wrote:
+> +static int tdx_reclaim_page(hpa_t pa, bool do_wb, u16 hkid)
+> +{
+> +       struct tdx_module_output out;
+> +       u64 err;
+> +
+> +       do {
+> +               err = tdh_phymem_page_reclaim(pa, &out);
+> +               /*
+> +                * TDH.PHYMEM.PAGE.RECLAIM is allowed only when TD is shutdown.
+> +                * state.  i.e. destructing TD.
+> +                * TDH.PHYMEM.PAGE.RECLAIM  requires TDR and target page.
+> +                * Because we're destructing TD, it's rare to contend with TDR.
+> +                */
+> +       } while (err == (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RCX));
+> +       if (WARN_ON_ONCE(err)) {
+> +               pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err, &out);
+> +               return -EIO;
+> +       }
+> +
+> +       if (do_wb) {
+> +               /*
+> +                * Only TDR page gets into this path.  No contention is expected
+> +                * because of the last page of TD.
+> +                */
+> +               err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(pa, hkid));
+> +               if (WARN_ON_ONCE(err)) {
+> +                       pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err, NULL);
+> +                       return -EIO;
+> +               }
+> +       }
+> +
+> +       tdx_clear_page(pa);
+> +       return 0;
+> +}
