@@ -2,161 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DC17666DF79
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 14:53:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88C5766DFB5
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 14:57:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231174AbjAQNx1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 08:53:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47016 "EHLO
+        id S231314AbjAQN52 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 08:57:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230219AbjAQNxF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 08:53:05 -0500
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86FB83C2A6
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 05:52:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673963534; x=1705499534;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=yw/vVmB+uKwicZSSe7+nfFW2O/zJWBbF9teZnNFRaCI=;
-  b=O9fs7Dp/jr2b6tvqyj1jYu1OWwPs/mQJnXVcqi+gEhS79hCyYS9liKS8
-   Q3W8PyQZTn5rQa4qqBYC0QJon0PPv47PDjnoIceX969sDfZpDeSQeoW6/
-   XCTk0cHbDG4AZXXeAGWNl4/Q+qpzogokMXH9ylFAr0xiZj4VQW2cTkBkb
-   DJUiBuRWsEGvDfbcdpc9Jh/H2oAj9r6A96NdXnvX1CdIEUjyZwVGM0UKM
-   E9vY3XpWPSCqBmkitqf/JPkHetyqkUbMkw+zELiX3bwTo2lH956F1zmNM
-   p8iXHHTmUTumZaY7W9jUT5zfpwRquzW9i39LsFEhbTwo6LoYl1l8BMsuc
-   A==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="351943699"
-X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
-   d="scan'208";a="351943699"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jan 2023 05:52:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="609245847"
-X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
-   d="scan'208";a="609245847"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga003.jf.intel.com with ESMTP; 17 Jan 2023 05:52:06 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 17 Jan 2023 05:52:05 -0800
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Tue, 17 Jan 2023 05:52:05 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Tue, 17 Jan 2023 05:52:05 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Tue, 17 Jan 2023 05:52:04 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cRw7hJ0Z4Et7P9VqW+HD6WSeG+X9aGzFAySRqcXZHAngbZaNl6ruyhpfs1PqomVyHU37kW36NpmOJepKpixhk+vGFE9q8oThKgLOUiX9Y/R3jxHO6l7aq1R7wAi8WbsJowyvuPuWpJMzjdG6au9/onxciUB+m1qQV1JpI1KOuXTcckixEWqFQ9pNAXcN0kssIoUk56SkFeo5s3JwbRzwJhg9s4Fovh/9/Q/o65tVY3vzE8UFs2ovZJ2WLuQmP5/msPxwWzrrU8eNu35q7+LGCx8IYDebl5N01+DTwRS2vUgHJ70lt3/u+SQRywZr/uQvsH2JWvc/vp2IdPk42PyUWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yw/vVmB+uKwicZSSe7+nfFW2O/zJWBbF9teZnNFRaCI=;
- b=cLRaX2TYNuQy2jBaHCeemP1GLHEDTr35ZmriWc52CkxRqHaQs2WIwjb5dRhcUszO6h/1DcBkxejD4pnSYWaaDhImf47/J/CDYPA7mLn5w32tdXe6RszXJegzIFo5vius1RFJhkgg5i7ZmQ0N4+mxfFc+vgM9Q44zAvVy8Rcg7x0OmjIhTtGqi2q4LsoTf9h+eMn+isdD66VrpdPorvp0cbf8nofsla418RtsMsECB9Blo0MVpSaNeVY2PWmfM2CMSNCtDcgHkQU0j49m9c3vXvjtKmgkAArLWTntCmUAK6nxijkyvCJk4q4JqbZPiouyQKcf+cCOpC/3nGTj9IZODw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by PH7PR11MB7099.namprd11.prod.outlook.com (2603:10b6:510:20e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Tue, 17 Jan
- 2023 13:51:57 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e1fa:abbe:2009:b0a3]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::e1fa:abbe:2009:b0a3%3]) with mapi id 15.20.5986.023; Tue, 17 Jan 2023
- 13:51:57 +0000
-From:   "Liu, Yi L" <yi.l.liu@intel.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-CC:     Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: RE: [PATCH v2] vfio: Support VFIO_NOIOMMU with iommufd
-Thread-Topic: [PATCH v2] vfio: Support VFIO_NOIOMMU with iommufd
-Thread-Index: AQHZJS8kfO7o6BZcqkmxMznEHHL4Oa6iGfLAgACMWgCAAASz0A==
-Date:   Tue, 17 Jan 2023 13:51:56 +0000
-Message-ID: <DS0PR11MB75290F8DB8B7ED2414CD1B02C3C69@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <0-v2-568c93fef076+5a-iommufd_noiommu_jgg@nvidia.com>
- <DS0PR11MB75292238656F19908C0D0A4BC3C69@DS0PR11MB7529.namprd11.prod.outlook.com>
- <Y8ajvgYMgM+dKUWJ@nvidia.com>
-In-Reply-To: <Y8ajvgYMgM+dKUWJ@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|PH7PR11MB7099:EE_
-x-ms-office365-filtering-correlation-id: 6895a99d-d47b-44db-0664-08daf891ff81
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: p9k1qLXmO06zwCtFcDmMI2nRsNljT80BUk5ePVjYDcfCD3ZdT47ylBUFDh5ZelDMncHplwNN5oVxzJAxgE7M4WJbzWeSJXqsLbxqgHhZ7/mjxSGsi7NY+v6uMDlWF2YIMGtLSwItEp2kniMoTgN8K+SxLpMAEjsSsOjjS+co8/aPJcC48DXCAUYGmfUcZoiQN9yIG/TsduI66zi2mwz24Gh+r5ddD//VKmTaQkQTUE5fmYWXeqMJf6jZKzcL9zMFqQVeX7B1FtbspXwqEJdH0VwuRTjIHI+5Ad5JLS7olg4GmVZzEOqUO4xujkN4CXDwbkMizhL8Kj+Emb6nq8vHlTWm42y3H0eK/omVEOCiNpPIGzNwd5hdX16Vi2TIwZ4lTF4MV6ThKPJblc4cbuKxxa+Nrj+b9eMscxSWVowkFauPD4bRgTpTo48qj8TSENaQs/zc6eLxaexWaq/wJZZnV1caX2lyjcLy6BdnC0+ws5EY/NB/t84wthJKwajqiXOYN8ESIBjQAR4HOoIx8ryUUaGGmuoukEn9Y3+dK87uLbnU5DG5P6rJWIJj89uPH+EXb9sdchb2qriV+Cf+v62NfaGHLbyurUZipkJh1/0/BnUcDK5FkStgjYxvWg8Ep8XLnyvQgeX2Jyizz90F4Xq1BuiL68zQCtbKr+NujCM1r4WGNF7eRgDBBVqqO8ao78oLmH3BoMkGISzFrckVgnJCCQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(376002)(396003)(366004)(136003)(346002)(451199015)(33656002)(66476007)(66446008)(66946007)(66556008)(41300700001)(9686003)(8676002)(26005)(186003)(6916009)(64756008)(4326008)(86362001)(76116006)(5660300002)(83380400001)(82960400001)(52536014)(8936002)(54906003)(478600001)(71200400001)(7696005)(38100700002)(38070700005)(316002)(55016003)(6506007)(2906002)(4744005)(122000001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?dUFPTjJXUjNzdFpXVExIRXlLZ1hnanVZMkNuRmpMM3RiNkt6Zkg3QUFYdjB0?=
- =?utf-8?B?RFBrTWkvWkdZY01lUjRaenNzYnJUNGdOUmRVNkNraHh3RllPeG13Tm1neTJF?=
- =?utf-8?B?dlY4QnR1VEhPbVoxWUFoTzA5SlNjMnJBOCtSbytCLy9QN1p2UWpwM3JsMWUy?=
- =?utf-8?B?V0xhRmxhQTlaYyswa0t3V2t4NGoyYjYycEVVUkNtQWpkbitDc3RnM0lRb0pJ?=
- =?utf-8?B?RWpzNHpUT0xkbXZGTURkWmRzZWhqMUdwVGtIZjMwVGo2cncrWTdMV1hScVhw?=
- =?utf-8?B?MXdCVXlKSnV0Z2pnU1pHUEk5bU9wVjcrbkR5bjc1TUdUSUxOTmhIR3NtOG5r?=
- =?utf-8?B?dTdOQjB0a0ZDVEpvZ2Y3eEJpT0tielh6RFovejN2NGZEemx0Tm1XbkRybmJ4?=
- =?utf-8?B?UWM3ZUYyVU1kb2xPY3BrVkd5bjhsOEpPR0RUWnBLZm1WUUI0cy83RDVGVUlS?=
- =?utf-8?B?UzBCZFJmaFFkckRYVWhMS2hHMGZETzZuV1orT2dYZDJ4c2dxc3hPR29ZZHli?=
- =?utf-8?B?Z3FHd0ZmdVFjaTIzVUVvRmZLV1UzVUJkTnpzWXZTdEZUU2ZKd2pxZ0s0TEFL?=
- =?utf-8?B?K3oraDRKWjIxbktJNmUzWVNoY1B0SWd2UElDZmc5YjNYK3BqckZGelNkdk5l?=
- =?utf-8?B?V3BsMDhYQXVObkZqY0tyNUpUY3MvUng4YVFXNG5ad2U1WCtJZ3VwbUNBT2F6?=
- =?utf-8?B?WWlRc3FUSUlrcWZuRXAvVjVOTlNYcXU0dTI2NENZVHNiNW1udGloTVdwSHJU?=
- =?utf-8?B?ZEJNbWNJMm1VRnJmWktDN1JtTGhNa0kydzN2T3MwRWprdkZNUlRqKzF3RGxo?=
- =?utf-8?B?NGxudWJDUXdnd2NHV3dCSUw1ZUpITnl0K0Nld3VvZUZjL3JSQWFYeUxJN2RZ?=
- =?utf-8?B?VzlrRlFoSFlPenZ4dFdNODZQcmx5bFlrRzM2aHdzdTdaNlF4SCtwdGVDazlZ?=
- =?utf-8?B?b2ZsRVM0RDJ0Y1dCNnpaZDFpQUJmM0dyVi96UEJ4WkVJck1mM1Q4azNza3Jv?=
- =?utf-8?B?WVRmQS91YzBRNUhONFZ1WXZUMWM2NEh2RUd2cTg3c2NWUlo3WTFFMFArVWlj?=
- =?utf-8?B?UTZQa0VJQWFmNHI3M0dPMmFRRHdvMEZvcnNqNnZBSXFCQS9ZSVBCNG9CeE5y?=
- =?utf-8?B?ZTFucEdwQ1dkNk5EY0VlKzR4cDBDcDNrNEc4QXlONFhObTNRMWNTZGpld0l5?=
- =?utf-8?B?UEhrK3MzVER5TkFvK2krTWx1WXZIb2RCMXMxdDdpL1BVOTZyakxnMWtnc1RS?=
- =?utf-8?B?ZlNJUDQwVW54QnQ3Nk9vTm1SQk9zalk5S1NYMmZOcGJ6YlVCYnN3Z3I5OFpD?=
- =?utf-8?B?ek5Uald5ZW9XN1l5R1BlRlNBVjVxdy95OFdEZWpTTmxheUxtY1pzU1ZKRW1s?=
- =?utf-8?B?c29aNjlXbEE1Qis4K3QwRVZ4KzlsOGQraW9jMkhhZ3JXb2p1ZVhpK3lEQmx2?=
- =?utf-8?B?YXNUN0hNZXNwNDcxZE9KT3VlZDdWU2tqcHhCN0JGdmttekNtVjB2ZmMzS3Fm?=
- =?utf-8?B?RTMxT2tCSXRqR29uVmd6Q3RmUzRoeTBnNFlNZHRPV0hndVRrQ3NTdlBrcmVn?=
- =?utf-8?B?UlhPNUdTZDRmWEhKOTZKL2lSVHpNdkczOGRQdFRUK0lEeXJWL054VmE2WEFU?=
- =?utf-8?B?LzlhdFYzN0R0bFZ4RW1SRzVQRHFSeWk3VUtGanVydlJmMXN2SDJvenJoaDVS?=
- =?utf-8?B?ZUZqc0F1amdPUEtJOC81TzJYTC9MTnFSdUFuUHdtN2daaWtQRnRpN0RqbHAx?=
- =?utf-8?B?MHZGbjc4SzdkRGNobFVZSnZHN21Ob25OaTAxekM4VUFqZVdhRHZZWGIwYzNJ?=
- =?utf-8?B?MzY0RkJaeDEwUEZ4cWthZENvdHFtK3VrZzRCUXQ2WXgyam50QUhBM1FNbUNY?=
- =?utf-8?B?WGt5UmJGaXRFVS93bENzRGVxdVFSTTAxVll6RUlPcnRha3dJcFJDZitFVzFZ?=
- =?utf-8?B?UlNnTEtTTkdOdE9JUWhjRFBZVWlyQ3R6N3dBeVZGTUZPamVUbkJNbFFmdXBy?=
- =?utf-8?B?cHlTRGI3bWM3UW9rbjVJcFdVdXFzVUNoYk45V203bklzb1pxcjJlRi9GcWln?=
- =?utf-8?B?TS9PTzY3aVJsTWVVM2kwWTRKWGhhOGRDaTUvVHVxSlBUdllpbkdaT2NPNHZp?=
- =?utf-8?Q?H205bPaakLvdRt1apNhoIv+Z7?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        with ESMTP id S231599AbjAQN4w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 08:56:52 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1A43D084
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 05:56:14 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30HDgnWE019402;
+        Tue, 17 Jan 2023 13:55:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=K2EglMWMY9Achu743Wi1HWI8smes8b+0IqAFTL8sYz4=;
+ b=p+4rAdw1Z9U03VAxcEqM1K1VUTjmKUNi9I0XLT445skuZbWvSgsdpUMH91meIzn33dm9
+ 1ptl9NRxL00A+wMbMxDVD6osDaZJOZ55/c8GGrRPZ8+yisVtjb17MsgVQM+gYv5Mbq7a
+ eU9MNbYSkbgd47jwBi2Dy2zjsCQqZSJlZ0KNOzCRKdifjpiJuFSEKgUxCXtq/NrUz7Z4
+ UOfca0ZTSq1KhSclmLJD81gHNRm9SC8ZB7HLyUG5kcmg0j3VQWD6DSkj28RcCtu3Qfe8
+ 9hoPeRfc2ng/ePhW1mctvfkisex1nBg/vknOMLMym3wW+SJgkzoxXG1PpmQPkLGRVOmO 4Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5p809n25-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 13:55:59 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30HCWr4d014414;
+        Tue, 17 Jan 2023 13:55:58 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5p809n1e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 13:55:58 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30H5HJPu017351;
+        Tue, 17 Jan 2023 13:55:56 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16kxcg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 13:55:56 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30HDtqg751577318
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Jan 2023 13:55:52 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7B1382004B;
+        Tue, 17 Jan 2023 13:55:52 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E1FF720040;
+        Tue, 17 Jan 2023 13:55:50 +0000 (GMT)
+Received: from [9.171.42.216] (unknown [9.171.42.216])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 17 Jan 2023 13:55:50 +0000 (GMT)
+Message-ID: <8063592a-971a-d029-e8ac-0fb6286199d5@linux.ibm.com>
+Date:   Tue, 17 Jan 2023 14:55:50 +0100
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6895a99d-d47b-44db-0664-08daf891ff81
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2023 13:51:56.6496
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: nsjFbsxO8Ix0aAZY9i3MrI39xh2F8NSNcqJTRgdI09D6eNAPwPHJuRK4m3q8c2uV2Y5NSJLBDKGMJtxAzUv8uw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7099
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v14 02/11] s390x/cpu topology: add topology entries on CPU
+ hotplug
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+ <20230105145313.168489-3-pmorel@linux.ibm.com>
+ <666b9711b23d807525be06992fffd4d782ee80c7.camel@linux.ibm.com>
+Content-Language: en-US
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <666b9711b23d807525be06992fffd4d782ee80c7.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: f8nCsPfU5gNMBMh6kMPSMxhgij2A3FDI
+X-Proofpoint-ORIG-GUID: mZLhTPvhuTr4zyWd07Zl2wbTJ-DreB5y
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-17_05,2023-01-17_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ malwarescore=0 adultscore=0 clxscore=1015 spamscore=0 impostorscore=0
+ mlxscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301170112
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -164,20 +100,480 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPg0KPiBTZW50OiBUdWVzZGF5
-LCBKYW51YXJ5IDE3LCAyMDIzIDk6MzQgUE0NCj4gDQo+IE9uIFR1ZSwgSmFuIDE3LCAyMDIzIGF0
-IDA1OjE0OjEyQU0gKzAwMDAsIExpdSwgWWkgTCB3cm90ZToNCj4gPiBIaSBKYXNvbiwNCj4gPg0K
-PiA+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvdmZpby9pb21tdWZkLmMgYi9kcml2ZXJzL3ZmaW8v
-aW9tbXVmZC5jDQo+ID4gPiBpbmRleCA0ZjgyYTZmYTdjNmM3Zi4uNzlhNzgxYTRlNzRjMDkgMTAw
-NjQ0DQo+ID4gPiAtLS0gYS9kcml2ZXJzL3ZmaW8vaW9tbXVmZC5jDQo+ID4gPiArKysgYi9kcml2
-ZXJzL3ZmaW8vaW9tbXVmZC5jDQo+ID4gPiBAQCAtMTgsNiArMTgsMjEgQEAgaW50IHZmaW9faW9t
-bXVmZF9iaW5kKHN0cnVjdCB2ZmlvX2RldmljZSAqdmRldiwNCj4gPiA+IHN0cnVjdCBpb21tdWZk
-X2N0eCAqaWN0eCkNCj4gPiA+DQo+ID4gPiAgCWxvY2tkZXBfYXNzZXJ0X2hlbGQoJnZkZXYtPmRl
-dl9zZXQtPmxvY2spOw0KPiA+ID4NCj4gPiA+ICsJaWYgKElTX0VOQUJMRUQoQ09ORklHX1ZGSU9f
-Tk9JT01NVSkgJiYNCj4gPiA+ICsJICAgIHZkZXYtPmdyb3VwLT50eXBlID09IFZGSU9fTk9fSU9N
-TVUpIHsNCj4gPg0KPiA+IFRoaXMgc2hvdWxkIGJlIGRvbmUgd2l0aCBhIGhlbHBlciBwcm92aWRl
-ZCBieSBncm91cC5jIGFzIGl0IHRyaWVzDQo+ID4gdG8gZGVjb2RlIHRoZSBncm91cCBmaWVsZHMu
-IElzIGl0Pw0KPiANCj4gSXQgd2lsbCBtYWtlIHlvdXIgY2RldiBzZXJpZXMgZWFzaWVyDQoNClll
-cCDwn5iKIEkndmUganVzdCBzZW50IG91dCBhIG5ldyBjZGV2IHZlcnNpb24uIE5vdCBiYXNlZCBv
-biB0aGlzDQpwYXRjaCB5ZXQuIFdvdWxkIGdldCBpdCBiZSB3aGVuIHRoaXMgcGF0Y2ggZ290IG1l
-cmdlZC4NCg0KUmVnYXJkcywNCllpIExpdQ0K
+
+
+On 1/13/23 19:15, Nina Schoetterl-Glausch wrote:
+> On Thu, 2023-01-05 at 15:53 +0100, Pierre Morel wrote:
+>> The topology information are attributes of the CPU and are
+>> specified during the CPU device creation.
+>>
+>> On hot plug, we gather the topology information on the core,
+>> creates a list of topology entries, each entry contains a single
+>> core mask of each core with identical topology and finaly we
+> s/finaly/finally/
+
+thx
+
+>> orders the list in topological order.
+> s/orders/order/
+
+thx
+
+>> The topological order is, from higher to lower priority:
+>> - physical topology
+>>      - drawer
+>>      - book
+>>      - socket
+>>      - core origin, offset in 64bit increment from core 0.
+>> - modifier attributes
+>>      - CPU type
+>>      - polarization entitlement
+>>      - dedication
+>>
+>> The possibility to insert a CPU in a mask is dependent on the
+>> number of cores allowed in a socket, a book or a drawer, the
+>> checking is done during the hot plug of the CPU to have an
+>> immediate answer.
+>>
+>> If the complete topology is not specified, the core is added
+>> in the physical topology based on its core ID and it gets
+>> defaults values for the modifier attributes.
+>>
+>> This way, starting QEMU without specifying the topology can
+>> still get some adventage of the CPU topology.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   include/hw/s390x/cpu-topology.h |  48 ++++++
+>>   hw/s390x/cpu-topology.c         | 293 ++++++++++++++++++++++++++++++++
+>>   hw/s390x/s390-virtio-ccw.c      |  10 ++
+>>   hw/s390x/meson.build            |   1 +
+>>   4 files changed, 352 insertions(+)
+>>   create mode 100644 hw/s390x/cpu-topology.c
+>>
+>> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+>> index d945b57fc3..b3fd752d8d 100644
+>> --- a/include/hw/s390x/cpu-topology.h
+>> +++ b/include/hw/s390x/cpu-topology.h
+>> @@ -10,7 +10,11 @@
+>>   #ifndef HW_S390X_CPU_TOPOLOGY_H
+>>   #define HW_S390X_CPU_TOPOLOGY_H
+>>   
+>> +#include "qemu/queue.h"
+>> +#include "hw/boards.h"
+>> +
+>>   #define S390_TOPOLOGY_CPU_IFL   0x03
+>> +#define S390_TOPOLOGY_MAX_ORIGIN ((63 + S390_MAX_CPUS) / 64)
+>>   
+>>   #define S390_TOPOLOGY_POLARITY_HORIZONTAL      0x00
+>>   #define S390_TOPOLOGY_POLARITY_VERTICAL_LOW    0x01
+>> @@ -20,4 +24,48 @@
+>>   #define S390_TOPOLOGY_SHARED    0x00
+>>   #define S390_TOPOLOGY_DEDICATED 0x01
+>>   
+>> +typedef union s390_topology_id {
+>> +    uint64_t id;
+>> +    struct {
+>> +        uint64_t level_6:8; /* byte 0 BE */
+>> +        uint64_t level_5:8; /* byte 1 BE */
+>> +        uint64_t drawer:8;  /* byte 2 BE */
+>> +        uint64_t book:8;    /* byte 3 BE */
+>> +        uint64_t socket:8;  /* byte 4 BE */
+>> +        uint64_t rsrv:5;
+>> +        uint64_t d:1;
+>> +        uint64_t p:2;       /* byte 5 BE */
+>> +        uint64_t type:8;    /* byte 6 BE */
+>> +        uint64_t origin:2;
+> 
+> This is two bits because it's the core divided by 64, and we have 248 cores at most?
+> Where is this set?
+
+right, must be set so does the core offset in the mask.
+
+> 
+>> +        uint64_t core:6;    /* byte 7 BE */
+>> +    };
+>> +} s390_topology_id;
+> 
+> This struct seems to do double duty, 1. it represents a cpu and 2. a topology entry.
+> You also use it for sorting.
+> I would suggest to just use a cpu object when referring to a specific cpu and
+> put the relevant fields directly into the topology entry.
+
+Yes, I can remove the core:6.
+After Thomas comment I will change all the bit field for uint8_t.
+I think we should not use the real topology entry here if we want to use 
+TGE in the future.
+
+> You get rid of the bit field that way.
+> You'd then need a comparison function for a cpu object and a topology entry.
+> As long as that isn't the only type pair that shouldn't be too ugly.
+> 
+>> +#define TOPO_CPU_MASK       0x000000000000003fUL
+>> +
+>> +typedef struct S390TopologyEntry {
+>> +    s390_topology_id id;
+>> +    QTAILQ_ENTRY(S390TopologyEntry) next;
+>> +    uint64_t mask;
+>> +} S390TopologyEntry;
+>> +
+>> +typedef struct S390Topology {
+>> +    QTAILQ_HEAD(, S390TopologyEntry) list;
+>> +    uint8_t *sockets;
+>> +    CpuTopology *smp;
+>> +} S390Topology;
+>> +
+>> +#ifdef CONFIG_KVM
+>> +bool s390_has_topology(void);
+>> +void s390_topology_set_cpu(MachineState *ms, S390CPU *cpu, Error **errp);
+>> +#else
+>> +static inline bool s390_has_topology(void)
+>> +{
+>> +       return false;
+>> +}
+>> +static inline void s390_topology_set_cpu(MachineState *ms,
+>> +                                         S390CPU *cpu,
+>> +                                         Error **errp) {}
+>> +#endif
+>> +extern S390Topology s390_topology;
+>> +
+>>   #endif
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> new file mode 100644
+>> index 0000000000..438055c612
+>> --- /dev/null
+>> +++ b/hw/s390x/cpu-topology.c
+>> @@ -0,0 +1,293 @@
+>> +/*
+>> + * CPU Topology
+>> + *
+>> + * Copyright IBM Corp. 2022
+>> + * Author(s): Pierre Morel <pmorel@linux.ibm.com>
+>> +
+>> + * This work is licensed under the terms of the GNU GPL, version 2 or (at
+>> + * your option) any later version. See the COPYING file in the top-level
+>> + * directory.
+>> + */
+>> +
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "qemu/error-report.h"
+>> +#include "hw/qdev-properties.h"
+>> +#include "hw/boards.h"
+>> +#include "qemu/typedefs.h"
+>> +#include "target/s390x/cpu.h"
+>> +#include "hw/s390x/s390-virtio-ccw.h"
+>> +#include "hw/s390x/cpu-topology.h"
+>> +
+>> +/*
+>> + * s390_topology is used to keep the topology information.
+>> + * .list: queue the topology entries inside which
+>> + *        we keep the information on the CPU topology.
+>> + *
+>> + * .smp: keeps track of the machine topology.
+>> + *
+>> + * .socket: tracks information on the count of cores per socket.
+>> + *
+>> + */
+>> +S390Topology s390_topology = {
+>> +    .list = QTAILQ_HEAD_INITIALIZER(s390_topology.list),
+>> +    .sockets = NULL, /* will be initialized after the cpu model is realized */
+> 
+> I guess you should do the same for .smp then also.
+
+OK
+
+> 
+>> +};
+>> +
+>> +/**
+>> + * s390_socket_nb:
+>> + * @id: s390_topology_id
+>> + *
+>> + * Returns the socket number used inside the socket array.
+>> + */
+>> +static int s390_socket_nb(s390_topology_id id)
+>> +{
+>> +    return (id.socket + 1) * (id.book + 1) * (id.drawer + 1);
+> 
+> This calculation doesn't make a whole lot of sense to me.
+> It's symmetric with regards to the variables, so (s=0 b=1 d=1)
+> will have the same result as (s=1 b=0 d=1).
+> You want the "global" socket number right?
+> So that would be (drawer * books_per_drawer + book) * sockets_per_book + socket.
+
+yes, already changed
+
+> 
+>> +}
+>> +
+>> +/**
+>> + * s390_has_topology:
+>> + *
+>> + * Return value: if the topology is supported by the machine.
+>> + */
+>> +bool s390_has_topology(void)
+>> +{
+>> +    return false;
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_init:
+>> + * @ms: the machine state where the machine topology is defined
+>> + *
+>> + * Keep track of the machine topology.
+>> + * Allocate an array to keep the count of cores per socket.
+>> + * The index of the array starts at socket 0 from book 0 and
+>> + * drawer 0 up to the maximum allowed by the machine topology.
+>> + */
+>> +static void s390_topology_init(MachineState *ms)
+>> +{
+>> +    CpuTopology *smp = &ms->smp;
+>> +
+>> +    s390_topology.smp = smp;
+>> +    if (!s390_topology.sockets) {
+> 
+> Is this function being called multiple times, or why the if?
+> Use an assert instead?
+
+I forgot to remove this test.
+The caller already check this.
+
+> 
+>> +        s390_topology.sockets = g_new0(uint8_t, smp->sockets *
+>> +                                       smp->books * smp->drawers);
+>> +    }
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_from_cpu:
+>> + * @cpu: The S390CPU
+>> + *
+>> + * Initialize the topology id from the CPU environment.
+>> + */
+>> +static s390_topology_id s390_topology_from_cpu(S390CPU *cpu)
+>> +{
+>> +    s390_topology_id topology_id;
+>> +
+>> +    topology_id.core = cpu->env.core_id;
+>> +    topology_id.type = cpu->env.cpu_type;
+>> +    topology_id.p = cpu->env.polarity;
+>> +    topology_id.d = cpu->env.dedicated;
+>> +    topology_id.socket = cpu->env.socket_id;
+>> +    topology_id.book = cpu->env.book_id;
+>> +    topology_id.drawer = cpu->env.drawer_id;
+>> +
+>> +    return topology_id;
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_set_entry:
+>> + * @entry: Topology entry to setup
+>> + * @id: topology id to use for the setup
+>> + *
+>> + * Set the core bit inside the topology mask and
+>> + * increments the number of cores for the socket.
+>> + */
+>> +static void s390_topology_set_entry(S390TopologyEntry *entry,
+> 
+> Not sure if I like the name, what it does is to add a cpu to the entry.
+
+s390_topology_add_cpu_to_entry() ?
+
+
+
+> 
+>> +                                    s390_topology_id id)
+>> +{
+>> +    set_bit(63 - id.core, &entry->mask);
+> 
+> You need to subtract the origin first or that might be negative.
+
+yes, origin is not handled correctly
+
+> 
+>> +    s390_topology.sockets[s390_socket_nb(id)]++;
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_new_entry:
+>> + * @id: s390_topology_id to add
+>> + *
+>> + * Allocate a new entry and initialize it.
+>> + *
+>> + * returns the newly allocated entry.
+>> + */
+>> +static S390TopologyEntry *s390_topology_new_entry(s390_topology_id id)
+>> +{
+>> +    S390TopologyEntry *entry;
+>> +
+>> +    entry = g_malloc0(sizeof(S390TopologyEntry));
+>> +    entry->id.id = id.id & ~TOPO_CPU_MASK;
+>> +    s390_topology_set_entry(entry, id);
+>> +
+>> +    return entry;
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_insert:
+>> + *
+>> + * @id: s390_topology_id to insert.
+>> + *
+>> + * Parse the topology list to find if the entry already
+>> + * exist and add the core in it.
+>> + * If it does not exist, allocate a new entry and insert
+>> + * it in the queue from lower id to greater id.
+>> + */
+>> +static void s390_topology_insert(s390_topology_id id)
+>> +{
+>> +    S390TopologyEntry *entry;
+>> +    S390TopologyEntry *tmp = NULL;
+>> +    uint64_t new_id;
+>> +
+>> +    new_id = id.id & ~TOPO_CPU_MASK;
+>> +
+>> +    /* First CPU to add to an entry */
+>> +    if (QTAILQ_EMPTY(&s390_topology.list)) {
+>> +        entry = s390_topology_new_entry(id);
+>> +        QTAILQ_INSERT_HEAD(&s390_topology.list, entry, next);
+>> +        return;
+>> +    }
+>> +
+>> +    QTAILQ_FOREACH(tmp, &s390_topology.list, next) {
+>> +        if (new_id == tmp->id.id) {
+>> +            s390_topology_set_entry(tmp, id);
+>> +            return;
+>> +        } else if (new_id < tmp->id.id) {
+>> +            entry = s390_topology_new_entry(id);
+>> +            QTAILQ_INSERT_BEFORE(tmp, entry, next);
+>> +            return;
+>> +        }
+>> +    }
+>> +
+>> +    entry = s390_topology_new_entry(id);
+>> +    QTAILQ_INSERT_TAIL(&s390_topology.list, entry, next);
+> 
+> Consider adding a sentinel entry "at infinity", then that whole code
+> would simplify.
+
+looks good, thanks.
+
+
+> 
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_check:
+>> + * @errp: Error pointer
+>> + * id: s390_topology_id to be verified
+>> + *
+>> + * The function checks if the topology id fits inside the
+>> + * system topology.
+>> + */
+>> +static void s390_topology_check(Error **errp, s390_topology_id id)
+>> +{
+>> +    CpuTopology *smp = s390_topology.smp;
+>> +
+>> +    if (id.socket > smp->sockets) {
+>> +            error_setg(errp, "Unavailable socket: %d", id.socket);
+>> +            return;
+>> +    }
+>> +    if (id.book > smp->books) {
+>> +            error_setg(errp, "Unavailable book: %d", id.book);
+>> +            return;
+>> +    }
+>> +    if (id.drawer > smp->drawers) {
+>> +            error_setg(errp, "Unavailable drawer: %d", id.drawer);
+>> +            return;
+>> +    }
+>> +    if (id.type != S390_TOPOLOGY_CPU_IFL) {
+>> +            error_setg(errp, "Unknown cpu type: %d", id.type);
+>> +            return;
+>> +    }
+>> +    /* Polarity and dedication can never be wrong */
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_cpu_default:
+>> + * @errp: Error pointer
+>> + * @cpu: pointer to a S390CPU
+>> + *
+>> + * Setup the default topology for unset attributes.
+>> + *
+>> + * The function accept only all all default values or all set values
+>> + * for the geometry topology.
+>> + *
+>> + * The function calculates the (drawer_id, book_id, socket_id)
+>> + * topology by filling the cores starting from the first socket
+>> + * (0, 0, 0) up to the last (smp->drawers, smp->books, smp->sockets).
+>> + *
+>> + */
+>> +static void s390_topology_cpu_default(Error **errp, S390CPU *cpu)
+>> +{
+>> +    CpuTopology *smp = s390_topology.smp;
+>> +    CPUS390XState *env = &cpu->env;
+>> +
+>> +    /* All geometry topology attributes must be set or all unset */
+>> +    if ((env->socket_id < 0 || env->book_id < 0 || env->drawer_id < 0) &&
+>> +        (env->socket_id >= 0 || env->book_id >= 0 || env->drawer_id >= 0)) {
+>> +        error_setg(errp,
+>> +                   "Please define all or none of the topology geometry attributes");
+>> +        return;
+>> +    }
+>> +
+>> +    /* Check if one of the geometry topology is unset */
+>> +    if (env->socket_id < 0) {
+>> +        /* Calculate default geometry topology attributes */
+>> +        env->socket_id = (env->core_id / smp->cores) % smp->sockets;
+>> +        env->book_id = (env->core_id / (smp->sockets * smp->cores)) %
+>> +                       smp->books;
+>> +        env->drawer_id = (env->core_id /
+>> +                          (smp->books * smp->sockets * smp->cores)) %
+>> +                         smp->drawers;
+>> +    }
+>> +}
+>> +
+>> +/**
+>> + * s390_topology_set_cpu:
+>> + * @ms: MachineState used to initialize the topology structure on
+>> + *      first call.
+>> + * @cpu: the new S390CPU to insert in the topology structure
+>> + * @errp: the error pointer
+>> + *
+>> + * Called from CPU Hotplug to check and setup the CPU attributes
+>> + * before to insert the CPU in the topology.
+>> + */
+>> +void s390_topology_set_cpu(MachineState *ms, S390CPU *cpu, Error **errp)
+>> +{
+>> +    Error *local_error = NULL;
+> 
+> Can't you just use ERRP_GUARD ?
+
+I do not think it is necessary and I find it obfuscating.
+So, should I?
+
+> 
+>> +    s390_topology_id id;
+>> +
+>> +    /*
+>> +     * We do not want to initialize the topology if the cpu model
+>> +     * does not support topology consequently, we have to wait for
+> 
+> ", consequently," I think. Could you do the initialization some where else,
+> after you know what the cpu model is? Not that I object to doing it this way.
+> 
+
+I did not find a better place, it must be done after the CPU model is 
+initialize and before the first CPU is created.
+The cpu model is initialized during the early creation of the first cpu.
+
+Any idea?
+
+Thanks.
+
+Regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
