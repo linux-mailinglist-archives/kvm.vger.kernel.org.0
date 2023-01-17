@@ -2,165 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41C9466D4E6
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 04:11:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1563066D4EF
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 04:21:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235271AbjAQDLx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 16 Jan 2023 22:11:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36362 "EHLO
+        id S235230AbjAQDV3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 16 Jan 2023 22:21:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38436 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235214AbjAQDLv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 16 Jan 2023 22:11:51 -0500
+        with ESMTP id S230301AbjAQDV1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 16 Jan 2023 22:21:27 -0500
 Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BCCD17145;
-        Mon, 16 Jan 2023 19:11:50 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 611E41ABCC;
+        Mon, 16 Jan 2023 19:21:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1673925110; x=1705461110;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=8ZtziamPYwKKN1KpLuBDYO317YmqaBGIGZA6fPSg5dg=;
-  b=h3RnEfpfBnLATEKWmm8+0/pwwxiasu+SS99TTSsS/X5q5jme/WSwkgRu
-   pzTQ4fjduufZvGjSfAs6ToEGrHbNGF0Xqt/JOsQXUm6JYgiI5vYi+3d7K
-   vYgruJp3RHTdsKcpfNkKjNIgwLwRIZLy+xlwgGc+hpXQRtQ9l9v+da/Ga
-   0hpNJYQ4KLJBrARKiwGmcuB2f8FvTeSS4wR6n6XnZikli8US2JIl0Rce9
-   oBA6yxN82jfUFMuRSunM8V7r4mRFy0eRjRoAQh6lrrZk0rIH/6PCWxhWX
-   mWiVQLNrAv/ylPRLe+Fx2c59mPqrrTwzevVhliVPly2Pwsf/pREmTXnQ6
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="323296989"
+  t=1673925685; x=1705461685;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=dHN1vav1t5EnRUr6UdHotg6czTkkjwNiQkXgUEZ1z7k=;
+  b=SQ76ztvQGzjauPOfWo3ZTEkYmOqHokdrJW5YQD8U7Wd6iPIoUE/FqTun
+   7W9j6F2W3waLWAz2THxOG7bZuErHnj6MRWhZbj+SJJBxrHK4m1vIZTyGh
+   PHeqHJ/zJOce2T9jFWIu7e0J/LLx3xV1mOPSIHXmADJAH8R2XkPqsCLxe
+   KALbmIIXdO7qmFiMatGEpZxgvMuzrR7B+5+K3K1P8CwRfv0ZkkQrozTjD
+   G/rG+VlAwCfXeGx4SNDtocXeTXbReEWqYp5gsKLSUCF2SE67D31O/7BZi
+   DMR5MRWAUwcxxjp6aJbVhrjSJ3ryavTts7kfnBWzu20hsVLnaJhyWwHqJ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="323298309"
 X-IronPort-AV: E=Sophos;i="5.97,222,1669104000"; 
-   d="scan'208";a="323296989"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2023 19:11:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="833017079"
+   d="scan'208";a="323298309"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2023 19:21:24 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10592"; a="783096609"
 X-IronPort-AV: E=Sophos;i="5.97,222,1669104000"; 
-   d="scan'208";a="833017079"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga005.jf.intel.com with ESMTP; 16 Jan 2023 19:11:49 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Mon, 16 Jan 2023 19:11:49 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Mon, 16 Jan 2023 19:11:49 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.106)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Mon, 16 Jan 2023 19:11:49 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AQJuF/yxlj8vi54sj5AcOSAHTCxdwvvLeqvp55BzVY0SlpX6igq8hFRsy1DH8Y5nxbOGa/EGDV2K/jWc3QzgFKO8ittoh4IkWJchQdrGU8f7Br3qJFv/CfuzumviRmh+h9avXJqNMMtpiq9IgtVph9PsGIocS5Hi2mtjA16BQFEDX2Rg+WmTYfUn7npI6N9DHu4wSppiXpQ31ctVgMPhcNXgcLBEsb/vgF7EzbJ92rOuE/94MSR1EwNGZYNpTZVsqMewAtMQE2lBZWxN1ix400h2RMQTyQNPhWRGECCtKMPtw/Sa+mtwAofMCfXo8cJDKeJOr9t0otrvGgHqH5OGVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8ZtziamPYwKKN1KpLuBDYO317YmqaBGIGZA6fPSg5dg=;
- b=EMv9VNb0XE9tNbmE/oMdtlQpinmxRbO+KGv5Wz+ftt1P3ZOJ4mCEbpnkgQ8qLMK8WN0jWVo8ZsQhT7LOy8Y44mGd+yrWtH5KLZkv+LlBuf7M6FMMNlU37TX9+azJDJv2mb3Y82/MTvFd21vLsNSZdwUeesrOUQTcetrGioKzHzjwWrpEXdOiYP892pR3mwLH2k7ZTsij91JftKoDRM44odJRpW0KHIokukxMHuZf145lp/fJdNvlHB6NWg01MDysaF+To6BKnO05e/uM8ykvxPNP2g60j17Bnaxu4mAgSFySi/2Fto5E8A7hEmlG4TFn6LTFTDuDDV5udcpM3TJ9xw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH7PR11MB6980.namprd11.prod.outlook.com (2603:10b6:510:208::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.19; Tue, 17 Jan
- 2023 03:11:46 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3f19:b226:ebf1:b04a]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3f19:b226:ebf1:b04a%6]) with mapi id 15.20.5986.019; Tue, 17 Jan 2023
- 03:11:46 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Subject: Re: [PATCH v11 058/113] KVM: TDX: MTRR: implement get_mt_mask() for
- TDX
-Thread-Topic: [PATCH v11 058/113] KVM: TDX: MTRR: implement get_mt_mask() for
- TDX
-Thread-Index: AQHZJqWir7JSMuEP5k+09IxeugZm166h9Y6A
-Date:   Tue, 17 Jan 2023 03:11:46 +0000
-Message-ID: <1a32f2570f13fa0125ddbbceeabcd36fc4beb9db.camel@intel.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
-         <21e0d94ccf2fd3d766d6aa7b45441791c04e5e4f.1673539699.git.isaku.yamahata@intel.com>
-In-Reply-To: <21e0d94ccf2fd3d766d6aa7b45441791c04e5e4f.1673539699.git.isaku.yamahata@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.46.3 (3.46.3-1.fc37) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|PH7PR11MB6980:EE_
-x-ms-office365-filtering-correlation-id: 0b2aae5d-a1d2-4a25-0feb-08daf8389110
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: qVES/ByO8sC7oKveC0bQYvWI5i8NXL1SUzq8729tjkZsyou/fkErw4y8S+dfYM6FHjhgPjuH3vvOGhuyneHsdHTzhTspRxcMHxrLKqBZeuPo8jT84f4p56quof6f2picx04+u+N5s1U1Dh3WJQ266AqG+i9gLDmgQT+hC3Xw8NE0+oTzkyu3Mk/bp1W//SgKeu9fTXIl2nJgj6ilqdarGRBiOzwKV/XAWDR0SC3y3Gg4lZtgNSUWTHC4ANQwia55SC7qgNG/um3c62YErIXxNooZO84YF4u7MZzebFQIhKg46chMUcdNTmsn7aeF2+KywZpPKV67K5RM0tYS75H+tN9EQ7A6pmBYB0ssO8Nid6MeyOmMWqgy9CPzaLU7j+y3MjHJ4WNvSIHOrod9xOpSEssQvEUAT+bFPb7foEZG0cU6dRMn/CnOBwivcAtt2wugK34eE1kknjcu10lAJd69z1pQgdiW2hUOw0v7fry2T+6OMfpQJ7pQ92grB/2nrthZOKx1Maj3mPZc8I/I2IU8zswEjXM72Y9gsISnx7S/ZbD20PGF6MCRCW8UJZKcsKJ67sGhnPScCscqhu8BfIIa0suCqQ7UHVxxjDKq3d1IZXI16fvNh9kFb64DAD6hzHeshVVgD6gLJ7ec4QQEdf/MIIEe7TAQQCfYXysNv+PS1l2AAKjVWtpn+GbxasZxBvy02/DoWV3hfTjr8OUjNgqdbIA9hUsmbl7YRKU1xf38jds=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(366004)(396003)(376002)(346002)(39860400002)(451199015)(8936002)(8676002)(41300700001)(76116006)(91956017)(66476007)(66556008)(38070700005)(4326008)(66946007)(66446008)(64756008)(316002)(6636002)(478600001)(54906003)(2616005)(36756003)(2906002)(5660300002)(110136005)(26005)(6486002)(71200400001)(82960400001)(6512007)(86362001)(6506007)(186003)(122000001)(38100700002)(966005)(83380400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VE5BamhJM0Vuc3pQRUw1WXR2dXlwOWJ1MS9jQVlDbWNlOWp6MnhjWWUwcng2?=
- =?utf-8?B?WW9lQndQa0lvUnBQd2NnbjBxRStocXZta2VCaXFkZllzMk9hQ3J0Rit0Q2dW?=
- =?utf-8?B?bUlralFJZmlwUlJYMDZZZ1JoZVNpZkdHbnMweDZyL0lkNE92Q1BSWlY4NnJh?=
- =?utf-8?B?UmwrQmU1S3hUWmc1TnM3V0hvNWVpQ3MrK1dEdUY0TUtYbmxlRFJUYnFOdm1M?=
- =?utf-8?B?VWh5WUs4cTlQblVsL05zM3E1aktGUTRLa3VEMTVYR0hMU0ZrejdmbENSWk12?=
- =?utf-8?B?N1VCZWRScnRpSGdDVUVtTHZ3NVVnS2FpK0NEWldCNVNNVWx3ZWxJbmlRZ3F0?=
- =?utf-8?B?SGFkM20wTkFkYW0yTjZUZElFckpVNmhvKzVQRXhwR1krMXVXdEg0Z2Ivckgr?=
- =?utf-8?B?VmNidW1qMG8zSnNhQnVHRWZKemVJOWFwdlNRWWNCZTNGbTdONUFKLzQwS2Jz?=
- =?utf-8?B?dEJyMkNvYVJBUHc0REx3aURIK0pWOU4zWHdkaEREWllkQnZnb0FocEZVTFFH?=
- =?utf-8?B?d1lPOWZpdDlWNlB1QWdEeFZUYXZDYjhjbzhHMm9KZ3RFeHBHa0pjOUJXNDkv?=
- =?utf-8?B?WWtkU0IrQzNveWh1VFUvdzBScDlKYjdpVHc3ZDNMZTd5UnRhZU5uaEV2MVI0?=
- =?utf-8?B?a2NWOHBtb3lGSHVLVWxpcXpZRTRyNStlTUdQQ1ZCWG1LaXVtZXNmdURINWMz?=
- =?utf-8?B?UXFFVkRDbmdMYW50QnhiOGRIT3RQdGVwQUs5QTZyMHFXbC8xZncwOGtvVm0v?=
- =?utf-8?B?TTJjUWN5c1k4R0hUZm1tbEd5NXJlbkRsZE9kazZKRUt1dHFSRmM0TVhKZjNF?=
- =?utf-8?B?VlkvV1c1akVhd1k1L2YvNEVlSHBGVkZNODRBbEpwRDJSSG1ZQ0RsMHNLdGlm?=
- =?utf-8?B?TmRYdWREdFhvNUtWU2Z5VDh2K0N4RUhudGlybkYxUEN1aHMxUERsUEFZTUxx?=
- =?utf-8?B?Z08wZkVWVmVSQno2dHR0cFlsVWhjSGVPQ1BaczBZZFQvK1VONUtRQkc1V05v?=
- =?utf-8?B?MjZsM2ZySWtVTS8veGtXWEpvalY4UDRibGFBVUp1QmVEWmFZMGdvdGU3Q2F3?=
- =?utf-8?B?M2g4czVwcEhheG1FSEFMZWxmMUlsT0tuODM3Ym9IYW8xeVFLc0xUaU1paVRI?=
- =?utf-8?B?a2hBalBhTmpwZTU4QlVrN2ZvaTRYTVRkRWZlVEdMWk9WVXdnRWtYdUdRd0I5?=
- =?utf-8?B?TjRTZy8zYWU0SkpFT2lpTkZvckpIT1ltM2o2NjNtNC9Fdk5qQURucVVsSitI?=
- =?utf-8?B?QUVBYmNKQlQ2RUpVVUFqaStzUEVNaUs3MjEzUEk0bEt6QVhZNTg2WldOejFs?=
- =?utf-8?B?N1pUV3ZvSWFyOFlJQ0hxUWF2R3c4bllvaVZabXI2bnQ1VDJNcTZaUEZnSnBU?=
- =?utf-8?B?REJtWEllbHhFOHkzR3IveVJBVm5pTGloQlFjSXRJaXhkMzFaZGVZandlc3VU?=
- =?utf-8?B?cjVwWXluSHdLUHBSZWN4VWRRdEs2V0dndVUvamdyNEFSSjVweElLMXJBaXo0?=
- =?utf-8?B?TjYycGlWa0FCdVdyeE4xTyt2QlgzdExoWWN1SEJMQ014b2Z2NTFkd1IyRW03?=
- =?utf-8?B?SmJqanJ4b3BQQjM0WmhEdDJwQmNnTjJ1UkI3UFJFTFBOVVdiRkh0K1cxWHlF?=
- =?utf-8?B?MnVNR3pDb01jMGhyWkQrYlBBNG9kc0t2R1Z3anhVeVM3VU1QY1hyd1RuNDRU?=
- =?utf-8?B?dDRvY2VDNjFGTzVKQXc5M01LQUNBbHF2RGlhU1dKa3pFV1VtdlBURWg4RGJF?=
- =?utf-8?B?VjQzSXlydWhob3VzbjV4amJjQXdWSGhOL0Nzc0pQcE95QkZ0REhzS1J6dTFL?=
- =?utf-8?B?NU5LSDVMODZvMXBZNW9TVDd4djdXL2pYNHRYYVlBbTU4emczRXJwbUk5YkJk?=
- =?utf-8?B?NkhHTUJmU29tMVZSWC80QzI3VHRIS280V3dJOVlxeFNYVzhiS2FTMVhuVTh2?=
- =?utf-8?B?UXNPREltNTFXTVJqUEhkV3lDSE5CR0s4cmVaZ2J1MDNOLzg4Q3RwTVVnKzlh?=
- =?utf-8?B?NHF1V2s3d0ZnRk5oUGJBbW5zQ1FwYlZQNW4yZ0RHTVV5L2hFMElOT1FEaCth?=
- =?utf-8?B?K0l4MDBuRFczNzA3MytlZ0puTy9Wc0lEY1J6aHdTQVVDbFd6bmtObmxtNmhT?=
- =?utf-8?B?eTRWSFd5Zjg3S0s4SndVYUtadi94QlRyTzYyR0RoR3Z5K0hseW8reTJ2RlNp?=
- =?utf-8?B?Qnc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <7A45C8AF151EB84B9FD7419F6E1C2968@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+   d="scan'208";a="783096609"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.249.170.151]) ([10.249.170.151])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2023 19:21:13 -0800
+Message-ID: <c25f1f8c-f7c0-6a96-cd67-260df47f79a9@linux.intel.com>
+Date:   Tue, 17 Jan 2023 11:21:10 +0800
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b2aae5d-a1d2-4a25-0feb-08daf8389110
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jan 2023 03:11:46.1640
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: elua6ib8V4kQ+lKu5opv004zEsegP6eWXjWb+m30j7s/E/EgnEpa+97vjG88IvfFe893rxbFuIV0QpzMu2LRWg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6980
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v10 2/9] KVM: Introduce per-page memory attributes
+To:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+From:   Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20221202061347.1070246-3-chao.p.peng@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
         SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -168,84 +92,307 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVGh1LCAyMDIzLTAxLTEyIGF0IDA4OjMyIC0wODAwLCBpc2FrdS55YW1haGF0YUBpbnRlbC5j
-b20gd3JvdGU6DQo+IEZyb206IElzYWt1IFlhbWFoYXRhIDxpc2FrdS55YW1haGF0YUBpbnRlbC5j
-b20+DQo+IA0KPiBBbHRob3VnaCBURFggc3VwcG9ydHMgb25seSBXQiBmb3IgcHJpdmF0ZSBHUEEs
-IE1UUlIvUEFUIGZvciBzaGFyZWQgR1BBDQo+IHNob3VsZCBiZSBzdXBwb3J0ZWQuIEltcGxlbWVu
-dCBnZXRfbXRfbWFzaygpIGZvbGxvd2luZyB2bXggY2FzZS4NCg0KQnkgZmFyIHRoaXMgaXMgdGhl
-IGZpcnN0IHBhdGNoIHRvIGhhbmRsZSBNVFJSL1BBVC4gIFRoZXJlJ3MgYWJzb2x1dGVseSBubw0K
-YmFja2dyb3VuZCBoYXZlIGJlZW4gZXhwbGFpbmVkLg0KDQpTbyB3aGF0IGFib3V0IE1UUlIvUEFU
-IHJlbGF0ZWQgTVNScyBoYW5kbGluZz8gIE5vIGNvZGUgbmVlZGVkIHRvIGhhbmRsZT8NCg0KSSB3
-YXMgZXhwZWN0aW5nIHRoZXJlIHNob3VsZCBiZSBhdCBsZWFzdCBzb21lIHdvcmRzIGhlcmUgdG8g
-ZXhwbGFpbiBob3cgVERYDQpoYW5kbGVzIHRoZW0sIGFuZCBpZiBubyBoYW5kbGluZyBpcyByZXF1
-aXJlZCBpbiBLVk0sIHdoeS4NCg0KVy9vIHRob3NlLCBJIGRvbid0IHRoaW5rIHRoaXMgcGF0Y2gg
-aXMgcmV2aWV3YWJsZS4gIA0KDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBJc2FrdSBZYW1haGF0YSA8
-aXNha3UueWFtYWhhdGFAaW50ZWwuY29tPg0KPiAtLS0NCj4gIGFyY2gveDg2L2t2bS92bXgvbWFp
-bi5jICAgIHwgMTAgKysrKysrKysrLQ0KPiAgYXJjaC94ODYva3ZtL3ZteC90ZHguYyAgICAgfCAx
-OSArKysrKysrKysrKysrKysrKysrDQo+ICBhcmNoL3g4Ni9rdm0vdm14L3g4Nl9vcHMuaCB8ICAy
-ICsrDQo+ICAzIGZpbGVzIGNoYW5nZWQsIDMwIGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkN
-Cj4gDQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14L21haW4uYyBiL2FyY2gveDg2L2t2
-bS92bXgvbWFpbi5jDQo+IGluZGV4IDc3MGQxYjI5ZDFjMy4uNDMxOWY2ZDdhNGRhIDEwMDY0NA0K
-PiAtLS0gYS9hcmNoL3g4Ni9rdm0vdm14L21haW4uYw0KPiArKysgYi9hcmNoL3g4Ni9rdm0vdm14
-L21haW4uYw0KPiBAQCAtMTU4LDYgKzE1OCwxNCBAQCBzdGF0aWMgdm9pZCB2dF9sb2FkX21tdV9w
-Z2Qoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBocGFfdCByb290X2hwYSwNCj4gIAl2bXhfbG9hZF9t
-bXVfcGdkKHZjcHUsIHJvb3RfaHBhLCBwZ2RfbGV2ZWwpOw0KPiAgfQ0KPiAgDQo+ICtzdGF0aWMg
-dTggdnRfZ2V0X210X21hc2soc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBnZm5fdCBnZm4sIGJvb2wg
-aXNfbW1pbykNCj4gK3sNCj4gKwlpZiAoaXNfdGRfdmNwdSh2Y3B1KSkNCj4gKwkJcmV0dXJuIHRk
-eF9nZXRfbXRfbWFzayh2Y3B1LCBnZm4sIGlzX21taW8pOw0KPiArDQo+ICsJcmV0dXJuIHZteF9n
-ZXRfbXRfbWFzayh2Y3B1LCBnZm4sIGlzX21taW8pOw0KPiArfQ0KPiArDQo+ICBzdGF0aWMgaW50
-IHZ0X21lbV9lbmNfaW9jdGwoc3RydWN0IGt2bSAqa3ZtLCB2b2lkIF9fdXNlciAqYXJncCkNCj4g
-IHsNCj4gIAlpZiAoIWlzX3RkKGt2bSkpDQo+IEBAIC0yNjcsNyArMjc1LDcgQEAgc3RydWN0IGt2
-bV94ODZfb3BzIHZ0X3g4Nl9vcHMgX19pbml0ZGF0YSA9IHsNCj4gIA0KPiAgCS5zZXRfdHNzX2Fk
-ZHIgPSB2bXhfc2V0X3Rzc19hZGRyLA0KPiAgCS5zZXRfaWRlbnRpdHlfbWFwX2FkZHIgPSB2bXhf
-c2V0X2lkZW50aXR5X21hcF9hZGRyLA0KPiAtCS5nZXRfbXRfbWFzayA9IHZteF9nZXRfbXRfbWFz
-aywNCj4gKwkuZ2V0X210X21hc2sgPSB2dF9nZXRfbXRfbWFzaywNCj4gIA0KPiAgCS5nZXRfZXhp
-dF9pbmZvID0gdm14X2dldF9leGl0X2luZm8sDQo+ICANCj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2
-L2t2bS92bXgvdGR4LmMgYi9hcmNoL3g4Ni9rdm0vdm14L3RkeC5jDQo+IGluZGV4IGU2ODgxNjk5
-OTM4Ny4uYzRjNWE4Zjc4NmMxIDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9rdm0vdm14L3RkeC5j
-DQo+ICsrKyBiL2FyY2gveDg2L2t2bS92bXgvdGR4LmMNCj4gQEAgLTMwOSw2ICszMDksMjUgQEAg
-aW50IHRkeF92bV9pbml0KHN0cnVjdCBrdm0gKmt2bSkNCj4gIAlyZXR1cm4gMDsNCj4gIH0NCj4g
-IA0KPiArdTggdGR4X2dldF9tdF9tYXNrKHN0cnVjdCBrdm1fdmNwdSAqdmNwdSwgZ2ZuX3QgZ2Zu
-LCBib29sIGlzX21taW8pDQo+ICt7DQo+ICsJLyogVERYIHByaXZhdGUgR1BBIGlzIGFsd2F5cyBX
-Qi4gKi8NCj4gKwlpZiAoZ2ZuICYga3ZtX2dmbl9zaGFyZWRfbWFzayh2Y3B1LT5rdm0pKSB7DQoN
-CkZpcnN0IG9mIGFsbCwgcHJpdmF0ZSBHUEEgZG9lc24ndCBoYXZlICdzaGFyZWQgYml0JyBzZXQs
-IHNvIGNvbW1lbnQgIGRvZXNuJ3QNCnJlZmxlY3QgY29kZS4NCg0KU2Vjb25kbHkgKGFuZCBhZ2Fp
-biksIElJVUMgdGhlIHNoYXJlZCBiaXQgb2YgdGhlIGdmbiBoYXMgYmVlbiBzdHJpcHBlZCBvdXQg
-bG9uZw0KdGltZSBhZ28sIHNvIHRoaXMgaXMgaW5jb3JyZWN0Lg0KDQpQbGVhc2UgZG9uJ3Qgc2xp
-ZW50bHkgaWdub3JlIG90aGVyIHBlb3BsZSdzIGNvbW1lbnQ6DQoNCmh0dHBzOi8vbG9yZS5rZXJu
-ZWwub3JnL2xrbWwvWTE5TnpsUWN3aFYlMkYyd2wzQGRlYmlhbi5tZS9ULyNtZjMxOWQ1YjcxODUx
-OTcwOTM2MmY5ZjA5NGJmYzViNTNmZDg3MDI0MQ0KDQoNCg0KPiArCQlXQVJOX09OX09OQ0UoaXNf
-bW1pbyk7DQo+ICsJCXJldHVybiAgTVRSUl9UWVBFX1dSQkFDSyA8PCBWTVhfRVBUX01UX0VQVEVf
-U0hJRlQ7DQoNClNob3VsZG4ndCB5b3UgYWxzbyBpbmNsdWRlIFZNWF9FUFRfSVBBVF9CSVQ/ICBJ
-IGxvc3QgeW91ciBsb2dpYy4uDQoNCj4gKwl9DQo+ICsNCj4gKwlpZiAoaXNfbW1pbykNCj4gKwkJ
-cmV0dXJuIE1UUlJfVFlQRV9VTkNBQ0hBQkxFIDw8IFZNWF9FUFRfTVRfRVBURV9TSElGVDsNCj4g
-Kw0KPiArCS8qDQo+ICsJICogRGV2aWNlIGFzc2lnbmVtbnQgd2l0aG91dCBWVC1kIHNub29waW5n
-IGNhcGFiaWxpdHkgd2l0aCBzaGFyZWQtR1BBDQo+ICsJICogaXMgZHViaW91cy4NCj4gKwkgKi8N
-Cj4gKwlXQVJOX09OX09OQ0Uoa3ZtX2FyY2hfaGFzX25vbmNvaGVyZW50X2RtYSh2Y3B1LT5rdm0p
-KTsNCg0KSXMgdGhlcmUgYW55IGNvZGUgdG8gcmVqZWN0IHN1Y2ggY2FzZSBhdCB0aGUgYmVnaW5u
-aW5nLCBmb3IgaW5zdGFuY2UsIGRvbid0DQphbGxvdyBhc3NpZ25pbmcgZGV2aWNlIGluIHN1Y2gg
-Y2FzZT8NCg0KPiArCXJldHVybiAoTVRSUl9UWVBFX1dSQkFDSyA8PCBWTVhfRVBUX01UX0VQVEVf
-U0hJRlQpIHwgVk1YX0VQVF9JUEFUX0JJVDsNCj4gK30NCj4gKw0KPiAgaW50IHRkeF92Y3B1X2Ny
-ZWF0ZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpDQo+ICB7DQo+ICAJc3RydWN0IGt2bV9jcHVpZF9l
-bnRyeTIgKmU7DQo+IGRpZmYgLS1naXQgYS9hcmNoL3g4Ni9rdm0vdm14L3g4Nl9vcHMuaCBiL2Fy
-Y2gveDg2L2t2bS92bXgveDg2X29wcy5oDQo+IGluZGV4IDhhZTY4OTkyOTM0Ny4uZDkwM2UwZjYw
-NmQzIDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9rdm0vdm14L3g4Nl9vcHMuaA0KPiArKysgYi9h
-cmNoL3g4Ni9rdm0vdm14L3g4Nl9vcHMuaA0KPiBAQCAtMTU0LDYgKzE1NCw3IEBAIHZvaWQgdGR4
-X3ZtX2ZyZWUoc3RydWN0IGt2bSAqa3ZtKTsNCj4gIGludCB0ZHhfdmNwdV9jcmVhdGUoc3RydWN0
-IGt2bV92Y3B1ICp2Y3B1KTsNCj4gIHZvaWQgdGR4X3ZjcHVfZnJlZShzdHJ1Y3Qga3ZtX3ZjcHUg
-KnZjcHUpOw0KPiAgdm9pZCB0ZHhfdmNwdV9yZXNldChzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUsIGJv
-b2wgaW5pdF9ldmVudCk7DQo+ICt1OCB0ZHhfZ2V0X210X21hc2soc3RydWN0IGt2bV92Y3B1ICp2
-Y3B1LCBnZm5fdCBnZm4sIGJvb2wgaXNfbW1pbyk7DQo+ICANCj4gIGludCB0ZHhfdm1faW9jdGwo
-c3RydWN0IGt2bSAqa3ZtLCB2b2lkIF9fdXNlciAqYXJncCk7DQo+ICBpbnQgdGR4X3ZjcHVfaW9j
-dGwoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB2b2lkIF9fdXNlciAqYXJncCk7DQo+IEBAIC0xNzYs
-NiArMTc3LDcgQEAgc3RhdGljIGlubGluZSB2b2lkIHRkeF92bV9mcmVlKHN0cnVjdCBrdm0gKmt2
-bSkge30NCj4gIHN0YXRpYyBpbmxpbmUgaW50IHRkeF92Y3B1X2NyZWF0ZShzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUpIHsgcmV0dXJuIC1FT1BOT1RTVVBQOyB9DQo+ICBzdGF0aWMgaW5saW5lIHZvaWQg
-dGR4X3ZjcHVfZnJlZShzdHJ1Y3Qga3ZtX3ZjcHUgKnZjcHUpIHt9DQo+ICBzdGF0aWMgaW5saW5l
-IHZvaWQgdGR4X3ZjcHVfcmVzZXQoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCBib29sIGluaXRfZXZl
-bnQpIHt9DQo+ICtzdGF0aWMgaW5saW5lIHU4IHRkeF9nZXRfbXRfbWFzayhzdHJ1Y3Qga3ZtX3Zj
-cHUgKnZjcHUsIGdmbl90IGdmbiwgYm9vbCBpc19tbWlvKSB7IHJldHVybiAwOyB9DQo+ICANCj4g
-IHN0YXRpYyBpbmxpbmUgaW50IHRkeF92bV9pb2N0bChzdHJ1Y3Qga3ZtICprdm0sIHZvaWQgX191
-c2VyICphcmdwKSB7IHJldHVybiAtRU9QTk9UU1VQUDsgfQ0KPiAgc3RhdGljIGlubGluZSBpbnQg
-dGR4X3ZjcHVfaW9jdGwoc3RydWN0IGt2bV92Y3B1ICp2Y3B1LCB2b2lkIF9fdXNlciAqYXJncCkg
-eyByZXR1cm4gLUVPUE5PVFNVUFA7IH0NCg0K
+
+On 12/2/2022 2:13 PM, Chao Peng wrote:
+> In confidential computing usages, whether a page is private or shared is
+> necessary information for KVM to perform operations like page fault
+> handling, page zapping etc. There are other potential use cases for
+> per-page memory attributes, e.g. to make memory read-only (or no-exec,
+> or exec-only, etc.) without having to modify memslots.
+>
+> Introduce two ioctls (advertised by KVM_CAP_MEMORY_ATTRIBUTES) to allow
+> userspace to operate on the per-page memory attributes.
+>    - KVM_SET_MEMORY_ATTRIBUTES to set the per-page memory attributes to
+>      a guest memory range.
+>    - KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES to return the KVM supported
+>      memory attributes.
+>
+> KVM internally uses xarray to store the per-page memory attributes.
+>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
+> Link: https://lore.kernel.org/all/Y2WB48kD0J4VGynX@google.com/
+> ---
+>   Documentation/virt/kvm/api.rst | 63 ++++++++++++++++++++++++++++
+>   arch/x86/kvm/Kconfig           |  1 +
+>   include/linux/kvm_host.h       |  3 ++
+>   include/uapi/linux/kvm.h       | 17 ++++++++
+
+Should the changes introduced in this file also need to be added in 
+tools/include/uapi/linux/kvm.h ?
+
+
+
+>   virt/kvm/Kconfig               |  3 ++
+>   virt/kvm/kvm_main.c            | 76 ++++++++++++++++++++++++++++++++++
+>   6 files changed, 163 insertions(+)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 5617bc4f899f..bb2f709c0900 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5952,6 +5952,59 @@ delivery must be provided via the "reg_aen" struct.
+>   The "pad" and "reserved" fields may be used for future extensions and should be
+>   set to 0s by userspace.
+>   
+> +4.138 KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES
+> +-----------------------------------------
+> +
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm ioctl
+> +:Parameters: u64 memory attributes bitmask(out)
+> +:Returns: 0 on success, <0 on error
+> +
+> +Returns supported memory attributes bitmask. Supported memory attributes will
+> +have the corresponding bits set in u64 memory attributes bitmask.
+> +
+> +The following memory attributes are defined::
+> +
+> +  #define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
+> +  #define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
+> +  #define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
+> +  #define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> +
+> +4.139 KVM_SET_MEMORY_ATTRIBUTES
+> +-----------------------------------------
+> +
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm ioctl
+> +:Parameters: struct kvm_memory_attributes(in/out)
+> +:Returns: 0 on success, <0 on error
+> +
+> +Sets memory attributes for pages in a guest memory range. Parameters are
+> +specified via the following structure::
+> +
+> +  struct kvm_memory_attributes {
+> +	__u64 address;
+> +	__u64 size;
+> +	__u64 attributes;
+> +	__u64 flags;
+> +  };
+> +
+> +The user sets the per-page memory attributes to a guest memory range indicated
+> +by address/size, and in return KVM adjusts address and size to reflect the
+> +actual pages of the memory range have been successfully set to the attributes.
+> +If the call returns 0, "address" is updated to the last successful address + 1
+> +and "size" is updated to the remaining address size that has not been set
+> +successfully. The user should check the return value as well as the size to
+> +decide if the operation succeeded for the whole range or not. The user may want
+> +to retry the operation with the returned address/size if the previous range was
+> +partially successful.
+> +
+> +Both address and size should be page aligned and the supported attributes can be
+> +retrieved with KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES.
+> +
+> +The "flags" field may be used for future extensions and should be set to 0s.
+> +
+>   5. The kvm_run structure
+>   ========================
+>   
+> @@ -8270,6 +8323,16 @@ structure.
+>   When getting the Modified Change Topology Report value, the attr->addr
+>   must point to a byte where the value will be stored or retrieved from.
+>   
+> +8.40 KVM_CAP_MEMORY_ATTRIBUTES
+> +------------------------------
+> +
+> +:Capability: KVM_CAP_MEMORY_ATTRIBUTES
+> +:Architectures: x86
+> +:Type: vm
+> +
+> +This capability indicates KVM supports per-page memory attributes and ioctls
+> +KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES/KVM_SET_MEMORY_ATTRIBUTES are available.
+> +
+>   9. Known KVM API problems
+>   =========================
+>   
+> diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
+> index fbeaa9ddef59..a8e379a3afee 100644
+> --- a/arch/x86/kvm/Kconfig
+> +++ b/arch/x86/kvm/Kconfig
+> @@ -49,6 +49,7 @@ config KVM
+>   	select SRCU
+>   	select INTERVAL_TREE
+>   	select HAVE_KVM_PM_NOTIFIER if PM
+> +	select HAVE_KVM_MEMORY_ATTRIBUTES
+>   	help
+>   	  Support hosting fully virtualized guest machines using hardware
+>   	  virtualization extensions.  You will need a fairly recent
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 8f874a964313..a784e2b06625 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -800,6 +800,9 @@ struct kvm {
+>   
+>   #ifdef CONFIG_HAVE_KVM_PM_NOTIFIER
+>   	struct notifier_block pm_notifier;
+> +#endif
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +	struct xarray mem_attr_array;
+>   #endif
+>   	char stats_id[KVM_STATS_NAME_SIZE];
+>   };
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index 64dfe9c07c87..5d0941acb5bb 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -1182,6 +1182,7 @@ struct kvm_ppc_resize_hpt {
+>   #define KVM_CAP_S390_CPU_TOPOLOGY 222
+>   #define KVM_CAP_DIRTY_LOG_RING_ACQ_REL 223
+>   #define KVM_CAP_S390_PROTECTED_ASYNC_DISABLE 224
+> +#define KVM_CAP_MEMORY_ATTRIBUTES 225
+>   
+>   #ifdef KVM_CAP_IRQ_ROUTING
+>   
+> @@ -2238,4 +2239,20 @@ struct kvm_s390_zpci_op {
+>   /* flags for kvm_s390_zpci_op->u.reg_aen.flags */
+>   #define KVM_S390_ZPCIOP_REGAEN_HOST    (1 << 0)
+>   
+> +/* Available with KVM_CAP_MEMORY_ATTRIBUTES */
+> +#define KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES    _IOR(KVMIO,  0xd2, __u64)
+> +#define KVM_SET_MEMORY_ATTRIBUTES              _IOWR(KVMIO,  0xd3, struct kvm_memory_attributes)
+> +
+> +struct kvm_memory_attributes {
+> +	__u64 address;
+> +	__u64 size;
+> +	__u64 attributes;
+> +	__u64 flags;
+> +};
+> +
+> +#define KVM_MEMORY_ATTRIBUTE_READ              (1ULL << 0)
+> +#define KVM_MEMORY_ATTRIBUTE_WRITE             (1ULL << 1)
+> +#define KVM_MEMORY_ATTRIBUTE_EXECUTE           (1ULL << 2)
+> +#define KVM_MEMORY_ATTRIBUTE_PRIVATE           (1ULL << 3)
+> +
+>   #endif /* __LINUX_KVM_H */
+> diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
+> index 800f9470e36b..effdea5dd4f0 100644
+> --- a/virt/kvm/Kconfig
+> +++ b/virt/kvm/Kconfig
+> @@ -19,6 +19,9 @@ config HAVE_KVM_IRQ_ROUTING
+>   config HAVE_KVM_DIRTY_RING
+>          bool
+>   
+> +config HAVE_KVM_MEMORY_ATTRIBUTES
+> +       bool
+> +
+>   # Only strongly ordered architectures can select this, as it doesn't
+>   # put any explicit constraint on userspace ordering. They can also
+>   # select the _ACQ_REL version.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index 1782c4555d94..7f0f5e9f2406 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -1150,6 +1150,9 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
+>   	spin_lock_init(&kvm->mn_invalidate_lock);
+>   	rcuwait_init(&kvm->mn_memslots_update_rcuwait);
+>   	xa_init(&kvm->vcpu_array);
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +	xa_init(&kvm->mem_attr_array);
+> +#endif
+>   
+>   	INIT_LIST_HEAD(&kvm->gpc_list);
+>   	spin_lock_init(&kvm->gpc_lock);
+> @@ -1323,6 +1326,9 @@ static void kvm_destroy_vm(struct kvm *kvm)
+>   		kvm_free_memslots(kvm, &kvm->__memslots[i][0]);
+>   		kvm_free_memslots(kvm, &kvm->__memslots[i][1]);
+>   	}
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +	xa_destroy(&kvm->mem_attr_array);
+> +#endif
+>   	cleanup_srcu_struct(&kvm->irq_srcu);
+>   	cleanup_srcu_struct(&kvm->srcu);
+>   	kvm_arch_free_vm(kvm);
+> @@ -2323,6 +2329,49 @@ static int kvm_vm_ioctl_clear_dirty_log(struct kvm *kvm,
+>   }
+>   #endif /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
+>   
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +static u64 kvm_supported_mem_attributes(struct kvm *kvm)
+> +{
+> +	return 0;
+> +}
+> +
+> +static int kvm_vm_ioctl_set_mem_attributes(struct kvm *kvm,
+> +					   struct kvm_memory_attributes *attrs)
+> +{
+> +	gfn_t start, end;
+> +	unsigned long i;
+> +	void *entry;
+> +	u64 supported_attrs = kvm_supported_mem_attributes(kvm);
+> +
+> +	/* flags is currently not used. */
+> +	if (attrs->flags)
+> +		return -EINVAL;
+> +	if (attrs->attributes & ~supported_attrs)
+> +		return -EINVAL;
+> +	if (attrs->size == 0 || attrs->address + attrs->size < attrs->address)
+> +		return -EINVAL;
+> +	if (!PAGE_ALIGNED(attrs->address) || !PAGE_ALIGNED(attrs->size))
+> +		return -EINVAL;
+> +
+> +	start = attrs->address >> PAGE_SHIFT;
+> +	end = (attrs->address + attrs->size - 1 + PAGE_SIZE) >> PAGE_SHIFT;
+> +
+> +	entry = attrs->attributes ? xa_mk_value(attrs->attributes) : NULL;
+> +
+> +	mutex_lock(&kvm->lock);
+> +	for (i = start; i < end; i++)
+> +		if (xa_err(xa_store(&kvm->mem_attr_array, i, entry,
+> +				    GFP_KERNEL_ACCOUNT)))
+> +			break;
+> +	mutex_unlock(&kvm->lock);
+> +
+> +	attrs->address = i << PAGE_SHIFT;
+> +	attrs->size = (end - i) << PAGE_SHIFT;
+> +
+> +	return 0;
+> +}
+> +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+> +
+>   struct kvm_memory_slot *gfn_to_memslot(struct kvm *kvm, gfn_t gfn)
+>   {
+>   	return __gfn_to_memslot(kvm_memslots(kvm), gfn);
+> @@ -4459,6 +4508,9 @@ static long kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+>   #ifdef CONFIG_HAVE_KVM_MSI
+>   	case KVM_CAP_SIGNAL_MSI:
+>   #endif
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +	case KVM_CAP_MEMORY_ATTRIBUTES:
+> +#endif
+>   #ifdef CONFIG_HAVE_KVM_IRQFD
+>   	case KVM_CAP_IRQFD:
+>   	case KVM_CAP_IRQFD_RESAMPLE:
+> @@ -4804,6 +4856,30 @@ static long kvm_vm_ioctl(struct file *filp,
+>   		break;
+>   	}
+>   #endif /* CONFIG_HAVE_KVM_IRQ_ROUTING */
+> +#ifdef CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES
+> +	case KVM_GET_SUPPORTED_MEMORY_ATTRIBUTES: {
+> +		u64 attrs = kvm_supported_mem_attributes(kvm);
+> +
+> +		r = -EFAULT;
+> +		if (copy_to_user(argp, &attrs, sizeof(attrs)))
+> +			goto out;
+> +		r = 0;
+> +		break;
+> +	}
+> +	case KVM_SET_MEMORY_ATTRIBUTES: {
+> +		struct kvm_memory_attributes attrs;
+> +
+> +		r = -EFAULT;
+> +		if (copy_from_user(&attrs, argp, sizeof(attrs)))
+> +			goto out;
+> +
+> +		r = kvm_vm_ioctl_set_mem_attributes(kvm, &attrs);
+> +
+> +		if (!r && copy_to_user(argp, &attrs, sizeof(attrs)))
+> +			r = -EFAULT;
+> +		break;
+> +	}
+> +#endif /* CONFIG_HAVE_KVM_MEMORY_ATTRIBUTES */
+>   	case KVM_CREATE_DEVICE: {
+>   		struct kvm_create_device cd;
+>   
