@@ -2,79 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DA6B366E864
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 22:27:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B151366E88D
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 22:38:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229753AbjAQV07 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 16:26:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47920 "EHLO
+        id S229660AbjAQViH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 16:38:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229807AbjAQVZi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 16:25:38 -0500
-Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 482F8577CA;
-        Tue, 17 Jan 2023 11:44:49 -0800 (PST)
-Received: by mail-il1-x130.google.com with SMTP id a3so9984691ilp.6;
-        Tue, 17 Jan 2023 11:44:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5JIbNrskGEup5Zw9WnSDYstYuiQFrpRXeEKVLHFV3c0=;
-        b=Un29ENV3PsO12mZsz1Cpw3Y/IMp3vk04r584klcjOGzNX+sa8IW8/Wuxt0OQ6D7Gw4
-         C1MXZ9FLRoZd859hYPW5w9pEKpvOvMAonjV50zSROBh753cvTyMOWKuwnutfICmWlDFa
-         3hiBekqoQ1z7Nk6DaEkOPb45ekRp5h0EMrb1L1ZgHJz2MmpHCVgInSbYQhjm0LUWZrtq
-         7DcvhB4WaKTWwBD5dir6jWbXvc1WhNzZMuas7skehZH+PWR55EnoReTUMBeqekUK0zoP
-         q+ecv690GH8Z1oRgQZhmdEsAyZD+d+y9gJ1qTgf7jILwnnIU+2gNXkW/s2Zoba8XckCm
-         8cfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5JIbNrskGEup5Zw9WnSDYstYuiQFrpRXeEKVLHFV3c0=;
-        b=l7rfoMpfFM6gMh8dARugXhGZskv2OGUwzdMB2rCY87dbrTOCkn7rEJlgkSC1dkk6pY
-         GMW6fMaHsMBgvEsgxx8Qw0ikzMPee/91VDUcCy3SrGaJiUr46yz6Ev3ixaAs1NtYhcX/
-         zlErW/LwD63NVYAqzUgIDE4ZS3IRXtyM7KI5NtDXVstU3I9pGwGq4cga8hFYPZ7rN2ya
-         sPRPiK/TXqM+QgZA9vmoou0PfLyp9c3Nv5HuVPgBIlYAF4UBRKwp4g542q8A4nW1Tonp
-         iJ9AxPVL/xBdmKGP339JwLAWj9hmtroRT932xQvqHBeGUhAlqMK1gPhkfmBWW94QAq7j
-         0U2g==
-X-Gm-Message-State: AFqh2krckBkMsd6JTUfClb0ZkWHQtnzW4Qz2p2Dgjjl3zCopUjDYjo+R
-        jOO0bmNeJlsjqo8TBdA9jNA=
-X-Google-Smtp-Source: AMrXdXtmzuxLQLKp1Cxoe2DdLdH+nQqgx5k4CpKJfmDeOkEgKxXNEHTIQcZD6PbeFLCzWIsJweqEpQ==
-X-Received: by 2002:a92:9501:0:b0:30e:f03e:a76e with SMTP id y1-20020a929501000000b0030ef03ea76emr624301ilh.2.1673984660274;
-        Tue, 17 Jan 2023 11:44:20 -0800 (PST)
-Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
-        by smtp.gmail.com with ESMTPSA id g12-20020a92d7cc000000b0030c332915aasm9428093ilq.49.2023.01.17.11.44.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 11:44:19 -0800 (PST)
-Date:   Tue, 17 Jan 2023 21:44:14 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Kai Huang <kai.huang@intel.com>
-Subject: Re: [PATCH v11 018/113] KVM: TDX: create/destroy VM structure
-Message-ID: <20230117214414.00003229@gmail.com>
-In-Reply-To: <Y8bFCb+rs25dKcMY@google.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
-        <68fa413e61d7471657174bc7c83bde5c842e251f.1673539699.git.isaku.yamahata@intel.com>
-        <20230113151258.00006a6d@gmail.com>
-        <Y8F1uPsW56fVdhmC@google.com>
-        <20230114111621.00001840@gmail.com>
-        <Y8bFCb+rs25dKcMY@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=ISO-8859-1
+        with ESMTP id S229746AbjAQVey (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 16:34:54 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B765F4DCCB
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 11:58:30 -0800 (PST)
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30HJQFI0002556;
+        Tue, 17 Jan 2023 19:58:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=Apa+RLI5AIUlbQGPDiuO1LW7cPjZPExNp+EC46G6sRQ=;
+ b=K55NvgHxkKzCmRh9NAaeHlx9ZXQ6oSmULSEAlgdueeMD+cfBxtjAsSbYZUOGLPIFzyU0
+ SltjT0BOd3w5bB2rEpE0yDO71DIK4Zcs4SisrJMNaHZWyMm/OXgYcTP0MMxl3R/QWFyf
+ H3+8XXVVD/9umq2ukcQJpnHuVZdW35Ax33Q+6AyMq+dK1A5mU1XKTAtQyU6M2XTuxVny
+ mI4gqzvUM+5tDD86431UOdiY77ssTQAefU2E2TYSgXs9vH8YD3ICx7LaWyLJxu43/oLE
+ vnRPBgHDEBaNvEzA2Lko67aM+zhY6jtfUf1bslYNBby9jyjWtE7DXsWV6NUfgQVpgweY pw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n61ty8kfm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 19:58:22 +0000
+Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30HJUNpd015511;
+        Tue, 17 Jan 2023 19:58:22 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n61ty8kf0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 19:58:21 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30HAwjps016548;
+        Tue, 17 Jan 2023 19:58:19 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3n3m16k5gq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 19:58:19 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30HJwF9O47317394
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Jan 2023 19:58:15 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 894252004B;
+        Tue, 17 Jan 2023 19:58:15 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2381C20040;
+        Tue, 17 Jan 2023 19:58:15 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.180.94])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 17 Jan 2023 19:58:15 +0000 (GMT)
+Message-ID: <0103e627a835013e00a9c55d46348e76b94366e9.camel@linux.ibm.com>
+Subject: Re: [PATCH v14 04/11] s390x/sclp: reporting the maximum nested
+ topology entries
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        frankja@linux.ibm.com, berrange@redhat.com, clg@kaod.org
+Date:   Tue, 17 Jan 2023 20:58:15 +0100
+In-Reply-To: <22aff83d-4379-e4f0-9826-33f986ddeec7@linux.ibm.com>
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+         <20230105145313.168489-5-pmorel@linux.ibm.com>
+         <e65bce5b-977c-ed19-9562-3af8ee8e9fba@redhat.com>
+         <22aff83d-4379-e4f0-9826-33f986ddeec7@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: OJ7MDHxD0Koil2ixbWftLc8OOaXFBM_G
+X-Proofpoint-GUID: 9GAHTua5RR4KG8xd242-hY5X4l3q0p7C
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-17_10,2023-01-17_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
+ suspectscore=0 mlxlogscore=999 adultscore=0 bulkscore=0 malwarescore=0
+ mlxscore=0 impostorscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301170156
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -82,159 +99,120 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 17 Jan 2023 15:55:53 +0000
-Sean Christopherson <seanjc@google.com> wrote:
-
-> On Sat, Jan 14, 2023, Zhi Wang wrote:
-> > On Fri, 13 Jan 2023 15:16:08 +0000 > Sean Christopherson <seanjc@google=
-.com> wrote:
-> >=20
-> > > On Fri, Jan 13, 2023, Zhi Wang wrote:
-> > > > Better add a FIXME: here as this has to be fixed later.
+On Tue, 2023-01-17 at 18:36 +0100, Pierre Morel wrote:
+>=20
+> On 1/11/23 09:57, Thomas Huth wrote:
+> > On 05/01/2023 15.53, Pierre Morel wrote:
+> > > The maximum nested topology entries is used by the guest to know
+> > > how many nested topology are available on the machine.
 > > >=20
-> > > No, leaking the page is all KVM can reasonably do here.  An improved
-> > > comment would be helpful, but no code change is required.
-> > > tdx_reclaim_page() returns an error if and only if there's an
-> > > unexpected, fatal error, e.g. a SEAMCALL with bad params, incorrect
-> > > concurrency in KVM, a TDX Module bug, etc.  Retrying at a later point=
- is
-> > > highly unlikely to be successful.
+> > > Currently, SCLP READ SCP INFO reports MNEST =3D 0, which is the
+> > > equivalent of reporting the default value of 2.
+> > > Let's use the default SCLP value of 2 and increase this value in the
+> > > future patches implementing higher levels.
 > >=20
-> > Hi:
-> >=20
-> > The word "leaking" sounds like a situation left unhandled temporarily.
-> >=20
-> > I checked the source code of the TDX module[1] for the possible reason =
-to
-> > fail when reviewing this patch:
-> >=20
-> > tdx-module-v1.0.01.01.zip\src\vmm_dispatcher\api_calls\tdh_phymem_page_=
-reclaim.c
-> > tdx-module-v1.0.01.01.zip\src\vmm_dispatcher\api_calls\tdh_phymem_page_=
-wbinvd.c
-> >=20
-> > a. Invalid parameters. For example, page is not aligned, PA HKID is not=
- zero...
-> >=20
-> > For invalid parameters, a WARN_ON_ONCE() + return value is good enough =
-as
-> > that is how kernel handles similar situations. The caller takes the
-> > responsibility.
-> > =20
-> > b. Locks has been taken in TDX module. TDR page has been locked due to =
-another
-> > SEAMCALL, another SEAMCALL is doing PAMT walk and holding PAMT lock...=
+> > I'm confused ... so does a SCLP value of 2 mean a MNEST level of 4 ?
+>=20
+> Sorry, I forgot to change this.
+> MNEST =3D 0 means no MNEST support and only socket is supported so it is=
 =20
+> like MNEST =3D 2.
+> MNEST !=3D 0 set the maximum nested level and correct values may be 2,3 o=
+r 4.
+> But this setting to 4 should already have been done in previous patch=20
+> where we introduced the books and drawers.
+
+I think setting it to 4 here is fine/preferable, since 2 is the default unl=
+ess
+you tell the guest that more are available, which you do in this patch.
+It's only the commit description that is confusing.
+
+>=20
+> I change the commit message with:
+> ---
+> s390x/sclp: reporting the maximum nested topology entries
+>=20
+> The maximum nested topology entries is used by the guest to know
+> how many nested topology are available on the machine.
+>=20
+> Let's return this information to the guest.
+> ---
+>=20
 > >=20
-> > This needs to be improved later either by retry or taking tdx_lock to a=
-void
-> > TDX module fails on this.
+> > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > > ---
+> > > =C2=A0 include/hw/s390x/sclp.h | 5 +++--
+> > > =C2=A0 hw/s390x/sclp.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 | 4 ++++
+> > > =C2=A0 2 files changed, 7 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/include/hw/s390x/sclp.h b/include/hw/s390x/sclp.h
+> > > index 712fd68123..4ce852473c 100644
+> > > --- a/include/hw/s390x/sclp.h
+> > > +++ b/include/hw/s390x/sclp.h
+> > > @@ -112,12 +112,13 @@ typedef struct CPUEntry {
+> > > =C2=A0 } QEMU_PACKED CPUEntry;
+> > > =C2=A0 #define SCLP_READ_SCP_INFO_FIXED_CPU_OFFSET=C2=A0=C2=A0=C2=A0=
+=C2=A0 128
+> > > -#define SCLP_READ_SCP_INFO_MNEST=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2
+> > > +#define SCLP_READ_SCP_INFO_MNEST=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 4
+> >=20
+> > ... since you update it to 4 here.
 >=20
-> No, tdx_reclaim_page() already retries TDH.PHYMEM.PAGE.RECLAIM if the tar=
-get page
-> is contended (though I'd question the validity of even that), and TDH.PHY=
-MEM.PAGE.WBINVD
-> is performed only when reclaiming the TDR.  If there's contention when re=
-claiming
-> the TDR, then KVM effectively has a use-after-free bug, i.e. leaking the =
-page is
-> the least of our worries.
+> Yes, in fact this should be set in the previous patch already to 4.
+> So I will do that.
 >=20
-
-Hi:
-
-Thanks for the reply. "Leaking" is the consquence of even failing in retry.=
- I
-agree with this. But I was questioning if "retry" is really a correct and o=
-nly
-solution when encountering lock contention in the TDX module as I saw that =
-there
-are quite some magic numbers are going to be introduced because of "retry" =
-and
-there were discussions about times of retry should be 3 or 1000 in TDX guest
-on hyper-V patches. It doesn't sound right.
-
-Compare to an typical *kernel lock* case, an execution path can wait on a
-waitqueue and later will be woken up. We usually do contention-wait-and-ret=
-ry
-and we rarely just do contention and retry X times. In TDX case, I understa=
-nd
-that it is hard for the TDX module to provide similar solutions as an execu=
-tion
-path can't stay long in the TDX module.
-
-1) We can always take tdx_lock (linux kernel lock) when calling a SEAMCALL
-that touch the TDX internal locks. But the downside is we might lose some
-concurrency.
-
-2) As TDX module doesn't provide contention-and-wait, I guess the following
-approach might have been discussed when designing this "retry".
-
-KERNEL                          TDX MODULE
-
-SEAMCALL A   ->                 PATH A: Taking locks
-
-SEAMCALL B   ->                 PATH B: Contention on a lock
-
-             <-                 Return "operand busy"
-
-SEAMCALL B   -|
-              |  <- Wait on a kernel waitqueue
-SEAMCALL B  <-|
-
-SEAMCALL A   <-                 PATH A: Return
-
-SEAMCALL A   -|
-              |  <- Wake up the waitqueue
-SEMACALL A  <-|=20
-
-SEAMCALL B  ->                  PATH B: Taking the locks
-...
-
-Why not this scheme wasn't chosen?
-
+> >=20
+> > > =C2=A0 typedef struct ReadInfo {
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SCCBHeader h;
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint16_t rnmax;
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t rnsize;
+> > > -=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 _reserved1[16 - 11];=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 /* 11-15 */
+> > > +=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 _reserved1[15 - 11];=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 /* 11-14 */
+> > > +=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 stsi_parm;=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
+ 15-16 */
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint16_t entries_cpu;=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 16=
+-17 */
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint16_t offset_cpu;=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*=
+ 18-19 */
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t=C2=A0 _reserved2[24 - 20];=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* 20-23 */
+> > > diff --git a/hw/s390x/sclp.c b/hw/s390x/sclp.c
+> > > index eff74479f4..07e3cb4cac 100644
+> > > --- a/hw/s390x/sclp.c
+> > > +++ b/hw/s390x/sclp.c
+> > > @@ -20,6 +20,7 @@
+> > > =C2=A0 #include "hw/s390x/event-facility.h"
+> > > =C2=A0 #include "hw/s390x/s390-pci-bus.h"
+> > > =C2=A0 #include "hw/s390x/ipl.h"
+> > > +#include "hw/s390x/cpu-topology.h"
+> > > =C2=A0 static inline SCLPDevice *get_sclp_device(void)
+> > > =C2=A0 {
+> > > @@ -125,6 +126,9 @@ static void read_SCP_info(SCLPDevice *sclp, SCCB=
+=20
+> > > *sccb)
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* CPU information */
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 prepare_cpu_entries(machine, entries_s=
+tart, &cpu_count);
+> > > +=C2=A0=C2=A0=C2=A0 if (s390_has_topology()) {
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 read_info->stsi_parm =3D =
+SCLP_READ_SCP_INFO_MNEST;
+> >=20
+> > This seems to be in contradiction to what you've said in the commit=20
+> > description - you set it to 4 and not to 2.
 >=20
-> On Thu, Jan 12, 2023 at 8:34 AM <isaku.yamahata@intel.com> wrote:
-> > +static int tdx_reclaim_page(hpa_t pa, bool do_wb, u16 hkid)
-> > +{
-> > + =A0 =A0 =A0 struct tdx_module_output out;
-> > + =A0 =A0 =A0 u64 err;
-> > +
-> > + =A0 =A0 =A0 do {
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D tdh_phymem_page_reclaim(pa, &out);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* TDH.PHYMEM.PAGE.RECLAIM is allowed o=
-nly when TD is shutdown.
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* state. =A0i.e. destructing TD.
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* TDH.PHYMEM.PAGE.RECLAIM =A0requires =
-TDR and target page.
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* Because we're destructing TD, it's r=
-are to contend with TDR.
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
-> > + =A0 =A0 =A0 } while (err =3D=3D (TDX_OPERAND_BUSY | TDX_OPERAND_ID_RC=
-X));
-> > + =A0 =A0 =A0 if (WARN_ON_ONCE(err)) {
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 pr_tdx_error(TDH_PHYMEM_PAGE_RECLAIM, err=
-, &out);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EIO;
-> > + =A0 =A0 =A0 }
-> > +
-> > + =A0 =A0 =A0 if (do_wb) {
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 /*
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* Only TDR page gets into this path. =
-=A0No contention is expected
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0* because of the last page of TD.
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0*/
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 err =3D tdh_phymem_page_wbinvd(set_hkid_t=
-o_hpa(pa, hkid));
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 if (WARN_ON_ONCE(err)) {
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 pr_tdx_error(TDH_PHYMEM_P=
-AGE_WBINVD, err, NULL);
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 return -EIO;
-> > + =A0 =A0 =A0 =A0 =A0 =A0 =A0 }
-> > + =A0 =A0 =A0 }
-> > +
-> > + =A0 =A0 =A0 tdx_clear_page(pa);
-> > + =A0 =A0 =A0 return 0;
-> > +}
+> Yes, I change the commit message.
+>=20
+> Thanks.
+>=20
+> Regards,
+> Pierre
+>=20
 
