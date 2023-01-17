@@ -2,77 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E35A66E3D6
-	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 17:41:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 14C6966E409
+	for <lists+kvm@lfdr.de>; Tue, 17 Jan 2023 17:49:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233064AbjAQQlp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 11:41:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50684 "EHLO
+        id S232715AbjAQQtT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 11:49:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233040AbjAQQlD (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 11:41:03 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 095EA3F2AD
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 08:40:59 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id z1-20020a17090a66c100b00226f05b9595so19528425pjl.0
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 08:40:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=irxkDiWsgsAkQraKpHAy3FezkTWc4VGbQfrpFess5dk=;
-        b=dVR1vS237CQ6fCANi/KMAsjNONLjHgvT1LOU/w6ZtQMxQizjSeunk8CmqQPk5DZA7H
-         3NVI7tC+XsYK2dKreFABPpEfZwDDbMlOeTUb53Y/786BXRXTCV4JhmDwLHGNlsPGaIIi
-         XoAs96nSmGvK/jd0nfzgfCJHQUvlJ3kvAbKj6KhbYTRdMuawCmabzpvP9k2pg7enecGg
-         WjEGBEfLt6hrkQ81DyUkRL4PGmMbbiCwCokbvIOKWg84J7phuIiizEDkZm2daz1RDEKv
-         DEDIgY86twz9HMiKWKpi2hYmHGJqofjBBW91CSkGCHYlTug78PqXAH+LhHw4zxFp5sa1
-         kMJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=irxkDiWsgsAkQraKpHAy3FezkTWc4VGbQfrpFess5dk=;
-        b=PyhRQbLMpKANv53Jb5q+8k9CyZ31zkgrKpEIj1NPrWVSACsCx0PT9od/IYy48lvfI3
-         jdotjrvNnhqKOk1m0FADmExFv0NoKoKEYjxgzui/GFtF1LxxSGcTX5AcP1sqAbNoX55v
-         BrhqL1RUEjCL3JImuv47zsfAZhNHIgw+q+ucZb2l3jap2R5zxpTbk5Oy5lDoPiUqEj6M
-         cRvwxrMPmInWcaNAd7/cJvaHTDCj5u8PAdH7xOuQ9F260Ke5ItH6Dw4bqxnOewZV7T8X
-         yXt0OmwuSp+2toEhnToMS3D63GNGnbX5ZT1JVFtJxsySQp2qS7eN6g99vpUmKyRW3O7F
-         rbWQ==
-X-Gm-Message-State: AFqh2kqsD2eiL2nmjlu58rDcocCrqTwX5/xKvELr9a37vxtRaxIVuzEo
-        wb552Ob3AsoHhmor1oSJigx3jg==
-X-Google-Smtp-Source: AMrXdXvPwz2MuaiP1Euf+cgYDEvPU/yYbL3k78WmQNLZNYzU9oSVx5lLJj3ijzHSeWgefTRb7xXwLA==
-X-Received: by 2002:a17:902:e808:b0:189:b910:c6d2 with SMTP id u8-20020a170902e80800b00189b910c6d2mr2832664plg.1.1673973658886;
-        Tue, 17 Jan 2023 08:40:58 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id s7-20020a170902988700b0017ec1b1bf9fsm21303359plp.217.2023.01.17.08.40.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 08:40:58 -0800 (PST)
-Date:   Tue, 17 Jan 2023 16:40:54 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "dmatlack@google.com" <dmatlack@google.com>
-Subject: Re: [PATCH v11 025/113] KVM: TDX: Use private memory for TDX
-Message-ID: <Y8bPljsAF+lSnWtC@google.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
- <4c3f5462852af9fd0957bb7db0b04a6f2d5639ee.1673539699.git.isaku.yamahata@intel.com>
- <b8f88a7b9b2ab00379e6b1afd6a7fdb409d35492.camel@intel.com>
+        with ESMTP id S234620AbjAQQtI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 11:49:08 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0AA59EF2
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 08:49:06 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30HGUh66029161;
+        Tue, 17 Jan 2023 16:49:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=n0YBDYKcLFNtdBHv+ttAeAwbiwIxAveDWQDeyaORJNM=;
+ b=KfsVhljijER+aXgWVsYBzbxDXcj3sktN3WFe36jYwF26qHLFow8eQrJt9WSZ0KG2EUOz
+ +x5Wu51VuF3/AVW+JhX8ZJP7p61lQv1O4+mEG5ZmJVw/Uh8lUhRn56wjuh0C602djLIO
+ IO35PpZpaNocbMNomJEJcw3SibocyQvyWHjTyj2bja+x0Z6XDbzKHFRyv4aNKYGdf7EH
+ SrhJC0CSB31yx8rcvzbYhclACs9ZWmThVRivxnnVCFJf7i7WRDEOA8FhO1751CiYpIpX
+ xbYgptUZHg6tM8kdZVKeR57idhRa5Aan1XEFz5c0E8+I3HiVWYpil+zhFCrEiDZuFtx/ 0w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5x3samet-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 16:48:59 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30HFQurS027223;
+        Tue, 17 Jan 2023 16:48:59 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n5x3samdt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 16:48:59 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30HELbIl015767;
+        Tue, 17 Jan 2023 16:48:56 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3n3m16k1dq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 Jan 2023 16:48:56 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30HGmqhA23331546
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 17 Jan 2023 16:48:53 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DD61F20043;
+        Tue, 17 Jan 2023 16:48:52 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 81D0A20040;
+        Tue, 17 Jan 2023 16:48:52 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.186.145])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 17 Jan 2023 16:48:52 +0000 (GMT)
+Message-ID: <13ad4df8bc83f552ae1c9aad4f1a44d18963e7a8.camel@linux.ibm.com>
+Subject: Re: [PATCH v14 02/11] s390x/cpu topology: add topology entries on
+ CPU hotplug
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Tue, 17 Jan 2023 17:48:52 +0100
+In-Reply-To: <8063592a-971a-d029-e8ac-0fb6286199d5@linux.ibm.com>
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+         <20230105145313.168489-3-pmorel@linux.ibm.com>
+         <666b9711b23d807525be06992fffd4d782ee80c7.camel@linux.ibm.com>
+         <8063592a-971a-d029-e8ac-0fb6286199d5@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b8f88a7b9b2ab00379e6b1afd6a7fdb409d35492.camel@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4Lri38RTcwwgef9jBrw6kpKM7BaC3Uz5
+X-Proofpoint-GUID: 4Nt8pDw41bbjVlpGc5k7RO0qsErGb7k_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-17_08,2023-01-17_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ lowpriorityscore=0 suspectscore=0 bulkscore=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 mlxlogscore=999 malwarescore=0 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301170133
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,54 +99,83 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 16, 2023, Huang, Kai wrote:
-> On Thu, 2023-01-12 at 08:31 -0800, isaku.yamahata@intel.com wrote:
-> > From: Chao Peng <chao.p.peng@linux.intel.com>
-> > 
-> > Override kvm_arch_has_private_mem() to use fd-based private memory.
-> > Return true when a VM has a type of KVM_X86_TDX_VM.
-> > 
-> > Signed-off-by: Chao Peng <chao.p.peng@linux.intel.com>
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >  arch/x86/kvm/x86.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index d548d3af6428..a8b555935fd8 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -13498,6 +13498,11 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
-> >  }
-> >  EXPORT_SYMBOL_GPL(kvm_sev_es_string_io);
-> >  
-> > +bool kvm_arch_has_private_mem(struct kvm *kvm)
-> > +{
-> > +	return kvm->arch.vm_type == KVM_X86_TDX_VM;
-> > +}
-> > +
-> 
-> AMD's series has a different solution:
-> 
-> https://lore.kernel.org/lkml/20221214194056.161492-3-michael.roth@amd.com/
-> 
-> I think somehow this needs to get aligned.
+On Tue, 2023-01-17 at 14:55 +0100, Pierre Morel wrote:
+>=20
+> On 1/13/23 19:15, Nina Schoetterl-Glausch wrote:
+> >=20
+[...]
 
-Ya.  My thought is
+> > > +/**
+> > > + * s390_topology_set_entry:
+> > > + * @entry: Topology entry to setup
+> > > + * @id: topology id to use for the setup
+> > > + *
+> > > + * Set the core bit inside the topology mask and
+> > > + * increments the number of cores for the socket.
+> > > + */
+> > > +static void s390_topology_set_entry(S390TopologyEntry *entry,
+> >=20
+> > Not sure if I like the name, what it does is to add a cpu to the entry.
+>=20
+> s390_topology_add_cpu_to_entry() ?
 
- bool kvm_arch_has_private_mem(struct kvm *kvm)
- {
-	return kvm->arch.vm_type != KVM_X86_DEFAULT_VM;
- }
+Yeah, that's better.
 
-where the VM types end up being:
+[...]
+>=20
+> > > +/**
+> > > + * s390_topology_set_cpu:
+> > > + * @ms: MachineState used to initialize the topology structure on
+> > > + *      first call.
+> > > + * @cpu: the new S390CPU to insert in the topology structure
+> > > + * @errp: the error pointer
+> > > + *
+> > > + * Called from CPU Hotplug to check and setup the CPU attributes
+> > > + * before to insert the CPU in the topology.
+> > > + */
+> > > +void s390_topology_set_cpu(MachineState *ms, S390CPU *cpu, Error **e=
+rrp)
+> > > +{
+> > > +    Error *local_error =3D NULL;
+> >=20
+> > Can't you just use ERRP_GUARD ?
+>=20
+> I do not think it is necessary and I find it obfuscating.
+> So, should I?
 
- #define KVM_X86_DEFAULT_VM	0
- #define KVM_X86_PROTECTED_VM	1
- #define KVM_X86_TDX_VM		2
- #define KVM_X86_SNP_VM		3
+/*
+ * Propagate error object (if any) from @local_err to @dst_errp.
+[...]
+ * Please use ERRP_GUARD() instead when possible.
+ * Please don't error_propagate(&error_fatal, ...), use
+ * error_report_err() and exit(), because that's more obvious.
+ */
+void error_propagate(Error **dst_errp, Error *local_err);
 
-Don't spend too much time reworking the TDX series at this point, I'm going to do
-a trial run of combining UPM+TDX+SNP sometime in the next few weeks to see how all
-the pieces fit together, this is one of the common touchpoints that I'll make sure
-to look at.  Though if you have ideas on, by all means post them.
+So I'd say yes.
+>=20
+> >=20
+> > > +    s390_topology_id id;
+> > > +
+> > > +    /*
+> > > +     * We do not want to initialize the topology if the cpu model
+> > > +     * does not support topology consequently, we have to wait for
+> >=20
+> > ", consequently," I think. Could you do the initialization some where e=
+lse,
+> > after you know what the cpu model is? Not that I object to doing it thi=
+s way.
+> >=20
+>=20
+> I did not find a better place, it must be done after the CPU model is=20
+> initialize and before the first CPU is created.
+> The cpu model is initialized during the early creation of the first cpu.
+>=20
+> Any idea?
+>=20
+> Thanks.
+>=20
+> Regards,
+> Pierre
+>=20
+
