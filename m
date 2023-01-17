@@ -2,82 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A323B670E3A
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 00:54:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6B4EC670E4E
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 01:00:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbjAQXyr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 18:54:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45100 "EHLO
+        id S229949AbjARAAo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 19:00:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229931AbjAQXy1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 18:54:27 -0500
-Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8526627483
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 15:06:59 -0800 (PST)
-Received: by mail-ed1-x535.google.com with SMTP id s21so3074967edi.12
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 15:06:59 -0800 (PST)
+        with ESMTP id S229525AbjARAAW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 19:00:22 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24F4723304;
+        Tue, 17 Jan 2023 15:14:46 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id 127so7536859pfe.4;
+        Tue, 17 Jan 2023 15:14:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=34NRbc6Rn5Hl13DlQK5hbHVd7yokEN6LIZjVZYLB8G8=;
-        b=mOosTStJClf1s+/aMHv4S9eSJthVfst5f0cCzLOs1zteP8KNfa71CF91fExyu7VZ97
-         xSm0YCQlKvZnF3zYP8GSxnl8E+kVDjs1ja+TgYK9xk+fStA1q97MHIQf+gw4UW0F0+yZ
-         OVgaZH+yNXuXUWq9swdoOXdxPHPzbDbbLBJlrhycbusqjUHZm2gbbwRmYJVOAasR1i+1
-         9i/8U0igntuW//mMuCx4ExS6UnuJ5+7rX3aqk84HnNSPBVixf4WeqTX8C6mOSUNKO+vS
-         yGMZgpaLF7ewxO5tmaI4I3CalehZhVUPA414tyTk1QYqDZRfZ/834dIrY1A1gR8OkeVn
-         8ZyA==
+        d=gmail.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xYYclJT0SRDfx3j8T+Q0suM7DxwMbnZVfV94sfe2l/Q=;
+        b=SUGzEMXa0jJdEwFho5rOpwE6/0R8GdrrgHWuJ9A1SrVwo77Hm3LTMmEb9SEudLh8Vl
+         /PzoC5ZdwJBap1nOWNR9fwyuVyVfUtPNjJ1xqesNmhIPl2n741WqCP891qVps8pR771i
+         jlcTzyQG9GLGcc+1IdjZpqQuF7qa+qCEuAd+8c8VA6FhYh5k+5zRE8Un0G3Zkd263osf
+         ejBQthbTJSE4AsyTQ8SfjlBqabcl0D0R0YbOudEw1v6QXBLDy+lAQsBnd0O/WJe8F25Q
+         kqP/KwLHw3TdMoHU+Pu2+wS3+0D0w5BxqSnXnMW5GdPQQScGDJi0wcedNHPdein62LSj
+         o9Vw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=34NRbc6Rn5Hl13DlQK5hbHVd7yokEN6LIZjVZYLB8G8=;
-        b=ercg+OwXQNZ77O391AXSwc0zatGzXQXHgus0KPcmqZ5O93RVgphf2iv3midL82daV+
-         V2gef8PvRteToKetzN7hp2lxa+Gwu3KoCYlhp5W0r/gEhU3mrFfAhxp9ITrVwHpYZUDj
-         gjfE7w2s7MNvOT7xwVdMZ2+rOFjx4/RolTx0RSjBV+sjRFxu+Jo9Kijck+1d0KdXFp0+
-         ptC60erUGQpM0USalxV+V2oVRq9qMdJUFfGQRhD5i2WHyxtseEkQ1I89ZtAMpp+6HR5A
-         ad/twVOZ+x6EKkS8WkMI88yDqDqDPvac4gbpRVX/1Edbd6r+TVfDC9+oV2gzrV26SQfq
-         3toQ==
-X-Gm-Message-State: AFqh2koWujxLlmw/JqVmbWHrf77+DNqbmTTfGTKyPIRtudqBTCl/1iSr
-        rw+X/Iu9RaPCvVnQACYICXPVf2+034PskicT9R4i6BUVZ2svuBFU
-X-Google-Smtp-Source: AMrXdXuD8XDTRfhe8VdadVUHbu5H49U/f3QNMGiza2JXIZMnTQHUeeLXRJYvdz8Z6t4UwnRQmicWSGwLne3BbvoTf/E=
-X-Received: by 2002:aa7:da51:0:b0:49e:4936:bbd8 with SMTP id
- w17-20020aa7da51000000b0049e4936bbd8mr34172eds.410.1673996817849; Tue, 17 Jan
- 2023 15:06:57 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xYYclJT0SRDfx3j8T+Q0suM7DxwMbnZVfV94sfe2l/Q=;
+        b=Qg8gmOedMZ1zppRSfQEBYqMtZuvzn8Erttv0UQ0XSs+DFv0rfzI7Qt9bo8knevBHyS
+         KgCnERthijW1crCBKm6rEADQalusKpciVwzUvY5PcKOh8x32Z7jhZPP+EXyZFT+sSemg
+         677DAguRZEJ+JLu1wz28v8URiOay8ztSekjM//8djcSFRrm1fH16pWPxVLScJlSkXeVa
+         ps7UiCCxgytG72j4pd/wTlZplbKjwJAtrbaszQUQLV4c6xmvAM0wIkHtlX52ednfXcFe
+         V47GpNUyGJm6URxUl6qjcvckc/wIkKVyV6zDI6igyXoa8Izh8CkwLPxwcX+rp86WzcU1
+         qqZg==
+X-Gm-Message-State: AFqh2krQMwyF5tfn2xuk9TdB2iQ563aDH6zwnF9Mcsn7exV5niDFdhkn
+        BwIobZjwFGR0Gpz60ehLjzMtv6h6G9JQbw==
+X-Google-Smtp-Source: AMrXdXvOL5Zurqa1giRr2W+k4fK1YThD3bN38NPuR85GBFd2A050lb3UL4kQDBziA5MMZRUaGpH0Sw==
+X-Received: by 2002:a62:5341:0:b0:57f:c170:dc6 with SMTP id h62-20020a625341000000b0057fc1700dc6mr4178981pfb.14.1673997286354;
+        Tue, 17 Jan 2023 15:14:46 -0800 (PST)
+Received: from localhost (ec2-13-57-97-131.us-west-1.compute.amazonaws.com. [13.57.97.131])
+        by smtp.gmail.com with ESMTPSA id z30-20020aa7991e000000b005898fcb7c2bsm16244841pff.170.2023.01.17.15.14.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Jan 2023 15:14:45 -0800 (PST)
+Date:   Tue, 17 Jan 2023 23:14:44 +0000
+From:   Bobby Eshleman <bobbyeshleman@gmail.com>
+To:     Stefano Garzarella <sgarzare@redhat.com>
+Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
+        Cong Wang <cong.wang@bytedance.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        Arseniy Krasnov <AVKrasnov@sberdevices.ru>,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Eric Dumazet <edumazet@google.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next v10] virtio/vsock: replace virtio_vsock_pkt with
+ sk_buff
+Message-ID: <Y8cr5KosN5kZaOgK@bullseye>
+References: <20230113222137.2490173-1-bobby.eshleman@bytedance.com>
+ <20230116111207.yxlwh4jlejtn4ple@sgarzare-redhat>
 MIME-Version: 1.0
-References: <20221205232341.4131240-1-vannapurve@google.com>
- <20221205232341.4131240-4-vannapurve@google.com> <Y8cXvS2gKcK8tU2D@google.com>
-In-Reply-To: <Y8cXvS2gKcK8tU2D@google.com>
-From:   Vishal Annapurve <vannapurve@google.com>
-Date:   Tue, 17 Jan 2023 15:06:44 -0800
-Message-ID: <CAGtprH-xN_mSrsJtf4FAKM7xtCoz7XPZvsxdoj_N9XEL__QSkA@mail.gmail.com>
-Subject: Re: [V2 PATCH 3/6] KVM: selftests: x86: Add IS_ALIGNED/IS_PAGE_ALIGNED
- helpers
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230116111207.yxlwh4jlejtn4ple@sgarzare-redhat>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,20 +81,48 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 17, 2023 at 1:48 PM Sean Christopherson <seanjc@google.com> wrote:
-> ...
-> I certainly don't object to adding IS_PAGE_ALIGNED(), but it's not needed for
-> this series.  Verifying that KVM doesn't allow an unaligned page conversion during
-> KVM_HC_MAP_GPA_RANGE belongs in a separate test+series, as that doesn't have a
-> strict dependency on UPM.
->
-> TL;DR: this patch can be dropped, for now at least.
->
+On Mon, Jan 16, 2023 at 12:12:07PM +0100, Stefano Garzarella wrote:
+> On Fri, Jan 13, 2023 at 10:21:37PM +0000, Bobby Eshleman wrote:
+> > This commit changes virtio/vsock to use sk_buff instead of
+> > virtio_vsock_pkt. Beyond better conforming to other net code, using
+> > sk_buff allows vsock to use sk_buff-dependent features in the future
+> > (such as sockmap) and improves throughput.
+> > 
+> > This patch introduces the following performance changes:
+> > 
+> > Tool: Uperf
+> > Env: Phys Host + L1 Guest
+> > Payload: 64k
+> > Threads: 16
+> > Test Runs: 10
+> > Type: SOCK_STREAM
+> > Before: commit b7bfaa761d760 ("Linux 6.2-rc3")
+> > 
+> > Before
+> > ------
+> > g2h: 16.77Gb/s
+> > h2g: 10.56Gb/s
+> > 
+> > After
+> > -----
+> > g2h: 21.04Gb/s
+> > h2g: 10.76Gb/s
+> > 
+> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> > 
+> > ---
+> > Changes in v10:
+> > - vhost/vsock: use virtio_vsock_skb_dequeue()
+> > - vhost/vsock: remove extra iov_length() call
+> > - vhost/vsock: also consider hdr when evaluating that incoming size is
+> >  valid
+> > - new uperf data
+> 
+> Tests seem fine!
+> 
+> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Makes sense.
+Thank you for all of the reviews and testing!
 
-> >  #define HUGEPAGE_SHIFT(x)    (PAGE_SHIFT + (((x) - 1) * 9))
-> >  #define HUGEPAGE_SIZE(x)     (1UL << HUGEPAGE_SHIFT(x))
-> > --
-> > 2.39.0.rc0.267.gcb52ba06e7-goog
-> >
+Best,
+Bobby
