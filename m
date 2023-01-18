@@ -2,88 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38C366724A8
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 18:17:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 112236724B4
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 18:20:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231154AbjARRRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 12:17:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47306 "EHLO
+        id S229638AbjARRUR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 12:20:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231175AbjARRRS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 12:17:18 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEA159571
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:17:16 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id o7-20020a17090a0a0700b00226c9b82c3aso2837104pjo.3
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:17:16 -0800 (PST)
+        with ESMTP id S229593AbjARRUP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 12:20:15 -0500
+Received: from mail-wr1-x42c.google.com (mail-wr1-x42c.google.com [IPv6:2a00:1450:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4C6114EBE
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:20:13 -0800 (PST)
+Received: by mail-wr1-x42c.google.com with SMTP id z5so33613000wrt.6
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:20:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6FL8JJKN1LVzWkPF+aKtJUdwHaz9en8xDzUW2zFOrSY=;
-        b=bl5IHfblF7oi96NNkA5U8SF7wUtop9rpLyHBYs/4MD+DADCJ6isUH3ZccvjespkLZD
-         gXwGmB8IdvutFO2kyTnloszSczWHCoKGfI0xG1j2Ve7NarDvGd+URgpodYb19MJaH0zX
-         RPikpRZqC7VGmj+XI1sO0dpytVz5VH0NFQdvEeeYc2H4LDBAQ8i2KWpNvjQ/zdZ64Aif
-         Ta6Gn9SHn1KpN21U6TsCYRCkzVuVZVycpaUyRvdubCEtUP/O+Sejy1reztba8QfEwtde
-         Ky7f0b80BDeXQbMn20TkFDFRyyL5nozpU7s/VU/Vzb6+D3GxrVXlO1/pwwFhTV96xl/G
-         WGXA==
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CPlZeDlP3K2O68f6cRu29S/V8m0qV1aEJTBSTQwuMVA=;
+        b=p7g0n5dhXwa8i2YTjlfirOZDol5cFc/mF/G7Y41HP1JQgA5ToAucAlXZN6V3YsRxRy
+         z2uWauyIyiEzAU3GjVKnApfwenUU1ZtER+skNG+TYBciTpQvEhEKA3nPygfIAIVhihYa
+         omzz5C5JyOUvtALBascu5PmQkU3+V8M637WTNVtSqiVicABJyhjLfxuL9NuzxVigks9v
+         S0mFLKu4rBDbLETtHs8IhyIARLWeS6CE9Rc8q9aj/zl6msTzyzyQO2GFzsxUZeBIJ06S
+         jqDBMMfDFWcneVJdIoNpQgbEdyD7bSSVwmUPF/YFyLM8K9P+HkHDnG4/dSUnkIs8Vc1e
+         FSqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6FL8JJKN1LVzWkPF+aKtJUdwHaz9en8xDzUW2zFOrSY=;
-        b=dMHBzWbu/pwKkM5Y6B2glvQBj8RzZcqRDbq0W7S0gHB2iNOeQQNs0ZTTQmmPrL5ckZ
-         iksKKPijulhlwN2I3QNXGNAepN68FJ3t8hWHbw3WR74uQvscIpODZwPlWabwOyP9AP3L
-         F3as49nCi85y9oIMVpT2S/rKPU6mY4GKY2n2/W/soqofhU6h7vD98hCAgHr1kpCW51Od
-         TGS6Xcsjv/Ovi+adjJcOI2Fg+4eBVp4OlZI8yMCJGYCMyOWfMNZDcxhJpX5OWm68nZ+M
-         2D8qCdtEHpN6U3+85Jshyh4ZE11ocRZsQ5ZwWzLdVnmEH2vL1fBoVkOunw0+i/IqgfGa
-         AbzQ==
-X-Gm-Message-State: AFqh2kriln5+ZhrEw9rBh4LZQRmkPBEDm+DXpoIfuxRIa1/z/4E2gp/m
-        spdkrhn//8wyoEY3TiHe2CwLXw==
-X-Google-Smtp-Source: AMrXdXtOORgNGTIyd11R2eMP7ByXXE52rPFRkTZwXhynNFuQSIdozZ7e3gP+UEGWXjWMQ6ldDAX2Ig==
-X-Received: by 2002:a17:902:e808:b0:189:b910:c6d2 with SMTP id u8-20020a170902e80800b00189b910c6d2mr3394337plg.1.1674062235976;
-        Wed, 18 Jan 2023 09:17:15 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d17-20020a170902ced100b001895f7c8a71sm6609409plg.97.2023.01.18.09.17.15
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CPlZeDlP3K2O68f6cRu29S/V8m0qV1aEJTBSTQwuMVA=;
+        b=YdF+v1HvQMMQ0bv+tq1Ic9fT9/iOtS+QBXOqMUkwt+TPBWwVZ4pYxCj3NkA3ooBJqN
+         UrDjMEsGCdwTGFrvFV28ojvIXcgv4Y/rm815NaoPz/7zBqpUXUW8tovxqvSo2JmkRbuN
+         cX7xJooDOrFS43LjvMWZNkRaptAl5iCr188aZzcjaVnZO/fE1CKVxpQkQfKytWz8txlI
+         +oM0Rp+1/t+Mfh1XeHstLzixE3IJBh1ulsLzHq69uFPA6RriGLITAi1NX6C4Rw+539uG
+         9WBebTdtX09gJXLeqOP2IINF/lNgYkqesNRYnuAc/iwkdvZp4OA1/V5AMLBn/YFXaz51
+         vq1A==
+X-Gm-Message-State: AFqh2kqZL6BZLlup5soSwfoAN7cB6nqFuOpccnfFYNV/4sj82/hgAMZR
+        Sh94yAQN+zoKsIiGBQMfj1Wb75Q87bdMiwKw
+X-Google-Smtp-Source: AMrXdXuNNj38dSN82gGzVLj7c58r1shl8qKMa5J+t/eSpc5dFU/4QW3GQtqFQ87t51klO+k4vs++nw==
+X-Received: by 2002:a5d:5584:0:b0:2bd:c19f:8e90 with SMTP id i4-20020a5d5584000000b002bdc19f8e90mr6848978wrv.7.1674062412561;
+        Wed, 18 Jan 2023 09:20:12 -0800 (PST)
+Received: from localhost.localdomain (cpc98982-watf12-2-0-cust57.15-2.cable.virginm.net. [82.26.13.58])
+        by smtp.gmail.com with ESMTPSA id w4-20020adfee44000000b0029100e8dedasm31631541wro.28.2023.01.18.09.20.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 09:17:15 -0800 (PST)
-Date:   Wed, 18 Jan 2023 17:17:11 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     "Kirill A. Shutemov" <kirill@shutemov.name>
-Cc:     Vishal Annapurve <vannapurve@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
-Subject: Re: [V2 PATCH 0/6] KVM: selftests: selftests for fd-based private
- memory
-Message-ID: <Y8gpl+LwSuSgBFks@google.com>
-References: <20221205232341.4131240-1-vannapurve@google.com>
- <Y8dG3WDxY2OCGPby@google.com>
- <20230118112511.wrljyng2xiz3yktv@box.shutemov.name>
+        Wed, 18 Jan 2023 09:20:12 -0800 (PST)
+From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
+To:     apatel@ventanamicro.com, atishp@rivosinc.com, kvm@vger.kernel.org
+Cc:     Rajnesh Kanwal <rkanwal@rivosinc.com>
+Subject: [PATCH kvmtool 1/1] riscv: pci: Add --force-pci option for riscv VMs.
+Date:   Wed, 18 Jan 2023 17:20:07 +0000
+Message-Id: <20230118172007.408667-1-rkanwal@rivosinc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230118112511.wrljyng2xiz3yktv@box.shutemov.name>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -91,68 +66,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 18, 2023, Kirill A. Shutemov wrote:
-> On Wed, Jan 18, 2023 at 01:09:49AM +0000, Sean Christopherson wrote:
-> > On Mon, Dec 05, 2022, Vishal Annapurve wrote:
-> > > This series implements selftests targeting the feature floated by Chao via:
-> > > https://lore.kernel.org/lkml/20221202061347.1070246-10-chao.p.peng@linux.intel.com/T/
-> > > 
-> > > Below changes aim to test the fd based approach for guest private memory
-> > > in context of normal (non-confidential) VMs executing on non-confidential
-> > > platforms.
-> > > 
-> > > private_mem_test.c file adds selftest to access private memory from the
-> > > guest via private/shared accesses and checking if the contents can be
-> > > leaked to/accessed by vmm via shared memory view before/after conversions.
-> > > 
-> > > Updates in V2:
-> > > 1) Simplified vcpu run loop implementation API
-> > > 2) Removed VM creation logic from private mem library
-> > 
-> > I pushed a rework version of this series to:
-> > 
-> >   git@github.com:sean-jc/linux.git x86/upm_base_support
-> 
-> It still has build issue with lockdep enabled that I mentioned before:
+Adding force-pci option to allow forcing virtio
+devices to use pci as the default transport.
 
-Yeah, I haven't updated the branch since last Friday, i.e. I haven't fixed the
-known bugs yet.  I pushed the selftests changes at the same as everything else,
-just didn't get to typing up the emails until yesterday.
+Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+---
+ riscv/include/kvm/kvm-arch.h        | 6 ++++--
+ riscv/include/kvm/kvm-config-arch.h | 7 ++++++-
+ 2 files changed, 10 insertions(+), 3 deletions(-)
 
-> https://lore.kernel.org/all/20230116134845.vboraky2nd56szos@box.shutemov.name/
-> 
-> And when compiled with lockdep, it triggers a lot of warnings about missed
-> locks, like this:
-
-Ah crud, I knew I was forgetting something.  The lockdep assertion can simply be
-removed, mmu_lock doesn't need to be held to read attributes.  I knew the assertion
-was wrong when I added it, but I wanted to remind myself to take a closer look at
-the usage of kvm_mem_is_private() and forgot to go back and delete the assertion.
-
-The use of kvm_mem_is_private() in kvm_mmu_do_page_fault() is technically unsafe.
-Similar to getting the pfn, if mmu_lock isn't held, consuming the attributes
-(private vs. shared) needs MMU notifier protection, i.e. the attributes are safe
-to read only after mmu_invalidate_seq is snapshot.
-
-However, is_private gets rechecked by __kvm_faultin_pfn(), which is protected by
-the sequence counter, and so the technically unsafe read is verified in the end.
-The obvious alternative is to make is_private an output of kvm_faultin_pfn(), but
-that's incorrect for SNP and TDX guests, in which case "is_private" is a property
-of the fault itself.
-
-TL;DR: I'm going to delete the assertion and add a comment in kvm_mmu_do_page_fault()
-explaining why it's safe to consume kvm_mem_is_private() for "legacy" guests.
-
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 35a339891aed..da0afe81cf10 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -2310,8 +2310,6 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
- #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
- static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
- {
--       lockdep_assert_held(kvm->mmu_lock);
--
-        return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
- }
+diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+index 1e130f5..2cf41c5 100644
+--- a/riscv/include/kvm/kvm-arch.h
++++ b/riscv/include/kvm/kvm-arch.h
+@@ -46,8 +46,10 @@
+ 
+ #define KVM_VM_TYPE		0
+ 
+-#define VIRTIO_DEFAULT_TRANS(kvm) \
+-	((kvm)->cfg.virtio_legacy ? VIRTIO_MMIO_LEGACY : VIRTIO_MMIO)
++#define VIRTIO_DEFAULT_TRANS(kvm)					\
++	((kvm)->cfg.arch.virtio_trans_pci ?				\
++	 ((kvm)->cfg.virtio_legacy ? VIRTIO_PCI_LEGACY : VIRTIO_PCI) :	\
++	 ((kvm)->cfg.virtio_legacy ? VIRTIO_MMIO_LEGACY : VIRTIO_MMIO))
+ 
+ #define VIRTIO_RING_ENDIAN	VIRTIO_ENDIAN_LE
+ 
+diff --git a/riscv/include/kvm/kvm-config-arch.h b/riscv/include/kvm/kvm-config-arch.h
+index 188125c..901a5e0 100644
+--- a/riscv/include/kvm/kvm-config-arch.h
++++ b/riscv/include/kvm/kvm-config-arch.h
+@@ -6,6 +6,7 @@
+ struct kvm_config_arch {
+ 	const char	*dump_dtb_filename;
+ 	bool		ext_disabled[KVM_RISCV_ISA_EXT_MAX];
++	bool		virtio_trans_pci;
+ };
+ 
+ #define OPT_ARCH_RUN(pfx, cfg)						\
+@@ -26,6 +27,10 @@ struct kvm_config_arch {
+ 		    "Disable Zicbom Extension"),			\
+ 	OPT_BOOLEAN('\0', "disable-zihintpause",			\
+ 		    &(cfg)->ext_disabled[KVM_RISCV_ISA_EXT_ZIHINTPAUSE],\
+-		    "Disable Zihintpause Extension"),
++		    "Disable Zihintpause Extension"),			\
++	OPT_BOOLEAN('\0', "force-pci",					\
++			&(cfg)->virtio_trans_pci,			\
++		    "Force virtio devices to use PCI as their "		\
++		    "default transport"),
+ 
+ #endif /* KVM__KVM_CONFIG_ARCH_H */
+-- 
+2.25.1
 
