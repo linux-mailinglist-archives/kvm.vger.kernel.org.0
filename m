@@ -2,62 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EAB0967251C
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 18:38:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C18B667253C
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 18:43:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230434AbjARRiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 12:38:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35312 "EHLO
+        id S231207AbjARRnC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 12:43:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbjARRiM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 12:38:12 -0500
+        with ESMTP id S231191AbjARRmY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 12:42:24 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96815577E1
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:37:28 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1ABE5AA44
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:40:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674063447;
+        s=mimecast20190719; t=1674063650;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=EcOGpMJZHpvpIVLPl2NxaPq3qMDI707uF0xETD21OrE=;
-        b=F9Swjzm0x4G+hjy361diZBaofrvB5F7JGjBAe7WQHScFugjEL4CQ6+Ia5OLysgWe5n687B
-        Hsn7iC+6d/KNV+W1Ys89MBhn1Agvhx1K7CEOjSDAqdjHhvx2t5Ze+d+pOgmYnZrRFfhYgv
-        pH5ZWLIG+tz87La5jV1993QdysDnLeU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-618-ppKmffdfMj6cPFITbHfZCQ-1; Wed, 18 Jan 2023 12:37:26 -0500
-X-MC-Unique: ppKmffdfMj6cPFITbHfZCQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1772185A588;
-        Wed, 18 Jan 2023 17:37:26 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.85])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B1D54492B02;
-        Wed, 18 Jan 2023 17:37:25 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Richard Henderson <richard.henderson@linaro.org>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eric Auger <eauger@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 1/2] arm/kvm: add support for MTE
-In-Reply-To: <b92e6786-acc6-50ef-8804-e4e3ef4eb2d6@linaro.org>
-Organization: Red Hat GmbH
-References: <20230111161317.52250-1-cohuck@redhat.com>
- <20230111161317.52250-2-cohuck@redhat.com>
- <b92e6786-acc6-50ef-8804-e4e3ef4eb2d6@linaro.org>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Wed, 18 Jan 2023 18:37:24 +0100
-Message-ID: <87fsc7oiaz.fsf@redhat.com>
+        bh=OFz6FhuT9o8DqB1H+HaxFzzE6T3dZEv/qEAy6lvVPWw=;
+        b=HluVSda8xyvijDu/uxWUPZUBxcn08N3fP2ekO9jgOtWgeNcDzLVPXgmvwim9pmZb9ioQkI
+        LCowad2PrUDb6kdfnxZvwfoLgqdYi/JfwNBvyfKFYU5ODDdH6p/TgwIPUf2C2rYCwILrTg
+        +SRB6X6cZfXZEMj1vCkfwXFABMBIIXA=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-584-edDDFyLAPkSiktr3GSV6Fg-1; Wed, 18 Jan 2023 12:40:48 -0500
+X-MC-Unique: edDDFyLAPkSiktr3GSV6Fg-1
+Received: by mail-io1-f70.google.com with SMTP id s17-20020a0566022bd100b00704c01f38abso4655623iov.0
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:40:48 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OFz6FhuT9o8DqB1H+HaxFzzE6T3dZEv/qEAy6lvVPWw=;
+        b=Am0euT5IX98CUNgeBg6HBTAB+wfPzOeTcPNAoxznBE4ZqRafw0VjJfh/C5TkOQekIg
+         67fLlYjQ/4LkIH9PbpeGOpqjtj8aAk/Gz2Ca9a8109l4p+Di89OSBaviKmI/DiBXdDOC
+         Q9KJitu92oUmn4lEeHA4VCI4UI/agRlOugV55bMnqL73iY6X0HPWR2UQF/jiObciZ7CN
+         YTTzIbAY8kPgQ11YKA2JIb/ukA013er4hS6OE2ckLpWd2GNeQNoRgZARCjWnqLsXhWo7
+         GD83bb8sHQe5lAn/hvfTiBDKc4lLTxg7E6U4jAjgSSsGVPN4b+iXHrcmjsj3+jeAI1E6
+         PLcw==
+X-Gm-Message-State: AFqh2kptHaevxKptheRQeUm9ELGIA3dQllLo4AeLQ+m7Gop1xYXtEUbA
+        MT2YItBVl78WmBTibvBcb+VjDdcH11zysG++2E64acaiiKAe27RIZXyW38/MVMwAf1OiSHxy8Go
+        7Ht/NFMvpo5uQ
+X-Received: by 2002:a92:cf50:0:b0:30d:b08b:259c with SMTP id c16-20020a92cf50000000b0030db08b259cmr6919858ilr.5.1674063647776;
+        Wed, 18 Jan 2023 09:40:47 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXteuK5LqishWSUxXjJosygpDRsVMY0Aoa/N5Wb+T7nrch7I9lpZJHMhLJN+SXXq9+i3Wfe3Lg==
+X-Received: by 2002:a92:cf50:0:b0:30d:b08b:259c with SMTP id c16-20020a92cf50000000b0030db08b259cmr6919837ilr.5.1674063647504;
+        Wed, 18 Jan 2023 09:40:47 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id l14-20020a92700e000000b0030c27c9eea4sm10003679ilc.33.2023.01.18.09.40.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jan 2023 09:40:46 -0800 (PST)
+Date:   Wed, 18 Jan 2023 10:40:44 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yishai Hadas <yishaih@nvidia.com>, kvm@vger.kernel.org,
+        kevin.tian@intel.com, joao.m.martins@oracle.com, leonro@nvidia.com,
+        diana.craciun@oss.nxp.com, eric.auger@redhat.com, maorg@nvidia.com,
+        cohuck@redhat.com, shameerali.kolothum.thodi@huawei.com
+Subject: Re: [PATCH V1 vfio 0/6] Move to use cgroups for userspace
+ persistent allocations
+Message-ID: <20230118104044.2811ab35.alex.williamson@redhat.com>
+In-Reply-To: <Y8gM+9ptO2umgPQf@nvidia.com>
+References: <20230108154427.32609-1-yishaih@nvidia.com>
+        <20230117163811.591b4d6f.alex.williamson@redhat.com>
+        <Y8gM+9ptO2umgPQf@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -68,137 +83,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 17 2023, Richard Henderson <richard.henderson@linaro.org> wrote:
+On Wed, 18 Jan 2023 11:15:07 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-> On 1/11/23 06:13, Cornelia Huck wrote:
->> @@ -2136,7 +2136,7 @@ static void machvirt_init(MachineState *machine)
->>   
->>       if (vms->mte && (kvm_enabled() || hvf_enabled())) {
->>           error_report("mach-virt: %s does not support providing "
->> -                     "MTE to the guest CPU",
->> +                     "emulated MTE to the guest CPU",
->>                        kvm_enabled() ? "KVM" : "HVF");
->
-> Not your bug, but noticing this should use current_accel_name().
+> On Tue, Jan 17, 2023 at 04:38:11PM -0700, Alex Williamson wrote:
+> 
+> > The type1 IOMMU backend is notably absent here among the core files, any
+> > reason?  
+> 
+> Mostly fear that charging alot of memory to the cgroup will become a
+> compatibility problem. I'd be happier if we go along the iommufd path
+> some more and get some field results from cgroup enablement before we
+> think about tackling type 1.
+> 
+> With this series in normal non-abusive cases this is probably only a
+> few pages of ram so it shouldn't be a problem. mlx5 needs huge amounts
+> of memory but it is new so anyone deploying a new mlx5 configuration
+> can set their cgroup accordingly.
+> 
+> If we fully do type 1 we are looking at alot of memory. eg a 1TB
+> guest will charge 2GB just in IOPTE structures at 4k page size. Maybe
+> that is enough to be a problem, I don't know.
+> 
+> > Potentially this removes the dma_avail issue as a means to
+> > prevent userspace from creating an arbitrarily large number of DMA
+> > mappings, right?  
+> 
+> Yes, it is what iommufd did
+>  
+> > Are there any compatibility issues we should expect with this change to
+> > accounting otherwise?  
+> 
+> Other than things might start hitting the limit, I don't think so?
 
-I can fix it as I'm touching the code anyway.
+Ok, seems like enough FUD to limit the scope for now.  We'll need to
+monitor this for native and compat mode iommufd use.  I'll fix the
+commit log typo, assuming there are no further comments.  Thanks,
 
-(Hm... two more of these right above. Maybe better in a separate patch.)
-
->
->> +static inline bool arm_machine_has_tag_memory(void)
->> +{
->> +#ifndef CONFIG_USER_ONLY
->> +    Object *obj = object_dynamic_cast(qdev_get_machine(), TYPE_VIRT_MACHINE);
->> +
->> +    /* so far, only the virt machine has support for tag memory */
->> +    if (obj) {
->> +        VirtMachineState *vms = VIRT_MACHINE(obj);
->> +
->> +        return vms->mte;
->> +    }
->> +#endif
->> +    return false;
->> +}
->
-> True for CONFIG_USER_ONLY, via page_get_target_data().
-> You should have seen check-tcg test failures...
-
-Weird, let me check my setup...
-
->
->> +void arm_cpu_mte_finalize(ARMCPU *cpu, Error **errp)
->> +{
->> +    bool enable_mte;
->> +
->> +    switch (cpu->prop_mte) {
->> +    case ON_OFF_AUTO_OFF:
->> +        enable_mte = false;
->> +        break;
->> +    case ON_OFF_AUTO_ON:
->> +        if (!kvm_enabled()) {
->
-> tcg_enabled(), here and everywhere else you test for !kvm.
->
->> +#ifdef CONFIG_KVM
->> +        if (kvm_enabled() && !kvm_arm_mte_supported()) {
->
-> kvm_arm.h should get a stub inline returning false, so that the ifdef is removed.
-> See e.g. kvm_arm_sve_supported().
-
-Oh, I actually did add it already...
-
->
->> +    default: /* AUTO */
->> +        if (!kvm_enabled()) {
->
-> tcg_enabled.
->
->> +    /* accelerator-specific enablement */
->> +    if (kvm_enabled()) {
->> +#ifdef CONFIG_KVM
->> +        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_ARM_MTE, 0)) {
->> +            error_setg(errp, "Failed to enable KVM_CAP_ARM_MTE");
->
-> Ideally this ifdef could go away as well.
->
->> +        } else {
->> +            /* TODO: add proper migration support with MTE enabled */
->> +            if (!mte_migration_blocker) {
->
-> Move the global variable here, as a local static?
->
-> I guess this check is to avoid adding one blocker per cpu?
-> I would guess the cap doesn't need enabling more than once either?
-
-Indeed, it's a VM cap. (I only tested this on a single-cpu FVP setup.)
-
->
->
->> +                error_setg(&mte_migration_blocker,
->> +                           "Live migration disabled due to MTE enabled");
->> +                if (migrate_add_blocker(mte_migration_blocker, NULL)) {
->
-> You pass NULL to the migrate_add_blocker errp argument...
->
->> +                    error_setg(errp, "Failed to add MTE migration blocker");
->
-> ... then make up your own generic reason for why it failed.
-> In this case it seems only related to another command-line option: --only-migratable.
->
->
-> Anyway, I wonder about hiding all of this in target/arm/kvm.c:
->
-> bool kvm_arm_enable_mte(Error *errp)
-> {
->      static bool once = false;
->      Error *blocker;
->
->      if (once) {
->          return;
->      }
->      once = true;
->
->      if (kvm_vm_enable_cap(kvm_state, KVM_CAP_ARM_MTE, 0)) {
->          error_setg_errno(errp, "Failed to enable KVM_CAP_ARM_MTE");
->          return false;
->      }
->
->      blocker = g_new0(Error);
->      error_setg(blocker, "Live migration disabled....");
->      return !migrate_add_blocker(blocker, errp);
-> }
->
-> with
->
-> static inline bool kvm_arm_enable_mte(Error *errp)
-> {
->      g_assert_not_reached();
-> }
->
-> in the !CONFIG_KVM block in kvm_arm.h.
-
-Good suggestion, I'll give that one a try.
-
-Thanks for the feedback!
+Alex
 
