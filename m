@@ -2,243 +2,265 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A8830671E57
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 14:50:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2DDA8671EAA
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 14:58:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbjARNuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 08:50:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48740 "EHLO
+        id S229463AbjARN6B (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 08:58:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230472AbjARNtv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 08:49:51 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6C1CCD20F
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 05:19:24 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30IDA4a4026579;
-        Wed, 18 Jan 2023 13:18:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=NYbbonmwmTKG18jwPn2PoTy0UGH6KHhJCyK8/m2jhmA=;
- b=lX+YErun+tZP1qW5s9eE8ylKRY4TFXCwKfmN+5/0NFedE541oycH1pEA/cOeiWScGNS9
- J3loaY/Ygcum5ccis9V4J3RfrZaVvYusnaEt9o9Lq/ff7DytFwq5+xqdDPBYgYmOKhZZ
- EjBg8nSEoMIBaxg+P04P0Shx4u0oeK4hT7LVDP6HJtFZzVgZU+mkODyO7ukYCYC/9pQO
- B4bqmimZ5lRvoXWXhKJZp4zX6WbQYMX/kvRxGRMl959k+kjtnXPG5w4oSGj56K8i312B
- t2+IihLfBSM659nMrkzOcQjDwgVXrxBCBIhkx7k7+1mi3MlP/OTxq1suqqVSIKa9fFSo Ew== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6f91ucjt-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 13:18:06 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30ICsRQY021892;
-        Wed, 18 Jan 2023 13:18:05 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6f91ucj3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 13:18:05 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30ICtbA3006229;
-        Wed, 18 Jan 2023 13:18:03 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n3knfnam3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 13:18:03 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30IDHxC145613382
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Jan 2023 13:18:00 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D09A120040;
-        Wed, 18 Jan 2023 13:17:59 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CA0A820043;
-        Wed, 18 Jan 2023 13:17:58 +0000 (GMT)
-Received: from [9.171.39.117] (unknown [9.171.39.117])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Jan 2023 13:17:58 +0000 (GMT)
-Message-ID: <2242c485-1f34-bf58-30a8-4f6443dc672d@linux.ibm.com>
-Date:   Wed, 18 Jan 2023 14:17:58 +0100
+        with ESMTP id S230163AbjARN5a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 08:57:30 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3360F4ABC3
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 05:29:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674048547;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jHBEUrqQX1BjXMD4sLi0vstHMvphiis+e+dt7giiBpk=;
+        b=EkmWLNsOWl/pUzeKylStuNGIls7FUAZyFePl1ruxdHKi6g4m9Dkk2fQQHtknVO5VMD/Wzz
+        We492NHfb0+iD+Xsy56EgYu2ZNyWaHHfl5pAlMV3yMPrI8Y2Bf9O/s6NmKF5HqbCcMT97x
+        hyOWFkTqrt8I7cj79tmWJZ0sZc9pgO8=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-663-CL7-uKrTPJaLhZF-ZELeRw-1; Wed, 18 Jan 2023 08:29:06 -0500
+X-MC-Unique: CL7-uKrTPJaLhZF-ZELeRw-1
+Received: by mail-qt1-f198.google.com with SMTP id bq19-20020a05622a1c1300b003b2685a574bso6503635qtb.1
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 05:29:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jHBEUrqQX1BjXMD4sLi0vstHMvphiis+e+dt7giiBpk=;
+        b=jNpBrff4SQqE5bG2CROXUw0Phv6F2MsO7CZ4ZjzhNI7YJgKCRf3Xq6pTdC/2gYh7Zm
+         lEDrSslOGcZCVyUTtLNVSJS3LfHScR7UX5+rNRb89aJjmjtzFoqLqqCAx5g7qKEAL8iw
+         Tnhc5ClfmWQALbhpq+79llEcTAXbF3sV4TzapJFxLuD2rs09e7F4SPMxwglQeGzM9lLm
+         p0mgLcSTvZqnyX4nIAv8bd9C7mgxYBnTaQyikBwJflRQC7675Qx1T3jACqkTO7lkctZ5
+         gVAQUTl5W4CsBv6AJJgRGt8e8c6uiTXfCVGPsINLPSgIHaWplkvW0YuR/mu6SuK9Ld3F
+         i4Vg==
+X-Gm-Message-State: AFqh2korTJ9sum3zzKqDYRGEZpKhJ/Nj6H74l6SU5r1JEL4I5KBMrBWK
+        eE6qagAFkJ7gMVnpunqqB2q97k/zMicFOyzB/uW7IZhqSJcn5b69Fb4IJUIpO9cAygsxt61KnDu
+        9oBlzbJqngEkH
+X-Received: by 2002:a05:622a:4306:b0:3b3:7d5:a752 with SMTP id el6-20020a05622a430600b003b307d5a752mr6588131qtb.50.1674048545605;
+        Wed, 18 Jan 2023 05:29:05 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtiMK9CH4/eLCeebi8oju7ub87SXoewN2uWjHLR+N5kusTIKfuBNixFAxbt+3kNAhyp6LrrXA==
+X-Received: by 2002:a05:622a:4306:b0:3b3:7d5:a752 with SMTP id el6-20020a05622a430600b003b307d5a752mr6588108qtb.50.1674048545339;
+        Wed, 18 Jan 2023 05:29:05 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id z26-20020ac8711a000000b003b62dcbedb8sm5085156qto.74.2023.01.18.05.29.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Jan 2023 05:29:03 -0800 (PST)
+Message-ID: <b2053afd-bf94-7b43-8ca9-8adba29af3da@redhat.com>
+Date:   Wed, 18 Jan 2023 14:28:58 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v14 08/11] qapi/s390/cpu topology: change-topology monitor
- command
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 01/13] vfio: Allocate per device file structure
 Content-Language: en-US
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
-        borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        frankja@linux.ibm.com, clg@kaod.org
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-9-pmorel@linux.ibm.com> <Y7/29cONlVoKukIP@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <Y7/29cONlVoKukIP@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ix2_0e-Bg8kkADjNgXQhKSQUG7rE5awk
-X-Proofpoint-ORIG-GUID: sohAw0zDgTpzfYC4E6caP3uNw52okJuy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-18_05,2023-01-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0 mlxlogscore=999
- bulkscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2301180113
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com
+Cc:     kevin.tian@intel.com, cohuck@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        suravee.suthikulpanit@amd.com
+References: <20230117134942.101112-1-yi.l.liu@intel.com>
+ <20230117134942.101112-2-yi.l.liu@intel.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230117134942.101112-2-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Hi Yi,
 
+On 1/17/23 14:49, Yi Liu wrote:
+> This is preparation for adding vfio device cdev support. vfio device
+> cdev requires:
+> 1) a per device file memory to store the kvm pointer set by KVM. It will
+>    be propagated to vfio_device:kvm after the device cdev file is bound
+>    to an iommufd
+> 2) a mechanism to block device access through device cdev fd before it
+>    is bound to an iommufd
+>
+> To address above requirements, this adds a per device file structure
+> named vfio_device_file. For now, it's only a wrapper of struct vfio_device
+> pointer. Other fields will be added to this per file structure in future
+> commits.
+>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/group.c     | 13 +++++++++++--
+>  drivers/vfio/vfio.h      |  6 ++++++
+>  drivers/vfio/vfio_main.c | 31 ++++++++++++++++++++++++++-----
+>  3 files changed, 43 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index bb24b2f0271e..8fdb7e35b0a6 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -186,19 +186,26 @@ void vfio_device_group_close(struct vfio_device *device)
+>  
+>  static struct file *vfio_device_open_file(struct vfio_device *device)
+>  {
+> +	struct vfio_device_file *df;
+>  	struct file *filep;
+>  	int ret;
+>  
+> +	df = vfio_allocate_device_file(device);
+> +	if (IS_ERR(df)) {
+> +		ret = PTR_ERR(df);
+> +		goto err_out;
+> +	}
+> +
+>  	ret = vfio_device_group_open(device);
+>  	if (ret)
+> -		goto err_out;
+> +		goto err_free;
+>  
+>  	/*
+>  	 * We can't use anon_inode_getfd() because we need to modify
+>  	 * the f_mode flags directly to allow more than just ioctls
+>  	 */
+>  	filep = anon_inode_getfile("[vfio-device]", &vfio_device_fops,
+> -				   device, O_RDWR);
+> +				   df, O_RDWR);
+>  	if (IS_ERR(filep)) {
+>  		ret = PTR_ERR(filep);
+>  		goto err_close_device;
+> @@ -222,6 +229,8 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+>  
+>  err_close_device:
+>  	vfio_device_group_close(device);
+> +err_free:
+> +	kfree(df);
+>  err_out:
+>  	return ERR_PTR(ret);
+>  }
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index f8219a438bfb..1091806bc89d 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -16,12 +16,18 @@ struct iommu_group;
+>  struct vfio_device;
+>  struct vfio_container;
+>  
+> +struct vfio_device_file {
+> +	struct vfio_device *device;
+> +};
+> +
+>  void vfio_device_put_registration(struct vfio_device *device);
+>  bool vfio_device_try_get_registration(struct vfio_device *device);
+>  int vfio_device_open(struct vfio_device *device,
+>  		     struct iommufd_ctx *iommufd, struct kvm *kvm);
+>  void vfio_device_close(struct vfio_device *device,
+>  		       struct iommufd_ctx *iommufd);
+> +struct vfio_device_file *
+> +vfio_allocate_device_file(struct vfio_device *device);
+>  
+>  extern const struct file_operations vfio_device_fops;
+>  
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 5177bb061b17..ee54c9ae0af4 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -344,6 +344,20 @@ static bool vfio_assert_device_open(struct vfio_device *device)
+>  	return !WARN_ON_ONCE(!READ_ONCE(device->open_count));
+>  }
+>  
+> +struct vfio_device_file *
+> +vfio_allocate_device_file(struct vfio_device *device)
+> +{
+> +	struct vfio_device_file *df;
+> +
+> +	df = kzalloc(sizeof(*df), GFP_KERNEL_ACCOUNT);
+> +	if (!df)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	df->device = device;
+> +
+> +	return df;
+> +}
+> +
+>  static int vfio_device_first_open(struct vfio_device *device,
+>  				  struct iommufd_ctx *iommufd, struct kvm *kvm)
+>  {
+> @@ -461,12 +475,15 @@ static inline void vfio_device_pm_runtime_put(struct vfio_device *device)
+>   */
+>  static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+>  {
+> -	struct vfio_device *device = filep->private_data;
+> +	struct vfio_device_file *df = filep->private_data;
+> +	struct vfio_device *device = df->device;
+>  
+>  	vfio_device_group_close(device);
+>  
+>  	vfio_device_put_registration(device);
+>  
+> +	kfree(df);
+> +
+>  	return 0;
+>  }
+>  
+> @@ -1031,7 +1048,8 @@ static int vfio_ioctl_device_feature(struct vfio_device *device,
+>  static long vfio_device_fops_unl_ioctl(struct file *filep,
+>  				       unsigned int cmd, unsigned long arg)
+>  {
+> -	struct vfio_device *device = filep->private_data;
+> +	struct vfio_device_file *df = filep->private_data;
+> +	struct vfio_device *device = df->device;
+>  	int ret;
+>  
+>  	ret = vfio_device_pm_runtime_get(device);
+> @@ -1058,7 +1076,8 @@ static long vfio_device_fops_unl_ioctl(struct file *filep,
+>  static ssize_t vfio_device_fops_read(struct file *filep, char __user *buf,
+>  				     size_t count, loff_t *ppos)
+>  {
+> -	struct vfio_device *device = filep->private_data;
+> +	struct vfio_device_file *df = filep->private_data;
+> +	struct vfio_device *device = df->device;
+>  
+>  	if (unlikely(!device->ops->read))
+>  		return -EINVAL;
+> @@ -1070,7 +1089,8 @@ static ssize_t vfio_device_fops_write(struct file *filep,
+>  				      const char __user *buf,
+>  				      size_t count, loff_t *ppos)
+>  {
+> -	struct vfio_device *device = filep->private_data;
+> +	struct vfio_device_file *df = filep->private_data;
+> +	struct vfio_device *device = df->device;
+>  
+>  	if (unlikely(!device->ops->write))
+>  		return -EINVAL;
+> @@ -1080,7 +1100,8 @@ static ssize_t vfio_device_fops_write(struct file *filep,
+>  
+>  static int vfio_device_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+>  {
+> -	struct vfio_device *device = filep->private_data;
+> +	struct vfio_device_file *df = filep->private_data;
+> +	struct vfio_device *device = df->device;
+>  
+>  	if (unlikely(!device->ops->mmap))
+>  		return -EINVAL;
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-On 1/12/23 13:03, Daniel P. Berrangé wrote:
-> On Thu, Jan 05, 2023 at 03:53:10PM +0100, Pierre Morel wrote:
->> The modification of the CPU attributes are done through a monitor
->> commands.
->>
->> It allows to move the core inside the topology tree to optimise
->> the cache usage in the case the host's hypervizor previously
->> moved the CPU.
->>
->> The same command allows to modifiy the CPU attributes modifiers
->> like polarization entitlement and the dedicated attribute to notify
->> the guest if the host admin modified scheduling or dedication of a vCPU.
->>
->> With this knowledge the guest has the possibility to optimize the
->> usage of the vCPUs.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   qapi/machine-target.json |  29 ++++++++
->>   include/monitor/hmp.h    |   1 +
->>   hw/s390x/cpu-topology.c  | 141 +++++++++++++++++++++++++++++++++++++++
->>   hmp-commands.hx          |  16 +++++
->>   4 files changed, 187 insertions(+)
->>
->> diff --git a/qapi/machine-target.json b/qapi/machine-target.json
->> index 2e267fa458..75b0aa254d 100644
->> --- a/qapi/machine-target.json
->> +++ b/qapi/machine-target.json
->> @@ -342,3 +342,32 @@
->>                      'TARGET_S390X',
->>                      'TARGET_MIPS',
->>                      'TARGET_LOONGARCH64' ] } }
->> +
->> +##
->> +# @change-topology:
->> +#
->> +# @core: the vCPU ID to be moved
->> +# @socket: the destination socket where to move the vCPU
->> +# @book: the destination book where to move the vCPU
->> +# @drawer: the destination drawer where to move the vCPU
-> 
-> This movement can be done while the guest OS is running ?
-> What happens to guest OS apps ? Every I know will read
-> topology once and assume it never changes at runtime.
+Thanks
 
-Yes this can change while the guest is running.
+Eric
 
-The S390 Logical PARtition, where the Linux runs is already a first 
-level of virtualization and the lpar CPU are already virtual CPU which 
-can be moved from one real CPU to another, the guest is at a second 
-level of virtualization.
-
-On the LPAR host an admin can check the topology.
-A lpar CPU can be moved to another real CPU because of multiple reasons: 
-maintenance, failure, other decision from the first level hypervisor 
-that I do not know, may be scheduling balancing.
-
-There is a mechanism for the OS in which is running in LPAR to set a 
-flag for the guest on a topology change.
-The guest use a specific instruction to get this flag.
-This instruction PTF(2) is interpreted by the firmware and does not 
-appear in this patch series but in Linux patch series.
-
-So we have, real CPU <-> lpar CPU <-> vCPU
-
-> 
-> What's the use case for wanting to re-arrange topology in
-> this manner ? It feels like its going to be a recipe for
-> hard to diagnose problems, as much code in libvirt and apps
-> above will assuming the vCPU IDs are assigned sequentially
-> starting from node=0,book=0,drawer=0,socket=0,core=0,
-> incrementing core, then incrementing socket, then
-> incrementing drawer, etc.
-
-The goal to rearrange the vCPU is to give the guest the knowledge of the 
-topology so it can takes benefit of it.
-If a lpar CPU moved to another real CPU in another drawer we must move 
-the guest vCPU to another drawer so the guest OS can take the best 
-scheduling decisions.
-
-Per default, if nothing is specified on the creation of a vCPU, the 
-creation is done exactly like you said, starting from (0,0,0,0) and 
-incrementing.
-
-There are two possibility to set a vCPU at its place:
-
-1) on creation by specifying the drawer,book,socket for a specific core-id
-
-2) with this QAPI command to move the CPU while it is running.
-Note that the core-id and the CPU address do not change when moving the 
-CPU so that there is no problem with scheduling, all we do is to provide 
-the topology up to the guest when it asks.
-
-The period of checking by the Linux kernel if there is a change and if 
-there is a need to ask the topology is one minute.
-
-The migration of CPU is not supposed to happen very often, (not every day).
-
-> 
->> +# @polarity: optional polarity, default is last polarity set by the guest
->> +# @dedicated: optional, if the vCPU is dedicated to a real CPU
->> +#
->> +# Modifies the topology by moving the CPU inside the topology
->> +# tree or by changing a modifier attribute of a CPU.
->> +#
->> +# Returns: Nothing on success, the reason on failure.
->> +#
->> +# Since: <next qemu stable release, eg. 1.0>
->> +##
->> +{ 'command': 'change-topology',
-> 
-> 'set-cpu-topology'
-
-OK, yes looks better.
-
-> 
->> +  'data': {
->> +      'core': 'int',
->> +      'socket': 'int',
->> +      'book': 'int',
->> +      'drawer': 'int',
->> +      '*polarity': 'int',
->> +      '*dedicated': 'bool'
->> +  },
->> +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
->> +}
-> 
-> 
-> With regards,
-> Daniel
-
-Thanks,
-
-Regards,
-Pierre
-
-
--- 
-Pierre Morel
-IBM Lab Boeblingen
