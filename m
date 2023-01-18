@@ -2,186 +2,351 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE1FE6718F6
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 11:30:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5CBB467199A
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 11:49:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229704AbjARKaj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 05:30:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57354 "EHLO
+        id S229874AbjARKtd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 05:49:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229734AbjARK3j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 05:29:39 -0500
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6A4DBCE07
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 01:35:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674034553; x=1705570553;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=tt2DxdLnG2HlP7WcrSeb0fJk2X1BhxHdNSQaGyAb3H8=;
-  b=muol565keKXrJW5D0iPXnCj7fv2OiCgOG1i0tSO4NAiliymjoHPQRt6z
-   W5ISAV/dMggzQeyK514OPvtdjTWGni/rF1tZdMstb24hThDDfTRZ2QcF1
-   TGWjKHmcOEYW/M5qAzc9nGSueZKnaheEza6kgjvNUvzpSldzXR53G43VB
-   7RXGVUEPKt1/DRDHZhN4rM9nWlbe3Z2Zsn8SE13lkWXb0kV9MSYK/6lBy
-   jwEv79sFVHGwCVLDNfupjPEbGHzrfBCefu7JN+7y8mVP7Dcsw7OHQ00/j
-   T/aL5Sw+mvsJEFvyMELlsOzX/Re5VkgJ9TCMX84XAm7UbnMCECes0x8s3
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10593"; a="389443853"
-X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
-   d="scan'208";a="389443853"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2023 01:35:37 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10593"; a="748397548"
-X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
-   d="scan'208";a="748397548"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by FMSMGA003.fm.intel.com with ESMTP; 18 Jan 2023 01:35:36 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Wed, 18 Jan 2023 01:35:35 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Wed, 18 Jan 2023 01:35:35 -0800
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.44) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Wed, 18 Jan 2023 01:35:35 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kmJteT+ggj9L9wrSgR5RWCZC08U8lp/MK1X2qRnAxG4Igcv+PlGzfnQ0nnua8EcDSNGJoUWbzrGJKfj4Xp5hvDkbJ8b4K8LvEe+sMoyUvDzqlcpGFCOR0erqyhi/jQwxPlwMfzVIQgivXqAQRt4lMJy5Jpa582ESDOfi1/xLuQ6U2UBr14sne5lN5GHavox8dCWDfBq0BmbktX0SCUnAXLCnYZQKf7Bmb8usEb4N/Mo1FPo6kvNSXviRzVqA/IrucjawqfWU9eRaqcPDLvCR6Fhwl1EL+hc7UQruN5cYX/7Iw3IPyINR4D6tnxbyuwgVL4I9dCUkNOPSaEmpCrcEvA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tt2DxdLnG2HlP7WcrSeb0fJk2X1BhxHdNSQaGyAb3H8=;
- b=R26MD5oG4v9NoS1g6cK00X+Eoe61q3ds9wBgdgJZyLJ+hX435O1K32/7JExas7/YYFu0GtNiT+ON3iXP3BD89LQNmLtS02G2i2F71Vjd4SPz8bN614VJlzR4quRg4Ggr4AJ0JAh/XMI/Pap/cMY/xpOaJ2L+zJ3nMv9tgd/atT9yU6bmMA3P9HrGQY+PSZbJHnbJ8suiyVAkg9MOr6aTEEPQD+8l4dxWw4uEHH+WUP7VAlAPu0IPK1chlGFbtP4+xOVtcoghrTc4lR0+ILDzVm57PrMyBJYhLzMxc0bVrrbScJjLWV9QcUMSIMiLvuHJ/wbNeL3lGWUSfCs7M6U4Pw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH7PR11MB6008.namprd11.prod.outlook.com (2603:10b6:510:1d0::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Wed, 18 Jan
- 2023 09:35:33 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::6a8d:b95:e1b5:d79d%9]) with mapi id 15.20.5986.023; Wed, 18 Jan 2023
- 09:35:33 +0000
-From:   "Tian, Kevin" <kevin.tian@intel.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>,
-        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>
-CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
-        "eric.auger@redhat.com" <eric.auger@redhat.com>,
-        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
-        "peterx@redhat.com" <peterx@redhat.com>,
-        "jasowang@redhat.com" <jasowang@redhat.com>,
-        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>
-Subject: RE: [PATCH 08/13] vfio: Block device access via device fd until
- device is opened
-Thread-Topic: [PATCH 08/13] vfio: Block device access via device fd until
- device is opened
-Thread-Index: AQHZKnqYgxUzhzjIGEixJ/hIzOZ5Sq6j6vbg
-Date:   Wed, 18 Jan 2023 09:35:33 +0000
-Message-ID: <BN9PR11MB5276941A0F5FD7880DD1C41C8CC79@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20230117134942.101112-1-yi.l.liu@intel.com>
- <20230117134942.101112-9-yi.l.liu@intel.com>
-In-Reply-To: <20230117134942.101112-9-yi.l.liu@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH7PR11MB6008:EE_
-x-ms-office365-filtering-correlation-id: 2b6a788f-1cc0-4e17-684b-08daf93758a6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: y8JuyN0j6J4DqXwo0LeVNlwXL4lmgoBP7rFZmY79oXKiEuCqfF2IrsfKjY8Nz0snkuTrKxKu6ARN6IScNERPe2hYv+GuiKltQ+Ct8fwiqc8g+ego3SG3hpJyQYDHfkcaGjXG0M5QJkqgfkQ/43KDeuwpAisNteGgIHJZC37pH3fBJA+NbI+xr/VkpQo/KbIGXqLLyG6aCPIYa/Jyf5jj2hkLKiFYlEB8KSJVF8TKW6II+kD3hNx+Ubr4VQA1GSU8jgVX4bHll3xl1faBryuEN/QjdMbEiMx8GHRMJ4f+pcv3qSdt0WFjH7tyfIdQs8ZnumtScR9mM2w1d7yX6jlNWioSjndfYPi7fsDkBwbc+fFRyyTFCu3e3tADadk0A6xduXy8wp03t7SvNdHOKfuOpMa9ksIcbOQjAea3xwaBG5GixiViEIO/fX/HsHEgv86AjNtWnqj9z7ej/0aCfHDVotDqN5WJRlDtKkriw/QOtFkvmWjS+zMk7G5dLGAw6QZmEgR6o1cg6AGQ20PJHextszH3zNjDgheN1NmzXrV3rM+70JXkLEEJf5/jXG6oWoVaWaFLHJLLeb0W+WwWtjtjAnf4r2CN1bjtRMxQMHvg/+dBcrxJmAPcgFCwBROmn6+7mptdDE3K4bv/2Zja8S+2niyO2xB/6c1hxY73BCdxnNQqchnhgwUes7uFyt1Tf49euSZAS2NUi3jBdJNzfg76pA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(346002)(376002)(136003)(39860400002)(366004)(396003)(451199015)(26005)(4326008)(66446008)(86362001)(76116006)(33656002)(55016003)(64756008)(186003)(9686003)(8676002)(66556008)(41300700001)(66476007)(66946007)(71200400001)(316002)(54906003)(478600001)(7696005)(6506007)(110136005)(122000001)(38070700005)(38100700002)(2906002)(7416002)(82960400001)(5660300002)(83380400001)(52536014)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9PmH2U9zM1LySTP0+5UKjsZsU0TDWNgLEHNDcDHkelATi5VG2RrymmryOt9t?=
- =?us-ascii?Q?dfwckZIwI/uyX3E4KPgPWx003AyBuk/xPlMrHRAWFhQgol7FeOqKGLaJiml0?=
- =?us-ascii?Q?OGWHdZauERBWCL0w82NRva1HEWXU34VDbdORptJpYqXww914ONLkqqWf67uS?=
- =?us-ascii?Q?ekVE9bb0hu9HY5/WGxwcVBktSf93v0VX3zw3nTfch2fJMQwDEmb1v3FJU5yh?=
- =?us-ascii?Q?cSLGpB6vVB9RkmjWFFqIrZDa8m8JqHyQnpOFH9QxF4Ub1tE/ZxuHpTaYy8YB?=
- =?us-ascii?Q?mUdr6h9QoVzc3LJNapfy+si0V29/iQul4N3hIS+FTO2tNsI0n4zuCpaCW0UU?=
- =?us-ascii?Q?LIWQ+v7QVi/Rwa0tF+s4siOcjLkPkf50OrC4YKBWZSo6/w0vJyDVq7vWVbgi?=
- =?us-ascii?Q?I7vfqrf7JwOWFT+PGmzNJlbZWvEu0gDQ+TwoNGfo49hugbw5LWQ+ByV7maUS?=
- =?us-ascii?Q?1/0a9N7XwTh+kQRlaZJoPMlNzvrCIt/ct8SzBnB2j6Lk2WLPsHuxFZZ73TQ8?=
- =?us-ascii?Q?jOd8m9AvKy8fW2CE462tyZ5gSlytJUmZKMseGmNhwzZPJ6TORsefsXwqzPJ2?=
- =?us-ascii?Q?m04wevJXLnHG5v8nlL98A/+JJ+Mq6gTci3V7Fqut1JEVtzCfOXbFuR2ZAkkJ?=
- =?us-ascii?Q?4k0GLmIp/CfhAINEtl3S3wmWpsREmsDP21CcERzv0+safxVrMwS9nTb860Gx?=
- =?us-ascii?Q?ylljNCFlIjQZahV1bFSSRbjXaaRjvbPitEH2b7CVPO/jXOiX5bzKtS3x8gX8?=
- =?us-ascii?Q?983kQZfvQ6wObVS0rgSB6st1tDLR2jU9ynWDvHxsjPSJ4wm0oUE5G2mqGsdq?=
- =?us-ascii?Q?NtkPTqnz30XeVdpNfct3zUgFyGcu/B/dmquXbW4mJERPStYFOzIRPTspJX4o?=
- =?us-ascii?Q?DEPjji/rZutN1JPpD3MpwD4RzGOLq8AjEy7l74efH+7DbezEkNWe+5+vOtrN?=
- =?us-ascii?Q?gD8Yzt6WiWnOwpu3HoI0tatDMWYCaZoFyzME3MOWzdJMQV5u++Cr4D4pFbqT?=
- =?us-ascii?Q?AjZFqUNkWqz1x8XUaoxsIod+jqZ9SFD61DDq1gM42xMpO7r+STx3VlyhqNhe?=
- =?us-ascii?Q?UZlwEeCCuhwoYrbZyfb2Jw3Lhslur+X+JN2lJ5PtAxwCX8vAtVeDEH9eWXoe?=
- =?us-ascii?Q?9VvJb+FMa679j+qeb6qDLBy3T0ACuqqkr1H1eGu8kBA3I2OHcm7BbIvaFczM?=
- =?us-ascii?Q?K+rDD+bAKC25fwIeWZh05OWxPowKuxwlOZ5PAT++5vk9DIqhmL6Cj0rk+Op9?=
- =?us-ascii?Q?fljfe5ON9+0ou5hkYU/66KCCnLOHNQU0TZGtcjG0CE4JdNm8CF1RP7OLmF15?=
- =?us-ascii?Q?/KmKWjsKdHmQUx8uIgBhBwLwMJDOg/3Qmwn/IkIABhXYHu0g4h5nN08zZjvc?=
- =?us-ascii?Q?DFz+/tP5V3L33Cw1UJcQLqorDGQ0xaEkvsj2cfmCxc/iiwM3iOwb6yAECaR1?=
- =?us-ascii?Q?A7B+AnA/gsA7SdLpWWKT7K2BoPp34y/VXTRVjB0FHrtLtuBlT111lrtHsms1?=
- =?us-ascii?Q?puKG6pLcXN5ajEw85HvmWaNhdHcv2NLABojIFFZ5bRW9H9AZiarwO/Tlzsca?=
- =?us-ascii?Q?C6a9lr9i2mfq0nqE3SC4SlI23QthSubdBjABjFOi?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S230106AbjARKsa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 05:48:30 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570EB3018A
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 01:54:32 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30I8CLMU027698;
+        Wed, 18 Jan 2023 09:54:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=G8GESOAdrRjdUmpGxaMVbsEmzn8nQvWNQ3bad9m+swE=;
+ b=oWNSGHGuQaIzUIE8HvPCoH9JPq3ZHv8ZbKYNUpoegpqt59TEHShp+ywddKsI7e9wvcST
+ ppmAltYQwfbHRwMxAPaPTMhlbDcB58r+Y4UCCtwdZIt9dr7yFTKgB0H1DmLkLoGjqoqo
+ vfGa8T/RKsDYY15npFXlFBz+AcsbGlzNI797IxlQmlCegkYeaBEsuLC1USJXafD23ifw
+ dYLvHfRHOQqClhu+ZP8lPJbvxW7uI4cg2tktmX1ObDHWdUfK1J/tkY/ITDF1IsHommf+
+ YKhXFOSQ9IDuiRv70gCjksVLp0xDq8rOKjwgEfQXMogsDd601inYWotQ2y3L5cdmFwZ9 HQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6a2m63jf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Jan 2023 09:54:18 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30I9ruoS030796;
+        Wed, 18 Jan 2023 09:54:18 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6a2m63hx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Jan 2023 09:54:18 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30HN0W6Z004723;
+        Wed, 18 Jan 2023 09:54:16 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16n2q5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Jan 2023 09:54:16 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30I9sBpv39846362
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Jan 2023 09:54:12 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E0ED620049;
+        Wed, 18 Jan 2023 09:54:11 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E5F2B20043;
+        Wed, 18 Jan 2023 09:54:10 +0000 (GMT)
+Received: from [9.171.39.117] (unknown [9.171.39.117])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 18 Jan 2023 09:54:10 +0000 (GMT)
+Message-ID: <aca908a0-e0d0-dfec-0276-b197b4fb9d3a@linux.ibm.com>
+Date:   Wed, 18 Jan 2023 10:54:10 +0100
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2b6a788f-1cc0-4e17-684b-08daf93758a6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jan 2023 09:35:33.2009
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ug8OMh8neAIEIUeWSVGQ6GNG71M5FbdQPUx7OmExWN2T+2Tq72bW5m9BTks93QkMhnJeyPvFPhlNXVA/5+ijzQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6008
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.0
+Subject: Re: [PATCH v14 06/11] s390x/cpu topology: interception of PTF
+ instruction
+Content-Language: en-US
+To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+ <20230105145313.168489-7-pmorel@linux.ibm.com>
+ <e27e12b2535736dcadd08a3b14caf70566487214.camel@linux.ibm.com>
+From:   Pierre Morel <pmorel@linux.ibm.com>
+In-Reply-To: <e27e12b2535736dcadd08a3b14caf70566487214.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: GuqNfQOjlRenrN9MUHqqXWH1J-v2kqQl
+X-Proofpoint-ORIG-GUID: QlWQIVpY7UvNT5ZwqK5WQOn-0Ry14j9X
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-18_04,2023-01-17_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ bulkscore=0 phishscore=0 clxscore=1015 spamscore=0 malwarescore=0
+ mlxlogscore=999 lowpriorityscore=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301180082
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-> From: Liu, Yi L <yi.l.liu@intel.com>
-> Sent: Tuesday, January 17, 2023 9:50 PM
->=20
-> Allow the vfio_device file to be in a state where the device FD is
-> opened but the device cannot be used by userspace (i.e. its .open_device(=
-)
-> hasn't been called). This inbetween state is not used when the device
-> FD is spawned from the group FD, however when we create the device FD
-> directly by opening a cdev it will be opened in the blocked state.
->=20
-> In the blocked state, currently only the bind operation is allowed,
-> other device accesses are not allowed. Completing bind will allow user
-> to further access the device.
->=20
-> This is implemented by adding a flag in struct vfio_device_file to mark
-> the blocked state and using a simple smp_load_acquire() to obtain the
-> flag value and serialize all the device setup with the thread accessing
-> this device.
->=20
-> Due to this scheme it is not possible to unbind the FD, once it is bound,
-> it remains bound until the FD is closed.
->=20
 
-My question to the last version was not answered...
 
-Can you elaborate why it is impossible to unbind? Is it more an
-implementation choice or conceptual restriction?
+On 1/16/23 19:24, Nina Schoetterl-Glausch wrote:
+> On Thu, 2023-01-05 at 15:53 +0100, Pierre Morel wrote:
+>> When the host supports the CPU topology facility, the PTF
+>> instruction with function code 2 is interpreted by the SIE,
+>> provided that the userland hypervizor activates the interpretation
+>> by using the KVM_CAP_S390_CPU_TOPOLOGY KVM extension.
+>>
+>> The PTF instructions with function code 0 and 1 are intercepted
+>> and must be emulated by the userland hypervizor.
+>>
+>> During RESET all CPU of the configuration are placed in
+>> horizontal polarity.
+>>
+>> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+>> ---
+>>   include/hw/s390x/cpu-topology.h    |  3 +
+>>   include/hw/s390x/s390-virtio-ccw.h |  6 ++
+>>   target/s390x/cpu.h                 |  1 +
+>>   hw/s390x/cpu-topology.c            | 92 ++++++++++++++++++++++++++++++
+>>   target/s390x/cpu-sysemu.c          | 16 ++++++
+>>   target/s390x/kvm/kvm.c             | 11 ++++
+>>   6 files changed, 129 insertions(+)
+>>
+>> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topology.h
+>> index 9571aa70e5..33e23d78b9 100644
+>> --- a/include/hw/s390x/cpu-topology.h
+>> +++ b/include/hw/s390x/cpu-topology.h
+>> @@ -55,11 +55,13 @@ typedef struct S390Topology {
+>>       QTAILQ_HEAD(, S390TopologyEntry) list;
+>>       uint8_t *sockets;
+>>       CpuTopology *smp;
+>> +    int polarity;
+>>   } S390Topology;
+>>   
+>>   #ifdef CONFIG_KVM
+>>   bool s390_has_topology(void);
+>>   void s390_topology_set_cpu(MachineState *ms, S390CPU *cpu, Error **errp);
+>> +void s390_topology_set_polarity(int polarity);
+>>   #else
+>>   static inline bool s390_has_topology(void)
+>>   {
+>> @@ -68,6 +70,7 @@ static inline bool s390_has_topology(void)
+>>   static inline void s390_topology_set_cpu(MachineState *ms,
+>>                                            S390CPU *cpu,
+>>                                            Error **errp) {}
+>> +static inline void s390_topology_set_polarity(int polarity) {}
+>>   #endif
+>>   extern S390Topology s390_topology;
+>>   
+>> diff --git a/include/hw/s390x/s390-virtio-ccw.h b/include/hw/s390x/s390-virtio-ccw.h
+>> index 9bba21a916..c1d46e78af 100644
+>> --- a/include/hw/s390x/s390-virtio-ccw.h
+>> +++ b/include/hw/s390x/s390-virtio-ccw.h
+>> @@ -30,6 +30,12 @@ struct S390CcwMachineState {
+>>       uint8_t loadparm[8];
+>>   };
+>>   
+>> +#define S390_PTF_REASON_NONE (0x00 << 8)
+>> +#define S390_PTF_REASON_DONE (0x01 << 8)
+>> +#define S390_PTF_REASON_BUSY (0x02 << 8)
+>> +#define S390_TOPO_FC_MASK 0xffUL
+>> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra);
+>> +
+>>   struct S390CcwMachineClass {
+>>       /*< private >*/
+>>       MachineClass parent_class;
+>> diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
+>> index 01ade07009..5da4041576 100644
+>> --- a/target/s390x/cpu.h
+>> +++ b/target/s390x/cpu.h
+>> @@ -864,6 +864,7 @@ void s390_do_cpu_set_diag318(CPUState *cs, run_on_cpu_data arg);
+>>   int s390_assign_subch_ioeventfd(EventNotifier *notifier, uint32_t sch_id,
+>>                                   int vq, bool assign);
+>>   void s390_cpu_topology_reset(void);
+>> +void s390_cpu_topology_set(void);
+> 
+> I don't like this name much, it's nondescript.
+> s390_cpu_topology_set_modified ?
+
+yes, better.
+
+> 
+>>   #ifndef CONFIG_USER_ONLY
+>>   unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu);
+>>   #else
+>> diff --git a/hw/s390x/cpu-topology.c b/hw/s390x/cpu-topology.c
+>> index 438055c612..e6b4692581 100644
+>> --- a/hw/s390x/cpu-topology.c
+>> +++ b/hw/s390x/cpu-topology.c
+>> @@ -97,6 +97,98 @@ static s390_topology_id s390_topology_from_cpu(S390CPU *cpu)
+>>   }
+>>   
+>>   /**
+>> + * s390_topology_set_polarity
+>> + * @polarity: horizontal or vertical
+>> + *
+>> + * Changes the polarity of all the CPU in the configuration.
+>> + *
+>> + * If the dedicated CPU modifier attribute is set a vertical
+>> + * polarization is always high (Architecture).
+>> + * Otherwise we decide to set it as medium.
+>> + *
+>> + * Once done, advertise a topology change.
+>> + */
+>> +void s390_topology_set_polarity(int polarity)
+> 
+> I don't like that this function ignores what kind of vertical polarization is passed,
+> it's confusing.
+> That seems like a further reason to split horizontal/vertical from the entitlement.
+
+OK, you are right.
+I remove this function and put the s390_cpu_topology_set() inside the 
+handle_ptf()
+
+> 
+>> +{
+>> +    S390TopologyEntry *entry;
+> 
+> I also expected this function to set s390_topology.polarization, but it doesn't.
+>> +
+>> +    QTAILQ_FOREACH(entry, &s390_topology.list, next) {
+>> +        if (polarity == S390_TOPOLOGY_POLARITY_HORIZONTAL) {
+>> +            entry->id.p = polarity;
+>> +        } else {
+>> +            if (entry->id.d) {
+>> +                entry->id.p = S390_TOPOLOGY_POLARITY_VERTICAL_HIGH;
+>> +            } else {
+>> +                entry->id.p = S390_TOPOLOGY_POLARITY_VERTICAL_MEDIUM;
+>> +            }
+>> +        }
+>> +    }
+>> +    s390_cpu_topology_set();
+>> +}
+>> +
+>> +/*
+>> + * s390_handle_ptf:
+>> + *
+>> + * @register 1: contains the function code
+>> + *
+>> + * Function codes 0 and 1 handle the CPU polarization.
+>> + * We assume an horizontal topology, the only one supported currently
+>> + * by Linux, consequently we answer to function code 0, requesting
+>> + * horizontal polarization that it is already the current polarization
+>> + * and reject vertical polarization request without further explanation.
+> 
+> This comment is outdated, right? Same for those in the function body.
+> 
+>> + *
+>> + * Function code 2 is handling topology changes and is interpreted
+>> + * by the SIE.
+>> + */
+>> +void s390_handle_ptf(S390CPU *cpu, uint8_t r1, uintptr_t ra)
+>> +{
+>> +    CPUS390XState *env = &cpu->env;
+>> +    uint64_t reg = env->regs[r1];
+>> +    uint8_t fc = reg & S390_TOPO_FC_MASK;
+>> +
+>> +    if (!s390_has_feat(S390_FEAT_CONFIGURATION_TOPOLOGY)) {
+>> +        s390_program_interrupt(env, PGM_OPERATION, ra);
+>> +        return;
+>> +    }
+>> +
+>> +    if (env->psw.mask & PSW_MASK_PSTATE) {
+>> +        s390_program_interrupt(env, PGM_PRIVILEGED, ra);
+>> +        return;
+>> +    }
+>> +
+>> +    if (reg & ~S390_TOPO_FC_MASK) {
+>> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>> +        return;
+>> +    }
+>> +
+>> +    switch (fc) {
+>> +    case 0:    /* Horizontal polarization is already set */
+>> +        if (s390_topology.polarity == S390_TOPOLOGY_POLARITY_HORIZONTAL) {
+>> +            env->regs[r1] |= S390_PTF_REASON_DONE;
+>> +            setcc(cpu, 2);
+>> +        } else {
+>> +            s390_topology_set_polarity(S390_TOPOLOGY_POLARITY_HORIZONTAL);
+>> +            s390_topology.polarity = S390_TOPOLOGY_POLARITY_HORIZONTAL;
+>> +            setcc(cpu, 0);
+>> +        }
+>> +        break;
+>> +    case 1:    /* Vertical polarization is not supported */
+>> +        if (s390_topology.polarity != S390_TOPOLOGY_POLARITY_HORIZONTAL) {
+>> +            env->regs[r1] |= S390_PTF_REASON_DONE;
+>> +            setcc(cpu, 2);
+>> +        } else {
+>> +            s390_topology_set_polarity(S390_TOPOLOGY_POLARITY_VERTICAL_LOW);
+> 
+> This is why I said it's confusing, nothing gets set to LOW.
+> 
+>> +            s390_topology.polarity = S390_TOPOLOGY_POLARITY_VERTICAL_LOW;
+> 
+> Why LOW here?
+I wanted something not being S390_TOPOLOGY_POLARITY_HORIZONTAL and did 
+not want to define a S390_TOPOLOGY_POLARITY_VERTICAL.
+
+OK I define S390_TOPOLOGY_POLARITY_HORIZONTAL=0 and ..._VERTICAL=1
+
+
+
+> 
+>> +            setcc(cpu, 0);
+>> +        }
+>> +        break;
+>> +    default:
+>> +        /* Note that fc == 2 is interpreted by the SIE */
+>> +        s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+>> +    }
+> 
+> You can simplify this by doing:
+> 
+> int new_polarity;
+> switch (fc) {
+> case 0:
+> 	new_polarity = S390_TOPOLOGY_POLARITY_HORIZONTAL;
+> 	break;
+> case 1:
+> 	new_polarity = S390_TOPOLOGY_POLARITY_VERTICAL_?;
+> 	break;
+> default:
+> 	/* Note that fc == 2 is interpreted by the SIE */
+> 	s390_program_interrupt(env, PGM_SPECIFICATION, ra);
+> 	return;
+> }
+> 
+> if same polarity:
+> 	rc done, rejected
+> else
+> 	set polarity, initiated
+> 
+> Might be a good idea to turn the polarity values into an enum.
+> 
+>> +}
+> [...]
+> 
+
+Even I never really understood the added value of an enum I can do this.
+
+Thanks,
+
+regards,
+Pierre
+
+-- 
+Pierre Morel
+IBM Lab Boeblingen
