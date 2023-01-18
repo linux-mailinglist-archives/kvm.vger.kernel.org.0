@@ -2,71 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6B6FD672647
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 19:06:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B0CE467267C
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 19:15:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231256AbjARSG0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 13:06:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57292 "EHLO
+        id S230072AbjARSP4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 13:15:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231246AbjARSFj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 13:05:39 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597295AB7B
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 10:03:26 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id 200so20671187pfx.7
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 10:03:26 -0800 (PST)
+        with ESMTP id S229695AbjARSPw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 13:15:52 -0500
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98071460A0
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 10:15:50 -0800 (PST)
+Received: by mail-il1-x12f.google.com with SMTP id f8so11360378ilj.5
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 10:15:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1LWD9/QLpObyf7uK4hbDzgQfFl7VFFLA3YY+bVGtV2A=;
-        b=EmorF5thQTFFqPxBHfiajOhPpV4kMBr2heHGT5Nxk7gEWpjPWQVv7PvLYdr/SIkIqh
-         3+V/J9iAtXDUR5/KO7ldxpBFPXIZt+3vXRi890HHMQRzkYYumlG2fgJvuI41a3NeE+kl
-         7D2TU1iuEreOX3I7BOsoDu7KhXITypHsoXhk1fUaqJn2wbyH2YGfx7ygQzCsgCyEA2RY
-         AnQFps5xWyYMMZY25ZmReDxwFsd9yrriiId7x/1N0ok9+qLlAxdVBcJf2b2klq8sLAyi
-         iAXChOsswjZ3UjzKefnbxLKFjC7GGt3BkZB8yBA0ypwJ/6BlNm2zCp4Qxlt9hU6igRE6
-         yMBQ==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qFMvi2a6L2BPNbil1Z3ukPsrERB30WY5FsfmzneS0xY=;
+        b=FXN2VCbM00KvzRkLSjJCig2q0kiMeLGNdPtqDsL6Sn+DpZ+Rfxrxmut8jlbmR5reSW
+         MrN/046C1mOXE04WG8BP9Ag0tGSdsv3J1z3DLT+Ft+cTDKo0Fc8nHcQtX93SChBeTB3S
+         v+M0dtOnqM6E0LcYWrXGlAWURLkqAyXlfgRZUmty3DrKEjdVUMAJTpxYB9sMafWHFfnQ
+         Hw1IkSK/+hFION0jdBrcEI5Z2Pi0CTrplRkhpS3r4GLCFizUFFazRU1xi37XSU1WjSSS
+         GhASTTqJtcHutSoQlKJhlVJhKCKta6qfDEEx/dft6aFS/IzYIBXXmaQXjCEYcOjx29Of
+         zquQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1LWD9/QLpObyf7uK4hbDzgQfFl7VFFLA3YY+bVGtV2A=;
-        b=tA5nsDRtek0Zln6U7mK/JADULwbMT2ntEST+1GUUmQabHI5AVfO+GAEaFg0hPJ52bZ
-         Hdilr9H2n7Qz4jAPDU7z36ccGGn/kgNQWyHsEzAH8kvmY5NlZCcJhZUiLNppEcGlso3C
-         WaefHNWxhmSOTe4QISPkFYrIA78XkChCi2cN9scmRnlIOOGgWR8kclr2zzmX2LVyUuya
-         eqjaNFhT2DH2uyN1d5qwaoOJFcT22nibjz/3STT+gRwmDvweHt1RwBTVIX9I9jUOlj+Y
-         ehLkOSvnTmX8PZdAZezrBY0P49t20XkMfPXkfXHJaRgqSd2OWE/LUXgJa3PcQclT+LYy
-         UndA==
-X-Gm-Message-State: AFqh2ko5sn8eB3IXspJHUBctX3U0N1fuOQG+sUtMWBvudjBEfUtq8jgE
-        xDPyWQ9ruurOH+YVm3hqB/H81A==
-X-Google-Smtp-Source: AMrXdXtiFexFV6OeMcBVrHc0yLyJV0VjIVxq5F3AHMqYHHbWZxOSlD1/ie70xe37tAttZMs8iz4jSw==
-X-Received: by 2002:aa7:9041:0:b0:58b:cb1b:978f with SMTP id n1-20020aa79041000000b0058bcb1b978fmr1487655pfo.1.1674065002413;
-        Wed, 18 Jan 2023 10:03:22 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 124-20020a621882000000b0057709fce782sm17720022pfy.54.2023.01.18.10.03.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 10:03:22 -0800 (PST)
-Date:   Wed, 18 Jan 2023 18:03:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ackerley Tng <ackerleytng@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        David Matlack <dmatlack@google.com>,
-        Wei Wang <wei.w.wang@intel.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 1/2] KVM: selftests: Fix initialization of GDT limit
-Message-ID: <Y8g0Zv0IjLEBw5qO@google.com>
-References: <20230114161557.499685-1-ackerleytng@google.com>
- <20230114161557.499685-2-ackerleytng@google.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qFMvi2a6L2BPNbil1Z3ukPsrERB30WY5FsfmzneS0xY=;
+        b=7X1lN8KH7+B1mpOZWf8mhBexAfPjHIr4ZV3mGkLGk9JwxapC00Y7bZdGbmK8C7vcbd
+         RsF8WdGJXmJJ8RkgGLZonbI0rFdOJwiIU+fQNa/gcKPJ5Wi15K7eXv9DC7qu8fXuz+IH
+         v0ogbAcXEE21udzxWcHhKYjzCu7n4VSR78QB9EhrzuqdiCYQSTo1hO0hDqQWTGGnGifA
+         8KwGjI/RzfEW+cIrfVg6xuQponrXshizJW4EtU7Xx069VauEMGBYP/yYSWZF6OwIywvg
+         0VdbsQv6GEvAYOYeel6L9UeDhCJk2exYdYKy+z0+4JVlvLsKxXSG+Qvr05oSfLNX1gi8
+         PgEQ==
+X-Gm-Message-State: AFqh2kp3lIGozayfYlD8CYrj+uVen9B9EITVapq8F9EdMQ7RnQwxXS7e
+        NCs/N2RcAKwXUzJ8+iZOAa5PPuXmb1BFbdD3zPc0MQ==
+X-Google-Smtp-Source: AMrXdXv6zW3mUb3uJJYwWd8l/Zc0mUhiArEpYUTm10kiV+NXSFLzq7Rpx0/aHPDhA/yUTebrZSMnVWp7fevFEhGvFro=
+X-Received: by 2002:a92:d911:0:b0:30d:a0c6:55a3 with SMTP id
+ s17-20020a92d911000000b0030da0c655a3mr951212iln.199.1674065749311; Wed, 18
+ Jan 2023 10:15:49 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230114161557.499685-2-ackerleytng@google.com>
+References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-45-michael.roth@amd.com>
+ <20230118152721.GA24742@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+In-Reply-To: <20230118152721.GA24742@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+From:   Alper Gun <alpergun@google.com>
+Date:   Wed, 18 Jan 2023 10:15:38 -0800
+Message-ID: <CABpDEunq_GwJZWw9LNEHB=67w7PHut=UfCr_0bmTHe6Ymng9vQ@mail.gmail.com>
+Subject: Re: [PATCH RFC v7 44/64] KVM: SVM: Remove the long-lived GHCB host map
+To:     Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, dgilbert@redhat.com,
+        jarkko@kernel.org, ashish.kalra@amd.com, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,52 +82,208 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 14, 2023, Ackerley Tng wrote:
-> Subtract 1 to initialize GDT limit according to spec.
+On Wed, Jan 18, 2023 at 7:27 AM Jeremi Piotrowski
+<jpiotrowski@linux.microsoft.com> wrote:
+>
+> On Wed, Dec 14, 2022 at 01:40:36PM -0600, Michael Roth wrote:
+> > From: Brijesh Singh <brijesh.singh@amd.com>
+> >
+> > On VMGEXIT, sev_handle_vmgexit() creates a host mapping for the GHCB GPA,
+> > and unmaps it just before VM-entry. This long-lived GHCB map is used by
+> > the VMGEXIT handler through accessors such as ghcb_{set_get}_xxx().
+> >
+> > A long-lived GHCB map can cause issue when SEV-SNP is enabled. When
+> > SEV-SNP is enabled the mapped GPA needs to be protected against a page
+> > state change.
+> >
+> > To eliminate the long-lived GHCB mapping, update the GHCB sync operations
+> > to explicitly map the GHCB before access and unmap it after access is
+> > complete. This requires that the setting of the GHCBs sw_exit_info_{1,2}
+> > fields be done during sev_es_sync_to_ghcb(), so create two new fields in
+> > the vcpu_svm struct to hold these values when required to be set outside
+> > of the GHCB mapping.
+> >
+> > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > [mdr: defer per_cpu() assignment and order it with barrier() to fix case
+> >       where kvm_vcpu_map() causes reschedule on different CPU]
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >  arch/x86/kvm/svm/sev.c | 131 ++++++++++++++++++++++++++---------------
+> >  arch/x86/kvm/svm/svm.c |  18 +++---
+> >  arch/x86/kvm/svm/svm.h |  24 +++++++-
+> >  3 files changed, 116 insertions(+), 57 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> > index d5c6e48055fb..6ac0cb6e3484 100644
+> > --- a/arch/x86/kvm/svm/sev.c
+> > +++ b/arch/x86/kvm/svm/sev.c
+> > @@ -2921,15 +2921,40 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
+> >       kvfree(svm->sev_es.ghcb_sa);
+> >  }
+> >
+> > +static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
+> > +{
+> > +     struct vmcb_control_area *control = &svm->vmcb->control;
+> > +     u64 gfn = gpa_to_gfn(control->ghcb_gpa);
+> > +
+> > +     if (kvm_vcpu_map(&svm->vcpu, gfn, map)) {
+> > +             /* Unable to map GHCB from guest */
+> > +             pr_err("error mapping GHCB GFN [%#llx] from guest\n", gfn);
+> > +             return -EFAULT;
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static inline void svm_unmap_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
+> > +{
+> > +     kvm_vcpu_unmap(&svm->vcpu, map, true);
+> > +}
+> > +
+> >  static void dump_ghcb(struct vcpu_svm *svm)
+> >  {
+> > -     struct ghcb *ghcb = svm->sev_es.ghcb;
+> > +     struct kvm_host_map map;
+> >       unsigned int nbits;
+> > +     struct ghcb *ghcb;
+> > +
+> > +     if (svm_map_ghcb(svm, &map))
+> > +             return;
+> > +
+> > +     ghcb = map.hva;
+>
+> dump_ghcb() is called from sev_es_validate_vmgexit() with the ghcb already
+> mapped. How about passing 'struct kvm_host_map *' (or struct ghcb *) as a
+> param to avoid double mapping?
 
-Nit, make changelogs standalone, i.e. don't make me read the code just to
-understand the changelog.  "Subtract 1" is meaningless without seeing the
-existing code.  The changelog doesn't need to be a play-by-play, e.g. describing
-the change as "inclusive vs. exclusive" is also fine, the important thing is that
-readers can gain a basic understanding of the change without needing to read code.
+This also causes a soft lockup, PSC spin lock is already acquired in
+sev_es_validate_vmgexit. dump_ghcb will try to acquire the same lock
+again. So a guest can send an invalid ghcb page  and cause a host soft
+lockup.
 
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> ---
->  tools/testing/selftests/kvm/lib/x86_64/processor.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> index acfa1d01e7df..33ca7f5232a4 100644
-> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> @@ -502,7 +502,12 @@ static void kvm_setup_gdt(struct kvm_vm *vm, struct kvm_dtable *dt)
->  		vm->gdt = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
->  
->  	dt->base = vm->gdt;
-> -	dt->limit = getpagesize();
-> +
-> +	/*
-> +	 * Intel SDM Volume 3, 3.5.1:
-
-As a general rule, especially in code comments, never reference manual sections
-by their index/numbers, there's a 99% chance the comment will be stale within a
-few years.
-
-Quoting manuals is ok, because if the quote because stale then that in and of
-itself is an interesting datapoint.  If referencing a specific section is the
-easiest way to convey something, then use then name of the section, as that's less
-likely to be arbitrarily change.
-
-In this case, I'd just omit the comment entirely.  We have to assume readers have
-a minimum level of knowledge, and IMO this is firmly below (above?) the threshold.
-
-> "the GDT limit should always be one less
-> +	 * than an integral multiple of eight"
-> +	 */
-> +	dt->limit = getpagesize() - 1;
->  }
->  
->  static void kvm_setup_tss_64bit(struct kvm_vm *vm, struct kvm_segment *segp,
-> -- 
-> 2.39.0.314.g84b9a713c41-goog
-> 
+>
+> >
+> >       /* Re-use the dump_invalid_vmcb module parameter */
+> >       if (!dump_invalid_vmcb) {
+> >               pr_warn_ratelimited("set kvm_amd.dump_invalid_vmcb=1 to dump internal KVM state.\n");
+> > -             return;
+> > +             goto e_unmap;
+> >       }
+> >
+> >       nbits = sizeof(ghcb->save.valid_bitmap) * 8;
+> > @@ -2944,12 +2969,21 @@ static void dump_ghcb(struct vcpu_svm *svm)
+> >       pr_err("%-20s%016llx is_valid: %u\n", "sw_scratch",
+> >              ghcb->save.sw_scratch, ghcb_sw_scratch_is_valid(ghcb));
+> >       pr_err("%-20s%*pb\n", "valid_bitmap", nbits, ghcb->save.valid_bitmap);
+> > +
+> > +e_unmap:
+> > +     svm_unmap_ghcb(svm, &map);
+> >  }
+> >
+> > -static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+> > +static bool sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+> >  {
+> >       struct kvm_vcpu *vcpu = &svm->vcpu;
+> > -     struct ghcb *ghcb = svm->sev_es.ghcb;
+> > +     struct kvm_host_map map;
+> > +     struct ghcb *ghcb;
+> > +
+> > +     if (svm_map_ghcb(svm, &map))
+> > +             return false;
+> > +
+> > +     ghcb = map.hva;
+> >
+> >       /*
+> >        * The GHCB protocol so far allows for the following data
+> > @@ -2963,13 +2997,24 @@ static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
+> >       ghcb_set_rbx(ghcb, vcpu->arch.regs[VCPU_REGS_RBX]);
+> >       ghcb_set_rcx(ghcb, vcpu->arch.regs[VCPU_REGS_RCX]);
+> >       ghcb_set_rdx(ghcb, vcpu->arch.regs[VCPU_REGS_RDX]);
+> > +
+> > +     /*
+> > +      * Copy the return values from the exit_info_{1,2}.
+> > +      */
+> > +     ghcb_set_sw_exit_info_1(ghcb, svm->sev_es.ghcb_sw_exit_info_1);
+> > +     ghcb_set_sw_exit_info_2(ghcb, svm->sev_es.ghcb_sw_exit_info_2);
+> > +
+> > +     trace_kvm_vmgexit_exit(svm->vcpu.vcpu_id, ghcb);
+> > +
+> > +     svm_unmap_ghcb(svm, &map);
+> > +
+> > +     return true;
+> >  }
+> >
+> > -static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+> > +static void sev_es_sync_from_ghcb(struct vcpu_svm *svm, struct ghcb *ghcb)
+> >  {
+> >       struct vmcb_control_area *control = &svm->vmcb->control;
+> >       struct kvm_vcpu *vcpu = &svm->vcpu;
+> > -     struct ghcb *ghcb = svm->sev_es.ghcb;
+> >       u64 exit_code;
+> >
+> >       /*
+> > @@ -3013,20 +3058,25 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
+> >       memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
+> >  }
+> >
+> > -static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+> > +static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
+> >  {
+> > -     struct kvm_vcpu *vcpu;
+> > +     struct kvm_vcpu *vcpu = &svm->vcpu;
+> > +     struct kvm_host_map map;
+> >       struct ghcb *ghcb;
+> > -     u64 exit_code;
+> >       u64 reason;
+> >
+> > -     ghcb = svm->sev_es.ghcb;
+> > +     if (svm_map_ghcb(svm, &map))
+> > +             return -EFAULT;
+> > +
+> > +     ghcb = map.hva;
+> > +
+> > +     trace_kvm_vmgexit_enter(vcpu->vcpu_id, ghcb);
+> >
+> >       /*
+> >        * Retrieve the exit code now even though it may not be marked valid
+> >        * as it could help with debugging.
+> >        */
+> > -     exit_code = ghcb_get_sw_exit_code(ghcb);
+> > +     *exit_code = ghcb_get_sw_exit_code(ghcb);
+> >
+> >       /* Only GHCB Usage code 0 is supported */
+> >       if (ghcb->ghcb_usage) {
+> > @@ -3119,6 +3169,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+> >               goto vmgexit_err;
+> >       }
+> >
+> > +     sev_es_sync_from_ghcb(svm, ghcb);
+> > +
+> > +     svm_unmap_ghcb(svm, &map);
+> >       return 0;
+> >
+> >  vmgexit_err:
+> > @@ -3129,10 +3182,10 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+> >                           ghcb->ghcb_usage);
+> >       } else if (reason == GHCB_ERR_INVALID_EVENT) {
+> >               vcpu_unimpl(vcpu, "vmgexit: exit code %#llx is not valid\n",
+> > -                         exit_code);
+> > +                         *exit_code);
+> >       } else {
+> >               vcpu_unimpl(vcpu, "vmgexit: exit code %#llx input is not valid\n",
+> > -                         exit_code);
+> > +                         *exit_code);
+> >               dump_ghcb(svm);
+> >       }
+> >
+> > @@ -3142,6 +3195,8 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
+> >       ghcb_set_sw_exit_info_1(ghcb, 2);
+> >       ghcb_set_sw_exit_info_2(ghcb, reason);
+> >
+> > +     svm_unmap_ghcb(svm, &map);
+> > +
+> >       /* Resume the guest to "return" the error code. */
+> >       return 1;
+> >  }
+>
