@@ -2,298 +2,169 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 65A70671626
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 09:26:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C9BE67169A
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 09:53:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229996AbjARI0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 03:26:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43788 "EHLO
+        id S229759AbjARIw6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 03:52:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229896AbjARI0C (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 03:26:02 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D9B575A0A
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 23:50:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674028203;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Sc2QbvS5LHUEHeHr3GXeISkdXx26baXFdsIw1im/Hdg=;
-        b=YInOOYPZ1GcSNhhT9b10CagkzrRfMyCyCc6TIeTgLXIBvpcRvqXMpSOSMJG6r3dtv3P3Bv
-        l4n87OFNMeoA+amUDgEO48UU5K9K4pv+751KqVVKmgoCc8jSSUl+NZuaNNwaYLCoUn18kB
-        eJ3gR2i5NAXW9EcTwYrFsxd85/mYd44=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-501-ewoTHGt2MOCYWaCRYfBm8A-1; Wed, 18 Jan 2023 02:50:02 -0500
-X-MC-Unique: ewoTHGt2MOCYWaCRYfBm8A-1
-Received: by mail-pg1-f197.google.com with SMTP id h185-20020a636cc2000000b004820a10a57bso15304407pgc.22
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 23:50:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sc2QbvS5LHUEHeHr3GXeISkdXx26baXFdsIw1im/Hdg=;
-        b=K/y5J2Cz4p5fRr6n35tbJ46B6hfDgJxOkJfxybuhrHrUcjUDrnifusfsujp8G871cU
-         CHDMLmieE7njsOh70/lzrit5lawGDTy2a6XMyfAojDFrHHvIcaYrmTt4wAxpCVUrZnPt
-         3ticc7ioe3rpKHGK74tdaO3/UF7NSVNaEXl+ijICtiKc75ovz4gZymPVcL/0NVPEhx09
-         eHEmytkOLOyvqy16XS51Gs7LCrjuYDG1FT/Hy7jKBGYsn1ywjEDwMDOv/tzcbwXJcaY6
-         ma+SbxhdYEkAFbQCIynNTODf5U2wmQuO3Z4bq9b2XR/2l5nkwq9W9vV1czQkLPlkDGc9
-         EP+w==
-X-Gm-Message-State: AFqh2kp2B0AfWsLjhNLHpafpn3j0q3e7A5Eb+cVSctuKp94WDHcV5mZ6
-        UeGPAzNhiRDmB8t51SavNZVVLVR0cndTYAfyN29uPVH2/exJYn+sAKeM/NXKNgdqzkVMRo+8OWy
-        M9D/RrtBvgapq
-X-Received: by 2002:a17:903:1303:b0:194:6d4b:e1da with SMTP id iy3-20020a170903130300b001946d4be1damr1463732plb.0.1674028199883;
-        Tue, 17 Jan 2023 23:49:59 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXsLeWhkZtDm3E+RDju0/hHDvZz5BOx2tfUmdpw+rX506gUsaCHlChIFIbDe4ocrlPBsPVA/rA==
-X-Received: by 2002:a17:903:1303:b0:194:6d4b:e1da with SMTP id iy3-20020a170903130300b001946d4be1damr1463719plb.0.1674028199533;
-        Tue, 17 Jan 2023 23:49:59 -0800 (PST)
-Received: from [10.66.60.207] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id a3-20020a170902900300b00189393ab02csm4931717plp.99.2023.01.17.23.49.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jan 2023 23:49:58 -0800 (PST)
-Message-ID: <acf66ec9-9de2-7d87-c237-ade895c2bb72@redhat.com>
-Date:   Wed, 18 Jan 2023 15:49:53 +0800
-MIME-Version: 1.0
+        with ESMTP id S229546AbjARIw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 03:52:29 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2047.outbound.protection.outlook.com [40.107.243.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9488E5DC0C;
+        Wed, 18 Jan 2023 00:05:03 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Ll/0SSfoHKPnbiM1LtVgYwjnEZj4r0X3HQAZFmT5RQ3wJKwm9o45mchcsiioeGY7yqrD0EYFYB3EcrmxwHEmxoNqppUPhmn7OmwaSmvkWHcLIX6Tf9166nxVqiXT/5IStlOThzS9YtS0qasXg1xkVUKbFn0AyGcXlxBEn21Bze6ztbKEG/V0pRlKWy4+QMZwW5CMJRvnkQGdAEGOMsMH6Amo8/o93JnE+IsOcqsxzFsq/8Si4bS+kckKUaSvCGI13bmNR/99Ucyj6tRjElo84umnO7/ZbsGWK01XCMgsaspvIZTzEvTPKGNauX8txeokOs9SMxL2BmXM8boXM6NDqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=J7AFGP3jHdED9IVdAq4ydlRzrDzeoEY8MQC3durBBcA=;
+ b=TTMo0a2f1iffHRODUpqt+j4URJ6vIW6f2ThIl05snSjvDxENdGdGjSkhPbXKp6J9kzumv1GiBlsttnmDm1qWmpN6/+hUJEMkfX1HvU6Yf824lwbjeS5uDNkOTpAIeIZ5fyH6AIXxksdczreKH9g7GeAMNSEPX29b4jzxNS/aSEDCie/5ekWjxhNolsHCdkytNZgL+6+rek7lksLbOxdN7Ggo2N09Yyd7lMdLc+QRBcg6SGrI58E37+z9d2NcShBVYNO0kjDvzVP0LDgMDTnwtqEmnVl95GzWeZ8A+AhmUqYDvttxX4zR7zENgxHR0N8p7RV2GK3gIX5LgoxnYYbsNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=J7AFGP3jHdED9IVdAq4ydlRzrDzeoEY8MQC3durBBcA=;
+ b=UJ5P3EhTH37OsSTrEwZ+iSbnLzaP648hRUjg/pY4sMl39lYy1S3vFkTWchF2hOd4JpgJjlv6b+7LoMcmKKQ5bPrdSpTqMAjQXdMFvVzLLr9WqZEA1GDlmf9CBPtqsBiTddb4SYn083RnXVSq6hovjwuXzFNrQVTFZr+2+sahTV4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ BL1PR12MB5753.namprd12.prod.outlook.com (2603:10b6:208:390::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.18; Wed, 18 Jan
+ 2023 08:05:01 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::8079:86db:f2e5:7700]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::8079:86db:f2e5:7700%6]) with mapi id 15.20.5986.018; Wed, 18 Jan 2023
+ 08:05:01 +0000
+Message-ID: <a1856c7c-6106-3cf6-77a3-87d8cab9eecf@amd.com>
+Date:   Wed, 18 Jan 2023 13:34:38 +0530
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v2 8/8] KVM: selftests: aarch64: vPMU register test for
- unimplemented counters
+ Thunderbird/102.4.2
+Subject: Re: [PATCH RFC v7 11/64] KVM: SEV: Support private pages in
+ LAUNCH_UPDATE_DATA
 Content-Language: en-US
-To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
-        kvmarm@lists.linux.dev
-Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-References: <20230117013542.371944-1-reijiw@google.com>
- <20230117013542.371944-9-reijiw@google.com>
-From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230117013542.371944-9-reijiw@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, ashish.kalra@amd.com, harald@profian.com
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-12-michael.roth@amd.com> <Y8cvsS27o1BaUNPz@kernel.org>
+From:   "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <Y8cvsS27o1BaUNPz@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+X-ClientProxiedBy: PN3PR01CA0176.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:de::18) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|BL1PR12MB5753:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3a7f2a41-5a2d-4c2d-60d9-08daf92ab29c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: b8RPihugXdpw/dreAvkuECX116CzTxzP01A4IZ/OvcunkaM8II3KFgOC7ArtavKZXaceRLT3+/Ws6Qt1/G4EJ2dM9xUlM1wNfDT59Q6w/OFw2ftw61ACLhQjUVvOW6dkvQVRnwOXLA1osPgXlAXnhndcEPp5D4+6iYaRgRF9DTUcKOeX0D489C3uUs/kAojGq8y06ck5NDLuZxjQuBjChj/lf36M9mHJCOYAPpg7ireTGwre1KaHcXifXHgJ434fBzs5jyqofXXiQHaUKYHFAXITIXUUGyHorO0gG4ls27g2rFwtOrMwnxfgwgQrtDXaWlP1DI3JbtNv1Da10FlL62SE1Qh+oVuXTWOHi3S4Wi3pvXUonEJO9VwoBd1tYz9DZhNBET1gYQ7PhtC3VFJIK0R3gtbJRkbC7n3Zp+xfwnxyz74TzMqhcfCnbQdfET4F/aeXjcNd3YwQNOBnHXVnxFVyxy3GVHB/LOrEltN/Hkgu6ntLZjGswAimNPugTuhqHz2+v0DjoDOR0msGpvkoo8ZDr9Hi4tmAYAVuHFtaxVJJxLF7iqLIJF6EdEINqD9DFfv9etJHirP2sIL13/RTJ47N7O8fyQpDMWhSKT/PCazGgYHDQaHIuRFduJpBvYTtwkSqM3oDGuh2dCiCMg8XwHO/5SaqSVYvU9yZOar5WsSXHN8Xbhvbvob/qkr+vqrilTgitrc58UHyu4Dvp6oQAj6zTPxwOEvsok7twqSSDm36NI2ZME4vqQ2W5P5uhrwc
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(366004)(136003)(39860400002)(346002)(451199015)(31686004)(36756003)(8936002)(83380400001)(66476007)(8676002)(66556008)(66946007)(7406005)(7416002)(31696002)(4744005)(5660300002)(2906002)(4326008)(38100700002)(6666004)(966005)(316002)(110136005)(6636002)(6486002)(41300700001)(2616005)(53546011)(26005)(6512007)(6506007)(186003)(478600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bFZkYXN0alZYWk9vbUd5Mk9MaWpMNDFhNHBqekNwUmx4cm1mVHVXV1VZZ0tK?=
+ =?utf-8?B?Y0dMV0pxd3RtY2VnNk55bVdCTHZLVGF5ZnYvOU03eFhhK093ZStZRFpTZDVp?=
+ =?utf-8?B?cEhTU1VNM0xLT0NYK3Q2K3B4Z0xyTXZ0cE42R3BCSVdwVTRnMkVEc3pPWEpC?=
+ =?utf-8?B?UnpwM21wRTlrQzJHS1lYNEs0bmtzMjROSWk5QmNiME1WSFkyTzQxL2szb3V0?=
+ =?utf-8?B?N3BQdW1ra0owZkpxU213MDBpc0pLK1J0TEJ2ZXFJdEJrV3pQakV4SXN1Yk9E?=
+ =?utf-8?B?dGxoUjVWQ3NkTkU5TmlYMDNlSHBKQ084eFlwY1VWelk1aE13NW1wbUlla1pl?=
+ =?utf-8?B?YUVJZ0RPeExJSGJacnZiaUx4L0ZrWUZjbmtnUWtqRlg3RDNDeUw3NmlueFIx?=
+ =?utf-8?B?TzdueXF3Mjd2UkRnMzJGZ3ZJc1NwRWtjWmdCWmNMZmdLUTk2ZDduTWExYkRu?=
+ =?utf-8?B?SG1JcmYySEYxYU9FY053Yi9aRG9hTzB4MWNKZkJpczBjb2hTOHNvMGt6dmE0?=
+ =?utf-8?B?TlVqdDZDMFRPemV4MkNSSjc1MHZzaUhrcVFRckRXYTdENGVWYmh0WkFuc05G?=
+ =?utf-8?B?MFY5WVVOakcyUU1xNXpiRlVRMHVrSzRuMlVqQlFhbGo4SDhPcGdDcHcwd0x0?=
+ =?utf-8?B?QUVPWHRaK0tIODZiMjU2aTBWRDZ2b1RhTVQ0YlVZc1A0NjhtSkVuR0IyOEdD?=
+ =?utf-8?B?bFZneTN5NDdPb1ZtbzQxbHh6TXlOREwvYmF6a01uNlJGN3czMUR0aE1XWGs1?=
+ =?utf-8?B?eklwUURJWVJLY0hCaW9QQ28zRDJ3S1JxUk0wbE1oN3BxNGFSYkxHSUhsZUts?=
+ =?utf-8?B?VXZPWm1ORVlidjVnbC96RUVleUpPQTQwTW9Oc0x1ay8wRDNlOGd2M0lTY3Fm?=
+ =?utf-8?B?ZDFqSjRCY3Q1bjdVMXpzbnI1T3QzZWsvWGhiNHc1Zkk0V0tBZkp2MWQ0ZDJF?=
+ =?utf-8?B?cS9xNnA4N3ZIREoxbW5FenVyU2R5bUNxK3JtcVYwQXF4b3dlK09lR3ozNlVO?=
+ =?utf-8?B?ekVPVXZBc3I1U2N6b1lKWSs3SG5GRWtETlZQTVl4cDZicThCS3p3cGRYVE9L?=
+ =?utf-8?B?WlBESFFwejh3d0F0cWFyV3lkZnhoL0RVNHFwTjU4bE9qeWQzYzVjOWZST0lv?=
+ =?utf-8?B?YkJjcmp1WWRzdFVSZnhxWnN3UjNoSEJ0QjNHL0RrcHpDaDdCKzBoZ3M2S3JY?=
+ =?utf-8?B?UFQ5MERvRVlUVDhpekYyamtXc0ZBWlVMb1RIcmxVbmhWR3pQaUhVcGRPRUVV?=
+ =?utf-8?B?WjVUdGlkcGdxanhxMTZ5Tm5iZ2hwUk00MytUOEl4TElpQ0JGK0F2ZFBlUmpr?=
+ =?utf-8?B?cXV6Z0kxd2dSa09TWVMwNWlvWFduMWdKNXdyZXhOa2xaeWJqRnByTGN5Qy9G?=
+ =?utf-8?B?dGovSSsvOWc3RmxCWGgzMERWZkxHOHQrTVh3RVB1VEtUeExtcEJYT1ZGcHNM?=
+ =?utf-8?B?UDZ5SkdGZm9DWFN2YjdhR20vdk4vTC90dUV6MUlvaiswM1kwUVYvcG51UHlG?=
+ =?utf-8?B?T2p1ZFZFMHFyNm1COWFKZHQrMXBqU3dKOXdqcGVBejBjcm5XMzZiOHVISzNR?=
+ =?utf-8?B?UUpEaGtSUHAyWWJXb2luOHdrMWxHdzM0aUx3emdDTjlNaksyQlFrdWk1bzBy?=
+ =?utf-8?B?VjZBaElTWTRJWU9lalZ3SVhhWGcyOXJyZ2J4SUd4NFlQQ1JuWmM3YXJCR0V6?=
+ =?utf-8?B?Z2tDa0ZQbmhPVjZ5WFVNN2xYYUFCUFhsb3hLZmhuUXdrRkxmKzl1SFgrMFJj?=
+ =?utf-8?B?Y3Bsc2t1R0VZODJXcGt0bzRYUlJ5NDh3dFUvTFY0Q2lkMVVtM1NPaVBVV2hy?=
+ =?utf-8?B?NjBSd0lSL3k4WTVrMk0rNGUrQUlXZm01dzQ2eVpZVDRqM0U4OEw2OGRXKzl6?=
+ =?utf-8?B?d1U5MHB1Sm9pTTRHR1p4VFlWV1N4Ris0OUxGNy80cGU0alZxeloyQlYwMWFN?=
+ =?utf-8?B?dmtRZmo2SjhLRzNsSDNHanU4K2FqckNjZjdlQ0VBTHh5QVYxbiszSHdLR2pj?=
+ =?utf-8?B?TUFqMjRCNUFLL3lHRWtUNnpaSkExdXJJNXljZDg0OFJFMzZER3IyOHJFRStW?=
+ =?utf-8?B?NVFRNDFzTUVUNEZSTEgwWVg3eS8zaTFRNGsvQk9zbGFQWUhqWWE4alFZY0NV?=
+ =?utf-8?Q?NZ6WAj4NVAOaCZx2xwYhHYN8M?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3a7f2a41-5a2d-4c2d-60d9-08daf92ab29c
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2023 08:05:01.0800
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tEyfH9gyAA0407A8kFxOqjswGiJdAdApw70EprGYyAERsjKYOHZpHpyJt5jYdDS248gPVMjAPqcjjCLyy580Kw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5753
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Reiji,
+On 18/01/23 05:00, Jarkko Sakkinen wrote:
+> On Wed, Dec 14, 2022 at 01:40:03PM -0600, Michael Roth wrote:
+>> From: Nikunj A Dadhania <nikunj@amd.com>
 
-On 1/17/23 09:35, Reiji Watanabe wrote:
-> Add a new test case to the vpmu_counter_access test to check
-> if PMU registers or their bits for unimplemented counters are not
-> accessible or are RAZ, as expected.
->
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->   .../kvm/aarch64/vpmu_counter_access.c         | 103 +++++++++++++++++-
->   .../selftests/kvm/include/aarch64/processor.h |   1 +
->   2 files changed, 98 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> index 54b69c76c824..a7e34d63808b 100644
-> --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> @@ -5,8 +5,8 @@
->    * Copyright (c) 2022 Google LLC.
->    *
->    * This test checks if the guest can see the same number of the PMU event
-> - * counters (PMCR_EL1.N) that userspace sets, and if the guest can access
-> - * those counters.
-> + * counters (PMCR_EL1.N) that userspace sets, if the guest can access
-> + * those counters, and if the guest cannot access any other counters.
->    * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
->    */
->   #include <kvm_util.h>
-> @@ -179,6 +179,51 @@ struct pmc_accessor pmc_accessors[] = {
->   	{ read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
->   };
->   
-> +#define INVALID_EC	(-1ul)
-> +uint64_t expected_ec = INVALID_EC;
-> +uint64_t op_end_addr;
-> +
-> +static void guest_sync_handler(struct ex_regs *regs)
-> +{
-> +	uint64_t esr, ec;
-> +
-> +	esr = read_sysreg(esr_el1);
-> +	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-> +	GUEST_ASSERT_4(op_end_addr && (expected_ec == ec),
-> +		       regs->pc, esr, ec, expected_ec);
-> +
-> +	/* Will go back to op_end_addr after the handler exits */
-> +	regs->pc = op_end_addr;
-> +
-> +	/*
-> +	 * Clear op_end_addr, and setting expected_ec to INVALID_EC
-> +	 * as a sign that an exception has occurred.
-> +	 */
-> +	op_end_addr = 0;
-> +	expected_ec = INVALID_EC;
-> +}
-> +
-> +/*
-> + * Run the given operation that should trigger an exception with the
-> + * given exception class. The exception handler (guest_sync_handler)
-> + * will reset op_end_addr to 0, and expected_ec to INVALID_EC, and
-> + * will come back to the instruction at the @done_label.
-> + * The @done_label must be a unique label in this test program.
-> + */
-> +#define TEST_EXCEPTION(ec, ops, done_label)		\
-> +{							\
-> +	extern int done_label;				\
-> +							\
-> +	WRITE_ONCE(op_end_addr, (uint64_t)&done_label);	\
-> +	GUEST_ASSERT(ec != INVALID_EC);			\
-> +	WRITE_ONCE(expected_ec, ec);			\
-> +	dsb(ish);					\
-> +	ops;						\
-> +	asm volatile(#done_label":");			\
-> +	GUEST_ASSERT(!op_end_addr);			\
-> +	GUEST_ASSERT(expected_ec == INVALID_EC);	\
-> +}
-> +
->   static void pmu_disable_reset(void)
->   {
->   	uint64_t pmcr = read_sysreg(pmcr_el0);
-> @@ -352,16 +397,38 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
->   		       pmc_idx, acc, read_data, read_data_prev);
->   }
->   
-> +/*
-> + * Tests for reading/writing registers for the unimplemented event counter
-> + * specified by @pmc_idx (>= PMCR_EL1.N).
-> + */
-> +static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
-> +{
-> +	/*
-> +	 * Reading/writing the event count/type registers should cause
-> +	 * an UNDEFINED exception.
-> +	 */
-> +	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx), inv_rd_cntr);
-> +	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0), inv_wr_cntr);
-> +	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx), inv_rd_typer);
-> +	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0), inv_wr_typer);
-> +	/*
-> +	 * The bit corresponding to the (unimplemented) counter in
-> +	 * {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers should be RAZ.
-> +	 */
-> +	test_bitmap_pmu_regs(pmc_idx, 1);
-> +	test_bitmap_pmu_regs(pmc_idx, 0);
-> +}
-> +
->   /*
->    * The guest is configured with PMUv3 with @expected_pmcr_n number of
->    * event counters.
->    * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
-> - * if reading/writing PMU registers for implemented counters can work
-> - * as expected.
-> + * if reading/writing PMU registers for implemented or unimplemented
-> + * counters can work as expected.
->    */
->   static void guest_code(uint64_t expected_pmcr_n)
->   {
-> -	uint64_t pmcr, pmcr_n;
-> +	uint64_t pmcr, pmcr_n, unimp_mask;
->   	int i, pmc;
->   
->   	GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS);
-> @@ -372,6 +439,14 @@ static void guest_code(uint64_t expected_pmcr_n)
->   	/* Make sure that PMCR_EL0.N indicates the value userspace set */
->   	GUEST_ASSERT_2(pmcr_n == expected_pmcr_n, pmcr_n, expected_pmcr_n);
->   
-> +	/*
-> +	 * Make sure that (RAZ) bits corresponding to unimplemented event
-> +	 * counters in {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers are reset to zero.
-> +	 * (NOTE: bits for implemented event counters are reset to UNKNOWN)
-> +	 */
-> +	unimp_mask = GENMASK_ULL(ARMV8_PMU_MAX_GENERAL_COUNTERS - 1, pmcr_n);
-> +	check_bitmap_pmu_regs(unimp_mask, false);
-> +
->   	/*
->   	 * Tests for reading/writing PMU registers for implemented counters.
->   	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-> @@ -381,6 +456,14 @@ static void guest_code(uint64_t expected_pmcr_n)
->   			test_access_pmc_regs(&pmc_accessors[i], pmc);
->   	}
->   
-> +	/*
-> +	 * Tests for reading/writing PMU registers for unimplemented counters.
-> +	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-Here should be PMEV{CNTR, TYPER}<n>.
-> +	 */
-> +	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-> +		for (pmc = pmcr_n; pmc < ARMV8_PMU_MAX_GENERAL_COUNTERS; pmc++)
-> +			test_access_invalid_pmc_regs(&pmc_accessors[i], pmc);
-> +	}
->   	GUEST_DONE();
->   }
->   
-> @@ -394,7 +477,7 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
->   	struct kvm_vm *vm;
->   	struct kvm_vcpu *vcpu;
->   	struct kvm_vcpu_init init;
-> -	uint8_t pmuver;
-> +	uint8_t pmuver, ec;
->   	uint64_t dfr0, irq = 23;
->   	struct kvm_device_attr irq_attr = {
->   		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
-> @@ -407,11 +490,18 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
->   	};
->   
->   	vm = vm_create(1);
-> +	vm_init_descriptor_tables(vm);
-> +	/* Catch exceptions for easier debugging */
-> +	for (ec = 0; ec < ESR_EC_NUM; ec++) {
-> +		vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
-> +					guest_sync_handler);
-> +	}
->   
->   	/* Create vCPU with PMUv3 */
->   	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
->   	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
->   	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
-> +	vcpu_init_descriptor_tables(vcpu);
->   	*gic_fd = vgic_v3_setup(vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
->   
->   	/* Make sure that PMUv3 support is indicated in the ID register */
-> @@ -480,6 +570,7 @@ static void run_test(uint64_t pmcr_n)
->   	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
->   	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
->   	aarch64_vcpu_setup(vcpu, &init);
-> +	vcpu_init_descriptor_tables(vcpu);
->   	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
->   	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
->   
-> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> index 5f977528e09c..52d87809356c 100644
-> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
-> @@ -104,6 +104,7 @@ enum {
->   #define ESR_EC_SHIFT		26
->   #define ESR_EC_MASK		(ESR_EC_NUM - 1)
->   
-> +#define ESR_EC_UNKNOWN		0x0
->   #define ESR_EC_SVC64		0x15
->   #define ESR_EC_IABT		0x21
->   #define ESR_EC_DABT		0x25
+>> @@ -609,9 +659,8 @@ static int sev_launch_update_priv_gfn_handler(struct kvm *kvm,
+>>  			goto e_ret;
+>>  		kvm_release_pfn_clean(pfn);
+>>  	}
+>> -	kvm_vm_set_region_attr(kvm, range->start, range->end,
+>> -		true /* priv_attr */);
+>>  
+>> +	kvm_vm_set_region_attr(kvm, range->start, range->end, KVM_MEMORY_ATTRIBUTE_PRIVATE);
 
--- 
-Regards,
-Shaoqin
+As the memory attribute is no more a boolean in the UPM series, I had this change.
+
+>>  e_ret:
+>>  	return ret;
+>>  }
+>> -- 
+>> 2.25.1
+>>
+> 
+> kvm_vm_set_region_attr() should be fixed already in:
+>> https://lore.kernel.org/all/20221214194056.161492-11-michael.roth@amd.com/
+
+Will discuss with Mike and move this hunk to above patch.
+
+Regards
+Nikunj
 
