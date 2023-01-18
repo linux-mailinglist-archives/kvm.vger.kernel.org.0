@@ -2,148 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E88167175D
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 10:21:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1ABFB671761
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 10:21:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229708AbjARJVA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 04:21:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45012 "EHLO
+        id S229974AbjARJVK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 04:21:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44996 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230209AbjARJU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S230210AbjARJU3 (ORCPT <rfc822;kvm@vger.kernel.org>);
         Wed, 18 Jan 2023 04:20:29 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 096F338B5E
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 00:37:55 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30I5gAjA022794
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:37:54 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=d0O54qbq+uVP8uslu1em6WybW7uI0SEes3v+6MNPS00=;
- b=Hp43uWIr5SNT4LChHW9tQiEHO6qJWN70AgJLZ67V8T0WLgxfJTF48kGYQjRriQiEnjTe
- KB7ehB/V3By37NQD6ppxbeUnRjaiOPSoRnWCQqtcSewZkuiHlvsFSczxZN4SRqJ87NM3
- yVUQVbUzlC8vcm+F4/lU0nABqToUTxyDPTSuFvEJATkr6AdFJgZt3p7vU4fXxhtU7nxN
- QFn8K5u3TRO6q10jbkt7qy2VX9SChf8TKTiYYsDjajPdyUut/pBB8gqCl6fozEOgGVND
- 92/aivSYDT0bSs714vSHfXQVGYHVvyNsXfeUaPSsn/KdZHgOzGs/gm6Xkk8PYNyAjI5r fg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6aup3g0p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:37:54 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30I84r4r002836
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:37:54 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6aup3fyx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 08:37:54 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30HMHJrY006209;
-        Wed, 18 Jan 2023 08:37:51 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n3knfmyu2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 08:37:51 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30I8bmuq38470112
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Jan 2023 08:37:48 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 348EE20049;
-        Wed, 18 Jan 2023 08:37:48 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AD44720040;
-        Wed, 18 Jan 2023 08:37:47 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.179.30.151])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed, 18 Jan 2023 08:37:47 +0000 (GMT)
-From:   Marc Hartmayer <mhartmay@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH 3/9] s390x/Makefile: fix `*.gbin` target
- dependencies
-In-Reply-To: <2a84da8c-1a02-e303-e58a-454de0de6792@linux.ibm.com>
-References: <20230116175757.71059-1-mhartmay@linux.ibm.com>
- <20230116175757.71059-4-mhartmay@linux.ibm.com>
- <2a84da8c-1a02-e303-e58a-454de0de6792@linux.ibm.com>
-Date:   Wed, 18 Jan 2023 09:37:46 +0100
-Message-ID: <878ri0kzl1.fsf@li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55C7E470AF
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 00:38:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674031085; x=1705567085;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aCjlJ+lVidmbQiwHgtbQI3oyzxQjLrub4avcV8lq7iE=;
+  b=hBXCMpbE0teaYEK4kQiRF7sMyEb04s6SiKU4tH/UAKP4HKkUpDTcBmWp
+   9kQnei0c4B/j6rT5hggkLQDRcD7tPSrZJye9eQ1wisj4oj1s/ESMtV9x0
+   EyInm0jrtMyDhqucmcl3+IaT8gKijKWFxTIDX/sNg040yYk01OTmVjTe8
+   OIOeF09XCARzW2MExED0HKqKqNbNZWj7TL4UHZMfbK51zbhBeqqezIs/r
+   PEP1rhbIVg5tUnkj7VHCJRG5s1rCH0cjgE2bp4Tiah9/wHMzUUgzpLY89
+   jaQxjvgfil8RhjRdC6ivg+yefiGk8ItjrO3LIlolu+7LRdSQdvKQpswW7
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10593"; a="324984287"
+X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
+   d="scan'208";a="324984287"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2023 00:38:03 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10593"; a="783589526"
+X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
+   d="scan'208";a="783589526"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga004.jf.intel.com with ESMTP; 18 Jan 2023 00:38:02 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 18 Jan 2023 00:38:02 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 18 Jan 2023 00:38:01 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Wed, 18 Jan 2023 00:38:01 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.172)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Wed, 18 Jan 2023 00:38:01 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EMbjZio1MwTJPZzgDcuj5E61twOOCSlha7fysMmaYURG8NAOEXf9w+aO2flAy0fzNqnQhU4F86Gll8p9pmtfcQH/rUSieJmL2axmk4YvY1J7asIAU9DujgEm5L6KfYyXu1Rv2TEDtyRO7SGVcZusEQhK7uILurabzp8SiggLjIkxBjTxSh7zglJ7CP2Jp0LuuXP+8lVLNjQ5ixrTpx5BNMtb2/xBksNYkJZ5E+wNY8Y4DnhgqKo/RS0J3qoS9xJ4m6+C8eyNZZDYFPB8dFEtX93cVYsyPTT+fhuPjX4YUOm9RlxhMy9YedEZBXtMHpQfBtZi2/LssDmDV1fmVRHu+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x+IDuDEO0BK1yfLKfurwsFmpR3axwPNL0pt6/aJgTFA=;
+ b=c9LgMfgk8VrSZwpN6iYAcYSULsEZAUBxijc5SLXUcuHZYRDLSchFiGPB7bMhqh34P1gH1gx+BYa3mn11Bgnju6Lm3WvSKntlCD7uz5tRU3QfHtmitKB3ntvd3GSmYkK1qk29p/g8W5mbip1XWkvE8elDDZdyOPduHAKgezJn5hRMnoR8f/qbl0O7jBFCPzcJiETe2h3zFSDiZ5GPJ3od7bYK5JrdMcilBwfbP9KhLu0igilMbkz0NmsKrYmjIn8z9Z879nf8y6CHD65Q8bPUE1DhPb5Ooaz7BZHqYDCg8l/7Z1ObZu6Mk7PX4LHY5a6gkUl2BGwBF6stwvp3rbnvTw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by BL1PR11MB6051.namprd11.prod.outlook.com (2603:10b6:208:393::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.19; Wed, 18 Jan
+ 2023 08:37:59 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d%9]) with mapi id 15.20.5986.023; Wed, 18 Jan 2023
+ 08:37:59 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>
+CC:     "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>
+Subject: RE: [PATCH 01/13] vfio: Allocate per device file structure
+Thread-Topic: [PATCH 01/13] vfio: Allocate per device file structure
+Thread-Index: AQHZKnqUfas0a/KuZEq5mvH75NwRFq6j2xyA
+Date:   Wed, 18 Jan 2023 08:37:59 +0000
+Message-ID: <BN9PR11MB52769F1EBACA0FA567DF7D2A8CC79@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230117134942.101112-1-yi.l.liu@intel.com>
+ <20230117134942.101112-2-yi.l.liu@intel.com>
+In-Reply-To: <20230117134942.101112-2-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|BL1PR11MB6051:EE_
+x-ms-office365-filtering-correlation-id: 98ea2abf-055d-4bdb-3afe-08daf92f4e47
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2ZHX+32sCJjdr878Z1CHMwzfAH/1DPlE8xaqkT47l5Jh4FR1n7afGIE/4ypFhZu/sNTi4SUd1Dcy11bLtyZl//6LlhLZZx1fZOyFTdq/8eMSd+B/P2TVeYi/O/tWf5AhhN/OYR2KYvZFOgvkOJJQ+8aOWJYFfX+mUTmbQ/Iv5jiTxt6Aps5SMHVzJF0wvr2HSmHBzrF6c22ZMIaPTSyhVBfDbaueqmYoavN6lbe7FyZq3u6vqbvDZhtJRFdqHDmcYUFkdwjzAD6pcsvCxhd9PTQfFhvhwsewXzAw6J5MfBuM2XQaOaK5nsTuiJevqbJY3Rsg/Noo76xRku4Yynu1VyXmPpv1Q6jpK9oveqbhwHwSysUcYG6rfoEelkzpUhulMub6WzK4nVwiFHjmPM8s2dl5hryr5xVDKP48DO/3K+rCWrDlpYmDfPLNOnexGSSDUGs4LAO9R2cfr98EjwAR7/pkeot0tx/EsO/8yxTU6yIYbaRMc0hkBY3N/e9DSYdYLzJq4ShgjcN05HbxCNcH5B0Rw+7mr7AdDZhBtQWyaTH7XfXCsS6/yxN7IJo+KY8D3K5R1EPbFkGUpjWJ2C9HIChO2gGThS2aXJ5AEpiue6cjeNeCvesDnWFjasCRpQgw1Rg3P+01qwXKS/OM7IOFSYdHfy9rjjZMThFTyvsrFXXgcV7NHfwVg/j0sjl3x/vOxc8dUlxC2upgoRM+aSYrBg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(136003)(396003)(346002)(39860400002)(376002)(366004)(451199015)(4326008)(64756008)(41300700001)(5660300002)(7416002)(66556008)(8936002)(4744005)(66446008)(8676002)(76116006)(54906003)(66476007)(110136005)(66946007)(478600001)(7696005)(71200400001)(186003)(26005)(9686003)(6506007)(2906002)(52536014)(55016003)(83380400001)(82960400001)(86362001)(33656002)(38070700005)(38100700002)(316002)(122000001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?hzdIg9xSwEcLxAiQayXaj8MdPLbqpXycXcngBac5C7Wrw51c+prnbhwZwIlo?=
+ =?us-ascii?Q?4JiwPjdgR0IqK2BxRddFObGqZdecz3umIEIiu2iMpZxpx5pEZVfi5EvfaQXS?=
+ =?us-ascii?Q?GoOJqiokTbKCS7W/SqVXCuFgt+VHqh53gknrweGO938ayP1OyZFEtVJQ06Go?=
+ =?us-ascii?Q?/dqeP+pCT2aujQzGAZsvxIT31KsRG+R03JyJ5HJ37Ycim6IfJMecGhqOIaUp?=
+ =?us-ascii?Q?j47pM2GKfJJMe9q1cm6isuTB9K+c7qnHIK3PfFwssqmJXLMcqzrm+J5mpfQe?=
+ =?us-ascii?Q?rdg38x+Xwez8m4g/az0tcgk0Sznyhw+VL2f3V6HVU5msDt0zDOUxSOtohFTo?=
+ =?us-ascii?Q?kjoaw7Y35ycfBJLiVyWzwXISaLUmLnUVk9B5vYzqRrQ9y/7zNnDddLTWZz3e?=
+ =?us-ascii?Q?BXBwLEGoz3TSujTHQIrvrI0KHYN145Xi7kNf3JnO4Vr0sZKUWJeese+Nhzby?=
+ =?us-ascii?Q?a9wDrxjSgh4TD+EuRfi1sbCeIDbMpzw5uCGGBaSxGUIJl50ubAs3hV8wffVn?=
+ =?us-ascii?Q?F+ntc/dAEAusee/fGl6Rmb5UxbuDJ07xrj4AQ71Spyr6JKB/V/aTyyLMtrXu?=
+ =?us-ascii?Q?ej/HvZ8fsJvx6DuzBImB/n85nbcmUuohjcu/LEsgAcURhmTPaSbVov/x3FgJ?=
+ =?us-ascii?Q?TefbSg2EgBK/UpCtu6ZsGt7RyO4Ejja8Js4MxnXIjcq5Szxcndzuzf2QPJSX?=
+ =?us-ascii?Q?rOnLX5PJlrdZ/M25LbfNXF+/pX3w/2LZzsHzE+22MpCaJMRTadJ95YYidHGh?=
+ =?us-ascii?Q?ZenNS1gxeHMlYWBzHECeLh5XrqD1TSsjaize2lEto1Lh9FNsgT/2WpKmCg2S?=
+ =?us-ascii?Q?UB/X6bo3dUkwA/2x7xdMey3YUWj+FPDVs7s18NYKRzpXk4v59ZTXB2EaIKmv?=
+ =?us-ascii?Q?xmnW+Z+VUgi/go3NAYdAn1/Bhu4NBsYzhzGWtTDSwkW3b9nCMG3+79krOM9U?=
+ =?us-ascii?Q?WhvrQjfIZG7dmBrHsgTs+JsVMf65YnV32TH1V5kTWcCAr9bZKke3nGvmZ+tm?=
+ =?us-ascii?Q?wQpl1ENDyDT+ZoIZIy44UbXR1Jd3+3iR/0oyQZgau3sSsy9nC6ahsGJSI+YZ?=
+ =?us-ascii?Q?a3uW6eB3OSEjdGhkbqhnKTWKlKqOO/JNrVG0WVN49xkNGvNnBVyGi+Lmyh7c?=
+ =?us-ascii?Q?qbexkbXWl8AMmALYDKLtHrGqLaKMOLkWwERqxWshYXV2f1/sZaYHBFi/GVR1?=
+ =?us-ascii?Q?gwZeuBOX3lx4IM4anFWaOxHxkiuaB+rawo1rm8nwJa35Ry97p4ES4RaKgUSZ?=
+ =?us-ascii?Q?5WuEhLc65VNWWcdpmI0WodyS99lVVHNJY9k7dd9wCo2y8dRwryjN2DXoHp1g?=
+ =?us-ascii?Q?cDrd9z+5LpnrqtsK6KWfRI5WHtiiH9hU0jK2RnrECVHW+cqRnwlnPhVA0lxF?=
+ =?us-ascii?Q?Yym5zJtwiG8CvS6iq9aoQ335uAcVqSFrE3Fzzths1Vu5KGR8usRxVr9VeVw9?=
+ =?us-ascii?Q?RViEZU1NrLtt5fOEoghyjUIA/MUBf1E/WutM0l5wk91Hink3k8fckYmiQVVB?=
+ =?us-ascii?Q?O5MJ0QTyjQjg+XPYtmVpu4sb3w5l9zs5rE3Qo+gRGP+ZeGm4yZZ2kUEi3jw4?=
+ =?us-ascii?Q?Y8mUY/9jHEwxAXISneZwZ2jYXTPMcZeQyjXHnYLT?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: bi_hrCTjLi4tndicJmoaN-Ixs0lQGROx
-X-Proofpoint-ORIG-GUID: CyHQNbUImaBf8y5Soh96AMY6XSK9qT4r
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-18_03,2023-01-17_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- impostorscore=0 clxscore=1015 spamscore=0 mlxlogscore=999 suspectscore=0
- adultscore=0 priorityscore=1501 phishscore=0 mlxscore=0 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301180073
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98ea2abf-055d-4bdb-3afe-08daf92f4e47
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jan 2023 08:37:59.7947
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eYpvMhXbSN6DQzM/crr34tulYbO6Knf2xuBXveOTt8XZH8aaS32tjsctJeuOZ/l/3GT4qaCW4T26NobgY4aCbQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB6051
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Janosch Frank <frankja@linux.ibm.com> writes:
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Tuesday, January 17, 2023 9:50 PM
+>=20
+> This is preparation for adding vfio device cdev support. vfio device
+> cdev requires:
+> 1) a per device file memory to store the kvm pointer set by KVM. It will
+>    be propagated to vfio_device:kvm after the device cdev file is bound
+>    to an iommufd
+> 2) a mechanism to block device access through device cdev fd before it
+>    is bound to an iommufd
+>=20
+> To address above requirements, this adds a per device file structure
+> named vfio_device_file. For now, it's only a wrapper of struct vfio_devic=
+e
+> pointer. Other fields will be added to this per file structure in future
+> commits.
+>=20
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 
-> On 1/16/23 18:57, Marc Hartmayer wrote:
->> If the linker scripts change, then the .gbin binaries must be rebuilt.
->>=20
->> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->> ---
->>   s390x/Makefile | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>=20
->> diff --git a/s390x/Makefile b/s390x/Makefile
->> index 660ff06f1e7c..b6bf2ed99afd 100644
->> --- a/s390x/Makefile
->> +++ b/s390x/Makefile
->> @@ -135,12 +135,12 @@ $(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(a=
-sm-offsets)
->>   $(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
->>   	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
->>=20=20=20
->> -$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o
->> +$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(SRCDIR)/s390x/snipp=
-ets/asm/flat.lds
->
-> Any reason why you didn't use the shorter:
-> $(SNIPPET_DIR)/asm/flat.lds ?
-
-No - it was just copied from the rule without thinking further :)
-
->
->
->>   	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/asm/flat.lds $<
->>   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data"=
- -j ".bss" --set-section-flags .bss=3Dalloc,load,contents $@ $@
->>   	truncate -s '%4096' $@
->>=20=20=20
->> -$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
->> +$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS=
-) $(SRCDIR)/s390x/snippets/c/flat.lds
->>   	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $< $(sn=
-ippet_lib) $(FLATLIBS)
->>   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data"=
- -j ".bss" --set-section-flags .bss=3Dalloc,load,contents $@ $@
->>   	truncate -s '%4096' $@
->
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Gregor Pillen=20
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
