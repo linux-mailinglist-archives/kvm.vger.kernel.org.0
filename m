@@ -2,138 +2,157 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5A4B1672486
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 18:11:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 38C366724A8
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 18:17:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230361AbjARRLH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 12:11:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43004 "EHLO
+        id S231154AbjARRRi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 12:17:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjARRLE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 12:11:04 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CA3D46089
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:11:03 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30IFTLuG026711;
-        Wed, 18 Jan 2023 17:10:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=3OAPInVnFVZKsEiBtdIUSugEcvzC8D5M+HLlMZO9pfI=;
- b=PYjb2HmQt8ohNDHXuYEWF8AcRl+MY696aK1Y6N+TeIOqb1Wy8D3/QPs/NVlSpslfX70L
- 3ULcITgcJ2XlJBD1gYTSKAnZm7HFpiOTJn0U/1PJzYSSTadfJowTQN+jAm1M37nJZ6iZ
- YlHTD8oj2dhrcG5ytuouKeCNp9FQbOEL4DReSzC5kGOcVFd/0QsarvOlY+W/egIfCfLa
- onXvnKdOPxf5HPTe6va/pxd7nZPROXNkg/MmaCDrk7YtyupAZrad4ed7ITygD2b1kn27
- 0y05oouHYsSf9TN5sMgsfofEPxULGRcAJE1K6rA501LUajP6RnTw4bsEBaREah8l9vCV vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6f921fhk-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 17:10:57 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30IGlNeH030812;
-        Wed, 18 Jan 2023 17:10:57 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6f921fgj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 17:10:57 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30ICvqR9004659;
-        Wed, 18 Jan 2023 17:10:55 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16nk8r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 17:10:55 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30IHApKA35324402
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Jan 2023 17:10:51 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 667C52007D;
-        Wed, 18 Jan 2023 17:10:51 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2696120040;
-        Wed, 18 Jan 2023 17:10:50 +0000 (GMT)
-Received: from [9.179.13.15] (unknown [9.179.13.15])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Jan 2023 17:10:50 +0000 (GMT)
-Message-ID: <074a45e3-b465-f3aa-0187-57ab3f779912@linux.ibm.com>
-Date:   Wed, 18 Jan 2023 18:10:49 +0100
+        with ESMTP id S231175AbjARRRS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 12:17:18 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEA159571
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:17:16 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id o7-20020a17090a0a0700b00226c9b82c3aso2837104pjo.3
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 09:17:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6FL8JJKN1LVzWkPF+aKtJUdwHaz9en8xDzUW2zFOrSY=;
+        b=bl5IHfblF7oi96NNkA5U8SF7wUtop9rpLyHBYs/4MD+DADCJ6isUH3ZccvjespkLZD
+         gXwGmB8IdvutFO2kyTnloszSczWHCoKGfI0xG1j2Ve7NarDvGd+URgpodYb19MJaH0zX
+         RPikpRZqC7VGmj+XI1sO0dpytVz5VH0NFQdvEeeYc2H4LDBAQ8i2KWpNvjQ/zdZ64Aif
+         Ta6Gn9SHn1KpN21U6TsCYRCkzVuVZVycpaUyRvdubCEtUP/O+Sejy1reztba8QfEwtde
+         Ky7f0b80BDeXQbMn20TkFDFRyyL5nozpU7s/VU/Vzb6+D3GxrVXlO1/pwwFhTV96xl/G
+         WGXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6FL8JJKN1LVzWkPF+aKtJUdwHaz9en8xDzUW2zFOrSY=;
+        b=dMHBzWbu/pwKkM5Y6B2glvQBj8RzZcqRDbq0W7S0gHB2iNOeQQNs0ZTTQmmPrL5ckZ
+         iksKKPijulhlwN2I3QNXGNAepN68FJ3t8hWHbw3WR74uQvscIpODZwPlWabwOyP9AP3L
+         F3as49nCi85y9oIMVpT2S/rKPU6mY4GKY2n2/W/soqofhU6h7vD98hCAgHr1kpCW51Od
+         TGS6Xcsjv/Ovi+adjJcOI2Fg+4eBVp4OlZI8yMCJGYCMyOWfMNZDcxhJpX5OWm68nZ+M
+         2D8qCdtEHpN6U3+85Jshyh4ZE11ocRZsQ5ZwWzLdVnmEH2vL1fBoVkOunw0+i/IqgfGa
+         AbzQ==
+X-Gm-Message-State: AFqh2kriln5+ZhrEw9rBh4LZQRmkPBEDm+DXpoIfuxRIa1/z/4E2gp/m
+        spdkrhn//8wyoEY3TiHe2CwLXw==
+X-Google-Smtp-Source: AMrXdXtOORgNGTIyd11R2eMP7ByXXE52rPFRkTZwXhynNFuQSIdozZ7e3gP+UEGWXjWMQ6ldDAX2Ig==
+X-Received: by 2002:a17:902:e808:b0:189:b910:c6d2 with SMTP id u8-20020a170902e80800b00189b910c6d2mr3394337plg.1.1674062235976;
+        Wed, 18 Jan 2023 09:17:15 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id d17-20020a170902ced100b001895f7c8a71sm6609409plg.97.2023.01.18.09.17.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jan 2023 09:17:15 -0800 (PST)
+Date:   Wed, 18 Jan 2023 17:17:11 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>
+Cc:     Vishal Annapurve <vannapurve@google.com>, x86@kernel.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
+        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
+        aaronlewis@google.com, wei.w.wang@intel.com,
+        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
+        jlayton@kernel.org, bfields@fieldses.org,
+        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
+        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
+        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
+        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
+        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
+        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
+        diviness@google.com, maz@kernel.org, dmatlack@google.com,
+        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
+        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
+Subject: Re: [V2 PATCH 0/6] KVM: selftests: selftests for fd-based private
+ memory
+Message-ID: <Y8gpl+LwSuSgBFks@google.com>
+References: <20221205232341.4131240-1-vannapurve@google.com>
+ <Y8dG3WDxY2OCGPby@google.com>
+ <20230118112511.wrljyng2xiz3yktv@box.shutemov.name>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-Subject: Re: [PATCH v14 11/11] docs/s390x/cpu topology: document s390x cpu
- topology
-Content-Language: en-US
-To:     =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
-        borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
-        frankja@linux.ibm.com, clg@kaod.org
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-12-pmorel@linux.ibm.com> <Y7/17Yjblca57VT9@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <Y7/17Yjblca57VT9@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -KHBjhBuOAcLX9Er-rIcLSrMNVpADD0X
-X-Proofpoint-ORIG-GUID: LAn8uwC0nmOhbwiU1Y7-KRbMSl2lxm8x
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-18_05,2023-01-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0 mlxlogscore=999
- bulkscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2301180143
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230118112511.wrljyng2xiz3yktv@box.shutemov.name>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/12/23 12:58, Daniel P. Berrangé wrote:
-> On Thu, Jan 05, 2023 at 03:53:13PM +0100, Pierre Morel wrote:
->> Add some basic examples for the definition of cpu topology
->> in s390x.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
->>   docs/system/s390x/cpu-topology.rst | 292 +++++++++++++++++++++++++++++
->>   docs/system/target-s390x.rst       |   1 +
->>   2 files changed, 293 insertions(+)
->>   create mode 100644 docs/system/s390x/cpu-topology.rst
->>
->> diff --git a/docs/system/s390x/cpu-topology.rst b/docs/system/s390x/cpu-topology.rst
->> new file mode 100644
->> index 0000000000..0020b70b50
->> --- /dev/null
->> +++ b/docs/system/s390x/cpu-topology.rst
->> @@ -0,0 +1,292 @@
->> +CPU Topology on s390x
->> +=====================
->> +
->> +CPU Topology on S390x provides up to 5 levels of topology containers:
->> +nodes, drawers, books, sockets and CPUs.
+On Wed, Jan 18, 2023, Kirill A. Shutemov wrote:
+> On Wed, Jan 18, 2023 at 01:09:49AM +0000, Sean Christopherson wrote:
+> > On Mon, Dec 05, 2022, Vishal Annapurve wrote:
+> > > This series implements selftests targeting the feature floated by Chao via:
+> > > https://lore.kernel.org/lkml/20221202061347.1070246-10-chao.p.peng@linux.intel.com/T/
+> > > 
+> > > Below changes aim to test the fd based approach for guest private memory
+> > > in context of normal (non-confidential) VMs executing on non-confidential
+> > > platforms.
+> > > 
+> > > private_mem_test.c file adds selftest to access private memory from the
+> > > guest via private/shared accesses and checking if the contents can be
+> > > leaked to/accessed by vmm via shared memory view before/after conversions.
+> > > 
+> > > Updates in V2:
+> > > 1) Simplified vcpu run loop implementation API
+> > > 2) Removed VM creation logic from private mem library
+> > 
+> > I pushed a rework version of this series to:
+> > 
+> >   git@github.com:sean-jc/linux.git x86/upm_base_support
 > 
-> The last level should be 'cores' not CPUs for QEMU terminology.
+> It still has build issue with lockdep enabled that I mentioned before:
 
-Yes, thanks.
+Yeah, I haven't updated the branch since last Friday, i.e. I haven't fixed the
+known bugs yet.  I pushed the selftests changes at the same as everything else,
+just didn't get to typing up the emails until yesterday.
 
-Regards,
-Pierre
+> https://lore.kernel.org/all/20230116134845.vboraky2nd56szos@box.shutemov.name/
+> 
+> And when compiled with lockdep, it triggers a lot of warnings about missed
+> locks, like this:
 
+Ah crud, I knew I was forgetting something.  The lockdep assertion can simply be
+removed, mmu_lock doesn't need to be held to read attributes.  I knew the assertion
+was wrong when I added it, but I wanted to remind myself to take a closer look at
+the usage of kvm_mem_is_private() and forgot to go back and delete the assertion.
 
--- 
-Pierre Morel
-IBM Lab Boeblingen
+The use of kvm_mem_is_private() in kvm_mmu_do_page_fault() is technically unsafe.
+Similar to getting the pfn, if mmu_lock isn't held, consuming the attributes
+(private vs. shared) needs MMU notifier protection, i.e. the attributes are safe
+to read only after mmu_invalidate_seq is snapshot.
+
+However, is_private gets rechecked by __kvm_faultin_pfn(), which is protected by
+the sequence counter, and so the technically unsafe read is verified in the end.
+The obvious alternative is to make is_private an output of kvm_faultin_pfn(), but
+that's incorrect for SNP and TDX guests, in which case "is_private" is a property
+of the fault itself.
+
+TL;DR: I'm going to delete the assertion and add a comment in kvm_mmu_do_page_fault()
+explaining why it's safe to consume kvm_mem_is_private() for "legacy" guests.
+
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index 35a339891aed..da0afe81cf10 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -2310,8 +2310,6 @@ static inline void kvm_account_pgtable_pages(void *virt, int nr)
+ #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+ static inline unsigned long kvm_get_memory_attributes(struct kvm *kvm, gfn_t gfn)
+ {
+-       lockdep_assert_held(kvm->mmu_lock);
+-
+        return xa_to_value(xa_load(&kvm->mem_attr_array, gfn));
+ }
+
