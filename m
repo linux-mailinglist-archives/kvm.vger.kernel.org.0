@@ -2,74 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 15BF06722DC
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 17:21:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 557716722F4
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 17:24:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230315AbjARQVe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 11:21:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50504 "EHLO
+        id S230379AbjARQX5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 11:23:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230021AbjARQVJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 11:21:09 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D469A16ADE
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:16:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674058607;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=I4r8CuW+YnKvqSeeax1QytRlVDAJqyT4u8ebKhPNjo4=;
-        b=ao6agEB4PKdmEfALUsiWAYSN+mXIO1mKlr+8PAQ6J3t12FbX4x9w12Fa+xxysanNT3FRtG
-        6O3taOiAJtWDfD5tRqLLHcA2Tdu0rCLHka2wadxLpjbqt/s2I8Ea8ga5ZUMcS9Wszz32gf
-        IsCwfh1SB1vQI1i6nSbzs+A4Dbsk3U8=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-265-k0Mlo56cOvShHwfLZzPTyw-1; Wed, 18 Jan 2023 11:16:45 -0500
-X-MC-Unique: k0Mlo56cOvShHwfLZzPTyw-1
-Received: by mail-ed1-f70.google.com with SMTP id z18-20020a05640235d200b0049d84165065so8794167edc.18
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:16:45 -0800 (PST)
+        with ESMTP id S229977AbjARQXd (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 11:23:33 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A99253E53
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:21:57 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id s13-20020a17090a6e4d00b0022900843652so2906350pjm.1
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:21:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=96onnRMfNwCGefmryXDgBGIqeU2EbYigY6Cf6nLd5Os=;
+        b=TPa77qDbMKs1jOi/NjHOv3Z5G1yMko3K2DBfOBoyDqDTg4wPSaPNTIMzoNozIajr00
+         ISjPpT/dS4UKZt1V2+7RDRmttjFg1iDtBIK56bw5sEWMRUfyh81T8c4BpdVw0tcTxFfG
+         zEpVx5xaSPhHb3QWm9d7QNvhjuMbJKsez6MTLWb8KtFRvn4JaupZq/DjGxTIkH2vYK83
+         hnUvluCT3oyvClvI5z/tIWkCNRZzm2gyRgg9MKAAi0yAwdJl+OP0ZhX8xOnmTGMb3HgK
+         8a5Tu3KXmd8eNw9a81mwXYe0yOgYZ0zYT7MURAvAMZwDNjhrs0tpCPEejIEpsePd4ptK
+         JnCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=I4r8CuW+YnKvqSeeax1QytRlVDAJqyT4u8ebKhPNjo4=;
-        b=Hj3qE1WqxNZBIxXW/nHxahENcHQXDD1SnzkMMumKFqlerggyGdqkkc+AUOO0+kDTWV
-         qVEkG06KHwDV4L6bH0/gDSsk+r1Nr5NZMqiuAOP80D9s5Cs53LMI/hFKjoXcTPQF2+tb
-         /3ntWP4O63b834k+CbzV/mabMLvJXK3vVV3R3WDDXYKcGdhOKMcKhwhxr78iA4ovV9bf
-         TwjEPF3CFrDw/AXsQkcgnZbhGgeCPCz1sFSorUehIh1494l6uNGhuJfcr3me5AgZMO/F
-         +zdm7+/22EcPmpESMd1eJ28DzR3Ymgm3bFDLVLz3Ke7TNlL4Y197+DND+hFphOLfDTfO
-         GI3w==
-X-Gm-Message-State: AFqh2kpHY8tSq5JrE2gN3MysR7d//HZMNeudA8NP6aECBzXqbJahb6h+
-        /1boeRFEFJ6Bt5a0CcHga9WibQFm/QhJ7ll5deCMiJWVsZEfF+Es0gyNL43e/Vo1OieA08yIL+L
-        U/qoCBCHacY4C
-X-Received: by 2002:a50:fe95:0:b0:46c:aa8b:da5c with SMTP id d21-20020a50fe95000000b0046caa8bda5cmr7299738edt.33.1674058604621;
-        Wed, 18 Jan 2023 08:16:44 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXv0mzGeCORs+rL+WFHMFaMedZamVs1+tL0AujyQL/Ydr0pFwgWRmY5hC+H2H9tmo/saPRTfYA==
-X-Received: by 2002:a50:fe95:0:b0:46c:aa8b:da5c with SMTP id d21-20020a50fe95000000b0046caa8bda5cmr7299730edt.33.1674058604447;
-        Wed, 18 Jan 2023 08:16:44 -0800 (PST)
-Received: from ovpn-194-7.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id v22-20020aa7d816000000b0049dd7eec977sm5638085edq.41.2023.01.18.08.16.43
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=96onnRMfNwCGefmryXDgBGIqeU2EbYigY6Cf6nLd5Os=;
+        b=PlYC4VielK5m+5wbsSDNOUfsyJddJgDo1F8sCK6a6aSQDYxffD0VRqZJ4zjFJfU3qL
+         Qy/li7JEjAZpxq+Mr9C4ZmANf0kH5j/D+VJOqG/npQmflqL9kWciqg06NMiPA7zuv+AB
+         Q/myjGdJ9xK1bv8G7CEN+YIXPonK51GgDyjOzXBm2bCgqTylDQLT2t72Rn+H7jv9Z5XL
+         zwOTjn846W0YrAKA1e0GyHGvx8/cJByC5bI9RtxHInGPD1nE31WZfIDA4tN4Qs4nI31D
+         8bimirFbX7k6g4O4vh6F73Mmtv6rVmUazZqCnynOxO4MZgl5ukSF8Fal5qdgYJ/2jylO
+         sIzg==
+X-Gm-Message-State: AFqh2koZRqElMXpt0bNvqSacj7U/hzK319YGgF8E3wrlOqZosDVFGDet
+        Bnl/Grse4pTieNsCV1RntsTUrp6djNqn5/JS
+X-Google-Smtp-Source: AMrXdXvTWC3IlJDKVvE3/zk7/oO1j9I/5Scc+jXSAGEa/rsErLecG8Zt5Y6jHwkVgqvSqQTmTtagfA==
+X-Received: by 2002:a05:6a20:a883:b0:a4:efde:2ed8 with SMTP id ca3-20020a056a20a88300b000a4efde2ed8mr2797128pzb.0.1674058916349;
+        Wed, 18 Jan 2023 08:21:56 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id q145-20020a632a97000000b004a4f24fbce9sm19095664pgq.5.2023.01.18.08.21.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 08:16:43 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Alexandru Matei <alexandru.matei@uipath.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Wed, 18 Jan 2023 08:21:55 -0800 (PST)
+Date:   Wed, 18 Jan 2023 16:21:40 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Alexandru Matei <alexandru.matei@uipath.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         Mihai Petrisor <mihai.petrisor@uipath.com>,
         Viorel Canja <viorel.canja@uipath.com>
 Subject: Re: [PATCH] KVM: VMX: Fix crash due to uninitialized current_vmcs
-In-Reply-To: <Y8gT/DNwUvaDjfeW@google.com>
+Message-ID: <Y8gclHES8KXiXHV2@google.com>
 References: <20230118141348.828-1-alexandru.matei@uipath.com>
  <Y8gT/DNwUvaDjfeW@google.com>
-Date:   Wed, 18 Jan 2023 17:16:42 +0100
-Message-ID: <87bkmves2d.fsf@ovpn-194-7.brq.redhat.com>
+ <87bkmves2d.fsf@ovpn-194-7.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87bkmves2d.fsf@ovpn-194-7.brq.redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,101 +75,70 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Wed, Jan 18, 2023, Vitaly Kuznetsov wrote:
+> Sean Christopherson <seanjc@google.com> writes:
+> 
+> > On Wed, Jan 18, 2023, Alexandru Matei wrote:
+> >> KVM enables 'Enlightened VMCS' and 'Enlightened MSR Bitmap' when running as
+> >> a nested hypervisor on top of Hyper-V. When MSR bitmap is updated,
+> >> evmcs_touch_msr_bitmap function uses current_vmcs per-cpu variable to mark
+> >> that the msr bitmap was changed.
+> >> 
+> >> vmx_vcpu_create() modifies the msr bitmap via vmx_disable_intercept_for_msr
+> >> -> vmx_msr_bitmap_l01_changed which in the end calls this function. The
+> >> function checks for current_vmcs if it is null but the check is
+> >> insufficient because current_vmcs is not initialized. Because of this, the
+> >> code might incorrectly write to the structure pointed by current_vmcs value
+> >> left by another task. Preemption is not disabled so the current task can
+> >> also be preempted and moved to another CPU while current_vmcs is accessed
+> >> multiple times from evmcs_touch_msr_bitmap() which leads to crash.
+> >> 
+> >> To fix this problem, this patch moves vmx_disable_intercept_for_msr calls
+> >> before init_vmcs call in __vmx_vcpu_reset(), as ->vcpu_reset() is invoked
+> >> after the vCPU is properly loaded via ->vcpu_load() and current_vmcs is
+> >> initialized.
+> >
+> > IMO, moving the calls is a band-aid and doesn't address the underlying bug.  I
+> > don't see any reason why the Hyper-V code should use a per-cpu pointer in this
+> > case.  It makes sense when replacing VMX sequences that operate on the VMCS, e.g.
+> > VMREAD, VMWRITE, etc., but for operations that aren't direct replacements for VMX
+> > instructions I think we should have a rule that Hyper-V isn't allowed to touch the
+> > per-cpu pointer.
+> >
+> > E.g. in this case it's trivial to pass down the target (completely untested).
+> >
+> > Vitaly?
+> 
+> Mid-air collision detected) I've just suggested a very similar approach
+> but instead of 'vmx->vmcs01.vmcs' I've suggested using
+> 'vmx->loaded_vmcs->vmcs': in case we're running L2 and loaded VMCS is
+> 'vmcs02', I think we still need to touch the clean field indicating that
+> MSR-Bitmap has changed. Equally untested :-)
 
-> On Wed, Jan 18, 2023, Alexandru Matei wrote:
->> KVM enables 'Enlightened VMCS' and 'Enlightened MSR Bitmap' when running as
->> a nested hypervisor on top of Hyper-V. When MSR bitmap is updated,
->> evmcs_touch_msr_bitmap function uses current_vmcs per-cpu variable to mark
->> that the msr bitmap was changed.
->> 
->> vmx_vcpu_create() modifies the msr bitmap via vmx_disable_intercept_for_msr
->> -> vmx_msr_bitmap_l01_changed which in the end calls this function. The
->> function checks for current_vmcs if it is null but the check is
->> insufficient because current_vmcs is not initialized. Because of this, the
->> code might incorrectly write to the structure pointed by current_vmcs value
->> left by another task. Preemption is not disabled so the current task can
->> also be preempted and moved to another CPU while current_vmcs is accessed
->> multiple times from evmcs_touch_msr_bitmap() which leads to crash.
->> 
->> To fix this problem, this patch moves vmx_disable_intercept_for_msr calls
->> before init_vmcs call in __vmx_vcpu_reset(), as ->vcpu_reset() is invoked
->> after the vCPU is properly loaded via ->vcpu_load() and current_vmcs is
->> initialized.
->
-> IMO, moving the calls is a band-aid and doesn't address the underlying bug.  I
-> don't see any reason why the Hyper-V code should use a per-cpu pointer in this
-> case.  It makes sense when replacing VMX sequences that operate on the VMCS, e.g.
-> VMREAD, VMWRITE, etc., but for operations that aren't direct replacements for VMX
-> instructions I think we should have a rule that Hyper-V isn't allowed to touch the
-> per-cpu pointer.
->
-> E.g. in this case it's trivial to pass down the target (completely untested).
->
-> Vitaly?
+Three reasons to use vmcs01 directly:
 
-Mid-air collision detected) I've just suggested a very similar approach
-but instead of 'vmx->vmcs01.vmcs' I've suggested using
-'vmx->loaded_vmcs->vmcs': in case we're running L2 and loaded VMCS is
-'vmcs02', I think we still need to touch the clean field indicating that
-MSR-Bitmap has changed. Equally untested :-)
+  1. I don't want to require loaded_vmcs to be set.  E.g. in the problematic
+     flows, this 
 
->
->
-> ---
->  arch/x86/kvm/vmx/hyperv.h | 12 +++++++-----
->  arch/x86/kvm/vmx/vmx.c    |  2 +-
->  2 files changed, 8 insertions(+), 6 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
-> index ab08a9b9ab7d..ad16b52766bb 100644
-> --- a/arch/x86/kvm/vmx/hyperv.h
-> +++ b/arch/x86/kvm/vmx/hyperv.h
-> @@ -250,13 +250,15 @@ static inline u16 evmcs_read16(unsigned long field)
->  	return *(u16 *)((char *)current_evmcs + offset);
->  }
->  
-> -static inline void evmcs_touch_msr_bitmap(void)
-> +static inline void evmcs_touch_msr_bitmap(struct vcpu_vmx *vmx)
->  {
-> -	if (unlikely(!current_evmcs))
-> +	struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
-> +
-> +	if (WARN_ON_ONCE(!evmcs))
->  		return;
->  
-> -	if (current_evmcs->hv_enlightenments_control.msr_bitmap)
-> -		current_evmcs->hv_clean_fields &=
-> +	if (evmcs->hv_enlightenments_control.msr_bitmap)
-> +		evmcs->hv_clean_fields &=
->  			~HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP;
->  }
->  
-> @@ -280,7 +282,7 @@ static inline u64 evmcs_read64(unsigned long field) { return 0; }
->  static inline u32 evmcs_read32(unsigned long field) { return 0; }
->  static inline u16 evmcs_read16(unsigned long field) { return 0; }
->  static inline void evmcs_load(u64 phys_addr) {}
-> -static inline void evmcs_touch_msr_bitmap(void) {}
-> +static inline void evmcs_touch_msr_bitmap(struct vcpu_vmx *vmx) {}
->  #endif /* IS_ENABLED(CONFIG_HYPERV) */
->  
->  #define EVMPTR_INVALID (-1ULL)
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index c788aa382611..6ed6f52aad0c 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -3937,7 +3937,7 @@ static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
->  	 * bitmap has changed.
->  	 */
->  	if (static_branch_unlikely(&enable_evmcs))
-> -		evmcs_touch_msr_bitmap();
-> +		evmcs_touch_msr_bitmap(vmx);
->  
->  	vmx->nested.force_msr_bitmap_recalc = true;
->  }
->
-> base-commit: 6e9a476ea49d43a27b42004cfd7283f128494d1d
+	vmx->loaded_vmcs = &vmx->vmcs01;
 
--- 
-Vitaly
+     comes after the calls to vmx_disable_intercept_for_msr().
 
+  2. KVM on Hyper-V doesn't use the bitmaps for L2 (evmcs02):
+
+	/*
+	 * Use Hyper-V 'Enlightened MSR Bitmap' feature when KVM runs as a
+	 * nested (L1) hypervisor and Hyper-V in L0 supports it. Enable the
+	 * feature only for vmcs01, KVM currently isn't equipped to realize any
+	 * performance benefits from enabling it for vmcs02.
+	 */
+	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs) &&
+	    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
+		struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
+
+		evmcs->hv_enlightenments_control.msr_bitmap = 1;
+	}
+
+  3. KVM's manipulation of MSR bitmaps typically happens _only_ for vmcs01,
+     e.g. the caller is vmx_msr_bitmap_l01_changed().  The nested case is a 
+     special snowflake.
