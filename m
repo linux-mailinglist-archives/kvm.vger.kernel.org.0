@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D99AE67161C
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 09:22:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 65A70671626
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 09:26:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229710AbjARIW3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 03:22:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41046 "EHLO
+        id S229996AbjARI0Q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 03:26:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbjARIVL (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 03:21:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF1476F89E
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 23:47:54 -0800 (PST)
+        with ESMTP id S229896AbjARI0C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 03:26:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D9B575A0A
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 23:50:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674028073;
+        s=mimecast20190719; t=1674028203;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tlVUxcaPaiWawLUro82o60VnJJfjPIrLSa466P13ZoI=;
-        b=Vich5gUeb6P8T6uetfix7NjPbrcPHDVJrJJ4xDFrsyE1JLrAMatJxSlxXbVe/wmIIOYTWs
-        EpXDidSzLJuiYgktoT9e77TzoONhfDzn4f8bYqNTy+6CzU43F6LRQ3cK1IMUNm0s8SEUQ4
-        oQug4qSv6iGmRMWdkhyhawB/Sll4uvc=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=Sc2QbvS5LHUEHeHr3GXeISkdXx26baXFdsIw1im/Hdg=;
+        b=YInOOYPZ1GcSNhhT9b10CagkzrRfMyCyCc6TIeTgLXIBvpcRvqXMpSOSMJG6r3dtv3P3Bv
+        l4n87OFNMeoA+amUDgEO48UU5K9K4pv+751KqVVKmgoCc8jSSUl+NZuaNNwaYLCoUn18kB
+        eJ3gR2i5NAXW9EcTwYrFsxd85/mYd44=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-592-aBRm9vn5PS20NeKPFPWiAg-1; Wed, 18 Jan 2023 02:47:49 -0500
-X-MC-Unique: aBRm9vn5PS20NeKPFPWiAg-1
-Received: by mail-pf1-f197.google.com with SMTP id dc11-20020a056a0035cb00b00589a6a97519so12012597pfb.8
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 23:47:49 -0800 (PST)
+ us-mta-501-ewoTHGt2MOCYWaCRYfBm8A-1; Wed, 18 Jan 2023 02:50:02 -0500
+X-MC-Unique: ewoTHGt2MOCYWaCRYfBm8A-1
+Received: by mail-pg1-f197.google.com with SMTP id h185-20020a636cc2000000b004820a10a57bso15304407pgc.22
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 23:50:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tlVUxcaPaiWawLUro82o60VnJJfjPIrLSa466P13ZoI=;
-        b=4UrRzf3kmA0UpkJfyMFuPcoTVAU9Zan+rPUS2LNrOyPzhEoDj/x6FSJPlYOMrFx4Hw
-         KH6JqaLkyG6rqVFPk7wnZStW97eLh9Zw7/ZzdGxAA1z9MItqQXfsERAW6uiBHlCiVjfP
-         sDwfCE5g1iEmQRNOpePWC8wPRI3jfB+mDd9zLz/CpOjDPCtMuJSiGDHwEptZHwGDEWZ7
-         jFlIYIXQ8egWFuC0HEJg8Dxv6pnfqB65FNEhtmFGm1wzKLJnaVVHb93P2/HtVAm2rGBe
-         xyy29utp9Kn6tACAiumPFuQAWW2b2UAr1Mxx9SBXKF+hepMRohr3FNVLY6uKmM2DYQv4
-         Wh5g==
-X-Gm-Message-State: AFqh2krDz0L+9BHZdpJy6uDydbua1PuanAhRSL0KH12pvc/GqKtKQGkL
-        9pWkM7dzEtYkYaMCm5OiJ0lp2O8FhV6Ot9jHB4G6cHQMrsXHPTbip6HLrxM5EDhzQq0KNCuDo/r
-        KIZKcKylJF4fC
-X-Received: by 2002:aa7:9114:0:b0:57f:d5d1:41d0 with SMTP id 20-20020aa79114000000b0057fd5d141d0mr1507041pfh.3.1674028068460;
-        Tue, 17 Jan 2023 23:47:48 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvYKTekF4XxUh8s4kPzgSvNbcgQ4xezNbU2QpJP5Qj3AUKhgCwzUxS/yP593Zsc6apCJlRhbw==
-X-Received: by 2002:aa7:9114:0:b0:57f:d5d1:41d0 with SMTP id 20-20020aa79114000000b0057fd5d141d0mr1507033pfh.3.1674028068138;
-        Tue, 17 Jan 2023 23:47:48 -0800 (PST)
+        bh=Sc2QbvS5LHUEHeHr3GXeISkdXx26baXFdsIw1im/Hdg=;
+        b=K/y5J2Cz4p5fRr6n35tbJ46B6hfDgJxOkJfxybuhrHrUcjUDrnifusfsujp8G871cU
+         CHDMLmieE7njsOh70/lzrit5lawGDTy2a6XMyfAojDFrHHvIcaYrmTt4wAxpCVUrZnPt
+         3ticc7ioe3rpKHGK74tdaO3/UF7NSVNaEXl+ijICtiKc75ovz4gZymPVcL/0NVPEhx09
+         eHEmytkOLOyvqy16XS51Gs7LCrjuYDG1FT/Hy7jKBGYsn1ywjEDwMDOv/tzcbwXJcaY6
+         ma+SbxhdYEkAFbQCIynNTODf5U2wmQuO3Z4bq9b2XR/2l5nkwq9W9vV1czQkLPlkDGc9
+         EP+w==
+X-Gm-Message-State: AFqh2kp2B0AfWsLjhNLHpafpn3j0q3e7A5Eb+cVSctuKp94WDHcV5mZ6
+        UeGPAzNhiRDmB8t51SavNZVVLVR0cndTYAfyN29uPVH2/exJYn+sAKeM/NXKNgdqzkVMRo+8OWy
+        M9D/RrtBvgapq
+X-Received: by 2002:a17:903:1303:b0:194:6d4b:e1da with SMTP id iy3-20020a170903130300b001946d4be1damr1463732plb.0.1674028199883;
+        Tue, 17 Jan 2023 23:49:59 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXsLeWhkZtDm3E+RDju0/hHDvZz5BOx2tfUmdpw+rX506gUsaCHlChIFIbDe4ocrlPBsPVA/rA==
+X-Received: by 2002:a17:903:1303:b0:194:6d4b:e1da with SMTP id iy3-20020a170903130300b001946d4be1damr1463719plb.0.1674028199533;
+        Tue, 17 Jan 2023 23:49:59 -0800 (PST)
 Received: from [10.66.60.207] ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id x186-20020a6263c3000000b0058dbb5b44edsm4136563pfb.178.2023.01.17.23.47.43
+        by smtp.gmail.com with ESMTPSA id a3-20020a170902900300b00189393ab02csm4931717plp.99.2023.01.17.23.49.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 17 Jan 2023 23:47:47 -0800 (PST)
-Message-ID: <1c5f7194-277a-d8bd-8714-a8e1553344c4@redhat.com>
-Date:   Wed, 18 Jan 2023 15:47:41 +0800
+        Tue, 17 Jan 2023 23:49:58 -0800 (PST)
+Message-ID: <acf66ec9-9de2-7d87-c237-ade895c2bb72@redhat.com>
+Date:   Wed, 18 Jan 2023 15:49:53 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.6.0
-Subject: Re: [PATCH v2 7/8] KVM: selftests: aarch64: vPMU register test for
- implemented counters
+Subject: Re: [PATCH v2 8/8] KVM: selftests: aarch64: vPMU register test for
+ unimplemented counters
 Content-Language: en-US
 To:     Reiji Watanabe <reijiw@google.com>, Marc Zyngier <maz@kernel.org>,
         kvmarm@lists.linux.dev
@@ -76,9 +76,9 @@ Cc:     kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         Jing Zhang <jingzhangos@google.com>,
         Raghavendra Rao Anata <rananta@google.com>
 References: <20230117013542.371944-1-reijiw@google.com>
- <20230117013542.371944-8-reijiw@google.com>
+ <20230117013542.371944-9-reijiw@google.com>
 From:   Shaoqin Huang <shahuang@redhat.com>
-In-Reply-To: <20230117013542.371944-8-reijiw@google.com>
+In-Reply-To: <20230117013542.371944-9-reijiw@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -93,416 +93,205 @@ X-Mailing-List: kvm@vger.kernel.org
 
 Hi Reiji,
 
-
-I found some place should be PMEVTYPER, but wrongly written to 
-PMEVTTYPE. Should we fix them?
-
-
-I list some of them, but not covered every one.
-
 On 1/17/23 09:35, Reiji Watanabe wrote:
-> Add a new test case to the vpmu_counter_access test to check if PMU
-> registers or their bits for implemented counters on the vCPU are
-> readable/writable as expected, and can be programmed to count events.
+> Add a new test case to the vpmu_counter_access test to check
+> if PMU registers or their bits for unimplemented counters are not
+> accessible or are RAZ, as expected.
 >
 > Signed-off-by: Reiji Watanabe <reijiw@google.com>
 > ---
->   .../kvm/aarch64/vpmu_counter_access.c         | 347 +++++++++++++++++-
->   1 file changed, 344 insertions(+), 3 deletions(-)
+>   .../kvm/aarch64/vpmu_counter_access.c         | 103 +++++++++++++++++-
+>   .../selftests/kvm/include/aarch64/processor.h |   1 +
+>   2 files changed, 98 insertions(+), 6 deletions(-)
 >
 > diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> index 704a2500b7e1..54b69c76c824 100644
+> index 54b69c76c824..a7e34d63808b 100644
 > --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
 > +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> @@ -5,7 +5,8 @@
+> @@ -5,8 +5,8 @@
 >    * Copyright (c) 2022 Google LLC.
 >    *
 >    * This test checks if the guest can see the same number of the PMU event
-> - * counters (PMCR_EL1.N) that userspace sets.
-> + * counters (PMCR_EL1.N) that userspace sets, and if the guest can access
-> + * those counters.
+> - * counters (PMCR_EL1.N) that userspace sets, and if the guest can access
+> - * those counters.
+> + * counters (PMCR_EL1.N) that userspace sets, if the guest can access
+> + * those counters, and if the guest cannot access any other counters.
 >    * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
 >    */
 >   #include <kvm_util.h>
-> @@ -18,19 +19,350 @@
->   /* The max number of the PMU event counters (excluding the cycle counter) */
->   #define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
+> @@ -179,6 +179,51 @@ struct pmc_accessor pmc_accessors[] = {
+>   	{ read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
+>   };
 >   
-> +/*
-> + * The macros and functions below for reading/writing PMEVT{CNTR,TYPER}<n>_EL0
-Here should be PMEV{CNTR, TYPER}.
-> + * were basically copied from arch/arm64/kernel/perf_event.c.
-> + */
-> +#define PMEVN_CASE(n, case_macro) \
-> +	case n: case_macro(n); break
+> +#define INVALID_EC	(-1ul)
+> +uint64_t expected_ec = INVALID_EC;
+> +uint64_t op_end_addr;
 > +
-> +#define PMEVN_SWITCH(x, case_macro)				\
-> +	do {							\
-> +		switch (x) {					\
-> +		PMEVN_CASE(0,  case_macro);			\
-> +		PMEVN_CASE(1,  case_macro);			\
-> +		PMEVN_CASE(2,  case_macro);			\
-> +		PMEVN_CASE(3,  case_macro);			\
-> +		PMEVN_CASE(4,  case_macro);			\
-> +		PMEVN_CASE(5,  case_macro);			\
-> +		PMEVN_CASE(6,  case_macro);			\
-> +		PMEVN_CASE(7,  case_macro);			\
-> +		PMEVN_CASE(8,  case_macro);			\
-> +		PMEVN_CASE(9,  case_macro);			\
-> +		PMEVN_CASE(10, case_macro);			\
-> +		PMEVN_CASE(11, case_macro);			\
-> +		PMEVN_CASE(12, case_macro);			\
-> +		PMEVN_CASE(13, case_macro);			\
-> +		PMEVN_CASE(14, case_macro);			\
-> +		PMEVN_CASE(15, case_macro);			\
-> +		PMEVN_CASE(16, case_macro);			\
-> +		PMEVN_CASE(17, case_macro);			\
-> +		PMEVN_CASE(18, case_macro);			\
-> +		PMEVN_CASE(19, case_macro);			\
-> +		PMEVN_CASE(20, case_macro);			\
-> +		PMEVN_CASE(21, case_macro);			\
-> +		PMEVN_CASE(22, case_macro);			\
-> +		PMEVN_CASE(23, case_macro);			\
-> +		PMEVN_CASE(24, case_macro);			\
-> +		PMEVN_CASE(25, case_macro);			\
-> +		PMEVN_CASE(26, case_macro);			\
-> +		PMEVN_CASE(27, case_macro);			\
-> +		PMEVN_CASE(28, case_macro);			\
-> +		PMEVN_CASE(29, case_macro);			\
-> +		PMEVN_CASE(30, case_macro);			\
-> +		default:					\
-> +			GUEST_ASSERT_1(0, x);			\
-> +		}						\
-> +	} while (0)
-> +
-> +#define RETURN_READ_PMEVCNTRN(n) \
-> +	return read_sysreg(pmevcntr##n##_el0)
-> +static unsigned long read_pmevcntrn(int n)
+> +static void guest_sync_handler(struct ex_regs *regs)
 > +{
-> +	PMEVN_SWITCH(n, RETURN_READ_PMEVCNTRN);
-> +	return 0;
-> +}
+> +	uint64_t esr, ec;
 > +
-> +#define WRITE_PMEVCNTRN(n) \
-> +	write_sysreg(val, pmevcntr##n##_el0)
-> +static void write_pmevcntrn(int n, unsigned long val)
-> +{
-> +	PMEVN_SWITCH(n, WRITE_PMEVCNTRN);
-> +	isb();
-> +}
+> +	esr = read_sysreg(esr_el1);
+> +	ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
+> +	GUEST_ASSERT_4(op_end_addr && (expected_ec == ec),
+> +		       regs->pc, esr, ec, expected_ec);
 > +
-> +#define READ_PMEVTYPERN(n) \
-> +	return read_sysreg(pmevtyper##n##_el0)
-> +static unsigned long read_pmevtypern(int n)
-> +{
-> +	PMEVN_SWITCH(n, READ_PMEVTYPERN);
-> +	return 0;
-> +}
+> +	/* Will go back to op_end_addr after the handler exits */
+> +	regs->pc = op_end_addr;
 > +
-> +#define WRITE_PMEVTYPERN(n) \
-> +	write_sysreg(val, pmevtyper##n##_el0)
-> +static void write_pmevtypern(int n, unsigned long val)
-> +{
-> +	PMEVN_SWITCH(n, WRITE_PMEVTYPERN);
-> +	isb();
-> +}
-> +
-> +/* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
-> +static inline unsigned long read_sel_evcntr(int sel)
-> +{
-> +	write_sysreg(sel, pmselr_el0);
-> +	isb();
-> +	return read_sysreg(pmxevcntr_el0);
-> +}
-> +
-> +/* Write PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
-> +static inline void write_sel_evcntr(int sel, unsigned long val)
-> +{
-> +	write_sysreg(sel, pmselr_el0);
-> +	isb();
-> +	write_sysreg(val, pmxevcntr_el0);
-> +	isb();
-> +}
-> +
-> +/* Read PMEVTTYPER<n>_EL0 through PMXEVTYPER_EL0 */
-Here should be PMEVTYPER.
-> +static inline unsigned long read_sel_evtyper(int sel)
-> +{
-> +	write_sysreg(sel, pmselr_el0);
-> +	isb();
-> +	return read_sysreg(pmxevtyper_el0);
-> +}
-> +
-> +/* Write PMEVTTYPER<n>_EL0 through PMXEVTYPER_EL0 */
-> +static inline void write_sel_evtyper(int sel, unsigned long val)
-> +{
-> +	write_sysreg(sel, pmselr_el0);
-> +	isb();
-> +	write_sysreg(val, pmxevtyper_el0);
-> +	isb();
-> +}
-> +
-> +static inline void enable_counter(int idx)
-> +{
-> +	uint64_t v = read_sysreg(pmcntenset_el0);
-> +
-> +	write_sysreg(BIT(idx) | v, pmcntenset_el0);
-> +	isb();
-> +}
-> +
-> +static inline void disable_counter(int idx)
-> +{
-> +	uint64_t v = read_sysreg(pmcntenset_el0);
-> +
-> +	write_sysreg(BIT(idx) | v, pmcntenclr_el0);
-> +	isb();
+> +	/*
+> +	 * Clear op_end_addr, and setting expected_ec to INVALID_EC
+> +	 * as a sign that an exception has occurred.
+> +	 */
+> +	op_end_addr = 0;
+> +	expected_ec = INVALID_EC;
 > +}
 > +
 > +/*
-> + * The pmc_accessor structure has pointers to PMEVT{CNTR,TYPER}<n>_EL0
-> + * accessors that test cases will use. Each of the accessors will
-> + * either directly reads/writes PMEVT{CNTR,TYPER}<n>_EL0
-> + * (i.e. {read,write}_pmev{cnt,type}rn()), or reads/writes them through
-> + * PMXEV{CNTR,TYPER}_EL0 (i.e. {read,write}_sel_ev{cnt,type}r()).
-> + *
-> + * This is used to test that combinations of those accessors provide
-> + * the consistent behavior.
+> + * Run the given operation that should trigger an exception with the
+> + * given exception class. The exception handler (guest_sync_handler)
+> + * will reset op_end_addr to 0, and expected_ec to INVALID_EC, and
+> + * will come back to the instruction at the @done_label.
+> + * The @done_label must be a unique label in this test program.
 > + */
-> +struct pmc_accessor {
-> +	/* A function to be used to read PMEVTCNTR<n>_EL0 */
-> +	unsigned long	(*read_cntr)(int idx);
-> +	/* A function to be used to write PMEVTCNTR<n>_EL0 */
-> +	void		(*write_cntr)(int idx, unsigned long val);
-> +	/* A function to be used to read PMEVTTYPER<n>_EL0 */
-> +	unsigned long	(*read_typer)(int idx);
-> +	/* A function to be used write PMEVTTYPER<n>_EL0 */
-> +	void		(*write_typer)(int idx, unsigned long val);
-> +};
-> +
-> +struct pmc_accessor pmc_accessors[] = {
-> +	/* test with all direct accesses */
-> +	{ read_pmevcntrn, write_pmevcntrn, read_pmevtypern, write_pmevtypern },
-> +	/* test with all indirect accesses */
-> +	{ read_sel_evcntr, write_sel_evcntr, read_sel_evtyper, write_sel_evtyper },
-> +	/* read with direct accesses, and write with indirect accesses */
-> +	{ read_pmevcntrn, write_sel_evcntr, read_pmevtypern, write_sel_evtyper },
-> +	/* read with indirect accesses, and write with direct accesses */
-> +	{ read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
-> +};
-> +
-> +static void pmu_disable_reset(void)
-> +{
-> +	uint64_t pmcr = read_sysreg(pmcr_el0);
-> +
-> +	/* Reset all counters, disabling them */
-> +	pmcr &= ~ARMV8_PMU_PMCR_E;
-> +	write_sysreg(pmcr | ARMV8_PMU_PMCR_P, pmcr_el0);
-> +	isb();
+> +#define TEST_EXCEPTION(ec, ops, done_label)		\
+> +{							\
+> +	extern int done_label;				\
+> +							\
+> +	WRITE_ONCE(op_end_addr, (uint64_t)&done_label);	\
+> +	GUEST_ASSERT(ec != INVALID_EC);			\
+> +	WRITE_ONCE(expected_ec, ec);			\
+> +	dsb(ish);					\
+> +	ops;						\
+> +	asm volatile(#done_label":");			\
+> +	GUEST_ASSERT(!op_end_addr);			\
+> +	GUEST_ASSERT(expected_ec == INVALID_EC);	\
 > +}
 > +
-> +static void pmu_enable(void)
-> +{
-> +	uint64_t pmcr = read_sysreg(pmcr_el0);
-> +
-> +	/* Reset all counters, disabling them */
-> +	pmcr |= ARMV8_PMU_PMCR_E;
-> +	write_sysreg(pmcr | ARMV8_PMU_PMCR_P, pmcr_el0);
-> +	isb();
-> +}
-> +
-> +static bool pmu_event_is_supported(uint64_t event)
-> +{
-> +	GUEST_ASSERT_1(event < 64, event);
-> +	return (read_sysreg(pmceid0_el0) & BIT(event));
-> +}
-> +
->   static uint64_t pmcr_extract_n(uint64_t pmcr_val)
+>   static void pmu_disable_reset(void)
 >   {
->   	return (pmcr_val >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
+>   	uint64_t pmcr = read_sysreg(pmcr_el0);
+> @@ -352,16 +397,38 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
+>   		       pmc_idx, acc, read_data, read_data_prev);
 >   }
 >   
-> +#define GUEST_ASSERT_BITMAP_REG(regname, mask, set_expected)		\
-> +{									\
-> +	uint64_t _tval = read_sysreg(regname);				\
-> +									\
-> +	if (set_expected)						\
-> +		GUEST_ASSERT_3((_tval & mask), _tval, mask, set_expected); \
-> +	else								   \
-> +		GUEST_ASSERT_3(!(_tval & mask), _tval, mask, set_expected);\
-> +}
-> +
 > +/*
-> + * Check if @mask bits in {PMCNTEN,PMOVS}{SET,CLR} registers
-> + * are set or cleared as specified in @set_expected.
+> + * Tests for reading/writing registers for the unimplemented event counter
+> + * specified by @pmc_idx (>= PMCR_EL1.N).
 > + */
-> +static void check_bitmap_pmu_regs(uint64_t mask, bool set_expected)
+> +static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
 > +{
-> +	GUEST_ASSERT_BITMAP_REG(pmcntenset_el0, mask, set_expected);
-> +	GUEST_ASSERT_BITMAP_REG(pmcntenclr_el0, mask, set_expected);
-> +	GUEST_ASSERT_BITMAP_REG(pmovsset_el0, mask, set_expected);
-> +	GUEST_ASSERT_BITMAP_REG(pmovsclr_el0, mask, set_expected);
-> +}
-> +
-> +/*
-> + * Check if the bit in {PMCNTEN,PMOVS}{SET,CLR} registers corresponding
-> + * to the specified counter (@pmc_idx) can be read/written as expected.
-> + * When @set_op is true, it tries to set the bit for the counter in
-> + * those registers by writing the SET registers (the bit won't be set
-> + * if the counter is not implemented though).
-> + * Otherwise, it tries to clear the bits in the registers by writing
-> + * the CLR registers.
-> + * Then, it checks if the values indicated in the registers are as expected.
-> + */
-> +static void test_bitmap_pmu_regs(int pmc_idx, bool set_op)
-> +{
-> +	uint64_t pmcr_n, test_bit = BIT(pmc_idx);
-> +	bool set_expected = false;
-> +
-> +	if (set_op) {
-> +		write_sysreg(test_bit, pmcntenset_el0);
-> +		write_sysreg(test_bit, pmovsset_el0);
-> +
-> +		/* The bit will be set only if the counter is implemented */
-> +		pmcr_n = pmcr_extract_n(read_sysreg(pmcr_el0));
-> +		set_expected = (pmc_idx < pmcr_n) ? true : false;
-> +	} else {
-> +		write_sysreg(test_bit, pmcntenclr_el0);
-> +		write_sysreg(test_bit, pmovsclr_el0);
-> +	}
-> +	check_bitmap_pmu_regs(test_bit, set_expected);
-> +}
-> +
-> +/*
-> + * Tests for reading/writing registers for the (implemented) event counter
-> + * specified by @pmc_idx.
-> + */
-> +static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
-> +{
-> +	uint64_t write_data, read_data, read_data_prev, test_bit;
-> +
-> +	/* Disable all PMCs and reset all PMCs to zero. */
-> +	pmu_disable_reset();
-> +
-> +
 > +	/*
-> +	 * Tests for reading/writing {PMCNTEN,PMOVS}{SET,CLR}_EL1.
+> +	 * Reading/writing the event count/type registers should cause
+> +	 * an UNDEFINED exception.
 > +	 */
-> +
-> +	test_bit = 1ul << pmc_idx;
-> +	/* Make sure that the bit in those registers are set to 0 */
-> +	test_bitmap_pmu_regs(test_bit, false);
-> +	/* Test if setting the bit in those registers works */
-> +	test_bitmap_pmu_regs(test_bit, true);
-> +	/* Test if clearing the bit in those registers works */
-> +	test_bitmap_pmu_regs(test_bit, false);
-> +
-> +
+> +	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx), inv_rd_cntr);
+> +	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0), inv_wr_cntr);
+> +	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx), inv_rd_typer);
+> +	TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0), inv_wr_typer);
 > +	/*
-> +	 * Tests for reading/writing the event type register.
+> +	 * The bit corresponding to the (unimplemented) counter in
+> +	 * {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers should be RAZ.
 > +	 */
-> +
-> +	read_data = acc->read_typer(pmc_idx);
-> +	/*
-> +	 * Set the event type register to an arbitrary value just for testing
-> +	 * of reading/writing the register.
-> +	 * ArmARM says that for the event from 0x0000 to 0x003F,
-> +	 * the value indicated in the PMEVTYPER<n>_EL0.evtCount field is
-> +	 * the value written to the field even when the specified event
-> +	 * is not supported.
-> +	 */
-> +	write_data = (ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMUV3_PERFCTR_INST_RETIRED);
-> +	acc->write_typer(pmc_idx, write_data);
-> +	read_data = acc->read_typer(pmc_idx);
-> +	GUEST_ASSERT_4(read_data == write_data,
-> +		       pmc_idx, acc, read_data, write_data);
-> +
-> +
-> +	/*
-> +	 * Tests for reading/writing the event count register.
-> +	 */
-> +
-> +	read_data = acc->read_cntr(pmc_idx);
-> +
-> +	/* The count value must be 0, as it is not used after the reset */
-> +	GUEST_ASSERT_3(read_data == 0, pmc_idx, acc, read_data);
-> +
-> +	write_data = read_data + pmc_idx + 0x12345;
-> +	acc->write_cntr(pmc_idx, write_data);
-> +	read_data = acc->read_cntr(pmc_idx);
-> +	GUEST_ASSERT_4(read_data == write_data,
-> +		       pmc_idx, acc, read_data, write_data);
-> +
-> +
-> +	/* The following test requires the INST_RETIRED event support. */
-> +	if (!pmu_event_is_supported(ARMV8_PMUV3_PERFCTR_INST_RETIRED))
-> +		return;
-> +
-> +	pmu_enable();
-> +	acc->write_typer(pmc_idx, ARMV8_PMUV3_PERFCTR_INST_RETIRED);
-> +
-> +	/*
-> +	 * Make sure that the counter doesn't count the INST_RETIRED
-> +	 * event when disabled, and the counter counts the event when enabled.
-> +	 */
-> +	disable_counter(pmc_idx);
-> +	read_data_prev = acc->read_cntr(pmc_idx);
-> +	read_data = acc->read_cntr(pmc_idx);
-> +	GUEST_ASSERT_4(read_data == read_data_prev,
-> +		       pmc_idx, acc, read_data, read_data_prev);
-> +
-> +	enable_counter(pmc_idx);
-> +	read_data = acc->read_cntr(pmc_idx);
-> +
-> +	/*
-> +	 * The counter should be increased by at least 1, as there is at
-> +	 * least one instruction between enabling the counter and reading
-> +	 * the counter (the test assumes that all event counters are not
-> +	 * being used by the host's higher priority events).
-> +	 */
-> +	GUEST_ASSERT_4(read_data > read_data_prev,
-> +		       pmc_idx, acc, read_data, read_data_prev);
+> +	test_bitmap_pmu_regs(pmc_idx, 1);
+> +	test_bitmap_pmu_regs(pmc_idx, 0);
 > +}
 > +
 >   /*
 >    * The guest is configured with PMUv3 with @expected_pmcr_n number of
 >    * event counters.
-> - * Check if @expected_pmcr_n is consistent with PMCR_EL0.N.
-> + * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
-> + * if reading/writing PMU registers for implemented counters can work
-> + * as expected.
+>    * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
+> - * if reading/writing PMU registers for implemented counters can work
+> - * as expected.
+> + * if reading/writing PMU registers for implemented or unimplemented
+> + * counters can work as expected.
 >    */
 >   static void guest_code(uint64_t expected_pmcr_n)
 >   {
->   	uint64_t pmcr, pmcr_n;
-> +	int i, pmc;
+> -	uint64_t pmcr, pmcr_n;
+> +	uint64_t pmcr, pmcr_n, unimp_mask;
+>   	int i, pmc;
 >   
 >   	GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS);
->   
-> @@ -40,6 +372,15 @@ static void guest_code(uint64_t expected_pmcr_n)
+> @@ -372,6 +439,14 @@ static void guest_code(uint64_t expected_pmcr_n)
 >   	/* Make sure that PMCR_EL0.N indicates the value userspace set */
 >   	GUEST_ASSERT_2(pmcr_n == expected_pmcr_n, pmcr_n, expected_pmcr_n);
 >   
 > +	/*
-> +	 * Tests for reading/writing PMU registers for implemented counters.
+> +	 * Make sure that (RAZ) bits corresponding to unimplemented event
+> +	 * counters in {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers are reset to zero.
+> +	 * (NOTE: bits for implemented event counters are reset to UNKNOWN)
+> +	 */
+> +	unimp_mask = GENMASK_ULL(ARMV8_PMU_MAX_GENERAL_COUNTERS - 1, pmcr_n);
+> +	check_bitmap_pmu_regs(unimp_mask, false);
+> +
+>   	/*
+>   	 * Tests for reading/writing PMU registers for implemented counters.
+>   	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
+> @@ -381,6 +456,14 @@ static void guest_code(uint64_t expected_pmcr_n)
+>   			test_access_pmc_regs(&pmc_accessors[i], pmc);
+>   	}
+>   
+> +	/*
+> +	 * Tests for reading/writing PMU registers for unimplemented counters.
 > +	 * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
+Here should be PMEV{CNTR, TYPER}<n>.
 > +	 */
 > +	for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
-> +		for (pmc = 0; pmc < pmcr_n; pmc++)
-> +			test_access_pmc_regs(&pmc_accessors[i], pmc);
+> +		for (pmc = pmcr_n; pmc < ARMV8_PMU_MAX_GENERAL_COUNTERS; pmc++)
+> +			test_access_invalid_pmc_regs(&pmc_accessors[i], pmc);
 > +	}
-> +
 >   	GUEST_DONE();
 >   }
 >   
-> @@ -96,7 +437,7 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
->   	vcpu_run(vcpu);
->   	switch (get_ucall(vcpu, &uc)) {
->   	case UCALL_ABORT:
-> -		REPORT_GUEST_ASSERT_2(uc, "values:%#lx %#lx");
-> +		REPORT_GUEST_ASSERT_4(uc, "values:%#lx %#lx %#lx %#lx");
->   		break;
->   	case UCALL_DONE:
->   		break;
+> @@ -394,7 +477,7 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
+>   	struct kvm_vm *vm;
+>   	struct kvm_vcpu *vcpu;
+>   	struct kvm_vcpu_init init;
+> -	uint8_t pmuver;
+> +	uint8_t pmuver, ec;
+>   	uint64_t dfr0, irq = 23;
+>   	struct kvm_device_attr irq_attr = {
+>   		.group = KVM_ARM_VCPU_PMU_V3_CTRL,
+> @@ -407,11 +490,18 @@ static struct kvm_vm *create_vpmu_vm(void *guest_code, struct kvm_vcpu **vcpup,
+>   	};
+>   
+>   	vm = vm_create(1);
+> +	vm_init_descriptor_tables(vm);
+> +	/* Catch exceptions for easier debugging */
+> +	for (ec = 0; ec < ESR_EC_NUM; ec++) {
+> +		vm_install_sync_handler(vm, VECTOR_SYNC_CURRENT, ec,
+> +					guest_sync_handler);
+> +	}
+>   
+>   	/* Create vCPU with PMUv3 */
+>   	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+>   	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+>   	vcpu = aarch64_vcpu_add(vm, 0, &init, guest_code);
+> +	vcpu_init_descriptor_tables(vcpu);
+>   	*gic_fd = vgic_v3_setup(vm, 1, 64, GICD_BASE_GPA, GICR_BASE_GPA);
+>   
+>   	/* Make sure that PMUv3 support is indicated in the ID register */
+> @@ -480,6 +570,7 @@ static void run_test(uint64_t pmcr_n)
+>   	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init);
+>   	init.features[0] |= (1 << KVM_ARM_VCPU_PMU_V3);
+>   	aarch64_vcpu_setup(vcpu, &init);
+> +	vcpu_init_descriptor_tables(vcpu);
+>   	vcpu_set_reg(vcpu, ARM64_CORE_REG(sp_el1), sp);
+>   	vcpu_set_reg(vcpu, ARM64_CORE_REG(regs.pc), (uint64_t)guest_code);
+>   
+> diff --git a/tools/testing/selftests/kvm/include/aarch64/processor.h b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> index 5f977528e09c..52d87809356c 100644
+> --- a/tools/testing/selftests/kvm/include/aarch64/processor.h
+> +++ b/tools/testing/selftests/kvm/include/aarch64/processor.h
+> @@ -104,6 +104,7 @@ enum {
+>   #define ESR_EC_SHIFT		26
+>   #define ESR_EC_MASK		(ESR_EC_NUM - 1)
+>   
+> +#define ESR_EC_UNKNOWN		0x0
+>   #define ESR_EC_SVC64		0x15
+>   #define ESR_EC_IABT		0x21
+>   #define ESR_EC_DABT		0x25
 
 -- 
 Regards,
