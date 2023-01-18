@@ -2,74 +2,122 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 46FE767135F
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 06:56:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08F376713EE
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 07:25:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229550AbjARF43 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 00:56:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45650 "EHLO
+        id S229773AbjARGZC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 01:25:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbjARFyQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 00:54:16 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D83F453FBE
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 21:53:30 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id y1so35853121plb.2
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 21:53:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=wahhz162cGALETeb/ISZLg8Fhmw0Fj3kLf5lRSh9VZM=;
-        b=GvcDFbzXPkGbkEKZrNUtBEp9Rg2IsP8T5gSRRo4uGLyjFexdd9XSDGNM4Uw1GQ/Ae9
-         aI/W7ey2axc3Cnmn6+GxStsjMuIvc4n2lZtL3vsQ/AATXG5LzV7ngtFFZl/8jJnwWaRF
-         BF4DpyqbWYEWMYoNarqDgWbsuqZzOSEqbsjKjX08DsKbk0eU2Cb6mmrE1UP4Glnp4E5f
-         MNOdcWXdVW1uHe2TfRhzulok8BCWK4ww3Wze+g+xkogaNeFYM7CePz031w+T3rLVxSnt
-         NFz4pqCSJkLgsk2v8uASyvRoci0/OfPR0OPhBoHJkfBndpujD8Pp2xx0Znbyetyz1tag
-         JXfA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wahhz162cGALETeb/ISZLg8Fhmw0Fj3kLf5lRSh9VZM=;
-        b=ifLSzmb4f9gNco1dFHaUn3XwKaCUVbny1R13j4Ge7DQPpaJ514x5YwGzsI/1y20Ouy
-         o6Uk4gCeFtH7YWJuxo7h/sPjzhQKX3WXjOx+S0M+yGjA6FYULEmRZazTH/0oaT+t7iPz
-         ZJu7cJNmqjUvWB1CjhxpplMIJTPzPXGQGHcudXLsTsuxuOMXC3B2LEjecnCQDNBaN7cx
-         utO/7g/+5ln7lQ+D1fG3ByP0p/YHajo831LfbAzcOYIIAPvjB6ONlO9ao+6SpRb4l6ul
-         /GjM83awsn3TWAgKtlc41SkSPgqqdorP9jpw7g1iUUxpixCEc9k3F/vSy0HmTM9+oAVn
-         Q4Mg==
-X-Gm-Message-State: AFqh2kq/vCa0pBwgSAbUYSS1hdiseH5KrtyZZbxWd8Cry99iHJYnpJGi
-        cQtrojmLdoJOcQB0j/7Ipz55FZAP0ClSkazGEEbY8A==
-X-Google-Smtp-Source: AMrXdXuP1ogMpHwdRh8FHVtzRB3m/jt9X03RZQAcnQdwF6D5j30DJzC633Pz+N1kJMop9GmbAY4Yh87/hvbAoLs6xJk=
-X-Received: by 2002:a17:90a:8546:b0:227:1d0b:5379 with SMTP id
- a6-20020a17090a854600b002271d0b5379mr497896pjw.103.1674021210146; Tue, 17 Jan
- 2023 21:53:30 -0800 (PST)
+        with ESMTP id S229709AbjARGWg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 01:22:36 -0500
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2081.outbound.protection.outlook.com [40.107.100.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7BE64ED1D;
+        Tue, 17 Jan 2023 22:11:39 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YFwgRfY34Y+gKWtr/wFF7s7/08Ji+wBoV1qgBBpQrC/GlQz3ZiCiuvw6dpI9X3eBQ98Hm4owE4fZNy6SPYxClkrm5QEQWVj64ldF4PfH11mokXvW4CWe40MmbOf4UHBmRfXqWPYvGHzC2V/kertSia87IF5xmqJYX3AFMKX4SgFNjAVolNdfwyz419LkAcQCeYzBLXYBCWCKDmkILi9TtggaCUTYNDgCKvv/s6wf5pg8rDz/ebSsHYbXPoYLTElFbWQOAlA1+431y8sasvlRfGa5GfnK8zBr/lySu4LDsHVcUi8h4+2ae7UUBlM3VDrsUfAHixwJbYrusYNAKIEObA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=w5oe4fcY+Kp8WoFkS5iTAeG2oFU9CDkN9LUjzVJyBTY=;
+ b=DDGFE4dSbZSJCmOt14K3hejMnAK8VcJKalQ7ormkwsoxshzP0UiWGBNrMPeRM9pjPJVZi5/ihvPQyIfOeuSJT42qjwg5s6rFKYabvAidZ/sFWGfDmjbGVkaE3gq2iqUlNcJbEMDYY/ng8jW34rqImNhzlNINoD1xmqzTWub3o1X8mLFjrDvqxbPe+xZWLQfOJ9IDFZyk84XrM1YAC6f/NKXhLWIH57txm4Bnl9TAyuxdUbpXHb1IhibZx8eSswoxbwM9RELmwU8eGGyf60SSyLVX3jyqP4xGlYwO18XPppP8QVopajTLejB3vtQDLWdn2QWX87VF5vFnmQx1Y7O5fA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w5oe4fcY+Kp8WoFkS5iTAeG2oFU9CDkN9LUjzVJyBTY=;
+ b=DSMgGGmEzoWjtSE5vx5WXO0W1qJsFtGMR0QtYbwQO4INXnqbMA6HN1mMt58PDwMCD6LM4K6Bz+EsKjFa3iHNgEt5Lc0I8HNhqRP2Ew6Fpaq5lDXZwuV0iBXqjL2snU5R4UOTBuhrGZvIzu9kboK97HmjSyhU0fzQz6EBElf6PwA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
+ DS0PR12MB8502.namprd12.prod.outlook.com (2603:10b6:8:15b::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5986.18; Wed, 18 Jan 2023 06:11:37 +0000
+Received: from DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::8079:86db:f2e5:7700]) by DS7PR12MB6309.namprd12.prod.outlook.com
+ ([fe80::8079:86db:f2e5:7700%6]) with mapi id 15.20.5986.018; Wed, 18 Jan 2023
+ 06:11:37 +0000
+Message-ID: <086444df-568b-d394-c190-9f206cad9222@amd.com>
+Date:   Wed, 18 Jan 2023 11:41:23 +0530
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH v6] x86/sev: Add SEV-SNP guest feature negotiation support
+Content-Language: en-US
+To:     linux-kernel@vger.kernel.org, x86@kernel.org, kvm@vger.kernel.org,
+        bp@alien8.de
+Cc:     mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+        seanjc@google.com, pbonzini@redhat.com, thomas.lendacky@amd.com,
+        michael.roth@amd.com, zhi.wang.linux@gmail.com,
+        David Rientjes <rientjes@google.com>, stable@kernel.org
+References: <20230116091036.72579-1-nikunj@amd.com>
+From:   "Nikunj A. Dadhania" <nikunj@amd.com>
+In-Reply-To: <20230116091036.72579-1-nikunj@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN3PR01CA0105.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:9b::9) To DS7PR12MB6309.namprd12.prod.outlook.com
+ (2603:10b6:8:96::19)
 MIME-Version: 1.0
-References: <20230117013542.371944-1-reijiw@google.com> <ce52d9fc-cd1f-9863-0f3a-b83eb0c36e5d@redhat.com>
-In-Reply-To: <ce52d9fc-cd1f-9863-0f3a-b83eb0c36e5d@redhat.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Tue, 17 Jan 2023 21:53:13 -0800
-Message-ID: <CAAeT=Fwj3cqLupv-L05JxP6XEUGJMoHYq6PuOYb0gXfvj8B-ww@mail.gmail.com>
-Subject: Re: [PATCH v2 0/8] KVM: arm64: PMU: Allow userspace to limit the
- number of PMCs on vCPU
-To:     Shaoqin Huang <shahuang@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|DS0PR12MB8502:EE_
+X-MS-Office365-Filtering-Correlation-Id: 713282ed-4a04-48f8-3ac1-08daf91adb17
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5Q1WcGP+CppJGRKfX5o3P6zYggZ66g6DoGk53uxzWVWwvWDBuUibgRJT0XqjGUi/88zum85xDpv6uNWt2BpYHGQPSblgh2U12aqVy2SK4CQYYi7ZHD6+zwQ/DvQzebDWBPYeNiD0ZmGY5Pz5r48Npn0gteiFzMr4ACtOW+kfbCstpQTGSUTW0xmsd4/9nP6E5mEIthZ4C5Cuzljt52L76+o/3C+lLGMSKdcb3ipDqQ4XOnrDmE791kcoMyuubzfMr0UxIkRYWaPPFa3zi0fr1zCuuihNDhZiJJNRRGLf0Sphp6cna2tID/xxUyTVU2DOklVvOzo0dO3XTSdZql6+Cngvo1WsmOc3G0zJF1uASja+hS5NWORj6fK3+/LsGmbSStafwrYCG03c9oYlfmoqOXjxSZqkNI0CvJSsHAuPNlcj8IJBjdQhm0mGdoGjvnZwSJGcx3puC2DUOnxESB6Ali8WtVm+fGtEIQau/D803bSHy6tNlcCVxVrnmJuebwe3q7Pd7+rrmyNjkfQV+/qj989tlrQ0eiMEbymxPI/8EarwYI0o81zYzoOrgLDzL7EmxWEN8VIGUr7NezTUH1M27tHaCIB15PsnWRZVaPMa1m4ZvR4xkZ2dV7685gcRCLT9ew/H7mwkpMYtYX760xxRz0GKLuMtKvu4X+Xq6SRMSQI0M6Zt3U7CA8zp09/X7vhW0FWM75Xv4JVEPAYTIUeoxV8lV0TyoOvnV/++7s/IdT0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(396003)(366004)(136003)(346002)(376002)(39860400002)(451199015)(316002)(4744005)(26005)(186003)(6512007)(6486002)(5660300002)(478600001)(7416002)(2616005)(8676002)(41300700001)(66476007)(31696002)(4326008)(66556008)(83380400001)(36756003)(8936002)(66946007)(31686004)(6666004)(53546011)(6506007)(38100700002)(2906002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?VXlqU3VqYU4vUERqcHJWU0hEcXpEMDBXZ0NsdG4rMDN6bmtlcHhwZlpwUFBR?=
+ =?utf-8?B?bzlQbnk3UExOaWk1TEVGaUtlMEsxWnNYbWIyNGcrdkF0M2Qrb1ZaZS96TUNn?=
+ =?utf-8?B?MnhTcFJqOHdQQlZoZjZNTUdhQUZjSmtMVGhhWExkVVJBTXFWZmpEVlJVMS9n?=
+ =?utf-8?B?RjNhSDAvb1NMbXlCMkk3Z0w0R0dNcjZFbUNLMzJqeGd2dDlTd29WSTRwU0V0?=
+ =?utf-8?B?UXFLRFRJaDJicEdGQmNtWlpaeDlDNmVhZ0hjVjZwWGRCYm1kcjJQNE8xaDBz?=
+ =?utf-8?B?SEo5aGVzMnc2NTBjMk0xT3JuY283TkF1eWZJUU9VOENyMWdiZFdhK0pkV3BR?=
+ =?utf-8?B?Q0p4ZlFSQ2xjblExak11MUxHbyttSVVGVTREN0ZrMXQ0N1d2cVhUTEsvOVF0?=
+ =?utf-8?B?bDRkTitGQThMdGdwMVBRWW9hNkIxYk9OUWh1NU43WENma1BUWU1LRko4K1pu?=
+ =?utf-8?B?WXZJQVppMXY2ZHNGUGlUbjRqNXF2S0NZWHhjdExZRHV5TGhSWFN5azVEeUNQ?=
+ =?utf-8?B?ZUl5L1FPK3J2ekpzWWFGa2hvSW9sNzNxYWtXWG5KeHlCNWxGV0w0MENGdllF?=
+ =?utf-8?B?UnZ0U2ZOcXkyQXlXdE5qQ21tdWVibUIxTXFYQkxKN01yVnZDb0dPc2JiYzhL?=
+ =?utf-8?B?emhuOERnbVhDV05idExDRWlJMU84UHZ3bVkxbmNrS2JmTGtweERDNC9HSFRO?=
+ =?utf-8?B?ZGRkT25ROUhuMTZLdEh6cEZBakY2SDZQUi9MT0grUzZxQkovcEpkUzhDQkpq?=
+ =?utf-8?B?eGhBd1FHVnJncWNJMTh3OUtGMUhwRmltL1ZhRERpYlF6UlNuYVdNRDFyUmtK?=
+ =?utf-8?B?aUtsTmYvQjZreGwvM3FsVzhsaGQrOU9Od1FEVGFHcXNpaTVyL0hGU2w0dHE5?=
+ =?utf-8?B?eU5GeWs2S2daZWhYT3pEMFFwVkNiVWpnaElSZjVmMzJWV2F0MEpiZDdCNGJQ?=
+ =?utf-8?B?WExZTmRhWjAwV284ZHBYNTlPWEU1WE9lSjdQeWRhbkVhMExic2JiUWVURnp5?=
+ =?utf-8?B?VkJUSGZSc3B6ZnFMcWJ5OTFwdm50NThmNFFKZC9IelkrbDVBWDNXSnAzb0Vz?=
+ =?utf-8?B?M05MQ29aM2hqY3drbzBLYUd0RzBvVEg0ZDUwK1pKOWtjMUJ5OHdVVTRFQlZo?=
+ =?utf-8?B?L0pDZ3BTV1hlWVB3NFhZQ29BOGpCeVFUZm10djRtUlhsUlRsYkJ6dFNHSW94?=
+ =?utf-8?B?dXltdU04QU45aUcxRnFvVDEzOWcwMnp4SlRFZ2tGNUFKcjM2TU5IdGxOWEE0?=
+ =?utf-8?B?L2M2bVFrMTFUWVJYWWx1VG9hT2FMaHZxZ24raW5kQVRUSStkVVZsNjdsSjA3?=
+ =?utf-8?B?ZDN3djJpbVFLK0ljZG5zam83YkZiQktlRnZUZTRvMjZTc01iZU1zN1dLUlhv?=
+ =?utf-8?B?UWZ3UnZTdFg5bytkRTVVQWZVV3JlUWIyR3VpSjNaTTYwSUZ0Z1o4dUdwTmtG?=
+ =?utf-8?B?d2ZpOHFVK0RSTzhKcmZWLzhkdkRsN3pXSGptMmk2ZGVCWFh3ZEY2aEVvaGVG?=
+ =?utf-8?B?NGhFYVZNQUFTVUlWN09md3N3N2ZFTXJvQnJ1blI3WDc0eGFFc1U2c1VyRitW?=
+ =?utf-8?B?Rm1tR3pmd09tdEI4NDZpSDNjeFZiL0taQ0t0S2h0WUxLV2xubWp2anpEZEZk?=
+ =?utf-8?B?bXNLVUF3UjI0VStOdWpnS3c2cXc0MDdXY3E3ZmZXSjJCOWJyMUtFY2dnUXI4?=
+ =?utf-8?B?bDFsYTU4ejd2T1VURHFjV0w4OHhwNk5rTEU3UW1lT0xEMHBFekhnc2VKSGVB?=
+ =?utf-8?B?NzR0ZXlVbFoyRHdmNVE3aWtNbGZIODhWRURsa1Z6VVVTN3lXVHZhamV6VzRK?=
+ =?utf-8?B?QWE4M0Z5bFBlU0JzcVZ3OXNqam9lNk5ncXI0ZDBHamhhNzlNbkRxME9GZFFH?=
+ =?utf-8?B?N1czRE5OS3dUeWxkUXFxcjVYRzVzRG9CekttNDQ5NmV4cUZNM3lFRDJxSGRt?=
+ =?utf-8?B?bUp5b2pBbHppUXRZbkYxWldpTTRqOGtaaEJjV1lXeVpsQkE4Vm9mWTNHcGky?=
+ =?utf-8?B?VE5BVmRFdXlZaXpJSDZZcFBJdnkzTUlreVZuWElwcWJpNDZiSGtnNHQzVW1E?=
+ =?utf-8?B?MmFCT3N1Qk1DbytueTVodzBEOElKZXFqS1FYWkhjSmFpT21aZUlQbVhqTU94?=
+ =?utf-8?Q?D42a9tJoIvv3gmarcI5BkxlZt?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 713282ed-4a04-48f8-3ac1-08daf91adb17
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jan 2023 06:11:37.0294
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Z44pg06FyPZ8pBSl4EgZ54AfxEVkkHu1jYuaem7lxc2sV5IOSIeA3gwPReNipsHvldAFNQ8O1Kxqr4wJP5n+YA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8502
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,96 +125,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shaoqin,
-
-> I have tested this patch set on an Ampere machine, and every thing works
-> fine.
->
->
-> Tested-by: Shaoqin Huang <shahuang@redhat.com>
-
-Thank you for testing the series!
-Reiji
 
 
->
-> On 1/17/23 09:35, Reiji Watanabe wrote:
-> > The goal of this series is to allow userspace to limit the number
-> > of PMU event counters on the vCPU. We need this to support migration
-> > across systems that implement different numbers of counters.
-> >
-> > The number of PMU event counters is indicated in PMCR_EL0.N.
-> > For a vCPU with PMUv3 configured, its value will be the same as
-> > the host value by default. Userspace can set PMCR_EL0.N for the
-> > vCPU to a lower value than the host value, using KVM_SET_ONE_REG.
-> > However, it is practically unsupported, as KVM resets PMCR_EL0.N
-> > to the host value on vCPU reset and some KVM code uses the host
-> > value to identify (un)implemented event counters on the vCPU.
-> >
-> > This series will ensure that the PMCR_EL0.N value is preserved
-> > on vCPU reset and that KVM doesn't use the host value
-> > to identify (un)implemented event counters on the vCPU.
-> > This allows userspace to limit the number of the PMU event
-> > counters on the vCPU.
-> >
-> > Patch 1 fixes reset_pmu_reg() to ensure that (RAZ) bits of
-> > {PMCNTEN,PMOVS}{SET,CLR}_EL1 corresponding to unimplemented event
-> > counters on the vCPU are reset to zero even when PMCR_EL0.N for
-> > the vCPU is different from the host.
-> >
-> > Patch 2 is a minor refactoring to use the default PMU register reset
-> > function (reset_pmu_reg()) for PMUSERENR_EL0 and PMCCFILTR_EL0.
-> > (With the Patch 1 change, reset_pmu_reg() can now be used for
-> > those registers)
-> >
-> > Patch 3 fixes reset_pmcr() to preserve PMCR_EL0.N for the vCPU on
-> > vCPU reset.
-> >
-> > Patch 4 adds the sys_reg's set_user() handler for the PMCR_EL0
-> > to disallow userspace to set PMCR_EL0.N for the vCPU to a value
-> > that is greater than the host value.
-> >
-> > Patch 5-8 adds a selftest to verify reading and writing PMU registers
-> > for implemented or unimplemented PMU event counters on the vCPU.
-> >
-> > The series is based on v6.2-rc4.
-> >
-> > v2:
-> >   - Added the sys_reg's set_user() handler for the PMCR_EL0 to
-> >     disallow userspace to set PMCR_EL0.N for the vCPU to a value
-> >     that is greater than the host value (and added a new test
-> >     case for this behavior). [Oliver]
-> >   - Added to the commit log of the patch 2 that PMUSERENR_EL0 and
-> >     PMCCFILTR_EL0 have UNKNOWN reset values.
-> >
-> > v1: https://lore.kernel.org/all/20221230035928.3423990-1-reijiw@google.com/
-> >
-> > Reiji Watanabe (8):
-> >    KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
-> >    KVM: arm64: PMU: Use reset_pmu_reg() for PMUSERENR_EL0 and
-> >      PMCCFILTR_EL0
-> >    KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value on vCPU reset
-> >    KVM: arm64: PMU: Disallow userspace to set PMCR.N greater than the
-> >      host value
-> >    tools: arm64: Import perf_event.h
-> >    KVM: selftests: aarch64: Introduce vpmu_counter_access test
-> >    KVM: selftests: aarch64: vPMU register test for implemented counters
-> >    KVM: selftests: aarch64: vPMU register test for unimplemented counters
-> >
-> >   arch/arm64/kvm/pmu-emul.c                     |   6 +
-> >   arch/arm64/kvm/sys_regs.c                     |  57 +-
-> >   tools/arch/arm64/include/asm/perf_event.h     | 258 +++++++
-> >   tools/testing/selftests/kvm/Makefile          |   1 +
-> >   .../kvm/aarch64/vpmu_counter_access.c         | 644 ++++++++++++++++++
-> >   .../selftests/kvm/include/aarch64/processor.h |   1 +
-> >   6 files changed, 954 insertions(+), 13 deletions(-)
-> >   create mode 100644 tools/arch/arm64/include/asm/perf_event.h
-> >   create mode 100644 tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> >
-> >
-> > base-commit: 5dc4c995db9eb45f6373a956eb1f69460e69e6d4
->
-> --
-> Regards,
-> Shaoqin
->
+On 16/01/23 14:40, Nikunj A Dadhania wrote:
+> +static void __noreturn sev_es_ghcb_terminate(struct ghcb *ghcb, unsigned int set,
+> +					     unsigned int reason, u64 exit_info_2)
+> +{
+
+Found this today:
+
+In file included from arch/x86/kernel/sev.c:519:
+At top level:
+arch/x86/kernel/sev-shared.c:167:24: warning: ‘sev_es_ghcb_terminate’ defined but not used [-Wunused-function]
+  167 | static void __noreturn sev_es_ghcb_terminate(struct ghcb *ghcb, unsigned int set,
+      |                        ^~~~~~~~~~~~~~~~~~~~~
+
+I am wondering why I did not get this error in my build testing.
+
+sev-shared.c gets included from two files boot/compressed/sev.c and kernel/sev.c, sev_es_ghcb_terminate() 
+has only one user. I will move helper function to boot/compressed/sev.c and send an updated version.
+
+
+Regards
+Nikunj
