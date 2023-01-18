@@ -2,93 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 866B267202E
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 15:52:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 479AD67204D
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 15:55:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231608AbjAROww (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 09:52:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50364 "EHLO
+        id S231557AbjAROzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 09:55:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231320AbjAROw3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 09:52:29 -0500
-Received: from smtpout.efficios.com (unknown [IPv6:2607:5300:203:b2ee::31e5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CD302386B;
-        Wed, 18 Jan 2023 06:45:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
-        s=smtpout1; t=1674053152;
-        bh=jnoOetXYIGXsnxje52HdC8DNcTcXPQAKGIEjinWGQdA=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=tVdtZaHi3/AsRHSiU/ctzQigE1bSd5wKtpMUJaP6o9TDDW+xssa+HU9SN/VKobcFJ
-         2s6yMn6TbDDtMm2MIWE6P57epomXiN0mOHVmjrcxbN+ddfuV4+Uca6fj0s+PdDWqZ2
-         YzuboSSZNdFnyhVqWsytBaaU0N4xSz+HLb5BUH1MQKpr6EA46cRy/MpkCttVuE/aKV
-         N8/gAyDcEc6ydp9erW2dNA1A89RDAEQCFrhIj2ga3zu2IJGfjMlmYOhY/v7A/2Hxlm
-         hPvCfzeLAr/Ezn8dGIPUOBWMSmXCEBQyXJ1Yd6RLZIs89qjMBGCRB4PppWcoLkcSqE
-         hI/pfiuWrBXkA==
-Received: from [172.16.0.101] (192-222-180-24.qc.cable.ebox.net [192.222.180.24])
-        by smtpout.efficios.com (Postfix) with ESMTPSA id 4NxpTr2WlfzhCY;
-        Wed, 18 Jan 2023 09:45:52 -0500 (EST)
-Message-ID: <a7ce23b5-c60f-e515-8a15-f4de30ebfe75@efficios.com>
-Date:   Wed, 18 Jan 2023 09:46:25 -0500
+        with ESMTP id S231723AbjAROzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 09:55:09 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 055C462D0D
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 06:49:27 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C6B8B169C;
+        Wed, 18 Jan 2023 06:50:09 -0800 (PST)
+Received: from e121798.cambridge.arm.com (e121798.cambridge.arm.com [10.1.196.158])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0458B3F67D;
+        Wed, 18 Jan 2023 06:49:26 -0800 (PST)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     andrew.jones@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: [kvm-unit-tests PATCH v4 0/2] arm: Add PSCI CPU_OFF test
+Date:   Wed, 18 Jan 2023 14:49:10 +0000
+Message-Id: <20230118144912.32049-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH] KVM: selftests: Fix build of rseq test
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Mark Brown <broonie@kernel.org>
-References: <20230106-fix-kvm-rseq-build-v1-1-b704d9831d02@kernel.org>
- <Y8f2HA02BJNYUYc7@sirena.org.uk>
- <c8901eb2-bee5-a7b3-cd43-ace970754ade@efficios.com>
- <Y8gFutX+TaukU1BX@sirena.org.uk>
-Content-Language: en-US
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-In-Reply-To: <Y8gFutX+TaukU1BX@sirena.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RDNS_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-01-18 09:44, Mark Brown wrote:
-> On Wed, Jan 18, 2023 at 09:30:01AM -0500, Mathieu Desnoyers wrote:
->> On 2023-01-18 08:37, Mark Brown wrote:
->>> On Fri, Jan 06, 2023 at 07:24:19PM +0000, Mark Brown wrote:
-> 
->>>> The KVM rseq test is failing to build in -next due to a commit merged
->>>> from the tip tree which adds a wrapper for sys_getcpu() to the rseq
->>>> kselftests, conflicting with the wrapper already included in the KVM
->>>> selftest:
-> 
->>> Any thoughts on this?  The KVM tests are still failing to build
->>> in -next:
-> 
->> I'm OK with the fix you submitted in this email thread. Should it be routed
->> through -tip ?
-> 
-> I think so, it'll need to go along with the patch that introduced
-> the new wrapper.
-> 
->> Acked-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+The series adds a test for the PSCI function CPU_OFF. The test is
+implemented in patch #2, "arm/psci: Add PSCI CPU_OFF test case".  Patch #1,
+"arm/psci: Test that CPU 1 has been successfully brought online" is a
+preparatory patch to allow the CPU_OFF test to run after the CPU_ON test.
+Executing the CPU_OFF test after the CPU_ON test makes the most sense,
+since CPU_OFF requires all the CPUs to be brought online before the test
+can execute, and this is exactly what the CPU_ON test does.
 
-Peter, can you pick up this patch through tip ?
+I believe that proving that a CPU has been successfully offlined is an
+undecidable problem - it might just be that the CPU is stuck at a higher
+exception level doing something else entirely, and if the test were to wait
+long enough, the CPU would return from the CPU_OFF call and start executing
+code, thus failing to be offlined. Right now, the test waits for 1 second
+before checking that all the other CPUs are offline. I thought this was a
+good balance between making the test fast and being reasonably sure that
+the offline succeeded. I'm open to suggestions here if anyone thinks
+otherwise.
 
-https://lore.kernel.org/r/20230106-fix-kvm-rseq-build-v1-1-b704d9831d02@kernel.org
+Tested for both the arm and arm64 architectures: on an x86 machine (qemu
+with TCG), and an ampere emag (qemu and kvmtool).
 
-Thanks,
+And Nikita is not longer at Arm, and I don't have a new email address where
+she can be reached, so I didn't CC her.
 
-Mathieu
+Changelog:
 
-> 
-> Thanks.
+v3 -> v4:
+- Moved ownership of the series to Alexandru Elisei. All bugs are mine.
+- Moved the timeout for the CPU_ON test to patch #1.
+- Changed the include order for arm/psic.c in patch #1 to order the headers
+  alphabetically.
+- Run the CPU_OFF test only if CPU_ON succeeds, because CPU_OFF expects all
+  CPUs to be online, the test would otherwise hang forever.
+- Minor style changes here and there.
 
+v2 -> v3:
+- Add timeout so that test does not hang if CPU1 fails to come online
+- Remove unnecessary call of on_cpus() in the condition where target CPU is not online.
+
+v1 -> v2:
+- Modify PSCI CPU_ON test to ensure CPU 1 remains online after the execution of the test.
+- Addition of PSCI CPU_OFF test and calling it after PSCI CPU_ON test has been executed.
+
+Alexandru Elisei (1):
+  arm/psci: Test that CPU 1 has been successfully brought online
+
+Nikita Venkatesh (1):
+  arm/psci: Add PSCI CPU_OFF test case
+
+ arm/psci.c        | 132 +++++++++++++++++++++++++++++++++++++++-------
+ lib/arm/asm/smp.h |   1 +
+ lib/arm/smp.c     |  12 +++--
+ lib/errata.h      |   2 +
+ 4 files changed, 125 insertions(+), 22 deletions(-)
+
+
+base-commit: 2480430a36102f8ea276b3bfb1d64d5dacc23b8f
 -- 
-Mathieu Desnoyers
-EfficiOS Inc.
-https://www.efficios.com
+2.25.1
 
