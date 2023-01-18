@@ -2,75 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5452B672330
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 17:28:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 60784672370
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 17:35:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230166AbjARQ2b (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 11:28:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57318 "EHLO
+        id S229627AbjARQfS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 11:35:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230143AbjARQ2E (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 11:28:04 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F84D5866C
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:25:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674059112;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=dD050lmzP4QOj50Y6kl8JDI+p6Vx+v1KEXu0Q9ihSpg=;
-        b=A0aISmNzsxxNz9cieIDwH3gnhXwHfsmTXceQPHCFWTqzB/OS/t/0TN9GxZXcKx/+id3uj0
-        GbAZn07EnrP2UISUBkvGcAFBLSJPiVR3OVm7w5T2SejB+jBgwtuJlLG1f0O+HdFYlXNhK8
-        AZQKc17aGjtuzRESz2nWyvXVPtanyLQ=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-608-HEMxkwQXNxmxqPJ3sYQtgw-1; Wed, 18 Jan 2023 11:25:11 -0500
-X-MC-Unique: HEMxkwQXNxmxqPJ3sYQtgw-1
-Received: by mail-ej1-f71.google.com with SMTP id nb4-20020a1709071c8400b0084d4712780bso20675606ejc.18
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:25:09 -0800 (PST)
+        with ESMTP id S229561AbjARQet (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 11:34:49 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D430E42BF5
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:33:01 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id 200so20450781pfx.7
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:33:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yd14vaBNEa2VdUUX04j7MB+x+aVbgeBsn031i62frpo=;
+        b=MkJ1nRlQQc56TlQw/B8iyg0XuaJCEI+loMFojrHN9fb93nCKQp/Gx6XaofKwXphiMR
+         RZcgonYkp76SLOeuLy49IKpSfhzH/FdqbOSJY1u66v8ohFPYynxlnM5Tim+2Vmv3piIO
+         6xdutg3tiJ7a8+PCuYJ1WWOnkxzbGQqlDprpGZMxVJA+oVE1wCTdRZZgVSfkHXTPMigq
+         Z2P4JVrEcAsk5T/9LdCGaRTneaj17BQOKv5hmV6/5kb+DleBTa6GKA+SPGHEqTYv3D4J
+         oXEc9wloOH3kV3yPQ+4bB79j6xEmOc6nqDOhBZ9cFXzrmeit1Cibfd/edSxsqGT7foq9
+         XUtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dD050lmzP4QOj50Y6kl8JDI+p6Vx+v1KEXu0Q9ihSpg=;
-        b=w7UvvwDdc98tGi3MZt0ydS2HjE85tEdT7YgK1W/3AG277nWfA6X6fypslfhxMGt79X
-         VxBn1So37re9JsAC7k5jIEVnydxBBPRlUzT3Xo2S09Riv37tFPFrWM80nvWkohLdphzz
-         ouMImRvU/I83k82Ki1pOC1ltKABjqSy1TjT5B1sjwtHH7f4Kx+gdnmyzxARoYmlvZcbx
-         KLOB+oQ05eZO+bHQyVmKSJOcXhasoLzavWjB5901FDSM3gDxC0FFQ/3lVTAfZpw1P2w/
-         CFc98pRjXrPB1NBN2qj5Q/hsaDKU/M7nFsPIZueqgpvKogFE4J85lRtl8NtSfW4rQd96
-         jHIA==
-X-Gm-Message-State: AFqh2kql8Ehs4758kFeMyRkEhYR4rgH4F+tFAyweMKN1IrwfzLVleRG7
-        dvoGAboI+eMc4xkHbg844LLkM+lbBWqgf9U66Hhl6jrBKRU6zDt1Of0o8hA2rUwXNkEAm67eGPX
-        82AoqsBi1f4jT
-X-Received: by 2002:a05:6402:3496:b0:499:70a8:f91d with SMTP id v22-20020a056402349600b0049970a8f91dmr9841829edc.2.1674059108232;
-        Wed, 18 Jan 2023 08:25:08 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXv84Khiptx2PQjDtOC2B84/w029Ii1Ev/tWlNi26Pfwazj2W2fGCki5R6mUehAH/W18HaY3JQ==
-X-Received: by 2002:a05:6402:3496:b0:499:70a8:f91d with SMTP id v22-20020a056402349600b0049970a8f91dmr9841814edc.2.1674059108026;
-        Wed, 18 Jan 2023 08:25:08 -0800 (PST)
-Received: from ovpn-194-7.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
-        by smtp.gmail.com with ESMTPSA id a11-20020aa7d74b000000b0049e08f781e3sm4692805eds.3.2023.01.18.08.25.06
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yd14vaBNEa2VdUUX04j7MB+x+aVbgeBsn031i62frpo=;
+        b=qWyeCadcVZtbWbPtKmFroVWW8APDfdSI/S5wVITc4UVR0mGs4JA3Hms7h8fXbv/9UQ
+         N5wF9O0ep9DOtAcicPp+J8Uf3BP20vVeisBGYIOZ2eUinxvTrkE/k59DZjMRd2FLvenD
+         2cyJ+/1iNeFQT+ZVaJb436Y/aEOAs5GEJ/pZB1nxv0kwHOjupcq4VyOx8HJx5fg+uhtR
+         +W/xYgO5CvWukgpUgv/x325aW92uaInd4AIaHphto/xdn0p3Ig7WL4RnG5S5UaybU1az
+         fFrtJ8OcGWoAgPi0VgkhucDYojKpI9tiNWZwr6mNZljdY9NrbWvLwnxfl8QQuHQob90R
+         yAaQ==
+X-Gm-Message-State: AFqh2kr8/0uSK3LNsSbdwP6UOf/4UhydAkMoHSXcZv2HObaFvGkpy7r9
+        Ve+j91Iaetu/MH2FO+6jKFQaXg==
+X-Google-Smtp-Source: AMrXdXsg5r+DwGfdUsJJ0nWziK0avTzB5xuHBfANRrI2JaS9rdLq83+n477EJ5XOh+Rv/wjOE4zK8Q==
+X-Received: by 2002:a05:6a00:368a:b0:581:bfac:7a52 with SMTP id dw10-20020a056a00368a00b00581bfac7a52mr2828384pfb.1.1674059581080;
+        Wed, 18 Jan 2023 08:33:01 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 3-20020a620503000000b00582bdaab584sm13399073pff.81.2023.01.18.08.32.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 08:25:07 -0800 (PST)
-From:   Vitaly Kuznetsov <vkuznets@redhat.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Alexandru Matei <alexandru.matei@uipath.com>,
-        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Mihai Petrisor <mihai.petrisor@uipath.com>,
-        Viorel Canja <viorel.canja@uipath.com>
-Subject: Re: [PATCH] KVM: VMX: Fix crash due to uninitialized current_vmcs
-In-Reply-To: <Y8gclHES8KXiXHV2@google.com>
-References: <20230118141348.828-1-alexandru.matei@uipath.com>
- <Y8gT/DNwUvaDjfeW@google.com> <87bkmves2d.fsf@ovpn-194-7.brq.redhat.com>
- <Y8gclHES8KXiXHV2@google.com>
-Date:   Wed, 18 Jan 2023 17:25:06 +0100
-Message-ID: <878rhzerod.fsf@ovpn-194-7.brq.redhat.com>
+        Wed, 18 Jan 2023 08:32:59 -0800 (PST)
+Date:   Wed, 18 Jan 2023 16:32:56 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Colton Lewis <coltonlewis@google.com>, kvm@vger.kernel.org,
+        pbonzini@redhat.com, maz@kernel.org, dmatlack@google.com,
+        bgardon@google.com, oupton@google.com
+Subject: Re: [PATCH 2/3] KVM: selftests: Collect memory access latency samples
+Message-ID: <Y8gfOP5CMXK60AtH@google.com>
+References: <20221115173258.2530923-1-coltonlewis@google.com>
+ <20221115173258.2530923-3-coltonlewis@google.com>
+ <Y8cIdxp5k8HivVAe@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y8cIdxp5k8HivVAe@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,82 +74,123 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
+On Tue, Jan 17, 2023, Ricardo Koller wrote:
+> On Tue, Nov 15, 2022 at 05:32:57PM +0000, Colton Lewis wrote:
+> > @@ -44,6 +47,18 @@ static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
+> >  /* Store all samples in a flat array so they can be easily sorted later. */
+> >  uint64_t latency_samples[SAMPLE_CAPACITY];
+> >  
+> > +static uint64_t perf_test_timer_read(void)
+> > +{
+> > +#if defined(__aarch64__)
+> > +	return timer_get_cntct(VIRTUAL);
+> > +#elif defined(__x86_64__)
+> > +	return rdtsc();
+> > +#else
+> > +#warn __func__ " is not implemented for this architecture, will return 0"
+> > +	return 0;
+> > +#endif
+> > +}
 
-> On Wed, Jan 18, 2023, Vitaly Kuznetsov wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > On Wed, Jan 18, 2023, Alexandru Matei wrote:
->> >> KVM enables 'Enlightened VMCS' and 'Enlightened MSR Bitmap' when running as
->> >> a nested hypervisor on top of Hyper-V. When MSR bitmap is updated,
->> >> evmcs_touch_msr_bitmap function uses current_vmcs per-cpu variable to mark
->> >> that the msr bitmap was changed.
->> >> 
->> >> vmx_vcpu_create() modifies the msr bitmap via vmx_disable_intercept_for_msr
->> >> -> vmx_msr_bitmap_l01_changed which in the end calls this function. The
->> >> function checks for current_vmcs if it is null but the check is
->> >> insufficient because current_vmcs is not initialized. Because of this, the
->> >> code might incorrectly write to the structure pointed by current_vmcs value
->> >> left by another task. Preemption is not disabled so the current task can
->> >> also be preempted and moved to another CPU while current_vmcs is accessed
->> >> multiple times from evmcs_touch_msr_bitmap() which leads to crash.
->> >> 
->> >> To fix this problem, this patch moves vmx_disable_intercept_for_msr calls
->> >> before init_vmcs call in __vmx_vcpu_reset(), as ->vcpu_reset() is invoked
->> >> after the vCPU is properly loaded via ->vcpu_load() and current_vmcs is
->> >> initialized.
->> >
->> > IMO, moving the calls is a band-aid and doesn't address the underlying bug.  I
->> > don't see any reason why the Hyper-V code should use a per-cpu pointer in this
->> > case.  It makes sense when replacing VMX sequences that operate on the VMCS, e.g.
->> > VMREAD, VMWRITE, etc., but for operations that aren't direct replacements for VMX
->> > instructions I think we should have a rule that Hyper-V isn't allowed to touch the
->> > per-cpu pointer.
->> >
->> > E.g. in this case it's trivial to pass down the target (completely untested).
->> >
->> > Vitaly?
->> 
->> Mid-air collision detected) I've just suggested a very similar approach
->> but instead of 'vmx->vmcs01.vmcs' I've suggested using
->> 'vmx->loaded_vmcs->vmcs': in case we're running L2 and loaded VMCS is
->> 'vmcs02', I think we still need to touch the clean field indicating that
->> MSR-Bitmap has changed. Equally untested :-)
->
-> Three reasons to use vmcs01 directly:
->
->   1. I don't want to require loaded_vmcs to be set.  E.g. in the problematic
->      flows, this 
->
-> 	vmx->loaded_vmcs = &vmx->vmcs01;
->
->      comes after the calls to vmx_disable_intercept_for_msr().
->
->   2. KVM on Hyper-V doesn't use the bitmaps for L2 (evmcs02):
->
-> 	/*
-> 	 * Use Hyper-V 'Enlightened MSR Bitmap' feature when KVM runs as a
-> 	 * nested (L1) hypervisor and Hyper-V in L0 supports it. Enable the
-> 	 * feature only for vmcs01, KVM currently isn't equipped to realize any
-> 	 * performance benefits from enabling it for vmcs02.
-> 	 */
-> 	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs) &&
-> 	    (ms_hyperv.nested_features & HV_X64_NESTED_MSR_BITMAP)) {
-> 		struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
->
-> 		evmcs->hv_enlightenments_control.msr_bitmap = 1;
-> 	}
+I would prefer to put the guest-side timer helpers into common code, e.g. as
+guest_read_system_counter(), replacing system_counter_offset_test.c's one-off
+version.
 
-Oh, indeed, I've forgotten this. I'm fine with 'vmx->vmcs01' then but
-let's leave a comment (which I've going to also forget about, but still)
-that eMSR bitmap is an L1-only feature.
+> >  /*
+> >   * Continuously write to the first 8 bytes of each page in the
+> >   * specified region.
+> > @@ -59,6 +74,10 @@ void perf_test_guest_code(uint32_t vcpu_idx)
+> >  	int i;
+> >  	struct guest_random_state rand_state =
+> >  		new_guest_random_state(pta->random_seed + vcpu_idx);
+> > +	uint64_t *latency_samples_offset = latency_samples + SAMPLES_PER_VCPU * vcpu_idx;
 
->
->   3. KVM's manipulation of MSR bitmaps typically happens _only_ for vmcs01,
->      e.g. the caller is vmx_msr_bitmap_l01_changed().  The nested case is a 
->      special snowflake.
->
+"offset" is confusing because the system counter (TSC in x86) has an offset for
+the guest-perceived value.  Maybe just "latencies"?
 
--- 
-Vitaly
+> > +	uint64_t count_before;
+> > +	uint64_t count_after;
 
+Maybe s/count/time?  Yeah, it's technically wrong to call it "time", but "count"
+is too generic.
+
+> > +	uint32_t maybe_sample;
+> >  
+> >  	gva = vcpu_args->gva;
+> >  	pages = vcpu_args->pages;
+> > @@ -75,10 +94,21 @@ void perf_test_guest_code(uint32_t vcpu_idx)
+> >  
+> >  			addr = gva + (page * pta->guest_page_size);
+> >  
+> > -			if (guest_random_u32(&rand_state) % 100 < pta->write_percent)
+> > +			if (guest_random_u32(&rand_state) % 100 < pta->write_percent) {
+> > +				count_before = perf_test_timer_read();
+> >  				*(uint64_t *)addr = 0x0123456789ABCDEF;
+> > -			else
+> > +				count_after = perf_test_timer_read();
+> > +			} else {
+> > +				count_before = perf_test_timer_read();
+> >  				READ_ONCE(*(uint64_t *)addr);
+> > +				count_after = perf_test_timer_read();
+> 
+> "count_before ... ACCESS count_after" could be moved to some macro,
+> e.g.,:
+> 	t = MEASURE(READ_ONCE(*(uint64_t *)addr));
+
+Even better, capture the read vs. write in a local variable to self-document the
+use of the RNG, then the motivation for reading the system counter inside the
+if/else-statements goes away.  That way we don't need to come up with a name
+that documents what MEASURE() measures.
+
+			write = guest_random_u32(&rand_state) % 100 < args->write_percent;
+
+			time_before = guest_system_counter_read();
+			if (write)
+				*(uint64_t *)addr = 0x0123456789ABCDEF;
+			else
+				READ_ONCE(*(uint64_t *)addr);
+			time_after = guest_system_counter_read();
+
+> > +			}
+> > +
+> > +			maybe_sample = guest_random_u32(&rand_state) % (i + 1);
+
+No need to generate a random number for iterations that always sample.  And I
+think it will make the code easier to follow if there is a single write to the
+array.  The derivation of the index is what's interesting and different, we should
+use code to highlight that.
+
+			/*
+			 * Always sample early iterations to ensure at least the
+			 * number of requested samples is collected.  Once the
+			 * array has been filled, <here is a comment from Colton
+			 * briefly explaining the math>.
+			 * 
+			if (i < SAMPLES_PER_VCPU)
+				idx = i;
+			else
+				idx = guest_random_u32(&rand_state) % (i + 1);
+
+			if (idx < SAMPLES_PER_VCPU)
+				latencies[idx] = time_after - time_before;
+
+> > +			if (i < SAMPLES_PER_VCPU)
+
+Would it make sense to let the user configure the number of samples?  Seems easy
+enough and would let the user ultimately decide how much memory to burn on samples.
+
+> > +				latency_samples_offset[i] = count_after - count_before;
+> > +			else if (maybe_sample < SAMPLES_PER_VCPU)
+> > +				latency_samples_offset[maybe_sample] = count_after - count_before;
+> 
+> I would prefer these reservoir sampling details to be in a helper, 
+> e.g.,:
+> 	reservoir_sample_record(t, i);
+
+Heh, I vote to open code the behavior.  I dislike fancy names that hide relatively
+simple logic.  IMO, readers won't care how the modulo math provides even distribution,
+just that it does and that the early iterations always samples to ensure ever bucket
+is filled.
+
+In this case, I can pretty much guarantee that I'd end up spending more time
+digging into what "reservoir" means than I would to understand the basic flow.
