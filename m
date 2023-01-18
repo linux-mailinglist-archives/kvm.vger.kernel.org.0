@@ -2,85 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BC46670FC2
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 02:16:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 348FF670FD7
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 02:20:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230098AbjARBQ2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 17 Jan 2023 20:16:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39634 "EHLO
+        id S229491AbjARBUT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 17 Jan 2023 20:20:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229744AbjARBQN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 17 Jan 2023 20:16:13 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC6738027
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 17:09:53 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id dw9so32791395pjb.5
-        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 17:09:53 -0800 (PST)
+        with ESMTP id S229889AbjARBUC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 17 Jan 2023 20:20:02 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6A34C34
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 17:16:53 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id p24so35325261plw.11
+        for <kvm@vger.kernel.org>; Tue, 17 Jan 2023 17:16:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3JuSDYqZWGf39oVCbPD+c17ZjYNYI+6+cfw+Ots82+Y=;
-        b=Ve3FxUDvOHo6Fn7HY/ppNZz+WelafZ+RJ2HzV3I/qvn1wkPTF599o9nRJTX3hXldgb
-         ianClHwAyXr4VeNKpAE6Ue/lSK8Okcw7wiWZkSciZSXDlPXaAeGaoTg1OklCVs9h0fLM
-         m9/gFhYNxrKaZ+f8LJSj3fdKM7zqw0fiD5S/ueOWCQdkCeof82/rL75xM/G+N6tC2r/C
-         YtYxcPce/m6LRW5kv8PKvg0mbIjuarPCZfYT6ehmzP6FHK4ZyylgC1JKWdSsjAlSt3DE
-         7dsOOZiCAR3/NwwHwwrOTAYPmKI0b1ej46mfNHWgMfUXtNJit69u3lhXZ9pThoJy2EpK
-         vuNQ==
+        bh=nR851gTQUNhuZ9nIqOBqdizsZwq4fVLd+DeaO/RL3js=;
+        b=Hd6WMpGYSNQdq6x5bZEpXv1KX4X9pv/ZsFdwt6iPmRB17S3WL8F4pe+UYA/RvwFBR3
+         2andNh8JioNmt1w7ODtXwzK2SSABlFcpVJjGhA3lXo57Qdz4CO/NjcHzNEBUi/OnTKxW
+         ox1NhKj4dnSoXAC58rF53eQK0b+9PC/0eSIQyJEZCsjeZGR2T/cvR7n12txhLtwqtQwU
+         ywpJ44DNPB9j7b4VkcHo7QNEXTEVyn342SF26e8/RVcMW+tpnEjG/Dg4Z3EMbYlLQ84R
+         g73nmIgc0JdPGhARJM+p1pjjuvK0ZNYZNQcI3JKkcHE5UAbz/ASX5xecyba7HkLKLbwt
+         4H0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3JuSDYqZWGf39oVCbPD+c17ZjYNYI+6+cfw+Ots82+Y=;
-        b=4TtDxJ+RFCBePLzvhzds+Rh5J2Hz3bym1Ko9ogftLuYALR6PTsXLVDUUF8Hs8JVDad
-         0abRpgdOiYBY8TI+5ZozVVOc9v9q2XY3ImEnaqz+GGCtw1W6W6yTjomFrKXrjN1zOfSE
-         ZsEzQPeUnVn6f0GvI7meBYloTiHbFXUbzLyXws9ZhTIUijgO5IDNrKAUYx5B/uVIjM1b
-         y0sZ8z8AOsPYNIWNfBTp9FHJVRAYA8NeGJirz5uQe4aD7uVahag9hLTTuG/x6d0hoBmQ
-         2wxlqMWI/KOBI1VdKBrYICQG69HKCGMenJ8ooPaIaqRnxDIZzlDHn0dAK1z2/2j4yWXY
-         TVvg==
-X-Gm-Message-State: AFqh2kqPpCtoJEzSpbwdAXTs3r4ES4VSMtFILXNTKS+Z1B0pfQ0u444d
-        KJ7lRuHdkZ+NoCG4T2Z31IOEu9Jq7C8jCH9h
-X-Google-Smtp-Source: AMrXdXv5kooD4dGpQLPvyRvgMkoX5y8OCxWBHB/rOCGPjku7DRiAMCKQl96+K8+2t75cauDHnHGELw==
-X-Received: by 2002:a17:902:ebc6:b0:192:8a1e:9bc7 with SMTP id p6-20020a170902ebc600b001928a1e9bc7mr3150303plg.0.1674004192919;
-        Tue, 17 Jan 2023 17:09:52 -0800 (PST)
+        bh=nR851gTQUNhuZ9nIqOBqdizsZwq4fVLd+DeaO/RL3js=;
+        b=zSku1aw8bAplSVD3bNY8SHMBU+c6QGoAPZwt17D2BZAOBudL0DA/Ea1EqhmrFzANAV
+         2ncN2D1voA4T/M/cz2UhEEJQ/OEFUP7/HAI6fxVMGmCSssqa03xC5bXKO/hB7oWtHyJO
+         pLYWdTYAkzHWd80IIsZNfeKQVBxqbyYpslI6apL+V3Miod7Fpb27F0TogAPUGEVN7UL8
+         oLRMUn8h3a66XNbnxmjdQNkrW8+2L00HlSl2GHOQfdq07gR5hS6Y6QjzWuyru3DzIpMh
+         nrBljnETO7VGC6GBkLrgUOeS70RzouqDhtrv0V0aTPxkHA679T5r2xQ2ZTHNLL+ayH7q
+         aZwg==
+X-Gm-Message-State: AFqh2kqth14z7ymrswX+Fdadl6n3cK1qowoVs1rV4jYxtpS7E9+gMTbZ
+        HIHND1rxfqotJKJqx1dHUoR6lA==
+X-Google-Smtp-Source: AMrXdXsY6+D7UtkQ8QiX1vkkhfrbiAxGDNZS2xOOMXN6r3s6A82c2NGSaWy3Rx6VWNBn2JQ5Ph2PHA==
+X-Received: by 2002:a05:6a21:33a1:b0:ac:af5c:2970 with SMTP id yy33-20020a056a2133a100b000acaf5c2970mr2962127pzb.3.1674004612406;
+        Tue, 17 Jan 2023 17:16:52 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y2-20020a17090a16c200b002272616d3e1sm154353pje.40.2023.01.17.17.09.52
+        by smtp.gmail.com with ESMTPSA id t13-20020a170902b20d00b001926a76e8absm21827824plr.114.2023.01.17.17.16.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Jan 2023 17:09:52 -0800 (PST)
-Date:   Wed, 18 Jan 2023 01:09:49 +0000
+        Tue, 17 Jan 2023 17:16:51 -0800 (PST)
+Date:   Wed, 18 Jan 2023 01:16:48 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Vishal Annapurve <vannapurve@google.com>
-Cc:     x86@kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
-Subject: Re: [V2 PATCH 0/6] KVM: selftests: selftests for fd-based private
- memory
-Message-ID: <Y8dG3WDxY2OCGPby@google.com>
-References: <20221205232341.4131240-1-vannapurve@google.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "dmatlack@google.com" <dmatlack@google.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v11 025/113] KVM: TDX: Use private memory for TDX
+Message-ID: <Y8dIgEhj1Zb1688t@google.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+ <4c3f5462852af9fd0957bb7db0b04a6f2d5639ee.1673539699.git.isaku.yamahata@intel.com>
+ <b8f88a7b9b2ab00379e6b1afd6a7fdb409d35492.camel@intel.com>
+ <Y8bPljsAF+lSnWtC@google.com>
+ <9fa4473f76f20b94a8ba516defb3b33ac3e86e96.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221205232341.4131240-1-vannapurve@google.com>
+In-Reply-To: <9fa4473f76f20b94a8ba516defb3b33ac3e86e96.camel@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,47 +82,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Dec 05, 2022, Vishal Annapurve wrote:
-> This series implements selftests targeting the feature floated by Chao via:
-> https://lore.kernel.org/lkml/20221202061347.1070246-10-chao.p.peng@linux.intel.com/T/
+On Tue, Jan 17, 2023, Huang, Kai wrote:
+> On Tue, 2023-01-17 at 16:40 +0000, Sean Christopherson wrote:
+> > On Mon, Jan 16, 2023, Huang, Kai wrote:
+> > > AMD's series has a different solution:
+> > > 
+> > > https://lore.kernel.org/lkml/20221214194056.161492-3-michael.roth@amd.com/
+> > > 
+> > > I think somehow this needs to get aligned.
+> > 
+> > Ya.  My thought is
+> > 
+> >  bool kvm_arch_has_private_mem(struct kvm *kvm)
+> >  {
+> > 	return kvm->arch.vm_type != KVM_X86_DEFAULT_VM;
+> >  }
+> > 
+> > where the VM types end up being:
+> > 
+> >  #define KVM_X86_DEFAULT_VM	0
+> >  #define KVM_X86_PROTECTED_VM	1
+> >  #define KVM_X86_TDX_VM		2
+> >  #define KVM_X86_SNP_VM		3
 > 
-> Below changes aim to test the fd based approach for guest private memory
-> in context of normal (non-confidential) VMs executing on non-confidential
-> platforms.
-> 
-> private_mem_test.c file adds selftest to access private memory from the
-> guest via private/shared accesses and checking if the contents can be
-> leaked to/accessed by vmm via shared memory view before/after conversions.
-> 
-> Updates in V2:
-> 1) Simplified vcpu run loop implementation API
-> 2) Removed VM creation logic from private mem library
+> What's the  difference between  PROTECTED_VM vs TDX_VM/SNP_VM, may I ask?
 
-I pushed a rework version of this series to:
+Not sure :-)  
 
-  git@github.com:sean-jc/linux.git x86/upm_base_support
+At this point, PROTECTED_VM is a handwavy "guest that can access restricted memory".
+I think/hope it can be used in combination with existing SEV/SEV-ES APIs to allow
+backing such guests with restrictedmem.
 
-Can you take a look and make sure that I didn't completely botch anything, and
-preserved the spirit of what you are testing?
+As for TDX_VM and SNP_VM, I'm speculating that KVM will need to differentiate between
+SNP, TDX, and everything else.  E.g. if KVM needs to uniquely identify TDX VMs at
+creation time, then adding dedicated VM types seems like the obvious choice.  Ditto
+for SNP VMs.
 
-Going forward, no need to send a v3 at this time.  Whoever sends v11 of the series
-will be responsible for including tests.
-
-No need to respond to comments either, unless of course there's something you
-object to, want to clarify, etc., in which case definitely pipe up.
-
-Beyond the SEV series, do you have additional UPM testcases written?  If so, can
-you post them, even if they're in a less-than-perfect state?  If they're in a
-"too embarassing to post" state, feel from to send them off list :-)
-
-Last question, do you have a list of testcases that you consider "required" for
-UPM?  My off-the-cuff list of selftests I want to have before merging UPM is pretty
-short at this point:
-
-  - Negative testing of the memslot changes, e.g. bad alignment, bad fd,
-    illegal memslot updates, etc.
-  - Negative testing of restrictedmem, e.g. various combinations of overlapping
-    bindings of a single restrictedmem instance.
-  - Access vs. conversion stress, e.g. accessing a region in the guest while it's
-    concurrently converted by the host, maybe with fancy guest code to try and
-    detect TLB or ordering bugs?
+That's partly why I want to smush everything together, to see if we actually need
+multiple VM types.
