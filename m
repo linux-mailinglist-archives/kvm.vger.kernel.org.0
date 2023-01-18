@@ -2,76 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B66F672794
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 19:59:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A9526727BF
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 20:02:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229492AbjARS7Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 13:59:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39402 "EHLO
+        id S230097AbjARTCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 14:02:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229459AbjARS7W (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 13:59:22 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D3759B6F
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 10:58:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674068316;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=jwaWlIaPebdK8DNpQuuvVjS8artPxBM6nDox3pZmeN8=;
-        b=G2y6QmnqywaTBo+Q9991umEGokv+ikP8RUglylr4yKs8MK0vV+vBkbbSXQBYanntVkAExN
-        +C/cXlqYRM+NoJcc2Gk6hXzmDriOiTWs9XvfJDzu+N4ZgD9gDvosWJfoYq74p9Fj67Ftc9
-        LX/XG8TAmaujVTva4PkyDwtKiltakkI=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-250-qcac1dtUPWO9288nq4gm8A-1; Wed, 18 Jan 2023 13:58:34 -0500
-X-MC-Unique: qcac1dtUPWO9288nq4gm8A-1
-Received: by mail-io1-f70.google.com with SMTP id k1-20020a6b3c01000000b006f744aee560so21374098iob.2
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 10:58:34 -0800 (PST)
+        with ESMTP id S230100AbjARTCP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 14:02:15 -0500
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14085D907
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 11:01:29 -0800 (PST)
+Received: by mail-pl1-x635.google.com with SMTP id jl3so2790754plb.8
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 11:01:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QtExxK4ADgw6ZE718YwmO/t71md0krpwXYndr6NxVnU=;
+        b=M3aQFUP1lcJH0765ybpm4yrsrb4oQT9zJO/GI1m1G9KLxaYRSw5DrgLL3kBPHZQ3Hi
+         W1r9lxyHx8noTxW8/7YLzhOcLjkAOq6lQYKn0M3ZWz9O4sbofS/SY0Rnx+LS8crO+fol
+         oOT5EQ66gFg/lCxy6nAceOpEdypLi5t5EGkaMrnTkL5HfY1vkGsrcrnFT7XtAnj/OBvK
+         kNtJfLtMrQ9AkMBUjldpKcOJzfVqV6y3AK+rvRq8wPTKUnqdbMd9zS8MyHZxgDFSLK+H
+         YY/9Z0PRsbOap4FVqNdA2/XQFtyvj93rnTWGGEeVudLJKP/EJCXxMXA/Aoz2zEZJaxzO
+         OYkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jwaWlIaPebdK8DNpQuuvVjS8artPxBM6nDox3pZmeN8=;
-        b=Iq2g9pGmMghxY3don9qfgdHn2aPZt541AKnwdbSSFk5iSfwq2iQDEZUsUsgJ4UXdgL
-         3IsSOjLJd1zLhzXC4mbA99z2tNVKMqVQmDP2Djomq7eEkHzF+Z8F1ne+3QlCwo/JZUjO
-         rW6DN9MyP1qg0EpEhIko45FVOQamvOjruyjBijEj9FkcdPvKgjOEVmHIYTjbnEGxZTMI
-         Dzx/enbnaC4yhkmyNZhl4gbBitgcBLRiNnbQis8QDYuwVEqiz9BKYRhc1S6u3vlLj6S3
-         /kgj2qDFM5p2655o0JxaW3iCyDTBAj6JF8/MJVUr+zN4KsOxvkSDoU9umKmlWqzmaS4E
-         mFzg==
-X-Gm-Message-State: AFqh2koieSAeHeUIjhqL/xpbzrtjsZVsw1Ukadkdc6JI0H6iVgd0GXIi
-        RLLluoyksfElNZCoR8AnZEvv5ctIfsUFCUXaUBkOKc8e1SlyzoxBt5aUrV/2qeBkIacajS2+fAb
-        olYYrgCATlk3x
-X-Received: by 2002:a5d:9f0c:0:b0:704:b286:64c3 with SMTP id q12-20020a5d9f0c000000b00704b28664c3mr5357197iot.16.1674068313897;
-        Wed, 18 Jan 2023 10:58:33 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuD3FNjIe8uZwiymfGir/K6vuU0PbE/oIAy9VURoxPULmWGDYCX5CqFDoljCfgmrCuNOhASOg==
-X-Received: by 2002:a5d:9f0c:0:b0:704:b286:64c3 with SMTP id q12-20020a5d9f0c000000b00704b28664c3mr5357187iot.16.1674068313655;
-        Wed, 18 Jan 2023 10:58:33 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id h7-20020a05660208c700b00704a77b7b28sm3952149ioz.54.2023.01.18.10.58.32
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QtExxK4ADgw6ZE718YwmO/t71md0krpwXYndr6NxVnU=;
+        b=A1ibsu3Jq4lfb3Mn2wz60P7IGj1q40KI91gC+Vpc4PooKcAlu1PYSAbYbVZjJqJfLQ
+         6XVzPUskWMqrNHbWn1eP9duUmzdnoMh7PjncY2Wbs2YoaNXzFNuV5k42SiwUxp7V5dj5
+         pKkGELxfuYOEgT4BloQ0dQdhu43lNKFRhriYcy0cQazlqwWQhWyduyFBS04TwjDJV3Mp
+         L0rViKitev+IUUC7KYKBAuavs7tM8NOe6YZb0sieOysxke/yYiXF+WK255nCByo5n0I+
+         5glIKWAO17oXJEjvdazy06lUYB6Rn6Y/IEyCLozoQEG+CQZpghgJsS8C+b6iYi8LbX4E
+         uZkQ==
+X-Gm-Message-State: AFqh2kp/Ig6tBiTPqFMeZKA+qhr9fckzhNCq/dXilC+DT290ONnKfzYu
+        iz7nTohjSVVTcYyAbmrwDMjk4w==
+X-Google-Smtp-Source: AMrXdXsGwGNSb93sj72HwHJ/6wD+/hvMFaY7dl3Lb88Tl3bA0ZlUfIhwcC3Rw9YHYADmS+BT3FZK9g==
+X-Received: by 2002:a17:902:ebc6:b0:192:8a1e:9bc7 with SMTP id p6-20020a170902ebc600b001928a1e9bc7mr3530092plg.0.1674068489027;
+        Wed, 18 Jan 2023 11:01:29 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id e3-20020a17090301c300b00172cb8b97a8sm9725897plh.5.2023.01.18.11.01.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 10:58:33 -0800 (PST)
-Date:   Wed, 18 Jan 2023 11:58:31 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Jason Gunthorpe <jgg@nvidia.com>
-Cc:     Cornelia Huck <cohuck@redhat.com>, iommu@lists.linux.dev,
-        Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org,
-        Yi Liu <yi.l.liu@intel.com>
-Subject: Re: [PATCH v3] vfio: Support VFIO_NOIOMMU with iommufd
-Message-ID: <20230118115831.3e76742d.alex.williamson@redhat.com>
-In-Reply-To: <0-v3-480cd64a16f7+1ad0-iommufd_noiommu_jgg@nvidia.com>
-References: <0-v3-480cd64a16f7+1ad0-iommufd_noiommu_jgg@nvidia.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        Wed, 18 Jan 2023 11:01:28 -0800 (PST)
+Date:   Wed, 18 Jan 2023 19:01:24 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Ackerley Tng <ackerleytng@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        David Matlack <dmatlack@google.com>,
+        Wei Wang <wei.w.wang@intel.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: selftests: Reuse kvm_setup_gdt in
+ vcpu_init_descriptor_tables
+Message-ID: <Y8hCBOndYMD9zsDL@google.com>
+References: <20230114161557.499685-1-ackerleytng@google.com>
+ <20230114161557.499685-3-ackerleytng@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230114161557.499685-3-ackerleytng@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -79,43 +75,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 18 Jan 2023 13:50:28 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-> index f8219a438bfbf5..9e94abcf8ee1a8 100644
-> --- a/drivers/vfio/vfio.h
-> +++ b/drivers/vfio/vfio.h
-> @@ -10,10 +10,10 @@
->  #include <linux/device.h>
->  #include <linux/cdev.h>
->  #include <linux/module.h>
-> +#include <linux/vfio.h>
->  
->  struct iommufd_ctx;
->  struct iommu_group;
-> -struct vfio_device;
->  struct vfio_container;
->  
->  void vfio_device_put_registration(struct vfio_device *device);
-> @@ -88,6 +88,12 @@ bool vfio_device_has_container(struct vfio_device *device);
->  int __init vfio_group_init(void);
->  void vfio_group_cleanup(void);
->  
-> +static inline bool vfio_device_is_noiommu(struct vfio_device *vdev)
-> +{
-> +	return IS_ENABLED(CONFIG_VFIO_NOIOMMU) &&
-> +	       vdev->group->type == VFIO_NO_IOMMU;
-> +}
+On Sat, Jan 14, 2023, Ackerley Tng wrote:
+> Refactor vcpu_init_descriptor_tables to use kvm_setup_gdt
+> 
+> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> ---
+>  tools/testing/selftests/kvm/lib/x86_64/processor.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> index 33ca7f5232a4..8d544e9237aa 100644
+> --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> @@ -1119,8 +1119,7 @@ void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
+>  	vcpu_sregs_get(vcpu, &sregs);
+>  	sregs.idt.base = vm->idt;
+>  	sregs.idt.limit = NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
+> -	sregs.gdt.base = vm->gdt;
+> -	sregs.gdt.limit = getpagesize() - 1;
+> +	kvm_setup_gdt(vcpu->vm, &sregs.gdt);
 
+*sigh*
 
-What about:
+The selftests infrastructure is so misguided.  Forcing tests to opt-in to
+installing an IDT just to avoid allocating two pages is such an awful tradeoff.
 
-static inline bool vfio_group_type_is_noiommu(struct vfio_group *group)
+Now that we have kvm_arch_vm_post_create(), I think we should always allocate
+the GDT, IDT, and handlers, and then vCPU setup/creation can simply grab the
+already-allocated values and stuff them into KVM.  That would then eliminate
+kvm_setup_gdt() entirely.
 
-which would allow us to pickup the group.c use with only extending the
-callers here as s/vdev/vdev->group/?  Or we could even make a
-vfio_device_group_type_is_noiommu(struct vfio_device*) calling the
-above if we want a device specific interface.  Thanks,
+And much of the setup code is also backwards and unnecessarily thread-unsafe, e.g.
+vCPU initialization shouldn't need to fill GDT entries.
 
-Alex
+So, while I agree that using kvm_setup_gdt() is a good change on its own, I'd
+rather go the more aggressive route and clean up the underlying mess.
 
+I'll send patches sometime this week, unfortunately typing up what I have in mind
+is harder than just reworking the code :-/
