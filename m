@@ -2,130 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 090B76716E0
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 10:01:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 530F467170C
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 10:06:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229829AbjARJBB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 04:01:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58124 "EHLO
+        id S229963AbjARJGT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 04:06:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229798AbjARI7l (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 03:59:41 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D6785F380
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 00:19:19 -0800 (PST)
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30I8IdP1013038
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:19:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=WlzO0+vLH0SW1C0vH+bslj4KfhWG8belNTeB3gD8EqY=;
- b=EDwMPeQjLWZfcLNiVkoroyCkMDGanISandRJ7Y+4DNW1y5zGfeCeoenRhRgA2eitrIf0
- day35tJE1qR4QsgEXOQc2aqRBsf5+Py6y54abe/fAqZHEglxTz1UD9zmDXQKYoCtuDnu
- ocHAnPE6xkTIQU5byN/rtGN4sOYIfX6NSJymrmnr2WaPTWjRgz8jmdReqEG+xnuVoTpp
- f2sunFvRGCsF3eOQw5Rf4WPPKUzhH4BFR+jbmU2ZOEf+uQJkQ3Ja6Etw9otBH+pAk/y+
- 5XR9dZuArqbGPhBJbNap2PmMCUaALeyutaPaiKr1IeeOEAy446wFhYgHCxhpyaYVDC7a gA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6d5700ae-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:19:18 +0000
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30I8JIdY016827
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:19:18 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6d5700a3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 08:19:17 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30HMba4v006324;
-        Wed, 18 Jan 2023 08:19:15 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n3knfmy44-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 08:19:15 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30I8JBNa51577264
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Jan 2023 08:19:12 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DAB1320040;
-        Wed, 18 Jan 2023 08:19:11 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C8B920043;
-        Wed, 18 Jan 2023 08:19:11 +0000 (GMT)
-Received: from [9.171.68.162] (unknown [9.171.68.162])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Jan 2023 08:19:11 +0000 (GMT)
-Message-ID: <2a84da8c-1a02-e303-e58a-454de0de6792@linux.ibm.com>
-Date:   Wed, 18 Jan 2023 09:19:11 +0100
+        with ESMTP id S229838AbjARJEg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 04:04:36 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 755523E0AD;
+        Wed, 18 Jan 2023 00:24:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674030281; x=1705566281;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=mSO4PAMhEZisTll2SVfi2Yx3pBS6smLK7Q3mTuJU1oA=;
+  b=Xw5pozIH/dQFwvoJIvMdSKyZ69PKHC2soxXvHTqfxtxwVSDqkyWEtCfA
+   ipGSRm2hIIZxS3oQ0xiNx/l29EfDF1SJH2L97GChoGaKd4BctU+oeVRUY
+   mUCOuNP14slRIsR4Hj//w1ykPHkYYqcp/OSYQjkn88KBcUKnzF2WmwSg9
+   UvuvxkDlrQ3StY+f+L2CBO3aOOGhsSscfNh87yrxPEghYjw2hsYy0c8il
+   EVbziUgGqb67ahXJKBgpRh0kvRORM8lu95w5HrCHcjq78znw31sEQ/LbM
+   vNJTrUZ0qH8DrEEqOaAjHLKFW284bfJstu4HG1wGECFDEyjd43slXQpe5
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10593"; a="323620012"
+X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
+   d="scan'208";a="323620012"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2023 00:24:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10593"; a="722997271"
+X-IronPort-AV: E=Sophos;i="5.97,224,1669104000"; 
+   d="scan'208";a="722997271"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.105])
+  by fmsmga008.fm.intel.com with ESMTP; 18 Jan 2023 00:24:28 -0800
+Date:   Wed, 18 Jan 2023 16:16:41 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
+ create restricted user memory
+Message-ID: <20230118081641.GA303785@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
+ <Y8HTITl1+Oe0H7Gd@google.com>
+ <20230117124107.GA273037@chaop.bj.intel.com>
+ <Y8bOB7VuVIsxoMcn@google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [kvm-unit-tests PATCH 3/9] s390x/Makefile: fix `*.gbin` target
- dependencies
-Content-Language: en-US
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-References: <20230116175757.71059-1-mhartmay@linux.ibm.com>
- <20230116175757.71059-4-mhartmay@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20230116175757.71059-4-mhartmay@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: bAjbDaCMgxFNYA5Jfu3ZwQQOrDJZXaR6
-X-Proofpoint-GUID: --wg4upfbRmumN015u_dWqrp8xYzC51o
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-18_02,2023-01-17_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 phishscore=0
- spamscore=0 bulkscore=0 mlxlogscore=999 priorityscore=1501 impostorscore=0
- lowpriorityscore=0 mlxscore=0 adultscore=0 malwarescore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2301180070
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y8bOB7VuVIsxoMcn@google.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/16/23 18:57, Marc Hartmayer wrote:
-> If the linker scripts change, then the .gbin binaries must be rebuilt.
+On Tue, Jan 17, 2023 at 04:34:15PM +0000, Sean Christopherson wrote:
+> On Tue, Jan 17, 2023, Chao Peng wrote:
+> > On Fri, Jan 13, 2023 at 09:54:41PM +0000, Sean Christopherson wrote:
+> > > > +	list_for_each_entry(notifier, &data->notifiers, list) {
+> > > > +		notifier->ops->invalidate_start(notifier, start, end);
+> > > 
+> > > Two major design issues that we overlooked long ago:
+> > > 
+> > >   1. Blindly invoking notifiers will not scale.  E.g. if userspace configures a
+> > >      VM with a large number of convertible memslots that are all backed by a
+> > >      single large restrictedmem instance, then converting a single page will
+> > >      result in a linear walk through all memslots.  I don't expect anyone to
+> > >      actually do something silly like that, but I also never expected there to be
+> > >      a legitimate usecase for thousands of memslots.
+> > > 
+> > >   2. This approach fails to provide the ability for KVM to ensure a guest has
+> > >      exclusive access to a page.  As discussed in the past, the kernel can rely
+> > >      on hardware (and maybe ARM's pKVM implementation?) for those guarantees, but
+> > >      only for SNP and TDX VMs.  For VMs where userspace is trusted to some extent,
+> > >      e.g. SEV, there is value in ensuring a 1:1 association.
+> > > 
+> > >      And probably more importantly, relying on hardware for SNP and TDX yields a
+> > >      poor ABI and complicates KVM's internals.  If the kernel doesn't guarantee a
+> > >      page is exclusive to a guest, i.e. if userspace can hand out the same page
+> > >      from a restrictedmem instance to multiple VMs, then failure will occur only
+> > >      when KVM tries to assign the page to the second VM.  That will happen deep
+> > >      in KVM, which means KVM needs to gracefully handle such errors, and it means
+> > >      that KVM's ABI effectively allows plumbing garbage into its memslots.
+> > 
+> > It may not be a valid usage, but in my TDX environment I do meet below
+> > issue.
+> > 
+> > kvm_set_user_memory AddrSpace#0 Slot#0 flags=0x4 gpa=0x0 size=0x80000000 ua=0x7fe1ebfff000 ret=0
+> > kvm_set_user_memory AddrSpace#0 Slot#1 flags=0x4 gpa=0xffc00000 size=0x400000 ua=0x7fe271579000 ret=0
+> > kvm_set_user_memory AddrSpace#0 Slot#2 flags=0x4 gpa=0xfeda0000 size=0x20000 ua=0x7fe1ec09f000 ret=-22
+> > 
+> > Slot#2('SMRAM') is actually an alias into system memory(Slot#0) in QEMU
+> > and slot#2 fails due to below exclusive check.
+> > 
+> > Currently I changed QEMU code to mark these alias slots as shared
+> > instead of private but I'm not 100% confident this is correct fix.
 > 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> ---
->   s390x/Makefile | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 660ff06f1e7c..b6bf2ed99afd 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -135,12 +135,12 @@ $(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
->   $(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
->   	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
->   
-> -$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o
-> +$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(SRCDIR)/s390x/snippets/asm/flat.lds
+> That's a QEMU bug of sorts.  SMM is mutually exclusive with TDX, QEMU shouldn't
+> be configuring SMRAM (or any SMM memslots for that matter) for TDX guests.
 
-Any reason why you didn't use the shorter:
-$(SNIPPET_DIR)/asm/flat.lds ?
+Thanks for the confirmation. As long as we only bind one notifier for
+each address, using xarray does make things simple.
 
-
->   	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/asm/flat.lds $<
->   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
->   	truncate -s '%4096' $@
->   
-> -$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
-> +$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SRCDIR)/s390x/snippets/c/flat.lds
->   	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
->   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
->   	truncate -s '%4096' $@
-
+Chao
