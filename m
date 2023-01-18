@@ -2,155 +2,214 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 52AEA672262
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 17:04:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6449F6722C2
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 17:15:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231252AbjARQD6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 11:03:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37512 "EHLO
+        id S229840AbjARQPK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 11:15:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43224 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231140AbjARQDh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 11:03:37 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C959D56EF7
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 07:59:32 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30IFVRap026657;
-        Wed, 18 Jan 2023 15:59:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Mgq/e1oJj8BQ1YPwC+oAOG+izgrUrBtQvmYoPRWcsfQ=;
- b=nheZmhYPS04ZGvb0p7oQSK+vsId2fP8sQRJeRKemYI+0IwfAjgthcL36n5UPDckD4W0h
- XWiHyQez7d7KzkFyOHwwfC2oMc+3fw2qEsAWytG0iJIaSBtyB9wKhdJ+2uu4xHxJbPap
- OpedeWB40B7Uo4D3y8ixyoBBOImAz09Kw4FhG/zzcq8mAaikksL5O3kY88PmDVG+cko+
- JMVuLWqoUKr28zCEmfNZQyrMeukb2/YQKFgOXkxRUXzkmfIPM0T8NQS+t2J+V5CML5xI
- 15qDQ0lvQ5i8dR3YjBRbrfEGmJZJHyZi7gIuhbUEF5puhYsHAJDGB+hw07Fu1Rmnw3Cm DQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6f91ygs9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 15:59:27 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30IFbhNj004033;
-        Wed, 18 Jan 2023 15:59:27 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6f91ygra-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 15:59:27 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30ICC7nl006282;
-        Wed, 18 Jan 2023 15:59:25 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n3knfngtr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 18 Jan 2023 15:59:25 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30IFxLON44958152
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 18 Jan 2023 15:59:21 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6259120043;
-        Wed, 18 Jan 2023 15:59:21 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 138EB2004B;
-        Wed, 18 Jan 2023 15:59:20 +0000 (GMT)
-Received: from [9.179.13.15] (unknown [9.179.13.15])
-        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 18 Jan 2023 15:59:19 +0000 (GMT)
-Message-ID: <2c1681b2-05ef-6245-38ea-d2c363eb432e@linux.ibm.com>
-Date:   Wed, 18 Jan 2023 16:59:19 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
+        with ESMTP id S229838AbjARQOI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 11:14:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5B5356EDD
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 08:08:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674058124;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=I/uYMi6JWgVe4uvjmjmyIXlGNgTThxELKzyBUKBYyxQ=;
+        b=hIPnRQRzawYc5gINGvnkONS/bWlbGHErEbwqOdf+VjBN1qL1T3ZczsN4udEf8geQlLzP0i
+        coc8X5Iyhz8iOF7CQhqOthAsD4QiKN0GGpPso4tZOPvDgPMBmlnpuhRJZJOFKST2LAf8kw
+        hK+6hRkkeiAeTrfBILrSu4iPQhMonpQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-570-ygQ1T7sDPVycWbYs6PRfrQ-1; Wed, 18 Jan 2023 11:08:40 -0500
+X-MC-Unique: ygQ1T7sDPVycWbYs6PRfrQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 22D398A0108;
+        Wed, 18 Jan 2023 16:08:40 +0000 (UTC)
+Received: from redhat.com (unknown [10.33.36.59])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A623240C6EC4;
+        Wed, 18 Jan 2023 16:08:37 +0000 (UTC)
+Date:   Wed, 18 Jan 2023 16:08:35 +0000
+From:   Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>
+Cc:     qemu-s390x@nongnu.org, qemu-devel@nongnu.org,
+        borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, scgl@linux.ibm.com,
+        frankja@linux.ibm.com, clg@kaod.org
 Subject: Re: [PATCH v14 09/11] qapi/s390/cpu topology: monitor query topology
  information
-Content-Language: en-US
-To:     Thomas Huth <thuth@redhat.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
+Message-ID: <Y8gZg/+k04+LPEd4@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 References: <20230105145313.168489-1-pmorel@linux.ibm.com>
  <20230105145313.168489-10-pmorel@linux.ibm.com>
- <114b34b1-303b-154b-6ac1-91e1718de49b@redhat.com>
-From:   Pierre Morel <pmorel@linux.ibm.com>
-In-Reply-To: <114b34b1-303b-154b-6ac1-91e1718de49b@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+ <Y7/4rm9JYihUpLS1@redhat.com>
+ <d97d0a6a-a87e-e0d2-5d95-0645c09d9730@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: w2rwQ_x6G8Rb0f2y6_zdNIdcli0SYTDG
-X-Proofpoint-ORIG-GUID: 6-UShI331C0jbb3f9k1oLrDRMO5k0FTw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-18_05,2023-01-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- adultscore=0 clxscore=1015 impostorscore=0 malwarescore=0 mlxlogscore=999
- bulkscore=0 spamscore=0 priorityscore=1501 lowpriorityscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2301180130
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <d97d0a6a-a87e-e0d2-5d95-0645c09d9730@linux.ibm.com>
+User-Agent: Mutt/2.2.9 (2022-11-12)
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
-
-On 1/12/23 12:48, Thomas Huth wrote:
-> On 05/01/2023 15.53, Pierre Morel wrote:
->> Reporting the current topology informations to the admin through
->> the QEMU monitor.
->>
->> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
->> ---
-> ...
->> diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
->> index 754b1e8408..5730a47f71 100644
->> --- a/hmp-commands-info.hx
->> +++ b/hmp-commands-info.hx
->> @@ -993,3 +993,19 @@ SRST
->>     ``info virtio-queue-element`` *path* *queue* [*index*]
->>       Display element of a given virtio queue
->>   ERST
->> +
->> +#if defined(TARGET_S390X) && defined(CONFIG_KVM)
->> +    {
->> +        .name       = "query-topology",
->> +        .args_type  = "",
->> +        .params     = "",
->> +        .help       = "Show information about CPU topology",
->> +        .cmd        = hmp_query_topology,
->> +        .flags      = "p",
->> +    },
->> +
->> +SRST
->> +  ``info query-topology``
-> 
-> "info query-topology" sounds weird ... I'd maybe rather call it only 
-> "info topology" or "info cpu-topology" here.
-
-info cpu-topology looks good for me.
-
-thanks.
-
-Regards,
-Pierre
-
-> 
->   Thomas
+On Wed, Jan 18, 2023 at 04:58:05PM +0100, Pierre Morel wrote:
 > 
 > 
->> +    Show information about CPU topology
->> +ERST
->> +#endif
+> On 1/12/23 13:10, Daniel P. Berrangé wrote:
+> > On Thu, Jan 05, 2023 at 03:53:11PM +0100, Pierre Morel wrote:
+> > > Reporting the current topology informations to the admin through
+> > > the QEMU monitor.
+> > > 
+> > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > > ---
+> > >   qapi/machine-target.json | 66 ++++++++++++++++++++++++++++++++++
+> > >   include/monitor/hmp.h    |  1 +
+> > >   hw/s390x/cpu-topology.c  | 76 ++++++++++++++++++++++++++++++++++++++++
+> > >   hmp-commands-info.hx     | 16 +++++++++
+> > >   4 files changed, 159 insertions(+)
+> > > 
+> > > diff --git a/qapi/machine-target.json b/qapi/machine-target.json
+> > > index 75b0aa254d..927618a78f 100644
+> > > --- a/qapi/machine-target.json
+> > > +++ b/qapi/machine-target.json
+> > > @@ -371,3 +371,69 @@
+> > >     },
+> > >     'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
+> > >   }
+> > > +
+> > > +##
+> > > +# @S390CpuTopology:
+> > > +#
+> > > +# CPU Topology information
+> > > +#
+> > > +# @drawer: the destination drawer where to move the vCPU
+> > > +#
+> > > +# @book: the destination book where to move the vCPU
+> > > +#
+> > > +# @socket: the destination socket where to move the vCPU
+> > > +#
+> > > +# @polarity: optional polarity, default is last polarity set by the guest
+> > > +#
+> > > +# @dedicated: optional, if the vCPU is dedicated to a real CPU
+> > > +#
+> > > +# @origin: offset of the first bit of the core mask
+> > > +#
+> > > +# @mask: mask of the cores sharing the same topology
+> > > +#
+> > > +# Since: 8.0
+> > > +##
+> > > +{ 'struct': 'S390CpuTopology',
+> > > +  'data': {
+> > > +      'drawer': 'int',
+> > > +      'book': 'int',
+> > > +      'socket': 'int',
+> > > +      'polarity': 'int',
+> > > +      'dedicated': 'bool',
+> > > +      'origin': 'int',
+> > > +      'mask': 'str'
+> > > +  },
+> > > +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
+> > > +}
+> > > +
+> > > +##
+> > > +# @query-topology:
+> > > +#
+> > > +# Return information about CPU Topology
+> > > +#
+> > > +# Returns a @CpuTopology instance describing the CPU Toplogy
+> > > +# being currently used by QEMU.
+> > > +#
+> > > +# Since: 8.0
+> > > +#
+> > > +# Example:
+> > > +#
+> > > +# -> { "execute": "cpu-topology" }
+> > > +# <- {"return": [
+> > > +#     {
+> > > +#         "drawer": 0,
+> > > +#         "book": 0,
+> > > +#         "socket": 0,
+> > > +#         "polarity": 0,
+> > > +#         "dedicated": true,
+> > > +#         "origin": 0,
+> > > +#         "mask": 0xc000000000000000,
+> > > +#     },
+> > > +#    ]
+> > > +#   }
+> > > +#
+> > > +##
+> > > +{ 'command': 'query-topology',
+> > > +  'returns': ['S390CpuTopology'],
+> > > +  'if': { 'all': [ 'TARGET_S390X', 'CONFIG_KVM' ] }
+> > > +}
+> > 
+> > IIUC, you're using @mask as a way to compress the array returned
+> > from query-topology, so that it doesn't have any repeated elements
+> > with the same data. I guess I can understand that desire when the
+> > core count can get very large, this can have a large saving.
+> > 
+> > The downside of using @mask, is that now you require the caller
+> > to parse the string to turn it into a bitmask and expand the
+> > data. Generally this is considered a bit of an anti-pattern in
+> > QAPI design - we don't want callers to have to further parse
+> > the data to extract information, we want to directly consumable
+> > from the parsed JSON doc.
 > 
+> Not exactly, the mask is computed by the firmware to provide it to the guest
+> and is already available when querying the topology.
+> But I understand that for the QAPI user the mask is not the right solution,
+> standard coma separated values like (1,3,5,7-11) would be much easier to
+> read.
 
+That is still inventing a second level data format for an attribute
+that needs to be parsed, and its arguably more complex.
+
+> > We already have 'query-cpus-fast' wich returns one entry for
+> > each CPU. In fact why do we need to add query-topology at all.
+> > Can't we just add book-id / drawer-id / polarity / dedicated
+> > to the query-cpus-fast result ?
+> 
+> Yes we can, I think we should, however when there are a lot of CPU it will
+> be complicated to find the CPU sharing the same socket and the same
+> attributes.
+
+It shouldn't be that hard to populate a hash table, using the set of
+socket + attributes you want as the hash key.
+
+> I think having both would be interesting.
+
+IMHO this is undesirable if we can make query-cpus-fast report
+sufficient information, as it gives a maint burden to QEMU and
+is confusing to consumers to QEMU to have multiple commands with
+largely overlapping functionality.
+
+
+With regards,
+Daniel
 -- 
-Pierre Morel
-IBM Lab Boeblingen
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
