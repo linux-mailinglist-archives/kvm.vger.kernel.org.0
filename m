@@ -2,258 +2,160 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DD78E672140
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 16:27:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 958BA6721A5
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 16:45:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230466AbjARP15 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 10:27:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57544 "EHLO
+        id S229512AbjARPpM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 10:45:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229994AbjARP1Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 10:27:25 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4C37C212F;
-        Wed, 18 Jan 2023 07:27:22 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1112)
-        id B06F020E09F3; Wed, 18 Jan 2023 07:27:21 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B06F020E09F3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1674055641;
-        bh=nyM2Q/9B+FBlb3H/YYpaI5gb/MfRcINPjbbYDRtXRvg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=B4qKpnRqJ7WP304w/B16ae2Q649R06mFxTS7U97Kex+JcUGcCcovw8E04oBMJ3hyA
-         wYOYr4TT92Y/UV6eOljcJ1Gg2ah8qaVp3BvZRT+4wLybZD4TxUG8uTXl8mO846sa8H
-         NdAMJP3V0PzHbjg/PQZCf9vZONzArtpPyWj2EmZQ=
-Date:   Wed, 18 Jan 2023 07:27:21 -0800
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com, Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v7 44/64] KVM: SVM: Remove the long-lived GHCB host
- map
-Message-ID: <20230118152721.GA24742@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-45-michael.roth@amd.com>
+        with ESMTP id S229881AbjARPpI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 10:45:08 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7126E302B3
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 07:45:06 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id r21so5188749plg.13
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 07:45:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yeOwkb15YsHX9dNg55dB8ZzXAkLncJGPCZFeKh6Ajlc=;
+        b=DPaYAEJEmxUT/xXoX8u/F9T/zjjZ6WNOKaQAk/VkEdo87tK7TKKye+wW/RjJ33r1Vm
+         PeYqmB4HWkJ4f7a9MoXlfrMJFtOMo66MZaAxGElDceJMiC43lz1L+xIS7HQ9Tw/EiN4f
+         5Zn1JCun3JyYb7ZyzE6CjNH3vEsEdiwuMHHsnBVgt9XPmywxzLERh+BK4MWRuYOaaVys
+         gRZRsvwDgqU5dXiiU0haT9xPjoUCjnkE7goIJ9xNDI4hUIcoq/dg604Mkt28Gxx7Hg/n
+         F6O3efUwmoSAO5yeaIp6WSZqPimpjd3QG+cpIcseRrOubG2GqOZx0HvQGJj6q4r6g1hZ
+         f4/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yeOwkb15YsHX9dNg55dB8ZzXAkLncJGPCZFeKh6Ajlc=;
+        b=vrvgp4Qy/zI16oV/O7+JYKeTheHnMBEx3nPV4XTncWRzgonv0pCzbRcyD27Db85UFC
+         5eLFZTHuOom5VomED7TCCOzKLrZvgvzWv29vxk9OKq1pZeulDhViP90fgkl6DAYbQlgn
+         iXydT1dKa81ppmt3OaEnu3eK8/4HhjLpEHSYSVqcNbmy+N/sgvM9NP+1pfSTNWrJFArD
+         yw4/w5dIbTkTyx0eSgV3y1FoiiPITkxtUBjOi1XlrnRwmmPQKZLYMOr8YvoKQCGbKXPw
+         B4BNIK0MJdp4RUzcijhE7IwMndL1LEnYrPmFX70Go0dELzIBf3gvDUt7nz9vLfu6GoU4
+         2TYQ==
+X-Gm-Message-State: AFqh2kry9B8zYCWWu2VK4sNpauUfTNPwC74JArRlVQNWne2r0K06j74y
+        /ojBPqLWvH+o81tO1Cl8zvVQrQ==
+X-Google-Smtp-Source: AMrXdXukW2fa36O5aBB+p7uY+amXtsGxTNaBG/asiE3oYILziz9Z7GhXRGxJHq/4+lCEv56YVGm+kQ==
+X-Received: by 2002:a17:90b:3941:b0:225:e761:6d2b with SMTP id oe1-20020a17090b394100b00225e7616d2bmr3111420pjb.1.1674056705768;
+        Wed, 18 Jan 2023 07:45:05 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id c2-20020a17090a558200b00229661c5650sm1468007pji.37.2023.01.18.07.45.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 18 Jan 2023 07:45:04 -0800 (PST)
+Date:   Wed, 18 Jan 2023 15:45:00 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Alexandru Matei <alexandru.matei@uipath.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org,
+        Mihai Petrisor <mihai.petrisor@uipath.com>,
+        Viorel Canja <viorel.canja@uipath.com>
+Subject: Re: [PATCH] KVM: VMX: Fix crash due to uninitialized current_vmcs
+Message-ID: <Y8gT/DNwUvaDjfeW@google.com>
+References: <20230118141348.828-1-alexandru.matei@uipath.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-45-michael.roth@amd.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230118141348.828-1-alexandru.matei@uipath.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:40:36PM -0600, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
+On Wed, Jan 18, 2023, Alexandru Matei wrote:
+> KVM enables 'Enlightened VMCS' and 'Enlightened MSR Bitmap' when running as
+> a nested hypervisor on top of Hyper-V. When MSR bitmap is updated,
+> evmcs_touch_msr_bitmap function uses current_vmcs per-cpu variable to mark
+> that the msr bitmap was changed.
 > 
-> On VMGEXIT, sev_handle_vmgexit() creates a host mapping for the GHCB GPA,
-> and unmaps it just before VM-entry. This long-lived GHCB map is used by
-> the VMGEXIT handler through accessors such as ghcb_{set_get}_xxx().
+> vmx_vcpu_create() modifies the msr bitmap via vmx_disable_intercept_for_msr
+> -> vmx_msr_bitmap_l01_changed which in the end calls this function. The
+> function checks for current_vmcs if it is null but the check is
+> insufficient because current_vmcs is not initialized. Because of this, the
+> code might incorrectly write to the structure pointed by current_vmcs value
+> left by another task. Preemption is not disabled so the current task can
+> also be preempted and moved to another CPU while current_vmcs is accessed
+> multiple times from evmcs_touch_msr_bitmap() which leads to crash.
 > 
-> A long-lived GHCB map can cause issue when SEV-SNP is enabled. When
-> SEV-SNP is enabled the mapped GPA needs to be protected against a page
-> state change.
-> 
-> To eliminate the long-lived GHCB mapping, update the GHCB sync operations
-> to explicitly map the GHCB before access and unmap it after access is
-> complete. This requires that the setting of the GHCBs sw_exit_info_{1,2}
-> fields be done during sev_es_sync_to_ghcb(), so create two new fields in
-> the vcpu_svm struct to hold these values when required to be set outside
-> of the GHCB mapping.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> [mdr: defer per_cpu() assignment and order it with barrier() to fix case
->       where kvm_vcpu_map() causes reschedule on different CPU]
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/kvm/svm/sev.c | 131 ++++++++++++++++++++++++++---------------
->  arch/x86/kvm/svm/svm.c |  18 +++---
->  arch/x86/kvm/svm/svm.h |  24 +++++++-
->  3 files changed, 116 insertions(+), 57 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index d5c6e48055fb..6ac0cb6e3484 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2921,15 +2921,40 @@ void sev_free_vcpu(struct kvm_vcpu *vcpu)
->  	kvfree(svm->sev_es.ghcb_sa);
->  }
->  
-> +static inline int svm_map_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
-> +{
-> +	struct vmcb_control_area *control = &svm->vmcb->control;
-> +	u64 gfn = gpa_to_gfn(control->ghcb_gpa);
-> +
-> +	if (kvm_vcpu_map(&svm->vcpu, gfn, map)) {
-> +		/* Unable to map GHCB from guest */
-> +		pr_err("error mapping GHCB GFN [%#llx] from guest\n", gfn);
-> +		return -EFAULT;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static inline void svm_unmap_ghcb(struct vcpu_svm *svm, struct kvm_host_map *map)
-> +{
-> +	kvm_vcpu_unmap(&svm->vcpu, map, true);
-> +}
-> +
->  static void dump_ghcb(struct vcpu_svm *svm)
->  {
-> -	struct ghcb *ghcb = svm->sev_es.ghcb;
-> +	struct kvm_host_map map;
->  	unsigned int nbits;
-> +	struct ghcb *ghcb;
-> +
-> +	if (svm_map_ghcb(svm, &map))
-> +		return;
-> +
-> +	ghcb = map.hva;
+> To fix this problem, this patch moves vmx_disable_intercept_for_msr calls
+> before init_vmcs call in __vmx_vcpu_reset(), as ->vcpu_reset() is invoked
+> after the vCPU is properly loaded via ->vcpu_load() and current_vmcs is
+> initialized.
 
-dump_ghcb() is called from sev_es_validate_vmgexit() with the ghcb already
-mapped. How about passing 'struct kvm_host_map *' (or struct ghcb *) as a
-param to avoid double mapping?
+IMO, moving the calls is a band-aid and doesn't address the underlying bug.  I
+don't see any reason why the Hyper-V code should use a per-cpu pointer in this
+case.  It makes sense when replacing VMX sequences that operate on the VMCS, e.g.
+VMREAD, VMWRITE, etc., but for operations that aren't direct replacements for VMX
+instructions I think we should have a rule that Hyper-V isn't allowed to touch the
+per-cpu pointer.
 
->  
->  	/* Re-use the dump_invalid_vmcb module parameter */
->  	if (!dump_invalid_vmcb) {
->  		pr_warn_ratelimited("set kvm_amd.dump_invalid_vmcb=1 to dump internal KVM state.\n");
-> -		return;
-> +		goto e_unmap;
->  	}
->  
->  	nbits = sizeof(ghcb->save.valid_bitmap) * 8;
-> @@ -2944,12 +2969,21 @@ static void dump_ghcb(struct vcpu_svm *svm)
->  	pr_err("%-20s%016llx is_valid: %u\n", "sw_scratch",
->  	       ghcb->save.sw_scratch, ghcb_sw_scratch_is_valid(ghcb));
->  	pr_err("%-20s%*pb\n", "valid_bitmap", nbits, ghcb->save.valid_bitmap);
-> +
-> +e_unmap:
-> +	svm_unmap_ghcb(svm, &map);
->  }
->  
-> -static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
-> +static bool sev_es_sync_to_ghcb(struct vcpu_svm *svm)
->  {
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
-> -	struct ghcb *ghcb = svm->sev_es.ghcb;
-> +	struct kvm_host_map map;
-> +	struct ghcb *ghcb;
-> +
-> +	if (svm_map_ghcb(svm, &map))
-> +		return false;
-> +
-> +	ghcb = map.hva;
->  
->  	/*
->  	 * The GHCB protocol so far allows for the following data
-> @@ -2963,13 +2997,24 @@ static void sev_es_sync_to_ghcb(struct vcpu_svm *svm)
->  	ghcb_set_rbx(ghcb, vcpu->arch.regs[VCPU_REGS_RBX]);
->  	ghcb_set_rcx(ghcb, vcpu->arch.regs[VCPU_REGS_RCX]);
->  	ghcb_set_rdx(ghcb, vcpu->arch.regs[VCPU_REGS_RDX]);
-> +
-> +	/*
-> +	 * Copy the return values from the exit_info_{1,2}.
-> +	 */
-> +	ghcb_set_sw_exit_info_1(ghcb, svm->sev_es.ghcb_sw_exit_info_1);
-> +	ghcb_set_sw_exit_info_2(ghcb, svm->sev_es.ghcb_sw_exit_info_2);
-> +
-> +	trace_kvm_vmgexit_exit(svm->vcpu.vcpu_id, ghcb);
-> +
-> +	svm_unmap_ghcb(svm, &map);
-> +
-> +	return true;
->  }
->  
-> -static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
-> +static void sev_es_sync_from_ghcb(struct vcpu_svm *svm, struct ghcb *ghcb)
->  {
->  	struct vmcb_control_area *control = &svm->vmcb->control;
->  	struct kvm_vcpu *vcpu = &svm->vcpu;
-> -	struct ghcb *ghcb = svm->sev_es.ghcb;
->  	u64 exit_code;
->  
->  	/*
-> @@ -3013,20 +3058,25 @@ static void sev_es_sync_from_ghcb(struct vcpu_svm *svm)
->  	memset(ghcb->save.valid_bitmap, 0, sizeof(ghcb->save.valid_bitmap));
->  }
->  
-> -static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
-> +static int sev_es_validate_vmgexit(struct vcpu_svm *svm, u64 *exit_code)
->  {
-> -	struct kvm_vcpu *vcpu;
-> +	struct kvm_vcpu *vcpu = &svm->vcpu;
-> +	struct kvm_host_map map;
->  	struct ghcb *ghcb;
-> -	u64 exit_code;
->  	u64 reason;
->  
-> -	ghcb = svm->sev_es.ghcb;
-> +	if (svm_map_ghcb(svm, &map))
-> +		return -EFAULT;
-> +
-> +	ghcb = map.hva;
-> +
-> +	trace_kvm_vmgexit_enter(vcpu->vcpu_id, ghcb);
->  
->  	/*
->  	 * Retrieve the exit code now even though it may not be marked valid
->  	 * as it could help with debugging.
->  	 */
-> -	exit_code = ghcb_get_sw_exit_code(ghcb);
-> +	*exit_code = ghcb_get_sw_exit_code(ghcb);
->  
->  	/* Only GHCB Usage code 0 is supported */
->  	if (ghcb->ghcb_usage) {
-> @@ -3119,6 +3169,9 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
->  		goto vmgexit_err;
->  	}
->  
-> +	sev_es_sync_from_ghcb(svm, ghcb);
-> +
-> +	svm_unmap_ghcb(svm, &map);
->  	return 0;
->  
->  vmgexit_err:
-> @@ -3129,10 +3182,10 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
->  			    ghcb->ghcb_usage);
->  	} else if (reason == GHCB_ERR_INVALID_EVENT) {
->  		vcpu_unimpl(vcpu, "vmgexit: exit code %#llx is not valid\n",
-> -			    exit_code);
-> +			    *exit_code);
->  	} else {
->  		vcpu_unimpl(vcpu, "vmgexit: exit code %#llx input is not valid\n",
-> -			    exit_code);
-> +			    *exit_code);
->  		dump_ghcb(svm);
->  	}
->  
-> @@ -3142,6 +3195,8 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
->  	ghcb_set_sw_exit_info_1(ghcb, 2);
->  	ghcb_set_sw_exit_info_2(ghcb, reason);
->  
-> +	svm_unmap_ghcb(svm, &map);
-> +
->  	/* Resume the guest to "return" the error code. */
->  	return 1;
->  }
+E.g. in this case it's trivial to pass down the target (completely untested).
+
+Vitaly?
+
+
+---
+ arch/x86/kvm/vmx/hyperv.h | 12 +++++++-----
+ arch/x86/kvm/vmx/vmx.c    |  2 +-
+ 2 files changed, 8 insertions(+), 6 deletions(-)
+
+diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
+index ab08a9b9ab7d..ad16b52766bb 100644
+--- a/arch/x86/kvm/vmx/hyperv.h
++++ b/arch/x86/kvm/vmx/hyperv.h
+@@ -250,13 +250,15 @@ static inline u16 evmcs_read16(unsigned long field)
+ 	return *(u16 *)((char *)current_evmcs + offset);
+ }
+ 
+-static inline void evmcs_touch_msr_bitmap(void)
++static inline void evmcs_touch_msr_bitmap(struct vcpu_vmx *vmx)
+ {
+-	if (unlikely(!current_evmcs))
++	struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
++
++	if (WARN_ON_ONCE(!evmcs))
+ 		return;
+ 
+-	if (current_evmcs->hv_enlightenments_control.msr_bitmap)
+-		current_evmcs->hv_clean_fields &=
++	if (evmcs->hv_enlightenments_control.msr_bitmap)
++		evmcs->hv_clean_fields &=
+ 			~HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP;
+ }
+ 
+@@ -280,7 +282,7 @@ static inline u64 evmcs_read64(unsigned long field) { return 0; }
+ static inline u32 evmcs_read32(unsigned long field) { return 0; }
+ static inline u16 evmcs_read16(unsigned long field) { return 0; }
+ static inline void evmcs_load(u64 phys_addr) {}
+-static inline void evmcs_touch_msr_bitmap(void) {}
++static inline void evmcs_touch_msr_bitmap(struct vcpu_vmx *vmx) {}
+ #endif /* IS_ENABLED(CONFIG_HYPERV) */
+ 
+ #define EVMPTR_INVALID (-1ULL)
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c788aa382611..6ed6f52aad0c 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -3937,7 +3937,7 @@ static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
+ 	 * bitmap has changed.
+ 	 */
+ 	if (static_branch_unlikely(&enable_evmcs))
+-		evmcs_touch_msr_bitmap();
++		evmcs_touch_msr_bitmap(vmx);
+ 
+ 	vmx->nested.force_msr_bitmap_recalc = true;
+ }
+
+base-commit: 6e9a476ea49d43a27b42004cfd7283f128494d1d
+-- 
