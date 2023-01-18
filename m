@@ -2,179 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 94C36671B78
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 13:07:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CEDE2671C23
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 13:34:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229802AbjARMHm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 07:07:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40328 "EHLO
+        id S230166AbjARMeL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 07:34:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229997AbjARMGu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 07:06:50 -0500
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B3824134;
-        Wed, 18 Jan 2023 03:25:18 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 42AAF581DE7;
-        Wed, 18 Jan 2023 06:25:17 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Wed, 18 Jan 2023 06:25:17 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1674041117; x=1674048317; bh=3r
-        HztNKFKDzP6FM37wshrSzfwbcQFDaDtmm5ss89k4A=; b=mxJ8Ow5LoW3L4wATqS
-        QRZc3mo+g/GkoyDuddkmVm6WUo4ggGW6bSF9USy+3MYpAerT0sGFFX+0wX/Z4TyB
-        MueZeyW0+/dxyLd8gBZxmEBbj598ORS+yezgLpM8o6S22Dfuy4CnY230cw4vwVfP
-        W4MYnBdh0688rBaZlIurvNVn5T3BJPP59w6BpAEHmE21fzHLb59jS2tbZmIrnWOH
-        rzFlh+AIj9STbV7OA+sRfLV6DU/9WW4CzsUKKjJN/JRpP6OLMWS+ZDRoID2shVSW
-        iaOzCz/PqkmTsjEa7bwaBbNG0z6j3ES4Qn9DUFkE4j9cTjOA9hxptoxS6rOAf5Jc
-        5JWw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; t=1674041117; x=1674048317; bh=3rHztNKFKDzP6FM37wshrSzfwbcQ
-        FDaDtmm5ss89k4A=; b=C+spHhDandahXHFa+N1IYo9iF9EF1hPn2Nh5/XYbXyjW
-        I7CBcs6UrA1ERS1xi993zVHrKcobSsQo22TGwkST1h9WcRnLktG81eVxjYVp2ekD
-        3qI/leuzV01/6CylFPxXfIhdLkBf1S/lO3XUf64qmUEY46d5cwyWaKXNCGIrCTNJ
-        WlIGFcgPuTLL8ROkUydAQJpZUvdoUi7HUwTyp+nTAmm4L9/NClWlL4iF9Ldwybe0
-        NX0FUm6lE/N880Kn4YdxDY4V70+IrJB3PWPWc3JmUX7dLH0x9cj29V3URhycxdf0
-        H8MxGF4IHT3TXwfgSE5fwlpvRAnSjYs/U45z6pm12A==
-X-ME-Sender: <xms:G9fHY_ep1MNRwtvIOOEMd19i0OqlrUclzwsljdwYKAEjA_UsC2jA0Q>
-    <xme:G9fHY1Nk6pvM6KeHQ7jq5h30qzvNcusT2e5KFW4AXTSNK3TD5KACjEUayuekKwXdI
-    JY1GhhtnH8QbIxOtB4>
-X-ME-Received: <xmr:G9fHY4ih02aM9oeJ3OiNr0KHSXCiahDUJ1xdid6Gk2NkrDT3xjS6G_NaV1cS6VrwggYgRQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedruddtkedgvdekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
-    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
-    grmhgvqeenucggtffrrghtthgvrhhnpeegvdevjeehleetkeeigfevkeehtdeklefgleef
-    leehuefgveevgfdvieejvedvveenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdhqvg
-    hmuhdrohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhr
-    ohhmpehkihhrihhllhesshhhuhhtvghmohhvrdhnrghmvg
-X-ME-Proxy: <xmx:G9fHYw9jfwnpU4Nh4xAVbKbCm4tzw1x4eZ00yL-nE5V1K4GCoS0_hA>
-    <xmx:G9fHY7trVA4spyMhA9NVhPpA_nYklvmVkvzKxGv790UAvZgCJzbiew>
-    <xmx:G9fHY_F8Bu4CYoL1-3vPRx_UQyXcUQSYo1gFwSmk-COF02pgKlj2MQ>
-    <xmx:HdfHY7zYGKxeYUa8MD3orQFQtkqWHaHKrFajIvy7HqohsSp1J9MG0g>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 18 Jan 2023 06:25:14 -0500 (EST)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 6EBD1104CC6; Wed, 18 Jan 2023 14:25:11 +0300 (+03)
-Date:   Wed, 18 Jan 2023 14:25:11 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Vishal Annapurve <vannapurve@google.com>, x86@kernel.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        joro@8bytes.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com,
-        shuah@kernel.org, yang.zhong@intel.com, ricarkol@google.com,
-        aaronlewis@google.com, wei.w.wang@intel.com,
-        kirill.shutemov@linux.intel.com, corbet@lwn.net, hughd@google.com,
-        jlayton@kernel.org, bfields@fieldses.org,
-        akpm@linux-foundation.org, chao.p.peng@linux.intel.com,
-        yu.c.zhang@linux.intel.com, jun.nakajima@intel.com,
-        dave.hansen@intel.com, michael.roth@amd.com, qperret@google.com,
-        steven.price@arm.com, ak@linux.intel.com, david@redhat.com,
-        luto@kernel.org, vbabka@suse.cz, marcorr@google.com,
-        erdemaktas@google.com, pgonda@google.com, nikunj@amd.com,
-        diviness@google.com, maz@kernel.org, dmatlack@google.com,
-        axelrasmussen@google.com, maciej.szmigiero@oracle.com,
-        mizhang@google.com, bgardon@google.com, ackerleytng@google.com
-Subject: Re: [V2 PATCH 0/6] KVM: selftests: selftests for fd-based private
- memory
-Message-ID: <20230118112511.wrljyng2xiz3yktv@box.shutemov.name>
-References: <20221205232341.4131240-1-vannapurve@google.com>
- <Y8dG3WDxY2OCGPby@google.com>
+        with ESMTP id S230292AbjARMdq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 07:33:46 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE8756D6AC
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 03:54:33 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30I9dfQZ009044;
+        Wed, 18 Jan 2023 11:54:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=OeeXRPElEVOc+QB2cqhaK7Z6Dsgk1TA52g6zq23E4wY=;
+ b=Q1EHDjzdW0vS5HMBvPUqY4HQKcgw3dIIQRkhj8cnmLNBf7ZCcL1yWy2GZD7zrD6OYMYK
+ 8qWKMKa3qtoBHsoVAzRwEP01+zNTdHjna+/sHFVzbTqK+B2F7CX6Pj+ZL7bNqyoz3xnB
+ s+NobE+Oeryb0m7M0PGVEskJRCfZJADR6SssN2chktATZhu1Q78TdSlt6eAWrdTMFiux
+ 6dNLg1hNA/thpk9TWKzhWMIt3fPoWCHcekaQOnBGQid217XtxvOcyCcYD4AVh/Yhqwcv
+ Sbyj8aGXKEs7pimdRMgaojqzzOB18ffDAhzxzX7kz00P6LJuBE5DqVYGdFk7Rxmhk9HB Dg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6bu0ek90-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Jan 2023 11:54:22 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30IBjsMl026639;
+        Wed, 18 Jan 2023 11:54:21 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6bu0ek85-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Jan 2023 11:54:21 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30I6V0eR013172;
+        Wed, 18 Jan 2023 11:54:19 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3n3knfbtje-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 18 Jan 2023 11:54:19 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30IBsF2920382052
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 18 Jan 2023 11:54:15 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6183C20043;
+        Wed, 18 Jan 2023 11:54:15 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9766C2004B;
+        Wed, 18 Jan 2023 11:54:13 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.152.224.238])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 18 Jan 2023 11:54:13 +0000 (GMT)
+Message-ID: <61a19c4397897283754ceedfd8673c63ef1c369b.camel@linux.ibm.com>
+Subject: Re: [PATCH v14 03/11] target/s390x/cpu topology: handle STSI(15)
+ and build the SYSIB
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Thomas Huth <thuth@redhat.com>,
+        Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org,
+        frankja@linux.ibm.com
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
+        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
+        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Wed, 18 Jan 2023 12:54:13 +0100
+In-Reply-To: <9bf4841b-57a6-b08d-3d39-cd79ad0036e3@redhat.com>
+References: <20230105145313.168489-1-pmorel@linux.ibm.com>
+         <20230105145313.168489-4-pmorel@linux.ibm.com>
+         <5cf19913-b2d7-d72d-4332-27aa484f72e4@redhat.com>
+         <01782d4e-4c84-f958-b427-ff294f6c3c3f@linux.ibm.com>
+         <9bf4841b-57a6-b08d-3d39-cd79ad0036e3@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.2 (3.46.2-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y8dG3WDxY2OCGPby@google.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: _qPzN6SMSpk4ID8ntyw5DgXBDVV6QYdT
+X-Proofpoint-ORIG-GUID: vW75gtXlurtmAUdVjSB-jfXHM2Gni4kn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-18_04,2023-01-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ priorityscore=1501 bulkscore=0 phishscore=0 mlxlogscore=999
+ lowpriorityscore=0 impostorscore=0 malwarescore=0 spamscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301180096
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 18, 2023 at 01:09:49AM +0000, Sean Christopherson wrote:
-> On Mon, Dec 05, 2022, Vishal Annapurve wrote:
-> > This series implements selftests targeting the feature floated by Chao via:
-> > https://lore.kernel.org/lkml/20221202061347.1070246-10-chao.p.peng@linux.intel.com/T/
-> > 
-> > Below changes aim to test the fd based approach for guest private memory
-> > in context of normal (non-confidential) VMs executing on non-confidential
-> > platforms.
-> > 
-> > private_mem_test.c file adds selftest to access private memory from the
-> > guest via private/shared accesses and checking if the contents can be
-> > leaked to/accessed by vmm via shared memory view before/after conversions.
-> > 
-> > Updates in V2:
-> > 1) Simplified vcpu run loop implementation API
-> > 2) Removed VM creation logic from private mem library
-> 
-> I pushed a rework version of this series to:
-> 
->   git@github.com:sean-jc/linux.git x86/upm_base_support
+On Wed, 2023-01-18 at 11:26 +0100, Thomas Huth wrote:
+> On 17/01/2023 17.56, Pierre Morel wrote:
+> >=20
+> >=20
+> > On 1/10/23 15:29, Thomas Huth wrote:
+> > > On 05/01/2023 15.53, Pierre Morel wrote:
+> > > > On interception of STSI(15.1.x) the System Information Block
+> > > > (SYSIB) is built from the list of pre-ordered topology entries.
+> > > >=20
+> > > > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> > > > ---
+> ...
+> > > > +typedef struct SysIBTl_container {
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t nl;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t reserved[6];
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t id;
+> > > > +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_container;
+> > > > +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_container) !=3D 8);
+> > > > +
+> > > > +/* CPU type Topology List Entry */
+> > > > +typedef struct SysIBTl_cpu {
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t nl;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t reserved0[3];
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t reserved1:5;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t dedicated:1;
+> > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 uint8_t polarity:2;
+> > >=20
+> > > Hmmm, yet another bitfield...
+> >=20
+> > Yes, this is the firmware interface.
+> > If it makes problem I can use masks and logic arithmetic
+>=20
+> It depends ... if we are sure that this will ever only be used with KVM o=
+n=20
+> real s390x hardware, then bitfields are OK. If we think that this is=20
+> something that could be implemented in TCG, too, I'd scratch the bitfield=
+s=20
+> and use logic arithmetic instead...
 
-It still has build issue with lockdep enabled that I mentioned before:
+Is there something like linux' bitfield.h in qemu?
+In this case it's only two fields, and not too complicated, but I imagine i=
+t could
+get quite ugly to do it manually in other cases.
+>=20
+> I'm not too experienced with this CPU topology stuff, but it sounds like =
+it=20
+> could be implemented in TCG without too much efforts one day, too, so I'd=
+=20
+> rather go with the logic arithmetic immediately instead if it is not too=
+=20
+> annoying for you right now.
+>=20
+> > > > diff --git a/target/s390x/kvm/cpu_topology.c=20
+> > > > b/target/s390x/kvm/cpu_topology.c
+> > > > new file mode 100644
+> > > > index 0000000000..3831a3264c
+> > > > --- /dev/null
+> > > > +++ b/target/s390x/kvm/cpu_topology.c
+> > > > @@ -0,0 +1,136 @@
+> > > > +/*
+> > > > + * QEMU S390x CPU Topology
+> > > > + *
+> > > > + * Copyright IBM Corp. 2022
+> > >=20
+> > > Happy new year?
+> >=20
+> > So after Nina's comment what do I do?
+> > let it be 22 because I started last year or update because what is impo=
+rtant=20
+> > is when it comes into mainline?
+>=20
+> Honestly, I don't have a really good clue either... But keeping 2022 is=
+=20
+> certainly fine for me, too.
+>=20
+>   Thomas
+>=20
 
-https://lore.kernel.org/all/20230116134845.vboraky2nd56szos@box.shutemov.name/
-
-And when compiled with lockdep, it triggers a lot of warnings about missed
-locks, like this:
-
-[   59.632024] kvm: FIXME: Walk the memory attributes of the slot and set the mixed status appropriately
-[   59.684888] ------------[ cut here ]------------
-[   59.690677] WARNING: CPU: 2 PID: 138 at include/linux/kvm_host.h:2307 kvm_mmu_do_page_fault+0x19a/0x1b0
-[   59.693531] CPU: 2 PID: 138 Comm: private_mem_con Not tainted 6.1.0-rc4-00624-g7e536bf3c45c-dirty #1
-[   59.696265] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-[   59.699586] RIP: 0010:kvm_mmu_do_page_fault+0x19a/0x1b0
-[   59.700720] Code: d8 1c 00 00 eb e3 65 48 8b 0c 25 28 00 00 00 48 3b 4c 24 50 75 1b 48 83 c4 58 5b 41 5e 41 5f 5d c3 48 81 c0
-[   59.704711] RSP: 0018:ffffc90000323c80 EFLAGS: 00010246
-[   59.705830] RAX: 0000000000000000 RBX: ffff888103bc8000 RCX: ffffffff8107dff0
-[   59.707353] RDX: 0000000000000001 RSI: ffffffff82549d49 RDI: ffffffff825abe77
-[   59.708865] RBP: ffffc90000e59000 R08: 0000000000000000 R09: 0000000000000000
-[   59.710369] R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-[   59.711859] R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000180
-[   59.713338] FS:  00007f2e556de740(0000) GS:ffff8881f9d00000(0000) knlGS:0000000000000000
-[   59.714978] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   59.716168] CR2: 0000000000000000 CR3: 0000000100e90005 CR4: 0000000000372ee0
-[   59.717631] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[   59.719086] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[   59.721148] Call Trace:
-[   59.722661]  <TASK>
-[   59.723986]  ? lock_is_held_type+0xdb/0x150
-[   59.726501]  kvm_mmu_page_fault+0x41/0x170
-[   59.728946]  vmx_handle_exit+0x343/0x750
-[   59.731007]  kvm_arch_vcpu_ioctl_run+0x1d12/0x2790
-[   59.733319]  kvm_vcpu_ioctl+0x4a6/0x590
-[   59.735195]  __se_sys_ioctl+0x6a/0xb0
-[   59.736976]  do_syscall_64+0x3d/0x80
-[   59.738698]  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-[   59.740743] RIP: 0033:0x7f2e557d8f6b
-[   59.741907] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 c7 04 24 10 00 00 00 b0
-[   59.747836] RSP: 002b:00007ffe8b84eb50 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-[   59.750147] RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f2e557d8f6b
-[   59.751754] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 0000000000000007
-[   59.753361] RBP: 000000000042f880 R08: 0000000000000007 R09: 0000000000430210
-[   59.754952] R10: ca7f9f3d969d5d5c R11: 0000000000000246 R12: 000000000042d2a0
-[   59.756596] R13: 0000000100000000 R14: 0000000000422e00 R15: 00007f2e558f7000
-[   59.758231]  </TASK>
-[   59.758752] irq event stamp: 8637
-[   59.759540] hardirqs last  enabled at (8647): [<ffffffff8119ae18>] __up_console_sem+0x68/0x90
-[   59.761309] hardirqs last disabled at (8654): [<ffffffff8119adfd>] __up_console_sem+0x4d/0x90
-[   59.763022] softirqs last  enabled at (8550): [<ffffffff81123c7a>] __irq_exit_rcu+0xaa/0x130
-[   59.764731] softirqs last disabled at (8539): [<ffffffff81123c7a>] __irq_exit_rcu+0xaa/0x130
-[   59.766409] ---[ end trace 0000000000000000 ]---
-
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
