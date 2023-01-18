@@ -2,30 +2,32 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 479AD67204D
-	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 15:55:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0D29C67204F
+	for <lists+kvm@lfdr.de>; Wed, 18 Jan 2023 15:55:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231557AbjAROzj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 09:55:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55306 "EHLO
+        id S229512AbjAROzs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 09:55:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231723AbjAROzJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 09:55:09 -0500
+        with ESMTP id S231768AbjAROzQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 09:55:16 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 055C462D0D
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 06:49:27 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C35E94ED03
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 06:49:36 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C6B8B169C;
-        Wed, 18 Jan 2023 06:50:09 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C61B71477;
+        Wed, 18 Jan 2023 06:50:18 -0800 (PST)
 Received: from e121798.cambridge.arm.com (e121798.cambridge.arm.com [10.1.196.158])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0458B3F67D;
-        Wed, 18 Jan 2023 06:49:26 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05D223F67D;
+        Wed, 18 Jan 2023 06:49:35 -0800 (PST)
 From:   Alexandru Elisei <alexandru.elisei@arm.com>
 To:     andrew.jones@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: [kvm-unit-tests PATCH v4 0/2] arm: Add PSCI CPU_OFF test
-Date:   Wed, 18 Jan 2023 14:49:10 +0000
-Message-Id: <20230118144912.32049-1-alexandru.elisei@arm.com>
+Subject: [kvm-unit-tests PATCH v4 1/2] arm/psci: Test that CPU 1 has been successfully brought online
+Date:   Wed, 18 Jan 2023 14:49:11 +0000
+Message-Id: <20230118144912.32049-2-alexandru.elisei@arm.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20230118144912.32049-1-alexandru.elisei@arm.com>
+References: <20230118144912.32049-1-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
@@ -36,63 +38,202 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The series adds a test for the PSCI function CPU_OFF. The test is
-implemented in patch #2, "arm/psci: Add PSCI CPU_OFF test case".  Patch #1,
-"arm/psci: Test that CPU 1 has been successfully brought online" is a
-preparatory patch to allow the CPU_OFF test to run after the CPU_ON test.
-Executing the CPU_OFF test after the CPU_ON test makes the most sense,
-since CPU_OFF requires all the CPUs to be brought online before the test
-can execute, and this is exactly what the CPU_ON test does.
+For the PSCI CPU_ON function test, all other CPUs perform a CPU_ON call
+that target CPU 1. The test is considered a success if CPU_ON returns PSCI
+SUCCESS exactly once, and for the rest of the calls PSCI ALREADY_ON.
 
-I believe that proving that a CPU has been successfully offlined is an
-undecidable problem - it might just be that the CPU is stuck at a higher
-exception level doing something else entirely, and if the test were to wait
-long enough, the CPU would return from the CPU_OFF call and start executing
-code, thus failing to be offlined. Right now, the test waits for 1 second
-before checking that all the other CPUs are offline. I thought this was a
-good balance between making the test fast and being reasonably sure that
-the offline succeeded. I'm open to suggestions here if anyone thinks
-otherwise.
+Enhance the test by checking that CPU 1 is actually online and able to
+execute code. Also make the test more robust by checking that the CPU_ON
+call returns, instead of assuming that it will always succeed and
+hanging indefinitely if it doesn't.
 
-Tested for both the arm and arm64 architectures: on an x86 machine (qemu
-with TCG), and an ampere emag (qemu and kvmtool).
+Since the CPU 1 thread is now being set up properly by kvm-unit-tests
+when being brought online, it becomes possible to add other tests in the
+future that require all CPUs.
 
-And Nikita is not longer at Arm, and I don't have a new email address where
-she can be reached, so I didn't CC her.
+The include header order in arm/psci.c has been changed to be in
+alphabetic order. This means moving the errata.h include before
+libcflat.h, which causes compilation to fail because of missing includes
+in errata.h. Fix that also by including the needed header in errata.h.
 
-Changelog:
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+---
+ arm/psci.c        | 60 ++++++++++++++++++++++++++++++++++++-----------
+ lib/arm/asm/smp.h |  1 +
+ lib/arm/smp.c     | 12 +++++++---
+ lib/errata.h      |  2 ++
+ 4 files changed, 58 insertions(+), 17 deletions(-)
 
-v3 -> v4:
-- Moved ownership of the series to Alexandru Elisei. All bugs are mine.
-- Moved the timeout for the CPU_ON test to patch #1.
-- Changed the include order for arm/psic.c in patch #1 to order the headers
-  alphabetically.
-- Run the CPU_OFF test only if CPU_ON succeeds, because CPU_OFF expects all
-  CPUs to be online, the test would otherwise hang forever.
-- Minor style changes here and there.
-
-v2 -> v3:
-- Add timeout so that test does not hang if CPU1 fails to come online
-- Remove unnecessary call of on_cpus() in the condition where target CPU is not online.
-
-v1 -> v2:
-- Modify PSCI CPU_ON test to ensure CPU 1 remains online after the execution of the test.
-- Addition of PSCI CPU_OFF test and calling it after PSCI CPU_ON test has been executed.
-
-Alexandru Elisei (1):
-  arm/psci: Test that CPU 1 has been successfully brought online
-
-Nikita Venkatesh (1):
-  arm/psci: Add PSCI CPU_OFF test case
-
- arm/psci.c        | 132 +++++++++++++++++++++++++++++++++++++++-------
- lib/arm/asm/smp.h |   1 +
- lib/arm/smp.c     |  12 +++--
- lib/errata.h      |   2 +
- 4 files changed, 125 insertions(+), 22 deletions(-)
-
-
-base-commit: 2480430a36102f8ea276b3bfb1d64d5dacc23b8f
+diff --git a/arm/psci.c b/arm/psci.c
+index efa0722c0566..e96be941953b 100644
+--- a/arm/psci.c
++++ b/arm/psci.c
+@@ -7,11 +7,13 @@
+  *
+  * This work is licensed under the terms of the GNU LGPL, version 2.
+  */
+-#include <libcflat.h>
+ #include <errata.h>
++#include <libcflat.h>
++
++#include <asm/delay.h>
+ #include <asm/processor.h>
+-#include <asm/smp.h>
+ #include <asm/psci.h>
++#include <asm/smp.h>
+ 
+ static bool invalid_function_exception;
+ 
+@@ -72,14 +74,23 @@ static int cpu_on_ret[NR_CPUS];
+ static cpumask_t cpu_on_ready, cpu_on_done;
+ static volatile int cpu_on_start;
+ 
+-static void cpu_on_secondary_entry(void)
++extern void secondary_entry(void);
++static void cpu_on_do_wake_target(void)
+ {
+ 	int cpu = smp_processor_id();
+ 
+ 	cpumask_set_cpu(cpu, &cpu_on_ready);
+ 	while (!cpu_on_start)
+ 		cpu_relax();
+-	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(halt));
++	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(secondary_entry));
++	cpumask_set_cpu(cpu, &cpu_on_done);
++}
++
++static void cpu_on_target(void)
++{
++	int cpu = smp_processor_id();
++
++	cpu_on_ret[cpu] = PSCI_RET_ALREADY_ON;
+ 	cpumask_set_cpu(cpu, &cpu_on_done);
+ }
+ 
+@@ -87,33 +98,53 @@ static bool psci_cpu_on_test(void)
+ {
+ 	bool failed = false;
+ 	int ret_success = 0;
+-	int cpu;
+-
+-	cpumask_set_cpu(1, &cpu_on_ready);
+-	cpumask_set_cpu(1, &cpu_on_done);
++	int i, cpu;
+ 
+ 	for_each_present_cpu(cpu) {
+ 		if (cpu < 2)
+ 			continue;
+-		smp_boot_secondary(cpu, cpu_on_secondary_entry);
++		smp_boot_secondary(cpu, cpu_on_do_wake_target);
+ 	}
+ 
+ 	cpumask_set_cpu(0, &cpu_on_ready);
++	cpumask_set_cpu(1, &cpu_on_ready);
+ 	while (!cpumask_full(&cpu_on_ready))
+ 		cpu_relax();
+ 
++	/*
++	 * Wait for all other CPUs to be online before configuring the thread
++	 * for the target CPU, as all secondaries are set up using the same
++	 * global variable.
++	 */
++	smp_prepare_secondary(1, cpu_on_target);
++
+ 	cpu_on_start = 1;
+ 	smp_mb();
+ 
+-	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(halt));
++	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(secondary_entry));
+ 	cpumask_set_cpu(0, &cpu_on_done);
+ 
+-	while (!cpumask_full(&cpu_on_done))
+-		cpu_relax();
++	report_info("waiting for CPU1 to come online...");
++	for (i = 0; i < 10; i++) {
++		mdelay(100);
++		if (cpumask_full(&cpu_on_done))
++			break;
++	}
++
++	if (!cpumask_full(&cpu_on_done)) {
++		for_each_present_cpu(cpu) {
++			if (!cpumask_test_cpu(cpu, &cpu_on_done)) {
++				if (cpu == 1)
++					report_info("CPU1 failed to come online");
++				else
++					report_info("CPU%d failed to online CPU1", cpu);
++			}
++		}
++		failed = true;
++		goto out;
++	}
+ 
+ 	for_each_present_cpu(cpu) {
+-		if (cpu == 1)
+-			continue;
+ 		if (cpu_on_ret[cpu] == PSCI_RET_SUCCESS) {
+ 			ret_success++;
+ 		} else if (cpu_on_ret[cpu] != PSCI_RET_ALREADY_ON) {
+@@ -127,6 +158,7 @@ static bool psci_cpu_on_test(void)
+ 		failed = true;
+ 	}
+ 
++out:
+ 	return !failed;
+ }
+ 
+diff --git a/lib/arm/asm/smp.h b/lib/arm/asm/smp.h
+index 077afde85520..ff2ef8f88247 100644
+--- a/lib/arm/asm/smp.h
++++ b/lib/arm/asm/smp.h
+@@ -49,6 +49,7 @@ static inline void set_cpu_idle(int cpu, bool idle)
+ }
+ 
+ typedef void (*secondary_entry_fn)(void);
++extern void smp_prepare_secondary(int cpu, secondary_entry_fn entry);
+ extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
+ extern void on_cpu_async(int cpu, void (*func)(void *data), void *data);
+ extern void on_cpu(int cpu, void (*func)(void *data), void *data);
+diff --git a/lib/arm/smp.c b/lib/arm/smp.c
+index 98a5054e039b..947f417f4aea 100644
+--- a/lib/arm/smp.c
++++ b/lib/arm/smp.c
+@@ -58,13 +58,19 @@ secondary_entry_fn secondary_cinit(void)
+ 	return entry;
+ }
+ 
+-static void __smp_boot_secondary(int cpu, secondary_entry_fn entry)
++void smp_prepare_secondary(int cpu, secondary_entry_fn entry)
+ {
+-	int ret;
+-
+ 	secondary_data.stack = thread_stack_alloc();
+ 	secondary_data.entry = entry;
+ 	mmu_mark_disabled(cpu);
++}
++
++static void __smp_boot_secondary(int cpu, secondary_entry_fn entry)
++{
++	int ret;
++
++	smp_prepare_secondary(cpu, entry);
++
+ 	ret = cpu_psci_cpu_boot(cpu);
+ 	assert(ret == 0);
+ 
+diff --git a/lib/errata.h b/lib/errata.h
+index 5af0eb3bf8e2..de8205d8b370 100644
+--- a/lib/errata.h
++++ b/lib/errata.h
+@@ -6,6 +6,8 @@
+  */
+ #ifndef _ERRATA_H_
+ #define _ERRATA_H_
++#include <libcflat.h>
++
+ #include "config.h"
+ 
+ #ifndef CONFIG_ERRATA_FORCE
 -- 
 2.25.1
 
