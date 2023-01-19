@@ -2,73 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 91CE167409C
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 19:13:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5C6CA6740AC
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 19:15:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230287AbjASSNR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 13:13:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39124 "EHLO
+        id S230136AbjASSPM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 13:15:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbjASSNG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 13:13:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BAC38F7F8
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:12:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674151939;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZdrDTN701XEr5+CWMY6m6v20b2OvSDiU2dbFC+yj4Dk=;
-        b=ZMBnuSXvx1eaEbcff1+HP5rI5WWiGLYKsV904AU2do5jVwfaw3kMgAI/mNL8bqa6EhzJ3h
-        /HzaFrr9vOMiG2OrMVb+Uug2f1XxetZX2XFdV6YTbYunHTNoNF9qO2IEHRoVSmFWkdzNMC
-        ajeEz6Whb2vKoB+0+s+64YWE28Vl1Wo=
-Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
- [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-597-9p--hi4vOW6qSsgPYkEdOA-1; Thu, 19 Jan 2023 13:12:17 -0500
-X-MC-Unique: 9p--hi4vOW6qSsgPYkEdOA-1
-Received: by mail-vs1-f71.google.com with SMTP id k8-20020a056102004800b003d0f2b18a22so960397vsp.5
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:12:17 -0800 (PST)
+        with ESMTP id S229966AbjASSPG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 13:15:06 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 664DB917D3
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:15:02 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id a14-20020a17090a70ce00b00229a2f73c56so6637318pjm.3
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:15:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xr3qcJgaF5vAgY/VqxwE2Z8SykyvgmfIn0SNmkAE4nU=;
+        b=qhMvPE0EEmswKPBN9nfYdqxGi4HHSszB3D3IZvKJLTzMB+z8e7t9oJVhxCulTj+K48
+         1ffeM0ws/7/yw7STUqda2AkBMXQaJxE63pPVbHIvABTbHarfvbc7+ajRWHFyytY19cHt
+         kM+YgZTJzkjAtzdtqdHyhYifGOcGPJEjSvt1+Rgp2UMS4r5tLkBY8Ew5pbcMYBrSEFPo
+         gb/QzeaIVxzGUk9Y4ZtkmF6veMo14/BHj04g5falnYfDQIliBYcw9F5+nuhm6rwo2vOz
+         yu67BiSthp50cEWC6OJFICGk8M0WbX9T07CUHYLSMtFEtCO1tXKDw8T7/h8tqWExludb
+         vS5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZdrDTN701XEr5+CWMY6m6v20b2OvSDiU2dbFC+yj4Dk=;
-        b=4KdJhAA4tgoD36x187Fn8EUGd+wj1mDYiBXSkC0Y3S8D5m8JWSaDLbppBWsCS6e2cw
-         ONiGiQ3HzCd7pGkQVke1mUWeMAuaJ6aluzJft34zpUcKibDSvNiSdcrXGJ97hHIy1BL8
-         JVkrICP8K6SXK5EyhSzf0xYLHLAp+p3uPTECDqtEIbHLQ66jLD+VmYiRJ+BRGv6Tlv1k
-         EYSlXM55QeYX02SNAkyDuyM815nVXi5T2IcnF50jvCCNCAIE5wouZV7O1CNSHtEgsfCS
-         nlbUEVEen0iHN0V8Z0upGY2JuW8jL9/6u+GiqYfDQ+vt10r+4XLYb9bP/p5ELYBrnxVW
-         AQuw==
-X-Gm-Message-State: AFqh2koHBE9/7vcuZHLLzIx+7CAwJkSVIaJ4IEi7FokImq497q4g5gs8
-        LVa05TnXDKo+w2ThmcFAF0AvPApbrb2f7LLc6A6GSsRHkwhGFGLn7l13UGNLgFBUzS+s5+T90JB
-        c3ye9s+lkq2JLu+jlbA54VWGiNUSL
-X-Received: by 2002:a1f:e701:0:b0:3dd:f5ea:63a2 with SMTP id e1-20020a1fe701000000b003ddf5ea63a2mr1626161vkh.10.1674151937440;
-        Thu, 19 Jan 2023 10:12:17 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXsY5p+k0R0sGPWSdQFYydcLWgiPLWtRkKOKc1nkSGhtM7pkgJykCPn8YcbFoLMnuG/wlE/Bp0MebqiMNtWQH3o=
-X-Received: by 2002:a1f:e701:0:b0:3dd:f5ea:63a2 with SMTP id
- e1-20020a1fe701000000b003ddf5ea63a2mr1626156vkh.10.1674151937159; Thu, 19 Jan
- 2023 10:12:17 -0800 (PST)
-MIME-Version: 1.0
-References: <20221228110410.1682852-1-pbonzini@redhat.com> <20230119155800.fiypvvzoalnfavse@linux.intel.com>
- <Y8mEmSESlcdgtVg4@google.com> <CABgObfb6Z2MkG8yYtbObK4bhAD_1s8Q_M=PnP5pF-sk3=w8XDg@mail.gmail.com>
- <Y8mGHyg6DjkSyN5A@google.com>
-In-Reply-To: <Y8mGHyg6DjkSyN5A@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu, 19 Jan 2023 19:12:05 +0100
-Message-ID: <CABgObfZZ3TLvW=Qqph16T0759nWy0PL_C3w3g=PACj9cpupBQA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: fix deadlock for KVM_XEN_EVTCHN_RESET
-To:     Sean Christopherson <seanjc@google.com>
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xr3qcJgaF5vAgY/VqxwE2Z8SykyvgmfIn0SNmkAE4nU=;
+        b=3EqFNuQK3k54VSrFXVxjdIb+1kLcnRn7i6UwJpsvzQh7lePU3Z2hJBnwlwky6X/jM5
+         BFYJmhOZzw9FCqR7KfrnXY/xf941hNFkqzW9L8y/9+pVS/nmCKhxsia/4Z17247y6ACp
+         lCCX93rceLL9i6tBAbV1iKOdW6tyOY4T57VQd+h8j+z9HI6FLvINAg1sCNcxRcwJBw9O
+         J0VMx4c6a2HbQUJL3Fjh+NjTA4xSp8oPl9QlwIBWFlAuozGaTnywwr7WlCp/GiorF1yM
+         AtoIlEMp6+lhnFtyO++FAzf1F6pFmHpVcDSLkudzo2rRH/u7PjCQwf5AfRbpkzZBcpY+
+         jQPQ==
+X-Gm-Message-State: AFqh2kpdunxliigtFRhN/ZnfcGemggc8w0ma0STRCWFVJiQqnl6qBaF2
+        SQ3g6axXSulAw5hoaqVjQIGO3g==
+X-Google-Smtp-Source: AMrXdXuVsr2wL2Ppd/PjLvkpdiTDSs59fU6gdeTLm9yL9pzPrqst5KlUg1m4KtxFcUCKIQZvhK7sVQ==
+X-Received: by 2002:a05:6a20:a883:b0:a4:efde:2ed8 with SMTP id ca3-20020a056a20a88300b000a4efde2ed8mr3293758pzb.0.1674152101753;
+        Thu, 19 Jan 2023 10:15:01 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id z3-20020a6552c3000000b0049b7b1205a0sm21371832pgp.54.2023.01.19.10.15.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 10:15:01 -0800 (PST)
+Date:   Thu, 19 Jan 2023 18:14:57 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
 Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
         linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Michal Luczaj <mhal@rbox.co>,
         David Woodhouse <dwmw@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Subject: Re: [PATCH] KVM: x86: fix deadlock for KVM_XEN_EVTCHN_RESET
+Message-ID: <Y8mIoUqO8qFgoBZI@google.com>
+References: <20221228110410.1682852-1-pbonzini@redhat.com>
+ <20230119155800.fiypvvzoalnfavse@linux.intel.com>
+ <Y8mEmSESlcdgtVg4@google.com>
+ <CABgObfb6Z2MkG8yYtbObK4bhAD_1s8Q_M=PnP5pF-sk3=w8XDg@mail.gmail.com>
+ <Y8mGHyg6DjkSyN5A@google.com>
+ <CABgObfZZ3TLvW=Qqph16T0759nWy0PL_C3w3g=PACj9cpupBQA@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABgObfZZ3TLvW=Qqph16T0759nWy0PL_C3w3g=PACj9cpupBQA@mail.gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,16 +78,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 7:04 PM Sean Christopherson <seanjc@google.com> wrote:
-> > It's clang only; GCC only warns with -Wpedantic. Plus, bots probably
-> > don't compile tools/ that much.
->
-> /wave
->
-> Want to queue Yu's fix directly Paolo?  I was assuming you'd be offline until
-> sometime tomorrow.
+On Thu, Jan 19, 2023, Paolo Bonzini wrote:
+> On Thu, Jan 19, 2023 at 7:04 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > It's clang only; GCC only warns with -Wpedantic. Plus, bots probably
+> > > don't compile tools/ that much.
+> >
+> > /wave
+> >
+> > Want to queue Yu's fix directly Paolo?  I was assuming you'd be offline until
+> > sometime tomorrow.
+> 
+> Yes, I can, but what other patches were you meaning to send?
 
-Yes, I can, but what other patches were you meaning to send?
+A minor selftest fix
 
-Paolo
+  https://lore.kernel.org/all/20230111183408.104491-1-vipinsh@google.com
 
+and a fix for a longstanding VMX bug that seems problematic enough that it
+warrants going into this cycle.
+
+  https://lore.kernel.org/all/20221114164823.69555-1-hborghor@amazon.de
