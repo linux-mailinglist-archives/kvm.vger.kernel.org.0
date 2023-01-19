@@ -2,88 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B7C69674B68
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 05:54:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 610A4674A96
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 05:28:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231209AbjATEyL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 23:54:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49232 "EHLO
+        id S230039AbjATE2s (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 23:28:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230481AbjATExr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 23:53:47 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BA3BCE8A2;
-        Thu, 19 Jan 2023 20:45:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674189914; x=1705725914;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=DuOBg1V/kEEpNk+BV4bYqVrWJSOOFRR3sdWDamFrvt0=;
-  b=DpH5Gz6m8iV2ch09fwLFA5GAnqlxbeNoa7S3bI/YFsVgN87LhKKoHb0Q
-   cSCYdT3KmY8GtvjtNyqfoyZjFlZdvPRAzezNcOKx6+isXeCmUB45fV3DF
-   026+DbQtNrLVHraaQW0P2BkA1avJfJCRa80U8itPz7XQ3IEFFPIYbClxs
-   28pG13X7QphCrYMsq60VrkQyCLoGnlbwbBVjTPl45e3wWdRgqLxggzixe
-   SAA5swOR1eMGWiVdWM7YFfhsxGvQQy2A0iZNyMvQ//2lqzy3XrGkXktPN
-   QJ1loYld9EDGI/1Qb4zzbto8KYzzKZkmUqKFZsbc6A6sRmm5zTKHoGxD2
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="308821076"
-X-IronPort-AV: E=Sophos;i="5.97,229,1669104000"; 
-   d="scan'208";a="308821076"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 03:47:51 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="988957189"
-X-IronPort-AV: E=Sophos;i="5.97,229,1669104000"; 
-   d="scan'208";a="988957189"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.252.185.248]) ([10.252.185.248])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 03:47:45 -0800
-Message-ID: <08c874f6-0c59-0b74-a2c8-7ad61356af6f@linux.intel.com>
-Date:   Thu, 19 Jan 2023 19:47:42 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Cc:     baolu.lu@linux.intel.com,
-        Alex Williamson <alex.williamson@redhat.com>,
-        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-tegra@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v2 06/10] iommu/intel: Add a gfp parameter to
- alloc_pgtable_page()
-Content-Language: en-US
-To:     Jason Gunthorpe <jgg@nvidia.com>, Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Robin Murphy <robin.murphy@arm.com>
-References: <6-v2-ce66f632bd0d+484-iommu_map_gfp_jgg@nvidia.com>
-From:   Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <6-v2-ce66f632bd0d+484-iommu_map_gfp_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229797AbjATE2b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 23:28:31 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEDEDB1ED3;
+        Thu, 19 Jan 2023 20:28:27 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 279F8B82698;
+        Thu, 19 Jan 2023 17:24:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0EE7C433EF;
+        Thu, 19 Jan 2023 17:24:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674149068;
+        bh=esmAuiMb4cE5hZfqa2pdZ4JKU4zWFBBvjoAoXwc+zAk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=FItgwmM67QScUUENZ8Zwtagr5mIdG5cEHxPFfSNuC1jM6dBrsQGhnCtdKL1v4Yf0w
+         dW3PN2nS8nWYwK6BvAjRYCRs1jNPqcxP6UwIOvTzzQ9T/wZ6VcEzgDHqur2z3W0vff
+         Q1U6HgQ7VMeTq9MX32okWCpOlh8xJ8QfczraVmhyB125dZQ7bsUFjHD48Lr2RB1Xwn
+         dCD05u76MAQiAcbWsup1KSQa2MZ/UMnuWZVUxW8VbUZw7v99qBSmYLqsbt+GBlaRNB
+         uIlEinXfjpAehqjV461mc7XifGdWsWw6VTkhkWgCHrf79SoBq2+sYdBD1CdMnGEwy+
+         8vQzGzULTP5uQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pIYeI-003A4j-5l;
+        Thu, 19 Jan 2023 17:24:26 +0000
+Date:   Thu, 19 Jan 2023 17:24:25 +0000
+Message-ID: <86tu0mmo8m.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Sean Christopherson <seanjc@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Anshuman Khandual <anshuman.khandual@arm.com>,
+        Nadav Amit <namit@vmware.com>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
+        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
+        Colin Cross <ccross@google.com>,
+        Hugh Dickins <hughd@google.com>,
+        Ben Gardon <bgardon@google.com>,
+        Mingwei Zhang <mizhang@google.com>,
+        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org,
+        Alexandre Ghiti <alexghiti@rivosinc.com>,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common code
+In-Reply-To: <Y8l6egh2wWN7BUlZ@google.com>
+References: <20221208193857.4090582-1-dmatlack@google.com>
+        <Y8l6egh2wWN7BUlZ@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: dmatlack@google.com, pbonzini@redhat.com, james.morse@arm.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, chenhuacai@kernel.org, aleksandar.qemu.devel@gmail.com, anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu, seanjc@google.com, akpm@linux-foundation.org, anshuman.khandual@arm.com, namit@vmware.com, willy@infradead.org, vbabka@suse.cz, Liam.Howlett@oracle.com, surenb@google.com, peterx@redhat.com, cgel.zte@gmail.com, arnd@arndb.de, yuzhao@google.com, ccross@google.com, hughd@google.com, bgardon@google.com, mizhang@google.com, krish.sadhukhan@oracle.com, ricarkol@google.com, jingzhangos@google.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org, kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org, alexghiti@rivosinc.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/1/19 2:00, Jason Gunthorpe wrote:
-> This is eventually called by iommufd through intel_iommu_map_pages() and
-> it should not be forced to atomic. Push the GFP_ATOMIC to all callers.
+On Thu, 19 Jan 2023 17:14:34 +0000,
+David Matlack <dmatlack@google.com> wrote:
 > 
-> Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
+> On Thu, Dec 08, 2022 at 11:38:20AM -0800, David Matlack wrote:
+> > 
+> > Hello,
+> > 
+> > This series refactors the KVM/x86 "TDP MMU" into common code. This is
+> > the first step toward sharing TDP (aka Stage-2) page table management
+> > code across architectures that support KVM.
+> 
+> Thank you everyone for the feedback on this RFC. I have a couple of
+> updates to share and a question at the end.
+> 
+> First, Alexandre Ghiti from Rivos is going to work on the RISC-V port.
+> I'd like to target RISC-V first, since it has significantly lower risk
+> and complexity than e.g. ARM (which has pKVM, stage-1 walkers, and
+> [soon] nested virtualization to deal with).
 
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+And (joy, happiness), the upcoming 128bit page table support[1].
 
-Best regards,
-baolu
+	M.
+
+[1] https://developer.arm.com/documentation/ddi0601/2022-12/AArch64-Registers/TTBR0-EL1--Translation-Table-Base-Register-0--EL1-?lang=en
+
+-- 
+Without deviation from the norm, progress is not possible.
