@@ -2,89 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C9781673728
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 12:41:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC77A673745
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 12:46:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231153AbjASLlt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 06:41:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46362 "EHLO
+        id S229989AbjASLqH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 06:46:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230477AbjASLlO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 06:41:14 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBDF14B898
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 03:41:11 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30JANRGZ029976
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:41:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=atxlL22lTpQD0qkiYh+cNXVkDDhIGvAQ7WEieHWn0j4=;
- b=Vo4bRxaD3yYMiOizF6uOev25pTV7apyIWON9NPYbBGHllxh0ZcGdFjVEZknIT8wiTvET
- f32v9P1njuHVkWBzfLHsg90afI22exzU0Vju1Ha/eiUZKgnL4UI7qjeh2ZfqMyggnDfb
- T7mOqtRm22vskHO1eqzVzWVIsPc0tQ9wxkjQfsoN5qoAtnC/5RKCFfPukcyQdUeOuQJW
- rrGX7qElU5L077QcQK8R+i5bTcbK/SbELkvBxktZABBqQaht2q7YdxQrDUXM85mVvcEm
- jKL8WIEb6OR/tpimAUuddUW5Fve8OhVLMTNNHUHmAzOuvJyr+HTX4/Y3dHb57V5Xzqq+ rw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6jc026dp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:41:10 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30JBKADC001202
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:41:10 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6jc026d5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 11:41:10 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30J5X3x9023782;
-        Thu, 19 Jan 2023 11:41:08 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3n3m16pm1u-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 11:41:08 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30JBf5ZR26018472
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Jan 2023 11:41:05 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D3BB20049;
-        Thu, 19 Jan 2023 11:41:05 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9D17F20043;
-        Thu, 19 Jan 2023 11:41:04 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com.com (unknown [9.171.91.27])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Jan 2023 11:41:04 +0000 (GMT)
-From:   Marc Hartmayer <mhartmay@linux.ibm.com>
-To:     <kvm@vger.kernel.org>
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-Subject: [kvm-unit-tests PATCH v2 8/8] s390x/Makefile: add an extra `%.aux.o` target
-Date:   Thu, 19 Jan 2023 12:40:45 +0100
-Message-Id: <20230119114045.34553-9-mhartmay@linux.ibm.com>
-X-Mailer: git-send-email 2.39.0
-In-Reply-To: <20230119114045.34553-1-mhartmay@linux.ibm.com>
-References: <20230119114045.34553-1-mhartmay@linux.ibm.com>
+        with ESMTP id S230143AbjASLpj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 06:45:39 -0500
+Received: from out-105.mta0.migadu.com (out-105.mta0.migadu.com [91.218.175.105])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A83B54A1E9
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 03:45:25 -0800 (PST)
+Date:   Thu, 19 Jan 2023 12:45:23 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1674128723;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LO3GdTZYLyXwcaMeji/7lFqVXIXP4t8I45+lWmsA05o=;
+        b=hLfEp6KGdxLB5IV5Nx2mV+kxUeQrwO2HEpYt/KAL8RC33fVCHHfwVYu8/f754wfHe5xU1b
+        p50dxCpH8dP8GUCqKgCIGOk3UQb9j8jsOLvbHJqVM2Gr0Gaujue47llZazHeQjVD3Oxwc9
+        FwNSFEbXUOBgNPWMIxf89MphFNWolCc=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Andrew Jones <andrew.jones@linux.dev>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v4 2/2] arm/psci: Add PSCI CPU_OFF test
+ case
+Message-ID: <20230119114523.6kuuz7ehyubdl5mh@orel>
+References: <20230118144912.32049-1-alexandru.elisei@arm.com>
+ <20230118144912.32049-3-alexandru.elisei@arm.com>
+ <20230118184821.frpeemjwt4ey6m7v@orel>
+ <Y8kc92nC4tiVXNfs@arm.com>
+ <20230119113631.mj6yeopd3neo6z3w@orel>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9pj9ezN0zQt28Nw7Woqj_TXO_xjSbcbp
-X-Proofpoint-GUID: k-m9TFrYfKkVTskkacI2ShExlHtS2AHx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-19_09,2023-01-19_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 mlxscore=0 bulkscore=0 adultscore=0 lowpriorityscore=0
- phishscore=0 mlxlogscore=999 spamscore=0 clxscore=1015 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301190091
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230119113631.mj6yeopd3neo6z3w@orel>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -92,39 +50,253 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-It's unusual to create multiple files in one target rule, therefore
-let's create an extra target for `%.aux.o`. As a side effect, this
-change fixes the dependency tracking of the prerequisites of `.aux.o`
-(lib/auxinfo.c wasn't listed before).
+On Thu, Jan 19, 2023 at 12:36:39PM +0100, Andrew Jones wrote:
+> On Thu, Jan 19, 2023 at 10:35:35AM +0000, Alexandru Elisei wrote:
+> > Hi Drew,
+> > 
+> > On Wed, Jan 18, 2023 at 07:48:21PM +0100, Andrew Jones wrote:
+> > > On Wed, Jan 18, 2023 at 02:49:12PM +0000, Alexandru Elisei wrote:
+> > > > From: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
+> > > > 
+> > > > The test uses the following method.
+> > > > 
+> > > > The primary CPU brings up all the secondary CPUs, which are held in a wait
+> > > > loop. Once the primary releases the CPUs, each of the secondary CPUs
+> > > > proceed to issue PSCI_CPU_OFF. This is indicated by a cpumask and also the
+> > > > status of the call is updated by the secondary CPU in cpu_off_done[].
+> > > > 
+> > > > The primary CPU waits for all the secondary CPUs to update the cpumask and
+> > > > then proceeds to check for the status of the individual CPU CPU_OFF
+> > > > request. There is a chance that some CPUs might fail at the CPU_OFF request
+> > > > and come back and update the status once the primary CPU has finished the
+> > > > scan. There is no fool proof method to handle this. As of now, we add a
+> > > > 1sec delay between the cpumask check and the scan for the status.
+> > > > 
+> > > > Signed-off-by: Nikita Venkatesh <Nikita.Venkatesh@arm.com>
+> > > > [ Alex E: Skip CPU_OFF test if CPU_ON failed ]
+> > > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
+> > > > ---
+> > > >  arm/psci.c | 71 ++++++++++++++++++++++++++++++++++++++++++++++++++----
+> > > >  1 file changed, 66 insertions(+), 5 deletions(-)
+> > > > 
+> > > > diff --git a/arm/psci.c b/arm/psci.c
+> > > > index e96be941953b..d045616bfcd4 100644
+> > > > --- a/arm/psci.c
+> > > > +++ b/arm/psci.c
+> > > > @@ -15,6 +15,8 @@
+> > > >  #include <asm/psci.h>
+> > > >  #include <asm/smp.h>
+> > > >  
+> > > > +#define CPU_OFF_TEST_WAIT_TIME 1000
+> > > > +
+> > > >  static bool invalid_function_exception;
+> > > >  
+> > > >  #ifdef __arm__
+> > > > @@ -71,8 +73,10 @@ static bool psci_affinity_info_off(void)
+> > > >  }
+> > > >  
+> > > >  static int cpu_on_ret[NR_CPUS];
+> > > > -static cpumask_t cpu_on_ready, cpu_on_done;
+> > > > +static bool cpu_off_success[NR_CPUS];
+> > > > +static cpumask_t cpu_on_ready, cpu_on_done, cpu_off_done;
+> > > >  static volatile int cpu_on_start;
+> > > > +static volatile int cpu_off_start;
+> > > >  
+> > > >  extern void secondary_entry(void);
+> > > >  static void cpu_on_do_wake_target(void)
+> > > > @@ -94,6 +98,20 @@ static void cpu_on_target(void)
+> > > >  	cpumask_set_cpu(cpu, &cpu_on_done);
+> > > >  }
+> > > >  
+> > > > +static void cpu_off_secondary_entry(void *data)
+> > > > +{
+> > > > +	int cpu = smp_processor_id();
+> > > > +
+> > > > +	while (!cpu_off_start)
+> > > > +		cpu_relax();
+> > > > +	/* On to the CPU off test */
+> > > > +	cpu_off_success[cpu] = true;
+> > > > +	cpumask_set_cpu(cpu, &cpu_off_done);
+> > > > +	cpu_psci_cpu_die();
+> > > > +	/* The CPU shouldn't execute the next steps. */
+> > > > +	cpu_off_success[cpu] = false;
+> > > > +}
+> > > > +
+> > > >  static bool psci_cpu_on_test(void)
+> > > >  {
+> > > >  	bool failed = false;
+> > > > @@ -162,9 +180,45 @@ out:
+> > > >  	return !failed;
+> > > >  }
+> > > >  
+> > > > -int main(void)
+> > > > +static bool psci_cpu_off_test(void)
+> > > > +{
+> > > > +	bool failed = false;
+> > > > +	int cpu;
+> > > > +
+> > > > +	for_each_present_cpu(cpu) {
+> > > > +		if (cpu == 0)
+> > > > +			continue;
+> > > > +		on_cpu_async(cpu, cpu_off_secondary_entry, NULL);
+> > > > +	}
+> > > > +
+> > > > +	cpumask_set_cpu(0, &cpu_off_done);
+> > > 
+> > > Since we're setting cpu_off_done for cpu0, then we could also set
+> > > cpu_off_success[0] = true and not have to skip it in the check loop
+> > > below.
+> > 
+> > I would prefer not to, since CPU 0 never invokes CPU_OFF for itself and setting
+> > cpu_off_success to true for CPU 0 might get confusing. Unless you insist :)
+> 
+> I don't insist, I'm just looking for consistency with the other tests. The
+> last one was getting changed to the opposite, but now I see you plan to
+> change it back.
+> 
+> > 
+> > > 
+> > > > +
+> > > > +	report_info("starting CPU_OFF test...");
+> > > > +
+> > > > +	cpu_off_start = 1;
+> > > > +	while (!cpumask_full(&cpu_off_done))
+> > > > +		cpu_relax();
+> > > > +
+> > > > +	/* Allow all the other CPUs to complete the operation */
+> > > > +	mdelay(CPU_OFF_TEST_WAIT_TIME);
+> > > 
+> > > Don't really need the define, just the numbers work for stuff
+> > > like this, but OK.
+> > 
+> > I'll get rid of the define.
+> > 
+> > You ok with waiting for 1 second for each test run? I remember you had
+> > objections when I added a similar delay to the timer tests.
+> 
+> Thanks for reminding me :-) Indeed, I'd rather not have tests waiting for
+> no reason. We want these tests to execute as fast as possible to ensure
+> they get run by impatient developers like me.
+> 
+> How about something like this that waits *up to* one second.
+> 
+> static void cpu_off_secondary_entry(void *data)
+> {
+> 	int cpu = smp_processor_id();
+> 
+> 	while (!cpu_off_start)
+> 		cpu_relax();
+> 
+> 	cpumask_set_cpu(cpu, &cpu_off_done);
+> 	cpu_psci_cpu_die();
+> }
+> 
+> static bool psci_cpu_off_test(void)
+> {
+> 	int count;
+> 
+> 	...
+> 
+> 	while (!cpumask_full(&cpu_off_done))
+> 		cpu_relax();
+> 
+> 	for (i = 0; i < 100; ++i) {
+> 		mdelay(10);
+> 
+> 		count = 0;
+> 
+> 		for_each_present_cpu(cpu) {
+> 			if (cpu == 0)
+> 				continue;
+> 			if (psci_affinity_info(cpu, 0) != PSCI_0_2_AFFINITY_LEVEL_OFF)
+> 				++count;
+> 		}
+> 		if (!count)
+> 			break;
+> 	}
+> 
+> 	if (count) {
+> 		...
+> 	}
+> 	...
 
-Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
----
- s390x/Makefile | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+And here an additional sanity check that no cpus are in idle, which would
+mean they came back from cpu_psci_cpu_die() and psci_affinity_info() is
+lying.
 
-diff --git a/s390x/Makefile b/s390x/Makefile
-index 9a8e2af1b2be..6fa62416c0e9 100644
---- a/s390x/Makefile
-+++ b/s390x/Makefile
-@@ -162,13 +162,14 @@ $(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SNIPP
- %.lds: %.lds.S $(asm-offsets)
- 	$(CPP) $(autodepend-flags) $(CPPFLAGS) -P -C -o $@ $<
- 
-+%.aux.o: $(SRCDIR)/lib/auxinfo.c
-+	$(CC) $(CFLAGS) -c -o $@ $^ -DPROGNAME=\"$(@:.aux.o=.elf)\"
-+
- .SECONDEXPANSION:
--%.elf: $(FLATLIBS) $(asmlib) $(SRCDIR)/s390x/flat.lds $$(snippets-obj) $$(snippet-hdr-obj) %.o
--	$(CC) $(CFLAGS) -c -o $(@:.elf=.aux.o) $(SRCDIR)/lib/auxinfo.c -DPROGNAME=\"$@\"
-+%.elf: $(FLATLIBS) $(asmlib) $(SRCDIR)/s390x/flat.lds $$(snippets-obj) $$(snippet-hdr-obj) %.o %.aux.o
- 	@$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/flat.lds \
--		$(filter %.o, $^) $(FLATLIBS) $(snippets-obj) $(snippet-hdr-obj) $(@:.elf=.aux.o) || \
-+		$(filter %.o, $^) $(FLATLIBS) $(snippets-obj) $(snippet-hdr-obj) || \
- 		{ echo "Failure probably caused by missing definition of gen-se-header executable"; exit 1; }
--	$(RM) $(@:.elf=.aux.o)
- 	@chmod a-x $@
- 
- # Secure Execution Customer Communication Key file
--- 
-2.34.1
+  if (!cpumask_empty(&cpu_idle_mask)) {
+      ...
+  }
 
+Could also create a new cpu_off_failed mask that cpu_off_secondary_entry()
+would set on return from cpu_psci_cpu_die, but checking idle is pretty
+much the same.
+
+Thanks,
+drew
+
+> }
+> 
+> 
+> Thanks,
+> drew
+>                       
+> > 
+> > > 
+> > > > +
+> > > > +	for_each_present_cpu(cpu) {
+> > > > +		if (cpu == 0)
+> > > > +			continue;
+> > > > +
+> > > > +		if (!cpu_off_success[cpu]) {
+> > > > +			report_info("CPU%d could not be turned off", cpu);
+> > > > +			failed = true;
+> > > > +		}
+> > > > +	}
+> > > > +
+> > > > +	return !failed;
+> > > > +}
+> > > > +
+> > > > +int main(int argc, char **argv)
+> > > >  {
+> > > >  	int ver = psci_invoke(PSCI_0_2_FN_PSCI_VERSION, 0, 0, 0);
+> > > > +	bool cpu_on_success = true;
+> > > >  
+> > > >  	report_prefix_push("psci");
+> > > >  
+> > > > @@ -179,10 +233,17 @@ int main(void)
+> > > >  	report(psci_affinity_info_on(), "affinity-info-on");
+> > > >  	report(psci_affinity_info_off(), "affinity-info-off");
+> > > >  
+> > > > -	if (ERRATA(6c7a5dce22b3))
+> > > > -		report(psci_cpu_on_test(), "cpu-on");
+> > > > -	else
+> > > > +	if (ERRATA(6c7a5dce22b3)) {
+> > > > +		cpu_on_success = psci_cpu_on_test();
+> > > > +		report(cpu_on_success, "cpu-on");
+> > > > +	} else {
+> > > >  		report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
+> > > > +	}
+> > > > +
+> > > > +	if (!cpu_on_success)
+> > > > +		report_skip("Skipping cpu-off test because the cpu-on test failed");
+> > > > +	else
+> > > > +		report(psci_cpu_off_test(), "cpu-off");
+> > > >  
+> > > >  done:
+> > > >  #if 0
+> > > > -- 
+> > > > 2.25.1
+> > > > 
+> > > 
+> > > Besides the nits,
+> > > 
+> > > Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+> > 
+> > Thanks!
+> > 
+> > Alex
+> > 
+> > > 
+> > > Thanks,
+> > > drew
