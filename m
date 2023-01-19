@@ -2,69 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 99AEA674765
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 00:48:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC8CB67478A
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 00:52:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229844AbjASXsb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 18:48:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48518 "EHLO
+        id S230107AbjASXws (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 18:52:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229674AbjASXsa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 18:48:30 -0500
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 020C59F398
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 15:48:28 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id qx13so9852775ejb.13
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 15:48:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ax52PxQcUB86ZZa5cNbU1WVgqIMXtwZG4WanvmA1AQo=;
-        b=Vb/OkEE/qNrRPF8cKiSioV8riOPYqhZK/+DEPv+npXGYJWCfQVhh4j2qlnZxet7oA1
-         H8tYHFUe+mbp4Of1ZX0bBbdWJmTIddghvIRQyh79x8prJKtGvoiRsaS52wfJhEdv1PTB
-         LfyRDFy6jSK43ir7TgotFgorXG/h4ZEftH1Z51up8wmoCXAzKZje+Lpf4ijHk9Y6ZmwJ
-         7niIuM1sjoDXr4NcCskw0344c+44Xv2IpVM4/8h/4b4KzJBwmQqjsczzbzo+sGBi9Dxb
-         IkxTJc/H9O3n6CqrJE3wT5PhdY2osyV2De1oZ7rrofi6O6gGgD6ZBGJLUHFX0U5jLUzV
-         mYTg==
+        with ESMTP id S230010AbjASXwr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 18:52:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E1489F394
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 15:52:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674172322;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=A4R9MpU1qGlLDfX/V36djUL2kxqeKk6GpcFMsyNmyNA=;
+        b=JhS89CIAqzvavEvWoK1aO6jHgVC0senfTf9M1nnt+5tFAhC31Coo4vAGMkOnPvAOpDQALy
+        25PTKktZTUGAkv9Bm/MU1+HzmWzhzkfPWfULb9m8Ovel+e7I++E3hGiLXNUyRj/aV9Wh0f
+        W4hj34HQN79AOQfrAB1yuj193IdW/q0=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-617-spdDCOU4Pz2UuEh__d8LKg-1; Thu, 19 Jan 2023 18:52:00 -0500
+X-MC-Unique: spdDCOU4Pz2UuEh__d8LKg-1
+Received: by mail-io1-f69.google.com with SMTP id d189-20020a6bb4c6000000b00704ce012109so2039494iof.1
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 15:52:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ax52PxQcUB86ZZa5cNbU1WVgqIMXtwZG4WanvmA1AQo=;
-        b=ATDtXBHbCSIZII2vIJ7QRz6KRYgrokj3h6Zqr/vbGOeV2A4GGyIMwDDDkr743Dr6d4
-         gaC11NUUoMH3eoR+28KdROwfjlLKaKoB9hTFdMbpzSLp1ulp9Wy+uviE1DzkCrQDQpir
-         69cRHWWaOjL2SgYDLw7ZGZg9PPibOTom6JukA79OSKTnM2sxOMxkCY0ljFg8R7bVP18f
-         WkhpbDNZnc3j4rCGzJgl88tY80T71EmS3Ji+UAnd/4iOBA5f91i1Ld8nFpuTWYdtSOaq
-         ap0y2cjj7alR6ZB72GQE7aeCl4VLTLQqsvi2uRomCStkZNyug25EtYal58YDIQ+ugaUp
-         V7tA==
-X-Gm-Message-State: AFqh2koe0UtJxVOFjUyo0lwsCBZaTfcdFTRlGpx0MxbWeUGdQH0TiLJX
-        AYH5yR4eeyqJj18kIjD5OhgWR6ivsj2KDohJeNs5Eg==
-X-Google-Smtp-Source: AMrXdXuaNg3dS6YFkLOiuBolhweteL+t4YAHUHXynplY7DWeR1NVhegfDevq5PrXLZ8MZmSlafhwKphZZ8M+Wg2zSyo=
-X-Received: by 2002:a17:906:3f91:b0:870:4648:e8a9 with SMTP id
- b17-20020a1709063f9100b008704648e8a9mr1131264ejj.433.1674172106131; Thu, 19
- Jan 2023 15:48:26 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A4R9MpU1qGlLDfX/V36djUL2kxqeKk6GpcFMsyNmyNA=;
+        b=JYP38FdwoPZRyTqSVlIS24cJYv8ZMdavaqmGDztHlDciYWSSfdxaW17rUCQbO0KSb3
+         RPMlle7E4tDFH1uMBxXmbO1OqXlfNNuuqe5g1rBSXUhJohvYmEmmfWUPiuDZNiSBWmQg
+         WJn6I/8wjtBHF6D/3zYDn3V4ahKU5UXTOusEbDD8wQ+ZnCFtpPmPOH+mF7XYrzjuyNUD
+         JpDfqJA1MZHCBhTn6STOrPuCIfH3CzO8z8IH3IMBqiImTCyx5GB14lUcY83blTYUvk3F
+         s/NYtw9LWjvYn/I2QPxkqjCO4LLGOfCkX41WClWax7ohCgSjfdzMOd2mn2mTYM5/cmC5
+         DNyQ==
+X-Gm-Message-State: AFqh2kq2CLKAUCYW1X1AWZmeiEBWJONU5bA0BxdZgD1g7kcdjaekWKqK
+        7LO/UVMhknOpkuUbpAscYarzkRWWNZ5gDjE66WGouPXGto+CzfsQKuaggIF64W5RrtPitwVDsqa
+        lJUR+mpBTd3M8
+X-Received: by 2002:a6b:c9cc:0:b0:707:7d90:60da with SMTP id z195-20020a6bc9cc000000b007077d9060damr1825424iof.18.1674172319954;
+        Thu, 19 Jan 2023 15:51:59 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtdHq21bowAOl0hVFkr6kMGmobOCvHimmhIJpwF+zjRwEiauDhactER/FsurC5m1DbXVKJMvw==
+X-Received: by 2002:a6b:c9cc:0:b0:707:7d90:60da with SMTP id z195-20020a6bc9cc000000b007077d9060damr1825408iof.18.1674172319652;
+        Thu, 19 Jan 2023 15:51:59 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id l206-20020a6b3ed7000000b00704c45c795dsm3312593ioa.33.2023.01.19.15.51.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 15:51:59 -0800 (PST)
+Date:   Thu, 19 Jan 2023 16:51:57 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        suravee.suthikulpanit@amd.com
+Subject: Re: [PATCH 10/13] vfio: Make vfio_device_open() exclusive between
+ group path and device cdev path
+Message-ID: <20230119165157.5de95216.alex.williamson@redhat.com>
+In-Reply-To: <20230117134942.101112-11-yi.l.liu@intel.com>
+References: <20230117134942.101112-1-yi.l.liu@intel.com>
+        <20230117134942.101112-11-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20230119212510.3938454-1-bgardon@google.com> <20230119212510.3938454-3-bgardon@google.com>
- <Y8nKerX9tDRHkFq+@google.com>
-In-Reply-To: <Y8nKerX9tDRHkFq+@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 19 Jan 2023 15:48:14 -0800
-Message-ID: <CANgfPd8B_0w39d7V+c4GnUxdqrc8qN78r8Pq0Con3Mx9WO0hkQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] selftests: KVM: Add page splitting test
-To:     David Matlack <dmatlack@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,194 +83,188 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 2:56 PM David Matlack <dmatlack@google.com> wrote:
-...
-> > +static int NR_VCPUS = 2;
-> > +static int NR_SLOTS = 2;
-> > +static int NR_ITERATIONS = 2;
->
-> These should be macros or at least const?
+On Tue, 17 Jan 2023 05:49:39 -0800
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-Yikes, woops, that was a basic mistake.
+> VFIO group has historically allowed multi-open of the device FD. This
+> was made secure because the "open" was executed via an ioctl to the
+> group FD which is itself only single open.
+> 
+> No know use of multiple device FDs is known. It is kind of a strange
+  ^^ ^^^^                               ^^^^^
 
->
-> > +static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
-> > +
-> > +/* Host variables */
->
-> What does "Host variables" mean? (And why is guest_percpu_mem_size not a
-> "Host variable"?)
->
-> I imagine this is copy-pasta from a test that has some global variables
-> that are used by guest code? If that's correct, it's probably best to
-> just drop this comment.
+> thing to do because new device FDs can naturally be created via dup().
+> 
+> When we implement the new device uAPI there is no natural way to allow
+> the device itself from being multi-opened in a secure manner. Without
+> the group FD we cannot prove the security context of the opener.
+> 
+> Thus, when moving to the new uAPI we block the ability to multi-open
+> the device. This also makes the cdev path exclusive with group path.
+> 
+> The main logic is in the vfio_device_open(). It needs to sustain both
+> the legacy behavior i.e. multi-open in the group path and the new
+> behavior i.e. single-open in the cdev path. This mixture leads to the
+> introduction of a new single_open flag stored both in struct vfio_device
+> and vfio_device_file. vfio_device_file::single_open is set per the
+> vfio_device_file allocation. Its value is propagated to struct vfio_device
+> after device is opened successfully.
+> 
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/group.c     |  2 +-
+>  drivers/vfio/vfio.h      |  6 +++++-
+>  drivers/vfio/vfio_main.c | 25 ++++++++++++++++++++++---
+>  include/linux/vfio.h     |  1 +
+>  4 files changed, 29 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index 9484bb1c54a9..57ebe5e1a7e6 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -216,7 +216,7 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+>  	struct file *filep;
+>  	int ret;
+>  
+> -	df = vfio_allocate_device_file(device);
+> +	df = vfio_allocate_device_file(device, false);
+>  	if (IS_ERR(df)) {
+>  		ret = PTR_ERR(df);
+>  		goto err_out;
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index fe0fcfa78710..bdcf9762521d 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -17,7 +17,11 @@ struct vfio_device;
+>  struct vfio_container;
+>  
+>  struct vfio_device_file {
+> +	/* static fields, init per allocation */
+>  	struct vfio_device *device;
+> +	bool single_open;
+> +
+> +	/* fields set after allocation */
+>  	struct kvm *kvm;
+>  	struct iommufd_ctx *iommufd;
+>  	bool access_granted;
+> @@ -30,7 +34,7 @@ int vfio_device_open(struct vfio_device_file *df,
+>  void vfio_device_close(struct vfio_device_file *device);
+>  
+>  struct vfio_device_file *
+> -vfio_allocate_device_file(struct vfio_device *device);
+> +vfio_allocate_device_file(struct vfio_device *device, bool single_open);
+>  
+>  extern const struct file_operations vfio_device_fops;
+>  
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 90174a9015c4..78725c28b933 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -345,7 +345,7 @@ static bool vfio_assert_device_open(struct vfio_device *device)
+>  }
+>  
+>  struct vfio_device_file *
+> -vfio_allocate_device_file(struct vfio_device *device)
+> +vfio_allocate_device_file(struct vfio_device *device, bool single_open)
+>  {
+>  	struct vfio_device_file *df;
+>  
+> @@ -354,6 +354,7 @@ vfio_allocate_device_file(struct vfio_device *device)
+>  		return ERR_PTR(-ENOMEM);
+>  
+>  	df->device = device;
+> +	df->single_open = single_open;
 
-Yeah, shameful copypasta. I'll drop it.
+It doesn't make sense to me to convolute the definition of this
+function with an unmemorable bool arg when the one caller that sets the
+value true could simply open code it.
 
->
-> > +static u64 dirty_log_manual_caps;
-...
+>  
+>  	return df;
+>  }
+> @@ -421,6 +422,16 @@ int vfio_device_open(struct vfio_device_file *df,
+>  
+>  	lockdep_assert_held(&device->dev_set->lock);
+>  
+> +	/*
+> +	 * Device cdev path cannot support multiple device open since
+> +	 * it doesn't have a secure way for it. So a second device
+> +	 * open attempt should be failed if the caller is from a cdev
+> +	 * path or the device has already been opened by a cdev path.
+> +	 */
+> +	if (device->open_count != 0 &&
+> +	    (df->single_open || device->single_open))
+> +		return -EINVAL;
 
-> > +             /*
-> > +              * Incrementing the iteration number will start the vCPUs
-> > +              * dirtying memory again.
-> > +              */
-> > +             iteration++;
-> > +
-> > +             for (i = 0; i < NR_VCPUS; i++) {
-> > +                     while (READ_ONCE(vcpu_last_completed_iteration[i])
-> > +                            != iteration)
-> > +                             ;
-> > +             }
-> > +
-> > +             pr_debug("\nGetting stats after dirtying memory on pass %d:\n", iteration);
-> > +             get_page_stats(vm, &stats_dirty_pass[iteration - 1]);
->
-> Incrementing iteration, waiting for vCPUs, and grabbing stats is
-> repeated below. Throw it in a helper function?
+IIUC, the reason this exists is that we let the user open the device
+cdev arbitrarily, but only one instance can call
+ioctl(VFIO_DEVICE_BIND_IOMMUFD).  Why do we bother to let the user
+create those other file instances?  What expectations are we setting
+for the user by allowing them to open the device but not use it?
 
-Good call.
+Clearly we're thinking about a case here where the device has been
+opened via the group path and the user is now attempting to bind the
+same device via the cdev path.  That seems wrong to even allow and I'm
+surprised it gets this far.  In fact, where do we block a user from
+opening one device in a group via cdev and another via the group?
 
->
-> > +
-> > +             memstress_get_dirty_log(vm, bitmaps, NR_SLOTS);
-> > +
-> > +             if (dirty_log_manual_caps) {
-> > +                     memstress_clear_dirty_log(vm, bitmaps, NR_SLOTS, pages_per_slot);
-> > +
-> > +                     pr_debug("\nGetting stats after clearing dirty log pass %d:\n", iteration);
-> > +                     get_page_stats(vm, &stats_clear_pass[iteration - 1]);
-> > +             }
-> > +     }
-> > +
-> > +     /* Disable dirty logging */
-> > +     memstress_disable_dirty_logging(vm, NR_SLOTS);
-> > +
-> > +     pr_debug("\nGetting stats after disabling dirty logging:\n");
-> > +     get_page_stats(vm, &stats_dirty_logging_disabled);
-> > +
-> > +     /* Run vCPUs again to fault pages back in. */
-> > +     iteration++;
-> > +     for (i = 0; i < NR_VCPUS; i++) {
-> > +             while (READ_ONCE(vcpu_last_completed_iteration[i]) != iteration)
-> > +                     ;
-> > +     }
-> > +
-> > +     pr_debug("\nGetting stats after repopulating memory:\n");
-> > +     get_page_stats(vm, &stats_repopulated);
-> > +
-> > +     /*
-> > +      * Tell the vCPU threads to quit.  No need to manually check that vCPUs
-> > +      * have stopped running after disabling dirty logging, the join will
-> > +      * wait for them to exit.
-> > +      */
-> > +     host_quit = true;
-> > +     memstress_join_vcpu_threads(NR_VCPUS);
-> > +
-> > +     memstress_free_bitmaps(bitmaps, NR_SLOTS);
-> > +     memstress_destroy_vm(vm);
-> > +
-> > +     /* Make assertions about the page counts. */
-> > +     total_4k_pages = stats_populated.pages_4k;
-> > +     total_4k_pages += stats_populated.pages_2m * 512;
-> > +     total_4k_pages += stats_populated.pages_1g * 512 * 512;
-> > +
-> > +     /*
-> > +      * Check that all huge pages were split. Since large pages can only
-> > +      * exist in the data slot, and the vCPUs should have dirtied all pages
-> > +      * in the data slot, there should be no huge pages left after splitting.
-> > +      * Splitting happens at dirty log enable time without
-> > +      * KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 and after the first clear pass
-> > +      * with that capability.
-> > +      */
-> > +     if (dirty_log_manual_caps) {
-> > +             TEST_ASSERT(stats_clear_pass[0].hugepages == 0,
->
-> Consider using ASSERT_EQ() to simplify these checks. It will
-> automatically print out the values for you, but you'll lose the
-> contextual error message ("Unexpected huge page count after
-> splitting..."). But maybe we could add support for a custom extra error
-> string?
->
-> __ASSERT_EQ(stats_clear_pass[0].hugepages, 0,
->             "Expected 0 hugepages after splitting");
->
-> Or use a comment to document the context for the assertion. Whoever is
-> debugging a failure is going to come look at the selftest code no matter
-> what.
->
-> I think I prefer ASSERT_EQ() + comment, especially since the comment
-> pretty much already exists above.
 
-That's fair. I prefer the way it is because the resulting error
-message is a lot easier to read and I don't need to look at the test
-code to decrypt it. If I'm developing a feature and just running all
-tests, it's nice to not have to track down the test source code.
+> +
+>  	device->open_count++;
+>  	if (device->open_count == 1) {
+>  		int ret;
+> @@ -430,6 +441,7 @@ int vfio_device_open(struct vfio_device_file *df,
+>  			device->open_count--;
+>  			return ret;
+>  		}
+> +		device->single_open = df->single_open;
+>  	}
+>  
+>  	/*
+> @@ -446,8 +458,10 @@ void vfio_device_close(struct vfio_device_file *df)
+>  
+>  	mutex_lock(&device->dev_set->lock);
+>  	vfio_assert_device_open(device);
+> -	if (device->open_count == 1)
+> +	if (device->open_count == 1) {
+>  		vfio_device_last_close(df);
+> +		device->single_open = false;
+> +	}
+>  	device->open_count--;
+>  	mutex_unlock(&device->dev_set->lock);
+>  }
+> @@ -493,7 +507,12 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+>  	struct vfio_device_file *df = filep->private_data;
+>  	struct vfio_device *device = df->device;
+>  
+> -	vfio_device_group_close(df);
+> +	/*
+> +	 * group path supports multiple device open, while cdev doesn't.
+> +	 * So use vfio_device_group_close() for !singel_open case.
+> +	 */
+> +	if (!df->single_open)
+> +		vfio_device_group_close(df);
 
->
-> > +                         "Unexpected huge page count after splitting. Expected 0, got %ld",
-> > +                         stats_clear_pass[0].hugepages);
-> > +             TEST_ASSERT(stats_clear_pass[0].pages_4k == total_4k_pages,
-> > +                         "All memory should be mapped at 4k. Expected %ld 4k pages, got %ld",
-> > +                         total_4k_pages, stats_clear_pass[0].pages_4k);
->
-> Also assert that huge pages are *not* split when dirty logging is first
-> enabled.
+If we're going to use this to differentiate group vs cdev use cases,
+then let's name it something to reflect that rather than pretending it
+only limits the number of opens, ex. is_cdev_device.  Thanks,
 
-Ah great idea. I felt like I was a little light on the assertions.
-That'll be a good addition.
+Alex
 
->
-> > +     } else {
-...
-> > +
-> > +     dirty_log_manual_caps =
-> > +             kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-> > +     dirty_log_manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
-> > +                               KVM_DIRTY_LOG_INITIALLY_SET);
->
-> Since this is a correctness test I think the test should, by default,
-> test both KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE and 0, to ensure we get
-> test coverage of both.
->
-> And with that in place, there's probably no need for the -g flag.
 
-Good idea.
+>  
+>  	vfio_device_put_registration(device);
+>  
+> diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+> index 46edd6e6c0ba..300318f0d448 100644
+> --- a/include/linux/vfio.h
+> +++ b/include/linux/vfio.h
+> @@ -63,6 +63,7 @@ struct vfio_device {
+>  	struct iommufd_ctx *iommufd_ictx;
+>  	bool iommufd_attached;
+>  #endif
+> +	bool single_open;
+>  };
+>  
+>  /**
 
->
-> > +
-> > +     guest_modes_append_default();
-...
-> > +
-> > +     if (!is_backing_src_hugetlb(p.backing_src)) {
-> > +             pr_info("This test will only work reliably with HugeTLB memory. "
-> > +                     "It can work with THP, but that is best effort.");
-> > +             return KSFT_SKIP;
-> > +     }
->
-> backing_src only controls the memstress data slots. The rest of guest
-> memory could be a source of noise for this test.
-
-That's true, but we compensate for that noise by taking a measurement
-after the population pass. At that point the guest has executed all
-it's code (or at least from all it's code pages) and touched every
-page in the data slot. Since the other slots aren't backed with huge
-pages, NX hugepages shouldn't be an issue. As a result, I would be
-surprised if noise from the other memory became a problem.
-
->
-> > +
-> > +     run_test(&p);
->
-> Use for_each_guest_mode() to run against all supported guest modes.
-
-I'm not sure that would actually improve coverage. None of the page
-splitting behavior depends on the mode AFAICT.
-
->
-> > +
-> > +     return 0;
-> > +}
-> > --
-> > 2.39.1.405.gd4c25cc71f-goog
-> >
