@@ -2,124 +2,103 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AEEEE673DB3
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 16:40:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECD85673DE4
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 16:48:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229608AbjASPkF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 10:40:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41888 "EHLO
+        id S231432AbjASPsu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 10:48:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46222 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231293AbjASPkB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 10:40:01 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EF707E4B9
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 07:40:00 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id b10so2787466pjo.1
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 07:40:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oGOd0msiKtPUi40NQhnTui7LovvqqH6CkT8xmcG9Sh0=;
-        b=lBWFm5Uo5P0QadyGJPq0BdNWny0S9CmUSXifqJ164PxXfsiRpZX2Q97uTwvkRYQWDt
-         cG2MZOQUxJUbPfAL/6URMwZ/yupofag2v3DpLfGLDc1GIaoSmsqO3LA36robK53PDUcD
-         k/ifV9u59dZJWRcvg3YkquWH5sIJY7N6VmUYsSEvoCQxHGQ5yNalNwdPESJGNzhVa8UR
-         W/40/5KtTwcJeSiCk9nIEEj6R1MiK4fftjG2OqqkdL2wGo2Bq0ZE9S4iWrs+aM2gkW/1
-         W4CxNKDoLofq0NPwf0lsA9elH+W36loAVQ23H7U7O1+Y5gLke5XJqGFtXj827FQCYU63
-         3abQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oGOd0msiKtPUi40NQhnTui7LovvqqH6CkT8xmcG9Sh0=;
-        b=6/ctITxK1s+BT9FrJu01SALSkfBiFYPVST3XR24umHK0Pmh5wD32YouZ749EVxBGpZ
-         kA97jKV3hnqroCqhqBWQpyHOI7MEUyXpm3ZnMvzjzRITROxVmfLblaoY0M3YG1XAqbIQ
-         F240G329nwKt5t8OBLklNcOLW/E39PLmPXpd9EgEg849fQe8nWsLk+AiJkkyJJDcIuYs
-         YAX9jmRCvOCOYDzuEMsqo3EeUi/A+xP6gAHS76fz+YGpRemU3avE4rd52rjAyRvs1eOI
-         2jRotu+hNB0uCtmGAtSWzOa32d0zicfpHk5Zpc/dDPQl4KVTc+IUzIuAJkVSNa1iu+HN
-         Hs1A==
-X-Gm-Message-State: AFqh2kqWv/GZ1EYfrENJOiHsHN3G3D3HgjB0qBsN6uMC4U9vMei9/Qga
-        hctoWVUuXsxuo6yiTHLCXzLvHQ==
-X-Google-Smtp-Source: AMrXdXsWEa0QHcWC97605RHISqaUh563ZfBKmW2ev1RfduDhsP0SlTmgpAwu9ewNf+AacpTR7KiFhQ==
-X-Received: by 2002:a05:6a20:c527:b0:9d:c38f:9bdd with SMTP id gm39-20020a056a20c52700b0009dc38f9bddmr3288869pzb.2.1674142799917;
-        Thu, 19 Jan 2023 07:39:59 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 201-20020a6303d2000000b004b4d4de54absm16613532pgd.59.2023.01.19.07.39.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 07:39:59 -0800 (PST)
-Date:   Thu, 19 Jan 2023 15:39:55 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Andy Lutomirski <luto@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH 7/7] KVM: VMX: Handle NMI VM-Exits in noinstr region
-Message-ID: <Y8lkS2XUBBrcjNku@google.com>
-References: <20221213060912.654668-1-seanjc@google.com>
- <20221213060912.654668-8-seanjc@google.com>
- <Y8kSLBwUuqzlcSEZ@hirez.programming.kicks-ass.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y8kSLBwUuqzlcSEZ@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S231374AbjASPsH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 10:48:07 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 562018456A;
+        Thu, 19 Jan 2023 07:47:25 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 1634261C7A;
+        Thu, 19 Jan 2023 15:47:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53C79C433EF;
+        Thu, 19 Jan 2023 15:47:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674143238;
+        bh=nf+TfbsdsLnbBMpPQU+Z3CHp7yhDIe+N4TFfsC327dE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=mIDiP/LEUSddUG+KRv1yAHu1BUHOcJf5M45Lxdfh8NIAt/S6eM6oLGvGD64SiUpzz
+         BB8F1EHeU1B03bQq6YHQoGV9eSCZI9Kx5bSkitzyUP6bx0Wqu8E2OWjxQp4pUB+s2j
+         XNiXWjp4gZfZ0QUsZc0ZqQLxYi4571K4rxYR2KZu2YLvrjYYXHWUkdS12ua25fO6dT
+         y++3ODurgU4GCy4fMCG7KuAaVn1ryefJ4zyeqRFdE+axpZHhBgOnSH38xyxHNrs3QG
+         79aNESccMbt3pLIidpMCqMyVcb0ldk3xlLr4tpR/1nMpd05UPIP//QJ9OIwd3dwzEh
+         uvHrQSDkULlaw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pIX8G-0038Ks-1Y;
+        Thu, 19 Jan 2023 15:47:16 +0000
+Date:   Thu, 19 Jan 2023 15:47:15 +0000
+Message-ID: <86v8l2msqk.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net,
+        james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
+        eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
+        ardb@kernel.org, peterx@redhat.com, seanjc@google.com,
+        shan.gavin@gmail.com
+Subject: Re: [PATCH 1/4] KVM: arm64: Allow saving vgic3 LPI pending status in no running vcpu context
+In-Reply-To: <0626e135-5d6b-8d09-ccd1-068e42a052f6@redhat.com>
+References: <20230116040405.260935-1-gshan@redhat.com>
+        <20230116040405.260935-2-gshan@redhat.com>
+        <Y8cKQRIbpLWVcdcw@google.com>
+        <0626e135-5d6b-8d09-ccd1-068e42a052f6@redhat.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: gshan@redhat.com, oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, corbet@lwn.net, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com, eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com, ardb@kernel.org, peterx@redhat.com, seanjc@google.com, shan.gavin@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023, Peter Zijlstra wrote:
-> On Tue, Dec 13, 2022 at 06:09:12AM +0000, Sean Christopherson wrote:
+On Thu, 19 Jan 2023 01:11:44 +0000,
+Gavin Shan <gshan@redhat.com> wrote:
 > 
-> > @@ -7119,6 +7118,18 @@ static noinstr void vmx_vcpu_enter_exit(struct kvm_vcpu *vcpu,
-> >  
-> >  	vmx_enable_fb_clear(vmx);
-> >  
-> > +	if (unlikely(vmx->fail))
-> > +		vmx->exit_reason.full = 0xdead;
-> > +	else
-> > +		vmx->exit_reason.full = vmcs_read32(VM_EXIT_REASON);
-> > +
-> > +	if ((u16)vmx->exit_reason.basic == EXIT_REASON_EXCEPTION_NMI &&
-> > +	    is_nmi(vmx_get_intr_info(vcpu))) {
-> > +		kvm_before_interrupt(vcpu, KVM_HANDLING_NMI);
-> > +		vmx_do_nmi_irqoff();
-> > +		kvm_after_interrupt(vcpu);
-> > +	}
-> > +
-> >  	guest_state_exit_irqoff();
-> >  }
+> I will have vgic_write_guest_lock() in v2. Note that those 3 paths can't be
+> running in parallel since one switch is shared by them. Alternatively, we
+> extend struct vgic_dist::save_tables_in_progress from 'bool' to 'unsigned long'.
+> Several bit is defined for each site as below. In this way, the 3 paths can be
+> running in parallel:
 > 
-> I think we're going to have to sprinkle __always_inline on the
-> kvm_{before,after}_interrupt() things (or I missed the earlier patches
-> doing this already), sometimes compilers are just weird.
+>   unsigned long struct vgic_dist::save_tables_in_progress
+> 
+>   #define VGIC_DIST_SAVE_ITS_ITE		0	/* ITS Translation Entry */
+>   #define VGIC_DIST_SAVE_ITS_DTE		1	/* ITS Device Table Entry */
+>   #define VGIC_DIST_SAVE_ITS_CTE		2	/* ITS Collection Table Entry */
+>   #define VGIC_DIST_SAVE_ITS_CT			3	/* ITS Collection Table */
+>   #define VGIC_DIST_SAVE_VGIC3_LPI		4	/* VGIC3 LPI Pending Status */
+>   #define VGIC_DIST_SAVE_VGIC3_PENDING_TABLE	5	/* VGIC3 Pending Table */
+> 
+> The drawback is the calls are limited to 64. If those 3 paths can't be running
+> in parallel, we needn't the extension at all.
 
-It's in this patch, just lurking at the bottom.
+It should all be completely sequential. KVM_DEV_ARM_ITS_SAVE_TABLES
+runs in a context where everything is locked, and so is
+VGIC_DIST_SAVE_VGIC3_PENDING_TABLE.
 
-> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
-> index 9de72586f406..44d1827f0a30 100644
-> --- a/arch/x86/kvm/x86.h
-> +++ b/arch/x86/kvm/x86.h
-> @@ -382,13 +382,13 @@ enum kvm_intr_type {
->         KVM_HANDLING_NMI,
->  };
->
-> -static inline void kvm_before_interrupt(struct kvm_vcpu *vcpu,
-> -                                       enum kvm_intr_type intr)
-> +static __always_inline void kvm_before_interrupt(struct kvm_vcpu *vcpu,
-> +                                                enum kvm_intr_type intr)
->  {
->         WRITE_ONCE(vcpu->arch.handling_intr_from_guest, (u8)intr);
->  }
->
-> -static inline void kvm_after_interrupt(struct kvm_vcpu *vcpu)
-> +static __always_inline void kvm_after_interrupt(struct kvm_vcpu *vcpu)
->  {
->         WRITE_ONCE(vcpu->arch.handling_intr_from_guest, 0);
->  }
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
