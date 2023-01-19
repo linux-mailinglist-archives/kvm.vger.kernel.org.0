@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07AB36734D7
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 10:55:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6816A6734DF
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 10:56:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229924AbjASJzC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 04:55:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34564 "EHLO
+        id S230107AbjASJ4g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 04:56:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230280AbjASJyz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 04:54:55 -0500
+        with ESMTP id S230250AbjASJ4a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 04:56:30 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 546435D106
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 01:54:54 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 158D8611F2
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 01:56:25 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E636060B59
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 09:54:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 540C6C433F0;
-        Thu, 19 Jan 2023 09:54:53 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9C43561382
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 09:56:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 070D4C433EF;
+        Thu, 19 Jan 2023 09:56:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674122093;
-        bh=y7c7NqbbdZg32I6uaJ43JYiG4QLb3yxiDnBwhTViYDE=;
+        s=k20201202; t=1674122184;
+        bh=M+2oi24ZX5Sq0ORB/Er7ZwzgtCNJPmHsLAW1HemxPqc=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=RlUK30TfOiSPpN/bbClkFXsyswLks4nOsJXasioFl2de7TwM8qgv7er2miWELHcVS
-         IVa1Op5u/RI+VIAr/xpTNbzCOh2bantBJAaBVBXniOCuMgfTvuUqGyNrHqHsjM+8Vi
-         ossfId3gj2inTnWTmyFIVAbjbDsOMzSNb+PaB8e3gbjIpkxKJ00Zhj4XFManaJKqp3
-         8jD5BX9FafwRxVDv1YqgL5AvfACfyyBW1k7Q0hf1h3b72vO54XcL6rXPKfIlrb8NeU
-         li0k3C7BJpAP7jUUjS5ADJZS53lTzJM3sI9INdwQu7AzMBLC8r3vYIfYZmt9t3wUll
-         7Xuh/BJXOqcnA==
+        b=Fh0MxYl/HLIWqzjWsmwws631AJUThDI75mOHI4xE5CsBP22+dggJjeHcC11AXAkkY
+         aoy407uf9rv1GyTOsQO4K0FiLmQ/4XHQlmhMkIlzIJ9hy3Ey3+nr3x43ZI3tDQrySa
+         u29vcUuiaT7oKasluwJqiPJKuhFUtMB8gCD63yk3983hFFX92hItNYNjuo4/VwakFM
+         JyuZVo2eYEmBHsyq/wSWzk8lXJD7htJrhSbFtoRgvLnGcDT8EJ2EM7PPs6CZQIyVs+
+         wM1PYQEJjCuanxfrZgvs3A/WBWSoivAtZDHegkurs+y70Gx7I+hj2fH6Gn/jqlRuPk
+         su5L6eWiAh1tg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pIRdC-00329l-Uk;
-        Thu, 19 Jan 2023 09:54:51 +0000
-Date:   Thu, 19 Jan 2023 09:54:50 +0000
-Message-ID: <861qnqonmd.wl-maz@kernel.org>
+        id 1pIRef-0032Ax-Rg;
+        Thu, 19 Jan 2023 09:56:22 +0000
+Date:   Thu, 19 Jan 2023 09:56:21 +0000
+Message-ID: <86zgaen8ze.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Sean Christopherson <seanjc@google.com>
 Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>, kvm@vger.kernel.org,
@@ -46,9 +46,10 @@ Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>, kvm@vger.kernel.org,
         suzuki.poulose@arm.com, oliver.upton@linux.dev,
         catalin.marinas@arm.com, will@kernel.org, paul@xen.org
 Subject: Re: [PATCH v5] KVM: MMU: Make the definition of 'INVALID_GPA' common
-In-Reply-To: <Y8iUkMbNM8jWE4RR@google.com>
+In-Reply-To: <861qnqonmd.wl-maz@kernel.org>
 References: <20230105130127.866171-1-yu.c.zhang@linux.intel.com>
         <Y8iUkMbNM8jWE4RR@google.com>
+        <861qnqonmd.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -67,35 +68,43 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 19 Jan 2023 00:53:36 +0000,
-Sean Christopherson <seanjc@google.com> wrote:
+On Thu, 19 Jan 2023 09:54:50 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On Thu, Jan 05, 2023, Yu Zhang wrote:
-> > KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in kvm_types.h,
-> > and it is used by ARM code. We do not need another definition of
-> > 'INVALID_GPA' for X86 specifically.
+> On Thu, 19 Jan 2023 00:53:36 +0000,
+> Sean Christopherson <seanjc@google.com> wrote:
 > > 
-> > Instead of using the common 'GPA_INVALID' for X86, replace it with
-> > 'INVALID_GPA', and change the users of 'GPA_INVALID' so that the diff
-> > can be smaller. Also because the name 'INVALID_GPA' tells the user we
-> > are using an invalid GPA, while the name 'GPA_INVALID' is emphasizing
-> > the GPA is an invalid one.
+> > On Thu, Jan 05, 2023, Yu Zhang wrote:
+> > > KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in kvm_types.h,
+> > > and it is used by ARM code. We do not need another definition of
+> > > 'INVALID_GPA' for X86 specifically.
+> > > 
+> > > Instead of using the common 'GPA_INVALID' for X86, replace it with
+> > > 'INVALID_GPA', and change the users of 'GPA_INVALID' so that the diff
+> > > can be smaller. Also because the name 'INVALID_GPA' tells the user we
+> > > are using an invalid GPA, while the name 'GPA_INVALID' is emphasizing
+> > > the GPA is an invalid one.
+> > > 
+> > > No functional change intended.
+> > > 
+> > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> > > Reviewed-by: Paul Durrant <paul@xen.org>
+> > > Reviewed-by: Sean Christopherson <seanjc@google.com>
+> > > ---
 > > 
-> > No functional change intended.
+> > Marc and/or Oliver,
 > > 
-> > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > Reviewed-by: Paul Durrant <paul@xen.org>
-> > Reviewed-by: Sean Christopherson <seanjc@google.com>
-> > ---
+> > Do you want to grab this since most of the changes are to arm64?
+> > I'll happily take it through x86, but generating a conflict in arm64
+> > seems infinitely more likely.
+> > 
 > 
-> Marc and/or Oliver,
-> 
-> Do you want to grab this since most of the changes are to arm64?
-> I'll happily take it through x86, but generating a conflict in arm64
-> seems infinitely more likely.
-> 
+> Do you mind acking it then, at least for the x86 part?
 
-Do you mind acking it then, at least for the x86 part?
+Duh, ignore me, I haven't had enough coffee yet... I'll coordinate
+with Oliver on how to queue this.
+
+Thanks,
 
 	M.
 
