@@ -2,96 +2,199 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E729E672DBA
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 01:54:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3866D672DDA
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 02:12:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229900AbjASAyM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 19:54:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59368 "EHLO
+        id S229724AbjASBMw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 20:12:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229827AbjASAyC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 19:54:02 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8173689F2
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 16:53:44 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id c6so829510pls.4
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 16:53:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JxtP2JZYn15BaZI+3hGbjmjCOphbX1iS/a9OgxH9eC8=;
-        b=nYkvUuCvwNRmZ6/tYbIyRxA0D5d0Q0xjH60buaSFodXtojlR2kkCGcwp/4LFFLDF5X
-         I1RnsHS5SYp8plDzHyEf5LU/X6DKkhRn2S2Lyz3XmsqH+daSlySqCxw40602Vm3iD0nT
-         DePSkF6WyKct8hovGfr7ErVny4ZA7ijXnwQJ21ihuJ52HDHmdahaf5yxQmwKNVSPyUUx
-         kEejswki3qDBbgIAfvP4BKYf8zP1xQwQy73uH1OgaVTdpT/ngUcOmbcwtwjO0/W2QTNf
-         S+Os0Z0KKLxg9O+Xu6+bPXXQzawhp6Et8aYU1CRxWqrG5Xv58LHO6c1htrZJUo1A0Hc8
-         1Sbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JxtP2JZYn15BaZI+3hGbjmjCOphbX1iS/a9OgxH9eC8=;
-        b=4i33AbMgBgSt6dCpwmJBqmY/c3tc8l6U2eT9p/Z818iPSIeJR47Oim/devtfS4Gaxp
-         4Kx8KN6xE8hX3HLG+TiBGCm9YXjx6IWMOZWxbY/v/bJ4r2lwLqGuWzUJmvcigaIc0CS5
-         QeAxf1oDXHR+0k2XEet+DoYjBJ72iFiXQ4YPd/sVp8QjEOOkunbjw0Gb5ClCp85ykvBy
-         lcUkmT50wPHVziYkOcz0WlJ8T1j1my7ckQIGst9bMlbCGcwLufNSRyvrozInzQEtVCyr
-         ZgB8N9sTGHLXzyS1EP9/haDuz4ErtSa+0M5hCBYo/eqkmZHIjBWB2JBxGPmwxoevnQu0
-         a35A==
-X-Gm-Message-State: AFqh2krVhwzja3zH8+C3671wqkzPChfjsIxW4oTOE7fKB96218GgoxjO
-        xx6qAYJRSDVsALAcryUG6FyM4keMCrwH+Vxl
-X-Google-Smtp-Source: AMrXdXs4AR/eypC+8FwZqFfBXNZ5jiZW908O2b1D/lZ+STRLmhTSWLLV3FUCGHL/M576AJH/g+uREw==
-X-Received: by 2002:a17:902:d409:b0:189:6624:58c0 with SMTP id b9-20020a170902d40900b00189662458c0mr2800450ple.3.1674089623401;
-        Wed, 18 Jan 2023 16:53:43 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id m4-20020a170902bb8400b00192a8b35fa3sm23704483pls.122.2023.01.18.16.53.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Jan 2023 16:53:40 -0800 (PST)
-Date:   Thu, 19 Jan 2023 00:53:36 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com, maz@kernel.org,
-        james.morse@arm.com, alexandru.elisei@arm.com,
-        suzuki.poulose@arm.com, oliver.upton@linux.dev,
-        catalin.marinas@arm.com, will@kernel.org, paul@xen.org
-Subject: Re: [PATCH v5] KVM: MMU: Make the definition of 'INVALID_GPA' common
-Message-ID: <Y8iUkMbNM8jWE4RR@google.com>
-References: <20230105130127.866171-1-yu.c.zhang@linux.intel.com>
+        with ESMTP id S229689AbjASBMv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 20:12:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 064F766EEA
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 17:12:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674090720;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=1s/focwXYH9ypammfY4jmkagsBW5DWFSgWPXj6TkN40=;
+        b=Z/jFNBzyXJdGfpKF4qeONTM90x/T/p3lWBGX2ObYWcObZEoia78mYwf+5BFfzNXWLPva0d
+        hbEVQT6EomMLgHfHIeziYx9fKnwBTBIxRlb4RecwnvAGYv2jCO42rUtJ2U8mkfJUaVzgyJ
+        xWjUz2+RMKVaLLTTI0/Qj/+BmgZjm74=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-462-g-IkxgauOgGNQSydGKEIsg-1; Wed, 18 Jan 2023 20:11:56 -0500
+X-MC-Unique: g-IkxgauOgGNQSydGKEIsg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CECDD101A521;
+        Thu, 19 Jan 2023 01:11:55 +0000 (UTC)
+Received: from [10.64.54.98] (vpn2-54-98.bne.redhat.com [10.64.54.98])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3E18D40C2064;
+        Thu, 19 Jan 2023 01:11:47 +0000 (UTC)
+Reply-To: Gavin Shan <gshan@redhat.com>
+Subject: Re: [PATCH 1/4] KVM: arm64: Allow saving vgic3 LPI pending status in
+ no running vcpu context
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, maz@kernel.org, corbet@lwn.net,
+        james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
+        eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
+        ardb@kernel.org, peterx@redhat.com, seanjc@google.com,
+        shan.gavin@gmail.com
+References: <20230116040405.260935-1-gshan@redhat.com>
+ <20230116040405.260935-2-gshan@redhat.com> <Y8cKQRIbpLWVcdcw@google.com>
+From:   Gavin Shan <gshan@redhat.com>
+Message-ID: <0626e135-5d6b-8d09-ccd1-068e42a052f6@redhat.com>
+Date:   Thu, 19 Jan 2023 12:11:44 +1100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230105130127.866171-1-yu.c.zhang@linux.intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y8cKQRIbpLWVcdcw@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 05, 2023, Yu Zhang wrote:
-> KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in kvm_types.h,
-> and it is used by ARM code. We do not need another definition of
-> 'INVALID_GPA' for X86 specifically.
-> 
-> Instead of using the common 'GPA_INVALID' for X86, replace it with
-> 'INVALID_GPA', and change the users of 'GPA_INVALID' so that the diff
-> can be smaller. Also because the name 'INVALID_GPA' tells the user we
-> are using an invalid GPA, while the name 'GPA_INVALID' is emphasizing
-> the GPA is an invalid one.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> Reviewed-by: Paul Durrant <paul@xen.org>
-> Reviewed-by: Sean Christopherson <seanjc@google.com>
-> ---
+Hi Oliver,
 
-Marc and/or Oliver,
+On 1/18/23 7:51 AM, Oliver Upton wrote:
+> On Mon, Jan 16, 2023 at 12:04:02PM +0800, Gavin Shan wrote:
+>> When dirty ring is enabled, the dirty page information is pushed to
+>> the dirty ring if there is a running VCPU context. Otherwise, the
+>> dirty page information is still tracked by the backup dirty bitmap.
+>> In order to detect if there is a running VCPU context when a guest
+>> page becomes dirty, kvm_arch_allow_write_without_running_vcpu() was
+>> introduced to warn when no running VCPU context exists on unknown
+>> cases.
+>>
+>> Other than the site of saving ITS tables, it's possible to save vgic3
+>> LPI pending status in no running vcpu context because it can happen when
+>> ITS ITE is restored through the command KVM_DEV_ARM_ITS_RESTORE_TABLES
+>> on 'kvm-arm-vgic-its' device.
+>>
+>> Fix it by allowing to save vgic3 LPI pending status in no running
+>> vcpu context.
+>>
+>> Signed-off-by: Gavin Shan <gshan@redhat.com>
+>> ---
+>>   Documentation/virt/kvm/api.rst | 5 +++--
+>>   arch/arm64/kvm/vgic/vgic-its.c | 3 ++-
+>>   arch/arm64/kvm/vgic/vgic-v3.c  | 3 +++
+>>   include/kvm/arm_vgic.h         | 1 +
+>>   4 files changed, 9 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+>> index 9807b05a1b57..18b245a0ba02 100644
+>> --- a/Documentation/virt/kvm/api.rst
+>> +++ b/Documentation/virt/kvm/api.rst
+>> @@ -8071,8 +8071,9 @@ state is final and avoid missing dirty pages from another ioctl ordered
+>>   after the bitmap collection.
+>>   
+>>   NOTE: One example of using the backup bitmap is saving arm64 vgic/its
+>> -tables through KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on
+>> -KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+>> +tables and vgic3 LPI pending status through KVM_DEV_ARM_{VGIC_GRP_CTRL,
+>> +ITS_SAVE_TABLES} and KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_RESTORE_TABLES}
+>> +command on KVM device "kvm-arm-vgic-its" when dirty ring is enabled.
+>>   
+>>   8.30 KVM_CAP_XEN_HVM
+>>   --------------------
+>> diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
+>> index 94a666dd1443..119a9c7a0a52 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-its.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-its.c
+>> @@ -2792,7 +2792,8 @@ bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+>>   {
+>>   	struct vgic_dist *dist = &kvm->arch.vgic;
+>>   
+>> -	return dist->save_its_tables_in_progress;
+>> +	return dist->save_vgic_v3_tables_in_progress ||
+>> +	       dist->save_its_tables_in_progress;
+> 
+> I'd much prefer using a single bool to keep track of this, i.e:
+> 
 
-Do you want to grab this since most of the changes are to arm64?  I'll happily
-take it through x86, but generating a conflict in arm64 seems infinitely more likely.
+Yes, it's clean to have 'dist->save_tables_in_progress' for all
+3 cases. One more concern like below.
+
+> 	return dist->save_tables_in_progress;
+> 
+>>   }
+>>   
+>>   static int vgic_its_set_attr(struct kvm_device *dev,
+>> diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
+>> index 2074521d4a8c..32998c8587a8 100644
+>> --- a/arch/arm64/kvm/vgic/vgic-v3.c
+>> +++ b/arch/arm64/kvm/vgic/vgic-v3.c
+>> @@ -304,6 +304,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
+>>   int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>>   {
+>>   	struct kvm_vcpu *vcpu;
+>> +	struct vgic_dist *dist = &kvm->arch.vgic;
+>>   	int byte_offset, bit_nr;
+>>   	gpa_t pendbase, ptr;
+>>   	bool status;
+>> @@ -339,7 +340,9 @@ int vgic_v3_lpi_sync_pending_status(struct kvm *kvm, struct vgic_irq *irq)
+>>   	if (status) {
+>>   		/* clear consumed data */
+>>   		val &= ~(1 << bit_nr);
+>> +		dist->save_vgic_v3_tables_in_progress = true;
+>>   		ret = kvm_write_guest_lock(kvm, ptr, &val, 1);
+>> +		dist->save_vgic_v3_tables_in_progress = false;
+> 
+> With the above suggestion of using a bool, this should become a helper
+> used at all the affected callsites:
+> 
+>    static int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
+>    				   const void *data, unsigned long len)
+>    {
+>    	struct vgic_dist *dist = &kvm->arch.vgic;
+> 	int ret;
+> 
+> 	dist->save_tables_in_progress = true;
+> 	ret = kvm_write_guest_lock(kvm, gpa, data, len);
+> 	dist->save_tables_in_progress = false;
+> 
+> 	return ret;
+>    }
+> 
+
+I will have vgic_write_guest_lock() in v2. Note that those 3 paths can't be
+running in parallel since one switch is shared by them. Alternatively, we
+extend struct vgic_dist::save_tables_in_progress from 'bool' to 'unsigned long'.
+Several bit is defined for each site as below. In this way, the 3 paths can be
+running in parallel:
+
+   unsigned long struct vgic_dist::save_tables_in_progress
+
+   #define VGIC_DIST_SAVE_ITS_ITE		0	/* ITS Translation Entry */
+   #define VGIC_DIST_SAVE_ITS_DTE		1	/* ITS Device Table Entry */
+   #define VGIC_DIST_SAVE_ITS_CTE		2	/* ITS Collection Table Entry */
+   #define VGIC_DIST_SAVE_ITS_CT			3	/* ITS Collection Table */
+   #define VGIC_DIST_SAVE_VGIC3_LPI		4	/* VGIC3 LPI Pending Status */
+   #define VGIC_DIST_SAVE_VGIC3_PENDING_TABLE	5	/* VGIC3 Pending Table */
+
+The drawback is the calls are limited to 64. If those 3 paths can't be running
+in parallel, we needn't the extension at all.
+
+Thanks,
+Gavin
+
