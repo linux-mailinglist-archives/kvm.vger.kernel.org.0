@@ -2,49 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50B036743A2
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 21:43:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0E76E6743A9
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 21:49:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbjASUnx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 15:43:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46300 "EHLO
+        id S230126AbjASUtF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 15:49:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229461AbjASUnu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 15:43:50 -0500
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A0A6FF8F;
-        Thu, 19 Jan 2023 12:43:47 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4NyZNG0j75z4xGM;
-        Fri, 20 Jan 2023 07:43:41 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1674161022;
-        bh=OVMeYFepwe2nhDfTebMISEal8NwdZk/ON7NKF1Lf+8U=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NP56b6ZJ8TNN2ruGvglHBXvf7r0HzRBQ1jcOqa8xpD9y13Hz5qC39yJHVhFvAzvln
-         s5u5tBskuvU6cpHpQ8XkFrKffRQGjMaTSgTAig33TeReYRyKy3BTZavBZoqPOp0wDZ
-         5aOvBozS/+RSc1nno607LHJVBbqOzI3QZw2o1FxJhLPKrlFZM/wDhDeCxo/g0jhhtf
-         nqOlX7krozv5cy1LypCtUo5JWPotiBM4ZwVUawknZMFyvC2iNaItVO+yRZWqRyR3hC
-         055zjK0IIVzgq4XXBXaML+xLtUgxgVWLM8Vq3p/RzGbXNwDInLCNqxR0SmFVXGZoWo
-         qfwbpmPwkvmNA==
-Date:   Fri, 20 Jan 2023 07:43:27 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
-        linux-next@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: Add kvm-x86 to linux-next
-Message-ID: <20230120074327.3e96bb7e@canb.auug.org.au>
-In-Reply-To: <Y8mhA9NBzAT27sh0@google.com>
-References: <Y8mhA9NBzAT27sh0@google.com>
+        with ESMTP id S229853AbjASUsT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 15:48:19 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B401966D6
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:47:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674161250;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=IIowsBrf9b3JCaK9pHoD6oxsa3VcB7SaCU8GOAbl9E8=;
+        b=AiTcxijN5+2xS82TrZuWJesaYKboVz2IaOPDAZxe2tCEp71mfZlw3msY7PcqNBP4orlq1c
+        UvHN+u61UCSizA26YdNo9QFVvFR3cqBWBumOgROJc6FmCd1RIG47Vd8ISsjpNhC0z6322o
+        VZLeTjiwQQRGqp+WrUpi3COZ5WJYzEE=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-192-r3dgnVTsM3yljAFoCltzHw-1; Thu, 19 Jan 2023 15:47:28 -0500
+X-MC-Unique: r3dgnVTsM3yljAFoCltzHw-1
+Received: by mail-il1-f199.google.com with SMTP id i7-20020a056e021b0700b003033a763270so2419347ilv.19
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:47:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IIowsBrf9b3JCaK9pHoD6oxsa3VcB7SaCU8GOAbl9E8=;
+        b=NsJIltSGXP8XmO0aE/AkeWO6Y5Fl12paoVLhM0OJvRdBHTt/KDj1rd/ofxgpYJNEIS
+         NOrPD8Vm8WQ4ihxIJ5BXM3wYjobWoBYoD5/Rqi+Gz6mBcK+YCBK1BelsqnqqyHU4o7+Y
+         ESwop3mPfPq48J7DGcpx6Gn3k18ayxQ3NXWRNwwLcQaKlpsQJ+25Y4yjQ4gI5tfzJCH6
+         r7ajLbiO9kdQH52FdNz04BJatXR0wBmYCRUrB7NsB3p5hMBYPlZ43w4C1NPW//wGn37Q
+         XoWoVUJOWieXW+2eHlTKO0dwbbMsXAypig0xC6R92ly/RoQ8m3tU7oaakRn5RErBb52C
+         z5yg==
+X-Gm-Message-State: AFqh2kqkHJ+BH53zVVcQgKxgknOY4oYvRxu8aoVfWWA99DLkv/uhZo7q
+        nQSg+DKp1C18InlwjSXH8F817fV0RQQ1OvKAPZSnLkHqA2ncJTDiPihjL/4evdYIqpOpLQp2ZIK
+        7+3Wa6BQZEIzt
+X-Received: by 2002:a5d:9c16:0:b0:6df:820f:beae with SMTP id 22-20020a5d9c16000000b006df820fbeaemr8991259ioe.18.1674161248146;
+        Thu, 19 Jan 2023 12:47:28 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXul5eTiTgaIeDVtkmgrhxBLkc/24OqBtha+BQx8gHk4Ea5M/QKYBoDcNlzzKrBGRaGGf1559w==
+X-Received: by 2002:a5d:9c16:0:b0:6df:820f:beae with SMTP id 22-20020a5d9c16000000b006df820fbeaemr8991251ioe.18.1674161247919;
+        Thu, 19 Jan 2023 12:47:27 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id w14-20020a02b0ce000000b003a5eae30e55sm2778065jah.75.2023.01.19.12.47.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 12:47:27 -0800 (PST)
+Date:   Thu, 19 Jan 2023 13:47:26 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, cohuck@redhat.com,
+        eric.auger@redhat.com, nicolinc@nvidia.com, kvm@vger.kernel.org,
+        mjrosato@linux.ibm.com, chao.p.peng@linux.intel.com,
+        yi.y.sun@linux.intel.com, peterx@redhat.com, jasowang@redhat.com,
+        suravee.suthikulpanit@amd.com
+Subject: Re: [PATCH 08/13] vfio: Block device access via device fd until
+ device is opened
+Message-ID: <20230119134726.5e381c10.alex.williamson@redhat.com>
+In-Reply-To: <20230117134942.101112-9-yi.l.liu@intel.com>
+References: <20230117134942.101112-1-yi.l.liu@intel.com>
+        <20230117134942.101112-9-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/4Ys2hWAjez6hY/3l1TX.XQr";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS autolearn=ham
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -52,60 +83,61 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/4Ys2hWAjez6hY/3l1TX.XQr
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, 17 Jan 2023 05:49:37 -0800
+Yi Liu <yi.l.liu@intel.com> wrote:
 
-Hi Sean,
+> Allow the vfio_device file to be in a state where the device FD is
+> opened but the device cannot be used by userspace (i.e. its .open_device()
+> hasn't been called). This inbetween state is not used when the device
+> FD is spawned from the group FD, however when we create the device FD
+> directly by opening a cdev it will be opened in the blocked state.
+> 
+> In the blocked state, currently only the bind operation is allowed,
+> other device accesses are not allowed. Completing bind will allow user
+> to further access the device.
+> 
+> This is implemented by adding a flag in struct vfio_device_file to mark
+> the blocked state and using a simple smp_load_acquire() to obtain the
+> flag value and serialize all the device setup with the thread accessing
+> this device.
+> 
+> Due to this scheme it is not possible to unbind the FD, once it is bound,
+> it remains bound until the FD is closed.
+> 
+> Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/vfio.h      |  1 +
+>  drivers/vfio/vfio_main.c | 29 +++++++++++++++++++++++++++++
+>  2 files changed, 30 insertions(+)
+> 
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 3d8ba165146c..c69a9902ea84 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -20,6 +20,7 @@ struct vfio_device_file {
+>  	struct vfio_device *device;
+>  	struct kvm *kvm;
+>  	struct iommufd_ctx *iommufd;
+> +	bool access_granted;
+>  };
+>  
+>  void vfio_device_put_registration(struct vfio_device *device);
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index 3df71bd9cd1e..d442ebaa4b21 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -430,6 +430,11 @@ int vfio_device_open(struct vfio_device_file *df)
+>  		}
+>  	}
+>  
+> +	/*
+> +	 * Paired with smp_load_acquire() in vfio_device_fops::ioctl/
+> +	 * read/write/mmap
+> +	 */
+> +	smp_store_release(&df->access_granted, true);
 
-On Thu, 19 Jan 2023 19:58:59 +0000 Sean Christopherson <seanjc@google.com> =
-wrote:
->
-> Can you please add
->=20
->   https://github.com/kvm-x86/linux.git next
->=20
-> to the set of linux-next inputs?  Going forward, it'll be my semi-officia=
-l tree
-> for KVM x86 (Paolo and I are still working out exactly how best to juggle=
- x86).
+Why is this happening outside of the first-open branch?  Thanks,
 
-Thanks for adding your subsystem tree as a participant of linux-next.  As
-you may know, this is not a judgement of your code.  The purpose of
-linux-next is for integration testing and to lower the impact of
-conflicts between subsystems in the next merge window.=20
+Alex
 
-You will need to ensure that the patches/commits in your tree/series have
-been:
-     * submitted under GPL v2 (or later) and include the Contributor's
-        Signed-off-by,
-     * posted to the relevant mailing list,
-     * reviewed by you (or another maintainer of your subsystem tree),
-     * successfully unit tested, and=20
-     * destined for the current or next Linux merge window.
-
-Basically, this should be just what you would send to Linus (or ask him
-to fetch).  It is allowed to be rebased if you deem it necessary.
-
---=20
-Cheers,
-Stephen Rothwell=20
-sfr@canb.auug.org.au
-
---Sig_/4Ys2hWAjez6hY/3l1TX.XQr
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmPJq28ACgkQAVBC80lX
-0Gwr1wgAhfrbIKcWqaponb079qRd8RHg1Qz7Fxyo3HKkrHeAxU+aLwy3XUCKZokq
-VdwEzzCfUt+47zb7+2jw3n0E1UQIlXxk1XkUXc5RLqRk0PRdmmfxM2X6nza7n0Cf
-V0zO3SY8+aoxwCxm7GxliWw1c6UGy+SU9MTZW8ID+4zQmz87LCEhJX+ZsXojhkw+
-YPKmZxqlPiMAGoeAjJwjypjZD7p2hrCX11r8HpyWrIO9/bvpl31KbUIP+BAnbdwf
-UETXSW4SklKyBwwVVnTmn17kRivzaukvGBVJP8rI4gkAniqKmqpVJvkVrc9oxa66
-9vdwwm9Cer4mAdyAe7c9NyXYwFXcCQ==
-=p8IL
------END PGP SIGNATURE-----
-
---Sig_/4Ys2hWAjez6hY/3l1TX.XQr--
