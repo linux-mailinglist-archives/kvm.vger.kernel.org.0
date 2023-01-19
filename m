@@ -2,276 +2,119 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A490A673D2E
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 16:10:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 10C28673D50
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 16:19:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230234AbjASPK5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 10:10:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51224 "EHLO
+        id S230383AbjASPT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 10:19:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230288AbjASPKw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 10:10:52 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C64A6DB3D;
-        Thu, 19 Jan 2023 07:10:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674141050; x=1705677050;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=L7iHmUNW9JP/1fUrsU1qz6/t8KvG5NQvNDZLIvQ9EXo=;
-  b=i1GK/uM8WFE0LtwiDbrcZ77HnQLXXMNjglKR4sM6jm7TdoVDx5H12WGt
-   0G5vah2KVCpu08nVJMAHYF4eyTe3AcubKlqkALlCcH9PtQP0X8ZpSSobB
-   taoaKZOAXqz8qgASR7bVqys1/pUSlsFU4ruNaW44XGb/Pmu7Li2gqdHgm
-   fkeNnP5+qVmPdk+2dPFnRY/SLlPKEqFHi7U+hBfFENNXB66LSG3kcCGY9
-   LZ6KqAxcKJc7Mhsp9JQLOEh8rIFRDX/0b3fgajjQWDquXufJScjD3Fi7J
-   ci+kRLov5Zr00w46QG1LtImsDMvTgS5JnjiedfNiVIv2Y7hx8CJA/Bc/q
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="325350486"
-X-IronPort-AV: E=Sophos;i="5.97,229,1669104000"; 
-   d="scan'208";a="325350486"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 07:10:49 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="610093354"
-X-IronPort-AV: E=Sophos;i="5.97,229,1669104000"; 
-   d="scan'208";a="610093354"
-Received: from skxmcp01.bj.intel.com ([10.240.193.86])
-  by orsmga003.jf.intel.com with ESMTP; 19 Jan 2023 07:10:47 -0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/2] KVM: nVMX: Add helpers to setup VMX control msr configs
-Date:   Thu, 19 Jan 2023 22:19:46 +0800
-Message-Id: <20230119141946.585610-2-yu.c.zhang@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230119141946.585610-1-yu.c.zhang@linux.intel.com>
-References: <20230119141946.585610-1-yu.c.zhang@linux.intel.com>
+        with ESMTP id S229958AbjASPTZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 10:19:25 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B0B82D41
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 07:19:24 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id r18so1744813pgr.12
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 07:19:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=COC0cQf3RM+28HjrZuFfI8U9iEnmOUqpakV5+y8hXro=;
+        b=iYhnq31FqaCsdLQsRmrrrSLPknKuzg5EDi5FnG0XJsMCKleZzOOmIahMB3jDftuROY
+         H59Ix3pMjUGC32cz0psGxHXSEcTHd8pi8Qrq+kL8J6jfZ8xhUtDMh+Tzue4FsbiOkW3y
+         URS8YujQKNW9cPaYrDJPmzT15CUqXfqdqGhoCrQgkaPR9Ed8OGrN+9NyH3H7m/5QBEWV
+         hIkBu9SKzujHSZQFK9WfBMq0uvlOQq4I2fvhIczyLYxMGFewOAWWJfkfA27Q1PUGyPZi
+         3iQ2BSwglss6M0QPQ5mSnVR3fNPSvjfiFE54E9yOscLqQ2KH5BZGDbWYFbMsy5huTIVf
+         XMJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=COC0cQf3RM+28HjrZuFfI8U9iEnmOUqpakV5+y8hXro=;
+        b=oFafH28nTod7u9rTkf2JJhwqDauEHErFAcRVneRZYtGHwJwFqsSmiCw8nWQchFYe7D
+         jj7SbN1MSElNXJsn+1cb34xJFtD5aoYj1vaVAO1WQFmzdSMAuwnj/Nmn+DwFXntYAz+B
+         zT67eSN6nWscnWjs+bQNAJdAgjBJaPYpYBhSlcXFb5655xsdwQOVF1Uco4PLOwgICxaJ
+         Wz24y4OlpsugfS804oaZhx1phDXtGYprVxK6st6Ox4ot+hHTDAMlSOjs4yxWaNztYHrW
+         V1ejOBIdpYAr9puzBYvLj6KHtH6jVVsZJMwbUrcBZ3uIkTxxI4rOp7ioTb1S6LoQuHIq
+         ohWA==
+X-Gm-Message-State: AFqh2kpyboL6oV93hQgYIg+fdhMB2sYJxloNLKP4rsdFpUej9o0QQfM0
+        xcDgcvgwJRfy2u/8MjOEDY0qXg==
+X-Google-Smtp-Source: AMrXdXsUJCiHv+x8er4RQjqeSGm7p768nE4Z3fEvWZooodpyJRG2iLwFsWL/7iAU6pOKxpq0PgMGhQ==
+X-Received: by 2002:aa7:9041:0:b0:58b:cb1b:978f with SMTP id n1-20020aa79041000000b0058bcb1b978fmr1888929pfo.1.1674141562945;
+        Thu, 19 Jan 2023 07:19:22 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id x2-20020aa79a42000000b0058d9730ede0sm8638923pfj.210.2023.01.19.07.19.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 07:19:22 -0800 (PST)
+Date:   Thu, 19 Jan 2023 15:19:18 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Gavin Shan <gshan@redhat.com>
+Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, maz@kernel.org, corbet@lwn.net,
+        james.morse@arm.com, suzuki.poulose@arm.com,
+        oliver.upton@linux.dev, yuzenghui@huawei.com,
+        catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
+        eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
+        ardb@kernel.org, peterx@redhat.com, shan.gavin@gmail.com
+Subject: Re: [PATCH 4/4] KVM: Improve warning report in
+ mark_page_dirty_in_slot()
+Message-ID: <Y8lfdgcjLvtgII2a@google.com>
+References: <20230116040405.260935-1-gshan@redhat.com>
+ <20230116040405.260935-5-gshan@redhat.com>
+ <Y8bBzKF17IdZP9eF@google.com>
+ <d8e63ad9-e0e3-dbb1-b646-a1b5771d4c4b@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d8e63ad9-e0e3-dbb1-b646-a1b5771d4c4b@redhat.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-nested_vmx_setup_ctls_msrs() is used to set up the various VMX MSR
-controls for nested VMX. But it is a bit lengthy, just add helpers
-to setup the configuration of VMX MSRs.
+On Thu, Jan 19, 2023, Gavin Shan wrote:
+> Hi Sean,
+> 
+> On 1/18/23 2:42 AM, Sean Christopherson wrote:
+> > On Mon, Jan 16, 2023, Gavin Shan wrote:
+> > > There are two warning reports about the dirty ring in the function.
+> > > We have the wrong assumption that the dirty ring is always enabled when
+> > > CONFIG_HAVE_KVM_DIRTY_RING is selected.
+> > 
+> > No, it's not a wrong assumption, becuase it's not an assumption.  The intent is
+> > to warn irrespective of dirty ring/log enabling.  The orignal code actually warned
+> > irrespective of dirty ring support[1], again intentionally.  The
+> > CONFIG_HAVE_KVM_DIRTY_RING check was added because s390 can mark pages dirty from
+> > an worker thread[2] and s390 has no plans to support the dirty ring.
+> > 
+> > The reason for warning even if dirty ring isn't enabled is so that bots can catch
+> > potential KVM bugs without having to set up a dirty ring or enable dirty logging.
+> > 
+> > [1] 2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU")
+> > [2] e09fccb5435d ("KVM: avoid warning on s390 in mark_page_dirty")
+> > 
+> 
+> Thanks for the linker. I was confused when looking at the code, but now it's clear to
+> me. Thanks for your explanation. How about to add a comment there?
+> 
+>   /*
+>    * The warning is expected when the dirty ring is configured,
+>    * but not enabled.
+>    */
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
----
- arch/x86/kvm/vmx/nested.c | 129 +++++++++++++++++++++++++-------------
- 1 file changed, 85 insertions(+), 44 deletions(-)
+That's not correct either.  By design, the warning can also fire if the dirty ring
+is enabled.  KVM's rule is that writes to guest memory always need to be done in
+the context of a running vCPU, with the recently added exception of
+kvm_arch_allow_write_without_running_vcpu().  That intent of the warning is to
+enforce that rule regardless of the state of the VM.
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 81dfbffae575..98ed7631e810 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -6750,36 +6750,9 @@ static u64 nested_vmx_calc_vmcs_enum_msr(void)
- 	return (u64)max_idx << VMCS_FIELD_INDEX_SHIFT;
- }
- 
--/*
-- * nested_vmx_setup_ctls_msrs() sets up variables containing the values to be
-- * returned for the various VMX controls MSRs when nested VMX is enabled.
-- * The same values should also be used to verify that vmcs12 control fields are
-- * valid during nested entry from L1 to L2.
-- * Each of these control msrs has a low and high 32-bit half: A low bit is on
-- * if the corresponding bit in the (32-bit) control field *must* be on, and a
-- * bit in the high half is on if the corresponding bit in the control field
-- * may be on. See also vmx_control_verify().
-- */
--void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
-+static inline void nested_vmx_setup_pinbased_ctls(struct vmcs_config *vmcs_conf,
-+						  struct nested_vmx_msrs *msrs)
- {
--	struct nested_vmx_msrs *msrs = &vmcs_conf->nested;
--
--	/*
--	 * Note that as a general rule, the high half of the MSRs (bits in
--	 * the control fields which may be 1) should be initialized by the
--	 * intersection of the underlying hardware's MSR (i.e., features which
--	 * can be supported) and the list of features we want to expose -
--	 * because they are known to be properly supported in our code.
--	 * Also, usually, the low half of the MSRs (bits which must be 1) can
--	 * be set to 0, meaning that L1 may turn off any of these bits. The
--	 * reason is that if one of these bits is necessary, it will appear
--	 * in vmcs01 and prepare_vmcs02, when it bitwise-or's the control
--	 * fields of vmcs01 and vmcs02, will turn these bits off - and
--	 * nested_vmx_l1_wants_exit() will not pass related exits to L1.
--	 * These rules have exceptions below.
--	 */
--
--	/* pin-based controls */
- 	msrs->pinbased_ctls_low =
- 		PIN_BASED_ALWAYSON_WITHOUT_TRUE_MSR;
- 
-@@ -6792,8 +6765,11 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 	msrs->pinbased_ctls_high |=
- 		PIN_BASED_ALWAYSON_WITHOUT_TRUE_MSR |
- 		PIN_BASED_VMX_PREEMPTION_TIMER;
-+}
- 
--	/* exit controls */
-+static inline void nested_vmx_setup_exit_ctls(struct vmcs_config *vmcs_conf,
-+					      struct nested_vmx_msrs *msrs)
-+{
- 	msrs->exit_ctls_low =
- 		VM_EXIT_ALWAYSON_WITHOUT_TRUE_MSR;
- 
-@@ -6812,8 +6788,11 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 
- 	/* We support free control of debug control saving. */
- 	msrs->exit_ctls_low &= ~VM_EXIT_SAVE_DEBUG_CONTROLS;
-+}
- 
--	/* entry controls */
-+static inline void nested_vmx_setup_entry_ctls(struct vmcs_config *vmcs_conf,
-+					       struct nested_vmx_msrs *msrs)
-+{
- 	msrs->entry_ctls_low =
- 		VM_ENTRY_ALWAYSON_WITHOUT_TRUE_MSR;
- 
-@@ -6829,8 +6808,11 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 
- 	/* We support free control of debug control loading. */
- 	msrs->entry_ctls_low &= ~VM_ENTRY_LOAD_DEBUG_CONTROLS;
-+}
- 
--	/* cpu-based controls */
-+static inline void nested_vmx_setup_cpubased_ctls(struct vmcs_config *vmcs_conf,
-+						  struct nested_vmx_msrs *msrs)
-+{
- 	msrs->procbased_ctls_low =
- 		CPU_BASED_ALWAYSON_WITHOUT_TRUE_MSR;
- 
-@@ -6862,7 +6844,12 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 	/* We support free control of CR3 access interception. */
- 	msrs->procbased_ctls_low &=
- 		~(CPU_BASED_CR3_LOAD_EXITING | CPU_BASED_CR3_STORE_EXITING);
-+}
- 
-+static inline void nested_vmx_setup_secondary_ctls(u32 ept_caps,
-+				struct vmcs_config *vmcs_conf,
-+				struct nested_vmx_msrs *msrs)
-+{
- 	msrs->secondary_ctls_low = 0;
- 
- 	msrs->secondary_ctls_high = vmcs_conf->cpu_based_2nd_exec_ctrl;
-@@ -6944,8 +6931,11 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 
- 	if (enable_sgx)
- 		msrs->secondary_ctls_high |= SECONDARY_EXEC_ENCLS_EXITING;
-+}
- 
--	/* miscellaneous data */
-+static inline void nested_vmx_setup_misc_data(struct vmcs_config *vmcs_conf,
-+					      struct nested_vmx_msrs *msrs)
-+{
- 	msrs->misc_low = (u32)vmcs_conf->misc & VMX_MISC_SAVE_EFER_LMA;
- 	msrs->misc_low |=
- 		MSR_IA32_VMX_MISC_VMWRITE_SHADOW_RO_FIELDS |
-@@ -6953,13 +6943,16 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 		VMX_MISC_ACTIVITY_HLT |
- 		VMX_MISC_ACTIVITY_WAIT_SIPI;
- 	msrs->misc_high = 0;
-+}
- 
--	/*
--	 * This MSR reports some information about VMX support. We
--	 * should return information about the VMX we emulate for the
--	 * guest, and the VMCS structure we give it - not about the
--	 * VMX support of the underlying hardware.
--	 */
-+/*
-+ * VMX basic MSR reports some information about VMX support. We should
-+ * return information about the VMX we emulate for the guest, and the
-+ * VMCS structure we give it - not about the VMX support of the underlying
-+ * hardware.
-+ */
-+static inline void nested_vmx_setup_basic(struct nested_vmx_msrs *msrs)
-+{
- 	msrs->basic =
- 		VMCS12_REVISION |
- 		VMX_BASIC_TRUE_CTLS |
-@@ -6968,12 +6961,15 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 
- 	if (cpu_has_vmx_basic_inout())
- 		msrs->basic |= VMX_BASIC_INOUT;
-+}
- 
--	/*
--	 * These MSRs specify bits which the guest must keep fixed on
--	 * while L1 is in VMXON mode (in L1's root mode, or running an L2).
--	 * We picked the standard core2 setting.
--	 */
-+/*
-+ * cr0_fixed & cr4_fixed MSRs specify bits which the guest must keep fixed
-+ * on while L1 is in VMXON mode (in L1's root mode, or running an L2).
-+ * We picked the standard core2 setting.
-+ */
-+static inline void nested_vmx_setup_cr_fixed(struct nested_vmx_msrs *msrs)
-+{
- #define VMXON_CR0_ALWAYSON     (X86_CR0_PE | X86_CR0_PG | X86_CR0_NE)
- #define VMXON_CR4_ALWAYSON     X86_CR4_VMXE
- 	msrs->cr0_fixed0 = VMXON_CR0_ALWAYSON;
-@@ -6985,6 +6981,51 @@ void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
- 
- 	if (vmx_umip_emulated())
- 		msrs->cr4_fixed1 |= X86_CR4_UMIP;
-+}
-+
-+/*
-+ * nested_vmx_setup_ctls_msrs() sets up variables containing the values to be
-+ * returned for the various VMX controls MSRs when nested VMX is enabled.
-+ * The same values should also be used to verify that vmcs12 control fields are
-+ * valid during nested entry from L1 to L2.
-+ * Each of these control msrs has a low and high 32-bit half: A low bit is on
-+ * if the corresponding bit in the (32-bit) control field *must* be on, and a
-+ * bit in the high half is on if the corresponding bit in the control field
-+ * may be on. See also vmx_control_verify().
-+ */
-+void nested_vmx_setup_ctls_msrs(struct vmcs_config *vmcs_conf, u32 ept_caps)
-+{
-+	struct nested_vmx_msrs *msrs = &vmcs_conf->nested;
-+
-+	/*
-+	 * Note that as a general rule, the high half of the MSRs (bits in
-+	 * the control fields which may be 1) should be initialized by the
-+	 * intersection of the underlying hardware's MSR (i.e., features which
-+	 * can be supported) and the list of features we want to expose -
-+	 * because they are known to be properly supported in our code.
-+	 * Also, usually, the low half of the MSRs (bits which must be 1) can
-+	 * be set to 0, meaning that L1 may turn off any of these bits. The
-+	 * reason is that if one of these bits is necessary, it will appear
-+	 * in vmcs01 and prepare_vmcs02, when it bitwise-or's the control
-+	 * fields of vmcs01 and vmcs02, will turn these bits off - and
-+	 * nested_vmx_l1_wants_exit() will not pass related exits to L1.
-+	 * These rules have exceptions below.
-+	 */
-+	nested_vmx_setup_pinbased_ctls(vmcs_conf, msrs);
-+
-+	nested_vmx_setup_exit_ctls(vmcs_conf, msrs);
-+
-+	nested_vmx_setup_entry_ctls(vmcs_conf, msrs);
-+
-+	nested_vmx_setup_cpubased_ctls(vmcs_conf, msrs);
-+
-+	nested_vmx_setup_secondary_ctls(ept_caps, vmcs_conf, msrs);
-+
-+	nested_vmx_setup_misc_data(vmcs_conf, msrs);
-+
-+	nested_vmx_setup_basic(msrs);
-+
-+	nested_vmx_setup_cr_fixed(msrs);
- 
- 	msrs->vmcs_enum = nested_vmx_calc_vmcs_enum_msr();
- }
--- 
-2.25.1
-
+Concretely, I think you can just drop patches 3 and 4, and just fix the arm64 issues.
