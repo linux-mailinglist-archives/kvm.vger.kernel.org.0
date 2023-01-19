@@ -2,230 +2,509 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CF9B4672F17
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 03:40:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 491D2672F53
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 04:02:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229886AbjASCkg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 21:40:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49276 "EHLO
+        id S229618AbjASDCd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 22:02:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229844AbjASCka (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 21:40:30 -0500
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EB5059259;
-        Wed, 18 Jan 2023 18:40:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674096029; x=1705632029;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=JKdooXNqgcnncM9S6ZvI5EAyD8bSGwNvizMF1iRC6/U=;
-  b=D8ft6QDPD9DWQQmro6xXhZ4VaN880k76n4I4DpXDesXDSlObkeTPHx8q
-   VjwL6vTBqh8yAlD1v4MjCcDv56brxteiLheUm7IK8XRerxKcSbRY5X/zj
-   5e3/p7eKCVAXeTAGh5kn75ghWuldRKsYYN9O7l9YzQt+zIAGJRYpMajqi
-   cH/IdisB/ZPAbftv2VtF1XWK/uT3LMMos5WVOPGKyex7ZzFGEnBd7/9kK
-   ovaKmR0NAXcQkfTMp6wCAILpsAIZ1NaAcm931ItJlXer2K2qglVBYzpC6
-   hz9v/0DYIfxZNs74QFSuv9ViO1dX+h82InKe+tHp3cnCVhoTmy/HxGt89
-   w==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="304857043"
-X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
-   d="scan'208";a="304857043"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2023 18:40:21 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="802459885"
-X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
-   d="scan'208";a="802459885"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga001.fm.intel.com with ESMTP; 18 Jan 2023 18:40:21 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Wed, 18 Jan 2023 18:40:21 -0800
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Wed, 18 Jan 2023 18:40:20 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16 via Frontend Transport; Wed, 18 Jan 2023 18:40:20 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.109)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.16; Wed, 18 Jan 2023 18:40:20 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zju4jlZfTUMmJTPdZysod7yMnomfQU1yDU4AXqForVwPpmZLKT8S6/IKs6tvu+TlEbtgastkBEnW8P5bMIIAueut6Z6djvXoNrIYqX/NCpcFIO2fq4H+ct62q8xx9JzvK2FHELUimd7zRJm9tJMYMg/AU9frJx3BBQ5smI/80VO97W+dom4A7yEK+JTUXuWV//9TXGAzfgtuv1/zGvLNRZluzFvi7LQT0VZHiUXaoMICNb74EEZL7kxkYQxHKAQQr6KL+aNMmNOKu5nTRaAWx8ex/IzqYOUbXd0v8wRF8aUSRtpomE0dPfV9WZPPukmXoEAz1ECtBfdrJd6n00Yo/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JKdooXNqgcnncM9S6ZvI5EAyD8bSGwNvizMF1iRC6/U=;
- b=k9ZbUVU4Pm0yEmlA7ReMEVt0X4HELs4nUXRHMmecNb6OdqqYW/zfpKxrrRcSlIUSiP+OitVPBNQWFSdu74yp51sxrFGBNtF8kW6F9lp0vtNEYpFscgWNCer4Y/Lw5FZnir8MmGlgbVqd8PlYOd4aaWY2V3mhL+ndX4kg678fV4R3sDkfDq+pfI5G7t8x6mY1ne/nuhmiiLoJoPkUUMKffYG8rRCIVMRX8D4CYDbcR11OST0FnZl+GzJbyuFA87GSKCp6nFbAeIkcMC1KUc1ICFJ4LD9GjX+tSX/lYtbDLwoIfSGP5nSews87TtfpEmXFlI8PXWMWEexK7bGXtwYNbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by SJ0PR11MB4925.namprd11.prod.outlook.com (2603:10b6:a03:2df::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.25; Thu, 19 Jan
- 2023 02:40:18 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3f19:b226:ebf1:b04a]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::3f19:b226:ebf1:b04a%8]) with mapi id 15.20.6002.024; Thu, 19 Jan 2023
- 02:40:17 +0000
-From:   "Huang, Kai" <kai.huang@intel.com>
-To:     "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-CC:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "dmatlack@google.com" <dmatlack@google.com>,
-        "Christopherson,, Sean" <seanjc@google.com>
-Subject: Re: [PATCH v11 016/113] KVM: TDX: Add place holder for TDX VM
- specific mem_enc_op ioctl
-Thread-Topic: [PATCH v11 016/113] KVM: TDX: Add place holder for TDX VM
- specific mem_enc_op ioctl
-Thread-Index: AQHZJqTwAeom7RMUz0mEVml2aXul+q6lEW6A
-Date:   Thu, 19 Jan 2023 02:40:17 +0000
-Message-ID: <19645255d65fdfd184b92b5192cac83a27c430fb.camel@intel.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
-         <e846968f2e1c554b3ecc1a876e0bb691727d34fc.1673539699.git.isaku.yamahata@intel.com>
-In-Reply-To: <e846968f2e1c554b3ecc1a876e0bb691727d34fc.1673539699.git.isaku.yamahata@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.46.3 (3.46.3-1.fc37) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR11MB5978:EE_|SJ0PR11MB4925:EE_
-x-ms-office365-filtering-correlation-id: 4d505b49-9a65-4a4a-afad-08daf9c68054
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: cJ6vgco/6VmQTCTan85CG6eJSEW+4pfFZEh8M6K4HHDOVFcJKOYDEbFpADy5w8uw66d/DoJLoxjBMg3rN7VkYIa+oCtrDYgcDlf6fJDmLcXOZl7wR/7vbzY0asjgNsoRBXBkL4+9qnMN6EQnQFLv0xVWC7WqO9YNLKZEwcHM1U/o710ZCKVmD1u116lMXpYYXDKlu7GIMe5q46dGYOLUTwdBMr/fBnbkkqSW7nZPbIe6bU6S57H9713gmC+FkXZutUwU2IuMK6EqMNU6thqSIAdPqgaOjuSQJ0PqfKtbZB/nLf8H3/mtigfTrG2H4J8KWKpNHOCftXIcc74bZXEE/o60nDhOFdiPcDLKs7pF3kwXCdRgOfQTy5og9vGLno7/oyI2as/xh/jb49tDekqp+On16hy/EQ1EifsvbZLGeFtmv5PVcDsaU4J5IZqJD8ST78Z9XsbXIVNsZnYwgFHvqtI0mO2vG7dvvlcaf2fHdvjcSBiWb43SD3yzOwpoRUN0mVJzf8SKy86nuWJoXOwBGwrlOgukwEzEZGTo5nd1mOSufAm+0lpaEkSrHUm7gv3kQrEBjSYdOv0S5VtTEU8Ckvrv+XFAlNyVqUNY/2hRtkG2D+l4utEJYA9kd2gviPQ1HxRYH+K6yQBKmrsLZk42jW8oar3SWTn7TC5Q+u2+rgdS7o33n0zQCyzY6HTQVNdgR6xplUkSNTGYLEh6JMnzTg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(39860400002)(136003)(366004)(346002)(376002)(396003)(451199015)(38070700005)(86362001)(5660300002)(41300700001)(8936002)(122000001)(82960400001)(36756003)(38100700002)(6486002)(71200400001)(478600001)(110136005)(54906003)(6636002)(83380400001)(6512007)(6506007)(26005)(186003)(4326008)(8676002)(316002)(64756008)(66556008)(66946007)(66446008)(66476007)(76116006)(91956017)(2616005)(2906002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MXM2M0hyVEl4VXk2SmtHa0c1cWZuMWFjNlcyc2ZTUGNOWGR3cVc3cUJ2Z1Vt?=
- =?utf-8?B?RzNudUxjTHZPYjZRcTVyKy9ZUVNIeGZjL2haUUZrVkhLQWZ6Z2psT0pxVEUx?=
- =?utf-8?B?YU9tVVdmWXAzMGo3dU9QOW5zeUcyQk9XWjFlaEFZbTVjdll2d0VCRVA1OWpy?=
- =?utf-8?B?REIrVms5NlFkU0h1S1pEZW90cFFZbXhRaFlZaTg2S3RzeEtXN0UwZWYvTDFL?=
- =?utf-8?B?ZnZldXozQXVyc2xVNWkwb3F3elY3Ym0veHFNOGdYbUNnQU9QYVdLVlJLdUxn?=
- =?utf-8?B?TlBwcC9OQ0pyNzlHaW4rc0N0cUNxdzdFdEZYSk9ncHBoMkxqdFMwNWdlSzJh?=
- =?utf-8?B?T0NoRUhjRzFRdVpwUS9pYWQybFh2NTRUQk9kbFZLbGpNbnoxdWxnOG1kUTBa?=
- =?utf-8?B?elZsdlNZMTMvNlhtOWo4UUxFa3Q4bTZPNGtCT0pJNDBWM1dNSU9WNHgySGR3?=
- =?utf-8?B?VlhDQmxPZXhsUWNRdjV2Yll5dFVxQXd6NTlmL2xOcEsyZitrY0dLcTVhSDZL?=
- =?utf-8?B?WGtUM1Y0UlZsQzVZbitFcld4QjJsRzVWTTJBNWJCMURJdlp3WW4rdmo3VEFv?=
- =?utf-8?B?VVR0M2RUdS91dVk0aHlCVFdkdmdTYll2UG9UeXA3RTFjOEdZcmRGcVVydStZ?=
- =?utf-8?B?VjZzVzh2SGszNFdyZDZUUTJDeU5rK3VlUERJdnVjbTZqbi9kVzI0R1hCdzlR?=
- =?utf-8?B?UU1BUDRsSU12aEloNTJMZnR6bkp5a0ZJRktmdk5HN0Fmay80Sys0YWdKSEFk?=
- =?utf-8?B?T3FLZXQ4dzM3TTZUeVlpblZJV2k5WmVZa0haY28rbmhseDRnWld6eWhUYm5i?=
- =?utf-8?B?dWRROEV0UkJVQkRKNHhTM1NTRGR5VThoZndwUEtoMVBwdlg2VHRCTGQyaE54?=
- =?utf-8?B?eXd4bkwvanoxKzBmRndlUWFhZ3IzS05oMkg3bG5lMUVFQ3B6NWRydk9MQlN0?=
- =?utf-8?B?WGZacWdiMUNLTjFVdDA3YWl4L1E0cDJocWZOZTRJQWdCVHBtYzliYVZWMnFT?=
- =?utf-8?B?Z1FuTnZ3UVlvSDVqdmZTRVdFUkVJMVFnZGl1K0lwcDlzNVZUYmx5eTM0ZlRR?=
- =?utf-8?B?UFBNVHpaSjJSNlZsbThRcFFMTUNSUlJpbDREZXMydmpHeER6SE51Ky9VOXJ6?=
- =?utf-8?B?WVAxaVZzTnhURHNreW5ZcTZERmNuY1FyaHlPdzZLQ2krMGZTMytIWVZmL0E3?=
- =?utf-8?B?VjBDWE1Kc3Nmc3hnOHNlbVUyNFFmRTBEckRGaTBvd2ljVk9OT2lUZGJKTENU?=
- =?utf-8?B?OHRweUFFSEQ1Y1BYZ1Zla2ZueGMwL0hybXV0ak1EY3R0cVdvYmZNTFNZaHZ5?=
- =?utf-8?B?VmtaQmo1c0tyVkU0dnh3L0wyQ3k2OHNIWmlYQktKaXRDbUZjdTN0WVNCV1Zy?=
- =?utf-8?B?NWxTZCtIRDUzQThkVWlCbjJqek5CN29mRXpxTitoUmdtdVFRdmdSd00xQkZq?=
- =?utf-8?B?dHpGdkZUT3FPdkNLcWd0a2hlLy9iaysxZ3dDcXdoMFVMT0VST0pPQnZudThl?=
- =?utf-8?B?VXVYeTBoeG9FUThZaXVNWnpVVE9FUW9RUkxBTSt0eFJEV2ZBQlJ5WTB1VWth?=
- =?utf-8?B?RjNpREdISU9lVms5c2pVSmZlWmI4akN3RU16VnE4UGt6UHFlcVgwb1N2NGY4?=
- =?utf-8?B?SSt1QXNzYk94N0RIT3dTU3JUQXVpY0ovVXFmVGxxb2ZCV0lvNWdOQmhFYWN2?=
- =?utf-8?B?S2dFbVdON2pzYkVWMWU2T0lCKzFCb3FRS0tQMzZ5NHVMY1hUOC92eFBNb0s2?=
- =?utf-8?B?amhidkVIK2NPZWp6SkdmZHVoWGFyM1BOSFg1Wk5VNXlrNlp4RTZqNnRNbzhC?=
- =?utf-8?B?UDFDTUoxOUpFRWtpWEtFdWNCQ1hkVEFvenRybEkvSVc4ZjBhcGFrQU5GbU9H?=
- =?utf-8?B?YklVNUlBUG1WTG16WUZBcUV0Q2R4Y05HUVFrTWZiV0V6enRDZy9Lbk9BeGlN?=
- =?utf-8?B?NWIyTFBkQThZTSs2OGd0dzN4OVI4OXM2K3g3a1R1UEdXaTlOZUZzY1NDRDVU?=
- =?utf-8?B?QmJuaGNvSEwrN3h5OGNQdm5sd0t2YTh0MVZ2ZXUxZFhDOEVmNURQaG85UXpO?=
- =?utf-8?B?NXh2Q2NLLzU0aUc0TTVTVGYyM3RENEhuOTZRN1RYOEJkSUJGcHRUSEtvTFla?=
- =?utf-8?B?c0RGaHBxSkEvajUzazBxcHQyR0p4dVhUcGhHYk15bmV2blRaSFROUHpaRGFm?=
- =?utf-8?B?Umc9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <14E13A8B693D68429475ADD7F94F5EAD@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        with ESMTP id S229561AbjASDCc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 22:02:32 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0AB46CCEE
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 19:02:17 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id 78so457359pgb.8
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 19:02:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ytIhUpS0QRrsfwX4cMpPxGYht+fMjfx+YZkR0WKWH5I=;
+        b=YD0XX6BcT1Itn9WAqJyPIKvaHqLXvk6Dk5dH/L0FVqzvSJE4ovIr0HJtLfRh4omCMs
+         PKnZ2D4LJaMMsBr4s8RTEw4KzVXLmOTZZqje6waE36p6HKh8xRI1YqjqCiMYeipbWd+o
+         shhZiN2aJdSSX6x3ZtT/GY0o/U8KBcXW3p/zgBUKlMoI7S/3ALhdCI3UKFL716j0L+X+
+         osqoN0y+nQWyUUaVK4sc+sj9zMGZLkvQ8lRvulXU/pPqo3sbN/oKNVybpBLU3rj7/oiV
+         IBPUTszdj2NHhU+uY51QGJXFTm1FRJTiZ4ACt1eO7w5nxXNZmOkhx/tqfm0N1cDo7zb2
+         wXIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ytIhUpS0QRrsfwX4cMpPxGYht+fMjfx+YZkR0WKWH5I=;
+        b=b5juRHLfU8N5kSM+AetFj3UlPC/mw/Uf/J1F1z+lmYAh3nFUe/wz0KomT6bao1HRf9
+         ttVzr3u1Q6Jf+7ygRw9F3EoizsQHD/R1Vi8ITkwgBHpr98jpej+XYn8cgZB85pc5xwqj
+         Ypxz9x2JPsRDCsU5SOxpqBrf8/CgwvuU1eqi/4708xoc7KNqDzujkDKDjzRcPeTXb5T3
+         3/5iF70qvwpEcVTFsIsnizVb+Usz0HFX3nmHx6BSq6CEbakdIH3Xs0vXyvt7Zy5MQe8y
+         rRPo9nMT41mstrL4GGOgMcZoCkEeiSB1JYWFF0ExqvFsMCxfDFsFkBS+FtOUZOVQ993F
+         jmOw==
+X-Gm-Message-State: AFqh2kry6h9tj18LJTCn8kHqWZ3y1aygwxyqOiTCubMkNpIhQG1iP15Q
+        ygQDX2iSRrVf7NM6JOPDkzTPWJTEQoSl/GhF3EKCFg==
+X-Google-Smtp-Source: AMrXdXtZpp/7RT4/L/cIfXWvCC/w9yM8fw8CkFMLOebzaO7O5qN/DMn6nrENtvWUTiYmqcZLe5sikv5Y0L3EtPx+ygI=
+X-Received: by 2002:a62:6084:0:b0:582:392e:8bbf with SMTP id
+ u126-20020a626084000000b00582392e8bbfmr799319pfb.75.1674097336709; Wed, 18
+ Jan 2023 19:02:16 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d505b49-9a65-4a4a-afad-08daf9c68054
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jan 2023 02:40:17.7596
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: FqfsU29UGVlBb94P+tYZgyul5/AkNzcg146+akKRHAw1pieH3GwTEMDggFBiJYkxjXaXiUWXwGr0KxPMG75kOg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4925
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230117013542.371944-1-reijiw@google.com> <20230117013542.371944-8-reijiw@google.com>
+ <1c5f7194-277a-d8bd-8714-a8e1553344c4@redhat.com>
+In-Reply-To: <1c5f7194-277a-d8bd-8714-a8e1553344c4@redhat.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Wed, 18 Jan 2023 19:02:00 -0800
+Message-ID: <CAAeT=Fw2cGtVcHvYH-4gEQ3Rh+iE8iKxYd+7EWxK9W1Eb_t5Vw@mail.gmail.com>
+Subject: Re: [PATCH v2 7/8] KVM: selftests: aarch64: vPMU register test for
+ implemented counters
+To:     Shaoqin Huang <shahuang@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-T24gVGh1LCAyMDIzLTAxLTEyIGF0IDA4OjMxIC0wODAwLCBpc2FrdS55YW1haGF0YUBpbnRlbC5j
-b20gd3JvdGU6DQo+IEZyb206IElzYWt1IFlhbWFoYXRhIDxpc2FrdS55YW1haGF0YUBpbnRlbC5j
-b20+DQo+IA0KPiBBZGQgYSBwbGFjZSBob2xkZXIgZnVuY3Rpb24gZm9yIFREWCBzcGVjaWZpYyBW
-TS1zY29wZWQgaW9jdGwgYXMgbWVtX2VuY19vcC4NCj4gVERYIHNwZWNpZmljIHN1Yi1jb21tYW5k
-cyB3aWxsIGJlIGFkZGVkIHRvIHJldHJpZXZlL3Bhc3MgVERYIHNwZWNpZmljDQo+IHBhcmFtZXRl
-cnMuDQo+IA0KPiBLVk1fTUVNT1JZX0VOQ1JZUFRfT1Agd2FzIGludHJvZHVjZWQgZm9yIFZNLXNj
-b3BlZCBvcGVyYXRpb25zIHNwZWNpZmljIGZvcg0KPiBndWVzdCBzdGF0ZS1wcm90ZWN0ZWQgVk0u
-ICBJdCBkZWZpbmVkIHN1YmNvbW1hbmRzIGZvciB0ZWNobm9sb2d5LXNwZWNpZmljDQo+IG9wZXJh
-dGlvbnMgdW5kZXIgS1ZNX01FTU9SWV9FTkNSWVBUX09QLiAgRGVzcGl0ZSBpdHMgbmFtZSwgdGhl
-IHN1YmNvbW1hbmRzDQo+IGFyZSBub3QgbGltaXRlZCB0byBtZW1vcnkgZW5jcnlwdGlvbiwgYnV0
-IHZhcmlvdXMgdGVjaG5vbG9neS1zcGVjaWZpYw0KPiBvcGVyYXRpb25zIGFyZSBkZWZpbmVkLiAg
-SXQncyBuYXR1cmFsIHRvIHJlcHVycG9zZSBLVk1fTUVNT1JZX0VOQ1JZUFRfT1ANCj4gZm9yIFRE
-WCBzcGVjaWZpYyBvcGVyYXRpb25zIGFuZCBkZWZpbmUgc3ViY29tbWFuZHMuDQo+IA0KPiBURFgg
-cmVxdWlyZXMgVk0tc2NvcGVkIFREWC1zcGVjaWZpYyBvcGVyYXRpb25zIGZvciBkZXZpY2UgbW9k
-ZWwsIGZvcg0KPiBleGFtcGxlLCBxZW11LiAgR2V0dGluZyBzeXN0ZW0td2lkZSBwYXJhbWV0ZXJz
-LCBURFgtc3BlY2lmaWMgVk0NCj4gaW5pdGlhbGl6YXRpb24uDQoNClRoZXJlJ3MgZ3JhbW1hciBp
-c3N1ZSBpbiB0aGUgbGFzdCBwYXJhZ3JhcGguICBQbGVhc2UgdXNlIGdyYW1tYXIgY2hlY2suDQoN
-Cj4gDQo+IFNpZ25lZC1vZmYtYnk6IElzYWt1IFlhbWFoYXRhIDxpc2FrdS55YW1haGF0YUBpbnRl
-bC5jb20+DQo+IC0tLQ0KPiAgYXJjaC94ODYva3ZtL3ZteC9tYWluLmMgICAgfCAgOSArKysrKysr
-KysNCj4gIGFyY2gveDg2L2t2bS92bXgvdGR4LmMgICAgIHwgMjYgKysrKysrKysrKysrKysrKysr
-KysrKysrKysNCj4gIGFyY2gveDg2L2t2bS92bXgveDg2X29wcy5oIHwgIDQgKysrKw0KPiAgMyBm
-aWxlcyBjaGFuZ2VkLCAzOSBpbnNlcnRpb25zKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvYXJjaC94
-ODYva3ZtL3ZteC9tYWluLmMgYi9hcmNoL3g4Ni9rdm0vdm14L21haW4uYw0KPiBpbmRleCAxNjA1
-M2VjM2UwYWUuLjc4MWZiYzg5NjEyMCAxMDA2NDQNCj4gLS0tIGEvYXJjaC94ODYva3ZtL3ZteC9t
-YWluLmMNCj4gKysrIGIvYXJjaC94ODYva3ZtL3ZteC9tYWluLmMNCj4gQEAgLTM3LDYgKzM3LDE0
-IEBAIHN0YXRpYyBpbnQgdnRfdm1faW5pdChzdHJ1Y3Qga3ZtICprdm0pDQo+ICAJcmV0dXJuIHZt
-eF92bV9pbml0KGt2bSk7DQo+ICB9DQo+ICANCj4gK3N0YXRpYyBpbnQgdnRfbWVtX2VuY19pb2N0
-bChzdHJ1Y3Qga3ZtICprdm0sIHZvaWQgX191c2VyICphcmdwKQ0KPiArew0KPiArCWlmICghaXNf
-dGQoa3ZtKSkNCj4gKwkJcmV0dXJuIC1FTk9UVFk7DQo+ICsNCj4gKwlyZXR1cm4gdGR4X3ZtX2lv
-Y3RsKGt2bSwgYXJncCk7DQo+ICt9DQo+ICsNCj4gIHN0cnVjdCBrdm1feDg2X29wcyB2dF94ODZf
-b3BzIF9faW5pdGRhdGEgPSB7DQo+ICAJLm5hbWUgPSBLQlVJTERfTU9ETkFNRSwNCj4gIA0KPiBA
-QCAtMTc5LDYgKzE4Nyw3IEBAIHN0cnVjdCBrdm1feDg2X29wcyB2dF94ODZfb3BzIF9faW5pdGRh
-dGEgPSB7DQo+ICAJLnZjcHVfZGVsaXZlcl9zaXBpX3ZlY3RvciA9IGt2bV92Y3B1X2RlbGl2ZXJf
-c2lwaV92ZWN0b3IsDQo+ICANCj4gIAkuZGV2X21lbV9lbmNfaW9jdGwgPSB0ZHhfZGV2X2lvY3Rs
-LA0KPiArCS5tZW1fZW5jX2lvY3RsID0gdnRfbWVtX2VuY19pb2N0bCwNCj4gIH07DQoNCklJVUMs
-IG5vdyBib3RoIEFNRCBhbmQgSW50ZWwgaGF2ZSBtZW1fZW5jX2lvY3RsKCkgY2FsbGJhY2sgaW1w
-bGVtZW50ZWQsIHNvIHRoZQ0KS1ZNX1g4Nl9PUF9PUFRJT05BTCgpIG9mIGl0IGNhbiBiZSBjaGFu
-Z2VkIHRvIEtWTV9YODZfT1AoKSwgYW5kIHRoZSBmdW5jdGlvbg0KcG9pbnRlciBjaGVjayBjYW4g
-YmUgcmVtb3ZlZCBpbiB0aGUgSU9DVEw6DQoNCmRpZmYgLS1naXQgYS9hcmNoL3g4Ni9pbmNsdWRl
-L2FzbS9rdm0teDg2LW9wcy5oIGIvYXJjaC94ODYvaW5jbHVkZS9hc20va3ZtLXg4Ni0NCm9wcy5o
-DQppbmRleCA4ZGMzNDVjYzYzMTguLmE1OTg1MmZiNWUyYSAxMDA2NDQNCi0tLSBhL2FyY2gveDg2
-L2luY2x1ZGUvYXNtL2t2bS14ODYtb3BzLmgNCisrKyBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL2t2
-bS14ODYtb3BzLmgNCkBAIC0xMTYsNyArMTE2LDcgQEAgS1ZNX1g4Nl9PUChlbnRlcl9zbW0pDQog
-S1ZNX1g4Nl9PUChsZWF2ZV9zbW0pDQogS1ZNX1g4Nl9PUChlbmFibGVfc21pX3dpbmRvdykNCiAj
-ZW5kaWYNCi1LVk1fWDg2X09QX09QVElPTkFMKG1lbV9lbmNfaW9jdGwpDQorS1ZNX1g4Nl9PUCht
-ZW1fZW5jX2lvY3RsKQ0KIEtWTV9YODZfT1BfT1BUSU9OQUwobWVtX2VuY19yZWdpc3Rlcl9yZWdp
-b24pDQogS1ZNX1g4Nl9PUF9PUFRJT05BTChtZW1fZW5jX3VucmVnaXN0ZXJfcmVnaW9uKQ0KIEtW
-TV9YODZfT1BfT1BUSU9OQUwodm1fY29weV9lbmNfY29udGV4dF9mcm9tKQ0KZGlmZiAtLWdpdCBh
-L2FyY2gveDg2L2t2bS94ODYuYyBiL2FyY2gveDg2L2t2bS94ODYuYw0KaW5kZXggYzkzNmY4ZDI4
-YTUzLi5kZmEyNzllMzU0NzggMTAwNjQ0DQotLS0gYS9hcmNoL3g4Ni9rdm0veDg2LmMNCisrKyBi
-L2FyY2gveDg2L2t2bS94ODYuYw0KQEAgLTY5MzcsMTAgKzY5MzcsNiBAQCBsb25nIGt2bV9hcmNo
-X3ZtX2lvY3RsKHN0cnVjdCBmaWxlICpmaWxwLA0KICAgICAgICAgICAgICAgIGdvdG8gb3V0Ow0K
-ICAgICAgICB9DQogICAgICAgIGNhc2UgS1ZNX01FTU9SWV9FTkNSWVBUX09QOiB7DQotICAgICAg
-ICAgICAgICAgciA9IC1FTk9UVFk7DQotICAgICAgICAgICAgICAgaWYgKCFrdm1feDg2X29wcy5t
-ZW1fZW5jX2lvY3RsKQ0KLSAgICAgICAgICAgICAgICAgICAgICAgZ290byBvdXQ7DQotDQogICAg
-ICAgICAgICAgICAgciA9IHN0YXRpY19jYWxsKGt2bV94ODZfbWVtX2VuY19pb2N0bCkoa3ZtLCBh
-cmdwKTsNCiAgICAgICAgICAgICAgICBicmVhazsNCiAgICAgICAgfQ0KDQpbc25pcF0NCg0K
+Hi Shaoqin,
+
+> I found some place should be PMEVTYPER, but wrongly written to
+> PMEVTTYPE. Should we fix them?
+
+Thank you for catching them!
+I will review the patch, and fix them all in v3.
+
+Thank you,
+Reiji
+
+On Tue, Jan 17, 2023 at 11:47 PM Shaoqin Huang <shahuang@redhat.com> wrote:
+>
+> Hi Reiji,
+>
+>
+> I found some place should be PMEVTYPER, but wrongly written to
+> PMEVTTYPE. Should we fix them?
+>
+>
+> I list some of them, but not covered every one.
+>
+> On 1/17/23 09:35, Reiji Watanabe wrote:
+> > Add a new test case to the vpmu_counter_access test to check if PMU
+> > registers or their bits for implemented counters on the vCPU are
+> > readable/writable as expected, and can be programmed to count events.
+> >
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >   .../kvm/aarch64/vpmu_counter_access.c         | 347 +++++++++++++++++-
+> >   1 file changed, 344 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> > index 704a2500b7e1..54b69c76c824 100644
+> > --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> > +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
+> > @@ -5,7 +5,8 @@
+> >    * Copyright (c) 2022 Google LLC.
+> >    *
+> >    * This test checks if the guest can see the same number of the PMU event
+> > - * counters (PMCR_EL1.N) that userspace sets.
+> > + * counters (PMCR_EL1.N) that userspace sets, and if the guest can access
+> > + * those counters.
+> >    * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
+> >    */
+> >   #include <kvm_util.h>
+> > @@ -18,19 +19,350 @@
+> >   /* The max number of the PMU event counters (excluding the cycle counter) */
+> >   #define ARMV8_PMU_MAX_GENERAL_COUNTERS      (ARMV8_PMU_MAX_COUNTERS - 1)
+> >
+> > +/*
+> > + * The macros and functions below for reading/writing PMEVT{CNTR,TYPER}<n>_EL0
+> Here should be PMEV{CNTR, TYPER}.
+> > + * were basically copied from arch/arm64/kernel/perf_event.c.
+> > + */
+> > +#define PMEVN_CASE(n, case_macro) \
+> > +     case n: case_macro(n); break
+> > +
+> > +#define PMEVN_SWITCH(x, case_macro)                          \
+> > +     do {                                                    \
+> > +             switch (x) {                                    \
+> > +             PMEVN_CASE(0,  case_macro);                     \
+> > +             PMEVN_CASE(1,  case_macro);                     \
+> > +             PMEVN_CASE(2,  case_macro);                     \
+> > +             PMEVN_CASE(3,  case_macro);                     \
+> > +             PMEVN_CASE(4,  case_macro);                     \
+> > +             PMEVN_CASE(5,  case_macro);                     \
+> > +             PMEVN_CASE(6,  case_macro);                     \
+> > +             PMEVN_CASE(7,  case_macro);                     \
+> > +             PMEVN_CASE(8,  case_macro);                     \
+> > +             PMEVN_CASE(9,  case_macro);                     \
+> > +             PMEVN_CASE(10, case_macro);                     \
+> > +             PMEVN_CASE(11, case_macro);                     \
+> > +             PMEVN_CASE(12, case_macro);                     \
+> > +             PMEVN_CASE(13, case_macro);                     \
+> > +             PMEVN_CASE(14, case_macro);                     \
+> > +             PMEVN_CASE(15, case_macro);                     \
+> > +             PMEVN_CASE(16, case_macro);                     \
+> > +             PMEVN_CASE(17, case_macro);                     \
+> > +             PMEVN_CASE(18, case_macro);                     \
+> > +             PMEVN_CASE(19, case_macro);                     \
+> > +             PMEVN_CASE(20, case_macro);                     \
+> > +             PMEVN_CASE(21, case_macro);                     \
+> > +             PMEVN_CASE(22, case_macro);                     \
+> > +             PMEVN_CASE(23, case_macro);                     \
+> > +             PMEVN_CASE(24, case_macro);                     \
+> > +             PMEVN_CASE(25, case_macro);                     \
+> > +             PMEVN_CASE(26, case_macro);                     \
+> > +             PMEVN_CASE(27, case_macro);                     \
+> > +             PMEVN_CASE(28, case_macro);                     \
+> > +             PMEVN_CASE(29, case_macro);                     \
+> > +             PMEVN_CASE(30, case_macro);                     \
+> > +             default:                                        \
+> > +                     GUEST_ASSERT_1(0, x);                   \
+> > +             }                                               \
+> > +     } while (0)
+> > +
+> > +#define RETURN_READ_PMEVCNTRN(n) \
+> > +     return read_sysreg(pmevcntr##n##_el0)
+> > +static unsigned long read_pmevcntrn(int n)
+> > +{
+> > +     PMEVN_SWITCH(n, RETURN_READ_PMEVCNTRN);
+> > +     return 0;
+> > +}
+> > +
+> > +#define WRITE_PMEVCNTRN(n) \
+> > +     write_sysreg(val, pmevcntr##n##_el0)
+> > +static void write_pmevcntrn(int n, unsigned long val)
+> > +{
+> > +     PMEVN_SWITCH(n, WRITE_PMEVCNTRN);
+> > +     isb();
+> > +}
+> > +
+> > +#define READ_PMEVTYPERN(n) \
+> > +     return read_sysreg(pmevtyper##n##_el0)
+> > +static unsigned long read_pmevtypern(int n)
+> > +{
+> > +     PMEVN_SWITCH(n, READ_PMEVTYPERN);
+> > +     return 0;
+> > +}
+> > +
+> > +#define WRITE_PMEVTYPERN(n) \
+> > +     write_sysreg(val, pmevtyper##n##_el0)
+> > +static void write_pmevtypern(int n, unsigned long val)
+> > +{
+> > +     PMEVN_SWITCH(n, WRITE_PMEVTYPERN);
+> > +     isb();
+> > +}
+> > +
+> > +/* Read PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+> > +static inline unsigned long read_sel_evcntr(int sel)
+> > +{
+> > +     write_sysreg(sel, pmselr_el0);
+> > +     isb();
+> > +     return read_sysreg(pmxevcntr_el0);
+> > +}
+> > +
+> > +/* Write PMEVTCNTR<n>_EL0 through PMXEVCNTR_EL0 */
+> > +static inline void write_sel_evcntr(int sel, unsigned long val)
+> > +{
+> > +     write_sysreg(sel, pmselr_el0);
+> > +     isb();
+> > +     write_sysreg(val, pmxevcntr_el0);
+> > +     isb();
+> > +}
+> > +
+> > +/* Read PMEVTTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+> Here should be PMEVTYPER.
+> > +static inline unsigned long read_sel_evtyper(int sel)
+> > +{
+> > +     write_sysreg(sel, pmselr_el0);
+> > +     isb();
+> > +     return read_sysreg(pmxevtyper_el0);
+> > +}
+> > +
+> > +/* Write PMEVTTYPER<n>_EL0 through PMXEVTYPER_EL0 */
+> > +static inline void write_sel_evtyper(int sel, unsigned long val)
+> > +{
+> > +     write_sysreg(sel, pmselr_el0);
+> > +     isb();
+> > +     write_sysreg(val, pmxevtyper_el0);
+> > +     isb();
+> > +}
+> > +
+> > +static inline void enable_counter(int idx)
+> > +{
+> > +     uint64_t v = read_sysreg(pmcntenset_el0);
+> > +
+> > +     write_sysreg(BIT(idx) | v, pmcntenset_el0);
+> > +     isb();
+> > +}
+> > +
+> > +static inline void disable_counter(int idx)
+> > +{
+> > +     uint64_t v = read_sysreg(pmcntenset_el0);
+> > +
+> > +     write_sysreg(BIT(idx) | v, pmcntenclr_el0);
+> > +     isb();
+> > +}
+> > +
+> > +/*
+> > + * The pmc_accessor structure has pointers to PMEVT{CNTR,TYPER}<n>_EL0
+> > + * accessors that test cases will use. Each of the accessors will
+> > + * either directly reads/writes PMEVT{CNTR,TYPER}<n>_EL0
+> > + * (i.e. {read,write}_pmev{cnt,type}rn()), or reads/writes them through
+> > + * PMXEV{CNTR,TYPER}_EL0 (i.e. {read,write}_sel_ev{cnt,type}r()).
+> > + *
+> > + * This is used to test that combinations of those accessors provide
+> > + * the consistent behavior.
+> > + */
+> > +struct pmc_accessor {
+> > +     /* A function to be used to read PMEVTCNTR<n>_EL0 */
+> > +     unsigned long   (*read_cntr)(int idx);
+> > +     /* A function to be used to write PMEVTCNTR<n>_EL0 */
+> > +     void            (*write_cntr)(int idx, unsigned long val);
+> > +     /* A function to be used to read PMEVTTYPER<n>_EL0 */
+> > +     unsigned long   (*read_typer)(int idx);
+> > +     /* A function to be used write PMEVTTYPER<n>_EL0 */
+> > +     void            (*write_typer)(int idx, unsigned long val);
+> > +};
+> > +
+> > +struct pmc_accessor pmc_accessors[] = {
+> > +     /* test with all direct accesses */
+> > +     { read_pmevcntrn, write_pmevcntrn, read_pmevtypern, write_pmevtypern },
+> > +     /* test with all indirect accesses */
+> > +     { read_sel_evcntr, write_sel_evcntr, read_sel_evtyper, write_sel_evtyper },
+> > +     /* read with direct accesses, and write with indirect accesses */
+> > +     { read_pmevcntrn, write_sel_evcntr, read_pmevtypern, write_sel_evtyper },
+> > +     /* read with indirect accesses, and write with direct accesses */
+> > +     { read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
+> > +};
+> > +
+> > +static void pmu_disable_reset(void)
+> > +{
+> > +     uint64_t pmcr = read_sysreg(pmcr_el0);
+> > +
+> > +     /* Reset all counters, disabling them */
+> > +     pmcr &= ~ARMV8_PMU_PMCR_E;
+> > +     write_sysreg(pmcr | ARMV8_PMU_PMCR_P, pmcr_el0);
+> > +     isb();
+> > +}
+> > +
+> > +static void pmu_enable(void)
+> > +{
+> > +     uint64_t pmcr = read_sysreg(pmcr_el0);
+> > +
+> > +     /* Reset all counters, disabling them */
+> > +     pmcr |= ARMV8_PMU_PMCR_E;
+> > +     write_sysreg(pmcr | ARMV8_PMU_PMCR_P, pmcr_el0);
+> > +     isb();
+> > +}
+> > +
+> > +static bool pmu_event_is_supported(uint64_t event)
+> > +{
+> > +     GUEST_ASSERT_1(event < 64, event);
+> > +     return (read_sysreg(pmceid0_el0) & BIT(event));
+> > +}
+> > +
+> >   static uint64_t pmcr_extract_n(uint64_t pmcr_val)
+> >   {
+> >       return (pmcr_val >> ARMV8_PMU_PMCR_N_SHIFT) & ARMV8_PMU_PMCR_N_MASK;
+> >   }
+> >
+> > +#define GUEST_ASSERT_BITMAP_REG(regname, mask, set_expected)         \
+> > +{                                                                    \
+> > +     uint64_t _tval = read_sysreg(regname);                          \
+> > +                                                                     \
+> > +     if (set_expected)                                               \
+> > +             GUEST_ASSERT_3((_tval & mask), _tval, mask, set_expected); \
+> > +     else                                                               \
+> > +             GUEST_ASSERT_3(!(_tval & mask), _tval, mask, set_expected);\
+> > +}
+> > +
+> > +/*
+> > + * Check if @mask bits in {PMCNTEN,PMOVS}{SET,CLR} registers
+> > + * are set or cleared as specified in @set_expected.
+> > + */
+> > +static void check_bitmap_pmu_regs(uint64_t mask, bool set_expected)
+> > +{
+> > +     GUEST_ASSERT_BITMAP_REG(pmcntenset_el0, mask, set_expected);
+> > +     GUEST_ASSERT_BITMAP_REG(pmcntenclr_el0, mask, set_expected);
+> > +     GUEST_ASSERT_BITMAP_REG(pmovsset_el0, mask, set_expected);
+> > +     GUEST_ASSERT_BITMAP_REG(pmovsclr_el0, mask, set_expected);
+> > +}
+> > +
+> > +/*
+> > + * Check if the bit in {PMCNTEN,PMOVS}{SET,CLR} registers corresponding
+> > + * to the specified counter (@pmc_idx) can be read/written as expected.
+> > + * When @set_op is true, it tries to set the bit for the counter in
+> > + * those registers by writing the SET registers (the bit won't be set
+> > + * if the counter is not implemented though).
+> > + * Otherwise, it tries to clear the bits in the registers by writing
+> > + * the CLR registers.
+> > + * Then, it checks if the values indicated in the registers are as expected.
+> > + */
+> > +static void test_bitmap_pmu_regs(int pmc_idx, bool set_op)
+> > +{
+> > +     uint64_t pmcr_n, test_bit = BIT(pmc_idx);
+> > +     bool set_expected = false;
+> > +
+> > +     if (set_op) {
+> > +             write_sysreg(test_bit, pmcntenset_el0);
+> > +             write_sysreg(test_bit, pmovsset_el0);
+> > +
+> > +             /* The bit will be set only if the counter is implemented */
+> > +             pmcr_n = pmcr_extract_n(read_sysreg(pmcr_el0));
+> > +             set_expected = (pmc_idx < pmcr_n) ? true : false;
+> > +     } else {
+> > +             write_sysreg(test_bit, pmcntenclr_el0);
+> > +             write_sysreg(test_bit, pmovsclr_el0);
+> > +     }
+> > +     check_bitmap_pmu_regs(test_bit, set_expected);
+> > +}
+> > +
+> > +/*
+> > + * Tests for reading/writing registers for the (implemented) event counter
+> > + * specified by @pmc_idx.
+> > + */
+> > +static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
+> > +{
+> > +     uint64_t write_data, read_data, read_data_prev, test_bit;
+> > +
+> > +     /* Disable all PMCs and reset all PMCs to zero. */
+> > +     pmu_disable_reset();
+> > +
+> > +
+> > +     /*
+> > +      * Tests for reading/writing {PMCNTEN,PMOVS}{SET,CLR}_EL1.
+> > +      */
+> > +
+> > +     test_bit = 1ul << pmc_idx;
+> > +     /* Make sure that the bit in those registers are set to 0 */
+> > +     test_bitmap_pmu_regs(test_bit, false);
+> > +     /* Test if setting the bit in those registers works */
+> > +     test_bitmap_pmu_regs(test_bit, true);
+> > +     /* Test if clearing the bit in those registers works */
+> > +     test_bitmap_pmu_regs(test_bit, false);
+> > +
+> > +
+> > +     /*
+> > +      * Tests for reading/writing the event type register.
+> > +      */
+> > +
+> > +     read_data = acc->read_typer(pmc_idx);
+> > +     /*
+> > +      * Set the event type register to an arbitrary value just for testing
+> > +      * of reading/writing the register.
+> > +      * ArmARM says that for the event from 0x0000 to 0x003F,
+> > +      * the value indicated in the PMEVTYPER<n>_EL0.evtCount field is
+> > +      * the value written to the field even when the specified event
+> > +      * is not supported.
+> > +      */
+> > +     write_data = (ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMUV3_PERFCTR_INST_RETIRED);
+> > +     acc->write_typer(pmc_idx, write_data);
+> > +     read_data = acc->read_typer(pmc_idx);
+> > +     GUEST_ASSERT_4(read_data == write_data,
+> > +                    pmc_idx, acc, read_data, write_data);
+> > +
+> > +
+> > +     /*
+> > +      * Tests for reading/writing the event count register.
+> > +      */
+> > +
+> > +     read_data = acc->read_cntr(pmc_idx);
+> > +
+> > +     /* The count value must be 0, as it is not used after the reset */
+> > +     GUEST_ASSERT_3(read_data == 0, pmc_idx, acc, read_data);
+> > +
+> > +     write_data = read_data + pmc_idx + 0x12345;
+> > +     acc->write_cntr(pmc_idx, write_data);
+> > +     read_data = acc->read_cntr(pmc_idx);
+> > +     GUEST_ASSERT_4(read_data == write_data,
+> > +                    pmc_idx, acc, read_data, write_data);
+> > +
+> > +
+> > +     /* The following test requires the INST_RETIRED event support. */
+> > +     if (!pmu_event_is_supported(ARMV8_PMUV3_PERFCTR_INST_RETIRED))
+> > +             return;
+> > +
+> > +     pmu_enable();
+> > +     acc->write_typer(pmc_idx, ARMV8_PMUV3_PERFCTR_INST_RETIRED);
+> > +
+> > +     /*
+> > +      * Make sure that the counter doesn't count the INST_RETIRED
+> > +      * event when disabled, and the counter counts the event when enabled.
+> > +      */
+> > +     disable_counter(pmc_idx);
+> > +     read_data_prev = acc->read_cntr(pmc_idx);
+> > +     read_data = acc->read_cntr(pmc_idx);
+> > +     GUEST_ASSERT_4(read_data == read_data_prev,
+> > +                    pmc_idx, acc, read_data, read_data_prev);
+> > +
+> > +     enable_counter(pmc_idx);
+> > +     read_data = acc->read_cntr(pmc_idx);
+> > +
+> > +     /*
+> > +      * The counter should be increased by at least 1, as there is at
+> > +      * least one instruction between enabling the counter and reading
+> > +      * the counter (the test assumes that all event counters are not
+> > +      * being used by the host's higher priority events).
+> > +      */
+> > +     GUEST_ASSERT_4(read_data > read_data_prev,
+> > +                    pmc_idx, acc, read_data, read_data_prev);
+> > +}
+> > +
+> >   /*
+> >    * The guest is configured with PMUv3 with @expected_pmcr_n number of
+> >    * event counters.
+> > - * Check if @expected_pmcr_n is consistent with PMCR_EL0.N.
+> > + * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
+> > + * if reading/writing PMU registers for implemented counters can work
+> > + * as expected.
+> >    */
+> >   static void guest_code(uint64_t expected_pmcr_n)
+> >   {
+> >       uint64_t pmcr, pmcr_n;
+> > +     int i, pmc;
+> >
+> >       GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS);
+> >
+> > @@ -40,6 +372,15 @@ static void guest_code(uint64_t expected_pmcr_n)
+> >       /* Make sure that PMCR_EL0.N indicates the value userspace set */
+> >       GUEST_ASSERT_2(pmcr_n == expected_pmcr_n, pmcr_n, expected_pmcr_n);
+> >
+> > +     /*
+> > +      * Tests for reading/writing PMU registers for implemented counters.
+> > +      * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
+> > +      */
+> > +     for (i = 0; i < ARRAY_SIZE(pmc_accessors); i++) {
+> > +             for (pmc = 0; pmc < pmcr_n; pmc++)
+> > +                     test_access_pmc_regs(&pmc_accessors[i], pmc);
+> > +     }
+> > +
+> >       GUEST_DONE();
+> >   }
+> >
+> > @@ -96,7 +437,7 @@ static void run_vcpu(struct kvm_vcpu *vcpu, uint64_t pmcr_n)
+> >       vcpu_run(vcpu);
+> >       switch (get_ucall(vcpu, &uc)) {
+> >       case UCALL_ABORT:
+> > -             REPORT_GUEST_ASSERT_2(uc, "values:%#lx %#lx");
+> > +             REPORT_GUEST_ASSERT_4(uc, "values:%#lx %#lx %#lx %#lx");
+> >               break;
+> >       case UCALL_DONE:
+> >               break;
+>
+> --
+> Regards,
+> Shaoqin
+>
