@@ -2,74 +2,85 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF09B6740B7
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 19:17:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ED2A6740BA
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 19:18:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230183AbjASSR5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 13:17:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43296 "EHLO
+        id S230302AbjASSSG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 13:18:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230208AbjASSRi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 13:17:38 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38491449F
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:16:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674152215;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q+oPjhxahFRNdh2AOJEQpeD10rNKUEwEjHNdLdR7TwE=;
-        b=efGHEeCrNTgWiuhZn0pKh2ZOqwJcjHGsfMhYNPeMDU8YSyHXqZbPUTrgBFZ6Jj6BDmXLDS
-        RnIn0Jv+O+yvYcSsHRDf7j4q2xabODg+F/yTrpMam20BsYe4/yqifGGvGdcJdowCJpJObU
-        mtnDAAZ9g2PrKz4MJ1iXS5x9DJIKzWM=
-Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
- [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-634--Idt3y2UPsCkPKB-JHf9-w-1; Thu, 19 Jan 2023 13:16:53 -0500
-X-MC-Unique: -Idt3y2UPsCkPKB-JHf9-w-1
-Received: by mail-vs1-f70.google.com with SMTP id 68-20020a670347000000b003bf750cb86eso964535vsd.8
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:16:52 -0800 (PST)
+        with ESMTP id S230303AbjASSRy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 13:17:54 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1CB0917E6
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:17:41 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id e10so2187378pgc.9
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:17:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=T97gz6Bdfm+yNe+YRAHaCA8lPMcmr0KKDU8hjh4V/OY=;
+        b=S62eIbGCR48HzJ0dxRt+FcY1H+wMEDIgps64urcsiB/Xc9UNElGPfDG3M7k3dXhjgf
+         IC5/b7TPA5WN8B2zCt5l4+xmMaFP9NYLJK/lZmuCXs/8t+pmpeQvndT/TDDBr+7AJom4
+         4pkvYO9rfSviaNIp2nYLbIFOYwSHuwxcCYcbKuCg3UatPoX1KOHQvANMvhPeXSzraKoZ
+         wJ7ujoqoxRw++cokwdmUjITxy2xnHEMqWV+aLlcTduAxpgrCgUVkdbhB/vJmoBfElJ/7
+         HKH7b5gqivDXkVuH5iLHJd1+y95HqWRJUApg9Cqz/NX8HJl04xAO3dA1YVhbAm6S3N6x
+         ybFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q+oPjhxahFRNdh2AOJEQpeD10rNKUEwEjHNdLdR7TwE=;
-        b=3a+7AyenFKSb0RCzf8uRVhDK1XZX4ABT6JhfwXxeLm8U+D29T/Ud461tzCZXvWB80i
-         9lp2qcgQSR4AV543Su589EDQ0t641R/enh886JVG09xY8/RHI9sPnKNsf+tL5Tq+iKSv
-         j/5skhrd5kPPCCCYq1/xkhWg+Ds39VI72vg92RMqcbA0BGbY5zmD9pkl1GKqkMMy4bl6
-         0Q9KdguwN+3aFaTpnxRCEKk7a3OnjQXZ1P7EF4QR/cxnCuM7qM9Fpp0s/e9FN7lqNgbx
-         KyeT8whiN/vI3Jv/CHp/fo33m92YAISGwvOXPFKdgK5RyZXzyyRTkQBiGHW/blwvwNM+
-         jTag==
-X-Gm-Message-State: AFqh2krmssx3d0yxYvmpZRkfjRffmQgyia54iLYoP4k96NPtnFMYNWt4
-        FV2eSZxzAt3Dd7RUFkco4GMyErdl54HOVjvqgDR//pQIBMZkTmjmIv+2xuVd2AQxM6/akxYm0j+
-        lhIBcpEeWmpXAQB44TIXV5nnxOnI9
-X-Received: by 2002:a05:6102:b09:b0:3d0:f045:c1eb with SMTP id b9-20020a0561020b0900b003d0f045c1ebmr1625579vst.54.1674152209554;
-        Thu, 19 Jan 2023 10:16:49 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXtthD5MJghyW9vRqY3kw4Xa5W7Er3DFd3yJoQHRfgQ/SGRx//G/5kOA5gfW6jCk/RgHHH9euHP/f7VcqX4SsTw=
-X-Received: by 2002:a05:6102:b09:b0:3d0:f045:c1eb with SMTP id
- b9-20020a0561020b0900b003d0f045c1ebmr1625574vst.54.1674152209344; Thu, 19 Jan
- 2023 10:16:49 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T97gz6Bdfm+yNe+YRAHaCA8lPMcmr0KKDU8hjh4V/OY=;
+        b=jB1bEiE8Qs525nCvoWxDZRJWRxuVoYrIeLspOY8FVTBt9zNsAizSeq/q0YCYbhJe/2
+         H3jrE0IS2GQRoQu/Jg3sLX6xWAjMsEbwCYrY3VlfqHGLJO3ktYCa+uUiEsFildeJIHir
+         fCm+6/AizAFW61E7ZfdoADQbTDlejFlJhSsC/o+E6NQYfTODwrfUl5Egw0tStgaUzfm4
+         1IVuUuMkYqF1FHe9Eh4em1MPH7w3RdcWgRBQAxENFnfvgL6MgwO2Pxp9fnmN/gDn2ghg
+         oB7wbcGPh/uXVV9l2y9cYG7jmDLAP2aufUbB9vC+OWA/mGM8JZ69Ic4/uWeKIdAnQh6M
+         f8jA==
+X-Gm-Message-State: AFqh2koIWJt8iDbgIKWeznV492hqPw7YoJYC2VuMCFpQlOCQc1RFUiIE
+        G12K+PTdFEiba/XKF58WWf9/Ww==
+X-Google-Smtp-Source: AMrXdXvE6V2XSH75DoWttX7FazNC7q5yK1/5LBnbOsot2oHEv4jYnuIT3ADTTrFdNA17lYqBgz1nVA==
+X-Received: by 2002:a05:6a00:a87:b0:582:13b5:d735 with SMTP id b7-20020a056a000a8700b0058213b5d735mr3493507pfl.0.1674152261141;
+        Thu, 19 Jan 2023 10:17:41 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f127-20020a623885000000b00588cb819473sm19996079pfa.39.2023.01.19.10.17.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 10:17:40 -0800 (PST)
+Date:   Thu, 19 Jan 2023 18:17:36 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH 4/7] KVM: x86/mmu: Rename
+ kvm_flush_remote_tlbs_with_address()
+Message-ID: <Y8mJQH4VqC76sX7k@google.com>
+References: <20230119173559.2517103-1-dmatlack@google.com>
+ <20230119173559.2517103-5-dmatlack@google.com>
 MIME-Version: 1.0
-References: <20221228110410.1682852-1-pbonzini@redhat.com> <20230119155800.fiypvvzoalnfavse@linux.intel.com>
- <Y8mEmSESlcdgtVg4@google.com> <CABgObfb6Z2MkG8yYtbObK4bhAD_1s8Q_M=PnP5pF-sk3=w8XDg@mail.gmail.com>
- <Y8mGHyg6DjkSyN5A@google.com> <CABgObfZZ3TLvW=Qqph16T0759nWy0PL_C3w3g=PACj9cpupBQA@mail.gmail.com>
- <Y8mIoUqO8qFgoBZI@google.com>
-In-Reply-To: <Y8mIoUqO8qFgoBZI@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Date:   Thu, 19 Jan 2023 19:16:37 +0100
-Message-ID: <CABgObfbCjQUZ9ES+vOdW7uZp6QHmz2cYQ=bnytScdcsDStWZ7Q@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: fix deadlock for KVM_XEN_EVTCHN_RESET
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Yu Zhang <yu.c.zhang@linux.intel.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Michal Luczaj <mhal@rbox.co>,
-        David Woodhouse <dwmw@amazon.co.uk>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230119173559.2517103-5-dmatlack@google.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,17 +88,14 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 7:15 PM Sean Christopherson <seanjc@google.com> wrote:
-> A minor selftest fix
->
->   https://lore.kernel.org/all/20230111183408.104491-1-vipinsh@google.com
->
-> and a fix for a longstanding VMX bug that seems problematic enough that it
-> warrants going into this cycle.
->
->   https://lore.kernel.org/all/20221114164823.69555-1-hborghor@amazon.de
+On Thu, Jan 19, 2023, David Matlack wrote:
+> Rename kvm_flush_remote_tlbs_with_address() to
+> kvm_flush_remote_tlbs_range(). This name is shorter, which reduces the
+> number of callsites that need to be broken up across multiple lines, and
+> more readable since it conveys a range of memory is being flushed rather
+> than a single address.
 
-Ok, I had seen the latter so I'll put together a pull request.
+FYI, this conflicts with Hou's series, which I'm in the process of queueing for
+v6.3.
 
-Paolo
-
+https://lore.kernel.org/all/cover.1665214747.git.houwenlong.hwl@antgroup.com
