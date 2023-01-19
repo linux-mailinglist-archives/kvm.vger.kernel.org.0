@@ -2,60 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 38D2D6743CD
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 21:58:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB04E6743CE
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 21:58:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229971AbjASU6R (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 15:58:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51958 "EHLO
+        id S230008AbjASU6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 15:58:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49324 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229882AbjASU4I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 15:56:08 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F3E94C32
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:55:31 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4fb212e68b7so24684547b3.0
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:55:31 -0800 (PST)
+        with ESMTP id S230310AbjASU4X (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 15:56:23 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C7B54954D
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:55:42 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id j1-20020aa78001000000b0057d28e11cb6so1423664pfi.11
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:55:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=x7fI85XABax6CE1jNNhi9yCUkpck1zGw624Fdq4pyak=;
-        b=bqqaMmG+/CEA/HE9qA7YcWGxhrDx8X7soMAGZZ/Q6hCDN9M0thT8I8odWemTiWHYea
-         nFdb5S8aY6RRcmnxZ+M77J1p5WJIvD2dr0lDK/qFjlU+3O+oQ3aBwD4o2sbQ8WGCfm+N
-         a3R3tMbK+U1LBlIBwpq/OavBHl+mqtDlh3pmKj2aRsIxkTcRpDSeLyk8KvorfpP8cMk5
-         sK4UQCR7jnm+dhDtsSQzt+FXp75NBpSDZh9ve6LtdJOQQgpGzk8Wdq81fWjGlGa346v4
-         ID8FKVsYuqEK3refHzinZLtrGl/dMM6ryZ7ASBHRTF8R6YEdACr/s7dkT2XlvDJ/rARf
-         xJbg==
+        bh=Kr5Q2q0Ve+Pe7+jty2F9WP7IXPdPCiaONGdC3SEcJCc=;
+        b=JkxQZ/LVH/doRkTNSUgHIzqJaOyeOz+COgABHjmdN+WH4SnXL/nz5hbWj/VKwNNVZG
+         kGbCjEn58I77K4yGndK8XJo+LUpRbqCdBfOvfrKmDnWOYl689/kkl/sBwR7RNEbd3d3f
+         EQg/RX4IBBeZ3cbCX9pkToCuZ5RlWKsCE9IScqQ3J4/WZ1d2Hf2QM357nZgZkuW8KOfB
+         drFIDkUY2qRqJYR6OxBeXevkWOhW+suw3TVJnOLzWlgDSiMezXr/Foo5290cKicj1Otm
+         Yz3JNSvapNwD/hRyLxftb0bFts2Qxjfr+kd+N+7MaTSv+95X8urL0Bv81c+y0RDk8ywA
+         33TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x7fI85XABax6CE1jNNhi9yCUkpck1zGw624Fdq4pyak=;
-        b=GKCLiiDvkZYi6nGit9PugkbNo9HQTCtV2ZJlEUxWdGl0yGlc9q499RlJX4e+jq0Iyk
-         GilnMfimojDRB2Cbu2S9WL5ZLNex+UySbdi8I3GVCY7EKhDZFuxbTDLqxY6nqqhql2f0
-         iCEtWFE1BXsDvzTJrUJ8WGhagLrixaAIjd20F+LWUXxSE7PcZ4RtsdBHvqOKmhnNHCYd
-         2yKFOFMevO0AoRhfG0+wPUAjTWTAX5+KDHDrJGccyeVI+bLP4t3WuwHkhKi2uwwJG9mk
-         gX7aA6xY6VSCa8eEZ4WG+D26rQD8trs+DFA7CZMrRHmNYsZ5d45XSvcY87+oPA/4hRCu
-         TVCw==
-X-Gm-Message-State: AFqh2krcfM/Ny+R4jAYd7wkNtmU5O+a/pxWXDhYruzjG2+0+OqtAILU3
-        DGB7Sc47YSGmr8RRVpQvVxJaa3WdWPU=
-X-Google-Smtp-Source: AMrXdXtcZlLJLiYaPzvAsftAgCeJXgtZP4ubmEZiK6f5isqNi41hurQk5tr53uJNanJgDEUePKWmpEceSJY=
+        bh=Kr5Q2q0Ve+Pe7+jty2F9WP7IXPdPCiaONGdC3SEcJCc=;
+        b=jNICsd1d5OT17NEZ2Gi/KSTxMfvP+ZX6K5E7bGkyjM65sVCqa5jMpy2zNAOAk9mGFq
+         pQsQFL9V/fjQy7CfU0pFJdNmetGr6ykEbC6zLwTNWo+J0QKwLDPO7cwU5P1AJHjuyhqk
+         iU04Dl9wtXE9/QZEe6EbuZOJjFTLA/TKpUytL1IztnBD6XfCzCzWWk7L5JKKEtnSR4X+
+         pSTncjkbe+FzsyJsz/WCUIFHWGXfBs2y2LKkD151TPpZzPGz2gSZgzJQtWvLeQug3TUB
+         rRjeTXjx43ViCevkccsjgj+8nmW+5I1C0TmgyG20kymC2Ffhf/TVGtd5mekw/fCo6y3k
+         t6kw==
+X-Gm-Message-State: AFqh2koHgkYt4WED9Mely6jdnPL6Y9JQ2Kpb/omjtUfquEM1wkkm9zqB
+        O5EYFFVgGShuPv/6YNonb0ddz/1UsRo=
+X-Google-Smtp-Source: AMrXdXsuBbPBjEznnLSHkdPQBP68LTshyCgo7rSUXG1m6MFFIQwwWFDTODCN2vx+gGO4Jg5ebGIcn9UOVlQ=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:793:0:b0:4fe:fc97:58d1 with SMTP id
- 141-20020a810793000000b004fefc9758d1mr2229ywh.91.1674161730824; Thu, 19 Jan
- 2023 12:55:30 -0800 (PST)
-Date:   Thu, 19 Jan 2023 20:54:02 +0000
-In-Reply-To: <cover.1665214747.git.houwenlong.hwl@antgroup.com>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:414c:b0:229:9369:e62a with SMTP id
+ m12-20020a17090a414c00b002299369e62amr1532308pjg.231.1674161741551; Thu, 19
+ Jan 2023 12:55:41 -0800 (PST)
+Date:   Thu, 19 Jan 2023 20:54:04 +0000
+In-Reply-To: <20230105100310.6700-1-jiangshanlai@gmail.com>
 Mime-Version: 1.0
-References: <cover.1665214747.git.houwenlong.hwl@antgroup.com>
+References: <20230105100310.6700-1-jiangshanlai@gmail.com>
 X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
-Message-ID: <167408992939.2370458.7888282998581500159.b4-ty@google.com>
-Subject: Re: [PATCH v4 0/6] KVM: x86/mmu: Fix wrong usages of range-based tlb flushing
+Message-ID: <167408804666.2363885.5695334430262199072.b4-ty@google.com>
+Subject: Re: [PATCH] kvm: x86/mmu: Don't clear write flooding for direct SP
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc:     David Matlack <dmatlack@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        linux-kernel@vger.kernel.org,
+        Lai Jiangshan <jiangshanlai@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Lai Jiangshan <jiangshan.ljs@antgroup.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -67,38 +73,16 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 10 Oct 2022 20:19:11 +0800, Hou Wenlong wrote:
-> Commit c3134ce240eed ("KVM: Replace old tlb flush function with new one
-> to flush a specified range.") replaces old tlb flush function with
-> kvm_flush_remote_tlbs_with_address() to do tlb flushing. However, the
-> gfn range of tlb flushing is wrong in some cases. E.g., when a spte is
-> dropped, the start gfn of tlb flushing should be the gfn of spte not the
-> base gfn of SP which contains the spte. Although, as Paolo said, Hyper-V
-> may treat a 1-page flush the same if the address points to a huge page,
-> and no fixes are reported so far. So it seems that it works well for
-> Hyper-V. But it would be better to use the correct size for huge page.
-> So this patchset would fix them and introduce some helper functions as
-> David suggested to make the code clear.
+On Thu, 05 Jan 2023 18:03:10 +0800, Lai Jiangshan wrote:
+> Although there is no harm, but there is no point to clear write
+> flooding for direct SP.
 > 
-> [...]
-
-David and/or Hou, it's probably a good idea to double check my results, there
-were a few minor conflicts and I doubt anything would fail if I messed up.
+> 
 
 Applied to kvm-x86 mmu, thanks!
 
-[1/6] KVM: x86/mmu: Move round_gfn_for_level() helper into mmu_internal.h
-      https://github.com/kvm-x86/linux/commit/bb05964f0a3c
-[2/6] KVM: x86/mmu: Fix wrong gfn range of tlb flushing in kvm_set_pte_rmapp()
-      https://github.com/kvm-x86/linux/commit/564246ae7da2
-[3/6] KVM: x86/mmu: Reduce gfn range of tlb flushing in tdp_mmu_map_handle_target_level()
-      https://github.com/kvm-x86/linux/commit/c6753e20e09d
-[4/6] KVM: x86/mmu: Fix wrong start gfn of tlb flushing with range
-      https://github.com/kvm-x86/linux/commit/4fa7e22ed6ed
-[5/6] KVM: x86/mmu: Fix wrong gfn range of tlb flushing in validate_direct_spte()
-      https://github.com/kvm-x86/linux/commit/976d07c25056
-[6/6] KVM: x86/mmu: Cleanup range-based flushing for given page
-      https://github.com/kvm-x86/linux/commit/f9309825c4b1
+[1/1] kvm: x86/mmu: Don't clear write flooding for direct SP
+      https://github.com/kvm-x86/linux/commit/5ee0c3718540
 
 --
 https://github.com/kvm-x86/linux/tree/next
