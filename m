@@ -2,98 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 69A8767466F
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 23:55:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E29AE674682
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 23:59:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230234AbjASWzP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 17:55:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44582 "EHLO
+        id S230430AbjASW7q (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 17:59:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229807AbjASWyd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 17:54:33 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 459635895D;
-        Thu, 19 Jan 2023 14:37:07 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id f3so2768049pgc.2;
-        Thu, 19 Jan 2023 14:37:07 -0800 (PST)
+        with ESMTP id S230079AbjASW7I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 17:59:08 -0500
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F2E9A45E0;
+        Thu, 19 Jan 2023 14:45:51 -0800 (PST)
+Received: by mail-il1-x133.google.com with SMTP id v6so1950705ilq.3;
+        Thu, 19 Jan 2023 14:45:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c3/xglDrs4GgAM40Pjq1vzK1v2T7qf4JcCCRFWl6k4g=;
-        b=NSYj639Mp9v5ap+wI0hCjvD0/JJIjDFxjIAk8s0W6QQZeGagLHTMYL5/dvvI2DPi4B
-         +aGueObJ+RXaUVDn4NiXYFIhEcPYWxInkxzarthRsu1sZZ256/vMx7XvGmJtSYSWRLwB
-         vl6fpplWJgAyhnKrjElYHYhD8OeiwcbmHLjIG5BiksGBX7KJzcLCywEenDObbw+Mxjwr
-         pmu+l0l6CF6xX7jvLuX0TRIXSYOrvw5purr8S55V7TS8hL4NzHy8DcBRiXHfgymzDvFg
-         PvZjALLBOjVmU5MNA64b0nuXlR2yYuFwQaHv+ETJElDhkdksrjTql7nEvp7HQxv7QCn3
-         HOLw==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jd8DvczjAgkaoJ2/VgnefBfGOX7aqFYYlHr6EdELZ2k=;
+        b=QKeQBM9+VvaJ3ZgipoPQIFxNCvYPJmxpltzYP3ttSo6o2FkSzNYB7xzR1AO+qkQR32
+         wuHgqWJK5NP5nTb0KNJbPwZP/6qrSRWPm7kj8EYYJhvvGVkBMwxGu74VmCwuTnFCHoXd
+         bac0EXTAn4Azcc6ENzfNog5VU6tz7rqALCouT0uHCS2fGIa1QObS9Rt2owaZ8ZtZ0IEi
+         PJA/1Ve20whxneSCuPvQkq2SSkIZYTX+Zm0yVScRbpUlZzcF6ucNrWGZHfLPXhBOT8/c
+         V96LY6YaPiYCBwzab2TJYS5KZxNAHQoy4/WmZrm3AgrY6HlUqtIQGD2qUApBNWcX1C0+
+         laHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=c3/xglDrs4GgAM40Pjq1vzK1v2T7qf4JcCCRFWl6k4g=;
-        b=OpVuXW90GREJ8IPsBgaqU3tmELFOp4W+5eWlo+Q4wj0EQvohSimiv5iIP/nbKMBSDl
-         +QgbbhwKsf2aXFQ+yWDH62NAvqLscYAkolUtMrSzIA+U8gZJ3CBuYgUlDQVWFOkgHmQm
-         Z8EB1vbArrSTFv/3geeyzgVVJQ67U1Z3wslOnP0+oDDO5qU//mfNbAJ9104Y7HN7IIP+
-         zcjXcxunpwpwa/kJ4MoteHh2xf45+xrYrP9IfH9oS9j3rLCGFMEXeWZOOSk+p1x815Ry
-         SsGhayfVldf9dr8TwS/QcO2bs5T/IS/yy54lYdPsy4KkftCwkmPe2h5Bm0tlrKBTZcL2
-         2Ilg==
-X-Gm-Message-State: AFqh2ko9jBOMzyZ/8bInYMczvJo1WTEnXDMpYXwlreoiix5J3ddKEY5O
-        YiIgHEDFbkTDmlDqffsrRII=
-X-Google-Smtp-Source: AMrXdXtheeUgW/ehdT20D8crA3E+xLX19dRj8kq2j9cAtxWEF6/jTGrekTIsjKUTNo8D+nlbVHnJHA==
-X-Received: by 2002:a62:ab0b:0:b0:58b:46c9:a6b1 with SMTP id p11-20020a62ab0b000000b0058b46c9a6b1mr13080521pff.33.1674167826597;
-        Thu, 19 Jan 2023 14:37:06 -0800 (PST)
-Received: from localhost ([192.55.54.55])
-        by smtp.gmail.com with ESMTPSA id c202-20020a621cd3000000b0058dc1d54db1sm6563910pfc.206.2023.01.19.14.37.05
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jd8DvczjAgkaoJ2/VgnefBfGOX7aqFYYlHr6EdELZ2k=;
+        b=bfIeISSvnGto2ba90aCydPi/hbjJJJ1aeW9XlJ4PA+pmhN2dvxcD+FXndDrvAYfgJM
+         frv6jcLM0/kKlengd05ieUIvXwXnyMZ1Dk3XyAxTwGo2edt4AOWTh7wQnUaoOrQxmgAP
+         +S74yOnxXFb0sncFocG1jb2ASZODac6++XHzkiuAFe5R3WtmxhkSri4B1D3dQHEZsdD+
+         Vg9vt7cHCLslORlKlCnTqCKW+mB16L1O9Oz/FtAuLbOnlNYnrggRzwK1bLPTjer4ZiDk
+         ab8Pu+WqlO7VdxbikHNPathC5Q7BtNIdG5ZK5EXt+li8zVIUKFu5MK62f8SUIqKlw3Pq
+         LP/g==
+X-Gm-Message-State: AFqh2ko1FtCW7w5rDQ3MZCZvqYckmQzGThHUuj5w5M2bXDj6L3NSGQKU
+        06nMmnDIWxtMtCGQnK6pmZ0=
+X-Google-Smtp-Source: AMrXdXvYTQSFLiwoxfPR4C8ddUgxEC/p229Ds5rfrm9CRJ9mBbGO4xv3Q8k47kZ5eG4scZWKpHgKVg==
+X-Received: by 2002:a92:c5d1:0:b0:30d:9eea:e51 with SMTP id s17-20020a92c5d1000000b0030d9eea0e51mr1941414ilt.1.1674168350372;
+        Thu, 19 Jan 2023 14:45:50 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id x14-20020a92d64e000000b003024928a9afsm11079999ilp.83.2023.01.19.14.45.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 14:37:05 -0800 (PST)
-Date:   Thu, 19 Jan 2023 14:37:04 -0800
-From:   Isaku Yamahata <isaku.yamahata@gmail.com>
+        Thu, 19 Jan 2023 14:45:50 -0800 (PST)
+Date:   Fri, 20 Jan 2023 00:45:44 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Isaku Yamahata <isaku.yamahata@gmail.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
-Message-ID: <20230119223704.GD2976263@ls.amr.corp.intel.com>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <Y8H5Z3e4hZkFxAVS@google.com>
- <20230119111308.GC2976263@ls.amr.corp.intel.com>
- <Y8lg1G2lRIrI/hld@google.com>
+Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Kai Huang <kai.huang@intel.com>
+Subject: Re: [PATCH v11 018/113] KVM: TDX: create/destroy VM structure
+Message-ID: <20230120004544.00003c50@gmail.com>
+In-Reply-To: <Y8cLcY12zDWqO8nd@google.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+        <68fa413e61d7471657174bc7c83bde5c842e251f.1673539699.git.isaku.yamahata@intel.com>
+        <20230113151258.00006a6d@gmail.com>
+        <Y8F1uPsW56fVdhmC@google.com>
+        <20230114111621.00001840@gmail.com>
+        <Y8bFCb+rs25dKcMY@google.com>
+        <20230117214414.00003229@gmail.com>
+        <Y8cLcY12zDWqO8nd@google.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y8lg1G2lRIrI/hld@google.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -104,96 +84,181 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 03:25:08PM +0000,
+On Tue, 17 Jan 2023 20:56:17 +0000
 Sean Christopherson <seanjc@google.com> wrote:
 
-> On Thu, Jan 19, 2023, Isaku Yamahata wrote:
-> > On Sat, Jan 14, 2023 at 12:37:59AM +0000,
+> On Tue, Jan 17, 2023, Zhi Wang wrote:
+> > On Tue, 17 Jan 2023 15:55:53 +0000
 > > Sean Christopherson <seanjc@google.com> wrote:
 > > 
-> > > On Fri, Dec 02, 2022, Chao Peng wrote:
-> > > > This patch series implements KVM guest private memory for confidential
-> > > > computing scenarios like Intel TDX[1]. If a TDX host accesses
-> > > > TDX-protected guest memory, machine check can happen which can further
-> > > > crash the running host system, this is terrible for multi-tenant
-> > > > configurations. The host accesses include those from KVM userspace like
-> > > > QEMU. This series addresses KVM userspace induced crash by introducing
-> > > > new mm and KVM interfaces so KVM userspace can still manage guest memory
-> > > > via a fd-based approach, but it can never access the guest memory
-> > > > content.
+> > > On Sat, Jan 14, 2023, Zhi Wang wrote:
+> > > > On Fri, 13 Jan 2023 15:16:08 +0000 > Sean Christopherson <seanjc@google.com> wrote:
 > > > > 
-> > > > The patch series touches both core mm and KVM code. I appreciate
-> > > > Andrew/Hugh and Paolo/Sean can review and pick these patches. Any other
-> > > > reviews are always welcome.
-> > > >   - 01: mm change, target for mm tree
-> > > >   - 02-09: KVM change, target for KVM tree
+> > > > > On Fri, Jan 13, 2023, Zhi Wang wrote:
+> > > > > > Better add a FIXME: here as this has to be fixed later.
+> > > > > 
+> > > > > No, leaking the page is all KVM can reasonably do here.  An improved
+> > > > > comment would be helpful, but no code change is required.
+> > > > > tdx_reclaim_page() returns an error if and only if there's an
+> > > > > unexpected, fatal error, e.g. a SEAMCALL with bad params, incorrect
+> > > > > concurrency in KVM, a TDX Module bug, etc.  Retrying at a later point is
+> > > > > highly unlikely to be successful.
+> > > > 
+> > > > Hi:
+> > > > 
+> > > > The word "leaking" sounds like a situation left unhandled temporarily.
+> > > > 
+> > > > I checked the source code of the TDX module[1] for the possible reason to
+> > > > fail when reviewing this patch:
+> > > > 
+> > > > tdx-module-v1.0.01.01.zip\src\vmm_dispatcher\api_calls\tdh_phymem_page_reclaim.c
+> > > > tdx-module-v1.0.01.01.zip\src\vmm_dispatcher\api_calls\tdh_phymem_page_wbinvd.c
+> > > > 
+> > > > a. Invalid parameters. For example, page is not aligned, PA HKID is not zero...
+> > > > 
+> > > > For invalid parameters, a WARN_ON_ONCE() + return value is good enough as
+> > > > that is how kernel handles similar situations. The caller takes the
+> > > > responsibility.
+> > > >  
+> > > > b. Locks has been taken in TDX module. TDR page has been locked due to another
+> > > > SEAMCALL, another SEAMCALL is doing PAMT walk and holding PAMT lock... 
+> > > > 
+> > > > This needs to be improved later either by retry or taking tdx_lock to avoid
+> > > > TDX module fails on this.
 > > > 
-> > > A version with all of my feedback, plus reworked versions of Vishal's selftest,
-> > > is available here:
+> > > No, tdx_reclaim_page() already retries TDH.PHYMEM.PAGE.RECLAIM if the target page
+> > > is contended (though I'd question the validity of even that), and TDH.PHYMEM.PAGE.WBINVD
+> > > is performed only when reclaiming the TDR.  If there's contention when reclaiming
+> > > the TDR, then KVM effectively has a use-after-free bug, i.e. leaking the page is
+> > > the least of our worries.
 > > > 
-> > >   git@github.com:sean-jc/linux.git x86/upm_base_support
-> > > 
-> > > It compiles and passes the selftest, but it's otherwise barely tested.  There are
-> > > a few todos (2 I think?) and many of the commits need changelogs, i.e. it's still
-> > > a WIP.
-> > > 
-> > > As for next steps, can you (handwaving all of the TDX folks) take a look at what
-> > > I pushed and see if there's anything horrifically broken, and that it still works
-> > > for TDX?
-> > > 
-> > > Fuad (and pKVM folks) same ask for you with respect to pKVM.  Absolutely no rush
-> > > (and I mean that).
-> > > 
-> > > On my side, the two things on my mind are (a) tests and (b) downstream dependencies
-> > > (SEV and TDX).  For tests, I want to build a lists of tests that are required for
-> > > merging so that the criteria for merging are clear, and so that if the list is large
-> > > (haven't thought much yet), the work of writing and running tests can be distributed.
-> > > 
-> > > Regarding downstream dependencies, before this lands, I want to pull in all the
-> > > TDX and SNP series and see how everything fits together.  Specifically, I want to
-> > > make sure that we don't end up with a uAPI that necessitates ugly code, and that we
-> > > don't miss an opportunity to make things simpler.  The patches in the SNP series to
-> > > add "legacy" SEV support for UPM in particular made me slightly rethink some minor
-> > > details.  Nothing remotely major, but something that needs attention since it'll
-> > > be uAPI.
 > > 
-> > Although I'm still debuging with TDX KVM, I needed the following.
-> > kvm_faultin_pfn() is called without mmu_lock held.  the race to change
-> > private/shared is handled by mmu_seq.  Maybe dedicated function only for
-> > kvm_faultin_pfn().
+> > Hi:
+> > 
+> > Thanks for the reply. "Leaking" is the consquence of even failing in retry. I
+> > agree with this. But I was questioning if "retry" is really a correct and only
+> > solution when encountering lock contention in the TDX module as I saw that there
+> > are quite some magic numbers are going to be introduced because of "retry" and
+> > there were discussions about times of retry should be 3 or 1000 in TDX guest
+> > on hyper-V patches. It doesn't sound right.
 > 
-> Gah, you're not on the other thread where this was discussed[*].  Simply deleting
-> the lockdep assertion is safe, for guest types that rely on the attributes to
-> define shared vs. private, KVM rechecks the attributes under the protection of
-> mmu_seq.
+> Ah, yeah, I'm speaking only with respect to leaking pages on failure in this
+> specific scenario.
 > 
-> I'll get a fixed version pushed out today.
+> > Compare to an typical *kernel lock* case, an execution path can wait on a
+> > waitqueue and later will be woken up. We usually do contention-wait-and-retry
+> > and we rarely just do contention and retry X times. In TDX case, I understand
+> > that it is hard for the TDX module to provide similar solutions as an execution
+> > path can't stay long in the TDX module.
 > 
-> [*] https://lore.kernel.org/all/Y8gpl+LwSuSgBFks@google.com
+> Let me preface the below comments by saying that this is the first time that I've
+> seen the "Single-Step and Zero-Step Attacks Mitigation Mechanisms" behavior, i.e.
+> the first time I've been made aware that the TDX Module can apparently decide
+> to take S-EPT locks in the VM-Enter path.
+> 
+> > 
+> > 1) We can always take tdx_lock (linux kernel lock) when calling a SEAMCALL
+> > that touch the TDX internal locks. But the downside is we might lose some
+> > concurrency.
+> 
+> This isn't really feasible in practice.  Even if tdx_lock were made a spinlock
+> (it's currently a mutex) so that it could it could be taken inside kvm->mmu_lock,
+> acquiring a per-VM lock, let alone a global lock, in KVM's page fault handling
+> path is not an option.  KVM has a hard requirement these days of being able to
+> handle multiple page faults in parallel.
+> 
+> > 2) As TDX module doesn't provide contention-and-wait, I guess the following
+> > approach might have been discussed when designing this "retry".
+> > 
+> > KERNEL                          TDX MODULE
+> > 
+> > SEAMCALL A   ->                 PATH A: Taking locks
+> > 
+> > SEAMCALL B   ->                 PATH B: Contention on a lock
+> > 
+> >              <-                 Return "operand busy"
+> > 
+> > SEAMCALL B   -|
+> >               |  <- Wait on a kernel waitqueue
+> > SEAMCALL B  <-|
+> > 
+> > SEAMCALL A   <-                 PATH A: Return
+> > 
+> > SEAMCALL A   -|
+> >               |  <- Wake up the waitqueue
+> > SEMACALL A  <-| 
+> > 
+> > SEAMCALL B  ->                  PATH B: Taking the locks
+> > ...
+> > 
+> > Why not this scheme wasn't chosen?
+> 
+> AFAIK, I don't think a waitqueue approach as ever been discussed publicly.  Intel
+> may have considered the idea internally, but I don't recall anything being proposed
+> publically (though it's entirely possible I just missed the discussion).
+> 
+> Anways, I don't think a waitqueue would be a good fit, at least not for S-EPT
+> management, which AFAICT is the only scenario where KVM does the arbitrary "retry
+> X times and hope things work".  If the contention occurs due to the TDX Module
+> taking an S-EPT lock in VM-Enter, then KVM won't get a chance to do the "Wake up
+> the waitqueue" action until the next VM-Exit, which IIUC is well after the TDX
+> Module drops the S-EPT lock.  In other words, immediately retrying and then punting
+> the problem further up the stack in KVM does seem to be the least awful "solution"
+> if there's contention.
+>
 
-Now I have tdx kvm working. I've uploaded at the followings.
-It's rebased to v6.2-rc3.
-        git@github.com:yamahata/linux.git tdx/upm
-        git@github.com:yamahata/qemu.git tdx/upm
+I should put both "waitqueue or spin" in the chart above to prevent misunderstanding.
 
-kvm_mmu_do_page_fault() needs the following change.
-kvm_mem_is_private() queries mem_attr_array.  kvm_faultin_pfn() also uses
-kvm_mem_is_private(). So the shared-private check in kvm_faultin_pfn() doesn't
-make sense. This change would belong to TDX KVM patches, though.
+I agree that S-EPT should be thought and treated differently than others as
+any lock change on that path can affect the parallelization and performance. There are
+many internal locks for protecting private data structures inside the security
+firmware, like locks for TDR, TDCS, TDVPS. PAMT(mostly SEPT-related). Any contention
+on these might result in a BUSY.
 
-diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
-index 72b0da8e27e0..f45ac438bbf4 100644
---- a/arch/x86/kvm/mmu/mmu_internal.h
-+++ b/arch/x86/kvm/mmu/mmu_internal.h
-@@ -430,7 +430,7 @@ static inline int kvm_mmu_do_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
-                .max_level = vcpu->kvm->arch.tdp_max_page_level,
-                .req_level = PG_LEVEL_4K,
-                .goal_level = PG_LEVEL_4K,
--               .is_private = kvm_mem_is_private(vcpu->kvm, cr2_or_gpa >> PAGE_SHIFT),
-+               .is_private = kvm_is_private_gpa(vcpu->kvm, cr2_or_gpa),
-        };
-        int r;
+What I would like to clarify is: it would be better to have a mechanism to make sure a
+SEAMCALL can succeed at a certain point (or at least trying to succeed) as the 
+magic number would work like a lottery in reality. E.g. the CPU doing retry is running
+at a higher freq than the CPU running the execution path which took the TDX inner
+locks due to different P states. The retry loop might end much earlier than expectation.
+Not even say when the same linux kernel binary with the same pre-determined number 
+of retrying loop running on different CPU SKUs with different freqs.
 
+We sometimes do retry in a driver to wait HW states ready is because the clock of a
+device might be fixed or predictable. But I am in doubt if retrying loop works in the
+case mentioned above.
 
--- 
-Isaku Yamahata <isaku.yamahata@gmail.com>
+It still likes a temporary workaround to me and I think we should be quite
+careful of it.
+
+> That said, I 100% agree that the arbitrary retry stuff is awful.  The zero-step
+> interaction in particular isn't acceptable.
+> 
+> Intel folks, encountering "TDX_OPERAND_BUSY | TDX_OPERAND_ID_SEPT" on VM-Enter
+> needs to be treated as a KVM bug, even if it means teaching KVM to kill the VM
+> if a vCPU is on the cusp of triggerring the "pre-determined number" of EPT faults
+> mentioned in this snippet:
+> 
+>   After a pre-determined number of such EPT violations occur on the same instruction,
+>   the TDX module starts tracking the GPAs that caused Secure EPT faults and fails
+>   further host VMM attempts to enter the TD VCPU unless previously faulting private
+>   GPAs are properly mapped in the Secure EPT.
+> 
+> If the "pre-determined number" is too low to avoid false positives, e.g. if it can
+> be tripped by a vCPU spinning while a different vCPU finishes handling a fault,
+> then either the behavior of the TDX Module needs to be revisited, or KVM needs to
+> stall vCPUs that are approaching the threshold until all outstanding S-EPT faults
+> have been serviced.
+>
+
+That sharply hits the point. Let's keep this in mind and start from here.
+
+I also saw the AMD SEV-SNP host patches had retry times like (2 * cpu cores).
+But I haven't seen any explanation in the code and comment yet, like how it
+supposes to be able to work in reality. Would ask this question in the patch
+review. I start to feel this seems a common problem that needs to be sorted.
+
+> KVM shouldn't be spuriously zapping private S-EPT entries since the backing memory
+> is pinned, which means the only way for a vCPU to truly get stuck faulting on a
+> single instruction is if userspace is broken/malicious, in which case userspace
+> gets to keep the pieces.
+
