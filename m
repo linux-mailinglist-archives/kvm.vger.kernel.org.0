@@ -2,188 +2,208 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD77B673269
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 08:25:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 32D0E673295
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 08:38:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229830AbjASHZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 02:25:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38748 "EHLO
+        id S229760AbjASHhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 02:37:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229961AbjASHZV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 02:25:21 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75DF266FBD;
-        Wed, 18 Jan 2023 23:24:53 -0800 (PST)
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30J67eJR030173;
-        Thu, 19 Jan 2023 07:23:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=FaOVjx07ztTIdT60txx0s0b5gk5cg+3GhJNm7FRrqxA=;
- b=gGqM15HYRcnG3WHsQqKbdungpZdZvmGzS2AtsdqaSW/xfjHO3tqDkZ25Hz8DIWEm2B7I
- CZIrfeE1k3waUKwBNVVhBd+wbT/dshUzvjnPyhnHQ0PNJuTxFOPsnO/p0R/Zs86BeGLW
- TNW/jXn2lZeMZOoJbFtLvH735N0X2+RIqgUB05N2MU4eDKCi2j7IxHPoFCaEA5Cs13gZ
- 2xvzCM1CDorHq0AVtMhIKRmiXHPq7hUFGf5MIxbu1sEP92FQgZkgLLUbJOMldpnILphX
- rc8jaP48Bu/BMhY4srYRuy7xajXYE1Lq4CXc2BrzuC5rah5fVX+eCre0o1NfExG5wx+Q QA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6h5f6mkq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 07:23:41 +0000
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30J7DI0V030240;
-        Thu, 19 Jan 2023 07:23:40 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6h5f6mk8-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 07:23:40 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30J73lel009766;
-        Thu, 19 Jan 2023 07:23:39 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
-        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3n3m1837vq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 07:23:39 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30J7NbQw42271318
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Jan 2023 07:23:37 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 868EA58059;
-        Thu, 19 Jan 2023 07:23:37 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FFC358043;
-        Thu, 19 Jan 2023 07:23:28 +0000 (GMT)
-Received: from [9.160.127.29] (unknown [9.160.127.29])
-        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Jan 2023 07:23:28 +0000 (GMT)
-Message-ID: <f41e2872-a648-9c5d-88a3-23ad099dffa2@linux.ibm.com>
-Date:   Thu, 19 Jan 2023 09:23:26 +0200
+        with ESMTP id S229626AbjASHhw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 02:37:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A6911D
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 23:37:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674113822;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=S06AqGlmEUyC3/e/k2djDq5Ra/fFhZAiE0FaXodErl0=;
+        b=JlPkS2k/OjmsWHCmI4dZ1M87DK43KrgqQgAhun8VSFaj/dU7zcTHSU0gDBaRmhAkfG5h27
+        iETq+IBTPVlOcBoIriuEFqVcMx+qiyOJ1LWwz0kShBylbSBepB+1EXbNlStp1cSpSWy3KP
+        ah3xwwR6Yws8LCG0jMxgKuQnzVDHV7M=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-654-FQU6fZupOA2w6g_MqcapeA-1; Thu, 19 Jan 2023 02:36:55 -0500
+X-MC-Unique: FQU6fZupOA2w6g_MqcapeA-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB249183B3C8;
+        Thu, 19 Jan 2023 07:36:54 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-12-175.pek2.redhat.com [10.72.12.175])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id EC656492B00;
+        Thu, 19 Jan 2023 07:36:49 +0000 (UTC)
+From:   Jason Wang <jasowang@redhat.com>
+To:     mst@redhat.com, jasowang@redhat.com
+Cc:     pbonzini@redhat.com, stefanha@redhat.com, bcodding@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Nicholas Bellinger <nab@linux-iscsi.org>
+Subject: [PATCH V2] vhost-scsi: unbreak any layout for response
+Date:   Thu, 19 Jan 2023 15:36:47 +0800
+Message-Id: <20230119073647.76467-1-jasowang@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH RFC v7 31/64] crypto: ccp: Add the
- SNP_{SET,GET}_EXT_CONFIG command
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
-Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com, Brijesh Singh <brijesh.singh@amd.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-32-michael.roth@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-In-Reply-To: <20221214194056.161492-32-michael.roth@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: FI5em3frKKibChidKNc0sr30HSyxeZBK
-X-Proofpoint-ORIG-GUID: w6COoNNAPvn6WeEFWdLfRUXz5bx9bRjg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-18_05,2023-01-18_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 impostorscore=0 spamscore=0 phishscore=0
- mlxscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2301190056
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Mike,
+Al Viro said:
 
-On 14/12/2022 21:40, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> The SEV-SNP firmware provides the SNP_CONFIG command used to set the
-> system-wide configuration value for SNP guests. The information includes
-> the TCB version string to be reported in guest attestation reports.
-> 
-> Version 2 of the GHCB specification adds an NAE (SNP extended guest
-> request) that a guest can use to query the reports that include additional
-> certificates.
-> 
-> In both cases, userspace provided additional data is included in the
-> attestation reports. The userspace will use the SNP_SET_EXT_CONFIG
-> command to give the certificate blob and the reported TCB version string
-> at once. Note that the specification defines certificate blob with a
-> specific GUID format; the userspace is responsible for building the
-> proper certificate blob. The ioctl treats it an opaque blob.
-> 
-> While it is not defined in the spec, but let's add SNP_GET_EXT_CONFIG
-> command that can be used to obtain the data programmed through the
-> SNP_SET_EXT_CONFIG.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  Documentation/virt/coco/sev-guest.rst |  27 ++++++
->  drivers/crypto/ccp/sev-dev.c          | 123 ++++++++++++++++++++++++++
->  drivers/crypto/ccp/sev-dev.h          |   4 +
->  include/uapi/linux/psp-sev.h          |  17 ++++
->  4 files changed, 171 insertions(+)
-> 
-> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
-> index 11ea67c944df..fad1e5639dac 100644
-> --- a/Documentation/virt/coco/sev-guest.rst
-> +++ b/Documentation/virt/coco/sev-guest.rst
-> @@ -145,6 +145,33 @@ The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
->  status includes API major, minor version and more. See the SEV-SNP
->  specification for further details.
->  
-> +2.5 SNP_SET_EXT_CONFIG
-> +----------------------
-> +:Technology: sev-snp
-> +:Type: hypervisor ioctl cmd
-> +:Parameters (in): struct sev_data_snp_ext_config
-> +:Returns (out): 0 on success, -negative on error
-> +
-> +The SNP_SET_EXT_CONFIG is used to set the system-wide configuration such as
-> +reported TCB version in the attestation report. The command is similar to
-> +SNP_CONFIG command defined in the SEV-SNP spec. The main difference is the
-> +command also accepts an additional certificate blob defined in the GHCB
-> +specification.
-> +
-> +If the certs_address is zero, then the previous certificate blob will deleted.
-> +For more information on the certificate blob layout, see the GHCB spec
-> +(extended guest request message).
-> +
-> +2.6 SNP_GET_EXT_CONFIG
-> +----------------------
-> +:Technology: sev-snp
-> +:Type: hypervisor ioctl cmd
-> +:Parameters (in): struct sev_data_snp_ext_config
-> +:Returns (out): 0 on success, -negative on error
-> +
-> +The SNP_SET_EXT_CONFIG is used to query the system-wide configuration set
+"""
+Since "vhost/scsi: fix reuse of &vq->iov[out] in response"
+we have this:
+                cmd->tvc_resp_iov = vq->iov[vc.out];
+                cmd->tvc_in_iovs = vc.in;
+combined with
+                iov_iter_init(&iov_iter, ITER_DEST, &cmd->tvc_resp_iov,
+                              cmd->tvc_in_iovs, sizeof(v_rsp));
+in vhost_scsi_complete_cmd_work().  We used to have ->tvc_resp_iov
+_pointing_ to vq->iov[vc.out]; back then iov_iter_init() asked to
+set an iovec-backed iov_iter over the tail of vq->iov[], with
+length being the amount of iovecs in the tail.
 
-       ^^^^^^^^^^^^^^^^^^
+Now we have a copy of one element of that array.  Fortunately, the members
+following it in the containing structure are two non-NULL kernel pointers,
+so copy_to_iter() will not copy anything beyond the first iovec - kernel
+pointer is not (on the majority of architectures) going to be accepted by
+access_ok() in copyout() and it won't be skipped since the "length" (in
+reality - another non-NULL kernel pointer) won't be zero.
 
-This should be SNP_GET_EXT_CONFIG.
+So it's not going to give a guest-to-qemu escalation, but it's definitely
+a bug.  Frankly, my preference would be to verify that the very first iovec
+is long enough to hold rsp_size.  Due to the above, any users that try to
+give us vq->iov[vc.out].iov_len < sizeof(struct virtio_scsi_cmd_resp)
+would currently get a failure in vhost_scsi_complete_cmd_work()
+anyway.
+"""
 
+However, the spec doesn't say anything about the legacy descriptor
+layout for the respone. So this patch tries to not assume the response
+to reside in a single separate descriptor which is what commit
+79c14141a487 ("vhost/scsi: Convert completion path to use") tries to
+achieve towards to ANY_LAYOUT.
 
--Dov
+This is done by allocating and using dedicate resp iov in the
+command. To be safety, start with UIO_MAXIOV to be consistent with the
+limitation that we advertise to the vhost_get_vq_desc().
 
-> +through the SNP_SET_EXT_CONFIG.
-> +
->  3. SEV-SNP CPUID Enforcement
->  ============================
->  
+Testing with the hacked virtio-scsi driver that use 1 descriptor for 1
+byte in the response.
+
+Reported-by: Al Viro <viro@zeniv.linux.org.uk>
+Cc: Benjamin Coddington <bcodding@redhat.com>
+Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+Fixes: a77ec83a5789 ("vhost/scsi: fix reuse of &vq->iov[out] in response")
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+Changes since V1:
+- tweak the changelog
+- fix the allocation size for tvc_resp_iov (should be sizeof(struct iovec))
+---
+ drivers/vhost/scsi.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
+index dca6346d75b3..d5ecb8876fc9 100644
+--- a/drivers/vhost/scsi.c
++++ b/drivers/vhost/scsi.c
+@@ -80,7 +80,7 @@ struct vhost_scsi_cmd {
+ 	struct scatterlist *tvc_prot_sgl;
+ 	struct page **tvc_upages;
+ 	/* Pointer to response header iovec */
+-	struct iovec tvc_resp_iov;
++	struct iovec *tvc_resp_iov;
+ 	/* Pointer to vhost_scsi for our device */
+ 	struct vhost_scsi *tvc_vhost;
+ 	/* Pointer to vhost_virtqueue for the cmd */
+@@ -563,7 +563,7 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
+ 		memcpy(v_rsp.sense, cmd->tvc_sense_buf,
+ 		       se_cmd->scsi_sense_length);
+ 
+-		iov_iter_init(&iov_iter, ITER_DEST, &cmd->tvc_resp_iov,
++		iov_iter_init(&iov_iter, ITER_DEST, cmd->tvc_resp_iov,
+ 			      cmd->tvc_in_iovs, sizeof(v_rsp));
+ 		ret = copy_to_iter(&v_rsp, sizeof(v_rsp), &iov_iter);
+ 		if (likely(ret == sizeof(v_rsp))) {
+@@ -594,6 +594,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
+ 	struct vhost_scsi_cmd *cmd;
+ 	struct vhost_scsi_nexus *tv_nexus;
+ 	struct scatterlist *sg, *prot_sg;
++	struct iovec *tvc_resp_iov;
+ 	struct page **pages;
+ 	int tag;
+ 
+@@ -613,6 +614,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
+ 	sg = cmd->tvc_sgl;
+ 	prot_sg = cmd->tvc_prot_sgl;
+ 	pages = cmd->tvc_upages;
++	tvc_resp_iov = cmd->tvc_resp_iov;
+ 	memset(cmd, 0, sizeof(*cmd));
+ 	cmd->tvc_sgl = sg;
+ 	cmd->tvc_prot_sgl = prot_sg;
+@@ -625,6 +627,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
+ 	cmd->tvc_data_direction = data_direction;
+ 	cmd->tvc_nexus = tv_nexus;
+ 	cmd->inflight = vhost_scsi_get_inflight(vq);
++	cmd->tvc_resp_iov = tvc_resp_iov;
+ 
+ 	memcpy(cmd->tvc_cdb, cdb, VHOST_SCSI_MAX_CDB_SIZE);
+ 
+@@ -935,7 +938,7 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
+ 	struct iov_iter in_iter, prot_iter, data_iter;
+ 	u64 tag;
+ 	u32 exp_data_len, data_direction;
+-	int ret, prot_bytes, c = 0;
++	int ret, prot_bytes, i, c = 0;
+ 	u16 lun;
+ 	u8 task_attr;
+ 	bool t10_pi = vhost_has_feature(vq, VIRTIO_SCSI_F_T10_PI);
+@@ -1092,7 +1095,8 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
+ 		}
+ 		cmd->tvc_vhost = vs;
+ 		cmd->tvc_vq = vq;
+-		cmd->tvc_resp_iov = vq->iov[vc.out];
++		for (i = 0; i < vc.in ; i++)
++			cmd->tvc_resp_iov[i] = vq->iov[vc.out + i];
+ 		cmd->tvc_in_iovs = vc.in;
+ 
+ 		pr_debug("vhost_scsi got command opcode: %#02x, lun: %d\n",
+@@ -1461,6 +1465,7 @@ static void vhost_scsi_destroy_vq_cmds(struct vhost_virtqueue *vq)
+ 		kfree(tv_cmd->tvc_sgl);
+ 		kfree(tv_cmd->tvc_prot_sgl);
+ 		kfree(tv_cmd->tvc_upages);
++		kfree(tv_cmd->tvc_resp_iov);
+ 	}
+ 
+ 	sbitmap_free(&svq->scsi_tags);
+@@ -1508,6 +1513,14 @@ static int vhost_scsi_setup_vq_cmds(struct vhost_virtqueue *vq, int max_cmds)
+ 			goto out;
+ 		}
+ 
++		tv_cmd->tvc_resp_iov = kcalloc(UIO_MAXIOV,
++					       sizeof(struct iovec),
++					       GFP_KERNEL);
++		if (!tv_cmd->tvc_resp_iov) {
++			pr_err("Unable to allocate tv_cmd->tvc_resp_iov\n");
++			goto out;
++		}
++
+ 		tv_cmd->tvc_prot_sgl = kcalloc(VHOST_SCSI_PREALLOC_PROT_SGLS,
+ 					       sizeof(struct scatterlist),
+ 					       GFP_KERNEL);
+-- 
+2.25.1
+
