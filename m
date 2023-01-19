@@ -2,435 +2,188 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B9F68673174
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 06:59:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BD77B673269
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 08:25:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbjASF7A (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 00:59:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43396 "EHLO
+        id S229830AbjASHZq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 02:25:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229863AbjASF66 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 00:58:58 -0500
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9807818B12
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 21:58:56 -0800 (PST)
-Received: by mail-pf1-x430.google.com with SMTP id g205so692947pfb.6
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 21:58:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=JbVMnqUlIZgwpFUhBO/Bav1hYnoypeCQfNbPaXGsQX4=;
-        b=TB/tmy9tc8qQAyic8f7WOB0ZVtkf3j6lATCYF/kET4SuzhcBa2wF2cysSHGuhlZQjs
-         fOifCbhFeRdQpiG2HSPZbklTtG3+Rf4q60EKRIOcqlbKRlm6EKTGnjH91OZniECo+UlR
-         6rjjRkC+gy81qTA4aVUjCj0lNnJWGGq9KKaSIlN2OIbHjlzl2H9qUnglFsZP4EPUZxKS
-         rsgi3ERLGGKalCiPP1JA7pwim3LcMSPEDsHvP2HziBcR/OVSAKqo8O/LQpSRZqgGighH
-         Jv4t/51iZJ2lrYZugVNU4U0N8x7yg8eEyiL4ZIse0GVCKaMBqn0eIVTa3L6gH9PXAmkw
-         PuwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JbVMnqUlIZgwpFUhBO/Bav1hYnoypeCQfNbPaXGsQX4=;
-        b=jon3fTvVnyqJiu+yF+kuyKWZMhfXl5h3Nc53ttSarAKkBfjeuqf1FGDeOms+k9fsNu
-         BIzGlybJzLlI+oJdgNTVyAC1Ye2mDS3M1RlRWpYzmqh97df+Cw30WE3cBrcJCgMxb+XY
-         C/bcdBG2Mq3F4lkk8kCIl1talrinQjJBS88ofe2Bs2mCIUvzMOC/mI/K7BmB5Zs1oO4U
-         JIVouJEdX3vH3Zw/UwW0cahSgOVkNUEHoYzyM0HRv7BNXdlb0FJ1c2DaWLiJ6jIyFJu/
-         /KTWDXCE8VzBYp82lQF5lVxazXNHpuqlkE1BuaksYduVWDRwrAVBqs1EqRLf/teyy8CZ
-         BUug==
-X-Gm-Message-State: AFqh2krqZNx/ZSuwj32b4fk/F8zwzs6GI04stGrccvwYxPTmSmot8Xcx
-        3KpDwuyaY2/7IIzOqFEuWkMirosmRgqX//ZEDQUq5w==
-X-Google-Smtp-Source: AMrXdXutlwhX+7hle/4xEnH+H7o8kZXjptYKN2/7q+nDzqngyXgl5UmnwyN8prK5LlYj4IhRodyXhhXvzajHDNNRs7M=
-X-Received: by 2002:a05:6a00:9aa:b0:576:a748:8fa3 with SMTP id
- u42-20020a056a0009aa00b00576a7488fa3mr1000265pfg.37.1674107935747; Wed, 18
- Jan 2023 21:58:55 -0800 (PST)
+        with ESMTP id S229961AbjASHZV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 02:25:21 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75DF266FBD;
+        Wed, 18 Jan 2023 23:24:53 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30J67eJR030173;
+        Thu, 19 Jan 2023 07:23:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=FaOVjx07ztTIdT60txx0s0b5gk5cg+3GhJNm7FRrqxA=;
+ b=gGqM15HYRcnG3WHsQqKbdungpZdZvmGzS2AtsdqaSW/xfjHO3tqDkZ25Hz8DIWEm2B7I
+ CZIrfeE1k3waUKwBNVVhBd+wbT/dshUzvjnPyhnHQ0PNJuTxFOPsnO/p0R/Zs86BeGLW
+ TNW/jXn2lZeMZOoJbFtLvH735N0X2+RIqgUB05N2MU4eDKCi2j7IxHPoFCaEA5Cs13gZ
+ 2xvzCM1CDorHq0AVtMhIKRmiXHPq7hUFGf5MIxbu1sEP92FQgZkgLLUbJOMldpnILphX
+ rc8jaP48Bu/BMhY4srYRuy7xajXYE1Lq4CXc2BrzuC5rah5fVX+eCre0o1NfExG5wx+Q QA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6h5f6mkq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Jan 2023 07:23:41 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30J7DI0V030240;
+        Thu, 19 Jan 2023 07:23:40 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n6h5f6mk8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Jan 2023 07:23:40 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30J73lel009766;
+        Thu, 19 Jan 2023 07:23:39 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3n3m1837vq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Jan 2023 07:23:39 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30J7NbQw42271318
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Jan 2023 07:23:37 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 868EA58059;
+        Thu, 19 Jan 2023 07:23:37 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FFC358043;
+        Thu, 19 Jan 2023 07:23:28 +0000 (GMT)
+Received: from [9.160.127.29] (unknown [9.160.127.29])
+        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 19 Jan 2023 07:23:28 +0000 (GMT)
+Message-ID: <f41e2872-a648-9c5d-88a3-23ad099dffa2@linux.ibm.com>
+Date:   Thu, 19 Jan 2023 09:23:26 +0200
 MIME-Version: 1.0
-References: <20230109211754.67144-1-ricarkol@google.com> <20230109211754.67144-4-ricarkol@google.com>
-In-Reply-To: <20230109211754.67144-4-ricarkol@google.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 18 Jan 2023 21:58:38 -0800
-Message-ID: <CAAeT=FxoS2-cmMe-3FeXPXcvE4wNosZeZy2RGPXz5xisq5fj7A@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH v3 3/4] arm: pmu: Add tests for 64-bit overflows
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-        andrew.jones@linux.dev, maz@kernel.org, alexandru.elisei@arm.com,
-        eric.auger@redhat.com, oliver.upton@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH RFC v7 31/64] crypto: ccp: Add the
+ SNP_{SET,GET}_EXT_CONFIG command
+Content-Language: en-US
+To:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org
+Cc:     linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
+        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com, Brijesh Singh <brijesh.singh@amd.com>,
+        Dov Murik <dovmurik@linux.ibm.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-32-michael.roth@amd.com>
+From:   Dov Murik <dovmurik@linux.ibm.com>
+In-Reply-To: <20221214194056.161492-32-michael.roth@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: FI5em3frKKibChidKNc0sr30HSyxeZBK
+X-Proofpoint-ORIG-GUID: w6COoNNAPvn6WeEFWdLfRUXz5bx9bRjg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.923,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-18_05,2023-01-18_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 spamscore=0 phishscore=0
+ mlxscore=0 lowpriorityscore=0 mlxlogscore=999 bulkscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2301190056
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Ricardo,
+Hi Mike,
 
-On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
->
-> Modify all tests checking overflows to support both 32 (PMCR_EL0.LP == 0)
-> and 64-bit overflows (PMCR_EL0.LP == 1). 64-bit overflows are only
-> supported on PMUv3p5.
->
-> Note that chained tests do not implement "overflow_at_64bits == true".
-> That's because there are no CHAIN events when "PMCR_EL0.LP == 1" (for more
-> details see AArch64.IncrementEventCounter() pseudocode in the ARM ARM DDI
-> 0487H.a, J1.1.1 "aarch64/debug").
->
-> Signed-off-by: Ricardo Koller <ricarkol@google.com>
-
-Reviewed-by: Reiji Watanabe <reijiw@google.com>
-
-I have a few nits below.
-
+On 14/12/2022 21:40, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
+> 
+> The SEV-SNP firmware provides the SNP_CONFIG command used to set the
+> system-wide configuration value for SNP guests. The information includes
+> the TCB version string to be reported in guest attestation reports.
+> 
+> Version 2 of the GHCB specification adds an NAE (SNP extended guest
+> request) that a guest can use to query the reports that include additional
+> certificates.
+> 
+> In both cases, userspace provided additional data is included in the
+> attestation reports. The userspace will use the SNP_SET_EXT_CONFIG
+> command to give the certificate blob and the reported TCB version string
+> at once. Note that the specification defines certificate blob with a
+> specific GUID format; the userspace is responsible for building the
+> proper certificate blob. The ioctl treats it an opaque blob.
+> 
+> While it is not defined in the spec, but let's add SNP_GET_EXT_CONFIG
+> command that can be used to obtain the data programmed through the
+> SNP_SET_EXT_CONFIG.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
->  arm/pmu.c | 116 +++++++++++++++++++++++++++++++++++-------------------
->  1 file changed, 75 insertions(+), 41 deletions(-)
->
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 0d06b59..72d0f50 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -28,6 +28,7 @@
->  #define PMU_PMCR_X         (1 << 4)
->  #define PMU_PMCR_DP        (1 << 5)
->  #define PMU_PMCR_LC        (1 << 6)
-> +#define PMU_PMCR_LP        (1 << 7)
->  #define PMU_PMCR_N_SHIFT   11
->  #define PMU_PMCR_N_MASK    0x1f
->  #define PMU_PMCR_ID_SHIFT  16
-> @@ -56,9 +57,13 @@
->
->  #define ALL_SET                        0x00000000FFFFFFFFULL
-
-Nit: Perhaps renaming this to ALL_SET_32 might be more clear.
-Since the test is now aware of 64 bit counters, the name 'ALL_SET'
-makes me think that all 64 bits are set.
-
->  #define ALL_CLEAR              0x0000000000000000ULL
-> -#define PRE_OVERFLOW           0x00000000FFFFFFF0ULL
-> +#define PRE_OVERFLOW_32                0x00000000FFFFFFF0ULL
-> +#define PRE_OVERFLOW_64                0xFFFFFFFFFFFFFFF0ULL
->  #define PRE_OVERFLOW2          0x00000000FFFFFFDCULL
->
-> +#define PRE_OVERFLOW(__overflow_at_64bits)                             \
-> +       (__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
+>  Documentation/virt/coco/sev-guest.rst |  27 ++++++
+>  drivers/crypto/ccp/sev-dev.c          | 123 ++++++++++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.h          |   4 +
+>  include/uapi/linux/psp-sev.h          |  17 ++++
+>  4 files changed, 171 insertions(+)
+> 
+> diff --git a/Documentation/virt/coco/sev-guest.rst b/Documentation/virt/coco/sev-guest.rst
+> index 11ea67c944df..fad1e5639dac 100644
+> --- a/Documentation/virt/coco/sev-guest.rst
+> +++ b/Documentation/virt/coco/sev-guest.rst
+> @@ -145,6 +145,33 @@ The SNP_PLATFORM_STATUS command is used to query the SNP platform status. The
+>  status includes API major, minor version and more. See the SEV-SNP
+>  specification for further details.
+>  
+> +2.5 SNP_SET_EXT_CONFIG
+> +----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_ext_config
+> +:Returns (out): 0 on success, -negative on error
 > +
->  #define PMU_PPI                        23
->
->  struct pmu {
-> @@ -449,8 +454,10 @@ static bool check_overflow_prerequisites(bool overflow_at_64bits)
->  static void test_basic_event_count(bool overflow_at_64bits)
->  {
->         uint32_t implemented_counter_mask, non_implemented_counter_mask;
-> -       uint32_t counter_mask;
-> +       uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
-> +       uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->         uint32_t events[] = {CPU_CYCLES, INST_RETIRED};
-> +       uint32_t counter_mask;
->
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
->             !check_overflow_prerequisites(overflow_at_64bits))
-> @@ -472,13 +479,13 @@ static void test_basic_event_count(bool overflow_at_64bits)
->          * clear cycle and all event counters and allow counter enablement
->          * through PMCNTENSET. LC is RES1.
->          */
-> -       set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
-> +       set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P | pmcr_lp);
->         isb();
-> -       report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
-> +       report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC | pmcr_lp), "pmcr: reset counters");
->
->         /* Preset counter #0 to pre overflow value to trigger an overflow */
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       report(read_regn_el0(pmevcntr, 0) == pre_overflow,
->                 "counter #0 preset to pre-overflow value");
->         report(!read_regn_el0(pmevcntr, 1), "counter #1 is 0");
->
-> @@ -531,6 +538,8 @@ static void test_mem_access(bool overflow_at_64bits)
->  {
->         void *addr = malloc(PAGE_SIZE);
->         uint32_t events[] = {MEM_ACCESS, MEM_ACCESS};
-> +       uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
-> +       uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
->             !check_overflow_prerequisites(overflow_at_64bits))
-> @@ -542,7 +551,7 @@ static void test_mem_access(bool overflow_at_64bits)
->         write_regn_el0(pmevtyper, 1, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->         isb();
-> -       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         report_info("counter #0 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
->         report_info("counter #1 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
->         /* We may measure more than 20 mem access depending on the core */
-> @@ -552,11 +561,11 @@ static void test_mem_access(bool overflow_at_64bits)
->
->         pmu_reset();
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       write_regn_el0(pmevcntr, 1, pre_overflow);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->         isb();
-> -       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
-> +       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         report(read_sysreg(pmovsclr_el0) == 0x3,
->                "Ran 20 mem accesses with expected overflows on both counters");
->         report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
-> @@ -566,8 +575,10 @@ static void test_mem_access(bool overflow_at_64bits)
->
->  static void test_sw_incr(bool overflow_at_64bits)
->  {
-> +       uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
-> +       uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->         uint32_t events[] = {SW_INCR, SW_INCR};
-> -       uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-> +       uint64_t cntr0 = (pre_overflow + 100) & pmevcntr_mask();
->         int i;
->
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
-> @@ -581,7 +592,7 @@ static void test_sw_incr(bool overflow_at_64bits)
->         /* enable counters #0 and #1 */
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
->         isb();
->
->         for (i = 0; i < 100; i++)
-> @@ -589,14 +600,14 @@ static void test_sw_incr(bool overflow_at_64bits)
->
->         isb();
->         report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
-> -       report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
-> +       report(read_regn_el0(pmevcntr, 0) == pre_overflow,
->                 "PWSYNC does not increment if PMCR.E is unset");
->
->         pmu_reset();
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
-> -       set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> +       set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         isb();
->
->         for (i = 0; i < 100; i++)
-> @@ -614,6 +625,7 @@ static void test_sw_incr(bool overflow_at_64bits)
->  static void test_chained_counters(bool unused)
->  {
->         uint32_t events[] = {CPU_CYCLES, CHAIN};
-> +       uint64_t all_set = pmevcntr_mask();
->
->         if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
->                 return;
-> @@ -624,7 +636,7 @@ static void test_chained_counters(bool unused)
->         write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
->         /* enable counters #0 and #1 */
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->
->         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->
-> @@ -636,26 +648,26 @@ static void test_chained_counters(bool unused)
->         pmu_reset();
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->         write_regn_el0(pmevcntr, 1, 0x1);
->         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->         report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
->         report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
->         report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, ALL_SET);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
-> +       write_regn_el0(pmevcntr, 1, all_set);
->
->         precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
->         report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
-> -       report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
-> +       report(read_regn_el0(pmevcntr, 1) == 0, "CHAIN counter #1 wrapped");
->         report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
->  }
->
->  static void test_chained_sw_incr(bool unused)
->  {
->         uint32_t events[] = {SW_INCR, CHAIN};
-> -       uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
-> +       uint64_t cntr0 = (PRE_OVERFLOW_32 + 100) & pmevcntr_mask();
->         uint64_t cntr1 = (ALL_SET + 1) & pmevcntr_mask();
->         int i;
->
-> @@ -669,7 +681,7 @@ static void test_chained_sw_incr(bool unused)
->         /* enable counters #0 and #1 */
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->         set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
->         isb();
->
-> @@ -687,7 +699,7 @@ static void test_chained_sw_incr(bool unused)
->         pmu_reset();
->
->         write_regn_el0(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->         write_regn_el0(pmevcntr, 1, ALL_SET);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
->         set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> @@ -726,7 +738,7 @@ static void test_chain_promotion(bool unused)
->
->         /* Only enable even counter */
->         pmu_reset();
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
->         write_sysreg_s(0x1, PMCNTENSET_EL0);
->         isb();
->
-> @@ -856,6 +868,9 @@ static bool expect_interrupts(uint32_t bitmap)
->
->  static void test_overflow_interrupt(bool overflow_at_64bits)
->  {
-> +       uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
-> +       uint64_t all_set = pmevcntr_mask();
-> +       uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
->         uint32_t events[] = {MEM_ACCESS, SW_INCR};
->         void *addr = malloc(PAGE_SIZE);
->         int i;
-> @@ -874,16 +889,16 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->         write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
->         write_regn_el0(pmevtyper, 1, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
->         write_sysreg_s(0x3, PMCNTENSET_EL0);
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       write_regn_el0(pmevcntr, 1, pre_overflow);
->         isb();
->
->         /* interrupts are disabled (PMINTENSET_EL1 == 0) */
->
-> -       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> +       mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         report(expect_interrupts(0), "no overflow interrupt after preset");
->
-> -       set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
-> +       set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         isb();
->
->         for (i = 0; i < 100; i++)
-> @@ -898,12 +913,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->
->         pmu_reset_stats();
+> +The SNP_SET_EXT_CONFIG is used to set the system-wide configuration such as
+> +reported TCB version in the attestation report. The command is similar to
+> +SNP_CONFIG command defined in the SEV-SNP spec. The main difference is the
+> +command also accepts an additional certificate blob defined in the GHCB
+> +specification.
+> +
+> +If the certs_address is zero, then the previous certificate blob will deleted.
+> +For more information on the certificate blob layout, see the GHCB spec
+> +(extended guest request message).
+> +
+> +2.6 SNP_GET_EXT_CONFIG
+> +----------------------
+> +:Technology: sev-snp
+> +:Type: hypervisor ioctl cmd
+> +:Parameters (in): struct sev_data_snp_ext_config
+> +:Returns (out): 0 on success, -negative on error
+> +
+> +The SNP_SET_EXT_CONFIG is used to query the system-wide configuration set
 
-This isn't directly related to the patch.
-But, as bits of pmovsclr_el0 are already set (although interrupts
-are disabled), I would think it's good to clear pmovsclr_el0 here.
+       ^^^^^^^^^^^^^^^^^^
 
-Thank you,
-Reiji
+This should be SNP_GET_EXT_CONFIG.
 
 
+-Dov
 
->
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       write_regn_el0(pmevcntr, 1, pre_overflow);
->         write_sysreg(ALL_SET, pmintenset_el1);
->         isb();
->
-> -       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> +       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
->         for (i = 0; i < 100; i++)
->                 write_sysreg(0x3, pmswinc_el0);
->
-> @@ -912,25 +927,40 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
->         report(expect_interrupts(0x3),
->                 "overflow interrupts expected on #0 and #1");
->
-> -       /* promote to 64-b */
-> +       /*
-> +        * promote to 64-b:
-> +        *
-> +        * This only applies to the !overflow_at_64bits case, as
-> +        * overflow_at_64bits doesn't implement CHAIN events. The
-> +        * overflow_at_64bits case just checks that chained counters are
-> +        * not incremented when PMCR.LP == 1.
-> +        */
->
->         pmu_reset_stats();
->
->         write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
->         isb();
-> -       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
-> -       report(expect_interrupts(0x1),
-> -               "expect overflow interrupt on 32b boundary");
-> +       mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +       report(expect_interrupts(0x1), "expect overflow interrupt");
->
->         /* overflow on odd counter */
->         pmu_reset_stats();
-> -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
-> -       write_regn_el0(pmevcntr, 1, ALL_SET);
-> +       write_regn_el0(pmevcntr, 0, pre_overflow);
-> +       write_regn_el0(pmevcntr, 1, all_set);
->         isb();
-> -       mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
-> -       report(expect_interrupts(0x3),
-> -               "expect overflow interrupt on even and odd counter");
-> +       mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
-> +       if (overflow_at_64bits) {
-> +               report(expect_interrupts(0x1),
-> +                      "expect overflow interrupt on even counter");
-> +               report(read_regn_el0(pmevcntr, 1) == all_set,
-> +                      "Odd counter did not change");
-> +       } else {
-> +               report(expect_interrupts(0x3),
-> +                      "expect overflow interrupt on even and odd counter");
-> +               report(read_regn_el0(pmevcntr, 1) != all_set,
-> +                      "Odd counter wrapped");
-> +       }
->  }
->  #endif
->
-> @@ -1131,10 +1161,13 @@ int main(int argc, char *argv[])
->                 report_prefix_pop();
->         } else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
->                 run_test(argv[1], test_basic_event_count, false);
-> +               run_test(argv[1], test_basic_event_count, true);
->         } else if (strcmp(argv[1], "pmu-mem-access") == 0) {
->                 run_test(argv[1], test_mem_access, false);
-> +               run_test(argv[1], test_mem_access, true);
->         } else if (strcmp(argv[1], "pmu-sw-incr") == 0) {
->                 run_test(argv[1], test_sw_incr, false);
-> +               run_test(argv[1], test_sw_incr, true);
->         } else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
->                 run_test(argv[1], test_chained_counters, false);
->         } else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
-> @@ -1143,6 +1176,7 @@ int main(int argc, char *argv[])
->                 run_test(argv[1], test_chain_promotion, false);
->         } else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
->                 run_test(argv[1], test_overflow_interrupt, false);
-> +               run_test(argv[1], test_overflow_interrupt, true);
->         } else {
->                 report_abort("Unknown sub-test '%s'", argv[1]);
->         }
-> --
-> 2.39.0.314.g84b9a713c41-goog
->
+> +through the SNP_SET_EXT_CONFIG.
+> +
+>  3. SEV-SNP CPUID Enforcement
+>  ============================
+>  
