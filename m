@@ -2,98 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11DCB67421C
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 20:06:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A227C67423A
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 20:07:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231263AbjASTGD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 14:06:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48086 "EHLO
+        id S230333AbjASTHc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 14:07:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230318AbjASTF7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 14:05:59 -0500
-Received: from mail-yw1-x1129.google.com (mail-yw1-x1129.google.com [IPv6:2607:f8b0:4864:20::1129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C12530E97
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:04:53 -0800 (PST)
-Received: by mail-yw1-x1129.google.com with SMTP id 00721157ae682-4b718cab0e4so40893277b3.9
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:04:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=8ZdECDAg9mmwgMiId+0pdkIRFxWXX0Q/ZbZP48ymAFw=;
-        b=Giy1ebz7O7hQyLTIrtkNNdjBv+MOt2a11+O3yrLKdfi0gkb9lOByfeSgTPczfJEGb2
-         p8d0RDgaBcgodvbREpLedfJYFzJ6sUh3y+/Kk2nB5wG0XWFvHIIwdRQir2FjfdWdS9Tj
-         +rt17AF0fb7qkyCHUXHbr0WuZ+0k+UmlUL3XRsZ35z/NG8KC17aR/t4/C07kqwQtIjYu
-         ik9/D70oGXpm9zYVjNL7tCpYbaSSHLrAJ0Kx6LokMM1zSa/Omk45VsI0lkLRYIZHjJ0t
-         T4WywLp/HCTt1yfU3CMQr50DAEA47mnPOtX1zH6p6WhCGjVh6+PNei54Lb8VlWVsM6ML
-         fO1Q==
+        with ESMTP id S231286AbjASTGv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 14:06:51 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D8A9AAA1
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:05:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674155118;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qxwOPOgGhsGm2CilOB8QktAtozAzPUo8tE7EUr+QkN4=;
+        b=Kvw8gAoL+efqv7kwtJtND4o7yvHtTDiuiWPqP+tL80TmQioCjyDPUvCn5QF+/EDOkkIbwq
+        lIGQ68wvDF0qUBBtVA8MYl1U6olzGoJavNWf0v3wdRyZUcTqM3uYw8uk6DQmCIljqURdVh
+        OFQz5fUu7/7BXGjLa05mWIPqewVpQJE=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-110-NGtoSpq3OtqaOvtV1hmB0A-1; Thu, 19 Jan 2023 14:05:17 -0500
+X-MC-Unique: NGtoSpq3OtqaOvtV1hmB0A-1
+Received: by mail-io1-f72.google.com with SMTP id y22-20020a5d94d6000000b007076e06ba3dso1629658ior.20
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:05:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8ZdECDAg9mmwgMiId+0pdkIRFxWXX0Q/ZbZP48ymAFw=;
-        b=papp5LAXhmYva5YcVxu6lNkw4gWYdPzRfL3PkxXzt3uIbfQ43/tNPAu026PlcRE7Bs
-         DJxMVNE5dx5Adaq2dGabsBcCCJH8t9J4hiVToVzKTS+r3QGNUpvih2pPDXNU9oKUax6M
-         1kOilRZqiD+NLb/zacUcWAWyWk6vGCVBl85SF8N+e/Jm3UmJxm9v/TF7JiIZoX8v8Qyc
-         D5zOvvp+rOOpSSK+Ij8MgJ1BEA1A+mZ4YAvYHQixNBhSZCcqhSXaE1kvFhYzmRftGlUQ
-         ne/7p2yc106c7g9+F2zCOJyqrJKGTD462ycQERIWAt7eohSFY6x3+pSDY0rFpGE8Jbeg
-         roMg==
-X-Gm-Message-State: AFqh2kqoovSXjkJhO6JOckwI/7qfrG0JJXy3/5icqtsofg2wLjBcIXpn
-        adeNhjtLRcOmJwd5+PFgohj59b7c0pGeV8lZXG44lQ==
-X-Google-Smtp-Source: AMrXdXtw3ClXGsau5g83hRYHF5bMmdLrbSAwU9zjlK/t8/PMP/LzBLrUT8Sd0TO+7LHePXlgOs+p8s15w/v0I2sj3tQ=
-X-Received: by 2002:a81:4bd1:0:b0:478:1c89:6462 with SMTP id
- y200-20020a814bd1000000b004781c896462mr1433601ywa.150.1674155091041; Thu, 19
- Jan 2023 11:04:51 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qxwOPOgGhsGm2CilOB8QktAtozAzPUo8tE7EUr+QkN4=;
+        b=Ztq8R1fjq6MbYt8F0dWr/GI5FQ69KMcv/QpPYa1CGAX5nGJjOrL+kRVl/0bvkYWnw5
+         rBKjPliZ229aAnboSFPFjfMinZrQUT5t4BgSVXQ8EnCr3d2L7YHEZxGLH60DWSXbaV7P
+         BxCJxRP1WycrUaxTnZ+cHQOdpwbkSnRELJrcc/JFsDqyzppEmFcobBI/BzviuindznDQ
+         qcSIM0KsoNLAHnRMAQLzn7k20vDSdmWgHZhnipNCoQtBQo53egtVybGyPLpdmoGP1kpI
+         PygjWR7fujNMfnhL9PpuhCvAba85CJoR0ohJn2jp13NOwAm+n2AdRnZnBwipR378IZb4
+         K5bQ==
+X-Gm-Message-State: AFqh2krzOqOWTCNKbRC/3jb2scLJbxCK7cDhKkCrM7tI2p7/PDMPpa2O
+        SbXzYpPq6opzCXO4qb1mV5SW4lKFVsWZOi0xt4ayD8o+2P+WEDPQv/N4FH8Xr9zfCz67TmLkE8n
+        zQJXYWQw8nU+m
+X-Received: by 2002:a6b:dc12:0:b0:707:5b8d:745 with SMTP id s18-20020a6bdc12000000b007075b8d0745mr5702690ioc.15.1674155116317;
+        Thu, 19 Jan 2023 11:05:16 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtAMnL3Goqn5o+Ir8AcCe1SjWgVNFXCOrdiM/sijKRrcXt8wW9+Bm8x+wiDCw846gf100RgOg==
+X-Received: by 2002:a6b:dc12:0:b0:707:5b8d:745 with SMTP id s18-20020a6bdc12000000b007075b8d0745mr5702666ioc.15.1674155116049;
+        Thu, 19 Jan 2023 11:05:16 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m4-20020a056638224400b0036c8a246f54sm11646670jas.142.2023.01.19.11.05.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 11:05:15 -0800 (PST)
+Date:   Thu, 19 Jan 2023 12:05:13 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     "Tian, Kevin" <kevin.tian@intel.com>
+Cc:     Matthew Rosato <mjrosato@linux.ibm.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "Christopherson,, Sean" <seanjc@google.com>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>
+Subject: Re: [PATCH v4] vfio: fix potential deadlock on vfio group lock
+Message-ID: <20230119120513.3976cda7.alex.williamson@redhat.com>
+In-Reply-To: <BN9PR11MB5276CC29F17B87D14D1E61FF8CC49@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230114000351.115444-1-mjrosato@linux.ibm.com>
+        <20230117142252.70cc85c7.alex.williamson@redhat.com>
+        <BN9PR11MB52763D861C254248FD33F65C8CC79@BN9PR11MB5276.namprd11.prod.outlook.com>
+        <b5a7efc9-7cfa-3314-fe36-b8da4a25265d@linux.ibm.com>
+        <BN9PR11MB5276CC29F17B87D14D1E61FF8CC49@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20221208193857.4090582-1-dmatlack@google.com> <Y8l6egh2wWN7BUlZ@google.com>
- <86tu0mmo8m.wl-maz@kernel.org> <CALzav=dya7GsOD7-dm3649Xe4Xo_p5gJACvjZHtpbk0QwoU-gg@mail.gmail.com>
-In-Reply-To: <CALzav=dya7GsOD7-dm3649Xe4Xo_p5gJACvjZHtpbk0QwoU-gg@mail.gmail.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 19 Jan 2023 11:04:24 -0800
-Message-ID: <CALzav=ebYgZu2LfeQkspU_ke6GHbuPcpiST0pMafmAJGziybnA@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/37] KVM: Refactor the KVM/x86 TDP MMU into common code
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Sean Christopherson <seanjc@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        Nadav Amit <namit@vmware.com>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        "Liam R. Howlett" <Liam.Howlett@oracle.com>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Peter Xu <peterx@redhat.com>, xu xin <cgel.zte@gmail.com>,
-        Arnd Bergmann <arnd@arndb.de>, Yu Zhao <yuzhao@google.com>,
-        Colin Cross <ccross@google.com>,
-        Hugh Dickins <hughd@google.com>,
-        Ben Gardon <bgardon@google.com>,
-        Mingwei Zhang <mizhang@google.com>,
-        Krish Sadhukhan <krish.sadhukhan@oracle.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org,
-        Alexandre Ghiti <alexghiti@rivosinc.com>,
-        Raghavendra Rao Ananta <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -101,29 +103,93 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 10:38 AM David Matlack <dmatlack@google.com> wrote:
->
-> On Thu, Jan 19, 2023 at 9:24 AM Marc Zyngier <maz@kernel.org> wrote:
-> >
-> > On Thu, 19 Jan 2023 17:14:34 +0000, David Matlack <dmatlack@google.com> wrote:
-> > > I'd like to target RISC-V first, since it has significantly lower risk
-> > > and complexity than e.g. ARM (which has pKVM, stage-1 walkers, and
-> > > [soon] nested virtualization to deal with).
-> >
-> > And (joy, happiness), the upcoming 128bit page table support[1].
->
-> Oh good, I was worried the ARM port was going to be too easy :)
+On Thu, 19 Jan 2023 03:43:36 +0000
+"Tian, Kevin" <kevin.tian@intel.com> wrote:
 
-But in all seriousness, I'm not too worried about supporting 128-bit
-page tables in the Common MMU, assuming it is a compile-time decision.
-The way I'm planning to organize the code, architecture-specific code
-will own the PTEs, so each architecture can do whatever they want.
-There is a hard-coded assumption that PTEs are u64 in the current
-code, but we can abstract that behind a typedef for 128-bit support.
+> > From: Matthew Rosato <mjrosato@linux.ibm.com>
+> > Sent: Wednesday, January 18, 2023 10:56 PM
+> >=20
+> > On 1/18/23 4:03 AM, Tian, Kevin wrote: =20
+> > >> From: Alex Williamson
+> > >> Sent: Wednesday, January 18, 2023 5:23 AM
+> > >>
+> > >> On Fri, 13 Jan 2023 19:03:51 -0500
+> > >> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> > >> =20
+> > >>>  void vfio_device_group_close(struct vfio_device *device)
+> > >>>  {
+> > >>> +	void (*put_kvm)(struct kvm *kvm);
+> > >>> +	struct kvm *kvm;
+> > >>> +
+> > >>>  	mutex_lock(&device->group->group_lock);
+> > >>> +	kvm =3D device->kvm;
+> > >>> +	put_kvm =3D device->put_kvm;
+> > >>>  	vfio_device_close(device, device->group->iommufd);
+> > >>> +	if (kvm =3D=3D device->kvm)
+> > >>> +		kvm =3D NULL; =20
+> > >>
+> > >> Hmm, so we're using whether the device->kvm pointer gets cleared in
+> > >> last_close to detect whether we should put the kvm reference.  That'=
+s a
+> > >> bit obscure.  Our get and put is also asymmetric.
+> > >>
+> > >> Did we decide that we couldn't do this via a schedule_work() from the
+> > >> last_close function, ie. implementing our own version of an async pu=
+t?
+> > >> It seems like that potentially has a cleaner implementation, symmetr=
+ic
+> > >> call points, handling all the storing and clearing of kvm related
+> > >> pointers within the get/put wrappers, passing only a vfio_device to =
+the
+> > >> put wrapper, using the "vfio_device_" prefix for both.  Potentially
+> > >> we'd just want an unconditional flush outside of lock here for
+> > >> deterministic release.
+> > >>
+> > >> What's the downside?  Thanks,
+> > >> =20
+> > >
+> > > btw I guess this can be also fixed by Yi's work here:
+> > >
+> > > https://lore.kernel.org/kvm/20230117134942.101112-6-yi.l.liu@intel.co=
+m/
+> > >
+> > > with set_kvm(NULL) moved to the release callback of kvm_vfio device,
+> > > such circular lock dependency can be avoided too. =20
+> >=20
+> > Oh, interesting...  It seems to me that this would eliminate the report=
+ed call
+> > chain altogether:
+> >=20
+> > kvm_put_kvm =20
+> >  -> kvm_destroy_vm
+> >   -> kvm_destroy_devices
+> >    -> kvm_vfio_destroy (starting here -- this would no longer be execut=
+ed)
+> >     -> kvm_vfio_file_set_kvm
+> >      -> vfio_file_set_kvm
+> >       -> group->group_lock/group_rwsem =20
+> >=20
+> > because kvm_destroy_devices now can't end up calling kvm_vfio_destroy
+> > and friends, it won't try and acquire the group lock a 2nd time making a
+> > kvm_put_kvm while the group lock is held OK to do.  The vfio_file_set_k=
+vm
+> > call will now always come from a separate thread of execution,
+> > kvm_vfio_group_add, kvm_vfio_group_del or the release thread:
+> >=20
+> > kvm_device_release (where the group->group_lock would not be held since
+> > vfio does not trigger closing of the kvm fd) =20
+> >  -> kvm_vfio_destroy (or, kvm_vfio_release)
+> >   -> kvm_vfio_file_set_kvm
+> >    -> vfio_file_set_kvm
+> >     -> group->group_lock/group_rwsem =20
+>=20
+> Yes, that's my point. If Alex/Jason are also OK with it probably Yi can
+> send that patch separately as a fix to this issue. It's much simpler. =F0=
+=9F=98=8A
 
-We will need to figure out how to deal with concurrency though. Will
-128-bit page table support come with 128-bit atomic support (e.g.
-compare-exchange)? If so we should be good to go. If not, we'll need
-to emulate them with e.g. spinlocks. But either way, figuring this out
-is not specific to the Common MMU. Even if ARM kept its own stage-2
-MMU we'd have to solve the same problem there.
+If we can extract that flow separate from the cdev refactoring, ideally
+something that matches the stable kernel backport rules, then that
+sounds like the preferred solution.  Thanks,
+
+Alex
+
