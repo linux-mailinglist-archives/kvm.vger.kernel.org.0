@@ -2,92 +2,99 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A22096740CE
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 19:22:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E40736740DE
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 19:26:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230043AbjASSWo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 13:22:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48344 "EHLO
+        id S229962AbjASS0g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 13:26:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230041AbjASSWn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 13:22:43 -0500
-Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD2EB86BE
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:22:38 -0800 (PST)
-Date:   Thu, 19 Jan 2023 18:22:32 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1674152556;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OzfCV3/9JR3qLlWlWp5bkAeX6UfoakQGqHB6vOzQ/IU=;
-        b=f9+CdkZlmSi/jWLM8hevzqjt+sseTFUxwwcvWfIqondY/U/yJWIfcLD//ZVNBvrgnHf6G9
-        QjhFOCncRYUZHAH5csXiDMUi1tVLd3rEilZyI4pcWqh34tLjjpGSZvKwMz5h64oBx1GStI
-        Eb/tcw0PZzm7tmU/dVCcGgLu3c80W1Q=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, james.morse@arm.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        catalin.marinas@arm.com, will@kernel.org, paul@xen.org
-Subject: Re: [PATCH v5] KVM: MMU: Make the definition of 'INVALID_GPA' common
-Message-ID: <Y8mKaBgzDmtj2rtK@google.com>
-References: <20230105130127.866171-1-yu.c.zhang@linux.intel.com>
- <Y8iUkMbNM8jWE4RR@google.com>
- <20230119072556.ebnddkr54vqbzmjk@linux.intel.com>
+        with ESMTP id S230004AbjASS0e (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 13:26:34 -0500
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AE3B872B8
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:26:34 -0800 (PST)
+Received: by mail-yb1-xb2f.google.com with SMTP id 203so3647471yby.10
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 10:26:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=6VWrds5+dcyT0rgINmTYYWINCVZd2T1PEujEHrsOcLw=;
+        b=A6TDGupcab5kBFctEX907rvmeNwH7TSFDFaHTIVyeD6PCreG08fGa15PQ7ZMqoS+1m
+         Kxbe26YgQAvS6hpbgLxITj1eUcRA8mIo1x+Mapl67QqS5wyfrfuzRCU1tnxWZ0TS289l
+         w3u3MCioCSxlocWRtMKRdepquBJ0iHc8nYrd/K5h7zL2JXs5cWFUvxAeTGvuzHlMKRgk
+         egdpFD/bkXLZwSYHG+Z0kzwbLNaNF2PleWXHewOXJKxTE0H7QO7vqhNkuBSN+9K0BgW4
+         CUQWNgNvG4kQ6jAFI0ws+04L11xvj5+5tglT7p+FQ3rESyEpFyu6RBShjx3VyQd9khW6
+         qgnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6VWrds5+dcyT0rgINmTYYWINCVZd2T1PEujEHrsOcLw=;
+        b=sFlngLiOKD1BT3Hyc+GMjqlwYJdmDnmA9JVy5fCGxh81og9l5xFrp1ZrR4IbRmQ1+t
+         6zz+9sRZHubg6OO1ZaBMOf/dwl9r45HdTYTz2xfuwAdKIdGgFPJMz1U6acazPJFCKtCf
+         lpQCbjOWzVhfYqhzCdJy4lWl9yoObJHEK3jqk8EMj6YHHmrkJfWqbInySjPVMasTsHoM
+         gaRNtylola3bI/C0outDn4OfYqme4I0zN3k1/BfuItJ0fzZ2VYDwmwiNyPBPAwjyyvUq
+         4Dtvgfgy4YjJaLYUNaNQSIfhV0mxT+AEGK1PLjpDJzclhszcKWEqaP5nTyB4FQ4nzxW1
+         diMw==
+X-Gm-Message-State: AFqh2kqG97ljlE/6C0I0TJeQct0x4yG5WvoDgsD0tbdxIgE+IFonktXF
+        I1XO6QtiOLDzi6sUXc8SMD1WXr6iiPqZFwnarO5EcQ==
+X-Google-Smtp-Source: AMrXdXtwLTB5KOOpcHVBzvFcacNzq2MmR9bQGZt/ij36G6vo5gOSujCeJE0W7g6T7dRw7IL5u3KJsp+ZIGFjXU2FYsA=
+X-Received: by 2002:a25:1984:0:b0:7fe:e7f5:e228 with SMTP id
+ 126-20020a251984000000b007fee7f5e228mr146711ybz.582.1674152793200; Thu, 19
+ Jan 2023 10:26:33 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230119072556.ebnddkr54vqbzmjk@linux.intel.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230119173559.2517103-1-dmatlack@google.com> <20230119173559.2517103-5-dmatlack@google.com>
+ <Y8mJQH4VqC76sX7k@google.com>
+In-Reply-To: <Y8mJQH4VqC76sX7k@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 19 Jan 2023 10:26:06 -0800
+Message-ID: <CALzav=fN40q2QCcBuUdTg2z2sJLeRo9u4UCaW5grX5LC-bKqkg@mail.gmail.com>
+Subject: Re: [PATCH 4/7] KVM: x86/mmu: Rename kvm_flush_remote_tlbs_with_address()
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org,
+        Raghavendra Rao Ananta <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 03:25:56PM +0800, Yu Zhang wrote:
-> On Thu, Jan 19, 2023 at 12:53:36AM +0000, Sean Christopherson wrote:
-> > On Thu, Jan 05, 2023, Yu Zhang wrote:
-> > > KVM already has a 'GPA_INVALID' defined as (~(gpa_t)0) in kvm_types.h,
-> > > and it is used by ARM code. We do not need another definition of
-> > > 'INVALID_GPA' for X86 specifically.
-> > > 
-> > > Instead of using the common 'GPA_INVALID' for X86, replace it with
-> > > 'INVALID_GPA', and change the users of 'GPA_INVALID' so that the diff
-> > > can be smaller. Also because the name 'INVALID_GPA' tells the user we
-> > > are using an invalid GPA, while the name 'GPA_INVALID' is emphasizing
-> > > the GPA is an invalid one.
-> > > 
-> > > No functional change intended.
-> > > 
-> > > Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
-> > > Reviewed-by: Paul Durrant <paul@xen.org>
-> > > Reviewed-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > 
-> > Marc and/or Oliver,
-> > 
-> > Do you want to grab this since most of the changes are to arm64?  I'll happily
-> > take it through x86, but generating a conflict in arm64 seems infinitely more likely.
-> > 
-> Thank you, Sean! 
-> 
-> This patch was based on KVM's next branch - fc471e831016c ("Merge branch 'kvm-late-6.1'
-> into HEAD"). Tested by cross-building arm64. 
-> 
-> Do you know if KVM arm use a seperate branch(or repo)? Thanks!
+On Thu, Jan 19, 2023 at 10:17 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Jan 19, 2023, David Matlack wrote:
+> > Rename kvm_flush_remote_tlbs_with_address() to
+> > kvm_flush_remote_tlbs_range(). This name is shorter, which reduces the
+> > number of callsites that need to be broken up across multiple lines, and
+> > more readable since it conveys a range of memory is being flushed rather
+> > than a single address.
+>
+> FYI, this conflicts with Hou's series, which I'm in the process of queueing for
+> v6.3.
+>
+> https://lore.kernel.org/all/cover.1665214747.git.houwenlong.hwl@antgroup.com
 
-Yes, you can find us over here:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git/
-
-I'll grab this after I wrap up testing what I have so far.
-
---
-Thanks,
-Oliver
+Ack. I can resend on top of Hou's once it's queued.
