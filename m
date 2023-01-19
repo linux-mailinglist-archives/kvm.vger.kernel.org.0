@@ -2,208 +2,273 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32D0E673295
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 08:38:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 762376733AB
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 09:29:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbjASHhz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 02:37:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45650 "EHLO
+        id S229696AbjASI3L (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 03:29:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229626AbjASHhw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 02:37:52 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88A6911D
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 23:37:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674113822;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=S06AqGlmEUyC3/e/k2djDq5Ra/fFhZAiE0FaXodErl0=;
-        b=JlPkS2k/OjmsWHCmI4dZ1M87DK43KrgqQgAhun8VSFaj/dU7zcTHSU0gDBaRmhAkfG5h27
-        iETq+IBTPVlOcBoIriuEFqVcMx+qiyOJ1LWwz0kShBylbSBepB+1EXbNlStp1cSpSWy3KP
-        ah3xwwR6Yws8LCG0jMxgKuQnzVDHV7M=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-654-FQU6fZupOA2w6g_MqcapeA-1; Thu, 19 Jan 2023 02:36:55 -0500
-X-MC-Unique: FQU6fZupOA2w6g_MqcapeA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB249183B3C8;
-        Thu, 19 Jan 2023 07:36:54 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-12-175.pek2.redhat.com [10.72.12.175])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EC656492B00;
-        Thu, 19 Jan 2023 07:36:49 +0000 (UTC)
-From:   Jason Wang <jasowang@redhat.com>
-To:     mst@redhat.com, jasowang@redhat.com
-Cc:     pbonzini@redhat.com, stefanha@redhat.com, bcodding@redhat.com,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Nicholas Bellinger <nab@linux-iscsi.org>
-Subject: [PATCH V2] vhost-scsi: unbreak any layout for response
-Date:   Thu, 19 Jan 2023 15:36:47 +0800
-Message-Id: <20230119073647.76467-1-jasowang@redhat.com>
+        with ESMTP id S229501AbjASI3I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 03:29:08 -0500
+Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCC75AC
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 00:29:06 -0800 (PST)
+Received: by mail-ed1-x534.google.com with SMTP id v13so1881610eda.11
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 00:29:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=x5ck+uBW+we5mcml99JIlI5hbqOexLvffduO15vMLCQ=;
+        b=JtUEKYA4ngIiCcO38C3pG5dWS8AmHuQYxbH7z4bS0gjTrWl2JjNzmgu+bHT1rhVvCF
+         1AyQtvmN+FtmrNaWPPlJxZ1bL2eW7Oditr9V7+Te0BCwylH/bu1UdZdtD74u9sKME4pq
+         4gLh+tfjkooAP7I3TeDdqGgUeUnakDAAJVoJn1lZJ0nt6ynYWYQ2hSzGBEW18rNJpTE7
+         X/bTKUyOfdx/C86S3LXuUQzM7SIH2k3OgDl+54FiyHI4lRaVEg82PMf5IzorscxABa4G
+         3rV6OMUb6N6Qq3ZkX/pp6a00uXYu/B094V6gztspTEq96rPZswMmsEwrXoIDCMXflQrs
+         Yk6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x5ck+uBW+we5mcml99JIlI5hbqOexLvffduO15vMLCQ=;
+        b=eTFMUwFaZGSlZ7Xi/ERUZ4l2ZUcg/p9r6QBtpeUdFL4NAL+UOO6kVv6Y4GRMongBCz
+         dD6YiBRD2OGd+D2Ho9JvFIQywB78kAVA6H7qyT86K3Hhn6OHFgBsvD7KAps9OcIbVh4b
+         i3WvCc9t9X55KnVdcnCTjwmc3XpChBsDY6pZQlYQR8qCkWYrVJ8DwtlRDvR98DxITahP
+         qTJzcPTNVdnHDSfkDXDzvEGEwa8wSA2339ZZjROZs4AQhak+0haUx/kVJTRrJLMgmY5O
+         ft4NxfhVt5t9sblew6kOHavhiEKJEaNHHwitRt6xuE++bTZ3pKA/TpbpF1vKUzTxFeCn
+         tpew==
+X-Gm-Message-State: AFqh2kodh4tqMVsCFKNQXMOgCT9JL3ZPazr4T90dcLczB8KjU9EkO7vf
+        A2J2ZGAPWr6Wo/mgCwUbl4LD8wK6V7dy41KZ
+X-Google-Smtp-Source: AMrXdXt37wqPfFZsW/BhY2ZBx33uOivJd/nYfcmjoJqMYW92j1bl/42mtZmEp65y22+4CKilHwwZSg==
+X-Received: by 2002:a05:6402:b:b0:496:f517:d30d with SMTP id d11-20020a056402000b00b00496f517d30dmr10408911edu.38.1674116945288;
+        Thu, 19 Jan 2023 00:29:05 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id a3-20020aa7cf03000000b0049019b48373sm15294210edy.85.2023.01.19.00.29.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Jan 2023 00:29:04 -0800 (PST)
+Date:   Thu, 19 Jan 2023 09:29:03 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Conor Dooley <conor@kernel.org>
+Cc:     Heiko =?utf-8?Q?St=C3=BCbner?= <heiko@sntech.de>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Subject: Re: [PATCH v3 05/13] riscv: cpufeature: extend
+ riscv_cpufeature_patch_func to all ISA extensions
+Message-ID: <20230119082903.yk3uslfrjtxzassi@orel>
+References: <20230111171027.2392-1-jszhang@kernel.org>
+ <20230111171027.2392-6-jszhang@kernel.org>
+ <2398293.3Lj2Plt8kZ@diego>
+ <20230112092136.f2g43hrhmrqouy4y@orel>
+ <Y8F2YxMHUt+djhX4@wendy>
+ <Y8MRZQENua+wi34T@spud>
+ <Y8hqptFcUgjhns4F@spud>
 MIME-Version: 1.0
-Content-type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y8hqptFcUgjhns4F@spud>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Al Viro said:
+On Wed, Jan 18, 2023 at 09:54:46PM +0000, Conor Dooley wrote:
+> Hey!
+> 
+> I guess here is the right place to follow up on all of this stuff...
+> 
+> On Sat, Jan 14, 2023 at 08:32:37PM +0000, Conor Dooley wrote:
+> > On Fri, Jan 13, 2023 at 03:18:59PM +0000, Conor Dooley wrote:
+> > > On Thu, Jan 12, 2023 at 10:21:36AM +0100, Andrew Jones wrote:
+> > > > On Thu, Jan 12, 2023 at 12:29:57AM +0100, Heiko Stübner wrote:
+> > > > > Am Mittwoch, 11. Januar 2023, 18:10:19 CET schrieb Jisheng Zhang:
+> > > > > > riscv_cpufeature_patch_func() currently only scans a limited set of
+> > > > > > cpufeatures, explicitly defined with macros. Extend it to probe for all
+> > > > > > ISA extensions.
+> > > > > > 
+> > > > > > Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+> > > > > > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> > > > > > Reviewed-by: Heiko Stuebner <heiko@sntech.de>
+> > > > > > ---
+> > > > > >  arch/riscv/include/asm/errata_list.h |  9 ++--
+> > > > > >  arch/riscv/kernel/cpufeature.c       | 63 ++++------------------------
+> > > > > >  2 files changed, 11 insertions(+), 61 deletions(-)
+> > > > > 
+> > > > > hmmm ... I do see a somewhat big caveat for this.
+> > > > > and would like to take back my Reviewed-by for now
+> > > > > 
+> > > > > 
+> > > > > With this change we would limit the patchable cpufeatures to actual
+> > > > > riscv extensions. But cpufeatures can also be soft features like
+> > > > > how performant the core handles unaligned accesses.
+> > > > 
+> > > > I agree that this needs to be addressed and Jisheng also raised this
+> > > > yesterday here [*]. It seems we need the concept of cpufeatures, which
+> > > > may be extensions or non-extensions.
+> > > > 
+> > > > [*] https://lore.kernel.org/all/Y77xyNPNqnFQUqAx@xhacker/
+> > > > 
+> > > > > See Palmer's series [0].
+> > > > > 
+> > > > > 
+> > > > > Also this essentially codifies that each ALTERNATIVE can only ever
+> > > > > be attached to exactly one extension.
+> > > > > 
+> > > > > But contrary to vendor-errata, it is very likely that we will need
+> > > > > combinations of different extensions for some alternatives in the future.
+> > > > 
+> > > > One possible approach may be to combine extensions/non-extensions at boot
+> > > > time into pseudo-cpufeatures. Then, alternatives can continue attaching to
+> > > > a single "feature". (I'm not saying that's a better approach than the
+> > > > bitmap, I'm just suggesting it as something else to consider.)
+> > > 
+> > > 
+> > > > >         ALTERNATIVE_2("nop",
+> > > > >                       "j strcmp_zbb_unaligned", 0, CPUFEATURE_ZBB | CPUFEATURE_FAST_UNALIGNED, 0, CONFIG_RISCV_ISA_ZBB,
+> > > > >                       "j variant_zbb", 0, CPUFEATURE_ZBB, CPUFEATURE_FAST_UNALIGNED, CONFIG_RISCV_ISA_ZBB)
+> > > > > 
+> > > > > [the additional field there models a "not" component]
+> > > 
+> > > Since we're discussing theoretical implementations, and it's a little hard
+> > > to picture all that they entail in my head, I might be making a fool of
+> > > myself here with assumptions...
+> > > 
+> > > Heiko's suggestion sounded along the lines of: keep probing individual
+> > > "features" as we are now. Features in this case being the presence of
+> > > the extension or non-extension capability. And then in the alternative,
+> > > make all of the decisions about which to apply.
+> > > 
+> > > Drew's suggestion would have significantly more defined CPUFEATURE_FOOs,
+> > > but would offload the decision making about which extensions or non-
+> > > extension capabilities constitute a feature to regular old cpufeature
+> > > code. However, the order of precedence would remain in the alt macro, as
+> > > it does now.
+> > > 
+> > > I think I am just a wee bit biased, but adding the complexity somewhere
+> > > other than alternative macros seems a wise choice, especially as we are
+> > > likely to find that complexity increases over time?
+> > > 
+> > > The other thing that came to mind, and maybe this is just looking for
+> > > holes where they don't exist (or are not worth addressing), is that
+> > > order of precedence.
+> > > I can imagine that, in some cases, the order of precedence is not a
+> > > constant per psuedo-cpufeature, but determined by implementation of
+> > > the capabilities that comprise it?
+> > 
+> > Having spent longer than I maybe should've looking at your patches
+> > Heiko, given it's a Saturday evening, the precedence stuff is still
+> > sticking out to me..
+> > 
+> > For Zbb & fast unaligned, the order may be non-controversial, but in
+> > the general case I don't see how it can be true that the order of
+> > precedence for variants is a constant.
+> > 
+> > Creating pseudo cpufeatures as Drew suggested does seem like a way to
+> > extract complexity from the alternatives themselves (which I think is a
+> > good thing) but at the expense of eating up cpu_req_feature bits...
+> > By itself, it doesn't help with precedence, but it may better allow us
+> > to deal with some of the precedence in cpufeature.c, since the
+> > alternative would operate based on the pseudo cpufeature rather than on
+> > the individual capabilities that the pseudo cpufeature depends on.
+> > 
+> > I tried to come up with a suggestion for what to do about precedence,
+> > but everything I thought up felt a bit horrific tbh.
+> > The thing that fits the current model best is just allowing cpu vendors
+> > to add, yet more, "errata" that pick the variant that works best for
+> > their implementation... Although I'd be worried about ballooning some of
+> > these ALT_FOO macros out to a massive degree with that sort of approach.
+> > 
+> > > If my assumption/understanding holds, moving decision making out of the
+> > > alternative seems like it would better provision for scenarios like
+> > > that? I dunno, maybe that is whatever the corollary of "premature
+> > > optimisation" is for this discussion.
+> > > 
+> > > That's my unsolicited € 0.02, hopefully I wasn't off-base with the
+> > > assumptions I made.
+> > 
+> > The order in which an alternative is added to the macro does matter,
+> > right? At least, that's how I thought it worked and hope I've not had
+> > an incorrect interpretation there all along... I wasn't until I started
+> > reading your patch and couldn't understand why you had a construct that
+> > looked like
+> > 
+> > if (zbb && !fast_unaligned)
+> > ...
+> > else if (zbb && fast_unaligned)
+> > ...
+> > 
+> > rather than just inverting the order and dropping the !fast_unaligned
+> > that I realised I might have a gap in my understanding after all..
+> > 
+> > > Heiko, I figure you've got some sort of WIP stuff for this anyway since
+> > > you're interested in the fast unaligned? How close are you to posting any
+> > > of that?
+> > > 
+> > > While I think of it, w.r.t. extension versus (pseudo)cpufeature etc
+> > > naming, it may make sense to call the functions that this series adds
+> > > in patch 6 has_cpufeature_{un,}likely(), no matter what decision gets
+> > > made here?
+> > > IMO using cpufeature seems to make more sense for a general use API that
+> > > may be used later on for the likes of unaligned access, even if
+> > > initially it is not used for anything other than extensions. 
+> 
+> Today at [1] we talked a bit about the various bits going on here.
+> I'll attempt to summarise what I remember, but I meant to do this
+> several hours ago and am likely to make a hames of it.
+> 
+> For Zbb/unaligned stuff, the sentiment was along the lines of there
+> needing to be a performance benefit to justify the inclusion.
+> Some of us have HW that is (allegedly) capable of Zbb, and, if that's the
+> case, will give it a go.
+> I think it was similar for unaligned, since there is nothing yet that
+> supports this behaviour, we should wait until a benefit is demonstrable.
+> 
+> On the subject of grouping extension/non-extension capabilities into a
+> single cpufeature, Palmer mentioned that GCC does something similar,
+> for the likes of the Ventana vendor extensions, that are unlikely to be
+> present in isolation.
+> Those are (or were?) probed as a group of extensions rather than
+> individually.
+> I think it was said it'd make sense for us to unify extensions that will
+> only ever appear together single psuedo cpufeature too.
+> 
+> For the bitfield approach versus creating pseudo cpufeatures discussion
+> & how to deal with that in alternatives etc, I'm a bit less sure what the
+> outcome was.
+> IIRC, nothing concrete was said about either approach, but maybe it was
+> implied that we should do as GCC does, only grouping things that won't
+> ever been seen apart.
+> Figuring that out seems to have been punted down the road, as the
+> inclusion of our only current example of this (Zbb + unaligned) is
+> dependant on hardware showing up that actually benefits from it.
+> 
+> The plan then seemed to be press ahead with this series & test the
+> benefits of the Zbb str* functions in Zbb capable hardware before making
+> a decision there.
+> 
+> Hopefully I wasn't too far off with that summary...
 
-"""
-Since "vhost/scsi: fix reuse of &vq->iov[out] in response"
-we have this:
-                cmd->tvc_resp_iov = vq->iov[vc.out];
-                cmd->tvc_in_iovs = vc.in;
-combined with
-                iov_iter_init(&iov_iter, ITER_DEST, &cmd->tvc_resp_iov,
-                              cmd->tvc_in_iovs, sizeof(v_rsp));
-in vhost_scsi_complete_cmd_work().  We used to have ->tvc_resp_iov
-_pointing_ to vq->iov[vc.out]; back then iov_iter_init() asked to
-set an iovec-backed iov_iter over the tail of vq->iov[], with
-length being the amount of iovecs in the tail.
+This matches my recollection. Thanks for the summary, Conor.
 
-Now we have a copy of one element of that array.  Fortunately, the members
-following it in the containing structure are two non-NULL kernel pointers,
-so copy_to_iter() will not copy anything beyond the first iovec - kernel
-pointer is not (on the majority of architectures) going to be accepted by
-access_ok() in copyout() and it won't be skipped since the "length" (in
-reality - another non-NULL kernel pointer) won't be zero.
+drew
 
-So it's not going to give a guest-to-qemu escalation, but it's definitely
-a bug.  Frankly, my preference would be to verify that the very first iovec
-is long enough to hold rsp_size.  Due to the above, any users that try to
-give us vq->iov[vc.out].iov_len < sizeof(struct virtio_scsi_cmd_resp)
-would currently get a failure in vhost_scsi_complete_cmd_work()
-anyway.
-"""
+> 
+> Thanks,
+> Conor.
+> 
+> 1 - https://lore.kernel.org/linux-riscv/mhng-775d4068-6c1e-48a4-a1dc-b4a76ff26bb3@palmer-ri-x1c9a/
 
-However, the spec doesn't say anything about the legacy descriptor
-layout for the respone. So this patch tries to not assume the response
-to reside in a single separate descriptor which is what commit
-79c14141a487 ("vhost/scsi: Convert completion path to use") tries to
-achieve towards to ANY_LAYOUT.
-
-This is done by allocating and using dedicate resp iov in the
-command. To be safety, start with UIO_MAXIOV to be consistent with the
-limitation that we advertise to the vhost_get_vq_desc().
-
-Testing with the hacked virtio-scsi driver that use 1 descriptor for 1
-byte in the response.
-
-Reported-by: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Benjamin Coddington <bcodding@redhat.com>
-Cc: Nicholas Bellinger <nab@linux-iscsi.org>
-Fixes: a77ec83a5789 ("vhost/scsi: fix reuse of &vq->iov[out] in response")
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
-Changes since V1:
-- tweak the changelog
-- fix the allocation size for tvc_resp_iov (should be sizeof(struct iovec))
----
- drivers/vhost/scsi.c | 21 +++++++++++++++++----
- 1 file changed, 17 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/vhost/scsi.c b/drivers/vhost/scsi.c
-index dca6346d75b3..d5ecb8876fc9 100644
---- a/drivers/vhost/scsi.c
-+++ b/drivers/vhost/scsi.c
-@@ -80,7 +80,7 @@ struct vhost_scsi_cmd {
- 	struct scatterlist *tvc_prot_sgl;
- 	struct page **tvc_upages;
- 	/* Pointer to response header iovec */
--	struct iovec tvc_resp_iov;
-+	struct iovec *tvc_resp_iov;
- 	/* Pointer to vhost_scsi for our device */
- 	struct vhost_scsi *tvc_vhost;
- 	/* Pointer to vhost_virtqueue for the cmd */
-@@ -563,7 +563,7 @@ static void vhost_scsi_complete_cmd_work(struct vhost_work *work)
- 		memcpy(v_rsp.sense, cmd->tvc_sense_buf,
- 		       se_cmd->scsi_sense_length);
- 
--		iov_iter_init(&iov_iter, ITER_DEST, &cmd->tvc_resp_iov,
-+		iov_iter_init(&iov_iter, ITER_DEST, cmd->tvc_resp_iov,
- 			      cmd->tvc_in_iovs, sizeof(v_rsp));
- 		ret = copy_to_iter(&v_rsp, sizeof(v_rsp), &iov_iter);
- 		if (likely(ret == sizeof(v_rsp))) {
-@@ -594,6 +594,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
- 	struct vhost_scsi_cmd *cmd;
- 	struct vhost_scsi_nexus *tv_nexus;
- 	struct scatterlist *sg, *prot_sg;
-+	struct iovec *tvc_resp_iov;
- 	struct page **pages;
- 	int tag;
- 
-@@ -613,6 +614,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
- 	sg = cmd->tvc_sgl;
- 	prot_sg = cmd->tvc_prot_sgl;
- 	pages = cmd->tvc_upages;
-+	tvc_resp_iov = cmd->tvc_resp_iov;
- 	memset(cmd, 0, sizeof(*cmd));
- 	cmd->tvc_sgl = sg;
- 	cmd->tvc_prot_sgl = prot_sg;
-@@ -625,6 +627,7 @@ vhost_scsi_get_cmd(struct vhost_virtqueue *vq, struct vhost_scsi_tpg *tpg,
- 	cmd->tvc_data_direction = data_direction;
- 	cmd->tvc_nexus = tv_nexus;
- 	cmd->inflight = vhost_scsi_get_inflight(vq);
-+	cmd->tvc_resp_iov = tvc_resp_iov;
- 
- 	memcpy(cmd->tvc_cdb, cdb, VHOST_SCSI_MAX_CDB_SIZE);
- 
-@@ -935,7 +938,7 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
- 	struct iov_iter in_iter, prot_iter, data_iter;
- 	u64 tag;
- 	u32 exp_data_len, data_direction;
--	int ret, prot_bytes, c = 0;
-+	int ret, prot_bytes, i, c = 0;
- 	u16 lun;
- 	u8 task_attr;
- 	bool t10_pi = vhost_has_feature(vq, VIRTIO_SCSI_F_T10_PI);
-@@ -1092,7 +1095,8 @@ vhost_scsi_handle_vq(struct vhost_scsi *vs, struct vhost_virtqueue *vq)
- 		}
- 		cmd->tvc_vhost = vs;
- 		cmd->tvc_vq = vq;
--		cmd->tvc_resp_iov = vq->iov[vc.out];
-+		for (i = 0; i < vc.in ; i++)
-+			cmd->tvc_resp_iov[i] = vq->iov[vc.out + i];
- 		cmd->tvc_in_iovs = vc.in;
- 
- 		pr_debug("vhost_scsi got command opcode: %#02x, lun: %d\n",
-@@ -1461,6 +1465,7 @@ static void vhost_scsi_destroy_vq_cmds(struct vhost_virtqueue *vq)
- 		kfree(tv_cmd->tvc_sgl);
- 		kfree(tv_cmd->tvc_prot_sgl);
- 		kfree(tv_cmd->tvc_upages);
-+		kfree(tv_cmd->tvc_resp_iov);
- 	}
- 
- 	sbitmap_free(&svq->scsi_tags);
-@@ -1508,6 +1513,14 @@ static int vhost_scsi_setup_vq_cmds(struct vhost_virtqueue *vq, int max_cmds)
- 			goto out;
- 		}
- 
-+		tv_cmd->tvc_resp_iov = kcalloc(UIO_MAXIOV,
-+					       sizeof(struct iovec),
-+					       GFP_KERNEL);
-+		if (!tv_cmd->tvc_resp_iov) {
-+			pr_err("Unable to allocate tv_cmd->tvc_resp_iov\n");
-+			goto out;
-+		}
-+
- 		tv_cmd->tvc_prot_sgl = kcalloc(VHOST_SCSI_PREALLOC_PROT_SGLS,
- 					       sizeof(struct scatterlist),
- 					       GFP_KERNEL);
--- 
-2.25.1
 
