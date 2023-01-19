@@ -2,118 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E2FA673776
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 12:52:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 402066737A5
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 12:59:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230412AbjASLwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 06:52:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57264 "EHLO
+        id S229787AbjASL7I (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 06:59:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231132AbjASLwn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 06:52:43 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0AE91ABEF
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 03:52:38 -0800 (PST)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30JAosCp019465
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:52:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : in-reply-to : references : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=F9ULwSTreMvIivJ6DIQUMEmGYlOuOThq0NLGhXj//kU=;
- b=E9a9uDj8v9xDP6LPEY0siuB2HzVdlfb3r4T52jLVCvNHXR41muqOxcaHKFufY9fw/0vu
- rvxseRyHr3eY7jsg9FjHF4kSx1HTqu7ChY1EdQRzOLP46aamxmCOBBL/zt+eEX1ZCwcM
- Z1YgCTeBekAOQknLpIh8kGveYHuwHeTxYoFYJz3R16uNl9rMMNVRYj+O/Kve7yufJaO1
- pi53/i1GpHhEU1BNm1ob+tsHE1O1uQAtU+JiKKbXaWmGoyR3Uce4b2bL1ZxszWkCFZWL
- NRxOI+bo4+U4K1AJ2VsT7pGPYL7S4N8Ei4/2dKnh3c4TMhA7SOZWslP84eEI/21pAmmI Xg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n74f89d4t-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:52:37 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30JBeDPS025640
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:52:37 GMT
-Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n74f89d44-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 11:52:37 +0000
-Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
-        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30J1BZNA017966;
-        Thu, 19 Jan 2023 11:52:35 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3n3m16mttx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 11:52:35 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30JBqV7J47186356
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Jan 2023 11:52:31 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 551FE2004B;
-        Thu, 19 Jan 2023 11:52:31 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C582A20043;
-        Thu, 19 Jan 2023 11:52:30 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.91.27])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Thu, 19 Jan 2023 11:52:30 +0000 (GMT)
-From:   "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To:     kvm@vger.kernel.org
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v2 5/8] s390x: use C pre-processor for
- linker script generation
-In-Reply-To: <20230119114045.34553-6-mhartmay@linux.ibm.com>
-References: <20230119114045.34553-1-mhartmay@linux.ibm.com>
- <20230119114045.34553-6-mhartmay@linux.ibm.com>
-Date:   Thu, 19 Jan 2023 12:52:30 +0100
-Message-ID: <87sfg6vj0h.fsf@li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com>
+        with ESMTP id S231251AbjASL6Z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 06:58:25 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4206F30A;
+        Thu, 19 Jan 2023 03:57:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674129457; x=1705665457;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=OOSuI8Ptgbyop0bHqYWl6Cev1ihhKUlYoWWsszEriiM=;
+  b=Ld6BNIAxy62CgK+XmkZEcn8u2OyXgy38RzLrI62u+91zbhwkJHL7M/DM
+   6qLa4Jgtz/ZYP+Kq6YpEvUjCPAccKhRPgDkNEMUtuQ1rTpPjMPUpqZSOl
+   DNt12/diIZKjyxD2dc4yRIaL1QpRBiLaX6hnu8SbQNIBFjH1rrwdRn1LD
+   MBlcd8hdxlG7g/3OKpiWe3ldRGFLu2P5tdd8q6LxwkUyHbuSrDm9N9P7v
+   K2d2G6jP0ZFCd1vgXbBnlCTViTLds66WXqvfckl8b+CmSxRHpP9OXVuZ2
+   SAZrKRw+7liKWUHn+GGoVMvS2zZBpLlUpRTF7HhIWG2vCq7bMVBEgnUdw
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="305637388"
+X-IronPort-AV: E=Sophos;i="5.97,229,1669104000"; 
+   d="scan'208";a="305637388"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 03:57:29 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="692393155"
+X-IronPort-AV: E=Sophos;i="5.97,229,1669104000"; 
+   d="scan'208";a="692393155"
+Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.252.185.248]) ([10.252.185.248])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2023 03:57:23 -0800
+Message-ID: <e44077a7-e275-4e34-b7ad-3e1382ea974d@linux.intel.com>
+Date:   Thu, 19 Jan 2023 19:57:20 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CLnxCSOkD3KoMz2fNlIKLNfWjlOWPDKV
-X-Proofpoint-ORIG-GUID: _aqFJ-kfz79QEoofxmCku1pA4R-xo_2R
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-19_09,2023-01-19_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- suspectscore=0 malwarescore=0 spamscore=0 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 clxscore=1015 mlxlogscore=823 phishscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2301190091
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Cc:     baolu.lu@linux.intel.com,
+        Alex Williamson <alex.williamson@redhat.com>,
+        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-tegra@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 07/10] iommu/intel: Support the gfp argument to the
+ map_pages op
+Content-Language: en-US
+To:     Jason Gunthorpe <jgg@nvidia.com>, Joerg Roedel <joro@8bytes.org>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Robin Murphy <robin.murphy@arm.com>
+References: <7-v2-ce66f632bd0d+484-iommu_map_gfp_jgg@nvidia.com>
+From:   Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <7-v2-ce66f632bd0d+484-iommu_map_gfp_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Marc Hartmayer <mhartmay@linux.ibm.com> writes:
+On 2023/1/19 2:00, Jason Gunthorpe wrote:
+> Flow it down to alloc_pgtable_page() via pfn_to_dma_pte() and
+> __domain_mapping().
+> 
+> Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
 
-> Use the C pre-processor for the linker script generation. For example,
-> this enables us the use of constants in the "linker scripts" `*.lds.S`.
->
+Irrelevant to this patch, GFP_ATOMIC could be changed to GFP_KERNEL in
+some places. I will follow up further to clean it up.
 
-Sorry, I forgot to change the commit message (Claudio=E2=80=99s comment):
+For this patch,
 
-=E2=80=9Cs390x: use preprocessor for linker script generation
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
 
-The old `.lds` linker scripts are renamed to `.lds.S` and the actual
-.lds` scripts are generated by the assembler preprocessor. This change
-allows us to use constants defined by macros in the `.lds.S` files.=E2=80=9D
-
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
-
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Gregor Pillen=20
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+Best regards,
+baolu
