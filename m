@@ -2,233 +2,206 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1CEDA672F5E
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 04:05:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 83F8C67301D
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 05:21:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229481AbjASDFA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 18 Jan 2023 22:05:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32848 "EHLO
+        id S229654AbjASETV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 18 Jan 2023 23:19:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229812AbjASDEy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 18 Jan 2023 22:04:54 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9EF7728C
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 19:04:48 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id dw9so1032309pjb.5
-        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 19:04:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rX+3/YzlCSm7ruJGdTlZSlcuESHe3r7TiuJbPDt7GvE=;
-        b=H16mjPJg1xVUiHOtw5dcvB5G3fyc+SUjsmvm4QGOiLJP7sn8hkhbjvoJAHlZf3rjdR
-         VVz5sHVT/hYMSd5iLhA9yHPN7f57eyN2Z1zT4Z9y5uw1A6aakhXXsGN8oshBLDqDGB9m
-         KqfbRL78BbhnRJjA/irzKdUiqlES+hR3+ssKFhT0zw+G5jUXnC9TflCBa8cf54L2VHgr
-         XABCQ02fbtUDZwrpYyU8Ju0ww/62Ofgy2XfaF1xgQteu+1WuFZetc04pM8/uopohxIFm
-         ImKv98W/OPewNjNEBMzU+y8x34xEvUZuL0jhp6RojlJLYQ8C24BBcEcmyR25ajWhEA6H
-         kTjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rX+3/YzlCSm7ruJGdTlZSlcuESHe3r7TiuJbPDt7GvE=;
-        b=Kv07keLQgLYEYdTEIRsUYwhjvZTQpN25siISMBbG3e20n3Y3EDAdBPZgcU91HTtLUX
-         dS93mjOGZyBrwWbbSC9zuAyaG5zofa8KFkgovVCkCuMXIUrJ4XZwYG0kepKsgBajpHYx
-         UmBT0IO4CtZLKGooHK2xeHyHch+4zQkleTenA1APkqHNL4aC/3t8OY4HjmG3JkC1niSo
-         Gf5cBaQg6iphsGalcBONvIyNMBkVtoObsZIp8BmvOprsJp9cejILZMZtWw9RBwMI+htT
-         Y3dlNGmV6K/r2hUAxdlY56VABZ5Oxbb6434zK4fQtme5N8fi9xPEmPZ48240BrK59r2N
-         +lzw==
-X-Gm-Message-State: AFqh2kpLg3T5pSCszAOlkBcHTOVM7wUw8fyrzCRczFYoTBn7dE3prfGz
-        f/FdmntazxgkIDuRcZCfvlcAA9n78hB7YG0iWm5nqQ==
-X-Google-Smtp-Source: AMrXdXs5OUY2CpNa5luMCgP2m4HvXWecfbxTnXU9nEeW8X+DJPVfnzRgojJlMGgJR0YYgLrpbhxuu1aMyRlCbyHNPuA=
-X-Received: by 2002:a17:902:d1d2:b0:189:8ea3:7455 with SMTP id
- g18-20020a170902d1d200b001898ea37455mr824193plb.19.1674097488118; Wed, 18 Jan
- 2023 19:04:48 -0800 (PST)
+        with ESMTP id S229989AbjASDqw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 18 Jan 2023 22:46:52 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C4F4DE32
+        for <kvm@vger.kernel.org>; Wed, 18 Jan 2023 19:43:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674099908; x=1705635908;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aulRhudl4bS+GMiachwi7jrbOWpvKnnQz5u/Sh4+u+Q=;
+  b=h7/PWnL/W7XXaDNpuBgUFFDC21LDdjDxBFcdgWcWLpgj1RVeVY55nJmB
+   0DKWm0QZ50tcCwlDmy1HmxLvcmGeYBFbMwiFjUbS+RfA8lLieaoHjBKKE
+   hgbtxlJt82L64Sq998iH+bPui5uifH1Hl0XGFAr0kG02MJI+E5uc0iTAw
+   TwaultyGXlkFQnDWFtlRetJrfbscr+t51VFbKs8CBehexDfhO3f+v2zJn
+   eUeQbb1kWvqSeg/bclu8La9LJ7o6e6vPg5bM4mbrdt/8YMPCxqEQMW5J6
+   8hKCW6mJArSVD4raF7z1+D6JROBBykOckmZd1rKbUmjbkmWYnz4GHa9zi
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="304868242"
+X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
+   d="scan'208";a="304868242"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jan 2023 19:42:10 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10594"; a="609919650"
+X-IronPort-AV: E=Sophos;i="5.97,226,1669104000"; 
+   d="scan'208";a="609919650"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga003.jf.intel.com with ESMTP; 18 Jan 2023 19:42:10 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Wed, 18 Jan 2023 19:42:09 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Wed, 18 Jan 2023 19:42:09 -0800
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.102)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Wed, 18 Jan 2023 19:42:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EiLUgxSbIsw69BvTreBFWs6fUf2wm/EuqgNAs5g8EM/P4jzttfcZo8qExejWVJBeLJN7yXJFS/vz6/HKZP83DjeOXx+J4tSfKF6VB6qhqH3RwqREHtIiMKophkaPplx8cAYLkRwMkjizsQYM1x61gnI4jdQ60ogM8rP7NoaxZ6M6QDWgHjFPsak/jGYW50VaTTKsbq/UG1yq3iELfr5pX8P5OWjYu4ZVlTfW2HVexO6dCOKyMWZy7DlLIls7xPYh2PVj+SqVei3zqRIRJAspWS9jzskWC/aiR0gj/0OXi01gSY3uuAXhnyE5RF1G9b3cNpACasNszy+KAMOaEEelIQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aulRhudl4bS+GMiachwi7jrbOWpvKnnQz5u/Sh4+u+Q=;
+ b=h9rtQEqHecObSIniBeD0qMsRduBYGrnCzD/vS46pVpOsS8zcebme+Ka7Ukog13QvtVDc0JTvFHwpCOxtGTNTnE0EfT4BGatBOXrF+AmWaN50V1QZZkTCrEV6m3LnnkHeNF649N6g3Grc7OQKpRP5tdM2/sFeeRXNpokh/uGqdVmiO/RR1km/YFWYdBNpK4i3GrRIO5m6KkG23KBw5MxNt1UeILn7n5rtV/payX4uZJF4PEfE8xrKcD97g0tzMwDid3Ytg/Y49kll3CF4RoXoh9XIPIujGNG19diVe0a93gqLg9TqDZjkwBnw9L4coZxO32lHoE3/Bs7NI4wulqZhSQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by DM4PR11MB7374.namprd11.prod.outlook.com (2603:10b6:8:102::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5986.23; Thu, 19 Jan
+ 2023 03:42:08 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d%9]) with mapi id 15.20.6002.025; Thu, 19 Jan 2023
+ 03:42:07 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+CC:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>
+Subject: RE: [PATCH 08/13] vfio: Block device access via device fd until
+ device is opened
+Thread-Topic: [PATCH 08/13] vfio: Block device access via device fd until
+ device is opened
+Thread-Index: AQHZKnqYgxUzhzjIGEixJ/hIzOZ5Sq6j6vbggABIPwCAAOeakA==
+Date:   Thu, 19 Jan 2023 03:42:07 +0000
+Message-ID: <BN9PR11MB527637735DDEAEEE742852968CC49@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230117134942.101112-1-yi.l.liu@intel.com>
+ <20230117134942.101112-9-yi.l.liu@intel.com>
+ <BN9PR11MB5276941A0F5FD7880DD1C41C8CC79@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <Y8f5lEcYaL6QgiDD@nvidia.com>
+In-Reply-To: <Y8f5lEcYaL6QgiDD@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|DM4PR11MB7374:EE_
+x-ms-office365-filtering-correlation-id: 2ec85f18-1405-4c05-f459-08daf9cf23a9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Y88X/80UB+w6TXki1Nvfw273YSSsv6UaZznBC3aQ6gecJYuP7q2BKe76/JDa/5zdDa+MTBUEiUnQliMAK6te2kWIvQx5TngW8FOV8VK/YnSZVm62M/nBYdOf2tCKi+RwfNCmTGqyFEdYKkyh63anBWXKQaOQKMp2oPA6TXWrtZiazpQxUm93W+q0is/wBhxyN2o3Jb5Qi/GnWd88Of3UOZWyIMYWBC4C/KwIMkD4q8FJSsibo8+fsyg+MIEpoFx47Y6nUQchZ+24UAfYxMzD3Z+mqudAlpV3FJ8NakBk59bkUBKoGribFSKCNRYLvsTlrwdUYktdYOp5AzcUhCPGnJmVKXHmlW/z5hYZxGqx4l8Wu19bFYyZ/V/Z6vpzHs4UvogxZev6Bl3qpoYsF0/D87gUh3InUstxDqYZAiBGenRsMMnc8a4gCzfwyKKFKG/205x7Io8pyaIIoqlqsJ+sDM/yX72hipsb4Cc2Lm0lmu14GPpIf4b6D1qjf+oS3DTotUzgt1RYLdJCWHTvlggETuOkqa3U3LIu1NlHMKPt+RqzvEDwqvsSS8WpVEH1wXu9AWTLrc3jSA4Hag4C0WZv7YZidtyBlkfpzrFrvXgvNfXEw/hwiLHAxrGfc4A0Qlx2N0KPofm2052U/+CytikzP7ahwmQdo1MRkr7zBsN5e0wP+YNFeA+PAu+XmWyt+tMPpvCoyj7tLEg6ulW7NUTkwQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(376002)(39860400002)(366004)(346002)(136003)(396003)(451199015)(4326008)(38070700005)(64756008)(76116006)(8936002)(316002)(66446008)(66946007)(52536014)(66476007)(7416002)(8676002)(5660300002)(66556008)(55016003)(6916009)(2906002)(83380400001)(38100700002)(82960400001)(41300700001)(122000001)(33656002)(7696005)(54906003)(478600001)(71200400001)(86362001)(6506007)(186003)(26005)(9686003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?FsqO4o2eB8WfDUyF3F+hfOKn73raadE9nE+3C8y2XADdy7hchUwG94QKg43k?=
+ =?us-ascii?Q?sAYem4CTLn95++l+n3JlZz/pw6MKDGmfODB8yGUZ72Dn4yhNmar7h/xRuTOj?=
+ =?us-ascii?Q?jLo59wveFRCm8G23cWz0WtVTT2Mvof5Zuq1G+wRcGvWTrjuL7b6cC2RQcKWC?=
+ =?us-ascii?Q?tlseZLJ7VPJx4ApNZATddx7sJ9dKDf0npZO7zg6p1jXieAROEQ4yQV9jy+hA?=
+ =?us-ascii?Q?JMBhrzo/DjXCmMtEPFy4wRreTzWPM2T+xZRh9aWy+Ss5ktBwxFUIDxzvopbD?=
+ =?us-ascii?Q?TD3T/ULX9WRKKtLZF2h3oRfmT+DkCixh0ndTVsnUjBtZEDm89znGss7hBt1q?=
+ =?us-ascii?Q?jmXvKyFXMHGuaQ4hYJYqcjl1OI4fwn8O8zq7YULwCVug7RiEcXB/S1LuS0gu?=
+ =?us-ascii?Q?bLQ91H13MdediXe5vsIZUyz9v/f8AmiDCIsVihcnz+cDl00OjXfDzqIVukse?=
+ =?us-ascii?Q?xWuFqZWE133r4cVYffBsH9Dq/BabnZG82gds/s/VuYY04+yelisAmeX2DmDw?=
+ =?us-ascii?Q?4HD5bjfJx9KDft+X7//a92nG+8Mbr+Vpebb39uVUPDgwOCSMrT8M2TvDiFph?=
+ =?us-ascii?Q?AiNyqpNTAUI/UhDn2MAqF+C04RueBg4acl/WBK/Ju/TRzN+QFto8J5Ln2rd6?=
+ =?us-ascii?Q?LEKMVGzN2f1U1Vunjv0iB3c1vGLtnKqsI4quKASt4fSzYBEQa5PouzGb0OXm?=
+ =?us-ascii?Q?NGwgogND6HTAiUTAoEdQqSImvjM1BDHxFllZoNev4myPalfxI3xh6hsPSuyx?=
+ =?us-ascii?Q?hStI0TPmOtU7Nd2e/dvEwygp5ETSt0ONBugxfqJk0XhQh96CzRB3RyVAFy+I?=
+ =?us-ascii?Q?aEYtuQfqJvr3xVWbPKF9H0/E2EuJI6NnTIzkT2qY0Chz1oCUpBz6x+bgDR/e?=
+ =?us-ascii?Q?Yjp4kYdWJt3m8JA2iuSL1yQK+YlHP9TlMyoZvjxROiJXQaMttCCxU/JgH6u6?=
+ =?us-ascii?Q?u1pc+XrQe8/HYavZPRxz7U7Pmbb7/uFpeioLKDZBfYgJAvU3ZuoiE4jjGBWl?=
+ =?us-ascii?Q?aj8rqcPYklMi7e0xG2kk9a++LVJaPtVEOkSf1op18n0+mijIrCBNqBr2yxST?=
+ =?us-ascii?Q?BsZty2idD9lPgD6BnGZ6erJIuOW8IqRVDsf7J5sIcIxJW/rYP/MRREr3mG5K?=
+ =?us-ascii?Q?UbTjbzCOrMuJz4y2NVhVZm43Wn2jwClQtbfq75cx5VrchbjIaCV1r250EfH5?=
+ =?us-ascii?Q?8g34Ze+ATceVuU1eYUAtocani7vMVPRmFHGHq8MV1WYWOaFqV8+Yp6ZSKYbH?=
+ =?us-ascii?Q?xvJaohKaxZlxiHevHegwsvJQHuoC9sYKNcFJH3I47WjvQp7kkM168o/QMJUW?=
+ =?us-ascii?Q?6nrSMcvtv6ZrgDkT9WgQVaq34USjpjTyxNtlbeQioOJB4lFYvhS3OVdxupDE?=
+ =?us-ascii?Q?p7I2vCSWux3741Q5ZfOeTpdi0A2zrzIb5GoB9QtMPPcQ2hllESNeu5BreAJJ?=
+ =?us-ascii?Q?ggc1ikWjRbfrD1BXESqVuIn8XNwP0qO5eZSjBJan0wK7f2j0SFChNYe13X7C?=
+ =?us-ascii?Q?cl1+VjLQc/6n/T5FJRewAN2qAa9mlo+5dGZrNnpw/ON7JG12Q5FZyQ5aFJZC?=
+ =?us-ascii?Q?PauCeBAtmUd+Z2+jsGkRir+GgRaWcdvDhNiAdOF2?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20230117013542.371944-1-reijiw@google.com> <20230117013542.371944-9-reijiw@google.com>
- <acf66ec9-9de2-7d87-c237-ade895c2bb72@redhat.com>
-In-Reply-To: <acf66ec9-9de2-7d87-c237-ade895c2bb72@redhat.com>
-From:   Reiji Watanabe <reijiw@google.com>
-Date:   Wed, 18 Jan 2023 19:04:31 -0800
-Message-ID: <CAAeT=FxBuzpuQYeaKAOWEJhabFR4DUc2OFoe25kj80cB0Ka+QA@mail.gmail.com>
-Subject: Re: [PATCH v2 8/8] KVM: selftests: aarch64: vPMU register test for
- unimplemented counters
-To:     Shaoqin Huang <shahuang@redhat.com>
-Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ec85f18-1405-4c05-f459-08daf9cf23a9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jan 2023 03:42:07.8077
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: g5BxMknq6eMWQP8x3UmTr2TPukaJJwzMQEcLEvXyeqfe4isFL88o62b3UGhOxSU/++6HeTKRK2HRiijdItQx7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7374
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Shaoqin,
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Wednesday, January 18, 2023 9:52 PM
+>=20
+> On Wed, Jan 18, 2023 at 09:35:33AM +0000, Tian, Kevin wrote:
+> > > From: Liu, Yi L <yi.l.liu@intel.com>
+> > > Sent: Tuesday, January 17, 2023 9:50 PM
+> > >
+> > > Allow the vfio_device file to be in a state where the device FD is
+> > > opened but the device cannot be used by userspace (i.e. its .open_dev=
+ice()
+> > > hasn't been called). This inbetween state is not used when the device
+> > > FD is spawned from the group FD, however when we create the device FD
+> > > directly by opening a cdev it will be opened in the blocked state.
+> > >
+> > > In the blocked state, currently only the bind operation is allowed,
+> > > other device accesses are not allowed. Completing bind will allow use=
+r
+> > > to further access the device.
+> > >
+> > > This is implemented by adding a flag in struct vfio_device_file to ma=
+rk
+> > > the blocked state and using a simple smp_load_acquire() to obtain the
+> > > flag value and serialize all the device setup with the thread accessi=
+ng
+> > > this device.
+> > >
+> > > Due to this scheme it is not possible to unbind the FD, once it is bo=
+und,
+> > > it remains bound until the FD is closed.
+> > >
+> >
+> > My question to the last version was not answered...
+> >
+> > Can you elaborate why it is impossible to unbind? Is it more an
+> > implementation choice or conceptual restriction?
+>=20
+> At least for the implementation it is due to the use of the lockless
+> test for bind.
+>=20
+> It can safely handle unbind->bind but it cannot handle
+> bind->unbind. To allows this we'd need to add a lock on all the vfio
+> ioctls which seems costly.
+>=20
 
-On Tue, Jan 17, 2023 at 11:50 PM Shaoqin Huang <shahuang@redhat.com> wrote:
->
-> Hi Reiji,
->
-> On 1/17/23 09:35, Reiji Watanabe wrote:
-> > Add a new test case to the vpmu_counter_access test to check
-> > if PMU registers or their bits for unimplemented counters are not
-> > accessible or are RAZ, as expected.
-> >
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >   .../kvm/aarch64/vpmu_counter_access.c         | 103 +++++++++++++++++-
-> >   .../selftests/kvm/include/aarch64/processor.h |   1 +
-> >   2 files changed, 98 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> > index 54b69c76c824..a7e34d63808b 100644
-> > --- a/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> > +++ b/tools/testing/selftests/kvm/aarch64/vpmu_counter_access.c
-> > @@ -5,8 +5,8 @@
-> >    * Copyright (c) 2022 Google LLC.
-> >    *
-> >    * This test checks if the guest can see the same number of the PMU event
-> > - * counters (PMCR_EL1.N) that userspace sets, and if the guest can access
-> > - * those counters.
-> > + * counters (PMCR_EL1.N) that userspace sets, if the guest can access
-> > + * those counters, and if the guest cannot access any other counters.
-> >    * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
-> >    */
-> >   #include <kvm_util.h>
-> > @@ -179,6 +179,51 @@ struct pmc_accessor pmc_accessors[] = {
-> >       { read_sel_evcntr, write_pmevcntrn, read_sel_evtyper, write_pmevtypern },
-> >   };
-> >
-> > +#define INVALID_EC   (-1ul)
-> > +uint64_t expected_ec = INVALID_EC;
-> > +uint64_t op_end_addr;
-> > +
-> > +static void guest_sync_handler(struct ex_regs *regs)
-> > +{
-> > +     uint64_t esr, ec;
-> > +
-> > +     esr = read_sysreg(esr_el1);
-> > +     ec = (esr >> ESR_EC_SHIFT) & ESR_EC_MASK;
-> > +     GUEST_ASSERT_4(op_end_addr && (expected_ec == ec),
-> > +                    regs->pc, esr, ec, expected_ec);
-> > +
-> > +     /* Will go back to op_end_addr after the handler exits */
-> > +     regs->pc = op_end_addr;
-> > +
-> > +     /*
-> > +      * Clear op_end_addr, and setting expected_ec to INVALID_EC
-> > +      * as a sign that an exception has occurred.
-> > +      */
-> > +     op_end_addr = 0;
-> > +     expected_ec = INVALID_EC;
-> > +}
-> > +
-> > +/*
-> > + * Run the given operation that should trigger an exception with the
-> > + * given exception class. The exception handler (guest_sync_handler)
-> > + * will reset op_end_addr to 0, and expected_ec to INVALID_EC, and
-> > + * will come back to the instruction at the @done_label.
-> > + * The @done_label must be a unique label in this test program.
-> > + */
-> > +#define TEST_EXCEPTION(ec, ops, done_label)          \
-> > +{                                                    \
-> > +     extern int done_label;                          \
-> > +                                                     \
-> > +     WRITE_ONCE(op_end_addr, (uint64_t)&done_label); \
-> > +     GUEST_ASSERT(ec != INVALID_EC);                 \
-> > +     WRITE_ONCE(expected_ec, ec);                    \
-> > +     dsb(ish);                                       \
-> > +     ops;                                            \
-> > +     asm volatile(#done_label":");                   \
-> > +     GUEST_ASSERT(!op_end_addr);                     \
-> > +     GUEST_ASSERT(expected_ec == INVALID_EC);        \
-> > +}
-> > +
-> >   static void pmu_disable_reset(void)
-> >   {
-> >       uint64_t pmcr = read_sysreg(pmcr_el0);
-> > @@ -352,16 +397,38 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
-> >                      pmc_idx, acc, read_data, read_data_prev);
-> >   }
-> >
-> > +/*
-> > + * Tests for reading/writing registers for the unimplemented event counter
-> > + * specified by @pmc_idx (>= PMCR_EL1.N).
-> > + */
-> > +static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
-> > +{
-> > +     /*
-> > +      * Reading/writing the event count/type registers should cause
-> > +      * an UNDEFINED exception.
-> > +      */
-> > +     TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_cntr(pmc_idx), inv_rd_cntr);
-> > +     TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_cntr(pmc_idx, 0), inv_wr_cntr);
-> > +     TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->read_typer(pmc_idx), inv_rd_typer);
-> > +     TEST_EXCEPTION(ESR_EC_UNKNOWN, acc->write_typer(pmc_idx, 0), inv_wr_typer);
-> > +     /*
-> > +      * The bit corresponding to the (unimplemented) counter in
-> > +      * {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers should be RAZ.
-> > +      */
-> > +     test_bitmap_pmu_regs(pmc_idx, 1);
-> > +     test_bitmap_pmu_regs(pmc_idx, 0);
-> > +}
-> > +
-> >   /*
-> >    * The guest is configured with PMUv3 with @expected_pmcr_n number of
-> >    * event counters.
-> >    * Check if @expected_pmcr_n is consistent with PMCR_EL0.N, and
-> > - * if reading/writing PMU registers for implemented counters can work
-> > - * as expected.
-> > + * if reading/writing PMU registers for implemented or unimplemented
-> > + * counters can work as expected.
-> >    */
-> >   static void guest_code(uint64_t expected_pmcr_n)
-> >   {
-> > -     uint64_t pmcr, pmcr_n;
-> > +     uint64_t pmcr, pmcr_n, unimp_mask;
-> >       int i, pmc;
-> >
-> >       GUEST_ASSERT(expected_pmcr_n <= ARMV8_PMU_MAX_GENERAL_COUNTERS);
-> > @@ -372,6 +439,14 @@ static void guest_code(uint64_t expected_pmcr_n)
-> >       /* Make sure that PMCR_EL0.N indicates the value userspace set */
-> >       GUEST_ASSERT_2(pmcr_n == expected_pmcr_n, pmcr_n, expected_pmcr_n);
-> >
-> > +     /*
-> > +      * Make sure that (RAZ) bits corresponding to unimplemented event
-> > +      * counters in {PMCNTEN,PMOVS}{SET,CLR}_EL1 registers are reset to zero.
-> > +      * (NOTE: bits for implemented event counters are reset to UNKNOWN)
-> > +      */
-> > +     unimp_mask = GENMASK_ULL(ARMV8_PMU_MAX_GENERAL_COUNTERS - 1, pmcr_n);
-> > +     check_bitmap_pmu_regs(unimp_mask, false);
-> > +
-> >       /*
-> >        * Tests for reading/writing PMU registers for implemented counters.
-> >        * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-> > @@ -381,6 +456,14 @@ static void guest_code(uint64_t expected_pmcr_n)
-> >                       test_access_pmc_regs(&pmc_accessors[i], pmc);
-> >       }
-> >
-> > +     /*
-> > +      * Tests for reading/writing PMU registers for unimplemented counters.
-> > +      * Use each combination of PMEVT{CNTR,TYPER}<n>_EL0 accessor functions.
-> Here should be PMEV{CNTR, TYPER}<n>.
-
-Thank you for catching this. I will fix this.
-
-Thank you,
-Reiji
+OK, it makes sense. Yi, can you add this message in next version?
