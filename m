@@ -2,65 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AB2786746FE
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 00:14:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2D9A2674704
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 00:14:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231177AbjASXOL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 18:14:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56224 "EHLO
+        id S229637AbjASXO1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 18:14:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230506AbjASXN3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 18:13:29 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B26C8F6ED
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 15:10:00 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id s13-20020a17090a6e4d00b0022900843652so7410042pjm.1
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 15:10:00 -0800 (PST)
+        with ESMTP id S230459AbjASXNq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 18:13:46 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 740C03590
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 15:11:34 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id 12so1009491plo.3
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 15:11:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0xs+AkRX0zji5V82YtiqWPnSpc8i90g+KOIeXERoTho=;
-        b=E9JGR/DLpZ8PWbvGleifqa8xv945rGeHQuV9agxi1nvZWhWkEugJeJIoYa1Txl+eRI
-         W/a2e38An1fyzflFgGBQl9zsPJR5hRHKRToCUytngjx+39AWN+wx3ouMyj5izqOJJZ6X
-         hVSuNR+op0VzuyELdO5nwXm4oo2m5C5oFYmRP4PHg6bTmdf1lk2uc+pQdlq1dOmTtVO9
-         aYfdU7C9OtXyHEYUUf6JgN1Dfyn5Sd7RK5nhHOovC8UT3BG+c59v3ZLfau02MC3X3PWN
-         dQK1JscyWhzuw+BznyHlVvPVk+b/6oTyJgJqgscHCvbcMUDEWsAk5g+DjB0u2OqzO/jo
-         +Cjw==
+        bh=HeBX4hWuJsaHps7UYjGH1TLVfHHQaTbbfoKxw9Fb+mk=;
+        b=OzyQ7BOijAJL49Qa36dbhVv6eDsyXYSJbiPEeGykSdviurgBNnPy1lh9Z1cSkdN3GB
+         ohFFD4yRz/wNITkF4KCvnuk+OpQ72jgmquCsDnsE0mJTm/ClkmVB3FgeI1pWicBRjQCY
+         0ZnR3mT5AAfHNPydbkRqFIQdFgSbJOosa+hEaeywKuQs8h5TDSut5looUG85PQw+v8Fb
+         4B/L7qJbD5eXmq+xx49TOZo2Z0dmJq4VwEVgYSvGu59c7m8ZBWD2JCoIcrhZjslDZZZd
+         YXuLnu2kIVOjncMEJlJZlHgjlutcCkM5dDRWKfWCzRomr9OY2brVpqr1VawGLmwKOxsq
+         oh3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0xs+AkRX0zji5V82YtiqWPnSpc8i90g+KOIeXERoTho=;
-        b=iKyDIZf2KwP9pFjp1n4luJ7bHT4y/4fbSBLK9ICn0E/M+NdQygpJz6ZKJJFPvo+S7m
-         9lk7+f22x53pby7t9lRpTPtUZJRZsfGPahOOQJRyiZqOjhgImbhjI+b/AD6UOncKXIy8
-         nmuvuFgRHys7M92bEf9MkLfZhsjjoHfCepwLlUG7EbAdp/ns+YWH+A/nyIRGlyfvspUt
-         11iT5VaAe+AgWBqydnZ78QDlSwTctBTN+1rIzAwFY7iiao2oJPgR+95lJJZsq5usnyHV
-         7iFgXmtVDdAyiWJGApON8hrCLuTa+Cb+OdwMSPdUy1lMwrdBmhbOhPRE7Se2Ot+abT+T
-         o8nQ==
-X-Gm-Message-State: AFqh2kq3+DJTaq6YQP8iGS98HE9cmItP5HWFoB2nwF/7YojpoW6b1G8j
-        ftavy44nO5cV0i2sdsxhjs2yjhQltG2vRHTASxQ=
-X-Google-Smtp-Source: AMrXdXtLdY9B9kb1IsRD3qRSPR+b05c975sdeIA2zxjCFJyKFVjFEdhIO/Xx8VlDsBEGX1YzwpOv1g==
-X-Received: by 2002:a05:6a20:2d83:b0:a4:efde:2ed8 with SMTP id bf3-20020a056a202d8300b000a4efde2ed8mr110451pzb.0.1674169799183;
-        Thu, 19 Jan 2023 15:09:59 -0800 (PST)
+        bh=HeBX4hWuJsaHps7UYjGH1TLVfHHQaTbbfoKxw9Fb+mk=;
+        b=sWJ3957O8swkA9Rze/tUIIib+eWwFuWeDuofQ+5cBPx8dfHdQk37heXV19ths4DeFp
+         upey5wPP1Gqv3Oh1OFt3/1HEoWaXWllmEzxKe1CpkCcHL99HwmQG2WNLtI2Vs1F+ZH1h
+         zkPLSrjpdqFZr0biFrus4bhNJQaTQHY4vGuuKYSE8joOf7dRPST6NJiWK+nJ6UPFa3QU
+         cQq/QrZuIEge1WjxBWuY/US027hUvFOMzmVJt1aKeSXjuPcQ72imkXm6KuSAVLgL6c33
+         vXXxUeU38tb732NBpn4Ngk5YTOhAotv35qKvoGYmuCBdbVMX/86vzoa1gdYgsN6rrcso
+         CdLw==
+X-Gm-Message-State: AFqh2kpiMqqqBEne3CrFqsb0WYmS/l0pWb1vYTVMrBELm4GF6O/S7vQe
+        jXQwvy/tgRhP1VXq/DudXCJWjg==
+X-Google-Smtp-Source: AMrXdXufbHO0WUsXs3R5noeo8Wk9F9L4vR8i9iFK9wPdVllQ8vFaN9HlHKx2/e44IIYuEjKEqE1Phg==
+X-Received: by 2002:a17:902:c947:b0:191:1543:6b2f with SMTP id i7-20020a170902c94700b0019115436b2fmr18994pla.3.1674169893768;
+        Thu, 19 Jan 2023 15:11:33 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c4-20020a63da04000000b0047911890728sm21663872pgh.79.2023.01.19.15.09.58
+        by smtp.gmail.com with ESMTPSA id u9-20020a170903124900b00174c1855cd9sm25575902plh.267.2023.01.19.15.11.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 15:09:58 -0800 (PST)
-Date:   Thu, 19 Jan 2023 23:09:55 +0000
+        Thu, 19 Jan 2023 15:11:33 -0800 (PST)
+Date:   Thu, 19 Jan 2023 23:11:30 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     kvm@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc:     David Matlack <dmatlack@google.com>
-Subject: Re: [PATCH v4 0/6] KVM: x86/mmu: Fix wrong usages of range-based tlb
- flushing
-Message-ID: <Y8nNw4kxyedN2kaI@google.com>
-References: <cover.1665214747.git.houwenlong.hwl@antgroup.com>
- <167408992939.2370458.7888282998581500159.b4-ty@google.com>
+To:     "Huang, Kai" <kai.huang@intel.com>
+Cc:     "dmatlack@google.com" <dmatlack@google.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Subject: Re: [PATCH v11 018/113] KVM: TDX: create/destroy VM structure
+Message-ID: <Y8nOIjkskcXAi00V@google.com>
+References: <20230114111621.00001840@gmail.com>
+ <Y8bFCb+rs25dKcMY@google.com>
+ <20230117214414.00003229@gmail.com>
+ <Y8cLcY12zDWqO8nd@google.com>
+ <Y8cMnjHFNIFaoX27@google.com>
+ <eadc4a4e37ea0b04b8348395244b792bd34a762d.camel@intel.com>
+ <Y8ljwsrrBBdh1aYw@google.com>
+ <02b0e551647beed9ec3a2fefd3b659eb52c4846c.camel@intel.com>
+ <Y8m34OEVBfL7Q4Ns@google.com>
+ <38f506575caacd5488f73315b231c3282f893d46.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <167408992939.2370458.7888282998581500159.b4-ty@google.com>
+In-Reply-To: <38f506575caacd5488f73315b231c3282f893d46.camel@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -72,39 +88,53 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023, Sean Christopherson wrote:
-> On Mon, 10 Oct 2022 20:19:11 +0800, Hou Wenlong wrote:
-> > Commit c3134ce240eed ("KVM: Replace old tlb flush function with new one
-> > to flush a specified range.") replaces old tlb flush function with
-> > kvm_flush_remote_tlbs_with_address() to do tlb flushing. However, the
-> > gfn range of tlb flushing is wrong in some cases. E.g., when a spte is
-> > dropped, the start gfn of tlb flushing should be the gfn of spte not the
-> > base gfn of SP which contains the spte. Although, as Paolo said, Hyper-V
-> > may treat a 1-page flush the same if the address points to a huge page,
-> > and no fixes are reported so far. So it seems that it works well for
-> > Hyper-V. But it would be better to use the correct size for huge page.
-> > So this patchset would fix them and introduce some helper functions as
-> > David suggested to make the code clear.
+On Thu, Jan 19, 2023, Huang, Kai wrote:
+> On Thu, 2023-01-19 at 21:36 +0000, Sean Christopherson wrote:
+> > On Thu, Jan 19, 2023, Huang, Kai wrote:
+> > > On Thu, 2023-01-19 at 15:37 +0000, Sean Christopherson wrote:
+> > > > On Thu, Jan 19, 2023, Huang, Kai wrote:
+> > > > > On Tue, 2023-01-17 at 21:01 +0000, Sean Christopherson wrote:
+> > > > > > On Tue, Jan 17, 2023, Sean Christopherson wrote:
+> > > > > > > On Tue, Jan 17, 2023, Zhi Wang wrote:
+> > > > > > Oh, the other important piece I forgot to mention is that dropping mmu_lock deep
+> > > > > > in KVM's MMU in order to wait isn't always an option.  Most flows would play nice
+> > > > > > with dropping mmu_lock and sleeping, but some paths, e.g. from the mmu_notifier,
+> > > > > > (conditionally) disallow sleeping.
+> > > > > 
+> > > > > Could we do something similar to tdp_mmu_iter_cond_resched() but not simple busy
+> > > > > retrying "X times",  at least at those paths that can release mmu_lock()?
+> > > > 
+> > > > That's effectively what happens by unwinding up the stak with an error code.
+> > > > Eventually the page fault handler will get the error and retry the guest.
+> > > > 
+> > > > > Basically we treat TDX_OPERAND_BUSY as seamcall_needbreak(), similar to
+> > > > > rwlock_needbreak().  I haven't thought about details though.
+> > > > 
+> > > > I am strongly opposed to that approach.  I do not want to pollute KVM's MMU code
+> > > > with a bunch of retry logic and error handling just because the TDX module is
+> > > > ultra paranoid and hostile to hypervisors.
+> > > 
+> > > Right.  But IIUC there's legal cases that SEPT SEAMCALL can return BUSY due to
+> > > multiple threads trying to read/modify SEPT simultaneously in case of TDP MMU. 
+> > > For instance, parallel page faults on different vcpus on private pages.  I
+> > > believe this is the main reason to retry.
 > > 
-> > [...]
+> > Um, crud.  I think there's a bigger issue.  KVM always operates on its copy of the
+> > S-EPT tables and assumes the the real S-EPT tables will always be synchronized with
+> > KVM's mirror.  That assumption doesn't hold true without serializing SEAMCALLs in
+> > some way.  E.g. if a SPTE is zapped and mapped at the same time, we can end up with:
+> > 
+> >   vCPU0                      vCPU1
+> >   =====                      =====
+> >   mirror[x] = xyz
+> >                              old_spte = mirror[x]
+> >                              mirror[x] = REMOVED_SPTE
+> >                              sept[x] = REMOVED_SPTE
+> >   sept[x] = xyz
 > 
-> David and/or Hou, it's probably a good idea to double check my results, there
-> were a few minor conflicts and I doubt anything would fail if I messed up.
+> IIUC this case cannot happen, as the two steps in the vcpu0 are within read
+> lock, which prevents from vcpu1, which holds the write lock during zapping SPTE.
 
-Gah, doesn't even compile because I missed a paranthesis.  Messed up my scripts
-and didn't pull 'mmu' into 'next.
-
-Force pushed, new hashes are below.  Testing now...
-
-[1/6] KVM: x86/mmu: Move round_gfn_for_level() helper into mmu_internal.h
-      https://github.com/kvm-x86/linux/commit/bb05964f0a3c
-[2/6] KVM: x86/mmu: Fix wrong gfn range of tlb flushing in kvm_set_pte_rmapp()
-      https://github.com/kvm-x86/linux/commit/c61baeaa2a14
-[3/6] KVM: x86/mmu: Reduce gfn range of tlb flushing in tdp_mmu_map_handle_target_level()
-      https://github.com/kvm-x86/linux/commit/24c17bc3def7
-[4/6] KVM: x86/mmu: Fix wrong start gfn of tlb flushing with range
-      https://github.com/kvm-x86/linux/commit/873f68d8dac3
-[5/6] KVM: x86/mmu: Fix wrong gfn range of tlb flushing in validate_direct_spte()
-      https://github.com/kvm-x86/linux/commit/22f34c933198
-[6/6] KVM: x86/mmu: Cleanup range-based flushing for given page
-      https://github.com/kvm-x86/linux/commit/e7b406974086
+Zapping SPTEs can happen while holding mmu_lock for read, e.g. see the bug fixed
+by commit 21a36ac6b6c7 ("KVM: x86/mmu: Re-check under lock that TDP MMU SP hugepage
+is disallowed").
