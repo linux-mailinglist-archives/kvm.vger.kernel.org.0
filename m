@@ -2,133 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1FEF674428
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 22:18:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DE4C367446A
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 22:31:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229853AbjASVSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 16:18:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36728 "EHLO
+        id S230343AbjASVbl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 16:31:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229782AbjASVR3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 16:17:29 -0500
-Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4354DBE8;
-        Thu, 19 Jan 2023 13:12:34 -0800 (PST)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1674162752;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rRUXLP0p0WQ+Qd4xVEuRKMl25ggID9YoYcEY3DCIiik=;
-        b=mdQ7CD0wRJvfaZDOr0f82Dc4967iwC75I1+s5lDCu1fHHwtrp+IBba8UPSoQ/va3j4Qar2
-        ATGu2nZLLKa0vJ8CheBHLvt0I89xHSG06ZUusQKDPY104va7qqUjwYfiuIUukk+LaqO7Gu
-        N+aHnCbtSnW+e8Smx0L+A2DiKy1AOSyLQ5QGRIN4vgJHVE1sRkt9jT/0k9LahiDV7T+AiK
-        jKmIL8dmtVDNgeoMh+UAXcZ37mv49o4hNCz9KdPCGAyDUP9ZfpqnymsWZ0f3dG4LxhFiyw
-        RTndkgdz2BKS/FhRmtxFB9hP9YbenuT2IOAVALIMh4inh4bZRqxisS45FivGfA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1674162752;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=rRUXLP0p0WQ+Qd4xVEuRKMl25ggID9YoYcEY3DCIiik=;
-        b=0BJ5w/p0x778LsQ1MznxzGrIdB3OE1QGABAUfN3vpOmJUgdDINUgQsr9tLqZGxSzWuC+ct
-        ivl26is4VR39BBBw==
-To:     Igor Mammedov <imammedo@redhat.com>,
-        "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-Cc:     linux-kernel@vger.kernel.org, amakhalov@vmware.com,
-        ganb@vmware.com, ankitja@vmware.com, bordoloih@vmware.com,
-        keerthanak@vmware.com, blamoreaux@vmware.com, namit@vmware.com,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Wyes Karny <wyes.karny@amd.com>,
-        Lewis Caroll <lewis.carroll@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>, x86@kernel.org,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v2] x86/hotplug: Do not put offline vCPUs in mwait idle
- state
-In-Reply-To: <20230116155526.05d37ff9@imammedo.users.ipa.redhat.com>
-References: <20230116060134.80259-1-srivatsa@csail.mit.edu>
- <20230116155526.05d37ff9@imammedo.users.ipa.redhat.com>
-Date:   Thu, 19 Jan 2023 22:12:31 +0100
-Message-ID: <87bkmui5z4.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S231178AbjASVbH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 16:31:07 -0500
+Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC34A7906
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:25:27 -0800 (PST)
+Received: by mail-pf1-x44a.google.com with SMTP id s4-20020a056a00194400b0058d9b9fecb6so1459026pfk.1
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:25:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vgnyLDNSgvwVcu8AmZopvdgW3ASujbk2oM4NuNZjZP0=;
+        b=g898MByqpR4QSdftZPPM8wJDP652HbA9+ZoMck6HqIY8547fIVJkQecY35bALgkuPd
+         PwVfUBLHI/Pc1DE+zmAXJ9FoEqn7DOqt7PwrqU6yyZSn7YCmGVfH2QIQmUWB7Xp4j5no
+         DkjiYEr8kDHWxOVqs3B22PKilcSQ65XNsUUM1RaWm9kTSjcjeQewFvrsBsr9jhq8B54m
+         Dm4z3FlRDZzfXGw1sxpe76q8kM+QRApZA/E16DnbeYu5tG2boGFuHaPhKsL2sNLhSru+
+         8f92Y8e1sIWEb0uLYDXnx0XLEfL83kjSWOuL1N78+JcgqIlRhHGLkx97xR4ZklUL0T++
+         RVTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vgnyLDNSgvwVcu8AmZopvdgW3ASujbk2oM4NuNZjZP0=;
+        b=iOhfDEanrhMC1NtLK0YmnL4WN9TPJIJ5ZHJly8xcDlxtczF1c/u0N4uDxf0cnlR30+
+         HQY03nVNMnJppot/wU5UrLTGtz2+zthvKmVgnha+5vyqKNdWMEM+l1JGnkGdYmXhI85I
+         FVpXxA+EdBeALiMkWoLIRP/ZBAhMlCIBWwiYDzlS/N5O0Am9Ti2kEwkixFj6odCUgKX7
+         2zvT01kD9qgaRlYaZL+S8GTx5sIMEcm638fenld2tJd2y9xepadkUJZoTPD99aiaPWG4
+         6yf6iKYHCOgTTfW1uoZYLDDPBYt5Z/XD5kXbUbErHEeSVH0Siu1GOiXXMWjaPMxb5bl8
+         7aMw==
+X-Gm-Message-State: AFqh2kqdkyHW+bkgCRBDfWl0NSvqpoKKea+QWuZsFl/5570/B1ws7flX
+        1CrBN8islMXPm1ufzdsteQVma4L+mGhH
+X-Google-Smtp-Source: AMrXdXsRjd0daJT+VjjXiboL/8dO+R8B8aw5WpitBxaWhaDlAZ5nDoMUEkMtP6482azch2U/BAwlzi7Iqqq6
+X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
+ (user=bgardon job=sendgmr) by 2002:a17:90a:d505:b0:229:1740:1051 with SMTP id
+ t5-20020a17090ad50500b0022917401051mr1239826pju.111.1674163513524; Thu, 19
+ Jan 2023 13:25:13 -0800 (PST)
+Date:   Thu, 19 Jan 2023 21:25:08 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.405.gd4c25cc71f-goog
+Message-ID: <20230119212510.3938454-1-bgardon@google.com>
+Subject: [PATCH 0/2] selftests: KVM: Add a test for eager page splitting
+From:   Ben Gardon <bgardon@google.com>
+To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Ben Gardon <bgardon@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 16 2023 at 15:55, Igor Mammedov wrote:
-> "Srivatsa S. Bhat" <srivatsa@csail.mit.edu> wrote:
->> Fix this by preventing the use of mwait idle state in the vCPU offline
->> play_dead() path for any hypervisor, even if mwait support is
->> available.
->
-> if mwait is enabled, it's very likely guest to have cpuidle
-> enabled and using the same mwait as well. So exiting early from
->  mwait_play_dead(), might just punt workflow down:
->   native_play_dead()
->         ...
->         mwait_play_dead();
->         if (cpuidle_play_dead())   <- possible mwait here                                              
->                 hlt_play_dead(); 
->
-> and it will end up in mwait again and only if that fails
-> it will go HLT route and maybe transition to VMM.
+David Matlack recently added a feature known as eager page splitting
+to x86 KVM. This feature improves vCPU performance during dirty
+logging because the splitting operation is moved out of the page
+fault path, avoiding EPT/NPT violations or allowing the vCPU threads
+to resolve the violation in the fast path.
 
-Good point.
+While this feature is a great performance improvement, it does not
+have adequate testing in KVM selftests. Add a test to provide coverage
+of eager page splitting.
 
-> Instead of workaround on guest side,
-> shouldn't hypervisor force VMEXIT on being uplugged vCPU when it's
-> actually hot-unplugging vCPU? (ex: QEMU kicks vCPU out from guest
-> context when it is removing vCPU, among other things)
+Patch 1 is a quick refactor to be able to re-use some code from
+dirty_log_perf_test.
+Patch 2 adds the actual test.
 
-For a pure guest side CPU unplug operation:
+Please ignore the RFC version of this series. It was not meant as an RFC
+and did not include a cover letter.
 
-    guest$ echo 0 >/sys/devices/system/cpu/cpu$N/online
+Ben Gardon (2):
+  selftests: KVM: Move dirty logging functions to memstress.(c|h)
+  selftests: KVM: Add page splitting test
 
-the hypervisor is not involved at all. The vCPU is not removed in that
-case.
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/dirty_log_perf_test.c       |  84 +----
+ .../selftests/kvm/include/kvm_util_base.h     |   2 +
+ .../testing/selftests/kvm/include/memstress.h |   8 +
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   5 +
+ tools/testing/selftests/kvm/lib/memstress.c   |  72 ++++
+ .../kvm/x86_64/page_splitting_test.c          | 314 ++++++++++++++++++
+ 7 files changed, 409 insertions(+), 77 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/page_splitting_test.c
 
-So to ensure that this ends up in HLT something like the below is
-required.
+-- 
+2.39.1.405.gd4c25cc71f-goog
 
-Note, the removal of the comment after mwait_play_dead() is intentional
-because the comment is completely bogus. Not having MWAIT is not a
-failure. But that wants to be a seperate patch.
-
-Thanks,
-
-        tglx
----        
-diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-index 55cad72715d9..3f1f20f71ec5 100644
---- a/arch/x86/kernel/smpboot.c
-+++ b/arch/x86/kernel/smpboot.c
-@@ -1833,7 +1833,10 @@ void native_play_dead(void)
- 	play_dead_common();
- 	tboot_shutdown(TB_SHUTDOWN_WFS);
- 
--	mwait_play_dead();	/* Only returns on failure */
-+	if (this_cpu_has(X86_FEATURE_HYPERVISOR))
-+		hlt_play_dead();
-+
-+	mwait_play_dead();
- 	if (cpuidle_play_dead())
- 		hlt_play_dead();
- }
-
-
-  
