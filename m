@@ -2,68 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2928067447A
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 22:32:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B19526744E4
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 22:41:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230390AbjASVcN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 16:32:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45298 "EHLO
+        id S229682AbjASVlk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 16:41:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231221AbjASVbQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 16:31:16 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DC26A8383
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:25:39 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id h69-20020a638348000000b004d08330e922so1578247pge.5
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:25:39 -0800 (PST)
+        with ESMTP id S231164AbjASVhs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 16:37:48 -0500
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8130646B2
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:27:45 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id u19so9121583ejm.8
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:27:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DYdrgSlWXft+Tsg8pN9NCKsz/7KXm3iGPcuIiufq1QE=;
-        b=nk1Zy3yzFTo1ZuadOsMQ3wFIgaAuRxHBUCx3Rkat+n0jxtXXWLDNvHKZjQuu6i5OV7
-         LQjD6BexQrBCShQxxASv2roEFp5cwR4EBbFRI2o+8Ur2Ekjq/3EjJ8oTpl/eMbO4Xkn+
-         UtFolePP25hJMgesm5DKINUW4dNif2cdf+Bhc08NdJrQgkwnpDzYP8It2F/XrSapNYVN
-         G16/JUOGu2H0jt23wnAay4s9YfZ13waZK/5xEJwTgdhv2FU3jcrP5/+zk7KAWqan74my
-         G4SPmQaa2/dU0sZ+0gWUEoWtW+gPgMOB/XSM0t/w6r4VYn256yV9ZByLzLrWYlyIedZd
-         CIvA==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=XBxxsu+2nogYycJOVBa8FpBheOsrcQjWtd2yvS/CdzM=;
+        b=KvYOhyZIL1Dh6zrbX5HfN3585SCgwWI5wmkMDA2Z2k2ZU/sx4hmrd+135EWaliWtKr
+         yahZTBZ/X+RFVORo4q4lASCCHk6Qf9qBgAXJNNmo8BZ557jvNOW9epHdlyLAhnKjuFfe
+         5Zz4N7xwc2W8ZHmsNw8z8EFlrD6NDrEYmFKHF6yKpvW2fGgDAj/TjYxAGjFBuqwRUgJ1
+         CFwDdgdDDPQWMNufnh2dEPUVzOefvSVmkMNt155W2lVFFyjFFLvn4JT6fzDkVlcdnoBM
+         pd1hzCCx8dH4NMAVlGfe1T1+byDGGuJ/p5U6rVApyfuGdKIrCatKBanJx08yINP0Fp8e
+         dBbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DYdrgSlWXft+Tsg8pN9NCKsz/7KXm3iGPcuIiufq1QE=;
-        b=XGiHbyAddNUwrWET1iAXjVo6nk7vwOdpfoz4VYs7lkmwR8Y3izDa+zHHy/v/8wIDDI
-         peis9UzPzJV2BX9bOcOgyI1MNYlMfufvFOspiH9hHQhpxBKV7jqsL9r32BDOu2Q/1U+a
-         8s5bAUHmyqwvK2aBJJygdo9aX/2JDbQ5LYrZm7s5OET5KMF2y2ImXW7BZTAHxxwj+Zu1
-         D5r91QeCC82L/6Q8ocXX4Yj8v5bVKfYZRDL6UHXlCTPjmVkXERQbwMS130X40zCZuzmY
-         mswGNyFfIt+xupfIp2eCd8F0usK105G5MClIqzuelYQAUhiRhrRCtV7Ngel/pt/u472M
-         4ZiA==
-X-Gm-Message-State: AFqh2kryZcJab8EzRz4gsaEc1Qqjnb2z3ye01G2vJ/Rpn5uYbkFMF/um
-        7EacE8uYRkE9Obm/JVMwQv11FKoJvzzt
-X-Google-Smtp-Source: AMrXdXtPLIawmGZGPom0csVcrrZ//f0Hvrf10K5BQCjZDwzfjylz0fC4lYVS+IyDDZzJEV+OjiTzsJARbTp+
-X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
- (user=bgardon job=sendgmr) by 2002:a62:18d5:0:b0:578:3528:b4d with SMTP id
- 204-20020a6218d5000000b0057835280b4dmr1081889pfy.80.1674163516710; Thu, 19
- Jan 2023 13:25:16 -0800 (PST)
-Date:   Thu, 19 Jan 2023 21:25:10 +0000
-In-Reply-To: <20230119212510.3938454-1-bgardon@google.com>
-Mime-Version: 1.0
-References: <20230119212510.3938454-1-bgardon@google.com>
-X-Mailer: git-send-email 2.39.1.405.gd4c25cc71f-goog
-Message-ID: <20230119212510.3938454-3-bgardon@google.com>
-Subject: [PATCH 2/2] selftests: KVM: Add page splitting test
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XBxxsu+2nogYycJOVBa8FpBheOsrcQjWtd2yvS/CdzM=;
+        b=c3HLJFQhsz61yrZt25vJUtX2yR+KuDXILDRJ8T3OOBLDMjn5sWaMoHI/gJuKtwKzgQ
+         2xgO9FSLKe5VlEYKy50F3AlK4K80ai900xbJSVjwXwGEKNrKEFmxtsom9VeXBz6dXKoE
+         5Et6P6EzqGy9OCKqJGFa1/gpmJqA44+PVOktBLRlvqdq96HCbs44XXNzvXcn0kGIFt56
+         nv54t75FQA0Z75WxksusvbBF427+0FbMZxoVmqMsFCUKS6EO1beb1Y3DvTZsqd1ALDjT
+         AeZQTRNyeEWHNYKdr8lTYpqdbGUTcdtz1FnlurMKZQucR7Zx7utc3tiVISxxHpRIUDdD
+         TylA==
+X-Gm-Message-State: AFqh2kr7KzOSkjcekSzVO+5YP2JbVhb+4m9Vyw0PAairbpWUdSm+m7Zo
+        pmW4WLVg6u/P9sChrRBU1OUkQXiKCdF17661wkQeNA==
+X-Google-Smtp-Source: AMrXdXuIsOhhmDKIq4/fwgQCcPRwc4Lx51i0zGBEM1sK0CndlvxhPhe4DwACAVirxFIrAz/SDTucUM1eJP9tBhNTX+8=
+X-Received: by 2002:a17:906:f913:b0:85d:97b9:ec06 with SMTP id
+ lc19-20020a170906f91300b0085d97b9ec06mr787050ejb.541.1674163663856; Thu, 19
+ Jan 2023 13:27:43 -0800 (PST)
+MIME-Version: 1.0
+References: <20230119200553.3922206-1-bgardon@google.com> <Y8mqd7HUzXDnhXLV@google.com>
+ <CANgfPd902Sd+LCd61D8=ba2ZTbJCRu3emLXtE212_8NWW6c3Pw@mail.gmail.com> <Y8mt3uv5iF6i/DD1@google.com>
+In-Reply-To: <Y8mt3uv5iF6i/DD1@google.com>
 From:   Ben Gardon <bgardon@google.com>
-To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
+Date:   Thu, 19 Jan 2023 13:27:32 -0800
+Message-ID: <CANgfPd8owr_=va1u4eoH6=anjM0VX_YSU5AyvBJaKjuifojVDA@mail.gmail.com>
+Subject: Re: [RFC 1/2] selftests: KVM: Move dirty logging functions to memstress.(c|h)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
         David Matlack <dmatlack@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Ben Gardon <bgardon@google.com>
+        Vipin Sharma <vipinsh@google.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,398 +71,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a test for page splitting during dirty logging and for hugepage
-recovery after dirty logging.
+On Thu, Jan 19, 2023 at 12:53 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Jan 19, 2023, Ben Gardon wrote:
+> > Woops!
+>
+> Heh, and top posting too.  Me thinks you had too long of a break ;-)
 
-Page splitting represents non-trivial behavior, which is complicated
-by MANUAL_PROTECT mode, which causes pages to be split on the first
-clear, instead of when dirty logging is enabled.
+Oh no, I'm in shambles (^:
 
-Add a test which makes asserions about page counts to help define the
-expected behavior of page splitting and to provid needed coverage of the
-behavior. This also helps ensure that a failure in eager page splitting
-is not covered up by splitting in the vCPU path.
+>
+> > I did not mean to tag this RFC. Sorry about that. I will include a cover
+> > letter in the future and can resend these with one if preferred.
+>
+> Eh, no need, damage done.  I was just confused.
 
-Tested by running the test on an Intel Haswell machine w/wo
-MANUAL_PROTECT.
+I sent a revised version anyway because I realized it probably made
+sense to have test skip itself if TDP MMU or Eager Page Splitting was
+disabled.
 
-Signed-off-by: Ben Gardon <bgardon@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/include/kvm_util_base.h     |   2 +
- tools/testing/selftests/kvm/lib/kvm_util.c    |   5 +
- .../kvm/x86_64/page_splitting_test.c          | 314 ++++++++++++++++++
- 4 files changed, 322 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/x86_64/page_splitting_test.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 1750f91dd9362..057ebd709e77a 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -76,6 +76,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/kvm_pv_test
- TEST_GEN_PROGS_x86_64 += x86_64/mmio_warning_test
- TEST_GEN_PROGS_x86_64 += x86_64/monitor_mwait_test
- TEST_GEN_PROGS_x86_64 += x86_64/nested_exceptions_test
-+TEST_GEN_PROGS_x86_64 += x86_64/page_splitting_test
- TEST_GEN_PROGS_x86_64 += x86_64/platform_info_test
- TEST_GEN_PROGS_x86_64 += x86_64/pmu_event_filter_test
- TEST_GEN_PROGS_x86_64 += x86_64/set_boot_cpu_id
-diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tools/testing/selftests/kvm/include/kvm_util_base.h
-index fbc2a79369b8b..4e38a771fa5d1 100644
---- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-+++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-@@ -213,6 +213,7 @@ extern const struct vm_guest_mode_params vm_guest_mode_params[];
- int open_path_or_exit(const char *path, int flags);
- int open_kvm_dev_path_or_exit(void);
- 
-+bool get_kvm_param_bool(const char *param);
- bool get_kvm_intel_param_bool(const char *param);
- bool get_kvm_amd_param_bool(const char *param);
- 
-@@ -402,6 +403,7 @@ static inline uint64_t vm_get_stat(struct kvm_vm *vm, const char *stat_name)
- 	uint64_t data;
- 
- 	__vm_get_stat(vm, stat_name, &data, 1);
-+
- 	return data;
- }
- 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 56d5ea949cbbe..fa6d69f731990 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -80,6 +80,11 @@ static bool get_module_param_bool(const char *module_name, const char *param)
- 	TEST_FAIL("Unrecognized value '%c' for boolean module param", value);
- }
- 
-+bool get_kvm_param_bool(const char *param)
-+{
-+	return get_module_param_bool("kvm", param);
-+}
-+
- bool get_kvm_intel_param_bool(const char *param)
- {
- 	return get_module_param_bool("kvm_intel", param);
-diff --git a/tools/testing/selftests/kvm/x86_64/page_splitting_test.c b/tools/testing/selftests/kvm/x86_64/page_splitting_test.c
-new file mode 100644
-index 0000000000000..3e2ee20adf036
---- /dev/null
-+++ b/tools/testing/selftests/kvm/x86_64/page_splitting_test.c
-@@ -0,0 +1,314 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * KVM dirty logging page splitting test
-+ *
-+ * Based on dirty_log_perf.c
-+ *
-+ * Copyright (C) 2018, Red Hat, Inc.
-+ * Copyright (C) 2020, Google, Inc.
-+ */
-+
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <time.h>
-+#include <pthread.h>
-+#include <linux/bitmap.h>
-+
-+#include "kvm_util.h"
-+#include "test_util.h"
-+#include "memstress.h"
-+#include "guest_modes.h"
-+
-+/* How many host loops to run by default (one KVM_GET_DIRTY_LOG for each loop)*/
-+#define TEST_HOST_LOOP_N		2UL
-+
-+static int NR_VCPUS = 2;
-+static int NR_SLOTS = 2;
-+static int NR_ITERATIONS = 2;
-+static uint64_t guest_percpu_mem_size = DEFAULT_PER_VCPU_MEM_SIZE;
-+
-+/* Host variables */
-+static u64 dirty_log_manual_caps;
-+static bool host_quit;
-+static int iteration;
-+static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
-+
-+struct kvm_page_stats {
-+	uint64_t pages_4k;
-+	uint64_t pages_2m;
-+	uint64_t pages_1g;
-+	uint64_t hugepages;
-+};
-+
-+static void get_page_stats(struct kvm_vm *vm, struct kvm_page_stats *stats)
-+{
-+	stats->pages_4k = vm_get_stat(vm, "pages_4k");
-+	stats->pages_2m = vm_get_stat(vm, "pages_2m");
-+	stats->pages_1g = vm_get_stat(vm, "pages_1g");
-+	stats->hugepages = stats->pages_2m + stats->pages_1g;
-+
-+	pr_debug("Page stats - 4K: %ld 2M: %ld 1G: %ld huge: %ld\n",
-+		 stats->pages_4k, stats->pages_2m, stats->pages_1g,
-+		 stats->hugepages);
-+}
-+
-+static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
-+{
-+	struct kvm_vcpu *vcpu = vcpu_args->vcpu;
-+	int vcpu_idx = vcpu_args->vcpu_idx;
-+	uint64_t pages_count = 0;
-+	struct kvm_run *run;
-+	int ret;
-+
-+	run = vcpu->run;
-+
-+	while (!READ_ONCE(host_quit)) {
-+		int current_iteration = READ_ONCE(iteration);
-+
-+		ret = _vcpu_run(vcpu);
-+
-+		TEST_ASSERT(ret == 0, "vcpu_run failed: %d\n", ret);
-+		TEST_ASSERT(get_ucall(vcpu, NULL) == UCALL_SYNC,
-+			    "Invalid guest sync status: exit_reason=%s\n",
-+			    exit_reason_str(run->exit_reason));
-+
-+		vcpu_last_completed_iteration[vcpu_idx] = current_iteration;
-+
-+		if (current_iteration)
-+			pages_count += vcpu_args->pages;
-+
-+		/* Wait for the start of the next iteration to be signaled. */
-+		while (current_iteration == READ_ONCE(iteration) &&
-+		       READ_ONCE(iteration) >= 0 &&
-+		       !READ_ONCE(host_quit))
-+			;
-+	}
-+}
-+
-+struct test_params {
-+	enum vm_mem_backing_src_type backing_src;
-+};
-+
-+static void run_test(struct test_params *p)
-+{
-+	struct kvm_vm *vm;
-+	unsigned long **bitmaps;
-+	uint64_t guest_num_pages;
-+	uint64_t host_num_pages;
-+	uint64_t pages_per_slot;
-+	int i;
-+	uint64_t total_4k_pages;
-+	struct kvm_page_stats stats_populated;
-+	struct kvm_page_stats stats_dirty_logging_enabled;
-+	struct kvm_page_stats stats_dirty_pass[NR_ITERATIONS];
-+	struct kvm_page_stats stats_clear_pass[NR_ITERATIONS];
-+	struct kvm_page_stats stats_dirty_logging_disabled;
-+	struct kvm_page_stats stats_repopulated;
-+
-+	vm = memstress_create_vm(VM_MODE_DEFAULT, NR_VCPUS, guest_percpu_mem_size,
-+				 NR_SLOTS, p->backing_src, false);
-+
-+	guest_num_pages = (NR_VCPUS * guest_percpu_mem_size) >> vm->page_shift;
-+	guest_num_pages = vm_adjust_num_guest_pages(VM_MODE_DEFAULT, guest_num_pages);
-+	host_num_pages = vm_num_host_pages(VM_MODE_DEFAULT, guest_num_pages);
-+	pages_per_slot = host_num_pages / NR_SLOTS;
-+
-+	bitmaps = memstress_alloc_bitmaps(NR_SLOTS, pages_per_slot);
-+
-+	if (dirty_log_manual_caps)
-+		vm_enable_cap(vm, KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2,
-+			      dirty_log_manual_caps);
-+
-+	/* Start the iterations */
-+	iteration = 0;
-+	host_quit = false;
-+
-+	for (i = 0; i < NR_VCPUS; i++)
-+		vcpu_last_completed_iteration[i] = -1;
-+
-+	memstress_start_vcpu_threads(NR_VCPUS, vcpu_worker);
-+
-+	/* Allow the vCPUs to populate memory */
-+	for (i = 0; i < NR_VCPUS; i++) {
-+		while (READ_ONCE(vcpu_last_completed_iteration[i]) !=
-+		       iteration)
-+			;
-+	}
-+
-+	pr_debug("\nGetting stats after populating memory:\n");
-+	get_page_stats(vm, &stats_populated);
-+
-+	/* Enable dirty logging */
-+	memstress_enable_dirty_logging(vm, NR_SLOTS);
-+
-+	pr_debug("\nGetting stats after enabling dirty logging:\n");
-+	get_page_stats(vm, &stats_dirty_logging_enabled);
-+
-+	while (iteration < NR_ITERATIONS) {
-+		/*
-+		 * Incrementing the iteration number will start the vCPUs
-+		 * dirtying memory again.
-+		 */
-+		iteration++;
-+
-+		for (i = 0; i < NR_VCPUS; i++) {
-+			while (READ_ONCE(vcpu_last_completed_iteration[i])
-+			       != iteration)
-+				;
-+		}
-+
-+		pr_debug("\nGetting stats after dirtying memory on pass %d:\n", iteration);
-+		get_page_stats(vm, &stats_dirty_pass[iteration - 1]);
-+
-+		memstress_get_dirty_log(vm, bitmaps, NR_SLOTS);
-+
-+		if (dirty_log_manual_caps) {
-+			memstress_clear_dirty_log(vm, bitmaps, NR_SLOTS, pages_per_slot);
-+
-+			pr_debug("\nGetting stats after clearing dirty log pass %d:\n", iteration);
-+			get_page_stats(vm, &stats_clear_pass[iteration - 1]);
-+		}
-+	}
-+
-+	/* Disable dirty logging */
-+	memstress_disable_dirty_logging(vm, NR_SLOTS);
-+
-+	pr_debug("\nGetting stats after disabling dirty logging:\n");
-+	get_page_stats(vm, &stats_dirty_logging_disabled);
-+
-+	/* Run vCPUs again to fault pages back in. */
-+	iteration++;
-+	for (i = 0; i < NR_VCPUS; i++) {
-+		while (READ_ONCE(vcpu_last_completed_iteration[i]) != iteration)
-+			;
-+	}
-+
-+	pr_debug("\nGetting stats after repopulating memory:\n");
-+	get_page_stats(vm, &stats_repopulated);
-+
-+	/*
-+	 * Tell the vCPU threads to quit.  No need to manually check that vCPUs
-+	 * have stopped running after disabling dirty logging, the join will
-+	 * wait for them to exit.
-+	 */
-+	host_quit = true;
-+	memstress_join_vcpu_threads(NR_VCPUS);
-+
-+	memstress_free_bitmaps(bitmaps, NR_SLOTS);
-+	memstress_destroy_vm(vm);
-+
-+	/* Make assertions about the page counts. */
-+	total_4k_pages = stats_populated.pages_4k;
-+	total_4k_pages += stats_populated.pages_2m * 512;
-+	total_4k_pages += stats_populated.pages_1g * 512 * 512;
-+
-+	/*
-+	 * Check that all huge pages were split. Since large pages can only
-+	 * exist in the data slot, and the vCPUs should have dirtied all pages
-+	 * in the data slot, there should be no huge pages left after splitting.
-+	 * Splitting happens at dirty log enable time without
-+	 * KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2 and after the first clear pass
-+	 * with that capability.
-+	 */
-+	if (dirty_log_manual_caps) {
-+		TEST_ASSERT(stats_clear_pass[0].hugepages == 0,
-+			    "Unexpected huge page count after splitting. Expected 0, got %ld",
-+			    stats_clear_pass[0].hugepages);
-+		TEST_ASSERT(stats_clear_pass[0].pages_4k == total_4k_pages,
-+			    "All memory should be mapped at 4k. Expected %ld 4k pages, got %ld",
-+			    total_4k_pages, stats_clear_pass[0].pages_4k);
-+	} else {
-+		TEST_ASSERT(stats_dirty_logging_enabled.hugepages == 0,
-+			    "Unexpected huge page count after splitting. Expected 0, got %ld",
-+			    stats_dirty_logging_enabled.hugepages);
-+		TEST_ASSERT(stats_dirty_logging_enabled.pages_4k == total_4k_pages,
-+			    "All memory should be mapped at 4k. Expected %ld 4k pages, got %ld",
-+			    total_4k_pages, stats_dirty_logging_enabled.pages_4k);
-+	}
-+
-+	/*
-+	 * Once dirty logging is disabled and the vCPUs have touched all their
-+	 * memory again, the page counts should be the same as they were
-+	 * right after initial population of memory.
-+	 */
-+	TEST_ASSERT(stats_populated.pages_4k == stats_repopulated.pages_4k,
-+		    "4k page count did not return to its initial value after "
-+		    "dirty logging. Expected %ld, got %ld",
-+		    stats_populated.pages_4k, stats_repopulated.pages_4k);
-+	TEST_ASSERT(stats_populated.pages_2m == stats_repopulated.pages_2m,
-+		    "2m page count did not return to its initial value after "
-+		    "dirty logging. Expected %ld, got %ld",
-+		    stats_populated.pages_2m, stats_repopulated.pages_2m);
-+	TEST_ASSERT(stats_populated.pages_1g == stats_repopulated.pages_1g,
-+		    "1g page count did not return to its initial value after "
-+		    "dirty logging. Expected %ld, got %ld",
-+		    stats_populated.pages_1g, stats_repopulated.pages_1g);
-+}
-+
-+static void help(char *name)
-+{
-+	puts("");
-+	printf("usage: %s [-h] [-g] [-m mode] [-b vcpu bytes] [-s mem type]\n",
-+	       name);
-+	puts("");
-+	printf(" -g: Do not enable KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2. This\n"
-+	       "     makes KVM_GET_DIRTY_LOG clear the dirty log (i.e.\n"
-+	       "     KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE is not enabled)\n"
-+	       "     and writes will be tracked as soon as dirty logging is\n"
-+	       "     enabled on the memslot (i.e. KVM_DIRTY_LOG_INITIALLY_SET\n"
-+	       "     is not enabled).\n");
-+	printf(" -b: specify the size of the memory region which should be\n"
-+	       "     dirtied by each vCPU. e.g. 10M or 3G.\n"
-+	       "     (default: 1G)\n");
-+	backing_src_help("-s");
-+	puts("");
-+	exit(0);
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	struct test_params p = {
-+		.backing_src = VM_MEM_SRC_ANONYMOUS_HUGETLB,
-+	};
-+	int opt;
-+
-+	TEST_REQUIRE(get_kvm_param_bool("eager_page_split"));
-+	TEST_REQUIRE(get_kvm_param_bool("tdp_mmu"));
-+
-+	dirty_log_manual_caps =
-+		kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
-+	dirty_log_manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
-+				  KVM_DIRTY_LOG_INITIALLY_SET);
-+
-+	guest_modes_append_default();
-+
-+	while ((opt = getopt(argc, argv, "b:ghs:")) != -1) {
-+		switch (opt) {
-+		case 'b':
-+			guest_percpu_mem_size = parse_size(optarg);
-+			break;
-+		case 'g':
-+			dirty_log_manual_caps = 0;
-+			break;
-+		case 'h':
-+			help(argv[0]);
-+			break;
-+		case 's':
-+			p.backing_src = parse_backing_src_type(optarg);
-+			break;
-+		default:
-+			help(argv[0]);
-+			break;
-+		}
-+	}
-+
-+	if (!is_backing_src_hugetlb(p.backing_src)) {
-+		pr_info("This test will only work reliably with HugeTLB memory. "
-+			"It can work with THP, but that is best effort.");
-+		return KSFT_SKIP;
-+	}
-+
-+	run_test(&p);
-+
-+	return 0;
-+}
--- 
-2.39.1.405.gd4c25cc71f-goog
-
+>
+> > On Thu, Jan 19, 2023 at 12:39 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > Please provide cover letters for multi-patch series, regardless of how trivial
+> > > the series is.
+> > >
+> > > This series especially needs a cover explaining why it's tagged "RFC".
