@@ -2,154 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3952067441C
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 22:13:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C1FEF674428
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 22:18:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229674AbjASVNU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 16:13:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35168 "EHLO
+        id S229853AbjASVSC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 16:18:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229789AbjASVMm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 16:12:42 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C8A83E8;
-        Thu, 19 Jan 2023 13:07:35 -0800 (PST)
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30JJxKIU011215;
-        Thu, 19 Jan 2023 21:06:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=L+X3DXDCuhVM9Vcsx9GYVQBzF5Z+vgs3gSmPdnHr2hw=;
- b=p3ieh/FaVtY+yP8csbVHBjzEcOy+8MUCW0+AOCbq5+i+RezI7/HqBUho6f65la+joePE
- RZnmU3gEfPSWbnK/Br4zjjDKKrgFM9p18OV7nKqhU0Q9eJSx0Zr/ijAqjA5/L1QKd8bB
- jyK8EiLxAFckz2d0GE7P2Kxr+HtN5qjJMl/GeVzC4b/HCHDKOUVE2WAVJVXbHW1VtyQQ
- ztcEHgjl7V57MXf0Zx1rNh//8YUKjnvjUfldLbt2n+3AO0IIqT8Va8ccNJO2ni15MnPT
- MJ4nLEmfy+kpvWJoXeRkI8eIw96Rilkp6E8PmfM0e4AyjE10TOHkzoHLULxMjJT5n/gx +g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7cgm1ey9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 21:06:41 +0000
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30JKtsN1011348;
-        Thu, 19 Jan 2023 21:06:41 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7cgm1exh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 21:06:40 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30JItQhe024166;
-        Thu, 19 Jan 2023 21:06:39 GMT
-Received: from smtprelay01.wdc07v.mail.ibm.com ([9.208.129.119])
-        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3n3m17xf3p-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Jan 2023 21:06:39 +0000
-Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
-        by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30JL6bxp38208052
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Jan 2023 21:06:37 GMT
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A42C55805D;
-        Thu, 19 Jan 2023 21:06:37 +0000 (GMT)
-Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 44BCC58043;
-        Thu, 19 Jan 2023 21:06:28 +0000 (GMT)
-Received: from [9.160.127.29] (unknown [9.160.127.29])
-        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Jan 2023 21:06:28 +0000 (GMT)
-Message-ID: <52e31e39-e384-3c5e-307c-652926275099@linux.ibm.com>
-Date:   Thu, 19 Jan 2023 23:06:25 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH RFC v7 52/64] KVM: SVM: Provide support for
- SNP_GUEST_REQUEST NAE event
-Content-Language: en-US
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>,
-        Dionna Amalie Glaze <dionnaglaze@google.com>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        tobin@ibm.com, bp@alien8.de, vbabka@suse.cz, kirill@shutemov.name,
-        ak@linux.intel.com, tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Dov Murik <dovmurik@linux.ibm.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-53-michael.roth@amd.com>
- <CAAH4kHYoWtM=Xe0kgmtKw01-45DefEikdLz0qUJRRMLdZHzkwA@mail.gmail.com>
- <e75569a8-6b15-780c-a7fa-945f1cce576c@amd.com>
-From:   Dov Murik <dovmurik@linux.ibm.com>
-In-Reply-To: <e75569a8-6b15-780c-a7fa-945f1cce576c@amd.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: VbAr4XuiHnxpbti04kJMcSjCudXmouKI
-X-Proofpoint-GUID: 4DLi_8nYQcJkqJ4G3xq-1WEWs9LXQnQG
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S229782AbjASVR3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 16:17:29 -0500
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4354DBE8;
+        Thu, 19 Jan 2023 13:12:34 -0800 (PST)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1674162752;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rRUXLP0p0WQ+Qd4xVEuRKMl25ggID9YoYcEY3DCIiik=;
+        b=mdQ7CD0wRJvfaZDOr0f82Dc4967iwC75I1+s5lDCu1fHHwtrp+IBba8UPSoQ/va3j4Qar2
+        ATGu2nZLLKa0vJ8CheBHLvt0I89xHSG06ZUusQKDPY104va7qqUjwYfiuIUukk+LaqO7Gu
+        N+aHnCbtSnW+e8Smx0L+A2DiKy1AOSyLQ5QGRIN4vgJHVE1sRkt9jT/0k9LahiDV7T+AiK
+        jKmIL8dmtVDNgeoMh+UAXcZ37mv49o4hNCz9KdPCGAyDUP9ZfpqnymsWZ0f3dG4LxhFiyw
+        RTndkgdz2BKS/FhRmtxFB9hP9YbenuT2IOAVALIMh4inh4bZRqxisS45FivGfA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1674162752;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=rRUXLP0p0WQ+Qd4xVEuRKMl25ggID9YoYcEY3DCIiik=;
+        b=0BJ5w/p0x778LsQ1MznxzGrIdB3OE1QGABAUfN3vpOmJUgdDINUgQsr9tLqZGxSzWuC+ct
+        ivl26is4VR39BBBw==
+To:     Igor Mammedov <imammedo@redhat.com>,
+        "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
+Cc:     linux-kernel@vger.kernel.org, amakhalov@vmware.com,
+        ganb@vmware.com, ankitja@vmware.com, bordoloih@vmware.com,
+        keerthanak@vmware.com, blamoreaux@vmware.com, namit@vmware.com,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        Wyes Karny <wyes.karny@amd.com>,
+        Lewis Caroll <lewis.carroll@amd.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Juergen Gross <jgross@suse.com>, x86@kernel.org,
+        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v2] x86/hotplug: Do not put offline vCPUs in mwait idle
+ state
+In-Reply-To: <20230116155526.05d37ff9@imammedo.users.ipa.redhat.com>
+References: <20230116060134.80259-1-srivatsa@csail.mit.edu>
+ <20230116155526.05d37ff9@imammedo.users.ipa.redhat.com>
+Date:   Thu, 19 Jan 2023 22:12:31 +0100
+Message-ID: <87bkmui5z4.ffs@tglx>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-19_13,2023-01-19_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 phishscore=0 adultscore=0 mlxscore=0 suspectscore=0
- mlxlogscore=892 spamscore=0 bulkscore=0 impostorscore=0 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301190176
-X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,NORMAL_HTTP_TO_IP,
-        NUMERIC_HTTP_ADDR,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jan 16 2023 at 15:55, Igor Mammedov wrote:
+> "Srivatsa S. Bhat" <srivatsa@csail.mit.edu> wrote:
+>> Fix this by preventing the use of mwait idle state in the vCPU offline
+>> play_dead() path for any hypervisor, even if mwait support is
+>> available.
+>
+> if mwait is enabled, it's very likely guest to have cpuidle
+> enabled and using the same mwait as well. So exiting early from
+>  mwait_play_dead(), might just punt workflow down:
+>   native_play_dead()
+>         ...
+>         mwait_play_dead();
+>         if (cpuidle_play_dead())   <- possible mwait here                                              
+>                 hlt_play_dead(); 
+>
+> and it will end up in mwait again and only if that fails
+> it will go HLT route and maybe transition to VMM.
+
+Good point.
+
+> Instead of workaround on guest side,
+> shouldn't hypervisor force VMEXIT on being uplugged vCPU when it's
+> actually hot-unplugging vCPU? (ex: QEMU kicks vCPU out from guest
+> context when it is removing vCPU, among other things)
+
+For a pure guest side CPU unplug operation:
+
+    guest$ echo 0 >/sys/devices/system/cpu/cpu$N/online
+
+the hypervisor is not involved at all. The vCPU is not removed in that
+case.
+
+So to ensure that this ends up in HLT something like the below is
+required.
+
+Note, the removal of the comment after mwait_play_dead() is intentional
+because the comment is completely bogus. Not having MWAIT is not a
+failure. But that wants to be a seperate patch.
+
+Thanks,
+
+        tglx
+---        
+diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+index 55cad72715d9..3f1f20f71ec5 100644
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -1833,7 +1833,10 @@ void native_play_dead(void)
+ 	play_dead_common();
+ 	tboot_shutdown(TB_SHUTDOWN_WFS);
+ 
+-	mwait_play_dead();	/* Only returns on failure */
++	if (this_cpu_has(X86_FEATURE_HYPERVISOR))
++		hlt_play_dead();
++
++	mwait_play_dead();
+ 	if (cpuidle_play_dead())
+ 		hlt_play_dead();
+ }
 
 
-On 19/01/2023 22:54, Kalra, Ashish wrote:
-> 
-> On 1/19/2023 2:35 PM, Dionna Amalie Glaze wrote:
->>> +
->>> +static void snp_handle_guest_request(struct vcpu_svm *svm, gpa_t
->>> req_gpa, gpa_t resp_gpa)
->>> +{
->>
->> Both regular,
->>
->>> +
->>> +static void snp_handle_ext_guest_request(struct vcpu_svm *svm, gpa_t
->>> req_gpa, gpa_t resp_gpa)
->>> +{
->>
->> and extended guest requests should be subject to rate limiting, since
->> they take a lock on the shared resource that is the AMD-SP (psp?). I
->> proposed a mechanism with empirically chosen defaults in
->>
->> [PATCH v2 0/2] kvm: sev: Add SNP guest request throttling
->> [PATCH v2 1/2] kvm: sev: Add SEV-SNP guest request throttling
->> [PATCH v2 2/2] kvm: sev: If ccp is busy, report throttled to guest
->>
->> http://129.79.113.48/hypermail/linux/kernel/2211.2/03107.html
->> http://129.79.113.48/hypermail/linux/kernel/2211.2/03110.html
->> http://129.79.113.48/hypermail/linux/kernel/2211.2/03111.html
->>
->> But I don't see these on lore. Would you like me to repost these?
->>
-> 
-> Yes, please.
-> 
-
-I think it's this series:
-
-https://lore.kernel.org/all/20221117181127.1859634-1-dionnaglaze@google.com/
-
--Dov
+  
