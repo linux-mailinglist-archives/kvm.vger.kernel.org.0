@@ -2,44 +2,91 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CFE467374E
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 12:47:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E2FA673776
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 12:52:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230421AbjASLrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 06:47:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53472 "EHLO
+        id S230412AbjASLwr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 06:52:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230514AbjASLqx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 06:46:53 -0500
-Received: from out-22.mta0.migadu.com (out-22.mta0.migadu.com [91.218.175.22])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3593B4ABFD
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 03:46:33 -0800 (PST)
-Date:   Thu, 19 Jan 2023 12:46:24 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1674128791;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=aQ2IUhUvzSbVHZgw7YwuEUz0bDmpBiwVacUuCwfatnM=;
-        b=P13bpELiKcp6tuNoqxMXyevckgunBxS+KULhI7xbIUeO7mEHSThZEDrKVp2tsCVkD15De8
-        pu0dGcN02H++iosj2jVUBB57elUB44TQbSlXDDutZ937MVI0JLwUt4jhbF2yPWmAxbclw0
-        xcvlvpBHdqAIywVYcZdxZdjKVkKpp8E=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v4 1/2] arm/psci: Test that CPU 1 has been
- successfully brought online
-Message-ID: <20230119114624.5dzzwfueudvuyp5q@orel>
-References: <20230118144912.32049-1-alexandru.elisei@arm.com>
- <20230118144912.32049-2-alexandru.elisei@arm.com>
+        with ESMTP id S231132AbjASLwn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 06:52:43 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0AE91ABEF
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 03:52:38 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30JAosCp019465
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:52:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : in-reply-to : references : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=F9ULwSTreMvIivJ6DIQUMEmGYlOuOThq0NLGhXj//kU=;
+ b=E9a9uDj8v9xDP6LPEY0siuB2HzVdlfb3r4T52jLVCvNHXR41muqOxcaHKFufY9fw/0vu
+ rvxseRyHr3eY7jsg9FjHF4kSx1HTqu7ChY1EdQRzOLP46aamxmCOBBL/zt+eEX1ZCwcM
+ Z1YgCTeBekAOQknLpIh8kGveYHuwHeTxYoFYJz3R16uNl9rMMNVRYj+O/Kve7yufJaO1
+ pi53/i1GpHhEU1BNm1ob+tsHE1O1uQAtU+JiKKbXaWmGoyR3Uce4b2bL1ZxszWkCFZWL
+ NRxOI+bo4+U4K1AJ2VsT7pGPYL7S4N8Ei4/2dKnh3c4TMhA7SOZWslP84eEI/21pAmmI Xg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n74f89d4t-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:52:37 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30JBeDPS025640
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 11:52:37 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n74f89d44-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Jan 2023 11:52:37 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+        by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30J1BZNA017966;
+        Thu, 19 Jan 2023 11:52:35 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3n3m16mttx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 19 Jan 2023 11:52:35 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30JBqV7J47186356
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 19 Jan 2023 11:52:31 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 551FE2004B;
+        Thu, 19 Jan 2023 11:52:31 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C582A20043;
+        Thu, 19 Jan 2023 11:52:30 +0000 (GMT)
+Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.91.27])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Thu, 19 Jan 2023 11:52:30 +0000 (GMT)
+From:   "Marc Hartmayer" <mhartmay@linux.ibm.com>
+To:     kvm@vger.kernel.org
+Cc:     Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v2 5/8] s390x: use C pre-processor for
+ linker script generation
+In-Reply-To: <20230119114045.34553-6-mhartmay@linux.ibm.com>
+References: <20230119114045.34553-1-mhartmay@linux.ibm.com>
+ <20230119114045.34553-6-mhartmay@linux.ibm.com>
+Date:   Thu, 19 Jan 2023 12:52:30 +0100
+Message-ID: <87sfg6vj0h.fsf@li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230118144912.32049-2-alexandru.elisei@arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: CLnxCSOkD3KoMz2fNlIKLNfWjlOWPDKV
+X-Proofpoint-ORIG-GUID: _aqFJ-kfz79QEoofxmCku1pA4R-xo_2R
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-19_09,2023-01-19_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ suspectscore=0 malwarescore=0 spamscore=0 priorityscore=1501 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 mlxlogscore=823 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2301190091
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -47,214 +94,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 18, 2023 at 02:49:11PM +0000, Alexandru Elisei wrote:
-> For the PSCI CPU_ON function test, all other CPUs perform a CPU_ON call
-> that target CPU 1. The test is considered a success if CPU_ON returns PSCI
-> SUCCESS exactly once, and for the rest of the calls PSCI ALREADY_ON.
-> 
-> Enhance the test by checking that CPU 1 is actually online and able to
-> execute code. Also make the test more robust by checking that the CPU_ON
-> call returns, instead of assuming that it will always succeed and
-> hanging indefinitely if it doesn't.
-> 
-> Since the CPU 1 thread is now being set up properly by kvm-unit-tests
-> when being brought online, it becomes possible to add other tests in the
-> future that require all CPUs.
-> 
-> The include header order in arm/psci.c has been changed to be in
-> alphabetic order. This means moving the errata.h include before
-> libcflat.h, which causes compilation to fail because of missing includes
-> in errata.h. Fix that also by including the needed header in errata.h.
-> 
-> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> ---
->  arm/psci.c        | 60 ++++++++++++++++++++++++++++++++++++-----------
->  lib/arm/asm/smp.h |  1 +
->  lib/arm/smp.c     | 12 +++++++---
->  lib/errata.h      |  2 ++
->  4 files changed, 58 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arm/psci.c b/arm/psci.c
-> index efa0722c0566..e96be941953b 100644
-> --- a/arm/psci.c
-> +++ b/arm/psci.c
-> @@ -7,11 +7,13 @@
->   *
->   * This work is licensed under the terms of the GNU LGPL, version 2.
->   */
-> -#include <libcflat.h>
->  #include <errata.h>
-> +#include <libcflat.h>
-> +
-> +#include <asm/delay.h>
->  #include <asm/processor.h>
-> -#include <asm/smp.h>
->  #include <asm/psci.h>
-> +#include <asm/smp.h>
->  
->  static bool invalid_function_exception;
->  
-> @@ -72,14 +74,23 @@ static int cpu_on_ret[NR_CPUS];
->  static cpumask_t cpu_on_ready, cpu_on_done;
->  static volatile int cpu_on_start;
->  
-> -static void cpu_on_secondary_entry(void)
-> +extern void secondary_entry(void);
-> +static void cpu_on_do_wake_target(void)
->  {
->  	int cpu = smp_processor_id();
->  
->  	cpumask_set_cpu(cpu, &cpu_on_ready);
->  	while (!cpu_on_start)
->  		cpu_relax();
-> -	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(halt));
-> +	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(secondary_entry));
-> +	cpumask_set_cpu(cpu, &cpu_on_done);
-> +}
-> +
-> +static void cpu_on_target(void)
-> +{
-> +	int cpu = smp_processor_id();
-> +
-> +	cpu_on_ret[cpu] = PSCI_RET_ALREADY_ON;
->  	cpumask_set_cpu(cpu, &cpu_on_done);
->  }
->  
-> @@ -87,33 +98,53 @@ static bool psci_cpu_on_test(void)
->  {
->  	bool failed = false;
->  	int ret_success = 0;
-> -	int cpu;
-> -
-> -	cpumask_set_cpu(1, &cpu_on_ready);
-> -	cpumask_set_cpu(1, &cpu_on_done);
-> +	int i, cpu;
->  
->  	for_each_present_cpu(cpu) {
->  		if (cpu < 2)
->  			continue;
-> -		smp_boot_secondary(cpu, cpu_on_secondary_entry);
-> +		smp_boot_secondary(cpu, cpu_on_do_wake_target);
->  	}
->  
->  	cpumask_set_cpu(0, &cpu_on_ready);
-> +	cpumask_set_cpu(1, &cpu_on_ready);
->  	while (!cpumask_full(&cpu_on_ready))
->  		cpu_relax();
->  
-> +	/*
-> +	 * Wait for all other CPUs to be online before configuring the thread
-> +	 * for the target CPU, as all secondaries are set up using the same
-> +	 * global variable.
-> +	 */
-> +	smp_prepare_secondary(1, cpu_on_target);
-> +
->  	cpu_on_start = 1;
->  	smp_mb();
->  
-> -	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(halt));
-> +	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(secondary_entry));
->  	cpumask_set_cpu(0, &cpu_on_done);
->  
-> -	while (!cpumask_full(&cpu_on_done))
-> -		cpu_relax();
-> +	report_info("waiting for CPU1 to come online...");
-> +	for (i = 0; i < 10; i++) {
-> +		mdelay(100);
+Marc Hartmayer <mhartmay@linux.ibm.com> writes:
 
-Changing this to
+> Use the C pre-processor for the linker script generation. For example,
+> this enables us the use of constants in the "linker scripts" `*.lds.S`.
+>
 
-     for (i = 0; i < 100; i++) {
-             mdelay(10);
+Sorry, I forgot to change the commit message (Claudio=E2=80=99s comment):
 
-may speed it up a bit.
+=E2=80=9Cs390x: use preprocessor for linker script generation
 
-Thanks,
-drew
+The old `.lds` linker scripts are renamed to `.lds.S` and the actual
+.lds` scripts are generated by the assembler preprocessor. This change
+allows us to use constants defined by macros in the `.lds.S` files.=E2=80=9D
 
-> +		if (cpumask_full(&cpu_on_done))
-> +			break;
-> +	}
-> +
-> +	if (!cpumask_full(&cpu_on_done)) {
-> +		for_each_present_cpu(cpu) {
-> +			if (!cpumask_test_cpu(cpu, &cpu_on_done)) {
-> +				if (cpu == 1)
-> +					report_info("CPU1 failed to come online");
-> +				else
-> +					report_info("CPU%d failed to online CPU1", cpu);
-> +			}
-> +		}
-> +		failed = true;
-> +		goto out;
-> +	}
->  
->  	for_each_present_cpu(cpu) {
-> -		if (cpu == 1)
-> -			continue;
->  		if (cpu_on_ret[cpu] == PSCI_RET_SUCCESS) {
->  			ret_success++;
->  		} else if (cpu_on_ret[cpu] != PSCI_RET_ALREADY_ON) {
-> @@ -127,6 +158,7 @@ static bool psci_cpu_on_test(void)
->  		failed = true;
->  	}
->  
-> +out:
->  	return !failed;
->  }
->  
-> diff --git a/lib/arm/asm/smp.h b/lib/arm/asm/smp.h
-> index 077afde85520..ff2ef8f88247 100644
-> --- a/lib/arm/asm/smp.h
-> +++ b/lib/arm/asm/smp.h
-> @@ -49,6 +49,7 @@ static inline void set_cpu_idle(int cpu, bool idle)
->  }
->  
->  typedef void (*secondary_entry_fn)(void);
-> +extern void smp_prepare_secondary(int cpu, secondary_entry_fn entry);
->  extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
->  extern void on_cpu_async(int cpu, void (*func)(void *data), void *data);
->  extern void on_cpu(int cpu, void (*func)(void *data), void *data);
-> diff --git a/lib/arm/smp.c b/lib/arm/smp.c
-> index 98a5054e039b..947f417f4aea 100644
-> --- a/lib/arm/smp.c
-> +++ b/lib/arm/smp.c
-> @@ -58,13 +58,19 @@ secondary_entry_fn secondary_cinit(void)
->  	return entry;
->  }
->  
-> -static void __smp_boot_secondary(int cpu, secondary_entry_fn entry)
-> +void smp_prepare_secondary(int cpu, secondary_entry_fn entry)
->  {
-> -	int ret;
-> -
->  	secondary_data.stack = thread_stack_alloc();
->  	secondary_data.entry = entry;
->  	mmu_mark_disabled(cpu);
-> +}
-> +
-> +static void __smp_boot_secondary(int cpu, secondary_entry_fn entry)
-> +{
-> +	int ret;
-> +
-> +	smp_prepare_secondary(cpu, entry);
-> +
->  	ret = cpu_psci_cpu_boot(cpu);
->  	assert(ret == 0);
->  
-> diff --git a/lib/errata.h b/lib/errata.h
-> index 5af0eb3bf8e2..de8205d8b370 100644
-> --- a/lib/errata.h
-> +++ b/lib/errata.h
-> @@ -6,6 +6,8 @@
->   */
->  #ifndef _ERRATA_H_
->  #define _ERRATA_H_
-> +#include <libcflat.h>
-> +
->  #include "config.h"
->  
->  #ifndef CONFIG_ERRATA_FORCE
-> -- 
-> 2.25.1
-> 
+--=20
+Kind regards / Beste Gr=C3=BC=C3=9Fe
+   Marc Hartmayer
+
+IBM Deutschland Research & Development GmbH
+Vorsitzender des Aufsichtsrats: Gregor Pillen=20
+Gesch=C3=A4ftsf=C3=BChrung: David Faller
+Sitz der Gesellschaft: B=C3=B6blingen
+Registergericht: Amtsgericht Stuttgart, HRB 243294
