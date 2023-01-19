@@ -2,67 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1D203674400
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 22:10:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 94834674408
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 22:11:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbjASVKd (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 16:10:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58378 "EHLO
+        id S230168AbjASVLA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 16:11:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230032AbjASVJd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 16:09:33 -0500
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58B90A1037
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:02:57 -0800 (PST)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-4fb212e68b7so24869767b3.0
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:02:57 -0800 (PST)
+        with ESMTP id S230045AbjASVJj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 16:09:39 -0500
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A46945BFD
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:03:17 -0800 (PST)
+Received: by mail-pf1-x449.google.com with SMTP id j1-20020aa78001000000b0057d28e11cb6so1431222pfi.11
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 13:03:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=scpZoOFWPDXUVrlHPKgK5QZ1SbAZUb5y22SB5Of5htE=;
-        b=W6sWGyehGPZsspIZx2IM5SMylimpyKjrgNPTzzEoSl3NUzlfZH9FSJeFXrln2mUPph
-         CJEZMcp3Vbx3zx0i7aqbTjei/I4rV+kCUJJwQQRUpShtslHOxlTsLW9E0l/ohVtp+2qV
-         9siwTLYvZ2Vzb/T5ujr3AiPU9a4gKd8GHX72+TjU8xH1Kjaj/Gx8KXRrjyOXp0iDeNU7
-         cREeSZ6AQYADhL6rvL3nv+QjSbyNtOwBywztxzUAd10O9ny3v5Mj8LisX5kiDLd6p8Pw
-         DO6Ic8pO2q2QgCGEJJxX7khKFDswKyptsogbEJoCtR/w6WpMhq8mpeae4FQ9edfLKR2K
-         1Jug==
+        bh=glbcvlue13ghg8fH4Z2hVVePF8XkK30IUFyxhvitmoc=;
+        b=PoXkJxhppYvejc4Ue5Kc7MilB4VjNe0O2Q0ydftnFLHGPH5qza5QOyQ+nErDMZMEhO
+         10ySBbjw7rOKoIG40umUCJGf/ssh0chMeMUYZx1zdO7XqiCqWgSajk1LU9cudVUVJgCV
+         rN7u6HshPw+tV4pywNF9ynJSwbNCEpCtF6WYbESqDbOp/nVbM4XGhJe0iUJwQqpxxWmg
+         PVng0ViS+2JcheS7/jTEGs/p6sqRpDwVxE2G8FQwzbvReXaheObm8BTmoDptSo59Pplf
+         tNhWeyaS8bI/iubs7JsyXzDGgrLtNNq2kN0EWSnt7V3zv3u7Mwn0Bz1dFCJnj/mB3Qmq
+         5wMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=scpZoOFWPDXUVrlHPKgK5QZ1SbAZUb5y22SB5Of5htE=;
-        b=gfmCfHhuybxnAlqwhdYJHFhDLCN4r4APhTl+qiqe3I2TAbia0kw6v95tOgyfyJtNuK
-         TUej8/zywl3tk3RbMiEeoHMreGeH/zuBiRnJWPfkP8VL3K+4Qr2sCGf3VdwEQ+zhfHxM
-         Vcf9OtIy2xA2TH6HMo4D+/n3cY5lqJY8jcp3KqQsqb5BTPQRr/5JuKGP6ctNHDnQX/Dv
-         /fSeG7F4jnRHJbKs/epnCxWYBuXUzjYOoO/YgGcavEXh/5UD5t+qFUneR3J4zaYa44dN
-         ga4m5FCDrsTAVYpwuMmCvDmEqk/+gYfjH0BDd71rh2SNEyLSqibyGbX/6DLDyk35C/n8
-         iakg==
-X-Gm-Message-State: AFqh2ko21kLq9JcdivpPe7RpmtPGEiA36CRpwsXUo8tCcBPydRyHku2v
-        lhnRKvz/ZOoen3MpaG2mfvdRoMo5nU0=
-X-Google-Smtp-Source: AMrXdXsE32CWcwVxtHXXLXVs0hIW1J0kAMsXcmb72zVb8TZvSzCoV2nQAMqH0gfE4ILu2Nv8as3dQ5QULdA=
+        bh=glbcvlue13ghg8fH4Z2hVVePF8XkK30IUFyxhvitmoc=;
+        b=P/U6KI0La7/8HBd0kBR+sDXIe2KhQzkYM6h8kDm6e2BvDL9lvk1FQcPIGgzFNqecYp
+         WkgSE0w7EoCmzQBecZJFFU5uXySIUhFVnp/LlqlzCxETyLsqlbSBgnlCAT0vX5YTCcPA
+         w6gdmFHzfPVu908ZGZf8Uh+aGeKZly23YvO5ImXu1MLnxOr9vbt5PE4JJyztjuIk9Jn9
+         CIhLTg1WulQDoK59TZEZYLjsSFenoMyuhFAsjjdMb5I5rlePh4nOPbUWR6ZhAf7TjmxK
+         kejBuPtQ2ypj0UiBrMeaHhvZD5X/Eap7ERXtaM1IS9aKEQFWThe657DKRN4ptBYbt9ks
+         rPNg==
+X-Gm-Message-State: AFqh2kqSF+LK+tyBhKuT2Ppurp3DUi2y0/3Hiv5PIr1RaZvl65T14Y2e
+        ZSEaQKfIycXX0H+TLufa9VsBXORX+Rg=
+X-Google-Smtp-Source: AMrXdXtKOslrToo7TAuCDXajwguTTYg1prZsZVT+iQMyKdzJjwkv6ixxJ+CKpxPj/6laEFevvcX8IYNVsec=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:c183:0:b0:7b9:3ca:612f with SMTP id
- r125-20020a25c183000000b007b903ca612fmr1026905ybf.23.1674162176229; Thu, 19
- Jan 2023 13:02:56 -0800 (PST)
-Date:   Thu, 19 Jan 2023 21:01:27 +0000
-In-Reply-To: <202212191432274558936@zte.com.cn>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3006:b0:583:69e8:e6d with SMTP id
+ ay6-20020a056a00300600b0058369e80e6dmr1061373pfb.16.1674162197086; Thu, 19
+ Jan 2023 13:03:17 -0800 (PST)
+Date:   Thu, 19 Jan 2023 21:03:09 +0000
+In-Reply-To: <20230113220923.2834699-1-aghulati@google.com>
 Mime-Version: 1.0
-References: <202212191432274558936@zte.com.cn>
+References: <20230113220923.2834699-1-aghulati@google.com>
 X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
-Message-ID: <167409107087.2376475.13987745798229035037.b4-ty@google.com>
-Subject: Re: [PATCH linux-next] KVM: x86/xen: Remove unneeded semicolon
+Message-ID: <167409058943.2374162.15945588703835553093.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: SVM: Account scratch allocations used to decrypt SEV
+ guest memory
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com,
-        zhang.songyi@zte.com.cn
-Cc:     shuah@kernel.org, dwmw@amazon.co.uk, paul@xen.org,
-        like.xu.linux@gmail.com, coltonlewis@google.com, mhal@rbox.co,
-        kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Anish Ghulati <aghulati@google.com>
+Cc:     kvm@vger.kernel.org, Mingwei Zhang <mizhang@google.com>
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,15 +69,17 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 19 Dec 2022 14:32:27 +0800, zhang.songyi@zte.com.cn wrote:
-> The semicolon after the "}" is unneeded.
+On Fri, 13 Jan 2023 22:09:23 +0000, Anish Ghulati wrote:
+> Account the temp/scratch allocation used to decrypt unaligned debug
+> accesses to SEV guest memory, the allocation is very much tied to the
+> target VM.
 > 
 > 
 
-Applied to kvm-x86 selftests, thanks!
+Applied to kvm-x86 svm, thanks!
 
-[1/1] KVM: x86/xen: Remove unneeded semicolon
-      https://github.com/kvm-x86/linux/commit/c3d538f9145c
+[1/1] KVM: SVM: Account scratch allocations used to decrypt SEV guest memory
+      https://github.com/kvm-x86/linux/commit/e78dfc2b6ff0
 
 --
 https://github.com/kvm-x86/linux/tree/next
