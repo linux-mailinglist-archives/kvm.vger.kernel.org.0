@@ -2,78 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10C28673D50
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 16:19:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BDC75673D6F
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 16:25:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230383AbjASPT2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 10:19:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56390 "EHLO
+        id S229686AbjASPZU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 10:25:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229958AbjASPTZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 10:19:25 -0500
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B0B82D41
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 07:19:24 -0800 (PST)
-Received: by mail-pg1-x534.google.com with SMTP id r18so1744813pgr.12
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 07:19:24 -0800 (PST)
+        with ESMTP id S230153AbjASPZP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 10:25:15 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F4BC81002
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 07:25:13 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id j2-20020a17090aeb0200b00229f914fdcbso515394pjz.3
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 07:25:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=COC0cQf3RM+28HjrZuFfI8U9iEnmOUqpakV5+y8hXro=;
-        b=iYhnq31FqaCsdLQsRmrrrSLPknKuzg5EDi5FnG0XJsMCKleZzOOmIahMB3jDftuROY
-         H59Ix3pMjUGC32cz0psGxHXSEcTHd8pi8Qrq+kL8J6jfZ8xhUtDMh+Tzue4FsbiOkW3y
-         URS8YujQKNW9cPaYrDJPmzT15CUqXfqdqGhoCrQgkaPR9Ed8OGrN+9NyH3H7m/5QBEWV
-         hIkBu9SKzujHSZQFK9WfBMq0uvlOQq4I2fvhIczyLYxMGFewOAWWJfkfA27Q1PUGyPZi
-         3iQ2BSwglss6M0QPQ5mSnVR3fNPSvjfiFE54E9yOscLqQ2KH5BZGDbWYFbMsy5huTIVf
-         XMJQ==
+        bh=u3x+gqjTmgbestDAk4Awmq54vOdmydIW5Pid7KApIj0=;
+        b=mBCVF1D4CCb5Ux/a0sTklFD5Mi8L9pIXDGbMCkJlimD4PHSACap2p25+kVgwBgrsIq
+         EvdnQ1DJdyozyD6i/NGQ9LHUxMYOj57ZDAvsSBtrXrWSIG9rE81ZQPLMflUW9tlr3kaQ
+         W5HhRhzDrOZXVo2eJJX+pBBPi5F1VgqXmlz+Dn+5py/XCqnPsdSKBwTESeGVpPIz964i
+         Y7hB+IGNBYCrP1QuYyMwMmClI1OOCW3cnNMzXyQEA2j3fMpJV5G+s3nKt4FHhRG/KAkL
+         4FVfZGb2GwNGLwVQhykEPhQCdeJbS7eHn+w6UX0yqcdlwsdurSpSSE/duLw9iP7/BBnl
+         1UDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=COC0cQf3RM+28HjrZuFfI8U9iEnmOUqpakV5+y8hXro=;
-        b=oFafH28nTod7u9rTkf2JJhwqDauEHErFAcRVneRZYtGHwJwFqsSmiCw8nWQchFYe7D
-         jj7SbN1MSElNXJsn+1cb34xJFtD5aoYj1vaVAO1WQFmzdSMAuwnj/Nmn+DwFXntYAz+B
-         zT67eSN6nWscnWjs+bQNAJdAgjBJaPYpYBhSlcXFb5655xsdwQOVF1Uco4PLOwgICxaJ
-         Wz24y4OlpsugfS804oaZhx1phDXtGYprVxK6st6Ox4ot+hHTDAMlSOjs4yxWaNztYHrW
-         V1ejOBIdpYAr9puzBYvLj6KHtH6jVVsZJMwbUrcBZ3uIkTxxI4rOp7ioTb1S6LoQuHIq
-         ohWA==
-X-Gm-Message-State: AFqh2kpyboL6oV93hQgYIg+fdhMB2sYJxloNLKP4rsdFpUej9o0QQfM0
-        xcDgcvgwJRfy2u/8MjOEDY0qXg==
-X-Google-Smtp-Source: AMrXdXsUJCiHv+x8er4RQjqeSGm7p768nE4Z3fEvWZooodpyJRG2iLwFsWL/7iAU6pOKxpq0PgMGhQ==
-X-Received: by 2002:aa7:9041:0:b0:58b:cb1b:978f with SMTP id n1-20020aa79041000000b0058bcb1b978fmr1888929pfo.1.1674141562945;
-        Thu, 19 Jan 2023 07:19:22 -0800 (PST)
+        bh=u3x+gqjTmgbestDAk4Awmq54vOdmydIW5Pid7KApIj0=;
+        b=bEe9E9d7MO4urm85nRttPYNsjAlVtBtp3/cbwny1lCGZ1pn9WfIeJ/eAHQ4dIkgy+m
+         7nGxUDvzvwvbyofSPrMsG1qqlV73PVVEdKsqElJvj5IGLfl8itHW5ExfTHd+OklkeD/e
+         iT/usEhhGZEVVLmoUcs4MJDyOdPqHqX6BH2wyG6Nlr72xfLvjrrtUszWGu8hAJB6KJFE
+         VBf22kyQssGmnPyOQwneERUSN5z2uvOilUDioMwCxcQ4q8s+AB/ME8CKLK6WHW3UBlSN
+         TvvJM31nbZf7JJ4cJ/x4QVPDt0SuTVtAskiTIxVwuWLnfBOg+sNOuJ8pHngMy3qcONsK
+         jawg==
+X-Gm-Message-State: AFqh2kpuMYX8tqCdHMRqrXFMIdxqvlSfe4hQp0FJ+KeSiL1fEKI/SjC6
+        CgZ4F7zIk11/aFbI7d/QMg4x3ILcofo6dqkj
+X-Google-Smtp-Source: AMrXdXuFbwGpoS/BOsR3GLdQjSETsa46BfhBRwIB416u+GXbq71Q0+uUKVzOwXl/a9TU4tZ66S2N/Q==
+X-Received: by 2002:a05:6a20:ce43:b0:b8:c3c0:e7f7 with SMTP id id3-20020a056a20ce4300b000b8c3c0e7f7mr1187627pzb.1.1674141912349;
+        Thu, 19 Jan 2023 07:25:12 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x2-20020aa79a42000000b0058d9730ede0sm8638923pfj.210.2023.01.19.07.19.22
+        by smtp.gmail.com with ESMTPSA id z16-20020a170903019000b001945339354asm5530181plg.197.2023.01.19.07.25.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 07:19:22 -0800 (PST)
-Date:   Thu, 19 Jan 2023 15:19:18 +0000
+        Thu, 19 Jan 2023 07:25:11 -0800 (PST)
+Date:   Thu, 19 Jan 2023 15:25:08 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Gavin Shan <gshan@redhat.com>
-Cc:     kvmarm@lists.linux.dev, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        pbonzini@redhat.com, maz@kernel.org, corbet@lwn.net,
-        james.morse@arm.com, suzuki.poulose@arm.com,
-        oliver.upton@linux.dev, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, will@kernel.org, ricarkol@google.com,
-        eric.auger@redhat.com, yuzhe@nfschina.com, renzhengeek@gmail.com,
-        ardb@kernel.org, peterx@redhat.com, shan.gavin@gmail.com
-Subject: Re: [PATCH 4/4] KVM: Improve warning report in
- mark_page_dirty_in_slot()
-Message-ID: <Y8lfdgcjLvtgII2a@google.com>
-References: <20230116040405.260935-1-gshan@redhat.com>
- <20230116040405.260935-5-gshan@redhat.com>
- <Y8bBzKF17IdZP9eF@google.com>
- <d8e63ad9-e0e3-dbb1-b646-a1b5771d4c4b@redhat.com>
+To:     Isaku Yamahata <isaku.yamahata@gmail.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
+Message-ID: <Y8lg1G2lRIrI/hld@google.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <Y8H5Z3e4hZkFxAVS@google.com>
+ <20230119111308.GC2976263@ls.amr.corp.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d8e63ad9-e0e3-dbb1-b646-a1b5771d4c4b@redhat.com>
+In-Reply-To: <20230119111308.GC2976263@ls.amr.corp.intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,40 +103,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023, Gavin Shan wrote:
-> Hi Sean,
+On Thu, Jan 19, 2023, Isaku Yamahata wrote:
+> On Sat, Jan 14, 2023 at 12:37:59AM +0000,
+> Sean Christopherson <seanjc@google.com> wrote:
 > 
-> On 1/18/23 2:42 AM, Sean Christopherson wrote:
-> > On Mon, Jan 16, 2023, Gavin Shan wrote:
-> > > There are two warning reports about the dirty ring in the function.
-> > > We have the wrong assumption that the dirty ring is always enabled when
-> > > CONFIG_HAVE_KVM_DIRTY_RING is selected.
+> > On Fri, Dec 02, 2022, Chao Peng wrote:
+> > > This patch series implements KVM guest private memory for confidential
+> > > computing scenarios like Intel TDX[1]. If a TDX host accesses
+> > > TDX-protected guest memory, machine check can happen which can further
+> > > crash the running host system, this is terrible for multi-tenant
+> > > configurations. The host accesses include those from KVM userspace like
+> > > QEMU. This series addresses KVM userspace induced crash by introducing
+> > > new mm and KVM interfaces so KVM userspace can still manage guest memory
+> > > via a fd-based approach, but it can never access the guest memory
+> > > content.
+> > > 
+> > > The patch series touches both core mm and KVM code. I appreciate
+> > > Andrew/Hugh and Paolo/Sean can review and pick these patches. Any other
+> > > reviews are always welcome.
+> > >   - 01: mm change, target for mm tree
+> > >   - 02-09: KVM change, target for KVM tree
 > > 
-> > No, it's not a wrong assumption, becuase it's not an assumption.  The intent is
-> > to warn irrespective of dirty ring/log enabling.  The orignal code actually warned
-> > irrespective of dirty ring support[1], again intentionally.  The
-> > CONFIG_HAVE_KVM_DIRTY_RING check was added because s390 can mark pages dirty from
-> > an worker thread[2] and s390 has no plans to support the dirty ring.
+> > A version with all of my feedback, plus reworked versions of Vishal's selftest,
+> > is available here:
 > > 
-> > The reason for warning even if dirty ring isn't enabled is so that bots can catch
-> > potential KVM bugs without having to set up a dirty ring or enable dirty logging.
+> >   git@github.com:sean-jc/linux.git x86/upm_base_support
 > > 
-> > [1] 2efd61a608b0 ("KVM: Warn if mark_page_dirty() is called without an active vCPU")
-> > [2] e09fccb5435d ("KVM: avoid warning on s390 in mark_page_dirty")
+> > It compiles and passes the selftest, but it's otherwise barely tested.  There are
+> > a few todos (2 I think?) and many of the commits need changelogs, i.e. it's still
+> > a WIP.
 > > 
+> > As for next steps, can you (handwaving all of the TDX folks) take a look at what
+> > I pushed and see if there's anything horrifically broken, and that it still works
+> > for TDX?
+> > 
+> > Fuad (and pKVM folks) same ask for you with respect to pKVM.  Absolutely no rush
+> > (and I mean that).
+> > 
+> > On my side, the two things on my mind are (a) tests and (b) downstream dependencies
+> > (SEV and TDX).  For tests, I want to build a lists of tests that are required for
+> > merging so that the criteria for merging are clear, and so that if the list is large
+> > (haven't thought much yet), the work of writing and running tests can be distributed.
+> > 
+> > Regarding downstream dependencies, before this lands, I want to pull in all the
+> > TDX and SNP series and see how everything fits together.  Specifically, I want to
+> > make sure that we don't end up with a uAPI that necessitates ugly code, and that we
+> > don't miss an opportunity to make things simpler.  The patches in the SNP series to
+> > add "legacy" SEV support for UPM in particular made me slightly rethink some minor
+> > details.  Nothing remotely major, but something that needs attention since it'll
+> > be uAPI.
 > 
-> Thanks for the linker. I was confused when looking at the code, but now it's clear to
-> me. Thanks for your explanation. How about to add a comment there?
-> 
->   /*
->    * The warning is expected when the dirty ring is configured,
->    * but not enabled.
->    */
+> Although I'm still debuging with TDX KVM, I needed the following.
+> kvm_faultin_pfn() is called without mmu_lock held.  the race to change
+> private/shared is handled by mmu_seq.  Maybe dedicated function only for
+> kvm_faultin_pfn().
 
-That's not correct either.  By design, the warning can also fire if the dirty ring
-is enabled.  KVM's rule is that writes to guest memory always need to be done in
-the context of a running vCPU, with the recently added exception of
-kvm_arch_allow_write_without_running_vcpu().  That intent of the warning is to
-enforce that rule regardless of the state of the VM.
+Gah, you're not on the other thread where this was discussed[*].  Simply deleting
+the lockdep assertion is safe, for guest types that rely on the attributes to
+define shared vs. private, KVM rechecks the attributes under the protection of
+mmu_seq.
 
-Concretely, I think you can just drop patches 3 and 4, and just fix the arm64 issues.
+I'll get a fixed version pushed out today.
+
+[*] https://lore.kernel.org/all/Y8gpl+LwSuSgBFks@google.com
