@@ -2,67 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8C7936743A6
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 21:47:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 729996743AC
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 21:51:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229765AbjASUry (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 15:47:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47710 "EHLO
+        id S229895AbjASUu5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 15:50:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbjASUrs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 15:47:48 -0500
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23D784EE4
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:47:45 -0800 (PST)
-Received: by mail-ej1-x636.google.com with SMTP id v6so8904910ejg.6
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:47:45 -0800 (PST)
+        with ESMTP id S229818AbjASUtP (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 15:49:15 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 636C74DCC0
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:49:10 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id m7-20020a170902db0700b00194bd3c810aso1969027plx.23
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 12:49:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Auj6XCXOBwJJlVzevyyph1mYwbHw+mWksSnSvNFWQIg=;
-        b=oL1bfvLo7cVGrIodoE9TXFo/GXsYhB75CDKi5NHFRobQvCVDPdFvcqng76CFYfj7x7
-         yESJQqZs7YS/2pFaLuWLPiRv5C68yK4jt4D7RT01k7fSjCgwoFJm1A3M2mwPc4vH2qQG
-         Cgeet1dTTQrj6ajl4sWnUqbBKGUBiGhSOLFccD111UYFpk1zNdY6g0EBYzSZlLM3/vCm
-         Ef89nDDn/DMCm3CcnNS8GIVqyHz6lsrwkztEHu5YxKcjpU68JQVGy5yImv+HmAdbKDtA
-         6YrvLwAkHL/Y+vx0D26a4LjqMTAM4dkAq5j1R2zsBOptljdA6gobYq+lbGWtidFqDEqf
-         G0Hw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wig5JTFOOIWfDBvwzop4BGM09lRr5oKSEsYcvD8s+Ew=;
+        b=Vs8DgSRo/Hm2B8p+NidYLeTpa16Qehx32yLSDW0+954JaNA0GDhz6qvhQQUT1DEPSv
+         nWKZN3iXR1u7UaLbCa86kQrwxCLDIx9fj9wlnm04MLZc3oljIMhsaEs3yjKL8VyQA5Zb
+         wEj8pky06xtHcplbdRXv+EWEwi9M5SohR6TcFtxUorT2DCvd5Hb7ApTVT6zSEiaCeCo1
+         7Jg3SNa+IdEMUkPNgQ3fBqMHsnTmwNqC92XayECuvCxCNoeAeCFs7+KtoYi+B+ucRqAC
+         AZXdJ66h9Tjk9qVQavJD3uAOJm9xGS65fYo6bNL/Mp/0fJjGetB9wgq+gdooBBKpl8il
+         Le1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Auj6XCXOBwJJlVzevyyph1mYwbHw+mWksSnSvNFWQIg=;
-        b=DD4pNtI3rC/YHbH32c8H8a6zFBmWCxIFyFQeXgbBuCqWGUIwWmDUrXtNuoMbGaPB8a
-         /PP9Z3lKOZUAP453ziCMKvxwl2GRq/+M05mhEz/hdplGw1MnZ5/ImhNHUktNaRtZBxFc
-         9Kz9opTUaAsRrGX7ym8Il/qviIl0FHOVaf714hzqXVnpc9VgLuLUMUSHXTXlSgjiX11V
-         dtct98ssqm9NWj75XglbqdEM+VPJDi8XK4MRdfe9cSfv+nCpV4fU0pHRNxR/AlgflKcW
-         LrDzS58SCbcwAjy6TJrY+zQ0zglXervQZeWw5QzBulugl9gGML9xFmea02MmeYx3lmn7
-         bwjw==
-X-Gm-Message-State: AFqh2kreYOOua4BimhnBreryCmkNPlG97xAISN4axIyDlYBFrT6Woj1Q
-        Iw/W0Pl4qQUjppp5oAmJLQPh75/oUWATqDct8R+pTQ==
-X-Google-Smtp-Source: AMrXdXvcGdPvGop4M3UQ0q7VaEQzCiFuc+nu85C71F04aC54bS0mY807Xoqo4SvoTwiC5lNh34RsC9rkQ3ubzPrZXWU=
-X-Received: by 2002:a17:906:37d4:b0:854:cd76:e982 with SMTP id
- o20-20020a17090637d400b00854cd76e982mr1048141ejc.364.1674161263571; Thu, 19
- Jan 2023 12:47:43 -0800 (PST)
-MIME-Version: 1.0
-References: <20230119200553.3922206-1-bgardon@google.com> <Y8mqd7HUzXDnhXLV@google.com>
-In-Reply-To: <Y8mqd7HUzXDnhXLV@google.com>
-From:   Ben Gardon <bgardon@google.com>
-Date:   Thu, 19 Jan 2023 12:47:31 -0800
-Message-ID: <CANgfPd902Sd+LCd61D8=ba2ZTbJCRu3emLXtE212_8NWW6c3Pw@mail.gmail.com>
-Subject: Re: [RFC 1/2] selftests: KVM: Move dirty logging functions to memstress.(c|h)
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wig5JTFOOIWfDBvwzop4BGM09lRr5oKSEsYcvD8s+Ew=;
+        b=1b6kt1ns4PeOz1Y0mVDFMPv70NPNphGcssEoIJ4jE2KQ6b6CN/ipevr3fDc/eChIiH
+         RfVUIpYVLNjawmsQrvrGrLdzlGKPA9Sh5kqcSoltESVvjuUNj3ik/flJvE7jzHYXkT/r
+         J5ujwue91qHkMrggbWeqTnj8mWEvNMDgGm+D07IAZcxxYtNhh7vDZjFaPbiytqW5UXkU
+         Gz8ZsyRPl3Nh7u4OvbfsSA/NhewE2a/SVClhU9N4fuaZaMXeLPM37zCsUK+UiAkhJSbB
+         PFHUy2Zx1/cRitVnbBqA1g+YqOpEW5QLZOFE/aa2FOYUWYoQV6W7kRFvXxpe4fak8dpf
+         nK7Q==
+X-Gm-Message-State: AFqh2kr0AScDD8NVD0OWxfSOfbnqi4bQRCxNeiPWbzZ9+ld4blONK3Ql
+        wkth/cPdXint/Pj9hz4BfiTuc2hZE0I=
+X-Google-Smtp-Source: AMrXdXv4r8SuXFkgvfUk09FB2lNK8u69IqS9MYYsKdrnsOV0eFIhj/mHPlicgBdI1CPiQMzFxUTwkUVq+Bw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:9114:b0:229:f43c:4049 with SMTP id
+ k20-20020a17090a911400b00229f43c4049mr6332pjo.0.1674161349507; Thu, 19 Jan
+ 2023 12:49:09 -0800 (PST)
+Date:   Thu, 19 Jan 2023 20:48:48 +0000
+In-Reply-To: <20230105214303.2919415-1-dmatlack@google.com>
+Mime-Version: 1.0
+References: <20230105214303.2919415-1-dmatlack@google.com>
+X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
+Message-ID: <167409087681.2375490.6054601368040025297.b4-ty@google.com>
+Subject: Re: [PATCH v2] KVM: x86: Replace cpu_dirty_logging_count with nr_memslots_dirty_logging
+From:   Sean Christopherson <seanjc@google.com>
+To:     Sean Christopherson <seanjc@google.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        David Matlack <dmatlack@google.com>
+Cc:     kvm@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -70,13 +68,21 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Woops! I did not mean to tag this RFC. Sorry about that. I will
-include a cover letter in the future and can resend these with one if
-preferred.
+On Thu, 05 Jan 2023 13:43:03 -0800, David Matlack wrote:
+> Drop cpu_dirty_logging_count in favor of nr_memslots_dirty_logging.
+> Both fields count the number of memslots that have dirty-logging enabled,
+> with the only difference being that cpu_dirty_logging_count is only
+> incremented when using PML. So while nr_memslots_dirty_logging is not a
+> direct replacement for cpu_dirty_logging_count, it can be combined with
+> enable_pml to get the same information.
+> 
+> [...]
 
-On Thu, Jan 19, 2023 at 12:39 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> Please provide cover letters for multi-patch series, regardless of how trivial
-> the series is.
->
-> This series especially needs a cover explaining why it's tagged "RFC".
+Applied to kvm-x86 misc, thanks!
+
+[1/1] KVM: x86: Replace cpu_dirty_logging_count with nr_memslots_dirty_logging
+      https://github.com/kvm-x86/linux/commit/1799eb69b994
+
+--
+https://github.com/kvm-x86/linux/tree/next
+https://github.com/kvm-x86/linux/tree/fixes
