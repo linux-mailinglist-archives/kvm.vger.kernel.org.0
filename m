@@ -2,46 +2,86 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 28C44673643
-	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 12:01:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 78E7367364D
+	for <lists+kvm@lfdr.de>; Thu, 19 Jan 2023 12:04:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229915AbjASLBu (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 06:01:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49368 "EHLO
+        id S230388AbjASLD7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 06:03:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229908AbjASLBk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 06:01:40 -0500
-Received: from out-163.mta0.migadu.com (out-163.mta0.migadu.com [91.218.175.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667836FF9D
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 03:01:28 -0800 (PST)
-Date:   Thu, 19 Jan 2023 12:01:25 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1674126086;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S230288AbjASLDJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 06:03:09 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EDEE71781
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 03:02:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674126134;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=UGOf+ZiT7nXjMassCV20MsR/IWuAjv3YTfTASJKZyUc=;
-        b=krEGzdQMcEHEbSYSvIa0UDyvtWicFLiGoJtFaAXvxbEa/EQ/eEM7ZoEEYXIy3wHtb5KmSW
-        EAgrx5piTZUIk2Ts3SnyvjNT1lUTnid1S54FYn4C2YOKMk3EiyntpBqJhsJoT++yy37l5b
-        oDK+6zjXHnbt0PzY0A7d8SxqizM9smg=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Alexandru Elisei <alexandru.elisei@arm.com>
-Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v4 1/2] arm/psci: Test that CPU 1 has been
- successfully brought online
-Message-ID: <20230119110125.nw7gbcvdv3mqkpsg@orel>
-References: <20230118144912.32049-1-alexandru.elisei@arm.com>
- <20230118144912.32049-2-alexandru.elisei@arm.com>
- <20230118183512.xlwukqsg5i3wzfnv@orel>
- <Y8kcJ9P5brmPEpS1@arm.com>
+        bh=k0C/HtEob/1oAd5ytm41MO4vaCSKLv4Oq14Cyy/bw2U=;
+        b=L6/a8A7+xrlh1wMOUeVSqn5jz3XHh5pzAG32+tp02lpTc5KZsj9ggCRqhJZAHy/P+aHa+s
+        UjEQ2D6QSU0vaf86wfox+j+KWeVSR/xF99Jxxdz32CIJTY6pdiospjX9nSGHZGYK87SZCj
+        qfkjt73FMF/AhQ8PSHSLexKlSGol/E4=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-204-QBIiQgtNO8ih7lJqLv1bcw-1; Thu, 19 Jan 2023 06:02:11 -0500
+X-MC-Unique: QBIiQgtNO8ih7lJqLv1bcw-1
+Received: by mail-qk1-f197.google.com with SMTP id bs44-20020a05620a472c00b0070673cd1b05so1129463qkb.22
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 03:02:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=k0C/HtEob/1oAd5ytm41MO4vaCSKLv4Oq14Cyy/bw2U=;
+        b=xF7nfJzVI0k0WF+URFhpDS9pBx7C212Npu/0oiwamXS0ioOK+0UMLcHA5jdkjRGv8j
+         V/7c4ZKEn7gkFwtjgV6We4NKzPV0uHK4MbwpH7ey5S3x1/z99CLzHRPGf2k0xG8+U3Tg
+         18Vkwdv8mw0OIIXMbwUO+0UXMzFuKOrSRi0tnHVA1mvCcVocoIvIW5f1QpBFAONSlZfa
+         wjfxw7TmpyZXpsNxvXUig2rlxCrdpWOwAUqP+iBGWEn19zx1K6b9+fy2eTHvV8Or94z2
+         cyVCF9T+0f4U00WJsh4ceunQjRFFndglHvgZoaguReehxq1S45i2S8Y2asbAktpzWarX
+         0wEg==
+X-Gm-Message-State: AFqh2kqSlmZIqOtf62lA9HWbil1i4pM3VZFG8kH8z8ARZZZhyKqXFQCd
+        9tBxBTPo0WBpfsTGAkpLAOAHe1wNw4Xkx299X1Om5/ztU/x5pSRzzi1PXO2m3r1d/dlkfMx5P7a
+        09A3am5may8I7
+X-Received: by 2002:ac8:71c8:0:b0:3af:b6bd:aba7 with SMTP id i8-20020ac871c8000000b003afb6bdaba7mr14148429qtp.43.1674126125917;
+        Thu, 19 Jan 2023 03:02:05 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXuNjgtg0JqJEV+rxRkWTxbBj5fQftEz5zbS31cgmvbXd0BNYvoF9mLE++iwFMfYLa+fW5gBZA==
+X-Received: by 2002:ac8:71c8:0:b0:3af:b6bd:aba7 with SMTP id i8-20020ac871c8000000b003afb6bdaba7mr14148401qtp.43.1674126125590;
+        Thu, 19 Jan 2023 03:02:05 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id e25-20020ac86719000000b003b2d890752dsm3371429qtp.88.2023.01.19.03.02.01
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Jan 2023 03:02:04 -0800 (PST)
+Message-ID: <537e68ee-6dab-97e0-4797-1ca5cec4c710@redhat.com>
+Date:   Thu, 19 Jan 2023 12:01:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y8kcJ9P5brmPEpS1@arm.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH 07/13] vfio: Pass struct vfio_device_file * to
+ vfio_device_open/close()
+Content-Language: en-US
+To:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        jgg@nvidia.com
+Cc:     kevin.tian@intel.com, cohuck@redhat.com, nicolinc@nvidia.com,
+        kvm@vger.kernel.org, mjrosato@linux.ibm.com,
+        chao.p.peng@linux.intel.com, yi.y.sun@linux.intel.com,
+        peterx@redhat.com, jasowang@redhat.com,
+        suravee.suthikulpanit@amd.com
+References: <20230117134942.101112-1-yi.l.liu@intel.com>
+ <20230117134942.101112-8-yi.l.liu@intel.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230117134942.101112-8-yi.l.liu@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -49,287 +89,228 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 19, 2023 at 10:32:07AM +0000, Alexandru Elisei wrote:
-> Hi Drew,
-> 
-> Thanks for the quick review!
-> 
-> On Wed, Jan 18, 2023 at 07:35:12PM +0100, Andrew Jones wrote:
-> > On Wed, Jan 18, 2023 at 02:49:11PM +0000, Alexandru Elisei wrote:
-> > > For the PSCI CPU_ON function test, all other CPUs perform a CPU_ON call
-> > > that target CPU 1. The test is considered a success if CPU_ON returns PSCI
-> > > SUCCESS exactly once, and for the rest of the calls PSCI ALREADY_ON.
-> > > 
-> > > Enhance the test by checking that CPU 1 is actually online and able to
-> > > execute code. Also make the test more robust by checking that the CPU_ON
-> > > call returns, instead of assuming that it will always succeed and
-> > > hanging indefinitely if it doesn't.
-> > > 
-> > > Since the CPU 1 thread is now being set up properly by kvm-unit-tests
-> > > when being brought online, it becomes possible to add other tests in the
-> > > future that require all CPUs.
-> > > 
-> > > The include header order in arm/psci.c has been changed to be in
-> > > alphabetic order. This means moving the errata.h include before
-> > > libcflat.h, which causes compilation to fail because of missing includes
-> > > in errata.h. Fix that also by including the needed header in errata.h.
-> > > 
-> > > Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
-> > > ---
-> > >  arm/psci.c        | 60 ++++++++++++++++++++++++++++++++++++-----------
-> > >  lib/arm/asm/smp.h |  1 +
-> > >  lib/arm/smp.c     | 12 +++++++---
-> > >  lib/errata.h      |  2 ++
-> > >  4 files changed, 58 insertions(+), 17 deletions(-)
-> > > 
-> > > diff --git a/arm/psci.c b/arm/psci.c
-> > > index efa0722c0566..e96be941953b 100644
-> > > --- a/arm/psci.c
-> > > +++ b/arm/psci.c
-> > > @@ -7,11 +7,13 @@
-> > >   *
-> > >   * This work is licensed under the terms of the GNU LGPL, version 2.
-> > >   */
-> > > -#include <libcflat.h>
-> > >  #include <errata.h>
-> > > +#include <libcflat.h>
-> > > +
-> > > +#include <asm/delay.h>
-> > >  #include <asm/processor.h>
-> > > -#include <asm/smp.h>
-> > >  #include <asm/psci.h>
-> > > +#include <asm/smp.h>
-> > >  
-> > >  static bool invalid_function_exception;
-> > >  
-> > > @@ -72,14 +74,23 @@ static int cpu_on_ret[NR_CPUS];
-> > >  static cpumask_t cpu_on_ready, cpu_on_done;
-> > >  static volatile int cpu_on_start;
-> > >  
-> > > -static void cpu_on_secondary_entry(void)
-> > > +extern void secondary_entry(void);
-> > > +static void cpu_on_do_wake_target(void)
-> > >  {
-> > >  	int cpu = smp_processor_id();
-> > >  
-> > >  	cpumask_set_cpu(cpu, &cpu_on_ready);
-> > >  	while (!cpu_on_start)
-> > >  		cpu_relax();
-> > > -	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(halt));
-> > > +	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(secondary_entry));
-> > > +	cpumask_set_cpu(cpu, &cpu_on_done);
-> > > +}
-> > > +
-> > > +static void cpu_on_target(void)
-> > > +{
-> > > +	int cpu = smp_processor_id();
-> > > +
-> > > +	cpu_on_ret[cpu] = PSCI_RET_ALREADY_ON;
-> > 
-> > I'm not sure this is better than just skipping cpu1 in the check loop, as
-> > is done now, but OK. 
-> 
-> I think that's a good idea, I'll remove this and skip CPU 1 in the check
-> loop, because CPU 1 never invokes psci_cpu_on for itself.
-> 
-> > 
-> > >  	cpumask_set_cpu(cpu, &cpu_on_done);
-> > >  }
-> > >  
-> > > @@ -87,33 +98,53 @@ static bool psci_cpu_on_test(void)
-> > >  {
-> > >  	bool failed = false;
-> > >  	int ret_success = 0;
-> > > -	int cpu;
-> > > -
-> > > -	cpumask_set_cpu(1, &cpu_on_ready);
-> > > -	cpumask_set_cpu(1, &cpu_on_done);
-> > > +	int i, cpu;
-> > >  
-> > >  	for_each_present_cpu(cpu) {
-> > >  		if (cpu < 2)
-> > >  			continue;
-> > > -		smp_boot_secondary(cpu, cpu_on_secondary_entry);
-> > > +		smp_boot_secondary(cpu, cpu_on_do_wake_target);
-> > >  	}
-> > >  
-> > >  	cpumask_set_cpu(0, &cpu_on_ready);
-> > > +	cpumask_set_cpu(1, &cpu_on_ready);
-> > >  	while (!cpumask_full(&cpu_on_ready))
-> > >  		cpu_relax();
-> > >  
-> > > +	/*
-> > > +	 * Wait for all other CPUs to be online before configuring the thread
-> > > +	 * for the target CPU, as all secondaries are set up using the same
-> > > +	 * global variable.
-> > > +	 */
-> > 
-> > This comment says "Wait", so I'd move the while loop under it.
-> 
-> Can I reword it to keep it here?
-> 
-> 	/*
-> 	 * Configure CPU 1 after all the secondaries are online to avoid
-> 	 * secondary_data being overwritten.
-> 	 */
-> 
-> What do you think?
+Hi Yi,
 
-Works for me.
+On 1/17/23 14:49, Yi Liu wrote:
+> This avoids passing struct kvm * and struct iommufd_ctx * in multiple
+> functions. vfio_device_open() becomes to be a locked helper.
+why? because dev_set lock now protects vfio_device_file fields? worth to
+explain.
+do we need to update the comment in vfio.h related to struct
+vfio_device_set?
+>
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  drivers/vfio/group.c     | 34 +++++++++++++++++++++++++---------
+>  drivers/vfio/vfio.h      | 10 +++++-----
+>  drivers/vfio/vfio_main.c | 40 ++++++++++++++++++++++++----------------
+>  3 files changed, 54 insertions(+), 30 deletions(-)
+>
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index d83cf069d290..7200304663e5 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -154,33 +154,49 @@ static int vfio_group_ioctl_set_container(struct vfio_group *group,
+>  	return ret;
+>  }
+>  
+> -static int vfio_device_group_open(struct vfio_device *device)
+> +static int vfio_device_group_open(struct vfio_device_file *df)
+>  {
+> +	struct vfio_device *device = df->device;
+>  	int ret;
+>  
+>  	mutex_lock(&device->group->group_lock);
+>  	if (!vfio_group_has_iommu(device->group)) {
+>  		ret = -EINVAL;
+> -		goto out_unlock;
+> +		goto err_unlock_group;
+>  	}
+>  
+> +	mutex_lock(&device->dev_set->lock);
+is there an explanation somewhere about locking order b/w group_lock,
+dev_set lock?
+>  	/*
+>  	 * Here we pass the KVM pointer with the group under the lock.  If the
+>  	 * device driver will use it, it must obtain a reference and release it
+>  	 * during close_device.
+>  	 */
+May be the opportunity to rephrase the above comment. I am not a native
+english speaker but the time concordance seems weird + clarify a
+reference to what.
+> -	ret = vfio_device_open(device, device->group->iommufd,
+> -			       device->group->kvm);
+> +	df->kvm = device->group->kvm;
+> +	df->iommufd = device->group->iommufd;
+> +
+> +	ret = vfio_device_open(df);
+> +	if (ret)
+> +		goto err_unlock_device;
+> +	mutex_unlock(&device->dev_set->lock);
+>  
+> -out_unlock:
+> +	mutex_unlock(&device->group->group_lock);
+> +	return 0;
+> +
+> +err_unlock_device:
+> +	df->kvm = NULL;
+> +	df->iommufd = NULL;
+> +	mutex_unlock(&device->dev_set->lock);
+> +err_unlock_group:
+>  	mutex_unlock(&device->group->group_lock);
+>  	return ret;
+>  }
+>  
+> -void vfio_device_group_close(struct vfio_device *device)
+> +void vfio_device_group_close(struct vfio_device_file *df)
+>  {
+> +	struct vfio_device *device = df->device;
+> +
+>  	mutex_lock(&device->group->group_lock);
+> -	vfio_device_close(device, device->group->iommufd);
+> +	vfio_device_close(df);
+>  	mutex_unlock(&device->group->group_lock);
+>  }
+>  
+> @@ -196,7 +212,7 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+>  		goto err_out;
+>  	}
+>  
+> -	ret = vfio_device_group_open(device);
+> +	ret = vfio_device_group_open(df);
+>  	if (ret)
+>  		goto err_free;
+>  
+> @@ -228,7 +244,7 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+>  	return filep;
+>  
+>  err_close_device:
+> -	vfio_device_group_close(device);
+> +	vfio_device_group_close(df);
+>  err_free:
+>  	kfree(df);
+>  err_out:
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 53af6e3ea214..3d8ba165146c 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -19,14 +19,14 @@ struct vfio_container;
+>  struct vfio_device_file {
+>  	struct vfio_device *device;
+>  	struct kvm *kvm;
+> +	struct iommufd_ctx *iommufd;
+>  };
+>  
+>  void vfio_device_put_registration(struct vfio_device *device);
+>  bool vfio_device_try_get_registration(struct vfio_device *device);
+> -int vfio_device_open(struct vfio_device *device,
+> -		     struct iommufd_ctx *iommufd, struct kvm *kvm);
+> -void vfio_device_close(struct vfio_device *device,
+> -		       struct iommufd_ctx *iommufd);
+> +int vfio_device_open(struct vfio_device_file *df);
+> +void vfio_device_close(struct vfio_device_file *device);
+> +
+>  struct vfio_device_file *
+>  vfio_allocate_device_file(struct vfio_device *device);
+>  
+> @@ -90,7 +90,7 @@ void vfio_device_group_register(struct vfio_device *device);
+>  void vfio_device_group_unregister(struct vfio_device *device);
+>  int vfio_device_group_use_iommu(struct vfio_device *device);
+>  void vfio_device_group_unuse_iommu(struct vfio_device *device);
+> -void vfio_device_group_close(struct vfio_device *device);
+> +void vfio_device_group_close(struct vfio_device_file *df);
+>  struct vfio_group *vfio_group_from_file(struct file *file);
+>  bool vfio_group_enforced_coherent(struct vfio_group *group);
+>  void vfio_group_set_kvm(struct vfio_group *group, struct kvm *kvm);
+> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+> index dc08d5dd62cc..3df71bd9cd1e 100644
+> --- a/drivers/vfio/vfio_main.c
+> +++ b/drivers/vfio/vfio_main.c
+> @@ -358,9 +358,11 @@ vfio_allocate_device_file(struct vfio_device *device)
+>  	return df;
+>  }
+>  
+> -static int vfio_device_first_open(struct vfio_device *device,
+> -				  struct iommufd_ctx *iommufd, struct kvm *kvm)
+> +static int vfio_device_first_open(struct vfio_device_file *df)
+>  {
+> +	struct vfio_device *device = df->device;
+> +	struct iommufd_ctx *iommufd = df->iommufd;
+> +	struct kvm *kvm = df->kvm;
+>  	int ret;
+>  
+>  	lockdep_assert_held(&device->dev_set->lock);
+> @@ -394,9 +396,11 @@ static int vfio_device_first_open(struct vfio_device *device,
+>  	return ret;
+>  }
+>  
+> -static void vfio_device_last_close(struct vfio_device *device,
+> -				   struct iommufd_ctx *iommufd)
+> +static void vfio_device_last_close(struct vfio_device_file *df)
+>  {
+> +	struct vfio_device *device = df->device;
+> +	struct iommufd_ctx *iommufd = df->iommufd;
+> +
+>  	lockdep_assert_held(&device->dev_set->lock);
+>  
+>  	if (device->ops->close_device)
+> @@ -409,30 +413,34 @@ static void vfio_device_last_close(struct vfio_device *device,
+>  	module_put(device->dev->driver->owner);
+>  }
+>  
+> -int vfio_device_open(struct vfio_device *device,
+> -		     struct iommufd_ctx *iommufd, struct kvm *kvm)
+> +int vfio_device_open(struct vfio_device_file *df)
+>  {
+> -	int ret = 0;
+> +	struct vfio_device *device = df->device;
+> +
+> +	lockdep_assert_held(&device->dev_set->lock);
+>  
+> -	mutex_lock(&device->dev_set->lock);
+>  	device->open_count++;
+>  	if (device->open_count == 1) {
+> -		ret = vfio_device_first_open(device, iommufd, kvm);
+> -		if (ret)
+> +		int ret;
+> +
+> +		ret = vfio_device_first_open(df);
+> +		if (ret) {
+>  			device->open_count--;
+> +			return ret;
+nit: the original ret init and return was good enough, no need to change it?
+> +		}
+>  	}
+> -	mutex_unlock(&device->dev_set->lock);
+>  
+> -	return ret;
+> +	return 0;
+>  }
+>  
+> -void vfio_device_close(struct vfio_device *device,
+> -		       struct iommufd_ctx *iommufd)
+> +void vfio_device_close(struct vfio_device_file *df)
+>  {
+> +	struct vfio_device *device = df->device;
+> +
+>  	mutex_lock(&device->dev_set->lock);
+>  	vfio_assert_device_open(device);
+>  	if (device->open_count == 1)
+> -		vfio_device_last_close(device, iommufd);
+> +		vfio_device_last_close(df);
+>  	device->open_count--;
+>  	mutex_unlock(&device->dev_set->lock);
+>  }
+> @@ -478,7 +486,7 @@ static int vfio_device_fops_release(struct inode *inode, struct file *filep)
+>  	struct vfio_device_file *df = filep->private_data;
+>  	struct vfio_device *device = df->device;
+>  
+> -	vfio_device_group_close(device);
+> +	vfio_device_group_close(df);
+>  
+>  	vfio_device_put_registration(device);
+>  
+Thanks
 
-> 
-> > 
-> > > +	smp_prepare_secondary(1, cpu_on_target);
-> > 
-> > This new smp_prepare_secondary() function should be local to this unit
-> > test, please see my justification below.
-> 
-> Reply below.
-> 
-> > 
-> > > +
-> > >  	cpu_on_start = 1;
-> > >  	smp_mb();
-> > >  
-> > > -	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(halt));
-> > > +	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(secondary_entry));
-> > >  	cpumask_set_cpu(0, &cpu_on_done);
-> > >  
-> > > -	while (!cpumask_full(&cpu_on_done))
-> > > -		cpu_relax();
-> > > +	report_info("waiting for CPU1 to come online...");
-> > > +	for (i = 0; i < 10; i++) {
-> > > +		mdelay(100);
-> > > +		if (cpumask_full(&cpu_on_done))
-> > > +			break;
-> > > +	}
-> > > +
-> > > +	if (!cpumask_full(&cpu_on_done)) {
-> > > +		for_each_present_cpu(cpu) {
-> > > +			if (!cpumask_test_cpu(cpu, &cpu_on_done)) {
-> > > +				if (cpu == 1)
-> > > +					report_info("CPU1 failed to come online");
-> > > +				else
-> > > +					report_info("CPU%d failed to online CPU1", cpu);
-> > > +			}
-> > > +		}
-> > > +		failed = true;
-> > > +		goto out;
-> > 
-> > We could still run the other checks below, perhaps guarded with
-> > cpumask_test_cpu(cpu, &cpu_on_done), rather than bail early. I'm
-> > also OK with bailing early though. But, for that, I'd just return
-> > false right here rather than introduce the goto.
-> 
-> I like the idea of checking the return value for the CPU_ON calls that have
-> returned (I'll use for_each_cpu(cpu, &cpu_on _done) in the for loop below).
-> 
-> > 
-> > > +	}
-> > >  
-> > >  	for_each_present_cpu(cpu) {
-> > > -		if (cpu == 1)
-> > > -			continue;
-> > >  		if (cpu_on_ret[cpu] == PSCI_RET_SUCCESS) {
-> > >  			ret_success++;
-> > >  		} else if (cpu_on_ret[cpu] != PSCI_RET_ALREADY_ON) {
-> > > @@ -127,6 +158,7 @@ static bool psci_cpu_on_test(void)
-> > >  		failed = true;
-> > >  	}
-> > >  
-> > > +out:
-> > >  	return !failed;
-> > >  }
-> > >  
-> > > diff --git a/lib/arm/asm/smp.h b/lib/arm/asm/smp.h
-> > > index 077afde85520..ff2ef8f88247 100644
-> > > --- a/lib/arm/asm/smp.h
-> > > +++ b/lib/arm/asm/smp.h
-> > > @@ -49,6 +49,7 @@ static inline void set_cpu_idle(int cpu, bool idle)
-> > >  }
-> > >  
-> > >  typedef void (*secondary_entry_fn)(void);
-> > > +extern void smp_prepare_secondary(int cpu, secondary_entry_fn entry);
-> > >  extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
-> > >  extern void on_cpu_async(int cpu, void (*func)(void *data), void *data);
-> > >  extern void on_cpu(int cpu, void (*func)(void *data), void *data);
-> > > diff --git a/lib/arm/smp.c b/lib/arm/smp.c
-> > > index 98a5054e039b..947f417f4aea 100644
-> > > --- a/lib/arm/smp.c
-> > > +++ b/lib/arm/smp.c
-> > > @@ -58,13 +58,19 @@ secondary_entry_fn secondary_cinit(void)
-> > >  	return entry;
-> > >  }
-> > >  
-> > > -static void __smp_boot_secondary(int cpu, secondary_entry_fn entry)
-> > > +void smp_prepare_secondary(int cpu, secondary_entry_fn entry)
-> > 
-> > I'd rather not create an unsafe library function, especially one named
-> > without the leading underscores. It's OK for a unit test to duplicate
-> > __smp_boot_secondary() (secondary_data is available), but then the unit
-> > test also needs to ensure it does its own synchronization, as you do
-> > with the wait on cpu_on_ready already.
-> 
-> I created the function to share the code between __smp_boot_secondary and
-> the PSCI test. Cache maintenance would have to be added here (one CPU
-> writes to secondary_data, another CPU reads from it, possible with the MMU
-> off), and I would prefer to keep it in one place, in the library code,
-> rather than expose the boot cache maintenance requirements to tests.
-> 
-> If I rename it to __smp_boot_secondary(), would you find that acceptable?
+Eric
 
-I guess you mean __smp_prepare_secondary(). I suppose, but at this time
-we're only avoiding duplicating 3 lines, so it looks like premature
-refactoring. We can do it now though, since I hope to see the cache
-maint patches soon. Please add a comment above the new __ function warning
-users about its risks.
-
-Another option is to make an smp_prepare_secondary() that is safe to
-use without synchronization. We'd just need to make secondary_data per
-cpu.
-
-Thanks,
-drew
-
-
-> 
-> Thanks,
-> Alex
-> 
-> > 
-> > >  {
-> > > -	int ret;
-> > > -
-> > >  	secondary_data.stack = thread_stack_alloc();
-> > >  	secondary_data.entry = entry;
-> > >  	mmu_mark_disabled(cpu);
-> > > +}
-> > > +
-> > > +static void __smp_boot_secondary(int cpu, secondary_entry_fn entry)
-> > > +{
-> > > +	int ret;
-> > > +
-> > > +	smp_prepare_secondary(cpu, entry);
-> > > +
-> > >  	ret = cpu_psci_cpu_boot(cpu);
-> > >  	assert(ret == 0);
-> > >  
-> > > diff --git a/lib/errata.h b/lib/errata.h
-> > > index 5af0eb3bf8e2..de8205d8b370 100644
-> > > --- a/lib/errata.h
-> > > +++ b/lib/errata.h
-> > > @@ -6,6 +6,8 @@
-> > >   */
-> > >  #ifndef _ERRATA_H_
-> > >  #define _ERRATA_H_
-> > > +#include <libcflat.h>
-> > > +
-> > >  #include "config.h"
-> > >  
-> > >  #ifndef CONFIG_ERRATA_FORCE
-> > > -- 
-> > > 2.25.1
-> > >
-> > 
-> > Thanks,
-> > drew
