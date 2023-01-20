@@ -2,64 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 208CB6748AC
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 02:13:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 72D136748B9
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 02:19:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229966AbjATBNm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 20:13:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37488 "EHLO
+        id S229736AbjATBSy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 20:18:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbjATBNl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 20:13:41 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94CE19F3B5
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:13:40 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id jm10so3969982plb.13
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:13:40 -0800 (PST)
+        with ESMTP id S229972AbjATBSw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 20:18:52 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD6CA45F2
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:18:49 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id a9-20020a17090a740900b0022a0e51fb17so947915pjg.3
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:18:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=54Q/TlzbS+DFwNiz661U1uDBhYOWMskoME6kXhL4Rqs=;
-        b=HLXf297OXlmCinyIsALB6Gl5jSu9aSLUcLlqBBsQ+Yosm7cWWS3QTFqHqRsM7VRhNx
-         VlZE1a4yxahq2EeVVG8m0U0BmXEfx0sjbQ9W1xoiOffhHuWz9YdaoVerfYqYBvjKhqQG
-         pc8bbcriyiWhtvqxwaGPgKk3KHYmi5krB1WraueVzNSTMbqvAU2FaSmgwYzFw8F0pqU9
-         9/T8LKYBfX0ZIooNoDAWAMC5V+CfeIGZ2XfGLuyyLISBsbnKXF9bIaQpIeUBwb+8xvsK
-         r+RRECqQ7EPjL7QJ3qB49f2zigxwwey9Qj0So/uCGbNU6Zs8n26H5LqLc0Wa0eVczYAW
-         fdew==
+        bh=EIvtGhQ863eAgHEBR7gzw1wvWAHw06RQf9S7Ko277YM=;
+        b=nl3mSBo+1nhS4sKoPUAOfZK2zUSyaVHWy3zd27RXkDikAieQupMoh/UL3hTocVJreJ
+         e7dNjgHsUh+3mu2+eRc3i4/4Tufja81lu31S4InlmwaRPXghWUKDtuxGrunC8JCvpwpX
+         DRUGdS1K6U3WJqn/tI9GWEW6ekSURLxeO8D0/rO41uxg1G9kSSAxZeU7620G/v3kCWRt
+         XIcRyKYWWG3P3DiStnr6SmTdgtXWNwg/GIC6QwICEZs30gcgD17A6+2LHdTY5f6vdVtK
+         qySjAkqFEF9vDBnytSeVK1Ve21Z0ehQDrl6FHYK0g0OLI4rBTKyxMkwsV730XJ7/Rk88
+         7ZVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=54Q/TlzbS+DFwNiz661U1uDBhYOWMskoME6kXhL4Rqs=;
-        b=Rzsp+AZgFfmXbDLQZcMjF5xweOMVebNq9vrNOgA2Jijacj5QM1r59pH7n9YjTUcLg6
-         cYuHZFooL3BZzUhYGo25nUgGhrFmk1mt0me4M5YK1TQjAsLKJmCKA/ZXhDn5YUZqPBe5
-         WQOEo84mBhkAWNnOtIyabrBx1e8wcYNvvj7o4YyqhOZO4q5/sa/FAhrbOWN5q40bw8ik
-         qd3zvcqp0m9EPFW2IL/xEpWtlsst/K1NBxjIFmI2Ro7PSdlKNG2l/HFvHypDCsduXeWM
-         fgPhJqNjkyAb7HFwhJPseR2M9ok4g5B2agYF/39LJCbVCtv9nC30hRdv8A+fHix9KgYx
-         Xz6Q==
-X-Gm-Message-State: AFqh2kr6Efg34JnSsq/oWTbQDkUBzCawUS/4HqXm43KtMyj2GrFkXp3f
-        gqvQRERn0fl316EqD5GyagtNhg==
-X-Google-Smtp-Source: AMrXdXtBmKBoO8bveVA2cTRXrVxI82YkPJo/ltKfaMri16u76lDIMUNYKkiKDLzuUC/IwLzTgxJD+g==
-X-Received: by 2002:a17:903:304b:b0:194:d5ff:3ae3 with SMTP id u11-20020a170903304b00b00194d5ff3ae3mr4716pla.2.1674177219960;
-        Thu, 19 Jan 2023 17:13:39 -0800 (PST)
+        bh=EIvtGhQ863eAgHEBR7gzw1wvWAHw06RQf9S7Ko277YM=;
+        b=SZ4mkscz9/fiLxQQoMwycabmybgzVJaXuUbUPa3jmFbe8GRJ6YCbsTvdUJRyQb15We
+         7K0O5i4U2ZhoCkX6nIOw2HCRVXMQHM5NotsVO8cuMrCDC2YJO9zRrPBb6iMqTsZN8cWj
+         i/PpFh16Jk0IgL9JwDwPWobkKP6hsDjT7dWh+RVo0Bt0JvsBcgkdrvO2cGoNOow17avw
+         /kSxrUsrbvi5Nh9OoMvrXt0CTAR1TWIBXCqDWhIx/UbJzrZvUVbdBSg7NEinDE5awJ/M
+         GFzzD4TJj/W5ot0HLBdUxAXxWV87gy+XJJ3NxZy5KO0SNR8se8l4LE03Hr/FvPBlN9rc
+         J5rQ==
+X-Gm-Message-State: AFqh2kpOhGCvIPk0pfcEx0zxshFxv54SPUySTXSGDeoZljMSbZdQWDGz
+        4nPGYxoPksTt8T6RZzLnAAY9vzPCJyoF3ib8kGU=
+X-Google-Smtp-Source: AMrXdXtFneiKO3u0VL/FOlu+x06cPnFN5v62BvDxPDdRlscyXkFcGkAc5iAOuQfRIBcL/ViL8im7oA==
+X-Received: by 2002:a05:6a21:9214:b0:b8:c3c0:e7f7 with SMTP id tl20-20020a056a21921400b000b8c3c0e7f7mr8746pzb.1.1674177528978;
+        Thu, 19 Jan 2023 17:18:48 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q3-20020a17090311c300b0018c990ce7fesm25677780plh.239.2023.01.19.17.13.39
+        by smtp.gmail.com with ESMTPSA id s2-20020a170902ea0200b00192a96f4916sm7382638plg.259.2023.01.19.17.18.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 17:13:39 -0800 (PST)
-Date:   Fri, 20 Jan 2023 01:13:35 +0000
+        Thu, 19 Jan 2023 17:18:48 -0800 (PST)
+Date:   Fri, 20 Jan 2023 01:18:45 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 0/8] KVM: x86: Add AMD Guest PerfMonV2 PMU support
-Message-ID: <Y8nqv9K/WUqhaBub@google.com>
-References: <20221111102645.82001-1-likexu@tencent.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        David Matlack <dmatlack@google.com>,
+        Ben Gardon <bgardon@google.com>
+Subject: Re: [PATCH] KVM: MMU: Add wrapper to check whether MMU is in direct
+ mode
+Message-ID: <Y8nr9SZAnUguf3qU@google.com>
+References: <20221206073951.172450-1-yu.c.zhang@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221111102645.82001-1-likexu@tencent.com>
+In-Reply-To: <20221206073951.172450-1-yu.c.zhang@linux.intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -71,20 +73,78 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022, Like Xu wrote:
-> Starting with Zen4, core PMU on AMD platforms such as Genoa and
-> Ryzen-7000 will support PerfMonV2, and it is also compatible with
-> legacy PERFCTR_CORE behavior and msr addresses.
-> 
-> If you don't have access to the hardware specification, the commits
-> d6d0c7f681fd..7685665c390d for host perf can also bring a quick
-> overview. Its main change is the addition of three msr's equivalent
-> to Intel V2, namely global_ctrl, global_status, global_status_clear.
-> 
-> It is worth noting that this feature is very attractive for reducing the
-> overhead of PMU virtualization, since multiple msr accesses to multiple
-> counters will be replaced by a single access to the global register,
-> plus more accuracy gain when multiple guest counters are used.
++David and Ben
 
-Some minor nits, though I haven't looked at the meat of the series yet.  I'll
-give this a thorough review early next week (unless I'm extra ambitious tomorrow).
+On Tue, Dec 06, 2022, Yu Zhang wrote:
+> Simplify the code by introducing a wrapper, mmu_is_direct(),
+> instead of using vcpu->arch.mmu->root_role.direct everywhere.
+> 
+> Meanwhile, use temporary variable 'direct', in routines such
+> as kvm_mmu_load()/kvm_mmu_page_fault() etc. instead of checking
+> vcpu->arch.mmu->root_role.direct repeatedly.
+
+I've looked at this patch at least four times and still can't decide whether or
+not I like the helper.  On one had, it's shorter and easier to read.  On the other
+hand, I don't love that mmu_is_nested() looks at a completely different MMU, which
+is weird if not confusing.
+
+Anyone else have an opinion?
+
+> No functional change intended.
+> 
+> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 26 +++++++++++++-------------
+>  arch/x86/kvm/x86.c     |  9 +++++----
+>  arch/x86/kvm/x86.h     |  5 +++++
+>  3 files changed, 23 insertions(+), 17 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 4736d7849c60..d2d0fabdb702 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2280,7 +2280,7 @@ static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterato
+>  
+>  	if (iterator->level >= PT64_ROOT_4LEVEL &&
+>  	    vcpu->arch.mmu->cpu_role.base.level < PT64_ROOT_4LEVEL &&
+> -	    !vcpu->arch.mmu->root_role.direct)
+> +	    !mmu_is_direct(vcpu))
+>  		iterator->level = PT32E_ROOT_LEVEL;
+>  
+>  	if (iterator->level == PT32E_ROOT_LEVEL) {
+> @@ -2677,7 +2677,7 @@ static int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
+>  	gpa_t gpa;
+>  	int r;
+>  
+> -	if (vcpu->arch.mmu->root_role.direct)
+> +	if (mmu_is_direct(vcpu))
+>  		return 0;
+>  
+>  	gpa = kvm_mmu_gva_to_gpa_read(vcpu, gva, NULL);
+> @@ -3918,7 +3918,7 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
+>  	int i;
+>  	struct kvm_mmu_page *sp;
+>  
+> -	if (vcpu->arch.mmu->root_role.direct)
+> +	if (mmu_is_direct(vcpu))
+>  		return;
+>  
+>  	if (!VALID_PAGE(vcpu->arch.mmu->root.hpa))
+> @@ -4147,7 +4147,7 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  
+>  	arch.token = alloc_apf_token(vcpu);
+>  	arch.gfn = gfn;
+> -	arch.direct_map = vcpu->arch.mmu->root_role.direct;
+> +	arch.direct_map = mmu_is_direct(vcpu);
+>  	arch.cr3 = vcpu->arch.mmu->get_guest_pgd(vcpu);
+>  
+>  	return kvm_setup_async_pf(vcpu, cr2_or_gpa,
+> @@ -4157,17 +4157,16 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
+>  {
+>  	int r;
+> +	bool direct = mmu_is_direct(vcpu);
+
+I would prefer to not add local bools and instead due a 1:1 replacement.  "direct"
+loses too much context (direct what?), and performance wise I doubt it will
+influence the compiler.
