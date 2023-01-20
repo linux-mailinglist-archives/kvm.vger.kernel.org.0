@@ -2,65 +2,82 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 03B9067615D
-	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 00:17:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 969A9676180
+	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 00:28:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229672AbjATXR2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 18:17:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53912 "EHLO
+        id S230159AbjATX24 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 18:28:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjATXR1 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 18:17:27 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D153472B8;
-        Fri, 20 Jan 2023 15:17:25 -0800 (PST)
+        with ESMTP id S229487AbjATX2z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 18:28:55 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AD2F53FB1;
+        Fri, 20 Jan 2023 15:28:54 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 591FCB82AA6;
-        Fri, 20 Jan 2023 23:17:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7510DC433D2;
-        Fri, 20 Jan 2023 23:17:22 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C6030620E5;
+        Fri, 20 Jan 2023 23:28:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2A1FC433EF;
+        Fri, 20 Jan 2023 23:28:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674256643;
-        bh=SoqwK6Lbe/mngQK8/Z0v1FXpq/aJOBcKcs9SVP31/ss=;
+        s=k20201202; t=1674257333;
+        bh=r2edRcFMISYKtEmPEu1cLKZR7c8iF9zsqqnoWv9hU3I=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HAucgctXzN9/951JWEJjbzvwMgSm5mu/FK37EvGSRiIsqcGwiwm0Sd2MMd+k58d9G
-         Fp0qyJPu11GHZFkhDwIPCnhjqIlM0o13n/mq14ncbX/1ZNxhnX5nQdbv2s9DDIINdU
-         zkynKCEzKf2AjpTOkByQy3zeIem0IvE7iniX+PDZ2Zcga80SXcyT6Cx9V/XJYFmqMW
-         8xlCk1YB8+/16Wtm8akBQmfuMqE/uj4FKd8v2julqdoNeZv+InV1oBUkWNUHg/n+Y7
-         w3Xu/Cx89Yyy8Ab+QikkvjG1ytxt2d3Pki9e+jRBI/Cop2LOoXGWd8r6aIjK57H9Ce
-         WGCs8eUeLB8uQ==
-Date:   Fri, 20 Jan 2023 23:17:20 +0000
+        b=i8fMoEgfPYzBd+WPDibH/BLuqUwipoWJwcOyYpJ/Y0H3Rdml9thP589lRa96A/WAP
+         uJE5kWD2JscX/Sdjpw0CyzXtfG/LxhSegqHv1fuSmC0iMrjiQf/55jY7QZ7uEHsAoF
+         E8dMpHJh4CZNfldG+E9O6D3tHhc/7iue722H30CAwBzz6fKqrWs1mObgaZM6G6vx0B
+         6CxilOppA+Ky31fjHsYwZe3m5vUlfrsP8m1+9pPun5WaqAcNvIxLws8pDATrUwg9mj
+         ui7nzJ6cNZIPoyAp1NyeZPWJcbL3gGUtyqacFP7P3DAAb/PThvmhPJwGbNBhCwd+HW
+         B5OlWz8gR2uWg==
+Date:   Fri, 20 Jan 2023 23:28:50 +0000
 From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Pavan Kumar Paluri <papaluri@amd.com>
-Subject: Re: [PATCH RFC v7 37/64] KVM: SVM: Add KVM_SNP_INIT command
-Message-ID: <Y8shAD2bPCK6nltn@kernel.org>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-38-michael.roth@amd.com>
- <Y7BG6pSuoZsBQYrx@kernel.org>
- <fd23ee51-ec47-717d-7cce-1d79db8b6bd3@amd.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 3/9] KVM: Extend the memslot to support fd-based
+ private memory
+Message-ID: <Y8sjsvIJONydWpyQ@kernel.org>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-4-chao.p.peng@linux.intel.com>
+ <Y7azFdnnGAdGPqmv@kernel.org>
+ <20230106094000.GA2297836@chaop.bj.intel.com>
+ <Y7xrtf9FCuYRYm1q@google.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="Mwn5vxNlX4YIa3fN"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fd23ee51-ec47-717d-7cce-1d79db8b6bd3@amd.com>
+In-Reply-To: <Y7xrtf9FCuYRYm1q@google.com>
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -70,187 +87,59 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---Mwn5vxNlX4YIa3fN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-On Thu, Jan 05, 2023 at 05:37:20PM -0600, Kalra, Ashish wrote:
-> Hello Jarkko,
-> 
-> On 12/31/2022 8:27 AM, Jarkko Sakkinen wrote:
-> > On Wed, Dec 14, 2022 at 01:40:29PM -0600, Michael Roth wrote:
-> > >   static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> > >   {
-> > >   	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
-> > > @@ -260,13 +279,23 @@ static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
-> > >   		return ret;
-> > >   	sev->active = true;
-> > > -	sev->es_active = argp->id == KVM_SEV_ES_INIT;
-> > > +	sev->es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == KVM_SEV_SNP_INIT);
-> > > +	sev->snp_active = argp->id == KVM_SEV_SNP_INIT;
-> > >   	asid = sev_asid_new(sev);
-> > >   	if (asid < 0)
-> > >   		goto e_no_asid;
-> > >   	sev->asid = asid;
-> > > -	ret = sev_platform_init(&argp->error);
-> > > +	if (sev->snp_active) {
-> > > +		ret = verify_snp_init_flags(kvm, argp);
-> > > +		if (ret)
-> > > +			goto e_free;
-> > > +
-> > > +		ret = sev_snp_init(&argp->error, false);
-> > > +	} else {
-> > > +		ret = sev_platform_init(&argp->error);
-> > > +	}
+On Mon, Jan 09, 2023 at 07:32:05PM +0000, Sean Christopherson wrote:
+> On Fri, Jan 06, 2023, Chao Peng wrote:
+> > On Thu, Jan 05, 2023 at 11:23:01AM +0000, Jarkko Sakkinen wrote:
+> > > On Fri, Dec 02, 2022 at 02:13:41PM +0800, Chao Peng wrote:
+> > > > To make future maintenance easy, internally use a binary compatible
+> > > > alias struct kvm_user_mem_region to handle both the normal and the
+> > > > '_ext' variants.
+> > > 
+> > > Feels bit hacky IMHO, and more like a completely new feature than
+> > > an extension.
+> > > 
+> > > Why not just add a new ioctl? The commit message does not address
+> > > the most essential design here.
 > > 
-> > Couldn't sev_snp_init() and sev_platform_init() be called unconditionally
-> > in order?
-> > 
-> > Since there is a hardware constraint that SNP init needs to always happen
-> > before platform init, shouldn't SNP init happen as part of
-> > __sev_platform_init_locked() instead?
-> > 
+> > Yes, people can always choose to add a new ioctl for this kind of change
+> > and the balance point here is we want to also avoid 'too many ioctls' if
+> > the functionalities are similar.  The '_ext' variant reuses all the
+> > existing fields in the 'normal' variant and most importantly KVM
+> > internally can reuse most of the code. I certainly can add some words in
+> > the commit message to explain this design choice.
 > 
-> On Genoa there is currently an issue that if we do an SNP_INIT before an
-> SEV_INIT and then attempt to launch a SEV guest that may fail, so we need to
-> keep SNP INIT and SEV INIT separate.
+> After seeing the userspace side of this, I agree with Jarkko; overloading
+> KVM_SET_USER_MEMORY_REGION is a hack.  E.g. the size validation ends up being
+> bogus, and userspace ends up abusing unions or implementing kvm_user_mem_region
+> itself.
 > 
-> We need to provide a way to run (existing) SEV guests on a system that
-> supports SNP without doing an SNP_INIT at all.
+> It feels absolutely ridiculous, but I think the best option is to do:
 > 
-> This is done using psp_init_on_probe parameter of the CCP module to avoid
-> doing either SNP/SEV firmware initialization during module load and then
-> defer the firmware initialization till someone launches a guest of one
-> flavor or the other.
+> #define KVM_SET_USER_MEMORY_REGION2 _IOW(KVMIO, 0x49, \
+> 					 struct kvm_userspace_memory_region2)
 > 
-> And then sev_guest_init() does either SNP or SEV firmware init depending on
-> the type of the guest being launched.
+> /* for KVM_SET_USER_MEMORY_REGION2 */
+> struct kvm_user_mem_region2 {
+> 	__u32 slot;
+> 	__u32 flags;
+> 	__u64 guest_phys_addr;
+> 	__u64 memory_size;
+> 	__u64 userspace_addr;
+> 	__u64 restricted_offset;
+> 	__u32 restricted_fd;
+> 	__u32 pad1;
+> 	__u64 pad2[14];
+> }
+> 
+> And it's consistent with other KVM ioctls(), e.g. KVM_SET_CPUID2.
+> 
+> Regarding the userspace side of things, please include Vishal's selftests in v11,
+> it's impossible to properly review the uAPI changes without seeing the userspace
+> side of things.  I'm in the process of reviewing Vishal's v2[*], I'll try to
+> massage it into a set of patches that you can incorporate into your series.
+> 
+> [*] https://lore.kernel.org/all/20221205232341.4131240-1-vannapurve@google.com
 
-OK, got it, thank you. I have not noticed the init_on_probe for
-sev_snp_init() before. Was it in earlier patch set version?
-
-The benefit of having everything in __sev_platform_init_lock() would be first 
-less risk of shooting yourself into foot, and also no need to pass
-init_on_probe to sev_snp_init() as it would be internal to sev-dev.c, and
-no need for special cases for callers. It is in my opinion internals of the
-SEV driver to guarantee the order.
-
-E.g. changes to svm/sev.c would be then quite trivial.
-
-> > I found these call sites for __sev_platform_init_locked(), none of which
-> > follow the correct call order:
-> > 
-> > * sev_guest_init()
-> 
-> As explained above, this call site is important for deferring the firmware
-> initialization to an actual guest launch.
-> 
-> > * sev_ioctl_do_pek_csr
-> > * sev_ioctl_do_pdh_export()
-> > * sev_ioctl_do_pek_import()
-> > * sev_ioctl_do_pek_pdh_gen()
-
-What happens if any of these are called before sev_guest_init()? They only
-call __sev_platform_init_locked().
-
-> > * sev_pci_init()
-> > 
-> > For me it looks like a bit flakky API use to have sev_snp_init() as an API
-> > call.
-> > 
-> > I would suggest to make SNP init internal to the ccp driver and take care
-> > of the correct orchestration over there.
-> > 
-> 
-> Due to Genoa issue, we may still need SNP init and SEV init to be invoked
-> separately outside the CCP driver.
-> 
-> > Also, how it currently works in this patch set, if the firmware did not
-> > load correctly, SNP init halts the whole system. The version check needs
-> > to be in all call paths.
-> > 
-> 
-> Yes, i agree with that.
-
-Attached the fix I sent in private earlier.
-
-> Thanks,
-> Ashish
++1
 
 BR, Jarkko
-
---Mwn5vxNlX4YIa3fN
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment;
-	filename="0001-crypto-ccp-Prevent-a-spurious-SEV_CMD_SNP_INIT-trigg.patch"
-
-From f24054af9eeeb0314bbd0c37bd97ff38e2ded717 Mon Sep 17 00:00:00 2001
-From: Jarkko Sakkinen <jarkko@profian.com>
-Date: Sun, 4 Dec 2022 06:17:07 +0000
-Subject: [PATCH] crypto: ccp: Prevent a spurious SEV_CMD_SNP_INIT triggered by
- sev_guest_init()
-
-Move the firmware version check from sev_pci_init() to sev_snp_init().
-
-Signed-off-by: Jarkko Sakkinen <jarkko@profian.com>
----
- drivers/crypto/ccp/sev-dev.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 7c5698bde655..08787d998f15 100644
---- a/drivers/crypto/ccp/sev-dev.c
-+++ b/drivers/crypto/ccp/sev-dev.c
-@@ -1387,6 +1387,12 @@ static int __sev_snp_init_locked(int *error)
- 	if (sev->snp_initialized)
- 		return 0;
- 
-+	if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
-+		dev_dbg(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
-+			SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
-+		return 0;
-+	}
-+
- 	/*
- 	 * The SNP_INIT requires the MSR_VM_HSAVE_PA must be set to 0h
- 	 * across all cores.
-@@ -2319,25 +2325,19 @@ void sev_pci_init(void)
- 		}
- 	}
- 
-+	rc = sev_snp_init(&error, true);
-+	if (rc)
-+		/*
-+		 * Don't abort the probe if SNP INIT failed,
-+		 * continue to initialize the legacy SEV firmware.
-+		 */
-+		dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
-+
- 	/*
- 	 * If boot CPU supports SNP, then first attempt to initialize
- 	 * the SNP firmware.
- 	 */
- 	if (cpu_feature_enabled(X86_FEATURE_SEV_SNP)) {
--		if (!sev_version_greater_or_equal(SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR)) {
--			dev_err(sev->dev, "SEV-SNP support requires firmware version >= %d:%d\n",
--				SNP_MIN_API_MAJOR, SNP_MIN_API_MINOR);
--		} else {
--			rc = sev_snp_init(&error, true);
--			if (rc) {
--				/*
--				 * Don't abort the probe if SNP INIT failed,
--				 * continue to initialize the legacy SEV firmware.
--				 */
--				dev_err(sev->dev, "SEV-SNP: failed to INIT error %#x\n", error);
--			}
--		}
--
- 		/*
- 		 * Allocate the intermediate buffers used for the legacy command handling.
- 		 */
--- 
-2.38.1
-
-
---Mwn5vxNlX4YIa3fN--
