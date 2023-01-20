@@ -2,124 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6CA56753F3
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 12:57:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B44C675419
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 13:06:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjATL5W (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 06:57:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35644 "EHLO
+        id S229787AbjATMGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 07:06:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjATL5U (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 06:57:20 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17FBDAD11
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 03:56:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674215775;
+        with ESMTP id S229500AbjATMGI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 07:06:08 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7417AF2A;
+        Fri, 20 Jan 2023 04:06:04 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 135531EC04DA;
+        Fri, 20 Jan 2023 13:06:03 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1674216363;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=vg6mJzvu0y8vgifCIBh6KKubBetRO7GYEyZ6/+9wrew=;
-        b=CGXn+FIabaRSe4sbmTF3WKw4CwjkMfTDJ/lzn8ingq/03QdycFnDx4PDc+j7xo33M6r14b
-        LKyc5aUQGVO83wxLarGsMMLsQZro+cNvEvozMHJtjTF8Oyd3JwGWnef/N4KeYGjT8IQVGH
-        TWmXytCEJWxe7On7aMspSUc5blRVa7s=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-211-ukOOJgdBPk2EYpYXQxRe1Q-1; Fri, 20 Jan 2023 06:56:14 -0500
-X-MC-Unique: ukOOJgdBPk2EYpYXQxRe1Q-1
-Received: by mail-qt1-f198.google.com with SMTP id w25-20020ac86b19000000b003b692f65ca2so1838737qts.20
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 03:56:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vg6mJzvu0y8vgifCIBh6KKubBetRO7GYEyZ6/+9wrew=;
-        b=OLUntmRinnu1tsqwKvzf40J0ZMXeU4Ogop/29obEk0o7EAKslBQER0RISx7a9HyUnb
-         3PRQZMlRA5dOPBnZwq0TK8JOsYpobs2/Vuw06e3sl/CBwseiPU/zdK2bIFh4uxJGYL7+
-         FwCVPHKGrn1bXcsTmkLzzAR0UIPolfFjyI0y8vdI4v1To7AQIbs2ib+BQpBhnxD6xE7L
-         8l4kNxwrw6sqUy12k1XuwsL7l/vzYkkr/yDCxMh80mdeXF2evDbJdB4PFcX8aKSLrWIT
-         jol+ThhSm9cJy3GNcGawD3wVgxrMPa+qsowDoXI+NFRFmmLJqT3PtzQqJTRf/7IniteC
-         RqPA==
-X-Gm-Message-State: AFqh2kqwsxxcW0zOI+mNFnhUmGsMShjj9h4WXQoLeJBT3of8537XydNz
-        +rGyhRXoibSRH5OXUFCmRl6ylwyszWYJX6Bzmypdgsp9X5AuFTrLgerk25FIOrZlDkytyUo4K+9
-        zp6hzQQwplTgb
-X-Received: by 2002:ac8:71c1:0:b0:3b6:3abd:fcc2 with SMTP id i1-20020ac871c1000000b003b63abdfcc2mr20104423qtp.46.1674215773700;
-        Fri, 20 Jan 2023 03:56:13 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXslsqQwJqVGYKeuWvFHUQT4LIkpVZ6nAQtm3xvcGPgl1xP0C5pJn+pZBnsYQhs7SE+EMQ844w==
-X-Received: by 2002:ac8:71c1:0:b0:3b6:3abd:fcc2 with SMTP id i1-20020ac871c1000000b003b63abdfcc2mr20104391qtp.46.1674215773482;
-        Fri, 20 Jan 2023 03:56:13 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-177-118.web.vodafone.de. [109.43.177.118])
-        by smtp.gmail.com with ESMTPSA id k2-20020a05620a414200b006faaf6dc55asm26231527qko.22.2023.01.20.03.56.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 20 Jan 2023 03:56:12 -0800 (PST)
-Message-ID: <648e62ab-9d66-9a5a-0a03-124c16b85805@redhat.com>
-Date:   Fri, 20 Jan 2023 12:56:08 +0100
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=3SURoIpdP0J1MWZzS5Qe4d8ryuy8YYrNYJ0da/iJuiU=;
+        b=ga4d8nnAgJeWrYj5NTCHG1YfzBPmjh7NDP0Au1WuZDL/cAASppb3RDnfXmL+b/ix3uV05R
+        AzGGwMCR3nAwI8Z4R1ADx7+JaA7Ht3jtSWINw9+bIapIX1E3mIe1NlhwmLqTBAbDTTWtQX
+        ParbNPuZ4ACuQbjbtBkqemqh7W6sCig=
+Date:   Fri, 20 Jan 2023 13:06:02 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Alexey Kardashevskiy <aik@amd.com>
+Cc:     "Nikunj A. Dadhania" <nikunj@amd.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Yury Norov <yury.norov@gmail.com>,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sean Christopherson <seanjc@google.com>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Michael Roth <michael.roth@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Kees Cook <keescook@chromium.org>,
+        Juergen Gross <jgross@suse.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH kernel v3 3/3] x86/sev: Do not handle #VC for DR7
+ read/write
+Message-ID: <Y8qDqgzsAOgcckPW@zn.tnic>
+References: <20230120031047.628097-1-aik@amd.com>
+ <20230120031047.628097-4-aik@amd.com>
+ <adc11ed3-de89-a389-e629-3c951257469c@amd.com>
+ <533c5c83-b68b-eff0-d36d-9963194ab844@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [PATCH v14 10/11] qapi/s390/cpu topology: POLARITY_CHANGE qapi
- event
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        scgl@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230105145313.168489-1-pmorel@linux.ibm.com>
- <20230105145313.168489-11-pmorel@linux.ibm.com>
- <c338245c-82c3-ed57-9c98-f4d630fa1759@redhat.com>
- <5f177a1b-90d6-7e30-5b58-cdcae7919363@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <5f177a1b-90d6-7e30-5b58-cdcae7919363@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,RCVD_IN_SBL_CSS,SPF_HELO_NONE,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Level: *
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <533c5c83-b68b-eff0-d36d-9963194ab844@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 18/01/2023 18.09, Pierre Morel wrote:
-> 
-> On 1/12/23 12:52, Thomas Huth wrote:
->> On 05/01/2023 15.53, Pierre Morel wrote:
-...>>> +#
->>> +# Emitted when the guest asks to change the polarity.
->>> +#
->>> +# @polarity: polarity specified by the guest
->>
->> Please elaborate: Where does the value come from (the PTF instruction)? 
->> Which values are possible?
-> 
-> Yes what about:
-> 
-> # @polarity: the guest can specify with the PTF instruction a horizontal
-> #            or a vertical polarity.
+On Fri, Jan 20, 2023 at 09:23:48PM +1100, Alexey Kardashevskiy wrote:
+> Worth mentioning it is tip/x86/urgent (which does not have
+> X86_FEATURE_NO_NESTED_DATA_BP), not tip/master (which has
+> X86_FEATURE_NO_NESTED_DATA_BP).
 
-Maybe something like: "The guest can tell the host (via the PTF instruction) 
-whether a CPU should have horizontal or vertical polarity." ?
+Yeah, when you submit patches for tip, you can always use tip/master which has
+the latest lineup of all branches and should have all the required bits.
 
-> #         On horizontal polarity the host is expected to provision
-> #            the vCPU equally.
+Thx.
 
-Maybe: "all vCPUs equally" ?
-Or: "each vCPU equally" ?
+-- 
+Regards/Gruss,
+    Boris.
 
-> #            On vertical polarity the host can provision each vCPU
-> #            differently
-> #            The guest can get information on the provisioning with
-> #            the STSI(15) instruction.
-
-  Thomas
-
+https://people.kernel.org/tglx/notes-about-netiquette
