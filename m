@@ -2,85 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0F736748E3
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 02:33:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4B8B86748F1
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 02:40:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229712AbjATBd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 20:33:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47618 "EHLO
+        id S229769AbjATBk0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 20:40:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229531AbjATBdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 20:33:25 -0500
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A345EB47E
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:33:23 -0800 (PST)
-Received: by mail-pg1-x531.google.com with SMTP id b12so3026517pgj.6
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:33:23 -0800 (PST)
+        with ESMTP id S229492AbjATBkZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 20:40:25 -0500
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D530E9EE26
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:40:23 -0800 (PST)
+Received: by mail-pf1-x431.google.com with SMTP id w2so2892584pfc.11
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:40:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kp68jZKRyQvb1CWCfr7ryxkqu7zJ892bk7TwE8UhDeg=;
-        b=H/l0Obt0lE8Dt7WZH0dN6w05VSK2+qVutkVXC28jA6GVboKJkdOb6dy6flHfifS3eA
-         twQ2J0d4UNa0dl1Qn8gm0ibDLWgmNTpA6plkncRthFcZHjH7D4BuCq1cps6AxIk7yQ1g
-         tTeOqX8tMIymvL4hVtxnDU0TIUkwKcq9pgR7K1TYOAuiDS/S7HQdFY2ixosd08LKKT/n
-         dv1ykJakGnF3GMus+uWOXqpvdPfQxtjgpP7Uwk+lCEiRNFef8uXCERWuIZN7wfmpIkzK
-         K6bSXy0hREjSgP4rqdKLOnspmtPZnZ+ZW04ugucxZwzVgxxZVvo3hmwe9b4FgtHFFm09
-         GPzw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=B93pafDYiLEzdeFpoSwk6ASMlzCL9xGgaEmz8elDYkE=;
+        b=tmyKvc9Yi6bdrHRRM3gAqJqs1CzR1XX05zMF9AHW7o1g8CWfq25rGeVC46PYzv+QQb
+         G+FFXjaoKNOC9lUG9nQ8YldisNIgUf+da+3wUYpfXHWDv6Hekx4GBTnTEmhVY2u6xY27
+         z3yUKZ3I9m2D7TUe5q/k6SAPomZVlbLzyYhz3IxiySZb6xMMQEPi8rvCXbqTVAytxDjJ
+         dTsJPiH5Mr/IutzNznAv9WQcTlADk4CLKkyza6j3e9NO7NHS1fwemD3AD/19E9hb+3kw
+         zmi7mYUAc+q8GwjrleYQng8J8+I8VZ7OKV3ycKnnxrmzR13hfdso8R+4itSyFIG8EXlk
+         g3+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kp68jZKRyQvb1CWCfr7ryxkqu7zJ892bk7TwE8UhDeg=;
-        b=OddwHjLz3jayGQbANznC7NSzLlJE+U0Iw8oTU8HOXO0w1WFQSk4zbG4geUA9q3fXYy
-         a2uW/b5kzvBd9gqKn5PKMbimeUNaIG7GkX77IImys8TDo40g2J190BDBvDgKvF0Jh1LM
-         HmWqCQ0E6LMLm2Xp6drT1uZh/p/DItSbmEzBvchKw93Ye2yx+3jfiagSmcb9qXzFTeRK
-         i/S8doNcFMwUACI3CrdSykiWywM+flUPGXwPVvO7LkA0gn3EpTbLHntdS6f9un89RyG4
-         KMrhzMi50sBxWIfHbawFg5q1GlpsTHIZJ2/kmXgZNHu1XtGshrL8pwljS33Qkcuuk/om
-         Xx+w==
-X-Gm-Message-State: AFqh2kqmvIHd9aZiBUJLAquUT7zcXzoVoqNCT7t88nlURdkJ+GAEiifA
-        CKMQzN5Silwes+PDEVnop5LAEQ==
-X-Google-Smtp-Source: AMrXdXuj+pEzgczWgpSXc9mTAUie4xUf244aRmyLrVfENL9pUUqVg7frR07KJZR3dR0VXrbhEpML/A==
-X-Received: by 2002:aa7:84d8:0:b0:58b:cb1b:978f with SMTP id x24-20020aa784d8000000b0058bcb1b978fmr18689pfn.1.1674178403000;
-        Thu, 19 Jan 2023 17:33:23 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id f129-20020a623887000000b0058bf2ae9694sm10265600pfa.156.2023.01.19.17.33.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 17:33:22 -0800 (PST)
-Date:   Fri, 20 Jan 2023 01:33:18 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Kim Phillips <kim.phillips@amd.com>
-Cc:     x86@kernel.org, Borislav Petkov <bp@alien8.de>,
-        Borislav Petkov <borislav.petkov@amd.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6 2/7] x86/cpu, kvm: Add the NO_NESTED_DATA_BP feature
-Message-ID: <Y8nvXj0//cImdTJQ@google.com>
-References: <20230110224643.452273-1-kim.phillips@amd.com>
- <20230110224643.452273-4-kim.phillips@amd.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=B93pafDYiLEzdeFpoSwk6ASMlzCL9xGgaEmz8elDYkE=;
+        b=kNBSuh7Br0gaCICZkJZTYP/RVJ0D7NJXLo9t/HHkfqszLTLXyJuGsSDdmQAaK0pNjC
+         /FgdYs8Hz03S3u1JUnDAQ6WvDvFLcOYHYVMIoOdgs0Tw3COczsbnFPXf7/sJjEumfMkd
+         Ubv3dp6PqC+H8D8m5HXdqflN8y7usCeZFepQp5ZINI/oxBX+lSDrDYWdCMBoXUsH4jgw
+         Mi1TZK21gH5e6w4iJS0bAmKgofjpwOUqgRRspqGREgZscCobm15vBBOpqNQr3pRFe9iz
+         A7TkjOGi9VojQvXsdHc5KMCmSE83jGlQs8B9Bg3eQwHKbTK/LO0vf2A75yPTud5IWzCX
+         7Ilw==
+X-Gm-Message-State: AFqh2krAYStRzrAYFpasPoJia7km3vb4TEG7PIFY645B9Z4FsSlz5+Im
+        DEWL6tCCi1VAEUKHQzRxUcSVlLHYa32Fk1vA1VnCmw==
+X-Google-Smtp-Source: AMrXdXtX2ox98SuCBvArhlrqg1uXGxl5FHrJkf+XqM9+ca+Dt/RYaG6/dAfE1iGhutrPd+ArCj6PYRCWWDT4bL8xKQc=
+X-Received: by 2002:a05:6a00:4c14:b0:580:f2b8:213c with SMTP id
+ ea20-20020a056a004c1400b00580f2b8213cmr1309897pfb.8.1674178822730; Thu, 19
+ Jan 2023 17:40:22 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230110224643.452273-4-kim.phillips@amd.com>
+References: <20221214194056.161492-1-michael.roth@amd.com> <20221214194056.161492-63-michael.roth@amd.com>
+ <CAAH4kHZVaeL57bGAzeDjJDTumsnb96iAYBdhm7cs_8TjBg+v3w@mail.gmail.com> <d09e13c2-3a3d-924b-05b3-560fe1121516@amd.com>
+In-Reply-To: <d09e13c2-3a3d-924b-05b3-560fe1121516@amd.com>
+From:   Dionna Amalie Glaze <dionnaglaze@google.com>
+Date:   Thu, 19 Jan 2023 17:40:10 -0800
+Message-ID: <CAAH4kHYOtzgqSTZQFcRiZwPLCkLAThjsCMdjUCdsBTiP=W0Vxw@mail.gmail.com>
+Subject: Re: [PATCH RFC v7 62/64] x86/sev: Add KVM commands for instance certs
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, harald@profian.com
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,75 +81,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 10, 2023, Kim Phillips wrote:
-> The "Processor ignores nested data breakpoints" feature was being
-> open-coded for KVM in __do_cpuid_func().  Add it to its newly added
-> CPUID leaf 0x80000021 EAX proper, and propagate it in kvm_set_cpu_caps()
-> instead.
-> 
-> Also drop the bit description comments now it's more self-describing.
-> 
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 3 +++
->  arch/x86/kvm/cpuid.c               | 8 ++++++--
->  2 files changed, 9 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index d53e13048d2e..0cd7b4afd528 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -426,6 +426,9 @@
->  #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
->  #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
->  
-> +/* AMD-defined Extended Feature 2 EAX, CPUID level 0x80000021 (EAX), word 20 */
-> +#define X86_FEATURE_NO_NESTED_DATA_BP	(20*32+ 0) /* "" AMD No Nested Data Breakpoints */
-> +
->  /*
->   * BUG word(s)
->   */
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index b14653b61470..69e433e4e9ff 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -741,6 +741,10 @@ void kvm_set_cpu_caps(void)
->  		0 /* SME */ | F(SEV) | 0 /* VM_PAGE_FLUSH */ | F(SEV_ES) |
->  		F(SME_COHERENT));
->  
-> +	kvm_cpu_cap_mask(CPUID_8000_0021_EAX,
-> +		F(NO_NESTED_DATA_BP)
-> +	);
-> +
->  	kvm_cpu_cap_mask(CPUID_C000_0001_EDX,
->  		F(XSTORE) | F(XSTORE_EN) | F(XCRYPT) | F(XCRYPT_EN) |
->  		F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
-> @@ -1222,9 +1226,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  		break;
->  	case 0x80000021:
->  		entry->ebx = entry->ecx = entry->edx = 0;
-> +		cpuid_entry_override(entry, CPUID_8000_0021_EAX);
->  		/*
->  		 * Pass down these bits:
-> -		 *    EAX      0      NNDBP, Processor ignores nested data breakpoints
->  		 *    EAX      2      LAS, LFENCE always serializing
->  		 *    EAX      6      NSCB, Null selector clear base
->  		 *
-> @@ -1235,7 +1239,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->  		 * KVM doesn't support SMM_CTL.
->  		 *   EAX       9     SMM_CTL MSR is not supported
->  		 */
-> -		entry->eax &= BIT(0) | BIT(2) | BIT(6);
-> +		entry->eax &= BIT(2) | BIT(6);
+On Thu, Jan 19, 2023 at 2:18 PM Kalra, Ashish <ashish.kalra@amd.com> wrote:
+>
+> Hello Dionna,
+>
+> Do you also have other updates to this patch with regard to review
+> comments from Dov ?
+>
 
-This is broken.  It gets fixed by the end of the series, but between here and
-commit b1366f515fd6 ("x86/cpu, kvm: Add the Null Selector Clears Base feature"),
-the AND with open coded bits means any bits preserved/set by cpuid_entry_override()
-are wiped out.  E.g. NO_NESTED_DATA_BP will never be advertised as of this patch.
+Apart from the PAGE_ALIGN change, the result of the whole discussion
+appears to only need the following immediately before the
+copy_from_user of certs_uaddr in the snp_set_instance_certs function:
 
-The proper way to do this is to first convert all supported bits away from magic
-numbers in a single patch, and then introduce newly supported bits one by one.
-That one patch will be larger, but I don't see a better approach.
+/* The size could shrink and leave garbage at the end. */
+memset(sev->snp_certs_data, 0, SEV_FW_BLOB_MAX_SIZE);
 
-Is it too late to back this out?  Not a huge deal, but it seems easy enough to
-clean up.
+I don't believe there is an off-by-one with the page shifting for the
+number of pages because snp_certs_len is already rounded up to the
+nearest page size. Any other change wrt the way the blob size is
+decided between the guest and host should come later.
+
+-- 
+-Dionna Glaze, PhD (she/her)
