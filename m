@@ -2,207 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 41F04675F07
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 21:38:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB71F675F90
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 22:20:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229778AbjATUi1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 15:38:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44944 "EHLO
+        id S229749AbjATVUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 16:20:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229471AbjATUiZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 15:38:25 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2048.outbound.protection.outlook.com [40.107.100.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDB54966FD;
-        Fri, 20 Jan 2023 12:38:23 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jgbYVJU626le31ZRWXr2CPdZMKn686BILxA6T/cblLVWEA8mb9NQc/nvXfpTvTDKWF1xsgd/+SXtBdHBPyEkJ/De+O9PHRpaYywFG9rFlR8cXkhyU9UUvLEMvZv7uy/U1WMN0ph41p6d/dKPAocId2OZzgx9KLz8UeT0AE0cAbZyj77BYpbtpsxzLXqwHnyd62F8us6wijWwseNVbx/AsELyJ5rAuGMwX3J2xhml+jLRQzag+85jkXuaQna6Q57eyv/+GE2n+6NjBafW2UrWHHmKQApxSyfee+FL6Rgmfl/9erDISP1z19CNq+jqwC9ZQnY7J8NibC7V/z/tednb7A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=65YIash6zu+NspDmH4rIMcXSTVQi4mw9TTPwHsfeFN0=;
- b=IReNjXRMhtikCvbkuqQ1oo6ufdbweW2MZlDAgVN0MzQH8huEaSx0TITWr/t3AUg40y9qDL8NMJRfwHc7BzhEBk+PU+cUY5QenKjqVwcVg8OH+QUrhO+6feWdg3VRYr8xJryzmXMSzFc3GkX22yzUMpnwvbn4h0stfK99Qr6G5jwuUHjBdbhpGp7ADEnKXUub0aueLvNsoMpw7E0ipXQmeNLYcoW7OVqKBcn9xfIZg615Y+yzh2roR9cL7sdm75WU1h5/nNrswaFsgI4lSfks0K4Sm71Ja0VQOxB7a1xAnsgslJ7jA5Ma7JASwovEH0nVYHYHNqWiYDjQzu+lFL52+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=65YIash6zu+NspDmH4rIMcXSTVQi4mw9TTPwHsfeFN0=;
- b=jU4Arc84rMDK1/GY9iwQq9jYNVYBfMlkjBmnuulc3fI9gav5Tydx9c9UmoOU8qTG2EqXZ37JTDfCNZ0AaNgwXOI3fFE+IpTRaIslxzn6i4Ht7qwJfSDJrfZPnXg42j6DQ19ttpBGHTpPbH7e6pWbZG1OhvG8/2Hjcwv7ReuAotaNqH7gInaj4m44wXsdcQIFN6CGT3r+iPf+TISKJeyFe3Jp3JYKmIOXs3c+6/z5JrlrZ6A1dXdmo5/xJ4rwCmDzvBDLqeS9DvXKGFTo79tgU/RkjSQNDCoXeyAbqitNUFUv52TQRcP/QmP+EB9p+m4KYLYDgqHApfwJsWH76sQslQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by PH7PR12MB5832.namprd12.prod.outlook.com (2603:10b6:510:1d7::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.25; Fri, 20 Jan
- 2023 20:38:20 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f8b0:df13:5f8d:12a%9]) with mapi id 15.20.6002.013; Fri, 20 Jan 2023
- 20:38:19 +0000
-Date:   Fri, 20 Jan 2023 16:38:18 -0400
-From:   Jason Gunthorpe <jgg@nvidia.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-tegra@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v2 04/10] iommu/dma: Use the gfp parameter in
- __iommu_dma_alloc_noncontiguous()
-Message-ID: <Y8r7ujD8BVgWiIH/@nvidia.com>
-References: <4-v2-ce66f632bd0d+484-iommu_map_gfp_jgg@nvidia.com>
- <f24fcba7-2fcb-ed43-05da-60763dbb07bf@arm.com>
+        with ESMTP id S229487AbjATVUh (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 16:20:37 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C80EC55;
+        Fri, 20 Jan 2023 13:20:35 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 57E76B829FB;
+        Fri, 20 Jan 2023 21:20:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A04EC433EF;
+        Fri, 20 Jan 2023 21:20:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674249633;
+        bh=F8IpSOi2yAsoDoJtoZ+I9NR2c/7qvXeB0K1/DdBRsNY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ND9fVSSJQ8Sdt6aDyGMKj6L0Pk+kfUC0xhp9OzbiQ/MwP1P2i/fY/4x70eG08kFP+
+         FP/JzlzKcIwTfDuYnjZkj5Apjc+uSXOxq1vvelxt/4Ru+uzopag4DNPO/Uywaq4FLI
+         lPR8GD0GpVv1bwxvW1lMIcOpGlQsaqt4wEXyFmu4X+WYIhVm5t4VVaqt2LvnsTH8Aq
+         vdMcLamh7xyew6Ujc02MhTwLFJTdt4CNomQaoE9IZOdVBfZy4CVVFykaoBSy7eaDGz
+         7YP9emKOeK3RyjYyuyu0uf1e05N12b5TcHPsvFPQ0rKucbHZdxWZrw1dR5YHVEueVt
+         bJ8MVSTtdE8Gw==
+Date:   Fri, 20 Jan 2023 21:20:30 +0000
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, ashish.kalra@amd.com,
+        harald@profian.com, Nikunj A Dadhania <nikunj@amd.com>,
+        chao.p.peng@linux.intel.com
+Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
+ to KVM
+Message-ID: <Y8sFnsk2GvnUCVFI@kernel.org>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-4-michael.roth@amd.com>
+ <Y6Xd0ruz3kMij/5F@zn.tnic>
+ <20230105021419.rs23nfq44rv64tsd@amd.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f24fcba7-2fcb-ed43-05da-60763dbb07bf@arm.com>
-X-ClientProxiedBy: BL1PR13CA0131.namprd13.prod.outlook.com
- (2603:10b6:208:2bb::16) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|PH7PR12MB5832:EE_
-X-MS-Office365-Filtering-Correlation-Id: c7e236de-7c93-454f-b089-08dafb2643f8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: HZRZHOHjF1dSv4pXCeo1eko9iM0cmlCnSjGxmQAchQ5Nv+g/kwgiWS8la+MpfnHKGwNmIdLt4tG2jhQROjRYejvJwrUka6rX5kz68qWrJ4snIJ5zcIIBYQplkQFqy9WAptn5Y8AlYKGoD+zjN+3YGT7FuBKDJtwzhPJjb3Ja+Rzf7CF8kpimOaIkYZSBQjYP1zdfA8Zb3quT1sQ0qXZ/qK73t9k0/LtHQANmHxlao2mUmkRKphysfXI4373eF7f0NshfofwG7P11XERGjO2HlqPas6bJKusEaYj6/s6Xu4WRzeBLhTBlUpwHHYbPwQsw0Xay4AOqKj0YC2TSY8JtaqbU0cNcdnIKXES2/yAbnuu+NDSg0bALk0oGaYzXmYjlC8VnkiquCrpT1kbek6+SPHZL6Ow0pxf6FJkDaeGKyGRnTQt5bYGkR/Mw1ZoNAdaHBaarZdTzkPq5TZ4Z4/Du8At7VsAatk8cfAE4GsMSrGq5sFrR+vY2J7tl2QbxQWrF2ThCtDdirPaFrKpo+D9wc9SIIZlDkS758YhRnygHl8BIV1TGa6BcSBP2RtCfOive7BWXSlN6ShWFnM7P7Xzs9/osIWB9yamZVVCIx/Uo/wPiup1e9k4ZbHqcC642yrNw07pjnMPcm2r5R1AUY/uIRg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(366004)(376002)(346002)(39860400002)(396003)(136003)(451199015)(8936002)(316002)(5660300002)(86362001)(6486002)(478600001)(36756003)(6506007)(53546011)(2906002)(2616005)(83380400001)(6512007)(54906003)(6916009)(4326008)(8676002)(66556008)(7416002)(186003)(26005)(66476007)(66946007)(41300700001)(38100700002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?eLNs2NpejaIlYGQJD7BSOOF8jqxbQLUwSjPxwiqPm8yOsE3TFBuR1dwsqnPh?=
- =?us-ascii?Q?fSjIvvzStUErWKQNWdKaVtTomJbu3DJ7HGP3mDx4NXVdmdMdMIDuh8yNQETW?=
- =?us-ascii?Q?6dsaFX6imCqqI6yte9AmOyJ65Obu8ODrxidy3RXFRLW5qiHg+lPyYmMSsJJL?=
- =?us-ascii?Q?Efi8Xk+wlLKtYpFHiTegMWy+YracsaRIM8voTm/MqHk0fNww5qtLK+3BXzov?=
- =?us-ascii?Q?BxgjBaapmzZVcQAz3rUO5Ba0XFglxDayN+ZRsiM5CQhLZdeubkxRTmfsb0oc?=
- =?us-ascii?Q?7Qf27NMo9/PayC4ppKZxobriQ04T1qglsklGzsSNZ8S3VVBKUsxxTyWl7ryE?=
- =?us-ascii?Q?lDYuOOVGW/ZF/LdSZL9+w/5Vl7jectcLANgN/897PMtVNXTFejPZZGYFqQEx?=
- =?us-ascii?Q?CE+SE3VtS+FoBL7NDv1gma247PitkjyOeTvv6i9nn4vH6I6ChQtzk7Uz+KuT?=
- =?us-ascii?Q?ZhSoJF1IoJ/eoIAGcmY0tM0QKZtgGvFFAkjISNbXyfKZB+4X/sqJAQoEIan3?=
- =?us-ascii?Q?4RL5qt/IPWpbKTMtqB88KFpEb2iPlGo0U1Oj++CZeXv25UG6M8TQQkno5VYA?=
- =?us-ascii?Q?6C27X1MXFwxaqaiTh7RUXoRJTSKvVoD8rxzkUEev8sMvQtZ9NiEUnzaIMeWM?=
- =?us-ascii?Q?N3LccgBMJz83qvT36sQv9Bv8u3CJCeR8RzuuWdwHJ500+tJML73WDk79zqaL?=
- =?us-ascii?Q?WxaR/lb+iaO8BMapdsipnlDUfbJD5i390CNjzbiNMlMdHGIkbB5akvxNrQI0?=
- =?us-ascii?Q?LZNSqwttNY1U+qyfQcGrQftKtNZmubAAEx6dMJEUpF2N7jT4siSQwlP3wPzP?=
- =?us-ascii?Q?ZfCsz4pYxrHjnRCLwjo+ba2MzCEn5PjhbtAoe2CnQjn3RCG8jkcbNNd/Sci2?=
- =?us-ascii?Q?Bzr/oQuAr528RcCjpl5h7H92rsTaq249xOkti/hpkOBBntfVH1qZGKxnNvtT?=
- =?us-ascii?Q?PV/CTrRdFguBy05/4CoSwXQFGIAi9nQkbYSEyhV2CLESw8lZ3QxfKbSBMVGK?=
- =?us-ascii?Q?YmdNkaZwNu8dzToq6GDnxUHsz0oEfid2UdCGQTgyjLiV9dHE03LU+GgjGnyV?=
- =?us-ascii?Q?Jbv60xIkvyiSW+7w6bCRVfyMvsSWGDnpN/60GKCDyilBoVPjYSA4RrWJFfEu?=
- =?us-ascii?Q?CxaqXkEZEclp/ejV33Fh87B5+bSbsXWjkDlDEfzDnleAdEcWTV0G93K5Y2RS?=
- =?us-ascii?Q?++aS9oMY/GdbEkoaVk5wFBMMrRTzg1C/y4RSbAgvmBA7y7mv/fC6kg2oZ/RP?=
- =?us-ascii?Q?MmCnZ8wc911dPtVTwzSCt++84PV/H/7IX4XajxVXivaudWDnRBnLyFjjLW8Q?=
- =?us-ascii?Q?+LgIozmeLyPN/fDPSNn3g3fJjss+oCyJqPhoS8ZaqDeAo6qcWfwvEdKTc9vF?=
- =?us-ascii?Q?4Nn5liLbUJXNAAT1eDk1hyJkhyV26doqKK89SZRAsuTZxutabe5H8sFkyrOA?=
- =?us-ascii?Q?PCMcq6tv2MaNOGTdvpv8qOpDZo9s+so/SzkEKTgZrRIkIT1irrKybAYwvgAS?=
- =?us-ascii?Q?Lp2hwsykuDIXrUtdyqEa+Lz/6EPg079r5+AlImISzXmrPjjq+g1EOES7A3ut?=
- =?us-ascii?Q?JJIDdfGelfYpkRWQJO5zNJEN2+e3reaZsTzzL05X?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c7e236de-7c93-454f-b089-08dafb2643f8
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2023 20:38:19.6234
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: K4oTXB2HGiakYi0h1ZGvqDZ0EKLD00yaUn4LwqJEODca1cuxfEW6JYt7EaHjMJ75
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5832
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230105021419.rs23nfq44rv64tsd@amd.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 20, 2023 at 07:28:19PM +0000, Robin Murphy wrote:
-> On 2023-01-18 18:00, Jason Gunthorpe wrote:
-> > Change the sg_alloc_table_from_pages() allocation that was hardwired to
-> > GFP_KERNEL to use the gfp parameter like the other allocations in this
-> > function.
+On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
+> On Fri, Dec 23, 2022 at 05:56:50PM +0100, Borislav Petkov wrote:
+> > On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
+> > > +       bool (*private_mem_enabled)(struct kvm *kvm);
 > > 
-> > Auditing says this is never called from an atomic context, so it is safe
-> > as is, but reads wrong.
+> > This looks like a function returning boolean to me. IOW, you can
+> > simplify this to:
 > 
-> I think the point may have been that the sgtable metadata is a
-> logically-distinct allocation from the buffer pages themselves. Much like
-> the allocation of the pages array itself further down in
-> __iommu_dma_alloc_pages().
+> The semantics and existing uses of KVM_X86_OP_OPTIONAL_RET0() gave me the
+> impression it needed to return an integer value, since by default if a
+> platform doesn't implement the op it would "return 0", and so could
+> still be called unconditionally.
+> 
+> Maybe that's not actually enforced, by it seems awkward to try to use a
+> bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
+> 
+> However, we could just use KVM_X86_OP() to declare it so we can cleanly
+> use a function that returns bool, and then we just need to do:
+> 
+>   bool kvm_arch_has_private_mem(struct kvm *kvm)
+>   {
+>           if (kvm_x86_ops.private_mem_enabled)
+>                   return static_call(kvm_x86_private_mem_enabled)(kvm);
 
-That makes sense, and it is a good reason to mask off the allocation
-policy flags from the gfp.
+I guess this is missing:
 
-On the other hand it also makes sense to continue to pass in things
-like NOWAIT|NOWARN to all the allocations. Even to the iommu driver.
+        return false;
 
-So I'd prefer to change this to mask and make all the following calls
-consistently use the input gfp
+>   }
+>     
+> instead of relying on default return value. So I'll take that approach
+> and adopt your other suggested changes.
+> 
+> ...
+> 
+> On a separate topic though, at a high level, this hook is basically a way
+> for platform-specific code to tell generic KVM code that private memslots
+> are supported by overriding the kvm_arch_has_private_mem() weak
+> reference. In this case the AMD platform is using using kvm->arch.upm_mode
+> flag to convey that, which is in turn set by the
+> KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
+> 
+> But if, as I suggested in response to your PATCH 2 comments, we drop
+> KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
+> KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
+> code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
+> in-part relies on kvm_arch_has_private_mem() to determine what flags are
+> supported, whereas SEV/SNP code would be using what was set by
+> KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
+> kvm_arch_has_private_mem().
 
-> I'd say the more confusing thing about this particular context is why we're
-> using iommu_map_sg_atomic() further down - that seems to have been an
-> oversight in 781ca2de89ba, since this particular path has never supported
-> being called in atomic context.
+Does this mean that internal calls to  kvm_vm_set_region_attr() will
+cease to exist, and it will rely for user space to use the ioctl
+properly instead?
 
-Huh. I had fixed that in v1, this patch was supposed to have that
-hunk, that was the main point of making this patch actually..
+> So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
+> on something else. Maybe the logic can just be:
+> 
+>   bool svm_private_mem_enabled(struct kvm *kvm)
+>   {
+>     return sev_enabled(kvm) || sev_snp_enabled(kvm)
+>   }
+> 
+> (at least in the context of this patchset where UPM support is added for
+> both SEV and SNP).
+> 
+> So I'll plan to make that change as well.
+> 
+> -Mike
+> 
+> > 
+> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> > index 82ba4a564e58..4449aeff0dff 100644
+> > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > @@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
+> >  KVM_X86_OP(complete_emulated_msr)
+> >  KVM_X86_OP(vcpu_deliver_sipi_vector)
+> >  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> > +KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
+> >  
+> >  #undef KVM_X86_OP
+> >  #undef KVM_X86_OP_OPTIONAL
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index 1da0474edb2d..1b4b89ddeb55 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
+> >  
+> >  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+> >  			     int root_level);
+> > +	bool (*private_mem_enabled)(struct kvm *kvm);
+> >  
+> >  	bool (*has_wbinvd_exit)(void);
+> >  
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index ce362e88a567..73b780fa4653 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
+> >  	return 0;
+> >  }
+> >  
+> > +static bool svm_private_mem_enabled(struct kvm *kvm)
+> > +{
+> > +	if (sev_guest(kvm))
+> > +		return kvm->arch.upm_mode;
+> > +
+> > +	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
+> > +}
+> > +
+> >  static struct kvm_x86_ops svm_x86_ops __initdata = {
+> >  	.name = "kvm_amd",
+> >  
+> > @@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+> >  
+> >  	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
+> >  
+> > +	.private_mem_enabled = svm_private_mem_enabled,
+> > +
+> >  	.has_wbinvd_exit = svm_has_wbinvd_exit,
+> >  
+> >  	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 823646d601db..9a1ca59d36a4 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
+> >  }
+> >  EXPORT_SYMBOL_GPL(__x86_set_memory_region);
+> >  
+> > +bool kvm_arch_has_private_mem(struct kvm *kvm)
+> > +{
+> > +	return static_call(kvm_x86_private_mem_enabled)(kvm);
+> > +}
+> > +
+> >  void kvm_arch_pre_destroy_vm(struct kvm *kvm)
+> >  {
+> >  	kvm_mmu_pre_destroy_vm(kvm);
+> > 
+> > -- 
+> > Regards/Gruss,
+> >     Boris.
+> > 
+> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C319e89ce555a46eace4d08dae506b51a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638074114318137471%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=aG11K7va1BhemwlKCKKdcIXEwXGUzImYL%2BZ9%2FQ7XToI%3D&reserved=0
 
-> Overall I'm starting to wonder if it might not be better to stick a "use
-> GFP_KERNEL_ACCOUNT if you allocate" flag in the domain for any level of the
-> API internals to pick up as appropriate, rather than propagate per-call gfp
-> flags everywhere. 
-
-We might get to something like that, but it requires more parts that
-are not ready yet. Most likely this would take the form of some kind
-of 'this is an iommufd created domain' indication. This happens
-naturally as part of the nesting patches.
-
-Right now I want to get people to start testing with this because the
-charge from the IOPTEs is far and away the largest memory draw.  Parts
-like fixing the iommu drivers to actually use gfp are necessary to
-make it work.
-
-If we flip the two places using KERNEL_ACCOUNT to something else later
-it doesn't really matter. I think the removal of the two _atomic
-wrappers is still appropriate stand-alone.
-
-> As it stands we're still missing potential pagetable and other
-> domain-related allocations by drivers in .attach_dev and even (in
-
-Yes, I plan to get to those when we add an alloc_domain_iommufd() or
-whatever op. The driver will know the calling context and can set the
-gfp flags for any allocations under alloc_domain under that time.
-
-Then we can go and figure out if there are other allocations and if
-all or only some drivers need a flag - eg at attach time. Though this
-is less worrying because you can only scale attach up to num_pasids *
-num open vfios.
-
-iommufd will let userspace create and populate an unlimited number of
-iommu_domains, so everything linked to an unattached iommu_domain
-should be charged.
-
-> probably-shouldn't-really-happen cases) .unmap_pages...
-
-Gah, unmap_pages isn't allow to fail. There is no way to recover from
-this. iommufd will spew a warn and then have a small race where
-userspace can UAF kernel memory.
-
-I'd call such a driver implementation broken. Why would you need to do
-this?? :(
-
-Thanks,
-Jason
+BR, Jarkko
