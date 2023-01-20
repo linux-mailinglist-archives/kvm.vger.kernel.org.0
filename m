@@ -2,143 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5ED0B67543A
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 13:12:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B958867544C
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 13:21:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229985AbjATMMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 07:12:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48372 "EHLO
+        id S230037AbjATMVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 07:21:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229851AbjATMMk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 07:12:40 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0375983E5
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 04:12:38 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 42442CE2804
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 12:12:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BC5CC433D2;
-        Fri, 20 Jan 2023 12:12:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674216755;
-        bh=0iRYbwf/9VfNZDvMm3r5D5V9SjGnLfb8zDeKKD726pQ=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=dYnc6eLdwwBG1cYTK3l0gV197Jwvcv3DfcQMD7C3ZDWPUVN1nEQJ7kdFEdGf7ARlo
-         H9oQJSIJ8mDcFW58izgVRn4Ex5lRA5IHko2t3aOhY3pNhfvvw9DyZIS9aVjEDcLiju
-         rxUqJF4Ts+JJZqaGxNqN/sF5zObR3gUkYMGgLAGlfRFQvlaDLrpehQ0xeyCybAefIJ
-         lzHLWa6rOCSPYU6ACvOfapi5fFmwJspzCfJOc7cUXoIzi7aa69dQCZCXcQxw8bzytO
-         HRQpLRONAz3jYQfLGBIj/qKXAVvKfVtePF/i/jdpEHrq/Pu/AjtvY7gbtdtk2cPCZr
-         1zok2UNyqvTvw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pIqG1-003P46-99;
-        Fri, 20 Jan 2023 12:12:33 +0000
-Date:   Fri, 20 Jan 2023 12:12:32 +0000
-Message-ID: <86pmb9mmkv.wl-maz@kernel.org>
-From:   Marc Zyngier <maz@kernel.org>
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Reiji Watanabe <reijiw@google.com>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        with ESMTP id S229450AbjATMVp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 07:21:45 -0500
+Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AF3B8B303;
+        Fri, 20 Jan 2023 04:21:42 -0800 (PST)
+Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
+        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <heiko@sntech.de>)
+        id 1pIqNP-0003oi-Vu; Fri, 20 Jan 2023 13:20:12 +0100
+From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
+To:     linux-riscv@lists.infradead.org
+Cc:     Guo Ren <guoren@linux.alibaba.com>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Han-Kuan Chen <hankuan.chen@sifive.com>,
+        Greentime Hu <greentime.hu@sifive.com>,
+        Palmer Dabbelt <palmer@rivosinc.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Eric Biederman <ebiederm@xmission.com>,
+        Kees Cook <keescook@chromium.org>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Oleg Nesterov <oleg@redhat.com>,
+        Heinrich Schuchardt <heinrich.schuchardt@canonical.com>,
+        Guo Ren <guoren@kernel.org>,
+        Chris Stillson <stillson@rivosinc.com>,
+        Mayuresh Chitale <mchitale@ventanamicro.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Ricardo Koller <ricarkol@google.com>,
-        Jing Zhang <jingzhangos@google.com>,
-        Raghavendra Rao Anata <rananta@google.com>
-Subject: Re: [PATCH v2 3/8] KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value on vCPU reset
-In-Reply-To: <Y8ngqRHhiXHjc0vA@google.com>
-References: <20230117013542.371944-1-reijiw@google.com>
-        <20230117013542.371944-4-reijiw@google.com>
-        <Y8ngqRHhiXHjc0vA@google.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, reijiw@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        Alexandre Ghiti <alexandre.ghiti@canonical.com>,
+        Qinglin Pan <panqinglin2020@iscas.ac.cn>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Dao Lu <daolu@rivosinc.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        Sunil V L <sunilvl@ventanamicro.com>,
+        Ruinland Tsai <ruinland.tsai@sifive.com>,
+        Li Zhengyu <lizhengyu3@huawei.com>,
+        Alexander Graf <graf@amazon.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Tsukasa OI <research_trasio@irq.a4lg.com>,
+        Yury Norov <yury.norov@gmail.com>,
+        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Changbin Du <changbin.du@intel.com>,
+        Vitaly Wool <vitaly.wool@konsulko.com>,
+        Myrtle Shah <gatecat@ds0.me>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
+        Alexey Dobriyan <adobriyan@gmail.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Christian Brauner <brauner@kernel.org>,
+        Peter Collingbourne <pcc@google.com>,
+        Eugene Syromiatnikov <esyr@redhat.com>,
+        Colin Cross <ccross@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Barret Rhoden <brho@google.com>,
+        Suren Baghdasaryan <surenb@google.com>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org,
+        Chris Stillson <stillson@rivosinc.com>
+Subject: Re: [PATCH v12 06/17] riscv: Reset vector register
+Date:   Fri, 20 Jan 2023 13:20:09 +0100
+Message-ID: <2331455.NG923GbCHz@diego>
+In-Reply-To: <20220921214439.1491510-6-stillson@rivosinc.com>
+References: <20220921214439.1491510-1-stillson@rivosinc.com>
+ <20220921214439.1491510-6-stillson@rivosinc.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_PASS,
+        T_SPF_HELO_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Jan 2023 00:30:33 +0000,
-Oliver Upton <oliver.upton@linux.dev> wrote:
-> 
-> On Mon, Jan 16, 2023 at 05:35:37PM -0800, Reiji Watanabe wrote:
-> > The number of PMU event counters is indicated in PMCR_EL0.N.
-> > For a vCPU with PMUv3 configured, its value will be the same as
-> > the host value by default. Userspace can set PMCR_EL0.N for the
-> > vCPU to a lower value than the host value using KVM_SET_ONE_REG.
-> > However, it is practically unsupported, as reset_pmcr() resets
-> > PMCR_EL0.N to the host value on vCPU reset.
-> > 
-> > Change reset_pmcr() to preserve the vCPU's PMCR_EL0.N value on
-> > vCPU reset so that userspace can limit the number of the PMU
-> > event counter on the vCPU.
-> > 
-> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> > ---
-> >  arch/arm64/kvm/pmu-emul.c | 6 ++++++
-> >  arch/arm64/kvm/sys_regs.c | 4 +++-
-> >  2 files changed, 9 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
-> > index 24908400e190..937a272b00a5 100644
-> > --- a/arch/arm64/kvm/pmu-emul.c
-> > +++ b/arch/arm64/kvm/pmu-emul.c
-> > @@ -213,6 +213,12 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
-> >  
-> >  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
-> >  		pmu->pmc[i].idx = i;
-> > +
-> > +	/*
-> > +	 * Initialize PMCR_EL0 for the vCPU with the host value so that
-> > +	 * the value is available at the very first vCPU reset.
-> > +	 */
-> > +	__vcpu_sys_reg(vcpu, PMCR_EL0) = read_sysreg(pmcr_el0);
-> 
-> I think we need to derive a sanitised value for PMCR_EL0.N, as I believe
-> nothing in the architecture prevents implementers from gluing together
-> cores with varying numbers of PMCs. We probably haven't noticed it yet
-> since it would appear all Arm designs have had 6 PMCs.
+Am Mittwoch, 21. September 2022, 23:43:48 CET schrieb Chris Stillson:
+> @@ -431,6 +431,29 @@ ENTRY(reset_regs)
+>  	csrw	fcsr, 0
+>  	/* note that the caller must clear SR_FS */
+>  #endif /* CONFIG_FPU */
+> +
+> +#ifdef CONFIG_VECTOR
+> +	csrr	t0, CSR_MISA
+> +	li	t1, COMPAT_HWCAP_ISA_V
+> +	and	t0, t0, t1
+> +	beqz	t0, .Lreset_regs_done
+> +
+> +	/*
+> +	 * Clear vector registers and reset vcsr
+> +	 * VLMAX has a defined value, VLEN is a constant,
+> +	 * and this form of vsetvli is defined to set vl to VLMAX.
+> +	 */
+> +	li	t1, SR_VS
+> +	csrs	CSR_STATUS, t1
+> +	csrs	CSR_VCSR, x0
+> +	vsetvli t1, x0, e8, m8, ta, ma
+> +	vmv.v.i v0, 0
+> +	vmv.v.i v8, 0
+> +	vmv.v.i v16, 0
+> +	vmv.v.i v24, 0
+> +	/* note that the caller must clear SR_VS */
+> +#endif /* CONFIG_VECTOR */
+> +
+>  .Lreset_regs_done:
 
-This brings back the question of late onlining. How do you cope with
-with the onlining of such a CPU that has a smaller set of counters
-than its online counterparts? This is at odds with the way the PMU
-code works.
+Not sure how much they go together, but the #ifdef CONFIG_FPU block above
+your new VECTOR block also jumps to the same .Lreset_regs_done, so with
+the patch as is the vector-reset block is never reached in the !FPU case.
 
-If you have a different set of counters, you are likely to have a
-different PMU altogether:
+So maybe making them independent of each other might prevent issues
+down the roead.
 
-[    1.192606] hw perfevents: enabled with armv8_cortex_a57 PMU driver, 7 counters available
-[    1.201254] hw perfevents: enabled with armv8_cortex_a53 PMU driver, 7 counters available
 
-This isn't a broken system, but it has two set of cores which are
-massively different, and two PMUs.
-
-This really should tie back to the PMU type we're counting on, and to
-the set of CPUs that implements it. We already have some
-infrastructure to check for the affinity of the PMU vs the CPU we're
-running on, and this is already visible to userspace.
-
-Can't we just leave this responsibility to userspace?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
