@@ -2,141 +2,154 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06D93675647
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 15:02:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 08EE967564F
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 15:04:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230055AbjATOCK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 09:02:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59354 "EHLO
+        id S229590AbjATOEV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 09:04:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbjATOCJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 09:02:09 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D0B4C13F5;
-        Fri, 20 Jan 2023 06:02:08 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30KDrTo0021023;
-        Fri, 20 Jan 2023 14:02:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=MHYEeb1An0ddYguIQpgCo9rwIVDQ/HwjjdWBu/m9Rf4=;
- b=j0G6Sl2b5Fs/xSn0s5vfPmWQ6IrZeO4ejxGaOav/Dlc5dODf/69b927lUshyL2nsbXBv
- YVJn3U1treC9VtYU/ezVkD4vc5PZDSO9ymgMJ2HbxU8z82IfHGIIm9ueRFlNyKLcVI+W
- PY4l09q4LY8ZYx3qk3sxGoSVzyVUXlDoFdFYgNupQ2oIMjKYZK7khvPdnZJFQW1DWoD8
- +vdcqQ74w45Q9P3vw5HG81yfkFbCnfyny+avd496Z8FnrSejhLQq6Sdn8JeaYLuOtEql
- gW1rdV3X0+P2BejgDqbqEfUihh47guq6rIhGOItBh6wK7V+6CGNRIXqO7x37pC17KY5E 8Q== 
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7v85r613-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Jan 2023 14:02:07 +0000
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
-        by ppma02dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30KDQKRX006166;
-        Fri, 20 Jan 2023 14:02:06 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([9.208.130.99])
-        by ppma02dal.us.ibm.com (PPS) with ESMTPS id 3n3m185235-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Jan 2023 14:02:06 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-        by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30KE25m535455350
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 Jan 2023 14:02:05 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7B2285805C;
-        Fri, 20 Jan 2023 14:02:05 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id ABD325805F;
-        Fri, 20 Jan 2023 14:02:04 +0000 (GMT)
-Received: from [9.160.36.55] (unknown [9.160.36.55])
-        by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 20 Jan 2023 14:02:04 +0000 (GMT)
-Message-ID: <e51d751f-54c1-b292-7c86-e0b077f138c4@linux.ibm.com>
-Date:   Fri, 20 Jan 2023 09:02:04 -0500
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.0
-Subject: Re: [PATCH v2 0/6] improve AP queue reset processing
-Content-Language: en-US
-To:     Christian Borntraeger <borntraeger@de.ibm.com>,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-Cc:     jjherne@linux.ibm.com, freude@linux.ibm.com, pasic@linux.ibm.com,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-References: <20230118203111.529766-1-akrowiak@linux.ibm.com>
- <d8fe5146-def7-262d-15cb-0bb965102f3c@de.ibm.com>
-From:   Anthony Krowiak <akrowiak@linux.ibm.com>
-In-Reply-To: <d8fe5146-def7-262d-15cb-0bb965102f3c@de.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: k9FIqbtfj3DyL-buoeHvnG3a-BaNZEWi
-X-Proofpoint-ORIG-GUID: k9FIqbtfj3DyL-buoeHvnG3a-BaNZEWi
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-20_08,2023-01-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- phishscore=0 bulkscore=0 mlxscore=0 clxscore=1015 suspectscore=0
- adultscore=0 priorityscore=1501 mlxlogscore=857 impostorscore=0
- malwarescore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301200133
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S230086AbjATOEU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 09:04:20 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5668213C
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 06:04:16 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4290E61F76
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:04:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D037C4339B;
+        Fri, 20 Jan 2023 14:04:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674223455;
+        bh=RsGkcvnNtpSaNCyQB4mw8BBq8xS8J2zdcLN5ShvOTdE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=DpEKY2/CMiY/zNaitgj2T5rExEk/IURWoC0L6N4u+i3YdmqQjaup15yxRrMSC3NTz
+         d3+3JKujvBW+BZWWIgtUJXM3daVozNzbNqaTmSWAv30ml5CIQpa+iTxbrhvPMvcCRp
+         ClHmf2MpXFO5f8oCtd6YiJI9PkxTD6tJf8c79K7x/tbhLJchVQMm+zPaLLLEGTdHg5
+         pSIG9/YuSKCupTq6oMpqnJ5MS9AUb+xZvPmD6z2iFzkDhqmxMqftpZQSlzjmGPs/P/
+         L10MsLHQNFJywWVDbs+joNsYyGch0hKUCQg5P/PSp4yRrcOHGqqJBgt7HfovvP06PQ
+         xYAUTOquA3tYw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pIs05-003Qff-7y;
+        Fri, 20 Jan 2023 14:04:13 +0000
+Date:   Fri, 20 Jan 2023 14:04:12 +0000
+Message-ID: <86o7qtmher.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Reiji Watanabe <reijiw@google.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v2 1/8] KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
+In-Reply-To: <20230117013542.371944-2-reijiw@google.com>
+References: <20230117013542.371944-1-reijiw@google.com>
+        <20230117013542.371944-2-reijiw@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: reijiw@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, oliver.upton@linux.dev, jingzhangos@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Tue, 17 Jan 2023 01:35:35 +0000,
+Reiji Watanabe <reijiw@google.com> wrote:
+> 
+> On vCPU reset, PMCNTEN{SET,CLR}_EL0, PMINTEN{SET,CLR}_EL1, and
+> PMOVS{SET,CLR}_EL1 for a vCPU are reset by reset_pmu_reg().
+> This function clears RAZ bits of those registers corresponding
+> to unimplemented event counters on the vCPU, and sets bits
+> corresponding to implemented event counters to a predefined
+> pseudo UNKNOWN value (some bits are set to 1).
+> 
+> The function identifies (un)implemented event counters on the
+> vCPU based on the PMCR_EL1.N value on the host. Using the host
+> value for this would be problematic when KVM supports letting
+> userspace set PMCR_EL1.N to a value different from the host value
+> (some of the RAZ bits of those registers could end up being set to 1).
+> 
+> Fix reset_pmu_reg() to clear the registers so that it can ensure
+> that all the RAZ bits are cleared even when the PMCR_EL1.N value
+> for the vCPU is different from the host value.
+> 
+> Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> ---
+>  arch/arm64/kvm/sys_regs.c | 10 +---------
+>  1 file changed, 1 insertion(+), 9 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> index c6cbfe6b854b..ec4bdaf71a15 100644
+> --- a/arch/arm64/kvm/sys_regs.c
+> +++ b/arch/arm64/kvm/sys_regs.c
+> @@ -604,19 +604,11 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+>  
+>  static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+>  {
+> -	u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> -
+>  	/* No PMU available, any PMU reg may UNDEF... */
+>  	if (!kvm_arm_support_pmu_v3())
+>  		return;
 
-On 1/20/23 5:25 AM, Christian Borntraeger wrote:
-> Am 18.01.23 um 21:31 schrieb Tony Krowiak:
->> This series introduces several improvements to the function that 
->> performs
->> AP queue resets:
->>
->> * Breaks up reset processing into multiple smaller, more concise 
->> functions.
->>
->> * Use TAPQ to verify completion of a reset in progress rather than 
->> mulitple
->>    invocations of ZAPQ.
->>
->> * Check TAPQ response codes when verifying successful completion of 
->> ZAPQ.
->>
->> * Fix erroneous handling of some error response codes.
->>
->> * Increase the maximum amount of time to wait for successful 
->> completion of
->>    ZAPQ.
->>   Change log v1 => v2:
->> -------------------
->> Remove patch 7/7 to restore original behavior since we don't know 
->> whether
->> interrupts are disabled when an unexpected response code is returned 
->> from
->> ZAPQ. (Halil)
->>
->> Tony Krowiak (6):
->>    s390/vfio-ap: verify reset complete in separate function
->>    s390/vfio_ap: check TAPQ response code when waiting for queue reset
->>    s390/vfio_ap: use TAPQ to verify reset in progress completes
->>    s390/vfio_ap: verify ZAPQ completion after return of response code
->>      zero
->>    s390/vfio_ap: fix handling of error response codes
->>    s390/vfio_ap: increase max wait time for reset verification
->>
->>   drivers/s390/crypto/vfio_ap_ops.c | 104 +++++++++++++++++++++---------
->>   1 file changed, 72 insertions(+), 32 deletions(-)
->>
->
-> Thanks applied and queued for CI and regression runs. Will likely go 
-> via s390 tree.
+Is this still true? We remove the PMCR_EL0 access just below.
 
+>  
+> -	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> -	n &= ARMV8_PMU_PMCR_N_MASK;
+> -	if (n)
+> -		mask |= GENMASK(n - 1, 0);
+> -
+> -	reset_unknown(vcpu, r);
+> -	__vcpu_sys_reg(vcpu, r->reg) &= mask;
+> +	__vcpu_sys_reg(vcpu, r->reg) = 0;
+>  }
 
-Got it, thanks.
+At the end of the day, this function has no dependency on the host at
+all, and only writes 0 to the per-vcpu register.
 
+So why not get rid of it altogether and have:
 
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c6cbfe6b854b..1d1514b89d75 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -976,7 +976,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ 	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
+ 
+ #define PMU_SYS_REG(r)						\
+-	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
++	SYS_DESC(r), .visibility = pmu_visibility
+ 
+ /* Macro to expand the PMEVCNTRn_EL0 register */
+ #define PMU_PMEVCNTR_EL0(n)						\
+
+which would fall-back the specified reset value (zero by default)?
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
