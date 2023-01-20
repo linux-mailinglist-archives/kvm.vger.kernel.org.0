@@ -2,107 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 23B6F6757EB
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 16:00:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5638D675814
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 16:05:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230061AbjATPAK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 10:00:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36534 "EHLO
+        id S229943AbjATPFd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 10:05:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40818 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229590AbjATPAJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 10:00:09 -0500
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DE2641B72;
-        Fri, 20 Jan 2023 07:00:07 -0800 (PST)
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30KEx1X8000559;
-        Fri, 20 Jan 2023 14:59:42 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=3HrTy6KRH0c8nn8RZz4UfVbeho7HoRu2+7rX1+TKX6o=;
- b=NrU0ke3Gq12txpQ4inx0oalb6FODLnpl/63NNfyMI4fRK915a1sfFJm+ZGTnSS6XUrmu
- 6JDQbXXMyz+2t8MbTxD29cp9Xpd5/s2d9L7019nVyU9S0p6FtIO7AXRxqP4O+Em0crSd
- TRf3FojLW1/lbKiJeWDql6YEtTvYMF7NuF1wFVFgVcjgtQdR9uXTE32YwyPGz6DGz0eG
- 2VX9BXcRazJ0GM4DZHR4jJ1+58AiC4pLsm+wo+SNYERuIBSLfmp2ZDR4NQdZENhSDlHA
- 8HgUC93d+ZbYBetZ7ze5TMKhAmDbckmxTTKJqbn6+ZPeA9+uTO0p7cuJZFybsIlviJzj 8w== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3n7c28hwv5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Jan 2023 14:59:42 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-        by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 30KExfev006092
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Jan 2023 14:59:41 GMT
-Received: from [10.226.59.182] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 20 Jan
- 2023 06:59:40 -0800
-Message-ID: <8a5c3cc6-c1e5-b6c4-e69d-441cf3a1fa7d@quicinc.com>
-Date:   Fri, 20 Jan 2023 07:59:39 -0700
+        with ESMTP id S229907AbjATPFc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 10:05:32 -0500
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C888B7CCC1;
+        Fri, 20 Jan 2023 07:05:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674227131; x=1705763131;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Zn183ElO1bl64Y4pVPfF7h7rDHD+/IuJAJiKiAAXWvc=;
+  b=F/0vIVpVwojTbSAlnf2veNQ3B7J09FMvOPCmAYS/wa+rX8SN9SZwu//F
+   g27XxVYnlUsdx8FXerODDMbpDy6DaRZaL3aC3GBItoxhEjMNzDFtHNiMt
+   gvgmlJVnNEP3sGPBrIwWceEyFKJkIBKb8AVshNFSBOJ73fvqW5FZIHANP
+   iVzvG5cOsXYXT/hrVZKdA7hfxloRxb3FbQ66Vi9qQSaP6b5AJQrI2+/j4
+   0FepJEMCN/xG818aDRDF7mWx8VZKknMtjjRbh1vquc0Zww9VUHaUasmQP
+   5mBp8p7uwepP1pp8+fqrWjgLBj8/WSx/YTOj53x+s05xlsCUlb6HjWlXj
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="309169480"
+X-IronPort-AV: E=Sophos;i="5.97,232,1669104000"; 
+   d="scan'208";a="309169480"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2023 07:05:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="784532388"
+X-IronPort-AV: E=Sophos;i="5.97,232,1669104000"; 
+   d="scan'208";a="784532388"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga004.jf.intel.com with ESMTP; 20 Jan 2023 07:05:30 -0800
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     alex.williamson@redhat.com, pbonzini@redhat.com,
+        mjrosato@linux.ibm.com
+Cc:     yi.l.liu@intel.com, jgg@nvidia.com, kevin.tian@intel.com,
+        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com, akrowiak@linux.ibm.com,
+        jjherne@linux.ibm.com, pasic@linux.ibm.com,
+        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, seanjc@google.com,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] kvm/vfio: Fix potential deadlock on vfio group_lock
+Date:   Fri, 20 Jan 2023 07:05:28 -0800
+Message-Id: <20230120150528.471752-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.0
-Subject: Re: [PATCH linux-next 1/3] Documentation: accel: escape wildcard in
- special file path
-Content-Language: en-US
-To:     Bagas Sanjaya <bagasdotme@gmail.com>,
-        Freedesktop DRI List <dri-devel@lists.freedesktop.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Documentation <linux-doc@vger.kernel.org>,
-        Linux KVM <kvm@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-CC:     Oded Gabbay <ogabbay@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Ofir Bitton <obitton@habana.ai>,
-        Sean Christopherson <seanjc@google.com>,
-        Aaron Lewis <aaronlewis@google.com>,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-References: <20230120123534.137413-1-bagasdotme@gmail.com>
- <20230120123534.137413-2-bagasdotme@gmail.com>
-From:   Jeffrey Hugo <quic_jhugo@quicinc.com>
-In-Reply-To: <20230120123534.137413-2-bagasdotme@gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: c49osEI-LfEgRsTJD9aA3ZchrnIv8A_-
-X-Proofpoint-ORIG-GUID: c49osEI-LfEgRsTJD9aA3ZchrnIv8A_-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-20_09,2023-01-20_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- priorityscore=1501 adultscore=0 lowpriorityscore=0 mlxlogscore=954
- clxscore=1011 mlxscore=0 suspectscore=0 malwarescore=0 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301200142
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/20/2023 5:35 AM, Bagas Sanjaya wrote:
-> Stephen Rothwell reported htmldocs warning then merging accel tree:
-> 
-> Documentation/accel/introduction.rst:72: WARNING: Inline emphasis start-string without end-string.
-> 
-> Sphinx confuses the file wildcards with inline emphasis (italics), hence
-> the warning.
-> 
-> Fix the warning by escaping wildcards.
-> 
-> Link: https://lore.kernel.org/linux-next/20230120132116.21de1104@canb.auug.org.au/
-> Fixes: f65c5dac207322 ("docs: accel: Fix debugfs path")
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
+Currently it is possible that the final put of a KVM reference comes from
+vfio during its device close operation.  This occurs while the vfio group
+lock is held; however, if the vfio device is still in the kvm device list,
+then the following call chain could result in a deadlock:
 
-Thanks for addressing this before I even saw the warning report.
+VFIO holds group->group_lock/group_rwsem
+  -> kvm_put_kvm
+   -> kvm_destroy_vm
+    -> kvm_destroy_devices
+     -> kvm_vfio_destroy
+      -> kvm_vfio_file_set_kvm
+       -> vfio_file_set_kvm
+        -> try to hold group->group_lock/group_rwsem
 
-Reviewed-by: Jeffrey Hugo <quic_jhugo@quicinc.com>
+The key function is the kvm_destroy_devices() which triggers destroy cb
+of kvm_device_ops. It calls back to vfio and try to hold group_lock. So
+if this path doesn't call back to vfio, this dead lock would be fixed.
+Actually, there is a way for it. KVM provides another point to free the
+kvm-vfio device which is the point when the device file descriptor is
+closed. This can be achieved by providing the release cb instead of the
+destroy cb. Also rename kvm_vfio_destroy() to be kvm_vfio_release().
+
+	/*
+	 * Destroy is responsible for freeing dev.
+	 *
+	 * Destroy may be called before or after destructors are called
+	 * on emulated I/O regions, depending on whether a reference is
+	 * held by a vcpu or other kvm component that gets destroyed
+	 * after the emulated I/O.
+	 */
+	void (*destroy)(struct kvm_device *dev);
+
+	/*
+	 * Release is an alternative method to free the device. It is
+	 * called when the device file descriptor is closed. Once
+	 * release is called, the destroy method will not be called
+	 * anymore as the device is removed from the device list of
+	 * the VM. kvm->lock is held.
+	 */
+	void (*release)(struct kvm_device *dev);
+
+Fixes: 421cfe6596f6 ("vfio: remove VFIO_GROUP_NOTIFY_SET_KVM")
+Reported-by: Alex Williamson <alex.williamson@redhat.com>
+Suggested-by: Kevin Tian <kevin.tian@intel.com>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+---
+ virt/kvm/vfio.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
+index 495ceabffe88..e94f3ea718e5 100644
+--- a/virt/kvm/vfio.c
++++ b/virt/kvm/vfio.c
+@@ -336,7 +336,7 @@ static int kvm_vfio_has_attr(struct kvm_device *dev,
+ 	return -ENXIO;
+ }
+ 
+-static void kvm_vfio_destroy(struct kvm_device *dev)
++static void kvm_vfio_release(struct kvm_device *dev)
+ {
+ 	struct kvm_vfio *kv = dev->private;
+ 	struct kvm_vfio_group *kvg, *tmp;
+@@ -363,7 +363,7 @@ static int kvm_vfio_create(struct kvm_device *dev, u32 type);
+ static struct kvm_device_ops kvm_vfio_ops = {
+ 	.name = "kvm-vfio",
+ 	.create = kvm_vfio_create,
+-	.destroy = kvm_vfio_destroy,
++	.release = kvm_vfio_release,
+ 	.set_attr = kvm_vfio_set_attr,
+ 	.has_attr = kvm_vfio_has_attr,
+ };
+-- 
+2.34.1
+
