@@ -2,57 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6CFAA675E12
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 20:29:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 623D5675E83
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 21:04:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230163AbjATT3N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 14:29:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34420 "EHLO
+        id S230087AbjATUET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 15:04:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229877AbjATT3M (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 14:29:12 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C3AE0D0DA2;
-        Fri, 20 Jan 2023 11:28:48 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CB11511FB;
-        Fri, 20 Jan 2023 11:29:08 -0800 (PST)
-Received: from [10.57.89.132] (unknown [10.57.89.132])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A6FF03F445;
-        Fri, 20 Jan 2023 11:28:23 -0800 (PST)
-Message-ID: <f24fcba7-2fcb-ed43-05da-60763dbb07bf@arm.com>
-Date:   Fri, 20 Jan 2023 19:28:19 +0000
+        with ESMTP id S229699AbjATUES (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 15:04:18 -0500
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AB21743B7
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 12:04:17 -0800 (PST)
+Received: by mail-ej1-x634.google.com with SMTP id hw16so16608629ejc.10
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 12:04:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=R3mqKfWwkAqfNQ9SXTy26dswmpdH80HIQHhYT+qENhU=;
+        b=ZfsUCigmV0BK5vJIkJK8BqSjQ6+m3RwokF1amH7A0w1GyoVj2Pp7mGlqcXbqr7ZXfr
+         0gGsCLWhZ8sHkn/KXUOKkb90wNCHsJ9verb8w3/NsW5Xo/M5hCXhsmn0tRwyOiX+9FB5
+         KyS2P+M0Smg74ZxtOI0llSefj/PeXFBCVgSMsBaBoIqKP/CpfRXR24uBxo1JzTYSdM8w
+         0YAQAkv5ZwXONZrJqD4elzab21q2R/6Tj6mruP45FYHx9JIatfyxJXABUeuJyfbahzq9
+         2x3HiHJdBYBASSEwz2Nqkj6EUOlmVfrU0qxbdSN7q0uo0i7DAxlmhRVwE7gNqXnZQY7Z
+         Akug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=R3mqKfWwkAqfNQ9SXTy26dswmpdH80HIQHhYT+qENhU=;
+        b=n17/vVSGxpQMpYe8AZoprZoIgLBNBMo/pWLJuec6GFACEwE762Xe6W4vpAhoXaPs1s
+         Ree6A5AH/5kxN2/OpztaYuCob+JHWznZPXWLv5BeESlvwKtCWvJcE8XMDujmoLSUuXYY
+         kP8Or54LRHvMX0h3tUSYBEF8jV9lngqv9k5D4+nWUHzNSX7JrK+IAAdiLEMO4giw3jEw
+         HKRVlFcC67U9ly0tGN6/W8Dr6NG55WShmAoiSXeT1qJOi1VfRU52GggtGEb4+2Z4/apg
+         rUOJDNL940THK0NovvTTiZ/ZADiGu58CKBhv5qIUGosbP14rCjdZR0bp520ygoudUNWu
+         JnxA==
+X-Gm-Message-State: AFqh2ko4E8a4tqXycF8DAnm/PimNxe26o4Iwplc0NKHe/hQ3AlpEFi3i
+        tDZqNkp9ZZiguBuA97VTeICpLzcENOrMIRWK/Bl/GQ==
+X-Google-Smtp-Source: AMrXdXvhn2TK4BF8wu5kSP6frPft2UKnSVbWxknjjBVFfDTwNk3iQHeTRhqQtIeVs6UuwSb6atkzUoFCCh2AwoxTnDM=
+X-Received: by 2002:a17:906:40d6:b0:86d:8218:cf91 with SMTP id
+ a22-20020a17090640d600b0086d8218cf91mr1445656ejk.530.1674245055937; Fri, 20
+ Jan 2023 12:04:15 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH v2 04/10] iommu/dma: Use the gfp parameter in
- __iommu_dma_alloc_noncontiguous()
-Content-Language: en-GB
-To:     Jason Gunthorpe <jgg@nvidia.com>,
-        Lu Baolu <baolu.lu@linux.intel.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>
-Cc:     Alex Williamson <alex.williamson@redhat.com>,
-        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-arm-msm@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-tegra@vger.kernel.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        virtualization@lists.linux-foundation.org
-References: <4-v2-ce66f632bd0d+484-iommu_map_gfp_jgg@nvidia.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <4-v2-ce66f632bd0d+484-iommu_map_gfp_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230119212510.3938454-1-bgardon@google.com> <20230119212510.3938454-3-bgardon@google.com>
+ <Y8nKerX9tDRHkFq+@google.com> <CANgfPd8B_0w39d7V+c4GnUxdqrc8qN78r8Pq0Con3Mx9WO0hkQ@mail.gmail.com>
+ <Y8qj1QS1VadgaX7A@google.com> <CAOHnOrzKBh2Cq7ZQece+6f6P5wS6gZ1R2vjEQ5=QLTy7BmUvFQ@mail.gmail.com>
+In-Reply-To: <CAOHnOrzKBh2Cq7ZQece+6f6P5wS6gZ1R2vjEQ5=QLTy7BmUvFQ@mail.gmail.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Fri, 20 Jan 2023 12:04:04 -0800
+Message-ID: <CANgfPd_B0q6uU1Be7A-QOj5_YoWi8z9g9LO63mc+=136hO5K4Q@mail.gmail.com>
+Subject: Re: [PATCH 2/2] selftests: KVM: Add page splitting test
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     David Matlack <dmatlack@google.com>, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -60,53 +72,42 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-01-18 18:00, Jason Gunthorpe wrote:
-> Change the sg_alloc_table_from_pages() allocation that was hardwired to
-> GFP_KERNEL to use the gfp parameter like the other allocations in this
-> function.
-> 
-> Auditing says this is never called from an atomic context, so it is safe
-> as is, but reads wrong.
+On Fri, Jan 20, 2023 at 6:34 AM Ricardo Koller <ricarkol@google.com> wrote:
+>
+...
+> > > > > +
+> > > > > +     run_test(&p);
+> > > >
+> > > > Use for_each_guest_mode() to run against all supported guest modes.
+> > >
+> > > I'm not sure that would actually improve coverage. None of the page
+> > > splitting behavior depends on the mode AFAICT.
+> >
+> > You need to use for_each_guest_mode() for the ARM case. The issue is
+> > that whatever mode (guest page size and VA size) you pick might not be
+> > supported by the host. So, you first to explore what's available (via
+> > for_each_guest_mode()).
+>
+> Actually, that's fixed by using the default mode, which picks the
+> first available
+> mode. I would prefer to use for_each_guest_mode() though, who knows and
+> something fails with some specific guest page size for some reason.
 
-I think the point may have been that the sgtable metadata is a 
-logically-distinct allocation from the buffer pages themselves. Much 
-like the allocation of the pages array itself further down in 
-__iommu_dma_alloc_pages(). I see these days it wouldn't be catastrophic 
-to pass GFP_HIGHMEM into __get_free_page() via sg_kmalloc(), but still, 
-allocating implementation-internal metadata with all the same 
-constraints as a DMA buffer has just as much smell of wrong about it IMO.
+Okay, will do. I wasn't sure if we did eager page splitting on ARM, so
+I was only planning on making this test for x86_64 initially, hence it
+being in that directory. If ARM rolls with the same behavior, then
+I'll add the for_each_mode bit and move the test up a directory.
 
-I'd say the more confusing thing about this particular context is why 
-we're using iommu_map_sg_atomic() further down - that seems to have been 
-an oversight in 781ca2de89ba, since this particular path has never 
-supported being called in atomic context.
-
-Overall I'm starting to wonder if it might not be better to stick a "use 
-GFP_KERNEL_ACCOUNT if you allocate" flag in the domain for any level of 
-the API internals to pick up as appropriate, rather than propagate 
-per-call gfp flags everywhere. As it stands we're still missing 
-potential pagetable and other domain-related allocations by drivers in 
-.attach_dev and even (in probably-shouldn't-really-happen cases) 
-.unmap_pages...
-
-Thanks,
-Robin.
-
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->   drivers/iommu/dma-iommu.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
-> index 8c2788633c1766..e4bf1bb159f7c7 100644
-> --- a/drivers/iommu/dma-iommu.c
-> +++ b/drivers/iommu/dma-iommu.c
-> @@ -822,7 +822,7 @@ static struct page **__iommu_dma_alloc_noncontiguous(struct device *dev,
->   	if (!iova)
->   		goto out_free_pages;
->   
-> -	if (sg_alloc_table_from_pages(sgt, pages, count, 0, size, GFP_KERNEL))
-> +	if (sg_alloc_table_from_pages(sgt, pages, count, 0, size, gfp))
->   		goto out_free_iova;
->   
->   	if (!(ioprot & IOMMU_CACHE)) {
+>
+> >
+> > Thanks,
+> > Ricardo
+> >
+> > >
+> > > >
+> > > > > +
+> > > > > +     return 0;
+> > > > > +}
+> > > > > --
+> > > > > 2.39.1.405.gd4c25cc71f-goog
+> > > > >
