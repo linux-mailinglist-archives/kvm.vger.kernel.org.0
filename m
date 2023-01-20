@@ -2,219 +2,141 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D5159676016
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 23:20:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 18DE2676019
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 23:22:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230047AbjATWUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 17:20:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37466 "EHLO
+        id S229938AbjATWWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 17:22:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbjATWTz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 17:19:55 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2AD4762C2;
-        Fri, 20 Jan 2023 14:19:52 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A48AFB82A95;
-        Fri, 20 Jan 2023 22:19:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3130C4339B;
-        Fri, 20 Jan 2023 22:19:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674253190;
-        bh=HvcNM2UjecQL348bqHAOm445agwCIVqQtDTv2S/yEmw=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pDTcPNR6BXuGBjP48njVINKN5F4mgJzV2lu2lU+SiajKyiN1d9pouPWpoFT+XvXmP
-         p1moDyoN+5EFFREdr0oR4/QtuhG0eBg+nfymIU51LXQZjPtt4+tZSHc8kRvTMIesNi
-         N5TKxI/AuyFae1Pod78Qp6VO3XsbPnvU8SMAyKuj05xhg6Y+YN1BhQDju7OUbzYhdT
-         zrRiBZSrl4uuJw5bUXrzdOKEZfhl6OF9parCd9H83GKLEDxvijBfUR5wsISatx4H2+
-         evuGZ2pTnCHVocTM/YFfyfwP75KRtLMYIFTqZYgGjd6DKGo1p0Ps0At4i/ddziPeOm
-         JETqPRmVwe03Q==
-Date:   Fri, 20 Jan 2023 22:19:47 +0000
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     "Kalra, Ashish" <ashish.kalra@amd.com>
-Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v7 25/64] crypto: ccp: Add support to initialize the
- AMD-SP for SEV-SNP
-Message-ID: <Y8sTg3gI879qzDMV@kernel.org>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-26-michael.roth@amd.com>
- <Y7BWGvGj/Ky8RctP@kernel.org>
- <5bb741b8-8daa-028d-d920-826e1396dd87@amd.com>
+        with ESMTP id S229725AbjATWWA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 17:22:00 -0500
+Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A68026FD17
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:21:58 -0800 (PST)
+Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-4c131bede4bso92218297b3.5
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:21:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=aUZ0ffAJxXSAs75mrnI1JYQKtxulHE6LLibfAEIYCUE=;
+        b=Hp9pWr8vPaWaHT+lrAMRQ2ucltxYK2bG/0HMjvFmx3K6MDIeTUplEsmdQbjt4FgodK
+         PrAUBGgKy9MnLhlVVEPXB1G2qw5pC/mgmQ3kDbMFNr+T6lwuuu6/xbPfjv7QXrA4BTRI
+         Kuga8w97T3EIpIO96C3x8Y1VQT7bioTSMyBKrcwydWpRy4cZkn0qDM2yGNYY4vs4dHhr
+         24ziDrJuOztpNU3hRnEqYJhQLzAvvRY7Oz7fi7HVA3ITzX4BSU1xXOYprlZZcQ/DHRyM
+         KRYh/85BN6IavNe8kucJOQzQfX0xX28K08m5VF1bzzuteRw29hJ5+WlP0eows+mZyfW/
+         guIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=aUZ0ffAJxXSAs75mrnI1JYQKtxulHE6LLibfAEIYCUE=;
+        b=Z44VPr1vnU/f0Kuxk8CRFyPdmjeNr+ytwwkbsXTdyUru/rM5MAA/wQpNKZYoeg/men
+         nl5cpRhmIxsfakwybazDAviQAfuel312nW2GDThYTLBhBl1Wv0CZhuAeYfK57GdhlqC/
+         4NaTv4WqKvpLOrhJor+O4bmTJR8h41WbAn0utQY4THvQvlHLdvbiP+c8dFdIJvbKEtGZ
+         6pPLaFk+SHLMFrgpOjbGT5pzY7P/fs1ghOnXxkMI5BFMCJgQrlAlA8bWqE+YwKMEbujy
+         QJoBEwqUGX6fzGBM+wKChjK0IV4rL3/L2kcTsJ76aj2DtYj95RdKTPWHBcEiG5gSVGgX
+         3Evg==
+X-Gm-Message-State: AFqh2krjN+lhqLxfQ91UMOdHZ5GnINajSYQr02ErQkw4TR9M4OHZEwK2
+        b6X+k3klxrbUsWPffyU2LZdMAEkpT20wCPsZ1h+kGg==
+X-Google-Smtp-Source: AMrXdXvfyZ/JFeXqv55u2yuUwNm8Qm2ZSkWJdfn1rcJ73hXEVb6L9MkB0VNXwsliYqKgDcQANAkWmZs9heZw+eiV5dA=
+X-Received: by 2002:a0d:e611:0:b0:4ff:b3a2:5962 with SMTP id
+ p17-20020a0de611000000b004ffb3a25962mr467741ywe.111.1674253317753; Fri, 20
+ Jan 2023 14:21:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5bb741b8-8daa-028d-d920-826e1396dd87@amd.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230114111621.00001840@gmail.com> <Y8bFCb+rs25dKcMY@google.com>
+ <20230117214414.00003229@gmail.com> <Y8cLcY12zDWqO8nd@google.com>
+ <Y8cMnjHFNIFaoX27@google.com> <eadc4a4e37ea0b04b8348395244b792bd34a762d.camel@intel.com>
+ <Y8ljwsrrBBdh1aYw@google.com> <02b0e551647beed9ec3a2fefd3b659eb52c4846c.camel@intel.com>
+ <Y8m34OEVBfL7Q4Ns@google.com> <1c71eda35e03372f29162c6a5286f5b4d1e1d7e1.camel@intel.com>
+ <Y8ndcGHUHQjHfbF9@google.com>
+In-Reply-To: <Y8ndcGHUHQjHfbF9@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Fri, 20 Jan 2023 14:21:31 -0800
+Message-ID: <CALzav=d4vwHTnXP8wetA_Hqd3Tzc_NLp=3M-akwNSN1-ToL+Eg@mail.gmail.com>
+Subject: Re: [PATCH v11 018/113] KVM: TDX: create/destroy VM structure
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     "Huang, Kai" <kai.huang@intel.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "Shahar, Sagi" <sagis@google.com>,
+        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+        "Aktas, Erdem" <erdemaktas@google.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 05, 2023 at 04:40:29PM -0600, Kalra, Ashish wrote:
-> Hello Jarkko,
-> 
-> On 12/31/2022 9:32 AM, Jarkko Sakkinen wrote:
-> > On Wed, Dec 14, 2022 at 01:40:17PM -0600, Michael Roth wrote:
-> > > From: Brijesh Singh <brijesh.singh@amd.com>
-> > > 
-> > > Before SNP VMs can be launched, the platform must be appropriately
-> > > configured and initialized. Platform initialization is accomplished via
-> > > the SNP_INIT command. Make sure to do a WBINVD and issue DF_FLUSH
-> > > command to prepare for the first SNP guest launch after INIT.
-> > > 
-> > > During the execution of SNP_INIT command, the firmware configures
-> > > and enables SNP security policy enforcement in many system components.
-> > > Some system components write to regions of memory reserved by early
-> > > x86 firmware (e.g. UEFI). Other system components write to regions
-> > > provided by the operation system, hypervisor, or x86 firmware.
-> > > Such system components can only write to HV-fixed pages or Default
-> > > pages. They will error when attempting to write to other page states
-> > > after SNP_INIT enables their SNP enforcement.
-> > > 
-> > > Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list of
-> > > system physical address ranges to convert into the HV-fixed page states
-> > > during the RMP initialization. If INIT_RMP is 1, hypervisors should
-> > > provide all system physical address ranges that the hypervisor will
-> > > never assign to a guest until the next RMP re-initialization.
-> > > For instance, the memory that UEFI reserves should be included in the
-> > > range list. This allows system components that occasionally write to
-> > > memory (e.g. logging to UEFI reserved regions) to not fail due to
-> > > RMP initialization and SNP enablement.
-> > > 
-> > > Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
-> > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
-> > > ---
-> > >   drivers/crypto/ccp/sev-dev.c | 225 +++++++++++++++++++++++++++++++++++
-> > >   drivers/crypto/ccp/sev-dev.h |   2 +
-> > >   include/linux/psp-sev.h      |  17 +++
-> > >   3 files changed, 244 insertions(+)
-> > > 
-> > > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> > > index 9d84720a41d7..af20420bd6c2 100644
-> > > --- a/drivers/crypto/ccp/sev-dev.c
-> > > +++ b/drivers/crypto/ccp/sev-dev.c
-> > > @@ -26,6 +26,7 @@
-> > >   #include <linux/fs_struct.h>
-> > >   #include <asm/smp.h>
-> > > +#include <asm/e820/types.h>
-> > >   #include "psp-dev.h"
-> > >   #include "sev-dev.h"
-> > > @@ -34,6 +35,10 @@
-> > >   #define SEV_FW_FILE		"amd/sev.fw"
-> > >   #define SEV_FW_NAME_SIZE	64
-> > > +/* Minimum firmware version required for the SEV-SNP support */
-> > > +#define SNP_MIN_API_MAJOR	1
-> > > +#define SNP_MIN_API_MINOR	51
-> > > +
-> > >   static DEFINE_MUTEX(sev_cmd_mutex);
-> > >   static struct sev_misc_dev *misc_dev;
-> > > @@ -76,6 +81,13 @@ static void *sev_es_tmr;
-> > >   #define NV_LENGTH (32 * 1024)
-> > >   static void *sev_init_ex_buffer;
-> > > +/*
-> > > + * SEV_DATA_RANGE_LIST:
-> > > + *   Array containing range of pages that firmware transitions to HV-fixed
-> > > + *   page state.
-> > > + */
-> > > +struct sev_data_range_list *snp_range_list;
-> > > +
-> > >   static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
-> > >   {
-> > >   	struct sev_device *sev = psp_master->sev_data;
-> > > @@ -830,6 +842,186 @@ static int sev_update_firmware(struct device *dev)
-> > >   	return ret;
-> > >   }
-> > > +static void snp_set_hsave_pa(void *arg)
-> > > +{
-> > > +	wrmsrl(MSR_VM_HSAVE_PA, 0);
-> > > +}
-> > > +
-> > > +static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
-> > > +{
-> > > +	struct sev_data_range_list *range_list = arg;
-> > > +	struct sev_data_range *range = &range_list->ranges[range_list->num_elements];
-> > > +	size_t size;
-> > > +
-> > > +	if ((range_list->num_elements * sizeof(struct sev_data_range) +
-> > > +	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
-> > > +		return -E2BIG;
-> > > +
-> > > +	switch (rs->desc) {
-> > > +	case E820_TYPE_RESERVED:
-> > > +	case E820_TYPE_PMEM:
-> > > +	case E820_TYPE_ACPI:
-> > > +		range->base = rs->start & PAGE_MASK;
-> > > +		size = (rs->end + 1) - rs->start;
-> > > +		range->page_count = size >> PAGE_SHIFT;
-> > > +		range_list->num_elements++;
-> > > +		break;
-> > > +	default:
-> > > +		break;
-> > > +	}
-> > > +
-> > > +	return 0;
-> > > +}
-> > > +
-> > > +static int __sev_snp_init_locked(int *error)
-> > > +{
-> > > +	struct psp_device *psp = psp_master;
-> > > +	struct sev_data_snp_init_ex data;
-> > > +	struct sev_device *sev;
-> > > +	int rc = 0;
-> > > +
-> > > +	if (!psp || !psp->sev_data)
-> > > +		return -ENODEV;
-> > > +
-> > > +	sev = psp->sev_data;
-> > > +
-> > > +	if (sev->snp_initialized)
-> > > +		return 0;
-> > 
-> > Shouldn't this follow this check:
-> > 
-> >          if (sev->state == SEV_STATE_INIT) {
-> >                  /* debug printk about possible incorrect call order */
-> >                  return -ENODEV;
-> >          }
-> > 
-> > It is game over for SNP, if SEV_CMD_INIT{_EX} got first, which means that
-> > this should not proceed.
-> 
-> 
-> But, how will SEV_CMD_INIT_EX happen before as sev_pci_init() which is
-> invoked during CCP module load/initialization, will first try to do
-> sev_snp_init() if SNP is supported, before it invokes sev_platform_init() to
-> do SEV firmware initialization ?
+On Thu, Jan 19, 2023 at 4:16 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Jan 19, 2023, Huang, Kai wrote:
+> > On Thu, 2023-01-19 at 21:36 +0000, Sean Christopherson wrote:
+> > > The least invasive idea I have is expand the TDP MMU's concept of "frozen" SPTEs
+> > > and freeze (a.k.a. lock) the SPTE (KVM's mirror) until the corresponding S-EPT
+> > > update completes.
+> >
+> > This will introduce another "having-to-wait while SPTE is frozen" problem I
+> > think, which IIUC means (one way is) you have to do some loop and retry, perhaps
+> > similar to yield_safe.
+>
+> Yes, but because the TDP MMU already freezes SPTEs (just for a shorter duration),
+> I'm 99% sure all of the affected flows already know how to yield/bail when necessary.
+>
+> The problem with the zero-step mitigation is that it could (theoretically) cause
+> a "busy" error on literally any accesses, which makes it infeasible for KVM to have
+> sane behavior.  E.g. freezing SPTEs to avoid the ordering issues isn't necessary
+> when holding mmu_lock for write, whereas the zero-step madness brings everything
+> into play.
 
-Because the symbol is exported outside the driver to be called by other
-subsystems, you need to have a santiy check for the call order, as it
-is a hardware constraint. Otherwise, any unconsidered change in either
-side could unknowingily break the kernel.
+(I'm still ramping up on TDX so apologies in advance if the following
+is totally off base.)
 
-Alternatively, you could choose not to export sev_snp_init(). It is
-supported by the fact that the call in sev_guest_init() is does nothing
-useful (for the reasons you already wrote).
+The complexity, and to a lesser extent the memory overhead, of
+mirroring Secure EPT tables with the TDP MMU makes me wonder if it is
+really worth it. Especially since the initial TDX support has so many
+constraints that would seem to allow a simpler implementation: all
+private memory is pinned, no live migration support, no test/clear
+young notifiers, etc.
 
-BR, Jarkko
+For the initial version of KVM TDX support, what if we implemented the
+Secure EPT management entirely off to the side? i.e. Not on top of the
+TDP MMU. For example, write TDX-specific routines for:
+
+ - Fully populating the Secure EPT tree some time during VM creation.
+ - Tearing down the Secure EPT tree during VM destruction.
+ - Support for unmapping/mapping specific regions of the Secure EPT
+tree for private<->shared conversions.
+
+With that in place, KVM never would need to handle a fault on a Secure
+EPT mapping. Any fault (e.g. due to an in-progress private<->shared
+conversion) can just return back to the guest to retry the memory
+access until the operation is complete.
+
+If we start with only supporting 4K pages in the Secure EPT, the
+Secure EPT routines described above would be almost trivial to
+implement. Huge Pages would add some complexity, but I don't think it
+would be terrible. Concurrency can be handled with a single lock since
+we don't have to worry about concurrent faulting.
+
+This would avoid having TDX add a bunch of complexity to the TDP MMU
+(which would only be used for shared mappings). If and when we want to
+have more complicated memory management for TDX private mappings, we
+could revisit TDP MMU integration. But I think this design could even
+get us to the point of supporting Dirty Logging (where the only fault
+KVM would have to handle for TDX private mappings would be
+write-protection faults). I'm not sure it would work for Demand-Paging
+(at least the performance would not be great behind a single lock),
+but we can cross that bridge when we get there.
