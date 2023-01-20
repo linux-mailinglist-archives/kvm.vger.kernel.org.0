@@ -2,82 +2,80 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D871675C57
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 18:59:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7D7DF675C68
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 19:05:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229620AbjATR7k (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 12:59:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49500 "EHLO
+        id S230006AbjATSFC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 13:05:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229591AbjATR7j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 12:59:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C3D048605
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 09:58:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674237522;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WmRfpj48RyjRyZDGGPZo2d8kT+rAwJ1anTjm2/PHafk=;
-        b=TyBKQjbEcKKajw7PDEF0Ig/cbAnPhKR9IUYDxsNGj3EyQ+LQpnrRj9k/rfIttKamnJVBFf
-        /DjEbia6lWmCsEc7dXkHrD/p3Zdpa6GTTGHAvL9fUDNE72QUbXiRIjD+Kfe2IvbrzQRCce
-        0znWtQjgFOuQ7Ao4w4dEBl+yjWMdWdg=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-651-9T0mwCu1O5OUUYvzd0MM0A-1; Fri, 20 Jan 2023 12:58:41 -0500
-X-MC-Unique: 9T0mwCu1O5OUUYvzd0MM0A-1
-Received: by mail-il1-f200.google.com with SMTP id g11-20020a056e021a2b00b0030da3e7916fso4227371ile.18
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 09:58:41 -0800 (PST)
+        with ESMTP id S231177AbjATSE6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 13:04:58 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8AF75D7FE
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 10:04:56 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id z9-20020a17090a468900b00226b6e7aeeaso5674394pjf.1
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 10:04:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=2OuajGsQxBU53T1LkCzzlNc9v38dGdSuaz3Ry16782k=;
+        b=cv4xGHqJsuZvK2ZarceReQkinlRWj2RKHI/IXlEeZ8KhlCt9vSO+50shUgMQe8U7Xo
+         o/N48hI9fEfkAoRXatBZOk/BX0ATkFJL8snFudzFxL3kNQ9mKICA/iOJSXzXo2qLmZNF
+         8twvT7FVamMuP5tkEBBz1tL29FrI4hkbo5KtFr9UgvArdoGmLJNRcJR9SXOwhW03BQNG
+         VvQ5wv+icw52V1um0S2V9vmsnnONdVfyOW6vf7J6e74roX9rmFAD2M2mhIVkp66B3fmX
+         EuRuzMryXhDtQSyIsM/pnUMX+I5wmG9EwAsk0P9XQZKaRKc/AhS07ScnQZ1vfJbrvcvr
+         XJGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=WmRfpj48RyjRyZDGGPZo2d8kT+rAwJ1anTjm2/PHafk=;
-        b=PYPxY40BvqjaIov6oGcAf/wnAhpxmwfd8ovVrIH50YwNtP7sLn5oKzUkJyV6TfBH9P
-         d3KkcztXBAh497gj0huxXwPps7wSwSOmSsTs8CaQU1cA0ow2UDP2VvEUzsJqgbZp81dE
-         sHDhJqs/2ABIWtN/fGQHxtH6FOLKahy6a6DJyxwNF9vHh0oA22Sc9zHWGGmhCaJr/YlO
-         hNYPyfsa9DmIXBtA0iioOLVrorzjNGI5XrGHyoK9fPB4Ql9VfKz3+zEkVxBf0rkLqMro
-         SijP7KmeOXbrawtmfLeyQaiwYzA43BB32y5GOAJ9rcEsDwBer4s0OKvdSoVB8FWDNLRQ
-         Gu9w==
-X-Gm-Message-State: AFqh2kph+ic7rDI8Gre/Kmgm+z4x0APdybnLmAJHujZ5J84jCIHJCn9J
-        nftqwn0+PEWqee0JpblzLzSW9QnBFGtywfqfCGQcQZVHgPEHSpwqcS8Kqeer7ZrblTUMqBuCA/j
-        aX1fZVaOucoB7
-X-Received: by 2002:a5d:91ce:0:b0:704:ce06:81fd with SMTP id k14-20020a5d91ce000000b00704ce0681fdmr10190702ior.12.1674237520797;
-        Fri, 20 Jan 2023 09:58:40 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvWHZw0KBjfw/OOejn5eFckg+3ECBCwnEWHdhh2gOLwwb1mg/roN1/n+BWFUPswaGH+Cbf2rg==
-X-Received: by 2002:a5d:91ce:0:b0:704:ce06:81fd with SMTP id k14-20020a5d91ce000000b00704ce0681fdmr10190681ior.12.1674237520535;
-        Fri, 20 Jan 2023 09:58:40 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id j2-20020a026302000000b0038a48cfededsm12514918jac.15.2023.01.20.09.58.38
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2OuajGsQxBU53T1LkCzzlNc9v38dGdSuaz3Ry16782k=;
+        b=kKPTInuTHix2JfXDOa3/58HwT+4e4rGqnvYYxlJ6DA71lnXyYn2r22DdOIIT1bQWsp
+         QnIUwYnYfXfnhmHAhkbU1o77lTKyazTh15N3nc9esJ3zLvopY+X/GfZjCj9xgIJyfLlj
+         Olvy6RVbF/Mip1El+dix0dDnisaI2SKuz/HUf+iz4fZECMnkThwTVIT9qq4FyjeEp5Ko
+         yp7aNSFbbuEOecbGKNGQkLKIfP9bNRBcaduLfAXbD6tsvbILDVL+jtxReaeGT1fprAgi
+         RHdFUgFJoOf1NELggASZh+EQ+saJRj/xM4aexSBMyyFgHK3FEytX4qN/uiQpA9+xEL1U
+         IZzQ==
+X-Gm-Message-State: AFqh2kq41417XwcBQkZ0S50Dsc9fbSUN7Byma6yIqMhyXptMjbwXmcu7
+        SO/onNNugQUgqXpcO3VAaR4jbA==
+X-Google-Smtp-Source: AMrXdXuQhxYzud0iE3IRvL3V0n7Ork0xtZ6zEcwNtunFJm0FHpzqoz+cUMFDIt1LhNt+V+5xPvsjoQ==
+X-Received: by 2002:a17:903:404c:b0:191:4367:7fde with SMTP id n12-20020a170903404c00b0019143677fdemr268549pla.0.1674237896052;
+        Fri, 20 Jan 2023 10:04:56 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f5-20020a170902684500b0019488a36e2asm11100991pln.277.2023.01.20.10.04.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jan 2023 09:58:40 -0800 (PST)
-Date:   Fri, 20 Jan 2023 10:58:37 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Yi Liu <yi.l.liu@intel.com>
-Cc:     pbonzini@redhat.com, mjrosato@linux.ibm.com, jgg@nvidia.com,
-        kevin.tian@intel.com, cohuck@redhat.com, farman@linux.ibm.com,
-        pmorel@linux.ibm.com, borntraeger@linux.ibm.com,
-        frankja@linux.ibm.com, imbrenda@linux.ibm.com, david@redhat.com,
-        akrowiak@linux.ibm.com, jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, seanjc@google.com,
-        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] kvm/vfio: Fix potential deadlock on vfio group_lock
-Message-ID: <20230120105837.254a0b0a.alex.williamson@redhat.com>
-In-Reply-To: <20230120150528.471752-1-yi.l.liu@intel.com>
-References: <20230120150528.471752-1-yi.l.liu@intel.com>
-Organization: Red Hat
+        Fri, 20 Jan 2023 10:04:55 -0800 (PST)
+Date:   Fri, 20 Jan 2023 18:04:51 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Bagas Sanjaya <bagasdotme@gmail.com>
+Cc:     Freedesktop DRI List <dri-devel@lists.freedesktop.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Documentation <linux-doc@vger.kernel.org>,
+        Linux KVM <kvm@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Oded Gabbay <ogabbay@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jeffrey Hugo <quic_jhugo@quicinc.com>,
+        Ofir Bitton <obitton@habana.ai>,
+        Aaron Lewis <aaronlewis@google.com>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+Subject: Re: [PATCH linux-next 3/3] kvm: x86/pmu: Add blank line separator
+ before KVM_CAP_PMU_EVENT_MASKED_EVENTS code path list
+Message-ID: <Y8rXw6g8JZkajrZ5@google.com>
+References: <20230120123534.137413-1-bagasdotme@gmail.com>
+ <20230120123534.137413-4-bagasdotme@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230120123534.137413-4-bagasdotme@gmail.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -85,86 +83,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Jan 2023 07:05:28 -0800
-Yi Liu <yi.l.liu@intel.com> wrote:
-
-> Currently it is possible that the final put of a KVM reference comes from
-> vfio during its device close operation.  This occurs while the vfio group
-> lock is held; however, if the vfio device is still in the kvm device list,
-> then the following call chain could result in a deadlock:
+On Fri, Jan 20, 2023, Bagas Sanjaya wrote:
+> Stephen Rothwell reported htmldocs warning when merging kvm-x86 tree:
 > 
-> VFIO holds group->group_lock/group_rwsem
->   -> kvm_put_kvm
->    -> kvm_destroy_vm
->     -> kvm_destroy_devices
->      -> kvm_vfio_destroy
->       -> kvm_vfio_file_set_kvm
->        -> vfio_file_set_kvm
->         -> try to hold group->group_lock/group_rwsem  
+> Documentation/virt/kvm/api.rst:5070: ERROR: Unexpected indentation.
 > 
-> The key function is the kvm_destroy_devices() which triggers destroy cb
-> of kvm_device_ops. It calls back to vfio and try to hold group_lock. So
-> if this path doesn't call back to vfio, this dead lock would be fixed.
-> Actually, there is a way for it. KVM provides another point to free the
-> kvm-vfio device which is the point when the device file descriptor is
-> closed. This can be achieved by providing the release cb instead of the
-> destroy cb. Also rename kvm_vfio_destroy() to be kvm_vfio_release().
+> Fix the warning by adding a blank line separator before
+> KVM_CAP_PMU_EVENT_MASKED_EVENTS code path list to determine guest access.
 > 
-> 	/*
-> 	 * Destroy is responsible for freeing dev.
-> 	 *
-> 	 * Destroy may be called before or after destructors are called
-> 	 * on emulated I/O regions, depending on whether a reference is
-> 	 * held by a vcpu or other kvm component that gets destroyed
-> 	 * after the emulated I/O.
-> 	 */
-> 	void (*destroy)(struct kvm_device *dev);
-> 
-> 	/*
-> 	 * Release is an alternative method to free the device. It is
-> 	 * called when the device file descriptor is closed. Once
-> 	 * release is called, the destroy method will not be called
-> 	 * anymore as the device is removed from the device list of
-> 	 * the VM. kvm->lock is held.
-> 	 */
-> 	void (*release)(struct kvm_device *dev);
-> 
-> Fixes: 421cfe6596f6 ("vfio: remove VFIO_GROUP_NOTIFY_SET_KVM")
-> Reported-by: Alex Williamson <alex.williamson@redhat.com>
-> Suggested-by: Kevin Tian <kevin.tian@intel.com>
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> Link: https://lore.kernel.org/linux-next/20230120130927.3100f935@canb.auug.org.au/
+> Fixes: 651daa44b11c0e ("kvm: x86/pmu: Introduce masked events to the pmu event filter")
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Signed-off-by: Bagas Sanjaya <bagasdotme@gmail.com>
 > ---
->  virt/kvm/vfio.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  Documentation/virt/kvm/api.rst | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/virt/kvm/vfio.c b/virt/kvm/vfio.c
-> index 495ceabffe88..e94f3ea718e5 100644
-> --- a/virt/kvm/vfio.c
-> +++ b/virt/kvm/vfio.c
-> @@ -336,7 +336,7 @@ static int kvm_vfio_has_attr(struct kvm_device *dev,
->  	return -ENXIO;
->  }
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a477186c57c193..83e3acc9e3211d 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -5067,6 +5067,7 @@ An encoded event will follow this layout::
 >  
-> -static void kvm_vfio_destroy(struct kvm_device *dev)
-> +static void kvm_vfio_release(struct kvm_device *dev)
->  {
->  	struct kvm_vfio *kv = dev->private;
->  	struct kvm_vfio_group *kvg, *tmp;
-> @@ -363,7 +363,7 @@ static int kvm_vfio_create(struct kvm_device *dev, u32 type);
->  static struct kvm_device_ops kvm_vfio_ops = {
->  	.name = "kvm-vfio",
->  	.create = kvm_vfio_create,
-> -	.destroy = kvm_vfio_destroy,
-> +	.release = kvm_vfio_release,
->  	.set_attr = kvm_vfio_set_attr,
->  	.has_attr = kvm_vfio_has_attr,
->  };
+>  When the guest attempts to program the PMU, these steps are followed in
+>  determining if the guest should have access:
+> +
+>   1. Match the event select from the guest against the filter events.
+>   2. If a match is found, match the guest's unit mask to the mask and match
+>      values of the included filter events.
+> -- 
 
-Applied to vfio for-linus branch for v6.2, along with Matthew's R-b,
-the comment update, and the extra reference link.  Once we get a
-linux-next build I'll send a pull request, along with Matthew's
-reserved region fix.  Thanks,
-
-Alex
-
+Squashed this into the offending commit, thanks!
