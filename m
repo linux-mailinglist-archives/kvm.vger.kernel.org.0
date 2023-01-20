@@ -2,66 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 72D136748B9
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 02:19:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C0F736748E3
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 02:33:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229736AbjATBSy (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 20:18:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39902 "EHLO
+        id S229712AbjATBd1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 20:33:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229972AbjATBSw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 20:18:52 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BD6CA45F2
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:18:49 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id a9-20020a17090a740900b0022a0e51fb17so947915pjg.3
-        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:18:49 -0800 (PST)
+        with ESMTP id S229531AbjATBdZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 20:33:25 -0500
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A345EB47E
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:33:23 -0800 (PST)
+Received: by mail-pg1-x531.google.com with SMTP id b12so3026517pgj.6
+        for <kvm@vger.kernel.org>; Thu, 19 Jan 2023 17:33:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EIvtGhQ863eAgHEBR7gzw1wvWAHw06RQf9S7Ko277YM=;
-        b=nl3mSBo+1nhS4sKoPUAOfZK2zUSyaVHWy3zd27RXkDikAieQupMoh/UL3hTocVJreJ
-         e7dNjgHsUh+3mu2+eRc3i4/4Tufja81lu31S4InlmwaRPXghWUKDtuxGrunC8JCvpwpX
-         DRUGdS1K6U3WJqn/tI9GWEW6ekSURLxeO8D0/rO41uxg1G9kSSAxZeU7620G/v3kCWRt
-         XIcRyKYWWG3P3DiStnr6SmTdgtXWNwg/GIC6QwICEZs30gcgD17A6+2LHdTY5f6vdVtK
-         qySjAkqFEF9vDBnytSeVK1Ve21Z0ehQDrl6FHYK0g0OLI4rBTKyxMkwsV730XJ7/Rk88
-         7ZVQ==
+        bh=Kp68jZKRyQvb1CWCfr7ryxkqu7zJ892bk7TwE8UhDeg=;
+        b=H/l0Obt0lE8Dt7WZH0dN6w05VSK2+qVutkVXC28jA6GVboKJkdOb6dy6flHfifS3eA
+         twQ2J0d4UNa0dl1Qn8gm0ibDLWgmNTpA6plkncRthFcZHjH7D4BuCq1cps6AxIk7yQ1g
+         tTeOqX8tMIymvL4hVtxnDU0TIUkwKcq9pgR7K1TYOAuiDS/S7HQdFY2ixosd08LKKT/n
+         dv1ykJakGnF3GMus+uWOXqpvdPfQxtjgpP7Uwk+lCEiRNFef8uXCERWuIZN7wfmpIkzK
+         K6bSXy0hREjSgP4rqdKLOnspmtPZnZ+ZW04ugucxZwzVgxxZVvo3hmwe9b4FgtHFFm09
+         GPzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EIvtGhQ863eAgHEBR7gzw1wvWAHw06RQf9S7Ko277YM=;
-        b=SZ4mkscz9/fiLxQQoMwycabmybgzVJaXuUbUPa3jmFbe8GRJ6YCbsTvdUJRyQb15We
-         7K0O5i4U2ZhoCkX6nIOw2HCRVXMQHM5NotsVO8cuMrCDC2YJO9zRrPBb6iMqTsZN8cWj
-         i/PpFh16Jk0IgL9JwDwPWobkKP6hsDjT7dWh+RVo0Bt0JvsBcgkdrvO2cGoNOow17avw
-         /kSxrUsrbvi5Nh9OoMvrXt0CTAR1TWIBXCqDWhIx/UbJzrZvUVbdBSg7NEinDE5awJ/M
-         GFzzD4TJj/W5ot0HLBdUxAXxWV87gy+XJJ3NxZy5KO0SNR8se8l4LE03Hr/FvPBlN9rc
-         J5rQ==
-X-Gm-Message-State: AFqh2kpOhGCvIPk0pfcEx0zxshFxv54SPUySTXSGDeoZljMSbZdQWDGz
-        4nPGYxoPksTt8T6RZzLnAAY9vzPCJyoF3ib8kGU=
-X-Google-Smtp-Source: AMrXdXtFneiKO3u0VL/FOlu+x06cPnFN5v62BvDxPDdRlscyXkFcGkAc5iAOuQfRIBcL/ViL8im7oA==
-X-Received: by 2002:a05:6a21:9214:b0:b8:c3c0:e7f7 with SMTP id tl20-20020a056a21921400b000b8c3c0e7f7mr8746pzb.1.1674177528978;
-        Thu, 19 Jan 2023 17:18:48 -0800 (PST)
+        bh=Kp68jZKRyQvb1CWCfr7ryxkqu7zJ892bk7TwE8UhDeg=;
+        b=OddwHjLz3jayGQbANznC7NSzLlJE+U0Iw8oTU8HOXO0w1WFQSk4zbG4geUA9q3fXYy
+         a2uW/b5kzvBd9gqKn5PKMbimeUNaIG7GkX77IImys8TDo40g2J190BDBvDgKvF0Jh1LM
+         HmWqCQ0E6LMLm2Xp6drT1uZh/p/DItSbmEzBvchKw93Ye2yx+3jfiagSmcb9qXzFTeRK
+         i/S8doNcFMwUACI3CrdSykiWywM+flUPGXwPVvO7LkA0gn3EpTbLHntdS6f9un89RyG4
+         KMrhzMi50sBxWIfHbawFg5q1GlpsTHIZJ2/kmXgZNHu1XtGshrL8pwljS33Qkcuuk/om
+         Xx+w==
+X-Gm-Message-State: AFqh2kqmvIHd9aZiBUJLAquUT7zcXzoVoqNCT7t88nlURdkJ+GAEiifA
+        CKMQzN5Silwes+PDEVnop5LAEQ==
+X-Google-Smtp-Source: AMrXdXuj+pEzgczWgpSXc9mTAUie4xUf244aRmyLrVfENL9pUUqVg7frR07KJZR3dR0VXrbhEpML/A==
+X-Received: by 2002:aa7:84d8:0:b0:58b:cb1b:978f with SMTP id x24-20020aa784d8000000b0058bcb1b978fmr18689pfn.1.1674178403000;
+        Thu, 19 Jan 2023 17:33:23 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id s2-20020a170902ea0200b00192a96f4916sm7382638plg.259.2023.01.19.17.18.48
+        by smtp.gmail.com with ESMTPSA id f129-20020a623887000000b0058bf2ae9694sm10265600pfa.156.2023.01.19.17.33.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Jan 2023 17:18:48 -0800 (PST)
-Date:   Fri, 20 Jan 2023 01:18:45 +0000
+        Thu, 19 Jan 2023 17:33:22 -0800 (PST)
+Date:   Fri, 20 Jan 2023 01:33:18 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Yu Zhang <yu.c.zhang@linux.intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        David Matlack <dmatlack@google.com>,
-        Ben Gardon <bgardon@google.com>
-Subject: Re: [PATCH] KVM: MMU: Add wrapper to check whether MMU is in direct
- mode
-Message-ID: <Y8nr9SZAnUguf3qU@google.com>
-References: <20221206073951.172450-1-yu.c.zhang@linux.intel.com>
+To:     Kim Phillips <kim.phillips@amd.com>
+Cc:     x86@kernel.org, Borislav Petkov <bp@alien8.de>,
+        Borislav Petkov <borislav.petkov@amd.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Juergen Gross <jgross@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v6 2/7] x86/cpu, kvm: Add the NO_NESTED_DATA_BP feature
+Message-ID: <Y8nvXj0//cImdTJQ@google.com>
+References: <20230110224643.452273-1-kim.phillips@amd.com>
+ <20230110224643.452273-4-kim.phillips@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221206073951.172450-1-yu.c.zhang@linux.intel.com>
+In-Reply-To: <20230110224643.452273-4-kim.phillips@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -73,78 +88,75 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-+David and Ben
-
-On Tue, Dec 06, 2022, Yu Zhang wrote:
-> Simplify the code by introducing a wrapper, mmu_is_direct(),
-> instead of using vcpu->arch.mmu->root_role.direct everywhere.
+On Tue, Jan 10, 2023, Kim Phillips wrote:
+> The "Processor ignores nested data breakpoints" feature was being
+> open-coded for KVM in __do_cpuid_func().  Add it to its newly added
+> CPUID leaf 0x80000021 EAX proper, and propagate it in kvm_set_cpu_caps()
+> instead.
 > 
-> Meanwhile, use temporary variable 'direct', in routines such
-> as kvm_mmu_load()/kvm_mmu_page_fault() etc. instead of checking
-> vcpu->arch.mmu->root_role.direct repeatedly.
-
-I've looked at this patch at least four times and still can't decide whether or
-not I like the helper.  On one had, it's shorter and easier to read.  On the other
-hand, I don't love that mmu_is_nested() looks at a completely different MMU, which
-is weird if not confusing.
-
-Anyone else have an opinion?
-
-> No functional change intended.
+> Also drop the bit description comments now it's more self-describing.
 > 
-> Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
+> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c | 26 +++++++++++++-------------
->  arch/x86/kvm/x86.c     |  9 +++++----
->  arch/x86/kvm/x86.h     |  5 +++++
->  3 files changed, 23 insertions(+), 17 deletions(-)
+>  arch/x86/include/asm/cpufeatures.h | 3 +++
+>  arch/x86/kvm/cpuid.c               | 8 ++++++--
+>  2 files changed, 9 insertions(+), 2 deletions(-)
 > 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 4736d7849c60..d2d0fabdb702 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2280,7 +2280,7 @@ static void shadow_walk_init_using_root(struct kvm_shadow_walk_iterator *iterato
+> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+> index d53e13048d2e..0cd7b4afd528 100644
+> --- a/arch/x86/include/asm/cpufeatures.h
+> +++ b/arch/x86/include/asm/cpufeatures.h
+> @@ -426,6 +426,9 @@
+>  #define X86_FEATURE_V_TSC_AUX		(19*32+ 9) /* "" Virtual TSC_AUX */
+>  #define X86_FEATURE_SME_COHERENT	(19*32+10) /* "" AMD hardware-enforced cache coherency */
 >  
->  	if (iterator->level >= PT64_ROOT_4LEVEL &&
->  	    vcpu->arch.mmu->cpu_role.base.level < PT64_ROOT_4LEVEL &&
-> -	    !vcpu->arch.mmu->root_role.direct)
-> +	    !mmu_is_direct(vcpu))
->  		iterator->level = PT32E_ROOT_LEVEL;
+> +/* AMD-defined Extended Feature 2 EAX, CPUID level 0x80000021 (EAX), word 20 */
+> +#define X86_FEATURE_NO_NESTED_DATA_BP	(20*32+ 0) /* "" AMD No Nested Data Breakpoints */
+> +
+>  /*
+>   * BUG word(s)
+>   */
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index b14653b61470..69e433e4e9ff 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -741,6 +741,10 @@ void kvm_set_cpu_caps(void)
+>  		0 /* SME */ | F(SEV) | 0 /* VM_PAGE_FLUSH */ | F(SEV_ES) |
+>  		F(SME_COHERENT));
 >  
->  	if (iterator->level == PT32E_ROOT_LEVEL) {
-> @@ -2677,7 +2677,7 @@ static int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
->  	gpa_t gpa;
->  	int r;
->  
-> -	if (vcpu->arch.mmu->root_role.direct)
-> +	if (mmu_is_direct(vcpu))
->  		return 0;
->  
->  	gpa = kvm_mmu_gva_to_gpa_read(vcpu, gva, NULL);
-> @@ -3918,7 +3918,7 @@ void kvm_mmu_sync_roots(struct kvm_vcpu *vcpu)
->  	int i;
->  	struct kvm_mmu_page *sp;
->  
-> -	if (vcpu->arch.mmu->root_role.direct)
-> +	if (mmu_is_direct(vcpu))
->  		return;
->  
->  	if (!VALID_PAGE(vcpu->arch.mmu->root.hpa))
-> @@ -4147,7 +4147,7 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  
->  	arch.token = alloc_apf_token(vcpu);
->  	arch.gfn = gfn;
-> -	arch.direct_map = vcpu->arch.mmu->root_role.direct;
-> +	arch.direct_map = mmu_is_direct(vcpu);
->  	arch.cr3 = vcpu->arch.mmu->get_guest_pgd(vcpu);
->  
->  	return kvm_setup_async_pf(vcpu, cr2_or_gpa,
-> @@ -4157,17 +4157,16 @@ static bool kvm_arch_setup_async_pf(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->  void kvm_arch_async_page_ready(struct kvm_vcpu *vcpu, struct kvm_async_pf *work)
->  {
->  	int r;
-> +	bool direct = mmu_is_direct(vcpu);
+> +	kvm_cpu_cap_mask(CPUID_8000_0021_EAX,
+> +		F(NO_NESTED_DATA_BP)
+> +	);
+> +
+>  	kvm_cpu_cap_mask(CPUID_C000_0001_EDX,
+>  		F(XSTORE) | F(XSTORE_EN) | F(XCRYPT) | F(XCRYPT_EN) |
+>  		F(ACE2) | F(ACE2_EN) | F(PHE) | F(PHE_EN) |
+> @@ -1222,9 +1226,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		break;
+>  	case 0x80000021:
+>  		entry->ebx = entry->ecx = entry->edx = 0;
+> +		cpuid_entry_override(entry, CPUID_8000_0021_EAX);
+>  		/*
+>  		 * Pass down these bits:
+> -		 *    EAX      0      NNDBP, Processor ignores nested data breakpoints
+>  		 *    EAX      2      LAS, LFENCE always serializing
+>  		 *    EAX      6      NSCB, Null selector clear base
+>  		 *
+> @@ -1235,7 +1239,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		 * KVM doesn't support SMM_CTL.
+>  		 *   EAX       9     SMM_CTL MSR is not supported
+>  		 */
+> -		entry->eax &= BIT(0) | BIT(2) | BIT(6);
+> +		entry->eax &= BIT(2) | BIT(6);
 
-I would prefer to not add local bools and instead due a 1:1 replacement.  "direct"
-loses too much context (direct what?), and performance wise I doubt it will
-influence the compiler.
+This is broken.  It gets fixed by the end of the series, but between here and
+commit b1366f515fd6 ("x86/cpu, kvm: Add the Null Selector Clears Base feature"),
+the AND with open coded bits means any bits preserved/set by cpuid_entry_override()
+are wiped out.  E.g. NO_NESTED_DATA_BP will never be advertised as of this patch.
+
+The proper way to do this is to first convert all supported bits away from magic
+numbers in a single patch, and then introduce newly supported bits one by one.
+That one patch will be larger, but I don't see a better approach.
+
+Is it too late to back this out?  Not a huge deal, but it seems easy enough to
+clean up.
