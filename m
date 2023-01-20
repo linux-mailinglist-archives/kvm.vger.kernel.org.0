@@ -2,91 +2,131 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F195E67530C
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 12:08:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 567EE6753CE
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 12:50:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229686AbjATLIC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 06:08:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36270 "EHLO
+        id S229539AbjATLuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 06:50:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229598AbjATLIA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 06:08:00 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D3DA39297;
-        Fri, 20 Jan 2023 03:07:58 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        with ESMTP id S229749AbjATLtb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 06:49:31 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC08F1708
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 03:49:22 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 2CFAF1EC0606;
-        Fri, 20 Jan 2023 12:07:57 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1674212877;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=40oh1pHNa5pWx4jGamed6IL3y7gkerp1r2pzkAMoq2Q=;
-        b=r00y4jQUVtDshG4tDAS91vdI7QjPCLD7pFdU+iVAYMASoniRY2/rbP59M/S67L5qjGNx+5
-        1oOm3QQe/ipoBGU/6w8M0v5QtR2qq+nofQdVTsS1CeNYs10T2YYI3wFxzN+7Wr6ZteKYFA
-        DKDwJ6NJ6CbtiorKDRcZkyYI6+RO4Eg=
-Date:   Fri, 20 Jan 2023 12:07:57 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Kim Phillips <kim.phillips@amd.com>, x86@kernel.org,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
-        Joao Martins <joao.m.martins@oracle.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Juergen Gross <jgross@suse.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Alexey Kardashevskiy <aik@amd.com>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v7 0/7] x86/cpu, kvm: Support AMD Automatic IBRS
-Message-ID: <Y8p2DUtzoC409HYY@zn.tnic>
-References: <20230116230159.1511393-1-kim.phillips@amd.com>
- <Y8aMiH74WFmVM5Rk@zn.tnic>
- <Y8nw/XLTpKhKbbdX@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y8nw/XLTpKhKbbdX@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        by ams.source.kernel.org (Postfix) with ESMTPS id 69880B821A9
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 11:49:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BA0BC433EF;
+        Fri, 20 Jan 2023 11:49:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674215360;
+        bh=nBv3Z0zN6FIK72fB6cklCmKK6PIxgedt0S7yzYNK6hw=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=NGspnuDnCeckCB1H3fnRfpWPtmz4HXhUbeqcuB+GIOpy9BtvBDQOR/ZoVg3Xw10OG
+         6YMTaYG50bXTlaMK+/2YODwXhYhe2F5LpIw5kpzrxRsYCUpVNTdYSFDaRGeewphNzC
+         Ype4UgPlFo6IsqwxH4OT2RuvCtc01gN6kgx9siexHJ9MCfbbTrDLZz7JGnjkba34XQ
+         bGU6WzXNWJKomCQTeDWnXDeN5tMg0soO69IYbYuzC6PukdFGg/R9LQ613tUq0/Af+w
+         zE6Rm6nQq54mZ4A/tzX6AI6EZDSH6cVFMiF+JBR1Q6BfBxDSM3D7C8/Qs9MfsxxJ69
+         XDyJgGSJzpl8w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pIptV-003Ofx-IA;
+        Fri, 20 Jan 2023 11:49:17 +0000
+Date:   Fri, 20 Jan 2023 11:49:17 +0000
+Message-ID: <86sfg5mnnm.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Will Deacon <will@kernel.org>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+        kvm@vger.kernel.org, Catalin Marinas <catalin.marinas@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        James Morse <james.morse@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH 1/2] KVM: arm64: Disable KVM on systems with a VPIPT i-cache
+In-Reply-To: <20230120101415.GA21784@willie-the-truck>
+References: <20230113172523.2063867-1-maz@kernel.org>
+        <20230113172523.2063867-2-maz@kernel.org>
+        <20230120101415.GA21784@willie-the-truck>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: will@kernel.org, suzuki.poulose@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, catalin.marinas@arm.com, mark.rutland@arm.com, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 20, 2023 at 01:40:13AM +0000, Sean Christopherson wrote:
-> Sorry, completely missed this.
+On Fri, 20 Jan 2023 10:14:16 +0000,
+Will Deacon <will@kernel.org> wrote:
+> 
+> On Fri, Jan 13, 2023 at 05:25:22PM +0000, Marc Zyngier wrote:
+> > Systems with a VMID-tagged PIPT i-cache have been supported for
+> > a while by Linux and KVM. However, these systems never appeared
+> > on our side of the multiverse.
+> > 
+> > Refuse to initialise KVM on such a machine, should then ever appear.
+> > Following changes will drop the support from the hypervisor.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/arm.c | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index 9c5573bc4614..508deed213a2 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -2195,6 +2195,11 @@ int kvm_arch_init(void *opaque)
+> >  	int err;
+> >  	bool in_hyp_mode;
+> >  
+> > +	if (icache_is_vpipt()) {
+> > +		kvm_info("Incompatible VPIPT I-Cache policy\n");
+> > +		return -ENODEV;
+> > +	}
+> 
+> Hmm, does this work properly with late CPU onlining? For example, if my set
+> of boot CPUs are all friendly PIPT and KVM initialises happily, but then I
+> late online a CPU with a horrible VPIPT policy, I worry that we'll quietly
+> do the wrong thing wrt maintenance.
 
-Nothing to be sorry for - can't notice everything in the flood. :)
+Yup. The problem is what do we do in that case? Apart from preventing
+the late onlining itself?
 
-> There will be a minor conflict in KVM's reverse_cpuid, but it's trivial to resolve.
-> I don't anticipate any other conflicts, so taking this through tip does seem like
-> the best option.
+> 
+> If that's the case, then arguably we already have a bug in the cases where
+> we trap and emulate accesses to CTR_EL0 from userspace because I _think_
+> we'll change the L1Ip field at runtime after userspace could've already read
+> it.
+> 
+> Is there something that stops us from ended up in this situation?
 
-Ok, thx.
+Probably not. Userspace will observe the wrong thing, and this applies
+to *any* late onlining with a more restrictive cache topology (such as
+PIPT -> VIPT). Unclear how the trapping will be engaged on the *other*
+CPUs as well...
 
-> If possible, a new version to fix the bisection issues in patches 2 and 3 would
-> be nice, but again it's not a big deal.  The breakage is very, very minor.
+I've tried to reverse-engineer the cpufeature arrays again, and failed
+to find a good solution for this.
 
-Yap, I've zapped them and their removal will take a bit to propagate to
-linux-next.
+Suzuki, what do you think?
 
-Thx.
+	M.
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Without deviation from the norm, progress is not possible.
