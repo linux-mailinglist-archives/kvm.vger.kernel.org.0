@@ -2,129 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DF2A675FF5
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 23:12:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D5159676016
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 23:20:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230012AbjATWMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 17:12:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60702 "EHLO
+        id S230047AbjATWUB (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 17:20:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229984AbjATWMh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 17:12:37 -0500
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D32C1042B
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:12:36 -0800 (PST)
-Received: by mail-io1-xd30.google.com with SMTP id s26so3091738ioa.11
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:12:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=digitalocean.com; s=google;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4THOFKr/oi12Lh9VLujYmInaKqJLT8dgCNKdQB2cfmk=;
-        b=T4T5wgg++tuZ/vEq0fZnEjrnICkN93HtNwM8BOci4baJ4tNoZUO7qzGEVTNBfA+zQu
-         n+V3DygwoipkiGcrdikPsPg9EX2QlA0RNlOvWazocCNMxG+ELMunhJNN2QxkSiTowOD9
-         0wWjNg+idMoxJJ1ObfK0zxrJuNMwQRT2ae9oY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4THOFKr/oi12Lh9VLujYmInaKqJLT8dgCNKdQB2cfmk=;
-        b=Xh27EbgxyphoMBKhfkeJOzAK20ww7utIsv5i6fSiu5jZl3dK+3izIu/GJGBHLg6k1U
-         Z51+9wwXugzxI4H3CVU2v2dm4TJObOjyxsodLh4acSino5f7aewpmyrxOZGFx/ogZliw
-         9XgNfbm6aYbRLHLroCU2xsw+psqEyHkEOd4g4IbSSmKtdM/YPZekksXoroviEUE1/983
-         xBkqAO6wVU92hOh6LWZ0b6JrkfHyzXZHewPMJHmtDYHoAihrTOjexDNKPDKP+tSoeH/C
-         EcsziDqh5tzZt/1LaCwPH9nSRWAsu5eFY+gEOh+aVyyPUnPHMmkY0hTYGA1PupXDI+ZO
-         Q2DQ==
-X-Gm-Message-State: AFqh2kqND4T4pJtw8cniUsVX0wvly2fDWlEaLYk49IIEuMG6rXmQVGSX
-        b078g3Y5ByeOyl/Fvm/HV4GlQg==
-X-Google-Smtp-Source: AMrXdXuYH0nZSV1qNftw1CzohAHNXptoGk5ziEa4Bpij01Z0mb6PK5Xk5Fi9HVzcgmqxNrAazaw+Lg==
-X-Received: by 2002:a5e:df08:0:b0:704:6e8d:4891 with SMTP id f8-20020a5edf08000000b007046e8d4891mr12238768ioq.3.1674252755532;
-        Fri, 20 Jan 2023 14:12:35 -0800 (PST)
-Received: from localhost ([136.37.131.79])
-        by smtp.gmail.com with ESMTPSA id j5-20020a5d93c5000000b006bba42f7822sm13342047ioo.52.2023.01.20.14.12.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jan 2023 14:12:35 -0800 (PST)
-From:   "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>
-X-Google-Original-From: "Seth Forshee (DigitalOcean)" <sforshee@kernel.org>
-Date:   Fri, 20 Jan 2023 16:12:22 -0600
-Subject: [PATCH 2/2] vhost: check for pending livepatches from vhost worker
- kthreads
+        with ESMTP id S230096AbjATWTz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 17:19:55 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2AD4762C2;
+        Fri, 20 Jan 2023 14:19:52 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A48AFB82A95;
+        Fri, 20 Jan 2023 22:19:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3130C4339B;
+        Fri, 20 Jan 2023 22:19:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674253190;
+        bh=HvcNM2UjecQL348bqHAOm445agwCIVqQtDTv2S/yEmw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=pDTcPNR6BXuGBjP48njVINKN5F4mgJzV2lu2lU+SiajKyiN1d9pouPWpoFT+XvXmP
+         p1moDyoN+5EFFREdr0oR4/QtuhG0eBg+nfymIU51LXQZjPtt4+tZSHc8kRvTMIesNi
+         N5TKxI/AuyFae1Pod78Qp6VO3XsbPnvU8SMAyKuj05xhg6Y+YN1BhQDju7OUbzYhdT
+         zrRiBZSrl4uuJw5bUXrzdOKEZfhl6OF9parCd9H83GKLEDxvijBfUR5wsISatx4H2+
+         evuGZ2pTnCHVocTM/YFfyfwP75KRtLMYIFTqZYgGjd6DKGo1p0Ps0At4i/ddziPeOm
+         JETqPRmVwe03Q==
+Date:   Fri, 20 Jan 2023 22:19:47 +0000
+From:   Jarkko Sakkinen <jarkko@kernel.org>
+To:     "Kalra, Ashish" <ashish.kalra@amd.com>
+Cc:     Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org,
+        linux-coco@lists.linux.dev, linux-mm@kvack.org,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v7 25/64] crypto: ccp: Add support to initialize the
+ AMD-SP for SEV-SNP
+Message-ID: <Y8sTg3gI879qzDMV@kernel.org>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-26-michael.roth@amd.com>
+ <Y7BWGvGj/Ky8RctP@kernel.org>
+ <5bb741b8-8daa-028d-d920-826e1396dd87@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20230120-vhost-klp-switching-v1-2-7c2b65519c43@kernel.org>
-References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
-In-Reply-To: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
-To:     Petr Mladek <pmladek@suse.com>, Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>
-Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        "Seth Forshee (DigitalOcean)" <sforshee@kernel.org>,
-        netdev@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-X-Mailer: b4 0.10.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1164; i=sforshee@kernel.org;
- h=from:subject:message-id; bh=4/niAYH6EV14H83dRR2LugTxSHfcyLm3BmgkkAhqns4=;
- b=owEBbQGS/pANAwAKAVMDma7l9DHJAcsmYgBjyxHO/ViIOpErIY20s4GDksHjnp6o0DAE12QlN8dK
- hhzTEKaJATMEAAEKAB0WIQSQnt+rKAvnETy4Hc9TA5mu5fQxyQUCY8sRzgAKCRBTA5mu5fQxyfOWB/
- 0WuOaZX+X5hCUgwSQTrkcv8eFNZr4ccIejTsTobwcs5msz5xGxh69uUHYc01UIvAoWd1KmcPNRwrUQ
- L1d3KILMoPNtB9E1KUGutwyCKQ+II25ZpJEN4NwvS1ne/2RTuYLC3JAE/5KXJBPrgkYtamqmAlQigj
- qPsmksCw5XYnJL8mlFNPnKi7mRUrO5wzG6Nvfklg6ueJJ0RjChqfxx7ihMiyz/i6NYxwnWrdb81ThR
- bvCgejkYkOCxXGU141uIoNj8L/+LxSJt7V4fBLFhWS7StagI41mGFFMKQDYshldbxo3ni4dt209Pxc
- r41Nzfigh02pcyKBNKotRlwsrmhIEy
-X-Developer-Key: i=sforshee@kernel.org; a=openpgp;
- fpr=2ABCA7498D83E1D32D51D3B5AB4800A62DB9F73A
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
-        version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5bb741b8-8daa-028d-d920-826e1396dd87@amd.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Livepatch relies on stack checking of sleeping tasks to switch kthreads,
-so a busy kthread can block a livepatch transition indefinitely. We've
-seen this happen fairly often with busy vhost kthreads.
+On Thu, Jan 05, 2023 at 04:40:29PM -0600, Kalra, Ashish wrote:
+> Hello Jarkko,
+> 
+> On 12/31/2022 9:32 AM, Jarkko Sakkinen wrote:
+> > On Wed, Dec 14, 2022 at 01:40:17PM -0600, Michael Roth wrote:
+> > > From: Brijesh Singh <brijesh.singh@amd.com>
+> > > 
+> > > Before SNP VMs can be launched, the platform must be appropriately
+> > > configured and initialized. Platform initialization is accomplished via
+> > > the SNP_INIT command. Make sure to do a WBINVD and issue DF_FLUSH
+> > > command to prepare for the first SNP guest launch after INIT.
+> > > 
+> > > During the execution of SNP_INIT command, the firmware configures
+> > > and enables SNP security policy enforcement in many system components.
+> > > Some system components write to regions of memory reserved by early
+> > > x86 firmware (e.g. UEFI). Other system components write to regions
+> > > provided by the operation system, hypervisor, or x86 firmware.
+> > > Such system components can only write to HV-fixed pages or Default
+> > > pages. They will error when attempting to write to other page states
+> > > after SNP_INIT enables their SNP enforcement.
+> > > 
+> > > Starting in SNP firmware v1.52, the SNP_INIT_EX command takes a list of
+> > > system physical address ranges to convert into the HV-fixed page states
+> > > during the RMP initialization. If INIT_RMP is 1, hypervisors should
+> > > provide all system physical address ranges that the hypervisor will
+> > > never assign to a guest until the next RMP re-initialization.
+> > > For instance, the memory that UEFI reserves should be included in the
+> > > range list. This allows system components that occasionally write to
+> > > memory (e.g. logging to UEFI reserved regions) to not fail due to
+> > > RMP initialization and SNP enablement.
+> > > 
+> > > Co-developed-by: Ashish Kalra <ashish.kalra@amd.com>
+> > > Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
+> > > Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> > > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > > ---
+> > >   drivers/crypto/ccp/sev-dev.c | 225 +++++++++++++++++++++++++++++++++++
+> > >   drivers/crypto/ccp/sev-dev.h |   2 +
+> > >   include/linux/psp-sev.h      |  17 +++
+> > >   3 files changed, 244 insertions(+)
+> > > 
+> > > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> > > index 9d84720a41d7..af20420bd6c2 100644
+> > > --- a/drivers/crypto/ccp/sev-dev.c
+> > > +++ b/drivers/crypto/ccp/sev-dev.c
+> > > @@ -26,6 +26,7 @@
+> > >   #include <linux/fs_struct.h>
+> > >   #include <asm/smp.h>
+> > > +#include <asm/e820/types.h>
+> > >   #include "psp-dev.h"
+> > >   #include "sev-dev.h"
+> > > @@ -34,6 +35,10 @@
+> > >   #define SEV_FW_FILE		"amd/sev.fw"
+> > >   #define SEV_FW_NAME_SIZE	64
+> > > +/* Minimum firmware version required for the SEV-SNP support */
+> > > +#define SNP_MIN_API_MAJOR	1
+> > > +#define SNP_MIN_API_MINOR	51
+> > > +
+> > >   static DEFINE_MUTEX(sev_cmd_mutex);
+> > >   static struct sev_misc_dev *misc_dev;
+> > > @@ -76,6 +81,13 @@ static void *sev_es_tmr;
+> > >   #define NV_LENGTH (32 * 1024)
+> > >   static void *sev_init_ex_buffer;
+> > > +/*
+> > > + * SEV_DATA_RANGE_LIST:
+> > > + *   Array containing range of pages that firmware transitions to HV-fixed
+> > > + *   page state.
+> > > + */
+> > > +struct sev_data_range_list *snp_range_list;
+> > > +
+> > >   static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+> > >   {
+> > >   	struct sev_device *sev = psp_master->sev_data;
+> > > @@ -830,6 +842,186 @@ static int sev_update_firmware(struct device *dev)
+> > >   	return ret;
+> > >   }
+> > > +static void snp_set_hsave_pa(void *arg)
+> > > +{
+> > > +	wrmsrl(MSR_VM_HSAVE_PA, 0);
+> > > +}
+> > > +
+> > > +static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+> > > +{
+> > > +	struct sev_data_range_list *range_list = arg;
+> > > +	struct sev_data_range *range = &range_list->ranges[range_list->num_elements];
+> > > +	size_t size;
+> > > +
+> > > +	if ((range_list->num_elements * sizeof(struct sev_data_range) +
+> > > +	     sizeof(struct sev_data_range_list)) > PAGE_SIZE)
+> > > +		return -E2BIG;
+> > > +
+> > > +	switch (rs->desc) {
+> > > +	case E820_TYPE_RESERVED:
+> > > +	case E820_TYPE_PMEM:
+> > > +	case E820_TYPE_ACPI:
+> > > +		range->base = rs->start & PAGE_MASK;
+> > > +		size = (rs->end + 1) - rs->start;
+> > > +		range->page_count = size >> PAGE_SHIFT;
+> > > +		range_list->num_elements++;
+> > > +		break;
+> > > +	default:
+> > > +		break;
+> > > +	}
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > > +static int __sev_snp_init_locked(int *error)
+> > > +{
+> > > +	struct psp_device *psp = psp_master;
+> > > +	struct sev_data_snp_init_ex data;
+> > > +	struct sev_device *sev;
+> > > +	int rc = 0;
+> > > +
+> > > +	if (!psp || !psp->sev_data)
+> > > +		return -ENODEV;
+> > > +
+> > > +	sev = psp->sev_data;
+> > > +
+> > > +	if (sev->snp_initialized)
+> > > +		return 0;
+> > 
+> > Shouldn't this follow this check:
+> > 
+> >          if (sev->state == SEV_STATE_INIT) {
+> >                  /* debug printk about possible incorrect call order */
+> >                  return -ENODEV;
+> >          }
+> > 
+> > It is game over for SNP, if SEV_CMD_INIT{_EX} got first, which means that
+> > this should not proceed.
+> 
+> 
+> But, how will SEV_CMD_INIT_EX happen before as sev_pci_init() which is
+> invoked during CCP module load/initialization, will first try to do
+> sev_snp_init() if SNP is supported, before it invokes sev_platform_init() to
+> do SEV firmware initialization ?
 
-Add a check to call klp_switch_current() from vhost_worker() when a
-livepatch is pending. In testing this allowed vhost kthreads to switch
-immediately when they had previously blocked livepatch transitions for
-long periods of time.
+Because the symbol is exported outside the driver to be called by other
+subsystems, you need to have a santiy check for the call order, as it
+is a hardware constraint. Otherwise, any unconsidered change in either
+side could unknowingily break the kernel.
 
-Signed-off-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
----
- drivers/vhost/vhost.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Alternatively, you could choose not to export sev_snp_init(). It is
+supported by the fact that the call in sev_guest_init() is does nothing
+useful (for the reasons you already wrote).
 
-diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-index cbe72bfd2f1f..d8624f1f2d64 100644
---- a/drivers/vhost/vhost.c
-+++ b/drivers/vhost/vhost.c
-@@ -30,6 +30,7 @@
- #include <linux/interval_tree_generic.h>
- #include <linux/nospec.h>
- #include <linux/kcov.h>
-+#include <linux/livepatch.h>
- 
- #include "vhost.h"
- 
-@@ -366,6 +367,9 @@ static int vhost_worker(void *data)
- 			if (need_resched())
- 				schedule();
- 		}
-+
-+		if (unlikely(klp_patch_pending(current)))
-+			klp_switch_current();
- 	}
- 	kthread_unuse_mm(dev->mm);
- 	return 0;
-
--- 
-b4 0.10.1
+BR, Jarkko
