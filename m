@@ -2,131 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B958867544C
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 13:21:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 39A3D675447
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 13:20:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbjATMVq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 07:21:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51668 "EHLO
+        id S229556AbjATMUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 07:20:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229450AbjATMVp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 07:21:45 -0500
-Received: from gloria.sntech.de (gloria.sntech.de [185.11.138.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AF3B8B303;
-        Fri, 20 Jan 2023 04:21:42 -0800 (PST)
-Received: from ip5b412258.dynamic.kabel-deutschland.de ([91.65.34.88] helo=diego.localnet)
-        by gloria.sntech.de with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <heiko@sntech.de>)
-        id 1pIqNP-0003oi-Vu; Fri, 20 Jan 2023 13:20:12 +0100
-From:   Heiko =?ISO-8859-1?Q?St=FCbner?= <heiko@sntech.de>
-To:     linux-riscv@lists.infradead.org
-Cc:     Guo Ren <guoren@linux.alibaba.com>,
-        Vincent Chen <vincent.chen@sifive.com>,
-        Han-Kuan Chen <hankuan.chen@sifive.com>,
-        Greentime Hu <greentime.hu@sifive.com>,
-        Palmer Dabbelt <palmer@rivosinc.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Eric Biederman <ebiederm@xmission.com>,
-        Kees Cook <keescook@chromium.org>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Oleg Nesterov <oleg@redhat.com>,
-        Heinrich Schuchardt <heinrich.schuchardt@canonical.com>,
-        Guo Ren <guoren@kernel.org>,
-        Chris Stillson <stillson@rivosinc.com>,
-        Mayuresh Chitale <mchitale@ventanamicro.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexandre Ghiti <alexandre.ghiti@canonical.com>,
-        Qinglin Pan <panqinglin2020@iscas.ac.cn>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Jisheng Zhang <jszhang@kernel.org>,
-        Dao Lu <daolu@rivosinc.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        Sunil V L <sunilvl@ventanamicro.com>,
-        Ruinland Tsai <ruinland.tsai@sifive.com>,
-        Li Zhengyu <lizhengyu3@huawei.com>,
-        Alexander Graf <graf@amazon.com>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Tsukasa OI <research_trasio@irq.a4lg.com>,
-        Yury Norov <yury.norov@gmail.com>,
-        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Frederic Weisbecker <frederic@kernel.org>,
-        Changbin Du <changbin.du@intel.com>,
-        Vitaly Wool <vitaly.wool@konsulko.com>,
-        Myrtle Shah <gatecat@ds0.me>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Mark Brown <broonie@kernel.org>,
-        Alexey Dobriyan <adobriyan@gmail.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Christian Brauner <brauner@kernel.org>,
-        Peter Collingbourne <pcc@google.com>,
-        Eugene Syromiatnikov <esyr@redhat.com>,
-        Colin Cross <ccross@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Barret Rhoden <brho@google.com>,
-        Suren Baghdasaryan <surenb@google.com>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mm@kvack.org, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org,
-        Chris Stillson <stillson@rivosinc.com>
-Subject: Re: [PATCH v12 06/17] riscv: Reset vector register
-Date:   Fri, 20 Jan 2023 13:20:09 +0100
-Message-ID: <2331455.NG923GbCHz@diego>
-In-Reply-To: <20220921214439.1491510-6-stillson@rivosinc.com>
-References: <20220921214439.1491510-1-stillson@rivosinc.com>
- <20220921214439.1491510-6-stillson@rivosinc.com>
+        with ESMTP id S229504AbjATMUm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 07:20:42 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CD9F8B303
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 04:20:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674217242; x=1705753242;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Tgo1gQ7gSdxjO4L2CZmSW0g/1s7bejNlbjGJMrJ3PDQ=;
+  b=mcRxKTH3deMlfQSD7ZtaX0fP9S3UaZO3z7qJ3moNaCYoHKat92XF8nrf
+   q1SJ5LexgUt7AdvFVa5eRC89LQW9EOOBNLuyN00MEjsm5aJ/PzazgOTeW
+   R+7D78DSIP4LA0CYRARbnWDhSln/rk0JjBgRXnDYGUHNuggFrprdhqWpl
+   jBdhiKGzFm8wpEKPLm3VlkUxig2nW8zuJS6GF77eFxV0s5Gx2SqH8F4Tz
+   VfANU/TM2oY4X37cvuH2jRIkHYVPcIEVzq08bm+F2ydvzhhyaRmPiZVds
+   vEYYVK+wS7F4br+FdTCpEZuuobGQoynmEeXihMhBZHX0erdztmc7FHcbe
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="323257796"
+X-IronPort-AV: E=Sophos;i="5.97,232,1669104000"; 
+   d="scan'208";a="323257796"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2023 04:20:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10595"; a="834395473"
+X-IronPort-AV: E=Sophos;i="5.97,232,1669104000"; 
+   d="scan'208";a="834395473"
+Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
+  by orsmga005.jf.intel.com with ESMTP; 20 Jan 2023 04:20:41 -0800
+From:   Yi Liu <yi.l.liu@intel.com>
+To:     jgg@nvidia.com, kevin.tian@intel.com
+Cc:     yi.l.liu@intel.com, kvm@vger.kernel.org, iommu@lists.linux.dev
+Subject: [PATCH v2] iommufd: Add three missing structures in ucmd_buffer
+Date:   Fri, 20 Jan 2023 04:20:40 -0800
+Message-Id: <20230120122040.280219-1-yi.l.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_PASS,
-        T_SPF_HELO_TEMPERROR autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Am Mittwoch, 21. September 2022, 23:43:48 CET schrieb Chris Stillson:
-> @@ -431,6 +431,29 @@ ENTRY(reset_regs)
->  	csrw	fcsr, 0
->  	/* note that the caller must clear SR_FS */
->  #endif /* CONFIG_FPU */
-> +
-> +#ifdef CONFIG_VECTOR
-> +	csrr	t0, CSR_MISA
-> +	li	t1, COMPAT_HWCAP_ISA_V
-> +	and	t0, t0, t1
-> +	beqz	t0, .Lreset_regs_done
-> +
-> +	/*
-> +	 * Clear vector registers and reset vcsr
-> +	 * VLMAX has a defined value, VLEN is a constant,
-> +	 * and this form of vsetvli is defined to set vl to VLMAX.
-> +	 */
-> +	li	t1, SR_VS
-> +	csrs	CSR_STATUS, t1
-> +	csrs	CSR_VCSR, x0
-> +	vsetvli t1, x0, e8, m8, ta, ma
-> +	vmv.v.i v0, 0
-> +	vmv.v.i v8, 0
-> +	vmv.v.i v16, 0
-> +	vmv.v.i v24, 0
-> +	/* note that the caller must clear SR_VS */
-> +#endif /* CONFIG_VECTOR */
-> +
->  .Lreset_regs_done:
+struct iommu_ioas_copy, struct iommu_option and struct iommu_vfio_ioas
+are missed in ucmd_buffer. Although they are smaller than the size of
+ucmd_buffer, it is safer to list them in ucmd_buffer explicitly.
 
-Not sure how much they go together, but the #ifdef CONFIG_FPU block above
-your new VECTOR block also jumps to the same .Lreset_regs_done, so with
-the patch as is the vector-reset block is never reached in the !FPU case.
+Fixes: aad37e71d5c4 ("iommufd: IOCTLs for the io_pagetable")
+Fixes: d624d6652a65 ("iommufd: vfio container FD ioctl compatibility")
+Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+---
+v2:
+  - add iommu_ioas_copy as KevinT pointed
 
-So maybe making them independent of each other might prevent issues
-down the roead.
+v1: https://lore.kernel.org/kvm/20230120055757.67879-1-yi.l.liu@intel.com/
 
+ drivers/iommu/iommufd/main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/iommu/iommufd/main.c b/drivers/iommu/iommufd/main.c
+index 083e6fcbe10a..3fbe636c3d8a 100644
+--- a/drivers/iommu/iommufd/main.c
++++ b/drivers/iommu/iommufd/main.c
+@@ -252,9 +252,12 @@ union ucmd_buffer {
+ 	struct iommu_destroy destroy;
+ 	struct iommu_ioas_alloc alloc;
+ 	struct iommu_ioas_allow_iovas allow_iovas;
++	struct iommu_ioas_copy ioas_copy;
+ 	struct iommu_ioas_iova_ranges iova_ranges;
+ 	struct iommu_ioas_map map;
+ 	struct iommu_ioas_unmap unmap;
++	struct iommu_option option;
++	struct iommu_vfio_ioas vfio_ioas;
+ #ifdef CONFIG_IOMMUFD_TEST
+ 	struct iommu_test_cmd test;
+ #endif
+-- 
+2.34.1
 
