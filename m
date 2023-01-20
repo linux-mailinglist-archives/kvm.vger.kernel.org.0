@@ -2,95 +2,143 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4B44C675419
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 13:06:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5ED0B67543A
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 13:12:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229787AbjATMGK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 07:06:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43210 "EHLO
+        id S229985AbjATMMm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 07:12:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbjATMGI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 07:06:08 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C7417AF2A;
-        Fri, 20 Jan 2023 04:06:04 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        with ESMTP id S229851AbjATMMk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 07:12:40 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0375983E5
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 04:12:38 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 135531EC04DA;
-        Fri, 20 Jan 2023 13:06:03 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1674216363;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=3SURoIpdP0J1MWZzS5Qe4d8ryuy8YYrNYJ0da/iJuiU=;
-        b=ga4d8nnAgJeWrYj5NTCHG1YfzBPmjh7NDP0Au1WuZDL/cAASppb3RDnfXmL+b/ix3uV05R
-        AzGGwMCR3nAwI8Z4R1ADx7+JaA7Ht3jtSWINw9+bIapIX1E3mIe1NlhwmLqTBAbDTTWtQX
-        ParbNPuZ4ACuQbjbtBkqemqh7W6sCig=
-Date:   Fri, 20 Jan 2023 13:06:02 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     "Nikunj A. Dadhania" <nikunj@amd.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Yury Norov <yury.norov@gmail.com>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Sandipan Das <sandipan.das@amd.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        by sin.source.kernel.org (Postfix) with ESMTPS id 42442CE2804
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 12:12:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BC5CC433D2;
+        Fri, 20 Jan 2023 12:12:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674216755;
+        bh=0iRYbwf/9VfNZDvMm3r5D5V9SjGnLfb8zDeKKD726pQ=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=dYnc6eLdwwBG1cYTK3l0gV197Jwvcv3DfcQMD7C3ZDWPUVN1nEQJ7kdFEdGf7ARlo
+         H9oQJSIJ8mDcFW58izgVRn4Ex5lRA5IHko2t3aOhY3pNhfvvw9DyZIS9aVjEDcLiju
+         rxUqJF4Ts+JJZqaGxNqN/sF5zObR3gUkYMGgLAGlfRFQvlaDLrpehQ0xeyCybAefIJ
+         lzHLWa6rOCSPYU6ACvOfapi5fFmwJspzCfJOc7cUXoIzi7aa69dQCZCXcQxw8bzytO
+         HRQpLRONAz3jYQfLGBIj/qKXAVvKfVtePF/i/jdpEHrq/Pu/AjtvY7gbtdtk2cPCZr
+         1zok2UNyqvTvw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pIqG1-003P46-99;
+        Fri, 20 Jan 2023 12:12:33 +0000
+Date:   Fri, 20 Jan 2023 12:12:32 +0000
+Message-ID: <86pmb9mmkv.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Reiji Watanabe <reijiw@google.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Kees Cook <keescook@chromium.org>,
-        Juergen Gross <jgross@suse.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH kernel v3 3/3] x86/sev: Do not handle #VC for DR7
- read/write
-Message-ID: <Y8qDqgzsAOgcckPW@zn.tnic>
-References: <20230120031047.628097-1-aik@amd.com>
- <20230120031047.628097-4-aik@amd.com>
- <adc11ed3-de89-a389-e629-3c951257469c@amd.com>
- <533c5c83-b68b-eff0-d36d-9963194ab844@amd.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <533c5c83-b68b-eff0-d36d-9963194ab844@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Subject: Re: [PATCH v2 3/8] KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value on vCPU reset
+In-Reply-To: <Y8ngqRHhiXHjc0vA@google.com>
+References: <20230117013542.371944-1-reijiw@google.com>
+        <20230117013542.371944-4-reijiw@google.com>
+        <Y8ngqRHhiXHjc0vA@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, reijiw@google.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, alexandru.elisei@arm.com, yuzenghui@huawei.com, suzuki.poulose@arm.com, pbonzini@redhat.com, ricarkol@google.com, jingzhangos@google.com, rananta@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 20, 2023 at 09:23:48PM +1100, Alexey Kardashevskiy wrote:
-> Worth mentioning it is tip/x86/urgent (which does not have
-> X86_FEATURE_NO_NESTED_DATA_BP), not tip/master (which has
-> X86_FEATURE_NO_NESTED_DATA_BP).
+On Fri, 20 Jan 2023 00:30:33 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Mon, Jan 16, 2023 at 05:35:37PM -0800, Reiji Watanabe wrote:
+> > The number of PMU event counters is indicated in PMCR_EL0.N.
+> > For a vCPU with PMUv3 configured, its value will be the same as
+> > the host value by default. Userspace can set PMCR_EL0.N for the
+> > vCPU to a lower value than the host value using KVM_SET_ONE_REG.
+> > However, it is practically unsupported, as reset_pmcr() resets
+> > PMCR_EL0.N to the host value on vCPU reset.
+> > 
+> > Change reset_pmcr() to preserve the vCPU's PMCR_EL0.N value on
+> > vCPU reset so that userspace can limit the number of the PMU
+> > event counter on the vCPU.
+> > 
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/kvm/pmu-emul.c | 6 ++++++
+> >  arch/arm64/kvm/sys_regs.c | 4 +++-
+> >  2 files changed, 9 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/arm64/kvm/pmu-emul.c b/arch/arm64/kvm/pmu-emul.c
+> > index 24908400e190..937a272b00a5 100644
+> > --- a/arch/arm64/kvm/pmu-emul.c
+> > +++ b/arch/arm64/kvm/pmu-emul.c
+> > @@ -213,6 +213,12 @@ void kvm_pmu_vcpu_init(struct kvm_vcpu *vcpu)
+> >  
+> >  	for (i = 0; i < ARMV8_PMU_MAX_COUNTERS; i++)
+> >  		pmu->pmc[i].idx = i;
+> > +
+> > +	/*
+> > +	 * Initialize PMCR_EL0 for the vCPU with the host value so that
+> > +	 * the value is available at the very first vCPU reset.
+> > +	 */
+> > +	__vcpu_sys_reg(vcpu, PMCR_EL0) = read_sysreg(pmcr_el0);
+> 
+> I think we need to derive a sanitised value for PMCR_EL0.N, as I believe
+> nothing in the architecture prevents implementers from gluing together
+> cores with varying numbers of PMCs. We probably haven't noticed it yet
+> since it would appear all Arm designs have had 6 PMCs.
 
-Yeah, when you submit patches for tip, you can always use tip/master which has
-the latest lineup of all branches and should have all the required bits.
+This brings back the question of late onlining. How do you cope with
+with the onlining of such a CPU that has a smaller set of counters
+than its online counterparts? This is at odds with the way the PMU
+code works.
 
-Thx.
+If you have a different set of counters, you are likely to have a
+different PMU altogether:
+
+[    1.192606] hw perfevents: enabled with armv8_cortex_a57 PMU driver, 7 counters available
+[    1.201254] hw perfevents: enabled with armv8_cortex_a53 PMU driver, 7 counters available
+
+This isn't a broken system, but it has two set of cores which are
+massively different, and two PMUs.
+
+This really should tie back to the PMU type we're counting on, and to
+the set of CPUs that implements it. We already have some
+infrastructure to check for the affinity of the PMU vs the CPU we're
+running on, and this is already visible to userspace.
+
+Can't we just leave this responsibility to userspace?
+
+Thanks,
+
+	M.
 
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Without deviation from the norm, progress is not possible.
