@@ -2,229 +2,179 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B0D276758E3
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 16:39:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E2686758FE
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 16:45:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231207AbjATPjp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 10:39:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42038 "EHLO
+        id S231357AbjATPp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 10:45:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49380 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230526AbjATPjj (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 10:39:39 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD7C4DE09
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 07:38:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674229060;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Lf+VUNzHo6930QhHDjlYS5a/9FVCtfkspKq7OQ6oVEY=;
-        b=MO4uzR935q98DxhIKd51GMndg7y8YlQU/8Frnu4yLKk+0G9e2c+catA2uyLqfZy76Uloxp
-        hMgaRSopBnLZhK+3bRzkD+ShtWvJBvXi3qX/eU+EdA6xHLQ7BH8B5d+z51luiIAkNbXHFb
-        1n+i94xnvqwTZnEmXJHq0lHeZqBn1QE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-613-IuCFiylNNgiCZJZKXtIOSQ-1; Fri, 20 Jan 2023 10:37:39 -0500
-X-MC-Unique: IuCFiylNNgiCZJZKXtIOSQ-1
-Received: by mail-ed1-f69.google.com with SMTP id b15-20020a056402350f00b0049e42713e2bso4130534edd.0
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 07:37:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lf+VUNzHo6930QhHDjlYS5a/9FVCtfkspKq7OQ6oVEY=;
-        b=NXsy6swGjvyFhtnDYJUXwFE6HcDi19wY5irZ7rCUwJ/I/afmJ4VP7+bMUNd8yszoOF
-         jzMj2n9qb6e9CiQ+7f9UKWOt8v4Pqp6zEVg3W3FZRyXHDzlgEjYAbC+PXY9FJXTfqIUo
-         x0TJvVQCRJ3W/1xnyl87ri1DB9ebR71Y9b+KJIn+3ZBfzmeGRKGBHjHGuz3Xg49ahhyg
-         whIo7bUZfYRCMc7H9HOdjfRAN/mAsI/LAX+0capdm4H7MudKqQqA2yapA0d7PIVq6kci
-         ZpfMg9/HIHoqnBBriu4SGSNaN7xfZ+M+dT4/byOJCY4D/F922vdtnH3/0whg/lRS7SgU
-         gwng==
-X-Gm-Message-State: AFqh2kojWKjRqObNh0mWiy8losdzA2bSmb3rXLjAososzZ8uYtnE379d
-        mF9mC5GjpT8nCGN3T2MD6zHPp5RRG5McJLdL6SWXEaNdes3SX//tdaEQuT9mCezLJ40can7T1uQ
-        6MdwlOgKbfGJw
-X-Received: by 2002:a05:6402:413:b0:498:b9ea:1894 with SMTP id q19-20020a056402041300b00498b9ea1894mr14217253edv.15.1674229058188;
-        Fri, 20 Jan 2023 07:37:38 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXt9Neac975gd5nkcxdpVzeTBwC+wqA5CjhhwnQrnrtHBQwgyExGpn/wMyvV8tTW0X127YXwMw==
-X-Received: by 2002:a05:6402:413:b0:498:b9ea:1894 with SMTP id q19-20020a056402041300b00498b9ea1894mr14217220edv.15.1674229057884;
-        Fri, 20 Jan 2023 07:37:37 -0800 (PST)
-Received: from imammedo.users.ipa.redhat.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id eg49-20020a05640228b100b00488117821ffsm17591730edb.31.2023.01.20.07.37.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jan 2023 07:37:35 -0800 (PST)
-Date:   Fri, 20 Jan 2023 16:37:34 +0100
-From:   Igor Mammedov <imammedo@redhat.com>
-To:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>
-Cc:     Thomas Gleixner <tglx@linutronix.de>, linux-kernel@vger.kernel.org,
-        amakhalov@vmware.com, ganb@vmware.com, ankitja@vmware.com,
-        bordoloih@vmware.com, keerthanak@vmware.com, blamoreaux@vmware.com,
-        namit@vmware.com, Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Wyes Karny <wyes.karny@amd.com>,
-        Lewis Caroll <lewis.carroll@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>, x86@kernel.org,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v2] x86/hotplug: Do not put offline vCPUs in mwait idle
- state
-Message-ID: <20230120163734.63e62444@imammedo.users.ipa.redhat.com>
-In-Reply-To: <ecb9a22e-fd6e-67f0-d916-ad16033fc13c@csail.mit.edu>
-References: <20230116060134.80259-1-srivatsa@csail.mit.edu>
-        <20230116155526.05d37ff9@imammedo.users.ipa.redhat.com>
-        <87bkmui5z4.ffs@tglx>
-        <ecb9a22e-fd6e-67f0-d916-ad16033fc13c@csail.mit.edu>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.36; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        with ESMTP id S231180AbjATPpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 10:45:54 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3744974C;
+        Fri, 20 Jan 2023 07:45:53 -0800 (PST)
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30KEN79w023320;
+        Fri, 20 Jan 2023 15:45:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=jP4jR2i0Vx3/CXZzjbOxmRNKOfuz0Kxez96Br8vVvcU=;
+ b=QexltucWRcI0Yj7UTKuFqL4FmFx7fY41OWHAzclFDfxLerjh/pugkE7wG370ctFRF7GV
+ Hxa3mgTgsU7YyReednEWeampn4jkQp3P3Gw18P8ffh9TnkRMokUtWqp1PUPAd+9luErz
+ 79ONCrvcAUGxdhlhO2TUz1XqZsoCCDgo66HqYdIZ1TtumeIUVETsVbrO2hM0uhd1pWm7
+ SNOFBXUbvdYmhlMzIw5Op1qgyYdFLG+fgqjnOjy/8LBMBj3dEi75om4mT1WhFmraVFZ1
+ vFWf0YO3bKVswbtgyN7DDkk2DGspGZDo5atyLmb5NsEMdjXz0b+6S8/A6osQZ2hOXT2J iA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7tsbn9sn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Jan 2023 15:45:46 +0000
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30KFBRG0028162;
+        Fri, 20 Jan 2023 15:45:45 GMT
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7tsbn9s9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Jan 2023 15:45:45 +0000
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30KCuOeE024991;
+        Fri, 20 Jan 2023 15:45:44 GMT
+Received: from smtprelay04.dal12v.mail.ibm.com ([9.208.130.102])
+        by ppma05wdc.us.ibm.com (PPS) with ESMTPS id 3n3m182yj1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 20 Jan 2023 15:45:44 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+        by smtprelay04.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30KFjhHC8782464
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 20 Jan 2023 15:45:43 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 663475805F;
+        Fri, 20 Jan 2023 15:45:43 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 01FE95805C;
+        Fri, 20 Jan 2023 15:45:41 +0000 (GMT)
+Received: from [9.160.87.67] (unknown [9.160.87.67])
+        by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 20 Jan 2023 15:45:40 +0000 (GMT)
+Message-ID: <6eff63d8-d825-aecd-12b5-e8dbf55f4372@linux.ibm.com>
+Date:   Fri, 20 Jan 2023 10:45:40 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] kvm/vfio: Fix potential deadlock on vfio group_lock
+Content-Language: en-US
+To:     "Liu, Yi L" <yi.l.liu@intel.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Cc:     "jgg@nvidia.com" <jgg@nvidia.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Christopherson, , Sean" <seanjc@google.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20230120150528.471752-1-yi.l.liu@intel.com>
+ <DS0PR11MB7529B08476DF1764F1B6C007C3C59@DS0PR11MB7529.namprd11.prod.outlook.com>
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <DS0PR11MB7529B08476DF1764F1B6C007C3C59@DS0PR11MB7529.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: F9NWpvszn4K81JkqFp2jJcB3Ow5IH-ax
+X-Proofpoint-ORIG-GUID: J8JVlc_KWGK9Nyn4DQKTYEuioeLy0duP
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-20_09,2023-01-20_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ bulkscore=0 adultscore=0 clxscore=1015 mlxscore=0 priorityscore=1501
+ lowpriorityscore=0 spamscore=0 suspectscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301200148
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 20 Jan 2023 05:55:11 -0800
-"Srivatsa S. Bhat" <srivatsa@csail.mit.edu> wrote:
-
-> Hi Igor and Thomas,
+On 1/20/23 10:08 AM, Liu, Yi L wrote:
+>> From: Liu, Yi L <yi.l.liu@intel.com>
+>> Sent: Friday, January 20, 2023 11:05 PM
+>>
+>> Currently it is possible that the final put of a KVM reference comes from
+>> vfio during its device close operation.  This occurs while the vfio group
+>> lock is held; however, if the vfio device is still in the kvm device list,
+>> then the following call chain could result in a deadlock:
+>>
+>> VFIO holds group->group_lock/group_rwsem
+>>   -> kvm_put_kvm
+>>    -> kvm_destroy_vm
+>>     -> kvm_destroy_devices
+>>      -> kvm_vfio_destroy
+>>       -> kvm_vfio_file_set_kvm
+>>        -> vfio_file_set_kvm
+>>         -> try to hold group->group_lock/group_rwsem
+>>
+>> The key function is the kvm_destroy_devices() which triggers destroy cb
+>> of kvm_device_ops. It calls back to vfio and try to hold group_lock. So
+>> if this path doesn't call back to vfio, this dead lock would be fixed.
+>> Actually, there is a way for it. KVM provides another point to free the
+>> kvm-vfio device which is the point when the device file descriptor is
+>> closed. This can be achieved by providing the release cb instead of the
+>> destroy cb. Also rename kvm_vfio_destroy() to be kvm_vfio_release().
+>>
+>> 	/*
+>> 	 * Destroy is responsible for freeing dev.
+>> 	 *
+>> 	 * Destroy may be called before or after destructors are called
+>> 	 * on emulated I/O regions, depending on whether a reference is
+>> 	 * held by a vcpu or other kvm component that gets destroyed
+>> 	 * after the emulated I/O.
+>> 	 */
+>> 	void (*destroy)(struct kvm_device *dev);
+>>
+>> 	/*
+>> 	 * Release is an alternative method to free the device. It is
+>> 	 * called when the device file descriptor is closed. Once
+>> 	 * release is called, the destroy method will not be called
+>> 	 * anymore as the device is removed from the device list of
+>> 	 * the VM. kvm->lock is held.
+>> 	 */
+>> 	void (*release)(struct kvm_device *dev);
+>>
+>> Fixes: 421cfe6596f6 ("vfio: remove VFIO_GROUP_NOTIFY_SET_KVM")
+>> Reported-by: Alex Williamson <alex.williamson@redhat.com>
+>> Suggested-by: Kevin Tian <kevin.tian@intel.com>
+>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+>> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 > 
-> Thank you for your review!
+> More background can be found in Mathew's work.
+> https://lore.kernel.org/kvm/20230114000351.115444-1-mjrosato@linux.ibm.com/T/#u
 > 
-> On 1/19/23 1:12 PM, Thomas Gleixner wrote:
-> > On Mon, Jan 16 2023 at 15:55, Igor Mammedov wrote:  
-> >> "Srivatsa S. Bhat" <srivatsa@csail.mit.edu> wrote:  
-> >>> Fix this by preventing the use of mwait idle state in the vCPU offline
-> >>> play_dead() path for any hypervisor, even if mwait support is
-> >>> available.  
-> >>
-> >> if mwait is enabled, it's very likely guest to have cpuidle
-> >> enabled and using the same mwait as well. So exiting early from
-> >>  mwait_play_dead(), might just punt workflow down:
-> >>   native_play_dead()
-> >>         ...
-> >>         mwait_play_dead();
-> >>         if (cpuidle_play_dead())   <- possible mwait here                                              
-> >>                 hlt_play_dead(); 
-> >>
-> >> and it will end up in mwait again and only if that fails
-> >> it will go HLT route and maybe transition to VMM.  
-> > 
-> > Good point.
-> >   
-> >> Instead of workaround on guest side,
-> >> shouldn't hypervisor force VMEXIT on being uplugged vCPU when it's
-> >> actually hot-unplugging vCPU? (ex: QEMU kicks vCPU out from guest
-> >> context when it is removing vCPU, among other things)  
-> > 
-> > For a pure guest side CPU unplug operation:
-> > 
-> >     guest$ echo 0 >/sys/devices/system/cpu/cpu$N/online
-> > 
-> > the hypervisor is not involved at all. The vCPU is not removed in that
-> > case.
-> >   
-> 
-> Agreed, and this is indeed the scenario I was targeting with this patch,
-> as opposed to vCPU removal from the host side. I'll add this clarification
-> to the commit message.
 
-commit message explicitly said:
-"which prevents the hypervisor from running other vCPUs or workloads on the
-corresponding pCPU."
+Thanks Yi.
 
-and that implies unplug on hypervisor side as well.
-Why? That's because when hypervisor exposes mwait to guest, it has to reserve/pin
-a pCPU for each of present vCPUs. And you can safely run other VMs/workloads
-on that pCPU only after it's not possible for it to be reused by VM where
-it was used originally.
+Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
 
-Now consider following worst (and most likely) case without unplug
-on hypervisor side:
-
- 1. vm1mwait: pin pCPU2 to vCPU2
- 2. vm1mwait: guest$ echo 0 >/sys/devices/system/cpu/cpu2/online
-        -> HLT -> VMEXIT
- --
- 3. vm2mwait: pin pCPU2 to vCPUx and start VM
- 4. vm2mwait: guest OS onlines Vcpu and starts using it incl.
-       going into idle=>mwait state
- --
- 5. vm1mwait: it still thinks that vCPU is present it can rightfully do:
-       guest$ echo 1 >/sys/devices/system/cpu/cpu2/online
- --              
- 6.1 best case vm1mwait online fails after timeout
- 6.2 worse case: vm2mwait does VMEXIT on vCPUx around time-frame when
-     vm1mwait onlines vCPU2, the online may succeed and then vm2mwait's
-     vCPUx will be stuck (possibly indefinitely) until for some reason
-     VMEXIT happens on vm1mwait's vCPU2 _and_ host decides to schedule
-     vCPUx on pCPU2 which would make vm1mwait stuck on vCPU2.
-So either way it's expected behavior.
-
-And if there is no intention to unplug vCPU on hypervisor side,
-then VMEXIT on play_dead is not really necessary (mwait is better
-then HLT), since hypervisor can't safely reuse pCPU elsewhere and
-VCPU goes into deep sleep within guest context.
-
-PS:
-The only case where making HLT/VMEXIT on play_dead might work out,
-would be if new workload weren't pinned to the same pCPU nor
-used mwait (i.e. host can migrate it elsewhere and schedule
-vCPU2 back on pCPU2).
+One small nit:  There is a comment at the very end of kvm_vfio_release on the kfree(dev) that still references .destroy, this should be updated to .release
 
 
-> > So to ensure that this ends up in HLT something like the below is
-> > required.
-> > 
-> > Note, the removal of the comment after mwait_play_dead() is intentional
-> > because the comment is completely bogus. Not having MWAIT is not a
-> > failure. But that wants to be a seperate patch.
-> >   
-> 
-> Sounds good, will do and post a new version.
-> 
-> Thank you!
-> 
-> Regards,
-> Srivatsa
-> VMware Photon OS
-> 
-> 
-> > Thanks,
-> > 
-> >         tglx
-> > ---        
-> > diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
-> > index 55cad72715d9..3f1f20f71ec5 100644
-> > --- a/arch/x86/kernel/smpboot.c
-> > +++ b/arch/x86/kernel/smpboot.c
-> > @@ -1833,7 +1833,10 @@ void native_play_dead(void)
-> >  	play_dead_common();
-> >  	tboot_shutdown(TB_SHUTDOWN_WFS);
-> >  
-> > -	mwait_play_dead();	/* Only returns on failure */
-> > +	if (this_cpu_has(X86_FEATURE_HYPERVISOR))
-> > +		hlt_play_dead();
-> > +
-> > +	mwait_play_dead();
-> >  	if (cpuidle_play_dead())
-> >  		hlt_play_dead();
-> >  }
-> > 
-> > 
-> >   
-> >   
-> 
 
