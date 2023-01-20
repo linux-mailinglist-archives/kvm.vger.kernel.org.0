@@ -2,218 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CB71F675F90
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 22:20:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 446A2675FF2
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 23:12:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbjATVUi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 16:20:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39730 "EHLO
+        id S229991AbjATWMh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 17:12:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60606 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229487AbjATVUh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 16:20:37 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C80EC55;
-        Fri, 20 Jan 2023 13:20:35 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 57E76B829FB;
-        Fri, 20 Jan 2023 21:20:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A04EC433EF;
-        Fri, 20 Jan 2023 21:20:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674249633;
-        bh=F8IpSOi2yAsoDoJtoZ+I9NR2c/7qvXeB0K1/DdBRsNY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ND9fVSSJQ8Sdt6aDyGMKj6L0Pk+kfUC0xhp9OzbiQ/MwP1P2i/fY/4x70eG08kFP+
-         FP/JzlzKcIwTfDuYnjZkj5Apjc+uSXOxq1vvelxt/4Ru+uzopag4DNPO/Uywaq4FLI
-         lPR8GD0GpVv1bwxvW1lMIcOpGlQsaqt4wEXyFmu4X+WYIhVm5t4VVaqt2LvnsTH8Aq
-         vdMcLamh7xyew6Ujc02MhTwLFJTdt4CNomQaoE9IZOdVBfZy4CVVFykaoBSy7eaDGz
-         7YP9emKOeK3RyjYyuyu0uf1e05N12b5TcHPsvFPQ0rKucbHZdxWZrw1dR5YHVEueVt
-         bJ8MVSTtdE8Gw==
-Date:   Fri, 20 Jan 2023 21:20:30 +0000
-From:   Jarkko Sakkinen <jarkko@kernel.org>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     Borislav Petkov <bp@alien8.de>, kvm@vger.kernel.org,
-        linux-coco@lists.linux.dev, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, ashish.kalra@amd.com,
-        harald@profian.com, Nikunj A Dadhania <nikunj@amd.com>,
-        chao.p.peng@linux.intel.com
-Subject: Re: [PATCH RFC v7 03/64] KVM: SVM: Advertise private memory support
- to KVM
-Message-ID: <Y8sFnsk2GvnUCVFI@kernel.org>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-4-michael.roth@amd.com>
- <Y6Xd0ruz3kMij/5F@zn.tnic>
- <20230105021419.rs23nfq44rv64tsd@amd.com>
+        with ESMTP id S229924AbjATWMg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 17:12:36 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754DF36446
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:12:34 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id i70so3088623ioa.12
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:12:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digitalocean.com; s=google;
+        h=cc:to:message-id:date:content-transfer-encoding:mime-version
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=U1Ao9NXaWgBOUiK+rj9v9X8Q1xZNi+V9uTD46WKKtdw=;
+        b=CP69oNJLnjiVV4tB0rYNSmBoYhq8zTAf5aeWGwBovXoy78p1YHNttTfFLpgUdkZt5y
+         CF6BkjRK5BXmetvzcOipE6ZWALHWD4fDKhxrzQDRZETLKzd8lYiiMlj8HPAiBZDkBq+1
+         Fjdww4iDsWbfzKLRwjC85+Yo6BGDTWL5y5Tv4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:message-id:date:content-transfer-encoding:mime-version
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=U1Ao9NXaWgBOUiK+rj9v9X8Q1xZNi+V9uTD46WKKtdw=;
+        b=nFnXDAi6Xx7mYnZl1Zy4dW1hvHXjFY6B90lXHLTAi4XR01Ld68zA/ZC0IXQSBI7PT0
+         QhL9DzyKaGe+ibBfo4A+BCu0PH6m9IZqRK+ih5ZeZ0a2Q1GlM9VMTSgLHXFTss8HjNNJ
+         MXs3ctVRYtALmOpOcdla1tdjiQVJVXezSePhEbgrlOhnZ/1r4WlNUfOlJ2bpOnTusCxA
+         7I6NgVy+vbtszuZ58FuTG/kQuekBHycjJdYDVJc+ZpRGJ6dLjjLu8uRh/Vzl3C31rQuo
+         O99b6SFznaypacdsmztQdq3mX/O85m4fzZon4/VqXDX4WvohHXDNWRhB7aYpHebpuR47
+         n2GQ==
+X-Gm-Message-State: AFqh2kqkFLNzcODmh0mcuJKexznOe1c/3L8IEKd0hSfbZFN26BySIJPF
+        exFa205u3LrxXbt6RlA9pxeggQ==
+X-Google-Smtp-Source: AMrXdXum9CTPzdCUTloBWrH1lZInZCJwTTZUYqpFqr+e9Y/2n3mTCcLg6hp+gsZAesCShxp7/GqsWA==
+X-Received: by 2002:a6b:500a:0:b0:705:5e1e:eb6e with SMTP id e10-20020a6b500a000000b007055e1eeb6emr9205488iob.11.1674252753715;
+        Fri, 20 Jan 2023 14:12:33 -0800 (PST)
+Received: from localhost ([136.37.131.79])
+        by smtp.gmail.com with ESMTPSA id cs8-20020a056638470800b003a7cadffda7sm1519487jab.2.2023.01.20.14.12.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Jan 2023 14:12:33 -0800 (PST)
+From:   "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>
+X-Google-Original-From: "Seth Forshee (DigitalOcean)" <sforshee@kernel.org>
+Subject: [PATCH 0/2] vhost: improve livepatch switching for heavily loaded vhost worker kthreads
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230105021419.rs23nfq44rv64tsd@amd.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-b4-tracking: H4sIAMQRy2MC/w3LOw6AIAwA0KuYzjZBWNTbFGykkVRD/QzGu8v4hveCcRU2mLsXKt9ismvD0HeQMu
+ nKKEszeOeDG7zDO+924lYOtEfOlEVXjDRRIA5jHAnajGSMsZKm3K5epXzfD5ena69qAAAA
+Date:   Fri, 20 Jan 2023 16:12:20 -0600
+Message-Id: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+To:     Petr Mladek <pmladek@suse.com>, Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        "Seth Forshee (DigitalOcean)" <sforshee@kernel.org>,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+X-Mailer: b4 0.10.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2416; i=sforshee@kernel.org;
+ h=from:subject:message-id; bh=EZbjAIdznm3Oej+eWIGyRgmoqSdbR0GomfdbWyUvWuE=;
+ b=owEBbQGS/pANAwAKAVMDma7l9DHJAcsmYgBjyxHK47dK5XiK+U7PMs1DUY+EH512EmtrWsinE62O
+ st1NWfiJATMEAAEKAB0WIQSQnt+rKAvnETy4Hc9TA5mu5fQxyQUCY8sRygAKCRBTA5mu5fQxySm3B/
+ 9RzhyLuYXteP+GKtAYPSH91mkV9to22qctt0HVI4O7jF/xfnsSaW4H0H02HzXQL4C8vk9TICOgCpWM
+ pXpuuKMmpauwn5I88hvtmnChrAtfuwXV9F/UZOx/bcGLSB0XyBo6ZeZhGFtiBSptCzz8vAjY181OnP
+ DAN50d3RjfNYScU+jrA3MfX9R0/PfKs71zuNpV02R961kdFFUwIS/tPPHJHkElpqV/jm9BLIkCYle/
+ Bwg0bcI2xNiyjrSUqq5rr8jayRwWFBpLFlz3HgMSaIugOyfVtjr2ZTXwNjwmvhBPu7+KsrMWT/MUWO
+ 5AS2iykCZxhYrlFLHs79+KNjXkreR5
+X-Developer-Key: i=sforshee@kernel.org; a=openpgp;
+ fpr=2ABCA7498D83E1D32D51D3B5AB4800A62DB9F73A
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 04, 2023 at 08:14:19PM -0600, Michael Roth wrote:
-> On Fri, Dec 23, 2022 at 05:56:50PM +0100, Borislav Petkov wrote:
-> > On Wed, Dec 14, 2022 at 01:39:55PM -0600, Michael Roth wrote:
-> > > +       bool (*private_mem_enabled)(struct kvm *kvm);
-> > 
-> > This looks like a function returning boolean to me. IOW, you can
-> > simplify this to:
-> 
-> The semantics and existing uses of KVM_X86_OP_OPTIONAL_RET0() gave me the
-> impression it needed to return an integer value, since by default if a
-> platform doesn't implement the op it would "return 0", and so could
-> still be called unconditionally.
-> 
-> Maybe that's not actually enforced, by it seems awkward to try to use a
-> bool return instead. At least for KVM_X86_OP_OPTIONAL_RET0().
-> 
-> However, we could just use KVM_X86_OP() to declare it so we can cleanly
-> use a function that returns bool, and then we just need to do:
-> 
->   bool kvm_arch_has_private_mem(struct kvm *kvm)
->   {
->           if (kvm_x86_ops.private_mem_enabled)
->                   return static_call(kvm_x86_private_mem_enabled)(kvm);
+We've fairly regularaly seen liveptches which cannot transition within kpatch's
+timeout period due to busy vhost worker kthreads. In looking for a solution the
+only answer I found was to call klp_update_patch_state() from a safe location.
+I tried adding this call to vhost_worker(), and it works, but this creates the
+potential for problems if a livepatch attempted to patch vhost_worker().
+Without a call to klp_update_patch_state() fully loaded vhost kthreads can
+never switch because vhost_worker() will always appear on the stack, but with
+the call these kthreads can switch but will still be running the old version of
+vhost_worker().
 
-I guess this is missing:
+To avoid this situation I've added a new function, klp_switch_current(), which
+switches the current task only if its stack does not include any function being
+patched. This allows kthreads to safely attempt switching themselves if a patch
+is pending. There is at least one downside, however. Since there's no way for
+the kthread to track whether it has already tried to switch for a pending patch
+it can end up calling klp_switch_current() repeatedly when it can never be
+safely switched.
 
-        return false;
+I don't know whether this is the right solution, and I'm happy to try out other
+suggestions. But in my testing these patches proved effective in consistently
+switching heavily loaded vhost kthreads almost immediately.
 
->   }
->     
-> instead of relying on default return value. So I'll take that approach
-> and adopt your other suggested changes.
-> 
-> ...
-> 
-> On a separate topic though, at a high level, this hook is basically a way
-> for platform-specific code to tell generic KVM code that private memslots
-> are supported by overriding the kvm_arch_has_private_mem() weak
-> reference. In this case the AMD platform is using using kvm->arch.upm_mode
-> flag to convey that, which is in turn set by the
-> KVM_CAP_UNMAPPED_PRIVATE_MEMORY introduced in this series.
-> 
-> But if, as I suggested in response to your PATCH 2 comments, we drop
-> KVM_CAP_UNAMMPED_PRIVATE_MEMORY in favor of
-> KVM_SET_SUPPORTED_MEMORY_ATTRIBUTES ioctl to enable "UPM mode" in SEV/SNP
-> code, then we need to rethink things a bit, since KVM_SET_MEMORY_ATTRIBUTES
-> in-part relies on kvm_arch_has_private_mem() to determine what flags are
-> supported, whereas SEV/SNP code would be using what was set by
-> KVM_SET_MEMORY_ATTRIBUTES to determine the return value in
-> kvm_arch_has_private_mem().
+To: Josh Poimboeuf <jpoimboe@kernel.org>
+To: Jiri Kosina <jikos@kernel.org>
+To: Miroslav Benes <mbenes@suse.cz>
+To: Petr Mladek <pmladek@suse.com>
+To: Joe Lawrence <joe.lawrence@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: live-patching@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux-foundation.org
+Cc: netdev@vger.kernel.org
+Signed-off-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
 
-Does this mean that internal calls to  kvm_vm_set_region_attr() will
-cease to exist, and it will rely for user space to use the ioctl
-properly instead?
+---
+Seth Forshee (DigitalOcean) (2):
+      livepatch: add an interface for safely switching kthreads
+      vhost: check for pending livepatches from vhost worker kthreads
 
-> So, for AMD, the return value of kvm_arch_has_private_mem() needs to rely
-> on something else. Maybe the logic can just be:
-> 
->   bool svm_private_mem_enabled(struct kvm *kvm)
->   {
->     return sev_enabled(kvm) || sev_snp_enabled(kvm)
->   }
-> 
-> (at least in the context of this patchset where UPM support is added for
-> both SEV and SNP).
-> 
-> So I'll plan to make that change as well.
-> 
-> -Mike
-> 
-> > 
-> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> > index 82ba4a564e58..4449aeff0dff 100644
-> > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > @@ -129,6 +129,7 @@ KVM_X86_OP(msr_filter_changed)
-> >  KVM_X86_OP(complete_emulated_msr)
-> >  KVM_X86_OP(vcpu_deliver_sipi_vector)
-> >  KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-> > +KVM_X86_OP_OPTIONAL_RET0(private_mem_enabled);
-> >  
-> >  #undef KVM_X86_OP
-> >  #undef KVM_X86_OP_OPTIONAL
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index 1da0474edb2d..1b4b89ddeb55 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1574,6 +1574,7 @@ struct kvm_x86_ops {
-> >  
-> >  	void (*load_mmu_pgd)(struct kvm_vcpu *vcpu, hpa_t root_hpa,
-> >  			     int root_level);
-> > +	bool (*private_mem_enabled)(struct kvm *kvm);
-> >  
-> >  	bool (*has_wbinvd_exit)(void);
-> >  
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index ce362e88a567..73b780fa4653 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -4680,6 +4680,14 @@ static int svm_vm_init(struct kvm *kvm)
-> >  	return 0;
-> >  }
-> >  
-> > +static bool svm_private_mem_enabled(struct kvm *kvm)
-> > +{
-> > +	if (sev_guest(kvm))
-> > +		return kvm->arch.upm_mode;
-> > +
-> > +	return IS_ENABLED(CONFIG_HAVE_KVM_PRIVATE_MEM_TESTING);
-> > +}
-> > +
-> >  static struct kvm_x86_ops svm_x86_ops __initdata = {
-> >  	.name = "kvm_amd",
-> >  
-> > @@ -4760,6 +4768,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-> >  
-> >  	.vcpu_after_set_cpuid = svm_vcpu_after_set_cpuid,
-> >  
-> > +	.private_mem_enabled = svm_private_mem_enabled,
-> > +
-> >  	.has_wbinvd_exit = svm_has_wbinvd_exit,
-> >  
-> >  	.get_l2_tsc_offset = svm_get_l2_tsc_offset,
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index 823646d601db..9a1ca59d36a4 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -12556,6 +12556,11 @@ void __user * __x86_set_memory_region(struct kvm *kvm, int id, gpa_t gpa,
-> >  }
-> >  EXPORT_SYMBOL_GPL(__x86_set_memory_region);
-> >  
-> > +bool kvm_arch_has_private_mem(struct kvm *kvm)
-> > +{
-> > +	return static_call(kvm_x86_private_mem_enabled)(kvm);
-> > +}
-> > +
-> >  void kvm_arch_pre_destroy_vm(struct kvm *kvm)
-> >  {
-> >  	kvm_mmu_pre_destroy_vm(kvm);
-> > 
-> > -- 
-> > Regards/Gruss,
-> >     Boris.
-> > 
-> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%2Fpeople.kernel.org%2Ftglx%2Fnotes-about-netiquette&data=05%7C01%7Cmichael.roth%40amd.com%7C319e89ce555a46eace4d08dae506b51a%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C638074114318137471%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C3000%7C%7C%7C&sdata=aG11K7va1BhemwlKCKKdcIXEwXGUzImYL%2BZ9%2FQ7XToI%3D&reserved=0
+ drivers/vhost/vhost.c         |  4 ++++
+ include/linux/livepatch.h     |  2 ++
+ kernel/livepatch/transition.c | 11 +++++++++++
+ 3 files changed, 17 insertions(+)
+---
+base-commit: 5dc4c995db9eb45f6373a956eb1f69460e69e6d4
+change-id: 20230120-vhost-klp-switching-ba9a3ae38b8a
 
-BR, Jarkko
+Best regards,
+-- 
+Seth Forshee (DigitalOcean) <sforshee@kernel.org>
