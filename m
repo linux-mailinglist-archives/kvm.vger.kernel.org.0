@@ -2,90 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6672C674F74
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 09:27:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 686FD674FE4
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 09:55:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229648AbjATI1w (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 03:27:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50122 "EHLO
+        id S229689AbjATIzK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 03:55:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbjATI1u (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 03:27:50 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBAF810E6
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 00:27:47 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30K8Kwlq021090
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 08:27:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references :
- subject : to : cc : from : message-id : date; s=pp1;
- bh=5ZU4OwP34vgCXekl2YW6L2iyyIk+6BlzAApDlz7pTog=;
- b=OboQtwed9LeKTNHIhXl1Vvf07zDdH0ucMo29d4lBIasALP4Go75f/uqEqjrpky39V7mT
- 18isoYOpY0aLHVKYoDef+jO1NWqXHnt3YTvuN0p4Gx4vCoKIvkFJZcywoJyQUeDSXAd8
- /nNhjW05GQyYroS0Zv9snw9MVKNzZGbbM6UWm/KaJlAWeyS4wBfOgLMXSBMpyAJBuExo
- RRynEJREzo7LVmZw14aB5x5HtkWqim1a0WpqvA0wxHpJMZnCcm0T1vlsoiNn7kn1fzFv
- MK0K47iKEGWUvhXhUsH5wArNvUhoIjg7v2eMVhDF9vZiKCy4Y9xq65LyCVovkcIA7fvY bA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7qc9r4fy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 08:27:46 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30K8L2dQ021577
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 08:27:46 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3n7qc9r4f9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Jan 2023 08:27:46 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30K20MsC004582;
-        Fri, 20 Jan 2023 08:27:44 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3n3m16dm5x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 20 Jan 2023 08:27:44 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30K8RccV46072186
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 20 Jan 2023 08:27:38 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 53B8220049;
-        Fri, 20 Jan 2023 08:27:38 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 342DD20043;
-        Fri, 20 Jan 2023 08:27:38 +0000 (GMT)
-Received: from t14-nrb (unknown [9.179.19.180])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 20 Jan 2023 08:27:38 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S229612AbjATIzI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 03:55:08 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFAF2367C2
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 00:54:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674204858;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YNpAFosBegGjBSBh9Iz/d+r8uxivNRdyOMyPGi6CV6M=;
+        b=cGlX5usGB/jUqhKkKAIO0QGotSCtHDA88uX4NXohMBTMLVEpP4dRB2HCBCpNXr9ZZvQORI
+        7Ay0ud1uKhEPUCVXVTGqQDrSTaHd2UuA0DYvOPSaziD5hslo9TG4AlXGDdLjaZToHpCGy6
+        MD5Y84rLO63RkETpI73cFsNZdybicQE=
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
+ [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-665-tLOsGSryNUKMG40-J_SnWA-1; Fri, 20 Jan 2023 03:54:07 -0500
+X-MC-Unique: tLOsGSryNUKMG40-J_SnWA-1
+Received: by mail-ed1-f71.google.com with SMTP id g14-20020a056402090e00b0046790cd9082so3440057edz.21
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 00:54:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YNpAFosBegGjBSBh9Iz/d+r8uxivNRdyOMyPGi6CV6M=;
+        b=V33ctegvEPBAorvTSbXDo+o5I1pCgcRJXSXDUi3EHm72qMET+i8WN6+a6XbtboMHfn
+         6DDaqyXe1jySMVE3GSCPY2iT4RKPS0gkneR72AICWm9htBHatzOoZxxb6zvKhU77FE8c
+         cL4SIBf8I10Z49j5UwTaGjdWIZ8/ZTwEFllthIPZCWbdb19UjIEKKrLXVZbyPDNY06kL
+         hbd92xut8BaITrFcfTGBINPWWbn65DzgWCvnxFAhP1Gr5B5PWy1MsYwEAt8vWlKwYl2u
+         0/g+kSqN+5XSTNG/6FXkhqi0NminWLkgc3mrQCtya+tzwvb+i5nM1R8g9pQ2tbTJlYSG
+         KrMg==
+X-Gm-Message-State: AFqh2koF0tBpOA1N1zbeCVumU5ONY1J/XClukJ16htDLNYS3YcBY35CY
+        x4OHszLDu1yTGW7yfSs1Ivv5WUTLoUPca384Tv27R5cEfIRO/F3jJhL3XBLEI6iMDgV3yBJ2II6
+        cGPoCDZZo48MZ
+X-Received: by 2002:aa7:c917:0:b0:483:5e56:7bc5 with SMTP id b23-20020aa7c917000000b004835e567bc5mr13629460edt.40.1674204846168;
+        Fri, 20 Jan 2023 00:54:06 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXsU1p3X2qz/KKDextMwO/0oPSQWzXkiLmbPvAf4FXXH6Vpa6jvTsktLlA5vAhUHKAZsOOmlDg==
+X-Received: by 2002:aa7:c917:0:b0:483:5e56:7bc5 with SMTP id b23-20020aa7c917000000b004835e567bc5mr13629444edt.40.1674204845899;
+        Fri, 20 Jan 2023 00:54:05 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e? ([2001:b07:6468:f312:5e2c:eb9a:a8b6:fd3e])
+        by smtp.googlemail.com with ESMTPSA id e6-20020a170906314600b00781be3e7badsm17615047eje.53.2023.01.20.00.54.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 20 Jan 2023 00:54:05 -0800 (PST)
+Message-ID: <4c924730-b77e-146d-55e6-c29588adc61c@redhat.com>
+Date:   Fri, 20 Jan 2023 09:54:03 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20230119114045.34553-2-mhartmay@linux.ibm.com>
-References: <20230119114045.34553-1-mhartmay@linux.ibm.com> <20230119114045.34553-2-mhartmay@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 1/8] .gitignore: ignore `s390x/comm.key` file
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <167420325748.19639.18077815976999309170@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Fri, 20 Jan 2023 09:27:37 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: x4--71gMxgnfHpeuumjswOjKM7dBXGEs
-X-Proofpoint-GUID: Arb8jDNj37jgark343Xk2807stvh2tBy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-20_04,2023-01-19_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- malwarescore=0 priorityscore=1501 impostorscore=0 phishscore=0
- lowpriorityscore=0 clxscore=1015 suspectscore=0 adultscore=0 bulkscore=0
- spamscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301200075
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH 0/2] read kvmclock from guest memory if !correct_tsc_shift
+Content-Language: en-US
+To:     Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org
+Cc:     kvm@vger.kernel.org
+References: <20230120011116.134437211@redhat.com>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230120011116.134437211@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -93,12 +79,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Marc Hartmayer (2023-01-19 12:40:38)
-> Ignore the Secure Execution Customer Communication Key file.
->=20
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+On 1/20/23 02:11, Marcelo Tosatti wrote:
+> Before kernel commit 78db6a5037965429c04d708281f35a6e5562d31b,
+> kvm_guest_time_update() would use vcpu->virtual_tsc_khz to calculate
+> tsc_shift value in the vcpus pvclock structure written to guest memory.
 
-good find, thanks.
+To clarify, the problem is that kvm_guest_time_update() uses the guest
+TSC frequency *that userspace desired* instead of the *actual* TSC 
+frequency.  Because, within the 250 ppm tolerance, TSC scaling is not 
+enabled, the guest kvmclock is incorrect; KVM_GET_CLOCK instead returns 
+the correct value, and the bug occurs when migrating from a host that is 
+publishing a buggy kvmclock to the guest.
 
-Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+> For those kernels, if vcpu->virtual_tsc_khz != tsc_khz (which can be the
+> case when guest state is restored via migration, or if tsc-khz option is
+> passed to QEMU), and TSC scaling is not enabled (which happens if the
+> difference between the frequency requested via KVM_SET_TSC_KHZ and the
+> host TSC KHZ is smaller than 250ppm), then there can be a difference
+> between what KVM_GET_CLOCK would return and what the guest reads as
+> kvmclock value.
+
+In practice, to trigger the bug you need to do two migrations from a 
+six-year-old kernel; I just can't see too many people stumbling upon 
+this in the wild, and I don't think it makes sense to hobble _all_ 
+migrations from a kernel that is less than six years old for such an 
+edge case.  New versions of QEMU do not even support running with such 
+old kernels (it will for example complain about no support for certain 
+KVM PV features).
+
+It is not a huge request for the user to know if they are in the 
+problematic case.  It is easiest to use a custom QEMU on the 
+destination, and always compute the kvmclock value from memory if the 
+page is valid.
+
+Once you do a migration to the custom QEMU + a fixed kernel, the bug is 
+gone for good and there is no need to introduce new user API for that.
+
+Paolo
+
+> The effect is that the guest sees a jump in kvmclock value
+> (either forwards or backwards) in such case.
+> 
+> To fix incoming migration from pre-78db6a5037965 hosts,
+> read kvmclock value from guest memory.
+> 
+> Unless the KVM_CLOCK_CORRECT_TSC_SHIFT bit indicates
+> that the value retrieved by KVM_GET_CLOCK on the source
+> is safe to be used.
+> 
+> 
+> 
+
