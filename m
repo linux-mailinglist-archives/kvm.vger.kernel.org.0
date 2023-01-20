@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08EE967564F
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 15:04:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 507916756B9
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 15:14:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229590AbjATOEV (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 09:04:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33228 "EHLO
+        id S230183AbjATON6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 09:13:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230086AbjATOEU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 09:04:20 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5668213C
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 06:04:16 -0800 (PST)
+        with ESMTP id S230397AbjATONu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 09:13:50 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14CA6CFD00
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 06:12:56 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4290E61F76
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:04:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D037C4339B;
-        Fri, 20 Jan 2023 14:04:15 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 36E32B82841
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 14:11:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4845C4339E;
+        Fri, 20 Jan 2023 14:11:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674223455;
-        bh=RsGkcvnNtpSaNCyQB4mw8BBq8xS8J2zdcLN5ShvOTdE=;
+        s=k20201202; t=1674223889;
+        bh=iNAqNNq+Sru0PCPuZl0SbzF4cC7fbT3m2m2qiSAUfmE=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=DpEKY2/CMiY/zNaitgj2T5rExEk/IURWoC0L6N4u+i3YdmqQjaup15yxRrMSC3NTz
-         d3+3JKujvBW+BZWWIgtUJXM3daVozNzbNqaTmSWAv30ml5CIQpa+iTxbrhvPMvcCRp
-         ClHmf2MpXFO5f8oCtd6YiJI9PkxTD6tJf8c79K7x/tbhLJchVQMm+zPaLLLEGTdHg5
-         pSIG9/YuSKCupTq6oMpqnJ5MS9AUb+xZvPmD6z2iFzkDhqmxMqftpZQSlzjmGPs/P/
-         L10MsLHQNFJywWVDbs+joNsYyGch0hKUCQg5P/PSp4yRrcOHGqqJBgt7HfovvP06PQ
-         xYAUTOquA3tYw==
+        b=SfNWZBEitlNyT8YXJRFNjQriNBF7F+HqODpbsfv6abcysrttQ52PjII3LRmaDMEjs
+         DWPArrvQPxaM0ASYKlbd5IAhkWiGmy2lSWLjrU90H3A1t8YU0RUocVy3pKaGpr8lhL
+         LJosbU+z9eygnrEzc3lTE7+9SARhRsEUOYUXvC9UO2ZLs8ccJPdNIU0DWN1PUd2YbD
+         bFZ23Q0PRr3OJFPxQX4UpPMg1vxyqi8aZvE47HtucTCk4eJP9q41NiV/be91IxnxCs
+         vdDeH2khvWzxrLuNjI/YCiIWN6uCCn9aBybXC8hDWWfV/r7pHNfiEjwMq/mDHZYij6
+         J8hhTJjlNNJ0A==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pIs05-003Qff-7y;
-        Fri, 20 Jan 2023 14:04:13 +0000
-Date:   Fri, 20 Jan 2023 14:04:12 +0000
-Message-ID: <86o7qtmher.wl-maz@kernel.org>
+        id 1pIs74-003QoT-3o;
+        Fri, 20 Jan 2023 14:11:27 +0000
+Date:   Fri, 20 Jan 2023 14:11:25 +0000
+Message-ID: <86mt6dmh2q.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
 To:     Reiji Watanabe <reijiw@google.com>
 Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -53,9 +53,10 @@ Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         Jing Zhang <jingzhangos@google.com>,
         Raghavendra Rao Anata <rananta@google.com>
 Subject: Re: [PATCH v2 1/8] KVM: arm64: PMU: Have reset_pmu_reg() to clear a register
-In-Reply-To: <20230117013542.371944-2-reijiw@google.com>
+In-Reply-To: <86o7qtmher.wl-maz@kernel.org>
 References: <20230117013542.371944-1-reijiw@google.com>
         <20230117013542.371944-2-reijiw@google.com>
+        <86o7qtmher.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -74,65 +75,86 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 17 Jan 2023 01:35:35 +0000,
-Reiji Watanabe <reijiw@google.com> wrote:
+On Fri, 20 Jan 2023 14:04:12 +0000,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> On vCPU reset, PMCNTEN{SET,CLR}_EL0, PMINTEN{SET,CLR}_EL1, and
-> PMOVS{SET,CLR}_EL1 for a vCPU are reset by reset_pmu_reg().
-> This function clears RAZ bits of those registers corresponding
-> to unimplemented event counters on the vCPU, and sets bits
-> corresponding to implemented event counters to a predefined
-> pseudo UNKNOWN value (some bits are set to 1).
+> On Tue, 17 Jan 2023 01:35:35 +0000,
+> Reiji Watanabe <reijiw@google.com> wrote:
+> > 
+> > On vCPU reset, PMCNTEN{SET,CLR}_EL0, PMINTEN{SET,CLR}_EL1, and
+> > PMOVS{SET,CLR}_EL1 for a vCPU are reset by reset_pmu_reg().
+> > This function clears RAZ bits of those registers corresponding
+> > to unimplemented event counters on the vCPU, and sets bits
+> > corresponding to implemented event counters to a predefined
+> > pseudo UNKNOWN value (some bits are set to 1).
+> > 
+> > The function identifies (un)implemented event counters on the
+> > vCPU based on the PMCR_EL1.N value on the host. Using the host
+> > value for this would be problematic when KVM supports letting
+> > userspace set PMCR_EL1.N to a value different from the host value
+> > (some of the RAZ bits of those registers could end up being set to 1).
+> > 
+> > Fix reset_pmu_reg() to clear the registers so that it can ensure
+> > that all the RAZ bits are cleared even when the PMCR_EL1.N value
+> > for the vCPU is different from the host value.
+> > 
+> > Signed-off-by: Reiji Watanabe <reijiw@google.com>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 10 +---------
+> >  1 file changed, 1 insertion(+), 9 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index c6cbfe6b854b..ec4bdaf71a15 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -604,19 +604,11 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+> >  
+> >  static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+> >  {
+> > -	u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
+> > -
+> >  	/* No PMU available, any PMU reg may UNDEF... */
+> >  	if (!kvm_arm_support_pmu_v3())
+> >  		return;
 > 
-> The function identifies (un)implemented event counters on the
-> vCPU based on the PMCR_EL1.N value on the host. Using the host
-> value for this would be problematic when KVM supports letting
-> userspace set PMCR_EL1.N to a value different from the host value
-> (some of the RAZ bits of those registers could end up being set to 1).
+> Is this still true? We remove the PMCR_EL0 access just below.
 > 
-> Fix reset_pmu_reg() to clear the registers so that it can ensure
-> that all the RAZ bits are cleared even when the PMCR_EL1.N value
-> for the vCPU is different from the host value.
+> >  
+> > -	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
+> > -	n &= ARMV8_PMU_PMCR_N_MASK;
+> > -	if (n)
+> > -		mask |= GENMASK(n - 1, 0);
+> > -
+> > -	reset_unknown(vcpu, r);
+> > -	__vcpu_sys_reg(vcpu, r->reg) &= mask;
+> > +	__vcpu_sys_reg(vcpu, r->reg) = 0;
+> >  }
 > 
-> Signed-off-by: Reiji Watanabe <reijiw@google.com>
-> ---
->  arch/arm64/kvm/sys_regs.c | 10 +---------
->  1 file changed, 1 insertion(+), 9 deletions(-)
+> At the end of the day, this function has no dependency on the host at
+> all, and only writes 0 to the per-vcpu register.
+> 
+> So why not get rid of it altogether and have:
 > 
 > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index c6cbfe6b854b..ec4bdaf71a15 100644
+> index c6cbfe6b854b..1d1514b89d75 100644
 > --- a/arch/arm64/kvm/sys_regs.c
 > +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -604,19 +604,11 @@ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+> @@ -976,7 +976,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>  	  trap_wcr, reset_wcr, 0, 0,  get_wcr, set_wcr }
 >  
->  static void reset_pmu_reg(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
->  {
-> -	u64 n, mask = BIT(ARMV8_PMU_CYCLE_IDX);
-> -
->  	/* No PMU available, any PMU reg may UNDEF... */
->  	if (!kvm_arm_support_pmu_v3())
->  		return;
-
-Is this still true? We remove the PMCR_EL0 access just below.
-
+>  #define PMU_SYS_REG(r)						\
+> -	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
+> +	SYS_DESC(r), .visibility = pmu_visibility
 >  
-> -	n = read_sysreg(pmcr_el0) >> ARMV8_PMU_PMCR_N_SHIFT;
-> -	n &= ARMV8_PMU_PMCR_N_MASK;
-> -	if (n)
-> -		mask |= GENMASK(n - 1, 0);
-> -
-> -	reset_unknown(vcpu, r);
-> -	__vcpu_sys_reg(vcpu, r->reg) &= mask;
-> +	__vcpu_sys_reg(vcpu, r->reg) = 0;
->  }
+>  /* Macro to expand the PMEVCNTRn_EL0 register */
+>  #define PMU_PMEVCNTR_EL0(n)						\
+> 
+> which would fall-back the specified reset value (zero by default)?
 
-At the end of the day, this function has no dependency on the host at
-all, and only writes 0 to the per-vcpu register.
-
-So why not get rid of it altogether and have:
+Scratch that, we need:
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index c6cbfe6b854b..1d1514b89d75 100644
+index c6cbfe6b854b..6f6a928c92ec 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
 @@ -976,7 +976,7 @@ static bool access_pmuserenr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
@@ -140,14 +162,12 @@ index c6cbfe6b854b..1d1514b89d75 100644
  
  #define PMU_SYS_REG(r)						\
 -	SYS_DESC(r), .reset = reset_pmu_reg, .visibility = pmu_visibility
-+	SYS_DESC(r), .visibility = pmu_visibility
++	SYS_DESC(r), .reset = reset_val, .visibility = pmu_visibility
  
  /* Macro to expand the PMEVCNTRn_EL0 register */
  #define PMU_PMEVCNTR_EL0(n)						\
 
-which would fall-back the specified reset value (zero by default)?
-
-Thanks,
+But otherwise, this should be enough.
 
 	M.
 
