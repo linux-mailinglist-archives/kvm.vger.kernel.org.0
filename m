@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E6386749C8
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 04:13:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E2E66749CA
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 04:13:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229540AbjATDNR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 19 Jan 2023 22:13:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59636 "EHLO
+        id S229688AbjATDN3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 19 Jan 2023 22:13:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229652AbjATDNJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 19 Jan 2023 22:13:09 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2061e.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe59::61e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43CCAA261;
-        Thu, 19 Jan 2023 19:12:56 -0800 (PST)
+        with ESMTP id S229677AbjATDN0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 19 Jan 2023 22:13:26 -0500
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2048.outbound.protection.outlook.com [40.107.220.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF558AEDA2;
+        Thu, 19 Jan 2023 19:13:22 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Osk6df7171teTjJgVozlh+nyC7AL6wmSgksvPiBNsSI4JSyTk8G/AatBXIoXtr8a2kM5fc8x02EeU5vFE1LwsDFrsZGoBhLXlIT3rw51PT4vmECkgMh3+jzgJt/9zmeHN3k83a1A0SowopCcYVZvwLk8icPdXhtnvCYUrPdfBfzYkZDXfSNMcYo8mH/mSjWLBTa9F1gAwjHKgxnDrofzcoC5eICzyY/EdI6h8HykTZyShvEQ1gotX6tjI4n5IZU6AVzCvhqlybD2lmuh9naGCi7G7qSPnAvUCE+4FjEXawWnmtS8IKOYekiQVeNz1el6dRhXDR/PfpasYgtmyrvWew==
+ b=YPQL3Ug7Z5R7pj76EMFPQOXfs2qZyZRUwVBtMWZod2hQr6vlSyGu1/qsWGbBzU+l3KAMxdkWYz5/qfq1uVPy1aTL2zuvtLwAhk6UyM18yNjyMcj0pgGo+RteMM7CxJqpj3Wmiv6vk1LF3Q0CdUTOFqyFaNI+A13IHMpyRP27aCHl1k83VKzGN8ZHyTDhpbTIunEZBQ+R58ajlqJfCj5E1Up5Plt4i3i5odYVnHUxcKfBebMAH4luOzBwc4cLOOsc/0sxtKChV0Ytpb84TSvJnJNq6PqdUyAH+B2XVP2KR9gaTPeGU4hNAxWPLI4BF2qU9q7nEyqGay915wwBW5TZPg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=12/ZbAnMQUE9W3kfS+a+xzOcPcWwC0K/TIyDQl3EWWw=;
- b=CqsxsFOaP3W3HC6zmlhGeVNjYt5dCMC07Rz/r3YfT3vm21ETsTMeSFXH5S0erKS8LoSeJrEC3+HjW0pC9CKSgAnAu7GFqkmY9agXT4KLP3GNNBAuEd2mrrG3t/ccls6zTuRSE+wGIypWsswzWKcQVIh+vSqK9ZSMm6++Jg6NTysFoEapvv8ce7iyyVGteEs5U3WV+71xXO2vcZ3uhyyo8Zk6vIYuZwlOlLM4rEoyRgngie56tKrwEXYb+nMIjVOJizBdW9Nsru2A4YChnIkrNT46NcVvycR7nXQ67kQ5PO4SPYvHb1EmpMcqTTBN7LZP25XaZPHR0fYLWY/+SmL/vA==
+ bh=r55GGCszmmGL2c3WK5rvEb3vBVGxF2/mrici6yBv4V4=;
+ b=dKuTlnZ+m6yYOZJKPdl2YKQNmDzxTJD/94T5BT6MejiKsjWZFxxstiO0YqOzSO8aOE0JI6zUvAXi8mCpA04epsGiLocb5pvJwe9YyHfE7sWkSf8VPdQKx9RsSdH1PQkZdkLgqsVHHSjz7wJWg2Dr5dmLyQTlAaY/QsqTMeavVx9oWRs3hEssq72ALgJX/R1u42YTA6IkGDJjafrDcCD23V7O0FqWyXNGcBfVYMHtkDkWNnFKXWEElMYJhiSdRAvUN1UD3/BSTp/vSoqmKLh9vCwjGLaSctYhWCYjQZ6L+JDfibJzFn4yv80ru0oI5r5m3T2KfogVMgGUFWUAQ/Tb5w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=12/ZbAnMQUE9W3kfS+a+xzOcPcWwC0K/TIyDQl3EWWw=;
- b=HIMcBVehAqW/RhG9MAHE4vl3KtWy7UxuP9Zsf9Wy/iE6RtUJ4h2S76fAryoNBLRD38liwnMpygIkk7I9WRqSY0zVugdyJZ2zFgB7BMFSKzCmuQnq+Ibexx7jev78bYuiVGrud9g0iybJyT5X9f9o3nmd2BTFVcfDKSfhDBKL8yk=
-Received: from DM6PR05CA0050.namprd05.prod.outlook.com (2603:10b6:5:335::19)
- by CH0PR12MB5346.namprd12.prod.outlook.com (2603:10b6:610:d5::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.26; Fri, 20 Jan
- 2023 03:12:53 +0000
-Received: from DM6NAM11FT088.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:335:cafe::b1) by DM6PR05CA0050.outlook.office365.com
- (2603:10b6:5:335::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6023.17 via Frontend
- Transport; Fri, 20 Jan 2023 03:12:53 +0000
+ bh=r55GGCszmmGL2c3WK5rvEb3vBVGxF2/mrici6yBv4V4=;
+ b=34AQ5sE3mVfzt07tCR9ff+mpGz3hqL9u+/BJGmD4n2CrKzqkKcGaBcNIs6En60KvtwqF3y4VO3+AW1QZ5gf8k8QMY8IdveG9XeC9TSJWjsbGNHGfAlhfZZPE8Rl+Z2TdBB/1pINAwwXOio0+NekFFOIuq7X88OdyjxkXpeahJfM=
+Received: from DS7PR03CA0303.namprd03.prod.outlook.com (2603:10b6:8:2b::19) by
+ DM4PR12MB7622.namprd12.prod.outlook.com (2603:10b6:8:109::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5986.23; Fri, 20 Jan 2023 03:13:20 +0000
+Received: from DM6NAM11FT035.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:8:2b:cafe::9d) by DS7PR03CA0303.outlook.office365.com
+ (2603:10b6:8:2b::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.25 via Frontend
+ Transport; Fri, 20 Jan 2023 03:13:20 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -46,13 +45,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT088.mail.protection.outlook.com (10.13.172.147) with Microsoft SMTP
+ DM6NAM11FT035.mail.protection.outlook.com (10.13.172.100) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6023.16 via Frontend Transport; Fri, 20 Jan 2023 03:12:53 +0000
+ 15.20.6023.16 via Frontend Transport; Fri, 20 Jan 2023 03:13:20 +0000
 Received: from aiemdeew.1.ozlabs.ru (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Thu, 19 Jan
- 2023 21:12:40 -0600
+ 2023 21:13:07 -0600
 From:   Alexey Kardashevskiy <aik@amd.com>
 To:     Alexey Kardashevskiy <aik@amd.com>
 CC:     <kvm@vger.kernel.org>, <x86@kernel.org>,
@@ -83,249 +82,110 @@ CC:     <kvm@vger.kernel.org>, <x86@kernel.org>,
         "Peter Zijlstra (Intel)" <peterz@infradead.org>,
         "Jason A. Donenfeld" <Jason@zx2c4.com>,
         "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH kernel v3 2/3] KVM: SEV: Enable data breakpoints in SEV-ES
-Date:   Fri, 20 Jan 2023 14:10:46 +1100
-Message-ID: <20230120031047.628097-3-aik@amd.com>
+Subject: [PATCH kernel v3 3/3] x86/sev: Do not handle #VC for DR7 read/write
+Date:   Fri, 20 Jan 2023 14:10:47 +1100
+Message-ID: <20230120031047.628097-4-aik@amd.com>
 X-Mailer: git-send-email 2.38.1
 In-Reply-To: <20230120031047.628097-1-aik@amd.com>
 References: <20230120031047.628097-1-aik@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 X-Originating-IP: [10.180.168.240]
 X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT088:EE_|CH0PR12MB5346:EE_
-X-MS-Office365-Filtering-Correlation-Id: cbb716e6-1cca-4e40-d1d6-08dafa94383e
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT035:EE_|DM4PR12MB7622:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2d553487-8014-4529-f8c2-08dafa944890
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: q3gkdyf3yNpWMZXLk5bN0By5Yehl114+0KxT1rW/gFIqtUKZieA/rr5EEC9wANTU5W2iaZ5Pdl2i82+xwu7k+Golaa+0nn0TX1RB662HKIJPaDl0WdUDJ4nTWtfmXKd0AzVUpP/7OobU24mtvnr1udKV9m5P7qmJa4NDz7gtcFDx4NSwxZt02ZfooS6flfdt6xeXkvVq4UeR4HmaLg9d8A4GyKBEAh4pA5BlOGpVfxzGz7+tN8X85wX8hqv7C3SQzlbNqUpHOuFenUuYa573BDgRiS0i348E8k6k5rYAP3ox4ztl7JpLXZJFvrp6gguL0j9rRGJyn8uQ5ySVP0oqsb9O+IEfp5XgHhiSi5ry7m30fzI50/pJINiVT1vbAgAeW25z61eXLApK31uwPKMazoj4C1SlXicKuXWIj383MDRAlOslUwZVRt0sMJ/0jl2vXpt4FyQ5lQF7uJeGBnOi8fGqMtnBEUmKg/d9mxTjK0cxs0dj7Lrb358gUeHkp6/J5XDSWz4PEytij37ra5TdX0yPrXVErntVGXtZmQI1ud7hDv3NnlVV8136pd3khooJi7rKIFh6G4x9bJGIyvGQIwh7yK0hVRpmSmM/MDs+Zo1Rv3H38kCi9Bz4Zi0IxTfWKtqO66rdvQHDeH+EA7FOpqeCmFK2MOmxxSqJc1JynuHN11AZYYKFHS3OazI/buc88pYqFRlEQBhui09J05RcjC1GrwSMI9DFuNRHzZm7yhY=
-X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(39860400002)(396003)(346002)(451199015)(46966006)(40470700004)(36840700001)(82310400005)(356005)(6200100001)(40480700001)(36860700001)(478600001)(336012)(2906002)(37006003)(316002)(82740400003)(7416002)(1076003)(5660300002)(4326008)(2616005)(81166007)(54906003)(70586007)(70206006)(40460700003)(47076005)(83380400001)(7049001)(426003)(6862004)(41300700001)(8936002)(186003)(8676002)(16526019)(26005)(36756003)(36900700001);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: R3JO53eyfBJpXDk7B8dWVFm02xOS6WpdG8jCcw9o+t7UZtdYNnTRQcqi/VusWuL4tpS8pG0BWsIvZeVIaHYo4ZI2k4CSSA8YOZJ3gUnFdyWvWCPTs7SC3UlVFMTw9TBhnWTPwLT1zcSZtarYyOozT9XsRd/lk077kAvK/BgBKE8hK6iarPQdc9TUjCqqzzB7nD6LIyBXk/Hl5p8VFnGdyHVjPMAfuxu8Wiy1hYUG4+4VZ+fgE2LG7U2o2hV2aOY0Ddsoh/KKwGxOMZ8lfoqLkIAx02HpJrnVwdFH0Dm7ComEoIplHCZdsRnhBQepFZYVrAnucbsQRRi6s6aHrU3o9HWOGgffAmUPP8BJcJ/4C45WzQDlu8c0ghiq2rwzRCo8ZU0hlUD9D8ploR54YXw0yzmmIdfBIeTCi+jekPpBh7DbND565jknAq0uMiYqmhml/FIDsn/GqRazrAU/VZOhe4o2bBPs6MQPolP5VcoBdM/IVLKs3Hptlvsr+O9UxmY1nNDItSlf7/3s7+7PF1QHOWct7rSwIbgcaqAy3gJZSMp8OI04VEk2xDLMX7LcRoAOSper30/naHknMFKZowsrFNaGZyMsqPzd7qNCEutsYlQHGfpD3HIg05wAhNh/wZ8JgNBTiDHxEMoUxQ8HEZDhTlFV9KVB719PrpCwPis6PTME8lzGg+NGcnyfSr9M7qP96bXh4zNSh7EV4xpVNLlJ68B6yNYGnUosMD1NXDJIa9s=
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(346002)(396003)(376002)(136003)(451199015)(40470700004)(36840700001)(46966006)(82740400003)(81166007)(36860700001)(7049001)(5660300002)(356005)(2906002)(8676002)(4326008)(7416002)(6862004)(8936002)(70586007)(70206006)(426003)(40480700001)(2616005)(6200100001)(82310400005)(478600001)(47076005)(16526019)(186003)(26005)(336012)(1076003)(316002)(54906003)(41300700001)(40460700003)(6666004)(37006003)(36756003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2023 03:12:53.1153
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jan 2023 03:13:20.5129
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cbb716e6-1cca-4e40-d1d6-08dafa94383e
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d553487-8014-4529-f8c2-08dafa944890
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT088.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: DM6NAM11FT035.eop-nam11.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5346
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7622
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Prior to SEV-ES, KVM stored/loaded host debug registers upon switching
-to/from a VM. Changing those registers inside a running SEV VM
-triggered #VC exit to KVM.
-
-SEV-ES added the encrypted state (ES) which uses an encrypted guest page
-for the VM state (VMSA). The hardware saves/restores certain registers on
-VMRUN/VMEXIT according to a swap type (A, B, C), see
-"Table B-3. Swap Types" in the AMD Architecture Programmer’s Manual
-volume 2.
-
-AMD Milan (Fam 19h) introduces support for the debug registers swapping.
-DR6 and DR7 are always swapped. DR[0-3] and DR[0-3]_ADDR_MASK are swapped
-a type B when SEV_FEATURES[5] ("DebugSwap") is set.
-
-Enable DebugSwap in VMSA. But only do so if CPUID Fn80000021_EAX[0]
-("NoNestedDataBp", "Processor ignores nested data breakpoints") is
-supported by the SOC as otherwise a malicious SEV-ES guest can set up
-data breakpoints on the #VC IDT entry/stack and cause an infinite loop.
-
-Eliminate DR7 and #DB intercepts as:
-- they are not needed when DebugSwap is supported;
-- #VC for these intercepts is most likely not supported anyway and
-kills the VM.
-Keep DR7 intercepted unless DebugSwap enabled to prevent the infinite #DB
-loop DoS.
+With MSR_AMD64_SEV_DEBUG_SWAP enabled, the VM should not get #VC
+events for DR7 read/write which it rather avoided.
 
 Signed-off-by: Alexey Kardashevskiy <aik@amd.com>
+Reviewed-by: Borislav Petkov (AMD) <bp@alien8.de>
 ---
 Changes:
-v3:
-* rewrote the commit log again
-* rebased on tip/master to use recently defined X86_FEATURE_NO_NESTED_DATA_BP
-* s/boot_cpu_has/cpu_feature_enabled/
-
 v2:
-* debug_swap moved from vcpu to module_param
-* rewrote commit log
-
+* use new bit definition
 ---
-Tested with:
-===
-int x;
-int main(int argc, char *argv[])
-{
-        x = 1;
-        return 0;
-}
-===
-gcc -g a.c
-rsync a.out ruby-954vm:~/
-ssh -t ruby-954vm 'gdb -ex "file a.out" -ex "watch x" -ex r'
+ arch/x86/include/asm/msr-index.h       | 1 +
+ tools/arch/x86/include/asm/msr-index.h | 1 +
+ arch/x86/kernel/sev.c                  | 6 ++++++
+ 3 files changed, 8 insertions(+)
 
-where ruby-954vm is a VM.
-
-With "/sys/module/kvm_amd/parameters/debug_swap = 0", gdb does not stop
-on the watchpoint, with "= 1" - gdb does.
----
- arch/x86/include/asm/svm.h |  1 +
- arch/x86/kvm/svm/svm.h     | 16 ++++++++---
- arch/x86/kvm/svm/sev.c     | 29 ++++++++++++++++++++
- arch/x86/kvm/svm/svm.c     |  3 +-
- 4 files changed, 44 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
-index cb1ee53ad3b1..665515c7edae 100644
---- a/arch/x86/include/asm/svm.h
-+++ b/arch/x86/include/asm/svm.h
-@@ -278,6 +278,7 @@ enum avic_ipi_failure_cause {
- #define AVIC_HPA_MASK	~((0xFFFULL << 52) | 0xFFF)
- #define VMCB_AVIC_APIC_BAR_MASK		0xFFFFFFFFFF000ULL
+diff --git a/arch/x86/include/asm/msr-index.h b/arch/x86/include/asm/msr-index.h
+index cb3d0f6e6ac2..e15afe3500ff 100644
+--- a/arch/x86/include/asm/msr-index.h
++++ b/arch/x86/include/asm/msr-index.h
+@@ -574,6 +574,7 @@
+ #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
+ #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
+ #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
++#define MSR_AMD64_SEV_DEBUG_SWAP	BIT_ULL(7)
  
-+#define SVM_SEV_FEAT_DEBUG_SWAP                        BIT(5)
+ #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
  
- struct vmcb_seg {
- 	u16 selector;
-diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 4826e6cc611b..61f2cad1cbaf 100644
---- a/arch/x86/kvm/svm/svm.h
-+++ b/arch/x86/kvm/svm/svm.h
-@@ -389,6 +389,8 @@ static inline bool vmcb12_is_intercept(struct vmcb_ctrl_area_cached *control, u3
- 	return test_bit(bit, (unsigned long *)&control->intercepts);
- }
+diff --git a/tools/arch/x86/include/asm/msr-index.h b/tools/arch/x86/include/asm/msr-index.h
+index 37ff47552bcb..27c1c349e49b 100644
+--- a/tools/arch/x86/include/asm/msr-index.h
++++ b/tools/arch/x86/include/asm/msr-index.h
+@@ -565,6 +565,7 @@
+ #define MSR_AMD64_SEV_ENABLED		BIT_ULL(MSR_AMD64_SEV_ENABLED_BIT)
+ #define MSR_AMD64_SEV_ES_ENABLED	BIT_ULL(MSR_AMD64_SEV_ES_ENABLED_BIT)
+ #define MSR_AMD64_SEV_SNP_ENABLED	BIT_ULL(MSR_AMD64_SEV_SNP_ENABLED_BIT)
++#define MSR_AMD64_SEV_DEBUG_SWAP	BIT_ULL(7)
  
-+extern bool sev_es_is_debug_swap_enabled(void);
+ #define MSR_AMD64_VIRT_SPEC_CTRL	0xc001011f
+ 
+diff --git a/arch/x86/kernel/sev.c b/arch/x86/kernel/sev.c
+index 679026a640ef..8184f8ba4edc 100644
+--- a/arch/x86/kernel/sev.c
++++ b/arch/x86/kernel/sev.c
+@@ -1618,6 +1618,9 @@ static enum es_result vc_handle_dr7_write(struct ghcb *ghcb,
+ 	long val, *reg = vc_insn_get_rm(ctxt);
+ 	enum es_result ret;
+ 
++	if (sev_status & MSR_AMD64_SEV_DEBUG_SWAP)
++		return ES_VMM_ERROR;
 +
- static inline void set_dr_intercepts(struct vcpu_svm *svm)
- {
- 	struct vmcb *vmcb = svm->vmcb01.ptr;
-@@ -410,8 +412,10 @@ static inline void set_dr_intercepts(struct vcpu_svm *svm)
- 		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR6_WRITE);
- 	}
+ 	if (!reg)
+ 		return ES_DECODE_FAILED;
  
--	vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_READ);
--	vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_WRITE);
-+	if (!sev_es_guest(svm->vcpu.kvm) || !sev_es_is_debug_swap_enabled()) {
-+		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_READ);
-+		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_WRITE);
-+	}
+@@ -1655,6 +1658,9 @@ static enum es_result vc_handle_dr7_read(struct ghcb *ghcb,
+ 	struct sev_es_runtime_data *data = this_cpu_read(runtime_data);
+ 	long *reg = vc_insn_get_rm(ctxt);
  
- 	recalc_intercepts(svm);
- }
-@@ -422,8 +426,12 @@ static inline void clr_dr_intercepts(struct vcpu_svm *svm)
- 
- 	vmcb->control.intercepts[INTERCEPT_DR] = 0;
- 
--	/* DR7 access must remain intercepted for an SEV-ES guest */
--	if (sev_es_guest(svm->vcpu.kvm)) {
-+	/*
-+	 * DR7 access must remain intercepted for an SEV-ES guest unless DebugSwap
-+	 * (depends on NO_NESTED_DATA_BP) is enabled as otherwise a VM writing to DR7
-+	 * from the #DB handler may trigger infinite loop of #DB's.
-+	 */
-+	if (sev_es_guest(svm->vcpu.kvm) && !sev_es_is_debug_swap_enabled()) {
- 		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_READ);
- 		vmcb_set_intercept(&vmcb->control, INTERCEPT_DR7_WRITE);
- 	}
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 86d6897f4806..e989a6f4953d 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -21,6 +21,7 @@
- #include <asm/pkru.h>
- #include <asm/trapnr.h>
- #include <asm/fpu/xcr.h>
-+#include <asm/debugreg.h>
- 
- #include "mmu.h"
- #include "x86.h"
-@@ -52,11 +53,21 @@ module_param_named(sev, sev_enabled, bool, 0444);
- /* enable/disable SEV-ES support */
- static bool sev_es_enabled = true;
- module_param_named(sev_es, sev_es_enabled, bool, 0444);
++	if (sev_status & MSR_AMD64_SEV_DEBUG_SWAP)
++		return ES_VMM_ERROR;
 +
-+/* enable/disable SEV-ES DebugSwap support */
-+static bool sev_es_debug_swap_enabled = true;
-+module_param_named(debug_swap, sev_es_debug_swap_enabled, bool, 0644);
- #else
- #define sev_enabled false
- #define sev_es_enabled false
-+#define sev_es_debug_swap false
- #endif /* CONFIG_KVM_AMD_SEV */
+ 	if (!reg)
+ 		return ES_DECODE_FAILED;
  
-+bool sev_es_is_debug_swap_enabled(void)
-+{
-+	return sev_es_debug_swap_enabled;
-+}
-+
- static u8 sev_enc_bit;
- static DECLARE_RWSEM(sev_deactivate_lock);
- static DEFINE_MUTEX(sev_bitmap_lock);
-@@ -604,6 +615,9 @@ static int sev_es_sync_vmsa(struct vcpu_svm *svm)
- 	save->xss  = svm->vcpu.arch.ia32_xss;
- 	save->dr6  = svm->vcpu.arch.dr6;
- 
-+	if (sev_es_is_debug_swap_enabled())
-+		save->sev_features |= SVM_SEV_FEAT_DEBUG_SWAP;
-+
- 	pr_debug("Virtual Machine Save Area (VMSA):\n");
- 	print_hex_dump_debug("", DUMP_PREFIX_NONE, 16, 1, save, sizeof(*save), false);
- 
-@@ -2249,6 +2263,9 @@ void __init sev_hardware_setup(void)
- out:
- 	sev_enabled = sev_supported;
- 	sev_es_enabled = sev_es_supported;
-+	if (sev_es_debug_swap_enabled)
-+		sev_es_debug_swap_enabled = sev_es_enabled &&
-+			cpu_feature_enabled(X86_FEATURE_NO_NESTED_DATA_BP);
- #endif
- }
- 
-@@ -3027,6 +3044,18 @@ void sev_es_prepare_switch_to_guest(struct sev_es_save_area *hostsa)
- 
- 	/* MSR_IA32_XSS is restored on VMEXIT, save the currnet host value */
- 	hostsa->xss = host_xss;
-+
-+	/* The DebugSwap SEV feature does Type B swaps of DR[0-3] */
-+	if (sev_es_is_debug_swap_enabled()) {
-+		hostsa->dr0 = native_get_debugreg(0);
-+		hostsa->dr1 = native_get_debugreg(1);
-+		hostsa->dr2 = native_get_debugreg(2);
-+		hostsa->dr3 = native_get_debugreg(3);
-+		hostsa->dr0_addr_mask = amd_get_dr_addr_mask(0);
-+		hostsa->dr1_addr_mask = amd_get_dr_addr_mask(1);
-+		hostsa->dr2_addr_mask = amd_get_dr_addr_mask(2);
-+		hostsa->dr3_addr_mask = amd_get_dr_addr_mask(3);
-+	}
- }
- 
- void sev_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector)
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index 60c7c880266b..6c54a3c9d442 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -1190,7 +1190,8 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
- 	set_exception_intercept(svm, UD_VECTOR);
- 	set_exception_intercept(svm, MC_VECTOR);
- 	set_exception_intercept(svm, AC_VECTOR);
--	set_exception_intercept(svm, DB_VECTOR);
-+	if (!sev_es_is_debug_swap_enabled())
-+		set_exception_intercept(svm, DB_VECTOR);
- 	/*
- 	 * Guest access to VMware backdoor ports could legitimately
- 	 * trigger #GP because of TSS I/O permission bitmap.
 -- 
 2.38.1
 
