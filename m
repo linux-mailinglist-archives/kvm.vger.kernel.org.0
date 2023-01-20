@@ -2,85 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A37A7675CD3
-	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 19:35:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31F5D675D23
+	for <lists+kvm@lfdr.de>; Fri, 20 Jan 2023 19:53:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229773AbjATSf4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 13:35:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44080 "EHLO
+        id S230079AbjATSxZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 13:53:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229725AbjATSfy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 13:35:54 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55AEB4E0D
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 10:35:53 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id z13so6077193plg.6
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 10:35:53 -0800 (PST)
+        with ESMTP id S229899AbjATSxY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 13:53:24 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F08780B92
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 10:53:20 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id 7so4840887pga.1
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 10:53:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=okolDEB21Y0jblKM4zeN9TyhMCVMpN2TkJfDtRniBvc=;
-        b=HkY8uYC3eaoxfG+CDtPspZfD/eX0Nq+DRBL/w/lbBPAVctXPlKO27GnPIwXfthk5N9
-         VC7gyEcJ6u4nAFPLBZZtLuaIrW5eLQ7pRUIMsQ0P7IH/vAwrMVeY6O0eq5y8N9gtXD71
-         MsB/8V0TvAjpRoA/f7mCK/eJ8L5cCpz/8ba/KSvwKSwa6zBYdMvsYnc3fycaiKzhvXu0
-         bdjb2uPAa1zIysmYxuisWAZGW6U9LNAlN4IJnA8+tzSANClzdAuibHS3CeaFv6CpylZE
-         liAoGaxEFIkOokZ7ibDIQSN4J2us6Ws11V6wPdyXS4f5x0ophRHfbRwS5//CQJMGSnxo
-         NK+g==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hbVkhmbwrxHdRnc6988uVhgGX0OwIVVngeM3AP0vwwM=;
+        b=YyZ2GQPJLnmNMqIOhj29cQEAc2wXHLAdR8q265VO2GVcMv9W4doftcJuxezu6FeMMd
+         AmvJJde8mojg96TsP8yugvRvdUMypU+170DfXgEIIODZznKsXIv7KjhdxJtQQfUna4ml
+         r8xVDRNxdf+XoQ1l7NSaB7kXGnsHTw+Hk8AtKsulhEEphZeUm0ozgiFovnLOOkFAuYF/
+         /Tf2H5rNtukMv2qaQXMg6PMeICYvsx3baVQ4CeuzEiQYTpGAJhgli2+abXL+xZp8BgT3
+         IG+5Kx8QsAJv0F31/SIIce3oLwYRLcg57DTbur3J+NT5ab+qdmwGwrp5vH9XG3ECQqwC
+         TX5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=okolDEB21Y0jblKM4zeN9TyhMCVMpN2TkJfDtRniBvc=;
-        b=sCrOAPmwLPZR77DB09Sgis5PojFnzrnHuy/tH+uQJhuf44abq21Ll0e8TukWpD9Ej4
-         2iJQWE6AsnD8rj08IwxAWXu9I8l8kZEwbb1ppQ+QrinHXJ0Na0MfbH6Uf7qIK6vI1vmv
-         YRSmvngAD1c1Lveq/Sjhd8UjbLug4nL/Wn+GHa12hk+vze7uF/ptcYQQQKxKuVgOVoTn
-         mfk2NwFL91hFEIDwJPEI+tFU4aE1V4nIbUxb0nSRtsfYs3nWt002sWIMeeryiBpJ/cPA
-         cq1rF5Cxn6bgcvidttW/ZsamtwnYi+cnQ9wnUQy0OoPw3kn70q2WYRc8C2Pyr+tYA8PS
-         jopg==
-X-Gm-Message-State: AFqh2kpS7Up0sVeN7Oz02A3tqCZxDZFC6wmp3mVqj59qi5/+4wE5mnz5
-        cxfmzUbVhv4pvmG8pWxtBEWcgQ==
-X-Google-Smtp-Source: AMrXdXtygWR/fMhpmxei/j385EDCB6XPa4vZRiEc+kaRf3Blc1If9RpQwQ0WRTDgbKj1ut4JY7mfcQ==
-X-Received: by 2002:a17:90a:c985:b0:219:f970:5119 with SMTP id w5-20020a17090ac98500b00219f9705119mr297717pjt.1.1674239752856;
-        Fri, 20 Jan 2023 10:35:52 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id y9-20020a17090aca8900b0022bb3ee9b68sm816173pjt.13.2023.01.20.10.35.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jan 2023 10:35:52 -0800 (PST)
-Date:   Fri, 20 Jan 2023 18:35:48 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Igor Mammedov <imammedo@redhat.com>
-Cc:     "Srivatsa S. Bhat" <srivatsa@csail.mit.edu>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-kernel@vger.kernel.org, amakhalov@vmware.com,
-        ganb@vmware.com, ankitja@vmware.com, bordoloih@vmware.com,
-        keerthanak@vmware.com, blamoreaux@vmware.com, namit@vmware.com,
-        Peter Zijlstra <peterz@infradead.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Wyes Karny <wyes.karny@amd.com>,
-        Lewis Caroll <lewis.carroll@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Juergen Gross <jgross@suse.com>, x86@kernel.org,
-        VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v2] x86/hotplug: Do not put offline vCPUs in mwait idle
- state
-Message-ID: <Y8rfBBBicRMk+Hut@google.com>
-References: <20230116060134.80259-1-srivatsa@csail.mit.edu>
- <20230116155526.05d37ff9@imammedo.users.ipa.redhat.com>
- <87bkmui5z4.ffs@tglx>
- <ecb9a22e-fd6e-67f0-d916-ad16033fc13c@csail.mit.edu>
- <20230120163734.63e62444@imammedo.users.ipa.redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hbVkhmbwrxHdRnc6988uVhgGX0OwIVVngeM3AP0vwwM=;
+        b=zUmh2bI6p4syRDNWru1kbkFuI+Rh3hVltwu5yn4p0hkKcB+DVxgtcM+JaIGABGjQzn
+         fo9XRO38lnafjfrCRQoF6rwyHLMFgBGZkkExJGA373LQ5x4sfFqOryD3IKWJlCrdWmoo
+         wp+SmsOvkdz1MvblvivLibCUGFKd+3LW5VbVcqNxlk/oXrEJkvcTR/ni0GMjPQSCP05U
+         xl81V4ele5fpqHSzhOc1KOfjI4M0eEs6L+4amjw7SN2rfn8ti/vO1ig7S10UPqskjQr3
+         jd6szZZWV8Nr6ebQ+RgRiZrUII7O0/CfDpk2ecjTp01hhM9x3KouJU7OuAjR1988dhPr
+         I5XQ==
+X-Gm-Message-State: AFqh2kp7XFFC6iV6mdxIwabHfJkCjVUQwo/nPPhPvd59oBZe5QZjjKsc
+        qdxWtG+jl0ZAfq3KzdEJD952zNizjy10gD1GwP8xpQ==
+X-Google-Smtp-Source: AMrXdXtaABkqdOaqTa0aNwcY5jjakms9UPj5X9miquUpJAfFjmwpqsB8bwMVYIqvgg7fGfBCNdeZ9t7RkQfzzZfa1Aw=
+X-Received: by 2002:a62:6084:0:b0:582:392e:8bbf with SMTP id
+ u126-20020a626084000000b00582392e8bbfmr1484138pfb.75.1674240799468; Fri, 20
+ Jan 2023 10:53:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230120163734.63e62444@imammedo.users.ipa.redhat.com>
+References: <20230117013542.371944-1-reijiw@google.com> <20230117013542.371944-4-reijiw@google.com>
+ <Y8ngqRHhiXHjc0vA@google.com> <86pmb9mmkv.wl-maz@kernel.org> <Y8rXx+7EUob7qPXh@google.com>
+In-Reply-To: <Y8rXx+7EUob7qPXh@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Fri, 20 Jan 2023 10:53:02 -0800
+Message-ID: <CAAeT=FyYspSieevHO3gD_Snvn19HXdzbUD3z-Q=1qQ1BBX-Jjw@mail.gmail.com>
+Subject: Re: [PATCH v2 3/8] KVM: arm64: PMU: Preserve vCPU's PMCR_EL0.N value
+ on vCPU reset
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Ricardo Koller <ricarkol@google.com>,
+        Jing Zhang <jingzhangos@google.com>,
+        Raghavendra Rao Anata <rananta@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -92,116 +77,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 20, 2023, Igor Mammedov wrote:
-> On Fri, 20 Jan 2023 05:55:11 -0800
-> "Srivatsa S. Bhat" <srivatsa@csail.mit.edu> wrote:
-> 
-> > Hi Igor and Thomas,
-> > 
-> > Thank you for your review!
-> > 
-> > On 1/19/23 1:12 PM, Thomas Gleixner wrote:
-> > > On Mon, Jan 16 2023 at 15:55, Igor Mammedov wrote:  
-> > >> "Srivatsa S. Bhat" <srivatsa@csail.mit.edu> wrote:  
-> > >>> Fix this by preventing the use of mwait idle state in the vCPU offline
-> > >>> play_dead() path for any hypervisor, even if mwait support is
-> > >>> available.  
-> > >>
-> > >> if mwait is enabled, it's very likely guest to have cpuidle
-> > >> enabled and using the same mwait as well. So exiting early from
-> > >>  mwait_play_dead(), might just punt workflow down:
-> > >>   native_play_dead()
-> > >>         ...
-> > >>         mwait_play_dead();
-> > >>         if (cpuidle_play_dead())   <- possible mwait here                                              
-> > >>                 hlt_play_dead(); 
-> > >>
-> > >> and it will end up in mwait again and only if that fails
-> > >> it will go HLT route and maybe transition to VMM.  
-> > > 
-> > > Good point.
-> > >   
-> > >> Instead of workaround on guest side,
-> > >> shouldn't hypervisor force VMEXIT on being uplugged vCPU when it's
-> > >> actually hot-unplugging vCPU? (ex: QEMU kicks vCPU out from guest
-> > >> context when it is removing vCPU, among other things)  
-> > > 
-> > > For a pure guest side CPU unplug operation:
-> > > 
-> > >     guest$ echo 0 >/sys/devices/system/cpu/cpu$N/online
-> > > 
-> > > the hypervisor is not involved at all. The vCPU is not removed in that
-> > > case.
-> > >   
-> > 
-> > Agreed, and this is indeed the scenario I was targeting with this patch,
-> > as opposed to vCPU removal from the host side. I'll add this clarification
-> > to the commit message.
+Hi Oliver, Marc,
 
-Forcing HLT doesn't solve anything, it's perfectly legal to passthrough HLT.  I
-guarantee there are use cases that passthrough HLT but _not_ MONITOR/MWAIT, and
-that passthrough all of them.
+Thank you for the review!
 
-> commit message explicitly said:
-> "which prevents the hypervisor from running other vCPUs or workloads on the
-> corresponding pCPU."
-> 
-> and that implies unplug on hypervisor side as well.
-> Why? That's because when hypervisor exposes mwait to guest, it has to reserve/pin
-> a pCPU for each of present vCPUs. And you can safely run other VMs/workloads
-> on that pCPU only after it's not possible for it to be reused by VM where
-> it was used originally.
+On Fri, Jan 20, 2023 at 10:05 AM Oliver Upton <oliver.upton@linux.dev> wrote:
+>
+> Hey Marc,
+>
+> On Fri, Jan 20, 2023 at 12:12:32PM +0000, Marc Zyngier wrote:
+> > On Fri, 20 Jan 2023 00:30:33 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > I think we need to derive a sanitised value for PMCR_EL0.N, as I believe
+> > > nothing in the architecture prevents implementers from gluing together
+> > > cores with varying numbers of PMCs. We probably haven't noticed it yet
+> > > since it would appear all Arm designs have had 6 PMCs.
+> >
+> > This brings back the question of late onlining. How do you cope with
+> > with the onlining of such a CPU that has a smaller set of counters
+> > than its online counterparts? This is at odds with the way the PMU
+> > code works.
+>
+> You're absolutely right, any illusion we derived from the online set of
+> CPUs could fall apart with a late onlining of a different core.
+>
+> > If you have a different set of counters, you are likely to have a
+> > different PMU altogether:
+> >
+> > [    1.192606] hw perfevents: enabled with armv8_cortex_a57 PMU driver, 7 counters available
+> > [    1.201254] hw perfevents: enabled with armv8_cortex_a53 PMU driver, 7 counters available
+> >
+> > This isn't a broken system, but it has two set of cores which are
+> > massively different, and two PMUs.
+> >
+> > This really should tie back to the PMU type we're counting on, and to
+> > the set of CPUs that implements it. We already have some
+> > infrastructure to check for the affinity of the PMU vs the CPU we're
+> > running on, and this is already visible to userspace.
+> >
+> > Can't we just leave this responsibility to userspace?
+>
+> Believe me, I'm always a fan of offloading things to userspace :)
+>
+> If the VMM is privy to the details of the system it is on then the
+> differing PMUs can be passed through to the guest w/ pinned vCPU
+> threads. I just worry about the case of a naive VMM that assumes a
+> homogenous system. I don't think I could entirely blame the VMM in this
+> case either as we've gone to lengths to sanitise the feature set
+> exposed to userspace.
+>
+> What happens when a vCPU gets scheduled on a core where the vPMU
+> doesn't match? Ignoring other incongruences, it is not possible to
+> virtualize more counters than are supported by the vPMU of the core.
 
-Pinning isn't strictly required from a safety perspective.  The latency of context
-switching may suffer due to wake times, but preempting a vCPU that it's C1 (or
-deeper) won't cause functional problems.   Passing through an entire socket
-(or whatever scope triggers extra fun) might be a different story, but pinning
-isn't strictly required.
+I believe KVM_RUN will fail with KVM_EXIT_FAIL_ENTRY (Please see
+the code that handles ON_UNSUPPORTED_CPU).
 
-That said, I 100% agree that this is expected behavior and not a bug.  Letting the
-guest execute MWAIT or HLT means the host won't have perfect visibility into guest
-activity state.
+> Stopping short of any major hacks in the kernel to fudge around the
+> problem, I believe we may need to provide better documentation of how
+> heterogeneous CPUs are handled in KVM and what userspace can do about
+> it.
 
-Oversubscribing a pCPU and exposing MWAIT and/or HLT to vCPUs is generally not done
-precisely because the guest will always appear busy without extra effort on the
-host.  E.g. KVM requires an explicit opt-in from userspace to expose MWAIT and/or
-HLT.
+Documentation/virt/kvm/devices/vcpu.rstDocumentation/virt/kvm/devices/vcpu.rst
+for KVM_ARM_VCPU_PMU_V3_SET_PMU
+has some description for the current behavior at least.
+(perhaps we may need to update documents for this though)
 
-If someone really wants to effeciently oversubscribe pCPUs and passthrough MWAIT,
-then their best option is probably to have a paravirt interface so that the guest
-can tell the host its offlining a vCPU.  Barring that the host could inspect the
-guest when preempting a vCPU to try and guesstimate how much work the vCPU is
-actually doing in order to make better scheduling decisions.
+Now I'm a bit worried about the validation code for PMCR_EL0.N
+as well, as setting (restoring) PMCR_EL0 could be done on any
+pCPUs (even before using KVM_ARM_VCPU_PMU_V3_SET_PMU).
 
-> Now consider following worst (and most likely) case without unplug
-> on hypervisor side:
-> 
->  1. vm1mwait: pin pCPU2 to vCPU2
->  2. vm1mwait: guest$ echo 0 >/sys/devices/system/cpu/cpu2/online
->         -> HLT -> VMEXIT
->  --
->  3. vm2mwait: pin pCPU2 to vCPUx and start VM
->  4. vm2mwait: guest OS onlines Vcpu and starts using it incl.
->        going into idle=>mwait state
->  --
->  5. vm1mwait: it still thinks that vCPU is present it can rightfully do:
->        guest$ echo 1 >/sys/devices/system/cpu/cpu2/online
->  --              
->  6.1 best case vm1mwait online fails after timeout
->  6.2 worse case: vm2mwait does VMEXIT on vCPUx around time-frame when
->      vm1mwait onlines vCPU2, the online may succeed and then vm2mwait's
->      vCPUx will be stuck (possibly indefinitely) until for some reason
->      VMEXIT happens on vm1mwait's vCPU2 _and_ host decides to schedule
->      vCPUx on pCPU2 which would make vm1mwait stuck on vCPU2.
-> So either way it's expected behavior.
-> 
-> And if there is no intention to unplug vCPU on hypervisor side,
-> then VMEXIT on play_dead is not really necessary (mwait is better
-> then HLT), since hypervisor can't safely reuse pCPU elsewhere and
-> VCPU goes into deep sleep within guest context.
-> 
-> PS:
-> The only case where making HLT/VMEXIT on play_dead might work out,
-> would be if new workload weren't pinned to the same pCPU nor
-> used mwait (i.e. host can migrate it elsewhere and schedule
-> vCPU2 back on pCPU2).
+What I am currently looking at is something like this:
+ - Set the sanitised (min) value of PMCR_EL0.N among all PMUs
+   for vCPUs by default.
+ - Validate the PMCR_EL0.N value that userspace tries to set
+   against the max value on the system (this is to ensure that
+   restoring PMCR_EL0 for a vCPU works on any pCPUs)
+ - Make KVM_RUN fail when PMCR_EL0.N for the vCPU indicates
+   more counters than the PMU that is set for the vCPU.
+
+What do you think ?
+
+Thank you,
+Reiji
