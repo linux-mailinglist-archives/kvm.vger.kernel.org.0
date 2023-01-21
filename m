@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0F97467622B
-	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 01:18:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2799E67622D
+	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 01:18:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229720AbjAUASg (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 19:18:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55308 "EHLO
+        id S230150AbjAUASy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 19:18:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230154AbjAUAS0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 19:18:26 -0500
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E11DAC63BC
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:55 -0800 (PST)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-4fa63c84621so64451357b3.20
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:55 -0800 (PST)
+        with ESMTP id S229967AbjAUASb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 19:18:31 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1310473AFD
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:18:01 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id u15-20020a170902a60f00b00194d7d89168so2744405plq.10
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:18:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WjO5rBwLb0cHzWThJNyOsO1URxlYZa7SL0LoJaae1iY=;
-        b=DbRKdnP4x88VQmpI73F5HtgUxWbJ2hsDEBYdUyvS8NBGoTwSGWDKbPvp6spCy61JKa
-         d8sCFnczxbj7XTIgC5qmDASbZuQUm4JaxsHKPw5mgwOTcf+5C7fOEgl8kKDjBaA5vDiL
-         BzUxepdz3NOVVwzTyUgqjRDacw06zOUCEiAMbmYtayKjQ0EKf8XNVzpsKuRHJcd9LAcB
-         0lu7xGF0zPGrHg+/e0vv+lW6RaM488sqw/EJEPXs421fhv5UocYR+waxt3sO+VYZy3tH
-         td827j6Sc07EQNlG9HbMRF7AN9NBjz6hjBomANw6zqJWyuma2V9QYMTIBwBpkZ12gUI3
-         a14Q==
+        bh=WDRb3hUK3KL7DjIqYNoerTWOItA0XH5RYK6H+82j2oo=;
+        b=XKdLbiTjQhc9QJq14SPOY4oxXeT+HysgYBLtbPoSyINx26ic5GcWQYVBXakE2mIlKz
+         3OrvzXQoJQ8F1SBQxDJ8tcSajMpWk1WvEXySGVZz5WMgpy9VIWczLuL5s+e2/u5Eqalp
+         mNTWZliS4ITyJscyB4p3S0iuaQ7Wh9c2iLF2ASd2RtXUOf5/mG0b4/wF7eQtRovXL1L6
+         fuLxuYfQ2YAn9AlXtF14its/YFWf+KMNN4Zd3hlFp6ossx8R4A+zs23HvvI3tXLBMAAl
+         xXSNsTdW7suXb/hQ17/sYvsVmr33WQjnbxMlkNHI4XhNAeM36E3fKtxgX9ErrxPZMtw8
+         Ai0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WjO5rBwLb0cHzWThJNyOsO1URxlYZa7SL0LoJaae1iY=;
-        b=cYQ8giqIb4436xxWdJG6p1fN0gTy/hhD+W3vWshcpIWwQlSxUzlA28FrVE8B5/JmnG
-         Xegh/TwPJOpMst4gmmpdg8PlRvvEECt/wnRoRFLToUqbQz2hsxuO/9dISyjUFUKmDjS2
-         UWbNz7SLiGy7Uz8xpGas4BU0gaAo+sHu0h8slu5MzS8KjWGbnewxqOB4UhxmyU/Zl8y+
-         XmfvT8ik9v1cr44XdENR74FflSqGEtBh/BDJfltAVcgwY7CTqoyPgBGXf7aTimjh+lx2
-         zMbJi46OuNWyD7o4C1LYN6Nhhv0zhQD9dZZgkItvwZbSf4PQSPNpsQoX60q2GkAOAKOW
-         2izA==
-X-Gm-Message-State: AFqh2koXe5b0Yabntg/S2yMYCv6fgKGa9ZwtrG8NdPssNhq0E4PW1fgD
-        DevU8wSiW4BFMSSJtvnQmoEizfcakSnZHbUtUA==
-X-Google-Smtp-Source: AMrXdXs2Azizp8MgH3Huhhpq7IBWql1lWkjMllTIOkYSDytuaEr6jOkniKY65Y0teNdl7wi3iWIuU9V4MUkSE2rpow==
+        bh=WDRb3hUK3KL7DjIqYNoerTWOItA0XH5RYK6H+82j2oo=;
+        b=twACkrs+e3k1byrfClG3cwQ42hSYmATXTlB3vAEENZozJEj+p7/nOm4KE6H3VwRTAB
+         1JO36vWQwzdwYc4cf6OiIRR0QLlpSTGc4ma/MY2w8FKDWzPway9o8UM6E5xtERJYoPj3
+         nrZoxdIPpjM+e8hXzNS2r9qE/c6y9JXczO1RhNMhYTFSZRLMe0pwOoVrE1ZGoW4RCkoY
+         4QzWVuybq8q3ohDWFXzCDUKKKbWPtr31P7zlb9s4yeYSgR0MLhpOZqCniGhBxnGCmlHj
+         vZMu6ZrmA58/Se4q4Cpn0Z7fIMwbabUFgeTbaNWzc7MNEFvJzj3ZxCo58tZ8b/ETnQVq
+         MdNA==
+X-Gm-Message-State: AFqh2kp4YcQG2rupeBOwu4blpr9lOYPSaKALOOjLorSvsWbkRbBcEuT3
+        kQaXdOv2zirTs2Yh28krj6wNKn1lw8B7wmV7uA==
+X-Google-Smtp-Source: AMrXdXt1XhMvepnOd4PkQEnRmj4etZEsfLhZH3dY0GE9wFptQNK6vFci+DDTmZgluotiO55Qn6Oa6u3+G7bcLHPvkw==
 X-Received: from ackerleytng-cloudtop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:b30])
- (user=ackerleytng job=sendgmr) by 2002:a81:648:0:b0:4ee:30ce:15e1 with SMTP
- id 69-20020a810648000000b004ee30ce15e1mr2152793ywg.53.1674260249914; Fri, 20
- Jan 2023 16:17:29 -0800 (PST)
-Date:   Sat, 21 Jan 2023 00:15:29 +0000
+ (user=ackerleytng job=sendgmr) by 2002:a17:902:7595:b0:193:3b70:e9a0 with
+ SMTP id j21-20020a170902759500b001933b70e9a0mr1730374pll.6.1674260254883;
+ Fri, 20 Jan 2023 16:17:34 -0800 (PST)
+Date:   Sat, 21 Jan 2023 00:15:30 +0000
 In-Reply-To: <20230121001542.2472357-1-ackerleytng@google.com>
 Mime-Version: 1.0
 References: <20230121001542.2472357-1-ackerleytng@google.com>
 X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
-Message-ID: <20230121001542.2472357-19-ackerleytng@google.com>
-Subject: [RFC PATCH v3 18/31] KVM: selftests: TDX: Add TDX MMIO reads test
+Message-ID: <20230121001542.2472357-20-ackerleytng@google.com>
+Subject: [RFC PATCH v3 19/31] KVM: selftests: TDX: Add TDX MMIO writes test
 From:   Ackerley Tng <ackerleytng@google.com>
 To:     linux-kselftest@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
@@ -70,8 +70,8 @@ Cc:     pbonzini@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -80,154 +80,80 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sagi Shahar <sagis@google.com>
 
-The test verifies MMIO reads of various sizes from the host to the guest.
+The test verifies MMIO writes of various sizes from the guest to the host.
 
 Signed-off-by: Sagi Shahar <sagis@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
- .../selftests/kvm/include/x86_64/tdx/tdcall.h |  2 +
- .../selftests/kvm/include/x86_64/tdx/tdx.h    |  3 +
- .../kvm/include/x86_64/tdx/test_util.h        | 23 +++++
- .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 19 ++++
- .../selftests/kvm/x86_64/tdx_vm_tests.c       | 87 +++++++++++++++++++
- 5 files changed, 134 insertions(+)
+ .../selftests/kvm/include/x86_64/tdx/tdx.h    |  2 +
+ .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 14 +++
+ .../selftests/kvm/x86_64/tdx_vm_tests.c       | 85 +++++++++++++++++++
+ 3 files changed, 101 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
-index b5e94b7c48fa5..95fcdbd8404e9 100644
---- a/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
-@@ -9,6 +9,8 @@
- 
- #define TDG_VP_VMCALL_INSTRUCTION_IO_READ 0
- #define TDG_VP_VMCALL_INSTRUCTION_IO_WRITE 1
-+#define TDG_VP_VMCALL_VE_REQUEST_MMIO_READ 0
-+#define TDG_VP_VMCALL_VE_REQUEST_MMIO_WRITE 1
- 
- #define TDG_VP_VMCALL_SUCCESS 0x0000000000000000
- #define TDG_VP_VMCALL_INVALID_OPERAND 0x8000000000000000
 diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-index 7eba9d80b3681..8dd6a65485260 100644
+index 8dd6a65485260..f2a90ad8a55c6 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-@@ -11,6 +11,7 @@
- #define TDG_VP_VMCALL_INSTRUCTION_IO 30
- #define TDG_VP_VMCALL_INSTRUCTION_RDMSR 31
- #define TDG_VP_VMCALL_INSTRUCTION_WRMSR 32
-+#define TDG_VP_VMCALL_VE_REQUEST_MMIO 48
- 
- 
- uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
-@@ -21,5 +22,7 @@ uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
- uint64_t tdg_vp_vmcall_instruction_rdmsr(uint64_t index, uint64_t *ret_value);
- uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value);
+@@ -24,5 +24,7 @@ uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value);
  uint64_t tdg_vp_vmcall_instruction_hlt(uint64_t interrupt_blocked_flag);
-+uint64_t tdg_vp_vmcall_ve_request_mmio_read(uint64_t address, uint64_t size,
-+					uint64_t *data_out);
+ uint64_t tdg_vp_vmcall_ve_request_mmio_read(uint64_t address, uint64_t size,
+ 					uint64_t *data_out);
++uint64_t tdg_vp_vmcall_ve_request_mmio_write(uint64_t address, uint64_t size,
++					uint64_t data_in);
  
  #endif // SELFTEST_TDX_TDX_H
-diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
-index 8a9b6a1bec3eb..af412b7646049 100644
---- a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
-@@ -35,6 +35,29 @@
- 			(VCPU)->run->io.direction);			\
- 	} while (0)
- 
-+
-+/**
-+ * Assert that some MMIO operation involving TDG.VP.VMCALL <#VERequestMMIO> was
-+ * called in the guest.
-+ */
-+#define TDX_TEST_ASSERT_MMIO(VCPU, ADDR, SIZE, DIR)			\
-+	do {								\
-+		TEST_ASSERT((VCPU)->run->exit_reason == KVM_EXIT_MMIO,	\
-+			"Got exit_reason other than KVM_EXIT_MMIO: %u (%s)\n", \
-+			(VCPU)->run->exit_reason,			\
-+			exit_reason_str((VCPU)->run->exit_reason));	\
-+									\
-+		TEST_ASSERT(((VCPU)->run->exit_reason == KVM_EXIT_MMIO) && \
-+			((VCPU)->run->mmio.phys_addr == (ADDR)) &&	\
-+			((VCPU)->run->mmio.len == (SIZE)) &&		\
-+			((VCPU)->run->mmio.is_write == (DIR)),		\
-+			"Got an unexpected MMIO exit values: %u (%s) %llu %d %d\n", \
-+			(VCPU)->run->exit_reason,			\
-+			exit_reason_str((VCPU)->run->exit_reason),	\
-+			(VCPU)->run->mmio.phys_addr, (VCPU)->run->mmio.len, \
-+			(VCPU)->run->mmio.is_write);			\
-+	} while (0)
-+
- /**
-  * Check and report if there was some failure in the guest, either an exception
-  * like a triple fault, or if a tdx_test_fatal() was hit.
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-index 1af0626c2a4ad..dcdacf08bcd60 100644
+index dcdacf08bcd60..8b12ac7049572 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-@@ -103,3 +103,22 @@ uint64_t tdg_vp_vmcall_instruction_hlt(uint64_t interrupt_blocked_flag)
+@@ -122,3 +122,17 @@ uint64_t tdg_vp_vmcall_ve_request_mmio_read(uint64_t address, uint64_t size,
  
- 	return __tdx_hypercall(&args, 0);
+ 	return ret;
  }
 +
-+uint64_t tdg_vp_vmcall_ve_request_mmio_read(uint64_t address, uint64_t size,
-+					uint64_t *data_out)
++uint64_t tdg_vp_vmcall_ve_request_mmio_write(uint64_t address, uint64_t size,
++					uint64_t data_in)
 +{
-+	uint64_t ret;
 +	struct tdx_hypercall_args args = {
 +		.r11 = TDG_VP_VMCALL_VE_REQUEST_MMIO,
 +		.r12 = size,
-+		.r13 = TDG_VP_VMCALL_VE_REQUEST_MMIO_READ,
++		.r13 = TDG_VP_VMCALL_VE_REQUEST_MMIO_WRITE,
 +		.r14 = address,
++		.r15 = data_in,
 +	};
 +
-+	ret = __tdx_hypercall(&args, TDX_HCALL_HAS_OUTPUT);
-+
-+	if (data_out)
-+		*data_out = args.r11;
-+
-+	return ret;
++	return __tdx_hypercall(&args, 0);
 +}
 diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-index 346c1e07af9c0..88f0429db0176 100644
+index 88f0429db0176..dcc0940a74e92 100644
 --- a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
 +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-@@ -806,6 +806,92 @@ void verify_guest_hlt(void)
- 	_verify_guest_hlt(0);
+@@ -892,6 +892,90 @@ void verify_mmio_reads(void)
+ 	printf("\t ... PASSED\n");
  }
  
-+/* Pick any address that was not mapped into the guest to test MMIO */
-+#define TDX_MMIO_TEST_ADDR 0x200000000
-+
-+void guest_mmio_reads(void)
++void guest_mmio_writes(void)
 +{
-+	uint64_t data;
 +	uint64_t ret;
 +
-+	ret = tdg_vp_vmcall_ve_request_mmio_read(TDX_MMIO_TEST_ADDR, 1, &data);
++	ret = tdg_vp_vmcall_ve_request_mmio_write(TDX_MMIO_TEST_ADDR, 1, 0x12);
 +	if (ret)
 +		tdx_test_fatal(ret);
-+	if (data != 0x12)
-+		tdx_test_fatal(1);
 +
-+	ret = tdg_vp_vmcall_ve_request_mmio_read(TDX_MMIO_TEST_ADDR, 2, &data);
++	ret = tdg_vp_vmcall_ve_request_mmio_write(TDX_MMIO_TEST_ADDR, 2, 0x1234);
 +	if (ret)
 +		tdx_test_fatal(ret);
-+	if (data != 0x1234)
-+		tdx_test_fatal(2);
 +
-+	ret = tdg_vp_vmcall_ve_request_mmio_read(TDX_MMIO_TEST_ADDR, 4, &data);
++	ret = tdg_vp_vmcall_ve_request_mmio_write(TDX_MMIO_TEST_ADDR, 4, 0x12345678);
 +	if (ret)
 +		tdx_test_fatal(ret);
-+	if (data != 0x12345678)
-+		tdx_test_fatal(4);
 +
-+	ret = tdg_vp_vmcall_ve_request_mmio_read(TDX_MMIO_TEST_ADDR, 8, &data);
++	ret = tdg_vp_vmcall_ve_request_mmio_write(TDX_MMIO_TEST_ADDR, 8, 0x1234567890ABCDEF);
 +	if (ret)
 +		tdx_test_fatal(ret);
-+	if (data != 0x1234567890ABCDEF)
-+		tdx_test_fatal(8);
 +
-+	// Read an invalid number of bytes.
-+	ret = tdg_vp_vmcall_ve_request_mmio_read(TDX_MMIO_TEST_ADDR, 10, &data);
++	// Write across page boundary.
++	ret = tdg_vp_vmcall_ve_request_mmio_write(PAGE_SIZE - 1, 8, 0);
 +	if (ret)
 +		tdx_test_fatal(ret);
 +
@@ -235,39 +161,49 @@ index 346c1e07af9c0..88f0429db0176 100644
 +}
 +
 +/*
-+ * Varifies guest MMIO reads.
++ * Varifies guest MMIO writes.
 + */
-+void verify_mmio_reads(void)
++void verify_mmio_writes(void)
 +{
 +	struct kvm_vm *vm;
 +	struct kvm_vcpu *vcpu;
 +
++	uint8_t byte_1;
++	uint16_t byte_2;
++	uint32_t byte_4;
++	uint64_t byte_8;
++
 +	vm = td_create();
 +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+	vcpu = td_vcpu_add(vm, 0, guest_mmio_reads);
++	vcpu = td_vcpu_add(vm, 0, guest_mmio_writes);
 +	td_finalize(vm);
 +
-+	printf("Verifying TD MMIO reads:\n");
++	printf("Verifying TD MMIO writes:\n");
 +
 +	vcpu_run(vcpu);
 +	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-+	TDX_TEST_ASSERT_MMIO(vcpu, TDX_MMIO_TEST_ADDR, 1, TDG_VP_VMCALL_VE_REQUEST_MMIO_READ);
-+	*(uint8_t *)vcpu->run->mmio.data = 0x12;
++	TDX_TEST_ASSERT_MMIO(vcpu, TDX_MMIO_TEST_ADDR, 1, TDG_VP_VMCALL_VE_REQUEST_MMIO_WRITE);
++	byte_1 = *(uint8_t *)(vcpu->run->mmio.data);
 +
 +	vcpu_run(vcpu);
 +	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-+	TDX_TEST_ASSERT_MMIO(vcpu, TDX_MMIO_TEST_ADDR, 2, TDG_VP_VMCALL_VE_REQUEST_MMIO_READ);
-+	*(uint16_t *)vcpu->run->mmio.data = 0x1234;
++	TDX_TEST_ASSERT_MMIO(vcpu, TDX_MMIO_TEST_ADDR, 2, TDG_VP_VMCALL_VE_REQUEST_MMIO_WRITE);
++	byte_2 = *(uint16_t *)(vcpu->run->mmio.data);
 +
 +	vcpu_run(vcpu);
 +	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-+	TDX_TEST_ASSERT_MMIO(vcpu, TDX_MMIO_TEST_ADDR, 4, TDG_VP_VMCALL_VE_REQUEST_MMIO_READ);
-+	*(uint32_t *)vcpu->run->mmio.data = 0x12345678;
++	TDX_TEST_ASSERT_MMIO(vcpu, TDX_MMIO_TEST_ADDR, 4, TDG_VP_VMCALL_VE_REQUEST_MMIO_WRITE);
++	byte_4 = *(uint32_t *)(vcpu->run->mmio.data);
 +
 +	vcpu_run(vcpu);
 +	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-+	TDX_TEST_ASSERT_MMIO(vcpu, TDX_MMIO_TEST_ADDR, 8, TDG_VP_VMCALL_VE_REQUEST_MMIO_READ);
-+	*(uint64_t *)vcpu->run->mmio.data = 0x1234567890ABCDEF;
++	TDX_TEST_ASSERT_MMIO(vcpu, TDX_MMIO_TEST_ADDR, 8, TDG_VP_VMCALL_VE_REQUEST_MMIO_WRITE);
++	byte_8 = *(uint64_t *)(vcpu->run->mmio.data);
++
++	ASSERT_EQ(byte_1, 0x12);
++	ASSERT_EQ(byte_2, 0x1234);
++	ASSERT_EQ(byte_4, 0x12345678);
++	ASSERT_EQ(byte_8, 0x1234567890ABCDEF);
 +
 +	vcpu_run(vcpu);
 +	ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_SYSTEM_EVENT);
@@ -283,11 +219,11 @@ index 346c1e07af9c0..88f0429db0176 100644
  int main(int argc, char **argv)
  {
  	setbuf(stdout, NULL);
-@@ -825,6 +911,7 @@ int main(int argc, char **argv)
- 	run_in_new_process(&verify_guest_msr_writes);
+@@ -912,6 +996,7 @@ int main(int argc, char **argv)
  	run_in_new_process(&verify_guest_msr_reads);
  	run_in_new_process(&verify_guest_hlt);
-+	run_in_new_process(&verify_mmio_reads);
+ 	run_in_new_process(&verify_mmio_reads);
++	run_in_new_process(&verify_mmio_writes);
  
  	return 0;
  }
