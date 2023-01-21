@@ -2,58 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3A27D676211
-	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 01:17:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 79684676213
+	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 01:17:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbjAUARf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 19:17:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53418 "EHLO
+        id S229447AbjAUARi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 19:17:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229494AbjAUAR3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 19:17:29 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADA26BF8AF
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:01 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id d17-20020a5b0611000000b00801a0e3e117so3398004ybq.13
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:01 -0800 (PST)
+        with ESMTP id S230002AbjAUARa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 19:17:30 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD381C13C5
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:02 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id k204-20020a256fd5000000b007b8b040bc50so7395895ybc.1
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=e8fVu8QqTyecSUV8C3Vx7eVvdYsMLP9B/z2QHEeyWh0=;
-        b=i5XEImBpyUeHSwTbKwhHcRZgMwVEdGe03n+MFsqTosDso+tBjMIOrGOnjLAM8/yky5
-         N4xhtWLwaFTCrzTc1/jhO8PJF3LDPjMBTYLowMXjeYy3ymUQmO35tlGr1y8GHmtAL2sH
-         sfUB4Ydijv5hmx9wqVMWbLUo216Dcss6FPXZXeM5lm5CUQdAx6DwntdQLGBama8eC7r8
-         HSzcNAHXMYaquf6UWlPzQqgklPqhhRTF+U9yotPs103TVSsBYlOEoJKyXRFp2dWpM4TT
-         4eifnWcKS1kd5S3guDUMqKBoGzwfieLeEnFzoL1iONxvvnVHsG59qiJLJ5KK4TKEiHWd
-         oKVQ==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8GFYGGx0+c/JTGAK76bVwpACnJQuQ5mSfW/fyx26JT0=;
+        b=HumOf0ifUS3YfnDJXNhoBdtmg9FJoE6wlCqVa+T161sRt1hq9HViWgqfj58zoHAvEy
+         N1gnFBZrQ+eGpdu4uvsajl/JhWzXFRMweDw5B7cLPR2DetJwNStCJNUgHTshrQrqn/vM
+         6p1U06lQUhSYRltYVveoaOS4Hm0lQTnA1D6DxIbA+JYpeR8ooszyhN+GlEG6BzICjwNv
+         +Ov1qZ1buIRk1iuCpq0nxacfe1z0jB4LFQWwjPz2eS+q/R+IyU6HXcVuSRHKiu66/7N9
+         JdQZshBP4SEBmSt+Y+2useYdIsEUupcBJJkbyA1JiDKDDwa+LNl7fHz4T6gjSu5w/J6V
+         SNKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=e8fVu8QqTyecSUV8C3Vx7eVvdYsMLP9B/z2QHEeyWh0=;
-        b=TSOjY6PWLhWpbHnOm5F126yJQmcT90UaFjIIk7VLNVyAVHGPxvzWLELvvyTRH0lkg6
-         QbNQ+s8eL3PH4lKBVkAKVAXIzdgALIauolNP9k6z8PZG/7+F7hfAPGU0S74o1ylw7EOp
-         mT1pGF0AJrMTPCynPj6zgF+PVNWz0NaIQhZF92Iy6dAzRS5W2jR8Mh+9w6OkYhrZ92fI
-         qjBN4xRKZjyPnO+6mEtNkJmFdv6/z0nr9xFP9YpbrlUWbwKcJzWZm5fiGILwShfYeqQd
-         +SgQRkBtNxoXx24+Bzvp9I3vEKdKkjD8BnTWQyyL01JUsWi/GWnjqMhlzwcKybYppEp5
-         eFVA==
-X-Gm-Message-State: AFqh2kqqZGSF+NtBWKv+DyHdnrEwm6NIOhXBZWi4W1H3iz2z+fvB6+nk
-        PmFBuQkuWHzfTraaCPxlOuNA/c3umW30iGjZ6Q==
-X-Google-Smtp-Source: AMrXdXs4cYCD+h7+e40ddRslg/axY93Tvds7sBJEjfQJwo0v5rVjQMzFA5/S09H+XvohVO57EXS5SSV7wzwv6fTLcw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8GFYGGx0+c/JTGAK76bVwpACnJQuQ5mSfW/fyx26JT0=;
+        b=anS6BnyZ/S1pHQ0q76DeFKdad+lEAHBwMUMSJGoC0NMzzWbtO95qs+X9512tc3aa3v
+         qJBkHTZwVnoVibMVt1eQF2BZ+0dNxlrnSwgH047acoVw2/baLriVW1mvBmLY9xJgXHWy
+         IhyAfPB9KgpysqPbAAszYSAsN3rDcwZSX2ReWuqrecX+dkiJ3btJkXA9XVcSXi+N3/r8
+         LQIAO/NsJBCzPsZJSloHRXdOwNdBxJ1t+0dorYwGCx1eNHWb/ZN3SWjF58qv+Ovc9jn9
+         2wkvhwN20i+6UpxqmjVDM3H/rBX0pm914apIq8A+z9ZdinX0OASW+CgfrZ2KjwRsVI1v
+         1IMw==
+X-Gm-Message-State: AFqh2kq30Wky7uBMh4sigyo4C4taYN5DvrBYSQPKLMT5rgWbc9xzL8iF
+        iuSTMmWnVjtsXcyZ0Te9xY/ZyQNdgXO/p1LnYQ==
+X-Google-Smtp-Source: AMrXdXtzwGmgyX9XH8aXpbr891TmJe7G0QtxHKbFHE3C/5WFHHCdxWQnUZ0bfAsxZqyreJBq9m1qDrFhBr37yEpLuw==
 X-Received: from ackerleytng-cloudtop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:b30])
- (user=ackerleytng job=sendgmr) by 2002:a0d:dd4e:0:b0:4eb:e96a:1c63 with SMTP
- id g75-20020a0ddd4e000000b004ebe96a1c63mr1986522ywe.82.1674260210698; Fri, 20
- Jan 2023 16:16:50 -0800 (PST)
-Date:   Sat, 21 Jan 2023 00:15:20 +0000
+ (user=ackerleytng job=sendgmr) by 2002:a05:6902:8f:b0:800:748:7d05 with SMTP
+ id h15-20020a056902008f00b0080007487d05mr683891ybs.15.1674260215175; Fri, 20
+ Jan 2023 16:16:55 -0800 (PST)
+Date:   Sat, 21 Jan 2023 00:15:21 +0000
 In-Reply-To: <20230121001542.2472357-1-ackerleytng@google.com>
 Mime-Version: 1.0
 References: <20230121001542.2472357-1-ackerleytng@google.com>
 X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
-Message-ID: <20230121001542.2472357-10-ackerleytng@google.com>
-Subject: [RFC PATCH v3 09/31] KVM: selftests: TDX: Add TDX lifecycle test
+Message-ID: <20230121001542.2472357-11-ackerleytng@google.com>
+Subject: [RFC PATCH v3 10/31] KVM: selftests: TDX: Add report_fatal_error test
 From:   Ackerley Tng <ackerleytng@google.com>
 To:     linux-kselftest@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
@@ -70,10 +68,9 @@ Cc:     pbonzini@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
         like.xu@linux.intel.com, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,416 +78,165 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Erdem Aktas <erdemaktas@google.com>
+From: Sagi Shahar <sagis@google.com>
 
-Adding a test to verify TDX lifecycle by creating a TD and running a
-dummy TDG.VP.VMCALL <Instruction.IO> inside it.
+The test checks report_fatal_error functionality.
 
-Signed-off-by: Erdem Aktas <erdemaktas@google.com>
-Signed-off-by: Ryan Afranji <afranji@google.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
-Co-developed-by: Ackerley Tng <ackerleytng@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
-Changes RFCv2 -> RFCv3
-+ Add gitignore for tdx_vm_tests binary
-+ Thanks to Isaku for the comment about saving rbp separately for gcc!
-  In this revision, the assembly that wraps tdcall has been mostly taken
-  from the kernel=E2=80=99s implementation, which would be familiar to you!
-+ TDX test-related code is now grouped in
-  tools/testing/selftests/kvm/include/x86_64/tdx/test_util.{c,h} and
-  test-related functions and macros are prefixed with tdx_test to
-  indicate its purpose.
----
- tools/testing/selftests/kvm/.gitignore        |  1 +
- tools/testing/selftests/kvm/Makefile          |  4 +
- .../selftests/kvm/include/x86_64/tdx/tdcall.h | 35 ++++++++
- .../selftests/kvm/include/x86_64/tdx/tdx.h    | 12 +++
- .../kvm/include/x86_64/tdx/test_util.h        | 52 +++++++++++
- .../selftests/kvm/lib/x86_64/tdx/tdcall.S     | 90 +++++++++++++++++++
- .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 27 ++++++
- .../selftests/kvm/lib/x86_64/tdx/test_util.c  | 34 +++++++
- .../selftests/kvm/x86_64/tdx_vm_tests.c       | 45 ++++++++++
- 9 files changed, 300 insertions(+)
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
- create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/test_uti=
-l.h
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
- create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
- create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+ .../selftests/kvm/include/x86_64/tdx/tdx.h    |  3 ++
+ .../kvm/include/x86_64/tdx/test_util.h        | 19 ++++++++
+ .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 18 ++++++++
+ .../selftests/kvm/lib/x86_64/tdx/test_util.c  | 10 +++++
+ .../selftests/kvm/x86_64/tdx_vm_tests.c       | 44 +++++++++++++++++++
+ 5 files changed, 94 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftes=
-ts/kvm/.gitignore
-index 813e7610619d9..370d6430b32b4 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -65,6 +65,7 @@
- /x86_64/xss_msr_test
- /x86_64/vmx_pmu_caps_test
- /x86_64/triple_fault_event_test
-+/x86_64/tdx_vm_tests
- /access_tracking_perf_test
- /demand_paging_test
- /dirty_log_test
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests=
-/kvm/Makefile
-index 5f9cc1e6ee67e..9f289322a4933 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -61,6 +61,9 @@ LIBKVM_x86_64 +=3D lib/x86_64/vmx.c
- LIBKVM_x86_64 +=3D lib/x86_64/sev.c
- LIBKVM_x86_64 +=3D lib/x86_64/tdx/tdx_util.c
- LIBKVM_x86_64 +=3D lib/x86_64/tdx/td_boot.S
-+LIBKVM_x86_64 +=3D lib/x86_64/tdx/tdcall.S
-+LIBKVM_x86_64 +=3D lib/x86_64/tdx/tdx.c
-+LIBKVM_x86_64 +=3D lib/x86_64/tdx/test_util.c
-
- LIBKVM_aarch64 +=3D lib/aarch64/gic.c
- LIBKVM_aarch64 +=3D lib/aarch64/gic_v3.c
-@@ -148,6 +151,7 @@ TEST_GEN_PROGS_x86_64 +=3D set_memory_region_test
- TEST_GEN_PROGS_x86_64 +=3D steal_time
- TEST_GEN_PROGS_x86_64 +=3D kvm_binary_stats_test
- TEST_GEN_PROGS_x86_64 +=3D system_counter_offset_test
-+TEST_GEN_PROGS_x86_64 +=3D x86_64/tdx_vm_tests
-
- # Compiled outputs used by test targets
- TEST_GEN_PROGS_EXTENDED_x86_64 +=3D x86_64/nx_huge_pages_test
-diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h b/tool=
-s/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
-new file mode 100644
-index 0000000000000..78001bfec9c8d
---- /dev/null
-+++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
-@@ -0,0 +1,35 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Adapted from arch/x86/include/asm/shared/tdx.h */
-+
-+#ifndef SELFTESTS_TDX_TDCALL_H
-+#define SELFTESTS_TDX_TDCALL_H
-+
-+#include <linux/bits.h>
-+#include <linux/types.h>
-+
-+#define TDG_VP_VMCALL_INSTRUCTION_IO_READ 0
-+#define TDG_VP_VMCALL_INSTRUCTION_IO_WRITE 1
-+
-+#define TDX_HCALL_HAS_OUTPUT BIT(0)
-+
-+#define TDX_HYPERCALL_STANDARD 0
-+
-+/*
-+ * Used in __tdx_hypercall() to pass down and get back registers' values o=
-f
-+ * the TDCALL instruction when requesting services from the VMM.
-+ *
-+ * This is a software only structure and not part of the TDX module/VMM AB=
-I.
-+ */
-+struct tdx_hypercall_args {
-+	u64 r10;
-+	u64 r11;
-+	u64 r12;
-+	u64 r13;
-+	u64 r14;
-+	u64 r15;
-+};
-+
-+/* Used to request services from the VMM */
-+u64 __tdx_hypercall(struct tdx_hypercall_args *args, unsigned long flags);
-+
-+#endif // SELFTESTS_TDX_TDCALL_H
-diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/t=
-esting/selftests/kvm/include/x86_64/tdx/tdx.h
-new file mode 100644
-index 0000000000000..a7161efe4ee2e
---- /dev/null
+diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+index a7161efe4ee2e..28959bdb07628 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-@@ -0,0 +1,12 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef SELFTEST_TDX_TDX_H
-+#define SELFTEST_TDX_TDX_H
+@@ -4,9 +4,12 @@
+ 
+ #include <stdint.h>
+ 
++#define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
 +
-+#include <stdint.h>
-+
-+#define TDG_VP_VMCALL_INSTRUCTION_IO 30
-+
-+uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
-+				      uint64_t write, uint64_t *data);
-+
-+#endif // SELFTEST_TDX_TDX_H
-diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h b/t=
-ools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
-new file mode 100644
-index 0000000000000..b570b6d978ff1
---- /dev/null
+ #define TDG_VP_VMCALL_INSTRUCTION_IO 30
+ 
+ uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+ 				      uint64_t write, uint64_t *data);
++void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa);
+ 
+ #endif // SELFTEST_TDX_TDX_H
+diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+index b570b6d978ff1..6d69921136bd2 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
-@@ -0,0 +1,52 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+#ifndef SELFTEST_TDX_TEST_UTIL_H
-+#define SELFTEST_TDX_TEST_UTIL_H
-+
-+#include <stdbool.h>
-+
-+#include "tdcall.h"
-+
-+#define TDX_TEST_SUCCESS_PORT 0x30
-+#define TDX_TEST_SUCCESS_SIZE 4
-+
+@@ -49,4 +49,23 @@ bool is_tdx_enabled(void);
+  */
+ void tdx_test_success(void);
+ 
 +/**
-+ * Assert that tdx_test_success() was called in the guest.
-+ */
-+#define TDX_TEST_ASSERT_SUCCESS(VCPU)					\
-+	(TEST_ASSERT(							\
-+		((VCPU)->run->exit_reason =3D=3D KVM_EXIT_IO) &&		\
-+		((VCPU)->run->io.port =3D=3D TDX_TEST_SUCCESS_PORT) &&	\
-+		((VCPU)->run->io.size =3D=3D TDX_TEST_SUCCESS_SIZE) &&	\
-+		((VCPU)->run->io.direction =3D=3D				\
-+			TDG_VP_VMCALL_INSTRUCTION_IO_WRITE),		\
-+		"Unexpected exit values while waiting for test completion: %u (%s) %d %d=
- %d\n", \
-+		(VCPU)->run->exit_reason,				\
-+		exit_reason_str((VCPU)->run->exit_reason),		\
-+		(VCPU)->run->io.port, (VCPU)->run->io.size,		\
-+		(VCPU)->run->io.direction))
-+
-+/**
-+ * Run a test in a new process.
++ * Report an error with @error_code to userspace.
 + *
-+ * There might be multiple tests we are running and if one test fails, it =
-will
-+ * prevent the subsequent tests to run due to how tests are failing with
-+ * TEST_ASSERT function. The run_in_new_process function will run a test i=
-n a
-+ * new process context and wait for it to finish or fail to prevent TEST_A=
-SSERT
-+ * to kill the main testing process.
++ * Return value from tdg_vp_vmcall_report_fatal_error is ignored since execution
++ * is not expected to continue beyond this point.
 + */
-+void run_in_new_process(void (*func)(void));
++void tdx_test_fatal(uint64_t error_code);
 +
 +/**
-+ * Verify that the TDX is supported by KVM.
-+ */
-+bool is_tdx_enabled(void);
-+
-+/**
-+ * Report test success to userspace.
++ * Report an error with @error_code to userspace.
 + *
-+ * Use TDX_TEST_ASSERT_SUCCESS() to assert that this function was called i=
-n the
-+ * guest.
++ * @data_gpa may point to an optional shared guest memory holding the error
++ * string.
++ *
++ * Return value from tdg_vp_vmcall_report_fatal_error is ignored since execution
++ * is not expected to continue beyond this point.
 + */
-+void tdx_test_success(void);
++void tdx_test_fatal_with_data(uint64_t error_code, uint64_t data_gpa);
 +
-+#endif // SELFTEST_TDX_TEST_UTIL_H
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S b/tools/te=
-sting/selftests/kvm/lib/x86_64/tdx/tdcall.S
-new file mode 100644
-index 0000000000000..df9c1ed4bb2d1
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
-@@ -0,0 +1,90 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/* Adapted from arch/x86/coco/tdx/tdcall.S */
-+
-+#define TDX_HYPERCALL_r10 0 /* offsetof(struct tdx_hypercall_args, r10) */
-+#define TDX_HYPERCALL_r11 8 /* offsetof(struct tdx_hypercall_args, r11) */
-+#define TDX_HYPERCALL_r12 16 /* offsetof(struct tdx_hypercall_args, r12) *=
-/
-+#define TDX_HYPERCALL_r13 24 /* offsetof(struct tdx_hypercall_args, r13) *=
-/
-+#define TDX_HYPERCALL_r14 32 /* offsetof(struct tdx_hypercall_args, r14) *=
-/
-+#define TDX_HYPERCALL_r15 40 /* offsetof(struct tdx_hypercall_args, r15) *=
-/
-+
-+/*
-+ * Bitmasks of exposed registers (with VMM).
-+ */
-+#define TDX_R10 0x400
-+#define TDX_R11 0x800
-+#define TDX_R12 0x1000
-+#define TDX_R13 0x2000
-+#define TDX_R14 0x4000
-+#define TDX_R15 0x8000
-+
-+#define TDX_HCALL_HAS_OUTPUT 0x1
-+
-+/*
-+ * These registers are clobbered to hold arguments for each
-+ * TDVMCALL. They are safe to expose to the VMM.
-+ * Each bit in this mask represents a register ID. Bit field
-+ * details can be found in TDX GHCI specification, section
-+ * titled "TDCALL [TDG.VP.VMCALL] leaf".
-+ */
-+#define TDVMCALL_EXPOSE_REGS_MASK	( TDX_R10 | TDX_R11 | \
-+					  TDX_R12 | TDX_R13 | \
-+					  TDX_R14 | TDX_R15 )
-+
-+.code64
-+.section .text
-+
-+.globl __tdx_hypercall
-+.type __tdx_hypercall, @function
-+__tdx_hypercall:
-+	/* Set up stack frame */
-+	push %rbp
-+	movq %rsp, %rbp
-+
-+	/* Save callee-saved GPRs as mandated by the x86_64 ABI */
-+	push %r15
-+	push %r14
-+	push %r13
-+	push %r12
-+
-+	/* Mangle function call ABI into TDCALL ABI: */
-+	/* Set TDCALL leaf ID (TDVMCALL (0)) in RAX */
-+	xor %eax, %eax
-+
-+	/* Copy hypercall registers from arg struct: */
-+	movq TDX_HYPERCALL_r10(%rdi), %r10
-+	movq TDX_HYPERCALL_r11(%rdi), %r11
-+	movq TDX_HYPERCALL_r12(%rdi), %r12
-+	movq TDX_HYPERCALL_r13(%rdi), %r13
-+	movq TDX_HYPERCALL_r14(%rdi), %r14
-+	movq TDX_HYPERCALL_r15(%rdi), %r15
-+
-+	movl $TDVMCALL_EXPOSE_REGS_MASK, %ecx
-+
-+	tdcall
-+
-+	/* TDVMCALL leaf return code is in R10 */
-+	movq %r10, %rax
-+
-+	/* Copy hypercall result registers to arg struct if needed */
-+	testq $TDX_HCALL_HAS_OUTPUT, %rsi
-+	jz .Lout
-+
-+	movq %r10, TDX_HYPERCALL_r10(%rdi)
-+	movq %r11, TDX_HYPERCALL_r11(%rdi)
-+	movq %r12, TDX_HYPERCALL_r12(%rdi)
-+	movq %r13, TDX_HYPERCALL_r13(%rdi)
-+	movq %r14, TDX_HYPERCALL_r14(%rdi)
-+	movq %r15, TDX_HYPERCALL_r15(%rdi)
-+.Lout:
-+	/* Restore callee-saved GPRs as mandated by the x86_64 ABI */
-+	pop %r12
-+	pop %r13
-+	pop %r14
-+	pop %r15
-+
-+	pop %rbp
-+	ret
-+
-+/* Disable executable stack */
-+.section .note.GNU-stack,"",%progbits
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testi=
-ng/selftests/kvm/lib/x86_64/tdx/tdx.c
-new file mode 100644
-index 0000000000000..c2414523487a7
---- /dev/null
+ #endif // SELFTEST_TDX_TEST_UTIL_H
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+index c2414523487a7..e8c399f2277cf 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-@@ -0,0 +1,27 @@
-+// SPDX-License-Identifier: GPL-2.0-only
+@@ -1,5 +1,7 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ 
++#include <string.h>
 +
-+#include "tdx/tdcall.h"
-+#include "tdx/tdx.h"
+ #include "tdx/tdcall.h"
+ #include "tdx/tdx.h"
+ 
+@@ -25,3 +27,19 @@ uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+ 
+ 	return ret;
+ }
 +
-+uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
-+				      uint64_t write, uint64_t *data)
++void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa)
 +{
-+	uint64_t ret;
-+	struct tdx_hypercall_args args =3D {
-+		.r10 =3D TDX_HYPERCALL_STANDARD,
-+		.r11 =3D TDG_VP_VMCALL_INSTRUCTION_IO,
-+		.r12 =3D size,
-+		.r13 =3D write,
-+		.r14 =3D port,
-+	};
++	struct tdx_hypercall_args args;
 +
-+	if (write)
-+		args.r15 =3D *data;
++	memset(&args, 0, sizeof(struct tdx_hypercall_args));
 +
-+	ret =3D __tdx_hypercall(&args, write ? 0 : TDX_HCALL_HAS_OUTPUT);
++	if (data_gpa)
++		error_code |= 0x8000000000000000;
 +
-+	if (!write)
-+		*data =3D args.r11;
++	args.r11 = TDG_VP_VMCALL_REPORT_FATAL_ERROR;
++	args.r12 = error_code;
++	args.r13 = data_gpa;
 +
-+	return ret;
++	__tdx_hypercall(&args, 0);
 +}
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c b/tools=
-/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
-new file mode 100644
-index 0000000000000..6905d0ca38774
---- /dev/null
+diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+index 6905d0ca38774..7f3cd8089cea3 100644
+--- a/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
-@@ -0,0 +1,34 @@
-+// SPDX-License-Identifier: GPL-2.0-only
+@@ -32,3 +32,13 @@ void tdx_test_success(void)
+ 				     TDX_TEST_SUCCESS_SIZE,
+ 				     TDG_VP_VMCALL_INSTRUCTION_IO_WRITE, &code);
+ }
 +
-+#include <stdbool.h>
-+#include <stdint.h>
-+#include <stdlib.h>
-+#include <sys/wait.h>
-+#include <unistd.h>
-+
-+#include "kvm_util_base.h"
-+#include "tdx/tdx.h"
-+#include "tdx/test_util.h"
-+
-+void run_in_new_process(void (*func)(void))
++void tdx_test_fatal_with_data(uint64_t error_code, uint64_t data_gpa)
 +{
-+	if (fork() =3D=3D 0) {
-+		func();
-+		exit(0);
-+	}
-+	wait(NULL);
++	tdg_vp_vmcall_report_fatal_error(error_code, data_gpa);
 +}
 +
-+bool is_tdx_enabled(void)
++void tdx_test_fatal(uint64_t error_code)
 +{
-+	return !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_TDX_VM));
++	tdx_test_fatal_with_data(error_code, 0);
 +}
-+
-+void tdx_test_success(void)
-+{
-+	uint64_t code =3D 0;
-+
-+	tdg_vp_vmcall_instruction_io(TDX_TEST_SUCCESS_PORT,
-+				     TDX_TEST_SUCCESS_SIZE,
-+				     TDG_VP_VMCALL_INSTRUCTION_IO_WRITE, &code);
-+}
-diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/test=
-ing/selftests/kvm/x86_64/tdx_vm_tests.c
-new file mode 100644
-index 0000000000000..a18d1c9d60264
---- /dev/null
+diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+index a18d1c9d60264..627d60b573bb6 100644
+--- a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
 +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-@@ -0,0 +1,45 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+
-+#include <signal.h>
-+#include "kvm_util_base.h"
-+#include "tdx/tdx_util.h"
-+#include "tdx/test_util.h"
-+#include "test_util.h"
-+
-+void guest_code_lifecycle(void)
+@@ -2,6 +2,7 @@
+ 
+ #include <signal.h>
+ #include "kvm_util_base.h"
++#include "tdx/tdx.h"
+ #include "tdx/tdx_util.h"
+ #include "tdx/test_util.h"
+ #include "test_util.h"
+@@ -30,6 +31,48 @@ void verify_td_lifecycle(void)
+ 	printf("\t ... PASSED\n");
+ }
+ 
++void guest_code_report_fatal_error(void)
 +{
++	uint64_t err;
++
++	/*
++	 * Note: err should follow the GHCI spec definition:
++	 * bits 31:0 should be set to 0.
++	 * bits 62:32 are used for TD-specific extended error code.
++	 * bit 63 is used to mark additional information in shared memory.
++	 */
++	err = 0x0BAAAAAD00000000;
++	if (err)
++		tdx_test_fatal(err);
++
 +	tdx_test_success();
 +}
-+
-+void verify_td_lifecycle(void)
++void verify_report_fatal_error(void)
 +{
 +	struct kvm_vm *vm;
 +	struct kvm_vcpu *vcpu;
 +
-+	vm =3D td_create();
++	vm = td_create();
 +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+	vcpu =3D td_vcpu_add(vm, 0, guest_code_lifecycle);
++	vcpu = td_vcpu_add(vm, 0, guest_code_report_fatal_error);
 +	td_finalize(vm);
 +
-+	printf("Verifying TD lifecycle:\n");
++	printf("Verifying report_fatal_error:\n");
++
++	vcpu_run(vcpu);
++	ASSERT_EQ(vcpu->run->exit_reason, KVM_EXIT_SYSTEM_EVENT);
++	ASSERT_EQ(vcpu->run->system_event.ndata, 3);
++	ASSERT_EQ(vcpu->run->system_event.data[0], TDG_VP_VMCALL_REPORT_FATAL_ERROR);
++	ASSERT_EQ(vcpu->run->system_event.data[1], 0x0BAAAAAD00000000);
++	ASSERT_EQ(vcpu->run->system_event.data[2], 0);
 +
 +	vcpu_run(vcpu);
 +	TDX_TEST_ASSERT_SUCCESS(vcpu);
@@ -499,18 +245,17 @@ index 0000000000000..a18d1c9d60264
 +	printf("\t ... PASSED\n");
 +}
 +
-+int main(int argc, char **argv)
-+{
-+	setbuf(stdout, NULL);
-+
-+	if (!is_tdx_enabled()) {
-+		print_skip("TDX is not supported by the KVM");
-+		exit(KSFT_SKIP);
-+	}
-+
-+	run_in_new_process(&verify_td_lifecycle);
-+
-+	return 0;
-+}
---
+ int main(int argc, char **argv)
+ {
+ 	setbuf(stdout, NULL);
+@@ -40,6 +83,7 @@ int main(int argc, char **argv)
+ 	}
+ 
+ 	run_in_new_process(&verify_td_lifecycle);
++	run_in_new_process(&verify_report_fatal_error);
+ 
+ 	return 0;
+ }
+-- 
 2.39.0.246.g2a6d74b583-goog
+
