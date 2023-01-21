@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 83271676225
-	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 01:18:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DF0B676228
+	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 01:18:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230133AbjAUAS3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 19:18:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55030 "EHLO
+        id S230032AbjAUASc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 19:18:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbjAUASO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 19:18:14 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE4E9DB7BF
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:45 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id z9-20020a25ba49000000b007d4416e3667so7513278ybj.23
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:45 -0800 (PST)
+        with ESMTP id S230038AbjAUAST (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 19:18:19 -0500
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A648D73ACD
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:52 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id k15-20020a5b0a0f000000b007eba3f8e3baso7403405ybq.4
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:17:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rfsY1LSMZWbkB3lzXo82d1IvFhV8JL2sADgvMPah8iE=;
-        b=iOjwDOWBLA+75vHNu041s40M+FhZkzA3407S5hBkV79p5NSRaF7IU9DIGyOAlBbJoX
-         z/14b1ayPGaPg6JBGlwHj9sU9hxIGQ5kxlc8GbUMUbicrfUe/hvPJKB80Pq/idC7RquH
-         5x3R+qd2Rp70khxwTrGlKox2h1VNHn/9ZHD4qMYkcO9fKLZjaJ/DI03P9QduZwtLZrrY
-         2IN4ubI9WsgtkW1fh3/5ettAd38ZWBW7uHzTWYy2ZKScSKvP+oDd4kjVEXs2DBvnbj9L
-         8wuLw+gIyWbQXjZ+vfluxPl9PiK6W29xbaU7Wwah+4v02L/mEcwftEmwq6puQdXuJI1p
-         lHJg==
+        bh=vWnv20fie/GQfacbGSS84A7f8gWQK0m5+WUyBewkaDU=;
+        b=s/mE+Pd84jXkHm4/bsf0JUJY+Vp++e6y8PAPfYAiwDXQRJQ1LT+N4u/a1FMKW37+u/
+         boh/VILL9JRUzl83bGQNdfbCqD1Qvj7ynAwPya9Lq1ySN87DlcRVLqIFlqELUH0lKyNW
+         LkmRCj2jnjIkZf9JzBU/n7ZcKrB1Ka+Q6tuAg0NHsP6anucVnK7Du+6a6iv3DWS4hCDg
+         7iQwjc50ACCRROa2td41eLaV5Idiw0HAtFp230LJ68yTISUJyQsJcmuKqHc3XWrWrQMz
+         mQ5eS4mw2l7jgN7PMhMWvwN2Ea8kpEDd5ZpigUpLLz2PpbIhK8KTQvwuisc5TWbo4RSR
+         T2KA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rfsY1LSMZWbkB3lzXo82d1IvFhV8JL2sADgvMPah8iE=;
-        b=R24B90BJhCYS3iZWlochFbCdSnGyy7HbrYXkbmRlF4eQe9Ejta6zpuFZbr2hGto6VV
-         /mQpouNnk8AkLzOt9hmh6hk2lnz3MuRp3R3Tk1WprNpYUW2fZ68bierwo2wLnvkTMC2O
-         zkImhWoAXilkpbIFSqVaqid3tABhqU5jPsTlVDriGk/kfURFCpo+gjNb/cucBAH3uHz8
-         YZT2cfD+nuYnXMKdLzGSAlSQCAXITWweM/azYWMsXZTCq1aeMMfGPEV3wZDUjonubnlp
-         Hk+lVb5i9GqUKa5Q+802f2nF051RvH+9qfdnz4TgdJTV2Uy88D0SmRLiF90MEJct7D41
-         gkyw==
-X-Gm-Message-State: AFqh2kp/lMYlbJbCDu2iB/73BE7MFk8v8x1noSt3h09rPcI8FSlwPiAt
-        irNRbsU7Dp1q9VoBfjrBn8AwkTQWd4nFMyiQSQ==
-X-Google-Smtp-Source: AMrXdXuGQ/uTHxxtm+W+laNGWc0n8lUwlm0ZAYDNMJSsXsmvJ1Xc5HBhOnuhLPLPAamVVKNduZp2XSu1xPjt2GsL5A==
+        bh=vWnv20fie/GQfacbGSS84A7f8gWQK0m5+WUyBewkaDU=;
+        b=63RbfiNCEZ9px7FS6gu/Y0uboUEhi/0xjjZ5LCYUW18lxbnWDVYgsBKX/KohF6Hq+f
+         fQjklQZFAc1tIL44wQZc8YWoJ2jMOZrXIFlOuapIDvQWqKjihT/1cSs/Pbc7q2WLpZ2X
+         zD4apYLaCuuIqujiSQfwlICdNnb3ncncaTPHNlmXz3p0iXoo9OpRIcYy2Dx3DKqg1z5v
+         YuKqYutfTD1rKFhXstdPp2RLYT/E8PWBtSjPEJWntuDzf4yIPiF0MfStGaIBdqGJc4kg
+         y48/QjKcGU/zK6ui5m9eF76EmKqTbAkBGV/6LWh/WJlycPndQkl8i+G9I8gNH7Ka98r4
+         PbZA==
+X-Gm-Message-State: AFqh2ko2Sx4SzvUFU0L0nMW6jFhl/r4TEmUH8DPk992e+sZmMxWtbvx7
+        oxzuI4iBK8OI1xk9lWm6sdSW5p6whTTl/KGXvw==
+X-Google-Smtp-Source: AMrXdXuz77o9QEUtjLGDv2jBofIrwITXkhKV5huEbQvXz8JbBqYFuHnpsehfmqc8g5e6CXejkPMtKlLjl7Y9quXa+A==
 X-Received: from ackerleytng-cloudtop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:b30])
- (user=ackerleytng job=sendgmr) by 2002:a5b:58a:0:b0:7bb:3b2d:718f with SMTP
- id l10-20020a5b058a000000b007bb3b2d718fmr1765369ybp.302.1674260241431; Fri,
- 20 Jan 2023 16:17:21 -0800 (PST)
-Date:   Sat, 21 Jan 2023 00:15:27 +0000
+ (user=ackerleytng job=sendgmr) by 2002:a81:c0e:0:b0:3b2:2653:d3b with SMTP id
+ 14-20020a810c0e000000b003b226530d3bmr2091550ywm.86.1674260245563; Fri, 20 Jan
+ 2023 16:17:25 -0800 (PST)
+Date:   Sat, 21 Jan 2023 00:15:28 +0000
 In-Reply-To: <20230121001542.2472357-1-ackerleytng@google.com>
 Mime-Version: 1.0
 References: <20230121001542.2472357-1-ackerleytng@google.com>
 X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
-Message-ID: <20230121001542.2472357-17-ackerleytng@google.com>
-Subject: [RFC PATCH v3 16/31] KVM: selftests: TDX: Add TDX MSR read/write tests
+Message-ID: <20230121001542.2472357-18-ackerleytng@google.com>
+Subject: [RFC PATCH v3 17/31] KVM: selftests: TDX: Add TDX HLT exit test
 From:   Ackerley Tng <ackerleytng@google.com>
 To:     linux-kselftest@vger.kernel.org
 Cc:     pbonzini@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
@@ -70,7 +70,7 @@ Cc:     pbonzini@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,309 +80,156 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sagi Shahar <sagis@google.com>
 
-The test verifies reads and writes for MSR registers with different access
-level.
+The test verifies that the guest runs TDVMCALL<INSTRUCTION.HLT> and the
+guest vCPU enters to the halted state.
 
+Signed-off-by: Erdem Aktas <erdemaktas@google.com>
 Signed-off-by: Sagi Shahar <sagis@google.com>
 Signed-off-by: Ackerley Tng <ackerleytng@google.com>
 ---
-Changes RFCv2 -> RFCv3
-+ Fixed typo in MTTR->MTRR
----
- .../selftests/kvm/include/x86_64/tdx/tdx.h    |   4 +
- .../selftests/kvm/lib/x86_64/tdx/tdx.c        |  27 +++
- .../selftests/kvm/x86_64/tdx_vm_tests.c       | 217 ++++++++++++++++++
- 3 files changed, 248 insertions(+)
+ .../selftests/kvm/include/x86_64/tdx/tdx.h    |  3 +
+ .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 10 +++
+ .../selftests/kvm/x86_64/tdx_vm_tests.c       | 78 +++++++++++++++++++
+ 3 files changed, 91 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-index 37ad16943e299..fbac1951cfe35 100644
+index fbac1951cfe35..7eba9d80b3681 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
-@@ -8,11 +8,15 @@
+@@ -7,10 +7,12 @@
+ #define TDG_VP_VMCALL_GET_TD_VM_CALL_INFO 0x10000
  #define TDG_VP_VMCALL_REPORT_FATAL_ERROR 0x10003
-
+ 
++#define TDG_VP_VMCALL_INSTRUCTION_HLT 12
  #define TDG_VP_VMCALL_INSTRUCTION_IO 30
-+#define TDG_VP_VMCALL_INSTRUCTION_RDMSR 31
-+#define TDG_VP_VMCALL_INSTRUCTION_WRMSR 32
-
+ #define TDG_VP_VMCALL_INSTRUCTION_RDMSR 31
+ #define TDG_VP_VMCALL_INSTRUCTION_WRMSR 32
+ 
++
  uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
  				      uint64_t write, uint64_t *data);
  void tdg_vp_vmcall_report_fatal_error(uint64_t error_code, uint64_t data_gpa);
- uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
+@@ -18,5 +20,6 @@ uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
  					uint64_t *r13, uint64_t *r14);
-+uint64_t tdg_vp_vmcall_instruction_rdmsr(uint64_t index, uint64_t *ret_value);
-+uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value);
-
+ uint64_t tdg_vp_vmcall_instruction_rdmsr(uint64_t index, uint64_t *ret_value);
+ uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value);
++uint64_t tdg_vp_vmcall_instruction_hlt(uint64_t interrupt_blocked_flag);
+ 
  #endif // SELFTEST_TDX_TDX_H
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-index 7254d61515db2..43088d6f40b50 100644
+index 43088d6f40b50..1af0626c2a4ad 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
-@@ -66,3 +66,30 @@ uint64_t tdg_vp_vmcall_get_td_vmcall_info(uint64_t *r11, uint64_t *r12,
-
- 	return ret;
+@@ -93,3 +93,13 @@ uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value)
+ 
+ 	return __tdx_hypercall(&args, 0);
  }
 +
-+uint64_t tdg_vp_vmcall_instruction_rdmsr(uint64_t index, uint64_t *ret_value)
-+{
-+	uint64_t ret;
-+	struct tdx_hypercall_args args = {
-+		.r11 = TDG_VP_VMCALL_INSTRUCTION_RDMSR,
-+		.r12 = index,
-+	};
-+
-+	ret = __tdx_hypercall(&args, TDX_HCALL_HAS_OUTPUT);
-+
-+	if (ret_value)
-+		*ret_value = args.r11;
-+
-+	return ret;
-+}
-+
-+uint64_t tdg_vp_vmcall_instruction_wrmsr(uint64_t index, uint64_t value)
++uint64_t tdg_vp_vmcall_instruction_hlt(uint64_t interrupt_blocked_flag)
 +{
 +	struct tdx_hypercall_args args = {
-+		.r11 = TDG_VP_VMCALL_INSTRUCTION_WRMSR,
-+		.r12 = index,
-+		.r13 = value,
++		.r11 = TDG_VP_VMCALL_INSTRUCTION_HLT,
++		.r12 = interrupt_blocked_flag,
 +	};
 +
 +	return __tdx_hypercall(&args, 0);
 +}
 diff --git a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-index 71aa4e5907a05..65ca1ec2a6e82 100644
+index 65ca1ec2a6e82..346c1e07af9c0 100644
 --- a/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
 +++ b/tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
-@@ -514,6 +514,221 @@ void verify_guest_reads(void)
+@@ -728,6 +728,83 @@ void verify_guest_msr_writes(void)
  	printf("\t ... PASSED\n");
  }
-
+ 
 +/*
-+ * Define a filter which denies all MSR access except the following:
-+ * MTTR_BASE_0: Allow read/write access
-+ * MTTR_BASE_1: Allow read access
-+ * MTTR_BASE_2: Allow write access
++ * Verifies HLT functionality.
 + */
-+static u64 tdx_msr_test_allow_bits = 0xFFFFFFFFFFFFFFFF;
-+#define MTTR_BASE_0 (0x200)
-+#define MTTR_BASE_1 (0x202)
-+#define MTTR_BASE_2 (0x204)
-+struct kvm_msr_filter tdx_msr_test_filter = {
-+	.flags = KVM_MSR_FILTER_DEFAULT_DENY,
-+	.ranges = {
-+		{
-+			.flags = KVM_MSR_FILTER_READ |
-+				 KVM_MSR_FILTER_WRITE,
-+			.nmsrs = 1,
-+			.base = MTTR_BASE_0,
-+			.bitmap = (uint8_t *)&tdx_msr_test_allow_bits,
-+		}, {
-+			.flags = KVM_MSR_FILTER_READ,
-+			.nmsrs = 1,
-+			.base = MTTR_BASE_1,
-+			.bitmap = (uint8_t *)&tdx_msr_test_allow_bits,
-+		}, {
-+			.flags = KVM_MSR_FILTER_WRITE,
-+			.nmsrs = 1,
-+			.base = MTTR_BASE_2,
-+			.bitmap = (uint8_t *)&tdx_msr_test_allow_bits,
-+		},
-+	},
-+};
-+
-+/*
-+ * Verifies MSR read functionality.
-+ */
-+void guest_msr_read(void)
-+{
-+	uint64_t data;
-+	uint64_t ret;
-+
-+	ret = tdg_vp_vmcall_instruction_rdmsr(MTTR_BASE_0, &data);
-+	if (ret)
-+		tdx_test_fatal(ret);
-+
-+	ret = tdx_test_report_64bit_to_user_space(data);
-+	if (ret)
-+		tdx_test_fatal(ret);
-+
-+	ret = tdg_vp_vmcall_instruction_rdmsr(MTTR_BASE_1, &data);
-+	if (ret)
-+		tdx_test_fatal(ret);
-+
-+	ret = tdx_test_report_64bit_to_user_space(data);
-+	if (ret)
-+		tdx_test_fatal(ret);
-+
-+	/* We expect this call to fail since MTTR_BASE_2 is write only */
-+	ret = tdg_vp_vmcall_instruction_rdmsr(MTTR_BASE_2, &data);
-+	if (ret) {
-+		ret = tdx_test_report_64bit_to_user_space(ret);
-+		if (ret)
-+			tdx_test_fatal(ret);
-+	} else {
-+		tdx_test_fatal(-99);
-+	}
-+
-+	tdx_test_success();
-+}
-+
-+void verify_guest_msr_reads(void)
-+{
-+	struct kvm_vm *vm;
-+	struct kvm_vcpu *vcpu;
-+
-+	uint64_t data;
-+	int ret;
-+
-+	vm = td_create();
-+	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+
-+	/*
-+	 * Set explicit MSR filter map to control access to the MSR registers
-+	 * used in the test.
-+	 */
-+	printf("\t ... Setting test MSR filter\n");
-+	ret = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
-+	TEST_ASSERT(ret, "KVM_CAP_X86_USER_SPACE_MSR is unavailable");
-+	vm_enable_cap(vm, KVM_CAP_X86_USER_SPACE_MSR, KVM_MSR_EXIT_REASON_FILTER);
-+
-+	ret = kvm_check_cap(KVM_CAP_X86_MSR_FILTER);
-+	TEST_ASSERT(ret, "KVM_CAP_X86_MSR_FILTER is unavailable");
-+
-+	ret = ioctl(vm->fd, KVM_X86_SET_MSR_FILTER, &tdx_msr_test_filter);
-+	TEST_ASSERT(ret == 0,
-+		    "KVM_X86_SET_MSR_FILTER failed, ret: %i errno: %i (%s)",
-+		    ret, errno, strerror(errno));
-+
-+	vcpu = td_vcpu_add(vm, 0, guest_msr_read);
-+	td_finalize(vm);
-+
-+	printf("Verifying guest msr reads:\n");
-+
-+	printf("\t ... Setting test MTTR values\n");
-+	/* valid values for mtrr type are 0, 1, 4, 5, 6 */
-+	vcpu_set_msr(vcpu, MTTR_BASE_0, 4);
-+	vcpu_set_msr(vcpu, MTTR_BASE_1, 5);
-+	vcpu_set_msr(vcpu, MTTR_BASE_2, 6);
-+
-+	printf("\t ... Running guest\n");
-+	vcpu_run(vcpu);
-+	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-+	data = tdx_test_read_64bit_report_from_guest(vcpu);
-+	ASSERT_EQ(data, 4);
-+
-+	vcpu_run(vcpu);
-+	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-+	data = tdx_test_read_64bit_report_from_guest(vcpu);
-+	ASSERT_EQ(data, 5);
-+
-+	vcpu_run(vcpu);
-+	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-+	data = tdx_test_read_64bit_report_from_guest(vcpu);
-+	ASSERT_EQ(data, TDG_VP_VMCALL_INVALID_OPERAND);
-+
-+	vcpu_run(vcpu);
-+	TDX_TEST_ASSERT_SUCCESS(vcpu);
-+
-+	kvm_vm_free(vm);
-+	printf("\t ... PASSED\n");
-+}
-+
-+/*
-+ * Verifies MSR write functionality.
-+ */
-+void guest_msr_write(void)
++void guest_hlt(void)
 +{
 +	uint64_t ret;
++	uint64_t interrupt_blocked_flag;
 +
-+	ret = tdg_vp_vmcall_instruction_wrmsr(MTTR_BASE_0, 4);
-+	if (ret)
-+		tdx_test_fatal(ret);
-+
-+	/* We expect this call to fail since MTTR_BASE_1 is read only */
-+	ret = tdg_vp_vmcall_instruction_wrmsr(MTTR_BASE_1, 5);
-+	if (ret) {
-+		ret = tdx_test_report_64bit_to_user_space(ret);
-+		if (ret)
-+			tdx_test_fatal(ret);
-+	} else {
-+		tdx_test_fatal(-99);
-+	}
-+
-+
-+	ret = tdg_vp_vmcall_instruction_wrmsr(MTTR_BASE_2, 6);
++	interrupt_blocked_flag = 0;
++	ret = tdg_vp_vmcall_instruction_hlt(interrupt_blocked_flag);
 +	if (ret)
 +		tdx_test_fatal(ret);
 +
 +	tdx_test_success();
 +}
 +
-+void verify_guest_msr_writes(void)
-+{
-+	struct kvm_vcpu *vcpu;
-+	struct kvm_vm *vm;
++void _verify_guest_hlt(int signum);
 +
-+	uint64_t data;
-+	int ret;
++void wake_me(int interval)
++{
++	struct sigaction action;
++
++	action.sa_handler = _verify_guest_hlt;
++	sigemptyset(&action.sa_mask);
++	action.sa_flags = 0;
++
++	TEST_ASSERT(sigaction(SIGALRM, &action, NULL) == 0,
++		    "Could not set the alarm handler!");
++
++	alarm(interval);
++}
++
++void _verify_guest_hlt(int signum)
++{
++	struct kvm_vm *vm;
++	static struct kvm_vcpu *vcpu;
++
++	/*
++	 * This function will also be called by SIGALRM handler to check the
++	 * vCPU MP State. If vm has been initialized, then we are in the signal
++	 * handler. Check the MP state and let the guest run again.
++	 */
++	if (vcpu != NULL) {
++		struct kvm_mp_state mp_state;
++
++		vcpu_mp_state_get(vcpu, &mp_state);
++		ASSERT_EQ(mp_state.mp_state, KVM_MP_STATE_HALTED);
++
++		/* Let the guest to run and finish the test.*/
++		mp_state.mp_state = KVM_MP_STATE_RUNNABLE;
++		vcpu_mp_state_set(vcpu, &mp_state);
++		return;
++	}
 +
 +	vm = td_create();
 +	td_initialize(vm, VM_MEM_SRC_ANONYMOUS, 0);
-+
-+	/*
-+	 * Set explicit MSR filter map to control access to the MSR registers
-+	 * used in the test.
-+	 */
-+	printf("\t ... Setting test MSR filter\n");
-+	ret = kvm_check_cap(KVM_CAP_X86_USER_SPACE_MSR);
-+	TEST_ASSERT(ret, "KVM_CAP_X86_USER_SPACE_MSR is unavailable");
-+	vm_enable_cap(vm, KVM_CAP_X86_USER_SPACE_MSR, KVM_MSR_EXIT_REASON_FILTER);
-+
-+	ret = kvm_check_cap(KVM_CAP_X86_MSR_FILTER);
-+	TEST_ASSERT(ret, "KVM_CAP_X86_MSR_FILTER is unavailable");
-+
-+	ret = ioctl(vm->fd, KVM_X86_SET_MSR_FILTER, &tdx_msr_test_filter);
-+	TEST_ASSERT(ret == 0,
-+		    "KVM_X86_SET_MSR_FILTER failed, ret: %i errno: %i (%s)",
-+		    ret, errno, strerror(errno));
-+
-+	vcpu = td_vcpu_add(vm, 0, guest_msr_write);
++	vcpu = td_vcpu_add(vm, 0, guest_hlt);
 +	td_finalize(vm);
 +
-+	printf("Verifying guest msr writes:\n");
++	printf("Verifying HLT:\n");
 +
 +	printf("\t ... Running guest\n");
-+	/* Only the write to MTTR_BASE_1 should trigger an exit */
-+	vcpu_run(vcpu);
-+	TDX_TEST_CHECK_GUEST_FAILURE(vcpu);
-+	data = tdx_test_read_64bit_report_from_guest(vcpu);
-+	ASSERT_EQ(data, TDG_VP_VMCALL_INVALID_OPERAND);
 +
++	/* Wait 1 second for guest to execute HLT */
++	wake_me(1);
 +	vcpu_run(vcpu);
++
 +	TDX_TEST_ASSERT_SUCCESS(vcpu);
-+
-+	printf("\t ... Verifying MTTR values writen by guest\n");
-+
-+	ASSERT_EQ(vcpu_get_msr(vcpu, MTTR_BASE_0), 4);
-+	ASSERT_EQ(vcpu_get_msr(vcpu, MTTR_BASE_1), 0);
-+	ASSERT_EQ(vcpu_get_msr(vcpu, MTTR_BASE_2), 6);
 +
 +	kvm_vm_free(vm);
 +	printf("\t ... PASSED\n");
 +}
 +
-+
++void verify_guest_hlt(void)
++{
++	_verify_guest_hlt(0);
++}
+ 
  int main(int argc, char **argv)
  {
- 	setbuf(stdout, NULL);
-@@ -530,6 +745,8 @@ int main(int argc, char **argv)
- 	run_in_new_process(&verify_get_td_vmcall_info);
- 	run_in_new_process(&verify_guest_writes);
+@@ -747,6 +824,7 @@ int main(int argc, char **argv)
  	run_in_new_process(&verify_guest_reads);
-+	run_in_new_process(&verify_guest_msr_writes);
-+	run_in_new_process(&verify_guest_msr_reads);
-
+ 	run_in_new_process(&verify_guest_msr_writes);
+ 	run_in_new_process(&verify_guest_msr_reads);
++	run_in_new_process(&verify_guest_hlt);
+ 
  	return 0;
  }
---
+-- 
 2.39.0.246.g2a6d74b583-goog
+
