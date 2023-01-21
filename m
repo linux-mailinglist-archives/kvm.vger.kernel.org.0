@@ -2,85 +2,75 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C14F06761EE
-	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 01:12:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C8016761F4
+	for <lists+kvm@lfdr.de>; Sat, 21 Jan 2023 01:16:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229673AbjAUAMS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 20 Jan 2023 19:12:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49318 "EHLO
+        id S229747AbjAUAQI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 20 Jan 2023 19:16:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbjAUAMR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 20 Jan 2023 19:12:17 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C49218B77B
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:12:13 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id dw9so7045535pjb.5
-        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:12:13 -0800 (PST)
+        with ESMTP id S229643AbjAUAQG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 20 Jan 2023 19:16:06 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21CE28BA92
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:16:05 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id y66-20020a253245000000b007cb4f1e3e57so7414588yby.8
+        for <kvm@vger.kernel.org>; Fri, 20 Jan 2023 16:16:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4SK5QkZtNn1114IW/p2QqQjxFu3MpNyGxrITiSXzRQE=;
-        b=tg5hMelZw1XcCxmeBgZd0wSJ8z98D8IlS1msOxT8Rq6EDxxz4yssidqhASAoJdXRbU
-         r89swOLn+DnyhpkJJY7L/hEDPZ2upsGHOGbMHww8PxY4/DschRirjTz96PkkGnwrbrl/
-         b8YWtV/trPuLg3QiOu4c+dNChVCYtUxNf2GfGMe0XA3TIhcE3i0on3UWQZSdgw8uF4Mb
-         lsL9kjwvGhDMbcpZg04rPvgXEhIeg1IZ/8yMKhBQOtDopsR1tylXXpngjh4Yn4fz4t22
-         QpRkcFj5qrPzN470zgvQh+dHzGxwgf1fwTioLKue9uViLKmu61OeG+55oUfx0djOIvBz
-         DX+A==
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O13XsMhe3FapLxKaNj8MRbQZ1Bo+zuL+Id74AOAL1Xo=;
+        b=SaD8EG+wEFG08JNVIdCa38YUS+n1ExpCtEFt1+gN0wwtDDRTyXRmnHNuANZfM6N3h6
+         4IBqtaEOfPwcxWrnKGiStt3TMn2aujOR3KxkOBg8jZaJhNfMBmiBIYCrgFNLQaqWwjJp
+         M/GsqFEo8Dg61tRNkM13z0QFeGlQ9NDSsT5gqrArdWnABP9PxItopjLJk9otjMWepxIY
+         rw9hv2fRwV9vPaLfEVQi9HdrILpDDU+R3WGikfHOjxkzMSxE2a4URQDw4My4PFe77Wuj
+         N9/J+QdqUzn+aBKIXrisE+SWDBFNmxhVzfAw+z+wq9W1ITK+GtC3u+t4VJN+6DPYVtcF
+         4JEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4SK5QkZtNn1114IW/p2QqQjxFu3MpNyGxrITiSXzRQE=;
-        b=oF1rzaQo1s65CIZ6dsm6fy6OAYiCL8R/Rz/8/H6fynQsd4HG8ioF41WYMEOGt62AWL
-         ayD2pSr5oRUnMdK6NN586NJrpbPlHF17Xh27LFCP/VXtNWj/5kMQjj36A1KRZRje/j/u
-         ARqQk1cmOuAklk4zBqDO/cJV3TP/wwGnpLV2nEhfVPj/+q6w2bCniFjiSohoffGJBHvX
-         4Lozo/j/XzDZLF2IlAGQeZo8Ebx/BIpSFMmqUbP6FPVzHy9WA+PAFDHlm6xcAUgFaie/
-         NPNXgbDFv0DZOwEezn+N3wbHi28tsGsDu+EFV4VH1ReneuyyoR/O4kbWwkWgx02cEcF3
-         xRVA==
-X-Gm-Message-State: AFqh2kqi+frX72avQoclZ6pGPTL55C5wp+7T3eCBBDa+bg6dm5n2QIxQ
-        TS65MjSTyAGokxoI5g5SJi0Nug==
-X-Google-Smtp-Source: AMrXdXtw4On5+UzzEXtWtwMI26nwjAxvW3nuAa5ccm3X6juOVSET/2ddkUsJPNvQim+rpv3XnJ2czw==
-X-Received: by 2002:a05:6a20:93a7:b0:b8:ca86:f3ab with SMTP id x39-20020a056a2093a700b000b8ca86f3abmr19101pzh.2.1674259933059;
-        Fri, 20 Jan 2023 16:12:13 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 63-20020a621942000000b0056d98e359a5sm26512823pfz.165.2023.01.20.16.12.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Jan 2023 16:12:12 -0800 (PST)
-Date:   Sat, 21 Jan 2023 00:12:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "Shahar, Sagi" <sagis@google.com>,
-        "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "Aktas, Erdem" <erdemaktas@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Subject: Re: [PATCH v11 018/113] KVM: TDX: create/destroy VM structure
-Message-ID: <Y8st2PjGDQ+Q0LlW@google.com>
-References: <20230117214414.00003229@gmail.com>
- <Y8cLcY12zDWqO8nd@google.com>
- <Y8cMnjHFNIFaoX27@google.com>
- <eadc4a4e37ea0b04b8348395244b792bd34a762d.camel@intel.com>
- <Y8ljwsrrBBdh1aYw@google.com>
- <02b0e551647beed9ec3a2fefd3b659eb52c4846c.camel@intel.com>
- <Y8m34OEVBfL7Q4Ns@google.com>
- <1c71eda35e03372f29162c6a5286f5b4d1e1d7e1.camel@intel.com>
- <Y8ndcGHUHQjHfbF9@google.com>
- <CALzav=d4vwHTnXP8wetA_Hqd3Tzc_NLp=3M-akwNSN1-ToL+Eg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALzav=d4vwHTnXP8wetA_Hqd3Tzc_NLp=3M-akwNSN1-ToL+Eg@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        bh=O13XsMhe3FapLxKaNj8MRbQZ1Bo+zuL+Id74AOAL1Xo=;
+        b=EApNM4XevOTC/nUfxaf84YNNy06Y8K7NqlYd7XCWlsIIh3+hppPS8200hktQbdpu9W
+         +R/q5oCjL0R3wLwv34xrcgneFVxrY6wl6ujiNRwzbtbizocmZi20dBU+TU2rSztImAIJ
+         Qcv23joWmB9Vabyvpfhb2GaTjWIj/m1cliGBsyCwZZaqZYYvuT3xDTMvgWeNeGkO2sSp
+         4B2x59gFX9cGzwKB7znRWi1vevD7yd75VRAPtMSijMT9CHtPgF6bRBJTmHhZHJvV85BR
+         EEADfTGDA7j0t8se5/eigTgeB4ep10MGDCYQTgt6clT5/AbeTpay5CW4SpJO4WSP/h9x
+         pHow==
+X-Gm-Message-State: AFqh2koMmv+kWQBTr5Hh3nKI5DoPjCmkq1Cg49qs4KW0ZfoW8l5Lec+j
+        NiIncKACDv+qFO4okm0UTeP2tfk9BgCbwk/IWg==
+X-Google-Smtp-Source: AMrXdXvE4UxHSPt0jkUbjVScWwtHv+JfvxzKfDaUOpaJjockRZgYQA7m9flG5b3pUI8zx4lcw4+eDyS3Grl32fVvEw==
+X-Received: from ackerleytng-cloudtop-sg.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:b30])
+ (user=ackerleytng job=sendgmr) by 2002:a05:690c:31c:b0:4fa:7af6:5321 with
+ SMTP id bg28-20020a05690c031c00b004fa7af65321mr1035841ywb.451.1674260164370;
+ Fri, 20 Jan 2023 16:16:04 -0800 (PST)
+Date:   Sat, 21 Jan 2023 00:15:11 +0000
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.0.246.g2a6d74b583-goog
+Message-ID: <20230121001542.2472357-1-ackerleytng@google.com>
+Subject: [RFC PATCH v3 00/31] TDX KVM selftests
+From:   Ackerley Tng <ackerleytng@google.com>
+To:     linux-kselftest@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
+        sagis@google.com, erdemaktas@google.com, afranji@google.com,
+        runanwang@google.com, shuah@kernel.org, drjones@redhat.com,
+        maz@kernel.org, bgardon@google.com, jmattson@google.com,
+        dmatlack@google.com, peterx@redhat.com, oupton@google.com,
+        ricarkol@google.com, yang.zhong@intel.com, wei.w.wang@intel.com,
+        xiaoyao.li@intel.com, pgonda@google.com, marcorr@google.com,
+        eesposit@redhat.com, borntraeger@de.ibm.com, eric.auger@redhat.com,
+        wangyanan55@huawei.com, aaronlewis@google.com, vkuznets@redhat.com,
+        pshier@google.com, axelrasmussen@google.com,
+        zhenzhong.duan@intel.com, maciej.szmigiero@oracle.com,
+        like.xu@linux.intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,115 +78,179 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 20, 2023, David Matlack wrote:
-> On Thu, Jan 19, 2023 at 4:16 PM Sean Christopherson <seanjc@google.com> wrote:
-> >
-> > On Thu, Jan 19, 2023, Huang, Kai wrote:
-> > > On Thu, 2023-01-19 at 21:36 +0000, Sean Christopherson wrote:
-> > > > The least invasive idea I have is expand the TDP MMU's concept of "frozen" SPTEs
-> > > > and freeze (a.k.a. lock) the SPTE (KVM's mirror) until the corresponding S-EPT
-> > > > update completes.a
+Hello,
 
-Doh, the proposed patches already do a freeze+unfreeze.  Sorry, I obviously didn't
-read the most recent changelog and haven't looked at the code in a few versions.
+This is v3 of the patch series for TDX selftests.
 
-> > > This will introduce another "having-to-wait while SPTE is frozen" problem I
-> > > think, which IIUC means (one way is) you have to do some loop and retry, perhaps
-> > > similar to yield_safe.
-> >
-> > Yes, but because the TDP MMU already freezes SPTEs (just for a shorter duration),
-> > I'm 99% sure all of the affected flows already know how to yield/bail when necessary.
-> >
-> > The problem with the zero-step mitigation is that it could (theoretically) cause
-> > a "busy" error on literally any accesses, which makes it infeasible for KVM to have
-> > sane behavior.  E.g. freezing SPTEs to avoid the ordering issues isn't necessary
-> > when holding mmu_lock for write, whereas the zero-step madness brings everything
-> > into play.
-> 
-> (I'm still ramping up on TDX so apologies in advance if the following
-> is totally off base.)
-> 
-> The complexity, and to a lesser extent the memory overhead, of
-> mirroring Secure EPT tables with the TDP MMU makes me wonder if it is
-> really worth it. Especially since the initial TDX support has so many
-> constraints that would seem to allow a simpler implementation: all
-> private memory is pinned, no live migration support, no test/clear
-> young notifiers, etc.
-> 
-> For the initial version of KVM TDX support, what if we implemented the
-> Secure EPT management entirely off to the side? i.e. Not on top of the
-> TDP MMU. For example, write TDX-specific routines for:
-> 
->  - Fully populating the Secure EPT tree some time during VM creation.
+It has been updated for Intel=E2=80=99s V10 of the TDX host patches which w=
+as
+proposed in https://lkml.org/lkml/2022/8/8/877
 
-Fully populating S-EPT is likely not a viable option for performance reasons.  The
-number of SEAMCALLS needed for a large VM would be quite enormous, and to avoid
-faults entirely the backing memory would also need to be pre-allocated.
+The tree can be found at
+https://github.com/googleprodkernel/linux-cc/tree/tdx-selftests-rfc-v3/
 
->  - Tearing down the Secure EPT tree during VM destruction.
->  - Support for unmapping/mapping specific regions of the Secure EPT
-> tree for private<->shared conversions.
-> 
-> With that in place, KVM never would need to handle a fault on a Secure
-> EPT mapping. Any fault (e.g. due to an in-progress private<->shared
-> conversion) can just return back to the guest to retry the memory
-> access until the operation is complete.
+Changes from RFC v2:
 
-I don't think this will work.  Or at least, it's not that simple.  TDX and SNP
-both require the host to support implicit conversions from shared => private,
-i.e. KVM needs to be able to handle faults on private memory at any time.  KVM
-could rely on the attributes xarray to know if KVM should resume the guest or
-exit to userspace, but at some point KVM needs to know whether or an entry has
-been installed.  We could work around that by adding a hooking to "set attributes"
-to populate S-EPT entries, but I'm not sure that would yield a simpler implementation
-without sacrificing performance.
+Selftest setup now builds upon the KVM selftest framework when setting
+up the guest for testing. We now use the KVM selftest framework to
+build the guest page tables and load the ELF binary into guest memory.
 
-Thinking more about this, I do believe there is a simpler approach than freezing
-S-EPT entries.  If we tweak the TDP MMU rules for TDX to require mmu_lock be held
-for write when overwiting a present SPTE (with a live VM), then the problematic
-cases go away.  As you point out, all of the restrictions on TDX private memory
-means we're most of the way there.
+Inlining of the entire guest image is no longer required and that
+allows us to cleanly separate code into different compilation units
+and be able to use proper assembly instead of inline assembly
+(addresses Sean=E2=80=99s comment).
 
-Explicit unmap flows already take mmu_lock for write, zapping/splitting for dirty
-logging isn't a thing (yet), and the S-EPT root is fixed, i.e. kvm_tdp_mmu_put_root()
-should never free S-EPT tables until the VM is dead.
+To achieve this, we take a dependency on the SEV VM tests:
+https://lore.kernel.org/lkml/20221018205845.770121-1-pgonda@google.com/T/. =
+Those
+patches provide functions for the host to allocate and track protected
+memory in the guest.
 
-In other words, the only problematic flow is kvm_tdp_mmu_map().  Specifically,
-KVM will overwrite a present SPTE only to demote/promote an existing entry, i.e.
-to split a hugepage or collapse into a hugepage.  And I believe it's not too
-difficult to ensure KVM never does in-place promotion/demotion:
+In RFCv3, TDX selftest code is organized into:
 
-  - Private memory doesn't rely on host userspace page tables, i.e. KVM won't
-    try to promote to a hugepage because a hugepage was created in the host.
++ headers in tools/testing/selftests/kvm/include/x86_64/tdx/
++ common code in tools/testing/selftests/kvm/lib/x86_64/tdx/
++ selftests in tools/testing/selftests/kvm/x86_64/tdx_*
 
-  - Private memory doesn't (yet) support page migration, so again KVM won't try
-    to promote because a hugepage is suddenly possible.
+RFCv3 also adds additional selftests for UPM.
 
-  - Shadow paging isn't compatible, i.e. disallow_lpage won't change dynamically
-    except for when there are mixed attributes, and toggling private/shared in
-    the attributes requires zapping with mmu_lock held for write.
+Dependencies
 
-  - The idiotic non-coherent DMA + guest MTRR interaction can be disallowed (which
-    I assume is already the case for TDX).
++ Peter=E2=80=99s patches, which provide functions for the host to allocate
+  and track protected memory in the
+  guest. https://lore.kernel.org/lkml/20221018205845.770121-1-pgonda@google=
+.com/T/
++ Peter=E2=80=99s patches depend on Sean=E2=80=99s patches:
+    + https://lore.kernel.org/linux-arm-kernel/20220825232522.3997340-1-sea=
+njc@google.com/T/
+    + https://lore.kernel.org/lkml/20221006004512.666529-1-seanjc@google.co=
+m/T/
++ Proposed fixes for these these issues mentioned on the mailing list
+    + https://lore.kernel.org/lkml/36cde6d6-128d-884e-1447-09b08bb5de3d@int=
+el.com/
+    + https://lore.kernel.org/lkml/diqzedtubs0d.fsf@google.com/
+    + https://lore.kernel.org/lkml/67b782ee-c95c-d6bc-3cca-cdfe75f4bf6a@int=
+el.com/
+    + https://lore.kernel.org/lkml/diqzcz7cd983.fsf@ackerleytng-cloudtop-sg=
+.c.googlers.com/
+    + https://lore.kernel.org/linux-mm/20221116205025.1510291-1-ackerleytng=
+@google.com/
 
-  - Disallow toggling the NX hugepage mitigation when TDX is allowed.
+Further work for this patch series/TODOs
 
-Races to install leaf SPTEs will yield a "loser" either on the spurious check in
-tdp_mmu_map_handle_target_level():
++ Sean=E2=80=99s comments for the non-confidential UPM selftests patch seri=
+es
+  at https://lore.kernel.org/lkml/Y8dC8WDwEmYixJqt@google.com/T/#u apply
+  here as well
++ Add ucall support for TDX selftests
 
-	if (new_spte == iter->old_spte)
-		ret = RET_PF_SPURIOUS;
+I would also like to acknowledge the following people, who helped
+review or test patches in RFCv1 and RFCv2:
 
-or on the CMPXCHG in tdp_mmu_set_spte_atomic().
++ Sean Christopherson <seanjc@google.com>
++ Zhenzhong Duan <zhenzhong.duan@intel.com>
++ Peter Gonda <pgonda@google.com>
++ Andrew Jones <drjones@redhat.com>
++ Maxim Levitsky <mlevitsk@redhat.com>
++ Xiaoyao Li <xiaoyao.li@intel.com>
++ David Matlack <dmatlack@google.com>
++ Marc Orr <marcorr@google.com>
++ Isaku Yamahata <isaku.yamahata@gmail.com>
 
-So I _think_ the race I described can't actually happen in practice, and if it
-does happen, then we have a bug somewhere else.  Though that raises the question
-of why the proposed patches do the freeze+unfreeze.  If it's just the VM destroy
-case, then that should be easy enough to special case.
+Links to earlier patch series
 
++ RFC v1: https://lore.kernel.org/lkml/20210726183816.1343022-1-erdemaktas@=
+google.com/T/#u
++ RFC v2: https://lore.kernel.org/lkml/20220830222000.709028-1-sagis@google=
+.com/T/#u
 
-Intel folks,
+Ackerley Tng (14):
+  KVM: selftests: Add function to allow one-to-one GVA to GPA mappings
+  KVM: selftests: Expose function that sets up sregs based on VM's mode
+  KVM: selftests: Store initial stack address in struct kvm_vcpu
+  KVM: selftests: Refactor steps in vCPU descriptor table initialization
+  KVM: selftests: TDX: Use KVM_TDX_CAPABILITIES to validate TDs'
+    attribute configuration
+  KVM: selftests: Require GCC to realign stacks on function entry
+  KVM: selftests: Add functions to allow mapping as shared
+  KVM: selftests: Add support for restricted memory
+  KVM: selftests: TDX: Update load_td_memory_region for VM memory backed
+    by restricted memfd
+  KVM: selftests: Expose _vm_vaddr_alloc
+  KVM: selftests: TDX: Add support for TDG.MEM.PAGE.ACCEPT
+  KVM: selftests: TDX: Add support for TDG.VP.VEINFO.GET
+  KVM: selftests: TDX: Add TDX UPM selftest
+  KVM: selftests: TDX: Add TDX UPM selftests for implicit conversion
 
-Do you happen to know exactly what scenario prompted adding the freeze+unfreeze
-code?  Is there something I'm forgetting/missing, or is it possible we can go
-with a simpler implementation?
+Erdem Aktas (4):
+  KVM: selftests: Add support for creating non-default type VMs
+  KVM: selftests: Add helper functions to create TDX VMs
+  KVM: selftests: TDX: Add TDX lifecycle test
+  KVM: selftests: TDX: Adding test case for TDX port IO
+
+Roger Wang (1):
+  KVM: selftests: TDX: Add TDG.VP.INFO test
+
+Ryan Afranji (2):
+  KVM: selftests: TDX: Verify the behavior when host consumes a TD
+    private memory
+  KVM: selftests: TDX: Add shared memory test
+
+Sagi Shahar (10):
+  KVM: selftests: TDX: Add report_fatal_error test
+  KVM: selftests: TDX: Add basic TDX CPUID test
+  KVM: selftests: TDX: Add basic get_td_vmcall_info test
+  KVM: selftests: TDX: Add TDX IO writes test
+  KVM: selftests: TDX: Add TDX IO reads test
+  KVM: selftests: TDX: Add TDX MSR read/write tests
+  KVM: selftests: TDX: Add TDX HLT exit test
+  KVM: selftests: TDX: Add TDX MMIO reads test
+  KVM: selftests: TDX: Add TDX MMIO writes test
+  KVM: selftests: TDX: Add TDX CPUID TDVMCALL test
+
+ tools/testing/selftests/kvm/.gitignore        |    3 +
+ tools/testing/selftests/kvm/Makefile          |   10 +-
+ .../selftests/kvm/include/kvm_util_base.h     |   43 +-
+ .../testing/selftests/kvm/include/test_util.h |    2 +
+ .../selftests/kvm/include/x86_64/processor.h  |    4 +
+ .../kvm/include/x86_64/tdx/td_boot.h          |   82 +
+ .../kvm/include/x86_64/tdx/td_boot_asm.h      |   16 +
+ .../selftests/kvm/include/x86_64/tdx/tdcall.h |   59 +
+ .../selftests/kvm/include/x86_64/tdx/tdx.h    |   65 +
+ .../kvm/include/x86_64/tdx/tdx_util.h         |   19 +
+ .../kvm/include/x86_64/tdx/test_util.h        |  164 ++
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  123 +-
+ tools/testing/selftests/kvm/lib/test_util.c   |    7 +
+ .../selftests/kvm/lib/x86_64/processor.c      |   77 +-
+ tools/testing/selftests/kvm/lib/x86_64/sev.c  |    2 +-
+ .../selftests/kvm/lib/x86_64/tdx/td_boot.S    |  101 ++
+ .../selftests/kvm/lib/x86_64/tdx/tdcall.S     |  158 ++
+ .../selftests/kvm/lib/x86_64/tdx/tdx.c        |  231 +++
+ .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   |  562 +++++++
+ .../selftests/kvm/lib/x86_64/tdx/test_util.c  |  101 ++
+ .../kvm/x86_64/tdx_shared_mem_test.c          |  137 ++
+ .../selftests/kvm/x86_64/tdx_upm_test.c       |  460 ++++++
+ .../selftests/kvm/x86_64/tdx_vm_tests.c       | 1329 +++++++++++++++++
+ 23 files changed, 3709 insertions(+), 46 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/td_boot.=
+h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/td_boot_=
+asm.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx_util=
+.h
+ create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/test_uti=
+l.h
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/td_boot.S
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+ create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/test_util.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_shared_mem_test.=
+c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_upm_test.c
+ create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+
+--
+2.39.0.246.g2a6d74b583-goog
