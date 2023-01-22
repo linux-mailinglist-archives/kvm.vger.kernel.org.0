@@ -2,91 +2,81 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7B0A3676B23
-	for <lists+kvm@lfdr.de>; Sun, 22 Jan 2023 06:03:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2B3F3676BA7
+	for <lists+kvm@lfdr.de>; Sun, 22 Jan 2023 09:35:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229637AbjAVFDU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 22 Jan 2023 00:03:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54674 "EHLO
+        id S229917AbjAVIfY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 22 Jan 2023 03:35:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbjAVFDS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 22 Jan 2023 00:03:18 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93A2118A97;
-        Sat, 21 Jan 2023 21:03:17 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id d10so6820078pgm.13;
-        Sat, 21 Jan 2023 21:03:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1rPxEawLgI/tGMgZXoPPdkllAiNZ4imDQSRKldW+0Tg=;
-        b=ZmJe4uoWdrrnu2t0uTnKxkUzdqQIQCbXavzLn5Cckr5wQAN/XNChg6QUa3fC3gqvec
-         ZmffyDkvxjsGFn8lwh7w0D2Wqa4wOTLJ6so7CRqVkI/3oPrMWiS7YDk5EU6RD4IAiARw
-         WO/6KN+/Y/+1/1XOkM5/8yvgltDyHbcAUSDgyZ51d5H+evuJC7n6s0N4/gWuEGKZljYU
-         H6dofb3q0KXwc6iZhZDP6IDfiBZBIgK26cERQryQo/3ttWk3pnyh+th3liOs7N1HT3VD
-         exVu0cfFBrJAXSXqMGAtUNVm3cISNCjmI7HSrQfjXbsnybNZsh9PGCBXdD+eQ//CEweb
-         FHZA==
+        with ESMTP id S229780AbjAVIfV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 22 Jan 2023 03:35:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D60FD1814C
+        for <kvm@vger.kernel.org>; Sun, 22 Jan 2023 00:34:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674376476;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=LBOy3GEyTxqSKd3pw0Cq7/zzqUVdT2OzA5ZHrT96yhk=;
+        b=BvUH5MtjiVPmwOsCCns1CFpTvDqe3N7B6WGGypnQAEiDxgvZpP7wGFg3jdy1m7W1px6z7J
+        cO2R1jEPIe4ZqLFUQmCJeN8whu96MNk+i53bGqeYCcc99OUZ+i8zR3dYHQoS9bZzdYr7L7
+        9PYuz4wNIx0Qme05f3XcUS/6InYAZ/A=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-134-iEzxtaR9NHOuPBiz4BMcIg-1; Sun, 22 Jan 2023 03:34:32 -0500
+X-MC-Unique: iEzxtaR9NHOuPBiz4BMcIg-1
+Received: by mail-ej1-f72.google.com with SMTP id nd38-20020a17090762a600b00871ff52c6b5so6003331ejc.0
+        for <kvm@vger.kernel.org>; Sun, 22 Jan 2023 00:34:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1rPxEawLgI/tGMgZXoPPdkllAiNZ4imDQSRKldW+0Tg=;
-        b=sqw+lnym3lFQ9Ah61wyFTZCX0rkzG/rnxetzqwy//eaPst26fiyS3Nc04gzf0b9zrD
-         U0PBKDgd+wvSFDR1NebN+TqB9vYQwi11Bdj5LEkgE0XdU0m8qvFH4HU6MhPnh6v1hgNp
-         u19AJBQW95I8Im8ow/9oc/d2tGgMQvEIArwxVQe4PmfXRGiM2hvgGcSe9r2PGvSgnLPU
-         VGXCLJsOlSHVv/DDhhyYxmLIq8VlCmoyidl97YbyfQMauPhzY8l7/K+q4AZbGzFzwll7
-         j8y53BUPmpu5nqrYH+KcHdvdeiXdzBDwUnVSRAoXLiYSElx0e2hESzrTvebf/1sjVhpx
-         dTag==
-X-Gm-Message-State: AFqh2kowCwCDW+73unZOIU1Bhbf2n3DapW1pTkezp+YG0aNMA9G/7Ylk
-        DbnpWMRumHH0z7I7ONTLr94=
-X-Google-Smtp-Source: AMrXdXu31CyeCOIYHJy4PMa+lMnTUCPNOOCVGdySsvrNk+I6w/8v5j3J3q9D4DHiL0qBs7XWzHuMxg==
-X-Received: by 2002:a05:6a00:4519:b0:58d:f047:53b7 with SMTP id cw25-20020a056a00451900b0058df04753b7mr14535557pfb.3.1674363796900;
-        Sat, 21 Jan 2023 21:03:16 -0800 (PST)
-Received: from localhost (c-73-164-155-12.hsd1.wa.comcast.net. [73.164.155.12])
-        by smtp.gmail.com with ESMTPSA id h11-20020a056a00000b00b0058dd9c46a8csm9062788pfk.64.2023.01.21.21.03.15
+        bh=LBOy3GEyTxqSKd3pw0Cq7/zzqUVdT2OzA5ZHrT96yhk=;
+        b=xFAelesaXRkbKRFO725y98w5LJjOznuM0a4DVE0nqU7/GKYBnrN+6JGdcDVIxo2lGH
+         wcvn+7oCBeNiomdevH0Ka6Gud5LfhbHMf9eIzzU8caJLQjohxTCeKxlhb4jyQf8wmRJw
+         M7ScvK4XqJ0n5kamKL+4Wvf7FLl58jM48Rb6HEu9PGCtiV13VzxCV8OPEGXtJj7cGCz/
+         rCURrsaSG+Ai6WH3265J7+oumXdDpYpuI0lJDuk1EXwFRMqrX9LU0rKsNRxLjXwl8F/x
+         LNiQQ8CsOvaYuqdIPnKLXQip7GyjLcRbhu/z0SafRwmoE/IBUGZ5sW9FA9TmSQ1Tbg2A
+         pJQA==
+X-Gm-Message-State: AFqh2koN490lghyo8091fzZ0wSWzoNjtYUtKwqDeqZZOYw7izz69+oxg
+        D+fSdi0qVv8N1Lb8DwTU00JUBwftAiacrkJOE89DyH9FRB45WEMIeDpgoAr1ahU3C0OrcL8kZiK
+        khusqBfSBhKAJ
+X-Received: by 2002:a17:906:d8ad:b0:875:54f5:740d with SMTP id qc13-20020a170906d8ad00b0087554f5740dmr18980190ejb.51.1674376471264;
+        Sun, 22 Jan 2023 00:34:31 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXupkktggRT0GhSuPRcESSXkQviODPyb9ZmRHAGX+AHHUI13v12MW9XOdnRYvnmjPv5GEmYCQw==
+X-Received: by 2002:a17:906:d8ad:b0:875:54f5:740d with SMTP id qc13-20020a170906d8ad00b0087554f5740dmr18980169ejb.51.1674376471041;
+        Sun, 22 Jan 2023 00:34:31 -0800 (PST)
+Received: from redhat.com ([2.52.149.29])
+        by smtp.gmail.com with ESMTPSA id lb19-20020a170907785300b0084d1efe9af6sm20325371ejc.58.2023.01.22.00.34.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 Jan 2023 21:03:16 -0800 (PST)
-Date:   Thu, 19 Jan 2023 03:47:02 +0000
-From:   Bobby Eshleman <bobbyeshleman@gmail.com>
-To:     Cong Wang <xiyou.wangcong@gmail.com>
-Cc:     Bobby Eshleman <bobby.eshleman@bytedance.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Mykola Lysenko <mykolal@fb.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        Stanislav Fomichev <sdf@google.com>,
-        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-        Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, bpf@vger.kernel.org,
-        linux-kselftest@vger.kernel.org,
-        Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [PATCH RFC 1/3] vsock: support sockmap
-Message-ID: <Y8i9NlRpIR/KE/q2@bullseye>
-References: <20230118-support-vsock-sockmap-connectible-v1-0-d47e6294827b@bytedance.com>
- <20230118-support-vsock-sockmap-connectible-v1-1-d47e6294827b@bytedance.com>
- <Y8w7d+6UASP3jUHf@pop-os.localdomain>
+        Sun, 22 Jan 2023 00:34:30 -0800 (PST)
+Date:   Sun, 22 Jan 2023 03:34:26 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>
+Cc:     Petr Mladek <pmladek@suse.com>, Jason Wang <jasowang@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        "Seth Forshee (DigitalOcean)" <sforshee@kernel.org>,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <20230122032944-mutt-send-email-mst@kernel.org>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y8w7d+6UASP3jUHf@pop-os.localdomain>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+In-Reply-To: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -94,30 +84,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 21, 2023 at 11:22:31AM -0800, Cong Wang wrote:
-> On Wed, Jan 18, 2023 at 12:27:39PM -0800, Bobby Eshleman wrote:
-> > +static int vsock_read_skb(struct sock *sk, skb_read_actor_t read_actor)
-> > +{
-> > +	struct vsock_sock *vsk = vsock_sk(sk);
-> > +
-> > +	if (!vsk->transport)
-> > +		return -ENODEV;
-> > +
-> > +	if (!vsk->transport->read_skb)
-> > +		return -EOPNOTSUPP;
+On Fri, Jan 20, 2023 at 04:12:20PM -0600, Seth Forshee (DigitalOcean) wrote:
+> We've fairly regularaly seen liveptches which cannot transition within kpatch's
+> timeout period due to busy vhost worker kthreads. In looking for a solution the
+> only answer I found was to call klp_update_patch_state() from a safe location.
+> I tried adding this call to vhost_worker(), and it works, but this creates the
+> potential for problems if a livepatch attempted to patch vhost_worker().
+> Without a call to klp_update_patch_state() fully loaded vhost kthreads can
+> never switch because vhost_worker() will always appear on the stack, but with
+> the call these kthreads can switch but will still be running the old version of
+> vhost_worker().
 > 
-> Can we move these two checks to sockmap update path? It would make
-> vsock_read_skb() faster.
+> To avoid this situation I've added a new function, klp_switch_current(), which
+> switches the current task only if its stack does not include any function being
+> patched. This allows kthreads to safely attempt switching themselves if a patch
+> is pending. There is at least one downside, however. Since there's no way for
+> the kthread to track whether it has already tried to switch for a pending patch
+> it can end up calling klp_switch_current() repeatedly when it can never be
+> safely switched.
 > 
-> > +
-> > +	return vsk->transport->read_skb(vsk, read_actor);
-> > +}
+> I don't know whether this is the right solution, and I'm happy to try out other
+> suggestions. But in my testing these patches proved effective in consistently
+> switching heavily loaded vhost kthreads almost immediately.
 > 
-> Essentially can be just this one line.
-> 
-> Thanks.
+> To: Josh Poimboeuf <jpoimboe@kernel.org>
+> To: Jiri Kosina <jikos@kernel.org>
+> To: Miroslav Benes <mbenes@suse.cz>
+> To: Petr Mladek <pmladek@suse.com>
+> To: Joe Lawrence <joe.lawrence@redhat.com>
+> To: "Michael S. Tsirkin" <mst@redhat.com>
+> To: Jason Wang <jasowang@redhat.com>
+> Cc: live-patching@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Cc: kvm@vger.kernel.org
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
 
-That makes sense, will do.
+Don't know enough about live patching to judge this.
 
-Thanks,
-Bobby
+I'll let livepatch maintainers judge this, and merge through
+the livepatch tree if appropriate. For that:
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+but pls underestand this is more a 'looks ok superficially and
+I don't have better ideas'  than 'I have reviewed this thoroughly'.
+
+> 
+> ---
+> Seth Forshee (DigitalOcean) (2):
+>       livepatch: add an interface for safely switching kthreads
+>       vhost: check for pending livepatches from vhost worker kthreads
+> 
+>  drivers/vhost/vhost.c         |  4 ++++
+>  include/linux/livepatch.h     |  2 ++
+>  kernel/livepatch/transition.c | 11 +++++++++++
+>  3 files changed, 17 insertions(+)
+> ---
+> base-commit: 5dc4c995db9eb45f6373a956eb1f69460e69e6d4
+> change-id: 20230120-vhost-klp-switching-ba9a3ae38b8a
+> 
+> Best regards,
+> -- 
+> Seth Forshee (DigitalOcean) <sforshee@kernel.org>
+
