@@ -2,136 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7937C678B06
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 23:49:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E1D4E678B21
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 23:57:18 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233349AbjAWWta (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 17:49:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53664 "EHLO
+        id S233400AbjAWW5R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 17:57:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231681AbjAWWt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 17:49:29 -0500
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2041.outbound.protection.outlook.com [40.107.243.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1476E193E8;
-        Mon, 23 Jan 2023 14:49:28 -0800 (PST)
+        with ESMTP id S231634AbjAWW5Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 17:57:16 -0500
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2059.outbound.protection.outlook.com [40.107.237.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C748112F2A;
+        Mon, 23 Jan 2023 14:57:14 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AsyYA0qkuBKrWRoStCWiWkMwBEjmJ6VaAaTYJ5T2VDNjY3ml2C1sygyy64oJRg0D0ECKLy3y6G4QrW8LGf7gpvtQ/LNK2a9w12BsqjqRkg46kzD9my/u4rfYct++lm3Mv4ppNpIw7bo15TnsfGkWOjPsLLPigYnGZwtVGTd2dBGOw7mszdh+iE0Pxi4SnSIPZjsk7Z90fK5cnbsnG0IGIt/R3hooQ5GYbZ6W17Te6FlptnqQ2WsSHBLUwYIKqfeU8HRve/iJ5qQCtNARgZ7gH9OHKymVD92grCaVEQ2c6aLARqxxjgYraS2GerVzV+9Km3jrlVLw7q4yRzlAZbDyxg==
+ b=ndEBiXyzPxK+PXA18xr43GOU+aqcBf1YgvSFjqVj8kwAJhuWxpt0Br2pK1mTbkA/rpJC03gLdHi/X0sQR3P2Sg7oRnUoe6EFlxDZnSeKbqfYnDaMD+28ctwCb7bLBgzaIXJaxLB6iJuyhMmMrhQfMWR9Rz+ahr5AmpI32o1yqQd5g2FHf0ESWZ8fIL/ehrgqdsBnjvqNCd1VeTBUO0ezz8FQWGsYFNlV6AgMxAKiiJjea027JpT9u0nxA1GB6ACrQyjjzVskQa5qX5B+S/VRC7k3EWOa99nt9XcGkSMGq43yzDN8/8CofBEY4GLoOK62pcxzjSrtqaOXTofBjxBx4w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YpyDt1YTMkFBixMPMa8HQGXG8xXP70L1q6T6SvYosZE=;
- b=kbLGfy6kbeuh4MOnMnG1SKOojyA477gB4jmr80ZbxR2JMn4smmRPDZP3PcpFv0STff/9kEPVtp/YYzgUmKn+xiE03A51MrAaFXg9VOk4AoCDcRbPhpkltNrICvVSkVOG6i2BS7bJWw4K7HTsP4SNf2EL/0v/efqnSf6/duceRbuS9G7xuEzMS1u56qyUT8sRajFtPz/MzdDstL/wz8duBXeKSv8eRPOzyN61glbsPDxMKK3WHxQ5edh6Jbz2C0eXbl5flxMtjcP9W91ECe3Hw6nQiRBZnF5iMYMJtqzVk1XzZog5uc7qy4qIcIvN73WU59UZvq5jlxnMVkx7jRLQmQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ bh=RPG3Bts0JmFdi5wqksSVDt9p8JrnLTYYQoE4GvS6sVc=;
+ b=NBmoiRTiNzVoe65t4Gyu4Hzo/D4wQyTebOg2QkhjFQDopn/z/KfS+Lw0+Zi5MCyGjn7CSkhUIHEG1ifAjheftmcDBqKSin4TG0NEEpIMOyNOniKzdk/tSTPFEk7aAgC3Hztn8zfR9gfzqP+GSmeJdl9GXCctnGdodQBDXtC1zp4oKIFk1YowvGA2h1C1vCbmWQ9a9iiefpCer+jgGFE0RBP2QFFgcFnmqMK0JUwBRPbQ92x9UxMAqAXWY9ubEqdzxL5H6bke1rgJB76nHuMBOD1MYZ72HfxiXO3mzpSPJ8qlLbormyi4309hu/JUu8idqzjDdJZFFvKLroYDxRbx+A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YpyDt1YTMkFBixMPMa8HQGXG8xXP70L1q6T6SvYosZE=;
- b=aFDD3CMK3S8EVQpvkbbkapIM004TKIUphdR7C3L5VKjagm38Wur/aV61EceSgpn0Z0DYaHLS0ULQ+yoQjClhr+DVXbLtR+ryOACcyA1iqKp4r7Llbyz9QEkmr/jhmncD4Gr/0xjDPwO3Cdq/JWs/5yKKgYVjzg8vw6OsIrz2Zrs=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
- by SJ0PR12MB6943.namprd12.prod.outlook.com (2603:10b6:a03:44b::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Mon, 23 Jan
- 2023 22:49:25 +0000
-Received: from SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::dc5d:6248:1c13:4a3]) by SN6PR12MB2767.namprd12.prod.outlook.com
- ([fe80::dc5d:6248:1c13:4a3%7]) with mapi id 15.20.6002.033; Mon, 23 Jan 2023
- 22:49:20 +0000
-Message-ID: <16523f06-bb08-c4f9-bdfa-745fee553a43@amd.com>
-Date:   Mon, 23 Jan 2023 16:49:14 -0600
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.1
-Subject: Re: [PATCH RFC v7 37/64] KVM: SVM: Add KVM_SNP_INIT command
-Content-Language: en-US
-From:   "Kalra, Ashish" <ashish.kalra@amd.com>
-To:     Jarkko Sakkinen <jarkko@kernel.org>,
-        Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Pavan Kumar Paluri <papaluri@amd.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-38-michael.roth@amd.com> <Y7BG6pSuoZsBQYrx@kernel.org>
- <fd23ee51-ec47-717d-7cce-1d79db8b6bd3@amd.com>
-In-Reply-To: <fd23ee51-ec47-717d-7cce-1d79db8b6bd3@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: BL1PR13CA0131.namprd13.prod.outlook.com
- (2603:10b6:208:2bb::16) To SN6PR12MB2767.namprd12.prod.outlook.com
- (2603:10b6:805:75::23)
+ bh=RPG3Bts0JmFdi5wqksSVDt9p8JrnLTYYQoE4GvS6sVc=;
+ b=bfGgivcE/XtAzMyGw+jIqHf9L8n+5QHfMlQdOzyxappY1DDh3aRYfhcdweDefqH43sXOIfsSVWIi/Ol9aLlvA/g5bj6UxpoEuZ6VrLiwwmEz9zsMyn3g3JcvC5VYzm6Cyv+nWarzG008xjQBwwCCJEl2MFlHymfYEkR038gcfMo=
+Received: from BN0PR04CA0047.namprd04.prod.outlook.com (2603:10b6:408:e8::22)
+ by DS0PR12MB8413.namprd12.prod.outlook.com (2603:10b6:8:f9::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6002.33; Mon, 23 Jan 2023 22:57:11 +0000
+Received: from BN8NAM11FT114.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:408:e8:cafe::52) by BN0PR04CA0047.outlook.office365.com
+ (2603:10b6:408:e8::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33 via Frontend
+ Transport; Mon, 23 Jan 2023 22:57:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BN8NAM11FT114.mail.protection.outlook.com (10.13.177.46) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6023.16 via Frontend Transport; Mon, 23 Jan 2023 22:57:11 +0000
+Received: from fritz.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.34; Mon, 23 Jan
+ 2023 16:57:09 -0600
+From:   Kim Phillips <kim.phillips@amd.com>
+To:     <x86@kernel.org>
+CC:     Kim Phillips <kim.phillips@amd.com>,
+        Borislav Petkov <bp@alien8.de>,
+        "Boris Ostrovsky" <boris.ostrovsky@oracle.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "Paolo Bonzini" <pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Juergen Gross <jgross@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        "Alexey Kardashevskiy" <aik@amd.com>, <kvm@vger.kernel.org>,
+        <linux-doc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v8 0/8] x86/cpu, kvm: Support AMD Automatic IBRS
+Date:   Mon, 23 Jan 2023 16:56:52 -0600
+Message-ID: <20230123225700.2224063-1-kim.phillips@amd.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SJ0PR12MB6943:EE_
-X-MS-Office365-Filtering-Correlation-Id: 824888ea-864e-410c-2388-08dafd94109f
+X-MS-TrafficTypeDiagnostic: BN8NAM11FT114:EE_|DS0PR12MB8413:EE_
+X-MS-Office365-Filtering-Correlation-Id: c703b377-f91a-4cdc-ce72-08dafd952973
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MHCGeqDbNufU7CyGBArc5E1s9bjA/jmPdAkNaO2aakjU6KPxr+W/tzgqVWxd0y1E2giCFMtl+63n+LumyBSlulYmkD9qDz7bdzXvAZP75PpnbZftx//I6BPr0IFMxwSER6WlKN2IqHlHho5+JSr7hPoCgzOUZrH1uhM3Ugt0XKqGDMz+8TMJ26oNof6C+uNNMX/yHFLeK+8HjSLEcRpErjA8VLSoJ8EBBMSzVBMgGkkWromHHuc6i4R1VnpjaH7HuQ+P7BzqTQalE3WLUuiUrZEYq25Jj637CIh7qLZk3tlh/dKLMU4pC3hM+h4A4S5KYEQM9rs+eN+X+6iVXTBROUQMccy3sJWiCu81WOXTtQ30I0YdL97Ii7Qq/QRYeXT1oa7iAkq4wlTJLPwyxFB3pIOLYLTf3LrM9ggVqTZ1V7NmCpcgkRqPqhVhRCTdZudlUQntHhjzqggZkAKN+DNQx+OUvQ9FGdsjuKurwu4VtZPG4S/njlvPNc1sof7FPsqrHz6PnBiH5a7OqFZC5ViGvx7s4P6BCgX53vLkq/NWwAGt3gbmDrdRbLmDxZouxcigXyQm9QSKbGTZNazqx2rAWZnj5szY5v3Z4ZyWfbVburpfkO8rxv5LIbr11kggjcqZlLm4KYT7ngco78MftHkCLGxmFyXMvLHRAx4MCJ0esgDpOySQn0l+mI8p2+Lz1VzZGb5ijPAocbYvW6RW07m7vug6zUY7Mdm6is1rBBjyUNk=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(39860400002)(376002)(346002)(366004)(451199015)(8676002)(86362001)(66899015)(66476007)(6636002)(66946007)(54906003)(110136005)(66556008)(36756003)(6512007)(26005)(186003)(53546011)(6506007)(6666004)(83380400001)(4326008)(316002)(6486002)(478600001)(2616005)(31686004)(7416002)(7406005)(5660300002)(8936002)(41300700001)(2906002)(31696002)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OElKOFQ4cjhBRnhhMGJ3UGtqUXNnN1BYaE5pSFBQcVBJeXpLbWJGeXVBWmRq?=
- =?utf-8?B?WjUrZDFBU2VkVXBiVGdUdUhiR2lxMUU0UFFPVVJCZlVzcnRMY3dEQkZvRVdl?=
- =?utf-8?B?OEhKbnJsaGtDQ0NMd3BiMW1XeTN0Rk1IOW9WaUpZQzRsb3pKaUg5Y3VUdzho?=
- =?utf-8?B?STJETFgzTnpUcTMxNzVLVXlaQU5QaDVmQzVJRnZNemlPY0xJUnd1STEzK1h0?=
- =?utf-8?B?b2cvV0R5TFJCbFBqdGRVVHZUOVZBWG04bkF5ZjYyUVQ3S1hwd0w4TTBqeWNH?=
- =?utf-8?B?d0sxZGlROVNFTUNFRUhqS2xBZ0VjaWJad04vU00rdnNZcFlGbnVVei95b3Ew?=
- =?utf-8?B?L2pEVkY0VEJUMk0yaXhJbWt1eUI1L2VmbmJ0dmEwVVpWM1NFOFBTb255OU9x?=
- =?utf-8?B?dndLNzF2TTUrbjdDZDZzQlFTSm8yUUdWL1grcmhxRnZQTVlxTHJJeDJiL0x4?=
- =?utf-8?B?ZXhnN20rWXVCcVRZOCt5bG43Z3pXWXhvVlJMQTEwL0tiNExWSkI3U1hzY2gy?=
- =?utf-8?B?cm53VGZxd2k4ZlZERjk2enJEZ3FDaGlCY1doUGJzbDV4V2s3L2xpaVE5aHJp?=
- =?utf-8?B?QXI4S2VjalBzNnFHMWtJYjZWRDZDMDJ1Qk9ZNmNBUVJMRW5wSFNUWFhMMTJp?=
- =?utf-8?B?ckpxMUs0TGZkbStwVjZPcVY3SHlmNEl4L2lreWJadnZIZ3plKy9ZeG0rUk56?=
- =?utf-8?B?STJjcStWZ2xOOWVrQS9VZFE5U0pPaWtMb3VmVUpVUXUwT3JQSEtEei9mRnlX?=
- =?utf-8?B?alhpakJGUzdSUnNKeXgyVGdqZnc4VHRrYUcwYVFuclRMRklic0VPY1RBcmJk?=
- =?utf-8?B?V241VDJYeWE5RjdSVUpSU2hDaDNab2wzNm5qK3hQNTBPQS9sR0RvWmpOTXFz?=
- =?utf-8?B?NlZUWktzRTY3cWRVV1N4YlZpbVJta0VJRnhiMTFObitYaFBXOXg0Q3Q5ZEZo?=
- =?utf-8?B?Y20wVlM1NUpOZ3Evd2hQTGFTOSs2Wk9GL0pSMkQ2M3RtNTJMY1BvVFVQSy9H?=
- =?utf-8?B?RVVmRjlVVHFDaGUzKzRTeTZDMmg4Nk9Jc0dpejR3aWdjUmtsaWJpbFN0RFls?=
- =?utf-8?B?SHlOTzRZRXlPNXRIQ0xnNUs0RHlZeU9ZbWlTOVRtc3M5V213MnJTTy9SenVu?=
- =?utf-8?B?VTZsV3F3Sm9IMWFQYXpzSFNJQWxCZFUwY2xtTUlrZFgyZEtXY2thUGxqQTB4?=
- =?utf-8?B?SUxjOFpXUy9nSDFNZHBITXJmVTIxczg4K2Y2M01TeThLdVlEWnVlR1cvRENG?=
- =?utf-8?B?Y205bEpKb2JObS9SRUlKVzdtdEN6M21qUGlJeXNRSGk5ZkJ5dGl3S3JVSUpZ?=
- =?utf-8?B?aDNSeVJ5aWxhVmtYRjgybVFKQS8wWWhlNG9VUG1zbUVGSEZPcVZTZkpaN1pq?=
- =?utf-8?B?aWZtQTZTSytmWE5EeDNtbCsxejNzK3EzVWRZQm1xYUZ3QjdJblhIaE9SZkI0?=
- =?utf-8?B?UXpVbmExalhZNlcycHNreEZLeTFZcWdjaXpDcVNpalJPOFBwTVlNWmxvL1Bv?=
- =?utf-8?B?Q1FFS3dodEVsSmpKQmpSc0JlMlg4a0VMdmRhM1Y5MVY3V2RrT1hGUjdLVVRt?=
- =?utf-8?B?UFU5cktyaFpQVXV4VFVnNnBuejR1WjRjdXVrTHJNVTUvd0hxNHozRUZTeDdH?=
- =?utf-8?B?Tk5IWS9jNGVXczRWd2lQK1JWTTdWc2t5TEJGRGd1b0Z6WkE2VGx5TEtDNlRL?=
- =?utf-8?B?M0Nwd3Bla0U2TGJRaWZNdlJzVzVCcVZLZVV2OFNyQXFkM3JKZEdEMTRkZFlC?=
- =?utf-8?B?aEswd29SMmlNclNROVdsaTYrd2lrNnhoM1lNbm5DTHNsOC82TVRSZ2pnWmZs?=
- =?utf-8?B?ZkIyTS9SNXA3K3NTamtQbzdHUFo4a2NHR0NtT0l4Mk4wV3lIR21pcGVnZm5K?=
- =?utf-8?B?eEo0NDd2V2Z2b0tFdEl0b0N2eE1MWHo1UktValVnSlF4dlphYTRrWWpLNVFG?=
- =?utf-8?B?aWYvaWF0MlloeWk0S2lQeTdCamhJMzRweEtLZ1U2OEZNSTN4aDNYN0FZdTJU?=
- =?utf-8?B?a0RHbzFzc1c1UHRlTVN0Ylo3RFVod2RKTE1QbHBzTjU4ZkFhazVra2trN3J6?=
- =?utf-8?B?UzVkdmlrMVV4aU1ScXcvTUFldWZCcXJ4T0VGSG1RZkticjdpNVh4RUp4OHcx?=
- =?utf-8?Q?bfT7ts9hhhzaVLVAZhgKWJF0e?=
+X-Microsoft-Antispam-Message-Info: ohU/IikmTK0xYflYOGDkkJp2gFHaNl5Y4AvWW1TuOnJrSH/PzMN2Pxlr8eDK5HTWpojOmRMXFnlhA1Z/c9QjrFASzVxcfR7GGAt/eE79XOTdAJ2bAW/dcgz0xRLzlN+sQiwgJCrK5DPpfM91Z2YnFJ0hBUzNzONm+JBeiAV6Y11Te2kUgtJ4go2KPGJ4rvIG7Bt+Io9VD37eOCPfOh4OHV2f9usSMzNY5wNFq1I5wizQS7/dFesdzNlfdLxVYzZuS7pXQgmhxSR593aP+HN/hrrhD3EvwuJ4jfzCm5sQVJ3g91z7NlUgBeXHrgjfOTb3Yd7dvPX1mQvMmRiH2QM3HdJKesADSeg7Mb6CTsfBLQ9vS6CXkEhupb/gCyRslSO+9JdMI2j81zrfymhuFz9lcjHvjrRZNdpFD+0/DE/8x4mXXdCpIkrIptHxKZWlb30aBbrguT5ynoSd6yILX5HVVrEP4YC2J5j8rI6pUN/W4yBZmbor31AyWMv0Q13jwM3zAGSNQAuZU1Sgy4K8ztD/Lm+etUJXXzmgMnldkIVt0X+t1ykiJSrM+5033wDxrdAAhWBjZ6L2FsgVv0YtkWTKkolJvr3pi0gvnf5iFS3qfUlwipXSVh4KHV6W4FvobF5LXZu3zQfw1qaqS5RR8SlKoex78Zg/XmEhJ+s3Gtb4NJD6XsBg2wvVoHYNI+cK+z7KgYBFkgPBWVmXaI6YWGOReb7fsLZI2bocLphNw8VbvvY8b3Y8OW/gUeLS2P72b1te+WLlh4enrRRUxFTKTlMjp8AAixkJckYRYDfyzU8/FilljvHmVZabJauH/PsYbyn7
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230022)(4636009)(39860400002)(136003)(396003)(346002)(376002)(451199015)(36840700001)(46966006)(40470700004)(36860700001)(36756003)(316002)(4326008)(86362001)(70206006)(8676002)(70586007)(6916009)(54906003)(16526019)(186003)(26005)(6666004)(40480700001)(83380400001)(7696005)(478600001)(966005)(356005)(336012)(81166007)(2616005)(1076003)(7416002)(5660300002)(44832011)(47076005)(40460700003)(8936002)(41300700001)(2906002)(82740400003)(426003)(82310400005)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 824888ea-864e-410c-2388-08dafd94109f
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2023 22:49:20.5948
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2023 22:57:11.3287
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Network-Message-Id: c703b377-f91a-4cdc-ce72-08dafd952973
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 16trR8wRbpYO2lBNyL7N/2/hJYZmU19tsI4K30JJ/NA3hR7LfMCO/qg+j8rXekIObSF0oWkO+eCJ7qCdlsrgHw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6943
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT114.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8413
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
@@ -140,106 +112,148 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-There was an early firmware issue on Genoa which supported only SNP_INIT 
-or SEV_INIT, but this issue is resolved now.
+The AMD Zen4 core supports a new feature called Automatic IBRS
+(Indirect Branch Restricted Speculation).
 
-Now, the main constraints are that SNP_INIT is always required before 
-SEV_INIT in case we want to launch SNP guests. In other words, if only 
-SEV_INIT is done on a platform which supports SNP we won't be able to 
-launch SNP guests after that.
+Enable Automatic IBRS by default if the CPU feature is present.
+It typically provides greater performance over the incumbent
+generic retpolines mitigation.
 
-So once we have RMP table setup (in BIOS) we will always do an SNP_INIT 
-and SEV_INIT will be ideally done only (on demand) when an SEV guest is 
-launched.
+Patch 1 [unchanged from v7] Adds support for the leaf that
+contains the AutoIBRS feature bit.
 
-Thanks,
-Ashish
+Patch 2 moves the leaf's open-coded code from __do_cpuid_func()
+to kvm_set_cpu_caps() in preparation for adding the features in
+their native leaf.
 
-On 1/5/2023 5:37 PM, Kalra, Ashish wrote:
-> Hello Jarkko,
-> 
-> On 12/31/2022 8:27 AM, Jarkko Sakkinen wrote:
->> On Wed, Dec 14, 2022 at 01:40:29PM -0600, Michael Roth wrote:
->>>   static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
->>>   {
->>>       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
->>> @@ -260,13 +279,23 @@ static int sev_guest_init(struct kvm *kvm, 
->>> struct kvm_sev_cmd *argp)
->>>           return ret;
->>>       sev->active = true;
->>> -    sev->es_active = argp->id == KVM_SEV_ES_INIT;
->>> +    sev->es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == 
->>> KVM_SEV_SNP_INIT);
->>> +    sev->snp_active = argp->id == KVM_SEV_SNP_INIT;
->>>       asid = sev_asid_new(sev);
->>>       if (asid < 0)
->>>           goto e_no_asid;
->>>       sev->asid = asid;
->>> -    ret = sev_platform_init(&argp->error);
->>> +    if (sev->snp_active) {
->>> +        ret = verify_snp_init_flags(kvm, argp);
->>> +        if (ret)
->>> +            goto e_free;
->>> +
->>> +        ret = sev_snp_init(&argp->error, false);
->>> +    } else {
->>> +        ret = sev_platform_init(&argp->error);
->>> +    }
->>
->> Couldn't sev_snp_init() and sev_platform_init() be called unconditionally
->> in order?
->>
->> Since there is a hardware constraint that SNP init needs to always happen
->> before platform init, shouldn't SNP init happen as part of
->> __sev_platform_init_locked() instead?
->>
-> 
-> On Genoa there is currently an issue that if we do an SNP_INIT before an 
-> SEV_INIT and then attempt to launch a SEV guest that may fail, so we 
-> need to keep SNP INIT and SEV INIT separate.
-> 
-> We need to provide a way to run (existing) SEV guests on a system that 
-> supports SNP without doing an SNP_INIT at all.
-> 
-> This is done using psp_init_on_probe parameter of the CCP module to 
-> avoid doing either SNP/SEV firmware initialization during module load 
-> and then defer the firmware initialization till someone launches a guest 
-> of one flavor or the other.
-> 
-> And then sev_guest_init() does either SNP or SEV firmware init depending 
-> on the type of the guest being launched.
-> 
->> I found these call sites for __sev_platform_init_locked(), none of which
->> follow the correct call order:
->>
->> * sev_guest_init()
-> 
-> As explained above, this call site is important for deferring the 
-> firmware initialization to an actual guest launch.
-> 
->> * sev_ioctl_do_pek_csr
->> * sev_ioctl_do_pdh_export()
->> * sev_ioctl_do_pek_import()
->> * sev_ioctl_do_pek_pdh_gen()
->> * sev_pci_init()
->>
->> For me it looks like a bit flakky API use to have sev_snp_init() as an 
->> API
->> call.
->>
->> I would suggest to make SNP init internal to the ccp driver and take care
->> of the correct orchestration over there.
->>
-> 
-> Due to Genoa issue, we may still need SNP init and SEV init to be 
-> invoked separately outside the CCP driver.
-> 
->> Also, how it currently works in this patch set, if the firmware did not
->> load correctly, SNP init halts the whole system. The version check needs
->> to be in all call paths.
->>
-> 
-> Yes, i agree with that.
-> 
-> Thanks,
-> Ashish
+Patches 3-6 introduce the new leaf's supported bits one by one.
+
+Patch 7 [unchanged from v7] Adds support for AutoIBRS by turning
+its EFER enablement bit on at startup if the feature is available.
+
+Patch 8 [unchanged from v7] Adds support for propagating AutoIBRS
+to the guest.
+
+v8: Address comments from Sean Christopherson, Boris:
+    - Move open-coded cpuid leaf 0x80000021 EAX bit propagation code
+      in a single step/patch to avoid CPUID bits getting cleared
+      by the open-coded ANDs coming after cpuid_entry_override().
+    - Includes changes Boris made when committing v7 to tip/x86-cpu, i.e.:
+      - Removing "AMD" prefix from feature comment text in cpufeatures.h
+      - Convert test in check_null_seg_clears_base() too.
+      - commit message changes
+
+v7: https://lore.kernel.org/lkml/20230116230159.1511393-1-kim.phillips@amd.com/
+    - Add Dave Hansen's Acked-by to unchanged patch 6/7
+    - Change patch 3/7 to not bother to set MSR DE_CFG[1]
+      if X86_FEATURE_LFENCE_RDTSC is already set [Boris]
+    - v6 went out with two 1/1's, try to not do that again
+
+v6: https://lore.kernel.org/lkml/20230110224643.452273-1-kim.phillips@amd.com/
+    Address v5 comment from Boris:
+    - Move CPUID leaf 0x8000021 EAX feature bits from scattered
+      to the new whole leaf since the majority of the features
+      will be used in the kernel and thus a separate leaf is
+       appropriate.
+
+v5: https://lore.kernel.org/lkml/20221205233235.622491-1-kim.phillips@amd.com/
+    Address v4 comments from Dave Hansen, Pawan Gupta, and Boris:
+    - Don't add new user-visible 'autoibrs' command line
+      options that have to be documented: reuse 'eibrs'
+    - Update Documentation/admin-guide/hw-vuln/spectre.rst
+    - Add NO_EIBRS_PBRSB to Hygon as well
+    - Re-word commit texts to not use words like 'us'
+
+v4: https://lore.kernel.org/lkml/20221201015003.295769-8-kim.phillips@amd.com/
+    Moved some kvm bits that had crept into patch 6/7 back into 7/7,
+    and addressed v3 comments:
+    - Don't put ", kvm" in titles of patches that don't touch kvm.  [SeanC]
+    - () after function names, i.e. kvm_set_cpu_caps().  [SeanC]
+    - follow the established kvm_cpu_cap_init_scattered() style [SeanC]
+    - Add using cpu_feature_enabled() instead of static_cpu_has() to
+      commit text [SeanC]
+    - Pawan Gupta mentioned that the ordering of enabling the Intel
+      feature bit past Intel EIBRS bug detection could be avoided
+      by setting NO_EIBRS_PBRSB to cpu_vuln_whitelist, so did that
+      which allowed regrouping all EIBRS related code to one place
+      in cpu_set_bug_bits().
+
+v3: https://lore.kernel.org/lkml/20221129235816.188737-1-kim.phillips@amd.com/
+    - Remove Co-developed-bys.  They require signed-off-bys,
+      so co-developers need to add them themselves.
+    - update check_null_seg_clears_base() [Boris]
+    - Made the feature bit additions separate patches
+      because v2 patch was clearly doing too many things at once.
+
+v2: https://lore.kernel.org/lkml/20221124000449.79014-1-kim.phillips@amd.com/
+    https://lkml.org/lkml/2022/11/23/1690
+    - Use synthetic/scattered bits instead of introducing new leaf [Boris]
+    - Combine the rest of the leaf's bits being used [Paolo]
+      Note: Bits not used by the host can be moved to kvm/cpuid.c if
+      maintainers do not want them in cpufeatures.h.
+    - Hoist bitsetting code to kvm_set_cpu_caps(), and use
+      cpuid_entry_override() in __do_cpuid_func() [Paolo]
+    - Reuse SPECTRE_V2_EIBRS spectre_v2_mitigation enum [Boris, PeterZ, D.Hansen]
+      - Change from Boris' diff:
+        Moved setting X86_FEATURE_IBRS_ENHANCED to after BUG_EIBRS_PBRSB
+        so PBRSB mitigations wouldn't be enabled.
+    - Allow for users to specify "autoibrs,lfence/retpoline" instead
+      of actively preventing the extra protections.  AutoIBRS doesn't
+      require the extra protection, but allow it anyway.
+
+v1: https://lore.kernel.org/lkml/20221104213651.141057-1-kim.phillips@amd.com/
+
+Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+Cc: Borislav Petkov (AMD) <bp@alien8.de>
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Joao Martins <joao.m.martins@oracle.com>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: David Woodhouse <dwmw@amazon.co.uk>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Juergen Gross <jgross@suse.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Tony Luck <tony.luck@intel.com>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Alexey Kardashevskiy <aik@amd.com>
+Cc: kvm@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: x86@kernel.org
+Cc: linux-kernel@vger.kernel.org
+
+Kim Phillips (8):
+  x86/cpu, kvm: Add support for CPUID_80000021_EAX
+  x86/cpu, kvm: Move open-coded cpuid leaf 0x80000021 EAX bit
+    propagation code
+  x86/cpu, kvm: Add the NO_NESTED_DATA_BP feature
+  x86/cpu, kvm: Move X86_FEATURE_LFENCE_RDTSC to its native leaf
+  x86/cpu, kvm: Add the Null Selector Clears Base feature
+  x86/cpu, kvm: Add the SMM_CTL MSR not present feature
+  x86/cpu: Support AMD Automatic IBRS
+  x86/cpu, kvm: Propagate the AMD Automatic IBRS feature to the guest
+
+ Documentation/admin-guide/hw-vuln/spectre.rst |  6 ++--
+ .../admin-guide/kernel-parameters.txt         |  6 ++--
+ arch/x86/include/asm/cpufeature.h             |  7 +++--
+ arch/x86/include/asm/cpufeatures.h            | 11 +++++--
+ arch/x86/include/asm/disabled-features.h      |  3 +-
+ arch/x86/include/asm/msr-index.h              |  2 ++
+ arch/x86/include/asm/required-features.h      |  3 +-
+ arch/x86/kernel/cpu/amd.c                     |  2 +-
+ arch/x86/kernel/cpu/bugs.c                    | 20 ++++++++-----
+ arch/x86/kernel/cpu/common.c                  | 26 +++++++++-------
+ arch/x86/kvm/cpuid.c                          | 30 +++++++------------
+ arch/x86/kvm/reverse_cpuid.h                  |  1 +
+ arch/x86/kvm/svm/svm.c                        |  3 ++
+ arch/x86/kvm/x86.c                            |  3 ++
+ 14 files changed, 72 insertions(+), 51 deletions(-)
+
+-- 
+2.34.1
+
