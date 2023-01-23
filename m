@@ -2,72 +2,78 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B2722678470
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 19:21:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 528A26784EE
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 19:31:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233136AbjAWSVt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 13:21:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59058 "EHLO
+        id S233092AbjAWSbe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 13:31:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233073AbjAWSVq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 13:21:46 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C07E83CA
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 10:20:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674498058;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=7W3OhQFxDq6zqpMtU8wiqsGIhCfIgwM85fzOwnjEcTA=;
-        b=a8b1A5ZgxGcPbf2WWqvSFaLcZsUwhqqPhU4txBRDSteoZwxZecGh66uyE39B1Uhu/mvSk6
-        pkiGxbUmgdLFu6KfKAeWPHwVquzYT60H1gBJUtpbIzhcasU/zCBlKRQcGc2Si3kMDnmU8K
-        BboZhy9+KpRNhtCCnYzLEN6nUf5OH+M=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-19-PUq-7AmYO76JzgmbAlcLcA-1; Mon, 23 Jan 2023 13:20:57 -0500
-X-MC-Unique: PUq-7AmYO76JzgmbAlcLcA-1
-Received: by mail-il1-f199.google.com with SMTP id s12-20020a056e021a0c00b0030efd0ed890so8765835ild.7
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 10:20:57 -0800 (PST)
+        with ESMTP id S233084AbjAWSbS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 13:31:18 -0500
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF3E635267
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 10:30:55 -0800 (PST)
+Received: by mail-vs1-xe36.google.com with SMTP id 3so13907934vsq.7
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 10:30:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=o+xUN6pqH4KWhpdAZZASKkpdwX1dWlxeGaeUlHQVMdw=;
+        b=cV8GzTY0zBLyK2FJXATgkWVu401po27fDFp43ID0uM14l9ibUSQYqtncVhKy3qVOxD
+         s4a4ta+I5XrPn6sRK/XvlAiIBk1UnMoLlbm1Hcun1gskbAstCGmVpaS2LwxxDH/NlA6+
+         wU24POhe4aFZItoW1jW22klyPRhUJRHHatgOqF14b+v9JQ+7n4civ14F+6+zRLIw4Wtc
+         SIf5i9igZXGzKSKOCD7kTW1TsuplIudF3/xsJR8iUhO6WtxTOUWKPQ80SE7gNEx1mVg0
+         xyOQbSX9G+r8JCXUfX/xZlmqyY132/qX1FiWcg/749IJPRES7iWwafVer1HtNtqunHed
+         j71Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=7W3OhQFxDq6zqpMtU8wiqsGIhCfIgwM85fzOwnjEcTA=;
-        b=yQagvwn6WEAohuPu+5bGVSzzJ6CR2fnLB5//FCKTL3MQgaa8Ace7ofUTMHbmItLukB
-         ayg/Yi1JgbdOQLLlhCXpvfICoUfYeOSqkhxtXeKVRZcd/MogXA9okJgzqWheYq4RNK4c
-         m+NJYc8yc+4MidsfhLMhBt9rwyD6upIxW0F9HauXtQlfZCuiJQZmQc1AJHYMJ8P1kkJL
-         JPf5W0jDCY7dUbm2yBV2kMM71WbTnKvHtPk8vLi07gRJ09kBkypUXJCivZaxODx/rK84
-         o2GjLvTrcqA1qfFkgFVzhFP002IsMIs/XOib0rDMWhzTUaaB7G/w0jTidydRtXPb6jQd
-         Affw==
-X-Gm-Message-State: AFqh2kreNS6tZXv0Pqops7RZ7aHREgJ5TVuPqGI+xiwFlWMBawCXphKK
-        VSkdwAHz8IOcxxbiUUGXpqehklPnKPxouOiDtolZ9JjnX05FtuzYYBU8cDG4/08pFIvbzUDEG72
-        WsjgspMwfAxVn
-X-Received: by 2002:a92:6a07:0:b0:30f:3b60:ba50 with SMTP id f7-20020a926a07000000b0030f3b60ba50mr11516177ilc.21.1674498056323;
-        Mon, 23 Jan 2023 10:20:56 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuwyMuZ5ByIWQvrteD+fManzk00K1f9tJ/vzFoFzckZNo/UdoxOTo54064l6efCtDaIISGBMg==
-X-Received: by 2002:a92:6a07:0:b0:30f:3b60:ba50 with SMTP id f7-20020a926a07000000b0030f3b60ba50mr11516162ilc.21.1674498056101;
-        Mon, 23 Jan 2023 10:20:56 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id z19-20020a05663822b300b003a2b9bcec56sm8573574jas.67.2023.01.23.10.20.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jan 2023 10:20:55 -0800 (PST)
-Date:   Mon, 23 Jan 2023 11:20:53 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: [GIT PULL] VFIO fixes for v6.2-rc6
-Message-ID: <20230123112053.173232a7.alex.williamson@redhat.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        bh=o+xUN6pqH4KWhpdAZZASKkpdwX1dWlxeGaeUlHQVMdw=;
+        b=IGQs6nPJ8i/6elFYT4iIRYSz90/kuRGPATbKs6gvtWxOwSNUdzHcyPKvaphNg+uuHg
+         wJEkFT8oTkoWvCaugYGnNbmqpcpu/GPzdoex/Cv1MrO1dlrcOTaz77BE7Kr7uwnHYhhb
+         6WCVnPB7Tl8SJptRXjRr6wqH6WFGn1QQc0oefkPPHkOB3e/IqJw2rqAMSGPQ06zUAYVB
+         AGMXJaM3c2lmtuLs99b7v2ZJ0A2KFbE2RQfjn3+bwebfKWLpysrZkgYcs+wQLzNTd8Sk
+         DFDB2dJv7j3WXFzJgIz+m+cVQyQ+vfYj/zKQsL+Jo5W+EangkC5Jy6o+RxuPJRKjQrH0
+         77Xw==
+X-Gm-Message-State: AFqh2koa0YFsjFS/yxDBvIvt7ZdjoEkJ9I/jPkBje5XRdljGTWCKshoS
+        eh8k+kDpwA7swX+gd2roxmxBu2OlIuaBXx3uDs6g5Q==
+X-Google-Smtp-Source: AMrXdXtjMcYu45J9vgTNdZq5yrE/41r93upqkvNOfUCN6J0aGWd7SJJHXhoxYAbIpLuPTUF4sz+iXqmJwilen2GuONg=
+X-Received: by 2002:a05:6102:4425:b0:3c8:c513:197 with SMTP id
+ df37-20020a056102442500b003c8c5130197mr3309786vsb.9.1674498641262; Mon, 23
+ Jan 2023 10:30:41 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+References: <20230121001542.2472357-1-ackerleytng@google.com>
+ <20230121001542.2472357-9-ackerleytng@google.com> <Y8sxjppvEnm4IBWG@google.com>
+In-Reply-To: <Y8sxjppvEnm4IBWG@google.com>
+From:   Erdem Aktas <erdemaktas@google.com>
+Date:   Mon, 23 Jan 2023 10:30:30 -0800
+Message-ID: <CAAYXXYy7=ZTCZ1LQ3_Sy39ju_xG5++dTrxi+DKGcbpJ5VJ3OuQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v3 08/31] KVM: selftests: Require GCC to realign
+ stacks on function entry
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Ackerley Tng <ackerleytng@google.com>,
+        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+        isaku.yamahata@intel.com, sagis@google.com, afranji@google.com,
+        runanwang@google.com, shuah@kernel.org, drjones@redhat.com,
+        maz@kernel.org, bgardon@google.com, jmattson@google.com,
+        dmatlack@google.com, peterx@redhat.com, oupton@google.com,
+        ricarkol@google.com, yang.zhong@intel.com, wei.w.wang@intel.com,
+        xiaoyao.li@intel.com, pgonda@google.com, marcorr@google.com,
+        eesposit@redhat.com, borntraeger@de.ibm.com, eric.auger@redhat.com,
+        wangyanan55@huawei.com, aaronlewis@google.com, vkuznets@redhat.com,
+        pshier@google.com, axelrasmussen@google.com,
+        zhenzhong.duan@intel.com, maciej.szmigiero@oracle.com,
+        like.xu@linux.intel.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -75,40 +81,54 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Linus,
+On Fri, Jan 20, 2023 at 4:28 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Sat, Jan 21, 2023, Ackerley Tng wrote:
+> > Some SSE instructions assume a 16-byte aligned stack, and GCC compiles
+> > assuming the stack is aligned:
+> > https://gcc.gnu.org/bugzilla/show_bug.cgi?id=40838. This combination
+> > results in a #GP in guests.
+> >
+> > Adding this compiler flag will generate an alternate prologue and
+> > epilogue to realign the runtime stack, which makes selftest code
+> > slower and bigger, but this is okay since we do not need selftest code
+> > to be extremely performant.
+>
+> Huh, I had completely forgotten that this is why SSE is problematic.  I ran into
+> this with the base UPM selftests and just disabled SSE.  /facepalm.
+>
+> We should figure out exactly what is causing a misaligned stack.  As you've noted,
+> the x86-64 ABI requires a 16-byte aligned RSP.  Unless I'm misreading vm_arch_vcpu_add(),
+> the starting stack should be page aligned, which means something is causing the
+> stack to become unaligned at runtime.  I'd rather hunt down that something than
+> paper over it by having the compiler force realignment.
 
-The following changes since commit b7bfaa761d760e72a969d116517eaa12e404c262:
+Is not it due to the 32bit execution part of the guest code at boot
+time. Any push/pop of 32bit registers might make it a 16-byte
+unaligned stack.
 
-  Linux 6.2-rc3 (2023-01-08 11:49:43 -0600)
-
-are available in the Git repository at:
-
-  https://github.com/awilliam/linux-vfio.git tags/vfio-v6.2-rc6
-
-for you to fetch changes up to 51cdc8bc120ef6e42f6fb758341f5d91bc955952:
-
-  kvm/vfio: Fix potential deadlock on vfio group_lock (2023-01-20 08:50:05 -0700)
-
-----------------------------------------------------------------
-VFIO fixes for v6.2-rc6
-
- - Honor reserved regions when testing for IOMMU find grained super
-   page support, avoiding a regression on s390 for a firmware device
-   where the existence of the mapping, even if unused can trigger
-   an error state. (Niklas Schnelle)
-
- - Fix a deadlock in releasing KVM references by using the alternate
-   .release() rather than .destroy() callback for the kvm-vfio device.
-   (Yi Liu)
-
-----------------------------------------------------------------
-Niklas Schnelle (1):
-      vfio/type1: Respect IOMMU reserved regions in vfio_test_domain_fgsp()
-
-Yi Liu (1):
-      kvm/vfio: Fix potential deadlock on vfio group_lock
-
- drivers/vfio/vfio_iommu_type1.c | 31 ++++++++++++++++++++-----------
- virt/kvm/vfio.c                 |  6 +++---
- 2 files changed, 23 insertions(+), 14 deletions(-)
-
+>
+> > Similar issue discussed at
+> > https://lore.kernel.org/all/CAGtprH9yKvuaF5yruh3BupQe4BxDGiBQk3ExtY2m39yP-tppsg@mail.gmail.com/
+> >
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+> > index 317927d9c55bd..5f9cc1e6ee67e 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -205,7 +205,7 @@ LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/x86/include
+> >  else
+> >  LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
+> >  endif
+> > -CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+> > +CFLAGS += -mstackrealign -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+> >       -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+> >       -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+> >       -I$(<D) -Iinclude/$(UNAME_M) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+> > --
+> > 2.39.0.246.g2a6d74b583-goog
+> >
