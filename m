@@ -2,43 +2,42 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5E8DA6788F6
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 21:59:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CB4296788EC
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 21:58:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232804AbjAWU67 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 15:58:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59246 "EHLO
+        id S232621AbjAWU6l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 15:58:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232710AbjAWU6r (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 15:58:47 -0500
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2D616315;
-        Mon, 23 Jan 2023 12:58:24 -0800 (PST)
+        with ESMTP id S232553AbjAWU6i (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 15:58:38 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FA403802B;
+        Mon, 23 Jan 2023 12:58:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Type:MIME-Version:References:
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
         Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
         Content-ID:Content-Description:In-Reply-To;
-        bh=LKrP1wtwDwtGfmqJdEblQavVdQZHYUX7Rw9EhYSY0po=; b=LthrIcTz/vqS1NeYOD0uryIINK
-        L5KA0bgSmcB9KMp+I7aQ5EwxmG5qOTNqwwDMaLS8PmkuBC4HSTBPEsoS2bdKiHPtGPN4OFBPidnr2
-        5zbVMyZP0Y8odEb60DwuQfxT2Eaq/NUfnc1krSs7fj+svrKOAiOd/c5YRTY+/4PYC1xoidVDbYSli
-        ORaftVjMZwg4jYvWLzMGWTGKhY1mBn3TA0jGQksHIcZZqt2zQz/rCGybV3JcBvrHQ6IxXmwVkth8l
-        d1NqgwluXNaHMVCrlyKf/lsJuQ5S//P74orZosbW8IQc/Q1n2PXtJaHc/YqKiZHWCmUT8RmH7O4/Q
-        FhSIaXXw==;
+        bh=bIfFAXl3Gv4EnKDtIDltBqYZ3txjVL6G+NhMkZyfGI4=; b=gnYqMu4PNJySVrCjnkQZIgqD33
+        wQXB/rRboPQU3LRLINoxnUhxHyuyRecqTgiKPD7HJmGt1ujJzhYLpFgeknPGh83xjZgsPFTRxusSP
+        6FrdKCC3GQlR3CMbnpwqtGVsjcmD/Ej0w7wbfIM3vLWi6cNVejzdRqOExLrFK1rAnGCpRPlxr5+Oc
+        wDq1C+RIa8zZ3MBxAWZBdlLHGxcQGyE/awpvRp1BLNR+dLrA+45FqNKyNNuglm+LzlsIk4VYNAJ/q
+        P97sHNR5ecVeHuLhJ2L/MEZt49xD/FKILOzWA0ABELctEl+d01ONaULWBfayuntvr+R+X1nyG1EMb
+        5ooM8zaA==;
 Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-        id 1pK3sA-001dtm-02;
-        Mon, 23 Jan 2023 20:57:07 +0000
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pK3se-004WTw-59; Mon, 23 Jan 2023 20:57:28 +0000
 Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (4096 bits))
         (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 6025C3002BF;
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 64BDE300747;
         Mon, 23 Jan 2023 21:57:24 +0100 (CET)
 Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id C4CC620754993; Mon, 23 Jan 2023 21:57:24 +0100 (CET)
-Message-ID: <20230123205515.001913664@infradead.org>
+        id C96002075A6F7; Mon, 23 Jan 2023 21:57:24 +0100 (CET)
+Message-ID: <20230123205515.059999893@infradead.org>
 User-Agent: quilt/0.66
-Date:   Mon, 23 Jan 2023 21:50:11 +0100
+Date:   Mon, 23 Jan 2023 21:50:12 +0100
 From:   Peter Zijlstra <peterz@infradead.org>
 To:     mingo@kernel.org
 Cc:     will@kernel.org, peterz@infradead.org, boqun.feng@gmail.com,
@@ -54,9 +53,8 @@ Cc:     will@kernel.org, peterz@infradead.org, boqun.feng@gmail.com,
         bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
         vschneid@redhat.com, linux-kernel@vger.kernel.org,
         kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-trace-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-        Uros Bizjak <ubizjak@gmail.com>
-Subject: [PATCH 2/6] x86/pvclock: improve atomic update of last_value in pvclock_clocksource_read
+        linux-trace-kernel@vger.kernel.org, linux-pm@vger.kernel.org
+Subject: [PATCH 3/6] ftrace/x86: Warn and ignore graph tracing when RCU is disabled
 References: <20230123205009.790550642@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -69,47 +67,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Uros Bizjak <ubizjak@gmail.com>
+All RCU disabled code should be noinstr and hence we should never get
+here -- when we do, WARN about it and make sure to not actually do
+tracing.
 
-Improve atomic update of last_value in pvclock_clocksource_read:
-
-- Atomic update can be skipped if the "last_value" is already
-  equal to "ret".
-
-- The detection of atomic update failure is not correct. The value,
-  returned by atomic64_cmpxchg should be compared to the old value
-  from the location to be updated. If these two are the same, then
-  atomic update succeeded and "last_value" location is updated to
-  "ret" in an atomic way. Otherwise, the atomic update failed and
-  it should be retried with the value from "last_value" - exactly
-  what atomic64_try_cmpxchg does in a correct and more optimal way.
-
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
 Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Link: https://lkml.kernel.org/r/20230118202330.3740-1-ubizjak@gmail.com
 ---
- arch/x86/kernel/pvclock.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+ arch/x86/kernel/ftrace.c |    3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/arch/x86/kernel/pvclock.c b/arch/x86/kernel/pvclock.c
-index eda37df016f0..5a2a517dd61b 100644
---- a/arch/x86/kernel/pvclock.c
-+++ b/arch/x86/kernel/pvclock.c
-@@ -102,10 +102,9 @@ u64 pvclock_clocksource_read(struct pvclock_vcpu_time_info *src)
- 	 */
- 	last = atomic64_read(&last_value);
- 	do {
--		if (ret < last)
-+		if (ret <= last)
- 			return last;
--		last = atomic64_cmpxchg(&last_value, last, ret);
--	} while (unlikely(last != ret));
-+	} while (!atomic64_try_cmpxchg(&last_value, &last, ret));
+--- a/arch/x86/kernel/ftrace.c
++++ b/arch/x86/kernel/ftrace.c
+@@ -646,6 +646,9 @@ void prepare_ftrace_return(unsigned long
+ 	if (unlikely(atomic_read(&current->tracing_graph_pause)))
+ 		return;
  
- 	return ret;
- }
--- 
-2.39.0
-
++	if (WARN_ONCE(!rcu_is_watching(), "RCU not on for: %pS\n", (void *)ip))
++		return;
++
+ 	bit = ftrace_test_recursion_trylock(ip, *parent);
+ 	if (bit < 0)
+ 		return;
 
 
