@@ -2,85 +2,71 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 16A6967855B
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 19:53:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 17C6E6785A6
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 20:00:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232065AbjAWSxk (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 13:53:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33716 "EHLO
+        id S231712AbjAWTAw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 14:00:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232449AbjAWSxg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 13:53:36 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47EE631E17
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 10:53:22 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id lp10so9109653pjb.4
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 10:53:22 -0800 (PST)
+        with ESMTP id S229849AbjAWTAv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 14:00:51 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F88C1716
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 11:00:50 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id z13so12385482plg.6
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 11:00:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XbeqNDwM7PguRoxu1uJ4BvBe4RnoeTrJq9+Dcu44bdY=;
-        b=oqZ8GYVYMPss17svQQtt4WX28PkyYNlkKpMlDYe/MKVnswV3wPPOpbEdTr+qFxuhtO
-         91xcY14FmY7BCWgQzRFp2gP9cgHuvS5xGGBJQ3kZ7u+mQBzqAe2ubnIpkIZiZIKziX2B
-         aBMZxyeXZLqWuXx0xcu88+eHyALbAYaBrcw13Vh2kBP0bL/Kzfe+GkJdettkc5hJaCap
-         zyrmf1Spj8As97ZiUqpnmnF+wattpXxCdaBgiitxbCQHlK/vQ7MG3v4FsYy1Dc/cX1YH
-         y7Vjz8RNUj0M0cMN44Ei8uzADy+gmLn/xw0d94cz/N+8bgix9Y6cFeJktiR4go+x5FMP
-         0AmA==
+        bh=YRKDiD8yk6UzOY/88nYqL2GqYUybU1/pZpM7K8+xke8=;
+        b=BWLbKerSlobHaylN1IKXrU1WcSHG764kfCeOLzcsg1JrGhTVW5jN+sI1fkkKM7mojG
+         AxGfLFjjhq1xGkIGei698W7dGqanVwYWteHjayHXPlAKQ837wFyq00gO7IHks2vYeD8G
+         kUfGCyU4Zz48ffCEbVyrHhfdRVN4KQD5yf6HUIsroGJKoEBpym1EC82xHt2xdeNQ759/
+         EB+jKXmW34F3panq1WaQKIBOZAXhvkoUPCPikdcv/yTm5Glp3ulSN5htfip6Xelku3NA
+         gRmtG6Iq6+YRT7NIMZSgpteD36qXfJWR5XP366VV2QcGllHX3YzizMCxBKbuleWnMyq1
+         a0qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XbeqNDwM7PguRoxu1uJ4BvBe4RnoeTrJq9+Dcu44bdY=;
-        b=SeEbDpcwmbPNYxQWgkIQpDa0MH3jKr+O4PLJbcqGEA9FTJY+KDn/xjxPBy7rLLM+1A
-         0P64olHUOnTRVo9DdYbaImCOAs61IKXJ5oxQmmL/eZKMBvXAES/dbSx2WI1Zu7tjycOI
-         9QReZj27HPSDmLRZvnU+uDLead4y5ZqmaOW5lPvgXcwu9w34V7qRJWCM+EMJjJxisYTj
-         xKwGrLWVDwZAE0o4x7uXuEcE0MZjCJfPNIIKW+DqYakAabBM+NpL48g8XLy7uiU5vbMY
-         9a0ldkzy6ZoYZFvwUEabc1JNNq0vRPzbQ/9npfKZzLtOSH09mQ3viuXI/1Dj/za9rRzO
-         YTMw==
-X-Gm-Message-State: AFqh2koYAdnAbogNeXEeYPd2mvTybpm/52ol5+u9Hv4PmdENPV8hqV9p
-        xLZsC5PUz5cbzDj8Ez4oFZJheA==
-X-Google-Smtp-Source: AMrXdXvMENwzNtkH6xTfJJGQ8EMJjEv4Ar7wzDxyyqftcYtq70Nxs3pSACwmfFb80I3zNA7Fk+aTgA==
-X-Received: by 2002:a05:6a20:be05:b0:b8:c859:7fc4 with SMTP id ge5-20020a056a20be0500b000b8c8597fc4mr625799pzb.1.1674500001550;
-        Mon, 23 Jan 2023 10:53:21 -0800 (PST)
+        bh=YRKDiD8yk6UzOY/88nYqL2GqYUybU1/pZpM7K8+xke8=;
+        b=d1b1WNs5r8sxzJQxR5p8lB8/0+cTX1LmIEvl2A1G5mf9QBC/9Q7cBiOTAdBC2jhEHE
+         9QUpe4JEjs8T0YCGUjznoWqxCoMzwl8O2pM7zj7DSfvTSixR9b6pH10SJgjr9yr5f9zf
+         eHeBGlMikoGNRLXAq3gEKzaXDvs6ElNTcsOLqhLQnjXYrjgSNs9WzSt4g3bxnExcO/be
+         n2V/DrIDZz5A2MT9EeT8kA0r0xGTG9LboMsIxX8N413R4rU6fFc+8gddIWNYIO/PNjTh
+         xOixOpRHYyX+eAGsLQpBs89Tt+9okuqqwJuohSx1jc59Xwhey6zMd3YjvUUlhcZTDaXx
+         sxpw==
+X-Gm-Message-State: AFqh2koKr9hPS8+kJ+3m6u5+fd+SO+D0GpW9xdZDkIbofBTy2+6aYLCV
+        96cRPP7Wg3BGOgy+s+xn1Qwd1Q==
+X-Google-Smtp-Source: AMrXdXvhUfv5zqb5mbH+a9tDvD1eSRTtUQzRMPQYkqu8PfAvK7dW2CVM3Kne9MLQXQUor+vIwdpUPA==
+X-Received: by 2002:a17:903:503:b0:189:b910:c6d2 with SMTP id jn3-20020a170903050300b00189b910c6d2mr626020plb.1.1674500449485;
+        Mon, 23 Jan 2023 11:00:49 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id ml21-20020a17090b361500b0022bb9f05753sm5732668pjb.48.2023.01.23.10.53.20
+        by smtp.gmail.com with ESMTPSA id jm13-20020a17090304cd00b001933b4b1a49sm34970plb.183.2023.01.23.11.00.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jan 2023 10:53:20 -0800 (PST)
-Date:   Mon, 23 Jan 2023 18:53:17 +0000
+        Mon, 23 Jan 2023 11:00:49 -0800 (PST)
+Date:   Mon, 23 Jan 2023 19:00:45 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Erdem Aktas <erdemaktas@google.com>,
-        Ackerley Tng <ackerleytng@google.com>,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        isaku.yamahata@intel.com, sagis@google.com, afranji@google.com,
-        runanwang@google.com, shuah@kernel.org, drjones@redhat.com,
-        maz@kernel.org, bgardon@google.com, jmattson@google.com,
-        dmatlack@google.com, peterx@redhat.com, oupton@google.com,
-        ricarkol@google.com, yang.zhong@intel.com, wei.w.wang@intel.com,
-        xiaoyao.li@intel.com, pgonda@google.com, marcorr@google.com,
-        eesposit@redhat.com, borntraeger@de.ibm.com, eric.auger@redhat.com,
-        wangyanan55@huawei.com, aaronlewis@google.com, vkuznets@redhat.com,
-        pshier@google.com, axelrasmussen@google.com,
-        zhenzhong.duan@intel.com, like.xu@linux.intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [RFC PATCH v3 08/31] KVM: selftests: Require GCC to realign
- stacks on function entry
-Message-ID: <Y87XnYZx1qzZOLKR@google.com>
-References: <20230121001542.2472357-1-ackerleytng@google.com>
- <20230121001542.2472357-9-ackerleytng@google.com>
- <Y8sxjppvEnm4IBWG@google.com>
- <CAAYXXYy7=ZTCZ1LQ3_Sy39ju_xG5++dTrxi+DKGcbpJ5VJ3OuQ@mail.gmail.com>
- <99a36eed-e4e5-60ec-0f88-a33d1842a0d6@maciej.szmigiero.name>
+To:     Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc:     Alexandru Matei <alexandru.matei@uipath.com>,
+        Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        Mihai Petrisor <mihai.petrisor@uipath.com>,
+        Viorel Canja <viorel.canja@uipath.com>
+Subject: Re: [PATCH v3] KVM: VMX: Fix crash due to uninitialized current_vmcs
+Message-ID: <Y87ZXRBfY9RThKHT@google.com>
+References: <20230123162929.9773-1-alexandru.matei@uipath.com>
+ <878rhtchjo.fsf@ovpn-194-126.brq.redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <99a36eed-e4e5-60ec-0f88-a33d1842a0d6@maciej.szmigiero.name>
+In-Reply-To: <878rhtchjo.fsf@ovpn-194-126.brq.redhat.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -88,36 +74,46 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 23, 2023, Maciej S. Szmigiero wrote:
-> On 23.01.2023 19:30, Erdem Aktas wrote:
-> > On Fri, Jan 20, 2023 at 4:28 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > 
-> > > On Sat, Jan 21, 2023, Ackerley Tng wrote:
-> > > > Some SSE instructions assume a 16-byte aligned stack, and GCC compiles
-> > > > assuming the stack is aligned:
-> > > > https://gcc.gnu.org/bugzilla/show_bug.cgi?id=40838. This combination
-> > > > results in a #GP in guests.
-> > > > 
-> > > > Adding this compiler flag will generate an alternate prologue and
-> > > > epilogue to realign the runtime stack, which makes selftest code
-> > > > slower and bigger, but this is okay since we do not need selftest code
-> > > > to be extremely performant.
-> > > 
-> > > Huh, I had completely forgotten that this is why SSE is problematic.  I ran into
-> > > this with the base UPM selftests and just disabled SSE.  /facepalm.
-> > > 
-> > > We should figure out exactly what is causing a misaligned stack.  As you've noted,
-> > > the x86-64 ABI requires a 16-byte aligned RSP.  Unless I'm misreading vm_arch_vcpu_add(),
-> > > the starting stack should be page aligned, which means something is causing the
-> > > stack to become unaligned at runtime.  I'd rather hunt down that something than
-> > > paper over it by having the compiler force realignment.
-> > 
-> > Is not it due to the 32bit execution part of the guest code at boot
-> > time. Any push/pop of 32bit registers might make it a 16-byte
-> > unaligned stack.
+On Mon, Jan 23, 2023, Vitaly Kuznetsov wrote:
+> Alexandru Matei <alexandru.matei@uipath.com> writes:
 > 
-> 32-bit stack needs to be 16-byte aligned, too (at function call boundaries) -
-> see [1] chapter 2.2.2 "The Stack Frame"
+> > KVM enables 'Enlightened VMCS' and 'Enlightened MSR Bitmap' when running as
+> > a nested hypervisor on top of Hyper-V. When MSR bitmap is updated,
+> > evmcs_touch_msr_bitmap function uses current_vmcs per-cpu variable to mark
+> > that the msr bitmap was changed.
 
-And this showing up in the non-TDX selftests rules that out as the sole problem;
-the selftests stuff 64-bit mode, i.e. don't have 32-bit boot code.
+...
+
+> > @@ -219,7 +223,7 @@ static inline u64 evmcs_read64(unsigned long field) { return 0; }
+> >  static inline u32 evmcs_read32(unsigned long field) { return 0; }
+> >  static inline u16 evmcs_read16(unsigned long field) { return 0; }
+> >  static inline void evmcs_load(u64 phys_addr) {}
+> > -static inline void evmcs_touch_msr_bitmap(void) {}
+> > +static inline void evmcs_touch_msr_bitmap(struct hv_enlightened_vmcs *evmcs) {}
+> >  #endif /* IS_ENABLED(CONFIG_HYPERV) */
+> >  
+> >  #define EVMPTR_INVALID (-1ULL)
+> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > index fe5615fd8295..1d482a80bca8 100644
+> > --- a/arch/x86/kvm/vmx/vmx.c
+> > +++ b/arch/x86/kvm/vmx/vmx.c
+> > @@ -3869,7 +3869,7 @@ static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
+> >  	 * bitmap has changed.
+> >  	 */
+> >  	if (static_branch_unlikely(&enable_evmcs))
+> > -		evmcs_touch_msr_bitmap();
+> > +		evmcs_touch_msr_bitmap((struct hv_enlightened_vmcs *)vmx->vmcs01.vmcs);
+> >  
+> >  	vmx->nested.force_msr_bitmap_recalc = true;
+> >  }
+> 
+> Just in case we decide to follow this path and not merge
+> evmcs_touch_msr_bitmap() into vmx_msr_bitmap_l01_changed():
+
+This is the only approach that I'm outright opposed to.  The evmcs_touch_msr_bitmap()
+stub is a lie in that it should never be reached with CONFIG_HYPERV=n, i.e. should
+really WARN.  Ditto for the WARN_ON_ONCE() in the actual helper; if vmx->vmcs01.vmcs
+is NULL then KVM is completely hosed.
+
+KVM already consumes hv_enlightenments_control.msr_bitmap in vmx.c and in nested.c,
+shoving this case into hyperv.h but leaving those in VMX proper is odd/kludgy.
