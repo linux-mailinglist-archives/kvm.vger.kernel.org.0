@@ -2,187 +2,163 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C9AD677F80
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 16:21:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 027CC677F85
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 16:21:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232713AbjAWPU7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 10:20:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49376 "EHLO
+        id S232529AbjAWPVL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 10:21:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232706AbjAWPUr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 10:20:47 -0500
-Received: from new2-smtp.messagingengine.com (new2-smtp.messagingengine.com [66.111.4.224])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4E11EFE5;
-        Mon, 23 Jan 2023 07:20:09 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 16807581DF8;
-        Mon, 23 Jan 2023 10:18:10 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Mon, 23 Jan 2023 10:18:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-transfer-encoding:content-type:date:date:from
-        :from:in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm1; t=1674487090; x=
-        1674494290; bh=5kISd+ukDqvXoyuUF5unW5X7Gt8EcZaBqFcmuVPXAbs=; b=N
-        Axston+PNN+fEVioeD1V/lezUKAdjHfU9WuPeXM7fHsZvGjnyyO2FVQ+2IoofTD3
-        jrYl4JgKxDGXYTYKPMymgiEMsC6peKta1bphKVU1+UBG482ZbUobglIP4uLXLjvh
-        iz8svKCfNXQ9/sb9i3m+ZwF5ZaddAN//4EqhB6TPnfp+I0l6pe5vuwRi/QBKI2DA
-        cqTe9fYYC3tH3u6FnXRVcaV+S9g7rlE4KqmpdJeD8mCh158fZwqoQlGQz8gdR2RT
-        TZ5v5u6AHEuv162fcDTraiqMcKEIhKISRcihlR2d/22rn6pKJO8WIigCLYMAcka4
-        KPN16U9YlPtzjLX8HdEjg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1674487090; x=
-        1674494290; bh=5kISd+ukDqvXoyuUF5unW5X7Gt8EcZaBqFcmuVPXAbs=; b=Z
-        3pTD1YXyo5r/MKhvY5k85GR656ULBrcYsZOWggTr2ZC9w1c1I7Z+bY6sDSWgAvWJ
-        pM9aBZtww7dRFxUv0HoqMx4JpXc19n0xHG4h7LLGQ/08CnSbx2/q5hLy1/xprtl9
-        qgZlahCrM5wO2hvkE4Tfk+OSCUq8ywtwPX2h8kxtc5LDqf8FTDbrxmiXwVaQVDxJ
-        xy3rZPsc21uBW4nhTe5K7Yh1Z/O1Dh7LFReqE6wP2gfn1gkC7JRM4oIl+QfDAPt2
-        WTHg5DxjkMM4wlaD4/wKzLCzEXARGfJLoC5MplhMLol16WrJvJqE5JOjumf6rDBs
-        A9ScnDZUD2WKfbk/pDqkw==
-X-ME-Sender: <xms:L6XOY4oW7cZ0KsMoQyyuZwGY6jxIFenT4PMiIaNSantfsE6uWTbs7Q>
-    <xme:L6XOY-qwYHDktIPazniKsn1AzUL4NopVlq5iIgFWK6yLtyjtue5J0HMAdGfxcfvIb
-    CUpYKUzjwhHy2gSVpo>
-X-ME-Received: <xmr:L6XOY9PnNbOfZeVRWc98vtlCAHFsQcqdhzKjr484mTEUBaeQgt7coobZR7I4Vk5VDQZ57g>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedruddukedgieegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttddunecuhfhrohhmpedfmfhi
-    rhhilhhlucetrdcuufhhuhhtvghmohhvfdcuoehkihhrihhllhesshhhuhhtvghmohhvrd
-    hnrghmvgeqnecuggftrfgrthhtvghrnhepvdfgjeffteevffetleefgfehjefffefftdeh
-    ffeljeevfffgffefueegfeeuuefgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepkhhirhhilhhlsehshhhuthgvmhhovhdrnhgrmhgv
-X-ME-Proxy: <xmx:L6XOY_6yorHsS7PDkOUT35AZUSKjesOd8aMtN7N5ktN03p3PIE_yAg>
-    <xmx:L6XOY34uglE0JUtYx3xfFAjCtULHppwxo-Xi9yXUcwt4A53OqeQTJg>
-    <xmx:L6XOY_ibQUsgnKvUQ-qOWqsyFDdeARW97L0u0i9DUtUP8-Pi_dwYWA>
-    <xmx:MqXOY6cPQD-FBOYGYtkZJfYS69Xrq4oiYU-q5LMz6mcdWQpO5Xl6rA>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 23 Jan 2023 10:18:06 -0500 (EST)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 45D7C10352A; Mon, 23 Jan 2023 18:18:03 +0300 (+03)
-Date:   Mon, 23 Jan 2023 18:18:03 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Vlastimil Babka <vbabka@suse.cz>
-Cc:     "Huang, Kai" <kai.huang@intel.com>,
-        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "Hocko, Michal" <mhocko@suse.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "ak@linux.intel.com" <ak@linux.intel.com>,
-        "Lutomirski, Andy" <luto@kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "tabba@google.com" <tabba@google.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
-        "corbet@lwn.net" <corbet@lwn.net>,
-        "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
-        "dhildenb@redhat.com" <dhildenb@redhat.com>,
-        "bfields@fieldses.org" <bfields@fieldses.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "x86@kernel.org" <x86@kernel.org>, "bp@alien8.de" <bp@alien8.de>,
-        "ddutile@redhat.com" <ddutile@redhat.com>,
-        "rppt@kernel.org" <rppt@kernel.org>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "mail@maciej.szmigiero.name" <mail@maciej.szmigiero.name>,
-        "naoya.horiguchi@nec.com" <naoya.horiguchi@nec.com>,
-        "qperret@google.com" <qperret@google.com>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
-        "yu.c.zhang@linux.intel.com" <yu.c.zhang@linux.intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "vannapurve@google.com" <vannapurve@google.com>,
-        "hughd@google.com" <hughd@google.com>,
-        "aarcange@redhat.com" <aarcange@redhat.com>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "hpa@zytor.com" <hpa@zytor.com>,
-        "Nakajima, Jun" <jun.nakajima@intel.com>,
-        "jlayton@kernel.org" <jlayton@kernel.org>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "Wang, Wei W" <wei.w.wang@intel.com>,
-        "steven.price@arm.com" <steven.price@arm.com>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "Hansen, Dave" <dave.hansen@intel.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "linmiaohe@huawei.com" <linmiaohe@huawei.com>
-Subject: Re: [PATCH v10 1/9] mm: Introduce memfd_restricted system call to
- create restricted user memory
-Message-ID: <20230123151803.lwbjug6fm45olmru@box>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <20221202061347.1070246-2-chao.p.peng@linux.intel.com>
- <5c6e2e516f19b0a030eae9bf073d555c57ca1f21.camel@intel.com>
- <20221219075313.GB1691829@chaop.bj.intel.com>
- <deba096c85e41c3a15d122f2159986a74b16770f.camel@intel.com>
- <20221220072228.GA1724933@chaop.bj.intel.com>
- <126046ce506df070d57e6fe5ab9c92cdaf4cf9b7.camel@intel.com>
- <20221221133905.GA1766136@chaop.bj.intel.com>
- <b898e28d7fd7182e5d069646f84b650c748d9ca2.camel@intel.com>
- <010a330c-a4d5-9c1a-3212-f9107d1c5f4e@suse.cz>
+        with ESMTP id S232683AbjAWPUv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 10:20:51 -0500
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2062.outbound.protection.outlook.com [40.107.223.62])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92CF22BEEF
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 07:20:11 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nTs+rUe5W9sapRqhhUwn2RWcQLcQWDi5lJFFuOZ3Dpkd43p6nlFofzmthuAV3a9zwdZf8ofO9CtP7EdlGUEu0xgGM6Qbp/7xytt+FYSkLs7ySb8xGtwjg2ILIqypZlmzfq7bDTk6sWEFtOm8zFLwl2XMam09XDoXZUmTXLhiFWC2QEIH9JBatVeSKXlXnCCCgC2zWLvTXVHFxLdPQjfyVVx+rkeVjue05DcxDg9o8O2I1PCQxVgHHbSRtZd7KsfzWhUin3bIsGoTWXgKX8u+W2ylM6pkXiSAEaTM3mr2wyDJT7Zk+uo7NF0Tdwkj9K+2I4v8YmbOq1hJGPHvEMu13A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RO8ESjJXS8m8AumboxDYedSBPjWvJtRkzwjGR2UsJxg=;
+ b=dxykWVjXPJd/kT+Uc0OEAWavrYfPxR8yDahnZyo2lbKFnOe/Y5+k6mqxi0roK2OJoAvxU+WN7NUEY/VezHyRrebmVl7t+H+3o9M/4Ul0KgfyW+XmLC3yS2lw26Mi0wth8YgL/A8M39g+Vm4ojZakAaIf028kpm6kHD5TGwKpp/ph/5vCaCtii/qgYJ1DHTpF5FEHuVW8KxE56siHrhhFKTRZ8eVrYWRyDnjw+mimHeK94jBfyyAXethfjYuWtv+uM/WNyoyk/TqPgOKFpjTS79P0PMGbzlxvy2P5Ys+DmyQ54JjQar60x61YsPtcZUO2/0dr4u9Q1WZYgD+C2v6q4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RO8ESjJXS8m8AumboxDYedSBPjWvJtRkzwjGR2UsJxg=;
+ b=UHNfjzCxr88D0feYBdXQzCYbgGY0/oriUMuZ3aKYGuOdC8Jop5bgHxapTotE1hFkqANL3a+uS8fs9Q/i1+ldu5TjGtMlXsbBhO502tfg+ft2zty8/gvxZdqK10YeAWui5IU6Jia2oWX08pNjyGhCtEWJHtW9BYxF8kikshgj807DIF70izlQuPTL//E1/eAuZhNS6Pj5nzdgvl5Hw7OyiD5kAb0nUMH4OD1KrPymEqKb8h42IiYT5C8L2lDVQjobkmW0a5byQ6XJaYMZ1DtmWctiPIxXEcEdMkz2WZYJeCWRXL6ZU7TM0lzB8d326/+tKOezR8Ox0W9moY7z1ZX3fg==
+Received: from DM6PR07CA0096.namprd07.prod.outlook.com (2603:10b6:5:337::29)
+ by MW6PR12MB7086.namprd12.prod.outlook.com (2603:10b6:303:238::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Mon, 23 Jan
+ 2023 15:19:27 +0000
+Received: from DS1PEPF0000E64F.namprd02.prod.outlook.com
+ (2603:10b6:5:337:cafe::ce) by DM6PR07CA0096.outlook.office365.com
+ (2603:10b6:5:337::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33 via Frontend
+ Transport; Mon, 23 Jan 2023 15:19:27 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ DS1PEPF0000E64F.mail.protection.outlook.com (10.167.18.5) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6043.10 via Frontend Transport; Mon, 23 Jan 2023 15:19:27 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 23 Jan
+ 2023 07:19:17 -0800
+Received: from [172.27.11.158] (10.126.231.37) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Mon, 23 Jan
+ 2023 07:19:13 -0800
+Message-ID: <0ac2c961-2592-0925-e3ed-acd3d3de9d4b@nvidia.com>
+Date:   Mon, 23 Jan 2023 17:19:11 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <010a330c-a4d5-9c1a-3212-f9107d1c5f4e@suse.cz>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH V1 vfio 0/6] Move to use cgroups for userspace persistent
+ allocations
+To:     Alex Williamson <alex.williamson@redhat.com>,
+        Jason Gunthorpe <jgg@nvidia.com>
+CC:     <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <diana.craciun@oss.nxp.com>, <eric.auger@redhat.com>,
+        <maorg@nvidia.com>, <cohuck@redhat.com>,
+        <shameerali.kolothum.thodi@huawei.com>
+References: <20230108154427.32609-1-yishaih@nvidia.com>
+ <20230117163811.591b4d6f.alex.williamson@redhat.com>
+ <Y8gM+9ptO2umgPQf@nvidia.com>
+ <20230118104044.2811ab35.alex.williamson@redhat.com>
+Content-Language: en-US
+From:   Yishai Hadas <yishaih@nvidia.com>
+In-Reply-To: <20230118104044.2811ab35.alex.williamson@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.126.231.37]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS1PEPF0000E64F:EE_|MW6PR12MB7086:EE_
+X-MS-Office365-Filtering-Correlation-Id: 96a561bb-2659-445c-ccf1-08dafd5537bc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dhr00EVlxo0mmX36amR1eNBRZunv5qVM5RAxLZeKBJbzAgKeQJJQKFWCDAUf0BVJLx99i/pc23deZhWpY/JQkAlEKK+BHdSgFIY9QD/YIe+/XqnTF6bwaMqpM3FIlGZrA0OxIm5/L0+PDipoyPKS4fy59JpHGChjVr4+2Cda035fduhnSY+zy3ECAd2xUb9WHaN0/AHeyTmwuC2G1bWAa7HV3Tmajw0Qf+9FxPiMWcsw4MXOSNb/LYwv0Mv1Km/U+NSBs1OmxfWhh+ybmUl/1juVDCAvejrrtMtyhLU5nBBVrA5uDHGHxnDCmtTjRMre5qhZc/n2pb/J68upw5GUnQWzLXzi0FHFcNUhM19X6Lv8kz8DKyCV1e/wH2rR6/txyvauyuJY8xGiZH5/ejikAlQl46niW5NV7uaYXwNryhSnycjQIzk62HPS2lWEVMMGA4oRwwUt/I1Ci4zxfJB2mYUL28CZNYIJ98Ioa9oZ9uQ33qw3PVvnVppwI0Q7JQ3CyX7G3h1Q7eK3tlNiJwrb9hrQQoNqkpbNyTmqXo8hVnpqo5hvgbj+8qsmiKyByagl2WykUI+qFiU9XK6FRbXNJRHACU/4q9haVzs1GzO4kg28hlJQjP0rd/sbvs1zMkgPngBY7lRlONWk71IPHu012X/eq9kqOnaVySesVCe2HkNioexhsFVTfNo4p+jdc1GVbS8oJJ8dXoq1LuSUYeORyUS3chJ6vZ6KXz7yds4i9Zs=
+X-Forefront-Antispam-Report: CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230022)(4636009)(396003)(376002)(136003)(39860400002)(346002)(451199015)(36840700001)(46966006)(40470700004)(36860700001)(83380400001)(31696002)(82740400003)(82310400005)(2906002)(86362001)(5660300002)(356005)(41300700001)(7636003)(8936002)(4326008)(40480700001)(40460700003)(8676002)(16526019)(186003)(53546011)(26005)(47076005)(426003)(16576012)(336012)(54906003)(316002)(70206006)(6636002)(2616005)(70586007)(110136005)(478600001)(31686004)(36756003)(43740500002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2023 15:19:27.4107
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 96a561bb-2659-445c-ccf1-08dafd5537bc
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF0000E64F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB7086
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 03:03:45PM +0100, Vlastimil Babka wrote:
-> On 12/22/22 01:37, Huang, Kai wrote:
-> >>> I argue that this page pinning (or page migration prevention) is not
-> >>> tied to where the page comes from, instead related to how the page will
-> >>> be used. Whether the page is restrictedmem backed or GUP() backed, once
-> >>> it's used by current version of TDX then the page pinning is needed. So
-> >>> such page migration prevention is really TDX thing, even not KVM generic
-> >>> thing (that's why I think we don't need change the existing logic of
-> >>> kvm_release_pfn_clean()). 
-> >>>
-> > This essentially boils down to who "owns" page migration handling, and sadly,
-> > page migration is kinda "owned" by the core-kernel, i.e. KVM cannot handle page
-> > migration by itself -- it's just a passive receiver.
-> > 
-> > For normal pages, page migration is totally done by the core-kernel (i.e. it
-> > unmaps page from VMA, allocates a new page, and uses migrate_pape() or a_ops-
-> >> migrate_page() to actually migrate the page).
-> > In the sense of TDX, conceptually it should be done in the same way. The more
-> > important thing is: yes KVM can use get_page() to prevent page migration, but
-> > when KVM wants to support it, KVM cannot just remove get_page(), as the core-
-> > kernel will still just do migrate_page() which won't work for TDX (given
-> > restricted_memfd doesn't have a_ops->migrate_page() implemented).
-> > 
-> > So I think the restricted_memfd filesystem should own page migration handling,
-> > (i.e. by implementing a_ops->migrate_page() to either just reject page migration
-> > or somehow support it).
-> 
-> While this thread seems to be settled on refcounts already, just wanted
-> to point out that it wouldn't be ideal to prevent migrations by
-> a_ops->migrate_page() rejecting them. It would mean cputime wasted (i.e.
-> by memory compaction) by isolating the pages for migration and then
-> releasing them after the callback rejects it (at least we wouldn't waste
-> time creating and undoing migration entries in the userspace page tables
-> as there's no mmap). Elevated refcount on the other hand is detected
-> very early in compaction so no isolation is attempted, so from that
-> aspect it's optimal.
+On 18/01/2023 19:40, Alex Williamson wrote:
+> On Wed, 18 Jan 2023 11:15:07 -0400
+> Jason Gunthorpe <jgg@nvidia.com> wrote:
+>
+>> On Tue, Jan 17, 2023 at 04:38:11PM -0700, Alex Williamson wrote:
+>>
+>>> The type1 IOMMU backend is notably absent here among the core files, any
+>>> reason?
+>> Mostly fear that charging alot of memory to the cgroup will become a
+>> compatibility problem. I'd be happier if we go along the iommufd path
+>> some more and get some field results from cgroup enablement before we
+>> think about tackling type 1.
+>>
+>> With this series in normal non-abusive cases this is probably only a
+>> few pages of ram so it shouldn't be a problem. mlx5 needs huge amounts
+>> of memory but it is new so anyone deploying a new mlx5 configuration
+>> can set their cgroup accordingly.
+>>
+>> If we fully do type 1 we are looking at alot of memory. eg a 1TB
+>> guest will charge 2GB just in IOPTE structures at 4k page size. Maybe
+>> that is enough to be a problem, I don't know.
+>>
+>>> Potentially this removes the dma_avail issue as a means to
+>>> prevent userspace from creating an arbitrarily large number of DMA
+>>> mappings, right?
+>> Yes, it is what iommufd did
+>>   
+>>> Are there any compatibility issues we should expect with this change to
+>>> accounting otherwise?
+>> Other than things might start hitting the limit, I don't think so?
+> Ok, seems like enough FUD to limit the scope for now.  We'll need to
+> monitor this for native and compat mode iommufd use.  I'll fix the
+> commit log typo, assuming there are no further comments.  Thanks,
+>
+> Alex
+>
+Alex,
 
-Hm. Do we need a new hook in a_ops to check if the page is migratable
-before going with longer path to migrate_page().
+Based on the above, can you please take it into your next branch ?
 
-Or maybe add AS_UNMOVABLE?
+I would like to send soon some small series in mlx5 driver which 
+improves some flows as part of pre_copy to reduce downtime as part of 
+stop_copy.
 
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+Some code there should be sent on top of current series.
+
+Thanks,
+Yishai
+
