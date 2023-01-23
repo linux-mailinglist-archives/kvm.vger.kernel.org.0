@@ -2,68 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 77BE2678688
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 20:38:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE5DB67868B
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 20:38:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232245AbjAWTiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 14:38:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43568 "EHLO
+        id S232562AbjAWTiO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 14:38:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232290AbjAWTiK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 14:38:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A4C127D72
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 11:37:24 -0800 (PST)
+        with ESMTP id S232285AbjAWTiM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 14:38:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175173250F
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 11:37:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674502643;
+        s=mimecast20190719; t=1674502646;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=U3waa7Vh+F3v4Sw9OdVRy/Ysk0VROOPMdvyuuB1wY94=;
-        b=Ffjy6Jy/rKQxf0p9iUNuMOCSDbrr8wNss+0jmOhzNgs05UaWGBGznCEZ9Ktx8bRmlcTaNY
-        IReP1GfjHQE/clVxBRMps7HrEvdpVM1BBL8C7eCPOl7GcYYOkdX3Y+moebWius5MgFnsIJ
-        Xypw6YzRPmz7swzdQmL+n5+UNhHUewQ=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0vWogAhmj1NvtjWCQKs+r5RRl21/4W7OFkx5SINebkk=;
+        b=htwvFvDHjbcaURmolX68XCVE0P5ePiM1/1TuyX2C7Xazj1WOf/3dVeEmvAB0daiJBYeBwA
+        qSUDWL9mBQu3ziCA/VRESlZoDqnN67Lm3lOpYIjK0H25FvhwHl5GHkinP04ob0a0U66/86
+        rTMVO+ptXrMGSuqTHU6b6s6eLF5Mdik=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-20-ZZyNklRLPk6kmmIOwoSEXQ-1; Mon, 23 Jan 2023 14:37:21 -0500
-X-MC-Unique: ZZyNklRLPk6kmmIOwoSEXQ-1
-Received: by mail-io1-f71.google.com with SMTP id y22-20020a5d94d6000000b007076e06ba3dso7630756ior.20
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 11:37:21 -0800 (PST)
+ us-mta-311-XvJqs4ySPke185ev51NPbQ-1; Mon, 23 Jan 2023 14:37:25 -0500
+X-MC-Unique: XvJqs4ySPke185ev51NPbQ-1
+Received: by mail-io1-f72.google.com with SMTP id u1-20020a5d8181000000b006ee29a8c421so7592060ion.19
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 11:37:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U3waa7Vh+F3v4Sw9OdVRy/Ysk0VROOPMdvyuuB1wY94=;
-        b=fj9I3utyjjGnzvyVjvW5UizssFq1hc9JYmKGgYrXnQoKUlYlvbA7k4/v1BaMyx9MSC
-         fJWxSxMQ/QOALts6uCMgGVL11oSVyD0rJGb9qJ6ouH38Yo5WBrRxMdRi0MHm+K0GpLjm
-         DX4iDqwQ6HgnFvUzZNiYrxT9wd0AQOFo0S94/BjrqjDbvNKtNYyYU9EjEx5oma8mdFX5
-         VqZaJQc1N/dB3WYIzGWgsJHRkwtrLVsKE3bxxpiygb0u4DaOR0/FIALst7wdjq7tT1bv
-         aTtpWFgCEgXYgJZQITrdYC6Kw/pMYs/GMfm6/Ne4btRsJ9vpDIfwKkDJmyZs+aHQDbQL
-         dc1w==
-X-Gm-Message-State: AFqh2kosrQu+A2p3Y5+cfd/pmxCWXFmZLwhvu9QUJU66t2IN6QgsSm9+
-        7z9INUXXpSBiZ+B5FFEVA1gPpoAZDeMbGQFspf7pYK8fRZMo3RsXI3mXpwEL7fBc4kBgB+Q3wfi
-        eMW5Q8TRspcZN
-X-Received: by 2002:a6b:e812:0:b0:704:c53c:87e1 with SMTP id f18-20020a6be812000000b00704c53c87e1mr19626890ioh.19.1674502641188;
-        Mon, 23 Jan 2023 11:37:21 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvlHPcLruMSlZ46j7dIYhdYjmfLX++yyUXL53K95uB7smD1R7fbFefFew3pItw9QDm9fSngrA==
-X-Received: by 2002:a6b:e812:0:b0:704:c53c:87e1 with SMTP id f18-20020a6be812000000b00704c53c87e1mr19626884ioh.19.1674502640945;
-        Mon, 23 Jan 2023 11:37:20 -0800 (PST)
+        bh=0vWogAhmj1NvtjWCQKs+r5RRl21/4W7OFkx5SINebkk=;
+        b=ZfIuVTQ25/XbLIhKkW3aKbr1u4Tt/GUsxLTenziq9XNtgDB3GDRkmoMNzbiMFQW/4M
+         k+RlNACigtlZSo4Lf7Jod1ewo1a0CR+hfAPPZt4aqbWxXpS1fO1Iqio4f+DdPIGvxscL
+         dq4zlMKk6m72+vnU5xrTWU9C94Vj8adhLtzE7e6VClqsa1ag1GCyPhlqLAQ0cFyNvDkU
+         owvr+rIQuFEMB6z0WX/w6ipakpl45aD6EdOEqIZ1tVLdTlsD3wX2lmuySSN/qo+F7PJd
+         0z0ZaN/4CDj1w3UP5bWzd46FKLrshkkpyHUFkySZwN2mqaFufaoFPAbWEmtLyCNt1cKj
+         R04Q==
+X-Gm-Message-State: AFqh2krXfbfCTOHSE3b/qCVIKiV8Uij9B+mbfeU5yb3qEnGeRA2zFobk
+        uYFyM1r97u2/1s9TBbx/+wkYxqVLCgdFPFnlHut8iREWw0NnePfL2DK0iwpF0RqY8HI674aQ+eI
+        IGChk3yCouY/z
+X-Received: by 2002:a6b:8ed5:0:b0:6dd:83b1:199b with SMTP id q204-20020a6b8ed5000000b006dd83b1199bmr18182832iod.16.1674502644418;
+        Mon, 23 Jan 2023 11:37:24 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXtu6Ly17bULQyFSGVLnyQUqC5oEfEglCgbjJ55TyAbA0Veuv1+y+vbu15OeDiLpyx1J/bGIWA==
+X-Received: by 2002:a6b:8ed5:0:b0:6dd:83b1:199b with SMTP id q204-20020a6b8ed5000000b006dd83b1199bmr18182821iod.16.1674502644208;
+        Mon, 23 Jan 2023 11:37:24 -0800 (PST)
 Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id v26-20020a056602059a00b00704c3128817sm7121378iox.43.2023.01.23.11.37.20
+        by smtp.gmail.com with ESMTPSA id v26-20020a056602059a00b00704c3128817sm7121378iox.43.2023.01.23.11.37.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jan 2023 11:37:20 -0800 (PST)
-Date:   Mon, 23 Jan 2023 12:36:58 -0700
+        Mon, 23 Jan 2023 11:37:23 -0800 (PST)
+Date:   Mon, 23 Jan 2023 12:37:03 -0700
 From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Angus Chen <angus.chen@jaguarmicro.com>
-Cc:     eric.auger@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vfio: platform: No need to check res again
-Message-ID: <20230123123658.2748e6fc.alex.williamson@redhat.com>
-In-Reply-To: <20230107034721.2127-1-angus.chen@jaguarmicro.com>
-References: <20230107034721.2127-1-angus.chen@jaguarmicro.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Kirti Wankhede <kwankhede@nvidia.com>,
+        Tony Krowiak <akrowiak@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        Jason Herne <jjherne@linux.ibm.com>,
+        Zhenyu Wang <zhenyuw@linux.intel.com>,
+        Zhi Wang <zhi.a.wang@intel.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, intel-gfx@lists.freedesktop.org
+Subject: Re: misc mdev tidyups
+Message-ID: <20230123123703.35074b2b.alex.williamson@redhat.com>
+In-Reply-To: <20230110091009.474427-1-hch@lst.de>
+References: <20230110091009.474427-1-hch@lst.de>
 X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -78,34 +83,25 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat,  7 Jan 2023 11:47:20 +0800
-Angus Chen <angus.chen@jaguarmicro.com> wrote:
+On Tue, 10 Jan 2023 10:10:05 +0100
+Christoph Hellwig <hch@lst.de> wrote:
 
-> In function vfio_platform_regions_init(),we did check res implied
-> by using while loop,
-> so no need to check whether res be null or not again.
+> Hi all,
 > 
-> No functional change intended.
+> this series tidies up the mdev Kconfig interaction and documentation a bit.
 > 
-> Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
-> ---
->  drivers/vfio/platform/vfio_platform_common.c | 3 ---
->  1 file changed, 3 deletions(-)
+> Diffstat:
+>  Documentation/driver-api/vfio-mediated-device.rst |  108 ----------------------
+>  Documentation/s390/vfio-ap.rst                    |    1 
+>  arch/s390/Kconfig                                 |    6 -
+>  arch/s390/configs/debug_defconfig                 |    1 
+>  arch/s390/configs/defconfig                       |    1 
+>  drivers/gpu/drm/i915/Kconfig                      |    2 
+>  drivers/vfio/mdev/Kconfig                         |    8 -
+>  samples/Kconfig                                   |   16 +--
+>  samples/vfio-mdev/README.rst                      |  100 ++++++++++++++++++++
+>  9 files changed, 115 insertions(+), 128 deletions(-)
 > 
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index 1a0a238ffa35..a9ad3f4d2613 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -150,9 +150,6 @@ static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
->  		struct resource *res =
->  			vdev->get_resource(vdev, i);
->  
-> -		if (!res)
-> -			goto err;
-> -
->  		vdev->regions[i].addr = res->start;
->  		vdev->regions[i].size = resource_size(res);
->  		vdev->regions[i].flags = 0;
 
 Applied to vfio next branch for v6.3.  Thanks,
 
