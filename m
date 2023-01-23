@@ -2,142 +2,148 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 35FEF678A59
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 23:09:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 96253678A84
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 23:13:44 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232694AbjAWWI7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 17:08:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54394 "EHLO
+        id S233178AbjAWWNk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 17:13:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232151AbjAWWI4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 17:08:56 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8441D3526C;
-        Mon, 23 Jan 2023 14:08:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S233168AbjAWWNK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 17:13:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE3639BB8
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 14:11:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674511897;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lvUmurC9HOodDs2LaRkp+R+qT18zMiP3C2WK1UkBQdM=;
+        b=XXe8DYVs7/1Sh4W2edsUyjL3wZKD0ggi0KGNB+4xQZjlE3fpNzj5CJ2jiDNxZ6PchDhzrV
+        UvSncr/QQL4CkW3mkh8OSXR+C9p5JilUWmvSff5K35rwyDzqvjX6KB46O8OPEgbdjoMVmt
+        ihiv7+CL2a+izEC/19DSniT5OfvyUgo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-452--3poGQaqMM66JfqihUnbzw-1; Mon, 23 Jan 2023 17:11:33 -0500
+X-MC-Unique: -3poGQaqMM66JfqihUnbzw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 254C2B80EAB;
-        Mon, 23 Jan 2023 22:08:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CA9BC433D2;
-        Mon, 23 Jan 2023 22:07:55 +0000 (UTC)
-Date:   Mon, 23 Jan 2023 17:07:53 -0500
-From:   Steven Rostedt <rostedt@goodmis.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     mingo@kernel.org, will@kernel.org, boqun.feng@gmail.com,
-        mark.rutland@arm.com, tglx@linutronix.de, bp@alien8.de,
-        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
-        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
-        srivatsa@csail.mit.edu, amakhalov@vmware.com,
-        pv-drivers@vmware.com, mhiramat@kernel.org, wanpengli@tencent.com,
-        vkuznets@redhat.com, boris.ostrovsky@oracle.com, rafael@kernel.org,
-        daniel.lezcano@linaro.org, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
-        vschneid@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-trace-kernel@vger.kernel.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH 3/6] ftrace/x86: Warn and ignore graph tracing when RCU
- is disabled
-Message-ID: <20230123170753.7ac9419e@gandalf.local.home>
-In-Reply-To: <20230123165304.370121e7@gandalf.local.home>
-References: <20230123205009.790550642@infradead.org>
-        <20230123205515.059999893@infradead.org>
-        <20230123165304.370121e7@gandalf.local.home>
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8DF1F3C22745;
+        Mon, 23 Jan 2023 22:11:32 +0000 (UTC)
+Received: from localhost (unknown [10.39.193.206])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F2C8F492C3C;
+        Mon, 23 Jan 2023 22:11:31 +0000 (UTC)
+Date:   Mon, 23 Jan 2023 17:11:30 -0500
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst@redhat.com, pbonzini@redhat.com, bcodding@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Al Viro <viro@zeniv.linux.org.uk>,
+        Nicholas Bellinger <nab@linux-iscsi.org>
+Subject: Re: [PATCH V2] vhost-scsi: unbreak any layout for response
+Message-ID: <Y88GEm63Tsg1AAu4@fedora>
+References: <20230119073647.76467-1-jasowang@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-6.7 required=5.0 tests=BAYES_00,
-        HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_HI,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="vqhw79aaCtf0o+Pf"
+Content-Disposition: inline
+In-Reply-To: <20230119073647.76467-1-jasowang@redhat.com>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, 23 Jan 2023 16:53:04 -0500
-Steven Rostedt <rostedt@goodmis.org> wrote:
 
-> On Mon, 23 Jan 2023 21:50:12 +0100
-> Peter Zijlstra <peterz@infradead.org> wrote:
-> 
-> > All RCU disabled code should be noinstr and hence we should never get
-> > here -- when we do, WARN about it and make sure to not actually do
-> > tracing.
-> > 
-> > Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-> > ---
-> >  arch/x86/kernel/ftrace.c |    3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > --- a/arch/x86/kernel/ftrace.c
-> > +++ b/arch/x86/kernel/ftrace.c
-> > @@ -646,6 +646,9 @@ void prepare_ftrace_return(unsigned long
-> >  	if (unlikely(atomic_read(&current->tracing_graph_pause)))
-> >  		return;
-> >  
-> > +	if (WARN_ONCE(!rcu_is_watching(), "RCU not on for: %pS\n", (void *)ip))
-> > +		return;
-> > +  
-> 
-> Please add this to after recursion trylock below. Although WARN_ONCE()
-> should not not have recursion issues, as function tracing can do weird
-> things, I rather be safe than sorry, and not have the system triple boot
-> due to some path that might get added in the future.
-> 
-> If rcu_is_watching() is false, it will still get by the below recursion
-> check and warn. That is, the below check should be done before this
-> function calls any other function.
-> 
-> >  	bit = ftrace_test_recursion_trylock(ip, *parent);
-> >  	if (bit < 0)
-> >  		return;
-> >   
-> 
+--vqhw79aaCtf0o+Pf
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Actually, perhaps we can just add this, and all you need to do is create
-and set CONFIG_NO_RCU_TRACING (or some other name).
+On Thu, Jan 19, 2023 at 03:36:47PM +0800, Jason Wang wrote:
+> Al Viro said:
+>=20
+> """
+> Since "vhost/scsi: fix reuse of &vq->iov[out] in response"
+> we have this:
+>                 cmd->tvc_resp_iov =3D vq->iov[vc.out];
+>                 cmd->tvc_in_iovs =3D vc.in;
+> combined with
+>                 iov_iter_init(&iov_iter, ITER_DEST, &cmd->tvc_resp_iov,
+>                               cmd->tvc_in_iovs, sizeof(v_rsp));
+> in vhost_scsi_complete_cmd_work().  We used to have ->tvc_resp_iov
+> _pointing_ to vq->iov[vc.out]; back then iov_iter_init() asked to
+> set an iovec-backed iov_iter over the tail of vq->iov[], with
+> length being the amount of iovecs in the tail.
+>=20
+> Now we have a copy of one element of that array.  Fortunately, the members
+> following it in the containing structure are two non-NULL kernel pointers,
+> so copy_to_iter() will not copy anything beyond the first iovec - kernel
+> pointer is not (on the majority of architectures) going to be accepted by
+> access_ok() in copyout() and it won't be skipped since the "length" (in
+> reality - another non-NULL kernel pointer) won't be zero.
+>=20
+> So it's not going to give a guest-to-qemu escalation, but it's definitely
+> a bug.  Frankly, my preference would be to verify that the very first iov=
+ec
+> is long enough to hold rsp_size.  Due to the above, any users that try to
+> give us vq->iov[vc.out].iov_len < sizeof(struct virtio_scsi_cmd_resp)
+> would currently get a failure in vhost_scsi_complete_cmd_work()
+> anyway.
+> """
+>=20
+> However, the spec doesn't say anything about the legacy descriptor
+> layout for the respone. So this patch tries to not assume the response
+> to reside in a single separate descriptor which is what commit
+> 79c14141a487 ("vhost/scsi: Convert completion path to use") tries to
+> achieve towards to ANY_LAYOUT.
+>=20
+> This is done by allocating and using dedicate resp iov in the
+> command. To be safety, start with UIO_MAXIOV to be consistent with the
+> limitation that we advertise to the vhost_get_vq_desc().
+>=20
+> Testing with the hacked virtio-scsi driver that use 1 descriptor for 1
+> byte in the response.
+>=20
+> Reported-by: Al Viro <viro@zeniv.linux.org.uk>
+> Cc: Benjamin Coddington <bcodding@redhat.com>
+> Cc: Nicholas Bellinger <nab@linux-iscsi.org>
+> Fixes: a77ec83a5789 ("vhost/scsi: fix reuse of &vq->iov[out] in response")
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+> Changes since V1:
+> - tweak the changelog
+> - fix the allocation size for tvc_resp_iov (should be sizeof(struct iovec=
+))
+> ---
+>  drivers/vhost/scsi.c | 21 +++++++++++++++++----
+>  1 file changed, 17 insertions(+), 4 deletions(-)
 
-This should cover all ftrace locations. (Uncompiled).
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
--- Steve
+--vqhw79aaCtf0o+Pf
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/include/linux/trace_recursion.h b/include/linux/trace_recursion.h
-index c303f7a114e9..10ee3fbb9113 100644
---- a/include/linux/trace_recursion.h
-+++ b/include/linux/trace_recursion.h
-@@ -135,6 +135,22 @@ extern void ftrace_record_recursion(unsigned long ip, unsigned long parent_ip);
- # define do_ftrace_record_recursion(ip, pip)	do { } while (0)
- #endif
- 
-+#ifdef CONFIG_NO_RCU_TRACING
-+# define trace_warn_on_no_rcu(ip)					\
-+	({								\
-+		bool __ret = false;					\
-+		if (!trace_recursion_test(TRACE_RECORD_RECURSION_BIT)) { \
-+			trace_recursion_set(TRACE_RECORD_RECURSION_BIT); \
-+			__ret = WARN_ONCE(!rcu_is_watching(),		\
-+					  "RCU not on for: %pS\n", (void *)ip); \
-+			trace_recursion_clear(TRACE_RECORD_RECURSION_BIT); \
-+		}							\
-+		__ret;							\
-+	})
-+#else
-+# define trace_warn_on_no_rcu(ip)	false
-+#endif
-+
- /*
-  * Preemption is promised to be disabled when return bit >= 0.
-  */
-@@ -144,6 +160,9 @@ static __always_inline int trace_test_and_set_recursion(unsigned long ip, unsign
- 	unsigned int val = READ_ONCE(current->trace_recursion);
- 	int bit;
- 
-+	if (trace_warn_on_no_rcu(ip))
-+		return -1;
-+
- 	bit = trace_get_context_bit() + start;
- 	if (unlikely(val & (1 << bit))) {
- 		/*
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmPPBhIACgkQnKSrs4Gr
+c8h2CQgAjfogTnTq3fYLEVF3lup+f3//rNwFv+dD9Nj1SS3Hb+2tSXDvQWYcimF0
+Rk2sqHjeU50pU/ne5Scqe1SadPjqZb+iigRq/M0aRUuE3fa4os5tBRRLXbLNzu+v
+iyxXAskl3d9DwbOE13uocY4ldeRqAutyvVrvezMxwyGA2C19yWtmCjsu4FHrA6Wo
+WsM4Xu7WtIiqkxeR5TpkEhQokoMaVU+7w80WR1OsUhT3u40sfSwoN6Ue4kknBBHe
+JC3z804whf97+HwQ062bfKNZGLYpx8xjid9HqseL8u/n4DLsZTl6XN75f4878FbK
+npQ3QkEwdpabVVUxLsYfNsvXyuTwNg==
+=1Jmd
+-----END PGP SIGNATURE-----
+
+--vqhw79aaCtf0o+Pf--
+
