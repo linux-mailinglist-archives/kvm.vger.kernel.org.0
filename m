@@ -2,226 +2,244 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 939AA678A91
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 23:14:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7937C678B06
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 23:49:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233066AbjAWWOh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 17:14:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58638 "EHLO
+        id S233349AbjAWWta (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 17:49:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233045AbjAWWOI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 17:14:08 -0500
-Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2104.outbound.protection.outlook.com [40.107.247.104])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58FDA3A5A3
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 14:13:43 -0800 (PST)
+        with ESMTP id S231681AbjAWWt3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 17:49:29 -0500
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2041.outbound.protection.outlook.com [40.107.243.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1476E193E8;
+        Mon, 23 Jan 2023 14:49:28 -0800 (PST)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FQHd0jHXE7ucdGsQ6DHbK5Y+JRUK1UuESqk3RNzEAje9nBYogF99f+F0ZDtTOXUsMtLKND3WYEOd3/wWs7q4N21TQj7wCjS0OA3/Pnj9Ky8ykUEHLx/G8r2xdUHRmkHCHgpH7ZRAz78hAPm+O24ArOfWgu0sFLGbiOYEkNSCewxvpi9moK96goL1M/LzvNH/WTLpWeXE0MqJcUMyyCwOnYtO+T36C6sskV86h2nagjycOds9RHFqDile2swGwTzPzN4lS602vPUAQPPR4og/PX+/Q6gnt2NUHFlHP/6XIMa0q43WgndILVQECjXzkesJUJv+EeHuKeHHTM1jx5vOuQ==
+ b=AsyYA0qkuBKrWRoStCWiWkMwBEjmJ6VaAaTYJ5T2VDNjY3ml2C1sygyy64oJRg0D0ECKLy3y6G4QrW8LGf7gpvtQ/LNK2a9w12BsqjqRkg46kzD9my/u4rfYct++lm3Mv4ppNpIw7bo15TnsfGkWOjPsLLPigYnGZwtVGTd2dBGOw7mszdh+iE0Pxi4SnSIPZjsk7Z90fK5cnbsnG0IGIt/R3hooQ5GYbZ6W17Te6FlptnqQ2WsSHBLUwYIKqfeU8HRve/iJ5qQCtNARgZ7gH9OHKymVD92grCaVEQ2c6aLARqxxjgYraS2GerVzV+9Km3jrlVLw7q4yRzlAZbDyxg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VNRiFUosl6nGC060NdETbBXQzI5avogNFPe48Ox9k7w=;
- b=F1PsV0LTuI2PqcWfdFQoH9Tvzp/l+vWHSrw4GpEj08P6eMdlgIiW7eIsvDulr5hX25QynJXqZzavKYm7GwoNpnjP9Bn/b73MTtkQzMHVYskvq0a2hzdF5GNvA99s0+NOQuLXQCAJI3PVwAwjgmCzTFxI+9RsduGvuR21vs5hHkBP+vAV6x6ApvWJ18WsYktdwKoN61KiOtJtS7TITu/xxImeW1wk7Jo47VhB9dN60ww/J3Koz7nsuBLxlVXDAF7RJsgsfjC7zZo1l1ahLD1CkXvgKWmIcwQFRR2eahjUN6EyV5INpb3n03q+AcNwSlWf1J03Ma0lh+yI5x/DgU7r9g==
+ bh=YpyDt1YTMkFBixMPMa8HQGXG8xXP70L1q6T6SvYosZE=;
+ b=kbLGfy6kbeuh4MOnMnG1SKOojyA477gB4jmr80ZbxR2JMn4smmRPDZP3PcpFv0STff/9kEPVtp/YYzgUmKn+xiE03A51MrAaFXg9VOk4AoCDcRbPhpkltNrICvVSkVOG6i2BS7bJWw4K7HTsP4SNf2EL/0v/efqnSf6/duceRbuS9G7xuEzMS1u56qyUT8sRajFtPz/MzdDstL/wz8duBXeKSv8eRPOzyN61glbsPDxMKK3WHxQ5edh6Jbz2C0eXbl5flxMtjcP9W91ECe3Hw6nQiRBZnF5iMYMJtqzVk1XzZog5uc7qy4qIcIvN73WU59UZvq5jlxnMVkx7jRLQmQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=uipath.com; dmarc=pass action=none header.from=uipath.com;
- dkim=pass header.d=uipath.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uipath.com;
- s=selector1;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VNRiFUosl6nGC060NdETbBXQzI5avogNFPe48Ox9k7w=;
- b=QrgHn1pD7X1Rmlgw3QTsHwbrT71/1SPEXHmbrERvKNhbC5BA1bwujsXpJvNrQ+2DTQe6Drv19I7HaPai3v7tYk4TdyVB6yA9Jja07UO4fM3u6YIGmCbV0BVnvjaii8Q4t1HeBsxiY15IV05cnGoZ5ioOZ/Y2enfVciz0b/FQLJi1NHv2PWvuvMuQX2in6hNG0qNGnPB2K9QfDDWZZ4w7Xm7biXrOjJXVp+Z5p6D25oJnX3s4oYvAr7W5FL45LHVpWFwv2SsxbJsrxwZ7Z0ZFPRYur/nHcHO4K6mp9ICPjqTH8RxRmfhikeQiNnWOe1AYlp2gHwbXytp6u3xg2tMk7g==
+ bh=YpyDt1YTMkFBixMPMa8HQGXG8xXP70L1q6T6SvYosZE=;
+ b=aFDD3CMK3S8EVQpvkbbkapIM004TKIUphdR7C3L5VKjagm38Wur/aV61EceSgpn0Z0DYaHLS0ULQ+yoQjClhr+DVXbLtR+ryOACcyA1iqKp4r7Llbyz9QEkmr/jhmncD4Gr/0xjDPwO3Cdq/JWs/5yKKgYVjzg8vw6OsIrz2Zrs=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=uipath.com;
-Received: from VI1PR02MB4527.eurprd02.prod.outlook.com (2603:10a6:803:b1::28)
- by PAVPR02MB9378.eurprd02.prod.outlook.com (2603:10a6:102:309::9) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com (2603:10b6:805:75::23)
+ by SJ0PR12MB6943.namprd12.prod.outlook.com (2603:10b6:a03:44b::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6002.33; Mon, 23 Jan
- 2023 22:13:40 +0000
-Received: from VI1PR02MB4527.eurprd02.prod.outlook.com
- ([fe80::e4e:96d4:38b1:6d]) by VI1PR02MB4527.eurprd02.prod.outlook.com
- ([fe80::e4e:96d4:38b1:6d%4]) with mapi id 15.20.6002.033; Mon, 23 Jan 2023
- 22:13:40 +0000
-From:   Alexandru Matei <alexandru.matei@uipath.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, Alexandru Matei <alexandru.matei@uipath.com>,
-        Mihai Petrisor <mihai.petrisor@uipath.com>,
-        Viorel Canja <viorel.canja@uipath.com>
-Subject: [PATCH v4] KVM: VMX: Fix crash due to uninitialized current_vmcs
-Date:   Tue, 24 Jan 2023 00:12:08 +0200
-Message-Id: <20230123221208.4964-1-alexandru.matei@uipath.com>
-X-Mailer: git-send-email 2.25.1
+ 2023 22:49:25 +0000
+Received: from SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::dc5d:6248:1c13:4a3]) by SN6PR12MB2767.namprd12.prod.outlook.com
+ ([fe80::dc5d:6248:1c13:4a3%7]) with mapi id 15.20.6002.033; Mon, 23 Jan 2023
+ 22:49:20 +0000
+Message-ID: <16523f06-bb08-c4f9-bdfa-745fee553a43@amd.com>
+Date:   Mon, 23 Jan 2023 16:49:14 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.1
+Subject: Re: [PATCH RFC v7 37/64] KVM: SVM: Add KVM_SNP_INIT command
+Content-Language: en-US
+From:   "Kalra, Ashish" <ashish.kalra@amd.com>
+To:     Jarkko Sakkinen <jarkko@kernel.org>,
+        Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Pavan Kumar Paluri <papaluri@amd.com>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-38-michael.roth@amd.com> <Y7BG6pSuoZsBQYrx@kernel.org>
+ <fd23ee51-ec47-717d-7cce-1d79db8b6bd3@amd.com>
+In-Reply-To: <fd23ee51-ec47-717d-7cce-1d79db8b6bd3@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: VI1PR0701CA0072.eurprd07.prod.outlook.com
- (2603:10a6:800:5f::34) To VI1PR02MB4527.eurprd02.prod.outlook.com
- (2603:10a6:803:b1::28)
+X-ClientProxiedBy: BL1PR13CA0131.namprd13.prod.outlook.com
+ (2603:10b6:208:2bb::16) To SN6PR12MB2767.namprd12.prod.outlook.com
+ (2603:10b6:805:75::23)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VI1PR02MB4527:EE_|PAVPR02MB9378:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0edc9f32-527d-4611-235e-08dafd8f1513
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2767:EE_|SJ0PR12MB6943:EE_
+X-MS-Office365-Filtering-Correlation-Id: 824888ea-864e-410c-2388-08dafd94109f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BY5zHG1VpbxidyLXOobqO4dGYACreVQAtDOMi43V/jO+NUvGbj4bQ585rTVrEhVmeePAITIXPcZr6QOsYce0J3sV+nHCi7Kc9rlWwkLvbpi+cB0cANQ52SSNmbuWSF05AnA+YL6YN8gAE46B4M6NHJQ6q6M/pY+2jC+8++wypHc82Z4PFpJ8j61NYiSkUUS6KOjpSQiDZcrQ4ts3xpqDLuIxw7hwgUjJWkPWyjIzbmGu/QBsvdQMf9KRmKBgttElAO7jyjYoAOAQeRLZCua7zvV1RHdHtDrhrQ1azpIG+ZHufFzQfySC1rLYgg8Ji4MdUK16r+rDKqow1c4f9QTUtl8mDu5L/QjO8I2PWeMMnVN+r+uVXZOjJH85ERcYkTi388VCYVYY3/U212S7U0qyeb7XIBEdSNSFpNmKoAFJmvhxGBIoZ2fzxqHNotwpBVlktzgzx4WPsnN3ulzbU3LvvzSv4T2rcbemm9lCZx8YagtgXA7oxf/rTMG9T0CLFdr9kJ2B8jLJmmcBxNok7BK8OHLjdo07u0w9WGKtQX803mCnp9V+U4VIfSC3KXQg2F/qDIaJ3dRYYs5Ic0PyEFey23uuIfyMMn8VF7MR1lEuIst6bw5qawC1R2y9KZuRX15QKT7/TTsnkmU0CC9W7Gg2Jw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR02MB4527.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(376002)(346002)(39860400002)(366004)(396003)(451199015)(38100700002)(36756003)(110136005)(86362001)(316002)(478600001)(54906003)(6486002)(2616005)(66946007)(4326008)(66476007)(8676002)(66556008)(1076003)(2906002)(6506007)(107886003)(6666004)(6512007)(83380400001)(26005)(41300700001)(186003)(5660300002)(44832011)(8936002);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: MHCGeqDbNufU7CyGBArc5E1s9bjA/jmPdAkNaO2aakjU6KPxr+W/tzgqVWxd0y1E2giCFMtl+63n+LumyBSlulYmkD9qDz7bdzXvAZP75PpnbZftx//I6BPr0IFMxwSER6WlKN2IqHlHho5+JSr7hPoCgzOUZrH1uhM3Ugt0XKqGDMz+8TMJ26oNof6C+uNNMX/yHFLeK+8HjSLEcRpErjA8VLSoJ8EBBMSzVBMgGkkWromHHuc6i4R1VnpjaH7HuQ+P7BzqTQalE3WLUuiUrZEYq25Jj637CIh7qLZk3tlh/dKLMU4pC3hM+h4A4S5KYEQM9rs+eN+X+6iVXTBROUQMccy3sJWiCu81WOXTtQ30I0YdL97Ii7Qq/QRYeXT1oa7iAkq4wlTJLPwyxFB3pIOLYLTf3LrM9ggVqTZ1V7NmCpcgkRqPqhVhRCTdZudlUQntHhjzqggZkAKN+DNQx+OUvQ9FGdsjuKurwu4VtZPG4S/njlvPNc1sof7FPsqrHz6PnBiH5a7OqFZC5ViGvx7s4P6BCgX53vLkq/NWwAGt3gbmDrdRbLmDxZouxcigXyQm9QSKbGTZNazqx2rAWZnj5szY5v3Z4ZyWfbVburpfkO8rxv5LIbr11kggjcqZlLm4KYT7ngco78MftHkCLGxmFyXMvLHRAx4MCJ0esgDpOySQn0l+mI8p2+Lz1VzZGb5ijPAocbYvW6RW07m7vug6zUY7Mdm6is1rBBjyUNk=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2767.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230022)(4636009)(136003)(396003)(39860400002)(376002)(346002)(366004)(451199015)(8676002)(86362001)(66899015)(66476007)(6636002)(66946007)(54906003)(110136005)(66556008)(36756003)(6512007)(26005)(186003)(53546011)(6506007)(6666004)(83380400001)(4326008)(316002)(6486002)(478600001)(2616005)(31686004)(7416002)(7406005)(5660300002)(8936002)(41300700001)(2906002)(31696002)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Bk56W9MH4DS91CF8DqVKl/6BOjuiTDek4g/x/bJNjDT/WDwNn7d01mOenBJA?=
- =?us-ascii?Q?5n+BeCLHw2qfTjo0sdcEz6NPVddoroA3z8mk44u1rl+ROIMjMx8uqPmkr7V0?=
- =?us-ascii?Q?SWC0bn4jY/EKJ8IU8iesv7QKxTUvH53SvImfPkmQEBTNM27UxR97zJ8gjWHU?=
- =?us-ascii?Q?ikQ2qC/v9z2iG6FjjRFJMJOSpDHOAHtxcMEf7OAcxdhbrFeSnBGqB3Ysn/hD?=
- =?us-ascii?Q?UfXoi5WWD4XvJ/9Cfsp28tzbAnPXqBrGYd+gZ4W4xB1F6+gNZ5xGgjYjt1kw?=
- =?us-ascii?Q?bimo25rkMn53HCnD7X09b/ZDgH8QYqpr3Pg4ZgvuCKiIFv4dX1WQNZxdAk4B?=
- =?us-ascii?Q?+K8VEIaPNDgbQQF2RAH3tE/RjxEfuYYReDlqMyyk8KtaHX41FYqR4z+3HTn/?=
- =?us-ascii?Q?aMR8ZMucRAX25v7RSG60dst8EtwucNELd0nYeMvyOgWSFsL/+mq9dErL9JYX?=
- =?us-ascii?Q?nfGsqwrfyOz9l0L7TXQ/+p759bdqjkkwj7XIKsXTzG1/DOlin+I9kdjhM7IQ?=
- =?us-ascii?Q?NF47FnJGQgDpF8zvqFcEo8lAtg3rDxE9l3DrQLVOJjKC1vg5jK5bi+Ov0Ozi?=
- =?us-ascii?Q?BfMPg85HBir9bTNKdF95vgNXTQ2u9MJQ+cXmqeFZUyHeEhQc3Ohgxsp+5PC6?=
- =?us-ascii?Q?vzMbElUdfuGD7SDoYgL9jxOnczaQeTTgXtb3Ks9zLF33iiZfYcKzG6Dtq9cL?=
- =?us-ascii?Q?pPNyuyn3WEYQGMcZAl8p0t+Yz+nFR6Yt2YjqhWdyDXv/CkmJngxwp3TSIzte?=
- =?us-ascii?Q?+QtE75XxtV5wQjbv0wAD5wRDZr1lDrr3EI5L0gzd1l8XCG7tZfJeEG4r6iuk?=
- =?us-ascii?Q?+5TaWzrw15cmTQ1t08cnpRzISIaV9EJaWnXcpeEwiGA23nnPlc8UjP7rm/Ed?=
- =?us-ascii?Q?w4CB3mWxeLn1jx2pVXj+0Hen6SoUDwP3gYwNf1Unad4gRPFamqSitJYPYiId?=
- =?us-ascii?Q?mi8YqPX42bjHqIlah8aJ83imgY/G8jMlnfNGywmQ00rIcTtJE90VUbcC6/Lb?=
- =?us-ascii?Q?n2vrW3c7s72k1KehYwmFSSLjBHxGI7+2cMlSm6gZzFDwafDPCd+hIOtzR9Pt?=
- =?us-ascii?Q?RZ/Nl7IcBoJOR9MhIEVXXUTJ3Kyjcv45Gf8NnF9DI76yFToUb64M02qT0nbt?=
- =?us-ascii?Q?PC+aTO95PHKPg3UcK739N6WCyVBcKcN4wLArC52XyioREyM9a6Owz3LoBN+z?=
- =?us-ascii?Q?iHNjbMfNu5iRF3eStemBf5QtSVBePN5yBNinVvoxQyQxD9YFH5PInb9FPpZh?=
- =?us-ascii?Q?i9Iz291h2Iuef294Icxo/VCpcuRb4yO/ch2FXOfiu3F3xdhIWqFtHLMiNr/V?=
- =?us-ascii?Q?Fse7MIEcRu4FRm9IykY0D5RFXhbjC6kSHERNkM8WXeRJuCQPjLsrEJUqDpLM?=
- =?us-ascii?Q?3qm8xb+wi0P0qcKpELdH3FN67W7hPX4HtNMT+5faVnb89pYAlQ4TpnWQvpwV?=
- =?us-ascii?Q?grjM+dVrBgpWf3g3KBl7xX94BeORp5jixc094yYSSL20qgPLKHnttl8gAx0s?=
- =?us-ascii?Q?B2nehujVYE9vCuuZHDnSonmP1g4fZ27rpqN36r39Jqy7219Zd+Q2zBtZlxTc?=
- =?us-ascii?Q?TqfKLBmF8/vi38FaZFh8yvlfHBD4e/T6B0wkkoebAepd8u9WZvwcuR0jaBoD?=
- =?us-ascii?Q?ng=3D=3D?=
-X-OriginatorOrg: uipath.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0edc9f32-527d-4611-235e-08dafd8f1513
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR02MB4527.eurprd02.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OElKOFQ4cjhBRnhhMGJ3UGtqUXNnN1BYaE5pSFBQcVBJeXpLbWJGeXVBWmRq?=
+ =?utf-8?B?WjUrZDFBU2VkVXBiVGdUdUhiR2lxMUU0UFFPVVJCZlVzcnRMY3dEQkZvRVdl?=
+ =?utf-8?B?OEhKbnJsaGtDQ0NMd3BiMW1XeTN0Rk1IOW9WaUpZQzRsb3pKaUg5Y3VUdzho?=
+ =?utf-8?B?STJETFgzTnpUcTMxNzVLVXlaQU5QaDVmQzVJRnZNemlPY0xJUnd1STEzK1h0?=
+ =?utf-8?B?b2cvV0R5TFJCbFBqdGRVVHZUOVZBWG04bkF5ZjYyUVQ3S1hwd0w4TTBqeWNH?=
+ =?utf-8?B?d0sxZGlROVNFTUNFRUhqS2xBZ0VjaWJad04vU00rdnNZcFlGbnVVei95b3Ew?=
+ =?utf-8?B?L2pEVkY0VEJUMk0yaXhJbWt1eUI1L2VmbmJ0dmEwVVpWM1NFOFBTb255OU9x?=
+ =?utf-8?B?dndLNzF2TTUrbjdDZDZzQlFTSm8yUUdWL1grcmhxRnZQTVlxTHJJeDJiL0x4?=
+ =?utf-8?B?ZXhnN20rWXVCcVRZOCt5bG43Z3pXWXhvVlJMQTEwL0tiNExWSkI3U1hzY2gy?=
+ =?utf-8?B?cm53VGZxd2k4ZlZERjk2enJEZ3FDaGlCY1doUGJzbDV4V2s3L2xpaVE5aHJp?=
+ =?utf-8?B?QXI4S2VjalBzNnFHMWtJYjZWRDZDMDJ1Qk9ZNmNBUVJMRW5wSFNUWFhMMTJp?=
+ =?utf-8?B?ckpxMUs0TGZkbStwVjZPcVY3SHlmNEl4L2lreWJadnZIZ3plKy9ZeG0rUk56?=
+ =?utf-8?B?STJjcStWZ2xOOWVrQS9VZFE5U0pPaWtMb3VmVUpVUXUwT3JQSEtEei9mRnlX?=
+ =?utf-8?B?alhpakJGUzdSUnNKeXgyVGdqZnc4VHRrYUcwYVFuclRMRklic0VPY1RBcmJk?=
+ =?utf-8?B?V241VDJYeWE5RjdSVUpSU2hDaDNab2wzNm5qK3hQNTBPQS9sR0RvWmpOTXFz?=
+ =?utf-8?B?NlZUWktzRTY3cWRVV1N4YlZpbVJta0VJRnhiMTFObitYaFBXOXg0Q3Q5ZEZo?=
+ =?utf-8?B?Y20wVlM1NUpOZ3Evd2hQTGFTOSs2Wk9GL0pSMkQ2M3RtNTJMY1BvVFVQSy9H?=
+ =?utf-8?B?RVVmRjlVVHFDaGUzKzRTeTZDMmg4Nk9Jc0dpejR3aWdjUmtsaWJpbFN0RFls?=
+ =?utf-8?B?SHlOTzRZRXlPNXRIQ0xnNUs0RHlZeU9ZbWlTOVRtc3M5V213MnJTTy9SenVu?=
+ =?utf-8?B?VTZsV3F3Sm9IMWFQYXpzSFNJQWxCZFUwY2xtTUlrZFgyZEtXY2thUGxqQTB4?=
+ =?utf-8?B?SUxjOFpXUy9nSDFNZHBITXJmVTIxczg4K2Y2M01TeThLdVlEWnVlR1cvRENG?=
+ =?utf-8?B?Y205bEpKb2JObS9SRUlKVzdtdEN6M21qUGlJeXNRSGk5ZkJ5dGl3S3JVSUpZ?=
+ =?utf-8?B?aDNSeVJ5aWxhVmtYRjgybVFKQS8wWWhlNG9VUG1zbUVGSEZPcVZTZkpaN1pq?=
+ =?utf-8?B?aWZtQTZTSytmWE5EeDNtbCsxejNzK3EzVWRZQm1xYUZ3QjdJblhIaE9SZkI0?=
+ =?utf-8?B?UXpVbmExalhZNlcycHNreEZLeTFZcWdjaXpDcVNpalJPOFBwTVlNWmxvL1Bv?=
+ =?utf-8?B?Q1FFS3dodEVsSmpKQmpSc0JlMlg4a0VMdmRhM1Y5MVY3V2RrT1hGUjdLVVRt?=
+ =?utf-8?B?UFU5cktyaFpQVXV4VFVnNnBuejR1WjRjdXVrTHJNVTUvd0hxNHozRUZTeDdH?=
+ =?utf-8?B?Tk5IWS9jNGVXczRWd2lQK1JWTTdWc2t5TEJGRGd1b0Z6WkE2VGx5TEtDNlRL?=
+ =?utf-8?B?M0Nwd3Bla0U2TGJRaWZNdlJzVzVCcVZLZVV2OFNyQXFkM3JKZEdEMTRkZFlC?=
+ =?utf-8?B?aEswd29SMmlNclNROVdsaTYrd2lrNnhoM1lNbm5DTHNsOC82TVRSZ2pnWmZs?=
+ =?utf-8?B?ZkIyTS9SNXA3K3NTamtQbzdHUFo4a2NHR0NtT0l4Mk4wV3lIR21pcGVnZm5K?=
+ =?utf-8?B?eEo0NDd2V2Z2b0tFdEl0b0N2eE1MWHo1UktValVnSlF4dlphYTRrWWpLNVFG?=
+ =?utf-8?B?aWYvaWF0MlloeWk0S2lQeTdCamhJMzRweEtLZ1U2OEZNSTN4aDNYN0FZdTJU?=
+ =?utf-8?B?a0RHbzFzc1c1UHRlTVN0Ylo3RFVod2RKTE1QbHBzTjU4ZkFhazVra2trN3J6?=
+ =?utf-8?B?UzVkdmlrMVV4aU1ScXcvTUFldWZCcXJ4T0VGSG1RZkticjdpNVh4RUp4OHcx?=
+ =?utf-8?Q?bfT7ts9hhhzaVLVAZhgKWJF0e?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 824888ea-864e-410c-2388-08dafd94109f
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2767.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2023 22:13:40.4572
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2023 22:49:20.5948
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d8353d2a-b153-4d17-8827-902c51f72357
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nrFVZTQnTFbwccTebOqX77hqRvcNn2U8mHRUBPAV4IGliUzoJ94qqkcp6lzE3AM7RpqQbjQU/92Z3rdtX3wZ6gdgPlqae3fYavOPOqWyHC0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAVPR02MB9378
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: 16trR8wRbpYO2lBNyL7N/2/hJYZmU19tsI4K30JJ/NA3hR7LfMCO/qg+j8rXekIObSF0oWkO+eCJ7qCdlsrgHw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6943
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-KVM enables 'Enlightened VMCS' and 'Enlightened MSR Bitmap' when running as
-a nested hypervisor on top of Hyper-V. When MSR bitmap is updated,
-evmcs_touch_msr_bitmap function uses current_vmcs per-cpu variable to mark
-that the msr bitmap was changed.
+There was an early firmware issue on Genoa which supported only SNP_INIT 
+or SEV_INIT, but this issue is resolved now.
 
-vmx_vcpu_create() modifies the msr bitmap via vmx_disable_intercept_for_msr
--> vmx_msr_bitmap_l01_changed which in the end calls this function. The
-function checks for current_vmcs if it is null but the check is
-insufficient because current_vmcs is not initialized. Because of this, the
-code might incorrectly write to the structure pointed by current_vmcs value
-left by another task. Preemption is not disabled, the current task can be
-preempted and moved to another CPU while current_vmcs is accessed multiple
-times from evmcs_touch_msr_bitmap() which leads to crash.
+Now, the main constraints are that SNP_INIT is always required before 
+SEV_INIT in case we want to launch SNP guests. In other words, if only 
+SEV_INIT is done on a platform which supports SNP we won't be able to 
+launch SNP guests after that.
 
-The manipulation of MSR bitmaps by callers happens only for vmcs01 so the
-solution is to use vmx->vmcs01.vmcs instead of current_vmcs.
+So once we have RMP table setup (in BIOS) we will always do an SNP_INIT 
+and SEV_INIT will be ideally done only (on demand) when an SEV guest is 
+launched.
 
-BUG: kernel NULL pointer dereference, address: 0000000000000338
-PGD 4e1775067 P4D 0
-Oops: 0002 [#1] PREEMPT SMP NOPTI
-...
-RIP: 0010:vmx_msr_bitmap_l01_changed+0x39/0x50 [kvm_intel]
-...
-Call Trace:
- vmx_disable_intercept_for_msr+0x36/0x260 [kvm_intel]
- vmx_vcpu_create+0xe6/0x540 [kvm_intel]
- ? __vmalloc_node+0x4a/0x70
- kvm_arch_vcpu_create+0x1d1/0x2e0 [kvm]
- kvm_vm_ioctl_create_vcpu+0x178/0x430 [kvm]
- ? __handle_mm_fault+0x3cb/0x750
- kvm_vm_ioctl+0x53f/0x790 [kvm]
- ? syscall_exit_work+0x11a/0x150
- ? syscall_exit_to_user_mode+0x12/0x30
- ? do_syscall_64+0x69/0x90
- ? handle_mm_fault+0xc5/0x2a0
- __x64_sys_ioctl+0x8a/0xc0
- do_syscall_64+0x5c/0x90
- ? exc_page_fault+0x62/0x150
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
+Thanks,
+Ashish
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Alexandru Matei <alexandru.matei@uipath.com>
----
-v4:
-  - merge evmcs_touch_msr_bitmap into vmx_msr_bitmap_l01_changed
-
-v3:
-  - pass hv_enlightened_vmcs * directly
-
-v2:
-  - pass (e)vmcs01 to evmcs_touch_msr_bitmap
-  - use loaded_vmcs * instead of vcpu_vmx * to avoid
-    including vmx.h which generates circular dependency
-
- arch/x86/kvm/vmx/hyperv.h | 11 -----------
- arch/x86/kvm/vmx/vmx.c    |  9 +++++++--
- 2 files changed, 7 insertions(+), 13 deletions(-)
-
-diff --git a/arch/x86/kvm/vmx/hyperv.h b/arch/x86/kvm/vmx/hyperv.h
-index 571e7929d14e..9dee71441b59 100644
---- a/arch/x86/kvm/vmx/hyperv.h
-+++ b/arch/x86/kvm/vmx/hyperv.h
-@@ -190,16 +190,6 @@ static inline u16 evmcs_read16(unsigned long field)
- 	return *(u16 *)((char *)current_evmcs + offset);
- }
- 
--static inline void evmcs_touch_msr_bitmap(void)
--{
--	if (unlikely(!current_evmcs))
--		return;
--
--	if (current_evmcs->hv_enlightenments_control.msr_bitmap)
--		current_evmcs->hv_clean_fields &=
--			~HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP;
--}
--
- static inline void evmcs_load(u64 phys_addr)
- {
- 	struct hv_vp_assist_page *vp_ap =
-@@ -219,7 +209,6 @@ static inline u64 evmcs_read64(unsigned long field) { return 0; }
- static inline u32 evmcs_read32(unsigned long field) { return 0; }
- static inline u16 evmcs_read16(unsigned long field) { return 0; }
- static inline void evmcs_load(u64 phys_addr) {}
--static inline void evmcs_touch_msr_bitmap(void) {}
- #endif /* IS_ENABLED(CONFIG_HYPERV) */
- 
- #define EVMPTR_INVALID (-1ULL)
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index fe5615fd8295..65050efb8ae3 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -3868,8 +3868,13 @@ static void vmx_msr_bitmap_l01_changed(struct vcpu_vmx *vmx)
- 	 * 'Enlightened MSR Bitmap' feature L0 needs to know that MSR
- 	 * bitmap has changed.
- 	 */
--	if (static_branch_unlikely(&enable_evmcs))
--		evmcs_touch_msr_bitmap();
-+	if (IS_ENABLED(CONFIG_HYPERV) && static_branch_unlikely(&enable_evmcs)) {
-+		struct hv_enlightened_vmcs *evmcs = (void *)vmx->vmcs01.vmcs;
-+
-+		if (evmcs->hv_enlightenments_control.msr_bitmap)
-+			evmcs->hv_clean_fields &=
-+				~HV_VMX_ENLIGHTENED_CLEAN_FIELD_MSR_BITMAP;
-+	}
- 
- 	vmx->nested.force_msr_bitmap_recalc = true;
- }
--- 
-2.25.1
-
+On 1/5/2023 5:37 PM, Kalra, Ashish wrote:
+> Hello Jarkko,
+> 
+> On 12/31/2022 8:27 AM, Jarkko Sakkinen wrote:
+>> On Wed, Dec 14, 2022 at 01:40:29PM -0600, Michael Roth wrote:
+>>>   static int sev_guest_init(struct kvm *kvm, struct kvm_sev_cmd *argp)
+>>>   {
+>>>       struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+>>> @@ -260,13 +279,23 @@ static int sev_guest_init(struct kvm *kvm, 
+>>> struct kvm_sev_cmd *argp)
+>>>           return ret;
+>>>       sev->active = true;
+>>> -    sev->es_active = argp->id == KVM_SEV_ES_INIT;
+>>> +    sev->es_active = (argp->id == KVM_SEV_ES_INIT || argp->id == 
+>>> KVM_SEV_SNP_INIT);
+>>> +    sev->snp_active = argp->id == KVM_SEV_SNP_INIT;
+>>>       asid = sev_asid_new(sev);
+>>>       if (asid < 0)
+>>>           goto e_no_asid;
+>>>       sev->asid = asid;
+>>> -    ret = sev_platform_init(&argp->error);
+>>> +    if (sev->snp_active) {
+>>> +        ret = verify_snp_init_flags(kvm, argp);
+>>> +        if (ret)
+>>> +            goto e_free;
+>>> +
+>>> +        ret = sev_snp_init(&argp->error, false);
+>>> +    } else {
+>>> +        ret = sev_platform_init(&argp->error);
+>>> +    }
+>>
+>> Couldn't sev_snp_init() and sev_platform_init() be called unconditionally
+>> in order?
+>>
+>> Since there is a hardware constraint that SNP init needs to always happen
+>> before platform init, shouldn't SNP init happen as part of
+>> __sev_platform_init_locked() instead?
+>>
+> 
+> On Genoa there is currently an issue that if we do an SNP_INIT before an 
+> SEV_INIT and then attempt to launch a SEV guest that may fail, so we 
+> need to keep SNP INIT and SEV INIT separate.
+> 
+> We need to provide a way to run (existing) SEV guests on a system that 
+> supports SNP without doing an SNP_INIT at all.
+> 
+> This is done using psp_init_on_probe parameter of the CCP module to 
+> avoid doing either SNP/SEV firmware initialization during module load 
+> and then defer the firmware initialization till someone launches a guest 
+> of one flavor or the other.
+> 
+> And then sev_guest_init() does either SNP or SEV firmware init depending 
+> on the type of the guest being launched.
+> 
+>> I found these call sites for __sev_platform_init_locked(), none of which
+>> follow the correct call order:
+>>
+>> * sev_guest_init()
+> 
+> As explained above, this call site is important for deferring the 
+> firmware initialization to an actual guest launch.
+> 
+>> * sev_ioctl_do_pek_csr
+>> * sev_ioctl_do_pdh_export()
+>> * sev_ioctl_do_pek_import()
+>> * sev_ioctl_do_pek_pdh_gen()
+>> * sev_pci_init()
+>>
+>> For me it looks like a bit flakky API use to have sev_snp_init() as an 
+>> API
+>> call.
+>>
+>> I would suggest to make SNP init internal to the ccp driver and take care
+>> of the correct orchestration over there.
+>>
+> 
+> Due to Genoa issue, we may still need SNP init and SEV init to be 
+> invoked separately outside the CCP driver.
+> 
+>> Also, how it currently works in this patch set, if the firmware did not
+>> load correctly, SNP init halts the whole system. The version check needs
+>> to be in all call paths.
+>>
+> 
+> Yes, i agree with that.
+> 
+> Thanks,
+> Ashish
