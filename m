@@ -2,203 +2,87 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 60F51678BFE
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 00:25:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7AA08678C13
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 00:37:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231987AbjAWXZ3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 18:25:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51056 "EHLO
+        id S232339AbjAWXhI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 18:37:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231724AbjAWXZ2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 18:25:28 -0500
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0543C40CC
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 15:25:26 -0800 (PST)
-Received: by mail-pf1-x42e.google.com with SMTP id c26so10055105pfp.10
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 15:25:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GasCXjZfz4MKYwJwHukl2pdBsZh67+I2N//D6B0zamU=;
-        b=COGaZlvx3SmciGbu81hqZMERAREQRETI+4VTzCPg6LKJp23kxLfHvHfpOUs4bKBqWu
-         gFJVG/9kDBuy5X0d+p5+2PwX7cBxod5kBuk9g0uEhgkv4qDhZIVKdnKESJVSfxgE8eOv
-         CBIN6ukh39D9A/61L5BrBdQP75QsJtzQgbPytVKEKyTyppnxR4KFMy2ASiZ2L8UAxiIZ
-         00chSNQO9TYkDnkm/ISgrcVcgUuOKxtIa4S7fnsaOX3lWQaBGUzWwILYdg5eJ0osZPrn
-         lCyIqd23QFlu6Wfe3NMGZlKnGq8azy9zbiDeaKOhTf94qid8OgL5tHXidNvCR5skYLlO
-         leOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GasCXjZfz4MKYwJwHukl2pdBsZh67+I2N//D6B0zamU=;
-        b=t15vjYgBA+fCIGvzkoZC0MGpNjLdfi2rv0gPK8egbvDNc/VwQbTiZT8zsyMnmRDSSZ
-         h2fMzxvZHRlUBm60vYYGy1qepkdBPsaXFucivvx1ZpI4dqa+a7VrYuxByq3f8yL/WFx/
-         zRncmw7pkLcmcJQRek2xYSL3V6irCM2TzoLgWsVkcEqfuWXQONukAGtefr1sqzbIZG2H
-         ywyBiXxRFqPUDL+ffd5ZQfRDuVmZSnlqM50kcpt3Px19BLbhY2CFHMzodblQVcV2n3iL
-         LUsvTGVxS1q4jhtKaKGYo1JnihbH5weNG1EZS+Seil2btyTox2lXJ268y/RqkGQUtqnK
-         v0YQ==
-X-Gm-Message-State: AFqh2kq9DBdNi28GY3umupkF718BPyOxEjHwG5b7YK0CXmDs8H6eqUQk
-        bb2wNWWWUNovWU25WRcQE/PCKw==
-X-Google-Smtp-Source: AMrXdXtKaCGhioZ+WbBswMlqM+frTa0+XrI+F2SEhHfvnPnW3wauc2C2OwdTpdc0TPV/nL3XbZ/9aQ==
-X-Received: by 2002:a05:6a00:189a:b0:582:13b5:d735 with SMTP id x26-20020a056a00189a00b0058213b5d735mr935518pfh.0.1674516325300;
-        Mon, 23 Jan 2023 15:25:25 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u29-20020a056a00099d00b0058bbdaaa5e4sm125739pfg.162.2023.01.23.15.25.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jan 2023 15:25:24 -0800 (PST)
-Date:   Mon, 23 Jan 2023 23:25:21 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Wei Wang <wei.w.wang@intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        =?utf-8?B?5p+z6I+B5bOw?= <liujingfeng@qianxin.com>
-Subject: Re: [PATCH v1] KVM: destruct kvm_io_device while unregistering it
- from kvm_io_bus
-Message-ID: <Y88XYR0L2DyiKnIM@google.com>
-References: <20221229123302.4083-1-wei.w.wang@intel.com>
+        with ESMTP id S229502AbjAWXhH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 18:37:07 -0500
+Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4CDF2684B
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 15:37:05 -0800 (PST)
+Date:   Mon, 23 Jan 2023 23:36:52 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1674517024;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=O9OmVYl5JPIBMOqO4QTL0Ss3P7OHvD/38X/apKzN0wE=;
+        b=P7BBf1bvqu72jKL6i5vughpUjGGbBds2m1XjLqEOJgkFE8U4RbTfir7CD9gljTB1tb7rYy
+        JTfLd/GXXJ6BUTYA27XTHYE7I/5QQnHfZXGlo4pp1C4sG57N72ooE0xflk3CKMEt7Aen74
+        Jhco61qVirW5a4KxEUrL0PUBuQFxLP8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
+        alexandru.elisei@arm.com, eric.auger@redhat.com,
+        yuzenghui@huawei.com
+Subject: Re: [PATCH 4/4] KVM: selftests: aarch64: Test read-only PT memory
+ regions
+Message-ID: <Y88aFBBcsx7v/2qh@google.com>
+References: <20230110022432.330151-1-ricarkol@google.com>
+ <20230110022432.330151-5-ricarkol@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20221229123302.4083-1-wei.w.wang@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230110022432.330151-5-ricarkol@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Dec 29, 2022, Wei Wang wrote:
-> Current usage of kvm_io_device requires users to destruct it with an extra
-> call of kvm_iodevice_destructor after the device gets unregistered from
-> the kvm_io_bus. This is not necessary and can cause errors if a user
-> forgot to make the extra call.
-> 
-> Simplify the usage by combining kvm_iodevice_destructor into
-> kvm_io_bus_unregister_dev. This reduces LOCs a bit for users and can
-> avoid the leakage of destructing the device explicitly.
-> 
-> The fix was originally provided by Sean Christopherson.
-> Link: https://lore.kernel.org/lkml/DS0PR11MB6373F27D0EE6CD28C784478BDCEC9@DS0PR11MB6373.namprd11.prod.outlook.com/T/
-> Fixes: 5d3c4c79384a ("KVM: Stop looking for coalesced MMIO zones if the bus is destroyed")
-> Cc: stable@vger.kernel.org
-> Reported-by: 柳菁峰 <liujingfeng@qianxin.com>
-> Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+On Tue, Jan 10, 2023 at 02:24:32AM +0000, Ricardo Koller wrote:
+> Extend the read-only memslot tests in page_fault_test to test read-only PT
+> (Page table) memslots. Note that this was not allowed before commit "KVM:
+> arm64: Fix handling of S1PTW S2 fault on RO memslots" as all S1PTW faults
+> were treated as writes which resulted in an (unrecoverable) exception
+> inside the guest.
+
+Do we need an additional test that the guest gets nuked if TCR_EL1.HA =
+0b1 and AF is clear in one of the stage-1 PTEs?
+
+> Signed-off-by: Ricardo Koller <ricarkol@google.com>
 > ---
->  include/kvm/iodev.h       |  6 ------
->  virt/kvm/coalesced_mmio.c |  1 -
->  virt/kvm/eventfd.c        |  1 -
->  virt/kvm/kvm_main.c       | 24 +++++++++++++++---------
->  4 files changed, 15 insertions(+), 17 deletions(-)
+>  .../selftests/kvm/aarch64/page_fault_test.c        | 14 +++++++++-----
+>  1 file changed, 9 insertions(+), 5 deletions(-)
 > 
-> diff --git a/include/kvm/iodev.h b/include/kvm/iodev.h
-> index d75fc4365746..56619e33251e 100644
-> --- a/include/kvm/iodev.h
-> +++ b/include/kvm/iodev.h
-> @@ -55,10 +55,4 @@ static inline int kvm_iodevice_write(struct kvm_vcpu *vcpu,
->  				 : -EOPNOTSUPP;
->  }
->  
-> -static inline void kvm_iodevice_destructor(struct kvm_io_device *dev)
-> -{
-> -	if (dev->ops->destructor)
-> -		dev->ops->destructor(dev);
-> -}
-> -
->  #endif /* __KVM_IODEV_H__ */
-> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
-> index 0be80c213f7f..d7135a5e76f8 100644
-> --- a/virt/kvm/coalesced_mmio.c
-> +++ b/virt/kvm/coalesced_mmio.c
-> @@ -195,7 +195,6 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
->  			 */
->  			if (r)
->  				break;
-> -			kvm_iodevice_destructor(&dev->dev);
+> diff --git a/tools/testing/selftests/kvm/aarch64/page_fault_test.c b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> index 2e2178a7d0d8..2f81d68e876c 100644
+> --- a/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> +++ b/tools/testing/selftests/kvm/aarch64/page_fault_test.c
+> @@ -831,6 +831,7 @@ static void help(char *name)
+>  {										\
+>  	.name			= SCAT3(ro_memslot, _access, _with_af),		\
 
-The comment lurking above this is now stale.
+Does the '_with_af' actually belong here? The macro doesn't take such a
+parameter. AFAICT the access flag is already set in all S1 PTEs for this
+case and TCR_EL1.HA = 0b0.
 
->  		}
->  	}
->  
-> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-> index 2a3ed401ce46..1b277afb545b 100644
-> --- a/virt/kvm/eventfd.c
-> +++ b/virt/kvm/eventfd.c
-> @@ -898,7 +898,6 @@ kvm_deassign_ioeventfd_idx(struct kvm *kvm, enum kvm_bus bus_idx,
->  		bus = kvm_get_bus(kvm, bus_idx);
->  		if (bus)
->  			bus->ioeventfd_count--;
-> -		ioeventfd_release(p);
->  		ret = 0;
->  		break;
->  	}
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 13e88297f999..582757ebdce6 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -5200,6 +5200,12 @@ static struct notifier_block kvm_reboot_notifier = {
->  	.priority = 0,
->  };
->  
-> +static void kvm_iodevice_destructor(struct kvm_io_device *dev)
-> +{
-> +	if (dev->ops->destructor)
-> +		dev->ops->destructor(dev);
-> +}
-> +
->  static void kvm_io_bus_destroy(struct kvm_io_bus *bus)
->  {
->  	int i;
-> @@ -5423,7 +5429,7 @@ int kvm_io_bus_register_dev(struct kvm *kvm, enum kvm_bus bus_idx, gpa_t addr,
->  int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
->  			      struct kvm_io_device *dev)
->  {
-> -	int i, j;
-> +	int i;
->  	struct kvm_io_bus *new_bus, *bus;
->  
->  	lockdep_assert_held(&kvm->slots_lock);
-> @@ -5453,18 +5459,18 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
->  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
->  	synchronize_srcu_expedited(&kvm->srcu);
->  
-> -	/* Destroy the old bus _after_ installing the (null) bus. */
-> +	/*
-> +	 * If (null) bus is installed, destroy the old bus, including all the
-> +	 * attached devices. Otherwise, destroy the caller's device only.
-> +	 */
->  	if (!new_bus) {
->  		pr_err("kvm: failed to shrink bus, removing it completely\n");
-> -		for (j = 0; j < bus->dev_count; j++) {
-> -			if (j == i)
-> -				continue;
-> -			kvm_iodevice_destructor(bus->range[j].dev);
-> -		}
-> +		kvm_io_bus_destroy(bus);
-> +		return -ENOMEM;
+>  	.data_memslot_flags	= KVM_MEM_READONLY,				\
+> +	.pt_memslot_flags	= KVM_MEM_READONLY,				\
+>  	.guest_prepare		= { _PREPARE(_access) },			\
+>  	.guest_test		= _access,					\
+>  	.mmio_handler		= _mmio_handler,				\
 
-Returning an error code is unnecessary if unregister_dev() destroys the bus.
-Nothing ultimately consumes the result, e.g. kvm_vm_ioctl_unregister_coalesced_mmio()
-intentionally ignores the result other than to bail from the loop, and destroying
-the bus means it will immediately bail from the loop anyways.
-
->  	}
->  
-> -	kfree(bus);
-> -	return new_bus ? 0 : -ENOMEM;
-> +	kvm_iodevice_destructor(dev);
-> +	return 0;
-
-Unless I'm misreading things, this path leaks "bus".
-
-Given that that intent is to send the fix for stable, that this is as much a
-cleanup as it is a bug fix, and that it's not super trivial, I'm inclined to queue
-my patch and then land this on top as cleanup.
+--
+Thanks,
+Oliver
