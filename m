@@ -2,98 +2,89 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37F03677770
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 10:31:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 439DA677812
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 11:00:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231842AbjAWJb3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 04:31:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35672 "EHLO
+        id S231607AbjAWKAW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 05:00:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbjAWJb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 04:31:29 -0500
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 924B318B1D;
-        Mon, 23 Jan 2023 01:31:27 -0800 (PST)
-Received: (Authenticated sender: alex@ghiti.fr)
-        by mail.gandi.net (Postfix) with ESMTPSA id 49BFB240009;
-        Mon, 23 Jan 2023 09:31:21 +0000 (UTC)
-Message-ID: <bdabafb1-53f3-403c-ab9c-1c2d00421690@ghiti.fr>
-Date:   Mon, 23 Jan 2023 10:31:21 +0100
+        with ESMTP id S231560AbjAWKAV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 05:00:21 -0500
+Received: from mail.8bytes.org (mail.8bytes.org [IPv6:2a01:238:42d9:3f00:e505:6202:4f0c:f051])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1F5178A72;
+        Mon, 23 Jan 2023 01:59:53 -0800 (PST)
+Received: from 8bytes.org (p5b006afb.dip0.t-ipconnect.de [91.0.106.251])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.8bytes.org (Postfix) with ESMTPSA id 9A316262C2B;
+        Mon, 23 Jan 2023 10:59:34 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
+        s=default; t=1674467975;
+        bh=0KQBObUcnpg5GrqXq3hC5RyjGf2zS6TIXg2zcVgFWn0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Tr3JGNsZMXVI480xgKW5iIBnC2CS9vyEqh9gWSstha079Y/cRMHa9gi+uxnReHb5d
+         fwek2sY7wwUJnFwFFwIvWemH12HdN0YbgdSZ2RWwC0269UqDUwGwB35CRDyXhq60AT
+         USyIwI3wP05/5oGtUOpS94M53A08jNcPckKA5ZXpZIPRaNJ96Q+BFkTkmpgSNGCPm5
+         YogHT95t/tBdYhxC9Y35A2TokJihCUBd4VwOl8Pa35zfKfyCatWPy6AY7P+apvfw5a
+         T/W6TQnG+GLz390G6KRQWUX8KnoKg77Sxn7JUzcugID6/sS1m397rjmidCEXxQK2Lj
+         1j8HX1fY4eNAw==
+Date:   Mon, 23 Jan 2023 10:59:32 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Lu Baolu <baolu.lu@linux.intel.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        ath10k@lists.infradead.org, ath11k@lists.infradead.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        dri-devel@lists.freedesktop.org, iommu@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-arm-msm@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-remoteproc@vger.kernel.org,
+        linux-s390@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-tegra@vger.kernel.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH 1/8] iommu: Add a gfp parameter to iommu_map()
+Message-ID: <Y85ahCk3sRTVAU8O@8bytes.org>
+References: <1-v1-6e8b3997c46d+89e-iommu_map_gfp_jgg@nvidia.com>
+ <4fd1b194-29ef-621d-4059-a8336058f217@arm.com>
+ <Y7hZOwerwljDKoQq@nvidia.com>
+ <Y8pd50mdNShTyVRX@8bytes.org>
+ <Y8rVJGyTKAjXjLwV@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH] KVM: RISC-V: Fix wrong usage of PGDIR_SIZE to check page
- sizes
-To:     Alexandre Ghiti <alexghiti@rivosinc.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <20230123092928.808014-1-alexghiti@rivosinc.com>
-Content-Language: en-US
-From:   Alexandre Ghiti <alex@ghiti.fr>
-In-Reply-To: <20230123092928.808014-1-alexghiti@rivosinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y8rVJGyTKAjXjLwV@nvidia.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-@Anup: Sorry, forgot to add -fixes to the patch title, as I think this 
-should go into your fixes branch for 6.2.
+On Fri, Jan 20, 2023 at 01:53:40PM -0400, Jason Gunthorpe wrote:
+> > Well, having GFP parameters is not a strict kernel convention. There are
+> > places doing it differently and have sleeping and atomic variants of
+> > APIs. I have to say I like the latter more. But given that this leads to
+> > an invasion of API functions here which all do the same under the hood, I
+> > agree it is better to go with a GFP parameter here.
+> 
+> Ok, I think we are done with this series, I'll stick it in linux-next
+> for a bit and send you a PR so the trees stay in sync
 
-On 1/23/23 10:29, Alexandre Ghiti wrote:
-> At the moment, riscv only supports PMD and PUD hugepages. For sv39,
-> PGDIR_SIZE == PUD_SIZE but not for sv48 and sv57. So fix this by changing
-> PGDIR_SIZE into PUD_SIZE.
->
-> Signed-off-by: Alexandre Ghiti <alexghiti@rivosinc.com>
-> ---
->   arch/riscv/kvm/mmu.c | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> index 34b57e0be2ef..dbc4ca060174 100644
-> --- a/arch/riscv/kvm/mmu.c
-> +++ b/arch/riscv/kvm/mmu.c
-> @@ -585,7 +585,7 @@ bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->   	if (!kvm->arch.pgd)
->   		return false;
->   
-> -	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PGDIR_SIZE);
-> +	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
->   
->   	if (!gstage_get_leaf_entry(kvm, range->start << PAGE_SHIFT,
->   				   &ptep, &ptep_level))
-> @@ -603,7 +603,7 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->   	if (!kvm->arch.pgd)
->   		return false;
->   
-> -	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PGDIR_SIZE);
-> +	WARN_ON(size != PAGE_SIZE && size != PMD_SIZE && size != PUD_SIZE);
->   
->   	if (!gstage_get_leaf_entry(kvm, range->start << PAGE_SHIFT,
->   				   &ptep, &ptep_level))
-> @@ -645,12 +645,12 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
->   	if (logging || (vma->vm_flags & VM_PFNMAP))
->   		vma_pagesize = PAGE_SIZE;
->   
-> -	if (vma_pagesize == PMD_SIZE || vma_pagesize == PGDIR_SIZE)
-> +	if (vma_pagesize == PMD_SIZE || vma_pagesize == PUD_SIZE)
->   		gfn = (gpa & huge_page_mask(hstate_vma(vma))) >> PAGE_SHIFT;
->   
->   	mmap_read_unlock(current->mm);
->   
-> -	if (vma_pagesize != PGDIR_SIZE &&
-> +	if (vma_pagesize != PUD_SIZE &&
->   	    vma_pagesize != PMD_SIZE &&
->   	    vma_pagesize != PAGE_SIZE) {
->   		kvm_err("Invalid VMA page size 0x%lx\n", vma_pagesize);
+This series mostly touches parts outside of IOMMUFD, so we should follow
+the process here and let this reach linux-next via the IOMMU tree.
+Please send me a new version and I will put it into a separate branch
+where you can pull it from.
+
+Regards,
+
+	Joerg
