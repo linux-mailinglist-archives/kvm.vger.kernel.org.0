@@ -2,95 +2,112 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0888A678778
-	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 21:18:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 77BE2678688
+	for <lists+kvm@lfdr.de>; Mon, 23 Jan 2023 20:38:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232135AbjAWUS0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 15:18:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47982 "EHLO
+        id S232245AbjAWTiL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 14:38:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231618AbjAWUSX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 15:18:23 -0500
-X-Greylist: delayed 1801 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 Jan 2023 12:18:20 PST
-Received: from vps-vb.mhejs.net (vps-vb.mhejs.net [37.28.154.113])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3141B34C27;
-        Mon, 23 Jan 2023 12:18:20 -0800 (PST)
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1pK1ta-0001xF-1N; Mon, 23 Jan 2023 19:50:18 +0100
-Message-ID: <99a36eed-e4e5-60ec-0f88-a33d1842a0d6@maciej.szmigiero.name>
-Date:   Mon, 23 Jan 2023 19:50:11 +0100
+        with ESMTP id S232290AbjAWTiK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 14:38:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A4C127D72
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 11:37:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674502643;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=U3waa7Vh+F3v4Sw9OdVRy/Ysk0VROOPMdvyuuB1wY94=;
+        b=Ffjy6Jy/rKQxf0p9iUNuMOCSDbrr8wNss+0jmOhzNgs05UaWGBGznCEZ9Ktx8bRmlcTaNY
+        IReP1GfjHQE/clVxBRMps7HrEvdpVM1BBL8C7eCPOl7GcYYOkdX3Y+moebWius5MgFnsIJ
+        Xypw6YzRPmz7swzdQmL+n5+UNhHUewQ=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-20-ZZyNklRLPk6kmmIOwoSEXQ-1; Mon, 23 Jan 2023 14:37:21 -0500
+X-MC-Unique: ZZyNklRLPk6kmmIOwoSEXQ-1
+Received: by mail-io1-f71.google.com with SMTP id y22-20020a5d94d6000000b007076e06ba3dso7630756ior.20
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 11:37:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=U3waa7Vh+F3v4Sw9OdVRy/Ysk0VROOPMdvyuuB1wY94=;
+        b=fj9I3utyjjGnzvyVjvW5UizssFq1hc9JYmKGgYrXnQoKUlYlvbA7k4/v1BaMyx9MSC
+         fJWxSxMQ/QOALts6uCMgGVL11oSVyD0rJGb9qJ6ouH38Yo5WBrRxMdRi0MHm+K0GpLjm
+         DX4iDqwQ6HgnFvUzZNiYrxT9wd0AQOFo0S94/BjrqjDbvNKtNYyYU9EjEx5oma8mdFX5
+         VqZaJQc1N/dB3WYIzGWgsJHRkwtrLVsKE3bxxpiygb0u4DaOR0/FIALst7wdjq7tT1bv
+         aTtpWFgCEgXYgJZQITrdYC6Kw/pMYs/GMfm6/Ne4btRsJ9vpDIfwKkDJmyZs+aHQDbQL
+         dc1w==
+X-Gm-Message-State: AFqh2kosrQu+A2p3Y5+cfd/pmxCWXFmZLwhvu9QUJU66t2IN6QgsSm9+
+        7z9INUXXpSBiZ+B5FFEVA1gPpoAZDeMbGQFspf7pYK8fRZMo3RsXI3mXpwEL7fBc4kBgB+Q3wfi
+        eMW5Q8TRspcZN
+X-Received: by 2002:a6b:e812:0:b0:704:c53c:87e1 with SMTP id f18-20020a6be812000000b00704c53c87e1mr19626890ioh.19.1674502641188;
+        Mon, 23 Jan 2023 11:37:21 -0800 (PST)
+X-Google-Smtp-Source: AMrXdXvlHPcLruMSlZ46j7dIYhdYjmfLX++yyUXL53K95uB7smD1R7fbFefFew3pItw9QDm9fSngrA==
+X-Received: by 2002:a6b:e812:0:b0:704:c53c:87e1 with SMTP id f18-20020a6be812000000b00704c53c87e1mr19626884ioh.19.1674502640945;
+        Mon, 23 Jan 2023 11:37:20 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id v26-20020a056602059a00b00704c3128817sm7121378iox.43.2023.01.23.11.37.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Jan 2023 11:37:20 -0800 (PST)
+Date:   Mon, 23 Jan 2023 12:36:58 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Angus Chen <angus.chen@jaguarmicro.com>
+Cc:     eric.auger@redhat.com, cohuck@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio: platform: No need to check res again
+Message-ID: <20230123123658.2748e6fc.alex.williamson@redhat.com>
+In-Reply-To: <20230107034721.2127-1-angus.chen@jaguarmicro.com>
+References: <20230107034721.2127-1-angus.chen@jaguarmicro.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [RFC PATCH v3 08/31] KVM: selftests: Require GCC to realign
- stacks on function entry
-To:     Erdem Aktas <erdemaktas@google.com>,
-        Sean Christopherson <seanjc@google.com>
-Cc:     Ackerley Tng <ackerleytng@google.com>,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        isaku.yamahata@intel.com, sagis@google.com, afranji@google.com,
-        runanwang@google.com, shuah@kernel.org, drjones@redhat.com,
-        maz@kernel.org, bgardon@google.com, jmattson@google.com,
-        dmatlack@google.com, peterx@redhat.com, oupton@google.com,
-        ricarkol@google.com, yang.zhong@intel.com, wei.w.wang@intel.com,
-        xiaoyao.li@intel.com, pgonda@google.com, marcorr@google.com,
-        eesposit@redhat.com, borntraeger@de.ibm.com, eric.auger@redhat.com,
-        wangyanan55@huawei.com, aaronlewis@google.com, vkuznets@redhat.com,
-        pshier@google.com, axelrasmussen@google.com,
-        zhenzhong.duan@intel.com, like.xu@linux.intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-References: <20230121001542.2472357-1-ackerleytng@google.com>
- <20230121001542.2472357-9-ackerleytng@google.com>
- <Y8sxjppvEnm4IBWG@google.com>
- <CAAYXXYy7=ZTCZ1LQ3_Sy39ju_xG5++dTrxi+DKGcbpJ5VJ3OuQ@mail.gmail.com>
-Content-Language: en-US, pl-PL
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-In-Reply-To: <CAAYXXYy7=ZTCZ1LQ3_Sy39ju_xG5++dTrxi+DKGcbpJ5VJ3OuQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 23.01.2023 19:30, Erdem Aktas wrote:
-> On Fri, Jan 20, 2023 at 4:28 PM Sean Christopherson <seanjc@google.com> wrote:
->>
->> On Sat, Jan 21, 2023, Ackerley Tng wrote:
->>> Some SSE instructions assume a 16-byte aligned stack, and GCC compiles
->>> assuming the stack is aligned:
->>> https://gcc.gnu.org/bugzilla/show_bug.cgi?id=40838. This combination
->>> results in a #GP in guests.
->>>
->>> Adding this compiler flag will generate an alternate prologue and
->>> epilogue to realign the runtime stack, which makes selftest code
->>> slower and bigger, but this is okay since we do not need selftest code
->>> to be extremely performant.
->>
->> Huh, I had completely forgotten that this is why SSE is problematic.  I ran into
->> this with the base UPM selftests and just disabled SSE.  /facepalm.
->>
->> We should figure out exactly what is causing a misaligned stack.  As you've noted,
->> the x86-64 ABI requires a 16-byte aligned RSP.  Unless I'm misreading vm_arch_vcpu_add(),
->> the starting stack should be page aligned, which means something is causing the
->> stack to become unaligned at runtime.  I'd rather hunt down that something than
->> paper over it by having the compiler force realignment.
+On Sat,  7 Jan 2023 11:47:20 +0800
+Angus Chen <angus.chen@jaguarmicro.com> wrote:
+
+> In function vfio_platform_regions_init(),we did check res implied
+> by using while loop,
+> so no need to check whether res be null or not again.
 > 
-> Is not it due to the 32bit execution part of the guest code at boot
-> time. Any push/pop of 32bit registers might make it a 16-byte
-> unaligned stack.
+> No functional change intended.
+> 
+> Signed-off-by: Angus Chen <angus.chen@jaguarmicro.com>
+> ---
+>  drivers/vfio/platform/vfio_platform_common.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+> index 1a0a238ffa35..a9ad3f4d2613 100644
+> --- a/drivers/vfio/platform/vfio_platform_common.c
+> +++ b/drivers/vfio/platform/vfio_platform_common.c
+> @@ -150,9 +150,6 @@ static int vfio_platform_regions_init(struct vfio_platform_device *vdev)
+>  		struct resource *res =
+>  			vdev->get_resource(vdev, i);
+>  
+> -		if (!res)
+> -			goto err;
+> -
+>  		vdev->regions[i].addr = res->start;
+>  		vdev->regions[i].size = resource_size(res);
+>  		vdev->regions[i].flags = 0;
 
-32-bit stack needs to be 16-byte aligned, too (at function call boundaries) -
-see [1] chapter 2.2.2 "The Stack Frame"
+Applied to vfio next branch for v6.3.  Thanks,
 
-Thanks,
-Maciej
-
-[1]: https://www.uclibc.org/docs/psABI-i386.pdf
+Alex
 
