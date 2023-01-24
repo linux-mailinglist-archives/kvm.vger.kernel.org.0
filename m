@@ -2,123 +2,97 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9F9D5678C81
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 01:04:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFD3F678CAA
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 01:13:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232226AbjAXAEi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 19:04:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40744 "EHLO
+        id S231513AbjAXAN5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 19:13:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232655AbjAXAEf (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 19:04:35 -0500
-Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7186A71
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 16:04:29 -0800 (PST)
-Received: by mail-vk1-xa2a.google.com with SMTP id t2so6840661vkk.9
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 16:04:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=l7mwajEm76YoiYSB/V9MrizwymViJaehFEWPplLW4cU=;
-        b=GNGQnuNQKkQJgkDj3E9MuzhwJNzPRSgxVH+D81dgY+kINqbVVGvDlN1xoclVv69tV1
-         st9cXbSUPSSi4W5iBbMdUUuUoww9j0MBskM1VgXs9dJxfqa9ZKyct9dqS27kA9hMD7yJ
-         SUSvqaCdisIxxIODDiecgk2vBpQh3QGIMxEw4vjTDPcqfT29xgfyxvGm2aSPN2iH171K
-         h7aKKcGDVMBOcH5QA7PJJYbG4JvCQcYqIwV46tcUbMVSeTuG9O2ELZIldFit3u2jGEpQ
-         BL9/UGZniAt1gcJAWh9AzCngbiOCHWxfXEqQpeEC++OZOrzXF0pTDgbOByCEPHm6eVCb
-         kJOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l7mwajEm76YoiYSB/V9MrizwymViJaehFEWPplLW4cU=;
-        b=oAbMQIQV0rAXtI8aTgEMnIyIzaDS9noVSTaORxsfWs0EclLCgfhitobLMKfNXg7BZe
-         nvKvwngh+uJaD7Xj/HHfU33HIKNc1krEj+v7P2j5uwMBbJCehAiAoitCIRN5NKSChlsF
-         E5XXtdwBa1/FhMzj2mplJb0SIu+4QXMUqIwCKMfsVy8civBXcKzyaAVpVylp8FEH7DMj
-         NIxkMnNtvAZQOeYQovWmhktZEOqJ2iPy9uVq3eo4hA1D3HpivJYcQ7B/Vwre4eaFqa/A
-         sU9/vc0tD59F5tdP8zL7Qon+2DzsqFhkoNvaT+MxH1Y5GL7EybElOHq5TZmJ1SGZwzRC
-         hJDg==
-X-Gm-Message-State: AFqh2kqCo76q+O+zYE0quT/VBIuKdQdFySdNwue5/mVyMWO7uu51rsTh
-        59ZJLh35ofRx15rxvi+qjKeds7DUx/jWncCMJIX9TQ==
-X-Google-Smtp-Source: AMrXdXsqjE43sQI2EnZqMzPo+vtzh0Jj20NAjdE6K8Pau0aUn2g/X5IAjPDDAbO+o5t96B3IIWd6G+e17iWq6svdSYQ=
-X-Received: by 2002:a05:6122:219e:b0:3d5:dcb7:5f88 with SMTP id
- j30-20020a056122219e00b003d5dcb75f88mr3551142vkd.37.1674518668115; Mon, 23
- Jan 2023 16:04:28 -0800 (PST)
+        with ESMTP id S231274AbjAXANz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 19:13:55 -0500
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D012E3928F
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 16:13:50 -0800 (PST)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1pK6wd-00FWWh-09; Tue, 24 Jan 2023 01:13:47 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=hy8GiN7oR1zrZLDXK5pB2M+tlz4dOiv+/O6aK97woPk=; b=o20UtirM2NAVmZiZEEsSn+llFv
+        CwmYe0sXNAjuNI+gcju+GLz4oUlEl8opf1T2uQAUru2/QoYjlflWvM2/JgyvYHtdRdAxKEDuoIDQO
+        ugD3NAht8+xnfq5vzOoUnQyCyzbilyeEQqzVlbb6enRawT5sT+HKd1PPFGNAs9MYG9z1P332L/ObO
+        jtV4tqtomQKhM47fnJYc2vLOF70d7WaFp1NAKPyzQIb8vlvWGQxkf3z3FnQq2+EyKxJDSDn33rz0H
+        qAEpsCGkp+OwwIZdVhJAYxF39/I85iC58ZEsC/d5Jh4fpszzbzrpmuD9dciihb/UxkJLThz0vH8Pr
+        O3IXMu9Q==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1pK6wc-0005pZ-He; Tue, 24 Jan 2023 01:13:46 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1pK6wI-0008G3-It; Tue, 24 Jan 2023 01:13:26 +0100
+Message-ID: <bb2307fb-298f-c290-a6c9-6861016a6689@rbox.co>
+Date:   Tue, 24 Jan 2023 01:13:25 +0100
 MIME-Version: 1.0
-References: <20230121001542.2472357-1-ackerleytng@google.com>
- <20230121001542.2472357-9-ackerleytng@google.com> <Y8sxjppvEnm4IBWG@google.com>
- <CAAYXXYy7=ZTCZ1LQ3_Sy39ju_xG5++dTrxi+DKGcbpJ5VJ3OuQ@mail.gmail.com>
- <99a36eed-e4e5-60ec-0f88-a33d1842a0d6@maciej.szmigiero.name> <Y87XnYZx1qzZOLKR@google.com>
-In-Reply-To: <Y87XnYZx1qzZOLKR@google.com>
-From:   Erdem Aktas <erdemaktas@google.com>
-Date:   Mon, 23 Jan 2023 16:04:16 -0800
-Message-ID: <CAAYXXYyqDJx4=cSy3kp7vX4VF+5z_Rtm6wPM8_o9BmHkB_T-kg@mail.gmail.com>
-Subject: Re: [RFC PATCH v3 08/31] KVM: selftests: Require GCC to realign
- stacks on function entry
+User-Agent: Thunderbird
+Subject: Re: [PATCH] Revert "KVM: mmio: Fix use-after-free Read in
+ kvm_vm_ioctl_unregister_coalesced_mmio"
+Content-Language: en-GB, pl-PL, en-US
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-        Ackerley Tng <ackerleytng@google.com>,
-        linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-        isaku.yamahata@intel.com, sagis@google.com, afranji@google.com,
-        runanwang@google.com, shuah@kernel.org, drjones@redhat.com,
-        maz@kernel.org, bgardon@google.com, jmattson@google.com,
-        dmatlack@google.com, peterx@redhat.com, oupton@google.com,
-        ricarkol@google.com, yang.zhong@intel.com, wei.w.wang@intel.com,
-        xiaoyao.li@intel.com, pgonda@google.com, marcorr@google.com,
-        eesposit@redhat.com, borntraeger@de.ibm.com, eric.auger@redhat.com,
-        wangyanan55@huawei.com, aaronlewis@google.com, vkuznets@redhat.com,
-        pshier@google.com, axelrasmussen@google.com,
-        zhenzhong.duan@intel.com, like.xu@linux.intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+References: <20230118220003.1239032-1-mhal@rbox.co>
+ <Y88S2F2laAvqmj+E@google.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <Y88S2F2laAvqmj+E@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 10:53 AM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Jan 23, 2023, Maciej S. Szmigiero wrote:
-> > On 23.01.2023 19:30, Erdem Aktas wrote:
-> > > On Fri, Jan 20, 2023 at 4:28 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > >
-> > > > On Sat, Jan 21, 2023, Ackerley Tng wrote:
-> > > > > Some SSE instructions assume a 16-byte aligned stack, and GCC compiles
-> > > > > assuming the stack is aligned:
-> > > > > https://gcc.gnu.org/bugzilla/show_bug.cgi?id=40838. This combination
-> > > > > results in a #GP in guests.
-> > > > >
-> > > > > Adding this compiler flag will generate an alternate prologue and
-> > > > > epilogue to realign the runtime stack, which makes selftest code
-> > > > > slower and bigger, but this is okay since we do not need selftest code
-> > > > > to be extremely performant.
-> > > >
-> > > > Huh, I had completely forgotten that this is why SSE is problematic.  I ran into
-> > > > this with the base UPM selftests and just disabled SSE.  /facepalm.
-> > > >
-> > > > We should figure out exactly what is causing a misaligned stack.  As you've noted,
-> > > > the x86-64 ABI requires a 16-byte aligned RSP.  Unless I'm misreading vm_arch_vcpu_add(),
-> > > > the starting stack should be page aligned, which means something is causing the
-> > > > stack to become unaligned at runtime.  I'd rather hunt down that something than
-> > > > paper over it by having the compiler force realignment.
-> > >
-> > > Is not it due to the 32bit execution part of the guest code at boot
-> > > time. Any push/pop of 32bit registers might make it a 16-byte
-> > > unaligned stack.
-> >
-> > 32-bit stack needs to be 16-byte aligned, too (at function call boundaries) -
-> > see [1] chapter 2.2.2 "The Stack Frame"
->
-> And this showing up in the non-TDX selftests rules that out as the sole problem;
-> the selftests stuff 64-bit mode, i.e. don't have 32-bit boot code.
+On 1/24/23 00:06, Sean Christopherson wrote:
+> On Wed, Jan 18, 2023, Michal Luczaj wrote:
+>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>> ---
+>>  virt/kvm/coalesced_mmio.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/virt/kvm/coalesced_mmio.c b/virt/kvm/coalesced_mmio.c
+>> index 0be80c213f7f..f08f5e82460b 100644
+>> --- a/virt/kvm/coalesced_mmio.c
+>> +++ b/virt/kvm/coalesced_mmio.c
+>> @@ -186,6 +186,7 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
+>>  		    coalesced_mmio_in_range(dev, zone->addr, zone->size)) {
+>>  			r = kvm_io_bus_unregister_dev(kvm,
+>>  				zone->pio ? KVM_PIO_BUS : KVM_MMIO_BUS, &dev->dev);
+>> +			kvm_iodevice_destructor(&dev->dev);
+>>  
+>>  			/*
+>>  			 * On failure, unregister destroys all devices on the
+>> @@ -195,7 +196,6 @@ int kvm_vm_ioctl_unregister_coalesced_mmio(struct kvm *kvm,
+>>  			 */
+>>  			if (r)
+>>  				break;
+>> -			kvm_iodevice_destructor(&dev->dev);
+> 
+> Already posted[1], but didn't get queued because there's alternative solution[2]
+> that yields a far cleaner end result, albeit with a larger patch.  I'll follow
+> up on Wei's patch to move things along.
+> 
+> [1] https://lore.kernel.org/all/20221219171924.67989-1-seanjc@google.com
+> [2] https://lore.kernel.org/all/20221229123302.4083-1-wei.w.wang@intel.com
 
-Thanks Maciej and Sean for the clarification. I was suspecting the
-hand-coded assembly part that we have for TDX tests but  it being
-happening in the non-TDX selftests disproves it.
+I apologise for the noise, I should have searched the archives before posting.
+
+Michal
+
+
