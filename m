@@ -2,117 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D7B4367A3BD
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 21:22:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A9D667A3E9
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 21:29:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229719AbjAXUW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 15:22:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37754 "EHLO
+        id S233544AbjAXU3A (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 15:29:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232601AbjAXUWv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 15:22:51 -0500
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E942DB76D
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 12:22:44 -0800 (PST)
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.93)
-        (envelope-from <mhal@rbox.co>)
-        id 1pKPoO-000A7t-C2; Tue, 24 Jan 2023 21:22:32 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-        bh=ofpnODegQDOIRCO2eZN2SpGGzNBUu2sXhCtmyK94QM4=; b=eD07QtPIUxEY6K58yJAcgjTCJI
-        fR61X2nt7aWWjOa3y8vvkRlm2332FFy4uo6pjGeuLB+3ZyeJJJd1fq/MvBRnQJTKcM/WRQJ0IA+xn
-        w+jsF166ItraAHI3eWsCei5g79qfoVLwe8GvdERV9zqqIANo7+PHbGR4zcqn2STHxxwt+zXAxQLXI
-        KwcSoajLmtYWpF67B8ErK25bNyCMyDvSYCALzK1ToWJKVVMXZiElGtPjpp4rmMW20mMIpfFqkHt2Y
-        WN9MlhEOOUGdZjmF3++nKQJx6cPPEeeQ4HMY3eaaBgVBsrPFT/evkxdatR85gbyiXqtDyKGx7qbNY
-        B+mbfEWA==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-        (envelope-from <mhal@rbox.co>)
-        id 1pKPoN-0001OO-8D; Tue, 24 Jan 2023 21:22:31 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.90_1)
-        id 1pKPoH-0005lf-HN; Tue, 24 Jan 2023 21:22:25 +0100
-Message-ID: <85285ccd-7b1a-9a94-5471-8036cb824b28@rbox.co>
-Date:   Tue, 24 Jan 2023 21:22:23 +0100
+        with ESMTP id S231538AbjAXU3A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 15:29:00 -0500
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A73983C24
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 12:28:58 -0800 (PST)
+Date:   Tue, 24 Jan 2023 12:28:50 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1674592137;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/73jyguC+09XrXALkeeQcLu9/HGBWgVwVY/mjTKders=;
+        b=woDgSpregoLNsOVwUQdBXD0Vl+FpzkusPWIX5UQqTUW4HffQhV9MLoWH3z5cmC6vBFuyxl
+        9hcF052WTTUoXEFRSZPvwV6QSKQqGuPDEXgE1X0LwhJZZcbV8HNm+YkLURlZXgXaQOlIDT
+        2eHjfRN1VFHKZ9+Q1NE6CSyveAbmj30=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Ricardo Koller <ricarkol@google.com>,
+        Ben Gardon <bgardon@google.com>, pbonzini@redhat.com,
+        maz@kernel.org, yuzenghui@huawei.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, ricarkol@gmail.com
+Subject: Re: [PATCH 3/9] KVM: arm64: Add kvm_pgtable_stage2_split()
+Message-ID: <Y9A/gk0uAdNbbmbE@thinky-boi>
+References: <20230113035000.480021-1-ricarkol@google.com>
+ <20230113035000.480021-4-ricarkol@google.com>
+ <CANgfPd_PgrZ_4oRDT3ZaqX=3jboD=2qEUKefp4TsKM36p187gw@mail.gmail.com>
+ <Y9ALgtnd+h9ivn90@google.com>
+ <Y9ARN5hWlAYVFBoK@google.com>
+ <CAOHnOrxGu2sU2+-M8+-nMiRc01BQvRug+S2rnBbK6HiCP_BMVw@mail.gmail.com>
+ <Y9AZ7ORdmIPQ1YGL@google.com>
 MIME-Version: 1.0
-User-Agent: Thunderbird
-Subject: Re: [PATCH v1] KVM: destruct kvm_io_device while unregistering it
- from kvm_io_bus
-Content-Language: pl-PL
-To:     Sean Christopherson <seanjc@google.com>,
-        Wei Wang <wei.w.wang@intel.com>
-Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        =?UTF-8?B?5p+z6I+B5bOw?= <liujingfeng@qianxin.com>
-References: <20221229123302.4083-1-wei.w.wang@intel.com>
- <Y88XYR0L2DyiKnIM@google.com>
-From:   Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <Y88XYR0L2DyiKnIM@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9AZ7ORdmIPQ1YGL@google.com>
+X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/24/23 00:25, Sean Christopherson wrote:
-> On Thu, Dec 29, 2022, Wei Wang wrote:
->> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
->> index 2a3ed401ce46..1b277afb545b 100644
->> --- a/virt/kvm/eventfd.c
->> +++ b/virt/kvm/eventfd.c
->> @@ -898,7 +898,6 @@ kvm_deassign_ioeventfd_idx(struct kvm *kvm, enum kvm_bus bus_idx,
->>  		bus = kvm_get_bus(kvm, bus_idx);
->>  		if (bus)
->>  			bus->ioeventfd_count--;
->> -		ioeventfd_release(p);
->>  		ret = 0;
->>  		break;
->>  	}
+On Tue, Jan 24, 2023 at 09:48:28AM -0800, David Matlack wrote:
+> On Tue, Jan 24, 2023 at 09:18:33AM -0800, Ricardo Koller wrote:
+> > On Tue, Jan 24, 2023 at 9:11 AM Oliver Upton <oliver.upton@linux.dev> wrote:
 
-I was wondering: would it make sense to simplify from
-list_for_each_entry_safe() to list_for_each_entry() in this loop?
+[...]
 
->> @@ -5453,18 +5459,18 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
->>  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
->>  	synchronize_srcu_expedited(&kvm->srcu);
->>  
->> -	/* Destroy the old bus _after_ installing the (null) bus. */
->> +	/*
->> +	 * If (null) bus is installed, destroy the old bus, including all the
->> +	 * attached devices. Otherwise, destroy the caller's device only.
->> +	 */
->>  	if (!new_bus) {
->>  		pr_err("kvm: failed to shrink bus, removing it completely\n");
->> -		for (j = 0; j < bus->dev_count; j++) {
->> -			if (j == i)
->> -				continue;
->> -			kvm_iodevice_destructor(bus->range[j].dev);
->> -		}
->> +		kvm_io_bus_destroy(bus);
->> +		return -ENOMEM;
+> > > The numbering we use in the page table walkers is deliberate, as it
+> > > directly matches the Arm ARM. While we can certainly use either scheme
+> > > I'd prefer we keep aligned with the architecture.
+> > 
+> > hehe, I was actually subtly suggesting our x86 friends to change their side.
 > 
-> Returning an error code is unnecessary if unregister_dev() destroys the bus.
-> Nothing ultimately consumes the result, e.g. kvm_vm_ioctl_unregister_coalesced_mmio()
-> intentionally ignores the result other than to bail from the loop, and destroying
-> the bus means it will immediately bail from the loop anyways.
+> Yeah KVM/x86 and KVM/ARM use basically opposite numbering schemes for
+> page table levels.
+> 
+> Level | KVM/ARM | KVM/x86
+> ----- | ------- | ---------------
+> pte   | 3       | 1 (PG_LEVEL_4K)
+> pmd   | 2       | 2 (PG_LEVEL_2M)
+> pud   | 1       | 3 (PG_LEVEL_1G)
+> p4d   | 0       | 4
+>       | -1      | 5
+> 
+> The ARM levels come from the architecture, whereas the x86 levels are
+> arbitrary.
+> 
+> I do think it would be valuable to standardize on one leveling scheme at
+> some point. Otherwise, mixing level schemes is bound to be a source of
+> bugs if and when we are sharing more MMU code across architectures.
 
-But it is important to know _if_ the bus was destroyed, right?
-IOW, doesn't your comment from commit 5d3c4c79384a still hold?
+That could work, so long as the respective ISAs don't depend on any
+specific numbering scheme. For arm64 the level hints encoded in TLBIs
+match our numbering scheme, which is quite valuable. We are definitely
+at odds with RISC-V's numbering scheme (descending order, starting from
+root), but AFAICT there doesn't appear to be any portion of the ISA that
+depends on it (yet).
 
-    (...) But, it doesn't tell the caller that it obliterated the
-    bus and invoked the destructor for all devices that were on the bus.  In
-    the coalesced MMIO case, this can result in a deleted list entry
-    dereference due to attempting to continue iterating on coalesced_zones
-    after future entries (in the walk) have been deleted.
+Sure, we could add some glue code to transform KVM's common leveling
+scheme into an architecture-specific one for these use cases, but I
+worry that'll be incredibly error-prone.
 
-Michal
+In any case I'd prefer we not make any changes at this point, as they'd
+be purely cosmetic.
 
+--
+Thanks,
+Oliver
