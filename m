@@ -2,64 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A912E67925F
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 08:55:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 003C567936B
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 09:47:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232927AbjAXHzG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 02:55:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34576 "EHLO
+        id S233119AbjAXIrK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 03:47:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232203AbjAXHzE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 02:55:04 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 021243EFC3
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 23:55:02 -0800 (PST)
+        with ESMTP id S232559AbjAXIrJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 03:47:09 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E06832533;
+        Tue, 24 Jan 2023 00:47:02 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 562F0B810DB
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 07:55:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F612C433A1
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 07:55:00 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 09DBFB80F10;
+        Tue, 24 Jan 2023 08:47:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1577C433EF;
+        Tue, 24 Jan 2023 08:46:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674546900;
-        bh=ANHmRddKilWanGW/XcBBpQ7FgBClld3EIew1tu3+Tl8=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=eyaSLzMlMjZvM8QCwm1N/gXLZM+5EfYYkit/1hYmxnGFpsnUMypjy6bXjS3s2LHKy
-         qmgD26NYLX01WEsfQkbM/J2F2DQpSk2RukwOEPIo7OOqey1i5VPML5ngtfJ6XfWmEW
-         iccVpiFoTTHQz/46lGCXREek5wtMsnhig9ucGUZ/PEj1yvqx6zn8FLv5+RmpG4Sm+M
-         p/92bYahf+7Ir3dpXykhhgv8xm9JbGoHcsu7qHIfBDx4305RmO2Sw6cGAJFOHz7JoI
-         BEdZ+v0n+KFNaug/WhbhwPwCqixr7lDyaeQDgTjtehEA95/eVmWTHNMh3dtThJyDKc
-         LNj056nh5CROA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id F1C29C43141; Tue, 24 Jan 2023 07:54:59 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 208081] Memory leak in kvm_async_pf_task_wake
-Date:   Tue, 24 Jan 2023 07:54:59 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: BarinaHoppe@proton.me
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-208081-28872-W1ptaDxZff@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-208081-28872@https.bugzilla.kernel.org/>
-References: <bug-208081-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        s=k20201202; t=1674550019;
+        bh=IY1JiC1oRAjnhaWxVJ9ysa7pffnfQj3zjXFKj+NMIhs=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=banXH7kytPllxOUHpd5VNZr60bDUXhZQIkqcEsbodHhv3YsjjPxVPHBQVqfwi+mX6
+         i+9hhns+IwN79XIC83USQGML9UzaHP7flISvwKXqshKm6duQVE30f5TypEEDKaQk3Y
+         aPGX0c9GtHk3CFTvRhvYnI1eKlztH7zPF3yIsqQWgi7wFp8VdyoHVNtL5xvzR5g+Yc
+         fLbRthmQ0vR7gyZSc+wz2vb6mydNPBUx2Mh4K2cPkT6wxgKaUV+BQdxibGWXEdVVen
+         +4u8e+/9APeQwIHpvwEnCj6hJ3pAjd6hgHcGYwsG6DOoqEOMaY3bHtIOk2KdNaOCID
+         z1GWQhHAAv0jg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pKExF-004BqN-Ik;
+        Tue, 24 Jan 2023 08:46:57 +0000
+Date:   Tue, 24 Jan 2023 08:46:57 +0000
+Message-ID: <86a628mi9q.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+Cc:     KVM <kvm@vger.kernel.org>,
+        Christoffer Dall <cdall@cs.columbia.edu>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: duplicate patches in the kvm-x86 tree
+In-Reply-To: <20230124125515.7c88c9fb@canb.auug.org.au>
+References: <20230124125515.7c88c9fb@canb.auug.org.au>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: sfr@canb.auug.org.au, seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org, cdall@cs.columbia.edu, linux-kernel@vger.kernel.org, linux-next@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -69,23 +68,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D208081
+Hi Stephen,
 
-BarinaHoppe (BarinaHoppe@proton.me) changed:
+On Tue, 24 Jan 2023 01:55:15 +0000,
+Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> 
+> Hi all,
+> 
+> The following commits are also in other tree(s?) as different
+> commits (but the same patches):
+> 
+>   0b6639e8ed87 ("KVM: s390: Move hardware setup/unsetup to init/exit")
+>   0c2be59e0b53 ("KVM: x86: Use KBUILD_MODNAME to specify vendor module name")
+>   1334f214d19f ("KVM: s390: Unwind kvm_arch_init() piece-by-piece() if a step fails")
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |BarinaHoppe@proton.me
+[...]
 
---- Comment #7 from BarinaHoppe (BarinaHoppe@proton.me) ---
-If you are having a problem with the Bosch Dishwasher, it can be frustratin=
-g in
-your day-to-day life. To solve most of the problems in the Bosch Dishwasher=
-, we
-can reset the Bosch Dishwasher. Visit - https://appliancebytes.com/
+> I guess someone has rebased one of the kvm trees and it had already been
+> merged into another (like the kvm or kvm-arm trees).
 
---=20
-You may reply to this email to add a comment.
+Huh, that's worrying. I'm carrying the kvm-hw-enable-refactor branch
+from the KVM tree, which I understood to be a stable branch[1], and
+which I merged to avoid conflicts to be propagated everywhere.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Paolo, Sean: what is the *real* status of this branch?
+
+	M.
+
+[1] https://lore.kernel.org/r/4d73d1b9-2c28-ab6a-2963-579bcc7a9e67@redhat.com
+
+-- 
+Without deviation from the norm, progress is not possible.
