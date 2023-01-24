@@ -2,65 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 42F6D6796D8
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 12:42:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AB49E6797A7
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 13:20:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234264AbjAXLmf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 06:42:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36848 "EHLO
+        id S233440AbjAXMUq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 07:20:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234266AbjAXLm0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 06:42:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABE162884B
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 03:41:44 -0800 (PST)
+        with ESMTP id S231538AbjAXMUp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 07:20:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC0C045886
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 04:19:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674560503;
-        h=from:from:reply-to:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:mime-version:mime-version:
-         content-type:content-type; bh=+2NFEF7IRIXzVpiGFFgag93HDumbpr+DQPbZrpSfuYk=;
-        b=B8uzPS1ItkYPe8lUm6hhNXXFoATGsIplcUnPXG4O1ylHARa+EqzHMGdg5x79U3amHsf+71
-        YjpXvBk+ToYlrE9sqZknyjqyHn/9QbSMpLHM16+ryzZ9bR4tnNDAy+urKtJD2jcJVW6UBx
-        cMdF1xYF7UxVDGQGmRCPDGC4tJufvpg=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-350-gB-AUVkBOYSEFPht_y-rIQ-1; Tue, 24 Jan 2023 06:41:42 -0500
-X-MC-Unique: gB-AUVkBOYSEFPht_y-rIQ-1
-Received: by mail-wm1-f72.google.com with SMTP id bg25-20020a05600c3c9900b003da1f6a7b2dso11068012wmb.1
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 03:41:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=mime-version:message-id:date:reply-to:user-agent:subject:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+2NFEF7IRIXzVpiGFFgag93HDumbpr+DQPbZrpSfuYk=;
-        b=Dk/wegzdGvLGRwUIrsBgaoDKpz6qQMg8M4JNcdN411+DFco1X2YGvc9QuDwqTMJqx+
-         SgSd+02CebbE5Fp/rt81TD1NQUxDas1bXuGMk4G2qnJf11GEfZ/5IXnk6CSq44g2JwIg
-         cECt8+M/jtMfiKwjfebDM67/NQN+RFWnQ3h7iGjQUKNPUVAe3SYe9Fi05alaVygPk2FG
-         WQL1BZQE1b6FI0dZAgt5nQpAkjfCr+nn4CXVKBaRMQkxJf2FJibtLQUkEKApiIoYwGun
-         vgjDwLhjlAOV8Z/64aIkPuQhylGJv+TLNCCnkhamyU5+IlgYifvkbYYlo8Xt35vZtykp
-         IIcg==
-X-Gm-Message-State: AFqh2kqZjp73AXgglybltbdiUD6p9cc/DR/zMHPNG2XyENXX/qq2J/cq
-        ZC9WgjI1RFFc8D/eiC/4cUgg/5yS86RXkKu4+dsHx5fNvjC+kBGjMtogBYdwZhDf60oX1yKYUqU
-        gzYspaVHaWrmCxRNphSKqj1aE7+8i0EDrQTnyWodYu79BQidUCuZY8bE2lokFoWkF
-X-Received: by 2002:a5d:5c10:0:b0:2be:3ccd:7f33 with SMTP id cc16-20020a5d5c10000000b002be3ccd7f33mr20356119wrb.27.1674560500734;
-        Tue, 24 Jan 2023 03:41:40 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvGGtuLQf5OyAI7AkSDGbqG+sSRaqvFyvMgJzPwIxPdW0Wv+2hsmrkdKiqYekgAQ+bDdsh/tg==
-X-Received: by 2002:a5d:5c10:0:b0:2be:3ccd:7f33 with SMTP id cc16-20020a5d5c10000000b002be3ccd7f33mr20356102wrb.27.1674560500497;
-        Tue, 24 Jan 2023 03:41:40 -0800 (PST)
-Received: from redhat.com ([46.136.252.173])
-        by smtp.gmail.com with ESMTPSA id z8-20020a5d4408000000b002b8fe58d6desm1673525wrq.62.2023.01.24.03.41.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 03:41:39 -0800 (PST)
-From:   Juan Quintela <quintela@redhat.com>
-To:     kvm-devel <kvm@vger.kernel.org>, qemu-devel@nongnu.org
-Subject: Today KVM call meeting
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
-Reply-To: quintela@redhat.com
-Date:   Tue, 24 Jan 2023 12:41:39 +0100
-Message-ID: <878rhsgnws.fsf@secure.mitica>
+        s=mimecast20190719; t=1674562790;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=NO0Vxj0TvyYGxRIeR6HtKCRtmt8deFyema5cizHmwcc=;
+        b=TGL4p6LcLtvMNUAd8KgxBdgZczQl5U0ciSNGZA1pF9LGRXPuk9PwiU2M0uq7w9IbnAPtMi
+        4bpfuX3pYFOBucoL0+Pf0LmywWu2YMvSgmQfBNTqsIQQnTX0aM/qWf1AOskubGy/Wohwi+
+        UwSD77zrps1QJoaYtlF0pm3FUlYqr4A=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-551-fQMi2Gu3NH2ay_k6ijffYQ-1; Tue, 24 Jan 2023 07:19:49 -0500
+X-MC-Unique: fQMi2Gu3NH2ay_k6ijffYQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 474E73C1022B;
+        Tue, 24 Jan 2023 12:19:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.192.70])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D0AF2166B26;
+        Tue, 24 Jan 2023 12:19:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+        id 801C221E6A1F; Tue, 24 Jan 2023 13:19:46 +0100 (CET)
+From:   Markus Armbruster <armbru@redhat.com>
+To:     qemu-devel@nongnu.org
+Cc:     pbonzini@redhat.com, kraxel@redhat.com, kwolf@redhat.com,
+        hreitz@redhat.com, marcandre.lureau@redhat.com,
+        dgilbert@redhat.com, mst@redhat.com, imammedo@redhat.com,
+        ani@anisinha.ca, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
+        philmd@linaro.org, wangyanan55@huawei.com, jasowang@redhat.com,
+        jiri@resnulli.us, berrange@redhat.com, thuth@redhat.com,
+        quintela@redhat.com, stefanb@linux.vnet.ibm.com,
+        stefanha@redhat.com, kvm@vger.kernel.org, qemu-block@nongnu.org
+Subject: [PATCH 00/32] Move and clean up monitor command code
+Date:   Tue, 24 Jan 2023 13:19:14 +0100
+Message-Id: <20230124121946.1139465-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -71,34 +65,129 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+Over the years, many commands got dumped into monitor/, where
+MAINTAINERS blames them on Dave and me.  Recent "[PATCH v2 00/13] pci:
+Move and clean up monitor command code" (merge commit 33698d3abf8)
+evicted commands related to PCI (qapi/pci.json), and "[PATCH v4 00/17]
+ui: Move and clean up monitor command code" (merge commit 70d17c3eede)
+evicted commands rated to UI (qapi/ui.json) This series evicts most of
+the rest.  Commands related to the monitor itself (qapi/control.json
+qapi/introspect.json) and miscellaneous commands (qapi/misc.json) stay
+in monitor/.
 
-Hi
+Together, these patches move almost 4000 lines from monitor/ to
+subsystems where they belong.
 
-We are having today a call meeting, we are switching to jitsi as
-discussed on the previous call.  The "coordinates" are:
+Based-on: <20230119091545.3116376-1-armbru@redhat.com>
 
-Click the following link to join the meeting:
-https://meet.jit.si/kvmcallmeeting
+Markus Armbruster (32):
+  monitor: Drop unnecessary includes
+  audio: Move HMP commands from monitor/ to audio/
+  char: Move HMP commands from monitor/ to chardev/
+  char: Factor out qmp_add_client() parts and move to chardev/
+  hmp: Drop redundant argument check from add_completion_option()
+  readline: Extract readline_add_completion_of() from monitor
+  hmp: Rename help_cmd() to hmp_help_cmd(), move declaration to hmp.h
+  trace: Move HMP commands from monitor/ to trace/
+  machine: Move QMP commands from monitor/ to hw/core/
+  machine: Move HMP commands from monitor/ to hw/core/
+  qom: Move HMP commands from monitor/ to qom/
+  block: Factor out hmp_change_medium(), and move to block/monitor/
+  rocker: Move HMP commands from monitor to hw/net/rocker/
+  hmp: Rewrite strlist_from_comma_list() as hmp_split_at_comma()
+  net: Move HMP commands from monitor to net/
+  net: Move hmp_info_network() to net-hmp-cmds.c
+  migration: Move HMP commands from monitor/ to migration/
+  migration: Move the QMP command from monitor/ to migration/
+  virtio: Move HMP commands from monitor/ to hw/virtio/
+  tpm: Move HMP commands from monitor/ to softmmu/
+  runstate: Move HMP commands from monitor/ to softmmu/
+  stats: Move QMP commands from monitor/ to stats/
+  stats: Move HMP commands from monitor/ to stats/
+  acpi: Move the QMP command from monitor/ to hw/acpi/
+  qdev: Move HMP command completion from monitor to softmmu/
+  monitor: Split file descriptor passing stuff off misc.c
+  monitor: Move monitor_putc() next to monitor_puts & external linkage
+  monitor: Move target-dependent HMP commands to hmp-cmds-target.c
+  monitor: Move remaining HMP commands from misc.c to hmp-cmds.c
+  monitor: Move remaining QMP stuff from misc.c to qmp-cmds.c
+  monitor: Loosen coupling between misc.c and monitor.c slightly
+  monitor: Rename misc.c to hmp-target.c
 
-=====
+ MAINTAINERS                          |   10 +-
+ meson.build                          |    1 +
+ include/monitor/hmp-target.h         |    6 +
+ include/monitor/hmp.h                |   27 +
+ include/monitor/monitor.h            |    1 +
+ include/monitor/qmp-helpers.h        |    3 +
+ include/net/net.h                    |    4 +-
+ include/qemu/readline.h              |    2 +
+ include/{monitor => sysemu}/stats.h  |    0
+ monitor/monitor-internal.h           |    1 -
+ accel/kvm/kvm-all.c                  |    2 +-
+ audio/audio-hmp-cmds.c               |   83 +
+ block/monitor/block-hmp-cmds.c       |   21 +
+ chardev/char-hmp-cmds.c              |  220 +++
+ chardev/char.c                       |   20 +
+ hw/acpi/acpi-qmp-cmds.c              |   30 +
+ hw/core/machine-hmp-cmds.c           |  208 +++
+ hw/core/machine-qmp-cmds.c           |  144 ++
+ hw/net/rocker/rocker-hmp-cmds.c      |  316 ++++
+ hw/virtio/virtio-hmp-cmds.c          |  321 ++++
+ migration/migration-hmp-cmds.c       |  807 ++++++++++
+ migration/migration.c                |   30 +
+ monitor/fds.c                        |  468 ++++++
+ monitor/hmp-cmds-target.c            |  380 +++++
+ monitor/hmp-cmds.c                   | 2181 ++------------------------
+ monitor/hmp-target.c                 |  178 +++
+ monitor/hmp.c                        |   17 +-
+ monitor/misc.c                       | 1906 ----------------------
+ monitor/monitor.c                    |   30 +-
+ monitor/qmp-cmds-control.c           |    1 -
+ monitor/qmp-cmds.c                   |  355 +----
+ net/net-hmp-cmds.c                   |  170 ++
+ net/net.c                            |   28 +-
+ qom/qom-hmp-cmds.c                   |   67 +
+ softmmu/qdev-monitor.c               |   82 +
+ softmmu/runstate-hmp-cmds.c          |   82 +
+ softmmu/tpm-hmp-cmds.c               |   65 +
+ stats/stats-hmp-cmds.c               |  247 +++
+ stats/stats-qmp-cmds.c               |  162 ++
+ storage-daemon/qemu-storage-daemon.c |    4 +-
+ trace/trace-hmp-cmds.c               |  148 ++
+ util/readline.c                      |    8 +
+ audio/meson.build                    |    1 +
+ chardev/meson.build                  |    6 +-
+ hmp-commands.hx                      |    4 +-
+ hw/acpi/meson.build                  |    1 +
+ hw/net/meson.build                   |    1 +
+ hw/virtio/meson.build                |    1 +
+ migration/meson.build                |    1 +
+ monitor/meson.build                  |    4 +-
+ net/meson.build                      |    1 +
+ softmmu/meson.build                  |    2 +
+ stats/meson.build                    |    1 +
+ trace/meson.build                    |    1 +
+ 54 files changed, 4574 insertions(+), 4286 deletions(-)
+ rename include/{monitor => sysemu}/stats.h (100%)
+ create mode 100644 audio/audio-hmp-cmds.c
+ create mode 100644 chardev/char-hmp-cmds.c
+ create mode 100644 hw/acpi/acpi-qmp-cmds.c
+ create mode 100644 hw/net/rocker/rocker-hmp-cmds.c
+ create mode 100644 hw/virtio/virtio-hmp-cmds.c
+ create mode 100644 migration/migration-hmp-cmds.c
+ create mode 100644 monitor/fds.c
+ create mode 100644 monitor/hmp-cmds-target.c
+ create mode 100644 monitor/hmp-target.c
+ delete mode 100644 monitor/misc.c
+ create mode 100644 net/net-hmp-cmds.c
+ create mode 100644 softmmu/runstate-hmp-cmds.c
+ create mode 100644 softmmu/tpm-hmp-cmds.c
+ create mode 100644 stats/stats-hmp-cmds.c
+ create mode 100644 stats/stats-qmp-cmds.c
+ create mode 100644 trace/trace-hmp-cmds.c
+ create mode 100644 stats/meson.build
 
-Just want to dial in on your phone?
-
-Dial-in: +1.512.647.1431 PIN: 1518845548#
-
-Click this link to see the dial in phone numbers for this meeting
-https://meet.jit.si/static/dialInInfo.html?room=kvmcallmeeting
-
- Call details:
-
-By popular demand, a google calendar public entry with it
-
-  https://calendar.google.com/calendar/event?action=TEMPLATE&tmeid=NWR0NWppODdqNXFyYzAwbzYza3RxN2dob3VfMjAyMjEwMThUMTMwMDAwWiBlZ2VkN2NraTA1bG11MXRuZ3ZrbDN0aGlkc0Bn&tmsrc=eged7cki05lmu1tngvkl3thids%40group.calendar.google.com&scp=ALL
-
-(Let me know if you have any problems with the calendar entry.  I just
-gave up about getting right at the same time CEST, CET, EDT and DST).
-
-If you need phone number details,  contact me privately
-
-Thanks, Juan.
+-- 
+2.39.0
 
