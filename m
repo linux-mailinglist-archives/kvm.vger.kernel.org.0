@@ -2,115 +2,102 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5B306679FEC
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 18:16:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B3987679FF0
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 18:17:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234772AbjAXRQL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 12:16:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50378 "EHLO
+        id S234770AbjAXRRZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 12:17:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234738AbjAXRQH (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 12:16:07 -0500
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 908A222000
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 09:16:06 -0800 (PST)
-Received: by mail-yb1-xb32.google.com with SMTP id 129so15716095ybb.0
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 09:16:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=SB09lLGRGIMFrYYKfJZPIdG/5osP14MZrW2FUGghSBk=;
-        b=k/mBrYMkl7HW/QMTyhTOwhYfTPv20DbvoMy7/jnPRMNNTFDIfIuPWtckad7bfhUEAa
-         mvNAmEZ0E//z0z5QVr0ea1izXcOY609jgQtDn3iD5Vbte42TKhP4A+tl+Ofcl6kX90pm
-         HHzxU4hw+Z/GjMJzaHzwgmw4c/X2s3aIDG9es8kDGn7+GM4hCj69wt5bEzvgMUZTGwBw
-         8Yg1ZsMWcvLLW5KdhkvjT/rBfEyQkFrv8kUfT4ysBv/tZSKGLDz2Jz3rMDVFNZUvH7kc
-         2ERsLF0RBKO1wXF5by0OpPbSUlB1PZzrLIxE9RvtTUc57QGT94kL6a194LfKj8BCmvgL
-         x7bA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SB09lLGRGIMFrYYKfJZPIdG/5osP14MZrW2FUGghSBk=;
-        b=HRRayfO0IlL3TxYhuuYZ2Xo3FKEo2Z/C0A59CVfQLOa4Y02csiAHev93Uf/6nN52fo
-         sQ2XLwnY1UzSSAFFw+lrvEDZb4qHEjnRQhsvmMAS8uX5EEsvnu3AEmTysBzExauZO1LY
-         GjYb5cWwweDAClBrAyGYoUFSOq0OaTR2ZANx/Vj3WJCDynvyUkOIT1jk4j6Yu7CcUZh2
-         x3P4vokk36Cxy9hTf+MC7r5y4ngcWYlYhV1hMHWMFGxzKczz+MDvsgMwLIqRk5DK80aE
-         TXZWuSCj64rx5M8mLZDqJhEp0mK11cTsb/0yNAK5PBcuXDPtRgPoEB7o/eqB1+q+EhEE
-         O/Lw==
-X-Gm-Message-State: AFqh2kq9rD/54vP/ckWyd1cXTjm3qeP0bRBQf07Hz+3otdwX0BWtLY+k
-        auS/oZ27kz1gHrklaP3ipPjeDt2v74aP55UDGSr31Q==
-X-Google-Smtp-Source: AMrXdXtbY1NTeRdg02HGeRz8yvSmmdeILyVfa0WUl64oywG5rltAxavdZBHDfYp1xGmawbNnPXsSQWe6WQo+leez2kU=
-X-Received: by 2002:a25:8002:0:b0:723:96ad:6761 with SMTP id
- m2-20020a258002000000b0072396ad6761mr3476678ybk.326.1674580565671; Tue, 24
- Jan 2023 09:16:05 -0800 (PST)
-MIME-Version: 1.0
-References: <20230119212510.3938454-1-bgardon@google.com> <20230119212510.3938454-3-bgardon@google.com>
- <Y8nKerX9tDRHkFq+@google.com> <CANgfPd8B_0w39d7V+c4GnUxdqrc8qN78r8Pq0Con3Mx9WO0hkQ@mail.gmail.com>
- <Y8qj1QS1VadgaX7A@google.com> <CAOHnOrzKBh2Cq7ZQece+6f6P5wS6gZ1R2vjEQ5=QLTy7BmUvFQ@mail.gmail.com>
- <CANgfPd_B0q6uU1Be7A-QOj5_YoWi8z9g9LO63mc+=136hO5K4Q@mail.gmail.com>
- <Y87UzmpCg9hXO2NI@google.com> <Y8//SKBTT2h2m8Cz@google.com>
-In-Reply-To: <Y8//SKBTT2h2m8Cz@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 24 Jan 2023 09:15:39 -0800
-Message-ID: <CALzav=e0hiTK5xX+9vrpf_unK274NYxKGUVQ43tSpO_ad0MSPQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] selftests: KVM: Add page splitting test
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
+        with ESMTP id S232850AbjAXRRY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 12:17:24 -0500
+Received: from out-235.mta0.migadu.com (out-235.mta0.migadu.com [IPv6:2001:41d0:1004:224b::eb])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6671E45BDF
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 09:17:20 -0800 (PST)
+Date:   Tue, 24 Jan 2023 17:17:12 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1674580638;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=KIEASO5qPs55lTPiWLXCZgFc1uWbFeBJE6bZJxvRUc0=;
+        b=pHL003ov1XfnmIFlNayK1LaKatLGFuHSsS50iKWIk9FUm7eZ3+Hh4zvnZo0gD4kA+Ikrly
+        jgan9mv2Uos5m1WyH5cRwTLVHswqpM8wNprQ67Jyt6Jw1juH3/vuLsyhSdzSnnXDYt8ofY
+        ju2OUJ7yTEO4EIJpNHPVHxdHb1S591c=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     David Matlack <dmatlack@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Huacai Chen <chenhuacai@kernel.org>,
+        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
         Sean Christopherson <seanjc@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
+        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+        linux-riscv@lists.infradead.org,
+        Raghavendra Rao Ananta <rananta@google.com>
+Subject: Re: [PATCH 2/7] KVM: arm64: Use kvm_arch_flush_remote_tlbs()
+Message-ID: <Y9ASmOvJutgGLVnT@google.com>
+References: <20230119173559.2517103-1-dmatlack@google.com>
+ <20230119173559.2517103-3-dmatlack@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230119173559.2517103-3-dmatlack@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 7:54 AM Ricardo Koller <ricarkol@google.com> wrote:
->
-> On Mon, Jan 23, 2023 at 10:41:18AM -0800, David Matlack wrote:
-> >
-> > Ricardo, if you're interested in adding page size stats to KVM/ARM ahead
-> > of the Common MMU, e.g. to test eager page splitting, let me know.
->
-> Sure, I can do that. Sounds pretty useful too.
->
-> > I
-> > want to make sure we align on the userspace-visible stat names to avoid
-> > churn down the road. Specifically, do we want to expose neutral names
-> > like pages_{pte,pmd,pud} or expand the KVM/x86 list to include all of
-> > ARM's possible pages sizes like pages_{4k,16k,64k,...} (or both)?
->
-> I would prefer the latter, mainly to match the x86 names:
->
->         +       stats->pages_4k = vm_get_stat(vm, "pages_4k");
->         +       stats->pages_2m = vm_get_stat(vm, "pages_2m");
->         +       stats->pages_1g = vm_get_stat(vm, "pages_1g");
->         (from this patch)
+Hi David,
 
-We can always add pages_{pte,pmd,pud} to x86 as aliases of the
-existing stats. The series I recently sent out to allow custom names
-for stats [1] would make adding the aliases trivial actually.
+On Thu, Jan 19, 2023 at 09:35:54AM -0800, David Matlack wrote:
+> Use kvm_arch_flush_remote_tlbs() instead of
+> CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL. The two mechanisms solve the same
+> problem, allowing architecture-specific code to provide a non-IPI
+> implementation of remote TLB flushing.
+> 
+> Dropping CONFIG_HAVE_KVM_ARCH_TLB_FLUSH_ALL allows KVM to standardize
+> all architectures on kvm_arch_flush_remote_tlbs() instead of maintaining
+> two mechanisms.
+> 
+> Opt to standardize on kvm_arch_flush_remote_tlbs() since it avoids
+> duplicating the generic TLB stats across architectures that implement
+> their own remote TLB flush.
+> 
+> This adds an extra function call to the ARM64 kvm_flush_remote_tlbs()
+> path, but (I assume) that is a small cost in comparison to flushing
+> remote TLBs.
 
-[1] https://lore.kernel.org/kvm/20230118175300.790835-1-dmatlack@google.com/
+A fair assumption indeed. The real pile up occurs on the DSB subsequent
+to the TLBI.
 
->
-> but pages_{pte,pmd,pud} would certainly make this test simpler
-> as it would handle all guest page sizes:
->
->         +       stats->pages_pte = vm_get_stat(vm, "pages_pte");
->
+> No functional change intended.
+> 
+> Signed-off-by: David Matlack <dmatlack@google.com>
+> ---
+>  arch/arm64/include/asm/kvm_host.h | 3 +++
+>  arch/arm64/kvm/Kconfig            | 1 -
+>  arch/arm64/kvm/mmu.c              | 6 +++---
+>  virt/kvm/kvm_main.c               | 2 --
+>  4 files changed, 6 insertions(+), 6 deletions(-)
 
-Yeah pages_{pte,pmd,pud} would certainly make the test simpler.
+I think you're missing the diff that actually drops the Kconfig opton
+from virt/kvm/Kconfig.
 
-At this point I'm leaning toward pages_{pte,pmd,pud} to unblock this
-testing in an architecture neutral way, and we can add
-pages_{4k,16k,...} to ARM in the future using aliases.
+--
+Thanks,
+Oliver
