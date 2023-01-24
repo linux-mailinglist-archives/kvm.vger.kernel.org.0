@@ -2,185 +2,180 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 126CA67A6C1
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 00:16:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 948C467A6D4
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 00:25:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234282AbjAXXQz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 18:16:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58972 "EHLO
+        id S232084AbjAXXZy (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 18:25:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229933AbjAXXQy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 18:16:54 -0500
-Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D732430DE
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 15:16:52 -0800 (PST)
-Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-15eec491b40so19457813fac.12
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 15:16:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=O6FG0rZSsowFESqKod3eAgl51fl1/NMrQnVO/Zh39hI=;
-        b=eR1U7BkGEuJ+TCHIVXpFwddImI5S3U2vXU1zewsNhfCxSMVc/26xsyZBaRgZQOW+ZL
-         HnkKvbbBG+tuWBdrDCFZkTrSk2X9Y2NjywIGHOuLnidslxFJXZ5uSHs4KmPXSOuFWMsP
-         ZQf//u33Y2C6UYKLift0E23EGwHm+VeUA9/cBPNor6648uC15rHXsqWmJmBnFSGW09GT
-         8Y33o1T2FEGPi71gVa9fNcG7XYFOYKm9lsLUhUXnyKt7nGYWv9+s/a3SEkLUZf9AvG3+
-         3hTAtup8gHP74IYXFyVCNch9uobWHS1mCZdlzaU/v93rRfn4MJuih1A9+BFpqpX3ObgE
-         /jvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O6FG0rZSsowFESqKod3eAgl51fl1/NMrQnVO/Zh39hI=;
-        b=Jkckbyay3lb1dc9+Ii6TkU9Z6dVt7wp2jRRl9XdlrVraBryKb0PDyu4QOljCLHyG5f
-         nAaR3Mz2cYwZoQ8bNhsKpUgmKIraGzzbv/uALWutODpF2dTgcqXUDC1+2UdEYzz/bF8A
-         Ik01+I72cL0SnIWLfsy9LVkztLoMSLQRROZt4UJoewjRkW6LSNZ7Sbbye7VMw2pepnml
-         mmhFmsAguWtqA8ix8N+xMDz2GaoHAeFcBuGwXLQ13tZ5Jr/m3YScOZzSy+E5BL8Lv6cw
-         EK4qtzXn822I2a+bfyt7Iy5NzSTLtRbvbyimP8W6QQ79MdhaCo1Hf6uCUrzrPGsxIuX/
-         lc9g==
-X-Gm-Message-State: AO0yUKXWWmorfJOMUoBwpKvvQBB1OCcJPspwXZnKleuPhZioV5CroCWJ
-        SsMUKP9EXXSInYaVtSvPXOi+x66Qq4kGxWgyfArWFA==
-X-Google-Smtp-Source: AK7set8qpmlTZgkaUMcLNSDdmgMOL4CvGDG0uVtE6IwrUSmYA+gizCDKzIty6cgsFhGPXfg7G/uh/jeVCJmdTCdbZ6M=
-X-Received: by 2002:a05:6871:6ca5:b0:160:3235:9c33 with SMTP id
- zj37-20020a0568716ca500b0016032359c33mr389603oab.103.1674602211611; Tue, 24
- Jan 2023 15:16:51 -0800 (PST)
+        with ESMTP id S229590AbjAXXZx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 18:25:53 -0500
+Received: from out-14.mta0.migadu.com (out-14.mta0.migadu.com [IPv6:2001:41d0:1004:224b::e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEFCF1F5E6
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 15:25:51 -0800 (PST)
+Date:   Tue, 24 Jan 2023 15:25:42 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1674602749;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=c74+f/E81sUW5vwqR4R5i42L30Py8ifaBoFNS256FLc=;
+        b=DY6oY/iylKNyk7k7siN12oc3f6brxvNO05K/H869hJ8xZAiaE7YqpP72oXE86llGUFEe1O
+        1mZi+lfR4ZQbbSw3ILPGX0KEGFAA+qZm8QG7CFU4Ng+uzkdIhGom4q5q7r8SMljdvrLkXo
+        eMFUkv6hAz+FW8i4zMpGIlIcoJYa2XU=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
+To:     Raghavendra Rao Ananta <rananta@google.com>
+Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
+        Ricardo Koller <ricarkol@google.com>,
+        Reiji Watanabe <reijiw@google.com>,
+        James Morse <james.morse@arm.com>,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Jing Zhang <jingzhangos@google.com>,
+        Colton Lewis <coltonlewis@google.com>,
+        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [RFC PATCH 5/6] KVM: arm64: Optimize the stage2 map path with
+ TLBI range instructions
+Message-ID: <Y9Bo9qwJhs3KK6jR@thinky-boi>
+References: <20230109215347.3119271-1-rananta@google.com>
+ <20230109215347.3119271-6-rananta@google.com>
 MIME-Version: 1.0
-References: <20221027092036.2698180-1-pbonzini@redhat.com>
-In-Reply-To: <20221027092036.2698180-1-pbonzini@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Tue, 24 Jan 2023 15:16:40 -0800
-Message-ID: <CALMp9eQihPhjpoodw6ojgVh_KtvPqQ9qJ3wKWZQyVtArpGkfHA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: Do not return host topology information from KVM_GET_SUPPORTED_CPUID
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230109215347.3119271-6-rananta@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Oct 27, 2022 at 2:21 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> Passing the host topology to the guest is almost certainly wrong
-> and will confuse the scheduler.  In addition, several fields of
-> these CPUID leaves vary on each processor; it is simply impossible to
-> return the right values from KVM_GET_SUPPORTED_CPUID in such a way that
-> they can be passed to KVM_SET_CPUID2.
->
-> The values that will most likely prevent confusion are all zeroes.
-> Userspace will have to override it anyway if it wishes to present a
-> specific topology to the guest.
->
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Hi Raghavendra,
+
+My comment from the previous change also applies here:
+
+  KVM: arm64: Use range-based TLBIs when collapsing hugepages
+
+On Mon, Jan 09, 2023 at 09:53:46PM +0000, Raghavendra Rao Ananta wrote:
+> Currently, when the map path of stage2 page-table coalesces a
+> bunch of pages into a hugepage, KVM invalidates the entire
+> VM's TLB entries. This would cause a perforamance penality for
+> the guest whose pages have already been coalesced earlier as they
+> would have to refill their TLB entries unnecessarily again.
+
+It is also problematic that we do this on every single fault where we
+collapse a hugepage.
+
+> Hence, if the system supports it, use __kvm_tlb_flush_range_vmid_ipa()
+> to flush only the range of pages that have been combined into
+> a hugepage, while leaving other TLB entries alone.
+> 
+> Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
 > ---
->  Documentation/virt/kvm/api.rst | 14 ++++++++++++++
->  arch/x86/kvm/cpuid.c           | 32 ++++++++++++++++----------------
->  2 files changed, 30 insertions(+), 16 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index eee9f857a986..20f4f6b302ff 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8249,6 +8249,20 @@ CPU[EAX=1]:ECX[24] (TSC_DEADLINE) is not reported by ``KVM_GET_SUPPORTED_CPUID``
->  It can be enabled if ``KVM_CAP_TSC_DEADLINE_TIMER`` is present and the kernel
->  has enabled in-kernel emulation of the local APIC.
->
-> +CPU topology
-> +~~~~~~~~~~~~
-> +
-> +Several CPUID values include topology information for the host CPU:
-> +0x0b and 0x1f for Intel systems, 0x8000001e for AMD systems.  Different
-> +versions of KVM return different values for this information and userspace
-> +should not rely on it.  Currently they return all zeroes.
-> +
-> +If userspace wishes to set up a guest topology, it should be careful that
-> +the values of these three leaves differ for each CPU.  In particular,
-> +the APIC ID is found in EDX for all subleaves of 0x0b and 0x1f, and in EAX
-> +for 0x8000001e; the latter also encodes the core id and node id in bits
-> +7:0 of EBX and ECX respectively.
-> +
->  Obsolete ioctls and capabilities
->  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 0810e93cbedc..164bfb7e7a16 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -759,16 +759,22 @@ struct kvm_cpuid_array {
->         int nent;
->  };
->
-> +static struct kvm_cpuid_entry2 *get_next_cpuid(struct kvm_cpuid_array *array)
+>  arch/arm64/kvm/hyp/pgtable.c | 29 +++++++++++++++++++++++++----
+>  1 file changed, 25 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
+> index b11cf2c618a6c..099032bb01bce 100644
+> --- a/arch/arm64/kvm/hyp/pgtable.c
+> +++ b/arch/arm64/kvm/hyp/pgtable.c
+> @@ -686,6 +686,22 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>  	return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
+>  }
+>  
+> +static void kvm_table_pte_flush(struct kvm_s2_mmu *mmu, u64 addr, u32 level, u32 tlb_level)
+
+Could you call this something like kvm_pgtable_flush_range() and take an
+address range as an argument? TLBIRANGE can be used outside the context
+of a table (i.e. a subset of PTEs).
+
 > +{
-> +       if (array->nent >= array->maxnent)
-> +               return NULL;
+> +	if (system_supports_tlb_range()) {
+> +		u64 end = addr + kvm_granule_size(level);
 > +
-> +       return &array->entries[array->nent++];
+> +		kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, addr, end, tlb_level);
+> +	} else {
+> +		/*
+> +		 * Invalidate the whole stage-2, as we may have numerous leaf
+> +		 * entries below us which would otherwise need invalidating
+> +		 * individually.
+> +		 */
+> +		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +	}
 > +}
 > +
->  static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
->                                               u32 function, u32 index)
->  {
-> -       struct kvm_cpuid_entry2 *entry;
-> +       struct kvm_cpuid_entry2 *entry = get_next_cpuid(array);
->
-> -       if (array->nent >= array->maxnent)
-> +       if (!entry)
->                 return NULL;
->
-> -       entry = &array->entries[array->nent++];
-> -
->         memset(entry, 0, sizeof(*entry));
->         entry->function = function;
->         entry->index = index;
-> @@ -945,22 +951,13 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->                 entry->edx = edx.full;
->                 break;
->         }
-> -       /*
-> -        * Per Intel's SDM, the 0x1f is a superset of 0xb,
-> -        * thus they can be handled by common code.
-> -        */
->         case 0x1f:
->         case 0xb:
->                 /*
-> -                * Populate entries until the level type (ECX[15:8]) of the
-> -                * previous entry is zero.  Note, CPUID EAX.{0x1f,0xb}.0 is
-> -                * the starting entry, filled by the primary do_host_cpuid().
-> +                * No topology; a valid topology is indicated by the presence
-> +                * of subleaf 1.
->                  */
-> -               for (i = 1; entry->ecx & 0xff00; ++i) {
-> -                       entry = do_host_cpuid(array, function, i);
-> -                       if (!entry)
-> -                               goto out;
-> -               }
-> +               entry->eax = entry->ebx = entry->ecx = 0;
->                 break;
->         case 0xd: {
->                 u64 permitted_xcr0 = kvm_caps.supported_xcr0 & xstate_get_guest_group_perm();
-> @@ -1193,6 +1190,9 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
->                 entry->ebx = entry->ecx = entry->edx = 0;
->                 break;
->         case 0x8000001e:
-> +               /* Do not return host topology information.  */
-> +               entry->eax = entry->ebx = entry->ecx = 0;
-> +               entry->edx = 0; /* reserved */
->                 break;
->         case 0x8000001F:
->                 if (!kvm_cpu_cap_has(X86_FEATURE_SEV)) {
-> --
-> 2.31.1
->
+>  /**
+>   * stage2_try_break_pte() - Invalidates a pte according to the
+>   *			    'break-before-make' requirements of the
+> @@ -693,6 +709,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>   *
+>   * @ctx: context of the visited pte.
+>   * @mmu: stage-2 mmu
+> + * @tlb_level: The level at which the leaf pages are expected (for FEAT_TTL hint)
 
-This is a userspace ABI change that breaks existing hypervisors.
-Please don't do this. Userspace ABIs are supposed to be inviolate.
+Do we need the caller to provide the TTL hint? We already have
+ctx->level, and stage2_try_break_pte() also knows what the removed PTE
+contained (i.e. a table or a block/page).
+
+>   * Returns: true if the pte was successfully broken.
+>   *
+> @@ -701,7 +718,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
+>   * on the containing table page.
+>   */
+>  static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+> -				 struct kvm_s2_mmu *mmu)
+> +				 struct kvm_s2_mmu *mmu, u32 tlb_level)
+>  {
+>  	struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
+>  
+> @@ -722,7 +739,7 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
+>  	 * value (if any).
+>  	 */
+>  	if (kvm_pte_table(ctx->old, ctx->level))
+> -		kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
+> +		kvm_table_pte_flush(mmu, ctx->addr, ctx->level, tlb_level);
+
+I don't think we should provide a TTL hint for a removed table. It is
+entirely possible for the unlinked table to contain a mix of blocks and
+pages, meaning there isn't a uniform table level for the whole range.
+
+>  	else if (kvm_pte_valid(ctx->old))
+>  		kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
+>  
+> @@ -804,7 +821,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (!stage2_pte_needs_update(ctx->old, new))
+>  		return -EAGAIN;
+>  
+> -	if (!stage2_try_break_pte(ctx, data->mmu))
+> +	if (!stage2_try_break_pte(ctx, data->mmu, ctx->level))
+>  		return -EAGAIN;
+>  
+>  	/* Perform CMOs before installation of the guest stage-2 PTE */
+> @@ -861,7 +878,11 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
+>  	if (!childp)
+>  		return -ENOMEM;
+>  
+> -	if (!stage2_try_break_pte(ctx, data->mmu)) {
+> +	/*
+> +	 * As the table will be replaced with a block, one level down would
+> +	 * be the current page entries held by the table.
+> +	 */
+
+This isn't necessarily true. Ignoring mixed block/pages for a moment,
+Collapsing a PUD entry into a block after dirty logging (where we mapped
+at PTE level) would imply a TTL of ctx->level + 2.
+
+But again, I think it is best to provide no hint in this case.
+
+--
+Thanks,
+Oliver
