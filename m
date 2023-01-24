@@ -2,51 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B57EE679451
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 10:37:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6970B679485
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 10:51:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233061AbjAXJhl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 04:37:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35584 "EHLO
+        id S233533AbjAXJvT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 04:51:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229572AbjAXJhk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 04:37:40 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404E16E8D;
-        Tue, 24 Jan 2023 01:37:38 -0800 (PST)
+        with ESMTP id S230088AbjAXJvS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 04:51:18 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE209BBB3;
+        Tue, 24 Jan 2023 01:51:17 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DAA20B81104;
-        Tue, 24 Jan 2023 09:37:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45DBAC433EF;
-        Tue, 24 Jan 2023 09:37:33 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 58E3460302;
+        Tue, 24 Jan 2023 09:51:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACD86C433EF;
+        Tue, 24 Jan 2023 09:51:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674553055;
-        bh=1zzgkNRfTR3Nd94PvxKyIX49lYH4mssft7KcQNucUqY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=OuS4XbfhuQ3vkfJ5iXQDtE2abnO3giky+BFrHtX9/CzM2VEj7jIajVl3lm3t8TESe
-         3J9E1BgzSrg6Ijj1OD9PnRHVMsi78EoCbg+uXeSxb6WSsq7GohmMbMB6KmCI5eqYlC
-         RqeqIjuxVDDdeSyjJk6fNj87WntHQT8KbDLL9iSIlMmuD3/DhUbR0ljdemdHZDu+65
-         HO79MXjydzAmPG7ReyEOs5t2keE1cwBs3yJGmsQw5IiXXFbsHs7QlTelg2ytdRDKx+
-         Xot+lVqHRsDyREMJFq+iNzq8Xj42LhEf5N/+8L3IzjVWilnXZFdCXiHX0IaFigf5TF
-         zCGl3E6GGApXw==
-Date:   Tue, 24 Jan 2023 09:37:29 +0000
-From:   Will Deacon <will@kernel.org>
+        s=k20201202; t=1674553876;
+        bh=KyZYlqGLgXftJDvg3VMdGERtWC20c/29O8f9IQQ1xc4=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=N8Ly1HfA+BtCa1lM+qzkdH/L6pq0HTST9anCXFZv911pZXtKuYRO9KYV8wIts779D
+         xHTRrY28iL+63/RZmWIk1TzaPiI3N6PqDT2puVTYuggHoKbmW4a4B7JzAeu9mhvaIU
+         leEXNL7DHLKgDvtjDuniUaDLYplDzJ+N7ePr3H4oQQMD+CHHLYdZg4WyL72dk7lupD
+         gmjf6RsqZYPj4H/stfDBnTJ/0Kac1iBJvRQ3DeRemE0LpCnNMjwEqL2ipyNJAYd5Ac
+         uGrIwixpdjzYeXDJFNhjNHdqVBrcjBHv6NE1Mi9eAEekwBfFG7NJpMQfGcATQxrF+E
+         zcMsGQWEkAjbQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pKFxS-004CiH-B2;
+        Tue, 24 Jan 2023 09:51:14 +0000
+Date:   Tue, 24 Jan 2023 09:51:14 +0000
+Message-ID: <867cxcmfal.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
 To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     maz@kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+Cc:     linux-kernel@vger.kernel.org, pbonzini@redhat.com,
         seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com,
-        catalin.marinas@arm.com, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] MAINTAINERS: Add Oliver Upton as co-maintainer of
- KVM/arm64
-Message-ID: <20230124093728.GA26080@willie-the-truck>
-References: <20230123210256.2728218-1-oliver.upton@linux.dev>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        catalin.marinas@arm.com, will@kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] MAINTAINERS: Add Oliver Upton as co-maintainer of KVM/arm64
 In-Reply-To: <20230123210256.2728218-1-oliver.upton@linux.dev>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20230123210256.2728218-1-oliver.upton@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, linux-kernel@vger.kernel.org, pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, catalin.marinas@arm.com, will@kernel.org, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
@@ -56,7 +67,9 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 09:02:56PM +0000, Oliver Upton wrote:
+On Mon, 23 Jan 2023 21:02:56 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
 > Going forward I intend to help Marc with maintaining KVM/arm64. We've
 > spoken about this quite a bit and he has been a tremendous help in
 > ramping up to the task (thank you!). We haven't worked out the exact
@@ -66,6 +79,10 @@ On Mon, Jan 23, 2023 at 09:02:56PM +0000, Oliver Upton wrote:
 > To that end, updating the maintainers entry to reflect the change.
 > 
 > Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+
+Thanks for stepping up to the challenge, and for all the help you've
+provided so far.
+
 > ---
 >  MAINTAINERS | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
@@ -79,15 +96,19 @@ On Mon, Jan 23, 2023 at 09:02:56PM +0000, Oliver Upton wrote:
 >  KERNEL VIRTUAL MACHINE FOR ARM64 (KVM/arm64)
 >  M:	Marc Zyngier <maz@kernel.org>
 > +M:	Oliver Upton <oliver.upton@linux.dev>
+>  R:	James Morse <james.morse@arm.com>
+>  R:	Suzuki K Poulose <suzuki.poulose@arm.com>
+> -R:	Oliver Upton <oliver.upton@linux.dev>
+>  R:	Zenghui Yu <yuzenghui@huawei.com>
+>  L:	linux-arm-kernel@lists.infradead.org (moderated for non-subscribers)
+>  L:	kvmarm@lists.linux.dev
 
-Ya know, alphabetical order tends to put Mr Z at the bottom of the list,
-but I can understand why you don't necessarily want to be first in the
-pack just yet!
+As Will said, this should probably be in alphabetical order for a
+given tag. Not a big deal though, so FWIW:
 
-In any case, this is really great to see:
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-Acked-by: Will Deacon <will@kernel.org>
+	M.
 
-Thank you!
-
-Will
+-- 
+Without deviation from the norm, progress is not possible.
