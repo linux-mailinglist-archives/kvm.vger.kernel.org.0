@@ -2,115 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 446DB679FF9
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 18:18:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A23567A008
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 18:21:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233331AbjAXRSv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 12:18:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52856 "EHLO
+        id S234597AbjAXRVp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 12:21:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233565AbjAXRSr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 12:18:47 -0500
-Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A97A4AA5E
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 09:18:45 -0800 (PST)
-Received: by mail-qv1-xf29.google.com with SMTP id w15so1399882qvs.11
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 09:18:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2LfJhFw/HjO85prr/+n24x4Lw1Az/iZVTOQ35U0vJPk=;
-        b=YhoP2h9cs4sVzS+YglFxNK6Rcqx0MUi+FwfrQ33wk3UzCGOz8WkUtj2LzXW5IX9yXd
-         8mnyP4IRqSQTUvazAsZdKWFmyM8zXk0deXkY5KxAdLc53ki0RzafOvOLvsqsB35/akJk
-         uEiGearyMAcRkIKHjuOGK1/mYKxmS5BLD99/vt6s4pPwqc6v/1jgidlCckucMcuEp5gj
-         bKfaNcITx+kkfCaGe9FTPZydnUdojwlVP/CrmZdn+nQYyyCOmBDdizYdHn3Xmg96MjU5
-         ai/3P/ypTE5JfpVANAk+9XCzAwPwr2KyM8zV6aj6ZhpBDKMlntFz+CkaazfSnXS6vOSX
-         BE8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2LfJhFw/HjO85prr/+n24x4Lw1Az/iZVTOQ35U0vJPk=;
-        b=QB7PiOZvmEr0hvUOYIMI5YJ5/Op/e5S2/l9GZqJb1X7VeAlg+rb9USOcbvoX6sfRaA
-         BTXlPiMRjFlRCPwN5wsFWhhpoeLedk0LgODi4Z3jYQSD6MrBtaylJfTWjjado1Kk1y2x
-         JtgceJpl9o3MgZNhef7LnIUelslEeEi7o0dEzKKVCsatFC0T9g4hE+QXSAOPpbG/eIBV
-         ZRPqxQHH05iV8xoBAW+0eUNwNnB88M5T4yes62k3MtwdnvWZhSVM0kJp79LsWG5O1/Pt
-         JBXcrWpxRmBdQVpbTO9Y7EGQR9y5qwUYoAUxxGRZWs7vJj2R8MEjCiM6iDr2rYjSJoKp
-         ymeA==
-X-Gm-Message-State: AFqh2kozZHskdrJyAXD4ujRM4at7bAMAsaIOA9mEMGtFrTNIAkPKKJgC
-        EKHk7V0Sp0s79guwVDdVKGcQEJRdii/GRMP5PPH73g==
-X-Google-Smtp-Source: AMrXdXt/fh2hub/gv2zmH5rPavw+lkx8d22y/t4FGs5wmiizn+95CKFFDpttcMeya72+jvskubmaSBZMJYIcUuKB+kE=
-X-Received: by 2002:a05:6214:3113:b0:532:2acf:2577 with SMTP id
- ks19-20020a056214311300b005322acf2577mr1237633qvb.5.1674580724279; Tue, 24
- Jan 2023 09:18:44 -0800 (PST)
+        with ESMTP id S233704AbjAXRVo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 12:21:44 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 667134A20D;
+        Tue, 24 Jan 2023 09:21:43 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 164B3B81603;
+        Tue, 24 Jan 2023 17:21:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CD47C433D2;
+        Tue, 24 Jan 2023 17:21:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674580900;
+        bh=5u0HAqsMO32meB1+2hDlQk/3mQeAC0aecbaZTWGuo+U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QjXkTZ0idK5z1Ix6m1yf2oBxsdcJq94aU7EsrAkDisp/SxGulfBdNMOHDckBQCvRz
+         W6llnTDs0JyFfXUOfVaSTrQzHB06mjALwb4j+Phm8EDITPUQVpWD5IHsXkZkuoBPtv
+         RURIQy6zUHAvCnxo+xVec0gIbsGD27+BhiB5s6a+NXA37TUYzDYw69k0Ue/1GNZ5pA
+         e7XeoQuYn4y8JHNQWOTkXCt0qA/tsceHAidqLU0n+M/uxducs+tOJXNBbPy0iCuj6y
+         N0r2//PY2LaeDxixTQGxip8Sr7ZhPU0erQFPtHhNXN68HP/JMuxcj/3DvEDYW4dGN9
+         YTPE1btkwci6w==
+Date:   Tue, 24 Jan 2023 11:21:39 -0600
+From:   Seth Forshee <sforshee@kernel.org>
+To:     Petr Mladek <pmladek@suse.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] vhost: check for pending livepatches from vhost
+ worker kthreads
+Message-ID: <Y9ATo5FukOhphwqT@do-x1extreme>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <20230120-vhost-klp-switching-v1-2-7c2b65519c43@kernel.org>
+ <Y8/ohzRGcOiqsh69@alley>
 MIME-Version: 1.0
-References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-4-ricarkol@google.com>
- <CANgfPd_PgrZ_4oRDT3ZaqX=3jboD=2qEUKefp4TsKM36p187gw@mail.gmail.com>
- <Y9ALgtnd+h9ivn90@google.com> <Y9ARN5hWlAYVFBoK@google.com>
-In-Reply-To: <Y9ARN5hWlAYVFBoK@google.com>
-From:   Ricardo Koller <ricarkol@google.com>
-Date:   Tue, 24 Jan 2023 09:18:33 -0800
-Message-ID: <CAOHnOrxGu2sU2+-M8+-nMiRc01BQvRug+S2rnBbK6HiCP_BMVw@mail.gmail.com>
-Subject: Re: [PATCH 3/9] KVM: arm64: Add kvm_pgtable_stage2_split()
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Ben Gardon <bgardon@google.com>, pbonzini@redhat.com,
-        maz@kernel.org, yuzenghui@huawei.com, dmatlack@google.com,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, ricarkol@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y8/ohzRGcOiqsh69@alley>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 24, 2023 at 9:11 AM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> On Tue, Jan 24, 2023 at 08:46:58AM -0800, Ricardo Koller wrote:
-> > On Mon, Jan 23, 2023 at 05:03:23PM -0800, Ben Gardon wrote:
->
-> [...]
->
-> > > Would it be accurate to say:
-> > > /* No huge pages can exist at the root level, so there's nothing to
-> > > split here. */
-> > >
-> > > I think of "last level" as the lowest/leaf/4k level but
-> > > KVM_PGTABLE_MAX_LEVELS - 1 is 3?
-> >
-> > Right, this is the 4k level.
-> >
-> > > Does ARM do the level numbering in
-> > > reverse order to x86?
-> >
-> > Yes, it does. Interesting, x86 does
-> >
-> >       iter->level--;
-> >
-> > while arm does:
-> >
-> >       ret = __kvm_pgtable_walk(data, mm_ops, childp, level + 1);
-> >
-> > I don't think this numbering scheme is encoded anywhere in the PTEs, so
-> > either architecture could use the other.
->
-> The numbering we use in the page table walkers is deliberate, as it
-> directly matches the Arm ARM. While we can certainly use either scheme
-> I'd prefer we keep aligned with the architecture.
+On Tue, Jan 24, 2023 at 03:17:43PM +0100, Petr Mladek wrote:
+> On Fri 2023-01-20 16:12:22, Seth Forshee (DigitalOcean) wrote:
+> > Livepatch relies on stack checking of sleeping tasks to switch kthreads,
+> > so a busy kthread can block a livepatch transition indefinitely. We've
+> > seen this happen fairly often with busy vhost kthreads.
+> 
+> To be precise, it would be "indefinitely" only when the kthread never
+> sleeps.
+> 
+> But yes. I believe that the problem is real. It might be almost
+> impossible to livepatch some busy kthreads, especially when they
+> have a dedicated CPU.
+> 
+> 
+> > Add a check to call klp_switch_current() from vhost_worker() when a
+> > livepatch is pending. In testing this allowed vhost kthreads to switch
+> > immediately when they had previously blocked livepatch transitions for
+> > long periods of time.
+> > 
+> > Signed-off-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
+> > ---
+> >  drivers/vhost/vhost.c | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> > index cbe72bfd2f1f..d8624f1f2d64 100644
+> > --- a/drivers/vhost/vhost.c
+> > +++ b/drivers/vhost/vhost.c
+> > @@ -366,6 +367,9 @@ static int vhost_worker(void *data)
+> >  			if (need_resched())
+> >  				schedule();
+> >  		}
+> > +
+> > +		if (unlikely(klp_patch_pending(current)))
+> > +			klp_switch_current();
+> 
+> I suggest to use the following intead:
+> 
+> 		if (unlikely(klp_patch_pending(current)))
+> 			klp_update_patch_state(current);
+> 
+> We already use this in do_idle(). The reason is basically the same.
+> It is almost impossible to livepatch the idle task when a CPU is
+> very idle.
+> 
+> klp_update_patch_state(current) does not check the stack.
+> It switches the task immediately.
+> 
+> It should be safe because the kthread never leaves vhost_worker().
+> It means that the same kthread could never re-enter this function
+> and use the new code.
 
-hehe, I was actually subtly suggesting our x86 friends to change their side.
+My knowledge of livepatching internals is fairly limited, so I'll accept
+it if you say that it's safe to do it this way. But let me ask about one
+scenario.
 
->
-> --
-> Thanks,
-> Oliver
+Let's say that a livepatch is loaded which replaces vhost_worker(). New
+vhost worker threads are started which use the replacement function. Now
+if the patch is disabled, these new worker threads would be switched
+despite still running the code from the patch module, correct? Could the
+module then be unloaded, freeing the memory containing the code these
+kthreads are executing?
+
+Thanks,
+Seth
