@@ -2,43 +2,43 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F08A6797B9
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 13:21:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CFF9B6797C3
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 13:21:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233789AbjAXMVG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 07:21:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59154 "EHLO
+        id S233650AbjAXMVS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 07:21:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59228 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233781AbjAXMU7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 07:20:59 -0500
+        with ESMTP id S233822AbjAXMVE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 07:21:04 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19B69457D1
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 04:19:56 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9134E45885
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 04:19:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674562795;
+        s=mimecast20190719; t=1674562796;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Fuw2IqjvQJhgQ7y8l9uv2HOctTbLu8XeG6lMuEPE7vQ=;
-        b=IGq0cNS10BlPfRX5FRFKerpx8iExS1qSF7E7FnC2glwPon8y8jb6QMSLedMger8tpy2fjd
-        y1FTU67DVqfcFsjh4YSgrPGPhb/NsFdgtOVexvS+C6tA8stcs8GsLX/H3LvtNhhrrE+0NI
-        W4rgDwNB18DYgT7CPP9piwLNhFH39/M=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=aA3UG40IuCC83MPuaNaIfGgaRo/pnOr3gMdu0sFseUw=;
+        b=D1hMVeh4LxY4UxC34HopI4FR3nHzgSWBns8aJzAx5thfzLEOPzX5b6yQGXUvgkcJaayPjL
+        yPxF888mmyC8FKsCpwjMtzwopSjYCAQUm4vXQY7Q0fcL/ZtXRj4GaMZpiLHK9YxVaeKVsz
+        VFpZwW/IE74hGWTKExqi1hIxE/K8kIM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-567-s22F3_A-NQu9LV-YEuVOtA-1; Tue, 24 Jan 2023 07:19:51 -0500
-X-MC-Unique: s22F3_A-NQu9LV-YEuVOtA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ us-mta-589-cnDkY-VhNdWrGaRUyHDb3A-1; Tue, 24 Jan 2023 07:19:51 -0500
+X-MC-Unique: cnDkY-VhNdWrGaRUyHDb3A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EC27A29DD990;
-        Tue, 24 Jan 2023 12:19:50 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 178038533EF;
+        Tue, 24 Jan 2023 12:19:51 +0000 (UTC)
 Received: from blackfin.pond.sub.org (unknown [10.39.192.70])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id ACD7B2026D2B;
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id ACE642166B29;
         Tue, 24 Jan 2023 12:19:50 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-        id C948B21E692A; Tue, 24 Jan 2023 13:19:46 +0100 (CET)
+        id CC41321E692B; Tue, 24 Jan 2023 13:19:46 +0100 (CET)
 From:   Markus Armbruster <armbru@redhat.com>
 To:     qemu-devel@nongnu.org
 Cc:     pbonzini@redhat.com, kraxel@redhat.com, kwolf@redhat.com,
@@ -49,15 +49,15 @@ Cc:     pbonzini@redhat.com, kraxel@redhat.com, kwolf@redhat.com,
         jiri@resnulli.us, berrange@redhat.com, thuth@redhat.com,
         quintela@redhat.com, stefanb@linux.vnet.ibm.com,
         stefanha@redhat.com, kvm@vger.kernel.org, qemu-block@nongnu.org
-Subject: [PATCH 24/32] acpi: Move the QMP command from monitor/ to hw/acpi/
-Date:   Tue, 24 Jan 2023 13:19:38 +0100
-Message-Id: <20230124121946.1139465-25-armbru@redhat.com>
+Subject: [PATCH 25/32] qdev: Move HMP command completion from monitor to softmmu/
+Date:   Tue, 24 Jan 2023 13:19:39 +0100
+Message-Id: <20230124121946.1139465-26-armbru@redhat.com>
 In-Reply-To: <20230124121946.1139465-1-armbru@redhat.com>
 References: <20230124121946.1139465-1-armbru@redhat.com>
 MIME-Version: 1.0
 Content-type: text/plain
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
@@ -68,102 +68,201 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This moves the command from MAINTAINERS section "QMP" to section
-"ACPI/SMBIOS)".
+This moves the completion code from MAINTAINERS sections "Human
+Monitor (HMP)" and "QMP" to section "QOM".
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/acpi/acpi-qmp-cmds.c | 30 ++++++++++++++++++++++++++++++
- monitor/qmp-cmds.c      | 21 ---------------------
- hw/acpi/meson.build     |  1 +
- 3 files changed, 31 insertions(+), 21 deletions(-)
- create mode 100644 hw/acpi/acpi-qmp-cmds.c
+ monitor/misc.c         | 82 ------------------------------------------
+ softmmu/qdev-monitor.c | 82 ++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 82 insertions(+), 82 deletions(-)
 
-diff --git a/hw/acpi/acpi-qmp-cmds.c b/hw/acpi/acpi-qmp-cmds.c
-new file mode 100644
-index 0000000000..2d47cac52c
---- /dev/null
-+++ b/hw/acpi/acpi-qmp-cmds.c
-@@ -0,0 +1,30 @@
-+/*
-+ * QMP commands related to ACPI
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or
-+ * (at your option) any later version.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "hw/acpi/acpi_dev_interface.h"
-+#include "qapi/error.h"
-+#include "qapi/qapi-commands-acpi.h"
-+
-+ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
-+{
-+    bool ambig;
-+    ACPIOSTInfoList *head = NULL;
-+    ACPIOSTInfoList **prev = &head;
-+    Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, &ambig);
-+
-+    if (obj) {
-+        AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(obj);
-+        AcpiDeviceIf *adev = ACPI_DEVICE_IF(obj);
-+
-+        adevc->ospm_status(adev, &prev);
-+    } else {
-+        error_setg(errp, "command is not supported, missing ACPI device");
-+    }
-+
-+    return head;
-+}
-diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-index ab23e52f97..cc22f3fcc7 100644
---- a/monitor/qmp-cmds.c
-+++ b/monitor/qmp-cmds.c
-@@ -22,12 +22,10 @@
- #include "sysemu/runstate-action.h"
- #include "sysemu/block-backend.h"
- #include "qapi/error.h"
--#include "qapi/qapi-commands-acpi.h"
- #include "qapi/qapi-commands-control.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qapi/type-helpers.h"
- #include "hw/mem/memory-device.h"
--#include "hw/acpi/acpi_dev_interface.h"
- #include "hw/intc/intc.h"
- #include "hw/rdma/rdma.h"
- 
-@@ -153,22 +151,3 @@ void qmp_add_client(const char *protocol, const char *fdname,
-         close(fd);
-     }
+diff --git a/monitor/misc.c b/monitor/misc.c
+index a2584df0ca..c76d583b4f 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -1206,88 +1206,6 @@ int get_monitor_def(Monitor *mon, int64_t *pval, const char *name)
+     return ret;
  }
--
--ACPIOSTInfoList *qmp_query_acpi_ospm_status(Error **errp)
+ 
+-void device_add_completion(ReadLineState *rs, int nb_args, const char *str)
 -{
--    bool ambig;
--    ACPIOSTInfoList *head = NULL;
--    ACPIOSTInfoList **prev = &head;
--    Object *obj = object_resolve_path_type("", TYPE_ACPI_DEVICE_IF, &ambig);
+-    GSList *list, *elt;
+-    size_t len;
 -
--    if (obj) {
--        AcpiDeviceIfClass *adevc = ACPI_DEVICE_IF_GET_CLASS(obj);
--        AcpiDeviceIf *adev = ACPI_DEVICE_IF(obj);
--
--        adevc->ospm_status(adev, &prev);
--    } else {
--        error_setg(errp, "command is not supported, missing ACPI device");
+-    if (nb_args != 2) {
+-        return;
 -    }
 -
--    return head;
+-    len = strlen(str);
+-    readline_set_completion_index(rs, len);
+-    list = elt = object_class_get_list(TYPE_DEVICE, false);
+-    while (elt) {
+-        DeviceClass *dc = OBJECT_CLASS_CHECK(DeviceClass, elt->data,
+-                                             TYPE_DEVICE);
+-
+-        if (dc->user_creatable) {
+-            readline_add_completion_of(rs, str,
+-                                object_class_get_name(OBJECT_CLASS(dc)));
+-        }
+-        elt = elt->next;
+-    }
+-    g_slist_free(list);
 -}
-diff --git a/hw/acpi/meson.build b/hw/acpi/meson.build
-index 30054a8cdc..7818846d88 100644
---- a/hw/acpi/meson.build
-+++ b/hw/acpi/meson.build
-@@ -36,3 +36,4 @@ softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('acpi-stub.c', 'aml-build-stub
-                                                   'acpi-mem-hotplug-stub.c', 'acpi-cpu-hotplug-stub.c',
-                                                   'acpi-pci-hotplug-stub.c', 'acpi-nvdimm-stub.c',
-                                                   'cxl-stub.c'))
-+softmmu_ss.add(files('acpi-qmp-cmds.c'))
+-
+-static int qdev_add_hotpluggable_device(Object *obj, void *opaque)
+-{
+-    GSList **list = opaque;
+-    DeviceState *dev = (DeviceState *)object_dynamic_cast(obj, TYPE_DEVICE);
+-
+-    if (dev == NULL) {
+-        return 0;
+-    }
+-
+-    if (dev->realized && object_property_get_bool(obj, "hotpluggable", NULL)) {
+-        *list = g_slist_append(*list, dev);
+-    }
+-
+-    return 0;
+-}
+-
+-static GSList *qdev_build_hotpluggable_device_list(Object *peripheral)
+-{
+-    GSList *list = NULL;
+-
+-    object_child_foreach(peripheral, qdev_add_hotpluggable_device, &list);
+-
+-    return list;
+-}
+-
+-static void peripheral_device_del_completion(ReadLineState *rs,
+-                                             const char *str)
+-{
+-    Object *peripheral = container_get(qdev_get_machine(), "/peripheral");
+-    GSList *list, *item;
+-
+-    list = qdev_build_hotpluggable_device_list(peripheral);
+-    if (!list) {
+-        return;
+-    }
+-
+-    for (item = list; item; item = g_slist_next(item)) {
+-        DeviceState *dev = item->data;
+-
+-        if (dev->id) {
+-            readline_add_completion_of(rs, str, dev->id);
+-        }
+-    }
+-
+-    g_slist_free(list);
+-}
+-
+-void device_del_completion(ReadLineState *rs, int nb_args, const char *str)
+-{
+-    if (nb_args != 2) {
+-        return;
+-    }
+-
+-    readline_set_completion_index(rs, strlen(str));
+-    peripheral_device_del_completion(rs, str);
+-}
+-
+ static int
+ compare_mon_cmd(const void *a, const void *b)
+ {
+diff --git a/softmmu/qdev-monitor.c b/softmmu/qdev-monitor.c
+index 4b0ef65780..b8d2c4dadd 100644
+--- a/softmmu/qdev-monitor.c
++++ b/softmmu/qdev-monitor.c
+@@ -973,6 +973,88 @@ void hmp_device_del(Monitor *mon, const QDict *qdict)
+     hmp_handle_error(mon, err);
+ }
+ 
++void device_add_completion(ReadLineState *rs, int nb_args, const char *str)
++{
++    GSList *list, *elt;
++    size_t len;
++
++    if (nb_args != 2) {
++        return;
++    }
++
++    len = strlen(str);
++    readline_set_completion_index(rs, len);
++    list = elt = object_class_get_list(TYPE_DEVICE, false);
++    while (elt) {
++        DeviceClass *dc = OBJECT_CLASS_CHECK(DeviceClass, elt->data,
++                                             TYPE_DEVICE);
++
++        if (dc->user_creatable) {
++            readline_add_completion_of(rs, str,
++                                object_class_get_name(OBJECT_CLASS(dc)));
++        }
++        elt = elt->next;
++    }
++    g_slist_free(list);
++}
++
++static int qdev_add_hotpluggable_device(Object *obj, void *opaque)
++{
++    GSList **list = opaque;
++    DeviceState *dev = (DeviceState *)object_dynamic_cast(obj, TYPE_DEVICE);
++
++    if (dev == NULL) {
++        return 0;
++    }
++
++    if (dev->realized && object_property_get_bool(obj, "hotpluggable", NULL)) {
++        *list = g_slist_append(*list, dev);
++    }
++
++    return 0;
++}
++
++static GSList *qdev_build_hotpluggable_device_list(Object *peripheral)
++{
++    GSList *list = NULL;
++
++    object_child_foreach(peripheral, qdev_add_hotpluggable_device, &list);
++
++    return list;
++}
++
++static void peripheral_device_del_completion(ReadLineState *rs,
++                                             const char *str)
++{
++    Object *peripheral = container_get(qdev_get_machine(), "/peripheral");
++    GSList *list, *item;
++
++    list = qdev_build_hotpluggable_device_list(peripheral);
++    if (!list) {
++        return;
++    }
++
++    for (item = list; item; item = g_slist_next(item)) {
++        DeviceState *dev = item->data;
++
++        if (dev->id) {
++            readline_add_completion_of(rs, str, dev->id);
++        }
++    }
++
++    g_slist_free(list);
++}
++
++void device_del_completion(ReadLineState *rs, int nb_args, const char *str)
++{
++    if (nb_args != 2) {
++        return;
++    }
++
++    readline_set_completion_index(rs, strlen(str));
++    peripheral_device_del_completion(rs, str);
++}
++
+ BlockBackend *blk_by_qdev_id(const char *id, Error **errp)
+ {
+     DeviceState *dev;
 -- 
 2.39.0
 
