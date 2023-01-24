@@ -2,99 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6F957679E54
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 17:12:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 29A2C679E5E
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 17:16:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234126AbjAXQMr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 11:12:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47512 "EHLO
+        id S233442AbjAXQQF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 11:16:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234194AbjAXQMq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 11:12:46 -0500
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2882961A7
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 08:12:45 -0800 (PST)
-Received: by mail-pf1-x436.google.com with SMTP id 207so11518571pfv.5
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 08:12:45 -0800 (PST)
+        with ESMTP id S233185AbjAXQQC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 11:16:02 -0500
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2230D45893
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 08:15:57 -0800 (PST)
+Received: by mail-pl1-x633.google.com with SMTP id 5so9887176plo.3
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 08:15:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=d/92yOfPC4quQ0Hjjdafz7RrLaQ9Cr/2dayimzGP+m4=;
-        b=VV5GTAwEo16SgQUcigaADg3meFOjdJphHrDViP2i4CJXrOKWBOOOGNJCRN9qYNaWN3
-         lOrzL0IM2mws4V6s+8ltVdnLSauZINhBMpMI/XbqHqiDkWgi9BMu+7/uqjt32J0ZdcBx
-         jhZL+Yq3Bw7W7hSoaLZSbO2OaQqKyueYDNQXixH9NntCMq+vp/D6RLg96o1Bfc1cbgCX
-         4xr+e98LGI0k1xbvzM7dmBXPtM5EEHP/mxV8AyM2WJoz3bRpZSIkd3sj6ztRqxcVHHmB
-         cAjSOk1NdtjCFbbzSD2GM8SREq8Djd7h/8V6aTopsqjA5fCQUm4MlFNPreQLR58j2HQt
-         /2WA==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aPk9FnaXAHwLaHrt31b8O1lKJt10Zrrny18ftuYst2s=;
+        b=LYqDojeaQHL2HoA1wSz+SoLc9c2QOrTIbQbIpqZSAx0eM0iHqcmd08JhEl7Ul7xxl2
+         LYHVkfSXEDLeUavkJCPh3ZEVEG7VMDoYBKj4D05y10tV8KuLQHcxIjp+u24F5rSEyZ60
+         RmWRMJ1tXGlBKA13FAcjpzeUrnZEknGWR7osSZ1nuuB+45ddbxuxvANrWwjG7nEKuHmF
+         FNFwL/oxOqpa4kSMxKAotuetta/cCpRLo3sA46mrdUsw6HqEz8/AGoyM/UCyrNoHO5QZ
+         UDlXj9vOygeANg/36j0R1ei2MNxbLDfxoE8jjSfH8lx87qrS1+E0AMXorMkFsOsnqq4O
+         +HMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=d/92yOfPC4quQ0Hjjdafz7RrLaQ9Cr/2dayimzGP+m4=;
-        b=7GPQP3HQnmP2EZ+PF29fwjEh97WVp0dwfqsTfDZWJQOunQNTxkSSkFXQ9GlbLPsqAx
-         KzdAQSV4XbbjXC1L2+a+BAFjBnWeRKtTiOep6OTrw6gvXwXjjIJjzaQFIHpAX08fZ+mx
-         TmauIHIsuF9TQB9S143syqafwsfa+uDip+XCqLfDXIHNqlonYxKi+KnKG6GTUCL2Kx5W
-         SxZrqr/boZ4pFZP4E5TlnZ5QMDw9cEGVheulfqOQCaoXdWbfKVUCbjle+NPiFs90wb5q
-         Qz1HKvESX7NmXFRScdhHa2BQmmo49VlyN21IY70RTX59pY8lFS/zIur+3++TPJGJkghR
-         UwWw==
-X-Gm-Message-State: AFqh2kqCsjV2LaBZClZoHKOd9sVOqMs7HkocvWc32WjQfdOpyKxAKH0l
-        ChncY+gK2RgxujmXFYjutJLjE3Dh8BvKCz3gCqRz1g==
-X-Google-Smtp-Source: AMrXdXvQ7xLfJE7QLJmqKZ4GkFnqznDBO3boAwjSFpfc8/Oz2rKhdhbcNCuy9GIb8xliwIKmDxGl+6x9R1GPKI3Twa4=
-X-Received: by 2002:a62:61c4:0:b0:58b:e9af:948b with SMTP id
- v187-20020a6261c4000000b0058be9af948bmr3194053pfb.26.1674576764642; Tue, 24
- Jan 2023 08:12:44 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aPk9FnaXAHwLaHrt31b8O1lKJt10Zrrny18ftuYst2s=;
+        b=MS/J7ybZ+LlRt7H1dKFmduPYem5q7NR2DhQTDIR0V+Ba8cwx9D0mbXUqJLthbuniGv
+         xiKuXseK2ssGMzRz4d9L0lPBr/qpJl4yK9UbXQqiNgUB0vm1o8w3Td0Fkf1E5WZUaScv
+         djS1RLTGFx/ASTT2wZ300ZHuu1uxKzfN7Atqp9RpsLqy1zWc1TwQfoRG2NFxRi0FwPGE
+         ANtvdVPfRlfvcpT9COtU3N+PASYWnmxg4D53haf4BhwfdaFUWO7VCOB2dLNhnQFjotLs
+         7yQ5pWL/BUDtEUvdEjNjNLM3XgdusnhSeWQ1hzZlFSW02KreKqbLtaqrJAFiteiGItpe
+         /9gw==
+X-Gm-Message-State: AO0yUKV7lvbM2pEdU1WESNZS3ir0bpA1E90M4ua2DmaeCUOXxccWlmSf
+        uPYDgxh9roejbmUdLLjmV6oxhA==
+X-Google-Smtp-Source: AK7set8JayVzD/gktjyzi9/78oGfLr8uiYVAMw/+8m3wzEK0vHjiGUPHfsfLpijOnQN0Uno91anBiA==
+X-Received: by 2002:a17:902:74c3:b0:194:6d3c:38a5 with SMTP id f3-20020a17090274c300b001946d3c38a5mr175718plt.1.1674576956432;
+        Tue, 24 Jan 2023 08:15:56 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id ba1-20020a170902720100b00192e1590349sm1833789plb.216.2023.01.24.08.15.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jan 2023 08:15:55 -0800 (PST)
+Date:   Tue, 24 Jan 2023 16:15:52 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     Marc Zyngier <maz@kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        KVM <kvm@vger.kernel.org>,
+        Christoffer Dall <cdall@cs.columbia.edu>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: duplicate patches in the kvm-x86 tree
+Message-ID: <Y9AEOHooQhbpGFka@google.com>
+References: <20230124125515.7c88c9fb@canb.auug.org.au>
+ <86a628mi9q.wl-maz@kernel.org>
+ <CABgObfZxjbG+ZofDPfOdiY_QP4j09XtTNwQVmGnbwoc+oaocxA@mail.gmail.com>
 MIME-Version: 1.0
-References: <20221201103312.70720-1-akihiko.odaki@daynix.com>
-In-Reply-To: <20221201103312.70720-1-akihiko.odaki@daynix.com>
-From:   Peter Maydell <peter.maydell@linaro.org>
-Date:   Tue, 24 Jan 2023 16:12:33 +0000
-Message-ID: <CAFEAcA9sj838rCyPrxAOncXKmdOftZeM16rKiXB5ww7dSYY0tA@mail.gmail.com>
-Subject: Re: [PATCH] target/arm: Propagate errno when writing list
-To:     Akihiko Odaki <akihiko.odaki@daynix.com>
-Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CABgObfZxjbG+ZofDPfOdiY_QP4j09XtTNwQVmGnbwoc+oaocxA@mail.gmail.com>
+X-Spam-Status: No, score=-14.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,GUARANTEED_100_PERCENT,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 1 Dec 2022 at 10:33, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->
-> Before this change, write_kvmstate_to_list() and
-> write_list_to_kvmstate() tolerated even if it failed to access some
-> register, and returned a bool indicating whether one of the register
-> accesses failed. However, it does not make sen not to fail early as the
-> the callers check the returned value and fail early anyway.
->
-> So let write_kvmstate_to_list() and write_list_to_kvmstate() fail early
-> too. This will allow to propagate errno to the callers and log it if
-> appropriate.
+On Tue, Jan 24, 2023, Paolo Bonzini wrote:
+> On Tue, Jan 24, 2023 at 9:47 AM Marc Zyngier <maz@kernel.org> wrote:
+> >
+> > Hi Stephen,
+> >
+> > On Tue, 24 Jan 2023 01:55:15 +0000,
+> > Stephen Rothwell <sfr@canb.auug.org.au> wrote:
+> > >
+> > > Hi all,
+> > >
+> > > The following commits are also in other tree(s?) as different
+> > > commits (but the same patches):
+> > >
+> > >   0b6639e8ed87 ("KVM: s390: Move hardware setup/unsetup to init/exit")
+> > >   0c2be59e0b53 ("KVM: x86: Use KBUILD_MODNAME to specify vendor module name")
+> > >   1334f214d19f ("KVM: s390: Unwind kvm_arch_init() piece-by-piece() if a step fails")
+> >
+> > [...]
+> >
+> > > I guess someone has rebased one of the kvm trees and it had already been
+> > > merged into another (like the kvm or kvm-arm trees).
+> >
+> > Huh, that's worrying. I'm carrying the kvm-hw-enable-refactor branch
+> > from the KVM tree, which I understood to be a stable branch[1], and
+> > which I merged to avoid conflicts to be propagated everywhere.
+> 
+> It wasn't 100% guaranteed to be stable because it was meant to be
+> tested and have fixes squashed in. But since I had no issues reported
+> from either maintainers or bots,
 
-(Sorry this one didn't get reviewed earlier.)
+There's one issue, but I didn't explicitly call out that it could be squashed.
 
-I agree that all the callers of these functions check for
-failure, so there's no major benefit from doing the
-don't-fail-early logic. But is there a reason why we should
-actively make this change?
+https://lore.kernel.org/all/20230119182158.4026656-1-seanjc@google.com
 
-In particular, these functions form part of a family with the
-similar write_cpustate_to_list() and write_list_to_cpustate(),
-and it's inconsistent to have the kvmstate ones return
-negative-errno while the cpustate ones still return bool.
-For the cpustate ones we *do* rely in some places on
-the "don't fail early" behaviour. The kvmstate ones do the
-same thing I think mostly for consistency.
+> I will indeed merge commit 9f1a4c004869 aka kvm/kvm-hw-enable-refactor into
+> kvm/next. Sean, please rebase to drop the duplicate commits.
 
-So unless there's a specific reason why changing these
-functions improves behaviour as seen by users, I think
-I favour retaining the consistency.
-
-thanks
--- PMM
+Will do.
