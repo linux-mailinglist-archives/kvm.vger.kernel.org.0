@@ -2,96 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB63E67A40B
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 21:38:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 02C0167A414
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 21:41:49 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234085AbjAXUi4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 15:38:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48660 "EHLO
+        id S233513AbjAXUlr (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 15:41:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229533AbjAXUiz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 15:38:55 -0500
-Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2AA46D4A;
-        Tue, 24 Jan 2023 12:38:52 -0800 (PST)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 4P1f2F5twlz4xN4;
-        Wed, 25 Jan 2023 07:38:45 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-        s=201702; t=1674592725;
-        bh=KZz/kInveKaA8SPDm2PC8Xqw0Hm46w9QRSaZTmWmmwo=;
-        h=Date:From:To:Cc:Subject:From;
-        b=FLxuIulT3xpdkw/7xNRgL88v42ccQW3IWTNkzlov93+oKao5gmYv86Cdw9Q3qlQwG
-         6N+U6qYInL+IcOLhRBApLBPmNPWpSXdlvoWhACGjkVoaXmZbMpP19duA/pw/dbSaO9
-         Au5sAFFJRC/3f/yrAnIPso5D0P2raQBGgaWFeeLauAw9xd316MUFP+Tuz1PWxshd8R
-         aPAiAD+q1VLsFew9oBAKUbqwkLWmBd1qpVuP4YKZ1eTzDmUNwS7GdIltjO2iQviQPQ
-         5W6Log+QGUmG1IWgJNDdo3EeKy9LyU4pd0m0uFIoUTeDsMXD1d4npO9gObKe/HcZjH
-         qBEi2Xsu4nUKg==
-Date:   Wed, 25 Jan 2023 07:38:44 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     KVM <kvm@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the kvm-fixes tree
-Message-ID: <20230125073844.53aaf29d@canb.auug.org.au>
+        with ESMTP id S229778AbjAXUlq (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 15:41:46 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 548334C6C0
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 12:41:45 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id 36so12077658pgp.10
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 12:41:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kArh2JTETPG4MZN8AtzWKM/hnB740sJiaw+6d2XmltY=;
+        b=oyLp/nUpTQCOQMyT5yEtRG7o0JQPEbxztyhTTwBBWfbRApCOOFV/WkDLdIbvbSvWLz
+         b1hrf5/g8Fdn++whjE9zqRHbe7cRC42175lcv4Eyj7FJEwCFaWE1ruLkzMZpzPw3MEn6
+         dm8HGLCYb86tX0qQL+B4f0kcnhqKsu6O9j+KA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kArh2JTETPG4MZN8AtzWKM/hnB740sJiaw+6d2XmltY=;
+        b=pXR6h7Bc4SC9p4iq1pW6PMmNYVRYV/ri6UOzeiCKzZ6q20hPCZ6Z/Onlp/BRcv8oxJ
+         taNv3vGcnys/XXMYt9VUFNdDBIoM6HCr4YhQe+kRnVuRVj+s1NUPK3jSNAcwS1nro/nt
+         iQOf1w4lH88vFgO6QbHE0jZJpZdG2Eo4zB3CwrNtSuSFK4denU5RfAd0wVKI9fSfwdW7
+         bZ+i9H5rj/uQgCFh3WDyfNypXl+CXytmsvv3aNvy7BRM2GXyQhabe/4ajDPAjN2u9ZLh
+         sWb15KZJEVzVRb/U2dHfRMH2PZ3VUMyeOaMMLssb2+RfX2Ffxmjnog9fvyS4UP29Fi+3
+         exkw==
+X-Gm-Message-State: AFqh2ko+2vkiZ0Cz7c6Gld0V9A1LksPj3xK2BIIzZ8o/yQ2JOINTpVWU
+        V8C736r1PH15wmGZZnryX6SaNDPm8ojHGCl71wGl
+X-Google-Smtp-Source: AMrXdXv//TSHap1rIs4T8t6FimYpSoWP8wIEH1RnksqTCs7706WWqSUBG8nxukPl0ALp6mPXwdjofzthPg+fGXMiqgg=
+X-Received: by 2002:a05:6a00:1d23:b0:58d:b662:af11 with SMTP id
+ a35-20020a056a001d2300b0058db662af11mr2817916pfx.37.1674592904836; Tue, 24
+ Jan 2023 12:41:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/sI8/YBqI7=xgp9aoczk=jZx";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221215170046.2010255-1-atishp@rivosinc.com> <20221215170046.2010255-2-atishp@rivosinc.com>
+ <20230112100608.d7tnvhbotjfctlgk@orel> <CAHBxVyESkQ9Krmn-44f-A8hYzMrZBtBfq15fdx-sHDQfkBMtKQ@mail.gmail.com>
+ <20230113072255.34cnyautbwiy25p5@orel>
+In-Reply-To: <20230113072255.34cnyautbwiy25p5@orel>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Tue, 24 Jan 2023 12:41:33 -0800
+Message-ID: <CAOnJCU+UBG-AouAc1M4J-i9Y_nPE9RfrFZfNyLSxhKbNF55AMQ@mail.gmail.com>
+Subject: Re: [PATCH v2 01/11] RISC-V: Define helper functions expose hpm
+ counter width and count
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Atish Kumar Patra <atishp@rivosinc.com>,
+        linux-kernel@vger.kernel.org, Anup Patel <anup@brainfault.org>,
+        Guo Ren <guoren@kernel.org>, kvm-riscv@lists.infradead.org,
+        kvm@vger.kernel.org, linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Sergey Matyukevich <sergey.matyukevich@syntacore.com>,
+        Eric Lin <eric.lin@sifive.com>, Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---Sig_/sI8/YBqI7=xgp9aoczk=jZx
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Thu, Jan 12, 2023 at 11:22 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+>
+> On Thu, Jan 12, 2023 at 10:18:05AM -0800, Atish Kumar Patra wrote:
+> > On Thu, Jan 12, 2023 at 2:06 AM Andrew Jones <ajones@ventanamicro.com> wrote:
+> > >
+> > > On Thu, Dec 15, 2022 at 09:00:36AM -0800, Atish Patra wrote:
+> ...
+> > > > +EXPORT_SYMBOL(riscv_pmu_get_hpm_info);
+> > >
+> > > EXPORT_SYMBOL_GPL ?
+> > >
+> >
+> > Is that mandatory ? I have seen usage of both in arch/riscv and other
+> > places though.
+> > I am also not sure if any other non-GPL module should/need access to this.
+>
+> TBH, I'm not sure what the best policy is, but I presumed we should use
+> _GPL when we aren't aware of anything non-GPL and then when a day comes
+> that something non-GPL would like this to be exported, the patch that
+> flips it will provide the justification in its commit message.
+>
 
-Hi all,
+Sgtm. Changed it to EXPORT_SYMBOL_GPL for now.
 
-In commit
+> Thanks,
+> drew
 
-  50aa870ba2f7 ("selftests: kvm: move declaration at the beginning of main(=
-)")
 
-Fixes tag
 
-  Fixes: a79b53aaaab5 ("KVM: x86: fix deadlock for KVM_XEN_EVTCHN_RESET", 2=
-022-12-28)
-
-has these problem(s):
-
-  - Subject has leading but no trailing quotes
-    Just use
-	git log -1 --format=3D'Fixes: %h ("%s")'
-
-The date at the end does not add anything.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/sI8/YBqI7=xgp9aoczk=jZx
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmPQQdQACgkQAVBC80lX
-0GwKzAf/WIfQyqx7umgHsDtxP+j4gMgcPcmB6W5nu5nC1POxmSatzlNHXvgqQyIp
-fZajkJsVelgXRYxduljG3fsmnQVW9tSdkaPRTNefZg02/cmm8b6KkzoYa0UqtOiU
-8H3z/2e14gbs8DE0IaJEkuX3RkuYP+E/gNUt2atmbcLCtuush/Gw5hArpr8umhXY
-6vh7YBv5cJYapVEXOiViq76pdKEEM+/5MG4dYOn58mrnmFDEUifP3tzuxnptgHMx
-AcnX1Hu0EXHWfUDSQ5aCvjqaGnpZa9T0NpnNmTp1NEshyc5v51QIx9d6y5rje4SC
-b9JL0nfdF8+jbM/MMpOUT+bIEBLcXg==
-=3bd4
------END PGP SIGNATURE-----
-
---Sig_/sI8/YBqI7=xgp9aoczk=jZx--
+-- 
+Regards,
+Atish
