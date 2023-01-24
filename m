@@ -2,139 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A3CA67A3B6
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 21:17:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D7B4367A3BD
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 21:22:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230480AbjAXURG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 15:17:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35600 "EHLO
+        id S229719AbjAXUW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 15:22:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229619AbjAXURE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 15:17:04 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2102421967
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 12:17:04 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id h5-20020a17090a9c0500b0022bb85eb35dso10761260pjp.3
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 12:17:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tnps9xVOfH3PPgr1zmMdnLEIT0DDz3WfUqZSEXwwr/o=;
-        b=PpouaE7EQFpmqsL1Ig1tmZQ2vY/kUcmPs518HqRUfERC1WUr9/VrTyAAqx2b19/IOe
-         jeLrXDTuNSo1K3fPhFzl4ObsptGiZxNHj82Dcp63npD6NRe3sAUdEj+1lLAeuYlQCAUx
-         cdszV8gVi4Cd1dOGzsiwwF1ghOcyqkuJkVpWJ49/BYlbVqqmksdMMJcXno4VLpizhL0c
-         6h8DZKy4euhH0OexghXa01BXsfj6tGkgSNxS6k2jx3rzmU+JRzUtVoCACWJiSXI4tb8x
-         Ro+bEzJfRx3k7MVWkTqVolNK5Edh8LOoN+l6VU4mSfPWn/qVvDNQwEdVW5MOya5+oQUV
-         AAlw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tnps9xVOfH3PPgr1zmMdnLEIT0DDz3WfUqZSEXwwr/o=;
-        b=HQw1O8IT4wMGzVGzBRnk9QsDassRcUlE8LKZcbNTDO/0xKDSKpOxwl+4fUgH5DRbJk
-         Pz4U/JLsaKwDZ6+C5SEqEsklDTU1PghEbqZx3uCPV6j2J8BhxbmWZQ8eroDRAVYjaPsN
-         SN4eMb/dLVcSUCyI2ZU5Wk2QN4b3RzZSRSuJgPjCshEFgURMbyIFCtKFPhcA62hkEq2d
-         eGk94BS2wfmZOGKELH5DG+iO7aanbet0YKphwj7UStTOqloNCvWbHCIn7/kuRjDG9EJp
-         LBsypA4Q2fqFxHgrZJ+424WtZGFj1PiAYGl6I4DrAzkxAPomEw56rIFXYI5MdifU5tPF
-         LLZA==
-X-Gm-Message-State: AO0yUKWFiW9AKbXDprNt5ZXzd+aQEKkd7/GNBSEaLLz7Dd00skyKQGia
-        Ui9/rJJV3YvxDXvEN8RbtpFprw==
-X-Google-Smtp-Source: AK7set9y7Vwacso7iTYoyGLt9NtJsrhqIV/kv0DQvGcm/i9oxewbjuP0k3okxbtp//izfppyEAaZqg==
-X-Received: by 2002:a17:903:2644:b0:189:b910:c6d2 with SMTP id je4-20020a170903264400b00189b910c6d2mr272488plb.1.1674591423366;
-        Tue, 24 Jan 2023 12:17:03 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 13-20020a170902c24d00b00192aa53a7d5sm2104936plg.8.2023.01.24.12.17.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 12:17:02 -0800 (PST)
-Date:   Tue, 24 Jan 2023 20:16:59 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/8] KVM: x86/pmu: Rewrite reprogram_counters() to
- improve performance
-Message-ID: <Y9A8u3AqvUWc7pwL@google.com>
-References: <20221111102645.82001-1-likexu@tencent.com>
- <20221111102645.82001-4-likexu@tencent.com>
+        with ESMTP id S232601AbjAXUWv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 15:22:51 -0500
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [IPv6:2a0c:5a00:149::26])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E942DB76D
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 12:22:44 -0800 (PST)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1pKPoO-000A7t-C2; Tue, 24 Jan 2023 21:22:32 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+        bh=ofpnODegQDOIRCO2eZN2SpGGzNBUu2sXhCtmyK94QM4=; b=eD07QtPIUxEY6K58yJAcgjTCJI
+        fR61X2nt7aWWjOa3y8vvkRlm2332FFy4uo6pjGeuLB+3ZyeJJJd1fq/MvBRnQJTKcM/WRQJ0IA+xn
+        w+jsF166ItraAHI3eWsCei5g79qfoVLwe8GvdERV9zqqIANo7+PHbGR4zcqn2STHxxwt+zXAxQLXI
+        KwcSoajLmtYWpF67B8ErK25bNyCMyDvSYCALzK1ToWJKVVMXZiElGtPjpp4rmMW20mMIpfFqkHt2Y
+        WN9MlhEOOUGdZjmF3++nKQJx6cPPEeeQ4HMY3eaaBgVBsrPFT/evkxdatR85gbyiXqtDyKGx7qbNY
+        B+mbfEWA==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1pKPoN-0001OO-8D; Tue, 24 Jan 2023 21:22:31 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1pKPoH-0005lf-HN; Tue, 24 Jan 2023 21:22:25 +0100
+Message-ID: <85285ccd-7b1a-9a94-5471-8036cb824b28@rbox.co>
+Date:   Tue, 24 Jan 2023 21:22:23 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221111102645.82001-4-likexu@tencent.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Thunderbird
+Subject: Re: [PATCH v1] KVM: destruct kvm_io_device while unregistering it
+ from kvm_io_bus
+Content-Language: pl-PL
+To:     Sean Christopherson <seanjc@google.com>,
+        Wei Wang <wei.w.wang@intel.com>
+Cc:     pbonzini@redhat.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        =?UTF-8?B?5p+z6I+B5bOw?= <liujingfeng@qianxin.com>
+References: <20221229123302.4083-1-wei.w.wang@intel.com>
+ <Y88XYR0L2DyiKnIM@google.com>
+From:   Michal Luczaj <mhal@rbox.co>
+In-Reply-To: <Y88XYR0L2DyiKnIM@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Nov 11, 2022, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
-> 
-> A valid pmc is always tested before using pmu->reprogram_pmi. Eliminate
-> this part of the redundancy by setting the counter's bitmask directly,
-> and in addition, trigger KVM_REQ_PMU only once to save more cpu cycles.
+On 1/24/23 00:25, Sean Christopherson wrote:
+> On Thu, Dec 29, 2022, Wei Wang wrote:
+>> diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
+>> index 2a3ed401ce46..1b277afb545b 100644
+>> --- a/virt/kvm/eventfd.c
+>> +++ b/virt/kvm/eventfd.c
+>> @@ -898,7 +898,6 @@ kvm_deassign_ioeventfd_idx(struct kvm *kvm, enum kvm_bus bus_idx,
+>>  		bus = kvm_get_bus(kvm, bus_idx);
+>>  		if (bus)
+>>  			bus->ioeventfd_count--;
+>> -		ioeventfd_release(p);
+>>  		ret = 0;
+>>  		break;
+>>  	}
 
-It's a little silly, but can you split this into two patches?  First optimize the
-helper, then expose it in pmu.h.  The optimization stands on its own, whereas the
-code movement is justified only by the incoming AMD PMU v2 support.
+I was wondering: would it make sense to simplify from
+list_for_each_entry_safe() to list_for_each_entry() in this loop?
 
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
->  arch/x86/kvm/pmu.h           | 11 +++++++++++
->  arch/x86/kvm/vmx/pmu_intel.c | 12 ------------
->  2 files changed, 11 insertions(+), 12 deletions(-)
+>> @@ -5453,18 +5459,18 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
+>>  	rcu_assign_pointer(kvm->buses[bus_idx], new_bus);
+>>  	synchronize_srcu_expedited(&kvm->srcu);
+>>  
+>> -	/* Destroy the old bus _after_ installing the (null) bus. */
+>> +	/*
+>> +	 * If (null) bus is installed, destroy the old bus, including all the
+>> +	 * attached devices. Otherwise, destroy the caller's device only.
+>> +	 */
+>>  	if (!new_bus) {
+>>  		pr_err("kvm: failed to shrink bus, removing it completely\n");
+>> -		for (j = 0; j < bus->dev_count; j++) {
+>> -			if (j == i)
+>> -				continue;
+>> -			kvm_iodevice_destructor(bus->range[j].dev);
+>> -		}
+>> +		kvm_io_bus_destroy(bus);
+>> +		return -ENOMEM;
 > 
-> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-> index 2b5376ba66ea..be552c8217a0 100644
-> --- a/arch/x86/kvm/pmu.h
-> +++ b/arch/x86/kvm/pmu.h
-> @@ -189,6 +189,17 @@ static inline void kvm_pmu_request_counter_reprogam(struct kvm_pmc *pmc)
->  	kvm_make_request(KVM_REQ_PMU, pmc->vcpu);
->  }
->  
-> +static inline void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
-> +{
-> +	int bit;
-> +
-> +	if (diff) {
-> +		for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX)
-> +			__set_bit(bit, pmu->reprogram_pmi);
-> +		kvm_make_request(KVM_REQ_PMU, pmu_to_vcpu(pmu));
-> +	}
-> +}
-> +
->  void kvm_pmu_deliver_pmi(struct kvm_vcpu *vcpu);
->  void kvm_pmu_handle_event(struct kvm_vcpu *vcpu);
->  int kvm_pmu_rdpmc(struct kvm_vcpu *vcpu, unsigned pmc, u64 *data);
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 2f7cd388859c..db704eea2d7c 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -68,18 +68,6 @@ static struct kvm_pmc *intel_pmc_idx_to_pmc(struct kvm_pmu *pmu, int pmc_idx)
->  	}
->  }
->  
-> -static void reprogram_counters(struct kvm_pmu *pmu, u64 diff)
-> -{
-> -	int bit;
-> -	struct kvm_pmc *pmc;
-> -
-> -	for_each_set_bit(bit, (unsigned long *)&diff, X86_PMC_IDX_MAX) {
-> -		pmc = intel_pmc_idx_to_pmc(pmu, bit);
-> -		if (pmc)
-> -			kvm_pmu_request_counter_reprogam(pmc);
-> -	}
-> -}
-> -
->  static bool intel_hw_event_available(struct kvm_pmc *pmc)
->  {
->  	struct kvm_pmu *pmu = pmc_to_pmu(pmc);
-> -- 
-> 2.38.1
-> 
+> Returning an error code is unnecessary if unregister_dev() destroys the bus.
+> Nothing ultimately consumes the result, e.g. kvm_vm_ioctl_unregister_coalesced_mmio()
+> intentionally ignores the result other than to bail from the loop, and destroying
+> the bus means it will immediately bail from the loop anyways.
+
+But it is important to know _if_ the bus was destroyed, right?
+IOW, doesn't your comment from commit 5d3c4c79384a still hold?
+
+    (...) But, it doesn't tell the caller that it obliterated the
+    bus and invoked the destructor for all devices that were on the bus.  In
+    the coalesced MMIO case, this can result in a deleted list entry
+    dereference due to attempting to continue iterating on coalesced_zones
+    after future entries (in the walk) have been deleted.
+
+Michal
+
