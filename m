@@ -2,77 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4F2DA679DB7
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 16:41:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4508679DFF
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 16:53:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235288AbjAXPlK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 10:41:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52024 "EHLO
+        id S233030AbjAXPxA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 10:53:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234302AbjAXPlA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 10:41:00 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DB29474CD
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 07:40:58 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id v3so11538354pgh.4
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 07:40:58 -0800 (PST)
+        with ESMTP id S232977AbjAXPw6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 10:52:58 -0500
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 397FD4957E
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 07:52:57 -0800 (PST)
+Received: by mail-wm1-x32c.google.com with SMTP id m5-20020a05600c4f4500b003db03b2559eso11264240wmq.5
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 07:52:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IfrAQ8c+lQmozz6wI3CJdSN0luYdljLfbreYdoxdA48=;
-        b=XjVvXIYI5DZAKv/v0+oZmSajU1T19S8rt42twtbfWHfPRg9W46ohb15iC2tUQFXHHX
-         T/ARNnZ5hF+EEmXQ0WdZb7uyY6SrUv58VRSkkMbUWiRS47bm1dGctU9TmQjhmKjcIU1c
-         r+DMal3Go7wPvCZN1hunqP0aOygR+7Aoh9YnwY8LZolwgzQhkyTN9asjiqzdGDJb2plP
-         sVkuqgVd0EJdn3U1GPQul7GUpj4a+jvMDM59jcZ0viznDjI5cfr0uY+87CzLV4SZiBn/
-         FYVsK3m0GEIb99fXhgwvC2wbOYHhkPZfiY0pnM7ahb5znYCYYyPiSwQComzD8gW3nU+5
-         7Dtg==
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xYZNOer8XJPZvFVKYrNmJaUtsvc8OotdT9jt+nQK3S0=;
+        b=lUCLQU3lURZFuNu2q0oiIgfROslxhSjmlcNJmu3eDQPNWozZ5jebd6RBmnsoFtQ4l2
+         r5EThZTS06gfK7/sLR6OhXEWuQcle9Oum+U/eTeKTNaA10kbRAZ1QnaFCii+KTjK0upr
+         tgxUbmn/K9P0gXJnpiCugb5VAJ/rkwLluIhdZxCfF1y6kfkNTgDfrL42FTjaDYD6uFg7
+         qn/w6f+BPmtNFs7eRItQ09xaAOBL7XOLBog2iCkeQv2KvIwaWws/iyeM8CmHAtrGmSMC
+         MvCox72Qdg0oR1hk7VL7A/xLsGAtQSuSvofh/UZkp6aSUQJF8R2qMvm2+YH3WebD0T9l
+         LSlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IfrAQ8c+lQmozz6wI3CJdSN0luYdljLfbreYdoxdA48=;
-        b=HRfSpP8J39zIzhO+IBCXCBbEzs1vxpGfcjDQ5XveLFYMNuZMQbiidJr1w0Xu28vEON
-         lcmBXQgyCYpm8i2oLlD0vFHb/+QX1IczOSu4jZvAzwqf9muY2mqljrYPWKPz2AwqZml+
-         Uhpcx9Ty8JsOJVpQh4pWM/gZMitPgP+O4QsCbn0Q6WjtuZlhdp+yJst7COY/SedlVhsZ
-         yaV1Am6BqjyPL//ASmT32oFqY2wbmhzQUp33+twt30MnRgDx/uTP9HK6/Hlbmrt8Y2lN
-         dIf1oCIvESkDibjE00A/ipphJyW1dM5qgwGmNxuTCU7eVXp8Lp1x+HV4FXGgDRU6oN0K
-         Zg2w==
-X-Gm-Message-State: AO0yUKU4LqybdBQIRLqjI9Iqzi35BcifL4dYvDIpW/wiDfS1IY5Ip0OK
-        i9pdVI7iVL1ZkM3+8Bb6Rvh44A==
-X-Google-Smtp-Source: AK7set/HtyrgJjemStqQjN62dh5mKKRzW+Hg1Vs/WR12Dz9T0Qob+Or04HzPBxCUfV4t3j9uBGITpg==
-X-Received: by 2002:a05:6a00:b55:b0:576:9252:d06 with SMTP id p21-20020a056a000b5500b0057692520d06mr284751pfo.0.1674574857542;
-        Tue, 24 Jan 2023 07:40:57 -0800 (PST)
-Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id v10-20020a056a00148a00b0058da56f8b95sm1742261pfu.115.2023.01.24.07.40.56
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xYZNOer8XJPZvFVKYrNmJaUtsvc8OotdT9jt+nQK3S0=;
+        b=Oe+r4xN03+EULk3WedptNYH6OigAWyoTwBO3Lbu1VlU/VbO6buXmvMinpCY5zDlvbd
+         mwFFXBLzw5YoaFJwK1UpqE/VsMpdw/IjxgSO+vH/caIV3D+rrHp58tvkSXfVYA4XccaR
+         cGo4Ip8TksqvgwcklyKrN47ct9CsDmpJJMRg9XwpksnyDQmZZNTNWLzqKOGSJz6/CQaI
+         be+xFEQSwt0V9aqbgauswWU1T+D2embghxZPOXwPpAHUQamFSLlPJfhtifq9mYz4U1FG
+         Gct3o+2EN01sMAklhyBj6ELQnLLwxYSfie8+6eA+NTfTg3s9XRwv8kz0FmDjXAdhsTX5
+         emew==
+X-Gm-Message-State: AFqh2kqkp/L4wERklmy5Q21y6shHF12uwBt1Ouwz4halvfrsajK406Tz
+        ArmmdKLDo1AWq/7o3kTtrikm2g==
+X-Google-Smtp-Source: AMrXdXsqIGZzmFNEQ/236Bwy4cXZmvFQ82xYncgxTV9VwP2mYfHmXK5lwlyV+75lxP7/PG6Q404K8Q==
+X-Received: by 2002:a05:600c:35ce:b0:3db:1caf:1020 with SMTP id r14-20020a05600c35ce00b003db1caf1020mr21760190wmq.35.1674575575762;
+        Tue, 24 Jan 2023 07:52:55 -0800 (PST)
+Received: from localhost.localdomain (cpc98982-watf12-2-0-cust57.15-2.cable.virginm.net. [82.26.13.58])
+        by smtp.gmail.com with ESMTPSA id 21-20020a05600c26d500b003d9b87296a9sm12992381wmv.25.2023.01.24.07.52.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 07:40:56 -0800 (PST)
-Date:   Tue, 24 Jan 2023 07:40:53 -0800
-From:   Ricardo Koller <ricarkol@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     David Matlack <dmatlack@google.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Vipin Sharma <vipinsh@google.com>
-Subject: Re: [PATCH 2/2] selftests: KVM: Add page splitting test
-Message-ID: <Y8/8BX5ehAyZjyAD@google.com>
-References: <20230119212510.3938454-1-bgardon@google.com>
- <20230119212510.3938454-3-bgardon@google.com>
- <Y8nKerX9tDRHkFq+@google.com>
- <CANgfPd8B_0w39d7V+c4GnUxdqrc8qN78r8Pq0Con3Mx9WO0hkQ@mail.gmail.com>
- <Y8qj1QS1VadgaX7A@google.com>
- <CAOHnOrzKBh2Cq7ZQece+6f6P5wS6gZ1R2vjEQ5=QLTy7BmUvFQ@mail.gmail.com>
- <CANgfPd_B0q6uU1Be7A-QOj5_YoWi8z9g9LO63mc+=136hO5K4Q@mail.gmail.com>
+        Tue, 24 Jan 2023 07:52:55 -0800 (PST)
+From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
+To:     apatel@ventanamicro.com, atishp@rivosinc.com,
+        andre.przywara@arm.com, alexandru.elisei@arm.com,
+        kvm@vger.kernel.org
+Cc:     Rajnesh Kanwal <rkanwal@rivosinc.com>
+Subject: [PATCH kvmtool 1/1] riscv: Move serial and rtc from IO port space to MMIO area.
+Date:   Tue, 24 Jan 2023 15:52:51 +0000
+Message-Id: <20230124155251.1417682-1-rkanwal@rivosinc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANgfPd_B0q6uU1Be7A-QOj5_YoWi8z9g9LO63mc+=136hO5K4Q@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -80,48 +68,77 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 20, 2023 at 12:04:04PM -0800, Ben Gardon wrote:
-> On Fri, Jan 20, 2023 at 6:34 AM Ricardo Koller <ricarkol@google.com> wrote:
-> >
-> ...
-> > > > > > +
-> > > > > > +     run_test(&p);
-> > > > >
-> > > > > Use for_each_guest_mode() to run against all supported guest modes.
-> > > >
-> > > > I'm not sure that would actually improve coverage. None of the page
-> > > > splitting behavior depends on the mode AFAICT.
-> > >
-> > > You need to use for_each_guest_mode() for the ARM case. The issue is
-> > > that whatever mode (guest page size and VA size) you pick might not be
-> > > supported by the host. So, you first to explore what's available (via
-> > > for_each_guest_mode()).
-> >
-> > Actually, that's fixed by using the default mode, which picks the
-> > first available
-> > mode. I would prefer to use for_each_guest_mode() though, who knows and
-> > something fails with some specific guest page size for some reason.
-> 
-> Okay, will do. I wasn't sure if we did eager page splitting on ARM, so
-> I was only planning on making this test for x86_64 initially, hence it
+The default serial and rtc IO region overlaps with PCI IO bar
+region leading bar 0 activation to fail. Moving these devices
+to MMIO region similar to ARM.
 
-Thanks Ben, just saw that V2 has the for_each_guest_mode() change.
-> being in that directory. If ARM rolls with the same behavior, then
-> I'll add the for_each_mode bit and move the test up a directory.
+Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+---
+ hw/rtc.c                     |  3 +++
+ hw/serial.c                  |  4 ++++
+ riscv/include/kvm/kvm-arch.h | 10 ++++++++--
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
-No wories, I can take care of that as part of my ARM changes, maybe even
-as part of the eager splitting series.
+diff --git a/hw/rtc.c b/hw/rtc.c
+index 9b8785a..da696e1 100644
+--- a/hw/rtc.c
++++ b/hw/rtc.c
+@@ -9,6 +9,9 @@
+ #if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
+ #define RTC_BUS_TYPE		DEVICE_BUS_MMIO
+ #define RTC_BASE_ADDRESS	ARM_RTC_MMIO_BASE
++#elif defined(CONFIG_RISCV)
++#define RTC_BUS_TYPE		DEVICE_BUS_MMIO
++#define RTC_BASE_ADDRESS	RISCV_RTC_MMIO_BASE
+ #else
+ /* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+ #define RTC_BUS_TYPE		DEVICE_BUS_IOPORT
+diff --git a/hw/serial.c b/hw/serial.c
+index 3d53362..46280d3 100644
+--- a/hw/serial.c
++++ b/hw/serial.c
+@@ -17,6 +17,10 @@
+ #define serial_iobase(nr)	(ARM_UART_MMIO_BASE + (nr) * 0x1000)
+ #define serial_irq(nr)		(32 + (nr))
+ #define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
++#elif defined(CONFIG_RISCV)
++#define serial_iobase(nr)	(RISCV_UART_MMIO_BASE + (nr) * 0x1000)
++#define serial_irq(nr)		(1 + nr)
++#define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
+ #else
+ #define serial_iobase_0		(KVM_IOPORT_AREA + 0x3f8)
+ #define serial_iobase_1		(KVM_IOPORT_AREA + 0x2f8)
+diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+index 3f96d00..620c796 100644
+--- a/riscv/include/kvm/kvm-arch.h
++++ b/riscv/include/kvm/kvm-arch.h
+@@ -11,7 +11,7 @@
+ #define RISCV_IOPORT		0x00000000ULL
+ #define RISCV_IOPORT_SIZE	SZ_64K
+ #define RISCV_IRQCHIP		0x08000000ULL
+-#define RISCV_IRQCHIP_SIZE		SZ_128M
++#define RISCV_IRQCHIP_SIZE	SZ_128M
+ #define RISCV_MMIO		0x10000000ULL
+ #define RISCV_MMIO_SIZE		SZ_512M
+ #define RISCV_PCI		0x30000000ULL
+@@ -35,10 +35,16 @@
+ #define RISCV_MAX_MEMORY(kvm)	RISCV_LOMAP_MAX_MEMORY
+ #endif
+ 
++#define RISCV_UART_MMIO_BASE	RISCV_MMIO
++#define RISCV_UART_MMIO_SIZE	0x10000
++
++#define RISCV_RTC_MMIO_BASE	(RISCV_UART_MMIO_BASE + RISCV_UART_MMIO_SIZE)
++#define RISCV_RTC_MMIO_SIZE	0x10000
++
+ #define KVM_IOPORT_AREA		RISCV_IOPORT
+ #define KVM_PCI_CFG_AREA	RISCV_PCI
+ #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + RISCV_PCI_CFG_SIZE)
+-#define KVM_VIRTIO_MMIO_AREA	RISCV_MMIO
++#define KVM_VIRTIO_MMIO_AREA	(RISCV_RTC_MMIO_BASE + RISCV_UART_MMIO_SIZE)
+ 
+ #define KVM_IOEVENTFD_HAS_PIO	0
+ 
+-- 
+2.25.1
 
-> >
-> > >
-> > > Thanks,
-> > > Ricardo
-> > >
-> > > >
-> > > > >
-> > > > > > +
-> > > > > > +     return 0;
-> > > > > > +}
-> > > > > > --
-> > > > > > 2.39.1.405.gd4c25cc71f-goog
-> > > > > >
