@@ -2,106 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7D218679BA1
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 15:22:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03942679BB2
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 15:25:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234638AbjAXOWB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 09:22:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33392 "EHLO
+        id S233809AbjAXOZM (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 09:25:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234069AbjAXOWA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 09:22:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D7988E
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 06:21:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674570073;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=8oENsT6FKSbjG8qOkOCXUpHU8LhCuaYbvtqSD6QuPP0=;
-        b=Hkm1CIyzzP4VOHDSoshFeUD5fgi0f301BROg4pCXV7yS2YSB/jWokZ9owsBMpp17EEuJBM
-        gHuis1qQXE4o+8fkbgZ5Cgmt2ZBR09YGOLJkKak+90KRUGLkGJGD2etVB3wt1EDkUhxjU+
-        2FQGhjekKl8C28/EpgJv8l5Wo/Ybgtc=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-458-o0aymdeSMqKbydqx_e6y9Q-1; Tue, 24 Jan 2023 09:21:11 -0500
-X-MC-Unique: o0aymdeSMqKbydqx_e6y9Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 28A483C18350;
-        Tue, 24 Jan 2023 14:21:11 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.253])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 6B3172026D2A;
-        Tue, 24 Jan 2023 14:21:10 +0000 (UTC)
-Date:   Tue, 24 Jan 2023 09:21:08 -0500
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Markus Armbruster <armbru@redhat.com>
-Cc:     qemu-devel@nongnu.org, pbonzini@redhat.com, kraxel@redhat.com,
-        kwolf@redhat.com, hreitz@redhat.com, marcandre.lureau@redhat.com,
-        dgilbert@redhat.com, mst@redhat.com, imammedo@redhat.com,
-        ani@anisinha.ca, eduardo@habkost.net, marcel.apfelbaum@gmail.com,
-        philmd@linaro.org, wangyanan55@huawei.com, jasowang@redhat.com,
-        jiri@resnulli.us, berrange@redhat.com, thuth@redhat.com,
-        quintela@redhat.com, stefanb@linux.vnet.ibm.com,
-        kvm@vger.kernel.org, qemu-block@nongnu.org
-Subject: Re: [PATCH 08/32] trace: Move HMP commands from monitor/ to trace/
-Message-ID: <Y8/pVAXxDAoMRXUC@fedora>
-References: <20230124121946.1139465-1-armbru@redhat.com>
- <20230124121946.1139465-9-armbru@redhat.com>
+        with ESMTP id S233644AbjAXOZH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 09:25:07 -0500
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6899346174;
+        Tue, 24 Jan 2023 06:25:06 -0800 (PST)
+Received: by mail-ej1-f43.google.com with SMTP id az20so39502988ejc.1;
+        Tue, 24 Jan 2023 06:25:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HFiY49QSpECHmg3/XnIBpM7+6TWXqD6hxAB2tKV4uVM=;
+        b=trKfX0QKqQCcAFesVGpTCQrZJiut5jfyIjysJCeZjnSzDYYyWMBCxJ4a7MRMIY7nez
+         9KrA6eAHK44775RsvUKck63XA6W0+JffAYwRfd65Y7wOwJaPk+uovk6lZJvUkeAMHUbV
+         UAipStfZYzkBeBBkYFRYzG+kVlWfBPg9e3/7bwCKTi8QJ8HNU+r7iRK6y/ZgSWNKfa8o
+         5UpxenUmhZqPF3r9DArqM0Z0ew2fHjX+rT/y8kJcpvnYt+YfqIq92uv0V6QPtiR1aWb3
+         IkiSW60GjGMiMkSHo9Y4iHMIfo6rC2zgBZxZXFPefEF08XciMu5s9qSOnqBX4H9pc42W
+         n4Dg==
+X-Gm-Message-State: AFqh2kqNJBNsmmwdzZMX3z9ulUSlXyVuaXy3gB99vbPfwhh6Hsk0hO1H
+        J188Xw77bRSBWQWtVW/5wkYDSSbsLVs4FCLg5iM=
+X-Google-Smtp-Source: AMrXdXuJpYU/fVjzod6h2/vaXZp4NAt4KpSzd9J+SqARc7LgKOGgdEnk0S9WeDDl/G8RAbK5Y/RXyWsg2NY+LUrUB/o=
+X-Received: by 2002:a17:907:2b23:b0:877:8b1d:354e with SMTP id
+ gc35-20020a1709072b2300b008778b1d354emr2505342ejc.309.1674570304853; Tue, 24
+ Jan 2023 06:25:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="5diW0wbs6DbIwjht"
-Content-Disposition: inline
-In-Reply-To: <20230124121946.1139465-9-armbru@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230123205009.790550642@infradead.org> <20230123205515.233366796@infradead.org>
+In-Reply-To: <20230123205515.233366796@infradead.org>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Tue, 24 Jan 2023 15:24:53 +0100
+Message-ID: <CAJZ5v0jnmyWDQw=VXcViZLUfjjVgkP8TYKg3nS62jANT2qr-mg@mail.gmail.com>
+Subject: Re: [PATCH 6/6] cpuidle: Fix poll_idle() noinstr annotation
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     mingo@kernel.org, will@kernel.org, boqun.feng@gmail.com,
+        mark.rutland@arm.com, tglx@linutronix.de, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        srivatsa@csail.mit.edu, amakhalov@vmware.com,
+        pv-drivers@vmware.com, rostedt@goodmis.org, mhiramat@kernel.org,
+        wanpengli@tencent.com, vkuznets@redhat.com,
+        boris.ostrovsky@oracle.com, rafael@kernel.org,
+        daniel.lezcano@linaro.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
+        vschneid@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-trace-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+        kernel test robot <oliver.sang@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
+        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Mon, Jan 23, 2023 at 9:58 PM Peter Zijlstra <peterz@infradead.org> wrote:
+>
+> The instrumentation_begin()/end() annotations in poll_idle() were
+> complete nonsense. Specifically they caused tracing to happen in the
+> middle of noinstr code, resulting in RCU splats.
+>
+> Now that local_clock() is noinstr, mark up the rest and let it rip.
+>
+> Fixes: 00717eb8c955 ("cpuidle: Annotate poll_idle()")
+> Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+> Reported-by: kernel test robot <oliver.sang@intel.com>
+> Link: https://lore.kernel.org/oe-lkp/202301192148.58ece903-oliver.sang@intel.com
 
---5diW0wbs6DbIwjht
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-On Tue, Jan 24, 2023 at 01:19:22PM +0100, Markus Armbruster wrote:
-> This moves these commands from MAINTAINERS sections "Human
-> Monitor (HMP)" and "QMP" to "Tracing".
->=20
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->  include/monitor/hmp.h  |   3 +
->  monitor/misc.c         | 119 ---------------------------------
->  trace/trace-hmp-cmds.c | 148 +++++++++++++++++++++++++++++++++++++++++
->  trace/meson.build      |   1 +
->  4 files changed, 152 insertions(+), 119 deletions(-)
->  create mode 100644 trace/trace-hmp-cmds.c
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---5diW0wbs6DbIwjht
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmPP6VQACgkQnKSrs4Gr
-c8g9Twf4kU29jC0VJYy6y15wW//3dlo/OrfQS1kSi8WeAHKMYymeOxFDneZq455U
-8QMsHQAOWf0QVHJqZgRih+mdWIeCEYDhdIivcsr8BYf67Kn0PQlXqFeiGo993vrQ
-kijMU1bhLiSTOBXB+A4LxshiNDpRBa6XDOqwieD9lcEhn80PLi5xCgeM5uvRzZxO
-n+DeDXAKSVoW2CeIEeg2xrqgJQ762MtIOkveknSHOQ4i5w8tUPNK2DgGyx5FGTWg
-LF19ndFC+Cp7bGIpWvzhBpjPzt6dcuFFCh/pEz6rcNXbz6wiQcBBndGNTi9+ZLQM
-KhMVDacOPTIEyX9dyle2ups0q0W8
-=x8M5
------END PGP SIGNATURE-----
-
---5diW0wbs6DbIwjht--
-
+>  drivers/cpuidle/cpuidle.c    |    2 +-
+>  drivers/cpuidle/poll_state.c |    2 --
+>  2 files changed, 1 insertion(+), 3 deletions(-)
+>
+> --- a/drivers/cpuidle/cpuidle.c
+> +++ b/drivers/cpuidle/cpuidle.c
+> @@ -426,7 +426,7 @@ void cpuidle_reflect(struct cpuidle_devi
+>   * @dev:   the cpuidle device
+>   *
+>   */
+> -u64 cpuidle_poll_time(struct cpuidle_driver *drv,
+> +__cpuidle u64 cpuidle_poll_time(struct cpuidle_driver *drv,
+>                       struct cpuidle_device *dev)
+>  {
+>         int i;
+> --- a/drivers/cpuidle/poll_state.c
+> +++ b/drivers/cpuidle/poll_state.c
+> @@ -15,7 +15,6 @@ static int __cpuidle poll_idle(struct cp
+>  {
+>         u64 time_start;
+>
+> -       instrumentation_begin();
+>         time_start = local_clock();
+>
+>         dev->poll_time_limit = false;
+> @@ -42,7 +41,6 @@ static int __cpuidle poll_idle(struct cp
+>         raw_local_irq_disable();
+>
+>         current_clr_polling();
+> -       instrumentation_end();
+>
+>         return index;
+>  }
+>
+>
