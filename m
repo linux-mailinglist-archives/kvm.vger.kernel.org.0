@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6811678D31
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 02:17:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9E590678D3A
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 02:19:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232660AbjAXBR5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 23 Jan 2023 20:17:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46196 "EHLO
+        id S232708AbjAXBTF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 23 Jan 2023 20:19:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231772AbjAXBR4 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 23 Jan 2023 20:17:56 -0500
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AF3C8A7A
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 17:17:55 -0800 (PST)
-Received: by mail-pg1-x530.google.com with SMTP id 7so10351794pga.1
-        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 17:17:55 -0800 (PST)
+        with ESMTP id S232712AbjAXBTC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 23 Jan 2023 20:19:02 -0500
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C529EDC
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 17:19:01 -0800 (PST)
+Received: by mail-pg1-x535.google.com with SMTP id v3so10347607pgh.4
+        for <kvm@vger.kernel.org>; Mon, 23 Jan 2023 17:19:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VdIkKw85QyqR8RnovAWlaOqWkJ4x/84JU+MCLeNY4/w=;
-        b=XnuUpXBYmcbXYIl/WUVnKUIF0/iOyYXTFdKQ6MhIGZ+lSxA6obVt/YUk6NcVR6bE98
-         2wngsfbss+Q+B/nvpCog6BkcM4EPVNC1c5M+nqGvlw9HQrFsOUhSd8NCEDGWv7pgqsW8
-         cxJY4aYJ+NYeaZ/uxsxZYNDYAR0gqL0smN+BmlSQ55RamWuHnZfw0cD6H0tJMVXBxFL5
-         ZDmYesfFMwWm1TWbakB2jCQy9GRGNn1/BvXjU5QBdgiPHJLNQ8nvBSg7/KXWoU6nR6MY
-         rFD06x0IwB3JtsoPmH9fYEDrP3o9ahBgjbJz/zH9LKRDEiiqQXS3B4MWV/e8byXKOXKT
-         H3XA==
+        bh=rOxlYQn5IVTbZcsZT8BtGideAkmVidS2Y3/OPz6N7C0=;
+        b=eXFHzJcyhOw7VhLciS/S1ypBXdK588msqu3ys98NiGGmaI8RAljiz8T6BCKnQppN6m
+         z12tOKl7GPpJ0efR4Qetye6eByjbqr+OgwmY23AwF0cj7XXwUfqmwKP+PDOC19PSC9OZ
+         2iCcaMAHTb7CokUSejoDSOy6O4fifCsq/63ArbQYuOhuk7x2HaCDTaBi/IsY5bHE93hr
+         b4Wdm5KCDkdnoVDWs4oKnLtKvkCwQj62BRrsm7cfedwpEOCNqHlp1BFGiuX99myu/RuX
+         PmPN2ntZnHqE50voa+YCcx3HfKQAjuhkAE/QJUg8SRbrPDuZ/nE3DVkMboUL1qqV4C0B
+         jWsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VdIkKw85QyqR8RnovAWlaOqWkJ4x/84JU+MCLeNY4/w=;
-        b=DhJSX4L3oeeef65mONFOjp4XeCDlIe7V/HZT+StzMkh1VBgJUTAquoR0p17/QH4rP5
-         bB99tIq625vEzJBj4YmVqHu6QdYrPqxGvc/kBZskPR201Rj3rEnu8QHE4lXkQZXUGhMR
-         dN+nhL6v25PNybiiHyBWHNSul29oSrl2ng6oSuaAVW+i9jbNfbii4oTLuuROr24ZUamR
-         RYTfyzPHgOVZn2xyby2NrlOP47AaXy4HpUTrdt9uXnbC9H/nkGgnI6KQ0B1PYTaCBc2m
-         3cgQUSYzrNxwgj9RxUZ0QTO7y+MOrSVWpEou4AzD1g6ySbZDd2RJkru0hHQOhL8sWt0u
-         xmOw==
-X-Gm-Message-State: AO0yUKU9qsuw3efJgBI+Y9XDxqP9bswCjdgFVRf49607oE52Dt7H6rj3
-        RpUh/xaRQHtUVcRgI+Odvzb1Kw==
-X-Google-Smtp-Source: AK7set8fB2T3Yp6e7oXLpQvSuy5QdNrLHtwCWOp1643ps5CardXQOKYuldF9Mty3bq1ODsD5Zz9PEg==
-X-Received: by 2002:a05:6a00:288b:b0:582:13b5:d735 with SMTP id ch11-20020a056a00288b00b0058213b5d735mr12876pfb.0.1674523074825;
-        Mon, 23 Jan 2023 17:17:54 -0800 (PST)
+        bh=rOxlYQn5IVTbZcsZT8BtGideAkmVidS2Y3/OPz6N7C0=;
+        b=LLqncXZPjdA6uEw7THTGsjCFpTUy4iSkK6V5Kb/dowoGhX/A4od5kWDrsQ0Ee9758u
+         Gxp0Yx9FncqTS90YBjTnzp/QfZJwnkXRNHY0nWJEjA1iCQhN0iqf+1BrvfqaQ1LTxl3o
+         LqL0VRYl5okixSn/ZR8iOoZoF2+nRcIQi6cndYdmnPto2kAaTZvoCFwG3Ubq8inR5Eeg
+         NvVUr6c11lGtXEk4ElUTBOIKKtuIdJD9RfMY6nM+GQRHXu/m/FI0NbdmCt+KzPXn0Egr
+         OwisxuRhkDxmFP7qHKoOhBkvzU21XOXN5ftvw9szVtRPq4Vdag+5xG0gfpI6BuzMSDMG
+         j5yw==
+X-Gm-Message-State: AO0yUKXg3hs/3PI0jrvtXTfZDzB2LGvDo7fJmc3AppP4MvK/o3ID1utJ
+        TnUPUM70od8OnPSZLuF+Ehuh+w==
+X-Google-Smtp-Source: AK7set8MB8x5JTZulDndzboujvV5nEoTMycNiopxs/kJ16Via3RHL9uyHhOy++u9vGcZVbFW0KsmgQ==
+X-Received: by 2002:a05:6a00:134c:b0:581:bfac:7a52 with SMTP id k12-20020a056a00134c00b00581bfac7a52mr11256pfu.1.1674523141203;
+        Mon, 23 Jan 2023 17:19:01 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id f9-20020a623809000000b0056c2e497b02sm220593pfa.173.2023.01.23.17.17.54
+        by smtp.gmail.com with ESMTPSA id c9-20020aa781c9000000b0058de2c315e6sm218413pfn.158.2023.01.23.17.19.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 Jan 2023 17:17:54 -0800 (PST)
-Date:   Tue, 24 Jan 2023 01:17:50 +0000
+        Mon, 23 Jan 2023 17:19:00 -0800 (PST)
+Date:   Tue, 24 Jan 2023 01:18:57 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Kim Phillips <kim.phillips@amd.com>
 Cc:     x86@kernel.org, Borislav Petkov <bp@alien8.de>,
@@ -68,15 +68,13 @@ Cc:     x86@kernel.org, Borislav Petkov <bp@alien8.de>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
         linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 4/8] x86/cpu, kvm: Move X86_FEATURE_LFENCE_RDTSC to
- its native leaf
-Message-ID: <Y88xvq8vpH7Vz5Ac@google.com>
+Subject: Re: [PATCH v8 0/8] x86/cpu, kvm: Support AMD Automatic IBRS
+Message-ID: <Y88yASfHih8o2c7M@google.com>
 References: <20230123225700.2224063-1-kim.phillips@amd.com>
- <20230123225700.2224063-5-kim.phillips@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230123225700.2224063-5-kim.phillips@amd.com>
+In-Reply-To: <20230123225700.2224063-1-kim.phillips@amd.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -89,78 +87,26 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Mon, Jan 23, 2023, Kim Phillips wrote:
-> The LFENCE always serializing feature bit was defined as scattered
-> LFENCE_RDTSC and its native leaf bit position open-coded for KVM.
-> Add it to its newly added CPUID leaf 0x80000021 EAX proper.
+> The AMD Zen4 core supports a new feature called Automatic IBRS
+> (Indirect Branch Restricted Speculation).
 > 
-> Drop the bit description comments now it's more self-describing.
+> Enable Automatic IBRS by default if the CPU feature is present.
+> It typically provides greater performance over the incumbent
+> generic retpolines mitigation.
 > 
-> Also, in amd_init(), don't bother setting DE_CFG[1] any more.
+> Patch 1 [unchanged from v7] Adds support for the leaf that
+> contains the AutoIBRS feature bit.
 > 
-> Signed-off-by: Kim Phillips <kim.phillips@amd.com>
-> ---
->  arch/x86/include/asm/cpufeatures.h | 3 ++-
->  arch/x86/kernel/cpu/amd.c          | 2 +-
->  arch/x86/kvm/cpuid.c               | 4 ++--
->  3 files changed, 5 insertions(+), 4 deletions(-)
+> Patch 2 moves the leaf's open-coded code from __do_cpuid_func()
+> to kvm_set_cpu_caps() in preparation for adding the features in
+> their native leaf.
 > 
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 7f0fb894e432..4f22d828c753 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -97,7 +97,7 @@
->  #define X86_FEATURE_SYSENTER32		( 3*32+15) /* "" sysenter in IA32 userspace */
->  #define X86_FEATURE_REP_GOOD		( 3*32+16) /* REP microcode works well */
->  #define X86_FEATURE_AMD_LBR_V2		( 3*32+17) /* AMD Last Branch Record Extension Version 2 */
-> -#define X86_FEATURE_LFENCE_RDTSC	( 3*32+18) /* "" LFENCE synchronizes RDTSC */
-> +/* FREE, was #define X86_FEATURE_LFENCE_RDTSC		( 3*32+18) "" LFENCE synchronizes RDTSC */
->  #define X86_FEATURE_ACC_POWER		( 3*32+19) /* AMD Accumulated Power Mechanism */
->  #define X86_FEATURE_NOPL		( 3*32+20) /* The NOPL (0F 1F) instructions */
->  #define X86_FEATURE_ALWAYS		( 3*32+21) /* "" Always-present feature */
-> @@ -430,6 +430,7 @@
->  
->  /* AMD-defined Extended Feature 2 EAX, CPUID level 0x80000021 (EAX), word 20 */
->  #define X86_FEATURE_NO_NESTED_DATA_BP	(20*32+ 0) /* "" No Nested Data Breakpoints */
-> +#define X86_FEATURE_LFENCE_RDTSC	(20*32+ 2) /* "" LFENCE always serializing / synchronizes RDTSC */
->  
->  /*
->   * BUG word(s)
-> diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-> index f769d6d08b43..208c2ce8598a 100644
-> --- a/arch/x86/kernel/cpu/amd.c
-> +++ b/arch/x86/kernel/cpu/amd.c
-> @@ -956,7 +956,7 @@ static void init_amd(struct cpuinfo_x86 *c)
->  
->  	init_amd_cacheinfo(c);
->  
-> -	if (cpu_has(c, X86_FEATURE_XMM2)) {
-> +	if (!cpu_has(c, X86_FEATURE_LFENCE_RDTSC) && cpu_has(c, X86_FEATURE_XMM2)) {
->  		/*
->  		 * Use LFENCE for execution serialization.  On families which
->  		 * don't have that MSR, LFENCE is already serializing.
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 13bd2769fa5a..601eeb03ebc9 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -742,11 +742,11 @@ void kvm_set_cpu_caps(void)
->  		F(SME_COHERENT));
->  
->  	kvm_cpu_cap_mask(CPUID_8000_0021_EAX,
-> -		F(NO_NESTED_DATA_BP) | 0 /* SmmPgCfgLock */ |
-> +		F(NO_NESTED_DATA_BP) | F(LFENCE_RDTSC) | 0 /* SmmPgCfgLock */ |
->  		BIT(6) /* NULL_SEL_CLR_BASE */ | 0 /* PrefetchCtlMsr */
->  	);
->  	if (cpu_feature_enabled(X86_FEATURE_LFENCE_RDTSC))
-> -		kvm_cpu_caps[CPUID_8000_0021_EAX] |= BIT(2) /* LFENCE Always serializing */;
-> +		kvm_cpu_cap_set(X86_FEATURE_LFENCE_RDTSC);
+> Patches 3-6 introduce the new leaf's supported bits one by one.
+> 
+> Patch 7 [unchanged from v7] Adds support for AutoIBRS by turning
+> its EFER enablement bit on at startup if the feature is available.
+> 
+> Patch 8 [unchanged from v7] Adds support for propagating AutoIBRS
+> to the guest.
 
-Now that LFENCE_RDTSC is in its proper place, the kernel's set_cpu_cap() will
-effectively sythesize the feature for KVM.  I.e. this patch can simply delete the
-synthesis of the feature.
-
->  	if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
->  		kvm_cpu_caps[CPUID_8000_0021_EAX] |= BIT(6) /* NULL_SEL_CLR_BASE */;
->  	kvm_cpu_caps[CPUID_8000_0021_EAX] |= BIT(9) /* NO_SMM_CTL_MSR */;
-> -- 
-> 2.34.1
-> 
+A few nits, but otherwise looks good.  Thanks!
