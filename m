@@ -2,69 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F0F7C679E61
-	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 17:16:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5A843679E66
+	for <lists+kvm@lfdr.de>; Tue, 24 Jan 2023 17:17:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233843AbjAXQQi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 11:16:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49698 "EHLO
+        id S233544AbjAXQR5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 11:17:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232855AbjAXQQg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 11:16:36 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21AA2474D2
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 08:16:36 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id e10-20020a17090a630a00b0022bedd66e6dso2523003pjj.1
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 08:16:36 -0800 (PST)
+        with ESMTP id S232896AbjAXQRz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 11:17:55 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 596EC558C
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 08:17:54 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id nn18-20020a17090b38d200b0022bfb584987so890150pjb.2
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 08:17:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OHafq/bnQqe8SrboMo9hHNpvzyiZJrZ0d/xhlpndPV0=;
-        b=kUoFIx412QWnZID/hc50OfhcOoG1T6YgdOyyfP4tJlMecl1LkuOqAsHA+EWW1rAyje
-         abZUSy8nk8oVy6oh+8ZkQGR/szqVZoWxWMJyQC6YktTHMf6b+6Kwqwp8rDXd6t4UtI73
-         Yp8jCLSaI/OS1UCuMN5oi9p07L74QEtSrbkkYTAfN1twohmcWMWWVI8iXwOXeImnBbWC
-         xJKGsO7NgNMNsGRqMQjEYtp4GiVl0L0h4IeSugzm1C7sH6dlnx7pNlT0f5d4ff9T1UCO
-         YPPHQlefWgnxlwQTcLW4S/NRC4cnJ22LSwLuMIQ6U072sxgxEfiAjHfmFZDXfdHLarE9
-         lqmA==
+        bh=K4gUZ8QoPMsgmVIH22hnGP5ly+yceMbFGnzKyjd0wdY=;
+        b=UPp4JufSwtRNp94ONl0EC5nVMDyjAWSpwPgAbGkByDhx7r76dLXrdK0dQ/NGJgTyYy
+         4+gkDBE0A+5vVppVUkX2ll2vSZZ+zQQBhbnuQCeK5Zay5OWKvKIG80gKKrhlAextTHHX
+         jHtyuiTOjVPNNdLn845YcIbkIPp/NZMqMEcflWogAU5rGTAcycx3ffDsEhBXf+6TPtYr
+         mXi5MQotYa5/GTRAbX54CxxFuZzc6Zz4NqIo9ZVxaxmehr/Omwam2ZbRZU0f9X22rTle
+         z1W3M8paOpBXYay59HMe3u0g0X94tWF3TmcYkUUt5fMt6Vg9opxWw3d+fg+6ZP/ELFRW
+         9E8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OHafq/bnQqe8SrboMo9hHNpvzyiZJrZ0d/xhlpndPV0=;
-        b=Vz+f+oK1h5UiXhbSOLTexlMa3MhXtwYhkRT4FJVGesQJ5cvgU0zz94tudTKFh0Z5Uu
-         zGAADSua4cZC8m5ln3nmCtwgI2KiCSJYJBaB7DW/uOP4N+e12tefrvZSBuULsIIgwepe
-         PlTFYnE9C4IZXr6dnV8wonL8aH2bzdJslAMDZHD+dW2mTWexl2xWta12ftnMB+3FEPL1
-         XuRw51T7B1TwZStYe9xdN7e90ivuIRVHNtG43GGd4znHujlsAwlisFmdXNEkG6Sk54DN
-         cVygcjiYfwgbl/Ai8gCpVHrcQ+3E4pV9L5ugbsbbw+gm1ICuYnyKCkAT0drYFGbljoy8
-         3dbA==
-X-Gm-Message-State: AO0yUKV2BxS8p9TRESnDeHoqYjHsYMJvMBTnl6iU4cFd5C0BFZanp8MM
-        93TltqcsQrSlRBhTnHsBV/HwHg==
-X-Google-Smtp-Source: AK7set9/iAkFLt0+U8DRsBB0q9v3QqYTp1hzk/gVBo4wD77XsBCDOT/mY5FIlZ3E8l1LkfuFd1afLw==
-X-Received: by 2002:a05:6a21:329b:b0:b8:c3c0:e7f7 with SMTP id yt27-20020a056a21329b00b000b8c3c0e7f7mr293075pzb.1.1674576995440;
-        Tue, 24 Jan 2023 08:16:35 -0800 (PST)
+        bh=K4gUZ8QoPMsgmVIH22hnGP5ly+yceMbFGnzKyjd0wdY=;
+        b=RzprOEzDstHpAual7cmQoBUzRLQjkbm6UtRAxIbyTC/BF+o8Kw6HhhHiNYSLYgFZMl
+         6+6uIPUim6fgt++fjtsSWguDSUXf/vumsOza9C7F3lSn8WWcd5H9zK2o5jNk8spEmJrs
+         6LpVLIGmOtDmtPybFDeDeXf0CsvHo0XLSxONdfYzbOb1ghl4pPcE9oRhvRbdFUuLXpiM
+         1bsDqZ9u0HBLdTrdp+j5lLXGTYy15Vv9sppudS9zgeet9gu40xGYlhpYQwz2ALv+Fn9K
+         wwirvAWQ2TWc7rc1MLkNL2hoxFwcmseH7OhDFnmkNu7s4WuIg1KKVNkXTq7Md4aLQpCU
+         koGA==
+X-Gm-Message-State: AO0yUKWiR24PNfVmR5a4ZuhQe1lYqiHo5dUYpPMzPfxYAeLZ18zrgWtD
+        taeyJ3v6kEIT5dDQDoEvaW+S1A==
+X-Google-Smtp-Source: AK7set8FFTNIfErrcpZvHzozOWX3Xx1vcflIUxA+YhAImZ7s/xPIH9xo1Ps0QCaPnRHW+42pHVm8IQ==
+X-Received: by 2002:a05:6a20:9d90:b0:b8:e33c:f160 with SMTP id mu16-20020a056a209d9000b000b8e33cf160mr302472pzb.0.1674577073692;
+        Tue, 24 Jan 2023 08:17:53 -0800 (PST)
 Received: from google.com (220.181.82.34.bc.googleusercontent.com. [34.82.181.220])
-        by smtp.gmail.com with ESMTPSA id b192-20020a621bc9000000b005817fa83bcesm1765014pfb.76.2023.01.24.08.16.34
+        by smtp.gmail.com with ESMTPSA id x15-20020a62860f000000b0056b4c5dde61sm1846386pfd.98.2023.01.24.08.17.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 08:16:34 -0800 (PST)
-Date:   Tue, 24 Jan 2023 08:16:31 -0800
+        Tue, 24 Jan 2023 08:17:53 -0800 (PST)
+Date:   Tue, 24 Jan 2023 08:17:49 -0800
 From:   Ricardo Koller <ricarkol@google.com>
 To:     Oliver Upton <oliver.upton@linux.dev>
 Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
         andrew.jones@linux.dev, pbonzini@redhat.com, maz@kernel.org,
         alexandru.elisei@arm.com, eric.auger@redhat.com,
         yuzenghui@huawei.com
-Subject: Re: [PATCH 0/4] KVM: selftests: aarch64: page_fault_test S1PTW
- related fixes
-Message-ID: <Y9AEX1bOyJ2omlub@google.com>
+Subject: Re: [PATCH 1/4] KVM: selftests: aarch64: Relax userfaultfd read vs.
+ write checks
+Message-ID: <Y9AErXchOZFuKL05@google.com>
 References: <20230110022432.330151-1-ricarkol@google.com>
- <Y88bRSisoRAML0M6@google.com>
- <Y88bl/+lqrUCVKEf@google.com>
+ <20230110022432.330151-2-ricarkol@google.com>
+ <Y88TLcuetXMSYyfD@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y88bl/+lqrUCVKEf@google.com>
+In-Reply-To: <Y88TLcuetXMSYyfD@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -76,24 +76,26 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 23, 2023 at 11:43:19PM +0000, Oliver Upton wrote:
-> On Mon, Jan 23, 2023 at 11:41:57PM +0000, Oliver Upton wrote:
-> > On Tue, Jan 10, 2023 at 02:24:28AM +0000, Ricardo Koller wrote:
-> > > Commit "KVM: arm64: Fix S1PTW handling on RO memslots" changed the way
-> > > S1PTW faults were handled by KVM.
+On Mon, Jan 23, 2023 at 11:07:25PM +0000, Oliver Upton wrote:
+> On Tue, Jan 10, 2023 at 02:24:29AM +0000, Ricardo Koller wrote:
+> > Only Stage1 Page table walks (S1PTW) writing a PTE on an unmapped page
+> > should result in a userfaultfd write. However, the userfaultfd tests in
+> > page_fault_test wrongly assert that any S1PTW is a PTE write.
 > > 
-> > I understand that this commit wasn't in Linus' tree at the time you sent
-> > these patches, could you please attribute it as:
-> > 
-> >   commit 406504c7b040 ("KVM: arm64: Fix S1PTW handling on RO memslots")
-> > 
-> > in v2?
+> > Fix this by relaxing the read vs. write checks in all userfaultfd handlers.
+> > Note that this is also an attempt to focus less on KVM (and userfaultfd)
+> > behavior, and more on architectural behavior. Also note that after commit
+> > "KVM: arm64: Fix S1PTW handling on RO memslots" the userfaultfd fault
+> > (S1PTW with AF on an unmaped PTE page) is actually a read: the translation
+> > fault that comes before the permission fault.
 > 
-> Sorry, I was a bit terse. What I mean is to update all of the commit
-> messages to reflect the suggestion.
+> I certainly agree that we cannot make assertions about read v. write
+> when registering uffd in 'missing' mode. We probably need another test
+> to assert that we get write faults for hardware AF updates when using
+> uffd in write protect mode.
 
-Sounds good, will do. I was betting on having a v2 by then (should have
-mentioned it in the cover letter).
+I can do that. Only question, do you prefer having them in this series
+with fixes, or another one?
 
 > 
 > --
