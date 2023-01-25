@@ -2,155 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EEACA67BEA9
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 22:38:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5684867BEB2
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 22:39:09 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236632AbjAYViG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 16:38:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35128 "EHLO
+        id S236692AbjAYVjI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 16:39:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236476AbjAYViE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 16:38:04 -0500
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C53241A97A
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 13:38:02 -0800 (PST)
-Received: by mail-wr1-x430.google.com with SMTP id m7so4751888wru.8
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 13:38:02 -0800 (PST)
+        with ESMTP id S236535AbjAYVjH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 16:39:07 -0500
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6696B12F32
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 13:39:05 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id c2-20020a25a2c2000000b008016611ca77so17005498ybn.9
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 13:39:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=jrtc27.com; s=gmail.jrtc27.user;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WbZdqAhuTe9AIsgKG5ncENT/Fwm11IcS5xObaY+RarY=;
-        b=UkLUBw8AwwhiORilDzbdXozeWE2tAzcPWOjBItkn4G5MvRlWWNiLNKxDEBg1Q4+exF
-         NK34lXMXzWsN5JwM1A1eQw/1naFhpuGk86S21TaYfIEwjtls0hmVZXnJefidBCvZCoIc
-         37zcDnL2e3NfJwU8yXvSjRNhSGIfFB9sDsjcWcVy2DOdvfpdNCV6nQ5vq+vm8k1AOxeA
-         JNUCi47dnyNQoq+YQmp1QVpXI4cmU3pmXhHpBPFGcXFmhv7fZTJ5JxJas/zuja2SZplG
-         3gOToxegeWg1spBfCN/4qCmgXe1t6aCzgOR0K15bM30r0oPXRTsKwRrTLPQEEjIlEbVB
-         U2RA==
+        d=google.com; s=20210112;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=z+H+UxvTCHRq2s16xJmpZ8uSEEOupkr1b5CjiCnOkq0=;
+        b=ThnR8aaRFSVJ6f1dSLQmti6T/10Si88QgufO2iD1z2YErNe8jTdRZDq6tWbXGO+1aY
+         6JR7ubUZJ1ktrc4CwqGf40eFzOcSSHFCSz7OTItOt0PZq0bxEMe5Bx8eFDqyyWLQTnkk
+         sBzg7v+EPWRVXqGC747qF4kjUuz531+g0SzfXiSaJ4WynBW7ktKI2gBYTohy1VN1KURX
+         jS/JKpZWaNxkKZgQhhcsgb9py1ZFcc9c+nSjrCSfWyzFiII6YCUFMwycxbV/dh1/VjbQ
+         4wAnqmcLadNOXItFDGiLgpmToLQQAPdldYLQflRwBmoTgylFVtOm9ymkxBkFQwV01BUl
+         TSWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=to:references:message-id:content-transfer-encoding:cc:date
-         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WbZdqAhuTe9AIsgKG5ncENT/Fwm11IcS5xObaY+RarY=;
-        b=FzDq76RuKle9GFp5q3fOK02kP2oikpl/U6JxBkDgSj8Dp6+WAVk9ZX6m+CoHhUNo92
-         jnS2T/YyYuV5Bp3nlQPNqS2EHq9TMoNIA0F+HZGK2ecebbqmDdltSl9hB22nRsOgozlm
-         J7l8miXKaFTcDXiDegLzoIdCXsOxocDla9dzBj8HnwXCrTx/5L9gUho8OwvjQfCwqwmq
-         85CMI19d1fatDp0KEXPQSS4BLUfYUkZ3beZbnIYEyOCrvjQkDWR4rQjiQGSDIsBRZWUY
-         FrQFwgLoUiAiIBAs+iw4Vfvbca9H9oslMpN5oHZO+RabD/Xjgo2ctEkGeSk8UN/rVcC3
-         SWaA==
-X-Gm-Message-State: AFqh2koLmTBoufJxEV9cdyfDupO9DPNNjDor3MMaqaZF7dGh5+3wFylH
-        bMLTolZOaODrEvb2OV7FrOpimq5Cc5gCS4Cz90gjgw==
-X-Google-Smtp-Source: AMrXdXsR2Je/4xV9HRoKmjozZbu5PzVQTpAyfK0zfNO788NzP54zQrxCPv10LVg6W3IGFWf+qIWbEw==
-X-Received: by 2002:a5d:5083:0:b0:2be:546c:4663 with SMTP id a3-20020a5d5083000000b002be546c4663mr17895375wrt.45.1674682681272;
-        Wed, 25 Jan 2023 13:38:01 -0800 (PST)
-Received: from smtpclient.apple (global-5-143.n-2.net.cam.ac.uk. [131.111.5.143])
-        by smtp.gmail.com with ESMTPSA id y15-20020adfdf0f000000b00236883f2f5csm5597781wrl.94.2023.01.25.13.38.00
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 25 Jan 2023 13:38:00 -0800 (PST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
-Subject: Re: [PATCH -next v13 19/19] riscv: Enable Vector code to be built
-From:   Jessica Clarke <jrtc27@jrtc27.com>
-In-Reply-To: <Y9GZbVrZxEZAraVu@spud>
-Date:   Wed, 25 Jan 2023 21:38:00 +0000
-Cc:     Andy Chiu <andy.chiu@sifive.com>,
-        linux-riscv <linux-riscv@lists.infradead.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        Vineet Gupta <vineetg@rivosinc.com>,
-        Greentime Hu <greentime.hu@sifive.com>,
-        Guo Ren <guoren@linux.alibaba.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <08DF16C6-1D76-4FBE-871C-3A37C5349C87@jrtc27.com>
-References: <20230125142056.18356-1-andy.chiu@sifive.com>
- <20230125142056.18356-20-andy.chiu@sifive.com> <Y9GZbVrZxEZAraVu@spud>
-To:     Conor Dooley <conor@kernel.org>
-X-Mailer: Apple Mail (2.3696.120.41.1.1)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=z+H+UxvTCHRq2s16xJmpZ8uSEEOupkr1b5CjiCnOkq0=;
+        b=y0YE4pxgv4+iajPjzecRp/w/C4aIB6vL+FXAZgReMlcacdLGzT9JnHcmXVHNuQGweo
+         F8CqCfDQfG5w7koq3d2AWgmPvvgK1iMhj2ZmXLDNYprACI/InXBp3Fp+0s3ogqTDdFd2
+         FHzt5VGy4LLkX2v1hTE2gX0HIF1P5GnxGfk7Cr4cWoGMW4z9I4JtaUgNOB4gFfjTq0qI
+         VwGrES0SlYkFrGBxQaEL/yoIrWTkTf+xThH3IReFu+F6+oj+jza/iGsZRd0dRG5XkSMq
+         23tp5AYXI4/KIMJh90r/s/Rm9ESyLZQnrYEn+XUeTNxnD8j3ChBJ35DW3fpowYoX7/wO
+         pDRw==
+X-Gm-Message-State: AO0yUKVaEKDYsDuSKVB8EOHlrD6wxIK4F02M3EgyL4gVcgN/ovYPjoA1
+        /oftRmOHu2rP3xlYBrF/3dm141TwdEv2
+X-Google-Smtp-Source: AK7set/XJtT+OUZYKL5QmyqvLrn+GZmd+oxg9T7eDFIVB7yaDs3ETS7stX45UHKTCtlRG+8g6jeJLdKSSixk
+X-Received: from vipin.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:479f])
+ (user=vipinsh job=sendgmr) by 2002:a81:7e4b:0:b0:506:4f19:740c with SMTP id
+ p11-20020a817e4b000000b005064f19740cmr722466ywn.383.1674682744614; Wed, 25
+ Jan 2023 13:39:04 -0800 (PST)
+Date:   Wed, 25 Jan 2023 13:38:57 -0800
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
+Message-ID: <20230125213857.824959-1-vipinsh@google.com>
+Subject: [Patch] KVM: x86/mmu: Make optimized __handle_changed_spte() for
+ clear dirty log
+From:   Vipin Sharma <vipinsh@google.com>
+To:     seanjc@google.com, pbonzini@redhat.com, bgardon@google.com,
+        dmatlack@google.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Vipin Sharma <vipinsh@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25 Jan 2023, at 21:04, Conor Dooley <conor@kernel.org> wrote:
->=20
-> Hey Andy,
->=20
-> Thanks for respinning this, I think a lot of people will be happy to =
-see
-> it!
->=20
-> On Wed, Jan 25, 2023 at 02:20:56PM +0000, Andy Chiu wrote:
->=20
->> diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
->> index 12d91b0a73d8..67411cdc836f 100644
->> --- a/arch/riscv/Makefile
->> +++ b/arch/riscv/Makefile
->> @@ -52,6 +52,13 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:=3D rv32ima
->> riscv-march-$(CONFIG_ARCH_RV64I)	:=3D rv64ima
->> riscv-march-$(CONFIG_FPU)		:=3D $(riscv-march-y)fd
->> riscv-march-$(CONFIG_RISCV_ISA_C)	:=3D $(riscv-march-y)c
->> +riscv-march-$(CONFIG_RISCV_ISA_V)	:=3D $(riscv-march-y)v
->> +
->> +ifeq ($(CONFIG_RISCV_ISA_V), y)
->> +ifeq ($(CONFIG_CC_IS_CLANG), y)
->> +        riscv-march-y +=3D -mno-implicit-float =
--menable-experimental-extensions
->> +endif
->> +endif
->=20
-> Uh, so I don't think this was actually tested with (a recent version =
-of)
-> clang:
-> clang-15: error: unknown argument: =
-'-menable-experimental-extensions_zicbom_zihintpause'
->=20
-> Firstly, no-implicit-float is a CFLAG, so why add it to march?
-> There is an existing patch on the list for enabling this flag, but I
-> recall Palmer saying that it was not actually needed?
-> Palmer, do you remember why that was?
->=20
-> I dunno what enable-experimental-extensions is, but I can guess. Do we
-> really want to enable vector for toolchains where the support is
-> considered experimental? I'm not au fait with the details of clang
-> versions nor versions of the Vector spec, so take the following with a
-> bit of a pinch of salt...
-> Since you've allowed this to be built with anything later than clang =
-13,
-> does that mean that different versions of clang may generate vector =
-code
-> that are not compatible?
-> I'm especially concerned by:
-> https://github.com/riscv/riscv-v-spec/releases/tag/0.9
-> which appears to be most recently released version of the spec, prior =
-to
-> clang/llvm 13 being released.
+Use a tone down version of __handle_changed_spte() when clearing dirty
+log. Remove checks which will not be needed when dirty logs are cleared.
 
-For implementations of unratified extensions you both have to enable
-them with -menable-experimental-extensions and have to explicitly
-specify the version in the -march string specifically so this isn=E2=80=99=
-t a
-concern. Only once ratified can you use the unversioned extension,
-which is implicitly the ratified version (ignoring the whole i2p0 vs
-i2p1 fiasco).
+This change shows ~13% improvement in clear dirty log calls in
+dirty_log_perf_test
 
-But no, you probably don=E2=80=99t want experimental implementations, =
-which can
-exist when the ratified version is implemented in theory (so there=E2=80=99=
-s no
-compatibility concern based on ISA changes) but isn=E2=80=99t deemed
-production-ready (e.g. potential ABI instability in the case of
-something like V).
+Before tone down version:
+Clear dirty log over 3 iterations took 10.006764203s. (Avg 3.335588067s/iteration)
 
-Jess
+After tone down version:
+Clear dirty log over 3 iterations took 8.686433554s. (Avg 2.895477851s/iteration)
+
+Signed-off-by: Vipin Sharma <vipinsh@google.com>
+---
+ arch/x86/kvm/mmu/tdp_mmu.c | 20 +++++++++++++++++++-
+ 1 file changed, 19 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index bba33aea0fb0..ca21b33c4386 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -504,6 +504,19 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
+ 	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
+ }
+ 
++static void handle_changed_spte_clear_dirty_log(int as_id, gfn_t gfn,
++						u64 old_spte, u64 new_spte,
++						int level)
++{
++	if (old_spte == new_spte)
++		return;
++
++	trace_kvm_tdp_mmu_spte_changed(as_id, gfn, level, old_spte, new_spte);
++
++	if (is_dirty_spte(old_spte) &&  !is_dirty_spte(new_spte))
++		kvm_set_pfn_dirty(spte_to_pfn(old_spte));
++}
++
+ /**
+  * __handle_changed_spte - handle bookkeeping associated with an SPTE change
+  * @kvm: kvm instance
+@@ -736,7 +749,12 @@ static u64 __tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
+ 
+ 	old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte, new_spte, level);
+ 
+-	__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte, level, false);
++	if (record_dirty_log)
++		__handle_changed_spte(kvm, as_id, gfn, old_spte, new_spte,
++				      level, false);
++	else
++		handle_changed_spte_clear_dirty_log(as_id, gfn, old_spte,
++						    new_spte, level);
+ 
+ 	if (record_acc_track)
+ 		handle_changed_spte_acc_track(old_spte, new_spte, level);
+-- 
+2.39.1.456.gfc5497dd1b-goog
 
