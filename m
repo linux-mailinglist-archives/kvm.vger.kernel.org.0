@@ -2,75 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6DF367B851
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 18:22:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1400367B860
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 18:22:58 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236201AbjAYRWU (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 12:22:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46818 "EHLO
+        id S236228AbjAYRW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 12:22:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236191AbjAYRWS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 12:22:18 -0500
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6A0367E0
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:22:16 -0800 (PST)
-Received: by mail-pl1-x630.google.com with SMTP id k18so18510515pll.5
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:22:16 -0800 (PST)
+        with ESMTP id S236135AbjAYRWr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 12:22:47 -0500
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23B754C6EF
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:22:36 -0800 (PST)
+Received: by mail-yb1-xb33.google.com with SMTP id m199so8144624ybm.4
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:22:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J5q09ceLJBkpBwTbTm4c7I5DmoetL/obPF+nJ893yTw=;
-        b=GwTmmaRoIOeTt3q4z2fd6NmJrGhzMQzQPPL/YIra1PLM0ZhW18kPMbuBA0wdC9EAIN
-         NSzHFH4sVBYNcJ4PdWgWpWzD5bFHXjI3nzHVd/SOd+X/5vEzlolKVPcGlhZLOUgCGbU7
-         3whem4nEBodsJ2g8qpGKyhySk2Ot7+FIKWU5EJaGZFFjoub1pfvz0ZHahnC6RZ622qW9
-         rsKr/KfwwQdXirtXDxufRLf6V7/2W79hjOf2A77LIVzHc+qFvBwJRMx9T/agRFwLh1h2
-         ImzEXdOuJVlLzPrjk94FmmPh2DAK1+TZZhnBEWYxkaDchllcfzbP3gsn6ldljqzBzO0I
-         57rw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=IqJXv+IInDU1mKTOWecSjx46uIp9RhIiEah7PjvPLrg=;
+        b=QlZyecSvRJAlH7daZiVbTmdMCDJawwIkjqybbPcYd50INvCOOFwycJjGFsDCENBvPF
+         JeBM9yeOQDknmaZC6LT0p7wlzLAJo3QYgAn7K1xQNCTJjPrh6oinOxgRNGwGedAqUfeH
+         4EF6oknHwKU0N6BIZOc0CJi1hrgM4W0zxm3gicvvOuEGF7JC9HCNICDdMPEAz6Lz/B5y
+         FN2dpyuojKkpe3r7ipsFxRIyHaJ4nJmkiiUGkQy6aOsuBhBZ3WzwUsGkq0uXDlGTKFEH
+         iRh4N/trPN148wcbBUC1DmqB3ErHQLF9n9pkmMXooLK6oXyXf0aS41iIJv2buhnN7zSu
+         X8Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=J5q09ceLJBkpBwTbTm4c7I5DmoetL/obPF+nJ893yTw=;
-        b=E4TwfPIH78BdJ9dPo5f8taUSEGVSP5kbjMIBOCe9rZaEz2rGxyNPCGuJrFEaQElWPt
-         Ro6G4aVkgv/W28C0SdZNMCn8aVF8k40rzqcOcD8G/svU7EREcz2AVrhMblSZCIFgqAo2
-         q9Me5hKAvr3YrUO/6QNTCcy+Ko/A1xaw+gXFO4vzdWT5qKVTPbMyu4UGy6u1qNd4L1UC
-         oGcYySOKxPrTP8iwq3kL0vvR6sXq1pYt0kvuC7rf/uXmoxahxLTPBxWFmKegnjYvdz0+
-         9s89B/F88mPZoOXpoNB0vtcCQ3Ag+8SsLXqc3Hrd3UlLpfwRK+E7HMLEHfSKa53RnuOe
-         dz0g==
-X-Gm-Message-State: AO0yUKUd0rcpbmi70kFFZ+ssmT0ka/8aOtGhtXO7RQo7YHE3ELDJ4LJT
-        PR3dlqs5eaIOaSIhd1aO2TfteQ==
-X-Google-Smtp-Source: AK7set9xx1pXmn6wrJ+W9AiRYQuZ+Lo8dB0nJxH1gO0W40jM1S4cMhm0+BQvBvhXMpA7wv1arRY3WQ==
-X-Received: by 2002:a17:903:2644:b0:189:b910:c6d2 with SMTP id je4-20020a170903264400b00189b910c6d2mr605376plb.1.1674667336060;
-        Wed, 25 Jan 2023 09:22:16 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x5-20020a1709029a4500b00192a04bc620sm3850704plv.295.2023.01.25.09.22.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jan 2023 09:22:14 -0800 (PST)
-Date:   Wed, 25 Jan 2023 17:22:08 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Zhi Wang <zhi.wang.linux@gmail.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v11 030/113] KVM: x86/mmu: Replace hardcoded value 0 for
- the initial value for SPTE
-Message-ID: <Y9Fj/vgPEzfU1eof@google.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
- <dee30f0562d8be0102547d8eb9fc77736eae679d.1673539699.git.isaku.yamahata@intel.com>
- <20230125112434.0000512a@gmail.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IqJXv+IInDU1mKTOWecSjx46uIp9RhIiEah7PjvPLrg=;
+        b=768veeAqVH1agg8ngNszZ1vEm2eNbxq9bmomayml2zpiQ5URepj8sgcCkt5MJgAIu8
+         HtoCDx1VvQ2BRskv0/eQES+BPF1OGuZcZVbtFJqCwdnFnE8xYnox4rcWern3uTJJBS7K
+         2MEYitv9W83nylAsAsMySop8rNJF3Re/8+QJ4/yzDjcMb3KV/ai/kRe8tWiFhbx+ljpk
+         OOXzVmkfx7Tc++8iwetmwTB30SobOvimuwQojfyEFD1/6aLZ+Z+BjJfnrWXmzbe5Sd63
+         0LU15TP8ScWmmcBQFti+ckNDUP+Qm3llAVwTSzhMXzCOfw63lPTO/bZW43u9UtuJXih7
+         kBGA==
+X-Gm-Message-State: AFqh2kqPwdUQn4JW16SiE2eVfz/McvfQOkSU2M6VtDItND0wun+3qZYW
+        SYxCIfqdWg8qapehNSSfegJuW+fiJOQoxTipO1hX0A==
+X-Google-Smtp-Source: AMrXdXv634nY3BrnZ3PlTUGlyUi8i7L3YenO2gMgxW5qJ4tF6Xha6yZp+2FFeWeU8OQrXrCFeHpomo5nr++haHZW7UI=
+X-Received: by 2002:a25:a408:0:b0:800:28d4:6936 with SMTP id
+ f8-20020a25a408000000b0080028d46936mr2303639ybi.431.1674667354997; Wed, 25
+ Jan 2023 09:22:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230125112434.0000512a@gmail.com>
+References: <20230125083851.27759-1-surenb@google.com> <20230125083851.27759-5-surenb@google.com>
+ <Y9D4rWEsajV/WfNx@dhcp22.suse.cz> <CAJuCfpGd2eG0RSMte9OVgsRVWPo+Sj7+t8EOo8o_iKzZoh1MXA@mail.gmail.com>
+ <Y9Fh9joU3vTCwYbX@dhcp22.suse.cz>
+In-Reply-To: <Y9Fh9joU3vTCwYbX@dhcp22.suse.cz>
+From:   Suren Baghdasaryan <surenb@google.com>
+Date:   Wed, 25 Jan 2023 09:22:23 -0800
+Message-ID: <CAJuCfpEJ1U2UHBNhLx4gggN3PLZKP5RejiZL_U5ZLxU_wdviVg@mail.gmail.com>
+Subject: Re: [PATCH v2 4/6] mm: replace vma->vm_flags indirect modification in ksm_madvise
+To:     Michal Hocko <mhocko@suse.com>
+Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
+        jglisse@google.com, vbabka@suse.cz, hannes@cmpxchg.org,
+        mgorman@techsingularity.net, dave@stgolabs.net,
+        willy@infradead.org, liam.howlett@oracle.com, peterz@infradead.org,
+        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
+        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
+        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
+        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
+        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
+        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
+        jannh@google.com, shakeelb@google.com, tatashin@google.com,
+        edumazet@google.com, gthelen@google.com, gurua@google.com,
+        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
+        leewalsh@google.com, posk@google.com, will@kernel.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
+        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
+        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
+        qianweili@huawei.com, wangzhou1@hisilicon.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+        airlied@gmail.com, daniel@ffwll.ch,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, l.stach@pengutronix.de,
+        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
+        matthias.bgg@gmail.com, robdclark@gmail.com,
+        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
+        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
+        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
+        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
+        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
+        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
+        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, miklos@szeredi.hu,
+        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
+        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
+        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
+        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
+        loongarch@lists.linux.dev, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
+        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
+        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        freedreno@lists.freedesktop.org,
+        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
+        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        devel@lists.orangefs.org, kexec@lists.infradead.org,
+        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
+        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
+        kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -78,100 +137,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 25, 2023, Zhi Wang wrote:
-> On Thu, 12 Jan 2023 08:31:38 -0800
-> isaku.yamahata@intel.com wrote:
-> 
-> This refactor patch is quite hacky.
-> 
-> Why not change the purpose of vcpu->arch.mmu_shadow_page.gfp_zero and let the
-> callers respect that the initial value of spte can be configurable? It will be
-> generic and not TDX-specific, then kvm_init_shadow_page() is not required,
-> mmu_topup_shadow_page_cache() can be left un-touched as the refactor can cover
-> other architectures.
-> 
-> 1) Let it store the expected nonpresent value and rename it to nonpresent_spte.
+On Wed, Jan 25, 2023 at 9:08 AM Michal Hocko <mhocko@suse.com> wrote:
+>
+> On Wed 25-01-23 08:57:48, Suren Baghdasaryan wrote:
+> > On Wed, Jan 25, 2023 at 1:38 AM 'Michal Hocko' via kernel-team
+> > <kernel-team@android.com> wrote:
+> > >
+> > > On Wed 25-01-23 00:38:49, Suren Baghdasaryan wrote:
+> > > > Replace indirect modifications to vma->vm_flags with calls to modifier
+> > > > functions to be able to track flag changes and to keep vma locking
+> > > > correctness. Add a BUG_ON check in ksm_madvise() to catch indirect
+> > > > vm_flags modification attempts.
+> > >
+> > > Those BUG_ONs scream to much IMHO. KSM is an MM internal code so I
+> > > gueess we should be willing to trust it.
+> >
+> > Yes, but I really want to prevent an indirect misuse since it was not
+> > easy to find these. If you feel strongly about it I will remove them
+> > or if you have a better suggestion I'm all for it.
+>
+> You can avoid that by making flags inaccesible directly, right?
 
+Ah, you mean Peter's suggestion of using __private? I guess that would
+cover it. I'll drop these BUG_ONs in the next version. Thanks!
 
-I agree that handling this in the common code would be cleaner, but repurposing
-gfp_zero gets kludgy because it would require a magic value to say "don't initialize
-the data", e.g. x86's mmu_shadowed_info_cache isn't pre-filled.
-
-And supporting a custom 64-bit init value for kmem_cache-backed caches would require
-restricting such caches to be a multiple of 8 bytes in size.
-
-How about this?  Lightly tested.
-
-From: Sean Christopherson <seanjc@google.com>
-Date: Wed, 25 Jan 2023 16:55:01 +0000
-Subject: [PATCH] KVM: Allow page-sized MMU caches to be initialized with
- custom 64-bit values
-
-Add support to MMU caches for initializing a page with a custom 64-bit
-value, e.g. to pre-fill an entire page table with non-zero PTE values.
-The functionality will be used by x86 to support Intel's TDX, which needs
-to set bit 63 in all non-present PTEs in order to prevent !PRESENT page
-faults from getting reflected into the guest (Intel's EPT Violation #VE
-architecture made the less than brilliant decision of having the per-PTE
-behavior be opt-out instead of opt-in).
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- include/linux/kvm_types.h |  1 +
- virt/kvm/kvm_main.c       | 16 ++++++++++++++--
- 2 files changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-index 76de36e56cdf..67972db17b55 100644
---- a/include/linux/kvm_types.h
-+++ b/include/linux/kvm_types.h
-@@ -94,6 +94,7 @@ struct kvm_mmu_memory_cache {
- 	int nobjs;
- 	gfp_t gfp_zero;
- 	gfp_t gfp_custom;
-+	u64 init_value;
- 	struct kmem_cache *kmem_cache;
- 	int capacity;
- 	void **objects;
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d255964ec331..78f1e49179a7 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -380,12 +380,17 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
- static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
- 					       gfp_t gfp_flags)
- {
-+	void *page;
-+
- 	gfp_flags |= mc->gfp_zero;
- 
- 	if (mc->kmem_cache)
- 		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
--	else
--		return (void *)__get_free_page(gfp_flags);
-+
-+	page = (void *)__get_free_page(gfp_flags);
-+	if (page && mc->init_value)
-+		memset64(page, mc->init_value, PAGE_SIZE / sizeof(mc->init_value));
-+	return page;
- }
- 
- int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
-@@ -400,6 +405,13 @@ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity,
- 		if (WARN_ON_ONCE(!capacity))
- 			return -EIO;
- 
-+		/*
-+		 * Custom init values can be used only for page allocations,
-+		 * and obviously conflict with __GFP_ZERO.
-+		 */
-+		if (WARN_ON_ONCE(mc->init_value && (mc->kmem_cache || mc->gfp_zero)))
-+			return -EIO;
-+
- 		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
- 		if (!mc->objects)
- 			return -ENOMEM;
-
-base-commit: 503f0315c97739d3f8e645c500d81757dfbf76be
--- 
-
+>
+> --
+> Michal Hocko
+> SUSE Labs
