@@ -2,130 +2,63 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1400367B860
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 18:22:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25C5667B87B
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 18:27:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236228AbjAYRW4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 12:22:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47212 "EHLO
+        id S235513AbjAYR1D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 12:27:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236135AbjAYRWr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 12:22:47 -0500
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23B754C6EF
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:22:36 -0800 (PST)
-Received: by mail-yb1-xb33.google.com with SMTP id m199so8144624ybm.4
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:22:36 -0800 (PST)
+        with ESMTP id S235311AbjAYR1A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 12:27:00 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 064DF16ACE
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:26:59 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id o13so19265109pjg.2
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:26:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IqJXv+IInDU1mKTOWecSjx46uIp9RhIiEah7PjvPLrg=;
-        b=QlZyecSvRJAlH7daZiVbTmdMCDJawwIkjqybbPcYd50INvCOOFwycJjGFsDCENBvPF
-         JeBM9yeOQDknmaZC6LT0p7wlzLAJo3QYgAn7K1xQNCTJjPrh6oinOxgRNGwGedAqUfeH
-         4EF6oknHwKU0N6BIZOc0CJi1hrgM4W0zxm3gicvvOuEGF7JC9HCNICDdMPEAz6Lz/B5y
-         FN2dpyuojKkpe3r7ipsFxRIyHaJ4nJmkiiUGkQy6aOsuBhBZ3WzwUsGkq0uXDlGTKFEH
-         iRh4N/trPN148wcbBUC1DmqB3ErHQLF9n9pkmMXooLK6oXyXf0aS41iIJv2buhnN7zSu
-         X8Bw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LI/e7a+7qI8RLdBO66ly8Lxu3fk1Ck2EdZpclV0qcG0=;
+        b=DQJZXBxAMXpFUQBapuAvmpcvpRZyv9Dra9mtZ7D9fLqcPjtyzryFqzSPvfZaJSrB5c
+         VAVHEWD5GNumhrai1p7cQ5ERHArBa5CTkiGw3EEr5Bct46pFvIPxbxAjyLzRYZE7/TQQ
+         MnomKD/1RYvXk/S02f09snznq7pIdDfRE2MnpdvhLGWtg6uX3VyGjINfNr1to3GjO7CD
+         hZK/29F+Xg9A1+Gkx6VWDfiLDUJz3xe+sLffg8UdE8j7QEF7vUUS4PscUbO8+xBIZC4v
+         NM3pzX8whPRTrmAjhJ8XH85ANQAWWXMaj6SFMyz+NEbDLsbdjDgvHvNrzx7dKD7ybTFP
+         xORw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IqJXv+IInDU1mKTOWecSjx46uIp9RhIiEah7PjvPLrg=;
-        b=768veeAqVH1agg8ngNszZ1vEm2eNbxq9bmomayml2zpiQ5URepj8sgcCkt5MJgAIu8
-         HtoCDx1VvQ2BRskv0/eQES+BPF1OGuZcZVbtFJqCwdnFnE8xYnox4rcWern3uTJJBS7K
-         2MEYitv9W83nylAsAsMySop8rNJF3Re/8+QJ4/yzDjcMb3KV/ai/kRe8tWiFhbx+ljpk
-         OOXzVmkfx7Tc++8iwetmwTB30SobOvimuwQojfyEFD1/6aLZ+Z+BjJfnrWXmzbe5Sd63
-         0LU15TP8ScWmmcBQFti+ckNDUP+Qm3llAVwTSzhMXzCOfw63lPTO/bZW43u9UtuJXih7
-         kBGA==
-X-Gm-Message-State: AFqh2kqPwdUQn4JW16SiE2eVfz/McvfQOkSU2M6VtDItND0wun+3qZYW
-        SYxCIfqdWg8qapehNSSfegJuW+fiJOQoxTipO1hX0A==
-X-Google-Smtp-Source: AMrXdXv634nY3BrnZ3PlTUGlyUi8i7L3YenO2gMgxW5qJ4tF6Xha6yZp+2FFeWeU8OQrXrCFeHpomo5nr++haHZW7UI=
-X-Received: by 2002:a25:a408:0:b0:800:28d4:6936 with SMTP id
- f8-20020a25a408000000b0080028d46936mr2303639ybi.431.1674667354997; Wed, 25
- Jan 2023 09:22:34 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LI/e7a+7qI8RLdBO66ly8Lxu3fk1Ck2EdZpclV0qcG0=;
+        b=4gFZYbd1tjKs+UZfP8yv8ztpswSqxVE9Rpj01RJGvGo+I+z2FPwRTNxDg/GMumQYw+
+         zo+fzz4gmwuUoo8oH9RtcjYtX6pcS9usWE/ODtn+6cBPjRBnHGPf5Wh948bbnmNxHlmL
+         MNR/aUnBJs3eGCLrZ+X3A/HItfRIgOH0x52WqupSyCu1V+QM1rNdwIbiwv5Y2D0jTOLM
+         U1pckPg59I2KzNvKYwqoAjQ1Y7Xu8pYYQsiPcifF1DB9nitktrHQEGSfQhafMu9jqaW/
+         NbzYsgI4CsOM6re8DrTI9MQEFzfoZY72/K45Jb0Zy+bKosCAxQrOQsWNiDqHqm9oHadc
+         rgaw==
+X-Gm-Message-State: AO0yUKXQgmsSeclJt9tPxOorKRHuZQn8GFrB1FNqra7VHBbmG2v3DkRl
+        stPyIjXEhnbJAQYRXoOSy9/jfw==
+X-Google-Smtp-Source: AK7set+b8K3FPVsVdc87DvMbnIrj9bklg11lwWCMJJ+e+tgsnArjT3rRlbxsTd0u5B98MuQLZHg+5Q==
+X-Received: by 2002:a17:90a:eb06:b0:22c:952:ab22 with SMTP id j6-20020a17090aeb0600b0022c0952ab22mr289551pjz.1.1674667618360;
+        Wed, 25 Jan 2023 09:26:58 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id 15-20020a17090a0f8f00b0022bb3ee9b68sm1954747pjz.13.2023.01.25.09.26.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Jan 2023 09:26:57 -0800 (PST)
+Date:   Wed, 25 Jan 2023 17:26:53 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yu Zhang <yu.c.zhang@linux.intel.com>
+Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: A question of KVM selftests' makefile
+Message-ID: <Y9FmXVJw4PkLKryW@google.com>
+References: <20230125085350.xg6u73ozznpum4u5@linux.intel.com>
 MIME-Version: 1.0
-References: <20230125083851.27759-1-surenb@google.com> <20230125083851.27759-5-surenb@google.com>
- <Y9D4rWEsajV/WfNx@dhcp22.suse.cz> <CAJuCfpGd2eG0RSMte9OVgsRVWPo+Sj7+t8EOo8o_iKzZoh1MXA@mail.gmail.com>
- <Y9Fh9joU3vTCwYbX@dhcp22.suse.cz>
-In-Reply-To: <Y9Fh9joU3vTCwYbX@dhcp22.suse.cz>
-From:   Suren Baghdasaryan <surenb@google.com>
-Date:   Wed, 25 Jan 2023 09:22:23 -0800
-Message-ID: <CAJuCfpEJ1U2UHBNhLx4gggN3PLZKP5RejiZL_U5ZLxU_wdviVg@mail.gmail.com>
-Subject: Re: [PATCH v2 4/6] mm: replace vma->vm_flags indirect modification in ksm_madvise
-To:     Michal Hocko <mhocko@suse.com>
-Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
-        jglisse@google.com, vbabka@suse.cz, hannes@cmpxchg.org,
-        mgorman@techsingularity.net, dave@stgolabs.net,
-        willy@infradead.org, liam.howlett@oracle.com, peterz@infradead.org,
-        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
-        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
-        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
-        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
-        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
-        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
-        jannh@google.com, shakeelb@google.com, tatashin@google.com,
-        edumazet@google.com, gthelen@google.com, gurua@google.com,
-        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
-        leewalsh@google.com, posk@google.com, will@kernel.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
-        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
-        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
-        qianweili@huawei.com, wangzhou1@hisilicon.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-        airlied@gmail.com, daniel@ffwll.ch,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, l.stach@pengutronix.de,
-        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
-        matthias.bgg@gmail.com, robdclark@gmail.com,
-        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
-        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
-        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
-        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
-        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
-        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
-        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
-        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, miklos@szeredi.hu,
-        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
-        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
-        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
-        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
-        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
-        loongarch@lists.linux.dev, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
-        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
-        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org,
-        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        devel@lists.orangefs.org, kexec@lists.infradead.org,
-        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
-        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
-        kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230125085350.xg6u73ozznpum4u5@linux.intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -137,31 +70,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 9:08 AM Michal Hocko <mhocko@suse.com> wrote:
->
-> On Wed 25-01-23 08:57:48, Suren Baghdasaryan wrote:
-> > On Wed, Jan 25, 2023 at 1:38 AM 'Michal Hocko' via kernel-team
-> > <kernel-team@android.com> wrote:
-> > >
-> > > On Wed 25-01-23 00:38:49, Suren Baghdasaryan wrote:
-> > > > Replace indirect modifications to vma->vm_flags with calls to modifier
-> > > > functions to be able to track flag changes and to keep vma locking
-> > > > correctness. Add a BUG_ON check in ksm_madvise() to catch indirect
-> > > > vm_flags modification attempts.
-> > >
-> > > Those BUG_ONs scream to much IMHO. KSM is an MM internal code so I
-> > > gueess we should be willing to trust it.
-> >
-> > Yes, but I really want to prevent an indirect misuse since it was not
-> > easy to find these. If you feel strongly about it I will remove them
-> > or if you have a better suggestion I'm all for it.
->
-> You can avoid that by making flags inaccesible directly, right?
+On Wed, Jan 25, 2023, Yu Zhang wrote:
+> Hi all,
+> 
+>   Currently, unlike the build system of Linux kernel, KVM selftests will
+> have to run "make clean && make" to rebuild the entire test suite, once
+> a header file is modified.
+> 
+>   Is it designed like this on purpose,
 
-Ah, you mean Peter's suggestion of using __private? I guess that would
-cover it. I'll drop these BUG_ONs in the next version. Thanks!
+My #1 rule: never assume anything weird in KVM was an explicit design choice :-)
 
->
-> --
-> Michal Hocko
-> SUSE Labs
+>   or does anyone wanna change it?
+
+Yes!
+
+>   I hacked the makefile by using "-MD" as EXTRA_CFLAGS, so that dependency
+> rules can be generated for each target object, whose prerequisites contains
+> the source file and the included header files as well.
+> 
+>   However, this change has its own costs. E.g., new ".o" and ".d" files will
+> occupy more storage. And performance-wise, the benifit could be limited,
+> because for now, most header files are needed by almost every ".c" files.
+> But with the evolution of KVM selftests, more ".h" files may be added. Some
+> of which may be of special usage. E.g., file "include/x86_64/mce.h" is only
+> used by "x86_64/ucna_injection_test". Having to rebuild the whole test suite
+> just because one specific header is touched would be annoying.
+> 
+>   I am not sure if this change is worthy,
+
+Absolutely worthy, I've run afoul of the lack of dependency tracking far too many
+times.
+
+> or if there's a better solution.
+
+This part I don't know.  I would have cobbled together something long ago if I
+wasn't so clueless about Makefiles.
