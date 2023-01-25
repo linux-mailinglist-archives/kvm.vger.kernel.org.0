@@ -2,116 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B11967A980
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 05:10:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CEDC67A984
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 05:11:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230115AbjAYEKo (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 23:10:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34332 "EHLO
+        id S229832AbjAYEL3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 23:11:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229528AbjAYEKm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 23:10:42 -0500
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF7C3E600
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 20:10:41 -0800 (PST)
-Received: by mail-pl1-x62d.google.com with SMTP id d3so16748255plr.10
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 20:10:41 -0800 (PST)
+        with ESMTP id S229528AbjAYEL1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 23:11:27 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E0643F297
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 20:11:25 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id z31so9516948pfw.4
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 20:11:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jPE1Z4AiasvWAh81482PZ75gc33qItYy0XzDyKoMixc=;
-        b=oTU6Yj4hJGaiSLcbk7N2YURh0GtdwHzd2W6FgaM+BedXCoWTMzrRNSXzrA5f/m3GSU
-         y1QNATWo9RrqxhYdkXDclsfMdfcHmOnboZcg+LghPsH06C2vf9dQrQ2VOThLNc3YHdRt
-         GHGHYDWGMaizrgTfufgsBkciIoC5oL6ZRXSzvErIy/c8LnsLQt296DoZWy6/EyY5qUL9
-         hfbUzV+OYffiSPWfUJEhIYbmKBBkjFbUbXc2HyRWzFK1HRDajP5YWmv/+F6+aAo0kBLS
-         qIU28l0t68zGSTzi8ayp3qSuXI4dfNcKC3nrGV4eAN4D59jOxvu5D5d4p6sTeN6nFGb9
-         R0IA==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=CJabib5NbUBwMrm5oU+0ZoPWuUCQhccu6rUbctVZbq8=;
+        b=MJ66DxyKI49VCwmPR+axwQH0y85wmlFVSq9TUPPAnHXRAV8vX851P4gtGWmxNHNDeq
+         bS1amqDX26pXVTiqFrtxNIi6hdGKcq4/VehjRISxME7zSA4XdJ2dZH3n3SveQF1AQSw1
+         nCFDJQxzVRihLQeUEuYWkPr/F3BM0PM9YKvOwAypAhcLPv1jzJ6WxjrHtlINRIbmcb49
+         uJMegsDmsI04npoSPRMONp2QbUbn1cLrDxZH1LXLMpH21OvyfPCJ3B4h1h1Jzs7z/cCx
+         wMVoW3whFO+aQY+/rJUtzcaMn4RV3qA0S9RObUkkkVf65euA2kBuCb8i/N9yg2a0B9NX
+         z8ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jPE1Z4AiasvWAh81482PZ75gc33qItYy0XzDyKoMixc=;
-        b=ff79tjMyQSvhyrpGbxyEwuw/9xhKtVJtihEOZMsKTSuTodM8aggDEyD2fU10DlnEn6
-         BNW0/nqF/jfYbHpKz1+6440n2p15R1kvKnOAHK1mrSgg86LFFjyd7LVt2jpO6CKSEnlw
-         y1rBE5Pb1voTDVbDyA0H4pu+9s356G/sSbAfyRf2l68KKxMZPNCW94LonSLIFA+Siid9
-         02yLrypAGPoQD1gyZCzeqwE77OdgH6EXhxZh9//fiveAadg8X8w6oO/7MUO72FCB3JVc
-         lmC4sKgtP+ysPR1cMsWlE+nwzNbUtW1zVzz1z4HCHEMEFy0Fac5PJ/1AO2sPpQpncb3P
-         ceuw==
-X-Gm-Message-State: AO0yUKUx9xH812DRcMHPZz2hCJQPT4pBllcOWIidUZYvTzpUfDjfHiVM
-        XjaQt7NTCyXl5kA/6UHZQRBzLg==
-X-Google-Smtp-Source: AK7set+R37yXvoqhAcsjw23PODIcWIcdkiplx4QcLf83p8tO7nOgzPKY2gRqUFL8OY+Gb5g+X0QjQg==
-X-Received: by 2002:a17:90b:3805:b0:22c:4e1:93e with SMTP id mq5-20020a17090b380500b0022c04e1093emr1348473pjb.15.1674619841228;
-        Tue, 24 Jan 2023 20:10:41 -0800 (PST)
-Received: from ?IPV6:2400:4050:a840:1e00:4457:c267:5e09:481b? ([2400:4050:a840:1e00:4457:c267:5e09:481b])
-        by smtp.gmail.com with ESMTPSA id 101-20020a17090a09ee00b002276ba8fb71sm377487pjo.25.2023.01.24.20.10.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 24 Jan 2023 20:10:40 -0800 (PST)
-Message-ID: <76931dd5-e390-5055-8283-0e1cdf2ddf03@daynix.com>
-Date:   Wed, 25 Jan 2023 13:10:38 +0900
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CJabib5NbUBwMrm5oU+0ZoPWuUCQhccu6rUbctVZbq8=;
+        b=HYXuX3Jh3iE7CgVI60gmgY4Xbop3xjow1e9bq4TXVeD6Z85aY0w1Is4eBQzcXRd+pC
+         phsCPgMmfuHfthlyouYVNSJuXiI/UfDfCs8gV/dlnkzjDyir6b4YKAUIiPrwSSbkhK+7
+         niufZTebm5B03wtg054YeM/tpzNEnbDoT7xi3YDOZAiQwzcv0rHk9/pkYVXEEPgH2flm
+         mWGL29UgvayD1J3+FyeRiRRK/bOj7HxADtwUgaBdoCG6izBZMuu5UmCc5eh7sVBcn8nU
+         7hBEj7vzo5fvkC3bFzVr5Z/U8vfQLccB8Fxb1ok4fRT/iq1bLtMWbL5RPF+TKaOSIyY7
+         jL/Q==
+X-Gm-Message-State: AFqh2koKcIEzhXXsS9+MQjp/OzXT0zzumJgveIYaAftPIA0BbmAyfAuO
+        KGxBwAhJBpMWxhmvmwdesvwzsQ6pk0Pp+25ymS0S5g==
+X-Google-Smtp-Source: AMrXdXs3GPep6mt4hQqbDAb5KAIILk+feJKO4chYHRNTzVLCZFDczi5HHfp9XecXGhiiD5HVLbFbgqOWgKYeDjxV8f0=
+X-Received: by 2002:a05:6a00:2992:b0:58d:b26a:6238 with SMTP id
+ cj18-20020a056a00299200b0058db26a6238mr3885279pfb.84.1674619884776; Tue, 24
+ Jan 2023 20:11:24 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH] target/arm: Propagate errno when writing list
-Content-Language: en-US
-To:     Peter Maydell <peter.maydell@linaro.org>
-Cc:     qemu-devel@nongnu.org, qemu-arm@nongnu.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20221201103312.70720-1-akihiko.odaki@daynix.com>
- <CAFEAcA9sj838rCyPrxAOncXKmdOftZeM16rKiXB5ww7dSYY0tA@mail.gmail.com>
-From:   Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CAFEAcA9sj838rCyPrxAOncXKmdOftZeM16rKiXB5ww7dSYY0tA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20230109211754.67144-1-ricarkol@google.com> <20230109211754.67144-4-ricarkol@google.com>
+ <CAAeT=FxoS2-cmMe-3FeXPXcvE4wNosZeZy2RGPXz5xisq5fj7A@mail.gmail.com> <Y9CRxb2YvPtX340D@google.com>
+In-Reply-To: <Y9CRxb2YvPtX340D@google.com>
+From:   Reiji Watanabe <reijiw@google.com>
+Date:   Tue, 24 Jan 2023 20:11:08 -0800
+Message-ID: <CAAeT=FyP0658CNXT6csZpvMvZ4n+X5igLw4W9z0jQTs12y3aCQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/4] arm: pmu: Add tests for 64-bit overflows
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        andrew.jones@linux.dev, maz@kernel.org, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, oliver.upton@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023/01/25 1:12, Peter Maydell wrote:
-> On Thu, 1 Dec 2022 at 10:33, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> Before this change, write_kvmstate_to_list() and
->> write_list_to_kvmstate() tolerated even if it failed to access some
->> register, and returned a bool indicating whether one of the register
->> accesses failed. However, it does not make sen not to fail early as the
->> the callers check the returned value and fail early anyway.
->>
->> So let write_kvmstate_to_list() and write_list_to_kvmstate() fail early
->> too. This will allow to propagate errno to the callers and log it if
->> appropriate.
-> 
-> (Sorry this one didn't get reviewed earlier.)
-> 
-> I agree that all the callers of these functions check for
-> failure, so there's no major benefit from doing the
-> don't-fail-early logic. But is there a reason why we should
-> actively make this change?
-> 
-> In particular, these functions form part of a family with the
-> similar write_cpustate_to_list() and write_list_to_cpustate(),
-> and it's inconsistent to have the kvmstate ones return
-> negative-errno while the cpustate ones still return bool.
-> For the cpustate ones we *do* rely in some places on
-> the "don't fail early" behaviour. The kvmstate ones do the
-> same thing I think mostly for consistency.
-> 
-> So unless there's a specific reason why changing these
-> functions improves behaviour as seen by users, I think
-> I favour retaining the consistency.
-> 
-> thanks
-> -- PMM
+On Tue, Jan 24, 2023 at 6:19 PM Ricardo Koller <ricarkol@google.com> wrote:
+>
+> On Wed, Jan 18, 2023 at 09:58:38PM -0800, Reiji Watanabe wrote:
+> > Hi Ricardo,
+> >
+> > On Mon, Jan 9, 2023 at 1:18 PM Ricardo Koller <ricarkol@google.com> wrote:
+> > > @@ -898,12 +913,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+> > >
+> > >         pmu_reset_stats();
+> >
+> > This isn't directly related to the patch.
+> > But, as bits of pmovsclr_el0 are already set (although interrupts
+> > are disabled), I would think it's good to clear pmovsclr_el0 here.
+> >
+> > Thank you,
+> > Reiji
+> >
+>
+> There's no need in this case as there's this immediately before the
+> pmu_reset_stats();
+>
+>         report(expect_interrupts(0), "no overflow interrupt after counting");
+>
+> so pmovsclr_el0 should be clear.
 
-I withdraw this patch. The only reason is that it allows to log errno 
-when reporting the error, and the benefit is negligible when compared to 
-the consistency.
+In my understanding, it means that no overflow *interrupt* was reported,
+as the interrupt is not enabled yet (pmintenset_el1 is not set).
+But, (as far as I checked the test case,) the both counters should be
+overflowing here. So, pmovsclr_el0 must be 0x3.
 
-Regards,
-Akihiko Odaki
+Or am I misunderstanding something?
+
+Thank you,
+Reiji
+
+
+>
+> >
+> > >
+> > > -       write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> > > -       write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
+> > > +       write_regn_el0(pmevcntr, 0, pre_overflow);
+> > > +       write_regn_el0(pmevcntr, 1, pre_overflow);
+> > >         write_sysreg(ALL_SET, pmintenset_el1);
+> > >         isb();
+> > >
+>
