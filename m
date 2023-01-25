@@ -2,191 +2,166 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2F1D167BF25
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 22:50:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1BA2467BF3B
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 22:52:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236113AbjAYVuq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 16:50:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41298 "EHLO
+        id S236147AbjAYVwW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 16:52:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236736AbjAYVsV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 16:48:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 602E261D79
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 13:46:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674683202;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=gLCQgOuNAMLOsGwRlp0t3XHDmNl5xofkTJb6esBr2zs=;
-        b=jCNmJoH/Lk/n58i9RUT9jTh8Et8e+donPUpBi+jR4NG2hh9rvAYA3w+9Pz2KPB/3BDVTii
-        /67/fcJ13jq5DAIklCgLJZET5qhezIeoUWsuulM/+EGIDIK0IWrLdUs+TOqSX7lTTDyzhj
-        +VzuOK6qbV7pYMkzSUVWK6hl1RfO3ho=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-642-PZogDZk9M0yZczkm_p8xeA-1; Wed, 25 Jan 2023 16:46:41 -0500
-X-MC-Unique: PZogDZk9M0yZczkm_p8xeA-1
-Received: by mail-ed1-f70.google.com with SMTP id h18-20020a05640250d200b0049e0e9382c2so102030edb.13
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 13:46:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gLCQgOuNAMLOsGwRlp0t3XHDmNl5xofkTJb6esBr2zs=;
-        b=KzQ+uFa8xt2zGVWBI2u6iF3WuFlSN194Rk8a7NqvNIqm2CbqRITJ/umyn75TI9KUBd
-         96ASpi0NrFE1i2+5l927uCuo55SlVf9aFbIM8GDOiw46XIL7imWpTioS9Iv0PSuih4iA
-         14htOn+f4H5FPxAKx7MtSAg0CKaCp0uw+jRmYaznenpA+x6cp5PWWFmDjVhNSD6F+x+z
-         bz8dj4ojUqT00eRbhbJh7KpeRL1hSREEtyewtBVPhTyGS2T671RUH93Fe6Wt5Tb73WZl
-         8xVmyApJNgtZlMLN7goeyA23qSCq5qvZXU9CcDQnneRjzHUvHZ80PJJI6yxnO/u2Mkq6
-         01lg==
-X-Gm-Message-State: AFqh2koK+mD5CP5++WaxMVs2rkFKjqqhNDmnlEuNsAu/NG7WVWjYOp3r
-        Fwb4vFu4bSOjTlk6Hr7k/U79twClQ73cJdD6EDI4vUsJHFN16/MWSFsvIha/COlt2a5bDsGz7nt
-        Jxqfh80wKrxs+
-X-Received: by 2002:a05:6402:3220:b0:49e:1d59:794f with SMTP id g32-20020a056402322000b0049e1d59794fmr42338660eda.22.1674683198340;
-        Wed, 25 Jan 2023 13:46:38 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuaYorcRAqvlHkC2q/xU+XLFWtAsQn5eyQjkeLaZlqhHL+7YF+wyeezO9kOjzNPzfxS7pMrUw==
-X-Received: by 2002:a05:6402:3220:b0:49e:1d59:794f with SMTP id g32-20020a056402322000b0049e1d59794fmr42338646eda.22.1674683198074;
-        Wed, 25 Jan 2023 13:46:38 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:63a7:c72e:ea0e:6045? ([2001:b07:6468:f312:63a7:c72e:ea0e:6045])
-        by smtp.googlemail.com with ESMTPSA id r9-20020a056402018900b0049e09105705sm2826937edv.62.2023.01.25.13.46.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Jan 2023 13:46:32 -0800 (PST)
-Message-ID: <8bdf22c8-9ef1-e526-df36-9073a150669d@redhat.com>
-Date:   Wed, 25 Jan 2023 22:46:30 +0100
+        with ESMTP id S236034AbjAYVwI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 16:52:08 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8EA659269
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 13:51:11 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 98746B81BF8
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 21:51:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 490EFC433EF;
+        Wed, 25 Jan 2023 21:51:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674683469;
+        bh=y4Dnp7P5ZAxBNlDPdekbEu7uLh7HXiQwNL2aSww+M8U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kzCs/jPo8QVhjEcgWDKQG9xcpGP4SG4J0NMQGopAGMVzTRiUxw5C1sF1gKjJyJgAT
+         1n0+vSlrvoeIGMBAs4DXx9gu0eFGi+QYrcqKII5zGAbZY5gNGFEJZqUC+2UNc0rIof
+         FAglysKlBE7HJJpanya6p/LvFieGFKPXERgP/m8u+j0xHxZvL2PHFK9sbz/3RC1X2z
+         Ag0wuP7Icf9lJXVhSFkxHodYXyZzem1ZAfPFYizTuP7VCopnebiHnaKyQ8kWdJ30x4
+         8bC62nxyovNnudFlGbCEN2FIvlMob14ooaFCPVcN57PTRcYgKo6gPp0jSFe2+I7zUD
+         zF7f02iGCi9OQ==
+Date:   Wed, 25 Jan 2023 21:51:02 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
+        Han-Kuan Chen <hankuan.chen@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
+        Nicolas Saenz Julienne <nsaenzju@redhat.com>,
+        Frederic Weisbecker <frederic@kernel.org>,
+        Andrew Bresticker <abrestic@rivosinc.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Changbin Du <changbin.du@intel.com>,
+        Myrtle Shah <gatecat@ds0.me>
+Subject: Re: [PATCH -next v13 05/19] riscv: Disable Vector Instructions for
+ kernel itself
+Message-ID: <Y9GkRltyP4bTCAkQ@spud>
+References: <20230125142056.18356-1-andy.chiu@sifive.com>
+ <20230125142056.18356-6-andy.chiu@sifive.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Content-Language: en-US
-To:     Jim Mattson <jmattson@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, stable@vger.kernel.org
-References: <20221027092036.2698180-1-pbonzini@redhat.com>
- <CALMp9eQihPhjpoodw6ojgVh_KtvPqQ9qJ3wKWZQyVtArpGkfHA@mail.gmail.com>
- <3a23db58-3ae1-7457-ed09-bc2e3f6e8dc9@redhat.com>
- <CALMp9eQ3wZ4dkq_8ErcUdQAs2F96Gvr-g=7-iBteJeuN5aX00A@mail.gmail.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2] KVM: x86: Do not return host topology information from
- KVM_GET_SUPPORTED_CPUID
-In-Reply-To: <CALMp9eQ3wZ4dkq_8ErcUdQAs2F96Gvr-g=7-iBteJeuN5aX00A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="LFlwIBge0HQUJj8n"
+Content-Disposition: inline
+In-Reply-To: <20230125142056.18356-6-andy.chiu@sifive.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/25/23 17:47, Jim Mattson wrote:
->> Part of the definition of the API is that you can take
->> KVM_GET_SUPPORTED_CPUID and pass it to KVM_SET_CPUID2 for all vCPUs.
->> Returning host topology information for a random host vCPU definitely
->> violates the contract.
-> 
-> You are attempting to rewrite history.  Leaf 0xB was added to > KVM_GET_SUPPORTED_CPUID in commit 0771671749b5 ("KVM: Enhance guest
-> cpuid management"), and the only documentation of the
-> KVM_GET_SUPPORTED_CPUID ioctl at that time was in the commit message:
-> 
->       - KVM_GET_SUPPORTED_CPUID: get all cpuid entries the host (and kvm)
->         supports
->
-> [...] the intention was to return the
-> host topology information for the current logical processor.
 
-The handling of unknown features is so naive in that commit, that I 
-don't think it is possible to read anything from the implementation; and 
-it certainly should not be a paragon for a future-proof implementation 
-of KVM_GET_SUPPORTED_CPUID.
+--LFlwIBge0HQUJj8n
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-For example, it only hid _known_ CPUID leaves or features and passed the 
-unknown ones through, which you'll agree is completely broken.  It also 
-didn't try to handle all leaves for which ECX might turn out to be 
-significant---which happened for EAX=7 so the commit returns a wrong 
-output for CPUID[EAX=7,ECX=0].EAX.
+On Wed, Jan 25, 2023 at 02:20:42PM +0000, Andy Chiu wrote:
+> Disable vector instructions execution for kernel mode at its entrances.
+>=20
+> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
+> Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
+> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
+> Co-developed-by: Han-Kuan Chen <hankuan.chen@sifive.com>
+> Signed-off-by: Han-Kuan Chen <hankuan.chen@sifive.com>
+> Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
+> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
+> Signed-off-by: Vineet Gupta <vineetg@rivosinc.com>
+> [vineetg: split off vecreg file clearing]
+> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 
-In other words, the only reason it handles 0xB is because it was known 
-to have subleaves.
+That's a hilarious co-developed-by list for adding "| foo".
+I can only assume that this is mostly related to the asm that was
+removed by Vineet?
 
-We can get more information about how userspace was intended to use it 
-from the qemu-kvm fork, which at the time was practically the only KVM 
-userspace.  As of 2009 it was only checking a handful of leaves:
+Either way:
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
-https://git.kernel.org/pub/scm/virt/kvm/qemu-kvm.git/tree/target-i386/kvm.c?h=kvm-88#n133
+> ---
+>  arch/riscv/kernel/entry.S |  6 +++---
+>  arch/riscv/kernel/head.S  | 12 ++++++------
+>  2 files changed, 9 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/arch/riscv/kernel/entry.S b/arch/riscv/kernel/entry.S
+> index 99d38fdf8b18..e38676d9a0d6 100644
+> --- a/arch/riscv/kernel/entry.S
+> +++ b/arch/riscv/kernel/entry.S
+> @@ -77,10 +77,10 @@ _save_context:
+>  	 * Disable user-mode memory access as it should only be set in the
+>  	 * actual user copy routines.
+>  	 *
+> -	 * Disable the FPU to detect illegal usage of floating point in kernel
+> -	 * space.
+> +	 * Disable the FPU/Vector to detect illegal usage of floating point
+> +	 * or vector in kernel space.
+>  	 */
+> -	li t0, SR_SUM | SR_FS
+> +	li t0, SR_SUM | SR_FS_VS
+> =20
+>  	REG_L s0, TASK_TI_USER_SP(tp)
+>  	csrrc s1, CSR_STATUS, t0
+> diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
+> index ea803c96eeff..7cc975ce619d 100644
+> --- a/arch/riscv/kernel/head.S
+> +++ b/arch/riscv/kernel/head.S
+> @@ -140,10 +140,10 @@ secondary_start_sbi:
+>  	.option pop
+> =20
+>  	/*
+> -	 * Disable FPU to detect illegal usage of
+> -	 * floating point in kernel space
+> +	 * Disable FPU & VECTOR to detect illegal usage of
+> +	 * floating point or vector in kernel space
+>  	 */
+> -	li t0, SR_FS
+> +	li t0, SR_FS_VS
+>  	csrc CSR_STATUS, t0
+> =20
+>  	/* Set trap vector to spin forever to help debug */
+> @@ -234,10 +234,10 @@ pmp_done:
+>  .option pop
+> =20
+>  	/*
+> -	 * Disable FPU to detect illegal usage of
+> -	 * floating point in kernel space
+> +	 * Disable FPU & VECTOR to detect illegal usage of
+> +	 * floating point or vector in kernel space
+>  	 */
+> -	li t0, SR_FS
+> +	li t0, SR_FS_VS
+>  	csrc CSR_STATUS, t0
+> =20
+>  #ifdef CONFIG_RISCV_BOOT_SPINWAIT
+> --=20
+> 2.17.1
+>=20
 
-so shall we say that userspace is supposed to build each CPUID leaf one 
-by one and use KVM_GET_SUPPORTED_CPUID2 for validation only?  I think 
-the first committed documentation agrees: "Userspace can use the 
-information returned by this ioctl to construct cpuid information (for 
-KVM_SET_CPUID2) that is consistent with hardware, kernel, and userspace 
-capabilities, and with user requirements".
+--LFlwIBge0HQUJj8n
+Content-Type: application/pgp-signature; name="signature.asc"
 
-However, that's the theory.  "Do not break userspace" also involves 
-looking at how userspace *really* uses the API, and make compromises to 
-cater to those uses; which is different from rewriting history.
+-----BEGIN PGP SIGNATURE-----
 
-And in practice, people basically stopped reading after "(for 
-KVM_SET_CPUID2)".
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9GkRgAKCRB4tDGHoIJi
+0jYZAP4+hFLKZ79vgyldR0weanvD2UvzyTF9OZQfv78TqGDBDwD+OwG1JW0JzlYc
+kcJqCmvvauLvdwkGgnM/f3XnrUfedgA=
+=dZEs
+-----END PGP SIGNATURE-----
 
-For example in kvmtool:
-
-	kvm_cpuid->nent = MAX_KVM_CPUID_ENTRIES;
-	if (ioctl(vcpu->kvm->sys_fd, KVM_GET_SUPPORTED_CPUID, kvm_cpuid) < 0)
-		die_perror("KVM_GET_SUPPORTED_CPUID failed");
-
-	filter_cpuid(kvm_cpuid, vcpu->cpu_id);
-
-	if (ioctl(vcpu->vcpu_fd, KVM_SET_CPUID2, kvm_cpuid) < 0)
-		die_perror("KVM_SET_CPUID2 failed");
-
-where filter_cpuid only does minor adjustments that do not include 0xB, 
-0x1F and 0x8000001E.  The result is a topology that makes no sense if 
-host #vCPUs != guest #vCPUs, and which doesn't include the correct APIC 
-id in EDX.
-
-https://github.com/kvmtool/kvmtool/blob/5657dd3e48b41bc6db38fa657994bc0e030fd31f/x86/cpuid.c
-
-
-crosvm does optionally attempt to pass through leaves 0xB and 0x1F, but 
-it fails to adjust the APIC id in EDX.  On the other hand it also passes 
-through 0x8000001E if ctx.cpu_config.host_cpu_topology is false, 
-incorrectly.  So on one hand this patch breaks host_cpu_topology == 
-true, on the other hand it fixes host_cpu_topology == false on AMD 
-processors.
-
-https://github.com/google/crosvm/blob/cc79897fc0813ee8412e6395648593898962ec82/x86_64/src/cpuid.rs#L121
-
-
-The rust-vmm reference hypervisor adjusts the APIC id in EDX for 0xB but 
-not for 0x1F.  Apart from that it passes through the host topology 
-leaves, again resulting in nonsensical topology for host #vCPUs != guest 
-#vCPUs.
-
-https://github.com/rust-vmm/vmm-reference/blob/5cde58bc955afca8a180585a9f01c82d6277a755/src/vm-vcpu-ref/src/x86_64/cpuid.rs
-
-
-Firecracker, finally, ignores KVM_GET_SUPPORTED_CPUID's output for 0xb 
-and 0x8000001E (good!) but fails to do the same for 0x1F, so this patch 
-is again a fix of sorts---having all zeroes in 0x1F is better than 
-having a value that is valid but inconsistent with 0xB.
-
-https://github.com/firecracker-microvm/firecracker/blob/cdf4fef3011c51206f178bdf21ececb87caa16c1/src/cpuid/src/transformer/intel.rs#L120
-https://github.com/firecracker-microvm/firecracker/blob/cdf4fef3011c51206f178bdf21ececb87caa16c1/src/cpuid/src/transformer/amd.rs#L88
-
-
-So basically the only open source userspace that is penalized (but not 
-broken, and also partly fixed) by the patch is crosvm.  QEMU doesn't 
-care, while firecracker/kvmtool/vmm-reference are a net positive.
-
-Paolo
-
-> Any future changes to either the operational behavior or the
-> documented behavior of the ABI surely demand a version bump.
-> 
-
+--LFlwIBge0HQUJj8n--
