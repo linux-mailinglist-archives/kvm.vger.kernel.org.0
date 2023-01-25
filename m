@@ -2,232 +2,153 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D88CC67BFD3
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 23:20:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8A7AD67BFDA
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 23:24:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236001AbjAYWUx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 17:20:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37760 "EHLO
+        id S236200AbjAYWYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 17:24:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39444 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230257AbjAYWUu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 17:20:50 -0500
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B5385C0F3
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 14:20:46 -0800 (PST)
-Received: by mail-oi1-x22f.google.com with SMTP id s124so17631599oif.1
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 14:20:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mMN1uGFzD4Ah/Bo6fKk+5YN8Lg3dxQzr3D55yY1NtKs=;
-        b=C6ntfnEtMJt2j5DrQJKnyiMj3+hJCGBbmj044R0ouYXJEbL8Ta92YhrxtTj57+8+wf
-         08fhYYRiLZ0Um3ZO23n06U3hXSNRA66yuiIH6zbzkRXvTOwdvc/eaMBzECvNvqaY1pQb
-         cTo0MyBt6aBOHCq1nAqrRH9YzAFAo8sbjf3F3RxOoUlAZVN5V2AQ2r37nz86+Vg2sUPJ
-         S/ZnROZwb1hgdbEpCeHIkF3FDt+cBEm3plulkAFTV9Kor5+aPql7yJAYJaIsWpEMU2Ff
-         VkJ4q4tYoXp5ebWb+DHI3W7OXggpvKyteowPUtbg7eN/q0tmFpgtca7rZHuR3SxEZQd8
-         fUkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mMN1uGFzD4Ah/Bo6fKk+5YN8Lg3dxQzr3D55yY1NtKs=;
-        b=rWOjPzIRGXwfLvMw0LzUw42oK3NhuoWEfgIQOC4hl7WAPSbCvupFezRrtvxfuO8hQd
-         Uc1h9JTLCVJFMdX6VmT6t+bKaAKqmXPuVYiS55GHK89WnD+Nw5y5MGaIRsYTGuDK/Ba6
-         9XofRIjg9Pa6Q5lYDx8t8tMxDGVezi/qiKm21vNmSdfRFBSlNuvQMxou2zDyZNIh2263
-         wJQ7VN7hrGH2afoXuOJUTPV8jckFXiBsKjO4xkQwSlVDU081cMcAlY8HFAxWBul0pQJR
-         YnTr2jzzG+87rGg02GULdIxC1zzxpV+gAiEHjvkCobhU3fYCpmBvo8B5iGrZG0zaLRJN
-         3bzg==
-X-Gm-Message-State: AFqh2krhnetCGOTSX2NVtdzAdK0VGCtSEX5kuO+uBSxRDC0LJeB/MGy8
-        AJxiyvG7pwrbHgkkYTLvGjyGaz1FgSFMCuyR7GQxUw==
-X-Google-Smtp-Source: AMrXdXsklhSg5PxOuRHLC0Plnu+fQ9QwTycKq0GnTOUykYVeNYyl8bkoAqJqEj6u9gl5XSf/U/WTMThActLOCAgjQNQ=
-X-Received: by 2002:a05:6808:3b1:b0:364:ebf2:735c with SMTP id
- n17-20020a05680803b100b00364ebf2735cmr2296416oie.179.1674685245369; Wed, 25
- Jan 2023 14:20:45 -0800 (PST)
+        with ESMTP id S229446AbjAYWYH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 17:24:07 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD316CA3B
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 14:24:06 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 788AD6142E
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 22:24:06 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D12DC433D2;
+        Wed, 25 Jan 2023 22:24:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674685445;
+        bh=3Smre9hQ8LhrSiYVHVRxfH8uc7mGX4apvAk3pyqUt+w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=WUpHi/eXfd2xdkVvLMv3dJ/dxAd33pO3g5hAcZYwGxdC+phESA47b+K7CdGfXPO4h
+         N8ZjiBbMht5mYjYg8W/PT/8Swlya8izl79PYG6+ZW85aDI8zboEFaKptBdly3BloYQ
+         23lo37WoYBIM022gwyGnBXEuTE8fv/bm9vZ30xgDzyI342ulYE1y5UZtFxXZeJPLvE
+         hTAclaPeHqrecxihI1HK+WGxggzIVF4E6wo+agjgDAOdoosxWG2InisxoQ1+Yi0yax
+         z7RWv3mgutGHwPRxHytffPnyDjZMq5YskFlDuPgmHqXMB8Z5cE8uZDwMqLmExauF8+
+         gZn+iOYa6RxQg==
+Date:   Wed, 25 Jan 2023 22:24:00 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Jessica Clarke <jrtc27@jrtc27.com>
+Cc:     Andy Chiu <andy.chiu@sifive.com>,
+        linux-riscv <linux-riscv@lists.infradead.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        Vineet Gupta <vineetg@rivosinc.com>,
+        Greentime Hu <greentime.hu@sifive.com>,
+        Guo Ren <guoren@linux.alibaba.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
+Subject: Re: [PATCH -next v13 19/19] riscv: Enable Vector code to be built
+Message-ID: <Y9GsAOPMVX4qGero@spud>
+References: <20230125142056.18356-1-andy.chiu@sifive.com>
+ <20230125142056.18356-20-andy.chiu@sifive.com>
+ <Y9GZbVrZxEZAraVu@spud>
+ <08DF16C6-1D76-4FBE-871C-3A37C5349C87@jrtc27.com>
 MIME-Version: 1.0
-References: <20230109215347.3119271-1-rananta@google.com> <20230109215347.3119271-6-rananta@google.com>
- <Y9Bo9qwJhs3KK6jR@thinky-boi>
-In-Reply-To: <Y9Bo9qwJhs3KK6jR@thinky-boi>
-From:   Raghavendra Rao Ananta <rananta@google.com>
-Date:   Wed, 25 Jan 2023 14:20:34 -0800
-Message-ID: <CAJHc60yzrt5Y-aVyL3s-Ai=dbtNc_GqENzzbvbmokXgEoLiGLw@mail.gmail.com>
-Subject: Re: [RFC PATCH 5/6] KVM: arm64: Optimize the stage2 map path with
- TLBI range instructions
-To:     Oliver Upton <oliver.upton@linux.dev>
-Cc:     Oliver Upton <oupton@google.com>, Marc Zyngier <maz@kernel.org>,
-        Ricardo Koller <ricarkol@google.com>,
-        Reiji Watanabe <reijiw@google.com>,
-        James Morse <james.morse@arm.com>,
-        Alexandru Elisei <alexandru.elisei@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Jing Zhang <jingzhangos@google.com>,
-        Colton Lewis <coltonlewis@google.com>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="eIlcdKBA1YhB0Yws"
+Content-Disposition: inline
+In-Reply-To: <08DF16C6-1D76-4FBE-871C-3A37C5349C87@jrtc27.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Oliver,
 
-On Tue, Jan 24, 2023 at 3:25 PM Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> Hi Raghavendra,
->
-> My comment from the previous change also applies here:
->
->   KVM: arm64: Use range-based TLBIs when collapsing hugepages
->
-> On Mon, Jan 09, 2023 at 09:53:46PM +0000, Raghavendra Rao Ananta wrote:
-> > Currently, when the map path of stage2 page-table coalesces a
-> > bunch of pages into a hugepage, KVM invalidates the entire
-> > VM's TLB entries. This would cause a perforamance penality for
-> > the guest whose pages have already been coalesced earlier as they
-> > would have to refill their TLB entries unnecessarily again.
->
-> It is also problematic that we do this on every single fault where we
-> collapse a hugepage.
->
-Yes! I'll also include this description in v2.
+--eIlcdKBA1YhB0Yws
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > Hence, if the system supports it, use __kvm_tlb_flush_range_vmid_ipa()
-> > to flush only the range of pages that have been combined into
-> > a hugepage, while leaving other TLB entries alone.
-> >
-> > Signed-off-by: Raghavendra Rao Ananta <rananta@google.com>
-> > ---
-> >  arch/arm64/kvm/hyp/pgtable.c | 29 +++++++++++++++++++++++++----
-> >  1 file changed, 25 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/hyp/pgtable.c b/arch/arm64/kvm/hyp/pgtable.c
-> > index b11cf2c618a6c..099032bb01bce 100644
-> > --- a/arch/arm64/kvm/hyp/pgtable.c
-> > +++ b/arch/arm64/kvm/hyp/pgtable.c
-> > @@ -686,6 +686,22 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
-> >       return cmpxchg(ctx->ptep, ctx->old, new) == ctx->old;
-> >  }
-> >
-> > +static void kvm_table_pte_flush(struct kvm_s2_mmu *mmu, u64 addr, u32 level, u32 tlb_level)
->
-> Could you call this something like kvm_pgtable_flush_range() and take an
-> address range as an argument? TLBIRANGE can be used outside the context
-> of a table (i.e. a subset of PTEs).
->
-Good idea. In that case, the function becomes very close to arm64's
-implementation of kvm_flush_remote_tlbs_range() on top of David's
-series [1].
-Too bad, we may not be able to invoke that. I'll rename the function.
+On Wed, Jan 25, 2023 at 09:38:00PM +0000, Jessica Clarke wrote:
+> On 25 Jan 2023, at 21:04, Conor Dooley <conor@kernel.org> wrote:
+> > On Wed, Jan 25, 2023 at 02:20:56PM +0000, Andy Chiu wrote:
+> >=20
+> >> diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+> >> index 12d91b0a73d8..67411cdc836f 100644
+> >> --- a/arch/riscv/Makefile
+> >> +++ b/arch/riscv/Makefile
+> >> @@ -52,6 +52,13 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:=3D rv32ima
+> >> riscv-march-$(CONFIG_ARCH_RV64I)	:=3D rv64ima
+> >> riscv-march-$(CONFIG_FPU)		:=3D $(riscv-march-y)fd
+> >> riscv-march-$(CONFIG_RISCV_ISA_C)	:=3D $(riscv-march-y)c
+> >> +riscv-march-$(CONFIG_RISCV_ISA_V)	:=3D $(riscv-march-y)v
+> >> +
+> >> +ifeq ($(CONFIG_RISCV_ISA_V), y)
+> >> +ifeq ($(CONFIG_CC_IS_CLANG), y)
+> >> +        riscv-march-y +=3D -mno-implicit-float -menable-experimental-=
+extensions
+> >> +endif
+> >> +endif
+> >=20
+> > Uh, so I don't think this was actually tested with (a recent version of)
+> > clang:
+> > clang-15: error: unknown argument: '-menable-experimental-extensions_zi=
+cbom_zihintpause'
+> >=20
+> > Firstly, no-implicit-float is a CFLAG, so why add it to march?
+> > There is an existing patch on the list for enabling this flag, but I
+> > recall Palmer saying that it was not actually needed?
+> > Palmer, do you remember why that was?
+> >=20
+> > I dunno what enable-experimental-extensions is, but I can guess. Do we
+> > really want to enable vector for toolchains where the support is
+> > considered experimental? I'm not au fait with the details of clang
+> > versions nor versions of the Vector spec, so take the following with a
+> > bit of a pinch of salt...
+> > Since you've allowed this to be built with anything later than clang 13,
+> > does that mean that different versions of clang may generate vector code
+> > that are not compatible?
+> > I'm especially concerned by:
+> > https://github.com/riscv/riscv-v-spec/releases/tag/0.9
+> > which appears to be most recently released version of the spec, prior to
+> > clang/llvm 13 being released.
+>=20
+> For implementations of unratified extensions you both have to enable
+> them with -menable-experimental-extensions and have to explicitly
+> specify the version in the -march string specifically so this isn=E2=80=
+=99t a
+> concern. Only once ratified can you use the unversioned extension,
+> which is implicitly the ratified version (ignoring the whole i2p0 vs
+> i2p1 fiasco).
 
-> > +{
-> > +     if (system_supports_tlb_range()) {
-> > +             u64 end = addr + kvm_granule_size(level);
-> > +
-> > +             kvm_call_hyp(__kvm_tlb_flush_range_vmid_ipa, mmu, addr, end, tlb_level);
-> > +     } else {
-> > +             /*
-> > +              * Invalidate the whole stage-2, as we may have numerous leaf
-> > +              * entries below us which would otherwise need invalidating
-> > +              * individually.
-> > +              */
-> > +             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > +     }
-> > +}
-> > +
-> >  /**
-> >   * stage2_try_break_pte() - Invalidates a pte according to the
-> >   *                       'break-before-make' requirements of the
-> > @@ -693,6 +709,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
-> >   *
-> >   * @ctx: context of the visited pte.
-> >   * @mmu: stage-2 mmu
-> > + * @tlb_level: The level at which the leaf pages are expected (for FEAT_TTL hint)
->
-> Do we need the caller to provide the TTL hint? We already have
-> ctx->level, and stage2_try_break_pte() also knows what the removed PTE
-> contained (i.e. a table or a block/page).
->
-ctx->level may not always translate to TTL level hint. For example,
-the patch 6/6 of this series also calls stage2_try_break_pte(), but
-from the very top level (level-1). In that case, the level can be
-extracted from ctx, but we won't have any idea what the TTL hint is
-since we won't be traversing all of the page-table. As a result, we
-pass 0. However, if we are remapping a table to a bunch of pages, TTL
-level hint could be just one level down.
+Ahh, thanks for the clarification Jess.
 
-> >   * Returns: true if the pte was successfully broken.
-> >   *
-> > @@ -701,7 +718,7 @@ static bool stage2_try_set_pte(const struct kvm_pgtable_visit_ctx *ctx, kvm_pte_
-> >   * on the containing table page.
-> >   */
-> >  static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
-> > -                              struct kvm_s2_mmu *mmu)
-> > +                              struct kvm_s2_mmu *mmu, u32 tlb_level)
-> >  {
-> >       struct kvm_pgtable_mm_ops *mm_ops = ctx->mm_ops;
-> >
-> > @@ -722,7 +739,7 @@ static bool stage2_try_break_pte(const struct kvm_pgtable_visit_ctx *ctx,
-> >        * value (if any).
-> >        */
-> >       if (kvm_pte_table(ctx->old, ctx->level))
-> > -             kvm_call_hyp(__kvm_tlb_flush_vmid, mmu);
-> > +             kvm_table_pte_flush(mmu, ctx->addr, ctx->level, tlb_level);
->
-> I don't think we should provide a TTL hint for a removed table. It is
-> entirely possible for the unlinked table to contain a mix of blocks and
-> pages, meaning there isn't a uniform table level for the whole range.
->
-True, but it's particularly useful for the case where we know that a
-table is going to be replaced by a block. In that case, can't we be
-sure of the TTL level? Perhaps for other cases, we can supply 0. WDYT?
+> But no, you probably don=E2=80=99t want experimental implementations, whi=
+ch can
+> exist when the ratified version is implemented in theory (so there=E2=80=
+=99s no
+> compatibility concern based on ISA changes) but isn=E2=80=99t deemed
+> production-ready (e.g. potential ABI instability in the case of
+> something like V).
 
-> >       else if (kvm_pte_valid(ctx->old))
-> >               kvm_call_hyp(__kvm_tlb_flush_vmid_ipa, mmu, ctx->addr, ctx->level);
-> >
-> > @@ -804,7 +821,7 @@ static int stage2_map_walker_try_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> >       if (!stage2_pte_needs_update(ctx->old, new))
-> >               return -EAGAIN;
-> >
-> > -     if (!stage2_try_break_pte(ctx, data->mmu))
-> > +     if (!stage2_try_break_pte(ctx, data->mmu, ctx->level))
-> >               return -EAGAIN;
-> >
-> >       /* Perform CMOs before installation of the guest stage-2 PTE */
-> > @@ -861,7 +878,11 @@ static int stage2_map_walk_leaf(const struct kvm_pgtable_visit_ctx *ctx,
-> >       if (!childp)
-> >               return -ENOMEM;
-> >
-> > -     if (!stage2_try_break_pte(ctx, data->mmu)) {
-> > +     /*
-> > +      * As the table will be replaced with a block, one level down would
-> > +      * be the current page entries held by the table.
-> > +      */
->
-> This isn't necessarily true. Ignoring mixed block/pages for a moment,
-> Collapsing a PUD entry into a block after dirty logging (where we mapped
-> at PTE level) would imply a TTL of ctx->level + 2.
->
-> But again, I think it is best to provide no hint in this case.
->
-Ah, right. We could also collapse into a 1G block. No hint would be
-better in that case.
+And I guess, if you turn it on for one, it's on for all.
+While the vector extension might be okay in that regard, another
+extension well not be okay to use the "unversioned" experimental version
+of. Sounds like removing that option and picking the version of clang
+that adds the actual implementation is a better approach, at least IMO.
 
-Thanks,
-Raghavendra
 
-[1]: https://lore.kernel.org/linux-arm-kernel/20230119173559.2517103-1-dmatlack@google.com/T/#meca775fa8accc996900d5e9caeb004f7b9774627
+--eIlcdKBA1YhB0Yws
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> --
-> Thanks,
-> Oliver
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9GsAAAKCRB4tDGHoIJi
+0hqFAQC48XA84lz48uhvAtpzLEHeMOU2tUpSJ8GlckABIXQCJwEA3wPARCef7sAh
+co6sjKqf4Skq3blkPVYO104tRYo0AAc=
+=bxFQ
+-----END PGP SIGNATURE-----
+
+--eIlcdKBA1YhB0Yws--
