@@ -2,83 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 93A4D67B652
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 16:53:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2E70167B687
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 17:03:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235827AbjAYPxP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 10:53:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36486 "EHLO
+        id S233619AbjAYQDV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 11:03:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235799AbjAYPxN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 10:53:13 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05FD3274AF;
-        Wed, 25 Jan 2023 07:53:08 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30PFfebF014353;
-        Wed, 25 Jan 2023 15:53:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=6jUMnABkI5FmUtZ9zdfEQMrbbrZ4yQaSL+Azu+3zxz8=;
- b=l9XDJfrFeKcaPSvc4l7AYuupWY3Q7lb6TVSEFStSAuhKV/NFfUlJqhXdjGPqV/fg8rOD
- YUeNH18XLkFg8ibUy2CBjcxohSXLdqJWUS9y96hDySMbpOTX7rFonF6YAaDfLnLh1Jq3
- o05vYp+rAVx3ceM+m1SlStaXqJ3S9lc0AVv6TSVQKSAuA1wwLICwAFZojNA2iP5WchYG
- S7JSyCZNhuoLrcSHPjUiugE/knjcmvp3vF4lKaIXourOvHlaiUclcpC4gkYl0CmGM/7I
- dK57QbAjLtWMHefvuxxKyLejzGVFcsWLJLFmoWO6XbuMVk0p9OWzxgu4qx60awe7iTFA qg== 
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3naagutadu-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 Jan 2023 15:53:08 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-        by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30P14ZLa029222;
-        Wed, 25 Jan 2023 15:53:06 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3n87afbvcv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 Jan 2023 15:53:06 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30PFr2le51511578
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 25 Jan 2023 15:53:02 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5AA1120043;
-        Wed, 25 Jan 2023 15:53:02 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 253CB20040;
-        Wed, 25 Jan 2023 15:53:02 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.152.224.56])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 25 Jan 2023 15:53:02 +0000 (GMT)
-Date:   Wed, 25 Jan 2023 16:53:00 +0100
-From:   Claudio Imbrenda <imbrenda@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>
-Cc:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
-        kvm@vger.kernel.org, linux-s390@vger.kernel.org
-Subject: Re: [PATCH v1] KVM: s390: disable migration mode when dirty
- tracking is disabled
-Message-ID: <20230125165300.555cd21d@p-imbrenda>
-In-Reply-To: <2ef9a5df-cd05-8f27-f8ee-4c03f4c43d0d@linux.ibm.com>
-References: <20230120075406.101436-1-nrb@linux.ibm.com>
-        <2ef9a5df-cd05-8f27-f8ee-4c03f4c43d0d@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        with ESMTP id S230257AbjAYQDT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 11:03:19 -0500
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF2579740;
+        Wed, 25 Jan 2023 08:03:15 -0800 (PST)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30PFQ1QA028041;
+        Wed, 25 Jan 2023 16:01:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2022-7-12;
+ bh=saFD4DzkqiAr5h47onbY+I2Ylu6WEFKeZQsDaAEUvDw=;
+ b=CHZd9n4mVCpRnxjSWK7zfJ7IGnFPRqZIkVdWvLNRUson3wplzt5UQUOR4ZeC4e2wNP5O
+ miL8kB6+yPwUVbGL/l0FHHqX6xAOamdRPC8VEPOroS0P84n2Wh2Ts8ULAEW0dohJbw/f
+ jiMkjDexDRrA/lbrXvb9wC/Iq/T/e06YygjvHabM/sQXbydyGezp/+97mhK1hJlJDpey
+ BAo5ZnyRSHtV55aB96AuMYfvuMZBkva7ANRBN45AkthoffNNhEkbEBfYT9CDPE82HSFY
+ 683UzhUGKqjozblVSyId4Impr3qgp+l15JQRJia2hltUekGXGKWS/vnJ/tMqdMSR9EJC yw== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3n88ku07vx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 Jan 2023 16:01:24 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.5/8.17.1.5) with ESMTP id 30PEtuOu019389;
+        Wed, 25 Jan 2023 16:01:22 GMT
+Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2105.outbound.protection.outlook.com [104.47.58.105])
+        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3n86gd2e84-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 Jan 2023 16:01:22 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T5l8eR6HLTJQF/h70CJWEWgdZlJ3eDDKfTika3H7ZvMgoPgnd5w19vn7XQ9KvHwx1u0nRudCK2ZYAfDiEMq+suOkS/bm5ZIl/Dk9kmQg5rAtjkpFNgoYto9uKlH7JqGiLkiT0chn22zrncTz0jUZl7pQh9QvxvtGzUzuEtQ2ZOjuZKQiyRDu+hXccaKVLwFqOSDWVYQqfXXNW9Dh531MNHThOZo6hXkRtvqrqpbT9vsMW7cahupEKVymuKgOSixlx28DdERev0KdMUdNrDwi8qhMDhvNVwbf4JqWaenyiojb+/XttzPP48QxQtHxfI//jnZ24nF/n0A4Jp3+JOj8ZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=saFD4DzkqiAr5h47onbY+I2Ylu6WEFKeZQsDaAEUvDw=;
+ b=L0uzoRlFmsvnUaFoCc4NWj2xy8bVgU0eJIRegy/fIlv7YfX4Zb0F8h4+Sz1bR8lIQ+TWbWrkUDAQNlGD6UDFY69m/0p10t3ajmk1G63EacrwSYjxWjgPDDciGqaB0mG43VTRc/tcISZDH6Hwtw14ojJ1O0ybwdFS0IFbW9OceDZyR3iaKyJzwdT8jXQP1siQXz+qEzat73Q3AgEe2JBabAxFT6wd7KGWMoUS7qwB2N/yXp20zw+CZdprbMxJ+8SGmaFaE2RJCFbjDnZAwabnRfBz7Y1Y2G6ukzfrTCmM3OIl3BzTj7MAP+BdsyhomePNy0DtlTIY23k6ouaQcxYhNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=saFD4DzkqiAr5h47onbY+I2Ylu6WEFKeZQsDaAEUvDw=;
+ b=B4RO2G6fj248eldGDI2+HbX54KDFJ6xykRmmrktF6ReInoIIsJUDWAIoOCkxlcromKOC9PwlwBkoqybJEeCgof4cIn6oHJVCifjAv8JFGXckTyTRCRRcH7EICEidvDF0t00qsNeCepDPSAB9REEGmpU0BrpG98CY1/6N/uLIFQc=
+Received: from BN0PR10MB5030.namprd10.prod.outlook.com (2603:10b6:408:12a::18)
+ by MN0PR10MB6005.namprd10.prod.outlook.com (2603:10b6:208:3cb::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.17; Wed, 25 Jan
+ 2023 16:01:18 +0000
+Received: from BN0PR10MB5030.namprd10.prod.outlook.com
+ ([fe80::1316:4a15:2f17:cadf]) by BN0PR10MB5030.namprd10.prod.outlook.com
+ ([fe80::1316:4a15:2f17:cadf%7]) with mapi id 15.20.6043.020; Wed, 25 Jan 2023
+ 16:01:17 +0000
+Message-ID: <5193efe2-7c49-2490-7d17-030088fe6f55@oracle.com>
+Date:   Wed, 25 Jan 2023 16:01:05 +0000
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
+Content-Language: en-US
+To:     "Kirill A. Shutemov" <kirill@shutemov.name>,
+        Sean Christopherson <seanjc@google.com>
+Cc:     Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
+        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com, Liam Merwick <liam.merwick@oracle.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <Y8H5Z3e4hZkFxAVS@google.com>
+ <48953bf2-cee9-f818-dc50-5fb5b9b410bf@oracle.com>
+ <Y9B1yiRR8DpANAEo@google.com>
+ <20230125125321.yvsivupbbaqkb7a5@box.shutemov.name>
+From:   Liam Merwick <liam.merwick@oracle.com>
+In-Reply-To: <20230125125321.yvsivupbbaqkb7a5@box.shutemov.name>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: z8mojCURGy0lTgghuMGXRrZcIph0nYWt
-X-Proofpoint-GUID: z8mojCURGy0lTgghuMGXRrZcIph0nYWt
+X-ClientProxiedBy: AM0P190CA0001.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:208:190::11) To BN0PR10MB5030.namprd10.prod.outlook.com
+ (2603:10b6:408:12a::18)
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN0PR10MB5030:EE_|MN0PR10MB6005:EE_
+X-MS-Office365-Filtering-Correlation-Id: 70c5729b-dee7-41b9-6e13-08dafeed6464
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BQI1tQpCb3zNimJuMCUGL2JKI/hI4cEnj8YsM1+XHkhPQNHU8i1737wPq0Rwbmk/5+29U3HsULhp89Y+f7zQlyBvGDqze3LisjiMjU6jnjCqxGyrasRLA747ovnvN1plqQuAdqKWr42Eu3QvrkbExSqqoZhGu/X8RbtbA24qnRDsM2877+2HsOzUQlaPDpmabnvvivfQ4XlS4FQRW5UHt5NSAJkiXYfaTkTdtYhBlLvHKyFKmBX0OINPiTzPbNB29eceEwPmNM/pU5tXTGtxwUoMjbLQXErnboSYJy/bditHqMfBKNNH9P0u8V9WMzv44y8JuNkyHsAlXrU00U95dtwM9EDueQoBZbjPOtV9NrdmcTt/a1PJ1V37L70YwAuflMn8kBzjmzwyvlameXGu+1XVOtVlB4GGDJ1230sRBlEeLylRlxUWNy7CK37MjHM5ZHm3p092h2YwEaruS/0F8Dpuu/DiWmpdrBTzbxaBE/BQxNM78Kmz0nKPHbpq4xv5Q5PSUvUJrIOX3bq1UOS2icJDuY6zVXz1B/6ZBps6JDLPNN90s3mmwehBeLysr4O7RBp724z6sSGopxl/Quq4TPvABPbbDxXDxu1/r6FeMLSjn32zEhi6v+8it/wx+99SOyE8Qla+kTwPc5EMNM8Djk+qsg3VmOSAWepwKJuCZrlFrPc3Y38gSU4x2SjMFOs3ZSszAs+sWorRgN3xjT5IHVWQqYnywb+rYeSG+4YEjX92mm3Sq7391cLVe0mdplA4HcPZWB0erB9TIrxsrMZrXQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5030.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(39860400002)(376002)(136003)(396003)(346002)(366004)(451199018)(5660300002)(2906002)(7366002)(478600001)(7406005)(8936002)(6512007)(53546011)(4326008)(31696002)(86362001)(41300700001)(31686004)(36756003)(38100700002)(110136005)(54906003)(316002)(44832011)(26005)(186003)(7416002)(6486002)(6666004)(6506007)(66556008)(8676002)(66946007)(66476007)(2616005)(83380400001)(107886003)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K1JkcnU2YURKK1p1U01hZU1DSzEvTk1zWWxhekpJb3VzSExGN3F3RGt1cFd5?=
+ =?utf-8?B?NzJYME9PZXB1b3d1VXJQRFVtQ0s1elU4WGhMNnlQdWE2L1Jjbkl4RlhRb1ZK?=
+ =?utf-8?B?M2NOS3FBWmFNREZQd0RLcUREQUpyZ1BqYWtsV0pWQzkrL2tjaEpZK1hCdnJJ?=
+ =?utf-8?B?MmdLNC8rOFpiRC9zMUIrVVRWRGFaeTBGTUFBdzQxdjFiWUVTKzhZN0FibXZx?=
+ =?utf-8?B?U2R6TzVERTkrYWE4MzYyVEhLZmlqTEoyOUNzWEZXR0xmVHRWdnNFY2tHUDJz?=
+ =?utf-8?B?QXQ3Y0ltMFdzVXZMaUpZK3l2NGlldHU5VnY5NWNsaW1sdkl6anN1bTh0WHBL?=
+ =?utf-8?B?aE9CMS9kSnhYSXhFREJHM2JaVFRVcjQ1cHo3SHhVdWlxa0ZyeGFOLzA2cHdv?=
+ =?utf-8?B?WTJ0QmdxTEVkUWJ6VzQxN0VJMnhjVkxndlJ0Y1ZKMzJoZHQ5Nnk0NHZucmcr?=
+ =?utf-8?B?bGxSTVREaGlHRlNyTTViLzNrYVpURWRPaVRjYzdFU1hPd2d6TDBZQzBYd3l4?=
+ =?utf-8?B?anZ5c2RGQTlPSlF5T0NRQlhRaGJMTWRsRW1WVVdkNllyaTkrdnR0U1Noc25v?=
+ =?utf-8?B?M210UUFGK2k4Q2VvR25sOEYzUUtXRk82VGQ5QmVFVzRxaHkwM1dXRHdaODhh?=
+ =?utf-8?B?ZFF3WVIzMm84bitsOVdzdmVlMXlOamFQMTM5VWprYUNsLzVYRUNaZEdpOXNP?=
+ =?utf-8?B?c0NFTFc0L1NiTGZLM0p6YTlZSm5FLzRMMmlpV3BkYzBtY3BDR1JXdnZzUjBO?=
+ =?utf-8?B?RTdNenRoZGZCSWdaY0NySzFaVEZEb3NJTHJRMy9DZEh6T1JSMFpNUUo2TUFj?=
+ =?utf-8?B?Y0l3ZEZFbWFkdW5heXZNZ1Y5bTBqajJBdkJ0SDNoWlplZTFraWhmWEVpbDJy?=
+ =?utf-8?B?TEEvNWNnbTZtdDVDQ3BZWXZsUDBYRVJDY0xPTVY4UGxvaHY0QS9aMHczRWFW?=
+ =?utf-8?B?aklVUUxZVnlmSU5kcnNPejYzSWd3SDhOT28xSHJrKyswUE5tSU1hQjNBQk9h?=
+ =?utf-8?B?dUIweGV5cEVTZHlxM3l2SDlKajkvVUw3SHRmU243OW5YMlhoZk0vNjdJc0dG?=
+ =?utf-8?B?TW5GMlRpSmZXaWcyOVVTeWttamw1dFZ3bFczdVY5YTFWNCsrQnIrMUtlT01l?=
+ =?utf-8?B?bDBOcDBIMWw2dU91U0c2Vk43b3NnZzQxZnRsVGxjUFpMUGZzbzJYcGIvUmxs?=
+ =?utf-8?B?SnlaUm4weUl5eWhTZDJuajdBVXNMV08vdHZhNlk5L2ZHVlNMczF1dXRDS0VW?=
+ =?utf-8?B?SmFNT0FoNlkxdS9uM1Rld1NDRGF1NVE5dENtSDdyQitOdURhSTBMbDFtVmJR?=
+ =?utf-8?B?WVNITGZ5cG9Xc3ZmclVxeUpKOUNvNHBOSEU2S2NnRjFwWVAvTkd6cnE5WDRZ?=
+ =?utf-8?B?TGdkSDR2N3ZBc29nejZoNGhVZUU2RWVPVnE5TUZVM1BjU1k3M281blFrdDBW?=
+ =?utf-8?B?NXR3TXVkc3BLRExhcXJJaHB5RVZOZ2MydEh5M0hydS8rQUdrd3gvMWV3MUFF?=
+ =?utf-8?B?eStFMnMwN2xhNG5KZVhLUFc3eVpMVXcrSkpOZXB5NHNxcExQcEdYTjJmTEti?=
+ =?utf-8?B?SzJVYWs1KytxNG5NRHU2VW9uN2tTeWFGekJWZmV3N1RmUmd3V0llK2oxOU1s?=
+ =?utf-8?B?Z003dC9YLzQvcno1VTlKQjZ6TG1PUlRXSXppeWd0dUhJTjZyeHNFcXR2MjFa?=
+ =?utf-8?B?d2JTa0lGRzJHMTV0TmkzZzBFVkY1UWVDakhkU1N1S1RJSmlzRHFIZXhyMER4?=
+ =?utf-8?B?Vzh0eFFSTmtJSEIzOEpmaERQUXJRenR3ZkdiU1hQYlhicGVFbUswdGljdXY4?=
+ =?utf-8?B?WmsyU0VlMCtjdXZwcUxsM3BUWkhLNFZkZjhraTk0Y0VnaGMwNHc0YU8vNm1U?=
+ =?utf-8?B?V0VaaXBuRUJrRjN3cVB0aGlvUmdzbHh1dXA0NmxPT2k2MU1GSHBvVFpBU212?=
+ =?utf-8?B?dDNJZDU3bjNieVRXN0liWDE4eWtIVDR1UEtrSVpvSit5WUppM2wxNGt2UmJw?=
+ =?utf-8?B?Z0VsNklwOG4vNTl4T1dzMU1MK0VlRHhIL2VCbVZLSlloQlhuUXZQRlZlU3Ra?=
+ =?utf-8?B?MUprbmR4VW10NTBRQk5NS3liWGRTdjdHWDk0MkVvWENYN08zSW0zemlzeFRn?=
+ =?utf-8?B?cldUL1hWQzNPaDdNTnhjRG5jK0M1VHB3RGpnOWlsMXdydzVMS1M2OUYraTg3?=
+ =?utf-8?B?emc9PQ==?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: =?utf-8?B?bFpRMlUyNDBvdElVcHo3QzF3SVExMm1NSy9sV2NoWHpRYWZMZXhZT3JYeFpB?=
+ =?utf-8?B?WEE0TzUzYzVzdHlMTGdJaEc4K0ZWWHJ0ZVlITjBVZEh6ZTNBY24wNEdkQjFt?=
+ =?utf-8?B?RzFYemxtcitTb242VXdyalZ4K2ZTVFZoNFE1bzhkeHE0SXpkaTZPdVhTQlZk?=
+ =?utf-8?B?a0s0d3FhSVFKa1k4Lzd1Q2QvWkJIWGxDeWM5VW5JQXNyaU5pRElrQjcxYzZz?=
+ =?utf-8?B?blY2d2kvS0V3a3pZN2lwNDFKN1o0L3BvZmMySFBmTUoySDh4MDhmNHlObEIz?=
+ =?utf-8?B?U0g3OUVJaFJ1bDFjeXNzMjFiTXFiYzliKysxTGxmY2FIY012Z3ZUYjE0SHRx?=
+ =?utf-8?B?bzZFaDhlK1RWN3FyZTFjMnRhcEJGME1KdDJ3QjZDWGlXR0tHWU94bjhsNlIr?=
+ =?utf-8?B?SThCQk5jZkFVWXg3Wkp0MVlra210WGJXZGJDZWhvbzF5ckFpdzJRem9lVmxS?=
+ =?utf-8?B?S0VONy90eWMyR3pvTDI5djlOVW9QdVNpbHQ0Q3RvNS81UzFqdDZHVVJJakE5?=
+ =?utf-8?B?TWljbkQ4SXYvSzZ4MU5pcjQzTTRzcUlvbjl0T1ltL1BISjdMZkp6TUVLZDZW?=
+ =?utf-8?B?ZGY1ZzNTM1p5VWU2WXh4bllETmRXWUpqV1ZHTWRET1h6YVFza2FNdWQwZDFm?=
+ =?utf-8?B?aEZkdEUvUnFGM2xIVzdNSnFGRDVFUUdXWW5VRHdRYmNVaXRiRFVybG83ZnRG?=
+ =?utf-8?B?SW11bTVqZURaWWhIRXhDZUNXZUpJTUhEM05jNDNHWnFQbjN6MWQ1blk3RXpN?=
+ =?utf-8?B?emFBYk04WTIrU3M4dmpycFFEc0czWmtSdHJEZ0Q2RVg5MDdzUE1lUHFTMU8w?=
+ =?utf-8?B?aTIwYVJBOG4yaDBTVXV3d3dEZlB1cURMOTE4L25yeG5yc2ZpRXg1VVY2NDlV?=
+ =?utf-8?B?TmZpbTJ4R1EvbU9jTEs3aWZpZTR2RHZJSHFQdlRhcFdXdlVJaVZYblgvUEYx?=
+ =?utf-8?B?VUI3M1lGTGVWZWJzZmNMc0lqeGphTHFiamNVKzhkZDRnNG8wNzlLci8zRVY1?=
+ =?utf-8?B?RTMrV0I3amt2M29XQXQvOENWOTlNSkNYK2ZDWGxKY2lqSFc3dkxQSjlaeG9y?=
+ =?utf-8?B?OGl1aVl1MUNPQjA5Y1Z5N1g2UFZQbkRIeVNKcngyUzdpUUd4WkhVNGV1YTJv?=
+ =?utf-8?B?azdZNSthbUx3UkJiZnFqbThCckZLdWdwRzRWdy9NZmVTTEVvR0M4ay9kaWR1?=
+ =?utf-8?B?MEw3eUhTc3pYdys1ZmxHK1hOWkZyUXZ5bkJUbVJ0aVBqSDlEYkV0U1ZSMnpj?=
+ =?utf-8?B?ejVCOTF6ZE80UnhvVlVLN2o3b3pYdy9ud0p6aTl6WTlSLzdGK3YyZG5JYlNv?=
+ =?utf-8?B?ZnVNL0JSUnpuUmUvVE5mcGhTL3ZjeWdDTnJPUzNZN2o5cFk3dEdGZ203bStq?=
+ =?utf-8?B?NG4vSHE2V0ZxeWVSWk1VaHlGQ0FIOEFhQWhQM2k3ZFhIS1JYRzIwV3Q0a2p0?=
+ =?utf-8?B?QlpDQ2YrUCtrblJFc25DQkRQQm9iRjFhbWVmSW9oVjdwaFRvWmNxVUorZVpk?=
+ =?utf-8?B?QktnSmdsL1YrbTQ0WjM3OCtRREdnUk4xNVJMUVFxK2tHY3orRTZsbEFjRndu?=
+ =?utf-8?B?eDQvUU9jQUoyUXlqYWNSeW9sUkt2Tk05cGtud210bjl3Zkt4L0FMRlBIbDVu?=
+ =?utf-8?B?bE4zYWVFS09KVjZqekdMbEtZMjBKbENPdERIempmak1Bc1pKMzcybjBscS9Q?=
+ =?utf-8?B?dmpROE82VmZCT3BMNVFTVnpyVThHMUpjaHBVQ3d3Zk1RdnV2SEJYbVRSL1Ji?=
+ =?utf-8?B?bTg5bmRVUWdzR3BZWklRSmhMQ2thR3h6N1Z5cElsdC9QZUU5TTNZVXJ4TFJj?=
+ =?utf-8?B?V2VGSm1FUnRhSVFxeE1aNFZUU0hhY2FIVjZQdXlybitZVFplblNnb2RMWkJV?=
+ =?utf-8?B?cUJoNWxYN2kyWmZpWk1FTXpnN2pYenVucG40UFNGaXpzSmV5RzJXUjZ4NzJR?=
+ =?utf-8?B?ZmpOSUR0eDcvUTlkanMrZnhUbDB1WHB2dmlIMU1ndlFoTTRsRVpNb1l3dVdk?=
+ =?utf-8?Q?RDsTCPjTmd4TcnGcRAoEXJE3DEJrrM=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 70c5729b-dee7-41b9-6e13-08dafeed6464
+X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5030.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2023 16:01:17.4947
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: DkBtNn406g47yCfIhpCPSdQlN3C7ebfj5WbaQOb6G/MqPXiM5pcrhRL2P+ssjgcnUtMRiu0OkKvtGIRzdYcEDQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR10MB6005
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
  definitions=2023-01-25_10,2023-01-25_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- lowpriorityscore=0 spamscore=0 impostorscore=0 phishscore=0
- priorityscore=1501 adultscore=0 bulkscore=0 mlxscore=0 malwarescore=0
- mlxlogscore=999 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2301250139
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0
+ mlxlogscore=999 adultscore=0 mlxscore=0 suspectscore=0 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301250143
+X-Proofpoint-GUID: w751XtEoQ50sDGPrHmiILrayNAx7g2ok
+X-Proofpoint-ORIG-GUID: w751XtEoQ50sDGPrHmiILrayNAx7g2ok
+X-Spam-Status: No, score=-3.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -86,160 +225,68 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 25 Jan 2023 14:55:59 +0100
-Janosch Frank <frankja@linux.ibm.com> wrote:
-
-> On 1/20/23 08:54, Nico Boehr wrote:
-> > Migration mode is a VM attribute which enables tracking of changes in
-> > storage attributes (PGSTE). It assumes dirty tracking is enabled on all
-> > memslots to keep a dirty bitmap of pages with changed storage attributes.
-> > 
-> > When enabling migration mode, we currently check that dirty tracking is
-> > enabled for all memslots. However, userspace can disable dirty tracking
-> > without disabling migration mode.
-> > 
-> > Since migration mode is pointless with dirty tracking disabled, disable
-> > migration mode whenever userspace disables dirty tracking on any slot.  
+On 25/01/2023 12:53, Kirill A. Shutemov wrote:
+> On Wed, Jan 25, 2023 at 12:20:26AM +0000, Sean Christopherson wrote:
+>> On Tue, Jan 24, 2023, Liam Merwick wrote:
+>>> On 14/01/2023 00:37, Sean Christopherson wrote:
+>>>> On Fri, Dec 02, 2022, Chao Peng wrote:
+...
+>>>
+>>> When running LTP (https://github.com/linux-test-project/ltp) on the v10
+>>> bits (and also with Sean's branch above) I encounter the following NULL
+>>> pointer dereference with testcases/kernel/syscalls/madvise/madvise01
+>>> (100% reproducible).
+>>>
+>>> It appears that in restrictedmem_error_page() inode->i_mapping->private_data
+>>> is NULL
+>>> in the list_for_each_entry_safe(inode, next, &sb->s_inodes, i_sb_list)
+>>> but I don't know why.
+>>
+>> Kirill, can you take a look?  Or pass the buck to someone who can? :-)
 > 
-> Will userspace be able to handle the sudden -EINVAL rcs on 
-> KVM_S390_GET_CMMA_BITS and KVM_S390_SET_CMMA_BITS?
-> 
-> I.e. what allows us to simply turn it off without the userspace knowing 
-> about it?
+> The patch below should help.
 
-if we are here, userspace is disabling dirty tracking without having
-disabled migration mode. it should have disabled migration mode before
-disabling dirty tracking. also, migration mode does not actually impact
-userspace (at least at this point). it's just an indication from
-userspace to the kernel that userspace is trying to migrate. disabling
-dirty tracking is a rather explicit way for userspace to tell the
-kernel that the migration is over (one way or the other)
+Thanks, this works for me.
+
+Regards,
+Liam
 
 > 
-> > 
-> > Also update the documentation to clarify that dirty tracking must be
-> > enabled when enabling migration mode, which is already enforced by the
-> > code in kvm_s390_vm_start_migration().
-> > 
-> > To disable migration mode, slots_lock should be held, which is taken
-> > in kvm_set_memory_region() and thus held in
-> > kvm_arch_prepare_memory_region().
-> > 
-> > Restructure the prepare code a bit so all the sanity checking is done
-> > before disabling migration mode. This ensures migration mode isn't
-> > disabled when some sanity check fails.
-> > 
-> > Cc: stable@vger.kernel.org
-> > Fixes: 190df4a212a7 ("KVM: s390: CMMA tracking, ESSA emulation, migration mode")
-> > Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
-> > ---
-> >   Documentation/virt/kvm/devices/vm.rst |  4 +++
-> >   arch/s390/kvm/kvm-s390.c              | 41 ++++++++++++++++++---------
-> >   2 files changed, 32 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm/devices/vm.rst
-> > index 60acc39e0e93..147efec626e5 100644
-> > --- a/Documentation/virt/kvm/devices/vm.rst
-> > +++ b/Documentation/virt/kvm/devices/vm.rst
-> > @@ -302,6 +302,10 @@ Allows userspace to start migration mode, needed for PGSTE migration.
-> >   Setting this attribute when migration mode is already active will have
-> >   no effects.
-> >   
-> > +Dirty tracking must be enabled on all memslots, else -EINVAL is returned. When
-> > +dirty tracking is disabled on any memslot, migration mode is automatically
-> > +stopped.  
-> 
-> Do we also need to add a warning to the CMMA IOCTLs?
-> 
-> > +
-> >   :Parameters: none
-> >   :Returns:   -ENOMEM if there is not enough free memory to start migration mode;
-> >   	    -EINVAL if the state of the VM is invalid (e.g. no memory defined);
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index e4890e04b210..4785f002cd93 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -5628,28 +5628,43 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
-> >   				   enum kvm_mr_change change)
-> >   {
-> >   	gpa_t size;
-> > +	int rc;  
-> 
-> Not sure why you added rc even though it doesn't need to be used.
-> 
-> >   
-> >   	/* When we are protected, we should not change the memory slots */
-> >   	if (kvm_s390_pv_get_handle(kvm))
-> >   		return -EINVAL;
-> >   
-> > -	if (change == KVM_MR_DELETE || change == KVM_MR_FLAGS_ONLY)
-> > -		return 0;
-> > +	if (change != KVM_MR_DELETE && change != KVM_MR_FLAGS_ONLY) {
-> > +		/* A few sanity checks. We can have memory slots which have to be
-> > +		 * located/ended at a segment boundary (1MB). The memory in userland is
-> > +		 * ok to be fragmented into various different vmas. It is okay to mmap()
-> > +		 * and munmap() stuff in this slot after doing this call at any time
-> > +		 */  
-> 
-> This isn't net code, we usually start our comments on a "*" line.
-
-like this:
-
-/*
- * blah
- */
-
-I missed this when I reviewed the patch
-
-> 
-> >   
-> > -	/* A few sanity checks. We can have memory slots which have to be
-> > -	   located/ended at a segment boundary (1MB). The memory in userland is
-> > -	   ok to be fragmented into various different vmas. It is okay to mmap()
-> > -	   and munmap() stuff in this slot after doing this call at any time */
-> > +		if (new->userspace_addr & 0xffffful)
-> > +			return -EINVAL;
-> >   
-> > -	if (new->userspace_addr & 0xffffful)
-> > -		return -EINVAL;
-> > +		size = new->npages * PAGE_SIZE;
-> > +		if (size & 0xffffful)
-> > +			return -EINVAL;
-> >   
-> > -	size = new->npages * PAGE_SIZE;
-> > -	if (size & 0xffffful)
-> > -		return -EINVAL;
-> > +		if ((new->base_gfn * PAGE_SIZE) + size > kvm->arch.mem_limit)
-> > +			return -EINVAL;
-> > +	}
-> >   
-> > -	if ((new->base_gfn * PAGE_SIZE) + size > kvm->arch.mem_limit)
-> > -		return -EINVAL;
-> > +	/* Turn off migration mode when userspace disables dirty page logging.
-> > +	 * Migration mode expects dirty page logging being enabled to store
-> > +	 * its dirty bitmap.
-> > +	 */
-> > +	if (kvm->arch.migration_mode) {
-> > +		if ((old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
-> > +		    !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
-> > +			rc = kvm_s390_vm_stop_migration(kvm);
-> > +
-> > +			if (rc)
-> > +				pr_warn("Failed to stop migration mode\n");  
-> 
-> As the results were rather catastrophic it might make more sense to use 
-> WARN_ONCE() and condense these 3 lines into one.
-
-(in which case rc is not needed)
-
-is WARN_ONCE even enough? the results are indeed potentially
-catastrophic, would it not make sense to WARN (without _ONCE) ?
-
-> 
-> > +		}
-> > +	}
-> >   
-> >   	return 0;
-> >   }  
-> 
+> diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
+> index 15c52301eeb9..39ada985c7c0 100644
+> --- a/mm/restrictedmem.c
+> +++ b/mm/restrictedmem.c
+> @@ -307,14 +307,29 @@ void restrictedmem_error_page(struct page *page, struct address_space *mapping)
+>   
+>   	spin_lock(&sb->s_inode_list_lock);
+>   	list_for_each_entry_safe(inode, next, &sb->s_inodes, i_sb_list) {
+> -		struct restrictedmem *rm = inode->i_mapping->private_data;
+>   		struct restrictedmem_notifier *notifier;
+> -		struct file *memfd = rm->memfd;
+> +		struct restrictedmem *rm;
+>   		unsigned long index;
+> +		struct file *memfd;
+>   
+> -		if (memfd->f_mapping != mapping)
+> +		if (atomic_read(&inode->i_count))
+>   			continue;
+>   
+> +		spin_lock(&inode->i_lock);
+> +		if (inode->i_state & (I_NEW | I_FREEING | I_WILL_FREE)) {
+> +			spin_unlock(&inode->i_lock);
+> +			continue;
+> +		}
+> +
+> +		rm = inode->i_mapping->private_data;
+> +		memfd = rm->memfd;
+> +
+> +		if (memfd->f_mapping != mapping) {
+> +			spin_unlock(&inode->i_lock);
+> +			continue;
+> +		}
+> +		spin_unlock(&inode->i_lock);
+> +
+>   		xa_for_each_range(&rm->bindings, index, notifier, start, end)
+>   			notifier->ops->error(notifier, start, end);
+>   		break;
 
