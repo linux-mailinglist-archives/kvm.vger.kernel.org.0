@@ -2,397 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4897C67B7B3
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 18:00:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D3E1F67B7EF
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 18:09:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235883AbjAYRAT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 12:00:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53172 "EHLO
+        id S235846AbjAYRJT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 12:09:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235448AbjAYRAR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 12:00:17 -0500
-Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 777E9E3AA
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:00:14 -0800 (PST)
-Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-4fda31c3351so243697947b3.11
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 09:00:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=L4MXGiF0uBNS4YdEO04YxfSu/PH3d6GEYxinGGkJ0l0=;
-        b=W2wM+2B23DX4UFGjrNjz2QhZIRJJ0rJbNeAj16MEZr1nVm+y2drgVLMWhYKM+RXZwl
-         LyA9Ln6ru3ELYSr9r7So/z16X90Zls60BXzg/QzJqLOLV/j0Tixqf16TWNyXZGnACB9E
-         QkGJl1ScGfsTp7c4ttit0pgHNn4ey7S424sXU9dWBD5cTrLynb/1YBuhhrezEYSZhLSi
-         3eb09az3BMlgAYXh3d2+5Q7sC0FqvrC0NX040NYjkqv/h2gdKBNO3YpN4EQOf23xtORi
-         NxWfmFe951E1Au7ZDRJqODWALmTWnaVbj7QqRA33jeb/AA79tsFrFPyzpW0c4v2lui2R
-         IvJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=L4MXGiF0uBNS4YdEO04YxfSu/PH3d6GEYxinGGkJ0l0=;
-        b=ivMlGm3IRSVBnNCqgmnAKNQtwOcnVDO3ew9Z/AdHaTekLM8psr8HrIBQGpJuURXNbn
-         y7VAqu1S+me2w75517UzzqEDlJCM6mCcgbVJwxF0JTb8PXMyrC3iqdy5qSSbaLo7bKv4
-         hrMVaUuit27G05fdqIMR0wUuIdBYULmUOp9E3QuBupuaUTe1ZVfbcdkIG5LUCLP6WbX6
-         zzyY4e6nGXFS6mSCWPehTpJSJEHFnid79T1zTQuJsr8J0zegDRuQhTS0q7JYPTdNXZVi
-         lGnmU2eKPWAk9LgNzcbP0CS3fkCj7GZTEgzvTcxKHT2EKDAqShKWyEILKqTBJ7Ua40AS
-         WGyw==
-X-Gm-Message-State: AFqh2kpU/3HZc15WHZ85gYf9Jh/09UT3eTxDMNi8J1rjVZ1ff3fC75a4
-        VRqlr//y7A9cytV8TVfggfDltmOdbfMJsJA3jw5D1Q==
-X-Google-Smtp-Source: AMrXdXv6WFpwQ2RivVVjLGZIQcqOZe35ABaf7/kGtBR6QRxHke62z7D7Nf0zd78A9HxP1avFtZlnWBmbm7RD5GZUdQA=
-X-Received: by 2002:a0d:c0c7:0:b0:502:30d7:5fff with SMTP id
- b190-20020a0dc0c7000000b0050230d75fffmr2052050ywd.347.1674666013171; Wed, 25
- Jan 2023 09:00:13 -0800 (PST)
+        with ESMTP id S236088AbjAYRJF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 12:09:05 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2052.outbound.protection.outlook.com [40.107.93.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BA62B59748;
+        Wed, 25 Jan 2023 09:08:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Wkn/uu9yFWim/vVGbGqDmzvUc+HXmqnTixumBkWqIsNcvxflaGXbd1p1TCq/eyhcyotNFu6OMiZ4XM3T+5UrgsYh3m370WvxDNlUMAP6MNmmqzBYZUBMdlpFUkN8nC+f3kt4wAJvkPBkVTPS2/WF108UyaX+lnW09nuGcPPI5VSnGrJ3+/NUNbQzYuWpUCPJbZnmDw9iQyg1zZ7B/g7Efbq7IDsgxgo4KpiRM4SKDt11yw+sv+CB43ZLboZ6WfEB+xiavPR+pB7/IddlyRlwFgSsC5Wfi0TSHs67S/JlJYJ4y1H7nlDu3B7ULhOeVsN9kCiSkc+EwAZU4O0YYM5L9g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=i+kSdQMt27Yg0S94yrtOauRvEVbBge+NkYY0JHPaSTE=;
+ b=gSMaz7TikotsAd1+jLCtv61OYHKxG2Eh1bwlDGvGJcv8MCcFDGA7IYcgikMJOernk0KpF3Fak8+ElNKtZDBDYu+t7paGiOCL5YDTs6QWJoWWBRWz/iq/R3J3B3CUhVg93Mhnp07q0FFadkXondKo/jT9Njzhkk5gPgcDmTe3QQA/lSxI4pSdBrQAlRh4r/aXbRyvYTZUK8w8/FGMcwplJSh/cheCoFM3qU4TTOa9yGYWCX1RKHWm+Uysqe5L6bgsH8G8vgNxIegmZ7mJAqHriQ+pJEcKAHM+ZEWJ9vK8z1scyrfXkIV/XwN3b9YW45Y6OGj/nRzCkuHHXl/LSKfacQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=i+kSdQMt27Yg0S94yrtOauRvEVbBge+NkYY0JHPaSTE=;
+ b=i2rLFP8gPW0KwToj0KfTrFM7BnS4b4T/yG+8jsTRewKMppXKd+VBKtfu6nJKmZWOmOwIsTaU/Ye5IcRvFwJSkEKtoTdfyH4BMuDYKsAEskmGODkR5PzcJAQb55MEh6QZ5a+Mkx0/MJvNdWPfEYAupmS44ON/yHbjq9fqV7kxAMs=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5995.namprd12.prod.outlook.com (2603:10b6:208:39b::20)
+ by BY5PR12MB4049.namprd12.prod.outlook.com (2603:10b6:a03:201::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.21; Wed, 25 Jan
+ 2023 17:07:31 +0000
+Received: from BL1PR12MB5995.namprd12.prod.outlook.com
+ ([fe80::cb0c:2b31:6f3f:12a6]) by BL1PR12MB5995.namprd12.prod.outlook.com
+ ([fe80::cb0c:2b31:6f3f:12a6%7]) with mapi id 15.20.6002.033; Wed, 25 Jan 2023
+ 17:07:31 +0000
+Message-ID: <14db7a0b-b993-8d51-da94-893a2975f7ac@amd.com>
+Date:   Wed, 25 Jan 2023 11:07:26 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [RFC PATCH 0/7] SVM guest shadow stack support
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, weijiang.yang@intel.com,
+        rick.p.edgecombe@intel.com, x86@kernel.org, thomas.lendacky@amd.com
+References: <20221012203910.204793-1-john.allen@amd.com>
+ <Y9B97dZnFnjEHhVf@google.com>
+Content-Language: en-US
+From:   John Allen <john.allen@amd.com>
+In-Reply-To: <Y9B97dZnFnjEHhVf@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: QB1P288CA0004.CANP288.PROD.OUTLOOK.COM
+ (2603:10b6:c00:2d::17) To BL1PR12MB5995.namprd12.prod.outlook.com
+ (2603:10b6:208:39b::20)
 MIME-Version: 1.0
-References: <20230125083851.27759-1-surenb@google.com> <20230125083851.27759-6-surenb@google.com>
- <Y9D5hjcprLI92VKf@dhcp22.suse.cz>
-In-Reply-To: <Y9D5hjcprLI92VKf@dhcp22.suse.cz>
-From:   Suren Baghdasaryan <surenb@google.com>
-Date:   Wed, 25 Jan 2023 09:00:00 -0800
-Message-ID: <CAJuCfpHHPB=VE7Q=hoxVj7GBF18rpSQ-O-5+S3EPxOB5rHOrDg@mail.gmail.com>
-Subject: Re: [PATCH v2 5/6] mm: introduce mod_vm_flags_nolock and use it in untrack_pfn
-To:     Michal Hocko <mhocko@suse.com>
-Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
-        jglisse@google.com, vbabka@suse.cz, hannes@cmpxchg.org,
-        mgorman@techsingularity.net, dave@stgolabs.net,
-        willy@infradead.org, liam.howlett@oracle.com, peterz@infradead.org,
-        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
-        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
-        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
-        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
-        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
-        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
-        jannh@google.com, shakeelb@google.com, tatashin@google.com,
-        edumazet@google.com, gthelen@google.com, gurua@google.com,
-        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
-        leewalsh@google.com, posk@google.com, will@kernel.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
-        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
-        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
-        qianweili@huawei.com, wangzhou1@hisilicon.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-        airlied@gmail.com, daniel@ffwll.ch,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, l.stach@pengutronix.de,
-        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
-        matthias.bgg@gmail.com, robdclark@gmail.com,
-        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
-        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
-        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
-        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
-        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
-        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
-        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
-        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, miklos@szeredi.hu,
-        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
-        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
-        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
-        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
-        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
-        loongarch@lists.linux.dev, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
-        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
-        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org,
-        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        devel@lists.orangefs.org, kexec@lists.infradead.org,
-        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
-        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
-        kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5995:EE_|BY5PR12MB4049:EE_
+X-MS-Office365-Filtering-Correlation-Id: 948c7478-ac8d-443e-6b28-08dafef6a52d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: QBNIbluodxLNC9iOuQ8Bpr+XCH/r5ZeKpW7cRBRy/ipKzQO7M+EZk1dP6NNtToNFV5sPhZwgBzdETEPmsxt6jJ8DEKokD9k4Ni02yxIMtFjt2SvRTOiRrTipSJ4CLEs1VLRutMjqHX5bcRwnYWI1gtkZwYm9cUdl+nvqLVuO9z7b1mEr0Rx0aqRxd/fZLtgAPx25L6VNik4JkEFoIyb4+OY5zL3U7hUevWqJX7C2a92144BFtmVf831xmDZ1rKGob/QxCtMNfGD1cJQUVS/gSS03uEKN6C5Sbzj95Zo2xqqy4mrbv6qGQqkt/tdJ8Z3I4sJQQu5qSFL1kxGh3hQN//F+hJ8KH1WeuPNyBNSOr3SlxRs05ET14B1kBpJ+oGuiskO4keksiLMLSSsSp7M2FvX4Sw/s33LaOzFMO8KX4/k3LZKgnucwYzvpSAZrlxTK2q+IoZaFbQwRETRdlHVSm4y+s+RcKGGJxi1aTZ651jn/MVWuT+yBXlbsDcX+NjXP0Eh1OHKoT/5L4Bgzal6Fl0xBqZwRXVt6zvGP0qpZlkyxhY16GSxUOYr8lg3xXHjIvezVkkiCoYM9iqdr58CfrzGLs3SY9YzJoDVHz9LyMVfaQuPPPFbEO5Me6PzMD/nRTYpHHyRULbTMFxmkgLUxSgkrvxGjl3hr2MCPCit+Gs1jI6O6AwykZQGsOYnStNuEB2CMfE/E1IOhmI8zEYrFvjxz3lbeXBlYjsQH10S6BFugRUf8iNVN24wMIUTVdykw5X21gzseJOIn9AsGzewloz2aEfLQiL3Ov7N4OgYcwswIC8vsFJASAR7QgQmwcwvQ
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5995.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(346002)(376002)(136003)(396003)(39860400002)(451199018)(31696002)(36756003)(8676002)(316002)(53546011)(6506007)(6486002)(966005)(5660300002)(6666004)(44832011)(478600001)(2906002)(66476007)(66556008)(6916009)(41300700001)(4326008)(8936002)(66946007)(38100700002)(83380400001)(26005)(86362001)(6512007)(2616005)(186003)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NXZ6bFVocDZINm5BM0R3NzRHek53TVp4VEtkdGNUb1FUT2xIS0lzd1FxZlQ4?=
+ =?utf-8?B?dDhMN1dLNjhpZ2RDdHo1YWk2Q2drK1ltVk83UmJwSjd4VmFoNTcvS2RiTUFI?=
+ =?utf-8?B?M0NiNXd3RDRZYjduL0lVOHI2a1hUalNpQng1WHpocUFvamdVOXcveG1ZdHZN?=
+ =?utf-8?B?YS9mT3cvUXhsQUQ5a05rZDZYOUdXMmovMCtjS0Z1ZUJYYnNEbWtmU05IaTBC?=
+ =?utf-8?B?NGZJRGFoN2ZiT1gxU0V3RDFCT0NVcVF4TG5TVXNEbDdPVVQwN2xtNHdrRngw?=
+ =?utf-8?B?alRrSjcvZm91d2h5dDJFWjZ4UVR1Umc1Vk9tWmZ0dmxoTU1tUmYvV0hnSG9U?=
+ =?utf-8?B?Z1RTV0hWRG84clRva24wR0FSdXJkQTEzQmtNRHhiZmxWUk9ydnNyc0dkSGpO?=
+ =?utf-8?B?dE1uN25CWThzWGVNR21xUFNURWNFWXFzU1JLcUEyK2xCMnhPWEFxTm93UFk2?=
+ =?utf-8?B?TnJXSnlTbDdFV3JTbDNISjJ6YTRjUTlRc0tkVGtHeEtkT0ZhK3QxSWdFcGli?=
+ =?utf-8?B?UkdqMUtQS1NjYVU0Z0gzNUVDbVhjRWd4TkpndENsaXRhRXkycEJUY2svWW1U?=
+ =?utf-8?B?TWNZcmZ3M0hicFVkYWg5T2F4bXM0S1E5Qk83OGhVcjdvS0ZWaHZ2dWJNMGwy?=
+ =?utf-8?B?alZJSFh5TGhERFI1YXhZeDM3dGQyYkJOVTd3YXdhUG9wYTcwdHh6cnVZV0s3?=
+ =?utf-8?B?d2JEbGJaeFB3SFBmSm1jdkJOeHJ1NHk4c0xZVUR4Z3VmWStVWHB0MWRhSnpu?=
+ =?utf-8?B?RVNaYlRCOVV5aGRmUjdwTjZSQnJzY3cxc3hQWXpqWEFCaExNQ3lxRmQrQ3ZB?=
+ =?utf-8?B?Q0lXbGtXejY1KzhiRlJPYjFLUFYzTzE3L3hwTzQwRjh5TElqYnlhNEgyRVJO?=
+ =?utf-8?B?NGtlcVZWNWlFc3pjaXBkLzlYVUpYRDlMc09GZnd5TDF4cWg2M25yVFRsUHdN?=
+ =?utf-8?B?d1dNQkZGRUl2alN3NXF1ZFIwR2I2UGNWaDRuRGVJQWRaY3ErZXUzMXlUZlV3?=
+ =?utf-8?B?czl2WjdFMk80UlpjbytxUFN2M0dYUk5Sa2JSV0U5SWxjanl5WVc3Rnh1T3NL?=
+ =?utf-8?B?UCtoQXdMekxTMHZaeXgrbXVnUld1WnJ4b1ZDREhud0pIVUU2RHk1R1lwTWhX?=
+ =?utf-8?B?amhSWUEzL3pnTVVzc1RZcnFxVDNJU0RmUGtGTkdacmZYQmtWNDRUeHoxMGZ6?=
+ =?utf-8?B?em5EK3JlcnVXVDgrZVM1R3g1YkFUUFNJMHBhS3djOWVhNCtyS0JKZnk2YTl4?=
+ =?utf-8?B?NHdrcXhha2Zva1VaSXA5aHU1TkxwbHNJeFpRRkVKallDWWw0NTdpWGdDR09C?=
+ =?utf-8?B?T3lUeUVRdERlbG4yQ2ladmkxN21tUFJyV0h0bW5IbnJyTmtmOG14WkUrSWQw?=
+ =?utf-8?B?TGdkeGxjd1F2eTZrdDJyM2RvQ0ZLdU4yZTVKVkpQb1FJOVVmOEl2ZitjSjZv?=
+ =?utf-8?B?Z2locy9CajN0TlR4M1hJSTBCV25GOWwyUjd0QVM0U2NZc0N6WWUwd0JBR0pY?=
+ =?utf-8?B?aGdWN25uNHVZVmZxd1hXdWxWVi9CZmJ4OExlQTh3a0Qxd0hyWmYzd0dBQ1ZU?=
+ =?utf-8?B?Y0NHOGVKakhqUlZBbjdibVdjeDc2cFM2cGwwNkRRTUxuSkNRS1NIS25paUly?=
+ =?utf-8?B?cGZIVU51QkpJYXpGYWt0UUZGdThEVHBwQ0VuMnZyeENvZXZuR05ieVNRc2xP?=
+ =?utf-8?B?SEwxUmF1TDcvWkpJSWIzWGhNcjcxS2hQSWhrWlFGeUJkUDEyTUhzL2pPdXlP?=
+ =?utf-8?B?TzVkUEs5dGs5clFuVTI4SHhIVWV1dWhId0JZbHJHNk9WZFgwWGZ5NmoyNHFE?=
+ =?utf-8?B?Y2QrcEpZQTNQM0F1M2pUVit2OXBmM09keFpQUjB3eVpQRWY1ME1GOXB2d1li?=
+ =?utf-8?B?ZlF1S3FNeUZJWjZHQU9acG1oWGJDR21DNlZFNVhkYndVdFJSQmtUbFNDOSs4?=
+ =?utf-8?B?aGttNDNDSDlKSW1oQVEzeDM4WGZnVmhyc1lWOG5Ja2l6RXhRNmp6d1ZhMUYy?=
+ =?utf-8?B?MHUydWUvQ1BnWDhvenIzWkpMbVEwUmx0ZUVjY2gzeVR1dXc2RzdBZWpqTDZn?=
+ =?utf-8?B?MUp0UVhlM0E5eXVydzBIWGt0eUs1Y29BV2dmWU5ia01SaExaamZTTmozZWp6?=
+ =?utf-8?Q?2uN6v7fwmFsayVig76Qu6M2n1?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 948c7478-ac8d-443e-6b28-08dafef6a52d
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5995.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jan 2023 17:07:31.4223
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: QMLr9Bu8u6J1nIOmdOsaAUg+GqUtM7HFtiPi6Xwi0MeLiK0dZX6BjRnxj/eibqfoC34IPRJ1ZR39OnIw7RWHWA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4049
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 1:42 AM Michal Hocko <mhocko@suse.com> wrote:
->
-> On Wed 25-01-23 00:38:50, Suren Baghdasaryan wrote:
-> > In cases when VMA flags are modified after VMA was isolated and mmap_lock
-> > was downgraded, flags modifications would result in an assertion because
-> > mmap write lock is not held.
-> > Introduce mod_vm_flags_nolock to be used in such situation.
-> > Pass a hint to untrack_pfn to conditionally use mod_vm_flags_nolock for
-> > flags modification and to avoid assertion.
->
-> The changelog nor the documentation of mod_vm_flags_nolock
-> really explain when it is safe to use it. This is really important for
-> future potential users.
+On 1/24/23 6:55 PM, Sean Christopherson wrote:
+> On Wed, Oct 12, 2022, John Allen wrote:
+>> AMD Zen3 and newer processors support shadow stack, a feature designed to
+>> protect against ROP (return-oriented programming) attacks in which an attacker
+>> manipulates return addresses on the call stack in order to execute arbitrary
+>> code. To prevent this, shadow stacks can be allocated that are only used by
+>> control transfer and return instructions. When a CALL instruction is issued, it
+>> writes the return address to both the program stack and the shadow stack. When
+>> the subsequent RET instruction is issued, it pops the return address from both
+>> stacks and compares them. If the addresses don't match, a control-protection
+>> exception is raised.
+>>
+>> Shadow stack and a related feature, Indirect Branch Tracking (IBT), are
+>> collectively referred to as Control-flow Enforcement Technology (CET). However,
+>> current AMD processors only support shadow stack and not IBT.
+>>
+>> This series adds support for shadow stack in SVM guests and builds upon the
+>> support added in the CET guest support patch series [1] and the CET kernel
+>> patch series [2]. Additional patches are required to support shadow stack
+>> enabled guests in qemu [3] and glibc [4].
+>>
+>> [1]: CET guest support patches
+>> https://lore.kernel.org/all/20220616084643.19564-1-weijiang.yang@intel.com/
+>>
+>> [2]: Latest CET kernel patches
+>> https://lore.kernel.org/all/20220929222936.14584-1-rick.p.edgecombe@intel.com/
+> 
+> That dependency chain makes me sad.
+> 
+> Outside of a very shallow comment on the last patch, I don't plan on reviewing
+> this until the kernel side of things gets out of our way.  When that finally
+> does happen, I'll definitely prioritize reviewing and merging this and the KVM
+> Intel series.  I'd love to see this land.
+> 
+> Sorry :-(
 
-True. I'll add clarification in the comments and in the changelog. Thanks!
+Thanks Sean, understood. This submission is mainly for community awareness,
+but any feedback we can get now prior to the main kernel series getting
+merged is much appreciated. This would give us a longer lead on addressing
+any concerns that the community might have and potentially allow us to get
+this in more quickly when the kernel series has been merged.
 
->
-> > Signed-off-by: Suren Baghdasaryan <surenb@google.com>
-> > ---
-> >  arch/x86/mm/pat/memtype.c | 10 +++++++---
-> >  include/linux/mm.h        | 12 +++++++++---
-> >  include/linux/pgtable.h   |  5 +++--
-> >  mm/memory.c               | 13 +++++++------
-> >  mm/memremap.c             |  4 ++--
-> >  mm/mmap.c                 | 16 ++++++++++------
-> >  6 files changed, 38 insertions(+), 22 deletions(-)
-> >
-> > diff --git a/arch/x86/mm/pat/memtype.c b/arch/x86/mm/pat/memtype.c
-> > index ae9645c900fa..d8adc0b42cf2 100644
-> > --- a/arch/x86/mm/pat/memtype.c
-> > +++ b/arch/x86/mm/pat/memtype.c
-> > @@ -1046,7 +1046,7 @@ void track_pfn_insert(struct vm_area_struct *vma, pgprot_t *prot, pfn_t pfn)
-> >   * can be for the entire vma (in which case pfn, size are zero).
-> >   */
-> >  void untrack_pfn(struct vm_area_struct *vma, unsigned long pfn,
-> > -              unsigned long size)
-> > +              unsigned long size, bool mm_wr_locked)
-> >  {
-> >       resource_size_t paddr;
-> >       unsigned long prot;
-> > @@ -1065,8 +1065,12 @@ void untrack_pfn(struct vm_area_struct *vma, unsigned long pfn,
-> >               size = vma->vm_end - vma->vm_start;
-> >       }
-> >       free_pfn_range(paddr, size);
-> > -     if (vma)
-> > -             clear_vm_flags(vma, VM_PAT);
-> > +     if (vma) {
-> > +             if (mm_wr_locked)
-> > +                     clear_vm_flags(vma, VM_PAT);
-> > +             else
-> > +                     mod_vm_flags_nolock(vma, 0, VM_PAT);
-> > +     }
-> >  }
-> >
-> >  /*
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index 55335edd1373..48d49930c411 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -656,12 +656,18 @@ static inline void clear_vm_flags(struct vm_area_struct *vma,
-> >       vma->vm_flags &= ~flags;
-> >  }
-> >
-> > +static inline void mod_vm_flags_nolock(struct vm_area_struct *vma,
-> > +                                    unsigned long set, unsigned long clear)
-> > +{
-> > +     vma->vm_flags |= set;
-> > +     vma->vm_flags &= ~clear;
-> > +}
-> > +
-> >  static inline void mod_vm_flags(struct vm_area_struct *vma,
-> >                               unsigned long set, unsigned long clear)
-> >  {
-> >       mmap_assert_write_locked(vma->vm_mm);
-> > -     vma->vm_flags |= set;
-> > -     vma->vm_flags &= ~clear;
-> > +     mod_vm_flags_nolock(vma, set, clear);
-> >  }
-> >
-> >  static inline void vma_set_anonymous(struct vm_area_struct *vma)
-> > @@ -2087,7 +2093,7 @@ static inline void zap_vma_pages(struct vm_area_struct *vma)
-> >  }
-> >  void unmap_vmas(struct mmu_gather *tlb, struct maple_tree *mt,
-> >               struct vm_area_struct *start_vma, unsigned long start,
-> > -             unsigned long end);
-> > +             unsigned long end, bool mm_wr_locked);
-> >
-> >  struct mmu_notifier_range;
-> >
-> > diff --git a/include/linux/pgtable.h b/include/linux/pgtable.h
-> > index 5fd45454c073..c63cd44777ec 100644
-> > --- a/include/linux/pgtable.h
-> > +++ b/include/linux/pgtable.h
-> > @@ -1185,7 +1185,8 @@ static inline int track_pfn_copy(struct vm_area_struct *vma)
-> >   * can be for the entire vma (in which case pfn, size are zero).
-> >   */
-> >  static inline void untrack_pfn(struct vm_area_struct *vma,
-> > -                            unsigned long pfn, unsigned long size)
-> > +                            unsigned long pfn, unsigned long size,
-> > +                            bool mm_wr_locked)
-> >  {
-> >  }
-> >
-> > @@ -1203,7 +1204,7 @@ extern void track_pfn_insert(struct vm_area_struct *vma, pgprot_t *prot,
-> >                            pfn_t pfn);
-> >  extern int track_pfn_copy(struct vm_area_struct *vma);
-> >  extern void untrack_pfn(struct vm_area_struct *vma, unsigned long pfn,
-> > -                     unsigned long size);
-> > +                     unsigned long size, bool mm_wr_locked);
-> >  extern void untrack_pfn_moved(struct vm_area_struct *vma);
-> >  #endif
-> >
-> > diff --git a/mm/memory.c b/mm/memory.c
-> > index d6902065e558..5b11b50e2c4a 100644
-> > --- a/mm/memory.c
-> > +++ b/mm/memory.c
-> > @@ -1613,7 +1613,7 @@ void unmap_page_range(struct mmu_gather *tlb,
-> >  static void unmap_single_vma(struct mmu_gather *tlb,
-> >               struct vm_area_struct *vma, unsigned long start_addr,
-> >               unsigned long end_addr,
-> > -             struct zap_details *details)
-> > +             struct zap_details *details, bool mm_wr_locked)
-> >  {
-> >       unsigned long start = max(vma->vm_start, start_addr);
-> >       unsigned long end;
-> > @@ -1628,7 +1628,7 @@ static void unmap_single_vma(struct mmu_gather *tlb,
-> >               uprobe_munmap(vma, start, end);
-> >
-> >       if (unlikely(vma->vm_flags & VM_PFNMAP))
-> > -             untrack_pfn(vma, 0, 0);
-> > +             untrack_pfn(vma, 0, 0, mm_wr_locked);
-> >
-> >       if (start != end) {
-> >               if (unlikely(is_vm_hugetlb_page(vma))) {
-> > @@ -1675,7 +1675,7 @@ static void unmap_single_vma(struct mmu_gather *tlb,
-> >   */
-> >  void unmap_vmas(struct mmu_gather *tlb, struct maple_tree *mt,
-> >               struct vm_area_struct *vma, unsigned long start_addr,
-> > -             unsigned long end_addr)
-> > +             unsigned long end_addr, bool mm_wr_locked)
-> >  {
-> >       struct mmu_notifier_range range;
-> >       struct zap_details details = {
-> > @@ -1689,7 +1689,8 @@ void unmap_vmas(struct mmu_gather *tlb, struct maple_tree *mt,
-> >                               start_addr, end_addr);
-> >       mmu_notifier_invalidate_range_start(&range);
-> >       do {
-> > -             unmap_single_vma(tlb, vma, start_addr, end_addr, &details);
-> > +             unmap_single_vma(tlb, vma, start_addr, end_addr, &details,
-> > +                              mm_wr_locked);
-> >       } while ((vma = mas_find(&mas, end_addr - 1)) != NULL);
-> >       mmu_notifier_invalidate_range_end(&range);
-> >  }
-> > @@ -1723,7 +1724,7 @@ void zap_page_range_single(struct vm_area_struct *vma, unsigned long address,
-> >        * unmap 'address-end' not 'range.start-range.end' as range
-> >        * could have been expanded for hugetlb pmd sharing.
-> >        */
-> > -     unmap_single_vma(&tlb, vma, address, end, details);
-> > +     unmap_single_vma(&tlb, vma, address, end, details, false);
-> >       mmu_notifier_invalidate_range_end(&range);
-> >       tlb_finish_mmu(&tlb);
-> >  }
-> > @@ -2492,7 +2493,7 @@ int remap_pfn_range(struct vm_area_struct *vma, unsigned long addr,
-> >
-> >       err = remap_pfn_range_notrack(vma, addr, pfn, size, prot);
-> >       if (err)
-> > -             untrack_pfn(vma, pfn, PAGE_ALIGN(size));
-> > +             untrack_pfn(vma, pfn, PAGE_ALIGN(size), true);
-> >       return err;
-> >  }
-> >  EXPORT_SYMBOL(remap_pfn_range);
-> > diff --git a/mm/memremap.c b/mm/memremap.c
-> > index 08cbf54fe037..2f88f43d4a01 100644
-> > --- a/mm/memremap.c
-> > +++ b/mm/memremap.c
-> > @@ -129,7 +129,7 @@ static void pageunmap_range(struct dev_pagemap *pgmap, int range_id)
-> >       }
-> >       mem_hotplug_done();
-> >
-> > -     untrack_pfn(NULL, PHYS_PFN(range->start), range_len(range));
-> > +     untrack_pfn(NULL, PHYS_PFN(range->start), range_len(range), true);
-> >       pgmap_array_delete(range);
-> >  }
-> >
-> > @@ -276,7 +276,7 @@ static int pagemap_range(struct dev_pagemap *pgmap, struct mhp_params *params,
-> >       if (!is_private)
-> >               kasan_remove_zero_shadow(__va(range->start), range_len(range));
-> >  err_kasan:
-> > -     untrack_pfn(NULL, PHYS_PFN(range->start), range_len(range));
-> > +     untrack_pfn(NULL, PHYS_PFN(range->start), range_len(range), true);
-> >  err_pfn_remap:
-> >       pgmap_array_delete(range);
-> >       return error;
-> > diff --git a/mm/mmap.c b/mm/mmap.c
-> > index 2c6e9072e6a8..69d440997648 100644
-> > --- a/mm/mmap.c
-> > +++ b/mm/mmap.c
-> > @@ -78,7 +78,7 @@ core_param(ignore_rlimit_data, ignore_rlimit_data, bool, 0644);
-> >  static void unmap_region(struct mm_struct *mm, struct maple_tree *mt,
-> >               struct vm_area_struct *vma, struct vm_area_struct *prev,
-> >               struct vm_area_struct *next, unsigned long start,
-> > -             unsigned long end);
-> > +             unsigned long end, bool mm_wr_locked);
-> >
-> >  static pgprot_t vm_pgprot_modify(pgprot_t oldprot, unsigned long vm_flags)
-> >  {
-> > @@ -2136,14 +2136,14 @@ static inline void remove_mt(struct mm_struct *mm, struct ma_state *mas)
-> >  static void unmap_region(struct mm_struct *mm, struct maple_tree *mt,
-> >               struct vm_area_struct *vma, struct vm_area_struct *prev,
-> >               struct vm_area_struct *next,
-> > -             unsigned long start, unsigned long end)
-> > +             unsigned long start, unsigned long end, bool mm_wr_locked)
-> >  {
-> >       struct mmu_gather tlb;
-> >
-> >       lru_add_drain();
-> >       tlb_gather_mmu(&tlb, mm);
-> >       update_hiwater_rss(mm);
-> > -     unmap_vmas(&tlb, mt, vma, start, end);
-> > +     unmap_vmas(&tlb, mt, vma, start, end, mm_wr_locked);
-> >       free_pgtables(&tlb, mt, vma, prev ? prev->vm_end : FIRST_USER_ADDRESS,
-> >                                next ? next->vm_start : USER_PGTABLES_CEILING);
-> >       tlb_finish_mmu(&tlb);
-> > @@ -2391,7 +2391,11 @@ do_vmi_align_munmap(struct vma_iterator *vmi, struct vm_area_struct *vma,
-> >                       mmap_write_downgrade(mm);
-> >       }
-> >
-> > -     unmap_region(mm, &mt_detach, vma, prev, next, start, end);
-> > +     /*
-> > +      * We can free page tables without write-locking mmap_lock because VMAs
-> > +      * were isolated before we downgraded mmap_lock.
-> > +      */
-> > +     unmap_region(mm, &mt_detach, vma, prev, next, start, end, !downgrade);
-> >       /* Statistics and freeing VMAs */
-> >       mas_set(&mas_detach, start);
-> >       remove_mt(mm, &mas_detach);
-> > @@ -2704,7 +2708,7 @@ unsigned long mmap_region(struct file *file, unsigned long addr,
-> >
-> >               /* Undo any partial mapping done by a device driver. */
-> >               unmap_region(mm, &mm->mm_mt, vma, prev, next, vma->vm_start,
-> > -                          vma->vm_end);
-> > +                          vma->vm_end, true);
-> >       }
-> >       if (file && (vm_flags & VM_SHARED))
-> >               mapping_unmap_writable(file->f_mapping);
-> > @@ -3031,7 +3035,7 @@ void exit_mmap(struct mm_struct *mm)
-> >       tlb_gather_mmu_fullmm(&tlb, mm);
-> >       /* update_hiwater_rss(mm) here? but nobody should be looking */
-> >       /* Use ULONG_MAX here to ensure all VMAs in the mm are unmapped */
-> > -     unmap_vmas(&tlb, &mm->mm_mt, vma, 0, ULONG_MAX);
-> > +     unmap_vmas(&tlb, &mm->mm_mt, vma, 0, ULONG_MAX, false);
-> >       mmap_read_unlock(mm);
-> >
-> >       /*
-> > --
-> > 2.39.1
->
-> --
-> Michal Hocko
-> SUSE Labs
+Thanks,
+John
