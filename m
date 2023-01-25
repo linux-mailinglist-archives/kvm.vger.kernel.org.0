@@ -2,116 +2,83 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 795FC67B2D7
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 14:01:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CD1BA67B3BA
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 14:56:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235172AbjAYNB0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 08:01:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43702 "EHLO
+        id S235236AbjAYN4J (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 08:56:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232999AbjAYNBZ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 08:01:25 -0500
-Received: from new4-smtp.messagingengine.com (new4-smtp.messagingengine.com [66.111.4.230])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D19712064;
-        Wed, 25 Jan 2023 05:01:22 -0800 (PST)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 6D5F8581DCF;
-        Wed, 25 Jan 2023 07:53:28 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Wed, 25 Jan 2023 07:53:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=shutemov.name;
-         h=cc:cc:content-type:date:date:from:from:in-reply-to
-        :in-reply-to:message-id:mime-version:references:reply-to:sender
-        :subject:subject:to:to; s=fm1; t=1674651208; x=1674658408; bh=4+
-        WTh2wxYnUegwTOEldoemeAGUATx2lachXfcnNgrRM=; b=rW63RSV1s6p/5iI23s
-        pPb3Yev73vywbEK2l+K+UINyN0wq/ycFBZaIek7/rkZOTLRNsrb0bR8ni0tCGKby
-        EHkp3vTR7w59Cpw8IPpHzmtvU/PAFIfoRD4vaV/obIMlj05qa0x0RAP2GeD852oI
-        ql2jJRikMcmoNxIvJmcP7Y2F4bop+DZRBWkTHAJ76vxDVBlc2G1W0ri4zWEjF47W
-        RNJyjY1rMDCHnYAKtmDJut0wQz71Qi2dD1xllshO9o7KofTMflb45iXB1p9qfcp5
-        4SQQayRWg5q076nLUgQgb8PIAPhLi5FkrHBJEv3jQavuT8nd6Rl0xsJ+kfBWIN0h
-        5v+g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-type:date:date:feedback-id
-        :feedback-id:from:from:in-reply-to:in-reply-to:message-id
-        :mime-version:references:reply-to:sender:subject:subject:to:to
-        :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-        fm3; t=1674651208; x=1674658408; bh=4+WTh2wxYnUegwTOEldoemeAGUAT
-        x2lachXfcnNgrRM=; b=nMswIvhy39T0VwYZ++ke/f29wffPClGz2z3gerpeHY/P
-        veXiiALrTIG/Tq9iBnbIj1PjWFh/FIo+58pZWDG6X1UIpGokb3bWoMHiLtdDhXvK
-        7o1HZ0CYempwzfVV2O7x73la0cJpLaWtgAH5HWaHiJocgmAeMgBmgq83HcWq7Ffd
-        xvNnslwVO7SP3TDfN3BfKw3R3so/jjjZlzOtsjm8FsMi5As2hPcsHhGyN4/OiZIK
-        LX495GAPtTfvbAzlrws4yqPcGPUor/eUCjtIKv9eZOOb+PPPEZC7I6bP5Noa2dFF
-        yaaaeBAAMwBnWn3TsiT6GRQTzvIVT0bmyhlBeCVDHw==
-X-ME-Sender: <xms:RSbRY0TA1r4YQIZjOVqLRPcMjJJroxY05TIFzvdQrmh3afSbh6tl0A>
-    <xme:RSbRYxwR07Buzc1-9g4iscFNJklm3cZWzy2UjM9A9nop7GWGvW8iVknU2UCQDhQZs
-    1jR5u6ldOQ0FQDh9ho>
-X-ME-Received: <xmr:RSbRYx3JbfBe5NnwBX2dniGaNNSfnmu1-cBMXGWYcGd0-PPhiHZ3gt9pmNtJln1bG9KsoA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedruddvvddggeehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdttddttddtvdenucfhrhhomhepfdfmihhr
-    ihhllhcutedrucfuhhhuthgvmhhovhdfuceokhhirhhilhhlsehshhhuthgvmhhovhdrnh
-    grmhgvqeenucggtffrrghtthgvrhhnpeetvdehffelffeiveeikeduffetudeuheeiiefg
-    ueduvdevtdejhedvhfffffehfeenucffohhmrghinhepghhithhhuhgsrdgtohhmnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepkhhirhhilhhl
-    sehshhhuthgvmhhovhdrnhgrmhgv
-X-ME-Proxy: <xmx:RSbRY4AbDtPzxiU39td1Iki7uLF6-jp-3aOZzfoZGyoDTIrf9RfLeA>
-    <xmx:RSbRY9h5-h-9JQGeknGeWaqQNuf4_aCfT7IpAqbyOUSGtA1M0YIPFw>
-    <xmx:RSbRY0qNJMsSbCQasoVfsWkaEgxvOFJLjZxj4oEPBCIybrVRiUPRqg>
-    <xmx:SCbRY7GTBtI4J-Eaiys6yGJBW86fFTQIdmIVpm3Ln5Wgc4JKyv-GBA>
-Feedback-ID: ie3994620:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 25 Jan 2023 07:53:24 -0500 (EST)
-Received: by box.shutemov.name (Postfix, from userid 1000)
-        id 83A27104985; Wed, 25 Jan 2023 15:53:21 +0300 (+03)
-Date:   Wed, 25 Jan 2023 15:53:21 +0300
-From:   "Kirill A. Shutemov" <kirill@shutemov.name>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Liam Merwick <liam.merwick@oracle.com>,
-        Chao Peng <chao.p.peng@linux.intel.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-fsdevel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-doc@vger.kernel.org,
-        qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Naoya Horiguchi <naoya.horiguchi@nec.com>,
-        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
-        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
-        Jeff Layton <jlayton@kernel.org>,
-        "J . Bruce Fields" <bfields@fieldses.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
-        Steven Price <steven.price@arm.com>,
-        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        Vishal Annapurve <vannapurve@google.com>,
-        Yu Zhang <yu.c.zhang@linux.intel.com>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
-        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
-        ddutile@redhat.com, dhildenb@redhat.com,
-        Quentin Perret <qperret@google.com>, tabba@google.com,
-        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
-        wei.w.wang@intel.com
-Subject: Re: [PATCH v10 0/9] KVM: mm: fd-based approach for supporting KVM
-Message-ID: <20230125125321.yvsivupbbaqkb7a5@box.shutemov.name>
-References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
- <Y8H5Z3e4hZkFxAVS@google.com>
- <48953bf2-cee9-f818-dc50-5fb5b9b410bf@oracle.com>
- <Y9B1yiRR8DpANAEo@google.com>
+        with ESMTP id S235045AbjAYN4H (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 08:56:07 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB0DA1D936;
+        Wed, 25 Jan 2023 05:56:06 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30PBOL3r024672;
+        Wed, 25 Jan 2023 13:56:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=PBEXySdGnWe/PdFBrPgqRd2ENJcoGhhh3uaUOIR8qeY=;
+ b=MC5jBRYccFuIvmTarlPvCI1IU35Rafy5XN798/MI2Q+gFzlozWlcPVjMlT1k4AKj1GY9
+ obgSVi8mF3jNWyjKAN2/MSlXaKj+ynQJ9V7uKxVkXbTi3hf3lwFWuoRnEwMMeVGA+RZ6
+ +w78Za9BXKAfszTeyykp+U8HHSRPf4F5MVBEJvhiRSHlbdT2ukYH1iuoLnTQmblUCWCJ
+ x3BvTFUSigrIedHxDkL2CQ1fexvt02qqOlsSx3DHBcPmmxALLjeV310Dsw/TU7GCB4dm
+ ShH530EBT9nyV/zW1oAal2AHwq+SQGerjqcynKqLikFSCLMUTUuKa3t6RhTdSxK+z2tp Dw== 
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nac965f03-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 25 Jan 2023 13:56:05 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30OJYHkh026587;
+        Wed, 25 Jan 2023 13:56:03 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3n87p6br4v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 25 Jan 2023 13:56:03 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30PDu0A350659662
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 25 Jan 2023 13:56:00 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 37D5020040;
+        Wed, 25 Jan 2023 13:56:00 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DAC362004B;
+        Wed, 25 Jan 2023 13:55:59 +0000 (GMT)
+Received: from [9.171.63.61] (unknown [9.171.63.61])
+        by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 25 Jan 2023 13:55:59 +0000 (GMT)
+Message-ID: <2ef9a5df-cd05-8f27-f8ee-4c03f4c43d0d@linux.ibm.com>
+Date:   Wed, 25 Jan 2023 14:55:59 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9B1yiRR8DpANAEo@google.com>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+References: <20230120075406.101436-1-nrb@linux.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v1] KVM: s390: disable migration mode when dirty tracking
+ is disabled
+In-Reply-To: <20230120075406.101436-1-nrb@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: isX1apSCozSi0mBUsVE_HYNk3H2QfdNy
+X-Proofpoint-ORIG-GUID: isX1apSCozSi0mBUsVE_HYNk3H2QfdNy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-25_08,2023-01-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ malwarescore=0 spamscore=0 mlxscore=0 mlxlogscore=996 bulkscore=0
+ phishscore=0 priorityscore=1501 lowpriorityscore=0 impostorscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301250121
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
         SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -119,86 +86,132 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 12:20:26AM +0000, Sean Christopherson wrote:
-> On Tue, Jan 24, 2023, Liam Merwick wrote:
-> > On 14/01/2023 00:37, Sean Christopherson wrote:
-> > > On Fri, Dec 02, 2022, Chao Peng wrote:
-> > > > This patch series implements KVM guest private memory for confidential
-> > > > computing scenarios like Intel TDX[1]. If a TDX host accesses
-> > > > TDX-protected guest memory, machine check can happen which can further
-> > > > crash the running host system, this is terrible for multi-tenant
-> > > > configurations. The host accesses include those from KVM userspace like
-> > > > QEMU. This series addresses KVM userspace induced crash by introducing
-> > > > new mm and KVM interfaces so KVM userspace can still manage guest memory
-> > > > via a fd-based approach, but it can never access the guest memory
-> > > > content.
-> > > > 
-> > > > The patch series touches both core mm and KVM code. I appreciate
-> > > > Andrew/Hugh and Paolo/Sean can review and pick these patches. Any other
-> > > > reviews are always welcome.
-> > > >    - 01: mm change, target for mm tree
-> > > >    - 02-09: KVM change, target for KVM tree
-> > > 
-> > > A version with all of my feedback, plus reworked versions of Vishal's selftest,
-> > > is available here:
-> > > 
-> > >    git@github.com:sean-jc/linux.git x86/upm_base_support
-> > > 
-> > > It compiles and passes the selftest, but it's otherwise barely tested.  There are
-> > > a few todos (2 I think?) and many of the commits need changelogs, i.e. it's still
-> > > a WIP.
-> > > 
-> > 
-> > When running LTP (https://github.com/linux-test-project/ltp) on the v10
-> > bits (and also with Sean's branch above) I encounter the following NULL
-> > pointer dereference with testcases/kernel/syscalls/madvise/madvise01
-> > (100% reproducible).
-> > 
-> > It appears that in restrictedmem_error_page() inode->i_mapping->private_data
-> > is NULL
-> > in the list_for_each_entry_safe(inode, next, &sb->s_inodes, i_sb_list)
-> > but I don't know why.
+On 1/20/23 08:54, Nico Boehr wrote:
+> Migration mode is a VM attribute which enables tracking of changes in
+> storage attributes (PGSTE). It assumes dirty tracking is enabled on all
+> memslots to keep a dirty bitmap of pages with changed storage attributes.
 > 
-> Kirill, can you take a look?  Or pass the buck to someone who can? :-)
+> When enabling migration mode, we currently check that dirty tracking is
+> enabled for all memslots. However, userspace can disable dirty tracking
+> without disabling migration mode.
+> 
+> Since migration mode is pointless with dirty tracking disabled, disable
+> migration mode whenever userspace disables dirty tracking on any slot.
 
-The patch below should help.
+Will userspace be able to handle the sudden -EINVAL rcs on 
+KVM_S390_GET_CMMA_BITS and KVM_S390_SET_CMMA_BITS?
 
-diff --git a/mm/restrictedmem.c b/mm/restrictedmem.c
-index 15c52301eeb9..39ada985c7c0 100644
---- a/mm/restrictedmem.c
-+++ b/mm/restrictedmem.c
-@@ -307,14 +307,29 @@ void restrictedmem_error_page(struct page *page, struct address_space *mapping)
- 
- 	spin_lock(&sb->s_inode_list_lock);
- 	list_for_each_entry_safe(inode, next, &sb->s_inodes, i_sb_list) {
--		struct restrictedmem *rm = inode->i_mapping->private_data;
- 		struct restrictedmem_notifier *notifier;
--		struct file *memfd = rm->memfd;
-+		struct restrictedmem *rm;
- 		unsigned long index;
-+		struct file *memfd;
- 
--		if (memfd->f_mapping != mapping)
-+		if (atomic_read(&inode->i_count))
- 			continue;
- 
-+		spin_lock(&inode->i_lock);
-+		if (inode->i_state & (I_NEW | I_FREEING | I_WILL_FREE)) {
-+			spin_unlock(&inode->i_lock);
-+			continue;
-+		}
-+
-+		rm = inode->i_mapping->private_data;
-+		memfd = rm->memfd;
-+
-+		if (memfd->f_mapping != mapping) {
-+			spin_unlock(&inode->i_lock);
-+			continue;
-+		}
-+		spin_unlock(&inode->i_lock);
-+
- 		xa_for_each_range(&rm->bindings, index, notifier, start, end)
- 			notifier->ops->error(notifier, start, end);
- 		break;
--- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+I.e. what allows us to simply turn it off without the userspace knowing 
+about it?
+
+> 
+> Also update the documentation to clarify that dirty tracking must be
+> enabled when enabling migration mode, which is already enforced by the
+> code in kvm_s390_vm_start_migration().
+> 
+> To disable migration mode, slots_lock should be held, which is taken
+> in kvm_set_memory_region() and thus held in
+> kvm_arch_prepare_memory_region().
+> 
+> Restructure the prepare code a bit so all the sanity checking is done
+> before disabling migration mode. This ensures migration mode isn't
+> disabled when some sanity check fails.
+> 
+> Cc: stable@vger.kernel.org
+> Fixes: 190df4a212a7 ("KVM: s390: CMMA tracking, ESSA emulation, migration mode")
+> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> ---
+>   Documentation/virt/kvm/devices/vm.rst |  4 +++
+>   arch/s390/kvm/kvm-s390.c              | 41 ++++++++++++++++++---------
+>   2 files changed, 32 insertions(+), 13 deletions(-)
+> 
+> diff --git a/Documentation/virt/kvm/devices/vm.rst b/Documentation/virt/kvm/devices/vm.rst
+> index 60acc39e0e93..147efec626e5 100644
+> --- a/Documentation/virt/kvm/devices/vm.rst
+> +++ b/Documentation/virt/kvm/devices/vm.rst
+> @@ -302,6 +302,10 @@ Allows userspace to start migration mode, needed for PGSTE migration.
+>   Setting this attribute when migration mode is already active will have
+>   no effects.
+>   
+> +Dirty tracking must be enabled on all memslots, else -EINVAL is returned. When
+> +dirty tracking is disabled on any memslot, migration mode is automatically
+> +stopped.
+
+Do we also need to add a warning to the CMMA IOCTLs?
+
+> +
+>   :Parameters: none
+>   :Returns:   -ENOMEM if there is not enough free memory to start migration mode;
+>   	    -EINVAL if the state of the VM is invalid (e.g. no memory defined);
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index e4890e04b210..4785f002cd93 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -5628,28 +5628,43 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+>   				   enum kvm_mr_change change)
+>   {
+>   	gpa_t size;
+> +	int rc;
+
+Not sure why you added rc even though it doesn't need to be used.
+
+>   
+>   	/* When we are protected, we should not change the memory slots */
+>   	if (kvm_s390_pv_get_handle(kvm))
+>   		return -EINVAL;
+>   
+> -	if (change == KVM_MR_DELETE || change == KVM_MR_FLAGS_ONLY)
+> -		return 0;
+> +	if (change != KVM_MR_DELETE && change != KVM_MR_FLAGS_ONLY) {
+> +		/* A few sanity checks. We can have memory slots which have to be
+> +		 * located/ended at a segment boundary (1MB). The memory in userland is
+> +		 * ok to be fragmented into various different vmas. It is okay to mmap()
+> +		 * and munmap() stuff in this slot after doing this call at any time
+> +		 */
+
+This isn't net code, we usually start our comments on a "*" line.
+
+>   
+> -	/* A few sanity checks. We can have memory slots which have to be
+> -	   located/ended at a segment boundary (1MB). The memory in userland is
+> -	   ok to be fragmented into various different vmas. It is okay to mmap()
+> -	   and munmap() stuff in this slot after doing this call at any time */
+> +		if (new->userspace_addr & 0xffffful)
+> +			return -EINVAL;
+>   
+> -	if (new->userspace_addr & 0xffffful)
+> -		return -EINVAL;
+> +		size = new->npages * PAGE_SIZE;
+> +		if (size & 0xffffful)
+> +			return -EINVAL;
+>   
+> -	size = new->npages * PAGE_SIZE;
+> -	if (size & 0xffffful)
+> -		return -EINVAL;
+> +		if ((new->base_gfn * PAGE_SIZE) + size > kvm->arch.mem_limit)
+> +			return -EINVAL;
+> +	}
+>   
+> -	if ((new->base_gfn * PAGE_SIZE) + size > kvm->arch.mem_limit)
+> -		return -EINVAL;
+> +	/* Turn off migration mode when userspace disables dirty page logging.
+> +	 * Migration mode expects dirty page logging being enabled to store
+> +	 * its dirty bitmap.
+> +	 */
+> +	if (kvm->arch.migration_mode) {
+> +		if ((old->flags & KVM_MEM_LOG_DIRTY_PAGES) &&
+> +		    !(new->flags & KVM_MEM_LOG_DIRTY_PAGES)) {
+> +			rc = kvm_s390_vm_stop_migration(kvm);
+> +
+> +			if (rc)
+> +				pr_warn("Failed to stop migration mode\n");
+
+As the results were rather catastrophic it might make more sense to use 
+WARN_ONCE() and condense these 3 lines into one.
+
+> +		}
+> +	}
+>   
+>   	return 0;
+>   }
+
