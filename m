@@ -2,71 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BD55667A730
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 00:49:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E18E467A75A
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 01:10:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234486AbjAXXtb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 18:49:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49090 "EHLO
+        id S230404AbjAYAKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 19:10:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234326AbjAXXt0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 18:49:26 -0500
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B3BD49560
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 15:49:23 -0800 (PST)
-Received: by mail-pj1-x1049.google.com with SMTP id s24-20020a17090aa11800b00229fef3ac5dso131772pjp.5
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 15:49:23 -0800 (PST)
+        with ESMTP id S229546AbjAYAKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 19:10:16 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0BE4474E4
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 16:10:15 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id v23so16402085plo.1
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 16:10:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=UzMRX5SFUfOVkL2DhNd2WmgacyEPpUxAyESmr0cYTPo=;
-        b=U+2hjRjwdAw4rgSwJT4rTLx+XWZ6VA8xRr9CDH5MmtQ0DMC6I8AZu0utxcCMToxUt0
-         qEvmcAkPf0Z2PX0nGGVKoNQUWR9l3i/D88vwPrfs8FLHGmwsaNXkyQ4SaZ0wNIo8qhJZ
-         R8B0xXP4sv2OG4APlw8RdWx2ZdMWW2NUv5HfnHJ7M+2LhRT5WIz/p0YGDe3qGGVS8kRc
-         WcwkOSYbpY2N7QzFWXEuHkLkmO9KTO0XKtPlZ+kjdrEluzgZ2iPKY0u7rrxc+5NhusWx
-         XxSaFjfe7ss8AqeFDPdA+yjfi8DZ9I7MtXqYDCSNAlrfv5iKsocGtMA8YD6lzk6vGcYX
-         foLQ==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kvQQY5R/smm2VpLt79RKnjfK0iF1mBHjWIkac6Aen1w=;
+        b=DePKpPk+izzwBKxlN6VqyaCycZe6DgWRR0tmOk/Qy5d7YS05HX83MPEYVtNPSLLclj
+         qZre+ZkAG7HUdzU1qJscs8RAa3BiuAJlF9fw8GKkz5rXiWOwMDD7FK0nR4BSL3YHF/sp
+         UwbNZNzBvdEAnyLXw7W0w5xJg4VYFWMnNr6NzpdG+IZwcAH0pBN8ESPjUxqjZKLhoy/+
+         3KJtQhMkBvy11jsxRXOTULAVH5BRjyy3Tj6DkzpIONTYBuEJ0kPVCTps5iSJrYKuAskP
+         y0vA4ImMwi8WYqhBNFZNDUox5Sbq0hbSZ34aXC13ikv74oDNrRBDIdqFTJNdAPb1VInx
+         EhEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UzMRX5SFUfOVkL2DhNd2WmgacyEPpUxAyESmr0cYTPo=;
-        b=zZgVgrV/FUhrrcB+Ydf0zo0mYng0dmXZZ6anyJcyJxHbgSrrx+86XvLfRaMknKgLqM
-         QpIaUJ4PlFD/2bA1ECsj15huoCxF8eeX77ivZGtvxGsqVN9klZNhLazj50+bmQY0ptUQ
-         CscGIDFYF3uzVLF46nCncGg/VGzKFa9pMYojdsKXiNuX1ld6cGvx0kIKslg+8HXPiQJs
-         YyKwZKoWID4BrU4JrQoY3MOG2XkI0LmJMsURxWVM7Q5uPpTTbPXEJeiEPxwbWuIeKSjS
-         Ec16CGg4gQF9mymWvUwDo4oXMDnnaJupEGs3AE4nBU4mksutEnvIFARzRlQA+BKaYJ6N
-         jFaA==
-X-Gm-Message-State: AFqh2krRzv4Td521abKrYFHMsErgbjARjA5IRnVkDTdLhllHAAvCIiZn
-        KxCgOFiuzyFIpXfVTT7cSt2se5soj4c=
-X-Google-Smtp-Source: AMrXdXuK/2YHhj4eTdRh15QrAi1gGGAbhQFHxWDpJQGzDuXV8X4TYOIqARvH1aClbII5MaCT1Ll9QeXYTuY=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:4088:b0:576:cc71:b8e4 with SMTP id
- bw8-20020a056a00408800b00576cc71b8e4mr3170694pfb.20.1674604163135; Tue, 24
- Jan 2023 15:49:23 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Tue, 24 Jan 2023 23:49:05 +0000
-In-Reply-To: <20230124234905.3774678-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230124234905.3774678-1-seanjc@google.com>
-X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
-Message-ID: <20230124234905.3774678-7-seanjc@google.com>
-Subject: [PATCH 6/6] KVM: x86/pmu: Provide "error" semantics for
- unsupported-but-known PMU MSRs
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kvQQY5R/smm2VpLt79RKnjfK0iF1mBHjWIkac6Aen1w=;
+        b=5HeQ7TAvpPdy2dU3hA7meFsMXAxYtd9AzTN75jgGJKIhxQo5nd5l6XVzAxHt8+CsJ/
+         sUnIJFSkBDRUBLABCi2wmmtmZiC6Mno0FLV+Z6lz1I8r4M/KmhUEpSrrr4LVMVJpI4++
+         Z+ip7rvyWZvmZJgzGgGVXTI9UrR+NXssXO4hyVjh7JkbvxGROvg2gx9+zsXRdUIHwX1c
+         NZqg3olnApcAKJxBw14XynmK1xlBU28DhBIRoKfuBDBr3YzxnuXmKu3jkBqjLJk2nCpP
+         Bq7gfeZacOz9wWiPuoaBmmKbymdkyd47dsnx9lStg3r1X7gpUj+2Ba0F/wgc1DxWZJRg
+         ztDA==
+X-Gm-Message-State: AO0yUKUhl2/yOCCSP4wrs0w75IOWhmZhaf1gwSQtZyYcXcPrg/nA1EXm
+        BY8J+1gCfMA1HYPS21gTvv096A==
+X-Google-Smtp-Source: AK7set/jVpOixJjbQ2WRp5+nE0HpwuNbU1zpLJ9qSvLTawGNSnxn+fFUXp15uUUfsCklU1ALw/xoqw==
+X-Received: by 2002:a05:6a21:998a:b0:b8:c859:7fc4 with SMTP id ve10-20020a056a21998a00b000b8c8597fc4mr501308pzb.1.1674605414680;
+        Tue, 24 Jan 2023 16:10:14 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id u4-20020a17090ae00400b0022bbad75af4sm139372pjy.2.2023.01.24.16.10.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jan 2023 16:10:14 -0800 (PST)
+Date:   Wed, 25 Jan 2023 00:10:11 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>,
-        Weijiang Yang <weijiang.yang@intel.com>,
-        Like Xu <likexu@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>
+Subject: Re: [PATCH v3 6/8] KVM: x86/svm/pmu: Add AMD PerfMonV2 support
+Message-ID: <Y9BzYzEjAwUA+wuy@google.com>
+References: <20221111102645.82001-1-likexu@tencent.com>
+ <20221111102645.82001-7-likexu@tencent.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221111102645.82001-7-likexu@tencent.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,113 +72,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Provide "error" semantics (read zeros, drop writes) for userspace accesses
-to MSRs that are ultimately unsupported for whatever reason, but for which
-KVM told userspace to save and restore the MSR, i.e. for MSRs that KVM
-included in KVM_GET_MSR_INDEX_LIST.
+On Fri, Nov 11, 2022, Like Xu wrote:
+On Fri, Nov 11, 2022, Like Xu wrote:
+> @@ -162,20 +179,42 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
+>  {
+>       struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +     struct kvm_cpuid_entry2 *entry;
+> +     union cpuid_0x80000022_ebx ebx;
+>
+> -     if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
+> -             pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS_CORE;
+> +     pmu->version = 1;
+> +     if (kvm_cpu_cap_has(X86_FEATURE_AMD_PMU_V2) &&
 
-Previously, KVM special cased a few PMU MSRs that were problematic at one
-point or another.  Extend the treatment to all PMU MSRs, e.g. to avoid
-spurious unsupported accesses.
+Why check kvm_cpu_cap support?  I.e. what will go wrong if userspace enumerates
+PMU v2 to the guest without proper hardware/KVM support.
 
-Note, the logic can also be used for non-PMU MSRs, but as of today only
-PMU MSRs can end up being unsupported after KVM told userspace to save and
-restore them.
+If this is _necessary_ to protect the host kernel, then we should probably have
+a helper to query PMU features, e.g.
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 51 ++++++++++++++++++++++++++--------------------
- 1 file changed, 29 insertions(+), 22 deletions(-)
+static __always_inline bool guest_pmu_has(struct kvm_vcpu *vcpu,
+                                          unsigned int x86_feature)
+{
+        return kvm_cpu_cap_has(x86_feature) &&
+               guest_cpuid_has(vcpu, x86_feature);
+}
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 3c49c86b973d..64c567a1b32b 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3561,6 +3561,18 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
- 	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
- }
- 
-+static bool kvm_is_msr_to_save(u32 msr_index)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < num_msrs_to_save; i++) {
-+		if (msrs_to_save[i] == msr_index)
-+			return true;
-+	}
-+
-+	return false;
-+}
-+
- int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- {
- 	u32 msr = msr_info->index;
-@@ -3876,20 +3888,18 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		vcpu->arch.guest_fpu.xfd_err = data;
- 		break;
- #endif
--	case MSR_IA32_PEBS_ENABLE:
--	case MSR_IA32_DS_AREA:
--	case MSR_PEBS_DATA_CFG:
--	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
-+	default:
- 		if (kvm_pmu_is_valid_msr(vcpu, msr))
- 			return kvm_pmu_set_msr(vcpu, msr_info);
-+
- 		/*
- 		 * Userspace is allowed to write '0' to MSRs that KVM reports
- 		 * as to-be-saved, even if an MSRs isn't fully supported.
- 		 */
--		return !msr_info->host_initiated || data;
--	default:
--		if (kvm_pmu_is_valid_msr(vcpu, msr))
--			return kvm_pmu_set_msr(vcpu, msr_info);
-+		if (msr_info->host_initiated && !data &&
-+		    kvm_is_msr_to_save(msr))
-+			break;
-+
- 		return KVM_MSR_RET_INVALID;
- 	}
- 	return 0;
-@@ -3979,20 +3989,6 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_DRAM_ENERGY_STATUS:	/* DRAM controller */
- 		msr_info->data = 0;
- 		break;
--	case MSR_IA32_PEBS_ENABLE:
--	case MSR_IA32_DS_AREA:
--	case MSR_PEBS_DATA_CFG:
--	case MSR_F15H_PERF_CTL0 ... MSR_F15H_PERF_CTR5:
--		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
--			return kvm_pmu_get_msr(vcpu, msr_info);
--		/*
--		 * Userspace is allowed to read MSRs that KVM reports as
--		 * to-be-saved, even if an MSR isn't fully supported.
--		 */
--		if (!msr_info->host_initiated)
--			return 1;
--		msr_info->data = 0;
--		break;
- 	case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
- 	case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
- 	case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
-@@ -4248,6 +4244,17 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	default:
- 		if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
- 			return kvm_pmu_get_msr(vcpu, msr_info);
-+
-+		/*
-+		 * Userspace is allowed to read MSRs that KVM reports as
-+		 * to-be-saved, even if an MSR isn't fully supported.
-+		 */
-+		if (msr_info->host_initiated &&
-+		    kvm_is_msr_to_save(msr_info->index)) {
-+			msr_info->data = 0;
-+			break;
-+		}
-+
- 		return KVM_MSR_RET_INVALID;
- 	}
- 	return 0;
--- 
-2.39.1.456.gfc5497dd1b-goog
 
+
+> +         guest_cpuid_has(vcpu, X86_FEATURE_AMD_PMU_V2)) {
+> +             pmu->version = 2;
+> +             entry = kvm_find_cpuid_entry_index(vcpu, 0x80000022, 0);
+> +             ebx.full = entry->ebx;
+> +             pmu->nr_arch_gp_counters = min3((unsigned int)ebx.split.num_core_pmc,
+> +                                             (unsigned int)kvm_pmu_cap.num_counters_gp,
+> +                                             (unsigned int)KVM_AMD_PMC_MAX_GENERIC);
+
+Blech.  This really shouldn't be necessary, KVM should tweak kvm_pmu_cap.num_counters_gp
+as needed during initialization to ensure num_counters_gp doesn't exceed KVM's
+internal limits.
+
+Posted a patch[*], please take a look.  As mentioned in that thread, I'll somewhat
+speculatively apply that series sooner than later so that you can use it a base
+for this series (assuming the patch isn't busted).
+
+[*] https://lore.kernel.org/all/20230124234905.3774678-2-seanjc@google.com
+
+> +     }
+> +
+> +     /* Commitment to minimal PMCs, regardless of CPUID.80000022 */
+
+Please expand this comment.  I'm still not entirely sure I've interpreted it correctly,
+and I'm not sure that I agree with the code.
+
+> +     if (kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE) &&
+
+AFAICT, checking kvm_cpu_cap_has() is an unrelated change.  Either it's a bug fix
+and belongs in a separate patch, or it's unnecessary and should be dropped.
+
+> +         guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
+> +             pmu->nr_arch_gp_counters = max_t(unsigned int,
+> +                                              pmu->nr_arch_gp_counters,
+> +                                              AMD64_NUM_COUNTERS_CORE);
+>       else
+> -             pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS;
+> +             pmu->nr_arch_gp_counters = max_t(unsigned int,
+> +                                              pmu->nr_arch_gp_counters,
+> +                                              AMD64_NUM_COUNTERS);
+
+Using max() doesn't look right.  E.g. if KVM ends up running on some odd setup
+where ebx.split.num_core_pmc/kvm_pmu_cap.num_counters_gp is less than
+AMD64_NUM_COUNTERS_CORE or AMD64_NUM_COUNTERS.
+
+Or more likely, if userspace says "only expose N counters to this guest".
+
+Shouldn't this be something like?
+
+	if (guest_cpuid_has(vcpu, X86_FEATURE_AMD_PMU_V2))
+		pmu->nr_arch_gp_counters = min(ebx.split.num_core_pmc,
+					       kvm_pmu_cap.num_counters_gp);
+	else if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
+		pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS_CORE;
+	else
+		pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERSE;
