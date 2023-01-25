@@ -2,129 +2,187 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1621367B43E
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 15:23:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B7A6267B5B5
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 16:20:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235173AbjAYOXc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 09:23:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58618 "EHLO
+        id S235842AbjAYPUX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 10:20:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235286AbjAYOXO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 09:23:14 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF5C359549
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 06:22:41 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id y3-20020a17090a390300b00229add7bb36so2136488pjb.4
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 06:22:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2C3HjWrZB+7wSfjrD6r343Y4MWemAjdetwdnRYMFDS8=;
-        b=WHskQHqaOrEN26WyhV97d7Bg1iUstUPltyWS3O/fjmP+aSMAy1DoSKn7CMZml+K0yJ
-         d+5PX44kEX/Q/gqJGcM2zTd5Lewm76vjAC0t2yD253Vji1Ci06HxX5599SPKXI9C0Kci
-         U4LYPdODDXEl5pERcWF41p5r4kJ7emeU7czoNtpPSCM6rBgj79Tlkv5c7u6ABrGXAcwv
-         Zr7WdrtZWuuHr/dw7sn5sp0O4FZZtC11h9t1pQvsiyfGQEgKhgAT9DUwmYzv2LL+3cxH
-         Tai7bu2utXuMArBGP49Gh8EDJL4QrkKuQczUvWgJkIiz2/TKKTeUSqtJCmXmtRlhkn7E
-         tyHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2C3HjWrZB+7wSfjrD6r343Y4MWemAjdetwdnRYMFDS8=;
-        b=SrnK01uZIFsaXVUz2FT4o50xJHIlUWGdwrYNOuB8P2+pSf/Gr2vDp9P1uDRse2cgK2
-         kXbyAtYsCG5GO4DFHPPna/GYiYY2FyFO7V7vaIqz4FSQvgOBlRe9DS8TSBNFkUQUtD/B
-         M2JSCwniOJ0Yk7MSVLu6CD9IYy43yHHNNr4zlYCwvtkSVQKKMogpSWNSp8QYGB92k4Ss
-         sBR8Wes9IZF2Njme5t5bAxfojonQiy0C4wD8otnfPcww6pDJqhG2Yc6XPgg5rgmmnEZ4
-         UU8+pKIRuKuwI3FF34TFoSw2S02Y1Tp8yXrsHdSw6tsl+/sYjU1+oqMLm8BU9/jn+rdZ
-         5Tlg==
-X-Gm-Message-State: AFqh2kpV5XJCoSUvi6KygpPXfQ2p+fRhf9UXMyltUh/Mg50RiXms+tcp
-        SthXrzJFsWrWsGipVzD/OxgQWw==
-X-Google-Smtp-Source: AMrXdXtxy2JSAotwxjD+LLAsHQS6lJjbYHIewFy59htIOvhSpptE3SMPHca/oLJ27jZ+84EGJbLR7w==
-X-Received: by 2002:a05:6a20:4998:b0:b8:652a:79f2 with SMTP id fs24-20020a056a20499800b000b8652a79f2mr29889418pzb.11.1674656561421;
-        Wed, 25 Jan 2023 06:22:41 -0800 (PST)
-Received: from hsinchu25.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id bu11-20020a63294b000000b004a3510effa5sm3203520pgb.65.2023.01.25.06.22.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jan 2023 06:22:41 -0800 (PST)
-From:   Andy Chiu <andy.chiu@sifive.com>
-To:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-Cc:     vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Andy Chiu <andy.chiu@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Subject: [PATCH -next v13 19/19] riscv: Enable Vector code to be built
-Date:   Wed, 25 Jan 2023 14:20:56 +0000
-Message-Id: <20230125142056.18356-20-andy.chiu@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230125142056.18356-1-andy.chiu@sifive.com>
-References: <20230125142056.18356-1-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S235306AbjAYPUW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 10:20:22 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 07F6218AA8;
+        Wed, 25 Jan 2023 07:20:21 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DF144B3;
+        Wed, 25 Jan 2023 07:21:02 -0800 (PST)
+Received: from FVFF77S0Q05N.cambridge.arm.com (FVFF77S0Q05N.cambridge.arm.com [10.1.31.176])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7EEAD3F71E;
+        Wed, 25 Jan 2023 07:20:16 -0800 (PST)
+Date:   Wed, 25 Jan 2023 15:20:08 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     mingo@kernel.org, will@kernel.org, boqun.feng@gmail.com,
+        tglx@linutronix.de, bp@alien8.de, dave.hansen@linux.intel.com,
+        x86@kernel.org, hpa@zytor.com, seanjc@google.com,
+        pbonzini@redhat.com, jgross@suse.com, srivatsa@csail.mit.edu,
+        amakhalov@vmware.com, pv-drivers@vmware.com, rostedt@goodmis.org,
+        mhiramat@kernel.org, wanpengli@tencent.com, vkuznets@redhat.com,
+        boris.ostrovsky@oracle.com, rafael@kernel.org,
+        daniel.lezcano@linaro.org, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
+        vschneid@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-trace-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
+        Lorenzo Pieralisi <lpieralisi@kernel.org>
+Subject: Re: [PATCH 0/6] A few cpuidle vs rcu fixes
+Message-ID: <Y9FIqD21+DZU2kjV@FVFF77S0Q05N.cambridge.arm.com>
+References: <20230123205009.790550642@infradead.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230123205009.790550642@infradead.org>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Guo Ren <guoren@linux.alibaba.com>
+Hi Peter,
 
-This patch adds a config which enables vector feature from the kernel
-space.
+On Mon, Jan 23, 2023 at 09:50:09PM +0100, Peter Zijlstra wrote:
+> 0-day robot reported graph-tracing made the cpuidle-vs-rcu rework go splat.
+> 
+> These patches appear to cure this, the ftrace selftest now runs to completion
+> without spamming scary messages to dmesg.
 
-Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-Co-developed-by: Greentime Hu <greentime.hu@sifive.com>
-Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-Suggested-by: Vineet Gupta <vineetg@rivosinc.com>
-Suggested-by: Atish Patra <atishp@atishpatra.org>
-Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
+In addition to the other bits for arm64, we'll need the following patch. Are
+you happy to add that to the start of this series?
+
+I've tested this on an arm64 Juno board with a full-fat ftrace config,
+CONFIG_PROVE_LOCKING + CONFIG_DEBUG_LOCKDEP, and CONFIG_DEBUG_VIRTUAL=y, and
+build tested for 32-bit arm.
+
+Thanks,
+Mark.
+
+---->8----
+From 30ab9eba19e952cb51c9f599d2ac9b8a302cb63d Mon Sep 17 00:00:00 2001
+From: Mark Rutland <mark.rutland@arm.com>
+Date: Wed, 25 Jan 2023 14:20:49 +0000
+Subject: [PATCH] drivers: firmware: psci: don't instrument suspend code
+
+The PSCI suspend code is currently instrumentable, which is not safe as
+instrumentation (e.g. ftrace) may try to make use of RCU during idle
+periods when RCU is not watching.
+
+To fix this we need to ensure that psci_suspend_finisher() and anything
+it calls are not instrumented. We can do this fairly simply by marking
+psci_suspend_finisher() and the psci*_cpu_suspend() functions as
+noinstr, and the underlying helper functions as __always_inline.
+
+When CONFIG_DEBUG_VIRTUAL=y, __pa_symbol() can expand to an out-of-line
+instrumented function, so we must use __pa_symbol_nodebug() within
+psci_suspend_finisher().
+
+The raw SMCCC invocation functions are written in assembly, and are not
+subject to compiler instrumentation.
+
+Signed-off-by: Mark Rutland <mark.rutland@arm.com>
+Cc: Lorenzo Pieralisi <lpieralisi@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
 ---
- arch/riscv/Kconfig  | 10 ++++++++++
- arch/riscv/Makefile |  7 +++++++
- 2 files changed, 17 insertions(+)
+ drivers/firmware/psci/psci.c | 31 +++++++++++++++++++------------
+ 1 file changed, 19 insertions(+), 12 deletions(-)
 
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index e2b656043abf..f4299ba9a843 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -416,6 +416,16 @@ config RISCV_ISA_SVPBMT
+diff --git a/drivers/firmware/psci/psci.c b/drivers/firmware/psci/psci.c
+index f3a044fa4652a..c12847b4736de 100644
+--- a/drivers/firmware/psci/psci.c
++++ b/drivers/firmware/psci/psci.c
+@@ -108,9 +108,10 @@ bool psci_power_state_is_valid(u32 state)
+ 	return !(state & ~valid_mask);
+ }
  
- 	   If you don't know what to do here, say Y.
+-static unsigned long __invoke_psci_fn_hvc(unsigned long function_id,
+-			unsigned long arg0, unsigned long arg1,
+-			unsigned long arg2)
++static __always_inline unsigned long
++__invoke_psci_fn_hvc(unsigned long function_id,
++		     unsigned long arg0, unsigned long arg1,
++		     unsigned long arg2)
+ {
+ 	struct arm_smccc_res res;
  
-+config RISCV_ISA_V
-+	bool "VECTOR extension support"
-+	depends on GCC_VERSION >= 120000 || CLANG_VERSION >= 130000
-+	default n
-+	help
-+	  Say N here if you want to disable all vector related procedure
-+	  in the kernel.
-+
-+	  If you don't know what to do here, say Y.
-+
- config TOOLCHAIN_HAS_ZICBOM
- 	bool
- 	default y
-diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
-index 12d91b0a73d8..67411cdc836f 100644
---- a/arch/riscv/Makefile
-+++ b/arch/riscv/Makefile
-@@ -52,6 +52,13 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:= rv32ima
- riscv-march-$(CONFIG_ARCH_RV64I)	:= rv64ima
- riscv-march-$(CONFIG_FPU)		:= $(riscv-march-y)fd
- riscv-march-$(CONFIG_RISCV_ISA_C)	:= $(riscv-march-y)c
-+riscv-march-$(CONFIG_RISCV_ISA_V)	:= $(riscv-march-y)v
-+
-+ifeq ($(CONFIG_RISCV_ISA_V), y)
-+ifeq ($(CONFIG_CC_IS_CLANG), y)
-+        riscv-march-y += -mno-implicit-float -menable-experimental-extensions
-+endif
-+endif
+@@ -118,9 +119,10 @@ static unsigned long __invoke_psci_fn_hvc(unsigned long function_id,
+ 	return res.a0;
+ }
  
- # Newer binutils versions default to ISA spec version 20191213 which moves some
- # instructions from the I extension to the Zicsr and Zifencei extensions.
+-static unsigned long __invoke_psci_fn_smc(unsigned long function_id,
+-			unsigned long arg0, unsigned long arg1,
+-			unsigned long arg2)
++static __always_inline unsigned long
++__invoke_psci_fn_smc(unsigned long function_id,
++		     unsigned long arg0, unsigned long arg1,
++		     unsigned long arg2)
+ {
+ 	struct arm_smccc_res res;
+ 
+@@ -128,7 +130,7 @@ static unsigned long __invoke_psci_fn_smc(unsigned long function_id,
+ 	return res.a0;
+ }
+ 
+-static int psci_to_linux_errno(int errno)
++static __always_inline int psci_to_linux_errno(int errno)
+ {
+ 	switch (errno) {
+ 	case PSCI_RET_SUCCESS:
+@@ -169,7 +171,8 @@ int psci_set_osi_mode(bool enable)
+ 	return psci_to_linux_errno(err);
+ }
+ 
+-static int __psci_cpu_suspend(u32 fn, u32 state, unsigned long entry_point)
++static __always_inline int
++__psci_cpu_suspend(u32 fn, u32 state, unsigned long entry_point)
+ {
+ 	int err;
+ 
+@@ -177,13 +180,15 @@ static int __psci_cpu_suspend(u32 fn, u32 state, unsigned long entry_point)
+ 	return psci_to_linux_errno(err);
+ }
+ 
+-static int psci_0_1_cpu_suspend(u32 state, unsigned long entry_point)
++static __always_inline int
++psci_0_1_cpu_suspend(u32 state, unsigned long entry_point)
+ {
+ 	return __psci_cpu_suspend(psci_0_1_function_ids.cpu_suspend,
+ 				  state, entry_point);
+ }
+ 
+-static int psci_0_2_cpu_suspend(u32 state, unsigned long entry_point)
++static __always_inline int
++psci_0_2_cpu_suspend(u32 state, unsigned long entry_point)
+ {
+ 	return __psci_cpu_suspend(PSCI_FN_NATIVE(0_2, CPU_SUSPEND),
+ 				  state, entry_point);
+@@ -447,10 +452,12 @@ late_initcall(psci_debugfs_init)
+ #endif
+ 
+ #ifdef CONFIG_CPU_IDLE
+-static int psci_suspend_finisher(unsigned long state)
++static noinstr int psci_suspend_finisher(unsigned long state)
+ {
+ 	u32 power_state = state;
+-	phys_addr_t pa_cpu_resume = __pa_symbol(cpu_resume);
++	phys_addr_t pa_cpu_resume;
++
++	pa_cpu_resume = __pa_symbol_nodebug((unsigned long)cpu_resume);
+ 
+ 	return psci_ops.cpu_suspend(power_state, pa_cpu_resume);
+ }
 -- 
-2.17.1
+2.30.2
 
