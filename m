@@ -2,297 +2,297 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2666C67ADAF
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 10:25:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 201B567ADE1
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 10:30:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235209AbjAYJYr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 04:24:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42738 "EHLO
+        id S235263AbjAYJan (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 04:30:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229884AbjAYJYp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 04:24:45 -0500
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 126F045F4C;
-        Wed, 25 Jan 2023 01:24:44 -0800 (PST)
-Received: by mail-wr1-x432.google.com with SMTP id n7so16360294wrx.5;
-        Wed, 25 Jan 2023 01:24:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z0Arz+pfAQe2myKejng9WE2IrSZFUhfsk2WraOwJVT8=;
-        b=Bi3qWzqeMh80NryBIAF5Dhr6ASV1XIfGkldULP1u8WVVtFfkMD7sLb7qlR4JvlPLXk
-         O8CK3lYtRC1ghQgbr/EEHPEM300ot/WvDkj1+sjnCeQz/DRtPs7SIZgmyYklsUr4XiP4
-         erTeIYuE9z9XwqHzyaqcVE+5My6NZK5m+VgI+WUeSll5XsKOHSpn5uJG8nz/hkWiLzMO
-         Ill5FvXYPQqD0U8RbWmuHvxsiU+2M5YHj1cSI6M4OlHFvpm/9vegT7D7pN/2bh9L76b6
-         AptexREEtZs5VOCUdADhVMQFeT4QArwBR/qlZaJI913iz2V1YQBSGT3ZWIohFHuQMz5j
-         Jfmg==
+        with ESMTP id S235280AbjAYJaj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 04:30:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65CD71A968
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 01:29:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674638987;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=1C+0FjPfVRei4W8vyOzxXVXejQSTWzMmOkH8GQ0Kzi0=;
+        b=Fmrx3nHMR7yDnozs7JPze+4lx3QALD/nzVy4EsSSxCNOsxRi07D104Yn6+bZ7ZxWkziLPq
+        jvW2O41H26S1+d7jNQp88DtgydlFTYih/hydDz5hBD8WYRcketBb57QL6rYdN3IaYQUhl5
+        lVoWmKG6fsaYEeyBJFf1/Q5nte+OxLI=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-344-FYCzjQhuMxm_M_NGcpo68w-1; Wed, 25 Jan 2023 04:29:45 -0500
+X-MC-Unique: FYCzjQhuMxm_M_NGcpo68w-1
+Received: by mail-qv1-f70.google.com with SMTP id x6-20020a0cc506000000b005349c8b39d6so8942286qvi.2
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 01:29:45 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z0Arz+pfAQe2myKejng9WE2IrSZFUhfsk2WraOwJVT8=;
-        b=QKz77NsKej8VNj9ab8VHtA/tKPcICv3aSJ+nWJ3OFUfL4x+B9zwJyv3ryH8riyg8Aj
-         k7aeo9p3W6HXaJhS3NhgcImr/qbg3isb1957VoHFCcM2Yzq1TuW+7Sr+ChnyExQXNmQK
-         l4rskRwM5rWB0wToYC4M6vECiI65bpw0t5kFV2RplWgs7qSEgFhRTpyqy0eAfQwG2xZl
-         ckis9P5iaTvoNkppXmek6mkDKu021xt/ci6ZpwlEuWStvZ9H2zmP5dlGL4f5T/cQIPvN
-         OwLKvaDDIpkizVCVAOsvGMoy5cUPZSljTNDvu9O4eB4vKTcHuTuhvfluorozy7Svtdql
-         tK9w==
-X-Gm-Message-State: AFqh2kpqx5+yAi7/l2kOf3Iqm9I3A1Xepji5fYOcsxA3GGry9O9/L5oO
-        Wk3wqO4auYwtx53eOx1jDe0=
-X-Google-Smtp-Source: AMrXdXvCVpzdYmkvwD+InHMlUvlzHqd2a6n6HQAKP5NRmt2gyTAvFEqJRs1wOF0A6rEje9NtNEytnA==
-X-Received: by 2002:a05:6000:1e0d:b0:236:c60b:c766 with SMTP id bj13-20020a0560001e0d00b00236c60bc766mr4918321wrb.6.1674638682404;
-        Wed, 25 Jan 2023 01:24:42 -0800 (PST)
-Received: from localhost (95-172-185-203.cpe.netmadeira.com. [95.172.185.203])
-        by smtp.gmail.com with ESMTPSA id p15-20020a5d4e0f000000b002bdc39849d1sm3886630wrt.44.2023.01.25.01.24.41
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1C+0FjPfVRei4W8vyOzxXVXejQSTWzMmOkH8GQ0Kzi0=;
+        b=i7ieO+RpIpMmv4eb1Ml41DjyWH9N1X5Dq1D5FQL3YtYYQQZ3rX4E/Uz3LYE77lhay1
+         CjvcFqY7wbNzMpDcp1l5j3Ol412sRzv9lKaapR7KYVaFpv8c3o0ra7eNN/BSlsRp8QLc
+         GgYg/zGHPOMkrMkdiFFNc3Bxq2N+sD4XnlGTFxv2PgIUHnIQb3RpJUMqg869Gr4YXttY
+         uTTnCA2Ot9YA9vWF4BjKGWA+3BOmnGrVChD91FS9w4VeBGQSAyqvV5erkxWDXopIkAMc
+         y0VJpaFoWeQkXZ4TfhCLTogd3bOwJq0zP5uo2eSQTgpq1fFOsFfEghIhHd42IEH58IsF
+         9f3A==
+X-Gm-Message-State: AO0yUKUjfG5/qbCoGetYla/qg8K7smwRlFLYcXTZHacGBNHs4KDqbmDH
+        c4S4NnyxKER4AYGm7Y/bYf7J7+h5S/Ioars9Rrl9EIlCGlh1fTFpfN7Ss3r6BCSGWSJ/BxTO4RC
+        nt61LPnupAWgZ
+X-Received: by 2002:a05:622a:1443:b0:3b6:3697:63fa with SMTP id v3-20020a05622a144300b003b6369763famr2710954qtx.28.1674638984655;
+        Wed, 25 Jan 2023 01:29:44 -0800 (PST)
+X-Google-Smtp-Source: AK7set/miymPmji0URXPaMfKsdTTs4TjY5AMNfwyDVYyvLKm3Pkt4hwn5ydXGIOn6SOEOGveS+o4mQ==
+X-Received: by 2002:a05:622a:1443:b0:3b6:3697:63fa with SMTP id v3-20020a05622a144300b003b6369763famr2710937qtx.28.1674638984343;
+        Wed, 25 Jan 2023 01:29:44 -0800 (PST)
+Received: from ovpn-194-126.brq.redhat.com (nat-2.ign.cz. [91.219.240.2])
+        by smtp.gmail.com with ESMTPSA id r2-20020ac83b42000000b003b6464eda40sm3003461qtf.25.2023.01.25.01.29.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Jan 2023 01:24:42 -0800 (PST)
-Date:   Wed, 25 Jan 2023 11:24:34 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     isaku.yamahata@intel.com
+        Wed, 25 Jan 2023 01:29:43 -0800 (PST)
+From:   Vitaly Kuznetsov <vkuznets@redhat.com>
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
 Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
-        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v11 030/113] KVM: x86/mmu: Replace hardcoded value 0 for
- the initial value for SPTE
-Message-ID: <20230125112434.0000512a@gmail.com>
-In-Reply-To: <dee30f0562d8be0102547d8eb9fc77736eae679d.1673539699.git.isaku.yamahata@intel.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
-        <dee30f0562d8be0102547d8eb9fc77736eae679d.1673539699.git.isaku.yamahata@intel.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Aaron Lewis <aaronlewis@google.com>,
+        Weijiang Yang <weijiang.yang@intel.com>,
+        Like Xu <likexu@tencent.com>
+Subject: Re: [PATCH 2/6] KVM: x86/pmu: Gate all "unimplemented MSR" prints
+ on report_ignored_msrs
+In-Reply-To: <20230124234905.3774678-3-seanjc@google.com>
+References: <20230124234905.3774678-1-seanjc@google.com>
+ <20230124234905.3774678-3-seanjc@google.com>
+Date:   Wed, 25 Jan 2023 10:29:40 +0100
+Message-ID: <87bkmn55dn.fsf@ovpn-194-126.brq.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Jan 2023 08:31:38 -0800
-isaku.yamahata@intel.com wrote:
+Sean Christopherson <seanjc@google.com> writes:
 
-This refactor patch is quite hacky.
-
-Why not change the purpose of vcpu->arch.mmu_shadow_page.gfp_zero and let the
-callers respect that the initial value of spte can be configurable? It will be
-generic and not TDX-specific, then kvm_init_shadow_page() is not required,
-mmu_topup_shadow_page_cache() can be left un-touched as the refactor can cover
-other architectures.
-
-1) Let it store the expected nonpresent value and rename it to nonpresent_spte.
-
-2) Let mmu_spte_clear_track_bits(), mmu_spte_clear_no_track() and all
-the other places where assume 0 as initial value, respect nonpreset_spte.
-
-3) Let kvm_mmu_topup_memory_cache() to respect nonpresent_spte: a. using GFP_ZERO
-if the nonpresent_spte is zero. b. memset the page if nonpresent_spte is *not*
-zero.
-
-Now the initial value is configurable, configure the nonpresent_spte in the TDX
-initialization path before the first topup in the next patch.
-
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
-> 
-> The TDX support will need the "suppress #VE" bit (bit 63) set as the
-> initial value for SPTE.  To reduce code change size, introduce a new macro
-> SHADOW_NONPRESENT_VALUE for the initial value for the shadow page table
-> entry (SPTE) and replace hard-coded value 0 for it.  Initialize shadow page
-> tables with their value.
-> 
-> The plan is to unconditionally set the "suppress #VE" bit for both AMD and
-> Intel as: 1) AMD hardware uses the bit 63 as NX for present SPTE and
-> ignored for non-present SPTE; 2) for conventional VMX guests, KVM never
-> enables the "EPT-violation #VE" in VMCS control and "suppress #VE" bit is
-> ignored by hardware.
-> 
-> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Add helpers to print unimplemented MSR accesses and condition all such
+> prints on report_ignored_msrs, i.e. honor userspace's request to not
+> print unimplemented MSRs.  Even though vcpu_unimpl() is ratelimited,
+> printing can still be problematic, e.g. if a print gets stalled when host
+> userspace is writing MSRs during live migration, an effective stall can
+> result in very noticeable disruption in the guest.
+>
+> E.g. the profile below was taken while calling KVM_SET_MSRS on the PMU
+> counters while the PMU was disabled in KVM.
+>
+>   -   99.75%     0.00%  [.] __ioctl
+>    - __ioctl
+>       - 99.74% entry_SYSCALL_64_after_hwframe
+>            do_syscall_64
+>            sys_ioctl
+>          - do_vfs_ioctl
+>             - 92.48% kvm_vcpu_ioctl
+>                - kvm_arch_vcpu_ioctl
+>                   - 85.12% kvm_set_msr_ignored_check
+>                        svm_set_msr
+>                        kvm_set_msr_common
+>                        printk
+>                        vprintk_func
+>                        vprintk_default
+>                        vprintk_emit
+>                        console_unlock
+>                        call_console_drivers
+>                        univ8250_console_write
+>                        serial8250_console_write
+>                        uart_console_write
+>
+> Reported-by: Aaron Lewis <aaronlewis@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/mmu/mmu.c         | 50 ++++++++++++++++++++++++++++++----
->  arch/x86/kvm/mmu/paging_tmpl.h |  3 +-
->  arch/x86/kvm/mmu/spte.h        |  2 ++
->  arch/x86/kvm/mmu/tdp_mmu.c     | 15 +++++-----
->  4 files changed, 56 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 15d0e8f11d53..59befdfeec23 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -540,9 +540,9 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
->  
->  	if (!is_shadow_present_pte(old_spte) ||
->  	    !spte_has_volatile_bits(old_spte))
-> -		__update_clear_spte_fast(sptep, 0ull);
-> +		__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
->  	else
-> -		old_spte = __update_clear_spte_slow(sptep, 0ull);
-> +		old_spte = __update_clear_spte_slow(sptep, SHADOW_NONPRESENT_VALUE);
->  
->  	if (!is_shadow_present_pte(old_spte))
->  		return old_spte;
-> @@ -576,7 +576,7 @@ static u64 mmu_spte_clear_track_bits(struct kvm *kvm, u64 *sptep)
->   */
->  static void mmu_spte_clear_no_track(u64 *sptep)
->  {
-> -	__update_clear_spte_fast(sptep, 0ull);
-> +	__update_clear_spte_fast(sptep, SHADOW_NONPRESENT_VALUE);
->  }
->  
->  static u64 mmu_spte_get_lockless(u64 *sptep)
-> @@ -644,6 +644,39 @@ static void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+>  arch/x86/kvm/hyperv.c  | 10 ++++------
+>  arch/x86/kvm/svm/svm.c |  5 ++---
+>  arch/x86/kvm/vmx/vmx.c |  4 +---
+>  arch/x86/kvm/x86.c     | 18 +++++-------------
+>  arch/x86/kvm/x86.h     | 12 ++++++++++++
+>  5 files changed, 24 insertions(+), 25 deletions(-)
+>
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 71aff0edc0ed..3eb8caf87ee4 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1430,8 +1430,7 @@ static int kvm_hv_set_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 data,
+>  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
+>  		return syndbg_set_msr(vcpu, msr, data, host);
+>  	default:
+> -		vcpu_unimpl(vcpu, "Hyper-V unhandled wrmsr: 0x%x data 0x%llx\n",
+> -			    msr, data);
+> +		kvm_pr_unimpl_wrmsr(vcpu, msr, data);
+>  		return 1;
 >  	}
->  }
->  
-> +#ifdef CONFIG_X86_64
-> +static inline void kvm_init_shadow_page(void *page)
-> +{
-> +	memset64(page, SHADOW_NONPRESENT_VALUE, 4096 / 8);
-> +}
-> +
-> +static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_mmu_memory_cache *mc = &vcpu->arch.mmu_shadow_page_cache;
-> +	int start, end, i, r;
-> +
-> +	start = kvm_mmu_memory_cache_nr_free_objects(mc);
-> +	r = kvm_mmu_topup_memory_cache(mc, PT64_ROOT_MAX_LEVEL);
-> +
-> +	/*
-> +	 * Note, topup may have allocated objects even if it failed to allocate
-> +	 * the minimum number of objects required to make forward progress _at
-> +	 * this time_.  Initialize newly allocated objects even on failure, as
-> +	 * userspace can free memory and rerun the vCPU in response to -ENOMEM.
-> +	 */
-> +	end = kvm_mmu_memory_cache_nr_free_objects(mc);
-> +	for (i = start; i < end; i++)
-> +		kvm_init_shadow_page(mc->objects[i]);
-> +	return r;
-> +}
-> +#else
-> +static int mmu_topup_shadow_page_cache(struct kvm_vcpu *vcpu)
-> +{
-> +	return kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-> +					  PT64_ROOT_MAX_LEVEL);
-> +}
-> +#endif /* CONFIG_X86_64 */
-> +
->  static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
->  {
->  	int r;
-> @@ -653,8 +686,7 @@ static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
->  				       1 + PT64_ROOT_MAX_LEVEL + PTE_PREFETCH_NUM);
->  	if (r)
->  		return r;
-> -	r = kvm_mmu_topup_memory_cache(&vcpu->arch.mmu_shadow_page_cache,
-> -				       PT64_ROOT_MAX_LEVEL);
-> +	r = mmu_topup_shadow_page_cache(vcpu);
->  	if (r)
->  		return r;
->  	if (maybe_indirect) {
-> @@ -5920,7 +5952,13 @@ int kvm_mmu_create(struct kvm_vcpu *vcpu)
->  	vcpu->arch.mmu_page_header_cache.kmem_cache = mmu_page_header_cache;
->  	vcpu->arch.mmu_page_header_cache.gfp_zero = __GFP_ZERO;
->  
-> -	vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
-> +	/*
-> +	 * When X86_64, initial SEPT entries are initialized with
-> +	 * SHADOW_NONPRESENT_VALUE.  Otherwise zeroed.  See
-> +	 * mmu_topup_shadow_page_cache().
-> +	 */
-> +	if (!IS_ENABLED(CONFIG_X86_64))
-> +		vcpu->arch.mmu_shadow_page_cache.gfp_zero = __GFP_ZERO;
->  
->  	vcpu->arch.mmu = &vcpu->arch.root_mmu;
->  	vcpu->arch.walk_mmu = &vcpu->arch.root_mmu;
-> diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-> index 0f6455072055..42d7106c7350 100644
-> --- a/arch/x86/kvm/mmu/paging_tmpl.h
-> +++ b/arch/x86/kvm/mmu/paging_tmpl.h
-> @@ -1036,7 +1036,8 @@ static int FNAME(sync_page)(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp)
->  		gpa_t pte_gpa;
->  		gfn_t gfn;
->  
-> -		if (!sp->spt[i])
-> +		/* spt[i] has initial value of shadow page table allocation */
-> +		if (sp->spt[i] == SHADOW_NONPRESENT_VALUE)
->  			continue;
->  
->  		pte_gpa = first_pte_gpa + i * sizeof(pt_element_t);
-> diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-> index 0d8deefee66c..f190eaf6b2b5 100644
-> --- a/arch/x86/kvm/mmu/spte.h
-> +++ b/arch/x86/kvm/mmu/spte.h
-> @@ -148,6 +148,8 @@ static_assert(MMIO_SPTE_GEN_LOW_BITS == 8 && MMIO_SPTE_GEN_HIGH_BITS == 11);
->  
->  #define MMIO_SPTE_GEN_MASK		GENMASK_ULL(MMIO_SPTE_GEN_LOW_BITS + MMIO_SPTE_GEN_HIGH_BITS - 1, 0)
->  
-> +#define SHADOW_NONPRESENT_VALUE	0ULL
-> +
->  extern u64 __read_mostly shadow_host_writable_mask;
->  extern u64 __read_mostly shadow_mmu_writable_mask;
->  extern u64 __read_mostly shadow_nx_mask;
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index 12e430a4ebc3..9cf5844dd34a 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -701,7 +701,7 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
->  	 * here since the SPTE is going from non-present to non-present.  Use
->  	 * the raw write helper to avoid an unnecessary check on volatile bits.
->  	 */
-> -	__kvm_tdp_mmu_write_spte(iter->sptep, 0);
-> +	__kvm_tdp_mmu_write_spte(iter->sptep, SHADOW_NONPRESENT_VALUE);
->  
 >  	return 0;
->  }
-> @@ -878,8 +878,8 @@ static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
->  			continue;
->  
->  		if (!shared)
-> -			tdp_mmu_set_spte(kvm, &iter, 0);
-> -		else if (tdp_mmu_set_spte_atomic(kvm, &iter, 0))
-> +			tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
-> +		else if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE))
->  			goto retry;
->  	}
->  }
-> @@ -935,8 +935,9 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->  	if (WARN_ON_ONCE(!is_shadow_present_pte(old_spte)))
->  		return false;
->  
-> -	__tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte, 0,
-> -			   sp->gfn, sp->role.level + 1, true, true);
-> +	__tdp_mmu_set_spte(kvm, kvm_mmu_page_as_id(sp), sp->ptep, old_spte,
-> +			   SHADOW_NONPRESENT_VALUE, sp->gfn, sp->role.level + 1,
-> +			   true, true);
->  
->  	return true;
->  }
-> @@ -970,7 +971,7 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
->  		    !is_last_spte(iter.old_spte, iter.level))
->  			continue;
->  
-> -		tdp_mmu_set_spte(kvm, &iter, 0);
-> +		tdp_mmu_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
->  		flush = true;
+> @@ -1552,8 +1551,7 @@ static int kvm_hv_set_msr(struct kvm_vcpu *vcpu, u32 msr, u64 data, bool host)
+>  			return 1;
+>  		break;
+>  	default:
+> -		vcpu_unimpl(vcpu, "Hyper-V unhandled wrmsr: 0x%x data 0x%llx\n",
+> -			    msr, data);
+> +		kvm_pr_unimpl_wrmsr(vcpu, msr, data);
+>  		return 1;
 >  	}
 >  
-> @@ -1339,7 +1340,7 @@ static bool set_spte_gfn(struct kvm *kvm, struct tdp_iter *iter,
->  	 * invariant that the PFN of a present * leaf SPTE can never change.
->  	 * See __handle_changed_spte().
->  	 */
-> -	tdp_mmu_set_spte(kvm, iter, 0);
-> +	tdp_mmu_set_spte(kvm, iter, SHADOW_NONPRESENT_VALUE);
+> @@ -1608,7 +1606,7 @@ static int kvm_hv_get_msr_pw(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata,
+>  	case HV_X64_MSR_SYNDBG_CONTROL ... HV_X64_MSR_SYNDBG_PENDING_BUFFER:
+>  		return syndbg_get_msr(vcpu, msr, pdata, host);
+>  	default:
+> -		vcpu_unimpl(vcpu, "Hyper-V unhandled rdmsr: 0x%x\n", msr);
+> +		kvm_pr_unimpl_rdmsr(vcpu, msr);
+>  		return 1;
+>  	}
 >  
->  	if (!pte_write(range->pte)) {
->  		new_spte = kvm_mmu_changed_pte_notifier_make_spte(iter->old_spte,
+> @@ -1673,7 +1671,7 @@ static int kvm_hv_get_msr(struct kvm_vcpu *vcpu, u32 msr, u64 *pdata,
+>  		data = APIC_BUS_FREQUENCY;
+>  		break;
+>  	default:
+> -		vcpu_unimpl(vcpu, "Hyper-V unhandled rdmsr: 0x%x\n", msr);
+> +		kvm_pr_unimpl_rdmsr(vcpu, msr);
+>  		return 1;
+>  	}
+>  	*pdata = data;
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index d13cf53e7390..dd21e8b1a259 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -3015,8 +3015,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>  		break;
+>  	case MSR_IA32_DEBUGCTLMSR:
+>  		if (!lbrv) {
+> -			vcpu_unimpl(vcpu, "%s: MSR_IA32_DEBUGCTL 0x%llx, nop\n",
+> -				    __func__, data);
+> +			kvm_pr_unimpl_wrmsr(vcpu, ecx, data);
+>  			break;
+>  		}
+>  		if (data & DEBUGCTL_RESERVED_BITS)
+> @@ -3045,7 +3044,7 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+>  	case MSR_VM_CR:
+>  		return svm_set_vm_cr(vcpu, data);
+>  	case MSR_VM_IGNNE:
+> -		vcpu_unimpl(vcpu, "unimplemented wrmsr: 0x%x data 0x%llx\n", ecx, data);
+> +		kvm_pr_unimpl_wrmsr(vcpu, ecx, data);
+>  		break;
+>  	case MSR_AMD64_DE_CFG: {
+>  		struct kvm_msr_entry msr_entry;
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index c788aa382611..8f0f67c75f35 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2206,9 +2206,7 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  
+>  		invalid = data & ~vmx_get_supported_debugctl(vcpu, msr_info->host_initiated);
+>  		if (invalid & (DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR)) {
+> -			if (report_ignored_msrs)
+> -				vcpu_unimpl(vcpu, "%s: BTF|LBR in IA32_DEBUGCTLMSR 0x%llx, nop\n",
+> -					    __func__, data);
+> +			kvm_pr_unimpl_wrmsr(vcpu, msr_index, data);
+>  			data &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+>  			invalid &= ~(DEBUGCTLMSR_BTF|DEBUGCTLMSR_LBR);
+>  		}
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ad95ce92a154..d4a610ffe2b8 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -3560,7 +3560,6 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
+>  
+>  int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  {
+> -	bool pr = false;
+>  	u32 msr = msr_info->index;
+>  	u64 data = msr_info->data;
+>  
+> @@ -3606,15 +3605,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (data == BIT_ULL(18)) {
+>  			vcpu->arch.msr_hwcr = data;
+>  		} else if (data != 0) {
+> -			vcpu_unimpl(vcpu, "unimplemented HWCR wrmsr: 0x%llx\n",
+> -				    data);
+> +			kvm_pr_unimpl_wrmsr(vcpu, msr, data);
+>  			return 1;
+>  		}
+>  		break;
+>  	case MSR_FAM10H_MMIO_CONF_BASE:
+>  		if (data != 0) {
+> -			vcpu_unimpl(vcpu, "unimplemented MMIO_CONF_BASE wrmsr: "
+> -				    "0x%llx\n", data);
+> +			kvm_pr_unimpl_wrmsr(vcpu, msr, data);
+>  			return 1;
+>  		}
+>  		break;
+> @@ -3794,16 +3791,13 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  
+>  	case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
+>  	case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
+> -		pr = true;
+> -		fallthrough;
+>  	case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
+>  	case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
+>  		if (kvm_pmu_is_valid_msr(vcpu, msr))
+>  			return kvm_pmu_set_msr(vcpu, msr_info);
+>  
+> -		if (pr || data != 0)
+> -			vcpu_unimpl(vcpu, "disabled perfctr wrmsr: "
+> -				    "0x%x data 0x%llx\n", msr, data);
+> +		if (data)
+> +			kvm_pr_unimpl_wrmsr(vcpu, msr, data);
+
+The logic here was that "*_PERFCTR*" MSRs are reported even when 'data
+== 0' but looking at the commit 5753785fa977 ("KVM: do not #GP on perf
+MSR writes when vPMU is disabled") I can't really say why it was needed.
+
+>  		break;
+>  	case MSR_K7_CLK_CTL:
+>  		/*
+> @@ -3831,9 +3825,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		/* Drop writes to this legacy MSR -- see rdmsr
+>  		 * counterpart for further detail.
+>  		 */
+> -		if (report_ignored_msrs)
+> -			vcpu_unimpl(vcpu, "ignored wrmsr: 0x%x data 0x%llx\n",
+> -				msr, data);
+> +		kvm_pr_unimpl_wrmsr(vcpu, msr, data);
+>  		break;
+>  	case MSR_AMD64_OSVW_ID_LENGTH:
+>  		if (!guest_cpuid_has(vcpu, X86_FEATURE_OSVW))
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 9de72586f406..f3554bf05201 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -331,6 +331,18 @@ extern bool report_ignored_msrs;
+>  
+>  extern bool eager_page_split;
+>  
+> +static inline void kvm_pr_unimpl_wrmsr(struct kvm_vcpu *vcpu, u32 msr, u64 data)
+> +{
+> +	if (report_ignored_msrs)
+> +		vcpu_unimpl(vcpu, "Unhandled WRMSR(0x%x) = 0x%llx\n", msr, data);
+> +}
+> +
+> +static inline void kvm_pr_unimpl_rdmsr(struct kvm_vcpu *vcpu, u32 msr)
+> +{
+> +	if (report_ignored_msrs)
+> +		vcpu_unimpl(vcpu, "Unhandled RDMSR(0x%x)\n", msr);
+> +}
+> +
+>  static inline u64 nsec_to_cycles(struct kvm_vcpu *vcpu, u64 nsec)
+>  {
+>  	return pvclock_scale_delta(nsec, vcpu->arch.virtual_tsc_mult,
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
+-- 
+Vitaly
 
