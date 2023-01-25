@@ -2,104 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 57FCC67A801
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 01:51:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E995067A808
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 01:55:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234216AbjAYAvq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 19:51:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52656 "EHLO
+        id S234393AbjAYAzW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 19:55:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229809AbjAYAvm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 19:51:42 -0500
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC6A4113F2;
-        Tue, 24 Jan 2023 16:51:40 -0800 (PST)
-Date:   Wed, 25 Jan 2023 00:51:33 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1674607898;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tKZJHCuNcS9wmdGcYa74NyQbaZqjeiShG5FvQ1mhWsM=;
-        b=bj8WStw0zxg3MLqdRtbAX0JL3VYIi9naRAx1uWiRdxJdQreQasQOekCNtU6DzYsQo7oi1M
-        LHae7+//6q3qHKef5X57sWNCE20HZfjwjIcBMDrz/cOWaVFr+2MFwgmAfiIok12p6RuelG
-        1ntXs3GUvHw8B1SPOECe82979r6Pdd4=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     David Matlack <dmatlack@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Huacai Chen <chenhuacai@kernel.org>,
-        Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-mips@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
-        linux-riscv@lists.infradead.org,
-        Raghavendra Rao Ananta <rananta@google.com>
-Subject: Re: [PATCH 0/7] KVM: Add a common API for range-based TLB
- invalidation
-Message-ID: <Y9B9FZReDVwdNNrS@google.com>
-References: <20230119173559.2517103-1-dmatlack@google.com>
- <Y9B8A+/FSPCrAANT@google.com>
+        with ESMTP id S234144AbjAYAzR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 19:55:17 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CDAF4FCD3
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 16:55:14 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id w2so12380779pfc.11
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 16:55:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=j0YF0rWx8S9a0HEtMkweR4tK/cDvp3r9Bqf6MxKm/rI=;
+        b=iJdyzVPzXz7h7S2WmtKKe+sd89SWrr9Ja4izpE/zN0otMQqHEA3Y/IPBHZPQT5xz6+
+         pYIZQ35132YOfOcYSwSquRJy6ykUFEUE5dm8kPf9IL601tHGdSl/8UiKcovVtgHIWUNu
+         FBD37YuIHNIszZ9y223b4NON1cKk/h2iO8W1vdgz4pptrCQP91idtwlpS54fEcfh572Y
+         Tz3+vaNovlgYsC/YS4r8tctZ5qgkozwrI84kyaJ83rbzxqJccOo4mQp+mI1AIG1HlI0H
+         51sDPRqpO2e7idF9lwlJBH7V7nsBb0nx/LKFYaj4nWxHXXzSsRPJvFsNwn8HVIndmVaY
+         xl/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=j0YF0rWx8S9a0HEtMkweR4tK/cDvp3r9Bqf6MxKm/rI=;
+        b=ps/4WNQ+WWs/KC0T7RruIAHDBAzfbHSRDqpYCecdzjulbffaHhgJG+QEDDkgApa/PW
+         VgRyiIuVeWWxWaND79C3Hx3S8T6q9n3kBsyVtyhXFODzZP90F2rzkGqbpmWgMJpy6/rG
+         hqlrkVYfoe4CcmIYfWLaTc5CR759AY5HxdcVaSqMVbWi9T9gyJ5fq0qkpfR5ibDuffgK
+         D8WxWE40eHjOXkm8tpCKXU/B/Ck45jTDBDKY138VhfQS4MzUc4Z5fjv9dD+auRfhs8DT
+         E1Rhz3ICFv/tgF5GrCT/s+e/9xweUWsXvAXQij9ShDwxFStWKUz8PldnLuTfIsrAi+e8
+         bIiw==
+X-Gm-Message-State: AO0yUKUb87UXyeAQhjRvFvatyqgc6BbAa178jDgsPhdXBlsxTXnY3EnN
+        hwFbPFQSFVddH1Ov9BWmu0ogfw==
+X-Google-Smtp-Source: AK7set96ycG9wMPCfmKtz1r3i9fIEVzq+oHYyjZvNRqCKM8r+LLhsBZ/PuMv3+HddeGW9X3vMp2Log==
+X-Received: by 2002:a05:6a00:23cb:b0:581:bfac:7a52 with SMTP id g11-20020a056a0023cb00b00581bfac7a52mr465724pfc.1.1674608113769;
+        Tue, 24 Jan 2023 16:55:13 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f20-20020a056a0022d400b005877d374069sm2288340pfj.10.2023.01.24.16.55.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Jan 2023 16:55:13 -0800 (PST)
+Date:   Wed, 25 Jan 2023 00:55:09 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     John Allen <john.allen@amd.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        pbonzini@redhat.com, weijiang.yang@intel.com,
+        rick.p.edgecombe@intel.com, x86@kernel.org, thomas.lendacky@amd.com
+Subject: Re: [RFC PATCH 0/7] SVM guest shadow stack support
+Message-ID: <Y9B97dZnFnjEHhVf@google.com>
+References: <20221012203910.204793-1-john.allen@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y9B8A+/FSPCrAANT@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20221012203910.204793-1-john.allen@amd.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 12:46:59AM +0000, Sean Christopherson wrote:
-> On Thu, Jan 19, 2023, David Matlack wrote:
-> > This series introduces a common API for performing range-based TLB
-> > invalidation. This is then used to supplant
-> > kvm_arch_flush_remote_tlbs_memslot() and pave the way for two other
-> > patch series:
-> > 
-> > 1. https://lore.kernel.org/kvm/20230109215347.3119271-1-rananta@google.com/
-> > 
-> >   Adds ARM support for range-based TLB invalidation and needs a
-> >   mechanism to invoke it from common code. This series provides such a
-> >   mechanism via kvm_arch_flush_remote_tlbs_range().
-> > 
-> > 2. https://lore.kernel.org/kvm/20221208193857.4090582-1-dmatlack@google.com/
-> > 
-> >   Refactors the TDP MMU into common code, which requires an API for
-> >   range-based TLB invaliation.
-> > 
-> > This series is based on patches 29-33 from (2.), but I made some further
-> > cleanups after looking at it a second time.
-> > 
-> > Tested on x86_64 and ARM64 using KVM selftests.
+On Wed, Oct 12, 2022, John Allen wrote:
+> AMD Zen3 and newer processors support shadow stack, a feature designed to
+> protect against ROP (return-oriented programming) attacks in which an attacker
+> manipulates return addresses on the call stack in order to execute arbitrary
+> code. To prevent this, shadow stacks can be allocated that are only used by
+> control transfer and return instructions. When a CALL instruction is issued, it
+> writes the return address to both the program stack and the shadow stack. When
+> the subsequent RET instruction is issued, it pops the return address from both
+> stacks and compares them. If the addresses don't match, a control-protection
+> exception is raised.
 > 
-> Did a quick read through, didn't see anything I disagree with.
+> Shadow stack and a related feature, Indirect Branch Tracking (IBT), are
+> collectively referred to as Control-flow Enforcement Technology (CET). However,
+> current AMD processors only support shadow stack and not IBT.
+> 
+> This series adds support for shadow stack in SVM guests and builds upon the
+> support added in the CET guest support patch series [1] and the CET kernel
+> patch series [2]. Additional patches are required to support shadow stack
+> enabled guests in qemu [3] and glibc [4].
+> 
+> [1]: CET guest support patches
+> https://lore.kernel.org/all/20220616084643.19564-1-weijiang.yang@intel.com/
+> 
+> [2]: Latest CET kernel patches
+> https://lore.kernel.org/all/20220929222936.14584-1-rick.p.edgecombe@intel.com/
 
-LGTM for the tiny amount of arm64 changes, though I imagine David will
-do a v2 to completely get rid of the affected Kconfig.
+That dependency chain makes me sad.
 
-> Is there any urgency to getting this merged?  If not, due to the dependencies
-> with x86 stuff queued for 6.3, and because of the cross-architecture changes, it
-> might be easiest to plan on landing this in 6.4.  That would allow Paolo to create
-> an immutable topic branch fairly early on.
+Outside of a very shallow comment on the last patch, I don't plan on reviewing
+this until the kernel side of things gets out of our way.  When that finally
+does happen, I'll definitely prioritize reviewing and merging this and the KVM
+Intel series.  I'd love to see this land.
 
-+1, that buys us some time to go through the rounds on the arm64 side
-such that we could possibly stack the TLBIRANGE work on top.
-
---
-Thanks,
-Oliver
+Sorry :-(
