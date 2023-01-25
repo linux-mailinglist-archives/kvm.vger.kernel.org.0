@@ -2,96 +2,100 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D75FF67B6A2
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 17:11:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1731E67B738
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 17:49:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235522AbjAYQLh (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 11:11:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48250 "EHLO
+        id S235838AbjAYQtP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 11:49:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231438AbjAYQLg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 11:11:36 -0500
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A481269D;
-        Wed, 25 Jan 2023 08:11:35 -0800 (PST)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-        by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30PBQ8lv019573;
-        Wed, 25 Jan 2023 08:11:32 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=64PsPJS+9HFkKPYYL53jRXNfo5jOnlTkQq+pcqdFRq8=;
- b=A4BjRpNpo2eLUepW0VzkTzvQZVT8lnTmSUCzXOzMu1g8kdbpaeKIRwPANCYickUxiFQ2
- bUMQiMnpNAmgPDOcjWDKi8/fmph/3kGc39NwwMJKeX1BZcCX8Fo1ez7P94pSs2lFy9Qb
- RdLjdOhYoZXIDm9KIAKlc67pH1XY3HI999Y69hLOY/91efDcV2vBWvwLrBwN8VXM86Y/
- PI5Xq6VwhRG8VT7cWJpsgu95M8drM2RZkzDpdPeHMxC3eJqDWx55wgVSp/zurL9ayPiU
- 2gVaMvbPMGx1dquWNWul65QVLkU5xp/opEYJgtwZbS2OYZQxYmK6qy/FwmG8VHj3Vbw+ gw== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3nb0hp9npx-3
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Wed, 25 Jan 2023 08:11:32 -0800
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.42; Wed, 25 Jan
- 2023 08:11:28 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.42 via Frontend
- Transport; Wed, 25 Jan 2023 08:11:28 -0800
-Received: from cavium-DT10.. (unknown [10.28.34.39])
-        by maili.marvell.com (Postfix) with ESMTP id 57D4B3F7053;
-        Wed, 25 Jan 2023 08:11:25 -0800 (PST)
-From:   Tomasz Duszynski <tduszynski@marvell.com>
-To:     Eric Auger <eric.auger@redhat.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        "open list:VFIO PLATFORM DRIVER" <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-CC:     <jerinj@marvell.com>, Tomasz Duszynski <tduszynski@marvell.com>
-Subject: [PATCH] vfio: platform: ignore missing reset if disabled at module init
-Date:   Wed, 25 Jan 2023 17:11:15 +0100
-Message-ID: <20230125161115.1356233-1-tduszynski@marvell.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S235770AbjAYQsl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 11:48:41 -0500
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BFD53BD91
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 08:48:17 -0800 (PST)
+Received: by mail-ot1-x32e.google.com with SMTP id x21-20020a056830245500b006865ccca77aso11451807otr.11
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 08:48:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vq3LFQzKpZKBu49mGyCeTfi9HlhBCQSg5nBGLL0OypI=;
+        b=PdtocwtdB8FDvLU7tUXjJ+15U60AZmpxJVdEEWY4mMw+TzW4SDdaRmai8a4Jg4sxLI
+         Lwe2olqot8VczzHQsTvNOPHr+qwz9v5SXFz4zQoP4UibuaXU198h+2Emg7l91qhVxtB+
+         v1N4joqVqWTVHKVgaxbbPIBgHiingnGOZdJEGO54u6qs9iGFCIh6CUvi/Vn6qwJqJQug
+         qoqFiiVmHFRKosHCPjhm2In3muQfZeWloJ6AIR3Hipp5Rm79oHc2kswfbcHNMuIS8PWb
+         24ddY5+5jwAeJgf74J3RQ7dgSSguYK1BBjbAdXpaugu+J3hlbVKYovgl1g/n4PfWy5I+
+         EFsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vq3LFQzKpZKBu49mGyCeTfi9HlhBCQSg5nBGLL0OypI=;
+        b=tWeF31iJDXMtCofzHWpOcEESudwe1kHJ7X6iv0VV0KYCWwIOn4eRYWGobhajk+egPg
+         xWRJp61b6bpGR9rn6v56Slk1uDYzpQZLsum3RVqn/4uVPZje5gRkgjfr1unJ8ngmOs9+
+         50LkZQiPcuS/UCB+GAArHw8bzB16wyMFlYTYbQX6cDMRd5gTtiQUGNCgZ2hBjtnBTztt
+         k9YuM7SJoLtcHgCFGxKuCe9jQctr0FJGXK2Xicc5sQ9mzdoNmjER85g3eLQNriUzMmd+
+         WBrDl0kJXhyy/6sn4IvdO9HaFDwEAum6jEpfDyLRN6DKTGtXeeGT2ASIGWyOGaebx7Gc
+         Qe9g==
+X-Gm-Message-State: AFqh2krVymC7NH3EdZlAi41GQg/fV1wVcjkXdgxALGLXP9lh5A4MrP3Z
+        l7v6YNTqG/9WXHOaWZKb75vwIZenes+akwr4NbyfEQ==
+X-Google-Smtp-Source: AMrXdXtbgubewTmPxtFwsv2qHy+cXHIkihgATKvfFQzPBDZm7LPVyGSSuCJPV6EntjJunWDoW3ri+a4V+yJTVgdwfR0=
+X-Received: by 2002:a9d:3e2:0:b0:684:e1a4:1df9 with SMTP id
+ f89-20020a9d03e2000000b00684e1a41df9mr2141435otf.8.1674665290314; Wed, 25 Jan
+ 2023 08:48:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 6yQ2Ja2x8Kpoe_AwZgwhMo405DZkW_dm
-X-Proofpoint-GUID: 6yQ2Ja2x8Kpoe_AwZgwhMo405DZkW_dm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-25_10,2023-01-25_01,2022-06-22_01
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+References: <20221027092036.2698180-1-pbonzini@redhat.com> <CALMp9eQihPhjpoodw6ojgVh_KtvPqQ9qJ3wKWZQyVtArpGkfHA@mail.gmail.com>
+ <3a23db58-3ae1-7457-ed09-bc2e3f6e8dc9@redhat.com>
+In-Reply-To: <3a23db58-3ae1-7457-ed09-bc2e3f6e8dc9@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Wed, 25 Jan 2023 08:47:59 -0800
+Message-ID: <CALMp9eQ3wZ4dkq_8ErcUdQAs2F96Gvr-g=7-iBteJeuN5aX00A@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: x86: Do not return host topology information from KVM_GET_SUPPORTED_CPUID
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-If reset requirement was relaxed via module parameter errors caused by
-missing reset should not be propagated down to the vfio core.
-Otherwise initialization will fail.
+On Wed, Jan 25, 2023 at 6:17 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 1/25/23 00:16, Jim Mattson wrote:
+> > This is a userspace ABI change that breaks existing hypervisors.
+> > Please don't do this. Userspace ABIs are supposed to be inviolate.
+>
+> What exactly is broken?
 
-Signed-off-by: Tomasz Duszynski <tduszynski@marvell.com>
-Fixes: 5f6c7e0831a1 ("vfio/platform: Use the new device life cycle helpers")
----
- drivers/vfio/platform/vfio_platform_common.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+KVM_GET_SUPPORTED_CPUID no longer returns the host topology in leaf 0xB.
 
-diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-index 1a0a238ffa35..c09ffab6fbe6 100644
---- a/drivers/vfio/platform/vfio_platform_common.c
-+++ b/drivers/vfio/platform/vfio_platform_common.c
-@@ -653,7 +653,8 @@ int vfio_platform_init_common(struct vfio_platform_device *vdev)
- 	if (ret && vdev->reset_required)
- 		dev_err(dev, "No reset function found for device %s\n",
- 			vdev->name);
--	return ret;
-+
-+	return vdev->reset_required ? ret : 0;
- }
- EXPORT_SYMBOL_GPL(vfio_platform_init_common);
- 
--- 
-2.34.1
+> Part of the definition of the API is that you can take
+> KVM_GET_SUPPORTED_CPUID and pass it to KVM_SET_CPUID2 for all vCPUs.
+> Returning host topology information for a random host vCPU definitely
+> violates the contract.
 
+You are attempting to rewrite history. Leaf 0xB was added to
+KVM_GET_SUPPORTED_CPUID in commit 0771671749b5 ("KVM: Enhance guest
+cpuid management"), and the only documentation of the
+KVM_GET_SUPPORTED_CPUID ioctl at that time was in the commit message:
+
+     - KVM_GET_SUPPORTED_CPUID: get all cpuid entries the host (and kvm)
+       supports
+
+There is nothing in the commit message or the official documentation
+at the time that the ioctl was added that says anything about passing
+the result to KVM_SET_CPUID2 for all vCPUs. Operationally, it is quite
+clear from the committed code that the intention was to return the
+host topology information for the current logical processor.
+
+Any future changes to either the operational behavior or the
+documented behavior of the ABI surely demand a version bump.
