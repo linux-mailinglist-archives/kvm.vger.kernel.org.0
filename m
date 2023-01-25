@@ -2,149 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1145E67B3CE
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 15:04:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 03C7F67B408
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 15:15:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235586AbjAYOEQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 09:04:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47796 "EHLO
+        id S235682AbjAYOPY (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 09:15:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234845AbjAYOEO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 09:04:14 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8245844BDD
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 06:03:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674655406;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ncu/m+5+/WI/1e3GSfSo6VdQKJavRU4pao1vU93BlHw=;
-        b=ASdeiyC5dQGfefeGpjyx68VeoT1lscEtHhJCvdSy2XhrPeD6NBfdbPBRRGLKJr0lmYyr9W
-        VSsMOUad6lX3UvBsY/oELV9+AKBcnwqIrotkq3w98K8f6UUtBSmuTlOiJqPsGSrB/tVEKX
-        9xmUXeMnIt/r/xOcU6yahz/LIQl7Da0=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-373-VP2gGDSAOluu0k052J1qBw-1; Wed, 25 Jan 2023 09:03:25 -0500
-X-MC-Unique: VP2gGDSAOluu0k052J1qBw-1
-Received: by mail-ed1-f71.google.com with SMTP id x5-20020a05640226c500b0049e840f68feso11737263edd.23
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 06:03:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ncu/m+5+/WI/1e3GSfSo6VdQKJavRU4pao1vU93BlHw=;
-        b=fFIS+4e4Bwe8386Dhx5iU1EvMgBILIz3/uRYFZBh13cuGM53EcADiKBW+d9qxPPZmv
-         RNfhndKLjwHbVtUmG+EdVCHeer5JfKzHwyAXx+K9P5FhQ6Btdg+panxh8Ra0gx7UiVxV
-         nMzaXB5qEYM1JsGQJonn5goVotTVPY3/j2mQKzUAE5BEZKRVklRRFX7Y12rPtXzOzR0c
-         4C472+tjsSETc0FkijRf3dH1yssO0G80EX5rXyKyrr70agy2dQLMK4d07/q6D0bQ9yRr
-         Q176FYlvVMFYheMftYURyhkClCi71ZZsSohXFIFrPSV9//RN4WlcrmK1m0gw8kMWAOJB
-         AFLQ==
-X-Gm-Message-State: AFqh2kop4Nipxje3nuEsR12CYlOLW3P/+aistaLSUF/7NBxSwDRvXcQt
-        BGrlV2BcQfdacOIdB7C3RSYLiPjGT0JJ+0TSBuevaFUyprOCTN9gmgRvy9R23CHwly4SPTSKK5g
-        e8tdsG67A+n0l
-X-Received: by 2002:a17:907:8b0a:b0:877:5c3e:706 with SMTP id sz10-20020a1709078b0a00b008775c3e0706mr31811576ejc.73.1674655402445;
-        Wed, 25 Jan 2023 06:03:22 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXvUCNcE7exKGBNTzRlyuPWTkp0ghZlVVEFfENUI7ck1uWhBq7Q6OM8ofgDDHy/1rAF7l/yHUA==
-X-Received: by 2002:a17:907:8b0a:b0:877:5c3e:706 with SMTP id sz10-20020a1709078b0a00b008775c3e0706mr31811559ejc.73.1674655402220;
-        Wed, 25 Jan 2023 06:03:22 -0800 (PST)
-Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
-        by smtp.googlemail.com with ESMTPSA id un4-20020a170907cb8400b008775b8a5a5fsm2389452ejc.198.2023.01.25.06.03.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 25 Jan 2023 06:03:21 -0800 (PST)
-Message-ID: <ad6673bd-1500-eb9e-f5be-95e63bb8ff64@redhat.com>
-Date:   Wed, 25 Jan 2023 15:03:20 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.1
-Subject: Re: [PATCH] x86: KVM: Add common feature flag for AMD's PSFD
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org
-Cc:     "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org
-References: <20230124194519.2893234-1-seanjc@google.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-In-Reply-To: <20230124194519.2893234-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S235661AbjAYOOs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 09:14:48 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCED05927F
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 06:14:34 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 66A6CB818BD
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 14:14:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9458C433D2;
+        Wed, 25 Jan 2023 14:14:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674656071;
+        bh=/Vnpkso8mckCxGmyhVYzF2vn9Lk2POBSVUnWGWIl6DE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=W2vMBkDG5DOYhGg3hBI/GsFDxV4pBam6zX2r4AqmxDnjZFLrbyai2OHgo9OfcVttR
+         IQOv4Xx2lxjfZOF66WZJHc9xkIkq+OVgwV92yhgie8yuKl2Vm+sGZ07jV2SIQfGbJN
+         jScLIyTHj7FS+0CDNj35hilEdxrrTmRaOgGZVqG5s/3gmMIme7zVbqdJ+m9yS8HHGW
+         nHTH7ECVx/4XfN4/e7+/b9oc8Z5ihX4JhdTgpZHDudoHwrdA2yId4XeklwmV8NDSrc
+         aVZ4PQTZHiCbigH0tSRhvHXq8I/3Gmlrspz+On0fy4CVCQuTx1RGaZFtdJEwLIqbtj
+         qdvXL/kTsOKaA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pKgXl-004YD8-M1;
+        Wed, 25 Jan 2023 14:14:29 +0000
+Date:   Wed, 25 Jan 2023 14:14:29 +0000
+Message-ID: <86357yn1kq.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, andrew.jones@linux.dev,
+        pbonzini@redhat.com, alexandru.elisei@arm.com,
+        eric.auger@redhat.com, yuzenghui@huawei.com
+Subject: Re: [PATCH 4/4] KVM: selftests: aarch64: Test read-only PT memory regions
+In-Reply-To: <Y9E2atXyP/7Zzly6@google.com>
+References: <20230110022432.330151-1-ricarkol@google.com>
+        <20230110022432.330151-5-ricarkol@google.com>
+        <Y88aFBBcsx7v/2qh@google.com>
+        <Y9AGmn0CM/lNX6w/@google.com>
+        <Y9A3kVCnVgl+x5UJ@thinky-boi>
+        <864jsen6li.wl-maz@kernel.org>
+        <Y9E2atXyP/7Zzly6@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, andrew.jones@linux.dev, pbonzini@redhat.com, alexandru.elisei@arm.com, eric.auger@redhat.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/24/23 20:45, Sean Christopherson wrote:
-> Use a common X86_FEATURE_* flag for AMD's PSFD, and suppress it from
-> /proc/cpuinfo via the standard method of an empty string instead of
-> hacking in a one-off "private" #define in KVM.  The request that led to
-> KVM defining its own flag was really just that the feature not show up
-> in /proc/cpuinfo, and additional patches+discussions in the interim have
-> clarified that defining flags in cpufeatures.h purely so that KVM can
-> advertise features to userspace is ok so long as the kernel already uses
-> a word to track the associated CPUID leaf.
+On Wed, 25 Jan 2023 14:02:18 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> No functional change intended.
+> On Wed, Jan 25, 2023 at 12:26:01PM +0000, Marc Zyngier wrote:
+> > On Tue, 24 Jan 2023 19:54:57 +0000,
+> > Oliver Upton <oliver.upton@linux.dev> wrote:
+> > > 
+> > > On Tue, Jan 24, 2023 at 08:26:02AM -0800, Ricardo Koller wrote:
+> > > > On Mon, Jan 23, 2023 at 11:36:52PM +0000, Oliver Upton wrote:
+> > > > > On Tue, Jan 10, 2023 at 02:24:32AM +0000, Ricardo Koller wrote:
+> > > > > > Extend the read-only memslot tests in page_fault_test to test read-only PT
+> > > > > > (Page table) memslots. Note that this was not allowed before commit "KVM:
+> > > > > > arm64: Fix handling of S1PTW S2 fault on RO memslots" as all S1PTW faults
+> > > > > > were treated as writes which resulted in an (unrecoverable) exception
+> > > > > > inside the guest.
+> > > > > 
+> > > > > Do we need an additional test that the guest gets nuked if TCR_EL1.HA =
+> > > > > 0b1 and AF is clear in one of the stage-1 PTEs?
+> > > > > 
+> > > > 
+> > > > That should be easy to add. The only issue is whether that's also a case
+> > > > of checking for very specific KVM behavior that could change in the
+> > > > future.
+> > > 
+> > > From the perspective of the guest I believe this to match the
+> > > architecture. An external abort is appropriate if the hardware update to
+> > > a descriptor failed.
+> > > 
+> > > I believe that the current implementation of this in KVM is slightly
+> > > wrong, though. AFAICT, we encode the abort with an FSC of 0x10, which
+> > > indicates an SEA occurred outside of a table walk. The other nuance of
+> > > reporting SEAs due to a TTW is that the FSC encodes the level at which
+> > > the external abort occurred. Nonetheless, I think we can hide behind
+> > > R_BGPQR of DDI0487I.a and always encode a level of 0:
+> > > 
+> > > """
+> > >   If a synchronous External abort is generated due to a TLB or
+> > >   intermediate TLB caching structure, including parity or ECC errors,
+> > >   then all of the following are permitted:
+> > >    - If the PE cannot precisely determine the translation stage at which
+> > >      the error occurred, then it is reported and prioritized as a stage 1
+> > >      fault.
+> > >    - If the PE cannot precisely determine the lookup level at which the
+> > >      error occurred, then the lookup level is reported and prioritized
+> > >      as one of the following:
+> > >      - The lowest-numbered lookup level that could have caused the error.
+> > >      - If the PE cannot determine any information about the lookup level,
+> > >      then level 0.
+> > > """
+> > > 
+> > > Thoughts?
+> > 
+> > Indeed, the abort injection has always been on the dodgy side of
+> > things. I remember Christoffer and I writing this, saying that it was
+> > something we'd have to eventually fix. 10 years down the line, this
+> > code is, unsurprisingly, still dodgy.
+> > 
+> > My vote would be to slightly extend the API to take a set of
+> > KVM-specific flags to give context to the injection helpers (such as
+> > SEA during a TTW), and bring the KVM behaviour in line with the
+> > architecture.
+> > 
+> > Reporting 0 in the FSC is probably OK, but we should also be able to
+> > determine which level this fails at:
+> > 
+> > - Sample FAR_EL2[55] to derive which TTBR this translates from (n)
+> > - From TCR_EL1.{TnSZ,TGn}, you can determine the number of levels
+> > 
+> > There is a bunch of tables for this in the ARM ARM, and it is possible
+> > to come up with a decent formula that encompass all the possible
+> > combinations.
+> > 
+> > But as I said, 0 is probably fine... ;-)
+> > 
+> > 	M.
+> > 
+> > -- 
+> > Without deviation from the norm, progress is not possible.
+> > 
 > 
-> Link: https://lore.kernel.org/all/d1b1e0da-29f0-c443-6c86-9549bbe1c79d@redhat.como
-> Link: https://lore.kernel.org/all/YxGZH7aOXQF7Pu5q@nazgul.tnic
-> Link: https://lore.kernel.org/all/Y3O7UYWfOLfJkwM%2F@zn.tnic
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/include/asm/cpufeatures.h | 1 +
->   arch/x86/kvm/cpuid.c               | 8 +-------
->   2 files changed, 2 insertions(+), 7 deletions(-)
-
-Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-
-> diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
-> index 61012476d66e..2acaebc7bb76 100644
-> --- a/arch/x86/include/asm/cpufeatures.h
-> +++ b/arch/x86/include/asm/cpufeatures.h
-> @@ -330,6 +330,7 @@
->   #define X86_FEATURE_VIRT_SSBD		(13*32+25) /* Virtualized Speculative Store Bypass Disable */
->   #define X86_FEATURE_AMD_SSB_NO		(13*32+26) /* "" Speculative Store Bypass is fixed in hardware. */
->   #define X86_FEATURE_CPPC		(13*32+27) /* Collaborative Processor Performance Control */
-> +#define X86_FEATURE_AMD_PSFD            (13*32+28) /* "" Predictive Store Forwarding Disable */
->   #define X86_FEATURE_BTC_NO		(13*32+29) /* "" Not vulnerable to Branch Type Confusion */
->   #define X86_FEATURE_BRS			(13*32+31) /* Branch Sampling available */
->   
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 2a9f1e200dbc..fb2b0e3ecce1 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -59,12 +59,6 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
->   	return ret;
->   }
->   
-> -/*
-> - * This one is tied to SSB in the user API, and not
-> - * visible in /proc/cpuinfo.
-> - */
-> -#define KVM_X86_FEATURE_AMD_PSFD	(13*32+28) /* Predictive Store Forwarding Disable */
-> -
->   #define F feature_bit
->   
->   /* Scattered Flag - For features that are scattered by cpufeatures.h. */
-> @@ -710,7 +704,7 @@ void kvm_set_cpu_caps(void)
->   		F(CLZERO) | F(XSAVEERPTR) |
->   		F(WBNOINVD) | F(AMD_IBPB) | F(AMD_IBRS) | F(AMD_SSBD) | F(VIRT_SSBD) |
->   		F(AMD_SSB_NO) | F(AMD_STIBP) | F(AMD_STIBP_ALWAYS_ON) |
-> -		__feature_bit(KVM_X86_FEATURE_AMD_PSFD)
-> +		F(AMD_PSFD)
->   	);
->   
->   	/*
+> Thank you both.
 > 
-> base-commit: 7cb79f433e75b05d1635aefaa851cfcd1cb7dc4f
+> So, what about the following? I can send a series after this that
+> includes a KVM fix to report level 0 in the FSC in this S1PTW case, and
+> an extra test that checks that the exception comes with some sane values
+> (like a sane level in the FSC). Then, getting the actual lookup level
+> can be added as an improvement (with less priority than the first fix).
 
+Works for me. You could also fold the level-0 fix in this series, and
+only add the lookup level fix later, if ever.
 
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
