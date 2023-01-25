@@ -2,137 +2,219 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22F8E67ACDC
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 09:54:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECFE467ACFD
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 09:56:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234990AbjAYIyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 03:54:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53148 "EHLO
+        id S235102AbjAYI4a (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 03:56:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53926 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232753AbjAYIxt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 03:53:49 -0500
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9B0829159
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 00:53:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674636826; x=1706172826;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=A8gmcN6JKfeSEuDQLAdBHz86LKi0XImCOBNbrUmMCYA=;
-  b=LiMb5sqk2sLGBeyb1Tayk64Rohdsc54etxOnCD7xHal6+MC+3mmdaa7R
-   BmLHCUQLckwbdz/KjHKwzF15W02vGt8plS02BD9sveKnf3c0dGQVYZF5z
-   iauqDLKY7Vs0hA394YrkUnF4zOHN/J6PSfrTWgMQXvoMR0CNa/h5QUzxn
-   otzMmXZg2BAwcBHhWo04fMorhMEzXkdgDzaoVVb7zu7NwNbsx+AEvPM+v
-   cBnHW3vJx106WwWbqoj9mmhOpT+giakfLERM5ldfKyIA2KFt+V2/fwtIn
-   3x5Xoi2yBqF5uRI50NzFJkyeOLeV6jnKv1JEw1W0goqWQmSrkBT0W1j7r
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10600"; a="306862595"
-X-IronPort-AV: E=Sophos;i="5.97,244,1669104000"; 
-   d="scan'208";a="306862595"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2023 00:53:46 -0800
-X-IronPort-AV: E=McAfee;i="6500,9779,10600"; a="694672205"
-X-IronPort-AV: E=Sophos;i="5.97,244,1669104000"; 
-   d="scan'208";a="694672205"
-Received: from wangbolu-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.173.33])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2023 00:53:44 -0800
-Date:   Wed, 25 Jan 2023 16:53:50 +0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     kvm@vger.kernel.org
-Cc:     pbonzini@redhat.com, seanjc@google.com
-Subject: A question of KVM selftests' makefile
-Message-ID: <20230125085350.xg6u73ozznpum4u5@linux.intel.com>
+        with ESMTP id S229778AbjAYI40 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 03:56:26 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 611682B08B;
+        Wed, 25 Jan 2023 00:56:24 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 0BC6721B0A;
+        Wed, 25 Jan 2023 08:56:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1674636983; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=HlfVezvAjFmKLztHMOaZ+yji8Nsqp9vLwu4LVliFLNo=;
+        b=sP3k2vbL/TMjnnanRjZuUO51OPKL7NCAE7wor1COt2s99RKg6YGTByegVuny2bFzwE3+s6
+        UutXKdgKZ+JCm3/zcJc6jOoDAopdP55BVOpdwrjI4e178jvtCsfm11DvfUjHyJJs6l60Lo
+        ZwU2a8676f0/M9W0HO3obY7BVSmDGjU=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B78841339E;
+        Wed, 25 Jan 2023 08:56:22 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id ZJ2WLLbu0GN/CQAAMHmgww
+        (envelope-from <mhocko@suse.com>); Wed, 25 Jan 2023 08:56:22 +0000
+Date:   Wed, 25 Jan 2023 09:56:22 +0100
+From:   Michal Hocko <mhocko@suse.com>
+To:     Suren Baghdasaryan <surenb@google.com>
+Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
+        jglisse@google.com, vbabka@suse.cz, hannes@cmpxchg.org,
+        mgorman@techsingularity.net, dave@stgolabs.net,
+        willy@infradead.org, liam.howlett@oracle.com, peterz@infradead.org,
+        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
+        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
+        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
+        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
+        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
+        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
+        jannh@google.com, shakeelb@google.com, tatashin@google.com,
+        edumazet@google.com, gthelen@google.com, gurua@google.com,
+        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
+        leewalsh@google.com, posk@google.com, will@kernel.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
+        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
+        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
+        qianweili@huawei.com, wangzhou1@hisilicon.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+        airlied@gmail.com, daniel@ffwll.ch,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, l.stach@pengutronix.de,
+        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
+        matthias.bgg@gmail.com, robdclark@gmail.com,
+        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
+        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
+        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
+        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
+        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
+        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
+        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, miklos@szeredi.hu,
+        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
+        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
+        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
+        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
+        loongarch@lists.linux.dev, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
+        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
+        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        freedreno@lists.freedesktop.org,
+        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
+        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        devel@lists.orangefs.org, kexec@lists.infradead.org,
+        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
+        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 1/6] mm: introduce vma->vm_flags modifier functions
+Message-ID: <Y9DuttqjdKSRCVYh@dhcp22.suse.cz>
+References: <20230125083851.27759-1-surenb@google.com>
+ <20230125083851.27759-2-surenb@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: NeoMutt/20171215
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230125083851.27759-2-surenb@google.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi all,
+On Wed 25-01-23 00:38:46, Suren Baghdasaryan wrote:
+> vm_flags are among VMA attributes which affect decisions like VMA merging
+> and splitting. Therefore all vm_flags modifications are performed after
+> taking exclusive mmap_lock to prevent vm_flags updates racing with such
+> operations. Introduce modifier functions for vm_flags to be used whenever
+> flags are updated. This way we can better check and control correct
+> locking behavior during these updates.
+> 
+> Signed-off-by: Suren Baghdasaryan <surenb@google.com>
 
-  Currently, unlike the build system of Linux kernel, KVM selftests will
-have to run "make clean && make" to rebuild the entire test suite, once
-a header file is modified.
+Acked-by: Michal Hocko <mhocko@suse.com>
 
-  Is it designed like this on purpose, or does anyone wanna change it?
+> ---
+>  include/linux/mm.h       | 37 +++++++++++++++++++++++++++++++++++++
+>  include/linux/mm_types.h |  8 +++++++-
+>  2 files changed, 44 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/mm.h b/include/linux/mm.h
+> index c2f62bdce134..b71f2809caac 100644
+> --- a/include/linux/mm.h
+> +++ b/include/linux/mm.h
+> @@ -627,6 +627,43 @@ static inline void vma_init(struct vm_area_struct *vma, struct mm_struct *mm)
+>  	INIT_LIST_HEAD(&vma->anon_vma_chain);
+>  }
+>  
+> +/* Use when VMA is not part of the VMA tree and needs no locking */
+> +static inline void init_vm_flags(struct vm_area_struct *vma,
+> +				 unsigned long flags)
+> +{
+> +	vma->vm_flags = flags;
+> +}
+> +
+> +/* Use when VMA is part of the VMA tree and modifications need coordination */
+> +static inline void reset_vm_flags(struct vm_area_struct *vma,
+> +				  unsigned long flags)
+> +{
+> +	mmap_assert_write_locked(vma->vm_mm);
+> +	init_vm_flags(vma, flags);
+> +}
+> +
+> +static inline void set_vm_flags(struct vm_area_struct *vma,
+> +				unsigned long flags)
+> +{
+> +	mmap_assert_write_locked(vma->vm_mm);
+> +	vma->vm_flags |= flags;
+> +}
+> +
+> +static inline void clear_vm_flags(struct vm_area_struct *vma,
+> +				  unsigned long flags)
+> +{
+> +	mmap_assert_write_locked(vma->vm_mm);
+> +	vma->vm_flags &= ~flags;
+> +}
+> +
+> +static inline void mod_vm_flags(struct vm_area_struct *vma,
+> +				unsigned long set, unsigned long clear)
+> +{
+> +	mmap_assert_write_locked(vma->vm_mm);
+> +	vma->vm_flags |= set;
+> +	vma->vm_flags &= ~clear;
+> +}
+> +
+>  static inline void vma_set_anonymous(struct vm_area_struct *vma)
+>  {
+>  	vma->vm_ops = NULL;
+> diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+> index 2d6d790d9bed..6c7c70bf50dd 100644
+> --- a/include/linux/mm_types.h
+> +++ b/include/linux/mm_types.h
+> @@ -491,7 +491,13 @@ struct vm_area_struct {
+>  	 * See vmf_insert_mixed_prot() for discussion.
+>  	 */
+>  	pgprot_t vm_page_prot;
+> -	unsigned long vm_flags;		/* Flags, see mm.h. */
+> +
+> +	/*
+> +	 * Flags, see mm.h.
+> +	 * WARNING! Do not modify directly.
+> +	 * Use {init|reset|set|clear|mod}_vm_flags() functions instead.
+> +	 */
+> +	unsigned long vm_flags;
+>  
+>  	/*
+>  	 * For areas with an address space and backing store,
+> -- 
+> 2.39.1
 
-  I hacked the makefile by using "-MD" as EXTRA_CFLAGS, so that dependency
-rules can be generated for each target object, whose prerequisites contains
-the source file and the included header files as well.
-
-  However, this change has its own costs. E.g., new ".o" and ".d" files will
-occupy more storage. And performance-wise, the benifit could be limited,
-because for now, most header files are needed by almost every ".c" files.
-But with the evolution of KVM selftests, more ".h" files may be added. Some
-of which may be of special usage. E.g., file "include/x86_64/mce.h" is only
-used by "x86_64/ucna_injection_test". Having to rebuild the whole test suite
-just because one specific header is touched would be annoying.
-
-  I am not sure if this change is worthy, or if there's a better solution.
-So does anyone have any suggestion? 
-
-  Below are my current hack in KVM selftest's makefile in case someone is
-interested. It can not be optimal and any comment is welcome. Thanks!
-
-B.R.
-Yu
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 1750f91dd936..b329e0d1a460 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -180,6 +180,8 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
- TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
- LIBKVM += $(LIBKVM_$(ARCH_DIR))
-
-+OVERRIDE_TARGETS = 1
-+
- # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
- # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
- # which causes the environment variable to override the makefile).
-@@ -198,9 +200,11 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
-        -fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
-        -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
-        -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
--       -I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
-+       -I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. \
-        $(KHDR_INCLUDES)
-
-+EXTRA_CFLAGS += -MD
-+
- no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
-         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
-
-@@ -218,11 +222,22 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
- LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
- LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
-
--EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
-+TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
-+TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
-+TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
-+TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
-+-include $(TEST_DEP_FILES)
-+
-+$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
-+       $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
-+$(TEST_GEN_OBJ): %.o: %.c
-+       $(CC) $(CFLAGS) $(CPPFLAGS) $(EXTRA_CFLAGS) $(TARGET_ARCH) -c $< -o $@
-+
-+EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
-
- x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
- $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
--       $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-+       $(CC) $(CFLAGS) $(CPPFLAGS) $(EXTRA_CFLAGS) $(TARGET_ARCH) -c $< -o $@
-
- $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
-        $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-
+-- 
+Michal Hocko
+SUSE Labs
