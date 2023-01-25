@@ -2,161 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A37B67AC81
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 09:42:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 22F8E67ACDC
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 09:54:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235451AbjAYImY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 03:42:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44442 "EHLO
+        id S234990AbjAYIyJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 03:54:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235474AbjAYIkR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 03:40:17 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E20E54214
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 00:39:42 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id x188-20020a2531c5000000b00716de19d76bso19184165ybx.19
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 00:39:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=J7ancMifNNyjJiTof8bzSGdh+LvtuOAZ/yhUxoIZ6EY=;
-        b=l/hcCYqvcIly8bHSP154OLa3geKFmW7WOJHtqW6QP0WOiQCkjUgO6NFBclTznfTfXd
-         q/KZ4uqcFfz6e/A7WhMCPvMZlY7cpI5ZXPygAYrMACNGYIbdZdn2/wrvbiLbPFMi0EJU
-         e2xhTpttA9V49soY/4kK5pbOiY/jtu7/UBbsL9M2oZElpThGo5ueYxij1daBdATn/U6J
-         lFgz4QPoUTVqu2tO2Jv29c+EKfKlUr82uf6j5jrJG0K4kH7t4tXslYBl2iUfCiGyJg2L
-         sa2ZzT9fi8Nbfwma/h4EwurZmwhJrp5hy3f2wiTWrdCgSBqaWH+IxEwCQ2mYpS41PmTz
-         ZJ5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=J7ancMifNNyjJiTof8bzSGdh+LvtuOAZ/yhUxoIZ6EY=;
-        b=GdV6+rOIr/1NBTk0MrVbaJseHgflvjADCnbZLBHVrdMGxugM8J4lBmJs3v8pZOfSSU
-         PIA+vaV6wN1HUf6dDUS8bNVjBWIZ1Huhxfvh8FFJrtm6Iz/guwarW/vWLfu/I00krGkP
-         A6MhPZPoc6BsSzSxCmWEI9dXpaAJmii8hjSU7XcGMBOHCjuU1Qeq/SRRnZSLuDhrtaow
-         9EhUav9L45+yfAAmssaWsXD209fMm6HOnVO8pwxq0jv4vF2ZdMVtjbLZ1gGuCjvST2Ej
-         jfy1GEgF6UUDrq72QPgQaBR8+Rp+HiaofcQlAlwNiefIACgU71IxQB5ZknvbSfay9RdN
-         0b6w==
-X-Gm-Message-State: AFqh2kryYX84CybGrUIc2W6hF9d3oNX02Dn+z5TKO5nQL2eFSs/0QN9v
-        nqvt9xGtce6dxAPtUApX17dk84DTsXg=
-X-Google-Smtp-Source: AMrXdXslOvF1txeQ7QJk1q8MehIUDQnhzGgaj+Ckxm4gdtDkml40uAzU8COPOn8c5wwtHui85E8JZje3JZk=
-X-Received: from surenb-desktop.mtv.corp.google.com ([2620:15c:211:200:f7b0:20e8:ce66:f98])
- (user=surenb job=sendgmr) by 2002:a0d:ca88:0:b0:501:80db:3eca with SMTP id
- m130-20020a0dca88000000b0050180db3ecamr2010555ywd.100.1674635950405; Wed, 25
- Jan 2023 00:39:10 -0800 (PST)
-Date:   Wed, 25 Jan 2023 00:38:51 -0800
-In-Reply-To: <20230125083851.27759-1-surenb@google.com>
-Mime-Version: 1.0
-References: <20230125083851.27759-1-surenb@google.com>
-X-Mailer: git-send-email 2.39.1.405.gd4c25cc71f-goog
-Message-ID: <20230125083851.27759-7-surenb@google.com>
-Subject: [PATCH v2 6/6] mm: export dump_mm()
-From:   Suren Baghdasaryan <surenb@google.com>
-To:     akpm@linux-foundation.org
-Cc:     michel@lespinasse.org, jglisse@google.com, mhocko@suse.com,
-        vbabka@suse.cz, hannes@cmpxchg.org, mgorman@techsingularity.net,
-        dave@stgolabs.net, willy@infradead.org, liam.howlett@oracle.com,
-        peterz@infradead.org, ldufour@linux.ibm.com, paulmck@kernel.org,
-        luto@kernel.org, songliubraving@fb.com, peterx@redhat.com,
-        david@redhat.com, dhowells@redhat.com, hughd@google.com,
-        bigeasy@linutronix.de, kent.overstreet@linux.dev,
-        punit.agrawal@bytedance.com, lstoakes@gmail.com,
-        peterjung1337@gmail.com, rientjes@google.com,
-        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
-        jannh@google.com, shakeelb@google.com, tatashin@google.com,
-        edumazet@google.com, gthelen@google.com, gurua@google.com,
-        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
-        leewalsh@google.com, posk@google.com, will@kernel.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
-        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
-        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
-        qianweili@huawei.com, wangzhou1@hisilicon.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-        airlied@gmail.com, daniel@ffwll.ch,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, l.stach@pengutronix.de,
-        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
-        matthias.bgg@gmail.com, robdclark@gmail.com,
-        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
-        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
-        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
-        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
-        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
-        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
-        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
-        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, miklos@szeredi.hu,
-        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
-        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
-        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
-        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
-        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
-        loongarch@lists.linux.dev, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
-        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
-        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org,
-        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        devel@lists.orangefs.org, kexec@lists.infradead.org,
-        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
-        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
-        kernel-team@android.com, surenb@google.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232753AbjAYIxt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 03:53:49 -0500
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9B0829159
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 00:53:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674636826; x=1706172826;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=A8gmcN6JKfeSEuDQLAdBHz86LKi0XImCOBNbrUmMCYA=;
+  b=LiMb5sqk2sLGBeyb1Tayk64Rohdsc54etxOnCD7xHal6+MC+3mmdaa7R
+   BmLHCUQLckwbdz/KjHKwzF15W02vGt8plS02BD9sveKnf3c0dGQVYZF5z
+   iauqDLKY7Vs0hA394YrkUnF4zOHN/J6PSfrTWgMQXvoMR0CNa/h5QUzxn
+   otzMmXZg2BAwcBHhWo04fMorhMEzXkdgDzaoVVb7zu7NwNbsx+AEvPM+v
+   cBnHW3vJx106WwWbqoj9mmhOpT+giakfLERM5ldfKyIA2KFt+V2/fwtIn
+   3x5Xoi2yBqF5uRI50NzFJkyeOLeV6jnKv1JEw1W0goqWQmSrkBT0W1j7r
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10600"; a="306862595"
+X-IronPort-AV: E=Sophos;i="5.97,244,1669104000"; 
+   d="scan'208";a="306862595"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2023 00:53:46 -0800
+X-IronPort-AV: E=McAfee;i="6500,9779,10600"; a="694672205"
+X-IronPort-AV: E=Sophos;i="5.97,244,1669104000"; 
+   d="scan'208";a="694672205"
+Received: from wangbolu-mobl.ccr.corp.intel.com (HELO localhost) ([10.249.173.33])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2023 00:53:44 -0800
+Date:   Wed, 25 Jan 2023 16:53:50 +0800
+From:   Yu Zhang <yu.c.zhang@linux.intel.com>
+To:     kvm@vger.kernel.org
+Cc:     pbonzini@redhat.com, seanjc@google.com
+Subject: A question of KVM selftests' makefile
+Message-ID: <20230125085350.xg6u73ozznpum4u5@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-mmap_assert_write_locked() is used in vm_flags modifiers. Because
-mmap_assert_write_locked() uses dump_mm() and vm_flags are sometimes
-modified from from inside a module, it's necessary to export
-dump_mm() function.
+Hi all,
 
-Signed-off-by: Suren Baghdasaryan <surenb@google.com>
----
- mm/debug.c | 1 +
- 1 file changed, 1 insertion(+)
+  Currently, unlike the build system of Linux kernel, KVM selftests will
+have to run "make clean && make" to rebuild the entire test suite, once
+a header file is modified.
 
-diff --git a/mm/debug.c b/mm/debug.c
-index 9d3d893dc7f4..96d594e16292 100644
---- a/mm/debug.c
-+++ b/mm/debug.c
-@@ -215,6 +215,7 @@ void dump_mm(const struct mm_struct *mm)
- 		mm->def_flags, &mm->def_flags
- 	);
- }
-+EXPORT_SYMBOL(dump_mm);
- 
- static bool page_init_poisoning __read_mostly = true;
- 
--- 
-2.39.1
+  Is it designed like this on purpose, or does anyone wanna change it?
+
+  I hacked the makefile by using "-MD" as EXTRA_CFLAGS, so that dependency
+rules can be generated for each target object, whose prerequisites contains
+the source file and the included header files as well.
+
+  However, this change has its own costs. E.g., new ".o" and ".d" files will
+occupy more storage. And performance-wise, the benifit could be limited,
+because for now, most header files are needed by almost every ".c" files.
+But with the evolution of KVM selftests, more ".h" files may be added. Some
+of which may be of special usage. E.g., file "include/x86_64/mce.h" is only
+used by "x86_64/ucna_injection_test". Having to rebuild the whole test suite
+just because one specific header is touched would be annoying.
+
+  I am not sure if this change is worthy, or if there's a better solution.
+So does anyone have any suggestion? 
+
+  Below are my current hack in KVM selftest's makefile in case someone is
+interested. It can not be optimal and any comment is welcome. Thanks!
+
+B.R.
+Yu
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 1750f91dd936..b329e0d1a460 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -180,6 +180,8 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
+ TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
+ LIBKVM += $(LIBKVM_$(ARCH_DIR))
+
++OVERRIDE_TARGETS = 1
++
+ # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
+ # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
+ # which causes the environment variable to override the makefile).
+@@ -198,9 +200,11 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+        -fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
+        -fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
+        -I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+-       -I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
++       -I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. \
+        $(KHDR_INCLUDES)
+
++EXTRA_CFLAGS += -MD
++
+ no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
+         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+
+@@ -218,11 +222,22 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
+ LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
+ LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
+
+-EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
++TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
++TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
++TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
++TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
++-include $(TEST_DEP_FILES)
++
++$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
++       $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
++$(TEST_GEN_OBJ): %.o: %.c
++       $(CC) $(CFLAGS) $(CPPFLAGS) $(EXTRA_CFLAGS) $(TARGET_ARCH) -c $< -o $@
++
++EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
+
+ x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
+ $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
+-       $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
++       $(CC) $(CFLAGS) $(CPPFLAGS) $(EXTRA_CFLAGS) $(TARGET_ARCH) -c $< -o $@
+
+ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
+        $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
 
