@@ -2,160 +2,170 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9A01667B166
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 12:34:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 718FA67B25E
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 13:09:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235279AbjAYLes (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 06:34:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53168 "EHLO
+        id S235303AbjAYMJn (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 07:09:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235681AbjAYLeb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 06:34:31 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 874088E;
-        Wed, 25 Jan 2023 03:34:30 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 26FFB1FD87;
-        Wed, 25 Jan 2023 11:34:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1674646469; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=l49gqrR00YStom+4XbW1P7OXxNNfJs2Zagbrz3cxZDY=;
-        b=pTPV48ccsT35BHMOK1sMKdn9C2GwooatjjrH9AG3y4DLkRYKxLgTungIRgVixtSoT/oTI7
-        woGGottIqQtagTebAP0C3aYeI+CJUFAZI+E8AKxN9K2BTe+2UjhTJJIVLyw/f4/HVOHl/Y
-        BaQIEOw585ptaepsLrRy58308FjTRts=
-Received: from suse.cz (unknown [10.100.201.202])
+        with ESMTP id S234969AbjAYMJm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 07:09:42 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 306B6DE;
+        Wed, 25 Jan 2023 04:09:38 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 0223E2C141;
-        Wed, 25 Jan 2023 11:34:28 +0000 (UTC)
-Date:   Wed, 25 Jan 2023 12:34:26 +0100
-From:   Petr Mladek <pmladek@suse.com>
-To:     Seth Forshee <sforshee@kernel.org>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] vhost: check for pending livepatches from vhost
- worker kthreads
-Message-ID: <Y9ETwsT4LTXyH/0m@alley>
-References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
- <20230120-vhost-klp-switching-v1-2-7c2b65519c43@kernel.org>
- <Y8/ohzRGcOiqsh69@alley>
- <Y9ATo5FukOhphwqT@do-x1extreme>
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 629921EC047F;
+        Wed, 25 Jan 2023 13:09:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1674648577;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=2CKK5UqFKEbdOFeMTDMTUfy7cL9pOE+BIckZRxnZFls=;
+        b=N7mQUWfDbZHBP1w1vSbWCyHQmoYxavgmGF9takgbVKtSQvkgSrCo1cuaeytqiHnlbiGRMs
+        wW87s7zOaiKTNkK1BsCW9MatXilYyVkONKrxwFHA6du27aDJzXUOmb8zeteDv2osM4SJpM
+        YxefZwwOut5QGw/4eDXLEaErPcbkpmw=
+Date:   Wed, 25 Jan 2023 13:09:33 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Kim Phillips <kim.phillips@amd.com>, x86@kernel.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+        Joao Martins <joao.m.martins@oracle.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Juergen Gross <jgross@suse.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 4/8] x86/cpu, kvm: Move X86_FEATURE_LFENCE_RDTSC to
+ its native leaf
+Message-ID: <Y9Eb/Yvw38W01gPA@zn.tnic>
+References: <20230124163319.2277355-1-kim.phillips@amd.com>
+ <20230124163319.2277355-5-kim.phillips@amd.com>
+ <Y9BOh9xB/G5Ifj8N@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Y9ATo5FukOhphwqT@do-x1extreme>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y9BOh9xB/G5Ifj8N@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue 2023-01-24 11:21:39, Seth Forshee wrote:
-> On Tue, Jan 24, 2023 at 03:17:43PM +0100, Petr Mladek wrote:
-> > On Fri 2023-01-20 16:12:22, Seth Forshee (DigitalOcean) wrote:
-> > > Livepatch relies on stack checking of sleeping tasks to switch kthreads,
-> > > so a busy kthread can block a livepatch transition indefinitely. We've
-> > > seen this happen fairly often with busy vhost kthreads.
-> > 
-> > To be precise, it would be "indefinitely" only when the kthread never
-> > sleeps.
-> > 
-> > But yes. I believe that the problem is real. It might be almost
-> > impossible to livepatch some busy kthreads, especially when they
-> > have a dedicated CPU.
-> > 
-> > 
-> > > Add a check to call klp_switch_current() from vhost_worker() when a
-> > > livepatch is pending. In testing this allowed vhost kthreads to switch
-> > > immediately when they had previously blocked livepatch transitions for
-> > > long periods of time.
-> > > 
-> > > Signed-off-by: Seth Forshee (DigitalOcean) <sforshee@kernel.org>
-> > > ---
-> > >  drivers/vhost/vhost.c | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > > 
-> > > diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> > > index cbe72bfd2f1f..d8624f1f2d64 100644
-> > > --- a/drivers/vhost/vhost.c
-> > > +++ b/drivers/vhost/vhost.c
-> > > @@ -366,6 +367,9 @@ static int vhost_worker(void *data)
-> > >  			if (need_resched())
-> > >  				schedule();
-> > >  		}
-> > > +
-> > > +		if (unlikely(klp_patch_pending(current)))
-> > > +			klp_switch_current();
-> > 
-> > I suggest to use the following intead:
-> > 
-> > 		if (unlikely(klp_patch_pending(current)))
-> > 			klp_update_patch_state(current);
-> > 
-> > We already use this in do_idle(). The reason is basically the same.
-> > It is almost impossible to livepatch the idle task when a CPU is
-> > very idle.
-> > 
-> > klp_update_patch_state(current) does not check the stack.
-> > It switches the task immediately.
-> > 
-> > It should be safe because the kthread never leaves vhost_worker().
-> > It means that the same kthread could never re-enter this function
-> > and use the new code.
-> 
-> My knowledge of livepatching internals is fairly limited, so I'll accept
-> it if you say that it's safe to do it this way. But let me ask about one
-> scenario.
-> 
-> Let's say that a livepatch is loaded which replaces vhost_worker(). New
-> vhost worker threads are started which use the replacement function. Now
-> if the patch is disabled, these new worker threads would be switched
-> despite still running the code from the patch module, correct? Could the
-> module then be unloaded, freeing the memory containing the code these
-> kthreads are executing?
+On Tue, Jan 24, 2023 at 09:32:55PM +0000, Sean Christopherson wrote:
+> Boris, can you fold this in?
 
-Great catch! Yes, this might theoretically happen.
+Sure, see below.
 
-The above scenario would require calling klp_update_patch_state() from
-the code in the livepatch module. It is not possible at the moment because
-this function is not exported for modules.
+---
+From: Kim Phillips <kim.phillips@amd.com>
+Date: Tue, 24 Jan 2023 10:33:15 -0600
+Subject: [PATCH] x86/cpu, kvm: Move X86_FEATURE_LFENCE_RDTSC to its native leaf
 
-Hmm, the same problem might be when we livepatch a function that calls
-another function that calls klp_update_patch_state(). But in this case
-it would be kthread() from kernel/kthread.c. It would affect any
-running kthread. I doubt that anyone would seriously think about
-livepatching this function.
+The LFENCE always serializing feature bit was defined as scattered
+LFENCE_RDTSC and its native leaf bit position open-coded for KVM.  Add
+it to its newly added CPUID leaf 0x80000021 EAX proper.  With
+LFENCE_RDTSC in its proper place, the kernel's set_cpu_cap() will
+effectively synthesize the feature for KVM going forward.
 
-A good enough solution might be to document this. Livepatches could
-not be created blindly. There are more situations where the
-livepatch is tricky or not possible at all.
+Also, DE_CFG[1] doesn't need to be set on such CPUs anymore.
 
-Crazy idea. We could prevent this problem even technically. A solution
-would be to increment a per-process counter in klp_ftrace_handler() when a
-function is redirected(). And klp_update_patch_state() might refuse
-the migration when this counter is not zero. But it would require
-to use a trampoline on return that would decrement the counter.
-I am not sure if this is worth the complexity.
+  [ bp: Massage and merge diff from Sean. ]
 
-One the other hand, this counter might actually remove the need
-of the reliable backtrace. It is possible that I miss something
-or that it is not easy/possible to implement the return trampoline.
+Signed-off-by: Kim Phillips <kim.phillips@amd.com>
+Signed-off-by: Borislav Petkov (AMD) <bp@alien8.de>
+Acked-by: Sean Christopherson <seanjc@google.com>
+Link: https://lore.kernel.org/r/20230124163319.2277355-5-kim.phillips@amd.com
+---
+ arch/x86/include/asm/cpufeatures.h |  3 ++-
+ arch/x86/kernel/cpu/amd.c          |  2 +-
+ arch/x86/kvm/cpuid.c               | 16 +++++++++++++---
+ 3 files changed, 16 insertions(+), 5 deletions(-)
 
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index 1b2d40a96b97..901128ed4c7a 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -97,7 +97,7 @@
+ #define X86_FEATURE_SYSENTER32		( 3*32+15) /* "" sysenter in IA32 userspace */
+ #define X86_FEATURE_REP_GOOD		( 3*32+16) /* REP microcode works well */
+ #define X86_FEATURE_AMD_LBR_V2		( 3*32+17) /* AMD Last Branch Record Extension Version 2 */
+-#define X86_FEATURE_LFENCE_RDTSC	( 3*32+18) /* "" LFENCE synchronizes RDTSC */
++/* FREE, was #define X86_FEATURE_LFENCE_RDTSC		( 3*32+18) "" LFENCE synchronizes RDTSC */
+ #define X86_FEATURE_ACC_POWER		( 3*32+19) /* AMD Accumulated Power Mechanism */
+ #define X86_FEATURE_NOPL		( 3*32+20) /* The NOPL (0F 1F) instructions */
+ #define X86_FEATURE_ALWAYS		( 3*32+21) /* "" Always-present feature */
+@@ -429,6 +429,7 @@
+ 
+ /* AMD-defined Extended Feature 2 EAX, CPUID level 0x80000021 (EAX), word 20 */
+ #define X86_FEATURE_NO_NESTED_DATA_BP	(20*32+ 0) /* "" No Nested Data Breakpoints */
++#define X86_FEATURE_LFENCE_RDTSC	(20*32+ 2) /* "" LFENCE always serializing / synchronizes RDTSC */
+ 
+ /*
+  * BUG word(s)
+diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+index f769d6d08b43..208c2ce8598a 100644
+--- a/arch/x86/kernel/cpu/amd.c
++++ b/arch/x86/kernel/cpu/amd.c
+@@ -956,7 +956,7 @@ static void init_amd(struct cpuinfo_x86 *c)
+ 
+ 	init_amd_cacheinfo(c);
+ 
+-	if (cpu_has(c, X86_FEATURE_XMM2)) {
++	if (!cpu_has(c, X86_FEATURE_LFENCE_RDTSC) && cpu_has(c, X86_FEATURE_XMM2)) {
+ 		/*
+ 		 * Use LFENCE for execution serialization.  On families which
+ 		 * don't have that MSR, LFENCE is already serializing.
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index aa3a6dc74e95..12455dc5afe5 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -742,12 +742,22 @@ void kvm_set_cpu_caps(void)
+ 		F(SME_COHERENT));
+ 
+ 	kvm_cpu_cap_mask(CPUID_8000_0021_EAX,
+-		F(NO_NESTED_DATA_BP) |
+-		BIT(2) /* LFENCE Always serializing */ | 0 /* SmmPgCfgLock */ |
++		F(NO_NESTED_DATA_BP) | F(LFENCE_RDTSC) | 0 /* SmmPgCfgLock */ |
+ 		BIT(6) /* NULL_SEL_CLR_BASE */ | 0 /* PrefetchCtlMsr */
+ 	);
++
++	/*
++	 * Synthesize "LFENCE is serializing" into the AMD-defined entry in
++	 * KVM's supported CPUID if the feature is reported as supported by the
++	 * kernel.  LFENCE_RDTSC was a Linux-defined synthetic feature long
++	 * before AMD joined the bandwagon, e.g. LFENCE is serializing on most
++	 * CPUs that support SSE2.  On CPUs that don't support AMD's leaf,
++	 * kvm_cpu_cap_mask() will unfortunately drop the flag due to ANDing
++	 * the mask with the raw host CPUID, and reporting support in AMD's
++	 * leaf can make it easier for userspace to detect the feature.
++	 */
+ 	if (cpu_feature_enabled(X86_FEATURE_LFENCE_RDTSC))
+-		kvm_cpu_caps[CPUID_8000_0021_EAX] |= BIT(2) /* LFENCE Always serializing */;
++		kvm_cpu_cap_set(X86_FEATURE_LFENCE_RDTSC);
+ 	if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
+ 		kvm_cpu_caps[CPUID_8000_0021_EAX] |= BIT(6) /* NULL_SEL_CLR_BASE */;
+ 	kvm_cpu_caps[CPUID_8000_0021_EAX] |= BIT(9) /* NO_SMM_CTL_MSR */;
+-- 
+2.35.1
 
-Back to the original problem. I still consider calling
-klp_update_patch_state(current) in vhost_worker() safe.
+-- 
+Regards/Gruss,
+    Boris.
 
-Best Regards,
-Petr
+https://people.kernel.org/tglx/notes-about-netiquette
