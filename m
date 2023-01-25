@@ -2,162 +2,175 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 976C867BABA
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 20:23:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0833C67BD99
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 22:04:55 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236199AbjAYTXL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 14:23:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39050 "EHLO
+        id S236305AbjAYVEx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 16:04:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59650 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236147AbjAYTXE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 14:23:04 -0500
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D166F5FEB
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 11:22:50 -0800 (PST)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-506609635cbso63624057b3.4
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 11:22:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=PCnMypYs8jymH6Ufuva+9r/69Y/DZs8kYxwQEYrzQFk=;
-        b=hXTUs83qvSMCw0sqrewtph/1zyRGQA8EwV9VOqASoIhN1O27YlTeLHvU30LwpkaPKE
-         6ZtbduOBpeU0Mk6yScQyxHGjdOZ8W8NbAK7HCSbKR2qQVwpslpoP2Mqh8DnM60UrkSEV
-         Fy/rJx/xAj6ReR1yQheSDvUeiLsUOZe36GsXUe+/pA5dp4+pot+ScO1k5jhTafZOkoJo
-         vEjMe7B3/0BupSIQn5CSlkYjolaKBFMYB73xyId061H8p1ZYZbkvvK9SPdZltanRDpUl
-         vOuM+M/xFo7tmOP85pcv8h038+SVqlBqYWxO3Lgun0O5W06va+PJHK2pFsHgrhvmIiGL
-         lvow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PCnMypYs8jymH6Ufuva+9r/69Y/DZs8kYxwQEYrzQFk=;
-        b=RGVSfLtO7ob3TLbySzeinItzoWPW7d2pTx6EnFHczWFWIXZKDaKi8+XOHV+uv3KQ9U
-         fnzCvjCjGoTP4lIElqZqMK6O5l6zpPzMkyionBR2AMxVRAIjRQFZj7xbxKAHsg0tHvta
-         SigN/Oqtadjw0nBfeAbGLImffBB2Osuz3uNuw0N3H7XmxzcVgu8z+wEZxSV5d74qXmGk
-         NM82fX7RPMQKa/2jF2SoDfOGhVyTLGWMOjLzm+tyJryyrsTaOICYo7YtS/ax42cn+MvO
-         mgZrhPuJyaK+O92unI7QAAGlQuObR1OjIWxsZKc3jmH2cc8DV6/feUY2MoArEGIpp3+A
-         13Hw==
-X-Gm-Message-State: AO0yUKWx71huWA9Z2vW+IoYjR3PEhqUnQnrSaENii+O3Fo4j8vxs5IYE
-        joahBIMQnQ/9ojgLb9j8AuqnNNA0ECf98a9EH4hi2Q==
-X-Google-Smtp-Source: AK7set/Rj29H3r8vHaYccCmp943Un+QyMRF/w8dcRdt99GFw8apI+/L+5tSmXBTsBLdlTBniti7hA8kyFbpjr3H10kc=
-X-Received: by 2002:a0d:d456:0:b0:507:26dc:ebd with SMTP id
- w83-20020a0dd456000000b0050726dc0ebdmr298632ywd.455.1674674569763; Wed, 25
- Jan 2023 11:22:49 -0800 (PST)
+        with ESMTP id S235842AbjAYVEw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 16:04:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94F0223674
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 13:04:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3156F615E6
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 21:04:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D7DAC433D2;
+        Wed, 25 Jan 2023 21:04:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674680690;
+        bh=5XgIUsKQQfnJqmrJCF1Ci6vFUC+8ejjb8Ltko66AhdE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nj1pO4t16aTOFuGuZ7TSeefZfsF8eqqi44PedPJ5/hJf45UnJzobGr+D7VnlO85AJ
+         Ded5+078L02E5qvIHARMMPCN79F6DRhz9u9mC+8a1b+u37npcELVAJVhJvax0/b9iV
+         sNWFPCR3i43WjhvCi27BxeiO/ydEkzP35sapJgkj2V3CUgxYiQW9mhqbzqXYWkIMs4
+         Ss2yD0ivce40sRHbaSka3/KnovHZBt23pWEekz7bQgy4q8gbAQqdy5SQO/13MBr3BN
+         JXZABfSmVduBbnX0yiE0X7XE4o+qb72nv8kstxe+l06+XoAHJZMivz1kLHOHknf1T4
+         xbyEuyC6MLBXA==
+Date:   Wed, 25 Jan 2023 21:04:45 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
+Subject: Re: [PATCH -next v13 19/19] riscv: Enable Vector code to be built
+Message-ID: <Y9GZbVrZxEZAraVu@spud>
+References: <20230125142056.18356-1-andy.chiu@sifive.com>
+ <20230125142056.18356-20-andy.chiu@sifive.com>
 MIME-Version: 1.0
-References: <20230125083851.27759-1-surenb@google.com> <20230125083851.27759-2-surenb@google.com>
- <Y9F19QEDX5d/44EV@casper.infradead.org>
-In-Reply-To: <Y9F19QEDX5d/44EV@casper.infradead.org>
-From:   Suren Baghdasaryan <surenb@google.com>
-Date:   Wed, 25 Jan 2023 11:22:38 -0800
-Message-ID: <CAJuCfpH+LMFX=TT04gSMA05cz_-CXMum6fobRrduWvzm1HWPmQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/6] mm: introduce vma->vm_flags modifier functions
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
-        jglisse@google.com, mhocko@suse.com, vbabka@suse.cz,
-        hannes@cmpxchg.org, mgorman@techsingularity.net, dave@stgolabs.net,
-        liam.howlett@oracle.com, peterz@infradead.org,
-        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
-        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
-        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
-        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
-        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
-        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
-        jannh@google.com, shakeelb@google.com, tatashin@google.com,
-        edumazet@google.com, gthelen@google.com, gurua@google.com,
-        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
-        leewalsh@google.com, posk@google.com, will@kernel.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
-        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
-        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
-        qianweili@huawei.com, wangzhou1@hisilicon.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-        airlied@gmail.com, daniel@ffwll.ch,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, l.stach@pengutronix.de,
-        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
-        matthias.bgg@gmail.com, robdclark@gmail.com,
-        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
-        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
-        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
-        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
-        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
-        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
-        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
-        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, miklos@szeredi.hu,
-        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
-        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
-        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
-        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
-        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
-        loongarch@lists.linux.dev, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
-        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
-        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org,
-        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        devel@lists.orangefs.org, kexec@lists.infradead.org,
-        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
-        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
-        kernel-team@android.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="lkDM2IpOgivVn4g+"
+Content-Disposition: inline
+In-Reply-To: <20230125142056.18356-20-andy.chiu@sifive.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 10:33 AM Matthew Wilcox <willy@infradead.org> wrote:
->
-> On Wed, Jan 25, 2023 at 12:38:46AM -0800, Suren Baghdasaryan wrote:
-> > +/* Use when VMA is not part of the VMA tree and needs no locking */
-> > +static inline void init_vm_flags(struct vm_area_struct *vma,
-> > +                              unsigned long flags)
-> > +{
-> > +     vma->vm_flags = flags;
->
-> vm_flags are supposed to have type vm_flags_t.  That's not been
-> fully realised yet, but perhaps we could avoid making it worse?
->
-> >       pgprot_t vm_page_prot;
-> > -     unsigned long vm_flags;         /* Flags, see mm.h. */
-> > +
-> > +     /*
-> > +      * Flags, see mm.h.
-> > +      * WARNING! Do not modify directly.
-> > +      * Use {init|reset|set|clear|mod}_vm_flags() functions instead.
-> > +      */
-> > +     unsigned long vm_flags;
->
-> Including changing this line to vm_flags_t
 
-Good point. Will make the change. Thanks!
+--lkDM2IpOgivVn4g+
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+Hey Andy,
+
+Thanks for respinning this, I think a lot of people will be happy to see
+it!
+
+On Wed, Jan 25, 2023 at 02:20:56PM +0000, Andy Chiu wrote:
+
+> diff --git a/arch/riscv/Makefile b/arch/riscv/Makefile
+> index 12d91b0a73d8..67411cdc836f 100644
+> --- a/arch/riscv/Makefile
+> +++ b/arch/riscv/Makefile
+> @@ -52,6 +52,13 @@ riscv-march-$(CONFIG_ARCH_RV32I)	:=3D rv32ima
+>  riscv-march-$(CONFIG_ARCH_RV64I)	:=3D rv64ima
+>  riscv-march-$(CONFIG_FPU)		:=3D $(riscv-march-y)fd
+>  riscv-march-$(CONFIG_RISCV_ISA_C)	:=3D $(riscv-march-y)c
+> +riscv-march-$(CONFIG_RISCV_ISA_V)	:=3D $(riscv-march-y)v
+> +
+> +ifeq ($(CONFIG_RISCV_ISA_V), y)
+> +ifeq ($(CONFIG_CC_IS_CLANG), y)
+> +        riscv-march-y +=3D -mno-implicit-float -menable-experimental-ext=
+ensions
+> +endif
+> +endif
+
+Uh, so I don't think this was actually tested with (a recent version of)
+clang:
+clang-15: error: unknown argument: '-menable-experimental-extensions_zicbom=
+_zihintpause'
+
+Firstly, no-implicit-float is a CFLAG, so why add it to march?
+There is an existing patch on the list for enabling this flag, but I
+recall Palmer saying that it was not actually needed?
+Palmer, do you remember why that was?
+
+I dunno what enable-experimental-extensions is, but I can guess. Do we
+really want to enable vector for toolchains where the support is
+considered experimental? I'm not au fait with the details of clang
+versions nor versions of the Vector spec, so take the following with a
+bit of a pinch of salt...
+Since you've allowed this to be built with anything later than clang 13,
+does that mean that different versions of clang may generate vector code
+that are not compatible?
+I'm especially concerned by:
+https://github.com/riscv/riscv-v-spec/releases/tag/0.9
+which appears to be most recently released version of the spec, prior to
+clang/llvm 13 being released.
+
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index e2b656043abf..f4299ba9a843 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -416,6 +416,16 @@ config RISCV_ISA_SVPBMT
+> =20
+>  	   If you don't know what to do here, say Y.
+> =20
+> +config RISCV_ISA_V
+> +	bool "VECTOR extension support"
+> +	depends on GCC_VERSION >=3D 120000 || CLANG_VERSION >=3D 130000
+
+Are these definitely the versions you want to support?
+What are the earliest (upstream) versions that support the frozen
+version of the vector spec?
+
+Also, please copy what has been done with "TOOLCHAIN_HAS_FOO" for other
+extensions and check this support with cc-option instead. Similarly,
+you'll need to gate this support on the linker being capable of
+accepting vector:
+/stuff/toolchains/gcc-11/bin/riscv64-unknown-linux-gnu-ld: -march=3Drv64i2p=
+0_m2p0_a2p0_f2p0_d2p0_c2p0_v1p0_zihintpause2p0_zve32f1p0_zve32x1p0_zve64d1p=
+0_zve64f1p0_zve64x1p0_zvl128b1p0_zvl32b1p0_zvl64b1p0: prefixed ISA extensio=
+n must separate with _
+/stuff/toolchains/gcc-11/bin/riscv64-unknown-linux-gnu-ld: failed to merge =
+target specific data of file arch/riscv/kernel/vdso/vgettimeofday.o
+
+> +	default n
+
+I forget, but is the reason for this being default n, when the others
+are default y a conscious choice?
+I'm a bit of a goldfish sometimes memory wise, and I don't remember if
+that was an outcome of the previous discussions.
+If it is intentionally different, that needs to be in the changelog IMO.
+
+> +	help
+> +	  Say N here if you want to disable all vector related procedure
+> +	  in the kernel.
+> +
+> +	  If you don't know what to do here, say Y.
+> +
+>  config TOOLCHAIN_HAS_ZICBOM
+
+^ you can use this one here as an example :)
+
+I'll reply here again once the patchwork automation has given the series
+a once over and see if it comes up with any other build issues.
+Thanks,
+Conor.
+
+
+--lkDM2IpOgivVn4g+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9GZbQAKCRB4tDGHoIJi
+0vxmAQC/ka5xvUwWRzYCMdL2d95EkAC0HKbR302kC5upl5J6owEAlSoDmFq8aDwQ
+55BjL9+qD28qiZowz0+jc9GBpGCDYwE=
+=bYeS
+-----END PGP SIGNATURE-----
+
+--lkDM2IpOgivVn4g+--
