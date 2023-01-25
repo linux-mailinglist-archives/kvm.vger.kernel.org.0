@@ -2,69 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E18E467A75A
-	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 01:10:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FA3867A764
+	for <lists+kvm@lfdr.de>; Wed, 25 Jan 2023 01:16:23 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230404AbjAYAKR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 24 Jan 2023 19:10:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57128 "EHLO
+        id S233279AbjAYAQV (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 24 Jan 2023 19:16:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbjAYAKQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 24 Jan 2023 19:10:16 -0500
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0BE4474E4
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 16:10:15 -0800 (PST)
-Received: by mail-pl1-x62e.google.com with SMTP id v23so16402085plo.1
-        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 16:10:15 -0800 (PST)
+        with ESMTP id S229938AbjAYAQT (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 24 Jan 2023 19:16:19 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4C74956D
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 16:16:18 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id jl3so16376872plb.8
+        for <kvm@vger.kernel.org>; Tue, 24 Jan 2023 16:16:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=kvQQY5R/smm2VpLt79RKnjfK0iF1mBHjWIkac6Aen1w=;
-        b=DePKpPk+izzwBKxlN6VqyaCycZe6DgWRR0tmOk/Qy5d7YS05HX83MPEYVtNPSLLclj
-         qZre+ZkAG7HUdzU1qJscs8RAa3BiuAJlF9fw8GKkz5rXiWOwMDD7FK0nR4BSL3YHF/sp
-         UwbNZNzBvdEAnyLXw7W0w5xJg4VYFWMnNr6NzpdG+IZwcAH0pBN8ESPjUxqjZKLhoy/+
-         3KJtQhMkBvy11jsxRXOTULAVH5BRjyy3Tj6DkzpIONTYBuEJ0kPVCTps5iSJrYKuAskP
-         y0vA4ImMwi8WYqhBNFZNDUox5Sbq0hbSZ34aXC13ikv74oDNrRBDIdqFTJNdAPb1VInx
-         EhEQ==
+        bh=R9UlKt43E2njAMel5lTeV0RuiH54jP6JJgn/MaI87eQ=;
+        b=cyFg0CY1a5zRqK3gFsPgIys+tUEPnqtZZaYV3DwtP9wfJu+7xfjHVrVWUVEk01LhbJ
+         r5NOBKSPcBovb2dtCaYS0Z4U4znoDB8IdUFGyaJs9JNjcmbRrLL/WPF0gDYFAxtTOmZj
+         aEf0q31XK0ahsnsMjj3U6s4Cvu/XniLAuHXjwjE7hXxZiGa7m6IE88QA5sO0N46/lNDb
+         kT9TsvR7OU+ZFMweWL3lLiJUU2sQcTvUH4LghIsWpGUqlinaSOZQC3nZlw6X0xvtnhHp
+         cU0JLCDpf1yErVyWz7+P7CEzToh0qks2W5K9I9I32BxoO2RJ8ijl5fBmJkMCz2xAL1pV
+         HkYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kvQQY5R/smm2VpLt79RKnjfK0iF1mBHjWIkac6Aen1w=;
-        b=5HeQ7TAvpPdy2dU3hA7meFsMXAxYtd9AzTN75jgGJKIhxQo5nd5l6XVzAxHt8+CsJ/
-         sUnIJFSkBDRUBLABCi2wmmtmZiC6Mno0FLV+Z6lz1I8r4M/KmhUEpSrrr4LVMVJpI4++
-         Z+ip7rvyWZvmZJgzGgGVXTI9UrR+NXssXO4hyVjh7JkbvxGROvg2gx9+zsXRdUIHwX1c
-         NZqg3olnApcAKJxBw14XynmK1xlBU28DhBIRoKfuBDBr3YzxnuXmKu3jkBqjLJk2nCpP
-         Bq7gfeZacOz9wWiPuoaBmmKbymdkyd47dsnx9lStg3r1X7gpUj+2Ba0F/wgc1DxWZJRg
-         ztDA==
-X-Gm-Message-State: AO0yUKUhl2/yOCCSP4wrs0w75IOWhmZhaf1gwSQtZyYcXcPrg/nA1EXm
-        BY8J+1gCfMA1HYPS21gTvv096A==
-X-Google-Smtp-Source: AK7set/jVpOixJjbQ2WRp5+nE0HpwuNbU1zpLJ9qSvLTawGNSnxn+fFUXp15uUUfsCklU1ALw/xoqw==
-X-Received: by 2002:a05:6a21:998a:b0:b8:c859:7fc4 with SMTP id ve10-20020a056a21998a00b000b8c8597fc4mr501308pzb.1.1674605414680;
-        Tue, 24 Jan 2023 16:10:14 -0800 (PST)
+        bh=R9UlKt43E2njAMel5lTeV0RuiH54jP6JJgn/MaI87eQ=;
+        b=AHmcdphcL6IcG6EGPIDBcm1ItwxKORucM3coPxQOO3kLvCu1XQaqY+fFKBhQ7B0Zb9
+         iPqwWext0eON69LSdSgqApVCa7Wi8ou4Ljx8uRR1OnR/WwrpczA4hHAcQ4gHR+7aTHC7
+         SNUtDjQjkJ+b8SbLEUK9M4n9U1cR/aPfFno4ecYKNvsDwAZ4LRUmE28mg/63uzoIt/Kb
+         QZWYo94eQzOUoyIYWyE5bTATMlgOskkuOCVfyWzweFD746RI8q/OSkSSzJL4Ad2+OWJd
+         CUYYCrjr/5rgyhJv/8xpVz3mhVEHWCkTi6l+57Av2wwxR9n09NthA84iBJwH1kAi7Tm0
+         BidA==
+X-Gm-Message-State: AO0yUKVckuPI8YKogAUBa9tzT/EkDQWn7RLkeFdluzQp+Hfyx1ahla6U
+        JEo+TJ3rKEyZl+tcP/mvogx6+g==
+X-Google-Smtp-Source: AK7set/AMNTF4jXokNQGO71KPoa9jLj3jvaQLmywQ8hQPHYq56x4QBTyElEB6w670GQz8xIC8lIGrA==
+X-Received: by 2002:a05:6a20:9d90:b0:b8:e33c:f160 with SMTP id mu16-20020a056a209d9000b000b8e33cf160mr510562pzb.0.1674605777916;
+        Tue, 24 Jan 2023 16:16:17 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u4-20020a17090ae00400b0022bbad75af4sm139372pjy.2.2023.01.24.16.10.14
+        by smtp.gmail.com with ESMTPSA id a8-20020a656548000000b0048988ed9e4bsm2024351pgw.19.2023.01.24.16.16.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Jan 2023 16:10:14 -0800 (PST)
-Date:   Wed, 25 Jan 2023 00:10:11 +0000
+        Tue, 24 Jan 2023 16:16:17 -0800 (PST)
+Date:   Wed, 25 Jan 2023 00:16:14 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
         linux-kernel@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>
-Subject: Re: [PATCH v3 6/8] KVM: x86/svm/pmu: Add AMD PerfMonV2 support
-Message-ID: <Y9BzYzEjAwUA+wuy@google.com>
+Subject: Re: [PATCH v3 7/8] KVM: x86/cpuid: Add AMD CPUID ExtPerfMonAndDbg
+ leaf 0x80000022
+Message-ID: <Y9B0zgliB9BMPK1l@google.com>
 References: <20221111102645.82001-1-likexu@tencent.com>
- <20221111102645.82001-7-likexu@tencent.com>
+ <20221111102645.82001-8-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221111102645.82001-7-likexu@tencent.com>
+In-Reply-To: <20221111102645.82001-8-likexu@tencent.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,86 +74,120 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Nov 11, 2022, Like Xu wrote:
-On Fri, Nov 11, 2022, Like Xu wrote:
-> @@ -162,20 +179,42 @@ static int amd_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  static void amd_pmu_refresh(struct kvm_vcpu *vcpu)
->  {
->       struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +     struct kvm_cpuid_entry2 *entry;
-> +     union cpuid_0x80000022_ebx ebx;
->
-> -     if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
-> -             pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS_CORE;
-> +     pmu->version = 1;
-> +     if (kvm_cpu_cap_has(X86_FEATURE_AMD_PMU_V2) &&
-
-Why check kvm_cpu_cap support?  I.e. what will go wrong if userspace enumerates
-PMU v2 to the guest without proper hardware/KVM support.
-
-If this is _necessary_ to protect the host kernel, then we should probably have
-a helper to query PMU features, e.g.
-
-static __always_inline bool guest_pmu_has(struct kvm_vcpu *vcpu,
-                                          unsigned int x86_feature)
-{
-        return kvm_cpu_cap_has(x86_feature) &&
-               guest_cpuid_has(vcpu, x86_feature);
-}
-
-
-
-> +         guest_cpuid_has(vcpu, X86_FEATURE_AMD_PMU_V2)) {
-> +             pmu->version = 2;
-> +             entry = kvm_find_cpuid_entry_index(vcpu, 0x80000022, 0);
-> +             ebx.full = entry->ebx;
-> +             pmu->nr_arch_gp_counters = min3((unsigned int)ebx.split.num_core_pmc,
-> +                                             (unsigned int)kvm_pmu_cap.num_counters_gp,
-> +                                             (unsigned int)KVM_AMD_PMC_MAX_GENERIC);
-
-Blech.  This really shouldn't be necessary, KVM should tweak kvm_pmu_cap.num_counters_gp
-as needed during initialization to ensure num_counters_gp doesn't exceed KVM's
-internal limits.
-
-Posted a patch[*], please take a look.  As mentioned in that thread, I'll somewhat
-speculatively apply that series sooner than later so that you can use it a base
-for this series (assuming the patch isn't busted).
-
-[*] https://lore.kernel.org/all/20230124234905.3774678-2-seanjc@google.com
-
-> +     }
+> From: Like Xu <likexu@tencent.com>
+> 
+> CPUID leaf 0x80000022 i.e. ExtPerfMonAndDbg advertises some new
+> performance monitoring features for AMD processors.
+> 
+> Bit 0 of EAX indicates support for Performance Monitoring Version 2
+> (PerfMonV2) features. If found to be set during PMU initialization,
+> the EBX bits of the same CPUID function can be used to determine
+> the number of available PMCs for different PMU types.
+> 
+> Expose the relevant bits via KVM_GET_SUPPORTED_CPUID so that
+> guests can make use of the PerfMonV2 features.
+> 
+> Co-developed-by: Sandipan Das <sandipan.das@amd.com>
+> Signed-off-by: Sandipan Das <sandipan.das@amd.com>
+> Signed-off-by: Like Xu <likexu@tencent.com>
+> ---
+>  arch/x86/kvm/cpuid.c   | 30 +++++++++++++++++++++++++++++-
+>  arch/x86/kvm/svm/svm.c | 11 ++++++++---
+>  2 files changed, 37 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 6b5912578edd..df551fa66ccc 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1113,7 +1113,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		entry->edx = 0;
+>  		break;
+>  	case 0x80000000:
+> -		entry->eax = min(entry->eax, 0x80000021);
+> +		entry->eax = min(entry->eax, 0x80000022);
+>  		/*
+>  		 * Serializing LFENCE is reported in a multitude of ways, and
+>  		 * NullSegClearsBase is not reported in CPUID on Zen2; help
+> @@ -1229,6 +1229,34 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  		if (!static_cpu_has_bug(X86_BUG_NULL_SEG))
+>  			entry->eax |= BIT(6);
+>  		break;
+> +	/* AMD Extended Performance Monitoring and Debug */
+> +	case 0x80000022: {
+> +		union cpuid_0x80000022_ebx ebx;
 > +
-> +     /* Commitment to minimal PMCs, regardless of CPUID.80000022 */
+> +		entry->ecx = entry->edx = 0;
+> +		if (!enable_pmu || !kvm_cpu_cap_has(X86_FEATURE_AMD_PMU_V2)) {
+> +			entry->eax = entry->ebx;
+> +			break;
+> +		}
+> +
+> +		cpuid_entry_override(entry, CPUID_8000_0022_EAX);
+> +
+> +		if (kvm_cpu_cap_has(X86_FEATURE_AMD_PMU_V2))
+> +			ebx.split.num_core_pmc = min(kvm_pmu_cap.num_counters_gp,
+> +						     KVM_AMD_PMC_MAX_GENERIC);
 
-Please expand this comment.  I'm still not entirely sure I've interpreted it correctly,
-and I'm not sure that I agree with the code.
+Similar to the previous patch, sanitizing kvm_pmu_cap.num_counters_gp should be
+handled during PMU initialization.
 
-> +     if (kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE) &&
+> +
+> +		if (kvm_cpu_cap_has(X86_FEATURE_PERFCTR_CORE))
+> +			ebx.split.num_core_pmc = max_t(unsigned int,
+> +						       ebx.split.num_core_pmc,
+> +						       AMD64_NUM_COUNTERS_CORE);
+> +		else
+> +			ebx.split.num_core_pmc = max_t(unsigned int,
+> +						       ebx.split.num_core_pmc,
+> +						       AMD64_NUM_COUNTERS);
 
-AFAICT, checking kvm_cpu_cap_has() is an unrelated change.  Either it's a bug fix
-and belongs in a separate patch, or it's unnecessary and should be dropped.
+Again like the previous patch, I would expect this to be an if-elif-else sequence.
 
-> +         guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
-> +             pmu->nr_arch_gp_counters = max_t(unsigned int,
-> +                                              pmu->nr_arch_gp_counters,
-> +                                              AMD64_NUM_COUNTERS_CORE);
->       else
-> -             pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS;
-> +             pmu->nr_arch_gp_counters = max_t(unsigned int,
-> +                                              pmu->nr_arch_gp_counters,
-> +                                              AMD64_NUM_COUNTERS);
+> +
+> +		entry->ebx = ebx.full;
+> +		break;
+> +	}
+>  	/*Add support for Centaur's CPUID instruction*/
+>  	case 0xC0000000:
+>  		/*Just support up to 0xC0000004 now*/
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 527f18d8cc44..127983ab8307 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -4914,9 +4914,14 @@ static __init void svm_set_cpu_caps(void)
+>  	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
+>  		kvm_cpu_cap_set(X86_FEATURE_VIRT_SSBD);
+>  
+> -	/* AMD PMU PERFCTR_CORE CPUID */
+> -	if (enable_pmu && boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
+> -		kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
 
-Using max() doesn't look right.  E.g. if KVM ends up running on some odd setup
-where ebx.split.num_core_pmc/kvm_pmu_cap.num_counters_gp is less than
-AMD64_NUM_COUNTERS_CORE or AMD64_NUM_COUNTERS.
+Another existing wart.  This existing code can be:
 
-Or more likely, if userspace says "only expose N counters to this guest".
+	if (enable_pmu)
+		kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE)
 
-Shouldn't this be something like?
+Can you add a patch to do that minor cleanup?  Then this patch can yield:
 
-	if (guest_cpuid_has(vcpu, X86_FEATURE_AMD_PMU_V2))
-		pmu->nr_arch_gp_counters = min(ebx.split.num_core_pmc,
-					       kvm_pmu_cap.num_counters_gp);
-	else if (guest_cpuid_has(vcpu, X86_FEATURE_PERFCTR_CORE))
-		pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERS_CORE;
-	else
-		pmu->nr_arch_gp_counters = AMD64_NUM_COUNTERSE;
+	if (enable_pmu) {
+		kvm_cpu_cap_check_and_set(X86_FEATURE_PERFCTR_CORE);
+		kvm_cpu_cap_check_and_set(X86_FEATURE_PERFMON_V2);
+	}
+
+KVM's reverse-CPUID magic should Just Work for PERFMON_V2 even though it's scattered.
+		
+
+> +	if (enable_pmu) {
+> +		/* AMD PMU PERFCTR_CORE CPUID */
+> +		if (boot_cpu_has(X86_FEATURE_PERFCTR_CORE))
+> +			kvm_cpu_cap_set(X86_FEATURE_PERFCTR_CORE);
+> +		/* KVM only support AMD PerfMon V2 */
+> +		if (kvm_pmu_cap.version > 1)
+> +			kvm_cpu_cap_set(X86_FEATURE_AMD_PMU_V2);
+> +	}
+>  
+>  	/* CPUID 0x8000001F (SME/SEV features) */
+>  	sev_set_cpu_caps();
+> -- 
+> 2.38.1
+> 
