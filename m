@@ -2,333 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A670A67D102
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 17:11:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7A17967D10D
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 17:12:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232611AbjAZQK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 11:10:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49120 "EHLO
+        id S232619AbjAZQMP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 11:12:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232607AbjAZQKo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 11:10:44 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB22611C0;
-        Thu, 26 Jan 2023 08:10:43 -0800 (PST)
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30QFZpij022496;
-        Thu, 26 Jan 2023 16:10:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=cq2x6FbUOZx9kgcBjP26F5SrHdNwAFSfsEsk9sJ1R30=;
- b=EYMkPOkbiZfZTXY1HSm/lsOdU5BZDA3HfJDWzYdV+hVDijARy3SJscYruFWF94G2q0QL
- f2kA1JzGTcVrote2K/6A6BPsbmYk0G+aWpo3SJMeGVuciCZst65yKZdvr7an+49dCdvJ
- Zb68hlnhmwVbd5pxu/qfiPf490H3HUatfDSMojcC2zpt3ECophKd76RigC/tcjAeXcxE
- z0iMwJO5kPuuGtokklr6aMQc1G6jo9yNxub8CCSy0E8xd8E8GAXHh7fmP+JKLm+aTGAg
- 49TTL46ZFyi3ZjnMpBN+oi9Qf6SObudE4aoq/LBnJGjLhTS0Um2s2t6DH+L7JsvvrijV 8A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbt6rmnrq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 16:10:38 +0000
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30QFmMlA032067;
-        Thu, 26 Jan 2023 16:10:38 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbt6rmnqp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 16:10:38 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30Q9weI4010329;
-        Thu, 26 Jan 2023 16:10:35 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3n87p6pjpe-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 16:10:35 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30QGAVAf49479970
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Jan 2023 16:10:31 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2E7192004D;
-        Thu, 26 Jan 2023 16:10:31 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EA65720043;
-        Thu, 26 Jan 2023 16:10:30 +0000 (GMT)
-Received: from [9.152.224.253] (unknown [9.152.224.253])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 26 Jan 2023 16:10:30 +0000 (GMT)
-Message-ID: <aa942cf0-6f50-05f5-75a9-278129f00bf6@linux.ibm.com>
-Date:   Thu, 26 Jan 2023 17:10:30 +0100
+        with ESMTP id S232605AbjAZQMJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 11:12:09 -0500
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 407DF599BE
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:11:50 -0800 (PST)
+Received: by mail-ej1-x630.google.com with SMTP id v6so6389076ejg.6
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:11:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZTuRDxbfWg39Wdf8MzHmSvof5BdyBoYVZ4tVj9C0vdE=;
+        b=k4zXl9wSOzT/hXYVF/RWS+MlEEKZ9rSwfiqCrVzT+5K427yb+3ngGAKiKmE3HZLGLp
+         FIXsamU9iKhdxwfe5chNrwjiKnxYxZP7dzTdjDYdlOJ3pZBjYV4GUlIUUDfqzb1KOJY2
+         RS50VQikH+FNvBbsKC0/bO5gOrhdpl26RbPfotICnImztHHhDzK1vryqLRcKSbaNSbOu
+         otrkbjfn19peb5OMybSS0HrRC4ua3z9ZEXtj6FfyNSBwYtO9nblgJBq0F3fimk0CiIWP
+         qlAhImj/EASE9ScORVLWT4MCwiJ7N5dY/qbUTEWVsOIvz3RvGbqyGYGX1lbt41Atlv2v
+         7Ebg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZTuRDxbfWg39Wdf8MzHmSvof5BdyBoYVZ4tVj9C0vdE=;
+        b=qYmVUBVV0eqTy15fCpG4Rgzlvsc9AdZtvfpzb3568G2i6q6yF1pTcJhb/3tqSstzTd
+         SxAGEhXFBTm4t4MIamlJvvnipMxLBevm5nRnmGJwi5RjiWcnUFSYA5T3L0CCVNTLtV9b
+         C/RXt0RuVVk+tjWlhPTvecPfURZuFK+GY/rBAtudGrxdFaSrR6BMuCvLK2v7xrDSWdUi
+         YQ6Uze4CZcDZjhsWnRJaRDXpONhQFeb5PAjV2nUTeoSUketfFcSqWXm+hnWkUNLJkZ26
+         /Syw8b3oVhqIENMafMW9l8jncNVi0+KQWCUBqO0gXnJshfF0/WNl3koSk80/4GKTu+tw
+         bskw==
+X-Gm-Message-State: AFqh2krWA9E7vKhYidREdyk5dRKHKYGXkFjwiFCJAqsN7x5IjlmeA/mF
+        Q+4Y7bf2UTvOBmG6CTwTAxGBpQ==
+X-Google-Smtp-Source: AMrXdXsyyaq9WL28lgCMw2oKhC8d+T2NBMFe+cOw0CLF/8Noh23mi3z88nsbaVwyj37sqzNjaTmCvA==
+X-Received: by 2002:a17:907:c712:b0:7ba:5085:869 with SMTP id ty18-20020a170907c71200b007ba50850869mr41788111ejc.9.1674749508793;
+        Thu, 26 Jan 2023 08:11:48 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id z12-20020a17090655cc00b0084c6581c16fsm793123ejp.64.2023.01.26.08.11.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jan 2023 08:11:48 -0800 (PST)
+Date:   Thu, 26 Jan 2023 17:11:47 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 3/7] RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID
+ mask defines
+Message-ID: <20230126161147.6rewhfvlouqn4ual@orel>
+References: <20230112140304.1830648-1-apatel@ventanamicro.com>
+ <20230112140304.1830648-4-apatel@ventanamicro.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20230125212608.1860251-1-scgl@linux.ibm.com>
- <20230125212608.1860251-13-scgl@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v6 12/14] KVM: s390: Extend MEM_OP ioctl by storage key
- checked cmpxchg
-In-Reply-To: <20230125212608.1860251-13-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: kiLQ2uwDw7JHOMfsnVnOHywLdRgnW_2W
-X-Proofpoint-GUID: 41jJLM9WYa5Hpe_QpNKt_7G7rqAKm_48
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-26_07,2023-01-26_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 adultscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0
- spamscore=0 clxscore=1015 mlxscore=0 phishscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301260156
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230112140304.1830648-4-apatel@ventanamicro.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/25/23 22:26, Janis Schoetterl-Glausch wrote:
-> User space can use the MEM_OP ioctl to make storage key checked reads
-> and writes to the guest, however, it has no way of performing atomic,
-> key checked, accesses to the guest.
-> Extend the MEM_OP ioctl in order to allow for this, by adding a cmpxchg
-> op. For now, support this op for absolute accesses only.
+On Thu, Jan 12, 2023 at 07:33:00PM +0530, Anup Patel wrote:
+> The hgatp.VMID mask defines are used before shifting when extracting
+> VMID value from hgatp CSR value so based on the convention followed
+> in the other parts of asm/csr.h, the hgatp.VMID mask defines should
+> not have a _MASK suffix.
 > 
-> This op can be use, for example, to set the device-state-change
-
-s/use/used/
-
-> indicator and the adapter-local-summary indicator atomically.
-> 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 > ---
-[...]
-> +/**
-> + * cmpxchg_guest_abs_with_key() - Perform cmpxchg on guest absolute address.
-> + * @kvm: Virtual machine instance.
-> + * @gpa: Absolute guest address of the location to be changed.
-> + * @len: Operand length of the cmpxchg, required: 1 <= len <= 16. Providing a
-> + *       non power of two will result in failure.
-> + * @old_addr: Pointer to old value. If the location at @gpa contains this value,
-> + *            the exchange will succeed. After calling cmpxchg_guest_abs_with_key()
-> + *            *@old_addr contains the value at @gpa before the attempt to
-> + *            exchange the value.
-> + * @new: The value to place at @gpa.
-> + * @access_key: The access key to use for the guest access.
-> + * @success: output value indicating if an exchange occurred.
-> + *
-> + * Atomically exchange the value at @gpa by @new, if it contains *@old.
-> + * Honors storage keys.
-> + *
-> + * Return: * 0: successful exchange
-> + *         * a program interruption code indicating the reason cmpxchg could
-> + *           not be attempted
+>  arch/riscv/include/asm/csr.h | 8 ++++----
+>  arch/riscv/kvm/mmu.c         | 3 +--
+>  arch/riscv/kvm/vmid.c        | 4 ++--
+>  3 files changed, 7 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> index d608dac4b19f..36d580528f90 100644
+> --- a/arch/riscv/include/asm/csr.h
+> +++ b/arch/riscv/include/asm/csr.h
+> @@ -131,12 +131,12 @@
+>  
+>  #define HGATP32_MODE_SHIFT	31
+>  #define HGATP32_VMID_SHIFT	22
+> -#define HGATP32_VMID_MASK	_AC(0x1FC00000, UL)
+> +#define HGATP32_VMID		_AC(0x1FC00000, UL)
+>  #define HGATP32_PPN		_AC(0x003FFFFF, UL)
+>  
+>  #define HGATP64_MODE_SHIFT	60
+>  #define HGATP64_VMID_SHIFT	44
+> -#define HGATP64_VMID_MASK	_AC(0x03FFF00000000000, UL)
+> +#define HGATP64_VMID		_AC(0x03FFF00000000000, UL)
+>  #define HGATP64_PPN		_AC(0x00000FFFFFFFFFFF, UL)
+>  
+>  #define HGATP_PAGE_SHIFT	12
+> @@ -144,12 +144,12 @@
+>  #ifdef CONFIG_64BIT
+>  #define HGATP_PPN		HGATP64_PPN
+>  #define HGATP_VMID_SHIFT	HGATP64_VMID_SHIFT
+> -#define HGATP_VMID_MASK		HGATP64_VMID_MASK
+> +#define HGATP_VMID		HGATP64_VMID
+>  #define HGATP_MODE_SHIFT	HGATP64_MODE_SHIFT
+>  #else
+>  #define HGATP_PPN		HGATP32_PPN
+>  #define HGATP_VMID_SHIFT	HGATP32_VMID_SHIFT
+> -#define HGATP_VMID_MASK		HGATP32_VMID_MASK
+> +#define HGATP_VMID		HGATP32_VMID
+>  #define HGATP_MODE_SHIFT	HGATP32_MODE_SHIFT
+>  #endif
+>  
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index 34b57e0be2ef..034746638fa6 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -748,8 +748,7 @@ void kvm_riscv_gstage_update_hgatp(struct kvm_vcpu *vcpu)
+>  	unsigned long hgatp = gstage_mode;
+>  	struct kvm_arch *k = &vcpu->kvm->arch;
+>  
+> -	hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) &
+> -		 HGATP_VMID_MASK;
+> +	hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) & HGATP_VMID;
+>  	hgatp |= (k->pgd_phys >> PAGE_SHIFT) & HGATP_PPN;
+>  
+>  	csr_write(CSR_HGATP, hgatp);
+> diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+> index 6cd93995fb65..6f4d4979a759 100644
+> --- a/arch/riscv/kvm/vmid.c
+> +++ b/arch/riscv/kvm/vmid.c
+> @@ -26,9 +26,9 @@ void kvm_riscv_gstage_vmid_detect(void)
+>  
+>  	/* Figure-out number of VMID bits in HW */
+>  	old = csr_read(CSR_HGATP);
+> -	csr_write(CSR_HGATP, old | HGATP_VMID_MASK);
+> +	csr_write(CSR_HGATP, old | HGATP_VMID);
+>  	vmid_bits = csr_read(CSR_HGATP);
+> -	vmid_bits = (vmid_bits & HGATP_VMID_MASK) >> HGATP_VMID_SHIFT;
+> +	vmid_bits = (vmid_bits & HGATP_VMID) >> HGATP_VMID_SHIFT;
+>  	vmid_bits = fls_long(vmid_bits);
+>  	csr_write(CSR_HGATP, old);
+>  
+> -- 
+> 2.34.1
+>
 
-Nit:
- >0: a program interruption code...
+Could switch to GENMASK too at the same time :-)
 
+Anyway,
 
-> + *         * -EINVAL: address misaligned or len not power of two
-> + *         * -EAGAIN: transient failure (len 1 or 2)
-> + *         * -EOPNOTSUPP: read-only memslot (should never occur)
-> + */
-> +int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
-> +			       __uint128_t *old_addr, __uint128_t new,
-> +			       u8 access_key, bool *success)
-> +{
-> +	gfn_t gfn = gpa >> PAGE_SHIFT;
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
-  gpa_to_gfn()?
-
-> +	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
-> +	bool writable;
-> +	hva_t hva;
-> +	int ret;
-> +
-> +	if (!IS_ALIGNED(gpa, len))
-> +		return -EINVAL;
-> +
-> +	hva = gfn_to_hva_memslot_prot(slot, gfn, &writable);
-> +	if (kvm_is_error_hva(hva))
-> +		return PGM_ADDRESSING;
-> +	/*
-> +	 * Check if it's a read-only memslot, even though that cannot occur
-> +	 * since those are unsupported.
-> +	 * Don't try to actually handle that case.
-> +	 */
-> +	if (!writable)
-> +		return -EOPNOTSUPP;
-> +
-> +	hva += offset_in_page(gpa);
-
-Hmm if we don't use a macro to generate these then I'd add an explanation:
-
-cmpxchg_user_key() is a macro that is dependent on the type of "old" so 
-there's no deduplication possible without further macros.
-
-> +	switch (len) {
-> +	case 1: {
-> +		u8 old;
-> +
-> +		ret = cmpxchg_user_key((u8 *)hva, &old, *old_addr, new, access_key);
-> +		*success = !ret && old == *old_addr;
-> +		*old_addr = old;
-> +		break;
-> +	}
-> +	case 2: {
-> +		u16 old;
-> +
-> +		ret = cmpxchg_user_key((u16 *)hva, &old, *old_addr, new, access_key);
-> +		*success = !ret && old == *old_addr;
-> +		*old_addr = old;
-> +		break;
-> +	}
-> +	case 4: {
-> +		u32 old;
-> +
-> +		ret = cmpxchg_user_key((u32 *)hva, &old, *old_addr, new, access_key);
-> +		*success = !ret && old == *old_addr;
-> +		*old_addr = old;
-> +		break;
-> +	}
-> +	case 8: {
-> +		u64 old;
-> +
-> +		ret = cmpxchg_user_key((u64 *)hva, &old, *old_addr, new, access_key);
-> +		*success = !ret && old == *old_addr;
-> +		*old_addr = old;
-> +		break;
-> +	}
-> +	case 16: {
-> +		__uint128_t old;
-> +
-> +		ret = cmpxchg_user_key((__uint128_t *)hva, &old, *old_addr, new, access_key);
-> +		*success = !ret && old == *old_addr;
-> +		*old_addr = old;
-> +		break;
-> +	}
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +	mark_page_dirty_in_slot(kvm, slot, gfn);
-
-Is that needed if we failed the store?
-
-> +	/*
-> +	 * Assume that the fault is caused by protection, either key protection
-> +	 * or user page write protection.
-> +	 */
-> +	if (ret == -EFAULT)
-> +		ret = PGM_PROTECTION;
-> +	return ret;
-> +}
-> +
->   /**
->    * guest_translate_address_with_key - translate guest logical into guest absolute address
->    * @vcpu: virtual cpu
-> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> index 4b8b41be7aed..86e9734d5782 100644
-> --- a/arch/s390/kvm/kvm-s390.c
-> +++ b/arch/s390/kvm/kvm-s390.c
-> @@ -584,7 +584,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_S390_VCPU_RESETS:
->   	case KVM_CAP_SET_GUEST_DEBUG:
->   	case KVM_CAP_S390_DIAG318:
-> -	case KVM_CAP_S390_MEM_OP_EXTENSION:
->   		r = 1;
->   		break;
->   	case KVM_CAP_SET_GUEST_DEBUG2:
-> @@ -598,6 +597,15 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->   	case KVM_CAP_S390_MEM_OP:
->   		r = MEM_OP_MAX_SIZE;
->   		break;
-> +	case KVM_CAP_S390_MEM_OP_EXTENSION:
-> +		/*
-> +		 * Flag bits indicating which extensions are supported.
-> +		 * If r > 0, the base extension must also be supported/indicated,
-> +		 * in order to maintain backwards compatibility.
-> +		 */
-> +		r = KVM_S390_MEMOP_EXTENSION_CAP_BASE |
-> +		    KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG;
-> +		break;
->   	case KVM_CAP_NR_VCPUS:
->   	case KVM_CAP_MAX_VCPUS:
->   	case KVM_CAP_MAX_VCPU_ID:
-> @@ -2840,6 +2848,50 @@ static int kvm_s390_vm_mem_op_abs(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   	return r;
->   }
->   
-> +static int kvm_s390_vm_mem_op_cmpxchg(struct kvm *kvm, struct kvm_s390_mem_op *mop)
-> +{
-> +	void __user *uaddr = (void __user *)mop->buf;
-> +	void __user *old_addr = (void __user *)mop->old_addr;
-> +	union {
-> +		__uint128_t quad;
-> +		char raw[sizeof(__uint128_t)];
-> +	} old = { .quad = 0}, new = { .quad = 0 };
-> +	unsigned int off_in_quad = sizeof(new) - mop->size;
-> +	int r, srcu_idx;
-> +	bool success;
-> +
-> +	r = mem_op_validate_common(mop, KVM_S390_MEMOP_F_SKEY_PROTECTION);
-> +	if (r)
-> +		return r;
-> +	/*
-> +	 * This validates off_in_quad. Checking that size is a power
-> +	 * of two is not necessary, as cmpxchg_guest_abs_with_key
-> +	 * takes care of that
-> +	 */
-> +	if (mop->size > sizeof(new))
-> +		return -EINVAL;
-> +	if (copy_from_user(&new.raw[off_in_quad], uaddr, mop->size))
-> +		return -EFAULT;
-> +	if (copy_from_user(&old.raw[off_in_quad], old_addr, mop->size))
-> +		return -EFAULT;
-> +
-> +	srcu_idx = srcu_read_lock(&kvm->srcu);
-> +
-> +	if (kvm_is_error_gpa(kvm, mop->gaddr)) {
-> +		r = PGM_ADDRESSING;
-> +		goto out_unlock;
-> +	}
-> +
-> +	r = cmpxchg_guest_abs_with_key(kvm, mop->gaddr, mop->size, &old.quad,
-> +				       new.quad, mop->key, &success);
-> +	if (!success && copy_to_user(old_addr, &old.raw[off_in_quad], mop->size))
-> +		r = -EFAULT;
-> +
-> +out_unlock:
-> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
-> +	return r;
-> +}
-> +
->   static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   {
->   	/*
-> @@ -2858,6 +2910,8 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
->   	case KVM_S390_MEMOP_ABSOLUTE_READ:
->   	case KVM_S390_MEMOP_ABSOLUTE_WRITE:
->   		return kvm_s390_vm_mem_op_abs(kvm, mop);
-> +	case KVM_S390_MEMOP_ABSOLUTE_CMPXCHG:
-> +		return kvm_s390_vm_mem_op_cmpxchg(kvm, mop);
->   	default:
->   		return -EINVAL;
->   	}
-
+Thanks,
+drew
