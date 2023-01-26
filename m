@@ -2,186 +2,313 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A1C0F67D29F
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 18:07:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2CD9767D2E9
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 18:19:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232024AbjAZRHt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 12:07:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45396 "EHLO
+        id S232363AbjAZRTo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 12:19:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231989AbjAZRHq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 12:07:46 -0500
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B280D10EC;
-        Thu, 26 Jan 2023 09:07:43 -0800 (PST)
-Received: from mercury (dyndsl-037-138-191-219.ewe-ip-backbone.de [37.138.191.219])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: sre)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id 7FE346602E7E;
-        Thu, 26 Jan 2023 17:07:41 +0000 (GMT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1674752861;
-        bh=TJwB9xWefUtenAJhobcnuA3/dr44yh/1qZH05naV3dA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HIAeawkSMl4wLK9atphFO2PYIuQtn0mXWrQTGJkp27Vvwen4RmNJXIKy0KOcMN2qu
-         MGji/BoqRh//5quIKkg+7Jg9a4rlT6zYnOxKnHRve8IRt32uZ0O2J9C6ByA7KSG9ni
-         ooI+f+xDzdj/4Xv/XqAW1ZMOqMbxlnaE69Ns4AaVsCb09DHvVD+xjXrJ7HkcJ65ZDs
-         0FKkR9qOOchTbFQKw+Lbe8GJsd/K96q/WWSPWtyPUY4G0yRJ/G34tsJUBI/vL5q95x
-         a6dIJ/I/0Glk/75yhzfiBv6PLPN/HUTuWOcS4vpdAGRdicde5HTb77Vj3shLRE2rZN
-         snAuQFm3yL5CQ==
-Received: by mercury (Postfix, from userid 1000)
-        id 8DAD710609C7; Thu, 26 Jan 2023 18:07:39 +0100 (CET)
-Date:   Thu, 26 Jan 2023 18:07:39 +0100
-From:   Sebastian Reichel <sebastian.reichel@collabora.com>
-To:     Suren Baghdasaryan <surenb@google.com>
-Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
-        jglisse@google.com, mhocko@suse.com, vbabka@suse.cz,
-        hannes@cmpxchg.org, mgorman@techsingularity.net, dave@stgolabs.net,
-        willy@infradead.org, liam.howlett@oracle.com, peterz@infradead.org,
-        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
-        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
-        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
-        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
-        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
-        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
-        jannh@google.com, shakeelb@google.com, tatashin@google.com,
-        edumazet@google.com, gthelen@google.com, gurua@google.com,
-        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
-        leewalsh@google.com, posk@google.com, will@kernel.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
-        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
-        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
-        qianweili@huawei.com, wangzhou1@hisilicon.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-        airlied@gmail.com, daniel@ffwll.ch,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, l.stach@pengutronix.de,
-        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
-        matthias.bgg@gmail.com, robdclark@gmail.com,
-        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
-        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
-        ray.huang@amd.com, kraxel@redhat.com, mcoquelin.stm32@gmail.com,
-        alexandre.torgue@foss.st.com, tfiga@chromium.org,
-        m.szyprowski@samsung.com, mchehab@kernel.org,
-        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
-        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
-        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
-        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, miklos@szeredi.hu,
-        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
-        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
-        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
-        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
-        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
-        loongarch@lists.linux.dev, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
-        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
-        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org,
-        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        devel@lists.orangefs.org, kexec@lists.infradead.org,
-        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
-        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
-        kernel-team@android.com
-Subject: Re: [PATCH v2 3/6] mm: replace vma->vm_flags direct modifications
- with modifier calls
-Message-ID: <20230126170739.mlka2jivn3mfstyf@mercury.elektranox.org>
-References: <20230125083851.27759-1-surenb@google.com>
- <20230125083851.27759-4-surenb@google.com>
+        with ESMTP id S229846AbjAZRTn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 12:19:43 -0500
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AC311BCF
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 09:19:41 -0800 (PST)
+Received: by mail-ed1-x535.google.com with SMTP id v13so2479119eda.11
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 09:19:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=01osTMBd75dRpakFi+4b9Q8z4AgCSWYPv3lvZC0TYjM=;
+        b=lrO89/jqwvDxECL40SawzLb3nkxUOLRNmH+WH6HvtVummxi4esYTR3oUbmDt78ozlj
+         +vUvCoPnxaPazamIRsBkU9zwF9jwV1WV3aznQ/qJI7LNUxxlS+yL0HhNoetEetNSxiFY
+         gg80cTixAwH15DyhrpY3T47S5dm5+5zxv1L4ExLLcVlZ/HFR6XfsZNUHerfjUa3Ll55S
+         WGdjFxu5CnhgAqlWFiRaG8IvLITUwkrHs0oDJ2qfJZtRcAi0BsNAYny1IyLGjzW4GSJZ
+         W1r4FoKyQzBU+Gqw/UKZXoPqziN6F25sqLhuBaWNfLh4MTMn2DHdkeoKLNs4Av1XaStH
+         2i0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=01osTMBd75dRpakFi+4b9Q8z4AgCSWYPv3lvZC0TYjM=;
+        b=1nKSLEiq/Xm+3Bx6vB0jMxjRXArQpfCZDHfQu8Z+GR3UVLqrF8+UPP1HJeEI4UGzz3
+         l/l+cxxSpxwFgxw5alXOxD8E4NWWbqJvnzBazFg7h0ft7XsbKfBFJEmiBf0+bLirq5ix
+         kbn/Z4Aw2ld/v7XAy2bMvK+FDLzrDOP4RzumAV8/jt9DJ7iUOvbS0hTZs4lu/uWE2rMs
+         VoN4VS9DCpZdurnUXNJnGOkQQ6Ot6BDhSyyBa4cS+xTkV0+lzwKZkYttSGMMqVfslGW0
+         dwoSEzsygI3kx9oe9VTM4DLxBgZgnTNEhKIc6Qrf/x5sQRf+mN9aAH1r+d3oS5C4pU+c
+         rcfw==
+X-Gm-Message-State: AFqh2kpwyru7enr1Qv7OeQEa9v3PBAIsLOTKWvYvcXadK1iWQ/OmP7lM
+        QsUQ+g3hIi8b+h0OAYM1liAyqg==
+X-Google-Smtp-Source: AMrXdXtfKMYV3jATA6WLS4xpNKiethm1csHaCV2lOHmRMOi/M8Hk0+YWGFwOy/AhSPDS/Hp9yZrV+A==
+X-Received: by 2002:a05:6402:5299:b0:49c:5a27:c1fa with SMTP id en25-20020a056402529900b0049c5a27c1famr39368799edb.24.1674753579952;
+        Thu, 26 Jan 2023 09:19:39 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id s22-20020a056402037600b0049c4e3d4139sm1009026edw.89.2023.01.26.09.19.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jan 2023 09:19:39 -0800 (PST)
+Date:   Thu, 26 Jan 2023 18:19:38 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 5/7] RISC-V: KVM: Add ONE_REG interface for AIA CSRs
+Message-ID: <20230126171938.la5jswt6gr4qanl5@orel>
+References: <20230112140304.1830648-1-apatel@ventanamicro.com>
+ <20230112140304.1830648-6-apatel@ventanamicro.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="qcyccrleajamxo75"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230125083851.27759-4-surenb@google.com>
+In-Reply-To: <20230112140304.1830648-6-apatel@ventanamicro.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-
---qcyccrleajamxo75
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-Hi,
-
-On Wed, Jan 25, 2023 at 12:38:48AM -0800, Suren Baghdasaryan wrote:
-> Replace direct modifications to vma->vm_flags with calls to modifier
-> functions to be able to track flag changes and to keep vma locking
-> correctness.
->=20
-> Signed-off-by: Suren Baghdasaryan <surenb@google.com>
+On Thu, Jan 12, 2023 at 07:33:02PM +0530, Anup Patel wrote:
+> We extend the CSR ONE_REG interface to access both general CSRs and
+> AIA CSRs. To achieve this, we introduce "subtype" field in the ONE_REG
+> id which can be used for grouping registers within a particular "type"
+> of ONE_REG registers.
+> 
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 > ---
-> [...]
->  drivers/hsi/clients/cmt_speech.c                   |  2 +-
->  120 files changed, 188 insertions(+), 199 deletions(-)
-> [...]
-> diff --git a/drivers/hsi/clients/cmt_speech.c b/drivers/hsi/clients/cmt_s=
-peech.c
-> index 8069f795c864..952a31e742a1 100644
-> --- a/drivers/hsi/clients/cmt_speech.c
-> +++ b/drivers/hsi/clients/cmt_speech.c
-> @@ -1264,7 +1264,7 @@ static int cs_char_mmap(struct file *file, struct v=
-m_area_struct *vma)
->  	if (vma_pages(vma) !=3D 1)
+>  arch/riscv/include/uapi/asm/kvm.h | 15 ++++-
+>  arch/riscv/kvm/vcpu.c             | 96 ++++++++++++++++++++++++-------
+>  2 files changed, 89 insertions(+), 22 deletions(-)
+> 
+> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+> index 71992ff1f9dd..d0704eff0121 100644
+> --- a/arch/riscv/include/uapi/asm/kvm.h
+> +++ b/arch/riscv/include/uapi/asm/kvm.h
+> @@ -64,7 +64,7 @@ struct kvm_riscv_core {
+>  #define KVM_RISCV_MODE_S	1
+>  #define KVM_RISCV_MODE_U	0
+>  
+> -/* CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> +/* General CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+>  struct kvm_riscv_csr {
+>  	unsigned long sstatus;
+>  	unsigned long sie;
+> @@ -78,6 +78,10 @@ struct kvm_riscv_csr {
+>  	unsigned long scounteren;
+>  };
+>  
+> +/* AIA CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> +struct kvm_riscv_aia_csr {
+> +};
+> +
+>  /* TIMER registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+>  struct kvm_riscv_timer {
+>  	__u64 frequency;
+> @@ -105,6 +109,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+>  	KVM_RISCV_ISA_EXT_SVINVAL,
+>  	KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
+>  	KVM_RISCV_ISA_EXT_ZICBOM,
+> +	KVM_RISCV_ISA_EXT_SSAIA,
+>  	KVM_RISCV_ISA_EXT_MAX,
+>  };
+>  
+> @@ -134,6 +139,8 @@ enum KVM_RISCV_SBI_EXT_ID {
+>  /* If you need to interpret the index values, here is the key: */
+>  #define KVM_REG_RISCV_TYPE_MASK		0x00000000FF000000
+>  #define KVM_REG_RISCV_TYPE_SHIFT	24
+> +#define KVM_REG_RISCV_SUBTYPE_MASK	0x0000000000FF0000
+> +#define KVM_REG_RISCV_SUBTYPE_SHIFT	16
+
+We could just define a new AIA_CSR type, rather than introduce CSR
+subtypes. While grouping all CSRs together under the CSR type also
+makes sense, having to teach all userspaces about subtypes may not
+be worth the organizational benefits.
+
+>  
+>  /* Config registers are mapped as type 1 */
+>  #define KVM_REG_RISCV_CONFIG		(0x01 << KVM_REG_RISCV_TYPE_SHIFT)
+> @@ -147,8 +154,12 @@ enum KVM_RISCV_SBI_EXT_ID {
+>  
+>  /* Control and status registers are mapped as type 3 */
+>  #define KVM_REG_RISCV_CSR		(0x03 << KVM_REG_RISCV_TYPE_SHIFT)
+> +#define KVM_REG_RISCV_CSR_GENERAL	0x0
+> +#define KVM_REG_RISCV_CSR_AIA		0x1
+>  #define KVM_REG_RISCV_CSR_REG(name)	\
+> -		(offsetof(struct kvm_riscv_csr, name) / sizeof(unsigned long))
+> +	(offsetof(struct kvm_riscv_csr, name) / sizeof(unsigned long))
+> +#define KVM_REG_RISCV_CSR_AIA_REG(name)	\
+> +	(offsetof(struct kvm_riscv_aia_csr, name) / sizeof(unsigned long))
+>  
+>  /* Timer registers are mapped as type 4 */
+>  #define KVM_REG_RISCV_TIMER		(0x04 << KVM_REG_RISCV_TYPE_SHIFT)
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 3cf50eadc8ce..37933ea20274 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -58,6 +58,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
+>  	[KVM_RISCV_ISA_EXT_I] = RISCV_ISA_EXT_i,
+>  	[KVM_RISCV_ISA_EXT_M] = RISCV_ISA_EXT_m,
+>  
+> +	KVM_ISA_EXT_ARR(SSAIA),
+>  	KVM_ISA_EXT_ARR(SSTC),
+>  	KVM_ISA_EXT_ARR(SVINVAL),
+>  	KVM_ISA_EXT_ARR(SVPBMT),
+> @@ -96,6 +97,7 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsigned long ext)
+>  	case KVM_RISCV_ISA_EXT_C:
+>  	case KVM_RISCV_ISA_EXT_I:
+>  	case KVM_RISCV_ISA_EXT_M:
+> +	case KVM_RISCV_ISA_EXT_SSAIA:
+>  	case KVM_RISCV_ISA_EXT_SSTC:
+>  	case KVM_RISCV_ISA_EXT_SVINVAL:
+>  	case KVM_RISCV_ISA_EXT_ZIHINTPAUSE:
+> @@ -451,30 +453,79 @@ static int kvm_riscv_vcpu_set_reg_core(struct kvm_vcpu *vcpu,
+>  	return 0;
+>  }
+>  
+> +static int kvm_riscv_vcpu_general_get_csr(struct kvm_vcpu *vcpu,
+> +					  unsigned long reg_num,
+> +					  unsigned long *out_val)
+> +{
+> +	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> +
+> +	if (reg_num >= sizeof(struct kvm_riscv_csr) / sizeof(unsigned long))
+> +		return -EINVAL;
+> +
+> +	if (reg_num == KVM_REG_RISCV_CSR_REG(sip)) {
+> +		kvm_riscv_vcpu_flush_interrupts(vcpu);
+> +		*out_val = (csr->hvip >> VSIP_TO_HVIP_SHIFT) & VSIP_VALID_MASK;
+> +	} else
+> +		*out_val = ((unsigned long *)csr)[reg_num];
+> +
+> +	return 0;
+> +}
+> +
+>  static int kvm_riscv_vcpu_get_reg_csr(struct kvm_vcpu *vcpu,
+>  				      const struct kvm_one_reg *reg)
+>  {
+> -	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> +	int rc;
+>  	unsigned long __user *uaddr =
+>  			(unsigned long __user *)(unsigned long)reg->addr;
+>  	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
+>  					    KVM_REG_SIZE_MASK |
+>  					    KVM_REG_RISCV_CSR);
+> -	unsigned long reg_val;
+> +	unsigned long reg_val, reg_subtype;
+>  
+>  	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
 >  		return -EINVAL;
-> =20
-> -	vma->vm_flags |=3D VM_IO | VM_DONTDUMP | VM_DONTEXPAND;
-> +	set_vm_flags(vma, VM_IO | VM_DONTDUMP | VM_DONTEXPAND);
->  	vma->vm_ops =3D &cs_char_vm_ops;
->  	vma->vm_private_data =3D file->private_data;
-> =20
+> +
+> +	reg_subtype = (reg_num & KVM_REG_RISCV_SUBTYPE_MASK)
+> +			>> KVM_REG_RISCV_SUBTYPE_SHIFT;
+> +	reg_num &= ~KVM_REG_RISCV_SUBTYPE_MASK;
+> +	switch (reg_subtype) {
+> +	case KVM_REG_RISCV_CSR_GENERAL:
+> +		rc = kvm_riscv_vcpu_general_get_csr(vcpu, reg_num, &reg_val);
+> +		break;
+> +	case KVM_REG_RISCV_CSR_AIA:
+> +		rc = kvm_riscv_vcpu_aia_get_csr(vcpu, reg_num, &reg_val);
+> +		break;
+> +	default:
+> +		rc = -EINVAL;
+> +		break;
+> +	}
+> +	if (rc)
+> +		return rc;
+> +
+> +	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
+> +		return -EFAULT;
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int kvm_riscv_vcpu_general_set_csr(struct kvm_vcpu *vcpu,
+> +						 unsigned long reg_num,
+> +						 unsigned long reg_val)
+> +{
+> +	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> +
+>  	if (reg_num >= sizeof(struct kvm_riscv_csr) / sizeof(unsigned long))
+>  		return -EINVAL;
+>  
+>  	if (reg_num == KVM_REG_RISCV_CSR_REG(sip)) {
+> -		kvm_riscv_vcpu_flush_interrupts(vcpu);
+> -		reg_val = (csr->hvip >> VSIP_TO_HVIP_SHIFT) & VSIP_VALID_MASK;
+> -	} else
+> -		reg_val = ((unsigned long *)csr)[reg_num];
+> +		reg_val &= VSIP_VALID_MASK;
+> +		reg_val <<= VSIP_TO_HVIP_SHIFT;
+> +	}
+>  
+> -	if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
+> -		return -EFAULT;
+> +	((unsigned long *)csr)[reg_num] = reg_val;
+> +
+> +	if (reg_num == KVM_REG_RISCV_CSR_REG(sip))
+> +		WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+>  
+>  	return 0;
+>  }
+> @@ -482,31 +533,36 @@ static int kvm_riscv_vcpu_get_reg_csr(struct kvm_vcpu *vcpu,
+>  static int kvm_riscv_vcpu_set_reg_csr(struct kvm_vcpu *vcpu,
+>  				      const struct kvm_one_reg *reg)
+>  {
+> -	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> +	int rc;
+>  	unsigned long __user *uaddr =
+>  			(unsigned long __user *)(unsigned long)reg->addr;
+>  	unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
+>  					    KVM_REG_SIZE_MASK |
+>  					    KVM_REG_RISCV_CSR);
+> -	unsigned long reg_val;
+> +	unsigned long reg_val, reg_subtype;
+>  
+>  	if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
+>  		return -EINVAL;
+> -	if (reg_num >= sizeof(struct kvm_riscv_csr) / sizeof(unsigned long))
+> -		return -EINVAL;
+>  
+>  	if (copy_from_user(&reg_val, uaddr, KVM_REG_SIZE(reg->id)))
+>  		return -EFAULT;
+>  
+> -	if (reg_num == KVM_REG_RISCV_CSR_REG(sip)) {
+> -		reg_val &= VSIP_VALID_MASK;
+> -		reg_val <<= VSIP_TO_HVIP_SHIFT;
+> +	reg_subtype = (reg_num & KVM_REG_RISCV_SUBTYPE_MASK)
+> +			>> KVM_REG_RISCV_SUBTYPE_SHIFT;
+> +	reg_num &= ~KVM_REG_RISCV_SUBTYPE_MASK;
+> +	switch (reg_subtype) {
+> +	case KVM_REG_RISCV_CSR_GENERAL:
+> +		rc = kvm_riscv_vcpu_general_set_csr(vcpu, reg_num, reg_val);
+> +		break;
+> +	case KVM_REG_RISCV_CSR_AIA:
+> +		rc = kvm_riscv_vcpu_aia_set_csr(vcpu, reg_num, reg_val);
+> +		break;
+> +	default:
+> +		rc = -EINVAL;
+> +		break;
+>  	}
+> -
+> -	((unsigned long *)csr)[reg_num] = reg_val;
+> -
+> -	if (reg_num == KVM_REG_RISCV_CSR_REG(sip))
+> -		WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+> +	if (rc)
+> +		return rc;
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.34.1
+>
 
-Acked-by: Sebastian Reichel <sebastian.reichel@collabora.com>
-
--- Sebastian
-
---qcyccrleajamxo75
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmPSs1EACgkQ2O7X88g7
-+pquLBAAkw9lw9lxNRCI6jvqLy98JsUBgSQigNB6Eh8JVWsySHMm1OszFCcvTpoc
-vinC/VPMOa6JwEw5e9naXRF2UJahO+Cx+e5MYIKos3QyIUPfi0YM7Cv96h6+c4l/
-NdcxLS8+9ElitTuA47UVgPSeZwzdZ1kU5VUV1X2fx+6aGA+dBfWVBgWDqU6AB0Sa
-ehU4betso5Ypl26YEmLPHmY+8Xx2jXNwwBEgsHgO2/YjRn9YPDeMAqb4lWs99h0d
-nUV1VqwTClRrExtNDvidHryknmyCIBpYt38gn0i9+uIf9mFoBmUDN+/zAdRguGBT
-r1CQAwvRvHmEyGJ4dp1nijyt/PWxDBlCWytlmzXrK/rkeH8sQCRdCr9L83/d5DM0
-iU98ehmbH9kx8rD4y0L91xmsnegNYNKSfAvz3EP4KYFOHjTw2SOCYoazPu3z62bN
-d3HL+08LeZpm1XwVPydZqBd5UpBK8NaQYCJ3BjsLUefsSJE+SWzsnoYFnbUrL1X9
-1XfU6LGtVvjCPUsjk7oqh5PjtRGQsdtUhSZJLwNzTeh4I0nSzL1pj8vRFZ7UTcV4
-RmFYsjBbKhja2fC13eM4tKzfx53harnHVNuUPw2aoLKshpkQaOTUqWBnRXtbJZkb
-dSRKObxfPlHVI+awnfN6owpXF86Owew2+XJcXILOPxaBk8PI/Ns=
-=/0TB
------END PGP SIGNATURE-----
-
---qcyccrleajamxo75--
+Thanks,
+drew
