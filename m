@@ -2,140 +2,229 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id ED86867C94A
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 11:59:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A33B367C991
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 12:16:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237076AbjAZK7E (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 05:59:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49602 "EHLO
+        id S237175AbjAZLQk (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 06:16:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237057AbjAZK7A (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 05:59:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 235D1BB8D
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 02:58:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674730682;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S236502AbjAZLQj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 06:16:39 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41A18270B;
+        Thu, 26 Jan 2023 03:16:36 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id E25A31FF65;
+        Thu, 26 Jan 2023 11:16:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1674731794; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=pUtnlRWuSV9rzF4bHOmBDZppyOE20q92Y5J7hglnV3g=;
-        b=fUkqcNc8DWHHRGBY+MFFYlZkB4y3UW6vrImUJp48mre5Mn3NARr9qoYGe0BJAtL6+/LfTr
-        x/FyeMbxyRztPCOFIURt8eYU8ZCfOoi3JCViHnLsI+vH/4drkwi9uo6SeDMXUgw0tqajBM
-        DGlCjN4PRKqykD1Yx8Xgt6EmikjwJHU=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-634-0Lo4XJvHPPuiSLgXNcAMGQ-1; Thu, 26 Jan 2023 05:57:56 -0500
-X-MC-Unique: 0Lo4XJvHPPuiSLgXNcAMGQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        bh=VqvJ//mtxUzAL+qZwt9BocGJmjBDoQtWDsm6f0RHcJw=;
+        b=brCnbvCw0yFj2KB2XLQOvhzBW6Pnv5+JFss008p+DODbsTxFtCHWxo09XShJcZe3aG8Xg8
+        BfRTj2syQl/6yCyoMx/mZorf14W6aVLJvmfyfQs/BnHno/9Krlm5Qys3TD57sskrGWFsqp
+        n7zaBtnzD4oinqFzvBdPIGyKD4DlvDY=
+Received: from suse.cz (unknown [10.100.201.202])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5603F3C025C6;
-        Thu, 26 Jan 2023 10:57:56 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D3DC4C15BAD;
-        Thu, 26 Jan 2023 10:57:53 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Auger <eauger@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 2/2] qtests/arm: add some mte tests
-In-Reply-To: <be81e9e3-1669-4627-562e-30ab0a98c8fc@redhat.com>
-Organization: Red Hat GmbH
-References: <20230111161317.52250-1-cohuck@redhat.com>
- <20230111161317.52250-3-cohuck@redhat.com>
- <be81e9e3-1669-4627-562e-30ab0a98c8fc@redhat.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Thu, 26 Jan 2023 11:57:50 +0100
-Message-ID: <87a625y34h.fsf@redhat.com>
+        by relay2.suse.de (Postfix) with ESMTPS id B2CC52C141;
+        Thu, 26 Jan 2023 11:16:34 +0000 (UTC)
+Date:   Thu, 26 Jan 2023 12:16:32 +0100
+From:   Petr Mladek <pmladek@suse.com>
+To:     Seth Forshee <sforshee@kernel.org>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] vhost: check for pending livepatches from vhost
+ worker kthreads
+Message-ID: <Y9JhEJXFRDZjONAH@alley>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <20230120-vhost-klp-switching-v1-2-7c2b65519c43@kernel.org>
+ <Y8/ohzRGcOiqsh69@alley>
+ <Y9ATo5FukOhphwqT@do-x1extreme>
+ <Y9ETwsT4LTXyH/0m@alley>
+ <Y9FfenH/p3qzRlar@do-x1extreme>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9FfenH/p3qzRlar@do-x1extreme>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 23 2023, Eric Auger <eauger@redhat.com> wrote:
+On Wed 2023-01-25 10:57:30, Seth Forshee wrote:
+> On Wed, Jan 25, 2023 at 12:34:26PM +0100, Petr Mladek wrote:
+> > On Tue 2023-01-24 11:21:39, Seth Forshee wrote:
+> > > On Tue, Jan 24, 2023 at 03:17:43PM +0100, Petr Mladek wrote:
+> > > > On Fri 2023-01-20 16:12:22, Seth Forshee (DigitalOcean) wrote:
+> > > > > Livepatch relies on stack checking of sleeping tasks to switch kthreads,
+> > > > > so a busy kthread can block a livepatch transition indefinitely. We've
+> > > > > seen this happen fairly often with busy vhost kthreads.
+> > > > 
+> > > > > --- a/drivers/vhost/vhost.c
+> > > > > +++ b/drivers/vhost/vhost.c
+> > > > > @@ -366,6 +367,9 @@ static int vhost_worker(void *data)
+> > > > >  			if (need_resched())
+> > > > >  				schedule();
+> > > > >  		}
+> > > > > +
+> > > > > +		if (unlikely(klp_patch_pending(current)))
+> > > > > +			klp_switch_current();
+> > > > 
+> > > > I suggest to use the following intead:
+> > > > 
+> > > > 		if (unlikely(klp_patch_pending(current)))
+> > > > 			klp_update_patch_state(current);
+> > > > 
+> > > > We already use this in do_idle(). The reason is basically the same.
+> > > > It is almost impossible to livepatch the idle task when a CPU is
+> > > > very idle.
+> > > > 
+> > > > klp_update_patch_state(current) does not check the stack.
+> > > > It switches the task immediately.
+> > > > 
+> > > > It should be safe because the kthread never leaves vhost_worker().
+> > > > It means that the same kthread could never re-enter this function
+> > > > and use the new code.
+> > > 
+> > > My knowledge of livepatching internals is fairly limited, so I'll accept
+> > > it if you say that it's safe to do it this way. But let me ask about one
+> > > scenario.
+> > > 
+> > > Let's say that a livepatch is loaded which replaces vhost_worker(). New
+> > > vhost worker threads are started which use the replacement function. Now
+> > > if the patch is disabled, these new worker threads would be switched
+> > > despite still running the code from the patch module, correct? Could the
+> > > module then be unloaded, freeing the memory containing the code these
+> > > kthreads are executing?
+> > 
+> > The above scenario would require calling klp_update_patch_state() from
+> > the code in the livepatch module. It is not possible at the moment because
+> > this function is not exported for modules.
+> 
+> vhost can be built as a module, so in order to call
+> klp_update_patch_state() from vhost_worker() it would have to be
+> exported to modules.
 
-> Hi Connie,
-> On 1/11/23 17:13, Cornelia Huck wrote:
->> Acked-by: Thomas Huth <thuth@redhat.com>
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-> Maybe add some extra information about what tests are run. Also you
-> could add an example of test invocation so that any people interested in
-> can easily run those new tests?
+I see.
 
-Hm, it's just a part of the normal, standard qtests -- not sure what I
-should add there?
+> > Hmm, the same problem might be when we livepatch a function that calls
+> > another function that calls klp_update_patch_state(). But in this case
+> > it would be kthread() from kernel/kthread.c. It would affect any
+> > running kthread. I doubt that anyone would seriously think about
+> > livepatching this function.
+> 
+> Yes, there are clearly certain functions that are not safe/practical to
+> patch, and authors need to know what they are doing. Most kthread main()
+> functions probably qualify as impractical at best, at least without a
+> strategy to restart relevant kthreads.
+> 
+> But a livepatch transition will normally stall if patching these
+> functions when a relevant kthread is running (unless the patch is
+> forced), so a patch author who made a mistake should quickly notice.
+> vhost_worker() would behave differently.
 
->
->> ---
->>  tests/qtest/arm-cpu-features.c | 76 ++++++++++++++++++++++++++++++++++
->>  1 file changed, 76 insertions(+)
+Another crazy idea:
 
-(...)
+/**
+ * klp_update_patch_state_safe() - do not update the path state when
+ *	called from a livepatch.
+ * @task: task_struct to be updated
+ * @calller_addr: address of the function which  calls this one
+ *
+ * Do not update the patch set when called from a livepatch.
+ * It would allow to remove the livepatch module even when
+ * the code still might be in use.
+ */
+void klp_update_patch_state_safe(struct task_struct *task, void *caller_addr)
+{
+	static bool checked;
+	static bool safe;
 
->> +static void mte_tests_default(QTestState *qts, const char *cpu_type)
->> +{
->> +    assert_has_feature(qts, cpu_type, "mte");
->> +
->> +    /*
->> +     * Without tag memory, mte will be off under tcg.
->> +     * Explicitly enabling it yields an error.
->> +     */
->> +    assert_has_feature(qts, cpu_type, "mte");
-> called twice
+	if (unlikely(!checked)) {
+		struct module *mod;
 
-Ok, that's probably some kind of rebase artifact.
+		preempt_disable();
+		mod = __module_address(caller_addr);
+		if (!mod || !is_livepatch_module(mod))
+			safe = true;
+		checked = true;
+		preempt_enable();
+	}
 
->> +
->> +    assert_set_feature_str(qts, "max", "mte", "off", "{ 'mte': 'off' }");
->> +    assert_error(qts, cpu_type, "mte=on requires tag memory",
->> +                 "{ 'mte': 'on' }");
-> nit. with pauth_tests_default form: cannot enable mte without tag memory
+	if (safe)
+		klp_update_patch_state(task);
+}
 
-Not sure what you mean here?
+and use in vhost_worker()
 
->> +}
->> +
->>  static void test_query_cpu_model_expansion(const void *data)
->>  {
->>      QTestState *qts;
->> @@ -473,6 +539,7 @@ static void test_query_cpu_model_expansion(const void *data)
->>  
->>          sve_tests_default(qts, "max");
->>          pauth_tests_default(qts, "max");
->> +        mte_tests_default(qts, "max");
->>  
->>          /* Test that features that depend on KVM generate errors without. */
->>          assert_error(qts, "max",
->> @@ -516,6 +583,13 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
->>          assert_set_feature(qts, "host", "pmu", false);
->>          assert_set_feature(qts, "host", "pmu", true);
->>  
->> +        /*
->> +         * Unfortunately, there's no easy way to test whether this instance
->> +         * of KVM supports MTE. So we can only assert that the feature
->> +         * is present, but not whether it can be toggled.
->> +         */
->> +        assert_has_feature(qts, "host", "mte");
-> why isn't it possible to implement something like
->         kvm_supports_steal_time = resp_get_feature(resp, "kvm-steal-time");
-> Could you elaborate?
+		if (unlikely(klp_patch_pending(current)))
+			klp_update_patch_state_safe(current, vhost_worker);
 
-I really should have written that down in detail, but I _think_ that's
-because of OnOffAuto... if the prop is not set explicitly, we don't know
-what is supported. Unless someone has an idea how to work around that?
+Even better might be to get the caller address using some compiler
+macro. I guess that it should be possible.
 
+And even better would be to detect this at the compile time. But
+I do not know how to do so.
+
+> > A good enough solution might be to document this. Livepatches could
+> > not be created blindly. There are more situations where the
+> > livepatch is tricky or not possible at all.
+> 
+> I can add this if you like. Is Documentation/livepatch/livepatch.rst the
+> right place for this?
+
+Yes, the best place probably would be "7. Limitations" section in
+Documentation/livepatch/livepatch.rst.
+
+Even better would be to add a document about the best practices.
+We have dreamed about it for years ;-)
+
+> > Crazy idea. We could prevent this problem even technically. A solution
+> > would be to increment a per-process counter in klp_ftrace_handler() when a
+> > function is redirected(). And klp_update_patch_state() might refuse
+> > the migration when this counter is not zero. But it would require
+> > to use a trampoline on return that would decrement the counter.
+> > I am not sure if this is worth the complexity.
+> > 
+> > One the other hand, this counter might actually remove the need
+> > of the reliable backtrace. It is possible that I miss something
+> > or that it is not easy/possible to implement the return trampoline.
+> 
+> I agree this should work for unpatching, and even for patching a
+> function which is already patched.
+> 
+> Maybe I'm misunderstanding, but this would only work for unpatching or
+> patching an already-patched function, wouldn't it? Because the original
+> functions would not increment the counter so you would not know if tasks
+> still had those on their call stacks.
+
+Right. I knew that it could not be that easy. Otherwise, we would have
+used it. I just did not spent enough cycles on the idea yesterday.
+
+> > Back to the original problem. I still consider calling
+> > klp_update_patch_state(current) in vhost_worker() safe.
+> 
+> Okay, I can send a v2 which does this, so long as it's okay to export
+> klp_update_patch_state() to modules.
+
+It would be acceptable for me if we added a warning above the function
+definition and into the livepatch documentation.
+
+But I would prefer klp_update_patch_state_safe() if it worked. It is
+possible that I have missed something.
+
+Best Regards,
+Petr
