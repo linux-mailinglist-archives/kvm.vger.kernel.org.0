@@ -2,89 +2,125 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 61B5567D344
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 18:34:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2095267D364
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 18:40:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231641AbjAZReF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 12:34:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39604 "EHLO
+        id S232032AbjAZRkh (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 12:40:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231671AbjAZReC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 12:34:02 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0ECBC61841
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 09:33:58 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id p24so2449972plw.11
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 09:33:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=yjkve0GkHRTT7LcJVMv9OBtV7u24HWVBrdSJpzuk9SQ=;
-        b=lyQLi9NoIwQVMN6ip6uYi4tQscqL20aNad/kOw7203r0uE4HvY8VzxOVPB2hYD/9HR
-         iDwKK4PYTSAPeivfMEL1tLNAEUs0KI2RKXjgvlm0+8Wz84GiJLeibvTi2i2+1aDEHa42
-         N5uZ7oKRzNusC2TcaeZjsD5OsYM2Kc8usog3MHUllxSD9T7eTs4KVjpazxQrcqDIyCQM
-         OAI4S/MPVmBykrWlojF40yg32nWQ9AViy+DNBBw1d9dY0Owdx8cC6h62dtlH5WtHRA21
-         C2W21zipXnISiTmEaebFTYvK5ASKtgH0U0ZLOeoRCEeeGwhOi0q2MBE3VY7XihZs9G70
-         7X8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yjkve0GkHRTT7LcJVMv9OBtV7u24HWVBrdSJpzuk9SQ=;
-        b=l0pRjna2eDTvCLOi0cNEHnL3mVIllfC4dPx4kns5ra8L7ksu3g8fvJoVbFS2yi5x3C
-         3NvaL6yAUAbdAnW6RfUq0IrbniFXPnGO2rn0UpYEceqgOQGE91t3ILz9x+LbDCokUJ34
-         6/3rr3pEHYwfMrW1yXeqoPJheFzz+F414jO4cTkuxozfY0MH+BONQ0k2IpShXbsbIYmm
-         FlUqsrjrAo1AmSW//Pk/WP8IkY27vxGhizYhNqWPK4Ot0FCFS8O1pKhl6dks+ywbfgle
-         LrNSGyf4i6VuxDWAyPPseI7v8mn8/f3l/BxpTV9MnRuFTYXBEu9ao3uqWhzxiYHUk86D
-         EEow==
-X-Gm-Message-State: AO0yUKVjyLXqLyRHuUVq2ZrP7d0JGCXfOz9/b+nggzcoZoJaEKj9wZZ9
-        g3Pybvt49F/gjc6ptmD2faiBWtLLZHjMMPOfoTg=
-X-Google-Smtp-Source: AK7set/P3FSyhNLtnWR3iv9QrVAW5fL4CYxfj/lFkN/Un3ZxP3JDUESOQpVylKvI8/TFltIeG4d/3Q==
-X-Received: by 2002:a17:902:7891:b0:191:4367:7fde with SMTP id q17-20020a170902789100b0019143677fdemr1024166pll.0.1674754437315;
-        Thu, 26 Jan 2023 09:33:57 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id q5-20020a170902c74500b00195f0fb0c18sm1267942plq.31.2023.01.26.09.33.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 09:33:56 -0800 (PST)
-Date:   Thu, 26 Jan 2023 17:33:53 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Michal Luczaj <mhal@rbox.co>
-Cc:     kvm@vger.kernel.org, pbonzini@redhat.com
-Subject: Re: [PATCH 0/3] KVM: x86/emulator: Segment load fixes
-Message-ID: <Y9K5gahXK4kWdton@google.com>
-References: <20230126013405.2967156-1-mhal@rbox.co>
+        with ESMTP id S231378AbjAZRkg (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 12:40:36 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E776D5EB;
+        Thu, 26 Jan 2023 09:40:35 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30QFfP0h022998;
+        Thu, 26 Jan 2023 17:40:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=4BGYm+/EmkMFk7O7ogG/O2YwU0ggtlo/0JPD7ipLbAA=;
+ b=URrHZkmKDg+R3vsC0RSqVFWhfByQfqGoP6svRgleu4TjTnnjHs9lV418AQ7muYLtoV5U
+ nQrjNbEJWJlw5Wp41nHQ5dIgjYCvJ+IEaB+FhYzTz+Nit59Z7kR9IkDRUoMiaC00/jIS
+ iRxZg/8347VTGuUMtSN3LQjAvWno5ZO8zOuyNZqUN4lM249QqesF1PsOGW/LzIpeSerU
+ +a1NwpvY7Kq0lbK2o7kD0x/rvBFuHH5PHcQ7A3Vf5/D881TLT3accM1IHWfip+PORBVs
+ EqL4CJcHlrdX30wybiiTmB+tj0z3xyhPT29T8gKTrEdh70obZFw/LkFwGWnv8f4r2M2m kw== 
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbtp46365-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Jan 2023 17:40:34 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30Q3rEaL027380;
+        Thu, 26 Jan 2023 17:40:32 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3n87p64ryt-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Jan 2023 17:40:32 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30QHeSrl21561728
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Jan 2023 17:40:28 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1028A20043;
+        Thu, 26 Jan 2023 17:40:28 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DC57720040;
+        Thu, 26 Jan 2023 17:40:27 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 26 Jan 2023 17:40:27 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v3 0/1] KVM: s390: disable migration mode when dirty tracking is disabled
+Date:   Thu, 26 Jan 2023 18:40:26 +0100
+Message-Id: <20230126174027.133667-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230126013405.2967156-1-mhal@rbox.co>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ZAfSx2DQGrfD-WUK8zBraNCkIYZwkUl2
+X-Proofpoint-GUID: ZAfSx2DQGrfD-WUK8zBraNCkIYZwkUl2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-26_07,2023-01-26_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ priorityscore=1501 mlxlogscore=565 clxscore=1015 bulkscore=0 adultscore=0
+ lowpriorityscore=0 suspectscore=0 impostorscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301260169
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 26, 2023, Michal Luczaj wrote:
-> Two small fixes for __load_segment_descriptor(), along with a KUT
-> x86/emulator test.
-> 
-> And a question to maintainers: is it ok to send patches for two repos in
-> one series?
+v3:
+---
+* update docs for GET_CMMA_BITS
+* restructure error handling in prepare_memslot
 
-No, in the future please send two separate series (no need to do so for this case).
-Us humans can easily figure out what's going on, but b4[*] gets confused, e.g.
-`b4 am` will fail.
+v2:
+---
+* pr_warn -> WARN_ONCE
+* comment style
 
-What I usually do to connect the KVM-unit-test change to the kernel/KVM change is
-to post the kernel patches first, and then update the KVM-unit-test patch(es) to
-provide the lore link to the kernel patches.
+Migration mode is a VM attribute which enables tracking of changes in
+storage attributes (PGSTE). It assumes dirty tracking is enabled on all
+memslots to keep a dirty bitmap of pages with changed storage attributes.
 
-Thanks for asking, and a _huge_ thanks for writing tests!
+When enabling migration mode, we currently check that dirty tracking is
+enabled for all memslots. However, userspace can disable dirty tracking
+without disabling migration mode.
 
-[*] git://git.kernel.org/pub/scm/utils/b4/b4.git
+Since migration mode is pointless with dirty tracking disabled, disable
+migration mode whenever userspace disables dirty tracking on any slot.
+
+Also update the documentation to clarify that dirty tracking must be
+enabled when enabling migration mode, which is already enforced by the
+code in kvm_s390_vm_start_migration().
+
+To disable migration mode, slots_lock should be held, which is taken
+in kvm_set_memory_region() and thus held in
+kvm_arch_prepare_memory_region().
+
+Restructure the prepare code a bit so all the sanity checking is done
+before disabling migration mode. This ensures migration mode isn't
+disabled when some sanity check fails.
+
+
+Nico Boehr (1):
+  KVM: s390: disable migration mode when dirty tracking is disabled
+
+ Documentation/virt/kvm/api.rst        | 16 +++++++----
+ Documentation/virt/kvm/devices/vm.rst |  4 +++
+ arch/s390/kvm/kvm-s390.c              | 40 ++++++++++++++++++---------
+ 3 files changed, 42 insertions(+), 18 deletions(-)
+
+-- 
+2.39.1
+
