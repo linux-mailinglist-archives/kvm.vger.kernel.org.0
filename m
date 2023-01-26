@@ -2,158 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1E7A467D0D7
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 17:02:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6895067D0E3
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 17:06:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232513AbjAZQCr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 11:02:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41010 "EHLO
+        id S232573AbjAZQGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 11:06:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232525AbjAZQCm (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 11:02:42 -0500
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD14A6951F
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:02:37 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id vw16so6207808ejc.12
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:02:37 -0800 (PST)
+        with ESMTP id S232568AbjAZQGa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 11:06:30 -0500
+Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2887113DB
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:06:28 -0800 (PST)
+Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-15085b8a2f7so2952567fac.2
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:06:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XlKMRT9EHE65PtZHGD4k5FPNh/3AR3OGuPsdhBKT3qA=;
-        b=gVGoa76c/5rcg8G4PJsKVsH40EqYRtPXBFl7cMEhxTAGOx7n3XRkZBT5M1LjyfxzzS
-         NNTkEx8ZywN1TUdTYOGh6T2vQPp9JSmW2Ip0K4W3QnoyiA8dyh9gv0zxTLENpebOTA6Y
-         2TxJyZ01aQkpqZQ1izt8958vsDK9vtJm81ED338cGJ//zUeessnoocomcBAR7VKzpYCs
-         nJySEhKgBYDOjCcG+9shtL+EjAYO9GRPiQ8vR0Z5/+jhv3p0BDqHz5lEwigamOyQh5Uf
-         BwYynfKbGPtzq8Eb51M8Ebjd2g8s4fmr9EU/yj7rgI2u+1LxavslRi4hqS7VpeUOnETi
-         FSDQ==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=uDaQuB4zE4KgnrjX+Hk1otko+7yWJI0zZ43Q4BlCXeU=;
+        b=FvKjmv9dkMM+tpDvvzMCCbED7aweIL0vxA7Pq6UdpBOrgaZpwRfIGfLvvX4jEJncUU
+         8+2+9fnBNQ+H4Tsv2ed5+QzmuHAi/mK6A+Ng75yr/DLmP7F7seQnTY7iwtKNM8Oz7J4Y
+         OEYxD2fpSW1bE7cNIM/IlhbxWjI9BJGLAOv8ntjnKtgIy7XA3aeTfwshEH7fd5yl9SUN
+         dW51OLPVIOedKnVAHWNV9GPUB6o9VW0lAdS8+qZHm8yzD8Fp5q7SIA3KbjS6L1HZEXai
+         4pgjvQohy2PuhdyX1RFOETamkY/DSgg0Y5r0OGaE7gM/Ijp+HPtU12mFucY+wV/rhI86
+         0i7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XlKMRT9EHE65PtZHGD4k5FPNh/3AR3OGuPsdhBKT3qA=;
-        b=N7m7PO8hd8jTRq7sP1bJLjouOgV5xrmpy6luW+aYmUIdtTGF387Sk/aeaxMMss15Du
-         x5X5nkWn9+d+9n0vg8N1TczxV2NUT1tKnY0MEoueZurR9vxNRSB9caanttd3nG98twcx
-         q6sNzCeTSp7iCZUWhbiSaduTcKwZxjoG29iS1BWZigHTJTjhT09TVRuP+VeZRBUNxsXx
-         a5UYgRVYpw7ntQnjUzsBuNbSlKTHmrGcUdcRHGCqpHmUEVI0HmbyQWFmTNkl0QStqGIj
-         wCA+BwoQX2wekZqVRCbKBKCi5mZ9xLGcENTlg7eHPG0wRaQL4XlCIR4zj/+kg7v9x+GM
-         A00A==
-X-Gm-Message-State: AFqh2kr+XxYDfY/7cwmrKK9sGDUdhumiTGMYDkVuj19F3CkwR1yhJfCt
-        PkKU5gXtb7gU/dCpJVJAgFPcRWR+xhfcXPJ2
-X-Google-Smtp-Source: AMrXdXsk6/rbV5qIL2/9m6irzy5vZLxenpeokFpPeGQyT1ZRaqMfMO3FJ+14IUiRM7HGjs6S8IzxYw==
-X-Received: by 2002:a17:907:2489:b0:84d:255e:21a4 with SMTP id zg9-20020a170907248900b0084d255e21a4mr39291298ejb.2.1674748956236;
-        Thu, 26 Jan 2023 08:02:36 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id ec16-20020a170906b6d000b0073d796a1043sm762948ejb.123.2023.01.26.08.02.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 08:02:35 -0800 (PST)
-Date:   Thu, 26 Jan 2023 17:02:34 +0100
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/7] RISC-V: Detect AIA CSRs from ISA string
-Message-ID: <20230126160234.pkx4socjv3fcxpmn@orel>
-References: <20230112140304.1830648-1-apatel@ventanamicro.com>
- <20230112140304.1830648-3-apatel@ventanamicro.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=uDaQuB4zE4KgnrjX+Hk1otko+7yWJI0zZ43Q4BlCXeU=;
+        b=gOQfbirHyWJH7mvX5LtRah+jABsioNI7MuPy+idzE79P2hWJYat8/ZD/r/cOoY2lWo
+         vUZBaiv2OhqIfQe2kpbWxsqcDMFuMUNO0BnGc+aHyqArThU60kgk8+fsABDsRrgZLONc
+         dQTncU65UQDv3Hunb6wAw10P3vPcmnhDmu6zXxj34WKPH8ewyIhmUQU8ggzewuV+L2cC
+         jY7zEZ4IujpO2lpzlwbjRajvJUzijejmdnVWGeVAVAoYb32/PKvk2cp3FSAtl8ao/M0L
+         jnjFFSBwzj3GeFpoRLXMKN73+MAZTvbo71pjYCgByZZ0K7KNrV5g0LuVlLI4Gd8UKqLY
+         SjBA==
+X-Gm-Message-State: AO0yUKXBItR1ZT/ydQrmyXvW2/ubG2JUiK0lH0RdtEpdEYfwGgi7lfkH
+        uBNDXfI33YZ96i/lY3DtN+0sGnv2EGbI909ZPX0WYQ==
+X-Google-Smtp-Source: AK7set9VZ06xcui/dvBDxFkmeE+ae9XkXiqX3CM6kmHHw7gakmOYA97DzNO38U65Pxgnuw5b9Wnvcrz32n7BYNys6Ak=
+X-Received: by 2002:a05:6871:6ca5:b0:160:3235:9c33 with SMTP id
+ zj37-20020a0568716ca500b0016032359c33mr877063oab.103.1674749187821; Thu, 26
+ Jan 2023 08:06:27 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230112140304.1830648-3-apatel@ventanamicro.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20221027092036.2698180-1-pbonzini@redhat.com> <CALMp9eQihPhjpoodw6ojgVh_KtvPqQ9qJ3wKWZQyVtArpGkfHA@mail.gmail.com>
+ <3a23db58-3ae1-7457-ed09-bc2e3f6e8dc9@redhat.com> <CALMp9eQ3wZ4dkq_8ErcUdQAs2F96Gvr-g=7-iBteJeuN5aX00A@mail.gmail.com>
+ <8bdf22c8-9ef1-e526-df36-9073a150669d@redhat.com> <CALMp9eRKp_4j_Q0j1HYP2itT2+z3pRotQK8LwScMsaGF5FpARA@mail.gmail.com>
+ <dec8c012-885a-6ed8-534e-4a5f0a435025@redhat.com> <CALMp9eSyVWGS2HQVwwwViE6S_uweiOiFucqa3keuoUjNz9rKqA@mail.gmail.com>
+ <f322cce0-f83a-16d9-9738-f47f265b41d8@redhat.com>
+In-Reply-To: <f322cce0-f83a-16d9-9738-f47f265b41d8@redhat.com>
+From:   Jim Mattson <jmattson@google.com>
+Date:   Thu, 26 Jan 2023 08:06:16 -0800
+Message-ID: <CALMp9eTpbwQP3QsqpOBsDb0soLpsv9FZA=ivZUmf2GJgBxhfmw@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: x86: Do not return host topology information from KVM_GET_SUPPORTED_CPUID
+To:     Paolo Bonzini <pbonzini@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        seanjc@google.com, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 07:32:59PM +0530, Anup Patel wrote:
-> We have two extension names for AIA ISA support: Smaia (M-mode AIA CSRs)
-> and Ssaia (S-mode AIA CSRs).
-> 
-> We extend the ISA string parsing to detect Smaia and Ssaia extensions.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  arch/riscv/include/asm/hwcap.h | 8 ++++++++
->  arch/riscv/kernel/cpu.c        | 2 ++
->  arch/riscv/kernel/cpufeature.c | 2 ++
->  3 files changed, 12 insertions(+)
-> 
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> index 86328e3acb02..c649e85ed7bb 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -59,10 +59,18 @@ enum riscv_isa_ext_id {
->  	RISCV_ISA_EXT_ZIHINTPAUSE,
->  	RISCV_ISA_EXT_SSTC,
->  	RISCV_ISA_EXT_SVINVAL,
-> +	RISCV_ISA_EXT_SSAIA,
-> +	RISCV_ISA_EXT_SMAIA,
-
-These will change a couple different ways due other other patches in
-flight, but let's put the pair in alphabetical order now so they get
-moved together that way.
-
->  	RISCV_ISA_EXT_ID_MAX
->  };
->  static_assert(RISCV_ISA_EXT_ID_MAX <= RISCV_ISA_EXT_MAX);
->  
-> +#ifdef CONFIG_RISCV_M_MODE
-> +#define RISCV_ISA_EXT_SxAIA		RISCV_ISA_EXT_SMAIA
-> +#else
-> +#define RISCV_ISA_EXT_SxAIA		RISCV_ISA_EXT_SSAIA
-> +#endif
-
-This isn't used in this patch, so should probably be introduced in a later
-patch when it is.
-
-> +
->  /*
->   * This enum represents the logical ID for each RISC-V ISA extension static
->   * keys. We can use static key to optimize code path if some ISA extensions
-> diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
-> index 1b9a5a66e55a..a215ec929160 100644
-> --- a/arch/riscv/kernel/cpu.c
-> +++ b/arch/riscv/kernel/cpu.c
-> @@ -162,6 +162,8 @@ arch_initcall(riscv_cpuinfo_init);
->   *    extensions by an underscore.
->   */
->  static struct riscv_isa_ext_data isa_ext_arr[] = {
-> +	__RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
-> +	__RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
->  	__RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
->  	__RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
->  	__RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
-> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> index 93e45560af30..3c5b51f519d5 100644
-> --- a/arch/riscv/kernel/cpufeature.c
-> +++ b/arch/riscv/kernel/cpufeature.c
-> @@ -228,6 +228,8 @@ void __init riscv_fill_hwcap(void)
->  				SET_ISA_EXT_MAP("zihintpause", RISCV_ISA_EXT_ZIHINTPAUSE);
->  				SET_ISA_EXT_MAP("sstc", RISCV_ISA_EXT_SSTC);
->  				SET_ISA_EXT_MAP("svinval", RISCV_ISA_EXT_SVINVAL);
-> +				SET_ISA_EXT_MAP("smaia", RISCV_ISA_EXT_SMAIA);
-> +				SET_ISA_EXT_MAP("ssaia", RISCV_ISA_EXT_SSAIA);
->  			}
->  #undef SET_ISA_EXT_MAP
->  		}
-> -- 
-> 2.34.1
+On Thu, Jan 26, 2023 at 1:40 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
 >
+> On 1/26/23 01:58, Jim Mattson wrote:
+> >> You wrote it yourself: any VMM must either populate the topology on its
+> >> own, or possibly fill it with zeros.  Returning a value that is
+> >> extremely unlikely to be used is worse in pretty much every way (apart
+> >> from not breaking your VMM, of course).
+> >
+> > I've complained about this particular ioctl more than I can remember.
+> > This is just one of its many problems.
+>
+> I agree.  At the very least it should have been a VM ioctl.
+>
+> >> With a total of six known users (QEMU, crosvm, kvmtool, firecracker,
+> >> rust-vmm, and the Google VMM), KVM is damned if it reverts the patch and
+> >> damned if it doesn't.  There is a tension between fixing the one VMM
+> >> that was using KVM_GET_SUPPORTED_CPUID correctly and now breaks loudly,
+> >> and fixing 3-4 that were silently broken and are now fixed.  I will
+> >> probably send a patch to crosvm, though.
+> >>
+> >> The VMM being _proprietary_ doesn't really matter, however it does
+> >> matter to me that it is not _public_: it is only used within Google, and
+> >> the breakage is neither hard to fix in the VMM nor hard to temporarily
+> >> avoid by reverting the patch in the Google kernel.
+> >
+> > Sadly, there isn't a single kernel involved. People running our VMM on
+> > their desktops are going to be impacted as soon as this patch hits
+> > that distro. (I don't know if I can say which distro that is.) So, now
+> > we have to get the VMM folks to urgently accommodate this change and
+> > get a new distribution out.
+>
+> Ok, this is what is needed to make a more informed choice.  To be clear,
+> this is _still_ not public (for example it's not ChromeOS), so there is
+> at least some control on what version of the VMM they use?  Would it
+> make sense to buy you a few months by deferring this patch to Linux 6.3-6.5?
 
-Otherwise,
+Mainline isn't a problem. I'm more worried about 5.19 LTS.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-
-Thanks,
-drew
+Thanks!
