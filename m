@@ -2,146 +2,258 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 830DF67D012
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 16:24:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B85BF67D096
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 16:48:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232238AbjAZPYZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 10:24:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60310 "EHLO
+        id S232173AbjAZPr7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 10:47:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232501AbjAZPYK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 10:24:10 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AE2B420C;
-        Thu, 26 Jan 2023 07:23:53 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30QFEiR3004356;
-        Thu, 26 Jan 2023 15:23:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : references : from : subject : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=38Q/0OCGry8peDMSSdqlhdz0+1fJJuYxwowWJYS44go=;
- b=f0JWtdmKNHHIZwUwiDGJM69eVPs8Y5AjYb3g3BqL94aw5tg1LbDgjTxK9NpBqs5omPfD
- TWWDJN7GOgxjXPd1iahdemLwBRJahCVwLZpzaU+tTSETaHm9kGOuj7qtBC5QfjlupSCI
- 3CQjRLWGZ+yD8GxOW+U/2yUeCF8B3XxP0e7wGSYai1vlceE17tdWqDKO0lTlRelg9eKd
- RVpK/DeNGlqzUrO3YFqB64vrsaciUfCtzTM4gteJtftdeSydjnV3Ni88FPpjCqWDYJeR
- rwl/e6DDkP91ra6Whr/eTN0A/3hxSO72Vdz6slnBwqvMzcNGk4OVUavZo3ZRGogjc5fE EA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbv06g5rr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 15:23:48 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30QFEqEK004557;
-        Thu, 26 Jan 2023 15:23:47 GMT
-Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com [149.81.74.106])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbv06g5qw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 15:23:47 +0000
-Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
-        by ppma04fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30Q2KLlU027371;
-        Thu, 26 Jan 2023 15:23:45 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma04fra.de.ibm.com (PPS) with ESMTPS id 3n87p6cpay-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 15:23:45 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30QFNeUG44827002
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Jan 2023 15:23:40 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A228E2004D;
-        Thu, 26 Jan 2023 15:23:40 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 668CA20043;
-        Thu, 26 Jan 2023 15:23:40 +0000 (GMT)
-Received: from [9.152.224.253] (unknown [9.152.224.253])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 26 Jan 2023 15:23:40 +0000 (GMT)
-Message-ID: <2a21195b-9a13-a332-bab9-e2c023fc37a6@linux.ibm.com>
-Date:   Thu, 26 Jan 2023 16:23:40 +0100
+        with ESMTP id S231669AbjAZPr6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 10:47:58 -0500
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573E716AEA
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 07:47:56 -0800 (PST)
+Received: by mail-ed1-x52e.google.com with SMTP id cm4so2224943edb.9
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 07:47:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KAqu5gIfd41Ujj6HnAm2gfmxtC8KES1Su6FEM10lCcs=;
+        b=lIbK88unhw67kbpHXLqiSO4P/18muOWHt051vObkA/P8urKLCXc2CYbD6i4XysntfH
+         uQlLcyCRoCCFLPmvF32rsjWn4uf7ylHQzTz3eT7O90WsugGAO3mVv7PSAAg4Wzd4W8QI
+         XCqDI4VVaw4VkkM/OZcKHGOFpD0r96eVM+IpF4LZFS883LMzRtYpbOL1naL0HFJUCCLX
+         pKiIkRfMhYCYZYza82ZvUxqArE2cyjGAGxiim9ss5rhNZaxwLGvmu7UUDt1SB2qDj5eF
+         nb9hpJHcyvaR7t7OPlOMHKLOgQMMdMGgEtfzi0aKg+UoVEc8aW5Y5dJb/b+gYAz0qVg8
+         2zWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KAqu5gIfd41Ujj6HnAm2gfmxtC8KES1Su6FEM10lCcs=;
+        b=ZVRaM0NLq5zz9AF9Dpezxc8nmPPekH35MvK4T31q5FwuzNyVzF+zKP0aI1PB2C+RyY
+         1lFuMLCWWZk9Q6PqRLHmmh5zehd53TR7yiKezDh6tZwe5g7+ziAx26r51RtH+EvrmbW5
+         PwftNey+kdIoP+eLbhwknMBs6SY74pGrjIKMKO0xkRV+h0JDnxDPzX7Jey0CTs8niCcz
+         w6LfJzCdLfvSyomg0DGEfjHzmbj+rthBY+vMVBDXwXK5w2APiFSTtSCWXmIJO+X40vaI
+         9ffG+5jJ9yPGUSJt7k1W5XDMZRmG+ptyPdh+sg7PUjfM9K3QywkbxSeodHZ7I2xa3afJ
+         q/SQ==
+X-Gm-Message-State: AFqh2krZ1IMPed01DlwjE7kKkl+IlUCkh+I3bAICQSKrsUqsU7JQCHHK
+        Swz8awNdI8Dk8d5jUiwZBf+puQ==
+X-Google-Smtp-Source: AMrXdXscA6aP1SSZoydTKGhWayyE/MWVpvECSxfsHCTChXfATe6RC/dwkKGFT9r0S5gLsLLZzC2G4A==
+X-Received: by 2002:a05:6402:524f:b0:49d:6503:9743 with SMTP id t15-20020a056402524f00b0049d65039743mr51168680edd.9.1674748074929;
+        Thu, 26 Jan 2023 07:47:54 -0800 (PST)
+Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
+        by smtp.gmail.com with ESMTPSA id y11-20020a50eb0b000000b00467481df198sm904119edp.48.2023.01.26.07.47.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jan 2023 07:47:54 -0800 (PST)
+Date:   Thu, 26 Jan 2023 16:47:53 +0100
+From:   Andrew Jones <ajones@ventanamicro.com>
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/7] RISC-V: Add AIA related CSR defines
+Message-ID: <20230126154753.txhgaqgudnksymrm@orel>
+References: <20230112140304.1830648-1-apatel@ventanamicro.com>
+ <20230112140304.1830648-2-apatel@ventanamicro.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Content-Language: en-US
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>
-References: <20230125212608.1860251-1-scgl@linux.ibm.com>
- <20230125212608.1860251-5-scgl@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [PATCH v6 04/14] KVM: s390: selftest: memop: Add bad address test
-In-Reply-To: <20230125212608.1860251-5-scgl@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: S7x_h8djFowqJrL1JZ7Fwk9QiDnFy7Pd
-X-Proofpoint-ORIG-GUID: RdPz5P2-f5xBlgJ2o1DLR7EfVdsF4d4e
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-26_07,2023-01-25_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
- malwarescore=0 clxscore=1015 mlxscore=0 bulkscore=0 impostorscore=0
- phishscore=0 lowpriorityscore=0 suspectscore=0 priorityscore=1501
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301260146
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230112140304.1830648-2-apatel@ventanamicro.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/25/23 22:25, Janis Schoetterl-Glausch wrote:
-> Add test that tries to access, instead of CHECK_ONLY.
-""
-Add a test that tries a real write to a bad address.
-A CHECK_ONLY test doesn't cover all paths.
-""
-
-At first I thought you were replacing a test.
-
+On Thu, Jan 12, 2023 at 07:32:58PM +0530, Anup Patel wrote:
+> The RISC-V AIA specification improves handling per-HART local interrupts
+> in a backward compatible manner. This patch adds defines for new RISC-V
+> AIA CSRs.
 > 
-> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 > ---
->   tools/testing/selftests/kvm/s390x/memop.c | 4 +++-
->   1 file changed, 3 insertions(+), 1 deletion(-)
+>  arch/riscv/include/asm/csr.h | 93 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 93 insertions(+)
 > 
-> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
-> index bbc191a13760..5aae27549437 100644
-> --- a/tools/testing/selftests/kvm/s390x/memop.c
-> +++ b/tools/testing/selftests/kvm/s390x/memop.c
-> @@ -641,7 +641,9 @@ static void _test_errors_common(struct test_info info, enum mop_target target, i
->   
->   	/* Bad guest address: */
->   	rv = ERR_MOP(info, target, WRITE, mem1, size, GADDR((void *)~0xfffUL), CHECK_ONLY);
-> -	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory access");
-> +	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory address");
+> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> index 0e571f6483d9..d608dac4b19f 100644
+> --- a/arch/riscv/include/asm/csr.h
+> +++ b/arch/riscv/include/asm/csr.h
+> @@ -73,7 +73,10 @@
+>  #define IRQ_S_EXT		9
+>  #define IRQ_VS_EXT		10
+>  #define IRQ_M_EXT		11
+> +#define IRQ_S_GEXT		12
+>  #define IRQ_PMU_OVF		13
+> +#define IRQ_LOCAL_MAX		(IRQ_PMU_OVF + 1)
+> +#define IRQ_LOCAL_MASK		((_AC(1, UL) << IRQ_LOCAL_MAX) - 1)
 
-"ioctl does not report bad guest memory address on CHECK_ONLY write" ?
+How about instead of the above two defines we do
 
-> +	rv = ERR_MOP(info, target, WRITE, mem1, size, GADDR((void *)~0xfffUL));
-> +	TEST_ASSERT(rv > 0, "ioctl does not report bad guest memory address");
+  #define IRQ_LOCAL_MASK GENMASK(13, 0)
 
-"ioctl does not report bad guest memory address on write" ?
+And in general it might be nice to put GENMASK to work for all the
+new masks below.
 
-Not really necessary in this case, it just needs to be different from 
-the one on top.
+>  
+>  /* Exception causes */
+>  #define EXC_INST_MISALIGNED	0
+> @@ -156,6 +159,27 @@
+>  				 (_AC(1, UL) << IRQ_S_TIMER) | \
+>  				 (_AC(1, UL) << IRQ_S_EXT))
+>  
+> +/* AIA CSR bits */
+> +#define TOPI_IID_SHIFT		16
+> +#define TOPI_IID_MASK		_AC(0xfff, UL)
+> +#define TOPI_IPRIO_MASK		_AC(0xff, UL)
+> +#define TOPI_IPRIO_BITS		8
+> +
+> +#define TOPEI_ID_SHIFT		16
+> +#define TOPEI_ID_MASK		_AC(0x7ff, UL)
+> +#define TOPEI_PRIO_MASK		_AC(0x7ff, UL)
+> +
+> +#define ISELECT_IPRIO0		0x30
+> +#define ISELECT_IPRIO15		0x3f
+> +#define ISELECT_MASK		_AC(0x1ff, UL)
+> +
+> +#define HVICTL_VTI		_AC(0x40000000, UL)
 
->   
->   	/* Bad host address: */
->   	rv = ERR_MOP(info, target, WRITE, 0, size, GADDR_V(mem1));
+I'd rather read this as '1 << 30' to match the spec and other
+bit masks in this file. Actually, it'd be nice if BIT() was
+used throughout this file, e.g. #define HVICTL_VTI BIT(30)
 
+> +#define HVICTL_IID		_AC(0x0fff0000, UL)
+> +#define HVICTL_IID_SHIFT	16
+> +#define HVICTL_DPR		_AC(0x00000200, UL)
+> +#define HVICTL_IPRIOM		_AC(0x00000100, UL)
+> +#define HVICTL_IPRIO		_AC(0x000000ff, UL)
+> +
+>  /* xENVCFG flags */
+>  #define ENVCFG_STCE			(_AC(1, ULL) << 63)
+>  #define ENVCFG_PBMTE			(_AC(1, ULL) << 62)
+> @@ -250,6 +274,18 @@
+>  #define CSR_STIMECMP		0x14D
+>  #define CSR_STIMECMPH		0x15D
+>  
+> +/* Supervisor-Level Window to Indirectly Accessed Registers (AIA) */
+> +#define CSR_SISELECT		0x150
+> +#define CSR_SIREG		0x151
+> +
+> +/* Supervisor-Level Interrupts (AIA) */
+> +#define CSR_STOPEI		0x15c
+> +#define CSR_STOPI		0xdb0
+> +
+> +/* Supervisor-Level High-Half CSRs (AIA) */
+> +#define CSR_SIEH		0x114
+> +#define CSR_SIPH		0x154
+> +
+>  #define CSR_VSSTATUS		0x200
+>  #define CSR_VSIE		0x204
+>  #define CSR_VSTVEC		0x205
+> @@ -279,8 +315,32 @@
+>  #define CSR_HGATP		0x680
+>  #define CSR_HGEIP		0xe12
+>  
+> +/* Virtual Interrupts and Interrupt Priorities (H-extension with AIA) */
+> +#define CSR_HVIEN		0x608
+> +#define CSR_HVICTL		0x609
+> +#define CSR_HVIPRIO1		0x646
+> +#define CSR_HVIPRIO2		0x647
+> +
+> +/* VS-Level Window to Indirectly Accessed Registers (H-extension with AIA) */
+> +#define CSR_VSISELECT		0x250
+> +#define CSR_VSIREG		0x251
+> +
+> +/* VS-Level Interrupts (H-extension with AIA) */
+> +#define CSR_VSTOPEI		0x25c
+> +#define CSR_VSTOPI		0xeb0
+> +
+> +/* Hypervisor and VS-Level High-Half CSRs (H-extension with AIA) */
+> +#define CSR_HIDELEGH		0x613
+> +#define CSR_HVIENH		0x618
+> +#define CSR_HVIPH		0x655
+> +#define CSR_HVIPRIO1H		0x656
+> +#define CSR_HVIPRIO2H		0x657
+> +#define CSR_VSIEH		0x214
+> +#define CSR_VSIPH		0x254
+> +
+>  #define CSR_MSTATUS		0x300
+>  #define CSR_MISA		0x301
+> +#define CSR_MIDELEG		0x303
+>  #define CSR_MIE			0x304
+>  #define CSR_MTVEC		0x305
+>  #define CSR_MENVCFG		0x30a
+> @@ -297,6 +357,25 @@
+>  #define CSR_MIMPID		0xf13
+>  #define CSR_MHARTID		0xf14
+>  
+> +/* Machine-Level Window to Indirectly Accessed Registers (AIA) */
+> +#define CSR_MISELECT		0x350
+> +#define CSR_MIREG		0x351
+> +
+> +/* Machine-Level Interrupts (AIA) */
+> +#define CSR_MTOPEI		0x35c
+> +#define CSR_MTOPI		0xfb0
+> +
+> +/* Virtual Interrupts for Supervisor Level (AIA) */
+> +#define CSR_MVIEN		0x308
+> +#define CSR_MVIP		0x309
+> +
+> +/* Machine-Level High-Half CSRs (AIA) */
+> +#define CSR_MIDELEGH		0x313
+> +#define CSR_MIEH		0x314
+> +#define CSR_MVIENH		0x318
+> +#define CSR_MVIPH		0x319
+> +#define CSR_MIPH		0x354
+> +
+>  #ifdef CONFIG_RISCV_M_MODE
+>  # define CSR_STATUS	CSR_MSTATUS
+>  # define CSR_IE		CSR_MIE
+> @@ -307,6 +386,13 @@
+>  # define CSR_TVAL	CSR_MTVAL
+>  # define CSR_IP		CSR_MIP
+>  
+> +# define CSR_IEH		CSR_MIEH
+> +# define CSR_ISELECT	CSR_MISELECT
+> +# define CSR_IREG	CSR_MIREG
+> +# define CSR_IPH		CSR_MIPH
+> +# define CSR_TOPEI	CSR_MTOPEI
+> +# define CSR_TOPI	CSR_MTOPI
+> +
+>  # define SR_IE		SR_MIE
+>  # define SR_PIE		SR_MPIE
+>  # define SR_PP		SR_MPP
+> @@ -324,6 +410,13 @@
+>  # define CSR_TVAL	CSR_STVAL
+>  # define CSR_IP		CSR_SIP
+>  
+> +# define CSR_IEH		CSR_SIEH
+> +# define CSR_ISELECT	CSR_SISELECT
+> +# define CSR_IREG	CSR_SIREG
+> +# define CSR_IPH		CSR_SIPH
+> +# define CSR_TOPEI	CSR_STOPEI
+> +# define CSR_TOPI	CSR_STOPI
+> +
+>  # define SR_IE		SR_SIE
+>  # define SR_PIE		SR_SPIE
+>  # define SR_PP		SR_SPP
+> -- 
+> 2.34.1
+>
+
+Besides my preference for GENMASK and BIT, this looks good to me.
+
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+
+Thanks,
+drew
