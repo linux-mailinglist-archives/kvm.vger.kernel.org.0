@@ -2,111 +2,333 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6895067D0E3
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 17:06:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A670A67D102
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 17:11:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232573AbjAZQGb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 11:06:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44132 "EHLO
+        id S232611AbjAZQK6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 11:10:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232568AbjAZQGa (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 11:06:30 -0500
-Received: from mail-oa1-x2d.google.com (mail-oa1-x2d.google.com [IPv6:2001:4860:4864:20::2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2887113DB
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:06:28 -0800 (PST)
-Received: by mail-oa1-x2d.google.com with SMTP id 586e51a60fabf-15085b8a2f7so2952567fac.2
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:06:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=uDaQuB4zE4KgnrjX+Hk1otko+7yWJI0zZ43Q4BlCXeU=;
-        b=FvKjmv9dkMM+tpDvvzMCCbED7aweIL0vxA7Pq6UdpBOrgaZpwRfIGfLvvX4jEJncUU
-         8+2+9fnBNQ+H4Tsv2ed5+QzmuHAi/mK6A+Ng75yr/DLmP7F7seQnTY7iwtKNM8Oz7J4Y
-         OEYxD2fpSW1bE7cNIM/IlhbxWjI9BJGLAOv8ntjnKtgIy7XA3aeTfwshEH7fd5yl9SUN
-         dW51OLPVIOedKnVAHWNV9GPUB6o9VW0lAdS8+qZHm8yzD8Fp5q7SIA3KbjS6L1HZEXai
-         4pgjvQohy2PuhdyX1RFOETamkY/DSgg0Y5r0OGaE7gM/Ijp+HPtU12mFucY+wV/rhI86
-         0i7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=uDaQuB4zE4KgnrjX+Hk1otko+7yWJI0zZ43Q4BlCXeU=;
-        b=gOQfbirHyWJH7mvX5LtRah+jABsioNI7MuPy+idzE79P2hWJYat8/ZD/r/cOoY2lWo
-         vUZBaiv2OhqIfQe2kpbWxsqcDMFuMUNO0BnGc+aHyqArThU60kgk8+fsABDsRrgZLONc
-         dQTncU65UQDv3Hunb6wAw10P3vPcmnhDmu6zXxj34WKPH8ewyIhmUQU8ggzewuV+L2cC
-         jY7zEZ4IujpO2lpzlwbjRajvJUzijejmdnVWGeVAVAoYb32/PKvk2cp3FSAtl8ao/M0L
-         jnjFFSBwzj3GeFpoRLXMKN73+MAZTvbo71pjYCgByZZ0K7KNrV5g0LuVlLI4Gd8UKqLY
-         SjBA==
-X-Gm-Message-State: AO0yUKXBItR1ZT/ydQrmyXvW2/ubG2JUiK0lH0RdtEpdEYfwGgi7lfkH
-        uBNDXfI33YZ96i/lY3DtN+0sGnv2EGbI909ZPX0WYQ==
-X-Google-Smtp-Source: AK7set9VZ06xcui/dvBDxFkmeE+ae9XkXiqX3CM6kmHHw7gakmOYA97DzNO38U65Pxgnuw5b9Wnvcrz32n7BYNys6Ak=
-X-Received: by 2002:a05:6871:6ca5:b0:160:3235:9c33 with SMTP id
- zj37-20020a0568716ca500b0016032359c33mr877063oab.103.1674749187821; Thu, 26
- Jan 2023 08:06:27 -0800 (PST)
+        with ESMTP id S232607AbjAZQKo (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 11:10:44 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BB22611C0;
+        Thu, 26 Jan 2023 08:10:43 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30QFZpij022496;
+        Thu, 26 Jan 2023 16:10:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : subject : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=cq2x6FbUOZx9kgcBjP26F5SrHdNwAFSfsEsk9sJ1R30=;
+ b=EYMkPOkbiZfZTXY1HSm/lsOdU5BZDA3HfJDWzYdV+hVDijARy3SJscYruFWF94G2q0QL
+ f2kA1JzGTcVrote2K/6A6BPsbmYk0G+aWpo3SJMeGVuciCZst65yKZdvr7an+49dCdvJ
+ Zb68hlnhmwVbd5pxu/qfiPf490H3HUatfDSMojcC2zpt3ECophKd76RigC/tcjAeXcxE
+ z0iMwJO5kPuuGtokklr6aMQc1G6jo9yNxub8CCSy0E8xd8E8GAXHh7fmP+JKLm+aTGAg
+ 49TTL46ZFyi3ZjnMpBN+oi9Qf6SObudE4aoq/LBnJGjLhTS0Um2s2t6DH+L7JsvvrijV 8A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbt6rmnrq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Jan 2023 16:10:38 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30QFmMlA032067;
+        Thu, 26 Jan 2023 16:10:38 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbt6rmnqp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Jan 2023 16:10:38 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30Q9weI4010329;
+        Thu, 26 Jan 2023 16:10:35 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3n87p6pjpe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Jan 2023 16:10:35 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30QGAVAf49479970
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Jan 2023 16:10:31 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 2E7192004D;
+        Thu, 26 Jan 2023 16:10:31 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA65720043;
+        Thu, 26 Jan 2023 16:10:30 +0000 (GMT)
+Received: from [9.152.224.253] (unknown [9.152.224.253])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 26 Jan 2023 16:10:30 +0000 (GMT)
+Message-ID: <aa942cf0-6f50-05f5-75a9-278129f00bf6@linux.ibm.com>
+Date:   Thu, 26 Jan 2023 17:10:30 +0100
 MIME-Version: 1.0
-References: <20221027092036.2698180-1-pbonzini@redhat.com> <CALMp9eQihPhjpoodw6ojgVh_KtvPqQ9qJ3wKWZQyVtArpGkfHA@mail.gmail.com>
- <3a23db58-3ae1-7457-ed09-bc2e3f6e8dc9@redhat.com> <CALMp9eQ3wZ4dkq_8ErcUdQAs2F96Gvr-g=7-iBteJeuN5aX00A@mail.gmail.com>
- <8bdf22c8-9ef1-e526-df36-9073a150669d@redhat.com> <CALMp9eRKp_4j_Q0j1HYP2itT2+z3pRotQK8LwScMsaGF5FpARA@mail.gmail.com>
- <dec8c012-885a-6ed8-534e-4a5f0a435025@redhat.com> <CALMp9eSyVWGS2HQVwwwViE6S_uweiOiFucqa3keuoUjNz9rKqA@mail.gmail.com>
- <f322cce0-f83a-16d9-9738-f47f265b41d8@redhat.com>
-In-Reply-To: <f322cce0-f83a-16d9-9738-f47f265b41d8@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Thu, 26 Jan 2023 08:06:16 -0800
-Message-ID: <CALMp9eTpbwQP3QsqpOBsDb0soLpsv9FZA=ivZUmf2GJgBxhfmw@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: Do not return host topology information from KVM_GET_SUPPORTED_CPUID
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+References: <20230125212608.1860251-1-scgl@linux.ibm.com>
+ <20230125212608.1860251-13-scgl@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v6 12/14] KVM: s390: Extend MEM_OP ioctl by storage key
+ checked cmpxchg
+In-Reply-To: <20230125212608.1860251-13-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: kiLQ2uwDw7JHOMfsnVnOHywLdRgnW_2W
+X-Proofpoint-GUID: 41jJLM9WYa5Hpe_QpNKt_7G7rqAKm_48
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-26_07,2023-01-26_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 mlxlogscore=999 bulkscore=0 malwarescore=0
+ spamscore=0 clxscore=1015 mlxscore=0 phishscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301260156
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 26, 2023 at 1:40 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 1/26/23 01:58, Jim Mattson wrote:
-> >> You wrote it yourself: any VMM must either populate the topology on its
-> >> own, or possibly fill it with zeros.  Returning a value that is
-> >> extremely unlikely to be used is worse in pretty much every way (apart
-> >> from not breaking your VMM, of course).
-> >
-> > I've complained about this particular ioctl more than I can remember.
-> > This is just one of its many problems.
->
-> I agree.  At the very least it should have been a VM ioctl.
->
-> >> With a total of six known users (QEMU, crosvm, kvmtool, firecracker,
-> >> rust-vmm, and the Google VMM), KVM is damned if it reverts the patch and
-> >> damned if it doesn't.  There is a tension between fixing the one VMM
-> >> that was using KVM_GET_SUPPORTED_CPUID correctly and now breaks loudly,
-> >> and fixing 3-4 that were silently broken and are now fixed.  I will
-> >> probably send a patch to crosvm, though.
-> >>
-> >> The VMM being _proprietary_ doesn't really matter, however it does
-> >> matter to me that it is not _public_: it is only used within Google, and
-> >> the breakage is neither hard to fix in the VMM nor hard to temporarily
-> >> avoid by reverting the patch in the Google kernel.
-> >
-> > Sadly, there isn't a single kernel involved. People running our VMM on
-> > their desktops are going to be impacted as soon as this patch hits
-> > that distro. (I don't know if I can say which distro that is.) So, now
-> > we have to get the VMM folks to urgently accommodate this change and
-> > get a new distribution out.
->
-> Ok, this is what is needed to make a more informed choice.  To be clear,
-> this is _still_ not public (for example it's not ChromeOS), so there is
-> at least some control on what version of the VMM they use?  Would it
-> make sense to buy you a few months by deferring this patch to Linux 6.3-6.5?
+On 1/25/23 22:26, Janis Schoetterl-Glausch wrote:
+> User space can use the MEM_OP ioctl to make storage key checked reads
+> and writes to the guest, however, it has no way of performing atomic,
+> key checked, accesses to the guest.
+> Extend the MEM_OP ioctl in order to allow for this, by adding a cmpxchg
+> op. For now, support this op for absolute accesses only.
+> 
+> This op can be use, for example, to set the device-state-change
 
-Mainline isn't a problem. I'm more worried about 5.19 LTS.
+s/use/used/
 
-Thanks!
+> indicator and the adapter-local-summary indicator atomically.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> ---
+[...]
+> +/**
+> + * cmpxchg_guest_abs_with_key() - Perform cmpxchg on guest absolute address.
+> + * @kvm: Virtual machine instance.
+> + * @gpa: Absolute guest address of the location to be changed.
+> + * @len: Operand length of the cmpxchg, required: 1 <= len <= 16. Providing a
+> + *       non power of two will result in failure.
+> + * @old_addr: Pointer to old value. If the location at @gpa contains this value,
+> + *            the exchange will succeed. After calling cmpxchg_guest_abs_with_key()
+> + *            *@old_addr contains the value at @gpa before the attempt to
+> + *            exchange the value.
+> + * @new: The value to place at @gpa.
+> + * @access_key: The access key to use for the guest access.
+> + * @success: output value indicating if an exchange occurred.
+> + *
+> + * Atomically exchange the value at @gpa by @new, if it contains *@old.
+> + * Honors storage keys.
+> + *
+> + * Return: * 0: successful exchange
+> + *         * a program interruption code indicating the reason cmpxchg could
+> + *           not be attempted
+
+Nit:
+ >0: a program interruption code...
+
+
+> + *         * -EINVAL: address misaligned or len not power of two
+> + *         * -EAGAIN: transient failure (len 1 or 2)
+> + *         * -EOPNOTSUPP: read-only memslot (should never occur)
+> + */
+> +int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
+> +			       __uint128_t *old_addr, __uint128_t new,
+> +			       u8 access_key, bool *success)
+> +{
+> +	gfn_t gfn = gpa >> PAGE_SHIFT;
+
+  gpa_to_gfn()?
+
+> +	struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
+> +	bool writable;
+> +	hva_t hva;
+> +	int ret;
+> +
+> +	if (!IS_ALIGNED(gpa, len))
+> +		return -EINVAL;
+> +
+> +	hva = gfn_to_hva_memslot_prot(slot, gfn, &writable);
+> +	if (kvm_is_error_hva(hva))
+> +		return PGM_ADDRESSING;
+> +	/*
+> +	 * Check if it's a read-only memslot, even though that cannot occur
+> +	 * since those are unsupported.
+> +	 * Don't try to actually handle that case.
+> +	 */
+> +	if (!writable)
+> +		return -EOPNOTSUPP;
+> +
+> +	hva += offset_in_page(gpa);
+
+Hmm if we don't use a macro to generate these then I'd add an explanation:
+
+cmpxchg_user_key() is a macro that is dependent on the type of "old" so 
+there's no deduplication possible without further macros.
+
+> +	switch (len) {
+> +	case 1: {
+> +		u8 old;
+> +
+> +		ret = cmpxchg_user_key((u8 *)hva, &old, *old_addr, new, access_key);
+> +		*success = !ret && old == *old_addr;
+> +		*old_addr = old;
+> +		break;
+> +	}
+> +	case 2: {
+> +		u16 old;
+> +
+> +		ret = cmpxchg_user_key((u16 *)hva, &old, *old_addr, new, access_key);
+> +		*success = !ret && old == *old_addr;
+> +		*old_addr = old;
+> +		break;
+> +	}
+> +	case 4: {
+> +		u32 old;
+> +
+> +		ret = cmpxchg_user_key((u32 *)hva, &old, *old_addr, new, access_key);
+> +		*success = !ret && old == *old_addr;
+> +		*old_addr = old;
+> +		break;
+> +	}
+> +	case 8: {
+> +		u64 old;
+> +
+> +		ret = cmpxchg_user_key((u64 *)hva, &old, *old_addr, new, access_key);
+> +		*success = !ret && old == *old_addr;
+> +		*old_addr = old;
+> +		break;
+> +	}
+> +	case 16: {
+> +		__uint128_t old;
+> +
+> +		ret = cmpxchg_user_key((__uint128_t *)hva, &old, *old_addr, new, access_key);
+> +		*success = !ret && old == *old_addr;
+> +		*old_addr = old;
+> +		break;
+> +	}
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +	mark_page_dirty_in_slot(kvm, slot, gfn);
+
+Is that needed if we failed the store?
+
+> +	/*
+> +	 * Assume that the fault is caused by protection, either key protection
+> +	 * or user page write protection.
+> +	 */
+> +	if (ret == -EFAULT)
+> +		ret = PGM_PROTECTION;
+> +	return ret;
+> +}
+> +
+>   /**
+>    * guest_translate_address_with_key - translate guest logical into guest absolute address
+>    * @vcpu: virtual cpu
+> diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> index 4b8b41be7aed..86e9734d5782 100644
+> --- a/arch/s390/kvm/kvm-s390.c
+> +++ b/arch/s390/kvm/kvm-s390.c
+> @@ -584,7 +584,6 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_S390_VCPU_RESETS:
+>   	case KVM_CAP_SET_GUEST_DEBUG:
+>   	case KVM_CAP_S390_DIAG318:
+> -	case KVM_CAP_S390_MEM_OP_EXTENSION:
+>   		r = 1;
+>   		break;
+>   	case KVM_CAP_SET_GUEST_DEBUG2:
+> @@ -598,6 +597,15 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>   	case KVM_CAP_S390_MEM_OP:
+>   		r = MEM_OP_MAX_SIZE;
+>   		break;
+> +	case KVM_CAP_S390_MEM_OP_EXTENSION:
+> +		/*
+> +		 * Flag bits indicating which extensions are supported.
+> +		 * If r > 0, the base extension must also be supported/indicated,
+> +		 * in order to maintain backwards compatibility.
+> +		 */
+> +		r = KVM_S390_MEMOP_EXTENSION_CAP_BASE |
+> +		    KVM_S390_MEMOP_EXTENSION_CAP_CMPXCHG;
+> +		break;
+>   	case KVM_CAP_NR_VCPUS:
+>   	case KVM_CAP_MAX_VCPUS:
+>   	case KVM_CAP_MAX_VCPU_ID:
+> @@ -2840,6 +2848,50 @@ static int kvm_s390_vm_mem_op_abs(struct kvm *kvm, struct kvm_s390_mem_op *mop)
+>   	return r;
+>   }
+>   
+> +static int kvm_s390_vm_mem_op_cmpxchg(struct kvm *kvm, struct kvm_s390_mem_op *mop)
+> +{
+> +	void __user *uaddr = (void __user *)mop->buf;
+> +	void __user *old_addr = (void __user *)mop->old_addr;
+> +	union {
+> +		__uint128_t quad;
+> +		char raw[sizeof(__uint128_t)];
+> +	} old = { .quad = 0}, new = { .quad = 0 };
+> +	unsigned int off_in_quad = sizeof(new) - mop->size;
+> +	int r, srcu_idx;
+> +	bool success;
+> +
+> +	r = mem_op_validate_common(mop, KVM_S390_MEMOP_F_SKEY_PROTECTION);
+> +	if (r)
+> +		return r;
+> +	/*
+> +	 * This validates off_in_quad. Checking that size is a power
+> +	 * of two is not necessary, as cmpxchg_guest_abs_with_key
+> +	 * takes care of that
+> +	 */
+> +	if (mop->size > sizeof(new))
+> +		return -EINVAL;
+> +	if (copy_from_user(&new.raw[off_in_quad], uaddr, mop->size))
+> +		return -EFAULT;
+> +	if (copy_from_user(&old.raw[off_in_quad], old_addr, mop->size))
+> +		return -EFAULT;
+> +
+> +	srcu_idx = srcu_read_lock(&kvm->srcu);
+> +
+> +	if (kvm_is_error_gpa(kvm, mop->gaddr)) {
+> +		r = PGM_ADDRESSING;
+> +		goto out_unlock;
+> +	}
+> +
+> +	r = cmpxchg_guest_abs_with_key(kvm, mop->gaddr, mop->size, &old.quad,
+> +				       new.quad, mop->key, &success);
+> +	if (!success && copy_to_user(old_addr, &old.raw[off_in_quad], mop->size))
+> +		r = -EFAULT;
+> +
+> +out_unlock:
+> +	srcu_read_unlock(&kvm->srcu, srcu_idx);
+> +	return r;
+> +}
+> +
+>   static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
+>   {
+>   	/*
+> @@ -2858,6 +2910,8 @@ static int kvm_s390_vm_mem_op(struct kvm *kvm, struct kvm_s390_mem_op *mop)
+>   	case KVM_S390_MEMOP_ABSOLUTE_READ:
+>   	case KVM_S390_MEMOP_ABSOLUTE_WRITE:
+>   		return kvm_s390_vm_mem_op_abs(kvm, mop);
+> +	case KVM_S390_MEMOP_ABSOLUTE_CMPXCHG:
+> +		return kvm_s390_vm_mem_op_cmpxchg(kvm, mop);
+>   	default:
+>   		return -EINVAL;
+>   	}
+
