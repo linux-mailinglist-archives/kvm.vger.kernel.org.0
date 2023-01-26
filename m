@@ -2,64 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7CFB167CFAF
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 16:15:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A8FB867CF5B
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 16:11:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232364AbjAZPPx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 10:15:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49396 "EHLO
+        id S230231AbjAZPLc (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 10:11:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231952AbjAZPPl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 10:15:41 -0500
+        with ESMTP id S229976AbjAZPLb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 10:11:31 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F19756ED8;
-        Thu, 26 Jan 2023 07:15:41 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA4F03402A;
+        Thu, 26 Jan 2023 07:11:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:References:
-        Subject:Cc:To:From:Date:Message-ID:Sender:Reply-To:Content-Transfer-Encoding:
-        Content-ID:Content-Description:In-Reply-To;
-        bh=UiLenWKE4N7YiebGVKqbpfxu4L5ilGfROJtDYiqSmiM=; b=qX/MohLe9qK+s0H2S0N4CLq75M
-        M5NWyzV407+Sw95ha/kiM8+WNubx3nxlrRDsOez5SufNbaj+tOgiUxwcFYAfFylqwUDtGPS8zRw3V
-        fVqgKLPbr4qYfsWggrrIlzNNs0Ob3+qwLO7tliC+1UZT+IiWdPvO20WjSEmY94ECD3SBgZ+a7nYZG
-        KG+gKRDeVThBA4mW5cVkDi/0bMExLI0z7glVYiBpo4h4Zx7aeHRGC0McEZTK0CzFD7vGjnl1zMgsG
-        1lidiKa+8sR+PTZusDAk/vRwS+UBzHyi2gv2JF+N2IG1+2qMlQ4wzc6C+XHLOI9XMnW8gn67Zliwx
-        /c9NewWg==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pL3xn-006qUR-F4; Thu, 26 Jan 2023 15:14:56 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits))
-        (Client did not present a certificate)
-        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 88EC6302D60;
-        Thu, 26 Jan 2023 16:14:54 +0100 (CET)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
-        id 34A262084C4B0; Thu, 26 Jan 2023 16:14:53 +0100 (CET)
-Message-ID: <20230126151323.819534689@infradead.org>
-User-Agent: quilt/0.66
-Date:   Thu, 26 Jan 2023 16:08:38 +0100
-From:   Peter Zijlstra <peterz@infradead.org>
-To:     mingo@kernel.org
-Cc:     will@kernel.org, peterz@infradead.org, boqun.feng@gmail.com,
-        mark.rutland@arm.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, srivatsa@csail.mit.edu, amakhalov@vmware.com,
-        pv-drivers@vmware.com, wanpengli@tencent.com, vkuznets@redhat.com,
-        boris.ostrovsky@oracle.com, rafael@kernel.org,
-        daniel.lezcano@linaro.org, lpieralisi@kernel.org,
-        frederic@kernel.org, paulmck@kernel.org, rostedt@goodmis.org,
-        mhiramat@kernel.org, longman@redhat.com, juri.lelli@redhat.com,
-        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
-        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
-        vschneid@redhat.com, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        linux-pm@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-        kernel test robot <oliver.sang@intel.com>
-Subject: [PATCH v2 9/9] cpuidle: Fix poll_idle() noinstr annotation
-References: <20230126150829.087606759@infradead.org>
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=EH9adbDOpWNaGYEHl4xrAV40gwHDwqK76tq84Z0eyXc=; b=iqmwaHjxa8hZXZrYCzuWMxG2Kd
+        gUi1Y8eYsd0omFHjfmpVdNaehwIHED+H1VzLiTscJu/MXykaHjjIUo4/UeePSQ/3qO2Scxl5KBcbs
+        rwafzWiMp0gW54lDXpQNTGojrzBrhUSE24qBNrz9Eu8wZKUKM+VJeNVRGRDui4Mjh6zNrJRA9uXJe
+        2WKv1rttzI5041i+Ny9WQoRsYwvuy+Pu29+WLEfQrszB7lQZjKA+bZ/4URx7/yXNldScNG2l8YeYl
+        moQR7vt2oRKUKukioTBGNdLmNI+GiODuZUH9eGz4sLFdnhDHr8CijQAXVN9xNJqlnGwrCU0R4Kh9h
+        Kpe2WfSQ==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pL3s4-006q4a-Hd; Thu, 26 Jan 2023 15:09:00 +0000
+Date:   Thu, 26 Jan 2023 15:09:00 +0000
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Mike Rapoport <rppt@kernel.org>
+Cc:     Suren Baghdasaryan <surenb@google.com>, akpm@linux-foundation.org,
+        michel@lespinasse.org, jglisse@google.com, mhocko@suse.com,
+        vbabka@suse.cz, hannes@cmpxchg.org, mgorman@techsingularity.net,
+        dave@stgolabs.net, liam.howlett@oracle.com, peterz@infradead.org,
+        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
+        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
+        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
+        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
+        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
+        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
+        jannh@google.com, shakeelb@google.com, tatashin@google.com,
+        edumazet@google.com, gthelen@google.com, gurua@google.com,
+        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
+        leewalsh@google.com, posk@google.com, will@kernel.org,
+        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
+        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
+        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
+        qianweili@huawei.com, wangzhou1@hisilicon.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+        airlied@gmail.com, daniel@ffwll.ch,
+        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
+        tzimmermann@suse.de, l.stach@pengutronix.de,
+        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
+        matthias.bgg@gmail.com, robdclark@gmail.com,
+        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
+        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
+        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
+        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
+        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
+        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
+        jejb@linux.ibm.com, martin.petersen@oracle.com,
+        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
+        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
+        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
+        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
+        adilger.kernel@dilger.ca, miklos@szeredi.hu,
+        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
+        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
+        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
+        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
+        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
+        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
+        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
+        loongarch@lists.linux.dev, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
+        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
+        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
+        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
+        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        freedreno@lists.freedesktop.org,
+        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
+        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
+        devel@lists.orangefs.org, kexec@lists.infradead.org,
+        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
+        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
+        kernel-team@android.com
+Subject: Re: [PATCH v2 1/6] mm: introduce vma->vm_flags modifier functions
+Message-ID: <Y9KXjLaFFUvqqdd4@casper.infradead.org>
+References: <20230125083851.27759-1-surenb@google.com>
+ <20230125083851.27759-2-surenb@google.com>
+ <Y9JFFYjfJf9uDijE@kernel.org>
+ <Y9KTUw/04FmBVplw@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9KTUw/04FmBVplw@kernel.org>
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
         SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
@@ -69,50 +118,22 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The instrumentation_begin()/end() annotations in poll_idle() were
-complete nonsense. Specifically they caused tracing to happen in the
-middle of noinstr code, resulting in RCU splats.
+On Thu, Jan 26, 2023 at 04:50:59PM +0200, Mike Rapoport wrote:
+> On Thu, Jan 26, 2023 at 11:17:09AM +0200, Mike Rapoport wrote:
+> > On Wed, Jan 25, 2023 at 12:38:46AM -0800, Suren Baghdasaryan wrote:
+> > > +/* Use when VMA is not part of the VMA tree and needs no locking */
+> > > +static inline void init_vm_flags(struct vm_area_struct *vma,
+> > > +				 unsigned long flags)
+> > 
+> > I'd suggest to make it vm_flags_init() etc.
+> 
+> Thinking more about it, it will be even clearer to name these vma_flags_xyz()
 
-Now that local_clock() is noinstr, mark up the rest and let it rip.
+Perhaps vma_VERB_flags()?
 
-Fixes: 00717eb8c955 ("cpuidle: Annotate poll_idle()")
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-Link: https://lore.kernel.org/oe-lkp/202301192148.58ece903-oliver.sang@intel.com
----
- drivers/cpuidle/cpuidle.c    |    2 +-
- drivers/cpuidle/poll_state.c |    2 --
- 2 files changed, 1 insertion(+), 3 deletions(-)
-
---- a/drivers/cpuidle/cpuidle.c
-+++ b/drivers/cpuidle/cpuidle.c
-@@ -426,7 +426,7 @@ void cpuidle_reflect(struct cpuidle_devi
-  * @dev:   the cpuidle device
-  *
-  */
--u64 cpuidle_poll_time(struct cpuidle_driver *drv,
-+__cpuidle u64 cpuidle_poll_time(struct cpuidle_driver *drv,
- 		      struct cpuidle_device *dev)
- {
- 	int i;
---- a/drivers/cpuidle/poll_state.c
-+++ b/drivers/cpuidle/poll_state.c
-@@ -15,7 +15,6 @@ static int __cpuidle poll_idle(struct cp
- {
- 	u64 time_start;
- 
--	instrumentation_begin();
- 	time_start = local_clock();
- 
- 	dev->poll_time_limit = false;
-@@ -42,7 +41,6 @@ static int __cpuidle poll_idle(struct cp
- 	raw_local_irq_disable();
- 
- 	current_clr_polling();
--	instrumentation_end();
- 
- 	return index;
- }
-
+vma_init_flags()
+vma_reset_flags()
+vma_set_flags()
+vma_clear_flags()
+vma_mod_flags()
 
