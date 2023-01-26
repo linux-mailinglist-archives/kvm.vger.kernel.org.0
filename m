@@ -2,172 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 009FA67CA3F
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 12:49:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 293B767CA49
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 12:52:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237370AbjAZLta (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 06:49:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54670 "EHLO
+        id S237375AbjAZLv6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 06:51:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237362AbjAZLt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 06:49:28 -0500
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E98D3FF21;
-        Thu, 26 Jan 2023 03:49:26 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 5E8441FF3F;
-        Thu, 26 Jan 2023 11:49:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1674733765; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XxsY7YJivcVXv/JzbSrqly22j3+hrQ/gP/mZJ85hOmM=;
-        b=PFl31VywpTHBZGWIgd9uRk3v2XHk0OLkw48lxQB/Gf3mKcK58iqtZ3FZUImQd8Nyga0fYC
-        I05ylbJXSO1YY7P958zJ2LoobK/Eawt+RRMwuU1lwWEjpe2OrTfaHDDtPazu5rH1A6XY3E
-        N8Jrtmby4uUXUY6wJs3SPw1ZmNSAW9g=
-Received: from suse.cz (unknown [10.100.208.146])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 3A4912C141;
-        Thu, 26 Jan 2023 11:49:25 +0000 (UTC)
-Date:   Thu, 26 Jan 2023 12:49:24 +0100
-From:   Petr Mladek <pmladek@suse.com>
-To:     Seth Forshee <sforshee@kernel.org>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] vhost: check for pending livepatches from vhost
- worker kthreads
-Message-ID: <Y9JoxAHLplZoVPea@alley>
-References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
- <20230120-vhost-klp-switching-v1-2-7c2b65519c43@kernel.org>
- <Y8/ohzRGcOiqsh69@alley>
- <Y9ATo5FukOhphwqT@do-x1extreme>
- <Y9ETwsT4LTXyH/0m@alley>
- <Y9FfenH/p3qzRlar@do-x1extreme>
- <Y9JhEJXFRDZjONAH@alley>
+        with ESMTP id S235269AbjAZLv5 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 06:51:57 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBBE61259A;
+        Thu, 26 Jan 2023 03:51:56 -0800 (PST)
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30QBg6Bn013213;
+        Thu, 26 Jan 2023 11:51:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=dT4GiBRJi0vaPuWg1zPzvIHecZYmHpSb6zEd1Vr8B4s=;
+ b=hifgUfKUsKHMUO5SCrHr/wGKgFjvRjKwEwJZILhtSOgJoQTWUFazlhkwOrFWNDqsMT0d
+ cs3xx79m0MlqrTaKDRweItS/BOiruMAT9BI1bbtoR5BlI0ChGKpRcYOXjlBRgC5btqWO
+ xTPua3+QPaYUY2Yesbdq711n3vEBPwWhBWMAipS6OUdabowSGMMAdTTp4eNEQc8t1qAY
+ rT+yd0FXqTrOvPFXLQ3DuirNV2auH6qhZCrPpayTQ4Td5S4vaGa6dTzD3qPIVNs4848E
+ qNOnMWAlvDEgLPKjHEThtGgkyzaexxvPZqg/eMjI3SBLaqSpNrY7uCwv8eIoqusW0UVj WQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbrv6g6ry-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Jan 2023 11:51:54 +0000
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30QBgIpQ013670;
+        Thu, 26 Jan 2023 11:51:53 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbrv6g6qh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Jan 2023 11:51:53 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30QApjPv015356;
+        Thu, 26 Jan 2023 11:51:51 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n87afeb8f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 26 Jan 2023 11:51:51 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30QBpl1c41222402
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 26 Jan 2023 11:51:47 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 76D8420040;
+        Thu, 26 Jan 2023 11:51:47 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3D5F42004B;
+        Thu, 26 Jan 2023 11:51:47 +0000 (GMT)
+Received: from [9.152.224.253] (unknown [9.152.224.253])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu, 26 Jan 2023 11:51:47 +0000 (GMT)
+Message-ID: <9a8086e5-7794-5d76-6f96-69b218d1cc25@linux.ibm.com>
+Date:   Thu, 26 Jan 2023 12:51:47 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9JhEJXFRDZjONAH@alley>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v6 01/14] KVM: s390: selftest: memop: Pass mop_desc via
+ pointer
+Content-Language: en-US
+To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>
+References: <20230125212608.1860251-1-scgl@linux.ibm.com>
+ <20230125212608.1860251-2-scgl@linux.ibm.com>
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230125212608.1860251-2-scgl@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: yPmX9jEjrrwQBP9klnm9vIDq2QnZsMpK
+X-Proofpoint-GUID: uSsVsctfDzmd1SLIfbBSBhE-OjEJO23-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-26_04,2023-01-25_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 mlxscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0
+ clxscore=1015 impostorscore=0 adultscore=0 phishscore=0 suspectscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301260111
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu 2023-01-26 12:16:36, Petr Mladek wrote:
-> On Wed 2023-01-25 10:57:30, Seth Forshee wrote:
-> > On Wed, Jan 25, 2023 at 12:34:26PM +0100, Petr Mladek wrote:
-> > > On Tue 2023-01-24 11:21:39, Seth Forshee wrote:
-> > > > On Tue, Jan 24, 2023 at 03:17:43PM +0100, Petr Mladek wrote:
-> > > > > On Fri 2023-01-20 16:12:22, Seth Forshee (DigitalOcean) wrote:
-> > > > > > Livepatch relies on stack checking of sleeping tasks to switch kthreads,
-> > > > > > so a busy kthread can block a livepatch transition indefinitely. We've
-> > > > > > seen this happen fairly often with busy vhost kthreads.
-> > > > > 
-> > > > > > --- a/drivers/vhost/vhost.c
-> > > > > > +++ b/drivers/vhost/vhost.c
-> > > > > > @@ -366,6 +367,9 @@ static int vhost_worker(void *data)
-> > > > > >  			if (need_resched())
-> > > > > >  				schedule();
-> > > > > >  		}
-> > > > > > +
-> > > > > > +		if (unlikely(klp_patch_pending(current)))
-> > > > > > +			klp_switch_current();
-> > > > > 
-> > > > > I suggest to use the following intead:
-> > > > > 
-> > > > > 		if (unlikely(klp_patch_pending(current)))
-> > > > > 			klp_update_patch_state(current);
-> > > > > 
-> > > > > We already use this in do_idle(). The reason is basically the same.
-> > > > > It is almost impossible to livepatch the idle task when a CPU is
-> > > > > very idle.
-> > > > > 
-> > > > Let's say that a livepatch is loaded which replaces vhost_worker(). New
-> > > > vhost worker threads are started which use the replacement function. Now
-> > > > if the patch is disabled, these new worker threads would be switched
-> > > > despite still running the code from the patch module, correct? Could the
-> > > > module then be unloaded, freeing the memory containing the code these
-> > > > kthreads are executing?
-> > > 
-> > > Hmm, the same problem might be when we livepatch a function that calls
-> > > another function that calls klp_update_patch_state(). But in this case
-> > > it would be kthread() from kernel/kthread.c. It would affect any
-> > > running kthread. I doubt that anyone would seriously think about
-> > > livepatching this function.
+On 1/25/23 22:25, Janis Schoetterl-Glausch wrote:
+> The struct is quite large, so this seems nicer.
+> 
+> Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-And I missed something. klp_update_patch_state_safe(), proposed below,
-would not cover the above scenario.
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
-It might be possible to add something similar to kthread()
-function. I think that it is the only "livepatchable" function
-that might call vhost_worker(). We could block
-klp_update_patch_state() for the entire kthread when the kthread()
-function is called from a livepatch.
+> ---
+>   tools/testing/selftests/kvm/s390x/memop.c | 44 +++++++++++------------
+>   1 file changed, 22 insertions(+), 22 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/s390x/memop.c b/tools/testing/selftests/kvm/s390x/memop.c
+> index 3fd81e58f40c..9c05d1205114 100644
+> --- a/tools/testing/selftests/kvm/s390x/memop.c
+> +++ b/tools/testing/selftests/kvm/s390x/memop.c
+> @@ -48,53 +48,53 @@ struct mop_desc {
+>   	uint8_t key;
+>   };
+>   
+> -static struct kvm_s390_mem_op ksmo_from_desc(struct mop_desc desc)
+> +static struct kvm_s390_mem_op ksmo_from_desc(const struct mop_desc *desc)
+>   {
+>   	struct kvm_s390_mem_op ksmo = {
+> -		.gaddr = (uintptr_t)desc.gaddr,
+> -		.size = desc.size,
+> -		.buf = ((uintptr_t)desc.buf),
+> +		.gaddr = (uintptr_t)desc->gaddr,
+> +		.size = desc->size,
+> +		.buf = ((uintptr_t)desc->buf),
+>   		.reserved = "ignored_ignored_ignored_ignored"
+>   	};
+>   
+> -	switch (desc.target) {
+> +	switch (desc->target) {
+>   	case LOGICAL:
+> -		if (desc.mode == READ)
+> +		if (desc->mode == READ)
+>   			ksmo.op = KVM_S390_MEMOP_LOGICAL_READ;
+> -		if (desc.mode == WRITE)
+> +		if (desc->mode == WRITE)
+>   			ksmo.op = KVM_S390_MEMOP_LOGICAL_WRITE;
+>   		break;
+>   	case SIDA:
+> -		if (desc.mode == READ)
+> +		if (desc->mode == READ)
+>   			ksmo.op = KVM_S390_MEMOP_SIDA_READ;
+> -		if (desc.mode == WRITE)
+> +		if (desc->mode == WRITE)
+>   			ksmo.op = KVM_S390_MEMOP_SIDA_WRITE;
+>   		break;
+>   	case ABSOLUTE:
+> -		if (desc.mode == READ)
+> +		if (desc->mode == READ)
+>   			ksmo.op = KVM_S390_MEMOP_ABSOLUTE_READ;
+> -		if (desc.mode == WRITE)
+> +		if (desc->mode == WRITE)
+>   			ksmo.op = KVM_S390_MEMOP_ABSOLUTE_WRITE;
+>   		break;
+>   	case INVALID:
+>   		ksmo.op = -1;
+>   	}
+> -	if (desc.f_check)
+> +	if (desc->f_check)
+>   		ksmo.flags |= KVM_S390_MEMOP_F_CHECK_ONLY;
+> -	if (desc.f_inject)
+> +	if (desc->f_inject)
+>   		ksmo.flags |= KVM_S390_MEMOP_F_INJECT_EXCEPTION;
+> -	if (desc._set_flags)
+> -		ksmo.flags = desc.set_flags;
+> -	if (desc.f_key) {
+> +	if (desc->_set_flags)
+> +		ksmo.flags = desc->set_flags;
+> +	if (desc->f_key) {
+>   		ksmo.flags |= KVM_S390_MEMOP_F_SKEY_PROTECTION;
+> -		ksmo.key = desc.key;
+> +		ksmo.key = desc->key;
+>   	}
+> -	if (desc._ar)
+> -		ksmo.ar = desc.ar;
+> +	if (desc->_ar)
+> +		ksmo.ar = desc->ar;
+>   	else
+>   		ksmo.ar = 0;
+> -	if (desc._sida_offset)
+> -		ksmo.sida_offset = desc.sida_offset;
+> +	if (desc->_sida_offset)
+> +		ksmo.sida_offset = desc->sida_offset;
+>   
+>   	return ksmo;
+>   }
+> @@ -183,7 +183,7 @@ static int err_memop_ioctl(struct test_info info, struct kvm_s390_mem_op *ksmo)
+>   		else								\
+>   			__desc.gaddr = __desc.gaddr_v;				\
+>   	}									\
+> -	__ksmo = ksmo_from_desc(__desc);					\
+> +	__ksmo = ksmo_from_desc(&__desc);					\
+>   	print_memop(__info.vcpu, &__ksmo);					\
+>   	err##memop_ioctl(__info, &__ksmo);					\
+>   })
 
-Well, it is all just the best effort. The reference counting in
-the ftrace handler would be more reliable. But it would require
-adding the trampoline on the return.
-
-> /**
->  * klp_update_patch_state_safe() - do not update the path state when
->  *	called from a livepatch.
->  * @task: task_struct to be updated
->  * @calller_addr: address of the function which  calls this one
->  *
->  * Do not update the patch set when called from a livepatch.
->  * It would allow to remove the livepatch module even when
->  * the code still might be in use.
->  */
-> void klp_update_patch_state_safe(struct task_struct *task, void *caller_addr)
-> {
-> 	static bool checked;
-> 	static bool safe;
-> 
-> 	if (unlikely(!checked)) {
-> 		struct module *mod;
-> 
-> 		preempt_disable();
-> 		mod = __module_address(caller_addr);
-> 		if (!mod || !is_livepatch_module(mod))
-> 			safe = true;
-> 		checked = true;
-> 		preempt_enable();
-> 	}
-> 
-> 	if (safe)
-> 		klp_update_patch_state(task);
-> }
-> 
-> and use in vhost_worker()
-> 
-> 		if (unlikely(klp_patch_pending(current)))
-> 			klp_update_patch_state_safe(current, vhost_worker);
-> 
-> Even better might be to get the caller address using some compiler
-> macro. I guess that it should be possible.
-> 
-> And even better would be to detect this at the compile time. But
-> I do not know how to do so.
-> 
-> > Okay, I can send a v2 which does this, so long as it's okay to export
-> > klp_update_patch_state() to modules.
-> 
-> It would be acceptable for me if we added a warning above the function
-> definition and into the livepatch documentation.
-
-I would probably go this way after all. Still thinking...
-
-Best Regards,
-Petr
