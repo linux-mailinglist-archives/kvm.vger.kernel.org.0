@@ -2,306 +2,172 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 22F3A67CA3D
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 12:48:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 009FA67CA3F
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 12:49:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237355AbjAZLsl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 06:48:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54280 "EHLO
+        id S237370AbjAZLta (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 06:49:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237074AbjAZLsk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 06:48:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A123841098
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 03:48:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674733679;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        with ESMTP id S237362AbjAZLt2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 06:49:28 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E98D3FF21;
+        Thu, 26 Jan 2023 03:49:26 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 5E8441FF3F;
+        Thu, 26 Jan 2023 11:49:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1674733765; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=gW18Ss9Lzrp4NFwKCB2kFJc4bmfBf93FYizzDbkiEwY=;
-        b=fNCsQWZw/s9A+JG8IhefkeafdiDC1pVL1QT8a/y03bs6jjtosu+oZWYaQ2UVPL+0NjgXEe
-        FKs7WEgvhkgM3TveRh4oAe+ISrcoX6xPiO6j7GUnDNqJuUoQbK4N9ZFNHnnJIhhmArOolM
-        t/OibdNT/nB4H1S0DCR2nBvlnho6U9s=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-304-zsevXJBhMB2J7rGIjH5OYg-1; Thu, 26 Jan 2023 06:47:56 -0500
-X-MC-Unique: zsevXJBhMB2J7rGIjH5OYg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        bh=XxsY7YJivcVXv/JzbSrqly22j3+hrQ/gP/mZJ85hOmM=;
+        b=PFl31VywpTHBZGWIgd9uRk3v2XHk0OLkw48lxQB/Gf3mKcK58iqtZ3FZUImQd8Nyga0fYC
+        I05ylbJXSO1YY7P958zJ2LoobK/Eawt+RRMwuU1lwWEjpe2OrTfaHDDtPazu5rH1A6XY3E
+        N8Jrtmby4uUXUY6wJs3SPw1ZmNSAW9g=
+Received: from suse.cz (unknown [10.100.208.146])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F03DD801779;
-        Thu, 26 Jan 2023 11:47:55 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.233])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 43C98401530E;
-        Thu, 26 Jan 2023 11:47:52 +0000 (UTC)
-From:   Cornelia Huck <cohuck@redhat.com>
-To:     Eric Auger <eauger@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>
-Subject: Re: [PATCH v4 1/2] arm/kvm: add support for MTE
-In-Reply-To: <44d82d98-6a27-f4d3-9773-670231f82c63@redhat.com>
-Organization: Red Hat GmbH
-References: <20230111161317.52250-1-cohuck@redhat.com>
- <20230111161317.52250-2-cohuck@redhat.com>
- <44d82d98-6a27-f4d3-9773-670231f82c63@redhat.com>
-User-Agent: Notmuch/0.37 (https://notmuchmail.org)
-Date:   Thu, 26 Jan 2023 12:47:49 +0100
-Message-ID: <877cx9y0t6.fsf@redhat.com>
+        by relay2.suse.de (Postfix) with ESMTPS id 3A4912C141;
+        Thu, 26 Jan 2023 11:49:25 +0000 (UTC)
+Date:   Thu, 26 Jan 2023 12:49:24 +0100
+From:   Petr Mladek <pmladek@suse.com>
+To:     Seth Forshee <sforshee@kernel.org>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] vhost: check for pending livepatches from vhost
+ worker kthreads
+Message-ID: <Y9JoxAHLplZoVPea@alley>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <20230120-vhost-klp-switching-v1-2-7c2b65519c43@kernel.org>
+ <Y8/ohzRGcOiqsh69@alley>
+ <Y9ATo5FukOhphwqT@do-x1extreme>
+ <Y9ETwsT4LTXyH/0m@alley>
+ <Y9FfenH/p3qzRlar@do-x1extreme>
+ <Y9JhEJXFRDZjONAH@alley>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9JhEJXFRDZjONAH@alley>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 23 2023, Eric Auger <eauger@redhat.com> wrote:
+On Thu 2023-01-26 12:16:36, Petr Mladek wrote:
+> On Wed 2023-01-25 10:57:30, Seth Forshee wrote:
+> > On Wed, Jan 25, 2023 at 12:34:26PM +0100, Petr Mladek wrote:
+> > > On Tue 2023-01-24 11:21:39, Seth Forshee wrote:
+> > > > On Tue, Jan 24, 2023 at 03:17:43PM +0100, Petr Mladek wrote:
+> > > > > On Fri 2023-01-20 16:12:22, Seth Forshee (DigitalOcean) wrote:
+> > > > > > Livepatch relies on stack checking of sleeping tasks to switch kthreads,
+> > > > > > so a busy kthread can block a livepatch transition indefinitely. We've
+> > > > > > seen this happen fairly often with busy vhost kthreads.
+> > > > > 
+> > > > > > --- a/drivers/vhost/vhost.c
+> > > > > > +++ b/drivers/vhost/vhost.c
+> > > > > > @@ -366,6 +367,9 @@ static int vhost_worker(void *data)
+> > > > > >  			if (need_resched())
+> > > > > >  				schedule();
+> > > > > >  		}
+> > > > > > +
+> > > > > > +		if (unlikely(klp_patch_pending(current)))
+> > > > > > +			klp_switch_current();
+> > > > > 
+> > > > > I suggest to use the following intead:
+> > > > > 
+> > > > > 		if (unlikely(klp_patch_pending(current)))
+> > > > > 			klp_update_patch_state(current);
+> > > > > 
+> > > > > We already use this in do_idle(). The reason is basically the same.
+> > > > > It is almost impossible to livepatch the idle task when a CPU is
+> > > > > very idle.
+> > > > > 
+> > > > Let's say that a livepatch is loaded which replaces vhost_worker(). New
+> > > > vhost worker threads are started which use the replacement function. Now
+> > > > if the patch is disabled, these new worker threads would be switched
+> > > > despite still running the code from the patch module, correct? Could the
+> > > > module then be unloaded, freeing the memory containing the code these
+> > > > kthreads are executing?
+> > > 
+> > > Hmm, the same problem might be when we livepatch a function that calls
+> > > another function that calls klp_update_patch_state(). But in this case
+> > > it would be kthread() from kernel/kthread.c. It would affect any
+> > > running kthread. I doubt that anyone would seriously think about
+> > > livepatching this function.
 
-> Hi Connie,
-> On 1/11/23 17:13, Cornelia Huck wrote:
->> Introduce a new cpu feature flag to control MTE support. To preserve
->> backwards compatibility for tcg, MTE will continue to be enabled as
->> long as tag memory has been provided.
->> 
->> If MTE has been enabled, we need to disable migration, as we do not
-> this only applies to KVM acceleration
+And I missed something. klp_update_patch_state_safe(), proposed below,
+would not cover the above scenario.
 
-"If MTE has been enabled with KVM," ...
+It might be possible to add something similar to kthread()
+function. I think that it is the only "livepatchable" function
+that might call vhost_worker(). We could block
+klp_update_patch_state() for the entire kthread when the kthread()
+function is called from a livepatch.
 
->> yet have a way to migrate the tags as well. Therefore, MTE will stay
->> off with KVM unless requested explicitly.
->> 
->> Signed-off-by: Cornelia Huck <cohuck@redhat.com>
->> ---
->>  docs/system/arm/cpu-features.rst |  21 +++++
->>  hw/arm/virt.c                    |   2 +-
->>  target/arm/cpu.c                 |  18 ++---
->>  target/arm/cpu.h                 |   1 +
->>  target/arm/cpu64.c               | 133 +++++++++++++++++++++++++++++++
->>  target/arm/internals.h           |   1 +
->>  target/arm/kvm64.c               |   5 ++
->>  target/arm/kvm_arm.h             |  12 +++
->>  target/arm/monitor.c             |   1 +
->>  9 files changed, 181 insertions(+), 13 deletions(-)
->> 
->> diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
->> index 00c444042ff5..e278650c837e 100644
->> --- a/docs/system/arm/cpu-features.rst
->> +++ b/docs/system/arm/cpu-features.rst
->> @@ -443,3 +443,24 @@ As with ``sve-default-vector-length``, if the default length is larger
->>  than the maximum vector length enabled, the actual vector length will
->>  be reduced.  If this property is set to ``-1`` then the default vector
->>  length is set to the maximum possible length.
->> +
->> +MTE CPU Property
->> +================
->> +
->> +The ``mte`` property controls the Memory Tagging Extension. For TCG, it requires
->> +presence of tag memory (which can be turned on for the ``virt`` machine via
->> +``mte=on``). For KVM, it requires the ``KVM_CAP_ARM_MTE`` capability; until
->> +proper migration support is implemented, enabling MTE will install a migration
->> +blocker.
-> maybe re-emphasize: when KVM is enabled
+Well, it is all just the best effort. The reference counting in
+the ftrace handler would be more reliable. But it would require
+adding the trampoline on the return.
 
-I think it's explicit enough, since it is in the "For KVM" phrase?
+> /**
+>  * klp_update_patch_state_safe() - do not update the path state when
+>  *	called from a livepatch.
+>  * @task: task_struct to be updated
+>  * @calller_addr: address of the function which  calls this one
+>  *
+>  * Do not update the patch set when called from a livepatch.
+>  * It would allow to remove the livepatch module even when
+>  * the code still might be in use.
+>  */
+> void klp_update_patch_state_safe(struct task_struct *task, void *caller_addr)
+> {
+> 	static bool checked;
+> 	static bool safe;
+> 
+> 	if (unlikely(!checked)) {
+> 		struct module *mod;
+> 
+> 		preempt_disable();
+> 		mod = __module_address(caller_addr);
+> 		if (!mod || !is_livepatch_module(mod))
+> 			safe = true;
+> 		checked = true;
+> 		preempt_enable();
+> 	}
+> 
+> 	if (safe)
+> 		klp_update_patch_state(task);
+> }
+> 
+> and use in vhost_worker()
+> 
+> 		if (unlikely(klp_patch_pending(current)))
+> 			klp_update_patch_state_safe(current, vhost_worker);
+> 
+> Even better might be to get the caller address using some compiler
+> macro. I guess that it should be possible.
+> 
+> And even better would be to detect this at the compile time. But
+> I do not know how to do so.
+> 
+> > Okay, I can send a v2 which does this, so long as it's okay to export
+> > klp_update_patch_state() to modules.
+> 
+> It would be acceptable for me if we added a warning above the function
+> definition and into the livepatch documentation.
 
->> +
->> +If not specified explicitly via ``on`` or ``off``, MTE will be available
->> +according to the following rules:
->> +
->> +* When TCG is used, MTE will be available iff tag memory is available; i.e. it
-> suggestion: is available at machine level
+I would probably go this way after all. Still thinking...
 
-It's only configured at machine level, not sure if that clarifies
-anything?
-
->> +  preserves the behaviour prior to introduction of the feature.
-> s/prior to/prior to the ?
-
-ok
-
->> +
->> +* When KVM is used, MTE will default to off, so that migration will not
->> +  unintentionally be blocked.
->> +
->> +* Other accelerators currently don't support MTE.
->> +
->> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
->> index ea2413a0bad7..42359e256ad0 100644
->> --- a/hw/arm/virt.c
->> +++ b/hw/arm/virt.c
->> @@ -2136,7 +2136,7 @@ static void machvirt_init(MachineState *machine)
->>  
->>      if (vms->mte && (kvm_enabled() || hvf_enabled())) {
->>          error_report("mach-virt: %s does not support providing "
->> -                     "MTE to the guest CPU",
->> +                     "emulated MTE to the guest CPU",
-> each time I read this message I feel difficult to understand it. Why not
-> replacing by
-> "mach-virt does not support tag memory with %s acceleration" or
-> something alike?
-
-Hmm... well, it does not support tag memory with kvm/hvf, and the
-consequence of this is that kvm/hvf cannot provide support for emulated
-mte... what about
-
-"mach-virt: tag memory not supported with %s, emulated MTE cannot be
-provided to the guest CPU"
-
-Might be a bit long, though.
-
->>                       kvm_enabled() ? "KVM" : "HVF");
->>          exit(1);
->>      }
-
-(...)
-
->> +static void aarch64_cpu_set_mte(Object *obj, Visitor *v, const char *name,
->> +                                void *opaque, Error **errp)
->> +{
->> +    ARMCPU *cpu = ARM_CPU(obj);
->> +
->> +    visit_type_OnOffAuto(v, name, &cpu->prop_mte, errp);
->> +
-> nit: spare void line
-
-will drop
-
->> +}
->> +
->> +static void aarch64_add_mte_properties(Object *obj)
->> +{
->> +    /*
->> +     * For tcg, "AUTO" means turn on mte if tag memory has been provided, and
->> +     * turn it off (without error) if not.
->> +     * For kvm, "AUTO" currently means mte off, as migration is not supported
->> +     * yet.
->> +     * For all others, "AUTO" means mte off.
->> +     */
->> +    object_property_add(obj, "mte", "OnOffAuto", aarch64_cpu_get_mte,
->> +                        aarch64_cpu_set_mte, NULL, NULL);
->> +}
->> +
->> +static inline bool arm_machine_has_tag_memory(void)
->> +{
->> +#ifndef CONFIG_USER_ONLY
->> +    Object *obj = object_dynamic_cast(qdev_get_machine(), TYPE_VIRT_MACHINE);
->> +
->> +    /* so far, only the virt machine has support for tag memory */
->> +    if (obj) {
->> +        VirtMachineState *vms = VIRT_MACHINE(obj);
->> +
->> +        return vms->mte;
->> +    }
->> +#endif
->> +    return false;
->> +}
->> +
->> +void arm_cpu_mte_finalize(ARMCPU *cpu, Error **errp)
->> +{
->> +    bool enable_mte;
->> +
->> +    switch (cpu->prop_mte) {
->> +    case ON_OFF_AUTO_OFF:
->> +        enable_mte = false;
->> +        break;
->> +    case ON_OFF_AUTO_ON:
->> +        if (!kvm_enabled()) {
->> +            if (cpu_isar_feature(aa64_mte, cpu)) {
->> +                if (!arm_machine_has_tag_memory()) {
->> +                    error_setg(errp, "mte=on requires tag memory");
->> +                    return;
->> +                }
->> +            } else {
->> +                error_setg(errp, "mte not provided");
-> mte not supported by this CPU type?
-
-yes, probably better
-
->> +                return;
->> +            }
->> +        }
->> +#ifdef CONFIG_KVM
->> +        if (kvm_enabled() && !kvm_arm_mte_supported()) {
-> as you have stubs for both, is the #ifdef needed?
-
-see prior discussion :) Doesn't look like it.
-
->> +            error_setg(errp, "mte not supported by kvm");
->> +            return;
->> +        }
->> +#endif
->> +        enable_mte = true;
->> +        break;
->> +    default: /* AUTO */
->> +        if (!kvm_enabled()) {
->> +            if (cpu_isar_feature(aa64_mte, cpu)) {
->> +                /*
->> +                 * Tie mte enablement to presence of tag memory, in order to
->> +                 * preserve pre-existing behaviour.
->> +                 */
->> +                enable_mte = arm_machine_has_tag_memory();
->> +            } else {
->> +                enable_mte = false;
->> +            }
->> +            break;
->> +        } else {
->> +            /*
->> +             * This cannot yet be
->> +             * enable_mte = kvm_arm_mte_supported();
->> +             * as we don't support migration yet.
->> +             */
->> +            enable_mte = false;
->> +        }
->> +    }
->> +
->> +    if (!enable_mte) {
->> +        /* Disable MTE feature bits. */
->> +        cpu->isar.id_aa64pfr1 =
->> +            FIELD_DP64(cpu->isar.id_aa64pfr1, ID_AA64PFR1, MTE, 0);
->> +        return;
->> +    }
->> +
->> +    /* accelerator-specific enablement */
->> +    if (kvm_enabled()) {
->> +#ifdef CONFIG_KVM
->> +        if (kvm_vm_enable_cap(kvm_state, KVM_CAP_ARM_MTE, 0)) {
->> +            error_setg(errp, "Failed to enable KVM_CAP_ARM_MTE");
-> nit: return and remove the else?
-
-I've reworked that anyway (no need to enable a vm cap for every cpu.)
-
->> +        } else {
->> +            /* TODO: add proper migration support with MTE enabled */
->> +            if (!mte_migration_blocker) {
->> +                error_setg(&mte_migration_blocker,
->> +                           "Live migration disabled due to MTE enabled");
->> +                if (migrate_add_blocker(mte_migration_blocker, NULL)) {
-> Can't you pass the erro directly to migrate_add_blocker. Also  in
-> arm_gicv3_its_kvm.c or virtio-gpu-pci, < 0 is checked. Maybe worth to
-> double check the rationale.
-
-I've rewritten that in the meanwhile as well :)
-
->> +                    error_setg(errp, "Failed to add MTE migration blocker");
->> +                    error_free(mte_migration_blocker);
->> +                    mte_migration_blocker = NULL;
->> +                }
->> +            }
->> +        }
->> +#endif
->> +    }
->> +}
-
+Best Regards,
+Petr
