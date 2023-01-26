@@ -2,54 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 14D4467D3A8
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 18:58:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EE45167D3A9
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 18:59:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230046AbjAZR6u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 12:58:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55384 "EHLO
+        id S229848AbjAZR7l (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 12:59:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229848AbjAZR6t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 12:58:49 -0500
-Received: from mail-io1-xd4a.google.com (mail-io1-xd4a.google.com [IPv6:2607:f8b0:4864:20::d4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFFE5298F1
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 09:58:48 -0800 (PST)
-Received: by mail-io1-xd4a.google.com with SMTP id n8-20020a6bf608000000b007048850aa92so1338794ioh.10
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 09:58:48 -0800 (PST)
+        with ESMTP id S229482AbjAZR7k (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 12:59:40 -0500
+Received: from mail-oo1-xc4a.google.com (mail-oo1-xc4a.google.com [IPv6:2607:f8b0:4864:20::c4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32BDBF9
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 09:59:39 -0800 (PST)
+Received: by mail-oo1-xc4a.google.com with SMTP id l1-20020a4ab0c1000000b00511f44a57ebso950127oon.5
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 09:59:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=CgaKsn4RVDEpOSgH5DEyhW7gCnTkwkj12anY5asYwFI=;
-        b=oGrb1HAK712prNTP3ppxVnPYlP6Jc1GgZn1dOpV/o+3BxE2aXM+yIV6WToSuOjIwTI
-         0CKfrw4gF56hs0ebwS70rtOVmhZCLhqW9m5cU4+k6GDtJwsYD3KqPIBJuZpobYSh2VZS
-         ErP7zT+/adoh4/ZimdaRx+v4GhaPqB7AVO28geTv0t8TaNTOcDOvtr9/lmAeDIKhhinn
-         KFdAx/mEx76leNvZOh4LodPb474gSP3puRcP/AYOCqh3VpEaEUmB3ZaYNiezZph60xXY
-         9S03Zg+O2VmmbVeWaRHRYxx+U5wmQKVISCH3P0MLBAkksqyc/oqla9rTiGOgwwi8PQjm
-         RkvQ==
+        bh=s8lMg0EXnQ3v10Ym+MohqiB63ohQCFcVihzjJlgKe0Y=;
+        b=TWCN4fAWwr1bB9IyBXHEMcXtB1Pq3sd+u4/hScAnNgXMUT/UlLNM/rUAHe0iw4UPae
+         8Ae/qt6zjW5fehRJK3qGVjyImLg4KZrRgyvmc34pzdnM7eg2m8KkmdUEdOAxj/IxG65R
+         FbZvFqtq/y0XHX2UaSZTAzpjKL0utaIR9FDygGDJ9Cropb4RBOpVtXqUvhMSjdrx3H5x
+         s8SmZm3b/6eLIU+YQG7XrOA95+RzmduClYrxUwjSPlgVoGb8vzf5yXKvLttwO630lUXD
+         7BrimFNe9NNeeirHi/151TF7IU1W6mwh/ZaihTFHF+uKgVN9GIcmgW9CV1y2+/hiOYUl
+         2YKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CgaKsn4RVDEpOSgH5DEyhW7gCnTkwkj12anY5asYwFI=;
-        b=E9rCcyqFIOQ8EmvYhrjsKKzfhjHDb6BxB6TSnyOSbOnWki9LM+WlgXwZU2s52JyN+3
-         czfGnREhMjfInuBRHfskIQf4N9PhhalYb5/gyFIiH8IQvVSqzWbsGbNSnqXd4387gJ1P
-         XJe8K1hwCCnESjKYRJmh4LVIhBlLBykzq4dzxIo6y3STczKGL5bI21QP4uNXQfjME8kh
-         O4ocJ/ccdRg/WP08QHKLstb7qns6NsBG/sXZOhRWBf4HZjAXsemEHUpJbp9ROBzFiHmm
-         2v8e8ImU63qBky1T0QMnWBx7g8gzsBXQyFxxD36dyx4n6U0Z5zJbpcDVgslswYriqnJk
-         GaLA==
-X-Gm-Message-State: AFqh2kq5ZW+9fFXiwEA1WeCHMgNgg5ZIsX4qu7ZM0ObGi5Hb9AvFIMVn
-        zuF/vKzZM1uv6ewbLLUBZMuB3eVSecBl34JNzw==
-X-Google-Smtp-Source: AMrXdXvk73bqraIyQhpcOXTzCzCx+/SXJVRdmCIQq30SpDFNMjnCLmC1Tc8l7nEiOQcFPuadBBegEYWtQEyWltoNUQ==
+        bh=s8lMg0EXnQ3v10Ym+MohqiB63ohQCFcVihzjJlgKe0Y=;
+        b=bTtck0oNd8jY0oDGItnQlzd/HgI6x/4fQp+2Of2DOrvIMQfpUhNcuCYC4O0YrRiJpb
+         MZlLp7ky9lkd7E1BvkI/WTQ4S96jJoxUdHhGtzFWI2LkUEdjDG+k4X7bbuC9ApoLvsMg
+         AOKLO1jIxohBZvcsV0kFOw85iBPydciZ1KHtiI2IUQ4IfXx4b4aeUkc4wjpGKcLZEBvU
+         44mYTUpQojdRqMnSzp0/ps8jqMLS9X5HZ3QU6UPvGCKEhUINIMx/eLBqrStepx7K2jbj
+         FjIN3gRVxD+Vwy3WvmEwLcqMudn1/kaQDbKJuqhrLsQ4hOum0MqF/4XmW2dsx3RDlYn7
+         tu4g==
+X-Gm-Message-State: AFqh2krcpz5SEqK3TbJMWV1l1rSvncP/NwBxscHpwGQ2UyAfUhpemoiG
+        eQIyxeY5UU4U+Z01fByIhffVS7Y+TMA8ZlTvUw==
+X-Google-Smtp-Source: AMrXdXsw0LPe4dqem8m7McMq3Ii81IGujix2zE4k3PE473L6qKq7Yooz2tpsp3JAxI0NDlGTlV2szNY6J8TECG1h2A==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a5d:89c6:0:b0:704:bdfe:db72 with SMTP
- id a6-20020a5d89c6000000b00704bdfedb72mr3257020iot.85.1674755928223; Thu, 26
- Jan 2023 09:58:48 -0800 (PST)
-Date:   Thu, 26 Jan 2023 17:58:47 +0000
-In-Reply-To: <Y8cIdxp5k8HivVAe@google.com> (message from Ricardo Koller on
- Tue, 17 Jan 2023 12:43:35 -0800)
+ (user=coltonlewis job=sendgmr) by 2002:a9d:6385:0:b0:686:47e7:ab87 with SMTP
+ id w5-20020a9d6385000000b0068647e7ab87mr2272607otk.53.1674755978501; Thu, 26
+ Jan 2023 09:59:38 -0800 (PST)
+Date:   Thu, 26 Jan 2023 17:59:37 +0000
+In-Reply-To: <Y8cJg+RDLgAFrG+O@google.com> (message from Ricardo Koller on
+ Tue, 17 Jan 2023 12:48:03 -0800)
 Mime-Version: 1.0
-Message-ID: <gsntfsbxqiso.fsf@coltonlewis-kvm.c.googlers.com>
+Message-ID: <gsntedrhqira.fsf@coltonlewis-kvm.c.googlers.com>
 Subject: Re: [PATCH 2/3] KVM: selftests: Collect memory access latency samples
 From:   Colton Lewis <coltonlewis@google.com>
 To:     Ricardo Koller <ricarkol@google.com>
@@ -70,25 +70,13 @@ X-Mailing-List: kvm@vger.kernel.org
 Ricardo Koller <ricarkol@google.com> writes:
 
 
-> nit: reservoir
+>> Resevoir sampling means despite keeping only a small number of
+
+> Could you add a reference? I'm trying to understand the algorithm, but
+> I'm not even sure what's the version implemented ("Optimal: Algorithm
+> L"?).
 
 
-Will fix
-
-
-> Didn't see this before my previous comment. But, I guess it still
-> applies: isn't it possible to know the number of events to store?  to
-> avoid the "100" obtained via trial and error.
-
-
-That's what I thought I was calculating with sample_pages =
-sizeof(latency_samples) / pta->guest_page_size. Both values are in bytes
-so that should give the number of guest pages I need to allocate to hold
-latency_samples. The 100 is a fudge factor added to the calculation
-after encountering crashes. Any idea why the math above is incorrect?
-
-
-> reservoir
-
-
-Will fix.
+I can add an external link to Wikipedia. That was the source I used. The
+version implemented here is the simple version that Wikipedia names
+"Algorithm R".
