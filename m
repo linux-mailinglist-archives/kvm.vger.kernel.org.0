@@ -2,134 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BB3D367C21B
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 01:58:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3442B67C272
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 02:35:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236453AbjAZA6y (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 25 Jan 2023 19:58:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58764 "EHLO
+        id S235678AbjAZBfX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 25 Jan 2023 20:35:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236191AbjAZA6x (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 25 Jan 2023 19:58:53 -0500
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B9295CFFF
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 16:58:52 -0800 (PST)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-142b72a728fso689442fac.9
-        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 16:58:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=erjiEkZ9D43eAKN0jnPh/XHVutvD1e0c37Mj/PZ/I90=;
-        b=LADojTLzWfF4+JTwfjq4BL3FNGteMKzy9i0qwRgH34cA6sGXD/h+1MWzDT9mGzAqAI
-         /ebaYb3SOJdEg9N3FAJ2nTQQewzMEUuMgMd67VNrpnooR9IBwpk8zNToj/GiVVqKNdX4
-         H4qTBOUgt5zf0CN3bQMwVj5vnhOTKv6eJmNiYUjrassnxjYjWgd1K1xzQn/G7za7eTpN
-         e0T0as5FqNXeHC1DsL7FBIJ3tVh96aNrVrrCHVLXA1y9cuKOtPyPfmYsvuGtJaoHJHKh
-         XeUkOaJAQ1Y6TIFLb6eyZF/2p3sRteXIW0k+PG2s5NvA+B8USExLMZQ1Lf5ACvpNDu1l
-         8E3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=erjiEkZ9D43eAKN0jnPh/XHVutvD1e0c37Mj/PZ/I90=;
-        b=eDVvjGcazNVeM7hP78n8Ur4ULU7vUkRa0QPqZcqPCzjjNh/rU4CA/FSYP4czVGHLJG
-         BsuSdo0PlLaK2gQYH1sTAZFkGxuEwHA48VmGLUZnSBpLssd3LY9C2N3sLU6/Vs970mjQ
-         lrHETFADjwdiUNFSNtmbAUi9r0Kh3TPfKvqV+Jxsewhwp+XSkgP5sjTFpT3Uj90tdRcC
-         UmHYAbJK8/hPsPBfFykEUIOI9HfOYnIaYDoTjsJqthp1ic31H41miq4qgjBuSSotUMAH
-         u7SPT9cMHtklEsLRl2kMOVLtg5pz9lurI3pYMidZBKbNEa2GU/wx+Cn9OQF8j0xgKpO2
-         SSIg==
-X-Gm-Message-State: AO0yUKWMEJXUHy3ZwIbid5dMeQ0gCsD8By6HM2FS6Pb79jtgmeDWNpMB
-        KmbaHQHdNnZQNKpN7wCnZLcXGZDidBgdKCsb9gajHg==
-X-Google-Smtp-Source: AK7set9L6/IA9Gj8L+AYOTlQdt7smnu5QUEFf0dssjEPi4hJqca5hVmTRAjgASZWpf9AlBr/WrV+g5rg4U0dmBFAhhU=
-X-Received: by 2002:a05:6871:6ca5:b0:160:3235:9c33 with SMTP id
- zj37-20020a0568716ca500b0016032359c33mr675619oab.103.1674694731192; Wed, 25
- Jan 2023 16:58:51 -0800 (PST)
+        with ESMTP id S236186AbjAZBfC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 25 Jan 2023 20:35:02 -0500
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [IPv6:2a0c:5a00:149::25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2826842BE0
+        for <kvm@vger.kernel.org>; Wed, 25 Jan 2023 17:35:01 -0800 (PST)
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+        by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.93)
+        (envelope-from <mhal@rbox.co>)
+        id 1pKrAJ-0008Hh-AL
+        for kvm@vger.kernel.org; Thu, 26 Jan 2023 02:34:59 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+        s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject
+        :Cc:To:From; bh=chALMGIoQDmaei/8EfRkNa4wN80rSPvBAehTZctm2VM=; b=tX7NpyNxqJ3J6
+        EdWE0NUYJIXo/2Osgs66/HUoYaBzXmh87RzteOf6vs8YLg5B4OEPZI8z3BXSPXcqKalVR5TBRs896
+        +uNJXzx/84q08nNTmvtlh37UgOqG6mQ9BcNm29KaA0IG5FTz089732BA04IQdUaP/093z09Ih9FkA
+        UUKgx+a0Ps1p/mYDbD+2PPc5Q82ZSlUocUAkrlAEefuCYCbgQCHhxAVe37UR5Rkd5EzwlOKFuwkoW
+        g1bxYHWibUjkK8nSJXDuwv6Oi+39H36aWpxuUBuuoQfsENMFYWzH4xHHHY1JHQh00sRbi1thl+6rG
+        5mWbJm7SRw+AyUwFangdQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+        by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+        (envelope-from <mhal@rbox.co>)
+        id 1pKrAJ-0003BP-0p; Thu, 26 Jan 2023 02:34:59 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.90_1)
+        id 1pKrA6-00010H-TK; Thu, 26 Jan 2023 02:34:46 +0100
+From:   Michal Luczaj <mhal@rbox.co>
+To:     kvm@vger.kernel.org
+Cc:     seanjc@google.com, pbonzini@redhat.com,
+        Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH 0/3] KVM: x86/emulator: Segment load fixes
+Date:   Thu, 26 Jan 2023 02:34:02 +0100
+Message-Id: <20230126013405.2967156-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.39.0
 MIME-Version: 1.0
-References: <20221027092036.2698180-1-pbonzini@redhat.com> <CALMp9eQihPhjpoodw6ojgVh_KtvPqQ9qJ3wKWZQyVtArpGkfHA@mail.gmail.com>
- <3a23db58-3ae1-7457-ed09-bc2e3f6e8dc9@redhat.com> <CALMp9eQ3wZ4dkq_8ErcUdQAs2F96Gvr-g=7-iBteJeuN5aX00A@mail.gmail.com>
- <8bdf22c8-9ef1-e526-df36-9073a150669d@redhat.com> <CALMp9eRKp_4j_Q0j1HYP2itT2+z3pRotQK8LwScMsaGF5FpARA@mail.gmail.com>
- <dec8c012-885a-6ed8-534e-4a5f0a435025@redhat.com>
-In-Reply-To: <dec8c012-885a-6ed8-534e-4a5f0a435025@redhat.com>
-From:   Jim Mattson <jmattson@google.com>
-Date:   Wed, 25 Jan 2023 16:58:40 -0800
-Message-ID: <CALMp9eSyVWGS2HQVwwwViE6S_uweiOiFucqa3keuoUjNz9rKqA@mail.gmail.com>
-Subject: Re: [PATCH v2] KVM: x86: Do not return host topology information from KVM_GET_SUPPORTED_CPUID
-To:     Paolo Bonzini <pbonzini@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        seanjc@google.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 2:44 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> On 1/25/23 23:09, Jim Mattson wrote:
-> > The topology leaves returned by KVM_GET_SUPPORTED_CPUID *for over a
-> > decade* have been passed through unmodified from the host. They have
-> > never made sense for KVM_SET_CPUID2, with the unlikely exception of a
-> > whole-host VM.
->
-> True, unfortunately people have not read the nonexistent documentation
-> and they are:
->
-> 1) rarely adjusting correctly all of 0xB, 0x1F and 0x8000001E;
->
-> 2) never bounding CPUID[EAX=0].EAX to a known CPUID leaf, resulting for
-> example in inconsistencies between 0xB and 0x1F.
->
-> *But* (2) should not be needed unless you care about maintaining
-> homogeneous CPUID within a VM migration pool.  For something like
-> kvmtool, having to do (2) would be a workaround for the bug that this
-> patch fixes.
+Two small fixes for __load_segment_descriptor(), along with a KUT
+x86/emulator test.
 
-Maybe we should just populate up to leaf 3. :-)
+And a question to maintainers: is it ok to send patches for two repos in
+one series?
 
-> > Our VMM populates the topology of the guest CPUID table on its own, as
-> > any VMM must. However, it uses the host topology (which
-> > KVM_GET_SUPPORTED_CPUID has been providing pass-through *for over a
-> > decade*) to see if the requested guest topology is possible.
->
-> Ok, thanks; this is useful to know.
->
-> > Changing a long-established ABI in a way that breaks userspace
-> > applications is a bad practice. I didn't think we, as a community, did
-> > that. I didn't realize that we were only catering to open source
-> > implementations here.
->
-> We aren't.  But the open source implementations provide some guidance as
-> to how the API is being used in the wild, and what the pitfalls are.
->
-> You wrote it yourself: any VMM must either populate the topology on its
-> own, or possibly fill it with zeros.  Returning a value that is
-> extremely unlikely to be used is worse in pretty much every way (apart
-> from not breaking your VMM, of course).
+Michal Luczaj (3):
+  KVM: x86/emulator: Fix segment load privilege level validation
+  KVM: x86/emulator: Fix comment in __load_segment_descriptor()
+  x86: Test CPL=3 DS/ES/FS/GS RPL=DPL=0 segment descriptor load
 
-I've complained about this particular ioctl more than I can remember.
-This is just one of its many problems.
+-- 
+2.39.0
 
-> With a total of six known users (QEMU, crosvm, kvmtool, firecracker,
-> rust-vmm, and the Google VMM), KVM is damned if it reverts the patch and
-> damned if it doesn't.  There is a tension between fixing the one VMM
-> that was using KVM_GET_SUPPORTED_CPUID correctly and now breaks loudly,
-> and fixing 3-4 that were silently broken and are now fixed.  I will
-> probably send a patch to crosvm, though.
->
-> The VMM being _proprietary_ doesn't really matter, however it does
-> matter to me that it is not _public_: it is only used within Google, and
-> the breakage is neither hard to fix in the VMM nor hard to temporarily
-> avoid by reverting the patch in the Google kernel.
-
-Sadly, there isn't a single kernel involved. People running our VMM on
-their desktops are going to be impacted as soon as this patch hits
-that distro. (I don't know if I can say which distro that is.) So, now
-we have to get the VMM folks to urgently accommodate this change and
-get a new distribution out.
