@@ -2,229 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2CE9B67D3AD
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 19:01:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2815667D3C2
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 19:08:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230455AbjAZSBA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 13:01:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56344 "EHLO
+        id S231709AbjAZSIo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 13:08:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbjAZSA6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 13:00:58 -0500
-Received: from mail-oa1-x49.google.com (mail-oa1-x49.google.com [IPv6:2001:4860:4864:20::49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1A664B765
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 10:00:57 -0800 (PST)
-Received: by mail-oa1-x49.google.com with SMTP id 586e51a60fabf-1631f1eb91aso828265fac.18
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 10:00:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gltqiiCHiqHTiyoTnuQZd66WC1FXO8sWVT1wNpsgQ3U=;
-        b=Zup1pPLsDMoJel8LOh50lybwtunuDvo4erYKoGrFn2mLQB5ufTbMv2+QzL1gsEv2F0
-         la7XGNJ16BA9ndJmfzrHsfJW1OAR142jX98yuyq7XGHDDzx+Q+S6t4GH1vjBW0F6ej0P
-         3YX3Qd0NAWl1rT7+58SsWbpSAxmzAfbVMLpgQrww62eEoa89zP4j4cCtue2QQy4Od7M1
-         4GVd3tVj3snjq2eXf9Rs4/76GriH94XG+d5ByMzNqSduSzpsXVuBMfufBqoHrvKZxIng
-         NfGnMf4+vSaZcqCMKEnCIDLu0VUiCd8ijX87eHSZ7wYfJXTK5qTQRMY9k/tH4Tqss25l
-         PMQw==
+        with ESMTP id S229486AbjAZSIm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 13:08:42 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38B931DBA7
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 10:07:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674756474;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=JPJcZCJeMXtNIVcSvHlLHeN+QFqCFf0Z1zlozMPClWw=;
+        b=Ntx7U5JoVx4+n+3t/jB7oXzNkbJ/RO8Avk5Bm/tIb1RCQVXabS8Tiz7T8QGlvzIkwjogQe
+        PybySW1MsUDJxSv5hzjnP3d6NoRsvLDDRilMIw/EHEMYZz46uFIPCrUYMtbRwg1DQAiqf/
+        pupm6sT11TjEy/wsi57HYWkB1koMPZA=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-320-XrIDimyfODS1NS0wj09-QQ-1; Thu, 26 Jan 2023 13:07:53 -0500
+X-MC-Unique: XrIDimyfODS1NS0wj09-QQ-1
+Received: by mail-ej1-f70.google.com with SMTP id hq7-20020a1709073f0700b0086fe36ed3d0so1734269ejc.3
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 10:07:52 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gltqiiCHiqHTiyoTnuQZd66WC1FXO8sWVT1wNpsgQ3U=;
-        b=IF2kRJ+GYNCzuDQ7EO4QyJDG4PSyucLJi5gE6AYMb9j+vvmXlKYUx05y1GZnNX3y4I
-         A9+rC74nT23tt34ic5JaTcBsRcNXpY5MIlNRCRvqzARIq5x51y6qbkzfV+fs7+4SisHb
-         Uhe+7Sb987aIiAKAfJri+VxDVRNtsSZ2NjXEFsOhOOWxDQ9rgrdJG4+6V6SGXXnqNmjo
-         /zUyfp8KeCmRlNxwN5XuGcfkN8isplJqkudbE67I6EoOq74Vjaqiz2Z/4VpFdsU20kRx
-         rOzKRTJl5pXbkuglAzAe8P1ygP1IPL9vAOEDd5dssweGb22+UzYkpARrcvLnBSsourg6
-         jgNQ==
-X-Gm-Message-State: AFqh2kozFhz47kVhSQntO6lM7MRoHCa1Aujxc6AfQJLMrbk5X5bw0Pij
-        mwUaKMFN6xmUV7/pbOUNRZ9pYTYLTzJiMHOicA==
-X-Google-Smtp-Source: AMrXdXuEr+OqYOKef3BkHUu+R1a9KM3AGxJHpApAX6xKQV7VbFCUmQDixkwxQ4oPSDMsHnUdCCJyoVXgjEMBl/gXnQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a9d:6385:0:b0:686:47e7:ab87 with SMTP
- id w5-20020a9d6385000000b0068647e7ab87mr2272922otk.53.1674756056144; Thu, 26
- Jan 2023 10:00:56 -0800 (PST)
-Date:   Thu, 26 Jan 2023 18:00:55 +0000
-In-Reply-To: <Y8gfOP5CMXK60AtH@google.com> (message from Sean Christopherson
- on Wed, 18 Jan 2023 16:32:56 +0000)
-Mime-Version: 1.0
-Message-ID: <gsnta625qip4.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH 2/3] KVM: selftests: Collect memory access latency samples
-From:   Colton Lewis <coltonlewis@google.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     ricarkol@google.com, kvm@vger.kernel.org, pbonzini@redhat.com,
-        maz@kernel.org, dmatlack@google.com, bgardon@google.com,
-        oupton@google.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        bh=JPJcZCJeMXtNIVcSvHlLHeN+QFqCFf0Z1zlozMPClWw=;
+        b=1xhcTnb9ZmqzpWHLakJTj1C9rRqYTzBCYaaGvRxU6mQt5e1n5JDhayvtBicA3MXo9m
+         r7+aDHuhKcx+NtLH9QutZ30dw9vpR70Sbjl0BSObEGdX/qjBcSehdEjaWViNNyGANiCs
+         7FFzYyPP+00dZ+CihBbnDFE32jDxbR/FYBbRA4+FLzE1fNUAjwAwYscCWG+AFlZKtcpV
+         V9Ke7JfoX3lqkTbAqMWCwPGexuw+hWQV3jBzKehIBqFQ1qu5b7S1460oQeZ0efnV7fMq
+         qpyIFZI5q3zfXr7GsB5JdI8K3LVcYzgwMoKFfnGuk8EuHiyR7cPSz3FNVt8GAx5Bs5iJ
+         WBOg==
+X-Gm-Message-State: AO0yUKUqJkGuLlmavjDSrPjrGkjM5eq/686PW9hGa1p4bTRL1//Slz4j
+        4zw9ppqpvkjqYvsx9ckPXXuBS60N0u8Wl+0Wyj7jSKUHabX7mbNv4PcU+RIu2c6CMQ+z8bFuOrB
+        +bd3soIcvOUnG
+X-Received: by 2002:a17:906:2c03:b0:878:734d:1d87 with SMTP id e3-20020a1709062c0300b00878734d1d87mr1968164ejh.47.1674756472007;
+        Thu, 26 Jan 2023 10:07:52 -0800 (PST)
+X-Google-Smtp-Source: AK7set+e9dDlpXORthWM1Snp5LdPVU6ymxzecZzigYkUZU4rX8EVpaxIztZgQSCgh+vGG+C0vFcEtg==
+X-Received: by 2002:a17:906:2c03:b0:878:734d:1d87 with SMTP id e3-20020a1709062c0300b00878734d1d87mr1968151ejh.47.1674756471805;
+        Thu, 26 Jan 2023 10:07:51 -0800 (PST)
+Received: from ?IPV6:2001:b07:6468:f312:9af8:e5f5:7516:fa89? ([2001:b07:6468:f312:9af8:e5f5:7516:fa89])
+        by smtp.googlemail.com with ESMTPSA id b13-20020aa7cd0d000000b004a028d443f9sm1075564edw.55.2023.01.26.10.07.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Jan 2023 10:07:51 -0800 (PST)
+Message-ID: <c4b2d1e1-c255-8cd3-6ec9-2748fd2951cb@redhat.com>
+Date:   Thu, 26 Jan 2023 19:07:50 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.5.1
+Subject: Re: [PATCH 1/3] KVM: x86/emulator: Fix segment load privilege level
+ validation
+Content-Language: en-US
+To:     Michal Luczaj <mhal@rbox.co>, kvm@vger.kernel.org
+Cc:     seanjc@google.com
+References: <20230126013405.2967156-1-mhal@rbox.co>
+ <20230126013405.2967156-2-mhal@rbox.co>
+From:   Paolo Bonzini <pbonzini@redhat.com>
+In-Reply-To: <20230126013405.2967156-2-mhal@rbox.co>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Sean Christopherson <seanjc@google.com> writes:
-> On Tue, Jan 17, 2023, Ricardo Koller wrote:
->> On Tue, Nov 15, 2022 at 05:32:57PM +0000, Colton Lewis wrote:
->> > @@ -44,6 +47,18 @@ static struct kvm_vcpu *vcpus[KVM_MAX_VCPUS];
->> >  /* Store all samples in a flat array so they can be easily sorted  
->> later. */
->> >  uint64_t latency_samples[SAMPLE_CAPACITY];
->> >
->> > +static uint64_t perf_test_timer_read(void)
->> > +{
->> > +#if defined(__aarch64__)
->> > +	return timer_get_cntct(VIRTUAL);
->> > +#elif defined(__x86_64__)
->> > +	return rdtsc();
->> > +#else
->> > +#warn __func__ " is not implemented for this architecture, will  
->> return 0"
->> > +	return 0;
->> > +#endif
->> > +}
+On 1/26/23 02:34, Michal Luczaj wrote:
+> Intel SDM describes what steps are taken by the CPU to verify if a
+> memory segment can actually be used at a given privilege level. Loading
+> DS/ES/FS/GS involves checking segment's type as well as making sure that
+> neither selector's RPL nor caller's CPL are greater than segment's DPL.
+> 
+> Emulator implements Intel's pseudocode in __load_segment_descriptor(),
+> even quoting the pseudocode in the comments. Although the pseudocode is
+> correctly translated, the implementation is incorrect. This is most
+> likely due to SDM, at the time, being wrong.
+> 
+> Patch fixes emulator's logic and updates the pseudocode in the comment.
+> Below are historical notes.
+> 
+> Emulator code for handling segment descriptors appears to have been
+> introduced in March 2010 in commit 38ba30ba51a0 ("KVM: x86 emulator:
+> Emulate task switch in emulator.c"). Intel SDM Vol 2A: Instruction Set
+> Reference, A-M (Order Number: 253666-034US, _March 2010_) lists the
+> steps for loading segment registers in section related to MOV
+> instruction:
+> 
+>    IF DS, ES, FS, or GS is loaded with non-NULL selector
+>    THEN
+>      IF segment selector index is outside descriptor table limits
+>      or segment is not a data or readable code segment
+>      or ((segment is a data or nonconforming code segment)
+>      and (both RPL and CPL > DPL))   <---
+>        THEN #GP(selector); FI;
+> 
+> This is precisely what __load_segment_descriptor() quotes and
+> implements. But there's a twist; a few SDM revisions later
+> (253667-044US), in August 2012, the snippet above becomes:
+> 
+>    IF DS, ES, FS, or GS is loaded with non-NULL selector
+>    THEN
+>      IF segment selector index is outside descriptor table limits
+>      or segment is not a data or readable code segment
+>      or ((segment is a data or nonconforming code segment)
+>        [note: missing or superfluous parenthesis?]
+>      or ((RPL > DPL) and (CPL > DPL))   <---
+>        THEN #GP(selector); FI;
+> 
+> Many SDMs later (253667-065US), in December 2017, pseudocode reaches
+> what seems to be its final form:
+> 
+>    IF DS, ES, FS, or GS is loaded with non-NULL selector
+>    THEN
+>      IF segment selector index is outside descriptor table limits
+>      OR segment is not a data or readable code segment
+>      OR ((segment is a data or nonconforming code segment)
+>          AND ((RPL > DPL) or (CPL > DPL)))   <---
+>        THEN #GP(selector); FI;
+> 
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+> ---
+>   arch/x86/kvm/emulate.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 5cc3efa0e21c..81b8f5dcfa44 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -1695,11 +1695,11 @@ static int __load_segment_descriptor(struct x86_emulate_ctxt *ctxt,
+>   		/*
+>   		 * segment is not a data or readable code segment or
+>   		 * ((segment is a data or nonconforming code segment)
+> -		 * and (both RPL and CPL > DPL))
+> +		 * and ((RPL > DPL) or (CPL > DPL)))
+>   		 */
+>   		if ((seg_desc.type & 0xa) == 0x8 ||
+>   		    (((seg_desc.type & 0xc) != 0xc) &&
+> -		     (rpl > dpl && cpl > dpl)))
+> +		     (rpl > dpl || cpl > dpl)))
+>   			goto exception;
+>   		break;
+>   	}
 
-> I would prefer to put the guest-side timer helpers into common code, e.g.  
-> as
-> guest_read_system_counter(), replacing system_counter_offset_test.c's  
-> one-off
-> version.
+Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Will do.
-
->> >  /*
->> >   * Continuously write to the first 8 bytes of each page in the
->> >   * specified region.
->> > @@ -59,6 +74,10 @@ void perf_test_guest_code(uint32_t vcpu_idx)
->> >  	int i;
->> >  	struct guest_random_state rand_state =
->> >  		new_guest_random_state(pta->random_seed + vcpu_idx);
->> > +	uint64_t *latency_samples_offset = latency_samples +  
->> SAMPLES_PER_VCPU * vcpu_idx;
-
-> "offset" is confusing because the system counter (TSC in x86) has an  
-> offset for
-> the guest-perceived value.  Maybe just "latencies"?
-
-Will do.
-
->> > +	uint64_t count_before;
->> > +	uint64_t count_after;
-
-> Maybe s/count/time?  Yeah, it's technically wrong to call it "time",  
-> but "count"
-> is too generic.
-
-I could say "cycles".
-
->> > +	uint32_t maybe_sample;
->> >
->> >  	gva = vcpu_args->gva;
->> >  	pages = vcpu_args->pages;
->> > @@ -75,10 +94,21 @@ void perf_test_guest_code(uint32_t vcpu_idx)
->> >
->> >  			addr = gva + (page * pta->guest_page_size);
->> >
->> > -			if (guest_random_u32(&rand_state) % 100 < pta->write_percent)
->> > +			if (guest_random_u32(&rand_state) % 100 < pta->write_percent) {
->> > +				count_before = perf_test_timer_read();
->> >  				*(uint64_t *)addr = 0x0123456789ABCDEF;
->> > -			else
->> > +				count_after = perf_test_timer_read();
->> > +			} else {
->> > +				count_before = perf_test_timer_read();
->> >  				READ_ONCE(*(uint64_t *)addr);
->> > +				count_after = perf_test_timer_read();
-
->> "count_before ... ACCESS count_after" could be moved to some macro,
->> e.g.,:
->> 	t = MEASURE(READ_ONCE(*(uint64_t *)addr));
-
-> Even better, capture the read vs. write in a local variable to  
-> self-document the
-> use of the RNG, then the motivation for reading the system counter inside  
-> the
-> if/else-statements goes away.  That way we don't need to come up with a  
-> name
-> that documents what MEASURE() measures.
-
-> 			write = guest_random_u32(&rand_state) % 100 < args->write_percent;
-
-> 			time_before = guest_system_counter_read();
-> 			if (write)
-> 				*(uint64_t *)addr = 0x0123456789ABCDEF;
-> 			else
-> 				READ_ONCE(*(uint64_t *)addr);
-> 			time_after = guest_system_counter_read();
-
-Couldn't timing before and after the if statement produce bad
-measurements? We might be including a branch mispredict in our memory
-access latency and this could happen a lot because it's random so no way
-for the CPU to predict.
-
->> > +			}
->> > +
->> > +			maybe_sample = guest_random_u32(&rand_state) % (i + 1);
-
-> No need to generate a random number for iterations that always sample.   
-> And I
-> think it will make the code easier to follow if there is a single write  
-> to the
-> array.  The derivation of the index is what's interesting and different,  
-> we should
-> use code to highlight that.
-
-> 			/*
-> 			 * Always sample early iterations to ensure at least the
-> 			 * number of requested samples is collected.  Once the
-> 			 * array has been filled, <here is a comment from Colton
-> 			 * briefly explaining the math>.
-> 			 *
-> 			if (i < SAMPLES_PER_VCPU)
-> 				idx = i;
-> 			else
-> 				idx = guest_random_u32(&rand_state) % (i + 1);
-
-> 			if (idx < SAMPLES_PER_VCPU)
-> 				latencies[idx] = time_after - time_before;
-
-Will do.
-
->> > +			if (i < SAMPLES_PER_VCPU)
-
-> Would it make sense to let the user configure the number of samples?   
-> Seems easy
-> enough and would let the user ultimately decide how much memory to burn  
-> on samples.
-
-Theoretically users may wish to tweak the accuracy vs memory use
-tradeoff. Seemed like a shakey value proposition to me because of
-diminishing returns to increased accuracy, but I will include an option
-if you insist.
-
->> > +				latency_samples_offset[i] = count_after - count_before;
->> > +			else if (maybe_sample < SAMPLES_PER_VCPU)
->> > +				latency_samples_offset[maybe_sample] = count_after - count_before;
-
->> I would prefer these reservoir sampling details to be in a helper,
->> e.g.,:
->> 	reservoir_sample_record(t, i);
-
-> Heh, I vote to open code the behavior.  I dislike fancy names that hide  
-> relatively
-> simple logic.  IMO, readers won't care how the modulo math provides even  
-> distribution,
-> just that it does and that the early iterations always samples to ensure  
-> ever bucket
-> is filled.
-
-> In this case, I can pretty much guarantee that I'd end up spending more  
-> time
-> digging into what "reservoir" means than I would to understand the basic  
-> flow.
-I agree. Logic is simple enough more names will confuse as to what's
-really happening.
