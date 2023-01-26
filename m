@@ -2,71 +2,70 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32E4A67CA83
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 13:05:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67BA767CAAA
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 13:14:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236704AbjAZMFn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 07:05:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34106 "EHLO
+        id S235859AbjAZMOE (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 07:14:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230505AbjAZMFl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 07:05:41 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B991F9;
-        Thu, 26 Jan 2023 04:05:40 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30QBMLw8000377;
-        Thu, 26 Jan 2023 12:05:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=bP4Y4aqXV8qGv8U7nj2DVFZz5xfIpgRi6zfbGgdWY/Q=;
- b=iE9TrHBMgYrbSGjrtARv2vEUgSYnSPOIa/uiku5NGQ8fXfwu0fLV0k4zDCJSod1s9BOe
- GEkXPJ4+FRj6h0SLluHh0DJ5qiKDbGBZkmSdStkP6BgE+UxNb2ycuK5L344EHWoCS+Hq
- RcUlv5xwX349PlHHBGmHLan6xnBeDpj+x1jyzK0k8urVUfG5x/ZEK6fKYu9tQf6AD14r
- DX+3513XcQ/tdttbDPMsuFugBg5eA+vJNh4wneKAnMiFAnJLifsQ7xWobUO2ZsWgInZG
- byb9T3PiTTBnVzQ9sr5VxZ3HYLxlwl60MIYmYOlvCmOy4OWE7kU1B2YwXULquWF4h46e gg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbrka0wf2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 12:05:35 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30QBW1he004572;
-        Thu, 26 Jan 2023 12:04:53 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nbrka0uuj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 12:04:53 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30QBMXAa010330;
-        Thu, 26 Jan 2023 12:03:39 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3n87p6pbf9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 26 Jan 2023 12:03:39 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30QC3ZEB49938750
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 26 Jan 2023 12:03:35 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C68820040;
-        Thu, 26 Jan 2023 12:03:35 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3F91420043;
-        Thu, 26 Jan 2023 12:03:35 +0000 (GMT)
-Received: from [9.152.224.253] (unknown [9.152.224.253])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu, 26 Jan 2023 12:03:35 +0000 (GMT)
-Message-ID: <e007461e-53b5-bde5-0c69-6d50f62ffe0b@linux.ibm.com>
-Date:   Thu, 26 Jan 2023 13:03:35 +0100
+        with ESMTP id S229631AbjAZMOD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 07:14:03 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C54226227F
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 04:13:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1674735198;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=df9zb9ds5IPmNup55FO6H71Nj0ejludr4WqF0rB5QrM=;
+        b=Hf9IdqP25bwiqLG/A/NJ5ogs5EH2hz2sAuIQEI1kfCwyG3jPVT5dub7qudN8LOBdiPCf31
+        mZm7K0M0y3K8fxLWMi+i2NqDW0vm7eOVWXGdiMjogm7DjHjlps3WMrLZ+5CFGcAxC6HcfG
+        6CDATco2MZ+m1Ie7E0lBai+BU3KHVMI=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-664-R_WgXxfHOwag9P8aBSFwig-1; Thu, 26 Jan 2023 07:13:17 -0500
+X-MC-Unique: R_WgXxfHOwag9P8aBSFwig-1
+Received: by mail-qk1-f200.google.com with SMTP id c18-20020a05620a269200b0070d0f35e15eso909616qkp.12
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 04:13:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=df9zb9ds5IPmNup55FO6H71Nj0ejludr4WqF0rB5QrM=;
+        b=4/LexvtpDRY1EJiC6yJfQqyIjO27KK0TIO0YAx2wmrrsxDJQ7BX7GhVQpg9qG4aOkf
+         x7TkrRqh6aE73NyJO/SiOZYCFN67ATbXkUxprECR1AKry8nn13FS2B7nlAIFfiocVOe6
+         nyqcQN6gU7xHEx2vLQbFq4mrkyv2lI17cQebOIrIhPBFj8EkfhiYiaES8hcA4hoL3KI5
+         UbRh+OluuANLIRGhPi4xY+RkZyl2pVQcSYfPNpuuVCe6uV93xywqrSG7FXhUIz8kEfe3
+         zvBODFevEnql2K5RiUNyIkMYAyjDMPOSQnUNKQp5ixEEniBppUn16uROjV+GRijLKaqt
+         6Fqw==
+X-Gm-Message-State: AO0yUKVCa0vLNuZIpELiYkv3nbGqdG9r0pehLEVxDU8Qm4o+5znuBHuy
+        0BbQDxGNN1hG4EQI2WOsGdHN6b6GxTgvCKRSdNnsm2jPxixBlvpkFhi1YqU8Q2KzXTcS3o29uAH
+        p6biZ9VIWRqDG
+X-Received: by 2002:a05:622a:1114:b0:3b7:ed2c:fbb7 with SMTP id e20-20020a05622a111400b003b7ed2cfbb7mr2996171qty.0.1674735197164;
+        Thu, 26 Jan 2023 04:13:17 -0800 (PST)
+X-Google-Smtp-Source: AK7set+3bupg7QW2LEoYM6DfA2/q552ZZlO5ojHc9xon3id8NQsaud7k8MHTZIh/HseFB8NDInu28w==
+X-Received: by 2002:a05:622a:1114:b0:3b7:ed2c:fbb7 with SMTP id e20-20020a05622a111400b003b7ed2cfbb7mr2996147qty.0.1674735196947;
+        Thu, 26 Jan 2023 04:13:16 -0800 (PST)
+Received: from [192.168.0.2] (ip-109-43-177-174.web.vodafone.de. [109.43.177.174])
+        by smtp.gmail.com with ESMTPSA id 2-20020ac82082000000b003ad373d04b6sm611659qtd.59.2023.01.26.04.13.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 26 Jan 2023 04:13:15 -0800 (PST)
+Message-ID: <11397ebe-f751-06de-1275-72f7303d4e35@redhat.com>
+Date:   Thu, 26 Jan 2023 13:13:11 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v6 03/14] KVM: s390: selftest: memop: Move testlist into
- main
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [PATCH v6 09/14] KVM: s390: Dispatch to implementing function at
+ top level of vm mem_op
 Content-Language: en-US
 To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
         Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
         Claudio Imbrenda <imbrenda@linux.ibm.com>,
         Heiko Carstens <hca@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
@@ -77,41 +76,35 @@ Cc:     David Hildenbrand <david@redhat.com>,
         linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
         Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Thomas Huth <thuth@redhat.com>
+        Sven Schnelle <svens@linux.ibm.com>
 References: <20230125212608.1860251-1-scgl@linux.ibm.com>
- <20230125212608.1860251-4-scgl@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20230125212608.1860251-4-scgl@linux.ibm.com>
+ <20230125212608.1860251-10-scgl@linux.ibm.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <20230125212608.1860251-10-scgl@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 9dJut2T1WyZ-XF1_j7kPwetwEuZ-dJ6j
-X-Proofpoint-GUID: UzYy-z_wQCQ-vu19EBr8CqfUaoOHmBSX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-26_04,2023-01-25_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- priorityscore=1501 impostorscore=0 bulkscore=0 spamscore=0 clxscore=1015
- suspectscore=0 malwarescore=0 lowpriorityscore=0 mlxscore=0
- mlxlogscore=925 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301260116
-X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-3.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/25/23 22:25, Janis Schoetterl-Glausch wrote:
-> This allows checking if the necessary requirements for a test case are
-> met via an arbitrary expression. In particular, it is easy to check if
-> certain bits are set in the memop extension capability.
+On 25/01/2023 22.26, Janis Schoetterl-Glausch wrote:
+> Instead of having one function covering all mem_op operations,
+> have a function implementing absolute access and dispatch to that
+> function in its caller, based on the operation code.
+> This way additional future operations can be implemented by adding an
+> implementing function without changing existing operations.
 > 
+> Suggested-by: Janosch Frank <frankja@linux.ibm.com>
 > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   arch/s390/kvm/kvm-s390.c | 38 ++++++++++++++++++++++++--------------
+>   1 file changed, 24 insertions(+), 14 deletions(-)
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
