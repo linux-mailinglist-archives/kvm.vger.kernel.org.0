@@ -2,81 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 966C267D815
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 23:00:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98BCB67D81D
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 23:01:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233114AbjAZWAC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 17:00:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42152 "EHLO
+        id S233134AbjAZWBs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 17:01:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233134AbjAZV7z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 16:59:55 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE62073748
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 13:59:54 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id 143so2026512pgg.6
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 13:59:54 -0800 (PST)
+        with ESMTP id S229964AbjAZWBr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 17:01:47 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D24273748
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 14:01:46 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id x2-20020a17090a46c200b002295ca9855aso6708980pjg.2
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 14:01:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YJnku2tU3/6C2F8suak76N7QwbI25qrwIMn4ZDl4TFI=;
-        b=QYG1rYc8La4B3E/MkSHWT5RxKkar6r4pvkx3HyZiVu1tVarzy6kcr/VFFiVgtoi1Ra
-         ZSGyz+F2QvIjob6gceJZgvtq5UdaIdQdLmz76BB7S6Oku1fG9U9Egjj5rOD7U/wtXrHj
-         ajPPi91z5UUBPDJRxkK4s3OjwYYe/C9A3LB0+gDD8vLCFukSu4j7/E2PU+BzCCFQbYTc
-         tF/xpGQBFYmFJARe2QE3SCqL4g6VLeW87RnW+IlnEm7OWti6WOaP+LFX8e7XrExX2aPi
-         Av234avFZ8wqm7JOzqcgCvMQwyZJpQXCXFj3gSHq443MvbJzDGhPjWqMAoeu8cidWAUl
-         gtgA==
+        bh=5JbhjLtl1lcS3CAhxrq5yfKZFfaH2pnSCNdns3oouJU=;
+        b=Q6o4bwROJ1kEixGJhUp0jqak9FsRexuHEWJB31REAWu+8yFk0Z/nylWHAMza2ORvw/
+         ZVv96n0hUrKl0qOeoOLF1G/kFrDFQjLxhap4278oZhDrMQE6s5RX0S3cfvTS7zd3xzFw
+         hGkqVr5qrw/dXSOqvq6RqqbwJjiq45dSI4B2M8WOrKS6ic4mutYoL4uPlTaCevulaVEk
+         +NB3nQTyVh9iHcEYuE7nmEo+2xxSmSWlwp4zCLW2JLsm9zqHf6TsbJI2xmbjveJXXj3M
+         fnYwobI0oia6T6FqjmIsdbJrfyH2Kk/wLLELWlLNLdpWh/kFkrOB0jsyeMFp1bL1hZNe
+         xn8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YJnku2tU3/6C2F8suak76N7QwbI25qrwIMn4ZDl4TFI=;
-        b=E6AtKqIrB5vki1BJAVr7KL7LT9FBSalyZFdOykoiC1gSMcCDKs3Ug4iLVC2B34tzLV
-         NnXU+WsBztJn8mH7TKDY/0OrRxiFT+Qq6vI6dIb22AVYYejvSCbZGVZM6sI3z+vFLP0m
-         N+izEUm+SYuXUpHclPctveFyvYVK+0MCcZ0GT/X6O28yJevsbw4UTUaY3uzgiSRLhp42
-         H7hlQxY1HFt6KKfNJ+IppCLhLNSuoeN1hEsmh+pjnTJ3ENTv3CQ54Ldy4TEAX4PJ3tMc
-         5Bm9+clChimZjJIEsV9cvuKXelmh/2oeOeFGzpx6hWvdgtNMclCNWaKCSE0rMFOyO8WT
-         h+Jg==
-X-Gm-Message-State: AO0yUKW5TkdheBAhxYxl+3qWvxfd4Ivr8ZwBHkE7MoH1IEkpXc6kY/kN
-        GKJR5AZEpzKiLlK52dAMjaD91g==
-X-Google-Smtp-Source: AK7set+5EZ/qT4Z/ggWinkndf4ffSHynNy8XELCqMlevIgpOgNFZ8JsBSKxAPw5A8iCBg+mkSPUL3Q==
-X-Received: by 2002:a05:6a00:23cb:b0:581:bfac:7a52 with SMTP id g11-20020a056a0023cb00b00581bfac7a52mr1507578pfc.1.1674770394220;
-        Thu, 26 Jan 2023 13:59:54 -0800 (PST)
+        bh=5JbhjLtl1lcS3CAhxrq5yfKZFfaH2pnSCNdns3oouJU=;
+        b=4EihpxvuIqx3sSzeKKssDIbC+8LW6oM0LGNpJsYu6PCALNSvP09SzoFpijvUzwonWb
+         qOcbJjSMXSNiwziEiJANmToUfa0DEpb/gdZeiDSyH1L/8B/CJyQg1d/Ztkv/Jqk2DpFA
+         og9Jg/L4/UNgsa6V3QF6jYro605SZ9iyU+A/7TtTujkjqGb3/eUs0No3bw3r47tMy1lp
+         Iwjj/pbX1BT2Dae9x7EuCGM8teHPAhBdwr8hxFnVXTHyR5aOzSXHEc/xVZLSpBPH1PXQ
+         98x9IWv4MtTRNnDvK9q6brfmYm2WkDgxCOkE3lufD4c4eGfoFKNUjICOjMXKRA4aG84A
+         4jeg==
+X-Gm-Message-State: AO0yUKWmyDePwlHqZMld+p1u+J6jvrWudyadQA1ztbNjogEUdsE5BxwT
+        0dlBsGvowo5wOcVPzZ7xAWjyLw==
+X-Google-Smtp-Source: AK7set8tT2B/+o6HazEeWoCdSUXhCPVyrNgyq7+ZObjca9q8KDKZecctFwPiXh//NeBg9EXpFDM/pw==
+X-Received: by 2002:a05:6a20:4c08:b0:a4:efde:2ed8 with SMTP id fm8-20020a056a204c0800b000a4efde2ed8mr1211129pzb.0.1674770505875;
+        Thu, 26 Jan 2023 14:01:45 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c64-20020a624e43000000b00586fbbdf6e4sm1316693pfb.34.2023.01.26.13.59.53
+        by smtp.gmail.com with ESMTPSA id nm16-20020a17090b19d000b0022c0622cc16sm3824842pjb.54.2023.01.26.14.01.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 13:59:53 -0800 (PST)
-Date:   Thu, 26 Jan 2023 21:59:49 +0000
+        Thu, 26 Jan 2023 14:01:45 -0800 (PST)
+Date:   Thu, 26 Jan 2023 22:01:41 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     "Huang, Kai" <kai.huang@intel.com>
-Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+Cc:     "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
+        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "Shahar, Sagi" <sagis@google.com>,
         "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "Aktas, Erdem" <erdemaktas@google.com>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
-        "zhi.wang.linux@gmail.com" <zhi.wang.linux@gmail.com>,
         "dmatlack@google.com" <dmatlack@google.com>,
-        "Yamahata, Isaku" <isaku.yamahata@intel.com>
-Subject: Re: [PATCH v11 018/113] KVM: TDX: create/destroy VM structure
-Message-ID: <Y9L31cqsKvr4boGU@google.com>
-References: <Y8m34OEVBfL7Q4Ns@google.com>
- <1c71eda35e03372f29162c6a5286f5b4d1e1d7e1.camel@intel.com>
- <Y8ndcGHUHQjHfbF9@google.com>
- <CALzav=d4vwHTnXP8wetA_Hqd3Tzc_NLp=3M-akwNSN1-ToL+Eg@mail.gmail.com>
- <Y8st2PjGDQ+Q0LlW@google.com>
- <3951e178bc38191074f5cccadc442212ff15c737.camel@intel.com>
- <Y87GzHrx8vxZLBEJ@google.com>
- <e5912f7d04ce7a27a68ce4328fc50ce594295c6c.camel@intel.com>
- <Y9K4Mnx/Je4j+RsD@google.com>
- <144de0bf7cc86dd7807f1b559c3269bccbb56317.camel@intel.com>
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>
+Subject: Re: [PATCH v11 030/113] KVM: x86/mmu: Replace hardcoded value 0 for
+ the initial value for SPTE
+Message-ID: <Y9L4RQXuTJ4RTVcF@google.com>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+ <dee30f0562d8be0102547d8eb9fc77736eae679d.1673539699.git.isaku.yamahata@intel.com>
+ <20230125112434.0000512a@gmail.com>
+ <Y9Fj/vgPEzfU1eof@google.com>
+ <0be55c001aa1a538a02055aa244c655262228ce4.camel@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <144de0bf7cc86dd7807f1b559c3269bccbb56317.camel@intel.com>
+In-Reply-To: <0be55c001aa1a538a02055aa244c655262228ce4.camel@intel.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -89,30 +85,43 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Thu, Jan 26, 2023, Huang, Kai wrote:
-> On Thu, 2023-01-26 at 17:28 +0000, Sean Christopherson wrote:
-> > In other words, once the PTE is zapped/blocked (branch is pruned), it's completely
-> > removed from the paging tree and no other tasks can access the branch (page table
-> > and its children).  I.e. the only remaining reference to the branch is the pointer
-> > handed to the RCU callback.  That means the RCU callback has exclusive access to the
-> > branch, i.e. can operate as if it were holding mmu_lock for write.  Furthermore, the
-> > RCU callback also doesn't need to flush TLBs because that was again done when
-> > pruning the branch.
+> On Wed, 2023-01-25 at 17:22 +0000, Sean Christopherson wrote:
+> > I agree that handling this in the common code would be cleaner, but repurposing
+> > gfp_zero gets kludgy because it would require a magic value to say "don't initialize
+> > the data", e.g. x86's mmu_shadowed_info_cache isn't pre-filled.
+
+...
+
+> > @@ -400,6 +405,13 @@ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity,
+> >  		if (WARN_ON_ONCE(!capacity))
+> >  			return -EIO;
+> >  
+> > +		/*
+> > +		 * Custom init values can be used only for page allocations,
+> > +		 * and obviously conflict with __GFP_ZERO.
+> > +		 */
+> > +		if (WARN_ON_ONCE(mc->init_value && (mc->kmem_cache || mc->gfp_zero)))
+> > +			return -EIO;
+> > +
+> >  		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
+> >  		if (!mc->objects)
+> >  			return -ENOMEM;
 > > 
-> > It's the same idea that KVM already uses for root SPs, the only difference is how
-> > KVM determines that there is exactly one entity that holds a reference to the SP.
+> > base-commit: 503f0315c97739d3f8e645c500d81757dfbf76be
 > 
-> Right.  This works fine for normal non-TDX case.  However for TDX unfortunately
-> the access to the removed branch (or the removed sub-page-table) isn't that
-> "exclusive" as the SEAMCALL to truly zap that branch still needs to hold the
-> write lock of the entire Secure EPT tree, so it can still conflict with other
-> threads handling new faults.
+> init_value and gfp_zone is kinda redundant.  How about removing gfp_zero
+> completely?
+> 
+> 	mmu_memory_cache_alloc_obj(...)
+> 	{
+> 		...
+> 		if (!mc->init_value)
+> 			gfp_flags |= __GFP_ZERO;
+> 		...
+> 	}
+> 
+> And in kvm_mmu_create() you initialize all caches' init_value explicitly.
 
-I thought TDX was smart enough to read-lock only the part of the tree that it's
-actually consuming, and write-lock only the part of the tree that it's actually
-modifying?
-
-Hrm, but even if TDX takes a read-lock, there's still the problem of it needing
-to walk the upper levels, i.e. KVM needs to keep mid-level page tables reachable
-until they're fully removed.  Blech.  That should be a non-issue at this time
-though, as I don't think KVM will ever REMOVE a page table of a live guest.  I
-need to look at the PROMOTE/DEMOTE flows...
+No, as mentioned above there's also a "don't initialize the data" case.  Leaving
+init_value=0 means those users would see unnecessary zeroing, and again I don't
+want to use a magic value to say "don't initialize".
