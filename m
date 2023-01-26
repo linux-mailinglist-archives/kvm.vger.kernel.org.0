@@ -2,562 +2,454 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 375FB67D1F2
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 17:41:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D01CC67D210
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 17:45:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231979AbjAZQln (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 11:41:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53220 "EHLO
+        id S230360AbjAZQpu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 11:45:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57272 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231897AbjAZQll (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 11:41:41 -0500
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE5D74F349
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:41:31 -0800 (PST)
-Received: by mail-ej1-x634.google.com with SMTP id qx13so6541743ejb.13
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:41:31 -0800 (PST)
+        with ESMTP id S232509AbjAZQpr (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 11:45:47 -0500
+Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5C512F38
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:45:44 -0800 (PST)
+Received: by mail-qv1-xf2d.google.com with SMTP id s4so1868709qvo.3
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 08:45:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XzndCoNPZGmxqAXThcLcvm/cCjhhxuAGbOgNnyFPrt0=;
-        b=Jzg9NSOZEBC+2StwEiVJdLLsZwcVLG3n2Oef07YTj+tJv41XyN/a6wGdREZLnzbXcW
-         qZjdSF07eEnXYYdDGd222LwsAM1hxqtAEyLJcxAU8UDro6ORNVmtWo0QTMdj4Zyk3f8j
-         eMe7rp2rvQV5Uzj9ucToSaq5xrt5iXsqns/RalG3Q4UVEB2iuxoyYu0QJ3enARifnbAE
-         p4e+cyJk+koBt7zp049laeFy5ku5HsJPHSI9D8ZLaw8/kNdAYgxhWqpWn/N9wRWNQphn
-         H8VqKU0ofJ4OSfhg6JvYqpt/Zsny+JLrP1Es4wjkWbx8Vx53ssVfm2bOo6Baw0WoE5mJ
-         V+1w==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4UApxU1cLYQhX56w2cK4ArBdk8zXPKWslFvS2XGLRHI=;
+        b=IfLEBktZjVT46JtaNT3qoyvwSw9NlD6+nxhvi1zsh6LOnS43yARtlWML/Bz+hBk+0M
+         Q9Y1sthMYu50wExrZtPTB8e81IFTMM0KIoKof60giXNxIiDcmqn6AGf9ARo9Pp6PrHSK
+         6bIzjVzkrSILF+VCXiGqfSYohzpLE9R7JZLPbJclrASYDiXRdPAmGflYRCQu8L8SMPE9
+         0QhSkiFg84ml86G+7LTEWuum2pYTDrKn16uq31YFg5GTJ5nRfDPZ4D/vYtBbHLm1ZDCV
+         0KsVxW43G55kYJ3zYu8U9WpSmEj3/+1AKprhhR170qtx+VxMlFnl9hbixYys13vQ6HCl
+         SSuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XzndCoNPZGmxqAXThcLcvm/cCjhhxuAGbOgNnyFPrt0=;
-        b=zE+sRgS24FKvVAo38Hr15mc8s7B81GzN+zdOxP00rlGFvL34UhbnMM09rx6kM5PhXA
-         UlgzuwothOr0Jk5FXbFVFG9XES4kXibTKDNwC2J/nJECqyVYdJAAJGvwvXzrLM4/RBs9
-         +E6fmYVsjaIh4PEiJPXJP48qdgf7Y74wKRPoNZQODnRfxj8dUgyNRq3e9dJ7APdfAwc+
-         9Tu6JPvxkWKr7sNzMjEQVdkquw0gtitglpKMc0j4FAdUTf0fVom2A4ObZkER/tsuHWY3
-         pH9m/DvAI9tPeuEk29lCOB9CpO9oOH2W/mqgJh7xH19szZ5wAx9Kjy4gBjk+ZqVnEHrX
-         5DAw==
-X-Gm-Message-State: AFqh2kq01XALyjIDk2CJsFADN4FVO75J1JuU4PuPSrQLn2I+fZiH3kJP
-        fjVdg79qF3cmQ+thseafmxha5Q==
-X-Google-Smtp-Source: AMrXdXtTkuQQaIwPIRmMAUxLfmy1DemYQzFnaq218g3j8jatJUvWSCVoLQePf5+NxnCQ8H5R+KgQVA==
-X-Received: by 2002:a17:906:4a8f:b0:84d:3403:f4f4 with SMTP id x15-20020a1709064a8f00b0084d3403f4f4mr38433381eju.64.1674751290142;
-        Thu, 26 Jan 2023 08:41:30 -0800 (PST)
-Received: from localhost (cst2-173-16.cust.vodafone.cz. [31.30.173.16])
-        by smtp.gmail.com with ESMTPSA id v4-20020a1709063bc400b0084c2065b388sm812050ejf.128.2023.01.26.08.41.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 08:41:29 -0800 (PST)
-Date:   Thu, 26 Jan 2023 17:41:28 +0100
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/7] RISC-V: KVM: Initial skeletal support for AIA
-Message-ID: <20230126164128.p3blvlwegizmh2ca@orel>
-References: <20230112140304.1830648-1-apatel@ventanamicro.com>
- <20230112140304.1830648-5-apatel@ventanamicro.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4UApxU1cLYQhX56w2cK4ArBdk8zXPKWslFvS2XGLRHI=;
+        b=0V2yiedA/MEyifbJVfELWuxVEISzLOCBZnV16gmiwC05WSdPXPq81VIXmUtPkrYQT6
+         hitVO+WFoyzpNu1U+aFbPgjEREqmQ6Te5jrtoZkSZWSRX2J9oEjA0jGrEAROvPRMX4lK
+         Qr49clNv0SmHVQZLUJfM2Hk4Q9yikkMg+I+6hOTXvT/uL7SqgBzMZi/iimU5fpB3NR5A
+         cCgQeljSdd4IrbXsc7bUun+jgdhldwpd52AVXqBzxHrWIx1BIN2ZCvLJ1Rmdjox1J8RZ
+         ivyMLeEDNfKu1o3rXh2BV7zgDhm8sLN1pzJZeypU5hMIWj7owGHka6zY5j49IRdCt8jq
+         Ar2A==
+X-Gm-Message-State: AO0yUKVysCzFri729Bk9t03KwupbnKLSoFK+j4+9D0nHEUGqwmpqcqSy
+        qek3mYVeYaahO82p28wD7gSizsDY3SsYoXIj8ktLmA==
+X-Google-Smtp-Source: AK7set9QnPkP94vuVVk5b77iZdQOnUiyjS7/gfFzycj+tnP1H0j1qJH5gvR+ULWAX89KONnlqWi1iacQbOH6bYZbrpc=
+X-Received: by 2002:a0c:e991:0:b0:537:7276:a5b7 with SMTP id
+ z17-20020a0ce991000000b005377276a5b7mr498141qvn.16.1674751543641; Thu, 26 Jan
+ 2023 08:45:43 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230112140304.1830648-5-apatel@ventanamicro.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+References: <20230109211754.67144-1-ricarkol@google.com> <20230109211754.67144-4-ricarkol@google.com>
+ <8bfc9b2b-0bad-a6dc-3c23-f67ad3d56741@redhat.com> <Y8/4kxSdOP2QrJVm@google.com>
+ <14d813ba-492a-bf23-0dfd-ab4a9c708822@redhat.com>
+In-Reply-To: <14d813ba-492a-bf23-0dfd-ab4a9c708822@redhat.com>
+From:   Ricardo Koller <ricarkol@google.com>
+Date:   Thu, 26 Jan 2023 08:45:32 -0800
+Message-ID: <CAOHnOrw0y4v5TQ8CnvCCw45=Q3Visr_WxzUaRMqqGDgFRGizkQ@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/4] arm: pmu: Add tests for 64-bit overflows
+To:     eric.auger@redhat.com
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        andrew.jones@linux.dev, maz@kernel.org, alexandru.elisei@arm.com,
+        oliver.upton@linux.dev, reijiw@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 12, 2023 at 07:33:01PM +0530, Anup Patel wrote:
-> To incrementally implement AIA support, we first add minimal skeletal
-> support which only compiles and detects AIA hardware support at the
-> boot-time but does not provide any functionality.
-> 
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  arch/riscv/include/asm/kvm_aia.h  | 109 ++++++++++++++++++++++++++++++
->  arch/riscv/include/asm/kvm_host.h |   7 ++
->  arch/riscv/kvm/Makefile           |   1 +
->  arch/riscv/kvm/aia.c              |  66 ++++++++++++++++++
->  arch/riscv/kvm/main.c             |  13 ++++
->  arch/riscv/kvm/vcpu.c             |  40 ++++++++++-
->  arch/riscv/kvm/vcpu_insn.c        |   4 +-
->  arch/riscv/kvm/vm.c               |   4 ++
->  8 files changed, 240 insertions(+), 4 deletions(-)
->  create mode 100644 arch/riscv/include/asm/kvm_aia.h
->  create mode 100644 arch/riscv/kvm/aia.c
-> 
-> diff --git a/arch/riscv/include/asm/kvm_aia.h b/arch/riscv/include/asm/kvm_aia.h
-> new file mode 100644
-> index 000000000000..52b5e8aefb30
-> --- /dev/null
-> +++ b/arch/riscv/include/asm/kvm_aia.h
-> @@ -0,0 +1,109 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (C) 2021 Western Digital Corporation or its affiliates.
-> + * Copyright (C) 2022 Ventana Micro Systems Inc.
-> + *
-> + * Authors:
-> + *	Anup Patel <apatel@ventanamicro.com>
-> + */
-> +
-> +#ifndef __KVM_RISCV_AIA_H
-> +#define __KVM_RISCV_AIA_H
-> +
-> +#include <linux/jump_label.h>
-> +#include <linux/kvm_types.h>
-> +
-> +struct kvm_aia {
-> +	/* In-kernel irqchip created */
-> +	bool		in_kernel;
-> +
-> +	/* In-kernel irqchip initialized */
-> +	bool		initialized;
-> +};
-> +
-> +struct kvm_vcpu_aia {
-> +};
-> +
-> +#define kvm_riscv_aia_initialized(k)	(!!((k)->arch.aia.initialized))
-> +
-> +#define irqchip_in_kernel(k)		(!!((k)->arch.aia.in_kernel))
-
-No need for the '!!' operator in the above two defines since in both
-cases the type it's operating on is bool.
-
-> +
-> +DECLARE_STATIC_KEY_FALSE(kvm_riscv_aia_available);
-> +#define kvm_riscv_aia_available() \
-> +	static_branch_unlikely(&kvm_riscv_aia_available)
-> +
-> +static inline void kvm_riscv_vcpu_aia_flush_interrupts(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
-> +static inline void kvm_riscv_vcpu_aia_sync_interrupts(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
-> +static inline bool kvm_riscv_vcpu_aia_has_interrupts(struct kvm_vcpu *vcpu,
-> +						     u64 mask)
-> +{
-> +	return false;
-> +}
-> +
-> +static inline void kvm_riscv_vcpu_aia_update_hvip(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
-> +static inline void kvm_riscv_vcpu_aia_load(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +}
-> +
-> +static inline void kvm_riscv_vcpu_aia_put(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
-> +static inline int kvm_riscv_vcpu_aia_get_csr(struct kvm_vcpu *vcpu,
-> +					     unsigned long reg_num,
-> +					     unsigned long *out_val)
-> +{
-> +	*out_val = 0;
-> +	return 0;
-> +}
-> +
-> +static inline int kvm_riscv_vcpu_aia_set_csr(struct kvm_vcpu *vcpu,
-> +					     unsigned long reg_num,
-> +					     unsigned long val)
-> +{
-> +	return 0;
-> +}
-> +
-> +#define KVM_RISCV_VCPU_AIA_CSR_FUNCS
-> +
-> +static inline int kvm_riscv_vcpu_aia_update(struct kvm_vcpu *vcpu)
-> +{
-> +	return 1;
-> +}
-> +
-> +static inline void kvm_riscv_vcpu_aia_reset(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
-> +static inline int kvm_riscv_vcpu_aia_init(struct kvm_vcpu *vcpu)
-> +{
-> +	return 0;
-> +}
-> +
-> +static inline void kvm_riscv_vcpu_aia_deinit(struct kvm_vcpu *vcpu)
-> +{
-> +}
-> +
-> +static inline void kvm_riscv_aia_init_vm(struct kvm *kvm)
-> +{
-> +}
-> +
-> +static inline void kvm_riscv_aia_destroy_vm(struct kvm *kvm)
-> +{
-> +}
-> +
-> +void kvm_riscv_aia_enable(void);
-> +void kvm_riscv_aia_disable(void);
-> +int kvm_riscv_aia_init(void);
-> +void kvm_riscv_aia_exit(void);
-> +
-> +#endif
-> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
-> index 93f43a3e7886..b71f0e639b39 100644
-> --- a/arch/riscv/include/asm/kvm_host.h
-> +++ b/arch/riscv/include/asm/kvm_host.h
-> @@ -14,6 +14,7 @@
->  #include <linux/kvm_types.h>
->  #include <linux/spinlock.h>
->  #include <asm/hwcap.h>
-> +#include <asm/kvm_aia.h>
->  #include <asm/kvm_vcpu_fp.h>
->  #include <asm/kvm_vcpu_insn.h>
->  #include <asm/kvm_vcpu_sbi.h>
-> @@ -93,6 +94,9 @@ struct kvm_arch {
->  
->  	/* Guest Timer */
->  	struct kvm_guest_timer timer;
-> +
-> +	/* AIA Guest/VM context */
-> +	struct kvm_aia aia;
->  };
->  
->  struct kvm_cpu_trap {
-> @@ -220,6 +224,9 @@ struct kvm_vcpu_arch {
->  	/* SBI context */
->  	struct kvm_vcpu_sbi_context sbi_context;
->  
-> +	/* AIA VCPU context */
-> +	struct kvm_vcpu_aia aia;
-
-Maybe name this one vcpu_aia?
-
-> +
->  	/* Cache pages needed to program page tables with spinlock held */
->  	struct kvm_mmu_memory_cache mmu_page_cache;
->  
-> diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
-> index 019df9208bdd..adbc85a94364 100644
-> --- a/arch/riscv/kvm/Makefile
-> +++ b/arch/riscv/kvm/Makefile
-> @@ -25,3 +25,4 @@ kvm-y += vcpu_sbi_base.o
->  kvm-y += vcpu_sbi_replace.o
->  kvm-y += vcpu_sbi_hsm.o
->  kvm-y += vcpu_timer.o
-> +kvm-y += aia.o
-
-Shouldn't the compilation of aia.c depend on the same config(s) as the
-rest of the kernel's AIA support?
-
-> diff --git a/arch/riscv/kvm/aia.c b/arch/riscv/kvm/aia.c
-> new file mode 100644
-> index 000000000000..e7fa4e014d08
-> --- /dev/null
-> +++ b/arch/riscv/kvm/aia.c
-> @@ -0,0 +1,66 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2021 Western Digital Corporation or its affiliates.
-> + * Copyright (C) 2022 Ventana Micro Systems Inc.
-> + *
-> + * Authors:
-> + *	Anup Patel <apatel@ventanamicro.com>
-> + */
-> +
-> +#include <linux/kvm_host.h>
-> +#include <asm/hwcap.h>
-> +
-> +DEFINE_STATIC_KEY_FALSE(kvm_riscv_aia_available);
-> +
-> +static inline void aia_set_hvictl(bool ext_irq_pending)
-
-I'd drop the 'inline' from functions in .c files and let the compiler
-fully decide.
-
-> +{
-> +	unsigned long hvictl;
-> +
-> +	/*
-> +	 * HVICTL.IID == 9 and HVICTL.IPRIO == 0 represents
-> +	 * no interrupt in HVICTL.
-> +	 */
-> +
-> +	hvictl = (IRQ_S_EXT << HVICTL_IID_SHIFT) & HVICTL_IID;
-> +	hvictl |= (ext_irq_pending) ? 1 : 0;
-
-ext_irq_pending is bool, so this can just be 'hvictl |= ext_irq_pending'.
-
-> +	csr_write(CSR_HVICTL, hvictl);
-> +}
-> +
-> +void kvm_riscv_aia_enable(void)
-> +{
-> +	if (!kvm_riscv_aia_available())
-> +		return;
-> +
-> +	aia_set_hvictl(false);
-> +	csr_write(CSR_HVIPRIO1, 0x0);
-> +	csr_write(CSR_HVIPRIO2, 0x0);
-> +#ifdef CONFIG_32BIT
-> +	csr_write(CSR_HVIPH, 0x0);
-> +	csr_write(CSR_HIDELEGH, 0x0);
-> +	csr_write(CSR_HVIPRIO1H, 0x0);
-> +	csr_write(CSR_HVIPRIO2H, 0x0);
-> +#endif
-> +}
-> +
-> +void kvm_riscv_aia_disable(void)
-> +{
-> +	if (!kvm_riscv_aia_available())
-> +		return;
-> +
-> +	aia_set_hvictl(false);
-> +}
-> +
-> +int kvm_riscv_aia_init(void)
-> +{
-> +	if (!riscv_isa_extension_available(NULL, SxAIA))
-> +		return -ENODEV;
-> +
-> +	/* Enable KVM AIA support */
-> +	static_branch_enable(&kvm_riscv_aia_available);
-> +
-> +	return 0;
-> +}
-> +
-> +void kvm_riscv_aia_exit(void)
-> +{
-> +}
-> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
-> index 58c5489d3031..d8ff44eb04ca 100644
-> --- a/arch/riscv/kvm/main.c
-> +++ b/arch/riscv/kvm/main.c
-> @@ -53,11 +53,15 @@ int kvm_arch_hardware_enable(void)
->  
->  	csr_write(CSR_HVIP, 0);
->  
-> +	kvm_riscv_aia_enable();
-> +
->  	return 0;
->  }
->  
->  void kvm_arch_hardware_disable(void)
->  {
-> +	kvm_riscv_aia_disable();
-> +
->  	/*
->  	 * After clearing the hideleg CSR, the host kernel will receive
->  	 * spurious interrupts if hvip CSR has pending interrupts and the
-> @@ -72,6 +76,7 @@ void kvm_arch_hardware_disable(void)
->  
->  int kvm_arch_init(void *opaque)
->  {
-> +	int rc;
->  	const char *str;
->  
->  	if (!riscv_isa_extension_available(NULL, h)) {
-> @@ -93,6 +98,10 @@ int kvm_arch_init(void *opaque)
->  
->  	kvm_riscv_gstage_vmid_detect();
->  
-> +	rc = kvm_riscv_aia_init();
-> +	if (rc && rc != -ENODEV)
-> +		return rc;
-> +
->  	kvm_info("hypervisor extension available\n");
->  
->  	switch (kvm_riscv_gstage_mode()) {
-> @@ -115,11 +124,15 @@ int kvm_arch_init(void *opaque)
->  
->  	kvm_info("VMID %ld bits available\n", kvm_riscv_gstage_vmid_bits());
->  
-> +	if (kvm_riscv_aia_available())
-> +		kvm_info("AIA available\n");
-> +
->  	return 0;
->  }
->  
->  void kvm_arch_exit(void)
->  {
-> +	kvm_riscv_aia_exit();
->  }
->  
->  static int __init riscv_kvm_init(void)
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 2260adaf2de8..3cf50eadc8ce 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -135,6 +135,8 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
->  
->  	kvm_riscv_vcpu_timer_reset(vcpu);
->  
-> +	kvm_riscv_vcpu_aia_reset(vcpu);
-> +
->  	WRITE_ONCE(vcpu->arch.irqs_pending, 0);
->  	WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
->  
-> @@ -155,6 +157,7 @@ int kvm_arch_vcpu_precreate(struct kvm *kvm, unsigned int id)
->  
->  int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  {
-> +	int rc;
->  	struct kvm_cpu_context *cntx;
->  	struct kvm_vcpu_csr *reset_csr = &vcpu->arch.guest_reset_csr;
->  	unsigned long host_isa, i;
-> @@ -194,6 +197,11 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	/* Setup VCPU timer */
->  	kvm_riscv_vcpu_timer_init(vcpu);
->  
-> +	/* Setup VCPU AIA */
-> +	rc = kvm_riscv_vcpu_aia_init(vcpu);
-> +	if (rc)
-> +		return rc;
-> +
->  	/* Reset VCPU */
->  	kvm_riscv_reset_vcpu(vcpu);
->  
-> @@ -213,6 +221,9 @@ void kvm_arch_vcpu_postcreate(struct kvm_vcpu *vcpu)
->  
->  void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
->  {
-> +	/* Cleanup VCPU AIA context */
-> +	kvm_riscv_vcpu_aia_deinit(vcpu);
-> +
->  	/* Cleanup VCPU timer */
->  	kvm_riscv_vcpu_timer_deinit(vcpu);
->  
-> @@ -730,6 +741,9 @@ void kvm_riscv_vcpu_flush_interrupts(struct kvm_vcpu *vcpu)
->  		csr->hvip &= ~mask;
->  		csr->hvip |= val;
->  	}
-> +
-> +	/* Flush AIA high interrupts */
-> +	kvm_riscv_vcpu_aia_flush_interrupts(vcpu);
->  }
->  
->  void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu)
-> @@ -755,6 +769,9 @@ void kvm_riscv_vcpu_sync_interrupts(struct kvm_vcpu *vcpu)
->  		}
->  	}
->  
-> +	/* Sync-up AIA high interrupts */
-> +	kvm_riscv_vcpu_aia_sync_interrupts(vcpu);
-> +
->  	/* Sync-up timer CSRs */
->  	kvm_riscv_vcpu_timer_sync(vcpu);
->  }
-> @@ -791,10 +808,15 @@ int kvm_riscv_vcpu_unset_interrupt(struct kvm_vcpu *vcpu, unsigned int irq)
->  
->  bool kvm_riscv_vcpu_has_interrupts(struct kvm_vcpu *vcpu, unsigned long mask)
->  {
-> -	unsigned long ie = ((vcpu->arch.guest_csr.vsie & VSIP_VALID_MASK)
-> -			    << VSIP_TO_HVIP_SHIFT) & mask;
-> +	unsigned long ie;
-> +
-> +	ie = ((vcpu->arch.guest_csr.vsie & VSIP_VALID_MASK)
-> +		<< VSIP_TO_HVIP_SHIFT) & mask;
-> +	if (READ_ONCE(vcpu->arch.irqs_pending) & ie)
-> +		return true;
->  
-> -	return (READ_ONCE(vcpu->arch.irqs_pending) & ie) ? true : false;
-> +	/* Check AIA high interrupts */
-> +	return kvm_riscv_vcpu_aia_has_interrupts(vcpu, mask);
->  }
->  
->  void kvm_riscv_vcpu_power_off(struct kvm_vcpu *vcpu)
-> @@ -890,6 +912,8 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->  	kvm_riscv_vcpu_guest_fp_restore(&vcpu->arch.guest_context,
->  					vcpu->arch.isa);
->  
-> +	kvm_riscv_vcpu_aia_load(vcpu, cpu);
-> +
->  	vcpu->cpu = cpu;
->  }
->  
-> @@ -899,6 +923,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
->  
->  	vcpu->cpu = -1;
->  
-> +	kvm_riscv_vcpu_aia_put(vcpu);
-> +
->  	kvm_riscv_vcpu_guest_fp_save(&vcpu->arch.guest_context,
->  				     vcpu->arch.isa);
->  	kvm_riscv_vcpu_host_fp_restore(&vcpu->arch.host_context);
-> @@ -966,6 +992,7 @@ static void kvm_riscv_update_hvip(struct kvm_vcpu *vcpu)
->  	struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
->  
->  	csr_write(CSR_HVIP, csr->hvip);
-> +	kvm_riscv_vcpu_aia_update_hvip(vcpu);
->  }
->  
->  /*
-> @@ -1040,6 +1067,13 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
->  
->  		local_irq_disable();
->  
-> +		/* Update AIA HW state before entering guest */
-> +		ret = kvm_riscv_vcpu_aia_update(vcpu);
-> +		if (ret <= 0) {
-> +			local_irq_enable();
-> +			continue;
-> +		}
-> +
->  		/*
->  		 * Ensure we set mode to IN_GUEST_MODE after we disable
->  		 * interrupts and before the final VCPU requests check.
-> diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
-> index 0bb52761a3f7..07e8c121922b 100644
-> --- a/arch/riscv/kvm/vcpu_insn.c
-> +++ b/arch/riscv/kvm/vcpu_insn.c
-> @@ -213,7 +213,9 @@ struct csr_func {
->  		    unsigned long wr_mask);
->  };
->  
-> -static const struct csr_func csr_funcs[] = { };
-> +static const struct csr_func csr_funcs[] = {
-> +	KVM_RISCV_VCPU_AIA_CSR_FUNCS
-> +};
->  
->  /**
->   * kvm_riscv_vcpu_csr_return -- Handle CSR read/write after user space
-> diff --git a/arch/riscv/kvm/vm.c b/arch/riscv/kvm/vm.c
-> index 65a964d7e70d..bc03d2ddcb51 100644
-> --- a/arch/riscv/kvm/vm.c
-> +++ b/arch/riscv/kvm/vm.c
-> @@ -41,6 +41,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  		return r;
->  	}
->  
-> +	kvm_riscv_aia_init_vm(kvm);
-> +
->  	kvm_riscv_guest_timer_init(kvm);
->  
->  	return 0;
-> @@ -49,6 +51,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
->  void kvm_arch_destroy_vm(struct kvm *kvm)
->  {
->  	kvm_destroy_vcpus(kvm);
-> +
-> +	kvm_riscv_aia_destroy_vm(kvm);
->  }
->  
->  int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
-> -- 
-> 2.34.1
+On Tue, Jan 24, 2023 at 12:15 PM Eric Auger <eric.auger@redhat.com> wrote:
 >
+>
+>
+> On 1/24/23 16:26, Ricardo Koller wrote:
+> > On Mon, Jan 23, 2023 at 09:33:50PM +0100, Eric Auger wrote:
+> >> Hi Ricardo,
+> >>
+> >> On 1/9/23 22:17, Ricardo Koller wrote:
+> >>> Modify all tests checking overflows to support both 32 (PMCR_EL0.LP == 0)
+> >>> and 64-bit overflows (PMCR_EL0.LP == 1). 64-bit overflows are only
+> >>> supported on PMUv3p5.
+> >>>
+> >>> Note that chained tests do not implement "overflow_at_64bits == true".
+> >>> That's because there are no CHAIN events when "PMCR_EL0.LP == 1" (for more
+> >>> details see AArch64.IncrementEventCounter() pseudocode in the ARM ARM DDI
+> >>> 0487H.a, J1.1.1 "aarch64/debug").
+> >>>
+> >>> Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> >>> ---
+> >>>  arm/pmu.c | 116 +++++++++++++++++++++++++++++++++++-------------------
+> >>>  1 file changed, 75 insertions(+), 41 deletions(-)
+> >>>
+> >>> diff --git a/arm/pmu.c b/arm/pmu.c
+> >>> index 0d06b59..72d0f50 100644
+> >>> --- a/arm/pmu.c
+> >>> +++ b/arm/pmu.c
+> >>> @@ -28,6 +28,7 @@
+> >>>  #define PMU_PMCR_X         (1 << 4)
+> >>>  #define PMU_PMCR_DP        (1 << 5)
+> >>>  #define PMU_PMCR_LC        (1 << 6)
+> >>> +#define PMU_PMCR_LP        (1 << 7)
+> >>>  #define PMU_PMCR_N_SHIFT   11
+> >>>  #define PMU_PMCR_N_MASK    0x1f
+> >>>  #define PMU_PMCR_ID_SHIFT  16
+> >>> @@ -56,9 +57,13 @@
+> >>>
+> >>>  #define ALL_SET                    0x00000000FFFFFFFFULL
+> >>>  #define ALL_CLEAR          0x0000000000000000ULL
+> >>> -#define PRE_OVERFLOW               0x00000000FFFFFFF0ULL
+> >>> +#define PRE_OVERFLOW_32            0x00000000FFFFFFF0ULL
+> >>> +#define PRE_OVERFLOW_64            0xFFFFFFFFFFFFFFF0ULL
+> >>>  #define PRE_OVERFLOW2              0x00000000FFFFFFDCULL
+> >>>
+> >>> +#define PRE_OVERFLOW(__overflow_at_64bits)                         \
+> >>> +   (__overflow_at_64bits ? PRE_OVERFLOW_64 : PRE_OVERFLOW_32)
+> >>> +
+> >>>  #define PMU_PPI                    23
+> >>>
+> >>>  struct pmu {
+> >>> @@ -449,8 +454,10 @@ static bool check_overflow_prerequisites(bool overflow_at_64bits)
+> >>>  static void test_basic_event_count(bool overflow_at_64bits)
+> >>>  {
+> >>>     uint32_t implemented_counter_mask, non_implemented_counter_mask;
+> >>> -   uint32_t counter_mask;
+> >>> +   uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
+> >>> +   uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
+> >>>     uint32_t events[] = {CPU_CYCLES, INST_RETIRED};
+> >>> +   uint32_t counter_mask;
+> >>>
+> >>>     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
+> >>>         !check_overflow_prerequisites(overflow_at_64bits))
+> >>> @@ -472,13 +479,13 @@ static void test_basic_event_count(bool overflow_at_64bits)
+> >>>      * clear cycle and all event counters and allow counter enablement
+> >>>      * through PMCNTENSET. LC is RES1.
+> >>>      */
+> >>> -   set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P);
+> >>> +   set_pmcr(pmu.pmcr_ro | PMU_PMCR_LC | PMU_PMCR_C | PMU_PMCR_P | pmcr_lp);
+> >>>     isb();
+> >>> -   report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC), "pmcr: reset counters");
+> >>> +   report(get_pmcr() == (pmu.pmcr_ro | PMU_PMCR_LC | pmcr_lp), "pmcr: reset counters");
+> >>>
+> >>>     /* Preset counter #0 to pre overflow value to trigger an overflow */
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> -   report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
+> >>> +   write_regn_el0(pmevcntr, 0, pre_overflow);
+> >>> +   report(read_regn_el0(pmevcntr, 0) == pre_overflow,
+> >>>             "counter #0 preset to pre-overflow value");
+> >>>     report(!read_regn_el0(pmevcntr, 1), "counter #1 is 0");
+> >>>
+> >>> @@ -531,6 +538,8 @@ static void test_mem_access(bool overflow_at_64bits)
+> >>>  {
+> >>>     void *addr = malloc(PAGE_SIZE);
+> >>>     uint32_t events[] = {MEM_ACCESS, MEM_ACCESS};
+> >>> +   uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
+> >>> +   uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
+> >>>
+> >>>     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
+> >>>         !check_overflow_prerequisites(overflow_at_64bits))
+> >>> @@ -542,7 +551,7 @@ static void test_mem_access(bool overflow_at_64bits)
+> >>>     write_regn_el0(pmevtyper, 1, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>>     isb();
+> >>> -   mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> >>> +   mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> >>>     report_info("counter #0 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 0));
+> >>>     report_info("counter #1 is %ld (MEM_ACCESS)", read_regn_el0(pmevcntr, 1));
+> >>>     /* We may measure more than 20 mem access depending on the core */
+> >>> @@ -552,11 +561,11 @@ static void test_mem_access(bool overflow_at_64bits)
+> >>>
+> >>>     pmu_reset();
+> >>>
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> -   write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, pre_overflow);
+> >>> +   write_regn_el0(pmevcntr, 1, pre_overflow);
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>>     isb();
+> >>> -   mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E);
+> >>> +   mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> >>>     report(read_sysreg(pmovsclr_el0) == 0x3,
+> >>>            "Ran 20 mem accesses with expected overflows on both counters");
+> >>>     report_info("cnt#0 = %ld cnt#1=%ld overflow=0x%lx",
+> >>> @@ -566,8 +575,10 @@ static void test_mem_access(bool overflow_at_64bits)
+> >>>
+> >>>  static void test_sw_incr(bool overflow_at_64bits)
+> >>>  {
+> >>> +   uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
+> >>> +   uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
+> >>>     uint32_t events[] = {SW_INCR, SW_INCR};
+> >>> -   uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
+> >>> +   uint64_t cntr0 = (pre_overflow + 100) & pmevcntr_mask();
+> >>>     int i;
+> >>>
+> >>>     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)) ||
+> >>> @@ -581,7 +592,7 @@ static void test_sw_incr(bool overflow_at_64bits)
+> >>>     /* enable counters #0 and #1 */
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>>
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, pre_overflow);
+> >>>     isb();
+> >>>
+> >>>     for (i = 0; i < 100; i++)
+> >>> @@ -589,14 +600,14 @@ static void test_sw_incr(bool overflow_at_64bits)
+> >>>
+> >>>     isb();
+> >>>     report_info("SW_INCR counter #0 has value %ld", read_regn_el0(pmevcntr, 0));
+> >>> -   report(read_regn_el0(pmevcntr, 0) == PRE_OVERFLOW,
+> >>> +   report(read_regn_el0(pmevcntr, 0) == pre_overflow,
+> >>>             "PWSYNC does not increment if PMCR.E is unset");
+> >>>
+> >>>     pmu_reset();
+> >>>
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, pre_overflow);
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>> -   set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
+> >>> +   set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> >>>     isb();
+> >>>
+> >>>     for (i = 0; i < 100; i++)
+> >>> @@ -614,6 +625,7 @@ static void test_sw_incr(bool overflow_at_64bits)
+> >>>  static void test_chained_counters(bool unused)
+> >>>  {
+> >>>     uint32_t events[] = {CPU_CYCLES, CHAIN};
+> >>> +   uint64_t all_set = pmevcntr_mask();
+> >> ALL_SET_32 may be enough, as suggested by Reiji;
+> > I think we still want to conditionally use ALL_SET_64 for the
+> > pre-overflow value of the odd counter in the case of PMUv3p5.
+> > More below.
+> Ah OK I initially understood there were no chain events at all with
+> PMUv3p5at. However they do exit if LP=0. Sorry for the noise.
+> >
+> >>>
+> >>>     if (!satisfy_prerequisites(events, ARRAY_SIZE(events)))
+> >>>             return;
+> >>> @@ -624,7 +636,7 @@ static void test_chained_counters(bool unused)
+> >>>     write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
+> >>>     /* enable counters #0 and #1 */
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
+> >>>
+> >>>     precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> >>>
+> >>> @@ -636,26 +648,26 @@ static void test_chained_counters(bool unused)
+> >>>     pmu_reset();
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>>
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
+> >>>     write_regn_el0(pmevcntr, 1, 0x1);
+> >>>     precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> >>>     report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> >>>     report(read_regn_el0(pmevcntr, 1) == 2, "CHAIN counter #1 set to 2");
+> >>>     report(read_sysreg(pmovsclr_el0) == 0x1, "overflow recorded for chained incr #2");
+> > As we want to test the overflow of the chained counter, we need
+> > ALL_SET_64 for its preoverflow value.
+> >
+> >>>
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> -   write_regn_el0(pmevcntr, 1, ALL_SET);
+> >>> +   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
+> >>> +   write_regn_el0(pmevcntr, 1, all_set);
+> >> and here
+> >>>
+> >>>     precise_instrs_loop(22, pmu.pmcr_ro | PMU_PMCR_E);
+> >>>     report_info("overflow reg = 0x%lx", read_sysreg(pmovsclr_el0));
+> >>> -   report(!read_regn_el0(pmevcntr, 1), "CHAIN counter #1 wrapped");
+> >>> +   report(read_regn_el0(pmevcntr, 1) == 0, "CHAIN counter #1 wrapped");
+> >>>     report(read_sysreg(pmovsclr_el0) == 0x3, "overflow on even and odd counters");
+> >>>  }
+> >>>
+> >>>  static void test_chained_sw_incr(bool unused)
+> >>>  {
+> >>>     uint32_t events[] = {SW_INCR, CHAIN};
+> >>> -   uint64_t cntr0 = (PRE_OVERFLOW + 100) & pmevcntr_mask();
+> >>> +   uint64_t cntr0 = (PRE_OVERFLOW_32 + 100) & pmevcntr_mask();
+> >>>     uint64_t cntr1 = (ALL_SET + 1) & pmevcntr_mask();
+> >>>     int i;
+> >> the chained counter changes may be put in a separate patch to help the
+> >> reviewer focus on the new 64b overflow tests.
+> > Got it, will try that for the next version.
+> >
+> >>>
+> >>> @@ -669,7 +681,7 @@ static void test_chained_sw_incr(bool unused)
+> >>>     /* enable counters #0 and #1 */
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>>
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
+> >>>     set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
+> >>>     isb();
+> >>>
+> >>> @@ -687,7 +699,7 @@ static void test_chained_sw_incr(bool unused)
+> >>>     pmu_reset();
+> >>>
+> >>>     write_regn_el0(pmevtyper, 1, events[1] | PMEVTYPER_EXCLUDE_EL0);
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
+> >>>     write_regn_el0(pmevcntr, 1, ALL_SET);
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>>     set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
+> >>> @@ -726,7 +738,7 @@ static void test_chain_promotion(bool unused)
+> >>>
+> >>>     /* Only enable even counter */
+> >>>     pmu_reset();
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW_32);
+> >>>     write_sysreg_s(0x1, PMCNTENSET_EL0);
+> >>>     isb();
+> >>>
+> >>> @@ -856,6 +868,9 @@ static bool expect_interrupts(uint32_t bitmap)
+> >>>
+> >>>  static void test_overflow_interrupt(bool overflow_at_64bits)
+> >>>  {
+> >>> +   uint64_t pre_overflow = PRE_OVERFLOW(overflow_at_64bits);
+> >>> +   uint64_t all_set = pmevcntr_mask();
+> >>> +   uint64_t pmcr_lp = overflow_at_64bits ? PMU_PMCR_LP : 0;
+> >>>     uint32_t events[] = {MEM_ACCESS, SW_INCR};
+> >>>     void *addr = malloc(PAGE_SIZE);
+> >>>     int i;
+> >>> @@ -874,16 +889,16 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+> >>>     write_regn_el0(pmevtyper, 0, MEM_ACCESS | PMEVTYPER_EXCLUDE_EL0);
+> >>>     write_regn_el0(pmevtyper, 1, SW_INCR | PMEVTYPER_EXCLUDE_EL0);
+> >>>     write_sysreg_s(0x3, PMCNTENSET_EL0);
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> -   write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, pre_overflow);
+> >>> +   write_regn_el0(pmevcntr, 1, pre_overflow);
+> >>>     isb();
+> >>>
+> >>>     /* interrupts are disabled (PMINTENSET_EL1 == 0) */
+> >>>
+> >>> -   mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
+> >>> +   mem_access_loop(addr, 20, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> >> I noticed that undocumented change. Is it done on purpose?
+> > Yes, it's intentional. It conditionally sets PMCR.LP for the next
+> > subtest when overflow_at_64bits==true. That's also why the pre-overflow
+> > value is close to ALL_SET_64 (and not ALL_SET_32).
+> I rather meant s/200/20
 
-Thanks,
-drew
+Ooh, yes, that was a mistake. Fixing it in v4.
+
+Thanks!
+
+>
+> Thanks
+>
+> Eric
+> >
+> >>>     report(expect_interrupts(0), "no overflow interrupt after preset");
+> >>>
+> >>> -   set_pmcr(pmu.pmcr_ro | PMU_PMCR_E);
+> >>> +   set_pmcr(pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> >>>     isb();
+> >>>
+> >>>     for (i = 0; i < 100; i++)
+> >>> @@ -898,12 +913,12 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+> >>>
+> >>>     pmu_reset_stats();
+> >>>
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> -   write_regn_el0(pmevcntr, 1, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, pre_overflow);
+> >>> +   write_regn_el0(pmevcntr, 1, pre_overflow);
+> >>>     write_sysreg(ALL_SET, pmintenset_el1);
+> >>>     isb();
+> >>>
+> >>> -   mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
+> >>> +   mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> >>>     for (i = 0; i < 100; i++)
+> >>>             write_sysreg(0x3, pmswinc_el0);
+> >>>
+> >>> @@ -912,25 +927,40 @@ static void test_overflow_interrupt(bool overflow_at_64bits)
+> >>>     report(expect_interrupts(0x3),
+> >>>             "overflow interrupts expected on #0 and #1");
+> >>>
+> >>> -   /* promote to 64-b */
+> >>> +   /*
+> >>> +    * promote to 64-b:
+> >>> +    *
+> >>> +    * This only applies to the !overflow_at_64bits case, as
+> >>> +    * overflow_at_64bits doesn't implement CHAIN events. The
+> >>> +    * overflow_at_64bits case just checks that chained counters are
+> >>> +    * not incremented when PMCR.LP == 1.
+> >>> +    */
+> >>>
+> >>>     pmu_reset_stats();
+> >>>
+> >>>     write_regn_el0(pmevtyper, 1, CHAIN | PMEVTYPER_EXCLUDE_EL0);
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> +   write_regn_el0(pmevcntr, 0, pre_overflow);
+> >>>     isb();
+> >>> -   mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E);
+> >>> -   report(expect_interrupts(0x1),
+> >>> -           "expect overflow interrupt on 32b boundary");
+> >>> +   mem_access_loop(addr, 200, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> >>> +   report(expect_interrupts(0x1), "expect overflow interrupt");
+> >>>
+> >>>     /* overflow on odd counter */
+> >>>     pmu_reset_stats();
+> >>> -   write_regn_el0(pmevcntr, 0, PRE_OVERFLOW);
+> >>> -   write_regn_el0(pmevcntr, 1, ALL_SET);
+> >>> +   write_regn_el0(pmevcntr, 0, pre_overflow);
+> >>> +   write_regn_el0(pmevcntr, 1, all_set);
+> >>>     isb();
+> >>> -   mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E);
+> >>> -   report(expect_interrupts(0x3),
+> >>> -           "expect overflow interrupt on even and odd counter");
+> >>> +   mem_access_loop(addr, 400, pmu.pmcr_ro | PMU_PMCR_E | pmcr_lp);
+> >>> +   if (overflow_at_64bits) {
+> >>> +           report(expect_interrupts(0x1),
+> >>> +                  "expect overflow interrupt on even counter");
+> >>> +           report(read_regn_el0(pmevcntr, 1) == all_set,
+> >>> +                  "Odd counter did not change");
+> >>> +   } else {
+> >>> +           report(expect_interrupts(0x3),
+> >>> +                  "expect overflow interrupt on even and odd counter");
+> >>> +           report(read_regn_el0(pmevcntr, 1) != all_set,
+> >>> +                  "Odd counter wrapped");
+> >>> +   }
+> >>>  }
+> >>>  #endif
+> >>>
+> >>> @@ -1131,10 +1161,13 @@ int main(int argc, char *argv[])
+> >>>             report_prefix_pop();
+> >>>     } else if (strcmp(argv[1], "pmu-basic-event-count") == 0) {
+> >>>             run_test(argv[1], test_basic_event_count, false);
+> >>> +           run_test(argv[1], test_basic_event_count, true);
+> >>>     } else if (strcmp(argv[1], "pmu-mem-access") == 0) {
+> >>>             run_test(argv[1], test_mem_access, false);
+> >>> +           run_test(argv[1], test_mem_access, true);
+> >>>     } else if (strcmp(argv[1], "pmu-sw-incr") == 0) {
+> >>>             run_test(argv[1], test_sw_incr, false);
+> >>> +           run_test(argv[1], test_sw_incr, true);
+> >>>     } else if (strcmp(argv[1], "pmu-chained-counters") == 0) {
+> >>>             run_test(argv[1], test_chained_counters, false);
+> >>>     } else if (strcmp(argv[1], "pmu-chained-sw-incr") == 0) {
+> >>> @@ -1143,6 +1176,7 @@ int main(int argc, char *argv[])
+> >>>             run_test(argv[1], test_chain_promotion, false);
+> >>>     } else if (strcmp(argv[1], "pmu-overflow-interrupt") == 0) {
+> >>>             run_test(argv[1], test_overflow_interrupt, false);
+> >>> +           run_test(argv[1], test_overflow_interrupt, true);
+> >>>     } else {
+> >>>             report_abort("Unknown sub-test '%s'", argv[1]);
+> >>>     }
+> >> Thanks
+> >>
+> >> Eric
+> >>
+>
