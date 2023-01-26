@@ -2,139 +2,117 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E1CD767D748
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 22:07:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4816D67D774
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 22:12:50 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232736AbjAZVHF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 16:07:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39230 "EHLO
+        id S232846AbjAZVMs (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 16:12:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232658AbjAZVHC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 16:07:02 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B15BF6A301
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 13:06:57 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5EB2AB81E0F
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 21:06:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D2F0C4339B;
-        Thu, 26 Jan 2023 21:06:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674767215;
-        bh=Ppta7s+cza1Wa3n4i3Lt9bAtYmobvY+8Fx+wlBv7I7Q=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=GlwzjLANHi+Xj3Y+7+StAUpxHetxmrzs765Gi+9wSHxqiFJ1C2goDeGk6tpUupRd5
-         oyIfcbgkBwstgCcI8h4hXUTso57skhfP5V1QvxQ9ByRUbX86d2ZGDFLTbzD40Ml9sX
-         YNbFdhebW3alSAj0iQ1PEpGCiMQ0vx7BWUgdm/yqGbpjeGv/2s+zmqZoxUYGxG7NiE
-         ZiYDOC+dSifUpoUUuo+cOTXsFzSfwDQaLCurlVzHXI9DXC0v9aWpWif6C3H43ku53y
-         rGr/RLpcTuzhQVO5zHi8mF6qplAe/PErs5z2NlcVdmG7oTTGhvsBM+jlOXWfdQsWJG
-         KORUU+b+sdfyQ==
-Date:   Thu, 26 Jan 2023 21:06:49 +0000
-From:   Conor Dooley <conor@kernel.org>
-To:     Andy Chiu <andy.chiu@sifive.com>
-Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Vincent Chen <vincent.chen@sifive.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>
-Subject: Re: [PATCH -next v13 06/19] riscv: Introduce Vector enable/disable
- helpers
-Message-ID: <Y9LraUk0SZfYWu+O@spud>
-References: <20230125142056.18356-1-andy.chiu@sifive.com>
- <20230125142056.18356-7-andy.chiu@sifive.com>
+        with ESMTP id S231856AbjAZVMn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 16:12:43 -0500
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8319F74F
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 13:12:38 -0800 (PST)
+Received: by mail-il1-x130.google.com with SMTP id i1so1325924ilu.8
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 13:12:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=digitalocean.com; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mQPwRIBKhjb6JhTfp5iOA/66mO6S7MMMqq8824Tk2b0=;
+        b=HNU9PynKvAx2Imqc0jgm2uqETw6F54OUO0SSiTEIJebfso5A4bn9aZ+5oCUUMn25X/
+         V0yHOqUa9bF4IC/tI0Zb/zxgNzutu2sU7/g4sOQf4FfXqwMNszdlOBr42qng17jrigHc
+         e2rNCMsmuW+kgB1D2mg74e9vNEYTG9vqW5aAE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mQPwRIBKhjb6JhTfp5iOA/66mO6S7MMMqq8824Tk2b0=;
+        b=Kdvgu5zSwosZpN2yNjIjPM6FjzazFEgdV14ouPU/ZBkJ/Q8D5lwcANyAjrxbQGrTm0
+         b1VDtSvHrQbo2n6Ap47dYMV7TO2E0VqBdcmuGf6QgbKz74TPx2eGxy3Vz/bhTGPGuOqy
+         /hPjza86xKmvKaNLkzyTvXKOUfyAE7CCKM87FsBZEbNuVC1+mGR498Jf5yR2l8a5iBu6
+         JTZX35bs/EouVvEMimzj+OEU7H9pj/J1Vn9WjFu9YSzsZXk4kh4XCUBzysB+72yYnUr6
+         FTJPX8B03vZKUuOPLzunABEMvy/qX6SmxgfLRR5Mff/BxNtj4l2V13bErf/5CSLxJftT
+         sarw==
+X-Gm-Message-State: AO0yUKX05Z7xeAyCPOexuSLvx6i+0N++YJdAM3I1v36xeL1amrGFP7Ao
+        HEK0Ut0veW3siylbn+jaCnhing==
+X-Google-Smtp-Source: AK7set/T2POVnIBDD3cCjQ6V6AuAcgZrmYFyZYwurwlKmZVmv5S1z9Nv09xWZAyt5AlNpv75YtZurA==
+X-Received: by 2002:a05:6e02:18cb:b0:310:c6d3:f4de with SMTP id s11-20020a056e0218cb00b00310c6d3f4demr19111ilu.22.1674767558124;
+        Thu, 26 Jan 2023 13:12:38 -0800 (PST)
+Received: from localhost ([136.37.131.79])
+        by smtp.gmail.com with ESMTPSA id i21-20020a02c615000000b0039e8f997ad6sm799222jan.32.2023.01.26.13.12.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jan 2023 13:12:36 -0800 (PST)
+Date:   Thu, 26 Jan 2023 15:12:35 -0600
+From:   "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>
+To:     Petr Mladek <pmladek@suse.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <Y9LswwnPAf+nOVFG@do-x1extreme>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <Y9KyVKQk3eH+RRse@alley>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="zndK4lDP+3zPv3BZ"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230125142056.18356-7-andy.chiu@sifive.com>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y9KyVKQk3eH+RRse@alley>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_NONE autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu, Jan 26, 2023 at 06:03:16PM +0100, Petr Mladek wrote:
+> On Fri 2023-01-20 16:12:20, Seth Forshee (DigitalOcean) wrote:
+> > We've fairly regularaly seen liveptches which cannot transition within kpatch's
+> > timeout period due to busy vhost worker kthreads.
+> 
+> I have missed this detail. Miroslav told me that we have solved
+> something similar some time ago, see
+> https://lore.kernel.org/all/20220507174628.2086373-1-song@kernel.org/
 
---zndK4lDP+3zPv3BZ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Interesting thread. I had thought about something along the lines of the
+original patch, but there are some ideas in there that I hadn't
+considered.
 
-Hey Andy,
+> Honestly, kpatch's timeout 1 minute looks incredible low to me. Note
+> that the transition is tried only once per minute. It means that there
+> are "only" 60 attempts.
+> 
+> Just by chance, does it help you to increase the timeout, please?
 
-On Wed, Jan 25, 2023 at 02:20:43PM +0000, Andy Chiu wrote:
-> These are small and likely to be frequently called so implement as
-> inline routines (vs. function call).
->=20
-> Co-developed-by: Guo Ren <guoren@linux.alibaba.com>
-> Signed-off-by: Guo Ren <guoren@linux.alibaba.com>
-> Co-developed-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Vincent Chen <vincent.chen@sifive.com>
-> Signed-off-by: Greentime Hu <greentime.hu@sifive.com>
-> Signed-off-by: Vineet Gupta <vineetg@rivosinc.com>
-> [vineetg: create new patch from meshup, introduced asm variant]
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> [andy.chiu: remove calls from asm thus remove asm vaiant]
+To be honest my test setup reproduces the problem well enough to make
+KLP wait significant time due to vhost threads, but it seldom causes it
+to hit kpatch's timeout.
 
-Again, these chains are odd but a reflection of the series' history I
-guess.
+Our system management software will try to load a patch tens of times in
+a day, and we've seen real-world cases where patches couldn't load
+within kpatch's timeout for multiple days. But I don't have such an
+environment readily accessible for my own testing. I can try to refine
+my test case and see if I can get it to that point.
 
-> ---
->  arch/riscv/include/asm/vector.h | 11 +++++++++++
->  1 file changed, 11 insertions(+)
->=20
-> diff --git a/arch/riscv/include/asm/vector.h b/arch/riscv/include/asm/vec=
-tor.h
-> index 917c8867e702..0fda0faf5277 100644
-> --- a/arch/riscv/include/asm/vector.h
-> +++ b/arch/riscv/include/asm/vector.h
-> @@ -11,12 +11,23 @@
->  #ifdef CONFIG_RISCV_ISA_V
-> =20
->  #include <asm/hwcap.h>
-> +#include <asm/csr.h>
-> =20
->  static __always_inline bool has_vector(void)
->  {
->  	return static_branch_likely(&riscv_isa_ext_keys[RISCV_ISA_EXT_KEY_VECTO=
-R]);
+> This low timeout might be useful for testing. But in practice, it does
+> not matter when the transition is lasting one hour or even longer.
+> It takes much longer time to prepare the livepatch.
 
-This likely will need to drop the static branch due to Jisheng's series.
-See here for what the equivalent change to has_fpu() was:
-https://lore.kernel.org/all/20230115154953.831-1-jszhang@kernel.org/
-Hopefully that series has been queued by the time you are resubmitting
-this one.
-
->  }
-> =20
-> +static __always_inline void rvv_enable(void)
-
-I'm not keen on these function names. IMO, they should be
-riscv_v_{en,dis}able() to match other riscv specific functions, like
-those of zicbom or sbi stuff.
-Other parts of this series use riscv_v_foo & riscv_vfoo. Some of the kvm
-bits spell out vector rather than v. Consistent naming of functions etc
-would be appreciated.
+Agreed. And to be clear, we cope with the fact that patches may take
+hours or even days to get applied in some cases. The patches I sent are
+just about improving the only case I've identified which has lead to
+kpatch failing to load a patch for a day or longer.
 
 Thanks,
-Conor.
-
-
---zndK4lDP+3zPv3BZ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9LraQAKCRB4tDGHoIJi
-0mqsAP9Qo6HEuZtRfJkKXx2t6klPzSPuz6ZQJ/dPp3HjDgcnMQEA1QNZBTWJA/d9
-dhQCa9qj+NiMhnhvwKGzggrdfRX3iAw=
-=Jevm
------END PGP SIGNATURE-----
-
---zndK4lDP+3zPv3BZ--
+Seth
