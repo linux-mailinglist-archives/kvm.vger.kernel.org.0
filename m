@@ -2,89 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1407C67C7F7
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 11:03:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0F9D667C86E
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 11:21:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236573AbjAZKDb (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 05:03:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59712 "EHLO
+        id S237116AbjAZKV4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 05:21:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232925AbjAZKD3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 05:03:29 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0E5D9756
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 02:03:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 6DE6E61781
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 10:03:28 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CB9ACC433A1
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 10:03:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674727407;
-        bh=PNUQAW/iPLRcDtEgHw0YOe0U5YIeAEN0C3VB2SiIL4k=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=oh9vyv+rQuOEwiuF9W6NXC7zgB2BYEXN97FHDeNv0M5cXJoC6kHW48m8ZWM4Rn5KL
-         4kx/vAQQsGP61UTcsBl6/XnL2Ti/ctMCV3p6h5g7tpXALwAweAsHikVjHj+dLFJLgq
-         ovQUvgXsSaIekxktzkvbgWvH+WQRnMie2rVUUJzPhes0TI2OyCvbBDJkPmucZYxtDD
-         Pjh6CWhac6gS9d64Pss7ZtpPZw/bhMueRxzh21kp+otq7IB1tQM49c2WxSh9ANiSwA
-         /dzbrU7uOLKRdxYgdufEUVeGg1V1CGnxmfrKrymikb8hWz30Ad0J0BHlfyDBSjLCWB
-         GXUW8kIr4M1Iw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id B5E54C43165; Thu, 26 Jan 2023 10:03:27 +0000 (UTC)
-From:   bugzilla-daemon@kernel.org
-To:     kvm@vger.kernel.org
-Subject: [Bug 215964] nVMX: KVM(L0) does not perform a platform reboot when
- guest(L2) trigger a reboot event through IO-Port-0xCF9
-Date:   Thu, 26 Jan 2023 10:03:27 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: mail@klee-parthy.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-215964-28872-adJlNyHQsp@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215964-28872@https.bugzilla.kernel.org/>
-References: <bug-215964-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        with ESMTP id S236534AbjAZKVk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 05:21:40 -0500
+Received: from mail-vk1-xa2b.google.com (mail-vk1-xa2b.google.com [IPv6:2607:f8b0:4864:20::a2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23E94AD19
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 02:21:21 -0800 (PST)
+Received: by mail-vk1-xa2b.google.com with SMTP id 22so684868vkn.2
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 02:21:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ddKdS4x8c4ZSI9PbKdla4xMHlbecpUYnHnf7KqPY/v4=;
+        b=QTXITi9RdYJJU4tVDT2koYQ99bqfBUb1IdyvbWh6udyPpM557F+1AF5eZtDG+Rhmfb
+         zXytod/ujQyiC9ACxXH3Gd0x+3JtRvDhhOzUPucsd/32l04SEYn4W67yqVC0Bt/0eizL
+         gHFF20sKTja/4+XCAuXlogZi5PISS6geetImlFze3Gog+rQMa5qXg04rLbsepr7xHGIi
+         JbvpM/QHnqYLhPKZELiOMYn75ACckhZt8GUbiEJFWqDOd58OxlENgOeg7QGIJMEG/Sfn
+         rBwLvEOEeATF+qFMeIwYQdlBYg8cf3dHf/+nZN++vPHoWyr7C46I0tv7igitN+kj2HkW
+         UVbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=to:subject:message-id:date:from:reply-to:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ddKdS4x8c4ZSI9PbKdla4xMHlbecpUYnHnf7KqPY/v4=;
+        b=3H2hz2y4LF3p/yM97qjWuaW9xqVb2g8XPntc0ciaNsbhI1AOjgoU/FjUbTw6+xl3P1
+         gs0Tj/XnosCHcE4s9ANYbhm/8veepOFkXgG24jR7S2dSMAOkAMQyS6GbmNXgPoxB9nIX
+         SH+pdKrQAMtKJypGe8xgfmVyj7XnZpEzKw8wOzNEvzS2c+u3BVJE+jWFG+8o+S/xh4hI
+         uiG9wVSTUdQa5P/ciPbGCGXXXPg6kBDzFdZr6QF6BXdUMlHxs+4QUKqT2j5AarypItW9
+         86nw5SQzkrFOBjzX1M3lXroEVJffHqhNcHTSnVxVyxVdADT5wkJZb5BfKL+MCn1trir3
+         fNkg==
+X-Gm-Message-State: AFqh2kpi+uwAs7jbd0FoJSlUT4r7SPnhf99syh1DOF0CuxznkMlB8G75
+        x+WxCBg2Qk6lwl7o3Moy1UVZnZzu/Kt47KmPiCo=
+X-Google-Smtp-Source: AMrXdXvNJDEYQrB1rSVhf6CXZmgqx4hcIVAD6CGApssZp4wQRjmbLoIBgS8SIhZWVy3DGHm0FXiiuWMMEzkUXrCrRfg=
+X-Received: by 2002:a1f:c403:0:b0:3dd:f6a9:4b73 with SMTP id
+ u3-20020a1fc403000000b003ddf6a94b73mr4374224vkf.12.1674728480250; Thu, 26 Jan
+ 2023 02:21:20 -0800 (PST)
 MIME-Version: 1.0
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Received: by 2002:a05:612c:15a4:b0:37f:9ad6:a2dc with HTTP; Thu, 26 Jan 2023
+ 02:21:19 -0800 (PST)
+Reply-To: subik7633@gmail.com
+From:   Susan Bikram <sb8766198@gmail.com>
+Date:   Thu, 26 Jan 2023 02:21:19 -0800
+Message-ID: <CALhHHampgvNXF+A18GqJ+7yfFMwvjupEs87Rm7XFQx9gSkZogQ@mail.gmail.com>
+Subject: Please can i have your attention
+To:     undisclosed-recipients:;
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=4.9 required=5.0 tests=BAYES_50,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+        FREEMAIL_FROM,FREEMAIL_REPLYTO,FREEMAIL_REPLYTO_END_DIGIT,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,UNDISC_FREEM autolearn=no
+        autolearn_force=no version=3.4.6
+X-Spam-Level: ****
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215964
+Dear ,
 
-mail@klee-parthy.de changed:
+Please can I have your attention and possibly help me for humanity's
+sake please. I am writing this message with a heavy heart filled with
+sorrows and sadness.
+Please if you can respond, i have an issue that i will be most
+grateful if you could help me deal with it please.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |mail@klee-parthy.de
-
---- Comment #7 from mail@klee-parthy.de ---
-This seems similar to what I observed in
-https://gitlab.com/qemu-project/qemu/-/issues/530. The AMD nested commit
-specifically seems to be the culprit in my experiments.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Susan
