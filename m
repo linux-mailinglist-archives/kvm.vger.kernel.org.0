@@ -2,162 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7E4A767CEDF
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 15:51:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D088F67CFAD
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 16:15:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232294AbjAZOvw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 09:51:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57414 "EHLO
+        id S232350AbjAZPPw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 10:15:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232029AbjAZOvt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 09:51:49 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92C7A23862;
-        Thu, 26 Jan 2023 06:51:48 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5798A61842;
-        Thu, 26 Jan 2023 14:51:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3695EC433EF;
-        Thu, 26 Jan 2023 14:51:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674744706;
-        bh=vTtNm5B4uxkFGkyUcD6bt7bUv740cC5zoLQ3n4iCXig=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=r54XDevqCxaIthjhpV90e/3PReNDit6CxkjYziBMldcr+DpwGPcGH7s0yFhPlYu8B
-         NohDoJ7KVIUCX5Zs7V0ydKB7t9XQRchAYOCR8XLnEbVPCZ8e7MIHv0UEcp73VODAq8
-         aFhcsGcrVCc28IZRly/gODnl3cguu4R9trJCc4u2GtQ9ygUwR4IFSGftEKj188geBR
-         3987kGANtDLWA/GzBI6W69E/F450ClXU14kAngo3y+A1wCivQR2InkOef4HeCwIwVj
-         QYEspA95Wv7WS3mfCUr9QMGnsDd2HsZvTUBOWl52ZSZiQBqHvpwy1Yy3PsmXixNWVQ
-         B28KDvwGClVRQ==
-Date:   Thu, 26 Jan 2023 16:50:59 +0200
-From:   Mike Rapoport <rppt@kernel.org>
-To:     Suren Baghdasaryan <surenb@google.com>
-Cc:     akpm@linux-foundation.org, michel@lespinasse.org,
-        jglisse@google.com, mhocko@suse.com, vbabka@suse.cz,
-        hannes@cmpxchg.org, mgorman@techsingularity.net, dave@stgolabs.net,
-        willy@infradead.org, liam.howlett@oracle.com, peterz@infradead.org,
-        ldufour@linux.ibm.com, paulmck@kernel.org, luto@kernel.org,
-        songliubraving@fb.com, peterx@redhat.com, david@redhat.com,
-        dhowells@redhat.com, hughd@google.com, bigeasy@linutronix.de,
-        kent.overstreet@linux.dev, punit.agrawal@bytedance.com,
-        lstoakes@gmail.com, peterjung1337@gmail.com, rientjes@google.com,
-        axelrasmussen@google.com, joelaf@google.com, minchan@google.com,
-        jannh@google.com, shakeelb@google.com, tatashin@google.com,
-        edumazet@google.com, gthelen@google.com, gurua@google.com,
-        arjunroy@google.com, soheil@google.com, hughlynch@google.com,
-        leewalsh@google.com, posk@google.com, will@kernel.org,
-        aneesh.kumar@linux.ibm.com, npiggin@gmail.com,
-        chenhuacai@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, richard@nod.at,
-        anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
-        qianweili@huawei.com, wangzhou1@hisilicon.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
-        airlied@gmail.com, daniel@ffwll.ch,
-        maarten.lankhorst@linux.intel.com, mripard@kernel.org,
-        tzimmermann@suse.de, l.stach@pengutronix.de,
-        krzysztof.kozlowski@linaro.org, patrik.r.jakobsson@gmail.com,
-        matthias.bgg@gmail.com, robdclark@gmail.com,
-        quic_abhinavk@quicinc.com, dmitry.baryshkov@linaro.org,
-        tomba@kernel.org, hjc@rock-chips.com, heiko@sntech.de,
-        ray.huang@amd.com, kraxel@redhat.com, sre@kernel.org,
-        mcoquelin.stm32@gmail.com, alexandre.torgue@foss.st.com,
-        tfiga@chromium.org, m.szyprowski@samsung.com, mchehab@kernel.org,
-        dimitri.sivanich@hpe.com, zhangfei.gao@linaro.org,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        dgilbert@interlog.com, hdegoede@redhat.com, mst@redhat.com,
-        jasowang@redhat.com, alex.williamson@redhat.com, deller@gmx.de,
-        jayalk@intworks.biz, viro@zeniv.linux.org.uk, nico@fluxnic.net,
-        xiang@kernel.org, chao@kernel.org, tytso@mit.edu,
-        adilger.kernel@dilger.ca, miklos@szeredi.hu,
-        mike.kravetz@oracle.com, muchun.song@linux.dev, bhe@redhat.com,
-        andrii@kernel.org, yoshfuji@linux-ipv6.org, dsahern@kernel.org,
-        kuba@kernel.org, pabeni@redhat.com, perex@perex.cz, tiwai@suse.com,
-        haojian.zhuang@gmail.com, robert.jarzmik@free.fr,
-        linux-mm@kvack.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, linux-graphics-maintainer@vmware.com,
-        linux-ia64@vger.kernel.org, linux-arch@vger.kernel.org,
-        loongarch@lists.linux.dev, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-sgx@vger.kernel.org,
-        linux-um@lists.infradead.org, linux-acpi@vger.kernel.org,
-        linux-crypto@vger.kernel.org, nvdimm@lists.linux.dev,
-        dmaengine@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-        dri-devel@lists.freedesktop.org, etnaviv@lists.freedesktop.org,
-        linux-samsung-soc@vger.kernel.org, intel-gfx@lists.freedesktop.org,
-        linux-mediatek@lists.infradead.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org,
-        linux-rockchip@lists.infradead.org, linux-tegra@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
-        linux-accelerators@lists.ozlabs.org, sparclinux@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
-        target-devel@vger.kernel.org, linux-usb@vger.kernel.org,
-        netdev@vger.kernel.org, linux-fbdev@vger.kernel.org,
-        linux-aio@kvack.org, linux-fsdevel@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
-        devel@lists.orangefs.org, kexec@lists.infradead.org,
-        linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, kasan-dev@googlegroups.com,
-        selinux@vger.kernel.org, alsa-devel@alsa-project.org,
-        kernel-team@android.com
-Subject: Re: [PATCH v2 1/6] mm: introduce vma->vm_flags modifier functions
-Message-ID: <Y9KTUw/04FmBVplw@kernel.org>
-References: <20230125083851.27759-1-surenb@google.com>
- <20230125083851.27759-2-surenb@google.com>
- <Y9JFFYjfJf9uDijE@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9JFFYjfJf9uDijE@kernel.org>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S232085AbjAZPPl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 10:15:41 -0500
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1016C460B0;
+        Thu, 26 Jan 2023 07:15:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Subject:Cc:To:From:Date:Message-ID:
+        Sender:Reply-To:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=eLqO1bA1ovJ6Tk3ye++iUoffczzuE9Es9NByP+7cFt8=; b=HfMc4m9Dr3GMuzid7iRyiLIvSz
+        KcWcjJ+vXqxvH6l4bMC0kYM4TLvxE13XKgeiFngLSP/9uC2SCwPcg0yX6vwgoGJNssEBiRhX6b67J
+        s2y50+62if5VJtHpjGNbnlB/vParYaoxFizVfooe0/2eCYroVVPDjeJiqh0oXqc7r910QLWj5uv29
+        epzcJo21rMRwpLOlWQoHp6XaQ//OS128hlgMfSFFOa/9TdMxMDklWWJ1VQVOael72XRin5mgKFJeE
+        r6qDmiz1TuhnJXPRWVYEMnfT49mFKRH0Gplmij47FlLlEIhTfnv+FfdZ8O3J3kDgGqggjpjB/Gouw
+        I2INHJng==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+        id 1pL3xH-002U1e-2W;
+        Thu, 26 Jan 2023 15:14:23 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 26A49300577;
+        Thu, 26 Jan 2023 16:14:53 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 0)
+        id 064C52084C4A7; Thu, 26 Jan 2023 16:14:53 +0100 (CET)
+Message-ID: <20230126150829.087606759@infradead.org>
+User-Agent: quilt/0.66
+Date:   Thu, 26 Jan 2023 16:08:29 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     mingo@kernel.org
+Cc:     will@kernel.org, peterz@infradead.org, boqun.feng@gmail.com,
+        mark.rutland@arm.com, tglx@linutronix.de, mingo@redhat.com,
+        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
+        jgross@suse.com, srivatsa@csail.mit.edu, amakhalov@vmware.com,
+        pv-drivers@vmware.com, wanpengli@tencent.com, vkuznets@redhat.com,
+        boris.ostrovsky@oracle.com, rafael@kernel.org,
+        daniel.lezcano@linaro.org, lpieralisi@kernel.org,
+        frederic@kernel.org, paulmck@kernel.org, rostedt@goodmis.org,
+        mhiramat@kernel.org, longman@redhat.com, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
+        vschneid@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-pm@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: [PATCH v2 0/9] A few more cpuidle vs rcu fixes
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 26, 2023 at 11:17:09AM +0200, Mike Rapoport wrote:
-> On Wed, Jan 25, 2023 at 12:38:46AM -0800, Suren Baghdasaryan wrote:
-> > vm_flags are among VMA attributes which affect decisions like VMA merging
-> > and splitting. Therefore all vm_flags modifications are performed after
-> > taking exclusive mmap_lock to prevent vm_flags updates racing with such
-> > operations. Introduce modifier functions for vm_flags to be used whenever
-> > flags are updated. This way we can better check and control correct
-> > locking behavior during these updates.
-> > 
-> > Signed-off-by: Suren Baghdasaryan <surenb@google.com>
-> > ---
-> >  include/linux/mm.h       | 37 +++++++++++++++++++++++++++++++++++++
-> >  include/linux/mm_types.h |  8 +++++++-
-> >  2 files changed, 44 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/include/linux/mm.h b/include/linux/mm.h
-> > index c2f62bdce134..b71f2809caac 100644
-> > --- a/include/linux/mm.h
-> > +++ b/include/linux/mm.h
-> > @@ -627,6 +627,43 @@ static inline void vma_init(struct vm_area_struct *vma, struct mm_struct *mm)
-> >  	INIT_LIST_HEAD(&vma->anon_vma_chain);
-> >  }
-> >  
-> > +/* Use when VMA is not part of the VMA tree and needs no locking */
-> > +static inline void init_vm_flags(struct vm_area_struct *vma,
-> > +				 unsigned long flags)
-> 
-> I'd suggest to make it vm_flags_init() etc.
+0-day robot reported graph-tracing made the cpuidle-vs-rcu rework go splat.
 
-Thinking more about it, it will be even clearer to name these vma_flags_xyz()
+These patches appear to cure this, the ftrace selftest now runs to completion
+without spamming scary messages to dmesg.
 
-> Except that
-> 
-> Acked-by: Mike Rapoport (IBM) <rppt@kernel.org>
-> 
+Since v1:
 
---
-Sincerely yours,
-Mike.
+ - fixed recursive RCU splats
+ - fixed psci thingies for arm (null)
+ - improved the tracing WARN (rostedt)
+ - fixed TRACE_PREEMPT_TOGGLE (null)
+
+---
+ arch/x86/include/asm/atomic64_32.h | 44 +++++++++++++++++++-------------------
+ arch/x86/include/asm/atomic64_64.h | 36 +++++++++++++++----------------
+ arch/x86/include/asm/kvmclock.h    |  2 +-
+ arch/x86/include/asm/paravirt.h    |  2 +-
+ arch/x86/include/asm/pvclock.h     |  3 ++-
+ arch/x86/kernel/cpu/vmware.c       |  2 +-
+ arch/x86/kernel/kvmclock.c         |  6 +++---
+ arch/x86/kernel/pvclock.c          | 22 +++++++++++++------
+ arch/x86/kernel/tsc.c              |  7 +++---
+ arch/x86/xen/time.c                | 12 +++++++++--
+ drivers/cpuidle/cpuidle.c          |  2 +-
+ drivers/cpuidle/poll_state.c       |  2 --
+ drivers/firmware/psci/psci.c       | 31 ++++++++++++++++-----------
+ include/linux/context_tracking.h   | 27 +++++++++++++++++++++++
+ include/linux/math64.h             |  4 ++--
+ include/linux/sched/clock.h        |  8 +++----
+ include/linux/trace_recursion.h    | 18 ++++++++++++++++
+ kernel/locking/lockdep.c           |  3 +++
+ kernel/panic.c                     |  5 +++++
+ kernel/sched/clock.c               | 27 +++++++++++++++++------
+ kernel/trace/trace_preemptirq.c    |  6 ++----
+ lib/bug.c                          | 15 ++++++++++++-
+ 22 files changed, 192 insertions(+), 92 deletions(-)
+
