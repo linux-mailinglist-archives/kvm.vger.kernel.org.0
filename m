@@ -2,120 +2,222 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 31E8E67D5F6
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 21:09:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73B9B67D5F8
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 21:10:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232743AbjAZUJs (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 15:09:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33490 "EHLO
+        id S232741AbjAZUKX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 15:10:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34070 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232180AbjAZUJq (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 15:09:46 -0500
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43F273EFC6
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 12:09:45 -0800 (PST)
-Received: by mail-yb1-xb34.google.com with SMTP id d8so1499216ybe.9
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 12:09:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=c+NzW40rV7jGj0x8hq/4PfBMwZ32g9LoSmeMFZgGTRU=;
-        b=fsWn5e62pzILYcSqv2gIzK/MnKsPYqo+jDc+OQawlFAtWzuJCKWsXSfiGW0YwBLnoT
-         tRPZiRQfda8O8Tz+B+41M0cZRkGKQw6ZelOvgcxC7p3SBqIR8bUiMJ7WSoKA16De8PeG
-         i4x76JfYQag0QkJ/BAcQcBeeAmOGcnXmVNSKqBbLbesPQwNGRcsYom2efat/63jSoeM8
-         Ph7GgQroUG/jCx6KnRKYa3GgPPKTAlo4CVAgoYbHzRhAsKRbLSw/98cAE61At3od+c5/
-         zuEKDd5WIsusRU8A43+bQP2v5+htd2IT24sGPLH8XV65t0YcBDAWFqmRNBSxxlSOJVFj
-         /Rqw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c+NzW40rV7jGj0x8hq/4PfBMwZ32g9LoSmeMFZgGTRU=;
-        b=6TgQC++DANDbzA2ofu/UVnD82HLsovqJr5V2a4zUQsL/dZxntJvfk/P+83nF7cK7L0
-         pOTDT7BjK9MLsfrSMUlI8vKs/jI4R+x0sGuO7e8lgvspi9O7Z/h6/KxTYmbjYIw/9g5n
-         B3Wa53yIAHDX2MQlsEB/hPHIma44JB6z7MmsJp2hQWnwNk3aUnQEXVKrgtHVy3aaE1oU
-         eyC3pjSPnOcyTTaoxEr9C21DK4rzWFRazkGq9kwQqnYEV3g+XEuO4h8sL9Mj1KS0E15N
-         Ws6b1NavnXHI821T0mRJ21ls3pYyGnPDf+Zbwsx9IAqE4+tXev9+Z2+Js5LSCdbbdNAb
-         Cahg==
-X-Gm-Message-State: AO0yUKW8vAlUmBW9ntS0N8/Me3jBm5KvGwnhgj50uHXuxwwPZ/0/xjZp
-        NQRSIvHS6SNpqNfS7Gu5f7fdm9tteVN8mmOYdtOIAw==
-X-Google-Smtp-Source: AK7set+FHB0NwKdq/VPToS+YGauyrMTcRZHhpSNMnjBTcZvCWfNxUOCj4i7p8uuSLW8x/Ui4U+6TAD1oJem51pNyGVY=
-X-Received: by 2002:a25:d907:0:b0:80b:69f5:3966 with SMTP id
- q7-20020a25d907000000b0080b69f53966mr1391344ybg.519.1674763784142; Thu, 26
- Jan 2023 12:09:44 -0800 (PST)
-MIME-Version: 1.0
-References: <20230125182311.2022303-1-bgardon@google.com>
-In-Reply-To: <20230125182311.2022303-1-bgardon@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Thu, 26 Jan 2023 12:09:08 -0800
-Message-ID: <CAHVum0eKdcsZ-6L0ypqL1CBW+2quyj_dPiqw83b-XMShoRkvig@mail.gmail.com>
-Subject: Re: [PATCH v4 0/2] selftests: KVM: Add a test for eager page splitting
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Ricardo Koller <ricarkol@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+        with ESMTP id S229828AbjAZUKW (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 15:10:22 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BD6C3F297
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 12:10:14 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 40D5D618A9
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 20:10:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83361C433D2;
+        Thu, 26 Jan 2023 20:10:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674763813;
+        bh=uOu5z9Ooi3oSKC53tDihHmURSCVTBzPhl+j9Il0JBSE=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=JdPuNC4kKq31M5Jp36hDlXJ60GqTO2+1RB2Mu3omu1dF5M4b4rAvm4P4QtP5hWWYg
+         RNvTnm207UGdsKewBV4JXmr/bQHLkFYhapcdvCt44QDjHzMArqibI8F4OhOXnsMLV7
+         Sb0RE6jV+RUoI6infzjZW9bdvfVgywmxftVBPNaKv4YxyZrQL06UaCqfavVceChi0N
+         BR/R1yNz6PAVG2eZNI29AZ7QUTHYPC/0bjHoD9k5mAa8TwBA1pMJuZqHT6oPtnpzTV
+         zu2ZzmEVQIoewfD3EY7jqxb3xqr719zeHJvr1cyleAv2UU01uBV5uxjUQq8hv5pXIe
+         +y8bCgoGCueAw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pL8ZX-004wYB-9j;
+        Thu, 26 Jan 2023 20:10:11 +0000
+Date:   Thu, 26 Jan 2023 20:10:10 +0000
+Message-ID: <86v8ktkqfx.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, pbonzini@redhat.com,
+        oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is enabled
+In-Reply-To: <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
+References: <20230113035000.480021-1-ricarkol@google.com>
+        <20230113035000.480021-7-ricarkol@google.com>
+        <Y9BfdgL+JSYCirvm@thinky-boi>
+        <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, oliver.upton@linux.dev, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Jan 25, 2023 at 10:23 AM Ben Gardon <bgardon@google.com> wrote:
->
-> David Matlack recently added a feature known as eager page splitting
-> to x86 KVM. This feature improves vCPU performance during dirty
-> logging because the splitting operation is moved out of the page
-> fault path, avoiding EPT/NPT violations or allowing the vCPU threads
-> to resolve the violation in the fast path.
->
-> While this feature is a great performance improvement, it does not
-> have adequate testing in KVM selftests. Add a test to provide coverage
-> of eager page splitting.
->
-> Patch 1 is a quick refactor to be able to re-use some code from
-> dirty_log_perf_test.
-> Patch 2 adds the actual test.
->
-> V1->V2:
-Links of previous versions of patches are helpful and avoid searching
-if one wants to read previous discussions.
+On Thu, 26 Jan 2023 18:45:43 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
+>=20
+> On Tue, Jan 24, 2023 at 2:45 PM Oliver Upton <oliver.upton@linux.dev> wro=
+te:
+> >
+> > Hi Ricardo,
+> >
+> > On Fri, Jan 13, 2023 at 03:49:57AM +0000, Ricardo Koller wrote:
+> > > Split huge pages eagerly when enabling dirty logging. The goal is to
+> > > avoid doing it while faulting on write-protected pages, which
+> > > negatively impacts guest performance.
+> > >
+> > > A memslot marked for dirty logging is split in 1GB pieces at a time.
+> > > This is in order to release the mmu_lock and give other kernel threads
+> > > the opportunity to run, and also in order to allocate enough pages to
+> > > split a 1GB range worth of huge pages (or a single 1GB huge page).
+> > > Note that these page allocations can fail, so eager page splitting is
+> > > best-effort.  This is not a correctness issue though, as huge pages
+> > > can still be split on write-faults.
+> > >
+> > > The benefits of eager page splitting are the same as in x86, added
+> > > with commit a3fe5dbda0a4 ("KVM: x86/mmu: Split huge pages mapped by
+> > > the TDP MMU when dirty logging is enabled"). For example, when running
+> > > dirty_log_perf_test with 64 virtual CPUs (Ampere Altra), 1GB per vCPU,
+> > > 50% reads, and 2MB HugeTLB memory, the time it takes vCPUs to access
+> > > all of their memory after dirty logging is enabled decreased by 44%
+> > > from 2.58s to 1.42s.
+> > >
+> > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h |  30 ++++++++
+> > >  arch/arm64/kvm/mmu.c              | 110 ++++++++++++++++++++++++++++=
++-
+> > >  2 files changed, 138 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/a=
+sm/kvm_host.h
+> > > index 35a159d131b5..6ab37209b1d1 100644
+> > > --- a/arch/arm64/include/asm/kvm_host.h
+> > > +++ b/arch/arm64/include/asm/kvm_host.h
+> > > @@ -153,6 +153,36 @@ struct kvm_s2_mmu {
+> > >       /* The last vcpu id that ran on each physical CPU */
+> > >       int __percpu *last_vcpu_ran;
+> > >
+> > > +     /*
+> > > +      * Memory cache used to split EAGER_PAGE_SPLIT_CHUNK_SIZE worth=
+ of huge
+> > > +      * pages. It is used to allocate stage2 page tables while split=
+ting
+> > > +      * huge pages. Its capacity should be EAGER_PAGE_SPLIT_CACHE_CA=
+PACITY.
+> > > +      * Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE influenc=
+es both
+> > > +      * the capacity of the split page cache (CACHE_CAPACITY), and h=
+ow often
+> > > +      * KVM reschedules. Be wary of raising CHUNK_SIZE too high.
+> > > +      *
+> > > +      * A good heuristic to pick CHUNK_SIZE is that it should be lar=
+ger than
+> > > +      * all the available huge-page sizes, and be a multiple of all =
+the
+> > > +      * other ones; for example, 1GB when all the available huge-pag=
+e sizes
+> > > +      * are (1GB, 2MB, 32MB, 512MB).
+> > > +      *
+> > > +      * CACHE_CAPACITY should have enough pages to cover CHUNK_SIZE;=
+ for
+> > > +      * example, 1GB requires the following number of PAGE_SIZE-page=
+s:
+> > > +      * - 512 when using 2MB hugepages with 4KB granules (1GB / 2MB).
+> > > +      * - 513 when using 1GB hugepages with 4KB granules (1 + (1GB /=
+ 2MB)).
+> > > +      * - 32 when using 32MB hugepages with 16KB granule (1GB / 32MB=
+).
+> > > +      * - 2 when using 512MB hugepages with 64KB granules (1GB / 512=
+MB).
+> > > +      * CACHE_CAPACITY below assumes the worst case: 1GB hugepages w=
+ith 4KB
+> > > +      * granules.
+> > > +      *
+> > > +      * Protected by kvm->slots_lock.
+> > > +      */
+> > > +#define EAGER_PAGE_SPLIT_CHUNK_SIZE                 SZ_1G
+> > > +#define EAGER_PAGE_SPLIT_CACHE_CAPACITY                             =
+         \
+> > > +     (DIV_ROUND_UP_ULL(EAGER_PAGE_SPLIT_CHUNK_SIZE, SZ_1G) +        =
+ \
+> > > +      DIV_ROUND_UP_ULL(EAGER_PAGE_SPLIT_CHUNK_SIZE, SZ_2M))
+> >
+> > Could you instead make use of the existing KVM_PGTABLE_MIN_BLOCK_LEVEL
+> > as the batch size? 513 pages across all page sizes is a non-negligible
+> > amount of memory that goes largely unused when PAGE_SIZE !=3D 4K.
+> >
+>=20
+> Sounds good, will refine this for v2.
+>=20
+> > With that change it is a lot easier to correctly match the cache
+> > capacity to the selected page size. Additionally, we continue to have a
+> > single set of batching logic that we can improve later on.
+> >
+> > > +     struct kvm_mmu_memory_cache split_page_cache;
+> > > +
+> > >       struct kvm_arch *arch;
+> > >  };
+> > >
+> > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+> > > index 700c5774b50d..41ee330edae3 100644
+> > > --- a/arch/arm64/kvm/mmu.c
+> > > +++ b/arch/arm64/kvm/mmu.c
+> > > @@ -31,14 +31,24 @@ static phys_addr_t hyp_idmap_vector;
+> > >
+> > >  static unsigned long io_map_base;
+> > >
+> > > -static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr=
+_t end)
+> > > +bool __read_mostly eager_page_split =3D true;
+> > > +module_param(eager_page_split, bool, 0644);
+> > > +
+> >
+> > Unless someone is really begging for it I'd prefer we not add a module
+> > parameter for this.
+>=20
+> It was mainly to match x86 and because it makes perf testing a bit
+> simpler. What do others think?
 
->         Run test in multiple modes, as suggested by David and Ricardo
->         Cleanups from shameful copy-pasta, as suggested by David
-> V2->V3:
->         Removed copyright notice from the top of
->         dirty_log_page_splitting.c
->         Adopted ASSERT_EQ for test assertions
->         Now skipping testing with MANUAL_PROTECT if unsupported
-> V3->V4:
->         Added the copyright notices back. Thanks Vipin for the right
->         thing to do there.
->
-> Ben Gardon (2):
->   selftests: KVM: Move dirty logging functions to memstress.(c|h)
->   selftests: KVM: Add dirty logging page splitting test
->
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/dirty_log_perf_test.c       |  84 +-----
->  .../selftests/kvm/include/kvm_util_base.h     |   1 +
->  .../testing/selftests/kvm/include/memstress.h |   8 +
->  tools/testing/selftests/kvm/lib/kvm_util.c    |   5 +
->  tools/testing/selftests/kvm/lib/memstress.c   |  72 +++++
->  .../x86_64/dirty_log_page_splitting_test.c    | 257 ++++++++++++++++++
->  7 files changed, 351 insertions(+), 77 deletions(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/dirty_log_page_splitting_test.c
->
-> --
-> 2.39.1.456.gfc5497dd1b-goog
->
+=46rom my PoV this is a no.
+
+If you have a flag because this is an experimental feature (like NV),
+then this is a kernel option, and you taint the kernel when it is set.
+
+If you have a flag because this is a modal option that makes different
+use of the HW which cannot be exposed to userspace (like GICv4), then
+this also is a kernel option.
+
+This is neither.
+
+The one thing that would convince me to make it an option is the
+amount of memory this thing consumes. 512+ pages is a huge amount, and
+I'm not overly happy about that. Why can't this be a userspace visible
+option, selectable on a per VM (or memslot) basis?
+
+Thanks,
+
+	M.
+
+--=20
+Without deviation from the norm, progress is not possible.
