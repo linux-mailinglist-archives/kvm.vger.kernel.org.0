@@ -2,68 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B759567D5AD
-	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 20:50:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC4EB67D5E7
+	for <lists+kvm@lfdr.de>; Thu, 26 Jan 2023 21:06:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232680AbjAZTun (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 14:50:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49904 "EHLO
+        id S232663AbjAZUGu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 15:06:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232660AbjAZTuk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 14:50:40 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 695F13C38
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 11:50:35 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id z13so2830039plg.6
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 11:50:35 -0800 (PST)
+        with ESMTP id S230230AbjAZUGs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 15:06:48 -0500
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76C444C12
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 12:06:47 -0800 (PST)
+Received: by mail-yb1-xb2d.google.com with SMTP id d132so3443271ybb.5
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 12:06:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UUvKx9totPqnePNsm+o+Df+E2nVvcP4SPqdwJ4LAruE=;
-        b=tYTM15unzWTtR1t8u6g5HH2QlrZI0TTC+UkGRb9L0pzB9YB5zIuQAXELhRJb33FobU
-         l4B+JbY+OFzkKkNvgBzbGsQZoYFUzFYTpuxXidKXwy2vtn/zrOle+j+RKzXn5HTdkpHO
-         vaSe+rPLbmYqeQ8FEU5yMNUeOPcuTxnxLWhy4habFZZQ5WNUY2XZs5RCMLJKtdKFUjTu
-         coU2pjHC2aeawT1pfZciaSH8lnyLTRALYqri5d5E8iwmz4pQh5ulWbmwWOKDOtqmC8KU
-         ikFs9qZCQvA5vxIKGFkERXkeJFcIp+S0ey0s/bH0QFQ67gxsPmRMH9U+1X6nSgK2hRAN
-         ONJw==
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kjtLi/8WKn2oW5QyDUOhA67hgly+UmbkPzhgpNv8AMU=;
+        b=oH3bXQN+JoJrVUu+Bz51byhgL8DsonLwrvM3zDrglgjuerp6zGBifzPPKrO554Mgzd
+         pc/nBHlOhF3mzB3iCssigSAh234VYPnccD4sFe5zf65HSpjX9uTG+SjVMHsBWLDHbEPJ
+         88GjLBRCtx+6g5g3Uhg0EoLU2sLieJ1QyUCSnbInSf1ydeItkvirLZIf+dwIz7A5WF7z
+         bFvFt6r315QxZFoH11EK/oo0z8VFmRtNj3LhECRcQpu3V2blKJGOTorbknjZ0AA5UB8S
+         wMAgmR5jzmCfdH824v6Vy8MsfEMckIIylbhZV2gsgYfRaVmubSZm9OPymf9ZEWNgy8MC
+         4sCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UUvKx9totPqnePNsm+o+Df+E2nVvcP4SPqdwJ4LAruE=;
-        b=y79/uhJYt9m7p656G7welj9wb/URCooZiDfYo6MoVkS2Y3rXXSSF754y24qIg5tHGC
-         ufF0w4edkeljTSRpoUSBqpnNrjeATbzphXgLMMpiZt/vdUWPALvfI/iJV2yk8foG4Wg6
-         thjpwNnF0W359szCD37otLu9zqozrRRO/zpvin82AMR6A8U+6PCZ8ZIZx5YKMAqMfvjX
-         zY9HFQC28d5ZgnOpR0AbANb9T6As8tncmLMDRAdIpqCVUINI0uoMOI1k0k+V9gVNVm3/
-         q/tsslcb9SOB9mEKFZYOC/v5vK/d2GKAJ9A02zXbsPbxGcEdyo5cOShNxnLL3c4V5jCN
-         nOIA==
-X-Gm-Message-State: AO0yUKVw4LjOa/rz6I4IpI/M0hFqy1XY3qBwPKrg9GI5HICabwwWGnjI
-        +PKeW10ydvk+O4XWPwgRJmc0tw==
-X-Google-Smtp-Source: AK7set8AiFhu+LCC9WPRp5yN14IXny544EmZy5V3SkTTa3S5ynSEQGbZky6lxKfZnc0VWSdyNv9xJw==
-X-Received: by 2002:a05:6a20:4c08:b0:a4:efde:2ed8 with SMTP id fm8-20020a056a204c0800b000a4efde2ed8mr1164132pzb.0.1674762634726;
-        Thu, 26 Jan 2023 11:50:34 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id w5-20020a170902d3c500b00194bf8cef44sm1339566plb.117.2023.01.26.11.50.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 11:50:34 -0800 (PST)
-Date:   Thu, 26 Jan 2023 19:50:30 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, like.xu.linux@gmail.com,
-        kan.liang@linux.intel.com, wei.w.wang@intel.com,
-        Zhang Yi Z <yi.z.zhang@linux.intel.com>
-Subject: Re: [PATCH v2 03/15] KVM: x86: Refresh CPUID on writes to
- MSR_IA32_XSS
-Message-ID: <Y9LZhsqxRjMjbK3s@google.com>
-References: <20221125040604.5051-1-weijiang.yang@intel.com>
- <20221125040604.5051-4-weijiang.yang@intel.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kjtLi/8WKn2oW5QyDUOhA67hgly+UmbkPzhgpNv8AMU=;
+        b=Z1CuGi3dAIGH2qJGy/PZu3Sq7yMKE7shSkFzpeKxac9zxu9vLNKOkQjUgVvnd+up/0
+         o4VW4ipoLuNHftF77JqDuC73JwKBvQWxEwk+Sc7OOjTIEyskbf7YcFpEJDUn6aXD0R1/
+         WXg6ybu0DpIpm4oDkwkF4dgA1uoh662c64nSYLf4FsPMk0AnIP7uGPotkNpyDcF0+1hm
+         KseiKPMB4FoHZ2WD5utrI1eGzVEy6vOBu+tOj5XG1t9IHNz6gMQ9G4Aa58TvKz8WM8WL
+         u6/A2j9NzidLAUh1YxRd7/rUg7DeUPtjY0cJ1U9q620haonAYgFlTqKb0gwVb+sINiyG
+         u9pw==
+X-Gm-Message-State: AFqh2krJXXPY9inPUVy6AW58fozmwVAzuoh4oZuxGTDPxnxOY9+8fmam
+        ik11qAPbuJv5SOVYrt6xuXgXjHb48gPIBIrk4EHUl71vLN1HMNxj
+X-Google-Smtp-Source: AMrXdXvulrX9qsSyygd1hulQLBBseHXK9nztfSRV2xngfTj5Kv9OdDT4Le8mrK95TeaxnpS6iQKCwUMin1YiuVJUDIg=
+X-Received: by 2002:a25:6a0b:0:b0:7d1:5a92:eb5c with SMTP id
+ f11-20020a256a0b000000b007d15a92eb5cmr4400549ybc.166.1674763606261; Thu, 26
+ Jan 2023 12:06:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221125040604.5051-4-weijiang.yang@intel.com>
+References: <20230125182311.2022303-1-bgardon@google.com> <20230125182311.2022303-3-bgardon@google.com>
+In-Reply-To: <20230125182311.2022303-3-bgardon@google.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Thu, 26 Jan 2023 12:06:10 -0800
+Message-ID: <CAHVum0ex4=X_iD_hKMQAkNVEcVzZSNUb_V0ApjPKxpCX+oFV6w@mail.gmail.com>
+Subject: Re: [PATCH v4 2/2] selftests: KVM: Add dirty logging page splitting test
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        David Matlack <dmatlack@google.com>,
+        Ricardo Koller <ricarkol@google.com>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -75,70 +71,47 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 24, 2022, Yang Weijiang wrote:
-> Updated CPUID.0xD.0x1, which reports the current required storage size
-> of all features enabled via XCR0 | XSS, when the guest's XSS is modified.
-> 
-> Note, KVM does not yet support any XSS based features, i.e. supported_xss
-> is guaranteed to be zero at this time.
-> 
-> Co-developed-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Zhang Yi Z <yi.z.zhang@linux.intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/kvm/cpuid.c | 16 +++++++++++++---
->  arch/x86/kvm/x86.c   |  6 ++++--
->  2 files changed, 17 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index 6b5912578edd..85e3df6217af 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -272,9 +272,19 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
->  		best->ebx = xstate_required_size(vcpu->arch.xcr0, false);
->  
->  	best = cpuid_entry2_find(entries, nent, 0xD, 1);
-> -	if (best && (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
-> -		     cpuid_entry_has(best, X86_FEATURE_XSAVEC)))
-> -		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
-> +	if (best) {
-> +		if (cpuid_entry_has(best, X86_FEATURE_XSAVES) ||
-> +		    cpuid_entry_has(best, X86_FEATURE_XSAVEC))  {
-> +			u64 xstate = vcpu->arch.xcr0 | vcpu->arch.ia32_xss;
-> +
-> +			best->ebx = xstate_required_size(xstate, true);
-> +		}
-> +
-> +		if (!cpuid_entry_has(best, X86_FEATURE_XSAVES)) {
-> +			best->ecx = 0;
-> +			best->edx = 0;
+On Wed, Jan 25, 2023 at 10:23 AM Ben Gardon <bgardon@google.com> wrote:
 
-ECX and EDX should be left alone, it is userspace's responsibility to provide a
-sane CPUID model.  E.g. KVM doesn't clear EBX or EDX in CPUID.0xD.0x1 when XSAVE
-is unsupported.
+> +static void run_vcpus_get_page_stats(struct kvm_vm *vm, struct kvm_page_stats *stats, const char *stage)
+> +{
+> +       int i;
+> +
+> +       iteration++;
+> +       for (i = 0; i < VCPUS; i++) {
+> +               while (READ_ONCE(vcpu_last_completed_iteration[i]) !=
+> +                      iteration)
+> +                       ;
+> +       }
+> +
+> +       get_page_stats(vm, stats, stage);
 
-> +		}
-> +	}
->  
->  	best = __kvm_find_kvm_cpuid_features(vcpu, entries, nent);
->  	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 16726b44061b..888a153e32bc 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -3685,8 +3685,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  		 */
->  		if (data & ~kvm_caps.supported_xss)
->  			return 1;
-> -		vcpu->arch.ia32_xss = data;
-> -		kvm_update_cpuid_runtime(vcpu);
-> +		if (vcpu->arch.ia32_xss != data) {
-> +			vcpu->arch.ia32_xss = data;
-> +			kvm_update_cpuid_runtime(vcpu);
-> +		}
->  		break;
->  	case MSR_SMI_COUNT:
->  		if (!msr_info->host_initiated)
-> -- 
-> 2.27.0
-> 
+get_page_stats() is already called in run_test() explicitly for other
+stats. I think it's better to split this function and make the flow
+like:
+
+run_vcpus_till_iteration(iteration++);
+get_page_stats(vm, &stats_populated, "populating memory");
+
+This makes it easy to follow run_test_till_iteration() and easy to see
+where stats are collected. run_test_till_iteration() can also be a
+library function used by other tests like dirty_log_perf_test
+
+
+> +       dirty_log_manual_caps = 0;
+> +       for_each_guest_mode(run_test, NULL);
+> +
+> +       dirty_log_manual_caps =
+> +               kvm_check_cap(KVM_CAP_MANUAL_DIRTY_LOG_PROTECT2);
+> +
+> +       if (dirty_log_manual_caps) {
+> +               dirty_log_manual_caps &= (KVM_DIRTY_LOG_MANUAL_PROTECT_ENABLE |
+> +                                         KVM_DIRTY_LOG_INITIALLY_SET);
+> +               for_each_guest_mode(run_test, NULL);
+> +       }
+
+Should there be a message to show  that this capability is not tested
+as it is not available?
+Or, there can be a command line option to explicitly provide intent of
+testing combined,  split modes, or both? Then test can error out
+accordingly.
