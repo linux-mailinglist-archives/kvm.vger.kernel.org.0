@@ -2,59 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E6FC967DA88
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 01:16:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6327B67DC05
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 03:00:54 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231939AbjA0AQA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 19:16:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51290 "EHLO
+        id S233367AbjA0CAu (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 21:00:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231531AbjA0AP5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 19:15:57 -0500
-Received: from mail-vs1-xe2a.google.com (mail-vs1-xe2a.google.com [IPv6:2607:f8b0:4864:20::e2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 958C76C126
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 16:15:22 -0800 (PST)
-Received: by mail-vs1-xe2a.google.com with SMTP id k4so3738424vsc.4
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 16:15:22 -0800 (PST)
+        with ESMTP id S233771AbjA0B7u (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 20:59:50 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D39420D01
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 17:54:46 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id jl3so3587195plb.8
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 17:54:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QjeHhACl8gnIS4cmcvzy1UcNTbu80hG/eXrpn1xCMvY=;
-        b=pz7k21q+eoVbdLB/KOGFdbVo0S75UR2AiRZhExahr91vXX4JB8Kai5pp0+zLhwm1tR
-         HAbyi0mTdWrta+50nwzdTsyLe19F0UFHIyxkoZImiCy2Yad4f5BhvlPTanir+f59Odxj
-         jpIzXUXs5Kh/llv8MEo25DmxudF61ctx7nW1MMOgTDiP1TszPCKpx/3lLrRw8n1FgvwP
-         ybAbVwkcP4sprkey9Tp996iqPfzoMATFIpkdW7O2/gSRp1Hg7zx8c/aLuoWphFVl2SdT
-         fRUi87ZOmgchrxUj+7xrwSwJo2o+8YizQ7+M9SPVH54jdtsVm0uwvU+hhW5pUseBD9eu
-         36Sw==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FVG3vcUNPuoauz0kQenibTVS8tEh32mHDh/BHGYm35Y=;
+        b=REC6/SFdfstwPIQoNNlCe9zuXnwMpGW0RN3HSf1+wbzY0tdAqgA9C+YqlDiSRlJk4Z
+         39fGpvhtKfanXE5VS8pFPQOV6kuY74S9ZaYkO+An7XxNyKaGvOdqRVeYa3cc9A2X5N9n
+         zyHJcXqi14Nmqy9tp+58sQvzG9dJMY2SymT0LivicpBBn2HOpSBfgVmdXNdDXrLidnKP
+         hn6vAQoQuZtTIvXdQGIMgWpAyhOwfvbBseIL87bwexpEQCBNjk8XEQ41dtwM7UZlp2z5
+         cPVZjHyc3GSBxQ8QlsFLhklKncC5XFF0V6EBq85wLYW7HGNh9NQgn+b3HZuGPyvO3+mu
+         eKRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QjeHhACl8gnIS4cmcvzy1UcNTbu80hG/eXrpn1xCMvY=;
-        b=uKXqovG8SLmCmkSN5H5qXF9qn/suVinsvxj+mT5Qqer+rtdPXIHa62sLTpFvMlqDuq
-         pCLN7mnqK9KDgqMAKSQKDqmAax11g5/kTocYqeyWoUIeIXH9eh2Yte4g/vn6TkFyT1rf
-         ucgYy9A1n3Kd1D/cZ33bZrYjpBj1WIdUU1K5HE3XGKsHlzK1JvM+aLTDyEIuVKNadQpU
-         tmv9QTgguzTJerg4kTb2Jr7cH3fiw0/HGyBpozuucrHyJStVHlM+oR7AYBzjfFFBnNTQ
-         RI+pnJdLCwC4vXWRaVLJPytY431VxtHBe382HTVjVHU46A+7b7zzx0SJAgXARYgRcK8n
-         clYw==
-X-Gm-Message-State: AFqh2kqld59jPDqPbHcwZpXTJ0vjfhZ2Jgby5851R4InhWRG4QFQUwsJ
-        Qzy01cOFEXfRwfadO30UReueNavWgvHgOZNofCLKkKSzAHnc34CO
-X-Google-Smtp-Source: AMrXdXuqZ1Jh6mZlyLbFkX/dM4JRRvAtX1YB6jX74MnLmQWTS8Bx7U7BHD40c2kaVy2lFNh0D1QB/AluFR6znHuhy5E=
-X-Received: by 2002:a67:66c2:0:b0:3ce:ce8c:4175 with SMTP id
- a185-20020a6766c2000000b003cece8c4175mr4726661vsc.48.1674778497531; Thu, 26
- Jan 2023 16:14:57 -0800 (PST)
-MIME-Version: 1.0
-References: <20230126210401.2862537-1-dmatlack@google.com> <Y9MA0+Q/rO5Voa0D@google.com>
-In-Reply-To: <Y9MA0+Q/rO5Voa0D@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Thu, 26 Jan 2023 16:14:31 -0800
-Message-ID: <CALzav=dXWkX7aFga=T9fk1auXcArECLXMOEotWnGODeGVL44iQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Replace tdp_mmu_page with a bit in the role
-To:     Sean Christopherson <seanjc@google.com>
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FVG3vcUNPuoauz0kQenibTVS8tEh32mHDh/BHGYm35Y=;
+        b=k5qgCf4Zpd+SyyiCxk7n8RLlAF4W7NxIB5EHgVbdYmMBQOqIhm2wJNkCcETfZ3EIKb
+         0gEiWRdhiWXdrLQLLf/ZrxkFcFCl+bktrT6zNHqFj5l3GYNM6ckpEo5cJmoAUHdO2Icy
+         GoLK6qjpH0Onx5wlbLs/vfm8zGKHG7pYHAXQgnUaRjjNJ2qAA2q1muJdRLkMYAoVODkc
+         m/Mexf6BdQtriKMqOC+ASVxngx3ShCObyZmmNIhFHxur/AXxQtVai83EjJ7rO0LVWvzk
+         /C7bP9S6R59/FlhRYoEglJrPMeBy/lYzSszcGSNaRRzU1FIiZcEmayeOqX7BcD6XSc74
+         h7jA==
+X-Gm-Message-State: AO0yUKXausjHrLO4jU4XIeOFvntjTXWif/IOBX1kVDUCNDrhJ1t3qMXd
+        +Cb4svQcM/3cqjQ7v1XU0FPrsmVNzucw+fpDe2Y=
+X-Google-Smtp-Source: AK7set88GHGvcNPhPkrAwGoIKwM+9AaXp2qlR9nsgSF2ertjsvvggvYD2qLb7IbyHXN5DPsY44AJiw==
+X-Received: by 2002:a05:6a20:9d90:b0:b8:e33c:f160 with SMTP id mu16-20020a056a209d9000b000b8e33cf160mr1565325pzb.0.1674784408722;
+        Thu, 26 Jan 2023 17:53:28 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id g5-20020a1709026b4500b0018b025d9a40sm1588184plt.256.2023.01.26.17.53.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Jan 2023 17:53:28 -0800 (PST)
+Date:   Fri, 27 Jan 2023 01:53:25 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     David Matlack <dmatlack@google.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH] KVM: x86/mmu: Replace tdp_mmu_page with a bit in the role
+Message-ID: <Y9MulRF8QXEiGIog@google.com>
+References: <20230126210401.2862537-1-dmatlack@google.com>
+ <Y9MA0+Q/rO5Voa0D@google.com>
+ <CALzav=dXWkX7aFga=T9fk1auXcArECLXMOEotWnGODeGVL44iQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALzav=dXWkX7aFga=T9fk1auXcArECLXMOEotWnGODeGVL44iQ@mail.gmail.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -66,49 +72,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 26, 2023 at 2:38 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Thu, Jan 26, 2023, David Matlack wrote:
-> > Replace sp->tdp_mmu_page with a bit in the page role. This reduces the
-> > size of struct kvm_mmu_page by a byte.
->
-> No it doesn't.  I purposely squeezed the flag into an open byte in commit
->
->   ca41c34cab1f ("KVM: x86/mmu: Relocate kvm_mmu_page.tdp_mmu_page for better cache locality")
->
-> I double checked just to make sure: the size is 184 bytes before and after.
-
-My mistake, thanks for pointing it out.
-
->
-> I'm not opposed to this change, but I also don't see the point.  The common code
-> ends up with an arch hook in the appropriate place anyways[*], and I think we'll
-> want to pay careful attention to the cache locality of the struct as whole, e.g.
-> naively dumping the arch crud at the end of the common kvm_mmu_page structure may
-> impact performance, especially for shadow paging.
->
-> And just drop the WARN_ON() sanity check in kvm_tdp_mmu_put_root() .
->
-> Hmm, actually, if we invert the order for the shadow MMU, e.g. embed "struct
-> kvm_mmu_page" in a "struct kvm_shadow_mmu_page" or whatever, then the size of
-> TDP MMU pages should shrink substantially.
->
-> So my vote is to hold off for now and take a closer look at this in the common
-> MMU series proper.
-
-Sounds good to me.
-
->
-> [*] https://lore.kernel.org/all/20221208193857.4090582-20-dmatlack@google.com
->
-> > Note that in tdp_mmu_init_sp() there is no need to explicitly set
-> > sp->role.tdp_mmu=1 for every SP since the role is already copied to all
-> > child SPs.
+On Thu, Jan 26, 2023, David Matlack wrote:
+> On Thu, Jan 26, 2023 at 2:38 PM Sean Christopherson <seanjc@google.com> wrote:
 > >
-> > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > Link: https://lore.kernel.org/kvm/b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com/
->
-> Drop the trailing slash, otherwise directly clicking the link goes sideways.
+> > On Thu, Jan 26, 2023, David Matlack wrote:
+> > > Link: https://lore.kernel.org/kvm/b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com/
+> >
+> > Drop the trailing slash, otherwise directly clicking the link goes sideways.
+> 
+> I don't have any problem clicking this link, but I can try to omit the
+> trailing slash in the future.
 
-I don't have any problem clicking this link, but I can try to omit the
-trailing slash in the future.
+Ha!  Figured out what happens.  Gmail gets confused and thinks the forward slash
+indiciates a continuation, e.g. the original mail sends me to:
+
+  https://lore.kernel.org/kvm/b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com/Signed-off-by
+
+I bet the above now works because there's whitespace. For giggles....
+
+https://lore.kernel.org/kvm/b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com/
+will_it_blend
