@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A59AC67E51E
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 13:27:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 826E567E520
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 13:27:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231971AbjA0M1e (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 07:27:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59644 "EHLO
+        id S233618AbjA0M1g (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 07:27:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233793AbjA0M1W (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S233804AbjA0M1W (ORCPT <rfc822;kvm@vger.kernel.org>);
         Fri, 27 Jan 2023 07:27:22 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E1E257DBC9;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9AE47DBC3;
         Fri, 27 Jan 2023 04:26:02 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5F65B1682;
-        Fri, 27 Jan 2023 03:30:48 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1BB72F;
+        Fri, 27 Jan 2023 03:30:50 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.16])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2170A3F64C;
-        Fri, 27 Jan 2023 03:30:04 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AE3BF3F64C;
+        Fri, 27 Jan 2023 03:30:06 -0800 (PST)
 From:   Steven Price <steven.price@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc:     Steven Price <steven.price@arm.com>,
@@ -34,9 +34,9 @@ Cc:     Steven Price <steven.price@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Christoffer Dall <christoffer.dall@arm.com>,
         Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
-Subject: [RFC PATCH 09/28] arm64: RME: RTT handling
-Date:   Fri, 27 Jan 2023 11:29:13 +0000
-Message-Id: <20230127112932.38045-10-steven.price@arm.com>
+Subject: [RFC PATCH 10/28] arm64: RME: Allocate/free RECs to match vCPUs
+Date:   Fri, 27 Jan 2023 11:29:14 +0000
+Message-Id: <20230127112932.38045-11-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127112932.38045-1-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -51,229 +51,286 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The RMM owns the stage 2 page tables for a realm, and KVM must request
-that the RMM creates/destroys entries as necessary. The physical pages
-to store the page tables are delegated to the realm as required, and can
-be undelegated when no longer used.
+The RMM maintains a data structure known as the Realm Execution Context
+(or REC). It is similar to struct kvm_vcpu and tracks the state of the
+virtual CPUs. KVM must delegate memory and request the structures are
+created when vCPUs are created, and suitably tear down on destruction.
 
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/include/asm/kvm_rme.h |  19 +++++
- arch/arm64/kvm/mmu.c             |   7 +-
- arch/arm64/kvm/rme.c             | 139 +++++++++++++++++++++++++++++++
- 3 files changed, 162 insertions(+), 3 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h |   2 +
+ arch/arm64/include/asm/kvm_host.h    |   3 +
+ arch/arm64/include/asm/kvm_rme.h     |  10 ++
+ arch/arm64/kvm/arm.c                 |   1 +
+ arch/arm64/kvm/reset.c               |  11 ++
+ arch/arm64/kvm/rme.c                 | 144 +++++++++++++++++++++++++++
+ 6 files changed, 171 insertions(+)
 
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5a2b7229e83f..285e62914ca4 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -504,6 +504,8 @@ static inline enum realm_state kvm_realm_state(struct kvm *kvm)
+ 
+ static inline bool vcpu_is_rec(struct kvm_vcpu *vcpu)
+ {
++	if (static_branch_unlikely(&kvm_rme_is_available))
++		return vcpu->arch.rec.mpidr != INVALID_HWID;
+ 	return false;
+ }
+ 
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 04347c3a8c6b..ef497b718cdb 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -505,6 +505,9 @@ struct kvm_vcpu_arch {
+ 		u64 last_steal;
+ 		gpa_t base;
+ 	} steal;
++
++	/* Realm meta data */
++	struct rec rec;
+ };
+ 
+ /*
 diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
-index a6318af3ed11..eea5118dfa8a 100644
+index eea5118dfa8a..4b219ebe1400 100644
 --- a/arch/arm64/include/asm/kvm_rme.h
 +++ b/arch/arm64/include/asm/kvm_rme.h
-@@ -35,5 +35,24 @@ u32 kvm_realm_ipa_limit(void);
- int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+@@ -6,6 +6,7 @@
+ #ifndef __ASM_KVM_RME_H
+ #define __ASM_KVM_RME_H
+ 
++#include <asm/rmi_smc.h>
+ #include <uapi/linux/kvm.h>
+ 
+ enum realm_state {
+@@ -29,6 +30,13 @@ struct realm {
+ 	unsigned int ia_bits;
+ };
+ 
++struct rec {
++	unsigned long mpidr;
++	void *rec_page;
++	struct page *aux_pages[REC_PARAMS_AUX_GRANULES];
++	struct rec_run *run;
++};
++
+ int kvm_init_rme(void);
+ u32 kvm_realm_ipa_limit(void);
+ 
+@@ -36,6 +44,8 @@ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
  int kvm_init_realm_vm(struct kvm *kvm);
  void kvm_destroy_realm(struct kvm *kvm);
-+void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
-+
-+#define RME_RTT_BLOCK_LEVEL	2
-+#define RME_RTT_MAX_LEVEL	3
-+
-+#define RME_PAGE_SHIFT		12
-+#define RME_PAGE_SIZE		BIT(RME_PAGE_SHIFT)
-+/* See ARM64_HW_PGTABLE_LEVEL_SHIFT() */
-+#define RME_RTT_LEVEL_SHIFT(l)	\
-+	((RME_PAGE_SHIFT - 3) * (4 - (l)) + 3)
-+#define RME_L2_BLOCK_SIZE	BIT(RME_RTT_LEVEL_SHIFT(2))
-+
-+static inline unsigned long rme_rtt_level_mapsize(int level)
-+{
-+	if (WARN_ON(level > RME_RTT_MAX_LEVEL))
-+		return RME_PAGE_SIZE;
-+
-+	return (1UL << RME_RTT_LEVEL_SHIFT(level));
-+}
+ void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level);
++int kvm_create_rec(struct kvm_vcpu *vcpu);
++void kvm_destroy_rec(struct kvm_vcpu *vcpu);
  
- #endif
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index 22c00274884a..f29558c5dcbc 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -834,16 +834,17 @@ void stage2_unmap_vm(struct kvm *kvm)
- void kvm_free_stage2_pgd(struct kvm_s2_mmu *mmu)
- {
- 	struct kvm *kvm = kvm_s2_mmu_to_kvm(mmu);
--	struct kvm_pgtable *pgt = NULL;
-+	struct kvm_pgtable *pgt;
+ #define RME_RTT_BLOCK_LEVEL	2
+ #define RME_RTT_MAX_LEVEL	3
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index badd775547b8..52affed2f3cf 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -373,6 +373,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+ 	/* Force users to call KVM_ARM_VCPU_INIT */
+ 	vcpu->arch.target = -1;
+ 	bitmap_zero(vcpu->arch.features, KVM_VCPU_MAX_FEATURES);
++	vcpu->arch.rec.mpidr = INVALID_HWID;
  
- 	write_lock(&kvm->mmu_lock);
-+	pgt = mmu->pgt;
- 	if (kvm_is_realm(kvm) &&
- 	    kvm_realm_state(kvm) != REALM_STATE_DYING) {
--		/* TODO: teardown rtts */
- 		write_unlock(&kvm->mmu_lock);
-+		kvm_realm_destroy_rtts(&kvm->arch.realm, pgt->ia_bits,
-+				       pgt->start_level);
- 		return;
+ 	vcpu->arch.mmu_page_cache.gfp_zero = __GFP_ZERO;
+ 
+diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+index 9e71d69e051f..0c84392a4bf2 100644
+--- a/arch/arm64/kvm/reset.c
++++ b/arch/arm64/kvm/reset.c
+@@ -135,6 +135,11 @@ int kvm_arm_vcpu_finalize(struct kvm_vcpu *vcpu, int feature)
+ 			return -EPERM;
+ 
+ 		return kvm_vcpu_finalize_sve(vcpu);
++	case KVM_ARM_VCPU_REC:
++		if (!kvm_is_realm(vcpu->kvm))
++			return -EINVAL;
++
++		return kvm_create_rec(vcpu);
  	}
--	pgt = mmu->pgt;
- 	if (pgt) {
- 		mmu->pgd_phys = 0;
- 		mmu->pgt = NULL;
+ 
+ 	return -EINVAL;
+@@ -145,6 +150,11 @@ bool kvm_arm_vcpu_is_finalized(struct kvm_vcpu *vcpu)
+ 	if (vcpu_has_sve(vcpu) && !kvm_arm_vcpu_sve_finalized(vcpu))
+ 		return false;
+ 
++	if (kvm_is_realm(vcpu->kvm) &&
++	    !(vcpu_is_rec(vcpu) &&
++	      READ_ONCE(vcpu->kvm->arch.realm.state) == REALM_STATE_ACTIVE))
++		return false;
++
+ 	return true;
+ }
+ 
+@@ -157,6 +167,7 @@ void kvm_arm_vcpu_destroy(struct kvm_vcpu *vcpu)
+ 	if (sve_state)
+ 		kvm_unshare_hyp(sve_state, sve_state + vcpu_sve_state_size(vcpu));
+ 	kfree(sve_state);
++	kvm_destroy_rec(vcpu);
+ }
+ 
+ static void kvm_vcpu_reset_sve(struct kvm_vcpu *vcpu)
 diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
-index 0c9d70e4d9e6..f7b0e5a779f8 100644
+index f7b0e5a779f8..d79ed889ca4d 100644
 --- a/arch/arm64/kvm/rme.c
 +++ b/arch/arm64/kvm/rme.c
-@@ -73,6 +73,28 @@ static int rmi_check_version(void)
- 	return 0;
+@@ -514,6 +514,150 @@ void kvm_destroy_realm(struct kvm *kvm)
+ 	kvm_free_stage2_pgd(&kvm->arch.mmu);
  }
  
-+static void realm_destroy_undelegate_range(struct realm *realm,
-+					   unsigned long ipa,
-+					   unsigned long addr,
-+					   ssize_t size)
++static void free_rec_aux(struct page **aux_pages,
++			 unsigned int num_aux)
 +{
-+	unsigned long rd = virt_to_phys(realm->rd);
-+	int ret;
++	unsigned int i;
 +
-+	while (size > 0) {
-+		ret = rmi_data_destroy(rd, ipa);
-+		WARN_ON(ret);
-+		ret = rmi_granule_undelegate(addr);
++	for (i = 0; i < num_aux; i++) {
++		phys_addr_t aux_page_phys = page_to_phys(aux_pages[i]);
 +
-+		if (ret)
-+			get_page(phys_to_page(addr));
++		if (WARN_ON(rmi_granule_undelegate(aux_page_phys)))
++			continue;
 +
-+		addr += PAGE_SIZE;
-+		ipa += PAGE_SIZE;
-+		size -= PAGE_SIZE;
++		__free_page(aux_pages[i]);
 +	}
 +}
 +
- static unsigned long create_realm_feat_reg0(struct kvm *kvm)
- {
- 	unsigned long ia_bits = VTCR_EL2_IPA(kvm->arch.vtcr);
-@@ -170,6 +192,123 @@ static int realm_create_rd(struct kvm *kvm)
- 	return r;
- }
- 
-+static int realm_rtt_destroy(struct realm *realm, unsigned long addr,
-+			     int level, phys_addr_t rtt_granule)
++static int alloc_rec_aux(struct page **aux_pages,
++			 u64 *aux_phys_pages,
++			 unsigned int num_aux)
 +{
-+	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
-+	return rmi_rtt_destroy(rtt_granule, virt_to_phys(realm->rd), addr,
-+			level);
-+}
++	int ret;
++	unsigned int i;
 +
-+static int realm_destroy_free_rtt(struct realm *realm, unsigned long addr,
-+				  int level, phys_addr_t rtt_granule)
-+{
-+	if (realm_rtt_destroy(realm, addr, level, rtt_granule))
-+		return -ENXIO;
-+	if (!WARN_ON(rmi_granule_undelegate(rtt_granule)))
-+		put_page(phys_to_page(rtt_granule));
++	for (i = 0; i < num_aux; i++) {
++		struct page *aux_page;
++		phys_addr_t aux_page_phys;
++
++		aux_page = alloc_page(GFP_KERNEL);
++		if (!aux_page) {
++			ret = -ENOMEM;
++			goto out_err;
++		}
++		aux_page_phys = page_to_phys(aux_page);
++		if (rmi_granule_delegate(aux_page_phys)) {
++			__free_page(aux_page);
++			ret = -ENXIO;
++			goto out_err;
++		}
++		aux_pages[i] = aux_page;
++		aux_phys_pages[i] = aux_page_phys;
++	}
 +
 +	return 0;
++out_err:
++	free_rec_aux(aux_pages, i);
++	return ret;
 +}
 +
-+static int realm_rtt_create(struct realm *realm,
-+			    unsigned long addr,
-+			    int level,
-+			    phys_addr_t phys)
++int kvm_create_rec(struct kvm_vcpu *vcpu)
 +{
-+	addr = ALIGN_DOWN(addr, rme_rtt_level_mapsize(level - 1));
-+	return rmi_rtt_create(phys, virt_to_phys(realm->rd), addr, level);
-+}
++	struct user_pt_regs *vcpu_regs = vcpu_gp_regs(vcpu);
++	unsigned long mpidr = kvm_vcpu_get_mpidr_aff(vcpu);
++	struct realm *realm = &vcpu->kvm->arch.realm;
++	struct rec *rec = &vcpu->arch.rec;
++	unsigned long rec_page_phys;
++	struct rec_params *params;
++	int r, i;
 +
-+static int realm_tear_down_rtt_range(struct realm *realm, int level,
-+				     unsigned long start, unsigned long end)
-+{
-+	phys_addr_t rd = virt_to_phys(realm->rd);
-+	ssize_t map_size = rme_rtt_level_mapsize(level);
-+	unsigned long addr, next_addr;
-+	bool failed = false;
++	if (kvm_realm_state(vcpu->kvm) != REALM_STATE_NEW)
++		return -ENOENT;
 +
-+	for (addr = start; addr < end; addr = next_addr) {
-+		phys_addr_t rtt_addr, tmp_rtt;
-+		struct rtt_entry rtt;
-+		unsigned long end_addr;
++	/*
++	 * The RMM will report PSCI v1.0 to Realms and the KVM_ARM_VCPU_PSCI_0_2
++	 * flag covers v0.2 and onwards.
++	 */
++	if (!test_bit(KVM_ARM_VCPU_PSCI_0_2, vcpu->arch.features))
++		return -EINVAL;
 +
-+		next_addr = ALIGN(addr + 1, map_size);
++	BUILD_BUG_ON(sizeof(*params) > PAGE_SIZE);
++	BUILD_BUG_ON(sizeof(*rec->run) > PAGE_SIZE);
 +
-+		end_addr = min(next_addr, end);
-+
-+		if (rmi_rtt_read_entry(rd, ALIGN_DOWN(addr, map_size),
-+				       level, &rtt)) {
-+			failed = true;
-+			continue;
-+		}
-+
-+		rtt_addr = rmi_rtt_get_phys(&rtt);
-+		WARN_ON(level != rtt.walk_level);
-+
-+		switch (rtt.state) {
-+		case RMI_UNASSIGNED:
-+		case RMI_DESTROYED:
-+			break;
-+		case RMI_TABLE:
-+			if (realm_tear_down_rtt_range(realm, level + 1,
-+						      addr, end_addr)) {
-+				failed = true;
-+				break;
-+			}
-+			if (IS_ALIGNED(addr, map_size) &&
-+			    next_addr <= end &&
-+			    realm_destroy_free_rtt(realm, addr, level + 1,
-+						   rtt_addr))
-+				failed = true;
-+			break;
-+		case RMI_ASSIGNED:
-+			WARN_ON(!rtt_addr);
-+			/*
-+			 * If there is a block mapping, break it now, using the
-+			 * spare_page. We are sure to have a valid delegated
-+			 * page at spare_page before we enter here, otherwise
-+			 * WARN once, which will be followed by further
-+			 * warnings.
-+			 */
-+			tmp_rtt = realm->spare_page;
-+			if (level == 2 &&
-+			    !WARN_ON_ONCE(tmp_rtt == PHYS_ADDR_MAX) &&
-+			    realm_rtt_create(realm, addr,
-+					     RME_RTT_MAX_LEVEL, tmp_rtt)) {
-+				WARN_ON(1);
-+				failed = true;
-+				break;
-+			}
-+			realm_destroy_undelegate_range(realm, addr,
-+						       rtt_addr, map_size);
-+			/*
-+			 * Collapse the last level table and make the spare page
-+			 * reusable again.
-+			 */
-+			if (level == 2 &&
-+			    realm_rtt_destroy(realm, addr, RME_RTT_MAX_LEVEL,
-+					      tmp_rtt))
-+				failed = true;
-+			break;
-+		case RMI_VALID_NS:
-+			WARN_ON(rmi_rtt_unmap_unprotected(rd, addr, level));
-+			break;
-+		default:
-+			WARN_ON(1);
-+			failed = true;
-+			break;
-+		}
++	params = (struct rec_params *)get_zeroed_page(GFP_KERNEL);
++	rec->rec_page = (void *)__get_free_page(GFP_KERNEL);
++	rec->run = (void *)get_zeroed_page(GFP_KERNEL);
++	if (!params || !rec->rec_page || !rec->run) {
++		r = -ENOMEM;
++		goto out_free_pages;
 +	}
 +
-+	return failed ? -EINVAL : 0;
++	for (i = 0; i < ARRAY_SIZE(params->gprs); i++)
++		params->gprs[i] = vcpu_regs->regs[i];
++
++	params->pc = vcpu_regs->pc;
++
++	if (vcpu->vcpu_id == 0)
++		params->flags |= REC_PARAMS_FLAG_RUNNABLE;
++
++	rec_page_phys = virt_to_phys(rec->rec_page);
++
++	if (rmi_granule_delegate(rec_page_phys)) {
++		r = -ENXIO;
++		goto out_free_pages;
++	}
++
++	r = alloc_rec_aux(rec->aux_pages, params->aux, realm->num_aux);
++	if (r)
++		goto out_undelegate_rmm_rec;
++
++	params->num_rec_aux = realm->num_aux;
++	params->mpidr = mpidr;
++
++	if (rmi_rec_create(rec_page_phys,
++			   virt_to_phys(realm->rd),
++			   virt_to_phys(params))) {
++		r = -ENXIO;
++		goto out_free_rec_aux;
++	}
++
++	rec->mpidr = mpidr;
++
++	free_page((unsigned long)params);
++	return 0;
++
++out_free_rec_aux:
++	free_rec_aux(rec->aux_pages, realm->num_aux);
++out_undelegate_rmm_rec:
++	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
++		rec->rec_page = NULL;
++out_free_pages:
++	free_page((unsigned long)rec->run);
++	free_page((unsigned long)rec->rec_page);
++	free_page((unsigned long)params);
++	return r;
 +}
 +
-+void kvm_realm_destroy_rtts(struct realm *realm, u32 ia_bits, u32 start_level)
++void kvm_destroy_rec(struct kvm_vcpu *vcpu)
 +{
-+	realm_tear_down_rtt_range(realm, start_level, 0, (1UL << ia_bits));
++	struct realm *realm = &vcpu->kvm->arch.realm;
++	struct rec *rec = &vcpu->arch.rec;
++	unsigned long rec_page_phys;
++
++	if (!vcpu_is_rec(vcpu))
++		return;
++
++	rec_page_phys = virt_to_phys(rec->rec_page);
++
++	if (WARN_ON(rmi_rec_destroy(rec_page_phys)))
++		return;
++	if (WARN_ON(rmi_granule_undelegate(rec_page_phys)))
++		return;
++
++	free_rec_aux(rec->aux_pages, realm->num_aux);
++	free_page((unsigned long)rec->rec_page);
 +}
 +
- /* Protects access to rme_vmid_bitmap */
- static DEFINE_SPINLOCK(rme_vmid_lock);
- static unsigned long *rme_vmid_bitmap;
+ int kvm_init_realm_vm(struct kvm *kvm)
+ {
+ 	struct realm_params *params;
 -- 
 2.34.1
 
