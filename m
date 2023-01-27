@@ -2,66 +2,66 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 18F1667DC1A
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 03:06:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D0E9A67DC2B
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 03:09:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233764AbjA0CGE (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 21:06:04 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45910 "EHLO
+        id S230149AbjA0CJe (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 21:09:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232959AbjA0CFn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 21:05:43 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32D4546704
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 18:03:15 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id nn18-20020a17090b38d200b0022bfb584987so3552496pjb.2
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 18:03:15 -0800 (PST)
+        with ESMTP id S232954AbjA0CJ3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 21:09:29 -0500
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A19C1737
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 18:09:25 -0800 (PST)
+Received: by mail-pj1-x102f.google.com with SMTP id x2-20020a17090a46c200b002295ca9855aso7211286pjg.2
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 18:09:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QlnC2FACLz4TVazdbeeDFs7ZKh+4cFrx8LwVyzMk1F8=;
-        b=loBlZtwcLsVlfXwQIERwIJ+CvIOKfjyag+u+fc7ru6Zxx3Fdk5sbWOUYc98VITpEgU
-         dfk+Z+14ls4uR+LOpmvabY0SZH22k3D/rg95JtaWxgMKNFOodruDeiw+25R4/6tMVPb2
-         gAyCAFCAmwQDN0X0tXZyaHBJnmehybBqSZgdYXH3QHlQ9gfCd+kXH0hNzkGkb8hl6Y1c
-         Si2uIeSghkSBj6GSlBIHCwtA0ewSS2odWWIi0evy6WsoHJYjiFRV+bDZu2Hv/P7fsI6X
-         xT1nm7jnQ9il8SLu9MU4qeRUAO85eAnTvJmiCpR1DATPSUgw5oLJjE6VWv8eG2U3Md7L
-         6IiQ==
+        bh=sZWjoy5ITWduM3HQPZ6ehf+xisI9RMToBBdRYssmoV8=;
+        b=XKGVkYb13CxNZM7SaAKdglWy4rp4mdw9zerMpl2cilYjOkfPjf50MVJIPin69EcMEC
+         cwmglXZCmjdfigdBcdeuINhM5MMeBys5vJB3UnhZK0LDJ5XYwY2k8+FQWikXEQR0DOCC
+         VOuj+9u7py3TJPEMXANp2mLTRh2oBfVvhuPF4oMhLZp2tMOsfTVfeEtzojfOZ65g+J1y
+         gq+yRc+Vka3tPf7PMmcoCHBK8pQmPmb4CsuBw7vznCjGvLyaXX6puv807Bgsxu8EPRUH
+         0LsAvP/jAv+dHqufpjXf19/flMtJ8n7ObcwJR5s5Td12ZS2orqZUIUht6CYDLgUvJVr3
+         maTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QlnC2FACLz4TVazdbeeDFs7ZKh+4cFrx8LwVyzMk1F8=;
-        b=eUi7PcBTnjJjZMiHt9MglpRQ1M39jeQOO0WmLGsOGjpxrbsmhF7jQeA1PxJG9th0Sm
-         fSNsGaNLl40iWDc83v1ZjlL610QtiU9j2oMcRJrjMLzoWLErPU6Uz8mPuqmfukQoeFbD
-         zucyEq3h4il1o6gaqwu63yzQgnLmyCHVjr+UnkKsj9LCheLT1AmlJ4QKfCQV+FzYgjH/
-         zRA/sQN5A4sViBoLqmlkxC23ac9ALngBGyY+E/FgYK7xCRwzw+4xjBvMG0BBydIdKvAz
-         axoUpwhDCevgfw5G5W65BZIVe+rhZhPEQ6SW1IDNnwXn32uaJOhhkx4Pqu+pjhwfu5e+
-         Lulg==
-X-Gm-Message-State: AO0yUKX087kC9+EGQ3/zBgE9d4rDx7popZuFfq1h0siz52lqNb1tghRW
-        dFj57C3Lcab5OPw5MDLjERHdmQtE8DsxYTaqrb8=
-X-Google-Smtp-Source: AK7set/q3kh0Y5amuDKghvzE2jA+7uNs0NPpCTSEeqflEwH2JIUjGWc2BNZcQcGyU16D8fjoov2vnQ==
-X-Received: by 2002:a17:902:c9d2:b0:189:6624:58c0 with SMTP id q18-20020a170902c9d200b00189662458c0mr1152283pld.3.1674784994516;
-        Thu, 26 Jan 2023 18:03:14 -0800 (PST)
+        bh=sZWjoy5ITWduM3HQPZ6ehf+xisI9RMToBBdRYssmoV8=;
+        b=j/f7O9aH5sTb19APSshqurZSz9iXlGycuQQZRuxOqyPsie3uBjtMNiTUQv0FQHZaFa
+         TfKVc9cg3O5xMzwbuBc2ytXLv8AfQ+GXC/+oU4ADCOeeZGo+q5gClXDoQetSrcVUt+b8
+         kyB46P2oCXZL9HdwEr1/EAP6IUFWNNLRmOWAuTu3fXuR5tSJSJidxjUrXJcq+GWsyuZe
+         hn8fvTfE0Wr1yAg5hq7aClnjPrYsuu9SJ0ukmGWvQzWpUdKF37h+pkz+LJLp2CbxJWi/
+         Grc+diobSRXDTir8X/m0myQcN8TFCnoOCX2bptmojJiw5Nj9SCzCfyTt14pAQTJcq55e
+         cueA==
+X-Gm-Message-State: AO0yUKWXcj0mNFT0pGKSKTZIxExpoUMCC/0UmHGMVSnbyWyZsmE8cHE1
+        4Fpls0MerLJMUKK/fQrn2Z3rIA==
+X-Google-Smtp-Source: AK7set+HJAFTEeH9uMJcKCtLAA9S8UYbohXeK9A8lVz8w0XDyLOrm+OyTtCOQrwpmNaOSiRLNCVbZA==
+X-Received: by 2002:a17:902:f550:b0:191:1543:6b2f with SMTP id h16-20020a170902f55000b0019115436b2fmr1176430plf.3.1674785364947;
+        Thu, 26 Jan 2023 18:09:24 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id u5-20020a170902e80500b00194974a2b3asm1619966plg.151.2023.01.26.18.03.13
+        by smtp.gmail.com with ESMTPSA id 19-20020a170902c11300b0018911ae9dfasm1613111pli.232.2023.01.26.18.09.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 18:03:14 -0800 (PST)
-Date:   Fri, 27 Jan 2023 02:03:10 +0000
+        Thu, 26 Jan 2023 18:09:24 -0800 (PST)
+Date:   Fri, 27 Jan 2023 02:09:20 +0000
 From:   Sean Christopherson <seanjc@google.com>
 To:     Like Xu <like.xu.linux@gmail.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH v3 1/8] KVM: x86/pmu: Rename pmc_is_enabled() to
- pmc_is_globally_enabled()
-Message-ID: <Y9Mw3pcW/SL/Mna8@google.com>
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 2/8] KVM: VMX: Refactor intel_pmu_set_msr() to align
+ with other set_msr() helpers
+Message-ID: <Y9MyUHhIRtImjoyd@google.com>
 References: <20221111102645.82001-1-likexu@tencent.com>
- <20221111102645.82001-2-likexu@tencent.com>
+ <20221111102645.82001-3-likexu@tencent.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20221111102645.82001-2-likexu@tencent.com>
+In-Reply-To: <20221111102645.82001-3-likexu@tencent.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -74,30 +74,30 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 On Fri, Nov 11, 2022, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
+> From: Sean Christopherson <seanjc@google.com>
 > 
-> The name of function pmc_is_enabled() is a bit misleading. A PMC can
-> be disabled either by PERF_CLOBAL_CTRL or by its corresponding EVTSEL.
-> Add the global semantic to its name.
+> Invert the flows in intel_pmu_set_msr()'s case statements so that they
+> follow the kernel's preferred style of:
 > 
-> Suggested-by: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Like Xu <likexu@tencent.com>
-> ---
+> 	if (<not valid>)
+> 		return <error>
+> 
+> 	<commit change>
+> 	return <success>
+> 
+> which is also the style used by every other set_msr() helper (except
+> AMD's PMU variant, which doesn't use a switch statement).
+> 
+> Opportunstically move the "val == current" checks below the validity
+> checks.  Except for the one-off case for MSR_P6_EVNTSEL2, the reserved
+> bit checks are extremely cheap, and the guest is unlikely to frequently
+> write the current value, i.e. avoiding the reserved bit checks doesn't
+> add much (any?) value.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-...
-
-> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
-> index 684393c22105..e57f707fb940 100644
-> --- a/arch/x86/kvm/pmu.c
-> +++ b/arch/x86/kvm/pmu.c
-> @@ -83,7 +83,7 @@ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops)
->  #undef __KVM_X86_PMU_OP
->  }
->  
-> -static inline bool pmc_is_enabled(struct kvm_pmc *pmc)
-> +static inline bool pmc_is_globally_enabled(struct kvm_pmc *pmc)
->  {
->  	return static_call(kvm_x86_pmu_pmc_is_enabled)(pmc);
-
-This doesn't compile.  v3, and I'm getting pings, and the very first patch doesn't
-compile.
+FYI, I'm going to post this separately and extend it to give the get_msr() flow
+the same treatment.  I'll plan on getting it queued sooner than later so that
+this series can use it as a base.
