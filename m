@@ -2,248 +2,325 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 898EC67E9EF
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 16:46:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E4C5067EA0E
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 16:55:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233599AbjA0PqN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 10:46:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42136 "EHLO
+        id S233599AbjA0Pzo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 10:55:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234641AbjA0Pp7 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 10:45:59 -0500
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C821E84FB8
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 07:45:35 -0800 (PST)
-Received: by mail-qk1-x72a.google.com with SMTP id d13so2516583qkk.12
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 07:45:35 -0800 (PST)
+        with ESMTP id S232060AbjA0Pzl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 10:55:41 -0500
+Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 528CB79F39
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 07:55:36 -0800 (PST)
+Received: by mail-ua1-x92f.google.com with SMTP id e18so1144568uax.2
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 07:55:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
+        d=ventanamicro.com; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=p8Z/gi3ufwmiA1kAD5TWm5UzQtPDtBj/4S6C+i0Z8XQ=;
-        b=mGTtF8mMjUBkM6s4dZEr5EDVhBn4+BQBEBS7AGQYxaaukWVDmBpGBbpMlf419QZat4
-         tbHnSEYpTKc022tK2IMpVstFQiACA7T0p+phHxzl91aGjV4ruUzzOzkkr/acD0wC7oFY
-         D7VE8yhah/avaWh/7JnOEhPQaVEguB0io0QSeVEyfZhxe/dKa6qd0LVbBccsnKjQbWgx
-         rbPjgZjAaj+vT9dVgiuZc6oVBtZFCIfQyqt7sB9DMGPnRmwV5haEDXfZfo+fSo3XU2hG
-         cTn4fwLJN0Y+SQx8t7ZGGZZqe2jEDsybalSXhB/JUggpNmTxEVtuCvTaF8SUpZsWcSvY
-         /EGg==
+        bh=r80X1ET8KcIlhWgcdQu72LX7k8pxX9L7dDPgmXQ6q7Q=;
+        b=n+hejz2kLGUHsdk7peWBW9rt9y1Wz7dmzEGv85IpcBju56LiHWSNww76NtOsmR76WO
+         HDvT4JDuBRMYGbsZT9nZHVrUGx5ZAV6ko1LJ5mDTKt7R9CN8R9k5LRPNqf+vu+fsKMAL
+         rFnvTftvnNZgXTXfqsuMV1MpbjP92Lpuy4uJvjvb+/QayHfV4XrUUX8q6w1q8w9NmVgl
+         xuaJ4H6ajNVcwQtIU+6OUC+mMJKq6/fpAi0PStTV+Vu2NjXtUXBFjYD11LR4FKRztFts
+         hUlhQBES+O/uPQU6tiWTWE1nTrgQwnxxVk72E1oRrC+GTEts4xgM/AbpOMF43e4Rt3Zs
+         bjDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=p8Z/gi3ufwmiA1kAD5TWm5UzQtPDtBj/4S6C+i0Z8XQ=;
-        b=2G/raulBZKSt/lsxMdk+b1jrh88vOy9gdi0UCHYHF8GBBrmRMkz9yk8KRsEVqAOzuU
-         qJgT4PviLeJaDd/rzL0K/JEU/njaFR5GBQeZltI2jPrAGuqyZyQJuD5TNZm06rOqxJ0O
-         2n36cmogpc1Rayi2inG4tsTTxnEa1Kr2b8/LZ4cc7K/gpMymt0sy+O0B2XpI4F29TYJE
-         J7iSkfhc1ktvOBlGnXwSyM95xR89sMCRqgKMmrVLaNYuVWQAWhaWrT+XOSju5SOvkO3Q
-         qLJQODqmFetUJ0MYBTFrM21n7EAh7nycrWAdVVxk9zWPA5stR+K/eZz8zqvuguk3tE+Q
-         mMzg==
-X-Gm-Message-State: AFqh2krMoZ5zhYYYJ9/uay6Sfy02qbW0/Yj8Er0gUJG9AgKATpHX0ZKs
-        pyjCDNYYrWD1Va7hvOjKx94TgyTFZkwI5lFXu7NhAQ==
-X-Google-Smtp-Source: AMrXdXvDWqh/1yfuPtUzzdUCYXFtOPArOTAdv2YTeqhlKY0I9gNNhPjHtXPQvKrSRQtdXycpDpOgBJ/y0miouwuimIQ=
-X-Received: by 2002:a05:620a:14ba:b0:702:e5b:a78c with SMTP id
- x26-20020a05620a14ba00b007020e5ba78cmr2324123qkj.230.1674834326637; Fri, 27
- Jan 2023 07:45:26 -0800 (PST)
+        bh=r80X1ET8KcIlhWgcdQu72LX7k8pxX9L7dDPgmXQ6q7Q=;
+        b=1XUnf0ECcOocNXELE+tVsV3VF1iE4iV6bJrs79pqPFQltlREooIQjzyf9YA3qy5lJo
+         pUAnatrxV87gdf3BBHh0pzaTkMzGZIb/1AE6qops/WuEl0JgpXdNN6yTYmoBaR8tG4SK
+         KJ6XkwyvTSpohglzdJ6rrPyABQsSRa2Xgm93qys7GMOLw3SCkClWqwnhAtZbCjMsX8z0
+         3XzL5w8yfx2DoVd9O5MvSga5cKZxRbN/vPvTCtOoI53XvCJP88AqL4rcPXDbpU32uM7P
+         pTGFvOXHsfVt4VTqCC+jH8Mh3mw8NjE+DyAV3EQB7zQGYwzHvC/J61RDWEcWLMmcLlwt
+         HD/w==
+X-Gm-Message-State: AFqh2krHPrPVf2u+CHTVhUOaCSGOD3SZPtRDlDmj5vWEUGiXZa8d8VQZ
+        zndg4VuzTYxL3IKQkx9+IOKtBjNYcbUoBvFEiwDy1A==
+X-Google-Smtp-Source: AMrXdXtN9tTpb4MriUs4cMqcHuVL3StlYC2et7/sFhzIhPQD+Ufj/0zurGQZsAIK+T8VdzIa6Is0IpVhSQFwu7Hh+Jk=
+X-Received: by 2002:ab0:2504:0:b0:63f:80d6:86d9 with SMTP id
+ j4-20020ab02504000000b0063f80d686d9mr2937711uan.38.1674834935207; Fri, 27 Jan
+ 2023 07:55:35 -0800 (PST)
 MIME-Version: 1.0
-References: <20230113035000.480021-1-ricarkol@google.com> <20230113035000.480021-7-ricarkol@google.com>
- <Y9BfdgL+JSYCirvm@thinky-boi> <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
- <86v8ktkqfx.wl-maz@kernel.org>
-In-Reply-To: <86v8ktkqfx.wl-maz@kernel.org>
-From:   Ricardo Koller <ricarkol@google.com>
-Date:   Fri, 27 Jan 2023 07:45:15 -0800
-Message-ID: <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
-Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is enabled
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, pbonzini@redhat.com,
-        oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+References: <20230112140304.1830648-1-apatel@ventanamicro.com>
+ <20230112140304.1830648-6-apatel@ventanamicro.com> <20230126171938.la5jswt6gr4qanl5@orel>
+In-Reply-To: <20230126171938.la5jswt6gr4qanl5@orel>
+From:   Anup Patel <apatel@ventanamicro.com>
+Date:   Fri, 27 Jan 2023 21:25:23 +0530
+Message-ID: <CAK9=C2VQF8kKfVztBR2hrANb63Q8s0+Md6ZDXFjLWjWED1A2zA@mail.gmail.com>
+Subject: Re: [PATCH 5/7] RISC-V: KVM: Add ONE_REG interface for AIA CSRs
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Marc,
-
-On Thu, Jan 26, 2023 at 12:10 PM Marc Zyngier <maz@kernel.org> wrote:
+On Thu, Jan 26, 2023 at 10:49 PM Andrew Jones <ajones@ventanamicro.com> wrote:
 >
-> On Thu, 26 Jan 2023 18:45:43 +0000,
-> Ricardo Koller <ricarkol@google.com> wrote:
+> On Thu, Jan 12, 2023 at 07:33:02PM +0530, Anup Patel wrote:
+> > We extend the CSR ONE_REG interface to access both general CSRs and
+> > AIA CSRs. To achieve this, we introduce "subtype" field in the ONE_REG
+> > id which can be used for grouping registers within a particular "type"
+> > of ONE_REG registers.
 > >
-> > On Tue, Jan 24, 2023 at 2:45 PM Oliver Upton <oliver.upton@linux.dev> wrote:
-> > >
-> > > Hi Ricardo,
-> > >
-> > > On Fri, Jan 13, 2023 at 03:49:57AM +0000, Ricardo Koller wrote:
-> > > > Split huge pages eagerly when enabling dirty logging. The goal is to
-> > > > avoid doing it while faulting on write-protected pages, which
-> > > > negatively impacts guest performance.
-> > > >
-> > > > A memslot marked for dirty logging is split in 1GB pieces at a time.
-> > > > This is in order to release the mmu_lock and give other kernel threads
-> > > > the opportunity to run, and also in order to allocate enough pages to
-> > > > split a 1GB range worth of huge pages (or a single 1GB huge page).
-> > > > Note that these page allocations can fail, so eager page splitting is
-> > > > best-effort.  This is not a correctness issue though, as huge pages
-> > > > can still be split on write-faults.
-> > > >
-> > > > The benefits of eager page splitting are the same as in x86, added
-> > > > with commit a3fe5dbda0a4 ("KVM: x86/mmu: Split huge pages mapped by
-> > > > the TDP MMU when dirty logging is enabled"). For example, when running
-> > > > dirty_log_perf_test with 64 virtual CPUs (Ampere Altra), 1GB per vCPU,
-> > > > 50% reads, and 2MB HugeTLB memory, the time it takes vCPUs to access
-> > > > all of their memory after dirty logging is enabled decreased by 44%
-> > > > from 2.58s to 1.42s.
-> > > >
-> > > > Signed-off-by: Ricardo Koller <ricarkol@google.com>
-> > > > ---
-> > > >  arch/arm64/include/asm/kvm_host.h |  30 ++++++++
-> > > >  arch/arm64/kvm/mmu.c              | 110 +++++++++++++++++++++++++++++-
-> > > >  2 files changed, 138 insertions(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-> > > > index 35a159d131b5..6ab37209b1d1 100644
-> > > > --- a/arch/arm64/include/asm/kvm_host.h
-> > > > +++ b/arch/arm64/include/asm/kvm_host.h
-> > > > @@ -153,6 +153,36 @@ struct kvm_s2_mmu {
-> > > >       /* The last vcpu id that ran on each physical CPU */
-> > > >       int __percpu *last_vcpu_ran;
-> > > >
-> > > > +     /*
-> > > > +      * Memory cache used to split EAGER_PAGE_SPLIT_CHUNK_SIZE worth of huge
-> > > > +      * pages. It is used to allocate stage2 page tables while splitting
-> > > > +      * huge pages. Its capacity should be EAGER_PAGE_SPLIT_CACHE_CAPACITY.
-> > > > +      * Note that the choice of EAGER_PAGE_SPLIT_CHUNK_SIZE influences both
-> > > > +      * the capacity of the split page cache (CACHE_CAPACITY), and how often
-> > > > +      * KVM reschedules. Be wary of raising CHUNK_SIZE too high.
-> > > > +      *
-> > > > +      * A good heuristic to pick CHUNK_SIZE is that it should be larger than
-> > > > +      * all the available huge-page sizes, and be a multiple of all the
-> > > > +      * other ones; for example, 1GB when all the available huge-page sizes
-> > > > +      * are (1GB, 2MB, 32MB, 512MB).
-> > > > +      *
-> > > > +      * CACHE_CAPACITY should have enough pages to cover CHUNK_SIZE; for
-> > > > +      * example, 1GB requires the following number of PAGE_SIZE-pages:
-> > > > +      * - 512 when using 2MB hugepages with 4KB granules (1GB / 2MB).
-> > > > +      * - 513 when using 1GB hugepages with 4KB granules (1 + (1GB / 2MB)).
-> > > > +      * - 32 when using 32MB hugepages with 16KB granule (1GB / 32MB).
-> > > > +      * - 2 when using 512MB hugepages with 64KB granules (1GB / 512MB).
-> > > > +      * CACHE_CAPACITY below assumes the worst case: 1GB hugepages with 4KB
-> > > > +      * granules.
-> > > > +      *
-> > > > +      * Protected by kvm->slots_lock.
-> > > > +      */
-> > > > +#define EAGER_PAGE_SPLIT_CHUNK_SIZE                 SZ_1G
-> > > > +#define EAGER_PAGE_SPLIT_CACHE_CAPACITY                                      \
-> > > > +     (DIV_ROUND_UP_ULL(EAGER_PAGE_SPLIT_CHUNK_SIZE, SZ_1G) +         \
-> > > > +      DIV_ROUND_UP_ULL(EAGER_PAGE_SPLIT_CHUNK_SIZE, SZ_2M))
-> > >
-> > > Could you instead make use of the existing KVM_PGTABLE_MIN_BLOCK_LEVEL
-> > > as the batch size? 513 pages across all page sizes is a non-negligible
-> > > amount of memory that goes largely unused when PAGE_SIZE != 4K.
-> > >
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  arch/riscv/include/uapi/asm/kvm.h | 15 ++++-
+> >  arch/riscv/kvm/vcpu.c             | 96 ++++++++++++++++++++++++-------
+> >  2 files changed, 89 insertions(+), 22 deletions(-)
 > >
-> > Sounds good, will refine this for v2.
+> > diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
+> > index 71992ff1f9dd..d0704eff0121 100644
+> > --- a/arch/riscv/include/uapi/asm/kvm.h
+> > +++ b/arch/riscv/include/uapi/asm/kvm.h
+> > @@ -64,7 +64,7 @@ struct kvm_riscv_core {
+> >  #define KVM_RISCV_MODE_S     1
+> >  #define KVM_RISCV_MODE_U     0
 > >
-> > > With that change it is a lot easier to correctly match the cache
-> > > capacity to the selected page size. Additionally, we continue to have a
-> > > single set of batching logic that we can improve later on.
-> > >
-> > > > +     struct kvm_mmu_memory_cache split_page_cache;
-> > > > +
-> > > >       struct kvm_arch *arch;
-> > > >  };
-> > > >
-> > > > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > > > index 700c5774b50d..41ee330edae3 100644
-> > > > --- a/arch/arm64/kvm/mmu.c
-> > > > +++ b/arch/arm64/kvm/mmu.c
-> > > > @@ -31,14 +31,24 @@ static phys_addr_t hyp_idmap_vector;
-> > > >
-> > > >  static unsigned long io_map_base;
-> > > >
-> > > > -static phys_addr_t stage2_range_addr_end(phys_addr_t addr, phys_addr_t end)
-> > > > +bool __read_mostly eager_page_split = true;
-> > > > +module_param(eager_page_split, bool, 0644);
-> > > > +
-> > >
-> > > Unless someone is really begging for it I'd prefer we not add a module
-> > > parameter for this.
+> > -/* CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> > +/* General CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> >  struct kvm_riscv_csr {
+> >       unsigned long sstatus;
+> >       unsigned long sie;
+> > @@ -78,6 +78,10 @@ struct kvm_riscv_csr {
+> >       unsigned long scounteren;
+> >  };
 > >
-> > It was mainly to match x86 and because it makes perf testing a bit
-> > simpler. What do others think?
+> > +/* AIA CSR registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> > +struct kvm_riscv_aia_csr {
+> > +};
+> > +
+> >  /* TIMER registers for KVM_GET_ONE_REG and KVM_SET_ONE_REG */
+> >  struct kvm_riscv_timer {
+> >       __u64 frequency;
+> > @@ -105,6 +109,7 @@ enum KVM_RISCV_ISA_EXT_ID {
+> >       KVM_RISCV_ISA_EXT_SVINVAL,
+> >       KVM_RISCV_ISA_EXT_ZIHINTPAUSE,
+> >       KVM_RISCV_ISA_EXT_ZICBOM,
+> > +     KVM_RISCV_ISA_EXT_SSAIA,
+> >       KVM_RISCV_ISA_EXT_MAX,
+> >  };
+> >
+> > @@ -134,6 +139,8 @@ enum KVM_RISCV_SBI_EXT_ID {
+> >  /* If you need to interpret the index values, here is the key: */
+> >  #define KVM_REG_RISCV_TYPE_MASK              0x00000000FF000000
+> >  #define KVM_REG_RISCV_TYPE_SHIFT     24
+> > +#define KVM_REG_RISCV_SUBTYPE_MASK   0x0000000000FF0000
+> > +#define KVM_REG_RISCV_SUBTYPE_SHIFT  16
 >
-> From my PoV this is a no.
+> We could just define a new AIA_CSR type, rather than introduce CSR
+> subtypes. While grouping all CSRs together under the CSR type also
+> makes sense, having to teach all userspaces about subtypes may not
+> be worth the organizational benefits.
+
+My main concern is that we have chosen a 8-bit wide "type" field
+in ONE_REG id which can't be changed now and it will be consumed
+very fast if we start adding separate "type" for each ISA extension.
+This "type" field is shared with SBI extensions and we will be also
+having separate nested CSR state for various ISA extensions.
+
+Since KVM RISC-V is young, I think it is better to introduce a
+"subtype" field now so that we have ample space for the future.
+
+Also, both ONE_REG "type" and "subtype" are arch specific fields
+of ONE_REG id so all KVM user space changes will be contained
+in RISC-V specific code.
+
 >
-> If you have a flag because this is an experimental feature (like NV),
-> then this is a kernel option, and you taint the kernel when it is set.
+> >
+> >  /* Config registers are mapped as type 1 */
+> >  #define KVM_REG_RISCV_CONFIG         (0x01 << KVM_REG_RISCV_TYPE_SHIFT)
+> > @@ -147,8 +154,12 @@ enum KVM_RISCV_SBI_EXT_ID {
+> >
+> >  /* Control and status registers are mapped as type 3 */
+> >  #define KVM_REG_RISCV_CSR            (0x03 << KVM_REG_RISCV_TYPE_SHIFT)
+> > +#define KVM_REG_RISCV_CSR_GENERAL    0x0
+> > +#define KVM_REG_RISCV_CSR_AIA                0x1
+> >  #define KVM_REG_RISCV_CSR_REG(name)  \
+> > -             (offsetof(struct kvm_riscv_csr, name) / sizeof(unsigned long))
+> > +     (offsetof(struct kvm_riscv_csr, name) / sizeof(unsigned long))
+> > +#define KVM_REG_RISCV_CSR_AIA_REG(name)      \
+> > +     (offsetof(struct kvm_riscv_aia_csr, name) / sizeof(unsigned long))
+> >
+> >  /* Timer registers are mapped as type 4 */
+> >  #define KVM_REG_RISCV_TIMER          (0x04 << KVM_REG_RISCV_TYPE_SHIFT)
+> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > index 3cf50eadc8ce..37933ea20274 100644
+> > --- a/arch/riscv/kvm/vcpu.c
+> > +++ b/arch/riscv/kvm/vcpu.c
+> > @@ -58,6 +58,7 @@ static const unsigned long kvm_isa_ext_arr[] = {
+> >       [KVM_RISCV_ISA_EXT_I] = RISCV_ISA_EXT_i,
+> >       [KVM_RISCV_ISA_EXT_M] = RISCV_ISA_EXT_m,
+> >
+> > +     KVM_ISA_EXT_ARR(SSAIA),
+> >       KVM_ISA_EXT_ARR(SSTC),
+> >       KVM_ISA_EXT_ARR(SVINVAL),
+> >       KVM_ISA_EXT_ARR(SVPBMT),
+> > @@ -96,6 +97,7 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsigned long ext)
+> >       case KVM_RISCV_ISA_EXT_C:
+> >       case KVM_RISCV_ISA_EXT_I:
+> >       case KVM_RISCV_ISA_EXT_M:
+> > +     case KVM_RISCV_ISA_EXT_SSAIA:
+> >       case KVM_RISCV_ISA_EXT_SSTC:
+> >       case KVM_RISCV_ISA_EXT_SVINVAL:
+> >       case KVM_RISCV_ISA_EXT_ZIHINTPAUSE:
+> > @@ -451,30 +453,79 @@ static int kvm_riscv_vcpu_set_reg_core(struct kvm_vcpu *vcpu,
+> >       return 0;
+> >  }
+> >
+> > +static int kvm_riscv_vcpu_general_get_csr(struct kvm_vcpu *vcpu,
+> > +                                       unsigned long reg_num,
+> > +                                       unsigned long *out_val)
+> > +{
+> > +     struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> > +
+> > +     if (reg_num >= sizeof(struct kvm_riscv_csr) / sizeof(unsigned long))
+> > +             return -EINVAL;
+> > +
+> > +     if (reg_num == KVM_REG_RISCV_CSR_REG(sip)) {
+> > +             kvm_riscv_vcpu_flush_interrupts(vcpu);
+> > +             *out_val = (csr->hvip >> VSIP_TO_HVIP_SHIFT) & VSIP_VALID_MASK;
+> > +     } else
+> > +             *out_val = ((unsigned long *)csr)[reg_num];
+> > +
+> > +     return 0;
+> > +}
+> > +
+> >  static int kvm_riscv_vcpu_get_reg_csr(struct kvm_vcpu *vcpu,
+> >                                     const struct kvm_one_reg *reg)
+> >  {
+> > -     struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> > +     int rc;
+> >       unsigned long __user *uaddr =
+> >                       (unsigned long __user *)(unsigned long)reg->addr;
+> >       unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
+> >                                           KVM_REG_SIZE_MASK |
+> >                                           KVM_REG_RISCV_CSR);
+> > -     unsigned long reg_val;
+> > +     unsigned long reg_val, reg_subtype;
+> >
+> >       if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
+> >               return -EINVAL;
+> > +
+> > +     reg_subtype = (reg_num & KVM_REG_RISCV_SUBTYPE_MASK)
+> > +                     >> KVM_REG_RISCV_SUBTYPE_SHIFT;
+> > +     reg_num &= ~KVM_REG_RISCV_SUBTYPE_MASK;
+> > +     switch (reg_subtype) {
+> > +     case KVM_REG_RISCV_CSR_GENERAL:
+> > +             rc = kvm_riscv_vcpu_general_get_csr(vcpu, reg_num, &reg_val);
+> > +             break;
+> > +     case KVM_REG_RISCV_CSR_AIA:
+> > +             rc = kvm_riscv_vcpu_aia_get_csr(vcpu, reg_num, &reg_val);
+> > +             break;
+> > +     default:
+> > +             rc = -EINVAL;
+> > +             break;
+> > +     }
+> > +     if (rc)
+> > +             return rc;
+> > +
+> > +     if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
+> > +             return -EFAULT;
+> > +
+> > +     return 0;
+> > +}
+> > +
+> > +static inline int kvm_riscv_vcpu_general_set_csr(struct kvm_vcpu *vcpu,
+> > +                                              unsigned long reg_num,
+> > +                                              unsigned long reg_val)
+> > +{
+> > +     struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> > +
+> >       if (reg_num >= sizeof(struct kvm_riscv_csr) / sizeof(unsigned long))
+> >               return -EINVAL;
+> >
+> >       if (reg_num == KVM_REG_RISCV_CSR_REG(sip)) {
+> > -             kvm_riscv_vcpu_flush_interrupts(vcpu);
+> > -             reg_val = (csr->hvip >> VSIP_TO_HVIP_SHIFT) & VSIP_VALID_MASK;
+> > -     } else
+> > -             reg_val = ((unsigned long *)csr)[reg_num];
+> > +             reg_val &= VSIP_VALID_MASK;
+> > +             reg_val <<= VSIP_TO_HVIP_SHIFT;
+> > +     }
+> >
+> > -     if (copy_to_user(uaddr, &reg_val, KVM_REG_SIZE(reg->id)))
+> > -             return -EFAULT;
+> > +     ((unsigned long *)csr)[reg_num] = reg_val;
+> > +
+> > +     if (reg_num == KVM_REG_RISCV_CSR_REG(sip))
+> > +             WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+> >
+> >       return 0;
+> >  }
+> > @@ -482,31 +533,36 @@ static int kvm_riscv_vcpu_get_reg_csr(struct kvm_vcpu *vcpu,
+> >  static int kvm_riscv_vcpu_set_reg_csr(struct kvm_vcpu *vcpu,
+> >                                     const struct kvm_one_reg *reg)
+> >  {
+> > -     struct kvm_vcpu_csr *csr = &vcpu->arch.guest_csr;
+> > +     int rc;
+> >       unsigned long __user *uaddr =
+> >                       (unsigned long __user *)(unsigned long)reg->addr;
+> >       unsigned long reg_num = reg->id & ~(KVM_REG_ARCH_MASK |
+> >                                           KVM_REG_SIZE_MASK |
+> >                                           KVM_REG_RISCV_CSR);
+> > -     unsigned long reg_val;
+> > +     unsigned long reg_val, reg_subtype;
+> >
+> >       if (KVM_REG_SIZE(reg->id) != sizeof(unsigned long))
+> >               return -EINVAL;
+> > -     if (reg_num >= sizeof(struct kvm_riscv_csr) / sizeof(unsigned long))
+> > -             return -EINVAL;
+> >
+> >       if (copy_from_user(&reg_val, uaddr, KVM_REG_SIZE(reg->id)))
+> >               return -EFAULT;
+> >
+> > -     if (reg_num == KVM_REG_RISCV_CSR_REG(sip)) {
+> > -             reg_val &= VSIP_VALID_MASK;
+> > -             reg_val <<= VSIP_TO_HVIP_SHIFT;
+> > +     reg_subtype = (reg_num & KVM_REG_RISCV_SUBTYPE_MASK)
+> > +                     >> KVM_REG_RISCV_SUBTYPE_SHIFT;
+> > +     reg_num &= ~KVM_REG_RISCV_SUBTYPE_MASK;
+> > +     switch (reg_subtype) {
+> > +     case KVM_REG_RISCV_CSR_GENERAL:
+> > +             rc = kvm_riscv_vcpu_general_set_csr(vcpu, reg_num, reg_val);
+> > +             break;
+> > +     case KVM_REG_RISCV_CSR_AIA:
+> > +             rc = kvm_riscv_vcpu_aia_set_csr(vcpu, reg_num, reg_val);
+> > +             break;
+> > +     default:
+> > +             rc = -EINVAL;
+> > +             break;
+> >       }
+> > -
+> > -     ((unsigned long *)csr)[reg_num] = reg_val;
+> > -
+> > -     if (reg_num == KVM_REG_RISCV_CSR_REG(sip))
+> > -             WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+> > +     if (rc)
+> > +             return rc;
+> >
+> >       return 0;
+> >  }
+> > --
+> > 2.34.1
+> >
 >
-> If you have a flag because this is a modal option that makes different
-> use of the HW which cannot be exposed to userspace (like GICv4), then
-> this also is a kernel option.
->
-> This is neither.
-
-Ah, I see. Thanks for the explanation.
-
->
-> The one thing that would convince me to make it an option is the
-> amount of memory this thing consumes. 512+ pages is a huge amount, and
-> I'm not overly happy about that. Why can't this be a userspace visible
-> option, selectable on a per VM (or memslot) basis?
->
-
-It should be possible.  I am exploring a couple of ideas that could
-help when the hugepages are not 1G (e.g., 2M).  However, they add
-complexity and I'm not sure they help much.
-
-(will be using PAGE_SIZE=4K to make things simpler)
-
-This feature pre-allocates 513 pages before splitting every 1G range.
-For example, it converts 1G block PTEs into trees made of 513 pages.
-When not using this feature, the same 513 pages would be allocated,
-but lazily over a longer period of time.
-
-Eager-splitting pre-allocates those pages in order to split huge-pages
-into fully populated trees.  Which is needed in order to use FEAT_BBM
-and skipping the expensive TLBI broadcasts.  513 is just the number of
-pages needed to break a 1G huge-page.
-
-We could optimize for smaller huge-pages, like 2M by splitting 1
-huge-page at a time: only preallocate one 4K page at a time.  The
-trick is how to know that we are splitting 2M huge-pages.  We could
-either get the vma pagesize or use hints from userspace.  I'm not sure
-that this is worth it though.  The user will most likely want to split
-big ranges of memory (>1G), so optimizing for smaller huge-pages only
-converts the left into the right:
-
-alloc 1 page            |    |  alloc 512 pages
-split 2M huge-page      |    |  split 2M huge-page
-alloc 1 page            |    |  split 2M huge-page
-split 2M huge-page      | => |  split 2M huge-page
-                        ...
-alloc 1 page            |    |  split 2M huge-page
-split 2M huge-page      |    |  split 2M huge-page
-
-Still thinking of what else to do.
-
-Thanks!
-Ricardo
-
 > Thanks,
->
->         M.
->
-> --
-> Without deviation from the norm, progress is not possible.
+> drew
