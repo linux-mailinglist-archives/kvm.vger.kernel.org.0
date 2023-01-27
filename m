@@ -2,42 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6E98867E622
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 14:09:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 879E267E623
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 14:09:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233878AbjA0NJQ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 08:09:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51622 "EHLO
+        id S234598AbjA0NJ0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 08:09:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233009AbjA0NJC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 08:09:02 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89E6A7F688
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 05:08:22 -0800 (PST)
+        with ESMTP id S234079AbjA0NJV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 08:09:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B685C474E4
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 05:08:43 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0C8F561C2C
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 13:07:37 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 71F5CC433D2
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 13:07:36 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 071B8B820C6
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 13:08:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B7359C433EF
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 13:08:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674824856;
-        bh=7WzKig9+FvNxSSCq9OzWUj/JmDoVDn12xHMXzIlWu3Q=;
+        s=k20201202; t=1674824920;
+        bh=3l7hzfSxWjIqP4WUEDGAxUjN8c1PLLawgrOerMiUEvg=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=k6qvw6Gi+NssFLS0HU9SfCCKRdmZ+27fFC+e77utqqm0/7vn3Od4jiJ3kku0+DGie
-         kQRe1rUDcxoJ3PpneEn/O4UqbxayLrHEFajVXdejD0fH9C6edMDziO3GCfMP7ugfoe
-         eOZ+P47tm2Bv0bIyk03mZ1h68rJloAkrLCAwRChGzhf2ttDpPexNOjN2ZLaE7xRp7f
-         rY7Gqs5glQVVM1gwKBd4J2YQXtSw234Gh3dRUrG3/1EPFWHqIdhjo4pmZd0HIM98qj
-         So2PLzZJI+WqbpbmCquyLHEbkd7vQ/j+Je8MbUQVS9PjfNE4KLqXevedwygxyW4iSq
-         LAoq0bpaBCFNg==
+        b=JCMGh0Erm7Jj+87zLzOp+io4N7mzC4gBEEElv3Y8EvfKD6aR5tROT+ycLYNLh3+OA
+         k7bacWSdOodE6wCTJp2TA8CwXv3mfuPJz0IHO/WFABH1yNM+Zml2zpRju3mIFs7OQE
+         /A00ypG0HC78pUtAjl99eHDW7qopC9vWtAKW+XPDJxZ6MWSw65DL4epBTXKg7J7cU1
+         5r22dmMBFoFem9kgMBibeBTdW5EYR/aM/VGzkBgoaTDINUInSLdUkOtlz/GoVyzeQw
+         qHRcj1g653HR0kzspxvaAWeOgCxg+NPi9kaF+ceDu/uhCdNP1AmRjHlnOCuMD2esnv
+         /rhNp+IRWJb/Q==
 Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-        id 610D2C43141; Fri, 27 Jan 2023 13:07:36 +0000 (UTC)
+        id A758BC43144; Fri, 27 Jan 2023 13:08:40 +0000 (UTC)
 From:   bugzilla-daemon@kernel.org
 To:     kvm@vger.kernel.org
-Subject: [Bug 75331] "soft lockup CPU#0 stuck for 23s" regression on 32bit
- 3.13.0+ kernels.
-Date:   Fri, 27 Jan 2023 13:07:36 +0000
+Subject: [Bug 202415] soft lockup while running windows vm
+Date:   Fri, 27 Jan 2023 13:08:40 +0000
 X-Bugzilla-Reason: None
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
@@ -45,7 +44,7 @@ X-Bugzilla-Product: Virtualization
 X-Bugzilla-Component: kvm
 X-Bugzilla-Version: unspecified
 X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
+X-Bugzilla-Severity: high
 X-Bugzilla-Who: devzero@web.de
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
@@ -53,9 +52,9 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-75331-28872-60iatlljj1@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-75331-28872@https.bugzilla.kernel.org/>
-References: <bug-75331-28872@https.bugzilla.kernel.org/>
+Message-ID: <bug-202415-28872-hoOn75tepr@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-202415-28872@https.bugzilla.kernel.org/>
+References: <bug-202415-28872@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -70,7 +69,7 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D75331
+https://bugzilla.kernel.org/show_bug.cgi?id=3D202415
 
 Roland Kletzing (devzero@web.de) changed:
 
@@ -78,7 +77,7 @@ Roland Kletzing (devzero@web.de) changed:
 ----------------------------------------------------------------------------
                  CC|                            |devzero@web.de
 
---- Comment #2 from Roland Kletzing (devzero@web.de) ---
+--- Comment #6 from Roland Kletzing (devzero@web.de) ---
 this may be caused by intense IO on the host if your VM is not using virtio
 dataplance.
 
