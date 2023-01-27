@@ -2,281 +2,207 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A24667EF80
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 21:25:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2C0F767EF94
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 21:31:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231648AbjA0UZY (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 15:25:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38720 "EHLO
+        id S231872AbjA0UbR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 15:31:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229482AbjA0UZW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 15:25:22 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237F42BEDB
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 12:25:21 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id b10so5663712pjo.1
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 12:25:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=uJe6a029aMe3U1mBIX27gKXNT1Xkqqrq1mwntN0JHEQ=;
-        b=FSRvGIOiUPcH8GZ8AoNaJbLkHoUBzCl0ahYHcKjsAVRU7MPFqYJwC/6XzATvQuOHNz
-         zH30Ezaj0UgPGL3V6QwiGVa46uxisyXDMTTIDzVplpCWko+J1wZPzzID6pLQ4G8pftrm
-         NigmlH8gKuvZksUjgwyk8bt1EUH2qJHm5pUBxeCosYtf01Sp8s/Z3snUZxx7rHiyv67a
-         USvYchAvTmHqRaIhoQhxPaq/OPckSp1Sl0fYI1OeLauRhql/tLZMP5uMmPFoX5+MbeTp
-         tGfTZv27FcyETKdN/ym1d+OErsh8+hY92C5jF1vcLSa3nVfYx4MxIU9W488g4l5zsW6L
-         hJkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uJe6a029aMe3U1mBIX27gKXNT1Xkqqrq1mwntN0JHEQ=;
-        b=PcMvv0vhmyQuR24orpbl+H12s6yilGeqplRIsjI059nulYm+jM7VmtEnLj7TnPPGob
-         6tP5iUtC3y6kE2/3A8VgsaH/pYcrmpBfkMjHUPyJ/ZR57c/SqyQ1eoGK1JbEVtJTqKIB
-         KGBLfskMpBLjW74sbFtaPg8z/PlcMYZ3ObldI5UbefJwaYDBN52kiyY6Cmn8b0njqUJU
-         yIdZ8inAQ9KtFUBa4sSbi5QQ2mXH9t5Y4RfjXIBmevjgvfaLWsm/Hxg+vnJPMUTWzbK0
-         NdJ6OGmo0DZ1S4DEGz/M+2k1Aa2Ap9opQYcBZ+miyLy/si5xU32QLDST8tAMeQxay4SN
-         FV3A==
-X-Gm-Message-State: AO0yUKVrGy4wOtv0/uANF8Mgyeeq3bjb4ln6u9YK+AzEUM0lmnWm6/f0
-        q9VaTieyGAL8pb4EnshH2XjJrGcMO+OBniXpSNg=
-X-Google-Smtp-Source: AK7set/9uEcs/0K2Hl2UXRg4jVt4RuoaOYuxJnSLwEZ29/MCL9mAE/uUO2MJAyh8qA6S5ZijUrc4mA==
-X-Received: by 2002:a17:90a:6949:b0:219:f970:5119 with SMTP id j9-20020a17090a694900b00219f9705119mr115299pjm.1.1674851120337;
-        Fri, 27 Jan 2023 12:25:20 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id c22-20020a637256000000b0048988ed9e4bsm2701875pgn.19.2023.01.27.12.25.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 12:25:19 -0800 (PST)
-Date:   Fri, 27 Jan 2023 20:25:16 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, like.xu.linux@gmail.com,
-        kan.liang@linux.intel.com, wei.w.wang@intel.com,
-        Like Xu <like.xu@linux.intel.com>
-Subject: Re: [PATCH v2 05/15] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_DEPTH for
- guest Arch LBR
-Message-ID: <Y9QzLHNxS4K81SfU@google.com>
-References: <20221125040604.5051-1-weijiang.yang@intel.com>
- <20221125040604.5051-6-weijiang.yang@intel.com>
+        with ESMTP id S230250AbjA0UbQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 15:31:16 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A09679216
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 12:31:12 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id CE983B821D3
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 20:31:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46583C433D2;
+        Fri, 27 Jan 2023 20:31:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674851469;
+        bh=CH9vEXq6cjjQQuKc4yHsTcQj0RJXiIwEwwGW9/HaeAs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qqzqOWUkTX1njH4vxEp03WTDozfnO7zH73gbFdvNqaASt8KeCO7tc6v1r5yH1J+Qz
+         MbFOaaY/AtlXhN6ba+eG+YOPxWzr09nQFtXi2JrYNke8xGEhuxnTgycz5Eh0vJfA4w
+         dFKa4RAL+6nCcZBwv22Alf/1lVnfnx2aJB8VciYkLEZQNnCZnSGs4ir+9C+5g6aA75
+         UPuOCSqTRKKu98fPJU+DSDMToDRr+cI+UcrGemRnhq16Si0GmBFUrWjDUdKqTdgewQ
+         Z5lHkRpDgO/WCFwssL37ok96kqMr5DlI+ToI7eCc6dQMDNYUDrANNPtXh6UokFc/N6
+         zR680/bsVlx/Q==
+Date:   Fri, 27 Jan 2023 20:31:03 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Andy Chiu <andy.chiu@sifive.com>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, ShihPo Hung <shihpo.hung@sifive.com>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, Guo Ren <guoren@kernel.org>,
+        Alexandre Ghiti <alexandre.ghiti@canonical.com>,
+        Myrtle Shah <gatecat@ds0.me>
+Subject: Re: [PATCH -next v13 15/19] riscv: Fix a kernel panic issue if $s2
+ is set to a specific value before entering Linux
+Message-ID: <Y9Q0h88UL0BRaF8d@spud>
+References: <20230125142056.18356-1-andy.chiu@sifive.com>
+ <20230125142056.18356-16-andy.chiu@sifive.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="Jy5FtS70Bk/OQG7w"
 Content-Disposition: inline
-In-Reply-To: <20221125040604.5051-6-weijiang.yang@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
-        autolearn_force=no version=3.4.6
+In-Reply-To: <20230125142056.18356-16-andy.chiu@sifive.com>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 24, 2022, Yang Weijiang wrote:
-> Write to MSR_ARCH_LBR_DEPTH has side-effect, all LBR entries are reset
-> to 0. Kernel PMU driver can leverage this effect to do fask reset to
-> LBR record MSRs. KVM allows guest to achieve it when Arch LBR records
-> MSRs are passed through to the guest.
-> 
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> Co-developed-by: Yang Weijiang <weijiang.yang@intel.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h |  3 ++
->  arch/x86/kvm/vmx/pmu_intel.c    | 58 +++++++++++++++++++++++++++++++--
->  2 files changed, 58 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 70af7240a1d5..2dba2fdd9cdc 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -571,6 +571,9 @@ struct kvm_pmu {
->  	 * redundant check before cleanup if guest don't use vPMU at all.
->  	 */
->  	u8 event_count;
-> +
-> +	/* Guest arch lbr depth supported by KVM. */
-> +	u64 kvm_arch_lbr_depth;
 
-There is zero reason to store this separately.  KVM already records the allowed
-depth in kvm_vcpu.lbr_desc.records.nr.
+--Jy5FtS70Bk/OQG7w
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
->  };
->  
->  struct kvm_pmu_ops;
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index 905673228932..0c78cb4b72be 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -178,6 +178,10 @@ static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
->  	    (index == MSR_LBR_SELECT || index == MSR_LBR_TOS))
->  		return true;
->  
-> +	if (index == MSR_ARCH_LBR_DEPTH)
-> +		return kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
+Hey Andy,
 
-Like the previous patch, since intel_pmu_lbr_is_enabled() effectively serves as
-a generic kvm_cpu_cap_has(LBRS) check, this can be distilled to:
+On Wed, Jan 25, 2023 at 02:20:52PM +0000, Andy Chiu wrote:
+> From: Greentime Hu <greentime.hu@sifive.com>
+>=20
+> Panic log:
+> [    0.018707] Unable to handle kernel NULL pointer dereference at virtua=
+l address 0000000000000000
+> [    0.023060] Oops [#1]
+> [    0.023214] Modules linked in:
+> [    0.023725] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.14.0 #33
+> [    0.023955] Hardware name: SiFive,FU800 (DT)
+> [    0.024150] epc : __vstate_save+0x1c/0x48
+> [    0.024654]  ra : arch_dup_task_struct+0x70/0x108
+> [    0.024815] epc : ffffffff80005ad8 ra : ffffffff800035a8 sp : ffffffff=
+81203d50
+> [    0.025020]  gp : ffffffff812e8290 tp : ffffffff8120bdc0 t0 : 00000000=
+00000000
+> [    0.025216]  t1 : 0000000000000000 t2 : 0000000000000000 s0 : ffffffff=
+81203d80
+> [    0.025424]  s1 : ffffffff8120bdc0 a0 : ffffffff8120c820 a1 : 00000000=
+00000000
+> [    0.025659]  a2 : 0000000000001000 a3 : 0000000000000000 a4 : 00000000=
+00000600
+> [    0.025869]  a5 : ffffffff8120cdc0 a6 : ffffffe00160b400 a7 : ffffffff=
+80a1fe60
+> [    0.026069]  s2 : ffffffe0016b8000 s3 : ffffffff81204000 s4 : 00000000=
+00004000
+> [    0.026267]  s5 : 0000000000000000 s6 : ffffffe0016b8000 s7 : ffffffe0=
+016b9000
+> [    0.026475]  s8 : ffffffff81203ee0 s9 : 0000000000800300 s10: ffffffff=
+812e9088
+> [    0.026689]  s11: ffffffd004008000 t3 : 0000000000000000 t4 : 00000000=
+00000100
+> [    0.026900]  t5 : 0000000000000600 t6 : ffffffe00167bcc4
+> [    0.027057] status: 8000000000000720 badaddr: 0000000000000000 cause: =
+000000000000000f
+> [    0.027344] [<ffffffff80005ad8>] __vstate_save+0x1c/0x48
+> [    0.027567] [<ffffffff8000abe8>] copy_process+0x266/0x11a0
+> [    0.027739] [<ffffffff8000bc98>] kernel_clone+0x90/0x2aa
+> [    0.027915] [<ffffffff8000c062>] kernel_thread+0x76/0x92
+> [    0.028075] [<ffffffff8072e34c>] rest_init+0x26/0xfc
+> [    0.028242] [<ffffffff80800638>] arch_call_rest_init+0x10/0x18
+> [    0.028423] [<ffffffff80800c4a>] start_kernel+0x5ce/0x5fe
+> [    0.029188] ---[ end trace 9a59af33f7ba3df4 ]---
+> [    0.029479] Kernel panic - not syncing: Attempted to kill the idle tas=
+k!
+> [    0.029907] ---[ end Kernel panic - not syncing: Attempted to kill the=
+ idle task! ]---
+>=20
+> The NULL pointer accessing caused the kernel panic. There is a NULL
+> pointer is because in vstate_save() function it will check
+> (regs->status & SR_VS) =3D=3D SR_VS_DIRTY and this is true, but it should=
+n't
+> be true because vector is not used here. Since vector is not used, datap
+> won't be allocated so it is NULL. The reason why regs->status is set to
+> a wrong value is because pt_regs->status is put in stack and it is pollut=
+ed
+> after setup_vm() called.
+>=20
+> In prologue of setup_vm(), we can observe it will save s2 to stack however
+> s2 is meaningless here because the caller is assembly code and s2 is just
+> some value from previous stage. The compiler will base on calling
+> convention to save the register to stack. Then 0x80008638 in s2 is saved
+> to stack. It might be any value. In this failure case it is 0x80008638 and
+> it will accidentally cause SR_VS_DIRTY to call the vstate_save() function.
 
-	if (cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
-		if (index == MSR_ARCH_LBR_DEPTH || index == MSR_ARCH_LBR_CTL)
-			return true;
-	} else {
-		if (index == MSR_LBR_SELECT || index == MSR_LBR_TOS))
-			return true;
-	}
+> diff --git a/arch/riscv/kernel/head.S b/arch/riscv/kernel/head.S
+> index 7cc975ce619d..512ebad013aa 100644
+> --- a/arch/riscv/kernel/head.S
+> +++ b/arch/riscv/kernel/head.S
+> @@ -301,6 +301,7 @@ clear_bss_done:
+>  	la tp, init_task
+>  	la sp, init_thread_union + THREAD_SIZE
+>  	XIP_FIXUP_OFFSET sp
+> +	addi sp, sp, -PT_SIZE
+>  #ifdef CONFIG_BUILTIN_DTB
+>  	la a0, __dtb_start
+>  	XIP_FIXUP_OFFSET a0
+> @@ -318,6 +319,7 @@ clear_bss_done:
+>  	/* Restore C environment */
+>  	la tp, init_task
+>  	la sp, init_thread_union + THREAD_SIZE
+> +	addi sp, sp, -PT_SIZE
 
-> +		       guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR);
-> +
->  	if ((index >= records->from && index < records->from + records->nr) ||
->  	    (index >= records->to && index < records->to + records->nr))
->  		return true;
-> @@ -345,6 +349,7 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->  	struct kvm_pmc *pmc;
-> +	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
->  	u32 msr = msr_info->index;
->  
->  	switch (msr) {
-> @@ -369,6 +374,9 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  	case MSR_PEBS_DATA_CFG:
->  		msr_info->data = pmu->pebs_data_cfg;
->  		return 0;
-> +	case MSR_ARCH_LBR_DEPTH:
-> +		msr_info->data = lbr_desc->records.nr;
-> +		return 0;
->  	default:
->  		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
->  		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-> @@ -395,6 +403,7 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->  	struct kvm_pmc *pmc;
-> +	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
->  	u32 msr = msr_info->index;
->  	u64 data = msr_info->data;
->  	u64 reserved_bits, diff;
-> @@ -456,6 +465,24 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->  			return 0;
->  		}
->  		break;
-> +	case MSR_ARCH_LBR_DEPTH:
-> +		if (!pmu->kvm_arch_lbr_depth && !msr_info->host_initiated)
+I've got no idea about this stuff, so I was just poking around at
+existing, similar bits of asm.
+grepping for code that does this (with your series applied), you are
+the only one who is using PT_SIZE rather than PT_SIZE_ON_STACK:
+rg "\bPT_SIZE" arch/riscv
+arch/riscv/kernel/head.S
+304:	addi sp, sp, -PT_SIZE
+322:	addi sp, sp, -PT_SIZE
 
-Don't invent a new check, just prevent KVM from reaching this path via the
-existing intel_pmu_lbr_is_enabled().
+arch/riscv/kernel/asm-offsets.c
+78:	DEFINE(PT_SIZE, sizeof(struct pt_regs));
+472:	DEFINE(PT_SIZE_ON_STACK, ALIGN(sizeof(struct pt_regs), STACK_ALIGN));
 
-> +			return 1;
-> +		/*
-> +		 * When guest/host depth are different, the handling would be tricky,
-> +		 * so only max depth is supported for both host and guest.
-> +		 */
+arch/riscv/kernel/probes/rethook_trampoline.S
+79:	addi sp, sp, -(PT_SIZE_ON_STACK)
+90:	addi sp, sp, PT_SIZE_ON_STACK
 
-This semi-arbitrary restriction is fine because Intel's architecture allows KVM
-to enumerate support for a single depth, but somewhere in the changelog and/or
-code that actually needs to be state.  This blurb
+arch/riscv/kernel/entry.S
+35:	addi sp, sp, -(PT_SIZE_ON_STACK)
+45:	addi sp, sp, -(PT_SIZE_ON_STACK)
+277:	addi s0, sp, PT_SIZE_ON_STACK
+417:	addi sp, sp, -(PT_SIZE_ON_STACK)
+461:	addi sp, sp, -(PT_SIZE_ON_STACK)
 
-  In the first generation of Arch LBR, max entry size is 32,
-  host configures the max size and guest always honors the setting.
+arch/riscv/kernel/mcount-dyn.S
+61:	addi	sp, sp, -PT_SIZE_ON_STACK
+64:	addi	sp, sp, PT_SIZE_ON_STACK
+66:	addi	sp, sp, -PT_SIZE_ON_STACK
+104:	addi	sp, sp, PT_SIZE_ON_STACK
+106:	addi	sp, sp, -PT_SIZE_ON_STACK
+139:	addi	sp, sp, PT_SIZE_ON_STACK
+179:	REG_L	a1, PT_SIZE_ON_STACK(sp)
 
-makes it sound like KVM is relying on the guest to do the right thing, and this
-code looks like KVM is making up it's own behavior.
+As I said, I don't know this area, so I am just pointing out the
+difference, and wondering if it is intentional!
 
-> +		if (data != pmu->kvm_arch_lbr_depth)
-> +			return 1;
-> +
-> +		lbr_desc->records.nr = data;
-> +		/*
-> +		 * Writing depth MSR from guest could either setting the
-> +		 * MSR or resetting the LBR records with the side-effect.
-> +		 */
-> +		if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+Cheers,
+Conor.
 
-Another check, really?  KVM shouldn't reach this point if KVM doesn't support
-Arch LBRs.  And if that isn't guarantee (honestly forgot what this series actually
-proposed at this point), then that's a bug, full stop.
 
-> +			wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
+--Jy5FtS70Bk/OQG7w
+Content-Type: application/pgp-signature; name="signature.asc"
 
-IIUC, this is subtly broken.  Piecing together all of the undocumented bits, my
-understanding is that arch LBRs piggyback KVM's existing LBR support, i.e. use a
-"virtual" perf event.  And like traditional LBR support, the host can steal control
-of the LBRs in IRQ context by disabling the perf event via IPI.  And since writes
-to MSR_ARCH_LBR_DEPTH purge LBR records, this needs to be treated as if it were a
-write to an LBR record, i.e. belongs in the IRQs disabled section of
-intel_pmu_handle_lbr_msrs_access().
+-----BEGIN PGP SIGNATURE-----
 
-If for some magical reason it's safe to access arch LBR MSRs without disabling IRQs
-and confirming perf event ownership, I want to see a very detailed changelog
-explaining exactly how that magic works.
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9Q0hwAKCRB4tDGHoIJi
+0oF3AP0Z15pGayQswQGlhn2kb9DurrmHCVDUpjOlzAuJb+20ewEA0jaMauqbMbls
+DyKlABEOalx2XeLgCpaPSDuJEsApmwk=
+=isMW
+-----END PGP SIGNATURE-----
 
-> +		return 0;
->  	default:
->  		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
->  		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
-> @@ -506,6 +533,32 @@ static void setup_fixed_pmc_eventsel(struct kvm_pmu *pmu)
->  	}
->  }
->  
-> +static bool cpuid_enable_lbr(struct kvm_vcpu *vcpu)
-> +{
-> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> +	struct kvm_cpuid_entry2 *entry;
-> +	int depth_bit;
-> +
-> +	if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-> +		return !static_cpu_has(X86_FEATURE_ARCH_LBR) &&
-> +			cpuid_model_is_consistent(vcpu);
-> +
-> +	pmu->kvm_arch_lbr_depth = 0;
-> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
-> +		return false;
-> +
-> +	entry = kvm_find_cpuid_entry(vcpu, 0x1C);
-> +	if (!entry)
-> +		return false;
-> +
-> +	depth_bit = fls(cpuid_eax(0x1C) & 0xff);
-
-This is unnecessarily fragile.  Get the LBR depth from perf, don't read CPUID and
-assume perf will always configured the max depth.,
-
-This enabling also belongs at the tail end of the series, i.e. KVM shouldn't let
-userspace enable LBRs until all the support pieces are in place.
-
-> +	if ((entry->eax & 0xff) != (1 << (depth_bit - 1)))
-> +		return false;
-> +
-> +	pmu->kvm_arch_lbr_depth = depth_bit * 8;
-> +	return true;
-> +}
-> +
->  static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  {
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
-> @@ -589,9 +642,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  	bitmap_set(pmu->all_valid_pmc_idx,
->  		INTEL_PMC_MAX_GENERIC, pmu->nr_arch_fixed_counters);
->  
-> -	perf_capabilities = vcpu_get_perf_capabilities(vcpu);
-> -	if (cpuid_model_is_consistent(vcpu) &&
-> -	    (perf_capabilities & PMU_CAP_LBR_FMT))
-> +	if (cpuid_enable_lbr(vcpu))
->  		x86_perf_get_lbr(&lbr_desc->records);
->  	else
->  		lbr_desc->records.nr = 0;
-> @@ -599,6 +650,7 @@ static void intel_pmu_refresh(struct kvm_vcpu *vcpu)
->  	if (lbr_desc->records.nr)
->  		bitmap_set(pmu->all_valid_pmc_idx, INTEL_PMC_IDX_FIXED_VLBR, 1);
->  
-> +	perf_capabilities = vcpu_get_perf_capabilities(vcpu);
->  	if (perf_capabilities & PERF_CAP_PEBS_FORMAT) {
->  		if (perf_capabilities & PERF_CAP_PEBS_BASELINE) {
->  			pmu->pebs_enable_mask = counter_mask;
-> -- 
-> 2.27.0
-> 
+--Jy5FtS70Bk/OQG7w--
