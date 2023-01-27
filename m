@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5AB1767E3CD
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:42:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E7FD767E381
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:33:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233762AbjA0LmT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 06:42:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60152 "EHLO
+        id S233329AbjA0Ldf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 06:33:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233802AbjA0Lln (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 06:41:43 -0500
+        with ESMTP id S233386AbjA0LdK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 06:33:10 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 737A37A4B9;
-        Fri, 27 Jan 2023 03:41:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AC64E7C33E;
+        Fri, 27 Jan 2023 03:31:25 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 63CF01713;
-        Fri, 27 Jan 2023 03:31:28 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1AC2B16F8;
+        Fri, 27 Jan 2023 03:31:31 -0800 (PST)
 Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.35.16])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0B9913F64C;
-        Fri, 27 Jan 2023 03:30:43 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B2D173F64C;
+        Fri, 27 Jan 2023 03:30:46 -0800 (PST)
 From:   Steven Price <steven.price@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc:     Steven Price <steven.price@arm.com>,
@@ -34,9 +34,9 @@ Cc:     Steven Price <steven.price@arm.com>,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Christoffer Dall <christoffer.dall@arm.com>,
         Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev
-Subject: [RFC PATCH 25/28] arm64: rme: support RSI_HOST_CALL
-Date:   Fri, 27 Jan 2023 11:29:29 +0000
-Message-Id: <20230127112932.38045-26-steven.price@arm.com>
+Subject: [RFC PATCH 26/28] arm64: rme: Allow checking SVE on VM instance
+Date:   Fri, 27 Jan 2023 11:29:30 +0000
+Message-Id: <20230127112932.38045-27-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127112932.38045-1-steven.price@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -51,67 +51,74 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joey Gouly <joey.gouly@arm.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
 
-Forward RSI_HOST_CALLS to KVM's HVC handler.
+Given we have different types of VMs supported, check the
+support for SVE for the given instance of the VM to accurately
+report the status.
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
- arch/arm64/kvm/rme-exit.c | 26 ++++++++++++++++++++++++++
- 1 file changed, 26 insertions(+)
+ arch/arm64/include/asm/kvm_rme.h | 2 ++
+ arch/arm64/kvm/arm.c             | 5 ++++-
+ arch/arm64/kvm/rme.c             | 7 ++++++-
+ 3 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/rme-exit.c b/arch/arm64/kvm/rme-exit.c
-index 15a4ff3517db..fcdc87e8f6bc 100644
---- a/arch/arm64/kvm/rme-exit.c
-+++ b/arch/arm64/kvm/rme-exit.c
-@@ -4,6 +4,7 @@
-  */
+diff --git a/arch/arm64/include/asm/kvm_rme.h b/arch/arm64/include/asm/kvm_rme.h
+index 2254e28c855e..68e99e5107bc 100644
+--- a/arch/arm64/include/asm/kvm_rme.h
++++ b/arch/arm64/include/asm/kvm_rme.h
+@@ -40,6 +40,8 @@ struct rec {
+ int kvm_init_rme(void);
+ u32 kvm_realm_ipa_limit(void);
  
- #include <linux/kvm_host.h>
-+#include <kvm/arm_hypercalls.h>
- #include <kvm/arm_psci.h>
- 
- #include <asm/rmi_smc.h>
-@@ -98,6 +99,29 @@ static int rec_exit_ripas_change(struct kvm_vcpu *vcpu)
- 	return 1;
++bool kvm_rme_supports_sve(void);
++
+ int kvm_realm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+ int kvm_init_realm_vm(struct kvm *kvm);
+ void kvm_destroy_realm(struct kvm *kvm);
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 645df5968e1e..1d0b8ac7314f 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -326,7 +326,10 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		r = get_kvm_ipa_limit();
+ 		break;
+ 	case KVM_CAP_ARM_SVE:
+-		r = system_supports_sve();
++		if (kvm && kvm_is_realm(kvm))
++			r = kvm_rme_supports_sve();
++		else
++			r = system_supports_sve();
+ 		break;
+ 	case KVM_CAP_ARM_PTRAUTH_ADDRESS:
+ 	case KVM_CAP_ARM_PTRAUTH_GENERIC:
+diff --git a/arch/arm64/kvm/rme.c b/arch/arm64/kvm/rme.c
+index 543e8d10f532..6ae7871aa6ed 100644
+--- a/arch/arm64/kvm/rme.c
++++ b/arch/arm64/kvm/rme.c
+@@ -49,6 +49,11 @@ static bool rme_supports(unsigned long feature)
+ 	return !!u64_get_bits(rmm_feat_reg0, feature);
  }
  
-+static int rec_exit_host_call(struct kvm_vcpu *vcpu)
++bool kvm_rme_supports_sve(void)
 +{
-+	int ret, i;
-+	struct rec *rec = &vcpu->arch.rec;
-+
-+	vcpu->stat.hvc_exit_stat++;
-+
-+	for (i = 0; i < REC_RUN_GPRS; i++)
-+		vcpu_set_reg(vcpu, i, rec->run->exit.gprs[i]);
-+
-+	ret = kvm_hvc_call_handler(vcpu);
-+
-+	if (ret < 0) {
-+		vcpu_set_reg(vcpu, 0, ~0UL);
-+		ret = 1;
-+	}
-+
-+	for (i = 0; i < REC_RUN_GPRS; i++)
-+		rec->run->entry.gprs[i] = vcpu_get_reg(vcpu, i);
-+
-+	return ret;
++	return rme_supports(RMI_FEATURE_REGISTER_0_SVE_EN);
 +}
 +
- static void update_arch_timer_irq_lines(struct kvm_vcpu *vcpu)
+ static int rmi_check_version(void)
  {
- 	struct rec *rec = &vcpu->arch.rec;
-@@ -159,6 +183,8 @@ int handle_rme_exit(struct kvm_vcpu *vcpu, int rec_run_ret)
- 		return rec_exit_psci(vcpu);
- 	case RMI_EXIT_RIPAS_CHANGE:
- 		return rec_exit_ripas_change(vcpu);
-+	case RMI_EXIT_HOST_CALL:
-+		return rec_exit_host_call(vcpu);
- 	}
+ 	struct arm_smccc_res res;
+@@ -1104,7 +1109,7 @@ static int config_realm_sve(struct realm *realm,
+ 	int max_sve_vq = u64_get_bits(rmm_feat_reg0,
+ 				      RMI_FEATURE_REGISTER_0_SVE_VL);
  
- 	kvm_pr_unimpl("Unsupported exit reason: %u\n",
+-	if (!rme_supports(RMI_FEATURE_REGISTER_0_SVE_EN))
++	if (!kvm_rme_supports_sve())
+ 		return -EINVAL;
+ 
+ 	if (cfg->sve_vq > max_sve_vq)
 -- 
 2.34.1
 
