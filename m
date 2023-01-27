@@ -2,76 +2,126 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5D4E067E1CF
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 11:38:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8AB2D67E31A
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:20:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231963AbjA0KiF (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 05:38:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46128 "EHLO
+        id S233213AbjA0LUp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 06:20:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231968AbjA0KiB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 05:38:01 -0500
-Received: from mail.8bytes.org (mail.8bytes.org [IPv6:2a01:238:42d9:3f00:e505:6202:4f0c:f051])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BEA59977D
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 02:37:48 -0800 (PST)
-Received: from 8bytes.org (p5b006afb.dip0.t-ipconnect.de [91.0.106.251])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        with ESMTP id S233188AbjA0LU2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 06:20:28 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B3C714222;
+        Fri, 27 Jan 2023 03:19:13 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 2A3AD21889;
+        Fri, 27 Jan 2023 11:19:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1674818344; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jg6tAtljWkLOtzvKkDNIoiHHgxanNXV1iXTx9cL+UQU=;
+        b=utmF3gy7DItB+OI2ZalxyBwjhN8ryT8raie78QEcmelb6Gaa27V6jEgklx42rzficIjadI
+        nu+HqyEOKtdYizLCOtQkNWx4S2VvGWugKipxH2r9HOc4bA9hB+YRcYXTY/zW8bW0QlDX7r
+        g41e96/5ttY1iEwr1MNKmU14WzKGC0w=
+Received: from suse.cz (unknown [10.100.201.202])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.8bytes.org (Postfix) with ESMTPSA id 434BB262DAE;
-        Fri, 27 Jan 2023 11:37:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-        s=default; t=1674815859;
-        bh=R/vzonbPGqlI/fZmSZV7Oq3KpncVikgbGOtJc5uDHsA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uiyg7VAqvx1KvY6pAty0HyViBFPcPNKJa7yPW1NGoUvjsD/KZbw2NK8bf1v3p0bVG
-         jcQSMu+XiQg8Qh5XzZvnyQ63ZLUp8Rzzr1OaPIssfgw7VRKjbqX/PVHKO7TRJlMMES
-         0e+iuWQVzRR3UU8f7raFD7bhHsn1ILcyoAiHaZc0AmX1168uJHCZo6ocJEo+PXvhpM
-         EqgjfxweSWpCZKwPpokCPzZBIJ9sKZ00feXY27b5sV1ns88FfocHRatiqO562iG7aC
-         sQ6SmA57DlPOXDryPlYaO2YvJ238p96W5LqGxvU28h605f4T2coCgYS6C2tlrPA8sD
-         ZcMfICSYsqTFQ==
-Date:   Fri, 27 Jan 2023 11:37:38 +0100
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Jiri Kosina <jkosina@suse.cz>, Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [Question PATCH kernel] x86/amd/sev/nmi+vc: Fix stack handling
- (why is this happening?)
-Message-ID: <Y9OpcoSacyOkPkvl@8bytes.org>
-References: <20230127035616.508966-1-aik@amd.com>
- <Y9OUfofjxDtTmwyV@hirez.programming.kicks-ass.net>
+        by relay2.suse.de (Postfix) with ESMTPS id A46122C141;
+        Fri, 27 Jan 2023 11:19:03 +0000 (UTC)
+Date:   Fri, 27 Jan 2023 12:19:03 +0100
+From:   Petr Mladek <pmladek@suse.com>
+To:     "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>
+Cc:     Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <Y9OzJzHIASUeIrzO@alley>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <Y9KyVKQk3eH+RRse@alley>
+ <Y9LswwnPAf+nOVFG@do-x1extreme>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y9OUfofjxDtTmwyV@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+In-Reply-To: <Y9LswwnPAf+nOVFG@do-x1extreme>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 10:08:14AM +0100, Peter Zijlstra wrote:
-> Welcome to the wonderful shit show that is x86 exceptions :/
+On Thu 2023-01-26 15:12:35, Seth Forshee (DigitalOcean) wrote:
+> On Thu, Jan 26, 2023 at 06:03:16PM +0100, Petr Mladek wrote:
+> > On Fri 2023-01-20 16:12:20, Seth Forshee (DigitalOcean) wrote:
+> > > We've fairly regularaly seen liveptches which cannot transition within kpatch's
+> > > timeout period due to busy vhost worker kthreads.
+> > 
+> > I have missed this detail. Miroslav told me that we have solved
+> > something similar some time ago, see
+> > https://lore.kernel.org/all/20220507174628.2086373-1-song@kernel.org/
 > 
-> I thought sev_es_*() is supposed to fix this. Joerg, any clue?
+> Interesting thread. I had thought about something along the lines of the
+> original patch, but there are some ideas in there that I hadn't
+> considered.
 
-Hmm, no, not yet, the stack-trace doesn't make much sense to me. The
-sev_es_* function calls in the NMI path are for re-enabling NMI and
-adjusting the #VC IST stack to allow nested VCs.
+Could you please provide some more details about the test system?
+Is there anything important to make it reproducible?
 
-Alexey, can you try to get a more stable backtrace? For example by
-building the kernel with frame pointers?
+The following aspects come to my mind. It might require:
 
-Regards,
+   + more workers running on the same system
+   + have a dedicated CPU for the worker
+   + livepatching the function called by work->fn()
+   + running the same work again and again
+   + huge and overloaded system
 
-	Joerg
+
+> > Honestly, kpatch's timeout 1 minute looks incredible low to me. Note
+> > that the transition is tried only once per minute. It means that there
+> > are "only" 60 attempts.
+> > 
+> > Just by chance, does it help you to increase the timeout, please?
+> 
+> To be honest my test setup reproduces the problem well enough to make
+> KLP wait significant time due to vhost threads, but it seldom causes it
+> to hit kpatch's timeout.
+> 
+> Our system management software will try to load a patch tens of times in
+> a day, and we've seen real-world cases where patches couldn't load
+> within kpatch's timeout for multiple days. But I don't have such an
+> environment readily accessible for my own testing. I can try to refine
+> my test case and see if I can get it to that point.
+
+My understanding is that you try to load the patch repeatedly but
+it always fails after the 1 minute timeout. It means that it always
+starts from the beginning (no livepatched process).
+
+Is there any chance to try it with a longer timeout, for example, one
+hour? It should increase the chance if there are more problematic kthreads.
+
+> > This low timeout might be useful for testing. But in practice, it does
+> > not matter when the transition is lasting one hour or even longer.
+> > It takes much longer time to prepare the livepatch.
+> 
+> Agreed. And to be clear, we cope with the fact that patches may take
+> hours or even days to get applied in some cases. The patches I sent are
+> just about improving the only case I've identified which has lead to
+> kpatch failing to load a patch for a day or longer.
+
+If it is acceptable to wait hours or even days then the 1 minute
+timeout is quite contra-productive. We actually do not use any timeout
+at all in livepatches provided by SUSE.
+
+Best Regards,
+Petr
