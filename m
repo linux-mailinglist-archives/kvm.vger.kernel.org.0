@@ -2,150 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CE1567E8BD
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 15:57:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 649D367E94A
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 16:18:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234097AbjA0O5p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 09:57:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34498 "EHLO
+        id S234369AbjA0PSJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 10:18:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbjA0O5o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 09:57:44 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7D174487;
-        Fri, 27 Jan 2023 06:57:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 7069AB80AEB;
-        Fri, 27 Jan 2023 14:57:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BE60C433EF;
-        Fri, 27 Jan 2023 14:57:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1674831461;
-        bh=9oICS0asxu5pqOGAnTqYWCY4ccjHnFUSU4M1Tn50WgY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nN+vviyBqLV/jR3XG1JSM2Cx4QFTyz+9OW/bDim9RT92HgOJYEH3IutWkLN6sbXeS
-         Hgd5D5xaniSuHsKg4XJYmUni90Pgj+f8ZnDpKsojX0xRTbyAMmMQoZRJci/33N4WuU
-         fX2NkOFdOzQ2qWybwwAFPCUTS3/Ufa1O2bSTbewTSV4/OFpNAwkfxjv6pmwuRUKqpc
-         Z/GOPE7yc/+/hcCC7QY9d47lcnpkIqB+FofcmoVFkG6Xn+lPaeDfatQMC1AXbLTT8d
-         q+o5GU18cAvSLfBDODTfwZ1W5oYNrFe2UWjMUrFkb4YBAu5iFahxPjYPDjumhTUvJl
-         zodV1RBIyz5nw==
-Date:   Fri, 27 Jan 2023 08:57:40 -0600
-From:   Seth Forshee <sforshee@kernel.org>
-To:     Petr Mladek <pmladek@suse.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
- loaded vhost worker kthreads
-Message-ID: <Y9PmZFBEwUBwV3s/@do-x1extreme>
-References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
- <Y9KyVKQk3eH+RRse@alley>
- <Y9LswwnPAf+nOVFG@do-x1extreme>
- <Y9OzJzHIASUeIrzO@alley>
+        with ESMTP id S234352AbjA0PSF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 10:18:05 -0500
+Received: from mail-yw1-x112e.google.com (mail-yw1-x112e.google.com [IPv6:2607:f8b0:4864:20::112e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EDD83D9
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 07:17:52 -0800 (PST)
+Received: by mail-yw1-x112e.google.com with SMTP id 00721157ae682-4c24993965eso70632027b3.12
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 07:17:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=qtmOJn2ynTbarZpt4sn09eBK6F0W3nGga9MlPF8BeoM=;
+        b=qMKuwTcsrrEKcPqZq+U1beo0zgEDd5gWpAx4YHRCBj5PaQbBtCA7AOLniz9QPhLuPP
+         IU3SwCLJ+LBYNahQm8PhXyVKm4pEBhC907/ooMVoNgRYWoXKXWszX7urIj4bmxgX6kGW
+         u0R6d/lQxpPfvjg/9+1GtXK5x8aZ1sH8A3a6nyZH9yp0McdnDU36Ro6aFfw0Gux9YF4Z
+         EO2T/Y7/JnbmfkDtE7H7PNhA8NXh2F8ZMPFUXOS5u+F3qfHygfdoAGo1p6qgP21gdFR7
+         ssDzCNggGchuK7SvJKsFjlaVEkNryccZC4MwUmxAD7If7IMvwgisvie2qfwhSD4RDfLz
+         sb7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qtmOJn2ynTbarZpt4sn09eBK6F0W3nGga9MlPF8BeoM=;
+        b=s4ISXSt61F8qCdVH1U2jrTuEaCy5f1nr7Fv0Ruyo9228+499UN9K7pz/9PpjBY5U5M
+         Ew+4CvmNmvgReAOptwao+E4ZYZV1UbiiA6mXsmmffG+qS71h99TU+FvAIo7xTGETe2UC
+         xAfVifpXajJQpUz7C0OOubovXefk4tWH2Oc9auIUB2oCr8vLb6F0Z++P7GuSKneXAAKU
+         iHwUi+leLU4TtrScR+mYobvEXlM+vQGhtevRJYex7jIoFCMo6XuE7wLRzPxPkr6AzEZs
+         GdKJLJNrIiuI5Ivk7bfBDhx9kFZQK1T+v0L5qDE9V35oZnP4MNhNwXot4cOTRkRZMHcj
+         a4qw==
+X-Gm-Message-State: AO0yUKUsKzNaVZAVGnqFmAeGqeGhSPk6qIeME4JSMvKClIaj3W3/sLtr
+        rwUJ5/9XPmPhUX7u2m7hYjjlBJqqIT2+BgDf73w=
+X-Google-Smtp-Source: AK7set9MQ4KitPLSUcDuN/or8feHGShMjiiAvNw02sa3lvN6wuzB2dBVneXGl+e7uNURvBEz+4OpxAlXHKKyHV8vlTE=
+X-Received: by 2002:a81:4882:0:b0:50e:79ff:776e with SMTP id
+ v124-20020a814882000000b0050e79ff776emr105761ywa.206.1674832671947; Fri, 27
+ Jan 2023 07:17:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9OzJzHIASUeIrzO@alley>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+From:   Stefan Hajnoczi <stefanha@gmail.com>
+Date:   Fri, 27 Jan 2023 10:17:40 -0500
+Message-ID: <CAJSP0QUuuZLC0DJNEfZ7amyd3XnRhRNr1k+1OgLfDeF77X1ZDQ@mail.gmail.com>
+Subject: Call for GSoC and Outreachy project ideas for summer 2023
+To:     qemu-devel <qemu-devel@nongnu.org>, kvm <kvm@vger.kernel.org>,
+        Rust-VMM Mailing List <rust-vmm@lists.opendev.org>
+Cc:     =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
+        =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+        Thomas Huth <thuth@redhat.com>, John Snow <jsnow@redhat.com>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+        "Florescu, Andreea" <fandree@amazon.com>,
+        Damien <damien.lemoal@opensource.wdc.com>,
+        Dmitry Fomichev <dmitry.fomichev@wdc.com>,
+        Hanna Reitz <hreitz@redhat.com>,
+        Alberto Faria <afaria@redhat.com>,
+        Daniel Henrique Barboza <danielhb413@gmail.com>,
+        =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+        Bernhard Beschow <shentey@gmail.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>, gmaglione@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 12:19:03PM +0100, Petr Mladek wrote:
-> On Thu 2023-01-26 15:12:35, Seth Forshee (DigitalOcean) wrote:
-> > On Thu, Jan 26, 2023 at 06:03:16PM +0100, Petr Mladek wrote:
-> > > On Fri 2023-01-20 16:12:20, Seth Forshee (DigitalOcean) wrote:
-> > > > We've fairly regularaly seen liveptches which cannot transition within kpatch's
-> > > > timeout period due to busy vhost worker kthreads.
-> > > 
-> > > I have missed this detail. Miroslav told me that we have solved
-> > > something similar some time ago, see
-> > > https://lore.kernel.org/all/20220507174628.2086373-1-song@kernel.org/
-> > 
-> > Interesting thread. I had thought about something along the lines of the
-> > original patch, but there are some ideas in there that I hadn't
-> > considered.
-> 
-> Could you please provide some more details about the test system?
-> Is there anything important to make it reproducible?
-> 
-> The following aspects come to my mind. It might require:
-> 
->    + more workers running on the same system
->    + have a dedicated CPU for the worker
->    + livepatching the function called by work->fn()
->    + running the same work again and again
->    + huge and overloaded system
+Dear QEMU, KVM, and rust-vmm communities,
+QEMU will apply for Google Summer of Code 2023
+(https://summerofcode.withgoogle.com/) and has been accepted into
+Outreachy May 2023 (https://www.outreachy.org/). You can now
+submit internship project ideas for QEMU, KVM, and rust-vmm!
 
-I'm isolating a CPU, starting a KVM guest with a virtio-net device, and
-setting the affinity of the vhost worker thread to only the isolated
-CPU. Thus the vhost-worker thread has a dedicated CPU, as you say. (I'll
-note that in real-world cases the systems have many CPUs, and while the
-vhost threads aren't each given a dedicated CPU, if the system load is
-light enough a thread can end up with exlusive use of a CPU).
+Please reply to this email by February 6th with your project ideas.
 
-Then all I do is run iperf between the guest and the host with several
-parallel streams. I seem to be hitting the limits of the guest vCPUs
-before the vhost thread is fully saturated, as this gets it to about 90%
-CPU utilization by the vhost thread.
+If you have experience contributing to QEMU, KVM, or rust-vmm you can
+be a mentor. Mentors support interns as they work on their project. It's a
+great way to give back and you get to work with people who are just
+starting out in open source.
 
-> > > Honestly, kpatch's timeout 1 minute looks incredible low to me. Note
-> > > that the transition is tried only once per minute. It means that there
-> > > are "only" 60 attempts.
-> > > 
-> > > Just by chance, does it help you to increase the timeout, please?
-> > 
-> > To be honest my test setup reproduces the problem well enough to make
-> > KLP wait significant time due to vhost threads, but it seldom causes it
-> > to hit kpatch's timeout.
-> > 
-> > Our system management software will try to load a patch tens of times in
-> > a day, and we've seen real-world cases where patches couldn't load
-> > within kpatch's timeout for multiple days. But I don't have such an
-> > environment readily accessible for my own testing. I can try to refine
-> > my test case and see if I can get it to that point.
-> 
-> My understanding is that you try to load the patch repeatedly but
-> it always fails after the 1 minute timeout. It means that it always
-> starts from the beginning (no livepatched process).
-> 
-> Is there any chance to try it with a longer timeout, for example, one
-> hour? It should increase the chance if there are more problematic kthreads.
+Good project ideas are suitable for remote work by a competent
+programmer who is not yet familiar with the codebase. In
+addition, they are:
+- Well-defined - the scope is clear
+- Self-contained - there are few dependencies
+- Uncontroversial - they are acceptable to the community
+- Incremental - they produce deliverables along the way
 
-Yes, I can try it. But I think I already mentioned that we are somewhat
-limited by our system management software and how livepatch loading is
-currently implemented there. I'd need to consult with others about how
-long we could make the timeout, but 1 hour is definitely too long under
-our current system.
+Feel free to post ideas even if you are unable to mentor the project.
+It doesn't hurt to share the idea!
 
-> > > This low timeout might be useful for testing. But in practice, it does
-> > > not matter when the transition is lasting one hour or even longer.
-> > > It takes much longer time to prepare the livepatch.
-> > 
-> > Agreed. And to be clear, we cope with the fact that patches may take
-> > hours or even days to get applied in some cases. The patches I sent are
-> > just about improving the only case I've identified which has lead to
-> > kpatch failing to load a patch for a day or longer.
-> 
-> If it is acceptable to wait hours or even days then the 1 minute
-> timeout is quite contra-productive. We actually do not use any timeout
-> at all in livepatches provided by SUSE.
+I will review project ideas and keep you up-to-date on QEMU's
+acceptance into GSoC.
 
-I agree, though I'd still prefer it didn't take days. Based on this
-discussion I do plan to look at changing how we load livepatches to make
-this possible, but it will take some time.
+Internship program details:
+- Paid, remote work open source internships
+- GSoC projects are 175 or 350 hours, Outreachy projects are 30
+hrs/week for 12 weeks
+- Mentored by volunteers from QEMU, KVM, and rust-vmm
+- Mentors typically spend at least 5 hours per week during the coding period
 
-Thanks,
-Seth
+For more background on QEMU internships, check out this video:
+https://www.youtube.com/watch?v=xNVCX7YMUL8
+
+Please let me know if you have any questions!
+
+Stefan
