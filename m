@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5577367E3DB
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:43:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id F35A667E3DA
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:43:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233882AbjA0Lm5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 06:42:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59676 "EHLO
+        id S233373AbjA0Lm4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 06:42:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233930AbjA0LmB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 06:42:01 -0500
+        with ESMTP id S231487AbjA0LmC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 06:42:02 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B2C177C31A;
-        Fri, 27 Jan 2023 03:41:30 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 056107C328;
+        Fri, 27 Jan 2023 03:41:32 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A914E1691;
-        Fri, 27 Jan 2023 03:41:56 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8AE0E169C;
+        Fri, 27 Jan 2023 03:41:59 -0800 (PST)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 08A9B3F64C;
-        Fri, 27 Jan 2023 03:41:11 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 04DDB3F64C;
+        Fri, 27 Jan 2023 03:41:14 -0800 (PST)
 From:   Suzuki K Poulose <suzuki.poulose@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc:     suzuki.poulose@arm.com,
@@ -37,10 +37,10 @@ Cc:     suzuki.poulose@arm.com,
         Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
         Zenghui Yu <yuzenghui@huawei.com>, linux-coco@lists.linux.dev,
         kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>
-Subject: [RFC kvmtool 30/31] arm64: realm: inject an abort on an unhandled MMIO access
-Date:   Fri, 27 Jan 2023 11:39:31 +0000
-Message-Id: <20230127113932.166089-31-suzuki.poulose@arm.com>
+        linux-kernel@vger.kernel.org
+Subject: [RFC kvmtool 31/31] arm64: Allow the user to create a realm
+Date:   Fri, 27 Jan 2023 11:39:32 +0000
+Message-Id: <20230127113932.166089-32-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127113932.166089-1-suzuki.poulose@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -55,35 +55,29 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Joey Gouly <joey.gouly@arm.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
 
-For Realms, inject a synchronous external abort, instead of ignoring unknown
-MMIO accesses.
+We have everything in place to create a realm, allow the user to do so.
 
-Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- arm/kvm-cpu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arm/aarch64/kvm.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arm/kvm-cpu.c b/arm/kvm-cpu.c
-index 90a15ae9..c96d75eb 100644
---- a/arm/kvm-cpu.c
-+++ b/arm/kvm-cpu.c
-@@ -155,4 +155,13 @@ void kvm_cpu__show_page_tables(struct kvm_cpu *vcpu)
- 
- void kvm_cpu__arch_unhandled_mmio(struct kvm_cpu *vcpu)
- {
-+	struct kvm_vcpu_events events = { };
-+
-+	if (!vcpu->kvm->cfg.arch.is_realm)
-+		return;
-+
-+	events.exception.ext_dabt_pending = 1;
-+
-+	if (ioctl(vcpu->vcpu_fd, KVM_SET_VCPU_EVENTS, &events) < 0)
-+		die_perror("KVM_SET_VCPU_EVENTS failed");
+diff --git a/arm/aarch64/kvm.c b/arm/aarch64/kvm.c
+index 1f3a0def..422dbec2 100644
+--- a/arm/aarch64/kvm.c
++++ b/arm/aarch64/kvm.c
+@@ -104,8 +104,6 @@ static void validate_realm_cfg(struct kvm *kvm)
+ 		if (strlen(kvm->cfg.arch.realm_pv) > KVM_CAP_ARM_RME_RPV_SIZE)
+ 			die("Invalid size for Realm Personalization Value\n");
+ 	}
+-
+-	die("Realms not supported");
  }
+ 
+ void kvm__arch_validate_cfg(struct kvm *kvm)
 -- 
 2.34.1
 
