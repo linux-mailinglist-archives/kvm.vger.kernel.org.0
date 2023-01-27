@@ -2,71 +2,51 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AE86167F09F
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 22:46:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E075B67F0C2
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 22:59:32 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231887AbjA0VqM (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 16:46:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57526 "EHLO
+        id S231938AbjA0V7b (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 16:59:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36374 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229981AbjA0VqK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 16:46:10 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E8E5C0F7
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 13:46:09 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id h5-20020a17090a9c0500b0022bb85eb35dso5960641pjp.3
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 13:46:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SBxu6NyOPQfAm5//jHY28N93ngYshh04Hp/ryNSbhA8=;
-        b=YHx+mWiOKFC4L7dYRxw7hJUNYN9atrXUf4k07CzfquThLD9OMz/BpnPo1FOFVZgU8X
-         QLkVp8TkBwq5ttTUQMdFiqfbFKITeZwFhfxaoVZKSNbeH8+nxgZO2WfqEEvLfnAKkkVL
-         AZTYo7GEGy4RqPTVgr02P2HnY4pzeijTGS/BCIPrMwa5LVDcck5BNGvw6yT1ZCm1vFT0
-         Z6M8djfk9DfaFcQTW99cXI4wsZ2ed5ji+1xpwPy1j86Em87rkoOFU3jkpq0Kip/Cl9+H
-         es7svuvlZYfLdpl90TaBgOJDReZL9C+nLd0phbYmaTK8GQGhG947TiuLKaseeS04K9Cb
-         /msw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SBxu6NyOPQfAm5//jHY28N93ngYshh04Hp/ryNSbhA8=;
-        b=myw/PDrNO6sB6qXl33Lxc1cAJfsNbSjp3S6cyigjt25tZX+t6gIZoxxyg/y0SBOUqW
-         TXMG8TPD9HLcafcyiyo5V1Us4b8ZfJ7B4DbFwlJ1uahphHPJC7Jb6Q32KoBl84QAEwyO
-         fXXskgsskapZOMoo8CntocV64GVWjcr0Q80OyBzFZHvx088mAmf7MnRJ25aOsN5FgNM2
-         xYZl72CDVAHsE6BkX1/OROVgikqNNqf508wZlY8jywKOs2EUiSeeju7GEKKsOGmuh5Xy
-         fw0j8ntg8EbOm3n22avMOYfE1DnI8C5JBA9LzQEhvWqHQv4B+w1/iLws1qcxNzDWpdEX
-         R6Uw==
-X-Gm-Message-State: AO0yUKVmSynFtXlzwU3SXzEifPrgbE7Z6D9KqmtGRDmaoi9R2kcQ6tKk
-        S/A3g7UnDgZALT/lULjQELDUEXea+d4Fv2VSOm0=
-X-Google-Smtp-Source: AK7set/LnUiebqUBd2kCESfTmkIx0pP8zJ0/XA1EwRyWLSaDm4LIvJcFTJwKMKGP38z4u4gX5WokDg==
-X-Received: by 2002:a17:902:b686:b0:191:4367:7fde with SMTP id c6-20020a170902b68600b0019143677fdemr162137pls.0.1674855969031;
-        Fri, 27 Jan 2023 13:46:09 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id a14-20020a170902ecce00b001960792dfe9sm3319119plh.135.2023.01.27.13.46.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 13:46:08 -0800 (PST)
-Date:   Fri, 27 Jan 2023 21:46:05 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yang Weijiang <weijiang.yang@intel.com>
-Cc:     pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, like.xu.linux@gmail.com,
-        kan.liang@linux.intel.com, wei.w.wang@intel.com
-Subject: Re: [PATCH v2 09/15] KVM: x86: Refine the matching and clearing
- logic for supported_xss
-Message-ID: <Y9RGHeXUVsQCpYBF@google.com>
-References: <20221125040604.5051-1-weijiang.yang@intel.com>
- <20221125040604.5051-10-weijiang.yang@intel.com>
+        with ESMTP id S229713AbjA0V7a (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 16:59:30 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6BF9A7E078;
+        Fri, 27 Jan 2023 13:58:58 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B7CD31FB;
+        Fri, 27 Jan 2023 13:59:35 -0800 (PST)
+Received: from [10.57.88.221] (unknown [10.57.88.221])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id AC4143F5A1;
+        Fri, 27 Jan 2023 13:58:50 -0800 (PST)
+Message-ID: <dfad6d75-6f4d-99ef-1c6a-4bf397dcaa13@arm.com>
+Date:   Fri, 27 Jan 2023 21:58:46 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221125040604.5051-10-weijiang.yang@intel.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH 1/4] iommu: Add a broken_unmanaged_domain flag in
+ iommu_ops
+Content-Language: en-GB
+To:     Nicolin Chen <nicolinc@nvidia.com>, jgg@nvidia.com,
+        kevin.tian@intel.com, joro@8bytes.org, will@kernel.org,
+        agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
+        yong.wu@mediatek.com, matthias.bgg@gmail.com,
+        thierry.reding@gmail.com, alex.williamson@redhat.com,
+        cohuck@redhat.com
+Cc:     vdumpa@nvidia.com, jonathanh@nvidia.com, iommu@lists.linux.dev,
+        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        linux-mediatek@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-tegra@vger.kernel.org,
+        kvm@vger.kernel.org
+References: <cover.1674849118.git.nicolinc@nvidia.com>
+ <0875479d24a53670e17db8a11945664a6bb4a25b.1674849118.git.nicolinc@nvidia.com>
+From:   Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <0875479d24a53670e17db8a11945664a6bb4a25b.1674849118.git.nicolinc@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-5.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+        RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,70 +54,94 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Nov 24, 2022, Yang Weijiang wrote:
-> From: Paolo Bonzini <pbonzini@redhat.com>
+On 2023-01-27 20:04, Nicolin Chen wrote:
+> Both IOMMU_DOMAIN_UNMANAGED and IOMMU_DOMAIN_DMA require the support
+> of __IOMMU_DOMAIN_PAGING capability, i.e. iommu_map/unmap. However,
+> some older iommu drivers do not fully support that, and these drivers
+> also do not advertise support for dma-iommu.c via IOMMU_DOMAIN_DMA,
+> or use arm_iommu_create_mapping(), so largely their implementations
+> of IOMMU_DOMAIN_UNMANAGED are untested. This means that a user like
+> vfio/iommufd does not likely work with them.
 > 
-> Refine the code path of the existing clearing of supported_xss in this way:
-> initialize the supported_xss with the filter of KVM_SUPPORTED_XSS mask and
-> update its value in a bit clear manner (rather than bit setting).
+> Several of them have obvious problems:
+>    * fsl_pamu_domain.c
+>      Without map/unmap ops in the default_domain_ops, it isn't an
+>      unmanaged domain at all.
+>    * mtk_iommu_v1.c
+>      With a fixed 4M "pagetable", it can only map exactly 4G of
+>      memory, but doesn't set the aperture.
+
+The aperture is easily fixed (one could argue that what's broken there 
+are the ARM DMA ops for assuming every IOMMU has a 32-bit IOVA space and 
+not checking).
+
+>    * tegra-gart.c
+>      Its notion of attach/detach and groups has to be a complete lie to
+>      get around all the other API expectations.
+
+That's true, and the domain is tiny and not isolated from the rest of 
+the address space outside the aperture, but the one thing it does do is 
+support iommu_map/unmap just fine, which is what this flag is documented 
+as saying it doesn't.
+
+> Some others might work but have never been tested with vfio/iommufd:
+>    * msm_iommu.c
+>    * omap-iommu.c
+>    * tegra-smmu.c
+
+And yet they all have other in-tree users (GPUs on MSM and Tegra, 
+remoteproc on OMAP) that allocate unmanaged domains and use 
+iommu_map/unmap just fine, so they're clearly not broken either.
+
+On the flipside, you're also missing cases like apple-dart, which can 
+have broken unmanaged domains by any definition, but only under certain 
+conditions (at least it "fails safe" and they will refuse attempts to 
+attach anything). I'd also question sprd-iommu, which hardly has a 
+generally-useful domain size, and has only just recently gained the 
+ability to unmap anything successfully. TBH none of the SoC IOMMUs are 
+likely to ever be of interest to VFIO or IOMMUFD, since the only things 
+they could assign to userspace are the individual devices - usually 
+graphics and media engines - that they're coupled to, whose useful 
+functionality tends to depend on clocks, phys, and random other 
+low-level stuff that would be somewhere between impractical and 
+downright unsafe to attempt to somehow expose as well.
+
+> Thus, mark all these drivers as having "broken" UNAMANGED domains and
+> add a new device_iommu_unmanaged_supported() API for vfio/iommufd and
+> dma-iommu to refuse to work with these drivers.
 > 
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Like Xu <like.xu@linux.intel.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
-> ---
->  arch/x86/kvm/vmx/vmx.c | 5 +++--
->  arch/x86/kvm/x86.c     | 6 +++++-
->  2 files changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 9bd52ad3bbf4..2ab4c33b5008 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7738,9 +7738,10 @@ static __init void vmx_set_cpu_caps(void)
->  		kvm_cpu_cap_set(X86_FEATURE_UMIP);
->  
->  	/* CPUID 0xD.1 */
-> -	kvm_caps.supported_xss = 0;
+> Co-developed-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
 
-This needs to stay until VMX actually supports something.
+[...]
 
-> -	if (!cpu_has_vmx_xsaves())
-> +	if (!cpu_has_vmx_xsaves()) {
->  		kvm_cpu_cap_clear(X86_FEATURE_XSAVES);
-> +		kvm_caps.supported_xss = 0;
+> diff --git a/include/linux/iommu.h b/include/linux/iommu.h
+> index 46e1347bfa22..919a5dbad75b 100644
+> --- a/include/linux/iommu.h
+> +++ b/include/linux/iommu.h
+> @@ -245,6 +245,10 @@ struct iommu_iotlb_gather {
+>    *                    pasid, so that any DMA transactions with this pasid
+>    *                    will be blocked by the hardware.
+>    * @pgsize_bitmap: bitmap of all possible supported page sizes
+> + * @broken_unmanaged_domain: IOMMU_DOMAIN_UNMANAGED is not fully functional; the
+> + *                           driver does not really support iommu_map/unmap, but
+> + *                           uses UNMANAGED domains for the IOMMU API, called by
+> + *                           other SOC drivers.
 
-This is already handled in common KVM.
+"uses UNMANAGED domains for the IOMMU API" is literally the definition 
+of unmanaged domains :/
 
-> +	}
->  
->  	/* CPUID 0x80000001 and 0x7 (RDPID) */
->  	if (!cpu_has_vmx_rdtscp()) {
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 74c858eaa1ea..889be0c9176d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -217,6 +217,8 @@ static struct kvm_user_return_msrs __percpu *user_return_msrs;
->  				| XFEATURE_MASK_BNDCSR | XFEATURE_MASK_AVX512 \
->  				| XFEATURE_MASK_PKRU | XFEATURE_MASK_XTILE)
->  
-> +#define KVM_SUPPORTED_XSS     0
-> +
->  u64 __read_mostly host_efer;
->  EXPORT_SYMBOL_GPL(host_efer);
->  
-> @@ -11999,8 +12001,10 @@ int kvm_arch_hardware_setup(void *opaque)
->  
->  	rdmsrl_safe(MSR_EFER, &host_efer);
->  
-> -	if (boot_cpu_has(X86_FEATURE_XSAVES))
-> +	if (boot_cpu_has(X86_FEATURE_XSAVES)) {
->  		rdmsrl(MSR_IA32_XSS, host_xss);
-> +		kvm_caps.supported_xss = host_xss & KVM_SUPPORTED_XSS;
-> +	}
->  
->  	kvm_init_pmu_capability();
->  
-> -- 
-> 2.27.0
-> 
+Some "other SOC drivers" use more of the IOMMU API than VFIO does :/
+
+Please just add IOMMU_CAP_IOMMUFD to represent whatever the nebulous 
+requirements of IOMMUFD actually are (frankly it's no less informative 
+than calling domains "broken"), handle that in the drivers you care 
+about and have tested, and use device_iommu_capable(). What you're 
+describing in this series is a capability, and we have a perfectly good 
+API for drivers to express those already. Plus, as demonstrated above, a 
+positive capability based on empirical testing will be infinitely more 
+robust than a negative one based on guessing.
+
+Thanks,
+Robin.
