@@ -2,132 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1F5D667ECB4
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 18:46:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9748667ECED
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 18:59:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235095AbjA0Rqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 12:46:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35610 "EHLO
+        id S232774AbjA0R7d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 12:59:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42128 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234025AbjA0Rqt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 12:46:49 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97C287D2AB;
-        Fri, 27 Jan 2023 09:46:47 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30RGrbqa021060;
-        Fri, 27 Jan 2023 17:46:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=VxG+aiZhuhssr8QPHzlAfPnXU7va5TskD2lv8gKu11w=;
- b=HIdofbICN06aRj/VbWJAqoAUUBNxmLgXL6LVdSs4HbMLnODBcdDf/IoL5NOARRaZMVp2
- PnCzsBP/x/cKi8fMbjDGwEbSs52oJSFm2PZVEY3X8T2qgh8FikkzP1YFVyYcCnO5ffD5
- MZxCE8cIRHiWB15wGZ6B4lbWfUe7l51kHwXQDuzTPJFTtIw4j6Nwri9N7WcNxGZMc575
- CT5fbyNAVX1zzaF8YJUylmBD4PlVxzn+a11P5EQH/cmOA7S5Fit2x3gK3xzp/6tVcHgn
- yR7uVlovXO3BGNW8Dt4Icam0G5fFazYhoBxlGKoozQHln3pOmYg7grxf41+HXOpER+/a yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ncjhk9d56-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Jan 2023 17:46:43 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30RHcIjI005768;
-        Fri, 27 Jan 2023 17:46:43 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ncjhk9d4m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Jan 2023 17:46:42 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30R5kv7S010790;
-        Fri, 27 Jan 2023 17:46:41 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3n87p6qv52-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Jan 2023 17:46:41 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30RHkbeg48169350
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Jan 2023 17:46:37 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7C2CA2004B;
-        Fri, 27 Jan 2023 17:46:37 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3923120043;
-        Fri, 27 Jan 2023 17:46:37 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Jan 2023 17:46:37 +0000 (GMT)
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, kvm@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Thomas Huth <thuth@redhat.com>
-Subject: [RFC PATCH v1] KVM: selftests: Compile s390 tests with -march=z10
-Date:   Fri, 27 Jan 2023 18:45:52 +0100
-Message-Id: <20230127174552.3370169-1-nsg@linux.ibm.com>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S234735AbjA0R7c (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 12:59:32 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4EB9C7CC9B
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 09:59:29 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D13782B;
+        Fri, 27 Jan 2023 10:00:10 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3B5BB3F5A1;
+        Fri, 27 Jan 2023 09:59:28 -0800 (PST)
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     andrew.jones@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: [kvm-unit-tests PATCH v5 0/2] arm: Add PSCI CPU_OFF test
+Date:   Fri, 27 Jan 2023 17:59:14 +0000
+Message-Id: <20230127175916.65389-1-alexandru.elisei@arm.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 3n17b4DYyHozSj_3UXQ1i8oMNO3MKu5a
-X-Proofpoint-ORIG-GUID: 3hjY8SkT8txt3NFncvzqm9PmjfM6ikfN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-27_10,2023-01-27_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- priorityscore=1501 spamscore=0 clxscore=1011 suspectscore=0
- mlxlogscore=999 adultscore=0 impostorscore=0 phishscore=0
- lowpriorityscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2301270164
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The guest used in s390 kvm selftests is not be set up to handle all
-instructions the compiler might emit, i.e. vector instructions, leading
-to crashes.
-Limit what the compiler emits to the oldest machine model currently
-supported by Linux.
+The series adds a test for the PSCI function CPU_OFF. The test is
+implemented in patch #2, "arm/psci: Add PSCI CPU_OFF test case".  Patch #1,
+"arm/psci: Test that CPU 1 has been successfully brought online" is a
+preparatory patch to allow the CPU_OFF test to run after the CPU_ON test.
+Executing the CPU_OFF test after the CPU_ON test makes the most sense,
+since CPU_OFF requires all the CPUs to be brought online before the test
+can execute, and this is exactly what the CPU_ON test does.
 
-Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
----
+I believe that proving that a CPU has been successfully offlined is an
+undecidable problem - it might just be that the CPU is stuck at a higher
+exception level doing something else entirely, and if the test were to wait
+long enough, the CPU would return from the CPU_OFF call and start executing
+code, thus failing to be offlined. Right now, the test waits for 100ms
+after checking that all the other CPUs are offline. I thought this was a
+good balance between making the test fast and being reasonably sure that
+the offline succeeded. I'm open to suggestions here if anyone thinks
+otherwise.
+
+Tested for both the arm and arm64 architectures: on an x86 machine (qemu
+with TCG), and a rockpro64 (qemu and kvmtool).
+
+And Nikita is not longer at Arm, and I don't have a new email address where
+she can be reached, so I didn't CC her.
+
+Changelog:
+
+v4 -> v5:
+- Open code smp_prepare_secondary in psci.c instead of exposing it as a
+  library function in the cpu_on test (Drew).
+- Don't return early if a CPU failed to online CPU1 in the cpu_on test, and
+  check the return values for the CPUs that succeeded to online CPU 1
+  (Drew).
+- Drop cpu_off_success in the cpu_off test in favour of checking
+  AFFINITY_INFO and the cpu idle mask (Drew).
+- Hopefully made the cpu_off test faster (Drew).
+
+v3 -> v4:
+- Moved ownership of the series to Alexandru Elisei. All bugs are mine.
+- Moved the timeout for the CPU_ON test to patch #1.
+- Changed the include order for arm/psic.c in patch #1 to order the headers
+  alphabetically.
+- Run the CPU_OFF test only if CPU_ON succeeds, because CPU_OFF expects all
+  CPUs to be online, the test would otherwise hang forever.
+- Minor style changes here and there.
+
+v2 -> v3:
+- Add timeout so that test does not hang if CPU1 fails to come online
+- Remove unnecessary call of on_cpus() in the condition where target CPU is not online.
+
+v1 -> v2:
+- Modify PSCI CPU_ON test to ensure CPU 1 remains online after the execution of the test.
+- Addition of PSCI CPU_OFF test and calling it after PSCI CPU_ON test has been executed.
+
+Alexandru Elisei (1):
+  arm/psci: Test that CPU 1 has been successfully brought online
+
+Nikita Venkatesh (1):
+  arm/psci: Add PSCI CPU_OFF test case
+
+ arm/psci.c        | 132 +++++++++++++++++++++++++++++++++++++++-------
+ lib/arm/asm/smp.h |   1 +
+ lib/arm/smp.c     |  12 +++--
+ lib/errata.h      |   2 +
+ 4 files changed, 125 insertions(+), 22 deletions(-)
 
 
-Should we also set -mtune?
-Since it are vector instructions that caused the problem here, there
-are some alternatives:
- * use -mno-vx
- * set the required guest control bit to enable vector instructions on
-   models supporting them
-
--march=z10 might prevent similar issues with other instructions, but I
-don't know if there actually exist other relevant instructions, so it
-could be needlessly restricting.
-
-
- tools/testing/selftests/kvm/Makefile | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 1750f91dd936..df0989949eb5 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -200,6 +200,9 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
- 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
- 	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
- 	$(KHDR_INCLUDES)
-+ifeq ($(ARCH),s390)
-+	CFLAGS += -march=z10
-+endif
- 
- no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
-         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+base-commit: 2480430a36102f8ea276b3bfb1d64d5dacc23b8f
 -- 
-2.34.1
+2.25.1
 
