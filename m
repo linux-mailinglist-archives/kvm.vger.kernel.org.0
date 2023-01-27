@@ -2,196 +2,246 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B56ED67F07A
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 22:37:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CC42667F08C
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 22:42:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230059AbjA0Vg7 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 16:36:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51162 "EHLO
+        id S230040AbjA0Vmo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 16:42:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229593AbjA0Vg6 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 16:36:58 -0500
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 651402A175;
-        Fri, 27 Jan 2023 13:36:57 -0800 (PST)
-Received: by mail-wm1-x32b.google.com with SMTP id l35-20020a05600c1d2300b003dc4634a466so244789wms.4;
-        Fri, 27 Jan 2023 13:36:57 -0800 (PST)
+        with ESMTP id S229447AbjA0Vmn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 16:42:43 -0500
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDBCF1C5AB
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 13:42:41 -0800 (PST)
+Received: by mail-pf1-x436.google.com with SMTP id g9so2106800pfk.13
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 13:42:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wjzq5k6eWg1I0/GMAp2LeFAGPD0xEfbPD6kNUwzQn8A=;
-        b=mqqjWersLhfnnFg/Gkqe7Zf3VibhxN0tDukAlSoRZ1/AEXL8BL+LplnUwCVPmWvMMS
-         OX9+qM9EkFPZtMpiAKG6VdZ0W68bwn3lMYc+oFu8ZDiOGYOZ/f0y+Lta5WBpPlDPDQJJ
-         6qlUeCfcP7oUgOkNsYUuw0dAG9Gkjy7FojaKnNIXueNkiIco+Kv5qskhYKJuwvD1ArmQ
-         /IoRmLePJOyWeuTGXU9/NOafvbpbtps62bM2VWLxX04jkRELtw31FWOgC8XHGP739I5n
-         gjEVQiywRy5jDySwPLutvKNUQPrlfv5uHtzoiu4MtQV8KuBgmyZ6uqQx9ERRR+ZzDfBx
-         1icg==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0d6n6AuTepafE8zRxy7R/0YUNfUjkxK2wRxr8ePG2TQ=;
+        b=Xd70rP95v9OOS8VZ/k+iLrWA61DJSoLEWwTfHLmKtArj4JixnNl/00BMvWM37/4e+q
+         zGYB8Qmj7+tqiBw/oie2xjCoKmJOV4JLfcRpzTN1rJwKPa420g1lyElw9YfS0VV3bh5n
+         YxeNAf6j2ugwdK5SUsUm16EANlytaNu7GucQ2LEe5EozOKNuxeSmK2/3Bcf9W61yKC5r
+         X9uHCqNIqzxTedojEN8KcjAi8z6eDqGBz/yOpoehWCRX0wNawVwTSkFa8zbKArGD7Wy4
+         K4H3c9nhbChl8jEbqQdVpQ4v1gsTkCEQBne//T6X46bRuNh3i8YFC+xoOXD9pmM8/NFq
+         GLFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wjzq5k6eWg1I0/GMAp2LeFAGPD0xEfbPD6kNUwzQn8A=;
-        b=0YiuWaHt0hwAen26m+EeTI9EhGu8jMEIF/sk/T6pWolpKkYFLkW71P+ET6gsFxDkgD
-         p1VhCb6VPkID5Y7WoAI4MEjz0Om66Dhfw3VfLigOgMF9DSDKu6y/bjFezTywPMxG13Tu
-         v43H9rqzZIOpWaH9g4r20Du20AlBLhYXCSm+ZPYCALHxuKCxa30XTzMJFY62o6nEQ5Fb
-         KgzAHsOep1FJcTPPaN3qIzNXZ3fdwoCtFL/VWWRI7mgW7X/Mfhcuvs7ojcB2QCBliDGU
-         UfCffvvo6nffqvPkplLx+PguSsmpKUMoKWz69uHl2qFzdtZTaWnyaTv7rEBBYPFDfkNE
-         iTNw==
-X-Gm-Message-State: AO0yUKXQb1TPGajldNRhkONhJdOjNKqurQbToaNd3Bg6VxxLZPLf/Nzr
-        NAODuPX6twEOWwFyiiQ7GBY=
-X-Google-Smtp-Source: AK7set8Pp4tv0182n/GQp7PzspRCykcbjXnPJBNjmaMDjFFHpobvlRLVqA0F6RTTSKBcgI2XIhPeqQ==
-X-Received: by 2002:a05:600c:1c02:b0:3dc:3b1a:5d2d with SMTP id j2-20020a05600c1c0200b003dc3b1a5d2dmr910363wms.0.1674855415880;
-        Fri, 27 Jan 2023 13:36:55 -0800 (PST)
-Received: from localhost (95-172-185-203.cpe.netmadeira.com. [95.172.185.203])
-        by smtp.gmail.com with ESMTPSA id t1-20020a05600c41c100b003dc47d458cdsm81138wmh.15.2023.01.27.13.36.54
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0d6n6AuTepafE8zRxy7R/0YUNfUjkxK2wRxr8ePG2TQ=;
+        b=tu7eHyU70Psa5j816B9KU9JQul9m+FlyFeOY1gcAMeVd6sQEaHwFRWbWT3QL3Kp3or
+         WVwl98j0K6p5OSxATVm9coSSyF1UkW9HRPor4Fk+aK75EzwQeu4UEFRSL6WaiXau7R8q
+         gWudqY1yw8r3MAPX/ufd8m1wxJ5Fi6LMctrRKsQlstr6sqoHxP/UzahHM0iGgFaqIr49
+         zx5BHE/s9gUkD13lSydbJe7IEVDJcHWSY3bOlpMEjEpMP0iajVdKYvIZqWTwRFndPxzL
+         PKRKXfjRTQ7ruy/YlM7MUcZc9cqrDbwiYaBMtXbXTWK3QPGjWYinty5Jo6ewkiM3FLGV
+         uBOA==
+X-Gm-Message-State: AO0yUKXCJUUgX/clGwyxbaWZuTsEQkZ6zqgvQfjqDa8XyN8+aFyGNEkC
+        vzzkRdj4XhaBaMQu5zX5YkqO2RdxnQVD/5v0+UI=
+X-Google-Smtp-Source: AK7set8ixdj3l9QJrIJEUtMxmDMBJN5pHM3X69PpntwQqq16lvP6YGflFCI+1AxN2EQZal+YPsNxaw==
+X-Received: by 2002:a05:6a00:1884:b0:581:bfac:7a52 with SMTP id x4-20020a056a00188400b00581bfac7a52mr131735pfh.1.1674855761263;
+        Fri, 27 Jan 2023 13:42:41 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id f186-20020a62dbc3000000b0058a72925687sm3040476pfg.212.2023.01.27.13.42.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 13:36:55 -0800 (PST)
-Date:   Fri, 27 Jan 2023 23:36:52 +0200
-From:   Zhi Wang <zhi.wang.linux@gmail.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     isaku.yamahata@intel.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-        Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-        Sagi Shahar <sagis@google.com>,
-        David Matlack <dmatlack@google.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        kai.huang@intel.com
-Subject: Re: [PATCH v11 030/113] KVM: x86/mmu: Replace hardcoded value 0 for
- the initial value for SPTE
-Message-ID: <20230127233513.0000367c@gmail.com>
-In-Reply-To: <Y9Fj/vgPEzfU1eof@google.com>
-References: <cover.1673539699.git.isaku.yamahata@intel.com>
-        <dee30f0562d8be0102547d8eb9fc77736eae679d.1673539699.git.isaku.yamahata@intel.com>
-        <20230125112434.0000512a@gmail.com>
-        <Y9Fj/vgPEzfU1eof@google.com>
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+        Fri, 27 Jan 2023 13:42:40 -0800 (PST)
+Date:   Fri, 27 Jan 2023 21:42:37 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, like.xu.linux@gmail.com,
+        kan.liang@linux.intel.com, wei.w.wang@intel.com,
+        Like Xu <like.xu@linux.intel.com>
+Subject: Re: [PATCH v2 06/15] KVM: vmx/pmu: Emulate MSR_ARCH_LBR_CTL for
+ guest Arch LBR
+Message-ID: <Y9RFTUqdS05WBCaW@google.com>
+References: <20221125040604.5051-1-weijiang.yang@intel.com>
+ <20221125040604.5051-7-weijiang.yang@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_SORBS_WEB,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221125040604.5051-7-weijiang.yang@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 25 Jan 2023 17:22:08 +0000
-Sean Christopherson <seanjc@google.com> wrote:
-
-> On Wed, Jan 25, 2023, Zhi Wang wrote:
-> > On Thu, 12 Jan 2023 08:31:38 -0800
-> > isaku.yamahata@intel.com wrote:
-> > 
-> > This refactor patch is quite hacky.
-> > 
-> > Why not change the purpose of vcpu->arch.mmu_shadow_page.gfp_zero and let the
-> > callers respect that the initial value of spte can be configurable? It will be
-> > generic and not TDX-specific, then kvm_init_shadow_page() is not required,
-> > mmu_topup_shadow_page_cache() can be left un-touched as the refactor can cover
-> > other architectures.
-> > 
-> > 1) Let it store the expected nonpresent value and rename it to nonpresent_spte.
-> 
-> 
-> I agree that handling this in the common code would be cleaner, but repurposing
-> gfp_zero gets kludgy because it would require a magic value to say "don't initialize
-> the data", e.g. x86's mmu_shadowed_info_cache isn't pre-filled.
-> 
-> And supporting a custom 64-bit init value for kmem_cache-backed caches would require
-> restricting such caches to be a multiple of 8 bytes in size.
-> 
-> How about this?  Lightly tested.
-> 
-> From: Sean Christopherson <seanjc@google.com>
-> Date: Wed, 25 Jan 2023 16:55:01 +0000
-> Subject: [PATCH] KVM: Allow page-sized MMU caches to be initialized with
->  custom 64-bit values
->
-
-It looks good enough so far although it only supports 64bit init value. But
-it can be extended in the future. 
-
-Just want to make sure people are thinking the same:
-
-1) Keep the changes of SHADOW_NONPRESENT_VALUE and REMOVED_SPTE in TDX patch.
-init_value stays as a generic feature in the kvm mmu cache layer. It is *not*
-going to replace SHADOW_NONPRESENT_VALUE.
-
-2) TDX kvm_x86_vcpu_create sets the SHADOW_NONPRESENT value into init_value.
-
-3) mmu cache topping up function initializes the page according to init_value
-with Sean's patch. 
-
-> Add support to MMU caches for initializing a page with a custom 64-bit
-> value, e.g. to pre-fill an entire page table with non-zero PTE values.
-> The functionality will be used by x86 to support Intel's TDX, which needs
-> to set bit 63 in all non-present PTEs in order to prevent !PRESENT page
-> faults from getting reflected into the guest (Intel's EPT Violation #VE
-> architecture made the less than brilliant decision of having the per-PTE
-> behavior be opt-out instead of opt-in).
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  include/linux/kvm_types.h |  1 +
->  virt/kvm/kvm_main.c       | 16 ++++++++++++++--
->  2 files changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
-> index 76de36e56cdf..67972db17b55 100644
-> --- a/include/linux/kvm_types.h
-> +++ b/include/linux/kvm_types.h
-> @@ -94,6 +94,7 @@ struct kvm_mmu_memory_cache {
->  	int nobjs;
->  	gfp_t gfp_zero;
->  	gfp_t gfp_custom;
-> +	u64 init_value;
->  	struct kmem_cache *kmem_cache;
->  	int capacity;
->  	void **objects;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d255964ec331..78f1e49179a7 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -380,12 +380,17 @@ static void kvm_flush_shadow_all(struct kvm *kvm)
->  static inline void *mmu_memory_cache_alloc_obj(struct kvm_mmu_memory_cache *mc,
->  					       gfp_t gfp_flags)
->  {
-> +	void *page;
-> +
->  	gfp_flags |= mc->gfp_zero;
->  
->  	if (mc->kmem_cache)
->  		return kmem_cache_alloc(mc->kmem_cache, gfp_flags);
-> -	else
-> -		return (void *)__get_free_page(gfp_flags);
-> +
-> +	page = (void *)__get_free_page(gfp_flags);
-> +	if (page && mc->init_value)
-> +		memset64(page, mc->init_value, PAGE_SIZE / sizeof(mc->init_value));
-> +	return page;
+On Thu, Nov 24, 2022, Yang Weijiang wrote:
+> @@ -345,6 +346,30 @@ static bool intel_pmu_handle_lbr_msrs_access(struct kvm_vcpu *vcpu,
+>  	return true;
 >  }
 >  
->  int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity, int min)
-> @@ -400,6 +405,13 @@ int __kvm_mmu_topup_memory_cache(struct kvm_mmu_memory_cache *mc, int capacity,
->  		if (WARN_ON_ONCE(!capacity))
->  			return -EIO;
+> +static bool arch_lbr_ctl_is_valid(struct kvm_vcpu *vcpu, u64 ctl)
+> +{
+> +	struct kvm_cpuid_entry2 *entry;
+> +	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> +
+> +	if (!pmu->kvm_arch_lbr_depth)
+> +		return false;
+> +
+> +	if (ctl & ~KVM_ARCH_LBR_CTL_MASK)
+> +		return false;
+> +
+> +	entry = kvm_find_cpuid_entry(vcpu, 0x1c);
+
+Why!?!?!  Why does this series reinvent the wheel so many times.  We already have
+a huge pile of reserved bits masks that are computed in intel_pmu_refresh(), just
+do the easy thing and follow the established pattern.
+
+> +	if (!entry)
+> +		return false;
+> +
+> +	if (!(entry->ebx & BIT(0)) && (ctl & ARCH_LBR_CTL_CPL))
+> +		return false;
+> +	if (!(entry->ebx & BIT(2)) && (ctl & ARCH_LBR_CTL_STACK))
+> +		return false;
+> +	if (!(entry->ebx & BIT(1)) && (ctl & ARCH_LBR_CTL_FILTER))
+> +		return false;
+> +	return true;
+> +}
+> +
+>  static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  {
+>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+> @@ -377,6 +402,14 @@ static int intel_pmu_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  	case MSR_ARCH_LBR_DEPTH:
+>  		msr_info->data = lbr_desc->records.nr;
+>  		return 0;
+> +	case MSR_ARCH_LBR_CTL:
+> +		if (!kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR)) {
+
+So I assume the point of this code is to allow reading MSR_ARCH_LBR_CTL from
+userspace before doing KVM_SET_CPUID2, but I would much rather do that in a
+generic way, i.e. build this series on 
+https://lore.kernel.org/all/20230124234905.3774678-7-seanjc@google.com
+
+> +			WARN_ON_ONCE(!msr_info->host_initiated);
+> +			msr_info->data = 0;
+> +		} else {
+> +			msr_info->data = vmcs_read64(GUEST_IA32_LBR_CTL);
+> +		}
+> +		return 0;
+>  	default:
+>  		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>  		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+> @@ -483,6 +516,18 @@ static int intel_pmu_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  		if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+>  			wrmsrl(MSR_ARCH_LBR_DEPTH, lbr_desc->records.nr);
+>  		return 0;
+> +	case MSR_ARCH_LBR_CTL:
+> +		if (msr_info->host_initiated && !pmu->kvm_arch_lbr_depth)
+> +			return data != 0;
+> +
+> +		if (!arch_lbr_ctl_is_valid(vcpu, data))
+> +			break;
+> +
+> +		vmcs_write64(GUEST_IA32_LBR_CTL, data);
+> +		if (intel_pmu_lbr_is_enabled(vcpu) && !lbr_desc->event &&
+> +		    (data & ARCH_LBR_CTL_LBREN))
+> +			intel_pmu_create_guest_lbr_event(vcpu);
+> +		return 0;
+>  	default:
+>  		if ((pmc = get_gp_pmc(pmu, msr, MSR_IA32_PERFCTR0)) ||
+>  		    (pmc = get_gp_pmc(pmu, msr, MSR_IA32_PMC0))) {
+> @@ -727,12 +772,16 @@ static void intel_pmu_reset(struct kvm_vcpu *vcpu)
+>   */
+>  static void intel_pmu_legacy_freezing_lbrs_on_pmi(struct kvm_vcpu *vcpu)
+>  {
+> -	u64 data = vmcs_read64(GUEST_IA32_DEBUGCTL);
+> +	u32 lbr_ctl_field = GUEST_IA32_DEBUGCTL;
+>  
+> -	if (data & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI) {
+> -		data &= ~DEBUGCTLMSR_LBR;
+> -		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+> -	}
+> +	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI))
+> +		return;
+> +
+> +	if (kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR) &&
+> +	    guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+> +		lbr_ctl_field = GUEST_IA32_LBR_CTL;
+
+Similar to other comments, just rely on KVM not allowing LBRs to be enabled unless
+the guest is configured with the correct flavor.
+
+> +
+> +	vmcs_write64(lbr_ctl_field, vmcs_read64(lbr_ctl_field) & ~0x1ULL);
+
+Open coding a bit just because it happens to be in the same position in both fields
+is ridiculous.
+
+	u64 debugctl = vmcs_read64(GUEST_IA32_DEBUGCTL);
+
+	if (!debugctl & DEBUGCTLMSR_FREEZE_LBRS_ON_PMI))
+		return;
+
+	if (cpu_feature_enabled(X86_FEATURE_ARCH_LBR))
+		vmcs_clear_bits64(GUEST_IA32_LBR_CTL, ARCH_LBR_CTL_LBREN);
+	else
+		vmcs_write64(GUEST_IA32_DEBUGCTL, debugctl & ~DEBUGCTLMSR_LBR);
+
+>  }
+>  
+>  static void intel_pmu_deliver_pmi(struct kvm_vcpu *vcpu)
+> @@ -801,7 +850,8 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>  	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
+> -	bool lbr_enable = !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) &&
+> +	bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
+> +		(vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
+>  		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
+>  
+>  	if (!lbr_desc->event) {
+> @@ -829,7 +879,8 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>  
+>  static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+>  {
+> -	bool lbr_enable = !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) &&
+> +	bool lbr_enable = guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) ?
+> +		(vmcs_read64(GUEST_IA32_LBR_CTL) & ARCH_LBR_CTL_LBREN) :
+>  		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
+
+Instead of open coding the same ugly ternary operator in multiple locations, add
+a helper.
+
+>  
+>  	if (!lbr_enable)
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index cea8c07f5229..1ae2efc29546 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -2120,6 +2120,13 @@ static int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>  						VM_EXIT_SAVE_DEBUG_CONTROLS)
+>  			get_vmcs12(vcpu)->guest_ia32_debugctl = data;
 >  
 > +		/*
-> +		 * Custom init values can be used only for page allocations,
-> +		 * and obviously conflict with __GFP_ZERO.
+> +		 * For Arch LBR, IA32_DEBUGCTL[bit 0] has no meaning.
+> +		 * It can be written to 0 or 1, but reads will always return 0.
 > +		 */
-> +		if (WARN_ON_ONCE(mc->init_value && (mc->kmem_cache || mc->gfp_zero)))
-> +			return -EIO;
-> +
->  		mc->objects = kvmalloc_array(sizeof(void *), capacity, gfp);
->  		if (!mc->objects)
->  			return -ENOMEM;
-> 
-> base-commit: 503f0315c97739d3f8e645c500d81757dfbf76be
+> +		if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
 
+This can be dependent solely on the host CPU.  If LBRs are unsupported, the bit
+will be marked invalid and cleared above.  And as mentioned multiple times, KVM
+needs to allow enabling LBRs iff the guest and host flavors match.
+
+> +			data &= ~DEBUGCTLMSR_LBR;
+
+This needs to be done before shoving the value into vmcs12.
+
+> +
+>  		vmcs_write64(GUEST_IA32_DEBUGCTL, data);
+>  		if (intel_pmu_lbr_is_enabled(vcpu) && !to_vmx(vcpu)->lbr_desc.event &&
+>  		    (data & DEBUGCTLMSR_LBR))
+> -- 
+> 2.27.0
+> 
