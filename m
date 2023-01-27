@@ -2,133 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A007667E4CA
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 13:12:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1577367E4DB
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 13:14:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233517AbjA0MMa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 07:12:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39366 "EHLO
+        id S233880AbjA0MOi (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 07:14:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233616AbjA0MMQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 07:12:16 -0500
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F2791FB5
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 04:06:38 -0800 (PST)
-Received: by mail-wm1-x32d.google.com with SMTP id f19-20020a1c6a13000000b003db0ef4dedcso5258470wmc.4
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 04:06:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=49P4rU1OzCSfjhkjXu4Djle+ur0lA/pLRqdrOGEuDgQ=;
-        b=RpNA9MFp0CVU4HeiQyETkfPOMTkObZr4wIbIXq7wmA6CTp03Z8EAd2089ySge5EERH
-         ZjZ9fN0BmIlhq0yDS6k/3Mm5XMV7qOsZ2EMRJSauB5sMxm96GgMjMYN+v4tLHl1E8Zvh
-         AmjTYt6adeiFzgPF4HnIH0BnzbEaLjScnhM8mtCqKSru6M0DdXIJsoc77IL+VpgMRyX0
-         mf0TpKlnmi4l8EHyv1ltaU5Dn8DNprra0RhdTMm5KcgGUuesLhhDPj7OBapsAbxBKEij
-         5+sO6qHjE5iY/nqcJRr2q14Ye3qc2t/nP2LnXHfMf0V+jeRAMbdzEn8rN78D8z+kvn3t
-         4kGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=49P4rU1OzCSfjhkjXu4Djle+ur0lA/pLRqdrOGEuDgQ=;
-        b=3kXhlmdHu0bNuy1VpF/a3W2Qs4rzE0VsiMgfpM10yAd9gVGKKC3B+2sMDGSwB1a8Ws
-         0z3c00xgnmtJCGmewxpiNUt0cWmKXMr/Bu9jwHmJ8QL4LHz5ubfcEBBpUOu3WET0FUse
-         YOvIV0K/5StK6eCa1RHAdkm4xl4zJgVdihTBCxZZr1iXdbjP64YQ+Z2eiOJkg3s5Zkaf
-         ZKnkapQ8TeHjBzLm1V4BW31g58jeMMM9k6WJFiM86KDIaJhZBKY4jX8u+iomHNEpHzFA
-         vMsiOJg47qRXlcMVAhHs1jBxCs+WQuWq8LGMaXQNIW4+q8GJsjbkNfFrm7owkc0UL12s
-         ovhA==
-X-Gm-Message-State: AFqh2koYC6UXtIMSdBCDfnPKLsU7YeJqWgzzS0gAYQcuqUYFTM1u7FaS
-        mVW4SjlK5nQp5DSvYOWC3o8pXA==
-X-Google-Smtp-Source: AMrXdXs5aFUhbmFjfKKDdPy0q2p6XQ4Qc5rB9l6xXkdXza417yI4JKDkS8vG3qPezgNlK6cM1LBxIw==
-X-Received: by 2002:a05:600c:3488:b0:3d2:370b:97f4 with SMTP id a8-20020a05600c348800b003d2370b97f4mr47051577wmq.16.1674821140277;
-        Fri, 27 Jan 2023 04:05:40 -0800 (PST)
-Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
-        by smtp.gmail.com with ESMTPSA id p8-20020a05600c05c800b003c65c9a36dfsm4010664wmd.48.2023.01.27.04.05.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 04:05:39 -0800 (PST)
-Date:   Fri, 27 Jan 2023 13:05:39 +0100
-From:   Andrew Jones <ajones@ventanamicro.com>
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Andy Chiu <andy.chiu@sifive.com>
-Subject: Re: [PATCH v2] RISC-V: KVM: Redirect illegal instruction traps to
- guest
-Message-ID: <20230127120539.nzbdoli7ahmenjmx@orel>
-References: <20230127112934.2749592-1-apatel@ventanamicro.com>
+        with ESMTP id S232859AbjA0MOZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 07:14:25 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 689C6206A7;
+        Fri, 27 Jan 2023 04:09:28 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 621CF218BB;
+        Fri, 27 Jan 2023 12:09:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1674821343; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=a9faRZ/SxtgILFonZsHOQNT86YKAAhJwA/HSfiWSP6Y=;
+        b=sMvrKAeF1FXre3nEN+/+ZQQUn2ojiJ+7aDv42b1jHg+dbyaQVeZI/KWwHjy4mn/l0JBxj1
+        TWkdJ4D44Wv8rj+4VbfdLqDSTf/FSTUUZo0J01gqgOs5vQM+tfDOOpi5dgSjp/SsqZc754
+        mjK6oH+DAvMdmUOUe3KdLkt0Rzik/wc=
+Received: from suse.cz (unknown [10.100.201.202])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 3C7932C141;
+        Fri, 27 Jan 2023 12:09:03 +0000 (UTC)
+Date:   Fri, 27 Jan 2023 13:09:02 +0100
+From:   Petr Mladek <pmladek@suse.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Josh Poimboeuf <jpoimboe@kernel.org>,
+        "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <Y9O+3jzH0PiG1qlJ@alley>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <Y9KyVKQk3eH+RRse@alley>
+ <Y9LswwnPAf+nOVFG@do-x1extreme>
+ <20230127044355.frggdswx424kd5dq@treble>
+ <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230127112934.2749592-1-apatel@ventanamicro.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 04:59:34PM +0530, Anup Patel wrote:
-> From: Andy Chiu <andy.chiu@sifive.com>
+On Fri 2023-01-27 11:37:02, Peter Zijlstra wrote:
+> On Thu, Jan 26, 2023 at 08:43:55PM -0800, Josh Poimboeuf wrote:
+> > On Thu, Jan 26, 2023 at 03:12:35PM -0600, Seth Forshee (DigitalOcean) wrote:
+> > > On Thu, Jan 26, 2023 at 06:03:16PM +0100, Petr Mladek wrote:
+> > > > On Fri 2023-01-20 16:12:20, Seth Forshee (DigitalOcean) wrote:
+> > > > > We've fairly regularaly seen liveptches which cannot transition within kpatch's
+> > > > > timeout period due to busy vhost worker kthreads.
+> > > > 
+> > > > I have missed this detail. Miroslav told me that we have solved
+> > > > something similar some time ago, see
+> > > > https://lore.kernel.org/all/20220507174628.2086373-1-song@kernel.org/
+> > > 
+> > > Interesting thread. I had thought about something along the lines of the
+> > > original patch, but there are some ideas in there that I hadn't
+> > > considered.
+> > 
+> > Here's another idea, have we considered this?  Have livepatch set
+> > TIF_NEED_RESCHED on all kthreads to force them into schedule(), and then
+> > have the scheduler call klp_try_switch_task() if TIF_PATCH_PENDING is
+> > set.
+> > 
+> > Not sure how scheduler folks would feel about that ;-)
 > 
-> The M-mode redirects an unhandled illegal instruction trap back
-> to S-mode. However, KVM running in HS-mode terminates the VS-mode
-> software when it receives illegal instruction trap. Instead, KVM
-> should redirect the illegal instruction trap back to VS-mode, and
-> let VS-mode trap handler decide the next step. This futher allows
-> guest kernel to implement on-demand enabling of vector extension
-> for a guest user space process upon first-use.
+> So, let me try and page all that back in.... :-)
 > 
-> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> ---
->  arch/riscv/kvm/vcpu_exit.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+> KLP needs to unwind the stack to see if any of the patched functions are
+> active, if not, flip task to new set.
 > 
-> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> index c9f741ab26f5..4ea101a73d8b 100644
-> --- a/arch/riscv/kvm/vcpu_exit.c
-> +++ b/arch/riscv/kvm/vcpu_exit.c
-> @@ -160,6 +160,9 @@ void kvm_riscv_vcpu_trap_redirect(struct kvm_vcpu *vcpu,
+> Unwinding the stack of a task can be done when:
+> 
+>  - task is inactive (stable reg and stack) -- provided it stays inactive
+>    while unwinding etc..
+> 
+>  - task is current (guarantees stack doesn't dip below where we started
+>    due to being busy on top etc..)
+> 
+> Can NOT be done from interrupt context, because can hit in the middle of
+> setting up stack frames etc..
+
+All the above seems correct.
+
+> The issue at hand is that some tasks run for a long time without passing
+> through an explicit check.
+
+There might actually be two possibilities why the transition fails
+too often:
+
+1. The task might be in the running state most of the time. Therefore
+   the backtrace is not reliable most of the time.
+
+   In this case, some cooperation with the scheduler would really
+   help. We would need to stop the task and check the stack
+   when it is stopped. Something like the patch you proposed.
+
+
+2. The task might be sleeping but almost always in a livepatched
+   function. Therefore it could not be transitioned.
+
+   It might be the case with vhost_worker(). The main loop is "tiny".
+   The kthread probaly spends most of the time with processing
+   a vhost_work. And if the "works" are livepatched...
+
+   In this case, it would help to call klp_try_switch_task(current)
+   in the main loop in vhost_worker(). It would always succeed
+   when vhost_worker() is not livepatched on its own.
+
+   Note that even this would not help with kPatch when a single
+   vhost_work might need more than the 1 minute timout to get proceed.
+
+> diff --git a/kernel/livepatch/transition.c b/kernel/livepatch/transition.c
+> index f1b25ec581e0..06746095a724 100644
+> --- a/kernel/livepatch/transition.c
+> +++ b/kernel/livepatch/transition.c
+> @@ -9,6 +9,7 @@
 >  
->  	/* Set Guest PC to Guest exception vector */
->  	vcpu->arch.guest_context.sepc = csr_read(CSR_VSTVEC);
-> +
-> +	/* Set Guest privilege mode to supervisor */
-> +	vcpu->arch.guest_context.sstatus |= SR_SPP;
-
-This could/should be a separate fix patch, right?
-
+>  #include <linux/cpu.h>
+>  #include <linux/stacktrace.h>
+> +#include <linux/stop_machine.h>
+>  #include "core.h"
+>  #include "patch.h"
+>  #include "transition.h"
+> @@ -334,6 +335,16 @@ static bool klp_try_switch_task(struct task_struct *task)
+>  	return !ret;
 >  }
 >  
+> +static int __stop_try_switch(void *arg)
+> +{
+> +	return klp_try_switch_task(arg) ? 0 : -EBUSY;
+> +}
+> +
+> +static bool klp_try_switch_task_harder(struct task_struct *task)
+> +{
+> +	return !stop_one_cpu(task_cpu(task), __stop_try_switch, task);
+> +}
+> +
 >  /*
-> @@ -179,6 +182,12 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
->  	ret = -EFAULT;
->  	run->exit_reason = KVM_EXIT_UNKNOWN;
->  	switch (trap->scause) {
-> +	case EXC_INST_ILLEGAL:
-> +		if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV) {
-> +			kvm_riscv_vcpu_trap_redirect(vcpu, trap);
-> +			ret = 1;
-> +		}
-> +		break;
->  	case EXC_VIRTUAL_INST_FAULT:
->  		if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
->  			ret = kvm_riscv_vcpu_virtual_insn(vcpu, run, trap);
-> -- 
-> 2.34.1
->
+>   * Sends a fake signal to all non-kthread tasks with TIF_PATCH_PENDING set.
+>   * Kthreads with TIF_PATCH_PENDING set are woken up.
 
-Otherwise,
+Nice. I am surprised that it can be implemented so easily.
 
-Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-
-Thanks,
-drew
+Best Regards,
+Petr
