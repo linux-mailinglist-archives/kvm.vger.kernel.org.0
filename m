@@ -2,123 +2,156 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88E1267DFB3
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 10:09:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6522E67E1C9
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 11:37:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232084AbjA0JJX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 04:09:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55480 "EHLO
+        id S231916AbjA0Kh3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 05:37:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbjA0JJW (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 04:09:22 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C0AF4C10;
-        Fri, 27 Jan 2023 01:09:21 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30R8kucJ018948;
-        Fri, 27 Jan 2023 09:09:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=4SZ7Es78iT9Bl1L8QXSmRpFohHTfZAPVu/ApukTo7Z0=;
- b=YYkwhCm6UX5DAfcGZbpf9cxes+8jobXlLBqG4S1Ag4hSDqQV5cwI10mkqQmddgVH1Zam
- Qm0EbqO7MVO0LvTOKnvd47FrvAMFqKUwnE4iuU5FbjtTQ2GnWWEWglhKb+RP+0Q5iwSj
- 1z+k3DCi+PCzyTaGgQr8EY35f3SP3HJW7J/dSEyX5SGT6IiNiQydad1xFYkaxyxuE8w7
- Y8L1IosVUIQVVYS1QFr78DNjBPzAeVR7lX2LJI9pDb8lX3eGVXCl5tcC6+hTFuhn6jxX
- o+rebkduEU7ZnshKtPzCOyqURz5iRo+jhWpidaMpaoeBZlB2AWmJZHshIBc10FlZKtdp 4Q== 
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nc8gxm80g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Jan 2023 09:09:20 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30R54RpW014840;
-        Fri, 27 Jan 2023 09:09:18 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n87affb05-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Jan 2023 09:09:18 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30R99ENW39715088
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Jan 2023 09:09:15 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id D55302004B;
-        Fri, 27 Jan 2023 09:09:14 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 8BD452004D;
-        Fri, 27 Jan 2023 09:09:14 +0000 (GMT)
-Received: from [9.171.2.114] (unknown [9.171.2.114])
-        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Jan 2023 09:09:14 +0000 (GMT)
-Message-ID: <c883a240-b5ad-9b21-006d-1074fc122f7b@linux.ibm.com>
-Date:   Fri, 27 Jan 2023 10:09:14 +0100
+        with ESMTP id S229482AbjA0Kh2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 05:37:28 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 123C2783C4;
+        Fri, 27 Jan 2023 02:37:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=PYMi/TarErTQ56/EQtR6VEaKTmJgxRJ5ZbhehxJvDLs=; b=L/qq7559CUAIGrM0xACianESbW
+        oKp8PaQUV86AD2w65sfBxeyZ9U5k+h0hXz92WEoTQ1p+fr5w7Ei3D0chC+a1gdRPXW5VRb9PaykvX
+        lUTpLhelg9SybB30rCkWBAIxeFmBNpzIy02w5JhhD7zhjOhDYawTiTisrjvNpSY+LljyE0kMLcsSj
+        vAkUF/K4pZttFFXnTUFoss9lMbH1S0J3N9u7KFhx/AprHMmz//ef/JpZMNWrbrg+jAcPdD2RrZz5Q
+        RZ2RY8+Xgl0k0hiAJWrGdEkvBOiHfa+rn6Cag8/DLn1Q8UPgyAJobMOYeO8WQf7kv3TZS59cQdgFW
+        3cUbg2ew==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pLM6T-007cYX-7t; Fri, 27 Jan 2023 10:37:06 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 26C6C3002BF;
+        Fri, 27 Jan 2023 11:37:03 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 099EC20DD8752; Fri, 27 Jan 2023 11:37:03 +0100 (CET)
+Date:   Fri, 27 Jan 2023 11:37:02 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
+        Petr Mladek <pmladek@suse.com>,
+        Jason Wang <jasowang@redhat.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jiri Kosina <jikos@kernel.org>,
+        Miroslav Benes <mbenes@suse.cz>,
+        Joe Lawrence <joe.lawrence@redhat.com>,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, live-patching@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <Y9KyVKQk3eH+RRse@alley>
+ <Y9LswwnPAf+nOVFG@do-x1extreme>
+ <20230127044355.frggdswx424kd5dq@treble>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH v3 1/1] KVM: s390: disable migration mode when dirty
- tracking is disabled
-To:     Nico Boehr <nrb@linux.ibm.com>, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-References: <20230126174027.133667-1-nrb@linux.ibm.com>
- <20230126174027.133667-2-nrb@linux.ibm.com>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20230126174027.133667-2-nrb@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: knMs9129_GZc04o7tlRVGvXn9NaAGZrf
-X-Proofpoint-GUID: knMs9129_GZc04o7tlRVGvXn9NaAGZrf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-27_04,2023-01-27_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- mlxlogscore=791 spamscore=0 mlxscore=0 phishscore=0 priorityscore=1501
- lowpriorityscore=0 suspectscore=0 malwarescore=0 clxscore=1015
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301270084
-X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230127044355.frggdswx424kd5dq@treble>
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIM_INVALID,
+        DKIM_SIGNED,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/26/23 18:40, Nico Boehr wrote:
-> Migration mode is a VM attribute which enables tracking of changes in
-> storage attributes (PGSTE). It assumes dirty tracking is enabled on all
-> memslots to keep a dirty bitmap of pages with changed storage attributes.
+On Thu, Jan 26, 2023 at 08:43:55PM -0800, Josh Poimboeuf wrote:
+> On Thu, Jan 26, 2023 at 03:12:35PM -0600, Seth Forshee (DigitalOcean) wrote:
+> > On Thu, Jan 26, 2023 at 06:03:16PM +0100, Petr Mladek wrote:
+> > > On Fri 2023-01-20 16:12:20, Seth Forshee (DigitalOcean) wrote:
+> > > > We've fairly regularaly seen liveptches which cannot transition within kpatch's
+> > > > timeout period due to busy vhost worker kthreads.
+> > > 
+> > > I have missed this detail. Miroslav told me that we have solved
+> > > something similar some time ago, see
+> > > https://lore.kernel.org/all/20220507174628.2086373-1-song@kernel.org/
+> > 
+> > Interesting thread. I had thought about something along the lines of the
+> > original patch, but there are some ideas in there that I hadn't
+> > considered.
 > 
-> When enabling migration mode, we currently check that dirty tracking is
-> enabled for all memslots. However, userspace can disable dirty tracking
-> without disabling migration mode.
+> Here's another idea, have we considered this?  Have livepatch set
+> TIF_NEED_RESCHED on all kthreads to force them into schedule(), and then
+> have the scheduler call klp_try_switch_task() if TIF_PATCH_PENDING is
+> set.
 > 
-> Since migration mode is pointless with dirty tracking disabled, disable
-> migration mode whenever userspace disables dirty tracking on any slot.
-> 
-> Also update the documentation to clarify that dirty tracking must be
-> enabled when enabling migration mode, which is already enforced by the
-> code in kvm_s390_vm_start_migration().
-> 
-> Also highlight in the documentation for KVM_S390_GET_CMMA_BITS that it
-> can now fail with -EINVAL when dirty tracking is disabled while
-> migration mode is on. Move all the error codes to a table to this stays
-> readable.
-> 
-> To disable migration mode, slots_lock should be held, which is taken
-> in kvm_set_memory_region() and thus held in
-> kvm_arch_prepare_memory_region().
-> 
-> Restructure the prepare code a bit so all the sanity checking is done
-> before disabling migration mode. This ensures migration mode isn't
-> disabled when some sanity check fails.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: 190df4a212a7 ("KVM: s390: CMMA tracking, ESSA emulation, migration mode")
-> Signed-off-by: Nico Boehr <nrb@linux.ibm.com>
+> Not sure how scheduler folks would feel about that ;-)
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+So, let me try and page all that back in.... :-)
+
+KLP needs to unwind the stack to see if any of the patched functions are
+active, if not, flip task to new set.
+
+Unwinding the stack of a task can be done when:
+
+ - task is inactive (stable reg and stack) -- provided it stays inactive
+   while unwinding etc..
+
+ - task is current (guarantees stack doesn't dip below where we started
+   due to being busy on top etc..)
+
+Can NOT be done from interrupt context, because can hit in the middle of
+setting up stack frames etc..
+
+The issue at hand is that some tasks run for a long time without passing
+through an explicit check.
+
+The thread above tried sticking something in cond_resched() which is a
+problem for PREEMPT=y since cond_resched() is a no-op.
+
+Preempt notifiers were raised, and those would actually be nice, except
+you can only install a notifier on current and you need some memory
+allocated per task, which makes it less than ideal. Plus ...
+
+... putting something in finish_task_switch() wouldn't be the end of the
+world I suppose, but then you still need to force schedule the task --
+imagine it being the only runnable task on the CPU, there's nothing
+going to make it actually switch.
+
+Which then leads me to suggest something daft like this.. does that
+help?
+
+
+diff --git a/kernel/livepatch/transition.c b/kernel/livepatch/transition.c
+index f1b25ec581e0..06746095a724 100644
+--- a/kernel/livepatch/transition.c
++++ b/kernel/livepatch/transition.c
+@@ -9,6 +9,7 @@
+ 
+ #include <linux/cpu.h>
+ #include <linux/stacktrace.h>
++#include <linux/stop_machine.h>
+ #include "core.h"
+ #include "patch.h"
+ #include "transition.h"
+@@ -334,6 +335,16 @@ static bool klp_try_switch_task(struct task_struct *task)
+ 	return !ret;
+ }
+ 
++static int __stop_try_switch(void *arg)
++{
++	return klp_try_switch_task(arg) ? 0 : -EBUSY;
++}
++
++static bool klp_try_switch_task_harder(struct task_struct *task)
++{
++	return !stop_one_cpu(task_cpu(task), __stop_try_switch, task);
++}
++
+ /*
+  * Sends a fake signal to all non-kthread tasks with TIF_PATCH_PENDING set.
+  * Kthreads with TIF_PATCH_PENDING set are woken up.
 
