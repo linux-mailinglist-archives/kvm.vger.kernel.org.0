@@ -2,124 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1139E67E840
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 15:27:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9572467E71E
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 14:53:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232907AbjA0O1a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 09:27:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40218 "EHLO
+        id S233172AbjA0Nx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 08:53:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232974AbjA0O11 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 09:27:27 -0500
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 140E78000C;
-        Fri, 27 Jan 2023 06:27:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674829633; x=1706365633;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=tQHYwsHuQmv3UmxqSGxgXFuhINcA80Abo3LA82di77s=;
-  b=Y7pVM78jO0HE/dAFn2MC+n1QPcxTlf+t0PCaJgf3dKQnetze2zawxNAu
-   q69c0J2MEFcOOMiANVxtmQN2YSFCzI/yfSYFrFoL7gih1s6pI1UX1Lqaz
-   ebdR9lldf4LLky8ii0uGc63YhYJQVTcR9ws1tNEIry4m1eMLhDDqwUp5h
-   Dn9yFRdfhdeLgVSXSJmR1xO7oCDOs3QbxeZ123IW4PXfOd7qfIuuTudvF
-   iPudNFbwLbGMIXMiu/sYVEGsJEIRIYeTvL0d017HIw/NebZuJStEhhnyK
-   d7tN/yT832fJekgxfUe0dhJ/ea4EwWLWoVmk9sHsrPdEmlplLDFYsFgyp
-   g==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10603"; a="310716130"
-X-IronPort-AV: E=Sophos;i="5.97,251,1669104000"; 
-   d="scan'208";a="310716130"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2023 06:27:12 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10603"; a="731859354"
-X-IronPort-AV: E=Sophos;i="5.97,251,1669104000"; 
-   d="scan'208";a="731859354"
-Received: from skxmcp01.bj.intel.com ([10.240.193.86])
-  by fmsmga004.fm.intel.com with ESMTP; 27 Jan 2023 06:27:10 -0800
-From:   Yu Zhang <yu.c.zhang@linux.intel.com>
-To:     pbonzini@redhat.com, shuah@kernel.org, seanjc@google.com,
-        kvm@vger.kernel.org
-Cc:     linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] KVM: selftest: Add dependency rules in makefile for C source code
-Date:   Fri, 27 Jan 2023 21:36:01 +0800
-Message-Id: <20230127133601.1165472-1-yu.c.zhang@linux.intel.com>
-X-Mailer: git-send-email 2.25.1
+        with ESMTP id S233086AbjA0Nx2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 08:53:28 -0500
+Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 590017C70E
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 05:53:26 -0800 (PST)
+Received: by mail-vs1-xe2d.google.com with SMTP id t10so5374297vsr.3
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 05:53:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=RzUBqryTptYUzEfhbyg+Lbcb+hwacEV+TO0IK7LNXU8=;
+        b=Nj0//xHZCol4X/4LoPRHBLp04mZ6EyoR6ifMGAJyZKXqDQ2DDO+UCVf7oXmiq8NKlv
+         uZhMC6w+AZvGFtaDvUzwidx8Sj6lRH4ps0RND4mC75QLASrACcarZbZAwCO+OrbBgA2a
+         g6FO/H9UpLopISqqI4EpbAT5FHiezaN0Fh8eq1vv3wpFDi1xJ1DxrF1FbWDGq1iQM8db
+         jhsXmwcthCd/L7yBe0BjwKvAfI5jGJEJ22/YXzrIkm6RnhG1QA/BRHhzDOqjpj8yDCHA
+         D4eYt52pTgdUF+rDhhr2qje3A/dPZp0eHCoQb4UOKqcPObAZwnduqaFfm0Ypw1PKn7gw
+         EiTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RzUBqryTptYUzEfhbyg+Lbcb+hwacEV+TO0IK7LNXU8=;
+        b=t3je/E3iT25IiZkFl0Ioco/j4AR4rkukPF0eXlLdheg6Qo3b+vS/mJTcs7lTdWb8sx
+         LksmTEWLrgfQegNHwY+YrVR+tnm8q/SGG/YIAp/L5pOXa5qZOqGrbOFB5RTXZ7Gv9h7E
+         +SDXQau3jYi3FQzyQXffl0mMSsBq9z3CP+CdfCDcnYvOsEEZdQ4gsBB4Aev7lry+tjd7
+         mgG4mE0/AaJwb5De+g1UL0RpXjhPaU6rZ+GRbQujCzertFrMtNZmqxK/OkN4vigJczvQ
+         gyye/z2hI0jzTzA9d+GWyx7dwVu/ME376Un97gusf+xtRGeTDqlAFPC5fB+t8d9aMCbj
+         BYyA==
+X-Gm-Message-State: AO0yUKX3AXINXx2j22EL9/y5SYNt70i76WuQw/Qsdw4k61tQIBAJ7mye
+        l5u/mPCtrs8/kfWbk9vw5fVD/MTwfpKkZCVLHVNBLA==
+X-Google-Smtp-Source: AK7set+G91Acv+61aPdZ7vz54qMR8TqpiXkerxphHeLdypTJtL9kTh+QKLLarGjOUcQbXe2xYcQWJXCbqIL8IuEg6ZM=
+X-Received: by 2002:a05:6102:3098:b0:3ec:1029:9eae with SMTP id
+ l24-20020a056102309800b003ec10299eaemr661243vsb.10.1674827605343; Fri, 27 Jan
+ 2023 05:53:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20230112140304.1830648-1-apatel@ventanamicro.com>
+ <20230112140304.1830648-4-apatel@ventanamicro.com> <20230126161147.6rewhfvlouqn4ual@orel>
+In-Reply-To: <20230126161147.6rewhfvlouqn4ual@orel>
+From:   Anup Patel <apatel@ventanamicro.com>
+Date:   Fri, 27 Jan 2023 19:23:13 +0530
+Message-ID: <CAK9=C2XzTdqXr+vWZ4Ua=HET1gvskAY+y9yFtGbmR2LGg87asQ@mail.gmail.com>
+Subject: Re: [PATCH 3/7] RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID
+ mask defines
+To:     Andrew Jones <ajones@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Atish Patra <atishp@atishpatra.org>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently, KVM selftests have to run "make clean && make" to rebuild the
-entire test suite each time a header file is modified. Define "-MD" as
-an EXTRA_CFLAGS, so we can generate the dependency rules for each target
-object, whose prerequisites contains the source file and the included header
-files as well. And including those dependency files in KVM selftests' makefile
-will release us from such annoyance.
+On Thu, Jan 26, 2023 at 9:41 PM Andrew Jones <ajones@ventanamicro.com> wrote:
+>
+> On Thu, Jan 12, 2023 at 07:33:00PM +0530, Anup Patel wrote:
+> > The hgatp.VMID mask defines are used before shifting when extracting
+> > VMID value from hgatp CSR value so based on the convention followed
+> > in the other parts of asm/csr.h, the hgatp.VMID mask defines should
+> > not have a _MASK suffix.
+> >
+> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> > ---
+> >  arch/riscv/include/asm/csr.h | 8 ++++----
+> >  arch/riscv/kvm/mmu.c         | 3 +--
+> >  arch/riscv/kvm/vmid.c        | 4 ++--
+> >  3 files changed, 7 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> > index d608dac4b19f..36d580528f90 100644
+> > --- a/arch/riscv/include/asm/csr.h
+> > +++ b/arch/riscv/include/asm/csr.h
+> > @@ -131,12 +131,12 @@
+> >
+> >  #define HGATP32_MODE_SHIFT   31
+> >  #define HGATP32_VMID_SHIFT   22
+> > -#define HGATP32_VMID_MASK    _AC(0x1FC00000, UL)
+> > +#define HGATP32_VMID         _AC(0x1FC00000, UL)
+> >  #define HGATP32_PPN          _AC(0x003FFFFF, UL)
+> >
+> >  #define HGATP64_MODE_SHIFT   60
+> >  #define HGATP64_VMID_SHIFT   44
+> > -#define HGATP64_VMID_MASK    _AC(0x03FFF00000000000, UL)
+> > +#define HGATP64_VMID         _AC(0x03FFF00000000000, UL)
+> >  #define HGATP64_PPN          _AC(0x00000FFFFFFFFFFF, UL)
+> >
+> >  #define HGATP_PAGE_SHIFT     12
+> > @@ -144,12 +144,12 @@
+> >  #ifdef CONFIG_64BIT
+> >  #define HGATP_PPN            HGATP64_PPN
+> >  #define HGATP_VMID_SHIFT     HGATP64_VMID_SHIFT
+> > -#define HGATP_VMID_MASK              HGATP64_VMID_MASK
+> > +#define HGATP_VMID           HGATP64_VMID
+> >  #define HGATP_MODE_SHIFT     HGATP64_MODE_SHIFT
+> >  #else
+> >  #define HGATP_PPN            HGATP32_PPN
+> >  #define HGATP_VMID_SHIFT     HGATP32_VMID_SHIFT
+> > -#define HGATP_VMID_MASK              HGATP32_VMID_MASK
+> > +#define HGATP_VMID           HGATP32_VMID
+> >  #define HGATP_MODE_SHIFT     HGATP32_MODE_SHIFT
+> >  #endif
+> >
+> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> > index 34b57e0be2ef..034746638fa6 100644
+> > --- a/arch/riscv/kvm/mmu.c
+> > +++ b/arch/riscv/kvm/mmu.c
+> > @@ -748,8 +748,7 @@ void kvm_riscv_gstage_update_hgatp(struct kvm_vcpu *vcpu)
+> >       unsigned long hgatp = gstage_mode;
+> >       struct kvm_arch *k = &vcpu->kvm->arch;
+> >
+> > -     hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) &
+> > -              HGATP_VMID_MASK;
+> > +     hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) & HGATP_VMID;
+> >       hgatp |= (k->pgd_phys >> PAGE_SHIFT) & HGATP_PPN;
+> >
+> >       csr_write(CSR_HGATP, hgatp);
+> > diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+> > index 6cd93995fb65..6f4d4979a759 100644
+> > --- a/arch/riscv/kvm/vmid.c
+> > +++ b/arch/riscv/kvm/vmid.c
+> > @@ -26,9 +26,9 @@ void kvm_riscv_gstage_vmid_detect(void)
+> >
+> >       /* Figure-out number of VMID bits in HW */
+> >       old = csr_read(CSR_HGATP);
+> > -     csr_write(CSR_HGATP, old | HGATP_VMID_MASK);
+> > +     csr_write(CSR_HGATP, old | HGATP_VMID);
+> >       vmid_bits = csr_read(CSR_HGATP);
+> > -     vmid_bits = (vmid_bits & HGATP_VMID_MASK) >> HGATP_VMID_SHIFT;
+> > +     vmid_bits = (vmid_bits & HGATP_VMID) >> HGATP_VMID_SHIFT;
+> >       vmid_bits = fls_long(vmid_bits);
+> >       csr_write(CSR_HGATP, old);
+> >
+> > --
+> > 2.34.1
+> >
+>
+> Could switch to GENMASK too at the same time :-)
 
-Signed-off-by: Yu Zhang <yu.c.zhang@linux.intel.com>
----
- tools/testing/selftests/kvm/Makefile | 21 ++++++++++++++++++---
- 1 file changed, 18 insertions(+), 3 deletions(-)
+Okay, I will update.
 
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index 1750f91dd936..b329e0d1a460 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -180,6 +180,8 @@ TEST_GEN_PROGS += $(TEST_GEN_PROGS_$(ARCH_DIR))
- TEST_GEN_PROGS_EXTENDED += $(TEST_GEN_PROGS_EXTENDED_$(ARCH_DIR))
- LIBKVM += $(LIBKVM_$(ARCH_DIR))
- 
-+OVERRIDE_TARGETS = 1
-+
- # lib.mak defines $(OUTPUT), prepends $(OUTPUT)/ to $(TEST_GEN_PROGS), and most
- # importantly defines, i.e. overwrites, $(CC) (unless `make -e` or `make CC=`,
- # which causes the environment variable to override the makefile).
-@@ -198,9 +200,11 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
- 	-fno-builtin-memcmp -fno-builtin-memcpy -fno-builtin-memset \
- 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
- 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
--	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
-+	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. \
- 	$(KHDR_INCLUDES)
- 
-+EXTRA_CFLAGS += -MD
-+
- no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
-         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
- 
-@@ -218,11 +222,22 @@ LIBKVM_S_OBJ := $(patsubst %.S, $(OUTPUT)/%.o, $(LIBKVM_S))
- LIBKVM_STRING_OBJ := $(patsubst %.c, $(OUTPUT)/%.o, $(LIBKVM_STRING))
- LIBKVM_OBJS = $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ) $(LIBKVM_STRING_OBJ)
- 
--EXTRA_CLEAN += $(LIBKVM_OBJS) cscope.*
-+TEST_GEN_OBJ = $(patsubst %, %.o, $(TEST_GEN_PROGS))
-+TEST_GEN_OBJ += $(patsubst %, %.o, $(TEST_GEN_PROGS_EXTENDED))
-+TEST_DEP_FILES = $(patsubst %.o, %.d, $(TEST_GEN_OBJ))
-+TEST_DEP_FILES += $(patsubst %.o, %.d, $(LIBKVM_OBJS))
-+-include $(TEST_DEP_FILES)
-+
-+$(TEST_GEN_PROGS) $(TEST_GEN_PROGS_EXTENDED): %: %.o
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH) $< $(LIBKVM_OBJS) $(LDLIBS) -o $@
-+$(TEST_GEN_OBJ): %.o: %.c
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(EXTRA_CFLAGS) $(TARGET_ARCH) -c $< -o $@
-+
-+EXTRA_CLEAN += $(LIBKVM_OBJS) $(TEST_DEP_FILES) $(TEST_GEN_OBJ) cscope.*
- 
- x := $(shell mkdir -p $(sort $(dir $(LIBKVM_C_OBJ) $(LIBKVM_S_OBJ))))
- $(LIBKVM_C_OBJ): $(OUTPUT)/%.o: %.c
--	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
-+	$(CC) $(CFLAGS) $(CPPFLAGS) $(EXTRA_CFLAGS) $(TARGET_ARCH) -c $< -o $@
- 
- $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S
- 	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c $< -o $@
--- 
-2.25.1
+>
+> Anyway,
+>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+>
 
+Thanks,
+Anup
