@@ -2,133 +2,111 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E78BE67EB04
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 17:36:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3359067EB9E
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 17:53:38 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234966AbjA0QgB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 11:36:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33452 "EHLO
+        id S232445AbjA0Qxf (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 11:53:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234958AbjA0QgA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 11:36:00 -0500
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 284FB618E;
-        Fri, 27 Jan 2023 08:35:59 -0800 (PST)
-Received: by linux.microsoft.com (Postfix, from userid 1112)
-        id B0B8420E67B2; Fri, 27 Jan 2023 08:35:58 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com B0B8420E67B2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1674837358;
-        bh=5mcq7PhD4YcYFiNvlkFyavcQvg058yspKz8CTNW7J0w=;
+        with ESMTP id S231382AbjA0Qxe (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 11:53:34 -0500
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1589C761C6;
+        Fri, 27 Jan 2023 08:53:02 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 81771CE0A36;
+        Fri, 27 Jan 2023 16:52:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21A53C433D2;
+        Fri, 27 Jan 2023 16:52:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674838358;
+        bh=4PEOSgaSNZcRyv2+4Vf4N0LKGu/uE0t/eNTGrTjQCE8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=nkRCVg+OBrYhnPug4FolKelm2JCHd7Xe4GUCmlQ6MN+/NXslq8sX7eEt7OHQusJep
-         Knu7vIhyveaE3kvQferaAI9ot0U7bu7+1dsz7hVckQoJHcODUeB0IwLHJ9TDz5S2fA
-         5mI093Wr1Or0tGtD89BYQ/q5K8uYO00ZrDMJ2pVs=
-Date:   Fri, 27 Jan 2023 08:35:58 -0800
-From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
-        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
-        tony.luck@intel.com, marcorr@google.com,
-        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
-        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
-        harald@profian.com, Nikunj A Dadhania <nikunj@amd.com>
-Subject: Re: [PATCH RFC v7 07/64] KVM: SEV: Handle KVM_HC_MAP_GPA_RANGE
- hypercall
-Message-ID: <20230127163558.GA22533@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-8-michael.roth@amd.com>
+        b=tDh7dRFiEDjTkn4QUY9DLfEhv4hvKDWOhuQFr/co53t+6RPG8/mbbd5IK3vfgBt4u
+         M15ZbDdGsTTvA/8kqxutPALB+tbijKfZqnH4ZLBndUu/BFDLGqFuw28pcR52cr1hyG
+         MbjAq0l6vdbGGWV2GbQzFQRwGqw6NXabRaExO2g01wSKMkkrL4muK4RfzJI6rCAjG3
+         3Z8kQ4YNkKGSOx6j7VjdfP682dkniDgwBbYkhjFA1OhOGJ0qRssXq8m4B0h/uFgKa9
+         EPR2bCInKU59FsqGVXDYnl3T98HdVXsie8++FxlNWSZvS1Z0QiHmX5CMik5q8CPozA
+         5Q07DNmxQ4H8Q==
+Date:   Fri, 27 Jan 2023 08:52:36 -0800
+From:   Josh Poimboeuf <jpoimboe@kernel.org>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Petr Mladek <pmladek@suse.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        Jiri Kosina <jikos@kernel.org>, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
+        live-patching@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <20230127165236.rjcp6jm6csdta6z3@treble>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <Y9KyVKQk3eH+RRse@alley>
+ <Y9LswwnPAf+nOVFG@do-x1extreme>
+ <20230127044355.frggdswx424kd5dq@treble>
+ <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-8-michael.roth@amd.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
-        SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:39:59PM -0600, Michael Roth wrote:
-> From: Nikunj A Dadhania <nikunj@amd.com>
-> 
-> KVM_HC_MAP_GPA_RANGE hypercall is used by the SEV guest to notify a
-> change in the page encryption status to the hypervisor.
-> 
-> The hypercall exits to userspace with KVM_EXIT_HYPERCALL exit code,
-> currently this is used for explicit memory conversion between
-> shared/private for memfd based private memory.
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/kvm/x86.c  | 8 ++++++++
->  virt/kvm/kvm_main.c | 1 +
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index bb6adb216054..732f9cbbadb5 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -9649,6 +9649,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+On Fri, Jan 27, 2023 at 11:37:02AM +0100, Peter Zijlstra wrote:
+> On Thu, Jan 26, 2023 at 08:43:55PM -0800, Josh Poimboeuf wrote:
+> > Here's another idea, have we considered this?  Have livepatch set
+> > TIF_NEED_RESCHED on all kthreads to force them into schedule(), and then
+> > have the scheduler call klp_try_switch_task() if TIF_PATCH_PENDING is
+> > set.
+> > 
+> > Not sure how scheduler folks would feel about that ;-)
 
-Couldn't find a better commit to comment on:
-when the guest has the ptp-kvm module, it will issue a KVM_HC_CLOCK_PAIRING
-hypercall. This will pass sev_es_validate_vmgexit validation and end up in this
-function where kvm_pv_clock_pairing() is called, and that calls
-kvm_write_guest(). This results in a CPU soft-lockup, at least in my testing.
+Hmmmm, with preemption I guess the above doesn't work for kthreads
+calling cond_resched() instead of what vhost_worker() does (explicit
+need_resched/schedule).
 
-Are there any emulated hypercalls that make sense for snp guests? We should
-block at least the ones that definitely don't work.
-
-Jeremi
-
->  		break;
->  	case KVM_HC_MAP_GPA_RANGE: {
->  		u64 gpa = a0, npages = a1, attrs = a2;
-> +		struct kvm_memory_slot *slot;
+> diff --git a/kernel/livepatch/transition.c b/kernel/livepatch/transition.c
+> index f1b25ec581e0..06746095a724 100644
+> --- a/kernel/livepatch/transition.c
+> +++ b/kernel/livepatch/transition.c
+> @@ -9,6 +9,7 @@
 >  
->  		ret = -KVM_ENOSYS;
->  		if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_MAP_GPA_RANGE)))
-> @@ -9660,6 +9661,13 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
->  			break;
->  		}
->  
-> +		slot = kvm_vcpu_gfn_to_memslot(vcpu, gpa_to_gfn(gpa));
-> +		if (!vcpu->kvm->arch.upm_mode ||
-> +		    !kvm_slot_can_be_private(slot)) {
-> +			ret = 0;
-> +			break;
-> +		}
-> +
->  		vcpu->run->exit_reason        = KVM_EXIT_HYPERCALL;
->  		vcpu->run->hypercall.nr       = KVM_HC_MAP_GPA_RANGE;
->  		vcpu->run->hypercall.args[0]  = gpa;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index d2daa049e94a..73bf0bdedb59 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2646,6 +2646,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
->  
->  	return NULL;
+>  #include <linux/cpu.h>
+>  #include <linux/stacktrace.h>
+> +#include <linux/stop_machine.h>
+>  #include "core.h"
+>  #include "patch.h"
+>  #include "transition.h"
+> @@ -334,6 +335,16 @@ static bool klp_try_switch_task(struct task_struct *task)
+>  	return !ret;
 >  }
-> +EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_memslot);
 >  
->  bool kvm_is_visible_gfn(struct kvm *kvm, gfn_t gfn)
->  {
-> -- 
-> 2.25.1
-> 
+> +static int __stop_try_switch(void *arg)
+> +{
+> +	return klp_try_switch_task(arg) ? 0 : -EBUSY;
+> +}
+> +
+> +static bool klp_try_switch_task_harder(struct task_struct *task)
+> +{
+> +	return !stop_one_cpu(task_cpu(task), __stop_try_switch, task);
+> +}
+> +
+>  /*
+>   * Sends a fake signal to all non-kthread tasks with TIF_PATCH_PENDING set.
+>   * Kthreads with TIF_PATCH_PENDING set are woken up.
+
+Doesn't work for PREEMPT+!ORC.  Non-ORC reliable unwinders will detect
+preemption on the stack and automatically report unreliable.
+
+-- 
+Josh
