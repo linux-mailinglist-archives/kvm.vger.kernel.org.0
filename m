@@ -2,24 +2,24 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6378D67E3A3
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:40:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F67767E3A9
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:41:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233455AbjA0Lkq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 06:40:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59236 "EHLO
+        id S233848AbjA0LlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 06:41:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234219AbjA0Lkk (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 06:40:40 -0500
+        with ESMTP id S233857AbjA0LlK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 06:41:10 -0500
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0BE7024CB3;
-        Fri, 27 Jan 2023 03:40:22 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 94271F77F;
+        Fri, 27 Jan 2023 03:40:41 -0800 (PST)
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 415CD1650;
-        Fri, 27 Jan 2023 03:40:42 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2471D1684;
+        Fri, 27 Jan 2023 03:40:45 -0800 (PST)
 Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id B89653F64C;
-        Fri, 27 Jan 2023 03:39:57 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 911713F64C;
+        Fri, 27 Jan 2023 03:40:00 -0800 (PST)
 From:   Suzuki K Poulose <suzuki.poulose@arm.com>
 To:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
 Cc:     suzuki.poulose@arm.com,
@@ -38,9 +38,9 @@ Cc:     suzuki.poulose@arm.com,
         Zenghui Yu <yuzenghui@huawei.com>, linux-coco@lists.linux.dev,
         kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org
-Subject: [RFC kvmtool 04/31] Add --nocompat option to disable compat warnings
-Date:   Fri, 27 Jan 2023 11:39:05 +0000
-Message-Id: <20230127113932.166089-5-suzuki.poulose@arm.com>
+Subject: [RFC kvmtool 05/31] arm64: Check pvtime support against the KVM instance
+Date:   Fri, 27 Jan 2023 11:39:06 +0000
+Message-Id: <20230127113932.166089-6-suzuki.poulose@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230127113932.166089-1-suzuki.poulose@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -55,79 +55,30 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Alexandru Elisei <alexandru.elisei@arm.com>
+KVM_CAP_STEAL_TIME can be checked against a VM instance.
+To allow controlling the feature depending on the VM type,
+use the cap against the VM.
 
-Commit e66942073035 ("kvm tools: Guest kernel compatability") added the
-functionality that enables devices to print a warning message if the device
-hasn't been initialized by the time the VM is destroyed. The purpose of
-these messages is to let the user know if the kernel hasn't been built with
-the correct Kconfig options to take advantage of the said devices (all
-using virtio).
-
-Since then, kvmtool has evolved and now supports loading different payloads
-(like firmware images), and having those warnings even when it is entirely
-intentional for the payload not to touch the devices can be confusing for
-the user and makes the output unnecessarily verbose in those cases.
-
-Add the --nocompat option to disable the warnings; the warnings are still
-enabled by default.
-
-Reported-by: Christoffer Dall <christoffer.dall@arm.com>
-Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 ---
- builtin-run.c            | 5 ++++-
- guest_compat.c           | 1 +
- include/kvm/kvm-config.h | 1 +
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ arm/aarch64/pvtime.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/builtin-run.c b/builtin-run.c
-index bb7e6e8d..f8edfb3f 100644
---- a/builtin-run.c
-+++ b/builtin-run.c
-@@ -183,6 +183,8 @@ static int mem_parser(const struct option *opt, const char *arg, int unset)
- 	OPT_BOOLEAN('\0', "nodefaults", &(cfg)->nodefaults, "Disable"   \
- 			" implicit configuration that cannot be"	\
- 			" disabled otherwise"),				\
-+	OPT_BOOLEAN('\0', "nocompat", &(cfg)->nocompat, "Disable"	\
-+			" compat warnings"),				\
- 	OPT_CALLBACK('\0', "9p", NULL, "dir_to_share,tag_name",		\
- 		     "Enable virtio 9p to share files between host and"	\
- 		     " guest", virtio_9p_rootdir_parser, kvm),		\
-@@ -797,7 +799,8 @@ static int kvm_cmd_run_work(struct kvm *kvm)
+diff --git a/arm/aarch64/pvtime.c b/arm/aarch64/pvtime.c
+index 2933ac7c..839aa8a7 100644
+--- a/arm/aarch64/pvtime.c
++++ b/arm/aarch64/pvtime.c
+@@ -58,8 +58,8 @@ int kvm_cpu__setup_pvtime(struct kvm_cpu *vcpu)
+ 	if (kvm_cfg->no_pvtime)
+ 		return 0;
  
- static void kvm_cmd_run_exit(struct kvm *kvm, int guest_ret)
- {
--	compat__print_all_messages();
-+	if (!kvm->cfg.nocompat)
-+		compat__print_all_messages();
- 
- 	init_list__exit(kvm);
- 
-diff --git a/guest_compat.c b/guest_compat.c
-index fd4704b2..a413c12c 100644
---- a/guest_compat.c
-+++ b/guest_compat.c
-@@ -88,6 +88,7 @@ int compat__print_all_messages(void)
- 
- 		printf("\n  # KVM compatibility warning.\n\t%s\n\t%s\n",
- 			msg->title, msg->desc);
-+		printf("\tTo stop seeing this warning, use the --nocompat option.\n");
- 
- 		list_del(&msg->list);
- 		compat__free(msg);
-diff --git a/include/kvm/kvm-config.h b/include/kvm/kvm-config.h
-index 368e6c7d..88df7cc2 100644
---- a/include/kvm/kvm-config.h
-+++ b/include/kvm/kvm-config.h
-@@ -30,6 +30,7 @@ struct kvm_config {
- 	u64 vsock_cid;
- 	bool virtio_rng;
- 	bool nodefaults;
-+	bool nocompat;
- 	int active_console;
- 	int debug_iodelay;
- 	int nrcpus;
+-	has_stolen_time = kvm__supports_extension(vcpu->kvm,
+-						  KVM_CAP_STEAL_TIME);
++	has_stolen_time = kvm__supports_vm_extension(vcpu->kvm,
++						     KVM_CAP_STEAL_TIME);
+ 	if (!has_stolen_time) {
+ 		kvm_cfg->no_pvtime = true;
+ 		return 0;
 -- 
 2.34.1
 
