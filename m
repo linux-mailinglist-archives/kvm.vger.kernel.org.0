@@ -2,168 +2,129 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9572467E71E
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 14:53:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C4EF067E7BA
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 15:06:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233172AbjA0Nx3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 08:53:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33442 "EHLO
+        id S234365AbjA0OGJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 09:06:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233086AbjA0Nx2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 08:53:28 -0500
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 590017C70E
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 05:53:26 -0800 (PST)
-Received: by mail-vs1-xe2d.google.com with SMTP id t10so5374297vsr.3
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 05:53:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=RzUBqryTptYUzEfhbyg+Lbcb+hwacEV+TO0IK7LNXU8=;
-        b=Nj0//xHZCol4X/4LoPRHBLp04mZ6EyoR6ifMGAJyZKXqDQ2DDO+UCVf7oXmiq8NKlv
-         uZhMC6w+AZvGFtaDvUzwidx8Sj6lRH4ps0RND4mC75QLASrACcarZbZAwCO+OrbBgA2a
-         g6FO/H9UpLopISqqI4EpbAT5FHiezaN0Fh8eq1vv3wpFDi1xJ1DxrF1FbWDGq1iQM8db
-         jhsXmwcthCd/L7yBe0BjwKvAfI5jGJEJ22/YXzrIkm6RnhG1QA/BRHhzDOqjpj8yDCHA
-         D4eYt52pTgdUF+rDhhr2qje3A/dPZp0eHCoQb4UOKqcPObAZwnduqaFfm0Ypw1PKn7gw
-         EiTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=RzUBqryTptYUzEfhbyg+Lbcb+hwacEV+TO0IK7LNXU8=;
-        b=t3je/E3iT25IiZkFl0Ioco/j4AR4rkukPF0eXlLdheg6Qo3b+vS/mJTcs7lTdWb8sx
-         LksmTEWLrgfQegNHwY+YrVR+tnm8q/SGG/YIAp/L5pOXa5qZOqGrbOFB5RTXZ7Gv9h7E
-         +SDXQau3jYi3FQzyQXffl0mMSsBq9z3CP+CdfCDcnYvOsEEZdQ4gsBB4Aev7lry+tjd7
-         mgG4mE0/AaJwb5De+g1UL0RpXjhPaU6rZ+GRbQujCzertFrMtNZmqxK/OkN4vigJczvQ
-         gyye/z2hI0jzTzA9d+GWyx7dwVu/ME376Un97gusf+xtRGeTDqlAFPC5fB+t8d9aMCbj
-         BYyA==
-X-Gm-Message-State: AO0yUKX3AXINXx2j22EL9/y5SYNt70i76WuQw/Qsdw4k61tQIBAJ7mye
-        l5u/mPCtrs8/kfWbk9vw5fVD/MTwfpKkZCVLHVNBLA==
-X-Google-Smtp-Source: AK7set+G91Acv+61aPdZ7vz54qMR8TqpiXkerxphHeLdypTJtL9kTh+QKLLarGjOUcQbXe2xYcQWJXCbqIL8IuEg6ZM=
-X-Received: by 2002:a05:6102:3098:b0:3ec:1029:9eae with SMTP id
- l24-20020a056102309800b003ec10299eaemr661243vsb.10.1674827605343; Fri, 27 Jan
- 2023 05:53:25 -0800 (PST)
+        with ESMTP id S234295AbjA0OFz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 09:05:55 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C79106951F;
+        Fri, 27 Jan 2023 06:05:39 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30RC1OVT010041;
+        Fri, 27 Jan 2023 14:05:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=LoTGPiuJh3766yTEZTf6HBDNTGo0cr5J76Pfl1uGNZI=;
+ b=FQRsNrh/pKGWwQgTtY5nZH7eOU1yTctJHj5K5N1UlpAumaxsUJHi6rHNlHveFZLuZ79F
+ CLE5kYcf3YDasSohIp9uMkr3tP2zTyCzmTpZnqnvojU+bPX0iwmB/f88semPFaPgRMz9
+ MQV/tP3TGVuJaLjulq07akktr/mK5MfjkfIClxuVtB+gw18YeVQOU+qHpktJW9gQEeKV
+ 5n9rqZXe+I+5NpNBATabZPCI/h8ANhRqlftA/OvytRFzeGeA83JBOno2IqGVe2mCENVk
+ o7sAWODq9R3iNqCD9f8TvawQs0nGlkpu/2CgFk68kxrIVDLsqDs9unhLYVI18i7XxBj/ hg== 
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nce8mb5cj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Jan 2023 14:05:38 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30QKVxeK027489;
+        Fri, 27 Jan 2023 14:05:36 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3n87p6fme8-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Jan 2023 14:05:36 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30RE5XEe22151570
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Jan 2023 14:05:33 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4421E2004D;
+        Fri, 27 Jan 2023 14:05:33 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 142132004B;
+        Fri, 27 Jan 2023 14:05:33 +0000 (GMT)
+Received: from t35lp63.lnxne.boe (unknown [9.152.108.100])
+        by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Jan 2023 14:05:33 +0000 (GMT)
+From:   Nico Boehr <nrb@linux.ibm.com>
+To:     borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com
+Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
+Subject: [PATCH v4 0/1] KVM: s390: disable migration mode when dirty tracking is disabled
+Date:   Fri, 27 Jan 2023 15:05:31 +0100
+Message-Id: <20230127140532.230651-1-nrb@linux.ibm.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-References: <20230112140304.1830648-1-apatel@ventanamicro.com>
- <20230112140304.1830648-4-apatel@ventanamicro.com> <20230126161147.6rewhfvlouqn4ual@orel>
-In-Reply-To: <20230126161147.6rewhfvlouqn4ual@orel>
-From:   Anup Patel <apatel@ventanamicro.com>
-Date:   Fri, 27 Jan 2023 19:23:13 +0530
-Message-ID: <CAK9=C2XzTdqXr+vWZ4Ua=HET1gvskAY+y9yFtGbmR2LGg87asQ@mail.gmail.com>
-Subject: Re: [PATCH 3/7] RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID
- mask defines
-To:     Andrew Jones <ajones@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: johLMoYsH2s5gG8T0slY12Deuw1VUqvf
+X-Proofpoint-GUID: johLMoYsH2s5gG8T0slY12Deuw1VUqvf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-27_08,2023-01-27_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ mlxscore=0 spamscore=0 impostorscore=0 malwarescore=0 suspectscore=0
+ mlxlogscore=561 priorityscore=1501 adultscore=0 phishscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301270133
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Jan 26, 2023 at 9:41 PM Andrew Jones <ajones@ventanamicro.com> wrote:
->
-> On Thu, Jan 12, 2023 at 07:33:00PM +0530, Anup Patel wrote:
-> > The hgatp.VMID mask defines are used before shifting when extracting
-> > VMID value from hgatp CSR value so based on the convention followed
-> > in the other parts of asm/csr.h, the hgatp.VMID mask defines should
-> > not have a _MASK suffix.
-> >
-> > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
-> > ---
-> >  arch/riscv/include/asm/csr.h | 8 ++++----
-> >  arch/riscv/kvm/mmu.c         | 3 +--
-> >  arch/riscv/kvm/vmid.c        | 4 ++--
-> >  3 files changed, 7 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
-> > index d608dac4b19f..36d580528f90 100644
-> > --- a/arch/riscv/include/asm/csr.h
-> > +++ b/arch/riscv/include/asm/csr.h
-> > @@ -131,12 +131,12 @@
-> >
-> >  #define HGATP32_MODE_SHIFT   31
-> >  #define HGATP32_VMID_SHIFT   22
-> > -#define HGATP32_VMID_MASK    _AC(0x1FC00000, UL)
-> > +#define HGATP32_VMID         _AC(0x1FC00000, UL)
-> >  #define HGATP32_PPN          _AC(0x003FFFFF, UL)
-> >
-> >  #define HGATP64_MODE_SHIFT   60
-> >  #define HGATP64_VMID_SHIFT   44
-> > -#define HGATP64_VMID_MASK    _AC(0x03FFF00000000000, UL)
-> > +#define HGATP64_VMID         _AC(0x03FFF00000000000, UL)
-> >  #define HGATP64_PPN          _AC(0x00000FFFFFFFFFFF, UL)
-> >
-> >  #define HGATP_PAGE_SHIFT     12
-> > @@ -144,12 +144,12 @@
-> >  #ifdef CONFIG_64BIT
-> >  #define HGATP_PPN            HGATP64_PPN
-> >  #define HGATP_VMID_SHIFT     HGATP64_VMID_SHIFT
-> > -#define HGATP_VMID_MASK              HGATP64_VMID_MASK
-> > +#define HGATP_VMID           HGATP64_VMID
-> >  #define HGATP_MODE_SHIFT     HGATP64_MODE_SHIFT
-> >  #else
-> >  #define HGATP_PPN            HGATP32_PPN
-> >  #define HGATP_VMID_SHIFT     HGATP32_VMID_SHIFT
-> > -#define HGATP_VMID_MASK              HGATP32_VMID_MASK
-> > +#define HGATP_VMID           HGATP32_VMID
-> >  #define HGATP_MODE_SHIFT     HGATP32_MODE_SHIFT
-> >  #endif
-> >
-> > diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
-> > index 34b57e0be2ef..034746638fa6 100644
-> > --- a/arch/riscv/kvm/mmu.c
-> > +++ b/arch/riscv/kvm/mmu.c
-> > @@ -748,8 +748,7 @@ void kvm_riscv_gstage_update_hgatp(struct kvm_vcpu *vcpu)
-> >       unsigned long hgatp = gstage_mode;
-> >       struct kvm_arch *k = &vcpu->kvm->arch;
-> >
-> > -     hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) &
-> > -              HGATP_VMID_MASK;
-> > +     hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) & HGATP_VMID;
-> >       hgatp |= (k->pgd_phys >> PAGE_SHIFT) & HGATP_PPN;
-> >
-> >       csr_write(CSR_HGATP, hgatp);
-> > diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
-> > index 6cd93995fb65..6f4d4979a759 100644
-> > --- a/arch/riscv/kvm/vmid.c
-> > +++ b/arch/riscv/kvm/vmid.c
-> > @@ -26,9 +26,9 @@ void kvm_riscv_gstage_vmid_detect(void)
-> >
-> >       /* Figure-out number of VMID bits in HW */
-> >       old = csr_read(CSR_HGATP);
-> > -     csr_write(CSR_HGATP, old | HGATP_VMID_MASK);
-> > +     csr_write(CSR_HGATP, old | HGATP_VMID);
-> >       vmid_bits = csr_read(CSR_HGATP);
-> > -     vmid_bits = (vmid_bits & HGATP_VMID_MASK) >> HGATP_VMID_SHIFT;
-> > +     vmid_bits = (vmid_bits & HGATP_VMID) >> HGATP_VMID_SHIFT;
-> >       vmid_bits = fls_long(vmid_bits);
-> >       csr_write(CSR_HGATP, old);
-> >
-> > --
-> > 2.34.1
-> >
->
-> Could switch to GENMASK too at the same time :-)
+v4:
+---
+* don't access old on CREATE/new on DELETE
 
-Okay, I will update.
+v3:
+---
+* update docs for GET_CMMA_BITS
+* restructure error handling in prepare_memslot
 
->
-> Anyway,
->
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
->
+v2:
+---
+* pr_warn -> WARN_ONCE
+* comment style
 
-Thanks,
-Anup
+Migration mode is a VM attribute which enables tracking of changes in
+storage attributes (PGSTE). It assumes dirty tracking is enabled on all
+memslots to keep a dirty bitmap of pages with changed storage attributes.
+
+When enabling migration mode, we currently check that dirty tracking is
+enabled for all memslots. However, userspace can disable dirty tracking
+without disabling migration mode.
+
+Since migration mode is pointless with dirty tracking disabled, disable
+migration mode whenever userspace disables dirty tracking on any slot.
+
+Also update the documentation to clarify that dirty tracking must be
+enabled when enabling migration mode, which is already enforced by the
+code in kvm_s390_vm_start_migration().
+
+To disable migration mode, slots_lock should be held, which is taken
+in kvm_set_memory_region() and thus held in
+kvm_arch_prepare_memory_region().
+
+Restructure the prepare code a bit so all the sanity checking is done
+before disabling migration mode. This ensures migration mode isn't
+disabled when some sanity check fails.
+
+
+Nico Boehr (1):
+  KVM: s390: disable migration mode when dirty tracking is disabled
+
+ Documentation/virt/kvm/api.rst        | 16 ++++++----
+ Documentation/virt/kvm/devices/vm.rst |  4 +++
+ arch/s390/kvm/kvm-s390.c              | 43 +++++++++++++++++++--------
+ 3 files changed, 45 insertions(+), 18 deletions(-)
+
+-- 
+2.39.1
+
