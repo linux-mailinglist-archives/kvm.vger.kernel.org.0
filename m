@@ -2,33 +2,33 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D84367E402
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:47:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A2D567E4C7
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 13:12:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229889AbjA0Lrm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 06:47:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40860 "EHLO
+        id S233757AbjA0MM1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 07:12:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233294AbjA0LrS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 06:47:18 -0500
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2065.outbound.protection.outlook.com [40.107.21.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE0F1EBEF;
-        Fri, 27 Jan 2023 03:45:21 -0800 (PST)
+        with ESMTP id S233761AbjA0MMK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 07:12:10 -0500
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on060c.outbound.protection.outlook.com [IPv6:2a01:111:f400:fe0e::60c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3D9D80172;
+        Fri, 27 Jan 2023 04:06:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3H/KofU7Yu6fUxSmEWe39E/Gu3RJjuYRpnxRF7mLwfI=;
- b=tV+JGkMrQftoQRTL2cVT7OiePpomSaEz3/ExHzrx31m4QRJof1jJMrFuIw9hJXH7dZx6z3QoryV79uJ+b5CmQJYrCPuT96h/HjUS1SSPX1Y+M3beNuw4HmVi0cnrUiTVQKLl2VDseKdlDaxPtiFVRro/mSy1CfxO/V5Crpjd8zQ=
+ bh=OaUsEIZHo1VrruVAtMnFib52+x175EA8f+O2M+UzY6Q=;
+ b=eMOQ2YlQknLEZLxRqds7Q0ND10bMQdFFP5C4NK+pASHiROz80P+9tSB22XSoI0s6UiKP16VbzGQUtxDfdMSo1hF6bmONRxKez1JrOQdf5feoSa0pMDhL2c3p3ymY7WCr4lhGGfy2k5xIwoPihYqxxs/VKr8amIkCr1KJlwXk4bI=
 Received: from AM5PR0701CA0015.eurprd07.prod.outlook.com
- (2603:10a6:203:51::25) by GV1PR08MB8215.eurprd08.prod.outlook.com
- (2603:10a6:150:5e::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.17; Fri, 27 Jan
- 2023 11:42:51 +0000
-Received: from AM7EUR03FT034.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:203:51:cafe::cf) by AM5PR0701CA0015.outlook.office365.com
+ (2603:10a6:203:51::25) by AM9PR08MB6115.eurprd08.prod.outlook.com
+ (2603:10a6:20b:2df::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23; Fri, 27 Jan
+ 2023 11:42:59 +0000
+Received: from AM7EUR03FT004.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:203:51:cafe::b3) by AM5PR0701CA0015.outlook.office365.com
  (2603:10a6:203:51::25) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.7 via Frontend
- Transport; Fri, 27 Jan 2023 11:42:51 +0000
+ Transport; Fri, 27 Jan 2023 11:42:59 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 63.35.35.123)
  smtp.mailfrom=arm.com; dkim=pass (signature was verified)
  header.d=armh.onmicrosoft.com;dmarc=pass action=none header.from=arm.com;
@@ -37,27 +37,27 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
  pr=C
 Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
- AM7EUR03FT034.mail.protection.outlook.com (100.127.140.87) with Microsoft
+ AM7EUR03FT004.mail.protection.outlook.com (100.127.140.210) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.22 via Frontend Transport; Fri, 27 Jan 2023 11:42:51 +0000
-Received: ("Tessian outbound 8038f0863a52:v132"); Fri, 27 Jan 2023 11:42:50 +0000
+ 15.20.6043.23 via Frontend Transport; Fri, 27 Jan 2023 11:42:59 +0000
+Received: ("Tessian outbound 8038f0863a52:v132"); Fri, 27 Jan 2023 11:42:59 +0000
 X-CheckRecipientChecked: true
-X-CR-MTA-CID: 94b28eb650647488
+X-CR-MTA-CID: 3093725a19c96cd7
 X-CR-MTA-TID: 64aa7808
-Received: from 3fa6661c85f2.1
-        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 300BB85B-DF74-4B62-800A-70313A127B26.1;
-        Fri, 27 Jan 2023 11:42:44 +0000
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com
-    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 3fa6661c85f2.1
+Received: from f5c94ac5c241.1
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 83963576-4C02-49FC-A89F-081568359FA4.1;
+        Fri, 27 Jan 2023 11:42:53 +0000
+Received: from EUR03-DBA-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id f5c94ac5c241.1
     (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
-    Fri, 27 Jan 2023 11:42:44 +0000
+    Fri, 27 Jan 2023 11:42:53 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I+Ae76UG64Rb+TLIKIHAW8AOZxboFRQK5wYukOtAUL5ttcTJezG/USJshtCFmjWMgIasIVwtU3ld2UtDsbGk0I6UwM8eUNfIBObSZT9mTSRQRtPUB4haEbdiGpW8ug2HLyIpjIkmUP8d7qntEFLjM7qzSTdq2BKe1jTLCb+ozHC/l+U0jnG1P68eOrQw2SZP0Y6EBwlM4io7Hd2CAtv6aF1bIojthDXhGo0i6MHPsGJv4GtG/ypc2tUmmoBmnA1VrtJz9JUtgL+VF8dca2YXSsKWAiAOjTDmBzRwdkeCtLMfmlAcwQRGfAi/8FeTM22bwqh8CKOJMGmOOi8XJMh0Cw==
+ b=baSuFzRt2dflh8qUwCRATN0ZwVVzoYJyECGABxAwVpPLACp8sRhVEa5qcv8v5M5rF4IkTKUj1CYXmWikg/ZbzNLtYw3l/dxEvo/dOyAIZw9YZw6iovAaxVLxISucczTYswvuox886ScAiCbOLzEbq7hiKHltIIVnBGglozvZk8Cn1MEkCgjrzDGYFGV+s8umv7SlKmZzh1Or1hYUMKE+x42kp80rhU+ch9qtgJRdlzxT+wjhCK5KJsjP9y2IzBhPJmXWB2Ww4+4sViZLXAdFJl2edUfyPzOI0zafJStzb6qUYMjkmA1ixgo2fsmjIilui/NnXbFgfjC+jgF1KcCheQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3H/KofU7Yu6fUxSmEWe39E/Gu3RJjuYRpnxRF7mLwfI=;
- b=eqkOLz+/+qVM94gD0N2ExU7ILB2C7TxD8Qlkotbj7DgpTuhRtNUD7OntQr110Cy7/EnpO0yGfJoye8EE6xWgeozwhaGFYGcJ5+zTIBVo+oz8mLLfbmi0qbWmy1nEol9ad8FoZcKl+MRRN3WPaJuMCT7NqevS1QVA9Up6/C9OFaiRKRt417j2JCMNYQBs81JSZuX44e7w8l2wg0Dtx75rLbzfTfF0YqAhFmZcNPlk877SwsTU1MGIswM4XKsvOrxI7EOt+llPaUWY0ppy1qlrFzLOttM+/QhlpQ1ooGlTD9Bc9jvsdBnCyJQiGnLgedJDjZxfc/ygqq9WAeB+aUhg7Q==
+ bh=OaUsEIZHo1VrruVAtMnFib52+x175EA8f+O2M+UzY6Q=;
+ b=bI/z3IZmrkbobWK3uB9GWtzsKbNDM3Cjeay94EyA8jUK/bArUzdO02QQJzk0ZFj4JYqZxOgKkRebUhIUGsgz6Bo3bkqoP0nSa8EGxqq6aptWk2oAqFTRasoWoDZYgY504v+LcFq8unI/VAQ8PPqjV8NM8j9GZhQuHfH1jzAWwK2Ih3SoKzqYirY2hlP1cklBRaaWhCJU/kv3cpAErH9flG3JTCr2e7M/+7/aOg/WqygS8q5d8kujxBPa6oLCxCGFBsqYKI3xFmFyRzIIvexV+T5FYzrznmjDTho0nI1/wnmgBFg9t0NTcShFyOxG6aDRSCzkmgsZlRD4vq9pz+W4kQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  40.67.248.234) smtp.rcpttodomain=linux.dev smtp.mailfrom=arm.com; dmarc=pass
  (p=none sp=none pct=100) action=none header.from=arm.com; dkim=none (message
@@ -65,18 +65,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
  s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3H/KofU7Yu6fUxSmEWe39E/Gu3RJjuYRpnxRF7mLwfI=;
- b=tV+JGkMrQftoQRTL2cVT7OiePpomSaEz3/ExHzrx31m4QRJof1jJMrFuIw9hJXH7dZx6z3QoryV79uJ+b5CmQJYrCPuT96h/HjUS1SSPX1Y+M3beNuw4HmVi0cnrUiTVQKLl2VDseKdlDaxPtiFVRro/mSy1CfxO/V5Crpjd8zQ=
-Received: from AS9PR06CA0596.eurprd06.prod.outlook.com (2603:10a6:20b:486::31)
- by DB8PR08MB5452.eurprd08.prod.outlook.com (2603:10a6:10:111::10) with
+ bh=OaUsEIZHo1VrruVAtMnFib52+x175EA8f+O2M+UzY6Q=;
+ b=eMOQ2YlQknLEZLxRqds7Q0ND10bMQdFFP5C4NK+pASHiROz80P+9tSB22XSoI0s6UiKP16VbzGQUtxDfdMSo1hF6bmONRxKez1JrOQdf5feoSa0pMDhL2c3p3ymY7WCr4lhGGfy2k5xIwoPihYqxxs/VKr8amIkCr1KJlwXk4bI=
+Received: from AM6PR05CA0001.eurprd05.prod.outlook.com (2603:10a6:20b:2e::14)
+ by DBAPR08MB5749.eurprd08.prod.outlook.com (2603:10a6:10:1af::11) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.22; Fri, 27 Jan
- 2023 11:42:41 +0000
-Received: from AM7EUR03FT016.eop-EUR03.prod.protection.outlook.com
- (2603:10a6:20b:486:cafe::e3) by AS9PR06CA0596.outlook.office365.com
- (2603:10a6:20b:486::31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23; Fri, 27 Jan
+ 2023 11:42:47 +0000
+Received: from AM7EUR03FT051.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:20b:2e:cafe::79) by AM6PR05CA0001.outlook.office365.com
+ (2603:10a6:20b:2e::14) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.23 via Frontend
- Transport; Fri, 27 Jan 2023 11:42:41 +0000
+ Transport; Fri, 27 Jan 2023 11:42:47 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 40.67.248.234)
  smtp.mailfrom=arm.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=arm.com;
@@ -84,16 +84,16 @@ Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
  40.67.248.234 as permitted sender) receiver=protection.outlook.com;
  client-ip=40.67.248.234; helo=nebula.arm.com; pr=C
 Received: from nebula.arm.com (40.67.248.234) by
- AM7EUR03FT016.mail.protection.outlook.com (100.127.140.106) with Microsoft
+ AM7EUR03FT051.mail.protection.outlook.com (100.127.140.64) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6043.22 via Frontend Transport; Fri, 27 Jan 2023 11:42:41 +0000
+ 15.20.6043.22 via Frontend Transport; Fri, 27 Jan 2023 11:42:47 +0000
 Received: from AZ-NEU-EX03.Arm.com (10.251.24.31) by AZ-NEU-EX03.Arm.com
  (10.251.24.31) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16; Fri, 27 Jan
- 2023 11:42:40 +0000
+ 2023 11:42:46 +0000
 Received: from e124191.cambridge.arm.com (10.1.197.45) by mail.arm.com
  (10.251.24.31) with Microsoft SMTP Server id 15.1.2507.16 via Frontend
- Transport; Fri, 27 Jan 2023 11:42:35 +0000
+ Transport; Fri, 27 Jan 2023 11:42:40 +0000
 From:   Joey Gouly <joey.gouly@arm.com>
 To:     Andrew Jones <andrew.jones@linux.dev>, <kvmarm@lists.linux.dev>,
         <kvm@vger.kernel.org>
@@ -113,10 +113,10 @@ CC:     <joey.gouly@arm.com>, Alexandru Elisei <alexandru.elisei@arm.com>,
         <linux-coco@lists.linux.dev>, <kvmarm@lists.cs.columbia.edu>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
-        Subhasish Ghosh <subhasish.ghosh@arm.com>
-Subject: [RFC kvm-unit-tests 15/27] arm: realm: Add test for FPU/SIMD context save/restore
-Date:   Fri, 27 Jan 2023 11:40:56 +0000
-Message-ID: <20230127114108.10025-16-joey.gouly@arm.com>
+        Djordje Kovacevic <djordje.kovacevic@arm.com>
+Subject: [RFC kvm-unit-tests 16/27] arm: realm: Add tests for in realm SEA
+Date:   Fri, 27 Jan 2023 11:40:57 +0000
+Message-ID: <20230127114108.10025-17-joey.gouly@arm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20230127114108.10025-1-joey.gouly@arm.com>
 References: <20230127112248.136810-1-suzuki.poulose@arm.com>
@@ -124,347 +124,235 @@ References: <20230127112248.136810-1-suzuki.poulose@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-EOPAttributedMessage: 1
-X-MS-TrafficTypeDiagnostic: AM7EUR03FT016:EE_|DB8PR08MB5452:EE_|AM7EUR03FT034:EE_|GV1PR08MB8215:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5038839f-aa68-4763-dd89-08db005b9ef2
+X-MS-TrafficTypeDiagnostic: AM7EUR03FT051:EE_|DBAPR08MB5749:EE_|AM7EUR03FT004:EE_|AM9PR08MB6115:EE_
+X-MS-Office365-Filtering-Correlation-Id: b03713a0-1406-49a1-894e-08db005ba3ec
 x-checkrecipientrouted: true
 NoDisclaimer: true
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam-Untrusted: BCL:0;
-X-Microsoft-Antispam-Message-Info-Original: 1sQTB5DLx+5RQCLMv9LvT5cZ+emGhI22P/936SHgbTE/PDSVRyAqb39bcPbb7BD56LM5DfCUk4n1YW17GFNRIFcu9nroeN4LxAj0rgugPV0a2MCd4Q0ZSdqEi7TpDsMAWEUbC2J+bo4gkqkZzcQJP5cXOnIilrK95NAXKWRIKSuLpBjgMTpf2/IHz8qaXllAsej8z2X/O99dVIva+41TDF5ey/IyTfepZn+lbS3JYH1avlPxBDGoORiETScXTjsIthnX8BZlsbD1ROftU+wiD1ygFhDtJPCRkoyt1oh518jKPHX2dlW6LsKNjzzsr194OHpuUQb9SKdjtjRbQ0PSfFPtXH2OpDnkbjw5CbTVYkojtNr9Erw7dlPjrcVFYHB8vnb7hGg8bUUVkhhdP0wkPpS4ogfjvD/yDB4ZWzHhB8G1ObqDgyaakygqBRjRlyZPRGt8zagzZPYUHhoLAOTq5taXJ+UDqinIObutW4HmtW2vUcLs1qNzhz1iuTuwkyBymbXZ949oUv6bUfupO4OEgTCKl0uraDylsQHF+84/zU01LsVslKq0G3krPBqy/XvvXFybejONOsyRLWLsAkShuKPAQyB3+EBy6IFQIOGwVIBiZK0+VyDOikPiPmotM1gFUgVgja4FjJmK8p/uIMBmMXlds+3+sGRhgc4RR35lHG9BdHdMK5AQga9obYViEAJ4LGm7AzXosAVW9fd3jy0yTBuNV7Z/gx/eO0/SeAUnhRwttrmf5SnOrV6Gj3l8O1we
-X-Forefront-Antispam-Report-Untrusted: CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(39860400002)(136003)(396003)(376002)(346002)(451199018)(36840700001)(40470700004)(46966006)(70586007)(4326008)(316002)(82310400005)(70206006)(8936002)(54906003)(36756003)(7416002)(5660300002)(8676002)(82740400003)(36860700001)(86362001)(356005)(81166007)(41300700001)(186003)(1076003)(26005)(6666004)(110136005)(336012)(426003)(47076005)(44832011)(40460700003)(40480700001)(2906002)(2616005)(478600001)(7696005)(83380400001)(2101003)(36900700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB8PR08MB5452
-X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM7EUR03FT034.eop-EUR03.prod.protection.outlook.com
+X-Microsoft-Antispam-Message-Info-Original: pZjh5UYrExFlcIRmFeDeH6ef2gX42Q8PIPTLlFMudGmyfpZs07oSGQjWVXBTYeEWOaL5XwihVAAWOMZGV1tMnZA4RapQ25SdgrmuB2oruHhiiMkxzSJIeyHx6Lr3t77i+nXLWQruT/GV9qQDTIB2e3Tp411U0SP3gtiIQ3SQoY9BHZA0wi5Bm8QwUJTpnMU7uJj6i2iUUrq45ZZ/Z2UfMKrdxmwYgm1SsAjIj6ZbHWyCX7m3rHgAfn71rQwn0E6VFo7NK30wtvihHGBZUj8WJAwffz9mDbK4bU+/TtXFVn7a7e+e1+Y6g4+8QHHYkS7LJTuH447diw1qxFGppl2kNuaiqjvLiZJOhcqKheSXREfMno1TRKODitG3mv+jO5sO8Pk6lSFMrxM+WVXCoFVSxTe18BsW42/fjrGzzIvKMqWfEPx3gQOzr7JkoNxphWOeGvkxUV2KjSHv7AXd0bRTpN87EU1EBHeRBM2ZTubBkjrAJvvFFoSmyV+lJLM5Xq9k+rKJikQhfP3LCLcAtDAkkgHE0KcBtNQkDwOewfbsio/w/+KrFMtm6Q38kp0V1nCmjzWDtfTcZbzJhoDzcLBA2XZnN+06b6+Yao6SISw27gXTTkAniOZiCc49HbYHV6XYGOqDuhFZic3rVLsOQ8u/hpVCtGkka13Y5Mbc55Q163kAXp3YiQyMaeXV7pyuLVcjiArqjpANQ4FPMJnOH1SRNTen3FAY+HgqDZQ/FiY/gM8RpDoK9VC9jGL7tzqZX78A
+X-Forefront-Antispam-Report-Untrusted: CIP:40.67.248.234;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:nebula.arm.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230025)(4636009)(346002)(39860400002)(396003)(376002)(136003)(451199018)(40470700004)(36840700001)(46966006)(83380400001)(36860700001)(336012)(40460700003)(36756003)(82310400005)(82740400003)(426003)(316002)(5660300002)(110136005)(54906003)(47076005)(7416002)(356005)(2616005)(86362001)(40480700001)(81166007)(26005)(70586007)(186003)(7696005)(478600001)(6666004)(2906002)(4326008)(8936002)(70206006)(8676002)(1076003)(44832011)(41300700001)(2101003)(36900700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR08MB5749
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM7EUR03FT004.eop-EUR03.prod.protection.outlook.com
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id-Prvs: 5cb29121-41b8-48ea-add8-08db005b994e
+X-MS-Office365-Filtering-Correlation-Id-Prvs: d8c897ae-a372-4964-dd5a-08db005b9c9e
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XDVM1yDjl0Fhfr1W9BmCZlVbLIfIsVH0+79XLVtWyD6Va22Nt8kgmsApvOtO/UxrTGT4g5pfPaf8ZQFRbgJjaO7Fu8lSkCoR3Yl8Wz1F+gqRUy6FIOOTSOjv4fLhjOwzB2XxaH3MRr9hQjgiBcpHUGhgb9XPcMiXwFqV5ma8aowG8M4bC0TCv+EGRpP8S4RXK6EPYst0+nFgRHHGOvQlNWN5qrdjDJRzsikTc2aa8MkiRV1UhIjYoMRM8Hc278JK6+cD1mDpmzmo9f+uXcD0GKre+cH+aPmSsdGcjy22SdcAQmDdbO3op90/51MERStIyuOOtB5y7pG9V0AYW0CehzKJjQVoMyvntOAKe6W+Szvq4yIwxSNP/D3GsjgwpJ/EPtIJXu9+qQiCHW0oh+qxFUj2Wc7h6E6aw84IGnjZ6eeM7Smt7UR2pt4seWIwc25CjHRbnJ2/tMJdH4p8BurNNKiaOjbdzXhVS9g0h2EPKgXIQ0RgPsUwX7mwXsl9XQyOcKhZx5IyqIcmHh7NrE37FyWa6rGHf6kGqe8FfcvOPs8nI+JfwP9UlJe+Hmv9UBlupevORWyPj5ijA2B2fR7OWelcedbhiwSi7KLAilNl9hhQEL0Dv2UckCeRDr3StyA9D4uZoYbe01ridKz7jyMvhgVtWIeQqJ07FBEjR6ASV08SKOalvJlVUS0TRjUCQrRSfR5M4+KDbCBRD2ji74s8JIKVTAr8iQg65Grv1jNrvus=
-X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230025)(4636009)(376002)(396003)(136003)(346002)(39860400002)(451199018)(46966006)(40470700004)(36840700001)(40460700003)(81166007)(86362001)(336012)(82310400005)(40480700001)(36756003)(47076005)(186003)(2906002)(83380400001)(4326008)(41300700001)(36860700001)(316002)(44832011)(8676002)(5660300002)(426003)(450100002)(70206006)(478600001)(110136005)(54906003)(26005)(70586007)(6666004)(2616005)(82740400003)(1076003)(8936002)(7696005)(2101003);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: +5gcXLpgbdv2EmuhHbuzGWdIUE6/sfCADQaRH/TGtDoA1rsMZBPt/c3598nAb8oDHeNbkp6PjztYXSIt1ArtT+//mGhLYIZ2dfBOXrPZnaS3feP3ly+SNXZQQPnftt3bLzrJBL2mOhTvL7EB/nVn4B5lwJWwFWIPc0MCHYyOTrmbhPPgCGZyUMRskNGwxxT33sorsRd+B36i3EsyP3CeSH9QH8wQu9nl2aqs8NhXxiC77ccfKmwBYkYuJ/wBXLcj8fc7RLJBn7CtStrPv9k75QkomqzcqZdcZf9Ew/w/TQ8pG7pGc0EcfMhPH/DFJVCn2u4c9riso8j1sk4wEJFO1OdapH/UXx6RgzDtEpKVWCwqzdkHr/5ruf0qnR20AvfYTieXlptLBGonjZoif8LaLUsgJKX6yMQyS4oYVP0ef7M5TDeSY9cow7+OblREBv/mGCzAme3NezsrlSWOqko0ExCNQizzPD/3Xrs4cp+V2+hH2fU1NuSLdt0cyQKlt3Ba3QFVRSBXZhEDvS5IZGBi+O9REs2PLVyqtvkkD7kVgqugkx7GCBYgzaRC9HYe9QWECjlEpWvO1DP3Q770Ftg5mhq7h6eJeo2diWIF1g8gpzXXQgD/JGN96bumRkeiw/BEAQWx+rUYkT8di9Ost/D/0fli6wTrqJYfGkQ6P7F4tgbw8Rx5IdYX7oEDWujnb34228RY80hvLiCybmXpYlX+TC9fkF7uTemwhPYfZ70igPs=
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFS:(13230025)(4636009)(346002)(396003)(39860400002)(376002)(136003)(451199018)(46966006)(40470700004)(36840700001)(2906002)(44832011)(426003)(36860700001)(336012)(5660300002)(41300700001)(8936002)(1076003)(4326008)(81166007)(8676002)(478600001)(26005)(450100002)(186003)(6666004)(2616005)(82740400003)(47076005)(83380400001)(40460700003)(70586007)(7696005)(40480700001)(86362001)(36756003)(316002)(110136005)(70206006)(82310400005)(54906003)(2101003);DIR:OUT;SFP:1101;
 X-OriginatorOrg: arm.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2023 11:42:51.0860
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2023 11:42:59.4175
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5038839f-aa68-4763-dd89-08db005b9ef2
+X-MS-Exchange-CrossTenant-Network-Message-Id: b03713a0-1406-49a1-894e-08db005ba3ec
 X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
-X-MS-Exchange-CrossTenant-AuthSource: AM7EUR03FT034.eop-EUR03.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: AM7EUR03FT004.eop-EUR03.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR08MB8215
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR08MB6115
 X-Spam-Status: No, score=-0.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,FORGED_SPF_HELO,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-        SPF_HELO_PASS,SPF_NONE,UNPARSEABLE_RELAY autolearn=no
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,FORGED_SPF_HELO,SPF_HELO_PASS,SPF_NONE,UNPARSEABLE_RELAY
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Subhasish Ghosh <subhasish.ghosh@arm.com>
+From: Djordje Kovacevic <djordje.kovacevic@arm.com>
 
-Test that the FPU/SIMD registers are saved and restored correctly when
-context switching VCPUs.
+The RMM/Host could inject Synchronous External Aborts in to the Realm
+for various reasons.
 
-In order to test fpu/simd functionality, we need to make sure that
-kvm-unit-tests doesn't generate code that uses the fpu registers, as that
-might interfere with the test results. Thus make sure we compile the tests
-with -mgeneral-regs-only.
+RMM injects the SEA for :
+  * Instruction/Data fetch from an IPA that is in RIPAS_EMPTY state
+  * Instruction fetch from an Unprotected IPA.
 
-Signed-off-by: Subhasish Ghosh <subhasish.ghosh@arm.com>
+Trigger these conditions from within the Realm and verify that the
+SEAs are received.
+
+Signed-off-by: Djordje Kovacevic <djordje.kovacevic@arm.com>
+Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Joey Gouly <joey.gouly@arm.com>
 ---
- arm/Makefile.arm64  |   1 +
- arm/Makefile.common |   1 +
- arm/realm-fpu.c     | 242 ++++++++++++++++++++++++++++++++++++++++++++
- arm/unittests.cfg   |   8 ++
- 4 files changed, 252 insertions(+)
- create mode 100644 arm/realm-fpu.c
+ arm/Makefile.arm64 |   1 +
+ arm/realm-sea.c    | 143 +++++++++++++++++++++++++++++++++++++++++++++
+ arm/unittests.cfg  |   6 ++
+ 3 files changed, 150 insertions(+)
+ create mode 100644 arm/realm-sea.c
 
 diff --git a/arm/Makefile.arm64 b/arm/Makefile.arm64
-index eed77d3a..90ec6815 100644
+index 90ec6815..8448af36 100644
 --- a/arm/Makefile.arm64
 +++ b/arm/Makefile.arm64
-@@ -34,6 +34,7 @@ tests += $(TEST_DIR)/micro-bench.flat
- tests += $(TEST_DIR)/cache.flat
+@@ -35,6 +35,7 @@ tests += $(TEST_DIR)/cache.flat
  tests += $(TEST_DIR)/debug.flat
  tests += $(TEST_DIR)/realm-rsi.flat
-+tests += $(TEST_DIR)/realm-fpu.flat
+ tests += $(TEST_DIR)/realm-fpu.flat
++tests += $(TEST_DIR)/realm-sea.flat
  
  include $(SRCDIR)/$(TEST_DIR)/Makefile.common
  
-diff --git a/arm/Makefile.common b/arm/Makefile.common
-index 1bbec64f..b339b62d 100644
---- a/arm/Makefile.common
-+++ b/arm/Makefile.common
-@@ -25,6 +25,7 @@ CFLAGS += -std=gnu99
- CFLAGS += -ffreestanding
- CFLAGS += -O2
- CFLAGS += -I $(SRCDIR)/lib -I $(SRCDIR)/lib/libfdt -I lib
-+CFLAGS += -mgeneral-regs-only
- 
- # We want to keep intermediate files
- .PRECIOUS: %.elf %.o
-diff --git a/arm/realm-fpu.c b/arm/realm-fpu.c
+diff --git a/arm/realm-sea.c b/arm/realm-sea.c
 new file mode 100644
-index 00000000..35cfdf09
+index 00000000..5ef3e2a4
 --- /dev/null
-+++ b/arm/realm-fpu.c
-@@ -0,0 +1,242 @@
++++ b/arm/realm-sea.c
+@@ -0,0 +1,143 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +/*
 + * Copyright (C) 2022 Arm Limited.
 + * All rights reserved.
 + */
-+
 +#include <libcflat.h>
-+#include <asm/smp.h>
-+#include <stdlib.h>
-+
++#include <vmalloc.h>
++#include <asm/ptrace.h>
++#include <asm/thread_info.h>
++#include <asm/mmu.h>
 +#include <asm/rsi.h>
++#include <linux/compiler.h>
++#include <alloc_page.h>
++#include <asm/pgtable.h>
 +
-+#define CPU0_ID			0
-+#define CPU1_ID			(CPU0_ID + 1)
-+#define CPUS_MAX		(CPU1_ID + 1)
-+#define RMM_FPU_QREG_MAX	32
-+#define RMM_FPU_RESULT_PASS	(-1U)
++typedef void (*empty_fn)(void);
 +
-+#define fpu_reg_read(val)				\
-+({							\
-+	uint64_t *__val = (val);			\
-+	asm volatile("stp q0, q1, [%0], #32\n\t"	\
-+		     "stp q2, q3, [%0], #32\n\t"	\
-+		     "stp q4, q5, [%0], #32\n\t"	\
-+		     "stp q6, q7, [%0], #32\n\t"	\
-+		     "stp q8, q9, [%0], #32\n\t"	\
-+		     "stp q10, q11, [%0], #32\n\t"	\
-+		     "stp q12, q13, [%0], #32\n\t"	\
-+		     "stp q14, q15, [%0], #32\n\t"	\
-+		     "stp q16, q17, [%0], #32\n\t"	\
-+		     "stp q18, q19, [%0], #32\n\t"	\
-+		     "stp q20, q21, [%0], #32\n\t"	\
-+		     "stp q22, q23, [%0], #32\n\t"	\
-+		     "stp q24, q25, [%0], #32\n\t"	\
-+		     "stp q26, q27, [%0], #32\n\t"	\
-+		     "stp q28, q29, [%0], #32\n\t"	\
-+		     "stp q30, q31, [%0], #32\n\t"	\
-+		     : "=r" (__val)			\
-+		     :					\
-+		     : "q0", "q1", "q2", "q3",		\
-+			"q4", "q5", "q6", "q7",		\
-+			"q8", "q9", "q10", "q11",	\
-+			"q12", "q13", "q14",		\
-+			"q15", "q16", "q17",		\
-+			"q18", "q19", "q20",		\
-+			"q21", "q22", "q23",		\
-+			"q24", "q25", "q26",		\
-+			"q27", "q28", "q29",		\
-+			"q30", "q31", "memory");	\
-+})
++static bool test_passed;
 +
-+#define fpu_reg_write(val)			\
-+do {						\
-+	uint64_t *__val = (val);		\
-+	asm volatile("ldp q0, q1, [%0]\n\t"	\
-+		     "ldp q2, q3, [%0]\n\t"	\
-+		     "ldp q4, q5, [%0]\n\t"	\
-+		     "ldp q6, q7, [%0]\n\t"	\
-+		     "ldp q8, q9, [%0]\n\t"	\
-+		     "ldp q10, q11, [%0]\n\t"	\
-+		     "ldp q12, q13, [%0]\n\t"	\
-+		     "ldp q14, q15, [%0]\n\t"	\
-+		     "ldp q16, q17, [%0]\n\t"	\
-+		     "ldp q18, q19, [%0]\n\t"	\
-+		     "ldp q20, q21, [%0]\n\t"	\
-+		     "ldp q22, q23, [%0]\n\t"	\
-+		     "ldp q24, q25, [%0]\n\t"	\
-+		     "ldp q26, q27, [%0]\n\t"	\
-+		     "ldp q28, q29, [%0]\n\t"	\
-+		     "ldp q30, q31, [%0]\n\t"	\
-+		     :				\
-+		     : "r" (__val)		\
-+		     : "q0", "q1", "q2", "q3",  \
-+			"q4", "q5", "q6", "q7", \
-+			"q8", "q9", "q10", "q11",\
-+			"q12", "q13", "q14",	\
-+			"q15", "q16", "q17",	\
-+			"q18", "q19", "q20",	\
-+			"q21", "q22", "q23",	\
-+			"q24", "q25", "q26",	\
-+			"q27", "q28", "q29",	\
-+			"q30", "q31", "memory");\
-+} while (0)
-+
-+static void nr_cpu_check(int nr)
-+{
-+	if (nr_cpus < nr)
-+		report_abort("At least %d cpus required", nr);
-+}
-+/**
-+ * @brief check if the FPU/SIMD register contents are the same as
-+ * the input data provided.
++/*
++ * The virtual address of the page that the test has made the access to
++ * in order to cause the I/DAbort with I/DFSC = Synchronous External Abort.
 + */
-+static uint32_t __realm_fpuregs_testall(uint64_t *indata)
++static void* target_page_va;
++
++/*
++ * Ensure that the @va is the executable location from EL1:
++ * - SCTLR_EL1.WXN must be off.
++ * - Disable the access from EL0 (controlled by AP[1] in PTE).
++ */
++static void enable_instruction_fetch(void* va)
 +{
-+	/* 128b aligned array to read data into */
-+	uint64_t outdata[RMM_FPU_QREG_MAX * 2]
-+			 __attribute__((aligned(sizeof(__uint128_t)))) = {
-+			[0 ... ((RMM_FPU_QREG_MAX * 2) - 1)] = 0 };
-+	uint8_t regcnt	= 0;
-+	uint32_t result	= 0;
-+
-+	if (indata == NULL)
-+		report_abort("invalid data pointer received");
-+
-+	/* read data from FPU registers */
-+	fpu_reg_read(outdata);
-+
-+	/* check is the data is the same */
-+	for (regcnt = 0; regcnt < (RMM_FPU_QREG_MAX * 2); regcnt += 2) {
-+		if ((outdata[regcnt] != indata[regcnt % 4]) ||
-+			(outdata[regcnt+1] != indata[(regcnt+1) % 4])) {
-+			report_info(
-+			"fpu/simd save/restore failed for reg: q%d expected: %lx_%lx received: %lx_%lx\n",
-+			regcnt / 2, indata[(regcnt+1) % 4],
-+			indata[regcnt % 4], outdata[regcnt+1],
-+			outdata[regcnt]);
-+		} else {
-+			/* populate a bitmask indicating which
-+			 * registers passed/failed
-+			 */
-+			result |= (1 << (regcnt / 2));
-+		}
++	unsigned long sctlr = read_sysreg(sctlr_el1);
++	if (sctlr & SCTLR_EL1_WXN) {
++		sctlr &= ~SCTLR_EL1_WXN;
++		write_sysreg(sctlr, sctlr_el1);
++		isb();
++		flush_tlb_all();
 +	}
 +
-+	return result;
++	mmu_clear_user(current_thread_info()->pgtable, (u64)va);
 +}
 +
-+/**
-+ * @brief writes randomly sampled data into the FPU/SIMD registers.
-+ */
-+static void __realm_fpuregs_writeall_random(uint64_t **indata)
++static void data_abort_handler(struct pt_regs *regs, unsigned int esr)
 +{
++	if ((esr & ESR_EL1_FSC_MASK) == ESR_EL1_FSC_EXTABT)
++		test_passed = true;
 +
-+	/* allocate 128b aligned memory */
-+	*indata = memalign(sizeof(__uint128_t), sizeof(uint64_t) * 4);
-+
-+	/* populate the memory with sampled data from a counter */
-+	(*indata)[0] = get_cntvct();
-+	(*indata)[1] = get_cntvct();
-+	(*indata)[2] = get_cntvct();
-+	(*indata)[3] = get_cntvct();
-+
-+	/* write data into FPU registers */
-+	fpu_reg_write(*indata);
++	report_info("esr = %x", esr);
++	/*
++	 * Advance the PC to complete the test.
++	 */
++	regs->pc += 4;
 +}
 +
-+static void realm_fpuregs_writeall_run(void *data)
++static void data_access_to_empty(void)
 +{
++	test_passed = false;
++	target_page_va = alloc_page();
++	phys_addr_t empty_ipa = virt_to_phys(target_page_va);
 +
-+	uint64_t **indata	= (uint64_t **)data;
++	arm_set_memory_shared(empty_ipa, SZ_4K);
 +
-+	__realm_fpuregs_writeall_random(indata);
++	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, data_abort_handler);
++	READ_ONCE(((char*)target_page_va)[0x55]);
++	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_DABT_EL1, NULL);
++
++	report(test_passed, " ");
 +}
 +
-+static void realm_fpuregs_testall_run(void *data)
++static void instruction_abort_handler(struct pt_regs *regs, unsigned int esr)
 +{
++	if (((esr & ESR_EL1_FSC_MASK) == ESR_EL1_FSC_EXTABT) &&
++	     (regs->pc == (u64)target_page_va))
++		test_passed = true;
 +
-+	uint64_t *indata	= (uint64_t *)data;
-+	uint32_t result		= 0;
-+
-+	result = __realm_fpuregs_testall(indata);
-+	report((result == RMM_FPU_RESULT_PASS),
-+	       "fpu/simd register save/restore mask: 0x%x", result);
++	report_info("esr = %x", esr);
++	/*
++	 * Simulate the RET instruction to complete the test.
++	 */
++	regs->pc = regs->regs[30];
 +}
 +
-+/**
-+ * @brief This test uses two VCPU to test FPU/SIMD save/restore
-+ * @details REC1 (vcpu1) writes random data into FPU/SIMD
-+ * registers, REC0 (vcpu0) corrupts/overwrites the data and finally
-+ * REC1 checks if the data remains unchanged in its context.
-+ */
-+static void realm_fpuregs_context_switch_cpu1(void)
++static void instr_fetch_from_empty(void)
 +{
-+	int target		= CPU1_ID;
-+	uint64_t *indata_remote	= NULL;
-+	uint64_t *indata_local	= NULL;
++	phys_addr_t empty_ipa;
 +
-+	/* write data from REC1/VCPU1 */
-+	on_cpu(target, realm_fpuregs_writeall_run, &indata_remote);
++	test_passed = false;
++	target_page_va = alloc_page();
++	enable_instruction_fetch(target_page_va);
 +
-+	/* Overwrite from REC0/VCPU0 */
-+	__realm_fpuregs_writeall_random(&indata_local);
++	empty_ipa = virt_to_phys((void*)target_page_va);
 +
-+	/* check data consistency */
-+	on_cpu(target, realm_fpuregs_testall_run, indata_remote);
++	arm_set_memory_shared(empty_ipa, SZ_4K);
 +
-+	free(indata_remote);
-+	free(indata_local);
++	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, instruction_abort_handler);
++	/*
++	 * This should cause the IAbort with IFSC = SEA
++	 */
++	((empty_fn)target_page_va)();
++	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, NULL);
++
++	report(test_passed, " ");
 +}
 +
-+/**
-+ * @brief This test uses two VCPU to test FPU/SIMD save/restore
-+ * @details REC0 (vcpu0) writes random data into FPU/SIMD
-+ * registers, REC1 (vcpu1) corrupts/overwrites the data and finally
-+ * REC0 checks if the data remains unchanged in its context.
-+ */
-+static void realm_fpuregs_context_switch_cpu0(void)
++static void instr_fetch_from_unprotected(void)
 +{
++	test_passed = false;
++	/*
++	 * The test will attempt to execute an instruction from the start of
++	 * the unprotected IPA space.
++	 */
++	target_page_va = vmap(PTE_NS_SHARED, SZ_4K);
++	enable_instruction_fetch(target_page_va);
 +
-+	int target		= CPU1_ID;
-+	uint64_t *indata_local	= NULL;
-+	uint64_t *indata_remote	= NULL;
-+	uint32_t result		= 0;
++	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, instruction_abort_handler);
++	/*
++	 * This should cause the IAbort with IFSC = SEA
++	 */
++	((empty_fn)target_page_va)();
++	install_exception_handler(EL1H_SYNC, ESR_EL1_EC_IABT_EL1, NULL);
 +
-+	/* write data from REC0/VCPU0 */
-+	__realm_fpuregs_writeall_random(&indata_local);
-+
-+	/* Overwrite from REC1/VCPU1 */
-+	on_cpu(target, realm_fpuregs_writeall_run, &indata_remote);
-+
-+	/* check data consistency */
-+	result = __realm_fpuregs_testall(indata_local);
-+	report((result == RMM_FPU_RESULT_PASS),
-+	       "fpu/simd register save/restore mask: 0x%x", result);
-+
-+	free(indata_remote);
-+	free(indata_local);
-+}
-+/**
-+ * checks if during realm context switch, FPU/SIMD registers
-+ * are saved/restored.
-+ */
-+static void realm_fpuregs_context_switch(void)
-+{
-+
-+	realm_fpuregs_context_switch_cpu0();
-+	realm_fpuregs_context_switch_cpu1();
++	report(test_passed, " ");
 +}
 +
 +int main(int argc, char **argv)
 +{
-+	report_prefix_pushf("realm-fpu");
++	report_prefix_push("in_realm_sea");
 +
-+	if (!is_realm())
-+		report_skip("Not running in Realm world, skipping");
++	report_prefix_push("data_access_to_empty");
++	data_access_to_empty();
++	report_prefix_pop();
 +
-+	nr_cpu_check(CPUS_MAX);
-+	realm_fpuregs_context_switch();
++	report_prefix_push("instr_fetch_from_empty");
++	instr_fetch_from_empty();
++	report_prefix_pop();
++
++	report_prefix_push("instr_fetch_from_unprotected");
++	instr_fetch_from_unprotected();
++	report_prefix_pop();
 +
 +	return report_summary();
 +}
 diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index 3cdb1a98..a60dc6a9 100644
+index a60dc6a9..bc2354c7 100644
 --- a/arm/unittests.cfg
 +++ b/arm/unittests.cfg
-@@ -297,3 +297,11 @@ groups = nodefault realms
- extra_params = -append 'hvc'
+@@ -305,3 +305,9 @@ smp = 2
+ groups = nodefault realms
  accel = kvm
  arch = arm64
 +
-+# Realm FPU/SIMD test
-+[realm-fpu-context]
-+file = realm-fpu.flat
-+smp = 2
++[realm-sea]
++file = realm-sea.flat
 +groups = nodefault realms
 +accel = kvm
 +arch = arm64
