@@ -2,126 +2,283 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8AB2D67E31A
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:20:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36C5167E37E
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 12:33:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233213AbjA0LUp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 06:20:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55370 "EHLO
+        id S233624AbjA0Ld1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 06:33:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233188AbjA0LU2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 06:20:28 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B3C714222;
-        Fri, 27 Jan 2023 03:19:13 -0800 (PST)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 2A3AD21889;
-        Fri, 27 Jan 2023 11:19:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1674818344; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Jg6tAtljWkLOtzvKkDNIoiHHgxanNXV1iXTx9cL+UQU=;
-        b=utmF3gy7DItB+OI2ZalxyBwjhN8ryT8raie78QEcmelb6Gaa27V6jEgklx42rzficIjadI
-        nu+HqyEOKtdYizLCOtQkNWx4S2VvGWugKipxH2r9HOc4bA9hB+YRcYXTY/zW8bW0QlDX7r
-        g41e96/5ttY1iEwr1MNKmU14WzKGC0w=
-Received: from suse.cz (unknown [10.100.201.202])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id A46122C141;
-        Fri, 27 Jan 2023 11:19:03 +0000 (UTC)
-Date:   Fri, 27 Jan 2023 12:19:03 +0100
-From:   Petr Mladek <pmladek@suse.com>
-To:     "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, live-patching@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
- loaded vhost worker kthreads
-Message-ID: <Y9OzJzHIASUeIrzO@alley>
-References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
- <Y9KyVKQk3eH+RRse@alley>
- <Y9LswwnPAf+nOVFG@do-x1extreme>
+        with ESMTP id S233723AbjA0Lcz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 06:32:55 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E51847C317;
+        Fri, 27 Jan 2023 03:31:21 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6DE432B;
+        Fri, 27 Jan 2023 03:24:13 -0800 (PST)
+Received: from ewhatever.cambridge.arm.com (ewhatever.cambridge.arm.com [10.1.197.1])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPA id 9335C3F64C;
+        Fri, 27 Jan 2023 03:23:28 -0800 (PST)
+From:   Suzuki K Poulose <suzuki.poulose@arm.com>
+To:     linux-coco@lists.linux.dev, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Chao Peng <chao.p.peng@linux.intel.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Fuad Tabba <tabba@google.com>,
+        James Morse <james.morse@arm.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joey Gouly <Joey.Gouly@arm.com>, Marc Zyngier <maz@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Quentin Perret <qperret@google.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Steven Price <steven.price@arm.com>,
+        Thomas Huth <thuth@redhat.com>, Will Deacon <will@kernel.org>,
+        Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.cs.columbia.edu
+Subject: [RFC] Support for Arm CCA VMs on Linux
+Date:   Fri, 27 Jan 2023 11:22:48 +0000
+Message-Id: <20230127112248.136810-1-suzuki.poulose@arm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9LswwnPAf+nOVFG@do-x1extreme>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu 2023-01-26 15:12:35, Seth Forshee (DigitalOcean) wrote:
-> On Thu, Jan 26, 2023 at 06:03:16PM +0100, Petr Mladek wrote:
-> > On Fri 2023-01-20 16:12:20, Seth Forshee (DigitalOcean) wrote:
-> > > We've fairly regularaly seen liveptches which cannot transition within kpatch's
-> > > timeout period due to busy vhost worker kthreads.
-> > 
-> > I have missed this detail. Miroslav told me that we have solved
-> > something similar some time ago, see
-> > https://lore.kernel.org/all/20220507174628.2086373-1-song@kernel.org/
-> 
-> Interesting thread. I had thought about something along the lines of the
-> original patch, but there are some ideas in there that I hadn't
-> considered.
+We are happy to announce the early RFC version of the Arm
+Confidential Compute Architecture (CCA) support for the Linux
+stack. The intention is to seek early feedback in the following areas:
+ * KVM integration of the Arm CCA
+ * KVM UABI for managing the Realms, seeking to generalise the operations
+   wherever possible with other Confidential Compute solutions.
+   Note: This version doesn't support Guest Private memory, which will be added
+   later (see below).
+ * Linux Guest support for Realms
 
-Could you please provide some more details about the test system?
-Is there anything important to make it reproducible?
+Arm CCA Introduction
+=====================
 
-The following aspects come to my mind. It might require:
+The Arm CCA is a reference software architecture and implementation that builds
+on the Realm Management Extension (RME), enabling the execution of Virtual
+machines, while preventing access by more privileged software, such as hypervisor.
+The Arm CCA allows the hypervisor to control the VM, but removes the right for
+access to the code, register state or data that is used by VM.
+More information on the architecture is available here[0].
 
-   + more workers running on the same system
-   + have a dedicated CPU for the worker
-   + livepatching the function called by work->fn()
-   + running the same work again and again
-   + huge and overloaded system
+    Arm CCA Reference Software Architecture
+
+        Realm World    ||    Normal World   ||  Secure World  ||
+                       ||        |          ||                ||
+ EL0 x-------x         || x----x | x------x ||                ||
+     | Realm |         || |    | | |      | ||                ||
+     |       |         || | VM | | |      | ||                ||
+ ----|  VM*  |---------||-|    |---|      |-||----------------||
+     |       |         || |    | | |  H   | ||                ||
+ EL1 x-------x         || x----x | |      | ||                ||
+         ^             ||        | |  o   | ||                ||
+         |             ||        | |      | ||                ||
+ ------- R*------------------------|  s  -|---------------------
+         S             ||          |      | ||                ||
+         I             ||          |  t   | ||                ||
+         |             ||          |      | ||                || 
+         v             ||          x------x ||                ||
+ EL2    RMM*           ||              ^    ||                ||
+         ^             ||              |    ||                ||
+ ========|=============================|========================
+         |                             | SMC
+         x--------- *RMI* -------------x
+
+ EL3                   Root World
+                       EL3 Firmware
+ ===============================================================
+Where :
+ RMM - Realm Management Monitor
+ RMI - Realm Management Interface
+ RSI - Realm Service Interface
+ SMC - Secure Monitor Call
+
+RME introduces a new security state "Realm world", in addition to the
+traditional Secure and Non-Secure states. The Arm CCA defines a new component,
+Realm Management Monitor (RMM) that runs at R-EL2. This is a standard piece of
+firmware, verified, installed and loaded by the EL3 firmware (e.g, TF-A), at
+system boot.
+
+The RMM provides standard interfaces - Realm Management Interface (RMI) - to the
+Normal world hypervisor to manage the VMs running in the Realm world (also called
+Realms in short). These are exposed via SMC and are routed through the EL3
+firmwre.
+The RMI interface includes:
+  - Move a physical page from the Normal world to the Realm world
+  - Creating a Realm with requested parameters, tracked via Realm Descriptor (RD)
+  - Creating VCPUs aka Realm Execution Context (REC), with initial register state.
+  - Create stage2 translation table at any level.
+  - Load initial images into Realm Memory from normal world memory
+  - Schedule RECs (vCPUs) and handle exits
+  - Inject virtual interrupts into the Realm
+  - Service stage2 runtime faults with pages (provided by host, scrubbed by RMM).
+  - Create "shared" mappings that can be accessed by VMM/Hyp.
+  - Reclaim the memory allocated for the RAM and RTTs (Realm Translation Tables)
+
+However v1.0 of RMM specifications doesn't support:
+ - Paging protected memory of a Realm VM. Thus the pages backing the protected
+   memory region must be pinned.
+ - Live migration of Realms.
+ - Trusted Device assignment.
+ - Physical interrupt backed Virtual interrupts for Realms
+
+RMM also provides certain services to the Realms via SMC, called Realm Service
+Interface (RSI). These include:
+ - Realm Guest Configuration.
+ - Attestation & Measurement services
+ - Managing the state of an Intermediate Physical Address (IPA aka GPA) page.
+ - Host Call service (Communication with the Normal world Hypervisor)
+
+The specifications for the RMM software is currently at *v1.0-Beta2* and the
+latest version is available here [1].
+
+The Trusted Firmware foundation has an implementation of the RMM - TF-RMM -
+available here [3].
+
+Implementation
+=================
+
+This version of the stack is based on the RMM specification v1.0-Beta0[2], with
+following exceptions :
+  - TF-RMM/KVM currently doesn't support the optional features of PMU,
+     SVE and Self-hosted debug (coming soon).
+  - The RSI_HOST_CALL structure alignment requirement is reduced to match
+     RMM v1.0 Beta1
+  - RMI/RSI version numbers do not match the RMM spec. This will be
+    resolved once the spec/implementation is complete, across TF-RMM+Linux stack.
+
+We plan to update the stack to support the latest version of the RMMv1.0 spec
+in the coming revisions.
+
+This release includes the following components :
+
+ a) Linux Kernel
+     i) Host / KVM support - Support for driving the Realms via RMI. This is
+     dependent on running in the Kernel at EL2 (aka VHE mode). Also provides
+     UABI for VMMs to manage the Realm VMs. The support is restricted to 4K page
+     size, matching the Stage2 granule supported by RMM. The VMM is responsible
+     for making sure the guest memory is locked.
+
+       TODO: Guest Private memory[10] integration - We have been following the
+       series and support will be added once it is merged upstream.
+     
+     ii) Guest support - Support for a Linux Kernel to run in the Realm VM at
+     Realm-EL1, using RSI services. This includes virtio support (virtio-v1.0
+     only). All I/O are treated as non-secure/shared.
+ 
+ c) kvmtool - VMM changes required to manage Realm VMs. No guest private memory
+    as mentioned above.
+ d) kvm-unit-tests - Support for running in Realms along with additional tests
+    for RSI ABI.
+
+Running the stack
+====================
+
+To run/test the stack, you would need the following components :
+
+1) FVP Base AEM RevC model with FEAT_RME support [4]
+2) TF-A firmware for EL3 [5]
+3) TF-A RMM for R-EL2 [3]
+4) Linux Kernel [6]
+5) kvmtool [7]
+6) kvm-unit-tests [8]
+
+Instructions for building the firmware components and running the model are
+available here [9]. Once, the host kernel is booted, a Realm can be launched by
+invoking the `lkvm` commad as follows:
+
+ $ lkvm run --realm 				 \
+	 --measurement-algo=["sha256", "sha512"] \
+	 --disable-sve				 \
+	 <normal-vm-options>
+
+Where:
+ * --measurement-algo (Optional) specifies the algorithm selected for creating the
+   initial measurements by the RMM for this Realm (defaults to sha256).
+ * GICv3 is mandatory for the Realms.
+ * SVE is not yet supported in the TF-RMM, and thus must be disabled using
+   --disable-sve
+
+You may also run the kvm-unit-tests inside the Realm world, using the similar
+options as above.
 
 
-> > Honestly, kpatch's timeout 1 minute looks incredible low to me. Note
-> > that the transition is tried only once per minute. It means that there
-> > are "only" 60 attempts.
-> > 
-> > Just by chance, does it help you to increase the timeout, please?
-> 
-> To be honest my test setup reproduces the problem well enough to make
-> KLP wait significant time due to vhost threads, but it seldom causes it
-> to hit kpatch's timeout.
-> 
-> Our system management software will try to load a patch tens of times in
-> a day, and we've seen real-world cases where patches couldn't load
-> within kpatch's timeout for multiple days. But I don't have such an
-> environment readily accessible for my own testing. I can try to refine
-> my test case and see if I can get it to that point.
+Links
+============
 
-My understanding is that you try to load the patch repeatedly but
-it always fails after the 1 minute timeout. It means that it always
-starts from the beginning (no livepatched process).
+[0] Arm CCA Landing page (See Key Resources section for various documentations)
+    https://www.arm.com/architecture/security-features/arm-confidential-compute-architecture
 
-Is there any chance to try it with a longer timeout, for example, one
-hour? It should increase the chance if there are more problematic kthreads.
+[1] RMM Specification Latest
+    https://developer.arm.com/documentation/den0137/latest
 
-> > This low timeout might be useful for testing. But in practice, it does
-> > not matter when the transition is lasting one hour or even longer.
-> > It takes much longer time to prepare the livepatch.
-> 
-> Agreed. And to be clear, we cope with the fact that patches may take
-> hours or even days to get applied in some cases. The patches I sent are
-> just about improving the only case I've identified which has lead to
-> kpatch failing to load a patch for a day or longer.
+[2] RMM v1.0-Beta0 specification
+    https://developer.arm.com/documentation/den0137/1-0bet0/
 
-If it is acceptable to wait hours or even days then the 1 minute
-timeout is quite contra-productive. We actually do not use any timeout
-at all in livepatches provided by SUSE.
+[3] Trusted Firmware RMM - TF-RMM
+    https://www.trustedfirmware.org/projects/tf-rmm/
+    GIT: https://git.trustedfirmware.org/TF-RMM/tf-rmm.git
 
-Best Regards,
-Petr
+[4] FVP Base RevC AEM Model (available on x86_64 / Arm64 Linux)
+    https://developer.arm.com/Tools%20and%20Software/Fixed%20Virtual%20Platforms
+
+[5] Trusted Firmware for A class
+    https://www.trustedfirmware.org/projects/tf-a/
+
+[6] Linux kernel support for Arm-CCA
+    https://gitlab.arm.com/linux-arm/linux-cca
+    Host Support branch:	cca-host/rfc-v1
+    Guest Support branch:	cca-guest/rfc-v1
+
+[7] kvmtool support for Arm CCA
+    https://gitlab.arm.com/linux-arm/kvmtool-cca cca/rfc-v1
+
+[8] kvm-unit-tests support for Arm CCA
+    https://gitlab.arm.com/linux-arm/kvm-unit-tests-cca  cca/rfc-v1
+
+[9] Instructions for Building Firmware components and running the model, see
+    section 4.19.2 "Building and running TF-A with RME"
+    https://trustedfirmware-a.readthedocs.io/en/latest/components/realm-management-extension.html#building-and-running-tf-a-with-rme
+
+[10] fd based Guest Private memory for KVM
+   https://lkml.kernel.org/r/20221202061347.1070246-1-chao.p.peng@linux.intel.com
+
+Cc: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: Andrew Jones <andrew.jones@linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Chao Peng <chao.p.peng@linux.intel.com>
+Cc: Christoffer Dall <christoffer.dall@arm.com>
+Cc: Fuad Tabba <tabba@google.com>
+Cc: James Morse <james.morse@arm.com>
+Cc: Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc: Joey Gouly <Joey.Gouly@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Quentin Perret <qperret@google.com>
+Cc: Sean Christopherson <seanjc@google.com>
+Cc: Steven Price <steven.price@arm.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Will Deacon <will@kernel.org>
+Cc: Zenghui Yu <yuzenghui@huawei.com>
+To: linux-coco@lists.linux.dev
+To: kvmarm@lists.linux.dev
+Cc: kvmarm@lists.cs.columbia.edu
+Cc: linux-arm-kernel@lists.infradead.org
+To: linux-kernel@vger.kernel.org
+To: kvm@vger.kernel.org
