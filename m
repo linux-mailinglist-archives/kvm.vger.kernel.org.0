@@ -2,258 +2,195 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DAF7167ED98
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 19:34:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 575E167ED60
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 19:26:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235107AbjA0SeZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 13:34:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41590 "EHLO
+        id S235239AbjA0S0R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 13:26:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235063AbjA0SeX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 13:34:23 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A0996F21C;
-        Fri, 27 Jan 2023 10:34:22 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30RHhJr5003759;
-        Fri, 27 Jan 2023 18:15:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=z4AA2ZK0KoCUrgCsScIkdFlax+AQ1xvYsqquTrj3a5k=;
- b=G9pUnuBbqRSCRdf+GsYx9Y7GLDNQsNXSdMqDVm4TYpQzKToLMJbNSrqH2mRHgGP35JBq
- tTLFq1hDM3Rp+BT67b9LYISni+BkgJpgI6ECun+omCs8zIiHLKx3bbocbZaxJHjjQYER
- 3wYnjcyuFKX5Jp6EZx/YbOi4EpvFnVnWlzp+/szXrMECf+4L/6HqdIScFvWZGfkApzIE
- 5wmmtPJ/U/lPZ3CJyl0jLKVRBb2OhH8l08ddTeixAjFZa4y7lyMgHdSf2lOWqgHgprcv
- XYdaMP0CrkjP6zdPIcgYEsulABQV2K+UL3iFPzwjqiplH+NdVrXM3kwansig+s1x0Yq5 CA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nck8s0rsd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Jan 2023 18:15:28 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30RHujp9007987;
-        Fri, 27 Jan 2023 18:15:28 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nck8s0rrm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Jan 2023 18:15:28 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30R6E8Fo014903;
-        Fri, 27 Jan 2023 18:15:26 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3n87affwh6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 27 Jan 2023 18:15:26 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30RIFMIn47579566
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 27 Jan 2023 18:15:22 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9857720049;
-        Fri, 27 Jan 2023 18:15:22 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3DDE920040;
-        Fri, 27 Jan 2023 18:15:22 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.154.20])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri, 27 Jan 2023 18:15:22 +0000 (GMT)
-Message-ID: <f0f6c83f7d38a24234203849e116516ab7ac32f7.camel@linux.ibm.com>
-Subject: Re: [PATCH v6 12/14] KVM: s390: Extend MEM_OP ioctl by storage key
- checked cmpxchg
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Date:   Fri, 27 Jan 2023 19:15:22 +0100
-In-Reply-To: <aa942cf0-6f50-05f5-75a9-278129f00bf6@linux.ibm.com>
-References: <20230125212608.1860251-1-scgl@linux.ibm.com>
-         <20230125212608.1860251-13-scgl@linux.ibm.com>
-         <aa942cf0-6f50-05f5-75a9-278129f00bf6@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S234613AbjA0S0Q (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 13:26:16 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BDE57B7AF
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 10:26:14 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id rm7-20020a17090b3ec700b0022c05558d22so5499649pjb.5
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 10:26:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=zsftkojp5OXA0h6KtHV2q16vdLIZZMWoH0UyNcPXsv0=;
+        b=tsBPO9VAaqsZisDSonZd6v6hy07NN4UbbIBWkgD0TSZIq1Joh7A9ADhF9Jl7mk6CK/
+         0n/usPnqbrZQpvKHTk3GCZkIdNWIoK70ZiucBN5PGZiXNkp7BinDUg0Ml81xbycIfbng
+         uL5lEvnVlxiXPddALd9L9yMrF+EztuZJPeC0YseiJr91O4qdBOCCBOs7uWRl8LUnOJzF
+         yw3rgSEWO9YEltz6i00/h3UP37QhnncYlVD/mtDiCbrPccZ8qqft/ZQZYuUuNmpRldQN
+         xkvgMptsr2EBcIh4RcustE/+CjnrgGL07Dmt+aDPX6TluPxfvl6JqG9Tr1kNxpJR+hWb
+         RpTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=zsftkojp5OXA0h6KtHV2q16vdLIZZMWoH0UyNcPXsv0=;
+        b=f0HdGfdFqAVd2/NBhUKG2Wg2m+zshac9juZbMDCoGykQrtU6kHmO0Ks0udiLrRpScj
+         jgxtyUGFLnWkfXS2NG4lwFBuwLtzWe8vaaWsqcc1vscEV0eetfcc7AQIveAHUbDi4ADB
+         ArVdVHINix/L4oiipkfSjEWaN9VLcWP1bB5TCX4v+7+SMS0aLe/nDNAWeWEG3s5TObDv
+         5DAkXU/slXv64kbPiY4gEXHIcsZYGAczeoow57sVu6UzQh8F6AcUDDZjRwNcg+fhROPy
+         CTKPb4eoehWVfF+/Uy7rc9bVv5ndgtpaSRMIk+gV7pjRwPgHPkmJ8tflNO/buvN3X37S
+         iFnA==
+X-Gm-Message-State: AFqh2kqpU6Y0W90BY8B0X7DFtKhjKO0wd283YTEAiD0dh7Fr/OAGvgoK
+        mMijFi6EEgoBSKEsaOl2WSnrhQ==
+X-Google-Smtp-Source: AMrXdXtmuMmbKkrnzKek9F1A8FnyuRvs7M9kcnyacbUaIv8D3BbicW4370yvpt3ia7QOLkL/u3kxLQ==
+X-Received: by 2002:a17:902:e882:b0:195:e9d4:5380 with SMTP id w2-20020a170902e88200b00195e9d45380mr32563156plg.56.1674843973701;
+        Fri, 27 Jan 2023 10:26:13 -0800 (PST)
+Received: from atishp.ba.rivosinc.com ([66.220.2.162])
+        by smtp.gmail.com with ESMTPSA id jc5-20020a17090325c500b00189d4c666c8sm3195219plb.153.2023.01.27.10.26.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jan 2023 10:26:13 -0800 (PST)
+From:   Atish Patra <atishp@rivosinc.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Atish Patra <atishp@rivosinc.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Sergey Matyukevich <sergey.matyukevich@syntacore.com>,
+        Will Deacon <will@kernel.org>
+Subject: [PATCH v3 00/14] KVM perf support 
+Date:   Fri, 27 Jan 2023 10:25:44 -0800
+Message-Id: <20230127182558.2416400-1-atishp@rivosinc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: X4TYTTeX60ySKf2aPVbcn3mRdDhAB91y
-X-Proofpoint-ORIG-GUID: fWJGBKK6oPYom01hnFAZGuDL5eIDQoTZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-27_10,2023-01-27_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 suspectscore=0
- mlxscore=0 malwarescore=0 lowpriorityscore=0 mlxlogscore=999 clxscore=1015
- priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
- definitions=main-2301270167
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2023-01-26 at 17:10 +0100, Janosch Frank wrote:
-> On 1/25/23 22:26, Janis Schoetterl-Glausch wrote:
-> > User space can use the MEM_OP ioctl to make storage key checked reads
-> > and writes to the guest, however, it has no way of performing atomic,
-> > key checked, accesses to the guest.
-> > Extend the MEM_OP ioctl in order to allow for this, by adding a cmpxchg
-> > op. For now, support this op for absolute accesses only.
-> >=20
-> > This op can be use, for example, to set the device-state-change
->=20
-> s/use/used/
->=20
-> > indicator and the adapter-local-summary indicator atomically.
-> >=20
-> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> > ---
-> [...]
-> > +/**
-> > + * cmpxchg_guest_abs_with_key() - Perform cmpxchg on guest absolute ad=
-dress.
-> > + * @kvm: Virtual machine instance.
-> > + * @gpa: Absolute guest address of the location to be changed.
-> > + * @len: Operand length of the cmpxchg, required: 1 <=3D len <=3D 16. =
-Providing a
-> > + *       non power of two will result in failure.
-> > + * @old_addr: Pointer to old value. If the location at @gpa contains t=
-his value,
-> > + *            the exchange will succeed. After calling cmpxchg_guest_a=
-bs_with_key()
-> > + *            *@old_addr contains the value at @gpa before the attempt=
- to
-> > + *            exchange the value.
-> > + * @new: The value to place at @gpa.
-> > + * @access_key: The access key to use for the guest access.
-> > + * @success: output value indicating if an exchange occurred.
-> > + *
-> > + * Atomically exchange the value at @gpa by @new, if it contains *@old=
-.
-> > + * Honors storage keys.
-> > + *
-> > + * Return: * 0: successful exchange
-> > + *         * a program interruption code indicating the reason cmpxchg=
- could
-> > + *           not be attempted
->=20
-> Nit:
->  >0: a program interruption code...
->=20
->=20
-> > + *         * -EINVAL: address misaligned or len not power of two
-> > + *         * -EAGAIN: transient failure (len 1 or 2)
-> > + *         * -EOPNOTSUPP: read-only memslot (should never occur)
-> > + */
-> > +int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
-> > +			       __uint128_t *old_addr, __uint128_t new,
-> > +			       u8 access_key, bool *success)
-> > +{
-> > +	gfn_t gfn =3D gpa >> PAGE_SHIFT;
->=20
->   gpa_to_gfn()?
+This series extends perf support for KVM. The KVM implementation relies
+on the SBI PMU extension and trap n emulation of hpmcounter CSRs.
+The KVM implementation exposes the virtual counters to the guest and internally
+manage the counters using kernel perf counters. 
 
-Yes.
->=20
-> > +	struct kvm_memory_slot *slot =3D gfn_to_memslot(kvm, gfn);
-> > +	bool writable;
-> > +	hva_t hva;
-> > +	int ret;
-> > +
-> > +	if (!IS_ALIGNED(gpa, len))
-> > +		return -EINVAL;
-> > +
-> > +	hva =3D gfn_to_hva_memslot_prot(slot, gfn, &writable);
-> > +	if (kvm_is_error_hva(hva))
-> > +		return PGM_ADDRESSING;
-> > +	/*
-> > +	 * Check if it's a read-only memslot, even though that cannot occur
-> > +	 * since those are unsupported.
-> > +	 * Don't try to actually handle that case.
-> > +	 */
-> > +	if (!writable)
-> > +		return -EOPNOTSUPP;
-> > +
-> > +	hva +=3D offset_in_page(gpa);
->=20
-> Hmm if we don't use a macro to generate these then I'd add an explanation=
-:
->=20
-> cmpxchg_user_key() is a macro that is dependent on the type of "old" so=
-=20
-> there's no deduplication possible without further macros.
+This series doesn't support the counter overflow as the Sscofpmf extension
+doesn't allow trap & emulation mechanism of scountovf CSR yet. The required
+changes to allow that are being under discussions. Supporting overflow interrupt
+also requires AIA interrupt filtering support.
 
-Can do.
-Btw. I could move the other two statements out of the switch by using a uni=
-on of old values,
-memcmp and memcpy, but I think that would be less readable.
+1. PATCH 1-5 are generic KVM/PMU driver improvements.
+2. PATCH 9 disables hpmcounter for now. It will be enabled to maintain ABI
+requirement once the ONE reg interface is settled. 
 
->=20
-> > +	switch (len) {
-> > +	case 1: {
-> > +		u8 old;
-> > +
-> > +		ret =3D cmpxchg_user_key((u8 *)hva, &old, *old_addr, new, access_key=
-);
-> > +		*success =3D !ret && old =3D=3D *old_addr;
-> > +		*old_addr =3D old;
-> > +		break;
-> > +	}
-> > +	case 2: {
-> > +		u16 old;
-> > +
-> > +		ret =3D cmpxchg_user_key((u16 *)hva, &old, *old_addr, new, access_ke=
-y);
-> > +		*success =3D !ret && old =3D=3D *old_addr;
-> > +		*old_addr =3D old;
-> > +		break;
-> > +	}
-> > +	case 4: {
-> > +		u32 old;
-> > +
-> > +		ret =3D cmpxchg_user_key((u32 *)hva, &old, *old_addr, new, access_ke=
-y);
-> > +		*success =3D !ret && old =3D=3D *old_addr;
-> > +		*old_addr =3D old;
-> > +		break;
-> > +	}
-> > +	case 8: {
-> > +		u64 old;
-> > +
-> > +		ret =3D cmpxchg_user_key((u64 *)hva, &old, *old_addr, new, access_ke=
-y);
-> > +		*success =3D !ret && old =3D=3D *old_addr;
-> > +		*old_addr =3D old;
-> > +		break;
-> > +	}
-> > +	case 16: {
-> > +		__uint128_t old;
-> > +
-> > +		ret =3D cmpxchg_user_key((__uint128_t *)hva, &old, *old_addr, new, a=
-ccess_key);
-> > +		*success =3D !ret && old =3D=3D *old_addr;
-> > +		*old_addr =3D old;
-> > +		break;
-> > +	}
-> > +	default:
-> > +		return -EINVAL;
-> > +	}
-> > +	mark_page_dirty_in_slot(kvm, slot, gfn);
->=20
-> Is that needed if we failed the store?
+perf stat works in kvm guests with this series. 
 
-Indeed it isn't.
+Here is example of running perf stat in a guest running in KVM.
 
-[...]
+===========================================================================
+/ # /host/apps/perf stat -e instructions -e cycles -e r8000000000000005 \
+> -e r8000000000000006 -e r8000000000000007 -e r8000000000000008 \
+> -e r800000000000000a perf bench sched messaging -g 10 -l 10
+
+# Running 'sched/messaging' benchmark:
+# 20 sender and receiver processes per group
+# 10 groups == 400 processes run
+
+     Total time: 7.769 [sec]
+                 
+ Performance counter stats for 'perf bench sched messaging -g 10 -l 10':
+
+       73556259604      cycles
+       73387266056      instructions              #    1.00  insn per cycle
+                 0      dTLB-store-misses
+                 0      iTLB-load-misses
+                 0      r8000000000000005
+              2595      r8000000000000006
+              2272      r8000000000000007
+                10      r8000000000000008
+                 0      r800000000000000a
+
+      12.173720400 seconds time elapsed
+
+       1.002716000 seconds user
+      21.931047000 seconds sys
+
+
+Note: The SBI_PMU_FW_SET_TIMER (eventid : r8000000000000005) is zero
+as kvm guest supports sstc now. 
+
+This series can be found here as well.
+https://github.com/atishp04/linux/tree/kvm_perf_v3
+
+TODO:
+1. Add sscofpmf support.
+2. Add One reg interface for the following operations:
+	1. Enable/Disable PMU (should it at VM level rather than vcpu ?)
+	2. Number of hpmcounter and width of the counters
+	3. Init PMU
+	4. Allow guest user to access cycle & instret without trapping
+
+Changes v2->v3:
+1. Changed the exported functions to GPL only export.
+2. Addressed all the nit comments on v2.
+3. Split non-kvm related changes into separate patches.
+4. Reorgainze the PATCH 11 and 10 based on Drew's suggestions.
+
+Changes from v1->v2:
+1. Addressed comments from Andrew.
+2. Removed kvpmu sanity check.
+3. Added a kvm pmu init flag and the sanity check to probe function.
+4. Improved the linux vs sbi error code handling.
+ 
+
+Atish Patra (14):
+perf: RISC-V: Define helper functions expose hpm counter width and
+count
+perf: RISC-V: Improve privilege mode filtering for perf
+RISC-V: Improve SBI PMU extension related definitions
+RISC-V: KVM: Define a probe function for SBI extension data structures
+RISC-V: KVM: Return correct code for hsm stop function
+RISC-V: KVM: Modify SBI extension handler to return SBI error code
+RISC-V: KVM: Add skeleton support for perf
+RISC-V: KVM: Add SBI PMU extension support
+RISC-V: KVM: Make PMU functionality depend on Sscofpmf
+RISC-V: KVM: Disable all hpmcounter access for VS/VU mode
+RISC-V: KVM: Implement trap & emulate for hpmcounters
+RISC-V: KVM: Implement perf support without sampling
+RISC-V: KVM: Support firmware events
+RISC-V: KVM: Increment firmware pmu events
+
+arch/riscv/include/asm/kvm_host.h     |   3 +
+arch/riscv/include/asm/kvm_vcpu_pmu.h | 108 +++++
+arch/riscv/include/asm/kvm_vcpu_sbi.h |  13 +-
+arch/riscv/include/asm/sbi.h          |   5 +-
+arch/riscv/kvm/Makefile               |   1 +
+arch/riscv/kvm/main.c                 |   3 +-
+arch/riscv/kvm/tlb.c                  |   4 +
+arch/riscv/kvm/vcpu.c                 |   5 +
+arch/riscv/kvm/vcpu_insn.c            |   4 +-
+arch/riscv/kvm/vcpu_pmu.c             | 622 ++++++++++++++++++++++++++
+arch/riscv/kvm/vcpu_sbi.c             |  57 ++-
+arch/riscv/kvm/vcpu_sbi_base.c        |  45 +-
+arch/riscv/kvm/vcpu_sbi_hsm.c         |  29 +-
+arch/riscv/kvm/vcpu_sbi_pmu.c         |  86 ++++
+arch/riscv/kvm/vcpu_sbi_replace.c     |  54 ++-
+arch/riscv/kvm/vcpu_sbi_v01.c         |  11 +-
+drivers/perf/riscv_pmu_sbi.c          |  64 ++-
+include/linux/perf/riscv_pmu.h        |   5 +
+18 files changed, 1013 insertions(+), 106 deletions(-)
+create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
+create mode 100644 arch/riscv/kvm/vcpu_pmu.c
+create mode 100644 arch/riscv/kvm/vcpu_sbi_pmu.c
+
+--
+2.25.1
 
