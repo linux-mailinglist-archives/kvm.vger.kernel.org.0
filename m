@@ -2,110 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 49E8B67DC72
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 03:59:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6690867DCB9
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 04:50:22 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231773AbjA0C7a (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 26 Jan 2023 21:59:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37982 "EHLO
+        id S229531AbjA0DuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 26 Jan 2023 22:50:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229946AbjA0C73 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 26 Jan 2023 21:59:29 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B05C2E81E
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 18:59:28 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id y15so2945262edq.13
-        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 18:59:27 -0800 (PST)
+        with ESMTP id S229510AbjA0DuO (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 26 Jan 2023 22:50:14 -0500
+Received: from mail-vk1-xa31.google.com (mail-vk1-xa31.google.com [IPv6:2607:f8b0:4864:20::a31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F11E359B78
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 19:50:12 -0800 (PST)
+Received: by mail-vk1-xa31.google.com with SMTP id 22so1907042vkn.2
+        for <kvm@vger.kernel.org>; Thu, 26 Jan 2023 19:50:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=profian-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=/AfdCkm99SUvFdMCwe3pmsh5HVt3esnvMEJqsrZ3avo=;
-        b=Lw1+9lxRR1sCal3wO6yNlAF8+j0tzSaG6hT7ZAC0A3jRdh3kWNAYuNi3k9VAtAYzwz
-         cRRJvKXPtkUVoLy/D4sdhQonLjdbrnM4mhrp0qX7BmIVcJz4YsvPn/shgWzCi/Kzvm3C
-         zpETtZRlY4wgwyw/2mQql77cpoS9qrXsPAJOc+BhpfV2SqlFEoOfsSObsrF/5Bsa8Y+S
-         mnG+KiJZf0Aa+/VD4SsSLw3xKHxqWyxTVE2W1bcgLbn1EtsmXP73vWqxmOUKsZS1wOkJ
-         jddWmBuUWcevsiwNrV8QVHDtc5yDnT567smEvCwgTyrXSZe42zwVI/i3JGnOeVJLJVkO
-         2buw==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GrQMLPA2+6YJ2nrnlqQhHB+M1ekzvtKiEZXAuyk27TU=;
+        b=hJct9Tl+rIs1BfCLM+aaHnrRvZ7/fj2NAOfbyyP+oXHmoNLLryLegV9Am9PHnmyuYi
+         m+6f3bNJHrkgnBcWyuZCPwUTU0fCWiyhPnJ5thHn08FlsWUQXm+YnmpYEUkS6wdq1whP
+         S6czdWwx+2lnhgi0Le+L2z6R6zTWdUHONXRdXovwWn/nRZpeXG05vi2HP8YArCulDLwh
+         7JELNsmOJfRJCI8Me/SfqjFC5zYwtakpbTilFls927W3IoBt6mD1NH9DQ9XGfhul4RW+
+         YX3LTk+gVOci3TE/2X1HEKkY9gu79w9cOYnLBvenC2rhAX1SPgL6m1/f6rKcnZLzPn1U
+         WaDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=/AfdCkm99SUvFdMCwe3pmsh5HVt3esnvMEJqsrZ3avo=;
-        b=7OnaZIHM1xdRn+QwaqBkX6j8f7FfYiodGoSEl68hel4K1gl2OU3Jk1wn6xTg1CGirU
-         incM1sx/lRFtKd+7VnGoDhAtfLNea4JJ0tBapHAnupilVXtnEOjAT0jCXqH2wA0flzma
-         pZ79vblK/D1sNGZMHyJcK5b38MT0LUbSgrKhuY/efvCC7SNqFbOebhZXY/EB7j5EeJ6z
-         MODCFPGPBM8MZcozznylT6CA72V6KSAkrFzT/KN8OnXXWO2+r+2jCakDrwm4uUEGaKMj
-         8yVeZzjNTdeeNNT73JAGo6+DPhM4qBi0Rqq/D8M7qq62vMWwwlg9wk71ttC53+LUNWon
-         o27w==
-X-Gm-Message-State: AO0yUKXZKI5xvYR4jC5J9toK7z5pjesZKoRlso3wMblFvTsaYCs1Em1I
-        H3QvUdDqQWE0P7DOw4GklXnSpQ==
-X-Google-Smtp-Source: AK7set+kjf7R52Itk1uYZWSVD4lmM+dajN2l5hFV3IOKd8xZCRy/syQHhhueg9DbhXmkvK6dFOjXUw==
-X-Received: by 2002:a05:6402:1946:b0:4a0:bb2e:3af0 with SMTP id f6-20020a056402194600b004a0bb2e3af0mr5605958edz.1.1674788366587;
-        Thu, 26 Jan 2023 18:59:26 -0800 (PST)
-Received: from localhost (88-113-101-73.elisa-laajakaista.fi. [88.113.101.73])
-        by smtp.gmail.com with ESMTPSA id p11-20020a50cd8b000000b004972644b19fsm1614757edi.16.2023.01.26.18.59.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 Jan 2023 18:59:26 -0800 (PST)
-From:   Jarkko Sakkinen <jarkko@profian.com>
-Cc:     Harald Hoyer <harald@profian.com>, Tom Dohrmann <erbse.13@gmx.de>,
-        Ashish Kalra <ashish.kalra@amd.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Jarkko Sakkinen <jarkko@profian.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        x86@kernel.org (maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)),
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: [PATCH RFC 0/8] Enarx fixes for AMD SEV-SNP hypervisor v7
-Date:   Fri, 27 Jan 2023 02:59:22 +0000
-Message-Id: <20230127025922.270463-1-jarkko@profian.com>
-X-Mailer: git-send-email 2.38.1
+        bh=GrQMLPA2+6YJ2nrnlqQhHB+M1ekzvtKiEZXAuyk27TU=;
+        b=SP6rfPg0FQWqnuSd8Y53KMG8Me3Mimd9XT6RBkGIPXJYmd1xUSN3EOEsN342bGhAEU
+         jQC6OjemwfgzG3tebXl6A7hfh5TpEEYt7xj4PZBb6N28/xzIlgbgA5DOXVkxGodFyH2C
+         ouR37iGFzCCNQHRRQxp2erOTUGBRtkIzDi+BlOqkn0/kemUNa8W57ntEj/P9J3xpqTWZ
+         nG6u09vPGNp4Qvf6mEOThcdjlvZNrzY+/BxpkdLyOFl6ODzKM9WpDBVCS1rFoyrDVs3D
+         v040cHqQC8wl7amirFkYGhH20FAcykZ571PRFLiLkyzz8tu5qzSxcJnBoW80yzA9jRk9
+         h4CA==
+X-Gm-Message-State: AFqh2kpThgA/vNA7woSRIgwR2IIQN3E2Psq0RySRHWBSqP6KeokdAana
+        6jfawVuKGHK6v3h6lA1KbkT6bkpWDBmZYlMKbgDRIQ5MyDj6PwWj
+X-Google-Smtp-Source: AMrXdXsXebuQ2QERobwmPTcWNxNO0CpUGZswZKOvF78Ux5WxRkq3PuMA0audZdYFiVWU4aX6w6+jUrQYaWo41FB1pfU=
+X-Received: by 2002:a1f:5945:0:b0:3d5:9937:886 with SMTP id
+ n66-20020a1f5945000000b003d599370886mr5094133vkb.5.1674791411914; Thu, 26 Jan
+ 2023 19:50:11 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+References: <20230126210401.2862537-1-dmatlack@google.com> <Y9MA0+Q/rO5Voa0D@google.com>
+ <CALzav=dXWkX7aFga=T9fk1auXcArECLXMOEotWnGODeGVL44iQ@mail.gmail.com> <Y9MulRF8QXEiGIog@google.com>
+In-Reply-To: <Y9MulRF8QXEiGIog@google.com>
+From:   David Matlack <dmatlack@google.com>
+Date:   Thu, 26 Jan 2023 19:49:45 -0800
+Message-ID: <CALzav=e2udiG0q4Hz_GbusfbNZowBZVuinCdCwO1vCJ63fnvWw@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Replace tdp_mmu_page with a bit in the role
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
-To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-A set of fixes that we've applied on top of SNP v7 patches for running Enarx.
+On Thu, Jan 26, 2023 at 5:53 PM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Thu, Jan 26, 2023, David Matlack wrote:
+> > On Thu, Jan 26, 2023 at 2:38 PM Sean Christopherson <seanjc@google.com> wrote:
+> > >
+> > > On Thu, Jan 26, 2023, David Matlack wrote:
+> > > > Link: https://lore.kernel.org/kvm/b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com/
+> > >
+> > > Drop the trailing slash, otherwise directly clicking the link goes sideways.
+> >
+> > I don't have any problem clicking this link, but I can try to omit the
+> > trailing slash in the future.
+>
+> Ha!  Figured out what happens.  Gmail gets confused and thinks the forward slash
+> indiciates a continuation, e.g. the original mail sends me to:
+>
+>   https://lore.kernel.org/kvm/b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com/Signed-off-by
 
-References:
-* https://github.com/enarx/linux/releases/tag/v6.1-enarx-upm-1
-* https://hackmd.io/@enarx/HJKSlW2Lo
+Ohhh I do see the same behavior when clicking the link in my original
+email. The copy of the link in your reply had nothing on the line
+after it so clicking it there worked just fine :)
 
-Jarkko Sakkinen (3):
-  KVM: SVM: KVM_SEV_SNP_LAUNCH_RESET_VECTOR
-  crypto: ccp: Prevent a spurious SEV_CMD_SNP_INIT triggered by
-    sev_guest_init()
-  crypto: ccp: Move __sev_snp_init_locked() call inside
-    __sev_platform_init_locked()
-
-Tom Dohrmann (5):
-  KVM: SVM: fix: calculate end instead of passing size
-  KVM: SVM: fix: initialize `npinned`
-  KVM: SVM: write back corrected CPUID page
-  KVM: SVM: fix: add separate error for missing slot
-  KVM: SVM: fix: Don't return an error for `GHCB_MSR_PSC_REQ`
-
- arch/x86/include/asm/svm.h   | 15 ++++--
- arch/x86/kvm/svm/sev.c       | 89 +++++++++++++++++++++++++++++-------
- arch/x86/kvm/svm/svm.h       |  1 +
- drivers/crypto/ccp/sev-dev.c | 63 ++++++++++---------------
- include/linux/psp-sev.h      | 15 ------
- include/uapi/linux/kvm.h     |  5 ++
- 6 files changed, 113 insertions(+), 75 deletions(-)
-
--- 
-2.38.1
-
+>
+> I bet the above now works because there's whitespace. For giggles....
+>
+> https://lore.kernel.org/kvm/b0e8eb55-c2ee-ce13-8806-9d0184678984@redhat.com/
+> will_it_blend
