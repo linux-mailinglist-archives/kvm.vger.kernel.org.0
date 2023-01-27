@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7C1E167F26E
-	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 00:53:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AE18167F275
+	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 00:53:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232370AbjA0Xx2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 18:53:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47084 "EHLO
+        id S231292AbjA0Xxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 18:53:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230058AbjA0XxX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 18:53:23 -0500
+        with ESMTP id S231953AbjA0Xxl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 18:53:41 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 821D584FA6
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 15:52:42 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B07D81C58E
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 15:52:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674863561;
+        s=mimecast20190719; t=1674863571;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=kli5sE9lIHwCvZbbt0ccDIlIdit3t3RFH2I2s6WRBok=;
-        b=Om11Y/tI4o/wap2EEnIKebSgPCUA4OIsZaDhZD6vDGyJ0whuXM5MKd469uaWqFN90/Mfti
-        SjLYsKGrFwvsOKJkzlfk/ouSjFZ4/4jfl5YgqDYftqMcdwIbciBIsFJXcm9VLQ5+mVTC3A
-        xDCqjy5gYtjwmF9oIMXWuqRtSwPd8II=
+        bh=UV4b6dQEMTcN7kzcyz9qC8kkquY3o3CuIM/qD6LLyUk=;
+        b=G7sPc8ftdOWzVSfGO5SVc1vZe8PF+Bqyxc417lcr3Cd7fWc/53Rlcz/bloaGOSpq5BFHJN
+        nLgi0ILH3rJ7z8D23WA1ZP+o10mRTJYQgcp+bm0hl/upeLMDVGi+kPlif3DwMCbIWsQj35
+        8vn8KoJ9nfIJt8eErx8XoUVX0mzoAX4=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-336-Q5XBn_UUMMCmDKAq2A9obQ-1; Fri, 27 Jan 2023 18:52:36 -0500
-X-MC-Unique: Q5XBn_UUMMCmDKAq2A9obQ-1
+ us-mta-34-13eyOOjpNii0BYz3EjCmtg-1; Fri, 27 Jan 2023 18:52:44 -0500
+X-MC-Unique: 13eyOOjpNii0BYz3EjCmtg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 836E23804067;
-        Fri, 27 Jan 2023 23:52:35 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C11773C025B0;
+        Fri, 27 Jan 2023 23:52:43 +0000 (UTC)
 Received: from gshan.redhat.com (vpn2-54-64.bne.redhat.com [10.64.54.64])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id DC4F240ED413;
-        Fri, 27 Jan 2023 23:52:27 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 174EA40C945A;
+        Fri, 27 Jan 2023 23:52:35 +0000 (UTC)
 From:   Gavin Shan <gshan@redhat.com>
 To:     kvm@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -48,9 +48,9 @@ Cc:     pbonzini@redhat.com, corbet@lwn.net, maz@kernel.org,
         gshan@redhat.com, seanjc@google.com, isaku.yamahata@intel.com,
         ricarkol@google.com, eric.auger@redhat.com, renzhengeek@gmail.com,
         reijiw@google.com, shan.gavin@gmail.com
-Subject: [PATCH v4 1/4] KVM: arm64: Include kvm_mmu.h from vgic.h
-Date:   Sat, 28 Jan 2023 07:51:47 +0800
-Message-Id: <20230127235150.17025-2-gshan@redhat.com>
+Subject: [PATCH v4 2/4] KVM: arm64: Add helper vgic_write_guest_lock()
+Date:   Sat, 28 Jan 2023 07:51:48 +0800
+Message-Id: <20230127235150.17025-3-gshan@redhat.com>
 In-Reply-To: <20230127235150.17025-1-gshan@redhat.com>
 References: <20230127235150.17025-1-gshan@redhat.com>
 MIME-Version: 1.0
@@ -67,126 +67,137 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-We need a unified helper in 'kvm/vgic/vgic.h' to write guest memory. In
-the helper, the check of no-running-vcpu context for dirty ring will be
-applied. kvm_write_guest_lock(), defined in 'include/asm/kvm_mmu.h', is
-going to be dereferenced by the unified helper.
+Currently, the unknown no-running-vcpu sites are reported when a
+dirty page is tracked by mark_page_dirty_in_slot(). Until now, the
+only known no-running-vcpu site is saving vgic/its tables through
+KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_SAVE_TABLES} command on KVM device
+"kvm-arm-vgic-its". Unfortunately, there are more unknown sites to
+be handled and no-running-vcpu context will be allowed in these
+sites: (1) KVM_DEV_ARM_{VGIC_GRP_CTRL, ITS_RESTORE_TABLES} command
+on KVM device "kvm-arm-vgic-its" to restore vgic/its tables. The
+VGICv3 LPI pending status could be restored. (2) Save VGICv3 pending
+table through KVM_DEV_ARM_{VGIC_GRP_CTRL, VGIC_SAVE_PENDING_TABLES}
+command on KVM device "kvm-arm-vgic-v3".
 
-Include 'include/asm/kvm_mmu.h' to 'kvm/vgic/vgic.h' to avoid including
-the former header file when the later one is needed. With the change,
-the duplicate inclusions of 'include/asm/kvm_mmu.h' are removed.
+To handle those unknown cases, an unified handler vgic_write_guest_lock()
+is introduced. struct vgic_dist::save_its_tables_in_progress is also
+renamed to struct vgic_dist::write_tables_in_progress.
 
 No functional change intended.
 
 Suggested-by: Oliver Upton <oliver.upton@linux.dev>
 Signed-off-by: Gavin Shan <gshan@redhat.com>
+Reviewed-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/vgic/vgic-debug.c      | 1 -
- arch/arm64/kvm/vgic/vgic-init.c       | 1 -
- arch/arm64/kvm/vgic/vgic-its.c        | 1 -
- arch/arm64/kvm/vgic/vgic-kvm-device.c | 1 -
- arch/arm64/kvm/vgic/vgic-mmio-v3.c    | 1 -
- arch/arm64/kvm/vgic/vgic-v2.c         | 1 -
- arch/arm64/kvm/vgic/vgic-v3.c         | 1 -
- arch/arm64/kvm/vgic/vgic.h            | 1 +
- 8 files changed, 1 insertion(+), 7 deletions(-)
+ arch/arm64/kvm/vgic/vgic-its.c | 13 +++++--------
+ arch/arm64/kvm/vgic/vgic.h     | 13 +++++++++++++
+ include/kvm/arm_vgic.h         |  2 +-
+ 3 files changed, 19 insertions(+), 9 deletions(-)
 
-diff --git a/arch/arm64/kvm/vgic/vgic-debug.c b/arch/arm64/kvm/vgic/vgic-debug.c
-index 78cde687383c..69201c2dfc6c 100644
---- a/arch/arm64/kvm/vgic/vgic-debug.c
-+++ b/arch/arm64/kvm/vgic/vgic-debug.c
-@@ -10,7 +10,6 @@
- #include <linux/kvm_host.h>
- #include <linux/seq_file.h>
- #include <kvm/arm_vgic.h>
--#include <asm/kvm_mmu.h>
- #include "vgic.h"
- 
- /*
-diff --git a/arch/arm64/kvm/vgic/vgic-init.c b/arch/arm64/kvm/vgic/vgic-init.c
-index f6d4f4052555..de389a5bec45 100644
---- a/arch/arm64/kvm/vgic/vgic-init.c
-+++ b/arch/arm64/kvm/vgic/vgic-init.c
-@@ -9,7 +9,6 @@
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <asm/kvm_emulate.h>
--#include <asm/kvm_mmu.h>
- #include "vgic.h"
- 
- /*
 diff --git a/arch/arm64/kvm/vgic/vgic-its.c b/arch/arm64/kvm/vgic/vgic-its.c
-index 94a666dd1443..ad4bb69ab83e 100644
+index ad4bb69ab83e..bad8ed6dcaa4 100644
 --- a/arch/arm64/kvm/vgic/vgic-its.c
 +++ b/arch/arm64/kvm/vgic/vgic-its.c
-@@ -18,7 +18,6 @@
+@@ -2186,7 +2186,7 @@ static int vgic_its_save_ite(struct vgic_its *its, struct its_device *dev,
+ 	       ((u64)ite->irq->intid << KVM_ITS_ITE_PINTID_SHIFT) |
+ 		ite->collection->collection_id;
+ 	val = cpu_to_le64(val);
+-	return kvm_write_guest_lock(kvm, gpa, &val, ite_esz);
++	return vgic_write_guest_lock(kvm, gpa, &val, ite_esz);
+ }
  
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_arm.h>
--#include <asm/kvm_mmu.h>
+ /**
+@@ -2338,7 +2338,7 @@ static int vgic_its_save_dte(struct vgic_its *its, struct its_device *dev,
+ 	       (itt_addr_field << KVM_ITS_DTE_ITTADDR_SHIFT) |
+ 		(dev->num_eventid_bits - 1));
+ 	val = cpu_to_le64(val);
+-	return kvm_write_guest_lock(kvm, ptr, &val, dte_esz);
++	return vgic_write_guest_lock(kvm, ptr, &val, dte_esz);
+ }
  
- #include "vgic.h"
- #include "vgic-mmio.h"
-diff --git a/arch/arm64/kvm/vgic/vgic-kvm-device.c b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-index edeac2380591..552668a91bd9 100644
---- a/arch/arm64/kvm/vgic/vgic-kvm-device.c
-+++ b/arch/arm64/kvm/vgic/vgic-kvm-device.c
-@@ -8,7 +8,6 @@
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <linux/uaccess.h>
--#include <asm/kvm_mmu.h>
- #include <asm/cputype.h>
- #include "vgic.h"
+ /**
+@@ -2525,7 +2525,7 @@ static int vgic_its_save_cte(struct vgic_its *its,
+ 	       ((u64)collection->target_addr << KVM_ITS_CTE_RDBASE_SHIFT) |
+ 	       collection->collection_id);
+ 	val = cpu_to_le64(val);
+-	return kvm_write_guest_lock(its->dev->kvm, gpa, &val, esz);
++	return vgic_write_guest_lock(its->dev->kvm, gpa, &val, esz);
+ }
  
-diff --git a/arch/arm64/kvm/vgic/vgic-mmio-v3.c b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-index 91201f743033..8ba04f4fa63d 100644
---- a/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-mmio-v3.c
-@@ -13,7 +13,6 @@
+ /*
+@@ -2606,7 +2606,7 @@ static int vgic_its_save_collection_table(struct vgic_its *its)
+ 	 */
+ 	val = 0;
+ 	BUG_ON(cte_esz > sizeof(val));
+-	ret = kvm_write_guest_lock(its->dev->kvm, gpa, &val, cte_esz);
++	ret = vgic_write_guest_lock(its->dev->kvm, gpa, &val, cte_esz);
+ 	return ret;
+ }
  
- #include <asm/kvm_emulate.h>
- #include <asm/kvm_arm.h>
--#include <asm/kvm_mmu.h>
+@@ -2742,7 +2742,6 @@ static int vgic_its_has_attr(struct kvm_device *dev,
+ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
+ {
+ 	const struct vgic_its_abi *abi = vgic_its_get_abi(its);
+-	struct vgic_dist *dist = &kvm->arch.vgic;
+ 	int ret = 0;
  
- #include "vgic.h"
- #include "vgic-mmio.h"
-diff --git a/arch/arm64/kvm/vgic/vgic-v2.c b/arch/arm64/kvm/vgic/vgic-v2.c
-index 645648349c99..d8604fdfdfcd 100644
---- a/arch/arm64/kvm/vgic/vgic-v2.c
-+++ b/arch/arm64/kvm/vgic/vgic-v2.c
-@@ -7,7 +7,6 @@
- #include <linux/kvm.h>
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
--#include <asm/kvm_mmu.h>
+ 	if (attr == KVM_DEV_ARM_VGIC_CTRL_INIT) /* Nothing to do */
+@@ -2762,9 +2761,7 @@ static int vgic_its_ctrl(struct kvm *kvm, struct vgic_its *its, u64 attr)
+ 		vgic_its_reset(kvm, its);
+ 		break;
+ 	case KVM_DEV_ARM_ITS_SAVE_TABLES:
+-		dist->save_its_tables_in_progress = true;
+ 		ret = abi->save_tables(its);
+-		dist->save_its_tables_in_progress = false;
+ 		break;
+ 	case KVM_DEV_ARM_ITS_RESTORE_TABLES:
+ 		ret = abi->restore_tables(its);
+@@ -2791,7 +2788,7 @@ bool kvm_arch_allow_write_without_running_vcpu(struct kvm *kvm)
+ {
+ 	struct vgic_dist *dist = &kvm->arch.vgic;
  
- #include "vgic.h"
+-	return dist->save_its_tables_in_progress;
++	return dist->write_tables_in_progress;
+ }
  
-diff --git a/arch/arm64/kvm/vgic/vgic-v3.c b/arch/arm64/kvm/vgic/vgic-v3.c
-index 2074521d4a8c..5dfbd03e5e1a 100644
---- a/arch/arm64/kvm/vgic/vgic-v3.c
-+++ b/arch/arm64/kvm/vgic/vgic-v3.c
-@@ -7,7 +7,6 @@
- #include <linux/kvm_host.h>
- #include <kvm/arm_vgic.h>
- #include <asm/kvm_hyp.h>
--#include <asm/kvm_mmu.h>
- #include <asm/kvm_asm.h>
- 
- #include "vgic.h"
+ static int vgic_its_set_attr(struct kvm_device *dev,
 diff --git a/arch/arm64/kvm/vgic/vgic.h b/arch/arm64/kvm/vgic/vgic.h
-index 0c8da72953f0..056425e3a490 100644
+index 056425e3a490..e578a296e7e0 100644
 --- a/arch/arm64/kvm/vgic/vgic.h
 +++ b/arch/arm64/kvm/vgic/vgic.h
-@@ -6,6 +6,7 @@
- #define __KVM_ARM_VGIC_NEW_H__
+@@ -132,6 +132,19 @@ static inline bool vgic_irq_is_multi_sgi(struct vgic_irq *irq)
+ 	return vgic_irq_get_lr_count(irq) > 1;
+ }
  
- #include <linux/irqchip/arm-gic-common.h>
-+#include <asm/kvm_mmu.h>
++static inline int vgic_write_guest_lock(struct kvm *kvm, gpa_t gpa,
++					const void *data, unsigned long len)
++{
++	struct vgic_dist *dist = &kvm->arch.vgic;
++	int ret;
++
++	dist->write_tables_in_progress = true;
++	ret = kvm_write_guest_lock(kvm, gpa, data, len);
++	dist->write_tables_in_progress = false;
++
++	return ret;
++}
++
+ /*
+  * This struct provides an intermediate representation of the fields contained
+  * in the GICH_VMCR and ICH_VMCR registers, such that code exporting the GIC
+diff --git a/include/kvm/arm_vgic.h b/include/kvm/arm_vgic.h
+index 9270cd87da3f..f009c04b3066 100644
+--- a/include/kvm/arm_vgic.h
++++ b/include/kvm/arm_vgic.h
+@@ -263,7 +263,7 @@ struct vgic_dist {
+ 	struct vgic_io_device	dist_iodev;
  
- #define PRODUCT_ID_KVM		0x4b	/* ASCII code K */
- #define IMPLEMENTER_ARM		0x43b
+ 	bool			has_its;
+-	bool			save_its_tables_in_progress;
++	bool			write_tables_in_progress;
+ 
+ 	/*
+ 	 * Contains the attributes and gpa of the LPI configuration table.
 -- 
 2.23.0
 
