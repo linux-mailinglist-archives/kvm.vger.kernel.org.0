@@ -2,141 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A712B67EF3F
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 21:06:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id BFB1067EF57
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 21:11:34 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233191AbjA0UGi (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 15:06:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49996 "EHLO
+        id S233752AbjA0ULZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 15:11:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233037AbjA0UGJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 15:06:09 -0500
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on20627.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e88::627])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B043A87C;
-        Fri, 27 Jan 2023 12:05:13 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mIG6GzZbsr0lrv5MBoky3paRa9iZWjwo2nkipGreTUj7HR/0KpmRo88/VqXGpk3bqce6lzVtU9R0TewHUqvgAOOweRStRyOWJ58pOASX10SW0STre6/eh/5F/e5qkc04s95OviUdu2+pIc+xEddEtlpy5utnPa+AanqDuaRd55iKh3+Tc+8GgSJ2S1pBUOj4pP6/dyGiV+fSazxuw/R+pZsMtNpsGcoOMtyPtAVNG/T3yqwMSJdbS2X08lMj6XP9Lh1CxTfdSsHbbEm/xKLn9Hf1HP33dD894sXJ73UsTaL8dE+Kx0W1Uh8Aiqp6X5JmzzjKvsdMoARdH7MAkCqEJw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=o7EmmtTfdC1T2cy1HdvKUC7kTulqclX17gm9CF+M76o=;
- b=RQCY3oEDTPRqE7cyizjGO9M+j83o4d1gLgGKOIqEQWxtLegS7QdBwF4EHxm1lXbrpfqAu3VC3VuSmniJMBs2pvEMsbsW9pGkIIA/SbnRRsOIrcGZrFonVgybMIJyK43RZFQUxpD8f5j7HkUTqq32TLODOtUGpwbzpGjF/Syr4ubf4CQi86876ihOUojsE34kc4NrySGnEc1NTKXsqLvPqIlJApAL6XjA+JhSFdipT5jT3n7ecTqXoBbXArQ43sLgNpNQBF2R8S7NgdZtHSrsPxBhEbUQTx1KDx1XyFiPwAwO/Dbwvacuqcrzqww8QaOnOuAaJwTvnyzI0gYz9/96+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=lists.infradead.org
- smtp.mailfrom=nvidia.com; dmarc=pass (p=reject sp=reject pct=100) action=none
- header.from=nvidia.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o7EmmtTfdC1T2cy1HdvKUC7kTulqclX17gm9CF+M76o=;
- b=asCisvUzJrfR14Og7RP/mS0grPh2gsbr777KreyStjvscxOBUhvtQVPLBVXLvqwaU1AFCtrxWIdTCvBI0ftYFVErTiDCZVpvoq0DUc08QjecUgyi9KkczxK3XxuOGUttTTCiJ4NP52K0Qi3PA6N3B5EPS4UcUAjUHGR2Csk4chhQuRxijYlSsAc8kWhEMKuR4VnyELda04BCd6kGmHMZhQ98sVSu8QkOl2Rhed5MJ7VYnpWwefm6No3S4N1as+5SovWjH9oHAobUfNUCdnv5hd1seMUvhRh1mAdpJyAR/5OWIrLtNWovuhWBqNNFTax6wRoh2OdGuLBJEhCCVFc3rg==
-Received: from BN0PR04CA0065.namprd04.prod.outlook.com (2603:10b6:408:ea::10)
- by DS0PR12MB8365.namprd12.prod.outlook.com (2603:10b6:8:f8::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.20; Fri, 27 Jan
- 2023 20:05:11 +0000
-Received: from BN8NAM11FT039.eop-nam11.prod.protection.outlook.com
- (2603:10b6:408:ea:cafe::10) by BN0PR04CA0065.outlook.office365.com
- (2603:10b6:408:ea::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.22 via Frontend
- Transport; Fri, 27 Jan 2023 20:05:11 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN8NAM11FT039.mail.protection.outlook.com (10.13.177.169) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6043.21 via Frontend Transport; Fri, 27 Jan 2023 20:05:11 +0000
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 27 Jan
- 2023 12:05:02 -0800
-Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail205.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Fri, 27 Jan
- 2023 12:05:02 -0800
-Received: from Asurada-Nvidia.nvidia.com (10.127.8.12) by mail.nvidia.com
- (10.129.68.10) with Microsoft SMTP Server id 15.2.986.36 via Frontend
- Transport; Fri, 27 Jan 2023 12:05:00 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     <jgg@nvidia.com>, <kevin.tian@intel.com>, <robin.murphy@arm.com>,
-        <joro@8bytes.org>, <will@kernel.org>, <agross@kernel.org>,
-        <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <yong.wu@mediatek.com>, <matthias.bgg@gmail.com>,
-        <thierry.reding@gmail.com>, <alex.williamson@redhat.com>,
-        <cohuck@redhat.com>
-CC:     <vdumpa@nvidia.com>, <jonathanh@nvidia.com>,
-        <iommu@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-tegra@vger.kernel.org>, <kvm@vger.kernel.org>
-Subject: [PATCH 4/4] vfio: Do not allocate domain if broken_unmanaged_domain
-Date:   Fri, 27 Jan 2023 12:04:20 -0800
-Message-ID: <42f5cec9d3f03eab3af9509bd5a730f6a1414989.1674849118.git.nicolinc@nvidia.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <cover.1674849118.git.nicolinc@nvidia.com>
-References: <cover.1674849118.git.nicolinc@nvidia.com>
+        with ESMTP id S233188AbjA0ULC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 15:11:02 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1717E4C08
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 12:10:49 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id m11so5650796pji.0
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 12:10:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uVeXA+MV2KiRuoJWt2euHuiO6q0ls69NMV+B5RGOE1g=;
+        b=UnHTto9iYs+wX9znqS/a19vQIBuu685jiveSd5U6TsEy2kUm4egnKX+d2Q8+uqgKpX
+         nAP4VyHRJkb+du25uLUwTbWRHG4imvVZ6B9sDjbqJ0BQrKilkVK+cTjFTYgF1tAPQ1SP
+         Yvh7hqPkSJSfLPuoYRBqJUd2uPPalH+W+6XO2HmidqekVUYHrA4vKHj+t3QvzigPj8lh
+         lJ9R6xniqfNYGpvlBxzT6GW9JV+sx7LhhQWlcrX7xqxm14myaujtxCqTDMYPI2oUIv4s
+         36L2Eapu+AKpE4LlxAN7Z/Fep1f+WWnY7bzspA9kqsC11kBBQqTcF/ExTH+hUyOvv7u+
+         yiow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uVeXA+MV2KiRuoJWt2euHuiO6q0ls69NMV+B5RGOE1g=;
+        b=uqj3uk/YJ/FUSFo4YkA+kIy4FsIaL+RaT0TMsUWm4+zvSZGaVrDNFyTCQ0+q9IEasy
+         YOAOxRRFMHtUdQFzubVM51aWhAODWXSCTskh9fCpvfOu4S7d5dCIGhBInpujdoUv1jQK
+         WnY6MBeya6PSyh7edgJv4Jikgi/Sna1FaPomcNsnX9UlUFipmC3IVX4h4MOqm/ES7iux
+         ltG6/SaKJaFBaYfeV3zq4TCSbDSenzwUqsy7z2YhSRo31qRbtra7WdOzK0aBFLaIBC/y
+         aQgh5PDFBDJy/o//CcknjGMo4ahowRbsau0vkwuf6+r/DrrbpcB6eFswMCHDcBMkGWeX
+         w8HQ==
+X-Gm-Message-State: AO0yUKUU8BPJVgPKR+yLxX43SWEzDMvwB7P1ePlCHxCumwfpVKVcalDF
+        NH9WjvTBPRPUgaYKnZx80Yn/+g==
+X-Google-Smtp-Source: AK7set+XmtiAzHziowdJYv4UlUisVIIgCtjFaVGFSMV2uzaTLcaE71V5YEPSlKrBprYinorG3plboQ==
+X-Received: by 2002:a05:6a20:3d16:b0:bc:3523:13c5 with SMTP id y22-20020a056a203d1600b000bc352313c5mr107342pzi.3.1674850248437;
+        Fri, 27 Jan 2023 12:10:48 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id v6-20020aa78506000000b00591b0c847b5sm1717135pfn.218.2023.01.27.12.10.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 Jan 2023 12:10:47 -0800 (PST)
+Date:   Fri, 27 Jan 2023 20:10:44 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     Yang Weijiang <weijiang.yang@intel.com>
+Cc:     pbonzini@redhat.com, jmattson@google.com, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, like.xu.linux@gmail.com,
+        kan.liang@linux.intel.com, wei.w.wang@intel.com
+Subject: Re: [PATCH v2 04/15] KVM: PMU: disable LBR handling if architectural
+ LBR is available
+Message-ID: <Y9QvxJbITGaY6Yki@google.com>
+References: <20221125040604.5051-1-weijiang.yang@intel.com>
+ <20221125040604.5051-5-weijiang.yang@intel.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN8NAM11FT039:EE_|DS0PR12MB8365:EE_
-X-MS-Office365-Filtering-Correlation-Id: 16aa347e-5ccd-4e8c-007b-08db00a1cc0b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: R6jo/E9hj+aFlwNh+ZQngKjzIs7s9C8Rr0TWz7tvftdukTv9brVHYi1ddAvd/5iVqpfpkuimTGThpauWSYwJVkpg1YpiKR3l80PUi97R+UEmGlMmpRMplN8zDQBw/XcFc0qAbYoiRU7q7zqFYpY3NAvGiMA9FAnR6rXHhpvCkS9tw8bGSjTqAV/5Top83N4/+Uh6zWp212eKGEiRT6dxeWdONz2z0urkGUdQ7ZkPnAb5SpWSj7Kt+hahPTAM8VMiFhpTdrv28fYSc/LwO5xc+BN0Iznsnm3NXQjBOeXo98voPXVDyrc2F1rHxROhyiSblkSo11tVDICFujNSRW25kdEVu8wERS2Zp1sOJourGD16KBPP4VBXW8zeyOiGIzXQXfHvU7pYO9sdcF/iGLFMGHLik5mSdVtqlpbuN/YXR6lswn8ecbA5TDhuqoyueOVjKPSVe044afcqHdNFlJ+B80i7HKB+JVmpQH3as6ogq+4CJjTFwxqwKetgCFzcYkfl05bxVSJJfk96zrQGi/VUkuNRRRpOZl3jEBjpzq3oKdGr8Ee741cGkUycZhDOkT6SgohZoOG54yQl/O1cKer3eVyEXcY2KrA4rc3v+Obfxjdx6My61NZpLi2/eM2n+eUimeXTWCxnaBDQyanfshLiaPgkbFra79JkWXr8p3OhzBPBV/9d39Hn3SlJUVOiNB2Aj1CUfl/i5UyDMutc/9p2sv2ZiLOymE9zIC7VH6ETIh8=
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(396003)(376002)(39860400002)(136003)(346002)(451199018)(36840700001)(46966006)(40470700004)(8936002)(2616005)(5660300002)(41300700001)(70206006)(2906002)(70586007)(4326008)(8676002)(7696005)(336012)(186003)(6666004)(26005)(83380400001)(426003)(86362001)(82310400005)(47076005)(82740400003)(316002)(7636003)(4744005)(7416002)(478600001)(54906003)(110136005)(36756003)(356005)(40460700003)(40480700001)(921005)(36860700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jan 2023 20:05:11.4190
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 16aa347e-5ccd-4e8c-007b-08db00a1cc0b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: BN8NAM11FT039.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8365
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        SPF_HELO_PASS,SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20221125040604.5051-5-weijiang.yang@intel.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Add a sanity of the broken_unmanaged_domain flag to reject the use of
-vfio_iommu_type1 in the early stage, if the flag is set by the iommu
-driver.
+On Thu, Nov 24, 2022, Yang Weijiang wrote:
+> From: Paolo Bonzini <pbonzini@redhat.com>
+> 
+> Traditional LBR is absent on CPU models that have architectural LBR, so
+> disable all processing of traditional LBR MSRs if they are not there.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: Yang Weijiang <weijiang.yang@intel.com>
+> ---
+>  arch/x86/kvm/vmx/pmu_intel.c | 32 ++++++++++++++++++++++----------
+>  1 file changed, 22 insertions(+), 10 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
+> index e5cec07ca8d9..905673228932 100644
+> --- a/arch/x86/kvm/vmx/pmu_intel.c
+> +++ b/arch/x86/kvm/vmx/pmu_intel.c
+> @@ -170,19 +170,23 @@ static inline struct kvm_pmc *get_fw_gp_pmc(struct kvm_pmu *pmu, u32 msr)
+>  static bool intel_pmu_is_valid_lbr_msr(struct kvm_vcpu *vcpu, u32 index)
+>  {
+>  	struct x86_pmu_lbr *records = vcpu_to_lbr_records(vcpu);
+> -	bool ret = false;
+>  
+>  	if (!intel_pmu_lbr_is_enabled(vcpu))
+> -		return ret;
+> +		return false;
+>  
+> -	ret = (index == MSR_LBR_SELECT) || (index == MSR_LBR_TOS) ||
+> -		(index >= records->from && index < records->from + records->nr) ||
+> -		(index >= records->to && index < records->to + records->nr);
+> +	if (!guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) &&
 
-Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
----
- drivers/vfio/vfio_iommu_type1.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+IIUC, the MSRs flat out don't exist _and_ KVM expects to passthrough MSRs to the
+guest, i.e. KVM should check host support, not guest support.  Probably a moot
+point from a functionality perspective since KVM shouldn't allow LBRs to shouldn't
+be enabled for the guest, but from a performance perspective, checking guest CPUID
+is slooow.
 
-diff --git a/drivers/vfio/vfio_iommu_type1.c b/drivers/vfio/vfio_iommu_type1.c
-index 23c24fe98c00..6ec238aefe89 100644
---- a/drivers/vfio/vfio_iommu_type1.c
-+++ b/drivers/vfio/vfio_iommu_type1.c
-@@ -2170,7 +2170,10 @@ static int vfio_iommu_domain_alloc(struct device *dev, void *data)
- {
- 	struct iommu_domain **domain = data;
- 
--	*domain = iommu_domain_alloc(dev->bus);
-+	if (device_iommu_unmanaged_supported(dev))
-+		*domain = iommu_domain_alloc(dev->bus);
-+	else
-+		*domain = NULL;
- 	return 1; /* Don't iterate */
- }
- 
--- 
-2.39.1
+That brings me to point #2, which is that KVM needs to disallow enabling legacy
+LBRs on CPUs that support arch LBRs.  Again, IIUC, because KVM doesn't have the
+option to fallback to legacy LBRs, that restriction needs to be treated as a bug
+fix.  I'll post a separate patch unless my understanding is wrong.
 
+> +	    (index == MSR_LBR_SELECT || index == MSR_LBR_TOS))
+> +		return true;
+>  
+> -	if (!ret && records->info)
+> -		ret = (index >= records->info && index < records->info + records->nr);
+> +	if ((index >= records->from && index < records->from + records->nr) ||
+> +	    (index >= records->to && index < records->to + records->nr))
+> +		return true;
+>  
+> -	return ret;
+> +	if (records->info && index >= records->info &&
+> +	    index < records->info + records->nr)
+> +		return true;
+> +
+> +	return false;
+>  }
+>  
+>  static bool intel_is_valid_msr(struct kvm_vcpu *vcpu, u32 msr)
+> @@ -702,6 +706,9 @@ static void vmx_update_intercept_for_lbr_msrs(struct kvm_vcpu *vcpu, bool set)
+>  			vmx_set_intercept_for_msr(vcpu, lbr->info + i, MSR_TYPE_RW, set);
+>  	}
+>  
+> +	if (guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR))
+
+Similar to above, I really don't want to query guest CPUID in the VM-Enter path.
+If we establish the rule that LBRs can be enabled if and only if the correct type
+is enabled (traditional/legacy vs. arch), then this can simply check host support.
+
+> +		return;
+> +
+>  	vmx_set_intercept_for_msr(vcpu, MSR_LBR_SELECT, MSR_TYPE_RW, set);
+>  	vmx_set_intercept_for_msr(vcpu, MSR_LBR_TOS, MSR_TYPE_RW, set);
+>  }
+> @@ -742,10 +749,12 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+>  	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
+> +	bool lbr_enable = !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) &&
+> +		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
+
+Unnecessary guest CPUID lookup and VMCS read, i.e. this can be deferred to the
+!lbr_desc->event path.
+
+>  
+>  	if (!lbr_desc->event) {
+>  		vmx_disable_lbr_msrs_passthrough(vcpu);
+> -		if (vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR)
+> +		if (lbr_enable)
+>  			goto warn;
+>  		if (test_bit(INTEL_PMC_IDX_FIXED_VLBR, pmu->pmc_in_use))
+>  			goto warn;
+> @@ -768,7 +777,10 @@ void vmx_passthrough_lbr_msrs(struct kvm_vcpu *vcpu)
+>  
+>  static void intel_pmu_cleanup(struct kvm_vcpu *vcpu)
+>  {
+> -	if (!(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR))
+> +	bool lbr_enable = !guest_cpuid_has(vcpu, X86_FEATURE_ARCH_LBR) &&
+> +		(vmcs_read64(GUEST_IA32_DEBUGCTL) & DEBUGCTLMSR_LBR);
+> +
+> +	if (!lbr_enable)
+>  		intel_pmu_release_guest_lbr_event(vcpu);
+>  }
+>  
+> -- 
+> 2.27.0
+> 
