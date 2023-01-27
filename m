@@ -2,154 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7EEEF67EC80
-	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 18:33:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1F5D667ECB4
+	for <lists+kvm@lfdr.de>; Fri, 27 Jan 2023 18:46:52 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235224AbjA0RdB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 12:33:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55198 "EHLO
+        id S235095AbjA0Rqv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 12:46:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232433AbjA0RdA (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 12:33:00 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8ED7BBFD
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 09:32:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1674840731;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=nV5PVEexFRTCEYgn3s3CxSGrrslwGO/8JvUDWaGn4vs=;
-        b=QLUWcDUpbOaMnZTg+LT+Qh+g1h7q344HpaJGTFpWoeyD++JtTbsR2ZCbm2R5DDE1ovKnEb
-        namXbacNHvEYD9GLqkjmEiCIUPleYNx3t4ZmhEDlq5biwsS5/jYhxJBQbiU8iOvDrlhOV5
-        9myOL/UYF+IvhMaYmEaC814tiUX+cXk=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-101-rB5xKTBJPea6tG0ss1k6dg-1; Fri, 27 Jan 2023 12:32:09 -0500
-X-MC-Unique: rB5xKTBJPea6tG0ss1k6dg-1
-Received: by mail-io1-f70.google.com with SMTP id d22-20020a5d9656000000b00704d3bd8c07so3026629ios.8
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 09:32:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=nV5PVEexFRTCEYgn3s3CxSGrrslwGO/8JvUDWaGn4vs=;
-        b=zy55B4jqVDiVtsnSSEubdsfpZQhO6Tccn4VSClFrit9h6iZXGkW/ZtYTZ3voZEP2/g
-         Nyp9Xn0fWV5RyIK02prpOqI9FFNvMpGDvIcv6FbhOfYoQLtJ5WI+3PVHiWgmEMX62CK7
-         NdV5oQp2Eiq3PZOz2v40MVc0umk6FFBVqK6oa2a0uBeFRgK14ZP+QgDXa4zxLABuDTL+
-         8MAjkQElaLkS0dftq0Y+ZV1uorG8xnUJDcvWiCK6VhwV4aM4bNo4aog6GK58YJqc1VXW
-         4ngHQUIMtUI8bVXywqsboJQj+QeMvpeHqDeNMZKrTFC8pHE2NAqQKhFjTIJXgsQXYe//
-         wZ5w==
-X-Gm-Message-State: AO0yUKXmJXTWxB6/70GuEo9RBf/I+4SnebaLL1YZo3tSR1435PU1yCSa
-        XiMlD2O5sbT4LENj+OnD4tlKcP/UuptoWKQrH88Bz9mdSNNmEobC1QCNYhl6rp6z3NcR6lTJc/l
-        pLasAhRk6v6jm
-X-Received: by 2002:a92:c54f:0:b0:310:af8b:aaa2 with SMTP id a15-20020a92c54f000000b00310af8baaa2mr6736918ilj.15.1674840729113;
-        Fri, 27 Jan 2023 09:32:09 -0800 (PST)
-X-Google-Smtp-Source: AK7set/wdRa6G/aQBqbaoXHP3HPpOxGpFgvsam+eJRxv1rG1uSYBts+PXV4F7K1rY6E8MFQq+MQHdA==
-X-Received: by 2002:a92:c54f:0:b0:310:af8b:aaa2 with SMTP id a15-20020a92c54f000000b00310af8baaa2mr6736905ilj.15.1674840728808;
-        Fri, 27 Jan 2023 09:32:08 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id p15-20020a92c60f000000b0031095196189sm1406006ilm.54.2023.01.27.09.32.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 09:32:07 -0800 (PST)
-Date:   Fri, 27 Jan 2023 10:32:05 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Cornelia Huck <cohuck@redhat.com>, kvm@vger.kernel.org,
-        linux-pci@vger.kernel.org, sglee97@dankook.ac.kr
-Subject: Re: [Bug 216970] New: When VM using vfio-pci driver to pci device
- passthrough, host can access VM's pci device with libpciaccess library.
-Message-ID: <20230127103205.50795e59.alex.williamson@redhat.com>
-In-Reply-To: <20230127171502.GA1388740@bhelgaas>
-References: <bug-216970-41252@https.bugzilla.kernel.org/>
-        <20230127171502.GA1388740@bhelgaas>
-Organization: Red Hat
+        with ESMTP id S234025AbjA0Rqt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 12:46:49 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97C287D2AB;
+        Fri, 27 Jan 2023 09:46:47 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30RGrbqa021060;
+        Fri, 27 Jan 2023 17:46:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=VxG+aiZhuhssr8QPHzlAfPnXU7va5TskD2lv8gKu11w=;
+ b=HIdofbICN06aRj/VbWJAqoAUUBNxmLgXL6LVdSs4HbMLnODBcdDf/IoL5NOARRaZMVp2
+ PnCzsBP/x/cKi8fMbjDGwEbSs52oJSFm2PZVEY3X8T2qgh8FikkzP1YFVyYcCnO5ffD5
+ MZxCE8cIRHiWB15wGZ6B4lbWfUe7l51kHwXQDuzTPJFTtIw4j6Nwri9N7WcNxGZMc575
+ CT5fbyNAVX1zzaF8YJUylmBD4PlVxzn+a11P5EQH/cmOA7S5Fit2x3gK3xzp/6tVcHgn
+ yR7uVlovXO3BGNW8Dt4Icam0G5fFazYhoBxlGKoozQHln3pOmYg7grxf41+HXOpER+/a yg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ncjhk9d56-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Jan 2023 17:46:43 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30RHcIjI005768;
+        Fri, 27 Jan 2023 17:46:43 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3ncjhk9d4m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Jan 2023 17:46:42 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30R5kv7S010790;
+        Fri, 27 Jan 2023 17:46:41 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3n87p6qv52-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 27 Jan 2023 17:46:41 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30RHkbeg48169350
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 27 Jan 2023 17:46:37 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7C2CA2004B;
+        Fri, 27 Jan 2023 17:46:37 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3923120043;
+        Fri, 27 Jan 2023 17:46:37 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri, 27 Jan 2023 17:46:37 +0000 (GMT)
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, kvm@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Thomas Huth <thuth@redhat.com>
+Subject: [RFC PATCH v1] KVM: selftests: Compile s390 tests with -march=z10
+Date:   Fri, 27 Jan 2023 18:45:52 +0100
+Message-Id: <20230127174552.3370169-1-nsg@linux.ibm.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 3n17b4DYyHozSj_3UXQ1i8oMNO3MKu5a
+X-Proofpoint-ORIG-GUID: 3hjY8SkT8txt3NFncvzqm9PmjfM6ikfN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-27_10,2023-01-27_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ priorityscore=1501 spamscore=0 clxscore=1011 suspectscore=0
+ mlxlogscore=999 adultscore=0 impostorscore=0 phishscore=0
+ lowpriorityscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2212070000 definitions=main-2301270164
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Jan 2023 11:15:02 -0600
-Bjorn Helgaas <helgaas@kernel.org> wrote:
+The guest used in s390 kvm selftests is not be set up to handle all
+instructions the compiler might emit, i.e. vector instructions, leading
+to crashes.
+Limit what the compiler emits to the oldest machine model currently
+supported by Linux.
 
-> On Fri, Jan 27, 2023 at 09:02:25AM +0000, bugzilla-daemon@kernel.org wrote:
-> > https://bugzilla.kernel.org/show_bug.cgi?id=216970
-> > 
-> >             Bug ID: 216970
-> >            Summary: When VM using vfio-pci driver to pci device
-> >                     passthrough, host can access VM's pci device with
-> >                     libpciaccess library.  
-> 
-> > Created attachment 303656  
-> >   --> https://bugzilla.kernel.org/attachment.cgi?id=303656&action=edit  
-> > Upload text data to vfio-pci passthrough GPU VRAM with using nvatools
-> > 
-> > 1) Release of Ubuntu
-> >   Host - Ubuntu 20.04.5 LTS / Release : 20.04
-> >   Guest - Ubuntu 18.04.6 LTS / Release : 18.04
-> > 
-> > 2) Kernel version
-> >   Host - 5.15.0-57-generic
-> >   Guest - 5.4.0-137-generic
-> > 
-> > 3) Version of the package
-> > libpciaccess0:
-> >   Installed: 0.16-0ubuntu1
-> >   Candidate: 0.16-0ubuntu1
-> > 
-> > libpciaccess-dev:
-> >   Installed: 0.16-0ubuntu1
-> >   Candidate: 0.16-0ubuntu1
-> > 
-> > 4) Expected to happen
-> > When the virtual machine is running, the Host could not access the virtual
-> > machine's pci passthrough device via libpciaccess.
-> > 
-> > 5) Happened instead
-> > When the virtual machine is running, the host can access the virtual machine's
-> > pci passthrough device via libpciaccess.
-> > 
-> > In this case, host can interrupt passthrough pci device, or access passthrough
-> > pci device memory to leak virtual machine data.
-> > 
-> > We checked this by creating a virtual machine using vfio-pci passthrough GPU in
-> > QEMU.
-> > 
-> > In addition, when running GPU applications such as CUDA in a virtual machine,
-> > we found that data inside passthrough GPU VRAM can be accessed from the host
-> > via libpciaccess(nvatools).
-> > 
-> > We proceeded as follows.
-> >  1. Create and run VMs with vfio-pci passthrough GPU.
-> > 
-> >  2. Upload text data from the host via nvatools to the VRAM on the passthrough
-> > GPU.
-> > 
-> >  3. The VM can see the text data in the GPU VRAM.  
-> 
-> I'm not really familiar with libpciaccess or nvatools, but it looks
-> like they do both PCI config accesses and MMIO access to PCI BARs.
-> 
-> I expect both types of access to work for the host, even for devices
-> passed through to a guest.  The VFIO folks can correct me if there's
-> some mechanism to prevent the host from accessing these devices.
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+---
 
-Yes, this is expected.  The host would need privileged access in order
-to interfere or access assigned device data.  Sounds like this is
-looking more for confidential computing type protection, which like
-protecting VM memory from host access, requires specific technologies
-that are under development.  Thanks,
 
-Alex
+Should we also set -mtune?
+Since it are vector instructions that caused the problem here, there
+are some alternatives:
+ * use -mno-vx
+ * set the required guest control bit to enable vector instructions on
+   models supporting them
+
+-march=z10 might prevent similar issues with other instructions, but I
+don't know if there actually exist other relevant instructions, so it
+could be needlessly restricting.
+
+
+ tools/testing/selftests/kvm/Makefile | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index 1750f91dd936..df0989949eb5 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -200,6 +200,9 @@ CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
+ 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
+ 	-I$(<D) -Iinclude/$(ARCH_DIR) -I ../rseq -I.. $(EXTRA_CFLAGS) \
+ 	$(KHDR_INCLUDES)
++ifeq ($(ARCH),s390)
++	CFLAGS += -march=z10
++endif
+ 
+ no-pie-option := $(call try-run, echo 'int main(void) { return 0; }' | \
+         $(CC) -Werror $(CFLAGS) -no-pie -x c - -o "$$TMP", -no-pie)
+-- 
+2.34.1
 
