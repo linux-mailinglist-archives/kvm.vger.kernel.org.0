@@ -2,65 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6DA6367F29F
-	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 01:06:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F14267F2A5
+	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 01:07:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232250AbjA1AGX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 27 Jan 2023 19:06:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54558 "EHLO
+        id S230414AbjA1AHZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 27 Jan 2023 19:07:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231614AbjA1AGU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 27 Jan 2023 19:06:20 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 818D88717D
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 16:06:19 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id r126-20020a632b84000000b004393806c06eso2796605pgr.4
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 16:06:19 -0800 (PST)
+        with ESMTP id S231598AbjA1AHY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 27 Jan 2023 19:07:24 -0500
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C17BE8624F
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 16:07:22 -0800 (PST)
+Received: by mail-pl1-x64a.google.com with SMTP id u15-20020a170902a60f00b00194d7d89168so3583461plq.10
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 16:07:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=UoBXGNyHS8VSlGwyH24PBy3LiUpM7j95hK4CPmoboMo=;
-        b=gfVdO9VMiW0XGf2NY9slCD+xg6P87ql5hYRPUiwqCzX+kIVmA8+dRcjYpbFDarxq6E
-         HlyjmxuG4zp/XoOhco+EMo01ah2Y6eyDor41wTZ5OreB5ZWscpF0JlaY7Yo39yI6WNJf
-         m6SEFPQ2aHONs+FGaGw8OpUI9R3ErfAqvpIhSWIXX9EERsbUPAyLLZzjAnO+weGCOp6u
-         01fzOLHAITB8ycwo0NUpCoLiRibEeh1Fa4UtVZkIiVX98fdrmCmcKCGsnYTsBhWyEjby
-         mm5eiSRgeeOiwIfRcIfi6JzuKFRxVuU5uncSKrVAcrOYWwuiJfC+KMOEaJWagbAG9TBx
-         2WrQ==
+        bh=uHsr2oJUItSi3vqA6tkcnF07ysr7z0zXfg4n2h1yTQE=;
+        b=J1SQgyRtJK/Zu2QQvkc7mBgYGUZiPn1Bz8v0O2XcSB0lKHhi3LH3gZPTwN9nKQ/EWc
+         cLS2uKCN+6G4VUH3++bNzvCPwhsLkIVT940ggF2W/alKMiAu+HK9S9DY637ZAbUPGhLS
+         eyfyJ6ZtR1hbIJo4E+NwzZpsx4zz8FIoDofnMZSk0Kmb6/v902SXxTAYs+U0cvS4Fx4r
+         YYDcTfbAsz2i51AWU4rgE2hs8KvEZs7a915gH7DybFRmprvfbeydswuWjiMKijDXS/fq
+         hl/rZxwjQTUFyfPwrOlim7VK94WV/F2XxbjEaHy2ekTG9oV3gSypm9HLCZrEHYJezsfN
+         RBaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UoBXGNyHS8VSlGwyH24PBy3LiUpM7j95hK4CPmoboMo=;
-        b=hduWWqTfEWLqA4QspLhOtaRJPsWVAzYm5AdhZF+ERaSdx+9IpyRCwH/hV9cW3DTF5J
-         TasLb34Avc+9vrLAqhCdl/HJQv4mYhSIYm966cWFNVQQXkJSqxcRdmCvoKr38SbxKFGP
-         Z0J5ZmlHvjElXPXSY5045tWPJYq7xp/Q4TFb9osnU7m0nHwJ0/t3krrDS0Yk0fiOnwo2
-         +LGrbPuvnlLDSESsmIQC9JntH+ferlkmcfvVl7xTKfSTfKarLZjM7tldtkKaI9Zlo+kM
-         N1vg+ecmamBWDY+ygVoS+SIhVzeS4tRhwVGewR+ESSwjEOLTvB1/wPCSbw4FgYxdNjZJ
-         ggWg==
-X-Gm-Message-State: AFqh2kr6hjI/nCG4OH7BQQ5fQ6yVttfYUe7INhyrsL9NLi7X9lzVCOS5
-        VtF072U3WtBzJez8PfV5srLD5oE1UV0=
-X-Google-Smtp-Source: AMrXdXtUCOjJ76PKa4ftdjizrS/4JFMcUqZv8WAN2YI0XFNoFeJ9dUNzwYw+asU1JemGkWcIDZ23jsORf68=
+        bh=uHsr2oJUItSi3vqA6tkcnF07ysr7z0zXfg4n2h1yTQE=;
+        b=CZrYkIS1OaFIU6qjHaj6kKGsCi3hXlaXe9Yg1Z4GVCAtu/5CC0yv7lxalo0Pt5QyYo
+         f3OR+pfBKjuP1KoYrK3gDU+DgGlhF/UWXLBsTAum2CapbRc02Di/5o35lxw5z2FGhzU7
+         wgZRxXUgnugFGaEGEAH0akok2Xm4myZQMGfmQaXbmGFN5qd4GuXosuqLGtVhNKRgt/am
+         lYf7uSZysdjsCo009qgUd4CxD+GgjuCDjzAtQGA0whqstnHnr6TWKhv4hjDW0J1paGbv
+         sSPHMXVQ0ERvuAfvzy6hjvHiYJ+SWHnvO3bd720Wrv6SIIgZZ6HVgDC9oqHwhjhorIqM
+         DR5g==
+X-Gm-Message-State: AFqh2kqvhz2OBdKwgKkHK3WSCdqxsY8ifKiNYOx9wjXe1F3qeHQm3/yN
+        CAYtCuKLseAgMY61GIvDlKwoZluAFvA=
+X-Google-Smtp-Source: AMrXdXuvu1sGU1vYAwHwXwDXKHxOUXsgegJAQwa8tvXvso1A8LdaRdJsA6zWArCPjuoYm/jCvqWVi0rND9Y=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:9c0c:b0:227:213d:4564 with SMTP id
- h12-20020a17090a9c0c00b00227213d4564mr4606147pjp.50.1674864378987; Fri, 27
- Jan 2023 16:06:18 -0800 (PST)
-Date:   Sat, 28 Jan 2023 00:05:51 +0000
-In-Reply-To: <202211161718436948912@zte.com.cn>
+ (user=seanjc job=sendgmr) by 2002:a17:902:b217:b0:194:7c22:1885 with SMTP id
+ t23-20020a170902b21700b001947c221885mr4493000plr.26.1674864442136; Fri, 27
+ Jan 2023 16:07:22 -0800 (PST)
+Date:   Sat, 28 Jan 2023 00:07:16 +0000
+In-Reply-To: <20221205122048.16023-1-likexu@tencent.com>
 Mime-Version: 1.0
-References: <202211161718436948912@zte.com.cn>
+References: <20221205122048.16023-1-likexu@tencent.com>
 X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
-Message-ID: <167458628707.3464739.1003587396919853689.b4-ty@google.com>
-Subject: Re: [PATCH linux-next] KVM: x86: Replace IS_ERR() with IS_ERR_VALUE()
+Message-ID: <167477056207.187359.3952314052374339122.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: x86/pmu: Drop event_type and rename "struct kvm_event_hw_type_mapping"
 From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>, ye.xingchen@zte.com.cn
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+To:     Sean Christopherson <seanjc@google.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Like Xu <like.xu.linux@gmail.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -68,16 +68,23 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 16 Nov 2022 17:18:43 +0800, ye.xingchen@zte.com.cn wrote:
-> Avoid type casts that are needed for IS_ERR() and use
-> IS_ERR_VALUE() instead.
+On Mon, 05 Dec 2022 20:20:48 +0800, Like Xu wrote:
+> After commit ("02791a5c362b KVM: x86/pmu: Use PERF_TYPE_RAW
+> to merge reprogram_{gp,fixed}counter()"), vPMU starts to directly
+> use the hardware event eventsel and unit_mask to reprogram perf_event,
+> and the event_type field in the "struct kvm_event_hw_type_mapping"
+> is simply no longer being used.
 > 
+> After discarding this field, the name of the structure also lost
+> its mapping semantics, renaming it "struct kvm_pmu_hw_event" and
+> reorganizing the comments to continue to help newcomers.
 > 
+> [...]
 
-Applied to kvm-x86 misc, thanks!
+Applied to kvm-x86 pmu, thanks!
 
-[1/1] KVM: x86: Replace IS_ERR() with IS_ERR_VALUE()
-      https://github.com/kvm-x86/linux/commit/2eb398df77a1
+[1/1] KVM: x86/pmu: Drop event_type and rename "struct kvm_event_hw_type_mapping"
+      https://github.com/kvm-x86/linux/commit/4996f87f9385
 
 --
 https://github.com/kvm-x86/linux/tree/next
