@@ -2,52 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 280B767F584
-	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 08:27:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A12F167F586
+	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 08:28:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233538AbjA1H1u (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Jan 2023 02:27:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59098 "EHLO
+        id S233409AbjA1H17 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Jan 2023 02:27:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232256AbjA1H1t (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Jan 2023 02:27:49 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CDBB7D80
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 23:27:47 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id j5so6679089pjn.5
-        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 23:27:47 -0800 (PST)
+        with ESMTP id S233556AbjA1H1z (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Jan 2023 02:27:55 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B495F199F6
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 23:27:52 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id p24so7041589plw.11
+        for <kvm@vger.kernel.org>; Fri, 27 Jan 2023 23:27:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ventanamicro.com; s=google;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZIp0ncMCm62OCfgMvP1/ZtcZEYlq9GSVvwzMRdDzsxc=;
-        b=WwmJCQbfdSpysGWAhddrN6xzvrr5sfTaMCaViq0MVeVN65lEA/K0kIbWOiJ5mx00sf
-         9sqz+ULl8iPa0yd67yMO+U2/mew/CeqDuS3f7o4cI2sBgRqx+OT9UxOQn/+M3B015gf9
-         ZvGN2si8+FKg6JafIeg2mvKJ+8gLA/w4AD8qRBvruTPhZMTyfioTqC7XOwLb87Kqcaas
-         edsL7+csyJAySV4Q8Z5WH5LtnL5jkYOvSMNGQsxJfwAcvtjdNwsuGXO7Rqa4or19sFAM
-         NmQv7Zt2Z0yBUQ+ce6VtIY49NShocrenZCvCsryo8pynAFdbm7m9YMDKewvXewYPQ2uU
-         ik4g==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rWz65mFu4SpNgBKuchq+hZ/4RmJtNYXBnYHJ3KOFc1U=;
+        b=X57n/zp66UtjvlWSyddZei2aSknXthJDMK9xiiS+WEpqZ3rr51OiSxi5DjGm8SnR3e
+         Ijocyn7HAt5kKJ3tJGUVnkxR1Nq6Jr1diiJXP48nYzwVrPhV/pl0npPK/ZVMhJ9bbOm3
+         K2U7C6l2/NHeZOjHAWcE4qmYHsJKwWPzJ3lZoAVUfiSv41VlP5kobL8gdnR+Q1AC3ZP+
+         NSZeVxxJUhBw426Vjyafs4+SIz6UgSl+ijIbpxcIhQOCc5kLvBMD9+6lROguXgz8ihtY
+         88kddPBOHS9M/e2zYRJZ9hhv12VQjGmNnyMuFae0No6rOu8SO0Di1ESSODDXyT6iEDB1
+         xBVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZIp0ncMCm62OCfgMvP1/ZtcZEYlq9GSVvwzMRdDzsxc=;
-        b=TjHfxI1xEPHtERwXQi0Y3rp6EGb7vqNvIcsZ/4hSZ1lXZdrE1ZTWQJePfe6FCxhTej
-         n0IxaXW0lPk+inMQd0lEZHMC7TLJU2HsKynu4IWRms6Igt13Iqv55cf1X2+PO9PAo6Za
-         ZJuauwm7v0NqYpFM55asYJMte3HdBQrHiOBkDNAElF+WNvISZqG7JtaTpcNNzj/JzTqA
-         eQjp1EU7VTLISIvRJd4xEpDRNSGMNOz1XqdyHm9gnG2InnI7HARAfkCXj9vNwGYoGbuB
-         5iyk175eLZqwqezltzBLG2TKD9RAR8k1+BebrHUFv5s3a29uf6TfCpM1iixCZLV0aKMy
-         knuA==
-X-Gm-Message-State: AO0yUKWIt8QDf6kDda6pQnmH85jomCjq5mYXzrUQAQ1NSXVHuvWe8MdP
-        eRrUN4oscgDqVOa9lH7hpOD+ug==
-X-Google-Smtp-Source: AK7set/JZk8OaVhYXMDTxZz7NE3fu1CtJ7X9nXADGQO9RjFWpzFvGeSfgyEKTn7iJvyPiZNUK7Pzxw==
-X-Received: by 2002:a17:903:230b:b0:196:13cd:a49 with SMTP id d11-20020a170903230b00b0019613cd0a49mr19370623plh.27.1674890866753;
-        Fri, 27 Jan 2023 23:27:46 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rWz65mFu4SpNgBKuchq+hZ/4RmJtNYXBnYHJ3KOFc1U=;
+        b=Co7GtZgs5vBQSZojWDPZO8H9sX7N3gYRql4eSqeShf9GuUK9wsTWlpx0x+U1OOmRLI
+         gUW1qnSEQjY3ThF2+K0NWF9hcUS9Z6oeH3b3Gr7En9lAxcwA4AU3nEKVoeajHGrZnmfy
+         U4lS86n5GfBk80Enk5Y8wCC3otzJOkG3hGVAe2Ar7jW+3WT5QxS9DWA0zT7M4a3aXeYS
+         +XzZ1udVduT9Zo8E1B0GGtMlo4orTMt5NYGTFFmDC81Wz6KyRcUFPI7NAx6QMHBdHBLJ
+         bPRt3Azzly5CExRl3FFgVwSBpZ2tAErN897ziXY7RXbQ/kRL9zQoEz+lE/97Ew0dU57q
+         3LGg==
+X-Gm-Message-State: AFqh2kr1CfCFKCXrpZXB50jRVgUFD7hcg8lAX7GDZ7aSbzhCBQ9utEsI
+        /XtI4pahI0joYzu1uqzxW8SsqA==
+X-Google-Smtp-Source: AMrXdXsHWFlCQA4W/tdpuX+4ePkLW7N9Scjn48mFDOO98hwvlx1MMdPaJAgXH+ylyEsGI6GB5pnI7Q==
+X-Received: by 2002:a17:903:2306:b0:193:3540:c54d with SMTP id d6-20020a170903230600b001933540c54dmr56913851plh.26.1674890871800;
+        Fri, 27 Jan 2023 23:27:51 -0800 (PST)
 Received: from anup-ubuntu-vm.localdomain ([103.97.165.210])
-        by smtp.gmail.com with ESMTPSA id jh19-20020a170903329300b00194ac38bc86sm753132plb.131.2023.01.27.23.27.42
+        by smtp.gmail.com with ESMTPSA id jh19-20020a170903329300b00194ac38bc86sm753132plb.131.2023.01.27.23.27.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 Jan 2023 23:27:46 -0800 (PST)
+        Fri, 27 Jan 2023 23:27:51 -0800 (PST)
 From:   Anup Patel <apatel@ventanamicro.com>
 To:     Paolo Bonzini <pbonzini@redhat.com>,
         Atish Patra <atishp@atishpatra.org>
@@ -56,74 +57,195 @@ Cc:     Palmer Dabbelt <palmer@dabbelt.com>,
         Andrew Jones <ajones@ventanamicro.com>,
         Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH v2 0/7] RISC-V KVM virtualize AIA CSRs
-Date:   Sat, 28 Jan 2023 12:57:30 +0530
-Message-Id: <20230128072737.2995881-1-apatel@ventanamicro.com>
+        linux-kernel@vger.kernel.org, Anup Patel <apatel@ventanamicro.com>,
+        Conor Dooley <conor.dooley@microchip.com>
+Subject: [PATCH v2 1/7] RISC-V: Add AIA related CSR defines
+Date:   Sat, 28 Jan 2023 12:57:31 +0530
+Message-Id: <20230128072737.2995881-2-apatel@ventanamicro.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230128072737.2995881-1-apatel@ventanamicro.com>
+References: <20230128072737.2995881-1-apatel@ventanamicro.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-The RISC-V AIA specification is now frozen as-per the RISC-V international
-process. The latest frozen specifcation can be found at:
-https://github.com/riscv/riscv-aia/releases/download/1.0-RC1/riscv-interrupts-1.0-RC1.pdf
+The RISC-V AIA specification improves handling per-HART local interrupts
+in a backward compatible manner. This patch adds defines for new RISC-V
+AIA CSRs.
 
-This series implements first phase of AIA virtualization which targets
-virtualizing AIA CSRs. This also provides a foundation for the second
-phase of AIA virtualization which will target in-kernel AIA irqchip
-(including both IMSIC and APLIC).
+Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+---
+ arch/riscv/include/asm/csr.h | 95 +++++++++++++++++++++++++++++++++++-
+ 1 file changed, 94 insertions(+), 1 deletion(-)
 
-The first two patches are shared with the "Linux RISC-V AIA Support"
-series which adds AIA driver support.
-
-To test this series, use AIA drivers from the "Linux RISC-V AIA Support"
-series and use KVMTOOL from the riscv_aia_v1 branch at:
-https://github.com/avpatel/kvmtool.git
-
-These patches can also be found in the riscv_kvm_aia_csr_v2 branch at:
-https://github.com/avpatel/linux.git
-
-Changes since v1:
- - Addressed from Drew and Conor in PATCH1
- - Use alphabetical ordering for SMAIA and SSAIA enum in PATCH2
- - Use GENMASK() in PATCH3
-
-Anup Patel (7):
-  RISC-V: Add AIA related CSR defines
-  RISC-V: Detect AIA CSRs from ISA string
-  RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID mask defines
-  RISC-V: KVM: Initial skeletal support for AIA
-  RISC-V: KVM: Add ONE_REG interface for AIA CSRs
-  RISC-V: KVM: Virtualize per-HART AIA CSRs
-  RISC-V: KVM: Implement guest external interrupt line management
-
- arch/riscv/include/asm/csr.h      | 107 ++++-
- arch/riscv/include/asm/hwcap.h    |   8 +
- arch/riscv/include/asm/kvm_aia.h  | 137 +++++++
- arch/riscv/include/asm/kvm_host.h |  14 +-
- arch/riscv/include/uapi/asm/kvm.h |  22 +-
- arch/riscv/kernel/cpu.c           |   2 +
- arch/riscv/kernel/cpufeature.c    |   2 +
- arch/riscv/kvm/Makefile           |   1 +
- arch/riscv/kvm/aia.c              | 624 ++++++++++++++++++++++++++++++
- arch/riscv/kvm/main.c             |  14 +
- arch/riscv/kvm/mmu.c              |   3 +-
- arch/riscv/kvm/vcpu.c             | 185 +++++++--
- arch/riscv/kvm/vcpu_insn.c        |   4 +-
- arch/riscv/kvm/vm.c               |   4 +
- arch/riscv/kvm/vmid.c             |   4 +-
- 15 files changed, 1075 insertions(+), 56 deletions(-)
- create mode 100644 arch/riscv/include/asm/kvm_aia.h
- create mode 100644 arch/riscv/kvm/aia.c
-
+diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+index 0e571f6483d9..3c8d68152bce 100644
+--- a/arch/riscv/include/asm/csr.h
++++ b/arch/riscv/include/asm/csr.h
+@@ -7,7 +7,7 @@
+ #define _ASM_RISCV_CSR_H
+ 
+ #include <asm/asm.h>
+-#include <linux/const.h>
++#include <linux/bits.h>
+ 
+ /* Status register flags */
+ #define SR_SIE		_AC(0x00000002, UL) /* Supervisor Interrupt Enable */
+@@ -73,7 +73,10 @@
+ #define IRQ_S_EXT		9
+ #define IRQ_VS_EXT		10
+ #define IRQ_M_EXT		11
++#define IRQ_S_GEXT		12
+ #define IRQ_PMU_OVF		13
++#define IRQ_LOCAL_MAX		(IRQ_PMU_OVF + 1)
++#define IRQ_LOCAL_MASK		GENMASK((IRQ_LOCAL_MAX - 1), 0)
+ 
+ /* Exception causes */
+ #define EXC_INST_MISALIGNED	0
+@@ -156,6 +159,27 @@
+ 				 (_AC(1, UL) << IRQ_S_TIMER) | \
+ 				 (_AC(1, UL) << IRQ_S_EXT))
+ 
++/* AIA CSR bits */
++#define TOPI_IID_SHIFT		16
++#define TOPI_IID_MASK		GENMASK(11, 0)
++#define TOPI_IPRIO_MASK		GENMASK(7, 0)
++#define TOPI_IPRIO_BITS		8
++
++#define TOPEI_ID_SHIFT		16
++#define TOPEI_ID_MASK		GENMASK(10, 0)
++#define TOPEI_PRIO_MASK		GENMASK(10, 0)
++
++#define ISELECT_IPRIO0		0x30
++#define ISELECT_IPRIO15		0x3f
++#define ISELECT_MASK		GENMASK(8, 0)
++
++#define HVICTL_VTI		BIT(30)
++#define HVICTL_IID		GENMASK(27, 16)
++#define HVICTL_IID_SHIFT	16
++#define HVICTL_DPR		BIT(9)
++#define HVICTL_IPRIOM		BIT(8)
++#define HVICTL_IPRIO		GENMASK(7, 0)
++
+ /* xENVCFG flags */
+ #define ENVCFG_STCE			(_AC(1, ULL) << 63)
+ #define ENVCFG_PBMTE			(_AC(1, ULL) << 62)
+@@ -250,6 +274,18 @@
+ #define CSR_STIMECMP		0x14D
+ #define CSR_STIMECMPH		0x15D
+ 
++/* Supervisor-Level Window to Indirectly Accessed Registers (AIA) */
++#define CSR_SISELECT		0x150
++#define CSR_SIREG		0x151
++
++/* Supervisor-Level Interrupts (AIA) */
++#define CSR_STOPEI		0x15c
++#define CSR_STOPI		0xdb0
++
++/* Supervisor-Level High-Half CSRs (AIA) */
++#define CSR_SIEH		0x114
++#define CSR_SIPH		0x154
++
+ #define CSR_VSSTATUS		0x200
+ #define CSR_VSIE		0x204
+ #define CSR_VSTVEC		0x205
+@@ -279,8 +315,32 @@
+ #define CSR_HGATP		0x680
+ #define CSR_HGEIP		0xe12
+ 
++/* Virtual Interrupts and Interrupt Priorities (H-extension with AIA) */
++#define CSR_HVIEN		0x608
++#define CSR_HVICTL		0x609
++#define CSR_HVIPRIO1		0x646
++#define CSR_HVIPRIO2		0x647
++
++/* VS-Level Window to Indirectly Accessed Registers (H-extension with AIA) */
++#define CSR_VSISELECT		0x250
++#define CSR_VSIREG		0x251
++
++/* VS-Level Interrupts (H-extension with AIA) */
++#define CSR_VSTOPEI		0x25c
++#define CSR_VSTOPI		0xeb0
++
++/* Hypervisor and VS-Level High-Half CSRs (H-extension with AIA) */
++#define CSR_HIDELEGH		0x613
++#define CSR_HVIENH		0x618
++#define CSR_HVIPH		0x655
++#define CSR_HVIPRIO1H		0x656
++#define CSR_HVIPRIO2H		0x657
++#define CSR_VSIEH		0x214
++#define CSR_VSIPH		0x254
++
+ #define CSR_MSTATUS		0x300
+ #define CSR_MISA		0x301
++#define CSR_MIDELEG		0x303
+ #define CSR_MIE			0x304
+ #define CSR_MTVEC		0x305
+ #define CSR_MENVCFG		0x30a
+@@ -297,6 +357,25 @@
+ #define CSR_MIMPID		0xf13
+ #define CSR_MHARTID		0xf14
+ 
++/* Machine-Level Window to Indirectly Accessed Registers (AIA) */
++#define CSR_MISELECT		0x350
++#define CSR_MIREG		0x351
++
++/* Machine-Level Interrupts (AIA) */
++#define CSR_MTOPEI		0x35c
++#define CSR_MTOPI		0xfb0
++
++/* Virtual Interrupts for Supervisor Level (AIA) */
++#define CSR_MVIEN		0x308
++#define CSR_MVIP		0x309
++
++/* Machine-Level High-Half CSRs (AIA) */
++#define CSR_MIDELEGH		0x313
++#define CSR_MIEH		0x314
++#define CSR_MVIENH		0x318
++#define CSR_MVIPH		0x319
++#define CSR_MIPH		0x354
++
+ #ifdef CONFIG_RISCV_M_MODE
+ # define CSR_STATUS	CSR_MSTATUS
+ # define CSR_IE		CSR_MIE
+@@ -307,6 +386,13 @@
+ # define CSR_TVAL	CSR_MTVAL
+ # define CSR_IP		CSR_MIP
+ 
++# define CSR_IEH		CSR_MIEH
++# define CSR_ISELECT	CSR_MISELECT
++# define CSR_IREG	CSR_MIREG
++# define CSR_IPH		CSR_MIPH
++# define CSR_TOPEI	CSR_MTOPEI
++# define CSR_TOPI	CSR_MTOPI
++
+ # define SR_IE		SR_MIE
+ # define SR_PIE		SR_MPIE
+ # define SR_PP		SR_MPP
+@@ -324,6 +410,13 @@
+ # define CSR_TVAL	CSR_STVAL
+ # define CSR_IP		CSR_SIP
+ 
++# define CSR_IEH		CSR_SIEH
++# define CSR_ISELECT	CSR_SISELECT
++# define CSR_IREG	CSR_SIREG
++# define CSR_IPH		CSR_SIPH
++# define CSR_TOPEI	CSR_STOPEI
++# define CSR_TOPI	CSR_STOPI
++
+ # define SR_IE		SR_SIE
+ # define SR_PIE		SR_SPIE
+ # define SR_PP		SR_SPP
 -- 
 2.34.1
 
