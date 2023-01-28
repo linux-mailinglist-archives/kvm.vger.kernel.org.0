@@ -2,130 +2,230 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 1FBB267F84E
-	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 14:52:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3EE4767F85C
+	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 15:03:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234622AbjA1Nw2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Jan 2023 08:52:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46814 "EHLO
+        id S233962AbjA1ODA (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Jan 2023 09:03:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233961AbjA1Nw0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Jan 2023 08:52:26 -0500
-Received: from mail.8bytes.org (mail.8bytes.org [IPv6:2a01:238:42d9:3f00:e505:6202:4f0c:f051])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6AA722659E;
-        Sat, 28 Jan 2023 05:52:24 -0800 (PST)
-Received: from 8bytes.org (p5b006afb.dip0.t-ipconnect.de [91.0.106.251])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.8bytes.org (Postfix) with ESMTPSA id DB0FF2602D3;
-        Sat, 28 Jan 2023 14:52:22 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-        s=default; t=1674913943;
-        bh=pwS9QMn9X+JPuuplngGyQsswZ0q+EpivgqmV4KbdGB0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MsHVwGkKcBJcmRSSSV3FRkDkaB+pjOqOQnuBEDdUnWPfFGwD29xg+ZroUSMDYxGF0
-         5eaNS8zYN5nFjUTuCu547K1OJFhoWT82xaHixQRM/QXF/8diLjagjRrazPHirbS2Q6
-         35DLMl8E7JD4cYffDU74nbXh+lxm5JLwra6GHKOIKrwKZck+s2RfsMGF0ETdFNvafQ
-         qQCgqUItRh5KGRZlj+z9Jd9/TLjuRzYf3NjU2qn/JcrKVepNFB+E5ntkmUt5kMnJE9
-         HzZhXYK/p4ml8zXv9FnKeIGkF2isVTFPUKY8KWadg1hOrQo2LAvcbgg9FQhtxdTAdG
-         YP2j/Bt8WKL0Q==
-Date:   Sat, 28 Jan 2023 14:52:21 +0100
-From:   Joerg Roedel <joro@8bytes.org>
-To:     Alexey Kardashevskiy <aik@amd.com>
-Cc:     Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
+        with ESMTP id S230175AbjA1OC6 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Jan 2023 09:02:58 -0500
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C461043C;
+        Sat, 28 Jan 2023 06:02:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674914572; x=1706450572;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   mime-version:in-reply-to;
+  bh=Kc8vJ3FvU/EJ0EkuHD1xOBQzKplcG7pKfCLj/xSsBkU=;
+  b=mU20VRy12R8p2Lt0ta8VNz+LnWUNK2FkIyxLprxPBA3d4vo8URlkdFZ+
+   gUhbk2/CXe59rcoya2dmV/buQZXq5aWiY87KoNDRyVD2DLrSuRzfRmgJD
+   zoP/PFkKup/HYA4Ro27UMS/kQG/t1cSvfFkeQGN9FE/4NAzGnadpc4bAJ
+   XzbViP9oOB6fZgfYB3wDpv7RMgI0jVLLAR/S6iQuwFkgKrDzTDiGh5gFB
+   yr5NHivuhuc0UhPx/3AG7B43BLaFJ8H9zXvdYodOB7SuAPffcD70kTJdQ
+   cqRt2V8F+iYhqcdQlnsHT9B4YhHgj6SBhPZKZeTe4nOT7lW2f9pTrDIYa
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10604"; a="391846258"
+X-IronPort-AV: E=Sophos;i="5.97,254,1669104000"; 
+   d="scan'208";a="391846258"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2023 06:02:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10604"; a="908979126"
+X-IronPort-AV: E=Sophos;i="5.97,254,1669104000"; 
+   d="scan'208";a="908979126"
+Received: from chaop.bj.intel.com (HELO localhost) ([10.240.192.105])
+  by fmsmga006.fm.intel.com with ESMTP; 28 Jan 2023 06:02:39 -0800
+Date:   Sat, 28 Jan 2023 21:54:54 +0800
+From:   Chao Peng <chao.p.peng@linux.intel.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-fsdevel@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-doc@vger.kernel.org, qemu-devel@nongnu.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Sean Christopherson <seanjc@google.com>,
-        Jiri Kosina <jkosina@suse.cz>, Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [Question PATCH kernel] x86/amd/sev/nmi+vc: Fix stack handling
- (why is this happening?)
-Message-ID: <Y9UolYXFzvocxIcn@8bytes.org>
-References: <20230127035616.508966-1-aik@amd.com>
- <Y9OUfofjxDtTmwyV@hirez.programming.kicks-ass.net>
- <Y9OpcoSacyOkPkvl@8bytes.org>
- <b7880f0b-a592-cf2d-03b9-1ccfd83f8223@amd.com>
- <Y9QI9JwCVvRmtbr+@8bytes.org>
- <3bb3e080-caee-8bc8-7de9-f44969f16e75@amd.com>
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Naoya Horiguchi <naoya.horiguchi@nec.com>,
+        Miaohe Lin <linmiaohe@huawei.com>, x86@kernel.org,
+        "H . Peter Anvin" <hpa@zytor.com>, Hugh Dickins <hughd@google.com>,
+        Jeff Layton <jlayton@kernel.org>,
+        "J . Bruce Fields" <bfields@fieldses.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Shuah Khan <shuah@kernel.org>, Mike Rapoport <rppt@kernel.org>,
+        Steven Price <steven.price@arm.com>,
+        "Maciej S . Szmigiero" <mail@maciej.szmigiero.name>,
+        Vlastimil Babka <vbabka@suse.cz>,
+        Vishal Annapurve <vannapurve@google.com>,
+        Yu Zhang <yu.c.zhang@linux.intel.com>,
+        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
+        luto@kernel.org, jun.nakajima@intel.com, dave.hansen@intel.com,
+        ak@linux.intel.com, david@redhat.com, aarcange@redhat.com,
+        ddutile@redhat.com, dhildenb@redhat.com,
+        Quentin Perret <qperret@google.com>, tabba@google.com,
+        Michael Roth <michael.roth@amd.com>, mhocko@suse.com,
+        wei.w.wang@intel.com
+Subject: Re: [PATCH v10 7/9] KVM: Update lpage info when private/shared
+ memory are mixed
+Message-ID: <20230128135454.GA700688@chaop.bj.intel.com>
+Reply-To: Chao Peng <chao.p.peng@linux.intel.com>
+References: <20221202061347.1070246-1-chao.p.peng@linux.intel.com>
+ <20221202061347.1070246-8-chao.p.peng@linux.intel.com>
+ <Y8HmS2iE4u0Gfkrn@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3bb3e080-caee-8bc8-7de9-f44969f16e75@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <Y8HmS2iE4u0Gfkrn@google.com>
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 28, 2023 at 10:24:56PM +1100, Alexey Kardashevskiy wrote:
-> (out of curiosity) where do you see these NOPs? "objdump -D vmlinux" does
-> not show any, is this after lifepatching?
+On Fri, Jan 13, 2023 at 11:16:27PM +0000, Sean Christopherson wrote:
+> On Fri, Dec 02, 2022, Chao Peng wrote:
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index 9a07380f8d3c..5aefcff614d2 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -12362,6 +12362,8 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+> >  		if ((slot->base_gfn + npages) & (KVM_PAGES_PER_HPAGE(level) - 1))
+> >  			linfo[lpages - 1].disallow_lpage = 1;
+> >  		ugfn = slot->userspace_addr >> PAGE_SHIFT;
+> > +		if (kvm_slot_can_be_private(slot))
+> > +			ugfn |= slot->restricted_offset >> PAGE_SHIFT;
+> >  		/*
+> >  		 * If the gfn and userspace address are not aligned wrt each
+> >  		 * other, disable large page support for this slot.
+> 
+> Forgot to talk about the bug.  This code needs to handle the scenario where a
+> memslot is created with existing, non-uniform attributes.  It might be a bit ugly
+> (I didn't even try to write the code), but it's definitely possible, and since
+> memslot updates are already slow I think it's best to handle things here.
+> 
+> In the meantime, I added this so we don't forget to fix it before merging.
+> 
+> #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+> 	pr_crit_once("FIXME: Walk the memory attributes of the slot and set the mixed status appropriately");
+> #endif
 
-Here is the disassembly of exc_nmi of a kernel built from tip/master
-with CONFIG_PARAVIRT=n:
+Here is the code to fix (based on your latest github repo).
 
-<exc_nmi>:
-       41 54                   push   %r12
-       55                      push   %rbp
-       48 89 fd                mov    %rdi,%rbp
-       53                      push   %rbx
-       0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)
-       65 8b 05 69 66 41 7e    mov    %gs:0x7e416669(%rip),%eax        # 3254c <pcpu_hot+0xc>
-       48 98                   cltq
-       48 0f a3 05 33 00 2b    bt     %rax,0x12b0033(%rip)        # ffffffff82ecbf20 <__cpu_online_mask>
-       01 
-       0f 83 c9 00 00 00       jae    ffffffff81c1bfbc <exc_nmi+0xec>
-       65 8b 05 f6 41 40 7e    mov    %gs:0x7e4041f6(%rip),%eax        # 200f0 <nmi_state>
-       85 c0                   test   %eax,%eax
-       0f 85 f8 00 00 00       jne    ffffffff81c1bffa <exc_nmi+0x12a>
-       65 c7 05 e3 41 40 7e    movl   $0x1,%gs:0x7e4041e3(%rip)        # 200f0 <nmi_state>
-       01 00 00 00 
-       0f 20 d0                mov    %cr2,%rax
-       65 48 89 05 d0 41 40    mov    %rax,%gs:0x7e4041d0(%rip)        # 200e8 <nmi_cr2>
-       7e 
-       41 0f 21 fc             mov    %db7,%r12			<-- here is the DR7 read
-       0f 1f 44 00 00          nopl   0x0(%rax,%rax,1)		<-- here are the NOPS that become a
-       								    call to sev_es_ist_enter() in
-								    SEV-ES guests
-
-The DR7 read will cause a #VC exception, switching to the #VC IST stack.
-If the NMI was raised while already on the #VC IST stack, this DR7 read
-will overwrite the previous stack frame and cause stack recursion, with
-all funny side effects.
-
-
-> diff --git a/arch/x86/include/asm/debugreg.h
-> b/arch/x86/include/asm/debugreg.h
-> index b049d950612f..687b15297057 100644
-> --- a/arch/x86/include/asm/debugreg.h
-> +++ b/arch/x86/include/asm/debugreg.h
-> @@ -39,7 +39,7 @@ static __always_inline unsigned long
-> native_get_debugreg(int regno)
->                 asm("mov %%db6, %0" :"=r" (val));
->                 break;
->         case 7:
-> -               asm("mov %%db7, %0" :"=r" (val));
-> +               asm volatile ("mov %%db7, %0" :"=r" (val));
-
-Yeah, something like this will be the fix. I am still thinking about
-the right place to put the volatile to make it explicit to the situation
-we are encountering here (which is SEV-ES specific).
-
-Best would be an explicit barrier in C code between sev_es_ist_enter()
-and the DR7 read, but all barriers I tried to far only seem to affect
-memory instructions and had no influence on the DR7 read (which is
-obviously not considered as a memory read by the compiler).
-
-The best place to put the barrier is in the sev_es_ist_enter() inline
-function, right after the static_call to __sev_es_ist_enter().
-
-Regards,
-
-	Joerg
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index e552374f2357..609ff1cba9c5 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -2195,4 +2195,9 @@ int memslot_rmap_alloc(struct kvm_memory_slot *slot, unsigned long npages);
+ 	 KVM_X86_QUIRK_FIX_HYPERCALL_INSN |	\
+ 	 KVM_X86_QUIRK_MWAIT_NEVER_UD_FAULTS)
+ 
++#ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
++void kvm_memory_attributes_create_memslot(struct kvm *kvm,
++					  struct kvm_memory_slot *slot);
++#endif
++
+ #endif /* _ASM_X86_KVM_HOST_H */
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index eda615f3951c..8833d7201e41 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -7201,10 +7201,11 @@ static bool has_mixed_attrs(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 	return false;
+ }
+ 
+-void kvm_arch_set_memory_attributes(struct kvm *kvm,
+-				    struct kvm_memory_slot *slot,
+-				    unsigned long attrs,
+-				    gfn_t start, gfn_t end)
++static void kvm_update_lpage_mixed_flag(struct kvm *kvm,
++					struct kvm_memory_slot *slot,
++					bool set_attrs,
++					unsigned long attrs,
++					gfn_t start, gfn_t end)
+ {
+ 	unsigned long pages, mask;
+ 	gfn_t gfn, gfn_end, first, last;
+@@ -7231,25 +7232,53 @@ void kvm_arch_set_memory_attributes(struct kvm *kvm,
+ 		first = start & mask;
+ 		last = (end - 1) & mask;
+ 
+-		/*
+-		 * We only need to scan the head and tail page, for middle pages
+-		 * we know they will not be mixed.
+-		 */
++		/* head page */
+ 		gfn = max(first, slot->base_gfn);
+ 		gfn_end = min(first + pages, slot->base_gfn + slot->npages);
++		if(!set_attrs)
++			attrs = kvm_get_memory_attributes(kvm, gfn);
+ 		mixed = has_mixed_attrs(kvm, slot, level, attrs, gfn, gfn_end);
+ 		linfo_update_mixed(gfn, slot, level, mixed);
+ 
+ 		if (first == last)
+ 			return;
+ 
+-		for (gfn = first + pages; gfn < last; gfn += pages)
+-			linfo_update_mixed(gfn, slot, level, false);
++		/* middle pages */
++		for (gfn = first + pages; gfn < last; gfn += pages) {
++			if (set_attrs) {
++				mixed = false;
++			} else {
++				gfn_end = gfn + pages;
++				attrs = kvm_get_memory_attributes(kvm, gfn);
++				mixed = has_mixed_attrs(kvm, slot, level, attrs,
++							gfn, gfn_end);
++			}
++			linfo_update_mixed(gfn, slot, level, mixed);
++		}
+ 
++		/* tail page */
+ 		gfn = last;
+ 		gfn_end = min(last + pages, slot->base_gfn + slot->npages);
++		if(!set_attrs)
++			attrs = kvm_get_memory_attributes(kvm, gfn);
+ 		mixed = has_mixed_attrs(kvm, slot, level, attrs, gfn, gfn_end);
+ 		linfo_update_mixed(gfn, slot, level, mixed);
+ 	}
+ }
++
++void kvm_arch_set_memory_attributes(struct kvm *kvm,
++				    struct kvm_memory_slot *slot,
++				    unsigned long attrs,
++				    gfn_t start, gfn_t end)
++{
++	kvm_update_lpage_mixed_flag(kvm, slot, true, attrs, start, end);
++}
++
++void kvm_memory_attributes_create_memslot(struct kvm *kvm,
++					  struct kvm_memory_slot *slot)
++{
++
++	kvm_update_lpage_mixed_flag(kvm, slot, false, 0, slot->base_gfn,
++				    slot->base_gfn + slot->npages);
++}
+ #endif
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 268c3d16894d..c1074aecf2d0 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12443,7 +12443,7 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
+ 	}
+ 
+ #ifdef CONFIG_KVM_GENERIC_MEMORY_ATTRIBUTES
+-	pr_crit_once("FIXME: Walk the memory attributes of the slot and set the mixed status appropriately");
++	kvm_memory_attributes_create_memslot(kvm, slot);
+ #endif
+ 
+ 	if (kvm_page_track_create_memslot(kvm, slot, npages))
