@@ -2,230 +2,168 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 75C1667F6B9
-	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 10:30:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8EB6A67F71A
+	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 11:28:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233902AbjA1Jae (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Jan 2023 04:30:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50680 "EHLO
+        id S234113AbjA1K2k (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Jan 2023 05:28:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231234AbjA1Jac (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Jan 2023 04:30:32 -0500
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB4012F13;
-        Sat, 28 Jan 2023 01:30:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674898231; x=1706434231;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=U72XuZly3Iu4fc1HHUfpwce/DIyiZRJ7N299SwsNygI=;
-  b=JnM5vfpKj2pcNAU9Q0H/2tYjtbQ5lq7+D2yj+gy75jXwkis8MNBbni8n
-   23O7OdRSudgYeukvWe77p/9pUs2yj8vT/MZiPAsZXL48f3tUwKf9pFjxr
-   QAG02lRzV8G1SZ36p25WDP5nRxA1wq6IakojALbMJqjODjaWBWCJWoXQg
-   IOMLvITfngcbAO7BXN9W+ayz9DbZDr2iNNTpzUyrqzwXPy5viRmV4gVOT
-   S1npw3x1vy0xjmkbVcjhqN4eqxBljMBeW5ZP6Pwm/+I0q5J8TBDRvQy2j
-   ZCdpijWVOUQDXaZB/zgQesKhMRknEZJsjzaxJ7Wpp7jv/6mEw570eTDje
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10603"; a="329405279"
-X-IronPort-AV: E=Sophos;i="5.97,253,1669104000"; 
-   d="scan'208";a="329405279"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2023 01:30:30 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10603"; a="665530690"
-X-IronPort-AV: E=Sophos;i="5.97,253,1669104000"; 
-   d="scan'208";a="665530690"
-Received: from lkp-server01.sh.intel.com (HELO ffa7f14d1d0f) ([10.239.97.150])
-  by fmsmga007.fm.intel.com with ESMTP; 28 Jan 2023 01:30:25 -0800
-Received: from kbuild by ffa7f14d1d0f with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1pLhXU-0000Yf-2R;
-        Sat, 28 Jan 2023 09:30:24 +0000
-Date:   Sat, 28 Jan 2023 17:29:32 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     oe-kbuild-all@lists.linux.dev,
-        Janis Schoetterl-Glausch <scgl@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: Re: [PATCH v6 12/14] KVM: s390: Extend MEM_OP ioctl by storage key
- checked cmpxchg
-Message-ID: <202301281752.6gSopuWh-lkp@intel.com>
-References: <20230125212608.1860251-13-scgl@linux.ibm.com>
+        with ESMTP id S234039AbjA1K2g (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Jan 2023 05:28:36 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3CDF4B88D
+        for <kvm@vger.kernel.org>; Sat, 28 Jan 2023 02:28:31 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8B16860B83
+        for <kvm@vger.kernel.org>; Sat, 28 Jan 2023 10:28:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EE6AC433EF;
+        Sat, 28 Jan 2023 10:28:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1674901709;
+        bh=LdatDRj19NTRu/mqjPRI5md+JhOX3+rhr/gM9iD9Ufo=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=cFadJIPwcmhTLyHvg5LQ8QQvb9Cwxset2eCqHtvwsOp0s2Xse5iH8wX1l4XnLFZLA
+         qwmxNSPdtfYX6NtrPHqYN3IaeJHoQDc/BLKC/OlGfQ1hhD+3L3fkyivZrGB0sLzPHt
+         5Z6KsMLFvq4WMYh4g0voBaLWGoMJld5gWy2mywi1KGxIZj5fUPRqLyB9fg8gyM1+1k
+         /yuewWAu/9QcShcKezSRBhQkRE9b3tlR3zX//zZ5PbXGyhUt0NcFBRYhjQJTljGm6y
+         7VndGaKFLFXwKOVNFkZFMjttzp4G6T8zQeDVdhwxaBc2J6Nn14Ls0MhSsXLsl87se1
+         IbAK0iNLqqZhQ==
+Date:   Sat, 28 Jan 2023 10:28:26 +0000
+From:   Conor Dooley <conor@kernel.org>
+To:     Guo Ren <guoren@kernel.org>
+CC:     Andy Chiu <andy.chiu@sifive.com>, linux-riscv@lists.infradead.org,
+        palmer@dabbelt.com, anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        vineetg@rivosinc.com, greentime.hu@sifive.com,
+        guoren@linux.alibaba.com, Guo Ren <ren_guo@c-sky.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>,
+        Heiko Stuebner <heiko@sntech.de>,
+        Atish Patra <atishp@rivosinc.com>,
+        Anup Patel <apatel@ventanamicro.com>,
+        Mayuresh Chitale <mchitale@ventanamicro.com>,
+        Conor Dooley <conor.dooley@microchip.com>,
+        Dao Lu <daolu@rivosinc.com>,
+        Jisheng Zhang <jszhang@kernel.org>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Vincent Chen <vincent.chen@sifive.com>,
+        Tsukasa OI <research_trasio@irq.a4lg.com>
+Subject: =?US-ASCII?Q?Re=3A_=5BPATCH_-next_v13_02/19=5D_riscv=3A_Exte?= =?US-ASCII?Q?nding_cpufeature=2Ec_to_detect_V-extension?=
+User-Agent: K-9 Mail for Android
+In-Reply-To: <CAJF2gTS11DcKuSBRQfn9AkU0YP=ry-FV=cH=Au5m3Us=1gVTQQ@mail.gmail.com>
+References: <20230125142056.18356-1-andy.chiu@sifive.com> <20230125142056.18356-3-andy.chiu@sifive.com> <Y9GgKiF8q2k9eRdh@spud> <CAJF2gTS11DcKuSBRQfn9AkU0YP=ry-FV=cH=Au5m3Us=1gVTQQ@mail.gmail.com>
+Message-ID: <3AE48592-5756-4D49-B860-1D8C54ACFF3A@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230125212608.1860251-13-scgl@linux.ibm.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Hi Janis,
-
-Thank you for the patch! Yet something to improve:
-
-[auto build test ERROR on kvm/queue]
-[also build test ERROR on lwn/docs-next linus/master]
-[cannot apply to kvms390/next kvm/linux-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Janis-Schoetterl-Glausch/KVM-s390-selftest-memop-Pass-mop_desc-via-pointer/20230128-132603
-base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-patch link:    https://lore.kernel.org/r/20230125212608.1860251-13-scgl%40linux.ibm.com
-patch subject: [PATCH v6 12/14] KVM: s390: Extend MEM_OP ioctl by storage key checked cmpxchg
-config: s390-allyesconfig (https://download.01.org/0day-ci/archive/20230128/202301281752.6gSopuWh-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 12.1.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/6e6b3d99b9978a70b148b989d46b039feda3a3c3
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Janis-Schoetterl-Glausch/KVM-s390-selftest-memop-Pass-mop_desc-via-pointer/20230128-132603
-        git checkout 6e6b3d99b9978a70b148b989d46b039feda3a3c3
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=s390 olddefconfig
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-12.1.0 make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-| Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   arch/s390/kvm/gaccess.c: In function 'cmpxchg_guest_abs_with_key':
->> arch/s390/kvm/gaccess.c:1217:23: error: implicit declaration of function 'cmpxchg_user_key'; did you mean 'copy_to_user_key'? [-Werror=implicit-function-declaration]
-    1217 |                 ret = cmpxchg_user_key((u8 *)hva, &old, *old_addr, new, access_key);
-         |                       ^~~~~~~~~~~~~~~~
-         |                       copy_to_user_key
-   cc1: some warnings being treated as errors
 
 
-vim +1217 arch/s390/kvm/gaccess.c
+On 28 January 2023 07:09:18 GMT, Guo Ren <guoren@kernel=2Eorg> wrote:
+>On Thu, Jan 26, 2023 at 5:33 AM Conor Dooley <conor@kernel=2Eorg> wrote:
+>>
+>> On Wed, Jan 25, 2023 at 02:20:39PM +0000, Andy Chiu wrote:
+>> > From: Guo Ren <ren_guo@c-sky=2Ecom>
+>> >
+>> > Add V-extension into riscv_isa_ext_keys array and detect it with isa
+>> > string parsing=2E
+>> >
+>> > Signed-off-by: Guo Ren <ren_guo@c-sky=2Ecom>
+>> > Signed-off-by: Guo Ren <guoren@linux=2Ealibaba=2Ecom>
+>> > Signed-off-by: Greentime Hu <greentime=2Ehu@sifive=2Ecom>
+>> > Suggested-by: Vineet Gupta <vineetg@rivosinc=2Ecom>
+>> > Signed-off-by: Andy Chiu <andy=2Echiu@sifive=2Ecom>
+>> > ---
+>> >  arch/riscv/include/asm/hwcap=2Eh      |  4 ++++
+>> >  arch/riscv/include/asm/vector=2Eh     | 26 +++++++++++++++++++++++++=
++
+>> >  arch/riscv/include/uapi/asm/hwcap=2Eh |  1 +
+>> >  arch/riscv/kernel/cpufeature=2Ec      | 12 ++++++++++++
+>> >  4 files changed, 43 insertions(+)
+>> >  create mode 100644 arch/riscv/include/asm/vector=2Eh
+>> >
+>> > diff --git a/arch/riscv/include/asm/hwcap=2Eh b/arch/riscv/include/as=
+m/hwcap=2Eh
+>> > index 57439da71c77=2E=2Ef413db6118e5 100644
+>> > --- a/arch/riscv/include/asm/hwcap=2Eh
+>> > +++ b/arch/riscv/include/asm/hwcap=2Eh
+>> > @@ -35,6 +35,7 @@ extern unsigned long elf_hwcap;
+>> >  #define RISCV_ISA_EXT_m              ('m' - 'a')
+>> >  #define RISCV_ISA_EXT_s              ('s' - 'a')
+>> >  #define RISCV_ISA_EXT_u              ('u' - 'a')
+>> > +#define RISCV_ISA_EXT_v              ('v' - 'a')
+>> >
+>> >  /*
+>> >   * Increse this to higher value as kernel support more ISA extension=
+s=2E
+>> > @@ -73,6 +74,7 @@ static_assert(RISCV_ISA_EXT_ID_MAX <=3D RISCV_ISA_E=
+XT_MAX);
+>> >  enum riscv_isa_ext_key {
+>> >       RISCV_ISA_EXT_KEY_FPU,          /* For 'F' and 'D' */
+>> >       RISCV_ISA_EXT_KEY_SVINVAL,
+>> > +     RISCV_ISA_EXT_KEY_VECTOR,       /* For 'V' */
+>>
+>> That's obvious surely, no?
+>>
+>> >       RISCV_ISA_EXT_KEY_ZIHINTPAUSE,
+>> >       RISCV_ISA_EXT_KEY_MAX,
+>> >  };
+>> > @@ -95,6 +97,8 @@ static __always_inline int riscv_isa_ext2key(int nu=
+m)
+>>
+>> You should probably check out Jisheng's series that deletes whole
+>> sections of this code, including this whole function=2E
+>> https://lore=2Ekernel=2Eorg/all/20230115154953=2E831-3-jszhang@kernel=
+=2Eorg/T/#u
+>Has that patch merged? It could be solved during the rebase for-next natu=
+rally=2E
 
-  1163	
-  1164	/**
-  1165	 * cmpxchg_guest_abs_with_key() - Perform cmpxchg on guest absolute address.
-  1166	 * @kvm: Virtual machine instance.
-  1167	 * @gpa: Absolute guest address of the location to be changed.
-  1168	 * @len: Operand length of the cmpxchg, required: 1 <= len <= 16. Providing a
-  1169	 *       non power of two will result in failure.
-  1170	 * @old_addr: Pointer to old value. If the location at @gpa contains this value,
-  1171	 *            the exchange will succeed. After calling cmpxchg_guest_abs_with_key()
-  1172	 *            *@old_addr contains the value at @gpa before the attempt to
-  1173	 *            exchange the value.
-  1174	 * @new: The value to place at @gpa.
-  1175	 * @access_key: The access key to use for the guest access.
-  1176	 * @success: output value indicating if an exchange occurred.
-  1177	 *
-  1178	 * Atomically exchange the value at @gpa by @new, if it contains *@old.
-  1179	 * Honors storage keys.
-  1180	 *
-  1181	 * Return: * 0: successful exchange
-  1182	 *         * a program interruption code indicating the reason cmpxchg could
-  1183	 *           not be attempted
-  1184	 *         * -EINVAL: address misaligned or len not power of two
-  1185	 *         * -EAGAIN: transient failure (len 1 or 2)
-  1186	 *         * -EOPNOTSUPP: read-only memslot (should never occur)
-  1187	 */
-  1188	int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len,
-  1189				       __uint128_t *old_addr, __uint128_t new,
-  1190				       u8 access_key, bool *success)
-  1191	{
-  1192		gfn_t gfn = gpa >> PAGE_SHIFT;
-  1193		struct kvm_memory_slot *slot = gfn_to_memslot(kvm, gfn);
-  1194		bool writable;
-  1195		hva_t hva;
-  1196		int ret;
-  1197	
-  1198		if (!IS_ALIGNED(gpa, len))
-  1199			return -EINVAL;
-  1200	
-  1201		hva = gfn_to_hva_memslot_prot(slot, gfn, &writable);
-  1202		if (kvm_is_error_hva(hva))
-  1203			return PGM_ADDRESSING;
-  1204		/*
-  1205		 * Check if it's a read-only memslot, even though that cannot occur
-  1206		 * since those are unsupported.
-  1207		 * Don't try to actually handle that case.
-  1208		 */
-  1209		if (!writable)
-  1210			return -EOPNOTSUPP;
-  1211	
-  1212		hva += offset_in_page(gpa);
-  1213		switch (len) {
-  1214		case 1: {
-  1215			u8 old;
-  1216	
-> 1217			ret = cmpxchg_user_key((u8 *)hva, &old, *old_addr, new, access_key);
-  1218			*success = !ret && old == *old_addr;
-  1219			*old_addr = old;
-  1220			break;
-  1221		}
-  1222		case 2: {
-  1223			u16 old;
-  1224	
-  1225			ret = cmpxchg_user_key((u16 *)hva, &old, *old_addr, new, access_key);
-  1226			*success = !ret && old == *old_addr;
-  1227			*old_addr = old;
-  1228			break;
-  1229		}
-  1230		case 4: {
-  1231			u32 old;
-  1232	
-  1233			ret = cmpxchg_user_key((u32 *)hva, &old, *old_addr, new, access_key);
-  1234			*success = !ret && old == *old_addr;
-  1235			*old_addr = old;
-  1236			break;
-  1237		}
-  1238		case 8: {
-  1239			u64 old;
-  1240	
-  1241			ret = cmpxchg_user_key((u64 *)hva, &old, *old_addr, new, access_key);
-  1242			*success = !ret && old == *old_addr;
-  1243			*old_addr = old;
-  1244			break;
-  1245		}
-  1246		case 16: {
-  1247			__uint128_t old;
-  1248	
-  1249			ret = cmpxchg_user_key((__uint128_t *)hva, &old, *old_addr, new, access_key);
-  1250			*success = !ret && old == *old_addr;
-  1251			*old_addr = old;
-  1252			break;
-  1253		}
-  1254		default:
-  1255			return -EINVAL;
-  1256		}
-  1257		mark_page_dirty_in_slot(kvm, slot, gfn);
-  1258		/*
-  1259		 * Assume that the fault is caused by protection, either key protection
-  1260		 * or user page write protection.
-  1261		 */
-  1262		if (ret == -EFAULT)
-  1263			ret = PGM_PROTECTION;
-  1264		return ret;
-  1265	}
-  1266	
+Not merged yet=2E Pretty sure Andy used for-next
+as his base so that CI could test it more easily
+I was just pointing out it's existence in case he
+hadn't seen it=2E
+Hopefully Jishengs stuff will make 6=2E3 :)
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests
+>
+>>
+>>
+>> > @@ -256,6 +257,17 @@ void __init riscv_fill_hwcap(void)
+>> >               elf_hwcap &=3D ~COMPAT_HWCAP_ISA_F;
+>> >       }
+>> >
+>> > +     if (elf_hwcap & COMPAT_HWCAP_ISA_V) {
+>> > +#ifndef CONFIG_RISCV_ISA_V
+>> > +             /*
+>> > +              * ISA string in device tree might have 'v' flag, but
+>> > +              * CONFIG_RISCV_ISA_V is disabled in kernel=2E
+>> > +              * Clear V flag in elf_hwcap if CONFIG_RISCV_ISA_V is d=
+isabled=2E
+>> > +              */
+>> > +             elf_hwcap &=3D ~COMPAT_HWCAP_ISA_V;
+>> > +#endif
+>       if (elf_hwcap & COMPAT_HWCAP_ISA_V && !IS_ENABLED(CONFIG_RISCV_ISA=
+_V)) {
+>
+>right?
+>>
+>> I know that a later patch in this series calls rvv_enable() here, which
+>> I'll comment on there, but I'd rather see IS_ENABLED as opposed to
+>> ifdefs in C files where possible=2E
+>>
+>> Thanks,
+>> Conor=2E
+>>
+>
+>
