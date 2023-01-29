@@ -2,215 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 82A3D67FF33
-	for <lists+kvm@lfdr.de>; Sun, 29 Jan 2023 13:45:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 8E93767FF60
+	for <lists+kvm@lfdr.de>; Sun, 29 Jan 2023 14:32:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234991AbjA2MpB (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sun, 29 Jan 2023 07:45:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42888 "EHLO
+        id S235018AbjA2Ncp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sun, 29 Jan 2023 08:32:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235217AbjA2Mor (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sun, 29 Jan 2023 07:44:47 -0500
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49801241F9
-        for <kvm@vger.kernel.org>; Sun, 29 Jan 2023 04:44:31 -0800 (PST)
-Received: by mail-ej1-x62f.google.com with SMTP id gr7so231984ejb.5
-        for <kvm@vger.kernel.org>; Sun, 29 Jan 2023 04:44:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=brainfault-org.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hzvl/LqOmRuw2DLDajc9nmwbZP+g/NBX1KDunvAJzQY=;
-        b=fY2QFwBTKBZO8Qst6ZUPyMu24A/jtW4pov+KH93ZP6/BznpvqQcwmDLlU9AlvfKvHc
-         kx1xqrQiAdRu1gI52+5qnmtBBw15VMdkOECUlNhT3f8RgCEjtRC2sD9hx92S0IRA7UZb
-         dbuzIexlxY2xnBHPJSFzDxTOPcc6Woi6Hq1hant2sI9rU3oXS9qKpMHoAiAc/E8Rsm50
-         jF9blpDcxyN56OCp0mwJpQw9r5/Yp6W4WSPMHNQ/X+0RAf+3DoSPj0DDL4EpygJtbeHj
-         IH1nClRvnDmSkrauRgGR/vJ2W9/BRexsnmqgHAhLchQrqyGIyHcdyqbbXNqK9kcehZ/R
-         UZtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hzvl/LqOmRuw2DLDajc9nmwbZP+g/NBX1KDunvAJzQY=;
-        b=dHY7GMo8gx3fGN5wLXlAwae0SIEfdbL9KyMHXbbVeJ8s26yT5ZgTpgOoyiGVXMdUmg
-         myd0xChrgAh+6SaZKfsaVzg5AWtE0ozp2DCRO2JtyGpSAPSDDkgpOH2I+5/cqItJfh4A
-         W1I1plv8vpTlkTKubzTRJs3Sj/vhxhssJRGbHYpt2ElYAQzBLVOgYkny5KMkFlD8/TCz
-         l4iazf3nOH4tDGUFVzGPGxo4evnA8z1Y+Q3VEqIh7KOY2fRn0xBtec6NMgqApUa/LNTQ
-         EO2aP1+83J3iP6X/8IwFZ4NEC59lBLGpJmSurhY0EbvH6oVLS+Wyz6JAG2ZL/B24Uj0x
-         rJFg==
-X-Gm-Message-State: AO0yUKUn+f1haGWIY/Do36uwkCjcOq+NZbmXwYwkuPp3+IcR1lO9DeZt
-        TRYF1BenQiEm2d5D5a7oCOg3CQnBfAZrhdEmFWQnvg==
-X-Google-Smtp-Source: AK7set+98zHjTjUCfz1Po+4TvGNEYBc/NoX6CxQ6nYhmE2sLz3ErpGLxfO2NEtvlVStSPaC/HwnxsOot12jRU9W6Y68=
-X-Received: by 2002:a17:906:e116:b0:881:4488:297c with SMTP id
- gj22-20020a170906e11600b008814488297cmr1198000ejb.129.1674996269674; Sun, 29
- Jan 2023 04:44:29 -0800 (PST)
+        with ESMTP id S229549AbjA2Nco (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sun, 29 Jan 2023 08:32:44 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B35C15546
+        for <kvm@vger.kernel.org>; Sun, 29 Jan 2023 05:32:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1674999163; x=1706535163;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Ej2bVpIh2eXHjRKuX637WkI6u/wx0Rgec00AFZxRNrc=;
+  b=K1VnOthkMzyH3Gofyq3u3rTiujNi7MvOWqsR8zImO+/DXr0jbYWg8cY4
+   cCy4/NdcsvLuR5+cQNxK84ex+hVuk7XbfEhPC+xFXVy/0kLQElxUEE1Xk
+   5/THMjYDVuUeqzAvIAfdgnDnzZhkveXYimZj0919IHYgCWXsonoLsfLqC
+   1jMc2QMSR3rpDEzNmO9X4l4cGPNq7OWRE5ppyKVpc6MaQH2a6jKJPVqDZ
+   u8gLRJqKNitky54lCN3PnjpBa3MWpRqzICNW4yVEv0VuPe9HGP19oGdSv
+   m6sAIhtCkU/0WBF7vGqimHF1Kz7MkG9BBSx34hwzyvCVS0za7OchMWYrQ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10605"; a="307044601"
+X-IronPort-AV: E=Sophos;i="5.97,256,1669104000"; 
+   d="scan'208";a="307044601"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2023 05:32:43 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10605"; a="613743252"
+X-IronPort-AV: E=Sophos;i="5.97,256,1669104000"; 
+   d="scan'208";a="613743252"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga003.jf.intel.com with ESMTP; 29 Jan 2023 05:32:42 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Sun, 29 Jan 2023 05:32:42 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Sun, 29 Jan 2023 05:32:42 -0800
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Sun, 29 Jan 2023 05:32:42 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Yrodtn4f/mKZ91EMluFYOqiYyqaA6/YKGkdkPVNdBWDYITkyklxr6CsgIuogaEgs79xLu0CyMu9ZxaLNdaQwiUQ/5wTLQOSQLdxrVaQ7xx4F2l95heOgiVsl8Y3JjgVEgbxNhAygw+1KR8vzF9ISrF9LUX2TXZsmG71qZtKK1M7pX5x15aAepnAf+AFGmHPoLM79GP2F0TSUtfKroQEF6fqrrszdk2KuGgq/iJW2mMX6nj0cOpz+xCy+xqNUcyoY30+vwKkSkqkZdLDSjD+b+rvoRn1LvmwNx30IHNMK8Wqay9hRL1D5NKIF1R3odHUS2IyBbkO+8egdWw3or8gm/A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ej2bVpIh2eXHjRKuX637WkI6u/wx0Rgec00AFZxRNrc=;
+ b=CKrx8e8FK0SHPgEDI1s6WYyKSQCKnwDd+DCjWdl0mcL9vnKNcXBACKcKbehKn1ztTT5wJrXozdeTD6+knoS3OIKHO76wwjPq3CrM1muznwMRso+9IELnfyY/Ca48aF1p1Jf4QoL1+bfIZ8Ok38JsMpupw8jUJav2jmm9IkectSvunytwgk/Y0D+6gPcOhmDOKeWfb7LUep4H3j1RYrCTVRhswwrMAZDtQnUmbdr1F5b3+14Xu9KIgTFiaKniI1/rHQ35lKtpNso21HKs72FL1DsbYov35ISsJLOhojo0JAj2AWtPpW8y1UyGCjlVMUwK1c21i/s5AscsR5ZynLonRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+ by SA0PR11MB4751.namprd11.prod.outlook.com (2603:10b6:806:73::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.30; Sun, 29 Jan
+ 2023 13:32:40 +0000
+Received: from DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e1fa:abbe:2009:b0a3]) by DS0PR11MB7529.namprd11.prod.outlook.com
+ ([fe80::e1fa:abbe:2009:b0a3%4]) with mapi id 15.20.6043.030; Sun, 29 Jan 2023
+ 13:32:40 +0000
+From:   "Liu, Yi L" <yi.l.liu@intel.com>
+To:     "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>
+CC:     "Tian, Kevin" <kevin.tian@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>
+Subject: RE: [PATCH 02/13] vfio: Refine vfio file kAPIs
+Thread-Topic: [PATCH 02/13] vfio: Refine vfio file kAPIs
+Thread-Index: AQHZKnqV2uhk3jz+X0eyylG0hfkNaa6kP8aAgBE2gtA=
+Date:   Sun, 29 Jan 2023 13:32:39 +0000
+Message-ID: <DS0PR11MB7529CA3007F75231620940BCC3D29@DS0PR11MB7529.namprd11.prod.outlook.com>
+References: <20230117134942.101112-1-yi.l.liu@intel.com>
+ <20230117134942.101112-3-yi.l.liu@intel.com>
+ <97a22ba3-72d4-7e3a-1b6d-469d5816860d@redhat.com>
+In-Reply-To: <97a22ba3-72d4-7e3a-1b6d-469d5816860d@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS0PR11MB7529:EE_|SA0PR11MB4751:EE_
+x-ms-office365-filtering-correlation-id: 8f086183-9f17-49ec-895c-08db01fd4ac1
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: TL/LRikJTS3PR6wUgBLiMR1Tb0b/Fy3UgvHw9wRniK9r4Z7iHYl66mkylAvLdMHaZ8BZh0nAgkJ9qpqkUKanoOFn8rVDm059A/TS2M4Pg4kl8T29jV7N05PpqAxDsKecjbziEz0cjMYZMZV+6nRNUHLPnW48YucuRykwG4DNpOQA5giMw2va8JBuhYapbRx8WiXXtJlM12fvAvxL8abDUoJ10FuknKAYADasBzcxAGUuPKjNvoFTdgW4IfGxR9vEmuvCmXZI8OKOz+lYETnK9mz+cGlcLO9NtPfMS4wGqjL6nKS43SpcCpxD7ZNRK/7Lunlsr+xrxyPRVvDR5kpLc1W0DhBgsT+8ogCI8p0C537/7ToEvdmq72VmHj7bnuYME81sGsZEvMrNqnpze8gs/pNJ0GJjLKo6gSIvhaRt3uvRxT+2auuuYce1f/SIwQD5S1uTYfKf3miC7LlEoCBZOzDWX35avqfemawVo4xNdibVjLj1m933Xxx7d+EMlBLfCqjTmZnpr0h40pGIlEKzF1M1DotTZTairnmztgKD0THHvzm48uiu6DawCUcdJj6utQ5X6coQGoTKk1IFfZXt7N4Rq3ink/DHgtZ8wh5orKy5RZAvMQyD+HSEaJnRppespCbd9UKdrOCVMIUuCxnElI7l1djtDbPF19j9faGsdrTQqoDjse2VFr67tghFD6LmPHM97glDDj783wLyjKGOZ0Kdvar0nJbhHIByPEn7RTw=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(136003)(376002)(346002)(396003)(39850400004)(366004)(451199018)(52536014)(82960400001)(7416002)(6506007)(4744005)(186003)(9686003)(26005)(55016003)(33656002)(38070700005)(71200400001)(7696005)(478600001)(86362001)(2906002)(38100700002)(316002)(110136005)(54906003)(122000001)(5660300002)(66446008)(66946007)(66476007)(64756008)(41300700001)(66556008)(76116006)(4326008)(8676002)(8936002)(13296009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?WExaSnBFN1BUYjl0eW5qcGVneitQSUpPSSs0ZlAxVUJIb3dIckVKdWltR1hX?=
+ =?utf-8?B?YllPZnREYmgzMTU3Z2NQdDIydzlnTUV5cDVad0EzU2owSm03Q0JCa09aaVJV?=
+ =?utf-8?B?ME1zbW5aMWFNaUhwalZ1N3hYWmZadHhtK1dEUGR6NWZJaU8vVUpLZ0drck5T?=
+ =?utf-8?B?aG5aSWdMODRJL1JVRjB1T0pzZ2xVaEJZTmxRUWtXV0k1bFJzRGJsTE1hNVFO?=
+ =?utf-8?B?RU1QSUJIN0lLNTFwSVFSOFdMZklNd3MwdTBwS05xd2lnK3ZhRHpGSlFSSHVI?=
+ =?utf-8?B?SGVEaUQ2eUYrTk9TTXdUT0lNakpSRkp5cld0OFg0dE1uaWtHaWhRY1Mwaitw?=
+ =?utf-8?B?b0lxKzJlKy92WEtYWjhBZ3BqVWpmTXQzM29NVGZyR1dPZHVEdnVTUmRHaUZS?=
+ =?utf-8?B?dnZjcUh6MWJzclVTakVaUFlzM0NCcXV0cnc1bjk4VURKVEZLK0JGTXptRHh0?=
+ =?utf-8?B?S2RBYWVRdVdPRjZkcENITzdSc3RyZVpiVkZreTN1MlcrQjlOQXU4M3hROG1W?=
+ =?utf-8?B?a1lQd3lJL0JBbFZUdFczcHd4dzJFMFZORjNSNVhGcy8vTUJzVjdBcjBNWUc3?=
+ =?utf-8?B?ZUJvWUlob2ZpbG5VeDg4YzllVGFXaVZ0ZWhXY1RhclpsTTBZUW5IOWZyVnFl?=
+ =?utf-8?B?MW9lc2VaVEN3S3F2bEtJUGMrVjRGRXRmSW1qZmRNd05yRk5IdklOblJRSEdq?=
+ =?utf-8?B?NzAySklCTU10Z2tWT2dudTZabnZkelNRUkpSZVpXTU9lenUyamdHa1plNHd0?=
+ =?utf-8?B?bzVodk50aWIzQ01udFk2MzdZaFhxNzBDUkNMRWVXcmZXY3VRbU0vaXQzUzJp?=
+ =?utf-8?B?VzJJUnlqQjBkTEMraGxHZXlZZ3dCRWtUcVkxM0tmellocFlIQkFrMk1vT0hw?=
+ =?utf-8?B?N0RNTTZqR3QzSHdwWFlKS0Ywdm5hc1JuTEFCelRCS3Zid3RRUVVBQWJWZHNk?=
+ =?utf-8?B?YlJ1Q3J6Ynh1ZGxIZk9QR05rWkF2aVh6RDkyRWJ1dDUzMnhER3pSWFI0MlVO?=
+ =?utf-8?B?VFBUMkVxdVRpRU9OMVd2RHJCMEtBZkJXbFl3b0tod2tzUHZVanJOSFJFOXJs?=
+ =?utf-8?B?MXpLYkRpZ2t5OEs5T2NPRVJON2RLc1dYZ3ZhNDBrTjJic0k2OVp4UTNpOTRV?=
+ =?utf-8?B?VWRtaFhUbU1JSW0rUnJnTVhUYml4NW8wd0VrNGs0dEZBVWR6czBnNVV0R3Ft?=
+ =?utf-8?B?eXZ1dXNkT010LzI0eEplbzhqZndHNG1FWEJDQXJtMlovd01BRStGZXhNSGE5?=
+ =?utf-8?B?TWZjTE1Vbmh5TUtIWGlxOEZaa2J6QXdjbkI4S0VYc0dBam1tUjdOV0VhQUZS?=
+ =?utf-8?B?bkVwMTVDeldyL3EwYTlSOTUyeStKSDArL2t6MU1mSkdadlZmM3cwSHRsQy8r?=
+ =?utf-8?B?MThtbkdLUDl5ZWU3ZnJIOU5RTldnVnl0TVJOTDdQVW0yeU53WXFmdnBUbjQ2?=
+ =?utf-8?B?RCtWYmdZQzcrMDEyRi9HK0JoNXc0Y2pFRzVlVG1RNnpVK1NVQXpESS9kUnlw?=
+ =?utf-8?B?NTY1Mlk4M0VzYzN2UThKdVVWZG1MMThNVXVHeU5ZMTRUVWh1SHFJcXVMR2pH?=
+ =?utf-8?B?MW8zeVZIcGd6c3hqSGJmclVoMWJkNy9wa25xYmZkL3ArN3lrREdSLzVoMlR3?=
+ =?utf-8?B?cEFrSU9pb1JpckoyV0xscW0wdFBaWEZZVENYV0dYYjJUUkpuRkdONG9OR2lP?=
+ =?utf-8?B?eStOSE43cFYwL093bHhXV09Ec0Y4enoraElPUHFaS1dCM1ZzMmp1UDdKMkp4?=
+ =?utf-8?B?TFluRC9DL09WRU1JTS9WT0NuYjZyZiswc1U3NjJ5bkM3RTkwRFkwT2ppaGdQ?=
+ =?utf-8?B?MFZmelFWdEx4ZGRUSXVBZzZzYkk5TkUvSTBoL09weWJweG9EWDlLdmYvWlM5?=
+ =?utf-8?B?bVFaR1RuQ25nWnB0RC8rS3ZPN2RrVmJ3MVozOFJGbnVpY3ErUXNnZDdXQkdU?=
+ =?utf-8?B?STMzdjB4RkRkb0NQWnhwbDRJUnZhWUc5b0FIczU3MjJDUURjMDR6eDlXL0c4?=
+ =?utf-8?B?UkNobENnM09IVHNhUUdTOXVKU2FSQkNSL0szS0tjWXNuMm5rVlg1V3J1eXB1?=
+ =?utf-8?B?bU9mVFFhc0E4aHh2THhKVEZ0S0JtSkZ5Y1NYcUo3SmJFMUV1WWNUNXNpQTla?=
+ =?utf-8?Q?RipYAgkvq37sjiMUlnze0MFJ/?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20230127182558.2416400-1-atishp@rivosinc.com> <20230127182558.2416400-12-atishp@rivosinc.com>
-In-Reply-To: <20230127182558.2416400-12-atishp@rivosinc.com>
-From:   Anup Patel <anup@brainfault.org>
-Date:   Sun, 29 Jan 2023 18:14:18 +0530
-Message-ID: <CAAhSdy1+6AprOdzRRTG98p6swisNFO6MUKjXobxW3RWbixvjCg@mail.gmail.com>
-Subject: Re: [PATCH v3 11/14] RISC-V: KVM: Implement trap & emulate for hpmcounters
-To:     Atish Patra <atishp@rivosinc.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        linux-riscv@lists.infradead.org,
-        Mark Rutland <mark.rutland@arm.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Sergey Matyukevich <sergey.matyukevich@syntacore.com>,
-        Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8f086183-9f17-49ec-895c-08db01fd4ac1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2023 13:32:39.5295
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: L0h95b8h8cPugxHiNJz/wus6N4pHhiRfhSku5sdBzHTwT290Y2DOOMLCwqVqSP2ULWTtzoEPCfgqS3nySCX9HQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4751
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 11:56 PM Atish Patra <atishp@rivosinc.com> wrote:
->
-> As the KVM guests only see the virtual PMU counters, all hpmcounter
-> access should trap and KVM emulates the read access on behalf of guests.
->
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> ---
->  arch/riscv/include/asm/kvm_vcpu_pmu.h | 16 ++++++++++
->  arch/riscv/kvm/vcpu_insn.c            |  4 ++-
->  arch/riscv/kvm/vcpu_pmu.c             | 45 ++++++++++++++++++++++++++-
->  3 files changed, 63 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> index 3f43a43..022d45d 100644
-> --- a/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
-> @@ -43,6 +43,19 @@ struct kvm_pmu {
->  #define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
->  #define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
->
-> +#if defined(CONFIG_32BIT)
-> +#define KVM_RISCV_VCPU_HPMCOUNTER_CSR_FUNCS \
-> +{ .base = CSR_CYCLEH,      .count = 31, .func = kvm_riscv_vcpu_pmu_read_hpm }, \
-> +{ .base = CSR_CYCLE,      .count = 31, .func = kvm_riscv_vcpu_pmu_read_hpm },
-> +#else
-> +#define KVM_RISCV_VCPU_HPMCOUNTER_CSR_FUNCS \
-> +{ .base = CSR_CYCLE,      .count = 31, .func = kvm_riscv_vcpu_pmu_read_hpm },
-> +#endif
-> +
-> +int kvm_riscv_vcpu_pmu_read_hpm(struct kvm_vcpu *vcpu, unsigned int csr_num,
-> +                               unsigned long *val, unsigned long new_val,
-> +                               unsigned long wr_mask);
-> +
->  int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_ext_data *edata);
->  int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
->                                 struct kvm_vcpu_sbi_ext_data *edata);
-> @@ -65,6 +78,9 @@ void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
->  #else
->  struct kvm_pmu {
->  };
-> +#define KVM_RISCV_VCPU_HPMCOUNTER_CSR_FUNCS \
-> +{ .base = 0,      .count = 0, .func = NULL },
-> +
-
-Redundant newline here.
-
->
->  static inline int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
->  {
-> diff --git a/arch/riscv/kvm/vcpu_insn.c b/arch/riscv/kvm/vcpu_insn.c
-> index 0bb5276..f689337 100644
-> --- a/arch/riscv/kvm/vcpu_insn.c
-> +++ b/arch/riscv/kvm/vcpu_insn.c
-> @@ -213,7 +213,9 @@ struct csr_func {
->                     unsigned long wr_mask);
->  };
->
-> -static const struct csr_func csr_funcs[] = { };
-> +static const struct csr_func csr_funcs[] = {
-> +       KVM_RISCV_VCPU_HPMCOUNTER_CSR_FUNCS
-> +};
->
->  /**
->   * kvm_riscv_vcpu_csr_return -- Handle CSR read/write after user space
-> diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> index 7713927..894053a 100644
-> --- a/arch/riscv/kvm/vcpu_pmu.c
-> +++ b/arch/riscv/kvm/vcpu_pmu.c
-> @@ -17,6 +17,44 @@
->
->  #define kvm_pmu_num_counters(pmu) ((pmu)->num_hw_ctrs + (pmu)->num_fw_ctrs)
->
-> +static int pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
-> +                       unsigned long *out_val)
-> +{
-> +       struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> +       struct kvm_pmc *pmc;
-> +       u64 enabled, running;
-> +
-> +       pmc = &kvpmu->pmc[cidx];
-> +       if (!pmc->perf_event)
-> +               return -EINVAL;
-> +
-> +       pmc->counter_val += perf_event_read_value(pmc->perf_event, &enabled, &running);
-> +       *out_val = pmc->counter_val;
-> +
-> +       return 0;
-> +}
-> +
-> +int kvm_riscv_vcpu_pmu_read_hpm(struct kvm_vcpu *vcpu, unsigned int csr_num,
-> +                               unsigned long *val, unsigned long new_val,
-> +                               unsigned long wr_mask)
-> +{
-> +       struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> +       int cidx, ret = KVM_INSN_CONTINUE_NEXT_SEPC;
-> +
-> +       if (!kvpmu || !kvpmu->init_done)
-> +               return KVM_INSN_EXIT_TO_USER_SPACE;
-
-As discussed previously, this should be KVM_INSN_ILLEGAL_TRAP.
-
-> +
-> +       if (wr_mask)
-> +               return KVM_INSN_ILLEGAL_TRAP;
-> +
-> +       cidx = csr_num - CSR_CYCLE;
-> +
-> +       if (pmu_ctr_read(vcpu, cidx, val) < 0)
-> +               return KVM_INSN_EXIT_TO_USER_SPACE;
-
-Same as above.
-
-> +
-> +       return ret;
-> +}
-> +
->  int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_ext_data *edata)
->  {
->         struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
-> @@ -69,7 +107,12 @@ int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_ba
->  int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
->                                 struct kvm_vcpu_sbi_ext_data *edata)
->  {
-> -       /* TODO */
-> +       int ret;
-> +
-> +       ret = pmu_ctr_read(vcpu, cidx, &edata->out_val);
-> +       if (ret == -EINVAL)
-> +               edata->err_val = SBI_ERR_INVALID_PARAM;
-> +
->         return 0;
->  }
->
-> --
-> 2.25.1
->
-
-Regards,
-Anup
+SGkgRXJpYywNCg0KPiBGcm9tOiBFcmljIEF1Z2VyIDxlcmljLmF1Z2VyQHJlZGhhdC5jb20+DQo+
+IFNlbnQ6IFdlZG5lc2RheSwgSmFudWFyeSAxOCwgMjAyMyAxMDozNyBQTQ0KDQo+ID4gKy8qKg0K
+PiA+ICsgKiB2ZmlvX2ZpbGVfaGFzX2RldiAtIFRydWUgaWYgdGhlIFZGSU8gZmlsZSBpcyBhIGhh
+bmRsZSBmb3IgZGV2aWNlDQo+IFRoaXMgb3JpZ2luYWwgZGVzY3JpcHRpb24gc291bmRzIHdlaXJk
+IGJlY2F1c2Ugb3JpZ2luYWxseSBpdCBhaW1lZA0KPiBhdCBmaWd1cmluZyB3aGV0aGVyIHRoZSBk
+ZXZpY2UgYmVsb25nZWQgdG8gdGhhdCB2ZmlvIGdyb3VwIGZkLCBubz8NCj4gQW5kIHNpbmNlIGl0
+IHdpbGwgaGFuZGxlIGJvdGggZ3JvdXAgZmQgYW5kIGRldmljZSBmZCBpdCBzdGlsbCBzb3VuZHMN
+Cj4gd2VpcmQgdG8gbWUuDQoNClllcy4gSXQgaXMgdG8gY2hlY2sgaWYgYSBkZXZpY2UgYmVsb25n
+cyB0byB0aGUgaW5wdXQgdmZpbyBncm91cCBzcGVjaWZpZWQNCmJ5IHRoZSBncm91cCBmZC4gQW5k
+IGFmdGVyIHRoaXMgY29tbWl0LCBpdCBtZWFucyBpZiB0aGUgaW5wdXQgZmlsZSBpcw0KY29tcGV0
+ZW50IHRvIGJlIGhhbmRsZSBmb3IgdGhlIGRldmljZSBlaXRoZXIgZHVlIHRvIGJlbG9uZyB0byBn
+cm91cA0Kb3IgaXQgaXMganVzdCBhIGRldmljZSBmZCBmb3IgdGhlIGRldmljZS4gSSBkb27igJl0
+IGhhdmUgYSBiZXR0ZXIgbmFtaW5nIHNvDQpmYXIuIEhvdyBhYm91dCB5b3U/DQoNClJlZ2FyZHMs
+DQpZaSBMaXUNCg==
