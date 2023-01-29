@@ -2,55 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 270BF67FB30
-	for <lists+kvm@lfdr.de>; Sat, 28 Jan 2023 22:43:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7777267FBFE
+	for <lists+kvm@lfdr.de>; Sun, 29 Jan 2023 01:47:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233952AbjA1VnG (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Sat, 28 Jan 2023 16:43:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42242 "EHLO
+        id S230452AbjA2ArI (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Sat, 28 Jan 2023 19:47:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230303AbjA1VnE (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Sat, 28 Jan 2023 16:43:04 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E643B20044;
-        Sat, 28 Jan 2023 13:43:01 -0800 (PST)
+        with ESMTP id S229580AbjA2ArG (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Sat, 28 Jan 2023 19:47:06 -0500
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ADEC1E9FC;
+        Sat, 28 Jan 2023 16:47:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1674942181; x=1706478181;
+  t=1674953224; x=1706489224;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:content-transfer-encoding:in-reply-to;
-  bh=PyhpbJ8qguYYZgn0dx69wiKvFWxrEB0n/lsLke30HeQ=;
-  b=RLmAL9eYCpJrvdV+DJozQLYyZ6A+CxN/ObG8dlDg02YWxTwpbwch1NTI
-   8tJYPvhphC8y7i+GDYDET6JJU+HJ9toQoYRgxUW6dk7cg+BiwIFZeJGRJ
-   NxXTKxFmvmUVtg6rVL/MDdBnN/1ev6jKzbb3rt2jWcjGTCnpJ49g82vUX
-   rpaeAkAYkjz2KwtOFfKDAtE7ycxZnjMro9cRUkjc42DkIy6AWo39q0UxT
-   ANZOckKJLYaZDuZnCZ8lIn8Xyd+WPLULGa7bdZ9bRArK6ikvCWW7LCLto
-   ZqMUVEiW6/11egH7lgldriNGtFlwafY8nQboEaVvkmnzSodeq/er0hcrF
-   Q==;
-X-IronPort-AV: E=McAfee;i="6500,9779,10604"; a="326009587"
+  bh=IjeBv+g6Uh5/Lci6CgNWIv3NPbnvvVnDcJrFkJBs470=;
+  b=klkP81itpDZfkoj/YU+Zqkbr5s+Sk0TTCgm31qZBRzRKB5CZ3EqLImIB
+   EUgbGDG+7u9u62muJTeZQIsjAP85La4d4LMmU3lUQBURVhhOay7In1ehg
+   mIklsxLcXQNPm4T+1DAbyMtjetkZJISTZ6c5JXYoaYwoGOCUgn5fCvkqg
+   lisjItSkhl7C5tSI3JG+u4me3IgPlCu3aAMB3OZFYgKKLy48hXX6vZYTE
+   LSR5RfyppHrhjT5qTnzHGzjl0IHJp8ZixXGT8mfwlTxhybVGcCJS7ZFaV
+   iHWDoFpdcjMg8oUx0MuCgLjQQ0FwNlx+X9GFLbKDMymDrGgrfOpsfLu5u
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10604"; a="329478143"
 X-IronPort-AV: E=Sophos;i="5.97,254,1669104000"; 
-   d="scan'208";a="326009587"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2023 13:43:01 -0800
+   d="scan'208";a="329478143"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2023 16:47:03 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6500,9779,10604"; a="992446763"
+X-IronPort-AV: E=McAfee;i="6500,9779,10604"; a="752390872"
 X-IronPort-AV: E=Sophos;i="5.97,254,1669104000"; 
-   d="scan'208";a="992446763"
+   d="scan'208";a="752390872"
 Received: from lkp-server01.sh.intel.com (HELO ffa7f14d1d0f) ([10.239.97.150])
-  by fmsmga005.fm.intel.com with ESMTP; 28 Jan 2023 13:42:59 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 28 Jan 2023 16:47:00 -0800
 Received: from kbuild by ffa7f14d1d0f with local (Exim 4.96)
         (envelope-from <lkp@intel.com>)
-        id 1pLsyL-00018e-2d;
-        Sat, 28 Jan 2023 21:42:53 +0000
-Date:   Sun, 29 Jan 2023 05:42:39 +0800
+        id 1pLvqV-0001H2-32;
+        Sun, 29 Jan 2023 00:46:59 +0000
+Date:   Sun, 29 Jan 2023 08:46:45 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     David Stevens <stevensd@chromium.org>,
         Sean Christopherson <seanjc@google.com>,
         David Woodhouse <dwmw@amazon.co.uk>
-Cc:     oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, David Stevens <stevensd@chromium.org>
+Cc:     llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        David Stevens <stevensd@chromium.org>
 Subject: Re: [PATCH 1/3] KVM: Support sharing gpc locks
-Message-ID: <202301290541.8nmbLtFC-lkp@intel.com>
+Message-ID: <202301290827.aRAvXuk9-lkp@intel.com>
 References: <20230127044500.680329-2-stevensd@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
@@ -81,28 +82,37 @@ url:    https://github.com/intel-lab-lkp/linux/commits/David-Stevens/KVM-Support
 base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
 patch link:    https://lore.kernel.org/r/20230127044500.680329-2-stevensd%40google.com
 patch subject: [PATCH 1/3] KVM: Support sharing gpc locks
-config: i386-randconfig-a003 (https://download.01.org/0day-ci/archive/20230129/202301290541.8nmbLtFC-lkp@intel.com/config)
-compiler: gcc-11 (Debian 11.3.0-8) 11.3.0
+config: x86_64-randconfig-a014 (https://download.01.org/0day-ci/archive/20230129/202301290827.aRAvXuk9-lkp@intel.com/config)
+compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
 reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
         # https://github.com/intel-lab-lkp/linux/commit/14d62b317199184bb71256cc5f652b04fb2f9107
         git remote add linux-review https://github.com/intel-lab-lkp/linux
         git fetch --no-tags linux-review David-Stevens/KVM-Support-sharing-gpc-locks/20230128-161425
         git checkout 14d62b317199184bb71256cc5f652b04fb2f9107
         # save the config file
         mkdir build_dir && cp config build_dir/.config
-        make W=1 O=build_dir ARCH=i386 olddefconfig
-        make W=1 O=build_dir ARCH=i386 SHELL=/bin/bash arch/x86/ drivers/
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 olddefconfig
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
 
 If you fix the issue, kindly add following tag where applicable
 | Reported-by: kernel test robot <lkp@intel.com>
 
 All errors (new ones prefixed by >>):
 
-   arch/x86/kvm/xen.c: In function 'kvm_xen_update_runstate_guest':
->> arch/x86/kvm/xen.c:319:45: error: 'gpc1->lock' is a pointer; did you mean to use '->'?
-     319 |                 lock_set_subclass(gpc1->lock.dep_map, 1, _THIS_IP_);
-         |                                             ^
-         |                                             ->
+>> arch/x86/kvm/xen.c:319:31: error: member reference type 'rwlock_t *' is a pointer; did you mean to use '->'?
+                   lock_set_subclass(gpc1->lock.dep_map, 1, _THIS_IP_);
+                                     ~~~~~~~~~~^
+                                               ->
+>> arch/x86/kvm/xen.c:319:21: error: passing 'struct lockdep_map' to parameter of incompatible type 'struct lockdep_map *'; take the address with &
+                   lock_set_subclass(gpc1->lock.dep_map, 1, _THIS_IP_);
+                                     ^~~~~~~~~~~~~~~~~~
+                                     &
+   include/linux/lockdep.h:296:58: note: passing argument to parameter 'lock' here
+   static inline void lock_set_subclass(struct lockdep_map *lock,
+                                                            ^
+   2 errors generated.
 
 
 vim +319 arch/x86/kvm/xen.c
