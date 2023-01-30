@@ -2,77 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id DE6AC681939
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:31:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id EFD7368193B
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:32:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238076AbjA3Sb5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 13:31:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36624 "EHLO
+        id S238276AbjA3ScG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 13:32:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238217AbjA3Sbh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 13:31:37 -0500
-Received: from out-67.mta0.migadu.com (out-67.mta0.migadu.com [IPv6:2001:41d0:1004:224b::43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B78E3D0BC
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 10:30:48 -0800 (PST)
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1675103446;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=lSCOsA3l6Whj8D78VA9+MZnM9iSGeCkaTGiJhbHGKtw=;
-        b=Sa3NAHBJGd/Y8jLn840YqKwTtbKLBb+HGNVenj0ef9CdXK0Xb9SKXXkhxcppxxvIqj4Yrr
-        H3CXzdNBfsFGrymB0haGCirRyhAMkg4+dQChXLey9s5GsPiufKF0sKUZf0W7IxtfJ8Dc42
-        QJUhj+sMPki3unPUtmcmR08P9SMD19Q=
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     linux-arm-kernel@lists.infradead.org,
-        Marc Zyngier <maz@kernel.org>, kvmarm@lists.cs.columbia.edu,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc:     Oliver Upton <oliver.upton@linux.dev>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        James Morse <james.morse@arm.com>,
-        D Scott Phillips <scott@os.amperecomputing.com>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 0/3] KVM: arm64: timer fixes and optimisations
-Date:   Mon, 30 Jan 2023 18:30:34 +0000
-Message-Id: <167510336269.1083059.9962999448888534799.b4-ty@linux.dev>
-In-Reply-To: <20230112123829.458912-1-maz@kernel.org>
-References: <20230112123829.458912-1-maz@kernel.org>
+        with ESMTP id S235891AbjA3Sbp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 13:31:45 -0500
+Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A43816314
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 10:30:54 -0800 (PST)
+Received: by mail-qt1-x830.google.com with SMTP id h24so2896477qtr.0
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 10:30:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zx/PI8cqG2+EaOq03efBGUF5spQGwS7QnFbIzH7bNaw=;
+        b=JkcE2So2T5MCTPbp2p8WcW/bU3yjpylUCXz6UlrGmQHcd+PBvO/Lw1AB+QbzggssgC
+         sfwruiRnFDwcBb8J7h2XZNYviyjVBxAT2WFSi+SMybKf8coYnhaNKrI9ayQotRXWSeIj
+         JptuBbwp2nCoNf8oCCKtqCIoNKoMmUbU52BON5/BenOheOeT4RX4+jNMs9co3kbqHrCu
+         5hK1O2jQ6KN+Vr+rBFOc7ghNUtB9SEAr8YcyUKdnnZ7ToiZ47TowjazDZmaSIl6dRTtv
+         swc6b1qwkwcxc+Vu/2op7OzSPwNOE+J7tBNHWQqJHsOfCRDfXRMtnaV4GQOTwzygi4P9
+         SrAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Zx/PI8cqG2+EaOq03efBGUF5spQGwS7QnFbIzH7bNaw=;
+        b=EPcWCis5i3LWK/2Pn8jTStXVPsoh2mhugbWXO1t6rGXLfiSVdE2Bd9glBtOf9JpZwU
+         ZY2LKx+HalLG6qxosAqx2g/09wi+2iqUP6xSigmsee5XjT2B8jCcjifIHMY1+mCyvVLx
+         9tLstCiI5o1KS2Rs7HFvKSfYMpoZbriAjf5ZH2H9SPoXp9E+CmuYOFyLmNzoiskfd/FE
+         yntO+mp/BFRKif6jJ7ey3eibGKl+lXQIqnn+wzUF21ECPnVkE8ZNsDjvhLjmBzwMItEW
+         /K7MWyd7EzbMGCqS8XQQGi4OLWPv26TYEVDyEzPAlbT9AnJrOy4hPRrSVMjGNX+QdUZY
+         IJqg==
+X-Gm-Message-State: AO0yUKWjR0LifoLJa7J1EjQdkh1SYnEArOheloqItn9LeF5A3RrnXels
+        eLKU+JR4SzNPcGkxRTJeDwkVHh252GHdytHM
+X-Google-Smtp-Source: AK7set8UG2lj0mTFkSwAk6ffmg7pUvx5blWuKd7HMb8t5vhWEH4y1bWQciKzeiyBGfEzfX4qJO9mQw==
+X-Received: by 2002:a05:622a:1042:b0:3b8:461c:12ed with SMTP id f2-20020a05622a104200b003b8461c12edmr14300022qte.8.1675103451536;
+        Mon, 30 Jan 2023 10:30:51 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-167-59-176.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.167.59.176])
+        by smtp.gmail.com with ESMTPSA id o8-20020ac80248000000b003b64f1b1f40sm8466415qtg.40.2023.01.30.10.30.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 10:30:51 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.95)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1pMYva-001MRl-E7;
+        Mon, 30 Jan 2023 14:30:50 -0400
+Date:   Mon, 30 Jan 2023 14:30:50 -0400
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Bo Liu <liubo03@inspur.com>
+Cc:     kwankhede@nvidia.com, alex.williamson@redhat.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vfio/mdev: Use sysfs_emit() to instead of sprintf()
+Message-ID: <Y9gM2slmBuqZ6QkQ@ziepe.ca>
+References: <20230129084117.2384-1-liubo03@inspur.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230129084117.2384-1-liubo03@inspur.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 12 Jan 2023 12:38:26 +0000, Marc Zyngier wrote:
-> Having been busy on the NV front the past few weeks, I collected a
-> small set of fixes/improvements that make sense even outside of NV.
+On Sun, Jan 29, 2023 at 03:41:17AM -0500, Bo Liu wrote:
+> Follow the advice of the Documentation/filesystems/sysfs.rst and show()
+> should only use sysfs_emit() or sysfs_emit_at() when formatting the
+> value to be returned to user space.
 > 
-> The first one is an interesting fix (actually a regression introduced
-> by the initial set of NV-related patches) reported by Scott and
-> Ganapatrao, where we fail to recognise that a timer that has fired
-> doesn't need to fire again. And again.
-> 
-> [...]
+> Signed-off-by: Bo Liu <liubo03@inspur.com>
+> ---
+>  drivers/vfio/mdev/mdev_sysfs.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied to kvmarm/next, thanks!
+Sure
 
-[1/3] KVM: arm64: Don't arm a hrtimer for an already pending timer
-      https://git.kernel.org/kvmarm/kvmarm/c/4d74ecfa6458
-[2/3] KVM: arm64: Reduce overhead of trapped timer sysreg accesses
-      https://git.kernel.org/kvmarm/kvmarm/c/fc6ee952cf00
-[3/3] KVM: arm64: timers: Don't BUG() on unhandled timer trap
-      https://git.kernel.org/kvmarm/kvmarm/c/ba82e06cf7f4
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
---
-Best,
-Oliver
+Jason
