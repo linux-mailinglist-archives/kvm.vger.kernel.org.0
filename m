@@ -2,116 +2,90 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 58115681946
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:35:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5121B681969
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:37:51 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237948AbjA3Sfe (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 13:35:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43482 "EHLO
+        id S238342AbjA3Sht (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 13:37:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237393AbjA3Sfd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 13:35:33 -0500
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98357170F;
-        Mon, 30 Jan 2023 10:35:30 -0800 (PST)
-Received: by mail-ej1-x631.google.com with SMTP id dr8so12888525ejc.12;
-        Mon, 30 Jan 2023 10:35:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=9FE8Tg/ETfLF2znBVGSneSNpDHtD4K+4dzhis/koiic=;
-        b=TdmKB3xUWwABi5gYQNKjBDn+QIkfyNCfLMKldrUBcWh0xLgeMjLs3Qub+GOKGwMozm
-         FUbJ1XZpC2jhGxFhyyhzN118RA97F6oSOXm3m1/Wk+FMjfUWolHE100s5kNNs+L38530
-         uOMnspdpGVscA37fmr5QPdeoxhIyThNBJdmwhiF6nQnureuktWkd6Kjmwi65jygf0nHZ
-         rIy2rkDK2Db/9GyNHpy3U5BFUA5hqu2EF0t9o15V7jSS6IE6idX4bXNtQazLjHQ6mKVg
-         66TdcLQr33MVchRcfI9E3P1LjAwRTNx+NjLiDce4tI2AmTdZIRtd42lzwZYv312KXNeQ
-         C0ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9FE8Tg/ETfLF2znBVGSneSNpDHtD4K+4dzhis/koiic=;
-        b=Ofl4uXiXhCZCIHhOX5LlX3U++GgUD/AfnBc4WI11c03JGtcdUB7DQsH6YI9t9EBTJC
-         Z0v9OGWGYjNwT7uFPleulD683C6nDcWu9f6Y4DsoFXL73S5j2YhSJjAKh6oSTueKXEBk
-         4gxyqJNeew8OVveDIo2p4efbtndy03iHM2o4AjoGzS0acrYqZc3f/yxp6OZVZWOM4ibS
-         zksM5+LL01aS1+WinBGffu2RSeqljJEgrLoy50VK0/BO7YFSmUW0uBHHPjKcLG3FTd/s
-         PZ12WsHVeTuFrhEqDocPNs5PBd2V15QyUcn9TCw6Xx5ugn+EtUhRxd9P2BwfONqK5cb5
-         VJyw==
-X-Gm-Message-State: AFqh2koVoejSB49Rt+fI7qlLud79mKaUDJLr0Ksc17fdVGghDQIfZc/a
-        FEQt1S5uJ9kuuUCRrCqf2BRjGbVvUn2HAVObheI=
-X-Google-Smtp-Source: AMrXdXvnrppwjWc2GYoaSQvqFwNiTQID4l0gmI8rLvQT5AS+GqW5c9yL3gsxiJUvTOWQUcAgkpnAGLzZ827Cy2iv9XQ=
-X-Received: by 2002:a17:906:3658:b0:872:68a:a17e with SMTP id
- r24-20020a170906365800b00872068aa17emr7442256ejb.159.1675103729082; Mon, 30
- Jan 2023 10:35:29 -0800 (PST)
-MIME-Version: 1.0
-References: <20230130092157.1759539-2-hch@lst.de> <20230130092157.1759539-1-hch@lst.de>
- <3347557.1675074816@warthog.procyon.org.uk> <20230130103619.GA11874@lst.de>
-In-Reply-To: <20230130103619.GA11874@lst.de>
-From:   Ilya Dryomov <idryomov@gmail.com>
-Date:   Mon, 30 Jan 2023 19:35:17 +0100
-Message-ID: <CAOi1vP_aU58YpiOkYgQy4a=VVnm64WeWH5pwYf+bc_C=COYY3g@mail.gmail.com>
-Subject: Re: [PATCH 01/23] block: factor out a bvec_set_page helper
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     David Howells <dhowells@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mike Marshall <hubcap@omnibond.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        with ESMTP id S235170AbjA3Shb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 13:37:31 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D96B7AAF;
+        Mon, 30 Jan 2023 10:36:42 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DDC211FB;
+        Mon, 30 Jan 2023 10:37:23 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.12.187])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBF2C3F71E;
+        Mon, 30 Jan 2023 10:36:39 -0800 (PST)
+Date:   Mon, 30 Jan 2023 18:36:32 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Josh Poimboeuf <jpoimboe@kernel.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        Jiri Kosina <jikos@kernel.org>, linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
+        live-patching@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <Y9gOMCWGmoc5GQMj@FVFF77S0Q05N>
+References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
+ <Y9KyVKQk3eH+RRse@alley>
+ <Y9LswwnPAf+nOVFG@do-x1extreme>
+ <20230127044355.frggdswx424kd5dq@treble>
+ <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
+ <20230127165236.rjcp6jm6csdta6z3@treble>
+ <20230127170946.zey6xbr4sm4kvh3x@treble>
+ <20230127221131.sdneyrlxxhc4h3fa@treble>
+ <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 11:36 AM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Mon, Jan 30, 2023 at 10:33:36AM +0000, David Howells wrote:
-> > Christoph Hellwig <hch@lst.de> wrote:
-> >
-> > > +static inline void bvec_set_page(struct bio_vec *bv, struct page *page,
-> > > +           unsigned int len, unsigned int offset)
-> >
-> > Could you swap len and offset around?  It reads better offset first.  You move
-> > offset into the page and then do something with len bytes.
->
-> This matches bio_add_page and the order inside bio_vec itself.  willy
-> wanted to switch it around for bio_add_folio but Jens didn't like it,
-> so I'll stick to the current convention in this area as well.
+On Mon, Jan 30, 2023 at 01:40:18PM +0100, Peter Zijlstra wrote:
+> On Fri, Jan 27, 2023 at 02:11:31PM -0800, Josh Poimboeuf wrote:
+> > @@ -8500,8 +8502,10 @@ EXPORT_STATIC_CALL_TRAMP(might_resched);
+> >  static DEFINE_STATIC_KEY_FALSE(sk_dynamic_cond_resched);
+> >  int __sched dynamic_cond_resched(void)
+> >  {
+> > -	if (!static_branch_unlikely(&sk_dynamic_cond_resched))
+> > +	if (!static_branch_unlikely(&sk_dynamic_cond_resched)) {
+> > +		klp_sched_try_switch();
+> >  		return 0;
+> > +	}
+> >  	return __cond_resched();
+> >  }
+> >  EXPORT_SYMBOL(dynamic_cond_resched);
+> 
+> I would make the klp_sched_try_switch() not depend on
+> sk_dynamic_cond_resched, because __cond_resched() is not a guaranteed
+> pass through __schedule().
+> 
+> But you'll probably want to check with Mark here, this all might
+> generate crap code on arm64.
 
-This also matches sg_set_page() so sticking to the current convention
-is definitely a good idea!
+IIUC here klp_sched_try_switch() is a static call, so on arm64 this'll generate
+at least a load, a conditional branch, and an indirect branch. That's not
+ideal, but I'd have to benchmark it to find out whether it's a significant
+overhead relative to the baseline of PREEMPT_DYNAMIC.
+
+For arm64 it'd be a bit nicer to have another static key check, and a call to
+__klp_sched_try_switch(). That way the static key check gets turned into a NOP
+in the common case, and the call to __klp_sched_try_switch() can be a direct
+call (potentially a tail-call if we made it return 0).
 
 Thanks,
-
-                Ilya
+Mark.
