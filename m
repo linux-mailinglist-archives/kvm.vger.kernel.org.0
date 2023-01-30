@@ -2,178 +2,181 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7491B681886
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:19:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 37F7A681897
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:20:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236672AbjA3STC (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 13:19:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50678 "EHLO
+        id S237846AbjA3ST6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 13:19:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235043AbjA3STB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 13:19:01 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67DBC7DAE;
-        Mon, 30 Jan 2023 10:18:59 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 17221B815DF;
-        Mon, 30 Jan 2023 18:18:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48E1AC433D2;
-        Mon, 30 Jan 2023 18:18:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675102736;
-        bh=PEg0sSTCrY0yNh3mUFBP7zlDy/BwcKXxPNf43sPcBQc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=abfDEXHFf7benkYjeTV2uRAGzfKU5LpMpYJ7uS7Kcv7AdaJyQrb9vcQaBWBsnf550
-         zZhDZEeqv9yW8uNMbCAhsP8DQUX1dPGHNwDZWqXToEH0bSogjxQKF/I6ImNqyrlkbt
-         AwCDmqv0HqKbyeZO+Bb/f01U9qjNr4bWK2LQx5fUdPkJr3vQvzg7QQLCI+xCiRqyuo
-         J88BkftT6ClbgAR3h4nEl9jG5/2YZeGkcA1m8/eXk3iMuSZ8X+tcOSHA9w6vU2YraA
-         0SjyVQIgZvM+R8+EOXq5kBf76j6GTXExUBflGl2vdG66zWu1PLPsP6yYx8Gnws5led
-         U9f+Pu8zRqCZg==
-Date:   Mon, 30 Jan 2023 10:18:53 -0800
-From:   Josh Poimboeuf <jpoimboe@kernel.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        Jiri Kosina <jikos@kernel.org>, linux-kernel@vger.kernel.org,
+        with ESMTP id S237508AbjA3STn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 13:19:43 -0500
+Received: from mail-il1-x131.google.com (mail-il1-x131.google.com [IPv6:2607:f8b0:4864:20::131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 207D538E81
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 10:19:41 -0800 (PST)
+Received: by mail-il1-x131.google.com with SMTP id i6so1619083ilq.8
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 10:19:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CAFjNasnKQN5LUWGdN7AtadW817QQm7F4FvMhjCHwb0=;
+        b=RfZdv5XTG+8uD8qkRBhdwNBF0cK8e8hji8B33Gj95Q6avMrpQVnYUAuUvQ6T7IR8+p
+         MYCxMzFUWeWWkyawSiU0lbQwLFknwHfAQy3hsCbXbZdWrjCG2Tc3YHS7D6WPN1oWkG0f
+         eFMyiUb05xok2QkhaK8jh7WLReqLeYSqv2qpU=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CAFjNasnKQN5LUWGdN7AtadW817QQm7F4FvMhjCHwb0=;
+        b=bPVHQZUDIHy2kaeCp02Pfy9aqMxGzx5IQrB0PR6JWVLYuKX3hVOTeti8E0UeC3ei8l
+         4hVN4nnzAPq3EjWJK8mJTM3g3PBcWBqEojotckUIJqoJK7T0ak2WGbozi4c77xZ7jocG
+         2A3rg0j4w81eF/ErVNRJw3GJrCYS4knBAqoHvaKvf1NUq4dQkhiZ0MbxyCGEweKTnIoP
+         9L9kQcnw5Vs4yml1OK3MEL/PXCIsD7/0buCQB8s5c5aSoUJxt1U638M9qtijgMJ5pK+J
+         4BmqpkwSD33ZiYBzIbQvYcW+VLsEm7emGGbiwur0msFBmFrVT4j9cW0mozoS5lCsrvd8
+         6KlQ==
+X-Gm-Message-State: AO0yUKWFVw+qnaTtoqjlSIT22HvD3ilV/O1qSuo3Q5ZZHaET8kQtJS2l
+        yvpmjdah3nXoEviTG4ujninxeg==
+X-Google-Smtp-Source: AK7set+mwFjhaqPt63RqulQxBusxgMUOOgqwMk/p2L94uGQONgxdBYrhcYQqNFbg7qLSnkSytLx+CQ==
+X-Received: by 2002:a05:6e02:1541:b0:310:c510:780c with SMTP id j1-20020a056e02154100b00310c510780cmr12382570ilu.11.1675102780494;
+        Mon, 30 Jan 2023 10:19:40 -0800 (PST)
+Received: from ravnica.bld.corp.google.com ([2620:15c:183:200:fc8a:dd2f:5914:df14])
+        by smtp.gmail.com with ESMTPSA id o16-20020a056e02115000b002f139ba4135sm4189801ill.86.2023.01.30.10.19.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 10:19:40 -0800 (PST)
+From:   Ross Zwisler <zwisler@chromium.org>
+X-Google-Original-From: Ross Zwisler <zwisler@google.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Ross Zwisler <zwisler@google.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        "Tobin C. Harding" <me@tobin.cc>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Hao Luo <haoluo@google.com>, Huang Rui <ray.huang@amd.com>,
+        Ingo Molnar <mingo@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Wang <jasowang@redhat.com>, Jiri Olsa <jolsa@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mykola Lysenko <mykolal@fb.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Todd E Brandt <todd.e.brandt@linux.intel.com>,
+        Tycho Andersen <tycho@tycho.pizza>, Yonghong Song <yhs@fb.com>,
+        bpf@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hardening@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
-        live-patching@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
- loaded vhost worker kthreads
-Message-ID: <20230130181853.irl3iqs7e23gw2kr@treble>
-References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
- <Y9KyVKQk3eH+RRse@alley>
- <Y9LswwnPAf+nOVFG@do-x1extreme>
- <20230127044355.frggdswx424kd5dq@treble>
- <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
- <20230127165236.rjcp6jm6csdta6z3@treble>
- <20230127170946.zey6xbr4sm4kvh3x@treble>
- <20230127221131.sdneyrlxxhc4h3fa@treble>
- <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
+        linux-trace-kernel@vger.kernel.org
+Subject: [PATCH 0/9] use canonical ftrace path whenever possible
+Date:   Mon, 30 Jan 2023 11:19:06 -0700
+Message-Id: <20230130181915.1113313-1-zwisler@google.com>
+X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 01:40:18PM +0100, Peter Zijlstra wrote:
-> On Fri, Jan 27, 2023 at 02:11:31PM -0800, Josh Poimboeuf wrote:
-> 
-> 
-> > diff --git a/include/linux/sched.h b/include/linux/sched.h
-> > index 4df2b3e76b30..fbcd3acca25c 100644
-> > --- a/include/linux/sched.h
-> > +++ b/include/linux/sched.h
-> > @@ -36,6 +36,7 @@
-> >  #include <linux/seqlock.h>
-> >  #include <linux/kcsan.h>
-> >  #include <linux/rv.h>
-> > +#include <linux/livepatch_sched.h>
-> >  #include <asm/kmap_size.h>
-> >  
-> >  /* task_struct member predeclarations (sorted alphabetically): */
-> > @@ -2074,6 +2075,9 @@ DECLARE_STATIC_CALL(cond_resched, __cond_resched);
-> >  
-> >  static __always_inline int _cond_resched(void)
-> >  {
-> > +	//FIXME this is a bit redundant with preemption disabled
-> > +	klp_sched_try_switch();
-> > +
-> >  	return static_call_mod(cond_resched)();
-> >  }
-> 
-> Right, I was thinking you'd do something like:
-> 
-> 	static_call_update(cond_resched, klp_cond_resched);
-> 
-> With:
-> 
-> static int klp_cond_resched(void)
-> {
-> 	klp_try_switch_task(current);
-> 	return __cond_resched();
-> }
-> 
-> That would force cond_resched() into doing the transition thing,
-> irrespective of the preemption mode at hand. And then, when KLP be done,
-> re-run sched_dynamic_update() to reset it to whatever it ought to be.
+The canonical location for the tracefs filesystem is at /sys/kernel/tracing.
 
-Ok, makes sense.
+But, from Documentation/trace/ftrace.rst:
 
-> 
-> > @@ -401,8 +421,10 @@ void klp_try_complete_transition(void)
-> >  	 */
-> >  	read_lock(&tasklist_lock);
-> >  	for_each_process_thread(g, task)
-> > -		if (!klp_try_switch_task(task))
-> > +		if (!klp_try_switch_task(task)) {
-> > +			set_tsk_need_resched(task);
-> >  			complete = false;
-> > +		}
-> 
-> Yeah, no, that's broken -- preemption state live in more than just the
-> TIF bit.
+  Before 4.1, all ftrace tracing control files were within the debugfs
+  file system, which is typically located at /sys/kernel/debug/tracing.
+  For backward compatibility, when mounting the debugfs file system,
+  the tracefs file system will be automatically mounted at:
 
-Oops.
+  /sys/kernel/debug/tracing
 
-> >  	read_unlock(&tasklist_lock);
-> >  
-> >  	/*
-> > @@ -413,6 +435,7 @@ void klp_try_complete_transition(void)
-> >  		task = idle_task(cpu);
-> >  		if (cpu_online(cpu)) {
-> >  			if (!klp_try_switch_task(task)) {
-> > +				set_tsk_need_resched(task);
-> >  				complete = false;
-> >  				/* Make idle task go through the main loop. */
-> >  				wake_up_if_idle(cpu);
-> 
-> Idem.
-> 
-> Also, I don't see the point of this and the __schedule() hook here:
+There are many places where this older debugfs path is still used in
+code comments, selftests, examples and tools, so let's update them to
+avoid confusion.
 
-The (poorly executed) idea was to catch kthreads which do
+I've broken up the series as best I could by maintainer or directory,
+and I've only sent people the patches that I think they care about to
+avoid spamming everyone.
 
-	if (need_resched())
-		schedule();
+Ross Zwisler (9):
+  tracing: always use canonical ftrace path
+  bpf: use canonical ftrace path
+  selftests/bpf: use canonical ftrace path
+  perf docs: use canonical ftrace path
+  tools/power: use canonical ftrace path
+  selftests: use canonical ftrace path
+  tools/virtio: use canonical ftrace path
+  leaking_addresses: also skip canonical ftrace path
+  tools/kvm_stat: use canonical ftrace path
 
-but I guess we can just replace those usages with cond_resched()?
-
-> > @@ -8500,8 +8502,10 @@ EXPORT_STATIC_CALL_TRAMP(might_resched);
-> >  static DEFINE_STATIC_KEY_FALSE(sk_dynamic_cond_resched);
-> >  int __sched dynamic_cond_resched(void)
-> >  {
-> > -	if (!static_branch_unlikely(&sk_dynamic_cond_resched))
-> > +	if (!static_branch_unlikely(&sk_dynamic_cond_resched)) {
-> > +		klp_sched_try_switch();
-> >  		return 0;
-> > +	}
-> >  	return __cond_resched();
-> >  }
-> >  EXPORT_SYMBOL(dynamic_cond_resched);
-> 
-> I would make the klp_sched_try_switch() not depend on
-> sk_dynamic_cond_resched, because __cond_resched() is not a guaranteed
-> pass through __schedule().
-> 
-> But you'll probably want to check with Mark here, this all might
-> generate crap code on arm64.
-> 
-> Both ways this seems to make KLP 'depend' (or at least work lots better)
-> when PREEMPT_DYNAMIC=y. Do we want a PREEMPT_DYNAMIC=n fallback for
-> _cond_resched() too?
-
-That was the intent but I obviously failed.  Let me go rework it a bit.
+ include/linux/kernel.h                        |  2 +-
+ include/linux/tracepoint.h                    |  4 ++--
+ include/uapi/linux/bpf.h                      |  8 ++++----
+ kernel/trace/Kconfig                          | 20 +++++++++----------
+ kernel/trace/kprobe_event_gen_test.c          |  2 +-
+ kernel/trace/ring_buffer.c                    |  2 +-
+ kernel/trace/synth_event_gen_test.c           |  2 +-
+ kernel/trace/trace.c                          |  2 +-
+ samples/bpf/cpustat_kern.c                    |  4 ++--
+ samples/bpf/hbm.c                             |  4 ++--
+ samples/bpf/ibumad_kern.c                     |  4 ++--
+ samples/bpf/lwt_len_hist.sh                   |  2 +-
+ samples/bpf/offwaketime_kern.c                |  2 +-
+ samples/bpf/task_fd_query_user.c              |  4 ++--
+ samples/bpf/test_lwt_bpf.sh                   |  2 +-
+ samples/bpf/test_overhead_tp_kern.c           |  4 ++--
+ samples/user_events/example.c                 |  4 ++--
+ scripts/leaking_addresses.pl                  |  1 +
+ scripts/tracing/draw_functrace.py             |  6 +++---
+ scripts/tracing/ftrace-bisect.sh              |  4 ++--
+ tools/include/uapi/linux/bpf.h                |  8 ++++----
+ tools/kvm/kvm_stat/kvm_stat                   |  2 +-
+ tools/lib/api/fs/tracing_path.c               |  4 ++--
+ tools/lib/traceevent/event-parse.c            |  8 ++++----
+ tools/perf/Documentation/perf-list.txt        |  2 +-
+ tools/perf/Documentation/perf-script-perl.txt |  2 +-
+ .../perf/Documentation/perf-script-python.txt |  4 ++--
+ tools/power/pm-graph/sleepgraph.py            |  4 ++--
+ .../x86/amd_pstate_tracer/amd_pstate_trace.py |  4 ++--
+ .../intel_pstate_tracer.py                    | 10 +++++-----
+ .../selftests/bpf/get_cgroup_id_user.c        |  2 +-
+ .../bpf/prog_tests/kprobe_multi_test.c        |  2 +-
+ .../bpf/prog_tests/task_fd_query_tp.c         |  2 +-
+ .../bpf/prog_tests/tp_attach_query.c          |  2 +-
+ .../selftests/bpf/prog_tests/trace_printk.c   |  2 +-
+ .../selftests/bpf/prog_tests/trace_vprintk.c  |  2 +-
+ .../selftests/bpf/progs/test_stacktrace_map.c |  2 +-
+ .../selftests/bpf/progs/test_tracepoint.c     |  2 +-
+ tools/testing/selftests/bpf/test_ftrace.sh    |  2 +-
+ tools/testing/selftests/bpf/test_tunnel.sh    |  8 ++++----
+ tools/testing/selftests/bpf/trace_helpers.c   |  4 ++--
+ .../testing/selftests/user_events/dyn_test.c  |  2 +-
+ .../selftests/user_events/ftrace_test.c       | 10 +++++-----
+ .../testing/selftests/user_events/perf_test.c |  8 ++++----
+ tools/testing/selftests/vm/protection_keys.c  |  4 ++--
+ tools/tracing/latency/latency-collector.c     |  2 +-
+ tools/virtio/virtio-trace/README              |  2 +-
+ tools/virtio/virtio-trace/trace-agent.c       |  2 +-
+ 48 files changed, 96 insertions(+), 95 deletions(-)
 
 -- 
-Josh
+2.39.1.456.gfc5497dd1b-goog
+
