@@ -2,90 +2,95 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 5121B681969
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:37:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 73DA368197B
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:39:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238342AbjA3Sht (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 13:37:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45092 "EHLO
+        id S238151AbjA3Sj0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 13:39:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235170AbjA3Shb (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 13:37:31 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3D96B7AAF;
-        Mon, 30 Jan 2023 10:36:42 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DDC211FB;
-        Mon, 30 Jan 2023 10:37:23 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.12.187])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CBF2C3F71E;
-        Mon, 30 Jan 2023 10:36:39 -0800 (PST)
-Date:   Mon, 30 Jan 2023 18:36:32 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Josh Poimboeuf <jpoimboe@kernel.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        Jiri Kosina <jikos@kernel.org>, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
-        live-patching@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
- loaded vhost worker kthreads
-Message-ID: <Y9gOMCWGmoc5GQMj@FVFF77S0Q05N>
-References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
- <Y9KyVKQk3eH+RRse@alley>
- <Y9LswwnPAf+nOVFG@do-x1extreme>
- <20230127044355.frggdswx424kd5dq@treble>
- <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
- <20230127165236.rjcp6jm6csdta6z3@treble>
- <20230127170946.zey6xbr4sm4kvh3x@treble>
- <20230127221131.sdneyrlxxhc4h3fa@treble>
- <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
+        with ESMTP id S238149AbjA3SjH (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 13:39:07 -0500
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB1514708A
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 10:38:26 -0800 (PST)
+Received: by mail-pj1-x102e.google.com with SMTP id b10so11935154pjo.1
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 10:38:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=xohq9EbIgnc/tnqstvxCmfauz3n996rqPi/cWgUMr6Q=;
+        b=LXSBMegShi0AqqFqiTiUbP486qAalHpzG9jEwHOpWkywKB5M/JiK3nIvk2xq3F1CVR
+         kZVlfXrQ6xdddsDSbPVNH5XO7bls0jat7fFvi2rhSXS5LUKQvfwqjrmUyijF1jf8VfMw
+         ChhomwkuEiTOGzPRARg2Wuh/spIgxBClvx7LpbIE1Z62mTU9+VjAfbnWt10lXXdMeTaI
+         IL23w74uELZATYSRl4wXG52IccPfI9kEiqwV7GvLNJZa85MueTXBCi8Qqw40JbILhu0z
+         3wn5TMZ6WB4px2k3n/SC5rLVGke1IQ/jb+TgW6FW8EPz3oz1FAHVCDbb0sbQCrlE+vfl
+         3E9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xohq9EbIgnc/tnqstvxCmfauz3n996rqPi/cWgUMr6Q=;
+        b=LPGdmIrYSx/e0VAOWy5J7JZDV8mKPkwTSIEKRbvng7aHfKnHohPhOIk0gSF2q6ipSH
+         qfpWyYFLqfM0vgPS7TX7XDC9/xCkHWpuvzS2YYPxlv732QgueXG4oz5ToYxpmx0vamO0
+         XjohHGkBAQwz5WxGU0rWivibmXjMwF4I21vo4Z+ucQmTWjxtetwK/fjN3c/FR5b2VVci
+         7i7uXH7GAU17bZuCX0SY4FbBVMaVNtA+7eJkPzyWBpxkGyM3SA85Eo4kZfYf0MW5pXul
+         /fP/gSez8OdpXXRDasUYYPNxPsZETmukNA0r0peRycM6tFXSN5N3Lb23BPsyiGffspUu
+         R3Fw==
+X-Gm-Message-State: AO0yUKXk9hloU8VYmphdl5nULo441xef55BuCqQQ1MPZxhzVkDbtt5dw
+        txf4Of49aS+/2LY5z7vaSpstJQ==
+X-Google-Smtp-Source: AK7set//AqkY7CCOSrgU+8ZYT1p/+L+gcQCLHh8Fcv3EKveF23rBrl7NO/JgNrZgRZcZYyGySuLKmQ==
+X-Received: by 2002:a17:902:d491:b0:196:2e10:ba5c with SMTP id c17-20020a170902d49100b001962e10ba5cmr11701106plg.49.1675103906085;
+        Mon, 30 Jan 2023 10:38:26 -0800 (PST)
+Received: from [192.168.50.116] (c-24-4-73-83.hsd1.ca.comcast.net. [24.4.73.83])
+        by smtp.gmail.com with ESMTPSA id z1-20020a1709028f8100b001888cadf8f6sm8144091plo.49.2023.01.30.10.38.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 30 Jan 2023 10:38:25 -0800 (PST)
+Message-ID: <c5470393-af09-e86b-b388-d6b830451e8f@rivosinc.com>
+Date:   Mon, 30 Jan 2023 10:38:24 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH -next v13 19/19] riscv: Enable Vector code to be built
+To:     Andy Chiu <andy.chiu@sifive.com>, Conor Dooley <conor@kernel.org>
+Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
+        anup@brainfault.org, atishp@atishpatra.org,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        greentime.hu@sifive.com, guoren@linux.alibaba.com,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Albert Ou <aou@eecs.berkeley.edu>
+References: <20230125142056.18356-1-andy.chiu@sifive.com>
+ <20230125142056.18356-20-andy.chiu@sifive.com> <Y9GZbVrZxEZAraVu@spud>
+ <CABgGipWndcnUxUvWtyxyETtLaJT42VaZoiat7uDmnOjREEt9tg@mail.gmail.com>
+Content-Language: en-US
+From:   Vineet Gupta <vineetg@rivosinc.com>
+In-Reply-To: <CABgGipWndcnUxUvWtyxyETtLaJT42VaZoiat7uDmnOjREEt9tg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 01:40:18PM +0100, Peter Zijlstra wrote:
-> On Fri, Jan 27, 2023 at 02:11:31PM -0800, Josh Poimboeuf wrote:
-> > @@ -8500,8 +8502,10 @@ EXPORT_STATIC_CALL_TRAMP(might_resched);
-> >  static DEFINE_STATIC_KEY_FALSE(sk_dynamic_cond_resched);
-> >  int __sched dynamic_cond_resched(void)
-> >  {
-> > -	if (!static_branch_unlikely(&sk_dynamic_cond_resched))
-> > +	if (!static_branch_unlikely(&sk_dynamic_cond_resched)) {
-> > +		klp_sched_try_switch();
-> >  		return 0;
-> > +	}
-> >  	return __cond_resched();
-> >  }
-> >  EXPORT_SYMBOL(dynamic_cond_resched);
-> 
-> I would make the klp_sched_try_switch() not depend on
-> sk_dynamic_cond_resched, because __cond_resched() is not a guaranteed
-> pass through __schedule().
-> 
-> But you'll probably want to check with Mark here, this all might
-> generate crap code on arm64.
 
-IIUC here klp_sched_try_switch() is a static call, so on arm64 this'll generate
-at least a load, a conditional branch, and an indirect branch. That's not
-ideal, but I'd have to benchmark it to find out whether it's a significant
-overhead relative to the baseline of PREEMPT_DYNAMIC.
 
-For arm64 it'd be a bit nicer to have another static key check, and a call to
-__klp_sched_try_switch(). That way the static key check gets turned into a NOP
-in the common case, and the call to __klp_sched_try_switch() can be a direct
-call (potentially a tail-call if we made it return 0).
+On 1/29/23 22:38, Andy Chiu wrote:
+>>> +     default n
+>> I forget, but is the reason for this being default n, when the others
+>> are default y a conscious choice?
+> Yes, I think it could be y if V is allocated in the first-use trap, as
+> far as I'm concerned. Hey Vineet, do you have any comments about that?
 
-Thanks,
-Mark.
+Yes I think this can be enabled by default now that everything is 
+allocated on demand.
+FWIW thread_struct would have 5 word overhead due to struct 
+__riscv_v_state but nothing I would worry about too much.
+
+-Vineet
