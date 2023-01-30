@@ -2,169 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id BA90C680749
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 09:18:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 7BC38680820
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 10:04:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235394AbjA3ISr (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 03:18:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46636 "EHLO
+        id S236015AbjA3JEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 04:04:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229888AbjA3ISn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 03:18:43 -0500
-Received: from mail-yw1-x1134.google.com (mail-yw1-x1134.google.com [IPv6:2607:f8b0:4864:20::1134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5597D4C0D
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 00:18:39 -0800 (PST)
-Received: by mail-yw1-x1134.google.com with SMTP id 00721157ae682-4b718cab0e4so149177467b3.9
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 00:18:39 -0800 (PST)
+        with ESMTP id S236039AbjA3JEt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 04:04:49 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065D12BED6;
+        Mon, 30 Jan 2023 01:04:47 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id j5so10471110pjn.5;
+        Mon, 30 Jan 2023 01:04:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UUp/6YID92JFAcveT6p4E2dADeEO7Fk2qJDYnyhDUuM=;
-        b=LCl/0LT+oiQFk2TDeIP0mhJLimuvr2KYhCX+kKriLEOd231afvJevzELvXaP6E152L
-         7k5xWJjg51U/ggIHE8YzxrXzuCkljXtK66I8nSG30nX3Toml+cq/8M8vtA7EoI57rQAj
-         GHZiSQOlEuLpXmrwY4e8UcaEcU8oajg8QsVBTcRj6aZbGLIePJximGxKu3WT/Cbi6woV
-         2kDdLGZRJyK4nQOoxyWPv/r1L8l2ukp/c56raw3vbuecSYbQKhiHrbX5v8QNTM+g/pjr
-         LjOjWM8vtrhZNMtu8wIE4jr/93U/wrb4rSqy0CYHvjxk2+7vAn1tIsw1vNx6ZOjBv9nY
-         OY7g==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=s6UNdUpKWpLSTSOHWKFbbLTpe021E5XwaO8VPJyBruA=;
+        b=fDQUb7nqvxToI/bLKsxrjgL1kp+4v6u1YF5/SLsB8nGadBv9GlY3URT6jiA1YTcdME
+         VaGMZzo020vEs+jm8HfIUJe5k/B3Q880/VFzh2SA7NDdOsmAFctCzrovUfYsY4Bz2SBQ
+         cLRUlKyiVp7YvHbcFEuRmB/Iakam1la0sb4uz42Er+wFx9kxzQMQ27b1TGsg0vDdmkWd
+         GcaMTCuz9va70pE18H+y0yQFDYevZaoyV8OYFvy02YgoFZbcwDwOww25QL/h+L9TSti5
+         U+lDhkIJngLsR3TqMLYWCXpK4KvV+l393w86+zWQ4Fr0Ke7GwIo9HTp3zSzBr0EB/GQj
+         XB7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=UUp/6YID92JFAcveT6p4E2dADeEO7Fk2qJDYnyhDUuM=;
-        b=H7nqSfBt5D8mEBlk4Es+CWVAGCM8uuPEbGzrNSK2GFC7You8HmKTi4MeMOtW23yu1X
-         OpaWXFTs6hwYQJvOzt/5j+aVE91fqQ29T1lrQ+uLzGzSU7EFD4XR+dMfz8y7sl9H9cO1
-         gwvdea3PxD8bP9yEc6AyK3P/0Gtqcn9qe5eizdvEruSE6CpyU2VNNiF4CzSFZrSRpqF4
-         XBpGT/0H4PXvlCMBeGrnPfBe+VI9mdHDj7FUQW13HYjWnxAx1ecVMkwJtQPfANnrBVUy
-         hVmZ29mzzcbVfX5LKzZXBUdrRX7C40J4b+wUFCtnxeCXTBbSiZZQ5bbOMid5OFxThESf
-         UBcA==
-X-Gm-Message-State: AFqh2kqrGvM0Gzjg+hVshYpQdKDaENRJ8rOQ2UOEB1k8CzurPjSrYRzk
-        hf9D8XoIZFfXoBqiDzp5EwpJRiJmoks/gV6cgjbv3w==
-X-Google-Smtp-Source: AMrXdXuiEugqB5vsz67q2rlzfCL6FLkh6p+M/+KuuutF0CGZJOSsBFbARe7b0EMunhesbUho6cQRttFrf2ydGcl2NsU=
-X-Received: by 2002:a81:7307:0:b0:464:4ea1:3baa with SMTP id
- o7-20020a817307000000b004644ea13baamr5078631ywc.302.1675066718489; Mon, 30
- Jan 2023 00:18:38 -0800 (PST)
+        bh=s6UNdUpKWpLSTSOHWKFbbLTpe021E5XwaO8VPJyBruA=;
+        b=f5ZqgbaMx5nXawUQ/8d4wyzuunWyX96CyZ8Ky3x5Nthnx1HhUpta2N7OKMR39Jam0o
+         Jv+C6fBq75MpunpsaxtFimSAGeQiXAV7NUyW6Cr05AjqdwTT0n5amhRsIMePtAsUXUio
+         PZLDDrEiZRL4iu87NsRMHmvPrH2if85lSp3VoKXbH6p7pRHsUjiivgAg+z5RbDGrUS88
+         g/InXXSngcA86M3kV9cS2Fn6XJo6bt9KKnQpFoe7ZXsTfbtkkyuAkSRmkwQCLAwSS+jC
+         JgIPVzu6Vel54xSCSVQCdvRyfc5KxVT0jUtwoXWrIvJ3BjSfssOrBimcy7Uk0mf2y49Y
+         myjQ==
+X-Gm-Message-State: AO0yUKVsvat7EVPvblwvDYuRFWbdVQYmI/5xyb1XAhImz+jugMWuqrlg
+        qKl7042ubVMvjwYra3tzl4c=
+X-Google-Smtp-Source: AK7set/3TAw8yhF6CPCb2wGY/0b8uhcN34CMIRKK2RrHevObDG2VhwyzGWNLsR1uIB/skeUSrEC0lA==
+X-Received: by 2002:a17:902:ce87:b0:196:341b:ed7 with SMTP id f7-20020a170902ce8700b00196341b0ed7mr21641187plg.15.1675069486498;
+        Mon, 30 Jan 2023 01:04:46 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id x7-20020a1709029a4700b00192aa53a7d5sm7255321plv.8.2023.01.30.01.04.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 01:04:46 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Shuah Khan <shuah@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
+        Wedson Almeida Filho <wedsonaf@google.com>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Kees Cook <keescook@chromium.org>, Andrew Davis <afd@ti.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
+Subject: [PATCH] .gitignore: Keep track of archived files as they are added to a new git repo
+Date:   Mon, 30 Jan 2023 17:04:26 +0800
+Message-Id: <20230130090426.13864-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-References: <20230125142056.18356-1-andy.chiu@sifive.com> <20230125142056.18356-19-andy.chiu@sifive.com>
- <CAK9=C2UWJ1qDfyfsKiznfFTVDHbjJm89m_6ymM=jpvYs7-qNcQ@mail.gmail.com>
-In-Reply-To: <CAK9=C2UWJ1qDfyfsKiznfFTVDHbjJm89m_6ymM=jpvYs7-qNcQ@mail.gmail.com>
-From:   Andy Chiu <andy.chiu@sifive.com>
-Date:   Mon, 30 Jan 2023 16:18:27 +0800
-Message-ID: <CABgGipUPwnu1p14sc6GT+Agh-zx=cbwHanTsTRweR1ErtsX0kA@mail.gmail.com>
-Subject: Re: [PATCH -next v13 18/19] riscv: kvm: redirect illegal instruction
- traps to guests
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     linux-riscv@lists.infradead.org, palmer@dabbelt.com,
-        anup@brainfault.org, atishp@atishpatra.org,
-        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-        vineetg@rivosinc.com, greentime.hu@sifive.com,
-        guoren@linux.alibaba.com, Paul Walmsley <paul.walmsley@sifive.com>,
-        Albert Ou <aou@eecs.berkeley.edu>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 7:28 PM Anup Patel <apatel@ventanamicro.com> wrote:
->
-> On Wed, Jan 25, 2023 at 7:53 PM Andy Chiu <andy.chiu@sifive.com> wrote:
-> >
-> > Running below m-mode, an illegal instruction trap where m-mode could not
-> > handle would be redirected back to s-mode. However, kvm running in hs-mode
-> > terminates the vs-mode software when it receive such exception code.
-> > Instead, it should redirect the trap back to vs-mode, and let vs-mode trap
-> > handler decide the next step.
-> >
-> > Besides, hs-mode should run transparently to vs-mode. So terminating
-> > guest OS breaks assumption for the kernel running in vs-mode.
-> >
-> > We use first-use trap to enable Vector for user space processes. This
-> > means that the user process running in u- or vu- mode will take an
-> > illegal instruction trap for the first time using V. Then the s- or vs-
-> > mode kernel would allocate V for the process. Thus, we must redirect the
-> > trap back to vs-mode in order to get the first-use trap working for guest
-> > OSes here.
->
-> In general, it is a good strategy to always redirect illegal instruction
-> traps to VS-mode.
->
-> >
-> > Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
-> > ---
-> >  arch/riscv/kvm/vcpu_exit.c | 15 +++++++++++++++
-> >  1 file changed, 15 insertions(+)
-> >
-> > diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> > index c9f741ab26f5..2a02cb750892 100644
-> > --- a/arch/riscv/kvm/vcpu_exit.c
-> > +++ b/arch/riscv/kvm/vcpu_exit.c
-> > @@ -162,6 +162,16 @@ void kvm_riscv_vcpu_trap_redirect(struct kvm_vcpu *vcpu,
-> >         vcpu->arch.guest_context.sepc = csr_read(CSR_VSTVEC);
-> >  }
-> >
-> > +static int vcpu_trap_redirect_vs(struct kvm_vcpu *vcpu,
-> > +                                struct kvm_cpu_trap *trap)
-> > +{
-> > +       /* set up trap handler and trap info when it gets back to vs */
-> > +       kvm_riscv_vcpu_trap_redirect(vcpu, trap);
-> > +       /* return to s-mode by setting vcpu's SPP */
-> > +       vcpu->arch.guest_context.sstatus |= SR_SPP;
->
-> Setting sstatus.SPP needs to be done in kvm_riscv_vcpu_trap_redirect()
-> because for guest all traps are always taken by VS-mode.
-NIce. Sorry that I didn't dig much into the kvm part so I thought it
-was left to VU-mode on purpose.
->
-> > +       return 1;
-> > +}
-> > +
-> >  /*
-> >   * Return > 0 to return to guest, < 0 on error, 0 (and set exit_reason) on
-> >   * proper exit to userspace.
-> > @@ -179,6 +189,10 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >         ret = -EFAULT;
-> >         run->exit_reason = KVM_EXIT_UNKNOWN;
-> >         switch (trap->scause) {
-> > +       case EXC_INST_ILLEGAL:
-> > +               if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
-> > +                       ret = vcpu_trap_redirect_vs(vcpu, trap);
-> > +               break;
-> >         case EXC_VIRTUAL_INST_FAULT:
-> >                 if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
-> >                         ret = kvm_riscv_vcpu_virtual_insn(vcpu, run, trap);
-> > @@ -206,6 +220,7 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
-> >                         vcpu->arch.guest_context.hstatus);
-> >                 kvm_err("SCAUSE=0x%lx STVAL=0x%lx HTVAL=0x%lx HTINST=0x%lx\n",
-> >                         trap->scause, trap->stval, trap->htval, trap->htinst);
-> > +               asm volatile ("ebreak\n\t");
->
-> This is not a related change.
->
-Oops, that was a mistake.
-> >         }
-> >
-> >         return ret;
-> > --
-> > 2.17.1
-> >
-> >
-> > _______________________________________________
-> > linux-riscv mailing list
-> > linux-riscv@lists.infradead.org
-> > http://lists.infradead.org/mailman/listinfo/linux-riscv
->
-> Overall, this patch can be accepted independent of this series due
-> to its usefulness.
->
-> I send a v2 of this patch separately.
-Thank you Anup. I will leave this patch there for the following
-revision of the vector patches.
+From: Like Xu <likexu@tencent.com>
 
-Cheers,
-Andy
+With thousands of commits going into mainline each development cycle,
+the metadata .git folder size is gradually expanding (1GB+), and for some
+developers (most likely testers) who don't care about the lengthy git-log,
+they just use git-archive to distribute a certain version of code (~210MB)
+and rebuild git repository from anywhere for further code changes, e.g.
+
+  $ git init && git add . -A
+
+Then unfortunately, the file tracking metadata from the original git-repo
+using "git add -f" will also be lost, to the point where part of source
+files wrapped by git-archive may be accidentally cleaned up:
+
+  $ git clean -nxdf
+  Would remove Documentation/devicetree/bindings/.yamllint
+  Would remove drivers/clk/.kunitconfig
+  Would remove drivers/gpu/drm/tests/.kunitconfig
+  Would remove drivers/hid/.kunitconfig
+  Would remove fs/ext4/.kunitconfig
+  Would remove fs/fat/.kunitconfig
+  Would remove kernel/kcsan/.kunitconfig
+  Would remove lib/kunit/.kunitconfig
+  Would remove mm/kfence/.kunitconfig
+  Would remove tools/testing/selftests/arm64/tags/
+  Would remove tools/testing/selftests/kvm/.gitignore
+  Would remove tools/testing/selftests/kvm/Makefile
+  Would remove tools/testing/selftests/kvm/config
+  Would remove tools/testing/selftests/kvm/settings
+
+This asymmetry is very troubling to those users since finding out which
+files to track with "git add -f" clearly requires priori knowledge on
+various subsystems. The eradication of this little issue requires naturally
+making git-init aware of all .gitignore restrictions at different file tree
+hierarchies. Similar issues can be troubleshot with "git check-ignore -v"
+for any mistakenly cleaned files.
+
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+ .gitignore                               | 2 ++
+ tools/testing/selftests/arm64/.gitignore | 2 ++
+ tools/testing/selftests/kvm/.gitignore   | 4 ++++
+ 3 files changed, 8 insertions(+)
+ create mode 100644 tools/testing/selftests/arm64/.gitignore
+
+diff --git a/.gitignore b/.gitignore
+index 20dce5c3b9e0..fa39e98caee3 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -102,6 +102,8 @@ modules.order
+ !.gitignore
+ !.mailmap
+ !.rustfmt.toml
++!.yamllint
++!.kunitconfig
+ 
+ #
+ # Generated include files
+diff --git a/tools/testing/selftests/arm64/.gitignore b/tools/testing/selftests/arm64/.gitignore
+new file mode 100644
+index 000000000000..135d709d2d65
+--- /dev/null
++++ b/tools/testing/selftests/arm64/.gitignore
+@@ -0,0 +1,2 @@
++# SPDX-License-Identifier: GPL-2.0-only
++!tags
+diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+index 6d9381d60172..96561c8e06e0 100644
+--- a/tools/testing/selftests/kvm/.gitignore
++++ b/tools/testing/selftests/kvm/.gitignore
+@@ -5,3 +5,7 @@
+ !*.h
+ !*.S
+ !*.sh
++!.gitignore
++!Makefile
++!settings
++!config
+\ No newline at end of file
+-- 
+2.39.1
+
