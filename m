@@ -2,130 +2,96 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6EC3C68158A
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 16:50:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 34E776815E2
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 17:04:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237473AbjA3PuK (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 10:50:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60846 "EHLO
+        id S236023AbjA3QET (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 11:04:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237655AbjA3Ptp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 10:49:45 -0500
-Received: from smtpout.efficios.com (smtpout.efficios.com [167.114.26.122])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0C061816D;
-        Mon, 30 Jan 2023 07:49:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
-        s=smtpout1; t=1675093778;
-        bh=ZpNvNQjqDJWSVYLNAt/JE5nTHOBGVZ5rNMJzdhWDBvI=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=YudiXcAUwBLHWeHQdmYHAwKb/PV+eIfah6AtkbuLFKMSbyI5VTiLJ2Vv09FzdbT50
-         0Dat4rR0fgpQWH9dxjK+1RnNVUPgGZD0J50ajPZpmshMP4kHVPThGbE9xdqVvPTTIb
-         p2uAJ/s0Yy4DADm94/g/AvFItVa5XcyLFAqexQbv4Kqm26H3efxSjhJxF6SXW0UlBj
-         wDTsWoiiyDa3e0Bw5pG/h5jo6hREj3Rt2UylpEpqH/A9UIJ0Zgpufr1UaOphQh/l6S
-         vLl1hgJ8I4QnPownZJ3U6XAua/hm/zRALUJwerJuQo9tiAoUEP+U0MaI0uFBsAnwKn
-         ImorP2qQKdiHA==
-Received: from [172.16.0.188] (192-222-180-24.qc.cable.ebox.net [192.222.180.24])
-        by smtpout.efficios.com (Postfix) with ESMTPSA id 4P5CKt449Jzj0p;
-        Mon, 30 Jan 2023 10:49:38 -0500 (EST)
-Message-ID: <946da82b-4792-fd0b-9b01-d64bacb17578@efficios.com>
-Date:   Mon, 30 Jan 2023 10:50:18 -0500
+        with ESMTP id S230365AbjA3QES (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 11:04:18 -0500
+X-Greylist: delayed 470 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 30 Jan 2023 08:04:16 PST
+Received: from mx.cjr.nz (mx.cjr.nz [51.158.111.142])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 716E311156;
+        Mon, 30 Jan 2023 08:04:16 -0800 (PST)
+Received: from authenticated-user (mx.cjr.nz [51.158.111.142])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pc)
+        by mx.cjr.nz (Postfix) with ESMTPSA id AF6077FC21;
+        Mon, 30 Jan 2023 15:56:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cjr.nz; s=dkim;
+        t=1675094184;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9mWu6waa/eExAxYRUAnoTwItAGCpuazH4rLKqgG96C8=;
+        b=IUWRXB4ZfZFvP08TAcu46IaSIPcqcOXTl56O8WHSQOaAhhkIQ9u88zYSEpIN2pbiC4jpac
+        jwGLtOnkbS+BV6uGbYvUTH2ghLzufe3qfEFRbAHRz9p2wIlhENt9DpUj0oE60tlK+yywCT
+        paOb0uNIIGHUk9S0XG3mYKsUFRPaYkoUgAjTvyhLEVU5Z9Cvmu7NO+rjrH2opN+EgEjgFa
+        fnzP4VIRAyAwr2ru+CZp9aX3dvfrMSXIvEWmaEh/hC29vO//ntKkMtDT6T0I20V2zRFjSn
+        4AWbxuRM00n7wzPS9dmDdPu7fsBiZbJIvRcLAZa39v75gFyA93kfj3o+j2QjPg==
+From:   Paulo Alcantara <pc@cjr.nz>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Ilya Dryomov <idryomov@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 13/23] cifs: use bvec_set_page to initialize bvecs
+In-Reply-To: <20230130092157.1759539-14-hch@lst.de>
+References: <20230130092157.1759539-1-hch@lst.de>
+ <20230130092157.1759539-14-hch@lst.de>
+Date:   Mon, 30 Jan 2023 12:56:16 -0300
+Message-ID: <87357shv8f.fsf@cjr.nz>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH -next] KVM: selftests: Fix build error
-Content-Language: en-US
-To:     YueHaibing <yuehaibing@huawei.com>, pbonzini@redhat.com,
-        shuah@kernel.org, gshan@redhat.com, peterz@infradead.org
-Cc:     kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20230130124445.3476-1-yuehaibing@huawei.com>
-From:   Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-In-Reply-To: <20230130124445.3476-1-yuehaibing@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2023-01-30 07:44, YueHaibing wrote:
-> kvm selftests build fails with below info:
-> 
-> rseq_test.c:48:13: error: conflicting types for ‘sys_getcpu’; have ‘void(unsigned int *)’
->     48 | static void sys_getcpu(unsigned *cpu)
->        |             ^~~~~~~~~~
-> In file included from rseq_test.c:23:
-> ../rseq/rseq.c:82:12: note: previous definition of ‘sys_getcpu’ with type ‘int(unsigned int *, unsigned int *)’
->     82 | static int sys_getcpu(unsigned *cpu, unsigned *node)
->        |            ^~~~~~~~~~
-> 
-> commit 66d42ac73fc6 ("KVM: selftests: Make rseq compatible with glibc-2.35")
-> has include "../rseq/rseq.c", and commit 99babd04b250 ("selftests/rseq: Implement rseq numa node id field selftest")
-> add sys_getcpu() implement, so use sys_getcpu in rseq/rseq.c to fix this.
-> 
-> Fixes: 99babd04b250 ("selftests/rseq: Implement rseq numa node id field selftest")
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Christoph Hellwig <hch@lst.de> writes:
 
-Hi,
-
-This patch replicates an already existing patch:
-
-https://lore.kernel.org/all/20230106-fix-kvm-rseq-build-v1-1-b704d9831d02@kernel.org/
-
-The original patch should be routed through the tip tree by Peter Zijlstra shortly.
-
-Thanks,
-
-Mathieu
-
+> Use the bvec_set_page helper to initialize bvecs.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 > ---
->   tools/testing/selftests/kvm/rseq_test.c | 19 ++++++-------------
->   1 file changed, 6 insertions(+), 13 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/rseq_test.c b/tools/testing/selftests/kvm/rseq_test.c
-> index 3045fdf9bdf5..69ff39aa2991 100644
-> --- a/tools/testing/selftests/kvm/rseq_test.c
-> +++ b/tools/testing/selftests/kvm/rseq_test.c
-> @@ -41,18 +41,6 @@ static void guest_code(void)
->   		GUEST_SYNC(0);
->   }
->   
-> -/*
-> - * We have to perform direct system call for getcpu() because it's
-> - * not available until glic 2.29.
-> - */
-> -static void sys_getcpu(unsigned *cpu)
-> -{
-> -	int r;
-> -
-> -	r = syscall(__NR_getcpu, cpu, NULL, NULL);
-> -	TEST_ASSERT(!r, "getcpu failed, errno = %d (%s)", errno, strerror(errno));
-> -}
-> -
->   static int next_cpu(int cpu)
->   {
->   	/*
-> @@ -249,7 +237,12 @@ int main(int argc, char *argv[])
->   			 * across the seq_cnt reads.
->   			 */
->   			smp_rmb();
-> -			sys_getcpu(&cpu);
-> +			/*
-> +			 * We have to perform direct system call for getcpu() because it's
-> +			 * not available until glic 2.29.
-> +			 */
-> +			r = sys_getcpu(&cpu, NULL);
-> +			TEST_ASSERT(!r, "getcpu failed, errno = %d (%s)", errno, strerror(errno));
->   			rseq_cpu = rseq_current_cpu_raw();
->   			smp_rmb();
->   		} while (snapshot != atomic_read(&seq_cnt));
+>  fs/cifs/connect.c |  5 +++--
+>  fs/cifs/fscache.c | 16 ++++++----------
+>  fs/cifs/misc.c    |  5 ++---
+>  fs/cifs/smb2ops.c |  6 +++---
+>  4 files changed, 14 insertions(+), 18 deletions(-)
 
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-https://www.efficios.com
-
+Acked-by: Paulo Alcantara (SUSE) <pc@cjr.nz>
