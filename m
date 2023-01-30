@@ -2,77 +2,138 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8EF83681807
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 18:50:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D725F681827
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 19:02:27 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236714AbjA3RuP (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 12:50:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34304 "EHLO
+        id S237544AbjA3SCZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 13:02:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39604 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229694AbjA3RuO (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 12:50:14 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D88A302A9;
-        Mon, 30 Jan 2023 09:50:12 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 1A34960F15;
-        Mon, 30 Jan 2023 17:50:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 607D9C433D2;
-        Mon, 30 Jan 2023 17:50:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675101011;
-        bh=1VBfxkrJ2jG7gVZ5bzrTzKycDwCYzooR1eYXc8bkWjQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=q4NwZmbm5DGxLaDRzc97uWryRvRm74rNOeUP4N3v/ZP6ca6IUz4i/YnNv+UDxzNxZ
-         nuTWsPOSOWYUfNGv7pz6VCnBsDv7APDGoOn2fJo17ClkgCFA2zVbjr03EJbN3HLH04
-         uW49Vetpo5fANZiQBXTs1dxIro0eQm4DFSkvz90Yv31H34QkHusqSqk8JbVSOaKnUj
-         a8n+JU8Nm6pZUIWGqqb5jv/pyd1eBA8PxyJiSmPCCguuZTyfC0YrynqVAkBs+pIEY1
-         R6cR7lfmD2H9h+DgY2WSqtRZ7UooQ9PtzLCW/m+Eks5xUhz9Elg8xiYwjYqUqdMbYs
-         5G+Rzv4T6R/AA==
-Date:   Mon, 30 Jan 2023 11:50:10 -0600
-From:   Seth Forshee <sforshee@kernel.org>
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Josh Poimboeuf <jpoimboe@kernel.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        Jiri Kosina <jikos@kernel.org>, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        live-patching@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
- loaded vhost worker kthreads
-Message-ID: <Y9gDUi79peQwf1MS@do-x1extreme>
-References: <20230120-vhost-klp-switching-v1-0-7c2b65519c43@kernel.org>
- <Y9KyVKQk3eH+RRse@alley>
- <Y9LswwnPAf+nOVFG@do-x1extreme>
- <20230127044355.frggdswx424kd5dq@treble>
- <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
- <20230127165236.rjcp6jm6csdta6z3@treble>
- <20230127170946.zey6xbr4sm4kvh3x@treble>
- <20230127221131.sdneyrlxxhc4h3fa@treble>
- <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
+        with ESMTP id S235278AbjA3SCY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 13:02:24 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1640F1EFF3;
+        Mon, 30 Jan 2023 10:02:22 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id gr7so9606757ejb.5;
+        Mon, 30 Jan 2023 10:02:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=2e4q4vLnV4kvKyozPY83n3uJMaYkgSTzaraxFCK6VlE=;
+        b=QjPHN5B6CALVYF8eJzNIPsG0g1pzceiE2hsCvWmpJNAGD1vrWbJvCZeCcjQ6eADy7X
+         +rHhPzs8YzfZY27hQrxxOVws+NeMmpQzs2dZvJyF9ePDcY6pL5qFpcxv6Z3gjK7XJP8V
+         cByRrvJBuUR2bPrhmi5d/WnmANG7Y6jQK9ldIaDSqBxh3ID4IGOHEOX0TaogXKy8B68f
+         YdGt9CF227lvD+bRgHbXuA/ANtLnfNmLv2C8td08GoyJe+3J4zL8gQFKZUR4Wjx07grD
+         jmy6zNmOrRAYNi0zk7CarTBn76RGSVuzRP3TFEnE334v1V1ZIQxbXypKDzhXSbc1rITc
+         v3Wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2e4q4vLnV4kvKyozPY83n3uJMaYkgSTzaraxFCK6VlE=;
+        b=GJIa4WvkGKZ88PB0p8X1zX1uWylaJLL2Bj+nscAyU5amcoy/P+WWn4d43arpjQ1doJ
+         O5Al60N4NXlvgMsfUXi5SSCRsDvP6zn+6NPfTYoP0pHaQmu8uSz8HhIliTQG+m9ldTwe
+         JVJRFgqRH0WNy0LxxwiwbwK4O1VIi5Gb2Amz2N/4eIaW54HVdI248qGAMtjYd4p6+JNm
+         4ZHUcx/vvlVXimKUL+gg/KVpPDDU1BmUqKYi7LkXyPw1JaAmB8itxbCCzoGMHeTbz1aB
+         mWhizaJgGRenKF5OWspL3cP91luTbk1vWzVJfHUkaMGnPZrhc9xFU6UARyG+6+2cJxCL
+         uDlA==
+X-Gm-Message-State: AFqh2kov34Uh6BHUvYOdgfbuBUaL2AF0DKWW2Yh2jiyxZ1NzKzCkMz6U
+        8dE0sPEEGYsZWLmVqB73y7hK05/+nUB590thxDQ=
+X-Google-Smtp-Source: AMrXdXt2v8RXnqr0n63brJW64DYfr9lJj0iX+IQ07lAj+juWDoh3rFhuQaZ3DIDSg0TjGFzZmicnL1ZkcXc8EtRtQFI=
+X-Received: by 2002:a17:906:7754:b0:86f:2cc2:7028 with SMTP id
+ o20-20020a170906775400b0086f2cc27028mr7689625ejn.133.1675101740519; Mon, 30
+ Jan 2023 10:02:20 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-13-hch@lst.de>
+In-Reply-To: <20230130092157.1759539-13-hch@lst.de>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Mon, 30 Jan 2023 19:02:08 +0100
+Message-ID: <CAOi1vP_b77Pq=hYmFMi1zGGRMee2uNjbAbHz_gCCoByOdbRqLw@mail.gmail.com>
+Subject: Re: [PATCH 12/23] ceph: use bvec_set_page to initialize a bvec
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 01:40:18PM +0100, Peter Zijlstra wrote:
-> Both ways this seems to make KLP 'depend' (or at least work lots better)
-> when PREEMPT_DYNAMIC=y. Do we want a PREEMPT_DYNAMIC=n fallback for
-> _cond_resched() too?
+On Mon, Jan 30, 2023 at 10:22 AM Christoph Hellwig <hch@lst.de> wrote:
+>
+> Use the bvec_set_page helper to initialize a bvec.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  fs/ceph/file.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/fs/ceph/file.c b/fs/ceph/file.c
+> index 764598e1efd91f..6419dce7c57987 100644
+> --- a/fs/ceph/file.c
+> +++ b/fs/ceph/file.c
+> @@ -103,11 +103,11 @@ static ssize_t __iter_get_bvecs(struct iov_iter *iter, size_t maxsize,
+>                 size += bytes;
+>
+>                 for ( ; bytes; idx++, bvec_idx++) {
+> -                       struct bio_vec bv = {
+> -                               .bv_page = pages[idx],
+> -                               .bv_len = min_t(int, bytes, PAGE_SIZE - start),
+> -                               .bv_offset = start,
+> -                       };
+> +                       struct bio_vec bv;
+> +
+> +                       bvec_set_page(&bv, pages[idx],
 
-I would like this, as we have no other need for PREEMPT_DYNAMIC=y and
-currently have it disabled.
+Hi Christoph,
+
+There is trailing whitespace on this line which git complains about
+and it made me take a second look.  I think bvec_set_page() allows to
+make this more compact:
+
+        for ( ; bytes; idx++, bvec_idx++) {
+                int len = min_t(int, bytes, PAGE_SIZE - start);
+
+                bvec_set_page(&bvecs[bvec_idx], pages[idx], len, start);
+                bytes -= len;
+                start = 0;
+        }
 
 Thanks,
-Seth
+
+                Ilya
