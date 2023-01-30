@@ -2,124 +2,136 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 08B62681066
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 15:03:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9AE296814B1
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 16:19:40 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237071AbjA3ODI (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 09:03:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42576 "EHLO
+        id S238147AbjA3PTj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 10:19:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236915AbjA3OCy (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 09:02:54 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD57B3B0E7;
-        Mon, 30 Jan 2023 06:02:46 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30UCWM1j007664;
-        Mon, 30 Jan 2023 14:02:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : content-transfer-encoding : in-reply-to : references : to :
- subject : cc : from : message-id : date; s=pp1;
- bh=yVh7i4PK4fHQvv7D9ESf+QBk4rtC5xmNe0nBGfUj+yE=;
- b=N6o6Ej5QyHykPiG/nOJ9Dvy7bv1GNxV4b2aGDjJeJfwpjmxCzRxa3pmdZYHprdrd7xS+
- bq4aXL/2OeWfsi0C4MXjf/TaLwWa7rN1bfSEubWNXiBe2CxnTHZxXM4vK8iX6MmMRFgE
- H58HIwpjUR9ALx52kzCuFl+vNN9DxHB8euwNPDLb9HEN42K9n2Joh1Ooi4Jf54dg0jdH
- yQ8bL1me70Cr4g80SC/7EUUNIHVhIc9aoiorNInbVxDKF91NrKb8rCIf9olOsjMQnHuw
- EpDrzYTnrJ7QRR5tjxijn/TVVoOMD0IXnk3TY48KnsMt4JYx5qGRQ2Sb2Mcj6+vXOyHm fw== 
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nedyut65v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Jan 2023 14:02:45 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30TDgQiN001561;
-        Mon, 30 Jan 2023 14:02:43 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3ncvv69nk4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 30 Jan 2023 14:02:43 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30UE2dFX42926544
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 30 Jan 2023 14:02:39 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 72AF12004E;
-        Mon, 30 Jan 2023 14:02:39 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D4DB2004D;
-        Mon, 30 Jan 2023 14:02:39 +0000 (GMT)
-Received: from t14-nrb (unknown [9.171.92.217])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Mon, 30 Jan 2023 14:02:39 +0000 (GMT)
-Content-Type: text/plain; charset="utf-8"
+        with ESMTP id S238090AbjA3PTb (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 10:19:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFADA3B667
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 07:18:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675091890;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=URESPY8B3rO6+zudqQ9a2I8Kc4P4ekxUO74igKr3Ygk=;
+        b=iz3IYkjWKiTvImyQYrPyAr6VPGVAOeV90N2lz0Z32JAuox9Sj1tAlwQ8ldjOiZcE/6/O4P
+        7+QOk/MoqPEXl2ZypcMyovRCa2ls8Sc3j6YHAAZK7kX0cuNSQyVLlymVUehk0XVLMtnZKg
+        uM9Fr1WqIy5TRqlmqPNuoG8M4d4kOd8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-54-Yx1AF_y5MiaxJdkTGUbhFg-1; Mon, 30 Jan 2023 10:18:07 -0500
+X-MC-Unique: Yx1AF_y5MiaxJdkTGUbhFg-1
+Received: by mail-wm1-f72.google.com with SMTP id k9-20020a05600c1c8900b003dc5dec2ac6so1040593wms.4
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 07:18:07 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=URESPY8B3rO6+zudqQ9a2I8Kc4P4ekxUO74igKr3Ygk=;
+        b=b+5mTJBIWJj1q2h/8GOMWnJPV1IrFnF/JjvNeDrotns5PCr2LCmaptjHJxPaPdPl43
+         pLBgc3Z7RVx/KD5LcJ2ojCitzWoWeIfwxqARCl5U3gNTgFKbPx1W++CcCEZ78Zcoje/7
+         P/kRaWdayRwk4QaF220hhOCvYdct1Bi+z/yRpadEf9PkIiAhmxJXqLsxwQrh+6vFIGTh
+         INdrtkUWqX1SVgT4Es/OYoq0NCteQXBGXdTIECKsohoOU4QEyrLz9VXscqZAnGdJ2knS
+         FkNhf8wphAyGa/L2dfBJHKInT6ELNELkqj3OEDCGk5FoIHbJFlsCCJc7t78LHRGZkmde
+         dheQ==
+X-Gm-Message-State: AO0yUKUq7Xd66QhjecJsxbVs5iqeQLgt1Ee3eLSlwMDT19RaHkSecH79
+        CkigG85WF2wimqEceceBWie7Ukt0+9P28ABu+OrNMDZw6e1qXr8ICw4z/eX4AITE1UHdlp3p7Ex
+        h6juIg7G6mASH
+X-Received: by 2002:a05:6000:1105:b0:2bf:b77c:df72 with SMTP id z5-20020a056000110500b002bfb77cdf72mr16512192wrw.25.1675091885643;
+        Mon, 30 Jan 2023 07:18:05 -0800 (PST)
+X-Google-Smtp-Source: AK7set9hHGYe0bnBQdwa2LZ/rAVCRbopEtGk+crtv3OHnMIQTfwimU+PtBLrc1/FzlqOKTq9Gtug2w==
+X-Received: by 2002:a05:6000:1105:b0:2bf:b77c:df72 with SMTP id z5-20020a056000110500b002bfb77cdf72mr16512171wrw.25.1675091885371;
+        Mon, 30 Jan 2023 07:18:05 -0800 (PST)
+Received: from redhat.com ([2.52.144.173])
+        by smtp.gmail.com with ESMTPSA id p6-20020a5d48c6000000b002bfc0558ecdsm11985935wrs.113.2023.01.30.07.18.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 07:18:04 -0800 (PST)
+Date:   Mon, 30 Jan 2023 10:17:58 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ilya Dryomov <idryomov@gmail.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
+Subject: Re: [PATCH 09/23] virtio_blk: use bvec_set_virt to initialize
+ special_vec
+Message-ID: <20230130101747-mutt-send-email-mst@kernel.org>
+References: <20230130092157.1759539-1-hch@lst.de>
+ <20230130092157.1759539-10-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <6e37979d-45f2-0714-d1ab-673f64cdd872@linux.ibm.com>
-References: <20230127140532.230651-1-nrb@linux.ibm.com> <20230127140532.230651-2-nrb@linux.ibm.com> <6e37979d-45f2-0714-d1ab-673f64cdd872@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>, borntraeger@linux.ibm.com,
-        imbrenda@linux.ibm.com
-Subject: Re: [PATCH v4 1/1] KVM: s390: disable migration mode when dirty tracking is disabled
-Cc:     kvm@vger.kernel.org, linux-s390@vger.kernel.org
-From:   Nico Boehr <nrb@linux.ibm.com>
-Message-ID: <167508735843.11453.11149771785732701137@t14-nrb.local>
-User-Agent: alot/0.8.1
-Date:   Mon, 30 Jan 2023 15:02:38 +0100
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rTCKJe8idpzqs7EucLVd20ry4ThFsdqX
-X-Proofpoint-ORIG-GUID: rTCKJe8idpzqs7EucLVd20ry4ThFsdqX
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-30_12,2023-01-30_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- lowpriorityscore=0 bulkscore=0 mlxscore=0 spamscore=0 impostorscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=785 malwarescore=0
- clxscore=1015 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2301300131
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230130092157.1759539-10-hch@lst.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Quoting Janosch Frank (2023-01-30 10:53:23)
-[...]
-> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/ap=
-i.rst
-> > index 9807b05a1b57..2978acfcafc4 100644
-> > --- a/Documentation/virt/kvm/api.rst
-> > +++ b/Documentation/virt/kvm/api.rst
-> > @@ -4537,11 +4537,17 @@ mask is unused.
-> >  =20
-> >   values points to the userspace buffer where the result will be stored.
-> >  =20
-> > -This ioctl can fail with -ENOMEM if not enough memory can be allocated=
- to
-> > -complete the task, with -ENXIO if CMMA is not enabled, with -EINVAL if
-> > -KVM_S390_CMMA_PEEK is not set but migration mode was not enabled, with
-> > --EFAULT if the userspace address is invalid or if no page table is
-> > -present for the addresses (e.g. when using hugepages).
-> > +Errors:
-> > +
-> > +  =3D=3D=3D=3D=3D=3D     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +  ENOMEM     not enough memory can be allocated to complete the task
-> > +  ENXIO      if CMMA is not enabled
-> > +  EINVAL     if KVM_S390_CMMA_PEEK is not set but migration mode was n=
-ot enabled
-> > +  EINVAL     if KVM_S390_CMMA_PEEK is not set but dirty tracking has b=
-een
-> > +             disabled (and thus migration mode was automatically disab=
-led)
-> > +  EFAULT     if the userspace address is invalid or if no page table is
-> > +             present for the addresses (e.g. when using hugepages).
-> > +  =3D=3D=3D=3D=3D=3D     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->=20
-> May I move this to the top?
+On Mon, Jan 30, 2023 at 10:21:43AM +0100, Christoph Hellwig wrote:
+> Use the bvec_set_virt helper to initialize the special_vec.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Sure, please go ahead.
->=20
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+> ---
+>  drivers/block/virtio_blk.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 6a77fa91742880..dc6e9b989910b0 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -170,9 +170,7 @@ static int virtblk_setup_discard_write_zeroes_erase(struct request *req, bool un
+>  
+>  	WARN_ON_ONCE(n != segments);
+>  
+> -	req->special_vec.bv_page = virt_to_page(range);
+> -	req->special_vec.bv_offset = offset_in_page(range);
+> -	req->special_vec.bv_len = sizeof(*range) * segments;
+> +	bvec_set_virt(&req->special_vec, range, sizeof(*range) * segments);
+>  	req->rq_flags |= RQF_SPECIAL_PAYLOAD;
+>  
+>  	return 0;
+> -- 
+> 2.39.0
+
