@@ -2,158 +2,178 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7BC38680820
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 10:04:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B1C15680825
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 10:05:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236015AbjA3JEz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 04:04:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45830 "EHLO
+        id S236037AbjA3JFo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 04:05:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236039AbjA3JEt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 04:04:49 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 065D12BED6;
-        Mon, 30 Jan 2023 01:04:47 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id j5so10471110pjn.5;
-        Mon, 30 Jan 2023 01:04:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=s6UNdUpKWpLSTSOHWKFbbLTpe021E5XwaO8VPJyBruA=;
-        b=fDQUb7nqvxToI/bLKsxrjgL1kp+4v6u1YF5/SLsB8nGadBv9GlY3URT6jiA1YTcdME
-         VaGMZzo020vEs+jm8HfIUJe5k/B3Q880/VFzh2SA7NDdOsmAFctCzrovUfYsY4Bz2SBQ
-         cLRUlKyiVp7YvHbcFEuRmB/Iakam1la0sb4uz42Er+wFx9kxzQMQ27b1TGsg0vDdmkWd
-         GcaMTCuz9va70pE18H+y0yQFDYevZaoyV8OYFvy02YgoFZbcwDwOww25QL/h+L9TSti5
-         U+lDhkIJngLsR3TqMLYWCXpK4KvV+l393w86+zWQ4Fr0Ke7GwIo9HTp3zSzBr0EB/GQj
-         XB7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=s6UNdUpKWpLSTSOHWKFbbLTpe021E5XwaO8VPJyBruA=;
-        b=f5ZqgbaMx5nXawUQ/8d4wyzuunWyX96CyZ8Ky3x5Nthnx1HhUpta2N7OKMR39Jam0o
-         Jv+C6fBq75MpunpsaxtFimSAGeQiXAV7NUyW6Cr05AjqdwTT0n5amhRsIMePtAsUXUio
-         PZLDDrEiZRL4iu87NsRMHmvPrH2if85lSp3VoKXbH6p7pRHsUjiivgAg+z5RbDGrUS88
-         g/InXXSngcA86M3kV9cS2Fn6XJo6bt9KKnQpFoe7ZXsTfbtkkyuAkSRmkwQCLAwSS+jC
-         JgIPVzu6Vel54xSCSVQCdvRyfc5KxVT0jUtwoXWrIvJ3BjSfssOrBimcy7Uk0mf2y49Y
-         myjQ==
-X-Gm-Message-State: AO0yUKVsvat7EVPvblwvDYuRFWbdVQYmI/5xyb1XAhImz+jugMWuqrlg
-        qKl7042ubVMvjwYra3tzl4c=
-X-Google-Smtp-Source: AK7set/3TAw8yhF6CPCb2wGY/0b8uhcN34CMIRKK2RrHevObDG2VhwyzGWNLsR1uIB/skeUSrEC0lA==
-X-Received: by 2002:a17:902:ce87:b0:196:341b:ed7 with SMTP id f7-20020a170902ce8700b00196341b0ed7mr21641187plg.15.1675069486498;
-        Mon, 30 Jan 2023 01:04:46 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id x7-20020a1709029a4700b00192aa53a7d5sm7255321plv.8.2023.01.30.01.04.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 01:04:46 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Shuah Khan <shuah@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
-        Wedson Almeida Filho <wedsonaf@google.com>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Kees Cook <keescook@chromium.org>, Andrew Davis <afd@ti.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
-Subject: [PATCH] .gitignore: Keep track of archived files as they are added to a new git repo
-Date:   Mon, 30 Jan 2023 17:04:26 +0800
-Message-Id: <20230130090426.13864-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.39.1
+        with ESMTP id S235509AbjA3JFn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 04:05:43 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA57829429;
+        Mon, 30 Jan 2023 01:05:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675069542; x=1706605542;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=OBNJbBVd/Imt8W/uVwT1cIU4SRTgC/hC/EgWw++FpL8=;
+  b=YHYKccUbub3LfVb4CA1bgtWN1ztD4XzsRo+f/AHYWzj14GGEXCY2vJWK
+   2gbaUG4uHDOQP6VhYaHkXE4QLWzJIaHjwqDKztRgnS4JrtWXjHQnycFhz
+   RiAbeIfDyQI/KvQO2Nno728W0w41JG+z3T7XhS0OrBynIYydEAtjTgji/
+   SRxarKOM7B0v8TpZl7issLn4AUyWwnj2UbvAVmeRDCWLKvHuWsP6Wn6bX
+   HA39P7GXeqWmul0mx7Cj1bAKznAfB/0rm9J/cch1HudLdbu09ZGQEGX+o
+   iTviuW7KbPd9AjJAreRdqCgFtl9Y4KVHbv7PSdLNFRsDuTG1WKbN2glgx
+   g==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10605"; a="326176891"
+X-IronPort-AV: E=Sophos;i="5.97,257,1669104000"; 
+   d="scan'208";a="326176891"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2023 01:05:42 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10605"; a="665999942"
+X-IronPort-AV: E=Sophos;i="5.97,257,1669104000"; 
+   d="scan'208";a="665999942"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga007.fm.intel.com with ESMTP; 30 Jan 2023 01:05:38 -0800
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Mon, 30 Jan 2023 01:05:37 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Mon, 30 Jan 2023 01:05:37 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16 via Frontend Transport; Mon, 30 Jan 2023 01:05:37 -0800
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.16; Mon, 30 Jan 2023 01:05:36 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=H4/njP3xQb7WZ1TICeHRaZe5OsmK1WZjLrLCmo/nnuqhDV/XYb0/9FXrdeIEcpDfWX3W6fOjpXMMKjvtu7xLay8ZnXLbycvmQ74nTA0zBtgK3QmtJz9nFQg56zX53PsVWjpYxYfFwnbOyzZFyoMeZCUXDfpjAETGHVOWN26uyB7Ca70Az76qLLk7xneQulfcKSqDO0q/NRFfF7RgyHlqvERqKMADS8VM+hQF3s5CF+T/yDasd3RNRkFQMThMqnMtt0kjs+jF4nuUM8TXodXfO2mB1Oq421INmE9UfMIiOtmv8yWHe2hChLGpWdLU3p8DF+0CZkZRGyXFc5aWOA4S7A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ginebk/E+Uz4nS6LOExtvyZjhhJZCesZ0xah70KUXcc=;
+ b=ULlOLHfh62R8tD4EXbr+hP+Vgg2dpFCPGwpQz4L+44fJn2GwBzryK96Wnja6ufXk3wMDcCn4mt/XzpjyuK62QctsZFpOZHKxE+w/YjRkJzBAORi05FFVRhYTEid61DAkAumJx0qqgpaI2I1oK6SlHK1mdObsF++eWCIgQpZCttf1Qr1sQF0aZjRHmDuY4L0LfZpJfquhwoA4SkeIZqrXF1VHuV0fe61437Py7IwsLdiLqD9Zj2ROMmqNQGnDXGb0SFbNBMoos9w7P/uQyXwqzT4M9CVt79DB5LGAEP35pr2U3KhZXH6s4/MT4AeTi5Ph6lu3hYlcectI//k07lgtHg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6043.33; Mon, 30 Jan
+ 2023 09:05:34 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::6a8d:b95:e1b5:d79d%9]) with mapi id 15.20.6043.033; Mon, 30 Jan 2023
+ 09:05:34 +0000
+From:   "Tian, Kevin" <kevin.tian@intel.com>
+To:     Tomasz Duszynski <tduszynski@marvell.com>,
+        Eric Auger <eric.auger@redhat.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "open list:VFIO PLATFORM DRIVER" <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+CC:     "jerinj@marvell.com" <jerinj@marvell.com>
+Subject: RE: [PATCH] vfio: platform: ignore missing reset if disabled at
+ module init
+Thread-Topic: [PATCH] vfio: platform: ignore missing reset if disabled at
+ module init
+Thread-Index: AQHZMNe4jRMwBM/EwUqhr5u7XKzShK62sPAQ
+Date:   Mon, 30 Jan 2023 09:05:34 +0000
+Message-ID: <BN9PR11MB527630B903EC14BC61351C668CD39@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230125161115.1356233-1-tduszynski@marvell.com>
+In-Reply-To: <20230125161115.1356233-1-tduszynski@marvell.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ2PR11MB7573:EE_
+x-ms-office365-filtering-correlation-id: 9e11a048-4911-4788-f0e5-08db02a1256d
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Dibk/WoPqdLk4ZgxlYg3Oewdh99DwTrsC65lFOQmKRIZm6jG+6tKcJa4prxl0VLQ789DuyKg+4xXNm17iE1d9NGslykn68IonMsyX1UxfAqj4BDEw9YDnFC/mftPz7rloghJAZDpKHaZVqRJNzYWGv+bBbn1Nor98VXvEQv0MUohu6lpO5yi8ZD26Iara9c2UTscdJqYLx3/s5uOtrivFRsndznAXoMjLYMZsHQMO0nzpPZ7U8FA+D9SQ44KFPoOHg5FfxjlpNcAsJV36ov3P4a8ooTcYMjcU6+GVkA8rvOfOrXe6HEUKF/KgZ5k96Dzm//rKf7LgzY++KWP11emk0AoQ4eIBrX2w/4+3AyG/WClCq8Na772HJCONGptc7j3n+iCTKq1edCsoG2ysb5MqPQr7cRSei/ojkxnnX0v3mf7m+OZrx4mPkgj1pBRpwhflE/plvELcsDUwgdKOpTSzry1VyJYFArkOyyASrVkl7VZiXpdUmj4sNBmrMq2qpCflNfL584UHY61glCfDATapAM6WyjSf7XP0tF2V+5bWyxNSmcPR+4Lj2VZMfnCqr4aqCH8GVakQqvpYMQaTvGVtHxChdhWY11FHMDBGQFUU9kFrEqjEXA6tuL9U+AwTxjhe24sN4PVJV7Y88S8ykvU2d+uS6iSbYJ6+cBGrbQEzNL3LTmgRD4hAG+gR9Si5Qm6TuUoV9unKJ3Te9c4QyuukA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(136003)(376002)(39860400002)(346002)(396003)(366004)(451199018)(2906002)(33656002)(86362001)(26005)(186003)(9686003)(64756008)(66556008)(66476007)(66946007)(76116006)(4326008)(66446008)(71200400001)(7696005)(8676002)(316002)(38100700002)(110136005)(6506007)(478600001)(122000001)(4744005)(38070700005)(5660300002)(82960400001)(55016003)(41300700001)(8936002)(52536014);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?AtgnvmaNq46ZENP+gWq4m0tTZkBXVXKEYH+ZqgVTxPmblar8nhsugv3fZdqf?=
+ =?us-ascii?Q?A2znNkF8VG3yU0ZqaU8xOfhAyoa3/GN2jSBx+QAWrjWoyiFIQ06nfKUp36Gx?=
+ =?us-ascii?Q?Fyhe2QvsAzAkzxp7VCQFmwStKbYEOiXizSZuYIQuaIcPMV9eiePwZ3cHQeKU?=
+ =?us-ascii?Q?c0LB9xQUYrzVETKEt7uD2+EzUxg3KaJuaRr1gNX59UWgGxobbzqMOgCB2ASP?=
+ =?us-ascii?Q?GbKRH9dPmfctjcvrElXTtYzEbGRx13I2+YyiklT/4cO3ED6DDsOT/szi5Ng8?=
+ =?us-ascii?Q?vJ3YUuE1qKhOIGNF01ugDpKunj6kGVrGlFU3FD1cNx+4F/fXotU8eUZ0psWh?=
+ =?us-ascii?Q?3y0nW5x9h6hGg6iPghed+F9bA7vNy2r5dCYtDR3b7jGnvVKvtcDwWHHs690B?=
+ =?us-ascii?Q?bQPmtuoxZuV8B6YuZ0uvXchjeWA/OEf81BGtsE9w6SGQ75g+7GO1gnLTPgWz?=
+ =?us-ascii?Q?jJwwToQ5BINxdPYSsSsAlnFkOCNIR7LZDUij61UU7GYhSh8UyYGf5L21xKyH?=
+ =?us-ascii?Q?8ZmuD1MHLESgzXfkC1UFgTvMpaM+ozXYua6CdWsaQvQ83fpgUzssKnsl95sr?=
+ =?us-ascii?Q?w5Z8IR61w8nz5d3U3cSvPveHOU+BcD8gtR5S0saPGtzpuULaXQ+zXuMr+W/w?=
+ =?us-ascii?Q?6okHos8PCCvu9vaes6sveR8WlMjLjqC69LLJ+mCwVBfiZdYJGKbnc2ve7+P2?=
+ =?us-ascii?Q?qKvAG/cWSFatNaR3IYGJC5t5UWCrNUZzsT17TQ2d1pXgw55L+FY+MCQkb4dr?=
+ =?us-ascii?Q?Sv08hDgZLy+8oQiImKA+IK8Cfc8kfTtFM8R9IcXnvjWVx4C3Eo3lLTSdlShU?=
+ =?us-ascii?Q?5S9D2ptV9syhF6VAqG5QCdp2L+eQxu4EA9k9SsBFINhJhM4KV2E5tGG1eL8t?=
+ =?us-ascii?Q?j/72lIJfKAblvZIIR+gw2L6xRRxpbKt8Qqy0y3p8reyMLHtyj5iVnlvd1cqY?=
+ =?us-ascii?Q?bvtut3OTMqnqn2EmkFtaDa0uuuvv8uxbs+kyq4AA0x8fOsZOuYaCDb5UuNwC?=
+ =?us-ascii?Q?aHXF3tiGWOb1QnV3Wc3gDl9Go8MDrl+d6+k4S5tCyrJ5807ZQr+imIHKayGz?=
+ =?us-ascii?Q?JzG/Bvh7jku2e3sTYCDk0LMWx5ZGGxpTQiMPww3VvoJA8sZY07dbZUHspX1F?=
+ =?us-ascii?Q?He+Pir9KMYsMQZzWr3TzDvPbZBubhUM7QufqQuKp/kGFz760Vl1gG7C3vyhl?=
+ =?us-ascii?Q?p7Mfqg/SfLrzp8XZAEi9ZjRowe4oL9BlZF8d0QafkomgtPxPE6WuMNta/g8W?=
+ =?us-ascii?Q?e2QDSV2gY8KzLVrbX/Je/KUN31TRTvMvmKOiPWlrl3A0ALNbgc9Wsek8lqsQ?=
+ =?us-ascii?Q?fI2U9LhcSJkT8D/xbSGaPxRCVV8Ljc4k7pPdoeaDc3ZvJsPd7oZ3Do1o6ROj?=
+ =?us-ascii?Q?4yybOKRIYuRa0oB0exSNlN2MGw1J/1Yv/uhP9mWEK21HTGMEOjHSdJHsoA2M?=
+ =?us-ascii?Q?E98iGRYFG7gcBYuL6tXBQqWJTVuG7MeEfeesgrJtO+K6N3vrDDbNDFHPie+x?=
+ =?us-ascii?Q?t/eUYJ8BWvhXm4iW4XXtwvlhqCoOUf5xWvRB2CMLzak/KGKOZs3iMj+4tQ6B?=
+ =?us-ascii?Q?6EEtQjFiZTKmaui5LvbyUshKB4hlTljCgAqZZRYX?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e11a048-4911-4788-f0e5-08db02a1256d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2023 09:05:34.3540
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 204MUcsZsWNRBQ+lT9fJSrXK+ftwZzqslllE6okv6jrxjMt60O8Es7+5PooSh1geUDwN8l+QU//+72exNzBbQg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB7573
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
+> From: Tomasz Duszynski <tduszynski@marvell.com>
+> Sent: Thursday, January 26, 2023 12:11 AM
+> @@ -653,7 +653,8 @@ int vfio_platform_init_common(struct
+> vfio_platform_device *vdev)
+>  	if (ret && vdev->reset_required)
+>  		dev_err(dev, "No reset function found for device %s\n",
+>  			vdev->name);
+> -	return ret;
+> +
+> +	return vdev->reset_required ? ret : 0;
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_platform_init_common);
 
-With thousands of commits going into mainline each development cycle,
-the metadata .git folder size is gradually expanding (1GB+), and for some
-developers (most likely testers) who don't care about the lengthy git-log,
-they just use git-archive to distribute a certain version of code (~210MB)
-and rebuild git repository from anywhere for further code changes, e.g.
+It reads slightly better to me as below:
 
-  $ git init && git add . -A
+	if (ret & vdev->reset_required) {
+		dev_err(...);
+		return ret;
+	}
 
-Then unfortunately, the file tracking metadata from the original git-repo
-using "git add -f" will also be lost, to the point where part of source
-files wrapped by git-archive may be accidentally cleaned up:
-
-  $ git clean -nxdf
-  Would remove Documentation/devicetree/bindings/.yamllint
-  Would remove drivers/clk/.kunitconfig
-  Would remove drivers/gpu/drm/tests/.kunitconfig
-  Would remove drivers/hid/.kunitconfig
-  Would remove fs/ext4/.kunitconfig
-  Would remove fs/fat/.kunitconfig
-  Would remove kernel/kcsan/.kunitconfig
-  Would remove lib/kunit/.kunitconfig
-  Would remove mm/kfence/.kunitconfig
-  Would remove tools/testing/selftests/arm64/tags/
-  Would remove tools/testing/selftests/kvm/.gitignore
-  Would remove tools/testing/selftests/kvm/Makefile
-  Would remove tools/testing/selftests/kvm/config
-  Would remove tools/testing/selftests/kvm/settings
-
-This asymmetry is very troubling to those users since finding out which
-files to track with "git add -f" clearly requires priori knowledge on
-various subsystems. The eradication of this little issue requires naturally
-making git-init aware of all .gitignore restrictions at different file tree
-hierarchies. Similar issues can be troubleshot with "git check-ignore -v"
-for any mistakenly cleaned files.
-
-Signed-off-by: Like Xu <likexu@tencent.com>
----
- .gitignore                               | 2 ++
- tools/testing/selftests/arm64/.gitignore | 2 ++
- tools/testing/selftests/kvm/.gitignore   | 4 ++++
- 3 files changed, 8 insertions(+)
- create mode 100644 tools/testing/selftests/arm64/.gitignore
-
-diff --git a/.gitignore b/.gitignore
-index 20dce5c3b9e0..fa39e98caee3 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -102,6 +102,8 @@ modules.order
- !.gitignore
- !.mailmap
- !.rustfmt.toml
-+!.yamllint
-+!.kunitconfig
- 
- #
- # Generated include files
-diff --git a/tools/testing/selftests/arm64/.gitignore b/tools/testing/selftests/arm64/.gitignore
-new file mode 100644
-index 000000000000..135d709d2d65
---- /dev/null
-+++ b/tools/testing/selftests/arm64/.gitignore
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+!tags
-diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
-index 6d9381d60172..96561c8e06e0 100644
---- a/tools/testing/selftests/kvm/.gitignore
-+++ b/tools/testing/selftests/kvm/.gitignore
-@@ -5,3 +5,7 @@
- !*.h
- !*.S
- !*.sh
-+!.gitignore
-+!Makefile
-+!settings
-+!config
-\ No newline at end of file
--- 
-2.39.1
-
+	return 0;
