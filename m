@@ -2,80 +2,167 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2AF8E6815CC
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 17:00:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 189C86815F7
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 17:07:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236783AbjA3QA2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 11:00:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39138 "EHLO
+        id S236670AbjA3QH2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 11:07:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236724AbjA3QA0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 11:00:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E0D11ABC4
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 07:59:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675094367;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fl/jnHLwbhnLse2jT7+4Lzwh9labRex05wjKl7Xvb60=;
-        b=gCrQJY1SRguR9+VwyYt/S22r6uq2gVf57YKF/3Jm9PnYmzTFBst0MZq/0wEq2hTZ8lnAxk
-        dQInnXWGSNk6ZoC7vLi1RZjJzutvwxzGr2PDapoPTsVABNvX6ZOjeoO788L29qBMoYJ3OM
-        z5HlZ4sJa8wuUwhherizI+tX4o1jqr4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-441-0OMBsTb3NwqemUKDMrnO3w-1; Mon, 30 Jan 2023 10:59:24 -0500
-X-MC-Unique: 0OMBsTb3NwqemUKDMrnO3w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S236669AbjA3QH1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 11:07:27 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0EF23C59;
+        Mon, 30 Jan 2023 08:07:25 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2E1F5858F09;
-        Mon, 30 Jan 2023 15:59:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.33.36.97])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 310581121314;
-        Mon, 30 Jan 2023 15:59:20 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <20230130092157.1759539-12-hch@lst.de>
-References: <20230130092157.1759539-12-hch@lst.de> <20230130092157.1759539-1-hch@lst.de>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     dhowells@redhat.com
-Cc:     Marc Dionne <marc.dionne@auristor.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-Subject: Re: [PATCH 11/23] afs: use bvec_set_folio to initialize a bvec
+        by ams.source.kernel.org (Postfix) with ESMTPS id C7CE5B81253;
+        Mon, 30 Jan 2023 16:07:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 776C9C433A1;
+        Mon, 30 Jan 2023 16:07:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675094842;
+        bh=X4aq03qfTprEgg2P4B5jLjLns6Z9kMvMXBP08AnjJnI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=i7O+hF0hl9PK/gRifk/Lx6Cf95CUAHMvtwdk9RQn/pzfwCfJPlwnySra5Tvn/BDb7
+         o084qt3maIAsgLnrR5ZjFxF+bowJ/e9Ei99Ni121huFuHnDCSRxbwdQ29OlLwBYmed
+         ci7SNMalsdIC3RJtpm7Ba10qAA3jVbbd573BzG35X5rjQsSRIkFwzsWQtg+1r4AM1A
+         tsTAcsxHvu8Y5ooCdVpCX/q6fmTRbZi957Zj8yM/5Rt7whyxAW/ngXWouoo/GR+xex
+         imwuspjLijKr7Ak+dLBAJYiB5hah1RbhubHp1QRgiqZGwavPUe0Bb5baeOpSBqXmZm
+         3d9JEPVDZr5qA==
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-163bd802238so3421753fac.1;
+        Mon, 30 Jan 2023 08:07:22 -0800 (PST)
+X-Gm-Message-State: AFqh2kpHI1kLWLnS8uz0E0MM2xYiIneJN9e+UVWjT1xeNx0AcGunMTic
+        cBOyHJzZZotJ1b8NwjYGHFahpWWr9lWhLzUuSMQ=
+X-Google-Smtp-Source: AK7set/tThFmcDWiZDC78vg3qp3LDXCIDyDuvYxEoearW2/LsbnmuL+8lG7lptjujOfHv7SSHPIU0pJxdMy5lE+Cocw=
+X-Received: by 2002:a05:6870:110f:b0:160:3296:a9b9 with SMTP id
+ 15-20020a056870110f00b001603296a9b9mr2289709oaf.287.1675094841638; Mon, 30
+ Jan 2023 08:07:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3499903.1675094359.1@warthog.procyon.org.uk>
-Date:   Mon, 30 Jan 2023 15:59:19 +0000
-Message-ID: <3499904.1675094359@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
-        DKIM_SIGNED,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_NONE autolearn=no autolearn_force=no version=3.4.6
+References: <20230130090426.13864-1-likexu@tencent.com>
+In-Reply-To: <20230130090426.13864-1-likexu@tencent.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 31 Jan 2023 01:06:45 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAT=8Z_-OJdEdUNvUwYpXvWZU7JnYLHW-o+w9GBXjaFbMQ@mail.gmail.com>
+Message-ID: <CAK7LNAT=8Z_-OJdEdUNvUwYpXvWZU7JnYLHW-o+w9GBXjaFbMQ@mail.gmail.com>
+Subject: Re: [PATCH] .gitignore: Keep track of archived files as they are
+ added to a new git repo
+To:     Like Xu <like.xu.linux@gmail.com>
+Cc:     Will Deacon <will@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Shuah Khan <shuah@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
+        Wedson Almeida Filho <wedsonaf@google.com>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Kees Cook <keescook@chromium.org>, Andrew Davis <afd@ti.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Christoph Hellwig <hch@lst.de> wrote:
+On Mon, Jan 30, 2023 at 6:04 PM Like Xu <like.xu.linux@gmail.com> wrote:
+>
+> From: Like Xu <likexu@tencent.com>
+>
+> With thousands of commits going into mainline each development cycle,
+> the metadata .git folder size is gradually expanding (1GB+), and for some
+> developers (most likely testers) who don't care about the lengthy git-log,
+> they just use git-archive to distribute a certain version of code (~210MB)
+> and rebuild git repository from anywhere for further code changes, e.g.
+>
+>   $ git init && git add . -A
+>
+> Then unfortunately, the file tracking metadata from the original git-repo
+> using "git add -f" will also be lost, to the point where part of source
+> files wrapped by git-archive may be accidentally cleaned up:
+>
+>   $ git clean -nxdf
+>   Would remove Documentation/devicetree/bindings/.yamllint
+>   Would remove drivers/clk/.kunitconfig
+>   Would remove drivers/gpu/drm/tests/.kunitconfig
+>   Would remove drivers/hid/.kunitconfig
+>   Would remove fs/ext4/.kunitconfig
+>   Would remove fs/fat/.kunitconfig
+>   Would remove kernel/kcsan/.kunitconfig
+>   Would remove lib/kunit/.kunitconfig
+>   Would remove mm/kfence/.kunitconfig
+>   Would remove tools/testing/selftests/arm64/tags/
+>   Would remove tools/testing/selftests/kvm/.gitignore
+>   Would remove tools/testing/selftests/kvm/Makefile
+>   Would remove tools/testing/selftests/kvm/config
+>   Would remove tools/testing/selftests/kvm/settings
+>
+> This asymmetry is very troubling to those users since finding out which
+> files to track with "git add -f" clearly requires priori knowledge on
+> various subsystems. The eradication of this little issue requires naturally
+> making git-init aware of all .gitignore restrictions at different file tree
+> hierarchies. Similar issues can be troubleshot with "git check-ignore -v"
+> for any mistakenly cleaned files.
+>
+> Signed-off-by: Like Xu <likexu@tencent.com>
 
-> Use the bvec_set_folio helper to initialize a bvec.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Acked-by: David Howells <dhowells@redhat.com>
 
+tools/testing/selftests/kvm/.gitignore is already meh.
+
+I hope somebody will submit a better fix.
+
+
+
+
+> ---
+>  .gitignore                               | 2 ++
+>  tools/testing/selftests/arm64/.gitignore | 2 ++
+>  tools/testing/selftests/kvm/.gitignore   | 4 ++++
+>  3 files changed, 8 insertions(+)
+>  create mode 100644 tools/testing/selftests/arm64/.gitignore
+>
+> diff --git a/.gitignore b/.gitignore
+> index 20dce5c3b9e0..fa39e98caee3 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -102,6 +102,8 @@ modules.order
+>  !.gitignore
+>  !.mailmap
+>  !.rustfmt.toml
+> +!.yamllint
+> +!.kunitconfig
+>
+>  #
+>  # Generated include files
+> diff --git a/tools/testing/selftests/arm64/.gitignore b/tools/testing/selftests/arm64/.gitignore
+> new file mode 100644
+> index 000000000000..135d709d2d65
+> --- /dev/null
+> +++ b/tools/testing/selftests/arm64/.gitignore
+> @@ -0,0 +1,2 @@
+> +# SPDX-License-Identifier: GPL-2.0-only
+> +!tags
+> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
+> index 6d9381d60172..96561c8e06e0 100644
+> --- a/tools/testing/selftests/kvm/.gitignore
+> +++ b/tools/testing/selftests/kvm/.gitignore
+> @@ -5,3 +5,7 @@
+>  !*.h
+>  !*.S
+>  !*.sh
+> +!.gitignore
+> +!Makefile
+> +!settings
+> +!config
+> \ No newline at end of file
+> --
+> 2.39.1
+>
+
+
+-- 
+Best Regards
+Masahiro Yamada
