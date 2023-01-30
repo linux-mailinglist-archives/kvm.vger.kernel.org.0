@@ -2,110 +2,194 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A4772681A4E
-	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 20:24:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A1900681A74
+	for <lists+kvm@lfdr.de>; Mon, 30 Jan 2023 20:27:45 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237660AbjA3TYt (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 14:24:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52886 "EHLO
+        id S238302AbjA3T1n (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 14:27:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55178 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231538AbjA3TYr (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 14:24:47 -0500
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CC0B212E;
-        Mon, 30 Jan 2023 11:24:45 -0800 (PST)
-Received: by mail-pj1-f54.google.com with SMTP id cq16-20020a17090af99000b0022c9791ac39so4191032pjb.4;
-        Mon, 30 Jan 2023 11:24:45 -0800 (PST)
+        with ESMTP id S238083AbjA3T1b (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 14:27:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 573AA3F295
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 11:26:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675106778;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=lxRPh/paZX5a/mJDhNvLvYnOtz1Fnppz2zZO/ehY1gY=;
+        b=PA/R8/ly6JaEybaGYIDMWNYI4GmYZhd+cCDxw2ykelHHlnp0btt1XACKEsKlAlxp/GsRTH
+        1OOQVY8kXhXETdOW8X6NAXc6amtS/kn+/IfqU9tTrY2CeahcBYGCAovbQNOqgFq73mAWdg
+        VcnZzTmysZEpcsnq3hsDsBrbpdlEuPo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-448-LAPq94fKPKKRDhEazUnCXQ-1; Mon, 30 Jan 2023 14:26:15 -0500
+X-MC-Unique: LAPq94fKPKKRDhEazUnCXQ-1
+Received: by mail-wr1-f69.google.com with SMTP id r6-20020adff106000000b002bfe5fb9649so1103819wro.14
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 11:26:15 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q0USauUwqY1SaOU2GvOVYD8aiTVQVkxSRI7nFSgwMtU=;
-        b=H3uUYUYdL0zlowCOr8tyfXc4JDL3ZjZgc6OL1sEgm+4YEEqsZ3/MFUwp5DHIe4NXIt
-         nGMOYHt2NPw5sfawWQG0G0sBA92lkpFnF2bsSgnbXdBnc1ekBPidTh41vkkWtvZyRxBg
-         nW9BJefQmaAg3i0fpUXtK0TKG6oZnP44tHeK+aaUI6ZlNDDa//5cH0JSN1Ib/qWa53FO
-         YdWhDHMnCcU6Hh8qC9F8VfiwE9AER9S4uXYAmpPetcx13RdNKhYJ0IPjYKNZL2ARstzc
-         kNdAebX6e5PAB+Gxi3K4rzoII+iWmQugiMUcv4pNEdGwJHRDCdDkJfgnZ24ob2Irtxya
-         0Eig==
-X-Gm-Message-State: AO0yUKWDxMivhK+gCHffektmOv2mXfLY2MeuIryf8YW9zQ9VhjnmfKB6
-        Q+vUJVtP1mW0MUbfSD5oQgQ=
-X-Google-Smtp-Source: AK7set/rGKHetFHi+kM9ZonjZUNA4n9BoD4xsf4KlNV/nZP1isOdo/PYXU7cRl9F9xNCOZ6lx4KGGg==
-X-Received: by 2002:a05:6a20:54a3:b0:be:a177:af43 with SMTP id i35-20020a056a2054a300b000bea177af43mr2872944pzk.24.1675106684718;
-        Mon, 30 Jan 2023 11:24:44 -0800 (PST)
-Received: from ?IPV6:2620:15c:211:201:5016:3bcd:59fe:334b? ([2620:15c:211:201:5016:3bcd:59fe:334b])
-        by smtp.gmail.com with ESMTPSA id 69-20020a630248000000b0045ff216a0casm7117730pgc.3.2023.01.30.11.24.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jan 2023 11:24:43 -0800 (PST)
-Message-ID: <0a7739db-13e2-efac-2c1a-872d7f2fa7aa@acm.org>
-Date:   Mon, 30 Jan 2023 11:24:40 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH 01/23] block: factor out a bvec_set_page helper
-Content-Language: en-US
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Ilya Dryomov <idryomov@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Howells <dhowells@redhat.com>,
-        Marc Dionne <marc.dionne@auristor.com>,
-        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
-        Trond Myklebust <trond.myklebust@hammerspace.com>,
-        Anna Schumaker <anna@kernel.org>,
-        Mike Marshall <hubcap@omnibond.com>,
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lxRPh/paZX5a/mJDhNvLvYnOtz1Fnppz2zZO/ehY1gY=;
+        b=qbcaTh8Tj3X0otG0pi4sTb8Xv89pNTFSFAELUSw8FmrTAD5z0TM6A6U2iMnDzjJfu3
+         5k2QUxFMV/VtsF6Bn0kaPUxz7eEjmXhJFmSGo+dSouqKOuYoStyQX4gB99NPvdeTb6+U
+         342+qDxHtSwlV4FMzmUsCMbmoEHscq/Wf82YJtnYQ4G3eXfVABtpnGwQWTFeIJHsGuib
+         ULnWIPfo+QfZtfXhiufLnJjm6uQMdu4UURXkJYBAGh7ALqDr8tkv+67q76NOyDA/w0xx
+         sIqhP9MvLeECMYDla/Loep5khHiTcgCimCCz7iSvzosa0nxoUawehZtDKQT3cWp+oslS
+         jwiw==
+X-Gm-Message-State: AO0yUKWiGYPps6PLdH7hvDJikcfrX+m53SHOVFpxSueMMZEmaZpE1MXe
+        HvO+jJ1oeczSCGu2G2MDLwytIFlw1xJg62tOSqou1+My/+IQsZDD+rASM16YzSuaqkQn21i9UaD
+        ZimX9FQC1unQx
+X-Received: by 2002:a5d:5908:0:b0:2bf:f027:3c30 with SMTP id v8-20020a5d5908000000b002bff0273c30mr3314161wrd.56.1675106774173;
+        Mon, 30 Jan 2023 11:26:14 -0800 (PST)
+X-Google-Smtp-Source: AK7set+eycYJ8p0mkRD8mPxEc0uaHr5C6uQOIksxyy+K6HKOMMdutlQSlkQGNzjc/g2dbWuMCMCRzg==
+X-Received: by 2002:a5d:5908:0:b0:2bf:f027:3c30 with SMTP id v8-20020a5d5908000000b002bff0273c30mr3314130wrd.56.1675106773965;
+        Mon, 30 Jan 2023 11:26:13 -0800 (PST)
+Received: from redhat.com ([2.52.144.173])
+        by smtp.gmail.com with ESMTPSA id c17-20020adffb11000000b002bc8130cca7sm12742836wrr.23.2023.01.30.11.26.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Jan 2023 11:26:13 -0800 (PST)
+Date:   Mon, 30 Jan 2023 14:26:06 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Ross Zwisler <zwisler@chromium.org>
+Cc:     linux-kernel@vger.kernel.org, Ross Zwisler <zwisler@google.com>,
+        "Tobin C. Harding" <me@tobin.cc>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alexei Starovoitov <ast@kernel.org>,
         Andrew Morton <akpm@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Chuck Lever <chuck.lever@oracle.com>,
-        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Hao Luo <haoluo@google.com>, Huang Rui <ray.huang@amd.com>,
+        Ingo Molnar <mingo@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+        Jason Wang <jasowang@redhat.com>, Jiri Olsa <jolsa@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Mykola Lysenko <mykolal@fb.com>,
+        Namhyung Kim <namhyung@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Shuah Khan <shuah@kernel.org>, Song Liu <song@kernel.org>,
+        Stanislav Fomichev <sdf@google.com>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Todd E Brandt <todd.e.brandt@linux.intel.com>,
+        Tycho Andersen <tycho@tycho.pizza>, Yonghong Song <yhs@fb.com>,
+        bpf@vger.kernel.org, kvm@vger.kernel.org,
+        linux-hardening@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-mm@kvack.org, linux-perf-users@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-rdma@vger.kernel.org,
         virtualization@lists.linux-foundation.org,
-        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
-        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
-        devel@lists.orangefs.org, io-uring@vger.kernel.org,
-        linux-mm@kvack.org
-References: <20230130092157.1759539-1-hch@lst.de>
- <20230130092157.1759539-2-hch@lst.de>
- <2bab7050-dec7-3af8-b643-31b414b8c4b4@acm.org>
-In-Reply-To: <2bab7050-dec7-3af8-b643-31b414b8c4b4@acm.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,
-        SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.6
+        linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/9] use canonical ftrace path whenever possible
+Message-ID: <20230130142555-mutt-send-email-mst@kernel.org>
+References: <20230130181915.1113313-1-zwisler@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230130181915.1113313-1-zwisler@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/30/23 09:09, Bart Van Assche wrote:
-> On 1/30/23 01:21, Christoph Hellwig wrote:
->> Add a helper to initialize a bvec based of a page pointer.  This will 
->> help
->> removing various open code bvec initializations.
+On Mon, Jan 30, 2023 at 11:19:06AM -0700, Ross Zwisler wrote:
+> The canonical location for the tracefs filesystem is at /sys/kernel/tracing.
+
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+> But, from Documentation/trace/ftrace.rst:
 > 
-> Why do you want to remove the open-coded bvec initializations? What is 
-> wrong with open-coding bvec initialization? This patch series modifies a 
-> lot of code but does not improve code readability. Anyone who encounters 
-> code that uses the new function bvec_set_page() has to look up the 
-> definition of that function to figure out what it does.
-
-Please ignore the above question - I just noticed that this question has 
-been answered in the cover letter.
-
-Bart.
+>   Before 4.1, all ftrace tracing control files were within the debugfs
+>   file system, which is typically located at /sys/kernel/debug/tracing.
+>   For backward compatibility, when mounting the debugfs file system,
+>   the tracefs file system will be automatically mounted at:
+> 
+>   /sys/kernel/debug/tracing
+> 
+> There are many places where this older debugfs path is still used in
+> code comments, selftests, examples and tools, so let's update them to
+> avoid confusion.
+> 
+> I've broken up the series as best I could by maintainer or directory,
+> and I've only sent people the patches that I think they care about to
+> avoid spamming everyone.
+> 
+> Ross Zwisler (9):
+>   tracing: always use canonical ftrace path
+>   bpf: use canonical ftrace path
+>   selftests/bpf: use canonical ftrace path
+>   perf docs: use canonical ftrace path
+>   tools/power: use canonical ftrace path
+>   selftests: use canonical ftrace path
+>   tools/virtio: use canonical ftrace path
+>   leaking_addresses: also skip canonical ftrace path
+>   tools/kvm_stat: use canonical ftrace path
+> 
+>  include/linux/kernel.h                        |  2 +-
+>  include/linux/tracepoint.h                    |  4 ++--
+>  include/uapi/linux/bpf.h                      |  8 ++++----
+>  kernel/trace/Kconfig                          | 20 +++++++++----------
+>  kernel/trace/kprobe_event_gen_test.c          |  2 +-
+>  kernel/trace/ring_buffer.c                    |  2 +-
+>  kernel/trace/synth_event_gen_test.c           |  2 +-
+>  kernel/trace/trace.c                          |  2 +-
+>  samples/bpf/cpustat_kern.c                    |  4 ++--
+>  samples/bpf/hbm.c                             |  4 ++--
+>  samples/bpf/ibumad_kern.c                     |  4 ++--
+>  samples/bpf/lwt_len_hist.sh                   |  2 +-
+>  samples/bpf/offwaketime_kern.c                |  2 +-
+>  samples/bpf/task_fd_query_user.c              |  4 ++--
+>  samples/bpf/test_lwt_bpf.sh                   |  2 +-
+>  samples/bpf/test_overhead_tp_kern.c           |  4 ++--
+>  samples/user_events/example.c                 |  4 ++--
+>  scripts/leaking_addresses.pl                  |  1 +
+>  scripts/tracing/draw_functrace.py             |  6 +++---
+>  scripts/tracing/ftrace-bisect.sh              |  4 ++--
+>  tools/include/uapi/linux/bpf.h                |  8 ++++----
+>  tools/kvm/kvm_stat/kvm_stat                   |  2 +-
+>  tools/lib/api/fs/tracing_path.c               |  4 ++--
+>  tools/lib/traceevent/event-parse.c            |  8 ++++----
+>  tools/perf/Documentation/perf-list.txt        |  2 +-
+>  tools/perf/Documentation/perf-script-perl.txt |  2 +-
+>  .../perf/Documentation/perf-script-python.txt |  4 ++--
+>  tools/power/pm-graph/sleepgraph.py            |  4 ++--
+>  .../x86/amd_pstate_tracer/amd_pstate_trace.py |  4 ++--
+>  .../intel_pstate_tracer.py                    | 10 +++++-----
+>  .../selftests/bpf/get_cgroup_id_user.c        |  2 +-
+>  .../bpf/prog_tests/kprobe_multi_test.c        |  2 +-
+>  .../bpf/prog_tests/task_fd_query_tp.c         |  2 +-
+>  .../bpf/prog_tests/tp_attach_query.c          |  2 +-
+>  .../selftests/bpf/prog_tests/trace_printk.c   |  2 +-
+>  .../selftests/bpf/prog_tests/trace_vprintk.c  |  2 +-
+>  .../selftests/bpf/progs/test_stacktrace_map.c |  2 +-
+>  .../selftests/bpf/progs/test_tracepoint.c     |  2 +-
+>  tools/testing/selftests/bpf/test_ftrace.sh    |  2 +-
+>  tools/testing/selftests/bpf/test_tunnel.sh    |  8 ++++----
+>  tools/testing/selftests/bpf/trace_helpers.c   |  4 ++--
+>  .../testing/selftests/user_events/dyn_test.c  |  2 +-
+>  .../selftests/user_events/ftrace_test.c       | 10 +++++-----
+>  .../testing/selftests/user_events/perf_test.c |  8 ++++----
+>  tools/testing/selftests/vm/protection_keys.c  |  4 ++--
+>  tools/tracing/latency/latency-collector.c     |  2 +-
+>  tools/virtio/virtio-trace/README              |  2 +-
+>  tools/virtio/virtio-trace/trace-agent.c       |  2 +-
+>  48 files changed, 96 insertions(+), 95 deletions(-)
+> 
+> -- 
+> 2.39.1.456.gfc5497dd1b-goog
 
