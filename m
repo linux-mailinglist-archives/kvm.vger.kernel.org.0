@@ -2,74 +2,77 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C1047681FF1
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 00:49:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 71DC0682015
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 00:52:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229992AbjA3Xtz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 18:49:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35372 "EHLO
+        id S231214AbjA3Xwz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 18:52:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229607AbjA3Xty (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 18:49:54 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBD0B2CC42
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 15:49:51 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id be8so13355919plb.7
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 15:49:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Hs3IBrQSokG10ZJHtMLuhAk/1kKCXkUp/Mu762hDWjQ=;
-        b=MUH6sx6kAUSdlqeQsrQeAPdSXyNlz2HcTS0x7gQsUZnV+CvOgH08KizKjJahGdZC3R
-         NPEkzCsU7VyHPrF4Ye6o1xnnzOBV2gDYbCBw2YBtT0vpQJES0pT95Dome9CznoD5tExT
-         qZFb6aBOoiRmx/9r2i5KTi9+ansCn5zMntpeJShUqX3q+rQly0V6U73vmmNjKMC+RvKP
-         i6IQbuw/ccAm6W4mednLwZbmm2SqWm9RBGAjOVIzO6wfe/sHR4zEyhM5Mowh4s+g+VNp
-         /svbtRUYyxzonpwgY3KI+pW7dPG1/UJBUGBz13JmdUFUsG3R+w4FftphLM8dQDRZ058x
-         Wshw==
+        with ESMTP id S231164AbjA3Xwx (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 18:52:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B862DE6C
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 15:52:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675122727;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=8HtdhIvc3sRp/chnPJ7lbFuqwPwYRMdQgt4UP7MxVGk=;
+        b=afmsDikJumznwcYWezhs05Z36JYHiSCvA8C5zfybcGlsuIO7JU0aROFCEflGCSzWjzLviS
+        K+CqE07YE0KyaR/aJTA6DTJjWtrOQOrppUohgoB+xJnOSSQ5FxqiAwpLfy+zBVXEjTmRiz
+        JeF7rMBo783ICsQSVRBuuzh9jW24elM=
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
+ [209.85.166.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-589-PBqdabMgNSa7nz_Ys5EFrA-1; Mon, 30 Jan 2023 18:52:05 -0500
+X-MC-Unique: PBqdabMgNSa7nz_Ys5EFrA-1
+Received: by mail-il1-f200.google.com with SMTP id l13-20020a056e0212ed00b00304c6338d79so8397441iln.21
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 15:52:05 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Hs3IBrQSokG10ZJHtMLuhAk/1kKCXkUp/Mu762hDWjQ=;
-        b=WwsolMhzyVHD/n89wf3/2KU/7a7XX50wxIiJB7A7MvAe9fSvZxgOezAsiBazGxLxFi
-         wu36n9kjJOGOIbR8dEoyMgU3yA7t0vNCxpbxyK+HVBTGDxMoRbpYTwmh4Z9NzwvQMVs/
-         IDd9/zmlm8j4kQPSiT73dXqFdT3tBcvrS1Ok6BoKqKBxqKDfaOihbSBdiDYjIBuzmz4F
-         gf9J/TYFjFqXX3af4wLQAdInLAqNdx12+x7/uG/0UvHQFGHRbtCvhxnD7LIlJGpF0uOJ
-         3b9KMyh6xEpSrOPdQ/Wi7X0lk2q4RaGL9UO1lOoR810awWkX50OV6kO80Z2XmL7jdMPa
-         WrgA==
-X-Gm-Message-State: AO0yUKWgoR78FT4nWvkJ3kYvpeRiY95hVtnjYzMLV1KM0JTuuPtDtjho
-        ubbpXv8uJq4tjY/CEvonpyn6xjWZg/hmYbNP1X8=
-X-Google-Smtp-Source: AK7set+Gk/rBYxxOctvVgN3Vf3jMBSBX5HDtoesOj1PFtv/BXSWMAPKPXf1fv+OMEkd4PFJtknhf9Q==
-X-Received: by 2002:a17:90a:6fa5:b0:22c:952:ab22 with SMTP id e34-20020a17090a6fa500b0022c0952ab22mr993595pjk.1.1675122591155;
-        Mon, 30 Jan 2023 15:49:51 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id n8-20020a17090a9f0800b0022c503c1897sm5821939pjp.3.2023.01.30.15.49.50
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8HtdhIvc3sRp/chnPJ7lbFuqwPwYRMdQgt4UP7MxVGk=;
+        b=ofxz6fiJDTCeDLKoHK6iI3dwDv7J56FmgM/V9mxMthI5YzUJxdLINmeZvNNCZeIBUW
+         CoSYr7bAjQAlKbQHDMdYDaXEQ/FNSR70lTlMwL1itofeO8aAQ+XI9qPmZbvHUegr1XVF
+         ASqYMmBVVUS8bF1Q9wSKypFSMRLo6wiL0aaDkldOeELjewnZyKMcBLhPTyNCZT+dIMUf
+         3oQ0xvq9St7RS7OA0RT/6YFCMg3eMjADt5Shq33kDJp1WDSp5hyUltERFrCnYfLSAFKv
+         Ne02A/XUEZZyGpj4vmUiZTQcMQLDiDNICCGV+B85+MoE4Wawm08VdIAOYMdSW6U9KkXf
+         71ug==
+X-Gm-Message-State: AO0yUKX7vrPusZ+x/+IhF0ylOk80RbdAUCc5smM5tnd3QvBSD3y2oGeg
+        YsJp+wKfPUXrdMJiBWYWDGCe4/bUBeK1rl930IXMv38Y2pvd91xHu7RsZXK2mpdRRSoCAFXY1np
+        1o87dEvECykHC
+X-Received: by 2002:a05:6e02:1c43:b0:310:fd98:1cc2 with SMTP id d3-20020a056e021c4300b00310fd981cc2mr3374029ilg.13.1675122725074;
+        Mon, 30 Jan 2023 15:52:05 -0800 (PST)
+X-Google-Smtp-Source: AK7set+F7KJU5EeEPHjB0AjVP96o4VSNzZzHXDZLVzr/t/KYa8cREe367jMkDLjD6opBHf2H3o4JVA==
+X-Received: by 2002:a05:6e02:1c43:b0:310:fd98:1cc2 with SMTP id d3-20020a056e021c4300b00310fd981cc2mr3374021ilg.13.1675122724850;
+        Mon, 30 Jan 2023 15:52:04 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id c10-20020a056638028a00b0037cb59b5c28sm1321706jaq.52.2023.01.30.15.52.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Jan 2023 15:49:50 -0800 (PST)
-Date:   Mon, 30 Jan 2023 23:49:47 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     David Matlack <dmatlack@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, Vipin Sharma <vipinsh@google.com>,
-        pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [Patch] KVM: x86/mmu: Make optimized __handle_changed_spte() for
- clear dirty log
-Message-ID: <Y9hXmz/nDOr1hQal@google.com>
-References: <20230125213857.824959-1-vipinsh@google.com>
- <Y9GmiyRQ6sULCjEG@google.com>
- <CANgfPd9T7jdh1Cjjo4y6DcxC2poTaGhQ7wNLf6OgGtStg-yKJg@mail.gmail.com>
- <Y9HcHRBShQgjxsQb@google.com>
- <CALzav=fkmS0U4tb4trDtbCmDxo27EcJeOWbiwb+meagj9+PFiw@mail.gmail.com>
+        Mon, 30 Jan 2023 15:52:04 -0800 (PST)
+Date:   Mon, 30 Jan 2023 16:52:03 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yishai Hadas <yishaih@nvidia.com>
+Cc:     <jgg@nvidia.com>, <kvm@vger.kernel.org>, <kevin.tian@intel.com>,
+        <joao.m.martins@oracle.com>, <leonro@nvidia.com>,
+        <shayd@nvidia.com>, <maorg@nvidia.com>, <avihaih@nvidia.com>
+Subject: Re: [PATCH vfio 0/3] Few improvements in the migration area of mlx5
+ driver
+Message-ID: <20230130165203.61d6e6b9.alex.williamson@redhat.com>
+In-Reply-To: <20230124144955.139901-1-yishaih@nvidia.com>
+References: <20230124144955.139901-1-yishaih@nvidia.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CALzav=fkmS0U4tb4trDtbCmDxo27EcJeOWbiwb+meagj9+PFiw@mail.gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -77,184 +80,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023, David Matlack wrote:
-> On Wed, Jan 25, 2023 at 5:49 PM Sean Christopherson <seanjc@google.com> wrote:
-> [...]
-> > ---
-> >  arch/x86/kvm/mmu/tdp_mmu.c | 92 ++++++++++----------------------------
-> >  1 file changed, 24 insertions(+), 68 deletions(-)
-> >
-> > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > index bba33aea0fb0..2f78ca43a276 100644
-> > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> [...]
-> > @@ -1289,8 +1244,7 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
-> >                 new_spte = mark_spte_for_access_track(new_spte);
-> >         }
-> >
-> > -       tdp_mmu_set_spte_no_acc_track(kvm, iter, new_spte);
-> > -
-> > +       kvm_tdp_mmu_write_spte(iter->sptep, iter->old_spte, new_spte, iter->level);
+On Tue, 24 Jan 2023 16:49:52 +0200
+Yishai Hadas <yishaih@nvidia.com> wrote:
+
+> This series includes few improvements for mlx5 driver in the migration
+> area as of below.
 > 
-> This can race with fast_page_fault() setting the W-bit and the CPU
-> setting the D-bit. i.e. This call to kvm_tdp_mmu_write_spte() could
-> clear the W-bit or D-bit.
+> The first patch adds an early checking whether the VF was configured to
+> support migration and report this capability accordingly.
+> 
+> This is a complementary patch for the series [1] that was accepted in
+> the previous kernel cycle in the devlink/mlx5_core area which requires a
+> specific setting for a VF to be migratable capable.
+> 
+> The other two patches improve the PRE_COPY flow in both the source and
+> the target to prepare ahead the stuff (i.e. data buffers, MKEY) that is
+> needed upon STOP_COPY and as such reduce the migration downtime.
+> 
+> [1] https://www.spinics.net/lists/netdev/msg867066.html
+> 
+> Yishai
+> 
+> Shay Drory (1):
+>   vfio/mlx5: Check whether VF is migratable
+> 
+> Yishai Hadas (2):
+>   vfio/mlx5: Improve the source side flow upon pre_copy
+>   vfio/mlx5: Improve the target side flow to reduce downtime
+> 
+>  drivers/vfio/pci/mlx5/cmd.c  |  58 +++++++--
+>  drivers/vfio/pci/mlx5/cmd.h  |  28 +++-
+>  drivers/vfio/pci/mlx5/main.c | 244 ++++++++++++++++++++++++++++++-----
+>  3 files changed, 284 insertions(+), 46 deletions(-)
+> 
 
-Ugh, right.  Hrm.  Duh, I just didn't go far enough.  A straight XCHG is silly.
-Except for the access-tracking mess, KVM wants to clear a single bit.  Writing
-the entire thing and potentially clobbering bits is wasteful and unnecessarily
-dangerous.  And the access-tracking code already needs special handling.
+Applied to vfio next branch for v6.3.  Thanks,
 
-We can just simplify this all by adding a helper to clear a single bit (and
-maybe even use clear_bit() and __clear_bit() if we save the bit number for the
-W/A/D bits and not just the mask).  And if it weren't for EPT (different A/D
-locations), we could even use static asserts to restrict the usage to the W/A/D
-bits :-/  Oh well.
-
-E.g. this
-
-static inline void kvm_tdp_mmu_clear_spte_bit(struct tdp_iter *iter, u64 mask)
-{
-	if (kvm_tdp_mmu_spte_has_volatile_bits(iter->old_spte, iter->level))
-		atomic64_and(~mask, (atomic64_t *)rcu_dereference(iter->sptep));
-	else
-		__kvm_tdp_mmu_write_spte(iter->sptep, iter->old_spte & ~mask);
-}
-
-yields another untested patch:
-
----
- arch/x86/kvm/mmu/tdp_iter.h | 24 +++++++++++++++++++-----
- arch/x86/kvm/mmu/tdp_mmu.c  | 33 +++++++++++++--------------------
- 2 files changed, 32 insertions(+), 25 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/tdp_iter.h b/arch/x86/kvm/mmu/tdp_iter.h
-index f0af385c56e0..09c8f2640ccc 100644
---- a/arch/x86/kvm/mmu/tdp_iter.h
-+++ b/arch/x86/kvm/mmu/tdp_iter.h
-@@ -29,11 +29,10 @@ static inline void __kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 new_spte)
- 	WRITE_ONCE(*rcu_dereference(sptep), new_spte);
- }
- 
--static inline u64 kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 old_spte,
--					 u64 new_spte, int level)
-+static inline bool kvm_tdp_mmu_spte_has_volatile_bits(u64 old_spte, int level)
- {
- 	/*
--	 * Atomically write the SPTE if it is a shadow-present, leaf SPTE with
-+	 * Atomically write SPTEs if it is a shadow-present, leaf SPTE with
- 	 * volatile bits, i.e. has bits that can be set outside of mmu_lock.
- 	 * The Writable bit can be set by KVM's fast page fault handler, and
- 	 * Accessed and Dirty bits can be set by the CPU.
-@@ -44,8 +43,15 @@ static inline u64 kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 old_spte,
- 	 * logic needs to be reassessed if KVM were to use non-leaf Accessed
- 	 * bits, e.g. to skip stepping down into child SPTEs when aging SPTEs.
- 	 */
--	if (is_shadow_present_pte(old_spte) && is_last_spte(old_spte, level) &&
--	    spte_has_volatile_bits(old_spte))
-+	return is_shadow_present_pte(old_spte) &&
-+	       is_last_spte(old_spte, level) &&
-+	       spte_has_volatile_bits(old_spte);
-+}
-+
-+static inline u64 kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 old_spte,
-+					 u64 new_spte, int level)
-+{
-+	if (kvm_tdp_mmu_spte_has_volatile_bits(old_spte, level))
- 		return kvm_tdp_mmu_write_spte_atomic(sptep, new_spte);
- 
- 	__kvm_tdp_mmu_write_spte(sptep, new_spte);
-@@ -115,4 +121,12 @@ void tdp_iter_start(struct tdp_iter *iter, struct kvm_mmu_page *root,
- void tdp_iter_next(struct tdp_iter *iter);
- void tdp_iter_restart(struct tdp_iter *iter);
- 
-+static inline void kvm_tdp_mmu_clear_spte_bit(struct tdp_iter *iter, u64 mask)
-+{
-+	if (kvm_tdp_mmu_spte_has_volatile_bits(iter->old_spte, iter->level))
-+		atomic64_and(~mask, (atomic64_t *)rcu_dereference(iter->sptep));
-+	else
-+		__kvm_tdp_mmu_write_spte(iter->sptep, iter->old_spte & ~mask);
-+}
-+
- #endif /* __KVM_X86_MMU_TDP_ITER_H */
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 2f78ca43a276..32a7209a522d 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -1223,28 +1223,26 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
- static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
- 			  struct kvm_gfn_range *range)
- {
--	u64 new_spte = 0;
-+	u64 new_spte;
- 
- 	/* If we have a non-accessed entry we don't need to change the pte. */
- 	if (!is_accessed_spte(iter->old_spte))
- 		return false;
- 
--	new_spte = iter->old_spte;
--
--	if (spte_ad_enabled(new_spte)) {
--		new_spte &= ~shadow_accessed_mask;
-+	if (spte_ad_enabled(iter->old_spte)) {
-+		kvm_tdp_mmu_clear_spte_bit(iter, shadow_accessed_mask);
- 	} else {
-+		new_spte = mark_spte_for_access_track(iter->old_spte);
-+		iter->old_spte = kvm_tdp_mmu_write_spte(iter->sptep, iter->old_spte,
-+							new_spte, iter->level);
- 		/*
- 		 * Capture the dirty status of the page, so that it doesn't get
- 		 * lost when the SPTE is marked for access tracking.
- 		 */
--		if (is_writable_pte(new_spte))
--			kvm_set_pfn_dirty(spte_to_pfn(new_spte));
--
--		new_spte = mark_spte_for_access_track(new_spte);
-+		if (is_writable_pte(iter->old_spte))
-+			kvm_set_pfn_dirty(spte_to_pfn(iter->old_spte));
- 	}
- 
--	kvm_tdp_mmu_write_spte(iter->sptep, iter->old_spte, new_spte, iter->level);
- 	return true;
- }
- 
-@@ -1632,7 +1630,6 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
- 				  gfn_t gfn, unsigned long mask, bool wrprot)
- {
- 	struct tdp_iter iter;
--	u64 new_spte;
- 
- 	rcu_read_lock();
- 
-@@ -1648,20 +1645,16 @@ static void clear_dirty_pt_masked(struct kvm *kvm, struct kvm_mmu_page *root,
- 		mask &= ~(1UL << (iter.gfn - gfn));
- 
- 		if (wrprot || spte_ad_need_write_protect(iter.old_spte)) {
--			if (is_writable_pte(iter.old_spte))
--				new_spte = iter.old_spte & ~PT_WRITABLE_MASK;
--			else
-+			if (!is_writable_pte(iter.old_spte))
- 				continue;
-+
-+			kvm_tdp_mmu_clear_spte_bit(&iter, PT_WRITABLE_MASK);
- 		} else {
--			if (iter.old_spte & shadow_dirty_mask)
--				new_spte = iter.old_spte & ~shadow_dirty_mask;
--			else
-+			if (!(iter.old_spte & shadow_dirty_mask))
- 				continue;
- 
--			kvm_set_pfn_dirty(spte_to_pfn(iter.old_spte));
-+			kvm_tdp_mmu_clear_spte_bit(&iter, shadow_dirty_mask);
- 		}
--
--		kvm_tdp_mmu_write_spte(iter.sptep, iter.old_spte, new_spte, iter.level);
- 	}
- 
- 	rcu_read_unlock();
-
-base-commit: 7bb67c88a2d77cc95524912f3b1ca51daf5c0224
--- 
-
+Alex
 
