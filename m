@@ -2,45 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 846DD682484
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 07:38:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id AC1576824C6
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 07:45:36 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230104AbjAaGig (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 01:38:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34862 "EHLO
+        id S230268AbjAaGpg (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 01:45:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229828AbjAaGif (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 01:38:35 -0500
-X-Greylist: delayed 387 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 30 Jan 2023 22:38:33 PST
-Received: from out-77.mta1.migadu.com (out-77.mta1.migadu.com [95.215.58.77])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE2C03CE2A
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 22:38:33 -0800 (PST)
-Date:   Tue, 31 Jan 2023 07:32:03 +0100
+        with ESMTP id S230329AbjAaGp2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 01:45:28 -0500
+Received: from out-159.mta1.migadu.com (out-159.mta1.migadu.com [95.215.58.159])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D85F640BE4
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 22:44:52 -0800 (PST)
+Date:   Tue, 31 Jan 2023 07:43:37 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1675146724;
+        t=1675147418;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=x8Kn2qeJM1klhLG/HhjicUBVZSX/GZZVoTBt/Rvyd2E=;
-        b=xxKybRY1ykRSEdudXEQS2ucWfFEh/LyCFhGW7F4W+nqF8YNTdCCoOiGZxR5VovBqsWv0rG
-        Al6UCOKMpmaAXHNNId1taW5DKnvnXvrkebJr6b9ZyB38czKut1ckVcsx/HYrFrzvtpd0Cw
-        MH3+ojnjLTYZqsvmCBL2JS/4e9GfsSw=
+        bh=b0E0PMaFQR5dXV1ymlnmzh8YVAA9azRsiP173rD9u2c=;
+        b=Urxn+yy9CWLz4OeLnVgpnXwb4CV5eSQi/kvEOJW5ieR0YvjWMeIN2Z5se/57dmiZogNj7P
+        MuV4hIJ/QjU+zaEsIxoNvZjHktw6an4WlgbFBMvQ4ITDOu6bHkcDLzDKm8PTiEjeVrC4nM
+        JFpV/Ksfgtxx7mws92CFe53lWbLYzD4=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From:   Andrew Jones <andrew.jones@linux.dev>
-To:     Colton Lewis <coltonlewis@google.com>
-Cc:     thuth@redhat.com, pbonzini@redhat.com, nrb@linux.ibm.com,
-        imbrenda@linux.ibm.com, marcorr@google.com,
-        alexandru.elisei@arm.com, oliver.upton@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Subject: Re: [kvm-unit-tests PATCH v3 1/1] arm: Replace MAX_SMP probe loop in
- favor of reading directly
-Message-ID: <20230131063203.67qgjf2ispi2k6hd@orel>
-References: <20230130195700.729498-1-coltonlewis@google.com>
- <20230130195700.729498-2-coltonlewis@google.com>
+To:     Alexandru Elisei <alexandru.elisei@arm.com>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v5 1/2] arm/psci: Test that CPU 1 has been
+ successfully brought online
+Message-ID: <20230131064337.6w73gj3inijbo3yb@orel>
+References: <20230127175916.65389-1-alexandru.elisei@arm.com>
+ <20230127175916.65389-2-alexandru.elisei@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230130195700.729498-2-coltonlewis@google.com>
+In-Reply-To: <20230127175916.65389-2-alexandru.elisei@arm.com>
 X-Migadu-Flow: FLOW_OUT
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
@@ -51,71 +47,210 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 07:57:00PM +0000, Colton Lewis wrote:
-> Replace the MAX_SMP probe loop in favor of reading a number directly
-> from the QEMU error message. This is equally safe as the existing code
-> because the error message has had the same format as long as it has
-> existed, since QEMU v2.10. The final number before the end of the
-> error message line indicates the max QEMU supports. A short awk
-
-awk is not used, despite the comment also being updated to say it's
-being used.
-
-> program is used to extract the number, which becomes the new MAX_SMP
-> value.
+On Fri, Jan 27, 2023 at 05:59:15PM +0000, Alexandru Elisei wrote:
+> For the PSCI CPU_ON function test, all other CPUs perform a CPU_ON call
+> that target CPU 1. The test is considered a success if CPU_ON returns PSCI
+> SUCCESS exactly once, and for the rest of the calls PSCI ALREADY_ON.
 > 
-> This loop logic is broken for machines with a number of CPUs that
-> isn't a power of two. This problem was noticed for gicv2 tests on
-> machines with a non-power-of-two number of CPUs greater than 8 because
-> tests were running with MAX_SMP less than 8. As a hypthetical example,
-> a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 1 ==
-> 6. This can, in rare circumstances, lead to different test results
-> depending only on the number of CPUs the machine has.
+> Enhance the test by checking that CPU 1 is actually online and able to
+> execute code. Also make the test more robust by checking that the CPU_ON
+> call returns, instead of assuming that it will always succeed and
+> hanging indefinitely if it doesn't.
 > 
-> A previous comment explains the loop should only apply to kernels
-> <=v4.3 on arm and suggests deletion when it becomes tiresome to
-> maintian. However, it is always theoretically possible to test on a
-> machine that has more CPUs than QEMU supports, so it makes sense to
-> leave some check in place.
+> Since the CPU 1 thread is now being set up properly by kvm-unit-tests
+> when being brought online, it becomes possible to add other tests in the
+> future that require all CPUs.
 > 
-> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+> The include header order in arm/psci.c has been changed to be in
+> alphabetic order. This means moving the errata.h include before
+> libcflat.h, which causes compilation to fail because of missing includes
+> in errata.h. Fix that also by including the needed header in errata.h.
+> 
+> Signed-off-by: Alexandru Elisei <alexandru.elisei@arm.com>
 > ---
->  scripts/runtime.bash | 16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
+>  arm/psci.c        | 67 ++++++++++++++++++++++++++++++++++++++---------
+>  lib/arm/asm/smp.h |  9 ++++++-
+>  lib/arm/smp.c     |  4 ---
+>  lib/errata.h      |  2 ++
+>  4 files changed, 64 insertions(+), 18 deletions(-)
 > 
-> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
-> index f8794e9a..587ffe30 100644
-> --- a/scripts/runtime.bash
-> +++ b/scripts/runtime.bash
-> @@ -188,12 +188,10 @@ function run()
->  # Probe for MAX_SMP, in case it's less than the number of host cpus.
->  #
->  # This probing currently only works for ARM, as x86 bails on another
-
-It just occurred to me that this code runs on all architectures, even
-though it only works for Arm. We should wrap this code in $ARCH
-checks or put it in a function which only Arm calls. That change
-should be a separate patch though.
-
-> -# error first. Also, this probing isn't necessary for any ARM hosts
-> -# running kernels later than v4.3, i.e. those including ef748917b52
-> -# "arm/arm64: KVM: Remove 'config KVM_ARM_MAX_VCPUS'". So, at some
-> -# point when maintaining the while loop gets too tiresome, we can
-> -# just remove it...
-> -while $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> -		|& grep -qi 'exceeds max CPUs'; do
-> -	MAX_SMP=$((MAX_SMP >> 1))
-> -done
-> +# error first. The awk program takes the last number from the QEMU
-> +# error message, which gives the allowable MAX_SMP.
-> +if smp=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
-> +      |& grep 'exceeds max CPUs'); then
-> +	smp=${smp##*(}
-> +	MAX_SMP=${smp:0:-1}
-> +fi
+> diff --git a/arm/psci.c b/arm/psci.c
+> index efa0722c0566..f7238f8e0bbd 100644
+> --- a/arm/psci.c
+> +++ b/arm/psci.c
+> @@ -7,11 +7,14 @@
+>   *
+>   * This work is licensed under the terms of the GNU LGPL, version 2.
+>   */
+> -#include <libcflat.h>
+>  #include <errata.h>
+> +#include <libcflat.h>
+> +
+> +#include <asm/delay.h>
+> +#include <asm/mmu.h>
+>  #include <asm/processor.h>
+> -#include <asm/smp.h>
+>  #include <asm/psci.h>
+> +#include <asm/smp.h>
+>  
+>  static bool invalid_function_exception;
+>  
+> @@ -72,46 +75,84 @@ static int cpu_on_ret[NR_CPUS];
+>  static cpumask_t cpu_on_ready, cpu_on_done;
+>  static volatile int cpu_on_start;
+>  
+> -static void cpu_on_secondary_entry(void)
+> +extern void secondary_entry(void);
+> +static void cpu_on_do_wake_target(void)
+>  {
+>  	int cpu = smp_processor_id();
+>  
+>  	cpumask_set_cpu(cpu, &cpu_on_ready);
+>  	while (!cpu_on_start)
+>  		cpu_relax();
+> -	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(halt));
+> +	cpu_on_ret[cpu] = psci_cpu_on(cpus[1], __pa(secondary_entry));
+>  	cpumask_set_cpu(cpu, &cpu_on_done);
+>  }
+>  
+> +static void cpu_on_target(void)
+> +{
+> +	int cpu = smp_processor_id();
+> +
+> +	cpumask_set_cpu(cpu, &cpu_on_done);
+> +}
+> +
+> +extern struct secondary_data secondary_data;
+> +
+> +/* Open code the setup part from smp_boot_secondary(). */
+> +static void psci_cpu_on_prepare_secondary(int cpu, secondary_entry_fn entry)
+> +{
+> +	secondary_data.stack = thread_stack_alloc();
+> +	secondary_data.entry = entry;
+> +	mmu_mark_disabled(cpu);
+> +}
+> +
+>  static bool psci_cpu_on_test(void)
+>  {
+>  	bool failed = false;
+>  	int ret_success = 0;
+> -	int cpu;
+> -
+> -	cpumask_set_cpu(1, &cpu_on_ready);
+> -	cpumask_set_cpu(1, &cpu_on_done);
+> +	int i, cpu;
+>  
+>  	for_each_present_cpu(cpu) {
+>  		if (cpu < 2)
+>  			continue;
+> -		smp_boot_secondary(cpu, cpu_on_secondary_entry);
+> +		smp_boot_secondary(cpu, cpu_on_do_wake_target);
+>  	}
+>  
+>  	cpumask_set_cpu(0, &cpu_on_ready);
+> +	cpumask_set_cpu(1, &cpu_on_ready);
+>  	while (!cpumask_full(&cpu_on_ready))
+>  		cpu_relax();
+>  
+> +	/*
+> +	 * Configure CPU 1 after all secondaries are online to avoid
+> +	 * secondary_data being overwritten.
+> +	 */
+> +	psci_cpu_on_prepare_secondary(1, cpu_on_target);
+> +
+>  	cpu_on_start = 1;
+>  	smp_mb();
+>  
+> -	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(halt));
+> +	cpu_on_ret[0] = psci_cpu_on(cpus[1], __pa(secondary_entry));
+>  	cpumask_set_cpu(0, &cpu_on_done);
+>  
+> -	while (!cpumask_full(&cpu_on_done))
+> -		cpu_relax();
+> +	report_info("waiting for CPU1 to come online...");
+> +	for (i = 0; i < 100; i++) {
+> +		mdelay(10);
+> +		if (cpumask_full(&cpu_on_done))
+> +			break;
+> +	}
+>  
+> -	for_each_present_cpu(cpu) {
+> +	if (!cpumask_full(&cpu_on_done)) {
+> +		for_each_present_cpu(cpu) {
+> +			if (!cpumask_test_cpu(cpu, &cpu_on_done)) {
+> +				if (cpu == 1)
+> +					report_info("CPU1 failed to come online");
+> +				else
+> +					report_info("CPU%d failed to online CPU1", cpu);
+> +			}
+> +		}
+> +		failed = true;
+> +	}
+> +
+> +	for_each_cpu(cpu, &cpu_on_done) {
+>  		if (cpu == 1)
+>  			continue;
+>  		if (cpu_on_ret[cpu] == PSCI_RET_SUCCESS) {
+> diff --git a/lib/arm/asm/smp.h b/lib/arm/asm/smp.h
+> index 077afde85520..dee4c1a883e7 100644
+> --- a/lib/arm/asm/smp.h
+> +++ b/lib/arm/asm/smp.h
+> @@ -10,6 +10,14 @@
+>  
+>  #define smp_processor_id()		(current_thread_info()->cpu)
+>  
+> +typedef void (*secondary_entry_fn)(void);
+> +
+> +struct secondary_data {
+> +	void *stack;            /* must be first member of struct */
+> +	secondary_entry_fn entry;
+> +};
+> +extern struct secondary_data secondary_data;
+> +
+>  extern bool cpu0_calls_idle;
+>  
+>  extern void halt(void);
+> @@ -48,7 +56,6 @@ static inline void set_cpu_idle(int cpu, bool idle)
+>  		cpumask_clear_cpu(cpu, &cpu_idle_mask);
+>  }
+>  
+> -typedef void (*secondary_entry_fn)(void);
+>  extern void smp_boot_secondary(int cpu, secondary_entry_fn entry);
+>  extern void on_cpu_async(int cpu, void (*func)(void *data), void *data);
+>  extern void on_cpu(int cpu, void (*func)(void *data), void *data);
+> diff --git a/lib/arm/smp.c b/lib/arm/smp.c
+> index 98a5054e039b..1d470d1aab45 100644
+> --- a/lib/arm/smp.c
+> +++ b/lib/arm/smp.c
+> @@ -21,10 +21,6 @@ cpumask_t cpu_present_mask;
+>  cpumask_t cpu_online_mask;
+>  cpumask_t cpu_idle_mask;
+>  
+> -struct secondary_data {
+> -	void *stack;            /* must be first member of struct */
+> -	secondary_entry_fn entry;
+> -};
+>  struct secondary_data secondary_data;
+>  static struct spinlock lock;
+>  
+> diff --git a/lib/errata.h b/lib/errata.h
+> index 5af0eb3bf8e2..de8205d8b370 100644
+> --- a/lib/errata.h
+> +++ b/lib/errata.h
+> @@ -6,6 +6,8 @@
+>   */
+>  #ifndef _ERRATA_H_
+>  #define _ERRATA_H_
+> +#include <libcflat.h>
+> +
+>  #include "config.h"
+>  
+>  #ifndef CONFIG_ERRATA_FORCE
 > -- 
-> 2.39.1.456.gfc5497dd1b-goog
+> 2.39.0
 >
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 
 Thanks,
 drew
