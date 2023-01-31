@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8BA1E682923
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:41:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A7DD682930
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:42:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232428AbjAaJlR (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 04:41:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39658 "EHLO
+        id S232321AbjAaJmW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 04:42:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41018 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232377AbjAaJlQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 04:41:16 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E7834016
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:41:13 -0800 (PST)
+        with ESMTP id S232253AbjAaJmV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 04:42:21 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF66410BD
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:41:46 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 47B18B81AB2
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:41:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED1A4C433D2;
-        Tue, 31 Jan 2023 09:41:10 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4015761489
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:41:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A65A1C433D2;
+        Tue, 31 Jan 2023 09:41:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675158071;
-        bh=+GltZpNflPk7u9VdDh7mZpVKmw9p7r9TMmLIybZwI6k=;
+        s=k20201202; t=1675158102;
+        bh=dhvTz42JuyazXpHz1ww4ODtTIeXpTYgqJ/HxgzVe05I=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rQRVCFoPS0E+D8hra1XrkuIZ6flmXIycElJa/94fr33d18W0aRjsc1ti+b/5VA5Zp
-         NZlwOnRss11X0bvqC60AZ99YRdKtDlxHOJUkdfxF+dz1RgjoL438r4bjfjPtUrAfeL
-         aVm0ra+U/1TnnOp7TBhyj9MgFxaXdOxfdrCxUAX+jPWhYZLUydasMQk6Jqn9UmXQ+h
-         lehOD/yZeXDTJlpxGhDetODQlkwFzE8NE8t9AjobK+SmSZfEQMqVNKPXUNvpfpVMn7
-         LPIR3OMYpAvQ/rZifZe77G5cvuLEwi7j75G5PbLcfdTBl6+1OAUuj24+g8bK7jK21w
-         +9X0f0FYl/Yqw==
+        b=n3bxXxfv1nzA7Q3ssHo+NQw0xe1S0gZuLWQAF9Y1zz7Yl1CCVPhrpV8CJy2C0Fl6M
+         Kcz3CS/KQ8i8w3UlZn3FSeXML/7tVyU7Brq+f+FLNk8hE1Y/uxTIMQMgtNh/Pqktij
+         8fi76IpMBi3ftiJTD2euN11U496HzLmw+Y+au9KHlPFpcmPBxEbgWE8S8PSAGfv0wo
+         PQtx1wdjJ7bwOAo1nHUX8FNVfQm6C2yEST6qJhlYABiTS2kzY9O4thNzwVm/i0tdjF
+         emeUGGFyhV3SKQkLGjsBXl7rYzihXol6st7JCH4Lh0sWx+sbG8rjXddc6DgcmPxwIW
+         9GCWxZREMwnfQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pMmtT-0067U2-D2;
+        id 1pMmtT-0067U2-LQ;
         Tue, 31 Jan 2023 09:25:35 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 21/69] KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
-Date:   Tue, 31 Jan 2023 09:24:16 +0000
-Message-Id: <20230131092504.2880505-22-maz@kernel.org>
+Subject: [PATCH v8 22/69] KVM: arm64: nv: Handle PSCI call via smc from the guest
+Date:   Tue, 31 Jan 2023 09:24:17 +0000
+Message-Id: <20230131092504.2880505-23-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -74,45 +74,69 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-For the same reason we trap virtual memory register accesses in virtual
-EL2, we trap CPACR_EL1 access too; We allow the virtual EL2 mode to
-access EL1 system register state instead of the virtual EL2 one.
+VMs used to execute hvc #0 for the psci call if EL3 is not implemented.
+However, when we come to provide the virtual EL2 mode to the VM, the
+host OS inside the VM calls kvm_call_hyp() which is also hvc #0. So,
+it's hard to differentiate between them from the host hypervisor's point
+of view.
+
+So, let the VM execute smc instruction for the psci call. On ARMv8.3,
+even if EL3 is not implemented, a smc instruction executed at non-secure
+EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than being treated as
+UNDEFINED. So, the host hypervisor can handle this psci call without any
+confusion.
 
 Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 3 +++
- arch/arm64/kvm/sys_regs.c       | 2 +-
- 2 files changed, 4 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/handle_exit.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index c8da8d350453..41385bb02d6b 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -68,6 +68,9 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 		__activate_traps_fpsimd32(vcpu);
- 	}
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index e75101f2aa6c..b0c343c4e062 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -63,6 +63,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
  
-+	if (vcpu_is_el2(vcpu) && !vcpu_el2_e2h_is_set(vcpu))
-+		val |= CPTR_EL2_TCPAC;
-+	
- 	write_sysreg(val, cpacr_el1);
+ static int handle_smc(struct kvm_vcpu *vcpu)
+ {
++	int ret;
++
+ 	/*
+ 	 * "If an SMC instruction executed at Non-secure EL1 is
+ 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
+@@ -70,10 +72,28 @@ static int handle_smc(struct kvm_vcpu *vcpu)
+ 	 *
+ 	 * We need to advance the PC after the trap, as it would
+ 	 * otherwise return to the same address...
++	 *
++	 * If imm is non-zero, it's not defined, so just skip it.
++	 */
++	if (kvm_vcpu_hvc_get_imm(vcpu)) {
++		vcpu_set_reg(vcpu, 0, ~0UL);
++		kvm_incr_pc(vcpu);
++		return 1;
++	}
++
++	/*
++	 * If imm is zero, it's a psci call.
++	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
++	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
++	 * being treated as UNDEFINED.
+ 	 */
+-	vcpu_set_reg(vcpu, 0, ~0UL);
++	ret = kvm_hvc_call_handler(vcpu);
++	if (ret < 0)
++		vcpu_set_reg(vcpu, 0, ~0UL);
++
+ 	kvm_incr_pc(vcpu);
+-	return 1;
++
++	return ret;
+ }
  
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index b559a289d996..1cc68ca9eb20 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -2038,7 +2038,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 
- 	{ SYS_DESC(SYS_SCTLR_EL1), access_vm_reg, reset_val, SCTLR_EL1, 0x00C50078 },
- 	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
--	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
-+	{ SYS_DESC(SYS_CPACR_EL1), access_rw, reset_val, CPACR_EL1, 0 },
- 
- 	MTE_REG(RGSR_EL1),
- 	MTE_REG(GCR_EL1),
+ /*
 -- 
 2.34.1
 
