@@ -2,33 +2,47 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B36EA6838FC
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 23:01:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id E6D18683908
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 23:05:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230281AbjAaWBc (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 17:01:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35880 "EHLO
+        id S231773AbjAaWFZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 17:05:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230414AbjAaWB3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 17:01:29 -0500
-Received: from out-48.mta1.migadu.com (out-48.mta1.migadu.com [IPv6:2001:41d0:203:375::30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF7C54200
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 14:01:17 -0800 (PST)
-Date:   Tue, 31 Jan 2023 22:01:10 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1675202475;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=hF/1JIX2REtL2/Qz1+cxYWhMMeoRoACTMXxfqUjUYco=;
-        b=sY3qNs0mkwHpAxOAoD2c7kJV/kexu8at9z88dznVcZhFHU+7QsXakoHxbV2FWdCWmnzWyt
-        YQqJunw3Si1f7XenSCEDk9ZyKDlA2SFkHhqqNyIsOFRRRC1TMGOKXbbf4teF6U7HTQl9Cf
-        bzdn+tF4IY2LYFeT/iHdC3uCbMBFTek=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Marc Zyngier <maz@kernel.org>
-Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        with ESMTP id S231688AbjAaWFV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 17:05:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E5825AA51
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 14:04:50 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6DFB6B81ED8
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 22:04:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EE74C433D2;
+        Tue, 31 Jan 2023 22:04:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675202683;
+        bh=QyEnfFrU4jzPsRHieCZShQfZdjS0kUZi0FdbqSHqlvk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=EMrVPrFky0qxWHgpJ56HHG7MGI57MhJ9atMErWLxoXVhhxVXDO0wpob1wWbWS0eh6
+         4rfVgy15QPqYUhNh5bWGR3W+cxVW3m4HpUAugmAS/P7THlzy5BGQn3b6XFk1C5/kUU
+         adJqG2JeQ6YeH/7m5280K4NoBulFaWZ1/S54Onpr5cnl8Lea1yUvGneXhmhqPPJO2h
+         eNsXVv6CBLlJuHsMJhAeJWC1q5ppN+wOX0MyFHFGo2GEzfZRMjB/S6cU0bhWvTersJ
+         6SVJ4PNLOuolg7wuLBZI4lZCMDO9e6NdSS7AgzVkGOq7sq1KJwFFQTRYOAbNrWqmDe
+         5sSzxY8Vyj1zw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pMyk4-006Km0-Lk;
+        Tue, 31 Jan 2023 22:04:40 +0000
+Date:   Tue, 31 Jan 2023 22:04:40 +0000
+Message-ID: <87zg9ycqdj.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
         Alexandru Elisei <alexandru.elisei@arm.com>,
         Andre Przywara <andre.przywara@arm.com>,
         Chase Conklin <chase.conklin@arm.com>,
@@ -37,52 +51,92 @@ Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
         Jintack Lim <jintack@cs.columbia.edu>,
         Russell King <rmk+kernel@armlinux.org.uk>,
         James Morse <james.morse@arm.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH v8 01/69] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
-Message-ID: <Y9mPpijHEinJkRQZ@google.com>
+Subject: Re: [PATCH v8 09/69] KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
+In-Reply-To: <Y9l3bofl5nMWy3wZ@google.com>
 References: <20230131092504.2880505-1-maz@kernel.org>
- <20230131092504.2880505-2-maz@kernel.org>
- <b7dbe85e-c7f8-48ad-e1af-85befabd8509@arm.com>
- <86cz6u248j.wl-maz@kernel.org>
- <3c15760c-c76f-3d5d-a661-442459ce4e07@arm.com>
- <Y9l0PzgnKZiFJjvp@google.com>
- <871qnae6ov.wl-maz@kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <871qnae6ov.wl-maz@kernel.org>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+        <20230131092504.2880505-10-maz@kernel.org>
+        <Y9l3bofl5nMWy3wZ@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 09:26:56PM +0000, Marc Zyngier wrote:
-> On Tue, 31 Jan 2023 20:04:15 +0000, Oliver Upton <oliver.upton@linux.dev> wrote:
-> > Marc, I'm curious, how do you plan to glue hVHE + NV together (if at
-> > all)? We may need two separate options for this so the user could
-> > separately configure NV for their hVHE KVM instance.
+On Tue, 31 Jan 2023 20:17:50 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> I really don't plan to support them together. But if we wanted to
-> support something, I'd rather express it as a composition of the
-> various options, as I suggested to Suzuki earlier. Something along the
-> lines of:
+> On Tue, Jan 31, 2023 at 09:24:04AM +0000, Marc Zyngier wrote:
+> > From: Christoffer Dall <christoffer.dall@arm.com>
+> > 
+> > The VMPIDR_EL2 and VPIDR_EL2 are architecturally UNKNOWN at reset, but
+> > let's be nice to a guest hypervisor behaving foolishly and reset these
+> > to something reasonable anyway.
 > 
-> 	kvm-arm.mode=hvhe,nested
+> Must we be so kind? :)
 > 
-> But the extra complexity is mind-boggling, frankly. And the result
-> will suck terribly. NV is already exit-heavy, compared to single-level
-> virtualisation. But now you double the cost of the exit by moving all
-> the load/put work into the entry-exit phase.
+> In all seriousness, I've found the hexspeak value of reset_unknown() to
+> be a rather useful debugging aid. And I can promise you that I'll use NV
+> to debug my own crap changes!
+> 
+> Any particular reason against just using reset_unknown()?
 
-Oh yeah, that wasn't a feature request, just wanted to pick your brain
-for a moment :) Hopefully nobody comes along asking for it in the
-future, heh.
+Because debugging NV itself is hell when all you have is a model!
+
+As we were trying to debug the early code base, we really wanted to
+make it easy to run tiny guests without much setup, and work out of
+the box. That's how this sort of changes came about.
+
+In any case, something like this the hack below works as well (I just
+booted an L1 and a couple of L2s with it, and nothing caught fire).
+
+	M.
+
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 924afc40ab8b..c1016a35a996 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -924,16 +924,6 @@ static void reset_mpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+ 	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), MPIDR_EL1);
+ }
+ 
+-static void reset_vmpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+-{
+-	vcpu_write_sys_reg(vcpu, compute_reset_mpidr(vcpu), VMPIDR_EL2);
+-}
+-
+-static void reset_vpidr(struct kvm_vcpu *vcpu, const struct sys_reg_desc *r)
+-{
+-	vcpu_write_sys_reg(vcpu, read_cpuid_id(), VPIDR_EL2);
+-}
+-
+ static unsigned int pmu_visibility(const struct kvm_vcpu *vcpu,
+ 				   const struct sys_reg_desc *r)
+ {
+@@ -2678,8 +2668,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ PMU_SYS_REG(SYS_PMCCFILTR_EL0), .access = access_pmu_evtyper,
+ 	  .reset = reset_val, .reg = PMCCFILTR_EL0, .val = 0 },
+ 
+-	EL2_REG(VPIDR_EL2, access_rw, reset_vpidr, 0),
+-	EL2_REG(VMPIDR_EL2, access_rw, reset_vmpidr, 0),
++	EL2_REG(VPIDR_EL2, access_rw, reset_unknown, 0),
++	EL2_REG(VMPIDR_EL2, access_rw, reset_unknown, 0),
+ 	EL2_REG(SCTLR_EL2, access_rw, reset_val, SCTLR_EL2_RES1),
+ 	EL2_REG(ACTLR_EL2, access_rw, reset_val, 0),
+ 	EL2_REG(HCR_EL2, access_rw, reset_val, 0),
 
 -- 
-Thanks,
-Oliver
+Without deviation from the norm, progress is not possible.
