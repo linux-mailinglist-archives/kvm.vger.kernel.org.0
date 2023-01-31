@@ -2,106 +2,118 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4777068362D
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 20:11:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 134FC683669
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 20:23:06 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230163AbjAaTLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 14:11:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59150 "EHLO
+        id S230513AbjAaTXC (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 14:23:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229761AbjAaTLU (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 14:11:20 -0500
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A85FD59B6F
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 11:10:59 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id t7so6834599wrp.5
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 11:10:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=LWQaPUHdvnU65mQKid3pXmNQLFqWKjlrZ1lOgMgLH+s=;
-        b=KRhy5frvJMVHgXhqQrlHounxae4upCd0hrESJBpOq5WU1qL7Uzbhat0uhXVNpYQhTz
-         b9qVSdLZ7CueM1UBOwhymX1jMWKQRypoS5c49CeHKgAAs0dE/qDA2mMfiuYW7kV7eqws
-         ZKoyZjP0TA6ytqwMBYJJowiBgQrWiNRHmF+5aVU9vCeaXd1WYmsLVZAoKeT83z4U0lHX
-         cWCyQO8vleafzBGlRQE+ooU7gCuD8T/cDGFxZizak+VXnZ6mQLG4TZUMrXCnh3rJFxaW
-         kx7wJk4eKPBG5/kU4Qj+wA0ZtXg4vcfuLvbKiOeskhSuOjFGtXbeAxc6Rj7ywThFIYOE
-         7AQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LWQaPUHdvnU65mQKid3pXmNQLFqWKjlrZ1lOgMgLH+s=;
-        b=wss1x4LQ3Gry4JjBv0frg9KJnUcKZMoKWg9R+ADB6YQwl5rqr4istzVr1ASEkoMWqW
-         XKj18WDzj+2OlpxjivuHJdsAsgnjrkukho5rLi1DvU/XntdCOZV7/2gql44lckaKzia+
-         qIBHjfG4hmZgGGFTq4Z3WCUE+OEh0huYoE3e7tlJeGIfQYN2BsF7izUgdUobHcmwdY3q
-         Ie9l+qcBftGcLFKZGfcY//V/44ABX3bpxE8/LCsTZY8w+fQTYRt/KGHj2yQ4UPmbNYD3
-         Rb+MuS5FOQ9MtbnbQH0twd+NBAjdKS/+YPQ5Lkr1iepiaF47nMwSa7sNiHeB3da6tBiE
-         k0jA==
-X-Gm-Message-State: AO0yUKX0vG6eTQjWRzvJmxDH8Jo4Huz33NMoBweo+/2Pi7Q9JyARQiBt
-        1pfc/v5zq30E3SQNggpzOjU4yw==
-X-Google-Smtp-Source: AK7set8y+W5CT0CBXGADEv6jw70U8BiynRGR11vPErBj7/6RMyebIrDMuBfwqBhI7I+SzvnxeImg9A==
-X-Received: by 2002:a5d:6b89:0:b0:2bf:b571:1f18 with SMTP id n9-20020a5d6b89000000b002bfb5711f18mr74635wrx.61.1675192255852;
-        Tue, 31 Jan 2023 11:10:55 -0800 (PST)
-Received: from [192.168.1.109] ([178.197.216.144])
-        by smtp.gmail.com with ESMTPSA id j9-20020a5d6189000000b002c285b4d2b5sm2516469wru.101.2023.01.31.11.10.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 11:10:55 -0800 (PST)
-Message-ID: <ce9eb95b-bff6-c042-efbc-b42062d7cbf2@linaro.org>
-Date:   Tue, 31 Jan 2023 20:10:50 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.7.1
-Subject: Re: [PATCH] .gitignore: Keep track of archived files as they are
- added to a new git repo
-Content-Language: en-US
-To:     Like Xu <like.xu.linux@gmail.com>, Will Deacon <will@kernel.org>,
+        with ESMTP id S229651AbjAaTXA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 14:23:00 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [5.9.137.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E88915C87;
+        Tue, 31 Jan 2023 11:22:55 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 11C6B1EC0662;
+        Tue, 31 Jan 2023 20:22:54 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1675192974;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=CMIhTkSoD/aOTCFfdIQOUQyCfk9POXyRE/QomVJgFEI=;
+        b=AW+Et34sN/zpVuONqz49/rlWU6aFwOPWj+a1i5gzxWJZBIMG9Ltk6tB0KWn60Ab8wpBcs4
+        qiCb9VLgEwVaF4hK0dWPij0+SCNBTTTrMPR8w1YX0uYUcBD2iwWUoXfu5Y8372daX1NB6X
+        U06q5MfLK0dmQFW0rHSSW6LtqTgXrhQ=
+Date:   Tue, 31 Jan 2023 20:22:49 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
+        x86@kernel.org, linux-kernel@vger.kernel.org,
+        Yury Norov <yury.norov@gmail.com>,
+        Venu Busireddy <venu.busireddy@oracle.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Sandipan Das <sandipan.das@amd.com>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Shuah Khan <shuah@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
-        Wedson Almeida Filho <wedsonaf@google.com>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Kees Cook <keescook@chromium.org>, Andrew Davis <afd@ti.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
-References: <20230130090426.13864-1-likexu@tencent.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230130090426.13864-1-likexu@tencent.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        Michael Roth <michael.roth@amd.com>,
+        Mario Limonciello <mario.limonciello@amd.com>,
+        Kim Phillips <kim.phillips@amd.com>,
+        Kees Cook <keescook@chromium.org>,
+        Juergen Gross <jgross@suse.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Brijesh Singh <brijesh.singh@amd.com>,
+        Arnaldo Carvalho de Melo <acme@redhat.com>,
+        Andrew Cooper <andrew.cooper3@citrix.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "H. Peter Anvin" <hpa@zytor.com>
+Subject: Re: [PATCH kernel v3 2/3] KVM: SEV: Enable data breakpoints in SEV-ES
+Message-ID: <Y9lqiXu4yUgP6APS@zn.tnic>
+References: <20230120031047.628097-1-aik@amd.com>
+ <20230120031047.628097-3-aik@amd.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230120031047.628097-3-aik@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/01/2023 10:04, Like Xu wrote:
-> From: Like Xu <likexu@tencent.com>
-> 
-> With thousands of commits going into mainline each development cycle,
-> the metadata .git folder size is gradually expanding (1GB+), and for some
-> developers (most likely testers) who don't care about the lengthy git-log,
-> they just use git-archive to distribute a certain version of code (~210MB)
-> and rebuild git repository from anywhere for further code changes, e.g.
-> 
->   $ git init && git add . -A
-> 
-> Then unfortunately, the file tracking metadata from the original git-repo
-> using "git add -f" will also be lost, to the point where part of source
-> files wrapped by git-archive may be accidentally cleaned up:
-> 
->   $ git clean -nxdf
->   Would remove Documentation/devicetree/bindings/.yamllint
+Hey Sean,
 
-https://lore.kernel.org/all/20230127150225.18148-1-andriy.shevchenko@linux.intel.com/
+On Fri, Jan 20, 2023 at 02:10:46PM +1100, Alexey Kardashevskiy wrote:
+> Prior to SEV-ES, KVM stored/loaded host debug registers upon switching
+> to/from a VM. Changing those registers inside a running SEV VM
+> triggered #VC exit to KVM.
+> 
+> SEV-ES added the encrypted state (ES) which uses an encrypted guest page
+> for the VM state (VMSA). The hardware saves/restores certain registers on
+> VMRUN/VMEXIT according to a swap type (A, B, C), see
+> "Table B-3. Swap Types" in the AMD Architecture Programmer’s Manual
+> volume 2.
+> 
+> AMD Milan (Fam 19h) introduces support for the debug registers swapping.
+> DR6 and DR7 are always swapped. DR[0-3] and DR[0-3]_ADDR_MASK are swapped
+> a type B when SEV_FEATURES[5] ("DebugSwap") is set.
+> 
+> Enable DebugSwap in VMSA. But only do so if CPUID Fn80000021_EAX[0]
+> ("NoNestedDataBp", "Processor ignores nested data breakpoints") is
+> supported by the SOC as otherwise a malicious SEV-ES guest can set up
+> data breakpoints on the #VC IDT entry/stack and cause an infinite loop.
+> 
+> Eliminate DR7 and #DB intercepts as:
+> - they are not needed when DebugSwap is supported;
+> - #VC for these intercepts is most likely not supported anyway and
+> kills the VM.
+> Keep DR7 intercepted unless DebugSwap enabled to prevent the infinite #DB
+> loop DoS.
 
-Best regards,
-Krzysztof
+...
 
+ok to take this through the tip tree?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
