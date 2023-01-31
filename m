@@ -2,67 +2,68 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 98910682A7C
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 11:28:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ADCCE682A94
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 11:31:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230404AbjAaK2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 05:28:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54382 "EHLO
+        id S230472AbjAaKba (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 05:31:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229565AbjAaK2w (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 05:28:52 -0500
+        with ESMTP id S230215AbjAaKb3 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 05:31:29 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B7A2DE4A
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 02:28:51 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20D353E0A3
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 02:31:28 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4639A614B5
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 10:28:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A61FCC433EF;
-        Tue, 31 Jan 2023 10:28:50 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id AE2DF614B3
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 10:31:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F102C433EF;
+        Tue, 31 Jan 2023 10:31:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675160930;
-        bh=CFpXrESVC1VdJC/0chHwon8lVrNNHg2Yos0VogDVZXk=;
+        s=k20201202; t=1675161087;
+        bh=EolnzFS1zIoNPOKdfq4QkgHK0eCsTa9281Itq9gCuiA=;
         h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=OUeXrhtJWXHtJce7JnnW0wsghJTKEZpyIB3fsQZDm6enKXhrI7pcsKyTbkOexod28
-         0A9T2eh5MVqP7Botskkqg2gQgQAmvWz1OLrwwQBp/g/grOdenkOCKH9yqd4QjHHKri
-         q75M1+5WX1631uzP8mYvAqunLhAUnD5igrMVnvrSLJZaW/8PyVszO3NoZVoABDCE1q
-         tpa6c48qQtwsgh7temQqia5CUUVW4ycBEVq+Iofq1FjQ8z2ZCA45hx3xNVJxtjyWhc
-         vknJYJ0t/D5M7KyKu75osVnUWPQ06Dv5uUuC3yccAs3bTrDsQ0RKMHBmwmaMUEFbaT
-         TF1nKdgEyRsBQ==
+        b=KM75abFO+qy8sh29MIU3aYEMeR0mTRPyK8bXXjvLi9quZ7zB2iRkCqsxvG2hG8a7l
+         XEeDF8cfx/qKJvMxjY2guMnHwsDyUxPSAqF4fM999I8jhK1wRRRzSrAwTJKQFJ1ssd
+         +kogVHA+RIwoapqePJToRMweXjB6uSv/zyTZ5Sjmh6XO1xPcYbDv35D5pnT7K18QfS
+         rDOl0u6hAIbwBRmqYc4kehj9phykUBuaWqeFhQUC2yGtakNHE1dI1g4VcbIjN4n8QN
+         EWwRw1G/+Hn/7ZoASKUofXZOG4OQi8x/O07N8N0/3ZH/hLwdtZQbbXanDYZHDaB1GV
+         WgrNYOcKvAB4Q==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pMnse-006A5h-B5;
-        Tue, 31 Jan 2023 10:28:48 +0000
-Date:   Tue, 31 Jan 2023 10:28:47 +0000
-Message-ID: <86h6w70zhc.wl-maz@kernel.org>
+        id 1pMnvA-006AAa-Qz;
+        Tue, 31 Jan 2023 10:31:25 +0000
+Date:   Tue, 31 Jan 2023 10:31:24 +0000
+Message-ID: <86fsbr0zcz.wl-maz@kernel.org>
 From:   Marc Zyngier <maz@kernel.org>
-To:     Ricardo Koller <ricarkol@google.com>
-Cc:     Oliver Upton <oliver.upton@linux.dev>, pbonzini@redhat.com,
-        oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Ricardo Koller <ricarkol@google.com>, pbonzini@redhat.com,
+        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, qperret@google.com,
         catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
         alexandru.elisei@arm.com, suzuki.poulose@arm.com,
         eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
         rananta@google.com, bgardon@google.com, ricarkol@gmail.com
 Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is enabled
-In-Reply-To: <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
+In-Reply-To: <Y9g0KGmsZqAZiTSP@google.com>
 References: <20230113035000.480021-1-ricarkol@google.com>
         <20230113035000.480021-7-ricarkol@google.com>
         <Y9BfdgL+JSYCirvm@thinky-boi>
         <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
         <86v8ktkqfx.wl-maz@kernel.org>
         <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
+        <Y9g0KGmsZqAZiTSP@google.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
 Content-Type: text/plain; charset=US-ASCII
 X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: ricarkol@google.com, oliver.upton@linux.dev, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, ricarkol@google.com, pbonzini@redhat.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
@@ -74,74 +75,71 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 27 Jan 2023 15:45:15 +0000,
-Ricardo Koller <ricarkol@google.com> wrote:
+On Mon, 30 Jan 2023 21:18:32 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
 > 
-> > The one thing that would convince me to make it an option is the
-> > amount of memory this thing consumes. 512+ pages is a huge amount, and
-> > I'm not overly happy about that. Why can't this be a userspace visible
-> > option, selectable on a per VM (or memslot) basis?
-> >
+> On Fri, Jan 27, 2023 at 07:45:15AM -0800, Ricardo Koller wrote:
+> > Hi Marc,
+> > 
+> > On Thu, Jan 26, 2023 at 12:10 PM Marc Zyngier <maz@kernel.org> wrote:
 > 
-> It should be possible.  I am exploring a couple of ideas that could
-> help when the hugepages are not 1G (e.g., 2M).  However, they add
-> complexity and I'm not sure they help much.
+> [...]
 > 
-> (will be using PAGE_SIZE=4K to make things simpler)
+> > >
+> > > The one thing that would convince me to make it an option is the
+> > > amount of memory this thing consumes. 512+ pages is a huge amount, and
+> > > I'm not overly happy about that. Why can't this be a userspace visible
+> > > option, selectable on a per VM (or memslot) basis?
+> > >
+> > 
+> > It should be possible.  I am exploring a couple of ideas that could
+> > help when the hugepages are not 1G (e.g., 2M).  However, they add
+> > complexity and I'm not sure they help much.
+> > 
+> > (will be using PAGE_SIZE=4K to make things simpler)
+> > 
+> > This feature pre-allocates 513 pages before splitting every 1G range.
+> > For example, it converts 1G block PTEs into trees made of 513 pages.
+> > When not using this feature, the same 513 pages would be allocated,
+> > but lazily over a longer period of time.
+> > 
+> > Eager-splitting pre-allocates those pages in order to split huge-pages
+> > into fully populated trees.  Which is needed in order to use FEAT_BBM
+> > and skipping the expensive TLBI broadcasts.  513 is just the number of
+> > pages needed to break a 1G huge-page.
+> > 
+> > We could optimize for smaller huge-pages, like 2M by splitting 1
+> > huge-page at a time: only preallocate one 4K page at a time.  The
+> > trick is how to know that we are splitting 2M huge-pages.  We could
+> > either get the vma pagesize or use hints from userspace.  I'm not sure
+> > that this is worth it though.  The user will most likely want to split
+> > big ranges of memory (>1G), so optimizing for smaller huge-pages only
+> > converts the left into the right:
+> > 
+> > alloc 1 page            |    |  alloc 512 pages
+> > split 2M huge-page      |    |  split 2M huge-page
+> > alloc 1 page            |    |  split 2M huge-page
+> > split 2M huge-page      | => |  split 2M huge-page
+> >                         ...
+> > alloc 1 page            |    |  split 2M huge-page
+> > split 2M huge-page      |    |  split 2M huge-page
+> > 
+> > Still thinking of what else to do.
 > 
-> This feature pre-allocates 513 pages before splitting every 1G range.
-> For example, it converts 1G block PTEs into trees made of 513 pages.
-> When not using this feature, the same 513 pages would be allocated,
-> but lazily over a longer period of time.
+> I think that Marc's suggestion of having userspace configure this is
+> sound. After all, userspace _should_ know the granularity of the backing
+> source it chose for guest memory.
 
-This is an important difference. It avoids the upfront allocation
-"thermal shock", giving time to the kernel to reclaim memory from
-somewhere else. Doing it upfront means you *must* have 2MB+ of
-immediately available memory for each GB of RAM you guest uses.
+Only if it is not using anonymous memory. That's the important distinction.
 
 > 
-> Eager-splitting pre-allocates those pages in order to split huge-pages
-> into fully populated trees.  Which is needed in order to use FEAT_BBM
-> and skipping the expensive TLBI broadcasts.  513 is just the number of
-> pages needed to break a 1G huge-page.
+> We could also interpret a cache size of 0 to signal that userspace wants
+> to disable eager page split for a VM altogether. It is entirely possible
+> that the user will want a differing QoS between slice-of-hardware and
+> overcommitted VMs.
 
-I understand that. But it also clear that 1GB huge pages are unlikely
-to be THPs, and I wonder if we should treat the two differently. Using
-HugeTLBFS pages is significant here.
-
-> 
-> We could optimize for smaller huge-pages, like 2M by splitting 1
-> huge-page at a time: only preallocate one 4K page at a time.  The
-> trick is how to know that we are splitting 2M huge-pages.  We could
-> either get the vma pagesize or use hints from userspace.  I'm not sure
-> that this is worth it though.  The user will most likely want to split
-> big ranges of memory (>1G), so optimizing for smaller huge-pages only
-> converts the left into the right:
-> 
-> alloc 1 page            |    |  alloc 512 pages
-> split 2M huge-page      |    |  split 2M huge-page
-> alloc 1 page            |    |  split 2M huge-page
-> split 2M huge-page      | => |  split 2M huge-page
->                         ...
-> alloc 1 page            |    |  split 2M huge-page
-> split 2M huge-page      |    |  split 2M huge-page
-> 
-> Still thinking of what else to do.
-
-I think the 1G case fits your own use case, but I doubt this covers
-the majority of the users. Most people rely on the kernel ability to
-use THPs, which are capped at the first level of block mapping.
-
-2MB (and 32MB for 16kB base pages) are the most likely mappings in my
-experience (512MB with 64kB pages are vanishingly rare).
-
-Having to pay an upfront cost for HugeTLBFS doesn't shock me, and it
-fits the model. For THPs, where everything is opportunistic and the
-user not involved, this is a lot more debatable.
-
-This is why I'd like this behaviour to be a buy-in, either directly (a
-first class userspace API) or indirectly (the provenance of the
-memory).
+Absolutely. The overcommited case would suffer from the upfront
+allocation (these systems are usually very densely packed).
 
 Thanks,
 
