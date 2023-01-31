@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 50341682918
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:41:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 06D7268292F
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:42:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232215AbjAaJky (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 04:40:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38730 "EHLO
+        id S232481AbjAaJmU (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 04:42:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230271AbjAaJkw (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 04:40:52 -0500
+        with ESMTP id S232524AbjAaJmS (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 04:42:18 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0D3B30B09
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:40:47 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DA73B0D4
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:41:42 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 27E8B6147F
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:40:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90B30C433D2;
-        Tue, 31 Jan 2023 09:40:46 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CD11C61488
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:41:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EC0AC433D2;
+        Tue, 31 Jan 2023 09:41:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675158046;
-        bh=AEdo1QjTraKeiiK+6yLem0poWl5PLEbqaOt2rrGehMk=;
+        s=k20201202; t=1675158098;
+        bh=bqx6jidbc2f+LQLxjJDORJmIUTqcTIYjVPiIBgFGjyA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=F2D6Fb/wH+F2p9hPsgJI1fXs/Pi27D5UFC6v+TcQkVqxMgLVVbck6cTxV4pXHnOtI
-         X371jqiOUbHQv00VyRB02WI9WkSIYNbkxVDAQxn2j8g4QfcxmhQc+Y32kLwZQgJGsu
-         G8SfCrpCIA7UBAr7+N42x+6dVdZJzi7vg36PwlWyjtZJIMIIiyl7qUKzQFtL5PjtW4
-         lMohoNnBnaFk81rwyRrYNFXkHReh7QGMZewXNc/toe/rbvsuOhHjaypOOTGkQxsJUh
-         7UyXBov93lH0b+3wrrLQmJY4IJO3N2ggEtXpXIWRj8HCRDUPpuyms0Bl0hJRsC4rfl
-         Fw1HIHwy0CBqw==
+        b=gmKFHnXXVz0blDbRJ32NQO9lsKJP4itsbuR+hZPuvqfkiOXw7k0505YSATJOSSgPm
+         6j5QVj90MsSIeUFtipigqMiPZGNTuYkjAw77jt7tltcuW1x9hTiVlnqjCXoDGfduKB
+         yNmIHyf3HTzXwd4DmAOzeQrMksXtdM/am7NrpJw2SMUTz2cpCfMQuRkx4ExYPo+NE2
+         ojN2awb3DL8OUO6WeLyNiC3qmmfRLSsKUbNmEuGpoAQc85jJtApwB8F7ivl4w6m6Xe
+         LcdSpuABt+4pDqY8+WaJrXX+1oMVAA2tPcAapzuej2riJlSFrqhN8pbQh8t0SEl3ln
+         FeVRW2oX64uGQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pMmtQ-0067U2-Tw;
-        Tue, 31 Jan 2023 09:25:32 +0000
+        id 1pMmtR-0067U2-5i;
+        Tue, 31 Jan 2023 09:25:33 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org
@@ -51,9 +51,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 12/69] KVM: arm64: nv: Handle trapped ERET from virtual EL2
-Date:   Tue, 31 Jan 2023 09:24:07 +0000
-Message-Id: <20230131092504.2880505-13-maz@kernel.org>
+Subject: [PATCH v8 13/69] KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
+Date:   Tue, 31 Jan 2023 09:24:08 +0000
+Message-Id: <20230131092504.2880505-14-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -72,78 +72,85 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Christoffer Dall <christoffer.dall@arm.com>
+Some EL2 system registers immediately affect the current execution
+of the system, so we need to use their respective EL1 counterparts.
+For this we need to define a mapping between the two. In general,
+this only affects non-VHE guest hypervisors, as VHE system registers
+are compatible with the EL1 counterparts.
 
-When a guest hypervisor running virtual EL2 in EL1 executes an ERET
-instruction, we will have set HCR_EL2.NV which traps ERET to EL2, so
-that we can emulate the exception return in software.
+These helpers will get used in subsequent patches.
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
-Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+Co-developed-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/esr.h     |  4 ++++
- arch/arm64/include/asm/kvm_arm.h |  2 +-
- arch/arm64/kvm/handle_exit.c     | 10 ++++++++++
- 3 files changed, 15 insertions(+), 1 deletion(-)
+ arch/arm64/include/asm/kvm_nested.h | 48 +++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
-index 206de10524e3..d4dd949b921e 100644
---- a/arch/arm64/include/asm/esr.h
-+++ b/arch/arm64/include/asm/esr.h
-@@ -272,6 +272,10 @@
- 		(((e) & ESR_ELx_SYS64_ISS_OP2_MASK) >>		\
- 		 ESR_ELx_SYS64_ISS_OP2_SHIFT))
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index fd601ea68d13..f7bb1f0d0954 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -2,6 +2,7 @@
+ #ifndef __ARM64_KVM_NESTED_H
+ #define __ARM64_KVM_NESTED_H
  
-+/* ISS field definitions for ERET/ERETAA/ERETAB trapping */
-+#define ESR_ELx_ERET_ISS_ERET		0x2
-+#define ESR_ELx_ERET_ISS_ERETA		0x1
-+
- /*
-  * ISS field definitions for floating-point exception traps
-  * (FP_EXC_32/FP_EXC_64).
-diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-index c101a611af9c..baef29fcbeee 100644
---- a/arch/arm64/include/asm/kvm_arm.h
-+++ b/arch/arm64/include/asm/kvm_arm.h
-@@ -345,7 +345,7 @@
- 	ECN(SP_ALIGN), ECN(FP_EXC32), ECN(FP_EXC64), ECN(SERROR), \
- 	ECN(BREAKPT_LOW), ECN(BREAKPT_CUR), ECN(SOFTSTP_LOW), \
- 	ECN(SOFTSTP_CUR), ECN(WATCHPT_LOW), ECN(WATCHPT_CUR), \
--	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64)
-+	ECN(BKPT32), ECN(VECTOR32), ECN(BRK64), ECN(ERET)
++#include <linux/bitfield.h>
+ #include <linux/kvm_host.h>
  
- #define CPACR_EL1_DEFAULT	(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN |\
- 				 CPACR_EL1_ZEN_EL1EN)
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index 2d8c09cf3e49..e75101f2aa6c 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -207,6 +207,15 @@ static int kvm_handle_ptrauth(struct kvm_vcpu *vcpu)
- 	return 1;
+ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+@@ -11,4 +12,51 @@ static inline bool vcpu_has_nv(const struct kvm_vcpu *vcpu)
+ 		test_bit(KVM_ARM_VCPU_HAS_EL2, vcpu->arch.features));
  }
  
-+static int kvm_handle_eret(struct kvm_vcpu *vcpu)
++/* Translation helpers from non-VHE EL2 to EL1 */
++static inline u64 tcr_el2_ps_to_tcr_el1_ips(u64 tcr_el2)
 +{
-+	if (kvm_vcpu_get_esr(vcpu) & ESR_ELx_ERET_ISS_ERET)
-+		return kvm_handle_ptrauth(vcpu);
-+
-+	kvm_emulate_nested_eret(vcpu);
-+	return 1;
++	return (u64)FIELD_GET(TCR_EL2_PS_MASK, tcr_el2) << TCR_IPS_SHIFT;
 +}
 +
- static exit_handle_fn arm_exit_handlers[] = {
- 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
- 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
-@@ -222,6 +231,7 @@ static exit_handle_fn arm_exit_handlers[] = {
- 	[ESR_ELx_EC_SMC64]	= handle_smc,
- 	[ESR_ELx_EC_SYS64]	= kvm_handle_sys_reg,
- 	[ESR_ELx_EC_SVE]	= handle_sve,
-+	[ESR_ELx_EC_ERET]	= kvm_handle_eret,
- 	[ESR_ELx_EC_IABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_DABT_LOW]	= kvm_handle_guest_abort,
- 	[ESR_ELx_EC_SOFTSTP_LOW]= kvm_handle_guest_debug,
++static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
++{
++	return TCR_EPD1_MASK |				/* disable TTBR1_EL1 */
++	       ((tcr & TCR_EL2_TBI) ? TCR_TBI0 : 0) |
++	       tcr_el2_ps_to_tcr_el1_ips(tcr) |
++	       (tcr & TCR_EL2_TG0_MASK) |
++	       (tcr & TCR_EL2_ORGN0_MASK) |
++	       (tcr & TCR_EL2_IRGN0_MASK) |
++	       (tcr & TCR_EL2_T0SZ_MASK);
++}
++
++static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
++{
++	u64 cpacr_el1 = 0;
++
++	if (cptr_el2 & CPTR_EL2_TTA)
++		cpacr_el1 |= CPACR_ELx_TTA;
++	if (!(cptr_el2 & CPTR_EL2_TFP))
++		cpacr_el1 |= CPACR_ELx_FPEN;
++	if (!(cptr_el2 & CPTR_EL2_TZ))
++		cpacr_el1 |= CPACR_ELx_ZEN;
++
++	return cpacr_el1;
++}
++
++static inline u64 translate_sctlr_el2_to_sctlr_el1(u64 val)
++{
++	/* Only preserve the minimal set of bits we support */
++	val &= (SCTLR_ELx_M | SCTLR_ELx_A | SCTLR_ELx_C | SCTLR_ELx_SA |
++		SCTLR_ELx_I | SCTLR_ELx_IESB | SCTLR_ELx_WXN | SCTLR_ELx_EE);
++	val |= SCTLR_EL1_RES1;
++
++	return val;
++}
++
++static inline u64 translate_ttbr0_el2_to_ttbr0_el1(u64 ttbr0)
++{
++	/* Clear the ASID field */
++	return ttbr0 & ~GENMASK_ULL(63, 48);
++}
++
+ #endif /* __ARM64_KVM_NESTED_H */
 -- 
 2.34.1
 
