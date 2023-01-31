@@ -2,90 +2,108 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B15CD682BC2
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 12:46:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3A526682BD1
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 12:50:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231721AbjAaLqw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 06:46:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44284 "EHLO
+        id S231839AbjAaLuH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 06:50:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230011AbjAaLqv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 06:46:51 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A313F4ED6;
-        Tue, 31 Jan 2023 03:46:50 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id z1-20020a17090a66c100b00226f05b9595so14219221pjl.0;
-        Tue, 31 Jan 2023 03:46:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=qYifaKQOdsCBowbWJxa8KCq6fsv+ZqlLk9cIq259ukc=;
-        b=HEnN3c0JOCuCmIJWBkj1VFuWv3t9X8o4DXgtnbgslMmtdKL8Lom6PgWpC947IGh4Q0
-         dBQ/Y7X8V8rTWAVtHXPbsXKUKgQzwRm9W7YHsC52mjCpVeocf4XCCF57fELlADh4CK90
-         76liDEi2MkhHLcyNNpDYqT22PakJNHFVdnUiQeYkmjIQT5imR/ujHNcMLTsfQt9KtQix
-         tbeHIsjO8SaBZ203d7d0kU4vt3D0iBAfqaHQD1xO9udnC5uYF/f9KkAzmUY8IQQofw3X
-         bUrtRh21NLFr1cZ5pBHRHZE6NK66mwmMn48t0zDVCkEMxkuxdPjBXdpKIi+5AxCE+54z
-         5+Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qYifaKQOdsCBowbWJxa8KCq6fsv+ZqlLk9cIq259ukc=;
-        b=EsSUDiK278Dselv6dUE9P4mUoR3Lvew+0ZlCiraygl6v0Uq6FufX4WicwjTsrtQyTv
-         XXqDC64dZktwBSKSHykkJ6thTJufQrL2AQ44nG3C4cMGE5rN8ERvH92ahpGhEMsi97A6
-         VREKZPTPLaDXTZBUJnZHaPw0kRS2pAE2Q1giCUBD6udxPdoBTDPmuqWYd5D2DTk8Q55v
-         20bIPJYd9GsspvNRXZ09MeTNi2Q4CbEDTTmQm4x7VBD/cm7m0ax4X89xq8pGNYPXISu8
-         5cVrZc4Z3fiBXeOCFueruhFvPbM7X01H3IZEb0kqzyu939PPp6OQYDi2SYvmTjkEKH2J
-         azxg==
-X-Gm-Message-State: AFqh2kq2NFu7F/dOBfLY21LYsgdDjK0KVS+uoRuV/LShBhL32A1lZT9/
-        amHwRRSfPuObQkBd2VjQbUgus5CtsX9EdD3e
-X-Google-Smtp-Source: AMrXdXs0Pd6dEis9OUHMH5J2mjSrTBwIqSPGsXo5Nc5ZZK1loen0+cG5mjgIeOiaC4bM6QLM1CvNUA==
-X-Received: by 2002:a17:90b:3eca:b0:229:f4cd:1e03 with SMTP id rm10-20020a17090b3eca00b00229f4cd1e03mr44938754pjb.22.1675165610071;
-        Tue, 31 Jan 2023 03:46:50 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id z28-20020a63b91c000000b004785a63b44bsm8502606pge.43.2023.01.31.03.46.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 03:46:49 -0800 (PST)
-Message-ID: <89c214e1-a7b4-a0e8-8fb9-c769dbf30ed4@gmail.com>
-Date:   Tue, 31 Jan 2023 19:46:41 +0800
+        with ESMTP id S230286AbjAaLuD (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 06:50:03 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8AD65125A0
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 03:49:58 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 679FF175A;
+        Tue, 31 Jan 2023 03:50:40 -0800 (PST)
+Received: from monolith.localdoman (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 80ACC3FA27;
+        Tue, 31 Jan 2023 03:49:57 -0800 (PST)
+Date:   Tue, 31 Jan 2023 11:49:50 +0000
+From:   Alexandru Elisei <alexandru.elisei@arm.com>
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Subject: Re: [kvm-unit-tests PATCH v5 2/2] arm/psci: Add PSCI CPU_OFF test
+ case
+Message-ID: <Y9kAXuOfgHgMJEN+@monolith.localdoman>
+References: <20230127175916.65389-1-alexandru.elisei@arm.com>
+ <20230127175916.65389-3-alexandru.elisei@arm.com>
+ <20230131065623.7jj4a2hp44vphw5t@orel>
+ <Y9jk+MVEPYNC1heb@monolith.localdoman>
+ <20230131104610.v3n2gxmime32ae3r@orel>
+ <Y9j3D9Ft4mWSoK7G@monolith.localdoman>
+ <20230131114549.jnvn7g3vk4r2fyt6@orel>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH 2/6] KVM: x86/pmu: Gate all "unimplemented MSR" prints on
- report_ignored_msrs
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Aaron Lewis <aaronlewis@google.com>,
-        Weijiang Yang <weijiang.yang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>
-References: <20230124234905.3774678-1-seanjc@google.com>
- <20230124234905.3774678-3-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230124234905.3774678-3-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230131114549.jnvn7g3vk4r2fyt6@orel>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 25/1/2023 7:49 am, Sean Christopherson wrote:
->   arch/x86/kvm/hyperv.c  | 10 ++++------
->   arch/x86/kvm/svm/svm.c |  5 ++---
->   arch/x86/kvm/vmx/vmx.c |  4 +---
->   arch/x86/kvm/x86.c     | 18 +++++-------------
->   arch/x86/kvm/x86.h     | 12 ++++++++++++
->   5 files changed, 24 insertions(+), 25 deletions(-)
+Hi Drew,
 
-Nit: those changes don't just involve PMU, better to
-remove pmu suffix from the patch title for more eyes.
+On Tue, Jan 31, 2023 at 12:45:49PM +0100, Andrew Jones wrote:
+> On Tue, Jan 31, 2023 at 11:16:22AM +0000, Alexandru Elisei wrote:
+> ...
+> > > > Does that make sense? Should I add a comment to make it clear why cpu-off
+> > > > is skipped when cpu-on fails?
+> > > 
+> > > I missed that cpu_on_success was initialized to true. Seeing that now, I
+> > > understand how the only time it's false is if the cpu-on test failed. When
+> > > I thought it was initialized to false it had two ways to be false, failure
+> > > or skip. I think it's a bit confusing to set a 'success' variable to true
+> > > when the test is skipped. Also, we can relax the condition as to whether
+> > > or not we try cpu-off by simply checking that all cpus, other than cpu0,
+> > > are in idle. How about
+> > > 
+> > >  if (ERRATA(6c7a5dce22b3))
+> > >      report(psci_cpu_on_test(), "cpu-on");
+> > >  else
+> > >      report_skip("Skipping unsafe cpu-on test. Set ERRATA_6c7a5dce22b3=y to enable.");
+> > > 
+> > >  assert(!cpu_idle(0));
+> > 
+> > cpu0 is the boot CPU, I don't see how cpu0 can execute this line of code
+> > and be in idle at the same time.
+> 
+> That's why it's an assert and not an if, i.e. it should never happen. It
+> could happen if things are messed up in the lib code, a previous test
+> mucked with cpu_idle_mask, or a previous test idled cpu0 and manipulated
+> another cpu into executing this line.
+> 
+> > Unless this is done for documenting
+> > purposes, to explain why we compare the number of cpus in idle to nr_cpus
+> > -1 below.
+> 
+> Exactly, and furthermore that we expect the missing cpu to be cpu0.
+> 
+> > But I still find it confusing, especially considering (almost)
+> > the same assert is in smp.c:
+> > 
+> > void on_cpu_async(int cpu, void (*func)(void *data), void *data)
+> > {
+> > 	[..]
+> >         assert_msg(cpu != 0 || cpu0_calls_idle, "Waiting on CPU0, which is unlikely to idle. "
+> >                                                 "If this is intended set cpu0_calls_idle=1");
+> > 
+> > I know, it's a different scenario, but the point I'm trying to make is that
+> > kvm-unit-tests really doesn't expect cpu0 to be in idle. I would prefer not
+> > to have the assert here.
+> 
+> asserts are for things we assume, but also want to ensure, as other code
+> depends on the assumptions. Please keep the assert. It doesn't hurt :-)
+
+I'm keeping the assert then :)
+
+Thanks,
+Alex
+
+> 
+> Thanks,
+> drew
