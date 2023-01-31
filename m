@@ -2,130 +2,106 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C454968360D
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 20:06:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4777068362D
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 20:11:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230202AbjAaTGw (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 14:06:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55950 "EHLO
+        id S230163AbjAaTLX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 14:11:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229816AbjAaTGv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 14:06:51 -0500
-Received: from out-233.mta0.migadu.com (out-233.mta0.migadu.com [91.218.175.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F7A715574
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 11:06:50 -0800 (PST)
-Date:   Tue, 31 Jan 2023 19:06:35 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1675192007;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ZmtUF7xjL5ODD9h13/vWb0RTU4ZRTPtj2CaIlUkmR3g=;
-        b=rzlb8oI2umgUIUXqdrIkpJ1G/vmiAMvKva0tvD2Tqk4I0kM+77GIAAeOI1jpkERECidISD
-        q+Ni/TsCsk8mkx15lx6qkB/TMkm2IN0I5xuWohcc0+m+0TDQvQ4REJXcACtdujBxo4v5bh
-        38rnhVTeFFZK3oD/qm0mUiq8f3bHg/k=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From:   Oliver Upton <oliver.upton@linux.dev>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ricardo Koller <ricarkol@google.com>,
-        Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
-        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
-        kvmarm@lists.linux.dev, qperret@google.com,
-        catalin.marinas@arm.com, andrew.jones@linux.dev,
-        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
-        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
-        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
-Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is
- enabled
-Message-ID: <Y9lmu8Ql/5nPRkX3@google.com>
-References: <20230113035000.480021-1-ricarkol@google.com>
- <20230113035000.480021-7-ricarkol@google.com>
- <Y9BfdgL+JSYCirvm@thinky-boi>
- <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
- <86v8ktkqfx.wl-maz@kernel.org>
- <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
- <Y9g0KGmsZqAZiTSP@google.com>
- <Y9hsV02TpQeoB0oN@google.com>
- <Y9lTz3ryasgkfhs/@google.com>
- <Y9lV5XEf7NV8i9uI@google.com>
+        with ESMTP id S229761AbjAaTLU (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 14:11:20 -0500
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A85FD59B6F
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 11:10:59 -0800 (PST)
+Received: by mail-wr1-x436.google.com with SMTP id t7so6834599wrp.5
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 11:10:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LWQaPUHdvnU65mQKid3pXmNQLFqWKjlrZ1lOgMgLH+s=;
+        b=KRhy5frvJMVHgXhqQrlHounxae4upCd0hrESJBpOq5WU1qL7Uzbhat0uhXVNpYQhTz
+         b9qVSdLZ7CueM1UBOwhymX1jMWKQRypoS5c49CeHKgAAs0dE/qDA2mMfiuYW7kV7eqws
+         ZKoyZjP0TA6ytqwMBYJJowiBgQrWiNRHmF+5aVU9vCeaXd1WYmsLVZAoKeT83z4U0lHX
+         cWCyQO8vleafzBGlRQE+ooU7gCuD8T/cDGFxZizak+VXnZ6mQLG4TZUMrXCnh3rJFxaW
+         kx7wJk4eKPBG5/kU4Qj+wA0ZtXg4vcfuLvbKiOeskhSuOjFGtXbeAxc6Rj7ywThFIYOE
+         7AQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LWQaPUHdvnU65mQKid3pXmNQLFqWKjlrZ1lOgMgLH+s=;
+        b=wss1x4LQ3Gry4JjBv0frg9KJnUcKZMoKWg9R+ADB6YQwl5rqr4istzVr1ASEkoMWqW
+         XKj18WDzj+2OlpxjivuHJdsAsgnjrkukho5rLi1DvU/XntdCOZV7/2gql44lckaKzia+
+         qIBHjfG4hmZgGGFTq4Z3WCUE+OEh0huYoE3e7tlJeGIfQYN2BsF7izUgdUobHcmwdY3q
+         Ie9l+qcBftGcLFKZGfcY//V/44ABX3bpxE8/LCsTZY8w+fQTYRt/KGHj2yQ4UPmbNYD3
+         Rb+MuS5FOQ9MtbnbQH0twd+NBAjdKS/+YPQ5Lkr1iepiaF47nMwSa7sNiHeB3da6tBiE
+         k0jA==
+X-Gm-Message-State: AO0yUKX0vG6eTQjWRzvJmxDH8Jo4Huz33NMoBweo+/2Pi7Q9JyARQiBt
+        1pfc/v5zq30E3SQNggpzOjU4yw==
+X-Google-Smtp-Source: AK7set8y+W5CT0CBXGADEv6jw70U8BiynRGR11vPErBj7/6RMyebIrDMuBfwqBhI7I+SzvnxeImg9A==
+X-Received: by 2002:a5d:6b89:0:b0:2bf:b571:1f18 with SMTP id n9-20020a5d6b89000000b002bfb5711f18mr74635wrx.61.1675192255852;
+        Tue, 31 Jan 2023 11:10:55 -0800 (PST)
+Received: from [192.168.1.109] ([178.197.216.144])
+        by smtp.gmail.com with ESMTPSA id j9-20020a5d6189000000b002c285b4d2b5sm2516469wru.101.2023.01.31.11.10.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 Jan 2023 11:10:55 -0800 (PST)
+Message-ID: <ce9eb95b-bff6-c042-efbc-b42062d7cbf2@linaro.org>
+Date:   Tue, 31 Jan 2023 20:10:50 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Y9lV5XEf7NV8i9uI@google.com>
-X-Migadu-Flow: FLOW_OUT
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH] .gitignore: Keep track of archived files as they are
+ added to a new git repo
+Content-Language: en-US
+To:     Like Xu <like.xu.linux@gmail.com>, Will Deacon <will@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Catalin Marinas <catalin.marinas@arm.com>,
+        Shuah Khan <shuah@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
+        Wedson Almeida Filho <wedsonaf@google.com>,
+        Alex Gaynor <alex.gaynor@gmail.com>,
+        Kees Cook <keescook@chromium.org>, Andrew Davis <afd@ti.com>,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org
+References: <20230130090426.13864-1-likexu@tencent.com>
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230130090426.13864-1-likexu@tencent.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+        version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 05:54:45PM +0000, Sean Christopherson wrote:
-> On Tue, Jan 31, 2023, Oliver Upton wrote:
-> > On Tue, Jan 31, 2023 at 01:18:15AM +0000, Sean Christopherson wrote:
-> > > On Mon, Jan 30, 2023, Oliver Upton wrote:
-> > > > I think that Marc's suggestion of having userspace configure this is
-> > > > sound. After all, userspace _should_ know the granularity of the backing
-> > > > source it chose for guest memory.
-> > > > 
-> > > > We could also interpret a cache size of 0 to signal that userspace wants
-> > > > to disable eager page split for a VM altogether. It is entirely possible that
-> > > > the user will want a differing QoS between slice-of-hardware and
-> > > > overcommitted VMs.
-> > > 
-> > > Maybe.  It's also entirely possible that QoS is never factored in, e.g. if QoS
-> > > guarantees for all VMs on a system are better met by enabling eager splitting
-> > > across the board.
-> > > 
-> > > There are other reasons to use module/kernel params beyond what Marc listed, e.g.
-> > > to let the user opt out even when something is on by default.  x86's TDP MMU has
-> > > benefited greatly from downstream users being able to do A/B performance testing
-> > > this way.  I suspect x86's eager_page_split knob was added largely for this
-> > > reason, e.g. to easily see how a specific workload is affected by eager splitting.
-> > > That seems like a reasonable fit on the ARM side as well.
-> > 
-> > There's a rather important distinction here in that we'd allow userspace
-> > to select the page split cache size, which should be correctly sized for
-> > the backing memory source. Considering the break-before-make rules of
-> > the architecture, the only way eager split is performant on arm64 is by
-> > replacing a block entry with a fully populated table hierarchy in one
-> > operation. AFAICT, you don't have this problem on x86, as the
-> > architecture generally permits a direct valid->valid transformation
-> > without an intermediate invalidation. Well, ignoring iTLB multihit :)
-> > 
-> > So, the largest transformation we need to do right now is on a PUD w/
-> > PAGE_SIZE=4K, leading to 513 pages as proposed in the series. Exposing
-> > that configuration option in a module parameter is presumptive that all
-> > VMs on a host use the exact same memory configuration, which doesn't
-> > feel right to me.
+On 30/01/2023 10:04, Like Xu wrote:
+> From: Like Xu <likexu@tencent.com>
 > 
-> Can you elaborate on the cache size needing to be tied to the backing source?
+> With thousands of commits going into mainline each development cycle,
+> the metadata .git folder size is gradually expanding (1GB+), and for some
+> developers (most likely testers) who don't care about the lengthy git-log,
+> they just use git-archive to distribute a certain version of code (~210MB)
+> and rebuild git repository from anywhere for further code changes, e.g.
+> 
+>   $ git init && git add . -A
+> 
+> Then unfortunately, the file tracking metadata from the original git-repo
+> using "git add -f" will also be lost, to the point where part of source
+> files wrapped by git-archive may be accidentally cleaned up:
+> 
+>   $ git clean -nxdf
+>   Would remove Documentation/devicetree/bindings/.yamllint
 
-The proposed eager split mechanism attempts to replace a block with a
-a fully populated page table hierarchy (i.e. mapped at PTE granularity)
-in order to avoid successive break-before-make invalidations. The cache
-size must be >= the number of pages required to build out that fully
-mapped page table hierarchy.
+https://lore.kernel.org/all/20230127150225.18148-1-andriy.shevchenko@linux.intel.com/
 
-> Do the issues arise if you get to a point where KVM can have PGD-sized hugepages
-> with PAGE_SIZE=4KiB?
+Best regards,
+Krzysztof
 
-Those problems when splitting any hugepage larger than a PMD. It just
-so happens that the only configuration that supports larger mappings is
-4K at the moment.
-
-If we were to take the step-down approach to eager page splitting, there
-will be a lot of knock-on break-before-make operations as we go
-PUD -> PMD -> PTE.
-
-> Or do you want to let userspace optimize _now_ for PMD+4KiB?
-
-The default cache value should probably optimize for PMD splitting and
-give userspace the option to scale that up for PUD or greater if it sees
-fit.
-
--- 
-Thanks,
-Oliver
