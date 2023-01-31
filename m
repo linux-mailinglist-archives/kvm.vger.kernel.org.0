@@ -2,180 +2,140 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8DB0D683896
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 22:27:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D8220683894
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 22:27:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232171AbjAaV1N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 16:27:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50238 "EHLO
+        id S232161AbjAaV1E (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 16:27:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229962AbjAaV1L (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 16:27:11 -0500
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C06B814226;
-        Tue, 31 Jan 2023 13:27:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1675200431; x=1706736431;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=vYK2NpO+ExFxzqnG6ZjWnmzVegQDyJD3/VETJklLIPY=;
-  b=ujo/dWQh0wEJfpGRNiseiydB5qh1/8c6XjjfeuqKubKFFdZzM7b8Uj+i
-   0DGHqJRTsuLqL+RauA+EW5tZjTVC1Bcfo7Et0/xiqUFzFpV6v53L+WLBU
-   1xhtfs0NAJ+dnTS5XEmEK0T/a5NDoRNmGDXsdx/zN5nt70PMWpi1nAqT0
-   w=;
-X-IronPort-AV: E=Sophos;i="5.97,261,1669075200"; 
-   d="scan'208";a="292221146"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2023 21:27:04 +0000
-Received: from EX13MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-        by email-inbound-relay-pdx-2b-m6i4x-32fb4f1a.us-west-2.amazon.com (Postfix) with ESMTPS id CE22BC3759;
-        Tue, 31 Jan 2023 21:27:00 +0000 (UTC)
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.45; Tue, 31 Jan 2023 21:26:58 +0000
-Received: from [0.0.0.0] (10.43.162.56) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1118.24; Tue, 31 Jan
- 2023 21:26:50 +0000
-Message-ID: <854a0caf-6940-8381-1e20-0ddb5ed94858@amazon.com>
-Date:   Tue, 31 Jan 2023 22:26:47 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH RFC v7 16/64] x86/sev: Add helper functions for RMPUPDATE
- and PSMASH instruction
-Content-Language: en-US
-To:     Michael Roth <michael.roth@amd.com>, <kvm@vger.kernel.org>
-CC:     <linux-coco@lists.linux.dev>, <linux-mm@kvack.org>,
-        <linux-crypto@vger.kernel.org>, <x86@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <tglx@linutronix.de>,
-        <mingo@redhat.com>, <jroedel@suse.de>, <thomas.lendacky@amd.com>,
-        <hpa@zytor.com>, <ardb@kernel.org>, <pbonzini@redhat.com>,
-        <seanjc@google.com>, <vkuznets@redhat.com>,
-        <wanpengli@tencent.com>, <jmattson@google.com>, <luto@kernel.org>,
-        <dave.hansen@linux.intel.com>, <slp@redhat.com>,
-        <pgonda@google.com>, <peterz@infradead.org>,
-        <srinivas.pandruvada@linux.intel.com>, <rientjes@google.com>,
-        <dovmurik@linux.ibm.com>, <tobin@ibm.com>, <bp@alien8.de>,
-        <vbabka@suse.cz>, <kirill@shutemov.name>, <ak@linux.intel.com>,
-        <tony.luck@intel.com>, <marcorr@google.com>,
-        <sathyanarayanan.kuppuswamy@linux.intel.com>,
-        <alpergun@google.com>, <dgilbert@redhat.com>, <jarkko@kernel.org>,
-        <ashish.kalra@amd.com>, <harald@profian.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        "Rapan, Sabin" <sabrapan@amazon.com>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-17-michael.roth@amd.com>
-From:   Alexander Graf <graf@amazon.com>
-In-Reply-To: <20221214194056.161492-17-michael.roth@amd.com>
-X-Originating-IP: [10.43.162.56]
-X-ClientProxiedBy: EX13D31UWA004.ant.amazon.com (10.43.160.217) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-        NICE_REPLY_A,RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229962AbjAaV1C (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 16:27:02 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 721602A161
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 13:27:01 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 27CCDB81EE8
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 21:27:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA0ABC433EF;
+        Tue, 31 Jan 2023 21:26:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675200418;
+        bh=9Zg0O6TBm+rTRWrq941GVC7/jc+aBKw/h5KKsoSoJ68=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=T2ZseHNas9jSrcJfRk+s5Q4dk8gXu4K6DCqYWFTEExV5gIBBIrVNyd6xRwxvYRZ5K
+         m/BB3mo8v7DoX7tyF6QwSR1YYhUFxI1b0BtFcYmum9AqGSg2cXlXqIwymxKM6Dy2/E
+         2hxVTNa/hruJt/CQ9W9x363wUvUTDx+hUWP7etbxfs1rgMdw7B1gDzJD8Hfnq1aXQb
+         M9i+dL+eCvJBM8RzpxjSoH2rk948A6qDlrI6BTJD4ANphmXGpq56AWclWC/e/6bpgK
+         IViPzXh6WQKcv+hyMW0U7nSTEkKGTOvCykHFU5nshO7H4AAvO7ykFRKp7cOmG2L1qO
+         zEkZnkF5Hofpw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pMy9Y-006KPL-FC;
+        Tue, 31 Jan 2023 21:26:56 +0000
+Date:   Tue, 31 Jan 2023 21:26:56 +0000
+Message-ID: <871qnae6ov.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Oliver Upton <oliver.upton@linux.dev>
+Cc:     Suzuki K Poulose <suzuki.poulose@arm.com>, kvmarm@lists.linux.dev,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v8 01/69] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+In-Reply-To: <Y9l0PzgnKZiFJjvp@google.com>
+References: <20230131092504.2880505-1-maz@kernel.org>
+        <20230131092504.2880505-2-maz@kernel.org>
+        <b7dbe85e-c7f8-48ad-e1af-85befabd8509@arm.com>
+        <86cz6u248j.wl-maz@kernel.org>
+        <3c15760c-c76f-3d5d-a661-442459ce4e07@arm.com>
+        <Y9l0PzgnKZiFJjvp@google.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/27.1
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Ck9uIDE0LjEyLjIyIDIwOjQwLCBNaWNoYWVsIFJvdGggd3JvdGU6Cj4gRnJvbTogQnJpamVzaCBT
-aW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPgo+Cj4gVGhlIFJNUFVQREFURSBpbnN0cnVjdGlv
-biB3cml0ZXMgYSBuZXcgUk1QIGVudHJ5IGluIHRoZSBSTVAgVGFibGUuIFRoZQo+IGh5cGVydmlz
-b3Igd2lsbCB1c2UgdGhlIGluc3RydWN0aW9uIHRvIGFkZCBwYWdlcyB0byB0aGUgUk1QIHRhYmxl
-LiBTZWUKPiBBUE0zIGZvciBkZXRhaWxzIG9uIHRoZSBpbnN0cnVjdGlvbiBvcGVyYXRpb25zLgo+
-Cj4gVGhlIFBTTUFTSCBpbnN0cnVjdGlvbiBleHBhbmRzIGEgMk1CIFJNUCBlbnRyeSBpbnRvIGEg
-Y29ycmVzcG9uZGluZyBzZXQKPiBvZiBjb250aWd1b3VzIDRLQi1QYWdlIFJNUCBlbnRyaWVzLiBU
-aGUgaHlwZXJ2aXNvciB3aWxsIHVzZSB0aGlzCj4gaW5zdHJ1Y3Rpb24gdG8gYWRqdXN0IHRoZSBS
-TVAgZW50cnkgd2l0aG91dCBpbnZhbGlkYXRpbmcgdGhlIHByZXZpb3VzCj4gUk1QIGVudHJ5Lgo+
-Cj4gQWRkIHRoZSBmb2xsb3dpbmcgZXh0ZXJuYWwgaW50ZXJmYWNlIEFQSSBmdW5jdGlvbnM6Cj4K
-PiBpbnQgcHNtYXNoKHU2NCBwZm4pOwo+IHBzbWFzaCBpcyB1c2VkIHRvIHNtYXNoIGEgMk1CIGFs
-aWduZWQgcGFnZSBpbnRvIDRLCj4gcGFnZXMgd2hpbGUgcHJlc2VydmluZyB0aGUgVmFsaWRhdGVk
-IGJpdCBpbiB0aGUgUk1QLgo+Cj4gaW50IHJtcF9tYWtlX3ByaXZhdGUodTY0IHBmbiwgdTY0IGdw
-YSwgZW51bSBwZ19sZXZlbCBsZXZlbCwgaW50IGFzaWQsIGJvb2wgaW1tdXRhYmxlKTsKPiBVc2Vk
-IHRvIGFzc2lnbiBhIHBhZ2UgdG8gZ3Vlc3QgdXNpbmcgdGhlIFJNUFVQREFURSBpbnN0cnVjdGlv
-bi4KPgo+IGludCBybXBfbWFrZV9zaGFyZWQodTY0IHBmbiwgZW51bSBwZ19sZXZlbCBsZXZlbCk7
-Cj4gVXNlZCB0byB0cmFuc2l0aW9uIGEgcGFnZSB0byBoeXBlcnZpc29yL3NoYXJlZCBzdGF0ZSB1
-c2luZyB0aGUgUk1QVVBEQVRFIGluc3RydWN0aW9uLgo+Cj4gU2lnbmVkLW9mZi1ieTogQXNoaXNo
-IEthbHJhIDxhc2hpc2gua2FscmFAYW1kLmNvbT4KPiBTaWduZWQtb2ZmLWJ5OiBCcmlqZXNoIFNp
-bmdoIDxicmlqZXNoLnNpbmdoQGFtZC5jb20+Cj4gW21kcjogYWRkIFJNUFVQREFURSByZXRyeSBs
-b2dpYyBmb3IgdHJhbnNpZW50IEZBSUxfT1ZFUkxBUCBlcnJvcnNdCj4gU2lnbmVkLW9mZi1ieTog
-TWljaGFlbCBSb3RoIDxtaWNoYWVsLnJvdGhAYW1kLmNvbT4KPiAtLS0KPiAgIGFyY2gveDg2L2lu
-Y2x1ZGUvYXNtL3Nldi5oIHwgMjQgKysrKysrKysrKwo+ICAgYXJjaC94ODYva2VybmVsL3Nldi5j
-ICAgICAgfCA5NSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKwo+ICAgMiBm
-aWxlcyBjaGFuZ2VkLCAxMTkgaW5zZXJ0aW9ucygrKQo+Cj4gZGlmZiAtLWdpdCBhL2FyY2gveDg2
-L2luY2x1ZGUvYXNtL3Nldi5oIGIvYXJjaC94ODYvaW5jbHVkZS9hc20vc2V2LmgKPiBpbmRleCA4
-ZDNjZTJhZDI3ZGEuLjRlZWVkY2FjYTU5MyAxMDA2NDQKPiAtLS0gYS9hcmNoL3g4Ni9pbmNsdWRl
-L2FzbS9zZXYuaAo+ICsrKyBiL2FyY2gveDg2L2luY2x1ZGUvYXNtL3Nldi5oCj4gQEAgLTgwLDEw
-ICs4MCwxNSBAQCBleHRlcm4gYm9vbCBoYW5kbGVfdmNfYm9vdF9naGNiKHN0cnVjdCBwdF9yZWdz
-ICpyZWdzKTsKPgo+ICAgLyogU29mdHdhcmUgZGVmaW5lZCAod2hlbiByRmxhZ3MuQ0YgPSAxKSAq
-Lwo+ICAgI2RlZmluZSBQVkFMSURBVEVfRkFJTF9OT1VQREFURSAgICAgICAgICAgICAgICAyNTUK
-PiArLyogUk1VUERBVEUgZGV0ZWN0ZWQgNEsgcGFnZSBhbmQgMk1CIHBhZ2Ugb3ZlcmxhcC4gKi8K
-PiArI2RlZmluZSBSTVBVUERBVEVfRkFJTF9PVkVSTEFQICAgICAgICAgNwo+Cj4gICAvKiBSTVAg
-cGFnZSBzaXplICovCj4gICAjZGVmaW5lIFJNUF9QR19TSVpFXzRLICAgICAgICAgICAgICAgICAw
-Cj4gKyNkZWZpbmUgUk1QX1BHX1NJWkVfMk0gICAgICAgICAgICAgICAgIDEKPiAgICNkZWZpbmUg
-Uk1QX1RPX1g4Nl9QR19MRVZFTChsZXZlbCkgICAgICgoKGxldmVsKSA9PSBSTVBfUEdfU0laRV80
-SykgPyBQR19MRVZFTF80SyA6IFBHX0xFVkVMXzJNKQo+ICsjZGVmaW5lIFg4Nl9UT19STVBfUEdf
-TEVWRUwobGV2ZWwpICAgICAoKChsZXZlbCkgPT0gUEdfTEVWRUxfNEspID8gUk1QX1BHX1NJWkVf
-NEsgOiBSTVBfUEdfU0laRV8yTSkKPiArCj4gICAjZGVmaW5lIFJNUEFESlVTVF9WTVNBX1BBR0Vf
-QklUICAgICAgICAgICAgICAgIEJJVCgxNikKPgo+ICAgLyogU05QIEd1ZXN0IG1lc3NhZ2UgcmVx
-dWVzdCAqLwo+IEBAIC0xMzMsNiArMTM4LDE1IEBAIHN0cnVjdCBzbnBfc2VjcmV0c19wYWdlX2xh
-eW91dCB7Cj4gICAgICAgICAgdTggcnN2ZDNbMzg0MF07Cj4gICB9IF9fcGFja2VkOwo+Cj4gK3N0
-cnVjdCBybXBfc3RhdGUgewo+ICsgICAgICAgdTY0IGdwYTsKPiArICAgICAgIHU4IGFzc2lnbmVk
-Owo+ICsgICAgICAgdTggcGFnZXNpemU7Cj4gKyAgICAgICB1OCBpbW11dGFibGU7Cj4gKyAgICAg
-ICB1OCByc3ZkOwo+ICsgICAgICAgdTMyIGFzaWQ7Cj4gK30gX19wYWNrZWQ7Cj4gKwo+ICAgI2lm
-ZGVmIENPTkZJR19BTURfTUVNX0VOQ1JZUFQKPiAgIGV4dGVybiBzdHJ1Y3Qgc3RhdGljX2tleV9m
-YWxzZSBzZXZfZXNfZW5hYmxlX2tleTsKPiAgIGV4dGVybiB2b2lkIF9fc2V2X2VzX2lzdF9lbnRl
-cihzdHJ1Y3QgcHRfcmVncyAqcmVncyk7Cj4gQEAgLTE5OCw2ICsyMTIsOSBAQCBib29sIHNucF9p
-bml0KHN0cnVjdCBib290X3BhcmFtcyAqYnApOwo+ICAgdm9pZCBfX2luaXQgX19ub3JldHVybiBz
-bnBfYWJvcnQodm9pZCk7Cj4gICBpbnQgc25wX2lzc3VlX2d1ZXN0X3JlcXVlc3QodTY0IGV4aXRf
-Y29kZSwgc3RydWN0IHNucF9yZXFfZGF0YSAqaW5wdXQsIHVuc2lnbmVkIGxvbmcgKmZ3X2Vycik7
-Cj4gICBpbnQgc25wX2xvb2t1cF9ybXBlbnRyeSh1NjQgcGZuLCBpbnQgKmxldmVsKTsKPiAraW50
-IHBzbWFzaCh1NjQgcGZuKTsKPiAraW50IHJtcF9tYWtlX3ByaXZhdGUodTY0IHBmbiwgdTY0IGdw
-YSwgZW51bSBwZ19sZXZlbCBsZXZlbCwgaW50IGFzaWQsIGJvb2wgaW1tdXRhYmxlKTsKPiAraW50
-IHJtcF9tYWtlX3NoYXJlZCh1NjQgcGZuLCBlbnVtIHBnX2xldmVsIGxldmVsKTsKPiAgICNlbHNl
-Cj4gICBzdGF0aWMgaW5saW5lIHZvaWQgc2V2X2VzX2lzdF9lbnRlcihzdHJ1Y3QgcHRfcmVncyAq
-cmVncykgeyB9Cj4gICBzdGF0aWMgaW5saW5lIHZvaWQgc2V2X2VzX2lzdF9leGl0KHZvaWQpIHsg
-fQo+IEBAIC0yMjMsNiArMjQwLDEzIEBAIHN0YXRpYyBpbmxpbmUgaW50IHNucF9pc3N1ZV9ndWVz
-dF9yZXF1ZXN0KHU2NCBleGl0X2NvZGUsIHN0cnVjdCBzbnBfcmVxX2RhdGEgKmluCj4gICAgICAg
-ICAgcmV0dXJuIC1FTk9UVFk7Cj4gICB9Cj4gICBzdGF0aWMgaW5saW5lIGludCBzbnBfbG9va3Vw
-X3JtcGVudHJ5KHU2NCBwZm4sIGludCAqbGV2ZWwpIHsgcmV0dXJuIDA7IH0KPiArc3RhdGljIGlu
-bGluZSBpbnQgcHNtYXNoKHU2NCBwZm4pIHsgcmV0dXJuIC1FTlhJTzsgfQo+ICtzdGF0aWMgaW5s
-aW5lIGludCBybXBfbWFrZV9wcml2YXRlKHU2NCBwZm4sIHU2NCBncGEsIGVudW0gcGdfbGV2ZWwg
-bGV2ZWwsIGludCBhc2lkLAo+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgYm9v
-bCBpbW11dGFibGUpCj4gK3sKPiArICAgICAgIHJldHVybiAtRU5PREVWOwo+ICt9Cj4gK3N0YXRp
-YyBpbmxpbmUgaW50IHJtcF9tYWtlX3NoYXJlZCh1NjQgcGZuLCBlbnVtIHBnX2xldmVsIGxldmVs
-KSB7IHJldHVybiAtRU5PREVWOyB9Cj4gICAjZW5kaWYKPgo+ICAgI2VuZGlmCj4gZGlmZiAtLWdp
-dCBhL2FyY2gveDg2L2tlcm5lbC9zZXYuYyBiL2FyY2gveDg2L2tlcm5lbC9zZXYuYwo+IGluZGV4
-IDcwNjY3NTU2MWY0OS4uNjcwMzVkMzRhZGFkIDEwMDY0NAo+IC0tLSBhL2FyY2gveDg2L2tlcm5l
-bC9zZXYuYwo+ICsrKyBiL2FyY2gveDg2L2tlcm5lbC9zZXYuYwo+IEBAIC0yNTIzLDMgKzI1MjMs
-OTggQEAgaW50IHNucF9sb29rdXBfcm1wZW50cnkodTY0IHBmbiwgaW50ICpsZXZlbCkKPiAgICAg
-ICAgICByZXR1cm4gISFybXBlbnRyeV9hc3NpZ25lZChlKTsKPiAgIH0KPiAgIEVYUE9SVF9TWU1C
-T0xfR1BMKHNucF9sb29rdXBfcm1wZW50cnkpOwo+ICsKPiArLyoKPiArICogcHNtYXNoIGlzIHVz
-ZWQgdG8gc21hc2ggYSAyTUIgYWxpZ25lZCBwYWdlIGludG8gNEsKPiArICogcGFnZXMgd2hpbGUg
-cHJlc2VydmluZyB0aGUgVmFsaWRhdGVkIGJpdCBpbiB0aGUgUk1QLgo+ICsgKi8KPiAraW50IHBz
-bWFzaCh1NjQgcGZuKQo+ICt7Cj4gKyAgICAgICB1bnNpZ25lZCBsb25nIHBhZGRyID0gcGZuIDw8
-IFBBR0VfU0hJRlQ7Cj4gKyAgICAgICBpbnQgcmV0Owo+ICsKPiArICAgICAgIGlmICghcGZuX3Zh
-bGlkKHBmbikpCj4gKyAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOwoKCldlIChhbmQgbWFu
-eSBvdGhlciBjbG91ZHMpIHVzZSBhIG5lYXQgdHJpY2sgdG8gcmVkdWNlIHRoZSBudW1iZXIgb2Yg
-CnN0cnVjdCBwYWdlcyBMaW51eCBhbGxvY2F0ZXMgZm9yIGd1ZXN0IG1lbW9yeTogSW4gaXRzIHNp
-bXBsZXN0IGZvcm0sIGFkZCAKbWVtPSB0byB0aGUga2VybmVsIGNtZGxpbmUgYW5kIG1tYXAoKSAv
-ZGV2L21lbSB0byBhY2Nlc3MgdGhlIHJlc2VydmVkIAptZW1vcnkgaW5zdGVhZC4KClRoaXMgbWVh
-bnMgdGhhdCB0aGUgc3lzdGVtIGNvdmVycyBtb3JlIFJBTSB0aGFuIExpbnV4IGNvbnRhaW5zLCB3
-aGljaCAKbWVhbnMgcGZuX3ZhbGlkKCkgaXMgbm8gbG9uZ2VyIGEgZ29vZCBpbmRpY2F0aW9uIHdo
-ZXRoZXIgYSBwYWdlIGlzIAppbmRlZWQgdmFsaWQuIEtWTSBoYW5kbGVzIHRoaXMgY2FzZSBmaW5l
-LCBidXQgdGhpcyBjb2RlIGRvZXMgbm90LgoKSXMgdGhlcmUgYW55IHBhcnRpY3VsYXIgcmVhc29u
-IHdoeSB3ZSBuZWVkIHRoaXMgY2hlY2sgKGFuZCBzaW1pbGFyIG9uZXMgCmJlbG93IGFuZCBpbiBv
-dGhlciBSTVAgcmVsYXRlZCBwYXRjaGVzKSBpbiB0aGUgZmlyc3QgcGxhY2U/IEkgd291bGQgCmV4
-cGVjdCB0aGF0IFBTTUFTSCBhbmQgZnJpZW5kcyByZXR1cm4gZmFpbHVyZSBjb2RlcyBmb3IgaW52
-YWxpZCBwZm5zLgoKCkFsZXgKCgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkg
-R21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJp
-c3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNo
-dCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDog
-REUgMjg5IDIzNyA4NzkKCgo=
+On Tue, 31 Jan 2023 20:04:15 +0000,
+Oliver Upton <oliver.upton@linux.dev> wrote:
+> 
+> On Tue, Jan 31, 2023 at 05:34:39PM +0000, Suzuki K Poulose wrote:
+> > On 31/01/2023 14:00, Marc Zyngier wrote:
+> 
+> [...]
+> 
+> > > What is exactly the objection here? NV is more or less a VHE++ mode,
+> > > but is also completely experimental and incomplete.
+> > 
+> > I am all in for making this an "optional", only enabled it when "I know
+> > what I want".
+> > 
+> > kvm-arm.mode=nv kind of seems that the KVM driver is conditioned
+> > mainly for running NV (comparing with the other existing options
+> > for kvm-arm.mode).
+> > 
+> > In reality, as you confirmed, NV is an *additional* capability
+> > of a VHE hypervisor. So it would be good to "opt" in for "nv" capability
+> > support.
+> > 
+> > e.g,
+> > 
+> >    kvm-arm.nv=on
+> > 
+> > Thinking more about it, either is fine.
+> 
+> Marc, I'm curious, how do you plan to glue hVHE + NV together (if at
+> all)? We may need two separate options for this so the user could
+> separately configure NV for their hVHE KVM instance.
 
+I really don't plan to support them together. But if we wanted to
+support something, I'd rather express it as a composition of the
+various options, as I suggested to Suzuki earlier. Something along the
+lines of:
+
+	kvm-arm.mode=hvhe,nested
+
+But the extra complexity is mind-boggling, frankly. And the result
+will suck terribly. NV is already exit-heavy, compared to single-level
+virtualisation. But now you double the cost of the exit by moving all
+the load/put work into the entry-exit phase.
+
+To give you an idea, an L2 guest under a hVHE L1 is ~30% slower than
+the same guest running under a VHE L1 with an exit-heavy workload
+(virtio-9p + hackbench). Making the L0 host hVHE would be even worse.
+We may be able to improve it to some extent, but it will always be the
+sucky option.
+
+Also, given where we are at the support stage (we basically offer an
+ARMv8.1 L1 environment), the impetus to support this sort of
+contraption is..  hrmm... low. I'd rather spend my energy on
+architecture correctness and feature-parity with single level.
+
+Thanks,
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
