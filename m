@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B323C6828BD
+	by mail.lfdr.de (Postfix) with ESMTP id 678686828BC
 	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:25:43 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231557AbjAaJZm (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 04:25:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53674 "EHLO
+        id S232471AbjAaJZl (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 04:25:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232069AbjAaJZk (ORCPT <rfc822;kvm@vger.kernel.org>);
+        with ESMTP id S231253AbjAaJZk (ORCPT <rfc822;kvm@vger.kernel.org>);
         Tue, 31 Jan 2023 04:25:40 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671CE2D50
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67946193C3
         for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:25:33 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 909376146C
+        by dfw.source.kernel.org (Postfix) with ESMTPS id CDECB61445
         for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:25:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8F42C433EF;
-        Tue, 31 Jan 2023 09:25:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34552C4339B;
+        Tue, 31 Jan 2023 09:25:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=k20201202; t=1675157132;
-        bh=tGHkRbN3qMfNg/4XaLyH+u6pSLp2UzgLkcIcf96UEBs=;
-        h=From:To:Cc:Subject:Date:From;
-        b=LQ/kbQhwB51D/x3YuJ0AWT3FANX9yuzZFc5r1J44obkxEfKCdZcLAza9bVqJomNVe
-         8QjBjMWitBm3tsl68DDRcNaEhbDnb0/DKGvlEfVxkOfdjsfMXSVrN+rhN925pKgL2w
-         KgrzAqpPyc7mEw2G0Q1LR2woPsTdp1U/mMgrMox4ETYxLTrRNSBt2/EpluGAdov5Z/
-         dzZCWAZCfoYnMEOQjMb9O7d2ycYepBLbyDKMeS9KQ/pJGTLlYK6+OG0MXjNmv9iLiK
-         d5oc9l0VIdTfyjWQ6NrsRS7JXzPauphRUV3Sq3xoywedP24m+YdoJvbvf2yR99WUqB
-         rEaIVLFHOSLjg==
+        bh=t4xEJAO5BfLuaX8mjpeucO4oU7Eyo3etANQIAyyRnTk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=LTyqvKlSOe2+bczruOsTReb9ysevGCLqjz0Y3HaTYUzbN94xU4XsSvSSyLxRakQDi
+         f+NFJFahx0Wgr8i+XhEjP+41SUFBH/+koahZ+/ObnlDxfb9tdxZkY2KP74jFT5VZbF
+         iRD2rbxXDUwSLp1UBDvImhxeAftXKhI7X7cGICAGbAk1YFB7sJvR/2oYjE29v/pe9c
+         835I/BYID6gNRwJ7ZJWBy0jh1OTFWIfP7+C48QXejXYFWMXLVSsYnmlKq4t43YmfIX
+         UY7dCIFU6NJJ1o/3QsDZab7t2kEjbs+1EsZHWezw83GgBSAQiRDdO6XxPjSP9XjrgY
+         b3+TyJHZ/NA5g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pMmtN-0067U2-FG;
+        id 1pMmtN-0067U2-T4;
         Tue, 31 Jan 2023 09:25:29 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -51,10 +51,12 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 00/69] KVM: arm64: ARMv8.3/8.4 Nested Virtualization support
-Date:   Tue, 31 Jan 2023 09:23:55 +0000
-Message-Id: <20230131092504.2880505-1-maz@kernel.org>
+Subject: [PATCH v8 01/69] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+Date:   Tue, 31 Jan 2023 09:23:56 +0000
+Message-Id: <20230131092504.2880505-2-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
+References: <20230131092504.2880505-1-maz@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 185.219.108.64
@@ -70,225 +72,138 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This is the second drop of NV support on arm64 for this year. This
-month even. Something is happening!
+From: Jintack Lim <jintack.lim@linaro.org>
 
-For the previous episodes, see [1].
+Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
+CPU has the ARMv8.3 nested virtualization capability, together
+with the 'kvm-arm.mode=nested' command line option.
 
-What's changed:
+This will be used to support nested virtualization in KVM.
 
-- TLB invalidation has been fixed! A couple of terrible bugs were
-  preventing the TLBI emulation code from selecting the correct MMU
-  context, leading the shadow page-tables never being invalidated.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+[maz: moved the command-line option to kvm-arm.mode]
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ .../admin-guide/kernel-parameters.txt         |  7 +++++-
+ arch/arm64/include/asm/kvm_host.h             |  5 ++++
+ arch/arm64/kernel/cpufeature.c                | 25 +++++++++++++++++++
+ arch/arm64/kvm/arm.c                          |  5 ++++
+ arch/arm64/tools/cpucaps                      |  1 +
+ 5 files changed, 42 insertions(+), 1 deletion(-)
 
-- As a consequence, EDK2 now works correctly at L2 with QEMU as the
-  VMM, as we now teardown the S2 PTs when L1 unmaps the memslot on
-  write to the emulated flash.
-
-- As a consequence of the above consequence, the Debian installer
-  passes with flying colors at L2. Yay!
-
-- A few other fixes, such as better handling of AT instructions.
-
-- All rebased on 6.2-rc4 + kvmarm-fixes-6.2-* + kvmarm/next. Full
-  branch at [2].
-
-Performance:
-
-- This is surprisingly good. Specially after years of watching paint
-  dry in a model. Of course, if your workload is exit/trap heavy, it
-  will suck. But not quite as much as on the model, which is the
-  benchmark.
-
-- For CPU intensive workloads (kernel compilation), I have seen as
-  little a 6% overhead between L0 and L2. YMMV.
-
-Testing:
-
-- No model involved this time around. I have solely run the series on
-  an Apple M2 with 16k pages, because that's what I have, and I
-  consider it the reference (HW you cannot get your hands on doesn't
-  really count).
-
-- Because the M2 is "pretty lax" with the architecture, a bunch of
-  things cannot be tested (E2H=0 being the most obvious one).
-
-- For the same reason, I may be relying on non-architectural
-  behaviours. I've done my best not to, but you never know. Until I
-  get a machine that *is* fully compliant with the architecture, it is
-  a risk I'll have to take.
-
-- The series has a number of hacks for the M2 to actually work (vgic
-  emulation, mostly).
-
-- I haven't tested FEAT_NV (only FEAT_NV2), and seriously considering
-  dropping the support for it. I doubt there is any HW solely
-  implementing FEAT_NV and not FEAT_NV2.
-
-- There is a kvmtool branch that allows you to use the --nested option
-  at [3]. I have no idea what became of the equivalent QEMU patches.
-
-Merging:
-
-- I would suggest that the first 12 patches are in a mergeable
-  state. Only patch #2 hasn't been reviewed yet (because it is new),
-  but it doesn't affect anything non-NV and makes NV work. I really
-  want this in before CCA! :D
-
-- I have a yet another fix for the Apple AIC driver, but I'll post
-  that separately.
-
-Many thanks to Alexandru, Chase, Ganapatrao and Russell for spending a
-lot of time reviewing this, spotting issues and providing helpful
-suggestions.
-
-[1] https://lore.kernel.org/r/20230112191927.1814989-1-maz@kernel.org
-[2] git://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git kvm-arm64/nv-6.3-WIP
-[3] https://git.kernel.org/pub/scm/linux/kernel/git/maz/kvmtool.git/log/?h=arm64/nv-5.16
-
-Andre Przywara (1):
-  KVM: arm64: nv: vgic: Allow userland to set VGIC maintenance IRQ
-
-Christoffer Dall (13):
-  KVM: arm64: nv: Introduce nested virtualization VCPU feature
-  KVM: arm64: nv: Reset VCPU to EL2 registers if VCPU nested virt is set
-  KVM: arm64: nv: Allow userspace to set PSR_MODE_EL2x
-  KVM: arm64: nv: Add nested virt VCPU primitives for vEL2 VCPU state
-  KVM: arm64: nv: Reset VMPIDR_EL2 and VPIDR_EL2 to sane values
-  KVM: arm64: nv: Handle trapped ERET from virtual EL2
-  KVM: arm64: nv: Trap EL1 VM register accesses in virtual EL2
-  KVM: arm64: nv: Only toggle cache for virtual EL2 when SCTLR_EL2
-    changes
-  KVM: arm64: nv: Implement nested Stage-2 page table walk logic
-  KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
-  KVM: arm64: nv: vgic: Emulate the HW bit in software
-  KVM: arm64: nv: Add nested GICv3 tracepoints
-  KVM: arm64: nv: Sync nested timer state with FEAT_NV2
-
-Jintack Lim (16):
-  arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
-  KVM: arm64: nv: Handle HCR_EL2.NV system register traps
-  KVM: arm64: nv: Support virtual EL2 exceptions
-  KVM: arm64: nv: Inject HVC exceptions to the virtual EL2
-  KVM: arm64: nv: Add accessors for SPSR_EL1, ELR_EL1 and VBAR_EL1 from
-    virtual EL2
-  KVM: arm64: nv: Trap CPACR_EL1 access in virtual EL2
-  KVM: arm64: nv: Handle PSCI call via smc from the guest
-  KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
-  KVM: arm64: nv: Respect virtual CPTR_EL2.{TFP,FPEN} settings
-  KVM: arm64: nv: Respect the virtual HCR_EL2.NV bit setting
-  KVM: arm64: nv: Respect virtual HCR_EL2.TVM and TRVM settings
-  KVM: arm64: nv: Respect the virtual HCR_EL2.NV1 bit setting
-  KVM: arm64: nv: Emulate EL12 register accesses from the virtual EL2
-  KVM: arm64: nv: Configure HCR_EL2 for nested virtualization
-  KVM: arm64: nv: Trap and emulate TLBI instructions from virtual EL2
-  KVM: arm64: nv: Nested GICv3 Support
-
-Marc Zyngier (39):
-  KVM: arm64: Use the S2 MMU context to iterate over S2 table
-  KVM: arm64: nv: Add EL2 system registers to vcpu context
-  KVM: arm64: nv: Add non-VHE-EL2->EL1 translation helpers
-  KVM: arm64: nv: Handle virtual EL2 registers in
-    vcpu_read/write_sys_reg()
-  KVM: arm64: nv: Handle SPSR_EL2 specially
-  KVM: arm64: nv: Handle HCR_EL2.E2H specially
-  KVM: arm64: nv: Save/Restore vEL2 sysregs
-  KVM: arm64: nv: Emulate PSTATE.M for a guest hypervisor
-  KVM: arm64: nv: Allow a sysreg to be hidden from userspace only
-  KVM: arm64: nv: Forward debug traps to the nested guest
-  KVM: arm64: nv: Filter out unsupported features from ID regs
-  KVM: arm64: nv: Hide RAS from nested guests
-  KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
-  KVM: arm64: nv: Handle shadow stage 2 page faults
-  KVM: arm64: nv: Restrict S2 RD/WR permissions to match the guest's
-  KVM: arm64: nv: Set a handler for the system instruction traps
-  KVM: arm64: nv: Trap and emulate AT instructions from virtual EL2
-  KVM: arm64: nv: Fold guest's HCR_EL2 configuration into the host's
-  KVM: arm64: nv: arch_timer: Support hyp timer emulation
-  KVM: arm64: nv: Add handling of EL2-specific timer registers
-  KVM: arm64: nv: Load timer before the GIC
-  KVM: arm64: nv: Don't load the GICv4 context on entering a nested
-    guest
-  KVM: arm64: nv: Implement maintenance interrupt forwarding
-  KVM: arm64: nv: Deal with broken VGIC on maintenance interrupt
-    delivery
-  KVM: arm64: nv: Allow userspace to request KVM_ARM_VCPU_NESTED_VIRT
-  KVM: arm64: nv: Add handling of FEAT_TTL TLB invalidation
-  KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like
-    information
-  KVM: arm64: nv: Tag shadow S2 entries with nested level
-  KVM: arm64: nv: Add include containing the VNCR_EL2 offsets
-  KVM: arm64: nv: Map VNCR-capable registers to a separate page
-  KVM: arm64: nv: Move nested vgic state into the sysreg file
-  KVM: arm64: Add FEAT_NV2 cpu feature
-  KVM: arm64: nv: Publish emulated timer interrupt state in the
-    in-memory state
-  KVM: arm64: nv: Allocate VNCR page when required
-  KVM: arm64: nv: Enable ARMv8.4-NV support
-  KVM: arm64: nv: Fast-track 'InHost' exception returns
-  KVM: arm64: nv: Fast-track EL1 TLBIs for VHE guests
-  KVM: arm64: nv: Use FEAT_ECV to trap access to EL0 timers
-  KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV is on
-
- .../admin-guide/kernel-parameters.txt         |    7 +-
- .../virt/kvm/devices/arm-vgic-v3.rst          |   12 +-
- arch/arm64/include/asm/esr.h                  |    5 +
- arch/arm64/include/asm/kvm_arm.h              |   27 +-
- arch/arm64/include/asm/kvm_asm.h              |    4 +
- arch/arm64/include/asm/kvm_emulate.h          |  159 +-
- arch/arm64/include/asm/kvm_host.h             |  195 ++-
- arch/arm64/include/asm/kvm_hyp.h              |    2 +
- arch/arm64/include/asm/kvm_mmu.h              |   23 +-
- arch/arm64/include/asm/kvm_nested.h           |  150 ++
- arch/arm64/include/asm/sysreg.h               |  102 +-
- arch/arm64/include/asm/vncr_mapping.h         |   74 +
- arch/arm64/include/uapi/asm/kvm.h             |    2 +
- arch/arm64/kernel/cpufeature.c                |   36 +
- arch/arm64/kvm/Makefile                       |    4 +-
- arch/arm64/kvm/arch_timer.c                   |  301 +++-
- arch/arm64/kvm/arm.c                          |   38 +-
- arch/arm64/kvm/at.c                           |  221 +++
- arch/arm64/kvm/emulate-nested.c               |  217 +++
- arch/arm64/kvm/guest.c                        |    6 +
- arch/arm64/kvm/handle_exit.c                  |   74 +-
- arch/arm64/kvm/hyp/exception.c                |   48 +-
- arch/arm64/kvm/hyp/include/hyp/switch.h       |   12 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h    |   24 +-
- arch/arm64/kvm/hyp/nvhe/switch.c              |    2 +-
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c           |    2 +-
- arch/arm64/kvm/hyp/vgic-v3-sr.c               |    2 +-
- arch/arm64/kvm/hyp/vhe/switch.c               |  230 ++-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c            |  125 +-
- arch/arm64/kvm/hyp/vhe/tlb.c                  |   83 +
- arch/arm64/kvm/inject_fault.c                 |   61 +-
- arch/arm64/kvm/mmu.c                          |  259 +++-
- arch/arm64/kvm/nested.c                       |  896 +++++++++++
- arch/arm64/kvm/reset.c                        |   17 +
- arch/arm64/kvm/sys_regs.c                     | 1377 ++++++++++++++++-
- arch/arm64/kvm/sys_regs.h                     |   14 +-
- arch/arm64/kvm/trace_arm.h                    |   65 +-
- arch/arm64/kvm/vgic/vgic-init.c               |   33 +
- arch/arm64/kvm/vgic/vgic-kvm-device.c         |   29 +-
- arch/arm64/kvm/vgic/vgic-nested-trace.h       |  137 ++
- arch/arm64/kvm/vgic/vgic-v3-nested.c          |  244 +++
- arch/arm64/kvm/vgic/vgic-v3.c                 |   39 +-
- arch/arm64/kvm/vgic/vgic.c                    |   44 +
- arch/arm64/kvm/vgic/vgic.h                    |   10 +
- arch/arm64/tools/cpucaps                      |    2 +
- include/clocksource/arm_arch_timer.h          |    4 +
- include/kvm/arm_arch_timer.h                  |    9 +-
- include/kvm/arm_vgic.h                        |   16 +
- include/uapi/linux/kvm.h                      |    1 +
- tools/arch/arm/include/uapi/asm/kvm.h         |    1 +
- 50 files changed, 5221 insertions(+), 224 deletions(-)
- create mode 100644 arch/arm64/include/asm/kvm_nested.h
- create mode 100644 arch/arm64/include/asm/vncr_mapping.h
- create mode 100644 arch/arm64/kvm/at.c
- create mode 100644 arch/arm64/kvm/emulate-nested.c
- create mode 100644 arch/arm64/kvm/nested.c
- create mode 100644 arch/arm64/kvm/vgic/vgic-nested-trace.h
- create mode 100644 arch/arm64/kvm/vgic/vgic-v3-nested.c
-
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index 6cfa6e3996cf..b7b0704e360e 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2553,9 +2553,14 @@
+ 			protected: nVHE-based mode with support for guests whose
+ 				   state is kept private from the host.
+ 
++			nested: VHE-based mode with support for nested
++				virtualization. Requires at least ARMv8.3
++				hardware.
++
+ 			Defaults to VHE/nVHE based on hardware support. Setting
+ 			mode to "protected" will disable kexec and hibernation
+-			for the host.
++			for the host. "nested" is experimental and should be
++			used with extreme caution.
+ 
+ 	kvm-arm.vgic_v3_group0_trap=
+ 			[KVM,ARM] Trap guest accesses to GICv3 group-0
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index b14a0199eba4..186f1b759763 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -60,9 +60,14 @@
+ enum kvm_mode {
+ 	KVM_MODE_DEFAULT,
+ 	KVM_MODE_PROTECTED,
++	KVM_MODE_NV,
+ 	KVM_MODE_NONE,
+ };
++#ifdef CONFIG_KVM
+ enum kvm_mode kvm_get_mode(void);
++#else
++static inline enum kvm_mode kvm_get_mode(void) { return KVM_MODE_NONE; };
++#endif
+ 
+ DECLARE_STATIC_KEY_FALSE(userspace_irqchip_in_use);
+ 
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index a77315b338e6..3fc14ee86239 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -1956,6 +1956,20 @@ static void cpu_copy_el2regs(const struct arm64_cpu_capabilities *__unused)
+ 		write_sysreg(read_sysreg(tpidr_el1), tpidr_el2);
+ }
+ 
++static bool has_nested_virt_support(const struct arm64_cpu_capabilities *cap,
++				    int scope)
++{
++	if (kvm_get_mode() != KVM_MODE_NV)
++		return false;
++
++	if (!has_cpuid_feature(cap, scope)) {
++		pr_warn("unavailable: %s\n", cap->desc);
++		return false;
++	}
++
++	return true;
++}
++
+ #ifdef CONFIG_ARM64_PAN
+ static void cpu_enable_pan(const struct arm64_cpu_capabilities *__unused)
+ {
+@@ -2215,6 +2229,17 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.matches = runs_at_el2,
+ 		.cpu_enable = cpu_copy_el2regs,
+ 	},
++	{
++		.desc = "Nested Virtualization Support",
++		.capability = ARM64_HAS_NESTED_VIRT,
++		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
++		.matches = has_nested_virt_support,
++		.sys_reg = SYS_ID_AA64MMFR2_EL1,
++		.sign = FTR_UNSIGNED,
++		.field_pos = ID_AA64MMFR2_EL1_NV_SHIFT,
++		.field_width = 4,
++		.min_field_value = ID_AA64MMFR2_EL1_NV_IMP,
++	},
+ 	{
+ 		.capability = ARM64_HAS_32BIT_EL0_DO_NOT_USE,
+ 		.type = ARM64_CPUCAP_SYSTEM_FEATURE,
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 698787ed87e9..4e1943e3aa42 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -2325,6 +2325,11 @@ static int __init early_kvm_mode_cfg(char *arg)
+ 		return 0;
+ 	}
+ 
++	if (strcmp(arg, "nested") == 0 && !WARN_ON(!is_kernel_in_hyp_mode())) {
++		kvm_mode = KVM_MODE_NV;
++		return 0;
++	}
++
+ 	return -EINVAL;
+ }
+ early_param("kvm-arm.mode", early_kvm_mode_cfg);
+diff --git a/arch/arm64/tools/cpucaps b/arch/arm64/tools/cpucaps
+index dfeb2c51e257..1af77a3657f7 100644
+--- a/arch/arm64/tools/cpucaps
++++ b/arch/arm64/tools/cpucaps
+@@ -31,6 +31,7 @@ HAS_GENERIC_AUTH_IMP_DEF
+ HAS_IRQ_PRIO_MASKING
+ HAS_LDAPR
+ HAS_LSE_ATOMICS
++HAS_NESTED_VIRT
+ HAS_NO_FPSIMD
+ HAS_NO_HW_PREFETCH
+ HAS_PAN
 -- 
 2.34.1
 
