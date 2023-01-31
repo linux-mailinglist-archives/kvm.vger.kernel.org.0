@@ -2,133 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id B32A66827BE
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 09:55:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A6B626827C2
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 09:56:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231878AbjAaIzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 03:55:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39452 "EHLO
+        id S232208AbjAaI4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 03:56:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232143AbjAaIyn (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 03:54:43 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1564A20A
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 00:50:13 -0800 (PST)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30V6TtjW015174
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 08:49:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=GO+RiA6QZjlk6a9RD+3C9jrUqRVuccFRan4BV8GHVjY=;
- b=qK1ilDqHoVUjfCCdcPhNYVhssF9s9JR+2qK7O1RXLuZYimopHHNnOBdLg6AUgF3Tgd6S
- e4tYrOnRC50Ele7UFeQyo4qFD3IE2rZYJgCUxklKhkWwfbN6ny0i3rJZUyQl80UH4PLW
- e9VdBDd1YGX6tvBRalQPy8o09oY0Mo/TtOz8DZXY+Gb6LKM4hSofBdRNurfK+brxtOdB
- j9Sg1+9z9oPxTkcAibF3E7flAcWAM6+YezJQkALo92oBzUO2BAjEx3/yPPpQh+wZ42aS
- 1RbKbxfrD8+n6/0vLHsX59qUvqv3YtsK5USpSM9uqsD0bHIKJH4uy0DXpCeIOThLPkYJ pA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3news7u7w9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 08:49:33 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30V8ToUd032439
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 08:49:33 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3news7u7vs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Jan 2023 08:49:32 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30UL4BUR013445;
-        Tue, 31 Jan 2023 08:49:31 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ncvtyb8cc-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Jan 2023 08:49:31 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30V8nR0819988830
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 Jan 2023 08:49:27 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7476520043;
-        Tue, 31 Jan 2023 08:49:27 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 06F4320040;
-        Tue, 31 Jan 2023 08:49:27 +0000 (GMT)
-Received: from [9.171.57.28] (unknown [9.171.57.28])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 31 Jan 2023 08:49:26 +0000 (GMT)
-Message-ID: <76cfa756-c3f5-8ab1-584f-c864be720717@linux.ibm.com>
-Date:   Tue, 31 Jan 2023 09:49:26 +0100
+        with ESMTP id S230109AbjAaIzs (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 03:55:48 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453A84B4B8;
+        Tue, 31 Jan 2023 00:50:57 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id b5so7126520plz.5;
+        Tue, 31 Jan 2023 00:50:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HlkVox6I5FUnYmeSbSAQbPKPPzCS1DM4/BxJexDwink=;
+        b=Oq1dXhl4AUSq8SXfZljEFxeZ8ojBbgd4u0vv7mGVOxjeDwJMKIrj20TgTJo8kv+Z4f
+         iNsJ6hwcsEM5hhzKAiB6obCDQQJzp809Ew9v1jFPi3PJ4mLttadxPE74sdCNpIwzTIGx
+         uhY+wdQbildYvj0qD76Vn9EY6yoV5nj9VOK65PSADlwZ80ouO3XR31NhNLwp0wcA+kI0
+         13McnwS/DW09DS3eegJBnZFack5BkaBktzWt4MuMLU5Z/IjCY/74vMghBEAVSqmvbk3q
+         XXHasbBZveqS8jyzGusZFmiEBFqAEfqlzNRrgzQc4I4RVqAdftplt1UWPXl9lwSJ2Mvz
+         GgHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HlkVox6I5FUnYmeSbSAQbPKPPzCS1DM4/BxJexDwink=;
+        b=xes/bvxmPhx3hflGLVheYZx47L4PtuXEwB2Nx3kDhtx9Cy5ugPvSwGxneJJ2c7ch9E
+         XdU9pMRiqj/OLrEUcVphDe3eoidqXqpjMqKUa51VMI+5yhwIaXn+Rg3V5fd4W8k7IquU
+         nSG+eiU3Tu5tUi2SNvgRFFwlRB5TpYZ0//WdAQ7ZxmJt39BLKHZ1zQ1Wygz6xIgloY0r
+         YBA5zwHn8ZV1MievaLWUbOOr0BhhbPLetQaUjWS1Zn46HLGEcMLRf3sGhM7X9IkyO3MM
+         2+sblETDra+ZYckeo2qxGd8+Cg+H+ZeQESPXEOweTSu6KUjUExyshX6htCsqtqc3RQPD
+         J4Fg==
+X-Gm-Message-State: AO0yUKU2remG1hfMlOh27TxpdEFeMT1uq5wQ+TlWlZbkIu1AVubBUp25
+        42KqKViMSLXGSumZRqhDFWU=
+X-Google-Smtp-Source: AK7set/qRO5xcYdV+5kV7GzLg/C0kCaV8drqDWjezWS5nG0YJiIatE2AszyuXEyg+3sevQWJupMa+Q==
+X-Received: by 2002:a17:902:c70a:b0:196:3056:38f4 with SMTP id p10-20020a170902c70a00b00196305638f4mr17717245plp.50.1675155050883;
+        Tue, 31 Jan 2023 00:50:50 -0800 (PST)
+Received: from localhost.localdomain ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id o17-20020a170902d4d100b00196077ba463sm9196140plg.123.2023.01.31.00.50.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 31 Jan 2023 00:50:50 -0800 (PST)
+From:   Like Xu <like.xu.linux@gmail.com>
+X-Google-Original-From: Like Xu <likexu@tencent.com>
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jianfeng Gao <jianfeng.gao@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH v2] KVM: x86/pmu: Disable all vPMU features support on Intel hybrid CPUs
+Date:   Tue, 31 Jan 2023 16:50:31 +0800
+Message-Id: <20230131085031.88939-1-likexu@tencent.com>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [kvm-unit-tests PATCH v2 3/8] s390x/Makefile: fix `*.gbin` target
- dependencies
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-References: <20230119114045.34553-1-mhartmay@linux.ibm.com>
- <20230119114045.34553-4-mhartmay@linux.ibm.com>
-Content-Language: en-US
-From:   Janosch Frank <frankja@linux.ibm.com>
-In-Reply-To: <20230119114045.34553-4-mhartmay@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Y5cp9gTCoEIbK4tGxwzZms485X7HLf7u
-X-Proofpoint-ORIG-GUID: XhSM_tyBiIHWdOKmX42wkfN9eZR8Chyr
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-31_02,2023-01-30_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- clxscore=1015 priorityscore=1501 lowpriorityscore=0 adultscore=0
- suspectscore=0 impostorscore=0 malwarescore=0 phishscore=0 bulkscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301310075
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/19/23 12:40, Marc Hartmayer wrote:
-> If the linker scripts change, then the .gbin binaries must be rebuilt.
-> While at it, replace `$(SRCDIR)/s390x/snippets` with `$(SNIPPET_DIR)`
-> for these Makefile rules.
-> 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+From: Like Xu <likexu@tencent.com>
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+Disable KVM support for virtualizing PMUs on hosts with hybrid PMUs until
+KVM gains a sane way to enumeration the hybrid vPMU to userspace and/or
+gains a mechanism to let userspace opt-in to the dangers of exposing a
+hybrid vPMU to KVM guests.
 
-> ---
->   s390x/Makefile | 8 ++++----
->   1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/s390x/Makefile b/s390x/Makefile
-> index 660ff06f1e7c..71e6563bbb61 100644
-> --- a/s390x/Makefile
-> +++ b/s390x/Makefile
-> @@ -135,13 +135,13 @@ $(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
->   $(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
->   	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
->   
-> -$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o
-> -	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/asm/flat.lds $<
-> +$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(SNIPPET_DIR)/asm/flat.lds
-> +	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/asm/flat.lds $<
->   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
->   	truncate -s '%4096' $@
->   
-> -$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
-> -	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
-> +$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SNIPPET_DIR)/c/flat.lds
-> +	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
->   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
->   	truncate -s '%4096' $@
->   
+Virtualizing a hybrid PMU, or at least part of a hybrid PMU, is possible,
+but it requires userspace to pin vCPUs to pCPUs to prevent migrating a
+vCPU between a big core and a little core, requires the VMM to accurately
+enumerate the topology to the guest (if exposing a hybrid CPU to the
+guest), and also requires the VMM to accurately enumerate the vPMU
+capabilities to the guest.
+
+The last point is especially problematic, as KVM doesn't control which
+pCPU it runs on when enumerating KVM's vPMU capabilities to userspace.
+For now, simply disable vPMU support on hybrid CPUs to avoid inducing
+seemingly random #GPs in guests.
+
+Reported-by: Jianfeng Gao <jianfeng.gao@intel.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Like Xu <likexu@tencent.com>
+---
+v1: https://lore.kernel.org/all/20230120004051.2043777-1-seanjc@google.com/
+ arch/x86/kvm/pmu.h | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+index 79988dafb15b..6a3995657e1e 100644
+--- a/arch/x86/kvm/pmu.h
++++ b/arch/x86/kvm/pmu.h
+@@ -166,9 +166,11 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
+ 
+ 	 /*
+ 	  * For Intel, only support guest architectural pmu
+-	  * on a host with architectural pmu.
++	  * on a non-hybrid host with architectural pmu.
+ 	  */
+-	if ((is_intel && !kvm_pmu_cap.version) || !kvm_pmu_cap.num_counters_gp)
++	if (!kvm_pmu_cap.num_counters_gp ||
++	    (is_intel && (!kvm_pmu_cap.version ||
++			  boot_cpu_has(X86_FEATURE_HYBRID_CPU))))
+ 		enable_pmu = false;
+ 
+ 	if (!enable_pmu) {
+-- 
+2.39.1
 
