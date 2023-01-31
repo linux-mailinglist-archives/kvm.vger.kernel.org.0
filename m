@@ -2,70 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D9D54682285
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 04:07:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 13C376822C5
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 04:24:17 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230163AbjAaDHO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Mon, 30 Jan 2023 22:07:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37632 "EHLO
+        id S229613AbjAaDYH (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Mon, 30 Jan 2023 22:24:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbjAaDHN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Mon, 30 Jan 2023 22:07:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 028A929E29
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 19:06:33 -0800 (PST)
+        with ESMTP id S229810AbjAaDYF (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Mon, 30 Jan 2023 22:24:05 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B182DBC7
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 19:23:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675134393;
+        s=mimecast20190719; t=1675135396;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=KdMSX2PGXe45qBgqP8RMLgntuCYyndOvWlGnSWr1I1w=;
-        b=PXBbXrEXJ0AYdMh+sQd326US5Hh6zpTvbJILTKSmIj4TrFy+cIV/r9dssM4ZirxvqZSulJ
-        BSLgt01lDKcAi60q1zKXob455+b3zcmibopEAHUVDxjxEJW/KhXHRTOyBwGLYmYl0VrkcL
-        nmLAF0isVPOqB+KCw0HroymPgI+rJUA=
-Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
- [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=ltkBGnwECMJmhbD7vrl7YLMiwdLoKe7LIr5e2nHG3PQ=;
+        b=PVFcvbmhakEccjUecJunEr9oEtcOzMbT7o4F9fBCNpa7BzGQ5CHOy24nQu9jvLh8Hks276
+        ksHrXhfTYYaflLbajSFM3kfP6k7d76pgS8xtZihzb4DGJt5OzxnocooquslI/owH5DNFN/
+        RK0DyQ/254+cD5b8bb+c2JhINB0ly9Y=
+Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
+ [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-649-zvzlPy0lMk-3sA68u307Dg-1; Mon, 30 Jan 2023 22:06:29 -0500
-X-MC-Unique: zvzlPy0lMk-3sA68u307Dg-1
-Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-15fddea3ee9so5057450fac.21
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 19:06:29 -0800 (PST)
+ us-mta-636-otRaEfoOMi6DN5rK1QzsAQ-1; Mon, 30 Jan 2023 22:23:10 -0500
+X-MC-Unique: otRaEfoOMi6DN5rK1QzsAQ-1
+Received: by mail-ot1-f71.google.com with SMTP id e19-20020a0568301e5300b0068bc4598b80so3371402otj.23
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 19:23:10 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=KdMSX2PGXe45qBgqP8RMLgntuCYyndOvWlGnSWr1I1w=;
-        b=pMkpPEsm9yf9Hddr27XZvDM2765KH/fBs/ylBFmFHadelJ7t5+Cue9uzTUHNx/5tp3
-         ttiO44xGMMnQI6zM+QSEhi4x5tdjl0JsLMY8TqjbgO/Zx5ioH785jIaAGuQ1xw3AdkYz
-         8ybbbkrPCUOnYIXBcDxYzQJ2CbFgfCLQTP5laZ+RAqsML6KIaAT7RiPAlJupo2FCX1dL
-         6HnUrnjlW5IgPxTxnf+yx+6STaXwjg/2meFQoFCrJEUlRWM0DuxciQqcoB305s2sByUI
-         QrzGgKfNLTxhE+LtMXfxkHNuPoV2sutevQOkzy80ug1Gn1Yq3JISc042yQEPs/eLHMkK
-         mpMA==
-X-Gm-Message-State: AO0yUKW7wfsX4VIZSfI0qU/1xAp+btFrcMnnHCOpGKQwFBkf8VlzhNCD
-        h6zruzQp06kqcmgOQ/wNS0Z7Bn7IGkDcNDxNSymMIbuLayTjD+1Mvqo/pU/9TqbPzuQ8onO6kV0
-        LUPlhE18hwDxR4A3RjFEToHNUak4t
-X-Received: by 2002:a05:6870:959e:b0:163:9cea:eea7 with SMTP id k30-20020a056870959e00b001639ceaeea7mr565248oao.35.1675134389118;
-        Mon, 30 Jan 2023 19:06:29 -0800 (PST)
-X-Google-Smtp-Source: AK7set/gy6zeCHS7dDqTzLgm0l0HH281Gpnu1QcOaLODISHVTb7n1+4QzN8Fzmkkj1rEtYbW+m8iASC8yFpzqnKRkFM=
+        bh=ltkBGnwECMJmhbD7vrl7YLMiwdLoKe7LIr5e2nHG3PQ=;
+        b=o6QOGLdl9SummDNh4Dt0YooT5O5Guz55VbMJuJRCCkkGKQ+JuUTGAO+1IUkcVew6Lj
+         onXkJSGpv/Dm0nwYIvz/0SIDBcY4JZ6Ut8IhWcWEcs8vISXwPtCpPWnqO4R9YFB72+j9
+         0fXgsamMjR6GCkCqP8ZSsUXs69RaSPMHMqIE02NGmNMFZrGMqZJmej00WlvuDatswP8p
+         3ceBcK2yRk0ip33v3XbNbqUWnFgPvbqQ3UtMDoCg1sZ3ksA15BaRA7mgueY3m0YeRbet
+         2UFS6iK4HAjL+WFtQgN97ya65V6bbFpVXE/Gt7gAlzdiw3EPath3c8csqhTmewolCL8h
+         7otA==
+X-Gm-Message-State: AO0yUKUrpUdC1QIZ+Y7fCndMhnI/soqrercjQlUFijDhn20JznT/jswt
+        t1SId2RAbOtLZAvpWxdNdI3izU5tDrBlXQKY4Cd7Vd/APUz+tlcG1tpBKCILlRujpfX1oKmZ/g6
+        hkECWnz3Nsn1ptxgSDct21FRol+cd
+X-Received: by 2002:a05:6870:959e:b0:163:9cea:eea7 with SMTP id k30-20020a056870959e00b001639ceaeea7mr567805oao.35.1675135387491;
+        Mon, 30 Jan 2023 19:23:07 -0800 (PST)
+X-Google-Smtp-Source: AK7set9Hu2HFEDPiDGXCaNnCjpBr1M/3mkKYHDHH6RsQ5EtesD62XsOTK7GEj1aXmBl8gjJeRQSyQJytKuQEUWxkdJU=
 X-Received: by 2002:a05:6870:959e:b0:163:9cea:eea7 with SMTP id
- k30-20020a056870959e00b001639ceaeea7mr565247oao.35.1675134388839; Mon, 30 Jan
- 2023 19:06:28 -0800 (PST)
+ k30-20020a056870959e00b001639ceaeea7mr567795oao.35.1675135387309; Mon, 30 Jan
+ 2023 19:23:07 -0800 (PST)
 MIME-Version: 1.0
-References: <20230128031740.166743-1-sunnanyong@huawei.com>
- <CACGkMEtMAFMbhPnaaTwGRFofPM-p8ceKzAUbD2AFBz=fbR6hYQ@mail.gmail.com> <ffe21085-13cf-e2e9-e5cc-8755e9e3250b@huawei.com>
-In-Reply-To: <ffe21085-13cf-e2e9-e5cc-8755e9e3250b@huawei.com>
+References: <20230130092157.1759539-1-hch@lst.de> <20230130092157.1759539-10-hch@lst.de>
+ <20230130101747-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230130101747-mutt-send-email-mst@kernel.org>
 From:   Jason Wang <jasowang@redhat.com>
-Date:   Tue, 31 Jan 2023 11:06:17 +0800
-Message-ID: <CACGkMEsuYLen=pXd0e3hFNcUj-GQzj8ggh_8NDgWR2HbsD2S1A@mail.gmail.com>
-Subject: Re: [PATCH] vhost/vdpa: Add MSI translation tables to iommu for
- software-managed MSI
-To:     Nanyong Sun <sunnanyong@huawei.com>
-Cc:     joro@8bytes.org, will@kernel.org, robin.murphy@arm.com,
-        mst@redhat.com, iommu@lists.linux.dev,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        wangrong68@huawei.com
+Date:   Tue, 31 Jan 2023 11:22:56 +0800
+Message-ID: <CACGkMEuoqJP4S+jz8Tt5K72i-w5qBhuheTiCWaRLxUBfYS_jQg@mail.gmail.com>
+Subject: Re: [PATCH 09/23] virtio_blk: use bvec_set_virt to initialize special_vec
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Ilya Dryomov <idryomov@gmail.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Howells <dhowells@redhat.com>,
+        Marc Dionne <marc.dionne@auristor.com>,
+        Xiubo Li <xiubli@redhat.com>, Steve French <sfrench@samba.org>,
+        Trond Myklebust <trond.myklebust@hammerspace.com>,
+        Anna Schumaker <anna@kernel.org>,
+        Mike Marshall <hubcap@omnibond.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Chuck Lever <chuck.lever@oracle.com>,
+        linux-block@vger.kernel.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        linux-nvme@lists.infradead.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-afs@lists.infradead.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-fsdevel@vger.kernel.org, linux-nfs@vger.kernel.org,
+        devel@lists.orangefs.org, io-uring@vger.kernel.org,
+        linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
@@ -77,138 +100,41 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 31, 2023 at 9:32 AM Nanyong Sun <sunnanyong@huawei.com> wrote:
+On Mon, Jan 30, 2023 at 11:18 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 >
-> On 2023/1/29 14:02, Jason Wang wrote:
-> > On Sat, Jan 28, 2023 at 10:25 AM Nanyong Sun <sunnanyong@huawei.com> wrote:
-> >> From: Rong Wang <wangrong68@huawei.com>
-> >>
-> >> Once enable iommu domain for one device, the MSI
-> >> translation tables have to be there for software-managed MSI.
-> >> Otherwise, platform with software-managed MSI without an
-> >> irq bypass function, can not get a correct memory write event
-> >> from pcie, will not get irqs.
-> >> The solution is to obtain the MSI phy base address from
-> >> iommu reserved region, and set it to iommu MSI cookie,
-> >> then translation tables will be created while request irq.
-> >>
-> >> Signed-off-by: Rong Wang <wangrong68@huawei.com>
-> >> Signed-off-by: Nanyong Sun <sunnanyong@huawei.com>
-> >> ---
-> >>   drivers/iommu/iommu.c |  1 +
-> >>   drivers/vhost/vdpa.c  | 53 ++++++++++++++++++++++++++++++++++++++++---
-> >>   2 files changed, 51 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/drivers/iommu/iommu.c b/drivers/iommu/iommu.c
-> >> index de91dd88705b..f6c65d5d8e2b 100644
-> >> --- a/drivers/iommu/iommu.c
-> >> +++ b/drivers/iommu/iommu.c
-> >> @@ -2623,6 +2623,7 @@ void iommu_get_resv_regions(struct device *dev, struct list_head *list)
-> >>          if (ops->get_resv_regions)
-> >>                  ops->get_resv_regions(dev, list);
-> >>   }
-> >> +EXPORT_SYMBOL_GPL(iommu_get_resv_regions);
-> >>
-> >>   /**
-> >>    * iommu_put_resv_regions - release resered regions
-> >> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> >> index ec32f785dfde..31d3e9ed4cfa 100644
-> >> --- a/drivers/vhost/vdpa.c
-> >> +++ b/drivers/vhost/vdpa.c
-> >> @@ -1103,6 +1103,48 @@ static ssize_t vhost_vdpa_chr_write_iter(struct kiocb *iocb,
-> >>          return vhost_chr_write_iter(dev, from);
-> >>   }
-> >>
-> >> +static bool vhost_vdpa_check_sw_msi(struct list_head *dev_resv_regions, phys_addr_t *base)
-> >> +{
-> >> +       struct iommu_resv_region *region;
-> >> +       bool ret = false;
-> >> +
-> >> +       list_for_each_entry(region, dev_resv_regions, list) {
-> >> +               /*
-> >> +                * The presence of any 'real' MSI regions should take
-> >> +                * precedence over the software-managed one if the
-> >> +                * IOMMU driver happens to advertise both types.
-> >> +                */
-> >> +               if (region->type == IOMMU_RESV_MSI) {
-> >> +                       ret = false;
-> >> +                       break;
-> >> +               }
-> >> +
-> >> +               if (region->type == IOMMU_RESV_SW_MSI) {
-> >> +                       *base = region->start;
-> >> +                       ret = true;
-> >> +               }
-> >> +       }
-> >> +
-> >> +       return ret;
-> >> +}
-> > Can we unify this with what VFIO had?
-> Yes, these two functions are just the same.
-> Do you think move this function to iommu.c, and export from iommu is a
-> good choice?
-
-Probably, we can try and see.
-
+> On Mon, Jan 30, 2023 at 10:21:43AM +0100, Christoph Hellwig wrote:
+> > Use the bvec_set_virt helper to initialize the special_vec.
 > >
-> >> +
-> >> +static int vhost_vdpa_get_msi_cookie(struct iommu_domain *domain, struct device *dma_dev)
-> >> +{
-> >> +       struct list_head dev_resv_regions;
-> >> +       phys_addr_t resv_msi_base = 0;
-> >> +       int ret = 0;
-> >> +
-> >> +       INIT_LIST_HEAD(&dev_resv_regions);
-> >> +       iommu_get_resv_regions(dma_dev, &dev_resv_regions);
-> >> +
-> >> +       if (vhost_vdpa_check_sw_msi(&dev_resv_regions, &resv_msi_base))
-> >> +               ret = iommu_get_msi_cookie(domain, resv_msi_base);
-> >> +
-> >> +       iommu_put_resv_regions(dma_dev, &dev_resv_regions);
-> >> +
-> >> +       return ret;
-> >> +}
-> >> +
-> >>   static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
-> >>   {
-> >>          struct vdpa_device *vdpa = v->vdpa;
-> >> @@ -1128,11 +1170,16 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
-> >>
-> >>          ret = iommu_attach_device(v->domain, dma_dev);
-> >>          if (ret)
-> >> -               goto err_attach;
-> >> +               goto err_alloc_domain;
-> >>
-> >> -       return 0;
-> >> +       ret = vhost_vdpa_get_msi_cookie(v->domain, dma_dev);
-> > Do we need to check the overlap mapping and record it in the interval
-> > tree (as what VFIO did)?
-> >
-> > Thanks
-> Yes, we need to care about this part, I will handle this recently.
-> Thanks a lot.
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+>
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-I think for parents that requires vendor specific mapping logic we
-probably also need this.
-
-But this could be added on top (via a new config ops probably).
+Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
 
-> >> +       if (ret)
-> >> +               goto err_attach_device;
-> >>
-> >> -err_attach:
-> >> +       return 0;
-> >> +err_attach_device:
-> >> +       iommu_detach_device(v->domain, dma_dev);
-> >> +err_alloc_domain:
-> >>          iommu_domain_free(v->domain);
-> >>          return ret;
-> >>   }
-> >> --
-> >> 2.25.1
-> >>
-> > .
+>
+>
+> > ---
+> >  drivers/block/virtio_blk.c | 4 +---
+> >  1 file changed, 1 insertion(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index 6a77fa91742880..dc6e9b989910b0 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -170,9 +170,7 @@ static int virtblk_setup_discard_write_zeroes_erase(struct request *req, bool un
+> >
+> >       WARN_ON_ONCE(n != segments);
+> >
+> > -     req->special_vec.bv_page = virt_to_page(range);
+> > -     req->special_vec.bv_offset = offset_in_page(range);
+> > -     req->special_vec.bv_len = sizeof(*range) * segments;
+> > +     bvec_set_virt(&req->special_vec, range, sizeof(*range) * segments);
+> >       req->rq_flags |= RQF_SPECIAL_PAYLOAD;
+> >
+> >       return 0;
+> > --
+> > 2.39.0
 >
 
