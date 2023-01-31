@@ -2,132 +2,120 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EC38D6829FF
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 11:11:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6C43D682A56
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 11:22:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231264AbjAaKKl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 05:10:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38632 "EHLO
+        id S231236AbjAaKWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 05:22:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231287AbjAaKKd (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 05:10:33 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E02655A0
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 02:10:31 -0800 (PST)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30V8Rwmv020183
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 10:10:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date : to :
- cc : references : from : subject : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=/tiO9LYQpIETeSz0AlLrrnmeQH9LgxzJup9YJXolPrM=;
- b=OqgtMqD6MGnMVATAsyEBnE80jLysyMQqgBYgvqggrCPZIpUwubYmtH+c0P9vLk+kUyI9
- j1SeKxZYJosozBT8MphgM7nEsbZqHzyQGDTpcLLd7QjrEYp1vhAXxUAvQkSnAHpICvV1
- 70fstLj7BkwxrXlc4JPJ8OyTLZyKO0UkT3SxW2tKdc5+kKwc07MDpJ/ViI1k/nNAbSb/
- 7++fy79rw/9gDSvkcwaP/eDAP+hyfhGHnSsGVwKqcHehs+LgLbKQ4+hyDk7tGBsb7hOd
- ogcAJ3Tpt51xhT6xrNt1ZbVq2cCQpAGAO4Ry2kSC1Fq9uQcFMAwpbCYKnwqMqoUI6MyX iA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3neygjtafm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 10:10:31 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30V9fYGq001041
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 10:10:31 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3neygjtaf3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Jan 2023 10:10:31 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30V1rKin001953;
-        Tue, 31 Jan 2023 10:10:28 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3ncvt7jcu3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 31 Jan 2023 10:10:28 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30VAAOaq42008900
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 31 Jan 2023 10:10:24 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BD7BB2004F;
-        Tue, 31 Jan 2023 10:10:24 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 502A62004B;
-        Tue, 31 Jan 2023 10:10:24 +0000 (GMT)
-Received: from [9.171.57.28] (unknown [9.171.57.28])
-        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Tue, 31 Jan 2023 10:10:24 +0000 (GMT)
-Message-ID: <86596e54-dd0d-9dfc-c58f-0594172ad16d@linux.ibm.com>
-Date:   Tue, 31 Jan 2023 11:10:24 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Content-Language: en-US
-To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
-Cc:     David Hildenbrand <david@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
-        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
-References: <20230119114045.34553-1-mhartmay@linux.ibm.com>
- <20230119114045.34553-8-mhartmay@linux.ibm.com>
-From:   Janosch Frank <frankja@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v2 7/8] lib/linux/const.h: test for
- `__ASSEMBLER__` as well
-In-Reply-To: <20230119114045.34553-8-mhartmay@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: QBUlxZQ_jkFelNOO6k49g-j7nfssEcI1
-X-Proofpoint-GUID: V2CVTRfVkSdgeYw0RgxgW92kJ5bny3mx
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+        with ESMTP id S230271AbjAaKWR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 05:22:17 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 19FC01E5F8;
+        Tue, 31 Jan 2023 02:22:15 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFD102F4;
+        Tue, 31 Jan 2023 02:22:56 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.12.254])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C65F63F64C;
+        Tue, 31 Jan 2023 02:22:12 -0800 (PST)
+Date:   Tue, 31 Jan 2023 10:22:09 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     Peter Zijlstra <peterz@infradead.org>,
+        Petr Mladek <pmladek@suse.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+        Jiri Kosina <jikos@kernel.org>, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
+        live-patching@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <Y9jr0fP7DtA9Of1L@FVFF77S0Q05N>
+References: <Y9KyVKQk3eH+RRse@alley>
+ <Y9LswwnPAf+nOVFG@do-x1extreme>
+ <20230127044355.frggdswx424kd5dq@treble>
+ <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
+ <20230127165236.rjcp6jm6csdta6z3@treble>
+ <20230127170946.zey6xbr4sm4kvh3x@treble>
+ <20230127221131.sdneyrlxxhc4h3fa@treble>
+ <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
+ <Y9gOMCWGmoc5GQMj@FVFF77S0Q05N>
+ <20230130194823.6y3rc227bvsgele4@treble>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-01-31_04,2023-01-31_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- lowpriorityscore=0 suspectscore=0 adultscore=0 priorityscore=1501
- mlxscore=0 mlxlogscore=999 spamscore=0 phishscore=0 clxscore=1015
- bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2301310088
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230130194823.6y3rc227bvsgele4@treble>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 1/19/23 12:40, Marc Hartmayer wrote:
-> On s390x we're using the preprocessor for generating our linker scripts
-> out of assembly files. The macro `__ASSEMBLER__` is defined with value 1
-> when preprocessing assembly language using gcc. [1] Therefore, let's
-> check for the macro `__ASSEMBLER__` in `lib/linux/const.h` as well. Thus
-> we can use macros that makes use of the `_AC` or `_AT` macro in the
-> "linker scripts".
+On Mon, Jan 30, 2023 at 11:48:23AM -0800, Josh Poimboeuf wrote:
+> On Mon, Jan 30, 2023 at 06:36:32PM +0000, Mark Rutland wrote:
+> > On Mon, Jan 30, 2023 at 01:40:18PM +0100, Peter Zijlstra wrote:
+> > > On Fri, Jan 27, 2023 at 02:11:31PM -0800, Josh Poimboeuf wrote:
+> > > > @@ -8500,8 +8502,10 @@ EXPORT_STATIC_CALL_TRAMP(might_resched);
+> > > >  static DEFINE_STATIC_KEY_FALSE(sk_dynamic_cond_resched);
+> > > >  int __sched dynamic_cond_resched(void)
+> > > >  {
+> > > > -	if (!static_branch_unlikely(&sk_dynamic_cond_resched))
+> > > > +	if (!static_branch_unlikely(&sk_dynamic_cond_resched)) {
+> > > > +		klp_sched_try_switch();
+> > > >  		return 0;
+> > > > +	}
+> > > >  	return __cond_resched();
+> > > >  }
+> > > >  EXPORT_SYMBOL(dynamic_cond_resched);
+> > > 
+> > > I would make the klp_sched_try_switch() not depend on
+> > > sk_dynamic_cond_resched, because __cond_resched() is not a guaranteed
+> > > pass through __schedule().
+> > > 
+> > > But you'll probably want to check with Mark here, this all might
+> > > generate crap code on arm64.
+> > 
+> > IIUC here klp_sched_try_switch() is a static call, so on arm64 this'll generate
+> > at least a load, a conditional branch, and an indirect branch. That's not
+> > ideal, but I'd have to benchmark it to find out whether it's a significant
+> > overhead relative to the baseline of PREEMPT_DYNAMIC.
+> > 
+> > For arm64 it'd be a bit nicer to have another static key check, and a call to
+> > __klp_sched_try_switch(). That way the static key check gets turned into a NOP
+> > in the common case, and the call to __klp_sched_try_switch() can be a direct
+> > call (potentially a tail-call if we made it return 0).
 > 
-> [1] https://gcc.gnu.org/onlinedocs/cpp/Standard-Predefined-Macros.html
-
-TIL: the whole ASSEMBLY / ASSEMBLER problem is a rabbit hole in itself.
-
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
-
+> Hm, it might be nice if our out-of-line static call implementation would
+> automatically do a static key check as part of static_call_cond() for
+> NULL-type static calls.
 > 
-> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-> ---
->   lib/linux/const.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/lib/linux/const.h b/lib/linux/const.h
-> index c872bfd25e13..be114dc4a553 100644
-> --- a/lib/linux/const.h
-> +++ b/lib/linux/const.h
-> @@ -12,7 +12,7 @@
->    * leave it unchanged in asm.
->    */
->   
-> -#ifdef __ASSEMBLY__
-> +#if defined(__ASSEMBLY__) || defined(__ASSEMBLER__)
->   #define _AC(X,Y)	X
->   #define _AT(T,X)	X
->   #else
+> But the best answer is probably to just add inline static calls to
+> arm64.  Is the lack of objtool the only thing blocking that?
 
+The major issues were branch range limitations (and needing the linker to add
+PLTs), and painful instruction patching requirements (e.g. the architecture's
+"CMODX" rules for Concurrent MODification and eXecution of instructions). We
+went with the static key scheme above because that was what our assembled code
+generation would devolve to anyway.
+
+If we knew each call-site would only call a particular function or skip the
+call, then we could do better (and would probably need something like objtool
+to NOP that out at compile time), but since we don't know the callee at build
+time we can't ensure we have a PLT in range when necessary.
+
+> Objtool is now modular, so all the controversial CFG reverse engineering
+> is now optional, so it shouldn't be too hard to just enable objtool for
+> static call inlines.
+
+Funnily enough, I spent some time yesterday looking at enabling a trivial
+objtool for arm64 as I wanted some basic ELF rewriting functionality (to
+manipulate the mcount_loc table). So I'll likely be looking at that soon
+regardless of static calls. :)
+
+Thanks,
+Mark.
