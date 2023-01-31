@@ -2,226 +2,447 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AAFAE683954
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 23:28:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 70650683965
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 23:35:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230494AbjAaW2p (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 17:28:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54904 "EHLO
+        id S231716AbjAaWf3 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 17:35:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230054AbjAaW2o (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 17:28:44 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEF113D41
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 14:28:43 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id m13so4689375plx.13
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 14:28:43 -0800 (PST)
+        with ESMTP id S231431AbjAaWf2 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 17:35:28 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 164F7113E6
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 14:35:25 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id w20so2350777pfn.4
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 14:35:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N7s5g/njGNZsKUP9bAQb4HSON8Z3dq/K+SA0pUZricQ=;
-        b=mAH8PQYsCu2WsusNle75fK+ImCQJbe6PwHrn65rGsY9u3wY4P+r30oPg17wcax6EkL
-         s6aE6kRtwrHxa6unsjnMzjC3+1K8KRceFqsU5+SdlxsogaGfY9Dgjj3Vda+g3Tlc7fng
-         GsXsVfGYls49N1tixbqDfqfCSrzj1qYfLhGgUgIw+qQlWxjSEY6B7QdnIkhSowDpV3Lt
-         MmU1CbAeZGdqQRoUZd6270KsC1SzXkrcSi3ptXwhq72nFuV4gQiQavLJVK8/ykhNXGeH
-         OtGyHbrq5z728kqlr8usdqSOHnKoaDQKxdwIaqWG0rcINo2qFA3WRZhFwBxNpeDbw1FV
-         fOgA==
+        d=atishpatra.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vJQIys1Qs1ZNaRcWZJhQjuX9zC46hHmqjCfBF/APpP8=;
+        b=RhLEBosLKFPPOVQnxcfYfKjGkreuNmB0Ri0p//WPSsT5jWoroy62e6IuRFkhpktP2H
+         ieiofANK5kUH7x2kUSVGAkiC+gz5VfJesGJUsZUo5FKnhzhcePNrwd4oXMg82PzCKUJ4
+         fExzF6yEcR8JYeqNDi842X4226GWaM0prKna0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N7s5g/njGNZsKUP9bAQb4HSON8Z3dq/K+SA0pUZricQ=;
-        b=oAT8oDMzPjL2ezCPMkJId8YRiUxecBzpj05jUzWCPxzb/Lh8bMyzg88mpicoTetQlz
-         vi2zJReGsb3XNNoGDLaZhqtfjQzTYlUpUqzxueyEgrW13LLdw6Rvv1c0vpIVGMc6wteT
-         fIj4p/CI2uPfCAfKxrXIAv3LyysFp/Xw+QwnztGJDDuF/3kuyHqZ5AXthH2TTg304Ivv
-         FXIturw2LgMKu3EMZK6lDEpUJaO/YUK4UIeyW1ZwlP1KpBYX983woB5bXU1nXghtnMYq
-         Al+7isk8Mhgslooe2+iAC0o6Go+GT2nkUybp43t0Bi5/Z2WF36UpP3GjfK48XF4RDHeh
-         cvcg==
-X-Gm-Message-State: AO0yUKWQbFajuV/AdXSSdyaO3DMeZ2bXPKTAWuzEPLonryndLgagwiXO
-        NMRInFJzul0SDb4JXI8BZSahIw==
-X-Google-Smtp-Source: AK7set9P4eybO7vgLjy2Ta8j4KN+vUkU4sgnPdrhY+RoILUDe983URuNAhrj8GrLzIh3DwbaSI8oRg==
-X-Received: by 2002:a05:6a20:a69d:b0:9d:c38f:9bdd with SMTP id ba29-20020a056a20a69d00b0009dc38f9bddmr174533pzb.2.1675204122667;
-        Tue, 31 Jan 2023 14:28:42 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id o9-20020a1709026b0900b00180033438a0sm10215571plk.106.2023.01.31.14.28.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Jan 2023 14:28:42 -0800 (PST)
-Date:   Tue, 31 Jan 2023 22:28:38 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Maxim Levitsky <mlevitsk@redhat.com>
-Cc:     kvm@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Jim Mattson <jmattson@google.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        Josh Poimboeuf <jpoimboe@kernel.org>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
-        Babu Moger <babu.moger@amd.com>, linux-kernel@vger.kernel.org,
-        Jing Liu <jing2.liu@intel.com>,
-        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH v2 07/11] KVM: x86: add a delayed hardware NMI injection
- interface
-Message-ID: <Y9mWFlGdzoa8ZDW7@google.com>
-References: <20221129193717.513824-1-mlevitsk@redhat.com>
- <20221129193717.513824-8-mlevitsk@redhat.com>
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vJQIys1Qs1ZNaRcWZJhQjuX9zC46hHmqjCfBF/APpP8=;
+        b=ySUaLHBoEoP8p32OgjmiSk0Nct5qHDFXSQkVMp9BqnPxC2ZdcesxqYiG8EhRADAdzv
+         oWHPlxb5LBiJ0AkZf6IZem2JlViqzptTvA02ByYo3nF9qsussZk7bd7LsN9A8PcYvjwz
+         ChseoH2vPBsNsU0d2d+MWE8oGEL2AoBp/MZMJ8THVLOFsF10qdmw6m3uTsU5QqWl32c/
+         ovNBgQ5P6Z7u9RzDD+kEpim3YyXT+0UqCDrJiLlguBaaxhgY3rwjugo5qyvgPKLsGx1z
+         wYqbyj//z1/qiohQlGl+Yr5jj7tN2ls84GXOtNxM8OgT8obpDOnA/15jLAO7C3mtw3mi
+         jpDg==
+X-Gm-Message-State: AO0yUKUDJdXcb3h/LPWPxl1iS8mm1xm0vL9wS2YQ8Qkia+O7jkTxp9rD
+        VzS8oNOL2qmwQcgJkzpdZywmqJnSOUZRRrlVLcU/
+X-Google-Smtp-Source: AK7set9Y3Gj+ZRjTBujRpWhQ+tYsM/J6jFMauSs2KBom+yMejeUdBIxihpYP+ZO1GwoyhlxXSYFC+h04ljzWK2dRje4=
+X-Received: by 2002:aa7:94b9:0:b0:593:1253:2ff5 with SMTP id
+ a25-20020aa794b9000000b0059312532ff5mr40915pfl.14.1675204524525; Tue, 31 Jan
+ 2023 14:35:24 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221129193717.513824-8-mlevitsk@redhat.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+References: <20230127182558.2416400-1-atishp@rivosinc.com> <20230127182558.2416400-8-atishp@rivosinc.com>
+ <CAAhSdy1P=u4a-4t8kn2Pa3Zs+Njai36QV9hBrwYk8zkhdR8r5g@mail.gmail.com>
+In-Reply-To: <CAAhSdy1P=u4a-4t8kn2Pa3Zs+Njai36QV9hBrwYk8zkhdR8r5g@mail.gmail.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Tue, 31 Jan 2023 14:35:13 -0800
+Message-ID: <CAOnJCUK+Ht10utv=18jET=sUTR5660Sm5Tf+e0zyQjUJ9m10_Q@mail.gmail.com>
+Subject: Re: [PATCH v3 07/14] RISC-V: KVM: Add skeleton support for perf
+To:     Anup Patel <anup@brainfault.org>
+Cc:     Atish Patra <atishp@rivosinc.com>, linux-kernel@vger.kernel.org,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Guo Ren <guoren@kernel.org>, Heiko Stuebner <heiko@sntech.de>,
+        kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+        linux-riscv@lists.infradead.org,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Sergey Matyukevich <sergey.matyukevich@syntacore.com>,
+        Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Nov 29, 2022, Maxim Levitsky wrote:
-> @@ -5191,9 +5191,12 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
->  
->  	vcpu->arch.nmi_injected = events->nmi.injected;
->  	if (events->flags & KVM_VCPUEVENT_VALID_NMI_PENDING)
-> -		vcpu->arch.nmi_pending = events->nmi.pending;
-> +		atomic_add(events->nmi.pending, &vcpu->arch.nmi_queued);
-> +
->  	static_call(kvm_x86_set_nmi_mask)(vcpu, events->nmi.masked);
->  
-> +	process_nmi(vcpu);
+On Sun, Jan 29, 2023 at 4:30 AM Anup Patel <anup@brainfault.org> wrote:
+>
+> On Fri, Jan 27, 2023 at 11:56 PM Atish Patra <atishp@rivosinc.com> wrote:
+> >
+> > This patch only adds barebore structure of perf implementation. Most of
+>
+> s/barebore/barebone/
+>
+> > the function returns zero at this point and will be implemented
+> > fully in the future.
+> >
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > ---
+> >  arch/riscv/include/asm/kvm_host.h     |   3 +
+> >  arch/riscv/include/asm/kvm_vcpu_pmu.h |  76 ++++++++++++++
+> >  arch/riscv/kvm/Makefile               |   1 +
+> >  arch/riscv/kvm/vcpu.c                 |   5 +
+> >  arch/riscv/kvm/vcpu_pmu.c             | 145 ++++++++++++++++++++++++++
+> >  5 files changed, 230 insertions(+)
+> >  create mode 100644 arch/riscv/include/asm/kvm_vcpu_pmu.h
+> >  create mode 100644 arch/riscv/kvm/vcpu_pmu.c
+> >
+> > diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> > index 93f43a3..f9874b4 100644
+> > --- a/arch/riscv/include/asm/kvm_host.h
+> > +++ b/arch/riscv/include/asm/kvm_host.h
+> > @@ -18,6 +18,7 @@
+> >  #include <asm/kvm_vcpu_insn.h>
+> >  #include <asm/kvm_vcpu_sbi.h>
+> >  #include <asm/kvm_vcpu_timer.h>
+> > +#include <asm/kvm_vcpu_pmu.h>
+> >
+> >  #define KVM_MAX_VCPUS                  1024
+> >
+> > @@ -228,6 +229,8 @@ struct kvm_vcpu_arch {
+> >
+> >         /* Don't run the VCPU (blocked) */
+> >         bool pause;
+> > +
+> > +       struct kvm_pmu pmu;
+>
+> Add a single line comment just like other members of the structure.
+>
+> I also suggest naming this variable "pmu_context" or something similar
+> for naming consistency.
+>
 
-Argh, having two process_nmi() calls is ugly (not blaming your code, it's KVM's
-ABI that's ugly).  E.g. if we collapse this down, it becomes:
+Done.
 
-	process_nmi(vcpu);
+> >  };
+> >
+> >  static inline void kvm_arch_hardware_unsetup(void) {}
+> > diff --git a/arch/riscv/include/asm/kvm_vcpu_pmu.h b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+> > new file mode 100644
+> > index 0000000..3f43a43
+> > --- /dev/null
+> > +++ b/arch/riscv/include/asm/kvm_vcpu_pmu.h
+> > @@ -0,0 +1,76 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/*
+> > + * Copyright (c) 2023 Rivos Inc
+> > + *
+> > + * Authors:
+> > + *     Atish Patra <atishp@rivosinc.com>
+> > + */
+> > +
+> > +#ifndef __KVM_VCPU_RISCV_PMU_H
+> > +#define __KVM_VCPU_RISCV_PMU_H
+> > +
+> > +#include <linux/perf/riscv_pmu.h>
+> > +#include <asm/kvm_vcpu_sbi.h>
+> > +#include <asm/sbi.h>
+> > +
+> > +#ifdef CONFIG_RISCV_PMU_SBI
+> > +#define RISCV_KVM_MAX_FW_CTRS 32
+> > +#define RISCV_MAX_COUNTERS      64
+> > +
+> > +/* Per virtual pmu counter data */
+> > +struct kvm_pmc {
+> > +       u8 idx;
+> > +       struct perf_event *perf_event;
+> > +       uint64_t counter_val;
+> > +       union sbi_pmu_ctr_info cinfo;
+> > +       /* Event monitoring status */
+> > +       bool started;
+> > +};
+> > +
+> > +/* PMU data structure per vcpu */
+> > +struct kvm_pmu {
+> > +       struct kvm_pmc pmc[RISCV_MAX_COUNTERS];
+> > +       /* Number of the virtual firmware counters available */
+> > +       int num_fw_ctrs;
+> > +       /* Number of the virtual hardware counters available */
+> > +       int num_hw_ctrs;
+> > +       /* A flag to indicate that pmu initialization is done */
+> > +       bool init_done;
+> > +       /* Bit map of all the virtual counter used */
+> > +       DECLARE_BITMAP(pmc_in_use, RISCV_MAX_COUNTERS);
+> > +};
+> > +
+> > +#define vcpu_to_pmu(vcpu) (&(vcpu)->arch.pmu)
+> > +#define pmu_to_vcpu(pmu)  (container_of((pmu), struct kvm_vcpu, arch.pmu))
+> > +
+> > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_ext_data *edata);
+> > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
+> > +                               struct kvm_vcpu_sbi_ext_data *edata);
+> > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                                unsigned long ctr_mask, unsigned long flag, uint64_t ival,
+> > +                                struct kvm_vcpu_sbi_ext_data *edata);
+> > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                               unsigned long ctr_mask, unsigned long flag,
+> > +                               struct kvm_vcpu_sbi_ext_data *edata);
+> > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                                    unsigned long ctr_mask, unsigned long flag,
+> > +                                    unsigned long eidx, uint64_t evtdata,
+> > +                                    struct kvm_vcpu_sbi_ext_data *edata);
+> > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
+> > +                               struct kvm_vcpu_sbi_ext_data *edata);
+> > +int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu);
+> > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu);
+> > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu);
+> > +
+> > +#else
+> > +struct kvm_pmu {
+> > +};
+> > +
+> > +static inline int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
+> > +{
+> > +       return 0;
+> > +}
+> > +static inline void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu) {}
+> > +static inline void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu) {}
+> > +#endif /* CONFIG_RISCV_PMU_SBI */
+> > +#endif /* !__KVM_VCPU_RISCV_PMU_H */
+> > diff --git a/arch/riscv/kvm/Makefile b/arch/riscv/kvm/Makefile
+> > index 019df920..5de1053 100644
+> > --- a/arch/riscv/kvm/Makefile
+> > +++ b/arch/riscv/kvm/Makefile
+> > @@ -25,3 +25,4 @@ kvm-y += vcpu_sbi_base.o
+> >  kvm-y += vcpu_sbi_replace.o
+> >  kvm-y += vcpu_sbi_hsm.o
+> >  kvm-y += vcpu_timer.o
+> > +kvm-$(CONFIG_RISCV_PMU_SBI) += vcpu_pmu.o
+> > diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> > index 7c08567..b746f21 100644
+> > --- a/arch/riscv/kvm/vcpu.c
+> > +++ b/arch/riscv/kvm/vcpu.c
+> > @@ -137,6 +137,7 @@ static void kvm_riscv_reset_vcpu(struct kvm_vcpu *vcpu)
+> >
+> >         WRITE_ONCE(vcpu->arch.irqs_pending, 0);
+> >         WRITE_ONCE(vcpu->arch.irqs_pending_mask, 0);
+>
+> Add an empty newline here.
+>
 
-	if (events->flags & KVM_VCPUEVENT_VALID_NMI_PENDING) {
-		<blah blah blah>
-	}
-	static_call(kvm_x86_set_nmi_mask)(vcpu, events->nmi.masked);
+Done.
+> > +       kvm_riscv_vcpu_pmu_reset(vcpu);
+> >
+> >         vcpu->arch.hfence_head = 0;
+> >         vcpu->arch.hfence_tail = 0;
+> > @@ -194,6 +195,9 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> >         /* Setup VCPU timer */
+> >         kvm_riscv_vcpu_timer_init(vcpu);
+> >
+> > +       /* setup performance monitoring */
+> > +       kvm_riscv_vcpu_pmu_init(vcpu);
+> > +
+> >         /* Reset VCPU */
+> >         kvm_riscv_reset_vcpu(vcpu);
+> >
+> > @@ -216,6 +220,7 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
+> >         /* Cleanup VCPU timer */
+> >         kvm_riscv_vcpu_timer_deinit(vcpu);
+> >
+> > +       kvm_riscv_vcpu_pmu_deinit(vcpu);
+>
+> Add an empty newline here.
+>
 
-	process_nmi(vcpu);
+Done.
 
-And the second mess is that V_NMI needs to be cleared.
+> >         /* Free unused pages pre-allocated for G-stage page table mappings */
+> >         kvm_mmu_free_memory_cache(&vcpu->arch.mmu_page_cache);
+> >  }
+> > diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+> > new file mode 100644
+> > index 0000000..d3fd551
+> > --- /dev/null
+> > +++ b/arch/riscv/kvm/vcpu_pmu.c
+> > @@ -0,0 +1,145 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * Copyright (c) 2023 Rivos Inc
+> > + *
+> > + * Authors:
+> > + *     Atish Patra <atishp@rivosinc.com>
+> > + */
+> > +
+> > +#include <linux/errno.h>
+> > +#include <linux/err.h>
+> > +#include <linux/kvm_host.h>
+> > +#include <linux/perf/riscv_pmu.h>
+> > +#include <asm/csr.h>
+> > +#include <asm/kvm_vcpu_sbi.h>
+> > +#include <asm/kvm_vcpu_pmu.h>
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#define kvm_pmu_num_counters(pmu) ((pmu)->num_hw_ctrs + (pmu)->num_fw_ctrs)
+> > +
+> > +int kvm_riscv_vcpu_pmu_num_ctrs(struct kvm_vcpu *vcpu, struct kvm_vcpu_sbi_ext_data *edata)
+> > +{
+> > +       struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+> > +
+> > +       edata->out_val = kvm_pmu_num_counters(kvpmu);
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_info(struct kvm_vcpu *vcpu, unsigned long cidx,
+> > +                               struct kvm_vcpu_sbi_ext_data *edata)
+> > +{
+> > +       struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+> > +
+> > +       if (cidx > RISCV_MAX_COUNTERS || cidx == 1) {
+> > +               edata->err_val = SBI_ERR_INVALID_PARAM;
+> > +               return 0;
+> > +       }
+> > +
+> > +       edata->out_val = kvpmu->pmc[cidx].cinfo.value;
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_start(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                                unsigned long ctr_mask, unsigned long flag, uint64_t ival,
+> > +                                struct kvm_vcpu_sbi_ext_data *edata)
+> > +{
+> > +       /* TODO */
+> > +       return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_stop(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                               unsigned long ctr_mask, unsigned long flag,
+> > +                               struct kvm_vcpu_sbi_ext_data *edata)
+> > +{
+> > +       /* TODO */
+> > +       return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_cfg_match(struct kvm_vcpu *vcpu, unsigned long ctr_base,
+> > +                                    unsigned long ctr_mask, unsigned long flag,
+> > +                                    unsigned long eidx, uint64_t evtdata,
+> > +                                    struct kvm_vcpu_sbi_ext_data *edata)
+> > +{
+> > +       /* TODO */
+> > +       return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_ctr_read(struct kvm_vcpu *vcpu, unsigned long cidx,
+> > +                               struct kvm_vcpu_sbi_ext_data *edata)
+> > +{
+> > +       /* TODO */
+> > +       return 0;
+> > +}
+> > +
+> > +int kvm_riscv_vcpu_pmu_init(struct kvm_vcpu *vcpu)
+> > +{
+> > +       int i = 0, num_fw_ctrs, ret, num_hw_ctrs = 0, hpm_width = 0;
+> > +       struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+> > +       struct kvm_pmc *pmc;
+> > +
+> > +       ret = riscv_pmu_get_hpm_info(&hpm_width, &num_hw_ctrs);
+> > +       if (ret < 0)
+> > +               return ret;
+> > +
+> > +       if (!hpm_width || !num_hw_ctrs) {
+> > +               pr_err("Cannot initialize VCPU with NULL hpmcounter width or number of counters\n");
+>
+> What will happen if underlying M-mode firmware does not implement
+> SBI PMU extension ?
+>
 
-The first process_nmi() effectively exists to (a) purge nmi_queued and (b) keep
-nmi_pending if KVM_VCPUEVENT_VALID_NMI_PENDING is not set.  I think we can just
-replace that with an set of nmi_queued, i.e.
+riscv_pmu_get_hpm_info will return an error and
+kvm_riscv_vcpu_pmu_init will fail.
 
-	if (events->flags & KVM_VCPUEVENT_VALID_NMI_PENDING) {
-		vcpu->arch-nmi_pending = 0;	
-		atomic_set(&vcpu->arch.nmi_queued, events->nmi.pending);
-		process_nmi();
-	}
+> > +               return -EINVAL;
+> > +       }
+> > +
+> > +       if ((num_hw_ctrs + RISCV_KVM_MAX_FW_CTRS) > RISCV_MAX_COUNTERS) {
+> > +               pr_warn("Limiting fw counters as hw & fw counters exceed maximum counters\n");
+>
+> How is this possible ?
+>
+> Maximum HW counters is 32 (including time, cycle, and instret),
+> RISCV_KVM_MAX_FW_CTRS = 32, and
+> RISCV_MAX_COUNTERS = 64
 
-because if nmi_queued is non-zero in the !KVM_VCPUEVENT_VALID_NMI_PENDING, then
-there should already be a pending KVM_REQ_NMI.  Alternatively, replace process_nmi()
-with a KVM_REQ_NMI request (that probably has my vote?).
+This was added to prevent the condition where somebody changed the
+definition RISCV_KVM_MAX_FW_CTRS
+without incrementing MAX_COUNTERS. The error might be subtle as it may
+work on some platforms (with less hardware counter)
+but fail on others (with more hardware counters.)
+I couldn't find a better way to describe the relationship between
+RISCV_KVM_MAX_FW_CTRS and RISCV_MAX_COUNTERS.
 
-If that works, can you do that in a separate patch?  Then this patch can tack on
-a call to clear V_NMI.
+I can just put a big comment here instead of the condition check if
+you prefer that way.
 
->  	if (events->flags & KVM_VCPUEVENT_VALID_SIPI_VECTOR &&
->  	    lapic_in_kernel(vcpu))
->  		vcpu->arch.apic->sipi_vector = events->sipi_vector;
-> @@ -10008,6 +10011,10 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
->  static void process_nmi(struct kvm_vcpu *vcpu)
->  {
->  	unsigned limit = 2;
-> +	int nmi_to_queue = atomic_xchg(&vcpu->arch.nmi_queued, 0);
-> +
-> +	if (!nmi_to_queue)
-> +		return;
->  
->  	/*
->  	 * x86 is limited to one NMI running, and one NMI pending after it.
-> @@ -10015,13 +10022,34 @@ static void process_nmi(struct kvm_vcpu *vcpu)
->  	 * Otherwise, allow two (and we'll inject the first one immediately).
->  	 */
->  	if (static_call(kvm_x86_get_nmi_mask)(vcpu) || vcpu->arch.nmi_injected)
-> -		limit = 1;
-> +		limit--;
-> +
-> +	/* Also if there is already a NMI hardware queued to be injected,
-> +	 * decrease the limit again
-> +	 */
-> +	if (static_call(kvm_x86_get_hw_nmi_pending)(vcpu))
-> +		limit--;
 
-I don't think this is correct.  If a vNMI is pending and NMIs are blocked, then
-limit will end up '0' and KVM will fail to pend the additional NMI in software.
-After much fiddling, and factoring in the above, how about this?
+>
+> > +               num_fw_ctrs = RISCV_MAX_COUNTERS - num_hw_ctrs;
+> > +       } else
+> > +               num_fw_ctrs = RISCV_KVM_MAX_FW_CTRS;
+> > +
+> > +       kvpmu->num_hw_ctrs = num_hw_ctrs;
+> > +       kvpmu->num_fw_ctrs = num_fw_ctrs;
+> > +
+> > +       /*
+> > +        * There is no correlation between the logical hardware counter and virtual counters.
+> > +        * However, we need to encode a hpmcounter CSR in the counter info field so that
+> > +        * KVM can trap n emulate the read. This works well in the migration use case as
+> > +        * KVM doesn't care if the actual hpmcounter is available in the hardware or not.
+> > +        */
+> > +       for (i = 0; i < kvm_pmu_num_counters(kvpmu); i++) {
+> > +               /* TIME CSR shouldn't be read from perf interface */
+> > +               if (i == 1)
+> > +                       continue;
+> > +               pmc = &kvpmu->pmc[i];
+> > +               pmc->idx = i;
+> > +               if (i < kvpmu->num_hw_ctrs) {
+> > +                       kvpmu->pmc[i].cinfo.type = SBI_PMU_CTR_TYPE_HW;
+> > +                       if (i < 3)
+> > +                               /* CY, IR counters */
+> > +                               kvpmu->pmc[i].cinfo.width = 63;
+> > +                       else
+> > +                               kvpmu->pmc[i].cinfo.width = hpm_width;
+> > +                       /*
+> > +                        * The CSR number doesn't have any relation with the logical
+> > +                        * hardware counters. The CSR numbers are encoded sequentially
+> > +                        * to avoid maintaining a map between the virtual counter
+> > +                        * and CSR number.
+> > +                        */
+> > +                       pmc->cinfo.csr = CSR_CYCLE + i;
+> > +               } else {
+> > +                       pmc->cinfo.type = SBI_PMU_CTR_TYPE_FW;
+> > +                       pmc->cinfo.width = BITS_PER_LONG - 1;
+> > +               }
+> > +       }
+> > +
+> > +       kvpmu->init_done = true;
+> > +
+> > +       return 0;
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_pmu_deinit(struct kvm_vcpu *vcpu)
+> > +{
+> > +       /* TODO */
+> > +}
+> > +
+> > +void kvm_riscv_vcpu_pmu_reset(struct kvm_vcpu *vcpu)
+> > +{
+> > +       kvm_riscv_vcpu_pmu_deinit(vcpu);
+> > +}
+> > --
+> > 2.25.1
+> >
+>
+> Regards,
+> Anup
 
-	unsigned limit = 2;
 
-	/*
-	 * x86 is limited to one NMI running, and one NMI pending after it.
-	 * If an NMI is already in progress, limit further NMIs to just one.
-	 * Otherwise, allow two (and we'll inject the first one immediately).
-	 */
-	if (vcpu->arch.nmi_injected) {
-		/* vNMI counts as the "one pending NMI". */
-		if (static_call(kvm_x86_is_vnmi_pending)(vcpu))
-			limit = 0;
-		else
-			limit = 1;
-	} else if (static_call(kvm_x86_get_nmi_mask)(vcpu) ||
-		   static_call(kvm_x86_is_vnmi_pending)(vcpu)) {
-		limit = 1;
-	}
 
-	vcpu->arch.nmi_pending += atomic_xchg(&vcpu->arch.nmi_queued, 0);
-	vcpu->arch.nmi_pending = min(vcpu->arch.nmi_pending, limit);
-
-	if (vcpu->arch.nmi_pending &&
-	    static_call(kvm_x86_set_vnmi_pending(vcpu)))
-		vcpu->arch.nmi_pending--;
-
-	if (vcpu->arch.nmi_pending)
-		kvm_make_request(KVM_REQ_EVENT, vcpu);
-
-With the KVM_REQ_EVENT change in a separate prep patch:
-
---
-From: Sean Christopherson <seanjc@google.com>
-Date: Tue, 31 Jan 2023 13:33:02 -0800
-Subject: [PATCH] KVM: x86: Raise an event request when processing NMIs iff an
- NMI is pending
-
-Don't raise KVM_REQ_EVENT if no NMIs are pending at the end of
-process_nmi().  Finishing process_nmi() without a pending NMI will become
-much more likely when KVM gains support for AMD's vNMI, which allows
-pending vNMIs in hardware, i.e. doesn't require explicit injection.
-
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 508074e47bc0..030136b6ebbd 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10134,7 +10134,9 @@ static void process_nmi(struct kvm_vcpu *vcpu)
- 
- 	vcpu->arch.nmi_pending += atomic_xchg(&vcpu->arch.nmi_queued, 0);
- 	vcpu->arch.nmi_pending = min(vcpu->arch.nmi_pending, limit);
--	kvm_make_request(KVM_REQ_EVENT, vcpu);
-+
-+	if (vcpu->arch.nmi_pending)
-+		kvm_make_request(KVM_REQ_EVENT, vcpu);
- }
- 
- void kvm_make_scan_ioapic_request_mask(struct kvm *kvm,
-
-base-commit: 916b54a7688b0b9a1c48c708b848e4348c3ae2ab
 -- 
+Regards,
+Atish
