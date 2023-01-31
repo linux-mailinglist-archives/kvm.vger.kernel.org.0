@@ -2,123 +2,132 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 97329682F8F
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 15:44:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 427E6682F9A
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 15:46:46 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231851AbjAaOoT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 09:44:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42078 "EHLO
+        id S231784AbjAaOqo (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 09:46:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231236AbjAaOoK (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 09:44:10 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DD82125BC
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 06:43:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675176202;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=LAtdCvaYcBjQla+NfgEkiJO+riIsmgiBoPP1Uy0xazs=;
-        b=PNppBzgKtEeV2bhcg9WjBqwpVSrH/RzBd6kgDPtP3Vv9nj09rlao0mj2YyMXNIMwPLgCXs
-        1yegoP2J2dPfNRtHxolSkuUh6cpsPnRMGDA5+aNXBsieMLypzsSNY6x2hX2MYVVQlvnshC
-        U+f8DwNOMlsAxeljGaxwVBNGDm6Rov0=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-494-l6otsC8kOQ6G5lPsWmM9fA-1; Tue, 31 Jan 2023 09:43:20 -0500
-X-MC-Unique: l6otsC8kOQ6G5lPsWmM9fA-1
-Received: by mail-qk1-f199.google.com with SMTP id j11-20020a05620a410b00b007066f45a99aso9213717qko.1
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 06:43:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LAtdCvaYcBjQla+NfgEkiJO+riIsmgiBoPP1Uy0xazs=;
-        b=t+o8vCh4QRN4nyjWaxftHT71ChCcQ+LjDYnuq6ZasDUsygfs4+ICxFyRoDirB2epgp
-         5VJw1QmrjsErGXO887Q4bjMAN/G0LxK19tBiFb/MyRmjnto03YlQnnzDmEwzGBdFao+s
-         pnWdgpxm6t410WdDX5bBaLOawdb1ztmdZzZoGNagteVAJnKgCgTdp+FGefYJZ3aNmnqh
-         7QfkCWfFx4xIfxoejWZ0UeNweLje7EET5r3fipLyujWe2/KNr8GzG4BzfQX7pZtQEIX8
-         5tL3vo0vXG+JrqyIxuBey3h7ZCs7D1EhEXVUrg0yI+ECqDT5eAYw7u82/HjXJuF+uBl+
-         neiw==
-X-Gm-Message-State: AFqh2kooyLUxwEAhVqpCNiZDNlpZFc5sd8KxOhuXPF6sL9NDeKDHRZ/2
-        rM6hkbDD3c+BSJj6iQN48hgU0nF0K4q1/aEFtAtu5uo067o2ALOgwEICVyvM6AhVO5xhlJaADBa
-        xd8jnnXlsR0OZ
-X-Received: by 2002:ac8:7ec4:0:b0:3b6:3c9c:59f0 with SMTP id x4-20020ac87ec4000000b003b63c9c59f0mr75200617qtj.15.1675176199683;
-        Tue, 31 Jan 2023 06:43:19 -0800 (PST)
-X-Google-Smtp-Source: AMrXdXuXH7IzWL307K632kUG5faoKR8tSdHwFt5EW1IhyhwYmM3PlJhpLhToOa2tJxLyWOWsmCmU4Q==
-X-Received: by 2002:ac8:7ec4:0:b0:3b6:3c9c:59f0 with SMTP id x4-20020ac87ec4000000b003b63c9c59f0mr75200586qtj.15.1675176199464;
-        Tue, 31 Jan 2023 06:43:19 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-176-155.web.vodafone.de. [109.43.176.155])
-        by smtp.gmail.com with ESMTPSA id z20-20020ac84314000000b003b960aad697sm2448545qtm.9.2023.01.31.06.43.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 06:43:18 -0800 (PST)
-Message-ID: <16e95056-919a-47dc-3ed7-50c29d39b6ae@redhat.com>
-Date:   Tue, 31 Jan 2023 15:43:13 +0100
+        with ESMTP id S231968AbjAaOqa (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 09:46:30 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3217485AB;
+        Tue, 31 Jan 2023 06:46:29 -0800 (PST)
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30VE0Fhe019152;
+        Tue, 31 Jan 2023 14:46:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=Cqc3HSkSdww8bGOaShAhMgF85gNR3Pp6Yw7MnUfKv3A=;
+ b=NYE3a0rIwVk9hIadFNk+wOPmH8yTAMVdiefS2DqD/E5C1XgiYBlv2yXW6W9S5ba+oIWQ
+ gP3+ynQa5sm6Cf2w6MSCp2+0412034XaJW3RYuSo4x3DpgWaQV/AUfu1qsNuTDAPpRjB
+ TsWib6W87mbI7jTO5tpdRHYTWudBaCBWcAGh/WyL8VLsJjSqb+93w3vFQ+ux6+Md4LJ0
+ GTLrK7RdRXPNPkGFk1+RY45u/xYkOpG5eyDLdSdcxE3j0mXf8heEdcKSm8bukYyLnGE0
+ XCB0WlQ4eLMWvxtUwD8vyPzULiJtowsNT5kPaBrf+T/HoN5sBhTZVNO90RlYu8WP4zK/ kA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nf4cb1ar4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Jan 2023 14:46:23 +0000
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30VE1K1q023821;
+        Tue, 31 Jan 2023 14:46:23 GMT
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nf4cb1aqq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Jan 2023 14:46:23 +0000
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+        by ppma03wdc.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30VC3Tbl007760;
+        Tue, 31 Jan 2023 14:46:22 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([9.208.130.100])
+        by ppma03wdc.us.ibm.com (PPS) with ESMTPS id 3ncvterhfs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Jan 2023 14:46:22 +0000
+Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
+        by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30VEkLtt9634476
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 Jan 2023 14:46:21 GMT
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0E90D5804E;
+        Tue, 31 Jan 2023 14:46:21 +0000 (GMT)
+Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4DDC45805A;
+        Tue, 31 Jan 2023 14:46:19 +0000 (GMT)
+Received: from [9.160.68.138] (unknown [9.160.68.138])
+        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 31 Jan 2023 14:46:19 +0000 (GMT)
+Message-ID: <b0ed98f6-3586-3151-47e7-9ec86d6c716d@linux.ibm.com>
+Date:   Tue, 31 Jan 2023 09:46:18 -0500
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Subject: Re: [RFC kvm-unit-tests 01/27] lib/string: include stddef.h for
- size_t
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.0
+Subject: Re: [PATCH] kvm/vfio: Fix potential deadlock on vfio group_lock
 Content-Language: en-US
-To:     Joey Gouly <joey.gouly@arm.com>,
-        Andrew Jones <andrew.jones@linux.dev>, kvmarm@lists.linux.dev,
-        kvm@vger.kernel.org
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Fuad Tabba <tabba@google.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Marc Zyngier <maz@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Quentin Perret <qperret@google.com>,
-        Steven Price <steven.price@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Will Deacon <will@kernel.org>,
-        Zenghui Yu <yuzenghui@huawei.com>, linux-coco@lists.linux.dev,
-        kvmarm@lists.cs.columbia.edu, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-References: <20230127112248.136810-1-suzuki.poulose@arm.com>
- <20230127114108.10025-1-joey.gouly@arm.com>
- <20230127114108.10025-2-joey.gouly@arm.com>
-From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <20230127114108.10025-2-joey.gouly@arm.com>
+To:     Jason Gunthorpe <jgg@nvidia.com>
+Cc:     Yi Liu <yi.l.liu@intel.com>, alex.williamson@redhat.com,
+        pbonzini@redhat.com, mjrosato@linux.ibm.com, kevin.tian@intel.com,
+        cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
+        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
+        imbrenda@linux.ibm.com, david@redhat.com, jjherne@linux.ibm.com,
+        pasic@linux.ibm.com, zhenyuw@linux.intel.com, zhi.a.wang@intel.com,
+        seanjc@google.com, linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        intel-gvt-dev@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
+References: <20230120150528.471752-1-yi.l.liu@intel.com>
+ <67ec09bf-cb24-34e3-6ec4-1ae87b0738bd@linux.ibm.com>
+ <Y9km+xezgD4ovjDX@nvidia.com>
+From:   Anthony Krowiak <akrowiak@linux.ibm.com>
+In-Reply-To: <Y9km+xezgD4ovjDX@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1fzfJzMuXnx2wUXed_vrg45H43lWmSaE
+X-Proofpoint-ORIG-GUID: H89OKK23Uz9PR6J4ex_TDF792Od8jPzo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-31_08,2023-01-31_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ suspectscore=0 spamscore=0 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=999 bulkscore=0 adultscore=0 priorityscore=1501 phishscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301310131
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/01/2023 12.40, Joey Gouly wrote:
-> Don't implicitly rely on this header being included.
-> 
-> Signed-off-by: Joey Gouly <joey.gouly@arm.com>
-> ---
->   lib/string.h | 2 ++
->   1 file changed, 2 insertions(+)
-> 
-> diff --git a/lib/string.h b/lib/string.h
-> index b07763ea..758dca8a 100644
-> --- a/lib/string.h
-> +++ b/lib/string.h
-> @@ -7,6 +7,8 @@
->   #ifndef _STRING_H_
->   #define _STRING_H_
->   
-> +#include <stddef.h>  /* For size_t */
-> +
->   extern size_t strlen(const char *buf);
->   extern size_t strnlen(const char *buf, size_t maxlen);
->   extern char *strcat(char *dest, const char *src);
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+On 1/31/23 9:34 AM, Jason Gunthorpe wrote:
+> On Tue, Jan 31, 2023 at 09:27:54AM -0500, Anthony Krowiak wrote:
+>> I encountered a lockdep splat while running some regression tests today (see
+>> below). I suspected it might be this patch so I reverted it, rebuilt the
+>> kernel and ran the regression tests again; this time, the test ran cleanly.
+>> It looks like this patch may not have fixed the problem for which it was
+>> intended. Here is the relevant dmesg output:
+> Well, it fixes the deadlock it intended to fix and created another one
+> :)
+>
+> It means device drivers cannot obtain the kvm lock from their open
+> functions in this new model.
+>
+> Why does ap need to touch kvm->lock? (via get_update_locks_for_kvm)
 
+
+We need the kvm->lock because we take the vCPUs out of SIE in order to 
+dynamically change values in the APCB.
+
+
+>
+> Maybe you should split that lock and have a dedicated apcb lock?
+
+
+I don't think that would suffice for taking the vCPUs out of SIE.
+
+
+>
+> Jason
