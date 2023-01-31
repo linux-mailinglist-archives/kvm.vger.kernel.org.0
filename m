@@ -2,69 +2,64 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E4FCA682956
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:44:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B4AB6828C8
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:26:15 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232808AbjAaJok (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 04:44:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42252 "EHLO
+        id S232592AbjAaJ0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 04:26:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54654 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232769AbjAaJoV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 04:44:21 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0839E4ABDA
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:43:35 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 725FB61481
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:42:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2BCDC433EF;
-        Tue, 31 Jan 2023 09:42:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675158149;
-        bh=R76HaO8qoXwTusW877BsCKlHkjCFGvuoQfdtYgi9v/k=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=E1SJhhLuWllct1hyqZ0/VugyusW1hDA+OdrBr2YwCiNp9G6lNodZodWtGWkgkffsW
-         kZ3tgdjL4OxLoxxcbq1LgAk2tob58cPo9YqXmNHjG/NaUf8UbrJbVLZ6X6xwAf3SOx
-         JVfEeMBendDCAcJNY4aD1U/VVCrUAT198jYbXbwuiHy0e0Z3XOhy3rmwZr/xJmofUG
-         41secMmr75MPiNms2BmzufWBUBjDi/zB9rMF69JdWjOsGEtgP4GFtMwhwb/XLvb36i
-         rwiUiP0ZusNBqRVeypKcwJIGI2PLonzkr7f8HyWaH0raFoGp05SHmKafdG5NiBMlHz
-         9c0Gx222Z2XJw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.95)
-        (envelope-from <maz@kernel.org>)
-        id 1pMmtx-0067U2-NT;
-        Tue, 31 Jan 2023 09:26:05 +0000
-From:   Marc Zyngier <maz@kernel.org>
-To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
-        Andre Przywara <andre.przywara@arm.com>,
-        Chase Conklin <chase.conklin@arm.com>,
-        Christoffer Dall <christoffer.dall@arm.com>,
-        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-        Jintack Lim <jintack@cs.columbia.edu>,
-        Russell King <rmk+kernel@armlinux.org.uk>,
-        James Morse <james.morse@arm.com>,
-        Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 69/69] KVM: arm64: nv: Accelerate EL0 timer read accesses when FEAT_ECV is on
-Date:   Tue, 31 Jan 2023 09:25:04 +0000
-Message-Id: <20230131092504.2880505-70-maz@kernel.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
-References: <20230131092504.2880505-1-maz@kernel.org>
+        with ESMTP id S232579AbjAaJ0I (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 04:26:08 -0500
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2C41E9CF
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:26:07 -0800 (PST)
+Received: by mail-pg1-x533.google.com with SMTP id 143so9592211pgg.6
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:26:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=atishpatra.org; s=google;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=iuOgM24FK59+MffbRIrpSxSdYJY4cKp8hxWLQ7aDyK0=;
+        b=mDT4gnR+VFMLC+hvEwWESSYsHhM3swOUMRQkP7LTrvMO2H9o2ZwcW4L7joLuD/XQwX
+         owIFiUtwX0EGsPgrnDgoORXLCKM8QzfTDMe8BfdRvCFHYRYmBU13DPROvapuJO+ATfiL
+         /5nWa+4I5Ki0TZMWoDyQoeXTyxNcprRRb+lSI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iuOgM24FK59+MffbRIrpSxSdYJY4cKp8hxWLQ7aDyK0=;
+        b=nxJmEIwAPxq3G2wyCJktE7WIM7RPnNRER9fP1rSwS4b/AR9r+orODznhdzVu/hBfpG
+         W64xvW+Fl+4ThsmOK8fKL1NiiJZVUhT72mGBnMemMSdI5fOXKBpEBMdvoxW8ar/9aY9U
+         iQdDh3OPL7d028h+M311zTFENgpt/9tr6ucKpOP+8i2KKTz5l0sEBbHhQlv1tE81HqXF
+         M7KuOvae60UdZLnaXI7FlOMaNAO1eI1ZD1ydBPrTyduTlg6W3ufJ/I2PnIrjvOxttyl2
+         qJamGppZ2h77hksjYVfkGCEvMPqYySpKP+a/kR1+vY+e9i55K74XTQ7yEWh73cTFt3jb
+         059Q==
+X-Gm-Message-State: AO0yUKWlMTSg/hhThMwJl3dMTl+XePFJL8v3Yymm9obiZTw05v2zKDmY
+        m8E/bXqSHAsQhWR56VSpMbO9C3pPJdW315tBbnuU
+X-Google-Smtp-Source: AK7set/MSOrSxz1qNdOEo3o9mrx0RsLwAY3Thk/17kJxDWGdCN+7K9AXDb2PlDva9XbGN0WlRZI59ue/ZbriaRWQtuw=
+X-Received: by 2002:a63:510a:0:b0:4da:6df2:f28 with SMTP id
+ f10-20020a63510a000000b004da6df20f28mr2526765pgb.36.1675157166777; Tue, 31
+ Jan 2023 01:26:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+References: <20230128072737.2995881-1-apatel@ventanamicro.com> <20230128072737.2995881-3-apatel@ventanamicro.com>
+In-Reply-To: <20230128072737.2995881-3-apatel@ventanamicro.com>
+From:   Atish Patra <atishp@atishpatra.org>
+Date:   Tue, 31 Jan 2023 01:25:55 -0800
+Message-ID: <CAOnJCUJnEMxQxjDtzAJe5_0edi=1pQLVE-LDeQtH9bzn7+O4rg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
+To:     Anup Patel <apatel@ventanamicro.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
+        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
         SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -72,84 +67,66 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Although FEAT_ECV allows us to correctly enable the timers, it also
-reduces performances pretty badly (a L2 guest doing a lot of virtio
-emulated in L1 userspace results in a 30% degradation).
+On Fri, Jan 27, 2023 at 11:27 PM Anup Patel <apatel@ventanamicro.com> wrote:
+>
+> We have two extension names for AIA ISA support: Smaia (M-mode AIA CSRs)
+> and Ssaia (S-mode AIA CSRs).
+>
+> We extend the ISA string parsing to detect Smaia and Ssaia extensions.
+>
+> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
+> ---
+>  arch/riscv/include/asm/hwcap.h | 2 ++
+>  arch/riscv/kernel/cpu.c        | 2 ++
+>  arch/riscv/kernel/cpufeature.c | 2 ++
+>  3 files changed, 6 insertions(+)
+>
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> index 86328e3acb02..341ef30a3718 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -59,6 +59,8 @@ enum riscv_isa_ext_id {
+>         RISCV_ISA_EXT_ZIHINTPAUSE,
+>         RISCV_ISA_EXT_SSTC,
+>         RISCV_ISA_EXT_SVINVAL,
+> +       RISCV_ISA_EXT_SMAIA,
+> +       RISCV_ISA_EXT_SSAIA,
+>         RISCV_ISA_EXT_ID_MAX
+>  };
+>  static_assert(RISCV_ISA_EXT_ID_MAX <= RISCV_ISA_EXT_MAX);
+> diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
+> index 1b9a5a66e55a..a215ec929160 100644
+> --- a/arch/riscv/kernel/cpu.c
+> +++ b/arch/riscv/kernel/cpu.c
+> @@ -162,6 +162,8 @@ arch_initcall(riscv_cpuinfo_init);
+>   *    extensions by an underscore.
+>   */
+>  static struct riscv_isa_ext_data isa_ext_arr[] = {
+> +       __RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
+> +       __RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
+>         __RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
+>         __RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
+>         __RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
+> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> index 93e45560af30..3c5b51f519d5 100644
+> --- a/arch/riscv/kernel/cpufeature.c
+> +++ b/arch/riscv/kernel/cpufeature.c
+> @@ -228,6 +228,8 @@ void __init riscv_fill_hwcap(void)
+>                                 SET_ISA_EXT_MAP("zihintpause", RISCV_ISA_EXT_ZIHINTPAUSE);
+>                                 SET_ISA_EXT_MAP("sstc", RISCV_ISA_EXT_SSTC);
+>                                 SET_ISA_EXT_MAP("svinval", RISCV_ISA_EXT_SVINVAL);
+> +                               SET_ISA_EXT_MAP("smaia", RISCV_ISA_EXT_SMAIA);
+> +                               SET_ISA_EXT_MAP("ssaia", RISCV_ISA_EXT_SSAIA);
+>                         }
+>  #undef SET_ISA_EXT_MAP
+>                 }
+> --
+> 2.34.1
+>
 
-Mitigate this by emulating the CTL/CVAL register reads in the
-inner run loop, without returning to the general kernel. This halves
-the overhead described above.
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/hyp/vhe/switch.c | 49 +++++++++++++++++++++++++++++++++
- 1 file changed, 49 insertions(+)
-
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index a3555b90d9e1..a9ac61505a86 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -201,11 +201,60 @@ static bool kvm_hyp_handle_tlbi_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	return true;
- }
- 
-+static bool kvm_hyp_handle_ecv(struct kvm_vcpu *vcpu, u64 *exit_code)
-+{
-+	u64 esr, val;
-+
-+	/*
-+	 * Having FEAT_ECV allows for a better quality of timer emulation.
-+	 * However, this comes at a huge cost in terms of traps. Try and
-+	 * satisfy the reads without returning to the kernel if we can.
-+	 */
-+	if (!cpus_have_final_cap(ARM64_HAS_ECV))
-+		return false;
-+
-+	if (!vcpu_has_nv2(vcpu))
-+		return false;
-+
-+	esr = kvm_vcpu_get_esr(vcpu);
-+	if ((esr & ESR_ELx_SYS64_ISS_DIR_MASK) != ESR_ELx_SYS64_ISS_DIR_READ)
-+		return false;
-+
-+	switch (esr_sys64_to_sysreg(esr)) {
-+	case SYS_CNTP_CTL_EL02:
-+	case SYS_CNTP_CTL_EL0:
-+		val = __vcpu_sys_reg(vcpu, CNTP_CTL_EL0);
-+		break;
-+	case SYS_CNTP_CVAL_EL02:
-+	case SYS_CNTP_CVAL_EL0:
-+		val = __vcpu_sys_reg(vcpu, CNTP_CVAL_EL0);
-+		break;
-+	case SYS_CNTV_CTL_EL02:
-+	case SYS_CNTV_CTL_EL0:
-+		val = __vcpu_sys_reg(vcpu, CNTV_CTL_EL0);
-+		break;
-+	case SYS_CNTV_CVAL_EL02:
-+	case SYS_CNTV_CVAL_EL0:
-+		val = __vcpu_sys_reg(vcpu, CNTV_CVAL_EL0);
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	vcpu_set_reg(vcpu, kvm_vcpu_sys_get_rt(vcpu), val);
-+	__kvm_skip_instr(vcpu);
-+
-+	return true;
-+}
-+
- static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
- {
- 	if (kvm_hyp_handle_tlbi_el1(vcpu, exit_code))
- 		return true;
- 
-+	if (kvm_hyp_handle_ecv(vcpu, exit_code))
-+		return true;
-+
- 	return kvm_hyp_handle_sysreg(vcpu, exit_code);
- }
- 
+Reviewed-by: Atish Patra <atishp@rivosinc.com>
 -- 
-2.34.1
-
+Regards,
+Atish
