@@ -2,77 +2,79 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 892746825A9
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 08:40:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 25CDE6825B0
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 08:43:00 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230218AbjAaHkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 02:40:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
+        id S230271AbjAaHmz (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 02:42:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229686AbjAaHkN (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 02:40:13 -0500
+        with ESMTP id S230033AbjAaHmy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 02:42:54 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD2AC360BC
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 23:39:21 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4654436442
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 23:42:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675150760;
+        s=mimecast20190719; t=1675150923;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NqWFZCMoZbKjkr6qHV37rtPcyidnztEiuJHNjLKNQDc=;
-        b=FPvqgLIwmLKzivuULLvJ1bSnIbxKhcOj2B4CQol3pvQDxaxQCbV+nWzmv8gcOIbqYQytyf
-        xrfzU7eWZUlHZiFXstXz8kNUEt5thibcyXRcMpgfDq6Vwo2OjETEEBfOYBleUEp77ODESA
-        HHfdmEkeDwO46iK+WgiZ23ocQCdTdro=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=pOekOPQEicd305LCzeaI3ahxQ6p+zMshj5HVCg0TAMQ=;
+        b=iPFVZuOtoEBABaIKyiSfzFGpCS3lC4MiFYq7tBvZ+wPkznvVgcW3Ht3kFu9gDcDp27OUgG
+        1Bmf7FtPfsTzbIaoD3WI9FuthuDHfFx91zzYDjCQBmluwE8I0/gAG5mozUdhlK0i5nOxTR
+        IOcWSBI6ThJr/nIERD66Ex303vy4F2Q=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-115-nTjmw0X3OvWGJqeaJS6c0Q-1; Tue, 31 Jan 2023 02:39:18 -0500
-X-MC-Unique: nTjmw0X3OvWGJqeaJS6c0Q-1
-Received: by mail-qv1-f71.google.com with SMTP id lw11-20020a05621457cb00b005376b828c22so7779864qvb.6
-        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 23:39:17 -0800 (PST)
+ us-mta-453-IWfCtACpM5qY3nzYUO72Jg-1; Tue, 31 Jan 2023 02:41:44 -0500
+X-MC-Unique: IWfCtACpM5qY3nzYUO72Jg-1
+Received: by mail-qt1-f199.google.com with SMTP id hf20-20020a05622a609400b003abcad051d2so6160851qtb.12
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 23:41:44 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NqWFZCMoZbKjkr6qHV37rtPcyidnztEiuJHNjLKNQDc=;
-        b=MCEXY9tWkGR4O4AbBiHpFVLNT3FzvIXoe0CSVYInxcZSfnA5CRPdqY50bCvs43cVib
-         ujCsSEXElZaX3TERc6P1eo5kqXcroZtvhQrtKm1A5oTsdMAMFR6k022RRLEqhT750wyP
-         5t3GaQwD6l8/GnfQ1LzaZUFMcN5hs4hMwl35O7ywkU01t/dTKQcjJyPXHmi2HLORWrIc
-         2mv+t4mOLLwMHpGiuxBg3Q2jLh+gZd+NWN8XfJybo/bd3iBg87JaCdY53CrZoO8/A6eZ
-         bRHY0Z431I5+uiVlnrVI9/Rn/AK61BSLKQfsU20ZrHDaxhUxis5/czStr64d4Prz5H6r
-         10yQ==
-X-Gm-Message-State: AO0yUKUuMTx5dtSaZ1UrUXSLrW5RQloKwuremD7xvlRXrd3i4UaiXDfh
-        5HFzz5MU+DiGh6YzC0Oc3R1JiIrutvJI67l4KgJv6MLBjCGPSDLDDn9Lt0mgK0D+BtZbva9Hry+
-        MXkgndfM5O/x+
-X-Received: by 2002:a05:622a:2cd:b0:3b9:a5d8:2c4d with SMTP id a13-20020a05622a02cd00b003b9a5d82c4dmr3906190qtx.53.1675150757404;
-        Mon, 30 Jan 2023 23:39:17 -0800 (PST)
-X-Google-Smtp-Source: AK7set/kbb8lIoDC0ZfQMp08DIj5gY8IgYDXxQsUxU/5Ud4IjT0Bc+P+4cGPhyTRBTriBOAn0sIwEQ==
-X-Received: by 2002:a05:622a:2cd:b0:3b9:a5d8:2c4d with SMTP id a13-20020a05622a02cd00b003b9a5d82c4dmr3906174qtx.53.1675150757167;
-        Mon, 30 Jan 2023 23:39:17 -0800 (PST)
+        bh=pOekOPQEicd305LCzeaI3ahxQ6p+zMshj5HVCg0TAMQ=;
+        b=gO6koENbuWjA/pMQQDa9KxCUOcfCm8nR9yRg1qkMiHiBgQdeN44HhgM+ESMV9/rbKp
+         k6I1HDoAZyBOjwREMSE1j4ANn+sCuF74cwU5qfSGzS0DmB0xuYZdRN7PbTUbYqkxrVha
+         e/scOFM4LfG+f7/TuP0CcuEFKG6j5+9QFBjsz9nMbGVkVdzI8vHPhVrdf3MXrAPSwsqO
+         /6kBf74vAWuy0+v870alqXWsIGYwEW6LeMGYTpWZgSw2tlSA0gygX3e8j6R5ed/TWjnN
+         a6V9XWSqk1vZsk9gV4igyFW272P+XFWWEylWDXZSEOMNtKsA/MF5QXsXLBRoNtCVdmiE
+         fT7g==
+X-Gm-Message-State: AO0yUKW2aKITohyohlLXkx+a+BFpwtJ2WkvmHyz3nYK0NSyaXtJLj1lN
+        vZtdF4qyYUas47Alt0YEs4tdwvQYn1HtNAEgYnoi3V5VF7Gv3mpRsq6aMb657htvumI0TrNOWNI
+        CLIVDJHmsub8t
+X-Received: by 2002:a05:622a:1316:b0:3b8:4a9e:7445 with SMTP id v22-20020a05622a131600b003b84a9e7445mr13398952qtk.21.1675150903772;
+        Mon, 30 Jan 2023 23:41:43 -0800 (PST)
+X-Google-Smtp-Source: AK7set8vKgpqG5EZrQ39ZZwl0nxZEVrPjxIbjUt/DuiD8RTXQH5Ffm24PmuSXQoKgbfm1kG+1FG/IA==
+X-Received: by 2002:a05:622a:1316:b0:3b8:4a9e:7445 with SMTP id v22-20020a05622a131600b003b84a9e7445mr13398938qtk.21.1675150903529;
+        Mon, 30 Jan 2023 23:41:43 -0800 (PST)
 Received: from [192.168.0.2] (ip-109-43-176-155.web.vodafone.de. [109.43.176.155])
-        by smtp.gmail.com with ESMTPSA id z13-20020ac86b8d000000b003995f6513b9sm9401370qts.95.2023.01.30.23.38.52
+        by smtp.gmail.com with ESMTPSA id e11-20020ac8010b000000b003b630ea0ea1sm9406960qtg.19.2023.01.30.23.41.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jan 2023 23:39:16 -0800 (PST)
-Message-ID: <f679707c-c868-2415-aa1e-d6a853c00e21@redhat.com>
-Date:   Tue, 31 Jan 2023 08:38:51 +0100
+        Mon, 30 Jan 2023 23:41:42 -0800 (PST)
+Message-ID: <03662bf9-1c92-085b-7418-f3a218093051@redhat.com>
+Date:   Tue, 31 Jan 2023 08:41:39 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.13.0
-Subject: Re: [kvm-unit-tests PATCH v2 1/1] arm: Replace MAX_SMP probe loop in
+Subject: Re: [kvm-unit-tests PATCH v3 1/1] arm: Replace MAX_SMP probe loop in
  favor of reading directly
 Content-Language: en-US
-To:     Colton Lewis <coltonlewis@google.com>
-Cc:     pbonzini@redhat.com, nrb@linux.ibm.com, andrew.jones@linux.dev,
-        imbrenda@linux.ibm.com, marcorr@google.com,
-        alexandru.elisei@arm.com, oliver.upton@linux.dev,
-        kvm@vger.kernel.org, kvmarm@lists.linux.dev
-References: <gsnt7cx3ygnu.fsf@coltonlewis-kvm.c.googlers.com>
+To:     Andrew Jones <andrew.jones@linux.dev>,
+        Colton Lewis <coltonlewis@google.com>
+Cc:     pbonzini@redhat.com, nrb@linux.ibm.com, imbrenda@linux.ibm.com,
+        marcorr@google.com, alexandru.elisei@arm.com,
+        oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
+References: <20230130195700.729498-1-coltonlewis@google.com>
+ <20230130195700.729498-2-coltonlewis@google.com>
+ <20230131063203.67qgjf2ispi2k6hd@orel>
 From:   Thomas Huth <thuth@redhat.com>
-In-Reply-To: <gsnt7cx3ygnu.fsf@coltonlewis-kvm.c.googlers.com>
+In-Reply-To: <20230131063203.67qgjf2ispi2k6hd@orel>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
@@ -83,64 +85,67 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 30/01/2023 20.19, Colton Lewis wrote:
-> Thomas Huth <thuth@redhat.com> writes:
+On 31/01/2023 07.32, Andrew Jones wrote:
+> On Mon, Jan 30, 2023 at 07:57:00PM +0000, Colton Lewis wrote:
+>> Replace the MAX_SMP probe loop in favor of reading a number directly
+>> from the QEMU error message. This is equally safe as the existing code
+>> because the error message has had the same format as long as it has
+>> existed, since QEMU v2.10. The final number before the end of the
+>> error message line indicates the max QEMU supports. A short awk
 > 
->> On 11/01/2023 22.54, Colton Lewis wrote:
->>> Replace the MAX_SMP probe loop in favor of reading a number directly
->>> from the QEMU error message. This is equally safe as the existing code
->>> because the error message has had the same format as long as it has
->>> existed, since QEMU v2.10. The final number before the end of the
->>> error message line indicates the max QEMU supports. A short awk
->>> program is used to extract the number, which becomes the new MAX_SMP
->>> value.
+> awk is not used, despite the comment also being updated to say it's
+> being used.
 > 
->>> This loop logic is broken for machines with a number of CPUs that
->>> isn't a power of two. A machine with 8 CPUs will test with MAX_SMP=8
->>> but a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 2 ==
->>> 6. This can, in rare circumstances, lead to different test results
->>> depending only on the number of CPUs the machine has.
-> 
->>> A previous comment explains the loop should only apply to kernels
->>> <=v4.3 on arm and suggests deletion when it becomes tiresome to
->>> maintian. However, it is always theoretically possible to test on a
->>> machine that has more CPUs than QEMU supports, so it makes sense to
->>> leave some check in place.
-> 
->>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
->>> ---
-...
->>> +if $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
->>> +      |& grep -qi 'exceeds max CPUs'; then
->>> +    GET_LAST_NUM='/exceeds max CPUs/ {match($0, /[[:digit:]]+)$/); print 
->>> substr($0, RSTART, RLENGTH-1)}'
->>> +    MAX_SMP=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& awk 
->>> "$GET_LAST_NUM")
->>> +fi
-> 
->> Is that string with "exceeds" really still the recent error message of the
->> latest QEMU versions? When I'm running
-> 
->>    qemu-system-aarch64 -machine virt -smp 1024
-> 
->> I'm getting:
-> 
->>    qemu-system-aarch64: Invalid SMP CPUs 1024. The max CPUs
->>    supported by machine 'virt-8.0' is 512
-> 
->> ... thus no "exceeds" in here? What do I miss? Maybe it's better to just
->> grep for "max CPUs" ?
-> 
-> The full qemu command run by the test is much more complicated. It takes
-> a different code path and results in different errors, including the
-> "exceeds" one. All my testing has been done with QEMU v7.0, released
-> 2022.
+>> program is used to extract the number, which becomes the new MAX_SMP
+>> value.
+>>
+>> This loop logic is broken for machines with a number of CPUs that
+>> isn't a power of two. This problem was noticed for gicv2 tests on
+>> machines with a non-power-of-two number of CPUs greater than 8 because
+>> tests were running with MAX_SMP less than 8. As a hypthetical example,
 
-Could you please provide such a command line? I haven't been able to 
-reproduce this with the current development version of QEMU (using TCG) - 
-either I (likely) did something wrong, or the behavior of QEMU changed in 
-the past months...
+s/hypthetical/hypothetical/
 
-  Thanks,
-   Thomas
+>> a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 1 ==
+>> 6. This can, in rare circumstances, lead to different test results
+>> depending only on the number of CPUs the machine has.
+>>
+>> A previous comment explains the loop should only apply to kernels
+>> <=v4.3 on arm and suggests deletion when it becomes tiresome to
+>> maintian. However, it is always theoretically possible to test on a
+
+s/maintian/maintain/
+
+>> machine that has more CPUs than QEMU supports, so it makes sense to
+>> leave some check in place.
+>>
+>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>> ---
+>>   scripts/runtime.bash | 16 +++++++---------
+>>   1 file changed, 7 insertions(+), 9 deletions(-)
+>>
+>> diff --git a/scripts/runtime.bash b/scripts/runtime.bash
+>> index f8794e9a..587ffe30 100644
+>> --- a/scripts/runtime.bash
+>> +++ b/scripts/runtime.bash
+>> @@ -188,12 +188,10 @@ function run()
+>>   # Probe for MAX_SMP, in case it's less than the number of host cpus.
+>>   #
+>>   # This probing currently only works for ARM, as x86 bails on another
+> 
+> It just occurred to me that this code runs on all architectures, even
+> though it only works for Arm. We should wrap this code in $ARCH
+> checks or put it in a function which only Arm calls. That change
+> should be a separate patch though.
+
+Or we just grep for "max CPUs", since this seems to be used on other 
+architectures, too:
+
+$ qemu-system-x86_64 -smp 12345
+qemu-system-x86_64: Invalid SMP CPUs 12345. The max CPUs supported by 
+machine 'pc-i440fx-8.0' is 255
+
+?
+
+  Thomas
 
