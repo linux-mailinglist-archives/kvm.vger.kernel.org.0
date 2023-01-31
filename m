@@ -2,192 +2,135 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2A49568296E
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:48:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88D8A682979
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:50:28 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232759AbjAaJsW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 04:48:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49180 "EHLO
+        id S231650AbjAaJu0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 04:50:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232837AbjAaJsI (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 04:48:08 -0500
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A19995FF8;
-        Tue, 31 Jan 2023 01:47:56 -0800 (PST)
-Received: by mail-pf1-x42b.google.com with SMTP id u5so9494067pfm.10;
-        Tue, 31 Jan 2023 01:47:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=A655nD9x3a8hHtfO8IDUSlIL069yAfQEg9w8Iv6Dufs=;
-        b=m12/umS4j2j0YqF5LiWwgSDuueEjUt9WJxbgd3UcEGFgpncM5fxHeU8fp3pIWJZu/Z
-         e8eaJAIjV3VUEKfJReLmAnzxAFEKylpVdbsY03rnbrgtM03mBeX2l7hJ47XWovIFjsyZ
-         GLv7z6ni9u0Rg9b+zM2u0BNBUPn4b8jue2pzsnMpYcjRtuioKu7XMNusVeVorDQOq9ev
-         hd/ncgcvuu9k5R03+tRwSiR92xMmq9nRmxc8GsWTfh1GHE6Owv6IEUSCCel5QQnvomDH
-         Ev63/O/mqL5+Oh9xlNyUibwJXO+EjCC6Z7uO2CNLGM7NxYeDpx3/vh90Q5eyqknrdlMU
-         UCXA==
+        with ESMTP id S231408AbjAaJuZ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 04:50:25 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 987215B9D
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:49:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675158566;
+        h=from:from:reply-to:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+         content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=jfaQ85a1dAVfhNsu1a2URYhGm3l71cfWadA+896tDVg=;
+        b=KEqLK5k5ndaUjbI6mtHa80BfWnAj7V9PgOIdkCjN7vx+N94E5ekiyxwd8igB0ywJ8EDaiF
+        RsMO8BYf+qdwJqvw+YNJnHpXSndIelNbwrND7UATsvb/y3+Y0BnYfDswRI4ml6zKZ1gBJm
+        dPBCU0+8XJZGeK7Sid3bV6wLV8ZTJKQ=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-660-XGBR4uT5P3Cz89vpTxsSYg-1; Tue, 31 Jan 2023 04:49:25 -0500
+X-MC-Unique: XGBR4uT5P3Cz89vpTxsSYg-1
+Received: by mail-qk1-f200.google.com with SMTP id w17-20020a05620a425100b00706bf3b459eso8829941qko.11
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:49:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A655nD9x3a8hHtfO8IDUSlIL069yAfQEg9w8Iv6Dufs=;
-        b=MRdyzLe3bs/IzBBsH4CnLVVf1vu+v4eOD/rn+nnrNHMkoBcHa+kLpWylDSU0fkL2Z7
-         rbYkDuJXncbibxT5XMunS4MKI5ZpgFWi/X3A3cgtssFjsR5wKEwKX/zEfv3aG2dJIXah
-         p64/5ghfTgjGTfB6sCw3SH3wtjiGusPFJ/AVPxlH/wmwRX53ak/sruho7npFVbGbFTW/
-         61+ji7+5bvniY3ndDzDC1K5tj904Mg5YcCoO4VrdjBjF8vcOCXoQ8p7EfL8+soJ7TsDL
-         03UOTQDcSkmYD1GmwukWZ5gs4hUOPk7c0qOF2dTq+shED38Y0DRkVZ4InmqkvsgA7ibC
-         zuvg==
-X-Gm-Message-State: AO0yUKWEbQPK1IL5OWXVMG7fa/Y5QXdE3ox/eSpbyVdXrCFqvfNUJx4p
-        RlV0JWVqE9QdkhJJEvmFhak=
-X-Google-Smtp-Source: AK7set9O4tsrz6wug59doXOI4kgE9FXIm4c4WQEycPHDa80z7J04/eOPcCC3ahy+mW4viPWptwCkEA==
-X-Received: by 2002:a05:6a00:26cf:b0:580:ea08:5277 with SMTP id p15-20020a056a0026cf00b00580ea085277mr9060494pfw.16.1675158476139;
-        Tue, 31 Jan 2023 01:47:56 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id j11-20020aa7928b000000b0058bb8943c9asm8911641pfa.161.2023.01.31.01.47.51
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jfaQ85a1dAVfhNsu1a2URYhGm3l71cfWadA+896tDVg=;
+        b=pz7eoh1MkT+Z91nj+GenDYv68Sh2J8P4kAcBArlVAVnl2gP6FJMMz7rJtSrE2QJwcs
+         xFSC8VuhmG57MmIqL2zpHVuy1AQoH0Oo7UyulZ47M5C2IRQqP6bSAUOVSOxMliMUfoBw
+         4NuceqilnzxxEGnXpwwGqfTTmGPZetnHAyI2OW7f8NroB77j3aHw71FATyZscagy/sEi
+         Jnl36ahHZU/ukqO6n+ixRDo1gAnDQKtIwXUQVvzn4f9fIREfUjUP367hA730dFo5UG32
+         YBhKqCbg86hBENeF3/JRaU4nSq+7AyyO6fjvDAaSYThEGRqtzWpFdWHTJDu330Sj1LNi
+         /9yw==
+X-Gm-Message-State: AO0yUKUGWXUnPOj0Or3KTKIvB/+uVJidunIGhtbEG1HeumUHQM/1OlOH
+        J/Zq1AofQlx7geofzQnBoMiJ8ljnf3sZ9sRl0j+ZNg3f8Ok9smgyf7bUfhtXDqEmawG5rju02Oo
+        Qpq1faLqoZnsI
+X-Received: by 2002:a0c:ea4c:0:b0:537:6a5d:4899 with SMTP id u12-20020a0cea4c000000b005376a5d4899mr30409077qvp.29.1675158564084;
+        Tue, 31 Jan 2023 01:49:24 -0800 (PST)
+X-Google-Smtp-Source: AK7set/SUd7wTQ5Au07UhYfX1m0HbSmQEcQjHvhILDcjUglU5votIYONG/eo7Ch8QW4jq+sJkQeRgQ==
+X-Received: by 2002:a0c:ea4c:0:b0:537:6a5d:4899 with SMTP id u12-20020a0cea4c000000b005376a5d4899mr30409060qvp.29.1675158563856;
+        Tue, 31 Jan 2023 01:49:23 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id j7-20020a37b907000000b00706c1fc62desm9643587qkf.112.2023.01.31.01.49.20
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 01:47:55 -0800 (PST)
-Message-ID: <18068631-d634-679c-3dd1-4493d186ffb8@gmail.com>
-Date:   Tue, 31 Jan 2023 17:47:46 +0800
+        Tue, 31 Jan 2023 01:49:22 -0800 (PST)
+Message-ID: <c946d31d-3696-510b-17b9-9ac9b361b7bf@redhat.com>
+Date:   Tue, 31 Jan 2023 10:49:19 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH] .gitignore: Keep track of archived files as they are
- added to a new git repo
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.3.1
+Reply-To: eric.auger@redhat.com
+Subject: Re: [PATCH v2] vfio: platform: ignore missing reset if disabled at
+ module init
 Content-Language: en-US
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Shuah Khan <shuah@kernel.org>, Miguel Ojeda <ojeda@kernel.org>,
-        Wedson Almeida Filho <wedsonaf@google.com>,
-        Alex Gaynor <alex.gaynor@gmail.com>,
-        Kees Cook <keescook@chromium.org>, Andrew Davis <afd@ti.com>,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kselftest@vger.kernel.org, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>
-References: <20230130090426.13864-1-likexu@tencent.com>
- <CAK7LNAT=8Z_-OJdEdUNvUwYpXvWZU7JnYLHW-o+w9GBXjaFbMQ@mail.gmail.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <CAK7LNAT=8Z_-OJdEdUNvUwYpXvWZU7JnYLHW-o+w9GBXjaFbMQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Tomasz Duszynski <tduszynski@marvell.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Cornelia Huck <cohuck@redhat.com>,
+        Kevin Tian <kevin.tian@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "open list:VFIO PLATFORM DRIVER" <kvm@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Cc:     jerinj@marvell.com
+References: <20230131083349.2027189-1-tduszynski@marvell.com>
+From:   Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <20230131083349.2027189-1-tduszynski@marvell.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 31/1/2023 12:06 am, Masahiro Yamada wrote:
-> On Mon, Jan 30, 2023 at 6:04 PM Like Xu <like.xu.linux@gmail.com> wrote:
->>
->> From: Like Xu <likexu@tencent.com>
->>
->> With thousands of commits going into mainline each development cycle,
->> the metadata .git folder size is gradually expanding (1GB+), and for some
->> developers (most likely testers) who don't care about the lengthy git-log,
->> they just use git-archive to distribute a certain version of code (~210MB)
->> and rebuild git repository from anywhere for further code changes, e.g.
->>
->>    $ git init && git add . -A
->>
->> Then unfortunately, the file tracking metadata from the original git-repo
->> using "git add -f" will also be lost, to the point where part of source
->> files wrapped by git-archive may be accidentally cleaned up:
->>
->>    $ git clean -nxdf
->>    Would remove Documentation/devicetree/bindings/.yamllint
->>    Would remove drivers/clk/.kunitconfig
->>    Would remove drivers/gpu/drm/tests/.kunitconfig
->>    Would remove drivers/hid/.kunitconfig
->>    Would remove fs/ext4/.kunitconfig
->>    Would remove fs/fat/.kunitconfig
->>    Would remove kernel/kcsan/.kunitconfig
->>    Would remove lib/kunit/.kunitconfig
->>    Would remove mm/kfence/.kunitconfig
->>    Would remove tools/testing/selftests/arm64/tags/
->>    Would remove tools/testing/selftests/kvm/.gitignore
->>    Would remove tools/testing/selftests/kvm/Makefile
->>    Would remove tools/testing/selftests/kvm/config
->>    Would remove tools/testing/selftests/kvm/settings
->>
->> This asymmetry is very troubling to those users since finding out which
->> files to track with "git add -f" clearly requires priori knowledge on
->> various subsystems. The eradication of this little issue requires naturally
->> making git-init aware of all .gitignore restrictions at different file tree
->> hierarchies. Similar issues can be troubleshot with "git check-ignore -v"
->> for any mistakenly cleaned files.
->>
->> Signed-off-by: Like Xu <likexu@tencent.com>
-> 
-> 
-> 
-> tools/testing/selftests/kvm/.gitignore is already meh.
-> 
-> I hope somebody will submit a better fix.
-> 
-> 
+Hi Tomasz,
 
-If we don't append "!.gitignore" to tools/testing/selftests/kvm/.gitignore,
-the same issue still exists due to the "*" entry in the same file:
+On 1/31/23 09:33, Tomasz Duszynski wrote:
+> If reset requirement was relaxed via module parameter errors caused by
+> missing reset should not be propagated down to the vfio core.
+> Otherwise initialization will fail.
+>
+> Signed-off-by: Tomasz Duszynski <tduszynski@marvell.com>
+> Fixes: 5f6c7e0831a1 ("vfio/platform: Use the new device life cycle helpers")
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-# git version 2.31.1
-$ git clean -nxdf
-Would remove tools/testing/selftests/kvm/.gitignore
+Thanks
 
-Is there a better move for this kind of git usage,
-or could any maintainer pick this up? Thanks.
+Eric
+> ---
+> v2:
+> - return directly instead of using ternary to do that
+>
+>  drivers/vfio/platform/vfio_platform_common.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
+> index 1a0a238ffa35..7325ff463cf0 100644
+> --- a/drivers/vfio/platform/vfio_platform_common.c
+> +++ b/drivers/vfio/platform/vfio_platform_common.c
+> @@ -650,10 +650,13 @@ int vfio_platform_init_common(struct vfio_platform_device *vdev)
+>  	mutex_init(&vdev->igate);
+>
+>  	ret = vfio_platform_get_reset(vdev);
+> -	if (ret && vdev->reset_required)
+> +	if (ret && vdev->reset_required) {
+>  		dev_err(dev, "No reset function found for device %s\n",
+>  			vdev->name);
+> -	return ret;
+> +		return ret;
+> +	}
+> +
+> +	return 0;
+>  }
+>  EXPORT_SYMBOL_GPL(vfio_platform_init_common);
+>
+> --
+> 2.34.1
+>
 
-> 
-> 
->> ---
->>   .gitignore                               | 2 ++
->>   tools/testing/selftests/arm64/.gitignore | 2 ++
->>   tools/testing/selftests/kvm/.gitignore   | 4 ++++
->>   3 files changed, 8 insertions(+)
->>   create mode 100644 tools/testing/selftests/arm64/.gitignore
->>
->> diff --git a/.gitignore b/.gitignore
->> index 20dce5c3b9e0..fa39e98caee3 100644
->> --- a/.gitignore
->> +++ b/.gitignore
->> @@ -102,6 +102,8 @@ modules.order
->>   !.gitignore
->>   !.mailmap
->>   !.rustfmt.toml
->> +!.yamllint
->> +!.kunitconfig
->>
->>   #
->>   # Generated include files
->> diff --git a/tools/testing/selftests/arm64/.gitignore b/tools/testing/selftests/arm64/.gitignore
->> new file mode 100644
->> index 000000000000..135d709d2d65
->> --- /dev/null
->> +++ b/tools/testing/selftests/arm64/.gitignore
->> @@ -0,0 +1,2 @@
->> +# SPDX-License-Identifier: GPL-2.0-only
->> +!tags
->> diff --git a/tools/testing/selftests/kvm/.gitignore b/tools/testing/selftests/kvm/.gitignore
->> index 6d9381d60172..96561c8e06e0 100644
->> --- a/tools/testing/selftests/kvm/.gitignore
->> +++ b/tools/testing/selftests/kvm/.gitignore
->> @@ -5,3 +5,7 @@
->>   !*.h
->>   !*.S
->>   !*.sh
->> +!.gitignore
->> +!Makefile
->> +!settings
->> +!config
->> \ No newline at end of file
->> --
->> 2.39.1
->>
-> 
-> 
