@@ -2,121 +2,121 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A8B8682EA7
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 15:01:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6E04E682E9D
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 15:01:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232462AbjAaOBf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 09:01:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37174 "EHLO
+        id S232467AbjAaOB1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 09:01:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232463AbjAaOB0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 09:01:26 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67194CA02
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 06:00:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675173620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=sW7aiMox0CriK8aU+HN+jb3vaXSIy6HBnrk2aPiMthI=;
-        b=Qz5GZeNUZFiuHxPFZ0G2LkOkqF9IciSx1jCHMwVq81Vq/usHDJerR/OQdCdNhzJ+qklFK/
-        VM2t7rCQIDMmaKlrNe4xk1xmpscmsIN0ixv46UMVZPhu/Xt/nSs4OgEAYYCeNv6TMDjvz3
-        tyFCZ0qdSRWlRje3FYYti+Gr/Sd139w=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-594-NqvT145SOoC4qfGkflv_5w-1; Tue, 31 Jan 2023 09:00:12 -0500
-X-MC-Unique: NqvT145SOoC4qfGkflv_5w-1
-Received: by mail-wm1-f69.google.com with SMTP id e38-20020a05600c4ba600b003dc434dabbdso6607797wmp.6
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 06:00:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:organization:from:references
-         :cc:to:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sW7aiMox0CriK8aU+HN+jb3vaXSIy6HBnrk2aPiMthI=;
-        b=zscBfIqYtZxZnJK/ORbVK0GgHjxabp58gFMT3OQtK2iaKjXra6xkSN6g92aMnHvjpJ
-         j3HJqv00DeKuDmkJX1T+EMN7MS9WfMVuF5lnHm92L0j6M+fYS7y+P+sGuyqKYDoatRHV
-         GAUXIlZlvixSE8dVQlkofso3CRGg/ZZTSJthgEHGdGVkDkCOgXcRhoznzRGdZY8QHURz
-         PnUdXgNxZ10cv7pzcdZbwfJjh3qwsob91IkJJH4VywIYtTm3HPFzIkCwrPSe5SeZIQPH
-         F8U/RX3BUtEBq0sgGQhIv89Rgzsu/NDyWYD/Xstv480Klb4msW6/p2mnqrvdG7ShkIcx
-         G/Pw==
-X-Gm-Message-State: AO0yUKUy1FZV1EVRQCpBy5+SXNjwGzIIEmPGBa+IxNmi/4xooRz9ZYLz
-        wh8PjdPPjEO2uiVZ97Kv58KD3n0KEBVcuFM5dOuEa9xrW2deq/h6x1LZYrTnD0M/cUXeypFUFm1
-        jdDhqeZ+XUCdy
-X-Received: by 2002:a05:600c:3b84:b0:3dc:1031:14c4 with SMTP id n4-20020a05600c3b8400b003dc103114c4mr3752221wms.14.1675173611364;
-        Tue, 31 Jan 2023 06:00:11 -0800 (PST)
-X-Google-Smtp-Source: AK7set94yYHCQtMUhLwwFZW2Tw85+OPCk5GgL8jU/FYp0b92bP94albwy2k0jgp6h4ZElMMLuWMq1g==
-X-Received: by 2002:a05:600c:3b84:b0:3dc:1031:14c4 with SMTP id n4-20020a05600c3b8400b003dc103114c4mr3752186wms.14.1675173611028;
-        Tue, 31 Jan 2023 06:00:11 -0800 (PST)
-Received: from ?IPV6:2003:d8:2f0a:ca00:f74f:2017:1617:3ec3? (p200300d82f0aca00f74f201716173ec3.dip0.t-ipconnect.de. [2003:d8:2f0a:ca00:f74f:2017:1617:3ec3])
-        by smtp.gmail.com with ESMTPSA id e38-20020a05600c4ba600b003dc434900e1sm11512963wmp.34.2023.01.31.06.00.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 Jan 2023 06:00:10 -0800 (PST)
-Message-ID: <658eda9c-d716-fcb7-ba0c-b36f646195f1@redhat.com>
-Date:   Tue, 31 Jan 2023 15:00:08 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [RFC PATCH 01/19] mm: Introduce vm_account
-Content-Language: en-US
-To:     Alistair Popple <apopple@nvidia.com>, linux-mm@kvack.org,
-        cgroups@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, jgg@nvidia.com, jhubbard@nvidia.com,
-        tjmercier@google.com, hannes@cmpxchg.org, surenb@google.com,
-        mkoutny@suse.com, daniel@ffwll.ch, linuxppc-dev@lists.ozlabs.org,
-        linux-fpga@vger.kernel.org, linux-rdma@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
-        netdev@vger.kernel.org, io-uring@vger.kernel.org,
-        bpf@vger.kernel.org, rds-devel@oss.oracle.com,
-        linux-kselftest@vger.kernel.org
-References: <cover.f52b9eb2792bccb8a9ecd6bc95055705cfe2ae03.1674538665.git-series.apopple@nvidia.com>
- <748338ffe4c42d86669923159fe0426808ecb04d.1674538665.git-series.apopple@nvidia.com>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <748338ffe4c42d86669923159fe0426808ecb04d.1674538665.git-series.apopple@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
-        autolearn=unavailable autolearn_force=no version=3.4.6
+        with ESMTP id S232462AbjAaOBR (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 09:01:17 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A157460A1
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 06:00:48 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D3785614E9
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 14:00:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DBEBC433D2;
+        Tue, 31 Jan 2023 14:00:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675173647;
+        bh=RavWo/+vph7ACbI3dpIUxK/OADzueQiLnxvDUG4JWG0=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=eQcNPe4Oqm5honiBDuXOVCUdNbHuQiy4KMjv6hUMx3qtSZsADDU+NyADdxwufjQPy
+         2jI1qZ/5yrA5r7ggEXUvjhuexWQQNGjTyBF/PCTIpPkOUL9+i1DQDIAhOUQXkfZweG
+         O8a9uPrxndf+Kj9cFb8djaD4fD+ogjoN5rZuPkVi9HGPl+I0ULcJHJxRicckz8ZLWr
+         /W+KKRAHxgFvyOniIjfTO31vaNz4fvqQh0qQZfu+Wauiia/xQfNc97ypEnZRPdbOW9
+         /jPYDU1hOdqYVLzsEtxqIaMuspVio6IpR3wQSBN74eZFi6I0hW9oBWrRnUHKz2esKv
+         c+rH/LOjWo3FA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pMrBk-006DXF-VD;
+        Tue, 31 Jan 2023 14:00:45 +0000
+Date:   Tue, 31 Jan 2023 14:00:44 +0000
+Message-ID: <86cz6u248j.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@arm.com>,
+        Chase Conklin <chase.conklin@arm.com>,
+        Christoffer Dall <christoffer.dall@arm.com>,
+        Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
+        Jintack Lim <jintack@cs.columbia.edu>,
+        Russell King <rmk+kernel@armlinux.org.uk>,
+        James Morse <james.morse@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>
+Subject: Re: [PATCH v8 01/69] arm64: Add ARM64_HAS_NESTED_VIRT cpufeature
+In-Reply-To: <b7dbe85e-c7f8-48ad-e1af-85befabd8509@arm.com>
+References: <20230131092504.2880505-1-maz@kernel.org>
+        <20230131092504.2880505-2-maz@kernel.org>
+        <b7dbe85e-c7f8-48ad-e1af-85befabd8509@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: suzuki.poulose@arm.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, alexandru.elisei@arm.com, andre.przywara@arm.com, chase.conklin@arm.com, christoffer.dall@arm.com, gankulkarni@os.amperecomputing.com, jintack@cs.columbia.edu, rmk+kernel@armlinux.org.uk, james.morse@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 24.01.23 06:42, Alistair Popple wrote:
-> Kernel drivers that pin pages should account these pages against
-> either user->locked_vm or mm->pinned_vm and fail the pinning if
-> RLIMIT_MEMLOCK is exceeded and CAP_IPC_LOCK isn't held.
-> 
-> Currently drivers open-code this accounting and use various methods to
-> update the atomic variables and check against the limits leading to
-> various bugs and inconsistencies. To fix this introduce a standard
-> interface for charging pinned and locked memory. As this involves
-> taking references on kernel objects such as mm_struct or user_struct
-> we introduce a new vm_account struct to hold these references. Several
-> helper functions are then introduced to grab references and check
-> limits.
-> 
-> As the way these limits are charged and enforced is visible to
-> userspace we need to be careful not to break existing applications by
-> charging to different counters. As a result the vm_account functions
-> support accounting to different counters as required.
-> 
-> A future change will extend this to also account against a cgroup for
-> pinned pages.
+Hi Suzuki,
 
-The term "vm_account" is misleading, no? VM_ACCOUNT is for accounting 
-towards the commit limit ....
+On Tue, 31 Jan 2023 13:47:31 +0000,
+Suzuki K Poulose <suzuki.poulose@arm.com> wrote:
+> 
+> Hi Marc
+> 
+> On 31/01/2023 09:23, Marc Zyngier wrote:
+> > From: Jintack Lim <jintack.lim@linaro.org>
+> > 
+> > Add a new ARM64_HAS_NESTED_VIRT feature to indicate that the
+> > CPU has the ARMv8.3 nested virtualization capability, together
+> > with the 'kvm-arm.mode=nested' command line option.
+> > 
+> > This will be used to support nested virtualization in KVM.
+> > 
+> > Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
+> > Signed-off-by: Andre Przywara <andre.przywara@arm.com>
+> > Signed-off-by: Christoffer Dall <christoffer.dall@arm.com>
+> > [maz: moved the command-line option to kvm-arm.mode]
+> 
+> Should this be separate kvm-arm mode ? Or can this be tied to
+> is_kernel_in_hyp_mode() ? Given this mode (from my limited
+> review) doesn't conflict with normal VHE mode (and RME support),
+> adding this explicit mode could confuse the user.
 
--- 
+What is exactly the objection here? NV is more or less a VHE++ mode,
+but is also completely experimental and incomplete.
+
+> In case we need a command line to turn the NV mode on/off,
+> we could always use the id-override and simply leave this out ?
+
+I really want an explicit user buy-in. There is absolutely no way this
+can be enabled by default, the risks are way too high. Just look at
+the x86 story: it took them 10 years to enable NV by default. I don't
+expect to do any better.
+
 Thanks,
 
-David / dhildenb
+	M.
 
+-- 
+Without deviation from the norm, progress is not possible.
