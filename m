@@ -2,113 +2,101 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6A610683414
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 18:41:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B678E683433
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 18:46:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231137AbjAaRlf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 12:41:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43542 "EHLO
+        id S229686AbjAaRqL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 12:46:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49062 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230520AbjAaRld (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 12:41:33 -0500
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB940577E9
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:41:31 -0800 (PST)
-Received: by mail-vs1-xe30.google.com with SMTP id y8so16936490vsq.0
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:41:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=UCx2vxuL1yW/aqxFsyC3X5oRhoumoRb7Us6ry2Ohm/8=;
-        b=B0WIQQRWtqXFIMW9ne1pzR1geefcm/QBxSmIuRLA/pM2gElyoWJVOwQ2mWMC5PpPbL
-         AuRKonYdBvkAw3tSI3kNQGAcFyhUHf7cnuJ5Nf9swNsiIMadu19g79LifXnTzP0HxRCD
-         sdE9+BkWVWJAo7kJyw0Sk0+4j9zIsdP6oEIGDdwlqxFYE4rJhB3tvmF6rA/uMeDqXRBc
-         LNBQnQ7NVZAik8DVzFmJ3cNNR2h7OSylhZ/XUhrbIk/VeZw6DdNKL0cfFA1H40P+hDgw
-         hBVZJgGClW0yAb4e7qZf66Y7dcP4Xn+xGcaQbFOGVyCfcAMu+yAXqUPQabJxYIjTVfpu
-         av4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UCx2vxuL1yW/aqxFsyC3X5oRhoumoRb7Us6ry2Ohm/8=;
-        b=SpnN7+sK2707ijmvjRJVowixlCfMmzK0zVnTLhCJrDr1/Fvs54+6TAUvgweHUTCRvr
-         cN92TsngVX532dGjME8XoT6IZEPi/RdN+N7oShz0sEaPBk9BF/tHm4zcjIIrRy9z4i3f
-         bVqgc6XrnzZe4neRd+/zy5OFEVGM7OjswFzaFOnXgIUw22JPk+mIfmpZAXDQUNDgHeVa
-         hPDBnp3f2wh5CykhDLJWpCgLFhnCoFTls2aAPLeNRfI9/dGt/+8fpBBI4ZI0xd/NsBgl
-         f0q/T9yij6ZXfwdOkqwjyvwopzBTUqPBDo8QTxbIVvp15H/UT/IoJrgUvyI+qdpWtzCa
-         G3gw==
-X-Gm-Message-State: AO0yUKX7EidvgTCe7lKjwP0RsG135CXn21yO4jjDJc0zCV10vZzC7FIv
-        JDx7iWk2rFWzHesXfdntJQzuI6F+XpN2KsiWXjil/w==
-X-Google-Smtp-Source: AK7set+yL0wuf4gZ5gqpcdiUgDKC3nPewltObXz/OcIl30zT//GOyIPopTSsoFr61d+v5YhgvAnROqDwILyFLm+sA2E=
-X-Received: by 2002:a67:f812:0:b0:3eb:dd6d:487d with SMTP id
- l18-20020a67f812000000b003ebdd6d487dmr2680061vso.16.1675186890959; Tue, 31
- Jan 2023 09:41:30 -0800 (PST)
-MIME-Version: 1.0
-References: <20230125213857.824959-1-vipinsh@google.com> <Y9GmiyRQ6sULCjEG@google.com>
- <CANgfPd9T7jdh1Cjjo4y6DcxC2poTaGhQ7wNLf6OgGtStg-yKJg@mail.gmail.com>
- <Y9HcHRBShQgjxsQb@google.com> <CALzav=fkmS0U4tb4trDtbCmDxo27EcJeOWbiwb+meagj9+PFiw@mail.gmail.com>
- <Y9hXmz/nDOr1hQal@google.com>
-In-Reply-To: <Y9hXmz/nDOr1hQal@google.com>
-From:   David Matlack <dmatlack@google.com>
-Date:   Tue, 31 Jan 2023 09:41:04 -0800
-Message-ID: <CALzav=cEoF4E3hYStpDDdi_RWvCYXF9iXvznbL234uuEQ0Zv=g@mail.gmail.com>
-Subject: Re: [Patch] KVM: x86/mmu: Make optimized __handle_changed_spte() for
- clear dirty log
+        with ESMTP id S229491AbjAaRqJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 12:46:09 -0500
+Received: from out-141.mta0.migadu.com (out-141.mta0.migadu.com [91.218.175.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8272211157
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:46:06 -0800 (PST)
+Date:   Tue, 31 Jan 2023 17:45:51 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1675187164;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DwrOcR2LffC/e+/t1pFYVsPzBZficz7j8jjPmO5CHe4=;
+        b=ZOX+OhybnoIrCkkqxXxWIG1SyBX+oFKddZxS5djZNenbmzAbZf1rQX6zFW/doatpLDjNE/
+        oTQRNWus2dGGiyDef1EV/Qd5IRfiHXZw1AoPkfnD9ik7y0rkJa1KqzCkrBkmHY7G21JqZf
+        NLCgS4oICiLeOkuxbQPwVO8J0m7iA5A=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Oliver Upton <oliver.upton@linux.dev>
 To:     Sean Christopherson <seanjc@google.com>
-Cc:     Ben Gardon <bgardon@google.com>, Vipin Sharma <vipinsh@google.com>,
-        pbonzini@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+Cc:     Ricardo Koller <ricarkol@google.com>,
+        Marc Zyngier <maz@kernel.org>, pbonzini@redhat.com,
+        yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org,
+        kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is
+ enabled
+Message-ID: <Y9lTz3ryasgkfhs/@google.com>
+References: <20230113035000.480021-1-ricarkol@google.com>
+ <20230113035000.480021-7-ricarkol@google.com>
+ <Y9BfdgL+JSYCirvm@thinky-boi>
+ <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
+ <86v8ktkqfx.wl-maz@kernel.org>
+ <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
+ <Y9g0KGmsZqAZiTSP@google.com>
+ <Y9hsV02TpQeoB0oN@google.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Y9hsV02TpQeoB0oN@google.com>
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 3:49 PM Sean Christopherson <seanjc@google.com> wrote:
->
-> On Mon, Jan 30, 2023, David Matlack wrote:
-> > On Wed, Jan 25, 2023 at 5:49 PM Sean Christopherson <seanjc@google.com> wrote:
-> > [...]
-> > > ---
-> > >  arch/x86/kvm/mmu/tdp_mmu.c | 92 ++++++++++----------------------------
-> > >  1 file changed, 24 insertions(+), 68 deletions(-)
-> > >
-> > > diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> > > index bba33aea0fb0..2f78ca43a276 100644
-> > > --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> > > +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> > [...]
-> > > @@ -1289,8 +1244,7 @@ static bool age_gfn_range(struct kvm *kvm, struct tdp_iter *iter,
-> > >                 new_spte = mark_spte_for_access_track(new_spte);
-> > >         }
-> > >
-> > > -       tdp_mmu_set_spte_no_acc_track(kvm, iter, new_spte);
-> > > -
-> > > +       kvm_tdp_mmu_write_spte(iter->sptep, iter->old_spte, new_spte, iter->level);
-> >
-> > This can race with fast_page_fault() setting the W-bit and the CPU
-> > setting the D-bit. i.e. This call to kvm_tdp_mmu_write_spte() could
-> > clear the W-bit or D-bit.
->
-> Ugh, right.  Hrm.  Duh, I just didn't go far enough.  A straight XCHG is silly.
-> Except for the access-tracking mess, KVM wants to clear a single bit.  Writing
-> the entire thing and potentially clobbering bits is wasteful and unnecessarily
-> dangerous.  And the access-tracking code already needs special handling.
->
-> We can just simplify this all by adding a helper to clear a single bit (and
-> maybe even use clear_bit() and __clear_bit() if we save the bit number for the
-> W/A/D bits and not just the mask).  And if it weren't for EPT (different A/D
-> locations), we could even use static asserts to restrict the usage to the W/A/D
-> bits :-/  Oh well.
->
-> E.g. this
+On Tue, Jan 31, 2023 at 01:18:15AM +0000, Sean Christopherson wrote:
+> On Mon, Jan 30, 2023, Oliver Upton wrote:
+> > I think that Marc's suggestion of having userspace configure this is
+> > sound. After all, userspace _should_ know the granularity of the backing
+> > source it chose for guest memory.
+> > 
+> > We could also interpret a cache size of 0 to signal that userspace wants
+> > to disable eager page split for a VM altogether. It is entirely possible that
+> > the user will want a differing QoS between slice-of-hardware and
+> > overcommitted VMs.
+> 
+> Maybe.  It's also entirely possible that QoS is never factored in, e.g. if QoS
+> guarantees for all VMs on a system are better met by enabling eager splitting
+> across the board.
+> 
+> There are other reasons to use module/kernel params beyond what Marc listed, e.g.
+> to let the user opt out even when something is on by default.  x86's TDP MMU has
+> benefited greatly from downstream users being able to do A/B performance testing
+> this way.  I suspect x86's eager_page_split knob was added largely for this
+> reason, e.g. to easily see how a specific workload is affected by eager splitting.
+> That seems like a reasonable fit on the ARM side as well.
 
-This patch looks good. Vipin can you incorporate this in your next version?
+There's a rather important distinction here in that we'd allow userspace
+to select the page split cache size, which should be correctly sized for
+the backing memory source. Considering the break-before-make rules of
+the architecture, the only way eager split is performant on arm64 is by
+replacing a block entry with a fully populated table hierarchy in one
+operation. AFAICT, you don't have this problem on x86, as the
+architecture generally permits a direct valid->valid transformation
+without an intermediate invalidation. Well, ignoring iTLB multihit :)
+
+So, the largest transformation we need to do right now is on a PUD w/
+PAGE_SIZE=4K, leading to 513 pages as proposed in the series. Exposing
+that configuration option in a module parameter is presumptive that all
+VMs on a host use the exact same memory configuration, which doesn't
+feel right to me.
+
+--
+Thanks,
+Oliver
