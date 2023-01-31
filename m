@@ -2,55 +2,37 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 21AD76831E6
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 16:53:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4240868320D
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 17:00:47 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232981AbjAaPxp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 10:53:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60898 "EHLO
+        id S230523AbjAaQAp (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 11:00:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231704AbjAaPxo (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 10:53:44 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23FF16ADD
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 07:53:43 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id b5so8255871plz.5
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 07:53:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8BDBGIr020TIEN48KHoXszHSY7JH31zE2b6DhwjqkpU=;
-        b=i0jigBhmeRjaAtvW2bVUaQPHSOXnmtp6KW5DRBVBoMs9M95X0qKfuKWydeztA7qQ9A
-         +PqS3GEUcHUGwBfRKP3Zuz3rfg+thRbu4mVBTTUBXhpE9TUVjx24IUQzns0scPtIXuMT
-         ctgHAVgpKcpJ7by5c58aOPLIilAVT9b9knMJz8fqgIO1SLTBHQ7f8kLcc5QbQOpKEC9Q
-         qJFBMGogqJC3mGYSXcXl1IxvbUJfJ6CHTl5z6jH2in9+Gl1URvuhstI5fQt6nPIRDK0n
-         wBCdfAIvDjt2WfX6v2ee8EjsAimhl2K90y6zivnNcHzOd78Q7m/lJtG+6nBvZHCHKZmh
-         iFHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8BDBGIr020TIEN48KHoXszHSY7JH31zE2b6DhwjqkpU=;
-        b=C5t0LkQP9Sji1z1VW0wiixH2fz+POphowNRgBCAJQV9YtfJUfoblG6EC1Gr57gJauI
-         eRrKq305iTtaRBqqDlhi/t9JT9P1G3cD0v8RsfnPnwyoZrKcPeh7UFMt45RsXF1F3oAg
-         +Au+sToo47KNJmxxxsRK5DGZb8CBfK0R3tODfo98H9I38J3T3kkrWvTJqdAhcLjGxviL
-         r4o/LoRf9LTpJ5Yoky/eDDOSRXAGO+UBHdmJs76QHjhV+j67+h3sXl/PHANUe8fv3CAW
-         ZmeMH2NfCJ+N60PUzAFlE83AGgnysd174efzGx6EJK6FAKuMsgwOFY35NFfSkPm/eyzg
-         btYg==
-X-Gm-Message-State: AO0yUKUeUYd5rcXe3bVJmWEupWb+CUG4A6Lqx+kumuGF/ZLNADXShcx1
-        HKe1dH/rczzIMh/3ldsqcApv2xD8mgp4jeVmJNw=
-X-Google-Smtp-Source: AK7set86Spbju15zAbisK2mmq3j8WKEdenghpKFRQltXbuwmg9z/EBPdC24x5DEU09pf9f5AKKLB0w==
-X-Received: by 2002:a17:902:b686:b0:191:4367:7fde with SMTP id c6-20020a170902b68600b0019143677fdemr1307314pls.0.1675180423267;
-        Tue, 31 Jan 2023 07:53:43 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id x17-20020a170902ea9100b00196768692e0sm5338448plb.86.2023.01.31.07.53.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Jan 2023 07:53:42 -0800 (PST)
-Date:   Tue, 31 Jan 2023 15:53:39 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Joerg Roedel <joro@8bytes.org>
+        with ESMTP id S233520AbjAaQAm (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 11:00:42 -0500
+Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7064C4FC16;
+        Tue, 31 Jan 2023 08:00:37 -0800 (PST)
+Received: from 8bytes.org (p5b006afb.dip0.t-ipconnect.de [91.0.106.251])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.8bytes.org (Postfix) with ESMTPSA id B4843221B65;
+        Tue, 31 Jan 2023 17:00:35 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
+        s=default; t=1675180835;
+        bh=f8+N+QlIuIQFbhMVMQyAXaOrIIwv00xABJZc2RkJ2pk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mamH11c5t/CDNFa7C/309AitR/ZII/C1ASm+L+zIQ5yioW7LS94mESPbYva6hDl5a
+         1X0xVrEqDQKbBzmJAIG7ThhVi+nVt1bjZef4vJGuptnci+GxuTadkp3Zck1N/bWdI6
+         MDVUt66wZuXxW1vrFGnLwUIGzdzaw9dKllA2um4Eu4HOVsNyeEZlKv/azsh/9Vw7Vr
+         npsf78xoXc4Y35IRY8OilVkX1R5+ATdTZfT1JlUWvAh8OV93lC2erD0k6oJ/WC5zvO
+         Q9PR7X4/HnuQfnPcAS37a269TM0zKKVRVT+6Hfm+of8TIAjk3rjZEJ+a6sswXl78w+
+         bFhruJwgylOiA==
+Date:   Tue, 31 Jan 2023 17:00:29 +0100
+From:   Joerg Roedel <joro@8bytes.org>
+To:     Sean Christopherson <seanjc@google.com>
 Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         Alexey Kardashevskiy <aik@amd.com>,
         Peter Zijlstra <peterz@infradead.org>, kvm@vger.kernel.org,
@@ -62,7 +44,7 @@ Cc:     "H. Peter Anvin" <hpa@zytor.com>,
         Tom Lendacky <thomas.lendacky@amd.com>
 Subject: Re: [Question PATCH kernel] x86/amd/sev/nmi+vc: Fix stack handling
  (why is this happening?)
-Message-ID: <Y9k5g5jYA/rjIwUj@google.com>
+Message-ID: <Y9k7HUA85bZKCEVn@8bytes.org>
 References: <20230127035616.508966-1-aik@amd.com>
  <Y9OUfofjxDtTmwyV@hirez.programming.kicks-ass.net>
  <Y9OpcoSacyOkPkvl@8bytes.org>
@@ -71,29 +53,32 @@ References: <20230127035616.508966-1-aik@amd.com>
  <3bb3e080-caee-8bc8-7de9-f44969f16e75@amd.com>
  <38C572D7-E637-48C2-A57A-E62D44FF19BB@zytor.com>
  <Y9jX9AKYP8H34wGI@8bytes.org>
+ <Y9k5g5jYA/rjIwUj@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Y9jX9AKYP8H34wGI@8bytes.org>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+In-Reply-To: <Y9k5g5jYA/rjIwUj@google.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 31, 2023, Joerg Roedel wrote:
-> On Mon, Jan 30, 2023 at 09:30:38AM -0800, H. Peter Anvin wrote:
-> > It's somewhat odd to me that reading %dr7 is volatile, but %dr6 is
-> > not... %dr6 is the status register!
-> 
-> The reason is that on SEV-ES only accesses to DR7 will cause #VC
-> exceptions, DR0-DR6 are not intercepted.
+On Tue, Jan 31, 2023 at 03:53:39PM +0000, Sean Christopherson wrote:
+> I don't think that is technically true.  A _well-behaved_ hypervisor will not
+> intercept DR0-DR6 accesses for SEV-ES guests, but AFAICT nothing in the SEV-ES
+> architecture enforces that behavior.
 
-I don't think that is technically true.  A _well-behaved_ hypervisor will not
-intercept DR0-DR6 accesses for SEV-ES guests, but AFAICT nothing in the SEV-ES
-architecture enforces that behavior.
+Not from the hardware architecture side, but the GHCB spec does not
+list NAE events for DR0-DR6 accesses, so a guest is not required to
+handle them in the VC handler.
+
+Linux under SEV-ES will crash if the HV intercepts debug registers,
+except DR7.
+
+Regards,
+
+	Joerg
