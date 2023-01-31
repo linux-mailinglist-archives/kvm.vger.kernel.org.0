@@ -2,136 +2,145 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 07D3368256F
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 08:20:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 892746825A9
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 08:40:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230295AbjAaHUn (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 02:20:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36666 "EHLO
+        id S230218AbjAaHkO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 02:40:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbjAaHUl (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 02:20:41 -0500
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4EB22B0B7;
-        Mon, 30 Jan 2023 23:20:39 -0800 (PST)
-Received: by mail-pl1-x631.google.com with SMTP id d3so14151366plr.10;
-        Mon, 30 Jan 2023 23:20:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Uf4J6ccw6V6I9dyQLrV+NN/+J2brxB5QVhy1JYmFFs8=;
-        b=iJzxqFi7xafyuD1QzyFQ5G715kAHT1Dk9lY5MDbpYnnxYgc0Fg3lvpGzdWMQ8oab6a
-         iUkijzSB620JaPry0FfVZwVLb5N9/vJrAgEsGR7Ng6D4nuiRqYOyrAndW0ng+4z+n5CI
-         t25UrrTKgRS5Zn+9MGSHdOuLroItoZTkdZaLbUHPp1x/M93yZFFwNTPfFxb5apoEnEqP
-         y13VAkmth+4SHXk7Mft8701RT66cIku14OSO3JYujXQG3mr6IQxv7X7cISC5phBURyG2
-         8lrLArmF/1HC98Akm6tUMNTr2HxkjwSH3jbequHLs3uMx/+MX+knMMuzi3hhg2UnkfIh
-         fxzA==
+        with ESMTP id S229686AbjAaHkN (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 02:40:13 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD2AC360BC
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 23:39:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675150760;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=NqWFZCMoZbKjkr6qHV37rtPcyidnztEiuJHNjLKNQDc=;
+        b=FPvqgLIwmLKzivuULLvJ1bSnIbxKhcOj2B4CQol3pvQDxaxQCbV+nWzmv8gcOIbqYQytyf
+        xrfzU7eWZUlHZiFXstXz8kNUEt5thibcyXRcMpgfDq6Vwo2OjETEEBfOYBleUEp77ODESA
+        HHfdmEkeDwO46iK+WgiZ23ocQCdTdro=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-115-nTjmw0X3OvWGJqeaJS6c0Q-1; Tue, 31 Jan 2023 02:39:18 -0500
+X-MC-Unique: nTjmw0X3OvWGJqeaJS6c0Q-1
+Received: by mail-qv1-f71.google.com with SMTP id lw11-20020a05621457cb00b005376b828c22so7779864qvb.6
+        for <kvm@vger.kernel.org>; Mon, 30 Jan 2023 23:39:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uf4J6ccw6V6I9dyQLrV+NN/+J2brxB5QVhy1JYmFFs8=;
-        b=5EPxK2W9llsa2VUUoUOuxBTDnAPJ/ElPGoJ35KZ3eAP4VyXjU4aNbojSJuFI/Iuya7
-         vr26Ok/bVPJlWw9e6uvq6AmqbK5/nF4UrmsQyjE6QsQZMbGIUzZzM0WwA9vtpOQoF1nY
-         Q9aYY/KwHr7ywTHuDEinTKPr5+mm2fxYVWXuPnnFxD1ZYRoJ4omrSvT5RxMNi6Qr1nsF
-         WNPNuGNpkyOAaIch2goRg+5WXMBdstqahH1gIZoavPVhAQBQHOmAx0N8Ze2WxBHA9Xoe
-         z/LAJ9UQLNTqU+slKX5NHAmH8axGSvVuu4P78p3i5yt/dOORp0dAInqmAS8+mkmViWpw
-         t1zQ==
-X-Gm-Message-State: AFqh2kpKLpmBibALeMdQbsmiAfaXWrEJnIxn9/9geWJRC9KNPAggM9Jx
-        EaoDvUek0+AF6hPivvawEjseruR5RvEoUwjt
-X-Google-Smtp-Source: AMrXdXvyHgU+XKn3Anr3zezEQ5EyGsLztYOW3iRXERHTdXiiKTgOkW+i2LXBw5AfRGPXxuLA3fmTBw==
-X-Received: by 2002:a05:6a20:d48f:b0:bb:84a1:68b0 with SMTP id im15-20020a056a20d48f00b000bb84a168b0mr28709634pzb.55.1675149639173;
-        Mon, 30 Jan 2023 23:20:39 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id x2-20020aa793a2000000b00592591d1634sm8160489pff.97.2023.01.30.23.20.37
+        bh=NqWFZCMoZbKjkr6qHV37rtPcyidnztEiuJHNjLKNQDc=;
+        b=MCEXY9tWkGR4O4AbBiHpFVLNT3FzvIXoe0CSVYInxcZSfnA5CRPdqY50bCvs43cVib
+         ujCsSEXElZaX3TERc6P1eo5kqXcroZtvhQrtKm1A5oTsdMAMFR6k022RRLEqhT750wyP
+         5t3GaQwD6l8/GnfQ1LzaZUFMcN5hs4hMwl35O7ywkU01t/dTKQcjJyPXHmi2HLORWrIc
+         2mv+t4mOLLwMHpGiuxBg3Q2jLh+gZd+NWN8XfJybo/bd3iBg87JaCdY53CrZoO8/A6eZ
+         bRHY0Z431I5+uiVlnrVI9/Rn/AK61BSLKQfsU20ZrHDaxhUxis5/czStr64d4Prz5H6r
+         10yQ==
+X-Gm-Message-State: AO0yUKUuMTx5dtSaZ1UrUXSLrW5RQloKwuremD7xvlRXrd3i4UaiXDfh
+        5HFzz5MU+DiGh6YzC0Oc3R1JiIrutvJI67l4KgJv6MLBjCGPSDLDDn9Lt0mgK0D+BtZbva9Hry+
+        MXkgndfM5O/x+
+X-Received: by 2002:a05:622a:2cd:b0:3b9:a5d8:2c4d with SMTP id a13-20020a05622a02cd00b003b9a5d82c4dmr3906190qtx.53.1675150757404;
+        Mon, 30 Jan 2023 23:39:17 -0800 (PST)
+X-Google-Smtp-Source: AK7set/kbb8lIoDC0ZfQMp08DIj5gY8IgYDXxQsUxU/5Ud4IjT0Bc+P+4cGPhyTRBTriBOAn0sIwEQ==
+X-Received: by 2002:a05:622a:2cd:b0:3b9:a5d8:2c4d with SMTP id a13-20020a05622a02cd00b003b9a5d82c4dmr3906174qtx.53.1675150757167;
+        Mon, 30 Jan 2023 23:39:17 -0800 (PST)
+Received: from [192.168.0.2] (ip-109-43-176-155.web.vodafone.de. [109.43.176.155])
+        by smtp.gmail.com with ESMTPSA id z13-20020ac86b8d000000b003995f6513b9sm9401370qts.95.2023.01.30.23.38.52
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Jan 2023 23:20:38 -0800 (PST)
-Message-ID: <f106a06e-ae6f-2c79-df87-721817aacc02@gmail.com>
-Date:   Tue, 31 Jan 2023 15:20:32 +0800
+        Mon, 30 Jan 2023 23:39:16 -0800 (PST)
+Message-ID: <f679707c-c868-2415-aa1e-d6a853c00e21@redhat.com>
+Date:   Tue, 31 Jan 2023 08:38:51 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH] KVM: x86/pmu: Disallow legacy LBRs if architectural LBRs
- are available
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.13.0
+Subject: Re: [kvm-unit-tests PATCH v2 1/1] arm: Replace MAX_SMP probe loop in
+ favor of reading directly
 Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-References: <20230128001427.2548858-1-seanjc@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <20230128001427.2548858-1-seanjc@google.com>
+To:     Colton Lewis <coltonlewis@google.com>
+Cc:     pbonzini@redhat.com, nrb@linux.ibm.com, andrew.jones@linux.dev,
+        imbrenda@linux.ibm.com, marcorr@google.com,
+        alexandru.elisei@arm.com, oliver.upton@linux.dev,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev
+References: <gsnt7cx3ygnu.fsf@coltonlewis-kvm.c.googlers.com>
+From:   Thomas Huth <thuth@redhat.com>
+In-Reply-To: <gsnt7cx3ygnu.fsf@coltonlewis-kvm.c.googlers.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 28/1/2023 8:14 am, Sean Christopherson wrote:
-> Disallow enabling LBR support if the CPU supports architectural LBRs.
-> Traditional LBR support is absent on CPU models that have architectural
-> LBRs, and KVM doesn't yet support arch LBRs, i.e. KVM will pass through
-> non-existent MSRs if userspace enables LBRs for the guest.
-
-True, we have call_trace due to MSR_ARCH_LBR_FROM_0 (0x1500) for example.
-
+On 30/01/2023 20.19, Colton Lewis wrote:
+> Thomas Huth <thuth@redhat.com> writes:
 > 
-> Cc: stable@vger.kernel.org
-> Cc: Yang Weijiang <weijiang.yang@intel.com>
-> Cc: Like Xu <like.xu.linux@gmail.com>
-
-Tested-by: Like Xu <likexu@tencent.com>
-
-> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-
-Fixes: 145dfad998ea ("KVM: VMX: Advertise PMU LBRs if and only if perf supports 
-LBRs")
-
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
+>> On 11/01/2023 22.54, Colton Lewis wrote:
+>>> Replace the MAX_SMP probe loop in favor of reading a number directly
+>>> from the QEMU error message. This is equally safe as the existing code
+>>> because the error message has had the same format as long as it has
+>>> existed, since QEMU v2.10. The final number before the end of the
+>>> error message line indicates the max QEMU supports. A short awk
+>>> program is used to extract the number, which becomes the new MAX_SMP
+>>> value.
 > 
-> Am I missing something that would prevent this scenario?
+>>> This loop logic is broken for machines with a number of CPUs that
+>>> isn't a power of two. A machine with 8 CPUs will test with MAX_SMP=8
+>>> but a machine with 12 CPUs will test with MAX_SMP=6 because 12 >> 2 ==
+>>> 6. This can, in rare circumstances, lead to different test results
+>>> depending only on the number of CPUs the machine has.
 > 
->   arch/x86/kvm/vmx/vmx.c | 8 +++++---
->   1 file changed, 5 insertions(+), 3 deletions(-)
+>>> A previous comment explains the loop should only apply to kernels
+>>> <=v4.3 on arm and suggests deletion when it becomes tiresome to
+>>> maintian. However, it is always theoretically possible to test on a
+>>> machine that has more CPUs than QEMU supports, so it makes sense to
+>>> leave some check in place.
 > 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 8f0f67c75f35..77ee6b4a5ec4 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -7761,9 +7761,11 @@ static u64 vmx_get_perf_capabilities(void)
->   	if (boot_cpu_has(X86_FEATURE_PDCM))
->   		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
->   
-> -	x86_perf_get_lbr(&lbr);
-> -	if (lbr.nr)
-> -		perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-> +	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
-
-To avoid changing this again in the Arch lbr enabling part, how about:
-
-	x86_perf_get_lbr(&lbr);
-	if (lbr.nr && cpu_feature_enabled(X86_FEATURE_ARCH_LBR) ==
-	    kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-		perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-
-?
-
-> +		x86_perf_get_lbr(&lbr);
-> +		if (lbr.nr)
-> +			perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-> +	}
->   
->   	if (vmx_pebs_supported()) {
->   		perf_cap |= host_perf_cap & PERF_CAP_PEBS_MASK;
+>>> Signed-off-by: Colton Lewis <coltonlewis@google.com>
+>>> ---
+...
+>>> +if $RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP \
+>>> +      |& grep -qi 'exceeds max CPUs'; then
+>>> +    GET_LAST_NUM='/exceeds max CPUs/ {match($0, /[[:digit:]]+)$/); print 
+>>> substr($0, RSTART, RLENGTH-1)}'
+>>> +    MAX_SMP=$($RUNTIME_arch_run _NO_FILE_4Uhere_ -smp $MAX_SMP |& awk 
+>>> "$GET_LAST_NUM")
+>>> +fi
 > 
-> base-commit: 2de154f541fc5b9f2aed3fe06e218130718ce320
+>> Is that string with "exceeds" really still the recent error message of the
+>> latest QEMU versions? When I'm running
+> 
+>>    qemu-system-aarch64 -machine virt -smp 1024
+> 
+>> I'm getting:
+> 
+>>    qemu-system-aarch64: Invalid SMP CPUs 1024. The max CPUs
+>>    supported by machine 'virt-8.0' is 512
+> 
+>> ... thus no "exceeds" in here? What do I miss? Maybe it's better to just
+>> grep for "max CPUs" ?
+> 
+> The full qemu command run by the test is much more complicated. It takes
+> a different code path and results in different errors, including the
+> "exceeds" one. All my testing has been done with QEMU v7.0, released
+> 2022.
+
+Could you please provide such a command line? I haven't been able to 
+reproduce this with the current development version of QEMU (using TCG) - 
+either I (likely) did something wrong, or the behavior of QEMU changed in 
+the past months...
+
+  Thanks,
+   Thomas
+
