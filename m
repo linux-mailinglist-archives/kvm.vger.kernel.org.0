@@ -2,53 +2,54 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B4AB6828C8
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:26:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 644766828CE
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:28:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232592AbjAaJ0N (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 04:26:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54654 "EHLO
+        id S232530AbjAaJ2D (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 04:28:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232579AbjAaJ0I (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 04:26:08 -0500
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2C41E9CF
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:26:07 -0800 (PST)
-Received: by mail-pg1-x533.google.com with SMTP id 143so9592211pgg.6
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:26:07 -0800 (PST)
+        with ESMTP id S230377AbjAaJ2B (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 04:28:01 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D8D49753
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:28:00 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id e10-20020a17090a630a00b0022bedd66e6dso18394701pjj.1
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:28:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=atishpatra.org; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=iuOgM24FK59+MffbRIrpSxSdYJY4cKp8hxWLQ7aDyK0=;
-        b=mDT4gnR+VFMLC+hvEwWESSYsHhM3swOUMRQkP7LTrvMO2H9o2ZwcW4L7joLuD/XQwX
-         owIFiUtwX0EGsPgrnDgoORXLCKM8QzfTDMe8BfdRvCFHYRYmBU13DPROvapuJO+ATfiL
-         /5nWa+4I5Ki0TZMWoDyQoeXTyxNcprRRb+lSI=
+        bh=cRicPiuaBpPdTHFzOhiCezQ5GuYSGllcRPaK1dz/uvE=;
+        b=b68LiQHhWG3BL76DPGqfQQR8n8lH8MhamuMSFuRccumQrqSxrFcpNzdHuWE0ZrmaOj
+         85t7w84ieF8VtgWrBMU3b93HPfiZRrsIzU6QEDBpWc3JT9ufUkERMQdZqInh/l18wd7n
+         TXnnQ3LerHMIrQesfDzvyGDIPEEXsmufdJmro=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=iuOgM24FK59+MffbRIrpSxSdYJY4cKp8hxWLQ7aDyK0=;
-        b=nxJmEIwAPxq3G2wyCJktE7WIM7RPnNRER9fP1rSwS4b/AR9r+orODznhdzVu/hBfpG
-         W64xvW+Fl+4ThsmOK8fKL1NiiJZVUhT72mGBnMemMSdI5fOXKBpEBMdvoxW8ar/9aY9U
-         iQdDh3OPL7d028h+M311zTFENgpt/9tr6ucKpOP+8i2KKTz5l0sEBbHhQlv1tE81HqXF
-         M7KuOvae60UdZLnaXI7FlOMaNAO1eI1ZD1ydBPrTyduTlg6W3ufJ/I2PnIrjvOxttyl2
-         qJamGppZ2h77hksjYVfkGCEvMPqYySpKP+a/kR1+vY+e9i55K74XTQ7yEWh73cTFt3jb
-         059Q==
-X-Gm-Message-State: AO0yUKWlMTSg/hhThMwJl3dMTl+XePFJL8v3Yymm9obiZTw05v2zKDmY
-        m8E/bXqSHAsQhWR56VSpMbO9C3pPJdW315tBbnuU
-X-Google-Smtp-Source: AK7set/MSOrSxz1qNdOEo3o9mrx0RsLwAY3Thk/17kJxDWGdCN+7K9AXDb2PlDva9XbGN0WlRZI59ue/ZbriaRWQtuw=
-X-Received: by 2002:a63:510a:0:b0:4da:6df2:f28 with SMTP id
- f10-20020a63510a000000b004da6df20f28mr2526765pgb.36.1675157166777; Tue, 31
- Jan 2023 01:26:06 -0800 (PST)
+        bh=cRicPiuaBpPdTHFzOhiCezQ5GuYSGllcRPaK1dz/uvE=;
+        b=I2ybWQ7OfxEM/JTf/wrddD38Fi7yGx/oEFlCHU/fweWgNiQh9Nkf50bx3p9RIp7NPP
+         YWiRcfDT7HHrAS/9UXJLaevq/NSGU/AHJKRins3EXypn7lmGJ0Zf4LNSlclTfXZ7xFYr
+         EcmnObBYElxScla962GrrqHISO3k/XHSh0W+eDm2YGxt9peZ7CSWaKaDQBkOfyrWseg+
+         Nn8UBSAAf64JCy0RjKtqelC2sQmeoGYfsETSKL74aGnIkCGjr7ZJXUyTc7us4t0IJItj
+         SrTQ+gP86D7IiH+BbEYtdKXr7oDS1qRzcVaKBy1tQr9X6E5PwjPNnIOLPPKmziZuEZMA
+         Up1A==
+X-Gm-Message-State: AFqh2koY9TR0xobaGCFJIxf+zVQNtfG32xYNwO7HrEsyQaioZLJpCLVO
+        ovWoG3f73yDv80akyQdRvAWVWxh8qqP84/hv302E
+X-Google-Smtp-Source: AMrXdXuqJZe71wMHsvHQa+/ofcNqzAcOCHpQvFAoA3yjOjAFaR3HQs3cLMhLk6QI5qrARLILCxRb9Lw/BmeYIUF58Rg=
+X-Received: by 2002:a17:902:8f8a:b0:193:794:ba9 with SMTP id
+ z10-20020a1709028f8a00b0019307940ba9mr6658889plo.22.1675157280064; Tue, 31
+ Jan 2023 01:28:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20230128072737.2995881-1-apatel@ventanamicro.com> <20230128072737.2995881-3-apatel@ventanamicro.com>
-In-Reply-To: <20230128072737.2995881-3-apatel@ventanamicro.com>
+References: <20230128072737.2995881-1-apatel@ventanamicro.com> <20230128072737.2995881-4-apatel@ventanamicro.com>
+In-Reply-To: <20230128072737.2995881-4-apatel@ventanamicro.com>
 From:   Atish Patra <atishp@atishpatra.org>
-Date:   Tue, 31 Jan 2023 01:25:55 -0800
-Message-ID: <CAOnJCUJnEMxQxjDtzAJe5_0edi=1pQLVE-LDeQtH9bzn7+O4rg@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] RISC-V: Detect AIA CSRs from ISA string
+Date:   Tue, 31 Jan 2023 01:27:48 -0800
+Message-ID: <CAOnJCUKDYkJz0RNEYnPFrSax7e8cATvqYTXwPA+58Y8zVqEZCQ@mail.gmail.com>
+Subject: Re: [PATCH v2 3/7] RISC-V: KVM: Drop the _MASK suffix from hgatp.VMID
+ mask defines
 To:     Anup Patel <apatel@ventanamicro.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
@@ -67,66 +68,95 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, Jan 27, 2023 at 11:27 PM Anup Patel <apatel@ventanamicro.com> wrote:
+On Fri, Jan 27, 2023 at 11:28 PM Anup Patel <apatel@ventanamicro.com> wrote:
 >
-> We have two extension names for AIA ISA support: Smaia (M-mode AIA CSRs)
-> and Ssaia (S-mode AIA CSRs).
+> The hgatp.VMID mask defines are used before shifting when extracting
+> VMID value from hgatp CSR value so based on the convention followed
+> in the other parts of asm/csr.h, the hgatp.VMID mask defines should
+> not have a _MASK suffix.
 >
-> We extend the ISA string parsing to detect Smaia and Ssaia extensions.
+> While we are here, let's use GENMASK() for hgatp.VMID and hgatp.PPN.
 >
 > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
 > Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 > ---
->  arch/riscv/include/asm/hwcap.h | 2 ++
->  arch/riscv/kernel/cpu.c        | 2 ++
->  arch/riscv/kernel/cpufeature.c | 2 ++
->  3 files changed, 6 insertions(+)
+>  arch/riscv/include/asm/csr.h | 12 ++++++------
+>  arch/riscv/kvm/mmu.c         |  3 +--
+>  arch/riscv/kvm/vmid.c        |  4 ++--
+>  3 files changed, 9 insertions(+), 10 deletions(-)
 >
-> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
-> index 86328e3acb02..341ef30a3718 100644
-> --- a/arch/riscv/include/asm/hwcap.h
-> +++ b/arch/riscv/include/asm/hwcap.h
-> @@ -59,6 +59,8 @@ enum riscv_isa_ext_id {
->         RISCV_ISA_EXT_ZIHINTPAUSE,
->         RISCV_ISA_EXT_SSTC,
->         RISCV_ISA_EXT_SVINVAL,
-> +       RISCV_ISA_EXT_SMAIA,
-> +       RISCV_ISA_EXT_SSAIA,
->         RISCV_ISA_EXT_ID_MAX
->  };
->  static_assert(RISCV_ISA_EXT_ID_MAX <= RISCV_ISA_EXT_MAX);
-> diff --git a/arch/riscv/kernel/cpu.c b/arch/riscv/kernel/cpu.c
-> index 1b9a5a66e55a..a215ec929160 100644
-> --- a/arch/riscv/kernel/cpu.c
-> +++ b/arch/riscv/kernel/cpu.c
-> @@ -162,6 +162,8 @@ arch_initcall(riscv_cpuinfo_init);
->   *    extensions by an underscore.
->   */
->  static struct riscv_isa_ext_data isa_ext_arr[] = {
-> +       __RISCV_ISA_EXT_DATA(smaia, RISCV_ISA_EXT_SMAIA),
-> +       __RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
->         __RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
->         __RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
->         __RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
-> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
-> index 93e45560af30..3c5b51f519d5 100644
-> --- a/arch/riscv/kernel/cpufeature.c
-> +++ b/arch/riscv/kernel/cpufeature.c
-> @@ -228,6 +228,8 @@ void __init riscv_fill_hwcap(void)
->                                 SET_ISA_EXT_MAP("zihintpause", RISCV_ISA_EXT_ZIHINTPAUSE);
->                                 SET_ISA_EXT_MAP("sstc", RISCV_ISA_EXT_SSTC);
->                                 SET_ISA_EXT_MAP("svinval", RISCV_ISA_EXT_SVINVAL);
-> +                               SET_ISA_EXT_MAP("smaia", RISCV_ISA_EXT_SMAIA);
-> +                               SET_ISA_EXT_MAP("ssaia", RISCV_ISA_EXT_SSAIA);
->                         }
->  #undef SET_ISA_EXT_MAP
->                 }
+> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> index 3c8d68152bce..3176355cf4e9 100644
+> --- a/arch/riscv/include/asm/csr.h
+> +++ b/arch/riscv/include/asm/csr.h
+> @@ -131,25 +131,25 @@
+>
+>  #define HGATP32_MODE_SHIFT     31
+>  #define HGATP32_VMID_SHIFT     22
+> -#define HGATP32_VMID_MASK      _AC(0x1FC00000, UL)
+> -#define HGATP32_PPN            _AC(0x003FFFFF, UL)
+> +#define HGATP32_VMID           GENMASK(28, 22)
+> +#define HGATP32_PPN            GENMASK(21, 0)
+>
+>  #define HGATP64_MODE_SHIFT     60
+>  #define HGATP64_VMID_SHIFT     44
+> -#define HGATP64_VMID_MASK      _AC(0x03FFF00000000000, UL)
+> -#define HGATP64_PPN            _AC(0x00000FFFFFFFFFFF, UL)
+> +#define HGATP64_VMID           GENMASK(57, 44)
+> +#define HGATP64_PPN            GENMASK(43, 0)
+>
+>  #define HGATP_PAGE_SHIFT       12
+>
+>  #ifdef CONFIG_64BIT
+>  #define HGATP_PPN              HGATP64_PPN
+>  #define HGATP_VMID_SHIFT       HGATP64_VMID_SHIFT
+> -#define HGATP_VMID_MASK                HGATP64_VMID_MASK
+> +#define HGATP_VMID             HGATP64_VMID
+>  #define HGATP_MODE_SHIFT       HGATP64_MODE_SHIFT
+>  #else
+>  #define HGATP_PPN              HGATP32_PPN
+>  #define HGATP_VMID_SHIFT       HGATP32_VMID_SHIFT
+> -#define HGATP_VMID_MASK                HGATP32_VMID_MASK
+> +#define HGATP_VMID             HGATP32_VMID
+>  #define HGATP_MODE_SHIFT       HGATP32_MODE_SHIFT
+>  #endif
+>
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index dbc4ca060174..829a7065ae01 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -748,8 +748,7 @@ void kvm_riscv_gstage_update_hgatp(struct kvm_vcpu *vcpu)
+>         unsigned long hgatp = gstage_mode;
+>         struct kvm_arch *k = &vcpu->kvm->arch;
+>
+> -       hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) &
+> -                HGATP_VMID_MASK;
+> +       hgatp |= (READ_ONCE(k->vmid.vmid) << HGATP_VMID_SHIFT) & HGATP_VMID;
+>         hgatp |= (k->pgd_phys >> PAGE_SHIFT) & HGATP_PPN;
+>
+>         csr_write(CSR_HGATP, hgatp);
+> diff --git a/arch/riscv/kvm/vmid.c b/arch/riscv/kvm/vmid.c
+> index 6cd93995fb65..6f4d4979a759 100644
+> --- a/arch/riscv/kvm/vmid.c
+> +++ b/arch/riscv/kvm/vmid.c
+> @@ -26,9 +26,9 @@ void kvm_riscv_gstage_vmid_detect(void)
+>
+>         /* Figure-out number of VMID bits in HW */
+>         old = csr_read(CSR_HGATP);
+> -       csr_write(CSR_HGATP, old | HGATP_VMID_MASK);
+> +       csr_write(CSR_HGATP, old | HGATP_VMID);
+>         vmid_bits = csr_read(CSR_HGATP);
+> -       vmid_bits = (vmid_bits & HGATP_VMID_MASK) >> HGATP_VMID_SHIFT;
+> +       vmid_bits = (vmid_bits & HGATP_VMID) >> HGATP_VMID_SHIFT;
+>         vmid_bits = fls_long(vmid_bits);
+>         csr_write(CSR_HGATP, old);
+>
 > --
 > 2.34.1
 >
 
-
 Reviewed-by: Atish Patra <atishp@rivosinc.com>
+
 -- 
 Regards,
 Atish
