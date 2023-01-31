@@ -2,104 +2,133 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F388368274A
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 09:47:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B32A66827BE
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 09:55:33 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231344AbjAaIq5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 03:46:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32892 "EHLO
+        id S231878AbjAaIzT (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 03:55:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230204AbjAaIqP (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 03:46:15 -0500
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98F174B755
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 00:42:18 -0800 (PST)
-Received: by mail-pf1-x42f.google.com with SMTP id u5so9385526pfm.10
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 00:42:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=atishpatra.org; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=QCf7Gk9CER9TWykUKPKE3uoStZNM4xMJ4HlA3aUUy/0=;
-        b=PIGIv+QT6Tcw0pdKxDeDj70Nap7gwxtMtZ1HaWM625UXPMA5Hpbk7Z9His8VZC+5Gz
-         QG8u3EG3stDN8xxsQ2nF1PfP85vwpSwLs3AqkxTC8BaWWRBPTmIbAFKZl6Hg4jgvFs5i
-         mS1zfordJBrRShBB4GrTCJeolXPC3njm4kg0E=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=QCf7Gk9CER9TWykUKPKE3uoStZNM4xMJ4HlA3aUUy/0=;
-        b=s6f42n5CTM8Q7m7DIJDf+Z4HrJgvjuHywGxkDow28ILog1uS/2/KwqPd8Ep7ThblxJ
-         KtQUvcnLtaKItAGLLogG6Rupuy2bjd0a7Mq4QUlP0Jgc7u2t96v4OgYckdOGWn58CF4Q
-         4vIKdYDPUiy7fCDJWRoeGVhcnwhQq7W8950dCsUzZCIDw8CLCYoZdifa7kBWKPhivnWJ
-         cQR6Kk5YKM1DAqF2Robb0IXMraNI5FVCYr/ZCLKOlcU6qGx6vOtXxSKjWTPM+KltZHJF
-         4+Fjtqrc5cVx8IaoS9Amo9yiMWyTSIxKon/tSF+KFHh7u5zA9Wtue0D0zU/2cwQ++R3v
-         cWJQ==
-X-Gm-Message-State: AFqh2kqMj+JvX2JOz9AwDINAUz1c0Sg+xMSDkGoxyc0zn16MjiJlVZt7
-        M/qmZXOB+escXBlqMsjS1QEbyFse5/vv5ofr/MWG
-X-Google-Smtp-Source: AMrXdXszFabjY+wcSz9JtpixIdGjJb0a3PP/mXva2CxGh2plpw5ZvmZWOtSfnd7Z4hwO6O/meJS7najdjrX6RAvJJs4=
-X-Received: by 2002:a63:1011:0:b0:4c7:ef33:bbe1 with SMTP id
- f17-20020a631011000000b004c7ef33bbe1mr5876108pgl.73.1675154529449; Tue, 31
- Jan 2023 00:42:09 -0800 (PST)
+        with ESMTP id S232143AbjAaIyn (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 03:54:43 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B1564A20A
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 00:50:13 -0800 (PST)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 30V6TtjW015174
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 08:49:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=GO+RiA6QZjlk6a9RD+3C9jrUqRVuccFRan4BV8GHVjY=;
+ b=qK1ilDqHoVUjfCCdcPhNYVhssF9s9JR+2qK7O1RXLuZYimopHHNnOBdLg6AUgF3Tgd6S
+ e4tYrOnRC50Ele7UFeQyo4qFD3IE2rZYJgCUxklKhkWwfbN6ny0i3rJZUyQl80UH4PLW
+ e9VdBDd1YGX6tvBRalQPy8o09oY0Mo/TtOz8DZXY+Gb6LKM4hSofBdRNurfK+brxtOdB
+ j9Sg1+9z9oPxTkcAibF3E7flAcWAM6+YezJQkALo92oBzUO2BAjEx3/yPPpQh+wZ42aS
+ 1RbKbxfrD8+n6/0vLHsX59qUvqv3YtsK5USpSM9uqsD0bHIKJH4uy0DXpCeIOThLPkYJ pA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3news7u7w9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 08:49:33 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 30V8ToUd032439
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 08:49:33 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3news7u7vs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Jan 2023 08:49:32 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 30UL4BUR013445;
+        Tue, 31 Jan 2023 08:49:31 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ncvtyb8cc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 31 Jan 2023 08:49:31 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 30V8nR0819988830
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 31 Jan 2023 08:49:27 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7476520043;
+        Tue, 31 Jan 2023 08:49:27 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 06F4320040;
+        Tue, 31 Jan 2023 08:49:27 +0000 (GMT)
+Received: from [9.171.57.28] (unknown [9.171.57.28])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Tue, 31 Jan 2023 08:49:26 +0000 (GMT)
+Message-ID: <76cfa756-c3f5-8ab1-584f-c864be720717@linux.ibm.com>
+Date:   Tue, 31 Jan 2023 09:49:26 +0100
 MIME-Version: 1.0
-References: <20230128082847.3055316-1-apatel@ventanamicro.com>
-In-Reply-To: <20230128082847.3055316-1-apatel@ventanamicro.com>
-From:   Atish Patra <atishp@atishpatra.org>
-Date:   Tue, 31 Jan 2023 00:41:58 -0800
-Message-ID: <CAOnJCUKQwKpEPYgTG7OQtRDsmHBPpLYLPg5v6XM7AZqsrYupRA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] RISC-V: KVM: Fix privilege mode setting in kvm_riscv_vcpu_trap_redirect()
-To:     Anup Patel <apatel@ventanamicro.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Anup Patel <anup@brainfault.org>, kvm@vger.kernel.org,
-        kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [kvm-unit-tests PATCH v2 3/8] s390x/Makefile: fix `*.gbin` target
+ dependencies
+To:     Marc Hartmayer <mhartmay@linux.ibm.com>, kvm@vger.kernel.org
+Cc:     David Hildenbrand <david@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Nico Boehr <nrb@linux.ibm.com>, Thomas Huth <thuth@redhat.com>
+References: <20230119114045.34553-1-mhartmay@linux.ibm.com>
+ <20230119114045.34553-4-mhartmay@linux.ibm.com>
+Content-Language: en-US
+From:   Janosch Frank <frankja@linux.ibm.com>
+In-Reply-To: <20230119114045.34553-4-mhartmay@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Y5cp9gTCoEIbK4tGxwzZms485X7HLf7u
+X-Proofpoint-ORIG-GUID: XhSM_tyBiIHWdOKmX42wkfN9eZR8Chyr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-01-31_02,2023-01-30_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ clxscore=1015 priorityscore=1501 lowpriorityscore=0 adultscore=0
+ suspectscore=0 impostorscore=0 malwarescore=0 phishscore=0 bulkscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2301310075
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-        version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+        SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 28, 2023 at 12:28 AM Anup Patel <apatel@ventanamicro.com> wrote:
->
-> The kvm_riscv_vcpu_trap_redirect() should set guest privilege mode
-> to supervisor mode because guest traps/interrupts are always handled
-> in virtual supervisor mode.
->
-> Fixes: 9f7013265112 ("RISC-V: KVM: Handle MMIO exits for VCPU")
-> Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+On 1/19/23 12:40, Marc Hartmayer wrote:
+> If the linker scripts change, then the .gbin binaries must be rebuilt.
+> While at it, replace `$(SRCDIR)/s390x/snippets` with `$(SNIPPET_DIR)`
+> for these Makefile rules.
+> 
+> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+
 > ---
->  arch/riscv/kvm/vcpu_exit.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> index c9f741ab26f5..af7c4bc07929 100644
-> --- a/arch/riscv/kvm/vcpu_exit.c
-> +++ b/arch/riscv/kvm/vcpu_exit.c
-> @@ -160,6 +160,9 @@ void kvm_riscv_vcpu_trap_redirect(struct kvm_vcpu *vcpu,
->
->         /* Set Guest PC to Guest exception vector */
->         vcpu->arch.guest_context.sepc = csr_read(CSR_VSTVEC);
-> +
-> +       /* Set Guest privilege mode to supervisor */
-> +       vcpu->arch.guest_context.sstatus |= SR_SPP;
->  }
->
->  /*
-> --
-> 2.34.1
->
+>   s390x/Makefile | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/s390x/Makefile b/s390x/Makefile
+> index 660ff06f1e7c..71e6563bbb61 100644
+> --- a/s390x/Makefile
+> +++ b/s390x/Makefile
+> @@ -135,13 +135,13 @@ $(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
+>   $(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
+>   	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
+>   
+> -$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o
+> -	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/asm/flat.lds $<
+> +$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(SNIPPET_DIR)/asm/flat.lds
+> +	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/asm/flat.lds $<
+>   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
+>   	truncate -s '%4096' $@
+>   
+> -$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS)
+> -	$(CC) $(LDFLAGS) -o $@ -T $(SRCDIR)/s390x/snippets/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
+> +$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SNIPPET_DIR)/c/flat.lds
+> +	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
+>   	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
+>   	truncate -s '%4096' $@
+>   
 
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
-
--- 
-Regards,
-Atish
