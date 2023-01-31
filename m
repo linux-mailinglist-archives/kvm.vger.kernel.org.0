@@ -2,120 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6C43D682A56
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 11:22:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 98910682A7C
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 11:28:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231236AbjAaKWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 05:22:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48124 "EHLO
+        id S230404AbjAaK2z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 05:28:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230271AbjAaKWR (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 05:22:17 -0500
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 19FC01E5F8;
-        Tue, 31 Jan 2023 02:22:15 -0800 (PST)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DFD102F4;
-        Tue, 31 Jan 2023 02:22:56 -0800 (PST)
-Received: from FVFF77S0Q05N (unknown [10.57.12.254])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C65F63F64C;
-        Tue, 31 Jan 2023 02:22:12 -0800 (PST)
-Date:   Tue, 31 Jan 2023 10:22:09 +0000
-From:   Mark Rutland <mark.rutland@arm.com>
-To:     Josh Poimboeuf <jpoimboe@kernel.org>
-Cc:     Peter Zijlstra <peterz@infradead.org>,
-        Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>, kvm@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
-        Jiri Kosina <jikos@kernel.org>, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
-        live-patching@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>
-Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
- loaded vhost worker kthreads
-Message-ID: <Y9jr0fP7DtA9Of1L@FVFF77S0Q05N>
-References: <Y9KyVKQk3eH+RRse@alley>
- <Y9LswwnPAf+nOVFG@do-x1extreme>
- <20230127044355.frggdswx424kd5dq@treble>
- <Y9OpTtqWjAkC2pal@hirez.programming.kicks-ass.net>
- <20230127165236.rjcp6jm6csdta6z3@treble>
- <20230127170946.zey6xbr4sm4kvh3x@treble>
- <20230127221131.sdneyrlxxhc4h3fa@treble>
- <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
- <Y9gOMCWGmoc5GQMj@FVFF77S0Q05N>
- <20230130194823.6y3rc227bvsgele4@treble>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230130194823.6y3rc227bvsgele4@treble>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
+        with ESMTP id S229565AbjAaK2w (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 05:28:52 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4B7A2DE4A
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 02:28:51 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4639A614B5
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 10:28:51 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A61FCC433EF;
+        Tue, 31 Jan 2023 10:28:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675160930;
+        bh=CFpXrESVC1VdJC/0chHwon8lVrNNHg2Yos0VogDVZXk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=OUeXrhtJWXHtJce7JnnW0wsghJTKEZpyIB3fsQZDm6enKXhrI7pcsKyTbkOexod28
+         0A9T2eh5MVqP7Botskkqg2gQgQAmvWz1OLrwwQBp/g/grOdenkOCKH9yqd4QjHHKri
+         q75M1+5WX1631uzP8mYvAqunLhAUnD5igrMVnvrSLJZaW/8PyVszO3NoZVoABDCE1q
+         tpa6c48qQtwsgh7temQqia5CUUVW4ycBEVq+Iofq1FjQ8z2ZCA45hx3xNVJxtjyWhc
+         vknJYJ0t/D5M7KyKu75osVnUWPQ06Dv5uUuC3yccAs3bTrDsQ0RKMHBmwmaMUEFbaT
+         TF1nKdgEyRsBQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.95)
+        (envelope-from <maz@kernel.org>)
+        id 1pMnse-006A5h-B5;
+        Tue, 31 Jan 2023 10:28:48 +0000
+Date:   Tue, 31 Jan 2023 10:28:47 +0000
+Message-ID: <86h6w70zhc.wl-maz@kernel.org>
+From:   Marc Zyngier <maz@kernel.org>
+To:     Ricardo Koller <ricarkol@google.com>
+Cc:     Oliver Upton <oliver.upton@linux.dev>, pbonzini@redhat.com,
+        oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com,
+        kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com,
+        catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com,
+        alexandru.elisei@arm.com, suzuki.poulose@arm.com,
+        eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com,
+        rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+Subject: Re: [PATCH 6/9] KVM: arm64: Split huge pages when dirty logging is enabled
+In-Reply-To: <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
+References: <20230113035000.480021-1-ricarkol@google.com>
+        <20230113035000.480021-7-ricarkol@google.com>
+        <Y9BfdgL+JSYCirvm@thinky-boi>
+        <CAOHnOrysMhp_8Kdv=Pe-O8ZGDbhN5HiHWVhBv795_E6+4RAzPw@mail.gmail.com>
+        <86v8ktkqfx.wl-maz@kernel.org>
+        <CAOHnOrx-vvuZ9n8xDRmJTBCZNiqvcqURVyrEt2tDpw5bWT0qew@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: ricarkol@google.com, oliver.upton@linux.dev, pbonzini@redhat.com, oupton@google.com, yuzenghui@huawei.com, dmatlack@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, qperret@google.com, catalin.marinas@arm.com, andrew.jones@linux.dev, seanjc@google.com, alexandru.elisei@arm.com, suzuki.poulose@arm.com, eric.auger@redhat.com, gshan@redhat.com, reijiw@google.com, rananta@google.com, bgardon@google.com, ricarkol@gmail.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Mon, Jan 30, 2023 at 11:48:23AM -0800, Josh Poimboeuf wrote:
-> On Mon, Jan 30, 2023 at 06:36:32PM +0000, Mark Rutland wrote:
-> > On Mon, Jan 30, 2023 at 01:40:18PM +0100, Peter Zijlstra wrote:
-> > > On Fri, Jan 27, 2023 at 02:11:31PM -0800, Josh Poimboeuf wrote:
-> > > > @@ -8500,8 +8502,10 @@ EXPORT_STATIC_CALL_TRAMP(might_resched);
-> > > >  static DEFINE_STATIC_KEY_FALSE(sk_dynamic_cond_resched);
-> > > >  int __sched dynamic_cond_resched(void)
-> > > >  {
-> > > > -	if (!static_branch_unlikely(&sk_dynamic_cond_resched))
-> > > > +	if (!static_branch_unlikely(&sk_dynamic_cond_resched)) {
-> > > > +		klp_sched_try_switch();
-> > > >  		return 0;
-> > > > +	}
-> > > >  	return __cond_resched();
-> > > >  }
-> > > >  EXPORT_SYMBOL(dynamic_cond_resched);
-> > > 
-> > > I would make the klp_sched_try_switch() not depend on
-> > > sk_dynamic_cond_resched, because __cond_resched() is not a guaranteed
-> > > pass through __schedule().
-> > > 
-> > > But you'll probably want to check with Mark here, this all might
-> > > generate crap code on arm64.
-> > 
-> > IIUC here klp_sched_try_switch() is a static call, so on arm64 this'll generate
-> > at least a load, a conditional branch, and an indirect branch. That's not
-> > ideal, but I'd have to benchmark it to find out whether it's a significant
-> > overhead relative to the baseline of PREEMPT_DYNAMIC.
-> > 
-> > For arm64 it'd be a bit nicer to have another static key check, and a call to
-> > __klp_sched_try_switch(). That way the static key check gets turned into a NOP
-> > in the common case, and the call to __klp_sched_try_switch() can be a direct
-> > call (potentially a tail-call if we made it return 0).
+On Fri, 27 Jan 2023 15:45:15 +0000,
+Ricardo Koller <ricarkol@google.com> wrote:
 > 
-> Hm, it might be nice if our out-of-line static call implementation would
-> automatically do a static key check as part of static_call_cond() for
-> NULL-type static calls.
+> > The one thing that would convince me to make it an option is the
+> > amount of memory this thing consumes. 512+ pages is a huge amount, and
+> > I'm not overly happy about that. Why can't this be a userspace visible
+> > option, selectable on a per VM (or memslot) basis?
+> >
 > 
-> But the best answer is probably to just add inline static calls to
-> arm64.  Is the lack of objtool the only thing blocking that?
+> It should be possible.  I am exploring a couple of ideas that could
+> help when the hugepages are not 1G (e.g., 2M).  However, they add
+> complexity and I'm not sure they help much.
+> 
+> (will be using PAGE_SIZE=4K to make things simpler)
+> 
+> This feature pre-allocates 513 pages before splitting every 1G range.
+> For example, it converts 1G block PTEs into trees made of 513 pages.
+> When not using this feature, the same 513 pages would be allocated,
+> but lazily over a longer period of time.
 
-The major issues were branch range limitations (and needing the linker to add
-PLTs), and painful instruction patching requirements (e.g. the architecture's
-"CMODX" rules for Concurrent MODification and eXecution of instructions). We
-went with the static key scheme above because that was what our assembled code
-generation would devolve to anyway.
+This is an important difference. It avoids the upfront allocation
+"thermal shock", giving time to the kernel to reclaim memory from
+somewhere else. Doing it upfront means you *must* have 2MB+ of
+immediately available memory for each GB of RAM you guest uses.
 
-If we knew each call-site would only call a particular function or skip the
-call, then we could do better (and would probably need something like objtool
-to NOP that out at compile time), but since we don't know the callee at build
-time we can't ensure we have a PLT in range when necessary.
+> 
+> Eager-splitting pre-allocates those pages in order to split huge-pages
+> into fully populated trees.  Which is needed in order to use FEAT_BBM
+> and skipping the expensive TLBI broadcasts.  513 is just the number of
+> pages needed to break a 1G huge-page.
 
-> Objtool is now modular, so all the controversial CFG reverse engineering
-> is now optional, so it shouldn't be too hard to just enable objtool for
-> static call inlines.
+I understand that. But it also clear that 1GB huge pages are unlikely
+to be THPs, and I wonder if we should treat the two differently. Using
+HugeTLBFS pages is significant here.
 
-Funnily enough, I spent some time yesterday looking at enabling a trivial
-objtool for arm64 as I wanted some basic ELF rewriting functionality (to
-manipulate the mcount_loc table). So I'll likely be looking at that soon
-regardless of static calls. :)
+> 
+> We could optimize for smaller huge-pages, like 2M by splitting 1
+> huge-page at a time: only preallocate one 4K page at a time.  The
+> trick is how to know that we are splitting 2M huge-pages.  We could
+> either get the vma pagesize or use hints from userspace.  I'm not sure
+> that this is worth it though.  The user will most likely want to split
+> big ranges of memory (>1G), so optimizing for smaller huge-pages only
+> converts the left into the right:
+> 
+> alloc 1 page            |    |  alloc 512 pages
+> split 2M huge-page      |    |  split 2M huge-page
+> alloc 1 page            |    |  split 2M huge-page
+> split 2M huge-page      | => |  split 2M huge-page
+>                         ...
+> alloc 1 page            |    |  split 2M huge-page
+> split 2M huge-page      |    |  split 2M huge-page
+> 
+> Still thinking of what else to do.
+
+I think the 1G case fits your own use case, but I doubt this covers
+the majority of the users. Most people rely on the kernel ability to
+use THPs, which are capped at the first level of block mapping.
+
+2MB (and 32MB for 16kB base pages) are the most likely mappings in my
+experience (512MB with 64kB pages are vanishingly rare).
+
+Having to pay an upfront cost for HugeTLBFS doesn't shock me, and it
+fits the model. For THPs, where everything is opportunistic and the
+user not involved, this is a lot more debatable.
+
+This is why I'd like this behaviour to be a buy-in, either directly (a
+first class userspace API) or indirectly (the provenance of the
+memory).
 
 Thanks,
-Mark.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
