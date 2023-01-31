@@ -2,40 +2,40 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0A7DD682930
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:42:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0A3E868292E
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 10:42:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232321AbjAaJmW (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 04:42:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41018 "EHLO
+        id S232562AbjAaJmS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 04:42:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232253AbjAaJmV (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 04:42:21 -0500
+        with ESMTP id S232153AbjAaJmQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 04:42:16 -0500
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF66410BD
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:41:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BF913402F
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 01:41:41 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4015761489
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:41:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A65A1C433D2;
-        Tue, 31 Jan 2023 09:41:42 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A32BD61480
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 09:41:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17DABC433EF;
+        Tue, 31 Jan 2023 09:41:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1675158102;
-        bh=dhvTz42JuyazXpHz1ww4ODtTIeXpTYgqJ/HxgzVe05I=;
+        s=k20201202; t=1675158100;
+        bh=/QY1FPyGRGaFdavJIbYCnyzWzBu7xwfwmRblKc+JKKs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=n3bxXxfv1nzA7Q3ssHo+NQw0xe1S0gZuLWQAF9Y1zz7Yl1CCVPhrpV8CJy2C0Fl6M
-         Kcz3CS/KQ8i8w3UlZn3FSeXML/7tVyU7Brq+f+FLNk8hE1Y/uxTIMQMgtNh/Pqktij
-         8fi76IpMBi3ftiJTD2euN11U496HzLmw+Y+au9KHlPFpcmPBxEbgWE8S8PSAGfv0wo
-         PQtx1wdjJ7bwOAo1nHUX8FNVfQm6C2yEST6qJhlYABiTS2kzY9O4thNzwVm/i0tdjF
-         emeUGGFyhV3SKQkLGjsBXl7rYzihXol6st7JCH4Lh0sWx+sbG8rjXddc6DgcmPxwIW
-         9GCWxZREMwnfQ==
+        b=cNOvakJ6KCxiNC2UdKi5Sf0dZeX0nDqa5Zkp8T82mZ7zRqnkXXnXjX6kQ/PoM2MRE
+         LedmDUu2cbkFXnQiGD0QiYuALCXDRHccVe3HI8qa2nQe8zbmQdEwn1+iotwBPGXbiF
+         Y1ODgnW/jwjAttTAOXinLsT8r/qP0cGrMGGfNcecaa2kd3g5MLN6jrYhJwwZlMiOQm
+         1ogTEhwGDUTKBgUcID4yHc28sv7YHL1JRbD60+861rdBLP2JwAwnYVCgJXBw5OUHcq
+         esS3MMlS4cVaU0eaxcI6xIYSnexvktKrTTKHjXLYinKZHNI1TL/VxcEK5Lxe9Fr4ob
+         RAh5hqY5kt1FA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
         by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.95)
         (envelope-from <maz@kernel.org>)
-        id 1pMmtT-0067U2-LQ;
+        id 1pMmtT-0067U2-Te;
         Tue, 31 Jan 2023 09:25:35 +0000
 From:   Marc Zyngier <maz@kernel.org>
 To:     kvmarm@lists.linux.dev, kvm@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>,
         Oliver Upton <oliver.upton@linux.dev>,
         Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH v8 22/69] KVM: arm64: nv: Handle PSCI call via smc from the guest
-Date:   Tue, 31 Jan 2023 09:24:17 +0000
-Message-Id: <20230131092504.2880505-23-maz@kernel.org>
+Subject: [PATCH v8 23/69] KVM: arm64: nv: Respect virtual HCR_EL2.TWX setting
+Date:   Tue, 31 Jan 2023 09:24:18 +0000
+Message-Id: <20230131092504.2880505-24-maz@kernel.org>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230131092504.2880505-1-maz@kernel.org>
 References: <20230131092504.2880505-1-maz@kernel.org>
@@ -74,69 +74,66 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Jintack Lim <jintack.lim@linaro.org>
 
-VMs used to execute hvc #0 for the psci call if EL3 is not implemented.
-However, when we come to provide the virtual EL2 mode to the VM, the
-host OS inside the VM calls kvm_call_hyp() which is also hvc #0. So,
-it's hard to differentiate between them from the host hypervisor's point
-of view.
+Forward exceptions due to WFI or WFE instructions to the virtual EL2 if
+they are not coming from the virtual EL2 and virtual HCR_EL2.TWX is set.
 
-So, let the VM execute smc instruction for the psci call. On ARMv8.3,
-even if EL3 is not implemented, a smc instruction executed at non-secure
-EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than being treated as
-UNDEFINED. So, the host hypervisor can handle this psci call without any
-confusion.
-
-Reviewed-by: Alexandru Elisei <alexandru.elisei@arm.com>
 Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/handle_exit.c | 24 ++++++++++++++++++++++--
- 1 file changed, 22 insertions(+), 2 deletions(-)
+ arch/arm64/include/asm/kvm_emulate.h | 14 ++++++++++++++
+ arch/arm64/kvm/handle_exit.c         |  6 +++++-
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
-index e75101f2aa6c..b0c343c4e062 100644
---- a/arch/arm64/kvm/handle_exit.c
-+++ b/arch/arm64/kvm/handle_exit.c
-@@ -63,6 +63,8 @@ static int handle_hvc(struct kvm_vcpu *vcpu)
- 
- static int handle_smc(struct kvm_vcpu *vcpu)
- {
-+	int ret;
-+
- 	/*
- 	 * "If an SMC instruction executed at Non-secure EL1 is
- 	 * trapped to EL2 because HCR_EL2.TSC is 1, the exception is a
-@@ -70,10 +72,28 @@ static int handle_smc(struct kvm_vcpu *vcpu)
- 	 *
- 	 * We need to advance the PC after the trap, as it would
- 	 * otherwise return to the same address...
-+	 *
-+	 * If imm is non-zero, it's not defined, so just skip it.
-+	 */
-+	if (kvm_vcpu_hvc_get_imm(vcpu)) {
-+		vcpu_set_reg(vcpu, 0, ~0UL);
-+		kvm_incr_pc(vcpu);
-+		return 1;
-+	}
-+
-+	/*
-+	 * If imm is zero, it's a psci call.
-+	 * Note that on ARMv8.3, even if EL3 is not implemented, SMC executed
-+	 * at Non-secure EL1 is trapped to EL2 if HCR_EL2.TSC==1, rather than
-+	 * being treated as UNDEFINED.
- 	 */
--	vcpu_set_reg(vcpu, 0, ~0UL);
-+	ret = kvm_hvc_call_handler(vcpu);
-+	if (ret < 0)
-+		vcpu_set_reg(vcpu, 0, ~0UL);
-+
- 	kvm_incr_pc(vcpu);
--	return 1;
-+
-+	return ret;
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 2f5d3e27c017..6e9c0d76a818 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -17,6 +17,7 @@
+ #include <asm/esr.h>
+ #include <asm/kvm_arm.h>
+ #include <asm/kvm_hyp.h>
++#include <asm/kvm_nested.h>
+ #include <asm/ptrace.h>
+ #include <asm/cputype.h>
+ #include <asm/virt.h>
+@@ -333,6 +334,19 @@ static __always_inline u64 kvm_vcpu_get_esr(const struct kvm_vcpu *vcpu)
+ 	return vcpu->arch.fault.esr_el2;
  }
  
- /*
++static inline bool guest_hyp_wfx_traps_enabled(const struct kvm_vcpu *vcpu)
++{
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
++	u64 hcr_el2 = __vcpu_sys_reg(vcpu, HCR_EL2);
++
++	if (!vcpu_has_nv(vcpu) || vcpu_is_el2(vcpu))
++		return false;
++
++	return ((is_wfe && (hcr_el2 & HCR_TWE)) ||
++		(!is_wfe && (hcr_el2 & HCR_TWI)));
++}
++
+ static __always_inline int kvm_vcpu_get_condition(const struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index b0c343c4e062..ea73b47b99ac 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -124,8 +124,12 @@ static int handle_no_fpsimd(struct kvm_vcpu *vcpu)
+ static int kvm_handle_wfx(struct kvm_vcpu *vcpu)
+ {
+ 	u64 esr = kvm_vcpu_get_esr(vcpu);
++	bool is_wfe = !!(esr & ESR_ELx_WFx_ISS_WFE);
+ 
+-	if (esr & ESR_ELx_WFx_ISS_WFE) {
++	if (guest_hyp_wfx_traps_enabled(vcpu))
++		return kvm_inject_nested_sync(vcpu, kvm_vcpu_get_esr(vcpu));
++
++	if (is_wfe) {
+ 		trace_kvm_wfx_arm64(*vcpu_pc(vcpu), true);
+ 		vcpu->stat.wfe_exit_stat++;
+ 	} else {
 -- 
 2.34.1
 
