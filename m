@@ -2,41 +2,41 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 4DC1C683807
+	by mail.lfdr.de (Postfix) with ESMTP id 99573683808
 	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 21:56:03 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230189AbjAaUze (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 15:55:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54608 "EHLO
+        id S231836AbjAaUzm (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 15:55:42 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56370 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231775AbjAaUz2 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 15:55:28 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47EDDCC15
-        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 12:54:41 -0800 (PST)
+        with ESMTP id S231220AbjAaUzl (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 15:55:41 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89BA993FF
+        for <kvm@vger.kernel.org>; Tue, 31 Jan 2023 12:54:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675198480;
+        s=mimecast20190719; t=1675198485;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=bwIpAqcX+KnGrnnAkFDnrt9OFoUGPx1pO+F4THaPIKA=;
-        b=Ivul+8Oh9C4Ml2YoJC7UxlTpRxsNBuW1wMwKbRMqIWQmUU3ZNsJW5mSzdpQgqwNbojwoY9
-        H4nI5pRK53TXBJFv2l7/dVs5rd9hQbm/ZnjqczaDo62tbd45KeJEakdQhFjabPBDqDUPBC
-        sUA/CKyAgMgG89O0k/9jrnfYr5AEzHU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=tT440oPsmvWe/E/zglkAuS0Ga4poZPOBe1uTUysR0cY=;
+        b=HoqJXTvsS9cXWeZVz1ktq+scUwsARztALH8C9n3gBJTjMZvFqSV3l2mdO22HffBG6H6boH
+        cTfv4Ffg3JcE7HUNU+NtPo3GtNAiPCk13AjLu/nraNJeei/yIOvjOTVazshGol8EU60Gw0
+        SSRNoosukhuok1x4gFvJGelYrA2/SWM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-9-KCVD7BVlOhWNQgDhwdbZIw-1; Tue, 31 Jan 2023 15:54:36 -0500
-X-MC-Unique: KCVD7BVlOhWNQgDhwdbZIw-1
+ us-mta-626-cTHNZsW8PLWB80HhygJ1MQ-1; Tue, 31 Jan 2023 15:54:42 -0500
+X-MC-Unique: cTHNZsW8PLWB80HhygJ1MQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EF619811E6E;
-        Tue, 31 Jan 2023 20:54:34 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 937AA2804823;
+        Tue, 31 Jan 2023 20:54:41 +0000 (UTC)
 Received: from laptop.redhat.com (unknown [10.39.193.239])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2184040C2064;
-        Tue, 31 Jan 2023 20:54:28 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4E49840C2064;
+        Tue, 31 Jan 2023 20:54:35 +0000 (UTC)
 From:   Eric Auger <eric.auger@redhat.com>
 To:     eric.auger.pro@gmail.com, eric.auger@redhat.com,
         yi.l.liu@intel.com, yi.y.sun@intel.com, alex.williamson@redhat.com,
@@ -49,9 +49,9 @@ Cc:     david@gibson.dropbear.id.au, thuth@redhat.com,
         peterx@redhat.com, shameerali.kolothum.thodi@huawei.com,
         zhangfei.gao@linaro.org, berrange@redhat.com, apopple@nvidia.com,
         suravee.suthikulpanit@amd.com
-Subject: [RFC v3 12/18] vfio/container-base: Introduce [attach/detach]_device container callbacks
-Date:   Tue, 31 Jan 2023 21:52:59 +0100
-Message-Id: <20230131205305.2726330-13-eric.auger@redhat.com>
+Subject: [RFC v3 13/18] vfio/container-base: Introduce VFIOContainer reset callback
+Date:   Tue, 31 Jan 2023 21:53:00 +0100
+Message-Id: <20230131205305.2726330-14-eric.auger@redhat.com>
 In-Reply-To: <20230131205305.2726330-1-eric.auger@redhat.com>
 References: <20230131205305.2726330-1-eric.auger@redhat.com>
 MIME-Version: 1.0
@@ -67,132 +67,180 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Let's turn attach/detach_device as container callbacks. That way,
-their implementation can be easily customized for a given backend.
-
-For the time being, only the legacy container is supported.
+Reset implementation depends on the container backend. Let's
+introduce a VFIOContainer class function and register a generic
+reset handler that will be able to call the right reset function
+depending on the container type. Also, let's move the
+registration/unregistration to a place that is not backend-specific
+(first vfio address space created instead of the first group).
 
 Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- include/hw/vfio/vfio-common.h         |  1 +
  include/hw/vfio/vfio-container-base.h |  2 ++
- hw/vfio/as.c                          | 21 +++++++++++++++++++++
- hw/vfio/container.c                   |  9 +++++++--
- hw/vfio/pci.c                         |  2 +-
- 5 files changed, 32 insertions(+), 3 deletions(-)
+ hw/vfio/as.c                          | 18 ++++++++++++++++++
+ hw/vfio/container-base.c              |  9 +++++++++
+ hw/vfio/container.c                   | 27 +++++++++++++++------------
+ 4 files changed, 44 insertions(+), 12 deletions(-)
 
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 1580f9617c..4f89657ac1 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -86,6 +86,7 @@ typedef struct VFIODeviceOps VFIODeviceOps;
- typedef struct VFIODevice {
-     QLIST_ENTRY(VFIODevice) next;
-     struct VFIOGroup *group;
-+    VFIOContainer *container;
-     char *sysfsdev;
-     char *name;
-     DeviceState *dev;
 diff --git a/include/hw/vfio/vfio-container-base.h b/include/hw/vfio/vfio-container-base.h
-index 6080a588bf..5e47faf293 100644
+index 5e47faf293..8ffd94f8ae 100644
 --- a/include/hw/vfio/vfio-container-base.h
 +++ b/include/hw/vfio/vfio-container-base.h
-@@ -133,6 +133,8 @@ struct VFIOIOMMUBackendOpsClass {
-     int (*dma_unmap)(VFIOContainer *container,
-                      hwaddr iova, ram_addr_t size,
+@@ -97,6 +97,7 @@ int vfio_container_dma_map(VFIOContainer *container,
+ int vfio_container_dma_unmap(VFIOContainer *container,
+                              hwaddr iova, ram_addr_t size,
+                              IOMMUTLBEntry *iotlb);
++int vfio_container_reset(VFIOContainer *container);
+ bool vfio_container_devices_all_dirty_tracking(VFIOContainer *container);
+ void vfio_container_set_dirty_page_tracking(VFIOContainer *container,
+                                             bool start);
+@@ -135,6 +136,7 @@ struct VFIOIOMMUBackendOpsClass {
                       IOMMUTLBEntry *iotlb);
-+    int (*attach_device)(VFIODevice *vbasedev, AddressSpace *as, Error **errp);
-+    void (*detach_device)(VFIODevice *vbasedev);
+     int (*attach_device)(VFIODevice *vbasedev, AddressSpace *as, Error **errp);
+     void (*detach_device)(VFIODevice *vbasedev);
++    int (*reset)(VFIOContainer *container);
      /* migration feature */
      bool (*devices_all_dirty_tracking)(VFIOContainer *container);
      void (*set_dirty_page_tracking)(VFIOContainer *container, bool start);
 diff --git a/hw/vfio/as.c b/hw/vfio/as.c
-index 6a5f3f80b5..d212974b9b 100644
+index d212974b9b..f186d0b789 100644
 --- a/hw/vfio/as.c
 +++ b/hw/vfio/as.c
-@@ -851,6 +851,27 @@ void vfio_put_address_space(VFIOAddressSpace *space)
+@@ -823,6 +823,18 @@ const MemoryListener vfio_memory_listener = {
+     .log_sync = vfio_listener_log_sync,
+ };
+ 
++void vfio_reset_handler(void *opaque)
++{
++    VFIOAddressSpace *space;
++    VFIOContainer *bcontainer;
++
++    QLIST_FOREACH(space, &vfio_address_spaces, list) {
++         QLIST_FOREACH(bcontainer, &space->containers, next) {
++             vfio_container_reset(bcontainer);
++         }
++    }
++}
++
+ VFIOAddressSpace *vfio_get_address_space(AddressSpace *as)
+ {
+     VFIOAddressSpace *space;
+@@ -838,6 +850,9 @@ VFIOAddressSpace *vfio_get_address_space(AddressSpace *as)
+     space->as = as;
+     QLIST_INIT(&space->containers);
+ 
++    if (QLIST_EMPTY(&vfio_address_spaces)) {
++        qemu_register_reset(vfio_reset_handler, NULL);
++    }
+     QLIST_INSERT_HEAD(&vfio_address_spaces, space, list);
+ 
+     return space;
+@@ -849,6 +864,9 @@ void vfio_put_address_space(VFIOAddressSpace *space)
+         QLIST_REMOVE(space, list);
+         g_free(space);
      }
++    if (QLIST_EMPTY(&vfio_address_spaces)) {
++        qemu_unregister_reset(vfio_reset_handler, NULL);
++    }
  }
  
-+int vfio_attach_device(VFIODevice *vbasedev, AddressSpace *as, Error **errp)
+ int vfio_attach_device(VFIODevice *vbasedev, AddressSpace *as, Error **errp)
+diff --git a/hw/vfio/container-base.c b/hw/vfio/container-base.c
+index b4ce0cd89a..3ae939c6c9 100644
+--- a/hw/vfio/container-base.c
++++ b/hw/vfio/container-base.c
+@@ -58,6 +58,15 @@ int vfio_container_dma_unmap(VFIOContainer *container,
+     return container->ops->dma_unmap(container, iova, size, iotlb);
+ }
+ 
++int vfio_container_reset(VFIOContainer *container)
 +{
-+    const VFIOIOMMUBackendOpsClass *ops;
-+
-+    ops = VFIO_IOMMU_BACKEND_OPS_CLASS(
-+                  object_class_by_name(TYPE_VFIO_IOMMU_BACKEND_LEGACY_OPS));
-+    if (!ops) {
-+        error_setg(errp, "VFIO IOMMU Backend not found!");
-+        return -ENODEV;
++    if (!container->ops->reset) {
++        return -ENOENT;
 +    }
-+    return ops->attach_device(vbasedev, as, errp);
++
++    return container->ops->reset(container);
 +}
 +
-+void vfio_detach_device(VFIODevice *vbasedev)
-+{
-+    if (!vbasedev->container) {
-+        return;
-+    }
-+    vbasedev->container->ops->detach_device(vbasedev);
-+}
-+
- static const TypeInfo vfio_iommu_backend_ops_type_info = {
-     .name = TYPE_VFIO_IOMMU_BACKEND_OPS,
-     .parent = TYPE_OBJECT,
+ void vfio_container_set_dirty_page_tracking(VFIOContainer *container,
+                                             bool start)
+ {
 diff --git a/hw/vfio/container.c b/hw/vfio/container.c
-index b9ee56067c..e99d12f4d8 100644
+index e99d12f4d8..61caf388c2 100644
 --- a/hw/vfio/container.c
 +++ b/hw/vfio/container.c
-@@ -1278,7 +1278,8 @@ static int vfio_device_groupid(VFIODevice *vbasedev, Error **errp)
-     return groupid;
+@@ -520,12 +520,16 @@ bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
+     return true;
  }
  
--int vfio_attach_device(VFIODevice *vbasedev, AddressSpace *as, Error **errp)
-+static int
-+vfio_legacy_attach_device(VFIODevice *vbasedev, AddressSpace *as, Error **errp)
+-void vfio_reset_handler(void *opaque)
++static int vfio_legacy_container_reset(VFIOContainer *bcontainer)
  {
-     int groupid = vfio_device_groupid(vbasedev, errp);
-     VFIODevice *vbasedev_iter;
-@@ -1307,14 +1308,16 @@ int vfio_attach_device(VFIODevice *vbasedev, AddressSpace *as, Error **errp)
-         vfio_put_group(group);
-         return -1;
++    VFIOLegacyContainer *container = container_of(bcontainer,
++                                                  VFIOLegacyContainer,
++                                                  bcontainer);
+     VFIOGroup *group;
+     VFIODevice *vbasedev;
++    int ret, final_ret = 0;
+ 
+-    QLIST_FOREACH(group, &vfio_group_list, next) {
++    QLIST_FOREACH(group, &container->group_list, container_next) {
+         QLIST_FOREACH(vbasedev, &group->device_list, next) {
+             if (vbasedev->dev->realized) {
+                 vbasedev->ops->vfio_compute_needs_reset(vbasedev);
+@@ -533,13 +537,19 @@ void vfio_reset_handler(void *opaque)
+         }
      }
-+    vbasedev->container = &group->container->bcontainer;
  
-     return 0;
+-    QLIST_FOREACH(group, &vfio_group_list, next) {
++    QLIST_FOREACH(group, &container->group_list, next) {
+         QLIST_FOREACH(vbasedev, &group->device_list, next) {
+             if (vbasedev->dev->realized && vbasedev->needs_reset) {
+-                vbasedev->ops->vfio_hot_reset_multi(vbasedev);
++                ret = vbasedev->ops->vfio_hot_reset_multi(vbasedev);
++                if (ret) {
++                    error_report("failed to reset %s (%d)",
++                                 vbasedev->name, ret);
++                    final_ret = ret;
++                }
+             }
+         }
+     }
++    return final_ret;
  }
  
--void vfio_detach_device(VFIODevice *vbasedev)
-+static void vfio_legacy_detach_device(VFIODevice *vbasedev)
- {
-     vfio_put_base_device(vbasedev);
-     vfio_put_group(vbasedev->group);
-+    vbasedev->container = NULL;
+ static void vfio_kvm_device_add_group(VFIOGroup *group)
+@@ -1045,10 +1055,6 @@ static VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
+         goto close_fd_exit;
+     }
+ 
+-    if (QLIST_EMPTY(&vfio_group_list)) {
+-        qemu_register_reset(vfio_reset_handler, NULL);
+-    }
+-
+     QLIST_INSERT_HEAD(&vfio_group_list, group, next);
+ 
+     return group;
+@@ -1077,10 +1083,6 @@ static void vfio_put_group(VFIOGroup *group)
+     trace_vfio_put_group(group->fd);
+     close(group->fd);
+     g_free(group);
+-
+-    if (QLIST_EMPTY(&vfio_group_list)) {
+-        qemu_unregister_reset(vfio_reset_handler, NULL);
+-    }
  }
  
- static void vfio_iommu_backend_legacy_ops_class_init(ObjectClass *oc,
-@@ -1329,6 +1332,8 @@ static void vfio_iommu_backend_legacy_ops_class_init(ObjectClass *oc,
-     ops->add_window = vfio_legacy_container_add_section_window;
-     ops->del_window = vfio_legacy_container_del_section_window;
+ static int vfio_get_device(VFIOGroup *group, const char *name,
+@@ -1334,6 +1336,7 @@ static void vfio_iommu_backend_legacy_ops_class_init(ObjectClass *oc,
      ops->check_extension = vfio_legacy_container_check_extension;
-+    ops->attach_device = vfio_legacy_attach_device;
-+    ops->detach_device = vfio_legacy_detach_device;
+     ops->attach_device = vfio_legacy_attach_device;
+     ops->detach_device = vfio_legacy_detach_device;
++    ops->reset = vfio_legacy_container_reset;
  }
  
  static const TypeInfo vfio_iommu_backend_legacy_ops_type = {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 9856d81819..07361a6fcd 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -3106,7 +3106,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
-     }
- 
-     if (!pdev->failover_pair_id &&
--        vfio_container_check_extension(&vbasedev->group->container->bcontainer,
-+        vfio_container_check_extension(vbasedev->container,
-                                        VFIO_FEAT_LIVE_MIGRATION)) {
-         ret = vfio_migration_probe(vbasedev, errp);
-         if (ret) {
 -- 
 2.37.3
 
