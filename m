@@ -2,111 +2,104 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 32665682EBC
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 15:03:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 91E64682EF8
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 15:15:11 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230110AbjAaODx (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 09:03:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40740 "EHLO
+        id S232139AbjAaOPJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 09:15:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231360AbjAaODv (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 09:03:51 -0500
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AB0B61BD;
-        Tue, 31 Jan 2023 06:03:40 -0800 (PST)
-Received: by mail-wm1-f43.google.com with SMTP id k8-20020a05600c1c8800b003dc57ea0dfeso4552391wms.0;
-        Tue, 31 Jan 2023 06:03:40 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zP46eoHMy0QQYTCPonziWXrKVD1CtL7gNynXxWXBiio=;
-        b=6jQm+uCmIMmc/4gOCx3vkY/f3Z3oaCum6+M5Cu4QWThbPQHgMoMcYMx4V6CIqf+UCm
-         iQVfwa4xrX0x4csk5X3VMFvdzTwdK+vHNJ7pFgWMBTXEWlCsNtbqJ9lFWJNGJvDRIX2+
-         jdeHXdoXTRqVoOF6a11ViVqXANHs/90MnjofiwRRORdr5Fj8mRVPHvVvOcPOOVc47YlP
-         RpF8f9tcwn8PjujgeNUGoxxRlFUI9wIM8DBc6O+2fPSHjKFWLGu75uhquOvoc1USltSg
-         x3mcFXzpX6rplncll1wrowDGluRe7xjyanN/ghp+uvFgek45KX4mEPQV+2WY0MYSca2b
-         63yA==
-X-Gm-Message-State: AFqh2koCZmvKNF2KQvQn35S//idBJdR3yx3/EDq1Jdkiz+rWYSojqxZ5
-        pXfcALS1IjeByx4ttnSqGwo=
-X-Google-Smtp-Source: AMrXdXsiOeq0P18xWjlHlrkHIORAOC9Tm4WATFMzLHCkskZWUoYwpSM042wufE/gqI38lYzh8zU3Dg==
-X-Received: by 2002:a05:600c:4fc9:b0:3d9:f769:2115 with SMTP id o9-20020a05600c4fc900b003d9f7692115mr54372049wmq.26.1675173818996;
-        Tue, 31 Jan 2023 06:03:38 -0800 (PST)
-Received: from liuwe-devbox-debian-v2 ([51.145.34.42])
-        by smtp.gmail.com with ESMTPSA id w10-20020adfcd0a000000b002bff7caa1c2sm3834349wrm.0.2023.01.31.06.03.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Jan 2023 06:03:38 -0800 (PST)
-Date:   Tue, 31 Jan 2023 14:03:36 +0000
-From:   Wei Liu <wei.liu@kernel.org>
-To:     Tianyu Lan <ltykernel@gmail.com>
-Cc:     luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com,
-        jgross@suse.com, tiala@microsoft.com, kirill@shutemov.name,
-        jiangshan.ljs@antgroup.com, peterz@infradead.org,
-        ashish.kalra@amd.com, srutherford@google.com,
-        akpm@linux-foundation.org, anshuman.khandual@arm.com,
-        pawan.kumar.gupta@linux.intel.com, adrian.hunter@intel.com,
-        daniel.sneddon@linux.intel.com, alexander.shishkin@linux.intel.com,
-        sandipan.das@amd.com, ray.huang@amd.com, brijesh.singh@amd.com,
-        michael.roth@amd.com, thomas.lendacky@amd.com,
-        venu.busireddy@oracle.com, sterritt@google.com,
-        tony.luck@intel.com, samitolvanen@google.com, fenghua.yu@intel.com,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org,
-        Wei Liu <wei.liu@kernel.org>
-Subject: Re: [RFC PATCH V3 09/16] x86/hyperv: SEV-SNP enlightened guest don't
- support legacy rtc
-Message-ID: <Y9kfuFGVoIlOfnoK@liuwe-devbox-debian-v2>
-References: <20230122024607.788454-1-ltykernel@gmail.com>
- <20230122024607.788454-10-ltykernel@gmail.com>
+        with ESMTP id S232052AbjAaOPI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 09:15:08 -0500
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D46E12843;
+        Tue, 31 Jan 2023 06:15:07 -0800 (PST)
+Received: by linux.microsoft.com (Postfix, from userid 1112)
+        id 0A33C20EA201; Tue, 31 Jan 2023 06:15:07 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0A33C20EA201
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1675174507;
+        bh=mT19G71ucLF+4CaSTXOpXQE/L4+jsWO6AotXm3MMpfA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=f4of6yuJuqxU4bwC8lYZggOCEjPalaQPNsTBE3fhlgDrMgY+vtzzXGQlAff+wYAVQ
+         mbZHxNBhfyk66pyhrYtonfjcK3mmagigi+pYRKBanuiMtQCkDmPuMUds8loo3afvqF
+         C3+wntX9R8q9w9AwgdpOxAJU1QKzbRugpppPtnig=
+Date:   Tue, 31 Jan 2023 06:15:07 -0800
+From:   Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de,
+        vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com,
+        tony.luck@intel.com, marcorr@google.com,
+        sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com,
+        dgilbert@redhat.com, jarkko@kernel.org, ashish.kalra@amd.com,
+        harald@profian.com, Nikunj A Dadhania <nikunj@amd.com>
+Subject: Re: [PATCH RFC v7 07/64] KVM: SEV: Handle KVM_HC_MAP_GPA_RANGE
+ hypercall
+Message-ID: <20230131141506.GA14449@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-8-michael.roth@amd.com>
+ <20230127163558.GA22533@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230122024607.788454-10-ltykernel@gmail.com>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-        FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <20230127163558.GA22533@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+        SPF_HELO_PASS,SPF_PASS,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 21, 2023 at 09:45:59PM -0500, Tianyu Lan wrote:
-> From: Tianyu Lan <tiala@microsoft.com>
+On Fri, Jan 27, 2023 at 08:35:58AM -0800, Jeremi Piotrowski wrote:
+> On Wed, Dec 14, 2022 at 01:39:59PM -0600, Michael Roth wrote:
+> > From: Nikunj A Dadhania <nikunj@amd.com>
+> > 
+> > KVM_HC_MAP_GPA_RANGE hypercall is used by the SEV guest to notify a
+> > change in the page encryption status to the hypervisor.
+> > 
+> > The hypercall exits to userspace with KVM_EXIT_HYPERCALL exit code,
+> > currently this is used for explicit memory conversion between
+> > shared/private for memfd based private memory.
+> > 
+> > Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
+> > Signed-off-by: Michael Roth <michael.roth@amd.com>
+> > ---
+> >  arch/x86/kvm/x86.c  | 8 ++++++++
+> >  virt/kvm/kvm_main.c | 1 +
+> >  2 files changed, 9 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > index bb6adb216054..732f9cbbadb5 100644
+> > --- a/arch/x86/kvm/x86.c
+> > +++ b/arch/x86/kvm/x86.c
+> > @@ -9649,6 +9649,7 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
 > 
-> SEV-SNP enlightened guest doesn't support legacy rtc. Set
-> legacy.rtc, x86_platform.set_wallclock and get_wallclock to
-> 0 or noop(). Make get/set_rtc_noop() to be public and reuse
-> them in the ms_hyperv_init_platform().
+> Couldn't find a better commit to comment on:
+> when the guest has the ptp-kvm module, it will issue a KVM_HC_CLOCK_PAIRING
+> hypercall. This will pass sev_es_validate_vmgexit validation and end up in this
+> function where kvm_pv_clock_pairing() is called, and that calls
+> kvm_write_guest(). This results in a CPU soft-lockup, at least in my testing.
 > 
-> Signed-off-by: Tianyu Lan <tiala@microsoft.com>
-> ---
->  arch/x86/include/asm/mshyperv.h | 7 ++++++-
->  arch/x86/include/asm/x86_init.h | 2 ++
->  arch/x86/kernel/cpu/mshyperv.c  | 3 +++
->  arch/x86/kernel/x86_init.c      | 4 ++--
->  4 files changed, 13 insertions(+), 3 deletions(-)
+> Are there any emulated hypercalls that make sense for snp guests? We should
+> block at least the ones that definitely don't work.
 > 
-> diff --git a/arch/x86/include/asm/mshyperv.h b/arch/x86/include/asm/mshyperv.h
-> index 1a4af0a4f29a..7266d71d30d6 100644
-> --- a/arch/x86/include/asm/mshyperv.h
-> +++ b/arch/x86/include/asm/mshyperv.h
-> @@ -33,6 +33,12 @@ extern bool hv_isolation_type_en_snp(void);
->  
->  extern union hv_ghcb * __percpu *hv_ghcb_pg;
->  
-> +/*
-> + * Hyper-V puts processor and memory layout info
-> + * to this address in SEV-SNP enlightened guest.
-> + */
-> +#define EN_SEV_SNP_PROCESSOR_INFO_ADDR	0x802000
+> Jeremi
 
-This hunk should be moved to the previous patch. It is not needed in
-this patch.
+So turns out the soft-lockup is a nested issue (details here for those
+interested: [^1]), but the questions still stands, of whether we should
+block kvm_write_page (and similar) explicitly or rely on the rmp fault.
 
-Thanks,
-Wei.
+[^1]: https://github.com/jepio/linux/commit/6c3bdf552e93664ae172660e24ceceed60fd4df5
