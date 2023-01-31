@@ -2,121 +2,127 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A6B626827C2
-	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 09:56:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 5FE4F6827C5
+	for <lists+kvm@lfdr.de>; Tue, 31 Jan 2023 09:56:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232208AbjAaI4F (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Tue, 31 Jan 2023 03:56:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47386 "EHLO
+        id S232173AbjAaI4Z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Tue, 31 Jan 2023 03:56:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230109AbjAaIzs (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Tue, 31 Jan 2023 03:55:48 -0500
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453A84B4B8;
-        Tue, 31 Jan 2023 00:50:57 -0800 (PST)
-Received: by mail-pl1-x632.google.com with SMTP id b5so7126520plz.5;
-        Tue, 31 Jan 2023 00:50:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=HlkVox6I5FUnYmeSbSAQbPKPPzCS1DM4/BxJexDwink=;
-        b=Oq1dXhl4AUSq8SXfZljEFxeZ8ojBbgd4u0vv7mGVOxjeDwJMKIrj20TgTJo8kv+Z4f
-         iNsJ6hwcsEM5hhzKAiB6obCDQQJzp809Ew9v1jFPi3PJ4mLttadxPE74sdCNpIwzTIGx
-         uhY+wdQbildYvj0qD76Vn9EY6yoV5nj9VOK65PSADlwZ80ouO3XR31NhNLwp0wcA+kI0
-         13McnwS/DW09DS3eegJBnZFack5BkaBktzWt4MuMLU5Z/IjCY/74vMghBEAVSqmvbk3q
-         XXHasbBZveqS8jyzGusZFmiEBFqAEfqlzNRrgzQc4I4RVqAdftplt1UWPXl9lwSJ2Mvz
-         GgHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=HlkVox6I5FUnYmeSbSAQbPKPPzCS1DM4/BxJexDwink=;
-        b=xes/bvxmPhx3hflGLVheYZx47L4PtuXEwB2Nx3kDhtx9Cy5ugPvSwGxneJJ2c7ch9E
-         XdU9pMRiqj/OLrEUcVphDe3eoidqXqpjMqKUa51VMI+5yhwIaXn+Rg3V5fd4W8k7IquU
-         nSG+eiU3Tu5tUi2SNvgRFFwlRB5TpYZ0//WdAQ7ZxmJt39BLKHZ1zQ1Wygz6xIgloY0r
-         YBA5zwHn8ZV1MievaLWUbOOr0BhhbPLetQaUjWS1Zn46HLGEcMLRf3sGhM7X9IkyO3MM
-         2+sblETDra+ZYckeo2qxGd8+Cg+H+ZeQESPXEOweTSu6KUjUExyshX6htCsqtqc3RQPD
-         J4Fg==
-X-Gm-Message-State: AO0yUKU2remG1hfMlOh27TxpdEFeMT1uq5wQ+TlWlZbkIu1AVubBUp25
-        42KqKViMSLXGSumZRqhDFWU=
-X-Google-Smtp-Source: AK7set/qRO5xcYdV+5kV7GzLg/C0kCaV8drqDWjezWS5nG0YJiIatE2AszyuXEyg+3sevQWJupMa+Q==
-X-Received: by 2002:a17:902:c70a:b0:196:3056:38f4 with SMTP id p10-20020a170902c70a00b00196305638f4mr17717245plp.50.1675155050883;
-        Tue, 31 Jan 2023 00:50:50 -0800 (PST)
-Received: from localhost.localdomain ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id o17-20020a170902d4d100b00196077ba463sm9196140plg.123.2023.01.31.00.50.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 Jan 2023 00:50:50 -0800 (PST)
-From:   Like Xu <like.xu.linux@gmail.com>
-X-Google-Original-From: Like Xu <likexu@tencent.com>
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Jianfeng Gao <jianfeng.gao@intel.com>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH v2] KVM: x86/pmu: Disable all vPMU features support on Intel hybrid CPUs
-Date:   Tue, 31 Jan 2023 16:50:31 +0800
-Message-Id: <20230131085031.88939-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.39.1
+        with ESMTP id S231697AbjAaI4A (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Tue, 31 Jan 2023 03:56:00 -0500
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 615664B764;
+        Tue, 31 Jan 2023 00:51:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=dIxm+aCWThEzSn6DIW8FvWBq3c9pv2ibQNS0mHEtmHY=; b=P99yUkPKlFO6Em1noB0wAC0mbH
+        VVTyTjchkZs8oTDX6DrLsSDzY4w1iEM7Eq83RPSTC6hbJWvJvsD7eNhZ6CKLRYtCAAjCdFdS+HfI1
+        aX4w//t5QEWYp1BLw0UGYf+SnVlyPZDFZr+8ujXvuZH/6C0CnmipvNW6SUlpSmcuGWKGNZMwyJ/C8
+        osew0SUGCAOdIAXP1ZD/FUbFzZME+QADr0FIX1E5t0otYJ4Dusdj+9abhDnbB2ZqoTh+qFCJmYY3R
+        D1CwEnmecBYG7aaYsUp+dFCskwvnPYeyrAx9mqsIK0clEyzBgdS0EIpPCyxgDKlzHyzLEU+GDj/kH
+        qNiRlCmQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1pMmLe-00BA4r-Iv; Tue, 31 Jan 2023 08:50:39 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (4096 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id BDED43002BF;
+        Tue, 31 Jan 2023 09:50:36 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id A1741208358FD; Tue, 31 Jan 2023 09:50:36 +0100 (CET)
+Date:   Tue, 31 Jan 2023 09:50:36 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     mingo@kernel.org
+Cc:     will@kernel.org, boqun.feng@gmail.com, mark.rutland@arm.com,
+        tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+        dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+        seanjc@google.com, pbonzini@redhat.com, jgross@suse.com,
+        srivatsa@csail.mit.edu, amakhalov@vmware.com,
+        pv-drivers@vmware.com, wanpengli@tencent.com, vkuznets@redhat.com,
+        boris.ostrovsky@oracle.com, rafael@kernel.org,
+        daniel.lezcano@linaro.org, lpieralisi@kernel.org,
+        frederic@kernel.org, paulmck@kernel.org, rostedt@goodmis.org,
+        mhiramat@kernel.org, longman@redhat.com, juri.lelli@redhat.com,
+        vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+        bsegall@google.com, mgorman@suse.de, bristot@redhat.com,
+        vschneid@redhat.com, linux-kernel@vger.kernel.org,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-pm@vger.kernel.org, linux-trace-kernel@vger.kernel.org
+Subject: [PATCH v2.1 4/9] tracing, preempt: Squash _rcuidle tracing
+Message-ID: <Y9jWXKgkxY5EZVwW@hirez.programming.kicks-ass.net>
+References: <20230126150829.087606759@infradead.org>
+ <20230126151323.526275416@infradead.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230126151323.526275416@infradead.org>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Like Xu <likexu@tencent.com>
 
-Disable KVM support for virtualizing PMUs on hosts with hybrid PMUs until
-KVM gains a sane way to enumeration the hybrid vPMU to userspace and/or
-gains a mechanism to let userspace opt-in to the dangers of exposing a
-hybrid vPMU to KVM guests.
+Extend commit 9aedeaed6fc6 ("tracing, hardirq: No moar _rcuidle()
+tracing") to also cover trace_preempt_{on,off}() which were
+mysteriously untouched.
 
-Virtualizing a hybrid PMU, or at least part of a hybrid PMU, is possible,
-but it requires userspace to pin vCPUs to pCPUs to prevent migrating a
-vCPU between a big core and a little core, requires the VMM to accurately
-enumerate the topology to the guest (if exposing a hybrid CPU to the
-guest), and also requires the VMM to accurately enumerate the vPMU
-capabilities to the guest.
-
-The last point is especially problematic, as KVM doesn't control which
-pCPU it runs on when enumerating KVM's vPMU capabilities to userspace.
-For now, simply disable vPMU support on hybrid CPUs to avoid inducing
-seemingly random #GPs in guests.
-
-Reported-by: Jianfeng Gao <jianfeng.gao@intel.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Suggested-by: Sean Christopherson <seanjc@google.com>
-Signed-off-by: Like Xu <likexu@tencent.com>
+Fixes: 9aedeaed6fc6 ("tracing, hardirq: No moar _rcuidle() tracing")
+Reported-by: Mark Rutland <mark.rutland@arm.com>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Tested-by: Mark Rutland <mark.rutland@arm.com>
+Link: https://lkml.kernel.org/r/Y9D5AfnOukWNOZ5q@hirez.programming.kicks-ass.net
 ---
-v1: https://lore.kernel.org/all/20230120004051.2043777-1-seanjc@google.com/
- arch/x86/kvm/pmu.h | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ kernel/trace/trace_preemptirq.c |   14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 79988dafb15b..6a3995657e1e 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -166,9 +166,11 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
+--- a/kernel/trace/trace_preemptirq.c
++++ b/kernel/trace/trace_preemptirq.c
+@@ -15,10 +15,6 @@
+ #define CREATE_TRACE_POINTS
+ #include <trace/events/preemptirq.h>
  
- 	 /*
- 	  * For Intel, only support guest architectural pmu
--	  * on a host with architectural pmu.
-+	  * on a non-hybrid host with architectural pmu.
- 	  */
--	if ((is_intel && !kvm_pmu_cap.version) || !kvm_pmu_cap.num_counters_gp)
-+	if (!kvm_pmu_cap.num_counters_gp ||
-+	    (is_intel && (!kvm_pmu_cap.version ||
-+			  boot_cpu_has(X86_FEATURE_HYBRID_CPU))))
- 		enable_pmu = false;
+-#ifdef CONFIG_TRACE_IRQFLAGS
+-/* Per-cpu variable to prevent redundant calls when IRQs already off */
+-static DEFINE_PER_CPU(int, tracing_irq_cpu);
+-
+ /*
+  * Use regular trace points on architectures that implement noinstr
+  * tooling: these calls will only happen with RCU enabled, which can
+@@ -33,6 +29,10 @@ static DEFINE_PER_CPU(int, tracing_irq_c
+ #define trace(point)	if (!in_nmi()) trace_##point##_rcuidle
+ #endif
  
- 	if (!enable_pmu) {
--- 
-2.39.1
-
++#ifdef CONFIG_TRACE_IRQFLAGS
++/* Per-cpu variable to prevent redundant calls when IRQs already off */
++static DEFINE_PER_CPU(int, tracing_irq_cpu);
++
+ /*
+  * Like trace_hardirqs_on() but without the lockdep invocation. This is
+  * used in the low level entry code where the ordering vs. RCU is important
+@@ -100,15 +100,13 @@ NOKPROBE_SYMBOL(trace_hardirqs_off);
+ 
+ void trace_preempt_on(unsigned long a0, unsigned long a1)
+ {
+-	if (!in_nmi())
+-		trace_preempt_enable_rcuidle(a0, a1);
++	trace(preempt_enable)(a0, a1);
+ 	tracer_preempt_on(a0, a1);
+ }
+ 
+ void trace_preempt_off(unsigned long a0, unsigned long a1)
+ {
+-	if (!in_nmi())
+-		trace_preempt_disable_rcuidle(a0, a1);
++	trace(preempt_disable)(a0, a1);
+ 	tracer_preempt_off(a0, a1);
+ }
+ #endif
