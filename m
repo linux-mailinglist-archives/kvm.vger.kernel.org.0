@@ -2,80 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2100A686F33
-	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 20:48:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 033B2686F31
+	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 20:48:35 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231543AbjBATsp (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Feb 2023 14:48:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59562 "EHLO
+        id S230091AbjBATsd (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Feb 2023 14:48:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231245AbjBATsg (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Feb 2023 14:48:36 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58A07D6C1
-        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 11:47:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675280866;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KsKUKAFzrjctC8+BAilBX6IagI/ItJtieRxvqFKd760=;
-        b=E2+tC2s/tFGW4I7BF58QRtYkAmekkUtzFM7z5rTd7gjerARum5gK24wYRq7buNNJVvg+M5
-        ylCIIilZB42mg8BPpude9ljv2PjPMkbvVmqHTd3TLL58GTjartFwVzWdFxmBo41vuP9eLl
-        r93gmTYvyiO1AgfpZV1MF9qLnNR62v0=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-42-6DJfhE9RO9-7aQT5p9P6tg-1; Wed, 01 Feb 2023 14:47:45 -0500
-X-MC-Unique: 6DJfhE9RO9-7aQT5p9P6tg-1
-Received: by mail-io1-f70.google.com with SMTP id d24-20020a5d9bd8000000b006ee2ddf6d77so10827175ion.6
-        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 11:47:45 -0800 (PST)
+        with ESMTP id S229551AbjBATsc (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Feb 2023 14:48:32 -0500
+Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D6999ED7
+        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 11:48:31 -0800 (PST)
+Received: by mail-ej1-x635.google.com with SMTP id qw12so38733973ejc.2
+        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 11:48:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GbKw2bj7MYWmb9R9AKQkFPSCVCTf6nBSBsfonYBTpx0=;
+        b=IgZVtlmpLu8K76cmIHlymzNS1y0BMQxmg8LPWlOgZreANxdb5QBAELtJADmCCDgJ1c
+         RJOljtHVD0muvMOkFZqBpq5pHqILjMF2O9h8XxoKaadZ/vUubQ3PMFvVwWSaZzEQ9OFQ
+         HFghC3rv07WunN/7Xj4Kw0+prXcd/XVXfjHR8W/PkZMEc+Vm4oO4/HlYLyf4M3QIHppk
+         mWdiGjuibLgl4i6Btm+A7HSScAtaXHEvS+PcqJP+rDiat40oYM9309BQmk5ofyFBWVqP
+         ShyBFjcgB51M3b8jHbJy3eY2rE+H3iGsACCDllnMAFhA3QibJbTpDG9Srz1M99kgqwlC
+         3f5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KsKUKAFzrjctC8+BAilBX6IagI/ItJtieRxvqFKd760=;
-        b=ttPgw8QCynGL6dsrhwi3IObYsCG8/1eN4S5kZrNr6IFH6C9AWStovav6NgsLz4eLTJ
-         /WpaqHiUleCtontkM5BCHsxHQ9g4YJuQO70RqtcSQDtBqXoASFPWm8pUpEPPDPF0FYPP
-         zmajYRcoJFHtuzdVPpYJ6v4D4+jFhRFilwVevv48NUSZAxKaUl20Q5iKZIelUmsfQ04X
-         qzVOoYtUCw3+0JN7t74Jey5R+SdRkkm4IJabUDnsXC31f8HnKiIopAUN2iycow9aA+yB
-         tye1TVvBYoursRSdiNYa35RfA5FRkNImv6jCPxmXI2DhFVrn2/ZclLD/Rs3+nW3y4HvX
-         L6Xg==
-X-Gm-Message-State: AO0yUKU0bMbpb7RY1AXA8L84TarvjFpSaciyXwNJ4XAAZioQ0k+/ThqS
-        QDqrV7n2EfIUZdT8aaCS74VtaXlYOpsgSNDL++FzfLiT9W0YQ+nLu6vILdrPCpJbFUjZB/LtpE9
-        GLTuWCcq8390P
-X-Received: by 2002:a05:6e02:148a:b0:310:a04d:abe with SMTP id n10-20020a056e02148a00b00310a04d0abemr156517ilk.2.1675280864956;
-        Wed, 01 Feb 2023 11:47:44 -0800 (PST)
-X-Google-Smtp-Source: AK7set8hQtblrX3fZRITnWeYooAK206rRg3w/eVZ5M/TUcA5JZjwlnYCEG6N3A0HHAQjRHmRWSpQCg==
-X-Received: by 2002:a05:6e02:148a:b0:310:a04d:abe with SMTP id n10-20020a056e02148a00b00310a04d0abemr156493ilk.2.1675280864721;
-        Wed, 01 Feb 2023 11:47:44 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id y2-20020a056e020f4200b0031107762217sm1943410ilj.3.2023.02.01.11.47.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 11:47:44 -0800 (PST)
-Date:   Wed, 1 Feb 2023 12:47:42 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     Tomasz Duszynski <tduszynski@marvell.com>
-Cc:     Eric Auger <eric.auger@redhat.com>,
-        Cornelia Huck <cohuck@redhat.com>,
-        Kevin Tian <kevin.tian@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        "open list:VFIO PLATFORM DRIVER" <kvm@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>, <jerinj@marvell.com>
-Subject: Re: [PATCH v2] vfio: platform: ignore missing reset if disabled at
- module init
-Message-ID: <20230201124742.08f15a1a.alex.williamson@redhat.com>
-In-Reply-To: <20230131083349.2027189-1-tduszynski@marvell.com>
-References: <20230131083349.2027189-1-tduszynski@marvell.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GbKw2bj7MYWmb9R9AKQkFPSCVCTf6nBSBsfonYBTpx0=;
+        b=WshV7hK2smy9c4HapVNgOgMZh5pzRqi1aAINbucAv8dtyF40sQoQJkUXjg4Cm8em0m
+         CxOur1qzuRvD20MMdb5hd64neTBKIdqQkroZOjrZTVmV6gcZelnmkekrm6CCVIRXuoCD
+         Fssltyypnb9Dg07YOkzT3W2jMS7/K9xTQP1zfsXuebJiedpUtTmKwqdoNKeMJXXNG0YZ
+         PTbnW2iHV01JrXIRmVjt0DKIFYCJ8l89fY3BN5Z1T1y8xyv0eyFcCzQjvd3Yf6svnqrq
+         gGcobK9Odo7X+vhanU5a2pZv2laPqZzvS33QpOrBZme9QTbnsh1onh8cWmVaTl2v5F2s
+         NUhQ==
+X-Gm-Message-State: AO0yUKUYqUukNKdyZ3c1Z5dXxTGH/0gjm4g0Bb2UBAopGvun6nvHLjb3
+        pgdAA2s2gs2OfTf42kin/LlymzZyAQ2BE4IQGDTItQ==
+X-Google-Smtp-Source: AK7set9Op0DiDjKw4XTcFVxiN3uCmIlijP4RGLcpuX/DBce7/Gn8JMuA7xa11GsJO9wnxH7ue5JE866jce75SYd3ZgY=
+X-Received: by 2002:a17:906:80a:b0:878:8bd5:4bdf with SMTP id
+ e10-20020a170906080a00b008788bd54bdfmr931813ejd.270.1675280909555; Wed, 01
+ Feb 2023 11:48:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
+References: <20221221222418.3307832-1-bgardon@google.com> <20221221222418.3307832-2-bgardon@google.com>
+ <Y9rBQAJg+ITHnVfw@google.com>
+In-Reply-To: <Y9rBQAJg+ITHnVfw@google.com>
+From:   Ben Gardon <bgardon@google.com>
+Date:   Wed, 1 Feb 2023 11:48:18 -0800
+Message-ID: <CANgfPd8gAW=u6yaPkrEURZ6vi0SWDrEKASAQAanGwBQLWqo+mg@mail.gmail.com>
+Subject: Re: [RFC 01/14] KVM: x86/MMU: Add shadow_mmu.(c|h)
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Nagareddy Reddy <nspreddy@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -83,43 +72,37 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, 31 Jan 2023 09:33:49 +0100
-Tomasz Duszynski <tduszynski@marvell.com> wrote:
+On Wed, Feb 1, 2023 at 11:45 AM Sean Christopherson <seanjc@google.com> wrote:
+>
+> On Wed, Dec 21, 2022, Ben Gardon wrote:
+> > diff --git a/arch/x86/kvm/mmu/shadow_mmu.c b/arch/x86/kvm/mmu/shadow_mmu.c
+> > new file mode 100644
+> > index 000000000000..7bce5ec52b2e
+> > --- /dev/null
+> > +++ b/arch/x86/kvm/mmu/shadow_mmu.c
+> > @@ -0,0 +1,21 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +/*
+> > + * KVM Shadow MMU
+> > + *
+> > + * This file implements the Shadow MMU: the KVM MMU implementation which has
+> > + * developed organically from hardware which did not have second level paging,
+> > + * and so used "shadow paging" to virtualize guest memory. The Shadow MMU is
+> > + * an alternative to the TDP MMU which only supports hardware with Two
+> > + * Dimentional Paging. (e.g. EPT on Intel or NPT on AMD CPUs.) Note that the
+> > + * Shadow MMU also supports TDP, it's just less scalable. The Shadow and TDP
+> > + * MMUs can cooperate to support nested virtualization on hardware with TDP.
+> > + */
+>
+> Eh, I vote to omit the comment.  For newbies, Documentation is likely a better
+> landing spot for describing the MMUs, and people that are familiar with KVM x86
+> MMU already know what the shadow MMU is and does.  That way we avoid bikeshedding
+> this comment, at least in the conext of this series.  E.g. I'm pretty sure much
+> of the shadow MMU behavior wasn't developed organically, it was stolen from Xen.
+> And the line about the Shadow and TDP MMUs cooperating support nested virt is
+> loaded with assumptions and qualifiers, and makes it sound like nested virt only
+> works with _the_ TDP MMU as oposed to _a_ TDP MMU`.
 
-> If reset requirement was relaxed via module parameter errors caused by
-> missing reset should not be propagated down to the vfio core.
-> Otherwise initialization will fail.
-> 
-> Signed-off-by: Tomasz Duszynski <tduszynski@marvell.com>
-> Fixes: 5f6c7e0831a1 ("vfio/platform: Use the new device life cycle helpers")
-> ---
-> v2:
-> - return directly instead of using ternary to do that
-> 
->  drivers/vfio/platform/vfio_platform_common.c | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/vfio/platform/vfio_platform_common.c b/drivers/vfio/platform/vfio_platform_common.c
-> index 1a0a238ffa35..7325ff463cf0 100644
-> --- a/drivers/vfio/platform/vfio_platform_common.c
-> +++ b/drivers/vfio/platform/vfio_platform_common.c
-> @@ -650,10 +650,13 @@ int vfio_platform_init_common(struct vfio_platform_device *vdev)
->  	mutex_init(&vdev->igate);
-> 
->  	ret = vfio_platform_get_reset(vdev);
-> -	if (ret && vdev->reset_required)
-> +	if (ret && vdev->reset_required) {
->  		dev_err(dev, "No reset function found for device %s\n",
->  			vdev->name);
-> -	return ret;
-> +		return ret;
-> +	}
-> +
-> +	return 0;
->  }
->  EXPORT_SYMBOL_GPL(vfio_platform_init_common);
-
-Applied to vfio next branch for v6.3.  Thanks,
-
-Alex
-
+Sounds good, I can dump the comment. I plan to send out a rebased
+version of this series tomorrow, incorporating all the feedback this
+series has gotten. Thanks for taking another look at it.
