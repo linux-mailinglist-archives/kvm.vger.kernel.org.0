@@ -2,61 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10C516867AC
-	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 14:56:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id CE468686812
+	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 15:19:07 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229651AbjBAN4S (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Feb 2023 08:56:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50000 "EHLO
+        id S232308AbjBAOTG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Feb 2023 09:19:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229582AbjBAN4R (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Feb 2023 08:56:17 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E49B37549
-        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 05:55:13 -0800 (PST)
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 311DhFKv015607
-        for <kvm@vger.kernel.org>; Wed, 1 Feb 2023 13:54:52 GMT
+        with ESMTP id S232304AbjBAOTE (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Feb 2023 09:19:04 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 120B8457D4
+        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 06:19:03 -0800 (PST)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 311EEpg6031224
+        for <kvm@vger.kernel.org>; Wed, 1 Feb 2023 14:19:02 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : in-reply-to : references : date : message-id : mime-version :
  content-type : content-transfer-encoding; s=pp1;
- bh=yI020FVPTZfDbi/rmBYhjl8CBKeO9h1KcEbEhZbFbs8=;
- b=QWlgBEQt6QLKdKjb+Azp8ieq1UHB8f/3AZkT6N4HKWpzRNvgw3IS7fswucaQxDHHQoQ8
- Huq9MhVKyNwKvg00uiy68KF1QtrY5EylcrxQn3Bs2pXsg/hLLzNWl+jd1zIbA82IYUhq
- gQ1XKdSnJcGaN/PXBwLZqvwwo1dWGxjKiwMkarurW9/n9gXgc6ZacL6CT8NrEVgyxRay
- Ry3XrzMSrfES3Bx0pHOuSoxqKYqlBuew7ifT5T8hkKXtLHTievFVDsS2rEd1h5zYNjB5
- GcAOxBZmXvxsAhCQ6BhUdgaPJkSyGa+KEx6BR+Y8nYeZiKBUCNB+5vl/eYfCC4MxaPsV RQ== 
+ bh=LH0+Sde8S3wJZ2Jj/YFJDzlasHpkRqxoSwaWIVVsBko=;
+ b=HW4cpgisqz3Rk5twjWdnpqi2F+qGirP6wIYsI17ZXBAekh6FJLNyvtSPXFy98uGlp6yv
+ LYXyVGAsggoY+t6k2Xp3Z9dbJfv5ZsC9EdRaTaqHje781N64jl2AdEZhEDCW6tRWKu16
+ J5nUhzwWjI5EHq8QDUcktusmmSppb4pqJSpU7pbtrP5fjlVKAAELW2h+z/Rhb2j5a2KX
+ WjPYBRj0DvLRbwjVLBCf0zVYyS4LadZgQt98neJUaMFLCX5j33j5LUXVSqgO7PYj0sr5
+ Lxjg5oihmFRW6HZ5ocl02YhSx3XQ/B1JzpW0Lvoi8wq2d0U5+JBJB2FZiQAFeFLEhiUt sA== 
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nfs71rab7-1
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nfsp604a9-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 13:54:51 +0000
-Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 311DhMKB016645
-        for <kvm@vger.kernel.org>; Wed, 1 Feb 2023 13:54:51 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nfs71raab-1
+        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 14:19:02 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 311EGi0Z009627
+        for <kvm@vger.kernel.org>; Wed, 1 Feb 2023 14:19:01 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nfsp6049r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Feb 2023 13:54:51 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3117PUb9027027;
-        Wed, 1 Feb 2023 13:54:49 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3ncvs7mydk-1
+        Wed, 01 Feb 2023 14:19:01 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3116oTaV013332;
+        Wed, 1 Feb 2023 14:18:59 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ncvtycyeu-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Feb 2023 13:54:49 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 311DsjaI36897194
+        Wed, 01 Feb 2023 14:18:59 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 311EIuVc46334428
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 1 Feb 2023 13:54:45 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 76FE020043;
-        Wed,  1 Feb 2023 13:54:45 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3D0F52004B;
-        Wed,  1 Feb 2023 13:54:45 +0000 (GMT)
+        Wed, 1 Feb 2023 14:18:56 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 16EBB20043;
+        Wed,  1 Feb 2023 14:18:56 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BEB442004B;
+        Wed,  1 Feb 2023 14:18:55 +0000 (GMT)
 Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.152.224.43])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-        Wed,  1 Feb 2023 13:54:45 +0000 (GMT)
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+        Wed,  1 Feb 2023 14:18:55 +0000 (GMT)
 From:   "Marc Hartmayer" <mhartmay@linux.ibm.com>
 To:     Nina Schoetterl-Glausch <nsg@linux.ibm.com>, kvm@vger.kernel.org
 Cc:     Janosch Frank <frankja@linux.ibm.com>,
@@ -71,25 +71,25 @@ References: <20230119114045.34553-1-mhartmay@linux.ibm.com>
  <dc9617483f2dbd36c64972bde068fcbb9cca10a3.camel@linux.ibm.com>
  <87a61xg0xb.fsf@li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com>
  <3b73658114b5423f0bc26b8dbe614abf2d0aabb4.camel@linux.ibm.com>
-Date:   Wed, 01 Feb 2023 14:54:44 +0100
-Message-ID: <877cx1fq3f.fsf@li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com>
+Date:   Wed, 01 Feb 2023 15:18:55 +0100
+Message-ID: <871qn9foz4.fsf@li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: CvRHeOHPg53pZ0ycAS27xfjjnW7ICeVM
-X-Proofpoint-ORIG-GUID: 8CdihRbgqfGwuH09plsS37uekNgtGD2h
+X-Proofpoint-GUID: 9bKA1xLaJeTVZqlA2fERTlkwxaJiz1f5
+X-Proofpoint-ORIG-GUID: mjFfXoHCV-eTWn0ho9PG8fc9pj9zTq_B
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
  definitions=2023-02-01_04,2023-01-31_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- lowpriorityscore=0 mlxscore=0 phishscore=0 adultscore=0 spamscore=0
- suspectscore=0 clxscore=1015 mlxlogscore=999 priorityscore=1501
- bulkscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2212070000 definitions=main-2302010116
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
+ spamscore=0 clxscore=1015 adultscore=0 lowpriorityscore=0 mlxlogscore=999
+ mlxscore=0 phishscore=0 suspectscore=0 priorityscore=1501 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2212070000
+ definitions=main-2302010120
 X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
@@ -164,30 +164,6 @@ lat.lds.o.
 > flat.lds.o: /foo/bar/s390x/flat.lds.S \
 >  /foo/bar/lib/asm/asm-offsets.h \
 >  /foo/bar/lib/generated/asm-offsets.h
-
-Yep, right=E2=80=A6 thanks for pointing it out! So I could either don=E2=80=
-=99t use
-$(autodepend-flags) or adapt it:
-
-I could change autodepend-flags to:
-
---- i/Makefile
-+++ w/Makefile
-@@ -94,7 +94,7 @@ CFLAGS +=3D $(wmissing_parameter_type)
- CFLAGS +=3D $(wold_style_declaration)
- CFLAGS +=3D -Woverride-init -Wmissing-prototypes -Wstrict-prototypes
-=20
--autodepend-flags =3D -MMD -MF $(dir $*).$(notdir $*).d
-+autodepend-flags =3D -MMD -MF $(dir $*).$(notdir $*).d -MT $@
-
-Shouldn=E2=80=99t break anything (we have to double check of course) and it
-results in a Makefile rule like this for the linker scripts:
-
-s390x/snippets/c/flat.lds: s390x/snippets/c/flat.lds.S \
- /foo/kvm-unit-tests/lib/asm/asm-offsets.h \
- /foo/kvm-unit-tests/lib/generated/asm-offsets.h
-
-
 >
 >>=20
 >> > I don't think that would be used anywhere.
@@ -199,9 +175,6 @@ s390x/snippets/c/flat.lds: s390x/snippets/c/flat.lds.S \
 >> -include */.*.d */*/.*.d
 >
 > Indeed, but the target flat.lds.o isn't used anywhere, is it?
-
-No, it=E2=80=99s not and it doesn=E2=80=99t make any sense.
-
 > So if flat.lds.S included some other header and that changed,
 > flat.lds wouldn't be rebuild.
 > So you would either need to generate a rule with flat.lds as target
@@ -222,9 +195,13 @@ ffset headers
 > but I guess that this is circular, in order to generate the dependencies,
 > the asm-offset headers must already have been built.
 
-Hmm - I=E2=80=99ll check.
+Hmm, no, this won=E2=80=99t work unless the dependency file was already cre=
+ated
+(chicken-egg problem). That=E2=80=99s probably the reason for this Makefile
+rule:
 
-Thanks for the feedback!
+generated-files =3D $(asm-offsets)
+$(tests:.elf=3D.o) $(asmlib) $(cflatobjs): $(generated-files)
 
 >>=20
 >> [=E2=80=A6snip]
