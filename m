@@ -2,92 +2,76 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 24A46686F7D
-	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 21:02:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0FA55686F82
+	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 21:03:10 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231956AbjBAUCj (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Feb 2023 15:02:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40260 "EHLO
+        id S232318AbjBAUCw (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Feb 2023 15:02:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231463AbjBAUCi (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Feb 2023 15:02:38 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 897B7A269
-        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 12:02:37 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id t12-20020a17090aae0c00b00229f4cff534so4088467pjq.1
-        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 12:02:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kr9wNeu+9zMbp947lD+6b8hMxHEqrpimcBPK+zq5B9E=;
-        b=ds4dsJWeCOK3T39vv1XbULKGx6HG5Ep+PbmOPBoO0z+GGkBSAyfBygba3hsDBWQBW8
-         1fXRwcSWseSYWToOsjvojXvvxi7WvPIUEYNfF7sgHZ0Zd66Zm86zWJtX0UQjqRBNDC/P
-         ZFl+i4PLgGcdMUqrNRSZ9slRmlbSWUoBsIkTyMibCdPIkN7hC8MoMuLa5QBr9MlmCG0o
-         sZSYLrYAs6IBHhPe11DdCe1xiJxCp8QZ2iqcOevgjBtWPlwb8BpnVRUGvfc9fFPXgWz7
-         n2/swEO7KPlADIC8Bzrt8Dv/jgi+DeUbji7rLTBgftH2U5d5iyEuXBYJmi2bqb9UvRmI
-         7//g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kr9wNeu+9zMbp947lD+6b8hMxHEqrpimcBPK+zq5B9E=;
-        b=wGBMSxTrDAftyTHzvpPlniZXmV47zI/Un75aK5hWzmqW6gtUmPSN1/cFqQyoAzD7TV
-         pDgJ8bN2lB+j13cP7IFp9EoxzwZIkZUXneZGa+Pw8XUlFGIwnbBd62vsZQVPxmkgvtH7
-         CtzbHTRjhAfMMv4PfvP6BzJ5vO+v+KYyhZJXTPE/L0STm97unJqNdZhNQdxwo1xrC5Np
-         fpGPWG85IFwU5J2qBwzjdcFI5HMen+OT+AiBAr+rfgNuThm40c+dbdVQTWzQIscKsVGT
-         ValgGo2nRP0pCESSOCDgayVR8wGuBQrTcCNJOQJaOF+nnEKof6qBn7sicQzJw4N2sBak
-         Wd2w==
-X-Gm-Message-State: AO0yUKV7EB9kvI86EIbzE0Qtpk2FBdJiMeLAfFIMwHIuvLp9RHfYa5bG
-        0rad4mqt/AmY794wYYGl4jucOg==
-X-Google-Smtp-Source: AK7set8nnzc5/5usrRzjiFXV3Nb3vuTPy73aG7xAyJCvFYhiMXCSq529FDxGIZ8+qoZ75tX62xFO9A==
-X-Received: by 2002:a17:902:f549:b0:198:af4f:de07 with SMTP id h9-20020a170902f54900b00198af4fde07mr71711plf.7.1675281756943;
-        Wed, 01 Feb 2023 12:02:36 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id 138-20020a621790000000b0059312530b54sm9734999pfx.180.2023.02.01.12.02.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 12:02:36 -0800 (PST)
-Date:   Wed, 1 Feb 2023 20:02:32 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Ben Gardon <bgardon@google.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Peter Xu <peterx@redhat.com>,
-        David Matlack <dmatlack@google.com>,
-        Vipin Sharma <vipinsh@google.com>,
-        Nagareddy Reddy <nspreddy@google.com>
-Subject: Re: [RFC 00/14] KVM: x86/MMU: Formalize the Shadow MMU
-Message-ID: <Y9rFWP7b/j25IjtZ@google.com>
-References: <20221221222418.3307832-1-bgardon@google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20221221222418.3307832-1-bgardon@google.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        with ESMTP id S232156AbjBAUCv (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Feb 2023 15:02:51 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5EA42DCB;
+        Wed,  1 Feb 2023 12:02:49 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 27540B822A4;
+        Wed,  1 Feb 2023 20:02:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D1835C433EF;
+        Wed,  1 Feb 2023 20:02:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1675281766;
+        bh=ze7tLLajYxPFA1rmGzEl6JCmS9yt5mfKFDsZEe6n59I=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=aH2P6l3eJrPgG0fg5gakMnS5Sk8NF+n3vMDCe6gzXJNEQ5QsjH54CzRhkkI9D3Db8
+         zuyTxvCbmwjSWOhMQPgWNMUks31gw9UpX381vXf85S+PocYMDFZ2Mr7IdbQKG4uD3Z
+         3o3YWC5LmbrlOwdMlw5MzhLZmGj8YzYpKg5Vly49JgJO2bVbHgf+h5uAyjrk5QBuJG
+         Y9GTh7XZRujno7nypg2jUkw+xdUh6pfWzueMAhWUyyw3cobzJpJVw9eMTYvroYg1el
+         zfQ2fRYWUaZSX/Hu/1VRA8I848emRFisRq9C4SyzIicu3MCxohn+cm0BzsARvpqnJ1
+         8L0w7WR5JEpcw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BD547E21ED2;
+        Wed,  1 Feb 2023 20:02:46 +0000 (UTC)
+Subject: Re: [GIT PULL] virtio,vhost,vdpa: fixes
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20230201110640-mutt-send-email-mst@kernel.org>
+References: <20230201110640-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20230201110640-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 6b04456e248761cf68f562f2fd7c04e591fcac94
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 9f266ccaa2f5228bfe67ad58a94ca4e0109b954a
+Message-Id: <167528176676.26493.9470166810574496838.pr-tracker-bot@kernel.org>
+Date:   Wed, 01 Feb 2023 20:02:46 +0000
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        007047221b@gmail.com, bcodding@redhat.com, eric.auger@redhat.com,
+        jasowang@redhat.com, lingshan.zhu@intel.com, mie@igel.co.jp,
+        mst@redhat.com, nab@linux-iscsi.org, viro@zeniv.linux.org.uk
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 21, 2022, Ben Gardon wrote:
-> This series builds on 9352e7470a1b4edd2fa9d235420ecc7bc3971bdc.
+The pull request you sent on Wed, 1 Feb 2023 11:06:40 -0500:
 
-Before you send the next version, can you tweak your workflow to generate the
-base commit via `git format-patch --base`?  That makes it much easier for humans
-and scripts to find the base commit, and saves you from having to remember to
-manually specify the base.  Because of the code movement, applying this series
-without the precise base is an exercise in frustration.
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-E.g. my workflow does
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/9f266ccaa2f5228bfe67ad58a94ca4e0109b954a
 
-	git format-patch --base=HEAD~$nr <more crud>
+Thank you!
 
-where $nr is the number of patches to generate.  There's also an "auto" option,
-but IIRC that only works if you have the upstream pointing at the base, e.g. it
-falls apart if upstream points at your own remote "backup" repo.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
