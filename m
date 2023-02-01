@@ -2,94 +2,69 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C948E686EFD
-	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 20:32:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4E250686F23
+	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 20:45:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232050AbjBATcf (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Feb 2023 14:32:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51052 "EHLO
+        id S230207AbjBATp4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Feb 2023 14:45:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230177AbjBATce (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Feb 2023 14:32:34 -0500
-Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C297BBCA
-        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 11:32:33 -0800 (PST)
-Received: by mail-pl1-x62f.google.com with SMTP id 5so19521044plo.3
-        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 11:32:33 -0800 (PST)
+        with ESMTP id S230347AbjBATpy (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Feb 2023 14:45:54 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 839208327E
+        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 11:45:30 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id e8-20020a17090a9a8800b0022c387f0f93so3313586pjp.3
+        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 11:45:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=OSNJYInipZ/N9ZUlMjv2BtkVzR+GxKWJaOF0xjf8sH0=;
-        b=n0XHt3yTCHKeaO4XN7poQwSbwm5p0ibDhgBbGgHE1Z51vm2IxOnnotcKpSRhjOBgna
-         SBfZdqOrcJ5CosUP+/2g2+I7mKqa5H86hJuB/LqJqvjrfOMseqnP0NqmgSOst/eGp+Qk
-         SQYmiahkedKUkTF5sUiQtJIT67vRO9EQYHG8yUTnqK3+bBTfFKa5UtL/OZwHJfz/CHSi
-         lK987MpGyEILVvDOc9yQS8r/KkEmcB5uiIMeq0z6Jee9p5FZGX/p9XVixJMp8IACGHmg
-         w3cmn7niWpgWWUNh37jjBMp3pATN98WRIEvHr0A6jTjzRKsuyND8SE/8aJvwTt2J9F7l
-         K7Fg==
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9pHkm+BjU/exUkyMzkVJbkP2yS/s+JUrPnH9qzpjYLM=;
+        b=MB9VdHl5MQovwwjUeW8FzfSu2L8t5qtNgWS5DdwG866AU/u4ENHAYV1xkX4l2+IHXp
+         1Q55MS7UxURiLdefiU/aa2p70DomK4y1OI8S39i0qgXkWWF5aoixonyHRtpImko1Kd+I
+         3/cRyQDdDI/pk+/Fzzm2cIwVtAtvYZUdtcew4/7ohF4CY9+vKcyNyyM1+eLJKZr1mImK
+         jXRn38tRJiwsTl/3w4cQChzog1vIgmeGhy5E9jBeX2acdpJjekN/f3Uggp2c2R/1M/Rb
+         noaNxYIQS1vp+WuV3AZgkfzNWUevNCLhHfKEzC28RApXfIHg/1FMxQ0uSzwbkeI4Yfxp
+         eCyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OSNJYInipZ/N9ZUlMjv2BtkVzR+GxKWJaOF0xjf8sH0=;
-        b=fiMx4pZ+0nLK7onwSLREVfzDCGFem/h4oy2DzCM/gX5MfCOd0SpcbYd47QHET01GKH
-         0Uiaz8a5RAaiOXOi1dVUgg6g+ysRu+4yHSDvdMLYgxa/PWSwq3MT7gd51buIo0ObNhrb
-         eC32VBW5vn1cyl+beY5X0TcI02CXO8RlFGwaLHXrek/JyUS7I1AHwrgFGoZ6B54GdQIm
-         hF2hll9Mjyn1ZnGSAObnhrNxWvwmlsp8UEBpjf+SmXZ3tR+oWP9q33h1hnPEXYr26OwQ
-         gP51mKCP4+bVXdF+qajMjWyN6cR31fFdTb3yGkNkzgwqPFCp5EbErFFLtqsOJ/2cTTcT
-         MGIg==
-X-Gm-Message-State: AO0yUKWT96kPOShsVM5zpxi4+EQf+PC1yFwoXlxj1AcwRMogWzTwy7Ye
-        dQhPzO5gVAoh1mgFcAO3qspCYSiGaYEe7dgLQAA=
-X-Google-Smtp-Source: AK7set/zucsS9D2hpiVndzXHJgUmEJcgKvG+FCH2SmbUMSy5FQQHyBGezNmvucp1jzbItlqYuTkWjA==
-X-Received: by 2002:a17:902:c944:b0:198:af4f:de13 with SMTP id i4-20020a170902c94400b00198af4fde13mr58116pla.19.1675279953012;
-        Wed, 01 Feb 2023 11:32:33 -0800 (PST)
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9pHkm+BjU/exUkyMzkVJbkP2yS/s+JUrPnH9qzpjYLM=;
+        b=EqGyiXhjcuWrgk3Svs4BkoUX4YYE5sYyRfxJcpieRm7dfSXTGBdHLg/GLtsDJzn5fj
+         Ra2wixndzuY7ylnBjF/RT/C1FDDYUBUj6ZNTkt9JsH8pdHDl6s5SAy93jK/BSJNy4YR7
+         x5/yqhcBBVRqQW+SzusL9w5rh7Q8sNu9LLGEbSoTYNPo9KzcZIAcBGLrrwnk0Ardl2N+
+         HwzH18/MuhLgWsRpe0kVqRK7YApaAbwuTxPD68390/m84PpQnKG8lw1ZlacamkzjkFHS
+         AR4RE8XKerTomjVPrPZP9ISLWke5cUTDST9plfcIc7xfr97BPCiZMKEdDWORuFeAXVTh
+         GjmA==
+X-Gm-Message-State: AO0yUKWzGH+uPNxoUlNuQKBKLAsr4KviPpzaDwiDq1FC9JZz0g6jROyR
+        NdVaT/24nAfCJWuqR+u8CMYseQ==
+X-Google-Smtp-Source: AK7set+PEOISZTq7r1ylp2+dARn7YrtM8rMK8aZqwj8E/E5ll/hPtvpkbGBLDzvpvfGOBDbY+FMdwA==
+X-Received: by 2002:a17:902:aa49:b0:198:af4f:de10 with SMTP id c9-20020a170902aa4900b00198af4fde10mr71676plr.16.1675280707949;
+        Wed, 01 Feb 2023 11:45:07 -0800 (PST)
 Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id z28-20020a63b91c000000b004785a63b44bsm11008653pge.43.2023.02.01.11.32.32
+        by smtp.gmail.com with ESMTPSA id u70-20020a638549000000b004468cb97c01sm11121652pgd.56.2023.02.01.11.45.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 11:32:32 -0800 (PST)
-Date:   Wed, 1 Feb 2023 19:32:29 +0000
+        Wed, 01 Feb 2023 11:45:07 -0800 (PST)
+Date:   Wed, 1 Feb 2023 19:45:04 +0000
 From:   Sean Christopherson <seanjc@google.com>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Alexey Kardashevskiy <aik@amd.com>, kvm@vger.kernel.org,
-        x86@kernel.org, linux-kernel@vger.kernel.org,
-        Yury Norov <yury.norov@gmail.com>,
-        Venu Busireddy <venu.busireddy@oracle.com>,
-        Tony Luck <tony.luck@intel.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Sandipan Das <sandipan.das@amd.com>,
-        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+To:     Ben Gardon <bgardon@google.com>
+Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>,
-        Michael Roth <michael.roth@amd.com>,
-        Mario Limonciello <mario.limonciello@amd.com>,
-        Kim Phillips <kim.phillips@amd.com>,
-        Kees Cook <keescook@chromium.org>,
-        Juergen Gross <jgross@suse.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
-        Brijesh Singh <brijesh.singh@amd.com>,
-        Arnaldo Carvalho de Melo <acme@redhat.com>,
-        Andrew Cooper <andrew.cooper3@citrix.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        "Peter Zijlstra (Intel)" <peterz@infradead.org>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "H. Peter Anvin" <hpa@zytor.com>
-Subject: Re: [PATCH kernel v3 2/3] KVM: SEV: Enable data breakpoints in SEV-ES
-Message-ID: <Y9q+TVBYDPJuVxiu@google.com>
-References: <20230120031047.628097-1-aik@amd.com>
- <20230120031047.628097-3-aik@amd.com>
- <Y9lqiXu4yUgP6APS@zn.tnic>
- <Y9nMZNrV+Iz8Ce5l@google.com>
+        Peter Xu <peterx@redhat.com>,
+        David Matlack <dmatlack@google.com>,
+        Vipin Sharma <vipinsh@google.com>,
+        Nagareddy Reddy <nspreddy@google.com>
+Subject: Re: [RFC 01/14] KVM: x86/MMU: Add shadow_mmu.(c|h)
+Message-ID: <Y9rBQAJg+ITHnVfw@google.com>
+References: <20221221222418.3307832-1-bgardon@google.com>
+ <20221221222418.3307832-2-bgardon@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Y9nMZNrV+Iz8Ce5l@google.com>
+In-Reply-To: <20221221222418.3307832-2-bgardon@google.com>
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
         ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
@@ -101,48 +76,31 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 01, 2023, Sean Christopherson wrote:
-> On Tue, Jan 31, 2023, Borislav Petkov wrote:
-> > Hey Sean,
-> > 
-> > On Fri, Jan 20, 2023 at 02:10:46PM +1100, Alexey Kardashevskiy wrote:
-> > > Prior to SEV-ES, KVM stored/loaded host debug registers upon switching
-> > > to/from a VM. Changing those registers inside a running SEV VM
-> > > triggered #VC exit to KVM.
-> > > 
-> > > SEV-ES added the encrypted state (ES) which uses an encrypted guest page
-> > > for the VM state (VMSA). The hardware saves/restores certain registers on
-> > > VMRUN/VMEXIT according to a swap type (A, B, C), see
-> > > "Table B-3. Swap Types" in the AMD Architecture Programmer’s Manual
-> > > volume 2.
-> > > 
-> > > AMD Milan (Fam 19h) introduces support for the debug registers swapping.
-> > > DR6 and DR7 are always swapped. DR[0-3] and DR[0-3]_ADDR_MASK are swapped
-> > > a type B when SEV_FEATURES[5] ("DebugSwap") is set.
-> > > 
-> > > Enable DebugSwap in VMSA. But only do so if CPUID Fn80000021_EAX[0]
-> > > ("NoNestedDataBp", "Processor ignores nested data breakpoints") is
-> > > supported by the SOC as otherwise a malicious SEV-ES guest can set up
-> > > data breakpoints on the #VC IDT entry/stack and cause an infinite loop.
-> > > 
-> > > Eliminate DR7 and #DB intercepts as:
-> > > - they are not needed when DebugSwap is supported;
-> > > - #VC for these intercepts is most likely not supported anyway and
-> > > kills the VM.
-> > > Keep DR7 intercepted unless DebugSwap enabled to prevent the infinite #DB
-> > > loop DoS.
-> > 
-> > ...
-> > 
-> > ok to take this through the tip tree?
-> 
-> I would prefer to take this through KVM, there's enough subtle complexity in this
-> code that it'd be nice to have it close by.
-> 
-> If you're happy with patch 1, maybe ack that one and take it through KVM, and
-> route patch 3 through tip?
+On Wed, Dec 21, 2022, Ben Gardon wrote:
+> diff --git a/arch/x86/kvm/mmu/shadow_mmu.c b/arch/x86/kvm/mmu/shadow_mmu.c
+> new file mode 100644
+> index 000000000000..7bce5ec52b2e
+> --- /dev/null
+> +++ b/arch/x86/kvm/mmu/shadow_mmu.c
+> @@ -0,0 +1,21 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * KVM Shadow MMU
+> + *
+> + * This file implements the Shadow MMU: the KVM MMU implementation which has
+> + * developed organically from hardware which did not have second level paging,
+> + * and so used "shadow paging" to virtualize guest memory. The Shadow MMU is
+> + * an alternative to the TDP MMU which only supports hardware with Two
+> + * Dimentional Paging. (e.g. EPT on Intel or NPT on AMD CPUs.) Note that the
+> + * Shadow MMU also supports TDP, it's just less scalable. The Shadow and TDP
+> + * MMUs can cooperate to support nested virtualization on hardware with TDP.
+> + */
 
-Ah, you've already applied 1.  That works too.  I don't think KVM support for
-DebugSwap is going to make v6.3 no matter who takes what, so just base on the
-next version of this patch on tip/x86/cpu and I'll make a mental note to not try
-to grab this until after v6.3-rc1.
+Eh, I vote to omit the comment.  For newbies, Documentation is likely a better
+landing spot for describing the MMUs, and people that are familiar with KVM x86
+MMU already know what the shadow MMU is and does.  That way we avoid bikeshedding
+this comment, at least in the conext of this series.  E.g. I'm pretty sure much
+of the shadow MMU behavior wasn't developed organically, it was stolen from Xen.
+And the line about the Shadow and TDP MMUs cooperating support nested virt is
+loaded with assumptions and qualifiers, and makes it sound like nested virt only
+works with _the_ TDP MMU as oposed to _a_ TDP MMU`.
