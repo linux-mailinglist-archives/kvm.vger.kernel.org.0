@@ -2,183 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0B1B0686C63
-	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 18:05:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DD24C686C78
+	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 18:12:05 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231773AbjBARE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Feb 2023 12:04:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34192 "EHLO
+        id S231685AbjBARMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Feb 2023 12:12:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231835AbjBAREt (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Feb 2023 12:04:49 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DF5813D77
-        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 09:04:48 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id v6-20020a17090ad58600b00229eec90a7fso4022503pju.0
-        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 09:04:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=792s+znQHM2oG4qpFrjQTGcnLGLqWihN5oBXvyffoK4=;
-        b=DY78J8RZJLcNWlktNuiYiNnJwXbCzltKAXPGRNR21N9g6+BZ31GUH8YTPWTrH5pvex
-         cCdwH9jbh40dy77HJAuhhaPYjC1cNyYYqmctwfCD1PeoYyPhy3lrqoSo1qVMM/sus1i8
-         9jbV/AAMO84BJV1fi7L5NVbJ9Rqp9mAp3nOxmUEUJW3w6vZP/zA7dTLWkVtNr8Mxhuie
-         JTALGl/bR0FmX+sp3RGn1wMXCOJTEJBSC+I2rhcnFgF6FT85MRE3lUv1WPZOt7np9hpq
-         P+cNso/Q1nnNr9VzH6pokEI5EB1MW0p5G6Ripm+SoE33ch1H4F67VeHHDfjT+eaG3X2X
-         mOsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=792s+znQHM2oG4qpFrjQTGcnLGLqWihN5oBXvyffoK4=;
-        b=IUw6HsGUN/yRwnU7+NcDDZP+ffRZ2FjfmIS1yGDG1CSrJHtM0DdRUGEg0zceDA1XID
-         W5/iT5T56na8jzNGMRLmgtfLKUKP4ms4AdiT9nTuEGLRJC7iGtlm7UGj7ZBsgUO9NU9W
-         fEElR10uRXDoXzXAa8aJrS/gNnDnYyKwEpADN3E5rcD6VuEJj0qmNizlkXjt8WbXmvam
-         2LcgsE+MCTRxaQWCr45Z35YF6yixrkglYRufjyXlS8WkkgeGN/u11SlDvKXvQUsDR5cI
-         VpFaXw1ZhN4vOyqtF1Dt/9AJVznc4rt30opmcgK8VuXEz7EaR6PtT4TiD1qBV1mETxhB
-         U+hg==
-X-Gm-Message-State: AO0yUKW5r+qkSPTSfLviY+fBDpl9Q0p5F+BbMBM8zhige8hFbsQQ48eJ
-        JuZpVPPFTL6tM9XIg9+o1oLhgLgP+0BrOg0Iuv92o+N/DWvzXg==
-X-Google-Smtp-Source: AK7set+7Dgk7WLDE5ihiSjFDeKB3B5nUdTjqkHxnm7WrM9H5BgNEP4ANZ1Hb+3mB8FS9z60pCKRzqDpKnGeUZ28W8Jk=
-X-Received: by 2002:a17:90a:1c4:b0:229:f43b:507c with SMTP id
- 4-20020a17090a01c400b00229f43b507cmr561778pjd.127.1675271087532; Wed, 01 Feb
- 2023 09:04:47 -0800 (PST)
+        with ESMTP id S229576AbjBARMB (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Feb 2023 12:12:01 -0500
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9A14D9EED;
+        Wed,  1 Feb 2023 09:12:00 -0800 (PST)
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 714DA4B3;
+        Wed,  1 Feb 2023 09:12:42 -0800 (PST)
+Received: from FVFF77S0Q05N (unknown [10.57.13.119])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 585CB3F64C;
+        Wed,  1 Feb 2023 09:11:58 -0800 (PST)
+Date:   Wed, 1 Feb 2023 17:11:55 +0000
+From:   Mark Rutland <mark.rutland@arm.com>
+To:     Josh Poimboeuf <jpoimboe@kernel.org>
+Cc:     Petr Mladek <pmladek@suse.com>,
+        Joe Lawrence <joe.lawrence@redhat.com>, kvm@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Peter Zijlstra <peterz@infradead.org>, netdev@vger.kernel.org,
+        Jiri Kosina <jikos@kernel.org>, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        "Seth Forshee (DigitalOcean)" <sforshee@digitalocean.com>,
+        live-patching@vger.kernel.org, Miroslav Benes <mbenes@suse.cz>
+Subject: Re: [PATCH 0/2] vhost: improve livepatch switching for heavily
+ loaded vhost worker kthreads
+Message-ID: <Y9qdWzOfiUZP2dET@FVFF77S0Q05N>
+References: <20230127165236.rjcp6jm6csdta6z3@treble>
+ <20230127170946.zey6xbr4sm4kvh3x@treble>
+ <20230127221131.sdneyrlxxhc4h3fa@treble>
+ <Y9e6ssSHUt+MUvum@hirez.programming.kicks-ass.net>
+ <Y9gOMCWGmoc5GQMj@FVFF77S0Q05N>
+ <20230130194823.6y3rc227bvsgele4@treble>
+ <Y9jr0fP7DtA9Of1L@FVFF77S0Q05N>
+ <20230131163832.z46ihurbmjcwuvck@treble>
+ <Y9pInB8KvcyhAwDa@FVFF77S0Q05N>
+ <20230201165727.lnywx6zyefbqbrke@treble>
 MIME-Version: 1.0
-References: <20230201160137.486622-1-rkanwal@rivosinc.com> <20230201163509.7fb82d7e@donnerap.cambridge.arm.com>
-In-Reply-To: <20230201163509.7fb82d7e@donnerap.cambridge.arm.com>
-From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
-Date:   Wed, 1 Feb 2023 17:04:36 +0000
-Message-ID: <CAECbVCvkKBbeKUNCvjZ4hhQb5njAgSKaY6nSPxu0N993qAaQ+A@mail.gmail.com>
-Subject: Re: [PATCH v2 kvmtool] riscv: Move serial and rtc from IO port space
- to MMIO area.
-To:     Andre Przywara <andre.przywara@foss.arm.com>
-Cc:     apatel@ventanamicro.com, atishp@rivosinc.com,
-        alexandru.elisei@arm.com, kvm@vger.kernel.org,
-        Will Deacon <will@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230201165727.lnywx6zyefbqbrke@treble>
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+        SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Feb 1, 2023 at 4:35 PM
-Andre Przywara <andre.przywara@foss.arm.com> wrote:
->
-> On Wed,  1 Feb 2023 16:01:37 +0000
-> Rajnesh Kanwal <rkanwal@rivosinc.com> wrote:
->
-> Hi,
->
-> > The default serial and rtc IO region overlaps with PCI IO bar
-> > region leading bar 0 activation to fail. Moving these devices
-> > to MMIO region similar to ARM.
-> >
-> > Given serial has been moved from 0x3f8 to 0x10000000, this
-> > requires us to now pass earlycon=uart8250,mmio,0x10000000
-> > from cmdline rather than earlycon=uart8250,mmio,0x3f8.
->
-> Doesn't it work either way with just "earlycon"? At least on the ARM side
-> it then finds the UART type and base address by following the DT's
-> stdout-path property. This would not only make this more robust, but also
-> more VMM agnostic.
->
+On Wed, Feb 01, 2023 at 08:57:27AM -0800, Josh Poimboeuf wrote:
+> On Wed, Feb 01, 2023 at 11:10:20AM +0000, Mark Rutland wrote:
+> > On Tue, Jan 31, 2023 at 08:38:32AM -0800, Josh Poimboeuf wrote:
+> > > On Tue, Jan 31, 2023 at 10:22:09AM +0000, Mark Rutland wrote:
+> > > > > Hm, it might be nice if our out-of-line static call implementation would
+> > > > > automatically do a static key check as part of static_call_cond() for
+> > > > > NULL-type static calls.
+> > > > > 
+> > > > > But the best answer is probably to just add inline static calls to
+> > > > > arm64.  Is the lack of objtool the only thing blocking that?
+> > > > 
+> > > > The major issues were branch range limitations (and needing the linker to add
+> > > > PLTs),
+> > > 
+> > > Does the compiler do the right thing (e.g., force PLT) if the branch
+> > > target is outside the translation unit?  I'm wondering if we could for
+> > > example use objtool to help enforce such rules at the call site.
+> > 
+> > It's the linker (rather than the compiler) that'll generate the PLT if the
+> > caller and callee are out of range at link time. There are a few other issues
+> > too (e.g. no guarnatee that the PLT isn't used by multiple distinct callers,
+> > CMODX patching requirements), so we'd have to generate a pseudo-PLT ourselves
+> > at build time with a patching-friendly code sequence. Ard had a prototype for
+> > that:
+> > 
+> >   https://lore.kernel.org/linux-arm-kernel/20211105145917.2828911-1-ardb@kernel.org/
+> > 
+> > ... but that was sufficiently painful that we went with the current static key
+> > approach:
+> > 
+> >   https://lore.kernel.org/all/20211109172408.49641-1-mark.rutland@arm.com/
+> 
+> Thanks for the background.
+> 
+> Was there a reason for putting it out-of-line rather than directly in
+> _cond_resched()?
 
-Sorry I didn't know that. Thanks for pointing this out. Just tested this and it
- works fine with just "earlycon".
+I think that's mostly a historical accident; I'm not aware of a reaason we
+can't put that directly in _cond_resched(). 
 
-$ ./lkvm-static run -c1 --console virtio -p "console=hvc1 earlycon
-root=/dev/vda " -k ./Image -d rootfs.ext4
-[    0.000000] earlycon: ns16550a0 at MMIO 0x0000000010000000 (options '')
-[    0.000000] printk: bootconsole [ns16550a0] enabled
+Since we started from out-of-line static call trampolines, even the out-of-line
+static key check looked nicer, and I think we just never considered moving the
+static key check inline.
 
-I will update the commit message in the next version.
+> If it were inline then it wouldn't be that much different from the
+> static called version and I wonder if we could simplify by just using
+> the static key for all PREEMPT_DYNAMIC configs.
+
+That would be nice!
+
+> > > > If we knew each call-site would only call a particular function or skip the
+> > > > call, then we could do better (and would probably need something like objtool
+> > > > to NOP that out at compile time), but since we don't know the callee at build
+> > > > time we can't ensure we have a PLT in range when necessary.
+> > > 
+> > > Unfortunately most static calls have multiple destinations.
+> > 
+> > Sure, but here we're just enabling/disabling a call, which we could treat
+> > differently, or wrap at a different level within the scheduler code. I'm happy
+> > to take a look at that.
+> 
+> I can try to emulate what you did for PREEMPT_DYNAMIC.  I'll Cc you on
+> my actual patch to come soon-ish.
+
+I look forward to it! :)
+
+> > > And most don't have the option of being NULL.
+> > 
+> > Oh, I was under the impression that all could be disabled/skipped, which is
+> > what a NULL target implied.
+> 
+> I guess what I was trying to say is that if the target can be NULL, the
+> call site has to use static_call_cond() to not break the
+> !HAVE_STATIC_CALL case.  But most call sites use static_call().
+
+Ah, sorry -- I had missed that we had distinct static_call_cond() and
+static_call() helpers.
 
 Thanks,
-Rajnesh
-
-> Also, Atish, Anup: can one of you please provide a Reviewed-by: or
-> Tested-by: for this patch?
->
-> Cheers,
-> Andre
->
-> >
-> > Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
-> > ---
-> > v2: Added further details in the commit message regarding the
-> >     UART address change required in kernel cmdline parameter.
-> >
-> > v1: https://www.spinics.net/lists/kvm/msg301835.html
-> >
-> >  hw/rtc.c                     |  3 +++
-> >  hw/serial.c                  |  4 ++++
-> >  riscv/include/kvm/kvm-arch.h | 10 ++++++++--
-> >  3 files changed, 15 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/hw/rtc.c b/hw/rtc.c
-> > index 9b8785a..da696e1 100644
-> > --- a/hw/rtc.c
-> > +++ b/hw/rtc.c
-> > @@ -9,6 +9,9 @@
-> >  #if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
-> >  #define RTC_BUS_TYPE         DEVICE_BUS_MMIO
-> >  #define RTC_BASE_ADDRESS     ARM_RTC_MMIO_BASE
-> > +#elif defined(CONFIG_RISCV)
-> > +#define RTC_BUS_TYPE         DEVICE_BUS_MMIO
-> > +#define RTC_BASE_ADDRESS     RISCV_RTC_MMIO_BASE
-> >  #else
-> >  /* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
-> >  #define RTC_BUS_TYPE         DEVICE_BUS_IOPORT
-> > diff --git a/hw/serial.c b/hw/serial.c
-> > index 3d53362..b6263a0 100644
-> > --- a/hw/serial.c
-> > +++ b/hw/serial.c
-> > @@ -17,6 +17,10 @@
-> >  #define serial_iobase(nr)    (ARM_UART_MMIO_BASE + (nr) * 0x1000)
-> >  #define serial_irq(nr)               (32 + (nr))
-> >  #define SERIAL8250_BUS_TYPE  DEVICE_BUS_MMIO
-> > +#elif defined(CONFIG_RISCV)
-> > +#define serial_iobase(nr)    (RISCV_UART_MMIO_BASE + (nr) * 0x1000)
-> > +#define serial_irq(nr)               (1 + (nr))
-> > +#define SERIAL8250_BUS_TYPE  DEVICE_BUS_MMIO
-> >  #else
-> >  #define serial_iobase_0              (KVM_IOPORT_AREA + 0x3f8)
-> >  #define serial_iobase_1              (KVM_IOPORT_AREA + 0x2f8)
-> > diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
-> > index 3f96d00..620c796 100644
-> > --- a/riscv/include/kvm/kvm-arch.h
-> > +++ b/riscv/include/kvm/kvm-arch.h
-> > @@ -11,7 +11,7 @@
-> >  #define RISCV_IOPORT         0x00000000ULL
-> >  #define RISCV_IOPORT_SIZE    SZ_64K
-> >  #define RISCV_IRQCHIP                0x08000000ULL
-> > -#define RISCV_IRQCHIP_SIZE           SZ_128M
-> > +#define RISCV_IRQCHIP_SIZE   SZ_128M
-> >  #define RISCV_MMIO           0x10000000ULL
-> >  #define RISCV_MMIO_SIZE              SZ_512M
-> >  #define RISCV_PCI            0x30000000ULL
-> > @@ -35,10 +35,16 @@
-> >  #define RISCV_MAX_MEMORY(kvm)        RISCV_LOMAP_MAX_MEMORY
-> >  #endif
-> >
-> > +#define RISCV_UART_MMIO_BASE RISCV_MMIO
-> > +#define RISCV_UART_MMIO_SIZE 0x10000
-> > +
-> > +#define RISCV_RTC_MMIO_BASE  (RISCV_UART_MMIO_BASE + RISCV_UART_MMIO_SIZE)
-> > +#define RISCV_RTC_MMIO_SIZE  0x10000
-> > +
-> >  #define KVM_IOPORT_AREA              RISCV_IOPORT
-> >  #define KVM_PCI_CFG_AREA     RISCV_PCI
-> >  #define KVM_PCI_MMIO_AREA    (KVM_PCI_CFG_AREA + RISCV_PCI_CFG_SIZE)
-> > -#define KVM_VIRTIO_MMIO_AREA RISCV_MMIO
-> > +#define KVM_VIRTIO_MMIO_AREA (RISCV_RTC_MMIO_BASE + RISCV_UART_MMIO_SIZE)
-> >
-> >  #define KVM_IOEVENTFD_HAS_PIO        0
-> >
->
+Mark.
