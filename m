@@ -2,158 +2,183 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id D4C93686CC6
-	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 18:22:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0B1B0686C63
+	for <lists+kvm@lfdr.de>; Wed,  1 Feb 2023 18:05:01 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232171AbjBARWS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Feb 2023 12:22:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47324 "EHLO
+        id S231773AbjBARE5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Feb 2023 12:04:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231954AbjBARWJ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Feb 2023 12:22:09 -0500
-X-Greylist: delayed 1468 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 01 Feb 2023 09:21:59 PST
-Received: from mail.zytor.com (unknown [IPv6:2607:7c80:54:3::138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F34E07CCB5;
-        Wed,  1 Feb 2023 09:21:58 -0800 (PST)
-Received: from [127.0.0.1] ([73.223.250.219])
-        (authenticated bits=0)
-        by mail.zytor.com (8.17.1/8.17.1) with ESMTPSA id 311Gtuar1673390
-        (version=TLSv1.3 cipher=TLS_AES_128_GCM_SHA256 bits=128 verify=NO);
-        Wed, 1 Feb 2023 08:55:56 -0800
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.zytor.com 311Gtuar1673390
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zytor.com;
-        s=2023010601; t=1675270559;
-        bh=23tO0MCEb93yUsul7CzC6ijVlvw5VHsg7S3VpOfZS/E=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=J+mss7dWrmbS+5PqF5sLKyQkQr4F4iUXYXJlb622rI+ZWHkGpEJthi77dwzZoVAhw
-         lFiCVdBim71PfFYNkjsGMM9JIKlEkpeRSw1W2aGAi21zSrCYNYOUqaCxOvfWamwD0e
-         /AnXFlOQSrp3evTL8+ZIlQLW+4sWD+8hebmzA8XeNedFnIsL3T+PcB3OLNDOURDRwh
-         nsIBw8niaiy7MqU9pMgdoJsPFMhasOFFL0wBrmgv0OammDrq5HSCAwpIZ9f5P6gji7
-         EkmXAC0z2wEcmvwJM4HzDJKEPHQNyS0wb0u7P82yGzGokaUJkVqT+ZX854mbndeNiv
-         0NOWiu7XlU7Yw==
-Date:   Wed, 01 Feb 2023 08:55:53 -0800
-From:   "H. Peter Anvin" <hpa@zytor.com>
-To:     Usama Arif <usama.arif@bytedance.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>
-CC:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        "Paul E . McKenney" <paulmck@kernel.org>,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
-        hushiyuan@huawei.com, luolongjun@huawei.com, hejingxian@huawei.com,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Paul Menzel <pmenzel@molgen.mpg.de>,
-        Fam Zheng <fam.zheng@bytedance.com>,
-        Punit Agrawal <punit.agrawal@bytedance.com>,
-        simon.evans@bytedance.com, liangma@liangbit.com
-Subject: Re: [External] Re: [PATCH v4 0/9] Parallel CPU bringup for x86_64
-User-Agent: K-9 Mail for Android
-In-Reply-To: <7fda05c9-9d4a-6005-0ce5-91bda1bb06c1@bytedance.com>
-References: <20220201205328.123066-1-dwmw2@infradead.org> <ff876008-b642-4dbc-aa41-1639905e08b6@bytedance.com> <1d0ed92ab68409b62a14cd29d0021f92c6e2568a.camel@infradead.org> <7fda05c9-9d4a-6005-0ce5-91bda1bb06c1@bytedance.com>
-Message-ID: <4C7F2481-0B0B-4399-A8E1-30731EFD02D2@zytor.com>
+        with ESMTP id S231835AbjBAREt (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Feb 2023 12:04:49 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DF5813D77
+        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 09:04:48 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id v6-20020a17090ad58600b00229eec90a7fso4022503pju.0
+        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 09:04:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=792s+znQHM2oG4qpFrjQTGcnLGLqWihN5oBXvyffoK4=;
+        b=DY78J8RZJLcNWlktNuiYiNnJwXbCzltKAXPGRNR21N9g6+BZ31GUH8YTPWTrH5pvex
+         cCdwH9jbh40dy77HJAuhhaPYjC1cNyYYqmctwfCD1PeoYyPhy3lrqoSo1qVMM/sus1i8
+         9jbV/AAMO84BJV1fi7L5NVbJ9Rqp9mAp3nOxmUEUJW3w6vZP/zA7dTLWkVtNr8Mxhuie
+         JTALGl/bR0FmX+sp3RGn1wMXCOJTEJBSC+I2rhcnFgF6FT85MRE3lUv1WPZOt7np9hpq
+         P+cNso/Q1nnNr9VzH6pokEI5EB1MW0p5G6Ripm+SoE33ch1H4F67VeHHDfjT+eaG3X2X
+         mOsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=792s+znQHM2oG4qpFrjQTGcnLGLqWihN5oBXvyffoK4=;
+        b=IUw6HsGUN/yRwnU7+NcDDZP+ffRZ2FjfmIS1yGDG1CSrJHtM0DdRUGEg0zceDA1XID
+         W5/iT5T56na8jzNGMRLmgtfLKUKP4ms4AdiT9nTuEGLRJC7iGtlm7UGj7ZBsgUO9NU9W
+         fEElR10uRXDoXzXAa8aJrS/gNnDnYyKwEpADN3E5rcD6VuEJj0qmNizlkXjt8WbXmvam
+         2LcgsE+MCTRxaQWCr45Z35YF6yixrkglYRufjyXlS8WkkgeGN/u11SlDvKXvQUsDR5cI
+         VpFaXw1ZhN4vOyqtF1Dt/9AJVznc4rt30opmcgK8VuXEz7EaR6PtT4TiD1qBV1mETxhB
+         U+hg==
+X-Gm-Message-State: AO0yUKW5r+qkSPTSfLviY+fBDpl9Q0p5F+BbMBM8zhige8hFbsQQ48eJ
+        JuZpVPPFTL6tM9XIg9+o1oLhgLgP+0BrOg0Iuv92o+N/DWvzXg==
+X-Google-Smtp-Source: AK7set+7Dgk7WLDE5ihiSjFDeKB3B5nUdTjqkHxnm7WrM9H5BgNEP4ANZ1Hb+3mB8FS9z60pCKRzqDpKnGeUZ28W8Jk=
+X-Received: by 2002:a17:90a:1c4:b0:229:f43b:507c with SMTP id
+ 4-20020a17090a01c400b00229f43b507cmr561778pjd.127.1675271087532; Wed, 01 Feb
+ 2023 09:04:47 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20230201160137.486622-1-rkanwal@rivosinc.com> <20230201163509.7fb82d7e@donnerap.cambridge.arm.com>
+In-Reply-To: <20230201163509.7fb82d7e@donnerap.cambridge.arm.com>
+From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
+Date:   Wed, 1 Feb 2023 17:04:36 +0000
+Message-ID: <CAECbVCvkKBbeKUNCvjZ4hhQb5njAgSKaY6nSPxu0N993qAaQ+A@mail.gmail.com>
+Subject: Re: [PATCH v2 kvmtool] riscv: Move serial and rtc from IO port space
+ to MMIO area.
+To:     Andre Przywara <andre.przywara@foss.arm.com>
+Cc:     apatel@ventanamicro.com, atishp@rivosinc.com,
+        alexandru.elisei@arm.com, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On February 1, 2023 8:38:14 AM PST, Usama Arif <usama=2Earif@bytedance=2Eco=
-m> wrote:
+On Wed, Feb 1, 2023 at 4:35 PM
+Andre Przywara <andre.przywara@foss.arm.com> wrote:
 >
+> On Wed,  1 Feb 2023 16:01:37 +0000
+> Rajnesh Kanwal <rkanwal@rivosinc.com> wrote:
 >
->On 01/02/2023 15:08, David Woodhouse wrote:
->> On Wed, 2023-02-01 at 14:40 +0000, Usama Arif wrote:
->>> On 01/02/2022 20:53, David Woodhouse wrote:
->>>> Doing the INIT/SIPI/SIPI in parallel for all APs and *then* waiting f=
-or
->>>> them shaves about 80% off the AP bringup time on a 96-thread 2-socket
->>>> Skylake box (EC2 c5=2Emetal) =E2=80=94 from about 500ms to 100ms=2E
->>>>=20
->>>> There are more wins to be had with further parallelisation, but this =
-is
->>>> the simple part=2E
->>>>=20
->>>=20
->>> Hi,
->>>=20
->>> We are interested in reducing the boot time of servers (with kexec), a=
-nd
->>> smpboot takes up a significant amount of time while booting=2E When
->>> testing the patch series (rebased to v6=2E1) on a server with 128 CPUs
->>> split across 2 NUMA nodes, it brought down the smpboot time from ~700m=
-s
->>> to 100ms=2E Adding another cpuhp state for do_wait_cpu_initialized to =
-make
->>> sure cpu_init is reached (as done in v1 of the series + using the
->>> cpu_finishup_mask) brought it down further to ~30ms=2E
->>>=20
->>> I just wanted to check what was needed to progress the patch series
->>> further for review? There weren't any comments on v4 of the patch so I
->>> couldn't figure out what more is needed=2E I think its quite useful to
->>> have this working so would be really glad help in anything needed to
->>> restart the review=2E
->>=20
->>=20
->> I believe the only thing holding it back was the fact that it broke on
->> some AMD CPUs=2E
->>=20
->> We don't *think* there are any remaining software issues; we think it's
->> hardware=2E Either an actual hardware race in CPU or chipset, or perhap=
-s
->> even something as simple as a voltage regulator which can't cope with
->> an increase in power draw from *all* the CPUs at the same time=2E
->>=20
->> We have prodded AMD a few times to investigate, but so far to no avail=
-=2E
->>=20
->> Last time I actually spoke to Thomas in person, I think he agreed that
->> we should just merge it and disable the parallel mode for the affected
->> AMD CPUs=2E
->>=20
+> Hi,
 >
->From the comments in v3, it seems to affect multiple generations, would i=
-t be worth proceeding with the patches by disabling it on all AMD CPUs to b=
-e on the safe side, until the actual issue is found and what causes it, and=
- then follow up later if the issue is found by disabling it only on affecte=
-d cpus=2E Maybe simply do something like below?
+> > The default serial and rtc IO region overlaps with PCI IO bar
+> > region leading bar 0 activation to fail. Moving these devices
+> > to MMIO region similar to ARM.
+> >
+> > Given serial has been moved from 0x3f8 to 0x10000000, this
+> > requires us to now pass earlycon=uart8250,mmio,0x10000000
+> > from cmdline rather than earlycon=uart8250,mmio,0x3f8.
 >
->diff --git a/arch/x86/kernel/smpboot=2Ec b/arch/x86/kernel/smpboot=2Ec
->index 0f144773a7fc=2E=2E6b8884592341 100644
->--- a/arch/x86/kernel/smpboot=2Ec
->+++ b/arch/x86/kernel/smpboot=2Ec
->@@ -1575,7 +1575,8 @@ void __init native_smp_prepare_cpus(unsigned int ma=
-x_cpus)
->         * for SEV-ES guests because they can't use CPUID that early=2E
->         */
->        if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data=2Ecpuid_level < 0x=
-0B ||
->-           cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT))
->+           cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT) ||
->+           boot_cpu_data=2Ex86_vendor =3D=3D X86_VENDOR_AMD)
->                do_parallel_bringup =3D false;
+> Doesn't it work either way with just "earlycon"? At least on the ARM side
+> it then finds the UART type and base address by following the DT's
+> stdout-path property. This would not only make this more robust, but also
+> more VMM agnostic.
 >
->        if (do_parallel_bringup) {
->
->
->
->
->> If you've already rebased to a newer kernel and tested it, perhaps now
->> is the time to do just that=2E
->
->If you would like me to repost the rebased patches to restart the reviews=
- (with do_parallel_bringup disabled for AMD), please let me know!
->
->Thanks,
->Usama
 
-This should be a CPU bug flag in my option=2E
+Sorry I didn't know that. Thanks for pointing this out. Just tested this and it
+ works fine with just "earlycon".
+
+$ ./lkvm-static run -c1 --console virtio -p "console=hvc1 earlycon
+root=/dev/vda " -k ./Image -d rootfs.ext4
+[    0.000000] earlycon: ns16550a0 at MMIO 0x0000000010000000 (options '')
+[    0.000000] printk: bootconsole [ns16550a0] enabled
+
+I will update the commit message in the next version.
+
+Thanks,
+Rajnesh
+
+> Also, Atish, Anup: can one of you please provide a Reviewed-by: or
+> Tested-by: for this patch?
+>
+> Cheers,
+> Andre
+>
+> >
+> > Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+> > ---
+> > v2: Added further details in the commit message regarding the
+> >     UART address change required in kernel cmdline parameter.
+> >
+> > v1: https://www.spinics.net/lists/kvm/msg301835.html
+> >
+> >  hw/rtc.c                     |  3 +++
+> >  hw/serial.c                  |  4 ++++
+> >  riscv/include/kvm/kvm-arch.h | 10 ++++++++--
+> >  3 files changed, 15 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/hw/rtc.c b/hw/rtc.c
+> > index 9b8785a..da696e1 100644
+> > --- a/hw/rtc.c
+> > +++ b/hw/rtc.c
+> > @@ -9,6 +9,9 @@
+> >  #if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
+> >  #define RTC_BUS_TYPE         DEVICE_BUS_MMIO
+> >  #define RTC_BASE_ADDRESS     ARM_RTC_MMIO_BASE
+> > +#elif defined(CONFIG_RISCV)
+> > +#define RTC_BUS_TYPE         DEVICE_BUS_MMIO
+> > +#define RTC_BASE_ADDRESS     RISCV_RTC_MMIO_BASE
+> >  #else
+> >  /* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+> >  #define RTC_BUS_TYPE         DEVICE_BUS_IOPORT
+> > diff --git a/hw/serial.c b/hw/serial.c
+> > index 3d53362..b6263a0 100644
+> > --- a/hw/serial.c
+> > +++ b/hw/serial.c
+> > @@ -17,6 +17,10 @@
+> >  #define serial_iobase(nr)    (ARM_UART_MMIO_BASE + (nr) * 0x1000)
+> >  #define serial_irq(nr)               (32 + (nr))
+> >  #define SERIAL8250_BUS_TYPE  DEVICE_BUS_MMIO
+> > +#elif defined(CONFIG_RISCV)
+> > +#define serial_iobase(nr)    (RISCV_UART_MMIO_BASE + (nr) * 0x1000)
+> > +#define serial_irq(nr)               (1 + (nr))
+> > +#define SERIAL8250_BUS_TYPE  DEVICE_BUS_MMIO
+> >  #else
+> >  #define serial_iobase_0              (KVM_IOPORT_AREA + 0x3f8)
+> >  #define serial_iobase_1              (KVM_IOPORT_AREA + 0x2f8)
+> > diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+> > index 3f96d00..620c796 100644
+> > --- a/riscv/include/kvm/kvm-arch.h
+> > +++ b/riscv/include/kvm/kvm-arch.h
+> > @@ -11,7 +11,7 @@
+> >  #define RISCV_IOPORT         0x00000000ULL
+> >  #define RISCV_IOPORT_SIZE    SZ_64K
+> >  #define RISCV_IRQCHIP                0x08000000ULL
+> > -#define RISCV_IRQCHIP_SIZE           SZ_128M
+> > +#define RISCV_IRQCHIP_SIZE   SZ_128M
+> >  #define RISCV_MMIO           0x10000000ULL
+> >  #define RISCV_MMIO_SIZE              SZ_512M
+> >  #define RISCV_PCI            0x30000000ULL
+> > @@ -35,10 +35,16 @@
+> >  #define RISCV_MAX_MEMORY(kvm)        RISCV_LOMAP_MAX_MEMORY
+> >  #endif
+> >
+> > +#define RISCV_UART_MMIO_BASE RISCV_MMIO
+> > +#define RISCV_UART_MMIO_SIZE 0x10000
+> > +
+> > +#define RISCV_RTC_MMIO_BASE  (RISCV_UART_MMIO_BASE + RISCV_UART_MMIO_SIZE)
+> > +#define RISCV_RTC_MMIO_SIZE  0x10000
+> > +
+> >  #define KVM_IOPORT_AREA              RISCV_IOPORT
+> >  #define KVM_PCI_CFG_AREA     RISCV_PCI
+> >  #define KVM_PCI_MMIO_AREA    (KVM_PCI_CFG_AREA + RISCV_PCI_CFG_SIZE)
+> > -#define KVM_VIRTIO_MMIO_AREA RISCV_MMIO
+> > +#define KVM_VIRTIO_MMIO_AREA (RISCV_RTC_MMIO_BASE + RISCV_UART_MMIO_SIZE)
+> >
+> >  #define KVM_IOEVENTFD_HAS_PIO        0
+> >
+>
