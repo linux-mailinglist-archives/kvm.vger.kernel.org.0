@@ -2,53 +2,53 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8A2926871A6
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 00:13:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 365026871A8
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 00:13:08 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231357AbjBAXND (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Feb 2023 18:13:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38002 "EHLO
+        id S231529AbjBAXNG (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Feb 2023 18:13:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229777AbjBAXM5 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Feb 2023 18:12:57 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD39344A9
-        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 15:12:56 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id rm7-20020a17090b3ec700b0022c05558d22so124976pjb.5
-        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 15:12:56 -0800 (PST)
+        with ESMTP id S231129AbjBAXNC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Feb 2023 18:13:02 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E151114C
+        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 15:12:57 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id nm12-20020a17090b19cc00b0022c2155cc0bso130219pjb.4
+        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 15:12:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kCMwx+bNWqE6Uw0wVFvOC8mb8JgaxncZy1aDemdVBjk=;
-        b=mdNqkzYUs2zpA4DU4VEmsE/uQMZGivSWSfYeFb6rmpfasEsLsAcZPkheNKsoOFTjd/
-         vq9cpIn8un8CiRxkgXJuDEjVEYrtJ32FDY0W7HHlquY0qlzqPXTcULeK+8fOMeeOu4q2
-         KFCm+0LEilFqCX77NN1juCn9Vsy8dCUzU+XMU+VY4HOD7MUu/P4iJlmI9p2JWXUxJMek
-         PFCms9ed2SH/2qADoAi9aUd56mwgsDRaJ8qXSYWlqAfPFPqBzVuVn5/izTeKikNZjBbu
-         uLGwwhc5JtW06s+X/OhthIZeYKsfpk7/u4oZ+Kf3xMlvFwzbWXO9KAYnvfWKrspcZmap
-         vTUA==
+        bh=cl7UMnqTD5QWwSQtcMHkzcnwz8kfWWwFumdLwjzGjWU=;
+        b=AYyDHKJWglbSzJEBLsLPFIGYX8v9aHwYKVczL2pHtwC5N22rJfU9y9NSfKlgOdh0fv
+         w2W+uyo3DAMX5HmdfdUMCHzWsJeZy1A6LGouRSP4Txaz+2I7rPOOhzpZdOqOYLabMum9
+         RF8gaSlxNxAsjzgxjAIujsLqXF61EP5lrlmVFpApJJZtwve5f+cIe5OLH86MvYz6CW6T
+         rHOlw5+PXp3yiMoz5DPxDc/XfO3kd0E/hj3ETsWis1HuVlSY2A3/7kI9Z2n6DIWw17X5
+         3lvZfhscfxSjPXVvpZspLtv8cxhpBq6IEqz3LxbptRZntG5zYI7hXpPp+IU58crDpYAG
+         e7Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kCMwx+bNWqE6Uw0wVFvOC8mb8JgaxncZy1aDemdVBjk=;
-        b=DjVlrCBhHvoTyK9GoBmjvCWDzrooXUi/f+1eUNsZREPS9j9IuF6R6K0Wp9ffzlD2PD
-         LwAgA9f19DGBRbUecj1424+fNwmhNOnRUOM0e4auRD5pJ+Ab+haHMs5fM02QkIrawMbh
-         IXRvrYxJneYvxh3nz7aBqHhn02HC/wsPRNfb876YFFYwJ+IOR29Kc7XwKFo28UcnMK2e
-         c5XXr9MPRml5J30lzjDVzApH5WvQZAVkuTBx6AE4M+CM2SYI/CnQKrTITJzICE9uP9YC
-         gliroZ67w5DqCnc7k4j/IVNQdBloMlT8ug2AdCs0Kh/RnOtJRTA4zYGMwkqXpnkbfBj8
-         9vLA==
-X-Gm-Message-State: AO0yUKWRjNWcwtyRW5xQO69N7Cca2aYWetqYJ6pK0+Y9vZK66MhLgM16
-        RkyVLAy++PGroxaDct2wLac8/w==
-X-Google-Smtp-Source: AK7set9HfqeuPhdedfadqcZDEVftRlnyWsjXY3IpoobY3rvnO7Fx5H9DRvVWwp0++NVgN6ZbRqMVQQ==
-X-Received: by 2002:a17:90b:1c05:b0:22b:b5c7:4fc with SMTP id oc5-20020a17090b1c0500b0022bb5c704fcmr4086441pjb.46.1675293176534;
-        Wed, 01 Feb 2023 15:12:56 -0800 (PST)
+        bh=cl7UMnqTD5QWwSQtcMHkzcnwz8kfWWwFumdLwjzGjWU=;
+        b=VzVqDkafXEUEQ9f6KSa5mZIVDNk+D5qnkbFyIx2c3cU6gfj46ebRDGzclgMdwZuGt5
+         o8D2aciwPUmx1EFc/u8lRnMFer2b0Phoi6jzrl9SeKoYG1cc+mFabbo8VYpBN2F/z+BE
+         E9H7uIPTy2qMUEWs7ZwaxPMbLYxukmB5eA9Td6lNzCnYEPVT3PkNPG29HFshMs8L2mqQ
+         E4rlnW8HNlVE2CrSlyj8/eKqt8SZgQIMWEQjwIvAZd6f7v5ZFCc8F1aQW5YjBRcpB1Tw
+         U9DJGVp3KdoowVG+nVqO7pO0tOk6TnJXzvGuV+kAxplOUES9Qaj+a/hj0v06MPvO9vp4
+         qBzQ==
+X-Gm-Message-State: AO0yUKWPRxclJiHJAuXXXQ/CmlR4GeRZqe6BE71RZNWkVri829byNRlt
+        8Es1NW2b8EZ2SSmmzgLjH9KniA==
+X-Google-Smtp-Source: AK7set+Zn3MRswtmIYIu62T6jZNygP14u2L1nwSLIM7HoaQCKkcqy33BWtvgX2o1OqydHiDIklFHUw==
+X-Received: by 2002:a17:90b:3148:b0:22c:5f97:f6b4 with SMTP id ip8-20020a17090b314800b0022c5f97f6b4mr4143148pjb.44.1675293177450;
+        Wed, 01 Feb 2023 15:12:57 -0800 (PST)
 Received: from atishp.ba.rivosinc.com ([66.220.2.162])
-        by smtp.gmail.com with ESMTPSA id t3-20020a17090a510300b0022bf0b0e1b7sm1861774pjh.10.2023.02.01.15.12.55
+        by smtp.gmail.com with ESMTPSA id t3-20020a17090a510300b0022bf0b0e1b7sm1861774pjh.10.2023.02.01.15.12.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Feb 2023 15:12:56 -0800 (PST)
+        Wed, 01 Feb 2023 15:12:57 -0800 (PST)
 From:   Atish Patra <atishp@rivosinc.com>
 To:     linux-kernel@vger.kernel.org
 Cc:     Atish Patra <atishp@rivosinc.com>,
@@ -64,9 +64,9 @@ Cc:     Atish Patra <atishp@rivosinc.com>,
         Palmer Dabbelt <palmer@dabbelt.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Will Deacon <will@kernel.org>
-Subject: [PATCH v4 04/14] RISC-V: KVM: Define a probe function for SBI extension data structures
-Date:   Wed,  1 Feb 2023 15:12:40 -0800
-Message-Id: <20230201231250.3806412-5-atishp@rivosinc.com>
+Subject: [PATCH v4 05/14] RISC-V: KVM: Return correct code for hsm stop function
+Date:   Wed,  1 Feb 2023 15:12:41 -0800
+Message-Id: <20230201231250.3806412-6-atishp@rivosinc.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230201231250.3806412-1-atishp@rivosinc.com>
 References: <20230201231250.3806412-1-atishp@rivosinc.com>
@@ -81,66 +81,34 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Currently the probe function just checks if an SBI extension is
-registered or not. However, the extension may not want to advertise
-itself depending on some other condition.
-An additional extension specific probe function will allow
-extensions to decide if they want to be advertised to the caller or
-not. Any extension that does not require additional dependency checks
-can avoid implementing this function.
+According to the SBI specification, the stop function can only
+return error code SBI_ERR_FAILED. However, currently it returns
+-EINVAL which will be mapped SBI_ERR_INVALID_PARAM.
+
+Return an linux error code that maps to SBI_ERR_FAILED i.e doesn't map
+to any other SBI error code. While EACCES is not the best error code
+to describe the situation, it is close enough and will be replaced
+with SBI error codes directly anyways.
 
 Reviewed-by: Anup Patel <anup@brainfault.org>
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
- arch/riscv/include/asm/kvm_vcpu_sbi.h |  3 +++
- arch/riscv/kvm/vcpu_sbi_base.c        | 13 +++++++++++--
- 2 files changed, 14 insertions(+), 2 deletions(-)
+ arch/riscv/kvm/vcpu_sbi_hsm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/riscv/include/asm/kvm_vcpu_sbi.h b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-index f79478a..45ba341 100644
---- a/arch/riscv/include/asm/kvm_vcpu_sbi.h
-+++ b/arch/riscv/include/asm/kvm_vcpu_sbi.h
-@@ -29,6 +29,9 @@ struct kvm_vcpu_sbi_extension {
- 	int (*handler)(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 		       unsigned long *out_val, struct kvm_cpu_trap *utrap,
- 		       bool *exit);
-+
-+	/* Extension specific probe function */
-+	unsigned long (*probe)(struct kvm_vcpu *vcpu);
- };
- 
- void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu, struct kvm_run *run);
-diff --git a/arch/riscv/kvm/vcpu_sbi_base.c b/arch/riscv/kvm/vcpu_sbi_base.c
-index 5d65c63..846d518 100644
---- a/arch/riscv/kvm/vcpu_sbi_base.c
-+++ b/arch/riscv/kvm/vcpu_sbi_base.c
-@@ -19,6 +19,7 @@ static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
+diff --git a/arch/riscv/kvm/vcpu_sbi_hsm.c b/arch/riscv/kvm/vcpu_sbi_hsm.c
+index 2e915ca..619ac0f 100644
+--- a/arch/riscv/kvm/vcpu_sbi_hsm.c
++++ b/arch/riscv/kvm/vcpu_sbi_hsm.c
+@@ -42,7 +42,7 @@ static int kvm_sbi_hsm_vcpu_start(struct kvm_vcpu *vcpu)
+ static int kvm_sbi_hsm_vcpu_stop(struct kvm_vcpu *vcpu)
  {
- 	int ret = 0;
- 	struct kvm_cpu_context *cp = &vcpu->arch.guest_context;
-+	const struct kvm_vcpu_sbi_extension *sbi_ext;
+ 	if (vcpu->arch.power_off)
+-		return -EINVAL;
++		return -EACCES;
  
- 	switch (cp->a6) {
- 	case SBI_EXT_BASE_GET_SPEC_VERSION:
-@@ -43,8 +44,16 @@ static int kvm_sbi_ext_base_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
- 			 */
- 			kvm_riscv_vcpu_sbi_forward(vcpu, run);
- 			*exit = true;
--		} else
--			*out_val = kvm_vcpu_sbi_find_ext(cp->a0) ? 1 : 0;
-+		} else {
-+			sbi_ext = kvm_vcpu_sbi_find_ext(cp->a0);
-+			if (sbi_ext) {
-+				if (sbi_ext->probe)
-+					*out_val = sbi_ext->probe(vcpu);
-+				else
-+					*out_val = 1;
-+			} else
-+				*out_val = 0;
-+		}
- 		break;
- 	case SBI_EXT_BASE_GET_MVENDORID:
- 		*out_val = vcpu->arch.mvendorid;
+ 	kvm_riscv_vcpu_power_off(vcpu);
+ 
 -- 
 2.25.1
 
