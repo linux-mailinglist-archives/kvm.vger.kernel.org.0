@@ -2,459 +2,366 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C350B688025
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 15:31:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id C2A6D6880CC
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 15:57:16 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232098AbjBBObN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 09:31:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43802 "EHLO
+        id S232279AbjBBO5M (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 09:57:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230372AbjBBObM (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 09:31:12 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFCF7712F0
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 06:31:09 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id qw12so6526376ejc.2
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 06:31:09 -0800 (PST)
+        with ESMTP id S230140AbjBBO5L (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 09:57:11 -0500
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51DF619F0B;
+        Thu,  2 Feb 2023 06:56:50 -0800 (PST)
+Received: by mail-io1-xd33.google.com with SMTP id q6so811340ior.12;
+        Thu, 02 Feb 2023 06:56:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=vrull.eu; s=google;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mOYw0Av35BMUzh2hzkJWlgpYAOCt2oHeMXkMdNbxYVQ=;
-        b=YLg8WMRNp7WtxwnLFm8wid1nN9TkjKohYo7/ur7uImGEQ9RYM7bq/xqujWl55c96ig
-         HCPIRePNtndo0f+u6yxTMa1e2bh02WZYI1k11n3XrpBav5gt0JX+bNH3M14c2npZjeld
-         FmDZ44chmzn8yU66DNNCOKvZ3kMGSXLUe52oMrIWmRq1dV5AMR4WIrJy/AdX66lYaQfk
-         z0lVEekHmtBX7NTsLiNQWvJ9/UOLv3wzPvsZEC2/TRAY0x9cjdD6R22fHKSKmcQUOIeq
-         eCuJ12/SDzg/vh/3o5vaAzuUEzO48CxylJg8YBscniyXmzWqmMLSEPsxlwFBpTEDVDZO
-         SPZA==
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RQ8bDqJqafzJlWgH9YAd57sfVxi9qer6mz3hjUfSQvQ=;
+        b=gZyQzQ2rvgMhVdXi6jyKe0CiVXZslMNfjsAkFkhVDMpfg/MWlnIV+k7c/XVMuyXkrv
+         NOcA9U9NdVJt5F1lN+JrsuIbUkYP56ti7wDsfCjinot7gpotX4Si0NIa4uX/M/Qx0Wql
+         F6TUpp1JFIGxfQosE8nrnVwI8agcf6LrLzobJ0fyc8QjcyO7UiGtKANt9ZxoMfGaDe6Q
+         M6866aZBiqm3on3qwGOHrL/QIxrsoqgAMHa/zAB+6KVkJbdKNirYD15quMKZF+Ve5J71
+         y09ZZTpZLNJWapZmr53YjyMpVIaHEB0NUc9+VjKxzqSsgUo3nlmQKbG7WHNNSTTsbpnq
+         sz2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mOYw0Av35BMUzh2hzkJWlgpYAOCt2oHeMXkMdNbxYVQ=;
-        b=VGukE4ARzqkafpLfTMiy3PfuUrvwAVJhAHkM5a6X6ysuH7HwE7dAF5QEfynz83IdDa
-         a8RnkO66kvCbkSrkwyFpzGNkBBA2gpRn5solsH06sv4meqpbrkXM1Dn4L0uAomYiiHb6
-         Q+NOquJdGQl/JGtJ/KM0QOs8DwpMeTzVUQkOSM1Pw/tvIf7CPlDIMkPBrzrauQV6aNt9
-         xsvUYighyngxis5Aw9bPxgISEO/ktls+aIgsAvutE9a7BOGmmB1wcy/kOC1wkPgOpQWX
-         Z/ZwagYAnJt44w3h8II7i6SwhVzZ8mNYdg1CIzT2R56591VRablqQFzyppqbeIX79Ait
-         bEdg==
-X-Gm-Message-State: AO0yUKVps+QD5KjZF5WR/1uBqbc2CdaVxd5gidY2sckxTsde38yvBC9o
-        PexaSnaCLAeUcJ0iRn2jNqA6iXXjoFrfxccpN8nZ4w==
-X-Google-Smtp-Source: AK7set/SekZJXZTng4TrQ4XkBvKfKvskGpVM4s4AJw0QkB8y5f4s1MBJxoXlfFxmXx77eYXrk68nBZBSrxLkEOLFoAg=
-X-Received: by 2002:a17:906:85c7:b0:878:581b:63ee with SMTP id
- i7-20020a17090685c700b00878581b63eemr1713866ejy.244.1675348268146; Thu, 02
- Feb 2023 06:31:08 -0800 (PST)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RQ8bDqJqafzJlWgH9YAd57sfVxi9qer6mz3hjUfSQvQ=;
+        b=bI6lEuiSIKC8+h0dVoTwJh/KzNZdvHKyOiCMEmJA4ANUhQU1rcfo8je6jpionyW+gF
+         QQmJyUuahet7S2PDGO62Eyps8M0jPKGd95myoPvXlZgBNQAYZ/lAHTlugnjkK08p+LbJ
+         iAs0+Wf+X37MuUqy58PDrwWmw8pp891JcxpMKleKk0VUg+kIwXjfBrirP+KTW2LxDBNA
+         rIU1bQrkEnAgHIEQC7W7xqScmlnOyipwavsvujeJiN5UtLztjr1GJoTQzxyerz8dPZuc
+         tlCqI6ginrMdxgBU1UML2c0BlWfB8MdOfNTAUta+1Yc62duDgIdfzdHAwm8R1Xp1Apx7
+         8vaQ==
+X-Gm-Message-State: AO0yUKWi02fs5+gAq5RHa0VUoQvcftNh376zLICIR1Mr8luq7u8gDzVk
+        wEUuVeSBZAdcMun7H7ARmto=
+X-Google-Smtp-Source: AK7set/b37fgV/Epoq5eUQj89WWweWKHmOn2ZVHkT6PG1EQiINP0FUEN6FJYntrREAovq7ywyt2A8A==
+X-Received: by 2002:a5e:de07:0:b0:716:8f6a:f480 with SMTP id e7-20020a5ede07000000b007168f6af480mr3854901iok.0.1675349809177;
+        Thu, 02 Feb 2023 06:56:49 -0800 (PST)
+Received: from localhost (88-115-161-74.elisa-laajakaista.fi. [88.115.161.74])
+        by smtp.gmail.com with ESMTPSA id h11-20020a02b60b000000b0039e90ba37e3sm7709820jam.43.2023.02.02.06.56.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 06:56:48 -0800 (PST)
+Date:   Thu, 2 Feb 2023 16:56:43 +0200
+From:   Zhi Wang <zhi.wang.linux@gmail.com>
+To:     Kechen Lu <kechenl@nvidia.com>
+Cc:     <kvm@vger.kernel.org>, <seanjc@google.com>, <pbonzini@redhat.com>,
+        <chao.gao@intel.com>, <shaoqin.huang@intel.com>,
+        <vkuznets@redhat.com>, <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC PATCH v6 2/6] KVM: x86: Move *_in_guest power management
+ flags to vCPU scope
+Message-ID: <20230202165643.00003a3b@gmail.com>
+In-Reply-To: <20230121020738.2973-3-kechenl@nvidia.com>
+References: <20230121020738.2973-1-kechenl@nvidia.com>
+        <20230121020738.2973-3-kechenl@nvidia.com>
+X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
 MIME-Version: 1.0
-References: <20230202124230.295997-1-lawrence.hunter@codethink.co.uk>
- <20230202124230.295997-7-lawrence.hunter@codethink.co.uk> <CAAeLtUA188Tdq4rROAWNqNkMSOXVT0BWQX669L6fyt5oM5knZg@mail.gmail.com>
-In-Reply-To: <CAAeLtUA188Tdq4rROAWNqNkMSOXVT0BWQX669L6fyt5oM5knZg@mail.gmail.com>
-From:   Philipp Tomsich <philipp.tomsich@vrull.eu>
-Date:   Thu, 2 Feb 2023 15:30:57 +0100
-Message-ID: <CAAeLtUDcpyWkKgAo2Lk0ZoHcdyEeVARYkh05Ps27wbOzDF0sHA@mail.gmail.com>
-Subject: Re: [PATCH 06/39] target/riscv: Add vrol.[vv,vx] and vror.[vv,vx,vi]
- decoding, translation and execution support
-To:     Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Cc:     qemu-devel@nongnu.org, dickon.hood@codethink.co.uk,
-        nazar.kazakov@codethink.co.uk, kiran.ostrolenk@codethink.co.uk,
-        frank.chang@sifive.com, palmer@dabbelt.com,
-        alistair.francis@wdc.com, bin.meng@windriver.com,
-        pbonzini@redhat.com, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, 2 Feb 2023 at 15:13, Philipp Tomsich <philipp.tomsich@vrull.eu> wrote:
->
-> On Thu, 2 Feb 2023 at 13:42, Lawrence Hunter
-> <lawrence.hunter@codethink.co.uk> wrote:
-> >
-> > From: Dickon Hood <dickon.hood@codethink.co.uk>
-> >
-> > Add an initial implementation of the vrol.* and vror.* instructions,
-> > with mappings between the RISC-V instructions and their internal TCG
-> > accelerated implmentations.
-> >
-> > There are some missing ror helpers, so I've bodged it by converting them
-> > to rols.
-> >
-> > Co-authored-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
-> > Signed-off-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
-> > Signed-off-by: Dickon Hood <dickon.hood@codethink.co.uk>
-> > ---
-> >  target/riscv/helper.h                      | 20 ++++++++
-> >  target/riscv/insn32.decode                 |  6 +++
-> >  target/riscv/insn_trans/trans_rvzvkb.c.inc | 20 ++++++++
-> >  target/riscv/vcrypto_helper.c              | 58 ++++++++++++++++++++++
-> >  target/riscv/vector_helper.c               | 45 -----------------
-> >  target/riscv/vector_internals.h            | 52 +++++++++++++++++++
-> >  6 files changed, 156 insertions(+), 45 deletions(-)
-> >
-> > diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> > index 32f1179e29..e5b6b3360f 100644
-> > --- a/target/riscv/helper.h
-> > +++ b/target/riscv/helper.h
-> > @@ -1142,3 +1142,23 @@ DEF_HELPER_6(vclmul_vv, void, ptr, ptr, ptr, ptr, env, i32)
-> >  DEF_HELPER_6(vclmul_vx, void, ptr, ptr, tl, ptr, env, i32)
-> >  DEF_HELPER_6(vclmulh_vv, void, ptr, ptr, ptr, ptr, env, i32)
-> >  DEF_HELPER_6(vclmulh_vx, void, ptr, ptr, tl, ptr, env, i32)
-> > +
-> > +DEF_HELPER_6(vror_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-> > +DEF_HELPER_6(vror_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> > +DEF_HELPER_6(vror_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> > +DEF_HELPER_6(vror_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> > +
-> > +DEF_HELPER_6(vror_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-> > +DEF_HELPER_6(vror_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-> > +DEF_HELPER_6(vror_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> > +DEF_HELPER_6(vror_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-> > +
-> > +DEF_HELPER_6(vrol_vv_b, void, ptr, ptr, ptr, ptr, env, i32)
-> > +DEF_HELPER_6(vrol_vv_h, void, ptr, ptr, ptr, ptr, env, i32)
-> > +DEF_HELPER_6(vrol_vv_w, void, ptr, ptr, ptr, ptr, env, i32)
-> > +DEF_HELPER_6(vrol_vv_d, void, ptr, ptr, ptr, ptr, env, i32)
-> > +
-> > +DEF_HELPER_6(vrol_vx_b, void, ptr, ptr, tl, ptr, env, i32)
-> > +DEF_HELPER_6(vrol_vx_h, void, ptr, ptr, tl, ptr, env, i32)
-> > +DEF_HELPER_6(vrol_vx_w, void, ptr, ptr, tl, ptr, env, i32)
-> > +DEF_HELPER_6(vrol_vx_d, void, ptr, ptr, tl, ptr, env, i32)
-> > diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> > index b4d88dd1cb..725f907ad1 100644
-> > --- a/target/riscv/insn32.decode
-> > +++ b/target/riscv/insn32.decode
-> > @@ -896,3 +896,9 @@ vclmul_vv       001100 . ..... ..... 010 ..... 1010111 @r_vm
-> >  vclmul_vx       001100 . ..... ..... 110 ..... 1010111 @r_vm
-> >  vclmulh_vv      001101 . ..... ..... 010 ..... 1010111 @r_vm
-> >  vclmulh_vx      001101 . ..... ..... 110 ..... 1010111 @r_vm
-> > +vrol_vv         010101 . ..... ..... 000 ..... 1010111 @r_vm
-> > +vrol_vx         010101 . ..... ..... 100 ..... 1010111 @r_vm
-> > +vror_vv         010100 . ..... ..... 000 ..... 1010111 @r_vm
-> > +vror_vx         010100 . ..... ..... 100 ..... 1010111 @r_vm
-> > +vror_vi         010100 . ..... ..... 011 ..... 1010111 @r_vm
-> > +vror_vi2        010101 . ..... ..... 011 ..... 1010111 @r_vm
->
-> We have only a single vror_vi instruction... and it has a 6bit immediate.
-> There's no need to deviate from the spec. Just write it as follows:
-> %imm_z6   26:1 15:5
-> @r2_zimm6  ..... . vm:1 ..... ..... ... ..... .......  &rmrr %rs2
-> rs1=%imm_z6 %rd
-> vror_vi         01010. . ..... ..... 011 ..... 1010111 @r2_zimm6
->
-> > diff --git a/target/riscv/insn_trans/trans_rvzvkb.c.inc b/target/riscv/insn_trans/trans_rvzvkb.c.inc
-> > index 533141e559..d2a7a92d42 100644
-> > --- a/target/riscv/insn_trans/trans_rvzvkb.c.inc
-> > +++ b/target/riscv/insn_trans/trans_rvzvkb.c.inc
-> > @@ -95,3 +95,23 @@ static bool vclmul_vx_check(DisasContext *s, arg_rmrr *a)
-> >
-> >  GEN_VX_MASKED_TRANS(vclmul_vx, vclmul_vx_check)
-> >  GEN_VX_MASKED_TRANS(vclmulh_vx, vclmul_vx_check)
-> > +
-> > +GEN_OPIVV_TRANS(vror_vv, zvkb_vv_check)
-> > +GEN_OPIVX_TRANS(vror_vx, zvkb_vx_check)
-> > +GEN_OPIVV_TRANS(vrol_vv, zvkb_vv_check)
-> > +GEN_OPIVX_TRANS(vrol_vx, zvkb_vx_check)
-> > +
-> > +GEN_OPIVI_TRANS(vror_vi, IMM_TRUNC_SEW, vror_vx, zvkb_vx_check)
->
-> Please introduce a IMM_ZIMM6 that integrates with the extract_imm as follows:
->     case IMM_ZIMM6:
->         return extract64(imm, 0, 6);
->
-> > +
-> > +/*
-> > + * Immediates are 5b long, and we need six for the rotate-immediate.  The
-> > + * decision has been taken to remove the vrol.vi instruction -- you can
-> > + * emulate it with a ror, after all -- and use the bottom bit of the funct6
-> > + * part of the opcode to encode the extra bit.  I've chosen to implement it
-> > + * like this because it's easy and reasonably clean.
-> > + */
-> > +static bool trans_vror_vi2(DisasContext *s, arg_rmrr *a)
-> > +{
-> > +    a->rs1 += 32;
-> > +    return trans_vror_vi(s, a);
-> > +}
->
-> As discussed above, please handle this in a single trans_vror_vi:
->    GEN_OPIVI_GVEC_TRANS_CHECK(vror_vi, IMM_ZIMM6, vror_vx, rotri, zvkb_check_vi)
+On Sat, 21 Jan 2023 02:07:34 +0000
+Kechen Lu <kechenl@nvidia.com> wrote:
 
-On the second pass over these patches, here's how we can use gvec
-support for both vror and vrol:
+> Make the runtime disabled mwait/hlt/pause/cstate exits flags vCPU scope
+> to allow finer-grained, per-vCPU control.  The VM-scoped control is only
+> allowed before vCPUs are created, thus preserving the existing behavior
+> is a simple matter of snapshotting the flags at vCPU creation.
+> 
+> Signed-off-by: Kechen Lu <kechenl@nvidia.com>
+> Suggested-by: Sean Christopherson <seanjc@google.com>
+> Reviewed-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/include/asm/kvm_host.h |  5 +++++
+>  arch/x86/kvm/cpuid.c            |  4 ++--
+>  arch/x86/kvm/lapic.c            |  7 +++----
+>  arch/x86/kvm/svm/nested.c       |  4 ++--
+>  arch/x86/kvm/svm/svm.c          | 12 ++++++------
+>  arch/x86/kvm/vmx/vmx.c          | 16 ++++++++--------
+>  arch/x86/kvm/x86.c              |  6 +++++-
+>  arch/x86/kvm/x86.h              | 16 ++++++++--------
+>  8 files changed, 39 insertions(+), 31 deletions(-)
+> 
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 6aaae18f1854..41b998234a04 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1009,6 +1009,11 @@ struct kvm_vcpu_arch {
+>  #if IS_ENABLED(CONFIG_HYPERV)
+>  	hpa_t hv_root_tdp;
+>  #endif
+> +
+> +	bool mwait_in_guest;
+> +	bool hlt_in_guest;
+> +	bool pause_in_guest;
+> +	bool cstate_in_guest;
 
-/* Synthesize a rotate-right from a negate(shift-amount) + rotate-left */
-static void tcg_gen_gvec_rotrs(unsigned vece, uint32_t dofs, uint32_t aofs,
-                       TCGv_i32 shift, uint32_t oprsz, uint32_t maxsz)
-{
-    TCGv_i32 tmp = tcg_temp_new_i32();
-    tcg_gen_neg_i32(tmp, shift);
-    tcg_gen_gvec_rotls(vece, dofs, aofs, tmp, oprsz, maxsz);
-    tcg_temp_free_i32(tmp);
-}
+Better add some comments here. When xxx_in_guest stays together with
+XXX_DISABLE_EXIT_XXX, it can be quite confusing. Or maybe align the naming
+like bool disable_exit_mwait <-> XXX_DISABLE_EXIT_XXX.
 
-/* vrol.v[vx] */
-GEN_OPIVV_GVEC_TRANS_CHECK(vrol_vv, rotlv, zvkb_check_vv)
-GEN_OPIVX_GVEC_SHIFT_TRANS_CHECK(vrol_vx, rotls, zvkb_check_vx)
+>  };
+>  
+>  struct kvm_lpage_info {
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 596061c1610e..20e427dc608c 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -283,8 +283,8 @@ static void __kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu, struct kvm_cpuid_e
+>  		best->ebx = xstate_required_size(vcpu->arch.xcr0, true);
+>  
+>  	best = __kvm_find_kvm_cpuid_features(vcpu, entries, nent);
+> -	if (kvm_hlt_in_guest(vcpu->kvm) && best &&
+> -		(best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
+> +	if (kvm_hlt_in_guest(vcpu) &&
+> +	    best && (best->eax & (1 << KVM_FEATURE_PV_UNHALT)))
+>  		best->eax &= ~(1 << KVM_FEATURE_PV_UNHALT);
+>  
+>  	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_MISC_ENABLE_NO_MWAIT)) {
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index 4efdb4a4d72c..f0f49d0c6e69 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -151,14 +151,13 @@ static inline u32 kvm_x2apic_id(struct kvm_lapic *apic)
+>  static bool kvm_can_post_timer_interrupt(struct kvm_vcpu *vcpu)
+>  {
+>  	return pi_inject_timer && kvm_vcpu_apicv_active(vcpu) &&
+> -		(kvm_mwait_in_guest(vcpu->kvm) || kvm_hlt_in_guest(vcpu->kvm));
+> +		(kvm_mwait_in_guest(vcpu) || kvm_hlt_in_guest(vcpu));
+>  }
+>  
+>  bool kvm_can_use_hv_timer(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_x86_ops.set_hv_timer
+> -	       && !(kvm_mwait_in_guest(vcpu->kvm) ||
+> -		    kvm_can_post_timer_interrupt(vcpu));
+> +	return kvm_x86_ops.set_hv_timer &&
+> +		!(kvm_mwait_in_guest(vcpu) || kvm_can_post_timer_interrupt(vcpu));
+>  }
+>  
+>  static bool kvm_use_posted_timer_interrupt(struct kvm_vcpu *vcpu)
+> diff --git a/arch/x86/kvm/svm/nested.c b/arch/x86/kvm/svm/nested.c
+> index add65dd59756..ed26b6de3007 100644
+> --- a/arch/x86/kvm/svm/nested.c
+> +++ b/arch/x86/kvm/svm/nested.c
+> @@ -721,7 +721,7 @@ static void nested_vmcb02_prepare_control(struct vcpu_svm *svm,
+>  
+>  	pause_count12 = svm->pause_filter_enabled ? svm->nested.ctl.pause_filter_count : 0;
+>  	pause_thresh12 = svm->pause_threshold_enabled ? svm->nested.ctl.pause_filter_thresh : 0;
+> -	if (kvm_pause_in_guest(svm->vcpu.kvm)) {
+> +	if (kvm_pause_in_guest(&svm->vcpu)) {
+>  		/* use guest values since host doesn't intercept PAUSE */
+>  		vmcb02->control.pause_filter_count = pause_count12;
+>  		vmcb02->control.pause_filter_thresh = pause_thresh12;
+> @@ -1012,7 +1012,7 @@ int nested_svm_vmexit(struct vcpu_svm *svm)
+>  	vmcb12->control.event_inj         = svm->nested.ctl.event_inj;
+>  	vmcb12->control.event_inj_err     = svm->nested.ctl.event_inj_err;
+>  
+> -	if (!kvm_pause_in_guest(vcpu->kvm)) {
+> +	if (!kvm_pause_in_guest(vcpu)) {
+>  		vmcb01->control.pause_filter_count = vmcb02->control.pause_filter_count;
+>  		vmcb_mark_dirty(vmcb01, VMCB_INTERCEPTS);
+>  
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index 9a194aa1a75a..dc7176605e01 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -1014,7 +1014,7 @@ static void grow_ple_window(struct kvm_vcpu *vcpu)
+>  	struct vmcb_control_area *control = &svm->vmcb->control;
+>  	int old = control->pause_filter_count;
+>  
+> -	if (kvm_pause_in_guest(vcpu->kvm))
+> +	if (kvm_pause_in_guest(vcpu))
+>  		return;
+>  
+>  	control->pause_filter_count = __grow_ple_window(old,
+> @@ -1035,7 +1035,7 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+>  	struct vmcb_control_area *control = &svm->vmcb->control;
+>  	int old = control->pause_filter_count;
+>  
+> -	if (kvm_pause_in_guest(vcpu->kvm))
+> +	if (kvm_pause_in_guest(vcpu))
+>  		return;
+>  
+>  	control->pause_filter_count =
+> @@ -1229,12 +1229,12 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+>  	svm_set_intercept(svm, INTERCEPT_RDPRU);
+>  	svm_set_intercept(svm, INTERCEPT_RSM);
+>  
+> -	if (!kvm_mwait_in_guest(vcpu->kvm)) {
+> +	if (!kvm_mwait_in_guest(vcpu)) {
+>  		svm_set_intercept(svm, INTERCEPT_MONITOR);
+>  		svm_set_intercept(svm, INTERCEPT_MWAIT);
+>  	}
+>  
+> -	if (!kvm_hlt_in_guest(vcpu->kvm))
+> +	if (!kvm_hlt_in_guest(vcpu))
+>  		svm_set_intercept(svm, INTERCEPT_HLT);
+>  
+>  	control->iopm_base_pa = __sme_set(iopm_base);
+> @@ -1278,7 +1278,7 @@ static void init_vmcb(struct kvm_vcpu *vcpu)
+>  	svm->nested.vmcb12_gpa = INVALID_GPA;
+>  	svm->nested.last_vmcb12_gpa = INVALID_GPA;
+>  
+> -	if (!kvm_pause_in_guest(vcpu->kvm)) {
+> +	if (!kvm_pause_in_guest(vcpu)) {
+>  		control->pause_filter_count = pause_filter_count;
+>  		if (pause_filter_thresh)
+>  			control->pause_filter_thresh = pause_filter_thresh;
+> @@ -4362,7 +4362,7 @@ static void svm_handle_exit_irqoff(struct kvm_vcpu *vcpu)
+>  
+>  static void svm_sched_in(struct kvm_vcpu *vcpu, int cpu)
+>  {
+> -	if (!kvm_pause_in_guest(vcpu->kvm))
+> +	if (!kvm_pause_in_guest(vcpu))
+>  		shrink_ple_window(vcpu);
+>  }
+>  
+> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> index fc9008dbed33..019a20029878 100644
+> --- a/arch/x86/kvm/vmx/vmx.c
+> +++ b/arch/x86/kvm/vmx/vmx.c
+> @@ -1689,7 +1689,7 @@ static void vmx_clear_hlt(struct kvm_vcpu *vcpu)
+>  	 * then the instruction is already executing and RIP has already been
+>  	 * advanced.
+>  	 */
+> -	if (kvm_hlt_in_guest(vcpu->kvm) &&
+> +	if (kvm_hlt_in_guest(vcpu) &&
+>  			vmcs_read32(GUEST_ACTIVITY_STATE) == GUEST_ACTIVITY_HLT)
+>  		vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
+>  }
+> @@ -4412,10 +4412,10 @@ static u32 vmx_exec_control(struct vcpu_vmx *vmx)
+>  		exec_control &= ~(CPU_BASED_CR3_LOAD_EXITING |
+>  				  CPU_BASED_CR3_STORE_EXITING |
+>  				  CPU_BASED_INVLPG_EXITING);
+> -	if (kvm_mwait_in_guest(vmx->vcpu.kvm))
+> +	if (kvm_mwait_in_guest(&vmx->vcpu))
+>  		exec_control &= ~(CPU_BASED_MWAIT_EXITING |
+>  				CPU_BASED_MONITOR_EXITING);
+> -	if (kvm_hlt_in_guest(vmx->vcpu.kvm))
+> +	if (kvm_hlt_in_guest(&vmx->vcpu))
+>  		exec_control &= ~CPU_BASED_HLT_EXITING;
+>  	return exec_control;
+>  }
+> @@ -4515,7 +4515,7 @@ static u32 vmx_secondary_exec_control(struct vcpu_vmx *vmx)
+>  	}
+>  	if (!enable_unrestricted_guest)
+>  		exec_control &= ~SECONDARY_EXEC_UNRESTRICTED_GUEST;
+> -	if (kvm_pause_in_guest(vmx->vcpu.kvm))
+> +	if (kvm_pause_in_guest(&vmx->vcpu))
+>  		exec_control &= ~SECONDARY_EXEC_PAUSE_LOOP_EXITING;
+>  	if (!kvm_vcpu_apicv_active(vcpu))
+>  		exec_control &= ~(SECONDARY_EXEC_APIC_REGISTER_VIRT |
+> @@ -4661,7 +4661,7 @@ static void init_vmcs(struct vcpu_vmx *vmx)
+>  		vmcs_write16(LAST_PID_POINTER_INDEX, kvm->arch.max_vcpu_ids - 1);
+>  	}
+>  
+> -	if (!kvm_pause_in_guest(kvm)) {
+> +	if (!kvm_pause_in_guest(&vmx->vcpu)) {
+>  		vmcs_write32(PLE_GAP, ple_gap);
+>  		vmx->ple_window = ple_window;
+>  		vmx->ple_window_dirty = true;
+> @@ -5833,7 +5833,7 @@ static void shrink_ple_window(struct kvm_vcpu *vcpu)
+>   */
+>  static int handle_pause(struct kvm_vcpu *vcpu)
+>  {
+> -	if (!kvm_pause_in_guest(vcpu->kvm))
+> +	if (!kvm_pause_in_guest(vcpu))
+>  		grow_ple_window(vcpu);
+>  
+>  	/*
+> @@ -7379,7 +7379,7 @@ static int vmx_vcpu_create(struct kvm_vcpu *vcpu)
+>  	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_CS, MSR_TYPE_RW);
+>  	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_ESP, MSR_TYPE_RW);
+>  	vmx_disable_intercept_for_msr(vcpu, MSR_IA32_SYSENTER_EIP, MSR_TYPE_RW);
+> -	if (kvm_cstate_in_guest(vcpu->kvm)) {
+> +	if (kvm_cstate_in_guest(vcpu)) {
+>  		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C1_RES, MSR_TYPE_R);
+>  		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C3_RESIDENCY, MSR_TYPE_R);
+>  		vmx_disable_intercept_for_msr(vcpu, MSR_CORE_C6_RESIDENCY, MSR_TYPE_R);
+> @@ -7935,7 +7935,7 @@ static void vmx_cancel_hv_timer(struct kvm_vcpu *vcpu)
+>  
+>  static void vmx_sched_in(struct kvm_vcpu *vcpu, int cpu)
+>  {
+> -	if (!kvm_pause_in_guest(vcpu->kvm))
+> +	if (!kvm_pause_in_guest(vcpu))
+>  		shrink_ple_window(vcpu);
+>  }
+>  
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index c8ae9c4f9f08..9a77b55142c6 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -11634,6 +11634,10 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>  #if IS_ENABLED(CONFIG_HYPERV)
+>  	vcpu->arch.hv_root_tdp = INVALID_PAGE;
+>  #endif
+> +	vcpu->arch.mwait_in_guest = vcpu->kvm->arch.mwait_in_guest;
+> +	vcpu->arch.hlt_in_guest = vcpu->kvm->arch.hlt_in_guest;
+> +	vcpu->arch.pause_in_guest = vcpu->kvm->arch.pause_in_guest;
+> +	vcpu->arch.cstate_in_guest = vcpu->kvm->arch.cstate_in_guest;
+>  
+>  	r = static_call(kvm_x86_vcpu_create)(vcpu);
+>  	if (r)
+> @@ -12885,7 +12889,7 @@ bool kvm_can_do_async_pf(struct kvm_vcpu *vcpu)
+>  		     kvm_is_exception_pending(vcpu)))
+>  		return false;
+>  
+> -	if (kvm_hlt_in_guest(vcpu->kvm) && !kvm_can_deliver_async_pf(vcpu))
+> +	if (kvm_hlt_in_guest(vcpu) && !kvm_can_deliver_async_pf(vcpu))
+>  		return false;
+>  
+>  	/*
+> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+> index 9de72586f406..b8e49a9d353d 100644
+> --- a/arch/x86/kvm/x86.h
+> +++ b/arch/x86/kvm/x86.h
+> @@ -351,24 +351,24 @@ static inline u64 nsec_to_cycles(struct kvm_vcpu *vcpu, u64 nsec)
+>  	    __rem;						\
+>  	 })
+>  
+> -static inline bool kvm_mwait_in_guest(struct kvm *kvm)
+> +static inline bool kvm_mwait_in_guest(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm->arch.mwait_in_guest;
+> +	return vcpu->arch.mwait_in_guest;
+>  }
+>  
+> -static inline bool kvm_hlt_in_guest(struct kvm *kvm)
+> +static inline bool kvm_hlt_in_guest(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm->arch.hlt_in_guest;
+> +	return vcpu->arch.hlt_in_guest;
+>  }
+>  
+> -static inline bool kvm_pause_in_guest(struct kvm *kvm)
+> +static inline bool kvm_pause_in_guest(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm->arch.pause_in_guest;
+> +	return vcpu->arch.pause_in_guest;
+>  }
+>  
+> -static inline bool kvm_cstate_in_guest(struct kvm *kvm)
+> +static inline bool kvm_cstate_in_guest(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm->arch.cstate_in_guest;
+> +	return vcpu->arch.cstate_in_guest;
+>  }
+>  
+>  static inline bool kvm_notify_vmexit_enabled(struct kvm *kvm)
 
-/* vror.v[vxi] */
-GEN_OPIVV_GVEC_TRANS_CHECK(vror_vv, rotrv, zvkb_check_vv)
-GEN_OPIVX_GVEC_SHIFT_TRANS_CHECK(vror_vx, rotrs, zvkb_check_vx)
-GEN_OPIVI_GVEC_TRANS_CHECK(vror_vi, IMM_ZIMM6, vror_vx, rotri, zvkb_check_vi)
-
-
-> > diff --git a/target/riscv/vcrypto_helper.c b/target/riscv/vcrypto_helper.c
-> > index 46e2e510c5..7ec75c5589 100644
-> > --- a/target/riscv/vcrypto_helper.c
-> > +++ b/target/riscv/vcrypto_helper.c
-> > @@ -57,3 +57,61 @@ GEN_VEXT_VV(vclmul_vv, 8)
-> >  GEN_VEXT_VX(vclmul_vx, 8)
-> >  GEN_VEXT_VV(vclmulh_vv, 8)
-> >  GEN_VEXT_VX(vclmulh_vx, 8)
-> > +
-> > +/*
-> > + *  Looks a mess, but produces reasonable (aarch32) code on clang:
-> > + * https://godbolt.org/z/jchjsTda8
-> > + */
-> > +#define DO_ROR(x, n)                       \
-> > +    ((x >> (n & ((sizeof(x) << 3) - 1))) | \
-> > +     (x << ((sizeof(x) << 3) - (n & ((sizeof(x) << 3) - 1)))))
-> > +#define DO_ROL(x, n)                       \
-> > +    ((x << (n & ((sizeof(x) << 3) - 1))) | \
-> > +     (x >> ((sizeof(x) << 3) - (n & ((sizeof(x) << 3) - 1)))))
-> > +
-> > +RVVCALL(OPIVV2, vror_vv_b, OP_UUU_B, H1, H1, H1, DO_ROR)
-> > +RVVCALL(OPIVV2, vror_vv_h, OP_UUU_H, H2, H2, H2, DO_ROR)
-> > +RVVCALL(OPIVV2, vror_vv_w, OP_UUU_W, H4, H4, H4, DO_ROR)
-> > +RVVCALL(OPIVV2, vror_vv_d, OP_UUU_D, H8, H8, H8, DO_ROR)
->
-> Indeed, this is a mess: we already have ror8/16/32/64 available.
-> Why not the following?
->
-> /* vror.vv */
-> GEN_VEXT_SHIFT_VV(vror_vv_b, uint8_t,  uint8_t,  H1, H1, ror8,  0x7)
-> GEN_VEXT_SHIFT_VV(vror_vv_h, uint16_t, uint16_t, H2, H2, ror16, 0xf)
-> GEN_VEXT_SHIFT_VV(vror_vv_w, uint32_t, uint32_t, H4, H4, ror32, 0x1f)
-> GEN_VEXT_SHIFT_VV(vror_vv_d, uint64_t, uint64_t, H8, H8, ror64, 0x3f)
->
-> > +GEN_VEXT_VV(vror_vv_b, 1)
-> > +GEN_VEXT_VV(vror_vv_h, 2)
-> > +GEN_VEXT_VV(vror_vv_w, 4)
-> > +GEN_VEXT_VV(vror_vv_d, 8)
-> > +
-> > +/*
-> > + * There's a missing tcg_gen_gvec_rotrs() helper function.
-> > + */
-> > +#define GEN_VEXT_VX_RTOL(NAME, ESZ)                                      \
-> > +void HELPER(NAME)(void *vd, void *v0, target_ulong s1, void *vs2,        \
-> > +                  CPURISCVState *env, uint32_t desc)                     \
-> > +{                                                                        \
-> > +    do_vext_vx(vd, v0, (ESZ << 3) - s1, vs2, env, desc, do_##NAME, ESZ); \
-> > +}
-> > +
-> > +/* DO_ROL because GEN_VEXT_VX_RTOL() converts from R to L */
-> > +RVVCALL(OPIVX2, vror_vx_b, OP_UUU_B, H1, H1, DO_ROL)
-> > +RVVCALL(OPIVX2, vror_vx_h, OP_UUU_H, H2, H2, DO_ROL)
-> > +RVVCALL(OPIVX2, vror_vx_w, OP_UUU_W, H4, H4, DO_ROL)
-> > +RVVCALL(OPIVX2, vror_vx_d, OP_UUU_D, H8, H8, DO_ROL)
->
-> Same applies as above:
-> /* vror.vx */
-> GEN_VEXT_SHIFT_VX(vror_vx_b, uint8_t,  uint8_t,  H1, H1, ror8,  0x7)
-> GEN_VEXT_SHIFT_VX(vror_vx_h, uint16_t, uint16_t, H2, H2, ror16, 0xf)
-> GEN_VEXT_SHIFT_VX(vror_vx_w, uint32_t, uint32_t, H4, H4, ror32, 0x1f)
-> GEN_VEXT_SHIFT_VX(vror_vx_d, uint64_t, uint64_t, H8, H8, ror64, 0x3f)
->
-> > +GEN_VEXT_VX_RTOL(vror_vx_b, 1)
-> > +GEN_VEXT_VX_RTOL(vror_vx_h, 2)
-> > +GEN_VEXT_VX_RTOL(vror_vx_w, 4)
-> > +GEN_VEXT_VX_RTOL(vror_vx_d, 8)
-> > +
-> > +RVVCALL(OPIVV2, vrol_vv_b, OP_UUU_B, H1, H1, H1, DO_ROL)
-> > +RVVCALL(OPIVV2, vrol_vv_h, OP_UUU_H, H2, H2, H2, DO_ROL)
-> > +RVVCALL(OPIVV2, vrol_vv_w, OP_UUU_W, H4, H4, H4, DO_ROL)
-> > +RVVCALL(OPIVV2, vrol_vv_d, OP_UUU_D, H8, H8, H8, DO_ROL)
-> > +GEN_VEXT_VV(vrol_vv_b, 1)
-> > +GEN_VEXT_VV(vrol_vv_h, 2)
-> > +GEN_VEXT_VV(vrol_vv_w, 4)
-> > +GEN_VEXT_VV(vrol_vv_d, 8)
-> > +
-> > +RVVCALL(OPIVX2, vrol_vx_b, OP_UUU_B, H1, H1, DO_ROL)
-> > +RVVCALL(OPIVX2, vrol_vx_h, OP_UUU_H, H2, H2, DO_ROL)
-> > +RVVCALL(OPIVX2, vrol_vx_w, OP_UUU_W, H4, H4, DO_ROL)
-> > +RVVCALL(OPIVX2, vrol_vx_d, OP_UUU_D, H8, H8, DO_ROL)
-> > +GEN_VEXT_VX(vrol_vx_b, 1)
-> > +GEN_VEXT_VX(vrol_vx_h, 2)
-> > +GEN_VEXT_VX(vrol_vx_w, 4)
-> > +GEN_VEXT_VX(vrol_vx_d, 8)
-> > diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> > index ab470092f6..ff7b03cbe3 100644
-> > --- a/target/riscv/vector_helper.c
-> > +++ b/target/riscv/vector_helper.c
-> > @@ -76,26 +76,6 @@ target_ulong HELPER(vsetvl)(CPURISCVState *env, target_ulong s1,
-> >      return vl;
-> >  }
-> >
-> > -/*
-> > - * Note that vector data is stored in host-endian 64-bit chunks,
-> > - * so addressing units smaller than that needs a host-endian fixup.
-> > - */
-> > -#if HOST_BIG_ENDIAN
-> > -#define H1(x)   ((x) ^ 7)
-> > -#define H1_2(x) ((x) ^ 6)
-> > -#define H1_4(x) ((x) ^ 4)
-> > -#define H2(x)   ((x) ^ 3)
-> > -#define H4(x)   ((x) ^ 1)
-> > -#define H8(x)   ((x))
-> > -#else
-> > -#define H1(x)   (x)
-> > -#define H1_2(x) (x)
-> > -#define H1_4(x) (x)
-> > -#define H2(x)   (x)
-> > -#define H4(x)   (x)
-> > -#define H8(x)   (x)
-> > -#endif
-> > -
-> >  /*
-> >   * Get the maximum number of elements can be operated.
-> >   *
-> > @@ -683,18 +663,11 @@ GEN_VEXT_ST_WHOLE(vs8r_v, int8_t, ste_b)
-> >   *** Vector Integer Arithmetic Instructions
-> >   */
-> >
-> > -/* expand macro args before macro */
-> > -#define RVVCALL(macro, ...)  macro(__VA_ARGS__)
-> > -
-> >  /* (TD, T1, T2, TX1, TX2) */
-> >  #define OP_SSS_B int8_t, int8_t, int8_t, int8_t, int8_t
-> >  #define OP_SSS_H int16_t, int16_t, int16_t, int16_t, int16_t
-> >  #define OP_SSS_W int32_t, int32_t, int32_t, int32_t, int32_t
-> >  #define OP_SSS_D int64_t, int64_t, int64_t, int64_t, int64_t
-> > -#define OP_UUU_B uint8_t, uint8_t, uint8_t, uint8_t, uint8_t
-> > -#define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
-> > -#define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
-> > -#define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
-> >  #define OP_SUS_B int8_t, uint8_t, int8_t, uint8_t, int8_t
-> >  #define OP_SUS_H int16_t, uint16_t, int16_t, uint16_t, int16_t
-> >  #define OP_SUS_W int32_t, uint32_t, int32_t, uint32_t, int32_t
-> > @@ -718,14 +691,6 @@ GEN_VEXT_ST_WHOLE(vs8r_v, int8_t, ste_b)
-> >  #define NOP_UUU_H uint16_t, uint16_t, uint32_t, uint16_t, uint32_t
-> >  #define NOP_UUU_W uint32_t, uint32_t, uint64_t, uint32_t, uint64_t
-> >
-> > -
-> > -#define OPIVV2(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
-> > -static void do_##NAME(void *vd, void *vs1, void *vs2, int i)    \
-> > -{                                                               \
-> > -    TX1 s1 = *((T1 *)vs1 + HS1(i));                             \
-> > -    TX2 s2 = *((T2 *)vs2 + HS2(i));                             \
-> > -    *((TD *)vd + HD(i)) = OP(s2, s1);                           \
-> > -}
-> >  #define DO_SUB(N, M) (N - M)
-> >  #define DO_RSUB(N, M) (M - N)
-> >
-> > @@ -747,16 +712,6 @@ GEN_VEXT_VV(vsub_vv_h, 2)
-> >  GEN_VEXT_VV(vsub_vv_w, 4)
-> >  GEN_VEXT_VV(vsub_vv_d, 8)
-> >
-> > -/*
-> > - * (T1)s1 gives the real operator type.
-> > - * (TX1)(T1)s1 expands the operator type of widen or narrow operations.
-> > - */
-> > -#define OPIVX2(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)             \
-> > -static void do_##NAME(void *vd, target_long s1, void *vs2, int i)   \
-> > -{                                                                   \
-> > -    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
-> > -    *((TD *)vd + HD(i)) = OP(s2, (TX1)(T1)s1);                      \
-> > -}
-> >
-> >  RVVCALL(OPIVX2, vadd_vx_b, OP_SSS_B, H1, H1, DO_ADD)
-> >  RVVCALL(OPIVX2, vadd_vx_h, OP_SSS_H, H2, H2, DO_ADD)
-> > diff --git a/target/riscv/vector_internals.h b/target/riscv/vector_internals.h
-> > index 49529d2379..a0fbac7bf3 100644
-> > --- a/target/riscv/vector_internals.h
-> > +++ b/target/riscv/vector_internals.h
-> > @@ -28,6 +28,26 @@ static inline uint32_t vext_nf(uint32_t desc)
-> >      return FIELD_EX32(simd_data(desc), VDATA, NF);
-> >  }
-> >
-> > +/*
-> > + * Note that vector data is stored in host-endian 64-bit chunks,
-> > + * so addressing units smaller than that needs a host-endian fixup.
-> > + */
-> > +#if HOST_BIG_ENDIAN
-> > +#define H1(x)   ((x) ^ 7)
-> > +#define H1_2(x) ((x) ^ 6)
-> > +#define H1_4(x) ((x) ^ 4)
-> > +#define H2(x)   ((x) ^ 3)
-> > +#define H4(x)   ((x) ^ 1)
-> > +#define H8(x)   ((x))
-> > +#else
-> > +#define H1(x)   (x)
-> > +#define H1_2(x) (x)
-> > +#define H1_4(x) (x)
-> > +#define H2(x)   (x)
-> > +#define H4(x)   (x)
-> > +#define H8(x)   (x)
-> > +#endif
-> > +
-> >  /*
-> >   * Encode LMUL to lmul as following:
-> >   *     LMUL    vlmul    lmul
-> > @@ -96,9 +116,30 @@ static inline uint32_t vext_get_total_elems(CPURISCVState *env, uint32_t desc,
-> >  void vext_set_elems_1s(void *base, uint32_t is_agnostic, uint32_t cnt,
-> >                         uint32_t tot);
-> >
-> > +/*
-> > + *** Vector Integer Arithmetic Instructions
-> > + */
-> > +
-> > +/* expand macro args before macro */
-> > +#define RVVCALL(macro, ...)  macro(__VA_ARGS__)
-> > +
-> > +/* (TD, T1, T2, TX1, TX2) */
-> > +#define OP_UUU_B uint8_t, uint8_t, uint8_t, uint8_t, uint8_t
-> > +#define OP_UUU_H uint16_t, uint16_t, uint16_t, uint16_t, uint16_t
-> > +#define OP_UUU_W uint32_t, uint32_t, uint32_t, uint32_t, uint32_t
-> > +#define OP_UUU_D uint64_t, uint64_t, uint64_t, uint64_t, uint64_t
-> > +
-> >  /* operation of two vector elements */
-> >  typedef void opivv2_fn(void *vd, void *vs1, void *vs2, int i);
-> >
-> > +#define OPIVV2(NAME, TD, T1, T2, TX1, TX2, HD, HS1, HS2, OP)    \
-> > +static void do_##NAME(void *vd, void *vs1, void *vs2, int i)    \
-> > +{                                                               \
-> > +    TX1 s1 = *((T1 *)vs1 + HS1(i));                             \
-> > +    TX2 s2 = *((T2 *)vs2 + HS2(i));                             \
-> > +    *((TD *)vd + HD(i)) = OP(s2, s1);                           \
-> > +}
-> > +
-> >  void do_vext_vv(void *vd, void *v0, void *vs1, void *vs2,
-> >                  CPURISCVState *env, uint32_t desc,
-> >                  opivv2_fn *fn, uint32_t esz);
-> > @@ -115,6 +156,17 @@ void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
-> >
-> >  typedef void opivx2_fn(void *vd, target_long s1, void *vs2, int i);
-> >
-> > +/*
-> > + * (T1)s1 gives the real operator type.
-> > + * (TX1)(T1)s1 expands the operator type of widen or narrow operations.
-> > + */
-> > +#define OPIVX2(NAME, TD, T1, T2, TX1, TX2, HD, HS2, OP)             \
-> > +static void do_##NAME(void *vd, target_long s1, void *vs2, int i)   \
-> > +{                                                                   \
-> > +    TX2 s2 = *((T2 *)vs2 + HS2(i));                                 \
-> > +    *((TD *)vd + HD(i)) = OP(s2, (TX1)(T1)s1);                      \
-> > +}
-> > +
-> >  void do_vext_vx(void *vd, void *v0, target_long s1, void *vs2,
-> >                  CPURISCVState *env, uint32_t desc,
-> >                  opivx2_fn fn, uint32_t esz);
->
-> Again: refactoring needs to go into a separate patch.
->
-> > --
-> > 2.39.1
-> >
