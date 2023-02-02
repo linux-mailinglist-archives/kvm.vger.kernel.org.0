@@ -2,108 +2,93 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00E24687A58
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 11:35:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 401BC687A76
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 11:43:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232245AbjBBKe4 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 05:34:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34552 "EHLO
+        id S232629AbjBBKnK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 05:43:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232833AbjBBKeu (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 05:34:50 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1373B6DB18
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 02:34:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675334042;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SpknTtimSl+guOKxaF16NMhAWaSqtArEG/8BewjAniM=;
-        b=FtcbzLjxVvJOkGDqDyXOXzv8zcTFFurVB54v0WqaIDm3C1007IHZ86i739AjhFrDZd6v8s
-        VfAjh73UBibhMHiki4Gq2A1U9K6c30jIQFJLkZ9dgi1z0iJA+59E6t9/rffU2netortYOM
-        uhz4K8wootE7tgp1m5NN/ETfG6zuXRY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-357-3dmK2oiyOh-qucDmKvbTZg-1; Thu, 02 Feb 2023 05:34:01 -0500
-X-MC-Unique: 3dmK2oiyOh-qucDmKvbTZg-1
-Received: by mail-wr1-f69.google.com with SMTP id w16-20020a5d4b50000000b002bfca568cdfso165015wrs.0
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 02:34:00 -0800 (PST)
+        with ESMTP id S230218AbjBBKnI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 05:43:08 -0500
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A3C410EF
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 02:42:57 -0800 (PST)
+Received: by mail-pf1-x435.google.com with SMTP id 203so868372pfx.6
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 02:42:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=igel-co-jp.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ldGt9CJfPI87gpBgmJqLjVS33kkn4ot4dZ1LzRIHTPU=;
+        b=EtrrguGOFagT+7kLAk6uTCf2dZGN0V2lCd1mIKii+4o1yT5n+YV479v6rWAtqm2894
+         EABYCzqBz/fN0oOMwM36Nc4O0fdp75HasO+9aAwoPjBMW4W2zcwIQgfkF+9EpEO9xn4o
+         Z6ctl6ZFxsBKfXQwhY63l3R8/ALoTj59C0Fh3wdAH5WIRVI2hODdscuiwrLQYb9GWb/G
+         O1LtgdXqkxmXCrRTUwfgY5dCuAKAdPHsHXRVDaQ5lGBXymtSHAUmrc+pl7NnlwWRWMbO
+         IJx1h97Zk6ylX+8ravr91EOpEZcOkJXEyaQ45X0bW61KQkKlmO/4g4W5CGF7wlsAFF12
+         TCVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SpknTtimSl+guOKxaF16NMhAWaSqtArEG/8BewjAniM=;
-        b=07BcJqFnbniR/yYzmoNnDMjG2J7CBsnCHoO9/2YyWh2I2IUkVNYpIdg3j95bp1nKw8
-         LJvBXIxyeemMYn+30thOGQrnWLpcQ+EkIS/oSqVY8Lc0E0RGclRQ+X1VcZimH6XT7cTi
-         smTe86HX+taEbTeLBS6Yh/q0HHG6hELxazjJnipBH6zOdfV39zlUYXgmpd4ySKWkMLgr
-         VNjCxXL4MIrc+vrK2fCzVbsV8UB4e/QFXnoS8M8rlRrhchz6jjYmT2DJ5cXgZWmA+xL4
-         0eVQ/TarwAfQSfF8wzCBG2PJKaLFgHiUKtvDRaPxSbEedI17bMRROHdQm3xgXj0X332c
-         eGXQ==
-X-Gm-Message-State: AO0yUKWp9+keYXGmfnylxyrdcRSqf4a/thGcPsBBJ9gL1o30sSPu9w1x
-        BnfxKZmttS77K9/ZHEsghrs6MPvvqgLU6TYRyG+kzV3I8VIveg0KLHqFPIzJi5wqbLkjcEPrFzX
-        FR3zDYC7M15yV
-X-Received: by 2002:a1c:f606:0:b0:3db:3695:11b4 with SMTP id w6-20020a1cf606000000b003db369511b4mr5235164wmc.33.1675334039773;
-        Thu, 02 Feb 2023 02:33:59 -0800 (PST)
-X-Google-Smtp-Source: AK7set/aRh3S+7oJAh3Alg/NT2t1M9KB8chGYSyRGs8MriRivULozR8wG/So+QjE+3JvxeVKT3C53g==
-X-Received: by 2002:a1c:f606:0:b0:3db:3695:11b4 with SMTP id w6-20020a1cf606000000b003db369511b4mr5235153wmc.33.1675334039564;
-        Thu, 02 Feb 2023 02:33:59 -0800 (PST)
-Received: from redhat.com ([2a02:14f:1fc:826d:55d8:70a4:3d30:fc2f])
-        by smtp.gmail.com with ESMTPSA id l13-20020adff48d000000b002366e3f1497sm19523049wro.6.2023.02.02.02.33.57
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ldGt9CJfPI87gpBgmJqLjVS33kkn4ot4dZ1LzRIHTPU=;
+        b=C6xUIUE6LggQLg31iGlCpHsh+ufNcNBESnAvJweOvMI1euE+UdbJEOhIzYPLWh4eS4
+         ceS4g1VdOTacT2zc6wqXyfGRh4c5CaA4vblDexA3rr7ELCekMI862RdgiTr4XNBIr9xu
+         wO6iGHMeyq+EZqNlL6u0iinPEa2Y3Bj2OiujCYGSHtRjDa1Gp7ENViZbr8gT3OiPuaH0
+         oPspb6ZDlwhcLjTllhB3K56hegrA6yPhVKpefy78cly13OhDbmkSRdHbAq9rHxu2yJQt
+         aaHwIQArYdcpBMjDWVgr880CjpSqVNZnDmQthtyo0Jx1+Sm7DjOyw8WWygjOWxO406PG
+         0x8A==
+X-Gm-Message-State: AO0yUKX0YESOLSb5A3zi4gV+GBpD9aWY2RGntgVGhx4TZIBjLkdp7Zaf
+        /X3my5LYt0nFNrU31i8yVmfnIA==
+X-Google-Smtp-Source: AK7set/Rs7+nLs58UmDprCnbeh0PTlwwm4Q7EdQOVVglBIKiQVz3PTwKOQuKPXet1bSUyYwrziJkYg==
+X-Received: by 2002:a05:6a00:248c:b0:58d:abd5:504a with SMTP id c12-20020a056a00248c00b0058dabd5504amr6366086pfv.31.1675334576527;
+        Thu, 02 Feb 2023 02:42:56 -0800 (PST)
+Received: from tyrell.hq.igel.co.jp (napt.igel.co.jp. [219.106.231.132])
+        by smtp.gmail.com with ESMTPSA id u144-20020a627996000000b0055f209690c0sm13294220pfc.50.2023.02.02.02.42.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 02:33:58 -0800 (PST)
-Date:   Thu, 2 Feb 2023 05:33:54 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Shunsuke Mie <mie@igel.co.jp>
-Cc:     Jason Wang <jasowang@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>, kvm@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v2 2/7] tools/virtio: enable to build with retpoline
-Message-ID: <20230202053341-mutt-send-email-mst@kernel.org>
-References: <20230202090934.549556-1-mie@igel.co.jp>
- <20230202090934.549556-3-mie@igel.co.jp>
+        Thu, 02 Feb 2023 02:42:56 -0800 (PST)
+From:   Shunsuke Mie <mie@igel.co.jp>
+To:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Rusty Russell <rusty@rustcorp.com.au>
+Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+        linux-kernel@vger.kernel.org, Shunsuke Mie <mie@igel.co.jp>
+Subject: [PATCH] vringh: fix a typo in comments for vringh_kiov
+Date:   Thu,  2 Feb 2023 19:42:48 +0900
+Message-Id: <20230202104248.2040652-1-mie@igel.co.jp>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230202090934.549556-3-mie@igel.co.jp>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 02, 2023 at 06:09:29PM +0900, Shunsuke Mie wrote:
-> Add build options to bring it close to a linux kernel. It allows for
-> testing that is close to reality.
-> 
-> Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
+Probably it is a simple copy error from struct vring_iov.
 
-This too, pls submit separately.
+Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
+---
+ include/linux/vringh.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> ---
->  tools/virtio/Makefile | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/tools/virtio/Makefile b/tools/virtio/Makefile
-> index 1b25cc7c64bb..7b7139d97d74 100644
-> --- a/tools/virtio/Makefile
-> +++ b/tools/virtio/Makefile
-> @@ -4,7 +4,7 @@ test: virtio_test vringh_test
->  virtio_test: virtio_ring.o virtio_test.o
->  vringh_test: vringh_test.o vringh.o virtio_ring.o
->  
-> -CFLAGS += -g -O2 -Werror -Wno-maybe-uninitialized -Wall -I. -I../include/ -I ../../usr/include/ -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -include ../../include/linux/kconfig.h
-> +CFLAGS += -g -O2 -Werror -Wno-maybe-uninitialized -Wall -I. -I../include/ -I ../../usr/include/ -Wno-pointer-sign -fno-strict-overflow -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -include ../../include/linux/kconfig.h -mfunction-return=thunk -fcf-protection=none -mindirect-branch-register
->  CFLAGS += -pthread
->  LDFLAGS += -pthread
->  vpath %.c ../../drivers/virtio ../../drivers/vhost
-> -- 
-> 2.25.1
+diff --git a/include/linux/vringh.h b/include/linux/vringh.h
+index 212892cf9822..1991a02c6431 100644
+--- a/include/linux/vringh.h
++++ b/include/linux/vringh.h
+@@ -92,7 +92,7 @@ struct vringh_iov {
+ };
+ 
+ /**
+- * struct vringh_iov - kvec mangler.
++ * struct vringh_kiov - kvec mangler.
+  *
+  * Mangles kvec in place, and restores it.
+  * Remaining data is iov + i, of used - i elements.
+-- 
+2.25.1
 
