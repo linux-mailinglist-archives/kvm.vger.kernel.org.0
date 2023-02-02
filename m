@@ -2,467 +2,209 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CBE406878CD
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 10:28:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 54AFE687944
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 10:44:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232056AbjBBJ2h (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 04:28:37 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37948 "EHLO
+        id S232512AbjBBJoa (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 04:44:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231778AbjBBJ2b (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 04:28:31 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F391969E;
-        Thu,  2 Feb 2023 01:28:24 -0800 (PST)
-Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3127oOBr025902;
-        Thu, 2 Feb 2023 09:28:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=gVOPArrThz9uhf1eTcKzuO6vuGs6mfN7Gdt/YT4pV00=;
- b=dsSmzAWysbcQJ9huOnTOjfUXTkwd1TMwhPWUEoMtmQTDGLb02hGJ1pbp8ibFKtnGlf+1
- +cMoROLyMsgaoxmsqLPJedUkwTXYPRxYnP3znaiFUyNeF769z+w7NsOUY3hAOusj1N7h
- 0wPmmws8Va4P91fj/1O82Qbp9Lwrlq9vr8udA731YwJFJWmYa5FxdzC9R/HT0mpHD/0m
- 3X6Jc91hTDWem9KShRUewh3M7MIT4i2cFlWqcWyd+u142ZJz5y/0xayBtHh4q0ZWCv2P
- fHd8ohrTW/SYeLZ0dzdiaX59KfnWkKK+T38MgGQDa0d4XDYPUu7GrZ3SLRVwm6o0IQ53 xg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ng94yj8cn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Feb 2023 09:28:23 +0000
-Received: from m0098399.ppops.net (m0098399.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3127w4KT020806;
-        Thu, 2 Feb 2023 09:28:23 GMT
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ng94yj8c3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Feb 2023 09:28:23 +0000
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
-        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 311JfsQW014735;
-        Thu, 2 Feb 2023 09:28:21 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3ncvttwyk4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 02 Feb 2023 09:28:20 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3129SHtv47645182
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 2 Feb 2023 09:28:17 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 591D32004D;
-        Thu,  2 Feb 2023 09:28:17 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B34BE20043;
-        Thu,  2 Feb 2023 09:28:16 +0000 (GMT)
-Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.28.52])
-        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Thu,  2 Feb 2023 09:28:16 +0000 (GMT)
-From:   Pierre Morel <pmorel@linux.ibm.com>
-To:     linux-s390@vger.kernel.org
-Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
-        imbrenda@linux.ibm.com, david@redhat.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com
-Subject: [kvm-unit-tests PATCH v6 2/2] s390x: topology: Checking Configuration Topology Information
-Date:   Thu,  2 Feb 2023 10:28:14 +0100
-Message-Id: <20230202092814.151081-3-pmorel@linux.ibm.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230202092814.151081-1-pmorel@linux.ibm.com>
-References: <20230202092814.151081-1-pmorel@linux.ibm.com>
+        with ESMTP id S232524AbjBBJo1 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 04:44:27 -0500
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2061.outbound.protection.outlook.com [40.107.93.61])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7009887597;
+        Thu,  2 Feb 2023 01:43:50 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=nUmPy65v1aw5aFZXvWXjZOCYUeo4kAPGwNAD1BEYffJEaUm9i8XBuaUSDIvcPD8tTsNXByRB3ze/To9lsHFt0HFFSkNLiekJDPpQWhH1u61z6tP5y4jxQmarZIb/qR+1q0ffZHt5pU0gtemh+rn5Ubb945DA1kZrWv4GqLSaltWCi1ev17n8Bvq2J8rbj93Wv4HYdtIAedr3tcOU4WAO8HiFdQj8b5TD59rHqovsJT+WCPoyJmNo1fgw+G55YdnuHz04XfDXLeerw5HvtFcTGA0NwWhCTrR4MRf7iLDT+7mdRuieA98HrziVToF2NY6Be9Lo764Q5Sg5b9DgdHP85Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=45fQumEXRGcmvB2AdAziYJpk3tepWzltm3WITh7jUy8=;
+ b=aXFeYXSG1EwV5qDGkvFyILkkUg3HM59fneIutab14wk43x1zqk+Z0ifTMVrkxv8oIylaFuEHSW4oZHvxKwSjzLoZyzCZ01uTL54NhyzU9n3qKWOAVYYOkdw/LHjqL6EOIxgcuIRcD3f3RFM6akRVSAZF1++ejPRnM99QgGzuN5iRwXH6XVgILmXglR62r1TXjgfkUoRAC0+CNbHQQUKmFdbw8UyiA0OZ2RlyujeIQQksrC3W8RVSFHWtZZHCoQbCGINGXakU6CVtf2i3wE2IRa0W6DAPXNWOJbex95GFinn31vqNcv/hvK1LE8x+JBdRsWICH2P/kjBj6K3OEBLskg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=45fQumEXRGcmvB2AdAziYJpk3tepWzltm3WITh7jUy8=;
+ b=XTnH4JiXDiuoYDYFHEXlJ4LV1L0fhflLgb4GhaNAyQ8J2MimKEF3toVedWHkZQrgYDv9IjHNKHDKpx1gc6i9xYd4LPbz0nRbbRckjalYeoGuCjCzWq+u2F0UnI/5cyL7zgp5WsXQOhrjDcBoQADhO3UsJEiW1NK8h6vT8Jy+WkY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11)
+ by BL3PR12MB6426.namprd12.prod.outlook.com (2603:10b6:208:3b5::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.22; Thu, 2 Feb
+ 2023 09:43:11 +0000
+Received: from CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::caf0:cffe:94c4:df18]) by CY5PR12MB6323.namprd12.prod.outlook.com
+ ([fe80::caf0:cffe:94c4:df18%2]) with mapi id 15.20.6043.038; Thu, 2 Feb 2023
+ 09:43:11 +0000
+Message-ID: <66f93354-22b1-a2aa-f64c-6e70b9b8063c@amd.com>
+Date:   Thu, 2 Feb 2023 15:12:53 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v2 09/11] KVM: SVM: Add VNMI bit definition
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>,
+        Maxim Levitsky <mlevitsk@redhat.com>
+Cc:     kvm@vger.kernel.org, Sandipan Das <sandipan.das@amd.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jim Mattson <jmattson@google.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Pawan Gupta <pawan.kumar.gupta@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Josh Poimboeuf <jpoimboe@kernel.org>,
+        Daniel Sneddon <daniel.sneddon@linux.intel.com>,
+        Jiaxi Chen <jiaxi.chen@linux.intel.com>,
+        Babu Moger <babu.moger@amd.com>, linux-kernel@vger.kernel.org,
+        Jing Liu <jing2.liu@intel.com>,
+        Wyes Karny <wyes.karny@amd.com>, x86@kernel.org,
+        "H. Peter Anvin" <hpa@zytor.com>
+References: <20221129193717.513824-1-mlevitsk@redhat.com>
+ <20221129193717.513824-10-mlevitsk@redhat.com> <Y9mZRU3nbz6ru2lS@google.com>
+From:   Santosh Shukla <santosh.shukla@amd.com>
+In-Reply-To: <Y9mZRU3nbz6ru2lS@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MA1P287CA0017.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:a00:35::36) To CY5PR12MB6323.namprd12.prod.outlook.com
+ (2603:10b6:930:20::11)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 7tml0u6OtQkXp5NeoF5oIKNzlZXW8WIA
-X-Proofpoint-GUID: GHSnc09e80SPv8lQ1krNKpN3dmnMqvxS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-02_01,2023-01-31_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- mlxscore=0 lowpriorityscore=0 impostorscore=0 priorityscore=1501
- suspectscore=0 mlxlogscore=859 bulkscore=0 spamscore=0 clxscore=1015
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302020085
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6323:EE_|BL3PR12MB6426:EE_
+X-MS-Office365-Filtering-Correlation-Id: bb38b24d-55f4-4cc2-fc42-08db0501e5c8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: n4XF7O3aC5/pOmHgqwFBEEBlAi06sl6E/L5S5xiWPFQjicmHoXuTKDYPSmaG0qpnzeTx6/pWYgoFENinOhJKHG4PGCwOG4H566X5AFVXmnghXWchV2onO255TfEAcyEh8d+6hMtBcShdZSbdMvRZRszHp3Bn9KtnqDKjn1bl2KUAhkW+mGUV2ZncfQgt4xnpD2GQqxfNaC2Bjz4sFqL/8Hk7Xk8j+P+8fkUF6PvnjKetUy//AO+rPKCWVn9siAgFjO+hOvUrZdSOmNw6UAr7ny816O27HxZ31d17vc2XXA8/9ziw0fLzfzliWynnmVgA6zcfNXx8suJvewjPzoN5fH7Qcb3wP+Dc5voAecRCtNJUUwW0Efj+1RY/4SisH3oTca3Lmr+MFWwx/VFWhRduEkczZUbMa7wvOV6VGX9BK5WaE2kVH6w2Moy2A6p/H6HbfUXMCI5RhDcZ40XWTOSG215wYt4lqcjGfPBj/OREb8BwNq4vzRHqhueURRht36sZa5kX+o58lmtZejZOJIDCwetOYwynejTAQ2G5dZRUqmUuRfaapFjQp676d/jjOamdVPrAak3BIkinx5MAPB22VdZPtmP64rBeELCIKFnmP/S30ZxMQ+xSV4yt3qLcUajpqtwqkvtrDigzOXtBe52d+xQnSUnN2bAGCvGHMEqAD4IHHhUPnQ4+NabsD41DyzDet2WmKXbjUiuT+dVwZ3KxNYRxeLDSZUokwyLf3BU3oyA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6323.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(366004)(136003)(396003)(376002)(39860400002)(346002)(451199018)(110136005)(8676002)(54906003)(66476007)(6486002)(2906002)(478600001)(316002)(41300700001)(8936002)(4326008)(66946007)(44832011)(5660300002)(66556008)(7416002)(86362001)(31696002)(38100700002)(36756003)(2616005)(186003)(6512007)(26005)(31686004)(83380400001)(6666004)(53546011)(6506007)(55236004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RGE2Vm1iRkhFNFVjeVVmdDhPZ1dpVHdkQUdwVFBzYmRJcUZOQlU3SlBCMlpY?=
+ =?utf-8?B?b25ac05DeXpvUHBJWU9vUTQ0VXRQMjMzYWdKeVdHSitlRDQyRCthcFBzMEs4?=
+ =?utf-8?B?bXdwOVFDeWlDWUxjVWFXYUdCRi80RTFhejJhRDdvNERqb2NOWTZHVWNBWFNK?=
+ =?utf-8?B?R1VmSEV3ZEc1bkt1YlF4bjQ0aitKRm1obS9VV0wxdUc3S2NLUXBKVGJnajFo?=
+ =?utf-8?B?K3VDKzdyR1AzYk0vRFJFeUNkazBYekJXQ3JtdFgvRzhFdmZ5Sk1HVWJYRTVJ?=
+ =?utf-8?B?REp0T3dsNHlYL1NZRm9PeVM2akxTN3VKSVppbmIvMmM0L0ZMYm5ZdUg1WUdR?=
+ =?utf-8?B?bjJQUDYxSmt5MVJySVdPYU00LzdrR21KKzhIZjlPbXFVUUZTVWo2blZyU2dm?=
+ =?utf-8?B?MENlRklRYzYrRUJCZ0Ira1ZFeEU3VndqWi8rUmdwaE5FNkwrM2dFYVlZNloy?=
+ =?utf-8?B?cm1XZHZrMjgzdjR2YzhhYkd4L3orbi91b25NaGhhcnk3MHk3ZHZJS3RVMmtD?=
+ =?utf-8?B?UENnV1lWYndnaW42NHdnd29WS0IzZC9sNTBSNmJzUXNKeXNCZVFWMjFDTFEw?=
+ =?utf-8?B?dHdab2Job3dYZksycTJvUUJzTSt2QTZDRk0yVmVyZnpydGs4d012NlEycEYr?=
+ =?utf-8?B?dDYrSThvV2tJOGxib2VOaS9RdmczWHRnQ1J5Z2hVbmVJbTcxRTZZSTllbTBz?=
+ =?utf-8?B?MTlPekFLMWpwMFdxOHF0bjZkdGxlNFpwZVRyZng3ei9qVUtISUNCTjFsckpi?=
+ =?utf-8?B?TkZTRXlpb1Rhc3dubHdZamJ1WUJGc20za3FHekUvQVlaMXdqOVl2b0ROa0l1?=
+ =?utf-8?B?bmRHUWdpZ25idTlyQy9WQVZGQnVxQmNiOHpUdDBaTlE0R0xyc2x0Zk9KZFJD?=
+ =?utf-8?B?T25RaUR1QnB2OFZ2Y21wb2U4MVRyQVFHNXpqcitUdnZHWGMxM2k1SHpsUHNG?=
+ =?utf-8?B?VTNkeUlIMDRpVStnWFVoYmxjU1VJd3FWWUNyOXFFSUxubThjV0tMdEI5a2Z1?=
+ =?utf-8?B?VnFNdjZtdU1ZU0ZFWVVKWnFWYW1GUUJuTkd1cjlOMTJCRk5jMGhicG9qVytJ?=
+ =?utf-8?B?OW0rRnQyTWR1cXVWWFlNOUJVd1ZCVE44OFJoNEFjZnhTMWxzNFJ6aEc0UTE1?=
+ =?utf-8?B?T29oUi9UYXJ2OEhLbHlFMmJnNE92NFg2TmhSeVRETVc4OEU3NERUejJHQUdu?=
+ =?utf-8?B?OHVxWVZTRFBrUmdzRkRTdkkxRzZBVzZYb3A2MXVidXVjb2hFUGRCUWlMOTRI?=
+ =?utf-8?B?OUs4UUg5MUxNT3g2WEpoamZmSkQwTlYzb3dzV1lWN2dIcWhzM0lNUFhXclJN?=
+ =?utf-8?B?NU9FVzlHSm56WnkvQk9ocXphUFRjMXM5TEFOOExacy9JaHRMckU0aVdua2l3?=
+ =?utf-8?B?QmVYbE5sb0tvVkNrZzdKc0pFNGFiVm5rR1JMazFpWlZtUU9PTnVaT0wwNmsx?=
+ =?utf-8?B?RUtESUcwcUFpRTdQWlowbVp4Q0xGZ2FkK3VMc0NkQWZQRjBXc25uT00xSHpR?=
+ =?utf-8?B?QkxXS3NzcmM0bHVIeEJxeFI5NVNoWVJYczJwdWF0ZmwwS2JlTG9TcFlyakFG?=
+ =?utf-8?B?bS8zWE14c1lNSlhuMFRwaVhRMUVuN0V3SWp6a05qZVZMY0dQRVo4Wjd4blg3?=
+ =?utf-8?B?WW5qT3NQU3hFdUhtQ0NQeXpwZGUvK2NQRmR3WDlSWGxMQk1oWkxzMjZMZnVj?=
+ =?utf-8?B?TzZkM2tlOElHby9rb2NTSVRxWlo3L3hwRHVha21BZXpwM3kzNlgzK2JUTTl2?=
+ =?utf-8?B?c3NxTkpTNTc4RUViaW5GUndRckJjcml5VktaQ21XcVBUY2tCU3I2OVBHWUth?=
+ =?utf-8?B?ZGEzUmJEYnBRemZyaXpodHQwOFNJWnQ2Q3R5QXlKdm1jT3hRRjF5NXU1NEtu?=
+ =?utf-8?B?SGVHcDcyMHd6Q2pDcmRJSFRmQUlsRTJvMlFLKzNkUngwNzdKam9xczFHR2d4?=
+ =?utf-8?B?U0Q0QXNXZm50MzJkb0hWa1o0cnkwTjdXWjRCMDZGeHNmbnNVakI1Q0lFQkQ2?=
+ =?utf-8?B?QmdtLzFNdzdYZ0N0aTVIZzA3Wmp2UXRaNzcyY0crUHIzalFoVVhYckJJRUpk?=
+ =?utf-8?B?THNoeDZRQVIyNzI5Q2NDMHVlMTlkQUhOTkJzUEpMREgzaTNleXRmaE1jZ1d3?=
+ =?utf-8?Q?zr5oJ18d27l9i6gPPAWeS/7w4?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bb38b24d-55f4-4cc2-fc42-08db0501e5c8
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6323.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2023 09:43:11.5222
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FxfBVO73i8W4D03lQRe8QvdOzixc2Zx7xxeo8Xd8Mg76S5T7p0wBElhQVxg+goOlGtnd/AqZmWgELCMZtZpOCw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6426
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-STSI with function code 15 is used to store the CPU configuration
-topology.
 
-We retrieve the maximum nested level with SCLP and use the
-topology tree provided by the drawers, books, sockets, cores
-arguments.
 
-We check :
-- if the topology stored is coherent between the QEMU -smp
-  parameters and kernel parameters.
-- the number of CPUs
-- the maximum number of CPUs
-- the number of containers of each levels for every STSI(15.1.x)
-  instruction allowed by the machine.
+On 2/1/2023 4:12 AM, Sean Christopherson wrote:
+> On Tue, Nov 29, 2022, Maxim Levitsky wrote:
+>> From: Santosh Shukla <santosh.shukla@amd.com>
+>>
+>> VNMI exposes 3 capability bits (V_NMI, V_NMI_MASK, and V_NMI_ENABLE) to
+>> virtualize NMI and NMI_MASK, Those capability bits are part of
+>> VMCB::intr_ctrl -
+>> V_NMI(11) - Indicates whether a virtual NMI is pending in the guest.
+>> V_NMI_MASK(12) - Indicates whether virtual NMI is masked in the guest.
+>> V_NMI_ENABLE(26) - Enables the NMI virtualization feature for the guest.
+>>
+>> When Hypervisor wants to inject NMI, it will set V_NMI bit, Processor
+>> will clear the V_NMI bit and Set the V_NMI_MASK which means the Guest is
+>> handling NMI, After the guest handled the NMI, The processor will clear
+>> the V_NMI_MASK on the successful completion of IRET instruction Or if
+>> VMEXIT occurs while delivering the virtual NMI.
+>>
+>> To enable the VNMI capability, Hypervisor need to program
+>> V_NMI_ENABLE bit 1.
+>>
+>> Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+>> Signed-off-by: Santosh Shukla <santosh.shukla@amd.com>
+>> ---
+>>  arch/x86/include/asm/svm.h | 7 +++++++
+>>  1 file changed, 7 insertions(+)
+>>
+>> diff --git a/arch/x86/include/asm/svm.h b/arch/x86/include/asm/svm.h
+>> index cb1ee53ad3b189..26d6f549ce2b46 100644
+>> --- a/arch/x86/include/asm/svm.h
+>> +++ b/arch/x86/include/asm/svm.h
+>> @@ -203,6 +203,13 @@ struct __attribute__ ((__packed__)) vmcb_control_area {
+>>  #define X2APIC_MODE_SHIFT 30
+>>  #define X2APIC_MODE_MASK (1 << X2APIC_MODE_SHIFT)
+>>  
+>> +#define V_NMI_PENDING_SHIFT 11
+>> +#define V_NMI_PENDING (1 << V_NMI_PENDING_SHIFT)
+>> +#define V_NMI_MASK_SHIFT 12
+>> +#define V_NMI_MASK (1 << V_NMI_MASK_SHIFT)
+> 
+> Argh, more KVM warts.  The existing INT_CTL defines all use "mask" in the name,
+> so looking at V_NMI_MASK in the context of other code reads "vNMI is pending",
+> not "vNMIs are blocked".
+> 
+> IMO, the existing _MASK terminology is the one that's wrong, but there's an absurd
+> amount of prior art in svm.h :-(
+> 
+> And the really annoying one is V_INTR_MASKING_MASK, which IIRC says "virtual INTR
+> masking is enabled", not "virtual INTRs are blocked".
+> 
+> So maybe call this V_NMI_BLOCKING_MASK?  And tack on _MASK too the others (even
+> though I agree it's ugly).
+> 
 
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
----
- lib/s390x/sclp.h    |   3 +-
- lib/s390x/stsi.h    |  44 ++++++++
- s390x/topology.c    | 244 ++++++++++++++++++++++++++++++++++++++++++++
- s390x/unittests.cfg |   1 +
- 4 files changed, 291 insertions(+), 1 deletion(-)
+Sure.
 
-diff --git a/lib/s390x/sclp.h b/lib/s390x/sclp.h
-index 853529b..6ecfb0a 100644
---- a/lib/s390x/sclp.h
-+++ b/lib/s390x/sclp.h
-@@ -150,7 +150,8 @@ typedef struct ReadInfo {
- 	SCCBHeader h;
- 	uint16_t rnmax;
- 	uint8_t rnsize;
--	uint8_t  _reserved1[16 - 11];       /* 11-15 */
-+	uint8_t  _reserved1[15 - 11];       /* 11-14 */
-+	uint8_t stsi_parm;                  /* 15-15 */
- 	uint16_t entries_cpu;               /* 16-17 */
- 	uint16_t offset_cpu;                /* 18-19 */
- 	uint8_t  _reserved2[24 - 20];       /* 20-23 */
-diff --git a/lib/s390x/stsi.h b/lib/s390x/stsi.h
-index bebc492..8dbbfc2 100644
---- a/lib/s390x/stsi.h
-+++ b/lib/s390x/stsi.h
-@@ -29,4 +29,48 @@ struct sysinfo_3_2_2 {
- 	uint8_t ext_names[8][256];
- };
- 
-+struct topology_core {
-+	uint8_t nl;
-+	uint8_t reserved1[3];
-+	uint8_t reserved4:5;
-+	uint8_t d:1;
-+	uint8_t pp:2;
-+	uint8_t type;
-+	uint16_t origin;
-+	uint64_t mask;
-+};
-+
-+struct topology_container {
-+	uint8_t nl;
-+	uint8_t reserved[6];
-+	uint8_t id;
-+};
-+
-+union topology_entry {
-+	uint8_t nl;
-+	struct topology_core cpu;
-+	struct topology_container container;
-+};
-+
-+#define CPU_TOPOLOGY_MAX_LEVEL 6
-+struct sysinfo_15_1_x {
-+	uint8_t reserved0[2];
-+	uint16_t length;
-+	uint8_t mag[CPU_TOPOLOGY_MAX_LEVEL];
-+	uint8_t reserved0a;
-+	uint8_t mnest;
-+	uint8_t reserved0c[4];
-+	union topology_entry tle[0];
-+};
-+
-+static inline int cpus_in_tle_mask(uint64_t val)
-+{
-+	int i, n;
-+
-+	for (i = 0, n = 0; i < 64; i++, val >>= 1)
-+		if (val & 0x01)
-+			n++;
-+	return n;
-+}
-+
- #endif  /* _S390X_STSI_H_ */
-diff --git a/s390x/topology.c b/s390x/topology.c
-index 20f7ba2..f21c653 100644
---- a/s390x/topology.c
-+++ b/s390x/topology.c
-@@ -16,6 +16,18 @@
- #include <smp.h>
- #include <sclp.h>
- #include <s390x/hardware.h>
-+#include <s390x/stsi.h>
-+
-+static uint8_t pagebuf[PAGE_SIZE * 2] __attribute__((aligned(PAGE_SIZE * 2)));
-+
-+static int max_nested_lvl;
-+static int number_of_cpus;
-+static int max_cpus = 1;
-+
-+/* Topology level as defined by architecture */
-+static int arch_topo_lvl[CPU_TOPOLOGY_MAX_LEVEL];
-+/* Topology nested level as reported in STSI */
-+static int stsi_nested_lvl[CPU_TOPOLOGY_MAX_LEVEL];
- 
- #define PTF_REQ_HORIZONTAL	0
- #define PTF_REQ_VERTICAL	1
-@@ -122,11 +134,241 @@ end:
- 	report_prefix_pop();
- }
- 
-+/*
-+ * stsi_check_maxcpus
-+ * @info: Pointer to the stsi information
-+ *
-+ * The product of the numbers of containers per level
-+ * is the maximum number of CPU allowed by the machine.
-+ */
-+static void stsi_check_maxcpus(struct sysinfo_15_1_x *info)
-+{
-+	int n, i;
-+
-+	report_prefix_push("maximum cpus");
-+
-+	for (i = 0, n = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-+		report_info("Mag%d: %d", CPU_TOPOLOGY_MAX_LEVEL - i, info->mag[i]);
-+		n *= info->mag[i] ? info->mag[i] : 1;
-+	}
-+	report(n == max_cpus, "Maximum CPUs %d expected %d", n, max_cpus);
-+
-+	report_prefix_pop();
-+}
-+
-+/*
-+ * stsi_check_tle_coherency
-+ * @info: Pointer to the stsi information
-+ * @sel2: Topology level to check.
-+ *
-+ * We verify that we get the expected number of Topology List Entry
-+ * containers for a specific level.
-+ */
-+static void stsi_check_tle_coherency(struct sysinfo_15_1_x *info, int sel2)
-+{
-+	struct topology_container *tc, *end;
-+	struct topology_core *cpus;
-+	int n = 0;
-+	int i;
-+
-+	report_prefix_push("TLE coherency");
-+
-+	tc = &info->tle[0].container;
-+	end = (struct topology_container *)((unsigned long)info + info->length);
-+
-+	for (i = 0; i < CPU_TOPOLOGY_MAX_LEVEL; i++)
-+		stsi_nested_lvl[i] = 0;
-+
-+	while (tc < end) {
-+		if (tc->nl > 5) {
-+			report_abort("Unexpected TL Entry: tle->nl: %d", tc->nl);
-+			return;
-+		}
-+		if (tc->nl == 0) {
-+			cpus = (struct topology_core *)tc;
-+			n += cpus_in_tle_mask(cpus->mask);
-+			report_info("cpu type %02x  d: %d pp: %d", cpus->type, cpus->d, cpus->pp);
-+			report_info("origin : %04x mask %016lx", cpus->origin, cpus->mask);
-+		}
-+
-+		stsi_nested_lvl[tc->nl]++;
-+		report_info("level %d: lvl: %d id: %d cnt: %d",
-+			    tc->nl, tc->nl, tc->id, stsi_nested_lvl[tc->nl]);
-+
-+		/* trick: CPU TLEs are twice the size of containers TLE */
-+		if (tc->nl == 0)
-+			tc++;
-+		tc++;
-+	}
-+	report(n == number_of_cpus, "Number of CPUs  : %d expect %d", n, number_of_cpus);
-+	/*
-+	 * For KVM we accept
-+	 * - only 1 type of CPU
-+	 * - only horizontal topology
-+	 * - only dedicated CPUs
-+	 * This leads to expect the number of entries of level 0 CPU
-+	 * Topology Level Entry (TLE) to be:
-+	 * 1 + (number_of_cpus - 1)  / arch_topo_lvl[0]
-+	 *
-+	 * For z/VM or LPAR this number can only be greater if different
-+	 * polarity, CPU types because there may be a nested level 0 CPU TLE
-+	 * for each of the CPU/polarity/sharing types in a level 1 container TLE.
-+	 */
-+	n =  (number_of_cpus - 1)  / arch_topo_lvl[0];
-+	report(stsi_nested_lvl[0] >=  n + 1,
-+	       "CPU Type TLE    : %d expect %d", stsi_nested_lvl[0], n + 1);
-+
-+	/* For each level found in STSI */
-+	for (i = 1; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-+		/*
-+		 * For non QEMU/KVM hypervisor the concatenation of the levels
-+		 * above level 1 are architecture dependent.
-+		 * Skip these checks.
-+		 */
-+		if (!host_is_kvm() && sel2 != 2)
-+			continue;
-+
-+		/* For QEMU/KVM we expect a simple calculation */
-+		if (sel2 > i) {
-+			report(stsi_nested_lvl[i] ==  n + 1,
-+			       "Container TLE  %d: %d expect %d", i, stsi_nested_lvl[i], n + 1);
-+			n /= arch_topo_lvl[i];
-+		}
-+	}
-+
-+	report_prefix_pop();
-+}
-+
-+/*
-+ * check_sysinfo_15_1_x
-+ * @info: pointer to the STSI info structure
-+ * @sel2: the selector giving the topology level to check
-+ *
-+ * Check if the validity of the STSI instruction and then
-+ * calls specific checks on the information buffer.
-+ */
-+static void check_sysinfo_15_1_x(struct sysinfo_15_1_x *info, int sel2)
-+{
-+	int ret;
-+
-+	report_prefix_pushf("mnested %d 15_1_%d", max_nested_lvl, sel2);
-+
-+	ret = stsi(pagebuf, 15, 1, sel2);
-+	if (max_nested_lvl >= sel2) {
-+		report(!ret, "Valid stsi instruction");
-+	} else {
-+		report(ret, "Invalid stsi instruction");
-+		goto end;
-+	}
-+
-+	stsi_check_maxcpus(info);
-+	stsi_check_tle_coherency(info, sel2);
-+
-+end:
-+	report_prefix_pop();
-+}
-+
-+static int sclp_get_mnest(void)
-+{
-+	ReadInfo *sccb = (void *)_sccb;
-+
-+	sclp_mark_busy();
-+	memset(_sccb, 0, PAGE_SIZE);
-+	sccb->h.length = PAGE_SIZE;
-+
-+	sclp_service_call(SCLP_CMDW_READ_SCP_INFO, sccb);
-+	assert(sccb->h.response_code == SCLP_RC_NORMAL_READ_COMPLETION);
-+
-+	return sccb->stsi_parm;
-+}
-+
-+/*
-+ * test_stsi
-+ *
-+ * Retrieves the maximum nested topology level supported by the architecture
-+ * and the number of CPUs.
-+ * Calls the checking for the STSI instruction in sel2 reverse level order
-+ * from 6 (CPU_TOPOLOGY_MAX_LEVEL) to 2 to have the most interesting level,
-+ * the one triggering a topology-change-report-pending condition, level 2,
-+ * at the end of the report.
-+ *
-+ */
-+static void test_stsi(void)
-+{
-+	int sel2;
-+
-+	max_nested_lvl = sclp_get_mnest();
-+	report_info("SCLP maximum nested level : %d", max_nested_lvl);
-+
-+	number_of_cpus = sclp_get_cpu_num();
-+	report_info("SCLP number of CPU: %d", number_of_cpus);
-+
-+	/* STSI selector 2 can takes values between 2 and 6 */
-+	for (sel2 = 6; sel2 >= 2; sel2--)
-+		check_sysinfo_15_1_x((struct sysinfo_15_1_x *)pagebuf, sel2);
-+}
-+
-+/*
-+ * parse_topology_args
-+ * @argc: number of arguments
-+ * @argv: argument array
-+ *
-+ * This function initialize the architecture topology levels
-+ * which should be the same as the one provided by the hypervisor.
-+ *
-+ * We use the current names found in IBM/Z literature, Linux and QEMU:
-+ * cores, sockets/packages, books, drawers and nodes to facilitate the
-+ * human machine interface but store the result in a machine abstract
-+ * array of architecture topology levels.
-+ * Note that when QEMU uses socket as a name for the topology level 1
-+ * Linux uses package or physical_package.
-+ */
-+static void parse_topology_args(int argc, char **argv)
-+{
-+	int i;
-+
-+	report_info("%d arguments", argc);
-+	for (i = 1; i < argc; i++) {
-+		if (!strcmp("-cores", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-cores needs a parameter");
-+			arch_topo_lvl[0] = atol(argv[i]);
-+			report_info("cores: %d", arch_topo_lvl[0]);
-+		} else if (!strcmp("-sockets", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-sockets needs a parameter");
-+			arch_topo_lvl[1] = atol(argv[i]);
-+			report_info("sockets: %d", arch_topo_lvl[1]);
-+		} else if (!strcmp("-books", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-books needs a parameter");
-+			arch_topo_lvl[2] = atol(argv[i]);
-+			report_info("books: %d", arch_topo_lvl[2]);
-+		} else if (!strcmp("-drawers", argv[i])) {
-+			i++;
-+			if (i >= argc)
-+				report_abort("-drawers needs a parameter");
-+			arch_topo_lvl[3] = atol(argv[i]);
-+			report_info("drawers: %d", arch_topo_lvl[3]);
-+		}
-+	}
-+
-+	for (i = 0; i < CPU_TOPOLOGY_MAX_LEVEL; i++) {
-+		if (!arch_topo_lvl[i])
-+			arch_topo_lvl[i] = 1;
-+		max_cpus *= arch_topo_lvl[i];
-+	}
-+}
-+
- static struct {
- 	const char *name;
- 	void (*func)(void);
- } tests[] = {
- 	{ "PTF", test_ptf},
-+	{ "STSI", test_stsi},
- 	{ NULL, NULL }
- };
- 
-@@ -136,6 +378,8 @@ int main(int argc, char *argv[])
- 
- 	report_prefix_push("CPU Topology");
- 
-+	parse_topology_args(argc, argv);
-+
- 	if (!test_facility(11)) {
- 		report_skip("Topology facility not present");
- 		goto end;
-diff --git a/s390x/unittests.cfg b/s390x/unittests.cfg
-index 3530cc4..b697aca 100644
---- a/s390x/unittests.cfg
-+++ b/s390x/unittests.cfg
-@@ -211,3 +211,4 @@ smp = 2
- 
- [topology]
- file = topology.elf
-+extra_params=-smp 5,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 -append '-drawers 3 -books 3 -sockets 4 -cores 4'
--- 
-2.31.1
+>> +#define V_NMI_ENABLE_SHIFT 26
+>> +#define V_NMI_ENABLE (1 << V_NMI_ENABLE_SHIFT)
+> 
+> Hrm.  I think I would prefer to keep the defines ordered by bit position.  Knowing
+> that there's an enable bit isn't all that critical for understanding vNMI pending
+> and blocked.
+
+Sure, Sean will include in V3.
+
+Thanks,
+Santosh
 
