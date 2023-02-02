@@ -2,48 +2,59 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 30FC26879B3
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 11:03:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B79966879C5
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 11:07:24 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232413AbjBBKDJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 05:03:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43578 "EHLO
+        id S232481AbjBBKHW (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 05:07:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232195AbjBBKDG (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 05:03:06 -0500
+        with ESMTP id S229671AbjBBKHV (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 05:07:21 -0500
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 227BF4231;
-        Thu,  2 Feb 2023 02:02:58 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A35196EAC0;
+        Thu,  2 Feb 2023 02:07:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
         In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=u2oqcbToefQOLeEMSkejGEEHfginKg8pvaMl/WW6b9U=; b=rBEqJ2Ztpw9l2h18uFDWCz04Ow
-        XD8VN/ZEefkDUJj8QDFadzGTP3rj8ir3yfTk4XzTHmkATLZGF4PZJm2+ufRK0WMLiP9BZM56w/LAA
-        QtPp2OR2EtjODsIrncj3UN4Bq9Njj12KKum9ifgWfxz2PFr7yCU8ZJnQdWfxqvql9htujakpsJqzR
-        gMv7jfUYbu/lHPJiI9J2/QDOtPULJ22q78NEUM0zIdMM0hfL9IYSJemu41asP86pwjlUyYi7Qgz6M
-        fzAgWkKRVkQy1cNPTfeYN9bMImUlHBUadru/cU7kzvc/BdAnkcbJpxKabrSchsOnHGtB2ue8OI88B
-        aNNT7C3A==;
-Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.ant.amazon.com)
+        bh=zazcIZWTS106UY5KbWguJvMoPbEyZL7+9aLHdaTrA5M=; b=e2zGNQjFp6ohv0EK/GXZstSYME
+        m+yzIIXS4s45wFH8AIfMEKlqBITvIUhaYYjep67O0gIXFOABb0Sk8gVvY5BMEKhk+7V0Tq6YEHJzl
+        DVf1OS0p+lQxuz3OD1VrpVW7CUkG07xHDMOAuoTMJD9p3JAuvddl0EuQvauPVribTs+EaITYUxAgD
+        zYS6ZmusKfZiBRWQwEQrxNBOcJr1qXDVF/NrOEI0WX3m3eAMBr9QAdOEuCrpsjiR+R6ql2wuapovv
+        9VrfXEuWi7hnD+gJI0J7/6IU+LlQKYPXqneiMTgnrBmDPlFcwt+pAV+X2ACv0dYOBYmyJEh/fyXlv
+        9YLptbAw==;
+Received: from [2001:8b0:10b:5::bb3] (helo=u3832b3a9db3152.infradead.org)
         by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1pNWQ2-00DHgo-MW; Thu, 02 Feb 2023 10:02:15 +0000
-Message-ID: <de9c33a14c370d09cefaa331b18525e164436082.camel@infradead.org>
-Subject: Re: [PATCH 0/9] Parallel CPU bringup for x86_64
+        id 1pNWUa-00DHvA-UL; Thu, 02 Feb 2023 10:06:57 +0000
+Message-ID: <c39ec509448e56f2002bd4ceef747b09dbf8a160.camel@infradead.org>
+Subject: Re: [External] Re: [PATCH v4 0/9] Parallel CPU bringup for x86_64
 From:   David Woodhouse <dwmw2@infradead.org>
-To:     Usama Arif <usama.arif@bytedance.com>, tglx@linutronix.de
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com
-Date:   Thu, 02 Feb 2023 10:02:13 +0000
-In-Reply-To: <20230201204338.1337562-1-usama.arif@bytedance.com>
-References: <20230201204338.1337562-1-usama.arif@bytedance.com>
+To:     "H. Peter Anvin" <hpa@zytor.com>,
+        Usama Arif <usama.arif@bytedance.com>,
+        Thomas Gleixner <tglx@linutronix.de>
+Cc:     Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        "Paul E . McKenney" <paulmck@kernel.org>,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        rcu@vger.kernel.org, mimoja@mimoja.de, hewenliang4@huawei.com,
+        hushiyuan@huawei.com, luolongjun@huawei.com, hejingxian@huawei.com,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Fam Zheng <fam.zheng@bytedance.com>,
+        Punit Agrawal <punit.agrawal@bytedance.com>,
+        simon.evans@bytedance.com, liangma@liangbit.com
+Date:   Thu, 02 Feb 2023 10:06:55 +0000
+In-Reply-To: <4C7F2481-0B0B-4399-A8E1-30731EFD02D2@zytor.com>
+References: <20220201205328.123066-1-dwmw2@infradead.org>
+         <ff876008-b642-4dbc-aa41-1639905e08b6@bytedance.com>
+         <1d0ed92ab68409b62a14cd29d0021f92c6e2568a.camel@infradead.org>
+         <7fda05c9-9d4a-6005-0ce5-91bda1bb06c1@bytedance.com>
+         <4C7F2481-0B0B-4399-A8E1-30731EFD02D2@zytor.com>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-        boundary="=-6fKw1VSoKTw4nwjUs7GA"
+        boundary="=-908WNcSLOvTrr71TRNtV"
 User-Agent: Evolution 3.44.4-0ubuntu1 
 MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
@@ -57,67 +68,97 @@ List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
 
---=-6fKw1VSoKTw4nwjUs7GA
+--=-908WNcSLOvTrr71TRNtV
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2023-02-01 at 20:43 +0000, Usama Arif wrote:
-> This patchseries is from the work done by David Woodhouse (v4: https://lo=
-re.kernel.org/all/20220201205328.123066-1-dwmw2@infradead.org/).
-> The parallel CPU bringup is disabled for all AMD CPUs in this version: (s=
-ee discussions: https://lore.kernel.org/all/bc3f2b1332c4bb77558df8aa36493a5=
-5542fe5b9.camel@infradead.org/=C2=A0and
-> https://lore.kernel.org/all/3b6ac86fdc800cac5806433daf14a9095be101e9.came=
-l@infradead.org/).
->=20
-> Doing INIT/SIPI/SIPI in parallel brings down the time for smpboot from ~7=
-00ms
-> to 100ms (85% improvement) on a server with 128 CPUs split across 2 NUMA
-> nodes.
->=20
-> Adding another cpuhp state for do_wait_cpu_initialized to make sure cpu_i=
-nit
-> is reached in parallel as proposed by David in v1 will bring it down furt=
-her
-> to ~30ms. Making this change would be dependent on this patchseries, so t=
-hey
-> could be explored if this gets merged.
->=20
-> Changes across versions:
-> v2: Cut it back to just INIT/SIPI/SIPI in parallel for now, nothing more
-> v3: Clean up x2apic patch, add MTRR optimisation, lock topology update
-> =C2=A0=C2=A0=C2=A0 in preparation for more parallelisation.
-> v4: Fixes to the real mode parallelisation patch spotted by SeanC, to
-> =C2=A0=C2=A0=C2=A0 avoid scribbling on initial_gs in common_cpu_up(), and=
- to allow all
-> =C2=A0=C2=A0=C2=A0 24 bits of the physical X2APIC ID to be used. That pat=
-ch still needs
-> =C2=A0=C2=A0=C2=A0 a Signed-off-by from its original author, who once cla=
-imed not to
-> =C2=A0=C2=A0=C2=A0 remember writing it at all. But now we've fixed it, ho=
-pefully he'll
-> =C2=A0=C2=A0=C2=A0 admit it now :)
-> v5: rebase to v6.1 and remeasure performance, disable parallel bringup
-> =C2=A0=C2=A0=C2=A0 for AMD CPUs.
+On Wed, 2023-02-01 at 08:55 -0800, H. Peter Anvin wrote:
+> This should be a CPU bug flag in my option.
 
-Thanks, Usama.
+This is in the tree that I've just rebased to v6.2-rc6 for Usama to
+continue testing and repost as appropriate.
 
-I've updated to v6.2-rc6 since there were a few more tweaks required
-(and we should double-check that the new handling of cache_ap_init from
-a dedicated cpuhp step works right if that ends up being done in
-parallel).
+(Oh, as I post it in email I realise we should probably retcon the
+explicit check for AMD out of the previous patch in the series. You can
+see it being *removed* in this patch.)
 
-I also fixed up the complaints from the test robot; including
-<linux/smpboot.h> from smpboot.c and making do_cpu_up() static, and
-putting #ifdef CONFIG_SMP around the 'are we booting the AP?' check and
-code segment in head_64.S.
+=46rom 1f7cece1241e5b9c9988f943962155bb7154d4f8 Mon Sep 17 00:00:00 2001
+From: David Woodhouse <dwmw@amazon.co.uk>
+Date: Thu, 2 Feb 2023 09:53:26 +0000
+Subject: [PATCH 07/15] x86/smpboot: Disable parallel boot for AMD CPUs
 
-I've made the AMD thing a CPU bug as Peter suggested, and pushed it to
-https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/paralle=
-l-6.2-rc6
-for you to do the real work of actually testing it :)
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+---
+ arch/x86/include/asm/cpufeatures.h |  1 +
+ arch/x86/kernel/cpu/amd.c          | 11 +++++++++++
+ arch/x86/kernel/smpboot.c          |  9 +++++++--
+ 3 files changed, 19 insertions(+), 2 deletions(-)
 
---=-6fKw1VSoKTw4nwjUs7GA
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpuf=
+eatures.h
+index 61012476d66e..ed7f32354edc 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -466,5 +466,6 @@
+ #define X86_BUG_MMIO_UNKNOWN		X86_BUG(26) /* CPU is too old and its MMIO S=
+tale Data status is unknown */
+ #define X86_BUG_RETBLEED		X86_BUG(27) /* CPU is affected by RETBleed */
+ #define X86_BUG_EIBRS_PBRSB		X86_BUG(28) /* EIBRS is vulnerable to Post Ba=
+rrier RSB Predictions */
++#define X86_BUG_NO_PARALLEL_BRINGUP	X86_BUG(29) /* CPU has hardware issues=
+ with parallel AP bringup */
+=20
+ #endif /* _ASM_X86_CPUFEATURES_H */
+diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
+index f769d6d08b43..19b5c8342d7e 100644
+--- a/arch/x86/kernel/cpu/amd.c
++++ b/arch/x86/kernel/cpu/amd.c
+@@ -941,6 +941,17 @@ static void init_amd(struct cpuinfo_x86 *c)
+ 	case 0x19: init_amd_zn(c); break;
+ 	}
+=20
++	/*
++	 * Various AMD CPUs appear to not to cope with APs being brought up
++	 * in parallel. In debugging, the AP doesn't even seem to reach an
++	 * outb to port 0x3f8 right at the top of the startup trampoline.
++	 * We don't *think* there are any remaining software issues which
++	 * may contribute to this, although it's possible. So far, attempts
++	 * to get AMD to investigate this have been to no avail. So just
++	 * disable parallel bring up for all AMD CPUs for now.
++	 */
++	set_cpu_bug(c, X86_BUG_NO_PARALLEL_BRINGUP);
++
+ 	/*
+ 	 * Enable workaround for FXSAVE leak on CPUs
+ 	 * without a XSaveErPtr feature
+diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+index 7920823d5a3b..95c182023d09 100644
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -1538,9 +1538,14 @@ void __init native_smp_prepare_cpus(unsigned int max=
+_cpus)
+ 	 * it for all AMD CPUs to be on the safe side.
+ 	 */
+ 	if (IS_ENABLED(CONFIG_X86_32) || boot_cpu_data.cpuid_level < 0x0B ||
+-	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT) ||
+-	    boot_cpu_data.x86_vendor =3D=3D X86_VENDOR_AMD)
++	    cc_platform_has(CC_ATTR_GUEST_STATE_ENCRYPT)) {
+ 		do_parallel_bringup =3D false;
++	}
++	if (do_parallel_bringup &&
++	    boot_cpu_has_bug(X86_BUG_NO_PARALLEL_BRINGUP)) {
++		pr_info("Disabling parallel bringup due to CPU bugs\n");
++		do_parallel_bringup =3D false;
++	}
+=20
+ 	snp_set_wakeup_secondary_cpu();
+ }
+--=20
+2.39.0
+
+
+
+--=-908WNcSLOvTrr71TRNtV
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -209,24 +250,24 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjAyMTAwMjEzWjAvBgkqhkiG9w0BCQQxIgQgjqqFIOwP
-4aeZuWsX/r/psx0BiASqntSjcyr/PcWth0kwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjMwMjAyMTAwNjU1WjAvBgkqhkiG9w0BCQQxIgQg97ZZWKw5
+aBJTqEYX2CM6jf/i/fE+6dE/urwkCGikjUIwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAuSuGtTnaDO2ebEZwrtOUTDiTvqQZPg6+C
-mZt287qtr8IlYVPYwAJpxHiG+WxssTxlIkF9Q2YgRolvw+Z6Fg6436+eY/L2aWcrAsiACdpMV0Ux
-+N+A3SLCTtlYKMjuDykSHtujdqUru8r60QnVdMlY7dvP6nzU9XSHuiLr2fFNen59s5v1QBVhaChi
-Hy2cNQhKUUh08SfKMX1mF6BNuoEp4fKEy+Lp/H4LDyUiXAZpsRazyLB2VyWjji8b1QRevkJdg6Ut
-E/azVeYtJWEgq4R7xH4BcTNaeD4fV8eiUjY8dy8wrif0UaOot+aYRYXtyZMgUJERg+BmRDp9SPDz
-blqQ4/xTMzZO472Ro7GzopSmAK6afy+cvp8pzUfTFnmbb3lOS4WbeudUuMteOEh1tdUTkYiA0QGD
-f+wQnJ9YEvjUoK32jMuJasm70aCd+bT0KaCjkMMbVjq/Nh/nkgeTbaW5SFiPrNGKQZTs6x3kIXem
-0MeJPTRH8U/o7DGphKcC0TuDkyWCIJy1+C+sgoR9Blp2XnSbZqjAs/ieyOhOjsfy+NbMdoeOP8Zs
-Ky6zlhpIQk/OxaaHpZq6jWJva+ox/Vm7P1JHOhfSsYfSte9fWZCoBwUdlNpKFPXpLyh6DjJMBVPU
-x8o66XRC2A3Vm6QqurMVZpH5sY1Z/ItsWSCjrDQHAwAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBxevMpGvJ6hWerWvVu+zIh7v/UFr3sE+nf
+6hPS3PbVy82mIpg/OMQPMahOqxwywXlUdd8VeY3QsjqSKugU1RuyaFcV/gj8aNmCAfPuL5D5KcyO
+e3xTAw84p38SfXdhLlyxDjLUzDRAud1LdGzm6qjPLQr5IIAq8nrKCf0P2XohSK7MFCOgt9d+ZFaj
+UozM1CB7DTDWOEIadIBTwxHo77Vts1HVLhF6U2gOfL3MvkT6xrP1USN5WiaBydPFS4do1Ef2PIqa
+b7iM3zfu41Et4jo45xCEB/P4JkDWnLGCeNnbQHTFzHNf8/Fom2uUNwyC6EvantNmDeXxpRF/8vKj
+Dq1R4F5LB91enLnSgnNsDHcyKQ9y/KqRXClwUKbZ20Ng6A1MkoX82A77Ln1EWjJQR5cTLUQ2ND5j
+0357ISKKiZu9cIPMN666Ja3bf39NGcnweTNa+jj5ICq37pzbp6HS340tJONnadCmB0k1ylNSoVwC
+GHW1V4wsqYd0cc8kBCxVStfjdkGxjbbEiBpWAmzPWYeV+pgVpoDbAijpxUbyjGkZe6EJQLq6qtcd
+MbH5L8JE+8P8WhoYn2DhkvEctYRfHMT41lQ9m30jxRA0hySU9WTjkOK2HPdx1PzDLCL6PzYKHyL/
+Rff9i0Vj5r5R3YrPAc0kge2+J2dFScGErxY08wLydwAAAAAAAA==
 
 
---=-6fKw1VSoKTw4nwjUs7GA--
+--=-908WNcSLOvTrr71TRNtV--
