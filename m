@@ -2,136 +2,204 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 36E4268896E
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 23:00:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9ED0B688981
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 23:03:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231322AbjBBWAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 17:00:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59980 "EHLO
+        id S233328AbjBBWDZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 17:03:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230504AbjBBWAp (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 17:00:45 -0500
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70641889A0
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 13:59:52 -0800 (PST)
-Received: by mail-wm1-x336.google.com with SMTP id l37-20020a05600c1d2500b003dfe46a9801so1022692wms.0
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 13:59:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GpQqIcYzW24NoE4rYiVknf6KZVN8LYqH5TXYzHdb+3M=;
-        b=mwh5EjD+CrWzvqutd8IljFnMGRQXj2tCaUtzf/ip7Fx/7JXdbc97L+E/EmTW9Oae73
-         9Ylt/v4jzuked0HEBtzU/q3pRrnsFRx+ZB7WxAQGE8qH+gWxbrIkpVhl87nxs73n9loO
-         fKG1uIuwKrHYhfZQ+GxXK4Cyn7XlbcZLSSv3McW7GHfVkWOwcoyIllOSckfARaD6G+cA
-         SLHOb1wgrhTf/xClLk9ydPorX3wtcu9Z8rh43CQLnMwktRcRnfudxaqmRpIG2SRkHYiC
-         o4fmZ7B88lQ0yrepdi8nofN2wQUWuoS+ZOn8VLEx2+i4Mzp60kYLRL2cVJ2vIsUzkfwR
-         LydA==
+        with ESMTP id S233272AbjBBWDC (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 17:03:02 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98DAB88CE3
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 14:01:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675375284;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cg6pr3XzYpc5DL6DcC4GwSw9pOl0fUz0Wz6d212U3LY=;
+        b=Auy1TWJhpeCBgfo4IA0iNhcH0BLQ0JxvKMs0SbV626Fv0p7pYPzxRZi7I9ia67eyM/GJ1a
+        llcn1VuffPMBGSOTvaIXB0GPVT72AyF3S3N+KhpYMU4UCI5bxPU5pr81HOnAFuRuEO+kzk
+        2u1ggq+9Y1Bhf5NakuJ1Lr51Xp5P92E=
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
+ [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-547-MFUaP_V1OSOYo2OaLPMeTA-1; Thu, 02 Feb 2023 17:01:13 -0500
+X-MC-Unique: MFUaP_V1OSOYo2OaLPMeTA-1
+Received: by mail-io1-f72.google.com with SMTP id b10-20020a5ea70a000000b0071a96a509a7so1936906iod.22
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 14:01:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GpQqIcYzW24NoE4rYiVknf6KZVN8LYqH5TXYzHdb+3M=;
-        b=NjKMMtRvY0faP/4nab2VJKM/tu5lxkmqwBDutPXBoHIRuhL5JYTmFQJMeq0dwuG7cU
-         RIax6cLpurl1QqIb5U0TKlC6l1uTqo2+cuG759scPCr5Z3F3rP9EUAP3gn35o4AKprAJ
-         k4k6/xyf1pBgTaknrkd45GEJNXigLstoVil0jrrTLz0Q9BDlItmRewm1De5CQ2HVSNik
-         DDPIDzBUFnFdv7iLhl3imSwiDBsvQpvfR4f39WnsDzsg/fKiaq4HO6q+JlbCqs+mao4i
-         44GVxXItS8grGGUJlj1m5gMZTvqp5jFpBfbRQqH9OkLES0ArGbZW1P1nyLdvDxpqlQSu
-         /rfA==
-X-Gm-Message-State: AO0yUKVa2/FmmN2cdQIOzoK3gOufTUkumyzc7dfbmV9WS3KcdbMEDy3O
-        88fy1mJmF9qlDj0UIftTTM6GTw==
-X-Google-Smtp-Source: AK7set8o50YFSBYeEBNtkAiBgAaIbG+rH/XDVtTCYV/fEyqOwguJihiZFYOvbTE8c29A7YdgzKGIMw==
-X-Received: by 2002:a05:600c:1c1f:b0:3dc:5e21:8aa2 with SMTP id j31-20020a05600c1c1f00b003dc5e218aa2mr7362676wms.34.1675375170436;
-        Thu, 02 Feb 2023 13:59:30 -0800 (PST)
-Received: from ?IPV6:2a02:6b6a:b566:0:98fe:e4ee:fc7e:cd71? ([2a02:6b6a:b566:0:98fe:e4ee:fc7e:cd71])
-        by smtp.gmail.com with ESMTPSA id l16-20020a1c7910000000b003dc1d668866sm5710640wme.10.2023.02.02.13.59.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 13:59:29 -0800 (PST)
-Message-ID: <702e3663-ceaa-c2b9-960f-1c909865f3d2@bytedance.com>
-Date:   Thu, 2 Feb 2023 21:59:29 +0000
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cg6pr3XzYpc5DL6DcC4GwSw9pOl0fUz0Wz6d212U3LY=;
+        b=oxapFzWONGebsB5DiP+LGNpdAI09Ib8m74IDdeaXlFasIaeMHXImnYzOCyNFA+KyVl
+         gUGmUUmxmb4V/dQfXe8LWfax5otcshuFB83hkVM64zv2W0d0ibHlS7X3U83AAKR8JKsV
+         JEfgbZ0vOPJMq3bcXCw3JBLhUyJnSDUGJ+z/RWQqhIlm3bRc3+NtbCRHE4hgtWjaWhc2
+         POioRA74S8v/teLPSMPgyFyRXks8p0VlEurckk1WhSzBrO7XZCMeGs7qeJIMnOSpMTMB
+         R1c3uGhLAKXUp6KBRiOCiGKzh0evtsp2f57lwglebi7lOjPmWoZ00u1Jj6O82mtVvH+J
+         3r/Q==
+X-Gm-Message-State: AO0yUKWewWrSikxp+Mb2cA647+80Ghz33XHemDQZxmY1IR4tryvhoEfS
+        T/xlR27acsANYZAzSEStInn0EKj1VWhIdN/x8i5sRIAm2U3PxvHhzv03jFVpmTFKIYWjGjer/y9
+        IB55CFQw9J72k
+X-Received: by 2002:a5d:8186:0:b0:712:cf90:e3e with SMTP id u6-20020a5d8186000000b00712cf900e3emr4913975ion.2.1675375272434;
+        Thu, 02 Feb 2023 14:01:12 -0800 (PST)
+X-Google-Smtp-Source: AK7set+5gMlu3C4avfByIvD48JpL7JdfIsclvwHls2LZoJC1BhU6TXJPisJU5JXKf3HwY9UQB3eeUg==
+X-Received: by 2002:a5d:8186:0:b0:712:cf90:e3e with SMTP id u6-20020a5d8186000000b00712cf900e3emr4913966ion.2.1675375272138;
+        Thu, 02 Feb 2023 14:01:12 -0800 (PST)
+Received: from redhat.com ([38.15.36.239])
+        by smtp.gmail.com with ESMTPSA id m1-20020a6b7f41000000b0070766817820sm241716ioq.20.2023.02.02.14.01.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Feb 2023 14:01:11 -0800 (PST)
+Date:   Thu, 2 Feb 2023 15:01:10 -0700
+From:   Alex Williamson <alex.williamson@redhat.com>
+To:     Yi Liu <yi.l.liu@intel.com>
+Cc:     jgg@nvidia.com, kevin.tian@intel.com, chao.p.peng@linux.intel.com,
+        eric.auger@redhat.com, yi.y.sun@linux.intel.com,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH 2/2] docs: vfio: Update vfio.rst per latest interfaces
+Message-ID: <20230202150110.1876c6a9.alex.williamson@redhat.com>
+In-Reply-To: <20230202080201.338571-3-yi.l.liu@intel.com>
+References: <20230202080201.338571-1-yi.l.liu@intel.com>
+        <20230202080201.338571-3-yi.l.liu@intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.35; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH 0/9] Parallel CPU bringup for x86_64
-Content-Language: en-US
-To:     David Woodhouse <dwmw2@infradead.org>, tglx@linutronix.de,
-        arjan@linux.intel.com
-Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-        hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
-        paulmck@kernel.org, linux-kernel@vger.kernel.org,
-        kvm@vger.kernel.org, rcu@vger.kernel.org, mimoja@mimoja.de,
-        hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
-        pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
-        punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com
-References: <20230201204338.1337562-1-usama.arif@bytedance.com>
- <de9c33a14c370d09cefaa331b18525e164436082.camel@infradead.org>
-From:   Usama Arif <usama.arif@bytedance.com>
-In-Reply-To: <de9c33a14c370d09cefaa331b18525e164436082.camel@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
+On Thu,  2 Feb 2023 00:02:01 -0800
+Yi Liu <yi.l.liu@intel.com> wrote:
 
+> this imports the latest vfio_device_ops definition to vfio.rst.
+> 
+> Signed-off-by: Yi Liu <yi.l.liu@intel.com>
+> ---
+>  Documentation/driver-api/vfio.rst | 71 +++++++++++++++++++++----------
+>  1 file changed, 48 insertions(+), 23 deletions(-)
+> 
+> diff --git a/Documentation/driver-api/vfio.rst b/Documentation/driver-api/vfio.rst
+> index c663b6f97825..10d84f01fda1 100644
+> --- a/Documentation/driver-api/vfio.rst
+> +++ b/Documentation/driver-api/vfio.rst
+> @@ -249,19 +249,22 @@ VFIO bus driver API
+>  
+>  VFIO bus drivers, such as vfio-pci make use of only a few interfaces
+>  into VFIO core.  When devices are bound and unbound to the driver,
+> -the driver should call vfio_register_group_dev() and
+> -vfio_unregister_group_dev() respectively::
+> +the driver should call vfio_register_group_dev() or
+> +vfio_register_emulated_iommu_dev() and vfio_unregister_group_dev()
+> +respectively::
+>  
+> -	void vfio_init_group_dev(struct vfio_device *device,
+> -				struct device *dev,
+> -				const struct vfio_device_ops *ops);
+> -	void vfio_uninit_group_dev(struct vfio_device *device);
+>  	int vfio_register_group_dev(struct vfio_device *device);
+> +	int vfio_register_emulated_iommu_dev(struct vfio_device *device);
+>  	void vfio_unregister_group_dev(struct vfio_device *device);
+>  
+>  The driver should embed the vfio_device in its own structure and call
+> -vfio_init_group_dev() to pre-configure it before going to registration
+> -and call vfio_uninit_group_dev() after completing the un-registration.
+> +vfio_alloc_device() or _vfio_alloc_device() to allocate the structure,
 
-On 02/02/2023 10:02, David Woodhouse wrote:
-> On Wed, 2023-02-01 at 20:43 +0000, Usama Arif wrote:
->> This patchseries is from the work done by David Woodhouse (v4: https://lore.kernel.org/all/20220201205328.123066-1-dwmw2@infradead.org/).
->> The parallel CPU bringup is disabled for all AMD CPUs in this version: (see discussions: https://lore.kernel.org/all/bc3f2b1332c4bb77558df8aa36493a55542fe5b9.camel@infradead.org/ and
->> https://lore.kernel.org/all/3b6ac86fdc800cac5806433daf14a9095be101e9.camel@infradead.org/).
->>
->> Doing INIT/SIPI/SIPI in parallel brings down the time for smpboot from ~700ms
->> to 100ms (85% improvement) on a server with 128 CPUs split across 2 NUMA
->> nodes.
->>
->> Adding another cpuhp state for do_wait_cpu_initialized to make sure cpu_init
->> is reached in parallel as proposed by David in v1 will bring it down further
->> to ~30ms. Making this change would be dependent on this patchseries, so they
->> could be explored if this gets merged.
->>
->> Changes across versions:
->> v2: Cut it back to just INIT/SIPI/SIPI in parallel for now, nothing more
->> v3: Clean up x2apic patch, add MTRR optimisation, lock topology update
->>      in preparation for more parallelisation.
->> v4: Fixes to the real mode parallelisation patch spotted by SeanC, to
->>      avoid scribbling on initial_gs in common_cpu_up(), and to allow all
->>      24 bits of the physical X2APIC ID to be used. That patch still needs
->>      a Signed-off-by from its original author, who once claimed not to
->>      remember writing it at all. But now we've fixed it, hopefully he'll
->>      admit it now :)
->> v5: rebase to v6.1 and remeasure performance, disable parallel bringup
->>      for AMD CPUs.
-> 
-> Thanks, Usama.
-> 
-> I've updated to v6.2-rc6 since there were a few more tweaks required
-> (and we should double-check that the new handling of cache_ap_init from
-> a dedicated cpuhp step works right if that ends up being done in
-> parallel).
-> 
-> I also fixed up the complaints from the test robot; including
-> <linux/smpboot.h> from smpboot.c and making do_cpu_up() static, and
-> putting #ifdef CONFIG_SMP around the 'are we booting the AP?' check and
-> code segment in head_64.S.
-> 
-> I've made the AMD thing a CPU bug as Peter suggested, and pushed it to
-> https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/parallel-6.2-rc6
-> for you to do the real work of actually testing it :)
+AIUI, _vfio_alloc_device() is only exported because it's used by
+vfio_alloc_device() which is a macro.  I don't think we want to list
+_vfio_alloc_device() as an equal alternative, if anything we should
+discourage any direct use.
 
-Thanks David! I have tested and reposted the v6.2-rc6 patches. One thing 
-I was mistaken about since I had rebased the patches together was that 
-the last 100ms to 30ms optimization was coming from parallelization in 
-x86/cpu:wait-init, when it seems to have a negligible affect. The last 
-70ms optimization was coming mainly from reusing timer calibration. Its 
-a simple patch and I have added it at the end of the series. The only 
-thing thats' missing was a sign-off from the author who I have added to 
-the latest series.
+> +and can register @init/@release callbacks to manage any private state
+> +wrapping the vfio_device.
+> +
+> +	vfio_alloc_device(dev_struct, member, dev, ops);
+> +	void vfio_put_device(struct vfio_device *device);
+> +
+>  vfio_register_group_dev() indicates to the core to begin tracking the
+>  iommu_group of the specified dev and register the dev as owned by a VFIO bus
+>  driver. Once vfio_register_group_dev() returns it is possible for userspace to
+> @@ -270,28 +273,50 @@ ready before calling it. The driver provides an ops structure for callbacks
+>  similar to a file operations structure::
+>  
+>  	struct vfio_device_ops {
+> -		int	(*open)(struct vfio_device *vdev);
+> +		char	*name;
+> +		int	(*init)(struct vfio_device *vdev);
+>  		void	(*release)(struct vfio_device *vdev);
+> +		int	(*bind_iommufd)(struct vfio_device *vdev,
+> +					struct iommufd_ctx *ictx, u32 *out_device_id);
+> +		void	(*unbind_iommufd)(struct vfio_device *vdev);
+> +		int	(*attach_ioas)(struct vfio_device *vdev, u32 *pt_id);
+> +		int	(*open_device)(struct vfio_device *vdev);
+> +		void	(*close_device)(struct vfio_device *vdev);
+>  		ssize_t	(*read)(struct vfio_device *vdev, char __user *buf,
+>  				size_t count, loff_t *ppos);
+> -		ssize_t	(*write)(struct vfio_device *vdev,
+> -				 const char __user *buf,
+> -				 size_t size, loff_t *ppos);
+> +		ssize_t	(*write)(struct vfio_device *vdev, const char __user *buf,
+> +			 size_t count, loff_t *size);
+>  		long	(*ioctl)(struct vfio_device *vdev, unsigned int cmd,
+>  				 unsigned long arg);
+> -		int	(*mmap)(struct vfio_device *vdev,
+> -				struct vm_area_struct *vma);
+> -	};
+> +		int	(*mmap)(struct vfio_device *vdev, struct vm_area_struct *vma);
+> +		void	(*request)(struct vfio_device *vdev, unsigned int count);
+> +		int	(*match)(struct vfio_device *vdev, char *buf);
+> +		void	(*dma_unmap)(struct vfio_device *vdev, u64 iova, u64 length);
+> +		int	(*device_feature)(struct vfio_device *device, u32 flags,
+> +					  void __user *arg, size_t argsz);
+> +};
+>  
+>  Each function is passed the vdev that was originally registered
+> -in the vfio_register_group_dev() call above.  This allows the bus driver
+> -to obtain its private data using container_of().  The open/release
+> -callbacks are issued when a new file descriptor is created for a
+> -device (via VFIO_GROUP_GET_DEVICE_FD).  The ioctl interface provides
+> -a direct pass through for VFIO_DEVICE_* ioctls.  The read/write/mmap
+> -interfaces implement the device region access defined by the device's
+> -own VFIO_DEVICE_GET_REGION_INFO ioctl.
+> -
+> +in the vfio_register_group_dev() or vfio_register_emulated_iommu_dev()
+> +call above.  This allows the bus driver to obtain its private data using
+> +container_of().
+> +- The init/release callbacks are issued in the drivers's structure allocation
+
+drivers' is the possessive of plural drivers.  Thanks,
+
+Alex
+
+> +  and put.
+> +- The open/close_device callbacks are issued when a new file descriptor is
+> +  created for a device (via VFIO_GROUP_GET_DEVICE_FD).
+> +- The ioctl interface provides a direct pass through for VFIO_DEVICE_* ioctls.
+> +- The [un]bind_iommufd callbacks are issued when the device is bound to iommufd.
+> +  'unbound' is implied if iommufd is being used.
+> +- The attach_ioas callback is issued when the device is attached to an IOAS
+> +  managed by the bound iommufd. The attached IOAS is automatically detached
+> +  when the device is unbound from the iommufd.
+> +- The read/write/mmap interfaces implement the device region access defined by
+> +  the device's own VFIO_DEVICE_GET_REGION_INFO ioctl.
+> +- The request callback is issued when device is going to be unregistered.
+> +- The dma_unmap callback is issued when a range of iova's are unmapped in
+> +  the container or IOAS attached by the device. Drivers which care about
+> +  DMA unmap can implement this callback and must tolerate receiving unmap
+> +  notifications before the device is opened.
+>  
+>  PPC64 sPAPR implementation note
+>  -------------------------------
+
