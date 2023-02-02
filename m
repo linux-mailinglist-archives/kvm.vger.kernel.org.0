@@ -2,113 +2,161 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0C4D3687CA3
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 12:47:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 224E7687DB4
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 13:45:02 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229761AbjBBLrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 06:47:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39398 "EHLO
+        id S231977AbjBBMot (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 07:44:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232161AbjBBLrQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 06:47:16 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760918D616;
-        Thu,  2 Feb 2023 03:46:55 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id f3so1136461pgc.2;
-        Thu, 02 Feb 2023 03:46:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OCHv+Rtu/T4PvxYHPWW8MnIPWqx9+x/w+3ZCigYTGeo=;
-        b=gBGsmXvDj7gKK8xLG2DDBPKoN+F5GpdpsEeTMUzi7Z09FMcz+VoCBnFpP4xl6/3Ke3
-         uuYc8qTvyE1y+OepENJBCwlwYPTAPtG9z4ZW/TuAPPFxWIjA9x22K8jVwkOkwW7k7cmt
-         RMOvpTVw1ecppwfRhJNPj6+Z+MFYA4TNZmnqVfBWKxd4isOdH8fNJBO98TItN7iITU03
-         AjxJ/+TDIxk3TmYURg9KomQh9PZCWoP2CPJnBlgqBAUL+gY9O1MsthHdUJmwP3TJThkA
-         nL/tzSlSMco/QmEGOhalmnktDssNg3+Ah02X3A/9TQoDpcec/alYJOP9suvpJFtg2El0
-         pyjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OCHv+Rtu/T4PvxYHPWW8MnIPWqx9+x/w+3ZCigYTGeo=;
-        b=WvgYsITQH+/NxFRIhv5CzWVOb3g6gCLu69zOcbWT8lZj6ts/gIr+dOHaSA+SWNQi1k
-         DUq40UTeYAa2rfOT5tR3Gd0vFwI4Q7LWZGTWwXkp39DdikuFqX/AzxtMo+NVlunocwAS
-         cCemRT5ZFzWtXzss0no7S3Hnea8UJspqn1F3AfsmDtGf4uHqXJEbijwmbOP/PNu9dEbq
-         lxHCtxD0tPol9TUppTs9Kl5H8Tbtr8G5FkJkclnPZ6/aqzzg7i+of9KmnnfvQ82jh9WZ
-         7XC8BbjfdApLqlId9Qgl9Uu6kHOAaTenUfdptAeJ/a7tlecpq+AUuWsDgyrbaDfk8MRU
-         cnvg==
-X-Gm-Message-State: AO0yUKUc7ickh5zkxU9JjdX42Y+M+LlYPmktGPHKU1OhwXj7rquEYI92
-        UVY2MnppmKEt17N2ODP+O80=
-X-Google-Smtp-Source: AK7set8eGQ8qm7P4Mq8Oi5ijbj3+njAE13TIs6LPMK1xA4qne/Lyf3/ludlqGYJ3wth3RNWZFiJSNQ==
-X-Received: by 2002:a62:b519:0:b0:58e:151c:f7fe with SMTP id y25-20020a62b519000000b0058e151cf7femr4901305pfe.4.1675338414936;
-        Thu, 02 Feb 2023 03:46:54 -0800 (PST)
-Received: from [192.168.255.10] ([103.7.29.32])
-        by smtp.gmail.com with ESMTPSA id p56-20020a056a0026f800b0058882b59d22sm13335902pfw.219.2023.02.02.03.46.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 03:46:54 -0800 (PST)
-Message-ID: <839ac9f7-92ff-c04d-37d3-d12db91d8829@gmail.com>
-Date:   Thu, 2 Feb 2023 19:46:44 +0800
+        with ESMTP id S231571AbjBBMom (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 07:44:42 -0500
+Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E99768E068
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 04:44:21 -0800 (PST)
+Received: from [167.98.27.226] (helo=lawrence-thinkpad.office.codethink.co.uk)
+        by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+        id 1pNYvD-004Q6t-8c; Thu, 02 Feb 2023 12:42:36 +0000
+From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
+To:     qemu-devel@nongnu.org
+Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
+        kiran.ostrolenk@codethink.co.uk, frank.chang@sifive.com,
+        palmer@dabbelt.com, alistair.francis@wdc.com,
+        bin.meng@windriver.com, pbonzini@redhat.com,
+        philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
+        Lawrence Hunter <lawrence.hunter@codethink.co.uk>
+Subject: [PATCH 00/39] Add RISC-V vector cryptography extensions
+Date:   Thu,  2 Feb 2023 12:41:51 +0000
+Message-Id: <20230202124230.295997-1-lawrence.hunter@codethink.co.uk>
+X-Mailer: git-send-email 2.39.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.6.1
-Subject: Re: [PATCH v3 1/8] KVM: x86/pmu: Rename pmc_is_enabled() to
- pmc_is_globally_enabled()
-Content-Language: en-US
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>
-References: <20221111102645.82001-1-likexu@tencent.com>
- <20221111102645.82001-2-likexu@tencent.com> <Y9Mw3pcW/SL/Mna8@google.com>
-From:   Like Xu <like.xu.linux@gmail.com>
-In-Reply-To: <Y9Mw3pcW/SL/Mna8@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+        SPF_PASS,URI_NOVOWEL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 27/1/2023 10:03 am, Sean Christopherson wrote:
-> On Fri, Nov 11, 2022, Like Xu wrote:
->> From: Like Xu<likexu@tencent.com>
->>
->> The name of function pmc_is_enabled() is a bit misleading. A PMC can
->> be disabled either by PERF_CLOBAL_CTRL or by its corresponding EVTSEL.
->> Add the global semantic to its name.
->>
->> Suggested-by: Jim Mattson<jmattson@google.com>
->> Signed-off-by: Like Xu<likexu@tencent.com>
->> ---
-> ...
-> 
->> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
->> index 684393c22105..e57f707fb940 100644
->> --- a/arch/x86/kvm/pmu.c
->> +++ b/arch/x86/kvm/pmu.c
->> @@ -83,7 +83,7 @@ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops)
->>   #undef __KVM_X86_PMU_OP
->>   }
->>   
->> -static inline bool pmc_is_enabled(struct kvm_pmc *pmc)
->> +static inline bool pmc_is_globally_enabled(struct kvm_pmc *pmc)
->>   {
->>   	return static_call(kvm_x86_pmu_pmc_is_enabled)(pmc);
-> This doesn't compile.  v3, and I'm getting pings, and the very first patch doesn't
-> compile.
-> 
+This patch series introduces an implementation for the six instruction sets
+of the draft RISC-V vector cryptography extensions specification.
 
-Oops, very sorry for this breaking the git-bisect attribute, it's my fault to 
-split the code diff incorrectly
-(weakly it compiles fine w/ 4th patch), I will enhance the process before 
-sending any patches to you.
-Thank you for taking time to review the rest of patches in detail as you always 
-do. The new version is
-under construction, apologies again.
+This patch set implements the instruction sets as per the 20221202
+version of the specification (1). We plan to update to the latest spec
+once stabilised.
+
+Work performed by Dickon, Lawrence, Nazar, Kiran, and William from Codethink
+sponsored by SiFive, as well as Max Chou and Frank Chang from SiFive.
+
+For convenience we have created a git repo with our patches on top of a
+recent master. https://github.com/CodethinkLabs/qemu-ct
+
+1. https://github.com/riscv/riscv-crypto/releases
+
+Dickon Hood (1):
+  target/riscv: Add vrol.[vv,vx] and vror.[vv,vx,vi] decoding,
+    translation and execution support
+
+Kiran Ostrolenk (4):
+  target/riscv: Add vsha2ms.vv decoding, translation and execution
+    support
+  target/riscv: add zvksh cpu property
+  target/riscv: Add vsm3c.vi decoding, translation and execution support
+  target/riscv: expose zvksh cpu property
+
+Lawrence Hunter (16):
+  target/riscv: Add vclmul.vv decoding, translation and execution
+    support
+  target/riscv: Add vclmul.vx decoding, translation and execution
+    support
+  target/riscv: Add vclmulh.vv decoding, translation and execution
+    support
+  target/riscv: Add vclmulh.vx decoding, translation and execution
+    support
+  target/riscv: Add vaesef.vv decoding, translation and execution
+    support
+  target/riscv: Add vaesef.vs decoding, translation and execution
+    support
+  target/riscv: Add vaesdf.vv decoding, translation and execution
+    support
+  target/riscv: Add vaesdf.vs decoding, translation and execution
+    support
+  target/riscv: Add vaesdm.vv decoding, translation and execution
+    support
+  target/riscv: Add vaesdm.vs decoding, translation and execution
+    support
+  target/riscv: Add vaesz.vs decoding, translation and execution support
+  target/riscv: Add vsha2c[hl].vv decoding, translation and execution
+    support
+  target/riscv: Add vsm3me.vv decoding, translation and execution
+    support
+  target/riscv: add zvkg cpu property
+  target/riscv: Add vghmac.vv decoding, translation and execution
+    support
+  target/riscv: expose zvkg cpu property
+
+Max Chou (5):
+  crypto: Move SM4_SBOXWORD from target/riscv
+  crypto: Add SM4 constant parameter CK.
+  target/riscv: Add zvksed cfg property
+  target/riscv: Add Zvksed support
+  target/riscv: Expose Zvksed property
+
+Nazar Kazakov (10):
+  target/riscv: add zvkb cpu property
+  target/riscv: Add vrev8.v decoding, translation and execution support
+  target/riscv: Add vandn.[vv,vx,vi] decoding, translation and execution
+    support
+  target/riscv: expose zvkb cpu property
+  target/riscv: add zvkns cpu property
+  target/riscv: Add vaeskf1.vi decoding, translation and execution
+    support
+  target/riscv: Add vaeskf2.vi decoding, translation and execution
+    support
+  target/riscv: expose zvkns cpu property
+  target/riscv: add zvknh cpu properties
+  target/riscv: expose zvknh cpu properties
+
+William Salmon (3):
+  target/riscv: Add vbrev8.v decoding, translation and execution support
+  target/riscv: Add vaesem.vv decoding, translation and execution
+    support
+  target/riscv: Add vaesem.vs decoding, translation and execution
+    support
+
+ crypto/sm4.c                                 |   10 +
+ include/crypto/sm4.h                         |    8 +
+ include/qemu/bitops.h                        |   32 +
+ target/arm/crypto_helper.c                   |   10 +-
+ target/riscv/cpu.c                           |   33 +
+ target/riscv/cpu.h                           |    7 +
+ target/riscv/crypto_helper.c                 |    1 +
+ target/riscv/helper.h                        |   69 ++
+ target/riscv/insn32.decode                   |   48 +
+ target/riscv/insn_trans/trans_rvzvkb.c.inc   |  162 +++
+ target/riscv/insn_trans/trans_rvzvkg.c.inc   |    9 +
+ target/riscv/insn_trans/trans_rvzvknh.c.inc  |   47 +
+ target/riscv/insn_trans/trans_rvzvkns.c.inc  |  119 ++
+ target/riscv/insn_trans/trans_rvzvksed.c.inc |   35 +
+ target/riscv/insn_trans/trans_rvzvksh.c.inc  |   20 +
+ target/riscv/meson.build                     |    4 +-
+ target/riscv/translate.c                     |    6 +
+ target/riscv/vcrypto_helper.c                | 1013 ++++++++++++++++++
+ target/riscv/vector_helper.c                 |  242 +----
+ target/riscv/vector_internals.c              |   63 ++
+ target/riscv/vector_internals.h              |  226 ++++
+ 21 files changed, 1914 insertions(+), 250 deletions(-)
+ create mode 100644 target/riscv/insn_trans/trans_rvzvkb.c.inc
+ create mode 100644 target/riscv/insn_trans/trans_rvzvkg.c.inc
+ create mode 100644 target/riscv/insn_trans/trans_rvzvknh.c.inc
+ create mode 100644 target/riscv/insn_trans/trans_rvzvkns.c.inc
+ create mode 100644 target/riscv/insn_trans/trans_rvzvksed.c.inc
+ create mode 100644 target/riscv/insn_trans/trans_rvzvksh.c.inc
+ create mode 100644 target/riscv/vcrypto_helper.c
+ create mode 100644 target/riscv/vector_internals.c
+ create mode 100644 target/riscv/vector_internals.h
+
+-- 
+2.39.1
+
