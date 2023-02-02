@@ -2,68 +2,67 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C179668866C
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:29:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 67BEE68868D
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:32:25 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232662AbjBBS32 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 13:29:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33298 "EHLO
+        id S232922AbjBBScX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 13:32:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232655AbjBBS2s (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 13:28:48 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05F8B4522B
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:27 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id i17-20020a25be91000000b0082663f3eecbso2505916ybk.2
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:27 -0800 (PST)
+        with ESMTP id S232828AbjBBScI (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 13:32:08 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD5417B7AE
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:30:41 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id o13so2723975pjg.2
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:30:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Leen11Z2EIFQsH+NN7hqdICZGapTSqx3IkQSdi85rv4=;
-        b=swDomma/Ao/1AjVGqZhc77Ly1aJmaYi96lJ6fEnLjho/yWLYjCbG87uCRLZVXzLq1M
-         LScVQt+pZ9knZ5XD8RVoKRxLT1q+fEpmj2L2LXViaHSf7ilAayTs/eQh/Rwtvr2Vs3eW
-         TtDm8cGugXeffCt23ir1w6zNFfj7yik+sgpFjM9V9BSjPfEoc9GUBKMV6qBA74fyHAWP
-         +dsl0anfnGpkYnWUciMVIuHcfYl7QH02zwFv0QlTgGrXln7suPDF2xX5Qqk8Hsk0ZjyP
-         jBboZOjT/qXiq8k9yfGUjmpOpA/fkbxmaAzM0uqiIkU6UwAe9vuKWKkQTF0m1+TCwBM8
-         dJvQ==
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QQJBjgddIJHSAMzF+NVGcc1TrnM9MSl9YEbpob5JvQg=;
+        b=E/6pe0lWyYyrgso15HzRBmaHQLVr2vHBUxD9nhorDb6Ya0oU1vYprXUKtdasWEzWwF
+         60Qarfa+SwAwJpbjwbaatEhNAjQ/1/LoH3yxmDp5zKfgUZ33mmE8sZTAflirlDm1D2RS
+         E+QzGMHGJNmnZ6d5F94vVCO+xSRrGSOqD54nfBrAYVyeEuz51CINSnKkVKPPXeCxN0EG
+         f5do9ojgyCbXBq2ozsFHrlbaAwXaoJV/afhiPidQ3gKUGrJ0/rQP6e5S4dvVmxd9NTTY
+         Yj8vPv7RSJFYXUC8DD22SLiR+DXqq7vhOaF0bqRo8fSkZAzuKovkNUxZYn/W3BKiSso6
+         dPpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Leen11Z2EIFQsH+NN7hqdICZGapTSqx3IkQSdi85rv4=;
-        b=ySFIE51YE/4H59QM79u1QqxbcJk0w+8a/7n8tM8xLtQXIPZNtwZTHVhuFz7WUCfFA8
-         6B69EYzSNJear3MFKuNP5QEA4hJZ+NGuQQD1u1OA/Tjg69UPABpv/aUMjTTa4VLghgpO
-         6D1QyWnR0Z23Rk4T0S4LW8e+6VJMEm7rJqU+vUCnhV4W6y7Ui5W02MeVIY1B2h6wgAWT
-         FxxYWMRMFgftJUv8EfDfDMGC/cfhdZktqx22HvWC8xktqtGkpJaWGjbQ/Fd/dWY/6oQ4
-         sRH6xIA3Zs9Z0B5W/cQd7hPXJhxIMvBTUIwchuijWlRwXiQ+yM17Pp/kMKJnScpe4S4j
-         /U2Q==
-X-Gm-Message-State: AO0yUKX/j+9WLy5/tHhg2p4O1uG4wRUzTZ+aSnZjds9rZgpeNnjF52j8
-        j2ZRXjTtf9B5hO4gwvx/Skzsr7E3yqg=
-X-Google-Smtp-Source: AK7set+v8zDs6XnzjllU8ur/f0MIRCkHIofH+Wt+ThfPgIot1Um67e13cWqpbQBNYlMCc88CYLX3y0XmC3I=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:d095:0:b0:857:8f9c:7b87 with SMTP id
- h143-20020a25d095000000b008578f9c7b87mr368794ybg.558.1675362505413; Thu, 02
- Feb 2023 10:28:25 -0800 (PST)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date:   Thu,  2 Feb 2023 18:28:17 +0000
-In-Reply-To: <20230202182817.407394-1-seanjc@google.com>
-Mime-Version: 1.0
-References: <20230202182817.407394-1-seanjc@google.com>
-X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230202182817.407394-4-seanjc@google.com>
-Subject: [PATCH v2 3/3] KVM: x86/mmu: Remove FNAME(is_self_change_mapping)
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Huang Hang <hhuang@linux.alibaba.com>,
-        Lai Jiangshan <jiangshan.ljs@antgroup.com>
+        bh=QQJBjgddIJHSAMzF+NVGcc1TrnM9MSl9YEbpob5JvQg=;
+        b=6Aypyr8GiIm2h1cf3gUCXKfVGkaLyJQEyNDgCTDAyqJLEEW7vQNbc5WImo9u9X1jnp
+         v8V+Du37J3gJYJMiwUlUoSo8QPmP0/ho1Li78x9+0fW0j67IdJP09h7KOnW/THabZjH3
+         0qZ4lxuO0/ppqL/PFjYjf2rrtL9MIY7+xpG3uAvUUjHPR9mfHW2rBZdiKqP+Xn6ETJFo
+         kJWqZ/IvuOsfyBoeJ9VJoguuUi1Uv+Hchod+Y+SHEb6KwakT7xYc5KWJX/qdCMU9zoa4
+         Phspfhc5a5rq7KR2ylV/VHR5E4gAfdTAq/6S7hhroKpuArsfwnndG5J1Wob9xbOZD3ov
+         LIoQ==
+X-Gm-Message-State: AO0yUKXLAlEyKNKZYjQpwpHS/qjJ56pJL8BgOAjyfLUiRmdwvPsKX0F3
+        123sD4ok6cFQdLAFeeOT700ybJXivBRxQxMibCRO5w==
+X-Google-Smtp-Source: AK7set8I1rjcyJXKCb+cKdWlZzbUQaAP7e5n1kx49qfAKpGWuFzK9lpJ0U1YqeCKniQpJjjxXFCtnKH7xs5u+dqeaYw=
+X-Received: by 2002:a17:90a:8ca:b0:22c:2c4b:bc29 with SMTP id
+ 10-20020a17090a08ca00b0022c2c4bbc29mr737258pjn.33.1675362578740; Thu, 02 Feb
+ 2023 10:29:38 -0800 (PST)
+MIME-Version: 1.0
+References: <20230201160137.486622-1-rkanwal@rivosinc.com> <20230201163509.7fb82d7e@donnerap.cambridge.arm.com>
+ <CAECbVCvkKBbeKUNCvjZ4hhQb5njAgSKaY6nSPxu0N993qAaQ+A@mail.gmail.com>
+ <Y9qezHiX9tSaWkmB@monolith.localdoman> <CAECbVCs9_+4+x5HNwxdKuxNzwARww16Li7=2=60dKj0Hd8x-ag@mail.gmail.com>
+In-Reply-To: <CAECbVCs9_+4+x5HNwxdKuxNzwARww16Li7=2=60dKj0Hd8x-ag@mail.gmail.com>
+From:   Atish Kumar Patra <atishp@rivosinc.com>
+Date:   Thu, 2 Feb 2023 10:29:27 -0800
+Message-ID: <CAHBxVyF1_aWHd1bmymSatgCnWo=OExM=X3bWYfURjWKpTsq_cA@mail.gmail.com>
+Subject: Re: [PATCH v2 kvmtool] riscv: Move serial and rtc from IO port space
+ to MMIO area.
+To:     Rajnesh Kanwal <rkanwal@rivosinc.com>
+Cc:     Alexandru Elisei <alexandru.elisei@arm.com>,
+        Andre Przywara <andre.przywara@foss.arm.com>,
+        apatel@ventanamicro.com, kvm@vger.kernel.org,
+        Will Deacon <will@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,124 +70,166 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Lai Jiangshan <jiangshan.ljs@antgroup.com>
+On Wed, Feb 1, 2023 at 9:29 AM Rajnesh Kanwal <rkanwal@rivosinc.com> wrote:
+>
+> On Wed, Feb 1, 2023 at 5:18 PM Alexandru Elisei
+> <alexandru.elisei@arm.com> wrote:
+> >
+> > Hi,
+> >
+> > On Wed, Feb 01, 2023 at 05:04:36PM +0000, Rajnesh Kanwal wrote:
+> > > On Wed, Feb 1, 2023 at 4:35 PM
+> > > Andre Przywara <andre.przywara@foss.arm.com> wrote:
+> > > >
+> > > > On Wed,  1 Feb 2023 16:01:37 +0000
+> > > > Rajnesh Kanwal <rkanwal@rivosinc.com> wrote:
+> > > >
+> > > > Hi,
+> > > >
+> > > > > The default serial and rtc IO region overlaps with PCI IO bar
+> > > > > region leading bar 0 activation to fail. Moving these devices
+> > > > > to MMIO region similar to ARM.
+> > > > >
+> > > > > Given serial has been moved from 0x3f8 to 0x10000000, this
+> > > > > requires us to now pass earlycon=uart8250,mmio,0x10000000
+> > > > > from cmdline rather than earlycon=uart8250,mmio,0x3f8.
+> > > >
+> > > > Doesn't it work either way with just "earlycon"? At least on the ARM side
+> > > > it then finds the UART type and base address by following the DT's
+> > > > stdout-path property. This would not only make this more robust, but also
+> > > > more VMM agnostic.
+> >
+> > It might actually be better to have both ways of specifying the UART using
+> > earlycon in the commit message. Some might find it easier to do git log
+> > hw/serial.c to find the exact parameters than to follow the code and do the
+> > math.
+> >
+> > Spearking for myself, the commit message for the coresponding arm change
+> > contains the exact parameters (earlycon=uart,mmio,0x1000000) and that has
+> > been helpful when trying to figure out the address (for example, for
+> > kvm-unit-tests, you can configure the uart address at compile time, and
+> > that provides an earlycon which is usable even before the DTB is parsed).
+> >
 
-Drop FNAME(is_self_change_mapping) and instead rely on
-kvm_mmu_hugepage_adjust() to adjust the hugepage accordingly.  Prior to
-commit 4cd071d13c5c ("KVM: x86/mmu: Move calls to thp_adjust() down a
-level"), the hugepage adjustment was done before allocating new shadow
-pages, i.e. failed to restrict the hugepage sizes if a new shadow page
-resulted in account_shadowed() changing the disallowed hugepage tracking.
+I agree. The kvm-riscv repo documentation[1] also mentions x3f8. I am
+assuming some folks may have this in their script
+which will fail once this is merged. Thus, it would be good to find a
+clear descriptive commit message.
 
-Removing FNAME(is_self_change_mapping) fixes a bug reported by Huang Hang
-where KVM unnecessarily forces a 4KiB page.  FNAME(is_self_change_mapping)
-has a defect in that it blindly disables _all_ hugepage mappings rather
-than trying to reduce the size of the hugepage.  If the guest is writing
-to a 1GiB page and the 1GiB is self-referential but a 2MiB page is not,
-then KVM can and should create a 2MiB mapping.
+Additionally, we should update the documentation once this patch is
+merged upstream.
 
-Add a comment above the call to kvm_mmu_hugepage_adjust() to call out the
-new dependency on adjusting the hugepage size after walking indirect PTEs.
+https://github.com/kvm-riscv/howto/wiki/KVM-RISCV64-on-QEMU#7-run-risc-v-kvm-on-qemu
 
-Reported-by: Huang Hang <hhuang@linux.alibaba.com>
-Signed-off-by: Lai Jiangshan <jiangshan.ljs@antgroup.com>
-Link: https://lore.kernel.org/r/20221213125538.81209-1-jiangshanlai@gmail.com
-[sean: rework changelog after separating out the emulator change]
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/paging_tmpl.h | 51 +++++-----------------------------
- 1 file changed, 7 insertions(+), 44 deletions(-)
+> > I think Andre was just trying to be helpful and point out that you don't
+> > need to full parameters to get earlycon working for a Linux guest.
+> >
+>
+> Thanks Alex. I actually didn't know that we can just specify "earlycon" only.
+> Just in case I will mention both ways in the commit message to keep it clear.
+>
+> Cheers,
+> Rajnesh
+>
+> > Thanks,
+> > Alex
+> >
+> > > >
+> > >
+> > > Sorry I didn't know that. Thanks for pointing this out. Just tested this and it
+> > >  works fine with just "earlycon".
+> > >
+> > > $ ./lkvm-static run -c1 --console virtio -p "console=hvc1 earlycon
+> > > root=/dev/vda " -k ./Image -d rootfs.ext4
+> > > [    0.000000] earlycon: ns16550a0 at MMIO 0x0000000010000000 (options '')
+> > > [    0.000000] printk: bootconsole [ns16550a0] enabled
+> > >
+> > > I will update the commit message in the next version.
+> > >
+> > > Thanks,
+> > > Rajnesh
+> > >
+> > > > Also, Atish, Anup: can one of you please provide a Reviewed-by: or
+> > > > Tested-by: for this patch?
+> > > >
+> > > > Cheers,
+> > > > Andre
+> > > >
+> > > > >
+> > > > > Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+> > > > > ---
+> > > > > v2: Added further details in the commit message regarding the
+> > > > >     UART address change required in kernel cmdline parameter.
+> > > > >
+> > > > > v1: https://www.spinics.net/lists/kvm/msg301835.html
+> > > > >
+> > > > >  hw/rtc.c                     |  3 +++
+> > > > >  hw/serial.c                  |  4 ++++
+> > > > >  riscv/include/kvm/kvm-arch.h | 10 ++++++++--
+> > > > >  3 files changed, 15 insertions(+), 2 deletions(-)
+> > > > >
+> > > > > diff --git a/hw/rtc.c b/hw/rtc.c
+> > > > > index 9b8785a..da696e1 100644
+> > > > > --- a/hw/rtc.c
+> > > > > +++ b/hw/rtc.c
+> > > > > @@ -9,6 +9,9 @@
+> > > > >  #if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
+> > > > >  #define RTC_BUS_TYPE         DEVICE_BUS_MMIO
+> > > > >  #define RTC_BASE_ADDRESS     ARM_RTC_MMIO_BASE
+> > > > > +#elif defined(CONFIG_RISCV)
+> > > > > +#define RTC_BUS_TYPE         DEVICE_BUS_MMIO
+> > > > > +#define RTC_BASE_ADDRESS     RISCV_RTC_MMIO_BASE
+> > > > >  #else
+> > > > >  /* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+> > > > >  #define RTC_BUS_TYPE         DEVICE_BUS_IOPORT
+> > > > > diff --git a/hw/serial.c b/hw/serial.c
+> > > > > index 3d53362..b6263a0 100644
+> > > > > --- a/hw/serial.c
+> > > > > +++ b/hw/serial.c
+> > > > > @@ -17,6 +17,10 @@
+> > > > >  #define serial_iobase(nr)    (ARM_UART_MMIO_BASE + (nr) * 0x1000)
+> > > > >  #define serial_irq(nr)               (32 + (nr))
+> > > > >  #define SERIAL8250_BUS_TYPE  DEVICE_BUS_MMIO
+> > > > > +#elif defined(CONFIG_RISCV)
+> > > > > +#define serial_iobase(nr)    (RISCV_UART_MMIO_BASE + (nr) * 0x1000)
+> > > > > +#define serial_irq(nr)               (1 + (nr))
+> > > > > +#define SERIAL8250_BUS_TYPE  DEVICE_BUS_MMIO
+> > > > >  #else
+> > > > >  #define serial_iobase_0              (KVM_IOPORT_AREA + 0x3f8)
+> > > > >  #define serial_iobase_1              (KVM_IOPORT_AREA + 0x2f8)
+> > > > > diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+> > > > > index 3f96d00..620c796 100644
+> > > > > --- a/riscv/include/kvm/kvm-arch.h
+> > > > > +++ b/riscv/include/kvm/kvm-arch.h
+> > > > > @@ -11,7 +11,7 @@
+> > > > >  #define RISCV_IOPORT         0x00000000ULL
+> > > > >  #define RISCV_IOPORT_SIZE    SZ_64K
+> > > > >  #define RISCV_IRQCHIP                0x08000000ULL
+> > > > > -#define RISCV_IRQCHIP_SIZE           SZ_128M
+> > > > > +#define RISCV_IRQCHIP_SIZE   SZ_128M
+> > > > >  #define RISCV_MMIO           0x10000000ULL
+> > > > >  #define RISCV_MMIO_SIZE              SZ_512M
+> > > > >  #define RISCV_PCI            0x30000000ULL
+> > > > > @@ -35,10 +35,16 @@
+> > > > >  #define RISCV_MAX_MEMORY(kvm)        RISCV_LOMAP_MAX_MEMORY
+> > > > >  #endif
+> > > > >
+> > > > > +#define RISCV_UART_MMIO_BASE RISCV_MMIO
+> > > > > +#define RISCV_UART_MMIO_SIZE 0x10000
+> > > > > +
+> > > > > +#define RISCV_RTC_MMIO_BASE  (RISCV_UART_MMIO_BASE + RISCV_UART_MMIO_SIZE)
+> > > > > +#define RISCV_RTC_MMIO_SIZE  0x10000
+> > > > > +
+> > > > >  #define KVM_IOPORT_AREA              RISCV_IOPORT
+> > > > >  #define KVM_PCI_CFG_AREA     RISCV_PCI
+> > > > >  #define KVM_PCI_MMIO_AREA    (KVM_PCI_CFG_AREA + RISCV_PCI_CFG_SIZE)
+> > > > > -#define KVM_VIRTIO_MMIO_AREA RISCV_MMIO
+> > > > > +#define KVM_VIRTIO_MMIO_AREA (RISCV_RTC_MMIO_BASE + RISCV_UART_MMIO_SIZE)
+> > > > >
+> > > > >  #define KVM_IOEVENTFD_HAS_PIO        0
+> > > > >
+> > > >
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index f57d9074fb9b..a056f2773dd9 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -690,6 +690,12 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 			fault->write_fault_to_shadow_pgtable = true;
- 	}
- 
-+	/*
-+	 * Adjust the hugepage size _after_ resolving indirect shadow pages.
-+	 * KVM doesn't support mapping hugepages into the guest for gfns that
-+	 * are being shadowed by KVM, i.e. allocating a new shadow page may
-+	 * affect the allowed hugepage size.
-+	 */
- 	kvm_mmu_hugepage_adjust(vcpu, fault);
- 
- 	trace_kvm_mmu_spte_requested(fault);
-@@ -734,41 +740,6 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 	return RET_PF_RETRY;
- }
- 
-- /*
-- * To see whether the mapped gfn can write its page table in the current
-- * mapping.
-- *
-- * It is the helper function of FNAME(page_fault). When guest uses large page
-- * size to map the writable gfn which is used as current page table, we should
-- * force kvm to use small page size to map it because new shadow page will be
-- * created when kvm establishes shadow page table that stop kvm using large
-- * page size. Do it early can avoid unnecessary #PF and emulation.
-- *
-- * Note: the PDPT page table is not checked for PAE-32 bit guest. It is ok
-- * since the PDPT is always shadowed, that means, we can not use large page
-- * size to map the gfn which is used as PDPT.
-- */
--static bool
--FNAME(is_self_change_mapping)(struct kvm_vcpu *vcpu,
--			      struct guest_walker *walker, bool user_fault)
--{
--	int level;
--	gfn_t mask = ~(KVM_PAGES_PER_HPAGE(walker->level) - 1);
--	bool self_changed = false;
--
--	if (!(walker->pte_access & ACC_WRITE_MASK ||
--	    (!is_cr0_wp(vcpu->arch.mmu) && !user_fault)))
--		return false;
--
--	for (level = walker->level; level <= walker->max_level; level++) {
--		gfn_t gfn = walker->gfn ^ walker->table_gfn[level - 1];
--
--		self_changed |= !(gfn & mask);
--	}
--
--	return self_changed;
--}
--
- /*
-  * Page fault handler.  There are several causes for a page fault:
-  *   - there is no shadow pte for the guest pte
-@@ -787,7 +758,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- {
- 	struct guest_walker walker;
- 	int r;
--	bool is_self_change_mapping;
- 
- 	pgprintk("%s: addr %lx err %x\n", __func__, fault->addr, fault->error_code);
- 	WARN_ON_ONCE(fault->is_tdp);
-@@ -812,6 +782,7 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	}
- 
- 	fault->gfn = walker.gfn;
-+	fault->max_level = walker.level;
- 	fault->slot = kvm_vcpu_gfn_to_memslot(vcpu, fault->gfn);
- 
- 	if (page_fault_handle_page_track(vcpu, fault)) {
-@@ -823,14 +794,6 @@ static int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (r)
- 		return r;
- 
--	is_self_change_mapping = FNAME(is_self_change_mapping)(vcpu,
--	      &walker, fault->user);
--
--	if (is_self_change_mapping)
--		fault->max_level = PG_LEVEL_4K;
--	else
--		fault->max_level = walker.level;
--
- 	r = kvm_faultin_pfn(vcpu, fault, walker.pte_access);
- 	if (r != RET_PF_CONTINUE)
- 		return r;
--- 
-2.39.1.519.gcb327c4b5f-goog
-
+FWIW,
+Tested-by: Atish Patra <atishp@rivosinc.com>
+Reviewed-by: Atish Patra <atishp@rivosinc.com>
