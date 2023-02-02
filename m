@@ -2,71 +2,65 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0DD2768875F
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 20:12:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A5636688763
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 20:13:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233132AbjBBTMD (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 14:12:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46496 "EHLO
+        id S233011AbjBBTNZ (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 14:13:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232605AbjBBTMC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 14:12:02 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FAAF69B21
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 11:12:00 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id ha3-20020a17090af3c300b00230222051a6so2770604pjb.2
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 11:12:00 -0800 (PST)
+        with ESMTP id S232926AbjBBTNX (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 14:13:23 -0500
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCEEC279B9
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 11:13:19 -0800 (PST)
+Received: by mail-wr1-x429.google.com with SMTP id h16so2617034wrz.12
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 11:13:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K7OHh0J0Ql5aSy3qyWjVTPkkQu7eVgUi1CxOXIrtf7k=;
-        b=GkTDlC74VN0LYx7i34Xq23OMwfRBaJK4X8ce7obW5kvsJ2xcXG4/t3iDcGXDxZQOdY
-         dFs6xRtZIsBhTJkpi6sFtWiSsg33hfd8rjkmZvR8NbgGuiWa4r7GN9ouckV7/YXaKFK8
-         HpAy4Ta1RRjLF2i/tIe/DaMYbFlfJZcedLPNUKDOEYZqiSgBE5I2Olx5IiVn5VI8BxDN
-         fyilcgYTrAOudhpM4VernjxFkUUpFx1tz3vJkf02WQaLbMJNvmZqITaGCgYBFd4gJGki
-         PfyYiXPRzKh0DfC0+Vcexl4ccmD/qpOkjYzRYOvH/8f39/UCd0XpqUbAniPW3ZrVregs
-         N8VQ==
+        d=rivosinc-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+5h3FkVGZK/7lAnqoj4IKq8jVgYNfiIxmZ5AdTxbqy4=;
+        b=cc0S8bjZSFXWekcGl3QY+lPa/L7uBNVrSBX1z9QoJsg4Xc9ig6VxpFzPwI88NLtp7m
+         /wnaYAa6SiJwFG22DIpal1NCpamIbyjNzGFUxjdbOj+GJy88Pgj5MUheWbCCOrMKyB2M
+         7Rd1byT+jYfY42rQ9NHr5+rJYNoQt68WDk2UMFxd/NVk/BzYCUPEYoy2Zppd+mY99TMw
+         9xb/xiX4VrtSKrm75izpnuyXdXkAF4NNmtZ/dGKP2HZTljTrdBKl9+lyLkUf+IjFQyvt
+         esTLCj7UBeUv1ZqrAcxvwLWV0tAtrxZIlqfCamzFYaNCg6/SyZP+qFdtA4RXRo/qpSyQ
+         DgmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K7OHh0J0Ql5aSy3qyWjVTPkkQu7eVgUi1CxOXIrtf7k=;
-        b=d1fprMnYiw/hAbS6jipIeufLiOLUtoH7lKTIHERseU6eK46XMbYwqdEWlbChFVfDmc
-         6GgB8luhbnWS+0dDl03a4zqbIUv7J2XarZa+SaQmVTgnHqE3/TnrP/NTIk/ahms3Gfgl
-         9DXckjsZ+x9AwAuBlNLtYGnGdI74OtR9M59kPPAv3eWMrnAlDXgr5bNUYj4LBZMkTFUH
-         q7tu+FWX4ZQtZaBaxvM1LSpRHycMJ1jj/TM/HLZ/Co/IA/3SPScmFZNqUpToRxqwckfk
-         b2F5o6HVJ/ZtMqCr4KiNXrw74WfpPYIgtTgrQM298b5hfMPQmG2vhImu9J8N8BXORCx5
-         YA3A==
-X-Gm-Message-State: AO0yUKXdZeSXJwi5SpYQXpzrftwZNV/z9AX+hQkzCB0NeeXRgBn+Ibz4
-        Fy4N2cWXnn4nFn9R732sir+AsA==
-X-Google-Smtp-Source: AK7set/eUA6CqqdqvgAdf3irvd3yLDq36g0kqfoojL5H7Im2SgQ1uTFFpnQZLV7icKRe5ALSrIYqNA==
-X-Received: by 2002:a17:902:7406:b0:198:af4f:de07 with SMTP id g6-20020a170902740600b00198af4fde07mr74828pll.7.1675365120010;
-        Thu, 02 Feb 2023 11:12:00 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id l19-20020a637013000000b004d2f5bb9339sm149004pgc.15.2023.02.02.11.11.59
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+5h3FkVGZK/7lAnqoj4IKq8jVgYNfiIxmZ5AdTxbqy4=;
+        b=YdYsDt5Zg+hFDEzutNMguTBYxR+KWEn8tuldWloz3OVp6S7/2AsphExa1X+fQUD8cC
+         IaHvzaVUKcABTqLc9sn8TBn2LAOw98t8SS+yNzRMB9eKs3D5eLVz1Nv2dNt9PodOriYd
+         fxyy78B/BGfw2aLmMDsxkCzI9Sj5DoLWMQgPNpF+3PG6U3o8fbYO8IC+2HcWwr9+jOPN
+         YODWTbDKRC6NRSZEnooJSePZc8VL9GQi1J4BRR4otQjOjLw+PJnNYM0BnrNVUOI00xd5
+         NhP+xwZwNSasS7FZo8j+v1mApOeShegegGaW66Mz0b7iFsBzIZ8/fNUyCEnhZm9lslvq
+         1X7Q==
+X-Gm-Message-State: AO0yUKU54mRthAbvkW8CfLA7pzk7ZbkDOhMQLOFCedh2D19moHMib+xV
+        wXaossMO55qvib+x6qIuWFCR1vgKoaW+scxA
+X-Google-Smtp-Source: AK7set+dDmzpveLA95ZhCN+Reb9G9Qs4HSmSluiqBaq9+/NG6aNJEGv3fL3TMNPkjG1Bzock6ZtxmQ==
+X-Received: by 2002:a5d:6481:0:b0:2bf:e895:3839 with SMTP id o1-20020a5d6481000000b002bfe8953839mr8541082wri.39.1675365198364;
+        Thu, 02 Feb 2023 11:13:18 -0800 (PST)
+Received: from localhost.localdomain (cpc98982-watf12-2-0-cust57.15-2.cable.virginm.net. [82.26.13.58])
+        by smtp.gmail.com with ESMTPSA id z11-20020adfd0cb000000b002bfd09f2ca6sm252809wrh.3.2023.02.02.11.13.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 11:11:59 -0800 (PST)
-Date:   Thu, 2 Feb 2023 19:11:56 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Like Xu <like.xu.linux@gmail.com>
-Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Yang Weijiang <weijiang.yang@intel.com>,
-        Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Disallow legacy LBRs if architectural LBRs
- are available
-Message-ID: <Y9wK/LkBYusOv1DO@google.com>
-References: <20230128001427.2548858-1-seanjc@google.com>
- <f106a06e-ae6f-2c79-df87-721817aacc02@gmail.com>
+        Thu, 02 Feb 2023 11:13:17 -0800 (PST)
+From:   Rajnesh Kanwal <rkanwal@rivosinc.com>
+To:     apatel@ventanamicro.com, atishp@rivosinc.com,
+        andre.przywara@arm.com, alexandru.elisei@arm.com,
+        kvm@vger.kernel.org
+Cc:     Rajnesh Kanwal <rkanwal@rivosinc.com>
+Subject: [PATCH v3 kvmtool 1/1] riscv: Move serial and rtc from IO port space to MMIO area.
+Date:   Thu,  2 Feb 2023 19:13:01 +0000
+Message-Id: <20230202191301.588804-1-rkanwal@rivosinc.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f106a06e-ae6f-2c79-df87-721817aacc02@gmail.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,64 +68,100 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Tue, Jan 31, 2023, Like Xu wrote:
-> On 28/1/2023 8:14 am, Sean Christopherson wrote:
-> > Disallow enabling LBR support if the CPU supports architectural LBRs.
-> > Traditional LBR support is absent on CPU models that have architectural
-> > LBRs, and KVM doesn't yet support arch LBRs, i.e. KVM will pass through
-> > non-existent MSRs if userspace enables LBRs for the guest.
-> 
-> True, we have call_trace due to MSR_ARCH_LBR_FROM_0 (0x1500) for example.
-> 
-> > 
-> > Cc: stable@vger.kernel.org
-> > Cc: Yang Weijiang <weijiang.yang@intel.com>
-> > Cc: Like Xu <like.xu.linux@gmail.com>
-> 
-> Tested-by: Like Xu <likexu@tencent.com>
-> 
-> > Reported-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Fixes: 145dfad998ea ("KVM: VMX: Advertise PMU LBRs if and only if perf
-> supports LBRs")
+The default serial and rtc IO region overlaps with PCI IO bar
+region leading bar 0 activation to fail. Moving these devices
+to MMIO region similar to ARM.
 
-If we want a fixes, I'd argue this is more appropriate:
+Given serial has been moved from 0x3f8 to 0x10000000, this
+requires us to now pass earlycon=uart8250,mmio,0x10000000
+from cmdline rather than earlycon=uart8250,mmio,0x3f8.
 
-  Fixes: be635e34c284 ("KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES")
+To avoid the need to change the address every time the tool
+is updated, we can also just pass "earlycon" from cmdline
+and guest then finds the type and base address by following
+the Device Tree's stdout-path property.
 
-Though I'd prefer not to blame KVM, there's not much we could have done in KVM
-to know that Intel would effectively break backwards compatibility.
+Signed-off-by: Rajnesh Kanwal <rkanwal@rivosinc.com>
+Tested-by: Atish Patra <atishp@rivosinc.com>
+Reviewed-by: Atish Patra <atishp@rivosinc.com>
+---
+v3: https://lore.kernel.org/all/20230201160137.486622-1-rkanwal@rivosinc.com/
+    Incorporated feedback from Andre Przywara and Alexandru Elisei.
+      Mainly updated the commit message to specify that we can simply pass
+      just "earlycon" from cmdline and avoid the need to specify uart address.
+    Also added Tested-by and Reviewed-by tags by Atish Patra.
 
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> > 
-> > Am I missing something that would prevent this scenario?
-> > 
-> >   arch/x86/kvm/vmx/vmx.c | 8 +++++---
-> >   1 file changed, 5 insertions(+), 3 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> > index 8f0f67c75f35..77ee6b4a5ec4 100644
-> > --- a/arch/x86/kvm/vmx/vmx.c
-> > +++ b/arch/x86/kvm/vmx/vmx.c
-> > @@ -7761,9 +7761,11 @@ static u64 vmx_get_perf_capabilities(void)
-> >   	if (boot_cpu_has(X86_FEATURE_PDCM))
-> >   		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
-> > -	x86_perf_get_lbr(&lbr);
-> > -	if (lbr.nr)
-> > -		perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-> > +	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
-> 
-> To avoid changing this again in the Arch lbr enabling part, how about:
-> 
-> 	x86_perf_get_lbr(&lbr);
-> 	if (lbr.nr && cpu_feature_enabled(X86_FEATURE_ARCH_LBR) ==
-> 	    kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
-> 		perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
-> 
-> ?
+v2: https://lore.kernel.org/all/20230201160137.486622-1-rkanwal@rivosinc.com/
+    Added further details in the commit message regarding the
+    UART address change required in kernel cmdline parameter.
 
-I'd rather force arch LBR enabling to explicitly update this code.  And I'd prefer
-that KVM explicitly clear PMU_CAP_LBR_FMT when KVM can't use arch LBRs for whatever
-reason, both for documentation purposes and to avoid ordering dependencies between
-consuming vmx_get_perf_capabilities() and updating kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR).
+v1: https://lore.kernel.org/all/20230124155251.1417682-1-rkanwal@rivosinc.com/
+
+ hw/rtc.c                     |  3 +++
+ hw/serial.c                  |  4 ++++
+ riscv/include/kvm/kvm-arch.h | 10 ++++++++--
+ 3 files changed, 15 insertions(+), 2 deletions(-)
+
+diff --git a/hw/rtc.c b/hw/rtc.c
+index 9b8785a..da696e1 100644
+--- a/hw/rtc.c
++++ b/hw/rtc.c
+@@ -9,6 +9,9 @@
+ #if defined(CONFIG_ARM) || defined(CONFIG_ARM64)
+ #define RTC_BUS_TYPE		DEVICE_BUS_MMIO
+ #define RTC_BASE_ADDRESS	ARM_RTC_MMIO_BASE
++#elif defined(CONFIG_RISCV)
++#define RTC_BUS_TYPE		DEVICE_BUS_MMIO
++#define RTC_BASE_ADDRESS	RISCV_RTC_MMIO_BASE
+ #else
+ /* PORT 0070-007F - CMOS RAM/RTC (REAL TIME CLOCK) */
+ #define RTC_BUS_TYPE		DEVICE_BUS_IOPORT
+diff --git a/hw/serial.c b/hw/serial.c
+index 3d53362..b6263a0 100644
+--- a/hw/serial.c
++++ b/hw/serial.c
+@@ -17,6 +17,10 @@
+ #define serial_iobase(nr)	(ARM_UART_MMIO_BASE + (nr) * 0x1000)
+ #define serial_irq(nr)		(32 + (nr))
+ #define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
++#elif defined(CONFIG_RISCV)
++#define serial_iobase(nr)	(RISCV_UART_MMIO_BASE + (nr) * 0x1000)
++#define serial_irq(nr)		(1 + (nr))
++#define SERIAL8250_BUS_TYPE	DEVICE_BUS_MMIO
+ #else
+ #define serial_iobase_0		(KVM_IOPORT_AREA + 0x3f8)
+ #define serial_iobase_1		(KVM_IOPORT_AREA + 0x2f8)
+diff --git a/riscv/include/kvm/kvm-arch.h b/riscv/include/kvm/kvm-arch.h
+index 3f96d00..620c796 100644
+--- a/riscv/include/kvm/kvm-arch.h
++++ b/riscv/include/kvm/kvm-arch.h
+@@ -11,7 +11,7 @@
+ #define RISCV_IOPORT		0x00000000ULL
+ #define RISCV_IOPORT_SIZE	SZ_64K
+ #define RISCV_IRQCHIP		0x08000000ULL
+-#define RISCV_IRQCHIP_SIZE		SZ_128M
++#define RISCV_IRQCHIP_SIZE	SZ_128M
+ #define RISCV_MMIO		0x10000000ULL
+ #define RISCV_MMIO_SIZE		SZ_512M
+ #define RISCV_PCI		0x30000000ULL
+@@ -35,10 +35,16 @@
+ #define RISCV_MAX_MEMORY(kvm)	RISCV_LOMAP_MAX_MEMORY
+ #endif
+ 
++#define RISCV_UART_MMIO_BASE	RISCV_MMIO
++#define RISCV_UART_MMIO_SIZE	0x10000
++
++#define RISCV_RTC_MMIO_BASE	(RISCV_UART_MMIO_BASE + RISCV_UART_MMIO_SIZE)
++#define RISCV_RTC_MMIO_SIZE	0x10000
++
+ #define KVM_IOPORT_AREA		RISCV_IOPORT
+ #define KVM_PCI_CFG_AREA	RISCV_PCI
+ #define KVM_PCI_MMIO_AREA	(KVM_PCI_CFG_AREA + RISCV_PCI_CFG_SIZE)
+-#define KVM_VIRTIO_MMIO_AREA	RISCV_MMIO
++#define KVM_VIRTIO_MMIO_AREA	(RISCV_RTC_MMIO_BASE + RISCV_UART_MMIO_SIZE)
+ 
+ #define KVM_IOEVENTFD_HAS_PIO	0
+ 
+-- 
+2.25.1
+
