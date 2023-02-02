@@ -2,102 +2,128 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E39B68730C
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 02:33:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id D2270687360
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 03:39:14 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231262AbjBBBdT (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Wed, 1 Feb 2023 20:33:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44222 "EHLO
+        id S231237AbjBBCjO (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Wed, 1 Feb 2023 21:39:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230048AbjBBBdS (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Wed, 1 Feb 2023 20:33:18 -0500
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B97166F217
-        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 17:33:13 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id t13-20020a056902018d00b0074747131938so332881ybh.12
-        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 17:33:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CJ2suvTcnRqJyFH1jkuVoU3bY9GWNZHCdTTD+8pN/ek=;
-        b=ab2NcTEqcbY7BhT+q9RKK8BMRghu34aBqxgrwqyQE9pKF+aD5Qh3pXIOp+Ca2Ct6V4
-         CR7D8BIMFNycXHTz8bU9RNWJCl4Xb9h94tE2xZgVu4/ABKE8zMV3v5k1m5eUDjVUNYP+
-         +qCv4S/lL4uRlD6jbps3dtQ1Ul7uTczt8pFhP0KgFOhUkWJS4L9UdgcWPpk72waZyOgz
-         /YlQrSnMFinkTESaIfmgGoAOThbRxb0Fji0qeEvgTT69mxb/2HXF7ii7gGx1Y89GSRwG
-         4Q6YaisfxkYxrFgZaXzE7lJzcoDhgQKklRkWWT2vuVHu7PTnLqtGJP2leiChCiJ2vHT1
-         J1RQ==
+        with ESMTP id S229470AbjBBCjM (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Wed, 1 Feb 2023 21:39:12 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 226DA2B0A1
+        for <kvm@vger.kernel.org>; Wed,  1 Feb 2023 18:38:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675305507;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ApOKYKEp9+NcVo7PhBHJxbKc52pVbDUPLTRV3lF5F48=;
+        b=JqrQOuqKQzpxSXF57qYG2rIATh/nqBSnIbNIPwGSjhEGJs3sRLE6ovjHlCcDUvsps6fc18
+        9MuVLHL0SHEi8jtPqjLGEyb/86PFSiTbR6owC5X4X7s5ygwuyfbVmUmTIhOBX5kOPGxG5c
+        IQOBJqIY+9Kd9c3JHJadpjcWzafjJUE=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-284-EjK0JqZIML2W1TRDNNjP1g-1; Wed, 01 Feb 2023 21:38:26 -0500
+X-MC-Unique: EjK0JqZIML2W1TRDNNjP1g-1
+Received: by mail-pl1-f197.google.com with SMTP id y9-20020a1709027c8900b00195e237dc8bso250513pll.13
+        for <kvm@vger.kernel.org>; Wed, 01 Feb 2023 18:38:26 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CJ2suvTcnRqJyFH1jkuVoU3bY9GWNZHCdTTD+8pN/ek=;
-        b=CHxWpusHL+i8KLmjz9e/DuuO6Y1NPr9T4YYwzhgd2mVmgMNrMIHJI0Ojc8W9WWeDie
-         xJmDFEUb37E6MyuE1NgJSp/T4Zj0Viy4IkOQn1SdD/La5VdRDwS4l9ZJc8iZf7cGRw9x
-         CQhevgPplMPwMgmdUuHalrJmqr3PByDXDF3O32cbnTIpDR80VNm+U7yIiYg1qaDremf0
-         az77zkYc3vnv3r22rRtzxr2wlT9wHBpdL6/RbLraGciJSUOTuMtqmGFi3WjwN/kuwjId
-         QDF2/eVPTz+hIN+xbQ8LvfW0ktnnOseOi0Yt3ijFLsMS2pqy2PfB2zl7qxgPSfDK+WBP
-         jMIQ==
-X-Gm-Message-State: AO0yUKXrRVmrLFuWmQ/IDMB8h6P1Qfz8fxybO2g1MZRrzUEgmkXV1p8J
-        a8f4D25bQ8zRip7zLtfKOzA4AiiLGKE=
-X-Google-Smtp-Source: AK7set9BpsXGFaQaIWNZQclxhRO3k0f4qDD0DIbvZ6nNKWBuTyun5Jle53OkdeNSGVkFVCMQzMEhbkT3UHI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:8389:0:b0:835:7411:4e35 with SMTP id
- t9-20020a258389000000b0083574114e35mr516313ybk.203.1675301593015; Wed, 01 Feb
- 2023 17:33:13 -0800 (PST)
-Date:   Thu,  2 Feb 2023 01:32:31 +0000
-In-Reply-To: <20221109082802.27543-1-likexu@tencent.com>
-Mime-Version: 1.0
-References: <20221109082802.27543-1-likexu@tencent.com>
-X-Mailer: git-send-email 2.39.1.456.gfc5497dd1b-goog
-Message-ID: <167529856265.852656.15112384836454646847.b4-ty@google.com>
-Subject: Re: [PATCH v3 0/3] KVM: x86/pmu: Enable guest PEBS for SPR and later models
-From:   Sean Christopherson <seanjc@google.com>
-To:     Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Like Xu <like.xu.linux@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
-        autolearn_force=no version=3.4.6
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ApOKYKEp9+NcVo7PhBHJxbKc52pVbDUPLTRV3lF5F48=;
+        b=sSxMiMCFgm8zMzdcIhAcEGm65gwd87nwRAu6GOAZglihA1/VAT4xJb/zifZk+ip2wx
+         0h2VBCJy3i3owYBNy8jao9XbqPAfqdOAbYYS1OOqjtd1LnMD08bZBaRmuGzNQ2YMoNJW
+         cl133Vk7kzW8cHNpx9ZqQkCp5X9WAT78C50jiPs8Z3gjFQ7mK8Rs6fdQN1q35W9oaIt9
+         +j4MS/ZDqp5Pj1kXSfMEuc/z/obTtHydnxi6hmMO1NWSE9GE8lzsN1yLqdhOW9Anhfxw
+         rn4bwwT0nllaFcBESrZDP+26O6Z5r5EQkg4rZNVbkwTey1EO3GYyGZ5kLTwAR31YBGrT
+         inrQ==
+X-Gm-Message-State: AO0yUKX+lI9YLL3Sj1hWJ4FfYfHHsYyWbvQDkwiF6bd9vr96yZ+4uV5I
+        2pb7HIL6lvEDRMxhYwdbNXTRzQ29tSpea4ys1qnNUG7H8n4sD08PN/ihJhki17xN+CWex1ikQYW
+        54PmfXx7NPL6Y
+X-Received: by 2002:a05:6a20:441b:b0:bc:f665:8656 with SMTP id ce27-20020a056a20441b00b000bcf6658656mr6380915pzb.6.1675305505062;
+        Wed, 01 Feb 2023 18:38:25 -0800 (PST)
+X-Google-Smtp-Source: AK7set89TVvVFfBlJQq1qKyH8W6aNmxyTnPHU7y3H1p8qyqbybkNHnnffdQH22CU3lhv6SUi66K9qw==
+X-Received: by 2002:a05:6a20:441b:b0:bc:f665:8656 with SMTP id ce27-20020a056a20441b00b000bcf6658656mr6380897pzb.6.1675305504740;
+        Wed, 01 Feb 2023 18:38:24 -0800 (PST)
+Received: from [10.66.61.39] ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id m1-20020a633f01000000b004dfacb4804bsm8818599pga.21.2023.02.01.18.38.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Feb 2023 18:38:24 -0800 (PST)
+Message-ID: <4b847318-280f-8b9b-bafa-2ada86a54cfa@redhat.com>
+Date:   Thu, 2 Feb 2023 10:38:19 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH] selftests: KVM: Replace optarg with arg in
+ guest_modes_cmdline
+Content-Language: en-US
+To:     Vipin Sharma <vipinsh@google.com>
+Cc:     kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+References: <20230201054522.162611-1-shahuang@redhat.com>
+ <CAHVum0eH_XrrPiviYYWEu=FouhEXeWq1mcx0=BoiF8NaoyVj_g@mail.gmail.com>
+From:   Shaoqin Huang <shahuang@redhat.com>
+In-Reply-To: <CAHVum0eH_XrrPiviYYWEu=FouhEXeWq1mcx0=BoiF8NaoyVj_g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 09 Nov 2022 16:27:59 +0800, Like Xu wrote:
-> Finally, SPR will go live in early 2023. Virtualization support for SPR
-> PEBS (kvm.x86.vpmu.pebs_ept) has officially available in the Intel SDM
-> (June 2022), and this patch set is validated on a late stepping machine.
-> 
-> Let's see if this new revision will satisfy everyone's appetite.
-> 
-> Previous:
-> https://lore.kernel.org/kvm/20220922051929.89484-1-likexu@tencent.com/
-> V2 -> V3 Changelog:
-> - Add more commit message about the pdit/pdir stuff; (Sean)
-> - Refine confusing comments on event precise level and TNT+; (Sean)
-> - Use pmc_get_pebs_precise_level() instead of need_max_precise(); (Sean)
-> - Move HYBRID_CPU change in a separate patch; (Sean)
-> - Land KVM changes before perf core changes; (Sean)
-> - Aalign code indentation; (Sean) // VScode is quite good for kernel dev.
-> 
-> [...]
 
-Applied 2-3 to kvm-x86 pmu.  I want to get Paolo's input before proceeding on
-the whole "disable vPMU for Hybrid PMUs" snafu.  IIUC, applying these patches
-won't make the situation worse, please holler if that's incorrect.
+On 2/2/23 00:00, Vipin Sharma wrote:
+> On Tue, Jan 31, 2023 at 9:46 PM <shahuang@redhat.com> wrote:
+>> From: Shaoqin Huang <shahuang@redhat.com>
+>>
+>> The parameter arg in guest_modes_cmdline not being used now, and the
+>> optarg should be replaced with arg in guest_modes_cmdline.
+>>
+>> Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+>> ---
+>>   tools/testing/selftests/kvm/lib/guest_modes.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
+>> index 99a575bbbc52..1f2dca4520ab 100644
+>> --- a/tools/testing/selftests/kvm/lib/guest_modes.c
+>> +++ b/tools/testing/selftests/kvm/lib/guest_modes.c
+>> @@ -127,7 +127,7 @@ void guest_modes_cmdline(const char *arg)
+>>                  mode_selected = true;
+>>          }
+>>
+>> -       mode = strtoul(optarg, NULL, 10);
+>> +       mode = strtoul(arg, NULL, 10);
+> While you are at it, can you also change strtoul to atoi_non_negative()?
+>
+> An underflow negative number will print an error message with a wrong
+> positive guest mode ID not passed by the user.
 
-Thanks!
+Of course I can do that. Thanks for you Suggestion.
 
-[2/3] KVM: x86/pmu: Add PRIR++ and PDist support for SPR and later models
-      https://github.com/kvm-x86/linux/commit/974850be0125
-[3/3] perf/x86/intel: Expose EPT-friendly PEBS for SPR and future models
-      https://github.com/kvm-x86/linux/commit/13738a364736
+Thanks,
 
---
-https://github.com/kvm-x86/linux/tree/next
-https://github.com/kvm-x86/linux/tree/fixes
+Shaoqin
+
+>>          TEST_ASSERT(mode < NUM_VM_MODES, "Guest mode ID %d too big", mode);
+>>          guest_modes[mode].enabled = true;
+>>   }
+>> --
+>> 2.39.0
+>>
+
