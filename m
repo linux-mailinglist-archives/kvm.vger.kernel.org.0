@@ -2,55 +2,62 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 00EAC688968
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 22:57:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 36E4268896E
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 23:00:48 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230174AbjBBV5r (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 16:57:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55024 "EHLO
+        id S231322AbjBBWAq (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 17:00:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232752AbjBBV5T (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 16:57:19 -0500
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BAD07A4BF
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 13:56:42 -0800 (PST)
-Received: by mail-wr1-x42f.google.com with SMTP id r2so2987300wrv.7
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 13:56:42 -0800 (PST)
+        with ESMTP id S230504AbjBBWAp (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 17:00:45 -0500
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70641889A0
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 13:59:52 -0800 (PST)
+Received: by mail-wm1-x336.google.com with SMTP id l37-20020a05600c1d2500b003dfe46a9801so1022692wms.0
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 13:59:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mlEYiVjRJdjrX9c53b+gnJjwRka4ZmK3zw3dl+LycL4=;
-        b=d28IFYmZuelC4BmIuIijPPFJKpeR6Lv83DAOYl4C9BGbHQihhQo9hhtpVtUE0YuD1x
-         Lr1fxDrkMlmUXMbyUMMeurglo0UW/JarxML1HYH9eZU6g1cuxtYA6wa3kEKN1R5QrMsO
-         DETcwBPXpbIBOEcAOeTrgbNYwfJ0CX0qsEsRmn25jT9BeKrRqH7ioIaIFMDP5yKOpsry
-         HPj4TEQ+A2OvEBANu8jibDM8tqIXtc7o0Z5wcBwo889u11HqaidUFya+h88bCt/WL3R+
-         n6evjrchUjg1Hf9c/fK6B0eQju+6VN81uY3sL3ZARvXIsO/3/K2UUkluvJzah5kr1VsK
-         u9ZA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=GpQqIcYzW24NoE4rYiVknf6KZVN8LYqH5TXYzHdb+3M=;
+        b=mwh5EjD+CrWzvqutd8IljFnMGRQXj2tCaUtzf/ip7Fx/7JXdbc97L+E/EmTW9Oae73
+         9Ylt/v4jzuked0HEBtzU/q3pRrnsFRx+ZB7WxAQGE8qH+gWxbrIkpVhl87nxs73n9loO
+         fKG1uIuwKrHYhfZQ+GxXK4Cyn7XlbcZLSSv3McW7GHfVkWOwcoyIllOSckfARaD6G+cA
+         SLHOb1wgrhTf/xClLk9ydPorX3wtcu9Z8rh43CQLnMwktRcRnfudxaqmRpIG2SRkHYiC
+         o4fmZ7B88lQ0yrepdi8nofN2wQUWuoS+ZOn8VLEx2+i4Mzp60kYLRL2cVJ2vIsUzkfwR
+         LydA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mlEYiVjRJdjrX9c53b+gnJjwRka4ZmK3zw3dl+LycL4=;
-        b=eW4r+LBDJrrE1vREGwhRxHfUFYZz+Do4q/wgcNT3qVXOPie1GkPoLfkaA4qJ0uZix7
-         gYpYWf1e50cFtQ+iuL7iB7Pp9CVEIz5H0n9lUSJ+aAqtcyUcRsWRo3jNaNs884ZJrSN1
-         J7yfD1T8xCmvVy6kkKontxysbsx/xA7EVAocriJxzb1fyLpjGv2kQrkE0a7vP4n07TCP
-         wvm6X8st9z8AtEYN5vQacQGGE24/H+nDhuNK3kQKDptvpCOEpTexBIM2W4JSd9NKbVoQ
-         88mtaa7NxhjoMmHNXwwWKfwdUyly0Mb+2lpMdyLiQED2dL92pxQkCidsgJQ7z7aCzS4o
-         QcuQ==
-X-Gm-Message-State: AO0yUKWqpMkVjYldVvLU3nJG3AIMh4axqqvz7Y+IeuGOHj6HuYB3DP+b
-        8JZG/oWMqnCfAkNOfaCDQVqOtg==
-X-Google-Smtp-Source: AK7set9vN+elj/A7UVERmpDS7I923p0GCEu+6d11KV7kTaut2fKwxlBkP91Es2mAI0NSHNtAQz+Tlg==
-X-Received: by 2002:adf:e351:0:b0:2bf:95d0:fa5d with SMTP id n17-20020adfe351000000b002bf95d0fa5dmr6988999wrj.9.1675375001192;
-        Thu, 02 Feb 2023 13:56:41 -0800 (PST)
-Received: from usaari01.cust.communityfibre.co.uk ([2a02:6b6a:b566:0:98fe:e4ee:fc7e:cd71])
-        by smtp.gmail.com with ESMTPSA id e8-20020a5d6d08000000b00297dcfdc90fsm506078wrq.24.2023.02.02.13.56.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 13:56:40 -0800 (PST)
-From:   Usama Arif <usama.arif@bytedance.com>
-To:     dwmw2@infradead.org, tglx@linutronix.de, arjan@linux.intel.com
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GpQqIcYzW24NoE4rYiVknf6KZVN8LYqH5TXYzHdb+3M=;
+        b=NjKMMtRvY0faP/4nab2VJKM/tu5lxkmqwBDutPXBoHIRuhL5JYTmFQJMeq0dwuG7cU
+         RIax6cLpurl1QqIb5U0TKlC6l1uTqo2+cuG759scPCr5Z3F3rP9EUAP3gn35o4AKprAJ
+         k4k6/xyf1pBgTaknrkd45GEJNXigLstoVil0jrrTLz0Q9BDlItmRewm1De5CQ2HVSNik
+         DDPIDzBUFnFdv7iLhl3imSwiDBsvQpvfR4f39WnsDzsg/fKiaq4HO6q+JlbCqs+mao4i
+         44GVxXItS8grGGUJlj1m5gMZTvqp5jFpBfbRQqH9OkLES0ArGbZW1P1nyLdvDxpqlQSu
+         /rfA==
+X-Gm-Message-State: AO0yUKVa2/FmmN2cdQIOzoK3gOufTUkumyzc7dfbmV9WS3KcdbMEDy3O
+        88fy1mJmF9qlDj0UIftTTM6GTw==
+X-Google-Smtp-Source: AK7set8o50YFSBYeEBNtkAiBgAaIbG+rH/XDVtTCYV/fEyqOwguJihiZFYOvbTE8c29A7YdgzKGIMw==
+X-Received: by 2002:a05:600c:1c1f:b0:3dc:5e21:8aa2 with SMTP id j31-20020a05600c1c1f00b003dc5e218aa2mr7362676wms.34.1675375170436;
+        Thu, 02 Feb 2023 13:59:30 -0800 (PST)
+Received: from ?IPV6:2a02:6b6a:b566:0:98fe:e4ee:fc7e:cd71? ([2a02:6b6a:b566:0:98fe:e4ee:fc7e:cd71])
+        by smtp.gmail.com with ESMTPSA id l16-20020a1c7910000000b003dc1d668866sm5710640wme.10.2023.02.02.13.59.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Feb 2023 13:59:29 -0800 (PST)
+Message-ID: <702e3663-ceaa-c2b9-960f-1c909865f3d2@bytedance.com>
+Date:   Thu, 2 Feb 2023 21:59:29 +0000
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH 0/9] Parallel CPU bringup for x86_64
+Content-Language: en-US
+To:     David Woodhouse <dwmw2@infradead.org>, tglx@linutronix.de,
+        arjan@linux.intel.com
 Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         hpa@zytor.com, x86@kernel.org, pbonzini@redhat.com,
         paulmck@kernel.org, linux-kernel@vger.kernel.org,
@@ -58,17 +65,15 @@ Cc:     mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
         hewenliang4@huawei.com, thomas.lendacky@amd.com, seanjc@google.com,
         pmenzel@molgen.mpg.de, fam.zheng@bytedance.com,
         punit.agrawal@bytedance.com, simon.evans@bytedance.com,
-        liangma@liangbit.com, Usama Arif <usama.arif@bytedance.com>
-Subject: [PATCH v6 11/11] x86/smpboot: reuse timer calibration
-Date:   Thu,  2 Feb 2023 21:56:25 +0000
-Message-Id: <20230202215625.3248306-12-usama.arif@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230202215625.3248306-1-usama.arif@bytedance.com>
-References: <20230202215625.3248306-1-usama.arif@bytedance.com>
-MIME-Version: 1.0
+        liangma@liangbit.com
+References: <20230201204338.1337562-1-usama.arif@bytedance.com>
+ <de9c33a14c370d09cefaa331b18525e164436082.camel@infradead.org>
+From:   Usama Arif <usama.arif@bytedance.com>
+In-Reply-To: <de9c33a14c370d09cefaa331b18525e164436082.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
         autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -76,32 +81,57 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-From: Arjan van de Ven <arjan@linux.intel.com>
 
-No point recalibrating for known-constant tsc.
-When tested on a 128 core, 2 socket server, this reduces
-the parallel smpboot time from 100ms to 30ms.
 
-Not-signed-off-by: Arjan van de Ven <arjan@linux.intel.com>
-Signed-off-by: Usama Arif <usama.arif@bytedance.com>
----
- arch/x86/kernel/tsc.c | 3 +++
- 1 file changed, 3 insertions(+)
+On 02/02/2023 10:02, David Woodhouse wrote:
+> On Wed, 2023-02-01 at 20:43 +0000, Usama Arif wrote:
+>> This patchseries is from the work done by David Woodhouse (v4: https://lore.kernel.org/all/20220201205328.123066-1-dwmw2@infradead.org/).
+>> The parallel CPU bringup is disabled for all AMD CPUs in this version: (see discussions: https://lore.kernel.org/all/bc3f2b1332c4bb77558df8aa36493a55542fe5b9.camel@infradead.org/ and
+>> https://lore.kernel.org/all/3b6ac86fdc800cac5806433daf14a9095be101e9.camel@infradead.org/).
+>>
+>> Doing INIT/SIPI/SIPI in parallel brings down the time for smpboot from ~700ms
+>> to 100ms (85% improvement) on a server with 128 CPUs split across 2 NUMA
+>> nodes.
+>>
+>> Adding another cpuhp state for do_wait_cpu_initialized to make sure cpu_init
+>> is reached in parallel as proposed by David in v1 will bring it down further
+>> to ~30ms. Making this change would be dependent on this patchseries, so they
+>> could be explored if this gets merged.
+>>
+>> Changes across versions:
+>> v2: Cut it back to just INIT/SIPI/SIPI in parallel for now, nothing more
+>> v3: Clean up x2apic patch, add MTRR optimisation, lock topology update
+>>      in preparation for more parallelisation.
+>> v4: Fixes to the real mode parallelisation patch spotted by SeanC, to
+>>      avoid scribbling on initial_gs in common_cpu_up(), and to allow all
+>>      24 bits of the physical X2APIC ID to be used. That patch still needs
+>>      a Signed-off-by from its original author, who once claimed not to
+>>      remember writing it at all. But now we've fixed it, hopefully he'll
+>>      admit it now :)
+>> v5: rebase to v6.1 and remeasure performance, disable parallel bringup
+>>      for AMD CPUs.
+> 
+> Thanks, Usama.
+> 
+> I've updated to v6.2-rc6 since there were a few more tweaks required
+> (and we should double-check that the new handling of cache_ap_init from
+> a dedicated cpuhp step works right if that ends up being done in
+> parallel).
+> 
+> I also fixed up the complaints from the test robot; including
+> <linux/smpboot.h> from smpboot.c and making do_cpu_up() static, and
+> putting #ifdef CONFIG_SMP around the 'are we booting the AP?' check and
+> code segment in head_64.S.
+> 
+> I've made the AMD thing a CPU bug as Peter suggested, and pushed it to
+> https://git.infradead.org/users/dwmw2/linux.git/shortlog/refs/heads/parallel-6.2-rc6
+> for you to do the real work of actually testing it :)
 
-diff --git a/arch/x86/kernel/tsc.c b/arch/x86/kernel/tsc.c
-index a78e73da4a74..bab8a98080cf 100644
---- a/arch/x86/kernel/tsc.c
-+++ b/arch/x86/kernel/tsc.c
-@@ -1569,6 +1569,9 @@ unsigned long calibrate_delay_is_known(void)
- 	if (!constant_tsc || !mask)
- 		return 0;
- 
-+	if (cpu != 0)
-+		return cpu_data(0).loops_per_jiffy;
-+
- 	sibling = cpumask_any_but(mask, cpu);
- 	if (sibling < nr_cpu_ids)
- 		return cpu_data(sibling).loops_per_jiffy;
--- 
-2.25.1
-
+Thanks David! I have tested and reposted the v6.2-rc6 patches. One thing 
+I was mistaken about since I had rebased the patches together was that 
+the last 100ms to 30ms optimization was coming from parallelization in 
+x86/cpu:wait-init, when it seems to have a negligible affect. The last 
+70ms optimization was coming mainly from reusing timer calibration. Its 
+a simple patch and I have added it at the end of the series. The only 
+thing thats' missing was a sign-off from the author who I have added to 
+the latest series.
