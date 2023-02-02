@@ -2,99 +2,116 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id F38CC688581
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 18:35:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4C7DE68860D
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:06:41 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230140AbjBBRfz (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 12:35:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56732 "EHLO
+        id S231635AbjBBSGj (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 13:06:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231237AbjBBRfx (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 12:35:53 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 448B129409
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 09:35:50 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id n13so2563671plf.11
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 09:35:50 -0800 (PST)
+        with ESMTP id S231465AbjBBSGi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 13:06:38 -0500
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E411D470BF
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:06:34 -0800 (PST)
+Received: by mail-yb1-xb30.google.com with SMTP id a1so3253838ybj.9
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:06:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=z93XaQC9nhfkablGxm5prOumg5C52MtsNJtAVgf+/Xk=;
-        b=siM7OcVxjUrp9VA9s6E/+waa5mTsORBQobtwYc3RoLp8uL5Uf3lkjX79K5voCbtz+y
-         PbIPrt9b/ljjRw1AVx5NZMFbtlne2N0Jc0uDb/rC9etuO8MckxfloDKlPhBO/iQS83dR
-         lVpR3X3TXXzwEk6qdFgcZA8SzcA7S4IGjeIQrYkFYvydDdzaWJ5TMsqrjgwmQePMol9r
-         6O0ERV4zoZVNJ7nnVtPTAINndnt1PklTIdm+/+AYTvUX68LO5sYfEX47JGf52qsLiSLV
-         /9v0tIfPj+O+AuOv9vLmJMHrPtVsRTCWnWHIgIp149tvJqNZ4C0JtHNlEaL/jCnt6WrB
-         Ql6g==
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=NXDH6ScKyBdH+mTM3V3vUdJt+9ozUBYrnmVSNczSmb4=;
+        b=LZVVLu8EVdJrcmMGqLWqp6FsTHBH7bPQdppAWmFpJw6vjgoLtQywpO2BOuUpuQojv4
+         y5IpvHZX2oBNQ2NaNo6lfDSYzDkOwK0+tGK4+uxw9nR6bBKjRpCN4xdPAbbumvlfD+eB
+         nqUCfJ8vVjN/7KpX5nbCmpZHX7vILblqOf0tICU+GYt3me8jNxH7ni2wnZMOh9OYbKDC
+         iFgpOAr3IH//UIePcbuu04Alh3gDJdjbqsU341PrfHDes6aLDCjXu3bICLtRRQP6tShT
+         LR2s4+dD0LrWrZ98MMIIJyYy1jKlTE8T3TPdQlbmfMKu0CE+5yJ7P7z/VwnRiJU5N96G
+         mXpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z93XaQC9nhfkablGxm5prOumg5C52MtsNJtAVgf+/Xk=;
-        b=j/sjyxIkQcBnnbDhekQhZZYurUbHIrIk+kx0is3ebJQAKH8oFp8K6c2fs84x4YN+pe
-         anHmYAsx6tTZLH5UyDHSQMr5SicpRps7ibOS8iSfkHd2odGI6wdvOT6HUV0hNvMeu/et
-         AuW/7opp2N6Lcw5MwTwIl68fJdVdG2C+RTId8pcY8G8KJH3Yj6U7KniW/b1d5G/7kZGu
-         9lLWo36Ds+vCTSNYVRK0aoJXalzstAQwzdqkn7FI0muUJ8d4cQzoRJaNnlac/E4+Mjc1
-         VYR9J4iIqVyiP00+ynacUk4Z+vBvUq1PNHsd7aEoMrtpLiAiQZsYgstC55pPYME907Q1
-         qBIA==
-X-Gm-Message-State: AO0yUKV2uuxMq36c9rKYGLho2rp0W7TPbw4UDJZcW2VIa7cGSvo8CUwh
-        xPZPaRLeDmIjTyUhFbZHGE++TQ==
-X-Google-Smtp-Source: AK7set8hqU5dyRazxJ180X7fxijCMJdWEZ2QWU0K21vL//Jsk+HdgCdiDJf7MzK9005de1HmiBT/5g==
-X-Received: by 2002:a17:90b:390a:b0:22e:5ffa:2a34 with SMTP id ob10-20020a17090b390a00b0022e5ffa2a34mr7581580pjb.36.1675359349787;
-        Thu, 02 Feb 2023 09:35:49 -0800 (PST)
-Received: from [192.168.50.194] (rrcs-173-197-98-118.west.biz.rr.com. [173.197.98.118])
-        by smtp.gmail.com with ESMTPSA id j5-20020a17090a694500b0022c2e29cadbsm3419163pjm.45.2023.02.02.09.35.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 09:35:49 -0800 (PST)
-Message-ID: <16a6fadf-ca13-d3aa-7e4b-f950db982a21@linaro.org>
-Date:   Thu, 2 Feb 2023 07:35:45 -1000
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=NXDH6ScKyBdH+mTM3V3vUdJt+9ozUBYrnmVSNczSmb4=;
+        b=o1SoShKRqO4fj8wNomwSkY1nPsndwOpk95r2ZbduS7gNoXR+YuEmggIiFvgmO3OIQ2
+         dKMf4wvM4liH4z2jDscB8zRceTJaXIc3PSss8CD1bcPpF9Ph72xwJKNQFm7t9J7b0eSU
+         PUm1SH+ws0p7+tzPeKMR9oJ17W736yVOo1t7XKgLP5N8CK3FiRTwdtKLIJjs+hWyKJjR
+         WjVmKYDJ9VrBKtjDJ3FclDzo5D05z5E4FBrbDiPiqiVoIc2rTURX/PgBUb7LF6+kqluR
+         /j+48Dn7IY3HUDI3yWsEfopy8aHgJ2nWKKZ3fwKtkaiY2PsXqlmSAxtXRMufJQU03WXM
+         HExg==
+X-Gm-Message-State: AO0yUKUwW2gwKJjxBDMy5gRzV541JAyUKqr5UIMrgNSKcVrcGR3iw8a9
+        dABh2+XHuavwH/LnYkrMuWUIxZBrQQwo9zV+J7K5NQ==
+X-Google-Smtp-Source: AK7set/tmh51lo08KsdcoZQoNyHkzL0IP8N96GUiRbXJIJQ+ZZhRCwwe37H+aoeqebCQTVNtJJHISje5C8PMQgzH/UM=
+X-Received: by 2002:a25:ae93:0:b0:7d1:5a92:eb5c with SMTP id
+ b19-20020a25ae93000000b007d15a92eb5cmr843519ybj.166.1675361193915; Thu, 02
+ Feb 2023 10:06:33 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH 06/39] target/riscv: Add vrol.[vv, vx] and vror.[vv, vx,
- vi] decoding, translation and execution support
-Content-Language: en-US
-To:     Philipp Tomsich <philipp.tomsich@vrull.eu>,
-        Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Cc:     qemu-devel@nongnu.org, dickon.hood@codethink.co.uk,
-        nazar.kazakov@codethink.co.uk, kiran.ostrolenk@codethink.co.uk,
-        frank.chang@sifive.com, palmer@dabbelt.com,
-        alistair.francis@wdc.com, bin.meng@windriver.com,
-        pbonzini@redhat.com, kvm@vger.kernel.org
-References: <20230202124230.295997-1-lawrence.hunter@codethink.co.uk>
- <20230202124230.295997-7-lawrence.hunter@codethink.co.uk>
- <CAAeLtUA188Tdq4rROAWNqNkMSOXVT0BWQX669L6fyt5oM5knZg@mail.gmail.com>
- <CAAeLtUDcpyWkKgAo2Lk0ZoHcdyEeVARYkh05Ps27wbOzDF0sHA@mail.gmail.com>
-From:   Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <CAAeLtUDcpyWkKgAo2Lk0ZoHcdyEeVARYkh05Ps27wbOzDF0sHA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+References: <20230202025716.216323-1-shahuang@redhat.com> <20230202081057.nanfjavyy2l4pswc@orel>
+In-Reply-To: <20230202081057.nanfjavyy2l4pswc@orel>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Thu, 2 Feb 2023 10:05:57 -0800
+Message-ID: <CAHVum0cs8Q+DWAswsmUG6xSchVzuoUcpScCrb+a_gJ-QWDdf+g@mail.gmail.com>
+Subject: Re: [PATCH v2] selftests: KVM: Replace optarg with arg in guest_modes_cmdline
+To:     Andrew Jones <andrew.jones@linux.dev>
+Cc:     shahuang@redhat.com, kvm@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sean Christopherson <seanjc@google.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/2/23 04:30, Philipp Tomsich wrote:
-> On the second pass over these patches, here's how we can use gvec
-> support for both vror and vrol:
-> 
-> /* Synthesize a rotate-right from a negate(shift-amount) + rotate-left */
-> static void tcg_gen_gvec_rotrs(unsigned vece, uint32_t dofs, uint32_t aofs,
->                         TCGv_i32 shift, uint32_t oprsz, uint32_t maxsz)
-> {
->      TCGv_i32 tmp = tcg_temp_new_i32();
->      tcg_gen_neg_i32(tmp, shift);
->      tcg_gen_gvec_rotls(vece, dofs, aofs, tmp, oprsz, maxsz);
-
-We can add rotls generically.
-I hadn't done this so far because there were no users.
-
-
-r~
+On Thu, Feb 2, 2023 at 12:11 AM Andrew Jones <andrew.jones@linux.dev> wrote:
+>
+> On Thu, Feb 02, 2023 at 10:57:15AM +0800, shahuang@redhat.com wrote:
+> > From: Shaoqin Huang <shahuang@redhat.com>
+> >
+> > The parameter arg in guest_modes_cmdline not being used now, and the
+> > optarg should be replaced with arg in guest_modes_cmdline.
+> >
+> > And this is the chance to change strtoul() to atoi_non_negative(), since
+> > guest mode ID will never be negative.
+>
+> Fixes: e42ac777d661 ("KVM: selftests: Factor out guest mode code")
+>
+> >
+> > Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
+> >
+> > ---
+> > Changes from v1:
+> >   - Change strtoul() to atoi_non_negative(). [Vipin]
+> >
+> > ---
+> >  tools/testing/selftests/kvm/lib/guest_modes.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/lib/guest_modes.c b/tools/testing/selftests/kvm/lib/guest_modes.c
+> > index 99a575bbbc52..1df3ce4b16fd 100644
+> > --- a/tools/testing/selftests/kvm/lib/guest_modes.c
+> > +++ b/tools/testing/selftests/kvm/lib/guest_modes.c
+> > @@ -127,7 +127,7 @@ void guest_modes_cmdline(const char *arg)
+> >               mode_selected = true;
+> >       }
+> >
+> > -     mode = strtoul(optarg, NULL, 10);
+> > +     mode = atoi_non_negative("Guest mode ID", arg);
+> >       TEST_ASSERT(mode < NUM_VM_MODES, "Guest mode ID %d too big", mode);
+> >       guest_modes[mode].enabled = true;
+> >  }
+> > --
+> > 2.39.0
+> >
+>
+> Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+Reviewed-by: Vipin Sharma <vipinsh@google.com>
