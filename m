@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A3166687F72
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 15:00:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id B24AD687F7D
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 15:04:12 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232067AbjBBN77 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 08:59:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51990 "EHLO
+        id S231510AbjBBOEK (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 09:04:10 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232081AbjBBN74 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 08:59:56 -0500
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DBBE8E074
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 05:59:49 -0800 (PST)
-Received: by mail-ed1-x533.google.com with SMTP id z11so2105519ede.1
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 05:59:49 -0800 (PST)
+        with ESMTP id S229881AbjBBOEJ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 09:04:09 -0500
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DED2E298DB
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 06:04:07 -0800 (PST)
+Received: by mail-ej1-x636.google.com with SMTP id m2so6204043ejb.8
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 06:04:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=vrull.eu; s=google;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zkMNL+kRpt0Zn2pJ+rCwwz97utSU2iggLFUmWWm0ckY=;
-        b=muHaMeX2r1LUchnDfPO3NJMRQMWk15Y3QVEXk3fvwRbhLqOG/JNffh8zYGZBR3dv6K
-         TsokH+phAT3+0Gv7xNujIe6TE7S4nzBdac+/10jaXYpnj6Tz5zgSxS+lADrlgX4lEce3
-         Ga8uCtbOTFFrTT0afl3sPHjO1PATPw8/0aypfEY4p3cmXLt6zhWCE6MK0TUl8DVe5wPL
-         771ITPVh6+enjuJMkYCjZ/rkG6XlXD2QJv0OCueGbnHnF66Fi623kdo/cleevt7Kyy17
-         Cu4Z/jR/ZcaIJKMe8fDQYIM7rc6csDTvHOxLgGP2mqpn7RqxF6YMq6mKU2S58Sg0j3ZR
-         4uEQ==
+        bh=6fy6ME76fsE2GltQoliTq9PmNQ1hERDS3fixqxq9DQ0=;
+        b=KKsvtvCHBWmwHLcKBvUSp3JdVY3xI2y3uMhDz1mGTnL351dTnVcNYvn5Tqr0SuLLgU
+         pyVFr9ISWY5/2z8AXbgjuh4BtrxoyzSAcYIjB3BnJpfY1fVloH1Ukbr4TqiZXjwSbkGE
+         L4nj1+x6KdyW5SBA4+ny8RKO0tuAHGc/GD5xVhg53BdPDOPfqwKau6wqeSRcaEskduoN
+         2OM3wR9eXXkNz57YkI91jVY6YJWxE0H+4zRgV/2HRa1DT0eIM/vD8YuJoBgJPW3e90ih
+         RccxrrrwY1/hixv8SQI81qibWvA66SHfKnX9pKlwbMgU70qVOE5SlKbCbhgDdRhBuMny
+         FxlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=zkMNL+kRpt0Zn2pJ+rCwwz97utSU2iggLFUmWWm0ckY=;
-        b=QWqf9GUOMhBge21Lb1yY5XmAEv2a/jmoZcJ2vJ0+GaEoBHwxGwzr8Uajbn2ZazpnlQ
-         3x/I/zH/RPumwHn73sFqNWwV9yv0BYa6eE+U+Dmr1y40fj9/BNSInl8ogLvMr5L0kYXA
-         FaYBjpx1P5k9N1YWy6zF/rrA2bXSALEknUKRGqQCrjvjNR9wdA3UEqAkKrEBjdblWnkf
-         Txt82wabRgEnFF7n5A+nASlUJqXdJRsx9mSBVKQuGQzJgxsorCw2pybdHs/WX6zbMXFt
-         OzwJpjKbtDlpLuVf8U+QD5PLym5WuFJPZs6k1Bu4vmxovIUojVnObmrKVd3OqMFTgDwp
-         KC7A==
-X-Gm-Message-State: AO0yUKUw/ASoNgOSx8cN57u3li0WxaJ/lku1mqUTiPq1o/B0/PQMgLPj
-        ZDoA/HCcZ7qiE8OKSNsbELzH9i5V9/35w5RsNza8+Q==
-X-Google-Smtp-Source: AK7set+3fl/RCKAikzpag4uGNJ5zQW6ILWkxqgdbJDDGArolDbb1LfUQyzF7bYr2xrSKtHZ+nXtlHL34+oaGVXj58Pc=
-X-Received: by 2002:a05:6402:294f:b0:499:b60f:5741 with SMTP id
- ed15-20020a056402294f00b00499b60f5741mr1937347edb.80.1675346388016; Thu, 02
- Feb 2023 05:59:48 -0800 (PST)
+        bh=6fy6ME76fsE2GltQoliTq9PmNQ1hERDS3fixqxq9DQ0=;
+        b=WeVpcg+QRJ3Urk3UHXrSKKnOmRpu3M4XLVOju0lOH7vf4gd/X2GjvLUXRQ4o30Wymt
+         8otV9HygkgKp117e13KvXZvC39VIN6P9GXqNF14EmjtaYV+pTAN4SRONtefpmNUsrBSC
+         4zMEEupSgS4FHJYwcE6/F/I+k2iONICK1yYVzyx+9A5qWsZmsNv74BGIQBPFv/JwATt9
+         947bU//ZdP9juszQImxgrdyWgZwyS3WjVjTfdgZfiFvzshvNH1ETV3o2sNTf5aw8WMFC
+         92EWE7MNorAeT9twCBtxcSbrRXHYmLHwyywdtFH9q2T0TWkaWm+SMV3PHJzhNU0PJOfT
+         U9Cg==
+X-Gm-Message-State: AO0yUKWbDwxKDw9NH8RxZJFetGDMsKB0ud2g0l9TrzYk1yXgQTHehPRP
+        jiuIZ3qqsvf2lG6NlwxYQPO4wp/RGMeKtWyM9FtBJQ==
+X-Google-Smtp-Source: AK7set/383oNBJ7S5z0YobbUohJMaKCMjncS+ajExqVzb+0S8m13Ye5hm9wXSaLELI+cTEmZGR39lKEf9bXZIfU7e00=
+X-Received: by 2002:a17:906:b001:b0:878:4cc7:ed23 with SMTP id
+ v1-20020a170906b00100b008784cc7ed23mr2066707ejy.14.1675346646374; Thu, 02 Feb
+ 2023 06:04:06 -0800 (PST)
 MIME-Version: 1.0
-References: <20230202124230.295997-1-lawrence.hunter@codethink.co.uk> <20230202124230.295997-4-lawrence.hunter@codethink.co.uk>
-In-Reply-To: <20230202124230.295997-4-lawrence.hunter@codethink.co.uk>
+References: <20230202124230.295997-1-lawrence.hunter@codethink.co.uk> <20230202124230.295997-5-lawrence.hunter@codethink.co.uk>
+In-Reply-To: <20230202124230.295997-5-lawrence.hunter@codethink.co.uk>
 From:   Philipp Tomsich <philipp.tomsich@vrull.eu>
-Date:   Thu, 2 Feb 2023 14:59:36 +0100
-Message-ID: <CAAeLtUAZG9DmPL7r8vmhbwoJ9_JQBZBez1jb-xMGXj5iVQ4P=g@mail.gmail.com>
-Subject: Re: [PATCH 03/39] target/riscv: Add vclmul.vx decoding, translation
+Date:   Thu, 2 Feb 2023 15:03:55 +0100
+Message-ID: <CAAeLtUDaL2_6ftqQtFZ5fRfyJbwbv=QXc7hTwQSf+w3QCG1c3Q@mail.gmail.com>
+Subject: Re: [PATCH 04/39] target/riscv: Add vclmulh.vv decoding, translation
  and execution support
 To:     Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 Cc:     qemu-devel@nongnu.org, dickon.hood@codethink.co.uk,
@@ -72,251 +72,95 @@ X-Mailing-List: kvm@vger.kernel.org
 On Thu, 2 Feb 2023 at 13:42, Lawrence Hunter
 <lawrence.hunter@codethink.co.uk> wrote:
 >
-
-Please split off the refactoring.
-See below for more comments.
-
-> Co-authored-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
-> Co-authored-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
-> Signed-off-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
-> Signed-off-by: Nazar Kazakov <nazar.kazakov@codethink.co.uk>
 > Signed-off-by: Lawrence Hunter <lawrence.hunter@codethink.co.uk>
 > ---
 >  target/riscv/helper.h                      |  1 +
 >  target/riscv/insn32.decode                 |  1 +
->  target/riscv/insn_trans/trans_rvzvkb.c.inc | 54 ++++++++++++++++++++++
->  target/riscv/vcrypto_helper.c              | 12 +++++
->  target/riscv/vector_helper.c               | 36 ---------------
->  target/riscv/vector_internals.c            | 24 ++++++++++
->  target/riscv/vector_internals.h            | 16 +++++++
->  7 files changed, 108 insertions(+), 36 deletions(-)
+>  target/riscv/insn_trans/trans_rvzvkb.c.inc |  1 +
+>  target/riscv/vcrypto_helper.c              | 12 ++++++++++++
+>  4 files changed, 15 insertions(+)
 >
 > diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-> index e9127c9ccb..6c786ef6f3 100644
+> index 6c786ef6f3..a155272701 100644
 > --- a/target/riscv/helper.h
 > +++ b/target/riscv/helper.h
-> @@ -1139,3 +1139,4 @@ DEF_HELPER_FLAGS_3(sm4ks, TCG_CALL_NO_RWG_SE, tl, tl, tl, tl)
->
+> @@ -1140,3 +1140,4 @@ DEF_HELPER_FLAGS_3(sm4ks, TCG_CALL_NO_RWG_SE, tl, tl, tl, tl)
 >  /* Vector crypto functions */
 >  DEF_HELPER_6(vclmul_vv, void, ptr, ptr, ptr, ptr, env, i32)
-> +DEF_HELPER_6(vclmul_vx, void, ptr, ptr, tl, ptr, env, i32)
+>  DEF_HELPER_6(vclmul_vx, void, ptr, ptr, tl, ptr, env, i32)
+> +DEF_HELPER_6(vclmulh_vv, void, ptr, ptr, ptr, ptr, env, i32)
 > diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-> index 5ddee69d60..4a7421354d 100644
+> index 4a7421354d..e26ea1df08 100644
 > --- a/target/riscv/insn32.decode
 > +++ b/target/riscv/insn32.decode
-> @@ -893,3 +893,4 @@ sm4ks       .. 11010 ..... ..... 000 ..... 0110011 @k_aes
->
+> @@ -894,3 +894,4 @@ sm4ks       .. 11010 ..... ..... 000 ..... 0110011 @k_aes
 >  # *** RV64 Zvkb vector crypto extension ***
 >  vclmul_vv       001100 . ..... ..... 010 ..... 1010111 @r_vm
-> +vclmul_vx       001100 . ..... ..... 110 ..... 1010111 @r_vm
+>  vclmul_vx       001100 . ..... ..... 110 ..... 1010111 @r_vm
+> +vclmulh_vv      001101 . ..... ..... 010 ..... 1010111 @r_vm
 > diff --git a/target/riscv/insn_trans/trans_rvzvkb.c.inc b/target/riscv/insn_trans/trans_rvzvkb.c.inc
-> index fb1995f737..6e8b81136c 100644
+> index 6e8b81136c..19ce4c7431 100644
 > --- a/target/riscv/insn_trans/trans_rvzvkb.c.inc
 > +++ b/target/riscv/insn_trans/trans_rvzvkb.c.inc
-> @@ -39,3 +39,57 @@ static bool vclmul_vv_check(DisasContext *s, arg_rmrr *a)
+> @@ -39,6 +39,7 @@ static bool vclmul_vv_check(DisasContext *s, arg_rmrr *a)
 >  }
 >
 >  GEN_VV_MASKED_TRANS(vclmul_vv, vclmul_vv_check)
-> +
-> +#define GEN_VX_MASKED_TRANS(NAME, CHECK)                                \
-> +static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                  \
-> +{                                                                       \
-> +    if (CHECK(s, a)) {                                                  \
-> +        TCGv_ptr rd_v, v0_v, rs2_v;                                     \
-> +        TCGv rs1;                                                       \
-> +        TCGv_i32 desc;                                                  \
-> +        uint32_t data = 0;                                              \
-> +                                                                        \
-> +        TCGLabel *over = gen_new_label();                               \
-> +        tcg_gen_brcondi_tl(TCG_COND_EQ, cpu_vl, 0, over);               \
-> +        tcg_gen_brcond_tl(TCG_COND_GEU, cpu_vstart, cpu_vl, over);      \
-> +                                                                        \
-> +        data = FIELD_DP32(data, VDATA, VM, a->vm);                      \
-> +        data = FIELD_DP32(data, VDATA, LMUL, s->lmul);                  \
-> +        data = FIELD_DP32(data, VDATA, VTA, s->vta);                    \
-> +        data = FIELD_DP32(data, VDATA, VTA_ALL_1S, s->cfg_vta_all_1s);  \
-> +        data = FIELD_DP32(data, VDATA, VMA, s->vma);                    \
-> +                                                                        \
-> +        rd_v = tcg_temp_new_ptr();                                      \
-> +        v0_v = tcg_temp_new_ptr();                                      \
-> +        rs1 = get_gpr(s, a->rs1, EXT_ZERO);                             \
-> +        rs2_v = tcg_temp_new_ptr();                                     \
-> +        desc = tcg_constant_i32(simd_desc(s->cfg_ptr->vlen / 8,         \
-> +                                          s->cfg_ptr->vlen / 8, data)); \
-> +        tcg_gen_addi_ptr(rd_v, cpu_env, vreg_ofs(s, a->rd));            \
-> +        tcg_gen_addi_ptr(v0_v, cpu_env, vreg_ofs(s, 0));                \
-> +        tcg_gen_addi_ptr(rs2_v, cpu_env, vreg_ofs(s, a->rs2));          \
-> +        gen_helper_##NAME(rd_v, v0_v, rs1, rs2_v, cpu_env, desc);       \
-> +        tcg_temp_free_ptr(rd_v);                                        \
-> +        tcg_temp_free_ptr(v0_v);                                        \
-> +        tcg_temp_free_ptr(rs2_v);                                       \
-> +                                                                        \
-> +        mark_vs_dirty(s);                                               \
-> +        gen_set_label(over);                                            \
-> +        return true;                                                    \
-> +    }                                                                   \
-> +    return false;                                                       \
-> +}
-
-Why not reuse the opivx_trans() function that is already present and
-call that from this macro?
-
-> +
-> +static bool zvkb_vx_check(DisasContext *s, arg_rmrr *a)
-> +{
-> +    return opivx_check(s, a) &&
-> +           s->cfg_ptr->ext_zvkb == true;
-> +}
-> +
-> +static bool vclmul_vx_check(DisasContext *s, arg_rmrr *a)
-> +{
-> +    return zvkb_vx_check(s, a) &&
-> +           s->sew == MO_64;
-> +}
-> +
-> +GEN_VX_MASKED_TRANS(vclmul_vx, vclmul_vx_check)
+> +GEN_VV_MASKED_TRANS(vclmulh_vv, vclmul_vv_check)
+>
+>  #define GEN_VX_MASKED_TRANS(NAME, CHECK)                                \
+>  static bool trans_##NAME(DisasContext *s, arg_rmrr *a)                  \
 > diff --git a/target/riscv/vcrypto_helper.c b/target/riscv/vcrypto_helper.c
-> index 8a11e56754..c453d348ad 100644
+> index c453d348ad..022b941131 100644
 > --- a/target/riscv/vcrypto_helper.c
 > +++ b/target/riscv/vcrypto_helper.c
-> @@ -20,4 +20,16 @@ static void do_vclmul_vv(void *vd, void *vs1, void *vs2, int i)
+> @@ -31,5 +31,17 @@ static void do_vclmul_vx(void *vd, target_long rs1, void *vs2, int i)
 >      ((uint64_t *)vd)[i] = result;
 >  }
 >
-> +static void do_vclmul_vx(void *vd, target_long rs1, void *vs2, int i)
+> +static void do_vclmulh_vv(void *vd, void *vs1, void *vs2, int i)
 > +{
-> +    uint64_t result = 0;
+> +    __uint128_t result = 0;
 > +    for (int j = 63; j >= 0; j--) {
-> +        if ((rs1 >> j) & 1) {
-> +            result ^= (((uint64_t *)vs2)[i] << j);
+> +        if ((((uint64_t *)vs1)[i] >> j) & 1) {
+> +            result ^= (((__uint128_t)(((uint64_t *)vs2)[i])) << j);
+
+Why are we computing a 128 bit result, if we reduce it to 64b bits anyway?
+
 > +        }
 > +    }
-> +    ((uint64_t *)vd)[i] = result;
+> +    ((uint64_t *)vd)[i] = (result >> 64);
 > +}
 
-This can be dropped, if you use the clmul64() I had proposed in the
-previous patch review.
-You can then use the existing generator macros:
+Please simplify in the same way as for clmul (i.e. a single function
+that computes uint64 x uint64 -> uint64 ... and 2 calls to the RVVCALL
+generator for OPIVV2 and OPIVX2):
 
-RVVCALL(OPIVV2, vclmul_vv_d, OP_UUU_D, H8, H8, H8, clmul64)
-RVVCALL(OPIVX2, vclmul_vx_d, OP_UUU_D, H8, H8, clmul64)
-GEN_VEXT_VV(vclmul_vv_d, 8)
-GEN_VEXT_VX(vclmul_vx_d, 8)
+static uint64_t clmulh64(uint64_t x, uint64_t y)
+{
+    target_ulong result = 0;
+    const unsigned int elem_width = 64;
+
+    for (unsigned int i = 1; i < elem_width; ++i)
+        if ((y >> i) & 1)
+            result ^= (x >> (elem_width - i));
+
+    return result;
+}
+
+/* vclmulh.vv */
+RVVCALL(OPIVV2, vclmulh_vv_d, OP_UUU_D, H8, H8, H8, clmulh64)
+GEN_VEXT_VV(vclmulh_vv_d, 8)
+
+/* vclmulh.vx */
+RVVCALL(OPIVX2, vclmulh_vx_d, OP_UUU_D, H8, H8, clmulh64)
+GEN_VEXT_VX(vclmulh_vx_d, 8)
+
 
 > +
 >  GEN_VEXT_VV(vclmul_vv, 8)
-> +GEN_VEXT_VX(vclmul_vx, 8)
-> diff --git a/target/riscv/vector_helper.c b/target/riscv/vector_helper.c
-> index def1b21414..ab470092f6 100644
-> --- a/target/riscv/vector_helper.c
-> +++ b/target/riscv/vector_helper.c
-> @@ -747,8 +747,6 @@ GEN_VEXT_VV(vsub_vv_h, 2)
->  GEN_VEXT_VV(vsub_vv_w, 4)
->  GEN_VEXT_VV(vsub_vv_d, 8)
->
-> -typedef void opivx2_fn(void *vd, target_long s1, void *vs2, int i);
-> -
->  /*
->   * (T1)s1 gives the real operator type.
->   * (TX1)(T1)s1 expands the operator type of widen or narrow operations.
-> @@ -773,40 +771,6 @@ RVVCALL(OPIVX2, vrsub_vx_h, OP_SSS_H, H2, H2, DO_RSUB)
->  RVVCALL(OPIVX2, vrsub_vx_w, OP_SSS_W, H4, H4, DO_RSUB)
->  RVVCALL(OPIVX2, vrsub_vx_d, OP_SSS_D, H8, H8, DO_RSUB)
->
-> -static void do_vext_vx(void *vd, void *v0, target_long s1, void *vs2,
-> -                       CPURISCVState *env, uint32_t desc,
-> -                       opivx2_fn fn, uint32_t esz)
-> -{
-> -    uint32_t vm = vext_vm(desc);
-> -    uint32_t vl = env->vl;
-> -    uint32_t total_elems = vext_get_total_elems(env, desc, esz);
-> -    uint32_t vta = vext_vta(desc);
-> -    uint32_t vma = vext_vma(desc);
-> -    uint32_t i;
-> -
-> -    for (i = env->vstart; i < vl; i++) {
-> -        if (!vm && !vext_elem_mask(v0, i)) {
-> -            /* set masked-off elements to 1s */
-> -            vext_set_elems_1s(vd, vma, i * esz, (i + 1) * esz);
-> -            continue;
-> -        }
-> -        fn(vd, s1, vs2, i);
-> -    }
-> -    env->vstart = 0;
-> -    /* set tail elements to 1s */
-> -    vext_set_elems_1s(vd, vta, vl * esz, total_elems * esz);
-> -}
-> -
-> -/* generate the helpers for OPIVX */
-> -#define GEN_VEXT_VX(NAME, ESZ)                            \
-> -void HELPER(NAME)(void *vd, void *v0, target_ulong s1,    \
-> -                  void *vs2, CPURISCVState *env,          \
-> -                  uint32_t desc)                          \
-> -{                                                         \
-> -    do_vext_vx(vd, v0, s1, vs2, env, desc,                \
-> -               do_##NAME, ESZ);                           \
-> -}
-> -
->  GEN_VEXT_VX(vadd_vx_b, 1)
->  GEN_VEXT_VX(vadd_vx_h, 2)
->  GEN_VEXT_VX(vadd_vx_w, 4)
-> diff --git a/target/riscv/vector_internals.c b/target/riscv/vector_internals.c
-> index a264797882..b23fa4dd74 100644
-> --- a/target/riscv/vector_internals.c
-> +++ b/target/riscv/vector_internals.c
-> @@ -37,3 +37,27 @@ void do_vext_vv(void *vd, void *v0, void *vs1, void *vs2,
->      /* set tail elements to 1s */
->      vext_set_elems_1s(vd, vta, vl * esz, total_elems * esz);
->  }
-> +
-> +void do_vext_vx(void *vd, void *v0, target_long s1, void *vs2,
-> +                CPURISCVState *env, uint32_t desc,
-> +                opivx2_fn fn, uint32_t esz)
-> +{
-> +    uint32_t vm = vext_vm(desc);
-> +    uint32_t vl = env->vl;
-> +    uint32_t total_elems = vext_get_total_elems(env, desc, esz);
-> +    uint32_t vta = vext_vta(desc);
-> +    uint32_t vma = vext_vma(desc);
-> +    uint32_t i;
-> +
-> +    for (i = env->vstart; i < vl; i++) {
-> +        if (!vm && !vext_elem_mask(v0, i)) {
-> +            /* set masked-off elements to 1s */
-> +            vext_set_elems_1s(vd, vma, i * esz, (i + 1) * esz);
-> +            continue;
-> +        }
-> +        fn(vd, s1, vs2, i);
-> +    }
-> +    env->vstart = 0;
-> +    /* set tail elements to 1s */
-> +    vext_set_elems_1s(vd, vta, vl * esz, total_elems * esz);
-> +}
-> diff --git a/target/riscv/vector_internals.h b/target/riscv/vector_internals.h
-> index f61803acc0..49529d2379 100644
-> --- a/target/riscv/vector_internals.h
-> +++ b/target/riscv/vector_internals.h
-> @@ -113,4 +113,20 @@ void HELPER(NAME)(void *vd, void *v0, void *vs1,          \
->                 do_##NAME, ESZ);                           \
->  }
->
-> +typedef void opivx2_fn(void *vd, target_long s1, void *vs2, int i);
-> +
-> +void do_vext_vx(void *vd, void *v0, target_long s1, void *vs2,
-> +                CPURISCVState *env, uint32_t desc,
-> +                opivx2_fn fn, uint32_t esz);
-> +
-> +/* generate the helpers for OPIVX */
-> +#define GEN_VEXT_VX(NAME, ESZ)                            \
-> +void HELPER(NAME)(void *vd, void *v0, target_ulong s1,    \
-> +                  void *vs2, CPURISCVState *env,          \
-> +                  uint32_t desc)                          \
-> +{                                                         \
-> +    do_vext_vx(vd, v0, s1, vs2, env, desc,                \
-> +               do_##NAME, ESZ);                           \
-> +}
-> +
->  #endif /* TARGET_RISCV_VECTOR_INTERNAL_H */
+>  GEN_VEXT_VX(vclmul_vx, 8)
+> +GEN_VEXT_VV(vclmulh_vv, 8)
 > --
 > 2.39.1
 >
