@@ -2,71 +2,94 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A167868839E
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 17:03:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 635796883AA
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 17:06:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232389AbjBBQD2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 11:03:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42456 "EHLO
+        id S232119AbjBBQGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 11:06:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232165AbjBBQD0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 11:03:26 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C3143C2B0
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 08:03:19 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id o13so2351020pjg.2
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 08:03:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CnTJJs+O/feHF+dtKsJMe8sGkEuF3IoD/Hd0PvzGTMk=;
-        b=ntILpNHieOlE1eQKlkEswLTzNxqODvW4UIylIlF6hRS4jdzdpSLvn5nG5RoRgG5Bgq
-         7dtxWITAVyjEVlmVQEt+iwH5zHcmfrsV4Mbfgcv6+8WIcYe3lyUI/lCYgCEbPbobufSg
-         tlsMycMU1nsX+x/tnC/hgF7+7XRGmF/xIPhf2SbzUu7YzpbCIJdC91xHSfrT+IGiyNSw
-         WnWs3CV2L1WfkgW0hE2JjG2CjOibBcKNyyjTJCxc0PXFNA0WhsENL27S+uPlTUnuVy7d
-         6uEmdPwBOPvmmKVh9UQK1XtRrbudvo6yxsVfABu1Etqug+ce3HqVqlaFHfGrMqudkjYk
-         ARpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CnTJJs+O/feHF+dtKsJMe8sGkEuF3IoD/Hd0PvzGTMk=;
-        b=dFqYMZwFt2WBCPHd6tXEvUPDaOTHE7iZS5JKFpOZLPhGI4G3hn81fkFQeURmxIaAFe
-         EltfJs5vDOAF6NW4jzHqcCzNx7t1DjnfZeP85gzY6a9lmvuvNs2p5vrS+8TxiBslT3C7
-         ghoD+GyyACNddCN2wvdzFVuroyz1kvSIayAEEpt2B9KOA3FI6HDNLWHQYWTJswe7QUpR
-         f7+rpguhTjPgxWMwigsBPM4ULhVWQW9B8CMiAHmLeMsono0ImlqWpwj1jYJ1EG4SNTzK
-         lUp36eyx5Bk89cEB2Npy1Cvphif10HRlS6ZlMBb9DikBpiU7jFhpyoYXhz3mw0zOogwQ
-         xVrQ==
-X-Gm-Message-State: AO0yUKVzATjxEuXN8kGESRGIT7GPfdsyn1xe95a7Bse3AcbXB2x5E0CO
-        am4q8nTiIAf0G5qV5JzSHfaexA==
-X-Google-Smtp-Source: AK7set/Di2re5uFl+ne06GLzugwEpNOWcHIFlsRKD8jsMY/VPWb1pFEIyTdJ5++rLnhtQtcIzFRFxQ==
-X-Received: by 2002:a17:902:7795:b0:191:4367:7fde with SMTP id o21-20020a170902779500b0019143677fdemr323109pll.0.1675353799009;
-        Thu, 02 Feb 2023 08:03:19 -0800 (PST)
-Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
-        by smtp.gmail.com with ESMTPSA id d2-20020a170903230200b00189c4b8ca21sm13923789plh.18.2023.02.02.08.03.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 08:03:18 -0800 (PST)
-Date:   Thu, 2 Feb 2023 16:03:14 +0000
-From:   Sean Christopherson <seanjc@google.com>
-To:     Yuan ZhaoXiong <yuanzhaoxiong@baidu.com>
-Cc:     pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, mlevitsk@redhat.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: SVM: fix calculate dest mask incorrectly in x2apic
- mode.
-Message-ID: <Y9vewvcdjKkaFS87@google.com>
-References: <1675328830-37483-1-git-send-email-yuanzhaoxiong@baidu.com>
+        with ESMTP id S230144AbjBBQGK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 11:06:10 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53E0268AFC
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 08:06:08 -0800 (PST)
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 312EBGCU002095;
+        Thu, 2 Feb 2023 16:05:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=D3FV9Y0GvJS2l6SYHPVWLLzH43WlotAtU617C7bwbMM=;
+ b=DHFR7RonXLVLk1jtoZnDrxgx7GeijBGXIUZNkEuNa6/HC3CPPW0iv5tWonO1BSwdm/OB
+ WOd1ZV7Q7pF0Vf2htPLHEbYaqTPXHCKsh7ZfSIcqRGaN1VwcFL39JNorkDnS7a6ooiHo
+ tHbViAjbIlx7XQb/32+CE3e8rqhYM+dmaWzIvTN/BTcxgF458dSyYdBthz+ywfjJQrZj
+ rHQR2Ir8V+BPbtHCrRiNIadmatZOYgJ2o6QjdGSqwH5n6B0LA7416lZ99du7wfguxKhA
+ xcKXWdlIv0RCXSOc/bONNMCRQQ8qZaYRDu6sIZTXj0nKiC8wzZWRRQFvs+hbSufyx+5D ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ngd74dswv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 16:05:53 +0000
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 312Et9P9025153;
+        Thu, 2 Feb 2023 16:05:53 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ngd74dsvg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 16:05:53 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 312CugD2014744;
+        Thu, 2 Feb 2023 16:05:50 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+        by ppma06ams.nl.ibm.com (PPS) with ESMTPS id 3ncvttxcnm-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 16:05:50 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+        by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 312G5lAE37552520
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Feb 2023 16:05:47 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 0645720063;
+        Thu,  2 Feb 2023 16:05:47 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 917AA2004F;
+        Thu,  2 Feb 2023 16:05:46 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.142.89])
+        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Feb 2023 16:05:46 +0000 (GMT)
+Message-ID: <9fed7aba2819a6564b785e90c2284b2a83f35431.camel@linux.ibm.com>
+Subject: Re: [PATCH v15 01/11] s390x/cpu topology: adding s390 specificities
+ to CPU topology
+From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
+Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
+        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
+        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
+        kvm@vger.kernel.org, ehabkost@redhat.com,
+        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
+        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
+        berrange@redhat.com, clg@kaod.org
+Date:   Thu, 02 Feb 2023 17:05:46 +0100
+In-Reply-To: <20230201132051.126868-2-pmorel@linux.ibm.com>
+References: <20230201132051.126868-1-pmorel@linux.ibm.com>
+         <20230201132051.126868-2-pmorel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1675328830-37483-1-git-send-email-yuanzhaoxiong@baidu.com>
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: xENYh6gJfcYtb0ZTXamuWLH_OTgv6mG-
+X-Proofpoint-GUID: R-UAo-g1wt-0rZw87a81WjT7jXvwB5Jg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-02_10,2023-02-02_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ mlxlogscore=999 malwarescore=0 clxscore=1011 priorityscore=1501
+ phishscore=0 mlxscore=0 spamscore=0 lowpriorityscore=0 adultscore=0
+ bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302020143
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -74,32 +97,87 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 02, 2023, Yuan ZhaoXiong wrote:
-> ICRH bits 31:16 is cluster id and bits 15:0 is dest mask when x2apic is
-> enabled.
-> 
-> Fixes: 603ccef42ce9 ("KVM: x86: SVM: fix avic_kick_target_vcpus_fast")
-> 
-> Signed-off-by: Yuan ZhaoXiong <yuanzhaoxiong@baidu.com>
+Nit patch title: s390x/cpu topology: add s390 specifics to CPU topology ?
+
+On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
+> S390 adds two new SMP levels, drawers and books to the CPU
+> topology.
+> The S390 CPU have specific toplogy features like dedication
+                                ^o
+> and polarity to give to the guest indications on the host
+> vCPUs scheduling and help the guest take the best decisions
+> on the scheduling of threads on the vCPUs.
+>=20
+> Let us provide the SMP properties with books and drawers levels
+> and S390 CPU with dedication and polarity,
+>=20
+> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
 > ---
->  arch/x86/kvm/svm/avic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/svm/avic.c b/arch/x86/kvm/svm/avic.c
-> index 6919dee..03b1e27 100644
-> --- a/arch/x86/kvm/svm/avic.c
-> +++ b/arch/x86/kvm/svm/avic.c
-> @@ -378,7 +378,7 @@ static int avic_kick_target_vcpus_fast(struct kvm *kvm, struct kvm_lapic *source
->  
->  		if (apic_x2apic_mode(source)) {
->  			/* 16 bit dest mask, 16 bit cluster id */
-> -			bitmap = dest & 0xFFFF0000;
-> +			bitmap = dest & 0xFFFF;
+>  qapi/machine.json               | 14 ++++++++--
+>  include/hw/boards.h             | 10 ++++++-
+>  include/hw/s390x/cpu-topology.h | 24 +++++++++++++++++
+>  target/s390x/cpu.h              |  5 ++++
+>  hw/core/machine-smp.c           | 48 ++++++++++++++++++++++++++++-----
+>  hw/core/machine.c               |  4 +++
+>  hw/s390x/s390-virtio-ccw.c      |  2 ++
+>  softmmu/vl.c                    |  6 +++++
+>  target/s390x/cpu.c              |  7 +++++
+>  qemu-options.hx                 |  7 +++--
+>  10 files changed, 115 insertions(+), 12 deletions(-)
+>  create mode 100644 include/hw/s390x/cpu-topology.h
+>=20
+[...]
+>=20
+> diff --git a/include/hw/s390x/cpu-topology.h b/include/hw/s390x/cpu-topol=
+ogy.h
+> new file mode 100644
+> index 0000000000..7a84b30a21
+> --- /dev/null
+> +++ b/include/hw/s390x/cpu-topology.h
+> @@ -0,0 +1,24 @@
+> +/*
+> + * CPU Topology
+> + *
+> + * Copyright IBM Corp. 2022
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or (a=
+t
+> + * your option) any later version. See the COPYING file in the top-level
+> + * directory.
+> + */
+> +#ifndef HW_S390X_CPU_TOPOLOGY_H
+> +#define HW_S390X_CPU_TOPOLOGY_H
+> +
+> +#define S390_TOPOLOGY_CPU_IFL   0x03
+> +
+> +enum s390_topology_polarity {
+> +    POLARITY_HORIZONTAL,
+> +    POLARITY_VERTICAL,
+> +    POLARITY_VERTICAL_LOW =3D 1,
+> +    POLARITY_VERTICAL_MEDIUM,
+> +    POLARITY_VERTICAL_HIGH,
+> +    POLARITY_MAX,
+> +};
 
-Already fixed in the Paolo's tree, commit da3fb46d226a ("KVM: SVM: Fix x2APIC
-Logical ID calculation for avic_kick_target_vcpus_fast").
+Probably a good idea to keep the S390 prefix.
+This works, but aliasing VERTICAL and VERTICAL_LOW is not
+entirely straight forward.
 
-In case you have more APIC/AVIC related fixes/bugs, a big pile of fixes are queued
-for 6.3, see commit f15a87c00690 ("Merge branch 'kvm-lapic-fix-and-cleanup' into HEAD").
+Why not have two enum?
+enum s390_topology_polarity {
+	S390_POLARITY_HORIZONTAL,
+	S390_POLARITY_VERTICAL,
+};
 
-Thanks!
+enum s390_topology_entitlement {
+	S390_ENTITLEMENT_LOW =3D 1,
+	S390_ENTITLEMENT_MEDIUM,
+	S390_ENTITLEMENT_HIGH,
+	S390_ENTITLEMENT_MAX,
+};
+Maybe add an ENTITLEMENT_INVALID/NONE, if you need that, as first value.
+
+> +#endif
+>=20
+[...]
+
