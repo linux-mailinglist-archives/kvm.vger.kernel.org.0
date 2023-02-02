@@ -2,54 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0458688654
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:28:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 09B76688656
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:28:19 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231868AbjBBS2P (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 13:28:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60504 "EHLO
+        id S232256AbjBBS2R (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 13:28:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229804AbjBBS2O (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 13:28:14 -0500
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4B715CA0
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:12 -0800 (PST)
-Received: by mail-pf1-x44a.google.com with SMTP id y5-20020aa78545000000b00593b071cb99so1368183pfn.4
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:12 -0800 (PST)
+        with ESMTP id S232048AbjBBS2P (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 13:28:15 -0500
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1550B1E1CA
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:14 -0800 (PST)
+Received: by mail-pg1-x549.google.com with SMTP id 84-20020a630257000000b00477f88d334eso1371460pgc.11
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=0+SBcx6MVrgVk2LoIRaHLt69jku4c6rTYPgXbWSbqGk=;
-        b=Q5aRqr2sxq2uX4adungANbB3rre1+leu5U94x534oEHG3jQYGfB1uazHzkIWOlqGpy
-         /z4TBMvW1Svu0LZamqE7g5s3jlKbKuih5/C6XwBaJgE5AW9xerqakVfbN2FEm9JY1XhN
-         I9TTllwSDjMN9g01dh7skwySOK78XhJuXdQKMSt4lj/gaYH8lsKeWYVhZydc70p64JrM
-         J8YMri7UEGb4yA+G3KTzc5QYpzSKlsBqTcS/qgCCEb8sipemc3wWQwlLDFBd9upsjfQY
-         SPUmZBRLkxrcgFgKGCjTIAtoeJXKWV+eihHSlIHTkLcfyvL/yZfmlKnrr+d/1+B2kgDK
-         GeDw==
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SvvKkW75+gdxQjUlvNBkeiHOn7ZjUPUrkdnVT/ZkYsk=;
+        b=D8+uY0IwwkhAM0wjz6tGjWHmroHIAqQNhGYpcXwU3usVKzeklVUJT/qLUp9slcFtyf
+         hoCrm+MMG/4mwarivWDAcU3jO+n8M5t4sRZfcrdnHJG/ERQhauamLgBJuAk7ewlKMDqW
+         58SEYIw8EBpKYvX7A1onz2XNAPWLcNPYBO4Kwq/qKaxkqOgnkvoc+wM03GqZN/HMKZWa
+         2F38iTqHWnSsb5aLv6EUT8KhwiEzTauEr/d87z19n3wVfLp/rzOMsyiXXuJhUyNOzLLP
+         /8wozJR7QfRfDRxZAacAGNdn3ue3w5hQqG7aZeOZHPAf2uNb7Go2XbSp0RObkPmhAt93
+         HyjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0+SBcx6MVrgVk2LoIRaHLt69jku4c6rTYPgXbWSbqGk=;
-        b=TQxwbtOkZVxojW1aUzE5r17xy9gLsWuuRg42CYNlYQHZ+3J7A0Z1AxM+9xxWrJ/Zi1
-         Nqbw9GgdLziAxYrQma2GC11z+5Su9eet9GnZlg3m6XaXC7wszZFBozMrJtfOUKZDB8nd
-         XOkZHetPxdXcKrN8fri5nmAkZbCi/UJBmH4OrqIe9NhvtLoa6/uNhAUEMOyoazqZRN81
-         csRH2XPk9qYirQsB9M39j51NJvMYdhMoq9Bz/n7CDf0GRj75VpbCuxP71W1JTaCCCwHd
-         B+m5vEb6sjfAwUDkqh7rXXyRzZEV2Y2u4tDkzVILqpgM3yzzXNRo0SbP6BJAyNPFeaQD
-         +cCQ==
-X-Gm-Message-State: AO0yUKVdmXSgP+S5DoERM00U3SpKO7TUXARVsxMk6ZLXwxjYIRWdbODv
-        iL5lz4J31z8/SMqhCt0TSqzCuWAHw1kP
-X-Google-Smtp-Source: AK7set91y1jj7PTgsJ5vCMdecR8eG7ZR8ipAA11/zzQ08GevhxMRiFrc6z6IefELTRiYqRf+6XlVagoBGRU4
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=SvvKkW75+gdxQjUlvNBkeiHOn7ZjUPUrkdnVT/ZkYsk=;
+        b=w0hoPPes9JLpuyfvA+B0MrMOOUmFOzpDZbshJ31eiafuKyZVSDTCDEyXYXJFOerKgt
+         qu/XZSF34F4+9WfbRGADkVtnCoavHWQTYFZJN/QSJdvv4uMC+xbUjV599sxnxqLcegYM
+         1rbujS9oFsBjsd/+JUuTKhlUDv6wIjj5Y0ofS2TUAmesAWhkUdgd8UXjWN6Z23gJd362
+         V8auHfXuZU4xWTAdpD/GIdMHC+1hy6LLAO277SpEuFTeG3Rl3Cv2/8Prfad5aYz1zIco
+         QL+owo3dARPzHquI/onq9D1PH39L+bKOOYBa8Tlaij7UoktIDcyko+HzIpy1myYn4Tng
+         27Jw==
+X-Gm-Message-State: AO0yUKXQCvlKf9gg7S27US14aAglxs2An8cXRjijd6+2MsjmD5nDCzLY
+        kGH2TZDCUBnFnAyx8c+0hHXE65llrMEf
+X-Google-Smtp-Source: AK7set8up62HzVic7cwUd/zWob1l4/oaE1pAVg6bhoiFuxEXIDwQTXzMFkjE+iB5ptvb7p11T1hGKjc9cK78
 X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
- (user=bgardon job=sendgmr) by 2002:a17:90b:ec2:b0:22c:4751:82b2 with SMTP id
- gz2-20020a17090b0ec200b0022c475182b2mr726051pjb.56.1675362491780; Thu, 02 Feb
- 2023 10:28:11 -0800 (PST)
-Date:   Thu,  2 Feb 2023 18:27:48 +0000
+ (user=bgardon job=sendgmr) by 2002:a05:6a00:190c:b0:593:a079:639a with SMTP
+ id y12-20020a056a00190c00b00593a079639amr1783509pfi.44.1675362493497; Thu, 02
+ Feb 2023 10:28:13 -0800 (PST)
+Date:   Thu,  2 Feb 2023 18:27:49 +0000
+In-Reply-To: <20230202182809.1929122-1-bgardon@google.com>
 Mime-Version: 1.0
+References: <20230202182809.1929122-1-bgardon@google.com>
 X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230202182809.1929122-1-bgardon@google.com>
-Subject: [PATCH 00/21] KVM: x86/MMU: Formalize the Shadow MMU
+Message-ID: <20230202182809.1929122-2-bgardon@google.com>
+Subject: [PATCH 01/21] KVM: x86/mmu: Rename slot rmap walkers to add clarity
+ and clean up code
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -69,116 +72,154 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This series makes the Shadow MMU a distinct part of the KVM x86 MMU,
-implemented in separate files, with a defined interface to common code.
+From: Sean Christopherson <seanjc@google.com>
 
-When the TDP (Two Dimensional Paging) MMU was added to x86 KVM, it came in
-a separate file with a (reasonably) clear interface. This lead to many
-points in the KVM MMU like this:
+Replace "slot_handle_level" with "walk_slot_rmaps" to better capture what
+the helpers are doing, and to slightly shorten the function names so that
+each function's return type and attributes can be placed on the same line
+as the function declaration.
 
-if (tdp_mmu_on())
-	kvm_tdp_mmu_do_stuff()
+No functional change intended.
 
-if (memslots_have_rmaps())
-	/* Do whatever was being done before */
+Link: https://lore.kernel.org/mm-commits/CAHk-=wjS-Jg7sGMwUPpDsjv392nDOOs0CtUtVkp=S6Q7JzFJRw@mail.gmail.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Ben Gardon <bgardon@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 66 +++++++++++++++++++++---------------------
+ 1 file changed, 33 insertions(+), 33 deletions(-)
 
-The implementations of various functions which preceded the TDP MMU have
-remained scattered around mmu.c with no clear identity or interface. Over the
-last couple years, the KVM x86 community has settled on calling the KVM MMU
-implementation which preceded the TDP MMU the "Shadow MMU", as it grew
-from shadow paging, which supported virtualization on hardware pre-TDP.
-(Note that the Shadow MMU can also build TDP page tables, and doesn't
-only do shadow paging, so the meaning is a bit overloaded.)
-
-Splitting it out into separate files will give a clear interface and make it
-easier to distinguish common x86 MMU code from the code specific to the two
-MMU implementations.
-
-Patches 1-3 are cleanups from Sean
-
-Patches 4-6 prepare for the refactor by adding files and exporting
-functions.
-
-Patch 7 the big move, transferring 3.5K lines from mmu.c to
-shadow_mmu.c
-(It may be best if whoever ends up preparing the pull request with
-this patch just dumps my version and re-does the move so that no code is
-lost.)
-
-Patches 8 and 9 move the includes for paging_tmpl.h to shadow_mmu.c
-
-Patches 10-17 clean up the interface between the Shadow MMU and
-common MMU code.
-
-The last few patches are in response to feedback on the RFC and move
-additional code to the Shadow MMU.
-
-Patch 7 is an enormous change, and doing it all at once in a single
-commit all but guarantees merge conflicts and makes it hard to review. I
-don't have a good answer to this problem as there's no easy way to move
-3.5K lines between files. I tried moving the code bit-by-bit but the
-intermediate steps added complexity and ultimately the 50+ patches it
-created didn't seem any easier to review.
-Doing the big move all at once at least makes it easier to get past when
-doing Git archeology, and doing it at the beginning of the series allows the
-rest of the commits to still show up in Git blame.
-
-I've tested this series on an Intel Skylake host with kvm-unit-tests and
-selftests.
-
-RFC -> v1:
- - RFC: https://lore.kernel.org/all/20221221222418.3307832-1-bgardon@google.com/
- - Moved some more Shadow MMU content to shadow_mmu.c. David Matlack
-   pointed out some code I'd missed in the first pass. Added commits
-   to the end of the series to achieve this.
- - Dropped is_cpuid_PSE36 and moved all the BUILD_MMU_ROLE*() macros
-   to mmu_internal, also as suggested by David Matlack.
- - Added copyright comments to the tops of shadow_mmu.c and .h
- - Tacked some cleanups from Sean onto the beginning of the series.
-
-Ben Gardon (18):
-  KVM: x86/MMU: Add shadow_mmu.(c|h)
-  KVM: x86/MMU: Expose functions for the Shadow MMU
-  KVM: x86/mmu: Get rid of is_cpuid_PSE36()
-  KVM: x86/MMU: Move the Shadow MMU implementation to shadow_mmu.c
-  KVM: x86/MMU: Expose functions for paging_tmpl.h
-  KVM: x86/MMU: Move paging_tmpl.h includes to shadow_mmu.c
-  KVM: x86/MMU: Clean up Shadow MMU exports
-  KVM: x86/MMU: Cleanup shrinker interface with Shadow MMU
-  KVM: x86/MMU: Clean up naming of exported Shadow MMU functions
-  KVM: x86/MMU: Fix naming on prepare / commit zap page functions
-  KVM: x86/MMU: Factor Shadow MMU wrprot / clear dirty ops out of mmu.c
-  KVM: x86/MMU: Remove unneeded exports from shadow_mmu.c
-  KVM: x86/MMU: Wrap uses of kvm_handle_gfn_range in mmu.c
-  KVM: x86/MMU: Add kvm_shadow_mmu_ to the last few functions in
-    shadow_mmu.h
-  KVM: x86/mmu: Move split cache topup functions to shadow_mmu.c
-  KVM: x86/mmu: Move Shadow MMU part of kvm_mmu_zap_all() to
-    shadow_mmu.h
-  KVM: x86/mmu: Move Shadow MMU init/teardown to shadow_mmu.c
-  KVM: x86/mmu: Split out Shadow MMU lockless walk begin/end
-
-Sean Christopherson (3):
-  KVM: x86/mmu: Rename slot rmap walkers to add clarity and clean up
-    code
-  KVM: x86/mmu: Replace comment with an actual lockdep assertion on
-    mmu_lock
-  KVM: x86/mmu: Clean up mmu.c functions that put return type on
-    separate line
-
- arch/x86/kvm/Makefile           |    2 +-
- arch/x86/kvm/debugfs.c          |    1 +
- arch/x86/kvm/mmu/mmu.c          | 4834 ++++---------------------------
- arch/x86/kvm/mmu/mmu_internal.h |   87 +-
- arch/x86/kvm/mmu/paging_tmpl.h  |   15 +-
- arch/x86/kvm/mmu/shadow_mmu.c   | 3692 +++++++++++++++++++++++
- arch/x86/kvm/mmu/shadow_mmu.h   |  132 +
- 7 files changed, 4498 insertions(+), 4265 deletions(-)
- create mode 100644 arch/x86/kvm/mmu/shadow_mmu.c
- create mode 100644 arch/x86/kvm/mmu/shadow_mmu.h
-
-
-base-commit: 7cb79f433e75b05d1635aefaa851cfcd1cb7dc4f
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index aeb240b339f54..09a0a2cc76bae 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -5801,23 +5801,24 @@ void kvm_configure_mmu(bool enable_tdp, int tdp_forced_root_level,
+ EXPORT_SYMBOL_GPL(kvm_configure_mmu);
+ 
+ /* The return value indicates if tlb flush on all vcpus is needed. */
+-typedef bool (*slot_level_handler) (struct kvm *kvm,
++typedef bool (*slot_rmaps_handler) (struct kvm *kvm,
+ 				    struct kvm_rmap_head *rmap_head,
+ 				    const struct kvm_memory_slot *slot);
+ 
+ /* The caller should hold mmu-lock before calling this function. */
+-static __always_inline bool
+-slot_handle_level_range(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+-			slot_level_handler fn, int start_level, int end_level,
+-			gfn_t start_gfn, gfn_t end_gfn, bool flush_on_yield,
+-			bool flush)
++static __always_inline bool __walk_slot_rmaps(struct kvm *kvm,
++					      const struct kvm_memory_slot *slot,
++					      slot_rmaps_handler fn,
++					      int start_level, int end_level,
++					      gfn_t start_gfn, gfn_t end_gfn,
++					      bool flush_on_yield, bool flush)
+ {
+ 	struct slot_rmap_walk_iterator iterator;
+ 
+-	for_each_slot_rmap_range(memslot, start_level, end_level, start_gfn,
++	for_each_slot_rmap_range(slot, start_level, end_level, start_gfn,
+ 			end_gfn, &iterator) {
+ 		if (iterator.rmap)
+-			flush |= fn(kvm, iterator.rmap, memslot);
++			flush |= fn(kvm, iterator.rmap, slot);
+ 
+ 		if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
+ 			if (flush && flush_on_yield) {
+@@ -5833,23 +5834,23 @@ slot_handle_level_range(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+ 	return flush;
+ }
+ 
+-static __always_inline bool
+-slot_handle_level(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+-		  slot_level_handler fn, int start_level, int end_level,
+-		  bool flush_on_yield)
++static __always_inline bool walk_slot_rmaps(struct kvm *kvm,
++					    const struct kvm_memory_slot *slot,
++					    slot_rmaps_handler fn,
++					    int start_level, int end_level,
++					    bool flush_on_yield)
+ {
+-	return slot_handle_level_range(kvm, memslot, fn, start_level,
+-			end_level, memslot->base_gfn,
+-			memslot->base_gfn + memslot->npages - 1,
+-			flush_on_yield, false);
++	return __walk_slot_rmaps(kvm, slot, fn, start_level, end_level,
++				 slot->base_gfn, slot->base_gfn + slot->npages - 1,
++				 flush_on_yield, false);
+ }
+ 
+-static __always_inline bool
+-slot_handle_level_4k(struct kvm *kvm, const struct kvm_memory_slot *memslot,
+-		     slot_level_handler fn, bool flush_on_yield)
++static __always_inline bool walk_slot_rmaps_4k(struct kvm *kvm,
++					       const struct kvm_memory_slot *slot,
++					       slot_rmaps_handler fn,
++					       bool flush_on_yield)
+ {
+-	return slot_handle_level(kvm, memslot, fn, PG_LEVEL_4K,
+-				 PG_LEVEL_4K, flush_on_yield);
++	return walk_slot_rmaps(kvm, slot, fn, PG_LEVEL_4K, PG_LEVEL_4K, flush_on_yield);
+ }
+ 
+ static void free_mmu_pages(struct kvm_mmu *mmu)
+@@ -6144,9 +6145,9 @@ static bool kvm_rmap_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_e
+ 			if (WARN_ON_ONCE(start >= end))
+ 				continue;
+ 
+-			flush = slot_handle_level_range(kvm, memslot, __kvm_zap_rmap,
+-							PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL,
+-							start, end - 1, true, flush);
++			flush = __walk_slot_rmaps(kvm, memslot, __kvm_zap_rmap,
++						  PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL,
++						  start, end - 1, true, flush);
+ 		}
+ 	}
+ 
+@@ -6199,8 +6200,8 @@ void kvm_mmu_slot_remove_write_access(struct kvm *kvm,
+ {
+ 	if (kvm_memslots_have_rmaps(kvm)) {
+ 		write_lock(&kvm->mmu_lock);
+-		slot_handle_level(kvm, memslot, slot_rmap_write_protect,
+-				  start_level, KVM_MAX_HUGEPAGE_LEVEL, false);
++		walk_slot_rmaps(kvm, memslot, slot_rmap_write_protect,
++				start_level, KVM_MAX_HUGEPAGE_LEVEL, false);
+ 		write_unlock(&kvm->mmu_lock);
+ 	}
+ 
+@@ -6435,10 +6436,9 @@ static void kvm_shadow_mmu_try_split_huge_pages(struct kvm *kvm,
+ 	 * all the way to the target level. There's no need to split pages
+ 	 * already at the target level.
+ 	 */
+-	for (level = KVM_MAX_HUGEPAGE_LEVEL; level > target_level; level--) {
+-		slot_handle_level_range(kvm, slot, shadow_mmu_try_split_huge_pages,
+-					level, level, start, end - 1, true, false);
+-	}
++	for (level = KVM_MAX_HUGEPAGE_LEVEL; level > target_level; level--)
++		__walk_slot_rmaps(kvm, slot, shadow_mmu_try_split_huge_pages,
++				  level, level, start, end - 1, true, false);
+ }
+ 
+ /* Must be called with the mmu_lock held in write-mode. */
+@@ -6537,8 +6537,8 @@ static void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
+ 	 * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
+ 	 * pages that are already mapped at the maximum hugepage level.
+ 	 */
+-	if (slot_handle_level(kvm, slot, kvm_mmu_zap_collapsible_spte,
+-			      PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1, true))
++	if (walk_slot_rmaps(kvm, slot, kvm_mmu_zap_collapsible_spte,
++			    PG_LEVEL_4K, KVM_MAX_HUGEPAGE_LEVEL - 1, true))
+ 		kvm_arch_flush_remote_tlbs_memslot(kvm, slot);
+ }
+ 
+@@ -6582,7 +6582,7 @@ void kvm_mmu_slot_leaf_clear_dirty(struct kvm *kvm,
+ 		 * Clear dirty bits only on 4k SPTEs since the legacy MMU only
+ 		 * support dirty logging at a 4k granularity.
+ 		 */
+-		slot_handle_level_4k(kvm, memslot, __rmap_clear_dirty, false);
++		walk_slot_rmaps_4k(kvm, memslot, __rmap_clear_dirty, false);
+ 		write_unlock(&kvm->mmu_lock);
+ 	}
+ 
 -- 
 2.39.1.519.gcb327c4b5f-goog
 
