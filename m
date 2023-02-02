@@ -2,207 +2,113 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 56F34687C0A
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 12:17:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 35713687C63
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 12:34:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231185AbjBBLRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 06:17:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47564 "EHLO
+        id S231722AbjBBLe0 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 06:34:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbjBBLRQ (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 06:17:16 -0500
-Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522DF8B363;
-        Thu,  2 Feb 2023 03:16:43 -0800 (PST)
-Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 40F4B1EC069A;
-        Thu,  2 Feb 2023 12:16:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1675336591;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=uvIi+Jx60bAKZN/jWrmPW8ftCneMWCqwRu7t5YqCP6A=;
-        b=VnhgzffYvCsw8bh+fg0k2U0T6Z3TNXxqbpnwhrQo53m3rVqxJxfuRf2qalw08ZdGttXzmS
-        eidLqdR/beaGLg4/8THaXR8t9Ifu0BDQnyxlBIx/42WtxL3O6a7xqtaAHrhg5gC6cc/Ozy
-        V2Iyhp9ReyT77PiDvfz2bpjHqKwMYsU=
-Date:   Thu, 2 Feb 2023 12:16:27 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Michael Roth <michael.roth@amd.com>
-Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
-        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
-        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
-        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
-        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
-        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
-        pgonda@google.com, peterz@infradead.org,
-        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
-        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
-        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
-        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
-        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
-        ashish.kalra@amd.com, harald@profian.com,
-        Brijesh Singh <brijesh.singh@amd.com>
-Subject: Re: [PATCH RFC v7 14/64] x86/sev: Add the host SEV-SNP
- initialization support
-Message-ID: <Y9ubi0i4Z750gdMm@zn.tnic>
-References: <20221214194056.161492-1-michael.roth@amd.com>
- <20221214194056.161492-15-michael.roth@amd.com>
+        with ESMTP id S230003AbjBBLeY (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 06:34:24 -0500
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96CC949564;
+        Thu,  2 Feb 2023 03:34:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1675337661; x=1706873661;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qTJGm0+3lSL7Eg3SsTrKOebqIYkNSjfdxlEJ+ZGPA8w=;
+  b=f2Kwja1cf+s9dvM1ESCrNhhVSrIKUR0esEWhP5jslMOU/JSNI9eEVOhw
+   7X7q/p17GGCgQwg0ihgOvEP8dfUarc3A40rcYoQfnErlOF/KAeLS6FTVu
+   Nw7Oxc53SkxiZQSWgzRUzJWIBA44bXPVJAkIMYjt5pLIbAjEEP7teCZZ+
+   O3/Baxpp6JYuxm+4krzlNFvVMpOEZ0AfqR3b+eHR1ADck52p7pf0oTl6X
+   v+xpgoLBGGybR+I4JbcaXOpBCbbtQw0NSGvul/NaxNCU3sIIj099yCEku
+   mJpKDINRFfW7g+v+hw74mS1XZ5jkmCnQZmpBpxG3yzwW4T8q1VCxeByKe
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.97,267,1669100400"; 
+   d="asc'?scan'208";a="199301901"
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 02 Feb 2023 04:34:21 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.16; Thu, 2 Feb 2023 04:34:20 -0700
+Received: from wendy (10.10.115.15) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16 via Frontend
+ Transport; Thu, 2 Feb 2023 04:34:17 -0700
+Date:   Thu, 2 Feb 2023 11:33:53 +0000
+From:   Conor Dooley <conor.dooley@microchip.com>
+To:     Atish Patra <atishp@rivosinc.com>
+CC:     <linux-kernel@vger.kernel.org>, Albert Ou <aou@eecs.berkeley.edu>,
+        Andrew Jones <ajones@ventanamicro.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Eric Lin <eric.lin@sifive.com>, Guo Ren <guoren@kernel.org>,
+        Heiko Stuebner <heiko@sntech.de>,
+        <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
+        <linux-riscv@lists.infradead.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Palmer Dabbelt <palmer@dabbelt.com>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Will Deacon <will@kernel.org>
+Subject: Re: [PATCH v4 07/14] RISC-V: KVM: Add skeleton support for perf
+Message-ID: <Y9ufoeZ/4obZDJz6@wendy>
+References: <20230201231250.3806412-1-atishp@rivosinc.com>
+ <20230201231250.3806412-8-atishp@rivosinc.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="oYelnov9+3SzjngH"
 Content-Disposition: inline
-In-Reply-To: <20221214194056.161492-15-michael.roth@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230201231250.3806412-8-atishp@rivosinc.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, Dec 14, 2022 at 01:40:06PM -0600, Michael Roth wrote:
-> From: Brijesh Singh <brijesh.singh@amd.com>
-> 
-> The memory integrity guarantees of SEV-SNP are enforced through a new
-> structure called the Reverse Map Table (RMP). The RMP is a single data
-> structure shared across the system that contains one entry for every 4K
-> page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
-> track the owner of each page of memory. Pages of memory can be owned by
-> the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
-> section 15.36.3 for more detail on RMP.
-> 
-> The RMP table is used to enforce access control to memory. The table itself
-> is not directly writable by the software. New CPU instructions (RMPUPDATE,
-> PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
-> 
-> Based on the platform configuration, the BIOS reserves the memory used
-> for the RMP table. The start and end address of the RMP table must be
-> queried by reading the RMP_BASE and RMP_END MSRs. If the RMP_BASE and
-> RMP_END are not set then disable the SEV-SNP feature.
-> 
-> The SEV-SNP feature is enabled only after the RMP table is successfully
-> initialized.
-> 
-> Also set SYSCFG.MFMD when enabling SNP as SEV-SNP FW >= 1.51 requires
-> that SYSCFG.MFMD must be se
+--oYelnov9+3SzjngH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-			   set.
-> 
-> RMP table entry format is non-architectural and it can vary by processor
-> and is defined by the PPR. Restrict SNP support on the known CPU model
-> and family for which the RMP table entry format is currently defined for.
-> 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Signed-off-b: Ashish Kalra <ashish.kalra@amd.com>
-	     ^^
+On Wed, Feb 01, 2023 at 03:12:43PM -0800, Atish Patra wrote:
+> This patch only adds barebone structure of perf implementation. Most of
+> the function returns zero at this point and will be implemented
+> fully in the future.
+>=20
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> +/* Per virtual pmu counter data */
+> +struct kvm_pmc {
+> +	u8 idx;
+> +	struct perf_event *perf_event;
+> +	uint64_t counter_val;
 
-Somebody ate a 'y' here. :)
+CI also complained that here, and elsewhere, you used uint64_t rather
+than u64. Am I missing a reason for not using the regular types?
 
-> Signed-off-by: Michael Roth <michael.roth@amd.com>
-> ---
->  arch/x86/include/asm/disabled-features.h |   8 +-
->  arch/x86/include/asm/msr-index.h         |  11 +-
->  arch/x86/kernel/sev.c                    | 180 +++++++++++++++++++++++
->  3 files changed, 197 insertions(+), 2 deletions(-)
+Thanks,
+Conor.
 
-...
+> +	union sbi_pmu_ctr_info cinfo;
+> +	/* Event monitoring status */
+> +	bool started;
 
-> +static __init int __snp_rmptable_init(void)
+--oYelnov9+3SzjngH
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Why is this one carved out of snp_rmptable_init() ?
+-----BEGIN PGP SIGNATURE-----
 
-> +{
-> +	u64 rmp_base, sz;
-> +	void *start;
-> +	u64 val;
-> +
-> +	if (!get_rmptable_info(&rmp_base, &sz))
-> +		return 1;
-> +
-> +	start = memremap(rmp_base, sz, MEMREMAP_WB);
-> +	if (!start) {
-> +		pr_err("Failed to map RMP table addr 0x%llx size 0x%llx\n", rmp_base, sz);
-> +		return 1;
-> +	}
-> +
-> +	/*
-> +	 * Check if SEV-SNP is already enabled, this can happen in case of
-> +	 * kexec boot.
-> +	 */
-> +	rdmsrl(MSR_AMD64_SYSCFG, val);
-> +	if (val & MSR_AMD64_SYSCFG_SNP_EN)
-> +		goto skip_enable;
-> +
-> +	/* Initialize the RMP table to zero */
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9ufoQAKCRB4tDGHoIJi
+0kf/AQCm19aDqW1X5Lc6vESz6aB/eF/+kPgo7u2mGJcop7tftgEAtJiiKgtviPjo
+RITcuT0ZpQ5HmhOW5orv0qV/m2UzhAA=
+=ZjQN
+-----END PGP SIGNATURE-----
 
-Useless comment.
-
-> +	memset(start, 0, sz);
-> +
-> +	/* Flush the caches to ensure that data is written before SNP is enabled. */
-> +	wbinvd_on_all_cpus();
-> +
-> +	/* MFDM must be enabled on all the CPUs prior to enabling SNP. */
-> +	on_each_cpu(mfd_enable, NULL, 1);
-> +
-> +	/* Enable SNP on all CPUs. */
-> +	on_each_cpu(snp_enable, NULL, 1);
-
-What happens if someone boots the machine with maxcpus=N, where N is
-less than all CPUs on the machine? The hotplug notifier should handle it
-but have you checked that it works fine?
-
-> +skip_enable:
-> +	rmptable_start = (unsigned long)start;
-> +	rmptable_end = rmptable_start + sz - 1;
-> +
-> +	return 0;
-> +}
-> +
-> +static int __init snp_rmptable_init(void)
-> +{
-> +	int family, model;
-> +
-> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
-> +		return 0;
-> +
-> +	family = boot_cpu_data.x86;
-> +	model  = boot_cpu_data.x86_model;
-
-Looks useless - just use boot_cpu_data directly below.
-
-> +
-> +	/*
-> +	 * RMP table entry format is not architectural and it can vary by processor and
-> +	 * is defined by the per-processor PPR. Restrict SNP support on the known CPU
-> +	 * model and family for which the RMP table entry format is currently defined for.
-> +	 */
-> +	if (family != 0x19 || model > 0xaf)
-> +		goto nosnp;
-> +
-> +	if (amd_iommu_snp_enable())
-> +		goto nosnp;
-> +
-> +	if (__snp_rmptable_init())
-> +		goto nosnp;
-> +
-> +	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
-> +
-> +	return 0;
-> +
-> +nosnp:
-> +	setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
-> +	return -ENOSYS;
-> +}
-
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+--oYelnov9+3SzjngH--
