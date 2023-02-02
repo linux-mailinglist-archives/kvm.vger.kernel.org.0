@@ -2,78 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 19CEF688740
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 20:00:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id ECFB768874B
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 20:03:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233094AbjBBTAH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 14:00:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40868 "EHLO
+        id S232605AbjBBTDL (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 14:03:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231871AbjBBTAF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 14:00:05 -0500
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A803F23DA9
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 11:00:00 -0800 (PST)
-Received: by mail-yb1-xb2f.google.com with SMTP id a1so3449302ybj.9
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 11:00:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=zucP5W+kwXs2wiOU2Sh4NohAzbi8BWE0Est2e19KOc8=;
-        b=oyfQ/DxlBU5iqPI5J355NstJZiS/2w5w667LGC5Pq/jckdlknwRq2GUEw7hhl4s3F9
-         mzgxDsyuuFC0dxSJG9B1ITkemEZt0sw+TdDz2Zz/+uQsoy0kgvO2pz3pP8Z2eYrto7AA
-         jU82FkHc+WgVaEJ9OcJcKXMQMZaNiOr/wxXegsL5aMpteM4lKaaLCs5IMLQyMKvP+LJg
-         2b0GRzBHlq/JwR1yHEEE7o0wEJXPkQokCPKG4x+76CYUnfNqNL9JqgmFY22ueybAsGHM
-         getdlATwZMjtHGL2kWD92LjTOXstd2W0HCWPf+6PjY0viazt1iHfoX/OtNEruIY0SpX8
-         f6YA==
+        with ESMTP id S231482AbjBBTDK (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 14:03:10 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A89445BE0
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 11:02:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1675364544;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4o2AJqH1LncKqMk2D1jCK1GtMJr5qHrJunic916Hg94=;
+        b=UoQzixwJUtNozjBerjtq0Z3A5Kl05J98C4M+guqkx/Qu9z6Ves5Dj2Uw/C8U6ST0Xr5bT7
+        +m3mYNZzDehDNZm9vmwSYFTTqIMEme4csN5TKN1G8jNFJEgd2/dqZ1RftfCUBBXiL/Ux9a
+        XznGIXNwRJH6OV4NXfEmFEltHy2bS1g=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
+ us-mta-155-A7rGto5sPy-ZfJFKvgCiiw-1; Thu, 02 Feb 2023 14:02:21 -0500
+X-MC-Unique: A7rGto5sPy-ZfJFKvgCiiw-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-4c8e781bc0aso29293647b3.22
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 11:02:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=zucP5W+kwXs2wiOU2Sh4NohAzbi8BWE0Est2e19KOc8=;
-        b=l6BskEQU7Pt8pWDlkll2lHPpBGcDVbgGBEPeWvSQFWSIGu1wiKObU8YFMUHeEy/1/V
-         mzDmnCh4Cj9GXU6fMF/i+V1eqg1X3tEMxr5kcbjszXUfPstOX2YCP+yzLiafp0kODaFJ
-         BvYk/D+VAuJeladVsaONmWy6Rsj2U6sTOzRPGdZLlsE/cpChCWqim/yOXgeFnTot2kkn
-         anJPNQzfM+GDWDSspZpzLYQDHGlsImi4oy8mVDOQUEZP4nR40jH1zI3zbepLj47RoSyP
-         91v6xm3lHUtTLuziUmLPLoSCfWLLNzJoYt4kQk9y7EE2axOKqaqlP1o58dy2Hn1OHw6T
-         UQrA==
-X-Gm-Message-State: AO0yUKXlX3FTXYzQbzX0n6ocp5iWhF9q8gzaMsKcKne1/7HkboDdCbbC
-        UHJs1f1b6r3TWnhrYkTSZIpdaLoiYvG/VuCwOMjY8w==
-X-Google-Smtp-Source: AK7set8Ytzp0jBxVYOcrX38K1GrWjc9umSJtTBsYYTDsmEjNKL4yKxif7vSXGi1MSwilFo2BtIJo7NtzBxYb16fdJbE=
-X-Received: by 2002:a05:6902:10f:b0:80b:72cc:3967 with SMTP id
- o15-20020a056902010f00b0080b72cc3967mr878863ybh.123.1675364399629; Thu, 02
- Feb 2023 10:59:59 -0800 (PST)
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4o2AJqH1LncKqMk2D1jCK1GtMJr5qHrJunic916Hg94=;
+        b=AthzZ4/rdIw0IEY88+RVs3aRJyT7uAPsewvu1B4M3rAXzfmL7isMy8HiNqzQYh9GiL
+         AbERPnrxQSK0ZRqNDvSCSTDnRPYqEY/O1gxDpHqgt14QhEkLIlWhpHmYVkQh1zGExkuQ
+         BIXAAQsvn00YrYezqQpbU2sR7T5uwr1PhqNNnLGJZjnvT5nLO2cwU15RHguJ+JzBhbxi
+         i2bAAJ79oRKfu4qMeK38M4f6QP4yhWQ0aR9J8VZGGyiDqLmRUHxqiWSFxPVF8Cp9tRvV
+         MsCK4hdDJTSTlON9Z0kOomQakVYI8MLdQzxVWsgVdlp5OKBA2WXHtEdHYKB+Y7k7rKPp
+         4h+Q==
+X-Gm-Message-State: AO0yUKXHs+Ocw/AaYOUZ1fcCRfs2UVgz57yzD/bknzVITtfF7hDYHk8O
+        1ABHLNvFsd6KpD1rgoYLejsLnJTOUz/UOYGkXweRrx1x93rhlzNcoBHQRbFMnQNf3oo1PJXSr8j
+        dATOtf5wGjWzG17U3FsuVDDbbXQsc
+X-Received: by 2002:a0d:d40e:0:b0:51b:64c0:3251 with SMTP id w14-20020a0dd40e000000b0051b64c03251mr958175ywd.266.1675364540775;
+        Thu, 02 Feb 2023 11:02:20 -0800 (PST)
+X-Google-Smtp-Source: AK7set/riZxYvQVJ3LC0NhNQqpRjygkYkpjD+BLDdbvtidfkPC0ROeO4nsgpqbwnaZyZ0ebQph7F3TISMNXl0y3nYCs=
+X-Received: by 2002:a0d:d40e:0:b0:51b:64c0:3251 with SMTP id
+ w14-20020a0dd40e000000b0051b64c03251mr958168ywd.266.1675364540565; Thu, 02
+ Feb 2023 11:02:20 -0800 (PST)
 MIME-Version: 1.0
-References: <20221212183720.4062037-1-vipinsh@google.com> <20221212183720.4062037-13-vipinsh@google.com>
- <Y9r0q9cuK/ifu+OW@google.com> <CAHVum0fEmEAQSxozb1BTTy-d3UGrsvhjt8V5FXQPrX5wOYqpPQ@mail.gmail.com>
- <Y9wGQx89zI3TMU1Y@google.com>
-In-Reply-To: <Y9wGQx89zI3TMU1Y@google.com>
-From:   Vipin Sharma <vipinsh@google.com>
-Date:   Thu, 2 Feb 2023 10:59:23 -0800
-Message-ID: <CAHVum0dFG6gFTQ=JzMkX5Yw-BO7jtUEQyVww6TpN9wk_hQMpqw@mail.gmail.com>
-Subject: Re: [Patch v4 12/13] KVM: selftests: Make vCPU exit reason test
- assertion common.
-To:     Sean Christopherson <seanjc@google.com>
-Cc:     pbonzini@redhat.com, vkuznets@redhat.com, dmatlack@google.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marc Zyngier <maz@kernel.org>,
-        James Morse <james.morse@arm.com>,
-        m Suzuki K Poulose <suzuki.poulose@arm.com>,
-        Oliver Upton <oliver.upton@linux.dev>,
-        Zenghui Yu <yuzenghui@huawei.com>,
-        Anup Patel <anup@brainfault.org>,
-        Atish Patra <atishp@atishpatra.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>
+References: <20230201152018.1270226-1-alvaro.karsz@solid-run.com> <20230202084212.1328530-1-alvaro.karsz@solid-run.com>
+In-Reply-To: <20230202084212.1328530-1-alvaro.karsz@solid-run.com>
+From:   Eugenio Perez Martin <eperezma@redhat.com>
+Date:   Thu, 2 Feb 2023 20:01:44 +0100
+Message-ID: <CAJaqyWeQRcnZ45xHYjbOhcQpN4kpPWADAK2gTvmBVeMwp19H8Q@mail.gmail.com>
+Subject: Re: [PATCH v2] vhost-vdpa: print warning when vhost_vdpa_alloc_domain fails
+To:     Alvaro Karsz <alvaro.karsz@solid-run.com>
+Cc:     mst@redhat.com, jasowang@redhat.com,
+        virtualization@lists.linux-foundation.org, kvm@vger.kernel.org,
+        netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=unavailable
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -81,50 +75,56 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Thu, Feb 2, 2023 at 10:51 AM Sean Christopherson <seanjc@google.com> wrote:
+On Thu, Feb 2, 2023 at 9:42 AM Alvaro Karsz <alvaro.karsz@solid-run.com> wr=
+ote:
 >
-> On Thu, Feb 02, 2023, Vipin Sharma wrote:
-> > On Wed, Feb 1, 2023 at 3:24 PM Sean Christopherson <seanjc@google.com> wrote:
-> > > I love the cleanup, but in the future, please don't squeeze KVM-wide changes in
-> > > the middle of an otherwise arch-specific series unless it's absolutely necessary.
-> > > I get why you added the macro before copy-pasting more code into a new test, but
-> > > the unfortunate side effect is that complicates grabbing the entire series.
-> > >
-> >
-> > Make sense. So what is preferable:
-> > 1. Make the big cleanup identified during a series as the last patches
-> > in that series?
-> > 2. Have two series and big cleanups rebased on top of the initial series?
-> >
-> > Or, both 1 & 2 are acceptable depending on the cleanup?
+> Add a print explaining why vhost_vdpa_alloc_domain failed if the device
+> is not IOMMU cache coherent capable.
 >
->   3. Post the cleanup independently, but make a note so that maintainers know
->      that there may be conflicts and/or missed cleanup opportunities.
+> Without this print, we have no hint why the operation failed.
 >
-> #1 is rarely going to be the best option.  The big cleanup is going to necessitate
-> Cc'ing a lot of people that don't care about the base arch-specific changes, so
-> unless the base changes are one or two trivial patches, a lot of people end up
-> having to wade through a lot of noise.  And aside from annoying people, that also
-> makes it more likely that someone will overlook the cleanup.
+> For example:
 >
-> As for #2 vs. #3, #3 is probably a better option in most cases.  For broad cleanups,
-> odds are very good that there will be other conflicts beyond just the changes _you_
-> have in-flight.  E.g. in this case, any new tests and/or asserts that are in-flight,
-> sitting in other trees, etc., will suffer the same fate.  I.e. whoever applies the
-> cleanup is going to need to resolve conflicts and/or look for other cleanup
-> opportunities anyways.  For a scenario like this, a way to make life easy for the
-> maintainer applying the cleanup would be to provide a script, e.g. single grep
-> command, to look for potential cleanup spots.  That communicates to the maintainer
-> that there may be silent "conflicts" and makes it easier for them to resolve such
-> conflicts.
+> $ virsh start <domain>
+>         error: Failed to start domain <domain>
+>         error: Unable to open '/dev/vhost-vdpa-<idx>' for vdpa device:
+>                Unknown error 524
+>
+> Suggested-by: Eugenio Perez Martin <eperezma@redhat.com>
+> Signed-off-by: Alvaro Karsz <alvaro.karsz@solid-run.com>
+>
 
-This is a good idea, to provide a grep or at least provide hints on
-how one has found places to edit. I will keep this in mind. Thanks
+Acked-by: Eugenio P=C3=A9rez Martin <eperezma@redhat.com>
 
+Thanks!
+
+> ---
+> v2:
+>         - replace dev_err with dev_warn_once.
 >
-> Posting the cleanup separately means the two series/patches can proceed
-> independently, e.g. respinning one doesn't screw up the other, maintainers can
-> take the patches in whatever order they prefer, etc.
+>  drivers/vhost/vdpa.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 >
-> There are undoubtedly exceptions, e.g. if the resulting conflicts are really nasty,
-> but those should be few and far between.
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index 23db92388393..135f8aa70fb2 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -1151,8 +1151,11 @@ static int vhost_vdpa_alloc_domain(struct vhost_vd=
+pa *v)
+>         if (!bus)
+>                 return -EFAULT;
+>
+> -       if (!device_iommu_capable(dma_dev, IOMMU_CAP_CACHE_COHERENCY))
+> +       if (!device_iommu_capable(dma_dev, IOMMU_CAP_CACHE_COHERENCY)) {
+> +               dev_warn_once(&v->dev,
+> +                             "Failed to allocate domain, device is not I=
+OMMU cache coherent capable\n");
+>                 return -ENOTSUPP;
+> +       }
+>
+>         v->domain =3D iommu_domain_alloc(bus);
+>         if (!v->domain)
+> --
+> 2.34.1
+>
+
