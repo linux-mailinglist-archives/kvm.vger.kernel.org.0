@@ -2,57 +2,57 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id C0BC7688659
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:28:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6A6AA688657
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:28:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232439AbjBBS2T (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 13:28:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60532 "EHLO
+        id S232478AbjBBS2V (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 13:28:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232156AbjBBS2Q (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 13:28:16 -0500
-Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DE3215CA0
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:15 -0800 (PST)
-Received: by mail-pf1-x449.google.com with SMTP id s4-20020a056a00194400b0058d9b9fecb6so1363134pfk.1
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:15 -0800 (PST)
+        with ESMTP id S232318AbjBBS2R (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 13:28:17 -0500
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E730E24CB4
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:16 -0800 (PST)
+Received: by mail-pg1-x54a.google.com with SMTP id r126-20020a632b84000000b004393806c06eso1377843pgr.4
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=68l7Ca3pftQohWSSywgHUbTYrISqbCJiWjSISNH3A/g=;
-        b=EMXPzaTxaxT9UedHi545O+WFewb41vhprDn/JgWd0GuGuUVJf5bJ/x9JMOgYr/DaUo
-         GbRid8cxpf9fdXPEp33jBiP2VbnEyzckcdCFs7ozLk3ZyQfN8gRLTpYGA1paFQLWnOvY
-         VCC3muI5+X/9OTSPo8pmYE1G3+g+77IGW8s5dN8ACqGG1y1m3K87eLAWbR4LTwMeY60n
-         R2GY+cV9cHHulDNM/vtauKXntnFTmlx9V/URQHJrZFL1dBB3JkanU+9ruEO0KMEnqz0I
-         6XgC/3Dv3SMD6uxplAxGSCDFMj73TutdCu0MOt4JuHMmUS9zI4MflVOwcaDl/7JL2sy9
-         cyAw==
+        bh=OApy4O0jSWZaxP9yRDTnwWGTbe0pAxcU+yFhklbFDjU=;
+        b=E6j6K2Cd3cHV60TkGdQXzHn0GMsSZ+APABGIDp9NcizWH0fxalbd2/UOO7UoBv2DrB
+         gxQtS3CRY6dUNStY5iKnL+BtTrvlacr6wqlD+WDHbBY6LB6jKpd+fpv7gHPQl9J6wbX7
+         R1WUD07zUy03S6GRJz3I5femHFrlHEwS+NUE1KSf3/fkJiOt1cRpLR5/kTexMxtVJy0I
+         tM0yhd7ZKR81cFTAN7N8uPCbzghtqPWcP4SAlzhI4f3sX7YkzWAJ0M4Pn2Qn+BJuAHKX
+         et2Y5KW0mcUSCOHiHE0z6i7Wm0k8cIMKYPcEOP3NY+xEkSSjyEPc+USyS3mUXrKv4S1H
+         QKGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=68l7Ca3pftQohWSSywgHUbTYrISqbCJiWjSISNH3A/g=;
-        b=BIid0aHhEYhzjDc+By1NWahcb/dh1mnBo6S7g7qz6K6Tyzoj2N+f7VJUG2G1MU503q
-         S0tlX2zKGir7Eu3U0KTXeYIEzK1MOWrGSeiMUTT4rejrLMozpDJfuz0cvsyEqgiIpeko
-         uVFpbb+qqpPmYV5DsAUaFrogVlF4WMtDDtHTft4/ZRDO1VH9VNy6tgKCFOrMU6UJIOrq
-         ft/19XhV9KrQGExFuwOvYtCVsI63QjRXQqWJRtol/oCU4rJSHpUWO1CyMhNv9o9OSiE5
-         P76siL5nBDuaQNZd9SHyHV4Yxn04+l/aK5uDo9qsynzGMUfxJg4wsUhymjPDgBgBzJ6B
-         jJqg==
-X-Gm-Message-State: AO0yUKX35wjovIPFOyfyTEzhogFSdFOgtuxwFVIjYFxQREgcdtbSVb2+
-        XaMiOWWPwwVp13MCUiBqtQKa73GOAbJZ
-X-Google-Smtp-Source: AK7set+tq80lCPirC/Q7fZiaHWWA0G4qZtd25vxjs6e6KXDvK/8v0jvJmn3Hi/zasYd/8TK7vU5rUlgciAHI
+        bh=OApy4O0jSWZaxP9yRDTnwWGTbe0pAxcU+yFhklbFDjU=;
+        b=znyefpBsBhuF58tFR4veNvuYIEZlUUvEvd++l9XIDeOO7SF+P3sY6Zsw2LnxctkHhL
+         VXYVbzwdvD6BhzRurJWCJaAfPpsPIqV4TU7undM6iRuoO9nxEBqlqyIbta3Mv/g+R1lU
+         rODi5GZRjU1XdfqwppcLI8qw+Tb0ijWTY2qYCEMP2Ib7ljzv2W2zhZGi4ho2YrXyK1mC
+         IH2onFfh5AbetcZ27dGf2NbKarIswbBV+N61TFRh32EvTIJPO8GIJnMcksOZCcUfLkmg
+         FpuhgnlCLAnQG8ydv4UwZjxHQMhDglyLYiXDhtZuV7hFrdgjrWi8MjJrY5JP24oG4VzP
+         02nQ==
+X-Gm-Message-State: AO0yUKVhK+ISQmwPp7Zo4nDFjedVv78LQ3xKqdi473nmwUlOwEDTsMW4
+        9DCmPM8UMY1M4QUiiof2iDSa+gOAzkDu
+X-Google-Smtp-Source: AK7set8amElDK0tuA+45x3He3tCI1LLVvZRUiwy/7da+rwCJCPtTzrLR2Jp2wIuR3GghmCBzeQ3D6/7vceCk
 X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
- (user=bgardon job=sendgmr) by 2002:a17:903:120e:b0:196:44d4:244b with SMTP id
- l14-20020a170903120e00b0019644d4244bmr1762579plh.8.1675362494885; Thu, 02 Feb
- 2023 10:28:14 -0800 (PST)
-Date:   Thu,  2 Feb 2023 18:27:50 +0000
+ (user=bgardon job=sendgmr) by 2002:a17:90a:17ef:b0:22c:5369:8a36 with SMTP id
+ q102-20020a17090a17ef00b0022c53698a36mr52pja.0.1675362496248; Thu, 02 Feb
+ 2023 10:28:16 -0800 (PST)
+Date:   Thu,  2 Feb 2023 18:27:51 +0000
 In-Reply-To: <20230202182809.1929122-1-bgardon@google.com>
 Mime-Version: 1.0
 References: <20230202182809.1929122-1-bgardon@google.com>
 X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230202182809.1929122-3-bgardon@google.com>
-Subject: [PATCH 02/21] KVM: x86/mmu: Replace comment with an actual lockdep
- assertion on mmu_lock
+Message-ID: <20230202182809.1929122-4-bgardon@google.com>
+Subject: [PATCH 03/21] KVM: x86/mmu: Clean up mmu.c functions that put return
+ type on separate line
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -74,36 +74,170 @@ X-Mailing-List: kvm@vger.kernel.org
 
 From: Sean Christopherson <seanjc@google.com>
 
-Assert that mmu_lock is held for write in __walk_slot_rmaps() instead of
-hoping the function comment will magically prevent introducing bugs.
+Adjust a variety of functions in mmu.c to put the function return type on
+the same line as the function declaration.  As stated in the Linus
+specification:
 
+  But the "on their own line" is complete garbage to begin with. That
+  will NEVER be a kernel rule. We should never have a rule that assumes
+  things are so long that they need to be on multiple lines.
+
+  We don't put function return types on their own lines either, even if
+  some other projects have that rule (just to get function names at the
+  beginning of lines or some other odd reason).
+
+Leave the functions generated by BUILD_MMU_ROLE_REGS_ACCESSOR() as-is,
+that code is basically illegible no matter how it's formatted.
+
+No functional change intended.
+
+Link: https://lore.kernel.org/mm-commits/CAHk-=wjS-Jg7sGMwUPpDsjv392nDOOs0CtUtVkp=S6Q7JzFJRw@mail.gmail.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ arch/x86/kvm/mmu/mmu.c | 59 ++++++++++++++++++++----------------------
+ 1 file changed, 28 insertions(+), 31 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 09a0a2cc76bae..2ea8e58f83256 100644
+index 2ea8e58f83256..3674bde2203b2 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5805,7 +5805,6 @@ typedef bool (*slot_rmaps_handler) (struct kvm *kvm,
- 				    struct kvm_rmap_head *rmap_head,
- 				    const struct kvm_memory_slot *slot);
+@@ -876,9 +876,9 @@ static void unaccount_nx_huge_page(struct kvm *kvm, struct kvm_mmu_page *sp)
+ 	untrack_possible_nx_huge_page(kvm, sp);
+ }
  
--/* The caller should hold mmu-lock before calling this function. */
- static __always_inline bool __walk_slot_rmaps(struct kvm *kvm,
- 					      const struct kvm_memory_slot *slot,
- 					      slot_rmaps_handler fn,
-@@ -5815,6 +5814,8 @@ static __always_inline bool __walk_slot_rmaps(struct kvm *kvm,
+-static struct kvm_memory_slot *
+-gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu, gfn_t gfn,
+-			    bool no_dirty_log)
++static struct kvm_memory_slot *gfn_to_memslot_dirty_bitmap(struct kvm_vcpu *vcpu,
++							   gfn_t gfn,
++							   bool no_dirty_log)
  {
- 	struct slot_rmap_walk_iterator iterator;
+ 	struct kvm_memory_slot *slot;
  
-+	lockdep_assert_held_write(&kvm->mmu_lock);
-+
- 	for_each_slot_rmap_range(slot, start_level, end_level, start_gfn,
- 			end_gfn, &iterator) {
- 		if (iterator.rmap)
+@@ -938,10 +938,9 @@ static int pte_list_add(struct kvm_mmu_memory_cache *cache, u64 *spte,
+ 	return count;
+ }
+ 
+-static void
+-pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
+-			   struct pte_list_desc *desc, int i,
+-			   struct pte_list_desc *prev_desc)
++static void pte_list_desc_remove_entry(struct kvm_rmap_head *rmap_head,
++				       struct pte_list_desc *desc, int i,
++				       struct pte_list_desc *prev_desc)
+ {
+ 	int j = desc->spte_count - 1;
+ 
+@@ -1493,8 +1492,8 @@ struct slot_rmap_walk_iterator {
+ 	struct kvm_rmap_head *end_rmap;
+ };
+ 
+-static void
+-rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator, int level)
++static void rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator,
++				 int level)
+ {
+ 	iterator->level = level;
+ 	iterator->gfn = iterator->start_gfn;
+@@ -1502,10 +1501,10 @@ rmap_walk_init_level(struct slot_rmap_walk_iterator *iterator, int level)
+ 	iterator->end_rmap = gfn_to_rmap(iterator->end_gfn, level, iterator->slot);
+ }
+ 
+-static void
+-slot_rmap_walk_init(struct slot_rmap_walk_iterator *iterator,
+-		    const struct kvm_memory_slot *slot, int start_level,
+-		    int end_level, gfn_t start_gfn, gfn_t end_gfn)
++static void slot_rmap_walk_init(struct slot_rmap_walk_iterator *iterator,
++				const struct kvm_memory_slot *slot,
++				int start_level, int end_level,
++				gfn_t start_gfn, gfn_t end_gfn)
+ {
+ 	iterator->slot = slot;
+ 	iterator->start_level = start_level;
+@@ -3295,9 +3294,9 @@ static bool page_fault_can_be_fast(struct kvm_page_fault *fault)
+  * Returns true if the SPTE was fixed successfully. Otherwise,
+  * someone else modified the SPTE from its original value.
+  */
+-static bool
+-fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+-			u64 *sptep, u64 old_spte, u64 new_spte)
++static bool fast_pf_fix_direct_spte(struct kvm_vcpu *vcpu,
++				    struct kvm_page_fault *fault,
++				    u64 *sptep, u64 old_spte, u64 new_spte)
+ {
+ 	/*
+ 	 * Theoretically we could also set dirty bit (and flush TLB) here in
+@@ -4626,10 +4625,9 @@ static bool sync_mmio_spte(struct kvm_vcpu *vcpu, u64 *sptep, gfn_t gfn,
+ #include "paging_tmpl.h"
+ #undef PTTYPE
+ 
+-static void
+-__reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
+-			u64 pa_bits_rsvd, int level, bool nx, bool gbpages,
+-			bool pse, bool amd)
++static void __reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
++				    u64 pa_bits_rsvd, int level, bool nx,
++				    bool gbpages, bool pse, bool amd)
+ {
+ 	u64 gbpages_bit_rsvd = 0;
+ 	u64 nonleaf_bit8_rsvd = 0;
+@@ -4742,9 +4740,9 @@ static void reset_guest_rsvds_bits_mask(struct kvm_vcpu *vcpu,
+ 				guest_cpuid_is_amd_or_hygon(vcpu));
+ }
+ 
+-static void
+-__reset_rsvds_bits_mask_ept(struct rsvd_bits_validate *rsvd_check,
+-			    u64 pa_bits_rsvd, bool execonly, int huge_page_level)
++static void __reset_rsvds_bits_mask_ept(struct rsvd_bits_validate *rsvd_check,
++					u64 pa_bits_rsvd, bool execonly,
++					int huge_page_level)
+ {
+ 	u64 high_bits_rsvd = pa_bits_rsvd & rsvd_bits(0, 51);
+ 	u64 large_1g_rsvd = 0, large_2m_rsvd = 0;
+@@ -4844,8 +4842,7 @@ static inline bool boot_cpu_is_amd(void)
+  * the direct page table on host, use as much mmu features as
+  * possible, however, kvm currently does not do execution-protection.
+  */
+-static void
+-reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
++static void reset_tdp_shadow_zero_bits_mask(struct kvm_mmu *context)
+ {
+ 	struct rsvd_bits_validate *shadow_zero_check;
+ 	int i;
+@@ -5060,8 +5057,8 @@ static void paging32_init_context(struct kvm_mmu *context)
+ 	context->invlpg = paging32_invlpg;
+ }
+ 
+-static union kvm_cpu_role
+-kvm_calc_cpu_role(struct kvm_vcpu *vcpu, const struct kvm_mmu_role_regs *regs)
++static union kvm_cpu_role kvm_calc_cpu_role(struct kvm_vcpu *vcpu,
++					    const struct kvm_mmu_role_regs *regs)
+ {
+ 	union kvm_cpu_role role = {0};
+ 
+@@ -6653,8 +6650,8 @@ void kvm_mmu_invalidate_mmio_sptes(struct kvm *kvm, u64 gen)
+ 	}
+ }
+ 
+-static unsigned long
+-mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
++static unsigned long mmu_shrink_scan(struct shrinker *shrink,
++				     struct shrink_control *sc)
+ {
+ 	struct kvm *kvm;
+ 	int nr_to_scan = sc->nr_to_scan;
+@@ -6712,8 +6709,8 @@ mmu_shrink_scan(struct shrinker *shrink, struct shrink_control *sc)
+ 	return freed;
+ }
+ 
+-static unsigned long
+-mmu_shrink_count(struct shrinker *shrink, struct shrink_control *sc)
++static unsigned long mmu_shrink_count(struct shrinker *shrink,
++				      struct shrink_control *sc)
+ {
+ 	return percpu_counter_read_positive(&kvm_total_used_mmu_pages);
+ }
 -- 
 2.39.1.519.gcb327c4b5f-goog
 
