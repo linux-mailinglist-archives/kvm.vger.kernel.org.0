@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3DC426877D9
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 09:50:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 4D2256877DE
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 09:50:13 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232034AbjBBIuA (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 03:50:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33262 "EHLO
+        id S232249AbjBBIuF (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 03:50:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232001AbjBBItz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 03:49:55 -0500
-Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68B7987165
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 00:49:36 -0800 (PST)
-Received: by mail-ej1-x62b.google.com with SMTP id gr7so3915594ejb.5
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 00:49:36 -0800 (PST)
+        with ESMTP id S232166AbjBBIuA (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 03:50:00 -0500
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86F517D6D5
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 00:49:57 -0800 (PST)
+Received: by mail-ej1-x62d.google.com with SMTP id ud5so3931597ejc.4
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 00:49:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=brainfault-org.20210112.gappssmtp.com; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=scOOV9S3a4QBlzHpx87cDvuev3VEso20BNEexdmKlT0=;
-        b=O3nVgV9gtylTwn60p8kK9nZJZAoCc9Ha3iSF7VeLPJh/boPlEGgsEPEHEFjH8JnJwd
-         6tmiA7JTfitRNVs4FO8C0pxnMHwq4vv6sZceQKNZJwi7VUaSVMVWPFml6hLKnt9kcd+Y
-         uLwneuso9EiX+opusRuUOkRANvzQqcZqDc3idsjXEGt2My08V6zhbGslYIXHKccK8Pcx
-         c8LZpp9pOB0rQT6HQaySWrbs/EMBFWRMArEOPwlGuHPcBgu1CNCVBt8RIc8hVREJ0uMB
-         /HdDYcwEVvfwxdLlcgZK8Q72tKxZ7W2tfRsQDTne3VkaW0T4ir1YHExTH9YtstvtmoAW
-         ocVA==
+        bh=YEMr8jwJtqEBvUW6IeEvoy6PFpQWvVltt0F9wihv4bc=;
+        b=E4VeslbplWo822JEUy/TVhNC3AjWEJtICAApZgk4VjnANKU98n3UtBxM9Lx27SUzZb
+         VCTl8nQfoW4L71CcnsAiYB4LB5F6+lGOeBiXou97b7WRakNcb1iB8m2OjwMHHMBm1TgB
+         iueYKPTQQh/tNy7xaOgo7bssfHdq68ITQRKsRX4KWF8TTXyK1Nw9+yTzkuIG5W22lNUB
+         NOWPKIysHGKjVu5FxtI3n5oqyd1doi3+rwy52r5uRu86hTtJ+McGGjd4FbURprZYu8SB
+         fYyakX2igykkWwkEMcYDqWnm+tZ1bvInFqQLOhkrbUHZBktlmPmp9Zr9frSkCFv5TIft
+         1m0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=scOOV9S3a4QBlzHpx87cDvuev3VEso20BNEexdmKlT0=;
-        b=tUnYdkmFE832/FsnD1XdIm9kfS+tz2x2ympAD0xxjRKCXEblN1PSgCklDx/PvlfpTm
-         YTA4Op/Zj3yCpwXiIuO4wEXDWtrz43HpuxtyEqRf6GZFW4Jzl/5XPD9QdIJm8i4SA7lr
-         tq5KOXsNGLEwwEsKvJ2r6tTdrlY8okOOH5hvnA8yeyWtBIPfkevsP0yOvnufgfT0riDp
-         KISfvnaJHmMG0pq598jIf69DryRygwtMhzPU4CrNYo3ydUNox/3o9AbQGdBe1n7J39Zr
-         YyBPXteAoXDw8rtw3bS2jQEYOlNtPU9D0wWhYNq2ocjS6WxEnWYT/ZWf0XfdZdEYt6cZ
-         esFQ==
-X-Gm-Message-State: AO0yUKWltxWtlaTjvUMhXxdFTi1JUkoXtKXYCZxGTM6xCFhS/KarMRkH
-        Oh//Q6T2jugcQ4rrxLK7dJgJuPqVN+SIkC++eJcdDQ==
-X-Google-Smtp-Source: AK7set8SjP7qAzOcTogP1InH1AzFV1lpTeuCw9CVQKwooWB2cjtaB7tzWyOwcOgZfvqWksth3Uyd9cPPqpbjKz4stP0=
-X-Received: by 2002:a17:906:1653:b0:88a:7cf5:5d33 with SMTP id
- n19-20020a170906165300b0088a7cf55d33mr1792317ejd.100.1675327774906; Thu, 02
- Feb 2023 00:49:34 -0800 (PST)
+        bh=YEMr8jwJtqEBvUW6IeEvoy6PFpQWvVltt0F9wihv4bc=;
+        b=aujeo+/dzB+DMlwCLdZQi0tYQDBgerSDAoU4Y+Vt79FQkmYsggB9xl+cHga/O/sHR7
+         /1VrderqcDltwy+XG/1/jMePstblixXiFp/FFuNXfpU2AEKyJZk6XjAWMW49oBp5drcU
+         n9T2kqDzf92ptD52845sIF4UOSU84LZTvEbREBdrb8yFgipDrYQ5UrPSi/Ik/dRwKSkS
+         SSMgr8ldk3JsIgMSWlCJ90vMKrxS8KaFb05jZjCoEY8DaPVZfeV2BCr8znu3+Zkzsvmo
+         4ktzEWEQ23ZOaA2pjawSPxr5TlgdrhnSf6XiyThtyVm0lvuFQK2l4uKp/D9yC4sCmvq5
+         mRIQ==
+X-Gm-Message-State: AO0yUKXqNc3TWYMp+B+9ve6grTOdoQlDCIR/7tHK47dB3E7swO3hYUv6
+        gzFVGu1V17JTEnAcrL3oB7Vb0wWKzQgxv/6urEofVg==
+X-Google-Smtp-Source: AK7set+38N6ru0VcJjhFUKCNehas73Jp8D6FAynbNoh9W4N5K+8dinXtsQKRFrjqrQ5QEKfdEvUkNXxWQWnqjKO2VgI=
+X-Received: by 2002:a17:906:7e42:b0:86d:fa64:2941 with SMTP id
+ z2-20020a1709067e4200b0086dfa642941mr1889020ejr.72.1675327795914; Thu, 02 Feb
+ 2023 00:49:55 -0800 (PST)
 MIME-Version: 1.0
-References: <20230128082847.3055316-1-apatel@ventanamicro.com>
-In-Reply-To: <20230128082847.3055316-1-apatel@ventanamicro.com>
+References: <20230128082847.3055316-1-apatel@ventanamicro.com> <20230128082847.3055316-2-apatel@ventanamicro.com>
+In-Reply-To: <20230128082847.3055316-2-apatel@ventanamicro.com>
 From:   Anup Patel <anup@brainfault.org>
-Date:   Thu, 2 Feb 2023 14:19:23 +0530
-Message-ID: <CAAhSdy17dUdhn3ijVzps4J0k=_xH6GWC16CHHJPN_2E7xBwdbA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] RISC-V: KVM: Fix privilege mode setting in kvm_riscv_vcpu_trap_redirect()
+Date:   Thu, 2 Feb 2023 14:19:44 +0530
+Message-ID: <CAAhSdy0GAwpUCTAXn_Gg==MMigFpkRSNHZMFvDQtZQ08zW_a9A@mail.gmail.com>
+Subject: Re: [PATCH v3 2/2] RISC-V: KVM: Redirect illegal instruction traps to guest
 To:     Anup Patel <apatel@ventanamicro.com>
 Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Atish Patra <atishp@atishpatra.org>,
@@ -59,25 +59,32 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>,
         Paul Walmsley <paul.walmsley@sifive.com>,
         Andrew Jones <ajones@ventanamicro.com>, kvm@vger.kernel.org,
         kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
-        linux-kernel@vger.kernel.org
+        linux-kernel@vger.kernel.org, Andy Chiu <andy.chiu@sifive.com>
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE autolearn=ham
-        autolearn_force=no version=3.4.6
+        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE
+        autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Sat, Jan 28, 2023 at 1:58 PM Anup Patel <apatel@ventanamicro.com> wrote:
+On Sat, Jan 28, 2023 at 1:59 PM Anup Patel <apatel@ventanamicro.com> wrote:
 >
-> The kvm_riscv_vcpu_trap_redirect() should set guest privilege mode
-> to supervisor mode because guest traps/interrupts are always handled
-> in virtual supervisor mode.
+> From: Andy Chiu <andy.chiu@sifive.com>
 >
-> Fixes: 9f7013265112 ("RISC-V: KVM: Handle MMIO exits for VCPU")
+> The M-mode redirects an unhandled illegal instruction trap back
+> to S-mode. However, KVM running in HS-mode terminates the VS-mode
+> software when it receives illegal instruction trap. Instead, KVM
+> should redirect the illegal instruction trap back to VS-mode, and
+> let VS-mode trap handler decide the next step. This futher allows
+> guest kernel to implement on-demand enabling of vector extension
+> for a guest user space process upon first-use.
+>
+> Signed-off-by: Andy Chiu <andy.chiu@sifive.com>
 > Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
 Queued this patch for Linux-6.3
 
@@ -85,23 +92,26 @@ Thanks,
 Anup
 
 > ---
->  arch/riscv/kvm/vcpu_exit.c | 3 +++
->  1 file changed, 3 insertions(+)
+>  arch/riscv/kvm/vcpu_exit.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
 >
 > diff --git a/arch/riscv/kvm/vcpu_exit.c b/arch/riscv/kvm/vcpu_exit.c
-> index c9f741ab26f5..af7c4bc07929 100644
+> index af7c4bc07929..4ea101a73d8b 100644
 > --- a/arch/riscv/kvm/vcpu_exit.c
 > +++ b/arch/riscv/kvm/vcpu_exit.c
-> @@ -160,6 +160,9 @@ void kvm_riscv_vcpu_trap_redirect(struct kvm_vcpu *vcpu,
->
->         /* Set Guest PC to Guest exception vector */
->         vcpu->arch.guest_context.sepc = csr_read(CSR_VSTVEC);
-> +
-> +       /* Set Guest privilege mode to supervisor */
-> +       vcpu->arch.guest_context.sstatus |= SR_SPP;
->  }
->
->  /*
+> @@ -182,6 +182,12 @@ int kvm_riscv_vcpu_exit(struct kvm_vcpu *vcpu, struct kvm_run *run,
+>         ret = -EFAULT;
+>         run->exit_reason = KVM_EXIT_UNKNOWN;
+>         switch (trap->scause) {
+> +       case EXC_INST_ILLEGAL:
+> +               if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV) {
+> +                       kvm_riscv_vcpu_trap_redirect(vcpu, trap);
+> +                       ret = 1;
+> +               }
+> +               break;
+>         case EXC_VIRTUAL_INST_FAULT:
+>                 if (vcpu->arch.guest_context.hstatus & HSTATUS_SPV)
+>                         ret = kvm_riscv_vcpu_virtual_insn(vcpu, run, trap);
 > --
 > 2.34.1
 >
