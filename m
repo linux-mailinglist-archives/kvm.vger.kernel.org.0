@@ -2,132 +2,150 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A326968763C
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 08:06:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 1B5BA687656
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 08:26:31 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231895AbjBBHGL (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 02:06:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48218 "EHLO
+        id S230456AbjBBH02 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 02:26:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231737AbjBBHGB (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 02:06:01 -0500
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2055.outbound.protection.outlook.com [40.107.220.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90F0983247;
-        Wed,  1 Feb 2023 23:05:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kLswzXG4CIiDs8AS9hlpKderOV1y9MWeLRq9siT1dvzp34yvvYqnhXyDQ54t+obwI0WT+phA1X72UJ4ssr7yyzKmbn3imeExlLdeuUt2bLzRTB5/92Hcu9cVOXrInbZ0ntpVH9pnEFb8dnNvMJTuGCvNWgP8alDlO02O4JVj/ia5+QzfCf9nMDuuIBDp8k+82sWkymouo+HVo9cJEQQ4niWx8HbP/M2XNN9pTc+qkenn3gaHI5eNdPGckg0O7+gJpMmyf079fXn45w/0vMSJAKDRU9gXkJzl3+oNSqIiBmT/Q8vj9SlNajr8YId3UCFey5TQxEkmN3TpBy5z+ZYXPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cSnb3seOfXhaHtUGd2lpRQOZXaxLwCLlFKCIaNVwaKE=;
- b=lD2Z7ceBgYPJ6y6Om8b4sa8Qe/tRBew/Mrijx4ZAEV5msh/1h72XD/C1J+L1zMj9skeCE5xcpwpIoLNcoA5GaDJPhOdaXOCTdawI+cADjNU5x/JL4FqlFV0n474Pi7LlbqQuwZn2FDBDHXfhaX/fZ+TS/m+/cgZxOjPYbug9mc81K76FBSzCm5oPRAjPxuv9gbEsgEuKS3R421Fxu0TgiqRV+nfSWB5GQziLTyM19V/0cN5/SQ7FqD4SJICgsdRo0EMaPhQQyz5keAsQno4UGpCAqEiwQ2LjkAaULSSOMnfBsZm29nb1KRUWvNAt5iSWfZPp6hyQp9JK1aEeUl8iKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cSnb3seOfXhaHtUGd2lpRQOZXaxLwCLlFKCIaNVwaKE=;
- b=NLPhKY+ZZXL5B9/CqQun+IX/5pejfoRW4ybs0qy2gM5RP9MOfh37grkf4M9FwFhTgHlDxGTBKXlNMT+/VKYyc71Inpcf+jJh+33jU7cuYpfHY1J4iSBb4tdTxGKdI6QyVNonBkMdbxvowGuURk/Q9NQpUXU+a2K9RiiSywd6ULUhE2Czi0SJEYq0VbDrZZ/1Ohbx7+ymkxmfQJsHD3a8tEIKxGZ38GXF0vh9M+MG34/ryiIP7ks1Ag95EGCRLFybBpNBOo7fsYIcXaCWyoUPng+sOKA9VrHxLKX8gwPZXOnvjyFu5XcTRU5oAsvsMu2yGHJ+YaHhTLd27MR+mFaDtQ==
-Received: from MW4PR03CA0252.namprd03.prod.outlook.com (2603:10b6:303:b4::17)
- by DM6PR12MB4284.namprd12.prod.outlook.com (2603:10b6:5:21a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.27; Thu, 2 Feb
- 2023 07:05:47 +0000
-Received: from CO1NAM11FT006.eop-nam11.prod.protection.outlook.com
- (2603:10b6:303:b4:cafe::e1) by MW4PR03CA0252.outlook.office365.com
- (2603:10b6:303:b4::17) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.27 via Frontend
- Transport; Thu, 2 Feb 2023 07:05:46 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1NAM11FT006.mail.protection.outlook.com (10.13.174.246) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6064.27 via Frontend Transport; Thu, 2 Feb 2023 07:05:45 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Wed, 1 Feb 2023
- 23:05:31 -0800
-Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.36; Wed, 1 Feb 2023
- 23:05:31 -0800
-Received: from Asurada-Nvidia.nvidia.com (10.127.8.11) by mail.nvidia.com
- (10.129.68.9) with Microsoft SMTP Server id 15.2.986.36 via Frontend
- Transport; Wed, 1 Feb 2023 23:05:30 -0800
-From:   Nicolin Chen <nicolinc@nvidia.com>
-To:     <jgg@nvidia.com>, <kevin.tian@intel.com>, <joro@8bytes.org>,
-        <will@kernel.org>, <robin.murphy@arm.com>,
-        <alex.williamson@redhat.com>, <shuah@kernel.org>
-CC:     <yi.l.liu@intel.com>, <linux-kernel@vger.kernel.org>,
-        <iommu@lists.linux.dev>, <kvm@vger.kernel.org>,
-        <linux-kselftest@vger.kernel.org>, <baolu.lu@linux.intel.com>
-Subject: [PATCH v1 8/8] vfio-iommufd: Support IO page table replacement
-Date:   Wed, 1 Feb 2023 23:05:12 -0800
-Message-ID: <a85ebe54c2fff9ca134a33cdf8744a7c1d66feef.1675320212.git.nicolinc@nvidia.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <cover.1675320212.git.nicolinc@nvidia.com>
-References: <cover.1675320212.git.nicolinc@nvidia.com>
+        with ESMTP id S229618AbjBBH01 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 02:26:27 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68E6C66FBE;
+        Wed,  1 Feb 2023 23:26:26 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id 7so674546pgh.7;
+        Wed, 01 Feb 2023 23:26:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ld+oANwBtzsv6bJz5Tu+JDSsYqqL3LUCBuAOz5v+nbA=;
+        b=YtbjYfhiyinlEdWQ14gqm44CRGJNvufLBOtdvBZl9ot+j9cYgqQdDEjZ2rrviOKFk2
+         WHNzSo0qPyW9/MZYOge73y54NKCwbv2hKMs0XkmyFPDGgkCnlMk9VoBb7PTLOz3F8Q5T
+         Fh0LcWzIQvk3bEVnpg0XMN1CgnijuAMWC4bHsKj9zP5pf2W9UA0mZSuUgH8VO8owan8F
+         d6HGZeJmsRgzdolMR1L6BsSYOjNIBNVUjOo20Sf2AI3acDKUmeTWDsX7l2sq2PXNrDZm
+         S3/Kr0nbL+45vl1gdHLvRRwDGhh9wHTM/XbKQ9wenKYH/kqxohqPznDtcnoo3XDfevFJ
+         7mew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ld+oANwBtzsv6bJz5Tu+JDSsYqqL3LUCBuAOz5v+nbA=;
+        b=0nDj3tbRMBnasBKntH5jz1txQfbSF8mjCH6Ld5luhV66CpgS+jpZ3y15v0eQfHT1cw
+         Yfd4DuboS8JYQbJxM3V6QZ6JzgAEoBlt94+4R0dnn1Zf73CY8kr3HFNCnjQ7tFz1S9J7
+         TgMBSlHv9+6yJz0i3KuWy8dsay2Rd63p22KaBxScFgwCjsA/LBCjlW4x30wIZXcjZT4e
+         w1PG3PHYbKiSFDxiA64dpDuq8nac607GKg+HK/DW6pL9x4Bejvuk9syF8jDuKQyxN7Il
+         dKB+GZLshpApgf2exEQblmYR6+RR4Fl7oPRST9tu8YhH7V1hgMZvD/HouJ8yKeTODsZO
+         jsww==
+X-Gm-Message-State: AO0yUKUID0HjEH74mpI0g1uwQXlj65z/X9V0J99HbTYFEfLoyUkIrbtz
+        ELcjrtbafKPe2C82VijHanPhzR2Ht/7E9/dE9u0=
+X-Google-Smtp-Source: AK7set/pphT6Xfy1D+SzvXtqRuqMRWCpo6dRBaHk93CigYZ4LKRxAwNgNy39EJ7oGhHD3uNDBInLQA==
+X-Received: by 2002:a05:6a00:21d1:b0:58b:ca43:9c05 with SMTP id t17-20020a056a0021d100b0058bca439c05mr5965754pfj.16.1675322785746;
+        Wed, 01 Feb 2023 23:26:25 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id s8-20020a056a00178800b0058e12372079sm6427061pfg.29.2023.02.01.23.26.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Feb 2023 23:26:24 -0800 (PST)
+Message-ID: <afe1fdd8-9f3e-c988-cd38-476a6da26d46@gmail.com>
+Date:   Thu, 2 Feb 2023 15:26:15 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1NAM11FT006:EE_|DM6PR12MB4284:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c7595f6-d48a-4fb5-bdcf-08db04ebe815
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1Gnh3SUWum0fnbUcSxaqsQQ8zYvirFe/OGILMgL7zo7DpppV5BmQo+9ozBjK0gNFq9c1sGTLkPP4t8qvJOgLSh4/a/YJiEhXjat+JuqPvMlRaxZgE47m9pM7eihoHMam+8OYcyKHLfPcqk4R6Su+3Zr+VFLhL1L0xcG3YGEzTcIO/qqTynCAZVH+182TAeDdWiSerB5oTvtLhlifu5U5KozBT3wvXUZwooorWtXc0NcakDbxt2yMXie0yleDjRnVoSUslxPM38ZCD8kCkue8Mz6W7tOPaldet03+SKNUF1YD+Bf1qlFN3RVbu/UkOKHP3WG7AIu1N42d3afJFcjxCa6xR625RbwgP41rypoZDciPsD9O2VFLcu1QR5y8n0Leu2MhEmP9k73LcRf28t7QZs8eAJfN0HOMDdAX9HetvqncYEGLa0Y37R73cWUU4KBTCogUkpGyIAna9ZVxgy1YVxoPSjfvphWLj1GkzKPmyEG3VEOvpXda75YlzOv5nRigDtNm7hUlT6r9/pxyDmGI59BI0/GKLAv4N+xUgqDUVBJUvGIe3oTvk76M+oDuls5A35ybgFWTyApDuPGP7c+1U/WfcUSSjCv5qsrUqUVsdg5Ku9/DuAkTREqb2uegLRw8IBjmZ4bhFPlD+9KFcOe5xMrT4OfIWfp/EC+wTE6jj/78FKaAhd0Ivf8J6cFP6D+ppFxRLE++SvA90OYrAzs4Bg==
-X-Forefront-Antispam-Report: CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230025)(4636009)(396003)(39860400002)(136003)(376002)(346002)(451199018)(46966006)(40470700004)(36840700001)(86362001)(2906002)(478600001)(36756003)(70586007)(4744005)(40460700003)(7416002)(6666004)(26005)(186003)(2616005)(7696005)(8936002)(336012)(40480700001)(47076005)(5660300002)(356005)(426003)(41300700001)(8676002)(82310400005)(4326008)(83380400001)(70206006)(316002)(82740400003)(36860700001)(110136005)(7636003)(54906003);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2023 07:05:45.9528
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c7595f6-d48a-4fb5-bdcf-08db04ebe815
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT006.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4284
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
-        autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH v2] KVM: x86/pmu: Disable all vPMU features support on
+ Intel hybrid CPUs
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Jianfeng Gao <jianfeng.gao@intel.com>,
+        Peter Zijlstra <peterz@infradead.org>
+References: <20230131085031.88939-1-likexu@tencent.com>
+ <Y9k7eyfmXjqW9lYF@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <Y9k7eyfmXjqW9lYF@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Remove the vdev->iommufd_attached check, since the kernel can internally
-handle a replacement of the IO page table now.
+On 1/2/2023 12:02 am, Sean Christopherson wrote:
+> On Tue, Jan 31, 2023, Like Xu wrote:
+>> From: Like Xu <likexu@tencent.com>
+>>
+>> Disable KVM support for virtualizing PMUs on hosts with hybrid PMUs until
+>> KVM gains a sane way to enumeration the hybrid vPMU to userspace and/or
+>> gains a mechanism to let userspace opt-in to the dangers of exposing a
+>> hybrid vPMU to KVM guests.
+>>
+>> Virtualizing a hybrid PMU, or at least part of a hybrid PMU, is possible,
+>> but it requires userspace to pin vCPUs to pCPUs to prevent migrating a
+>> vCPU between a big core and a little core, requires the VMM to accurately
+>> enumerate the topology to the guest (if exposing a hybrid CPU to the
+>> guest), and also requires the VMM to accurately enumerate the vPMU
+>> capabilities to the guest.
+>>
+>> The last point is especially problematic, as KVM doesn't control which
+>> pCPU it runs on when enumerating KVM's vPMU capabilities to userspace.
+>> For now, simply disable vPMU support on hybrid CPUs to avoid inducing
+>> seemingly random #GPs in guests.
+>>
+>> Reported-by: Jianfeng Gao <jianfeng.gao@intel.com>
+>> Cc: Peter Zijlstra <peterz@infradead.org>
+>> Suggested-by: Sean Christopherson <seanjc@google.com>
+>> Signed-off-by: Like Xu <likexu@tencent.com>
+>> ---
+>> v1: https://lore.kernel.org/all/20230120004051.2043777-1-seanjc@google.com/
+>>   arch/x86/kvm/pmu.h | 6 ++++--
+>>   1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
+>> index 79988dafb15b..6a3995657e1e 100644
+>> --- a/arch/x86/kvm/pmu.h
+>> +++ b/arch/x86/kvm/pmu.h
+>> @@ -166,9 +166,11 @@ static inline void kvm_init_pmu_capability(const struct kvm_pmu_ops *pmu_ops)
+>>   
+>>   	 /*
+>>   	  * For Intel, only support guest architectural pmu
+>> -	  * on a host with architectural pmu.
+>> +	  * on a non-hybrid host with architectural pmu.
+>>   	  */
+>> -	if ((is_intel && !kvm_pmu_cap.version) || !kvm_pmu_cap.num_counters_gp)
+>> +	if (!kvm_pmu_cap.num_counters_gp ||
+>> +	    (is_intel && (!kvm_pmu_cap.version ||
+>> +			  boot_cpu_has(X86_FEATURE_HYBRID_CPU))))
+> 
+> Why do this here instead of in perf_get_x86_pmu_capability()[*]?  The issue isn't
+> restricted to Intel CPUs, it just so happens that Intel is the only x86 vendor
+> that has shipped hybrid CPUs/PMUs.  Similarly, it's entirely possible to create a
+> hybrid CPU with a fully homogeneous PMU.  IMO KVM should rely on the PMU's is_hybrid()
+> and not the generic X86_FEATURE_HYBRID_CPU flag.
+> 
+> [*] https://lore.kernel.org/all/20230120004051.2043777-1-seanjc@google.com
 
-Signed-off-by: Nicolin Chen <nicolinc@nvidia.com>
----
- drivers/vfio/iommufd.c | 3 ---
- 1 file changed, 3 deletions(-)
+As of today, other x86 vendors do not have hybrid core products in their
+road maps. Before implementing the virtual hybrid vCPU model, there is
+no practical value in talking about homogeneous PMU on hybrid vCPU
+at the present stage.
 
-diff --git a/drivers/vfio/iommufd.c b/drivers/vfio/iommufd.c
-index 7e09defbcffe..f9e89b3eef69 100644
---- a/drivers/vfio/iommufd.c
-+++ b/drivers/vfio/iommufd.c
-@@ -111,9 +111,6 @@ int vfio_iommufd_physical_attach_ioas(struct vfio_device *vdev, u32 *pt_id)
- 		return 0;
- 	}
- 
--	if (vdev->iommufd_attached)
--		return -EBUSY;
--
- 	rc = iommufd_device_attach(vdev->iommufd_device, pt_id);
- 	if (rc)
- 		return rc;
--- 
-2.39.1
+The perf interface only provides host PMU capabilities and the logic for
+choosing to disable (or enable) vPMU based on perf input should be left
+in the KVM part so that subsequent development work can add most code
+to the just KVM, which is very helpful for downstream users to upgrade
+loadable KVM module rather than the entire core kernel.
 
+My experience interacting with the perf subsystem has taught me that
+perf change required from KVM should be made as small as possible.
+I assume that Peterz's timely "Acked-by" also implies his preference.
+
+Thanks,
+Like Xu
