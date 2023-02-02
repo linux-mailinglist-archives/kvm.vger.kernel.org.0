@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 449E3688679
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:30:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id DBC80688678
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:30:21 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232882AbjBBSaN (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 13:30:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33444 "EHLO
+        id S232891AbjBBSaP (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 13:30:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232757AbjBBS3Z (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 13:29:25 -0500
-Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB123F2B2
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:40 -0800 (PST)
-Received: by mail-pg1-x54a.google.com with SMTP id 201-20020a6300d2000000b004ccf545f44fso1373310pga.12
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:40 -0800 (PST)
+        with ESMTP id S232764AbjBBS30 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 13:29:26 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFDC91E292
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:42 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id y9-20020a1709027c8900b00195e237dc8bso1313533pll.13
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F2DHKgw0dJCtwQxpbZaWFIOX07AJ3Q8QHUf3isrBY5Q=;
-        b=hp3/EcJmYWEvxFjMK6a/uHpM1/syENeJe8Vvon0/F0y95LHB1UdDLRIDLy8N2fbnGz
-         aLVOkNCYi1c49Z3AvQargVa8ZHbDsPSERWCFQbdrUusIodCCUkfqI0SNdPidsNnRfPm0
-         JAZDm+rCgHNoBeAXuhhHiZy6TKc1Dou8DmV4tVp+bExmmdqerC28oE/BkhYDUMS+mfi6
-         vtMcr/v80IWmTBj6AV/kY5Y7thWKzdPPsI5jxHsgvYNxug0EmP7ubS9aNVRGYj/m3k7j
-         DTv45ZxkQ1pxSQwGY4zXeQgCvjHb46/SQTAemmsze3WrW0UbLW/5lV5NhGSw4dtjLLqz
-         8PSA==
+        bh=TamQ7OunAE4JUpYasRsLdFf4L+G/oCkA7IYvB0Ze0GI=;
+        b=Kd4q0HGp6rXEqYvuPFpu14ySATnUsyqeHtimcLiusOsHbo+XUUY11/D9w+KTWi32TN
+         eitny6WUWUhqgnQqH0KcvvXlL/EezRN4RI+67mfbfnQxnYDh456aRbNvCBrN49NPBHUt
+         q7WIMhCS8v9qymyctVGJerM42ANGqAz3pfNWH6UzSHhCf/Gy0rXHU28MHIGrAR8rp2j7
+         8W6wmy6tZ74gfniRy27HLIYoNSkeQ/vJsE/HGRuMzhXwvsLVRf9ik8gDPFyZ32UfOFFD
+         goJ2VcXA+GqEiETlVMOgd+HJT/WQI8V1VQ40S3eYYtEMU0Dy4cXZ8aPC9NVZxpeupxdO
+         ke+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F2DHKgw0dJCtwQxpbZaWFIOX07AJ3Q8QHUf3isrBY5Q=;
-        b=5BzGQ3HNkdpnNrc1CsJoVvDRf4UywlfsU2ovfXuCQ1tQBNmamem9g7nF+veh8ofrEU
-         YQQRIEvfQogvNLBXawySSRyZNtC4cOaO/qLQknU/SbuohuaHQqz7yN4ORd4rPbsff1Tx
-         yOuq8aSUgekMQWRXbYoojPc6+ggc0zL6zJ2MsyDAiQVLCN4wrWTe8zWMPDk8J17495Q4
-         oupqc3+VkS+JNkMzL7HHb9OP2Uujmj1TczKMrv0UeS+N8hUn4I0f+lkE91L4clGvuKhq
-         OXgntjPrJdHg12tZ4Nc51TGpP9qDA0a/EHOLzY2oZ8enjLg6uwyB4kKkRQeUr5NY047A
-         i9Bw==
-X-Gm-Message-State: AO0yUKWmZtS1/MUbtwAoX8yUGpRYLT0YBYMWO68/eX4kVMM5sIVa5fI2
-        E7SldplZC+ycjYhnB+49bTCI47DPyhvB
-X-Google-Smtp-Source: AK7set+1St8r3W5I1nEX/i8TVU1qDuow8994BZxFffesASfmjhN2QvIEIdFdhBsjnGpeO3g0yilg51yyg8NR
+        bh=TamQ7OunAE4JUpYasRsLdFf4L+G/oCkA7IYvB0Ze0GI=;
+        b=aUVfZj7cfkJKlcRzC99KyGIiFU3rJL/Hk68hvKaaTWLKOj1iZemm4iDyirjRwcE972
+         mmTkbXPLGq9b7A9G/EMbn3X5qQT8bKaN4i5UoceBwsZiJhmhrQolXynDjqOOVJECXmez
+         //Fmx66WulsYRK+8F9Upxq4Xbt6DdSV4qRxL2eJHlWixjdPQmXLi9hdhZ5yGSEP6JdlY
+         BwLW2oHRrxu7h/JiIrZtYYSedaDbWmNU7sGghoruVEybp1Cv0UA67aMs1cSgkxbeRNwu
+         jA5RQwth2rkQvNzHwLL0V9vMSAMPkr7U8RLRaddgAsl0/UFaf7ZrO7Q3xtMU/zzzpY2A
+         LGjA==
+X-Gm-Message-State: AO0yUKW8wOSRR1FyrvtsIju58qilvX+BOAPmmYQPUiWEvP/bk0tmHlB0
+        CMafjPRIGeNmpZ4VSfy/KGwuxs+Dk/Bi
+X-Google-Smtp-Source: AK7set8ZjdUMn8OosiXaHzdPzXHEVUwDqU5sA00SYdChOIl9SC9fnJ9/3lKhnb/qNcYCM1qpo12Cmfx07ze4
 X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
- (user=bgardon job=sendgmr) by 2002:a17:90a:6388:b0:225:eaa2:3f5d with SMTP id
- f8-20020a17090a638800b00225eaa23f5dmr105787pjj.2.1675362510924; Thu, 02 Feb
- 2023 10:28:30 -0800 (PST)
-Date:   Thu,  2 Feb 2023 18:28:00 +0000
+ (user=bgardon job=sendgmr) by 2002:a17:90a:38e3:b0:230:815:ff39 with SMTP id
+ x90-20020a17090a38e300b002300815ff39mr676156pjb.141.1675362512730; Thu, 02
+ Feb 2023 10:28:32 -0800 (PST)
+Date:   Thu,  2 Feb 2023 18:28:01 +0000
 In-Reply-To: <20230202182809.1929122-1-bgardon@google.com>
 Mime-Version: 1.0
 References: <20230202182809.1929122-1-bgardon@google.com>
 X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230202182809.1929122-13-bgardon@google.com>
-Subject: [PATCH 12/21] KVM: x86/MMU: Clean up naming of exported Shadow MMU functions
+Message-ID: <20230202182809.1929122-14-bgardon@google.com>
+Subject: [PATCH 13/21] KVM: x86/MMU: Fix naming on prepare / commit zap page functions
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -63,7 +63,7 @@ Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
         DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=unavailable
+        SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -71,245 +71,281 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Change the naming scheme on several functions exported from the shadow
-MMU to match the naming scheme used by the TDP MMU: kvm_shadow_mmu_.
-More cleanups will follow to convert the remaining functions to a similar
-naming scheme, but for now, start with the trivial renames.
+Since the various prepare / commit zap page functions are part of the
+Shadow MMU and used all over both shadow_mmu.c and mmu.c, add _shadow_
+to the function names to match the rest of the Shadow MMU interface.
+Since there are so many uses of these functions, this rename gets its
+own commit.
 
 No functional change intended.
 
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 19 ++++++++++---------
- arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
- arch/x86/kvm/mmu/shadow_mmu.c  | 19 ++++++++++---------
- arch/x86/kvm/mmu/shadow_mmu.h  | 17 +++++++++--------
- 4 files changed, 30 insertions(+), 27 deletions(-)
+ arch/x86/kvm/mmu/mmu.c        | 21 +++++++--------
+ arch/x86/kvm/mmu/shadow_mmu.c | 48 ++++++++++++++++++-----------------
+ arch/x86/kvm/mmu/shadow_mmu.h | 13 +++++-----
+ 3 files changed, 43 insertions(+), 39 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3ea54b08239aa..9308ab8102f9b 100644
+index 9308ab8102f9b..9b217e04cab0e 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1089,7 +1089,7 @@ static int mmu_alloc_direct_roots(struct kvm_vcpu *vcpu)
- 	int r;
+@@ -230,8 +230,9 @@ void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+ 		kvm_tdp_mmu_walk_lockless_end();
+ 	} else {
+ 		/*
+-		 * Make sure the write to vcpu->mode is not reordered in front of
+-		 * reads to sptes.  If it does, kvm_mmu_commit_zap_page() can see us
++		 * Make sure the write to vcpu->mode is not reordered in front
++		 * of reads to sptes.  If it does,
++		 * kvm_shadow_mmu_commit_zap_page() can see us
+ 		 * OUTSIDE_GUEST_MODE and proceed to free the shadow page table.
+ 		 */
+ 		smp_store_release(&vcpu->mode, OUTSIDE_GUEST_MODE);
+@@ -568,7 +569,7 @@ bool kvm_mmu_remote_flush_or_zap(struct kvm *kvm, struct list_head *invalid_list
+ 		return false;
  
- 	write_lock(&vcpu->kvm->mmu_lock);
--	r = make_mmu_pages_available(vcpu);
-+	r = kvm_shadow_mmu_make_pages_available(vcpu);
- 	if (r < 0)
- 		goto out_unlock;
- 
-@@ -1164,7 +1164,7 @@ static bool get_mmio_spte(struct kvm_vcpu *vcpu, u64 addr, u64 *sptep)
- 	if (is_tdp_mmu_active(vcpu))
- 		leaf = kvm_tdp_mmu_get_walk(vcpu, addr, sptes, &root);
+ 	if (!list_empty(invalid_list))
+-		kvm_mmu_commit_zap_page(kvm, invalid_list);
++		kvm_shadow_mmu_commit_zap_page(kvm, invalid_list);
  	else
--		leaf = get_walk(vcpu, addr, sptes, &root);
-+		leaf = kvm_shadow_mmu_get_walk(vcpu, addr, sptes, &root);
+ 		kvm_flush_remote_tlbs(kvm);
+ 	return true;
+@@ -1022,7 +1023,7 @@ static void mmu_free_root_page(struct kvm *kvm, hpa_t *root_hpa,
+ 	if (is_tdp_mmu_page(sp))
+ 		kvm_tdp_mmu_put_root(kvm, sp, false);
+ 	else if (!--sp->root_count && sp->role.invalid)
+-		kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
++		kvm_shadow_mmu_prepare_zap_page(kvm, sp, invalid_list);
  
- 	walk_shadow_page_lockless_end(vcpu);
- 
-@@ -1432,11 +1432,11 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
- 	if (is_page_fault_stale(vcpu, fault))
- 		goto out_unlock;
- 
--	r = make_mmu_pages_available(vcpu);
-+	r = kvm_shadow_mmu_make_pages_available(vcpu);
- 	if (r)
- 		goto out_unlock;
- 
--	r = direct_map(vcpu, fault);
-+	r = kvm_shadow_mmu_direct_map(vcpu, fault);
- 
- out_unlock:
- 	write_unlock(&vcpu->kvm->mmu_lock);
-@@ -1471,7 +1471,7 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
- 		trace_kvm_page_fault(vcpu, fault_address, error_code);
- 
- 		if (kvm_event_needs_reinjection(vcpu))
--			kvm_mmu_unprotect_page_virt(vcpu, fault_address);
-+			kvm_shadow_mmu_unprotect_page_virt(vcpu, fault_address);
- 		r = kvm_mmu_page_fault(vcpu, fault_address, error_code, insn,
- 				insn_len);
- 	} else if (flags & KVM_PV_REASON_PAGE_NOT_PRESENT) {
-@@ -2786,7 +2786,8 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 	 * In order to ensure all vCPUs drop their soon-to-be invalid roots,
- 	 * invalidating TDP MMU roots must be done while holding mmu_lock for
- 	 * write and in the same critical section as making the reload request,
--	 * e.g. before kvm_zap_obsolete_pages() could drop mmu_lock and yield.
-+	 * e.g. before kvm_shadow_mmu_zap_obsolete_pages() could drop mmu_lock
-+	 * and yield.
- 	 */
- 	if (tdp_mmu_enabled)
- 		kvm_tdp_mmu_invalidate_all_roots(kvm);
-@@ -2801,7 +2802,7 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
- 	 */
- 	kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS);
- 
--	kvm_zap_obsolete_pages(kvm);
-+	kvm_shadow_mmu_zap_obsolete_pages(kvm);
- 
- 	write_unlock(&kvm->mmu_lock);
- 
-@@ -2890,7 +2891,7 @@ void kvm_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- 
- 	kvm_mmu_invalidate_begin(kvm, 0, -1ul);
- 
--	flush = kvm_rmap_zap_gfn_range(kvm, gfn_start, gfn_end);
-+	flush = kvm_shadow_mmu_zap_gfn_range(kvm, gfn_start, gfn_end);
- 
- 	if (tdp_mmu_enabled) {
- 		for (i = 0; i < KVM_ADDRESS_SPACE_NUM; i++)
-@@ -3034,7 +3035,7 @@ void kvm_mmu_zap_collapsible_sptes(struct kvm *kvm,
- {
- 	if (kvm_memslots_have_rmaps(kvm)) {
- 		write_lock(&kvm->mmu_lock);
--		kvm_rmap_zap_collapsible_sptes(kvm, slot);
-+		kvm_shadow_mmu_zap_collapsible_sptes(kvm, slot);
- 		write_unlock(&kvm->mmu_lock);
+ 	*root_hpa = INVALID_PAGE;
+ }
+@@ -1075,7 +1076,7 @@ void kvm_mmu_free_roots(struct kvm *kvm, struct kvm_mmu *mmu,
+ 		mmu->root.pgd = 0;
  	}
  
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 1251357794538..14a8c8217c4cf 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -866,7 +866,7 @@ int FNAME(page_fault)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 	if (is_page_fault_stale(vcpu, fault))
- 		goto out_unlock;
+-	kvm_mmu_commit_zap_page(kvm, &invalid_list);
++	kvm_shadow_mmu_commit_zap_page(kvm, &invalid_list);
+ 	write_unlock(&kvm->mmu_lock);
+ }
+ EXPORT_SYMBOL_GPL(kvm_mmu_free_roots);
+@@ -1397,8 +1398,8 @@ bool is_page_fault_stale(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 	 * there is a pending request to free obsolete roots.  The request is
+ 	 * only a hint that the current root _may_ be obsolete and needs to be
+ 	 * reloaded, e.g. if the guest frees a PGD that KVM is tracking as a
+-	 * previous root, then __kvm_mmu_prepare_zap_page() signals all vCPUs
+-	 * to reload even if no vCPU is actively using the root.
++	 * previous root, then __kvm_shadow_mmu_prepare_zap_page() signals all
++	 * vCPUs to reload even if no vCPU is actively using the root.
+ 	 */
+ 	if (!sp && kvm_test_request(KVM_REQ_MMU_FREE_OBSOLETE_ROOTS, vcpu))
+ 		return true;
+@@ -3101,13 +3102,13 @@ void kvm_mmu_zap_all(struct kvm *kvm)
+ 	list_for_each_entry_safe(sp, node, &kvm->arch.active_mmu_pages, link) {
+ 		if (WARN_ON(sp->role.invalid))
+ 			continue;
+-		if (__kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign))
++		if (__kvm_shadow_mmu_prepare_zap_page(kvm, sp, &invalid_list, &ign))
+ 			goto restart;
+ 		if (cond_resched_rwlock_write(&kvm->mmu_lock))
+ 			goto restart;
+ 	}
  
--	r = make_mmu_pages_available(vcpu);
-+	r = kvm_shadow_mmu_make_pages_available(vcpu);
- 	if (r)
- 		goto out_unlock;
- 	r = FNAME(fetch)(vcpu, fault, &walker);
+-	kvm_mmu_commit_zap_page(kvm, &invalid_list);
++	kvm_shadow_mmu_commit_zap_page(kvm, &invalid_list);
+ 
+ 	if (tdp_mmu_enabled)
+ 		kvm_tdp_mmu_zap_all(kvm);
+@@ -3457,7 +3458,7 @@ static void kvm_recover_nx_huge_pages(struct kvm *kvm)
+ 		else if (is_tdp_mmu_page(sp))
+ 			flush |= kvm_tdp_mmu_zap_sp(kvm, sp);
+ 		else
+-			kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
++			kvm_shadow_mmu_prepare_zap_page(kvm, sp, &invalid_list);
+ 		WARN_ON_ONCE(sp->nx_huge_page_disallowed);
+ 
+ 		if (need_resched() || rwlock_needbreak(&kvm->mmu_lock)) {
 diff --git a/arch/x86/kvm/mmu/shadow_mmu.c b/arch/x86/kvm/mmu/shadow_mmu.c
-index 76c50aca3c487..36b335d75aee2 100644
+index 36b335d75aee2..32a24530cf19a 100644
 --- a/arch/x86/kvm/mmu/shadow_mmu.c
 +++ b/arch/x86/kvm/mmu/shadow_mmu.c
-@@ -1977,7 +1977,7 @@ static inline unsigned long kvm_mmu_available_pages(struct kvm *kvm)
- 	return 0;
+@@ -1282,7 +1282,7 @@ static int kvm_sync_page(struct kvm_vcpu *vcpu, struct kvm_mmu_page *sp,
+ 	int ret = vcpu->arch.mmu->sync_page(vcpu, sp);
+ 
+ 	if (ret < 0)
+-		kvm_mmu_prepare_zap_page(vcpu->kvm, sp, invalid_list);
++		kvm_shadow_mmu_prepare_zap_page(vcpu->kvm, sp, invalid_list);
+ 	return ret;
  }
  
--int make_mmu_pages_available(struct kvm_vcpu *vcpu)
-+int kvm_shadow_mmu_make_pages_available(struct kvm_vcpu *vcpu)
- {
- 	unsigned long avail = kvm_mmu_available_pages(vcpu->kvm);
+@@ -1444,8 +1444,8 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
+ 			 * upper-level page will be write-protected.
+ 			 */
+ 			if (role.level > PG_LEVEL_4K && sp->unsync)
+-				kvm_mmu_prepare_zap_page(kvm, sp,
+-							 &invalid_list);
++				kvm_shadow_mmu_prepare_zap_page(kvm, sp,
++								&invalid_list);
+ 			continue;
+ 		}
  
-@@ -2041,7 +2041,7 @@ int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn)
+@@ -1487,7 +1487,7 @@ static struct kvm_mmu_page *kvm_mmu_find_shadow_page(struct kvm *kvm,
+ 	++kvm->stat.mmu_cache_miss;
+ 
+ out:
+-	kvm_mmu_commit_zap_page(kvm, &invalid_list);
++	kvm_shadow_mmu_commit_zap_page(kvm, &invalid_list);
+ 
+ 	if (collisions > kvm->stat.max_mmu_page_hash_collisions)
+ 		kvm->stat.max_mmu_page_hash_collisions = collisions;
+@@ -1779,8 +1779,8 @@ static int mmu_page_zap_pte(struct kvm *kvm, struct kvm_mmu_page *sp, u64 *spte,
+ 			 */
+ 			if (tdp_enabled && invalid_list &&
+ 			    child->role.guest_mode && !child->parent_ptes.val)
+-				return kvm_mmu_prepare_zap_page(kvm, child,
+-								invalid_list);
++				return kvm_shadow_mmu_prepare_zap_page(kvm,
++							child, invalid_list);
+ 		}
+ 	} else if (is_mmio_spte(pte)) {
+ 		mmu_spte_clear_no_track(spte);
+@@ -1825,7 +1825,7 @@ static int mmu_zap_unsync_children(struct kvm *kvm,
+ 		struct kvm_mmu_page *sp;
+ 
+ 		for_each_sp(pages, sp, parents, i) {
+-			kvm_mmu_prepare_zap_page(kvm, sp, invalid_list);
++			kvm_shadow_mmu_prepare_zap_page(kvm, sp, invalid_list);
+ 			mmu_pages_clear_parents(&parents);
+ 			zapped++;
+ 		}
+@@ -1834,9 +1834,9 @@ static int mmu_zap_unsync_children(struct kvm *kvm,
+ 	return zapped;
+ }
+ 
+-bool __kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
+-				struct list_head *invalid_list,
+-				int *nr_zapped)
++bool __kvm_shadow_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
++				       struct list_head *invalid_list,
++				       int *nr_zapped)
+ {
+ 	bool list_unstable, zapped_root = false;
+ 
+@@ -1898,16 +1898,17 @@ bool __kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
+ 	return list_unstable;
+ }
+ 
+-bool kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
+-			      struct list_head *invalid_list)
++bool kvm_shadow_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
++				     struct list_head *invalid_list)
+ {
+ 	int nr_zapped;
+ 
+-	__kvm_mmu_prepare_zap_page(kvm, sp, invalid_list, &nr_zapped);
++	__kvm_shadow_mmu_prepare_zap_page(kvm, sp, invalid_list, &nr_zapped);
+ 	return nr_zapped;
+ }
+ 
+-void kvm_mmu_commit_zap_page(struct kvm *kvm, struct list_head *invalid_list)
++void kvm_shadow_mmu_commit_zap_page(struct kvm *kvm,
++				    struct list_head *invalid_list)
+ {
+ 	struct kvm_mmu_page *sp, *nsp;
+ 
+@@ -1952,8 +1953,8 @@ static unsigned long kvm_mmu_zap_oldest_mmu_pages(struct kvm *kvm,
+ 		if (sp->root_count)
+ 			continue;
+ 
+-		unstable = __kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list,
+-						      &nr_zapped);
++		unstable = __kvm_shadow_mmu_prepare_zap_page(kvm, sp,
++						&invalid_list, &nr_zapped);
+ 		total_zapped += nr_zapped;
+ 		if (total_zapped >= nr_to_zap)
+ 			break;
+@@ -1962,7 +1963,7 @@ static unsigned long kvm_mmu_zap_oldest_mmu_pages(struct kvm *kvm,
+ 			goto restart;
+ 	}
+ 
+-	kvm_mmu_commit_zap_page(kvm, &invalid_list);
++	kvm_shadow_mmu_commit_zap_page(kvm, &invalid_list);
+ 
+ 	kvm->stat.mmu_recycled += total_zapped;
+ 	return total_zapped;
+@@ -2033,9 +2034,9 @@ int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn)
+ 		pgprintk("%s: gfn %llx role %x\n", __func__, gfn,
+ 			 sp->role.word);
+ 		r = 1;
+-		kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
++		kvm_shadow_mmu_prepare_zap_page(kvm, sp, &invalid_list);
+ 	}
+-	kvm_mmu_commit_zap_page(kvm, &invalid_list);
++	kvm_shadow_mmu_commit_zap_page(kvm, &invalid_list);
+ 	write_unlock(&kvm->mmu_lock);
+ 
  	return r;
+@@ -3032,7 +3033,8 @@ void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+ 	for_each_gfn_valid_sp_with_gptes(vcpu->kvm, sp, gfn) {
+ 		if (detect_write_misaligned(sp, gpa, bytes) ||
+ 		      detect_write_flooding(sp)) {
+-			kvm_mmu_prepare_zap_page(vcpu->kvm, sp, &invalid_list);
++			kvm_shadow_mmu_prepare_zap_page(vcpu->kvm, sp,
++							&invalid_list);
+ 			++vcpu->kvm->stat.mmu_flooded;
+ 			continue;
+ 		}
+@@ -3141,7 +3143,7 @@ void kvm_shadow_mmu_zap_obsolete_pages(struct kvm *kvm)
+ 			goto restart;
+ 		}
+ 
+-		unstable = __kvm_mmu_prepare_zap_page(kvm, sp,
++		unstable = __kvm_shadow_mmu_prepare_zap_page(kvm, sp,
+ 				&kvm->arch.zapped_obsolete_pages, &nr_zapped);
+ 		batch += nr_zapped;
+ 
+@@ -3158,7 +3160,7 @@ void kvm_shadow_mmu_zap_obsolete_pages(struct kvm *kvm)
+ 	 * kvm_mmu_load()), and the reload in the caller ensure no vCPUs are
+ 	 * running with an obsolete MMU.
+ 	 */
+-	kvm_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
++	kvm_shadow_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
  }
  
--int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
-+int kvm_shadow_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva)
- {
- 	gpa_t gpa;
- 	int r;
-@@ -2331,7 +2331,7 @@ static void direct_pte_prefetch(struct kvm_vcpu *vcpu, u64 *sptep)
- 	__direct_pte_prefetch(vcpu, sp, sptep);
- }
+ bool kvm_shadow_mmu_has_zapped_obsolete_pages(struct kvm *kvm)
+@@ -3439,7 +3441,7 @@ unsigned long kvm_shadow_mmu_shrink_scan(struct kvm *kvm, int pages_to_free)
+ 	write_lock(&kvm->mmu_lock);
  
--int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
-+int kvm_shadow_mmu_direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- {
- 	struct kvm_shadow_walk_iterator it;
- 	struct kvm_mmu_page *sp;
-@@ -2549,7 +2549,7 @@ int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu)
- 		return r;
+ 	if (kvm_shadow_mmu_has_zapped_obsolete_pages(kvm)) {
+-		kvm_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
++		kvm_shadow_mmu_commit_zap_page(kvm, &kvm->arch.zapped_obsolete_pages);
+ 		goto out;
+ 	}
  
- 	write_lock(&vcpu->kvm->mmu_lock);
--	r = make_mmu_pages_available(vcpu);
-+	r = kvm_shadow_mmu_make_pages_available(vcpu);
- 	if (r < 0)
- 		goto out_unlock;
- 
-@@ -2797,7 +2797,8 @@ void kvm_mmu_sync_prev_roots(struct kvm_vcpu *vcpu)
-  *
-  * Must be called between walk_shadow_page_lockless_{begin,end}.
-  */
--int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level)
-+int kvm_shadow_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
-+			    int *root_level)
- {
- 	struct kvm_shadow_walk_iterator iterator;
- 	int leaf = -1;
-@@ -3104,7 +3105,7 @@ __always_inline bool walk_slot_rmaps_4k(struct kvm *kvm,
- }
- 
- #define BATCH_ZAP_PAGES	10
--void kvm_zap_obsolete_pages(struct kvm *kvm)
-+void kvm_shadow_mmu_zap_obsolete_pages(struct kvm *kvm)
- {
- 	struct kvm_mmu_page *sp, *node;
- 	int nr_zapped, batch = 0;
-@@ -3165,7 +3166,7 @@ bool kvm_shadow_mmu_has_zapped_obsolete_pages(struct kvm *kvm)
- 	return unlikely(!list_empty_careful(&kvm->arch.zapped_obsolete_pages));
- }
- 
--bool kvm_rmap_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
-+bool kvm_shadow_mmu_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end)
- {
- 	const struct kvm_memory_slot *memslot;
- 	struct kvm_memslots *slots;
-@@ -3417,8 +3418,8 @@ static bool kvm_mmu_zap_collapsible_spte(struct kvm *kvm,
- 	return need_tlb_flush;
- }
- 
--void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
--				    const struct kvm_memory_slot *slot)
-+void kvm_shadow_mmu_zap_collapsible_sptes(struct kvm *kvm,
-+					  const struct kvm_memory_slot *slot)
- {
- 	/*
- 	 * Note, use KVM_MAX_HUGEPAGE_LEVEL - 1 since there's no need to zap
 diff --git a/arch/x86/kvm/mmu/shadow_mmu.h b/arch/x86/kvm/mmu/shadow_mmu.h
-index 9e27d03fbe368..cc28895d2a24f 100644
+index cc28895d2a24f..82eed9bb9bc9a 100644
 --- a/arch/x86/kvm/mmu/shadow_mmu.h
 +++ b/arch/x86/kvm/mmu/shadow_mmu.h
-@@ -73,18 +73,19 @@ bool kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
- 			      struct list_head *invalid_list);
- void kvm_mmu_commit_zap_page(struct kvm *kvm, struct list_head *invalid_list);
+@@ -66,12 +66,13 @@ bool kvm_test_age_rmap(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
  
--int make_mmu_pages_available(struct kvm_vcpu *vcpu);
-+int kvm_shadow_mmu_make_pages_available(struct kvm_vcpu *vcpu);
+ void __clear_sp_write_flooding_count(struct kvm_mmu_page *sp);
  
--int kvm_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva);
-+int kvm_shadow_mmu_unprotect_page_virt(struct kvm_vcpu *vcpu, gva_t gva);
+-bool __kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
+-				struct list_head *invalid_list,
+-				int *nr_zapped);
+-bool kvm_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
+-			      struct list_head *invalid_list);
+-void kvm_mmu_commit_zap_page(struct kvm *kvm, struct list_head *invalid_list);
++bool __kvm_shadow_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
++				       struct list_head *invalid_list,
++				       int *nr_zapped);
++bool kvm_shadow_mmu_prepare_zap_page(struct kvm *kvm, struct kvm_mmu_page *sp,
++				     struct list_head *invalid_list);
++void kvm_shadow_mmu_commit_zap_page(struct kvm *kvm,
++				    struct list_head *invalid_list);
  
--int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
-+int kvm_shadow_mmu_direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
- u64 *fast_pf_get_last_sptep(struct kvm_vcpu *vcpu, gpa_t gpa, u64 *spte);
+ int kvm_shadow_mmu_make_pages_available(struct kvm_vcpu *vcpu);
  
- hpa_t mmu_alloc_root(struct kvm_vcpu *vcpu, gfn_t gfn, int quadrant, u8 level);
- int mmu_alloc_shadow_roots(struct kvm_vcpu *vcpu);
- int mmu_alloc_special_roots(struct kvm_vcpu *vcpu);
- 
--int get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes, int *root_level);
-+int kvm_shadow_mmu_get_walk(struct kvm_vcpu *vcpu, u64 addr, u64 *sptes,
-+			    int *root_level);
- 
- void kvm_mmu_pte_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
- 		       int bytes, struct kvm_page_track_notifier_node *node);
-@@ -99,8 +100,8 @@ bool walk_slot_rmaps(struct kvm *kvm, const struct kvm_memory_slot *slot,
- bool walk_slot_rmaps_4k(struct kvm *kvm, const struct kvm_memory_slot *slot,
- 			slot_rmaps_handler fn, bool flush_on_yield);
- 
--void kvm_zap_obsolete_pages(struct kvm *kvm);
--bool kvm_rmap_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
-+void kvm_shadow_mmu_zap_obsolete_pages(struct kvm *kvm);
-+bool kvm_shadow_mmu_zap_gfn_range(struct kvm *kvm, gfn_t gfn_start, gfn_t gfn_end);
- 
- bool slot_rmap_write_protect(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 			     const struct kvm_memory_slot *slot);
-@@ -109,8 +110,8 @@ void kvm_shadow_mmu_try_split_huge_pages(struct kvm *kvm,
- 					 const struct kvm_memory_slot *slot,
- 					 gfn_t start, gfn_t end,
- 					 int target_level);
--void kvm_rmap_zap_collapsible_sptes(struct kvm *kvm,
--				    const struct kvm_memory_slot *slot);
-+void kvm_shadow_mmu_zap_collapsible_sptes(struct kvm *kvm,
-+					  const struct kvm_memory_slot *slot);
- 
- bool kvm_shadow_mmu_has_zapped_obsolete_pages(struct kvm *kvm);
- unsigned long kvm_shadow_mmu_shrink_scan(struct kvm *kvm, int pages_to_free);
 -- 
 2.39.1.519.gcb327c4b5f-goog
 
