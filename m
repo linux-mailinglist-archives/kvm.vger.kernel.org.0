@@ -2,213 +2,158 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 85A6268786A
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 10:10:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A00CE6878C8
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 10:28:37 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232540AbjBBJKH (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 04:10:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52040 "EHLO
+        id S232002AbjBBJ2d (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 04:28:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232545AbjBBJKC (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 04:10:02 -0500
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E3127E6EA
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 01:09:59 -0800 (PST)
-Received: by mail-pj1-x102e.google.com with SMTP id 88so1296842pjo.3
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 01:09:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=igel-co-jp.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gcO0uxyztK7wrPRESDhnWawV9bJajYCn05I6EVJHO1Q=;
-        b=GH6KARO7thcAXAecHFCRqv2AThKvwRpSynFUPRyr/OZKPlK2yL0fvDQhRTEuxWPbag
-         soLM3KjFH60hrsUUukVibYDKMQm0sViyKG5mYZqPbfML2bae+Go5bIdqdw9B901M7ibu
-         wNT7zORKjzFmfIR2oCiVQM3HJyrFKC2BPqVxmkD7X27/Tbuv0DsrL5dChFH+9/NwvzIQ
-         EUYkhc2ftdhCYgF8ACeakDBIlsNguRxNJ82koXMxpahyWP6KNfGH647dLQIQkSf08b9Y
-         Kg9/9k7MncrjLlOlQrFvpRobgAOYtK7H68cuL5RxgyxNu+F+hxjmjIGD1BbGwHe4fB3M
-         210w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gcO0uxyztK7wrPRESDhnWawV9bJajYCn05I6EVJHO1Q=;
-        b=DKSAzDtwHzkPeXEGKu6Jeft25dF0iQWtGUjCI1tfoqazfoQG0mH7KtyEZwXTqK1sF2
-         a21cewGfoQw1W8akOR3IN6frygBZBExNbPcwqBYr7Tbw1fRaqa60YlYIe2DXTStV7XCW
-         6RXIqoYgt9f1HDDYneTaNGgZODEYie7CFKP8inKjIyTdmRoIhP27KeSaIt5T5iafZ5AH
-         RI6Yc3OTeeQ5XjorklBn6CennNI2KnHPLDqGxM02mGM+qV5Ai26Fk9jDbIHvopvfx6+W
-         d9T/2BUgHD6MFKGO3MqEkqIqveDN9cCYMCHpc3z6iYfucvqF0Ct42M23lfPq8XF+KrAq
-         Hmfw==
-X-Gm-Message-State: AO0yUKVtXY+5DrQ+3CBoAhIpCC19yBIQvg0iGyWIpMVzUvOnz/xbCgET
-        pqEp5YfljI+9TM/RapXLdMOclA==
-X-Google-Smtp-Source: AK7set/fXvDEmBQhH8c6B3dTk3eGn1u6YNr6DVl3bDrXS4EUzT2lgnlUWdYhoNLU3kNmqiqzSmYyqg==
-X-Received: by 2002:a17:903:2303:b0:195:f06f:84fc with SMTP id d3-20020a170903230300b00195f06f84fcmr7368514plh.40.1675328998631;
-        Thu, 02 Feb 2023 01:09:58 -0800 (PST)
-Received: from tyrell.hq.igel.co.jp (napt.igel.co.jp. [219.106.231.132])
-        by smtp.gmail.com with ESMTPSA id ik12-20020a170902ab0c00b001929827731esm13145968plb.201.2023.02.02.01.09.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Feb 2023 01:09:58 -0800 (PST)
-From:   Shunsuke Mie <mie@igel.co.jp>
-To:     "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Rusty Russell <rusty@rustcorp.com.au>
-Cc:     kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Shunsuke Mie <mie@igel.co.jp>
-Subject: [RFC PATCH v2 7/7] vringh: IOMEM support
-Date:   Thu,  2 Feb 2023 18:09:34 +0900
-Message-Id: <20230202090934.549556-8-mie@igel.co.jp>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230202090934.549556-1-mie@igel.co.jp>
-References: <20230202090934.549556-1-mie@igel.co.jp>
-MIME-Version: 1.0
+        with ESMTP id S231755AbjBBJ22 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 04:28:28 -0500
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E2A193EA;
+        Thu,  2 Feb 2023 01:28:23 -0800 (PST)
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3129CIgg034675;
+        Thu, 2 Feb 2023 09:28:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=HcC6NV55pAZlkkrVemqNQ+dkb/uHR1KwZ0a47asRJeA=;
+ b=CCcD8GvEnlFmWHKOEroZpVKgEAVDJMgJ5nydizhTGlKHvH9zo0o3Znfe3XK0rw5VoTXK
+ zIuHcNYIs81W9a97CU3ejqhJy+aXzahOHbOO3ljnVEQvS46t/z463qRGrxMPnZXGNG8m
+ QbMbYIY+wSyoTsjTnmWZ7IPUeQ0dGX+FCSFcyw5++SG/bHUy6Mdn/kSSybLbM9ZxRbxl
+ oGj+uTOYQ/Qv7iwhrYdOiCirNVDHAbJLi48b0ERvFgc5FjMJUqA34va+8wc2P0CeCnk0
+ GV9QE3jnJlgfZcvA/qS3w+Ilj5teVFojkJaROQbBEDa2v0nRxlr6Wp0jfkQ9xAhgLIe/ eg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ng98ft0tv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 09:28:22 +0000
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 3129CevJ036126;
+        Thu, 2 Feb 2023 09:28:21 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ng98ft0t2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 09:28:21 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 311KIKNp014521;
+        Thu, 2 Feb 2023 09:28:19 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+        by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3ncvtydyep-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 09:28:19 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 3129SF2e24838474
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Feb 2023 09:28:15 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C9E592004B;
+        Thu,  2 Feb 2023 09:28:15 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 12E9D20043;
+        Thu,  2 Feb 2023 09:28:15 +0000 (GMT)
+Received: from li-c6ac47cc-293c-11b2-a85c-d421c8e4747b.ibm.com.com (unknown [9.171.28.52])
+        by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Feb 2023 09:28:14 +0000 (GMT)
+From:   Pierre Morel <pmorel@linux.ibm.com>
+To:     linux-s390@vger.kernel.org
+Cc:     frankja@linux.ibm.com, thuth@redhat.com, kvm@vger.kernel.org,
+        imbrenda@linux.ibm.com, david@redhat.com, nrb@linux.ibm.com,
+        nsg@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v6 0/2] S390x: CPU Topology Information
+Date:   Thu,  2 Feb 2023 10:28:12 +0100
+Message-Id: <20230202092814.151081-1-pmorel@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: R-_y8_qHynip0slDlQjQPOmdO_470vnG
+X-Proofpoint-GUID: l9Ok0Ii60sZnCQTmq4_ZiGhBy9QEcj3I
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS
-        autolearn=unavailable autolearn_force=no version=3.4.6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-01_15,2023-01-31_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 suspectscore=0 lowpriorityscore=0 clxscore=1011
+ impostorscore=0 bulkscore=0 mlxscore=0 mlxlogscore=999 malwarescore=0
+ phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302020085
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-This patch introduces the new memory accessor for vringh. It is able to
-use vringh to virtio rings located on iomemory region.
+Hi,
 
-Signed-off-by: Shunsuke Mie <mie@igel.co.jp>
----
- drivers/vhost/Kconfig  |  6 ++++
- drivers/vhost/vringh.c | 76 ++++++++++++++++++++++++++++++++++++++++++
- include/linux/vringh.h |  8 +++++
- 3 files changed, 90 insertions(+)
+new version of the kvm-unit-test s390x CPU topology series.
 
-diff --git a/drivers/vhost/Kconfig b/drivers/vhost/Kconfig
-index 587fbae06182..a79a4efbc817 100644
---- a/drivers/vhost/Kconfig
-+++ b/drivers/vhost/Kconfig
-@@ -6,6 +6,12 @@ config VHOST_IOTLB
- 	  This option is selected by any driver which needs to support
- 	  an IOMMU in software.
- 
-+config VHOST_IOMEM
-+	tristate
-+	select VHOST_RING
-+	help
-+	  Generic IOMEM implementation for vhost and vringh.
-+
- config VHOST_RING
- 	tristate
- 	select VHOST_IOTLB
-diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-index 46fb315483ed..e3d9c7281ad0 100644
---- a/drivers/vhost/vringh.c
-+++ b/drivers/vhost/vringh.c
-@@ -18,6 +18,9 @@
- #include <linux/highmem.h>
- #include <linux/vhost_iotlb.h>
- #endif
-+#if IS_REACHABLE(CONFIG_VHOST_IOMEM)
-+#include <linux/io.h>
-+#endif
- #include <uapi/linux/virtio_config.h>
- 
- static __printf(1,2) __cold void vringh_bad(const char *fmt, ...)
-@@ -1165,4 +1168,77 @@ EXPORT_SYMBOL(vringh_set_iotlb);
- 
- #endif
- 
-+#if IS_REACHABLE(CONFIG_VHOST_IOMEM)
-+
-+/* io-memory space access helpers. */
-+static int getu16_iomem(const struct vringh *vrh, u16 *val, const __virtio16 *p)
-+{
-+	*val = vringh16_to_cpu(vrh, ioread16(p));
-+	return 0;
-+}
-+
-+static int putu16_iomem(const struct vringh *vrh, __virtio16 *p, u16 val)
-+{
-+	iowrite16(cpu_to_vringh16(vrh, val), p);
-+	return 0;
-+}
-+
-+static int copydesc_iomem(const struct vringh *vrh, void *dst, const void *src,
-+			  size_t len)
-+{
-+	memcpy_fromio(dst, src, len);
-+	return 0;
-+}
-+
-+static int putused_iomem(const struct vringh *vrh, struct vring_used_elem *dst,
-+			 const struct vring_used_elem *src, unsigned int num)
-+{
-+	memcpy_toio(dst, src, num * sizeof(*dst));
-+	return 0;
-+}
-+
-+static int xfer_from_iomem(const struct vringh *vrh, void *src, void *dst,
-+			   size_t len)
-+{
-+	memcpy_fromio(dst, src, len);
-+	return 0;
-+}
-+
-+static int xfer_to_iomem(const struct vringh *vrh, void *dst, void *src,
-+			 size_t len)
-+{
-+	memcpy_toio(dst, src, len);
-+	return 0;
-+}
-+
-+static struct vringh_ops iomem_vringh_ops = {
-+	.getu16 = getu16_iomem,
-+	.putu16 = putu16_iomem,
-+	.xfer_from = xfer_from_iomem,
-+	.xfer_to = xfer_to_iomem,
-+	.putused = putused_iomem,
-+	.copydesc = copydesc_iomem,
-+	.range_check = no_range_check,
-+	.getrange = NULL,
-+};
-+
-+int vringh_init_iomem(struct vringh *vrh, u64 features, unsigned int num,
-+		      bool weak_barriers, gfp_t gfp, struct vring_desc *desc,
-+		      struct vring_avail *avail, struct vring_used *used)
-+{
-+	int err;
-+
-+	err = __vringh_init(vrh, features, num, weak_barriers, gfp, desc, avail,
-+			    used);
-+	if (err)
-+		return err;
-+
-+	memcpy(&vrh->ops, &iomem_vringh_ops, sizeof(iomem_vringh_ops));
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(vringh_init_iomem);
-+
-+#endif
-+
- MODULE_LICENSE("GPL");
-diff --git a/include/linux/vringh.h b/include/linux/vringh.h
-index 89c73605c85f..420c2d0ed398 100644
---- a/include/linux/vringh.h
-+++ b/include/linux/vringh.h
-@@ -265,4 +265,12 @@ int vringh_init_iotlb(struct vringh *vrh, u64 features,
- 
- #endif /* CONFIG_VHOST_IOTLB */
- 
-+#if IS_REACHABLE(CONFIG_VHOST_IOMEM)
-+
-+int vringh_init_iomem(struct vringh *vrh, u64 features, unsigned int num,
-+		      bool weak_barriers, gfp_t gfp, struct vring_desc *desc,
-+		      struct vring_avail *avail, struct vring_used *used);
-+
-+#endif /* CONFIG_VHOST_IOMEM */
-+
- #endif /* _LINUX_VRINGH_H */
+1. what is done
+---------------
+
+- First part is checking PTF errors, for KVM and LPAR
+
+- Second part is checking PTF polarization change and STSI
+  with the cpu topology including drawers and books.
+  This tests are run for KVM only.
+
+To run these tests under KVM successfully you need Linux 6.0
+and the QEMU patches you find at:
+
+https://lists.gnu.org/archive/html/qemu-devel/2023-02/msg00081.html
+
+To start the test in KVM just do:
+
+# ./run_tests.sh topology
+
+or
+
+# ./s390x-run s390x/topology.elf \
+	-smp 5,drawers=3,books=3,sockets=4,cores=4,maxcpus=144 \
+	-append '-drawers 3 -books 3 -sockets 4 -cores 4'
+
+Of course the declaration of the number of socket and core must be
+coherent in -smp and -append arguments.
+
+
+To start the tests in LPAR you do not need any argument.
+
+
+Regards,
+Pierre
+
+Pierre Morel (2):
+  s390x: topology: Check the Perform Topology Function
+  s390x: topology: Checking Configuration Topology Information
+
+ lib/s390x/sclp.h    |   3 +-
+ lib/s390x/stsi.h    |  44 +++++
+ s390x/Makefile      |   1 +
+ s390x/topology.c    | 399 ++++++++++++++++++++++++++++++++++++++++++++
+ s390x/unittests.cfg |   4 +
+ 5 files changed, 450 insertions(+), 1 deletion(-)
+ create mode 100644 s390x/topology.c
+
 -- 
-2.25.1
+2.31.1
+
+Changelog:
+
+From v5:
+
+- added drawers and books
+
+- mnest parameter is not needed anymore, replaced
+  by the use of sclp.
+
+- Added several tests for polarity change and reset
+  for PTF
+
+From v4:
+
+- Simplify the tests for socket and cores only.
 
