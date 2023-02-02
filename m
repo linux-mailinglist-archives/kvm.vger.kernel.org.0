@@ -2,70 +2,73 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CE641687C73
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 12:41:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0C4D3687CA3
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 12:47:26 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232014AbjBBLl1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 06:41:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33910 "EHLO
+        id S229761AbjBBLrX (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 06:47:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229633AbjBBLl0 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 06:41:26 -0500
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5B0A6BBC8;
-        Thu,  2 Feb 2023 03:41:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1675338085; x=1706874085;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xAPwScE8MGvSRWPknoRnPVEE/EEIeDB2nFQYmmKKuhs=;
-  b=suxFV1GpgBaRU5qvIaCvSl4gaccO4jvxdTqiORYtjDtAAkkSIIgsY4F/
-   26g4vXZkxPlMcW+EbzeLdZjW00oXiCbckyknqhQAgzyjdMvAdyWhk7zSv
-   HMlMpB+MVlzL0ELGGuYkXWhv90JMoqO7O+hM5o3Bu9DMx511L40Ijp9t2
-   y584PEPVws45xc7am3r5UGsokTyl71VyrypAj7H2mMpxCWEwOmJMASkpe
-   exfKFxC1ca1Wbka6OvNfNYcBZ475MHWaiKEWCvvs30KJ5JrwBz2/n+719
-   Agt2lybMMXJLSJl9Xvu0yN8LQiZoCB805Rvs6OzVYhxrQb+F41BzCLo++
-   A==;
-X-IronPort-AV: E=Sophos;i="5.97,267,1669100400"; 
-   d="asc'?scan'208";a="210309876"
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 02 Feb 2023 04:41:24 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.16; Thu, 2 Feb 2023 04:41:25 -0700
-Received: from wendy (10.10.115.15) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.16 via Frontend
- Transport; Thu, 2 Feb 2023 04:41:22 -0700
-Date:   Thu, 2 Feb 2023 11:40:58 +0000
-From:   Conor Dooley <conor.dooley@microchip.com>
-To:     Atish Patra <atishp@rivosinc.com>
-CC:     <linux-kernel@vger.kernel.org>, Anup Patel <anup@brainfault.org>,
-        Albert Ou <aou@eecs.berkeley.edu>,
-        Andrew Jones <ajones@ventanamicro.com>,
-        Atish Patra <atishp@atishpatra.org>,
-        Eric Lin <eric.lin@sifive.com>, Guo Ren <guoren@kernel.org>,
-        Heiko Stuebner <heiko@sntech.de>,
-        <kvm-riscv@lists.infradead.org>, <kvm@vger.kernel.org>,
-        <linux-riscv@lists.infradead.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Palmer Dabbelt <palmer@dabbelt.com>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v4 13/14] RISC-V: KVM: Support firmware events
-Message-ID: <Y9uhSoOvodeQRO6G@wendy>
-References: <20230201231250.3806412-1-atishp@rivosinc.com>
- <20230201231250.3806412-14-atishp@rivosinc.com>
+        with ESMTP id S232161AbjBBLrQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 06:47:16 -0500
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760918D616;
+        Thu,  2 Feb 2023 03:46:55 -0800 (PST)
+Received: by mail-pg1-x52a.google.com with SMTP id f3so1136461pgc.2;
+        Thu, 02 Feb 2023 03:46:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OCHv+Rtu/T4PvxYHPWW8MnIPWqx9+x/w+3ZCigYTGeo=;
+        b=gBGsmXvDj7gKK8xLG2DDBPKoN+F5GpdpsEeTMUzi7Z09FMcz+VoCBnFpP4xl6/3Ke3
+         uuYc8qTvyE1y+OepENJBCwlwYPTAPtG9z4ZW/TuAPPFxWIjA9x22K8jVwkOkwW7k7cmt
+         RMOvpTVw1ecppwfRhJNPj6+Z+MFYA4TNZmnqVfBWKxd4isOdH8fNJBO98TItN7iITU03
+         AjxJ/+TDIxk3TmYURg9KomQh9PZCWoP2CPJnBlgqBAUL+gY9O1MsthHdUJmwP3TJThkA
+         nL/tzSlSMco/QmEGOhalmnktDssNg3+Ah02X3A/9TQoDpcec/alYJOP9suvpJFtg2El0
+         pyjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OCHv+Rtu/T4PvxYHPWW8MnIPWqx9+x/w+3ZCigYTGeo=;
+        b=WvgYsITQH+/NxFRIhv5CzWVOb3g6gCLu69zOcbWT8lZj6ts/gIr+dOHaSA+SWNQi1k
+         DUq40UTeYAa2rfOT5tR3Gd0vFwI4Q7LWZGTWwXkp39DdikuFqX/AzxtMo+NVlunocwAS
+         cCemRT5ZFzWtXzss0no7S3Hnea8UJspqn1F3AfsmDtGf4uHqXJEbijwmbOP/PNu9dEbq
+         lxHCtxD0tPol9TUppTs9Kl5H8Tbtr8G5FkJkclnPZ6/aqzzg7i+of9KmnnfvQ82jh9WZ
+         7XC8BbjfdApLqlId9Qgl9Uu6kHOAaTenUfdptAeJ/a7tlecpq+AUuWsDgyrbaDfk8MRU
+         cnvg==
+X-Gm-Message-State: AO0yUKUc7ickh5zkxU9JjdX42Y+M+LlYPmktGPHKU1OhwXj7rquEYI92
+        UVY2MnppmKEt17N2ODP+O80=
+X-Google-Smtp-Source: AK7set8eGQ8qm7P4Mq8Oi5ijbj3+njAE13TIs6LPMK1xA4qne/Lyf3/ludlqGYJ3wth3RNWZFiJSNQ==
+X-Received: by 2002:a62:b519:0:b0:58e:151c:f7fe with SMTP id y25-20020a62b519000000b0058e151cf7femr4901305pfe.4.1675338414936;
+        Thu, 02 Feb 2023 03:46:54 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id p56-20020a056a0026f800b0058882b59d22sm13335902pfw.219.2023.02.02.03.46.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Feb 2023 03:46:54 -0800 (PST)
+Message-ID: <839ac9f7-92ff-c04d-37d3-d12db91d8829@gmail.com>
+Date:   Thu, 2 Feb 2023 19:46:44 +0800
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="tlNBWfimPX/S/xVT"
-Content-Disposition: inline
-In-Reply-To: <20230201231250.3806412-14-atishp@rivosinc.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS autolearn=ham
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH v3 1/8] KVM: x86/pmu: Rename pmc_is_enabled() to
+ pmc_is_globally_enabled()
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>
+References: <20221111102645.82001-1-likexu@tencent.com>
+ <20221111102645.82001-2-likexu@tencent.com> <Y9Mw3pcW/SL/Mna8@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <Y9Mw3pcW/SL/Mna8@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
         autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -73,67 +76,39 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
---tlNBWfimPX/S/xVT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 27/1/2023 10:03 am, Sean Christopherson wrote:
+> On Fri, Nov 11, 2022, Like Xu wrote:
+>> From: Like Xu<likexu@tencent.com>
+>>
+>> The name of function pmc_is_enabled() is a bit misleading. A PMC can
+>> be disabled either by PERF_CLOBAL_CTRL or by its corresponding EVTSEL.
+>> Add the global semantic to its name.
+>>
+>> Suggested-by: Jim Mattson<jmattson@google.com>
+>> Signed-off-by: Like Xu<likexu@tencent.com>
+>> ---
+> ...
+> 
+>> diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+>> index 684393c22105..e57f707fb940 100644
+>> --- a/arch/x86/kvm/pmu.c
+>> +++ b/arch/x86/kvm/pmu.c
+>> @@ -83,7 +83,7 @@ void kvm_pmu_ops_update(const struct kvm_pmu_ops *pmu_ops)
+>>   #undef __KVM_X86_PMU_OP
+>>   }
+>>   
+>> -static inline bool pmc_is_enabled(struct kvm_pmc *pmc)
+>> +static inline bool pmc_is_globally_enabled(struct kvm_pmc *pmc)
+>>   {
+>>   	return static_call(kvm_x86_pmu_pmc_is_enabled)(pmc);
+> This doesn't compile.  v3, and I'm getting pings, and the very first patch doesn't
+> compile.
+> 
 
-Hey Atish,
-
-On Wed, Feb 01, 2023 at 03:12:49PM -0800, Atish Patra wrote:
-> SBI PMU extension defines a set of firmware events which can provide
-> useful information to guests about the number of SBI calls. As
-> hypervisor implements the SBI PMU extension, these firmware events
-> correspond to ecall invocations between VS->HS mode. All other firmware
-> events will always report zero if monitored as KVM doesn't implement them.
->=20
-> This patch adds all the infrastructure required to support firmware
-> events.
->=20
-> Reviewed-by: Anup Patel <anup@brainfault.org>
-> Signed-off-by: Atish Patra <atishp@rivosinc.com>
-> diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-> index 473ad80..dd16e60 100644
-> --- a/arch/riscv/kvm/vcpu_pmu.c
-> +++ b/arch/riscv/kvm/vcpu_pmu.c
-> @@ -202,12 +202,15 @@ static int pmu_ctr_read(struct kvm_vcpu *vcpu, unsi=
-gned long cidx,
->  	struct kvm_pmu *kvpmu =3D vcpu_to_pmu(vcpu);
->  	struct kvm_pmc *pmc;
->  	u64 enabled, running;
-> +	int fevent_code;
-> =20
->  	pmc =3D &kvpmu->pmc[cidx];
-> -	if (!pmc->perf_event)
-> -		return -EINVAL;
-> =20
-> -	pmc->counter_val +=3D perf_event_read_value(pmc->perf_event, &enabled, =
-&running);
-> +	if (pmc->cinfo.type =3D=3D SBI_PMU_CTR_TYPE_FW) {
-> +		fevent_code =3D get_event_code(pmc->event_idx);
-> +		pmc->counter_val =3D kvpmu->fw_event[fevent_code].value;
-> +	} else if (pmc->perf_event)
-> +		pmc->counter_val +=3D perf_event_read_value(pmc->perf_event, &enabled,=
- &running);
-
-Here, and elsewhere, all branches of an if/else must use {} if one
-branch needs them.
-Patches 4 & 12 have similar issues, which checkpatch in the patchwork
-CI stuff also complained about.
-
-Thanks,
-Conor.
-
-
---tlNBWfimPX/S/xVT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCY9uhSQAKCRB4tDGHoIJi
-0uqpAP9x4VGfcJGp96G2q7mYM1WaLkLQmijd3P41i9ItrDKGswD/ZmRRoH9XvuNl
-IoucvfrlrOXTic9oOkpunlmQVDzl6Aw=
-=V4EF
------END PGP SIGNATURE-----
-
---tlNBWfimPX/S/xVT--
+Oops, very sorry for this breaking the git-bisect attribute, it's my fault to 
+split the code diff incorrectly
+(weakly it compiles fine w/ 4th patch), I will enhance the process before 
+sending any patches to you.
+Thank you for taking time to review the rest of patches in detail as you always 
+do. The new version is
+under construction, apologies again.
