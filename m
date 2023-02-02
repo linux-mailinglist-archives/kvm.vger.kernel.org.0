@@ -2,84 +2,61 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id CFA05687A90
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 11:45:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 56F34687C0A
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 12:17:20 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232468AbjBBKpa (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 05:45:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42120 "EHLO
+        id S231185AbjBBLRS (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 06:17:18 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232693AbjBBKpF (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 05:45:05 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31CBE9EE6
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 02:44:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675334657;
+        with ESMTP id S229595AbjBBLRQ (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 06:17:16 -0500
+Received: from mail.skyhub.de (mail.skyhub.de [IPv6:2a01:4f8:190:11c2::b:1457])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522DF8B363;
+        Thu,  2 Feb 2023 03:16:43 -0800 (PST)
+Received: from zn.tnic (p5de8e9fe.dip0.t-ipconnect.de [93.232.233.254])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 40F4B1EC069A;
+        Thu,  2 Feb 2023 12:16:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1675336591;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=zk689njywsUoTOAdolT0FFFPb72OxAcJiOLt6/D1p1Y=;
-        b=UVwhCWClujGzVTuKSpn4VA2o3WIYhZ20KAxLl0/nVcUp0Ds6PdglTgnxn8LjEK6kFcysG2
-        2pAvxY+ECApJSeKaduDDts+E5HKVqoAys4Zlfqf8mR6j5e27kSwhHUscqZ7zP+mfhV+RUB
-        EFJ8Y0mfVsDD9hbEEo+M24nRDfNUxb8=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-90-hahsCgAyNr6vyWB2Dl9eVg-1; Thu, 02 Feb 2023 05:44:13 -0500
-X-MC-Unique: hahsCgAyNr6vyWB2Dl9eVg-1
-Received: by mail-qk1-f198.google.com with SMTP id a198-20020ae9e8cf000000b007259083a3c8so1078078qkg.7
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 02:44:13 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:subject:from:references:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zk689njywsUoTOAdolT0FFFPb72OxAcJiOLt6/D1p1Y=;
-        b=Ce0wqZX7pwZuuzBcRJtBaPHWK7xai66gQRJc8YksvTQtPXrkryYRnap3IxdzzYclx6
-         71ZYR12tUvr+eUP6VOfi81ixTvje/1T6Xq61l4+N5aHxAHjRXAeCjQBJA6IsJzaOugGo
-         uz3KpIJf2gVU/7Kn7TTDE2aLbd3EFC2C88vNFWNfv9ElW9uaMhDMM0ol1V9Q/mO/9iyg
-         bi+tQgYWQG/QLOHSclTQXY1GNLZiDzgurFxHR3E+5a+aC5HdHG5HliZVVjQfq1N7QSCd
-         H4lo/X+5OGiac1RHTy+C3tXL3vCoaHuLF7UumUWcZUxuYIiqyU/KaP/Pd4kCDMZ7Z5E7
-         zh8g==
-X-Gm-Message-State: AO0yUKXSg9rAhIcVy5Mnmf3gHJ2WSrK7EasEmN/ncM7Gp3BgPPx4epRV
-        7Lcci7RyqN9VpWJVFu04uzc8bBo40iS4UqWZqnXRANQ+JE7w4G+OQIu2UipuqprMeRIQ8ZJxlwd
-        ceLgXBOoPApYw
-X-Received: by 2002:ac8:5dce:0:b0:3b8:6043:daf8 with SMTP id e14-20020ac85dce000000b003b86043daf8mr10801135qtx.47.1675334653103;
-        Thu, 02 Feb 2023 02:44:13 -0800 (PST)
-X-Google-Smtp-Source: AK7set8xkxlLPup3tabY+V7Eq+5TTe5ay44NvoGI6jckJeZL6u8e/vKinxcibffe2Q4BFy26U/9Rrg==
-X-Received: by 2002:ac8:5dce:0:b0:3b8:6043:daf8 with SMTP id e14-20020ac85dce000000b003b86043daf8mr10801121qtx.47.1675334652853;
-        Thu, 02 Feb 2023 02:44:12 -0800 (PST)
-Received: from [192.168.0.2] (ip-109-43-177-146.web.vodafone.de. [109.43.177.146])
-        by smtp.gmail.com with ESMTPSA id 137-20020a37088f000000b0071aacb2c76asm10849689qki.132.2023.02.02.02.44.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 02:44:12 -0800 (PST)
-Message-ID: <8f5980bd-bbc3-ba78-cf1e-60afb26fb887@redhat.com>
-Date:   Thu, 2 Feb 2023 11:44:07 +0100
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=uvIi+Jx60bAKZN/jWrmPW8ftCneMWCqwRu7t5YqCP6A=;
+        b=VnhgzffYvCsw8bh+fg0k2U0T6Z3TNXxqbpnwhrQo53m3rVqxJxfuRf2qalw08ZdGttXzmS
+        eidLqdR/beaGLg4/8THaXR8t9Ifu0BDQnyxlBIx/42WtxL3O6a7xqtaAHrhg5gC6cc/Ozy
+        V2Iyhp9ReyT77PiDvfz2bpjHqKwMYsU=
+Date:   Thu, 2 Feb 2023 12:16:27 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Michael Roth <michael.roth@amd.com>
+Cc:     kvm@vger.kernel.org, linux-coco@lists.linux.dev,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com,
+        jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com,
+        ardb@kernel.org, pbonzini@redhat.com, seanjc@google.com,
+        vkuznets@redhat.com, wanpengli@tencent.com, jmattson@google.com,
+        luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com,
+        pgonda@google.com, peterz@infradead.org,
+        srinivas.pandruvada@linux.intel.com, rientjes@google.com,
+        dovmurik@linux.ibm.com, tobin@ibm.com, vbabka@suse.cz,
+        kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com,
+        marcorr@google.com, sathyanarayanan.kuppuswamy@linux.intel.com,
+        alpergun@google.com, dgilbert@redhat.com, jarkko@kernel.org,
+        ashish.kalra@amd.com, harald@profian.com,
+        Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH RFC v7 14/64] x86/sev: Add the host SEV-SNP
+ initialization support
+Message-ID: <Y9ubi0i4Z750gdMm@zn.tnic>
+References: <20221214194056.161492-1-michael.roth@amd.com>
+ <20221214194056.161492-15-michael.roth@amd.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.13.0
-Content-Language: en-US
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, cohuck@redhat.com,
-        mst@redhat.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-        ehabkost@redhat.com, marcel.apfelbaum@gmail.com, eblake@redhat.com,
-        armbru@redhat.com, seiden@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, frankja@linux.ibm.com, berrange@redhat.com,
-        clg@kaod.org
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
- <20230201132051.126868-2-pmorel@linux.ibm.com>
-From:   Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH v15 01/11] s390x/cpu topology: adding s390 specificities
- to CPU topology
-In-Reply-To: <20230201132051.126868-2-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20221214194056.161492-15-michael.roth@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS
         autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
@@ -87,23 +64,145 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 01/02/2023 14.20, Pierre Morel wrote:
-> S390 adds two new SMP levels, drawers and books to the CPU
-> topology.
-> The S390 CPU have specific toplogy features like dedication
-
-Nit: s/toplogy/topology/
-
-> and polarity to give to the guest indications on the host
-> vCPUs scheduling and help the guest take the best decisions
-> on the scheduling of threads on the vCPUs.
+On Wed, Dec 14, 2022 at 01:40:06PM -0600, Michael Roth wrote:
+> From: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> Let us provide the SMP properties with books and drawers levels
-> and S390 CPU with dedication and polarity,
+> The memory integrity guarantees of SEV-SNP are enforced through a new
+> structure called the Reverse Map Table (RMP). The RMP is a single data
+> structure shared across the system that contains one entry for every 4K
+> page of DRAM that may be used by SEV-SNP VMs. The goal of RMP is to
+> track the owner of each page of memory. Pages of memory can be owned by
+> the hypervisor, owned by a specific VM or owned by the AMD-SP. See APM2
+> section 15.36.3 for more detail on RMP.
 > 
-> Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
+> The RMP table is used to enforce access control to memory. The table itself
+> is not directly writable by the software. New CPU instructions (RMPUPDATE,
+> PVALIDATE, RMPADJUST) are used to manipulate the RMP entries.
+> 
+> Based on the platform configuration, the BIOS reserves the memory used
+> for the RMP table. The start and end address of the RMP table must be
+> queried by reading the RMP_BASE and RMP_END MSRs. If the RMP_BASE and
+> RMP_END are not set then disable the SEV-SNP feature.
+> 
+> The SEV-SNP feature is enabled only after the RMP table is successfully
+> initialized.
+> 
+> Also set SYSCFG.MFMD when enabling SNP as SEV-SNP FW >= 1.51 requires
+> that SYSCFG.MFMD must be se
+
+			   set.
+> 
+> RMP table entry format is non-architectural and it can vary by processor
+> and is defined by the PPR. Restrict SNP support on the known CPU model
+> and family for which the RMP table entry format is currently defined for.
+> 
+> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
+> Signed-off-b: Ashish Kalra <ashish.kalra@amd.com>
+	     ^^
+
+Somebody ate a 'y' here. :)
+
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
 > ---
+>  arch/x86/include/asm/disabled-features.h |   8 +-
+>  arch/x86/include/asm/msr-index.h         |  11 +-
+>  arch/x86/kernel/sev.c                    | 180 +++++++++++++++++++++++
+>  3 files changed, 197 insertions(+), 2 deletions(-)
 
-Apart from the nit:
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+...
 
+> +static __init int __snp_rmptable_init(void)
+
+Why is this one carved out of snp_rmptable_init() ?
+
+> +{
+> +	u64 rmp_base, sz;
+> +	void *start;
+> +	u64 val;
+> +
+> +	if (!get_rmptable_info(&rmp_base, &sz))
+> +		return 1;
+> +
+> +	start = memremap(rmp_base, sz, MEMREMAP_WB);
+> +	if (!start) {
+> +		pr_err("Failed to map RMP table addr 0x%llx size 0x%llx\n", rmp_base, sz);
+> +		return 1;
+> +	}
+> +
+> +	/*
+> +	 * Check if SEV-SNP is already enabled, this can happen in case of
+> +	 * kexec boot.
+> +	 */
+> +	rdmsrl(MSR_AMD64_SYSCFG, val);
+> +	if (val & MSR_AMD64_SYSCFG_SNP_EN)
+> +		goto skip_enable;
+> +
+> +	/* Initialize the RMP table to zero */
+
+Useless comment.
+
+> +	memset(start, 0, sz);
+> +
+> +	/* Flush the caches to ensure that data is written before SNP is enabled. */
+> +	wbinvd_on_all_cpus();
+> +
+> +	/* MFDM must be enabled on all the CPUs prior to enabling SNP. */
+> +	on_each_cpu(mfd_enable, NULL, 1);
+> +
+> +	/* Enable SNP on all CPUs. */
+> +	on_each_cpu(snp_enable, NULL, 1);
+
+What happens if someone boots the machine with maxcpus=N, where N is
+less than all CPUs on the machine? The hotplug notifier should handle it
+but have you checked that it works fine?
+
+> +skip_enable:
+> +	rmptable_start = (unsigned long)start;
+> +	rmptable_end = rmptable_start + sz - 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static int __init snp_rmptable_init(void)
+> +{
+> +	int family, model;
+> +
+> +	if (!cpu_feature_enabled(X86_FEATURE_SEV_SNP))
+> +		return 0;
+> +
+> +	family = boot_cpu_data.x86;
+> +	model  = boot_cpu_data.x86_model;
+
+Looks useless - just use boot_cpu_data directly below.
+
+> +
+> +	/*
+> +	 * RMP table entry format is not architectural and it can vary by processor and
+> +	 * is defined by the per-processor PPR. Restrict SNP support on the known CPU
+> +	 * model and family for which the RMP table entry format is currently defined for.
+> +	 */
+> +	if (family != 0x19 || model > 0xaf)
+> +		goto nosnp;
+> +
+> +	if (amd_iommu_snp_enable())
+> +		goto nosnp;
+> +
+> +	if (__snp_rmptable_init())
+> +		goto nosnp;
+> +
+> +	cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "x86/rmptable_init:online", __snp_enable, NULL);
+> +
+> +	return 0;
+> +
+> +nosnp:
+> +	setup_clear_cpu_cap(X86_FEATURE_SEV_SNP);
+> +	return -ENOSYS;
+> +}
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
