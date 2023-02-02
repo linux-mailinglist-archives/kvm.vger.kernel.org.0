@@ -2,56 +2,56 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E29F4688661
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:28:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 0CA5D688669
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 19:29:30 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232545AbjBBS2s (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 13:28:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32838 "EHLO
+        id S232528AbjBBS3Y (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 13:29:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232526AbjBBS2j (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 13:28:39 -0500
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 205E2410B3
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:21 -0800 (PST)
-Received: by mail-pg1-x549.google.com with SMTP id 201-20020a6300d2000000b004ccf545f44fso1373118pga.12
-        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:21 -0800 (PST)
+        with ESMTP id S232630AbjBBS2p (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 13:28:45 -0500
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA6978AE6
+        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 10:28:26 -0800 (PST)
+Received: by mail-pj1-x104a.google.com with SMTP id a20-20020a17090ad81400b0022c3185ebbeso1338503pjv.3
+        for <kvm@vger.kernel.org>; Thu, 02 Feb 2023 10:28:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VxkR2t/soCZeC9eyZl1mM8b7dI9FSV2mUjQI7FtOHrA=;
-        b=bRIm91U6CXHVWLtrnVZHyCbrrPa45LPwdl416lNZtl+FS4NbZUA/w8w3xI7dR3QaUJ
-         uzEyVHHOYRIhLTQG+2FeNkgmc+azanymGtl1QjsMyWScmGGcZ4ulvAEN2hHl11MQnb5J
-         eOl35AxgHUpuLLm/0yUkZ6/NrKDsh0/x+qZEWGU+6030SYpFKtDTj64pHtPMMmbY3Djo
-         hurVP9eX5Osf7WNhIL0csIDXWHRBcJu+1F20CketRewTixj85Jz2/ph8G9qDLLd45WEW
-         kk/bY69JhozRJVuKnj5DtXaDcPI7Ke+YuN+juZuw+du57/vbwq2+6mu5fKeeVzoB0WdE
-         jUJA==
+        bh=8tan31zdS6PKUwJVzyLN2c6lLyefV39OjyNzpOIJzl0=;
+        b=ISqEcv5gcdG1vlSJqzcQZNb8goQIJ7GJymvAuPaRAAGzFmj7/6ioDcfJmKq8OkerTl
+         Y35IYK48Z16XX1h/1FO4UtdDMCdajAYrethvBjoFGMSRM3UiRZRv093nrn1DHq5FGdbw
+         9l+di1c2Ijrief9oI3G0pT64Y9m1Pzzs69/OE2PeXU7It3P6LuoDX1vTriZtsbPH6RA1
+         joFvu87bobMayqIYx/m5W7ZmRSXHDJyw9kCxX9OOnN1AmAqUWgxDAhmuLg79rlArv5kc
+         WG4NLXMSDHA+xZW7NTnUfLCoGEIoXvO2y7H8CF5SlvCMUkwQBCQerBt+iBGwo6MzfZ1j
+         7CpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VxkR2t/soCZeC9eyZl1mM8b7dI9FSV2mUjQI7FtOHrA=;
-        b=gvQdKu7aXV+c5cAur93IbbEqDrY8IED85Bb0zfj2kb20LxoC+IxbxD9xXMDIME/ocA
-         FaRdO7rkaXJKB9Y1gjKFOkUi1EV09g/alLHTM5N56i5ebUodMeZspHui0dx2oKu64gre
-         nj+G+iaQFqpmlQz5koPkb03I2ZKgaGQbKvf5D4+qPVVXfMLvCRIFKklrRDoOFcPwYMGJ
-         mtX/w0uU+uhLkTR6XkGDn/cBKDW22UiRKuKFfHyQmfyqiTdxNBzYj6EjDlcyeKUO/VbL
-         mKIqxOCM+Q2V1uFYUA8Wfukdzmpo1sE6Z/goYqKQBTsAd5T1qHTM0uLwlX0HCKJ0a9Bj
-         i9HA==
-X-Gm-Message-State: AO0yUKU2ct2WoIimXQGY7DvWduGEk0JKCuvoMpSJZ61UQ5GQuxQpfZLQ
-        gBPWeDiQGQZIpKqmwx6hNIxcK3VlUbvf
-X-Google-Smtp-Source: AK7set+1EwIWWN59ZsHJFSU/7CoS97kInlt4PpAcX4d1vE0ypK/nvM2RzsVDAjRyGd2Upc/MT14gL5GycZ0t
+        bh=8tan31zdS6PKUwJVzyLN2c6lLyefV39OjyNzpOIJzl0=;
+        b=XLM/NPUMmy2iJJuHdWfK7MTTeKfRGJea5rLibayZku2Hs9Nv9etG9czje8SAHoSu2M
+         YOvyHTUtvftPYna0mZ/iucYKPaw0/JvkBO4mxWo4Sh7x/pEKEfLGd4O76w5TR1sVg3LH
+         6kU3q0e45IOG3cQvXUkPFInXq/BXmSVSxixk0Tuyvd57AbeG/YdBvQRYdpZXbF8BQ7L/
+         o79iFtMOjafOg2miq/BedqSClPASuA1wdr/eI6tB33osYepM5EOZz+LcSKdGX1imbCne
+         CdO5k0mkJNTdvBeIj/K7JZoKGSvqFN5j0OKuMNpbDXvwp2nVzQ9E9c6MiByWCcAjMIyy
+         kOcA==
+X-Gm-Message-State: AO0yUKWzMbkuw6zPu77nBdQ3DSv4GpYTUHW39X2T2MyCRITbfMT0UDVw
+        m+lZceDJbdWAoYY7k/tIwj4LWmDdKxj1
+X-Google-Smtp-Source: AK7set9+pwIHjUmTzegfYqJtFYn4WPGCr8+F8UytIIsEIUtLVGJJqFThSJnKjIIm/t+eJf1Eguz4Y1BA7na7
 X-Received: from sweer.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:e45])
- (user=bgardon job=sendgmr) by 2002:aa7:9f51:0:b0:58b:c29a:87a6 with SMTP id
- h17-20020aa79f51000000b0058bc29a87a6mr1724887pfr.13.1675362500951; Thu, 02
- Feb 2023 10:28:20 -0800 (PST)
-Date:   Thu,  2 Feb 2023 18:27:54 +0000
+ (user=bgardon job=sendgmr) by 2002:a17:90a:be0e:b0:22c:305a:4da3 with SMTP id
+ a14-20020a17090abe0e00b0022c305a4da3mr809032pjs.74.1675362504523; Thu, 02 Feb
+ 2023 10:28:24 -0800 (PST)
+Date:   Thu,  2 Feb 2023 18:27:56 +0000
 In-Reply-To: <20230202182809.1929122-1-bgardon@google.com>
 Mime-Version: 1.0
 References: <20230202182809.1929122-1-bgardon@google.com>
 X-Mailer: git-send-email 2.39.1.519.gcb327c4b5f-goog
-Message-ID: <20230202182809.1929122-7-bgardon@google.com>
-Subject: [PATCH 06/21] KVM: x86/mmu: Get rid of is_cpuid_PSE36()
+Message-ID: <20230202182809.1929122-9-bgardon@google.com>
+Subject: [PATCH 08/21] KVM: x86/MMU: Expose functions for paging_tmpl.h
 From:   Ben Gardon <bgardon@google.com>
 To:     linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Cc:     Paolo Bonzini <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
@@ -71,64 +71,213 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-is_cpuid_PSE36() always returns 1 and is never overridden, so just get
-rid of the function. This saves having to export it in a future commit
-in order to move the include of paging_tmpl.h out of mmu.c.
+In preparation for moving paging_tmpl.h to shadow_mmu.c, expose various
+functions it needs through mmu_internal.h. This includes moving all the
+BUILD_MMU_ROLE_*() macros. Not all of those macros are strictly needed
+by paging_tmpl.h, but it is cleaner to keep them together.
 
 No functional change intended.
 
-Suggested-by: David Matlack <dmatlack@google.com>
-
 Signed-off-by: Ben Gardon <bgardon@google.com>
 ---
- arch/x86/kvm/mmu/mmu.c         | 13 ++-----------
- arch/x86/kvm/mmu/paging_tmpl.h |  2 +-
- 2 files changed, 3 insertions(+), 12 deletions(-)
+ arch/x86/kvm/mmu/mmu.c          | 68 +++++----------------------------
+ arch/x86/kvm/mmu/mmu_internal.h | 59 ++++++++++++++++++++++++++++
+ 2 files changed, 68 insertions(+), 59 deletions(-)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 12d38a8772a80..35cb59737c0a3 100644
+index 2162dfda9601f..da290bfca0137 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -304,11 +304,6 @@ static bool check_mmio_spte(struct kvm_vcpu *vcpu, u64 spte)
- 	return likely(kvm_gen == spte_gen);
+@@ -123,57 +123,9 @@ struct kmem_cache *pte_list_desc_cache;
+ struct kmem_cache *mmu_page_header_cache;
+ struct percpu_counter kvm_total_used_mmu_pages;
+ 
+-struct kvm_mmu_role_regs {
+-	const unsigned long cr0;
+-	const unsigned long cr4;
+-	const u64 efer;
+-};
+-
+ #define CREATE_TRACE_POINTS
+ #include "mmutrace.h"
+ 
+-/*
+- * Yes, lot's of underscores.  They're a hint that you probably shouldn't be
+- * reading from the role_regs.  Once the root_role is constructed, it becomes
+- * the single source of truth for the MMU's state.
+- */
+-#define BUILD_MMU_ROLE_REGS_ACCESSOR(reg, name, flag)			\
+-static inline bool __maybe_unused					\
+-____is_##reg##_##name(const struct kvm_mmu_role_regs *regs)		\
+-{									\
+-	return !!(regs->reg & flag);					\
+-}
+-BUILD_MMU_ROLE_REGS_ACCESSOR(cr0, pg, X86_CR0_PG);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(cr0, wp, X86_CR0_WP);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, pse, X86_CR4_PSE);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, pae, X86_CR4_PAE);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, smep, X86_CR4_SMEP);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, smap, X86_CR4_SMAP);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, pke, X86_CR4_PKE);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, la57, X86_CR4_LA57);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(efer, nx, EFER_NX);
+-BUILD_MMU_ROLE_REGS_ACCESSOR(efer, lma, EFER_LMA);
+-
+-/*
+- * The MMU itself (with a valid role) is the single source of truth for the
+- * MMU.  Do not use the regs used to build the MMU/role, nor the vCPU.  The
+- * regs don't account for dependencies, e.g. clearing CR4 bits if CR0.PG=1,
+- * and the vCPU may be incorrect/irrelevant.
+- */
+-#define BUILD_MMU_ROLE_ACCESSOR(base_or_ext, reg, name)		\
+-static inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
+-{								\
+-	return !!(mmu->cpu_role. base_or_ext . reg##_##name);	\
+-}
+-BUILD_MMU_ROLE_ACCESSOR(base, cr0, wp);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smep);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
+-BUILD_MMU_ROLE_ACCESSOR(base, efer, nx);
+-BUILD_MMU_ROLE_ACCESSOR(ext,  efer, lma);
+-
+ static inline bool is_cr0_pg(struct kvm_mmu *mmu)
+ {
+         return mmu->cpu_role.base.level > 0;
+@@ -218,7 +170,7 @@ void kvm_flush_remote_tlbs_with_address(struct kvm *kvm,
+ 	kvm_flush_remote_tlbs_with_range(kvm, &range);
  }
  
--static int is_cpuid_PSE36(void)
--{
--	return 1;
--}
--
- #ifdef CONFIG_X86_64
- static void __set_spte(u64 *sptep, u64 spte)
+-static gfn_t get_mmio_spte_gfn(u64 spte)
++gfn_t get_mmio_spte_gfn(u64 spte)
  {
-@@ -4661,12 +4656,8 @@ static void __reset_rsvds_bits_mask(struct rsvd_bits_validate *rsvd_check,
- 			break;
- 		}
+ 	u64 gpa = spte & shadow_nonpresent_or_rsvd_lower_gfn_mask;
  
--		if (is_cpuid_PSE36())
--			/* 36bits PSE 4MB page */
--			rsvd_check->rsvd_bits_mask[1][1] = rsvd_bits(17, 21);
--		else
--			/* 32 bits PSE 4MB page */
--			rsvd_check->rsvd_bits_mask[1][1] = rsvd_bits(13, 21);
-+		/* 36bits PSE 4MB page */
-+		rsvd_check->rsvd_bits_mask[1][1] = rsvd_bits(17, 21);
- 		break;
- 	case PT32E_ROOT_LEVEL:
- 		rsvd_check->rsvd_bits_mask[0][2] = rsvd_bits(63, 63) |
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index e5662dbd519c4..730b413eebfde 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -426,7 +426,7 @@ static int FNAME(walk_addr_generic)(struct guest_walker *walker,
- 	gfn += (addr & PT_LVL_OFFSET_MASK(walker->level)) >> PAGE_SHIFT;
+@@ -287,7 +239,7 @@ void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu)
+ 	}
+ }
  
- #if PTTYPE == 32
--	if (walker->level > PG_LEVEL_4K && is_cpuid_PSE36())
-+	if (walker->level > PG_LEVEL_4K)
- 		gfn += pse36_gfn_delta(pte);
- #endif
+-static int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
++int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect)
+ {
+ 	int r;
  
+@@ -828,9 +780,8 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 	return -EFAULT;
+ }
+ 
+-static int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu,
+-				   struct kvm_page_fault *fault,
+-				   unsigned int access)
++int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++			    unsigned int access)
+ {
+ 	gva_t gva = fault->is_tdp ? 0 : fault->addr;
+ 
+@@ -1284,8 +1235,8 @@ static int handle_mmio_page_fault(struct kvm_vcpu *vcpu, u64 addr, bool direct)
+ 	return RET_PF_RETRY;
+ }
+ 
+-static bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
+-					 struct kvm_page_fault *fault)
++bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
++				  struct kvm_page_fault *fault)
+ {
+ 	if (unlikely(fault->rsvd))
+ 		return false;
+@@ -1408,8 +1359,8 @@ static int __kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
+ 	return RET_PF_CONTINUE;
+ }
+ 
+-static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+-			   unsigned int access)
++int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++		    unsigned int access)
+ {
+ 	int ret;
+ 
+@@ -1433,8 +1384,7 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+  * Returns true if the page fault is stale and needs to be retried, i.e. if the
+  * root was invalidated by a memslot update or a relevant mmu_notifier fired.
+  */
+-static bool is_page_fault_stale(struct kvm_vcpu *vcpu,
+-				struct kvm_page_fault *fault)
++bool is_page_fault_stale(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ {
+ 	struct kvm_mmu_page *sp = to_shadow_page(vcpu->arch.mmu->root.hpa);
+ 
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index 9c1399762496b..349d4a300ad34 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -347,6 +347,65 @@ bool is_obsolete_sp(struct kvm *kvm, struct kvm_mmu_page *sp);
+ void walk_shadow_page_lockless_begin(struct kvm_vcpu *vcpu);
+ void walk_shadow_page_lockless_end(struct kvm_vcpu *vcpu);
+ 
++int mmu_topup_memory_caches(struct kvm_vcpu *vcpu, bool maybe_indirect);
+ bool need_topup_split_caches_or_resched(struct kvm *kvm);
+ int topup_split_caches(struct kvm *kvm);
++
++bool is_page_fault_stale(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault);
++bool page_fault_handle_page_track(struct kvm_vcpu *vcpu,
++				  struct kvm_page_fault *fault);
++int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++		    unsigned int access);
++int kvm_handle_noslot_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
++			    unsigned int access);
++
++gfn_t get_mmio_spte_gfn(u64 spte);
++
++struct kvm_mmu_role_regs {
++	const unsigned long cr0;
++	const unsigned long cr4;
++	const u64 efer;
++};
++
++/*
++ * Yes, lot's of underscores.  They're a hint that you probably shouldn't be
++ * reading from the role_regs.  Once the root_role is constructed, it becomes
++ * the single source of truth for the MMU's state.
++ */
++#define BUILD_MMU_ROLE_REGS_ACCESSOR(reg, name, flag)			\
++static inline bool __maybe_unused					\
++____is_##reg##_##name(const struct kvm_mmu_role_regs *regs)		\
++{									\
++	return !!(regs->reg & flag);					\
++}
++BUILD_MMU_ROLE_REGS_ACCESSOR(cr0, pg, X86_CR0_PG);
++BUILD_MMU_ROLE_REGS_ACCESSOR(cr0, wp, X86_CR0_WP);
++BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, pse, X86_CR4_PSE);
++BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, pae, X86_CR4_PAE);
++BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, smep, X86_CR4_SMEP);
++BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, smap, X86_CR4_SMAP);
++BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, pke, X86_CR4_PKE);
++BUILD_MMU_ROLE_REGS_ACCESSOR(cr4, la57, X86_CR4_LA57);
++BUILD_MMU_ROLE_REGS_ACCESSOR(efer, nx, EFER_NX);
++BUILD_MMU_ROLE_REGS_ACCESSOR(efer, lma, EFER_LMA);
++
++/*
++ * The MMU itself (with a valid role) is the single source of truth for the
++ * MMU.  Do not use the regs used to build the MMU/role, nor the vCPU.  The
++ * regs don't account for dependencies, e.g. clearing CR4 bits if CR0.PG=1,
++ * and the vCPU may be incorrect/irrelevant.
++ */
++#define BUILD_MMU_ROLE_ACCESSOR(base_or_ext, reg, name)		\
++static inline bool __maybe_unused is_##reg##_##name(struct kvm_mmu *mmu)	\
++{								\
++	return !!(mmu->cpu_role. base_or_ext . reg##_##name);	\
++}
++BUILD_MMU_ROLE_ACCESSOR(base, cr0, wp);
++BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pse);
++BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smep);
++BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, smap);
++BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, pke);
++BUILD_MMU_ROLE_ACCESSOR(ext,  cr4, la57);
++BUILD_MMU_ROLE_ACCESSOR(base, efer, nx);
++BUILD_MMU_ROLE_ACCESSOR(ext,  efer, lma);
+ #endif /* __KVM_X86_MMU_INTERNAL_H */
 -- 
 2.39.1.519.gcb327c4b5f-goog
 
