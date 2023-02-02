@@ -2,159 +2,134 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 11A34687DA9
-	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 13:44:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 2512B687DE9
+	for <lists+kvm@lfdr.de>; Thu,  2 Feb 2023 13:52:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231751AbjBBMo1 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Thu, 2 Feb 2023 07:44:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43038 "EHLO
+        id S231698AbjBBMw5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Thu, 2 Feb 2023 07:52:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230496AbjBBMoX (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Thu, 2 Feb 2023 07:44:23 -0500
-Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5DC6EA6
-        for <kvm@vger.kernel.org>; Thu,  2 Feb 2023 04:43:51 -0800 (PST)
-Received: from [167.98.27.226] (helo=lawrence-thinkpad.office.codethink.co.uk)
-        by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
-        id 1pNYvK-004Q6t-HL; Thu, 02 Feb 2023 12:42:43 +0000
-From:   Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-To:     qemu-devel@nongnu.org
-Cc:     dickon.hood@codethink.co.uk, nazar.kazakov@codethink.co.uk,
-        kiran.ostrolenk@codethink.co.uk, frank.chang@sifive.com,
-        palmer@dabbelt.com, alistair.francis@wdc.com,
-        bin.meng@windriver.com, pbonzini@redhat.com,
-        philipp.tomsich@vrull.eu, kvm@vger.kernel.org,
-        Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Subject: [PATCH 29/39]  target/riscv: Add vsm3me.vv decoding, translation and execution support
-Date:   Thu,  2 Feb 2023 12:42:20 +0000
-Message-Id: <20230202124230.295997-30-lawrence.hunter@codethink.co.uk>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230202124230.295997-1-lawrence.hunter@codethink.co.uk>
-References: <20230202124230.295997-1-lawrence.hunter@codethink.co.uk>
+        with ESMTP id S229666AbjBBMwz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Thu, 2 Feb 2023 07:52:55 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35D55A7;
+        Thu,  2 Feb 2023 04:52:55 -0800 (PST)
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 312C3gva028808;
+        Thu, 2 Feb 2023 12:52:51 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=fOUMm9vaY0LQvEz1no9qV2e22/3sAj99TdI12zctCso=;
+ b=aau+3DPTkYLZrJ/MhHlt00lxqX2MoJ77BRl4qNyWYi07HHFJcvyTggz/FyKIWXnWdLTZ
+ yNlhiyrBWIfQGLr71pnvFPY6m53gUd0CZIIeG9pdf7cGI7oHPDybVHN10ePkQRXxZZd4
+ ocWQ0dVDv/387PU74Aa2PgXi5wuMaT53mjNya4R4QCMGEBZTn/jkK/OAx/5tAx8Lcg/K
+ bMAX0ZCf0R6TWUOFaxQuh45FDCC5BP0so6OFSwwmMvEkiDO+81Y5T3Cn6jsKBwUXJMxH
+ ZBQCqhQT72b9qi9Ke/NOruwJtuK+ZEpUqt7KHjOqRKTVQ3X5YqwH4r9uiG4vChFnVdWK oQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ng78h1bqs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 12:52:51 +0000
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 312BJxOq019471;
+        Thu, 2 Feb 2023 12:52:50 GMT
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3ng78h1bq9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 12:52:50 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 312A1TJN006508;
+        Thu, 2 Feb 2023 12:52:49 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([9.208.129.113])
+        by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3ncvtmt8tf-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 02 Feb 2023 12:52:49 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+        by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 312CqlVL12321518
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 2 Feb 2023 12:52:47 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 29E4B58053;
+        Thu,  2 Feb 2023 12:52:47 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C61315805D;
+        Thu,  2 Feb 2023 12:52:44 +0000 (GMT)
+Received: from [9.65.253.123] (unknown [9.65.253.123])
+        by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+        Thu,  2 Feb 2023 12:52:44 +0000 (GMT)
+Message-ID: <ee256360-b35b-55c1-d25b-b7abb065df3a@linux.ibm.com>
+Date:   Thu, 2 Feb 2023 07:52:44 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-        SPF_PASS,URI_NOVOWEL autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.0
+Subject: Re: [PATCH v2] vfio: fix deadlock between group lock and kvm lock
+To:     "Tian, Kevin" <kevin.tian@intel.com>,
+        Alex Williamson <alex.williamson@redhat.com>
+Cc:     "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "Liu, Yi L" <yi.l.liu@intel.com>,
+        "jgg@nvidia.com" <jgg@nvidia.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "farman@linux.ibm.com" <farman@linux.ibm.com>,
+        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
+        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
+        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
+        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
+        "david@redhat.com" <david@redhat.com>,
+        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
+        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
+        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
+        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
+        "Wang, Zhi A" <zhi.a.wang@intel.com>,
+        "Christopherson, , Sean" <seanjc@google.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "intel-gvt-dev@lists.freedesktop.org" 
+        <intel-gvt-dev@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20230201192010.42748-1-mjrosato@linux.ibm.com>
+ <20230201162730.685b5332.alex.williamson@redhat.com>
+ <BN9PR11MB5276B8F3F6735FF2616128868CD69@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Language: en-US
+From:   Matthew Rosato <mjrosato@linux.ibm.com>
+In-Reply-To: <BN9PR11MB5276B8F3F6735FF2616128868CD69@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: XcjC1Kt46PxL2S8wVIGhF-mMiGdE2aU3
+X-Proofpoint-ORIG-GUID: o81pid3WShnfEElUozHn3d2Sh9_qJ-gl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-02_04,2023-02-02_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=999 suspectscore=0 spamscore=0 priorityscore=1501
+ impostorscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0 bulkscore=0
+ phishscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302020112
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Co-authored-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
-Signed-off-by: Lawrence Hunter <lawrence.hunter@codethink.co.uk>
-Signed-off-by: Kiran Ostrolenk <kiran.ostrolenk@codethink.co.uk>
----
- target/riscv/helper.h                       |  2 +
- target/riscv/insn32.decode                  |  3 ++
- target/riscv/insn_trans/trans_rvzvksh.c.inc | 12 ++++++
- target/riscv/translate.c                    |  1 +
- target/riscv/vcrypto_helper.c               | 43 +++++++++++++++++++++
- 5 files changed, 61 insertions(+)
- create mode 100644 target/riscv/insn_trans/trans_rvzvksh.c.inc
+On 2/1/23 11:10 PM, Tian, Kevin wrote:
+>> From: Alex Williamson <alex.williamson@redhat.com>
+>> Sent: Thursday, February 2, 2023 7:28 AM
+>>>
+>>> +#ifdef CONFIG_HAVE_KVM
+>>> +static bool vfio_kvm_get_kvm_safe(struct vfio_device *device, struct kvm
+>> *kvm)
+>>
+>> I'm tempted to name these vfio_device_get_kvm_safe() and only pass the
+>> vfio_device, where of course we can get the kvm pointer from the group
+>> internally.
+>>
+> 
+> I have a different thought. In the end the cdev series also need the similar
+> safe get/put logic then it's better to keep it in vfio_main.c called by
+> the group/cdev path individually.
 
-diff --git a/target/riscv/helper.h b/target/riscv/helper.h
-index 911270c387..36e0d8eff3 100644
---- a/target/riscv/helper.h
-+++ b/target/riscv/helper.h
-@@ -1196,3 +1196,5 @@ DEF_HELPER_5(vaeskf2_vi, void, ptr, ptr, i32, env, i32)
- DEF_HELPER_5(vsha2ms_vv, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vsha2ch_vv, void, ptr, ptr, ptr, env, i32)
- DEF_HELPER_5(vsha2cl_vv, void, ptr, ptr, ptr, env, i32)
-+
-+DEF_HELPER_5(vsm3me_vv, void, ptr, ptr, ptr, env, i32)
-diff --git a/target/riscv/insn32.decode b/target/riscv/insn32.decode
-index 2387bc179c..671614e354 100644
---- a/target/riscv/insn32.decode
-+++ b/target/riscv/insn32.decode
-@@ -926,3 +926,6 @@ vaeskf2_vi      101010 1 ..... ..... 010 ..... 1110111 @r_vm_1
- vsha2ms_vv      101101 1 ..... ..... 010 ..... 1110111 @r_vm_1
- vsha2ch_vv      101110 1 ..... ..... 010 ..... 1110111 @r_vm_1
- vsha2cl_vv      101111 1 ..... ..... 010 ..... 1110111 @r_vm_1
-+
-+# *** RV64 Zvksh vector crypto extensions ***
-+vsm3me_vv       100000 1 ..... ..... 010 ..... 1110111 @r_vm_1
-diff --git a/target/riscv/insn_trans/trans_rvzvksh.c.inc b/target/riscv/insn_trans/trans_rvzvksh.c.inc
-new file mode 100644
-index 0000000000..ad7105b3ed
---- /dev/null
-+++ b/target/riscv/insn_trans/trans_rvzvksh.c.inc
-@@ -0,0 +1,12 @@
-+static inline bool vsm3_check(DisasContext *s)
-+{
-+    return s->cfg_ptr->ext_zvksh == true && vext_check_isa_ill(s) &&
-+           s->vstart % 8 == 0 && s->sew == MO_32;
-+}
-+
-+static inline bool vsm3me_check(DisasContext *s, arg_rmrr *a)
-+{
-+    return vsm3_check(s) && vext_check_sss(s, a->rd, a->rs1, a->rs2, a->vm);
-+}
-+
-+GEN_VV_UNMASKED_TRANS(vsm3me_vv, vsm3me_check)
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 924a89de9f..9ca2cec23a 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -1066,6 +1066,7 @@ static uint32_t opcode_at(DisasContextBase *dcbase, target_ulong pc)
- #include "insn_trans/trans_rvzvkb.c.inc"
- #include "insn_trans/trans_rvzvkns.c.inc"
- #include "insn_trans/trans_rvzvknh.c.inc"
-+#include "insn_trans/trans_rvzvksh.c.inc"
- #include "insn_trans/trans_privileged.c.inc"
- #include "insn_trans/trans_svinval.c.inc"
- #include "insn_trans/trans_xventanacondops.c.inc"
-diff --git a/target/riscv/vcrypto_helper.c b/target/riscv/vcrypto_helper.c
-index b73581641a..4dd5920aa4 100644
---- a/target/riscv/vcrypto_helper.c
-+++ b/target/riscv/vcrypto_helper.c
-@@ -694,3 +694,46 @@ void HELPER(vsha2cl_vv)(void *vd, void *vs1, void *vs2, CPURISCVState *env,
-     vext_set_elems_1s(vd, vta, env->vl * esz, total_elems * esz);
-     env->vstart = 0;
- }
-+
-+static inline uint32_t p1(uint32_t x)
-+{
-+    return (x) ^ rol32((x), 15) ^ rol32((x), 23);
-+}
-+
-+static inline uint32_t zvksh_w(uint32_t m16, uint32_t m9, uint32_t m3,
-+                               uint32_t m13, uint32_t m6)
-+{
-+    return p1(m16 ^ m9 ^ rol32(m3, 15)) ^ rol32(m13, 7) ^ m6;
-+}
-+
-+void HELPER(vsm3me_vv)(void *vd_vptr, void *vs1_vptr, void *vs2_vptr,
-+                       CPURISCVState *env, uint32_t desc)
-+{
-+    uint32_t esz = memop_size(FIELD_EX64(env->vtype, VTYPE, VSEW));
-+    uint32_t total_elems = vext_get_total_elems(env, desc, esz);
-+    uint32_t vta = vext_vta(desc);
-+    uint32_t *vd = vd_vptr;
-+    uint32_t *vs1 = vs1_vptr;
-+    uint32_t *vs2 = vs2_vptr;
-+
-+    if (env->vl % 8 != 0) {
-+        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-+    }
-+
-+    for (int i = env->vstart / 8; i < env->vl / 8; i++) {
-+        uint32_t w[24];
-+        for (int j = 0; j < 8; j++) {
-+            w[j] = bswap32(vs1[H4((i * 8) + j)]);
-+            w[j + 8] = bswap32(vs2[H4((i * 8) + j)]);
-+        }
-+        for (int j = 0; j < 8; j++) {
-+            w[j + 16] =
-+                zvksh_w(w[j], w[j + 7], w[j + 13], w[j + 3], w[j + 10]);
-+        }
-+        for (int j = 0; j < 8; j++) {
-+            vd[(i * 8) + j] = bswap32(w[H4(j + 16)]);
-+        }
-+    }
-+    vext_set_elems_1s(vd_vptr, vta, env->vl * esz, total_elems * esz);
-+    env->vstart = 0;
-+}
--- 
-2.39.1
-
+Ah, I hadn't considered the cdev series - OK, I can move the functions back into vfio_main and externalize both via drivers/vfio/vfio.h so they can be called from group.c for this fix and then available to vfio_main.c already for cdev.
