@@ -2,545 +2,139 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id A39B568A07E
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 18:37:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 31FF668A087
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 18:41:29 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233572AbjBCRho (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 12:37:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43956 "EHLO
+        id S232949AbjBCRl2 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 12:41:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233362AbjBCRhh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 12:37:37 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C0E8AD31B
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 09:37:11 -0800 (PST)
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 313HJbKq023559;
-        Fri, 3 Feb 2023 17:36:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=kpjxDO/dTi41LOvduKvUNsHDQMJtxn8SyIun1RA7Fd8=;
- b=saEKIIUFhAyobgTw0tMcGVkkq8LBqzsUNsG+yWafXm3Z/bJttBQLTdk2DsAQSd80QjM1
- 4mphRKITb0txRa8Ex+90mitUjARwvtS/jWyUEOIS5nk08Y5nwikO4gavwW6WloHFX1RI
- /oYpg2D7gtX5+Fa5IK1CLsuCsrZNyzXZhHkobBvcnwSeQ93m4VGjLEEjDIz1rZK5BgT/
- GOSL0SepOpFS3BVE/Uu4Gl2HzMRlWFDQnZ+KTjUpMhDLi2qGpf2/bi8PFt/Io4MsUg0q
- N1HQpi4fXNICnm8Bb0W5xAY3vFb0OCSYovE9XyzhiuoV7NuiJ0ws4bHZu2JriaerrRdw ZQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nh6jrgdey-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 17:36:50 +0000
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 313HRvcQ014450;
-        Fri, 3 Feb 2023 17:36:50 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nh6jrgdd3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 17:36:49 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 312H2fjE012974;
-        Fri, 3 Feb 2023 17:36:47 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-        by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3ncvt7ng46-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 17:36:47 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-        by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 313HahnG22282906
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Feb 2023 17:36:43 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9C8EE20043;
-        Fri,  3 Feb 2023 17:36:43 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D8E120040;
-        Fri,  3 Feb 2023 17:36:43 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.195.237])
-        by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Feb 2023 17:36:43 +0000 (GMT)
-Message-ID: <7785ea2cb7530647fcc38321d81745ce16f8055f.camel@linux.ibm.com>
-Subject: Re: [PATCH v15 03/11] target/s390x/cpu topology: handle STSI(15)
- and build the SYSIB
-From:   Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-To:     Pierre Morel <pmorel@linux.ibm.com>, qemu-s390x@nongnu.org
-Cc:     qemu-devel@nongnu.org, borntraeger@de.ibm.com, pasic@linux.ibm.com,
-        richard.henderson@linaro.org, david@redhat.com, thuth@redhat.com,
-        cohuck@redhat.com, mst@redhat.com, pbonzini@redhat.com,
-        kvm@vger.kernel.org, ehabkost@redhat.com,
-        marcel.apfelbaum@gmail.com, eblake@redhat.com, armbru@redhat.com,
-        seiden@linux.ibm.com, nrb@linux.ibm.com, frankja@linux.ibm.com,
-        berrange@redhat.com, clg@kaod.org
-Date:   Fri, 03 Feb 2023 18:36:43 +0100
-In-Reply-To: <20230201132051.126868-4-pmorel@linux.ibm.com>
-References: <20230201132051.126868-1-pmorel@linux.ibm.com>
-         <20230201132051.126868-4-pmorel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S231526AbjBCRl0 (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 12:41:26 -0500
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2046.outbound.protection.outlook.com [40.107.102.46])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D455B2125
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 09:41:25 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b5tlfV4QuXHJxcIIH6L8aHaZvOK6hm3AkbtVNjYoe2+r63qWNU/PJBesKHW+gYjvGZgsuS58H/AdrrCHndJ6Oibvs/M19uqSrG5Sze+pzxOIOcqxI5Uu59X5I0vttdqkw0b3aaYt5tS7BlvfFUmsjxCTThPJ97j20np7KRHLwhSP/8EuQDYe5s9hCouceZyt+gqI7nFbEN7DU9e9/fGeWy+oeXQskx34fjwWntXO2K0blMdfsUono8h1ZZ0T6dhWFQaTGp9uGXzPLR9u/7UlbamNA/4rLOb/ROZ4pV/UkST7h2ZdhiE+9mTy5bZbsYhVnhkDAePZiofbMWP6yAVrPQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=T9tJRIajPhbRlCIDevAJjZf/OMV57IRh1NDB4Y+N9VY=;
+ b=lJk2MnuAuiiVFB5Ka4MhpZYUGUFg41pITqMVAeTt/ErA/7fdXSUYs9yCoUotq5bcHg+ZztTPRAZ8DOooGZvGeBPbfHY9iXwt8MdxkT+KFCQD7m5dIH8zVlHdP9LaFfp2ViTst5X/QaGL5q/pY6dzs0rmzLVInBWv6u18h1zBqFJeK8PKgjjRVsAnsNGWD/w2Z5Hovy9M46Q/0vko1NQmwRPhDAopIHxC8+BAOjQrUMYAxHdQSX+kPHE2dW/Ru0Wp9KILRdsLQE6t9j4tje9sTfSSoPvrJh8Qcp6k0rY+hla2GnuoubO7/V+epyHmOjl9WAptgbwbt2ux1yzlvmAUrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T9tJRIajPhbRlCIDevAJjZf/OMV57IRh1NDB4Y+N9VY=;
+ b=EE9pLTDm6PiJdUf31gfytNhXqPWf2pQW519XvjeZYgo0CY2d065wiOL9w7GPf6n1NXlCRV/cinFJBwJERPi3k20fXYOIYC9VO0e/lDnebbCtNl6fpPqwLs32Ud6Z2M2eZTje9mlYlU6dlNZaNue5h691FryZHJs5PMKPqfF/+MEmgUbkBpq7A6vn2Ufvjtei7W9ksB66Zn5CUl5zblRbAYdwK2wvh4WufwT7TDHY6WrcnpVbUtS6nj0j/9jF2AmN/KHW2onJbtNlJV33k/o/cIALzUJ+DNy2o60W+m7HosZwfPd1TxcCJlIVgkvLEfZk484uzns6az6Wu9anaP7ShQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by CH3PR12MB8188.namprd12.prod.outlook.com (2603:10b6:610:120::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6064.27; Fri, 3 Feb
+ 2023 17:41:22 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::3cb3:2fce:5c8f:82ee%4]) with mapi id 15.20.6064.031; Fri, 3 Feb 2023
+ 17:41:22 +0000
+Date:   Fri, 3 Feb 2023 13:41:21 -0400
+From:   Jason Gunthorpe <jgg@nvidia.com>
+To:     "Liu, Yi L" <yi.l.liu@intel.com>
+Cc:     Alex Williamson <alex.williamson@redhat.com>,
+        "Tian, Kevin" <kevin.tian@intel.com>,
+        "cohuck@redhat.com" <cohuck@redhat.com>,
+        "eric.auger@redhat.com" <eric.auger@redhat.com>,
+        "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "mjrosato@linux.ibm.com" <mjrosato@linux.ibm.com>,
+        "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
+        "yi.y.sun@linux.intel.com" <yi.y.sun@linux.intel.com>,
+        "peterx@redhat.com" <peterx@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "suravee.suthikulpanit@amd.com" <suravee.suthikulpanit@amd.com>
+Subject: Re: [PATCH 10/13] vfio: Make vfio_device_open() exclusive between
+ group path and device cdev path
+Message-ID: <Y91HQUFrY5jbwoHF@nvidia.com>
+References: <20230117134942.101112-1-yi.l.liu@intel.com>
+ <20230117134942.101112-11-yi.l.liu@intel.com>
+ <20230119165157.5de95216.alex.williamson@redhat.com>
+ <DS0PR11MB752933F8C5D72473FE9FF5EEC3D39@DS0PR11MB7529.namprd11.prod.outlook.com>
+ <DS0PR11MB752960717017DFE7D2FB3AFBC3D69@DS0PR11MB7529.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DS0PR11MB752960717017DFE7D2FB3AFBC3D69@DS0PR11MB7529.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BLAPR03CA0147.namprd03.prod.outlook.com
+ (2603:10b6:208:32e::32) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: d3D216YdsY24a1F-bOoDpCbqUdi_UzfQ
-X-Proofpoint-ORIG-GUID: d0bnvfYklDGT8VdSXEzGhDHPfyWttXNb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-03_17,2023-02-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- malwarescore=0 clxscore=1015 impostorscore=0 mlxscore=0 suspectscore=0
- phishscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 priorityscore=1501
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302030157
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|CH3PR12MB8188:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47b72d0b-de60-4c52-fab4-08db060ddda2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Vtg3kJMrGXZX7pp169qvE6FTrweqvJd7ojtQTPPiiH1yRaPAPxJKkDx0dNw+XUpIWSkZ2aqUUnl/RQtBp35OPVaadSlRPvAH1SEjf8gy0xeA5hoc0+wmPDwvpU7ZpCrT0deL5knvakPhub8fMrEiuDOjr5yzF6LgeImsNSZAadHRfhJf8zZRAmX7mHnMep+UrJ8qJfGS5BbWYMjtOd9UhoQWnsRpvwW949yuqsz3cFq12At8riLa9eX1EiDQLCCkJEHYaFwFnSh5W5AFavEsmx9kPnKuafxEWRWmPeONp5FmVTL53KrfRzxjrIx8/niVc0MyN/pV+2+kLVLRR/akbi7TVCzDLOYBQFvPTHytdHPvvIzEWSgFtw7SNcAbuvaum3NHN4Hc6VCYbjUsw41GXhOEnqHT63gYFPlM/YGRy+VzTPped76ucMfwzb5/33WnPdYJ9NLe9bwFabby7fOptRIlRQgpL5lRsA69MXkzNGF1comoGKPNbudXj1vZLxr8klmHVy5fBJCX5xAjblBQo0lKaDOx/czyX4kA3TQPISre/RLSKd0r6+3qomReAWGzLCf0E4MJuAt1FLGjT8MvMmMb7S1cs9SPlwnTlQys85rdp430E2E0tr33DIv8zn3h+j0eUbVGIBtmyKB48DqgHg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230025)(4636009)(396003)(376002)(39860400002)(346002)(136003)(366004)(451199018)(36756003)(86362001)(6486002)(8676002)(66476007)(7416002)(478600001)(4744005)(41300700001)(316002)(54906003)(5660300002)(66556008)(6916009)(2906002)(6512007)(66946007)(8936002)(4326008)(6506007)(38100700002)(186003)(2616005)(83380400001)(26005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?8wRgvH7B/sACXuDE4H02NFK/lhTC7BEhVA6n5R5hapIezcoqOR86Ofmp3Lsr?=
+ =?us-ascii?Q?REoKek4BCT/GWOP8i+1EFB3JjnTAdzqKwyOhptZ4nsw3mdaDXzuTQ2V5Ezy5?=
+ =?us-ascii?Q?kLR3WxDnOPfjsvDQ9GHl8v6wBaZlxEKvYC2pzRZQ/baSgwLu0w2MPB1gNsUe?=
+ =?us-ascii?Q?JqtwRT66meEtrXXARxvkYYdAr9N4oVVW90NKFwYYJkpOWlWrs7SWfrDqC5HH?=
+ =?us-ascii?Q?8LZTNJG7Ga8YhJxz70rbSk+kfOVuRayeoMNGzCh7RiFP2L4XKHxZuZj08V3p?=
+ =?us-ascii?Q?02RQk46BjrzDNO1lnm4hQsdr7lpn5+xqfKcBA8LX4xWeonqglbq6CFQ6u0r0?=
+ =?us-ascii?Q?q2gHmZ/jHvhfoeRRKYOjePlxLviGyLYftauQnq+byuGXh1OxPWvGvf499ISW?=
+ =?us-ascii?Q?5i3h+eqT6WTw6EbckuJ/gtX7IJSG+/01cPaAvrdLBoJGj+LzCc4LTob+zqRR?=
+ =?us-ascii?Q?J1B5+l8bqxgMdhM24aNohe//G6ptz04KLTIFXtNSVow+Zs5TcvlmBzosEraJ?=
+ =?us-ascii?Q?iWsMhawF+SshQLcZHPmvVXyESBGfsi+ZsFfR6oPZafB0q7ZZZIFPFQDN8TLq?=
+ =?us-ascii?Q?lR4URZV5HGT+CG0lXcr1cVwT+u0+ai+2Xl6RbXKBa3WOe20IX7Q4cTuZgibE?=
+ =?us-ascii?Q?SdpTnB4RomfqCDinc/zHAjKQ//bnZniYKypch7n4S4wPtBqPzYGsDc+0HEUM?=
+ =?us-ascii?Q?OHb5wFUdrGCCIirqoGfn0PMZUZg7Rkpg5T6EqBKoBQ87A7UiZh+0kMxlMyIF?=
+ =?us-ascii?Q?RdQhtpj2zdwMCzaBVrzFafyddPLM6faCbWYv1ITrz6hj7pU6+V+ZEjbR+UhV?=
+ =?us-ascii?Q?5F43mOtBajNhNf9w44FxHmExbVNUmxnKsu2wCmlmcuREK7OFVXAAiT5mgcdZ?=
+ =?us-ascii?Q?lkHzvjK5D29mRZXQKxUPUtmoFlaskg0Cc3uV/rpI+714nGXHvPCXPlAoGY/p?=
+ =?us-ascii?Q?FDWFFx93IxqWX9Q3wAYi6dAv81WOe7jYQGuoJGKOh4yboW0sebAOCnP6qoAl?=
+ =?us-ascii?Q?De5Zj51dYN2wBomUmqsNRcDRXrm0GlZIXI4Wtrkw+lCLg+NlD5MrXbPaUUf8?=
+ =?us-ascii?Q?UCORZ0baHGoykqTnNL9F2Se6/sdKQOQLVyoBHMhEIBJci9sgjgs6pVJXZfh1?=
+ =?us-ascii?Q?Od3Yfm+jqgxDxZdDHNl0Nt1cCe5I0NEGQCiQB2gFvlfTthWs7LQWMvykOBHH?=
+ =?us-ascii?Q?1IViJvS5ChQxmRe9BRE2E2Ka228NlIkRLk/YtYEFcitu6BQIA1PyvX+Glj68?=
+ =?us-ascii?Q?Y3dHDVmZX/WXVf89XBjI2EEj/BPqJRSQlfgazsHWG9xIIA4FiCDjGs0EVQPc?=
+ =?us-ascii?Q?hNSoN/DmCKWkEB24TLDQRqQBgDzOSsh9rcX23IRep0iCV1BiugNn2zzsMpIh?=
+ =?us-ascii?Q?i8LkHWSQDEuZt7QtngIZ7Mv/wq0zXmIDuE7jD2Ao+nTLUCBdjpqBQ7jhWPGk?=
+ =?us-ascii?Q?Gg9aY+7zJ3mpuN5FA7uiNZmSjwMmlOWm1cNuwoN5lX1x1kPzOt25t8b0ngUx?=
+ =?us-ascii?Q?FJ5d7O/VzmRn3k8JTlR//cAOuVceUddvfV+lbkX+VdfDVcuWkMG2DhQlw1Ol?=
+ =?us-ascii?Q?e7ZR9H73Z58lbITxc59RK8di8xp0Ua3l2daYE0gg?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47b72d0b-de60-4c52-fab4-08db060ddda2
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Feb 2023 17:41:22.7419
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: r5gH3J+QsCyBHi58he3YwrFo6UE8CypjfmPUSkMOqElIdQ5GLdlwkRO+s8eMgykf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8188
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+        RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE
+        autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Wed, 2023-02-01 at 14:20 +0100, Pierre Morel wrote:
-> > On interception of STSI(15.1.x) the System Information Block
-> > (SYSIB) is built from the list of pre-ordered topology entries.
-> >=20
-> > Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-> > ---
-> >  include/hw/s390x/cpu-topology.h |  22 +++
-> >  include/hw/s390x/sclp.h         |   1 +
-> >  target/s390x/cpu.h              |  72 +++++++
-> >  hw/s390x/cpu-topology.c         |  10 +
-> >  target/s390x/kvm/cpu_topology.c | 335 ++++++++++++++++++++++++++++++++
-> >  target/s390x/kvm/kvm.c          |   5 +-
-> >  target/s390x/kvm/meson.build    |   3 +-
-> >  7 files changed, 446 insertions(+), 2 deletions(-)
-> >  create mode 100644 target/s390x/kvm/cpu_topology.c
-> >=20
-[...]
-> >=20
-> > diff --git a/target/s390x/cpu.h b/target/s390x/cpu.h
-> > index d654267a71..e1f6925856 100644
-> > --- a/target/s390x/cpu.h
-> > +++ b/target/s390x/cpu.h
-[...]
-> > +
-> > +/* CPU type Topology List Entry */
-> > +typedef struct SysIBTl_cpu {
-> > +        uint8_t nl;
-> > +        uint8_t reserved0[3];
-> > +#define SYSIB_TLE_POLARITY_MASK 0x03
-> > +#define SYSIB_TLE_DEDICATED     0x04
-> > +        uint8_t entitlement;
+On Thu, Feb 02, 2023 at 05:34:15AM +0000, Liu, Yi L wrote:
 
-I would just call this flags, since it's multiple fields.
+> This seems to be ok. The group path will attach the group to an auto-allocated
+> iommu_domain, while the cdev path actually waits for userspace to
+> attach it to an IOAS. Userspace should take care of it. It should ensure
+> the devices in the same group should be attached to the same domain.
 
-> > +        uint8_t type;
-> > +        uint16_t origin;
-> > +        uint64_t mask;
-> > +} QEMU_PACKED QEMU_ALIGNED(8) SysIBTl_cpu;
-> > +QEMU_BUILD_BUG_ON(sizeof(SysIBTl_cpu) !=3D 16);
-> >=20
-> > +
-> >=20
-[...]
-> >  /**
-> > diff --git a/target/s390x/kvm/cpu_topology.c b/target/s390x/kvm/cpu_top=
-ology.c
-> > new file mode 100644
-> > index 0000000000..aba141fb66
-> > --- /dev/null
-> > +++ b/target/s390x/kvm/cpu_topology.c
-> >=20
-[...]
-> > +
-> > +/*
-> > + * Macro to check that the size of data after increment
-> > + * will not get bigger than the size of the SysIB.
-> > + */
-> > +#define SYSIB_GUARD(data, x) do {       \
-> > +        data +=3D x;                      \
-> > +        if (data  > sizeof(SysIB)) {    \
-> > +            return -ENOSPC;             \
+Aren't there problems when someone closes the group or device FD while
+the other one is still open though?
 
-I would go with ENOMEM here.
-
-> > +        }                               \
-> > +    } while (0)
-> > +
-> > +/**
-> > + * stsi_set_tle:
-> > + * @p: A pointer to the position of the first TLE
-> > + * @level: The nested level wanted by the guest
-> > + *
-> > + * Loop inside the s390_topology.list until the sentinelle entry
-
-s/sentinelle/sentinel/
-
-> > + * is found and for each entry:
-> > + *   - Check using SYSIB_GUARD() that the size of the SysIB is not
-> > + *     reached.
-> > + *   - Add all the container TLE needed for the level
-> > + *   - Add the CPU TLE.
-
-I'd focus more on *what* the function does instead of *how*.
-
-Fill the SYSIB with the topology information as described in the PoP,
-nesting containers as appropriate, with the maximum nesting limited by @lev=
-el.
-
-Or something similar.
-
-> > + *
-> > + * Return value:
-> > + * s390_top_set_level returns the size of the SysIB_15x after being
-
-You forgot to rename the function here, right?
-How about stsi_fill_topology_sysib or stsi_topology_fill_sysib, instead?
-
-> > + * filled with TLE on success.
-> > + * It returns -ENOSPC in the case we would overrun the end of the SysI=
-B.
-
-You would have to change to ENOMEM here than also.
-
-> > + */
-> > +static int stsi_set_tle(char *p, int level)
-> > +{
-> > +    S390TopologyEntry *entry;
-> > +    int last_drawer =3D -1;
-> > +    int last_book =3D -1;
-> > +    int last_socket =3D -1;
-> > +    int drawer_id =3D 0;
-> > +    int book_id =3D 0;
-> > +    int socket_id =3D 0;
-> > +    int n =3D sizeof(SysIB_151x);
-> > +
-> > +    QTAILQ_FOREACH(entry, &s390_topology.list, next) {
-> > +        int current_drawer =3D entry->id.drawer;
-> > +        int current_book =3D entry->id.book;
-> > +        int current_socket =3D entry->id.socket;
-
-This only saves two characters, so you could just use entry->id. ...
-
-> > +        bool drawer_change =3D last_drawer !=3D current_drawer;
-> > +        bool book_change =3D drawer_change || last_book !=3D current_b=
-ook;
-> > +        bool socket_change =3D book_change || last_socket !=3D current=
-_socket;
-
-... but keep it if it would make this line too long.
-You could also rename entry, to current or cur, if you want to emphasize th=
-at.
-
-> > +
-> > +        /* If we reach the guard get out */
-> > +        if (entry->id.level5) {
-> > +            break;
-> > +        }
-> > +
-> > +        if (level > 3 && drawer_change) {
-> > +            SYSIB_GUARD(n, sizeof(SysIBTl_container));
-> > +            p =3D fill_container(p, 3, drawer_id++);
-> > +            book_id =3D 0;
-> > +        }
-> > +        if (level > 2 && book_change) {
-> > +            SYSIB_GUARD(n, sizeof(SysIBTl_container));
-> > +            p =3D fill_container(p, 2, book_id++);
-> > +            socket_id =3D 0;
-> > +        }
-> > +        if (socket_change) {
-> > +            SYSIB_GUARD(n, sizeof(SysIBTl_container));
-> > +            p =3D fill_container(p, 1, socket_id++);
-> > +        }
-> > +
-> > +        SYSIB_GUARD(n, sizeof(SysIBTl_cpu));
-> > +        p =3D fill_tle_cpu(p, entry);
-> > +        last_drawer =3D entry->id.drawer;
-> > +        last_book =3D entry->id.book;
-> > +        last_socket =3D entry->id.socket;
-> > +    }
-> > +
-> > +    return n;
-> > +}
-> > +
-> > +/**
-> > + * setup_stsi:
-> > + * sysib: pointer to a SysIB to be filled with SysIB_151x data
-> > + * level: Nested level specified by the guest
-> > + *
-> > + * Setup the SysIB_151x header before calling stsi_set_tle with
-> > + * a pointer to the first TLE entry.
-
-Same thing here with regards to describing the what.
-
-Setup the SYSIB for STSI 15.1, the header as well as the description
-of the topology.
-
-> > + */
-> > +static int setup_stsi(SysIB_151x *sysib, int level)
-> > +{
-> > +    sysib->mnest =3D level;
-> > +    switch (level) {
-> > +    case 4:
-> > +        sysib->mag[S390_TOPOLOGY_MAG4] =3D current_machine->smp.drawer=
-s;
-> > +        sysib->mag[S390_TOPOLOGY_MAG3] =3D current_machine->smp.books;
-> > +        sysib->mag[S390_TOPOLOGY_MAG2] =3D current_machine->smp.socket=
-s;
-> > +        sysib->mag[S390_TOPOLOGY_MAG1] =3D current_machine->smp.cores;
-> > +        break;
-> > +    case 3:
-> > +        sysib->mag[S390_TOPOLOGY_MAG3] =3D current_machine->smp.drawer=
-s *
-> > +                                         current_machine->smp.books;
-> > +        sysib->mag[S390_TOPOLOGY_MAG2] =3D current_machine->smp.socket=
-s;
-> > +        sysib->mag[S390_TOPOLOGY_MAG1] =3D current_machine->smp.cores;
-> > +        break;
-> > +    case 2:
-> > +        sysib->mag[S390_TOPOLOGY_MAG2] =3D current_machine->smp.drawer=
-s *
-> > +                                         current_machine->smp.books *
-> > +                                         current_machine->smp.sockets;
-> > +        sysib->mag[S390_TOPOLOGY_MAG1] =3D current_machine->smp.cores;
-> > +        break;
-> > +    }
-> > +
-> > +    return stsi_set_tle(sysib->tle, level);
-> > +}
-> > +
-> > +/**
-> > + * s390_topology_add_cpu_to_entry:
-> > + * @entry: Topology entry to setup
-> > + * @cpu: the S390CPU to add
-> > + *
-> > + * Set the core bit inside the topology mask and
-> > + * increments the number of cores for the socket.
-> > + */
-> > +static void s390_topology_add_cpu_to_entry(S390TopologyEntry *entry,
-> > +                                           S390CPU *cpu)
-> > +{
-> > +    set_bit(63 - (cpu->env.core_id % 64), &entry->mask);
-> > +}
-> > +
-> > +/**
-> > + * s390_topology_new_entry:
-> > + * @id: s390_topology_id to add
-> > + * @cpu: the S390CPU to add
-> > + *
-> > + * Allocate a new entry and initialize it.
-> > + *
-> > + * returns the newly allocated entry.
-> > + */
-> > +static S390TopologyEntry *s390_topology_new_entry(s390_topology_id id,
-> > +                                                  S390CPU *cpu)
-
-This is used only once, right?
-I think I'd go ahead and inline it into s390_topology_insert, since I had
-to go back and check if new_entry calls add_cpu when reading s390_topology_=
-insert.
-
-> > +{
-> > +    S390TopologyEntry *entry;
-> > +
-> > +    entry =3D g_malloc0(sizeof(S390TopologyEntry));
-> > +    entry->id.id =3D id.id;
-> > +    s390_topology_add_cpu_to_entry(entry, cpu);
-> > +
-> > +    return entry;
-> > +}
-> > +
-> > +/**
-> > + * s390_topology_from_cpu:
-> > + * @cpu: The S390CPU
-> > + *
-> > + * Initialize the topology id from the CPU environment.
-> > + */
-> > +static s390_topology_id s390_topology_from_cpu(S390CPU *cpu)
-> > +{
-> > +    s390_topology_id topology_id =3D {0};
-> > +
-> > +    topology_id.drawer =3D cpu->env.drawer_id;
-> > +    topology_id.book =3D cpu->env.book_id;
-> > +    topology_id.socket =3D cpu->env.socket_id;
-> > +    topology_id.origin =3D cpu->env.core_id / 64;
-> > +    topology_id.type =3D S390_TOPOLOGY_CPU_IFL;
-> > +    topology_id.dedicated =3D cpu->env.dedicated;
-> > +
-> > +    if (s390_topology.polarity =3D=3D POLARITY_VERTICAL) {
-> > +        /*
-> > +         * Vertical polarity with dedicated CPU implies
-> > +         * vertical high entitlement.
-> > +         */
-> > +        if (topology_id.dedicated) {
-> > +            topology_id.polarity |=3D POLARITY_VERTICAL_HIGH;
-> > +        } else {
-> > +            topology_id.polarity |=3D cpu->env.entitlement;
-> > +        }
-> > +    }
-> > +
-> > +    return topology_id;
-> > +}
-> > +
-> > +/**
-> > + * s390_topology_insert:
-> > + * @cpu: s390CPU insert.
-> > + *
-> > + * Parse the topology list to find if the entry already
-> > + * exist and add the core in it.
-> > + * If it does not exist, allocate a new entry and insert
-> > + * it in the queue from lower id to greater id.
-> > + */
-> > +static void s390_topology_insert(S390CPU *cpu)
-> > +{
-> > +    s390_topology_id id =3D s390_topology_from_cpu(cpu);
-> > +    S390TopologyEntry *entry =3D NULL;
-> > +    S390TopologyEntry *tmp =3D NULL;
-> > +
-> > +    QTAILQ_FOREACH(tmp, &s390_topology.list, next) {
-> > +        if (id.id =3D=3D tmp->id.id) {
-> > +            s390_topology_add_cpu_to_entry(tmp, cpu);
-> > +            return;
-> > +        } else if (id.id < tmp->id.id) {
-> > +            entry =3D s390_topology_new_entry(id, cpu);
-> > +            QTAILQ_INSERT_BEFORE(tmp, entry, next);
-> > +            return;
-> > +        }
-> > +    }
-> > +}
-> > +
-> > +/**
-> > + * s390_order_tle:
-> > + *
-> > + * Loop over all CPU and insert it at the right place
-> > + * inside the TLE entry list.
-> > + */
-
-Suggestion:
-
-s390_topology_fill_list_sorted
-
-Fill the S390Topology list with entries according to the order specified
-by the PoP.
-
-> > +static void s390_order_tle(void)
-> > +{
-> > +    CPUState *cs;
-> > +
-> > +    CPU_FOREACH(cs) {
-> > +        s390_topology_insert(S390_CPU(cs));
-> > +    }
-> > +}
-> > +
-> > +/**
-> > + * s390_free_tle:
-> > + *
-> > + * Loop over all TLE entries and free them.
-> > + * Keep the sentinelle which is the only one with level5 !=3D 0
-
-s/sentinelle/sentinel/
-
-> > + */
-
-Suggestion:
-s390_topology_empty_list
-
-Clear all entries in the S390Topology list except the sentinel.
-
-> > +static void s390_free_tle(void)
-> > +{
-> > +    S390TopologyEntry *entry =3D NULL;
-> > +    S390TopologyEntry *tmp =3D NULL;
-> > +
-> > +    QTAILQ_FOREACH_SAFE(entry, &s390_topology.list, next, tmp) {
-> > +        if (!entry->id.level5) {
-> > +            QTAILQ_REMOVE(&s390_topology.list, entry, next);
-> > +            g_free(entry);
-> > +        }
-> > +    }
-> > +}
-> > +
-> > +/**
-> > + * insert_stsi_15_1_x:
-> > + * cpu: the CPU doing the call for which we set CC
-> > + * sel2: the selector 2, containing the nested level
-> > + * addr: Guest logical address of the guest SysIB
-> > + * ar: the access register number
-> > + *
-> > + * Reserve a zeroed SysIB, let setup_stsi to fill it and
-> > + * copy the SysIB to the guest memory.
-> > + *
-> > + * In case of overflow set CC(3) and no copy is done.
-
-Suggestion:
-
-Emulate STSI 15.1.x, that is, perform all necessary checks and fill the SYS=
-IB.
-In case the topology description is too long to fit into the SYSIB,
-set CC=3D3 and abort without writing the SYSIB.
-=20
-> > + */
-> > +void insert_stsi_15_1_x(S390CPU *cpu, int sel2, __u64 addr, uint8_t ar=
-)
-> > +{
-> > +    SysIB sysib =3D {0};
-> > +    int len;
-> > +
-> > +    if (!s390_has_topology() || sel2 < 2 || sel2 > SCLP_READ_SCP_INFO_=
-MNEST) {
-> > +        setcc(cpu, 3);
-> > +        return;
-> > +    }
-> > +
-> > +    s390_order_tle();
-> > +
-> > +    len =3D setup_stsi(&sysib.sysib_151x, sel2);
-> > +
-> > +    if (len < 0) {
-
-I stumbled a bit over this, maybe rename len to r.
-
-> > +        setcc(cpu, 3);
-> > +        return;
-> > +    }
-> > +
-> > +    sysib.sysib_151x.length =3D cpu_to_be16(len);
-> > +    s390_cpu_virt_mem_write(cpu, addr, ar, &sysib, len);
-> > +    setcc(cpu, 0);
-> > +
-> > +    s390_free_tle();
-> > +}
-> > diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
-> > index 3ac7ec9acf..5ea358cbb0 100644
-> > --- a/target/s390x/kvm/kvm.c
-> > +++ b/target/s390x/kvm/kvm.c
-> > @@ -1919,9 +1919,12 @@ static int handle_stsi(S390CPU *cpu)
-> >          if (run->s390_stsi.sel1 !=3D 2 || run->s390_stsi.sel2 !=3D 2) =
-{
-> >              return 0;
-> >          }
-> > -        /* Only sysib 3.2.2 needs post-handling for now. */
-> >          insert_stsi_3_2_2(cpu, run->s390_stsi.addr, run->s390_stsi.ar)=
-;
-> >          return 0;
-> > +    case 15:
-> > +        insert_stsi_15_1_x(cpu, run->s390_stsi.sel2, run->s390_stsi.ad=
-dr,
-> > +                           run->s390_stsi.ar);
-> > +        return 0;
-> >      default:
-> >          return 0;
-> >      }
-> > diff --git a/target/s390x/kvm/meson.build b/target/s390x/kvm/meson.buil=
-d
-> > index aef52b6686..5daa5c6033 100644
-> > --- a/target/s390x/kvm/meson.build
-> > +++ b/target/s390x/kvm/meson.build
-> > @@ -1,6 +1,7 @@
-> > =20
-> >  s390x_ss.add(when: 'CONFIG_KVM', if_true: files(
-> > -  'kvm.c'
-> > +  'kvm.c',
-> > +  'cpu_topology.c'
-> >  ), if_false: files(
-> >    'stubs.c'
-> >  ))
-
-
+Jason
