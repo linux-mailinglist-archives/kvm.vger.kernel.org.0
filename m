@@ -2,170 +2,137 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 435B368A3AC
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 21:40:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id A020A68A3B9
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 21:44:42 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232372AbjBCUka (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 15:40:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38084 "EHLO
+        id S233007AbjBCUok (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 15:44:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230042AbjBCUk3 (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 15:40:29 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3B2F9A81A
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 12:40:27 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id 141so4492136pgc.0
-        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 12:40:27 -0800 (PST)
+        with ESMTP id S232932AbjBCUoi (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 15:44:38 -0500
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6876F9DCAB
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 12:44:35 -0800 (PST)
+Received: by mail-pj1-x1032.google.com with SMTP id nm12-20020a17090b19cc00b0022c2155cc0bso6034168pjb.4
+        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 12:44:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=iFvsZqbjjVzhb8kzRNmM+lxgUxdxU/8TitpFjwGLNtE=;
-        b=KYuj2w8CKAesNyc7VyMnGHaBm+iR+aSX+oHeoOaBBbXpN9qKlOMAsAbvCzi9t8mD92
-         G4hwpk4PLuIOlxL6FL2/JcEiAYVxbYj5Cj8wqyifcW2S1S1lLS3PNbiuL0NpFS1gNw34
-         4NmjfwNRymhgc9beWyeXQooQp62xEkzv3xrFfSGjtQNPrb2zSZ+o0f01qAn71vw/QE9D
-         auN3BzEdrN5pkYVCdILnH7wTueURHZsvbCZLLVXESHJQiM50r9JT8Tty5Eik+pQbcXOD
-         tXMlC98ou7N9EhDfqSH5RQMA9DCDfaQQJ29+KiixsHWHhQ84CYKZQPlfUTYiP5HsvVh8
-         3ykQ==
+        d=google.com; s=20210112;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=HFeFQYebQRR24NoxN2+qx/s/fgK8vHRENjBMrcH9q5s=;
+        b=GAiWIeK2Gp8KfSOvXOckv3r0i6Y0/dmXOG6pla8vtF4hW2MVKZ3bUxF4g1zjGkDetQ
+         gNOct9jcvbA9cEKTAIBrndx2gYtmdMMDI7ZXPrQb7NYTQrc0S3VcaCUhuMZRQQNKZT0s
+         AtB+hMcUjRRpIBxStvokQGngGhOshJ9Cg5mc6vp8GueX2ticzQ2DOpncXwqxJyY77U+c
+         d9IETBuxftRDekCPrNeTuo4Zj2ehaO+YDE4KAERSRmMaThdAQel2Hqg48SpPxlvvcQs7
+         hx1pdI+/1DqLbIbDAmdbCvfw3xtikIo4o84iFDWxmQTUL/tY9uPEm4EBIC9JiE7l4H1l
+         M8Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iFvsZqbjjVzhb8kzRNmM+lxgUxdxU/8TitpFjwGLNtE=;
-        b=edTIzMOdGn+vip2pje30gK22E668xbHaiRL1hyXYRGhPaRM6XKPfbi5ee9Xk3qyk2n
-         ZqJdpZ3ADj5XgMRslfT1IKGhSqDHYU5MP4eyzOMYzXLzJPFdhOMeQfj+mQs019buMyEM
-         IWoqot0h4k+Nlv5Djx4CQhPnMkupSxIQH8KKSOWNFMN0UKDFXdFGI+xtajxP+DXhH1p6
-         PtQ7Vvlm1WpxsXYtKmuqP4JEoBRWagkFV0tgVN3ms9hRZXzIMQB3kqh2iFgD7Bszvpct
-         h00hO40j8cSDLqs3QYHpeKfJcyOL4aZILQFV3hPO1qzNavu9Hj11TdUOdROHnA0+l73L
-         2FWQ==
-X-Gm-Message-State: AO0yUKW6irWyxVzYdzKUtkERROWc75x5Jlnwrt1gwgk/nFAf8Z16ztO1
-        MaTHr95Pa9QNKD5+MmhQqqhh+A==
-X-Google-Smtp-Source: AK7set+oKr3PH7PpRoEB8NGtNLgBY3W0/iicckGJhN07iFZ23T6jCoOVn2siLGd+mB7058mDkCU+4Q==
-X-Received: by 2002:a62:e509:0:b0:583:2971:df8b with SMTP id n9-20020a62e509000000b005832971df8bmr10291206pff.20.1675456827094;
-        Fri, 03 Feb 2023 12:40:27 -0800 (PST)
-Received: from [192.168.50.177] (rrcs-173-197-98-118.west.biz.rr.com. [173.197.98.118])
-        by smtp.gmail.com with ESMTPSA id s25-20020aa78bd9000000b00581d62be96dsm2227683pfd.197.2023.02.03.12.40.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 03 Feb 2023 12:40:26 -0800 (PST)
-Message-ID: <da118de5-adcd-ec0c-9870-454c3741a4ab@linaro.org>
-Date:   Fri, 3 Feb 2023 10:40:20 -1000
+        bh=HFeFQYebQRR24NoxN2+qx/s/fgK8vHRENjBMrcH9q5s=;
+        b=CMJ939pcRpqA5J/fZJTQ8b7gYsRO3M/EKFi3RUweFNDARXZC9zV6pfIHHrv1QZ29DK
+         550EWaom4SpfoQuW9kkB58Hc6/R2FFtLTtuJVZ1RKAzKjo6SIW1jwWrpVKjAgG/Zv5gk
+         lQxnxsXx1LZ8ERcZUuvyaRX4Dd5bpdtMA6Tbkzzhal97jDql+rJN24O1HtZ877wlCnpW
+         06b+zpllgV37+1GvEEG/6NQGEN2Q3AosDI8HGqNwSjZ7NS/z5gcAM23k7lb6m9TtKqlM
+         EtoCfkkNkDsyLHhJVsi/yNGIA7rfdhiwI5XSOIG5FxzcD3Va1R7CV1ej4VmabGrUf3lj
+         61Tg==
+X-Gm-Message-State: AO0yUKUlIfVcwKSDN+IURCMIq2buU8F9ROs1HHraTsnK6Oh7zr+NCHy9
+        LSHgXkmoBclAVFZJuGdGQfoqyg==
+X-Google-Smtp-Source: AK7set+MOJw9wVTamJM/Vd0hm2/sRRD2GBzhp2YkB5jDMJsCwheeK22/iFuxpSj/GlhuywxWL3tfTA==
+X-Received: by 2002:a17:903:2350:b0:198:af50:e4e8 with SMTP id c16-20020a170903235000b00198af50e4e8mr29596plh.14.1675457074755;
+        Fri, 03 Feb 2023 12:44:34 -0800 (PST)
+Received: from google.com (7.104.168.34.bc.googleusercontent.com. [34.168.104.7])
+        by smtp.gmail.com with ESMTPSA id k4-20020a170902e90400b0018544ad1e8esm2013212pld.238.2023.02.03.12.44.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Feb 2023 12:44:34 -0800 (PST)
+Date:   Fri, 3 Feb 2023 20:44:30 +0000
+From:   Sean Christopherson <seanjc@google.com>
+To:     lirongqing@baidu.com
+Cc:     kvm@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH] KVM: x86: PIT: fix PIT shutdown
+Message-ID: <Y91yLt3EZLA32csp@google.com>
+References: <1675396608-24164-1-git-send-email-lirongqing@baidu.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH v5 2/3] arm/kvm: add support for MTE
-Content-Language: en-US
-To:     Cornelia Huck <cohuck@redhat.com>,
-        Peter Maydell <peter.maydell@linaro.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Laurent Vivier <lvivier@redhat.com>
-Cc:     qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org,
-        Eric Auger <eauger@redhat.com>,
-        "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
-        Juan Quintela <quintela@redhat.com>,
-        Gavin Shan <gshan@redhat.com>,
-        =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@linaro.org>
-References: <20230203134433.31513-1-cohuck@redhat.com>
- <20230203134433.31513-3-cohuck@redhat.com>
-From:   Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20230203134433.31513-3-cohuck@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-        SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1675396608-24164-1-git-send-email-lirongqing@baidu.com>
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/3/23 03:44, Cornelia Huck wrote:
-> +static void aarch64_cpu_get_mte(Object *obj, Visitor *v, const char *name,
-> +                                void *opaque, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +    OnOffAuto mte = cpu->prop_mte;
-> +
-> +    visit_type_OnOffAuto(v, name, &mte, errp);
-> +}
+On Fri, Feb 03, 2023, lirongqing@baidu.com wrote:
+> From: Li RongQing <lirongqing@baidu.com>
+> 
+> pit_shutdown() in drivers/clocksource/i8253.c doesn't work because
+> setting the counter register to zero causes the PIT to start running
+> again, negating the shutdown.
 
-You don't need to copy to a local variable here.
+If this goes anywhere, the changelog needs to be rewritten to describe how KVM
+is violating the 8253/8254 spec, not how code in Linux-as-a-guest breaks.
 
-> +
-> +static void aarch64_cpu_set_mte(Object *obj, Visitor *v, const char *name,
-> +                                void *opaque, Error **errp)
-> +{
-> +    ARMCPU *cpu = ARM_CPU(obj);
-> +
-> +    visit_type_OnOffAuto(v, name, &cpu->prop_mte, errp);
-> +}
+> 
+> fix it by stopping pit timer and zeroing channel count
+> 
+> Signed-off-by: Li RongQing <lirongqing@baidu.com>
+> ---
+>  arch/x86/kvm/i8254.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/i8254.c b/arch/x86/kvm/i8254.c
+> index e0a7a0e..c8a51f5 100644
+> --- a/arch/x86/kvm/i8254.c
+> +++ b/arch/x86/kvm/i8254.c
+> @@ -358,13 +358,15 @@ static void create_pit_timer(struct kvm_pit *pit, u32 val, int is_period)
+>  		}
+>  	}
+>  
+> -	hrtimer_start(&ps->timer, ktime_add_ns(ktime_get(), interval),
+> +	if (interval)
+> +		hrtimer_start(&ps->timer, ktime_add_ns(ktime_get(), interval),
+>  		      HRTIMER_MODE_ABS);
+>  }
+>  
+>  static void pit_load_count(struct kvm_pit *pit, int channel, u32 val)
+>  {
+>  	struct kvm_kpit_state *ps = &pit->pit_state;
+> +	u32 org = val;
+>  
+>  	pr_debug("load_count val is %u, channel is %d\n", val, channel);
+>  
+> @@ -386,6 +388,9 @@ static void pit_load_count(struct kvm_pit *pit, int channel, u32 val)
+>  	 * mode 1 is one shot, mode 2 is period, otherwise del timer */
+>  	switch (ps->channels[0].mode) {
+>  	case 0:
+> +		val = org;
+> +		ps->channels[channel].count = val;
+> +		fallthrough;
 
-... which makes get and set functions identical.
-No need for both.
+The existing behavior is KVM ABI, e.g. KVM_SET_PIT and KVM_SET_PIT2.  I'm also
+not convinced that KVM is in the wrong here.  From the 8254 spec:
 
-> +static inline bool arm_machine_has_tag_memory(void)
-> +{
-> +#ifndef CONFIG_USER_ONLY
-> +    Object *obj = object_dynamic_cast(qdev_get_machine(), TYPE_VIRT_MACHINE);
-> +
-> +    /* so far, only the virt machine has support for tag memory */
-> +    if (obj) {
-> +        VirtMachineState *vms = VIRT_MACHINE(obj);
+  The largest possible initial count is 0; this is equivalent to 216 for
+  binary counting and 104 for BCD counting.
 
-VIRT_MACHINE() does object_dynamic_cast_assert, and we've just done that.
+  The Counter does not stop when it reaches zero. In Modes 0, 1, 4, and 5 the
+  Counter ‘‘wraps around’’ to the highest count, either FFFF hex for binary count-
+  ing or 9999 for BCD counting, and continues counting. 
 
-As this is startup, it's not the speed that matters.  But it does look unfortunate.  Not 
-for this patch set, but perhaps we ought to add TRY_OBJ_NAME to DECLARE_INSTANCE_CHECKER?
+  Mode 0 is typically used for event counting. After the Control Word is written,
+  OUT is initially low, and will remain low until the Counter reaches zero. OUT
+  then goes high and remains high until a new count or a new Mode 0 Control Word
+  is written into the Counter.
 
-> +void arm_cpu_mte_finalize(ARMCPU *cpu, Error **errp)
-> +{
-> +    bool enable_mte;
-> +
-> +    switch (cpu->prop_mte) {
-> +    case ON_OFF_AUTO_OFF:
-> +        enable_mte = false;
-> +        break;
-> +    case ON_OFF_AUTO_ON:
-> +        if (tcg_enabled()) {
-> +            if (cpu_isar_feature(aa64_mte, cpu)) {
-> +                if (!arm_machine_has_tag_memory()) {
-> +                    error_setg(errp, "mte=on requires tag memory");
-> +                    return;
-> +                }
-> +            } else {
-> +                error_setg(errp, "mte not supported by this CPU type");
-> +                return;
-> +            }
-> +        }
-> +        if (kvm_enabled() && !kvm_arm_mte_supported()) {
-> +            error_setg(errp, "mte not supported by kvm");
-> +            return;
-> +        }
-> +        enable_mte = true;
-> +        break;
-
-What's here is not wrong, but maybe better structured as
-
-	enable_mte = true;
-         if (qtest_enabled()) {
-             break;
-         }
-         if (tcg_enabled()) {
-             if (arm_machine_tag_mem) {
-                 break;
-             }
-             error;
-             return;
-         }
-         if (kvm_enabled() && kvm_arm_mte_supported) {
-             break;
-         }
-         error("mte not supported by %s", current_accel_type());
-         return;
-
-We only add the property for tcg via -cpu max, so the isar check is redundant.
-
-
-r~
+Maybe some actual hardware has a quirk where writing '0' disables the counter,
+but per the spec, I think Hyper-V and KVM have it right.
