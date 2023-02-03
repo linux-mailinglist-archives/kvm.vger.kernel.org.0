@@ -2,218 +2,124 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 88CB0689E6A
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 16:38:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 6F41D689E65
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 16:36:59 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233048AbjBCPh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 10:37:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51512 "EHLO
+        id S233068AbjBCPg5 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 10:36:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233010AbjBCPhz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 10:37:55 -0500
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74EBB6EDCA;
-        Fri,  3 Feb 2023 07:37:53 -0800 (PST)
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 313FOGq2007962;
-        Fri, 3 Feb 2023 15:37:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=wJPy5gnQQgp5DWijqh1cR/GZtnWuAVWAz/2QL+MNjPE=;
- b=VOZb5kX225l4AaPDHjqZuMPrpwTGxhw4Kzr1+f5z/4HUaxYf+aLXPTQkYVCNa9DVVGNH
- MfvAAptMZht5nPRqJ+7gPG+COvFfA8jTU2vKsIeamPnHk37KCtan/Uyw459Wbles/NvR
- 3Diulm3pArzRGt+S7aOKgb3fO+MzNelogQQHu5Nc9kNWFnBpWEyESlpfvgQt+UWkv4r5
- 0ekeygL1x60gAM4w1fD5ryBtyCXBzf7zZDNf4UXISQVO6QeZu9OtdEdxUwUK6UDKy+3X
- nqL+f+KzhyzwS7VuAQCMesX386rGWYLlL51hOfBK44wfsNWZ4UFgE9k/NMaub+LLC2Iu 6g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nh4vqgb4m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 15:37:47 +0000
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 313FQv66019759;
-        Fri, 3 Feb 2023 15:37:47 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nh4vqgb3h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 15:37:47 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 313DpObg024026;
-        Fri, 3 Feb 2023 15:32:45 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3ncvuqwe4e-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 15:32:45 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 313FWfAE50004278
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Feb 2023 15:32:41 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id A112C20043;
-        Fri,  3 Feb 2023 15:32:41 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 52FF12004B;
-        Fri,  3 Feb 2023 15:32:41 +0000 (GMT)
-Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.195.237])
-        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Feb 2023 15:32:41 +0000 (GMT)
-Message-ID: <e96b3c20055105af9ba76f0abefeb5a236023f37.camel@linux.ibm.com>
-Subject: Re: [PATCH v6 10/14] KVM: s390: Refactor absolute vm mem_op function
-From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-To:     Janosch Frank <frankja@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>
-Cc:     David Hildenbrand <david@redhat.com>,
-        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Sven Schnelle <svens@linux.ibm.com>
-Date:   Fri, 03 Feb 2023 16:32:41 +0100
-In-Reply-To: <f1b28707-c525-7cd1-64d5-6717bac5d711@linux.ibm.com>
-References: <20230125212608.1860251-1-scgl@linux.ibm.com>
-         <20230125212608.1860251-11-scgl@linux.ibm.com>
-         <f1b28707-c525-7cd1-64d5-6717bac5d711@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+        with ESMTP id S232999AbjBCPgw (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 10:36:52 -0500
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 112FB6F21F
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 07:36:50 -0800 (PST)
+Received: by mail-qk1-x72f.google.com with SMTP id l1so2571397qkg.11
+        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 07:36:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=0UYvq70HDOIo75wjd1El9PDilVQmMcpF6t7PglLrXVk=;
+        b=aImhPd9bN9VE0QHO2Wh3L0dRlzz/G7Mg5KgY08aAtSrX5GFGgWzJxU14VO3K4aUR6X
+         P6lPl+9M5liDXnrk9eSEotRi6kIjns9vgxW60OKwQLIFIyuJR7c62c6qgXqY+IsKi4W+
+         gwJD5LJHNJ5jkLo80VpZ6R+K8wKBTFNvhkjSGE7GGPXVYVqY4LJ2yZlQA1i4uvqSeSzC
+         x/JOhiLjefi0yKjCb4vwyiiuRtsKBfRiPDBFUY11QGqFipEuKHRJ7b2B82l081QHHT1n
+         hTWZz+td3a1PJRVi1uFNzZySjUnnPdigafLZqK3YLC9Y5n/cyIkJH9/fzJou0cZpwQoc
+         fB+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=0UYvq70HDOIo75wjd1El9PDilVQmMcpF6t7PglLrXVk=;
+        b=b5ygkN/exGWvjzyYbOLjnLoKb2SeEqQHyhkL68z3OG1M0SjpZKMdtGU8KtJgS3UNJR
+         4AqoGfn56X9tc+LCEtCfnMfAGPVrRCxMVZ44N4IUU1nea1qZygcRc2bq1wcT+gRMo0gB
+         tNLKq6BOzbkPHn9TYVWkR26vHQ24ZHvr/u0auZ67+bUXGoBP8GXb6/fMpNsg6v0oaxpq
+         nkLGl+e7Cj9j50OhX8xBRqNwzi+y7c07Y36nSfM4MYuvvbXNcz6XNp3ltuUYuiwIXhNb
+         NBk6fuskHoDhhVxjQDegLZJdaJTlkZvuLpp4wx1zaczAGSXu4IwlO47nX7O/dmzh/jgB
+         PeSw==
+X-Gm-Message-State: AO0yUKWVsLezfY51WaTV2fDk18NtLSY63nonMXtyqOOw6rNA6WS6bOBz
+        Do1pP08oMTjEbhMRge7ZBa4mzoaCsMA3kS1tEq7HEw==
+X-Google-Smtp-Source: AK7set+6xViBuxHQLgOv2161oDQ6P1Qe7Y0fSJLUVbtwcqJ+NT3AkubfrnFLGVU3QaU7FnFN9EHsLun7O6EkWM/fbsk=
+X-Received: by 2002:a05:620a:13d3:b0:706:8588:513c with SMTP id
+ g19-20020a05620a13d300b007068588513cmr743433qkl.390.1675438608985; Fri, 03
+ Feb 2023 07:36:48 -0800 (PST)
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 54Gn0kQUnlQTHXPWzLe1AGFCY_plwiBj
-X-Proofpoint-ORIG-GUID: 1dQmxI_NRK3cY9hLoGNOL_62IpZVv4AJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-03_15,2023-02-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- clxscore=1015 impostorscore=0 malwarescore=0 mlxlogscore=920
- suspectscore=0 adultscore=0 mlxscore=0 spamscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302030139
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221017195834.2295901-1-ricarkol@google.com> <Y90e4IluvCYSnShh@sirena.org.uk>
+In-Reply-To: <Y90e4IluvCYSnShh@sirena.org.uk>
+From:   Ricardo Koller <ricarkol@google.com>
+Date:   Fri, 3 Feb 2023 07:36:37 -0800
+Message-ID: <CAOHnOrwqJ+K4vcyzV7z=BcC-J=ZyFj8wZYSdJO7Kk=kJ=4kKOw@mail.gmail.com>
+Subject: Re: [PATCH v10 00/14] KVM: selftests: Add aarch64/page_fault_test
+To:     Mark Brown <broonie@kernel.org>
+Cc:     kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+        kvmarm@lists.cs.columbia.edu, andrew.jones@linux.dev,
+        pbonzini@redhat.com, maz@kernel.org, seanjc@google.com,
+        alexandru.elisei@arm.com, eric.auger@redhat.com, oupton@google.com,
+        reijiw@google.com, rananta@google.com, bgardon@google.com,
+        dmatlack@google.com, axelrasmussen@google.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 2023-02-03 at 15:48 +0100, Janosch Frank wrote:
-> On 1/25/23 22:26, Janis Schoetterl-Glausch wrote:
-> > Remove code duplication with regards to the CHECK_ONLY flag.
-> > Decrease the number of indents.
-> > No functional change indented.
-> >=20
-> > Suggested-by: Janosch Frank <frankja@linux.ibm.com>
-> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
-> > ---
-> >=20
-> >=20
-> > Cosmetic only, can be dropped.
-> >=20
-> >=20
-> >   arch/s390/kvm/kvm-s390.c | 43 ++++++++++++++++-----------------------=
--
-> >   1 file changed, 17 insertions(+), 26 deletions(-)
-> >=20
-> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-> > index 588cf70dc81e..cfd09cb43ef6 100644
-> > --- a/arch/s390/kvm/kvm-s390.c
-> > +++ b/arch/s390/kvm/kvm-s390.c
-> > @@ -2794,6 +2794,7 @@ static void *mem_op_alloc_buf(struct kvm_s390_mem=
-_op *mop)
-> >   static int kvm_s390_vm_mem_op_abs(struct kvm *kvm, struct kvm_s390_me=
-m_op *mop)
-> >   {
-> >   	void __user *uaddr =3D (void __user *)mop->buf;
-> > +	enum gacc_mode acc_mode;
-> >   	void *tmpbuf =3D NULL;
-> >   	int r, srcu_idx;
-> >  =20
-> > @@ -2813,33 +2814,23 @@ static int kvm_s390_vm_mem_op_abs(struct kvm *k=
-vm, struct kvm_s390_mem_op *mop)
-> >   		goto out_unlock;
-> >   	}
-> >  =20
-> > -	switch (mop->op) {
-> > -	case KVM_S390_MEMOP_ABSOLUTE_READ: {
-> > -		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
-> > -			r =3D check_gpa_range(kvm, mop->gaddr, mop->size, GACC_FETCH, mop->=
-key);
-> > -		} else {
-> > -			r =3D access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
-> > -						      mop->size, GACC_FETCH, mop->key);
-> > -			if (r =3D=3D 0) {
-> > -				if (copy_to_user(uaddr, tmpbuf, mop->size))
-> > -					r =3D -EFAULT;
-> > -			}
-> > -		}
-> > -		break;
-> > -	}
-> > -	case KVM_S390_MEMOP_ABSOLUTE_WRITE: {
-> > -		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
-> > -			r =3D check_gpa_range(kvm, mop->gaddr, mop->size, GACC_STORE, mop->=
-key);
-> > -		} else {
-> > -			if (copy_from_user(tmpbuf, uaddr, mop->size)) {
-> > -				r =3D -EFAULT;
-> > -				break;
-> > -			}
-> > -			r =3D access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
-> > -						      mop->size, GACC_STORE, mop->key);
-> > +	acc_mode =3D mop->op =3D=3D KVM_S390_MEMOP_ABSOLUTE_READ ? GACC_FETCH=
- : GACC_STORE;
->=20
-> Would the line be too long if that variable would be initialized where=
-=20
-> it's defined?
+Hi Mark,
 
-Just fits at 100 columns. Want me to move it?
+On Fri, Feb 3, 2023 at 6:49 AM Mark Brown <broonie@kernel.org> wrote:
+>
+> On Mon, Oct 17, 2022 at 07:58:20PM +0000, Ricardo Koller wrote:
+> > This series adds a new aarch64 selftest for testing stage 2 fault handling
+> > for various combinations of guest accesses (e.g., write, S1PTW), backing
+> > sources (e.g., anon), and types of faults (e.g., read on hugetlbfs with a
+> > hole, write on a readonly memslot). Each test tries a different combination
+> > and then checks that the access results in the right behavior (e.g., uffd
+> > faults with the right address and write/read flag). Some interesting
+> > combinations are:
+>
+> I'm seeing issues with the page_fault_test tests in both -next and
+> mainline all the way back to v6.1 when they were introduced running on
+> both the fast model and hardware.  With -next the reports come back as:
+>
+> # selftests: kvm: page_fault_test
+> # ==== Test Assertion Failure ====
+> #   aarch64/page_fault_test.c:316: __a == __b
+> #   pid=851 tid=860 errno=0 - Success
+> #      1        0x0000000000402253: uffd_generic_handler at page_fault_test.c:316
+> #      2        0x000000000040be07: uffd_handler_thread_fn at userfaultfd_util.c:97
+> #      3        0x0000ffff8b39edd7: ?? ??:0
+> #      4        0x0000ffff8b407e9b: ?? ??:0
+> #   ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write) failed.
+> #       !!(flags & UFFD_PAGEFAULT_FLAG_WRITE) is 0
+> #       expect_write is 0x1
+> not ok 6 selftests: kvm: page_fault_test # exit=254
+>
+> (addr2line seemed to be not doing much, I've not poked too hard at
+> that).  I've been unable to find any case where the program passes.
+> Is this expected?
+>
+> Some random full runs on hardware:
 
->=20
-> > +	if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
-> > +		r =3D check_gpa_range(kvm, mop->gaddr, mop->size, acc_mode, mop->key=
-);
->=20
-> We should early return i.e. goto out_unlock.
->=20
-> IMHO else if, else patterns should either be switches (testing the same=
-=20
-> variable) or kept as short as possible / be avoided.
->=20
-> > +	} else if (acc_mode =3D=3D GACC_FETCH) {
-> > +		r =3D access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
-> > +					      mop->size, GACC_FETCH, mop->key);
->=20
-> I'd guess it's personal taste whether you use GACC_FETCH or access_mode=
-=20
-> but if you don't use it here then we can remove the variable all=20
-> together, no?
+That failure was fixed with this series:
+"KVM: selftests: aarch64: page_fault_test S1PTW related fixes"
+https://lore.kernel.org/kvmarm/20230127214353.245671-1-ricarkol@google.com/
 
-Yeah, I think I did replace it, but then undid it.
-Probably just because it is a bit more explicit.
-It's used in check_gpa_range, so no, unless you want to dump the expression
-directly in there.
->=20
-> > +		if (r)
-> > +			goto out_unlock;
-> > +		if (copy_to_user(uaddr, tmpbuf, mop->size))
-> > +			r =3D -EFAULT;
-> > +	} else {
-> > +		if (copy_from_user(tmpbuf, uaddr, mop->size)) {
-> > +			r =3D -EFAULT;
-> > +			goto out_unlock;
-> >   		}
-> > -		break;
-> > -	}
-> > +		r =3D access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
-> > +					      mop->size, GACC_STORE, mop->key);
-> >   	}
-> >  =20
-> >   out_unlock:
->=20
+which made it into kvmarm/fixes and should get into 6.2:
+https://lore.kernel.org/kvmarm/20230129190142.2481354-1-maz@kernel.org/
 
+Note that the failing assert does not exist after the mentioned series:
+> #   ASSERT_EQ(!!(flags & UFFD_PAGEFAULT_FLAG_WRITE), expect_write) failed.
+
+>
+> 4xA53: https://lava.sirena.org.uk/scheduler/job/244678
+> 4xA72: https://lkft.validation.linaro.org/scheduler/job/6114427
+
+Thanks,
+Ricardo
