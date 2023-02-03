@@ -2,207 +2,218 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E8F05689E12
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 16:24:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 88CB0689E6A
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 16:38:04 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233312AbjBCPYJ (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 10:24:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35730 "EHLO
+        id S233048AbjBCPh6 (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 10:37:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232691AbjBCPXz (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 10:23:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B1AAE877
-        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 07:21:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1675437588;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3g9NXrofpUX/HnzotWG0ahi/8nrSPeNR8z5upflUFxU=;
-        b=WGKjnvzIQzjdRjWwJ6nujUB1BLCGEovHtqv9hk/+9ETg+KkKouj9ajVjfG/MGZVXl13EvY
-        E5jUEMTaKyTv+3O6dzpChC6mskEBub/eFchzpYcvmNNS4aMnSgCH4CDoXqCHxXYUK7PpgI
-        lgNE7mQ7DyRMSsxrkEvBcqexKyLdjSw=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_128_GCM_SHA256) id
- us-mta-22-56W50NjgMky0NSeivu9t4Q-1; Fri, 03 Feb 2023 10:19:47 -0500
-X-MC-Unique: 56W50NjgMky0NSeivu9t4Q-1
-Received: by mail-io1-f72.google.com with SMTP id n8-20020a6bf608000000b007048850aa92so3146464ioh.10
-        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 07:19:47 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3g9NXrofpUX/HnzotWG0ahi/8nrSPeNR8z5upflUFxU=;
-        b=T22UFb+iMErIHiw0b9ukC1Xc/5UWSupSDqTsi/mEOlniAcJbUTRXW8+RjlWJAKH74n
-         SO/atDL1x23wIg5NXkIDs609znEztid58Vg/3sM08TtKPPnPCsuibYLxzSHvVhfxa97h
-         ebhtaXtqOGKi+WxpMB96cRRtGlYYfzX4hmx48S7PodyFJkyOL5dSUBs2o3L+QqwpHLKA
-         3dBOGpKCXM18QP+MrINDyg6/3s5skr7N+8NfOaLruHqLVSRf9rZuYghx4j3/7UK49aYh
-         7DYqTgM8naVJQYctz7IhlfJVcpLC4UDbiOUItcTNVXvm9KmWzLrHNraCyUNOCDR0FytK
-         pMTw==
-X-Gm-Message-State: AO0yUKUKNoOcXqxgGtOjsCpuvsHAFF0LFpvSgoCXDJEp5emXD7yWr2IT
-        Dgs5HFyHHSjk23chHQZ9k2FpvnbDITkEcJytAf9lCKIeTAiU8U4dzMrWY9txY+mVsk0Zzj9eDZR
-        WhW4RASh3UDov
-X-Received: by 2002:a05:6e02:1bee:b0:310:dff1:f55a with SMTP id y14-20020a056e021bee00b00310dff1f55amr7898146ilv.1.1675437586788;
-        Fri, 03 Feb 2023 07:19:46 -0800 (PST)
-X-Google-Smtp-Source: AK7set9xS0+fDEKN1aTi0x42bIUmxvuWn31TlGlTEr16+4yc8RCliFt2/XQVRKmY908DNmVjPFwjDA==
-X-Received: by 2002:a05:6e02:1bee:b0:310:dff1:f55a with SMTP id y14-20020a056e021bee00b00310dff1f55amr7898130ilv.1.1675437586483;
-        Fri, 03 Feb 2023 07:19:46 -0800 (PST)
-Received: from redhat.com ([38.15.36.239])
-        by smtp.gmail.com with ESMTPSA id r6-20020a922a06000000b0031093e9c7fasm830954ile.85.2023.02.03.07.19.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Feb 2023 07:19:45 -0800 (PST)
-Date:   Fri, 3 Feb 2023 08:19:42 -0700
-From:   Alex Williamson <alex.williamson@redhat.com>
-To:     "Liu, Yi L" <yi.l.liu@intel.com>
-Cc:     "Tian, Kevin" <kevin.tian@intel.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jgg@nvidia.com" <jgg@nvidia.com>,
-        "cohuck@redhat.com" <cohuck@redhat.com>,
-        "farman@linux.ibm.com" <farman@linux.ibm.com>,
-        "pmorel@linux.ibm.com" <pmorel@linux.ibm.com>,
-        "borntraeger@linux.ibm.com" <borntraeger@linux.ibm.com>,
-        "frankja@linux.ibm.com" <frankja@linux.ibm.com>,
-        "imbrenda@linux.ibm.com" <imbrenda@linux.ibm.com>,
-        "david@redhat.com" <david@redhat.com>,
-        "akrowiak@linux.ibm.com" <akrowiak@linux.ibm.com>,
-        "jjherne@linux.ibm.com" <jjherne@linux.ibm.com>,
-        "pasic@linux.ibm.com" <pasic@linux.ibm.com>,
-        "zhenyuw@linux.intel.com" <zhenyuw@linux.intel.com>,
-        "Wang, Zhi A" <zhi.a.wang@intel.com>,
-        "Christopherson,, Sean" <seanjc@google.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "intel-gvt-dev@lists.freedesktop.org" 
-        <intel-gvt-dev@lists.freedesktop.org>,
-        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3] vfio: fix deadlock between group lock and kvm lock
-Message-ID: <20230203081942.64fbf9f1.alex.williamson@redhat.com>
-In-Reply-To: <DS0PR11MB75297154376388A3698C5CCAC3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
-References: <20230202162442.78216-1-mjrosato@linux.ibm.com>
-        <20230202124210.476adaf8.alex.williamson@redhat.com>
-        <BN9PR11MB527618E281BEB8E479ABB0418CD69@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <20230202161307.0c6aa23e.alex.williamson@redhat.com>
-        <BN9PR11MB5276017F9CEBB4BAE58C40E88CD79@BN9PR11MB5276.namprd11.prod.outlook.com>
-        <DS0PR11MB7529050661FCE4A5AC4B17C3C3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
-        <20230203064940.435e4d65.alex.williamson@redhat.com>
-        <DS0PR11MB75297154376388A3698C5CCAC3D79@DS0PR11MB7529.namprd11.prod.outlook.com>
-Organization: Red Hat
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+        with ESMTP id S233010AbjBCPhz (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 10:37:55 -0500
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74EBB6EDCA;
+        Fri,  3 Feb 2023 07:37:53 -0800 (PST)
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 313FOGq2007962;
+        Fri, 3 Feb 2023 15:37:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=wJPy5gnQQgp5DWijqh1cR/GZtnWuAVWAz/2QL+MNjPE=;
+ b=VOZb5kX225l4AaPDHjqZuMPrpwTGxhw4Kzr1+f5z/4HUaxYf+aLXPTQkYVCNa9DVVGNH
+ MfvAAptMZht5nPRqJ+7gPG+COvFfA8jTU2vKsIeamPnHk37KCtan/Uyw459Wbles/NvR
+ 3Diulm3pArzRGt+S7aOKgb3fO+MzNelogQQHu5Nc9kNWFnBpWEyESlpfvgQt+UWkv4r5
+ 0ekeygL1x60gAM4w1fD5ryBtyCXBzf7zZDNf4UXISQVO6QeZu9OtdEdxUwUK6UDKy+3X
+ nqL+f+KzhyzwS7VuAQCMesX386rGWYLlL51hOfBK44wfsNWZ4UFgE9k/NMaub+LLC2Iu 6g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nh4vqgb4m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Feb 2023 15:37:47 +0000
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 313FQv66019759;
+        Fri, 3 Feb 2023 15:37:47 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3nh4vqgb3h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Feb 2023 15:37:47 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+        by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 313DpObg024026;
+        Fri, 3 Feb 2023 15:32:45 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+        by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3ncvuqwe4e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 03 Feb 2023 15:32:45 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+        by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 313FWfAE50004278
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 3 Feb 2023 15:32:41 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A112C20043;
+        Fri,  3 Feb 2023 15:32:41 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 52FF12004B;
+        Fri,  3 Feb 2023 15:32:41 +0000 (GMT)
+Received: from li-7e0de7cc-2d9d-11b2-a85c-de26c016e5ad.ibm.com (unknown [9.171.195.237])
+        by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Fri,  3 Feb 2023 15:32:41 +0000 (GMT)
+Message-ID: <e96b3c20055105af9ba76f0abefeb5a236023f37.camel@linux.ibm.com>
+Subject: Re: [PATCH v6 10/14] KVM: s390: Refactor absolute vm mem_op function
+From:   Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+To:     Janosch Frank <frankja@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>
+Cc:     David Hildenbrand <david@redhat.com>,
+        Jonathan Corbet <corbet@lwn.net>, kvm@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-s390@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Sven Schnelle <svens@linux.ibm.com>
+Date:   Fri, 03 Feb 2023 16:32:41 +0100
+In-Reply-To: <f1b28707-c525-7cd1-64d5-6717bac5d711@linux.ibm.com>
+References: <20230125212608.1860251-1-scgl@linux.ibm.com>
+         <20230125212608.1860251-11-scgl@linux.ibm.com>
+         <f1b28707-c525-7cd1-64d5-6717bac5d711@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-        RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE autolearn=unavailable
-        autolearn_force=no version=3.4.6
+User-Agent: Evolution 3.46.3 (3.46.3-1.fc37) 
+MIME-Version: 1.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 54Gn0kQUnlQTHXPWzLe1AGFCY_plwiBj
+X-Proofpoint-ORIG-GUID: 1dQmxI_NRK3cY9hLoGNOL_62IpZVv4AJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
+ definitions=2023-02-03_15,2023-02-03_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
+ clxscore=1015 impostorscore=0 malwarescore=0 mlxlogscore=920
+ suspectscore=0 adultscore=0 mlxscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2212070000 definitions=main-2302030139
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
+        autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On Fri, 3 Feb 2023 14:54:44 +0000
-"Liu, Yi L" <yi.l.liu@intel.com> wrote:
-
-> > From: Alex Williamson <alex.williamson@redhat.com>
-> > Sent: Friday, February 3, 2023 9:50 PM
+On Fri, 2023-02-03 at 15:48 +0100, Janosch Frank wrote:
+> On 1/25/23 22:26, Janis Schoetterl-Glausch wrote:
+> > Remove code duplication with regards to the CHECK_ONLY flag.
+> > Decrease the number of indents.
+> > No functional change indented.
 > >=20
-> > On Fri, 3 Feb 2023 13:32:09 +0000
-> > "Liu, Yi L" <yi.l.liu@intel.com> wrote:
+> > Suggested-by: Janosch Frank <frankja@linux.ibm.com>
+> > Signed-off-by: Janis Schoetterl-Glausch <scgl@linux.ibm.com>
+> > ---
+> >=20
+> >=20
+> > Cosmetic only, can be dropped.
+> >=20
+> >=20
+> >   arch/s390/kvm/kvm-s390.c | 43 ++++++++++++++++-----------------------=
+-
+> >   1 file changed, 17 insertions(+), 26 deletions(-)
+> >=20
+> > diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+> > index 588cf70dc81e..cfd09cb43ef6 100644
+> > --- a/arch/s390/kvm/kvm-s390.c
+> > +++ b/arch/s390/kvm/kvm-s390.c
+> > @@ -2794,6 +2794,7 @@ static void *mem_op_alloc_buf(struct kvm_s390_mem=
+_op *mop)
+> >   static int kvm_s390_vm_mem_op_abs(struct kvm *kvm, struct kvm_s390_me=
+m_op *mop)
+> >   {
+> >   	void __user *uaddr =3D (void __user *)mop->buf;
+> > +	enum gacc_mode acc_mode;
+> >   	void *tmpbuf =3D NULL;
+> >   	int r, srcu_idx;
 > >  =20
-> > > > From: Tian, Kevin <kevin.tian@intel.com>
-> > > > Sent: Friday, February 3, 2023 10:00 AM
-> > > > =20
-> > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > Sent: Friday, February 3, 2023 7:13 AM
-> > > > >
-> > > > > On Thu, 2 Feb 2023 23:04:10 +0000
-> > > > > "Tian, Kevin" <kevin.tian@intel.com> wrote:
-> > > > > =20
-> > > > > > > From: Alex Williamson <alex.williamson@redhat.com>
-> > > > > > > Sent: Friday, February 3, 2023 3:42 AM
-> > > > > > >
-> > > > > > >
-> > > > > > > LGTM.  I'm not sure moving the functions to vfio_main really =
-buys =20
-> > us =20
-> > > > > > > anything since we're making so much use of group fields.  The=
- cdev
-> > > > > > > approach will necessarily be different, so the bulk of the ge=
-t code =20
-> > will =20
-> > > > > > > likely need to move back to group.c anyway.
-> > > > > > > =20
-> > > > > >
-> > > > > > well my last comment was based on Matthew's v2 where the get =20
-> > code =20
-> > > > > > gets a kvm passed in instead of implicitly retrieving group ref=
-_lock
-> > > > > > internally. In that case the get/put helpers only contain devic=
-e logic
-> > > > > > thus fit in vfio_main.c.
-> > > > > >
-> > > > > > with v3 then they have to be in group.c since we don't want to =
-use
-> > > > > > group fields in vfio_main.c.
-> > > > > >
-> > > > > > but I still think v2 of the helpers is slightly better. The onl=
-y difference
-> > > > > > between cdev and group when handling this race is using differe=
-nt
-> > > > > > ref_lock. the symbol get/put part is exactly same. So even if we
-> > > > > > merge v3 like this, very likely Yi has to change it back to v2 =
-style
-> > > > > > to share the get/put helpers while just leaving the ref_lock pa=
-rt
-> > > > > > handled differently between the two path. =20
-> > > > >
-> > > > > I'm not really a fan of the asymmetry of the v2 version where the=
- get
-> > > > > helper needs to be called under the new kvm_ref_lock, but the put
-> > > > > helper does not.  Having the get helper handle that makes the cal=
-ler
-> > > > > much cleaner.  Thanks,
-> > > > > =20
-> > > >
-> > > > What about passing the lock pointer into the helper? it's still sli=
-ghtly
-> > > > asymmetry as the put helper doesn't carry the lock pointer but it
-> > > > could also be interpreted as if the pointer has been saved in the g=
-et
-> > > > then if it needs to be referenced by the put there is no need to pa=
-ss
-> > > > it in again. =20
-> > >
-> > > For cdev, I may modify vfio_device_get_kvm_safe() to accept
-> > > struct kvm and let its caller hold a kvm_ref_lock (field within
-> > > struct vfio_device_file). Meanwhile, the group path holds
-> > > the group->kvm_ref_lock before invoking vfio_device_get_kvm_safe().
-> > > vfio_device_get_kvm_safe() just includes the symbol get/put and
-> > > the device->kvm and put_kvm set. =20
-> >=20
-> > Sounds a lot like v2 :-\  =20
+> > @@ -2813,33 +2814,23 @@ static int kvm_s390_vm_mem_op_abs(struct kvm *k=
+vm, struct kvm_s390_mem_op *mop)
+> >   		goto out_unlock;
+> >   	}
+> >  =20
+> > -	switch (mop->op) {
+> > -	case KVM_S390_MEMOP_ABSOLUTE_READ: {
+> > -		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
+> > -			r =3D check_gpa_range(kvm, mop->gaddr, mop->size, GACC_FETCH, mop->=
+key);
+> > -		} else {
+> > -			r =3D access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
+> > -						      mop->size, GACC_FETCH, mop->key);
+> > -			if (r =3D=3D 0) {
+> > -				if (copy_to_user(uaddr, tmpbuf, mop->size))
+> > -					r =3D -EFAULT;
+> > -			}
+> > -		}
+> > -		break;
+> > -	}
+> > -	case KVM_S390_MEMOP_ABSOLUTE_WRITE: {
+> > -		if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
+> > -			r =3D check_gpa_range(kvm, mop->gaddr, mop->size, GACC_STORE, mop->=
+key);
+> > -		} else {
+> > -			if (copy_from_user(tmpbuf, uaddr, mop->size)) {
+> > -				r =3D -EFAULT;
+> > -				break;
+> > -			}
+> > -			r =3D access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
+> > -						      mop->size, GACC_STORE, mop->key);
+> > +	acc_mode =3D mop->op =3D=3D KVM_S390_MEMOP_ABSOLUTE_READ ? GACC_FETCH=
+ : GACC_STORE;
 >=20
-> Yes, like v2. =F0=9F=98=8A
->=20
-> > I'd look more towards group and cdev specific
-> > helpers that handle the locking so that the callers aren't exposed to
-> > the asymmetry of get vs put, and reduce a new
-> > _vfio_device_get_kvm_safe() in common code that only does the symbol
-> > work.  Thanks, =20
->=20
-> If so, looks like Matthew needs a v4. I'm waiting for the final version
-> of this patch and sending a new cdev series based on it. wish to see
-> it soon ^_^.
+> Would the line be too long if that variable would be initialized where=
+=20
+> it's defined?
 
-cdev support is a future feature, why does it become a requirement for
-a fix to the current base?  The refactoring could also happen in the
-cdev series.  Thanks,
+Just fits at 100 columns. Want me to move it?
 
-Alex
+>=20
+> > +	if (mop->flags & KVM_S390_MEMOP_F_CHECK_ONLY) {
+> > +		r =3D check_gpa_range(kvm, mop->gaddr, mop->size, acc_mode, mop->key=
+);
+>=20
+> We should early return i.e. goto out_unlock.
+>=20
+> IMHO else if, else patterns should either be switches (testing the same=
+=20
+> variable) or kept as short as possible / be avoided.
+>=20
+> > +	} else if (acc_mode =3D=3D GACC_FETCH) {
+> > +		r =3D access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
+> > +					      mop->size, GACC_FETCH, mop->key);
+>=20
+> I'd guess it's personal taste whether you use GACC_FETCH or access_mode=
+=20
+> but if you don't use it here then we can remove the variable all=20
+> together, no?
+
+Yeah, I think I did replace it, but then undid it.
+Probably just because it is a bit more explicit.
+It's used in check_gpa_range, so no, unless you want to dump the expression
+directly in there.
+>=20
+> > +		if (r)
+> > +			goto out_unlock;
+> > +		if (copy_to_user(uaddr, tmpbuf, mop->size))
+> > +			r =3D -EFAULT;
+> > +	} else {
+> > +		if (copy_from_user(tmpbuf, uaddr, mop->size)) {
+> > +			r =3D -EFAULT;
+> > +			goto out_unlock;
+> >   		}
+> > -		break;
+> > -	}
+> > +		r =3D access_guest_abs_with_key(kvm, mop->gaddr, tmpbuf,
+> > +					      mop->size, GACC_STORE, mop->key);
+> >   	}
+> >  =20
+> >   out_unlock:
+>=20
 
