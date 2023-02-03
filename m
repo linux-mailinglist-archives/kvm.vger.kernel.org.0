@@ -2,169 +2,107 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 8625C68A4EB
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 22:50:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 3767B68A5D5
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 23:11:56 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233828AbjBCVup (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 16:50:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48244 "EHLO
+        id S233106AbjBCWLx (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 17:11:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231593AbjBCVun (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 16:50:43 -0500
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C311A976;
-        Fri,  3 Feb 2023 13:50:42 -0800 (PST)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 313Ln85P005631;
-        Fri, 3 Feb 2023 21:50:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=FBB8Cn7y9DuJ6A81j72Fv4lk9fW6BPvwNv7dAe4ZXSo=;
- b=HpRfWI5u5oEcQWJnQ9mA/kC4EDkGrB/68Qnvol74sV57N2fn9AlX+lFCqJ4XpYQD30mn
- YmwJjsWoRsHgkrOGqyt+0LE7ksHHfe6FE0I6Qxl3zZFgEzMhscixCsuVzQMCuYc3bRJH
- SDIyiAcJHJmSpnmkvCqpuaN3f8Hom+XoqP/JGPHR4Q4R/ttLmh8kTPfKC7kHl0XDPgc/
- FOW8ojspELat74sw97BWFk/2XYTVLmrttH1MXCsxDTikyxieOD4M2pcZeu7IgBZnbj2F
- BtLd3CZLC/o/IhLTvzI1VVBijSBdh/GWzwh7JcHrV3852fMT5zdjBfty0vsdRBk1WmrJ eQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nhah4r102-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 21:50:36 +0000
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 313LoMDp011813;
-        Fri, 3 Feb 2023 21:50:36 GMT
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.11])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3nhah4r0yp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 21:50:36 +0000
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
-        by ppma03dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 313KAB2H025419;
-        Fri, 3 Feb 2023 21:50:35 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
-        by ppma03dal.us.ibm.com (PPS) with ESMTPS id 3ncvtsbjr2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 03 Feb 2023 21:50:35 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-        by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 313LoY5A43844128
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 3 Feb 2023 21:50:34 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0CDE658056;
-        Fri,  3 Feb 2023 21:50:34 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3337058052;
-        Fri,  3 Feb 2023 21:50:32 +0000 (GMT)
-Received: from li-2311da4c-2e09-11b2-a85c-c003041e9174.ibm.com.com (unknown [9.65.253.123])
-        by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-        Fri,  3 Feb 2023 21:50:32 +0000 (GMT)
-From:   Matthew Rosato <mjrosato@linux.ibm.com>
-To:     alex.williamson@redhat.com, pbonzini@redhat.com,
-        yi.l.liu@intel.com, jgg@nvidia.com
-Cc:     cohuck@redhat.com, farman@linux.ibm.com, pmorel@linux.ibm.com,
-        borntraeger@linux.ibm.com, frankja@linux.ibm.com,
-        imbrenda@linux.ibm.com, david@redhat.com, akrowiak@linux.ibm.com,
-        jjherne@linux.ibm.com, pasic@linux.ibm.com,
-        zhenyuw@linux.intel.com, zhi.a.wang@intel.com, seanjc@google.com,
-        kevin.tian@intel.com, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, intel-gvt-dev@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v4 2/2] vfio: no need to pass kvm pointer during device open
-Date:   Fri,  3 Feb 2023 16:50:27 -0500
-Message-Id: <20230203215027.151988-3-mjrosato@linux.ibm.com>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20230203215027.151988-1-mjrosato@linux.ibm.com>
-References: <20230203215027.151988-1-mjrosato@linux.ibm.com>
+        with ESMTP id S232999AbjBCWLj (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 17:11:39 -0500
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8526BB3DF5
+        for <kvm@vger.kernel.org>; Fri,  3 Feb 2023 14:09:38 -0800 (PST)
+Received: by mail-yb1-xb30.google.com with SMTP id d132so7994921ybb.5
+        for <kvm@vger.kernel.org>; Fri, 03 Feb 2023 14:09:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=w6DST1msg//zK6dqyeoLsLRtE2+Zc6NidDMAyM3y9l4=;
+        b=b7STVl52IVA9hkjASfhfcXCUlfa/SPSFSi9vp21EkIFJnD/dktb8krAwZczgf2oE59
+         Q4aGScOqwoNq6T99frVjRBWEhngy424X7jQ3nPPQFP/A3ri8C1D6xX06CY0Y5gBilCWT
+         UPLbJtWci1TypWVcHBmh+AzKTuORzwWhNt8OqYmPYsQ7/GTXEs4xeDdr2QfQWGZjh1zn
+         vp/syqO1Wq//OeM+JpwWxOef/mMWrzMDGNxK4zmYEsUdF7+HBlIFNxkCW/LHwkefJXOW
+         0k+hJtMN0uzn6/aN/ymW5mOONqS842ZhaZCCrQ3XVbc2oUlC/F4khqT4i3Fgz1WO+0ug
+         N/cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w6DST1msg//zK6dqyeoLsLRtE2+Zc6NidDMAyM3y9l4=;
+        b=S2Q8QqAOqlmnzVU+nUAEuStlI5BQPOcfXlYwyFbj+WLUQCOy02M3Z5UXF+ZlQYMV+N
+         pqZs2Z3tfYgM0PyC/+WR5WX3LLSlKL3DVke67of8MlJB7d5atUxl+JJ46Wq9f3BgeoSH
+         xOxjf4KFFdpATmeYPUds4EQ3Oc2aYDtRYYgO+/QtPYZVBCxGaBl7lbJfvU1qpS+wSj2u
+         FVKohmEir39E+2z49pors2xPHaCKyeDw0gL29Fg1x1bsk+5zBxwqrbct1TJU7ybAYRbJ
+         SeAXYT9z5I5umeikgLK0CvQjHinruKyq5mG5MX+loLG8T9noWaKWuDqTrAan1rm/RgSQ
+         Y61g==
+X-Gm-Message-State: AO0yUKWooGnuSLvMeGT6j/poNojWv2wVozMg1Z1e9ygUq7bKCkSNor98
+        vIxjj17txp5d53efS7zro3CpGSv18ydViWUpjUv07g==
+X-Google-Smtp-Source: AK7set/dYbftPq3C5etClfX4WoO8g9dNllRTOgBQiziRssFh3DeIdQGLyRovOAPyjbGGuqBDH3ZJ05/Jr8WM2IjR0fA=
+X-Received: by 2002:a25:dd04:0:b0:80b:69f5:3966 with SMTP id
+ u4-20020a25dd04000000b0080b69f53966mr1312029ybg.519.1675462142547; Fri, 03
+ Feb 2023 14:09:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: CpOA_XrigkE-sXNCkcn5Q5Ubbwsh3eQy
-X-Proofpoint-GUID: Tx3h4YY7YrqjINEvIMVPstC5jZjJvS4Y
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.219,Aquarius:18.0.930,Hydra:6.0.562,FMLib:17.11.122.1
- definitions=2023-02-03_19,2023-02-03_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- clxscore=1015 lowpriorityscore=0 adultscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 priorityscore=1501 impostorscore=0 phishscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2212070000 definitions=main-2302030194
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS
-        autolearn=ham autolearn_force=no version=3.4.6
+References: <20221212183720.4062037-1-vipinsh@google.com> <20221212183720.4062037-13-vipinsh@google.com>
+ <Y9r0q9cuK/ifu+OW@google.com> <CAHVum0fEmEAQSxozb1BTTy-d3UGrsvhjt8V5FXQPrX5wOYqpPQ@mail.gmail.com>
+ <Y9wGQx89zI3TMU1Y@google.com> <CAHVum0dFG6gFTQ=JzMkX5Yw-BO7jtUEQyVww6TpN9wk_hQMpqw@mail.gmail.com>
+In-Reply-To: <CAHVum0dFG6gFTQ=JzMkX5Yw-BO7jtUEQyVww6TpN9wk_hQMpqw@mail.gmail.com>
+From:   Vipin Sharma <vipinsh@google.com>
+Date:   Fri, 3 Feb 2023 14:08:26 -0800
+Message-ID: <CAHVum0cDxK=wmd+UB9meZVm5h3tcGdkDJL=fK_jx19NhfikBSg@mail.gmail.com>
+Subject: Re: [Patch v4 12/13] KVM: selftests: Make vCPU exit reason test
+ assertion common.
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     pbonzini@redhat.com, vkuznets@redhat.com, dmatlack@google.com,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        m Suzuki K Poulose <suzuki.poulose@arm.com>,
+        Oliver Upton <oliver.upton@linux.dev>,
+        Zenghui Yu <yuzenghui@huawei.com>,
+        Anup Patel <anup@brainfault.org>,
+        Atish Patra <atishp@atishpatra.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+        ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+        USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL autolearn=ham
+        autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-Nothing uses this value during vfio_device_open anymore so it's safe
-to remove it.
-
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
----
- drivers/vfio/group.c     | 2 +-
- drivers/vfio/vfio.h      | 3 +--
- drivers/vfio/vfio_main.c | 7 +++----
- 3 files changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
-index 98621ac082f0..0e9036e2b9c4 100644
---- a/drivers/vfio/group.c
-+++ b/drivers/vfio/group.c
-@@ -187,7 +187,7 @@ static int vfio_device_group_open(struct vfio_device *device)
- 	if (device->open_count == 0)
- 		vfio_device_group_get_kvm_safe(device);
- 
--	ret = vfio_device_open(device, device->group->iommufd, device->kvm);
-+	ret = vfio_device_open(device, device->group->iommufd);
- 
- 	if (device->open_count == 0)
- 		vfio_device_put_kvm(device);
-diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
-index 24d6cd285945..4f39ab549a80 100644
---- a/drivers/vfio/vfio.h
-+++ b/drivers/vfio/vfio.h
-@@ -18,8 +18,7 @@ struct vfio_container;
- 
- void vfio_device_put_registration(struct vfio_device *device);
- bool vfio_device_try_get_registration(struct vfio_device *device);
--int vfio_device_open(struct vfio_device *device,
--		     struct iommufd_ctx *iommufd, struct kvm *kvm);
-+int vfio_device_open(struct vfio_device *device, struct iommufd_ctx *iommufd);
- void vfio_device_close(struct vfio_device *device,
- 		       struct iommufd_ctx *iommufd);
- 
-diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-index 28c47cd6a6b5..3a597e799918 100644
---- a/drivers/vfio/vfio_main.c
-+++ b/drivers/vfio/vfio_main.c
-@@ -397,7 +397,7 @@ static bool vfio_assert_device_open(struct vfio_device *device)
- }
- 
- static int vfio_device_first_open(struct vfio_device *device,
--				  struct iommufd_ctx *iommufd, struct kvm *kvm)
-+				  struct iommufd_ctx *iommufd)
- {
- 	int ret;
- 
-@@ -444,8 +444,7 @@ static void vfio_device_last_close(struct vfio_device *device,
- 	module_put(device->dev->driver->owner);
- }
- 
--int vfio_device_open(struct vfio_device *device,
--		     struct iommufd_ctx *iommufd, struct kvm *kvm)
-+int vfio_device_open(struct vfio_device *device, struct iommufd_ctx *iommufd)
- {
- 	int ret = 0;
- 
-@@ -453,7 +452,7 @@ int vfio_device_open(struct vfio_device *device,
- 
- 	device->open_count++;
- 	if (device->open_count == 1) {
--		ret = vfio_device_first_open(device, iommufd, kvm);
-+		ret = vfio_device_first_open(device, iommufd);
- 		if (ret)
- 			device->open_count--;
- 	}
--- 
-2.39.1
-
+On Thu, Feb 2, 2023 at 10:59 AM Vipin Sharma <vipinsh@google.com> wrote:
+>
+> On Thu, Feb 2, 2023 at 10:51 AM Sean Christopherson <seanjc@google.com> wrote:
+> >
+> > On Thu, Feb 02, 2023, Vipin Sharma wrote:
+> > > On Wed, Feb 1, 2023 at 3:24 PM Sean Christopherson <seanjc@google.com> wrote:
+> > > > I love the cleanup, but in the future, please don't squeeze KVM-wide changes in
+> > > > the middle of an otherwise arch-specific series unless it's absolutely necessary.
+> > > > I get why you added the macro before copy-pasting more code into a new test, but
+> > > > the unfortunate side effect is that complicates grabbing the entire series.
+> > > >
+> > >
+> > > Make sense. So what is preferable:
+> > > 1. Make the big cleanup identified during a series as the last patches
+> > > in that series?
+> > > 2. Have two series and big cleanups rebased on top of the initial series?
+> > >
+> > > Or, both 1 & 2 are acceptable depending on the cleanup?
+> >
+> >   3. Post the cleanup independently, but make a note so that maintainers know
+> >      that there may be conflicts and/or missed cleanup opportunities.
+> >
+Small question:
+Will it be fine if I use the current kvm/queue head or do you prefer
+if I take one of your kvm-x86/linux branches?
