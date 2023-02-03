@@ -2,105 +2,72 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3554D688F35
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 06:58:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 69027688F3B
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 06:59:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232098AbjBCF6g (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 00:58:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46830 "EHLO
+        id S232119AbjBCF7z (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 00:59:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230233AbjBCF6e (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 00:58:34 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E20036FD08;
-        Thu,  2 Feb 2023 21:58:33 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id z1so4247910plg.6;
-        Thu, 02 Feb 2023 21:58:33 -0800 (PST)
+        with ESMTP id S230233AbjBCF7y (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 00:59:54 -0500
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A0F36FD2F;
+        Thu,  2 Feb 2023 21:59:53 -0800 (PST)
+Received: by mail-pf1-x432.google.com with SMTP id n2so2841571pfo.3;
+        Thu, 02 Feb 2023 21:59:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+AsWB2oc0/sOofgx7ES2UpPnarL2Q9v7WCxcvNNPysY=;
-        b=JV3lVC11SOYxhQ8MfBmHeONQJVoFC/Kz/hzkAWDJuFlj3bFDHkLYR8FzvxqHlVHj7U
-         d5WT5+bPDNrOZMPLvUY/RVtcJYRAiRkTeADgFNb1P0BKavdGxbeV5NPSn9btQyOldq1w
-         kE9MA2CwS0+l5lKeypsvzdZ7mYrkrKMyK3ehJRyN+KqXH9u/zT9lajC1/v/Sahu4no/X
-         9ZNdhmWbiuwqXqAPh6DHbFgTjtqXJDgUBVF33D1WN9UudbeoB16f9t4P2AtO5totj8R6
-         +622ytIiE+9r7ncXEcIn8gDpt9r+CH256B4J+kUWrpc/4VkhH2DgUQFYCQlUkdr7dMFI
-         cIgA==
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=X/vaU3Sg2F/eUBMFHqD3MA69l323THpXmYdZXpW+Tyk=;
+        b=m8n5hoXlyHjMqOXX1qgb5q983jJP18mBmPdP6gB7cWEJMS3br2zlc2DR8+yTwyg7qK
+         uRpGqXxg7HBCtxQwtCgBjKVA2jHzrEnc6NBoEYHNVyPlyn3+CUCES+Lz3j5jtGynKZAS
+         D10Ex57b7zwlH3uj5JoBTxE4FH/j9yEoXw3WjH3YgR7HdyMNAtILXv5BMKI+tp51HP6N
+         vhY0VAisUD4urEmLws5WDnXB6Y7PRkEWtzgPp1TJd+rZb0y5anPZ4fWKfs+FcIvfNs/G
+         TYbA2R63Ys1QyISsTqquq9rUlnFxrVu/u6MRMip15XpnkM5Bc/7djCAcvktpub0xSjLo
+         r4xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+AsWB2oc0/sOofgx7ES2UpPnarL2Q9v7WCxcvNNPysY=;
-        b=IwN4nn50MeJmkd9yLnZJUNCaZFgFZkne2rpnCkYBz8L7AElD7TcvQWxuIpuYRO42hB
-         smKQQXxoN5rHMO3Gm4YxF1ZL1FKj2O5kXZqtp6yf8GM+I+QvUur3FFF3/53g7Qdsw/M8
-         enmBCPEjZlpIzNAwsi90mUyDg51n0+5T+BAUxtJ7xL0Rm3KsCUEHLKvDh0pxr/GvJ/sh
-         6+eK7GNvPGluWtgkvxk/Bc6yvNwqslo4siUzKy5xZig+iGf/xKmw8HuuXUYeN/2UowF1
-         FwkNeaAwERD3LYwReE70OelyHVIQfyok/FVZSBvVQQmiW41pEKvLj23ooywdIdgl85Dt
-         J55g==
-X-Gm-Message-State: AO0yUKVi7aV0NWrBa5Qu9AWat60f/Cpvl/MONBaUDSxc9+an7gVjPH4N
-        W6ivEaK192OhAY/StyWcZOo=
-X-Google-Smtp-Source: AK7set9SMkkiyl6xHOGhtlIl7qYfq9X3sxdVKCFtIQAIUpiv3tKE1yYkqyXCgVB0EsbYa5sP9gLjkA==
-X-Received: by 2002:a17:902:d488:b0:195:f3e0:769a with SMTP id c8-20020a170902d48800b00195f3e0769amr11367976plg.69.1675403913436;
-        Thu, 02 Feb 2023 21:58:33 -0800 (PST)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id h3-20020a170902680300b0019601b73e33sm678577plk.30.2023.02.02.21.58.23
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=X/vaU3Sg2F/eUBMFHqD3MA69l323THpXmYdZXpW+Tyk=;
+        b=NHLesr2itburp431celVe0MqqcvXCqn+ciV7zIxa+eM57l55H/pjIjpgKsQ0kF/CyP
+         mUkEWBvNSHwBMlJuTXj9Nz+oqAMgckivWnGHkKsnYJsfvxEvSB+eFL0CExwJkLbWP8A/
+         zg0ZlGeMkHwzGMELtEkuTpal0pNRRivkPhbRVShFrHevScQt3dxKhO8Mzve4p87cPXV6
+         hZKBCyyE2yw1Rhonsd0GAxWjRuY/9qYKxR3q5upeSLBwjIpH36UMoys76PCAqPFJO59Y
+         BkZsJBTVuJI6JGVdnmUY+KPYlKvYTogqwchazpAZxubSUMN8xV48hdYXy1z5zF2WDfKW
+         rxfQ==
+X-Gm-Message-State: AO0yUKVdBvuNVddcepl3X3aQMa8SS9Ydj86LkZE7wUmJK1/GCyslNqbi
+        1+iLQHtaBiIwbEpQ8SWtVts=
+X-Google-Smtp-Source: AK7set8XA/jh/lRsEGpF/TDEBH461DhyoZ5x5KVCFTY8Mf/8x03MhHFR+Xr1Yxucg2FRE0EOvq3pLQ==
+X-Received: by 2002:a05:6a00:26f2:b0:593:c7d4:22b0 with SMTP id p50-20020a056a0026f200b00593c7d422b0mr6907787pfw.2.1675403992420;
+        Thu, 02 Feb 2023 21:59:52 -0800 (PST)
+Received: from [192.168.255.10] ([103.7.29.32])
+        by smtp.gmail.com with ESMTPSA id a33-20020a056a001d2100b005941ff79428sm733317pfx.90.2023.02.02.21.59.48
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 21:58:32 -0800 (PST)
-Message-ID: <855e4043-d337-722e-77a0-5c2be246d2b5@gmail.com>
-Date:   Fri, 3 Feb 2023 13:58:21 +0800
+        Thu, 02 Feb 2023 21:59:51 -0800 (PST)
+Message-ID: <79bab707-6592-0c45-d21f-c3014362bb82@gmail.com>
+Date:   Fri, 3 Feb 2023 13:59:40 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [RFC PATCH V3 08/16] x86/hyperv: Initialize cpu and memory for
- sev-snp enlightened guest
-To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
-        "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "sandipan.das@amd.com" <sandipan.das@amd.com>,
-        "ray.huang@amd.com" <ray.huang@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "sterritt@google.com" <sterritt@google.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "samitolvanen@google.com" <samitolvanen@google.com>,
-        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
-References: <20230122024607.788454-1-ltykernel@gmail.com>
- <20230122024607.788454-9-ltykernel@gmail.com>
- <BYAPR21MB168803F19A65E356758A6046D7D09@BYAPR21MB1688.namprd21.prod.outlook.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <BYAPR21MB168803F19A65E356758A6046D7D09@BYAPR21MB1688.namprd21.prod.outlook.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.6.1
+Subject: Re: [PATCH] KVM: x86/pmu: Disallow legacy LBRs if architectural LBRs
+ are available
+Content-Language: en-US
+To:     Sean Christopherson <seanjc@google.com>
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Yang Weijiang <weijiang.yang@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>
+References: <20230128001427.2548858-1-seanjc@google.com>
+ <f106a06e-ae6f-2c79-df87-721817aacc02@gmail.com>
+ <Y9wK/LkBYusOv1DO@google.com>
+From:   Like Xu <like.xu.linux@gmail.com>
+In-Reply-To: <Y9wK/LkBYusOv1DO@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
         DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
         RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
@@ -111,44 +78,76 @@ Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/1/2023 2:20 AM, Michael Kelley (LINUX) wrote:
->> +struct memory_map_entry {
->> +	u64 starting_gpn;
->> +	u64 numpages;
->> +	u16 type;
->> +	u16 flags;
->> +	u32 reserved;
->> +};
-> Am I correct that this structure is defined by Hyper-V?  If so, it seems
-> like it should go in hyperv-tlfs.h, along with the definition of
-> EN_SEV_SNP_PROCESSOR_INFO_ADDR (which is also defined by
-> Hyper-V?)
->
-
-Yes, it's Hyper-V data structure and will move to hyperv-tlfs.h.
-
-
->> +			if (e820_end < ram_end) {
->> +				pr_info("Hyper-V: add e820 entry [mem %#018Lx-%#018Lx]\n", e820_end, ram_end - 1);
->> +				e820__range_add(e820_end, ram_end - e820_end,
->> +						E820_TYPE_RAM);
->> +				for (page = e820_end; page < ram_end; page += PAGE_SIZE)
->> +					pvalidate((unsigned long)__va(page), RMP_PG_SIZE_4K, true);
->> +			}
->> +		}
->> +	}
->> +
-> For SNP vTOM mode, most of the supporting code is placed in
-> arch/x86/hyperv/ivm.c, which is built only if CONFIG_HYPERV
-> is defined.  arch/x86/kernel/cpu/mshyperv.c is built for*any*
-> flavor of guest (i.e., CONFIG_HYPERVISOR_GUEST).  I'm thinking
-> all this code should go as a supporting function in ivm.c, to
-> avoid overloading mshyperv.c.  Take a look at how hv_vtom_init()
-> is handled in my patch set.
+On 3/2/2023 3:11 am, Sean Christopherson wrote:
+> On Tue, Jan 31, 2023, Like Xu wrote:
+>> On 28/1/2023 8:14 am, Sean Christopherson wrote:
+>>> Disallow enabling LBR support if the CPU supports architectural LBRs.
+>>> Traditional LBR support is absent on CPU models that have architectural
+>>> LBRs, and KVM doesn't yet support arch LBRs, i.e. KVM will pass through
+>>> non-existent MSRs if userspace enables LBRs for the guest.
+>>
+>> True, we have call_trace due to MSR_ARCH_LBR_FROM_0 (0x1500) for example.
+>>
+>>>
+>>> Cc: stable@vger.kernel.org
+>>> Cc: Yang Weijiang <weijiang.yang@intel.com>
+>>> Cc: Like Xu <like.xu.linux@gmail.com>
+>>
+>> Tested-by: Like Xu <likexu@tencent.com>
+>>
+>>> Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> Fixes: 145dfad998ea ("KVM: VMX: Advertise PMU LBRs if and only if perf
+>> supports LBRs")
 > 
-> Breaking it out as a separate supporting function might also
-> help reduce the deep indentation problem a bit. 😄
-
-Good idea. Will update in the next version.
-Thanks for your suggestion.
+> If we want a fixes, I'd argue this is more appropriate:
 > 
+>    Fixes: be635e34c284 ("KVM: vmx/pmu: Expose LBR_FMT in the MSR_IA32_PERF_CAPABILITIES")
+> 
+> Though I'd prefer not to blame KVM, there's not much we could have done in KVM
+> to know that Intel would effectively break backwards compatibility.
+
+Personally, I assume the bigger role of the Fix tag is to help the stable tree's
+bots make it easier to back port patches automatically, and there will be less
+sense of blame for the developers. In pmu scope, if a feature is not "architecture",
+I'm not surprised that a new arrival will break compatibility, and sometimes
+kernel developers need to plan ahead.
+
+> 
+>>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>>> ---
+>>>
+>>> Am I missing something that would prevent this scenario?
+>>>
+>>>    arch/x86/kvm/vmx/vmx.c | 8 +++++---
+>>>    1 file changed, 5 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>>> index 8f0f67c75f35..77ee6b4a5ec4 100644
+>>> --- a/arch/x86/kvm/vmx/vmx.c
+>>> +++ b/arch/x86/kvm/vmx/vmx.c
+>>> @@ -7761,9 +7761,11 @@ static u64 vmx_get_perf_capabilities(void)
+>>>    	if (boot_cpu_has(X86_FEATURE_PDCM))
+>>>    		rdmsrl(MSR_IA32_PERF_CAPABILITIES, host_perf_cap);
+>>> -	x86_perf_get_lbr(&lbr);
+>>> -	if (lbr.nr)
+>>> -		perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
+>>> +	if (!cpu_feature_enabled(X86_FEATURE_ARCH_LBR)) {
+>>
+>> To avoid changing this again in the Arch lbr enabling part, how about:
+>>
+>> 	x86_perf_get_lbr(&lbr);
+>> 	if (lbr.nr && cpu_feature_enabled(X86_FEATURE_ARCH_LBR) ==
+>> 	    kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR))
+>> 		perf_cap |= host_perf_cap & PMU_CAP_LBR_FMT;
+>>
+>> ?
+> 
+> I'd rather force arch LBR enabling to explicitly update this code.  And I'd prefer
+> that KVM explicitly clear PMU_CAP_LBR_FMT when KVM can't use arch LBRs for whatever
+> reason, both for documentation purposes and to avoid ordering dependencies between
+> consuming vmx_get_perf_capabilities() and updating kvm_cpu_cap_has(X86_FEATURE_ARCH_LBR).
+
+Indeed, we have too many assumptions about the order of function calls in the 
+kernel world.
+"Avoid ordering dependencies" looks good to me. Thanks.
