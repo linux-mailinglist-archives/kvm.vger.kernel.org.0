@@ -2,127 +2,164 @@ Return-Path: <kvm-owner@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 2B90B688F86
-	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 07:11:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTP id 9A8A0688FE5
+	for <lists+kvm@lfdr.de>; Fri,  3 Feb 2023 07:55:57 +0100 (CET)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbjBCGLl (ORCPT <rfc822;lists+kvm@lfdr.de>);
-        Fri, 3 Feb 2023 01:11:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54218 "EHLO
+        id S232049AbjBCGzv (ORCPT <rfc822;lists+kvm@lfdr.de>);
+        Fri, 3 Feb 2023 01:55:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230384AbjBCGLh (ORCPT <rfc822;kvm@vger.kernel.org>);
-        Fri, 3 Feb 2023 01:11:37 -0500
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF1373765;
-        Thu,  2 Feb 2023 22:10:59 -0800 (PST)
-Received: by mail-pj1-x102d.google.com with SMTP id pj3so4091080pjb.1;
-        Thu, 02 Feb 2023 22:10:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PasdPm0ruMjHHc/jYxUTTUFHsqQQeYT3E3v9depPqSY=;
-        b=DeACYSWRHZY/AFaLkDELrVwTfnkYEIXW9gUX9VEH2WyEQpuQjadz5JmoUE2PKOgQby
-         rlcp5jKrLmiq2EwWgKMrIQdd/2+1mmlAo4X98HU1rb+rpCKNquYMgy2HDoZFdykEBPt7
-         fn/CfPmz4VmYV0fCs/NTKKmpCSaFCKLDxYcJF7vKaYnyn56rwDTsnBS0FoFwPOcyzbtk
-         56/9aEfBEaFWhbqaiFLxmkxl2Ze1w3Cay59mhWgZKE5WxD+PhdS0lvHzIYIcRs4Pao5F
-         jns68q2f/hCo9uvkJPxpsCO83Dx+YjBEtFs1qH8kua8cZHMbxDdG7Ty96+3TKR8OB92C
-         E54Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=PasdPm0ruMjHHc/jYxUTTUFHsqQQeYT3E3v9depPqSY=;
-        b=zqYBLm4cZlmuTQ3xpo/s7e0+nFZmZ3xLYY2+PzioLeZ9eOpxZ/zGAaWuZagIHgG9xM
-         +MTfwAIiCmQ92yZ+h5+JYYIOL+Bj4sFYRSt5q6orqj0ei0ljzMYyECm/o6oY4d5Lyvma
-         2ri5Ei2f2YzYfkVSbKcR1fiMBeF7/6LVSAOx3aELFHjDulGCM+plZ2a7VfZGG9saRYeD
-         OByLem9GlXLS391Z+phyLDpceYeU96AUEOgP3tOzXnUAVKpnLE9F1Eni588imiKNMYNk
-         8OHNZeyk14J2OHSnMHutLDdddS0PtHZ/4icZSjzAHMJD0UghTY4XVuLqgPiPkrwnHYOV
-         jzlQ==
-X-Gm-Message-State: AO0yUKWySuxa7ZvCoFcRz9DkzrbgeUAW6xaXiJxoV0SgHk7Rycyrn53X
-        dTsTWydcd+IvdepMBVqq7QA=
-X-Google-Smtp-Source: AK7set/e9dLgRCkJF7IYel+eMA6xqP6bK7pJPkdXSX/O1LRdAarjnBvhvfKDUL+QUH7nAEU+GrG2tQ==
-X-Received: by 2002:a17:90b:3b90:b0:22c:1986:553b with SMTP id pc16-20020a17090b3b9000b0022c1986553bmr9606862pjb.38.1675404657549;
-        Thu, 02 Feb 2023 22:10:57 -0800 (PST)
-Received: from ?IPV6:2404:f801:0:5:8000::75b? ([2404:f801:9000:1a:efea::75b])
-        by smtp.gmail.com with ESMTPSA id m12-20020a63710c000000b004cd2eebc551sm743098pgc.62.2023.02.02.22.10.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Feb 2023 22:10:57 -0800 (PST)
-Message-ID: <a0a39ba2-0bea-59c2-b426-6e7957520234@gmail.com>
-Date:   Fri, 3 Feb 2023 14:10:45 +0800
+        with ESMTP id S231478AbjBCGzu (ORCPT <rfc822;kvm@vger.kernel.org>);
+        Fri, 3 Feb 2023 01:55:50 -0500
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FBF393D2;
+        Thu,  2 Feb 2023 22:55:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1675407349; x=1706943349;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ALVoZ5yUnWWYryD5/A24qUpsX/RD4sVgHT984aayrnk=;
+  b=IH0V3NBVjusge6INAoAtpRfC62dMAB7X8QpJSZVMDw17qdIx2t8smNOX
+   qc3qHj4KERCnW6OGDO7eayLuFfQYorrI4SSZYdW1vN96IHfVeuS/5tfxb
+   +y2Z6Q+WA0WbRrz9Dk5rMbm++C7Xjpdy3gPI7UNq2NLIwXvumxPSEEyXy
+   kBzAQ+sGHuVFpBLFdrmJNW47mpGcOAHMu5uVRg3H8sZl1FR6fEtPQxDhs
+   RxPJosZy2gkk+Q3qH5CXlB8W3AHnQoUeKvQLGKQN8B9yMh4w6XdEuultf
+   1eoaU0I6KMNzdKLquryaj6cvr2IiksDD3zAyBbk3CfTmBakwtwCmx4fk7
+   A==;
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="327318644"
+X-IronPort-AV: E=Sophos;i="5.97,269,1669104000"; 
+   d="scan'208";a="327318644"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2023 22:55:49 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6500,9779,10609"; a="659006910"
+X-IronPort-AV: E=Sophos;i="5.97,269,1669104000"; 
+   d="scan'208";a="659006910"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orsmga007.jf.intel.com with ESMTP; 02 Feb 2023 22:55:46 -0800
+Date:   Fri, 3 Feb 2023 14:55:45 +0800
+From:   Yuan Yao <yuan.yao@linux.intel.com>
+To:     isaku.yamahata@intel.com
+Cc:     kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+        isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+        erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+        Sagi Shahar <sagis@google.com>,
+        David Matlack <dmatlack@google.com>
+Subject: Re: [PATCH v11 058/113] KVM: TDX: MTRR: implement get_mt_mask() for
+ TDX
+Message-ID: <20230203065545.piywnc3jnxqotehv@yy-desk-7060>
+References: <cover.1673539699.git.isaku.yamahata@intel.com>
+ <21e0d94ccf2fd3d766d6aa7b45441791c04e5e4f.1673539699.git.isaku.yamahata@intel.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [RFC PATCH V3 10/16] x86/hyperv: Add smp support for sev-snp
- guest
-To:     "Michael Kelley (LINUX)" <mikelley@microsoft.com>,
-        "luto@kernel.org" <luto@kernel.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>,
-        "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
-        "x86@kernel.org" <x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>,
-        "seanjc@google.com" <seanjc@google.com>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "jgross@suse.com" <jgross@suse.com>,
-        Tianyu Lan <Tianyu.Lan@microsoft.com>,
-        "kirill@shutemov.name" <kirill@shutemov.name>,
-        "jiangshan.ljs@antgroup.com" <jiangshan.ljs@antgroup.com>,
-        "peterz@infradead.org" <peterz@infradead.org>,
-        "ashish.kalra@amd.com" <ashish.kalra@amd.com>,
-        "srutherford@google.com" <srutherford@google.com>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "anshuman.khandual@arm.com" <anshuman.khandual@arm.com>,
-        "pawan.kumar.gupta@linux.intel.com" 
-        <pawan.kumar.gupta@linux.intel.com>,
-        "adrian.hunter@intel.com" <adrian.hunter@intel.com>,
-        "daniel.sneddon@linux.intel.com" <daniel.sneddon@linux.intel.com>,
-        "alexander.shishkin@linux.intel.com" 
-        <alexander.shishkin@linux.intel.com>,
-        "sandipan.das@amd.com" <sandipan.das@amd.com>,
-        "ray.huang@amd.com" <ray.huang@amd.com>,
-        "brijesh.singh@amd.com" <brijesh.singh@amd.com>,
-        "michael.roth@amd.com" <michael.roth@amd.com>,
-        "thomas.lendacky@amd.com" <thomas.lendacky@amd.com>,
-        "venu.busireddy@oracle.com" <venu.busireddy@oracle.com>,
-        "sterritt@google.com" <sterritt@google.com>,
-        "tony.luck@intel.com" <tony.luck@intel.com>,
-        "samitolvanen@google.com" <samitolvanen@google.com>,
-        "fenghua.yu@intel.com" <fenghua.yu@intel.com>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>
-References: <20230122024607.788454-1-ltykernel@gmail.com>
- <20230122024607.788454-11-ltykernel@gmail.com>
- <BYAPR21MB16886B496845962DFBFB112DD7D09@BYAPR21MB1688.namprd21.prod.outlook.com>
-From:   Tianyu Lan <ltykernel@gmail.com>
-In-Reply-To: <BYAPR21MB16886B496845962DFBFB112DD7D09@BYAPR21MB1688.namprd21.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-        DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-        RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS autolearn=ham
-        autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <21e0d94ccf2fd3d766d6aa7b45441791c04e5e4f.1673539699.git.isaku.yamahata@intel.com>
+User-Agent: NeoMutt/20171215
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+        DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+        SPF_NONE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
         lindbergh.monkeyblade.net
 Precedence: bulk
 List-ID: <kvm.vger.kernel.org>
 X-Mailing-List: kvm@vger.kernel.org
 
-On 2/1/2023 2:34 AM, Michael Kelley (LINUX) wrote:
->> +		pr_err("HvCallStartVirtualProcessor failed: %llx\n", ret);
->> +		goto done;
->> +	}
->> +
->> +done:
->> +	local_irq_restore(flags);
->> +	return ret;
->> +}
->> +
-> Like a comment in an earlier patch, I'm wondering if the bulk of
-> this code could move to ivm.c, to avoid overloading mshyperv.c.
+On Thu, Jan 12, 2023 at 08:32:06AM -0800, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> Although TDX supports only WB for private GPA, MTRR/PAT for shared GPA
+> should be supported. Implement get_mt_mask() following vmx case.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> ---
+>  arch/x86/kvm/vmx/main.c    | 10 +++++++++-
+>  arch/x86/kvm/vmx/tdx.c     | 19 +++++++++++++++++++
+>  arch/x86/kvm/vmx/x86_ops.h |  2 ++
+>  3 files changed, 30 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> index 770d1b29d1c3..4319f6d7a4da 100644
+> --- a/arch/x86/kvm/vmx/main.c
+> +++ b/arch/x86/kvm/vmx/main.c
+> @@ -158,6 +158,14 @@ static void vt_load_mmu_pgd(struct kvm_vcpu *vcpu, hpa_t root_hpa,
+>  	vmx_load_mmu_pgd(vcpu, root_hpa, pgd_level);
+>  }
+>
+> +static u8 vt_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+> +{
+> +	if (is_td_vcpu(vcpu))
+> +		return tdx_get_mt_mask(vcpu, gfn, is_mmio);
+> +
+> +	return vmx_get_mt_mask(vcpu, gfn, is_mmio);
+> +}
+> +
+>  static int vt_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>  	if (!is_td(kvm))
+> @@ -267,7 +275,7 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
+>
+>  	.set_tss_addr = vmx_set_tss_addr,
+>  	.set_identity_map_addr = vmx_set_identity_map_addr,
+> -	.get_mt_mask = vmx_get_mt_mask,
+> +	.get_mt_mask = vt_get_mt_mask,
+>
+>  	.get_exit_info = vmx_get_exit_info,
+>
+> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+> index e68816999387..c4c5a8f786c1 100644
+> --- a/arch/x86/kvm/vmx/tdx.c
+> +++ b/arch/x86/kvm/vmx/tdx.c
+> @@ -309,6 +309,25 @@ int tdx_vm_init(struct kvm *kvm)
+>  	return 0;
+>  }
+>
+> +u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio)
+> +{
+> +	/* TDX private GPA is always WB. */
+> +	if (gfn & kvm_gfn_shared_mask(vcpu->kvm)) {
+> +		WARN_ON_ONCE(is_mmio);
+> +		return  MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT;
+> +	}
 
-Sure. Will update in the next version.
-> 
+This looks not clear enough, the comment says things about private GPA
+but the code returns WB for shared GPA, please align them.
+
+> +
+> +	if (is_mmio)
+> +		return MTRR_TYPE_UNCACHABLE << VMX_EPT_MT_EPTE_SHIFT;
+> +
+> +	/*
+> +	 * Device assignemnt without VT-d snooping capability with shared-GPA
+> +	 * is dubious.
+> +	 */
+> +	WARN_ON_ONCE(kvm_arch_has_noncoherent_dma(vcpu->kvm));
+> +	return (MTRR_TYPE_WRBACK << VMX_EPT_MT_EPTE_SHIFT) | VMX_EPT_IPAT_BIT;
+> +}
+> +
+>  int tdx_vcpu_create(struct kvm_vcpu *vcpu)
+>  {
+>  	struct kvm_cpuid_entry2 *e;
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index 8ae689929347..d903e0f606d3 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -154,6 +154,7 @@ void tdx_vm_free(struct kvm *kvm);
+>  int tdx_vcpu_create(struct kvm_vcpu *vcpu);
+>  void tdx_vcpu_free(struct kvm_vcpu *vcpu);
+>  void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event);
+> +u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio);
+>
+>  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+>  int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp);
+> @@ -176,6 +177,7 @@ static inline void tdx_vm_free(struct kvm *kvm) {}
+>  static inline int tdx_vcpu_create(struct kvm_vcpu *vcpu) { return -EOPNOTSUPP; }
+>  static inline void tdx_vcpu_free(struct kvm_vcpu *vcpu) {}
+>  static inline void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event) {}
+> +static inline u8 tdx_get_mt_mask(struct kvm_vcpu *vcpu, gfn_t gfn, bool is_mmio) { return 0; }
+>
+>  static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+>  static inline int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp) { return -EOPNOTSUPP; }
+> --
+> 2.25.1
+>
